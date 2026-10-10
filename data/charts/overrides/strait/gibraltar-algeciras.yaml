@@ -1,0 +1,58 @@
+# The Bay of Gibraltar: the water before Algeciras and about the Green Island as Tofiño
+# surveyed it in 1786, where the modern port of Algeciras has since been built out over
+# the isle and its chains of rock (spec M6 §26, block 6; package 39f). EMODnet's grid has
+# the port's fill as land (no value, GEBCO's fill under it, the shore's sweep's "88 cells
+# about 36.12 N, 5.43 W"): in 1805 the isle stood a quarter of a mile off the town with
+# one to four brazas inside it and three to nine outside.
+#
+# The sheet: Tofiño's 'Plano geométrico de la Bahía de Algeciras y Gibraltar' (Atlas
+# Marítimo de España, 1789; surveyed 1786), David Rumsey 13360.037, read at full
+# resolution (10,379 by 17,270 pixels) through the collection's IIIF server, the crops
+# cached outside the repository (CC BY-NC-SA 3.0), none committed. North up. Its legend:
+# "Los Nos de la Sonda son Brazas de á dos Varas Castellanas"; A arena, C conchuela, CC
+# cascajo, AP arena y piedra, LP lama y piedra, L lama, P piedra, CP conchuela y piedra,
+# LS lama suelta. His Derrotero (Tofiño 1787, p. 19) says how the soundings were taken
+# (each cast fixed by two theodolites ashore) and that the depths under the guns of
+# Gibraltar are from an English plan of 1781 engraved by Faden; it states no datum.
+#
+# The georeference: a similarity in least squares on three control points, the scale
+# 1.53 m a pixel and the sheet turned 1.6 degrees: the Torre del Carnero (F) on the
+# encyclopaedia's position of the Faro de Punta Carnero (residual 120 m), the tip of
+# Europa on the tiles' (76 m), and the mouth of the Rio de la Miel (P) on the town's
+# front against the foot of the natural slope in the tiles at that latitude, where the
+# port's fill begins (108 m). Checked against the tower of San García (250 m from the
+# feature) and the Devil's Tower (683 m; the tower's modern site is uncertain and the
+# east side of the Rock is the plan's least-sounded edge). The patch lies within half a
+# mile of the third point.
+#
+# The datum: the sheet states none; the soundings are read as low water of springs, the
+# practice of the period's surveys (Mackenzie's, Bellin's). Its height above the chart's
+# datum (the lowest astronomical tide) is JUDGEMENT: TICON's forty constituents at the
+# Algeciras gauge sum to 0.79 m, of which M2 and S2 are 0.44 m, so low water of springs
+# stands at most 0.34 m above the lowest astronomical tide; 0.3 m is taken.
+
+sheet: "Tofiño 1786, 'Plano geométrico de la Bahía de Algeciras y Gibraltar' (Atlas Marítimo de España 1789; Rumsey 13360.037)"
+source: "Tofiño 1786, the plan's soundings about the Isla Verde (N) and the town of Algeciras; Tofiño 1787, 'Isla Verde', 'Muelle de Algeciras', pp. 13 to 14"
+units: brazas
+datum: "low water of springs (the sheet states none; read as the period's surveys took it), JUDGEMENT"
+datum_above_chart_datum_m: 0.3
+control_points:
+  - {name: "Torre y Punta del Carnero (F)", sheet_px: [3142, 12087], lat_deg: 36.0772, lon_deg: -5.4264, residual_m: 120, source: "the encyclopaedia's 'Faro de Punta Carnero' (es, read 2026-10-10)"}
+  - {name: "Punta de Europa, the tip", sheet_px: [7990, 9890], lat_deg: 36.1106, lon_deg: -5.3442, residual_m: 76, source: "the tiles' southernmost land at Europa"}
+  - {name: "the mouth of the Rio de la Miel (P), the town's front", sheet_px: [2283, 8450], lat_deg: 36.1275, lon_deg: -5.4405, residual_m: 108, source: "the foot of the natural slope in the tiles, where the port's flat fill begins"}
+patches:
+  - name: the water east of the Green Island
+    kind: depth
+    depth: 4
+    polygon: [[36.1347, -5.4371], [36.1288, -5.4347], [36.1252, -5.4328], [36.1215, -5.4327], [36.1187, -5.4337], [36.1171, -5.4365], [36.1160, -5.4330], [36.1180, -5.4275], [36.1350, -5.4275]]
+    note: "the sheet's 3 P, 4, 5, 6 1/2, 7 and 9 east and north-east of the isle, 4 brazas the least of them but the 3 on a rock; the modern grid's port fill there and its shoaling water east of it"
+  - name: the water before the town and inside the Green Island
+    kind: sea
+    depth: 2
+    polygon: [[36.1346, -5.4417], [36.1291, -5.4412], [36.1273, -5.4403], [36.1260, -5.4388], [36.1237, -5.4385], [36.1214, -5.4389], [36.1204, -5.4400], [36.1186, -5.4388], [36.1171, -5.4365], [36.1187, -5.4337], [36.1215, -5.4327], [36.1252, -5.4328], [36.1288, -5.4347], [36.1347, -5.4371]]
+    note: "the sheet's 2, 2 1/2, 3 and 4 close before the town and the river of La Miel and between the isle and the Torre de Villa Vieja, the 1 brazas on the chains of rock off the isle left to the isle's own patch; 2 brazas the least of the common soundings"
+  - name: the Green Island
+    kind: land
+    height_m: 10
+    polygon: [[36.1242, -5.4339], [36.1246, -5.4328], [36.1236, -5.4316], [36.1227, -5.4319], [36.1225, -5.4333], [36.1233, -5.4339]]
+    note: "the isle as the sheet draws it (N), of middling height and fortified (Tofiño 1787, p. 13); the height JUDGEMENT"

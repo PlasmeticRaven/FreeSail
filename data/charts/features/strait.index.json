@@ -1,0 +1,127 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"142,-21": [
+"tetuan-road"
+],
+"142,-22": [
+"cape-negro"
+],
+"143,-22": [
+"cires-point",
+"perejil",
+"punta-leona",
+"apes-hill",
+"benzu-cove",
+"torre-blanca",
+"torre-blanca-laja",
+"ceuta",
+"the-acho",
+"almina-light",
+"ceuta-road",
+"santa-catalina-ceuta"
+],
+"143,-23": [
+"cape-malabata",
+"alcazar-point"
+],
+"143,-24": [
+"cape-spartel",
+"spartel-light",
+"fraylecillo",
+"tangier-point",
+"tangier-point-reef",
+"tangier",
+"tangier-road",
+"tangier-shoal"
+],
+"144,-22": [
+"acebuche-point",
+"tolmo-cove",
+"frayle-point",
+"punta-carnero",
+"carnero-light",
+"palomas-algeciras",
+"la-perla",
+"getares-bay",
+"san-garcia-tower",
+"isla-verde",
+"algeciras",
+"la-galera-algeciras",
+"algeciras-road",
+"palmones",
+"punta-mala",
+"punta-mala-reef",
+"fort-san-felipe",
+"fort-santa-barbara",
+"san-roque",
+"carbonera",
+"gibraltar-rock",
+"gibraltar",
+"old-mole",
+"gibraltar-road",
+"new-mole",
+"new-mole-anchorage",
+"europa-point",
+"europa-light",
+"devils-tower",
+"back-of-the-rock"
+],
+"144,-23": [
+"punta-paloma",
+"valdevaqueros",
+"pena-tower",
+"arroyo-del-puerco",
+"cabezos",
+"valdevaqueros-rock",
+"tarifa-island",
+"tarifa-island-tower",
+"tarifa-light",
+"marroquina",
+"santa-catalina-tarifa",
+"tarifa",
+"tarifa-road",
+"camorro-point",
+"guadalmesi-point"
+],
+"144,-24": [
+"meca-heights",
+"barbate-road",
+"barbate-reef",
+"zahara-bay",
+"camarinal-point",
+"camarinal-rocks",
+"cape-plata",
+"bolonia-bay"
+],
+"144,-25": [
+"laja-de-conil",
+"trafalgar-bank",
+"cape-trafalgar",
+"trafalgar-tower",
+"trafalgar-light",
+"aceitera",
+"trafalgar-rocky-flat"
+],
+"145,-25": [
+"sancti-petri-castle",
+"sancti-petri-bar",
+"la-pulpera",
+"la-tinosa",
+"torre-bermeja",
+"barrosa-tower",
+"cabeza-del-puerco",
+"marrajotes",
+"laja-de-cabo-roche",
+"torre-blanca-conil",
+"cape-roche",
+"conil",
+"conil-atalaya",
+"castilobos-tower"
+],
+"145,-26": [
+"juan-vela",
+"laja-de-plaste"
+]
+}
+}

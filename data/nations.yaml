@@ -85,6 +85,28 @@ nations:
     flag: "the Dannebrog"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: false
     closed_to: []
+  # package 39f, the Strait: Morocco, for Tangier and the African shore. The Emperor
+  # Muley Soliman (Mawlay Sulayman, from 1792) at peace with every nation in June 1805:
+  # no war in the table below, so a Moorish port is neutral to all and open to its own.
+  # Each relation with its source or its judgement under `relations:` (a word for the
+  # reader and for M7's world's business; the stance reads the wars and `closed_to`).
+  morocco:
+    name: Morocco
+    adjective: Moorish
+    people: the Moors
+    names: english               # no Moorish names list; the pilots' names are the port file's
+    colours: "plain red, the flag of the Alaouite sultans (the green star is of 1915)"
+    flag: "the plain red"    # the flag's short word, for the lookout (package 36)
+    letters_of_marque: false     # the Emperor's few cruisers at peace with all; judgement (his father had declared peace with all Europe, Lempriere 1800, p. 39, of Sidi Mahomet)
+    closed_to: []
+    relations:
+      britain: "peace; the Emperor apparently prefers the English to any other European power and allows Gibraltar its cattle from Tangier, a grant of Muley Ismael (Purdy 1826, p. 5, quoting Jackson); the fleets water at Tetuan (p. 8)"
+      spain: "peace since Muley Yazid's war of 1790 and 1791 on Ceuta (Lempriere 1800, pp. 318 and 326, the war's beginning); the peace of 1799 FROM MEMORY"
+      france: "peace; JUDGEMENT (the Emperor cut his trade with Europe after the French invasion of Egypt in 1798, the encyclopaedia's 'Slimane of Morocco', read 2026-10-10, but made no war)"
+      united-states: "peace since September 1803, when Preble met the Emperor at Tangier and the treaty of 1786 was confirmed; Morocco had declared war in June 1802 (the encyclopaedia's 'Slimane of Morocco' and 'Moroccan–American Treaty of Friendship', read 2026-10-10)"
+      portugal: "peace; JUDGEMENT"
+      denmark: "peace; JUDGEMENT"
+      batavian-republic: "peace; JUDGEMENT"
 
 # Who is at war with whom in June 1805, each war once, with its beginning and its source.
 wars:
@@ -153,3 +175,10 @@ ports:
   angra: portugal
   ponta-delgada: portugal
   horta: portugal
+  # the Strait (package 39f): Gibraltar the King's, the Spanish shore and Ceuta Spain's,
+  # Tangier the Emperor of Morocco's
+  gibraltar: britain
+  algeciras: spain
+  tarifa: spain
+  ceuta: spain
+  tangier: morocco

@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-10'
 tool: tools/build_charts.py
-build_hash: a19c340132e9d172
+build_hash: 0bffe7686908a63f
 levels:
   '0':
     cell_sec: 150.0
@@ -42,6 +42,7 @@ charts:
     - portugal
     - madeira
     - azores
+    - strait
     corridor: atlantic-corridor
 regions:
   channel-west:
@@ -4964,6 +4965,242 @@ regions:
       rock: 1
       shoal: 2
       town: 11
+  strait:
+    title: The Strait, Cape Trafalgar and Cape Spartel to Gibraltar and Ceuta
+    bounds:
+      south: 35.5
+      north: 36.4
+      west: -6.5
+      east: -5.0
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: 127584_-24384
+        south_sec: 127584
+        west_sec: -24384
+        min_depth_m: 110.8
+        bytes: 257905
+      - name: 127584_-22848
+        south_sec: 127584
+        west_sec: -22848
+        min_depth_m: -2.6
+        bytes: 188565
+      - name: 127584_-21312
+        south_sec: 127584
+        west_sec: -21312
+        min_depth_m: -2.3
+        bytes: 131923
+      - name: 127584_-19776
+        south_sec: 127584
+        west_sec: -19776
+        min_depth_m: -1.9
+        bytes: 201215
+      - name: 127584_-18240
+        south_sec: 127584
+        west_sec: -18240
+        min_depth_m: 49.0
+        bytes: 220517
+      - name: 129120_-24384
+        south_sec: 129120
+        west_sec: -24384
+        min_depth_m: 37.6
+        bytes: 238076
+      - name: 129120_-22848
+        south_sec: 129120
+        west_sec: -22848
+        min_depth_m: -0.0
+        bytes: 217821
+      - name: 129120_-21312
+        south_sec: 129120
+        west_sec: -21312
+        min_depth_m: -2.1
+        bytes: 210938
+      - name: 129120_-19776
+        south_sec: 129120
+        west_sec: -19776
+        min_depth_m: -11.0
+        bytes: 271271
+      - name: 129120_-18240
+        south_sec: 129120
+        west_sec: -18240
+        min_depth_m: 348.8
+        bytes: 202648
+      - name: 130656_-19776
+        south_sec: 130656
+        west_sec: -19776
+        min_depth_m: 0.0
+        bytes: 142080
+      - name: 130656_-18240
+        south_sec: 130656
+        west_sec: -18240
+        min_depth_m: 0.0
+        bytes: 167722
+      '3':
+      - name: 129632_-19776
+        south_sec: 129632
+        west_sec: -19776
+        min_depth_m: -2.3
+        bytes: 111648
+        harbour: gibraltar-algeciras
+      - name: 129632_-19520
+        south_sec: 129632
+        west_sec: -19520
+        min_depth_m: 11.0
+        bytes: 141120
+        harbour: gibraltar-algeciras
+      - name: 129632_-19264
+        south_sec: 129632
+        west_sec: -19264
+        min_depth_m: 473.4
+        bytes: 93851
+        harbour: gibraltar-algeciras
+      - name: 129888_-19776
+        south_sec: 129888
+        west_sec: -19776
+        min_depth_m: -9.6
+        bytes: 75237
+        harbour: gibraltar-algeciras
+      - name: 129888_-19520
+        south_sec: 129888
+        west_sec: -19520
+        min_depth_m: -2.7
+        bytes: 143674
+        harbour: gibraltar-algeciras
+      - name: 129888_-19264
+        south_sec: 129888
+        west_sec: -19264
+        min_depth_m: -12.0
+        bytes: 116716
+        harbour: gibraltar-algeciras
+      - name: 130144_-19776
+        south_sec: 130144
+        west_sec: -19776
+        min_depth_m: -0.4
+        bytes: 57449
+        harbour: gibraltar-algeciras
+      - name: 130144_-19520
+        south_sec: 130144
+        west_sec: -19520
+        min_depth_m: -0.9
+        bytes: 82267
+        harbour: gibraltar-algeciras
+      - name: 130144_-19264
+        south_sec: 130144
+        west_sec: -19264
+        min_depth_m: -5.9
+        bytes: 93098
+        harbour: gibraltar-algeciras
+      - name: 129376_-20288
+        south_sec: 129376
+        west_sec: -20288
+        min_depth_m: -0.3
+        bytes: 121549
+        harbour: tarifa
+      - name: 129632_-20288
+        south_sec: 129632
+        west_sec: -20288
+        min_depth_m: -0.3
+        bytes: 64965
+        harbour: tarifa
+      - name: 129120_-19264
+        south_sec: 129120
+        west_sec: -19264
+        min_depth_m: -4.5
+        bytes: 118006
+        harbour: ceuta
+      - name: 128608_-21056
+        south_sec: 128608
+        west_sec: -21056
+        min_depth_m: -0.5
+        bytes: 59998
+        harbour: tangier
+      - name: 128864_-21056
+        south_sec: 128864
+        west_sec: -21056
+        min_depth_m: -1.2
+        bytes: 85102
+        harbour: tangier
+    coast: coast/strait.geojson
+    features: features/strait.yaml
+    index: features/strait.index.json
+    overrides:
+    - file: overrides/strait/gibraltar-algeciras.yaml
+      sheet: Tofiño 1786, 'Plano geométrico de la Bahía de Algeciras y Gibraltar' (Atlas Marítimo de España
+        1789; Rumsey 13360.037)
+      source: Tofiño 1786, the plan's soundings about the Isla Verde (N) and the town of Algeciras; Tofiño
+        1787, 'Isla Verde', 'Muelle de Algeciras', pp. 13 to 14
+      units: brazas
+      datum: low water of springs (the sheet states none; read as the period's surveys took it), JUDGEMENT
+      datum_above_chart_datum_m: 0.3
+      control_points:
+      - name: Torre y Punta del Carnero (F)
+        sheet_px:
+        - 3142
+        - 12087
+        lat_deg: 36.0772
+        lon_deg: -5.4264
+        residual_m: 120
+        source: the encyclopaedia's 'Faro de Punta Carnero' (es, read 2026-10-10)
+      - name: Punta de Europa, the tip
+        sheet_px:
+        - 7990
+        - 9890
+        lat_deg: 36.1106
+        lon_deg: -5.3442
+        residual_m: 76
+        source: the tiles' southernmost land at Europa
+      - name: the mouth of the Rio de la Miel (P), the town's front
+        sheet_px:
+        - 2283
+        - 8450
+        lat_deg: 36.1275
+        lon_deg: -5.4405
+        residual_m: 108
+        source: the foot of the natural slope in the tiles, where the port's flat fill begins
+      patches: 3
+    harbours:
+      gibraltar-algeciras:
+        south: 36.04
+        north: 36.19
+        west: -5.46
+        east: -5.33
+      tarifa:
+        south: 35.995
+        north: 36.02
+        west: -5.62
+        east: -5.595
+      ceuta:
+        south: 35.88
+        north: 35.91
+        west: -5.33
+        east: -5.28
+      tangier:
+        south: 35.77
+        north: 35.8
+        west: -5.83
+        east: -5.78
+    fill_to_chart_datum: true
+    skip_dry_tiles: true
+    feature_count: 100
+    features_by_kind:
+      anchorage: 15
+      bank: 2
+      castle: 5
+      church: 1
+      drying: 1
+      headland: 20
+      hill: 5
+      island: 5
+      ledge: 10
+      light: 6
+      mark: 2
+      place: 1
+      rock: 9
+      shoal: 1
+      tower: 10
+      town: 7
 corridors:
   atlantic-corridor:
     title: 'The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira'
@@ -5370,6 +5607,12 @@ sources:
       sha256: 69c4dbf90f95a63b4e531d7c0b26fc2191339337e99938491bbeb2b644f2eb9c
       bytes: 193316251
       file: gebco_2025_s31.90_n51.10_w-32.10_e-0.90_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 35.25, ''north'':
+        36.9, ''west'': -6.95, ''east'': -4.45})'
+      retrieved: '2026-10-10'
+      sha256: bf531695c26180c04e2b5a7f6413a4fe6540d407a28b4a6ea6bc69c8cc6f26df
+      bytes: 1447981
+      file: gebco_2025_s35.25_n36.90_w-6.95_e-4.45_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -5454,7 +5697,17 @@ sources:
       sha256: 0741404c95a51f7e3f59dc326b26ab35866107d372f8df0bf6b2c02faa9614cf
       bytes: 138864636
       file: emodnet_dtm2024_elevation_max_41.80_46.15_-9.40_-0.75.nc
-    status: fetched in an earlier build
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(35.35):(36.8)%5D%5B(-6.85):(-4.55)%5D
+      retrieved: '2026-10-10'
+      sha256: 450a001461ce4d1205e9b4c5d375a1fcf0326d1cb535fadf9845127f11bbe043
+      bytes: 12342564
+      file: emodnet_dtm2024_elevation_35.35_36.80_-6.85_-4.55.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(35.35):(36.8)%5D%5B(-6.85):(-4.55)%5D
+      retrieved: '2026-10-10'
+      sha256: f03b9920fe0a9bfb9111f53930e51d173d6ffdcd9739637326963431b4b845cf
+      bytes: 12342204
+      file: emodnet_dtm2024_elevation_max_35.35_36.80_-6.85_-4.55.nc
+    status: fetched
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
     licence: Licence-Ouverte-2.0

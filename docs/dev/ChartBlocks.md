@@ -115,7 +115,10 @@ region's, its tide and its weather are rows in tables that already reach its wat
    own to both. Every road, anchorage and mooring has a note of the bottom (an anchorage
    or a bottom feature with `bottom:`) within three kilometres (`test_tackle_orders.py`,
    on the whole chart), and every book the game ships names places of the whole chart
-   (`test_log_lines.py`).
+   (`test_log_lines.py`). `tests/test_ports.py` holds every port file to ten goods at
+   least in its market, a yard's or a chandler's topmast and water, the three ratings
+   of the crew pool and the pilot's four words (`channel`, `marks`, `anchorage`, `tide`):
+   a small Moorish town has them too, judgement and said so (package 39f).
 6. **The tide**: the block's gauges read from TICON's file (`TICON.txt` in the zip at
    doi.pangaea.de, as package 34 read it, by their coordinates; Vigo it has (package 39c,
    the IEO's and Puertos del Estado's series; its UHSLC series has every phase an hour
@@ -149,17 +152,30 @@ region's, its tide and its weather are rows in tables that already reach its wat
    Biscay south between): give the block an area over its whole box (Portugal's
    `portuguese-coast`, after its bars and rivers; Biscay south's `open-bay-south`, after
    its passes and narrows, package 39c) so that no position of the box is
-   without a statement. Keep the polygons off the water
+   without a statement. **A constant current** under the
+   tide (the Strait's inset from the Atlantic) is an area's `current:` (`toward_deg`,
+   `kn`), added to the tidal stream as a velocity, and its `book:`'s `current:` (`set`
+   to a point, `kn`), which the master works into his account as one more course
+   (package 39f; `StreamArea.current_kn`, `BookStream.current_kn`); an area that names
+   none has none. Keep the polygons off the water
    the recorded passages' other sail use (the naval cruise's Diamond within eight miles
    of 48 N 4 55 W and Harpy within ten of 47 50 N 6 W; the merchant passage's Palinure
    from the Raz and Hirondelle from Sein), or their digests move with them. The places
    of the master's epitome in `establishments.yaml`, Norie's and Moore's, with
    `rise_judgement` where the period gives no rise: such a rise is the world's spring
    range at the place to the foot (`test_tide.py` holds it), which over a block whose
-   gauges are held is the Channel's blend and not the place's own. The eleven gauges and
-   their figures do not move.
+   gauges are held is the Channel's blend and not the place's own, and beyond the reach
+   of every gauge (the Strait, Portugal's south, Madeira) the nearest gauge's alone, Le
+   Conquet's eighteen feet at Cape Trafalgar (package 39f): give the period's rise where
+   a pilot has one. The eleven gauges and their figures do not move. A block whose
+   gauges lie beyond 400 miles of every Channel and Biscay north position (the Strait's,
+   the islands') would move no recorded passage if its gauges were blended; they are
+   held all the same until the lead rules on the gauges' water, and the block's tests
+   say what blending them would and would not move.
 7. **The weather**: nothing, unless the block's water lies in no box of
-   `data/weather/climatology.yaml` (the four boxes cover the corridor whole); a block
+   `data/weather/climatology.yaml` (the four boxes do not cover the corridor whole:
+   35 to 36 N east of 9 W, the Strait's southern half and the Moroccan coast, lies in
+   none, and takes the nearest, Portugal's, by `Climatology.box_at`; package 39f); a block
    that reads a printed climatic table replaces a PROVISIONAL row and says so in the
    row's `note`.
 8. **A scenario** `data/scenarios/<block>.yaml` that sails the block's stretch (a free
@@ -238,6 +254,16 @@ field knows only its own block, so within a cable or two of the seam it may give
 shore farther than the true one, until the neighbour is rebuilt (a finding, not a fix).
 Abut the bounds on the neighbour's (3 W, 48 N) rather than overlapping them: the
 features of the two then never share a box, and a query takes the one tile there is.
+**Two neighbours built at once** (packages 39d and 39f, abutting at 36.4 N, neither in
+the other's manifest): the tiles that meet both bounds (the Strait's two of the row from
+36.29 N west of 5.92 W, which hold Cadiz bay) are built by both branches, and the seam
+rule cannot keep them one region's until one is merged. The branch merged second
+rebuilds its region against the merged manifest (`--region`, `--skip-fetch`), so that
+the shared tiles stay the first's and are dropped from its own list; merge the block
+whose water the shared tiles hold first (Cadiz's patch is `portugal`'s). Done so for the
+Strait (package 39f, after 39d's merge): its files of the two tiles taken as
+`portugal`'s at the merge, the region rebuilt, the check printing "2 kept".
+
 **An isle the grid lacks.** EMODnet's sixteenth of a minute interpolates its soundings
 across an isle a few hundred metres long, so the tiles have water where Santa Clara at St
 Sebastian, Mouro at Santander and the Estelas stand forty metres high (package 39c): the
@@ -259,6 +285,20 @@ was the same fault mended by hand). Every block on a coast of large tides sets i
 Biscay north's recipe (package 39b, built beside 39a) has not the key either: its
 sweep found 34,053 cells in 267 places, the marshes behind its dykes among them, which
 flood at high water springs; the rebuild with the key is the lead's to order.
+**Beyond the reach of every gauge** (Portugal and the Strait, packages 39d and 39f) the
+world's mean level is the nearest gauge's alone (Le Conquet's 3.98 m over the Strait):
+raised by it, the land stands three metres higher than it need and a lagoon or an
+estuary of GEBCO's fill three metres shoaler. The recipe's `fill_mean_level_m` sets the
+block's own mean level above its datum instead (39d's 2.0 m from the Instituto
+Hidrográfico's datum). It is not for every block while the gauges are held: the world's
+tide is still the far gauge's, its high water springs some 7 m above the datum over the
+Strait, and where EMODnet stops short of the shore GEBCO's cells are the shore itself;
+tried at 0.6 m (judgement from the held gauges' amplitudes) the Strait lost Tarifa's
+island and 25 marks of the land to the water, so its recipe keeps the world's level
+(package 39f).
+**EMODnet's `elevation_max` is empty in places** where `elevation` has a value
+(over the Laja of Conil, package 39f): a check of a rock's head against the shoalest
+sounding falls back to the mean grid there.
 
 **Blocks built at once (packages 39c to 39f).** The neighbours' seams fall inside a
 row of tiles: Portugal's northern row (41.84 to 42.27 N) and southern row (36.29 to

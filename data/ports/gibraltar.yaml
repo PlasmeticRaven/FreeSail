@@ -1,0 +1,121 @@
+# FreeSail: Gibraltar as a port (spec M6 §26; package 39f, the Strait block), on package
+# 35's machinery (freesail/world/ports.py); the marks are the features file's
+# (data/charts/features/strait.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Descripción de la Bahía de Algeciras
+# y Gibraltar', pp. 12 to 22: the Old Mole 1100 feet NW by W from the town's north end
+# and the New Mole 700 feet NW a mile and a half farther south, under which the ships of
+# war lie in winter in 5 or 6 brazas; from the Puente Mayorga to San Felipe and the Old
+# Mole the ground is good and more even, and under the cannon of the place is the
+# anchorage of the English, the small vessels within and the great without; before the
+# space between the moles good anchorage in what water you will a third of a mile from
+# the wall; give Europa Point a reasonable berth, for the currents are very strong with
+# eddies about it; coming from the east with a strong Levanter keep off the Mount to mid
+# bay for its flaws; high water at one in the afternoon at full and change, the greatest
+# tides 5 to 6 feet. Purdy 1826, pp. 4 and 9: the summit 1,400 feet; about 5,000
+# inhabitants and as many of the garrison; run up the bay till the Devil's Tower opens,
+# steer for it and anchor, mooring SE and NW; during war ships generally anchor off the
+# New Mole; Mr Ignatius Reiner, pilot, of Gibraltar (p. 351). Tofiño 1786, the 'Plano
+# geométrico de la Bahía de Algeciras y Gibraltar' (David Rumsey 13360.037): the bay's
+# soundings, the bay's patch (data/charts/overrides/strait/gibraltar-algeciras.yaml).
+#
+# The datum: the bay's patch states it (Tofiño's soundings in brazas of two Castilian
+# varas, no datum on the sheet, read as low water; the height of that low water above
+# the chart's datum JUDGEMENT from TICON's constants at Gibraltar, the override says
+# how); the road off the town is the modern grid's.
+#
+# The stance. Gibraltar is the King's, British since 1704 (the nations table): open to a
+# King's ship and to every nation at peace with Britain, hostile to the French and the
+# Spaniards in June 1805. The prices are FROM MEMORY or JUDGEMENT; sterling.
+
+id: gibraltar
+name: Gibraltar
+nation: britain
+source: "Tofiño 1787 pp. 12-22 (the Bay of Algeciras and Gibraltar); Purdy 1826 pp. 4, 9, 351"
+datum: "the bay: Tofiño's plan of 1786 in brazas of two Castilian varas, read as low water, JUDGEMENT above the chart's datum (overrides/strait/gibraltar-algeciras.yaml); the road off the town the modern grid's"
+
+# The outer road is the bay's mouth between Europa and Cape Carnero, where a ship from
+# the west comes in; the anchorage the road off the Old Mole under the guns; the mooring
+# under the New Mole, where the King's ships lie in winter; the shore the Old Mole.
+outer_road:
+  name: the mouth of the bay off Europa
+  lat_deg: 36.1080
+  lon_deg: -5.3680
+anchorage:
+  feature: gibraltar-road
+  name: Gibraltar road
+  lat_deg: 36.1440
+  lon_deg: -5.3640
+mooring:
+  feature: new-mole-anchorage
+  name: under the New Mole
+  lat_deg: 36.1264
+  lon_deg: -5.3569
+  bottom: sand
+shore:
+  feature: old-mole
+  name: the Old Mole
+  lat_deg: 36.1445
+  lon_deg: -5.3565
+
+pilot:
+  station: gibraltar-road
+  cruising_nm: 5                 # judgement: the bay's boats meet ships about Europa and Cabrita Points
+  comes_off_by_night: false      # judgement: no light at Europa in 1805
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Gibraltar pilots' boat
+    under: a lateen sail and oars
+    note: "judgement: the bay's boats were the Spanish and Genoese lateen craft"
+  names: [Reiner, Imossi, Bosano, Canepa, Danino, Gaggero, Olivero, Ferrary]   # Reiner Purdy's (p. 351), the rest Genoese names of the garrison town: judgement
+  skill: 0.9
+  fee_pounds: 2                  # judgement; unverified
+  cast: larboard                 # from the road off the Old Mole the head paying off to the southward for Europa (judgement)
+  course_out_deg: 200            # out of the bay toward the Strait, Europa on the larboard hand
+  words:
+    channel: "Coming from the west, haul in for the Spanish shore past the Cabezos, else the current will carry you east of the Rock. When San Roque is open east of the rocks off Cape Carnero you are inside the Pearl: haul in for the bay, giving the cape a good berth, and run up till the Devil's Tower opens."
+    marks: "San Roque on its hill open east of the rocks off Cape Carnero clears the Pearl. The Devil's Tower at the north-east foot of the Rock: steer for it to anchor. Keep off Europa Point, for the currents run very strong with eddies about it."
+    anchorage: "Anchor off the Old Mole under the guns in what depth you prefer, a third of a mile from the wall, mooring south-east and north-west; the King's ships lie in winter under the New Mole in five or six brazas. Sound before you let go: the bay falls off to great depths."
+    tide: "It is high water at one in the afternoon at full and change, and the greatest tides rise five or six feet. In the middle of the Strait the current sets east whatever the tide; along the shores the flood runs west."
+
+tide:
+  establishment: Gibraltar       # the epitome's row (data/tides/establishments.yaml)
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  # the garrison town's market: the Barbary trade, the neutral's wine, the prize goods;
+  # FROM MEMORY and JUDGEMENT
+  goods:
+    - {good: fresh beef, price: 40, origin: morocco, note: "Barbary bullocks from Tangier and Tetuan for the garrison (Purdy 1826 p. 5, the grant of Muley Ismael); the price judgement"}
+    - {good: oranges, price: 8, origin: morocco, note: "Tetuan's oranges (Purdy 1826 p. 7); judgement"}
+    - {good: wine, price: 40, origin: spain, note: "Spanish wine by the neutrals in wartime; judgement"}
+    - {good: brandy, price: 100, origin: spain, note: "judgement"}
+    - {good: tobacco, price: 60, origin: null, note: "judgement"}
+    - {good: sugar, price: 70, origin: null, note: "judgement"}
+    - {good: salt, price: 12, origin: null, note: "from memory"}
+    - {good: salt beef, price: 62, origin: britain, note: "the victualling yard's; from memory"}
+    - {good: canvas, price: 65, origin: britain, note: "from memory"}
+    - {good: hemp, price: 75, origin: null, note: "from memory"}
+    - {good: timber, price: 8, origin: null, note: "scarce on the Rock; judgement"}
+
+dockyard:
+  kind: yard                     # the King's yard and victualling office at Gibraltar
+  items:
+    - {item: topmast, hours: 8, pounds: 48, note: "the yard's stores, judgement"}
+    - {item: topgallant_mast, hours: 4, pounds: 15}
+    - {item: yard, hours: 6, pounds: 30}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 26}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.06}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.2, note: "water scarce on the Rock, the tanks and wells; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
+
+crew_pool:
+  # judgement: the garrison town's seamen, Genoese and Minorquins among them
+  able: {hands: 6, pounds: 3, delay_h: 12}
+  ordinary: {hands: 8, pounds: 2, delay_h: 12}
+  landsman: {hands: 6, pounds: 1, delay_h: 6}
+
+closed_to: []

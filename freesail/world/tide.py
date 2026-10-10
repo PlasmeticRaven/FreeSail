@@ -193,6 +193,13 @@ class StreamArea:
     # Biscay's, and beyond every area there is no stream until a block tabulates one
     chart: str = ""
     bounds: tuple[float, float, float, float] | None = None  # south, north, west, east
+    # package 39f: a constant current over the tidal stream (`current:` in the file, the
+    # point it sets toward in degrees and its rate in knots): the Strait's inset from the
+    # Atlantic, which runs whatever the tide and which the tide's stream rides on, so that
+    # the water's velocity is the two added. Nought for every area that names none, so
+    # the Channel's and Biscay's streams are what they were.
+    current_toward_deg: float = 0.0
+    current_kn: float = 0.0
 
     def contains(self, pos: Position) -> bool:
         if self.polygon is None:
@@ -321,6 +328,7 @@ class Tide:
         for a in streams["areas"]:
             poly = a.get("polygon")
             box = a.get("bounds")
+            current = a.get("current") or {}
             self.areas.append(
                 StreamArea(
                     str(a["id"]),
@@ -340,6 +348,8 @@ class Tide:
                     )
                     if box
                     else None,
+                    float(current.get("toward_deg", 0.0)),
+                    float(current.get("kn", 0.0)),
                 )
             )
         self._about_cache = {}
@@ -446,6 +456,14 @@ class Tide:
         along = rate_kn * math.cos(math.radians(phase - shift))
         speed = units.knots_to_ms(along)
         axis = math.radians(area.axis_deg)
+        east, north = speed * math.sin(axis), speed * math.cos(axis)
+        if area.current_kn:
+            # package 39f: the constant current the tide's stream rides on (the Strait's
+            # inset), added as a velocity
+            toward = math.radians(area.current_toward_deg)
+            current = units.knots_to_ms(area.current_kn)
+            east += current * math.sin(toward)
+            north += current * math.cos(toward)
         rising = math.sin(math.radians(phase)) < 0.0  # the phase grows: past 180 it rises
         return TideState(
             height_m=level + z.real,
@@ -454,8 +472,8 @@ class Tide:
             neap_amplitude_m=neap,
             spring_amplitude_m=spring,
             rising=rising,
-            stream_east_ms=speed * math.sin(axis),
-            stream_north_ms=speed * math.cos(axis),
+            stream_east_ms=east,
+            stream_north_ms=north,
             area_id=area.id,
             axis_deg=area.axis_deg,
             rate_kn=rate_kn,
@@ -644,6 +662,12 @@ class BookStream:
     # as the world's area is (the open Channel's statement is the Channel's, not that of
     # every water within the directions' limits once they reach Portugal)
     bounds: tuple[float, float, float, float] | None = None  # south, north, west, east
+    # package 39f: what the directions say of a constant current under the tide (the
+    # Strait's inset: "the current from the Ocean generally sets to the eastward"), the
+    # point it sets toward and its rate to the half knot; none where the book says none
+    current_point: str = ""
+    current_rad: float = 0.0
+    current_kn: float = 0.0
 
     def contains(self, pos: Position) -> bool:
         if self.polygon is None:
@@ -715,6 +739,16 @@ def load_directions(streams: str | Path = STREAMS_PATH) -> Directions:
         if toward is None:
             raise ValueError(f"{streams}: the directions' set '{point}' is no compass point")
         poly = a.get("polygon")
+        current = book.get("current") or {}
+        current_rad = 0.0
+        current_point = ""
+        if current:
+            found = units.parse_compass_point(str(current["set"]))
+            if found is None:
+                raise ValueError(
+                    f"{streams}: the directions' current '{current['set']}' is no compass point"
+                )
+            current_rad, current_point = found, units.point_name(found)
         areas.append(
             BookStream(
                 str(a["id"]),
@@ -732,6 +766,9 @@ def load_directions(streams: str | Path = STREAMS_PATH) -> Directions:
                     if not poly and a.get("bounds")
                     else None
                 ),
+                current_point,
+                current_rad,
+                float(current.get("kn", 0.0)),
             )
         )
     lims = doc.get("book_limits") or {}

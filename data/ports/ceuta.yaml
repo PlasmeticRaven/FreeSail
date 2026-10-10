@@ -1,0 +1,102 @@
+# FreeSail: Ceuta as a port (spec M6 §26; package 39f, the Strait block), on package 35's
+# machinery; the marks are the features file's (data/charts/features/strait.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Costa de África', pp. 24 to 27: the
+# Almina, the eastern southern point of the Strait, its Acho a modern castle on its
+# highest hill; the anchorage of Ceuta between the islets of El Campo and those of
+# Santa Catalina in 8 to 14 brazas, sand with some loose stones, with the Calle del Obispo
+# open, gravel elsewhere; moor NE and SW with the longest cable NE; all the Almina girt
+# with stones that barely show. Purdy 1826, pp. 7 to 8: taken from the Moors by John of
+# Portugal early in the fifteenth century, ceded to Spain in 1688; on the land side, like
+# Gibraltar, impregnable; better shelter than Tetuan Bay, but less frequented in time of
+# war for its garrison; with the Levanter it becomes necessary to get under way; Captain
+# Knight's survey of 1799: spots of foul ground in 10 to 17 fathoms.
+#
+# The datum: UNVERIFIED. No period sheet is patched at Ceuta in this package; the chart's
+# depths are EMODnet's at the lowest astronomical tide.
+#
+# The stance. Ceuta is Spain's, a presidio on the African shore: hostile to a King's ship
+# in June 1805 by the nations table, open to a neutral. Prices FROM MEMORY or JUDGEMENT.
+
+id: ceuta
+name: Ceuta
+nation: spain
+source: "Tofiño 1787 pp. 24-27 (the coast of Africa, the Almina, the road); Purdy 1826 pp. 7-8"
+datum: unverified
+
+outer_road:
+  name: off the Almina
+  lat_deg: 35.9100
+  lon_deg: -5.3050
+anchorage:
+  feature: ceuta-road
+  name: Ceuta road
+  lat_deg: 35.8953
+  lon_deg: -5.3145
+mooring:
+  name: the lesser bay under the walls
+  lat_deg: 35.8937
+  lon_deg: -5.3138
+  depth_fathoms: 3
+  bottom: sand with a few loose stones
+  deep_draught_ft: 13    # judgement: three brazas under the walls
+shore:
+  name: the landing at Ceuta
+  lat_deg: 35.8900
+  lon_deg: -5.3170
+
+pilot:
+  station: ceuta-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the presidio's boat
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Alcántara, Benítez, Correa, Ortega, Cabrera, Navarro, Lozano, Durán]   # judgement
+  skill: 0.88
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 20             # out of the lesser bay north into the Strait
+  words:
+    channel: "Coming from the west, open all the walls of old Ceuta by the Red Point before you bring White-tower Point on Apes' Hill, so as to clear the rock off White-tower Point; then stand into the lesser bay between the islets of El Campo and those of Santa Catalina."
+    marks: "The Acho, the castle on the highest hill of the Almina; the Calle del Obispo, which begins at the north side of the governor's house with its four balconies: keep it open to anchor on sand."
+    anchorage: "Anchor in eight to fourteen brazas, sand with a few loose stones, the Bishop's Street open; elsewhere the ground is gravel. Moor north-east and south-west, the longest cable to the north-east. With the Levanter, get under way."
+    tide: "Along the shore of Africa the flood runs west; in the middle of the Strait the current sets east whatever the tide."
+
+tide:
+  establishment: Gibraltar
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 40, origin: spain, note: "brought over for the presidio; judgement"}
+    - {good: fresh beef, price: 45, origin: morocco, note: "from the Moors, when the frontier allows; judgement"}
+    - {good: salt beef, price: 70, origin: null, note: "from memory"}
+    - {good: biscuit, price: 30, origin: spain, note: "the presidio's stores; judgement"}
+    - {good: brandy, price: 100, origin: spain, note: "judgement"}
+    - {good: oranges, price: 6, origin: morocco, note: "Tetuan's, by the Moors' boats; judgement"}
+    - {good: salt, price: 12, origin: spain, note: "judgement"}
+    - {good: salt fish, price: 30, origin: spain, note: "judgement"}
+    - {good: canvas, price: 55, origin: spain, note: "from memory"}
+    - {good: hemp, price: 62, origin: null, note: "from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 55, note: "judgement"}
+    - {item: yard, hours: 10, pounds: 32}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.07}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.12}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 4, pounds: 1, delay_h: 12}
+
+closed_to: []

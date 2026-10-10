@@ -1,0 +1,37 @@
+# FreeSail: the frigate's book for the Strait (data/scenarios/strait.yaml; package 39f),
+# from off Cape Trafalgar through the Strait to Gibraltar road. Short, as the brief has it:
+# the points of the passage by the account, the sails trimmed, the land's bearings, the
+# lead, the anchor. The starter book is not loaded.
+
+# Off Cape Trafalgar she stands east-south-east, clear outside the Aceytera and the sand
+# bank (Tofiño 1789, pp. 128 to 129), for a point four miles south-south-west of the
+# Cabezos (Tofiño 1787, p. 6: the most dangerous shoals of the Strait, nearly five miles
+# west of the Isle of Tarifa). Then she hauls in for the Spanish shore, else the current
+# carries her east of the Rock (Purdy 1826, p. 9): a mile south of the Isle of Tarifa, off
+# the points of Acebuche within the shore's tide and out of the middle's current, and off
+# Cape Carnero south and east of the Pearl (Tofiño 1787, pp. 10 to 11); then up the middle
+# of the bay and east for the road off the Old Mole, where she anchors under the guns
+# (Tofiño 1787, p. 18; Purdy 1826, p. 9: run up the bay till the Devil's Tower opens). Each leg's course
+# is shaped again every hour while she is on it, since the streams set her off it (the
+# first runs, in the notes: on the Cabezos, past Carnero to the back of the Rock, and
+# with the stream over-allowed on the sand under the town).
+standing order "the course for the offing": every hour, if the distance to 35 57 N 5 48 W is over 1.5 miles and the distance to 36 02.4 N 5 24 W is over 18 miles then shape a course for 35 57 N 5 48 W
+standing order "past the Cabezos": when the distance to 35 57 N 5 48 W is under 1.5 miles then shape a course for 35 59 N 5 36 W
+standing order "the course for Tarifa": every hour, if the distance to 35 59 N 5 36 W is under 11 miles and the distance to 35 59 N 5 36 W is over 1.2 miles and the distance to 36 01.5 N 5 28.2 W is over 7.5 miles and the distance to 36 08 N 5 24 W is over 12 miles then shape a course for 35 59 N 5 36 W
+standing order "past Tarifa": when the distance to 35 59 N 5 36 W is under 1.2 miles then shape a course for 36 01.5 N 5 28.2 W
+standing order "the course along the shore": every hour, if the distance to 36 01.5 N 5 28.2 W is under 7.5 miles and the distance to 36 01.5 N 5 28.2 W is over 1 mile and the distance to 36 02.4 N 5 24 W is over 3.5 miles and the distance to 36 08 N 5 24 W is over 6.5 miles then shape a course for 36 01.5 N 5 28.2 W
+standing order "off the Acebuche": when the distance to 36 01.5 N 5 28.2 W is under 1 mile then shape a course for 36 02.4 N 5 24 W
+standing order "off Carnero": when the distance to 36 02.4 N 5 24 W is under 1 mile then shorten sail; shape a course for 36 08 N 5 24 W
+standing order "the course up the bay": every hour, if the distance to 36 08 N 5 24 W is under 6 miles and the distance to 36 08 N 5 24 W is over 1 mile and the distance to Gibraltar road is over 2.2 miles then shape a course for 36 08 N 5 24 W
+standing order "in the bay": when the distance to 36 08 N 5 24 W is under 1 mile then shape a course for Gibraltar road
+standing order "the course for the road": every hour, if the distance to Gibraltar road is under 2.2 miles and the distance to Gibraltar road is over 0.6 miles then shape a course for Gibraltar road
+# The bay falls off to great depths a little way from the shore (Tofiño 1787, p. 18: sound
+# before you let go, lest the anchor fall in too much water): she anchors by the lead.
+standing order "in the road": when the distance to Gibraltar road is under 0.6 miles and the depth is under 15 fathoms then come to an anchor
+
+# The ship's routines on the way.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
+standing order "the lead in the bay": every 10 minutes, if the distance to Gibraltar road is under 4 miles then heave the lead
+standing order "the lead off the road": every 2 minutes, if the distance to Gibraltar road is under 1 mile then heave the lead

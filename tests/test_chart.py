@@ -881,6 +881,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     regions += ["biscay-south"]  # package 39c
     regions += ["portugal"]  # package 39d
     regions += ISLANDS  # package 39e: the islands after the coast's blocks
+    regions += ["strait"]  # package 39f
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
     assert whole.region == whole.name == WHOLE and whole.regions == regions
@@ -901,6 +902,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     south = load_chart("biscay-south")  # package 39c
     portugal = load_chart("portugal")  # package 39d
     islands = [load_chart(r) for r in ISLANDS]
+    strait = load_chart("strait")  # package 39f
     assert whole.features.keys() == (
         chart.features.keys()
         | mid.features.keys()
@@ -908,12 +910,14 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         | south.features.keys()
         | portugal.features.keys()
         | set().union(*(i.features.keys() for i in islands))
+        | strait.features.keys()
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
     assert all(whole.region_of[fid] == "biscay-north" for fid in biscay.features)
     assert all(whole.region_of[fid] == "biscay-south" for fid in south.features)
     assert all(whole.region_of[fid] == "portugal" for fid in portugal.features)
+    assert all(whole.region_of[fid] == "strait" for fid in strait.features)  # package 39f
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
@@ -924,6 +928,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         + len(south.coast_lines())
         + len(portugal.coast_lines())
         + sum(len(i.coast_lines()) for i in islands)
+        + len(strait.coast_lines())
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
@@ -1755,3 +1760,130 @@ def test_the_depths_in_biscay_souths_roads_and_its_isles_the_grid_lacks():
     for name in names:
         f = whole.find_feature(name)
         assert f is not None and whole.region_of[f.id] == SOUTH, name
+
+
+# ---------------------------------------------------------------------------
+# Package 39f: the Strait (spec M6 §26, block 6)
+# ---------------------------------------------------------------------------
+
+STRAIT = "strait"
+
+
+def test_the_strait_is_a_region_built_to_its_bounds_with_its_patch_and_its_checks(manifest, capsys):
+    """The block's recipe, built and committed to its bounds exactly, abutting `portugal`
+    (package 39d) at 36.4 N: of the fifteen level-2 tiles that meet the bounds, the two
+    of the northern row west of 5.92 W are `portugal`'s, listed there first (the seam
+    rule: computed with the block, not written or listed again); of the thirteen others
+    the one east of them all land (`skip_dry_tiles`: not written, the corridor's), the
+    twelve the block's; the four harbour groups' level-3 tiles, the coast, the features;
+    under the region's size; GEBCO's fill raised by the world's mean level (the block's
+    own, `fill_mean_level_m`, would sink Tarifa's island while the world's tide over the
+    Strait is Le Conquet's); the one override, the water about the Green Island from
+    Tofiño's plan of 1786, with its unit (the braza of two Castilian varas) and its datum
+    stated; the checks pass."""
+    tool = build_tool()
+    entry = manifest["regions"][STRAIT]
+    assert entry["bounds"] == {"south": 35.5, "north": 36.4, "west": -6.5, "east": -5.0}
+    assert entry["bounds"] == tool.REGIONS[STRAIT]["bounds"] and entry["fill_to_chart_datum"]
+    assert "fill_mean_level_m" not in entry and entry["skip_dry_tiles"] is True
+    assert STRAIT in manifest["charts"][WHOLE]["regions"]
+    b = entry["bounds"]
+    every = {
+        tool.tile_name(*t) for t in tool.tiles_over(2, b["south"], b["north"], b["west"], b["east"])
+    }
+    seam = {"130656_-24384", "130656_-22848"}
+    dry = {"130656_-21312"}  # 36.29 to 36.72 N, 5.92 to 5.49 W: the hills of Medina
+    assert len(every) == 15 and seam < every and dry < every
+    assert {t["name"] for t in entry["tiles"]["2"]} == every - seam - dry
+    assert not (CHARTS / "tiles" / "2" / "130656_-21312.npz").exists()
+    assert seam <= {t["name"] for t in manifest["regions"]["portugal"]["tiles"]["2"]}
+    others = {k: v for k, v in manifest["regions"].items() if k != STRAIT}
+    for spec in others.values():
+        assert not {t["name"] for t in spec["tiles"].get("2") or []} & (every - seam)
+    total = 0
+    for level, tiles in entry["tiles"].items():
+        for t in tiles:
+            path = CHARTS / "tiles" / str(level) / f"{t['name']}.npz"
+            assert path.exists(), path
+            total += path.stat().st_size
+    total += (CHARTS / entry["coast"]).stat().st_size + (CHARTS / entry["features"]).stat().st_size
+    assert total < REGION_BUDGET_BYTES, f"{total / 1e6:.1f} MB"
+    assert set(entry["harbours"]) == {"gibraltar-algeciras", "tarifa", "ceuta", "tangier"}
+    [bay] = entry["overrides"]
+    assert bay["file"] == "overrides/strait/gibraltar-algeciras.yaml"
+    assert bay["units"] == "brazas" and bay["datum_above_chart_datum_m"] == 0.3
+    assert bay["patches"] == 3 and "Tofiño 1786" in bay["sheet"]
+    assert tool.UNIT_M["brazas"] == pytest.approx(1.6718, abs=1e-4)
+    assert tool.main(["--check", STRAIT]) == 0
+    out = capsys.readouterr().out
+    for words in (
+        "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
+        "ids unique across the manifest's regions: yes",
+        "harbour patches with their datum stated: 1 of 1",
+        "the fetch box covers the tiles whole: yes",
+        "passes its checks",
+        "tiles another region lists: 2 kept",
+    ):
+        assert words in out, words
+
+
+def test_the_strait_has_no_light_in_1805_and_its_land_is_raised_by_day():
+    """1805 sees no light between Cape Trafalgar and Ceuta: every light of the Strait is
+    later (Tarifa's, Europa's of 1841, the Almina's of 1855, Trafalgar's of 1860,
+    Spartel's of 1864, Carnero's of 1874), dated so; by night off Tarifa in 1805 the
+    lookout raises no light, in 1870 Tarifa's and the Almina's. By day in the middle of
+    the Strait both shores are in sight, the Rock and Apes' Hill among them."""
+    whole = load_chart(WHOLE)
+    lights = [f for f in whole.features.values() if f.kind == "light"]
+    mine = [f for f in lights if whole.region_of[f.id] == STRAIT]
+    assert len(mine) == 6 and not [f.id for f in mine if f.lit_in(1805)]
+    for fid, year in (
+        ("europa-light", 1841),
+        ("almina-light", 1855),
+        ("trafalgar-light", 1860),
+        ("spartel-light", 1864),
+        ("carnero-light", 1874),
+    ):
+        assert not whole.feature(fid).lit_in(year - 1) and whole.feature(fid).lit_in(year), fid
+    eye = 10.0
+    mid_strait = Position(35.96, -5.55)
+    assert whole.region_at(mid_strait) == STRAIT
+    assert whole.in_sight(mid_strait, eye, None, "night", datetime(1805, 6, 12, 23, 30)) == []
+    later = {
+        s.feature.id
+        for s in whole.in_sight(mid_strait, eye, None, "night", datetime(1870, 6, 12, 23, 30))
+    }
+    assert {"tarifa-light", "almina-light"} <= later
+    day = {
+        s.feature.id
+        for s in whole.in_sight(mid_strait, eye, None, "day", datetime(1805, 6, 12, 12))
+    }
+    assert {"gibraltar-rock", "apes-hill"} <= day
+    assert {"tarifa", "punta-leona"} & day
+
+
+def test_the_depths_in_the_straits_roads_its_dangers_and_the_green_islands_patch():
+    """The roads in the pilot's water: Gibraltar road off the Old Mole, Tangier's and
+    Ceuta's in Tofiño's brazas; the Laja of Conil where Tofiño laid it, a shoal of five
+    metres in the grid; the Cabezos and the Pearl, which the grid does not resolve, kept
+    where Tofiño's theodolites put them as dangers with their heads; the Green Island off
+    Algeciras an island again in the water of 1786, where the modern port's fill stands."""
+    whole = load_chart(WHOLE)
+    for fid, low, high in (
+        ("gibraltar-road", 5.0, 30.0),
+        ("tangier-road", 6.0, 25.0),
+        ("ceuta-road", 6.0, 30.0),
+        ("algeciras-road", 10.0, 45.0),
+    ):
+        f = whole.feature(fid)
+        assert low < whole.depth_at(f.position) < high, fid
+    laja = whole.feature("laja-de-conil")
+    assert whole.depth_at(laja.position) < 8.0 and laja.kind == "ledge"
+    for fid in ("cabezos", "la-perla", "aceitera"):
+        f = whole.feature(fid)
+        assert f.kind in ("rock", "ledge") and f.dries_m is not None and f.dries_m < 0.5, fid
+    green = whole.feature("isla-verde").position
+    assert whole.elevation_at(green) > 5.0  # the isle, land
+    inside = Position(36.1275, -5.4395)  # between the isle and the town, the sheet's 2 brazas
+    assert whole.depth_at(inside) == pytest.approx(2 * 1.6718 + 0.3, abs=0.2)
+    assert whole.region_at(inside) == STRAIT and whole.level_at(inside) == 3

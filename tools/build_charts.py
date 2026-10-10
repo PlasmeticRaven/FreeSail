@@ -390,6 +390,39 @@ REGIONS: dict[str, dict[str, Any]] = {
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
         "fill_to_chart_datum": True,
     },
+    # package 39f: the Strait, abutting `portugal` (package 39d) at 36.4 N exactly, so that
+    # Cadiz and its bay are that block's and Cape Trafalgar this one's. The level-2 tiles
+    # that meet the bounds span 35.44 to 36.72 N and 6.77 to 4.64 W; the northern row
+    # (36.29 to 36.72 N) west of 5.92 W meets `portugal`'s bounds too, and is the region's
+    # that the manifest lists first (the seam rule, `tiles_listed_elsewhere`): built here
+    # while `portugal` was not in the manifest, kept as `portugal`'s since its merge (the
+    # two tiles 2/130656_-24384 and 2/130656_-22848; the build prints "2 kept").
+    "strait": {
+        "title": "The Strait, Cape Trafalgar and Cape Spartel to Gibraltar and Ceuta",
+        "bounds": {"south": 35.5, "north": 36.4, "west": -6.5, "east": -5.0},
+        "fetch": {"south": 35.35, "north": 36.8, "west": -6.85, "east": -4.55},
+        "harbours": {
+            "gibraltar-algeciras": {"south": 36.04, "north": 36.19, "west": -5.46, "east": -5.33},
+            "tarifa": {"south": 35.995, "north": 36.02, "west": -5.62, "east": -5.595},
+            "ceuta": {"south": 35.88, "north": 35.91, "west": -5.33, "east": -5.28},
+            "tangier": {"south": 35.77, "north": 35.80, "west": -5.83, "east": -5.78},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level, NOT by the block's own
+        # (`fill_mean_level_m` tried at the merge with 39d and refused): over the Strait the
+        # world's tide is the nearest far gauge's alone, Le Conquet's (mean level 3.98 m,
+        # high water springs some 7 m above the datum), while the block's gauges are held,
+        # so the land must stand above that high water; and the Strait's shore where
+        # EMODnet has nothing is GEBCO's mixed cells of the shore itself, not estuaries:
+        # raised by 0.6 m (the Strait's own level, judgement from its gauges) Tarifa's
+        # island, the capes and 25 marks of the land fell in the water. When the gauges
+        # are blended the recipe takes the key and the region is rebuilt
+        # (docs/dev/TuningNotes.md, package 39f)
+        "fill_to_chart_datum": True,
+        # one level-2 tile of the block is all land (36.29 to 36.72 N, 5.92 to 5.49 W, the
+        # hills of Medina Sidonia): computed for the field, not written, the corridor's
+        "skip_dry_tiles": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -426,6 +459,9 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 39e: the islands, after the coast's blocks
             "madeira",
             "azores",
+            # package 39f: the Strait, the voyage's last (its own line, so that the four
+            # blocks' additions merge as lines)
+            "strait",
         ],
         "corridor": "atlantic-corridor",
     },

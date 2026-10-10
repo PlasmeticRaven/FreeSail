@@ -24,7 +24,7 @@ def chart():
     return load_chart("channel-west")
 
 
-def test_the_seven_nations_and_the_wars_of_june_1805(table):
+def test_the_eight_nations_and_the_wars_of_june_1805(table):
     assert list(table.nations) == [
         "britain",
         "france",
@@ -33,6 +33,8 @@ def test_the_seven_nations_and_the_wars_of_june_1805(table):
         "united-states",
         "portugal",
         "denmark",
+        # package 39f: Morocco, for Tangier
+        "morocco",
     ]
     assert table.at_war("britain", "france") and table.at_war("france", "britain")
     assert table.at_war("britain", "spain") and table.at_war("britain", "batavian-republic")
@@ -62,6 +64,43 @@ def test_the_seven_nations_and_the_wars_of_june_1805(table):
         "Britain at war with the Batavian Republic and Spain; "
         "peace made between Britain and France; the United States at war with Denmark"
     ), moved.wars_words()
+
+
+def test_morocco_is_at_peace_with_all_and_its_ports_neutral_to_every_flag(table):
+    """Package 39f: the nations table gains Morocco for Tangier, at peace with every
+    nation in June 1805 (no war in the table), so a Moorish port is neutral to the
+    British, the Spaniards and the French alike and open to its own; each relation says
+    its source or that it is judgement; the Strait's ports in the index."""
+    import yaml
+
+    morocco = table.get("morocco")
+    assert morocco.adjective == "Moorish" and "red" in morocco.colours
+    assert not morocco.letters_of_marque and not table.enemies_of("morocco")
+    assert table.find("Moorish").id == "morocco"
+    for other in table.nations:
+        if other != "morocco":
+            assert table.stance("morocco", other) == "neutral", other
+    assert table.stance("morocco", "morocco") == "open"
+    # at peace with all, so not the pilot's news (decision 45)
+    assert "Morocco" not in table.wars_words()
+    doc = yaml.safe_load(open(N.NATIONS_PATH, encoding="utf-8"))
+    relations = doc["nations"]["morocco"]["relations"]
+    assert set(relations) == set(table.nations) - {"morocco"}
+    for words in relations.values():
+        assert (
+            "JUDGEMENT" in words
+            or "MEMORY" in words
+            or any(w in words for w in ("1800", "1826", "encyclopaedia"))
+        )
+    assert (
+        table.port_nations["tangier"] == "morocco" and table.port_nations["gibraltar"] == "britain"
+    )
+    assert {table.port_nations[p] for p in ("algeciras", "tarifa", "ceuta")} == {"spain"}
+    # Gibraltar British, hostile to the Spaniards; Ceuta and Algeciras hostile to a King's ship
+    assert (
+        table.stance("britain", "spain") == "hostile"
+        and table.stance("spain", "britain") == "hostile"
+    )
 
 
 def test_letters_of_marque_colours_and_names_lists(table):
@@ -126,6 +165,12 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "angra": "portugal",
         "ponta-delgada": "portugal",
         "horta": "portugal",
+        # the Strait (package 39f)
+        "gibraltar": "britain",
+        "algeciras": "spain",
+        "tarifa": "spain",
+        "ceuta": "spain",
+        "tangier": "morocco",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

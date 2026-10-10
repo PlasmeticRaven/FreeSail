@@ -768,3 +768,118 @@ def test_the_directions_reach_portugal_by_their_own_box_and_the_open_channel_kee
     assert (lisbon.hw_h, lisbon.hw_m) == (2, 0) and lisbon.rise_judgement
     cadiz = T.Epitome.load("norie").by_name("Cadiz")
     assert cadiz.spring_rise_ft == 10.0 and not cadiz.rise_judgement
+
+
+# ---------------------------------------------------------------------------
+# Package 39f: the Strait's tide and its constant current (spec M6 §26, block 6)
+# ---------------------------------------------------------------------------
+
+MID_STRAIT = Position(35.96, -5.55)  # the middle of the Strait, off Tarifa
+
+
+def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_shores_do_not(tide):
+    """The constant current is a stream by area added to the tidal stream (`current:` in
+    the streams' file): in the middle of the Strait the water sets east at two knots
+    with the tide's two and a half at springs over it, so at the strength of the ebb it
+    runs four and a half east and at the strength of the flood half a knot west (Purdy
+    1826's westward set across the Strait at full and change); along the shores the tide
+    alone, west on the rising water and east on the falling (Tofiño 1787, p. 8); every
+    other area of the file names no current, so the Channel's streams are what they were."""
+    area = tide.area_at(MID_STRAIT)
+    assert area.id == "strait-middle" and area.chart == "strait"
+    assert (area.current_toward_deg, area.current_kn) == (90.0, 2.0)
+    assert [a.id for a in tide.areas if a.current_kn] == [
+        "strait-middle",
+        "strait-east-mouth",
+        "strait-west-approach",
+    ]
+    start = datetime(1805, 6, 12, 0, 0)  # springs
+    states = [tide.at(MID_STRAIT, start + timedelta(minutes=10 * i)) for i in range(6 * 25)]
+    east = [units.ms_to_knots(s.stream_east_ms) for s in states]
+    assert 4.0 < max(east) < 4.8 and -0.8 < min(east) < 0.0
+    assert sum(east) / len(east) == pytest.approx(2.0, abs=0.15)  # the inset, on the mean
+    # the tide's part is the area's own stream: the state less the current
+    for s in states:
+        tidal = s.stream_east_ms - units.knots_to_ms(2.0)
+        assert abs(tidal) <= units.knots_to_ms(s.rate_kn) + 1e-9
+    # rising water runs west (the flood is the westward stream, strongest at half flood)
+    rising = [units.ms_to_knots(s.stream_east_ms) for s in states if s.rising]
+    falling = [units.ms_to_knots(s.stream_east_ms) for s in states if not s.rising]
+    assert sum(rising) / len(rising) < 2.0 < sum(falling) / len(falling)
+    shore = Position(36.02, -5.55)  # two miles off the Spanish shore east of Tarifa
+    assert tide.area_at(shore).id == "strait-spanish-shore" and tide.area_at(shore).current_kn == 0
+    shore_east = [
+        units.ms_to_knots(tide.at(shore, start + timedelta(minutes=10 * i)).stream_east_ms)
+        for i in range(6 * 25)
+    ]
+    assert sum(shore_east) / len(shore_east) == pytest.approx(0.0, abs=0.2)
+    assert all(a.current_kn == 0.0 for a in tide.areas if a.chart != "strait")
+
+
+def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_strait():
+    """The directions' statement for the Strait's middle gives the current beside the tide
+    (`book: current:`), and the master works it into his account as one more course: in
+    the middle of the Strait his tide's words name the current to the eastward. The
+    directions reach the Strait by the block's own box in `book_limits` (package 39d's
+    list form), the block's bounds: west of it, off the Moorish coast south of Cape
+    Spartel's parallel, he has no statement."""
+    book = T.load_directions()
+    said = book.area_at(MID_STRAIT)
+    assert said is not None and said.id == "strait-middle"
+    assert (said.current_point, said.current_kn) == ("E", 2.0) and "current" in said.judgement
+    assert (35.5, 36.4, -6.5, -5.0) in book.boxes
+    assert book.area_at(Position(35.4, -6.3)) is None  # south of the box, no statement
+    assert book.area_at(Position(36.10, -5.40)).id == "gibraltar-bay"
+    assert book.area_at(Position(36.3, -6.3)).id == "strait-west-approach"
+    assert all(
+        a.current_kn == 0.0
+        for a in book.areas
+        if a.id not in {"strait-middle", "strait-east-mouth", "strait-west-approach"}
+    )
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=10.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": MID_STRAIT.lat_deg, "lon_deg": MID_STRAIT.lon_deg},
+        chart="atlantic-east",
+    )
+    world = make_world(7, FRIGATE, sc)
+    allowed = world.navigation.tide_allowed()
+    assert allowed["by"] == "book" and allowed["water"] == "strait-middle"
+    assert allowed["current_kn"] == 2.0 and allowed["current_toward_deg"] == 90.0
+    assert "the current two knots to the E" in allowed["words"]
+
+
+def test_the_straits_gauges_are_read_and_held_and_would_move_no_channel_position(tide):
+    """TICON's file has Ceuta, Tarifa, Algeciras and Gibraltar (none at Tangier); they are
+    held, as the brief has it, so the world's tide over the Strait is Le Conquet's alone
+    (the nearest of the eleven, beyond the reach of every one), marked far: two metres of
+    M2 where Gibraltar's own is 0.31. Unlike Biscay's, they lie beyond the reach of every
+    position of the Channel's and Biscay north's regions, so blending them would move no
+    recorded passage's tide; over the Strait it would give the gauges' own."""
+    import yaml
+
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    held = {
+        g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] < 36.4 and g["lon_deg"] > -7.0
+    }  # the block's
+    assert list(held) == ["ceuta", "tarifa", "algeciras", "gibraltar"]
+    assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
+    assert not set(held) & {g.id for g in tide.gauges}
+    gib = Position(held["gibraltar"]["lat_deg"], held["gibraltar"]["lon_deg"])
+    level, consts, nearest_nm, far = tide.constants_about(gib)
+    assert far and tide.nearest_gauge(gib)[0].id == "le-conquet" and nearest_nm > 700.0
+    assert consts["M2"][0] > 1.9 and held["gibraltar"]["M2"]["amplitude_m"] == 0.307
+    for g in held.values():
+        here = Position(g["lat_deg"], g["lon_deg"])
+        for corner in (Position(48.0, -7.0), Position(45.9, -0.9), Position(45.9, -5.0)):
+            assert bearing_and_distance(here, corner)[1] > tide.reach_m
+    # (their mean levels unread: nought for the blend's arithmetic, which the M2 test ignores)
+    added = [{**g, "mean_level_m": 0.0} for g in held.values()]
+    blended = T.Tide({**doc, "gauges": doc["gauges"] + added}, {"areas": []})
+    for pos in (FALMOUTH, THE_LIZARD, Position(48.0, -7.0), Position(46.0, -1.2)):
+        assert blended.constants_at(pos)[1] == tide.constants_at(pos)[1]
+    _, own = blended.constants_at(gib)
+    assert abs(own["M2"][0] - 0.307) < 0.02

@@ -246,7 +246,7 @@ def test_the_scenario_file_reads_a_chart_beside_a_region_and_a_save_before_it_lo
     )
     assert both.chart.name == "atlantic-east"
     # package 39a's Channel east and package 39b's Biscay north, package 39c's Biscay
-    # south, package 39d's Portugal, package 39e's islands
+    # south, package 39d's Portugal, package 39e's islands, package 39f's Strait
     assert both.chart.regions == [
         "channel-west",
         "channel-mid",
@@ -255,6 +255,7 @@ def test_the_scenario_file_reads_a_chart_beside_a_region_and_a_save_before_it_lo
         "portugal",
         "madeira",
         "azores",
+        "strait",
     ]
     data = both.save()
     assert data["scenario"]["chart"] == "atlantic-east"

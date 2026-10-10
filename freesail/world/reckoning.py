@@ -2406,6 +2406,14 @@ class Navigation:
         else:
             east = book.along_kn * hours * math.sin(book.area.set_rad)
             north = book.along_kn * hours * math.cos(book.area.set_rad)
+            current = float(getattr(book.area, "current_kn", 0.0))
+            if current:
+                # package 39f: the constant current his directions give under the tide (the
+                # Strait's inset), one more course in the traverse as Bowditch has it
+                toward = float(book.area.current_rad)
+                east += current * hours * math.sin(toward)
+                north += current * hours * math.cos(toward)
+                rate_h += current * hours
             whose = "book"
         if note:
             self._tide_used = _with(self._tide_used, whose)
@@ -2449,11 +2457,24 @@ class Navigation:
             f"by the directions for {book.area.name} and high water at {book.port.name} by "
             f"the epitome"
         )
+        current = book.current_words
+        if current:
+            # package 39f: the constant current under the tide (the Strait's inset): what
+            # he allows is the two together, which a shaped course works its triangle on
+            kn = float(book.area.current_kn)
+            c_rad = float(book.area.current_rad)
+            east = book.along_kn * math.sin(book.area.set_rad) + kn * math.sin(c_rad)
+            north = book.along_kn * math.cos(book.area.set_rad) + kn * math.cos(c_rad)
+            out["current_kn"] = round(kn, 2)
+            out["current_toward_deg"] = round(math.degrees(c_rad) % 360.0, 1)
+            out["knots"] = round(math.hypot(east, north), 2)
+            out["toward_deg"] = round(math.degrees(math.atan2(east, north)) % 360.0, 1)
+            current = f", and {current}"
         if abs(book.along_kn) < 0.5 * HOVE_TO_DRIFT_KN:
             making = "flood" if book.making_flood(now) else "ebb"
-            out["words"] = f"slack water, the {making} to make, {by}"
+            out["words"] = f"slack water, the {making} to make{current}, {by}"
         else:
-            out["words"] = f"{book.words}, {by}"
+            out["words"] = f"{book.words}{current}, {by}"
         return out
 
     def _say_tide(self) -> None:
@@ -2485,6 +2506,8 @@ class Navigation:
             what = "flood" if state[1] else "ebb"
             toward = book.area.set_rad if state[1] else book.area.set_rad + math.pi
             allowing = f"{rate_words(book.rate_kn)} to the {units.point_name(toward)}"
+            if book.current_words:
+                allowing += f", and {book.current_words}"  # package 39f: the inset
             turn = was[0] == state[0]
             if turn:
                 text = f"By the master's tide the {what} makes: allowing {allowing}."
@@ -4562,6 +4585,8 @@ class Navigation:
             what = f"{rate_words(knots)} of set {ward_words(toward)} by the captain's order"
         else:
             flood = "flood" if tide.get("flood") else "ebb"
+            if tide.get("current_kn"):
+                flood += " and the current"  # package 39f: the two together
             what = f"the {flood}, {rate_words(knots)} to the {units.point_name(toward)}"
         way = self._way_to_shape_by_kn()
         out["way_kn"] = way
@@ -5477,6 +5502,15 @@ class BookTide:
     def toward_rad(self) -> float:
         set_rad = float(self.area.set_rad)
         return set_rad % units.TWO_PI if self.flood else (set_rad + math.pi) % units.TWO_PI
+
+    @property
+    def current_words(self) -> str:
+        """'the current two knots to the E' where his directions give a constant current
+        under the tide (package 39f, the Strait's inset); '' where they give none."""
+        kn = float(getattr(self.area, "current_kn", 0.0))
+        if not kn:
+            return ""
+        return f"the current {rate_words(kn)} to the {self.area.current_point}"
 
     @property
     def words(self) -> str:

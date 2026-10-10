@@ -94,10 +94,14 @@
 # open Channel answered for every position within the limits).
 # Package 39c: Biscay south and Galicia's box is the block's bounds likewise, every position
 # of it in one of its areas below (the open bay of `open-bay-south` the rest).
+# Package 39f: the Strait's box is the block's bounds, every position of its water in one
+# of the Strait's areas below (the corners left out, north of 36.2 N between 6 and 5.48 W and
+# south of 35.76 N between 5.9 and 5.34 W, are the land of Spain and of Morocco).
 book_limits:
   - {south: 45.9, north: 51.0, west: -7.0, east: -0.9}
   - {south: 42.0, north: 45.9, west: -9.33, east: -0.9}  # Biscay south and Galicia (package 39c)
   - {south: 36.4, north: 42.0, west: -10.0, east: -6.0}  # Portugal and Cadiz (package 39d)
+  - {south: 35.5, north: 36.4, west: -6.5, east: -5.0}  # the Strait (package 39f)
   - {south: 36.5, north: 40.0, west: -31.5, east: -24.5}  # the Western Islands (package 39e)
 # Package 39e: the Western Islands' box is the region's bounds, far out in the ocean; the
 # only statement within it is the channel between Fayal and Pico (Tofiño's, below), and
@@ -743,6 +747,148 @@ areas:
       strongest_h: -3.0
       judgement: [set, rates, hour]
       source: "Tofiño 1789, 'Isla del Fayal', pp. 224 to 225: the flood N E and the ebb S W through the channel, three miles at the most; the set is the world's axis to the nearest point and the period's own word; the neaps half the springs and the hour JUDGEMENT"
+  # Package 39f (the Strait, spec M6 §26 block 6): the Strait's waters, each with the
+  # world's figures and the directions' statement in the same form as the Channel's, and
+  # one thing more: the CONSTANT CURRENT from the Atlantic in the middle of the Strait, a
+  # stream by area added to the tidal stream (`current:`, the point it sets toward in
+  # degrees and its rate in knots; the book's `current:` says it in the period's words;
+  # `freesail/world/tide.py`, `StreamArea.current_kn`, `BookStream.current_kn`). Tofiño
+  # 1787 gives the tide's sense and hours: "quando el agua crece corre por ambas costas
+  # para el O. y quando mengua para el E." (p. 8: when the water rises the stream runs
+  # westward along both shores, when it falls eastward), so the flood here is the westward
+  # stream, strongest at half-flood, three hours before high water; "las corrientes
+  # generales para el E. favorecen mucho" (p. 21). Purdy 1826 (pp. 8, 349 to 351, later
+  # than the period and the nearest English directions read) gives the rest: the tide
+  # along each shore "as far as two miles off the coast"; in the middle, between the lines
+  # A A of the charts, "the current from the Atlantic Ocean sets generally to the East";
+  # the current "in a degree regulated by the tide ... at the rate of from 3 to 6 miles";
+  # west of Tarifa "about the full and change of the moon" it "sometimes sets to the
+  # westward, quite across the Strait". So the middle runs two knots east under a tide of
+  # two and a half at springs (four and a half east at the strength of the ebb, half a
+  # knot west at the strength of a spring flood, as Purdy's figures and his rare westward
+  # set have it), the shores the tide alone. Every rate is JUDGEMENT within the period's
+  # words (no period book in hand gives a rate for the tide; Purdy's 3 to 6 miles is the
+  # current and the tide together); the axes the coasts' and the Strait's. The areas are
+  # first-match: the bay and the shores before the middle. Far from every recorded
+  # passage's water (the Strait lies 600 miles and more from the Channel's).
+  - id: gibraltar-bay
+    chart: strait
+    name: the Bay of Gibraltar
+    polygon: [[36.077, -5.425], [36.105, -5.347], [36.20, -5.347], [36.20, -5.48], [36.077, -5.48]]
+    axis_deg: 250
+    spring_kn: 0.5
+    neap_kn: 0.25
+    phase_h: -3.0
+    source: "Purdy 1826, 'Directions', p. 9: the tide that sets from Europa Point to Cape Carnero, and the eddy-tide within; Tofiño 1787, p. 19: the currents very strong with eddies about Europa Point; within the bay weak (judgement); the hour Tofiño's half-flood (p. 8)"
+    book:
+      set: WSW
+      spring_kn: 0.5
+      neap_kn: 0.25
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout but for Purdy's tide setting from Europa Point to Cape Carnero (p. 9): the world's figures rounded"
+  - id: strait-spanish-shore
+    chart: strait
+    name: the Spanish shore of the Strait, Cape Carnero to Tarifa
+    polygon: [[36.08, -5.43], [36.045, -5.43], [36.03, -5.47], [36.005, -5.53], [35.965, -5.61], [35.975, -5.665], [36.03, -5.665], [36.06, -5.55], [36.08, -5.48]]
+    axis_deg: 245
+    spring_kn: 3.0
+    neap_kn: 1.5
+    phase_h: -3.0
+    source: "Tofiño 1787, 'Mareas', p. 8: when the water rises the stream runs westward along both shores, when it falls eastward; Purdy 1826, p. 8: the tide runs as far as two miles off the coast, and at that distance off Tarifa flows until two o'clock; p. 350: a master at anchor at Tarifa found the tide running six knots and a half (a later report); the axis the coast's, the rate JUDGEMENT"
+    book:
+      set: WSW
+      spring_kn: 3.0
+      neap_kn: 1.5
+      strongest_h: -3.0
+      judgement: [set, rates]
+      source: "the sense and the hour Tofiño 1787's (p. 8: the rising water runs westward along the shore, strongest at half-flood); the set the coast's to the point and the rates JUDGEMENT (Purdy 1826's six knots and a half at Tarifa is one master's word, later)"
+  - id: strait-spanish-shore-west
+    chart: strait
+    name: the Spanish shore from Tarifa to Cape Trafalgar
+    polygon: [[35.975, -5.665], [36.03, -5.665], [36.05, -5.72], [36.20, -5.92], [36.20, -6.08], [36.15, -6.08], [36.12, -5.93], [36.04, -5.82], [36.02, -5.72]]
+    axis_deg: 293
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: -3.0
+    source: "Purdy 1826, p. 8: from Cadiz the tide of flood sets towards Cape Trafalgar, where it meets the tide from the west (the Strait's flood running out along the shore from Tarifa); Tofiño 1787, p. 8: the rising water runs westward along both shores; the axis the coast's, the rate JUDGEMENT"
+    book:
+      set: WNW
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: -3.0
+      judgement: [set, rates]
+      source: "the sense and the hour Tofiño 1787's (p. 8); the set the coast's to the point and the rates JUDGEMENT"
+  - id: strait-african-shore
+    chart: strait
+    name: the African shore of the Strait, Ceuta to Cape Spartel
+    polygon: [[35.88, -5.28], [35.935, -5.28], [35.955, -5.40], [35.945, -5.48], [35.885, -5.56], [35.85, -5.745], [35.825, -5.95], [35.76, -5.95], [35.76, -5.28]]
+    axis_deg: 275
+    spring_kn: 2.5
+    neap_kn: 1.25
+    phase_h: -3.0
+    source: "Purdy 1826, p. 8: on the southern coast, from Cape Spartel to Apes' Hill, another tide runs along shore to the westward; p. 353: the eddies under the points east of Malabat run to the west; Tofiño 1787, p. 8: the rising water runs westward along both shores; the axis the coast's, the rate JUDGEMENT"
+    book:
+      set: W
+      spring_kn: 2.5
+      neap_kn: 1.25
+      strongest_h: -3.0
+      judgement: [set, rates]
+      source: "the sense and the hour Tofiño 1787's (p. 8); the set the coast's to the point and the rates JUDGEMENT"
+  - id: strait-middle
+    chart: strait
+    name: the middle of the Strait
+    polygon: [[35.76, -6.00], [36.20, -6.00], [36.20, -5.34], [35.76, -5.34]]
+    axis_deg: 270
+    spring_kn: 2.5
+    neap_kn: 1.25
+    phase_h: -3.0
+    current: {toward_deg: 90, kn: 2.0}
+    source: "Purdy 1826, p. 8 and pp. 349 to 351: in the middle of the Strait, between the lines A A on the chart, the current from the Atlantic Ocean sets generally to the East; it is in a degree regulated by the tide and sets, according to the time of tide, at from 3 to 6 miles; west of Tarifa at full and change it sometimes sets westward quite across the Strait; Tofiño 1787, p. 21: the general currents to the eastward favour much; the inset two knots and the tide over it two and a half at springs JUDGEMENT within Purdy's figures"
+    book:
+      set: W
+      spring_kn: 2.5
+      neap_kn: 1.25
+      strongest_h: -3.0
+      current: {set: E, kn: 2.0}
+      judgement: [set, rates, current]
+      source: "the current's set the period's own (Tofiño 1787, p. 21: 'las corrientes generales para el E.'); its rate and the tide's JUDGEMENT within Purdy 1826's 3 to 6 miles of the two together (pp. 350 to 351); the tide's sense and hour Tofiño's (p. 8)"
+  - id: strait-east-mouth
+    chart: strait
+    name: the eastern mouth of the Strait, Europa Point and Ceuta
+    polygon: [[35.50, -5.34], [36.40, -5.34], [36.40, -5.00], [35.50, -5.00]]
+    axis_deg: 270
+    spring_kn: 1.5
+    neap_kn: 0.75
+    phase_h: -3.0
+    current: {toward_deg: 90, kn: 1.5}
+    source: "Purdy 1826, p. 352: allowance must be made for the current, which mostly sets near Alboran strongly eastward; pp. 349 to 350: from Malaga the flood sets along shore westward to Gibraltar; Tofiño 1787, p. 21: the general currents to the eastward; the rates JUDGEMENT, weaker than the narrows'"
+    book:
+      set: W
+      spring_kn: 1.5
+      neap_kn: 0.75
+      strongest_h: -3.0
+      current: {set: E, kn: 1.5}
+      judgement: [set, rates, current]
+      source: "the current's set the period's own (Tofiño 1787, p. 21); its rate and the tide's JUDGEMENT"
+  - id: strait-west-approach
+    chart: strait
+    name: the western approach to the Strait, Cape Trafalgar and Cape Spartel
+    polygon: [[35.50, -6.50], [36.40, -6.50], [36.40, -6.00], [35.76, -6.00], [35.76, -5.90], [35.50, -5.90]]
+    axis_deg: 270
+    spring_kn: 1.0
+    neap_kn: 0.5
+    phase_h: -3.0
+    current: {toward_deg: 90, kn: 0.5}
+    source: "Purdy 1826, p. 350: it has long been assumed that the central current invariably sets inward and affects the ocean water to the westward, inducing, to many leagues out, a general tendency to the same direction; p. 8: the Strait's flood meets the tide from the west off Cape Trafalgar; the rates JUDGEMENT"
+    book:
+      set: W
+      spring_kn: 1.0
+      neap_kn: 0.5
+      strongest_h: -3.0
+      current: {set: E, kn: 0.5}
+      judgement: [set, rates, current]
+      source: "JUDGEMENT throughout but for Purdy 1826's general tendency to the eastward many leagues out (p. 350)"
   - id: mid-channel
     chart: channel-west
     name: the open Channel
