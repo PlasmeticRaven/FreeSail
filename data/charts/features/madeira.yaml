@@ -280,7 +280,7 @@ features:
     says: "The Flat Deserter, the long high even island of the Desertas."
     fix: "moved 42 m to the grid's land"
 
-  - id: bugio
+  - id: bugio-deserta
     kind: island
     name: the Bugio
     modern: Bugio (Deserta do Sul)

@@ -40,6 +40,7 @@ testpaths = ["tests"]
 addopts = "-q --dist loadgroup"
 markers = [
     "slow: sails a day or replays one, or runs long; left out unless --slow (tests/conftest.py)",
+    "pace: measures ticks a second against the build machine's floor; meant to run alone, after the rest, not beside a worker's day (tests/conftest.py; the release workflow runs them so)",
 ]
 
 [tool.ruff]

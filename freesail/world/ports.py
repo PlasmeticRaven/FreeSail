@@ -52,6 +52,19 @@ frigate's from the King's yard by demand and survey, the schooner's from the cha
 at a price). **The crew pool** gives hands by rating at a bounty and a delay, mustered
 into the crew of milestone 3 with names from the muster's own lists.
 
+**A port's state** (package 39d; spec M6 §26): a port is `open` or `blockaded`. A
+blockaded port names its blockaders (`blockade: by:`), where their ships keep their
+station and when the blockade began, from its file or from the scenario's `ports:` entry,
+which may lay a blockade or lift one (`state: open`). What it means to a stance
+(`Nations.stance`): the port is closed to the blockaders' enemies, its own nation's
+ships among them, whose pilot will not take them in past the squadron, and whose trade,
+yard and hands are shut to them as any closed port's; to the blockaders and the rest its
+stance is the table's. It is watched by the blockaders' ships: `Ports.blockades()` lists
+each blockaded port with its blockaders and their station, the one place 6c's world's
+business reads to put the squadron on its station and to stop and search what comes
+(nothing here moves a ship), and `the port` says it. The prize court, the neutral turned
+away and the squadron itself are 6c's and milestone 7's.
+
 Every constant below names its source or says judgement; the prices in the port files
 are from memory and the files say so. Everything here is a function of the seed and
 the journal: the pilot's name is drawn from the `people` stream, the recruits' from
@@ -384,6 +397,18 @@ class Port:
     # Each mark a feature by its id or a position pricked on the chart, in the directions'
     # words; a port without them is approached by its outer road and anchorage alone.
     tracks: dict[str, list[str]] = field(default_factory=dict)
+    # A port's state (package 39d; spec M6 §26): "open", or "blockaded" with `blockade`,
+    # {"by": nation, "station": Position | None, "station_name", "since", "source"}. Plain
+    # class defaults, so a checkpoint written before them loads (`core.replay`).
+    state: str = "open"
+    blockade: dict[str, Any] | None = None
+
+    @property
+    def blockaded_by(self) -> str | None:
+        """The blockaders' nation, or None when the port is open."""
+        if self.state != "blockaded" or not self.blockade:
+            return None
+        return str(self.blockade.get("by") or "") or None
 
     def spots(self) -> list[Spot]:
         return [self.outer_road, self.anchorage, self.mooring]
@@ -496,6 +521,7 @@ def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None 
     state = state or {}
     closed = [str(x) for x in (doc.get("closed_to") or [])]
     closed += [str(x) for x in (state.get("closed_to") or []) if str(x) not in closed]
+    port_state, blockade = _port_state(doc, state, where)
     letters = []
     for letter in state.get("letters") or []:
         if isinstance(letter, str):
@@ -527,7 +553,43 @@ def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None 
         news=[str(x) for x in (state.get("news") or [])],
         path=where,
         tracks={str(k): [str(m) for m in (v or [])] for k, v in (doc.get("tracks") or {}).items()},
+        state=port_state,
+        blockade=blockade,
     )
+
+
+PORT_STATES = ("open", "blockaded")
+
+
+def _port_state(
+    doc: dict[str, Any], state: dict[str, Any], where: str
+) -> tuple[str, dict[str, Any] | None]:
+    """A port's state from its file, the scenario's entry for the port over it (package
+    39d): `state:` open or blockaded, and for a blockade `blockade:` with `by` (the
+    blockaders' nation, required), `station` (where their ships keep it: lat_deg, lon_deg
+    and a name), `since` and `source`. A scenario's `state: open` lifts the file's
+    blockade; its `blockade:` keys go over the file's."""
+    word = str(state.get("state") or doc.get("state") or "open")
+    if word not in PORT_STATES:
+        raise ValueError(f"{where}: state '{word}' is not one of {', '.join(PORT_STATES)}")
+    if word != "blockaded":
+        return word, None
+    raw = {**dict(doc.get("blockade") or {}), **dict(state.get("blockade") or {})}
+    if not raw.get("by"):
+        raise ValueError(f"{where}: a blockaded port names its blockaders (blockade: by:)")
+    station = raw.get("station") or {}
+    pos = (
+        Position(float(station["lat_deg"]), float(station["lon_deg"]))
+        if station.get("lat_deg") is not None and station.get("lon_deg") is not None
+        else None
+    )
+    return word, {
+        "by": str(raw["by"]),
+        "station": pos,
+        "station_name": str(station.get("name") or ""),
+        "since": str(raw.get("since") or ""),
+        "source": str(raw.get("source") or ""),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -649,7 +711,33 @@ class Ports:
         return self.world.nations.nation_of_names(names)
 
     def stance(self, port: Port) -> str:
-        return self.world.nations.stance(port.nation, self.ship_nation, port.closed_to)
+        return self.world.nations.stance(
+            port.nation, self.ship_nation, port.closed_to, blockaded_by=port.blockaded_by
+        )
+
+    def blockades(self) -> list[dict[str, Any]]:
+        """The blockaded ports of this World and who watches each (package 39d): the
+        port, the blockaders' nation, their station and its name, as data for 6c's
+        world's business to read; nothing here moves a ship."""
+        out = []
+        for port in self.ports.values():
+            by = port.blockaded_by
+            if by is None or port.blockade is None:
+                continue
+            out.append(
+                {
+                    "port": port.id,
+                    "by": by,
+                    "station": port.blockade.get("station"),
+                    "station_name": port.blockade.get("station_name", ""),
+                    "since": port.blockade.get("since", ""),
+                }
+            )
+        return out
+
+    def watched_by(self, port: Port) -> str | None:
+        """The nation whose ships watch the port: its blockaders, or None."""
+        return port.blockaded_by
 
     def nearest(self, within_nm: float | None = None) -> tuple[Port, float] | None:
         """The nearest port by its roads, and the miles to them."""
@@ -1142,11 +1230,21 @@ class Ports:
         nation = world.nations.get(self.ship_nation)
         if stance == "closed":
             craft = port.pilot.craft
-            text = (
-                f"The pilot hailed from the {craft}: {port.name} is closed to {nation.people} "
-                f"by the port's order; you will get no pilot here, and the batteries will not "
-                f"let you pass. The {craft} bore up for the land."
-            )
+            by = port.blockaded_by
+            if by is not None and world.nations.at_war(by, self.ship_nation):
+                # package 39d: closed by the blockade, not by the port's order
+                watchers = world.nations.get(by)
+                text = (
+                    f"The pilot hailed from the {craft}: {port.name} is blockaded by the "
+                    f"{watchers.adjective} squadron; no pilot will take {nation.people} in "
+                    f"past their ships. The {craft} bore up for the land."
+                )
+            else:
+                text = (
+                    f"The pilot hailed from the {craft}: {port.name} is closed to "
+                    f"{nation.people} by the port's order; you will get no pilot here, and "
+                    f"the batteries will not let you pass. The {craft} bore up for the land."
+                )
             self._record(
                 Severity.NOTABLE,
                 "port.pilot_refused",
@@ -1546,6 +1644,10 @@ class Ports:
                 f"{distance_words(d_nm * units.NAUTICAL_MILE)}, the account good to {good}"
             )
         bits = [where, f"the port {stance} to {self.world.nations.get(self.ship_nation).people}"]
+        by = port.blockaded_by
+        if by is not None:
+            # package 39d: a blockaded port says who watches it
+            bits.append(f"blockaded by the {self.world.nations.get(by).adjective}")
         if self.pilot is not None:
             bits.append(f"the pilot {self.pilot.name} aboard")
         cutter = self._cutter()
@@ -1563,7 +1665,7 @@ class Ports:
                 doing = "going back"
             bits.append(f"the pilot {port.pilot.craft} {doing}")
         bits.append(self.boat.words())
-        return {
+        out = {
             "words": "; ".join(bits),
             "port": port.id,
             "stance": stance,
@@ -1572,6 +1674,11 @@ class Ports:
             "pilot": self.pilot.to_dict() if self.pilot else None,
             "boat_away": self.boat.away,
         }
+        if by is not None:
+            # package 39d: only a blockaded port's reading carries its state, so an open
+            # port's reading is what it was
+            out.update({"state": port.state, "blockaded_by": by})
+        return out
 
     def pilot_reading(self) -> dict[str, Any] | None:
         if self.pilot is None or self.pilot_port is None:

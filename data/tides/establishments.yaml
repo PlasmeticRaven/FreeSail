@@ -91,6 +91,21 @@ tables:
       - {name: the Isle of Ré, lat_deg: 46.204, lon_deg: -1.367, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden pp. 81 and 93: in the Pertuis d'Antioche high tide from half an hour after 3 to 4 o'clock; the tide rises 15 feet in the roads of Ré"}
       - {name: La Rochelle, lat_deg: 46.159, lon_deg: -1.152, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden p. 81: the tides from half an hour after 3 to 4 o'clock at new and full moon; the tide rises 15 feet at La Rochelle"}
       - {name: Brouage, lat_deg: 45.862, lon_deg: -1.068, hw_h: 4, hw_m: 0, spring_rise_ft: 15, note: "Faden pp. 83 and 93: at Brouage high water at 4 o'clock and the currents very strong; the rise the coast of Poitou's, which his table holds Brouage in"}
+      # Package 39d, Portugal and Cadiz: the hours of high water at new and full moon that
+      # Tofiño 1789's Derrotero gives (the Spanish survey of the coast, 1786 to 1788, in
+      # period exactly; the better table's figures for this coast, as Faden's are for
+      # Biscay's). His rise at Cadiz, eleven Castilian feet at springs (3.06 m), is ten
+      # English feet; at Ayamonte "more than two brazas" (3.34 m), eleven. Where he gives
+      # no rise (Lisbon, San Lucar) it is the world's spring range at the place, the
+      # 37j rule (JUDGEMENT), which over the block is Le Conquet's tide alone while the
+      # block's gauges are held (constituents.yaml), and not the coast's own (Cascais's
+      # is some eleven feet). Moore 1799's table of latitudes and high water names Oporto,
+      # the Rock of Lisbon, Lisbon, Cape Espichel, Cape St Vincent and Cadiz, but its OCR
+      # loses the hours' column: no Moore row is added.
+      - {name: Lisbon, lat_deg: 38.704, lon_deg: -9.145, hw_h: 2, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Tofiño 1789, p. 88: high water on the days of new and full moon at two in the afternoon, the ebb running up to seven miles an hour"}
+      - {name: San Lucar, lat_deg: 36.790, lon_deg: -6.405, hw_h: 3, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Tofiño 1789, p. 108: on the days of new and full moon high water at three in the afternoon (the bar of the Guadalquivir)"}
+      - {name: Ayamonte, lat_deg: 37.170, lon_deg: -7.398, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Tofiño 1789, p. 101: the water rises more than two brazas on the days of new and full moon, high water at three in the afternoon (the bar of the Guadiana)"}
+      - {name: Cadiz, lat_deg: 36.548, lon_deg: -6.276, hw_h: 2, hw_m: 0, spring_rise_ft: 10, note: "Tofiño 1789, p. 119: on the days of new and full moon high water at two in the afternoon and the tide rises eleven feet (Castilian), twelve the days after, six at the quarters"}
       # Package 39e, Madeira and the Western Islands: Norie's own Table XLI of 1805 (the
       # edition the study did not read; Internet Archive norie-1805-a-new-and-complete-
       # epitome-of-practical-navigation, the page images of pp. 248 to 250 read through the

@@ -227,8 +227,9 @@ def test_the_islands_gauges_are_read_and_held_and_norie_gives_their_hours(tide=N
 def test_fayals_channel_is_in_the_directions_and_the_open_sea_between_has_no_statement():
     """Tofiño's stream between Fayal and Pico (the flood N E, the ebb S W, three miles at
     the most) is an area of the world's and a statement of the master's; the islands'
-    water is a box of the directions' own (`book_waters`), where only an area with a
-    polygon answers: the open Channel's statement does not reach the ocean."""
+    water is a box of the directions' limits of its own (package 39d's list of boxes), where
+    no other statement answers: the open Channel's is of its own bounds and does not reach
+    the ocean."""
     book = T.load_directions()
     channel = book.area_at(Position(38.52, -28.57))
     assert channel is not None and channel.id == "fayal-channel"
@@ -236,7 +237,7 @@ def test_fayals_channel_is_in_the_directions_and_the_open_sea_between_has_no_sta
     assert book.area_at(Position(38.0, -27.0)) is None  # the islands' box, no area
     assert book.area_at(Position(40.0, -15.0)) is None  # the ocean between
     assert book.area_at(Position(49.3, -5.0)).id == "mid-channel"  # the Channel as before
-    assert book.waters == ((36.5, 40.0, -31.5, -24.5),)
+    assert (36.5, 40.0, -31.5, -24.5) in book.boxes
 
 
 def test_a_tile_is_written_with_its_entries_dated_alike_so_the_same_arrays_give_the_same_bytes(

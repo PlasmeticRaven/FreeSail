@@ -308,6 +308,79 @@ held_gauges:
     S2: {amplitude_m: 0.642, phase_deg: 131.2}
     N2: {amplitude_m: 0.371, phase_deg: 78.6}
 
+  # THE GAUGES OF PORTUGAL AND CADIZ, READ AND HELD (package 39d). TICON's file read
+  # 2026-10-10 by coordinates over the block (36.3 to 42.1 N, 10.1 to 5.9 W; the zip at
+  # store.pangaea.de, SHA-256 7055f8ed...6514, the same file): five records, Cascais, Lagos,
+  # Huelva (Mazagón), Bonanza (the Guadalquivir's mouth) and Cadiz. It has NO gauge at
+  # Leixões, Oporto, Lisbon or Setúbal (the brief's "unverified until read": these it has
+  # not). Each named by Puertos del Estado's REDMAR list (Huelva 3329, Bonanza 3333,
+  # INT_3, read 2026-10-10) or by its coordinates (Cascais, Lagos, Cadiz).
+  #
+  # The mean levels above the chart's datum: Huelva 1.96 m and Bonanza 1.54, REDMAR's
+  # reports GLOB_2_3_3329 and _3333 (the mean sea level less the lowest astronomical tide,
+  # 203 less 7 and 173 less 19 cm above the gauge's zero), VERIFIED; Cascais and Lagos
+  # 2.0, the Instituto Hidrográfico's Zero Hidrográfico 2.0 m below the Cascais vertical
+  # datum offshore (EPSG 10393's record, read 2026-10-10), the datum's surface taken for
+  # the mean level and the ZH for the chart's datum: JUDGEMENT; Cadiz unverified (no
+  # published level read; Huelva's 1.96 would stand for it, the two tides agreeing to a
+  # centimetre and a degree).
+  #
+  # HELD, NOT BLENDED, as the Channel east's and Biscay north's are. These lie beyond the
+  # 400 miles' reach of every Channel position, so blending them would not move a recorded
+  # passage's digest by the reach (the nearest, Cascais, is some 610 miles from Le
+  # Conquet); but the far rule does not keep them to their own water either: blended, a
+  # position of Biscay south would take them with the Biscay gauges, and the block that
+  # blends a gauge decides for all. The lead's decision with the other blocks' (the
+  # engine wants a gauge's own reach); until then the world's tide over the block is Le
+  # Conquet's alone (the nearest of the eleven, `TideState.far`), M2 2.02 m at 110.7
+  # degrees against these 0.92 to 1.04 m at 57 to 64: an hour and three-quarters late
+  # and twice the range (docs/dev/TuningNotes.md, package 39d).
+  - id: cascais
+    name: Cascais
+    lat_deg: 38.6917
+    lon_deg: -9.4167
+    record: "GESLA-2, UHSLC, 1959 to 2005"
+    mean_level_m: 2.0  # judgement: the Cascais datum 2.0 m above the ZH (EPSG 10393)
+    M2: {amplitude_m: 0.996, phase_deg: 64.4}
+    S2: {amplitude_m: 0.353, phase_deg: 90.8}
+    N2: {amplitude_m: 0.213, phase_deg: 47.2}
+  - id: lagos
+    name: Lagos
+    lat_deg: 37.0983
+    lon_deg: -8.6683
+    record: "GESLA-2, UHSLC, 1986 to 2000"
+    mean_level_m: 2.0  # judgement, as Cascais's
+    M2: {amplitude_m: 1.011, phase_deg: 57.5}
+    S2: {amplitude_m: 0.364, phase_deg: 83.3}
+    N2: {amplitude_m: 0.216, phase_deg: 41.4}
+  - id: huelva
+    name: Huelva (Mazagón)
+    lat_deg: 37.1320
+    lon_deg: -6.8340
+    record: "GESLA-2, Puertos del Estado, 1996 to 2015"
+    mean_level_m: 1.96
+    M2: {amplitude_m: 1.040, phase_deg: 57.4}
+    S2: {amplitude_m: 0.378, phase_deg: 84.1}
+    N2: {amplitude_m: 0.222, phase_deg: 41.4}
+  - id: bonanza
+    name: Bonanza (the Guadalquivir)
+    lat_deg: 36.8000
+    lon_deg: -6.3400
+    record: "GESLA-2, Puertos del Estado, 1992 to 2015"
+    mean_level_m: 1.54
+    M2: {amplitude_m: 0.920, phase_deg: 63.6}
+    S2: {amplitude_m: 0.319, phase_deg: 90.4}
+    N2: {amplitude_m: 0.190, phase_deg: 48.0}
+  - id: cadiz
+    name: Cadiz
+    lat_deg: 36.5333
+    lon_deg: -6.2833
+    record: "GESLA-2, IEO, 1961 to 2012"
+    mean_level_m: null  # unverified: no published level read (Huelva's 1.96 would stand)
+    M2: {amplitude_m: 1.032, phase_deg: 57.1}
+    S2: {amplitude_m: 0.374, phase_deg: 83.0}
+    N2: {amplitude_m: 0.219, phase_deg: 40.6}
+
   # THE GAUGES OF MADEIRA AND THE WESTERN ISLANDS, READ AND HELD (package 39e). TICON's
   # file holds five gauges of the islands, read 2026-10-10 by their coordinates as package
   # 34 read the eleven (the zip at doi.pangaea.de, the same SHA-256 7055f8ed1a14abf8...6514):

@@ -30,7 +30,7 @@ A gate has four parts:
 The test suite is in two tiers. The **fast tier** is everything but the tests that sail a whole day or replay one, and the few truths that run long; the **slow tier** is those (they are marked `slow` in `tests/conftest.py`, which says how they were chosen).
 
 - `py -m pytest -n auto` runs the fast tier on all the machine's cores, in a few minutes (`python -m pytest` on Linux or a Mac, as in the commands below). Its last line says how many slow tests it left out.
-- `py -m pytest -n auto --slow` runs the whole suite, both tiers. This is what the gate release runs, and what a package runs before it is finished.
+- `py -m pytest -n auto --slow` runs the whole suite, both tiers. This is what a package runs before it is finished. The gate release runs it as `--slow -m "not pace"` and then `--slow -m pace` without `-n`: the five pace measurements (truth 51 and its kin, marked `pace` by `tests/conftest.py`) read the machine's load when they share it with the other workers' days, so they run alone, last; a run under `-n` that fails only them has measured the load, and they are re-run alone before anything is concluded.
 - `py -m pytest -n auto -m slow` runs the slow tier alone, and a test named by `-k` or by its node id (`file.py::test_name`) runs whichever tier it is in.
 
 Every push of code runs the fast tier on GitHub's machines, on Linux and on Windows. The days the slow tests sail are each built once a run, on one core (`--dist loadgroup`, set in `pyproject.toml`), however many cores there are.

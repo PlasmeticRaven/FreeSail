@@ -1,0 +1,220 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"145,-25": [
+"la-carraca",
+"isla-de-leon"
+],
+"145,-26": [
+"torregorda"
+],
+"146,-25": [
+"el-puerto",
+"matagorda",
+"trocadero",
+"puerto-real"
+],
+"146,-26": [
+"chipiona-point",
+"el-perro",
+"el-sabinal",
+"chipiona-light",
+"regla",
+"punta-candor",
+"candor-reef",
+"rota",
+"rota-rocks",
+"santa-catalina-del-puerto",
+"san-sebastian-light",
+"cadiz",
+"la-olla",
+"los-cochinos",
+"las-puercas",
+"el-fraile",
+"el-diamante",
+"la-galera",
+"cadiz-outer-road",
+"cadiz-bay-anchorage",
+"puntales",
+"puntales-channel",
+"santo-domingo-shoal"
+],
+"147,-26": [
+"sanlucar",
+"sanlucar-bar",
+"bonanza-road"
+],
+"147,-27": [
+"torre-de-la-higuera"
+],
+"147,-32": [
+"cabo-santa-maria",
+"santa-maria-light"
+],
+"147,-36": [
+"sagres-point"
+],
+"148,-27": [
+"arenas-gordas"
+],
+"148,-28": [
+"punta-umbria",
+"torre-del-oro"
+],
+"148,-30": [
+"guadiana-mouth",
+"ayamonte"
+],
+"148,-31": [
+"tavira",
+"tavira-road"
+],
+"148,-32": [
+"faro",
+"monte-figo"
+],
+"148,-33": [
+"albufeira"
+],
+"148,-34": [
+"carvoeiro-algarve"
+],
+"148,-35": [
+"ponta-da-piedade",
+"lagos",
+"lagos-road",
+"lagos-town-road",
+"portimao"
+],
+"148,-36": [
+"cape-st-vincent",
+"st-vincent-convent",
+"st-vincent-convent-light",
+"st-vincent-light",
+"st-vincent-farallon",
+"sagres-road"
+],
+"149,-35": [
+"monchique"
+],
+"149,-36": [
+"arrifana-road"
+],
+"150,-36": [
+"milfontes",
+"cabo-sardao"
+],
+"151,-36": [
+"cabo-de-sines",
+"sines-road",
+"pessegueiro"
+],
+"153,-36": [
+"arrabida",
+"outao",
+"outao-light",
+"setubal-bar"
+],
+"153,-37": [
+"cabo-espichel",
+"espichel-light",
+"espichel-church",
+"sesimbra",
+"sesimbra-road"
+],
+"154,-36": [
+"sao-filipe",
+"setubal",
+"setubal-road"
+],
+"154,-37": [
+"belem-tower",
+"belem-road",
+"lisbon",
+"castelo-sao-jorge",
+"lisbon-road"
+],
+"154,-38": [
+"guia-light",
+"cascais",
+"santa-marta",
+"cascais-road",
+"sao-juliao",
+"sao-juliao-light",
+"cachopo-norte",
+"bugio",
+"bugio-light",
+"cachopo-sul",
+"great-pass",
+"little-pass"
+],
+"155,-38": [
+"ericeira",
+"mafra",
+"cabo-da-roca",
+"roca-light",
+"sintra"
+],
+"155,-39": [
+"roca-shoal"
+],
+"157,-37": [
+"obidos-lagoon"
+],
+"157,-38": [
+"cabo-carvoeiro",
+"carvoeiro-light",
+"nau-dos-corvos",
+"peniche",
+"peniche-road",
+"berlenga-road",
+"berlings-passage"
+],
+"157,-39": [
+"berlenga",
+"berlenga-fort",
+"berlenga-light",
+"estelas",
+"estelas-laja",
+"farilhao-grande"
+],
+"158,-37": [
+"nazare-church",
+"pederneira-road"
+],
+"160,-36": [
+"cabo-mondego",
+"alto-de-mondego",
+"mondego-light",
+"buarcos-road",
+"figueira"
+],
+"162,-35": [
+"aveiro-bar"
+],
+"164,-35": [
+"leixoes",
+"sao-joao-da-foz",
+"senhora-da-luz-light",
+"sao-miguel-o-anjo",
+"filgueira",
+"cabedelo",
+"oporto",
+"clerigos-tower",
+"oporto-road",
+"douro-within-bar"
+],
+"165,-35": [
+"vila-do-conde"
+],
+"166,-36": [
+"viana",
+"viana-road",
+"cavalos-de-fao"
+],
+"167,-36": [
+"monte-santa-tecla",
+"minho-mouth"
+]
+}
+}

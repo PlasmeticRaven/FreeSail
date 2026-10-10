@@ -1255,6 +1255,60 @@ the figures are in `docs/dev/TuningNotes.md`.
    for the Spanish sheets; the Portuguese coast from the period's English directions
    (Norie, Faden) and Tofiño's Portuguese sheets; Portugal neutral in 1805, Cadiz
    blockaded, which the nations table gains as a state of a port.
+   **As built (package 39d, 2026-10-10).** `portugal`, 36.4 to 42 N and 10 to 6 W,
+   abutting Biscay south at 42 N and the Strait at 36.4 N (neither built beside it: the
+   rows of tiles straddling 42 N and 36.4 N are written by this block and the lead keeps
+   one listing at the merge). 68 level-2 tiles of the 140 that meet the bounds (the 72
+   all of land, the interior of Portugal and Spain, computed for the field and not
+   written: the recipe's `skip_dry_tiles`, the corridor answering there) and 48 level-3
+   tiles in six harbour groups (the Douro, the Tagus from Cascais to Lisbon, Setúbal,
+   Lagos, Faro, the bay of Cadiz), about 18 MB with the coast and the features; GEBCO's
+   fill raised by the coast's own mean level, 2.0 m (`fill_mean_level_m`: the world's over
+   a held block is a far gauge's, and raised by Le Conquet's four metres the estuaries
+   EMODnet lacks stood above low water). The period source is Tofiño's: his *Derrotero*
+   of 1789 for 139 marks from the Minho to the bay of Cadiz (his frigate's survey of the
+   Portuguese coast with Pimentel's directions quoted, the King's pilots' instruction for
+   Cadiz), his *Plano del Puerto de Cadiz* at full resolution for the one patch, the inner
+   bay given back its 1805 water where the modern grid has the free-trade zone and the
+   shipyard of Matagorda (the channel of Puntales at 4 2/6 brazas; the datum low water of
+   springs, 0.40 m above LAT by REDMAR's Huelva, whose tide is Cadiz's to a centimetre; the
+   new unit `brazas`); the English directions were looked for and not found in the
+   period's (the *Oriental Navigator* has no Lisbon). The lights of 1805: the Senhora da
+   Luz, the Rock, the Guide, São Julião, the Bugio, Carvoeiro and Espichel, the convent's
+   on Cape St Vincent (whether it burned in 1805 unverified) and San Sebastián's; the
+   Berlenga's (1842) and the tower of St Vincent (1846) not yet. Five port files: Oporto,
+   Lisbon, Setúbal and Lagos, Portuguese and neutral, open to all; Cadiz, Spain's and
+   blockaded. The tide: TICON has Cascais, Lagos, Huelva, Bonanza and Cadiz (none at
+   Leixões, Lisbon or Setúbal), read and held (they lie beyond every Channel position's
+   reach, so blending them would move no recorded passage: the lead's decision with the
+   other blocks'), and the world's tide over the block is Le Conquet's alone, far, twice
+   the range and late; six stream areas (the bars of the Douro, the Tagus and the Sado,
+   the river before Lisbon, the bay of Cadiz, the open coast); the directions' limits are
+   a list of boxes, the block its own, and the open Channel's statement keeps to its own
+   bounds (`tide.Directions.boxes`, `BookStream.bounds`); Tofiño's hours at Lisbon, Cadiz,
+   San Lucar and Ayamonte in the better epitome. The weather: the Portuguese coast's box
+   stays PROVISIONAL (no printed table read). The scenario `portugal.yaml`: the American
+   topsail schooner from the road off the bar of Oporto down the coast before the
+   northerly, through the Berlings' passage and over the bar of Lisbon to the road of
+   Belém; its run is in `docs/dev/TuningNotes.md`.
+   **A port's state** (package 39d; `freesail/world/ports.py`, `freesail/world/nations.py`).
+   What was built: a port file says `state: open` (the default) or `state: blockaded`
+   with `blockade:` (`by`, the blockaders' nation, required; `station`, where their ships
+   keep it; `since`; `source`), and a scenario's `ports:` entry lays a blockade or lifts
+   one (`state: open`); `Nations.stance` takes the blockaders and makes the port
+   **closed to every nation at war with them**, its own nation's ships and its allies'
+   among them, the table's to the rest (a King's ship finds Cadiz hostile as any Spanish
+   port, a neutral neutral); a closed-by-blockade port's pilot hails his refusal in the
+   blockade's words ("Cadiz is blockaded by the British squadron; no pilot will take the
+   Spaniards in past their ships"), and its trade, yard and hands are shut as any closed
+   port's; `the port` says "blockaded by the British"; `Ports.blockades()` lists each
+   blockaded port with its blockaders and their station, and `Ports.watched_by` names
+   them: **the one place 6c's world's business reads** to put the squadron on its
+   station. What was left to 6c and milestone 7: the squadron's ships themselves (no
+   ship is drawn or moved by a blockade), the stopping and searching of a neutral and
+   the turning away of one bound in (the law of blockade of the period, which closed a
+   declared blockade to neutrals too), prizes and the prize court, a blockade raised or
+   laid by the news of the war.
 5. **Madeira** (`madeira`, about 32°N to 33.5°N, 17.5°W to 16°W): Funchal and its open
    road, Porto Santo, the Desertas; the island's lights and marks as 1805 had them; the
    Portuguese trades in the climatology; the voyage's end as an anchorage in a road with a
@@ -1280,8 +1334,9 @@ the figures are in `docs/dev/TuningNotes.md`.
    held (no mean level read; they lie beyond the reach of every Channel position, so
    their blending is the lead's to order once they have one); Norie's Table XLI of 1805
    read from the page images for Funchal (12h 4m, 7 feet), Angra Bay and Fayal Road;
-   Tofiño's stream between Fayal and Pico, in a water of the directions' own
-   (`book_waters`), so that the open Channel's statement does not reach the ocean. The
+   Tofiño's stream between Fayal and Pico, in a box of the directions' limits of its
+   own (`book_limits`, package 39d's list of boxes), where the open Channel's statement,
+   of its own bounds, does not reach. The
    weather: an Azores box, PROVISIONAL and judgement. **The lookout at a peak's height**:
    a feature taller than `chart.SEARCH_HEIGHT_M` (300 m) is looked for wherever she is,
    and in the clearest weather seen to its own geographic horizon
