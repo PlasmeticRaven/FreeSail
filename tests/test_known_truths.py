@@ -73,6 +73,7 @@ script in tests/test_weather_script.py.
 
 from __future__ import annotations
 
+import json
 import math
 import re
 import sys
@@ -4812,47 +4813,15 @@ def test_truth_79_a_silent_captains_door_passes_the_deck_to_the_book_and_the_boo
 
 
 # Truth 80 (spec M6 §5, §8; package 40b): an officer's own reckoning, worked from the
-# master's slate by the slate's own words, as a model at the station reads them.
-_SLATE_POINT = r"([NESW]+(?: by [NESW]+)?)"
-_SLATE_FROM = re.compile(r"(\d+)° (\d+)' ([NS]), (\d+)° (\d+)' ([EW]) by account then")
-_SLATE_BOARD = re.compile(r"\((\d{3})°\) (\d+\.\d) miles([^;]*)")
-_SLATE_ALSO = re.compile(r"(?:the tide|her drift hove to) (\d+\.\d) miles to the " + _SLATE_POINT)
-_SLATE_SIGHT = re.compile(r"moved (\d+\.\d) miles to the " + _SLATE_POINT)
-
-
-def work_the_slate(words: str, with_the_tide: bool = True) -> tuple[float, float]:
-    """The traverse worked from the slate's words alone: where it begins, each board's
-    course and distance and the tide and drift with it, each sight's move; (lat, lon)."""
-    m = _SLATE_FROM.search(words)
-    assert m, words
-    lat = (int(m.group(1)) + int(m.group(2)) / 60.0) * (1 if m.group(3) == "N" else -1)
-    lon = (int(m.group(4)) + int(m.group(5)) / 60.0) * (1 if m.group(6) == "E" else -1)
-    boards = words.split("and its distance: ", 1)[1].split(". ", 1)[0]
-    de = dn = 0.0
-    for course, miles, rest in _SLATE_BOARD.findall(boards):
-        c = math.radians(float(course))
-        de += float(miles) * math.sin(c)
-        dn += float(miles) * math.cos(c)
-        for also in _SLATE_ALSO.finditer(rest):
-            if with_the_tide or not also.group(0).startswith("the tide"):
-                a = units.parse_compass_point(also.group(2))
-                de += float(also.group(1)) * math.sin(a)
-                dn += float(also.group(1)) * math.cos(a)
-    for miles, point in _SLATE_SIGHT.findall(words):
-        a = units.parse_compass_point(point)
-        de += float(miles) * math.sin(a)
-        dn += float(miles) * math.cos(a)
-    lat += dn / 60.0
-    lon += de / (60.0 * math.cos(math.radians(lat)))
-    return lat, lon
-
-
+# master's slate by the slate's own words, as a model at the station reads them (the
+# working is the fake master's since package 41, `fake.work_the_slate`).
 def _the_officers_own_noon(with_the_tide: bool):
     """The frigate standing ESE off the Lizard across the stream, the fake officer seated
     off watch at twenty to twelve: he asks for the slate, works it from its words, and
     gives his own reckoning; then noon."""
     from freesail.agents import Fake, Harness, SamplingPolicy, call, reply
     from freesail.agents.agent import officer
+    from freesail.agents.fake import work_the_slate
 
     sc = Scenario(
         start_time=datetime(1805, 6, 12, 11, 10),
@@ -4910,3 +4879,242 @@ def test_truth_80_an_officers_own_reckoning_from_the_slate_agrees_with_the_maste
     careless, _ = _the_officers_own_noon(with_the_tide=False)
     other = [e for e in careless.log if e.kind == "reckoning.own_noon"][0]
     assert other.data["from_master_nm"] > own.data["from_master_nm"] + 0.5
+
+
+# ---------------------------------------------------------------------------
+# Milestone 6b: the wardroom (package 41; spec M6 §11, §12, §16): truths 82 to 85 on the
+# cutter's free passage with fakes. No recorded passage's pin moves: none has a station
+# seated, and the pace rule changes no tick of the world (the clock's compression is the
+# driver's, not the simulation's).
+# ---------------------------------------------------------------------------
+
+CUTTER = "data/ships/cutter.yaml"
+WARDROOM_EVERY = 600  # the stations sampled every ten minutes in lockstep
+
+
+def _free_cutter() -> World:
+    return make_world(
+        7,
+        CUTTER,
+        Scenario(wind_from_deg=0.0, ship_heading_deg=180.0, gustiness=0.0, variability=0.0),
+    )
+
+
+def _the_cutters_free_passage():
+    """The cutter at seed 7 in a steady northerly, standing south under plain sail, with
+    the fake captain and the fake officer seated through two in-process doors (a harness
+    each) and the player at the master's station: the captain gives the officer the deck
+    and his general authority, tells him and asks the master for a course; the officer
+    trims the sheets and heaves the log once each when he has the deck (a cutter carries
+    no royals for the stock fake officer to keep)."""
+    from freesail.agents import Fake, Harness, Reply, SamplingPolicy, call
+    from freesail.agents.agent import CAPTAIN, OFFICER, captain, officer
+    from freesail.agents.fake import captain_of_the_ship, readings_so_far
+    from freesail.agents.seat import seat_player
+
+    world = _free_cutter()
+    world.submit("set plain sail")
+    world.run(600)
+    policy = SamplingPolicy.in_lockstep(WARDROOM_EVERY, "notable", "urgent")
+    orders = ["trim sails", "heave the log"]
+
+    def keep_the_cutter(last, turns):
+        if "tool_results" in last:
+            return Reply()
+        held = str(readings_so_far(turns).get("officer_of_the_watch") or "")
+        if orders and "has the deck since" in held:
+            return Reply(calls=(call("submit_order", text=orders.pop(0)),))
+        # a stand-by, not silence: a deck is not kept in silence (the officer's brief)
+        return Reply(calls=(call("stand_by", until="eight bells"),))
+
+    oh = Harness(world, officer(policy, world=world), Fake([keep_the_cutter], loop=True), save=None)
+    oh.model_name, oh.door = "the fake officer", "runner"
+    oh.start()
+    ch = Harness(
+        world,
+        captain(policy, world=world),
+        captain_of_the_ship(
+            [
+                "you have the deck",
+                "you may work the ship",
+                "tell the officer keep her full and by",
+                "ask the master for a course",
+            ]
+        ),
+        save=lambda w, r: None,
+    )
+    ch.model_name, ch.door = "the fake captain", "mcp"
+    ch.start()
+    seat = seat_player(world, "master", door="console")
+    world.run(4 * WARDROOM_EVERY + 1)
+    seat.route("answer south by east, sir, and nothing to leeward")
+    world.run(2 * 3600)
+    assert CAPTAIN in world.agents and OFFICER in world.agents
+    return world, ch, oh, seat
+
+
+@pytest.fixture(scope="module")
+def cutter_wardroom():
+    return _the_cutters_free_passage()
+
+
+def test_truth_82_two_fakes_through_two_doors_play_the_cutter_with_each_order_under_its_own_mark(
+    cutter_wardroom,
+):
+    """Spec M6 §16, truth 82: "Two fake stations on one ship through two in-process doors,
+    captain and officer, play the cutter's free passage with the captain's `you may` to
+    the officer, and the log carries each order under its own mark." The captain's
+    sentences are logged as his ('By the captain: you have the deck.'), the officer's
+    orders as his ('By the officer of the watch: ...'), the player's answer at the
+    master's seat as the driver's line it is; the officer holds the deck and the general
+    authority by the captain's word."""
+    world, ch, oh, seat = cutter_wardroom
+    log = world.log
+    assert ch.agent.has_deck and oh.agent.has_deck and oh.agent.general
+    by_captain = [e.text for e in log if e.actor == "the captain" and e.kind == "order.accepted"]
+    assert "By the captain: you have the deck." in by_captain
+    assert "By the captain: you may work the ship." in by_captain
+    assert "By the captain: tell the officer keep her full and by." in by_captain
+    assert "By the captain: ask the master for a course." in by_captain
+    by_officer = [
+        e.text for e in log if e.actor == "the officer of the watch" and e.kind == "order.accepted"
+    ]
+    assert by_officer and all(t.startswith("By the officer of the watch: ") for t in by_officer)
+    marks = {e.actor for e in log if e.kind == "order.accepted"}
+    assert {"the captain", "the officer of the watch", "captain"} <= marks
+    deck = [e for e in log if e.kind == "agent.deck" and e.data.get("deck") == "given"]
+    assert [e.data["station"] for e in deck] == ["captain", "officer of the watch"]
+    told = [e for e in log if e.kind == "agent.told"]
+    assert told and told[0].text.startswith(
+        f"The captain ({ch.station.person}), on the quarterdeck"
+    )
+    answered = [e for e in log if e.kind == "agent.answered"]
+    assert answered and answered[0].data["to"] == "captain" and answered[0].actor == "driver"
+    assert {actor for _, actor, _ in world.journal} <= {"captain", "the master (the player)"}
+
+
+def test_truth_83_the_clock_holds_at_1x_while_a_sample_is_open_and_a_stand_by_releases_it():
+    """Spec M6 §16, truth 83: "The clock holds at 1x while a sample is open and returns to
+    the set compression when it is answered; a stand-by releases it." The browser's
+    driver at 60x with a door that answers late: a real second brings one tick while the
+    officer's sample is open, sixty once it is answered, one again at his next sample,
+    and sixty when he stands by. The World's ticks are the same ticks: only how many a
+    real second brings moves."""
+    pytest.importorskip("fastapi")
+    from freesail.agents import Harness, Reply, SamplingPolicy, call
+    from freesail.agents.agent import officer
+    from freesail.ui.server import Driver
+
+    class Late:
+        def reply(self, turns):
+            return None
+
+    world = _free_cutter()
+    driver = Driver(world, compression=60.0)
+    h = Harness(
+        world, officer(SamplingPolicy.periodic(WARDROOM_EVERY), world=world), Late(), save=None
+    )
+    h.start()
+    driver.running = True
+    assert h.open_sample is not None
+    driver._tick_owed(0.0, 1.0)
+    assert world.clock.tick == 1 and driver.state()["pace"]["held"]
+    assert driver.state()["pace"]["open"][0]["station"] == "officer of the watch"
+    h.deliver(Reply(text="Nothing yet."))
+    driver._tick_owed(0.0, 1.0)
+    assert world.clock.tick == 61 and not driver.state()["pace"]["held"]
+    driver._tick_owed(0.0, 9.0)
+    assert world.clock.tick == 601 and h.open_sample is not None  # the next sample
+    driver._tick_owed(0.0, 1.0)
+    assert world.clock.tick == 602
+    h.deliver(Reply(calls=(call("stand_by", until="eight bells"),)))
+    assert h.agent.standing_by and h.open_sample is None
+    driver._tick_owed(0.0, 1.0)
+    assert world.clock.tick == 662
+    assert world.readings["pace"]["rule"] == "pace"
+    free = Driver(world, compression=60.0, free_running=True)
+    assert free.pace.rate(60.0) == 60.0 and world.pace_rule == "free"
+
+
+def test_truth_84_a_say_on_the_quarterdeck_is_heard_by_the_station_there_and_not_by_one_below():
+    """Spec M6 §16, truth 84: "A `say` on the quarterdeck is heard by the station there
+    and not by one below." The fake officer says a thing on the quarterdeck: the captain's
+    station there has it in its next sample under `heard`, with the speaker's name and
+    place; the lookout at the masthead has not."""
+    from freesail.agents import Fake, Harness, Reply, SamplingPolicy, call, reply
+    from freesail.agents.agent import LOOKOUT, captain, lookout, officer
+    from freesail.agents.fake import captain_of_the_ship
+
+    world = _free_cutter()
+    policy = SamplingPolicy.in_lockstep(WARDROOM_EVERY, "notable", "urgent")
+    ch = Harness(world, captain(policy, world=world), captain_of_the_ship(), save=None)
+    ch.start()
+    lh = Harness(world, lookout(policy, world=world), Fake([Reply()] * 8), save=None)
+    lh.start()
+    oh = Harness(
+        world,
+        officer(policy, world=world),
+        Fake([reply("", call("submit_order", text="say the glass is falling, sir")), Reply()]),
+        save=None,
+    )
+    oh.start()
+    world.run(WARDROOM_EVERY + 1)
+    spoke = [e for e in world.log if e.kind == "agent.spoke"]
+    assert len(spoke) == 1 and spoke[0].data["heard_by"] == ["captain"]
+    assert spoke[0].data["place"] == "quarterdeck" and LOOKOUT not in spoke[0].data["heard_by"]
+    assert spoke[0].text.startswith(
+        f"The officer of the watch ({oh.station.person}), on the quarterdeck: "
+    )
+    heard = [
+        t.content["heard"]
+        for turns in ch.model.seen
+        for t in turns
+        if t.role == "data" and t.content.get("heard")
+    ]
+    assert heard and heard[0][0].endswith("on the quarterdeck: the glass is falling, sir")
+    assert not any(
+        t.content.get("heard") for turns in lh.model.seen for t in turns if t.role == "data"
+    )
+    assert lh.agent.heard == [] and ch.agent.heard == []  # carried once
+
+
+def test_truth_85_a_game_saved_with_three_seated_loads_from_its_checkpoint_with_three(
+    cutter_wardroom, tmp_path
+):
+    """Spec M6 §16, truth 85, its first half: "A game saved with three stations seated
+    loads from its checkpoint with three", each re-seated station reading its own journal
+    (the second half, the replay on a build whose sampling differs, is package 42's
+    transcript-driven replay). The checkpoint carries the two harnesses and the
+    player's seat, their decks as held; a station taken up again by a live model reads
+    the journal it wrote, and its brief carries the journal's size; the JSON save
+    replays to the same digest."""
+    from freesail.agents import Fake, call, reply
+    from freesail.agents import tools as tools_mod
+    from freesail.agents.agent import CAPTAIN, MASTER, OFFICER
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+
+    world, ch, oh, seat = cutter_wardroom
+    ch.note("The captain's own note.")
+    oh.note("The officer's own note.")
+    seat.note("The master's own note, by the player.")
+    path = tmp_path / "three.ckpt"
+    replay_mod.write_checkpoint(world, path)
+    _header, back = replay_mod.read_checkpoint(path)
+    assert set(back.agents) == {CAPTAIN, OFFICER} and back.player_seat.station.name == MASTER
+    assert back.agents[CAPTAIN].agent.has_deck and back.agents[OFFICER].agent.has_deck
+    assert back.agents[OFFICER].agent.general and not back.player_seat.agent.released
+    for name, note in ((CAPTAIN, "The captain's own note."), (OFFICER, "The officer's own note.")):
+        h = back.agents[name]
+        h.take_over(Fake([reply("", call("read_journal", kind="notes"))]))
+        assert "The station's journal:" in h.brief.text()
+        read = tools_mod.call(back, name, "read_journal", {"kind": "notes"})
+        assert any(e["text"] == note for e in read["entries"]), name
+    read = tools_mod.read_journal(back, MASTER, kind="notes")
+    assert any(e["text"] == "The master's own note, by the player." for e in read["entries"])
+    assert back.stations.names() == world.stations.names()
+    save = tmp_path / "three.json"
+    save.write_text(json.dumps(json.loads(json.dumps(world.save()))))
+    copy = replay_mod.replay(replay_mod.load_file(save), ship_factory)
+    assert copy.log.digest() == world.log.digest()
+    assert copy.player_seat is not None and copy.player_seat.station.name == MASTER

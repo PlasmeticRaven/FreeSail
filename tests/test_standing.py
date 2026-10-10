@@ -794,9 +794,11 @@ TABLE: list[tuple[str, str, ok | no]] = [
         ok("at", event="eight bells", actions=2),
     ),
     (
+        # the lookout's station is aboard since package 41: a book may tell it, and the
+        # firing is refused in words if nobody mans it then, as the watcher's is
         F,
         'standing order "look": at sunset then tell the lookout to look sharp',
-        no(["'tell the lookout to look sharp' is refused", "there is no lookout aboard yet"]),
+        ok("at", event="sunset", actions=1),
     ),
     (
         # the officer of the watch is a station aboard (package 37): a book may ask it
@@ -807,7 +809,14 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (
         F,
         'standing order "o": at sunset then ask the lookout what she sees',
-        no(["there is no lookout aboard yet", "tell or ask the watcher or the officer"]),
+        ok("at", event="sunset", actions=1),
+    ),
+    (
+        # a station the ship has not got (package 41: the stations are the World's
+        # binding) is refused with the stations aboard named
+        F,
+        'standing order "o": at sunset then ask the purser what she sees',
+        no(["there is no purser aboard yet", "tell or ask the watcher or the officer"]),
     ),
     (
         F,
@@ -1733,12 +1742,12 @@ def test_the_station_verbs_after_then_are_resolved_when_the_order_is_given():
         "and what the standing order says"
     )
     assert e.kind == "standing.given", e.text
-    e = w.submit('standing order "l": at sunset then tell the lookout to look sharp')
+    e = w.submit('standing order "l": at sunset then tell the purser to look sharp')
     assert e.kind == "order.rejected"
     assert e.text.endswith(
-        "In standing order 'l', 'tell the lookout to look sharp' is refused: there is no "
-        "lookout aboard yet; a standing order may tell or ask the watcher or the officer of "
-        "the watch."
+        "In standing order 'l', 'tell the purser to look sharp' is refused: there is no "
+        "purser aboard yet; a standing order may tell or ask the watcher or the officer of "
+        "the watch or the master or the lookout or the passenger."
     )
     assert [r.name for r in w.standing.book] == ["sea", "q"]
 

@@ -259,7 +259,7 @@ def test_the_head_situation_reads_the_log_and_the_readings_through_the_tools():
     situation = h.brief.head[4].text
     assert "A sail on the larboard bow." in situation
     for row in R.REGISTRY:
-        if row.parametric is None and not row.is_absent:
+        if row.parametric is None and not row.is_absent and row.kind not in R.DRIVER_KINDS:
             assert f"  {row.id}: {tools.readings_words(world)[row.id]}" in situation
 
 
@@ -313,7 +313,8 @@ def test_readings_tool_reads_the_registry_and_nothing_else():
     got = tools.call(world, "watcher", "readings")
     view = world.readings
     for row in R.REGISTRY:
-        if row.is_absent or row.parametric is not None:
+        if row.is_absent or row.parametric is not None or row.kind in R.DRIVER_KINDS:
+            # the driver's own row (the pace, package 41) is read, never carried
             assert row.id not in got
         else:
             # the registry's words: a reading's own for a value it withholds on purpose
@@ -1525,6 +1526,14 @@ def test_the_agent_log_kinds_are_listed_in_one_place_and_used():
     Harness(world, officer(SamplingPolicy.in_lockstep(A_GLASS_S), world=world), Fake(script))
     world.submit("you have the deck")
     world.agents["officer of the watch"].start()
+    used |= set(kinds(world))
+    # the deck's conversation (package 41): the player's say, and the lookout's hail
+    from freesail.agents.agent import lookout
+
+    world = frigate_world()
+    hail = [reply("", call("submit_order", text="hail sail ho, on the larboard bow"))]
+    Harness(world, lookout(SamplingPolicy.in_lockstep(A_GLASS_S), world=world), Fake(hail)).start()
+    world.submit("say a fine morning")
     used |= set(kinds(world))
     assert used == set(AGENT_LOG_KINDS)
     for kind in AGENT_LOG_KINDS:
