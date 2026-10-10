@@ -1,0 +1,109 @@
+# FreeSail: Vigo as a port (spec M6 §26; package 39c, the Biscay south and Galicia
+# block), on package 35's machinery; the marks are the features file's
+# (data/charts/features/biscay-south.yaml). Bayona's road and castle are marks of this
+# port's water and no port of their own (the Derrotero: "para entrar en este Puerto de
+# Bayona es indispensable tener Práctico").
+#
+# Sources. Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico, 'Islas
+# Cíes ó Bayonas' and 'Ría de Vigo', pp. 60 to 72: the Isles of Bayona across the mouth,
+# the Porta between them a third of a cable wide; the Biduido, three and a half brazas
+# half a league north of the isles; entering by the north passage keep south of the Isle
+# Onza one to three miles, steer east till Our Lady of the Alba hides by the Point of
+# Subrido and Monte Ferro opens east of the Point of the Caballo, then for the Points of
+# the Hombre and Subrido a cable off, and up mid-ria; never close Subrido with the Caballo
+# till the church of Cangas opens, for the Borneyra; by the south passage bring Cape Mar
+# on with the hermitage of Our Lady of la Guía; the regular anchorage before the town in
+# eight to fourteen brazas mud, moored NNW and SSE, well sheltered by the isles; the tides
+# at full and change at three in the afternoon, rising thirteen to fourteen feet; ships
+# bound north wait east of the isles in twelve brazas sand (p. 63).
+#
+# The datum: UNVERIFIED. No period plan of Vigo was found in the Atlas's copy read (the
+# Derrotero's 'Plano del puerto de Vigo' is not among its sheets); the chart's depths are
+# EMODnet's at LAT, the modern quays standing before the old shore.
+#
+# The stance. Vigo is Spanish: hostile to a King's ship in June 1805, open to a neutral
+# (data/nations.yaml). Prices FROM MEMORY or JUDGEMENT; sterling at the exchange.
+
+id: vigo
+name: Vigo
+nation: spain
+source: "Tofiño 1789, Derrotero, pp. 60-72 (the Isles of Cíes or Bayona, the ria of Vigo, its entrances by the north and south passages, the road and the tides)"
+datum: unverified
+
+outer_road:
+  feature: cies-road
+  name: the road under the Isles of Bayona
+  lat_deg: 42.2240
+  lon_deg: -8.8920
+anchorage:
+  feature: vigo-road
+  name: the road of Vigo
+  lat_deg: 42.2440
+  lon_deg: -8.7350
+mooring:
+  feature: vigo-road
+  name: the road of Vigo, moored NNW and SSE
+  lat_deg: 42.2440
+  lon_deg: -8.7350
+shore:
+  feature: vigo
+  name: the mole of Vigo
+  lat_deg: 42.2389
+  lon_deg: -8.7238
+
+pilot:
+  station: cies-road
+  cruising_nm: 6                 # judgement: the ria's pilots met ships between the isles and Cape del Hombre
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' launch of Vigo
+    under: a lugsail and oars
+    note: "a Galician lancha (judgement)"
+  names: [Pereira, Alonso, Lorenzo, Comesaña, Davila, Freire, Iglesias, Carballo]   # Galician names: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, in sterling for the one account; unverified
+  cast: larboard                 # from the road the head paying off to the westward down the ria (judgement)
+  course_out_deg: 260            # out down the ria for the north passage
+  words:
+    channel: "By the north passage keep south of the Isle Onza one to three miles for the Biduido, and steer east till Our Lady of the Alba hides by the Point of Subrido and Monte Ferro opens east of the Point of the Caballo; then for the Points of the Hombre and Subrido a cable off, and up the middle of the ria. Never close Subrido with the Caballo till the church of Cangas opens, for the Borneyra; and in eight brazas go no nearer either shore. By the south passage bring Cape Mar on with the hermitage of la Guía."
+    marks: "The Isles of Bayona across the mouth; Cape del Hombre and its watch-tower; Our Lady of the Alba on her sharp hill south of the ria; Cape Mar, sand-coloured; the church of Cangas; the castle of Castro above the town."
+    anchorage: "Before the town in eight to fourteen brazas mud, moored NNW and SSE, the best anchor to the NNW; well sheltered by the isles from the westerly and south-westerly sea."
+    tide: "The tides at full and change come at three in the afternoon and rise thirteen or fourteen feet."
+
+tide:
+  establishment: Vigo
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 28, origin: spain, note: "the Ribeiro and the Condado's wine (judgement)"}
+    - {good: brandy, price: 95, origin: spain, note: "from memory"}
+    - {good: salt, price: 12, origin: spain, note: "from memory"}
+    - {good: pilchards, price: 22, origin: spain, season: {7: 0.8, 8: 0.8, 9: 0.8}, note: "the ria's sardines, salted and pressed (judgement: cheapest here)"}
+    - {good: salt fish, price: 28, origin: spain, note: "from memory"}
+    - {good: canvas, price: 42, origin: null, note: "from memory"}
+    - {good: salt beef, price: 72, origin: spain, note: "from memory"}
+    - {good: tobacco, price: 90, origin: null, note: "the Crown's monopoly; from memory"}
+    - {good: hemp, price: 56, origin: null, note: "from memory"}
+    - {good: linen, price: 60, origin: spain, note: "Galician linen (judgement)"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 45, note: "the town's shipwrights (judgement)"}
+    - {item: topgallant_mast, hours: 5, pounds: 15}
+    - {item: yard, hours: 7, pounds: 30}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.055}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1, note: "abundance of good water in the rias, little wood (Tofiño p. 71)"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.07}
+
+crew_pool:
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []

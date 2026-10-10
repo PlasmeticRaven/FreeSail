@@ -1,0 +1,115 @@
+# FreeSail: Ferrol as a port (spec M6 §26; package 39c, the Biscay south and Galicia
+# block), on package 35's machinery (freesail/world/ports.py); the marks are the features
+# file's (data/charts/features/biscay-south.yaml).
+#
+# Sources. Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico, 'Ría
+# del Ferrol', pp. 2 to 6: the narrows between the castles of San Felipe and San Martín
+# three tenths of a mile wide and two tenths at La Palma; the Muela off the Point of
+# Segaño with one braza on it; the winds to enter those of the third and fourth quadrant
+# from SSW to NNW; past the narrows "se podrá fondear donde mejor le convenga", the common
+# moor NW and SE; in the equinoctial tides the water runs with much violence in the
+# narrows, so enter or leave at high or low water an hour before it happens, with the
+# stream ahead; high water at three in the afternoon at full and change, the tides rising
+# thirteen to fourteen pies de Burgos; with a contrary wind not too fresh, wait in the
+# bay of Cariño in eight to fourteen brazas sand, and with it too fresh to ply, bear away
+# for Corunna. The Atlas's 'Plano de la rya y puerto de Ferrol' (1789) for the soundings
+# before the arsenal, five to eight brazas, mud.
+#
+# The datum: UNVERIFIED. No patch is made at Ferrol in this package: the 1789 plan was
+# read at full resolution (its soundings in brazas of two varas at low water of spring
+# tides, the plan's own note) and the modern grid agrees with it within the narrows and
+# before the arsenal to a braza or two, where the modern basin's works do not stand; the
+# low water of springs above the chart's datum at Ferrol is not read from a table.
+#
+# The stance. Ferrol is Spanish (data/nations.yaml): the King of Spain's great arsenal of
+# the north, hostile to a King's ship in June 1805 by the nations table, open to a
+# neutral. The prices are FROM MEMORY or JUDGEMENT, sterling at the exchange.
+
+id: ferrol
+name: Ferrol
+nation: spain
+source: "Tofiño 1789, Derrotero, pp. 1-6 ('Ría del Ferrol', the entrance, the tides); Atlas Marítimo de España, 'Plano de la rya y puerto de Ferrol' (1789)"
+datum: unverified
+
+# The outer road is the bay of Cariño within Cape Prioriño, where a ship waits for a wind
+# to take the narrows; the anchorage and the mooring are within, before the arsenal.
+outer_road:
+  feature: carino-road
+  name: the bay of Cariño
+  lat_deg: 43.4630
+  lon_deg: -8.3230
+anchorage:
+  feature: ferrol-road
+  name: the harbour of Ferrol
+  lat_deg: 43.4720
+  lon_deg: -8.2450
+mooring:
+  feature: ferrol-road
+  name: the harbour of Ferrol before the arsenal
+  lat_deg: 43.4720
+  lon_deg: -8.2450
+shore:
+  feature: ferrol-arsenal
+  name: the mole of the old town of Ferrol
+  lat_deg: 43.4800
+  lon_deg: -8.2400
+
+pilot:
+  station: carino-road
+  cruising_nm: 5                 # judgement: the port's pilots met ships off Cape Prioriño
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' launch of Ferrol
+    under: a lugsail and oars
+    note: "a Galician lancha (judgement)"
+  names: [Pita, Fernández, Lago, Couceiro, Seoane, Castro, Bermúdez, Leira]   # Galician names: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, in sterling for the one account; unverified
+  cast: larboard                 # from the harbour the head paying off to the westward for the narrows (judgement)
+  course_out_deg: 250            # out through the narrows, San Felipe on the starboard hand
+  words:
+    channel: "With a wind from SSW round to NNW place yourself south of Cape Prioriño within half a mile, eleven and twelve brazas at a cable off, and steer up mid-channel, nearer the south shore with a SSW wind and the north shore with a NNW. Mind the Muela off the Point of Segaño, one braza at low water, its weed floating over it; the little reefs off San Felipe, La Palma and the Point Redonda; and the stone off the Point of Bispon."
+    marks: "Cape Prioriño and Monte Ventoso with its watch; the Point and battery of Segaño; the castles of San Felipe and San Martín at the narrows, La Palma within; the Quartel de Batallones, a great square building commanding the channel."
+    anchorage: "Past the narrows anchor where you please, moored NW and SE: let go the larboard anchor first with a westerly to serve to the SE. A rocky patch of five brazas and two thirds lies a third of the way from the basin's mole to the Point of the Seyxo, and cuts cables."
+    tide: "High water at three in the afternoon at full and change; the tide rises thirteen or fourteen feet. At the equinoxes the water runs with much violence in the narrows: take them an hour before high or low water with the stream ahead, or at slack water."
+
+tide:
+  establishment: Ferrol
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds               # sterling at the exchange (a peso duro four shillings and sixpence, from memory)
+  goods:
+    - {good: wine, price: 30, origin: spain, note: "Galician and Ribeiro wine; from memory"}
+    - {good: brandy, price: 95, origin: spain, note: "from memory"}
+    - {good: salt, price: 12, origin: spain, note: "from memory"}
+    - {good: pilchards, price: 24, origin: spain, season: {7: 0.8, 8: 0.8, 9: 0.8}, note: "the sardines of the rias, salted (judgement)"}
+    - {good: hemp, price: 55, origin: null, note: "for the arsenal's ropery; from memory"}
+    - {good: timber, price: 5, origin: spain, note: "the arsenal's oak and pine from the Asturian and Galician hills (judgement)"}
+    - {good: canvas, price: 42, origin: null, note: "from memory"}
+    - {good: salt beef, price: 72, origin: spain, note: "from memory"}
+    - {good: biscuit, price: 31, origin: spain, note: "the victualling of the squadron (judgement)"}
+    - {good: coal, price: 7, origin: britain, note: "scarce under the war; from memory"}
+    - {good: tin, price: 185, origin: britain, note: "English tin, scarce under the war; from memory, as Brest's"}
+
+dockyard:
+  kind: yard                     # the King of Spain's arsenal: a yard
+  items:
+    - {item: topmast, hours: 8, pounds: 46, note: "the arsenal sells to a neutral at a price: judgement, as Brest's"}
+    - {item: topgallant_mast, hours: 4, pounds: 14}
+    - {item: yard, hours: 6, pounds: 28}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the Matrícula de Mar takes the coast's seamen for the King's ships
+  able: {hands: 4, pounds: 2, delay_h: 24}
+  ordinary: {hands: 8, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 16, pounds: 1, delay_h: 12}
+
+closed_to: []

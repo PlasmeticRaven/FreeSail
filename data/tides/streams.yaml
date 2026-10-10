@@ -85,7 +85,11 @@
 # the block's areas below. One box, so the limits are the Channel's and the two blocks'
 # together (from 48.0 N and 1 W, south to 45.9 N and east to 0.9 W). Within the box and no
 # block's area the statement is the open Channel's, as the world's stream is.
-book_limits: {south: 45.9, north: 51.0, west: -7.0, east: -0.9}
+# Package 39c: south to 42.0 N and west to 9.33 W with Biscay south and Galicia, whose
+# areas (the open bay among them, to 47.5 N west of 7 W) answer for all of the box's new
+# water south of 47.5 N; north of it, west of 7 W, the open Channel's statement, as the
+# world's stream there is mid-Channel's (its bounds reach 12 W).
+book_limits: {south: 42.0, north: 51.0, west: -9.33, east: -0.9}
 
 areas:
   - id: carrick-road
@@ -519,6 +523,94 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout but for Faden's 'the tides set N E and S W' off Yeu and Olonne (pp. 77 to 78): the world's figures rounded"
+  # Package 39c (Biscay south and Galicia, spec M6 §26): the block's waters in the same
+  # form. Tofiño 1789 gives one rate (Santander's ebb, three miles an hour) and two sets
+  # (the Sisarga passage's flood from the west, the Ferrol narrows' violence at the
+  # equinoxes); Faden 1793 the Gironde's "currents very strong"; every other figure is
+  # JUDGEMENT on the pattern above. The open bay reaches north to 47.5 N west of 7 W, the
+  # water the directions' limits now take in (book_limits) that no area held, so that the
+  # master's statement there is the bay's and not the open Channel's; the recorded
+  # passages' other sail keep east of 7 W and north of 47.5 N.
+  - id: gironde-passes
+    chart: biscay-south
+    name: the passes of the Gironde
+    polygon: [[45.53, -1.26], [45.53, -1.00], [45.66, -1.00], [45.66, -1.26]]
+    axis_deg: 120
+    spring_kn: 3.5
+    neap_kn: 1.75
+    phase_h: -3.0
+    source: "Faden 1793, 'Tides and Currents', p. 93: at the mouth of the river of Bourdeaux the currents are very strong; 'Entrance of the Gironde', p. 85: the current catches ships that come too near the rocks of Cordouan on the ebb; the axis the estuary's, the rate and the hour (an estuary's flood from low water to high) JUDGEMENT"
+    book:
+      set: SE by E
+      spring_kn: 3.5
+      neap_kn: 1.75
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: Faden's 'very strong' given a rate, the flood setting up the estuary to the nearest point, from low water to high"
+  - id: santander-mouth
+    chart: biscay-south
+    name: the mouth of Santander
+    polygon: [[43.455, -3.80], [43.455, -3.74], [43.485, -3.74], [43.485, -3.80]]
+    axis_deg: 250
+    spring_kn: 3.0
+    neap_kn: 1.5
+    phase_h: -3.0
+    source: "Tofiño 1789, Derrotero, p. 172: when the tide goes out it runs harder than when it comes in, the ebb commonly three miles an hour, and in the mouth of the port it turns SE toward the bay south of Santa Marina, which has set many on shore; the rate the period's (taken for both streams, the model being rectilinear), the axis into the bay and the hour JUDGEMENT"
+    book:
+      set: WSW
+      spring_kn: 3.0
+      neap_kn: 1.5
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "the spring rate Tofiño's, the ebb's three miles an hour (p. 172); the neaps half the springs, the set into the bay and the hour JUDGEMENT"
+  - id: ferrol-narrows
+    chart: biscay-south
+    name: the narrows of Ferrol
+    polygon: [[43.452, -8.31], [43.452, -8.26], [43.468, -8.26], [43.468, -8.31]]
+    axis_deg: 70
+    spring_kn: 2.5
+    neap_kn: 1.25
+    phase_h: -3.0
+    source: "Tofiño 1789, Derrotero, p. 6: in the tides near the equinoxes the water runs with much violence in the narrows of the ria, so that a ship should enter or leave an hour before high or low water with the stream ahead, or at slack water; the axis the narrows', the rate and the hour JUDGEMENT"
+    book:
+      set: ENE
+      spring_kn: 2.5
+      neap_kn: 1.25
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: Tofiño's 'mucha violencia' given a rate, the flood setting up the narrows to the nearest point"
+  - id: sisarga-passage
+    chart: biscay-south
+    name: the passage of Sisarga
+    polygon: [[43.345, -8.86], [43.345, -8.80], [43.370, -8.80], [43.370, -8.86]]
+    axis_deg: 90
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: 0.0
+    source: "Tofiño 1789, Derrotero, p. 19: in this channel there is much current, and when the tide fills it goes from the W to the E, and the contrary when it empties; with much sea it is all one breaker; the rate and the hour JUDGEMENT"
+    book:
+      set: E
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "the set to the point is the period's (Tofiño p. 19: when the tide fills it goes from the W to the E), marked judgement as every block's axis is by the file's rule; the rates and the hour JUDGEMENT"
+  - id: open-bay-south
+    chart: biscay-south
+    name: the bay of Biscay and the coast of Galicia
+    polygon: [[42.00, -9.33], [42.00, -0.90], [45.90, -0.90], [45.90, -7.00], [47.50, -7.00], [47.50, -9.33]]
+    axis_deg: 45
+    spring_kn: 0.5
+    neap_kn: 0.25
+    phase_h: 0.0
+    source: "judgement: the tidal streams of the open bay and of the Galician coast are weak (the model's axis the flood's toward the Channel, as Biscay north's open bay); Tofiño 1789, p. 15: with winds of the third quadrant the waters run with violence from Sisarga toward Cape Ortegal (a current of the wind, not modelled); p. 189: from Ortegal to Cape Prior the currents set strongly toward the land; no tidal rate in the period's books"
+    book:
+      set: NE
+      spring_kn: 0.5
+      neap_kn: 0.25
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: the world's figures rounded"
   - id: mid-channel
     chart: channel-west
     name: the open Channel
