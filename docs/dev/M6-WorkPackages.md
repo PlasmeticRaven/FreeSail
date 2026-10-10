@@ -704,9 +704,15 @@ API is the whole proof.
    identity. The OpenRouter dialect (decision 31): the same door on the OpenAI-shaped
    chat-completions with tools that `local.py` already speaks, with its own key name and
    base URL, if it falls out of the shared shape cheaply; else say what it would take.
-2. **The security pass**, the package's other half. The key is read from the environment
-   (`FREESAIL_API_KEY`, and the SDK's own variable as a second name) or from a file named
-   at the command line outside the repository, never from a setting file the game writes;
+2. **The security pass**, the package's other half. The key is read first from the
+   platform's credential store through the `keyring` package (the Windows Credential
+   Manager, the macOS Keychain, the Secret Service on Linux; the owner's note of
+   2026-10-10, from another project's practice), under a service and account name of the
+   game's, put there once by `--store-key`, which prompts without echo and writes nothing
+   else; second from the environment (`FREESAIL_API_KEY`, and the SDK's own variable as a
+   second name); third from a file named at the command line outside the repository, for
+   a machine with no store; never from a setting file the game writes. The tests use a
+   fake keyring backend and never touch the real store;
    it is never logged, saved, journaled, in a transcript or in a sample; request and reply
    bodies are journaled without their headers; the door refuses to start when the key
    would be written anywhere the game keeps (the records folder, the saves, the journal);
