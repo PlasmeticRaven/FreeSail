@@ -4381,6 +4381,8 @@ The head with 39e (Madeira and the Western Islands), 39c (Biscay south and Galic
 
 On the merged tree: `ruff check`, `ruff format --check` clean; `--check strait` passes as printed above; the fast tier 3,203 passed and 1 failed, the islands' test above, mended after the run and passing alone (`tests/test_islands.py`, 10 passed). The slow tier waits for the lead's re-pin.
 
+**The final tree** (the lead's re-pin for decision 45 merged in, eeb406c; the machine's load about four, the runs' own workers): the fast tier, whole, **3,204 passed**; the slow tier of the truths, whole and once (`python3 -m pytest tests/test_known_truths.py --slow -n 4 -q`), 108 tests, **99 passed, 8 expected failures, 1 failed**: `test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor`, 429 ticks a second against 500 (the channel-west region alone loaded, a position off Falmouth; a pace floor, not re-run, as the brief has it). Every pinned digest, line count and tick held.
+
 ### The suite, as run (package 39f)
 
 On the build machine under a load of about twenty (three other blocks' suites and builds beside), so no timing figure here is this package's; once each.
