@@ -374,6 +374,8 @@ def encode(v: Any) -> Any:
         }
     if hasattr(v, "value") and type(v).__module__.startswith("freesail."):
         return encode(v.value)  # an enum of the game's: its value
+    if type(v).__module__ == "numpy" and callable(getattr(v, "item", None)):
+        return encode(v.item())  # a number of numpy's, as the log's digest reads it
     return str(v)
 
 
