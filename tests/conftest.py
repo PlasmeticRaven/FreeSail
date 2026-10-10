@@ -393,6 +393,16 @@ def _group_by_shared_fixtures(items: list[pytest.Item]) -> None:
         item.add_marker(pytest.mark.xdist_group(find(keys[0])))
 
 
+def _is_pace(item: pytest.Item) -> bool:
+    """The pace measurements (truth 51 and its kin: the best of three thousands of ticks
+    against BUILD_MACHINE_FLOOR). Under `-n` they share the machine with the other workers'
+    days and read the load, not the tick: the release workflow runs the suite without them
+    and then them alone (`-m "not pace"`, then `--slow -m pace`), and so should anyone who
+    wants the figure. Any marked `pace` by name or by hand belongs here."""
+    name = item.name
+    return name.endswith(("holds_truth_51s_floor", "ticks_at_the_build_machines_floor"))
+
+
 def _chosen_on_the_command_line(config: pytest.Config) -> bool:
     """Tests picked by node id or by `-k` run whatever their tier: whoever names a test
     wants it run (the gate reports name truths so)."""
@@ -406,6 +416,8 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     for item in items:
         if _is_slow(item):
             item.add_marker(pytest.mark.slow)
+        if _is_pace(item):
+            item.add_marker(pytest.mark.pace)
     run_slow = (
         config.getoption("--slow")
         or "slow" in (config.getoption("markexpr") or "")
