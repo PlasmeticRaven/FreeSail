@@ -129,3 +129,10 @@ ports:
   paimboeuf: france
   la-rochelle: france
   rochefort: france
+  # Madeira and the Western Islands (package 39e): Portuguese, neutral in 1805 by the
+  # Treaty of Badajoz and open to every nation by the wars below
+  funchal: portugal
+  porto-santo: portugal
+  angra: portugal
+  ponta-delgada: portugal
+  horta: portugal

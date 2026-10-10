@@ -94,6 +94,12 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "paimboeuf": "france",
         "la-rochelle": "france",
         "rochefort": "france",
+        # Madeira and the Western Islands (package 39e): Portuguese
+        "funchal": "portugal",
+        "porto-santo": "portugal",
+        "angra": "portugal",
+        "ponta-delgada": "portugal",
+        "horta": "portugal",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

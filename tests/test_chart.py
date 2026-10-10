@@ -841,6 +841,8 @@ def test_the_coasts_distance_at_the_ship_is_the_charts_at_her_position_after_a_l
 # ---------------------------------------------------------------------------
 
 WHOLE = "atlantic-east"
+# package 39e: Madeira and the Western Islands, after the coast's blocks
+ISLANDS = ["madeira", "azores"]
 CORRIDOR = "atlantic-corridor"
 MID = "channel-mid"  # package 39a
 # The corridor's budget (spec M6 §26: "some 11 MB raw, half that compressed"; with the
@@ -868,24 +870,30 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     that region alone (every scenario of the Channel reads what it read); a name the
     manifest has not is refused in words that list both."""
     # package 39a: the Channel east beside the Channel west, in the order the voyage
-    # sails them; package 39b: Biscay north after them
-    regions = ["channel-west", MID, "biscay-north"]
+    # sails them; package 39b: Biscay north after them; package 39e: the islands
+    regions = ["channel-west", MID, "biscay-north", *ISLANDS]
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
     assert whole.region == whole.name == WHOLE and whole.regions == regions
     assert [lv.level for lv in whole.levels] == [3, 2, 1]
     # the envelope of the regions and the corridor: Biscay north reaches 0.9 W for
-    # Rochefort on the Charente (package 39b)
-    assert whole.bounds == (32.0, 51.0, -20.0, -0.9)
-    assert whole.bounds_words() == "32 to 51 N, 20 to 0.9 W"
+    # Rochefort on the Charente (package 39b), the Western Islands 31.5 W (package 39e;
+    # 32 W with the corridor widened to them)
+    west = min(-31.5, float(manifest["corridors"][CORRIDOR]["bounds"]["west"]))
+    assert whole.bounds == (32.0, 51.0, west, -0.9)
+    assert whole.bounds_words() == f"32 to 51 N, {abs(west):g} to 0.9 W"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_LISBON) is None
     # the features of every region, indexed together, and every region's coast
     mid = load_chart(MID)
     biscay = load_chart("biscay-north")
+    islands = [load_chart(r) for r in ISLANDS]
     assert whole.features.keys() == (
-        chart.features.keys() | mid.features.keys() | biscay.features.keys()
+        chart.features.keys()
+        | mid.features.keys()
+        | biscay.features.keys()
+        | set().union(*(i.features.keys() for i in islands))
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
@@ -894,7 +902,10 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
     assert len(whole.coast_lines()) == (
-        len(chart.coast_lines()) + len(mid.coast_lines()) + len(biscay.coast_lines())
+        len(chart.coast_lines())
+        + len(mid.coast_lines())
+        + len(biscay.coast_lines())
+        + sum(len(i.coast_lines()) for i in islands)
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor

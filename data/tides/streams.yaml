@@ -87,6 +87,13 @@
 # block's area the statement is the open Channel's, as the world's stream is.
 book_limits: {south: 45.9, north: 51.0, west: -7.0, east: -0.9}
 
+# Package 39e: the Western Islands lie far out in the ocean, and one box over the coast
+# and the islands would give the open Channel's statement to all the sea between; their
+# water is a box of its own, in which only an area with a polygon answers (Fayal's
+# channel below) and the open sea has no statement (`tide.Directions.waters`).
+book_waters:
+  - {name: the Western Islands, south: 36.5, north: 40.0, west: -31.5, east: -24.5}
+
 areas:
   - id: carrick-road
     chart: channel-west
@@ -519,6 +526,23 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT throughout but for Faden's 'the tides set N E and S W' off Yeu and Olonne (pp. 77 to 78): the world's figures rounded"
+  # package 39e: the channel between Fayal and Pico, Tofiño's (the Western Islands)
+  - id: fayal-channel
+    chart: azores
+    name: the channel between Fayal and Pico
+    polygon: [[38.48, -28.61], [38.48, -28.52], [38.56, -28.52], [38.56, -28.61]]
+    axis_deg: 45
+    spring_kn: 3.0
+    neap_kn: 1.5
+    phase_h: -3.0
+    source: "Tofiño 1789, 'Isla del Fayal', pp. 224 to 225: when the tide rises the water runs through this channel to the N E, and when it falls to the S W, its greatest speed three miles; on the day of new or full moon high water at half past twelve; the axis and the springs' rate his, the neaps half the springs and the hour (strongest at half flood, the stream running with the rising tide) JUDGEMENT"
+    book:
+      set: NE
+      spring_kn: 3.0
+      neap_kn: 1.5
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "Tofiño 1789, 'Isla del Fayal', pp. 224 to 225: the flood N E and the ebb S W through the channel, three miles at the most; the set is the world's axis to the nearest point and the period's own word; the neaps half the springs and the hour JUDGEMENT"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

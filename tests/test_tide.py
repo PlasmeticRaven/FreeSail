@@ -491,8 +491,9 @@ def test_far_from_every_place_of_his_table_the_master_says_his_tide_may_be_hours
     words = far.navigation.tide_by_almanac()["words"]
     assert "nearest place in the master's table" in words
     # package 39b: the nearest place of the table off Lisbon is now Brouage, of the Biscay
-    # block's places, 571 miles off (it was Ushant, 621)
-    assert "may differ by hours" in words and "Brouage" in words and "571 miles" in words
+    # block's places, 571 miles off (it was Ushant, 621); package 39e: Funchal, of the
+    # islands' places, 511 miles off
+    assert "may differ by hours" in words and "Funchal" in words and "511 miles" in words
     near = world_at(49.9, -5.2, "atlantic-east")
     assert "may differ by hours" not in near.navigation.tide_by_almanac()["words"]
 
@@ -561,8 +562,10 @@ def test_the_blocks_gauges_are_read_and_held_out_of_the_blend_that_would_move_th
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
     # the block's nine, after the Channel east's two (package 39a) under the same key
-    held = [g for g in doc["held_gauges"] if g["lat_deg"] < 48.0]
-    assert len(doc["held_gauges"]) == 2 + len(held)
+    held = [g for g in doc["held_gauges"] if 45.9 <= g["lat_deg"] < 48.0 and g["lon_deg"] > -5.0]
+    # package 39e's five of the islands after them
+    islands = [g for g in doc["held_gauges"] if g["lon_deg"] < -15.0]
+    assert len(doc["held_gauges"]) == 2 + len(held) + len(islands)
     assert [g["id"] for g in held] == [
         "concarneau",
         "port-tudy",

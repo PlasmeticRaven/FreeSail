@@ -102,6 +102,10 @@ ALL_PORTS = [
     "torbay",
     "weymouth",
 ]
+# Madeira and the Western Islands' five (package 39e), Portuguese: neutral to a King's
+# ship and to an American, open to their own; in the files' order with the rest
+ISLANDS_PORTS = ["angra", "funchal", "horta", "ponta-delgada", "porto-santo"]
+ALL_PORTS = sorted([*ALL_PORTS, *ISLANDS_PORTS])
 
 
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
@@ -253,7 +257,8 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # Biscay north's five (package 39b): hostile throughout to a King's ship
     french_ports |= {"la-rochelle", "le-palais", "lorient", "paimboeuf", "rochefort"}
     assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == {
-        pid: ("hostile" if pid in french_ports else "open") for pid in ALL_PORTS
+        pid: ("hostile" if pid in french_ports else "neutral" if pid in ISLANDS_PORTS else "open")
+        for pid in ALL_PORTS
     }
     schooner = world_at(OFF_THE_LIZARD, ship=SCHOONER)
     assert schooner.ports.ship_nation == "united-states"

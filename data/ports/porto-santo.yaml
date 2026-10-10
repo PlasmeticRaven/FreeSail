@@ -1,0 +1,103 @@
+# FreeSail: Porto Santo and its road as a port (spec M6 §26, block 5; package 39e), on
+# package 35's machinery; the marks are the features file's
+# (data/charts/features/madeira.yaml).
+#
+# Sources. The Oriental Navigator 1801, p. 22: "Porto Santo lies about 12 or 14 leagues
+# to the north-eastward of Madeira, and has a very good road on the south-west side,
+# wherein you may anchor in 12 fathoms, and where good water and refreshments can be
+# got"; "very remarkable, and may be seen in fine weather 15 or 20 leagues off; when you
+# first make it you will discover two or three very high hummocks"; "being abreast of
+# Porto Santo, and about 4 or 5 leagues to the south-westward of it, the course will be
+# W by S 1/2 S or W S W by compass, to carry you through between Madeira and the
+# Desertas". No hour of high water for the island in the period's tables: Funchal's
+# serves (Norie 1805, Table XLI p. 250).
+#
+# The datum: UNVERIFIED. No period sheet read, no override, no gauge in TICON's file for
+# the island; the road is EMODnet's depths at LAT.
+#
+# The stance: Portuguese, neutral, open to every nation. Prices FROM MEMORY or
+# JUDGEMENT; sterling at the exchange.
+
+id: porto-santo
+name: Porto Santo
+nation: portugal
+source: "the Oriental Navigator 1801, p. 22"
+datum: unverified
+
+outer_road:
+  feature: porto-santo-road
+  name: Porto Santo Road
+  lat_deg: 33.0440
+  lon_deg: -16.3370
+anchorage:
+  feature: porto-santo-road
+  name: Porto Santo Road
+  lat_deg: 33.0440
+  lon_deg: -16.3370
+mooring:
+  name: the road off the town
+  lat_deg: 33.0470
+  lon_deg: -16.3415      # the grid's 11 m, six fathoms, under the town (judgement)
+  bottom: sand
+  deep_draught_ft: 14    # judgement: a deeper ship lies in the road's twelve fathoms
+shore:
+  feature: porto-santo-town
+  name: the beach at the town of Porto Santo
+  lat_deg: 33.0620
+  lon_deg: -16.3390
+
+pilot:
+  station: porto-santo-road
+  cruising_nm: 3                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a fishing boat of Porto Santo
+    under: a lugsail and oars
+    note: "judgement"
+  names: [Melim, Vasconcelos, Ornelas, Drumond, Ferreira, Pestana]   # names of the island: judgement
+  skill: 0.8
+  fee_pounds: 1                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # off the road to the south-west (judgement)
+  course_out_deg: 225            # toward the passage between Madeira and the Desertas (the Oriental Navigator p. 22)
+  words:
+    channel: "The road is on the south-west side, open and clean; come in on the sand off the town."
+    marks: "The two or three high hummocks of the island, by which you know it from Madeira and the Desertas; the islet off the south-west end; the town behind its long beach."
+    anchorage: "Anchor in twelve fathoms off the town; good water and refreshments are got here."
+    tide: "No hour for this island in my book; Funchal's serves, noon or a little after on the full and change, seven feet at springs."
+
+tide:
+  establishment: Funchal         # the epitome has no Porto Santo; the nearest of its places with an hour
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: barley, price: 10, origin: portugal, note: "the island's corn (judgement)"}
+    - {good: wine, price: 60, origin: portugal, note: "the island's own, poorer than Madeira's; judgement"}
+    - {good: salt fish, price: 32, origin: null, note: "from memory"}
+    - {good: salt, price: 10, origin: portugal, note: "from memory"}
+    - {good: timber, price: 10, origin: portugal, note: "the island bare of wood (judgement)"}
+    - {good: canvas, price: 65, origin: britain, note: "from Funchal's stores; judgement"}
+    - {good: cordage, price: 75, origin: britain, note: "from Funchal's stores; judgement"}
+    - {good: salt beef, price: 70, origin: null, note: "from memory"}
+    - {good: brandy, price: 100, origin: portugal, note: "from memory"}
+    - {good: sugar, price: 62, origin: portugal, note: "Brazil sugar by way of Funchal; from memory"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 48, pounds: 55, note: "a spar sent over from Funchal, the island being bare of wood (judgement)"}
+    - {item: yard, hours: 36, pounds: 32, note: "from Funchal (judgement)"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.08}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.08, pounds_per_man_day: 0.07}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 48}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 48}
+  landsman: {hands: 3, pounds: 1, delay_h: 24}
+
+closed_to: []

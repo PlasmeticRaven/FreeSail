@@ -662,16 +662,26 @@ class Directions:
 
     areas: tuple[BookStream, ...]
     limits: tuple[float, float, float, float]  # south, north, west, east
+    # package 39e: waters the directions cover apart from the coast's box (`book_waters`,
+    # the Western Islands out in the ocean), where only an area with a polygon answers:
+    # the open Channel's statement, which answers everywhere within `limits`, is not the
+    # islands' (one box over the coast and the islands would give it to the sea between)
+    waters: tuple[tuple[float, float, float, float], ...] = ()
 
     def area_at(self, pos: Position) -> BookStream | None:
         """The statement for the water a position lies in; None beyond the directions'
-        limits."""
+        limits and their further waters."""
         south, north, west, east = self.limits
-        if not (south <= pos.lat_deg <= north and west <= pos.lon_deg <= east):
+        if south <= pos.lat_deg <= north and west <= pos.lon_deg <= east:
+            for a in self.areas:
+                if a.contains(pos):
+                    return a
             return None
-        for a in self.areas:
-            if a.contains(pos):
-                return a
+        for south, north, west, east in self.waters:
+            if south <= pos.lat_deg <= north and west <= pos.lon_deg <= east:
+                for a in self.areas:
+                    if a.polygon is not None and a.contains(pos):
+                        return a
         return None
 
     def by_id(self, area_id: str) -> BookStream | None:
@@ -723,7 +733,11 @@ def load_directions(streams: str | Path = STREAMS_PATH) -> Directions:
         float(lim.get("west", -180.0)),
         float(lim.get("east", 180.0)),
     )
-    out = Directions(tuple(areas), limits)
+    waters = tuple(
+        (float(w["south"]), float(w["north"]), float(w["west"]), float(w["east"]))
+        for w in doc.get("book_waters") or []
+    )
+    out = Directions(tuple(areas), limits, waters)
     _DIRECTIONS[key] = out
     return out
 
