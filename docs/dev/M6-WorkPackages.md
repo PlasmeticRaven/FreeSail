@@ -22,7 +22,7 @@ tuning notes and a report to the lead at the end.
 | 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | merged 2026-10-10; gate 6a opened (`docs/gates/gate-m6a.md`); the fast tier on the merged tree 3093 passed, none failed |
 | 42a | Opus | The consent brief revised once from 40's draft, describing in kind all of 6b and 6c that the rule watches; the watched sections pinned; the re-asks the owner's | merged 2026-10-10 (decision 42: the added sentences approved; the re-asks the owner's) |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | approved and launched 2026-10-10, beside 37p |
-| 42 | Opus | The API door and its security pass; the transcript-driven replay (the consent revision moved to 42a) | brief to write |
+| 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart as an image through the doors that carry one (the consent revision moved to 42a) | brief written 2026-10-10, for the owner's approval; to run beside 37p and 41 |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | approved and launched 2026-10-10; before gate 6a's runs |
 | 43b | Opus | The lugger and the smack; the world's business | brief to write |
@@ -670,3 +670,87 @@ it like a senior engineer and go beyond the letter where it fits the
 intent (the owner's standing word for the Fable packages), saying where. The fast tier
 before the report; the slow tests of the files touched; the pace truth measured on the
 build machine with the load said.
+
+## Package 42: the API door and its security pass, the replay driven by the transcript, the chart as an image (`freesail/agents/api.py` new; `freesail/agents/harness.py`, `journal.py`, `remote.py`, `tools.py`, `mcp_server.py`; `freesail/core/replay.py` and `core/world.py` for the station's acts as inputs; `freesail/ui/server.py` and `client/map.js` for the chart's picture; `pyproject.toml` for the SDK in the `agents` extra; `docs/agents/Harness.md` a section, `docs/agents/README.md`; `docs/TechnicalSpec-M5.md` §33 item 11 closed; `docs/TechnicalSpec-M6.md` §13 and §14 as built; `docs/dev/TuningNotes.md`; `tests/test_api_door.py` new, `test_replay.py`, `test_agent_api.py`, `test_mcp_server.py`, `test_known_truths.py` truths 85 (its second half) and 86)
+
+Opus. Spec M6 §13 and §14, on the harness as 37g, 40 and 42a left it; it runs beside 37p
+(the trim and the helm; no file in common) and 41 (the wardroom: the stations and the pace
+rule; the two meet in `harness.py`, `remote.py` and `mcp_server.py`, so keep each change
+small and local, and the lead resolves the merge). The consent brief already names a
+session through an API door (42a); `docs/agents/ConsentBrief.md` and `docs/agents/consent/`
+are not touched, and no model is seated by this package: a test server standing for the
+API is the whole proof.
+
+1. **The API door** (`freesail/agents/api.py`): a runner on the same harness as the local
+   runner (`local.py` is the pattern: a client of the running game and of the model, no
+   World of its own; `remote.GameClient`; the consent gate run by the game), speaking to a
+   hosted model through its own API, the Anthropic Messages API with tool use first, by
+   the official Python SDK (`anthropic`, added to the `agents` extra; imported inside the
+   door, so that the game runs without it). The same turn, tools, brief, budget, handover
+   and three ways of leaving as every other door, built on `local.py`'s translation of
+   package 27's turns (the brief as the system prompt; a sample as a user message; tool
+   results answering the tool calls by id; the opt-out token looked for in every reply and
+   every tool argument before anything else reads them). The settings: `--model` (no
+   default in the repository: the model is the owner's choice at the command line or in
+   the environment, and no model identifier is written in any file), `--effort` (the SDK's
+   adaptive thinking, with the effort levels the API offers; off when not asked),
+   `--max-reply`, `--request-timeout`; streaming for every request, the final message
+   taken whole from the stream (long replies would otherwise time out); the brief and the
+   library marked for prompt caching, since they are sent every turn and the cost is the
+   owner's; the server's own token counts kept and said at each handover and at the end
+   (what the server reported it used, in and out, cached and not); a reply cut off at the
+   limit asked once more (37i's rule), then the stand-by. The identity for the consent
+   record is the model name the server reports, in the record's form for a served
+   identity. The OpenRouter dialect (decision 31): the same door on the OpenAI-shaped
+   chat-completions with tools that `local.py` already speaks, with its own key name and
+   base URL, if it falls out of the shared shape cheaply; else say what it would take.
+2. **The security pass**, the package's other half. The key is read from the environment
+   (`FREESAIL_API_KEY`, and the SDK's own variable as a second name) or from a file named
+   at the command line outside the repository, never from a setting file the game writes;
+   it is never logged, saved, journaled, in a transcript or in a sample; request and reply
+   bodies are journaled without their headers; the door refuses to start when the key
+   would be written anywhere the game keeps (the records folder, the saves, the journal);
+   no key, URL token or account detail is ever in the repository, and a test greps the
+   repository and the records the tests write for the shapes of a key (the SDK's prefix,
+   OpenRouter's, a bearer header) and fails on any. The base URL is a setting so that the
+   tests point the door at a local test server and the owner may point it at a proxy.
+   `docs/agents/Harness.md`'s section says all of it to the owner, with the setup in his
+   words (where the key lives on his machine, what the door sends, what it costs and how
+   it says so).
+3. **The replay driven by the transcript** (§14; decision 36's promise of a replay on any
+   build). A station's acts (an order given, a `say`, a stand-by, a `you may` from the
+   captain's station, the leaving) are journaled at their ticks as inputs, as the driver's
+   lines are, so that a replay applies them at their ticks whatever the build's sampling
+   would have asked, and the transcript becomes the record and not the replay's source;
+   the acts of 40's player's seat already go this road (`seat.taken` and the seat's
+   refusals), and the station's follow the same form. A save of this build with a station
+   seated replays on a later build whose sampling differs to the same log (truth 85's
+   second half, with a test that changes the sampling and replays); a save from before
+   replays as it does now, from its checkpoint, and says so. M5 §33 item 11 (a door act at
+   the stationing tick, before any tick has run, not made by a replay) closes with it: say
+   in §33 how.
+4. **The chart as an image, through the doors that carry one** (the owner's note 7 of
+   2026-10-09; spec §13's second paragraph). The lead's design decision: the open browser
+   renders the chart as the player sees it and posts the picture to the server on the
+   tool's request, since the chart's drawing lives in `client/map.js` and a second
+   renderer in Python would be a second chart to keep true; where no browser is open the
+   tool says so in words and gives the chart's words instead (`the chart` reading). The
+   tool `the chart` at the MCP door (a tool result may carry an image, and Claude Desktop
+   and Claude Code read it) and at the API door (an image block in the tool result), the
+   picture shelved as the library is, never in the journal or the transcript (a note that
+   it was shown, with its size, is). `the ship's view` from any angle is M8's, with the
+   2.5D view; say so where the tool is listed.
+5. **Truths 85 and 86** in `tests/test_known_truths.py`: the replay on a build whose
+   sampling differs (85) and the API door's test server receiving no key in any body,
+   with the journal, the transcript and the save holding none (86), the test server a
+   small local HTTP server in the tests speaking the Messages API's shape (a tool call
+   and a text reply, a cut-off reply, a refusal), no network.
+6. **The docs and the notes**: `Harness.md` (the API door's section, the chart's picture,
+   the replay's rule), `docs/agents/README.md` (the doors listed), spec §13 and §14 as
+   built, M5 §33 item 11, the tuning notes' section (what the door sends per turn and
+   what the test server saw, the replay's test, what was found, the suite).
+
+No recorded passage's pin moves (nothing here touches a tick of the world; a pin that
+moves is a finding). Not this package's: the wardroom's stations and the pace rule (41);
+the ship's view as a picture (M8); the re-asks (the owner's). The fast tier before the
+report and the slow tests of the files touched.
