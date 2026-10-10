@@ -1268,6 +1268,48 @@ the figures are in `docs/dev/TuningNotes.md`.
    constant inset and the tides over it, which the tide model takes as a stream by area);
    Gibraltar British, Ceuta Spanish, Tangier Moorish (the nations table gains Morocco).
    Built last, as the door to the Mediterranean's own chart line.
+   **As built (package 39f, 2026-10-10).** `strait`, 35.5 N to 36.4 N and 6.5 W to 5.0 W,
+   abutting `portugal` (package 39d, built beside it) at 36.4 N: Cadiz and its bay are that
+   block's, Cape Trafalgar, Conil and Cape Roche this one's. Fifteen level-2 tiles and
+   fourteen level-3 in four harbour groups (the Bay of Gibraltar and Algeciras, Tarifa,
+   Ceuta, Tangier), 4.4 MB with the coast and the features, committed; no tile of another
+   region's met (the row from 36.29 N west of 5.92 W meets `portugal`'s bounds too and is
+   the region's that the merged manifest lists first: the seam rule at the merge). 88 marks
+   from Tofiño's *Derrotero* of the Mediterranean (1787) and of the Atlantic (1789) and
+   Purdy 1826, their places on Tofiño's theodolite bearings where the grid does not resolve
+   them (the Cabezos, the Pearl, the Aceytera); **no light of 1805** in the block, every
+   light dated later (Tarifa's first recorded in 1826, Europa's of 1841, the Almina's of
+   1855, Trafalgar's of 1860, Spartel's of 1864, Carnero's of 1874). One period patch:
+   the water about the Green Island before Algeciras from Tofiño's plan of the bay (1786),
+   where the modern port's fill stands, in brazas of two Castilian varas (a unit the tool
+   gained), the datum low water judged 0.3 m above LAT from TICON's constants. Five port
+   files (Gibraltar British; Algeciras, Tarifa and Ceuta Spanish, hostile to a King's ship
+   and open to a neutral; Tangier Moorish); the nations table gains **Morocco**, at peace
+   with every nation in June 1805, so a Moorish port is neutral to all and open to its own,
+   each relation with its source or judgement (`relations:`, read by nothing yet). **The
+   tide**: TICON's Ceuta, Tarifa, Algeciras and Gibraltar read and held (none at Tangier),
+   so the world's tide over the Strait is Le Conquet's alone, marked far (an M2 of 2.0 m
+   where Gibraltar's is 0.31, two hours late); they lie beyond the reach of every Channel
+   and Biscay north position, so blending them would move no recorded passage (the lead's
+   decision). **The constant inset** is a stream by area added to the tidal stream: an
+   area's `current:` (`toward_deg`, `kn`) in `streams.yaml`, added as a velocity to the
+   area's tide in `Tide.at` (`StreamArea.current_kn`), and its `book:`'s `current:` (a point
+   and a rate), which the master works into his account as one more course and names in
+   his tide's words (`BookStream.current_kn`, `BookTide.current_words`); an area naming none
+   has none, so no stream elsewhere moved. The middle of the Strait sets two knots east under
+   a tide of two and a half at springs, the eastern mouth a knot and a half, the western
+   approach half a knot; the shores, the bay and Tangier's water the tide alone, the flood
+   west on the rising water (Tofiño 1787, p. 8). The directions' box is not widened: beyond
+   it a statement whose water is a polygon holds within it (`Directions.area_at`), so the
+   master has the Strait's statements and none off Portugal. Four places of the epitome
+   (Norie's: Cape Trafalgar, Tarifa, Gibraltar, Tangier; Moore's: Gibraltar). The weather:
+   the Portuguese coast's box holds the block north of 36 N; south of it (and on the
+   Moroccan coast west to 9 W) no box does, and the nearest, Portugal's, answers by package
+   38's rule; nothing changed, the Strait's Levanter and Poniente a box of their own for a
+   printed table. The scenario `strait.yaml`: the
+   frigate from five miles south-west of Cape Trafalgar (not Cadiz bay, `portugal`'s) through
+   the Strait with the inset (the brief's "against" read as the passage out has it) to
+   Gibraltar road, at anchor at 12:52 in six fathoms off the Old Mole. The figures are in `docs/dev/TuningNotes.md`.
 
 Each block (the Strait's included) is a port file per port on 35's machinery, a patch per harbour where a period
 sheet can be read, the features file's marks with their sources in the references'

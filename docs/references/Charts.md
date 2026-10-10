@@ -124,6 +124,40 @@ were.
 | TICON (Piccioni et al. 2019), `TICON.txt` | the zip at doi.pangaea.de (PANGAEA 896587), fetched 2026-10-09, SHA-256 7055f8ed…6514, CC BY 4.0 | Nine gauges of the block by their coordinates (Concarneau, Port-Tudy, Le Crouesty, Saint-Nazaire, Paimboeuf, the Pointe de Saint-Gildas, Les Sables-d'Olonne, La Rochelle-Pallice, the Île d'Aix): M2, S2 and N2, held out of the blend (`held_gauges`, after the Channel east's two). |
 | The French encyclopaedia's pages | fr.wikipedia.org through its API, read 2026-10-09, slowly (most requests refused for their rate) | The lights' dates and positions: the Baleines (Vauban's tower 1682, replaced 1854), Chassiron (1685; its second tower 1836), Penmarch (1835), Goulphar (1836), Pen Men (1839), Penfret (1838), the Teignouse (1845), the Pilier (1829), Yeu (1830), La Vieille (1887), Tévennec (1875) and the Bec du Raz (1839); La Vieille's and Tévennec's positions and the Raz's six knots at springs; the tower of the Lanterne at La Rochelle. |
 
+## The Strait (package 39f)
+
+The sixth block of spec M6 §26, `strait` (35.5 N to 36.4 N, 6.5 W to 5.0 W, abutting the
+block `portugal`, package 39d, at 36.4 N, so that Cadiz and its bay are that block's and
+Cape Trafalgar, Conil and Cape Roche this one's). Its tiles are cut from the same two grids,
+fetched for the region on 2026-10-10: EMODnet's DTM 2024 by its ERDDAP service (`elevation`
+and `elevation_max` over 35.35 to 36.80 N, 6.85 to 4.55 W, two classic netCDF subsets of
+12.3 MB, CC BY 4.0) and GEBCO_2025's area extract (35.25 to 36.90 N, 6.95 to 4.45 W, ESRI
+ASCII, 1.4 MB, public domain), their checksums in the manifest. Fifteen tiles at level 2
+(the row from 36.29 N west of 5.92 W meets `portugal`'s bounds too: the seam rule keeps it
+the region's the manifest lists first, docs/dev/ChartBlocks.md) and fourteen at level 3 in
+four harbour groups (the Bay of Gibraltar and Algeciras, Tarifa, Ceuta, Tangier); 4.4 MB
+with the coast and the features. EMODnet covers the Strait's water whole (56 cells of 0.01°
+where GEBCO reads sea and EMODnet nothing, all at the shore); GEBCO's fill is raised by the
+world's mean level, which over the block is Le Conquet's alone (3.98 m; the block's gauges
+held).
+
+| Work | Where read | What was taken |
+|---|---|---|
+| Tofiño, *Derrotero de las costas de España en el Mediterráneo y su correspondiente de África*, Madrid 1787 | Internet Archive `derroterodelasco00tofi`, the OCR text, pp. 1 to 27 and the introduction (pp. LII to LVI) | The 88 marks of `features/strait.yaml` east of Cape Trafalgar: the coast from Trafalgar to Carnero (Barbate, Zahara, the Camarinal, Cape Plata, Bolonia, Punta Paloma, Valdevaqueros, the Peña, Tarifa and its isle, the Marroquina, Guadalmesí, the Acebuche, Tolmo, the Frayle, Carnero, Pigeon Island), the Strait's dangers by his theodolite bearings (the Cabezos, Arroyo del Puerco, the rock of Valdevaqueros, the Pearl), the Bay of Algeciras and Gibraltar (Getares, San García, the Green Island, Algeciras and the Galera, the Palmones, Punta Mala, the lines' forts, the moles, the anchorages, Europa), the coast of Africa (Spartel, Tangier and its bay, Malabata, the Alcázar, Cires, Parsley Island, Leona, Benzú, the Torre Blanca and its rock, Ceuta, the Acho); the tides (p. 8: the rising water runs west along both shores, the falling east; pp. 9 and 21: high water at Tarifa at noon, in the bay at one, 7 to 8 and 5 to 6 feet of Burgos); "las corrientes generales para el E." (p. 21); the sounding unit, brazas of Burgos (p. 19). Public domain. |
+| Tofiño, *Derrotero de las costas de España en el Océano Atlántico*, Madrid 1789 | Internet Archive `bub_gb_04Yq4fsvB8gC`, the OCR text, pp. 127 to 130 | Conil and its Atalaya, Castilobos, Cape Roche, the Laja of Conil, the sand bank and the Aceytera off Cape Trafalgar with their bearings, the Laugh of the Cape, the flood off Trafalgar setting SE to NW. Public domain. |
+| Tofiño, *Plano geométrico de la Bahía de Algeciras y Gibraltar* (surveyed 1786; *Atlas Marítimo de España*, 1789) | David Rumsey 13360.037, Internet Archive `dr_plano-geometrico-de-la-bahia-de-algeciras-y-gibraltar--levantado-por-el-13360037`; read 2026-10-10 at full resolution (10,379 by 17,270 pixels) through the Rumsey IIIF server, the crops cached outside the repository (CC BY-NC-SA 3.0), none committed | The legend (the letters A to Z and a to q of the bay's places; "Los Nos de la Sonda son Brazas de á dos Varas Castellanas"; the bottoms' letters); the soundings about the Green Island and the town of Algeciras, georeferenced by three control points (residuals 76 to 120 m): the bay's override, the water of 1786 where the modern port of Algeciras stands. |
+| John Purdy, *The New Sailing Directory for the Mediterranean Sea*, London 1826 | Internet Archive `newsailingdirec01purdgoog`, the OCR text, pp. 1 to 9 and 349 to 353, and the page images of pp. 6 to 8 (the tide's hours) | The tides and current of the Strait (p. 8: high water at Trafalgar V 1/4, Tarifa XI 1/4, Gibraltar XII 1/4, rising 5 feet; near Tangier at 12; the current from the Atlantic in the middle setting generally east; pp. 349 to 351: the current in a degree regulated by the tide, from 3 to 6 miles, sometimes westward across the Strait at full and change west of Tarifa); the English marks and anchorages (Pearl's 9 or 10 feet, the back of the Rock in 20 fathoms, the New Mole in war, Tangier's 12-foot ledge, Benzú, Ceuta, Captain Knight's survey of Ceuta and Tetuan bays of 1799, the fleets watering at Tetuan); Tangier's trade with Gibraltar (Jackson's words). Later than the period, and the nearest English directions read; much of it Tofiño's in English. Public domain. |
+| John Hamilton Moore, *The New Practical Navigator*, 1799 | Internet Archive `bim_eighteenth-century_the-practical-navigator_moore-john-hamilton_1799`, the OCR text | Gibraltar in the table by the moon's bearing's South group (12 o'clock), unverified against the page image. |
+| William Lempriere, *A Tour from Gibraltar to Tangier, Sallee, Mogodore ... and Morocco*, 1800 | Internet Archive `bim_eighteenth-century_a-tour-from-gibraltar-to_lempriere-william-md_1800`, the OCR text, pp. 39, 318 and 326 | Sidi Mahomet's peace with all Europe; Muley Yazid's war with Spain of 1790: Morocco's relations in `data/nations.yaml`. |
+| TICON (Piccioni et al. 2019), `TICON.txt` | the zip at doi.pangaea.de (PANGAEA 896587), fetched 2026-10-10, SHA-256 7055f8ed…6514 (the same file), CC BY 4.0 | Four gauges of the block by their coordinates (Ceuta, Tarifa, Algeciras, Gibraltar; none at Tangier): M2, S2 and N2, held out of the blend (`held_gauges`, after Biscay north's nine); the sum of the forty amplitudes at Algeciras for the patch's datum, judgement. |
+| The Spanish and English encyclopaedias' pages | es. and en.wikipedia.org, the pages' wikitext, read 2026-10-10 one at a time (the API answered 429) | The lights' dates (Trafalgar 1860, Carnero 1874, the Almina 1 December 1855, Spartel 1861 to 1864, Europa 1 August 1841, Tarifa's first record a plan of 1826, the shrine of Our Lady of Europe out of use after 1704); positions of Cape Trafalgar, Carnero's light, Cape Spartel, Parsley Island, Monte Hacho; the Camarinal's name moved to the Cabo de Gracia; Morocco's peace with the United States (1786, the war of June 1802 to September 1803), Sulayman's withdrawal from European trade after 1798, the plain red flag before 1915. |
+
+The positions were placed from the modern chart, the encyclopaedia's coordinates and
+Tofiño's bearings, then checked against the block's tiles by the features file's rule (39
+moved, each in `fix`; the Cabezos, the Pearl, the Aceytera and the rock of Valdevaqueros,
+which EMODnet's grid does not resolve, kept where Tofiño's theodolites put them; the Laja
+of Conil a five-metre shoal of the grid exactly at his bearings).
+
 ## The unverified list, checked
 
 Each item of the study's §7 was checked from the build network on 2026-09-30 and the

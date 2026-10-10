@@ -82,7 +82,10 @@ region's, its tide and its weather are rows in tables that already reach its wat
    own to both. Every road, anchorage and mooring has a note of the bottom (an anchorage
    or a bottom feature with `bottom:`) within three kilometres (`test_tackle_orders.py`,
    on the whole chart), and every book the game ships names places of the whole chart
-   (`test_log_lines.py`).
+   (`test_log_lines.py`). `tests/test_ports.py` holds every port file to ten goods at
+   least in its market, a yard's or a chandler's topmast and water, the three ratings
+   of the crew pool and the pilot's four words (`channel`, `marks`, `anchorage`, `tide`):
+   a small Moorish town has them too, judgement and said so (package 39f).
 6. **The tide**: the block's gauges read from TICON's file (`TICON.txt` in the zip at
    doi.pangaea.de, as package 34 read it, by their coordinates; which of Vigo, Leixões,
    Cascais, Lagos, Cadiz, Tarifa and Funchal it has is **unverified** here and read when
@@ -105,17 +108,35 @@ region's, its tide and its weather are rows in tables that already reach its wat
    before it (the Raz before the Iroise), and the block's areas go before `mid-channel`,
    whose statement in the directions has no polygon and answers for every position
    within `book_limits`, a single box the block widens to hold its water (39a took it
-   east to 1 W, 39b south to 45.9 N and east to 0.9 W). Keep the polygons off the water
+   east to 1 W, 39b south to 45.9 N and east to 0.9 W). **A block far from the Channel
+   need not widen the box** (package 39f): beyond it a statement whose water is a
+   polygon holds within its polygon (`Directions.area_at`), so the Strait's directions
+   are the Strait's; widened to the Strait, the box would have made the open Channel's
+   north-east stream the master's statement off Portugal and in the open Atlantic. Cover
+   the block's water with polygons and leave the box. **A constant current** under the
+   tide (the Strait's inset from the Atlantic) is an area's `current:` (`toward_deg`,
+   `kn`), added to the tidal stream as a velocity, and its `book:`'s `current:` (`set`
+   to a point, `kn`), which the master works into his account as one more course
+   (package 39f; `StreamArea.current_kn`, `BookStream.current_kn`); an area that names
+   none has none. Keep the polygons off the water
    the recorded passages' other sail use (the naval cruise's Diamond within eight miles
    of 48 N 4 55 W and Harpy within ten of 47 50 N 6 W; the merchant passage's Palinure
    from the Raz and Hirondelle from Sein), or their digests move with them. The places
    of the master's epitome in `establishments.yaml`, Norie's and Moore's, with
    `rise_judgement` where the period gives no rise: such a rise is the world's spring
    range at the place to the foot (`test_tide.py` holds it), which over a block whose
-   gauges are held is the Channel's blend and not the place's own. The eleven gauges and
-   their figures do not move.
+   gauges are held is the Channel's blend and not the place's own, and beyond the reach
+   of every gauge (the Strait, Portugal's south, Madeira) the nearest gauge's alone, Le
+   Conquet's eighteen feet at Cape Trafalgar (package 39f): give the period's rise where
+   a pilot has one. The eleven gauges and their figures do not move. A block whose
+   gauges lie beyond 400 miles of every Channel and Biscay north position (the Strait's,
+   the islands') would move no recorded passage if its gauges were blended; they are
+   held all the same until the lead rules on the gauges' water, and the block's tests
+   say what blending them would and would not move.
 7. **The weather**: nothing, unless the block's water lies in no box of
-   `data/weather/climatology.yaml` (the four boxes cover the corridor whole); a block
+   `data/weather/climatology.yaml` (the four boxes do not cover the corridor whole:
+   35 to 36 N east of 9 W, the Strait's southern half and the Moroccan coast, lies in
+   none, and takes the nearest, Portugal's, by `Climatology.box_at`; package 39f); a block
    that reads a printed climatic table replaces a PROVISIONAL row and says so in the
    row's `note`.
 8. **A scenario** `data/scenarios/<block>.yaml` that sails the block's stretch (a free
@@ -188,6 +209,13 @@ field knows only its own block, so within a cable or two of the seam it may give
 shore farther than the true one, until the neighbour is rebuilt (a finding, not a fix).
 Abut the bounds on the neighbour's (3 W, 48 N) rather than overlapping them: the
 features of the two then never share a box, and a query takes the one tile there is.
+**Two neighbours built at once** (packages 39d and 39f, abutting at 36.4 N, neither in
+the other's manifest): the tiles that meet both bounds (the Strait's two of the row from
+36.29 N west of 5.92 W, which hold Cadiz bay) are built by both branches, and the seam
+rule cannot keep them one region's until one is merged. The branch merged second
+rebuilds its region against the merged manifest (`--region`, `--skip-fetch`), so that
+the shared tiles stay the first's and are dropped from its own list; merge the block
+whose water the shared tiles hold first (Cadiz's patch is `portugal`'s).
 
 **GEBCO's fill.** Where EMODnet has no value (the land, mostly, and some harbours and
 lagoons it does not survey) the tiles take GEBCO's height, which is about mean sea level,
@@ -203,6 +231,14 @@ was the same fault mended by hand). Every block on a coast of large tides sets i
 Biscay north's recipe (package 39b, built beside 39a) has not the key either: its
 sweep found 34,053 cells in 267 places, the marshes behind its dykes among them, which
 flood at high water springs; the rebuild with the key is the lead's to order.
+**Beyond the reach of every gauge** (the Strait, package 39f) the world's mean level is
+the nearest gauge's alone (Le Conquet's 3.98 m over the whole block): the fill is raised
+by it, consistently with the world's tide there, which is Le Conquet's too; when the
+block's gauges are blended the region wants a rebuild (its land then stands three metres
+higher than it need, which floods nothing, and a lagoon of GEBCO's fill three metres
+shoaler). **EMODnet's `elevation_max` is empty in places** where `elevation` has a value
+(over the Laja of Conil, package 39f): a check of a rock's head against the shoalest
+sounding falls back to the mean grid there.
 
 A block's test file asserts the same of its own files through `tests/test_chart.py`'s
 helpers (the manifest's licences, the sources cited), and adds the block's own truths:
