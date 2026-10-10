@@ -16,7 +16,7 @@ tuning notes and a report to the lead at the end.
 | Package | Builder | What | State |
 |---|---|---|---|
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
-| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) merged 2026-10-10; 39c (biscay-south), 39d (portugal), 39e (madeira and azores, the corridor widened) and 39f (strait) launched together 2026-10-10 after gate 6a's cut, in four worktrees; 39d merged first, 2026-10-10; 39e merged 2026-10-10, its widened corridor held for the owner's word |
+| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) merged 2026-10-10; 39c (biscay-south), 39d (portugal), 39e (madeira and azores, the corridor widened) and 39f (strait) launched together 2026-10-10 after gate 6a's cut, in four worktrees; 39d merged first, 2026-10-10; 39e merged 2026-10-10, its widened corridor held for the owner's word; 39c merged 2026-10-10; 39f built and held for the owner's ruling on the pilot's news (six pins) |
 | 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the player's seat | merged 2026-10-09 (the officer's reckoning moved to 40b; the consent brief's revision drafted for the owner, `docs/playtests/drafts/consent-brief-m6-draft.md`, held for 42) |
 | 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | merged 2026-10-09 (an own reckoning carried on past noon, the lead's ruling; chapter 13 stays out of the primer test) |
 | 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | merged 2026-10-10; gate 6a opened (`docs/gates/gate-m6a.md`); the fast tier on the merged tree 3093 passed, none failed |
@@ -872,6 +872,32 @@ noon; an anchoring refused for depth is not retried by a `when` order; the depth
 quotes the Channel's seventeen fathoms at every road; the lookout's distance estimate is
 long for a peak; sea passages must not be `place` features (channel-mid's Race of Portland
 has the fault; a chart patch).
+
+## Package 39c, as merged (2026-10-10, the third of the four)
+
+The block as briefed, its west bound carried from 9.0 W to the tile column's edge at
+9.33 W so that Finisterre, Touriñán and Villano are the block's (the tile set the same;
+the corridor is the only neighbour there): 129 level-2 tiles with 59 all-land ones left
+out and 30 level-3 in seven harbour groups; 136 marks from Tofiño's *Derrotero* and Faden
+1793, 35 moved to fit the grid with each move in its `fix` note; Cordouan, the Tower of
+Hercules and Igueldo lit in 1805, six lights dated as not yet; GEBCO's land raised by
+2.5 m, SHOM's mean level for the French gauges and judgement for the Spanish; eleven TICON
+gauges held (Vigo's phases an hour early, a clock offset suspected); five stream areas,
+nine places in the master's table, the block's box in `book_limits`; no period patch,
+since no table gives Spanish low water of springs above the datum. The cutter from the
+Isles of Bayona round Finisterre to Corunna sailed once (881 lines, `657fc88fa6a0a59e`;
+39e's lookout rule moved the unpinned digest, the passage the same). Every pin held under
+the whole slow tier of the truths on the final tree. The merges with 39d and 39e were the
+builder's: the two seam tiles at 42.0 N are portugal's (the check says 12 kept), the
+`estelas` id clash resolved as `estelas-of-bayona`.
+
+**Open for the lead or the owner, recorded:** whether to blend the held gauges across the
+Bay now that Biscay south's are in (a cross-Bay blend question, with the Channel's
+positions unmoved by any of them); whether to read the Spanish mean levels from REDMAR
+(39d found the reports) and replace the 2.5 m judgement; a rule for leaving very deep
+tiles to the corridor (57 of this block's tiles are deeper than 1,000 m, some 2.4 MB;
+39e's open-sea tiles are the larger case); the Galea light at Bilbao, 1782 by the
+Lighthouse Directory and unnamed by Tofiño in 1789, left unlit and unverified.
 
 ## Packages 39c to 39f: the last four blocks of the chart line (the same files as 39a and 39b under each block's names; `data/scenarios/<block>.yaml` and `.orders` new per block; `docs/TechnicalSpec-M6.md` §26 as built; `docs/dev/TuningNotes.md`)
 
