@@ -2491,8 +2491,12 @@ def test_a_door_that_leaves_out_old_turns_sends_the_first_kept_with_every_readin
     assert probe.dropped_turns == 0
     costs = [len(json.dumps(m, ensure_ascii=False)) // 4 + 1 for m in full]
     tools_cost = len(json.dumps(probe.tools_schema())) // 4
-    # room for the brief, the later half of the turns and some to spare: the earlier go
-    ctx = costs[0] + sum(costs[len(costs) // 2 :]) + 600 + probe.max_reply + tools_cost
+    # room for the brief, the later half of the turns and the whole picture of the
+    # readings (what the first kept sample grows to) with some to spare: the earlier go.
+    # The spare is measured and not a number, so that a reading added to the registry
+    # (package 41's `stations` and `lookout`) does not outgrow it.
+    whole_cost = len(json.dumps(tools.readings_words(world), ensure_ascii=False)) // 4
+    ctx = costs[0] + sum(costs[len(costs) // 2 :]) + whole_cost + 200 + probe.max_reply + tools_cost
     model = LocalModel("http://127.0.0.1:9", ctx_size=ctx)
     msgs = model.messages(h.turns)
     assert model.dropped_turns > 0
