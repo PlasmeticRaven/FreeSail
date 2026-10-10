@@ -1250,6 +1250,40 @@ the figures are in `docs/dev/TuningNotes.md`.
    the national libraries, **unverified** which are at full resolution) for the Spanish
    sheets; the *Derrotero* of Tofiño for the directions. Spain at war with Britain in
    June 1805: hostile to a King's ship, open to a neutral.
+   **As built (package 39c, 2026-10-10).** `biscay-south`, 42.0 N to 45.9 N and 9.33 W
+   to 0.9 W, abutting `biscay-north` at 45.9 N and the Portuguese block at 42.0 N (the
+   west moved from the brief's 9.0 W to the tile column's edge so that Finisterre,
+   Touriñán and Villano lie within, the tiles the same): 130 level-2 tiles and 30 level-3
+   in seven harbour groups (Royan and Verdon, Santander, Gijón, Ferrol, Corunna, Vigo,
+   Bayona), about 19.7 MB with its coast and features, committed; the ten tiles of the
+   northern row that Biscay north lists are its (the seam rule, "tiles another region
+   lists: 10 kept"), and the sixty tiles with no water at the datum (Castile, León, the
+   Landes) are left to the corridor by a new recipe key, `dry_tiles_to_corridor`; no
+   file another region lists changed. GEBCO's fill raised to the datum. 136 marks from
+   Tofiño's *Derrotero* of 1789 (the Atlantic volume, read whole for the coast from the
+   river of Bayonne to Cabo Prior and from Cabo Prior to the Minho) and Faden 1793 for
+   the Gironde and Arcachon; the lights of 1805 the Tower of Cordouan, the Tower of
+   Hercules and the lanthorn of St Sebastian on Igueldo, those of 1839 to 1854 (Cape
+   Mayor, the Estaca, Machichaco, Peñas, Finisterre, Villano) dated out from the
+   Lighthouse Directory; four small isles the grid has as water (Santa Clara, Mouro,
+   Santa Marina, the Estelas) given as rocks of their height and extent. No period patch:
+   Tofiño's plans of Ferrol and Santander were read at full resolution from his *Atlas
+   Marítimo* of 1789, but no table of the low water of springs above the Spanish chart's
+   datum was reached, and the how-to makes no patch without it; the port files say
+   `datum: unverified`. Five port files (Royan with the roads of Verdon and Royan,
+   Santander, Ferrol, Corunna, Vigo with the road under the Isles of Bayona), Spain's
+   hostile to a King's ship and open to a neutral, Royan France's. The tide: TICON's
+   eleven gauges of the block read and held (four French with the RAM's mean levels,
+   seven Spanish with theirs unverified), so the world's tide over Galicia is still the
+   Channel's blend, two hours late at Santander; five stream areas (the Gironde's
+   passes, Santander's mouth with Tofiño's three-knot ebb, Ferrol's narrows, the Sisarga
+   passage with his flood from the west, the open bay to 47.5 N west of 7 W), the
+   directions' limits to 42 N and 9.33 W; nine places in the epitome, the Spanish
+   ports' "at three in the afternoon". The weather: Biscay's box and the Portuguese
+   coast's hold the block; both stay PROVISIONAL (no printed table read). The scenario
+   `biscay-south.yaml`: the cutter from the road under the Isles of Bayona round
+   Finisterre to Corunna. The recorded passages replay to their digests. The figures
+   are in `docs/dev/TuningNotes.md`.
 4. **Portugal and Cadiz** (`portugal`, about 36°N to 42°N, 10°W to 6°W): Oporto's bar,
    the Berlings, Lisbon and the Tagus, Cape St Vincent, Cadiz and its bay. Tofiño again
    for the Spanish sheets; the Portuguese coast from the period's English directions
