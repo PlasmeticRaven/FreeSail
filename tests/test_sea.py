@@ -504,11 +504,20 @@ def test_windage_under_bare_poles_is_measured_and_recorded():
     forces = S.compute_sail_forces(running.ship, running.wind)
     assert forces.windage_drag_n == pytest.approx(forces.thrust_n, rel=0.01)  # windage alone
     assert 7.0 <= units.ms_to_knots(bare_poles(45.0, 180.0).ship.dyn.u) <= 9.0
-    a_hull = bare_poles(15.0, 90.0, helm="a-lee")
+    # lying a-hull she comes up and falls off between four and seven points (54 to 110
+    # degrees of heading, the wind at north), now with sternway, now without; the drift is
+    # read over her last ten minutes (package 37p: a single tick's way, read before, fell
+    # on whichever side of the swing the half hour ended, and the keel's grip astern moved
+    # it; the drift is south-west at 0.8 knots with it and without it)
+    a_hull = bare_poles(15.0, 90.0, minutes=20, helm="a-lee")
     d = a_hull.ship.dyn
-    leeward = units.ms_to_knots(math.hypot(d.u, d.v))
+    x0, y0 = d.x, d.y
+    a_hull.run(600)
+    dx, dy = d.x - x0, d.y - y0
+    leeward = units.ms_to_knots(math.hypot(dx, dy) / 600.0)
     assert 0.2 <= leeward <= 1.5, leeward
-    assert abs(d.v) > abs(d.u)  # bodily to leeward, not ahead
+    bearing = math.degrees(math.atan2(dx, dy)) % 360.0
+    assert 135.0 <= bearing <= 270.0, bearing  # bodily to leeward, not ahead
 
 
 # ---------------------------------------------------------------------------
