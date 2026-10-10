@@ -94,6 +94,12 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "paimboeuf": "france",
         "la-rochelle": "france",
         "rochefort": "france",
+        # Biscay south and Galicia (package 39c): the Gironde's road French, the rest Spain's
+        "royan": "france",
+        "santander": "spain",
+        "ferrol": "spain",
+        "corunna": "spain",
+        "vigo": "spain",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

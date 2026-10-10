@@ -81,12 +81,14 @@ def run_until(world, kind, minutes=240):
 
 
 # the port files: the Channel's five, the Channel east's eight (package 39a) and Biscay
-# north's five (package 39b)
+# north's five (package 39b), Biscay south and Galicia's five (package 39c)
 ALL_PORTS = [
     "alderney",
     "brest",
+    "corunna",
     "dartmouth",
     "falmouth",
+    "ferrol",
     "la-rochelle",
     "le-palais",
     "lorient",
@@ -95,11 +97,14 @@ ALL_PORTS = [
     "plymouth",
     "rochefort",
     "roscoff",
+    "royan",
+    "santander",
     "st-helier",
     "st-malo",
     "st-marys",
     "st-peter-port",
     "torbay",
+    "vigo",
     "weymouth",
 ]
 
@@ -252,6 +257,9 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     french_ports = {"brest", "roscoff", "st-malo", "morlaix"}
     # Biscay north's five (package 39b): hostile throughout to a King's ship
     french_ports |= {"la-rochelle", "le-palais", "lorient", "paimboeuf", "rochefort"}
+    # Biscay south and Galicia's (package 39c): the Gironde's French, the rest Spain's,
+    # at war with Britain since December 1804
+    french_ports |= {"royan", "santander", "ferrol", "corunna", "vigo"}
     assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "open") for pid in ALL_PORTS
     }
@@ -1357,3 +1365,52 @@ def test_biscay_norths_ports_stand_on_the_blocks_marks_and_on_their_own_position
     assert whole.ports.stance(lorient) == "hostile"  # the frigate, British
     neutral = world_at(GROIX_ROAD, ship=SCHOONER, chart="atlantic-east")
     assert all(neutral.ports.stance(neutral.ports.ports[p]) == "neutral" for p in BISCAY_NORTH)
+
+
+# ---------------------------------------------------------------------------
+# Package 39c: Biscay south and Galicia's ports (spec M6 §26)
+# ---------------------------------------------------------------------------
+
+BISCAY_SOUTH = ["corunna", "ferrol", "royan", "santander", "vigo"]
+VIGO_OUTER_ROAD = {"lat_deg": 42.224, "lon_deg": -8.892}
+
+
+def test_biscay_souths_ports_stand_on_the_blocks_marks_and_on_their_own_positions_without_them():
+    """The block's five ports on 35's machinery: on the whole chart their roads are the
+    block's features, with the Derrotero's and Faden's depths; on the Channel's chart
+    alone each spot falls back to its own position, the same place; the Spanish ports
+    Spain's and the Gironde's France's, every one hostile to a King's ship and open to a
+    neutral; every datum unverified (no period sheet patched); each port's hour of high
+    water a place of the better epitome."""
+    import yaml
+
+    from freesail.world.tide import Epitome
+
+    whole = world_at(VIGO_OUTER_ROAD, chart="atlantic-east")
+    channel = world_at(OFF_THE_LIZARD)
+    norie = Epitome.load("norie")
+    for pid in BISCAY_SOUTH:
+        port, alone = whole.ports.ports[pid], channel.ports.ports[pid]
+        assert port.nation == ("france" if pid == "royan" else "spain"), pid
+        assert ("Faden 1793" if pid == "royan" else "Tofiño 1789") in port.source
+        for key in ("outer_road", "anchorage", "mooring", "shore"):
+            a, b = getattr(port, key), getattr(alone, key)
+            assert abs(a.position.lat_deg - b.position.lat_deg) < 1e-4, (pid, key)
+            assert abs(a.position.lon_deg - b.position.lon_deg) < 1e-4, (pid, key)
+            assert a.feature_id and whole.chart.feature(a.feature_id) is not None, (pid, key)
+            assert whole.chart.region_of[a.feature_id] == "biscay-south"
+            assert channel.chart.feature(a.feature_id) is None
+        # the road's depth the pilot's; Faden gives none for the road of Royan
+        assert (port.anchorage.depth_m is None) == (pid == "royan"), pid
+        assert alone.anchorage.depth_m is None
+        doc = yaml.safe_load(open(f"data/ports/{pid}.yaml", encoding="utf-8"))
+        assert doc["datum"] == "unverified"
+        assert norie.by_name(port.tide["establishment"]) is not None, pid
+        assert whole.ports.stance(port) == "hostile"  # the frigate, British
+    vigo = whole.ports.ports["vigo"]
+    assert vigo.outer_road.feature_id == "cies-road" == vigo.pilot.station
+    assert whole.ports.nearest()[0].id == "vigo"
+    # the road of Vigo in the Derrotero's eight to fourteen brazas, on mud
+    assert vigo.anchorage.bottom == "mud" and 14.0 < vigo.anchorage.depth_m < 20.0
+    neutral = world_at(VIGO_OUTER_ROAD, ship=SCHOONER, chart="atlantic-east")
+    assert all(neutral.ports.stance(neutral.ports.ports[p]) == "neutral" for p in BISCAY_SOUTH)
