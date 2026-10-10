@@ -21,7 +21,7 @@ tuning notes and a report to the lead at the end.
 | 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | merged 2026-10-09 (an own reckoning carried on past noon, the lead's ruling; chapter 13 stays out of the primer test) |
 | 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | merged 2026-10-10; gate 6a opened (`docs/gates/gate-m6a.md`); the fast tier on the merged tree 3093 passed, none failed |
 | 42a | Opus | The consent brief revised once from 40's draft, describing in kind all of 6b and 6c that the rule watches; the watched sections pinned; the re-asks the owner's | merged 2026-10-10 (decision 42: the added sentences approved; the re-asks the owner's) |
-| 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | brief to write |
+| 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | brief written 2026-10-10, for the owner's approval |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay (the consent revision moved to 42a) | brief to write |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | approved and launched 2026-10-10; before gate 6a's runs |
@@ -559,3 +559,98 @@ behaviour in a sea beyond truth 28's drift; the lugger's lugs (43b). Tuned once 
 cheaply: the trim's steps and the storm line are set from the sources and the trials, not
 iterated for a prettier passage. The fast tier before the report, and the whole slow tier
 once at the end, since every pin moves.
+
+## Package 41: the wardroom (`freesail/agents/agent.py` for the master's and the lookout's stations, their domains and briefs, the cadence; `harness.py` for the conversation, the stand-by on several conditions, `you may` down the ranks; `tools.py` for the new tools and the authority filter at the new stations; `remote.py`, `mcp_server.py`, `local.py`, `repl.py` for the doors; `seat.py` for the player at the master's and the lookout's; `fake.py` for the fake master and lookout; `freesail/core/world.py` and `freesail/ui/server.py` for the pace rule and the `pace` reading; `freesail/api/readings.py`; `freesail/world/reckoning.py` only where the master's figure replaces the ship's; `freesail/world/captains.py` where the rules-based captain is the captain over a seated officer; `freesail/standing/grammar.py` only if the stand-by's conditions need a form the dialect lacks; `docs/agents/Harness.md`, `docs/agents/README.md`; the primer's chapter 16 and a chapter for the wardroom's stations; `docs/TechnicalSpec-M6.md` §11, §12, §16 as built; `docs/dev/TuningNotes.md`; `tests/test_wardroom_doors.py` new, `test_agents.py`, `test_officer.py`, `test_captain.py`, `test_mcp_server.py`, `test_known_truths.py` truths 82 to 85)
+
+Fable: the harness's second large design, the stations and doors of spec M6 §11 and the
+pace rule of §12 (decision 39's ruling 2), on the ground of 40 (the captain's station, the
+player's seat), 40b (the slate as data) and 42a (the consent brief, which describes the
+master's and the lookout's stations already and is not touched: `docs/agents/ConsentBrief.md`
+and `docs/agents/consent/` are 42a's and the owner's; `tests/test_officer.py` pins the
+brief's digest). No model is seated by this package; the fake stations prove it, and the
+owner's wardroom game is gate 6b's.
+
+1. **The master's station.** A model at the master's place (the frigate's master, the
+   schooner's and the cutter's mate stand as the file binds them: `stations: master:` in
+   the wardroom files, added by this package) works the ship's reckoning when the master
+   would: at noon, at a fix, at the captain's word (`work up the reckoning`), and is given
+   the slate of 40b as the officer is (`work my reckoning`'s data) with the sights as the
+   ship takes them; his figure becomes the ship's account when it comes in time, and the
+   simulated master's stands when it does not (G19's third step; the brief says so and the
+   log says whose figure it was). His domain is the reckoning, the sights, the lead and the
+   chart's queries; no order of the deck (the consent brief's sentence); `you may` from the
+   owner or the captain's station may widen it as the officer's. The fake master works the
+   slate's words by the traverse as truth 80's fake officer does.
+2. **The lookout's station**, for a small model (M5 open item 6): the masthead's sightings
+   put into his words (`the lookout` reading and the sightings as they come), `make her
+   out` on a sail, the warning of a danger ahead; no order but `hail`. His cadence is on
+   events (a sighting, a loss, a change in what is seen) and the glass, never the sample's
+   every minute; his brief says what he counts and the three ways of stopping, in the
+   officer's form.
+3. **The stand-by on several conditions** (the owner's note 3 of 2026-10-09; the review's
+   I7 item 3): `stand by until <x>, or <y>, or <z>` takes a list of conditions in the
+   standing dialect's own words (an event, a bell, a reading's threshold, a sail sighted,
+   the land in sight), any of which wakes the station, each named in the wake's line; the
+   conditions at parity with the book's, so that a condition the book can read the stand-by
+   can wait for; refused in the dialect's own words when one cannot be read. A wait for an
+   event still ends at eight bells, as the officer's does.
+4. **The deck's conversation.** A station addresses another by its person's name or its
+   station: `ask the master for a course`, `tell the first lieutenant to shorten sail`,
+   `say <words>`; the words are a log line with a place aboard (the quarterdeck, the
+   cabin, the masthead) and a hearer, carried in the hearer's next sample as the
+   captain's `tell` is now; `say` is heard by whoever is in the same place, the player at
+   the prompt included (he is where the captain is). Nothing a station says is ever an
+   operator instruction to another (the fourth commitment): the harness keeps the
+   speaker's name on every line and sends it as a line of the game. A question put to a
+   station is answered on its next sample, and the asker told when no answer comes by the
+   patience. The player at his seat speaks the same way.
+5. **Who may give what.** `you may` flows down the ranks: the owner to any station, the
+   captain's station to the officer's and the master's, nobody upward; a station's `stand
+   down` is its own, `stand down the <station>` the owner's and the captain's. **The
+   rules-based captain over a seated officer**: on an intent scenario with nobody at the
+   captain's station, a model or the player at the officer's is given the deck by the
+   captain's book's own words with his standing orders in force over it (40c's gate item
+   6 has the owner typing `you have the deck` as the owner; here the captain gives it, and
+   takes it back for a judgement that needs the deck, saying so). **The player's seat** at
+   the master's and the lookout's stations beside the officer's (`SEAT_STATIONS`), with
+   each station's authority, so that the owner may hold a lowly station in his wardroom
+   game (gate 6b).
+6. **The doors.** Each client its own bridge asking for one station, as now, with
+   `--station master` and `--station lookout` at the MCP bridge, the local runner and the
+   REPL; a second door asking for a held station refused in words; a station found by its
+   name and its key; three stations through three in-process doors in the tests (two
+   fakes and the player's seat; truth 82), and a game with three seated saved and loaded
+   from its checkpoint with three, each re-seated station reading its own journal (truth
+   85's first half; its second half, the replay on a build whose sampling differs, is
+   42's transcript-driven replay).
+7. **The pace rule** (§12; decision 39, ruling 2). The clock slows to 1x while any model's
+   sample is open, whoever holds it, at whatever station, and returns to the set
+   compression when every open sample has been answered or has stood by; not lockstep (the
+   ship sails on at her own second while the model thinks, a slow answer lands late);
+   `--lockstep` stays as the separate option; free-running at the set compression stays as
+   the flag for the solo player. Each station's **cadence** (every glass, every watch, on
+   events only) is a setting of the seating, said in its brief. A `pace` reading says the
+   compression, which samples are open and since when; the log says once when the clock
+   has been held for a station longer than a stated time (a constant with its reasoning).
+   The owner's testing setting is the default; the pace truth of M5 §30 is measured again
+   with three stations sampled at a glass each at 60x, on the build machine (§27).
+8. **Truths 82 to 85** in `tests/test_known_truths.py`, on the cutter's free passage with
+   fakes: the captain's `you may` to the officer and each order under its own mark (82);
+   the clock at 1x while a sample is open and back at the set compression when it is
+   answered, a stand-by releasing it (83); a `say` on the quarterdeck heard by the station
+   there and not by one below (84); the save with three seated (85). No recorded passage's
+   pin moves: none has a station seated, and the pace rule changes no tick of the world
+   (the clock's compression is the driver's, not the simulation's).
+9. **The docs**: `Harness.md` a section for the wardroom (the stations, the conversation,
+   the stand-by's conditions, the pace rule and the cadence, the doors' flags),
+   `docs/agents/README.md` where the stations are listed; the primer's chapter 16 amended
+   and a chapter for the master's and the lookout's stations in its form; spec §11, §12
+   and §16 as built; the tuning notes with the constants, the pace measured, what was
+   found and the suite as run.
+
+Not this package's: the API door and its security pass, and the transcript-driven replay
+(42); the consent brief and the re-asks (42a, the owner's); a model captain of another
+ship (43). Work it like a senior engineer and go beyond the letter where it fits the
+intent (the owner's standing word for the Fable packages), saying where. The fast tier
+before the report; the slow tests of the files touched; the pace truth measured on the
+build machine with the load said.
