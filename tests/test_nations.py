@@ -47,7 +47,21 @@ def test_the_seven_nations_and_the_wars_of_june_1805(table):
     assert table.wars_words().startswith(
         "Britain at war with the Batavian Republic, France and Spain"
     )
-    assert "the United States, Portugal and Denmark at peace with all" in table.wars_words()
+    # a nation at peace with all is not news (decision 45): the table grows with the chart
+    # and the pilot's word does not
+    words = table.wars_words()
+    assert words == "Britain at war with the Batavian Republic, France and Spain", words
+    for quiet in ("United States", "Portugal", "Denmark"):
+        assert quiet not in words
+    # what the news lately changed is said after Britain's wars (a table of its own: the
+    # fixture is shared)
+    moved = N.load_nations()
+    assert moved.make_peace("britain", "france", "1805-06-12")
+    assert moved.declare_war("united-states", "denmark", "1805-06-13", "the pilot's news")
+    assert moved.wars_words() == (
+        "Britain at war with the Batavian Republic and Spain; "
+        "peace made between Britain and France; the United States at war with Denmark"
+    ), moved.wars_words()
 
 
 def test_letters_of_marque_colours_and_names_lists(table):

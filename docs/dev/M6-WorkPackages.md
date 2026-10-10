@@ -16,7 +16,7 @@ tuning notes and a report to the lead at the end.
 | Package | Builder | What | State |
 |---|---|---|---|
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
-| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) merged 2026-10-10; 39c (biscay-south), 39d (portugal), 39e (madeira and azores, the corridor widened) and 39f (strait) launched together 2026-10-10 after gate 6a's cut, in four worktrees; 39d merged first, 2026-10-10; 39e merged 2026-10-10, its widened corridor held for the owner's word; 39c merged 2026-10-10; 39f built and held for the owner's ruling on the pilot's news (six pins) |
+| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) merged 2026-10-10; 39c (biscay-south), 39d (portugal), 39e (madeira and azores, the corridor widened) and 39f (strait) launched together 2026-10-10 after gate 6a's cut, in four worktrees; 39d merged first, 2026-10-10; 39e merged 2026-10-10, its widened corridor held for the owner's word; 39c merged 2026-10-10; 39f built and held for the owner's ruling on the pilot's news, given 2026-10-10 (decision 45): the news names Britain's wars and what lately changed, the pins re-measured once by the lead; 39f merged after it |
 | 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the player's seat | merged 2026-10-09 (the officer's reckoning moved to 40b; the consent brief's revision drafted for the owner, `docs/playtests/drafts/consent-brief-m6-draft.md`, held for 42) |
 | 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | merged 2026-10-09 (an own reckoning carried on past noon, the lead's ruling; chapter 13 stays out of the primer test) |
 | 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | merged 2026-10-10; gate 6a opened (`docs/gates/gate-m6a.md`); the fast tier on the merged tree 3093 passed, none failed |
@@ -851,8 +851,10 @@ schooner Funchal to Porto Santo and back; the frigate Funchal to Angra by the lo
 noon sight (landfall on St Michael's with the account twelve miles out, the Peak raised,
 a fix within a cable, anchored in Angra Road in 35 fathoms).
 
-**The widened corridor, held.** The corridor's recipe is committed at 32 W; its rebuilt
-tiles are not. The brief's byte-identity condition cannot hold: the old west column of
+**The widened corridor, held and then applied.** The corridor's recipe was committed at
+32 W with the package; its rebuilt tiles were held for the owner, who approved them the
+same day (decision 45), and the lead applied the held rebuild to the branch (byte for byte
+the builder's proof) in the commit after the chart blocks' merges. The brief's byte-identity condition cannot hold: the old west column of
 every corridor tile was no-data by the build's design and is now GEBCO's (53,680 to
 124,932 cells a tile), the distance field moves where the Azores are the nearest land (up
 to 613 cells), and the new sampling origin rounds half-metre ties the other way (±1 m in 1
