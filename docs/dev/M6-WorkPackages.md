@@ -16,7 +16,7 @@ tuning notes and a report to the lead at the end.
 | Package | Builder | What | State |
 |---|---|---|---|
 | 38 | Fable | The chart stitched: many regions over the corridor, the queries across edges, the climatology's boxes, the tide's gauges, the recipe form for the blocks | launched 2026-10-09 |
-| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) building; the rest after them |
+| 39a to 39f | Opus | The six blocks of the voyage to Madeira and the Strait (39c to 39f briefed 2026-10-10, to launch together after gate 6a's cut; decision 44) | 39a (channel-mid) merged 2026-10-09, bounds 48.5 N to 51 N and 3 W to 1 W, Morlaix's patch left; 39b (biscay-north) building; the rest after them |
 | 40 | Fable | The ship's company and the rules-based captain in three layers; the captain's station; the player's seat | merged 2026-10-09 (the officer's reckoning moved to 40b; the consent brief's revision drafted for the owner, `docs/playtests/drafts/consent-brief-m6-draft.md`, held for 42) |
 | 40b | Opus | The lessons in the primer; the officer's own reckoning (spec M6 §5, truth 80; moved from 40 at the owner's word) | merged 2026-10-09 (an own reckoning carried on past noon, the lead's ruling; chapter 13 stays out of the primer test) |
 | 40c | the lead | The captain's trials: the gate's pinned scenarios of the rules-based captain under weather scripts and world orders; the player's hand on an intent scenario (the captain stands aside until `captain: carry on`) | merged 2026-10-10; gate 6a opened (`docs/gates/gate-m6a.md`); the fast tier on the merged tree 3093 passed, none failed |
@@ -765,3 +765,109 @@ No recorded passage's pin moves (nothing here touches a tick of the world; a pin
 moves is a finding). Not this package's: the wardroom's stations and the pace rule (41);
 the re-asks (the owner's). The fast tier before the
 report and the slow tests of the files touched.
+
+## Packages 39c to 39f: the last four blocks of the chart line (the same files as 39a and 39b under each block's names; `data/scenarios/<block>.yaml` and `.orders` new per block; `docs/TechnicalSpec-M6.md` §26 as built; `docs/dev/TuningNotes.md`)
+
+The rules of 39a and 39b hold for each of the four blocks below, and `docs/dev/ChartBlocks.md`
+as the first two corrected it is the how-to (read it whole; the seam rule, the fetch box
+covering the tiles whole, GEBCO's fill raised to the chart's datum where the recipe asks,
+the sources' earlier fetches kept, `held_gauges:` for a block's gauges held unblended, the
+`book_limits` box widened, the ports' spots with their own positions, a neighbour's marks in
+a neighbour's file and the lead rebuilding that neighbour's index at the merge). Each block
+abuts its neighbours exactly at the bounds given; a tile another region lists is that
+region's. The four run at once in four worktrees and touch the same shared files (the tool's
+recipes and `CHARTS`, the manifest, the tide files, `nations.yaml`, the tests' port lists
+and counts): keep every addition self-contained and in its own named place, and when the
+lead asks, merge the branch head into your worktree and resolve against it as 39b did. The
+recorded passages and the trials replay to their digests, which the slow tier proves once
+(`tests/test_known_truths.py --slow` whole, not a `-k` selection). No model identifier in any
+file; nothing under `docs/agents/consent/` touched; downloaded data in its own fresh
+directory under `.cache/`, never run or imported, read with `-I`.
+
+### Package 39c: Biscay south and Galicia (`biscay-south`)
+
+Opus. Spec M6 §26 item 3. Bounds **42.0 N to 45.9 N, abutting `biscay-north` at 45.9 N**,
+9.0 W to 0.9 W (the Galician coast to the Minho taken into this block, so that Vigo and
+the Spanish shore north of 42 are one region's). The Gironde to Bordeaux's river mouth
+(the river itself M8's), Arcachon's entrance as the directions have it, Santander, the
+Asturian ports the pilots name, Ferrol and Corunna, Cape Finisterre, Vigo and Bayona. The
+period data: Tofiño's *Atlas Marítimo de España* (1789; the scans at the national libraries,
+unverified at full resolution; public domain) for the Spanish sheets, the *Derrotero* for
+the directions; the Neptune François and Bellin for the French corner where 39b left them
+unread; the lights of 1805 dated (Cordouan is this block's; the Spanish lights the
+Derrotero gives). Nations: Spain at war with Britain in June 1805, hostile to a King's
+ship and open to a neutral; the French ports as 39b has them. The tide: TICON's gauges of
+the block held unblended (Bordeaux, Santander, Gijón, Corunna, Vigo: which it has is
+unverified until read), the Gironde's stream and the Spanish ports' by the directions, the
+epitome's places. The weather: Biscay's box stays PROVISIONAL unless a printed table is
+read. A scenario: the schooner from the Basque Roads to Corunna across the bay, or the
+cutter Vigo to Corunna round Finisterre; sailed once at seed 7; not a gate's.
+
+### Package 39d: Portugal and Cadiz (`portugal`)
+
+Opus. Spec M6 §26 item 4. Bounds **36.4 N to 42.0 N, abutting `biscay-south` at 42.0 N and
+the Strait's block at 36.4 N** (so that Cadiz and its bay, at 36.5 N, are this block's and
+Trafalgar the Strait's), 10.0 W to 6.0 W. Oporto's bar and the Douro's mouth, Aveiro,
+Figueira, the Berlings, Peniche, Cascais road, Lisbon and the Tagus to the town (the river
+above it M8's), Setúbal, Cape St Vincent, Lagos bay, Faro, Cadiz and its bay with Rota. The
+period data: Tofiño for the Spanish sheets and Cadiz; the Portuguese coast from the period's
+English directions (Norie, Faden, the *Oriental Navigator*'s Lisbon) and Tofiño's
+Portuguese sheets; the lights of 1805 dated (the Berlings, Cape St Vincent's convent light,
+Cadiz's San Sebastián, and whichever the directions give). Nations: Portugal neutral in
+1805, open to all; Cadiz blockaded, which the port files gain as a state of a port (`state:
+blockaded`, with what it means to a stance: closed to the blockaders' enemies and watched
+by their ships, a thing for 6c's world's business to read; say in §26 what you built and
+what you left). The tide: TICON's gauges held (Leixões, Cascais, Lagos, Cadiz: unverified
+until read), the Tagus's stream by the directions, the bar of Oporto's by its pilots. The
+weather: the Portuguese coast's box with its summer northerlies, PROVISIONAL unless a
+printed table (the *Oriental Navigator* or Purdy has them) is read. A scenario: the frigate
+from Lisbon's road to Cadiz bay, or the schooner Oporto to Lisbon; sailed once at seed 7;
+not a gate's.
+
+### Package 39e: Madeira and the Western Islands (`madeira` and `azores`; the corridor widened)
+
+Opus. Spec M6 §26 item 5, widened by the owner's word of 2026-10-10 (decision 44) to the
+Western Islands, the period's name for the Azores. Two regions in one package: **`madeira`**,
+32.0 N to 33.5 N, 17.5 W to 16.0 W (Funchal and its open road, Porto Santo, the Desertas; the
+island's lights and marks as 1805 had them; the voyage's end as an anchorage in a road with
+a swell), and **`azores`**, 36.5 N to 40.0 N, 31.5 W to 24.5 W (Angra do Heroísmo on
+Terceira, the main port and road; Ponta Delgada on São Miguel; Horta on Faial, the road
+between Faial and Pico; the other islands as marks and dangers, the Formigas among them).
+**The corridor widened**: the Western Islands lie west of the corridor's 20 W, so the
+corridor is rebuilt by `--corridor` with its west bound moved to 32.0 W (the recipe's
+`bounds` and `fetch`; GEBCO's extract fetched again over the wider box), its existing
+tiles byte-identical after the rebuild (the tiles are whole on a fixed grid and the source
+the same: prove it by `git diff --stat` over `data/charts/tiles/1/` showing only tiles
+added, and say so in the report; if any existing tile changes, stop and report before
+committing); the chart's envelope in `CHARTS` and the weather's and tide's tables reaching
+the islands (a weather box for the Azores' high, PROVISIONAL and judgement, said so in the
+row's note; the tide's gauges held unblended: Funchal, Ponta Delgada, Horta, Angra:
+unverified until read). The period data: the English pilots of the 1790s and Norie for
+Funchal road and the islands (the Admiralty's surveys are later; the block says what it
+rests on, as 35b did); Tofiño's or the Portuguese sheets where any exist; the lights
+dated. Nations: Portuguese, neutral, open to all. Scenarios: the schooner from Funchal
+road to Porto Santo and back; and the frigate from Funchal to Angra's road, a free passage
+of three or four days across the widened corridor, the reckoning by the log and the noon
+sight alone, the landfall on Pico's peak (which stands 2,350 m and is seen from thirty
+leagues in clear weather by the directions: the lookout's horizon rule tested at that
+height); sailed once each at seed 7; not a gate's.
+
+### Package 39f: the Strait (`strait`)
+
+Opus. Spec M6 §26 item 6 (the owner's ruling 4 of decision 39, the Mediterranean to come
+on its own chart line after this). Bounds **35.5 N to 36.4 N, abutting `portugal` at 36.4 N**,
+6.5 W to 5.0 W. Cape Trafalgar, Tarifa and the Strait's streams, Gibraltar and its bay
+with Algeciras, Ceuta, Tangier and the African shore between, Cape Spartel; the Pearl Rock
+and the Strait's dangers. The period data: Tofiño for the Spanish side and the Strait; the
+period's English directions for the Strait's currents (the constant inset from the Atlantic
+and the tides over it, which the tide model takes as a stream by area: an area with a
+constant set added to the tidal stream, which the stream model may need a field for; say
+what you built); the lights of 1805 dated (Europa Point's, Tarifa's, Spartel's if any).
+Nations: Gibraltar British; Ceuta and Algeciras Spanish, hostile to a King's ship; Tangier
+Moorish, the nations table gaining Morocco (neutral, open to all, its stance toward each
+nation as the period had it, with the source or judgement said). The tide: TICON's gauges
+held (Gibraltar, Tarifa, Ceuta, Tangier: unverified until read), the Strait's streams by
+area from the directions, the epitome's places. A scenario: the frigate from Cadiz bay
+through the Strait to Gibraltar's bay against the inset, with the land of both shores in
+sight; sailed once at seed 7; not a gate's. Built last in the voyage's order but launched
+with the others; its seam with `portugal` is its only neighbour.
