@@ -1,0 +1,114 @@
+# FreeSail: Oporto and the bar of the Douro as a port (spec M6 §26; package 39d, the
+# Portugal and Cadiz block), on package 35's machinery (freesail/world/ports.py); the marks
+# are the features file's (data/charts/features/portugal.yaml).
+#
+# Sources. Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico,
+# 'Derrotero de la Costa de Portugal', pp. 78 to 79: the bar of Oporto at the mouth of the
+# Douro in 41 11' N, the city more than half a league inland with São João da Foz near the
+# entrance; "the entrance is of a bar which changes with the gales, which obliges a ship
+# to take a pilot, found with ease, for the native fishermen are very vigilant when ships
+# are in sight and come off at once to offer themselves, unless the bad weather keeps them
+# in, in which case the port is not to be sought"; the city known by the black belfry of
+# the Clérigos, and near the river's mouth the hermitage of Our Lady of the Light, where
+# they keep a light every night; the sea rises much on this coast from the west. Pimentel
+# (quoted): the Leixões half a league north; the castle of São João on the north point
+# with its reef, the Filgueira to larboard going in, the Cabedelo the low sand point on
+# the south; enter on São Miguel in one with Santa Catalina, then along the Pilar, past
+# the stone in mid-channel, "and all is good anchorage up to the city".
+#
+# The datum: UNVERIFIED. No period sheet of the bar is patched. The river above the Foz
+# is narrower than EMODnet's cell and not in its grid (GEBCO's fill has it as land): the
+# chart holds the Douro's mouth within the bar, one to two metres at the datum, and no
+# farther, so the mooring is the mouth within the bar for a vessel of small draught and a
+# deeper ship lies in the road (the finding; a patch of the river from a period plan is a
+# later package's).
+#
+# The stance. Portugal neutral in June 1805 (data/nations.yaml): open to all. The great
+# trade of the port wine with England (the Factory House); prices FROM MEMORY or
+# JUDGEMENT, in sterling at the exchange.
+
+id: oporto
+name: Oporto
+nation: portugal
+source: "Tofiño 1789, Derrotero, pp. 78 to 79 (the bar of Oporto, São João da Foz, the light of Our Lady of the Light, the Clérigos), with Pimentel's directions quoted"
+datum: unverified
+
+outer_road:
+  feature: oporto-road
+  name: the road off the bar of Oporto
+  lat_deg: 41.1500
+  lon_deg: -8.7000
+anchorage:
+  feature: douro-within-bar
+  name: within the bar of Oporto
+  lat_deg: 41.14698
+  lon_deg: -8.67272
+mooring:
+  feature: douro-within-bar
+  name: within the bar of Oporto
+  lat_deg: 41.14698
+  lon_deg: -8.67272
+  deep_draught_ft: 12            # judgement: the bar's water no period book gives; a deeper ship lies in the road
+shore:
+  name: the quay of the Ribeira at Oporto
+  lat_deg: 41.1405
+  lon_deg: -8.6135
+
+pilot:
+  station: oporto-road
+  cruising_nm: 6                 # judgement: the fishermen come off when ships are in sight
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the fishermen's boat of the Foz
+    under: oars and a lug
+    note: "Tofiño: the native fishermen come off at once to offer themselves (judgement in the boat)"
+  names: [Oliveira, Pinto, Sousa, Carvalho, Teixeira, Moreira, Lopes, Ribeiro]   # names of the Minho and the Douro: judgement
+  skill: 0.85
+  fee_pounds: 4                  # judgement; unverified
+  cast: larboard                 # from within the bar the head paying off to the westward (judgement)
+  course_out_deg: 260            # out over the bar between the Cabedelo and the castle's reef (judgement)
+  words:
+    channel: "Bring the hermitage of São Miguel on the river's bank in one with the hermitage of Santa Catalina farther in and steer so till near the Pilar, the rock with a round tower, and coast it as close as you can; leave the Filgueira to larboard and the stone in mid-channel to starboard. The bar's mouth shifts after every gale."
+    marks: "The city on its height with the black belfry of the Clérigos, seen four or five leagues off in clear weather; São João da Foz low by the mouth, and the hermitage of Our Lady of the Light with its light; the Leixões always above water half a league north."
+    anchorage: "Past the stone in mid-channel all is good anchorage up to the city, by the middle of the channel. A ship too deep for the bar lies in the road outside and waits for the weather; in bad weather the port is not to be sought."
+    tide: "Take the bar on the flood and in fair weather only; the sea rises much on this coast from the westward."
+
+tide:
+  establishment: Lisbon          # no place of the epitome nearer; Tofiño gives no hour for Oporto
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 26, origin: portugal, season: {11: 0.9, 12: 0.9}, note: "port wine at its source, the Factory's trade with England; from memory"}
+    - {good: salt, price: 9, origin: portugal, note: "from memory"}
+    - {good: oranges, price: 15, origin: portugal, season: {12: 0.8, 1: 0.8, 2: 0.8, 6: 1.4, 7: 1.5}, note: "judgement, as Lisbon's"}
+    - {good: olive oil, price: 46, origin: portugal, note: "from memory"}
+    - {good: linen, price: 60, origin: portugal, note: "the linens of the Minho; judgement"}
+    - {good: salt fish, price: 29, origin: britain, note: "Newfoundland bacalhau; from memory"}
+    - {good: woollens, price: 85, origin: britain, note: "English woollens, the other half of the port-wine trade; from memory"}
+    - {good: coal, price: 7, origin: britain, note: "from memory"}
+    - {good: canvas, price: 42, origin: null, note: "judgement"}
+    - {good: salt beef, price: 72, origin: null, note: "from memory, as the Channel's"}
+    - {good: timber, price: 6, origin: portugal, note: "judgement"}
+
+dockyard:
+  kind: chandlers                # the merchants' yards of the Douro, no King's yard
+  items:
+    - {item: topmast, hours: 10, pounds: 44, note: "from the merchants' yards: judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 13}
+    - {item: yard, hours: 7, pounds: 27}
+    - {item: suit of sails, hours: 60, pounds_per_100m2: 24}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 5, pounds: 2, delay_h: 24}
+  ordinary: {hands: 8, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 15, pounds: 1, delay_h: 12}
+
+closed_to: []

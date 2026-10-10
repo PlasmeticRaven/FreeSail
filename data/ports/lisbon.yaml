@@ -1,0 +1,118 @@
+# FreeSail: Lisbon, with Cascais road and the bar of the Tagus, as a port (spec M6 §26;
+# package 39d, the Portugal and Cadiz block), on package 35's machinery
+# (freesail/world/ports.py); the marks are the features file's
+# (data/charts/features/portugal.yaml).
+#
+# Sources. Tofiño 1789, Derrotero de las costas de España en el Océano Atlántico,
+# 'Derrotero de la Costa de Portugal', pp. 84 to 90: Cascais road, eight to twenty brazas,
+# clean, sheltered from the north-west round to the north-east, "in this town live the
+# pilots of the bar of Lisbon"; the bar formed by the Cachopo and the flat of the Bugio,
+# the Little Pass under São Julião for a fair wind only and the Great Pass between the
+# shoals with ten to fifteen brazas, "the entrance of bar and dangerous, take a pilot who
+# knows the eddies of the tides, the want of which has lost many ships"; the road of Belém
+# in fifteen or eighteen brazas, where every ship waits for the health office's visit,
+# "without distinction of man of war or merchant"; the road before the new Lisbon, eight
+# to twenty-six brazas on ooze, moored east and west with good anchors and no buoys, the
+# ebb running up to seven miles an hour; high water at new and full moon at two in the
+# afternoon; keep the north shore, whose bottom is flatter. In his brazas (1.6718 m).
+#
+# The datum: UNVERIFIED. No period sheet of the Tagus is patched in this package (Tofiño's
+# Portuguese sheets are general charts of the coast; no plan of the bar was read); the
+# chart's depths are EMODnet's at the lowest astronomical tide, and the Zero Hidrográfico
+# lies 2.08 m below the Cascais datum in the Tagus (EPSG 10393, the Instituto
+# Hidrográfico's record) for the patch that a later package makes.
+#
+# The stance. Portugal is neutral in June 1805, at peace with all (data/nations.yaml):
+# open to her own and to every other nation as a neutral port, its pilots off Cascais
+# for the King's ships and the neutrals alike. The prices FROM MEMORY or JUDGEMENT, in
+# sterling at the exchange (the one account), as the other ports' are.
+
+id: lisbon
+name: Lisbon
+nation: portugal
+source: "Tofiño 1789, Derrotero, pp. 84 to 90 (Cascais road, the bar of Lisbon, the Little and the Great Pass, Belém, the road before Lisbon), with Pimentel's directions quoted"
+datum: unverified
+
+# The outer road is Cascais road, where a ship from the sea brings up for the pilots who
+# live in the town; the anchorage the road of Belém, where every ship waits for the health
+# office; the mooring the road before the city, eight to twenty-six brazas on ooze.
+outer_road:
+  feature: cascais-road
+  name: Cascais road
+  lat_deg: 38.6910
+  lon_deg: -9.4100
+anchorage:
+  feature: belem-road
+  name: the road of Belém
+  lat_deg: 38.69272
+  lon_deg: -9.20442
+mooring:
+  feature: lisbon-road
+  name: the road before Lisbon
+  lat_deg: 38.7040
+  lon_deg: -9.1450
+shore:
+  name: the quay of the Terreiro do Paço
+  lat_deg: 38.7075
+  lon_deg: -9.1365
+
+pilot:
+  station: cascais-road
+  cruising_nm: 6                 # judgement: the pilots of the bar met ships off Cascais and the Rock
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml # the stand-in at far detail, as at the other ports
+  vessel:
+    kind: a boat
+    name: the pilots' boat of Cascais
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Silva, Pereira, Santos, Ferreira, Costa, Rodrigues, Gomes, Martins]   # Portuguese names: judgement
+  skill: 0.9
+  fee_pounds: 5                  # judgement, in sterling for the one account; unverified
+  cast: larboard                 # from the road before Lisbon the head paying off down the river (judgement)
+  course_out_deg: 250            # down the river and out by the Great Pass, toward the Rock (judgement)
+  words:
+    channel: "With a fair wind take the Little Pass under São Julião: hug the coast of Cascais till Santa Marta is in one with the Guide's light, keep it to the Ponta de Rana, then the Bugio in one with the Monte de Córdoba. With a scant wind take the Great Pass between the Cachopo and the flat of the Bugio, ten to fifteen brazas; do not bring Cascais in one with the western fall of Sintra, or you are on the Cachopo's south-west end."
+    marks: "The Rock of Lisbon and the mountain of Sintra behind it; the light of the Guide and the fortress of Santa Marta at Cascais; the great castle of São Julião on the north side of the mouth and the round castle of the Bugio on its sand flat on the south; within, the tower of Belém, and the King's castle on the highest hill of the city."
+    anchorage: "Every ship anchors by the tower of Belém in fifteen or eighteen brazas till the health office has visited her, man of war or merchant. Then go up before the new Lisbon and moor east and west with good anchors and no buoys, eight to twenty-six brazas on ooze: the ebb runs seven miles an hour and makes anchors drag. Keep the north shore, whose bottom is flatter."
+    tide: "It is high water before Lisbon at two in the afternoon at new and full moon. The ebb runs strong out of the river and makes eddies over the bar; enter on the flood, and if you must enter on the ebb crowd all the sail you can."
+
+tide:
+  establishment: Lisbon
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds               # sterling at the exchange (the milreis about five and sixpence, from memory)
+  goods:
+    - {good: wine, price: 28, origin: portugal, season: {10: 0.9, 11: 0.9}, note: "the wines of Lisbon and Carcavelos at their source; from memory"}
+    - {good: salt, price: 8, origin: portugal, note: "the salt of Setúbal brought round; from memory"}
+    - {good: oranges, price: 14, origin: portugal, season: {12: 0.8, 1: 0.8, 2: 0.8, 6: 1.4, 7: 1.5}, note: "Lisbon oranges, cheap in the winter's crop (judgement)"}
+    - {good: olive oil, price: 45, origin: portugal, note: "from memory"}
+    - {good: sugar, price: 60, origin: portugal, note: "Brazil sugar, the colonial trade of Lisbon; from memory"}
+    - {good: tobacco, price: 75, origin: portugal, note: "Brazil roll tobacco; from memory"}
+    - {good: cotton, price: 90, origin: portugal, note: "Brazil cotton; from memory"}
+    - {good: cork, price: 20, origin: portugal, note: "judgement"}
+    - {good: salt fish, price: 30, origin: britain, note: "Newfoundland bacalhau, the staple of the Portuguese table; from memory"}
+    - {good: canvas, price: 42, origin: null, note: "judgement"}
+    - {good: hemp, price: 55, origin: null, note: "Baltic hemp by the neutrals; judgement"}
+    - {good: salt beef, price: 72, origin: null, note: "from memory, as the Channel's"}
+    - {good: coal, price: 7, origin: britain, note: "English coal, the factory's trade; from memory"}
+
+dockyard:
+  kind: yard                     # the Ribeira das Naus, the Crown's dockyard; a neutral's yard sells at a price
+  items:
+    - {item: topmast, hours: 8, pounds: 46, note: "the Crown's yard sells to a foreign ship at a price: judgement"}
+    - {item: topgallant_mast, hours: 4, pounds: 14}
+    - {item: yard, hours: 6, pounds: 28}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 23}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  able: {hands: 6, pounds: 2, delay_h: 24}
+  ordinary: {hands: 10, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 20, pounds: 1, delay_h: 12}
+
+closed_to: []

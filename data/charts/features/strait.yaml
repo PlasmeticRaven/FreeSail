@@ -13,9 +13,12 @@
 #                   Castilian varas (1.672 m; the plan's legend, below) and his feet the
 #                   pie de Burgos (0.279 m), his miles of sixty to the degree.
 #   Tofiño 1789     the same, Derrotero de las costas de España en el Océano Atlántico
-#                   (Internet Archive bub_gb_04Yq4fsvB8gC), 'Descripción de la costa de
-#                   Andalucía', pp. 127 to 130: Conil, Cape Roche, the Laja de Conil, the
-#                   sand bank and the Aceytera off Cape Trafalgar.
+#                   (Internet Archive bub_gb_04Yq4fsvB8gC), 'Descripción de la costa
+#                   comprehendida desde el castillo de S. Sebastian de Cadiz hasta el cabo
+#                   Trafalgar', pp. 121 to 130: Sancti Petri and its bar, Torre Bermeja and
+#                   the Barrosa, the Juan Vela, the Laja de Plaste, the Marrajotes, Cape
+#                   Roche and its ledge, Conil, the Laja de Conil, the sand bank and the
+#                   Aceytera off Cape Trafalgar.
 #   Tofiño 1786     his 'Plano geométrico de la Bahía de Algeciras y Gibraltar' (Atlas
 #                   Marítimo de España, 1789; David Rumsey 13360.037), read at full
 #                   resolution through the collection's IIIF server: its legend's letters
@@ -54,13 +57,171 @@
 # the moon.
 #
 # Cadiz and its bay (36.5 N) are the block `portugal`'s (package 39d), whose bounds abut
-# these at 36.4 N; Cape Roche, Conil and Cape Trafalgar are this block's.
+# these at 36.4 N; Sancti Petri (36.38 N), Cape Roche, Conil and Cape Trafalgar are this
+# block's (Torre Gorda, 36.46 N, and the breaker a mile off San Sebastián are
+# `portugal`'s).
 #
 # The lead reviews this list against the sources before the merge: the citation is on
 # every line for that.
 
 region: strait
 features:
+
+  # ---------------------------------------------------------------------------
+  # Sancti Petri to Cape Roche (Tofiño 1789, pp. 122 to 126; the marks south of 36.4 N
+  # that package 39d left to this block). His distances on this stretch fall a fifth
+  # short of the modern chart's between marks it has (the castle of Sancti Petri to Cape
+  # Roche, his chain of three legs; and the meeting of his two bearings on each danger):
+  # where he gives two bearings the danger is at their meeting; where one, at his bearing
+  # and his distance increased by a quarter, which closes his chain from the castle to
+  # Cape Roche within 30 m (JUDGEMENT, said in each `fix`).
+  # ---------------------------------------------------------------------------
+
+  - id: sancti-petri-castle
+    kind: castle
+    name: the castle of Sancti Petri
+    modern: Castillo de Sancti Petri
+    lat_deg: 36.3787
+    lon_deg: -6.2177
+    height_m: 15
+    source: "Tofiño 1789, 'Isla y Barra de Sancti Petri', p. 122: S 20° E 6 miles from Torre Gorda the island and mouth of the river of Sancti Petri; in the mouth a low island ringed with rocks with a castle on it and a square tower; the coast between low with beach and some rocks"
+    says: "The castle of Sancti Petri, its square tower on a low island ringed with rocks in the mouth of the river."
+    fix: "the modern chart's position of the castle; moved 120 m to the nearest land of the tiles (the grid does not resolve the island from the river's mouth)"
+
+  - id: sancti-petri-bar
+    kind: shoal
+    name: the bar of Sancti Petri
+    modern: the bar of the Caño de Sancti Petri
+    lat_deg: 36.3821
+    lon_deg: -6.2080
+    height_m: 0
+    extent_m: 150
+    dries_m: -2.5
+    source: "Tofiño 1789, pp. 122 to 123: the mouth seems two wide entrances, but the north-western is shut by a reef that shows at low water and breaks at high, which only the fishing feluccas pass; between the reef of the south-east, the island and the flat a channel half a cable wide, N and S, with a braza and a half at low water, called the Bar; within, 4 and 6 brazas up the river to the bridge of Suazo; with much sea all one breaker"
+    says: "The bar of Sancti Petri, a channel half a cable wide with a braza and a half at low water between the island and the Pulpera; with a sea on it is all one breaker, and wants a pilot of the place."
+    fix: "between the island and the Pulpera, as Tofiño describes the channel; moved 100 m to the nearest water of the tiles, which do not resolve the river's mouth; 1 1/2 brazas (2.5 m)"
+
+  - id: la-pulpera
+    kind: drying
+    name: the Pulpera
+    modern: the rocks of the Pulpera (the reef of the Caño de Sancti Petri)
+    lat_deg: 36.3860
+    lon_deg: -6.2040
+    height_m: 0
+    extent_m: 100
+    dries_m: 0.3
+    source: "Tofiño 1789, pp. 122 to 123: between the island and the coast a reef of rocks mostly drowned, whose north end is a ledge called the Pulpera, which uncovers at low water, on which they set a pine renewed from time to time for its knowledge; going in by the Bar the pine is left to starboard a ship's length off"
+    says: "The Pulpera, a ledge at the north end of the reef of Sancti Petri which uncovers at low water, a pine set up on it for a mark."
+    fix: "the reef's north end inside the island, by Tofiño's words (no bearing given); on the grid's land, which takes the mouth of the river and its reef together at this resolution (no water within 500 m but the bar's); it uncovers at low water: 0.3 m, JUDGEMENT"
+
+  - id: la-tinosa
+    kind: ledge
+    name: the Tinosa
+    modern: the ledge east of the island of Sancti Petri
+    lat_deg: 36.3780
+    lon_deg: -6.2039
+    height_m: 0
+    extent_m: 150
+    dries_m: -0.5
+    source: "Tofiño 1789, pp. 123 to 124: about two thirds of a mile east of the island a ledge called the Tinosa, where the reef begins that ends in the Pulpera, with more or less water all along it"
+    says: "The Tinosa, a ledge two thirds of a mile east of the island of Sancti Petri, where the reef of the Pulpera begins."
+    fix: "Tofiño's bearing and distance from the island, two thirds of a mile as he gives it (increased by a quarter it falls on the shore); moved 240 m to the nearest water of the tiles; its depth unstated: half a metre, JUDGEMENT"
+
+  - id: juan-vela
+    kind: rock
+    name: the Juan Vela
+    modern: Bajo de Juan Vela
+    lat_deg: 36.3525
+    lon_deg: -6.2857
+    height_m: 0
+    extent_m: 100
+    dries_m: -4.2
+    source: "Tofiño 1789, 'Baxo Juan Vela', p. 124: off the south-west of the island it is deep, 7 brazas two cables off and 10 and 15 to 2 1/2 miles, shoaling in places, chiefly over a stone like a ship's hull with only 2 1/2 brazas, called the Juan Vela, S 64° 30' W of the castle of Sancti Petri a league; so ships should not close the island within 4 miles"
+    says: "The Juan Vela, a stone like a ship's hull with two brazas and a half on it, a league west-south-west of the castle of Sancti Petri: a ship should not close the island within four miles."
+    fix: "Tofiño's bearing from the castle and his league increased by a quarter (JUDGEMENT, the head above); 2 1/2 brazas (4.2 m); the grid does not resolve it (30 m there, 21 m the shoalest within 2.5 km), kept where his bearing puts it, as the Cabezos are"
+
+  - id: torre-bermeja
+    kind: tower
+    name: Torre Bermeja
+    modern: Torre Bermeja (Chiclana, the north end of La Barrosa beach)
+    lat_deg: 36.3761
+    lon_deg: -6.1874
+    height_m: 15
+    source: "Tofiño 1789, 'Torre Bermeja', p. 124: S 81° 50' E 1 1/10 miles from the island of Sancti Petri, round, near the beach at the east end of a stretch of red coast, cut sheer, even and somewhat higher than the last, grown with pines"
+    says: "Torre Bermeja, a round tower by the beach at the end of a stretch of red cliff grown with pines, a mile east of Sancti Petri."
+    fix: "Tofiño's bearing from the island and his distance increased by a quarter (JUDGEMENT, the head above)"
+
+  - id: barrosa-tower
+    kind: tower
+    name: the tower of the Barrosa
+    modern: Torre del Puerco (the south end of La Barrosa beach; JUDGEMENT that it is his)
+    lat_deg: 36.3481
+    lon_deg: -6.1708
+    height_m: 30
+    source: "Tofiño 1789, 'Torre de la Barrosa', p. 124: S 23° E 1 1/2 miles from Torre Bermeja, also round and standing high; between them the shallow bay of the Barrosa, all beach, the coast rising insensibly from Sancti Petri"
+    says: "The tower of the Barrosa, round and standing high at the south end of the Barrosa's beach."
+    fix: "Tofiño's bearing from Torre Bermeja and his distance increased by a quarter (JUDGEMENT, the head above); his chain from it to Cape Roche, S 25° 10' E 2 3/4 miles, so increased, closes on the cape within 30 m; moved 160 m to the nearest land of the tiles"
+
+  - id: cabeza-del-puerco
+    kind: hill
+    name: the Cabeza del Puerco
+    modern: the Cerro del Puerco (the hill of the battle of the Barrosa, 1811)
+    lat_deg: 36.3530
+    lon_deg: -6.1640
+    height_m: 40
+    source: "Tofiño 1789, p. 124: a little to the north-east of the tower of the Barrosa a low hill lying east and west, called the Cabeza del Puerco, worth knowing as the mark of some shoals (the Marrajotes, p. 126; the Laja of Conil, p. 128)"
+    says: "The Cabeza del Puerco, a low hill lying east and west just north-east of the tower of the Barrosa: the mark for the Marrajotes and the Laja of Conil."
+    fix: "a short distance north-east of the tower, by Tofiño's words; the height JUDGEMENT"
+
+  - id: laja-de-plaste
+    kind: ledge
+    name: the Laja de Plaste afuera
+    modern: the outer ledge off Sancti Petri (the Laja de Plaste)
+    lat_deg: 36.3252
+    lon_deg: -6.2606
+    height_m: 0
+    extent_m: 460
+    dries_m: -5.0
+    source: "Tofiño 1789, 'Laja de Plaste afuera', p. 125 (the OCR reads 'Haste'): S 33° 45' W 3 miles from the island of Sancti Petri and N 72° 40' W 5 miles from Cape Roche, with 3 brazas of rock at low water and 11 to 15 outside it; ships of great draught keep off it, and small ones too in a swell, for the sea rises much over it and sometimes breaks; round, about half a mile across"
+    says: "The Laja de Plaste, a round ledge of rock half a mile across with three brazas on it, three miles south-west of Sancti Petri: the sea rises much over it and sometimes breaks."
+    fix: "the meeting of Tofiño's two bearings, from the island and from Cape Roche (3.9 and 6.0 miles there, against his 3 and 5); 3 brazas (5.0 m); the grid does not resolve it (31 m there), kept where his bearings put it, as the Cabezos are"
+
+  - id: marrajotes
+    kind: ledge
+    name: the Marrajotes
+    modern: Bajo de los Marrajotes
+    lat_deg: 36.3128
+    lon_deg: -6.2031
+    height_m: 0
+    extent_m: 1700
+    dries_m: -3.3
+    source: "Tofiño 1789, 'Los Marrajotes', pp. 125 to 126: the NW end S 1° 50' W 2 1/2 miles from the island of Sancti Petri and N 66° 15' W 3 1/2 long miles from Cape Roche; the SE end S 16° 7' E 4 scant miles from Sancti Petri and N 77° 54' W 2 long miles from Cape Roche; rock, 4 1/2 brazas at its ends, where the sea is wont to break, and 2 to 4 brazas of rock in its middle; to pass inside it Conil is to be hidden behind Cape Roche, to pass outside the white sand between Conil and Torre Blanca well open of the cape"
+    says: "The Marrajotes, a great ledge of rock nearly two miles long west-north-west of Cape Roche, with two to four brazas in its middle and breaking at its ends: inside it keep Conil hidden behind Cape Roche, outside it keep the white sand well open of the cape."
+    fix: "the middle of its two ends, each at the meeting of Tofiño's two bearings, from the island and from Cape Roche; 2 brazas (3.3 m) the least he gives; the extent half the ends' distance apart; the grid does not resolve it (14 to 15 m at its ends and middle, 4.6 m the shoalest within 2 km, by the shore), kept where his bearings put it, as the Cabezos are"
+
+  - id: laja-de-cabo-roche
+    kind: ledge
+    name: the Laja of Cape Roche
+    modern: the ledge off Cabo Roche
+    lat_deg: 36.2905
+    lon_deg: -6.1696
+    height_m: 0
+    extent_m: 460
+    dries_m: -2.5
+    source: "Tofiño 1789, 'Laja de Cabo Roche', p. 126: S 78° W a long mile from the tower of Cape Roche a ledge of rock with 1 1/2 brazas at low water lying NNW and SSE half a mile; its marks are so confused that they are left out, its bearing and distance from the cape sufficing"
+    says: "The Laja of Cape Roche, a ledge of rock half a mile long with a braza and a half at low water, a long mile west of the cape."
+    fix: "Tofiño's bearing from the tower and his long mile increased by a quarter (JUDGEMENT, the head above); 1 1/2 brazas (2.5 m); the grid does not resolve it (15 m there), kept where his bearing puts it, as the Cabezos are"
+
+  - id: torre-blanca-conil
+    kind: tower
+    name: Torre Blanca
+    modern: Torre Blanca (Conil), the ruin between Cape Roche and Conil
+    lat_deg: 36.2842
+    lon_deg: -6.1050
+    height_m: 10
+    source: "Tofiño 1789, 'Torreblanca', p. 126: between Cape Roche and the Atalaya of Conil the coast makes a bay, at whose bottom another round tower almost ruined called Torre Blanca, and at its foot against the beach three rocks or islets in a line square to the shore; the white sand between Conil and Torre Blanca the mark for the Marrajotes"
+    says: "Torre Blanca, a round tower almost in ruins at the bottom of the bay between Cape Roche and Conil, three rocks at its foot on the beach."
+    fix: "at the bottom of the bay between the cape and the Atalaya, by Tofiño's words (no bearing given): JUDGEMENT; moved 20 m to the nearest land of the tiles"
 
   # ---------------------------------------------------------------------------
   # Cape Roche, Conil and Cape Trafalgar
@@ -591,7 +752,7 @@ features:
     source: "Tofiño 1787, 'Muelle de Algeciras', p. 13: N 57° 18' W of the Isla Verde about half a mile the mole of the city of Algeciras, which stretches E along the sea, the Rio de la Miel by its southern houses, entered at high water by the vessels of the country; Purdy 1826, p. 4: agreeably situate on a gentle slope by the sea-side"
     says: "Algeciras on its gentle slope by the sea, its mole and the little river of La Miel."
 
-  - id: la-galera
+  - id: la-galera-algeciras
     kind: rock
     name: the Galera
     modern: La Galera (under the modern port of Algeciras)

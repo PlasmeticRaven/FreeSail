@@ -47,7 +47,7 @@
 "san-garcia-tower",
 "isla-verde",
 "algeciras",
-"la-galera",
+"la-galera-algeciras",
 "algeciras-road",
 "palmones",
 "punta-mala",
@@ -104,10 +104,24 @@
 "trafalgar-rocky-flat"
 ],
 "145,-25": [
+"sancti-petri-castle",
+"sancti-petri-bar",
+"la-pulpera",
+"la-tinosa",
+"torre-bermeja",
+"barrosa-tower",
+"cabeza-del-puerco",
+"marrajotes",
+"laja-de-cabo-roche",
+"torre-blanca-conil",
 "cape-roche",
 "conil",
 "conil-atalaya",
 "castilobos-tower"
+],
+"145,-26": [
+"juan-vela",
+"laja-de-plaste"
 ]
 }
 }

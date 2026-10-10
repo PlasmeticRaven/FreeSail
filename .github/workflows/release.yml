@@ -51,7 +51,11 @@ jobs:
         run: |
           pip install -e ".[dev,server]"
           ruff check .
-          python -m pytest -n auto --dist loadgroup --slow
+          # The pace measurements (truth 51 and its kin, marked `pace` in tests/conftest.py)
+          # read the load when they share the runner with the other workers' days: the
+          # suite runs without them, then they run alone, one at a time.
+          python -m pytest -n auto --dist loadgroup --slow -m "not pace"
+          python -m pytest --slow -m pace
       - name: Build the gate zip
         run: |
           git archive --format=zip --prefix="FreeSail-${{ steps.gate.outputs.tag }}/" \

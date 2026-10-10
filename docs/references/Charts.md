@@ -124,27 +124,54 @@ were.
 | TICON (Piccioni et al. 2019), `TICON.txt` | the zip at doi.pangaea.de (PANGAEA 896587), fetched 2026-10-09, SHA-256 7055f8ed…6514, CC BY 4.0 | Nine gauges of the block by their coordinates (Concarneau, Port-Tudy, Le Crouesty, Saint-Nazaire, Paimboeuf, the Pointe de Saint-Gildas, Les Sables-d'Olonne, La Rochelle-Pallice, the Île d'Aix): M2, S2 and N2, held out of the blend (`held_gauges`, after the Channel east's two). |
 | The French encyclopaedia's pages | fr.wikipedia.org through its API, read 2026-10-09, slowly (most requests refused for their rate) | The lights' dates and positions: the Baleines (Vauban's tower 1682, replaced 1854), Chassiron (1685; its second tower 1836), Penmarch (1835), Goulphar (1836), Pen Men (1839), Penfret (1838), the Teignouse (1845), the Pilier (1829), Yeu (1830), La Vieille (1887), Tévennec (1875) and the Bec du Raz (1839); La Vieille's and Tévennec's positions and the Raz's six knots at springs; the tower of the Lanterne at La Rochelle. |
 
+## Portugal and Cadiz (package 39d)
+
+The fourth block of spec M6 §26, `portugal` (36.4 N to 42 N, 10 W to 6 W, abutting
+Biscay south at 42 N and the Strait at 36.4 N; neither neighbour built at this block's
+build). Its tiles are cut from the same two grids as the others', fetched for the region on
+2026-10-10: EMODnet's DTM 2024 by its ERDDAP service (`elevation` and `elevation_max` over
+36.2 to 42.35 N, 10.3 to 5.8 W, two classic netCDF subsets of 102 MB, CC BY 4.0) and
+GEBCO_2025's area extract (36.1 to 42.45 N, 10.4 to 5.7 W, ESRI ASCII in a zip of 8.1 MB,
+public domain), their checksums in the manifest. 68 tiles at level 2 (of the 140 that meet
+the bounds: the 72 all of land, Portugal's and Spain's interior, are computed for the
+distance field and not written, the corridor answering there) and 48 at level 3 in six
+harbour groups (the Douro, the Tagus from Cascais to Lisbon, Setúbal, Lagos, Faro, the bay
+of Cadiz); GEBCO's fill under them raised to the chart's datum by the coast's own mean
+level, 2.0 m (below); about 18 MB with the coast and the features.
+
+| Work | Where read | What was taken |
+|---|---|---|
+| Tofiño de San Miguel, *Derrotero de las costas de España en el Océano Atlántico, y de las Islas Azores ó Terceras*, Madrid 1789 | Internet Archive `A302201` (the Universidad de Sevilla's copy), the OCR text; the copies `derroterodelasco00tofi_0` and `bub_gb_04Yq4fsvB8gC` beside it | The coast of Portugal from the Minho to Cape St Vincent (pp. 74 to 93, his frigate's survey of 1786 to 1788 with Pimentel's Portuguese directions quoted), the Berlings (pp. 83 to 84), Cape St Vincent to Trafalgar (pp. 94 to 110), the bay of Cadiz by the instruction of the King's pilots (pp. 111 to 120), San Sebastián to Trafalgar (pp. 121 to 128, the Strait's from 36.4 N): the 139 marks of `features/portugal.yaml`, the directions of the five port files, the hours of high water at Lisbon, Cadiz, San Lucar and Ayamonte and the rises at Cadiz and Ayamonte in the epitome, the lights he names (the Senhora da Luz, the Rock's lantern, the Guide, San Sebastián's). In his brazas of six Castilian feet and his leagues of twenty to the degree. In period exactly. Public domain. |
+| Tofiño, *Plano del Puerto de Cadiz*, *Atlas Marítimo de España*, Madrid 1789 | Internet Archive `A062039040` (the Universidad de Sevilla's copy, Public Domain Mark), page 24, read 2026-10-10 at full resolution (7,830 by 5,061 pixels) through the Archive's IIIF service; the crops cached outside the repository and none committed | The plan's notes (the soundings in brazas of six feet, reduced to low water of springs of ten feet's range), its soundings in the inner bay and the shoals' names; georeferenced by six control points (residuals 25 to 251 m): the Cadiz override `overrides/portugal/cadiz-bay.yaml`. The atlas's other sheets of the coast (pages 20 to 23 and 28 to 29) are general charts and were not transcribed. |
+| Puertos del Estado, REDMAR's reports for Huelva (`GLOB_2_3_3329`) and Bonanza (`GLOB_2_3_3333`), and the list of stations (`INT_3`) | bancodatos.puertos.es, the PDFs, read 2026-10-10 | The mean sea level and the lowest astronomical tide above each gauge's zero (Huelva 203 and 7 cm, Bonanza 173 and 19), and the observed low water of springs (47 cm at both): the two gauges' mean levels and the Cadiz patch's datum (0.40 m, Huelva's, put for Cadiz). Reused under Puertos del Estado's open-data terms (attribution). |
+| EPSG's record 10393 (the Instituto Hidrográfico's transformation, revised 2023-08-07) | epsg.io, read 2026-10-10 | The Zero Hidrográfico 2.08 m below the Cascais datum in the Tagus and 2.0 m offshore: the Cascais and Lagos gauges' mean levels (judgement) and the block's fill level. |
+| TICON (Piccioni et al. 2019), `TICON.txt` | the zip at store.pangaea.de (PANGAEA 896587), fetched 2026-10-10, SHA-256 7055f8ed…6514, CC BY 4.0 | Five records of the block by their coordinates: Cascais, Lagos, Huelva, Bonanza, Cadiz (held, `data/tides/constituents.yaml`); no gauge at Leixões, Lisbon or Setúbal. |
+| The Portuguese and Spanish encyclopaedias' pages | pt. and es.wikipedia.org, read 2026-10-10 one page at a time (the API refused the build network for its rate) | The lights' dates and positions: the Senhora da Luz (in service 1761), the Rock (1772), the Guide (a light at the hermitage from 1523, the tower 1761), São Julião (1761), the Bugio (the tower 1775), Carvoeiro (1790), Espichel (the tower 1790), Cape St Vincent (the convent's light relit 1606, the tower 1846), the Berlenga (1842), Santa Maria (1851), Mondego (1858), Outão (built 1880), Chipiona (1867), San Sebastián's (a light at least from the sixteenth century); the castles of Cadiz's bay and Rota (the override's control points). |
+| Huddart, *The Oriental Navigator*, 1794 and 1801; Imray's *Memoir of the North and South Atlantic*, 1847 (Internet Archive `bim_eighteenth-century_the-oriental-navigator-_1794`, `orientalnavigat00huddgoog`, `memoirofnorthsou00jameiala`) | the OCR texts | Nothing: the *Oriental Navigator* has Madeira and the Canaries and no Lisbon; the 1847 item is the volume of Africa and the Americas. No printed table of the Portuguese coast's winds was read, and the climatology's box stays PROVISIONAL. |
+| Moore, *The New Practical Navigator*, 1799 | the OCR text read for package 39a | His table of latitudes and high water names Oporto, the Rock, Lisbon, Espichel, St Vincent and Cadiz, but its hours' column is lost in the OCR: no row taken. |
 ## The Strait (package 39f)
 
 The sixth block of spec M6 §26, `strait` (35.5 N to 36.4 N, 6.5 W to 5.0 W, abutting the
 block `portugal`, package 39d, at 36.4 N, so that Cadiz and its bay are that block's and
-Cape Trafalgar, Conil and Cape Roche this one's). Its tiles are cut from the same two grids,
+Sancti Petri, Cape Roche, Conil and Cape Trafalgar this one's). Its tiles are cut from the same two grids,
 fetched for the region on 2026-10-10: EMODnet's DTM 2024 by its ERDDAP service (`elevation`
 and `elevation_max` over 35.35 to 36.80 N, 6.85 to 4.55 W, two classic netCDF subsets of
 12.3 MB, CC BY 4.0) and GEBCO_2025's area extract (35.25 to 36.90 N, 6.95 to 4.45 W, ESRI
-ASCII, 1.4 MB, public domain), their checksums in the manifest. Fifteen tiles at level 2
-(the row from 36.29 N west of 5.92 W meets `portugal`'s bounds too: the seam rule keeps it
-the region's the manifest lists first, docs/dev/ChartBlocks.md) and fourteen at level 3 in
-four harbour groups (the Bay of Gibraltar and Algeciras, Tarifa, Ceuta, Tangier); 4.4 MB
+ASCII, 1.4 MB, public domain), their checksums in the manifest. Twelve tiles at level 2 of
+the fifteen that meet the bounds (the two of the row from 36.29 N west of 5.92 W are
+`portugal`'s, merged first: the seam rule, docs/dev/ChartBlocks.md; the one east of them,
+the hills of Medina, all land and not written, `skip_dry_tiles`) and fourteen at level 3 in
+four harbour groups (the Bay of Gibraltar and Algeciras, Tarifa, Ceuta, Tangier); 4.0 MB
 with the coast and the features. EMODnet covers the Strait's water whole (56 cells of 0.01°
 where GEBCO reads sea and EMODnet nothing, all at the shore); GEBCO's fill is raised by the
 world's mean level, which over the block is Le Conquet's alone (3.98 m; the block's gauges
-held).
+held; the block's own level, `fill_mean_level_m`, tried at the merge with 39d and
+refused: it sank Tarifa's island, docs/dev/ChartBlocks.md).
 
 | Work | Where read | What was taken |
 |---|---|---|
-| Tofiño, *Derrotero de las costas de España en el Mediterráneo y su correspondiente de África*, Madrid 1787 | Internet Archive `derroterodelasco00tofi`, the OCR text, pp. 1 to 27 and the introduction (pp. LII to LVI) | The 88 marks of `features/strait.yaml` east of Cape Trafalgar: the coast from Trafalgar to Carnero (Barbate, Zahara, the Camarinal, Cape Plata, Bolonia, Punta Paloma, Valdevaqueros, the Peña, Tarifa and its isle, the Marroquina, Guadalmesí, the Acebuche, Tolmo, the Frayle, Carnero, Pigeon Island), the Strait's dangers by his theodolite bearings (the Cabezos, Arroyo del Puerco, the rock of Valdevaqueros, the Pearl), the Bay of Algeciras and Gibraltar (Getares, San García, the Green Island, Algeciras and the Galera, the Palmones, Punta Mala, the lines' forts, the moles, the anchorages, Europa), the coast of Africa (Spartel, Tangier and its bay, Malabata, the Alcázar, Cires, Parsley Island, Leona, Benzú, the Torre Blanca and its rock, Ceuta, the Acho); the tides (p. 8: the rising water runs west along both shores, the falling east; pp. 9 and 21: high water at Tarifa at noon, in the bay at one, 7 to 8 and 5 to 6 feet of Burgos); "las corrientes generales para el E." (p. 21); the sounding unit, brazas of Burgos (p. 19). Public domain. |
-| Tofiño, *Derrotero de las costas de España en el Océano Atlántico*, Madrid 1789 | Internet Archive `bub_gb_04Yq4fsvB8gC`, the OCR text, pp. 127 to 130 | Conil and its Atalaya, Castilobos, Cape Roche, the Laja of Conil, the sand bank and the Aceytera off Cape Trafalgar with their bearings, the Laugh of the Cape, the flood off Trafalgar setting SE to NW. Public domain. |
+| Tofiño, *Derrotero de las costas de España en el Mediterráneo y su correspondiente de África*, Madrid 1787 | Internet Archive `derroterodelasco00tofi`, the OCR text, pp. 1 to 27 and the introduction (pp. LII to LVI) | The marks of `features/strait.yaml` east of Cape Trafalgar: the coast from Trafalgar to Carnero (Barbate, Zahara, the Camarinal, Cape Plata, Bolonia, Punta Paloma, Valdevaqueros, the Peña, Tarifa and its isle, the Marroquina, Guadalmesí, the Acebuche, Tolmo, the Frayle, Carnero, Pigeon Island), the Strait's dangers by his theodolite bearings (the Cabezos, Arroyo del Puerco, the rock of Valdevaqueros, the Pearl), the Bay of Algeciras and Gibraltar (Getares, San García, the Green Island, Algeciras and the Galera, the Palmones, Punta Mala, the lines' forts, the moles, the anchorages, Europa), the coast of Africa (Spartel, Tangier and its bay, Malabata, the Alcázar, Cires, Parsley Island, Leona, Benzú, the Torre Blanca and its rock, Ceuta, the Acho); the tides (p. 8: the rising water runs west along both shores, the falling east; pp. 9 and 21: high water at Tarifa at noon, in the bay at one, 7 to 8 and 5 to 6 feet of Burgos); "las corrientes generales para el E." (p. 21); the sounding unit, brazas of Burgos (p. 19). Public domain. |
+| Tofiño, *Derrotero de las costas de España en el Océano Atlántico*, Madrid 1789 | Internet Archive `bub_gb_04Yq4fsvB8gC`, the OCR text, pp. 121 to 130 | The castle and bar of Sancti Petri, the Pulpera and the Tinosa, the Juan Vela, Torre Bermeja, the tower of the Barrosa and the Cabeza del Puerco, the Laja de Plaste afuera (the OCR's "Haste"), the Marrajotes, the Laja of Cape Roche, Torre Blanca (pp. 121 to 126: the marks south of 36.4 N that package 39d left to this block; his distances on this stretch a fifth short of the modern chart's, his bearings kept); Conil and its Atalaya, Castilobos, Cape Roche, the Laja of Conil, the sand bank and the Aceytera off Cape Trafalgar with their bearings, the Laugh of the Cape, the flood off Trafalgar setting SE to NW. Public domain. |
 | Tofiño, *Plano geométrico de la Bahía de Algeciras y Gibraltar* (surveyed 1786; *Atlas Marítimo de España*, 1789) | David Rumsey 13360.037, Internet Archive `dr_plano-geometrico-de-la-bahia-de-algeciras-y-gibraltar--levantado-por-el-13360037`; read 2026-10-10 at full resolution (10,379 by 17,270 pixels) through the Rumsey IIIF server, the crops cached outside the repository (CC BY-NC-SA 3.0), none committed | The legend (the letters A to Z and a to q of the bay's places; "Los Nos de la Sonda son Brazas de á dos Varas Castellanas"; the bottoms' letters); the soundings about the Green Island and the town of Algeciras, georeferenced by three control points (residuals 76 to 120 m): the bay's override, the water of 1786 where the modern port of Algeciras stands. |
 | John Purdy, *The New Sailing Directory for the Mediterranean Sea*, London 1826 | Internet Archive `newsailingdirec01purdgoog`, the OCR text, pp. 1 to 9 and 349 to 353, and the page images of pp. 6 to 8 (the tide's hours) | The tides and current of the Strait (p. 8: high water at Trafalgar V 1/4, Tarifa XI 1/4, Gibraltar XII 1/4, rising 5 feet; near Tangier at 12; the current from the Atlantic in the middle setting generally east; pp. 349 to 351: the current in a degree regulated by the tide, from 3 to 6 miles, sometimes westward across the Strait at full and change west of Tarifa); the English marks and anchorages (Pearl's 9 or 10 feet, the back of the Rock in 20 fathoms, the New Mole in war, Tangier's 12-foot ledge, Benzú, Ceuta, Captain Knight's survey of Ceuta and Tetuan bays of 1799, the fleets watering at Tetuan); Tangier's trade with Gibraltar (Jackson's words). Later than the period, and the nearest English directions read; much of it Tofiño's in English. Public domain. |
 | John Hamilton Moore, *The New Practical Navigator*, 1799 | Internet Archive `bim_eighteenth-century_the-practical-navigator_moore-john-hamilton_1799`, the OCR text | Gibraltar in the table by the moon's bearing's South group (12 o'clock), unverified against the page image. |
@@ -154,9 +181,11 @@ held).
 
 The positions were placed from the modern chart, the encyclopaedia's coordinates and
 Tofiño's bearings, then checked against the block's tiles by the features file's rule (39
-moved, each in `fix`; the Cabezos, the Pearl, the Aceytera and the rock of Valdevaqueros,
-which EMODnet's grid does not resolve, kept where Tofiño's theodolites put them; the Laja
-of Conil a five-metre shoal of the grid exactly at his bearings).
+moved, each in `fix`, and 5 of the twelve marks of Sancti Petri added at the merge with
+39d; the Cabezos, the Pearl, the Aceytera, the rock of Valdevaqueros, the Juan Vela, the
+Laja de Plaste, the Marrajotes and the Laja of Cape Roche, which EMODnet's grid does not
+resolve, kept where Tofiño's bearings put them; the Laja of Conil a five-metre shoal of
+the grid exactly at his bearings).
 
 ## The unverified list, checked
 

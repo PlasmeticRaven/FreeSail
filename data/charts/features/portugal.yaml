@@ -1,0 +1,1619 @@
+# The features of Portugal and Cadiz, the Minho to the bay of Cadiz (spec M6 §26; package
+# 39d): hazards, marks, lights with their dates, places, anchorages and bottom notes, in the
+# period's words, each with its source in the references' form (docs/references/README.md),
+# on the rules of channel-west.yaml's head, read from:
+#
+#   Tofiño 1789     Derrotero de las costas de España en el Océano Atlántico, y de las
+#                   Islas Azores (Madrid, 1789; Internet Archive A302201, the copy of the
+#                   Universidad de Sevilla, the OCR text): 'Derrotero de la Costa de
+#                   Portugal desde el Rio Miño hasta el Cabo de S. Vicente', pp. 74 to 93
+#                   (with Pimentel's Portuguese directions quoted, the lines he marks with
+#                   commas); 'Descripción de las Islas Berlingas', pp. 83 to 84; 'Descripción
+#                   de la Costa de Portugal y España desde el Cabo de S. Vicente hasta Cabo
+#                   Trafalgar', pp. 94 to 110; 'Descripción de la Bahía de Cadiz', pp. 111 to
+#                   120 (the instruction of the King's pilots of Cadiz); 'desde el Castillo de
+#                   S. Sebastian de Cadiz hasta el Cabo Trafalgar', pp. 121 to 122. In period
+#                   exactly (his survey of the Portuguese coast in the frigate, 1786 to 1788).
+#                   His depths are in brazas of six Castilian feet (1.6718 m: 0.914 of an
+#                   English fathom), his leagues of twenty to the degree (three miles), his
+#                   bearings magnetic as he gives them.
+#   Tofiño 1789,    'Plano del Puerto de Cadiz' (Atlas Marítimo de España, the Universidad
+#   the plan        de Sevilla's copy, Internet Archive A062039040 page 24, read at full
+#                   resolution): the bay's names and soundings, and the Cadiz override
+#                   (overrides/portugal/cadiz-bay.yaml).
+#   encyclopaedia   the Portuguese and Spanish encyclopaedias' pages for the lights and the
+#                   castles (pt. and es.wikipedia.org, read 2026-10-10): their dates and
+#                   positions.
+#
+# The marks south of 36.4 N (Sancti Petri and its bar, Torre Bermeja and the Barrosa, Cape
+# Roche and its ledges, the Marrajotes, the Laja de Plaste, Juan Vela, Conil, Cape
+# Trafalgar) are the Strait's region (package 39f) and are not here; Tofiño's pp. 121 to
+# 128 give them.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from): first placed from the encyclopaedia's coordinates or the modern chart as each
+# entry says, then checked against the chart's coast and EMODnet's shoalest sounding by
+# channel-west.yaml's rule (a headland, island, town, castle, church, mill, tower to the
+# nearest land within 800 m; a light to the nearest land or shoal head within 400 m; a
+# rock or ledge to the nearest shoal head within 400 m; an anchorage to water holding
+# half the pilot's depth within 800 m); a move is said in `fix`. Heights are above the sea
+# for the horizon: JUDGEMENT throughout, the modern chart's heights of the capes and the
+# hills (Monchique's Fóia 902 m, Sintra 529, the Arrábida 501, the Cerro de São Miguel
+# 410), the grid's own land about the mark elsewhere.
+#
+# The lights of 1805: the Senhora da Luz at the Douro's mouth (1761), Cabo da Roca (1772),
+# the Guia at Cascais (1761), São Julião (1761) and the Bugio (1775) at the Tagus's bar,
+# Cabo Carvoeiro (1790), Cabo Espichel's tower (1790), the convent's light on Cape St
+# Vincent (relit 1606) and the lantern of San Sebastián at Cadiz (Tofiño's "gran
+# Linterna", 1789); not yet: the Berlenga (1842), Cape St Vincent's tower (1846), Cape
+# Santa Maria (1851), Cabo Mondego (1858) and Chipiona (1867), which carry the year they
+# were first lit so that 1805 does not see them.
+#
+# The lead reviews this list against the sources before the merge: the citation is on
+# every line for that.
+
+region: portugal
+features:
+
+  # ---------------------------------------------------------------------------
+  # The Minho to the Douro
+  # ---------------------------------------------------------------------------
+
+  - id: monte-santa-tecla
+    kind: hill
+    name: the Mount of Santa Tecla
+    modern: Monte de Santa Tecla, A Guarda
+    lat_deg: 41.8930
+    lon_deg: -8.8710
+    height_m: 341
+    source: "Tofiño 1789, 'Extremo Norte de la Costa de Portugal', p. 76: S 6 10' E seven miles and a half from the Mount of Santa Tecla is Cape Viana; the mount the north bank of the Minho's mouth"
+    says: "The Mount of Santa Tecla over the mouth of the Minho, the last of Spain."
+
+  - id: minho-mouth
+    kind: place
+    name: the mouth of the Minho
+    modern: the mouth of the Minho, between A Guarda and Caminha
+    lat_deg: 41.8660
+    lon_deg: -8.8620
+    height_m: 5
+    source: "Tofiño 1789, p. 76: the high range behind Viana, seen sixteen to eighteen leagues off, the first land made, gives knowledge of the mouths of the Minho and the Lima"
+    says: "The mouth of the Minho, the bounds of Spain and Portugal."
+
+  - id: viana
+    kind: town
+    name: Viana
+    modern: Viana do Castelo
+    lat_deg: 41.6930
+    lon_deg: -8.8320
+    height_m: 30
+    source: "Tofiño 1789, p. 76: on the north side of the river Lima a good town called Viana, very visible for its whiteness; Pimentel: the bar narrow and dangerous, for vessels of small draught, take a pilot"
+    says: "Viana on the north bank of the Lima, very visible for its whiteness; its bar narrow and dangerous, for small vessels only."
+
+  - id: viana-road
+    kind: anchorage
+    name: the anchorage off Viana
+    modern: off the mouth of the Lima
+    lat_deg: 41.6700
+    lon_deg: -8.8650
+    height_m: 0
+    depth_fathoms: 6.4
+    bottom: "sand"
+    source: "Tofiño 1789, p. 76, Pimentel: a reef runs south from Cape Viana; to anchor outside it in seven, eight or nine brazas put the town north-east"
+    says: "Without the reef of Cape Viana a ship anchors in seven to nine brazas with the town north-east of her."
+    fix: "Pimentel's bearing of the town and his depth; the bottom not given (sand by the coast's character, judgement)"
+
+  - id: cavalos-de-fao
+    kind: ledge
+    name: the Horses of Fão
+    modern: Cavalos de Fão, off Esposende and Fão
+    lat_deg: 41.5150
+    lon_deg: -8.7980
+    height_m: 0
+    extent_m: 600
+    source: "Tofiño 1789, p. 77, Pimentel: off the town of Fão two reefs of stone level with the water run out half a league to sea, called the Horses of Fão; do not come under fifteen brazas near them"
+    says: "The Horses of Fão, two reefs of rock awash half a league off the town: keep in fifteen brazas."
+
+  - id: vila-do-conde
+    kind: town
+    name: Villa do Conde
+    modern: Vila do Conde
+    lat_deg: 41.3530
+    lon_deg: -8.7470
+    height_m: 20
+    source: "Tofiño 1789, p. 77: known by its white houses at the mouth of the bar; Pimentel: many rocks above water before the bar's entrance, pass south of them; eighteen palmos on the bar at high water and ten at low; do not enter without a pilot"
+    says: "Villa do Conde, white houses at the mouth of its bar, with many rocks before it; never entered without a pilot."
+
+  # ---------------------------------------------------------------------------
+  # Oporto and the Douro
+  # ---------------------------------------------------------------------------
+
+  - id: leixoes
+    kind: rock
+    name: the Leixões
+    modern: the rocks of Leixões (within the modern harbour's moles)
+    lat_deg: 41.18300
+    lon_deg: -8.70400
+    height_m: 3
+    extent_m: 200
+    source: "Tofiño 1789, pp. 78 to 79, Pimentel: half a league north of the bar of Oporto, before the castle of Matosinhos, a ridge of rocks always visible called the Leixões, and a musket shot north-west of them a dangerous shoal; one may pass between the Leixões and the coast in eight and ten brazas"
+    says: "The Leixões, a ridge of rocks always above water half a league north of the bar, with a dangerous shoal a musket shot north-west of them."
+    fix: "the rocks stand within the modern harbour of Leixões, which the grid has dredged (7 m); left where the modern chart has them"
+
+  - id: sao-joao-da-foz
+    kind: castle
+    name: the castle of São João da Foz
+    modern: Forte de São João Baptista da Foz
+    lat_deg: 41.14822
+    lon_deg: -8.67600
+    height_m: 15
+    source: "Tofiño 1789, p. 79, Pimentel: on the north point of the entrance the castle of São João da Foz, from which a ridge of rocks runs south-west two cables"
+    says: "The castle of São João da Foz on the north point of the Douro's entrance, a ridge of rocks running two cables south-west from it."
+    fix: "moved 25 m to the nearest land in the block's tiles"
+
+  - id: senhora-da-luz-light
+    kind: light
+    name: the light of Our Lady of the Light
+    modern: Farol da Senhora da Luz, Foz do Douro
+    lat_deg: 41.15444
+    lon_deg: -8.67748
+    height_m: 40
+    lit: {from: 1761, until: null, range_nm: 10, character: "a fixed light kept by the brotherhood of the hermitage"}
+    source: "Tofiño 1789, p. 78: the hermitage of Our Lady of the Light, where they keep a light every night; the encyclopaedia's 'Farol da Senhora da Luz' (read 2026-10-10): in service in 1761, a light kept by its brotherhood perhaps from the end of the seventeenth century"
+    says: "The light of Our Lady of the Light by São João da Foz, kept every night."
+
+  - id: sao-miguel-o-anjo
+    kind: church
+    name: the hermitage of São Miguel
+    modern: Capela-Farol de São Miguel-o-Anjo, Foz do Douro
+    lat_deg: 41.14817
+    lon_deg: -8.67040
+    height_m: 10
+    source: "Tofiño 1789, p. 79, Pimentel: to enter this river bring the hermitage of São Miguel on the river's bank in one with the hermitage of Santa Catalina farther in, and so steer till near the Pilar"
+    says: "The hermitage of São Miguel on the bank of the Douro, the leading mark over the bar with Santa Catalina beyond it."
+    fix: "moved 75 m to the nearest land in the block's tiles"
+
+  - id: filgueira
+    kind: rock
+    name: the Filgueira
+    modern: the rock off the Foz (Pedra da Filgueira)
+    lat_deg: 41.14371
+    lon_deg: -8.67854
+    height_m: 2
+    extent_m: 100
+    source: "Tofiño 1789, p. 79, Pimentel: south-west of the castle's reef another rock always visible called the Filgueira, which is to be left to larboard going in"
+    says: "The Filgueira, a rock always above water south-west of the castle's reef: leave it to larboard going in."
+    fix: "Pimentel's bearing from the castle; the modern chart's rock off the Foz; moved 50 m to the nearest shoal head in the block's tiles"
+
+  - id: cabedelo
+    kind: bank
+    name: the Cabedelo
+    modern: the Cabedelo, the sand spit on the Douro's south side
+    lat_deg: 41.1430
+    lon_deg: -8.6680
+    height_m: 0
+    source: "Tofiño 1789, p. 79, Pimentel: the south point of the bar is low and of sand, called the Cabedelo, from which a flat of sand with little water runs north; the bar's mouth changes after a gale, so a pilot of the place is needed"
+    says: "The Cabedelo, the low sand point on the south of the bar, a flat with little water running north from it; the bar shifts with every gale."
+
+  - id: oporto
+    kind: town
+    name: Oporto
+    modern: Porto
+    lat_deg: 41.1410
+    lon_deg: -8.6110
+    height_m: 60
+    source: "Tofiño 1789, p. 78: the city of Oporto, one of the most commercial of Portugal, more than half a league inland; it stands on a height and is seen four or five leagues off, the black belfry of the Clérigos in it; the bar of Oporto at the mouth of the Douro in 41 11' N"
+    says: "Oporto on its height half a league up the Douro, one of the most commercial cities of Portugal."
+
+  - id: clerigos-tower
+    kind: tower
+    name: the black belfry of the Clérigos
+    modern: Torre dos Clérigos, Porto
+    lat_deg: 41.1457
+    lon_deg: -8.6146
+    height_m: 120
+    source: "Tofiño 1789, p. 78: in the city a black belfry called of the Clérigos; the city seen four to five leagues off when the horizon is clear"
+    says: "The black belfry of the Clérigos over Oporto, seen four or five leagues off in clear weather."
+
+  - id: oporto-road
+    kind: anchorage
+    name: the road off the bar of Oporto
+    modern: off the mouth of the Douro
+    lat_deg: 41.1500
+    lon_deg: -8.7000
+    height_m: 0
+    bottom: "sand and rock"
+    source: "Tofiño 1789, p. 78: the bar changes with the gales, which obliges a ship to take a pilot, easily had, for the fishermen are vigilant and come off at once; in bad weather they cannot, and then the port is not to be sought; the sea rises much on this coast from the third and fourth quadrants"
+    says: "Off the bar of Oporto a ship waits for the pilot, who comes off at once in fair weather; in foul she cannot seek the port."
+    fix: "no anchorage depth in the directions; the position off the bar in the modern grid's 15 to 20 m, judgement"
+
+  # ---------------------------------------------------------------------------
+  # Aveiro to the Berlings
+  # ---------------------------------------------------------------------------
+
+  - id: douro-within-bar
+    kind: anchorage
+    name: within the bar of Oporto
+    modern: the mouth of the Douro off São João da Foz
+    lat_deg: 41.14698
+    lon_deg: -8.67272
+    height_m: 0
+    bottom: "sand"
+    source: "Tofiño 1789, p. 79, Pimentel: leaving a stone in the middle of the channel to starboard, past it all is good anchorage up to the city, keeping the middle of the channel; the bar's mouth changes after a gale, so call a pilot of the land"
+    says: "Within the bar of Oporto, past the stone in mid-channel, good anchorage all the way up to the city."
+    fix: "the river above the Foz is narrower than EMODnet's cell and not in its grid (GEBCO's fill has it as land): the mooring is the mouth within the bar, where the grid holds one to two metres at the datum; the bottom the Cabedelo's sand, judgement; moved 175 m to water of 2 m in the block's tiles"
+
+  - id: aveiro-bar
+    kind: place
+    name: the bar of Aveiro
+    modern: the mouth of the Ria de Aveiro
+    lat_deg: 40.64083
+    lon_deg: -8.74648
+    height_m: 3
+    source: "Tofiño 1789, p. 80: a low sandy coast, hard to know, with fishermen's huts to the town of Aveiro, which lies low and up the river with a house at the bar's mouth; Pimentel: its mouth shifts, take a pilot of the country; three poles for beacons; at high water springs twenty palmos, at low twelve to thirteen"
+    says: "The bar of Aveiro on a low sandy coast, its mouth shifting: three poles for beacons, and a pilot of the country."
+    fix: "moved 375 m to the nearest land in the block's tiles"
+
+  - id: cabo-mondego
+    kind: headland
+    name: Cape Mondego
+    modern: Cabo Mondego
+    lat_deg: 40.1910
+    lon_deg: -8.9050
+    height_m: 60
+    source: "Tofiño 1789, pp. 80 to 81: the Alto de Mondego, a mountain of middling height lying north-east and south-west, very flat on its top, ending in a point at both ends, and from the south-west end a ridge of rocks of more than a cable runs out, to which give a berth; seen from afar it looks an island, not to be mistaken for the Berlings"
+    says: "Cape Mondego, the end of a flat-topped mountain that looks an island from afar; a ridge of rocks runs a cable off its south-western end."
+
+  - id: alto-de-mondego
+    kind: hill
+    name: the Alto de Mondego
+    modern: Serra da Boa Viagem
+    lat_deg: 40.2050
+    lon_deg: -8.8800
+    height_m: 258
+    source: "Tofiño 1789, p. 80: the Alto de Mondego, a mountain of middling height very flat on its top; the height the modern chart's"
+    says: "The Alto de Mondego, a flat-topped mountain over the cape, looking an island from a distance."
+
+  - id: mondego-light
+    kind: light
+    name: Cape Mondego light
+    modern: Farol do Cabo Mondego
+    lat_deg: 40.19100
+    lon_deg: -8.90517
+    height_m: 96
+    lit: {from: 1858, until: null, range_nm: 28, character: "not yet built in 1805"}
+    source: "The encyclopaedia's 'Farol do Cabo Mondego' (read 2026-10-10): built 1858; not lit in 1805"
+    says: "Cape Mondego's light, which was not yet built in 1805."
+
+  - id: buarcos-road
+    kind: anchorage
+    name: the road of Buarcos
+    modern: off Buarcos, north of the mouth of the Mondego
+    lat_deg: 40.16057
+    lon_deg: -8.88602
+    height_m: 0
+    depth_fathoms: 5.5
+    bottom: "sand"
+    source: "Tofiño 1789, p. 81, Pimentel: the town of Buarcos, where there is an anchorage in six or seven brazas, sand, and where those who would enter the Mondego take a pilot, for its mouth shifts; at high water sixteen to seventeen palmos on its bar, at low eight"
+    says: "The road of Buarcos in six or seven brazas on sand, where a ship takes her pilot for the Mondego's shifting bar."
+    fix: "moved 500 m to water of 5.0 m in the block's tiles"
+
+  - id: figueira
+    kind: town
+    name: Figueira
+    modern: Figueira da Foz
+    lat_deg: 40.1500
+    lon_deg: -8.8600
+    height_m: 15
+    source: "Tofiño 1789, p. 81: about four miles south-east of Cape Mondego the town of Figueiras and the fort of Santa Catalina on the north point of the mouth of the river Mondego"
+    says: "Figueira and its fort of Santa Catarina on the north point of the Mondego's mouth."
+
+  - id: nazare-church
+    kind: church
+    name: the church of Our Lady of Nazareth
+    modern: Santuário de Nossa Senhora da Nazaré, the Sítio
+    lat_deg: 39.6040
+    lon_deg: -9.0730
+    height_m: 110
+    source: "Tofiño 1789, p. 81, Pimentel: the cove of Pederneira, good for pataches, easy to know by a church of Our Lady of Nazareth on the top of its north point, and there is no other on the whole coast"
+    says: "The church of Our Lady of Nazareth on the high north point of Pederneira, the only one like it on the coast."
+
+  - id: pederneira-road
+    kind: anchorage
+    name: the cove of Pederneira
+    modern: the bay of Nazaré
+    lat_deg: 39.5960
+    lon_deg: -9.0800
+    height_m: 0
+    bottom: "sand"
+    source: "Tofiño 1789, p. 81, Pimentel: the cove of Pederneira, small and good for pataches"
+    says: "The little cove of Pederneira under Our Lady of Nazareth, good for small craft."
+    fix: "no depth in the directions; the bottom sand by the beach, judgement"
+
+  - id: obidos-lagoon
+    kind: place
+    name: the lagoon of Óbidos
+    modern: Lagoa de Óbidos
+    lat_deg: 39.4100
+    lon_deg: -9.2200
+    height_m: 3
+    source: "Tofiño 1789, p. 82: a fifth of the way from Cape Ficeron to Cape Carvoeiro the lagoon of Óbidos; Pimentel's port of Selir, small and good only for pataches, is doubtless in it"
+    says: "The lagoon of Óbidos, the little port of Selir in it, for pataches only."
+
+  - id: cabo-carvoeiro
+    kind: headland
+    name: Cape Carvoeiro
+    modern: Cabo Carvoeiro, Peniche
+    lat_deg: 39.35979
+    lon_deg: -9.40810
+    height_m: 30
+    source: "Tofiño 1789, p. 82: Cape Carvoeiro or of Peniche, a low, steep, salient point with an islet at its foot and a hermitage of Our Lady of the Remedies on its top; west of the steep land, low sandy ground crossing north and south, so that ships coasting in thick weather have taken the cape for the Berlings and been lost on the low land, taking it for the channel; if you see the Berlinga you will see the high farallones north of it"
+    says: "Cape Carvoeiro, a low steep point with an islet at its foot and a hermitage on top: in thick weather it has been taken for the Berlings and ships lost on the low land behind it."
+    fix: "moved 25 m to the nearest land in the block's tiles"
+
+  - id: carvoeiro-light
+    kind: light
+    name: Cape Carvoeiro light
+    modern: Farol do Cabo Carvoeiro
+    lat_deg: 39.36023
+    lon_deg: -9.40807
+    height_m: 57
+    lit: {from: 1790, until: null, range_nm: 12, character: "a fixed light"}
+    source: "The encyclopaedia's 'Farol do Cabo Carvoeiro' (read 2026-10-10): ordered by the Pombaline alvará of 1 February 1758, in service in 1790; Tofiño 1789 names no light there"
+    says: "The light on Cape Carvoeiro, lit since 1790."
+    fix: "moved 50 m to the nearest land in the block's tiles"
+
+  - id: nau-dos-corvos
+    kind: rock
+    name: the islet of Cape Carvoeiro
+    modern: Nau dos Corvos
+    lat_deg: 39.3600
+    lon_deg: -9.4115
+    height_m: 30
+    extent_m: 60
+    source: "Tofiño 1789, p. 82: Cape Carvoeiro, salient, with an islet at its foot"
+    says: "The high islet at the foot of Cape Carvoeiro."
+
+  - id: peniche
+    kind: town
+    name: Peniche
+    modern: Peniche
+    lat_deg: 39.3560
+    lon_deg: -9.3810
+    height_m: 10
+    source: "Tofiño 1789, pp. 82 to 83: east and north of the cape the town of Peniche de Cima at the beginning of the low land, almost an island; east and south of it, at the end of the steep land, Peniche de Baixo, from which the long beach runs"
+    says: "Peniche on its low neck of land behind Cape Carvoeiro, almost an island."
+
+  - id: peniche-road
+    kind: anchorage
+    name: the road of Peniche
+    modern: the bay east of Peniche
+    lat_deg: 39.34854
+    lon_deg: -9.36828
+    height_m: 0
+    bottom: "sand"
+    source: "Tofiño 1789, p. 83: before this beach one may anchor sheltered from the winds of the first quadrant and even the north-west, taking great care to weigh when another threatens, for they are on the shore"
+    says: "The road of Peniche, sheltered from the north-west round to the east; weigh when the wind threatens from the south."
+    fix: "no depth in the directions; the bottom sand by the beach, judgement; moved 325 m to water of 2 m in the block's tiles"
+
+  - id: berlenga
+    kind: island
+    name: the Berlinga
+    modern: Berlenga Grande
+    lat_deg: 39.4150
+    lon_deg: -9.5080
+    height_m: 88
+    source: "Tofiño 1789, 'Descripción de las Islas Berlingas', p. 83: N 51 30' W five and a half miles from Cape Carvoeiro the north end of the great Berlinga, in 39 26' 50\" N: an island of middling size and height, flat on its top with a cleft near its middle, steep, with a little beach on its east side and a fortress for its defence"
+    says: "The Berlinga, a flat-topped steep island with a cleft in its middle and a fort on its east side, five and a half miles off Cape Carvoeiro."
+
+  - id: berlenga-fort
+    kind: castle
+    name: the fort of the Berlinga
+    modern: Forte de São João Baptista das Berlengas
+    lat_deg: 39.41189
+    lon_deg: -9.50846
+    height_m: 10
+    source: "Tofiño 1789, p. 83: a fortress for its defence, before which one may anchor"
+    says: "The fort on the Berlinga's east side."
+    fix: "moved 500 m to the nearest land in the block's tiles"
+
+  - id: berlenga-road
+    kind: anchorage
+    name: the anchorage of the Berlinga
+    modern: off the Forte de São João Baptista
+    lat_deg: 39.4100
+    lon_deg: -9.4980
+    height_m: 0
+    depth_fathoms: 11.0
+    bottom: "sand"
+    source: "Tofiño 1789, p. 83: before the fortress one may anchor in twelve or fifteen brazas, sand, sheltered from the north-west, west and south-west, but with the other winds a ship must make sail; water in abundance"
+    says: "Before the Berlinga's fort a ship anchors in twelve to fifteen brazas on sand, sheltered from the westward, with water in abundance; she makes sail with any easterly."
+
+  - id: berlenga-light
+    kind: light
+    name: the Berlinga light
+    modern: Farol da Berlenga (Duque de Bragança)
+    lat_deg: 39.4124
+    lon_deg: -9.5080
+    height_m: 120
+    lit: {from: 1842, until: null, range_nm: 16, character: "not yet built in 1805"}
+    source: "The encyclopaedia's 'Farol da Berlenga' (read 2026-10-10): ordered by the alvará of 1758, finished 1841, in service 1842; not lit in 1805"
+    says: "The Berlinga light, which was not yet built in 1805."
+
+  - id: estelas
+    kind: rock
+    name: the Estelas
+    modern: the Estelas, west of the Berlenga
+    lat_deg: 39.41831
+    lon_deg: -9.51591
+    height_m: 20
+    extent_m: 300
+    source: "Tofiño 1789, p. 83: on its west side and near the island a high farallón with many small ones about it called the Estelas, one of them a quarter of a mile off"
+    says: "The Estelas, a high rock with many small ones about it close west of the Berlinga."
+    fix: "set by hand on the grid's shoal head close west of the island (4.5 m); the grid does not resolve the rocks; moved 100 m to the nearest shoal head in the block's tiles"
+
+  - id: estelas-laja
+    kind: rock
+    name: the laja south-west of the Estelas
+    modern: the reef south-west of the Estelas
+    lat_deg: 39.40600
+    lon_deg: -9.53300
+    height_m: 0
+    dries_m: 0.0
+    extent_m: 100
+    source: "Tofiño 1789, p. 83: south-west of that farallón, a mile off, a laja which at low water is awash"
+    says: "A rock awash at low water a mile south-west of the Estelas."
+    fix: "Tofiño's bearing and distance from the farallón alone; the grid has 25 to 30 m here: the rock is narrower than its cell"
+
+  - id: farilhao-grande
+    kind: rock
+    name: the great Farallón
+    modern: Farilhão Grande
+    lat_deg: 39.48000
+    lon_deg: -9.54000
+    height_m: 90
+    extent_m: 150
+    source: "Tofiño 1789, pp. 83 to 84: N 17 30' W three miles from the north end of the great Berlinga the great Farallón, a thick, round, rugged islet almost as high as the Berlinga, with islets at its foot and a laja a quarter of a league south-west; S 5 30' E a mile from it another as large and as high"
+    says: "The great Farallón, a thick round rugged islet nearly as high as the Berlinga, three miles north of it."
+    fix: "set on the grid's shoalest (12.7 m) near the modern chart's position; the grid does not resolve the islets"
+
+  - id: berlings-passage
+    kind: bottom
+    name: the passage between the Berlings and Cape Carvoeiro
+    modern: the Boqueirão, between the Berlengas and Peniche
+    lat_deg: 39.3900
+    lon_deg: -9.4600
+    height_m: 0
+    depth_fathoms: 13.7
+    bottom: "clean ground"
+    source: "Tofiño 1789, p. 84: the channel between the Berlings and Cape Carvoeiro, five miles and a half wide, is clean with fifteen to thirty-five brazas, fit not only for single ships but for squadrons"
+    says: "The passage between the Berlings and Cape Carvoeiro, five miles and a half wide and clean, fifteen to thirty-five brazas: fit for a squadron."
+
+  # ---------------------------------------------------------------------------
+  # Ericeira to the Tagus
+  # ---------------------------------------------------------------------------
+
+  - id: ericeira
+    kind: town
+    name: Ericeira
+    modern: Ericeira
+    lat_deg: 38.9630
+    lon_deg: -9.4170
+    height_m: 25
+    source: "Tofiño 1789, p. 84: four leagues from the castle of Our Lady of the Incarnation the town of Ericeira on the shore of a small cove and beach"
+    says: "Ericeira on its little cove and beach."
+
+  - id: mafra
+    kind: church
+    name: the convent of Mafra
+    modern: Palácio Nacional de Mafra
+    lat_deg: 38.9370
+    lon_deg: -9.3260
+    height_m: 250
+    source: "Tofiño 1789, p. 84: E S E a league from Ericeira the celebrated convent of Mafra on the top of a very distinguishable range, both for standing high and because on the whole coast there is no building so great"
+    says: "The convent of Mafra, the greatest building on the coast, on its height a league inland of Ericeira."
+
+  - id: cabo-da-roca
+    kind: headland
+    name: the Rock of Lisbon
+    modern: Cabo da Roca
+    lat_deg: 38.7804
+    lon_deg: -9.4990
+    height_m: 140
+    source: "Tofiño 1789, p. 84: four leagues and a half from Ericeira Cabo la Roca, in 38 47' 20\" N: thick, sheer, of regular height, with a tower for a lantern on its top, a farallón at its foot and a shoal a musket shot off on which the sea breaks, forty brazas outside it; close behind the lantern a great mountain rises at once and runs a good way east, its top very uneven, the mountain of Sintra"
+    says: "The Rock of Lisbon, a thick sheer cape with its lantern on top and the mountain of Sintra rising behind it; a shoal breaks a musket shot off."
+
+  - id: roca-light
+    kind: light
+    name: the light of the Rock of Lisbon
+    modern: Farol do Cabo da Roca
+    lat_deg: 38.78193
+    lon_deg: -9.49730
+    height_m: 165
+    lit: {from: 1772, until: null, range_nm: 20, character: "a fixed light in the lantern tower"}
+    source: "The encyclopaedia's 'Farol do Cabo da Roca' (read 2026-10-10): in service 1772; Tofiño 1789, p. 84: a tower for a lantern on its top"
+    says: "The light on the Rock of Lisbon, high on the cape."
+
+  - id: roca-shoal
+    kind: rock
+    name: the shoal off the Rock
+    modern: the rocks off Cabo da Roca
+    lat_deg: 38.7800
+    lon_deg: -9.5020
+    height_m: 0
+    extent_m: 100
+    source: "Tofiño 1789, p. 84: a farallón at its foot and a shoal a musket shot off on which the sea breaks, and outside it forty brazas"
+    says: "A breaking shoal a musket shot off the Rock of Lisbon; forty brazas outside it."
+    fix: "Tofiño's musket shot (about 200 m) off the cape's foot"
+
+  - id: sintra
+    kind: hill
+    name: the mountain of Sintra
+    modern: Serra de Sintra (Cruz Alta)
+    lat_deg: 38.7810
+    lon_deg: -9.3900
+    height_m: 529
+    source: "Tofiño 1789, pp. 84 to 85: the mountain of Sintra, named for the town on its north slope; it gives the knowledge of the Rock, for there is no other of its figure on the whole coast nor so near the shore"
+    says: "The mountain of Sintra behind the Rock, its top very uneven with many little peaks, like no other on the coast."
+
+  - id: guia-light
+    kind: light
+    name: the light of Our Lady of the Guide
+    modern: Farol da Guia, Cascais
+    lat_deg: 38.69562
+    lon_deg: -9.44645
+    height_m: 58
+    lit: {from: 1761, until: null, range_nm: 12, character: "a fixed light, lit every night"}
+    source: "Tofiño 1789, p. 85: a tower with a lantern lit every night called Our Lady of the Guide, the point of Cascais close to it; the encyclopaedia's 'Farol da Guia (Cascais)' (read 2026-10-10): a light at the hermitage since 1523, the tower of the Service of Lights established in 1761"
+    says: "The light of Our Lady of the Guide by Cascais point, lit every night."
+
+  - id: cascais
+    kind: town
+    name: Cascais
+    modern: Cascais
+    lat_deg: 38.6970
+    lon_deg: -9.4210
+    height_m: 15
+    source: "Tofiño 1789, p. 85: the bay of Cascais from its point, the town with its beach at the bottom of it and the fortress of Santa Marta between it and the point; in this town live the pilots of the bar of Lisbon"
+    says: "Cascais, where the pilots of the bar of Lisbon live."
+
+  - id: santa-marta
+    kind: castle
+    name: the fortress of Santa Marta
+    modern: Forte de Santa Marta, Cascais
+    lat_deg: 38.6920
+    lon_deg: -9.4210
+    height_m: 10
+    source: "Tofiño 1789, pp. 85 and 87: between the town and the point a fortress called Santa Marta; for the Little Pass bring the castle of Santa Marta in one with the tower of the light of the Guide"
+    says: "The fortress of Santa Marta between Cascais and its point, in one with the Guide light for the Little Pass."
+
+  - id: cascais-road
+    kind: anchorage
+    name: Cascais road
+    modern: the bay of Cascais
+    lat_deg: 38.6910
+    lon_deg: -9.4100
+    height_m: 0
+    depth_fathoms: 7.3
+    bottom: "clean ground"
+    source: "Tofiño 1789, p. 85: before this town a good anchorage from eight to twenty brazas, all clean (but for lost anchors which chafe the cables), sheltered from the north-west, north and north-east; open the town by the castle and the point, for if they close she is on rock"
+    says: "Cascais road, eight to twenty brazas and clean, sheltered from the north-west round to the north-east; keep the town open of the castle and the point."
+
+  - id: sao-juliao
+    kind: castle
+    name: the castle of São Julião
+    modern: Forte de São Julião da Barra
+    lat_deg: 38.6745
+    lon_deg: -9.3250
+    height_m: 20
+    source: "Tofiño 1789, p. 85: the castle of São Julião, great, on a salient high steep point with a short reef, the western and northern point of the mouth of the Tagus, which runs in to the E N E deep and clean"
+    says: "The castle of São Julião, great, on its high point at the northern side of the Tagus's mouth."
+
+  - id: sao-juliao-light
+    kind: light
+    name: the light of São Julião
+    modern: Farol de São Julião
+    lat_deg: 38.67447
+    lon_deg: -9.32533
+    height_m: 38
+    lit: {from: 1761, until: null, range_nm: 12, character: "a fixed light on the fortress, Argand lamps from 1775"}
+    source: "The encyclopaedia's 'Farol de São Julião' (read 2026-10-10): in service in 1761, modernised in 1775"
+    says: "The light on the castle of São Julião at the Tagus's mouth."
+
+  - id: cachopo-norte
+    kind: shoal
+    name: the Cachopo
+    modern: Cachopo Norte
+    lat_deg: 38.6600
+    lon_deg: -9.3500
+    height_m: 0
+    source: "Tofiño 1789, p. 86: south of the castle of São Julião a musket shot off (which channel they name the Little Pass) the north-east head of a shoal of stone called the Cachopo, running south-west a league with little water, so that in a sea it is all one breaker"
+    says: "The Cachopo, a league of stony shoal running south-west from a musket shot off São Julião: in a sea it is all one breaker."
+    fix: "the middle of the shoal in the modern grid; its north-east head is the Little Pass's south side"
+
+  - id: bugio
+    kind: castle
+    name: the castle of the Bugio
+    modern: Forte de São Lourenço do Bugio
+    lat_deg: 38.66047
+    lon_deg: -9.29897
+    height_m: 15
+    source: "Tofiño 1789, p. 86: S E by E two miles from the castle of São Julião another castle called the Bugio, round, on a flat of sand which uncovers at low water and is covered at high, the sea washing its walls; the flat runs south and S by W two leagues"
+    says: "The round castle of the Bugio on its sand flat, the walls washed at high water; the flat runs two leagues to the southward."
+    fix: "the castle on its sand flat, which the grid holds 1.6 m under the datum: the tower is narrower than the cell"
+
+  - id: bugio-light
+    kind: light
+    name: the light of the Bugio
+    modern: Farol do Bugio
+    lat_deg: 38.66047
+    lon_deg: -9.29897
+    height_m: 27
+    lit: {from: 1775, until: null, range_nm: 12, character: "a fixed light on the castle's tower; Argand lamps from 1798"}
+    source: "The encyclopaedia's 'Farol do Bugio' (read 2026-10-10): a light working on oil by 1751, the tower destroyed by the earthquake of 1755, the present tower in service 1775, Argand lamps 1798; Tofiño 1789 does not name its light"
+    says: "The light on the castle of the Bugio, on the south side of the bar."
+
+  - id: cachopo-sul
+    kind: shoal
+    name: the flat of the Bugio
+    modern: Cachopo Sul
+    lat_deg: 38.6300
+    lon_deg: -9.3000
+    height_m: 0
+    source: "Tofiño 1789, p. 86: the Bugio's flat of sand runs south and S by W two leagues, forming with the Cachopo a channel called the Great Pass, with ten to fifteen brazas, except near the flat, where there are only five and it shoals at once"
+    says: "The flat of the Bugio, sand running two leagues south from the castle; it shoals at once from five brazas."
+
+  - id: great-pass
+    kind: bottom
+    name: the Great Pass of the bar of Lisbon
+    modern: the Barra Grande (the South Channel)
+    lat_deg: 38.64000
+    lon_deg: -9.32403
+    height_m: 0
+    depth_fathoms: 9.1
+    bottom: "sand"
+    source: "Tofiño 1789, pp. 86 to 88: between the flat of the Bugio and the Cachopo a channel called the Great Pass with ten to fifteen brazas; with a large wind do not bring Cascais in one with the western fall of the mountain of Sintra, or you will be on the south-west end of the Cachopo, till a round house of two stories, the Queen's, comes in one with one of three hillocks with windmills; the bar dangerous, take a pilot who knows the eddies of the tides"
+    says: "The Great Pass between the Cachopo and the flat of the Bugio, ten to fifteen brazas; the bar is dangerous for its eddies and a pilot is needed."
+    fix: "moved 350 m to water of 8.3 m in the block's tiles"
+
+  - id: little-pass
+    kind: bottom
+    name: the Little Pass of the bar of Lisbon
+    modern: the Corredor (the North Channel)
+    lat_deg: 38.6700
+    lon_deg: -9.3300
+    height_m: 0
+    bottom: "rock and sand"
+    source: "Tofiño 1789, p. 87: for the Little Pass a large wind or one aft is indispensable, for its narrowness will not let a ship beat; hug the coast of Cascais toward São Julião till Santa Marta is in one with the Guide's light, keep that mark to the Ponta de Rana, then the Bugio in one with the Monte de Córdoba"
+    says: "The Little Pass close under São Julião, too narrow to beat in: only with a fair wind."
+    fix: "no depth in the directions; the narrows south of the castle in the modern grid"
+
+  - id: belem-tower
+    kind: tower
+    name: the castle of Belém
+    modern: Torre de Belém
+    lat_deg: 38.69227
+    lon_deg: -9.21600
+    height_m: 30
+    source: "Tofiño 1789, p. 87: the castle of Belém, an old tower of three stories with a battery at its foot, isolated at high water, two leagues within São Julião; anchor near it, for no ship goes farther in till the health office has visited her, man of war or merchant"
+    says: "The tower of Belém, isolated at high water: a ship anchors by it till the health office has visited her."
+    fix: "moved 75 m to the nearest land in the block's tiles"
+
+  - id: belem-road
+    kind: anchorage
+    name: the road of Belém
+    modern: the Tagus off Belém
+    lat_deg: 38.69272
+    lon_deg: -9.20442
+    height_m: 0
+    depth_fathoms: 13.7
+    bottom: "ooze"
+    source: "Tofiño 1789, p. 88: steer for the castle of Belém, where she anchors in fifteen or eighteen brazas and waits to be visited by the health office"
+    says: "The road of Belém, fifteen to eighteen brazas, where every ship waits for the health office."
+    fix: "moved 100 m to water of 12.5 m in the block's tiles"
+
+  - id: lisbon
+    kind: town
+    name: Lisbon
+    modern: Lisboa
+    lat_deg: 38.7100
+    lon_deg: -9.1370
+    height_m: 80
+    source: "Tofiño 1789, p. 86: on the northern shore of the Tagus the city of Lisbon, the court of Portugal, its circuit four leagues from São Julião; the south shore a town in every hollow; the abundance of merchant ships that frequent the port"
+    says: "Lisbon, the court of Portugal, along the north shore of the Tagus, with the ships of every nation before it."
+
+  - id: castelo-sao-jorge
+    kind: castle
+    name: the King's castle at Lisbon
+    modern: Castelo de São Jorge
+    lat_deg: 38.7139
+    lon_deg: -9.1335
+    height_m: 110
+    source: "Tofiño 1789, p. 88: the castle of the King on the top of a hill forming the highest of the city; Pimentel: the Bugio in one with the King's castle, and Belém in one with it, the marks for beating in"
+    says: "The King's castle on the highest hill of Lisbon, a mark for beating over the bar."
+
+  - id: lisbon-road
+    kind: anchorage
+    name: the road before Lisbon
+    modern: the Tagus before the Baixa
+    lat_deg: 38.7040
+    lon_deg: -9.1450
+    height_m: 0
+    depth_fathoms: 7.3
+    bottom: "ooze"
+    source: "Tofiño 1789, p. 88: then go farther in before the new Lisbon at the foot of the King's castle; moor east and west with good anchors and no buoys, for the ebb runs up to seven miles an hour and makes anchors drag; the bottom ooze, from eight to twenty-six brazas; the flood not so strong; high water on the days of new and full moon at two in the afternoon"
+    says: "The road before Lisbon, eight to twenty-six brazas on ooze: moor east and west with good anchors and no buoys, for the ebb runs seven miles an hour."
+
+  # ---------------------------------------------------------------------------
+  # Espichel to Sines
+  # ---------------------------------------------------------------------------
+
+  - id: cabo-espichel
+    kind: headland
+    name: Cape Espichel
+    modern: Cabo Espichel
+    lat_deg: 38.4150
+    lon_deg: -9.2160
+    height_m: 134
+    source: "Tofiño 1789, p. 90: Cape Espichel in 38 26' N: salient, of middling height, almost sheer, its top very even, white on its north side and red on its south, with a hermitage called Our Lady of the Cape"
+    says: "Cape Espichel, sheer and even-topped, white to the north and red to the south, with its hermitage."
+
+  - id: espichel-light
+    kind: light
+    name: Cape Espichel light
+    modern: Farol do Cabo Espichel
+    lat_deg: 38.41561
+    lon_deg: -9.21644
+    height_m: 167
+    lit: {from: 1790, until: null, range_nm: 15, character: "a fixed light in the tower of 1790"}
+    source: "The encyclopaedia's 'Farol do Cabo Espichel' (read 2026-10-10): a little light of the brotherhood of Our Lady of the Cape from 1430, the present tower inaugurated in 1790; Tofiño 1789 names no light"
+    says: "The light on Cape Espichel, in its tower since 1790."
+
+  - id: espichel-church
+    kind: church
+    name: Our Lady of the Cape
+    modern: Santuário de Nossa Senhora do Cabo Espichel
+    lat_deg: 38.4190
+    lon_deg: -9.2140
+    height_m: 130
+    source: "Tofiño 1789, p. 90: a hermitage which they name Our Lady of the Cape"
+    says: "The hermitage of Our Lady of the Cape on Cape Espichel."
+
+  - id: arrabida
+    kind: hill
+    name: the mountain of São Luís
+    modern: Serra da Arrábida (Formosinho)
+    lat_deg: 38.4860
+    lon_deg: -8.9930
+    height_m: 501
+    source: "Tofiño 1789, p. 90: N 70 E of the cape and inland the mountain of São Luís, high and lying east and west, and a little north of it another smaller and round like a heap of wheat: from seaward they serve to know the place when the cape is not seen"
+    says: "The mountain of São Luís, high and lying east and west behind Cape Espichel, the land's mark from seaward."
+    fix: "Tofiño's bearing from the cape falls on the Arrábida's ridge (Formosinho, 68 degrees true); the modern Serra de São Luís lies farther north-east"
+
+  - id: sesimbra
+    kind: town
+    name: Sesimbra
+    modern: Sesimbra
+    lat_deg: 38.4440
+    lon_deg: -9.1010
+    height_m: 20
+    source: "Tofiño 1789, p. 90: about the middle between Espichel and Cape Ares the coast forms a cove with a town on the shore called Cezimbra, with a castle on the top of a peak"
+    says: "Sesimbra in its cove, its castle on a peak above."
+
+  - id: sesimbra-road
+    kind: anchorage
+    name: the road of Sesimbra
+    modern: off Sesimbra
+    lat_deg: 38.4400
+    lon_deg: -9.1030
+    height_m: 0
+    depth_fathoms: 6.4
+    bottom: "clean sand"
+    source: "Tofiño 1789, pp. 90 to 91: before this town one may anchor with the winds north-west, north and north-east, weighing with all others, for they are on the shore, the south above all; it must be very near the beach in seven or eight brazas, for farther off, in ten or twelve, the bottom is stone to twenty or thirty, where it is clean again"
+    says: "Sesimbra road, close to the beach in seven or eight brazas: farther out the bottom is stone; weigh before any southerly."
+
+  - id: outao
+    kind: castle
+    name: the old tower of Outão
+    modern: Forte de Santiago do Outão
+    lat_deg: 38.48772
+    lon_deg: -8.93310
+    height_m: 20
+    source: "Tofiño 1789, p. 91, Pimentel: on the north side of the entrance of Setúbal a new fortress, and within it a gunshot the old tower of Outão with two sentry boxes toward the sea; put the bow on the first sentry box and bring the castle of São Filipe in one with it, a little to the south"
+    says: "The old tower of Outão at the entrance of Setúbal, the castle of São Filipe in one with its sentry box the mark over the bar."
+    fix: "moved 125 m to the nearest land in the block's tiles"
+
+  - id: outao-light
+    kind: light
+    name: the light of Outão
+    modern: Farol do Outão
+    lat_deg: 38.48850
+    lon_deg: -8.93433
+    height_m: 33
+    lit: {from: 1880, until: null, range_nm: 15, character: "not yet built in 1805 (the encyclopaedia's construction date)"}
+    source: "The encyclopaedia's 'Farol do Outão' (read 2026-10-10): built 1880, no earlier date given; unverified whether a light burned at the tower before"
+    says: "The light of Outão, which the period's books do not name."
+
+  - id: sao-filipe
+    kind: castle
+    name: the castle of São Filipe
+    modern: Forte de São Filipe, Setúbal
+    lat_deg: 38.5180
+    lon_deg: -8.9060
+    height_m: 60
+    source: "Tofiño 1789, p. 91, Pimentel: the castle of São Filipe, which stands on a height up the river on the same north side, the mark over the bar with the sentry box of Outão"
+    says: "The castle of São Filipe on its height above Setúbal."
+
+  - id: setubal
+    kind: town
+    name: Setúbal
+    modern: Setúbal
+    lat_deg: 38.5240
+    lon_deg: -8.8920
+    height_m: 15
+    source: "Tofiño 1789, p. 91: close east of Cape Sampinedra the entrance of the bar of Setúbal, of which no more can be said than Pimentel says"
+    says: "Setúbal up its river behind the bar."
+
+  - id: setubal-bar
+    kind: shoal
+    name: the bar of Setúbal
+    modern: the bar of the Sado
+    lat_deg: 38.4700
+    lon_deg: -8.9250
+    height_m: 0
+    depth_fathoms: 2.97
+    source: "Tofiño 1789, p. 91, Pimentel: at high water of the springs the bar has five brazas, and at low water twenty-six palmos; in the neaps four and three and a half brazas; to go out the same marks, waiting for the flood or the slack"
+    says: "The bar of Setúbal, twenty-six palmos at low water springs and five brazas at high: cross it on the flood."
+    fix: "twenty-six palmos of 0.209 m, 5.4 m, at low water springs (the palmo a quarter of the vara, from memory); the position the modern grid's bar between Outão and Tróia"
+
+  - id: setubal-road
+    kind: anchorage
+    name: the road before Setúbal
+    modern: the Sado before Setúbal
+    lat_deg: 38.5120
+    lon_deg: -8.8950
+    height_m: 0
+    bottom: "ooze"
+    source: "Tofiño 1789, p. 91, Pimentel: by the marks one goes in over the bar of Setúbal toward the castle of São Filipe on its height up the river; the same marks serve to go out, waiting for the flood or the slack"
+    says: "The road before Setúbal, within the bar under the castle of São Filipe."
+    fix: "no anchorage or bottom in the directions: the river's deep water before the town in the modern grid (9 to 14 m), the bottom ooze JUDGEMENT"
+
+  - id: cabo-de-sines
+    kind: headland
+    name: Cape Sines
+    modern: Cabo de Sines
+    lat_deg: 37.9560
+    lon_deg: -8.8860
+    height_m: 15
+    source: "Tofiño 1789, pp. 91 to 92: S 3 W ten leagues and a half from the mouth of Setúbal Cape Sines, low and steep with an islet at its foot and another larger S S W of it"
+    says: "Cape Sines, low and steep with its islets."
+
+  - id: sines-road
+    kind: anchorage
+    name: the anchorage of Sines
+    modern: the bay of Sines
+    lat_deg: 37.94986
+    lon_deg: -8.86978
+    height_m: 0
+    depth_fathoms: 9.1
+    bottom: "sand"
+    source: "Tofiño 1789, p. 92: between Cape Sines and the island of Pessegueiro the coast forms a cove with a beach, where the anchorage of Sines is; Pimentel: the beach of Sines eleven leagues from Setúbal, with an anchorage in ten or fifteen brazas"
+    says: "The road of Sines under the cape, ten to fifteen brazas."
+    fix: "Pimentel's depth; the bottom sand by the beach, judgement; moved 25 m to water of 8.3 m in the block's tiles"
+
+  - id: pessegueiro
+    kind: island
+    name: the island of Pessegueiro
+    modern: Ilha do Pessegueiro
+    lat_deg: 37.83300
+    lon_deg: -8.79388
+    height_m: 10
+    source: "Tofiño 1789, p. 92: S 24 E three leagues from Cape Sines the island of Pessegueiro, low and of stone with a building on its height; Pimentel: between it and the coast a good anchorage, and on the main opposite a new fortress"
+    says: "Pessegueiro, a low stony island with a building on it and a good anchorage inside."
+    fix: "moved 625 m to the nearest land in the block's tiles"
+
+  - id: milfontes
+    kind: town
+    name: Villanova de Milfontes
+    modern: Vila Nova de Milfontes
+    lat_deg: 37.7250
+    lon_deg: -8.7830
+    height_m: 20
+    source: "Tofiño 1789, p. 92: S 5 W three leagues from Pessegueiro the bar of the river of Villanova de Milfontes, doubtless Pimentel's bar of Odemira, with two brazas and a sand shoal on its south point"
+    says: "Villanova de Milfontes at its little bar, two brazas and a sand shoal on its south point."
+
+  - id: cabo-sardao
+    kind: headland
+    name: Cape Sardão
+    modern: Cabo Sardão
+    lat_deg: 37.5970
+    lon_deg: -8.8160
+    height_m: 60
+    source: "Tofiño 1789, p. 93, Pimentel: three leagues to the south-west a high point called Cape Sardão"
+    says: "Cape Sardão, a high point of the coast."
+
+  - id: arrifana-road
+    kind: anchorage
+    name: the bay of Arrifana
+    modern: Arrifana
+    lat_deg: 37.29144
+    lon_deg: -8.86913
+    height_m: 0
+    depth_fathoms: 7.3
+    bottom: "sand"
+    source: "Tofiño 1789, p. 93, Pimentel: past Cape Sardão five leagues, Arrifana, a bay in which one may anchor in eight, ten or twelve brazas under the guns of a fort; at its entrance a great rock that looks like a ship, with smaller ones about it"
+    says: "The bay of Arrifana under its fort, eight to twelve brazas; a great rock like a ship at its entrance."
+    fix: "moved 200 m to water of 6.7 m in the block's tiles"
+
+  - id: monchique
+    kind: hill
+    name: the mountains of Monchique
+    modern: Serra de Monchique (Fóia)
+    lat_deg: 37.3150
+    lon_deg: -8.5940
+    height_m: 902
+    source: "Tofiño 1789, pp. 94 to 95: the mountains of Monchique, high, lying east and west and divided in two, the western the higher, its summit N E 20 E of Cape St Vincent; in the clear horizons of winter seen from 36 5' N on its meridian, twenty-five leagues off"
+    says: "The mountains of Monchique, the first land seen from seaward, twenty-five leagues off in clear weather."
+
+  # ---------------------------------------------------------------------------
+  # Cape St Vincent, Sagres and Lagos
+  # ---------------------------------------------------------------------------
+
+  - id: cape-st-vincent
+    kind: headland
+    name: Cape St Vincent
+    modern: Cabo de São Vicente
+    lat_deg: 37.02320
+    lon_deg: -8.99561
+    height_m: 60
+    source: "Tofiño 1789, p. 94: Cape St Vincent, the south-western point of the Algarve, very well known to every seaman, in 37 3' N: of middling height, steep and even, with a convent of religious on it; a little farallón at its foot about twenty brazas off, and in the channel ten to fifteen brazas of coarse sand and shells; a boat's length outside twelve to seventeen, a frigate's length nineteen, a cable twenty-two"
+    says: "Cape St Vincent, steep and even-topped with its convent, the corner of Portugal: deep water close to."
+    fix: "moved 125 m to the nearest land in the block's tiles"
+
+  - id: st-vincent-convent
+    kind: church
+    name: the convent of Cape St Vincent
+    modern: the convent within the Fortaleza de São Vicente
+    lat_deg: 37.02338
+    lon_deg: -8.99554
+    height_m: 70
+    source: "Tofiño 1789, p. 94: on the cape a convent of religious; all these coves and points and Cape St Vincent are garrisoned with artillery"
+    says: "The convent on Cape St Vincent."
+    fix: "moved 25 m to the nearest land in the block's tiles"
+
+  - id: st-vincent-convent-light
+    kind: light
+    name: the convent's light on Cape St Vincent
+    modern: the light of the Franciscans' convent, before the Farol de São Vicente
+    lat_deg: 37.02342
+    lon_deg: -8.99551
+    height_m: 75
+    lit: {from: 1606, until: 1846, range_nm: 6, character: "a lamp in the convent's tower, kept by the friars (whether it burned in 1805 unverified)"}
+    source: "The encyclopaedia's 'Farol do Cabo de São Vicente' (read 2026-10-10): signs of a rudimentary light in a tower of the convent from 1520; the tower destroyed by Drake in 1587 and the light relit in 1606; rebuilding ordered in 1835, the present light inaugurated in October 1846; Tofiño 1789 names the convent and no light, so whether it burned in 1805 is UNVERIFIED"
+    says: "The friars' lamp in the convent's tower on Cape St Vincent."
+    fix: "moved 50 m to the nearest land in the block's tiles"
+
+  - id: st-vincent-light
+    kind: light
+    name: Cape St Vincent light
+    modern: Farol do Cabo de São Vicente (D. Fernando)
+    lat_deg: 37.02294
+    lon_deg: -8.99567
+    height_m: 84
+    lit: {from: 1846, until: null, range_nm: 32, character: "not yet built in 1805"}
+    source: "The encyclopaedia's 'Farol do Cabo de São Vicente' (read 2026-10-10): ordered by D. Maria II, in service in October 1846"
+    says: "Cape St Vincent's tower light, which was not yet built in 1805."
+    fix: "moved 75 m to the nearest land in the block's tiles"
+
+  - id: st-vincent-farallon
+    kind: rock
+    name: the farallón of Cape St Vincent
+    modern: the islet at the foot of Cabo de São Vicente
+    lat_deg: 37.02303
+    lon_deg: -8.99791
+    height_m: 10
+    extent_m: 30
+    source: "Tofiño 1789, p. 94: at the foot of the cape about twenty brazas off a little farallón, and in the channel it forms ten to fifteen brazas"
+    says: "A little farallón twenty brazas off the foot of Cape St Vincent."
+    fix: "moved 150 m to the nearest shoal head in the block's tiles"
+
+  - id: sagres-point
+    kind: headland
+    name: Sagres point
+    modern: Ponta de Sagres
+    lat_deg: 36.9990
+    lon_deg: -8.9490
+    height_m: 50
+    source: "Tofiño 1789, p. 95: three miles S 46 E of Cape St Vincent the point of Sagres, as high as the cape but more sheer; between them the cove of Beliche, open to the south-west"
+    says: "Sagres point, as high as Cape St Vincent and sheerer."
+
+  - id: sagres-road
+    kind: anchorage
+    name: the road of Sagres
+    modern: the bay of Sagres (Mareta)
+    lat_deg: 37.00050
+    lon_deg: -8.93549
+    height_m: 0
+    depth_fathoms: 13.7
+    bottom: "sand"
+    source: "Tofiño 1789, p. 95: the cove of Sagres, better than Beliche, its mouth to the south-east; the two first coves have a convenient anchorage in summer for every kind of vessel, the usual depth fifteen to seventeen brazas; none in winter, nor in summer with easterlies"
+    says: "The road of Sagres, fifteen to seventeen brazas, good in summer and open to the east."
+    fix: "moved 650 m to water of 12.5 m in the block's tiles"
+
+  - id: ponta-da-piedade
+    kind: headland
+    name: the point of Piedade
+    modern: Ponta da Piedade
+    lat_deg: 37.0800
+    lon_deg: -8.6690
+    height_m: 30
+    source: "Tofiño 1789, p. 96: the point of Piedade in 37 6' 54\" N: of middling height, broken, with stones at its foot, a hermitage on it and a little shoal on its south side half a cable long; the western point of the bay of Lagos"
+    says: "The point of Piedade with its hermitage, the western point of the bay of Lagos; a little shoal half a cable off its south side."
+
+  - id: lagos
+    kind: town
+    name: Lagos
+    modern: Lagos
+    lat_deg: 37.1020
+    lon_deg: -8.6740
+    height_m: 15
+    source: "Tofiño 1789, p. 96: the great church of the city of Lagos, north of the point of Piedade, in 37 8' 30\" N; in this bay a river navigable for small vessels, which needs knowledge to enter"
+    says: "Lagos at the head of its bay, with its little river."
+
+  - id: lagos-road
+    kind: anchorage
+    name: the bay of Lagos
+    modern: the bay of Lagos
+    lat_deg: 37.0920
+    lon_deg: -8.6550
+    height_m: 0
+    depth_fathoms: 14.6
+    bottom: "clean sand"
+    source: "Tofiño 1789, p. 96: in summer a ship may lie in the bay of Lagos, very capacious and clean, ten brazas within a cable of the point; sheltered from the first and fourth quadrants, the rest on the shore; ships of the line best in twenty brazas E N E of the point a mile off; a frigate nearer in, in sixteen; a small vessel in eight before the city, with some shelter from the south-west"
+    says: "The bay of Lagos, clean and capacious: a frigate lies in sixteen brazas within the point of Piedade, sheltered from the westward."
+
+  - id: lagos-town-road
+    kind: anchorage
+    name: the anchorage before Lagos
+    modern: the bay of Lagos before the town
+    lat_deg: 37.0990
+    lon_deg: -8.6570
+    height_m: 0
+    depth_fathoms: 7.3
+    bottom: "clean sand"
+    source: "Tofiño 1789, p. 96: a small vessel lies in eight brazas before the city, where she has some shelter from the south-west; the bay very capacious and clean"
+    says: "Before Lagos a small vessel lies in eight brazas, clean ground, with some shelter from the south-west."
+
+  - id: portimao
+    kind: town
+    name: Villanova de Portimão
+    modern: Portimão
+    lat_deg: 37.1380
+    lon_deg: -8.5370
+    height_m: 15
+    source: "Tofiño 1789, p. 97: the mouth of the river of Villanueva ten long miles from the point of Piedade, entered only on two-thirds of the flood with a pilot, for it has a bar with a fort each side; at high water springs twenty-two palmos, at low ten; navigable up to Silves"
+    says: "Villanova de Portimão up its barred river, entered on the flood with a pilot."
+
+  - id: carvoeiro-algarve
+    kind: headland
+    name: Cape Carbonero
+    modern: Ponta do Carvoeiro, Algarve
+    lat_deg: 37.09286
+    lon_deg: -8.47009
+    height_m: 30
+    source: "Tofiño 1789, p. 97: E 1 N fifteen miles from the point of Piedade Cape Carbonero, of middling height, with a fort called Our Lady of the Incarnation or of the Rock defending a cove each side of it"
+    says: "Cape Carbonero with its fort, a cove each side."
+    fix: "moved 125 m to the nearest land in the block's tiles"
+
+  - id: albufeira
+    kind: town
+    name: Albufeira
+    modern: Albufeira
+    lat_deg: 37.0880
+    lon_deg: -8.2500
+    height_m: 25
+    source: "Tofiño 1789, pp. 97 to 98: south of Cape Carbonero five miles and a half the point of Albufeira, and east of it a small cove at the bottom of which the city, on a height by the beach with walls and old towers and a battery of eight guns; a good anchorage sheltered from the first and fourth quadrants"
+    says: "Albufeira on its height above a little cove, walled, with a good anchorage from the northerly winds."
+
+  # ---------------------------------------------------------------------------
+  # Faro to the Guadiana
+  # ---------------------------------------------------------------------------
+
+  - id: faro
+    kind: town
+    name: Faro
+    modern: Faro
+    lat_deg: 37.0160
+    lon_deg: -7.9350
+    height_m: 10
+    source: "Tofiño 1789, p. 98: the city of Faro on the shore near the mouth of the bar called the Barreta, N 24 30' W of Cape Santa Maria"
+    says: "Faro behind its sand islands, near the bar of the Barreta."
+
+  - id: cabo-santa-maria
+    kind: headland
+    name: Cape Santa Maria
+    modern: Cabo de Santa Maria, Ilha da Barreta
+    lat_deg: 36.96845
+    lon_deg: -7.87098
+    height_m: 3
+    source: "Tofiño 1789, p. 98: Cape Santa Maria in 36 56' 34\" N: low, with a beach, formed on a low sandy island with two more within it, an arm of the sea between all three and the coast; the Barreta has only eleven feet at high water, the Barra Grande fourteen, by which all enter, the Barra Nueva ten; a cable off the island two to two and a half brazas, three cables three, five cables five, a mile ten, then fifteen to twenty-five, and a league off eighty to ninety"
+    says: "Cape Santa Maria, a low sandy island, the bars of Faro beside it with no more than eleven to fourteen feet at high water."
+    fix: "moved 100 m to the nearest land in the block's tiles"
+
+  - id: santa-maria-light
+    kind: light
+    name: Cape Santa Maria light
+    modern: Farol do Cabo de Santa Maria
+    lat_deg: 36.97463
+    lon_deg: -7.86466
+    height_m: 49
+    lit: {from: 1851, until: null, range_nm: 25, character: "not yet built in 1805"}
+    source: "The encyclopaedia's 'Farol do Cabo de Santa Maria' (read 2026-10-10): in service in 1851"
+    says: "Cape Santa Maria's light, which was not yet built in 1805."
+
+  - id: monte-figo
+    kind: hill
+    name: Monte Figo
+    modern: Cerro de São Miguel
+    lat_deg: 37.1150
+    lon_deg: -7.8580
+    height_m: 410
+    source: "Tofiño 1789, p. 99: Monte Figo N 22 E of Cape Santa Maria, of middling height, the most notable of the high lands near the cape; from a ship's poop in clear weather seen on its meridian from 36 15' N, sixteen leagues and a half and no more; bearings taken of it from near Cape St Vincent were not of it but of a little range like it farther north-west"
+    says: "Monte Figo, the most notable height behind Cape Santa Maria, seen sixteen leagues and a half off and no farther."
+    fix: "the modern Cerro de São Miguel, the old Monte Figo; Tofiño's latitude for its top, 37 4', is three miles south of it"
+
+  - id: tavira
+    kind: town
+    name: Tavira
+    modern: Tavira
+    lat_deg: 37.1270
+    lon_deg: -7.6500
+    height_m: 15
+    source: "Tofiño 1789, p. 99: N 55 E six leagues from Cape Santa Maria the bar of Tavira, of shifting sand, not to be entered without a pilot; outside a ship may anchor in four or five brazas, sheltered from the land winds"
+    says: "Tavira behind its shifting bar, entered only with a pilot."
+
+  - id: tavira-road
+    kind: anchorage
+    name: the anchorage off the bar of Tavira
+    modern: off the barra de Tavira
+    lat_deg: 37.1050
+    lon_deg: -7.6200
+    height_m: 0
+    depth_fathoms: 3.7
+    bottom: "sand"
+    source: "Tofiño 1789, p. 99: outside the bar of Tavira one may anchor in four or five brazas, sheltered from the land winds"
+    says: "Off the bar of Tavira a ship anchors in four or five brazas with the wind off the land."
+
+  - id: guadiana-mouth
+    kind: headland
+    name: the point of Santo António
+    modern: Ponta de Santo António, Vila Real de Santo António
+    lat_deg: 37.1700
+    lon_deg: -7.3980
+    height_m: 3
+    source: "Tofiño 1789, p. 100: the point of Santo António, the western of the mouth of the Guadiana, of low sand with a flat running S S E half a league called the western Picacho; the eastern point Canelas with another flat two miles long, the eastern Picacho; between them a channel a cable wide, the bar of Ayamonte; within, the town of Vila Real and farther Castro Marim; this river the bounds of Spain and Portugal"
+    says: "The point of Santo António at the mouth of the Guadiana, the bounds of Spain and Portugal; the bar of Ayamonte a cable wide between two flats."
+
+  - id: ayamonte
+    kind: town
+    name: Ayamonte
+    modern: Ayamonte
+    lat_deg: 37.2130
+    lon_deg: -7.4070
+    height_m: 20
+    source: "Tofiño 1789, pp. 100 to 101: a mile up the river from the point of Canelas the city of Ayamonte on its eastern bank; at low water on the days of new and full moon only a braza on the bar, more within; the water rises more than two brazas, high water at three in the afternoon on those days"
+    says: "Ayamonte on the Spanish bank of the Guadiana; a braza on the bar at low water and two more at high."
+
+  # ---------------------------------------------------------------------------
+  # Huelva to the Guadalquivir
+  # ---------------------------------------------------------------------------
+
+  - id: punta-umbria
+    kind: headland
+    name: the point of Umbría
+    modern: Punta Umbría
+    lat_deg: 37.1720
+    lon_deg: -6.9580
+    height_m: 3
+    source: "Tofiño 1789, p. 103: the tower and point of Umbría, the first and western of the bar of Huelva, called Engañabobos, in 37 8' 56\" N, from which a sand flat runs S S E a mile; the main entrance the bar of Rodrigo, a scant cable wide with three brazas at low water, entered on two great pines in one; take a pilot, for these bars of sand change"
+    says: "The point of Umbría at the bar of Huelva; the bar of Rodrigo a scant cable wide with three brazas at low water, its sands shifting."
+
+  - id: torre-del-oro
+    kind: tower
+    name: the Torre del Oro
+    modern: the Torre del Oro, Mazagón
+    lat_deg: 37.1180
+    lon_deg: -6.7750
+    height_m: 15
+    source: "Tofiño 1789, p. 104: S 65 30' E seven miles from the point of the Picacho the Torre del Oro, so near the shore that at high water it stands isolated; there the Arenas Gordas begin"
+    says: "The Torre del Oro on the shore, isolated at high water, where the Arenas Gordas begin."
+
+  - id: arenas-gordas
+    kind: place
+    name: the Arenas Gordas
+    modern: the dunes of Doñana (the Asperillo cliff)
+    lat_deg: 37.04000
+    lon_deg: -6.63000
+    height_m: 40
+    source: "Tofiño 1789, p. 105: the Arenas Gordas, all of sand, rising insensibly to the east, so steep by the tower of the Asperillo that at high water the beach cannot be passed; their highest between the Asperillo and the Higuera"
+    says: "The Arenas Gordas, cliffs of sand along the coast to the Guadalquivir."
+    fix: "set inland on the grid's dunes"
+
+  - id: torre-de-la-higuera
+    kind: tower
+    name: the tower of the Higuera
+    modern: the fallen Torre de la Higuera, Matalascañas
+    lat_deg: 36.9930
+    lon_deg: -6.5330
+    height_m: 5
+    source: "Tofiño 1789, p. 105: S 54 30' E two scant leagues from the Asperillo the tower of the Higuera, which may still be seen fallen whole, its foundations of sand having failed"
+    says: "The tower of the Higuera, lying fallen whole on the sand."
+
+  - id: chipiona-point
+    kind: headland
+    name: the point of Chipiona
+    modern: Punta de Chipiona
+    lat_deg: 36.74277
+    lon_deg: -6.43921
+    height_m: 5
+    source: "Tofiño 1789, p. 106: S 34 W four long miles from the point of San Jacinto the point of Chipiona in 36 44' 18\" N, the southern beginning of the mouth of the Guadalquivir, low and of stones, with a reef to the W N W of less than a mile called the Perro; north of it fishing weirs"
+    says: "The point of Chipiona, low and stony, the south side of the Guadalquivir's mouth, with the reef of the Perro off it."
+    fix: "moved 75 m to the nearest land in the block's tiles"
+
+  - id: el-perro
+    kind: ledge
+    name: the Perro
+    modern: the reef off Punta de Chipiona
+    lat_deg: 36.7460
+    lon_deg: -6.4480
+    height_m: 0
+    extent_m: 500
+    source: "Tofiño 1789, p. 106: from the point of Chipiona a reef to the W N W of less than a mile, called the Perro, which breaks"
+    says: "The Perro, a breaking reef running from the point of Chipiona."
+
+  - id: el-sabinal
+    kind: ledge
+    name: the Sabinal
+    modern: the Salmedina shoal off Chipiona
+    lat_deg: 36.7400
+    lon_deg: -6.4750
+    height_m: 0
+    extent_m: 600
+    source: "Tofiño 1789, p. 106: about two miles west of the point of Chipiona the north end of the shoal of the Sabinal, a mile long lying N W by N, which uncovers at low water, is all covered at high and breaks with any swell; five brazas close west of it; between it and the Perro little channels of a braza and a half, passed only with much practice"
+    says: "The Sabinal, a mile of shoal two miles west of Chipiona, dry at low water and breaking in any swell."
+    fix: "the modern chart's Salmedina, the shoal at Tofiño's bearing and distance"
+
+  - id: chipiona-light
+    kind: light
+    name: Chipiona light
+    modern: Faro de Chipiona
+    lat_deg: 36.73789
+    lon_deg: -6.44210
+    height_m: 67
+    lit: {from: 1867, until: null, range_nm: 25, character: "not yet built in 1805"}
+    source: "The encyclopaedia's 'Faro de Chipiona' (read 2026-10-10): first lit on 28 November 1867"
+    says: "Chipiona light, which was not yet built in 1805."
+
+  - id: regla
+    kind: church
+    name: the convent of Our Lady of Regla
+    modern: Santuario de Nuestra Señora de Regla, Chipiona
+    lat_deg: 36.7380
+    lon_deg: -6.4290
+    height_m: 15
+    source: "Tofiño 1789, p. 109: between the point of Chipiona and the point of the Corrales of Regla a little cove with a beach, at its head and near the shore the convent of Our Lady of Regla"
+    says: "The convent of Our Lady of Regla by the beach south of Chipiona."
+
+  - id: sanlucar
+    kind: town
+    name: San Lucar
+    modern: Sanlúcar de Barrameda
+    lat_deg: 36.7780
+    lon_deg: -6.3530
+    height_m: 30
+    source: "Tofiño 1789, pp. 107 to 108: the city of San Lucar, its southern end half a mile from the point of the Espíritu Santo; between it and the little port of Bonanza a great convent called San Gerónimo, the leading mark with the Sierra de Gibalbín; at low water springs two brazas and a half on the bar and four and a half at high, gravel; high water at three in the afternoon at new and full moon"
+    says: "San Lucar at the mouth of the Guadalquivir; two brazas and a half on its bar at low water springs."
+
+  - id: sanlucar-bar
+    kind: bottom
+    name: the bar of San Lucar
+    modern: the bar of the Guadalquivir
+    lat_deg: 36.7900
+    lon_deg: -6.4050
+    height_m: 0
+    depth_fathoms: 2.3
+    bottom: "gravel"
+    source: "Tofiño 1789, pp. 107 to 109: at low water of new and full moon two brazas and a half on the bar and four and a half at high, its quality gravel; no ship of more than fifteen feet's draught should try it with a scant wind, even at high water, for the channel is too narrow to beat; mind the fishermen's nets in the channel"
+    says: "The bar of San Lucar, two brazas and a half at low water springs on gravel: no ship drawing fifteen feet tries it with a scant wind."
+
+  - id: bonanza-road
+    kind: anchorage
+    name: the road of Bonanza
+    modern: Bonanza, Sanlúcar
+    lat_deg: 36.80500
+    lon_deg: -6.34500
+    height_m: 0
+    depth_fathoms: 5.5
+    bottom: "sand and ooze"
+    source: "Tofiño 1789, p. 108: go for the port of Bonanza, where she anchors in six or seven brazas, sand and ooze, a third of the river's breadth from its eastern shore, and moors with two anchors along the stream"
+    says: "The road of Bonanza in six or seven brazas, sand and ooze: moor with two anchors along the stream."
+    fix: "the river above the bar is narrower than EMODnet's cell and not in its grid; GEBCO's fill holds 2.7 m here at the datum against Tofiño's six brazas"
+
+  # ---------------------------------------------------------------------------
+  # Rota and the bay of Cadiz
+  # ---------------------------------------------------------------------------
+
+  - id: punta-candor
+    kind: headland
+    name: the point of Candor
+    modern: Punta Candor
+    lat_deg: 36.62600
+    lon_deg: -6.38200
+    height_m: 3
+    source: "Tofiño 1789, p. 109: Punta Candor, a little low point of sand in 36 37' 15\" N with a reef running south half a league and along the coast east to Rota"
+    says: "The point of Candor, low and sandy, its reef running half a league south and along to Rota."
+    fix: "set by hand on the grid's shore at Tofiño's latitude"
+
+  - id: candor-reef
+    kind: ledge
+    name: the reef of Candor
+    modern: the rocks off Punta Candor
+    lat_deg: 36.61700
+    lon_deg: -6.38500
+    height_m: 0
+    dries_m: -2.0
+    extent_m: 800
+    source: "Tofiño 1789, p. 110: outside the reef that runs toward Punta Candor seven to twelve brazas, and on the reef itself only seven to fourteen feet at low water, all stone but some patches of ooze"
+    says: "The reef of Candor, seven to fourteen feet at low water, all stone."
+    fix: "dries_m the reef's least, seven pies (1.95 m) under low water; its middle on Tofiño's bearing from Rota; the grid has 6 to 9 m here against Tofiño's seven to fourteen feet: left at his figure"
+
+  - id: rota
+    kind: town
+    name: Rota
+    modern: Rota
+    lat_deg: 36.6190
+    lon_deg: -6.3570
+    height_m: 10
+    source: "Tofiño 1789, p. 110: S 62 E a mile and a half from Punta Candor the mole of Rota, very small, where little boats lie at high water; S S E, S and W of it stones run out two cables, some showing, on others the sea breaking, outside them six to seven brazas"
+    says: "Rota with its little mole, stones running two cables off it."
+
+  - id: rota-rocks
+    kind: ledge
+    name: the rocks off Rota
+    modern: the rocks before the mole of Rota
+    lat_deg: 36.6140
+    lon_deg: -6.3560
+    height_m: 0
+    extent_m: 300
+    source: "Tofiño 1789, p. 110: south-south-east, south and west of the mole some stones run out about two cables, some of which show and on others the sea breaks"
+    says: "The rocks off Rota's mole, two cables out, some showing, others breaking."
+
+  - id: santa-catalina-del-puerto
+    kind: castle
+    name: the castle of Santa Catalina del Puerto
+    modern: Castillo de Santa Catalina del Puerto
+    lat_deg: 36.58040
+    lon_deg: -6.26527
+    height_m: 15
+    source: "Tofiño 1789, pp. 110 and 112: S 61 30' E four miles and a half from Rota the castle of Santa Catalina on a point of stone, from which the coast trends north-east to the city of El Puerto de Santa María; with the point of San Felipe of Cadiz it makes the beginning of the bay; its flagstaff in one with the Morro of Xerez is the mark of the Diamante; the encyclopaedia's 'Castillo de Santa Catalina del Puerto' for the position"
+    says: "The castle of Santa Catalina on its stony point, the northern side of the bay's mouth."
+
+  - id: el-puerto
+    kind: town
+    name: El Puerto de Santa María
+    modern: El Puerto de Santa María
+    lat_deg: 36.5940
+    lon_deg: -6.2330
+    height_m: 15
+    source: "Tofiño 1789, p. 112: from the point of Santa Catalina the coast trends north-east to the city of El Puerto de Santa María; the plan's Puerto de Sta María"
+    says: "El Puerto de Santa María at the mouth of the Guadalete, on the north side of the bay."
+
+  - id: san-sebastian-light
+    kind: light
+    name: the lantern of San Sebastián
+    modern: Faro de San Sebastián, Cádiz
+    lat_deg: 36.52928
+    lon_deg: -6.31589
+    height_m: 38
+    lit: {from: 1789, until: null, range_nm: 10, character: "a great lantern on a round tower, seen three to three and a half leagues on a moonless night (lit before 1789: the encyclopaedia's 'at least since the sixteenth century')"}
+    source: "Tofiño 1789, p. 121: the castle of San Sebastián of Cadiz in 36 31' 7\" N, on a low reef of stones, a round tower in it with a great lantern seen from three to three and a half leagues when there is no moon, and less when it is very clear; the encyclopaedia's 'Faro de San Sebastián' (read 2026-10-10): a light there at least since the sixteenth century, and its position; the year here is Tofiño's"
+    says: "The lantern of San Sebastián on its tower at the western end of Cadiz, seen three leagues on a dark night."
+    fix: "moved 100 m to the nearest land in the block's tiles"
+
+  - id: cadiz
+    kind: town
+    name: Cadiz
+    modern: Cádiz
+    lat_deg: 36.52965
+    lon_deg: -6.29510
+    height_m: 20
+    source: "Tofiño 1789, 'Descripción de la Bahía de Cadiz', p. 111: the King keeps at the port of Cadiz a body of pilots employed only in the entering and leaving of ships of war and merchants of every nation; the plan's city within its walls"
+    says: "Cadiz, white within its walls at the end of its isthmus, the King's pilots for every ship."
+    fix: "set by hand within the walls (the cathedral's quarter); moved 75 m to the nearest land in the block's tiles; moved 25 m to the nearest land in the block's tiles"
+
+  - id: la-olla
+    kind: rock
+    name: the Olla
+    modern: the rock off the castle of San Sebastián
+    lat_deg: 36.52957
+    lon_deg: -6.31936
+    height_m: 0
+    dries_m: -1.67
+    extent_m: 60
+    source: "Tofiño 1789, p. 112: W N W of the lantern of San Sebastián a quarter of a mile a shoal of stone called the Olla, with only a braza of water; the plan's La Olla"
+    says: "The Olla, a stone with a braza over it a quarter of a mile west of the lantern."
+    fix: "moved 75 m to the nearest shoal head in the block's tiles"
+
+  - id: los-cochinos
+    kind: rock
+    name: the Cochinos
+    modern: the Cochinos, off the Alameda of Cádiz
+    lat_deg: 36.54624
+    lon_deg: -6.30466
+    height_m: 0
+    extent_m: 40
+    source: "Tofiño 1789, p. 112: north of the lantern, the two towers of the Carmelites' church in one, two small black stones called the Cochinos, which show at low water and are covered before high water"
+    says: "The Cochinos, two small black stones that show at low water and cover before the high."
+    fix: "on the plan's position north of the lantern; the stones' head taken at the datum (awash), the pilot giving no figure; moved 325 m to the nearest shoal head in the block's tiles"
+
+  - id: las-puercas
+    kind: rock
+    name: the Puercas
+    modern: Las Puercas, north of Cádiz
+    lat_deg: 36.5400
+    lon_deg: -6.2990
+    height_m: 0
+    extent_m: 100
+    source: "Tofiño 1789, p. 112: E by S a thousand varas from the Cochinos the Puercas, black stones lying east and west, very visible at low water and even at high, so little covered that the sea always breaks on them"
+    says: "The Puercas, black stones on which the sea always breaks, east of the Cochinos."
+
+  - id: el-fraile
+    kind: shoal
+    name: the Fraile
+    modern: El Fraile, off the Candelaria
+    lat_deg: 36.5390
+    lon_deg: -6.2900
+    height_m: 0
+    depth_fathoms: 2.3
+    source: "Tofiño 1789, pp. 112 to 113: E S E nine hundred and fifty varas from the Puercas the Fraile, a stony shoal from the cove of the Candelaria to near the channel, joining the Puercas, the Cochinos and the Freidera; its least fifteen feet, deepening to eighteen, twenty and twenty-two"
+    says: "The Fraile, stony ground with fifteen feet at the least, joining the Puercas to the channel."
+
+  - id: el-diamante
+    kind: shoal
+    name: the Diamante
+    modern: El Diamante, the bay of Cádiz
+    lat_deg: 36.5520
+    lon_deg: -6.2840
+    height_m: 0
+    depth_fathoms: 2.0
+    source: "Tofiño 1789, p. 113: N N E by N eighteen hundred varas from the Puercas the Diamante, a flat of stones lying W N W and E S E seven hundred varas, its least thirteen feet, deepening to twenty-two and twenty-four within two hundred varas; its least water with the flagstaff of Santa Catalina del Puerto on the eastern end of the Morro of Xerez"
+    says: "The Diamante, a flat of stones in the middle of the bay's mouth, thirteen feet at the least."
+
+  - id: la-galera
+    kind: shoal
+    name: the Galera
+    modern: La Galera, the bay of Cádiz
+    lat_deg: 36.5590
+    lon_deg: -6.2780
+    height_m: 0
+    depth_fathoms: 1.7
+    source: "Tofiño 1789, pp. 113 to 114: N E by N of the Diamante eight hundred and fifty varas centre to centre the Galera, a flat of stones lying N W and S E six hundred varas, eleven to thirty feet; some pilots say it has nine feet in one place, but sounded with care no less water was found than eleven"
+    says: "The Galera, stony ground north-east of the Diamante, eleven feet at the least."
+
+  - id: cadiz-outer-road
+    kind: anchorage
+    name: the outer road of Cadiz
+    modern: outside the shoals of the bay of Cádiz
+    lat_deg: 36.5700
+    lon_deg: -6.3350
+    height_m: 0
+    depth_fathoms: 9.1
+    bottom: "ooze"
+    source: "Tofiño 1789, pp. 119 to 120: if the strength of an easterly, the short day or the ebb will not let her into the bay, she may anchor very conveniently outside the shoals in ten or eleven brazas, ooze; in winter with the tower of San Sebastián S E and Santa Catalina del Puerto in one with the Morro of Xerez, to windward of the channel against a south-westerly"
+    says: "The outer road of Cadiz, ten or eleven brazas on ooze outside the shoals, the tower of San Sebastián bearing south-east."
+
+  - id: cadiz-bay-anchorage
+    kind: anchorage
+    name: the bay of Cadiz within the shoals
+    modern: the bay of Cádiz north-east of the city
+    lat_deg: 36.5480
+    lon_deg: -6.2760
+    height_m: 0
+    depth_fathoms: 3.7
+    bottom: "ooze"
+    source: "Tofiño 1789, pp. 115 to 116: within the shoals she may anchor where she likes in four to seven brazas, ooze, by her draught; with a fair wind keep Medina in one with Puerto Real till the mole of the Puerta de Sevilla opens by the point of San Felipe, and there she may anchor"
+    says: "The bay within the shoals, four to seven brazas on ooze: moor with the best anchor to the east or south-east."
+
+  - id: puntales
+    kind: castle
+    name: the castle of Puntales
+    modern: Castillo de San Lorenzo del Puntal
+    lat_deg: 36.50838
+    lon_deg: -6.26193
+    height_m: 10
+    source: "Tofiño 1789, p. 116: for Puntales steer straight for the castle of Matagorda till the Torre de Hércules opens east of the castle of Puntales; the encyclopaedia's 'Castillo de San Lorenzo del Puntal' for the position"
+    says: "The castle of Puntales on its point, where the inner bay narrows to the channel."
+    fix: "moved 50 m to the nearest land in the block's tiles"
+
+  - id: matagorda
+    kind: castle
+    name: the castle of Matagorda
+    modern: Castillo de Matagorda (within the shipyard)
+    lat_deg: 36.5185
+    lon_deg: -6.2500
+    height_m: 10
+    source: "Tofiño 1789, p. 116 and the plan's Cast. de Matagorda: opposite Puntales across the channel, a square fort on the point of the Trocadero"
+    says: "The castle of Matagorda across the channel from Puntales."
+    fix: "the plan's position by the Cadiz override's georeference, the fort being within the modern shipyard"
+
+  - id: puntales-channel
+    kind: bottom
+    name: the channel of Puntales
+    modern: the channel between Puntales and Matagorda
+    lat_deg: 36.5130
+    lon_deg: -6.2550
+    height_m: 0
+    depth_fathoms: 4.0
+    bottom: "gravel"
+    source: "Tofiño 1789, pp. 117 to 118 and the plan: the channel by Puntales, five hundred and sixty varas wide, twenty-two to twenty-seven feet at its edges; the plan's soundings 4 2/6 to 6 3/6 brazas on gravel; anchoring there, head to the north-easterly, do not let the Torregorda close behind Puntales or her stern is on the shoal of Santo Domingo"
+    says: "The channel of Puntales, four to six brazas on gravel, the way to the Carraca and the Trocadero."
+
+  - id: santo-domingo-shoal
+    kind: shoal
+    name: the shoal of Santo Domingo
+    modern: the shoal off the isthmus west of Puntales
+    lat_deg: 36.5140
+    lon_deg: -6.2680
+    height_m: 0
+    depth_fathoms: 1.4
+    source: "Tofiño 1789, p. 118: from the Corral toward Puntales the shoal of Santo Domingo, its least nine feet of sand and shells; eighty-three varas north-east of it twenty-two feet, the channel's edge"
+    says: "The shoal of Santo Domingo off the isthmus, nine feet at the least, the channel's western edge."
+
+  - id: trocadero
+    kind: place
+    name: the Trocadero
+    modern: the Trocadero, Puerto Real
+    lat_deg: 36.5150
+    lon_deg: -6.2380
+    height_m: 3
+    source: "Tofiño 1789, p. 118: west of Fort Luis the Caño del Trocadero, where the merchants' ships and the King's frigates unrig and careen, having a dock there; only thirty-four varas wide, seven feet at its mouth at low water, ten to thirteen within: wait for high water to enter or leave"
+    says: "The Trocadero, where the King's frigates careen, its creek seven feet at low water."
+
+  - id: la-carraca
+    kind: place
+    name: the arsenal of the Carraca
+    modern: Arsenal de La Carraca, San Fernando
+    lat_deg: 36.4930
+    lon_deg: -6.1900
+    height_m: 5
+    source: "Tofiño 1789, pp. 118 to 119: the narrows of the channel into the Carraca begin when the mark-pole on the point of the Clica is in one with the high tower of the Isla; fifty brazas wide from twenty feet on the south edge to seventeen on the north; the Caño of the bridge of Suazo seventeen to twenty-six feet"
+    says: "The King's arsenal of the Carraca up its narrow channel."
+
+  - id: puerto-real
+    kind: town
+    name: Puerto Real
+    modern: Puerto Real
+    lat_deg: 36.5280
+    lon_deg: -6.1900
+    height_m: 10
+    source: "Tofiño 1789, p. 114: Puerto Real, a town on the shore within the port; Puerto Real in one with Medina the mark for the channel"
+    says: "Puerto Real on the inner shore of the bay, in one with Medina for the channel."
+
+  - id: isla-de-leon
+    kind: town
+    name: the Isla de León
+    modern: San Fernando
+    lat_deg: 36.4650
+    lon_deg: -6.2000
+    height_m: 20
+    source: "Tofiño 1789, pp. 116 and 121: the high tower of the Isla and its convent of the Carmen, the mark for anchoring within; the road from Cadiz to the Isla de León along the Arrecife"
+    says: "The Isla de León, its high tower the mark for the inner anchorage."
+
+  - id: torregorda
+    kind: tower
+    name: the Torregorda
+    modern: Torregorda
+    lat_deg: 36.4720
+    lon_deg: -6.2520
+    height_m: 15
+    source: "Tofiño 1789, p. 122: S 35 56' E five miles and a half from the lantern of San Sebastián the Torregorda on a little height of sand, round, with a battery at its foot; between them the Arrecife of Cadiz, very low with beach and stones, not to be closed"
+    says: "The Torregorda, a round tower on the sand south of Cadiz, the mark that opens east of Puntales for the channel."

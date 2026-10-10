@@ -103,11 +103,11 @@ FATHOM_M = 1.8288  # six feet of 0.3048 m
 # built, and the override records the unit it used).
 BRASSE_M = 1.624
 UNIT_M = {"metres": 1.0, "m": 1.0, "fathoms": FATHOM_M, "feet": 0.3048, "brasses": BRASSE_M}
-# package 39f: Tofiño's braza, "de á dos varas castellanas" by his plan's legend (the
-# Castilian vara of Burgos 0.8359 m FROM MEMORY, unverified here as the brasse is: 1.6718
-# m), for the Spanish sheets of the Strait
-BRAZA_M = 1.6718
-UNIT_M["brazas"] = BRAZA_M
+# The braza of Tofiño's sheets (package 39d): six pies de Castilla, the sheet's own note
+# ("brazas de seis pies de Castilla cada una"; Tofiño 1789, 'Plano del Puerto de Cadiz'),
+# the pie a third of the vara of Burgos, 0.835905 m, so 1.6718 m (the vara's length from
+# memory of the standard tables, marked so in the Cadiz override)
+UNIT_M["brazas"] = 2 * 0.835905
 
 # ---------------------------------------------------------------------------
 # Sources and licences (C §2, §6)
@@ -196,6 +196,20 @@ SOURCES: dict[str, dict[str, Any]] = {
 #              GEBCO's fill under EMODnet, the land mostly, raised from mean sea level to
 #              the chart's datum by the world's mean level (`mean_level_grid`); a block
 #              on a coast of large tides sets it, or its low land floods at high water
+#   fill_mean_level_m
+#              (package 39d; optional) with `fill_to_chart_datum`, the raise is this one
+#              figure, the block's own mean level above its chart datum from its own
+#              sources, instead of the world's blend: where the block's gauges are held
+#              (docs/dev/ChartBlocks.md) the world's mean level is a far gauge's (over
+#              Portugal Le Conquet's 3.98 to 4.38 m, against the coast's 2.0), and a raise
+#              by it turned GEBCO's estuaries that EMODnet lacks (the Guadalquivir to
+#              Bonanza, the Odiel, the Arade) into ground above low water
+#   skip_dry_tiles
+#              (package 39d; optional, false where absent) a level-2 tile with no cell at
+#              or below the chart's datum (all land: the interior of Portugal and Spain)
+#              is computed with the block, so that the field knows its shore, and is not
+#              written or listed; a query there falls back to the corridor, which has the
+#              land as land. Portugal's 72 such tiles were 7.6 MB of its 21.7
 # The tile lists, and the seam (package 39a): the level-2 tiles are on one grid for every
 # region, so a region's edge column may be its neighbour's; a tile another region of the
 # manifest lists is that region's, computed with the block (the distance field sees the
@@ -274,12 +288,47 @@ REGIONS: dict[str, dict[str, Any]] = {
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
     },
+    # package 39d (spec M6 §26, block 4): Portugal and Cadiz, abutting biscay-south at
+    # 42.0 N and the Strait at 36.4 N exactly (Cadiz and its bay, 36.45 to 36.64 N, the
+    # block's; Trafalgar, 36.18 N, the Strait's), 10 W to 6 W. The level-2 tiles that meet
+    # the bounds span 36.29 to 42.27 N and 10.19 to 5.92 W: the northern row (41.84 to
+    # 42.27 N) and the southern (36.29 to 36.72 N) straddle the neighbours' bounds, and
+    # the region the manifest lists first keeps them (the seam rule; at this build neither
+    # neighbour is in the manifest, so the block writes them, and the lead keeps one
+    # listing at the merge). The fetch box covers the tiles whole.
+    "portugal": {
+        "title": "Portugal and Cadiz, the Minho to the bay of Cadiz",
+        "bounds": {"south": 36.4, "north": 42.0, "west": -10.0, "east": -6.0},
+        "fetch": {"south": 36.2, "north": 42.35, "west": -10.3, "east": -5.8},
+        # one per port of the block (the port files' roads), the Tagus from Cascais road
+        # to the town
+        "harbours": {
+            "oporto-douro": {"south": 41.12, "north": 41.17, "west": -8.71, "east": -8.60},
+            "lisbon-tagus": {"south": 38.62, "north": 38.72, "west": -9.45, "east": -9.09},
+            "setubal": {"south": 38.46, "north": 38.53, "west": -8.94, "east": -8.85},
+            "lagos": {"south": 37.06, "north": 37.12, "west": -8.70, "east": -8.63},
+            "faro": {"south": 36.95, "north": 37.03, "west": -7.98, "east": -7.85},
+            "cadiz-bay": {"south": 36.45, "north": 36.64, "west": -6.40, "east": -6.18},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised to the chart's datum by the coast's own mean level, 2.0 m
+        # above the Zero Hidrográfico offshore (the Instituto Hidrográfico's surface,
+        # EPSG 10393) and 1.96 m above LAT at Huelva (REDMAR); not by the world's,
+        # which over the block is Le Conquet's 3.98 to 4.38 m while the block's gauges
+        # are held (docs/dev/TuningNotes.md, package 39d)
+        "fill_to_chart_datum": True,
+        "fill_mean_level_m": 2.0,
+        # half the block's level-2 tiles are the land of Portugal and Spain, with no water
+        # in them: not written (the corridor answers there; the brief's 18 MB a region)
+        "skip_dry_tiles": True,
+    },
     # package 39f: the Strait, abutting `portugal` (package 39d) at 36.4 N exactly, so that
     # Cadiz and its bay are that block's and Cape Trafalgar this one's. The level-2 tiles
     # that meet the bounds span 35.44 to 36.72 N and 6.77 to 4.64 W; the northern row
     # (36.29 to 36.72 N) west of 5.92 W meets `portugal`'s bounds too, and is the region's
     # that the manifest lists first (the seam rule, `tiles_listed_elsewhere`): built here
-    # while `portugal` is not in the manifest, kept as `portugal`'s once it is.
+    # while `portugal` was not in the manifest, kept as `portugal`'s since its merge (the
+    # two tiles 2/130656_-24384 and 2/130656_-22848; the build prints "2 kept").
     "strait": {
         "title": "The Strait, Cape Trafalgar and Cape Spartel to Gibraltar and Ceuta",
         "bounds": {"south": 35.5, "north": 36.4, "west": -6.5, "east": -5.0},
@@ -291,10 +340,20 @@ REGIONS: dict[str, dict[str, Any]] = {
             "tangier": {"south": 35.77, "north": 35.80, "west": -5.83, "east": -5.78},
         },
         "sources": ["emodnet_dtm_2024", "gebco_2025"],
-        # GEBCO's fill raised by the world's mean level: over the Strait the world's tide is
-        # the nearest gauge's alone (the eleven lie beyond the reach; the block's gauges are
-        # held), so the fill stands as high above the world's high water as above the sea's
+        # GEBCO's fill raised by the world's mean level, NOT by the block's own
+        # (`fill_mean_level_m` tried at the merge with 39d and refused): over the Strait the
+        # world's tide is the nearest far gauge's alone, Le Conquet's (mean level 3.98 m,
+        # high water springs some 7 m above the datum), while the block's gauges are held,
+        # so the land must stand above that high water; and the Strait's shore where
+        # EMODnet has nothing is GEBCO's mixed cells of the shore itself, not estuaries:
+        # raised by 0.6 m (the Strait's own level, judgement from its gauges) Tarifa's
+        # island, the capes and 25 marks of the land fell in the water. When the gauges
+        # are blended the recipe takes the key and the region is rebuilt
+        # (docs/dev/TuningNotes.md, package 39f)
         "fill_to_chart_datum": True,
+        # one level-2 tile of the block is all land (36.29 to 36.72 N, 5.92 to 5.49 W, the
+        # hills of Medina Sidonia): computed for the field, not written, the corridor's
+        "skip_dry_tiles": True,
     },
 }
 
@@ -327,6 +386,7 @@ CHARTS: dict[str, dict[str, Any]] = {
             "channel-west",
             "channel-mid",
             "biscay-north",
+            "portugal",  # package 39d
             # package 39f: the Strait, the voyage's last (its own line, so that the four
             # blocks' additions merge as lines)
             "strait",
@@ -1440,13 +1500,25 @@ class Build:
         )
         self.log(f"  tiles another region lists: {kept} kept (theirs; not written, not listed)")
         fill_level = None
-        if recipe.get("fill_to_chart_datum"):
+        if recipe.get("fill_to_chart_datum") and recipe.get("fill_mean_level_m") is not None:
+            # the block's own mean level, one figure (package 39d)
+            level_m = float(recipe["fill_mean_level_m"])
+            fill_level = mean_level_grid(fb)
+            fill_level.values[:] = level_m
+            self.log(
+                f"  GEBCO's fill raised to the chart's datum by the block's own mean level, "
+                f"{level_m:.2f} m (the recipe's fill_mean_level_m)"
+            )
+            out["fill_mean_level_m"] = level_m
+        elif recipe.get("fill_to_chart_datum"):
             fill_level = mean_level_grid(fb)
             self.log(
                 f"  GEBCO's fill raised to the chart's datum by the world's mean level, "
                 f"{float(fill_level.values.min()):.2f} to {float(fill_level.values.max()):.2f} m"
             )
         out["fill_to_chart_datum"] = bool(fill_level is not None)
+        if recipe.get("skip_dry_tiles"):
+            out["skip_dry_tiles"] = True
         out["tiles"]["2"] = self._build_level(
             2,
             tiles2,
@@ -1458,6 +1530,7 @@ class Build:
             region,
             taken=taken,
             fill_level=fill_level,
+            skip_dry=bool(recipe.get("skip_dry_tiles")),
         )
         level3: list[dict[str, Any]] = []
         for hname, ts in harbour_tiles.items():
@@ -1515,13 +1588,16 @@ class Build:
         harbour: str | None = None,
         taken: frozenset[str] | set[str] = frozenset(),
         fill_level: Grid | None = None,
+        skip_dry: bool = False,
     ) -> list[dict[str, Any]]:
         """The tiles of one level over the region or a harbour patch: EMODnet sampled,
         GEBCO under it where EMODnet is unknown, the overrides written, the distance
         field derived over the whole block (so a shore beyond a tile's edge counts), and
         each tile written with its minimum depth. A tile in `taken` ('<level>/<name>',
         another region's: the seam) is computed with the block and is not written,
-        listed or drawn in the coast."""
+        listed or drawn in the coast. With `skip_dry` (the recipe's `skip_dry_tiles`), a
+        tile all of whose cells stand above the datum is computed and not written or
+        listed either (package 39d)."""
         cell_sec = LEVELS[level]["cell_sec"]
         unit_m = LEVELS[level]["unit_m"]
         souths = sorted({s for s, _ in tiles})
@@ -1587,6 +1663,7 @@ class Build:
                 f"    coast: {len(segs)} segments, {len(lines)} lines in {time.time() - t0:.1f} s"
             )
         records = []
+        dry = 0
         folder = CHARTS_DIR / "tiles" / str(level)
         folder.mkdir(parents=True, exist_ok=True)
         for s, w in tiles:
@@ -1595,6 +1672,9 @@ class Build:
             r0 = int(round((s - south0) / cell_sec))
             c0 = int(round((w - west0) / cell_sec))
             block = elev[r0 : r0 + TILE, c0 : c0 + TILE]
+            if skip_dry and level == 2 and bool(land[r0 : r0 + TILE, c0 : c0 + TILE].all()):
+                dry += 1
+                continue  # all land (package 39d): the corridor answers there
             shoal_block = shoal[r0 : r0 + TILE, c0 : c0 + TILE]
             dblock = dist[r0 : r0 + TILE, c0 : c0 + TILE]
             sea = (block < 0.0) & ~np.isnan(block)
@@ -1635,6 +1715,8 @@ class Build:
             f"    written: {len(records)} tiles, {total:,} bytes compressed "
             f"({len(records) * TILE * TILE * 4:,} raw)"
         )
+        if skip_dry:
+            self.log(f"    tiles with no water, all above the datum: {dry} not written")
         return records
 
     # -- the blocks' checks (spec M6 §26; package 38) ----------------------------------
