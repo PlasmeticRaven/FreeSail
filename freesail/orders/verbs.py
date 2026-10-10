@@ -44,7 +44,7 @@ from freesail.evolutions import scripts
 from freesail.evolutions import trim as yard_trim
 from freesail.evolutions.runner import PartyTooSmall
 from freesail.orders import crew as crew_orders
-from freesail.orders import errors, resolve, work
+from freesail.orders import errors, resolve, storm, work
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.vocabulary import Vocabulary, load_vocabulary
@@ -104,6 +104,9 @@ def execute(
         return crew_orders.CREW_VERBS[order.verb](ship, order)
     if order.verb in BRACE_VERBS:
         return _brace(ship, order, vocab, skip, group)
+    if order.verb in storm.STORM_VERBS:
+        _no_stray_modifiers(order, set())
+        return storm.set_storm_staysails(ship, order, vocab)  # package 37p
     if order.verb == "trim":
         return _trim(ship, order, vocab, skip, group=group)
     if order.verb == "sheet home":
@@ -155,6 +158,7 @@ UNDER_WAY_ONLY = frozenset(
         "heave_to",
         "fill_away",
         "boxhaul",
+        "box_off",
         "wear_short_round",
         "lie_a_try",
         "scud",
@@ -237,6 +241,7 @@ def _no_stray_modifiers(order: Order, allowed: set[str]) -> None:
         "afresh": "'afresh' belongs with 'reeve'",
         "heading": "a heading belongs with 'steer'",
         "points": "a number of points belongs with 'steer', 'come up' or 'bear away'",
+        "brace_to": "'to ... points' belongs with 'brace' (the yards' angle with the keel)",
         "direction": "a direction belongs with 'steer'",
         "hands_from": (
             "a watch or a station is sent to work on a sail, a yard or the ship, not to this"
@@ -587,11 +592,22 @@ def _brace(
     'trim the yards' finds it. 'Brace round' with no mode said braces sharp
     up for the tack the wind is on."""
     _no_stray_modifiers(
-        order, {"brace_mode", "tack", "manner", "round", "hands_from", HEAD_YARDS_SHARPER}
+        order,
+        {
+            "brace_mode",
+            "tack",
+            "manner",
+            "round",
+            "hands_from",
+            HEAD_YARDS_SHARPER,
+            "points",
+            "brace_to",
+        },
     )
     verb = order.verb
     mode = order.modifiers.get("brace_mode")
     tack = order.modifiers.get("tack")
+    by_hand = _by_hand_kind(order)
     if verb == "back" and order.object:
         backed = _back_headsails(ship, order, vocab)
         if backed is not None:
@@ -602,6 +618,8 @@ def _brace(
         mode = "square" if verb == "square" else "aback"
         if verb == "back" and not order.object:
             raise OrderError("Back what? Name a yard or a square sail, such as the main topsail.")
+    if by_hand == "to":
+        mode = "sharp up"  # the table's row is not read: `_by_hand_targets` gives the angles
     if mode is None:
         if tack is not None or order.modifiers.get("round"):
             mode = "sharp up"  # "brace round" or "brace on the larboard tack": sharp up for it
@@ -637,6 +655,8 @@ def _brace(
     if not yards:
         raise OrderError("This ship has no yards to brace.")
     if vocab.brace_modes[mode] == "wind":
+        if by_hand:
+            raise OrderError("'To the wind' is the trim's own angle; say it without a count.")
         return _trim(ship, order, vocab, skip, yards=yards, object_name=object_name, group=group)
 
     tack = tack or ship.dyn.tack
@@ -682,6 +702,11 @@ def _brace(
             ship, targets, bool(order.modifiers.get(HEAD_YARDS_SHARPER))
         )
     signed = yard_trim.signed(targets, sign)
+    hand_words = ""
+    if by_hand:
+        # the yards by hand (package 37p): a count of points from where they stand, so
+        # many points from the keel, or braced about; they stay as given
+        signed, hand_words = _by_hand_targets(ship, order, by_hand, workable, tack)
     # Checked last, after the whole-mast aback rule above, so nothing is refused twice: a
     # yard whose lee studding sail boom is out first (spec 3b §7), then the adjacent yards.
     too_far = _yard_refusals(ship, signed)
@@ -707,12 +732,15 @@ def _brace(
             failed_ids.append(yard.id)
             continue
         target = signed[yard.id]
+        yard_tack = tack
+        if by_hand and target != 0.0:
+            yard_tack = "starboard" if target > 0 else "larboard"  # each yard its own side
         params = {
             # unsigned, as data/evolutions/brace.yaml reads it; `tack` gives the sign
             "target_deg": round(abs(units.rad_to_deg(target)), 2),
             "target_angle": target,  # signed radians: + = braced up for the starboard tack
             "mode": mode,
-            "tack": tack,
+            "tack": yard_tack,
             **extra,
         }
         try:
@@ -733,7 +761,12 @@ def _brace(
     # when the runner has logged its start, so it goes in as a note, which
     # the next tick writes to the log after the runner's "Man the braces".
     note: str | None = None
-    if aback:
+    hand_ids = {s["subject"] for s in started}
+    _mark_by_hand(ship, hand_ids, bool(by_hand))
+    if by_hand:
+        note = f"Braced {hand_words}."
+        ship.note("routine", "yard.braced_by_hand", note, data={"subjects": sorted(hand_ids)})
+    elif aback:
         backed = errors.join_names(
             [resolve.display_name(ship, s["subject"]) for s in started], "and"
         )
@@ -774,6 +807,109 @@ def _brace(
         "failed_subjects": failed_ids,
     }
     return "evolution.started", text, data
+
+
+# The yards by hand (package 37p): the deck's measure is the point, never the degree.
+# "brace the fore yards in a point", "brace the main yards up half a point": reckoned from
+# where the yards stand; "brace the yards to four points": so many points from the keel,
+# the weather yardarms forward (Luce 1884, ch. XXIV, p. 418: "a point and three quarters
+# greater than the angles formed by the yards and the line of the keel"); "brace the
+# mizzen yards about": the same angle on the other side. Given, the yards stay as given
+# until the next trim or brace, and the log says what shivers or fills
+# (`physics.integrate`, `yards_by_hand`).
+YARDS_BY_HAND = "yards_by_hand"
+
+
+def _by_hand_kind(order: Order) -> str | None:
+    """'in' or 'up' with a count of points, 'to' so many points, 'about'; else None."""
+    mode = order.modifiers.get("brace_mode")
+    if "brace_to" in order.modifiers:
+        if mode is not None or "points" in order.modifiers:
+            raise OrderError(
+                "Say the yards' angle once: 'to four points' from the keel, or 'in a point' "
+                "from where they stand."
+            )
+        return "to"
+    if "points" in order.modifiers:
+        if mode in ("in", "up"):
+            return mode
+        raise OrderError(
+            "Brace them in or up so many points ('brace the fore yards in a point'), or to "
+            "so many points from the keel ('brace the yards to four points')."
+        )
+    if mode == "about":
+        return "about"
+    return None
+
+
+def _keel_points_words(points: float) -> str:
+    """'four points', 'four points and a half', 'half a point', to the half point."""
+    halves = max(0, int(round(points * 2.0)))
+    whole, half = divmod(halves, 2)
+    if whole == 0:
+        return "half a point" if half else "no points"
+    noun = "point" if whole == 1 else "points"
+    count = "a" if whole == 1 else number_words(whole)
+    return f"{count} {noun}{' and a half' if half else ''}"
+
+
+def _by_hand_targets(
+    ship: Ship, order: Order, kind: str, yards: list[Spar], tack: str
+) -> tuple[dict[str, float], str]:
+    """The signed brace angles for the yards by hand, each within its limit, and the words
+    of the log's line ("the fore yards in a point, to five points and a half from the
+    keel (62°)")."""
+    point = units.deg_to_rad(11.25)
+    out: dict[str, float] = {}
+    for yard in yards:
+        now = yard.brace_angle
+        side = 1.0 if now > 0 else -1.0 if now < 0 else (1.0 if tack == "starboard" else -1.0)
+        if kind == "about":
+            if abs(now) < units.deg_to_rad(0.5):
+                name = resolve.the(ship, yard.id)
+                raise OrderError(
+                    f"{name[0].upper()}{name[1:]} is square; brace it up for a tack, or "
+                    f"round, before bracing it about."
+                )
+            out[yard.id] = -now if abs(now) <= yard.brace_limit else -side * yard.brace_limit
+            continue
+        if kind == "to":
+            from_square = math.pi / 2 - float(order.modifiers["brace_to"]) * point
+            target = max(0.0, min(yard.brace_limit, from_square))
+            # "to so many points" braces for the tack she is on, or the one said
+            out[yard.id] = (1.0 if tack == "starboard" else -1.0) * target
+            continue
+        step = float(order.modifiers["points"]) * point
+        magnitude = abs(now) - step if kind == "in" else abs(now) + step
+        out[yard.id] = side * max(0.0, min(yard.brace_limit, magnitude))
+    what = order.object or "yards"
+    first = out[yards[0].id] if yards else 0.0
+    keel = math.pi / 2 - abs(first)
+    angle = f"{_keel_points_words(keel / point)} from the keel ({units.rad_to_deg(keel):.0f}°)"
+    if kind == "about":
+        side = "starboard" if first > 0 else "larboard"
+        words = f"the {what} about, for the {side} tack, {angle}"
+    elif kind == "to":
+        limited = any(
+            abs(out[y.id]) < math.pi / 2 - float(order.modifiers["brace_to"]) * point - 1e-6
+            for y in yards
+        )
+        words = f"the {what} to {angle}" + (", as sharp as they will brace" if limited else "")
+    else:
+        how = _keel_points_words(float(order.modifiers["points"]))
+        words = f"the {what} {kind} {how}, to {angle}"
+    return out, words
+
+
+def _mark_by_hand(ship: Ship, yard_ids: set[str], by_hand: bool) -> None:
+    """Record the yards braced by hand (`YARDS_BY_HAND`), or clear the record for yards
+    braced or trimmed any other way."""
+    held = set(ship.extra.get(YARDS_BY_HAND) or ())
+    held = held | yard_ids if by_hand else held - yard_ids
+    if held:
+        ship.extra[YARDS_BY_HAND] = sorted(held)
+    else:
+        ship.extra.pop(YARDS_BY_HAND, None)
 
 
 def _trim(
@@ -857,19 +993,43 @@ def _trim(
             if i.evo.id == vocab.evolutions["brace"] and i.params.get("mode") == "to the wind"
         }
         workable = [y for y in yards if not (y.wrecked or y.sent_down)]
+        # the trim is reckoned on the whole rig and the yards ordered take theirs from it
+        # (package 37p): a topsail trimmed by name lies where `trim sails` puts it, a step
+        # in from its course, and not at its own limit
+        ordered = {y.id for y in workable}
+        rig = workable + [
+            y
+            for y in ship.spars.values()
+            if y.is_yard and y.id not in ordered and not (y.wrecked or y.sent_down)
+        ]
         targets: dict[str, float] = {}
-        on_a_wind = True  # every lower yard wants to go sharper than it can
-        for yard in workable:
+        wants: dict[str, float] = {}
+        for yard in rig:
             sail = ship.sail_of(yard)
             cls = SAIL_CLASSES.get(sail.cls if sail else "square") or SAIL_CLASSES["square"]
             chord = min(max(awa - cls.peak_alpha, 0.0), math.pi / 2)
             want = math.pi / 2 - chord
             targets[yard.id] = min(want, yard.brace_limit)
-            parent = ship.parent_of(yard)
-            if parent is not None and parent.cls == "mast" and want < yard.brace_limit - 1e-9:
-                on_a_wind = False
+            wants[yard.id] = want
+        # on a wind: the lowest yard of every mast wants to go sharper than it can (package
+        # 37p: the lowest of each mast, so that a fore-and-after whose yards begin at the
+        # topsail is judged by it, where before only a course yard was read)
+        lowest: dict[str, Spar] = {}
+        for yard in rig:
+            mast = ship.mast_of(yard)
+            key = mast.id if mast is not None else yard.id
+            if key not in lowest or _level_rank(ship, yard) < _level_rank(ship, lowest[key]):
+                lowest[key] = yard
+        on_a_wind = all(wants[y.id] >= y.brace_limit - 1e-9 for y in lowest.values())
         if on_a_wind:
+            # the period's trim (package 37p): each level braced in from the one below,
+            # the courses sharpest (Luce 1884, p. 418), then the after yards staggered;
+            # in heavy weather the lowest yards eased a step as well
+            if yard_trim.heavy_weather_trim(ship):
+                targets = yard_trim.eased_lowest(ship, targets)
+            targets = yard_trim.by_level(ship, targets)
             targets, staggered = yard_trim.stagger(ship, targets, head_sharper)
+        targets = {yid: angle for yid, angle in targets.items() if yid in ordered}
         signed = yard_trim.signed(targets, sign)
         too_far = _yard_refusals(ship, signed)
         extra, call = _hands_params(
@@ -923,6 +1083,7 @@ def _trim(
             started.append({"evolution": "brace", "subject": yard.id, "params": params})
         _settle_call(ship, call, bool(started))
 
+    _mark_by_hand(ship, {s["subject"] for s in started}, False)
     trimmed: list[str] = []  # the sheets whose trim was started (package 32e)
     standing: list[str] = []  # the sheets already at their trim
     sheets_started: list[dict[str, Any]] = []
@@ -988,9 +1149,11 @@ def _trim(
         if failed and not folded:
             raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
         if not folded:
-            raise OrderError(
-                "Nothing to trim: no sail is set." if do_sheets else "No yards to trim."
-            )
+            # package 37p: "no sail is set" was said of a ship lying to under her topsails
+            # in a gale (the captain's trials), whose sheets are the fore-and-aft sails'
+            square_set = any(sl.is_set for sl in ship.sails.values())
+            what = "no fore-and-aft sail is set" if square_set else "no sail is set"
+            raise OrderError(f"Nothing to trim: {what}." if do_sheets else "No yards to trim.")
 
     parts: list[str] = []
     if started:
@@ -1074,6 +1237,13 @@ def _every_yard(ship: Ship, yards: list[Spar]) -> bool:
     """Whether these are all the ship's yards (a trim of the whole ship, however said)."""
     every = [s for s in ship.spars.values() if s.is_yard]
     return len(every) > 1 and {y.id for y in yards} >= {y.id for y in every}
+
+
+def _level_rank(ship: Ship, yard: Spar) -> int:
+    """A yard's level, 0 for a course yard up to 3 for a royal's (`trim.by_level`)."""
+    parent = ship.parent_of(yard)
+    levels = ("mast", "topmast", "topgallant_mast", "royal_mast")
+    return levels.index(parent.cls) if parent is not None and parent.cls in levels else 0
 
 
 def _trim_targets(ship: Ship, res: resolve.Resolution) -> tuple[list[Spar], list[Sail]]:

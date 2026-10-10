@@ -60,6 +60,35 @@ EASE_HEAD_YARDS = False
 # topmasts, and so on.
 _LEVELS = ("mast", "topmast", "topgallant_mast", "royal_mast")
 
+# The period's trim by the wind (package 37p): each level of yards braced in from the
+# level below it, the courses' yards the sharpest. Luce 1884, ch. XXIV, 'To Trim Yards',
+# p. 418: "First, brace the lower yard up sharp ... then trim the top-sail yard, if for a
+# stiff breeze, with the weather yard arm about a half point abaft the lower yard, and the
+# top-gallant trimmed by the topsail yard in the same way, and so on"; and his footnote's
+# three reasons: "The upper yards should be braced in more than the lower, first, because
+# the larger sail having greater curvature than the smaller must have its yard braced up
+# to a sharper angle, that the plane of both may have the same angle with the keel;
+# second, because the upper portion of the sail being attached to the yard approaches
+# nearer to a plane than the lower part which bellies out ...; and thirdly, the lighter
+# yards and braces require a greater angle for their support. Further, the upper yards
+# being in, when the main royal is just lifting all the other sails are a 'clean full and
+# by,' which makes it a good sail to steer by." `brace sharp up` is not this: every yard
+# as sharp as its rigging allows, the upper yards then the sharper ("in a light breeze
+# with a smooth sea ... the upper yards may be braced over the lower", the same page).
+# The figure is judgement, tuned once against the brief's test (tests/test_gale.py): the
+# least step that has the highest sail set lift first by more than a degree against the
+# model's twist (the wind at the royal some two degrees freer than at the course) and the
+# rest stand full, with the helm keeping the mark just lifting (`physics/hull.py`,
+# `MARK_MARGIN`); with it the frigate full and by under plain sail lies six points from the
+# wind in fifteen knots (67.5°, 5.1 knots), Fincham's "seldom within six points". Luce's
+# half point stands on a main yard at Fincham's 19¼° from the keel, where the model's lower
+# yards brace to 26° to 28°: half a point a level put the topgallant four points and a half
+# from the keel and the frigate 93° from the wind full and by (TuningNotes, package 37p).
+# The three reasons are the curvature and the support of the yards, which the model's flat
+# sails and fixed limits do not have, so the step does no more in the model than give the
+# helmsman his mark.
+UPPER_YARDS_IN_DEG = 2.0
+
 
 def _level(ship: Ship, yard: Spar) -> str:
     parent = ship.parent_of(yard)
@@ -122,6 +151,80 @@ def stagger(
         if h is not None and m is not None:
             return out, units.rad_to_deg(out[m] - out[h])
     return out, None
+
+
+def by_level(ship: Ship, targets: dict[str, float]) -> dict[str, float]:
+    """The period's trim by the wind (`UPPER_YARDS_IN_DEG`): on each mast every yard
+    braced in from the yard of the level below it by the step, as far as nought (square),
+    and never sharper than its own target. `targets` are unsigned angles from square
+    (radians), each within its yard's limit; the yards of one mast are taken from the
+    lowest up. Applied before `stagger`, which then braces the after yards of each level
+    sharper than the head yard of theirs as before."""
+    step = units.deg_to_rad(UPPER_YARDS_IN_DEG)
+    out = dict(targets)
+    by_mast: dict[str, list[tuple[int, str]]] = {}
+    for yid in targets:
+        yard = ship.spars[yid]
+        mast = ship.mast_of(yard)
+        if mast is None:
+            continue
+        level = _level(ship, yard)
+        rank = _LEVELS.index(level) if level in _LEVELS else 0
+        by_mast.setdefault(mast.id, []).append((rank, yid))
+    for yards in by_mast.values():
+        yards.sort()
+        for (_, below), (_, yid) in zip(yards, yards[1:], strict=False):
+            out[yid] = max(0.0, min(out[yid], out[below] - step))
+    return out
+
+
+# In heavy weather the yards are not braced so sharp (package 37p): Luce 1884, ch. XXIX,
+# 'In a Gale', p. 478, of the third reef: "proceed as with the second reef, observing not
+# to brace the topsail or lower yards too sharp"; Fincham 1843, art. 96, the head yards
+# eased "with a sea on the weather bow". The trim then braces every mast's lowest yard in
+# by `HEAVY_WEATHER_EASE_DEG` from its limit, and the levels above it by their steps: the
+# reefed topsails, the helm's mark, lie further off the wind than the light sails do in a
+# working breeze, and the helm never brings her up to the angle that took the frigate
+# aback in the captain's trials (the old rule's mean of her sails' luffs and eight
+# degrees). Heavy weather is a topsail set with this many reefs or all its bands, whichever
+# is fewer (Luce's third reef). The ease is a point, the deck's measure of "not too sharp":
+# judgement, Luce giving no figure.
+HEAVY_WEATHER_REEFS = 3
+HEAVY_WEATHER_EASE_DEG = 11.25
+
+
+def heavy_weather_trim(ship: Ship) -> bool:
+    """Whether a topsail is set reefed to the third reef, or close-reefed if it has
+    fewer bands (`HEAVY_WEATHER_REEFS`)."""
+    for sail in ship.sails.values():
+        if sail.cls != "square" or not sail.is_set or sail.reefs <= 0:
+            continue
+        yard = ship.yard_of(sail)
+        if yard is None or _level(ship, yard) != "topmast":
+            continue
+        if sail.reefs >= min(HEAVY_WEATHER_REEFS, sail.reef_bands):
+            return True
+    return False
+
+
+def eased_lowest(ship: Ship, targets: dict[str, float]) -> dict[str, float]:
+    """Every mast's lowest yard among `targets` braced in `HEAVY_WEATHER_EASE_DEG`
+    (`heavy_weather_trim`)."""
+    step = units.deg_to_rad(HEAVY_WEATHER_EASE_DEG)
+    out = dict(targets)
+    lowest: dict[str, tuple[int, str]] = {}
+    for yid in targets:
+        yard = ship.spars[yid]
+        mast = ship.mast_of(yard)
+        if mast is None:
+            continue
+        level = _level(ship, yard)
+        rank = _LEVELS.index(level) if level in _LEVELS else 0
+        if mast.id not in lowest or rank < lowest[mast.id][0]:
+            lowest[mast.id] = (rank, yid)
+    for _, yid in lowest.values():
+        out[yid] = max(0.0, out[yid] - step)
+    return out
 
 
 def difference_words(diff_deg: float | None) -> str:

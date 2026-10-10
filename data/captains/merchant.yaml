@@ -43,6 +43,12 @@ books:
     - 'standing order "the lead in pilot water": every 5 minutes, if the distance to {anchorage} is under 6 miles then heave the lead'
     - 'standing order "the anchorage": at a sounding, if the distance to {anchorage} is under 1.8 miles and the depth of water is under {anchorage_fathoms} fathoms and the speed is over 2 knots then come to an anchor'
     - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
+    # package 37p: sail made again when the gale is over, and not too soon (Luce 1884, ch.
+    # XXIX, p. 479: "After the gale abates, sail should not be made upon the vessel too
+    # rapidly"; the gate day's book's twenty-five knots for half an hour, judgement): in
+    # the captain's trials the frigate kept her station all the afternoon after the gale
+    # under the close-reefed main topsail alone, aback by turns
+    - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
     - 'standing order "the pilot boards": at the pilot''s hail then take in the {light_sail}; take the pilot'
     - 'standing order "the pilot aboard": at the pilot aboard then set plain sail'
     - 'standing order "the pilot put off": at the pilot asks to be put off then heave to'
@@ -55,8 +61,22 @@ books:
     - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
     - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
     - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
+    # package 37p: sail made again when the gale is over, and not too soon (Luce 1884, ch.
+    # XXIX, p. 479: "After the gale abates, sail should not be made upon the vessel too
+    # rapidly"; the gate day's book's twenty-five knots for half an hour, judgement): in
+    # the captain's trials the frigate kept her station all the afternoon after the gale
+    # under the close-reefed main topsail alone, aback by turns
+    - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
   hove to for weather:
     - 'standing order "bearings hove to": every glass, if the land is in sight then take a bearing of the land; take a fix'
+    # package 37p: the gale's lines while she lies to (Luce 1884, ch. XXIX, 'Reducing Sail
+    # to a Gale': the topsails close-reefed, the fore storm staysail set, the topgallant
+    # masts sent down "in a heavy gale, when the vessel has much top-hamper, as it eases her
+    # considerably", the courses hauled up and furled; 'Lying to'): another reef as the
+    # wind rises again, and the storm staysails over the storm line. The courses `lie a-try`
+    # hauls up in their gear; no line furls them, which no book could say of a schooner
+    - 'standing order "shorten sail lying to": when the true wind exceeds {gale_kn} knots for 5 minutes then shorten sail'
+    - 'standing order "storm canvas": when the true wind exceeds 40 knots for 5 minutes then set the storm staysails; send down the topgallant masts'
   running for shelter:
     - 'standing order "the leg": every glass, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
     - 'standing order "the lead": every 10 minutes then heave the lead'

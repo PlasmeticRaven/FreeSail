@@ -109,8 +109,10 @@ def bring_to(world, minutes=15):
 THE_GAMES_FOUR = {
     "seven knots, the wind abaft the beam": (240.0, 15.0, 0.0, (), 6.5),
     "four knots, the wind on the beam": (270.0, 8.0, 0.0, (), 4.0),
-    "a knot and a half in light airs, larboard tack": (50.0, 4.5, 0.3, GAME_SAIL, 1.0),
-    "a knot and a half in light airs, starboard tack": (310.0, 4.5, 0.3, GAME_SAIL, 1.0),
+    # package 37p: 0.98 knots on the larboard tack under the period's trim, the upper
+    # yards braced in from the lower (before, at their limits, 1.0 and more)
+    "a knot and a half in light airs, larboard tack": (50.0, 4.5, 0.3, GAME_SAIL, 0.95),
+    "a knot and a half in light airs, starboard tack": (310.0, 4.5, 0.3, GAME_SAIL, 0.95),
 }
 
 

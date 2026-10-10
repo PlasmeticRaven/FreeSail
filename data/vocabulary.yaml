@@ -381,6 +381,12 @@ verbs:
     synonyms: [wear her short round, ware short round]
     object: none
     level: 1
+  # package 37p: come to against the helm or taken aback, recovered on her tack (Luce
+  # 1866, ch. XXV, 'To Box Off')
+  box her off:
+    synonyms: [box off, box her head off, box the ship off, box her off the wind]
+    object: none
+    level: 1
   lie a try:
     # "lie a-try" reads as "lie a try". Lying to under the close-reefed main
     # topsail is the same thing said in full ("lie to" alone is heave to).
@@ -863,6 +869,12 @@ verbs:
     synonyms: [take in sail, reduce sail, snug her down]
     object: none
     level: 1
+  # package 37p: the storm staysails bent from the sail room where they are not, set, and
+  # the head sails and the spanker they replace taken in (orders/storm.py)
+  set the storm staysails:
+    synonyms: [set storm staysails, get the storm staysails on her, set the storm stay sails]
+    object: none
+    level: 1
   # The standing dialect (milestone 4, spec M4 §3): level 2 of the control ladder.
   # `standing order "name": <trigger> [, if <condition>] then <order> [; <order>]` and
   # the book's orders. `orders.handle` hands these to `freesail.standing.grammar` before
@@ -1089,6 +1101,7 @@ evolutions:
   fid the topmasts: fid_topmasts
   box haul: boxhaul
   wear short round: wear_short_round
+  box her off: box_off
   lie a try: lie_a_try
   scud: scud
   back and fill: back_and_fill
@@ -1154,6 +1167,10 @@ brace_modes:
   sharp aback: aback
   abox: aback
   to the wind: wind
+  # package 37p: braced about, the same angle on the other side ("brace about the head yards
+  # sharp the other way", Steel 1794 vol. II); with a count of points, `in` and `up` are
+  # reckoned from where the yards stand ("brace the fore yards in a point")
+  about: about
 
 # Modifiers a verb phrase carries in itself: "close reef" is "reef ...
 # close", "haul aft" is "haul ... home", and "brace round" with nothing else

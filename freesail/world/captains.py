@@ -1260,6 +1260,7 @@ class Captain:
                     math.radians(float(getattr(origin.pilot, "course_out_deg", 180.0)))
                 )
         fills["light_sail"] = self._light_sail()
+        fills["storm_topsail"] = self._storm_topsail()
         return fills
 
     def _spot_words(self, spot: Any) -> str:
@@ -1280,6 +1281,21 @@ class Captain:
         if "topsail" in sails:
             return "topsail"
         return "topsails"
+
+    def _storm_topsail(self) -> str:
+        """The topsail she lies to under in a gale, by the ship's own names (package 37p):
+        the one `lie a-try` keeps, on the mast with the most square sail (the main topsail
+        of a ship or a brig, the fore topsail of a topsail schooner), else as
+        `_light_sail`."""
+        ship = self.world.ship
+        try:
+            from freesail.evolutions.runner import part_name
+            from freesail.evolutions.scripts import _topsails_on, yards_to_back
+
+            kept = _topsails_on(ship, yards_to_back(ship))
+        except (AttributeError, KeyError, TypeError, ValueError):
+            kept = []
+        return part_name(ship, kept[0].id) if kept else self._light_sail()
 
     def _course_in(self, port: Any) -> str:
         """The course from the outer road to the first inner mark, for the book that
@@ -1315,8 +1331,14 @@ class Captain:
         """What is ordered on entering a state, beyond the book."""
         world = self.world
         if state == "hove to for weather":
+            # package 37p: shortened, the jibs in by their ratings and the storm staysails
+            # over the storm line (`orders.storm`), and lying to under the close-reefed
+            # main topsail and the staysails as Luce has a ship lie to in a gale (1884,
+            # ch. XXIX: "The ship is now 'lying to' under close-reefed main topsail, fore
+            # storm staysail"), where heaving to with the main topsail aback took the
+            # frigate astern at five knots and failed in the trials
             self.give("shorten sail")
-            self.give("heave to")
+            self.give("lie a-try")
             return
         lying_to = False
         if old == "at anchor" and state in ("on passage", "beating", "running for shelter"):

@@ -424,7 +424,9 @@ def test_the_grammar_page_holds_the_standing_dialect_in_full():
         "striking it takes it out of the book, and its name may be given again." in dialect
     )
     lines = read_orders_file(ROOT / "data/standing_orders/starter.orders")
-    assert len(lines) == 9  # the sheets tended every glass (package 32e)
+    # the sheets tended every glass (package 32e); the storm staysail's companion order
+    # folded into heavy weather (package 37p)
+    assert len(lines) == 8
     for line in lines:
         assert f"  {line}" in dialect
         e = world.submit(line)
@@ -1827,8 +1829,9 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # the bowsprit's two, reeve_line, the three navigation evolutions, the two sheet trims
     # ... and the lunar (package 33b: take_lunar.yaml), the anchor's seven (package 34),
     # and the port's five (package 35: get under way, moor, unmoor, the kedge, the boat),
-    # and `heave in` (package 37f: heave_in.yaml)
-    assert "66 evolutions; the list about" in contents
+    # and `heave in` (package 37f: heave_in.yaml), and `box her off` (package 37p:
+    # box_off.yaml)
+    assert "67 evolutions; the list about" in contents
     # the ship's papers are a topic beside the ship (package 35), listed with their handles
     assert "  papers: the ship's papers, 8 aboard" in contents and "the manifest" in contents
 

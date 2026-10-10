@@ -2,7 +2,7 @@
 #
 # The general and instructive routines of a ship at sea, each with the reason it exists:
 # the night and the morning sail, shortening sail for weather, keeping her full, trimming
-# on a shift, tending the sheets, heavy weather and the storm staysail, and the well. It is
+# on a shift, tending the sheets, heavy weather and the storm staysails, and the well. It is
 # a choice, never a requirement for beginning (the owner's ruling at gate 5b): a game
 # begins with an empty book unless its scenario names this file (the gates' days and
 # passages do) or the player asks for it, and a passage's own orders are in the
@@ -88,15 +88,16 @@ standing order "trim on a shift": when the true wind veers 1 point or backs 1 po
 standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
 
 # Heavy weather. Forty knots is a gale (units.describe_wind_strength); in 45 knots the
-# storm canvas of truth 28 has the topgallant masts sent down, the storm staysails bent and
+# storm canvas of truth 28 has the topgallant masts sent down, the storm staysails set and
 # the topsails close-reefed, and nothing carries away in an hour. Five minutes is the
-# duration that tells a gale from a squall (spec §3; judgement). The fore storm staysail
-# sets on the fore stay beside the fore topmast staysail's (Luce 1884 ch. XXIX 'Reducing
-# Sail to a Gale'), so it is bent from the sail room and set as a sail of its own; the
-# setting waits for the bending in the companion order below. In a gale that rises faster
-# than the head sails are shortened the fore topmast staysail may have blown out before
-# this fires (it goes at about 43 knots under plain sail on a wind); the order is then
-# refused in words and the rest go on.
+# duration that tells a gale from a squall (spec §3; judgement). The storm staysails are
+# set by their own order (package 37p, `set the storm staysails`): each is bent from the
+# sail room where it is not bent, set as soon as it is, and the head sails and the spanker
+# it replaces are taken in when it is set ("To set fore-storm staysail, and haul down fore
+# topmast staysail", Luce 1884, ch. XXIX, p. 477), so that she is never left with nothing
+# forward while the hands rouse it up. `shorten sail` (the book's thirty knots, above) has
+# taken the jib in already if its load came near its rating, and set the storm staysails
+# if the fore topmast staysail's did.
 # The order of the clauses is the order of the work (package 31b, from playtest 11's
 # finding 10): the hands go to the first clause first, and the rest get what is left and
 # what comes free. The close reef leads: the three topsails are reefed together by three
@@ -110,14 +111,12 @@ standing order "tend the sheets": every glass, if the manoeuvre in hand is not h
 standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes
     then close reef the topsails;
     send down the topgallant masts;
-    take in the fore topmast staysail;
-    bend the fore storm staysail
+    set the storm staysails
 
-# The storm staysail, set when it is bent: a standing order may test a sail's state, and
-# "bent and furled" is what the bending leaves. Edge-triggered, so it fires once as the
-# sail comes to be furled with the gale still blowing.
-standing order "storm staysail": when the fore storm staysail is furled and the true wind exceeds 40 knots
-    then set the fore storm staysail
+# Lying to is the captain's to order (`lie a-try`, under the close-reefed main topsail and
+# the storm staysails, Luce 1884 ch. XXIX: "The ship is now 'lying to' under close-reefed
+# main topsail, fore storm staysail"; or `heave to`); the book does not heave her to, since
+# whether she has the sea room for it is his judgement.
 
 # Sounding the well every glass is the pump routine of Luce's day ("Pump the ship out",
 # Luce 1866, ch. XXXII, daily routine at sea, morning watch art. III and dog watch art.

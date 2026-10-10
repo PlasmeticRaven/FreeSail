@@ -142,7 +142,7 @@ def test_truth_39_a_passage_under_the_starter_routines_replays_with_the_same_fir
     ], "trim every ten minutes from 19:45; the night routine at sunset, 19:59; the sheets at 20:15"
     assert [e.tick for e in original.log if e.kind == "sun.set"] == [1742]
     assert all(not a.startswith("standing order") for _, a, _ in original.journal)
-    assert sum(1 for _, _, t in original.journal if t.startswith("standing order")) == 9
+    assert sum(1 for _, _, t in original.journal if t.startswith("standing order")) == 8
     assert "order.rejected" not in {e.kind for e in original.log}
     path = replay.save_to_file(original, tmp_path / "standing.json")
     data = replay.load_file(path)
@@ -153,8 +153,7 @@ def test_truth_39_a_passage_under_the_starter_routines_replays_with_the_same_fir
         "keep her full",
         "trim on a shift",
         "tend the sheets",
-        "heavy weather",
-        "storm staysail",
+        "heavy weather",  # package 37p: it sets the storm staysails itself
         "trim",
     ]
     assert data["scenario"]["latitude_deg"] == 50.0

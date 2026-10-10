@@ -79,11 +79,38 @@ brace the head yards sharp aback
 
 Note that the order names one sail but the whole mast's yards come round together. That is the period sense of "back the main topsail": a single yard braced against the yards above and below it would foul their sails, so the main yards are laid aback as a set and the sails on them go to the mast. With the main aback and nothing else done she loses her way and rounds up with the helm hard over; to stop her properly, `heave to` (chapter 5) also hauls up the course and puts the helm a-lee. To fill again, `brace the main yards full` for the tack she is on. The refusals: "Back what? Name a yard or a square sail, such as the main topsail"; the spanker "is a gaff sail; it has no yard to brace."
 
-### How sharp, and which yards sharper
+### How sharp, and which yards sharper: three levels of bracing
 
-Luce's rule for a stiff breeze is to brace the lower yards up sharp and trim each yard above by the one below, "with the weather yard arm about a half point abaft the lower yard", because the upper sails are flatter and the lighter yards need the support; in light airs with smooth water "the yards of no ship can lie braced up too sharp"; with the wind abaft the beam the after yards should be braced sharper than the head yards so that the wind fills the forward sails (Luce 1866, ch. XXIV Working to Windward, 'To Trim Yards', and the 'Table of best angles of yard with keel'). Lever adds that in practice the yard is braced up sharper than the six-point geometry needs, "to make the Sail stand to the most advantage" (Lever, figure 397).
+Luce's rule for a stiff breeze is to brace the lower yards up sharp and trim each yard above by the one below, "with the weather yard arm about a half point abaft the lower yard, and the top-gallant trimmed by the topsail yard in the same way, and so on", and his footnote gives the reasons: "The upper yards should be braced in more than the lower, first, because the larger sail having greater curvature than the smaller must have its yard braced up to a sharper angle, that the plane of both may have the same angle with the keel; second, because the upper portion of the sail being attached to the yard approaches nearer to a plane than the lower part which bellies out ...; and thirdly, the lighter yards and braces require a greater angle for their support. Further, the upper yards being in, when the main royal is just lifting all the other sails are a 'clean full and by,' which makes it a good sail to steer by." In light airs with smooth water "the upper yards may be braced over the lower, and all got as nearly fore and aft as they will go" (Luce 1884, ch. XXIV, 'To Trim Yards', p. 418). Lever adds that in practice the yard is braced up sharper than the six-point geometry needs, "to make the Sail stand to the most advantage" (Lever, figure 397).
 
-What the game does: each yard has its own limit in the ship file, from Fincham's measured angles, the upper yards a few degrees *sharper* than the lower, not less; `brace sharp up` takes every yard to its own limit, and on a wind the after yards stand sharper than the head yards (*Pointing*, below). The steering advantage Luce describes, upper yards a little in so that the royal lifts first and "all the other sails are a clean full and by", is not modelled. A player who wants Luce's trim can brace mast by mast (`brace the fore yards sharp up`, then haul a weather topgallant brace a little), but nothing in the physics yet rewards it.
+The game has three levels of it (package 37p):
+
+- **`brace sharp up`**: every yard as sharp as its rigging allows, the upper yards then two degrees sharper than the lower, each at its own limit from the ship file (*Pointing*, below). It is for the evolutions, which brace up so, and for pointing her as high as she will go.
+- **`trim sails`** (and `trim the yards`): the period's trim, the default the books use. On a wind the lowest yard of each mast is braced up to its limit and each level above it braced in from the one below, two degrees a level, the after yards then braced sharper than the head yards of their level as before. Two degrees is the model's step, not Luce's half point: his steps stand on a main yard at Fincham's 19¼° from the keel, where the game's lower yards brace to 26° to 28°, and half a point a level put the topgallant four points and a half from the keel and the frigate more than eight points from the wind full and by. Two degrees is the least that has the highest sail lift first, by a degree and a half against the wind's freeing aloft, and the others stand a clean full when the helmsman keeps her by it (chapter 2): the frigate under plain sail in fifteen knots then lies six points from the wind at five knots. In heavy weather, with a topsail at its third reef, the lowest yards are eased a point (Luce 1884, ch. XXIX, at the third reef: "observing not to brace the topsail or lower yards too sharp"; the point is the game's judgement), and she lies further off the wind under her reefed topsails than under plain sail.
+- **The yards by hand**, in the deck's words: `brace the fore yards in a point` and `brace the main yards up half a point` are reckoned from where the yards stand; `brace the yards to four points` braces them so many points from the keel, the weather yardarms forward, for the tack she is on (or the one you say); `brace the mizzen yards about` braces them to the same angle on the other side; `square the fore yards` as before. A mast's yards or all of them; points and halves, never degrees, though the log says the angle in brackets as the helm's lines do. Given, the yards stay as given until the next trim or brace: in a fluky wind a captain sets them and lets them take the wind as they may, and the log says when a sail on them shivers and when it fills again.
+
+```orders frigate plain-sail
+trim sails
+brace sharp up
+brace the fore yards in a point
+brace the main yards up half a point
+brace the yards to four points
+brace the yards to six points on the larboard tack
+brace the mizzen yards about
+brace the head yards in two points
+square the fore yards
+# rejected: brace the yards sharp up a point
+```
+
+```
+  Forenoon watch (09:10)  Braced the fore yards in a point, to three points and a half from the keel (39°).
+  Forenoon watch (09:11)  The fore topsail shivers in the wind.
+  Forenoon watch (09:11)  The foresail shivers in the wind.
+  Forenoon watch (09:16)  Braced the yards to four points from the keel (45°).
+  Forenoon watch (09:20)  The fore topsail fills.
+```
+
+"Brace them in or up so many points ('brace the fore yards in a point'), or to so many points from the keel ('brace the yards to four points')" is the refusal of a count with another word.
 
 ### Hauling on a single brace
 
@@ -202,7 +229,7 @@ tend the sheets
 
 ## The `trim` order
 
-Package 13 adds the order the owner reached for at the gate. It braces every yard that has sail set to the best angle for the present apparent wind, each as its own `brace` evolution, the after yards a little sharper than the head yards on a wind (*Pointing*, below), and works every fore-and-aft sheet that is off its trim, each as its own sheet evolution:
+Package 13 adds the order the owner reached for at the gate. It braces every yard that has sail set to the best angle for the present apparent wind, each as its own `brace` evolution; on a wind it is the period's trim of the section above, each level braced in from the one below and the after yards a little sharper than the head yards (*Pointing*, below); and it works every fore-and-aft sheet that is off its trim, each as its own sheet evolution:
 
 ```orders frigate plain-sail
 trim the yards
@@ -317,7 +344,7 @@ The refusal: "The catharpins on the fore mast are not swiftered in." The gain is
 
 ### Full and by, and not pinched
 
-"Full and by" is sailing as close as the sails will stand full, and no closer. Seamen braced as sharp as they could and kept one point of the sail lifting, which Fincham allows only with five or six knots of way; with less, keep them full (Fincham 1843, art. 99). The game has the reason in it: in a light breeze of 8 knots the frigate at six points makes three knots and 0.9 of a knot good to windward over the ground; pinched to five points she makes a knot and three quarters, her leeway doubles, and she makes 0.75 good. **Keep her full** (*full and by*, *nothing off*) puts the helmsman to steering by the sails instead of the compass, as full as they stand plus a little; in a light wind that is fuller than six points, so a sailing master steering for windward in light airs gives a course.
+"Full and by" is sailing as close as the sails will stand full, and no closer. Seamen braced as sharp as they could and kept one point of the sail lifting, which Fincham allows only with five or six knots of way; with less, keep them full (Fincham 1843, art. 99). The helmsman's mark is the highest sail set, trimmed by `trim sails` to lift first (chapter 2). The game has the reason in it: in a light breeze of 8 knots the frigate at six points makes three knots and 0.9 of a knot good to windward over the ground; pinched to five points she makes a knot and three quarters, her leeway doubles, and she makes 0.75 good. **Keep her full** (*full and by*, *nothing off*) puts the helmsman to steering by the sails instead of the compass, as full as they stand plus a little; in a light wind that is fuller than six points, so a sailing master steering for windward in light airs gives a course.
 
 ```orders frigate plain-sail
 keep her full

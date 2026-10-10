@@ -204,12 +204,18 @@ def test_a_sail_shaking_and_aback_read_from_the_physics(world: World):
     # its sheets on what is now the weather side; before, the free tending flattened her
     # sheets as she came up and she stalled at some thirty-four degrees apparent with her
     # fore-and-aft canvas still drawing (the docstring of sails.py then)
+    # (package 37p: read as she comes to the wind, before the sternway she gathers there
+    # pays her head off again, `hull.sternway_yaw`)
     world.submit("trim sails")
     world.run(150)
     world.submit("steer north")
-    world.run(600)
-    awa = units.rad_to_deg(abs(ship.dyn.apparent_wind_angle))
-    assert awa < (45 if ship.spec.rig == "topsail-schooner" else 25), awa
+    limit = 45 if ship.spec.rig == "topsail-schooner" else 25
+    for _ in range(40):
+        world.run(15)
+        awa = units.rad_to_deg(abs(ship.dyn.apparent_wind_angle))
+        if awa < limit:
+            break
+    assert awa < limit, awa
     for s in ship.sails.values():
         if not s.is_set:
             continue

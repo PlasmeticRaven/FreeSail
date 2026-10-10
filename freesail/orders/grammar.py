@@ -76,6 +76,8 @@ class Order:
 
     Modifier keys that may appear:
       brace_mode   "sharp up" | "up" | "in" | "square" | "by the lifts" | "aback" | "to the wind"
+                   | "about"
+      brace_to     float, points from the keel      "brace the yards to four points"
       round        True                             "brace round" with no mode said
       tack         "starboard" | "larboard"        from "on the X tack"
       reefs        int                              "two reefs"
@@ -689,6 +691,19 @@ def _parse_modifiers(
             side = "both"
             i += len(bs.split())
             continue
+
+        # "to four points" (package 37p): the yards braced to so many points from the keel,
+        # the weather yardarms forward; the deck's measure, never degrees at the prompt
+        if w == "to" and i + 1 < n:
+            counted_to = _count_at(words, i + 1, vocab)
+            if counted_to is not None:
+                c_to, used_to = counted_to
+                at = i + 1 + used_to
+                if c_to is not None and at < n and words[at] in ("point", "points"):
+                    half = _and_a_half(words, at + 1)
+                    mods["brace_to"] = c_to + 0.5 * bool(half)
+                    i = at + 1 + half
+                    continue
 
         # brace modes
         bm = _longest_at(words, i, vocab.brace_modes)

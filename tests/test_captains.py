@@ -122,6 +122,7 @@ def test_every_book_line_of_every_doctrine_parses_in_the_dialect_on_every_ship()
     for ship in SHIPS:
         w = world_at(49.8, -5.2, ship)
         fills["light_sail"] = w.captain._light_sail()
+        fills["storm_topsail"] = w.captain._storm_topsail()
         for role in C.ROLES:
             d = C.load_doctrine(role)
             fills.update(d.thresholds)

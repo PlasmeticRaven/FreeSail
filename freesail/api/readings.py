@@ -1345,6 +1345,7 @@ MANOEUVRE_WORDS: dict[str, str] = {
     "lie_a_try": "heaving to",
     "fill_away": "filling away",
     "boxhaul": "box hauling",
+    "box_off": "boxing off",
     "wear_short_round": "wearing short round",
     "back_and_fill": "backing and filling",
     "scud": "bearing up to scud",

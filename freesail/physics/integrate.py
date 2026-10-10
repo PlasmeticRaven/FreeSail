@@ -123,6 +123,12 @@ def _substep(
         side_n += cable_stb
         yaw_moment_nm += cable_yaw
 
+    # with sternway the keel's grip acts near the stern, and the sails' side force swings
+    # her head off (package 37p, `hull.sternway_yaw`); nothing going ahead, and not at
+    # anchor, where the cable holds her head (`physics/anchor.py`, tuned without it)
+    if d.u < 0.0 and not st.aground and not st.at_anchor:
+        yaw_moment_nm += hp.sternway_yaw(hull, d.u, d.v)
+
     # Body-axis kinematics: as the bow swings, the water the ship is moving
     # through does not swing with it (the m v r and -m u r terms, with the
     # ship's own mass m, not the water she carries along).
@@ -174,9 +180,18 @@ def _note_lifting(ship: Ship, st: hp.HullState, dt: float, standing: bool) -> No
     stood full `LIFT_REARM_S` together; and it is a line that speaks of danger, which wakes
     a station standing by with the deck, so that the cry of "Taken aback" comes after a
     warning whenever the wind heads her by degrees (the review's G6: eight urgent cries in
-    game 10, no warning before any)."""
+    game 10, no warning before any).
+
+    Package 37p: in a ship or a brig the angle is the lower sails' (`helm_rest`, the first
+    of them to lift, the mainsail's weather leech first, Luce 1866, ch. XXIV), not the
+    highest sail's, which the helmsman keeps just lifting full and by on purpose (his mark,
+    `hull.full_and_by_angle`). Full and by, the lift of the lower sails is his warning that
+    she is too near, and he keeps her away himself with a small helm: the line is then
+    "Kept her away, the main course lifting, ...", once an episode. Steering a course by
+    compass, where the helm does not act, the warning to the captain stands as it was."""
     d = ship.dyn
-    luff = ship.extra.get("luff_angle")
+    rest = ship.extra.get("helm_rest")
+    luff = rest if isinstance(rest, int | float) else ship.extra.get("luff_angle")
     lifting = (
         standing
         and isinstance(luff, int | float)
@@ -199,13 +214,76 @@ def _note_lifting(ship: Ship, st: hp.HullState, dt: float, standing: bool) -> No
     st.lifting_noted = True
     side = "starboard" if st.awa >= 0 else "larboard"
     deg = int(round(units.rad_to_deg(abs(st.awa))))
+    data = {"awa": st.awa, "luff_angle": float(luff), "aws": st.aws, "speed": d.speed}
+    sail = ship.extra.get("helm_rest_sail") if isinstance(rest, int | float) else None
+    if d.helm_mode is HelmMode.FULL_AND_BY:
+        what = f", the {_sail_words(ship, sail)} lifting" if isinstance(sail, str) else ""
+        ship.note(
+            "routine",
+            "helm.kept_away",
+            f"Kept her away{what}, the wind {deg}° on the {side} bow.",
+            data={**data, "sail": sail},
+        )
+        return
     ship.note(
         "notable",
         "ship.lifting",
         f"Her sails lifting, the wind {deg}° on the {side} bow: keep her away, or she will "
         "be taken aback.",
-        data={"awa": st.awa, "luff_angle": float(luff), "aws": st.aws, "speed": d.speed},
+        data=data,
     )
+
+
+def _note_yards_by_hand(ship: Ship, st: hp.HullState, dt: float) -> None:
+    """The sails on yards braced by hand (package 37p, `orders.verbs`'s `yards_by_hand`):
+    left to take the wind as they may, the log says when one shivers and when it fills
+    again, each said after `LIFT_SAY_S` in its new state (a sail taken aback, and filled
+    again, is the sail's own line, `sails._record_backed`). Nothing on the first sight of
+    a sail, and nothing once its yard is braced or trimmed another way."""
+    full = ship.extra.get("by_hand_full")
+    memo = st.extra.setdefault("by_hand", {})
+    if not full:
+        memo.clear()
+        return
+    for sid in [k for k in memo if k not in full]:
+        del memo[sid]
+    for sid, margin in full.items():
+        sail = ship.sails.get(sid)
+        if sail is None:
+            continue
+        now = "aback" if sail.backed else ("shivers" if margin < 0.0 else "full")
+        rec = memo.get(sid)
+        if rec is None:
+            memo[sid] = {"said": now, "cand": now, "t": 0.0}
+            continue
+        if now == rec["said"]:
+            rec["cand"], rec["t"] = now, 0.0
+            continue
+        if now != rec["cand"]:
+            rec["cand"], rec["t"] = now, 0.0
+        rec["t"] += dt
+        if rec["t"] < hp.LIFT_SAY_S:
+            continue
+        name = _sail_words(ship, sid)
+        if now == "shivers":
+            text = f"The {name} shivers in the wind."
+        elif now == "full" and rec["said"] == "shivers":
+            text = f"The {name} fills."
+        else:
+            text = ""
+        rec["said"] = now
+        if text:
+            kind = "sail.shivers" if now == "shivers" else "sail.fills"
+            ship.note("routine", kind, text, sid, {"sail": sid, "margin": margin})
+
+
+def _sail_words(ship: Ship, sail_id: str) -> str:
+    """A sail's name for the log: the ship file's first plain alias ('mainsail'), or its
+    id in words ('main course')."""
+    for alias, target in ship.aliases.items():
+        if target == sail_id and not alias.startswith("the "):
+            return alias
+    return sail_id.replace("_", " ").replace(".", " ")
 
 
 def _rate(opposing_force: float, speed: float) -> float:
@@ -294,6 +372,8 @@ def _log_notes(ship: Ship, st: hp.HullState, dt: float) -> None:
         bool(runner) and any(e.get("subject") in ("ship", ship.name) for e in runner.in_progress())
     )
     _note_lifting(ship, st, dt, sail_set and not in_stays)
+    if "by_hand_full" in ship.extra or st.extra.get("by_hand"):
+        _note_yards_by_hand(ship, st, dt)
     # A new episode is logged only after a minute clear of the last (package 37c), and the
     # line is urgent only when she had way to lose in a working breeze, free of the anchor
     # and the ground; otherwise it is a notable line saying why it matters less.

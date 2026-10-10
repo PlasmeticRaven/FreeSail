@@ -51,6 +51,26 @@ C_LAT_LIFT = 1.0  # keel lift per radian of leeway at speed (u v); the keel's "g
 # the circle truth 16 measured (5.1 lengths at 8 knots) and every hull turns in a circle
 # that scales with her length. Judgement: no period source gives a sailing ship's yaw
 # damping; the form is the textbook's, the size fitted to the frigate's band.
+# Where the keel's lift acts when she makes sternway (package 37p, `sternway_yaw`): a
+# quarter of her length abaft amidships, the quarter-chord from the leading edge, which
+# going astern is the stern. The quarter-chord is the lifting surface's (a low-aspect
+# plate's centre of pressure lies near it); judgement, as no period source measures it.
+STERNWAY_LIFT_AFT_FRACTION = 0.25
+# The yaw fades in between these speeds astern (judgement, package 37p). At full strength
+# from the first inch of sternway it turned the manoeuvres earlier packages tuned without
+# it: the frigate getting under way from rest with her yards square (truth 17) gathered
+# half a knot astern, paid off fifty degrees before her sail was set, came back up with
+# too little way and was taken aback, as was the readings' frigate; the schooner's head
+# took twice the minute to pass the wind in stays (test_staying), the cutter lay fifty
+# degrees across the wind at her anchor in the road. The cause is not the yaw but the
+# model's ship griping up with no way on her (the sails' centre of effort abaft the
+# lateral plane's, which the rudder cannot answer under a knot); the yaw then held her in
+# the cycle of luffing, sternway and falling off. From a knot astern, where a ship taken
+# aback in a breeze is going, it acts, whole from two: lying a-try in forty-five knots
+# (truth 28) she goes astern at 1.6 knots on the hour's mean with it faded so, 1.57
+# whole, and 4.4 without it (TuningNotes, package 37p).
+STERNWAY_YAW_FROM_KN = 1.0
+STERNWAY_YAW_WHOLE_KN = 2.0
 C_YAW = 0.048  # quadratic yaw damping, per (A L^3 r |r|): the plane's cross-flow drag
 C_YAW_LIN = 0.06  # linear yaw damping, per (A L^2 u r): a moving hull resists swinging
 # The rudder's lift slope (per radian of helm) from the blade's aspect ratio, span^2 over
@@ -90,6 +110,20 @@ HELM_STUCK_RATE = math.radians(
 )  # rad/s; swinging slower than this, he learns the helm she carries
 FULL_AND_BY_MARGIN = math.radians(8.0)  # sailed this much fuller than the sails' luffing angle
 FULL_AND_BY_DEFAULT_LUFF = math.radians(45.0)  # luffing angle when package 4 has not said
+# Full and by in a ship or a brig (package 37p): the helmsman keeps the highest sail set
+# "just lifting" (Luce 1884, ch. XXIV, p. 418n), this much fuller than the angle at which
+# the model's sail begins to luff. The rest stand fuller by the trim's steps between the
+# levels (`evolutions/trim.py`, `UPPER_YARDS_IN_DEG`), so the margin of the mean
+# (`FULL_AND_BY_MARGIN`) is not wanted. Judgement, tuned once with the step: two degrees,
+# the mark trembling and not shaking whole; at five the frigate lay 75° from the wind under
+# plain sail and made a sixth less to windward (TuningNotes, package 37p).
+MARK_MARGIN = math.radians(2.0)
+# And fuller as she loses way (`full_for_way`): two points fuller with no way at all, none
+# with four knots of headway (or a fifth of the apparent wind's knots, in a light air).
+# Judgement: four knots is a frigate's way close-hauled under her reefed topsails in a
+# gale; two points brings her from the mark to where the trials' rig drove ahead again.
+WAY_KEEP_KN = 4.0
+FULL_FOR_WAY = math.radians(22.5)
 WEATHER_HELM_TIME_CONSTANT = 30.0  # seconds; the weather-helm reading averages the rudder
 STEADY_TOLERANCE = math.radians(2.0)  # within this of the ordered heading counts as on it
 STEADY_SECONDS = 20.0  # for this long before the log says "steady"
@@ -235,6 +269,34 @@ def sway_damping(hull: Hull, u: float, v: float) -> float:
     return -q_area * (C_LAT * v * abs(v) + C_LAT_LIFT * abs(u) * v)
 
 
+def sternway_yaw(hull: Hull, u: float, v: float) -> float:
+    """The keel's grip turning her when she makes sternway, in newton-metres (package
+    37p; the captain's trials, the gale: a frigate taken aback lay head to wind going
+    astern at eight knots for an hour and a half, the yaw she should have had from it
+    missing).
+
+    The keel's lift against her drift (`sway_damping`'s `u v` part) acts near the
+    leading edge of the lateral plane, as a lifting surface's does. Going ahead the
+    model has it at the centre of lateral resistance, where package 10 tuned the helm and
+    the turning circle, and nothing ahead changes. Going astern the leading edge is the
+    stern: the grip acts `STERNWAY_LIFT_AFT_FRACTION` of her length abaft amidships, and
+    the sails' side force, which her drift answers, swings her head off to leeward. That
+    is why a ship taken aback with sternway falls off (Luce 1866, ch. XXV, 'To Chapel
+    Ship': "the moment she gets sternboard, shift the helm, and she will fall off
+    briskly"), and why one lying to with sternway falls off into the trough until her
+    sails take her ahead again (truth 28). Nothing going ahead, and nothing under a knot
+    astern, faded in to two (`STERNWAY_YAW_FROM_KN`)."""
+    astern = units.ms_to_knots(-u)
+    if astern <= STERNWAY_YAW_FROM_KN:
+        return 0.0
+    span = STERNWAY_YAW_WHOLE_KN - STERNWAY_YAW_FROM_KN
+    fade = min(1.0, (astern - STERNWAY_YAW_FROM_KN) / span)
+    q_area = 0.5 * units.RHO_WATER * hull.lateral_area
+    lift = -q_area * C_LAT_LIFT * abs(u) * v
+    lever = -STERNWAY_LIFT_AFT_FRACTION * hull.length - hull.spec.clr_x_m
+    return fade * lift * lever
+
+
 def yaw_damping(hull: Hull, u: float, r: float) -> float:
     """The water's resistance to the hull swinging, in newton-metres, opposing `r`.
 
@@ -354,11 +416,61 @@ def heading_error(ship: Ship, st: HullState) -> float | None:
     if d.helm_mode is HelmMode.HEADING:
         return units.wrap_pi(d.target_heading - d.heading)
     if d.helm_mode is HelmMode.FULL_AND_BY:
-        luff = ship.extra.get("luff_angle")
-        wanted = luff if isinstance(luff, int | float) else FULL_AND_BY_DEFAULT_LUFF
-        wanted += FULL_AND_BY_MARGIN
+        wanted = full_and_by_angle(ship)
         return st.awa - math.copysign(wanted, st.awa if st.awa != 0 else 1.0)
     return None
+
+
+def full_and_by_angle(ship: Ship) -> float:
+    """The apparent wind the helmsman keeps her at, full and by (radians).
+
+    A ship or a brig (package 37p): the highest square sail set is his mark (Luce 1884,
+    ch. XXIV, p. 418n), and he keeps her so that it is just lifting and the rest full: the
+    angle at which the mark lifts, or the first of the rest if a lower sail would lift
+    before it (yards braced sharp up, where the upper yards stand sharper than the lower),
+    and `MARK_MARGIN` fuller. After a change of sail the
+    mark is the new highest sail at the next substep: the angle is found again from it.
+    When the mark is a reefed topsail she is never brought up nearer than the old rule's
+    angle (the brief's "under reefed topsails ... never brought up to the old angle",
+    which took the frigate aback in the captain's trials; the heavy-weather trim, which
+    eases the lower yards a point, puts the mark there or a little wider); nor when the
+    mark's level is the only square sail set (`helm_mark_alone`, the topsails alone),
+    where the rest are not the fuller for it and a mark kept lifting starves her: leaving
+    Falmouth under her topsails and jib in twelve knots the frigate made 2.1 knots so, 3.6
+    by the old rule, and the pilot's boat never came off for him (tests/test_ports.py).
+    Luce's "Keep her a good full!" (1884, ch. XXIV, p. 414).
+    A fore-and-after, or a ship with no square sail drawing: the area-weighted mean of
+    her sails' luffing angles (package 4) and the margin, as before."""
+    luff = ship.extra.get("luff_angle")
+    old = (luff if isinstance(luff, int | float) else FULL_AND_BY_DEFAULT_LUFF) + (
+        FULL_AND_BY_MARGIN
+    )
+    mark = ship.extra.get("helm_mark")
+    if isinstance(mark, int | float):
+        rest = ship.extra.get("helm_rest")
+        lifts = max(mark, rest) if isinstance(rest, int | float) else mark
+        wanted = lifts + MARK_MARGIN
+        sail = ship.sails.get(str(ship.extra.get("helm_mark_sail")))
+        if (sail is not None and sail.reefs > 0) or ship.extra.get("helm_mark_alone"):
+            wanted = max(wanted, old)
+        return wanted + full_for_way(ship)
+    return old
+
+
+def full_for_way(ship: Ship) -> float:
+    """How much fuller than the mark the helmsman keeps a ship or a brig that is losing
+    her way (package 37p), radians: none with `WAY_KEEP_KN` of headway, or a fifth of the
+    apparent wind's knots where that is less; `FULL_FOR_WAY` with none. Luce's "Keep her a
+    good full!" (1884, ch. XXIV, p. 414): in the captain's trials' gale, under the
+    reefed topsails and the courses, the rig's windage outweighed the sails' drive within
+    a few degrees of the mark, and a helmsman holding her at the mark let her lose her
+    way, come to and be taken aback every four minutes."""
+    knots = units.ms_to_knots(ship.dyn.u)
+    aws = units.ms_to_knots(ship.dyn.apparent_wind_speed)
+    keep = min(WAY_KEEP_KN, aws / 5.0)
+    if keep <= 0.0 or knots >= keep:
+        return 0.0
+    return FULL_FOR_WAY * min(1.0, (keep - knots) / keep)
 
 
 def steer(ship: Ship, dt: float) -> float:
@@ -399,6 +511,14 @@ def steer(ship: Ship, dt: float) -> float:
             # helmsman shifts the helm (and forgets the standing helm meanwhile)
             st.helm_integral = 0.0
             wanted = -(HELM_KP * err - HELM_KD * d.r)
+            if d.helm_mode is HelmMode.FULL_AND_BY and err * st.awa < 0.0:
+                # full and by with sternway and her head too near the wind: the helm
+                # shifted hard over, and she falls off (package 37p; Luce 1866, ch. XXV,
+                # 'To Chapel Ship': "the moment she gets sternboard, shift the helm, and
+                # she will fall off briskly"). Her apparent wind, freed by the sternway,
+                # reads fuller than her head lies, so the helm by the error alone was a
+                # few degrees and held her head to the wind for hours in the trials.
+                wanted = math.copysign(max_angle, -err)
         wanted = max(-max_angle, min(max_angle, wanted))
     rate = units.deg_to_rad(spec.rate_deg_s) * dt
     move = max(-rate, min(rate, wanted - d.rudder))
