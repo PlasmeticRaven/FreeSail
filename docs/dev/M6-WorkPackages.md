@@ -648,9 +648,25 @@ owner's wardroom game is gate 6b's.
    and §16 as built; the tuning notes with the constants, the pace measured, what was
    found and the suite as run.
 
+**Added at launch (the owner, 2026-10-10).** Stations are data on the ship, bound at run
+time, never a table in code: the set of stations and the person holding each live on the
+world as a binding (the wardroom file's `stations:` its starting state), with bind and
+unbind as the two operations the harness uses and a world order will drive later (M7b's
+director: `person: "Mr Fox" comes aboard as master`, on the `person:` channel; the road
+aboard the boat we have); a station unbound under a seated model releases it with a line;
+a person's brief is built from the person's outline, so a person made from words later
+carries what a brief needs. And a generic **passenger** station ("a person aboard", the
+owner's word): no domain of orders, the readings and the journal, `say`, `ask` and
+leaving; held by a person of the muster or one who comes aboard, so that a model or the
+player may be aboard with no duty and a person brought aboard later has a station to
+stand in; the consent brief covers it in kind already. Tests: a station bound to a new
+person at run time taken by a door; one unbound under a seated fake released with its
+line; a passenger hearing a `say` on the quarterdeck and giving no order.
+
 Not this package's: the API door and its security pass, and the transcript-driven replay
 (42); the consent brief and the re-asks (42a, the owner's); a model captain of another
-ship (43). Work it like a senior engineer and go beyond the letter where it fits the
+ship (43); making a person from words and the story's reasons (the director's, M7b). Work
+it like a senior engineer and go beyond the letter where it fits the
 intent (the owner's standing word for the Fable packages), saying where. The fast tier
 before the report; the slow tests of the files touched; the pace truth measured on the
 build machine with the load said.
