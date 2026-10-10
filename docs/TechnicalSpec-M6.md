@@ -682,6 +682,29 @@ same station on another hull. Package 42 and the 6c packages then change no sect
 rule watches, and a test pins the watched sections' text so that a later package cannot
 change one without a decision.
 
+**As built (package 42a, 2026-10-09).** `docs/agents/ConsentBrief.md` is package 40's
+draft to the character, its markers removed, with the additions for 6b and 6c in the
+same sections: the opening names the lookout (reports what is seen) and the master (works
+the ship's reckoning), the captain as of the player's ship or another in the same world,
+says which exist today and which are to come (the lookout, the master, a captain of
+another ship, stations speaking to one another, an API door, "described now so that an
+answer covers them"), and puts the owner at the door whatever the door (a chat client, a
+model server, or a model's own API called by the game with no chat client between), who
+may hold no station; *What an instance would see and do* says the lookout and the master
+give no order of the deck, that a captain of another ship keeps the station when she is far
+from the player's, working her by courses, sail and the plan of her passage, and that
+several stations held at once speak as a ship's people do, another station's words lines of
+the game under the speaker's name and never the operator's; *Being stopped* that a paused
+or silent lookout or master has its work done by the ship's own people; *What is not done*
+that an API door's key is the developer's and in nothing the game sends, writes or saves,
+and that a saved game may be replayed from its record, each instance's acts given again as
+the game's inputs with no model asked. *The record* and *Answering* are unchanged. Against
+the brief of 2026-10-07 (kept as `tests/fixtures/ConsentBrief-before-42a.md`, `-text`) the
+rule names all six watched sections, for every yes on record (`tests/test_officer.py`); the
+brief's digest is `d096d22a5842772f`, and the six sections' digests are pinned
+(`WATCHED_SECTION_DIGESTS`). 1,958 words below the rule against 1,371 (the draft, 1,708).
+No model was seated and no re-ask run.
+
 ### 16. Truths for 6b (behavioural)
 
 82. Two fake stations on one ship through two in-process doors, captain and officer, play
