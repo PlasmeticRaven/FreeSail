@@ -96,7 +96,7 @@ from pathlib import Path
 from typing import Any
 
 from freesail.agents import local
-from freesail.agents.agent import CAPTAIN, OFFICER, TURN_ENDS_WORDS, station_name
+from freesail.agents.agent import CADENCES, TURN_ENDS_WORDS, station_name
 from freesail.agents.harness import conversation_text
 from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError
@@ -981,7 +981,13 @@ def main(
     ap.add_argument("--max-reply", type=int, default=REPLY_MAX_TOKENS)
     ap.add_argument("--request-timeout", type=float, default=REQUEST_TIMEOUT_S)
     ap.add_argument("--ctx", type=int, default=None, help="the context (OpenRouter's dialect)")
-    ap.add_argument("--station", default="watcher", choices=["watcher", "officer", "captain"])
+    ap.add_argument(
+        "--station",
+        default="watcher",
+        help="the station asked for, by its name aboard (the watcher, officer, captain, master, "
+        "lookout or a passenger; package 41): the game refuses in words one the ship has not got",
+    )
+    ap.add_argument("--cadence", choices=list(CADENCES), default=None, help="the seating's cadence")
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true")
     ap.add_argument("--handover-reserve", type=local.reserve_form, action="append")
@@ -1073,7 +1079,7 @@ def main(
         return local.EXIT_UNREACHABLE
     context = model.context_size()
     reserve = local.handover_reserve_tokens(args.handover_reserve, context)
-    if context and station_name(args.station) in (OFFICER, CAPTAIN):
+    if context and station_name(args.station) not in ("watcher",):
         show(local.handover_words(args.handover_reserve, context, reserve))
     try:
         first = game.station(
@@ -1085,6 +1091,7 @@ def main(
             ask_again=args.ask_again,
             context_tokens=context,
             handover_reserve=reserve,
+            cadence=args.cadence or "",
         )
     except GameError as e:
         show(e.words)

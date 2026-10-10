@@ -368,9 +368,11 @@ def test_the_captains_station_gives_the_deck_allows_and_tells_the_officer_as_the
     world.run(EVERY)
     assert [g.verb for g in oh.grants()] == ["tack ship"]
     world.run(EVERY)
-    assert "The captain to the officer of the watch: keep her full and by" in lines(
-        world, "agent.told"
-    )
+    # a station's word carries its name and its place since package 41 (the deck's
+    # conversation): the captain's station speaks as the person who holds it
+    told = lines(world, "agent.told")
+    assert told and told[0].startswith(f"The captain ({ch.station.person}), on the quarterdeck")
+    assert told[0].endswith(", to the officer of the watch: keep her full and by")
     world.run(EVERY)
     assert not oh.agent.has_deck and not oh.agent.released
     assert ch.agent.has_deck
@@ -412,9 +414,12 @@ def test_the_doors_name_the_captains_station():
     assert CAPTAIN in STATIONS and CAPTAIN in repl.STATIONS
     for module in (mcp_server, local):
         src = Path(module.__file__).read_text(encoding="utf-8")
-        assert 'choices=["watcher", "officer", "captain"]' in src, module.__name__
+        # the stations are the World's binding since package 41 (the flag takes any name
+        # aboard), and the kinds' names are in the flag's help
+        assert "the captain" in src.split('"--station"')[1][:600], module.__name__
     assert "take_command" in Path(mcp_server.__file__).read_text(encoding="utf-8")
     assert STATIONS[CAPTAIN]().name == CAPTAIN
+    assert frigate_world().stations.factory(CAPTAIN) is STATIONS[CAPTAIN]
 
 
 def test_a_game_with_the_captain_seated_saves_and_replays_to_the_same_digest(tmp_path):
@@ -547,7 +552,9 @@ def test_the_player_seated_under_the_fake_captain_is_given_the_deck_from_the_sta
     world.run(EVERY)
     assert [g.verb for g in seat.grants()] == ["wear ship"]
     world.run(EVERY)
-    assert seat.agent.told == ["keep her full"]
+    assert seat.agent.told == [
+        f"The captain ({ch.station.person}), on the quarterdeck: keep her full"
+    ]
     assert ch.agent.has_deck  # the captain's deck is his by right, the officer's his own
     world.submit("set plain sail")
     world.run(900)

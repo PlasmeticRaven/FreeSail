@@ -253,7 +253,7 @@ def test_a_save_and_its_checkpoint_carry_the_builds_stamp(tmp_path):
     data = original.save()
     stamp = data["build"]
     assert stamp == world_mod.build_stamp() == replay.stamp_of(data)
-    assert stamp["name"] == world_mod.BUILD_NAME == "m5c-c"
+    assert stamp["name"] == world_mod.BUILD_NAME == "m6a"
     assert len(stamp["rules"]) == 16 and int(stamp["rules"], 16) >= 0
     assert data["format"] == world_mod.SAVE_FORMAT == 1
     assert data["engine"] == world_mod.ENGINE_VERSION == "0.0.1"
@@ -791,3 +791,158 @@ def test_an_act_names_none_but_the_games_own_records():
     assert acts.decode(acts.encode((grant,))) == (grant,)
     with pytest.raises(ValueError):
         acts.decode({"__class__": "os:system", "fields": {}})
+
+
+# ---------------------------------------------------------------------------
+# Package 42 on package 41's wardroom: five stations' acts, each of 41's roads by which a
+# station changes the World (a say heard, a tell, a hail, a stand-by on two conditions,
+# the master's figure adopted, a station unbound under a fake) replayed by the acts
+# ---------------------------------------------------------------------------
+
+
+def five_stations() -> World:
+    """The cutter standing ESE off the Lizard at ten past eleven, an hour: the captain's,
+    the officer's, the master's, the lookout's and a passenger's stations held by fakes in
+    lockstep. The captain gives the deck and tells the master; the officer stands by on
+    two conditions; the master works the noon and his figure is the ship's account; the
+    lookout hails from the masthead; the passenger says a word on the quarterdeck, which
+    the stations there hear; and at the end the passenger's station is unbound under its
+    fake."""
+    import datetime as dt
+
+    from freesail.agents import Fake, Harness, Reply, SamplingPolicy, call
+    from freesail.agents.agent import (
+        CAPTAIN,
+        LOOKOUT,
+        MASTER,
+        OFFICER,
+        PASSENGER,
+        STATION_FACTORIES,
+    )
+    from freesail.agents.fake import (
+        captain_of_the_ship,
+        master_of_the_reckoning,
+        passenger_aboard,
+    )
+    from freesail.api.session import make_world as make
+
+    sc = Scenario(
+        start_time=dt.datetime(1805, 6, 12, 11, 10),
+        wind_from_deg=270.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=112.0,
+        ship_speed_kn=5.0,
+        position={"lat_deg": 49.75, "lon_deg": -5.45},
+        region="channel-west",
+    )
+    world = make(7, "data/ships/cutter.yaml", sc)
+    world.record_driver("routine", "driver.book", "The book of standing orders begins empty.")
+    world.submit("steer ESE")
+    hail = Reply(calls=(call("submit_order", text="hail sail ho, two points on the lee bow"),))
+    stand_by = Reply(calls=(call("stand_by", until="eight bells, or a sail sighted"),))
+    for name, model, every in (
+        (
+            CAPTAIN,
+            captain_of_the_ship(["you have the deck", "tell the master we keep the Channel"]),
+            600,
+        ),
+        (OFFICER, Fake([stand_by], loop=True), 600),
+        (MASTER, master_of_the_reckoning(), 3600),
+        (LOOKOUT, Fake([Reply(), hail], when_done=Reply()), 600),
+        (PASSENGER, passenger_aboard(["a fine morning for it"]), 600),
+    ):
+        st = STATION_FACTORIES[name](
+            SamplingPolicy.in_lockstep(every, "notable", "urgent"), world=world
+        )
+        h = Harness(world, st, model, save=lambda w, why: None)
+        h.model_name, h.door = f"the fake {name}", "runner"
+        h.start()
+    world.run(3600)
+    world.stations.unbind(PASSENGER, "landed at Falmouth")
+    world.run(60)
+    return world
+
+
+def test_five_stations_of_the_wardroom_replay_by_their_acts_on_a_build_whose_sampling_differs(
+    monkeypatch, tmp_path
+):
+    """Each of package 41's roads by which a station changes the World is an act or an
+    input: a say heard on the quarterdeck (the line, and the hearers' state), a tell from
+    the captain's station to the master (an order), a hail from the masthead (a line), a
+    stand-by on two conditions (the state), the master's figure adopted at noon (an order,
+    the working's notice an act of its own), a station unbound under its fake (an input,
+    the stand-down inside it the station's acts). Both roads give the log that was played
+    and its journals; stamped as another build's and sampled at every other glass, the
+    acts' road gives it still."""
+    import json
+
+    from freesail.api.session import ship_factory
+
+    world = five_stations()
+    kinds = {e.kind for e in world.log}
+    assert {"agent.hail", "agent.spoke", "agent.stood_by", "agent.stopped"} <= kinds
+    adopted = [e for e in world.log if e.kind == "reckoning.own" and e.data.get("adopted")]
+    assert adopted, "the master's figure was not adopted"
+    assert any(e.data.get("heard_by") for e in world.log if e.kind == "agent.spoke")
+    assert any("binding" in i for i in world.inputs)
+    officer = world.agents["officer of the watch"]
+    assert officer.agent.stand_by is not None and officer.agent.stand_by.others
+    assert any("working_told" in e for e in world.station_acts)
+    told = [e["order"]["order"] for e in world.station_acts if "order" in e]
+    assert "tell the master we keep the Channel" in told
+    assert any(t.startswith("my reckoning is") for t in told)  # the master's figure
+    assert world.agents["passenger"].agent.released
+    data = json.loads(json.dumps(world.save()))
+    assert all(a["acts"] for a in data["agents"]) and len(data["agents"]) == 5
+    for road in (replay.BY_TRANSCRIPT, replay.BY_ACTS):
+        copy = replay.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == world.log.digest(), road
+        for name, journal in world.agent_journals.items():
+            assert copy.agent_journals[name].save() == journal.save(), (road, name)
+        assert copy.stations.names() == world.stations.names(), road
+    path = replay.save_to_file(world, tmp_path / "five.json", checkpoint=False)
+    _restamp(path, OTHER_BUILD)
+    sampled_every_other_glass(monkeypatch)
+    loaded, report = replay.load_report(path, ship_factory)
+    assert report.road == replay.BY_ACTS
+    assert loaded.log.digest() == world.log.digest()
+    other = replay.replay(replay.load_file(path), ship_factory, road=replay.BY_TRANSCRIPT)
+    assert other.log.digest() != world.log.digest()
+
+
+def test_the_players_seat_hears_a_stations_say_and_a_replay_by_the_acts_hears_it_too():
+    """The player's seat at the master's station hears the officer's say on the
+    quarterdeck: the seat's state and its journal change inside the officer's act, so the
+    seat's state is journaled with the acts (`seat_state`), and a replay by them gives the
+    seat what it heard and the journal its line."""
+    import json
+
+    from freesail.agents import Fake, Harness, Reply, SamplingPolicy, call
+    from freesail.agents.agent import OFFICER, officer
+    from freesail.agents.seat import seat_player
+    from freesail.api.session import make_world as make
+    from freesail.api.session import ship_factory
+
+    world = make(7, "data/ships/cutter.yaml", Scenario(gustiness=0.0, variability=0.0))
+    seat = seat_player(world, "master", door="console")
+    say = Reply(calls=(call("submit_order", text="say the glass is falling"),))
+    h = Harness(
+        world,
+        officer(SamplingPolicy.in_lockstep(600, "notable", "urgent"), world=world),
+        Fake([say], when_done=Reply()),
+        save=lambda w, why: None,
+    )
+    h.start()
+    world.run(700)
+    assert seat.agent.heard and "the glass is falling" in seat.agent.heard[0]
+    assert any("seat_state" in e for e in world.station_acts)
+    data = json.loads(json.dumps(world.save()))
+    for road in (replay.BY_TRANSCRIPT, replay.BY_ACTS):
+        copy = replay.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == world.log.digest(), road
+        assert copy.player_seat.agent.heard == seat.agent.heard, road
+        for name, journal in world.agent_journals.items():
+            assert copy.agent_journals[name].save() == journal.save(), (road, name)
+    assert OFFICER in world.agents

@@ -50,6 +50,7 @@ would replay by its acts without it.
 
 from __future__ import annotations
 
+import contextlib
 import dataclasses
 import functools
 import importlib
@@ -117,6 +118,21 @@ def _entry(world: Any, station: str, kind: str, payload: Any) -> None:
             kind: payload,
         }
     )
+
+
+@contextlib.contextmanager
+def aside(world: Any) -> Any:
+    """What is written meanwhile is an input's or the World's own, not a station's act
+    (a binding's line, package 41's; a harness's entry point inside it journals its own)."""
+    frames = _frames(world)
+    if frames is None:
+        yield
+        return
+    frames.append(_Frame(frames[-1].station if frames else "", False))
+    try:
+        yield
+    finally:
+        frames.pop()
 
 
 def record(world: Any, station: str, kind: str, payload: Any) -> None:
@@ -228,17 +244,30 @@ def _seated(world: Any, h: Any) -> None:
     )
 
 
+def _held(world: Any) -> list[tuple[str, Any, str]]:
+    """What has a state to journal: each recorded station's harness ("state"), and the
+    player's seat at a lesser station ("seat_state", package 41), whose state a station's
+    act may change (a say heard at the seat, a station's answer to his question)."""
+    out = [
+        (name, h, "state")
+        for name, h in list((getattr(world, "agents", None) or {}).items())
+        if getattr(h, "_acts_last", None) is not None
+    ]
+    seat = getattr(world, "player_seat", None)
+    if seat is not None and getattr(world, "station_acts", None) is not None:
+        out.append((seat.station.name, seat, "seat_state"))
+    return out
+
+
 def _sync(world: Any) -> None:
     """Each recorded station's state where it changed since it was last journaled."""
-    for name, h in list(world.agents.items()):
-        last = getattr(h, "_acts_last", None)
-        if last is None:
-            continue
+    for name, h, kind in _held(world):
+        last = getattr(h, "_acts_last", None) or {}
         now = state_of(h)
         changed = {k: v for k, v in now.items() if last.get(k, _MISSING) != v}
         if changed:
             h._acts_last = now
-            _entry(world, name, "state", encode(changed))
+            _entry(world, name, kind, encode(changed))
 
 
 def saved(world: Any) -> list[dict[str, Any]]:
@@ -246,10 +275,8 @@ def saved(world: Any) -> list[dict[str, Any]]:
     since it was last journaled (a save written in the middle of an act, as a stand-down's
     is, holds the state it saves), without journaling them twice."""
     out = [dict(e) for e in (getattr(world, "station_acts", None) or [])]
-    for name, h in list(getattr(world, "agents", {}).items()):
-        last = getattr(h, "_acts_last", None)
-        if last is None:
-            continue
+    for name, h, kind in _held(world):
+        last = getattr(h, "_acts_last", None) or {}
         now = state_of(h)
         changed = {k: v for k, v in now.items() if last.get(k, _MISSING) != v}
         if changed:
@@ -258,7 +285,7 @@ def saved(world: Any) -> list[dict[str, Any]]:
                     "tick": world.clock.tick,
                     "after_inputs": len(world.inputs),
                     "station": name,
-                    "state": encode(changed),
+                    kind: encode(changed),
                 }
             )
     return out
@@ -275,7 +302,8 @@ def state_of(h: Any) -> dict[str, Any]:
         if k not in SKIPPED:
             out[f"agent.{k}"] = _copy(v)
     for k in HARNESS_FIELDS:
-        out[k] = _copy(getattr(h, k, None))
+        if hasattr(h, k):  # the player's seat has some of them only
+            out[k] = _copy(getattr(h, k))
     return out
 
 
@@ -342,14 +370,28 @@ def give(world: Any, entry: dict[str, Any], build: Callable[[dict[str, Any]], An
         if h is not None:
             apply_state(h, entry["state"])
         return
+    if "seat_state" in entry:
+        seat = getattr(world, "player_seat", None)
+        if seat is not None and seat.station.name == station:
+            apply_state(seat, entry["seat_state"])
+        return
     for kind, applier in APPLIERS.items():
         if kind in entry:
             applier(world, station, entry[kind])
             return
 
 
+def _working_told(world: Any, station: str, payload: Any) -> None:
+    """The master's working told to the station (package 41): the navigation's working
+    marked told, as the station's sample marked it in play."""
+    nav = getattr(world, "navigation", None)
+    w = getattr(nav, "master_working", None) if nav is not None else None
+    if isinstance(w, dict):
+        w["told"] = True
+
+
 # Appliers for acts of other kinds (`record`), by kind: `fn(world, station, payload)`.
-APPLIERS: dict[str, Callable[[Any, str, Any], None]] = {}
+APPLIERS: dict[str, Callable[[Any, str, Any], None]] = {"working_told": _working_told}
 
 
 # ---------------------------------------------------------------------------

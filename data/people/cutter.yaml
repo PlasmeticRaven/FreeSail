@@ -7,10 +7,13 @@
 ship: data/ships/cutter.yaml
 
 # The harness's stations bound to a person by his role: the officer of the watch is the
-# mate (spec M5 §29).
+# mate (spec M5 §29), and so is the master's station (spec M6 §11; package 41): a cutter
+# carries no master beside the man who commands her, and the mate works the reckoning
+# when it is not the master's own.
 stations:
   captain: master
   officer of the watch: mate
+  master: mate
 
 wardroom:
   - role: master

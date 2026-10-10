@@ -31,6 +31,9 @@ ship: data/ships/frigate-36.yaml
 stations:
   captain: captain
   officer of the watch: first lieutenant
+  # the master's station (spec M6 §11; package 41): the frigate's master, the
+  # navigator, whose working a model at the station does when he would
+  master: master
 
 wardroom:
   - role: captain

@@ -84,6 +84,7 @@ __all__ = [
     "authority_check",
     "book_of",
     "call",
+    "conversation_order",
     "hand_over",
     "handover_note",
     "journal",
@@ -229,8 +230,8 @@ def readings_words(world: World) -> dict[str, Any]:
     view = world.readings
     out: dict[str, Any] = {}
     for row in R.REGISTRY:
-        if row.is_absent or row.parametric is not None:
-            continue
+        if row.is_absent or row.parametric is not None or row.kind in R.DRIVER_KINDS:
+            continue  # the driver's own rows (the pace) are read, never carried (41)
         out[row.id] = view.words(row.id)
     ship = world.ship
     sails = getattr(ship, "sails", None)
@@ -483,8 +484,8 @@ def submit_order(world: World, station: str, text: str, danger: str = "") -> str
         from freesail.standing.runtime import said_as_done
 
         if stations.recognises(text, world.ship) is not None:
-            # a station sentence from the captain's station (package 40): his words to
-            # the officer as he said them, not a gerund of them
+            # a station sentence from the captain's station (package 40), or the deck's
+            # conversation from any (package 41): the words as said, not a gerund of them
             said = f"By the {station}: {text}"
         else:
             said = f"By the {station}: {said_as_done(world.ship, text)}"
@@ -597,11 +598,15 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
     bare = standing.bare_book_sentence(ship, text)
     if verb is not None or bare is not None:
         return text, _book_check(world, station, bare or text, vocab), ""
-    if stations.recognises(text, ship) is not None:
+    sentence = stations.recognises(text, ship)
+    if sentence is not None:
         if domain.is_captains:
             # the captain's station addresses the stations as the player does (package
             # 40): the deck given and taken, the grants, tell and ask, stand down and
             # resume; the sentence is the captain's own, so the grammar reads it as his
+            return text, "", DOMAIN
+        if sentence in stations.CONVERSATION_VERBS:
+            # the deck's conversation is every station's (package 41): say, tell, ask
             return text, "", DOMAIN
         return text, f"{who} may not {text}: {_STATION_WHY}.", ""
     try:
@@ -1003,6 +1008,18 @@ def own_reckoning_order(world: World, text: str) -> bool:
     return order.verb in OWN_RECKONING_VERBS
 
 
+def conversation_order(world: World, text: str) -> bool:
+    """Whether the words are the deck's conversation (package 41): `say <words>`, `hail
+    <words>`, `tell the <station> ...` or `ask the <station> ...`, which every station
+    gives with the deck or without."""
+    from freesail.orders import stations
+
+    ship = world.ship
+    if not hasattr(ship, "parts"):
+        return False
+    return stations.recognises(" ".join(str(text).split()), ship) in stations.CONVERSATION_VERBS
+
+
 def _holder(world: World, station: str) -> Any:
     """Who holds a station for the authority filter: its harness, or the player's seat
     at it (package 40; `agents.seat`), which is judged as a model there would be."""
@@ -1322,10 +1339,24 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
         )
         return sentence
     # a station's own reckoning is kept with the deck or off watch, and moves nothing, so
-    # it neither wants the deck nor takes it back (package 40b)
+    # it neither wants the deck nor takes it back (package 40b); nor does the deck's
+    # conversation (package 41: say, tell and ask are any station's, with the deck or
+    # without); and a station with no deck at all (the master's, the lookout's, a
+    # passenger's) is judged by its domain alone
     needs_deck = tool.needs_deck and not (
-        name == "submit_order" and own_reckoning_order(world, str(args.get("text", "")))
+        name == "submit_order"
+        and (
+            own_reckoning_order(world, str(args.get("text", "")))
+            or conversation_order(world, str(args.get("text", "")))
+        )
     )
+    if (
+        needs_deck
+        and harness is not None
+        and harness.domain is not None
+        and not getattr(harness.domain, "deck", True)
+    ):
+        needs_deck = False
     if (
         needs_deck
         and harness is not None

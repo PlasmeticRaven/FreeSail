@@ -158,13 +158,16 @@ def replay(
     i = 0
     j = 0
 
-    def give_acts() -> None:
-        # the stations' acts due here: of this tick, after as many inputs as are given
+    def give_acts(within: tuple[int, str] | None = None) -> None:
+        # the stations' acts due here: of this tick, after as many inputs as are given;
+        # `within`, the acts of a station made inside the input about to be given
         nonlocal j
+        upto = i if within is None else within[0]
         while (
             j < len(station_acts)
             and int(station_acts[j]["tick"]) <= world.clock.tick
-            and int(station_acts[j].get("after_inputs") or 0) <= i
+            and int(station_acts[j].get("after_inputs") or 0) <= upto
+            and (within is None or station_acts[j].get("station") == within[1])
         ):
             act = station_acts[j]
             acts_mod.give(world, act, lambda seated: driven_station(world, seated))
@@ -181,6 +184,11 @@ def replay(
             agent.on_between_ticks()
         give_acts()
         while i < len(inputs) and int(inputs[i]["tick"]) == world.clock.tick:
+            unbinding = (inputs[i].get("binding") or {}).get("op") == "unbind"
+            if unbinding and station_acts:
+                # a station stood down by its unbinding: its acts inside the input come
+                # where they came, before the binding's own line (package 42)
+                give_acts(within=(i + 1, str(inputs[i]["binding"]["name"])))
             _give(world, inputs[i])
             i += 1
             # a station seated after this input, whatever it was (package 37d: a driver's
@@ -219,6 +227,18 @@ def _give(world: World, entry: dict[str, Any]) -> None:
         return
     if "world_order" in entry:
         world.world_order(str(entry["world_order"]), source=str(entry.get("source", "")))
+        return
+    if "binding" in entry:
+        # a station bound or unbound (package 41), an input since package 42
+        b = entry["binding"]
+        stations = getattr(world, "stations", None)
+        if stations is not None:
+            if b.get("op") == "unbind":
+                stations.unbind(str(b["name"]), str(b.get("why") or ""), quiet=True)
+            else:
+                stations.bind(
+                    str(b["name"]), b.get("person") or None, b.get("kind") or None, quiet=True
+                )
         return
     line = entry["line"]
     world.record_driver(line["severity"], line["kind"], line["text"], line.get("data"))
@@ -661,6 +681,10 @@ def load_report(
     # and saved again keeps it; the browser's server reads and cleans it for the chart
     # (`ui.server.take_marks`)
     world.chart_marks = [dict(m) for m in data.get("chart_marks") or [] if isinstance(m, dict)]
+    # the stations bound and unbound by hand (package 41): a replay re-makes none of it
+    # (the world order that will drive it is M7b's), so a load gives the save's back
+    if hasattr(world, "stations"):
+        world.stations.load(data.get("stations"))
     return world, report
 
 

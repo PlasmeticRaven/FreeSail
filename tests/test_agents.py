@@ -259,7 +259,7 @@ def test_the_head_situation_reads_the_log_and_the_readings_through_the_tools():
     situation = h.brief.head[4].text
     assert "A sail on the larboard bow." in situation
     for row in R.REGISTRY:
-        if row.parametric is None and not row.is_absent:
+        if row.parametric is None and not row.is_absent and row.kind not in R.DRIVER_KINDS:
             assert f"  {row.id}: {tools.readings_words(world)[row.id]}" in situation
 
 
@@ -315,7 +315,8 @@ def test_readings_tool_reads_the_registry_and_nothing_else():
     got = tools.call(world, "watcher", "readings")
     view = world.readings
     for row in R.REGISTRY:
-        if row.is_absent or row.parametric is not None:
+        if row.is_absent or row.parametric is not None or row.kind in R.DRIVER_KINDS:
+            # the driver's own row (the pace, package 41) is read, never carried
             assert row.id not in got
         else:
             # the registry's words: a reading's own for a value it withholds on purpose
@@ -1528,6 +1529,14 @@ def test_the_agent_log_kinds_are_listed_in_one_place_and_used():
     world.submit("you have the deck")
     world.agents["officer of the watch"].start()
     used |= set(kinds(world))
+    # the deck's conversation (package 41): the player's say, and the lookout's hail
+    from freesail.agents.agent import lookout
+
+    world = frigate_world()
+    hail = [reply("", call("submit_order", text="hail sail ho, on the larboard bow"))]
+    Harness(world, lookout(SamplingPolicy.in_lockstep(A_GLASS_S), world=world), Fake(hail)).start()
+    world.submit("say a fine morning")
+    used |= set(kinds(world))
     assert used == set(AGENT_LOG_KINDS)
     for kind in AGENT_LOG_KINDS:
         assert kind in used, kind
@@ -2484,8 +2493,12 @@ def test_a_door_that_leaves_out_old_turns_sends_the_first_kept_with_every_readin
     assert probe.dropped_turns == 0
     costs = [len(json.dumps(m, ensure_ascii=False)) // 4 + 1 for m in full]
     tools_cost = len(json.dumps(probe.tools_schema())) // 4
-    # room for the brief, the later half of the turns and some to spare: the earlier go
-    ctx = costs[0] + sum(costs[len(costs) // 2 :]) + 600 + probe.max_reply + tools_cost
+    # room for the brief, the later half of the turns and the whole picture of the
+    # readings (what the first kept sample grows to) with some to spare: the earlier go.
+    # The spare is measured and not a number, so that a reading added to the registry
+    # (package 41's `stations` and `lookout`) does not outgrow it.
+    whole_cost = len(json.dumps(tools.readings_words(world), ensure_ascii=False)) // 4
+    ctx = costs[0] + sum(costs[len(costs) // 2 :]) + whole_cost + 200 + probe.max_reply + tools_cost
     model = LocalModel("http://127.0.0.1:9", ctx_size=ctx)
     msgs = model.messages(h.turns)
     assert model.dropped_turns > 0
