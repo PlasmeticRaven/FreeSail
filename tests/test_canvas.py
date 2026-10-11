@@ -152,9 +152,16 @@ def test_no_2_canvas_is_the_anchor_of_the_derivation(path):
 @pytest.mark.parametrize("path", SHIPS)
 def test_every_sail_has_a_canvas_number_and_its_rating_follows_luce(path):
     ship = load_ship(path)
+    from freesail.ship.parts import storm_cloth_rating_for
+
+    storm = set(ship.groups.get("storm canvas") or [])
     for sail in ship.sails.values():
         assert sail.canvas_no in range(1, 10), sail.id
         expected = round(CLOTH_KN_PER_M2_NO2 * canvas_strength(sail.canvas_no) * sail.area_m2, 1)
+        if sail.id in storm:
+            # storm canvas is rated for the wind it is cut for (package 45, Part B item 7)
+            expected = storm_cloth_rating_for(sail.area_m2)
+            assert expected > 2.0 * CLOTH_KN_PER_M2_NO2 * sail.area_m2, sail.id
         assert sail.cloth_rating_kn == expected == sail.rating_kn, sail.id
 
 

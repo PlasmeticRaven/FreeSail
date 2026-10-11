@@ -83,7 +83,7 @@ def test_the_order_shapes_the_first_mark_and_the_master_keeps_the_way(off_falmou
     assert "leaving Ushant to larboard" in e.text
     assert e.data["via"] == ["5 miles south-west of Cape Finisterre", "Lisbon"]
     assert nav.way_mark == "5 miles north-west of Ushant"
-    assert [x["words"] for x in nav.way] == ["5 miles south-west of Cape Finisterre", "Lisbon"]
+    assert [x["said"] for x in nav.way] == ["5 miles south-west of Cape Finisterre", "Lisbon"]
     assert nav.way_words().startswith("for 5 miles north-west of Ushant, then ")
     # the mark reached by account: the next course shaped by the master, said in the log
     nav.way_target = nav.account_now()
@@ -93,7 +93,7 @@ def test_the_order_shapes_the_first_mark_and_the_master_keeps_the_way(off_falmou
     assert "5 miles north-west of Ushant reached, leaving Ushant to larboard" in said[-1].text
     assert "the course shaped for 5 miles south-west of Cape Finisterre" in said[-1].text
     assert nav.way_mark == "5 miles south-west of Cape Finisterre"
-    assert [x["words"] for x in nav.way] == ["Lisbon"]
+    assert [x["said"] for x in nav.way] == ["Lisbon"]
     assert said[-1].actor.startswith("standing order")  # a rule's order: never journaled
     assert not any(o[2].startswith("shape a course for 5 miles south-west") for o in w.journal)
     # a helm order of the officer's drops the way, said once
@@ -140,7 +140,7 @@ VIA_FRIGATE = {
     "name": "The frigate for Lisbon by way of Ushant and Finisterre",
     "seed": 7,
     "start": "1805-06-12T06:00",
-    "position": "50 06 N 5 00 W",
+    "position": "49 56 N 5 00 W",  # off Falmouth, clear of the Manacles' berth
     "region": "channel-west",
     "ship": {
         "file": "data/ships/frigate-36.yaml",
@@ -150,6 +150,7 @@ VIA_FRIGATE = {
     },
     "wind": {"gustiness": 0.3, "variability": 0.3},
     "intent": "bound for Lisbon via Ushant, Finisterre",
+    "orders": ["set plain sail"],
     "papers": {"chart": {"year": 1804}, "epitome": "norie", "almanac": 1805},
     "ports": ["falmouth", "brest", "corunna", "lisbon"],
     "weather": {
@@ -159,6 +160,17 @@ VIA_FRIGATE = {
             {"at": "1805-06-14T06:00", "from_deg": 10, "knots": 12},
         ],
         "background": {"hpa": 1020, "gradient_hpa_per_100km": 0.3, "high_toward_deg": 220},
+        "systems": [
+            {
+                "name": "the old high over Biscay",
+                "kind": "high",
+                "radius_km": 900,
+                "track": [
+                    {"at": "1805-06-11T12:00", "x_km": 300, "y_km": -500, "hpa": 1024},
+                    {"at": "1805-06-15T12:00", "x_km": 500, "y_km": -600, "hpa": 1022},
+                ],
+            }
+        ],
         "sky": {"sky": "clear", "weather": "fine", "visibility": "the horizon"},
         "sea": True,
     },

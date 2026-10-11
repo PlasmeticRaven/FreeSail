@@ -219,8 +219,18 @@ verbs:
     object: none
     level: 1
   tack ship:
-    synonyms: [ready about, go about, about ship, tack, put her about, stays]
+    synonyms: [ready about, go about, about ship, tack, stays]
     object: none
+    level: 1
+  # Package 45: the choice to tack or to wear, made by the ship's state (the captain's rule
+  # and a player's): she wears when her sail is short (no head sail set, the topsails
+  # close-reefed, or the wind over thirty knots) or after she has missed stays within the
+  # hour, and tacks regardless with the land to leeward within two miles, since wearing
+  # loses the ground; the log says the choice and why. `tack ship` and `wear ship` are the
+  # orders that choose for you.
+  put her about:
+    synonyms: [put her round, tack or wear, about or wear, put the ship about, put about]
+    object: navigation
     level: 1
   wear ship:
     # "Gybe" is the later word for wearing a fore-and-aft vessel; the log
@@ -854,6 +864,24 @@ verbs:
   hail the pilot:
     synonyms: [hail the pilot boat, hail the pilot's boat, hail the pilot cutter, hail the pilot's cutter,
                hail the pilot gig, hail the pilot's gig, hail for a pilot, hail the pilots]
+    object: port
+    level: 1
+  # Package 45: the pilot's conn. He conns her along his port's track by the conning words
+  # and courses, each line in the log as the pilot's, to the anchorage, where he says where
+  # to let go; `I have the conn` or any helm order of the officer's takes her back. The
+  # authority is the officer's (a passenger cannot), as every order's.
+  let the pilot take her in:
+    synonyms: [let the pilot take her, give the pilot the conn, the pilot has the conn, pilot take her in,
+               let the pilot con her in, let the pilot take us in, let him take her in]
+    object: port
+    level: 1
+  let the pilot take her out:
+    synonyms: [let the pilot con her out, pilot take her out, let the pilot take us out, let him take her out]
+    object: port
+    level: 1
+  i have the conn:
+    synonyms: [I have her, I'll take her, take the conn from the pilot, I have the ship, I'll take the conn,
+               take her from the pilot]
     object: port
     level: 1
   # Group evolutions: verb phrases with no object, expanded from the list below.

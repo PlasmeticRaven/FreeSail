@@ -291,6 +291,14 @@ STEERING_SIGMA_POINTS_SEAWAY = 0.5
 LEEWAY_ALLOWED_WITHIN_POINTS = 8.0
 LEEWAY_ESTIMATE_ERROR_POINTS = 0.5
 LEEWAY_DOUBT_POINTS = 0.25
+# He allows the leeway she makes with way on her, and never more than Norie's table gives
+# a ship under way (Norie 1805, 'Of Lee-way': four points under close-reefed topsails, the
+# most of a ship that still makes a course; five and more are a ship driving under her
+# courses or bare poles). Package 45: with sternway after she was taken aback the model's
+# leeway reads a hundred and sixty degrees, and the gale trial's master allowed fourteen
+# points and a half of it in a course for the station (W by account; steer E by S), wore
+# her round for it and ran her at seven knots onto the land under Keller.
+LEEWAY_ALLOWED_MAX_POINTS = 4.0
 
 # The set the master did not allow for (N §3: "Channel streams one to three knots turning
 # with the tide, allowed for only if the master knows the establishment and his own
@@ -1654,9 +1662,16 @@ class Reckoning:
     ) -> float:
         return self.observe_distance(mark, bearing_rad, distance_nm, sigma_nm).moved_nm
 
-    def set_position(self, pos: Position, tick: int, sigma_nm: float = DEPARTURE_SIGMA_NM) -> None:
-        """The captain's override, or a departure: the account set to a point with a
-        fresh doubt, the biases and the lines already had forgotten."""
+    def set_position(
+        self,
+        pos: Position,
+        tick: int,
+        sigma_nm: float = DEPARTURE_SIGMA_NM,
+        what: str = "the reckoning set by the captain's order",
+    ) -> None:
+        """The captain's override, or a departure, or the pilot's fix (package 45): the
+        account set to a point with a fresh doubt, the biases and the lines already had
+        forgotten; `what` is the slate's word for it."""
         self.lat_deg, self.lon_deg = pos.lat_deg, pos.lon_deg
         self.P = [[sigma_nm * sigma_nm, 0.0], [0.0, sigma_nm * sigma_nm]]
         self.set_doubt = [0.0, 0.0]
@@ -1669,7 +1684,7 @@ class Reckoning:
         self._seen = {}
         self.run_since_fix_nm = 0.0
         self.track.append((tick, self.lat_deg, self.lon_deg))
-        self.begin_slate(tick, "the reckoning set by the captain's order")
+        self.begin_slate(tick, what)
 
     # -- the master's slate (package 40b) -----------------------------------------------
 
@@ -4726,8 +4741,15 @@ class Navigation:
         dyn = getattr(self.world.ship, "dyn", None)
         wind_from = float(self.world.wind.direction_from)
         forward = units.rad_to_points(abs(units.wrap_pi(steer - wind_from)))
-        if dyn is not None and self._close_hauled_now() and forward <= LEEWAY_ALLOWED_WITHIN_POINTS:
+        if (
+            dyn is not None
+            and self._close_hauled_now()
+            and forward <= LEEWAY_ALLOWED_WITHIN_POINTS
+            and self._way_kn() >= NO_WAY_KN
+        ):
             leeway = float(dyn.leeway) + units.points_to_rad(self.errors.leeway_bias_points)
+            most = units.points_to_rad(LEEWAY_ALLOWED_MAX_POINTS)
+            leeway = math.copysign(min(abs(leeway), most), leeway)
             quarters = round(units.rad_to_points(abs(leeway)) * 4.0)
             if quarters >= 1:
                 steer -= leeway
@@ -4781,11 +4803,21 @@ class Navigation:
             return feature.position, feature.name, feature
         ports = getattr(self.world, "ports", None)
         port = ports.find(name) if ports is not None and hasattr(ports, "find") else None
-        if port is None:
-            return None
-        spot = port.outer_road
-        f = chart.feature(spot.feature_id) if getattr(spot, "feature_id", "") else None
-        return spot.position, f"{spot.name} ({port.name}'s road)", f
+        if port is not None:
+            spot = port.outer_road
+            f = chart.feature(spot.feature_id) if getattr(spot, "feature_id", "") else None
+            return spot.position, f"{spot.name} ({port.name}'s road)", f
+        # a point off a place ('5 miles north-west of Ushant', package 37l's form, which
+        # a way by marks names its points by; package 45): the order's own reader
+        from freesail.orders.navigation import OrderError, _off_a_place
+
+        try:
+            off = _off_a_place(self.world, name)
+        except OrderError:
+            off = None
+        if off is not None:
+            return off[0], off[1], None
+        return None
 
     def by_chart(self, name: str) -> dict[str, Any] | None:
         """`the bearing of <mark> by the chart` and `the distance to <mark>`: from the

@@ -609,7 +609,7 @@ sails:
   centre_height_m: 36.5
   canvas_no: 7
   cloth_rating_kn: 6.6
-# fore storm staysail 51 m2 on the fore stay (Luce 1884 ch. X): Kipping's fore staysail, a right-angled triangle, foot 36 ft (half the fore course's head cloths and two), leech 30 ft (the course's depth); the clew just before the fore mast and the foot 5 ft above the deck (judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# fore storm staysail 51 m2 on the fore stay (Luce 1884 ch. X): Kipping's fore staysail, a right-angled triangle, foot 36 ft (half the fore course's head cloths and two), leech 30 ft (the course's depth); the clew just before the fore mast and the foot 5 ft above the deck (judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: fore.storm_staysail
   class: jibheaded
   stay: fore.stay
@@ -617,9 +617,9 @@ sails:
   x_m: 18.7
   centre_height_m: 6.4
   canvas_no: 1
-  cloth_rating_kn: 18.3
+  cloth_rating_kn: 46.9
   bent: false
-# mizzen storm staysail 36 m2 on the mizzen stay (Luce 1884 ch. X; the Trenton's allowance has one, Luce p. 171): tack at the main mast collar, head 0.6 up the stay, clew 7 ft above the deck (Steel's mizzen staysail; 0.6 judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# mizzen storm staysail 36 m2 on the mizzen stay (Luce 1884 ch. X; the Trenton's allowance has one, Luce p. 171): tack at the main mast collar, head 0.6 up the stay, clew 7 ft above the deck (Steel's mizzen staysail; 0.6 judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: mizzen.storm_staysail
   class: jibheaded
   stay: mizzen.stay
@@ -627,9 +627,9 @@ sails:
   x_m: -7.6
   centre_height_m: 7.3
   canvas_no: 1
-  cloth_rating_kn: 12.9
+  cloth_rating_kn: 33.1
   bent: false
-# storm mizzen 35 m2, triangular (Luce 1884 ch. X; Steel 1794 'Storm mizen'): luff 38 ft on its vertical stay (0.8 of the mast head's height above the tack, judgement), foot 20 ft towards the taffrail (judgement); bent in place of the spanker; in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# storm mizzen 35 m2, triangular (Luce 1884 ch. X; Steel 1794 'Storm mizen'): luff 38 ft on its vertical stay (0.8 of the mast head's height above the tack, judgement), foot 20 ft towards the taffrail (judgement); bent in place of the spanker; in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: storm_mizzen
   class: jibheaded
   stay: storm_mizzen.stay
@@ -637,7 +637,7 @@ sails:
   x_m: -18.0
   centre_height_m: 6.9
   canvas_no: 1
-  cloth_rating_kn: 12.5
+  cloth_rating_kn: 32.2
   bent: false
   in_place_of: mizzen.spanker
 # ringtail 68 m2 (Kipping, Luce 1884): 61 ft deep, the depth of the spanker's after leech it borders (as Falconer's schooner's), 5 cloths in the head and 7 in the foot (Kipping's brig's); a studding-class sail with no side, lying in the spanker's plane; in the sail room. Canvas No. 5 (Kipping 1847 (1898 printing), Sails and Sailmaking, 'Ringtail Sails' (a brig's): No. 5 or 6; Steel 1794 vol. I, Sail-making, 'Sloop's ringtail sail': No. 5 or 8); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E.

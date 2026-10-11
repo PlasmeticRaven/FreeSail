@@ -52,6 +52,12 @@ mooring:
 shore:
   feature: falmouth-town
   name: the quay at Falmouth
+# The port's reach (package 45; freesail/world/ports.py IN_PORT_NM): at anchor within it
+# of the roads or the mooring she is in port and does her business from the road by the
+# boat. The outer road lies a mile and a half from the town's quay and Carrick Road a
+# mile; both within. (The owner's note 9 of gate m6a: "a ship that can come to anchor in
+# a road and close enough to trade might simply trade from there.")
+reach_nm: 2
 
 pilot:
   station: falmouth-outer-road   # the cutter cruises off the harbour's mouth and the Manacles

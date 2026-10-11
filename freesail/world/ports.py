@@ -187,6 +187,34 @@ PILOT_THICK_NM = 1.0
 PILOT_THICK_AHEAD_S = 300
 # At anchor within two miles of the port's roads or mooring she is in port: the boat
 # goes ashore, the market and the yard serve her.
+# A pilot's boat standing out for a ship she cannot catch gives her up beyond this many
+# times the port's cruising ground from the station (package 45; judgement: a boat
+# cruising six miles off follows a ship twelve, and no farther).
+PILOT_LETS_GO_FACTOR = 2.0
+
+# The pilot's fix (package 45, Part B item 2a; the owner's wardroom run: aground on the
+# Fillettes with the account and its doubt nowhere near them after a cast of the lead
+# moved the account, the pilot aboard). Aboard, within his port's ground and with his
+# marks in sight (the visibility a mile or more), he has her by his marks: the account
+# is brought to the truth every five minutes with a cable's doubt, said once; in thick
+# weather he fixes nothing and warns by the lead and the time run as before (37h).
+PILOT_FIX_EVERY_S = 300
+PILOT_FIX_SIGMA_NM = 0.1
+
+# The pilot's conn (package 45, Part B item 2c; `let the pilot take her in`): he conns
+# her along his port's track by the conning words, the helm given a course by compass for
+# each mark from where she truly is (he knows his water), the course corrected when the
+# mark's bearing has drawn half a point from it, a mark passed within two cables; at the
+# anchorage he says where to let go and his conn is done. His orders go under a rule's
+# actor (not journaled, a deterministic function of the conn given).
+PILOT_CONN_MARK_M = 2.0 * units.CABLE
+# How far from the line to his mark the pilot lays her off to pass a danger on it (radians;
+# package 45): two points, which at the warning distance of eight cables is three cables
+# off the line, past a rock's warning berth (`PILOT_WARN_ABEAM_M`). Judgement.
+PILOT_CONN_KEEP_OFF_RAD = 2.0 * units.POINT
+PILOT_CONN_TURN_RAD = units.POINT / 2.0
+PILOT_ACTOR = "standing order 'the pilot'"
+
 IN_PORT_NM = 2.0
 # -- the boat (judgement) --
 # A boat's crew pull four knots on an errand (no page times a boat's crew; a man-of-war's
@@ -397,6 +425,11 @@ class Port:
     # Each mark a feature by its id or a position pricked on the chart, in the directions'
     # words; a port without them is approached by its outer road and anchorage alone.
     tracks: dict[str, list[str]] = field(default_factory=dict)
+    # The port's reach (package 45, Part B item 3c): at anchor within this many miles of
+    # its roads or mooring she is in port and does her business by the boat (`reach_nm`
+    # in the file; `IN_PORT_NM` by default: Falmouth's outer road and Carrick Road are
+    # both within two miles of the town, the road of Bertheaume eight miles from Brest).
+    reach_nm: float = IN_PORT_NM
     # A port's state (package 39d; spec M6 §26): "open", or "blockaded" with `blockade`,
     # {"by": nation, "station": Position | None, "station_name", "since", "source"}. Plain
     # class defaults, so a checkpoint written before them loads (`core.replay`).
@@ -535,6 +568,7 @@ def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None 
                 )
             )
     return Port(
+        reach_nm=float(doc.get("reach_nm", IN_PORT_NM)),
         id=str(doc.get("id") or p.stem),
         name=str(doc.get("name") or p.stem),
         nation=str(doc.get("nation") or ""),
@@ -670,6 +704,16 @@ class Ports:
         self.jobs: list[Job] = []
         self._last_distance_nm: dict[str, float] = {}
         self._counter = 0
+        # the pilot's fix and his conn (package 45)
+        self.fix_tick: int | None = None
+        self.fix_said = False
+        self.conn = False
+        self.conn_inward = True
+        self.conn_track: list[tuple[str, Position]] = []
+        self.conn_i = 0
+        self.conn_heading: float | None = None
+        self.conn_bearing: float | None = None  # the mark's bearing the course was given for
+        self.conn_order_tick: int | None = None
         self._load()
 
     # -- loading -----------------------------------------------------------------------
@@ -754,11 +798,15 @@ class Ports:
         return best
 
     def in_port(self) -> Port | None:
-        """The port she lies in: at anchor within `IN_PORT_NM` of its roads or mooring."""
+        """The port she lies in: at anchor within the port's reach (`Port.reach_nm`,
+        `IN_PORT_NM` by default) of its roads or mooring."""
         if not self.world.at_anchor:
             return None
-        found = self.nearest(IN_PORT_NM)
-        return found[0] if found else None
+        found = self.nearest()
+        if found is None:
+            return None
+        port, d_nm = found
+        return port if d_nm <= port.reach_nm else None
 
     def find(self, words: str) -> Port | None:
         key = " ".join(str(words).lower().split()).removeprefix("the ")
@@ -897,8 +945,12 @@ class Ports:
             self._hail_reset()
         self._note_lay_in()
         if self.pilot is not None and self.pilot_port in self.ports:
-            # aboard, he warns of the dangers ahead in his own water (package 37h)
+            # aboard, he has her by his marks, warns of the dangers ahead in his own
+            # water (package 37h) and conns her when he has the conn (package 45)
+            self._fix(self.ports[self.pilot_port], now)
             self._warn(self.ports[self.pilot_port], now)
+            if self.conn:
+                self._conn(self.ports[self.pilot_port], now)
         if self.pilot is None and cutter is None:
             found = self.nearest()
             if found is None:
@@ -928,6 +980,23 @@ class Ports:
             if not self.cutter_hailed and dist <= PILOT_HAIL_WITHIN_M:
                 self._hail(port, cutter, now)
             if not self.cutter_hailed:
+                # a ship that outsails the boat before she can hail her is let go when she
+                # is beyond twice the cruising ground from the station (package 45: the
+                # Falmouth cutter chased the schooner a hundred miles to Ushant and hailed
+                # her there); the boat goes home, and no six hours are held against her
+                _, d_station = bearing_and_distance(world.position, port.outer_road.position)
+                if d_station > PILOT_LETS_GO_FACTOR * port.pilot.cruising_nm * units.NAUTICAL_MILE:
+                    cutter.plan = [("home", port.outer_road.position)]
+                    cutter.alongside = False
+                    self.cutter_errand = None
+                    self._hail_reset()
+                    self._record(
+                        Severity.ROUTINE,
+                        "port.pilot_gone",
+                        f"The {port.name} {port.pilot.craft}, left astern, bore away for "
+                        f"{port.outer_road.name}.",
+                        {"port": port.id, "unanswered": False, "left_astern": True},
+                    )
                 return
             if self.cutter_errand == "fetch" or self.hail_answer == "take":
                 # he boards (or leaves) a ship under six knots within two cables, as
@@ -1343,6 +1412,10 @@ class Ports:
     def _pilot_leaves(self, port: Port, cutter: Any, now: int) -> None:
         world = self.world
         pilot = self.pilot
+        if self.conn:
+            self._conn_off("he is put off", said=False)
+        self.fix_said = False
+        self.fix_tick = None
         assert pilot is not None
         fee = port.pilot.fee_pounds
         paid = ""
@@ -1434,17 +1507,40 @@ class Ports:
             self.warned = (*self.warned, f.id)
             deeper = "larboard" if side > 0 else "starboard"
             where = f"{distance_words(max(along, units.CABLE))} ahead"
+            text = f"{lead}: {f.name} {where}; the deeper water is to {deeper}."
             if not thick:
+                # the hand and the mark as a pilot would say them (package 45, item 2b):
+                # the danger's bearing relative to her head, the hand to leave it on,
+                # and plainly when it lies on the hand he names as the deeper one
                 from freesail.world.lookout import relative_words
 
                 dyn = getattr(world.ship, "dyn", None)
                 heading = float(dyn.heading) if dyn is not None else math.radians(track)
                 brg, _ = bearing_and_distance(pos, f.position)
-                where += ", " + relative_words(units.wrap_pi(math.radians(brg) - heading))
+                rel = units.wrap_pi(math.radians(brg) - heading)
+                where += ", " + relative_words(rel)
+                leave = "starboard" if deeper == "larboard" else "larboard"
+                plural = f.name.lower().endswith("s") and not f.name.lower().endswith("ss")
+                them = "them" if plural else "it"
+                lies = "lie" if plural else "lies"
+                if (rel > 0) == (deeper == "starboard") and abs(rel) < math.pi / 2:
+                    # on the bow he would haul to: keep her off till it is passed
+                    bow = "starboard" if rel > 0 else "larboard"
+                    text = (
+                        f"{lead}: keep her off, {f.name} {lies} under the {bow} bow, "
+                        f"{distance_words(max(along, units.CABLE))} ahead; leave {them} to "
+                        f"{leave}, and do not haul to {deeper} till {them if plural else 'it'} "
+                        f"{'are' if plural else 'is'} abaft the beam."
+                    )
+                else:
+                    text = (
+                        f"{lead}: {f.name} {where}; leave {them} to {leave}, the deeper water "
+                        f"is to {deeper}."
+                    )
             self._record(
                 Severity.URGENT,
                 "port.pilot_warns",
-                f"{lead}: {f.name} {where}; the deeper water is to {deeper}.",
+                text,
                 {"port": port.id, "danger": f.id, "deeper": deeper, "thick": thick},
             )
             return
@@ -1465,6 +1561,254 @@ class Ports:
             f"{lead}: {what} {distance_words(along)} ahead; {hand}.",
             {"port": port.id, "danger": "", "deeper": deeper or "astern", "thick": thick},
         )
+
+    # -- the pilot's fix and his conn (package 45) --------------------------------------------
+
+    def _fix(self, port: Port, now: int) -> None:
+        """Aboard and in sight of his marks within his port's ground, the pilot has her by
+        them: the account brought to the truth with a cable's doubt every five minutes,
+        said once as his fix and not again until he leaves or the weather thickens; by
+        the lead and the time run in thick weather, no fix (`_warn`)."""
+        from freesail.world.geo import format_position
+
+        world = self.world
+        nav = getattr(world, "navigation", None)
+        pos = world.position
+        if nav is None or pos is None or world.at_anchor or self._aground():
+            return
+        _, d_nm = port.nearest_spot(pos)
+        if d_nm > port.pilot.cruising_nm:
+            return
+        conditions = getattr(world, "conditions", None)
+        visibility = getattr(conditions, "visibility_nm", None) if conditions else None
+        if visibility is not None and float(visibility) < PILOT_THICK_NM:
+            self.fix_said = False  # said again when his marks come back
+            return
+        if self.fix_tick is not None and now - self.fix_tick < PILOT_FIX_EVERY_S:
+            return
+        self.fix_tick = now
+        nav.bring_up()
+        nav.reckoning.set_position(
+            pos, now, sigma_nm=PILOT_FIX_SIGMA_NM, what="the pilot's fix by his marks"
+        )
+        if not self.fix_said:
+            self.fix_said = True
+            self._record(
+                Severity.NOTABLE,
+                "port.pilot_fix",
+                f"The pilot has her by his marks: {format_position(pos)}; the account is "
+                "brought to it, and he keeps it there while his marks are in sight.",
+                {"port": port.id, "lat_deg": pos.lat_deg, "lon_deg": pos.lon_deg},
+            )
+
+    def _track_marks(self, port: Port, which: str) -> list[tuple[str, Position]]:
+        from freesail.world.captains import _mark
+
+        out: list[tuple[str, Position]] = []
+        for words in port.tracks.get(which) or []:
+            m = _mark(self.world, str(words))
+            if m is not None:
+                out.append(m)
+        return out
+
+    def give_conn(self, inward: bool) -> str:
+        """`let the pilot take her in` / `... out` (package 45, item 2c): the pilot conns
+        her along his port's track from where she is, inward to the anchorage, outward
+        to the outer road and the sea; refused in words with no pilot aboard."""
+        from freesail.orders.errors import OrderError
+
+        world = self.world
+        if self.pilot is None or self.pilot_port not in self.ports:
+            raise OrderError(
+                "No pilot is aboard to take her; a pilot comes off by day to a ship under way "
+                "in his port's ground, and hails her."
+            )
+        port = self.ports[self.pilot_port]
+        pos = world.position
+        if inward:
+            marks = self._track_marks(port, "in")
+            end = port.anchorage
+            if not marks or bearing_and_distance(marks[-1][1], end.position)[1] > units.CABLE:
+                marks.append((end.name, end.position))
+        else:
+            marks = self._track_marks(port, "to_sea")
+            if not marks:
+                marks = [(port.outer_road.name, port.outer_road.position)]
+        # the marks already astern of her are not conned for: a mark farther from the
+        # track's end than she is herself has been passed
+        goal = marks[-1][1]
+        here = bearing_and_distance(pos, goal)[1] if pos is not None else math.inf
+        keep = [m for m in marks[:-1] if bearing_and_distance(m[1], goal)[1] < here]
+        self.conn_track = [*keep, marks[-1]]
+        self.conn_i = 0
+        self.conn_inward = inward
+        self.conn_heading = None
+        self.conn_bearing = None
+        self.conn = True
+        way = "in" if inward else "out"
+        words = (
+            f"The pilot, {self.pilot.name}, has the conn to take her {way}: by "
+            f"{len(self.conn_track)} mark{'s' if len(self.conn_track) != 1 else ''} to "
+            f"{self.conn_track[-1][0]}; 'I have the conn', or a helm order, takes her back."
+        )
+        self._conn(port, world.clock.tick)
+        return words
+
+    def take_conn_back(self, why: str = "") -> str:
+        """`I have the conn`: the officer takes her back from the pilot, who stands by and
+        still warns of his water."""
+        from freesail.orders.errors import OrderError
+
+        if not self.conn:
+            raise OrderError("The pilot has not the conn; she is yours already.")
+        self._conn_off(why or "the conn taken back")
+        name = self.pilot.name if self.pilot is not None else "the pilot"
+        return f"I have the conn; {name} stands by and will still warn of his water."
+
+    def _conn_off(self, why: str, said: bool = True) -> None:
+        self.conn = False
+        self.conn_heading = None
+        self.conn_bearing = None
+        self.conn_order_tick = None
+        self.conn_track = []
+        self.conn_i = 0
+        if said and self.pilot is not None:
+            self._record(
+                Severity.NOTABLE,
+                "port.pilot_conn",
+                f"The pilot gives her up: {why}.",
+                {"port": self.pilot_port, "conn": False, "why": why},
+            )
+
+    def _conn(self, port: Port, now: int) -> None:
+        """Once a tick while the pilot has the conn: a helm order of the officer's takes
+        her back; a mark passed within two cables (or abeam) is left for the next; the
+        course for the mark in hand is given when it is first wanted or has drawn half
+        a point; at the last mark he says where to let go and his conn is done."""
+        from freesail.ship.parts import HelmMode
+
+        world = self.world
+        ship = world.ship
+        dyn = getattr(ship, "dyn", None)
+        pos = world.position
+        if dyn is None or pos is None:
+            return
+        # a helm order of anyone but the pilot since his last takes her back (the helm's
+        # own "kept her away" moves the target too, so the log's orders are read and not
+        # the target): "I have the conn" by its own order, a course or a manoeuvre by its
+        log = getattr(world, "log", None)
+        if log is not None and self.conn_order_tick is not None:
+            for e in log.since(self.conn_order_tick):
+                if e.tick <= self.conn_order_tick and e.kind != "helm.set":
+                    continue
+                if e.kind == "helm.set" and e.actor != PILOT_ACTOR:
+                    self._conn_off("you have her, sir (the helm was given another course)")
+                    return
+                if e.kind == "order.accepted" and e.actor != PILOT_ACTOR:
+                    order = str((e.data or {}).get("order") or "")
+                    if order.split(" ")[:1] in (["tack"], ["wear"], ["heave"], ["steer"]) or (
+                        order.startswith(("keep her", "shape a course", "put her about"))
+                    ):
+                        self._conn_off("you have her, sir (the helm was given another course)")
+                        return
+        if world.at_anchor:
+            self._conn_off("she is at anchor", said=False)
+            return
+        while self.conn_i < len(self.conn_track):
+            words, mark = self.conn_track[self.conn_i]
+            brg, dist = bearing_and_distance(pos, mark)
+            heading = float(dyn.heading)
+            abaft = abs(units.wrap_pi(math.radians(brg) - heading)) > math.pi / 2.0
+            last = self.conn_i == len(self.conn_track) - 1
+            if dist <= PILOT_CONN_MARK_M or (abaft and not last and dist <= 6.0 * units.CABLE):
+                self.conn_i += 1
+                if last:
+                    berth = port.pilot.words.get("anchorage", "") if port.pilot.words else ""
+                    self._record(
+                        Severity.NOTABLE,
+                        "port.pilot_berth",
+                        f"The pilot: this is the berth, {words}; let go when you please."
+                        + (f" {berth}" if berth and self.conn_inward else ""),
+                        {"port": port.id, "mark": words},
+                    )
+                    self._conn_off("her berth is under her", said=False)
+                    return
+                continue
+            wanted = math.radians(brg)
+            # a danger on the line to the mark (package 45): he keeps her off it on the
+            # hand his own warning names, two points from the line, till it is passed
+            kept_off = self._conn_keep_off(port, pos, brg)
+            if kept_off is not None:
+                wanted, words = kept_off[0], f"{words}, leaving {kept_off[1]}"
+            fresh = self.conn_bearing is None or dyn.helm_mode is not HelmMode.HEADING
+            # the course given again when the mark's bearing has drawn half a point from
+            # the bearing it was last given for, so that a bearing on a point's edge does
+            # not have him ordering E and E by N by turns
+            if fresh or abs(units.wrap_pi(wanted - self.conn_bearing)) >= PILOT_CONN_TURN_RAD:
+                self._conn_order(port, wanted, words, now)
+            return
+
+    def _conn_keep_off(self, port: Port, pos: Position, brg_deg: float) -> tuple[float, str] | None:
+        """The course to steer for the mark with a charted danger on the line kept off
+        (package 45): the first danger `dangers_ahead` finds on the line to the mark
+        within the warning distance (as `_warn` reads it, with the water the ship wants)
+        has the course laid `PILOT_CONN_KEEP_OFF_RAD` toward the deeper water from the
+        line, and the words say which hand it is left on; None with the line clear. A
+        first version conned her straight for Carrick Road from the outer road and ran
+        her onto the Black Rock while the pilot warned of it."""
+        chart = getattr(self.world, "chart", None)
+        if chart is None:
+            return None
+        east, north = self._ground_velocity()
+        speed = max(math.hypot(east, north), units.knots_to_ms(2.0))
+        ahead = max(PILOT_WARN_MIN_M, speed * PILOT_WARN_AHEAD_S)
+        tide = float(getattr(self.world, "tide_height_m", 0.0) or 0.0)
+        hull = getattr(self.world.ship, "hull", None)
+        draught = float(hull.spec.draught_m) if hull is not None else 0.0
+        found = chart.dangers_ahead(
+            pos, brg_deg, ahead, PILOT_WARN_ABEAM_M, tide, draught + PILOT_UNDER_KEEL_M
+        )
+        if not found:
+            return None
+        f, _along, _off, side = found[0]
+        deeper = "larboard" if side > 0 else "starboard"
+        leave = "starboard" if deeper == "larboard" else "larboard"
+        turn = -1.0 if deeper == "larboard" else 1.0
+        course = units.wrap_2pi(math.radians(brg_deg) + turn * PILOT_CONN_KEEP_OFF_RAD)
+        return course, f"{f.name} to {leave}"
+
+    def _conn_order(self, port: Port, wanted: float, mark: str, now: int) -> None:
+        world = self.world
+        dyn = world.ship.dyn
+        point = units.point_name(wanted)
+        turn = units.wrap_pi(wanted - float(dyn.heading))
+        points = abs(turn) / units.POINT
+        if points < 0.25:
+            how = "steady as she goes"
+        else:
+            side = "starboard" if turn > 0 else "port"
+            if points < 0.75:
+                count = "half a point"
+            elif points < 1.5:
+                count = "a point"
+            else:
+                count = f"{int(round(points))} points"
+            how = f"{side} {count}"
+        said = f"The pilot: {how}; steer {point} for {mark}"
+        e = world.submit(f"steer {point}", actor=PILOT_ACTOR, said=said)
+        if e.kind == "order.rejected":
+            self._conn_off(f"his course was refused ({e.data.get('reason', '')})")
+            return
+        # the helm's own target as the order laid it (by compass, as `steer` lays a
+        # point), so that the officer's hand is known from a change of it and nothing else
+        from freesail.ship.parts import HelmMode
+
+        if dyn.helm_mode is HelmMode.HEADING:
+            self.conn_heading = float(dyn.target_heading)
+        else:
+            self.conn_heading = units.parse_course(point)
+        self.conn_order_tick = now
+        self.conn_bearing = wanted
 
     # -- the pilot's words -----------------------------------------------------------------
 
@@ -1627,6 +1971,7 @@ class Ports:
                 f", the account good to {good}",
                 "port": port.id,
                 "stance": stance,
+                "reach_nm": port.reach_nm,
                 "distance_nm": round(d_nm, 1),
                 "by": "account",
                 "pilot": None,
@@ -1685,6 +2030,7 @@ class Ports:
             return None
         port = self.ports[self.pilot_port]
         return {
+            "conn": self.conn,
             "words": f"{self.pilot.name} of {port.name} aboard; {self._tide_words(port)}",
             "name": self.pilot.name,
             "port": port.id,

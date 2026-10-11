@@ -180,6 +180,30 @@ PLANNER_ROUNDS = 6
 # In port, by the captain's account: at anchor within this of the port's roads (the
 # port's own rule at the truth is `ports.IN_PORT_NM`, two miles; the same figure).
 IN_PORT_NM = 2.0
+
+# The entry (package 45, Part B item 3a; the owner's note 8: two entrances balked with the
+# wind on the beam): a leg of a port's inner track is sailed when it lies no nearer the
+# wind than this many points; the captain goes in as far as the legs serve and anchors
+# at the last anchorage he can reach. Six points: a square-rigged merchantman's full and
+# by with a little in hand for the stream (Fincham's "seldom within six points").
+ENTRY_POINTS = 6.0
+
+# Sail after the gale (Part B item 5; 37p's open point): the wind under `sail_again_kn`
+# for `sail_again_minutes` and he makes sail again whatever his state; a head sail blown
+# out of its bolt-ropes is replaced from the sail room when the wind is under
+# `wear_wind_kn`. The glass (Part B item 6; the owner's note 4c): the wind's trend over
+# the hour is kept here, since no reading gives it.
+TREND_HOUR_S = 3600
+# The land to leeward (Part B, the gale trial): the lee sector is six points either side
+# of dead to leeward (as the doctrine's rows always had it), and the land within it is
+# the nearest the chart's coast comes along rays of `LEE_RAY_NM` cast through the sector a
+# point apart from the account. A first version read the nearest coast point and its
+# bearing alone, and off Ushant two shores lie near-equidistant, one to leeward and one
+# not: the nearest flipped between them minute by minute, and the captain hove to and
+# filled away by turns (fifty state changes in the forenoon). Twelve miles is past every
+# doctrine's sea room.
+LEE_SECTOR_POINTS = 6
+LEE_RAY_NM = 12.0
 # The anchorage is taken at the first cast under this many fathoms within the book's
 # reach of its mark, where the port's file gives its anchorage no depth (the merchant
 # book's twelve for the Bay of Brest: Faden's eight, ten or sixteen on mud); with a
@@ -999,6 +1023,46 @@ class Planner:
 # ---------------------------------------------------------------------------
 
 
+def _lee_land_nm(world: Any, p: Perception) -> float | None:
+    """The nearest land within the lee sector, in miles: the lookout's land when it bears
+    within the sector, and the chart's coast along rays from the account a point apart
+    through it (`LEE_SECTOR_POINTS` either side of dead to leeward, `LEE_RAY_NM` long);
+    None with no wind, no account or nothing within the rays."""
+    if p.wind_from_deg is None:
+        return None
+    toward = (p.wind_from_deg + 180.0) % 360.0
+    half = math.radians(LEE_SECTOR_POINTS * 11.25)
+    best: float | None = None
+    land = _point_deg(p.nearest_land_bearing or "")
+    if p.nearest_land_nm is not None and land is not None:
+        if abs(units.wrap_pi(math.radians(land - toward))) < half:
+            best = p.nearest_land_nm
+    nav = getattr(world, "navigation", None)
+    chart = getattr(world, "chart", None)
+    if nav is None or chart is None:
+        return best
+    try:
+        here = nav.account_now()
+    except Exception:  # noqa: BLE001 - no account yet
+        here = None
+    if here is None:
+        return best
+    reach = LEE_RAY_NM * units.NAUTICAL_MILE
+    for k in range(-LEE_SECTOR_POINTS, LEE_SECTOR_POINTS + 1):
+        bearing = (toward + k * 11.25) % 360.0
+        try:
+            hit = chart.line_shore(here, destination(here, bearing, reach), 2.0 * units.CABLE)
+        except Exception:  # noqa: BLE001 - a chart with no field here
+            hit = None
+        if hit is None:
+            continue
+        _, where, _ = hit
+        d_nm = bearing_and_distance(here, where)[1] / units.NAUTICAL_MILE
+        if best is None or d_nm < best:
+            best = d_nm
+    return best
+
+
 @dataclass
 class Perception:
     """What the captain judges by, read from the registry's readings and the account
@@ -1020,6 +1084,7 @@ class Perception:
     anchoring: bool = False
     coast_by_account_nm: float | None = None
     coast_by_account_bearing_deg: float | None = None
+    lee_land_nm: float | None = None  # the nearest land within the lee sector (package 45)
     manoeuvre: str = ""
     strangers: list[dict[str, Any]] = field(default_factory=list)
     in_port: str = ""  # the port she lies in, by the port's reading
@@ -1034,6 +1099,16 @@ class Perception:
     now: datetime | None = None
     glass_falling_fast: bool = False
     dangers_nm: float | None = None
+    # package 45: the glass's tendency in words; the sails as the readings give them; the
+    # pilot's conn; the port's reach
+    glass_tendency: str = ""
+    headsail_set: bool = False
+    headsails_blown: list[str] = field(default_factory=list)
+    headsails_bent: list[str] = field(default_factory=list)
+    topsail_reefs: int = 0
+    storm_staysails_set: bool = False
+    pilot_conn: bool = False
+    reach_nm: float = IN_PORT_NM
 
     @classmethod
     def read(cls, world: Any) -> Perception:
@@ -1088,6 +1163,7 @@ class Perception:
                 metres, toward = found
                 p.coast_by_account_nm = float(metres) / units.NAUTICAL_MILE
                 p.coast_by_account_bearing_deg = float(toward)
+            p.lee_land_nm = _lee_land_nm(world, p)
         strangers = view.value("strangers")
         if isinstance(strangers, dict):
             p.strangers = list(strangers.get("items") or [])
@@ -1097,15 +1173,43 @@ class Perception:
             # in port: at anchor within the port's reach by account (`ports.IN_PORT_NM`
             # is the port's own rule at the truth; the captain reads his account)
             dist = port.get("distance_nm")
+            # the port's reach (package 45): the reading carries it
+            p.reach_nm = float(port.get("reach_nm") or IN_PORT_NM)
             if (
                 p.anchor_down
                 and port.get("port")
                 and dist is not None
-                and float(dist) <= IN_PORT_NM
+                and float(dist) <= p.reach_nm
             ):
                 p.in_port = str(port.get("port"))
         pilot = view.value("pilot")
         p.pilot_aboard = isinstance(pilot, dict) and bool(pilot.get("name"))
+        p.pilot_conn = isinstance(pilot, dict) and bool(pilot.get("conn"))
+        # the sails by the readings (package 45): the head sails set, blown out or bent
+        # and furled, the topsails' reefs, the storm staysails
+        ship = world.ship
+        groups = getattr(ship, "groups", {}) or {}
+        sails = getattr(ship, "sails", {}) or {}
+        head_ids = [sid for g in ("jibs", "staysails") for sid in groups.get(g, []) if sid in sails]
+        for sid in head_ids:
+            r = view.value("sail", sid)
+            if not isinstance(r, dict):
+                continue
+            state = str(r.get("state") or "")
+            if state == "set":
+                p.headsail_set = True
+            elif state == "blown_out":
+                p.headsails_blown.append(sid)
+            elif state in ("furled", "bent", "in_the_gear", "loosed"):
+                p.headsails_bent.append(sid)
+        for sid in groups.get("topsails", []):
+            r = view.value("sail", sid)
+            if isinstance(r, dict) and str(r.get("state") or "") == "set":
+                p.topsail_reefs = max(p.topsail_reefs, int(r.get("reefs") or 0))
+        for sid in groups.get("storm staysails", []) or groups.get("storm canvas", []):
+            r = view.value("sail", sid)
+            if isinstance(r, dict) and str(r.get("state") or "") == "set":
+                p.storm_staysails_set = True
         boat = view.value("boat")
         p.boat_away = bool(isinstance(boat, dict) and boat.get("away"))
         manifest = view.value("manifest")
@@ -1127,7 +1231,8 @@ class Perception:
                     p.high_waters.append(nxt)
         tendency = view.value("tendency")
         if isinstance(tendency, dict):
-            p.glass_falling_fast = tendency.get("words") == "falling fast"
+            p.glass_tendency = str(tendency.get("words") or "")
+            p.glass_falling_fast = p.glass_tendency == "falling fast"
         dangers = view.value("dangers")
         if isinstance(dangers, dict) and dangers.get("metres") is not None:
             p.dangers_nm = float(dangers["metres"]) / units.NAUTICAL_MILE
@@ -1212,6 +1317,14 @@ class Captain:
         self._state_entered: int | None = None
         self._waiting_at_road = False
         self._business: dict[str, Any] = {}
+        self._plan_from: Position | None = None  # where the plan was laid (package 45)
+        # the weather's trend (package 45): the wind each judgement for an hour, and the
+        # trend read from it and the glass ("worsening", "mending" or "")
+        self._wind_log: list[tuple[int, float]] = []
+        self.trend = ""
+        self._calm_since: int | None = None  # the wind under the sail-again line since
+        self._gale_over_since: int | None = None  # the wind under the gale-over line since
+        self._entry_stop: int | None = None  # the inner leg he anchors at, the wind foul beyond
         self._stranger: str | None = None
         self._departing = ""  # the port she sails from, for the plan's first legs
         self.error = ""
@@ -1362,6 +1475,7 @@ class Captain:
         events = [world.log[i] for i in range(self._seen_log, len(world.log))]
         self._seen_log = len(world.log)
         p = Perception.read(world)
+        self._read_trend(p)
         if self.state is None:
             self._enter(self._first_state(p))
         self._transitions(p)
@@ -1491,7 +1605,12 @@ class Captain:
             return []
         fills = self._fills()
         out = []
+        # while the pilot has the conn (package 45) the book's course lines are left out,
+        # or the hourly "the leg" would take her back from him at the hour
+        conn = bool(self._business.get("conn_given"))
         for line in self.doctrine.book(state):
+            if conn and 'standing order "the leg"' in line:
+                continue
             try:
                 out.append(line.format_map(fills))
             except (KeyError, IndexError, ValueError):
@@ -1648,6 +1767,39 @@ class Captain:
 
     # -- the doctrine's transitions ----------------------------------------------------
 
+    def _read_trend(self, p: Perception) -> str:
+        """The weather's trend (package 45, Part B item 6): "worsening" when the glass is
+        falling fast or the wind has risen by a force (`worsening_wind_kn`) within the
+        hour; "mending" when the glass is rising or the wind has eased by as much; else
+        "". Luce 1884 ch. XXVIII on the barometer as the instrument of warning, and
+        FitzRoy's rules of the glass (a rapid fall, a blow soon; "long foretold, long
+        last"); the force's knots and the hour judgement."""
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        self._wind_log.append((p.tick, p.wind_kn))
+        self._wind_log = [x for x in self._wind_log if p.tick - x[0] <= TREND_HOUR_S]
+        risen = p.wind_kn - self._wind_log[0][1]
+        worsening = p.glass_falling_fast or risen >= float(th("worsening_wind_kn", 6))
+        mending = p.glass_tendency in ("rising", "rising fast") or risen <= -float(
+            th("mending_wind_kn", 6)
+        )
+        self.trend = "worsening" if worsening else "mending" if mending else ""
+        # the gale-over line as the trend moves it, and how long the wind has stood under
+        # it: sooner by `mending_sooner_kn` with the glass rising, lower by
+        # `worsening_sooner_kn` with the glass falling (as the gale line is), so that the
+        # two lines keep their band apart
+        line = float(th("gale_over_kn", 28))
+        if self.trend == "mending":
+            line += float(th("mending_sooner_kn", 4))
+        elif self.trend == "worsening":
+            line -= float(th("worsening_sooner_kn", 6))
+        if p.wind_kn < line:
+            if self._gale_over_since is None:
+                self._gale_over_since = p.tick
+        else:
+            self._gale_over_since = None
+        return self.trend
+
     def _transitions(self, p: Perception) -> None:
         if self.doctrine is None or self.state is None:
             return
@@ -1659,38 +1811,41 @@ class Captain:
     def _stimulus(self, name: str, p: Perception) -> bool:
         d = self.doctrine
         th = d.threshold if d is not None else (lambda k, v=None: v)
+        # the glass as a stimulus (package 45, Part B item 6): worsening brings the
+        # heavy-weather rows a step sooner, mending the fair-weather rows
+        # (a first version widened the sea room and the lee shore by half as well when the
+        # glass fell: on the station fifteen miles off Ushant that put the station itself
+        # inside the no-sea-room line, and she hove to and filled away by turns all the
+        # forenoon of the gale trial; the two lines stand as the doctrine gives them)
+        sooner = float(th("worsening_sooner_kn", 6)) if self.trend == "worsening" else 0.0
+        if name == "weather worsening":
+            return self.trend == "worsening"
+        if name == "weather mending":
+            return self.trend == "mending"
         if name == "gale":
-            return p.wind_kn >= float(th("gale_kn", 34)) and p.manoeuvre not in (
+            return p.wind_kn >= float(th("gale_kn", 34)) - sooner and p.manoeuvre not in (
                 "hove to",
                 "heaving to",
             )
         if name == "gale over":
-            return p.wind_kn < float(th("gale_over_kn", 28))
+            # under the line for `gale_over_minutes` together, not on a lull (the first
+            # version filled her away ten minutes after she hove to, on a lull of the
+            # gusty wind, and she thrashed between the two books all the forenoon of the
+            # station trial); and while the glass falls the line comes down with the gale
+            # line, so that the band between them is never narrowed to a gust's width
+            since = self._gale_over_since
+            minutes = float(th("gale_over_minutes", 10))
+            return since is not None and p.tick - since >= minutes * 60.0
         if name == "lee shore":
-            if p.wind_from_deg is None:
-                return False
-            # the land as the lookout sees it, else as the account lays it on the chart
-            dist, land = p.nearest_land_nm, _point_deg(p.nearest_land_bearing or "")
-            if dist is None or land is None:
-                dist, land = p.coast_by_account_nm, p.coast_by_account_bearing_deg
-            if dist is None or land is None or dist > float(th("lee_shore_nm", 6)):
-                return False
-            toward = (p.wind_from_deg + 180.0) % 360.0
-            return abs(units.wrap_pi(math.radians(land - toward))) < math.radians(67.5)
+            # the land within the lee sector (`_lee_land_nm`: the lookout's land when it
+            # bears so, and the chart's coast along the account's rays through the sector)
+            return p.lee_land_nm is not None and p.lee_land_nm <= float(th("lee_shore_nm", 6))
         if name == "no sea room":
             # the land to leeward within the sea room a night's drift hove to wants
             # (package 40c): she heaves to only with sea room, and leaves it for a lee
             # shore within `lee_shore_nm`, the two thresholds apart so that she does not
             # heave to and fill away by turns at one line
-            if p.wind_from_deg is None:
-                return False
-            dist, land = p.nearest_land_nm, _point_deg(p.nearest_land_bearing or "")
-            if dist is None or land is None:
-                dist, land = p.coast_by_account_nm, p.coast_by_account_bearing_deg
-            if dist is None or land is None or dist > float(th("sea_room_nm", 10)):
-                return False
-            toward = (p.wind_from_deg + 180.0) % 360.0
-            return abs(units.wrap_pi(math.radians(land - toward))) < math.radians(67.5)
+            return p.lee_land_nm is not None and p.lee_land_nm <= float(th("sea_room_nm", 10))
         if name == "thick near the land":
             thick = p.visibility in ("a mile", "a cable")
             dist = p.nearest_land_nm if p.nearest_land_nm is not None else p.coast_by_account_nm
@@ -1771,6 +1926,7 @@ class Captain:
             # his own fill away done (not the book's after a pilot): the leg shaped now
             if self.legs and self.leg_i < len(self.legs) and self.legs[self.leg_i].kind != "out":
                 self._shape_leg(why="filled away")
+        self._weather_work(p, kinds)
         if state in ("on passage", "beating", "running for shelter"):
             self._passage(p, events, kinds)
         elif state == "in port":
@@ -1789,6 +1945,84 @@ class Captain:
             self._business["brought_up"] = True
         if "ship.under_way" in kinds or "ship.aweigh" in kinds:
             self._business.pop("brought_up", None)
+
+    def _weather_work(self, p: Perception, kinds: set[str]) -> None:
+        """Sail after the gale, whatever his state (package 45, Part B item 5; 37p's open
+        point: the station trial beat for the station under the main topsail and two
+        staysails to the end, the hove-to book's line having unloaded with the book); a
+        head sail blown out replaced from the sail room; and the glass (item 6): sail
+        shortened by the book's next line a step before the gale line when the weather
+        is worsening."""
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        shorten_kn = float(th("shorten_sail_kn", 30))
+        again_kn = float(th("sail_again_kn", 25))
+        minutes = float(th("sail_again_minutes", 30))
+        if self.trend == "mending":
+            minutes = minutes / 2.0
+        if p.wind_kn >= shorten_kn:
+            self._business["gale_met"] = True
+            self._business.pop("made_sail_after", None)
+        if p.wind_kn < again_kn:
+            if self._calm_since is None:
+                self._calm_since = p.tick
+        else:
+            self._calm_since = None
+        lying = p.manoeuvre in ("hove to", "heaving to") or p.anchor_down or p.aground
+        sailing = self.state not in ("hove to for weather", "at anchor", "in port", "in distress")
+        # worsening: the book's next line a step sooner than its own threshold
+        if (
+            self.trend == "worsening"
+            and sailing
+            and not lying
+            and p.topsail_reefs == 0
+            and p.wind_kn >= shorten_kn - float(th("worsening_sooner_kn", 6))
+            and not self._business.get("shortened_sooner")
+        ):
+            self._business["shortened_sooner"] = True
+            self.give("shorten sail", why="the glass falling and the wind rising")
+        if p.wind_kn < shorten_kn - float(th("worsening_sooner_kn", 6)):
+            self._business.pop("shortened_sooner", None)
+        # sail again after the gale: half an hour under the line, and not too soon
+        calm = self._calm_since is not None and p.tick - self._calm_since >= minutes * 60.0
+        if (
+            self._business.get("gale_met")
+            and calm
+            and sailing
+            and not lying
+            and not self._business.get("made_sail_after")
+            and (p.topsail_reefs > 0 or p.storm_staysails_set or p.headsails_blown)
+        ):
+            self._business["made_sail_after"] = True
+            self._business.pop("gale_met", None)
+            why = "the gale over" + (", the weather mending" if self.trend == "mending" else "")
+            if p.topsail_reefs > 0 or p.storm_staysails_set:
+                self.give("sway up the topgallant masts", why=why)
+                self.give("shake out the reefs in the topsails", why=why)
+            for sid in p.headsails_blown:
+                if p.wind_kn < float(th("wear_wind_kn", 30)):
+                    self.give(f"bend a new {self._sail_name(sid)}", why="blown out in the gale")
+            self.give("set plain sail", why=why)
+        # a head sail bent again after the gale, and not yet set
+        if (
+            self._business.get("made_sail_after")
+            and sailing
+            and not lying
+            and p.headsails_bent
+            and not p.headsail_set
+            and p.wind_kn < float(th("wear_wind_kn", 30))
+            and p.tick - self._business.get("headsail_set_tick", -(10**9)) >= 600
+        ):
+            self._business["headsail_set_tick"] = p.tick
+            self.give(f"set the {self._sail_name(p.headsails_bent[0])}", why="bent anew")
+
+    def _sail_name(self, sid: str) -> str:
+        try:
+            from freesail.evolutions.runner import part_name
+
+            return part_name(self.world.ship, sid)
+        except (AttributeError, KeyError, TypeError, ValueError, ImportError):
+            return sid.replace(".", " ").replace("_", " ")
 
     def _passage(self, p: Perception, events: list[Any], kinds: set[str]) -> None:
         if not self.legs:
@@ -1812,17 +2046,37 @@ class Captain:
             # schooner beat up the Goulet and took the ground on the Fillettes). Most often
             # it is the allowance for the stream that brings the steered course up to the
             # wind, the stream running along the channel; then she is conned for the mark
-            # by the rhumb line with the stream under her, as a pilot conns. A wind foul
-            # for the line itself is waited out at anchor, the at-anchor book trying again
-            # on the flood by day.
+            # with the stream under her: by the pilot, who has the conn (package 45), or
+            # by the rhumb line. A wind foul for the leg itself (`ENTRY_POINTS`) is waited
+            # out at anchor, the at-anchor book trying again on the flood by day.
             self._business.pop("course_not_laid", None)
-            if self._conn_for(leg, p):
+            if self._leg_serves(leg, p) and self._conn_for(leg, p):
                 return
             port = self._port_of(leg.port)
             where = port.name if port is not None else leg.words
             self._waiting_at_road = True
             self.give("come to an anchor", why=f"the wind does not serve to enter {where}")
             self._enter("at anchor")
+            return
+        if p.pilot_conn and self._inner_leg():
+            # the pilot conns her (package 45): no course of the captain's fights his, the
+            # legs advance by account for the anchor
+            dist = self._distance_by_account(leg)
+            if dist is not None and (dist <= leg.reached_nm or self._passed(leg)):
+                self._leg_reached(leg, p)
+            return
+        if self._business.get("conn_given") and not p.pilot_conn and not p.pilot_aboard:
+            # the pilot gone (put off, or he gave her up): the captain has her again, his
+            # book whole
+            self._business.pop("conn_given", None)
+            self._reload_leg_book()
+        elif self._business.get("conn_given") and not p.pilot_conn:
+            # the pilot aboard but the conn given up (a helm order of the book's or the
+            # officer's): the captain conns the leg himself, his book whole
+            self._business.pop("conn_given", None)
+            self._business["conn_refused"] = True
+            self._reload_leg_book()
+            self._shape_leg(why="the pilot gave her up")
             return
         dist = self._distance_by_account(leg)
         if dist is not None and (dist <= leg.reached_nm or self._passed(leg)):
@@ -1831,21 +2085,65 @@ class Captain:
         if "lookout.land_ahead" in kinds and leg.kind != "out":
             self._shape_leg(why="land ahead")
 
-    def _conn_for(self, leg: Leg, p: Perception) -> bool:
-        """The helm given the rhumb line to the leg's mark by account, as a pilot conns
-        her up a channel with the stream under her, when that line is laid; False when
-        the wind is foul for the line itself."""
-        from freesail.evolutions.scripts import close_hauled_true_angle
-
+    def _leg_serves(self, leg: Leg, p: Perception) -> bool:
+        """Whether a leg of the inner track lies no nearer the wind than `ENTRY_POINTS`
+        (package 45, Part B item 3a), from the account to its mark."""
         nav = getattr(self.world, "navigation", None)
         here = nav.account_now() if nav is not None else None
         if here is None or p.wind_from_deg is None:
-            return False
+            return True
         bearing, _ = bearing_and_distance(here, leg.position)
         off = abs(units.wrap_pi(math.radians(bearing - p.wind_from_deg)))
-        closest = close_hauled_true_angle(self.world.ship)
-        if off < closest + math.radians(5.0):
+        return off >= ENTRY_POINTS * units.POINT
+
+    def _entry_stop_for(self, p: Perception) -> int | None:
+        """The inner track judged leg by leg from the one in hand (package 45, item 3a):
+        the index of the last leg before the first that the wind will not serve, where
+        she anchors if it is a port's road or anchorage; None when every leg serves."""
+        if p.wind_from_deg is None or not self.legs:
+            return None
+        nav = getattr(self.world, "navigation", None)
+        at = nav.account_now() if nav is not None else None
+        if at is None:
+            return None
+        last_ok: int | None = None
+        for i in range(self.leg_i, len(self.legs)):
+            leg = self.legs[i]
+            if not leg.port or leg.kind not in ("to", "anchorage", "road"):
+                at = leg.position
+                continue
+            bearing, _ = bearing_and_distance(at, leg.position)
+            off = abs(units.wrap_pi(math.radians(bearing - p.wind_from_deg)))
+            if off < ENTRY_POINTS * units.POINT:
+                return last_ok
+            if leg.kind in ("road", "anchorage"):
+                last_ok = i
+            at = leg.position
+        return None
+
+    def _conn_for(self, leg: Leg, p: Perception) -> bool:
+        """The helm given the rhumb line to the leg's mark by account, as a pilot conns
+        her up a channel with the stream under her, when that line is laid; the pilot
+        himself given the conn when he is aboard (package 45); False when the wind is
+        foul for the line itself (`_leg_serves`)."""
+        if not self._leg_serves(leg, p):
             return False
+        if (
+            p.pilot_aboard
+            and not p.pilot_conn
+            and not self._business.get("conn_given")
+            and not self._business.get("conn_refused")
+        ):
+            self._business["conn_given"] = True
+            e = self.give("let the pilot take her in", why="his water")
+            if e.kind != "order.rejected":
+                self._reload_leg_book()
+                return True
+        nav = getattr(self.world, "navigation", None)
+        here = nav.account_now() if nav is not None else None
+        if here is None:
+            return False
+        bearing, _ = bearing_and_distance(here, leg.position)
         point = units.point_name(math.radians(bearing))
         e = self.give(f"steer {point}", why=f"conning her for {leg.words}, the stream under her")
         return e.kind != "order.rejected"
@@ -1873,8 +2171,15 @@ class Captain:
         here = nav.account_now() if nav is not None else None
         if here is None:
             return False
-        before = self.legs[self.leg_i - 1]
-        along, _ = bearing_and_distance(before.position, leg.position)
+        # the line to the mark: from the mark before it, or for the plan's first leg from
+        # where the plan was laid (package 45; before, the first leg read the last)
+        if self.leg_i > 0:
+            start = self.legs[self.leg_i - 1].position
+        elif self._plan_from is not None:
+            start = self._plan_from
+        else:
+            return False
+        along, _ = bearing_and_distance(start, leg.position)
         to_mark, _ = bearing_and_distance(here, leg.position)
         return abs(units.wrap_pi(math.radians(to_mark - along))) > math.pi / 2.0
 
@@ -1887,7 +2192,18 @@ class Captain:
                 self.give("come to an anchor", why=f"the tide does not serve to enter {port.name}")
                 self._enter("at anchor")
                 return
+        stop_here = self._entry_stop is not None and self.leg_i == self._entry_stop
+        if stop_here and leg.kind != "anchorage":
+            # as far in as the wind serves (package 45, item 3a): the next leg lies too
+            # near the wind, and this is the last anchorage he can reach
+            self._entry_stop = None
+            self._waiting_at_road = True
+            why = f"at {leg.words}; the wind does not serve farther in"
+            self.give("come to an anchor", why=why)
+            self._enter("at anchor")
+            return
         if leg.kind == "anchorage":
+            self._entry_stop = None
             self.give("come to an anchor", why=f"at {leg.words}")
             self._advance()
             if self.intent is not None and self.intent.kind in ("passage", "home", "letter"):
@@ -1940,6 +2256,7 @@ class Captain:
         if start is None:
             return
         departing = p.in_port or self._departing
+        self._plan_from = start
         try:
             self.legs = Planner(self.world).legs_for(self.intent, start, departing)
         except ValueError as e:
@@ -1967,6 +2284,23 @@ class Captain:
             return
         leg = self.legs[self.leg_i]
         self.leg_shaped_tick = self.world.clock.tick
+        if self._inner_leg():
+            p = Perception.read(self.world)
+            if p.pilot_conn:
+                return  # the pilot has her (package 45)
+            # the entry judged leg by leg (package 45, item 3a): the legs he can reach
+            self._entry_stop = self._entry_stop_for(p)
+            if (
+                p.pilot_aboard
+                and not self._business.get("conn_given")
+                and not self._business.get("conn_refused")
+                and self._leg_serves(leg, p)
+            ):
+                self._business["conn_given"] = True
+                e = self.give("let the pilot take her in", why="his water")
+                if e.kind != "order.rejected":
+                    self._reload_leg_book()
+                    return
         self.give(f"shape a course for {leg.words}", why=why)
 
     def _distance_by_account(self, leg: Leg) -> float | None:
@@ -2066,8 +2400,11 @@ class Captain:
         if e.kind != "order.rejected":
             self._business["sailing"] = True
             self._business.pop("course_not_laid", None)
+            self._business.pop("conn_given", None)
+            self._business.pop("conn_refused", None)
             self._departing = port.id
             self.legs, self.leg_i = [], 0
+            self._entry_stop = None
 
     # -- the station, the strangers ----------------------------------------------------
 

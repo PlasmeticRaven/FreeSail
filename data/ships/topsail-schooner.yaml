@@ -251,7 +251,7 @@ sails:
   centre_height_m: 20.2
   canvas_no: 6
   cloth_rating_kn: 7.8
-# storm trysail 85 m2 (Steel's sloop's storm mainsail): head 11 ft (two-fifths of the mainsail's), foot 32 ft (three times the head), luff 41 ft (0.85 of the mainsail's, judgement within Steel's three-fourths to the whole), after leech an eighth deeper; three reef bands (Steel: three or four); bent to the main gaff and boom in place of the mainsail; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, 'Sloop's trysail, or storm mainsail': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): storm sails of No. 1); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# storm trysail 85 m2 (Steel's sloop's storm mainsail): head 11 ft (two-fifths of the mainsail's), foot 32 ft (three times the head), luff 41 ft (0.85 of the mainsail's, judgement within Steel's three-fourths to the whole), after leech an eighth deeper; three reef bands (Steel: three or four); bent to the main gaff and boom in place of the mainsail; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, 'Sloop's trysail, or storm mainsail': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): storm sails of No. 1); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: storm_trysail
   class: gaff
   mast: main.mast
@@ -262,10 +262,10 @@ sails:
   x_m: -7.9
   centre_height_m: 8.0
   canvas_no: 1
-  cloth_rating_kn: 30.4
+  cloth_rating_kn: 78.2
   bent: false
   in_place_of: main.sail
-# storm jib 47 m2, two-thirds of the jib (Steel 1794); hanked to the jib stay in place of the jib; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, the sloop's jibs (p. 190): 'No. 1 or 2 ... two-thirds of the size of the first jib, and is used in stormy weather, in lieu of a larger one'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# storm jib 47 m2, two-thirds of the jib (Steel 1794); hanked to the jib stay in place of the jib; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, the sloop's jibs (p. 190): 'No. 1 or 2 ... two-thirds of the size of the first jib, and is used in stormy weather, in lieu of a larger one'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: storm_jib
   class: jibheaded
   stay: jib.stay
@@ -273,7 +273,7 @@ sails:
   x_m: 20.7
   centre_height_m: 6.1
   canvas_no: 1
-  cloth_rating_kn: 16.8
+  cloth_rating_kn: 43.2
   bent: false
   in_place_of: jib
 # ringtail 69 m2: 62 ft deep, the mainsail's after leech (Falconer), 5 cloths in the head and 7 in the foot (Kipping); a studding-class sail with no side, lying in the mainsail's plane; in the sail room. Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Sloop's ringtail sail': No. 5 or 8; Kipping 1847 (1898 printing), Sails and Sailmaking, a brig's: No. 5 or 6); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E.

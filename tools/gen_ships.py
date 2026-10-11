@@ -333,12 +333,36 @@ def cloth(area_m2: float, canvas_no: int) -> float:
     return cloth_rating_for(area_m2, canvas_no)
 
 
-def canvas_note(canvas: tuple[int, str]) -> str:
-    """The comment text for a sail's canvas: its number, the source, and the rating rule."""
-    from freesail.ship.parts import CLOTH_KN_PER_M2_NO2, canvas_strength
+def storm_cloth(area_m2: float) -> float:
+    """A storm sail's cloth rating, kN (package 45): rated for the wind it is cut for,
+    seventy knots apparent, and not by the square metre as the working canvas is
+    (freesail.ship.parts.storm_cloth_rating_for, with the reasoning)."""
+    from freesail.ship.parts import storm_cloth_rating_for
+
+    return storm_cloth_rating_for(area_m2)
+
+
+def canvas_note(canvas: tuple[int, str], storm: bool = False) -> str:
+    """The comment text for a sail's canvas: its number, the source, and the rating rule;
+    for storm canvas (package 45) the rating for the wind it is cut for."""
+    from freesail.ship.parts import (
+        CLOTH_KN_PER_M2_NO2,
+        STORM_CANVAS_APPARENT_KN,
+        STORM_CANVAS_RATIO,
+        canvas_strength,
+        storm_cloth_rating_for,
+    )
 
     no, source = canvas
     per = CLOTH_KN_PER_M2_NO2 * canvas_strength(no)
+    if storm:
+        return (
+            f" Canvas No. {no} ({source}); rated for the wind it is cut for (package 45): "
+            f"{storm_cloth_rating_for(1.0):.2f} kN/m2, the model's force on a jib-headed sail "
+            f"at {STORM_CANVAS_APPARENT_KN:.0f} knots apparent over a strain of "
+            f"{STORM_CANVAS_RATIO}, where the cloth's own rating of {per:.3f} kN/m2 "
+            "({canvas_strength:.2f} of No. 2 by Luce App. E) blew it out at sixty."
+        ).replace("{canvas_strength:.2f}", f"{canvas_strength(no):.2f}")
     return (
         f" Canvas No. {no} ({source}); cloth {per:.3f} kN/m2, {canvas_strength(no):.2f} of "
         "No. 2 by Luce App. E."
@@ -1565,13 +1589,13 @@ def frigate(out_dir="data/ships"):
         x_m=round(fss_clew_x + fss_foot * FT / 3.0, 1),
         centre_height_m=fss_centre,
         canvas_no=storm_canvas[0],
-        cloth_rating_kn=cloth(fss_area, storm_canvas[0]),
+        cloth_rating_kn=storm_cloth(fss_area),
         bent=False,
         note=f"fore storm staysail {fss_area} m2 on the fore stay (Luce 1884 ch. X): Kipping's "
         f"fore staysail, a right-angled triangle, foot {fss_foot:.0f} ft (half the fore course's "
         f"head cloths and two), leech {fss_leech:.0f} ft (the course's depth); the clew just "
         "before the fore mast and the foot 5 ft above the deck (judgement); in the sail room."
-        + canvas_note(storm_canvas),
+        + canvas_note(storm_canvas, storm=True),
     )
     # storm staysail halliards "sometimes a luff, and sometimes a gun-tackle purchase"; the
     # sheets "temporary purchases, ... stout luffs hooked ... to the clew-cringles, and
@@ -1596,12 +1620,12 @@ def frigate(out_dir="data/ships"):
         x_m=round(mast_x["main"] + (2.0 * head_x / 3.0) * FT, 1),
         centre_height_m=round(deck_height + (12.0 + head_z + 7.0) / 3.0 * FT, 1),
         canvas_no=storm_canvas[0],
-        cloth_rating_kn=cloth(mss_area, storm_canvas[0]),
+        cloth_rating_kn=storm_cloth(mss_area),
         bent=False,
         note=f"mizzen storm staysail {mss_area} m2 on the mizzen stay (Luce 1884 ch. X; the "
         "Trenton's allowance has one, Luce p. 171): tack at the main mast collar, head 0.6 up "
         "the stay, clew 7 ft above the deck (Steel's mizzen staysail; 0.6 judgement); in the "
-        "sail room." + canvas_note(storm_canvas),
+        "sail room." + canvas_note(storm_canvas, storm=True),
     )
     b.line("mizzen.storm_staysail.halyard", "halyard", mss, rating=rope_kn(3.0, 2))
     b.sided("mizzen.storm_staysail.sheet", "sheet", mss, rating=rope_kn(3.0, 3))
@@ -1631,13 +1655,13 @@ def frigate(out_dir="data/ships"):
         x_m=round(mast_x["mizzen"] - sm_foot / 3.0 * FT, 1),
         centre_height_m=round(deck_height + (4.0 + sm_luff / 3.0) * FT, 1),
         canvas_no=storm_canvas[0],
-        cloth_rating_kn=cloth(sm_area, storm_canvas[0]),
+        cloth_rating_kn=storm_cloth(sm_area),
         bent=False,
         in_place_of="mizzen.spanker",
         note=f"storm mizzen {sm_area} m2, triangular (Luce 1884 ch. X; Steel 1794 'Storm "
         f"mizen'): luff {sm_luff:.0f} ft on its vertical stay (0.8 of the mast head's height "
         f"above the tack, judgement), foot {sm_foot:.0f} ft towards the taffrail (judgement); "
-        "bent in place of the spanker; in the sail room." + canvas_note(storm_canvas),
+        "bent in place of the spanker; in the sail room." + canvas_note(storm_canvas, storm=True),
     )
     b.line("storm_mizzen.halyard", "halyard", sm, rating=rope_kn(3.0, 2))
     b.line("storm_mizzen.sheet", "sheet", sm, rating=rope_kn(3.5, 3), parts=3)
@@ -2535,7 +2559,7 @@ def schooner(out_dir="data/ships"):
         x_m=round(raked(main_x, st_z) - 0.4 * st_foot * FT, 1),
         centre_height_m=round(deck_height + st_z * FT, 1),
         canvas_no=storm_canvas[0],
-        cloth_rating_kn=cloth(st_area, storm_canvas[0]),
+        cloth_rating_kn=storm_cloth(st_area),
         bent=False,
         in_place_of="main.sail",
         note=f"storm trysail {st_area} m2 (Steel's sloop's storm mainsail): head {st_head:.0f} ft "
@@ -2543,7 +2567,7 @@ def schooner(out_dir="data/ships"):
         f"{st_luff:.0f} ft (0.85 of the mainsail's, judgement within Steel's three-fourths to "
         "the whole), after leech an eighth deeper; three reef bands (Steel: three or four); "
         "bent to the main gaff and boom in place of the mainsail; in the sail room."
-        + canvas_note(storm_canvas),
+        + canvas_note(storm_canvas, storm=True),
     )
     b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(4.0, 3), parts=3)
     b.line("storm_trysail.outhaul", "outhaul", st, rating=rope_kn(2.5))
@@ -2561,11 +2585,11 @@ def schooner(out_dir="data/ships"):
         x_m=jib_x,
         centre_height_m=round(jib_h * math.sqrt(2.0 / 3.0), 1),
         canvas_no=sj_canvas[0],
-        cloth_rating_kn=cloth(sj_area, sj_canvas[0]),
+        cloth_rating_kn=storm_cloth(sj_area),
         bent=False,
         in_place_of="jib",
         note=f"storm jib {sj_area} m2, two-thirds of the jib (Steel 1794); hanked to the jib stay "
-        "in place of the jib; in the sail room." + canvas_note(sj_canvas),
+        "in place of the jib; in the sail room." + canvas_note(sj_canvas, storm=True),
     )
     b.line("storm_jib.halyard", "halyard", sj, rating=rope_kn(3.0, 2))
     b.sided("storm_jib.sheet", "sheet", sj, rating=rope_kn(3.0))
@@ -3875,14 +3899,14 @@ def cutter(out_dir="data/ships"):
         x_m=m(raked(st_z) - 0.4 * st_foot),
         centre_height_m=round(deck_height + st_z * FT, 1),
         canvas_no=storm_canvas[0],
-        cloth_rating_kn=cloth(st_area, storm_canvas[0]),
+        cloth_rating_kn=storm_cloth(st_area),
         bent=False,
         in_place_of="main.sail",
         note=f"storm trysail {st_area} m2 (Steel 1794, 'Cutter's trysail'): head {st_head:.0f} "
         f"ft (two-fifths of the mainsail's), fore-leech {st_luff:.0f} ft (three-fourths of the "
         f"mainsail's), after-leech a sixth deeper, foot {st_foot:.0f} ft (three-fourths of "
         "the mainsail's, judgement); three reef-bands; bent to the gaff and boom in place of "
-        "the mainsail; in the sail room." + canvas_note(storm_canvas),
+        "the mainsail; in the sail room." + canvas_note(storm_canvas, storm=True),
     )
     b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(3.5, 3), parts=3)
     b.line("storm_trysail.outhaul", "outhaul", st, rating=rope_kn(2.0))
@@ -3901,13 +3925,14 @@ def cutter(out_dir="data/ships"):
         x_m=m(sj_x),
         centre_height_m=round((deck_height + jib_z * FT) * math.sqrt(2.0 / 3.0), 1),
         canvas_no=sj_canvas[0],
-        cloth_rating_kn=cloth(sj_area, sj_canvas[0]),
+        cloth_rating_kn=storm_cloth(sj_area),
         bent=False,
         in_place_of="jib",
         note=f"storm jib {sj_area} m2, two-thirds of the jib (Steel 1794 p. 190, the sloop's "
         f"jibs); its tack on the traveller at the reefed bowsprit's end, {bowsprit_reefed:.0f} "
         "ft before the stem, its centre lower as its size is smaller (judgement); set in place "
-        "of the jib, with the bowsprit reefed or not; in the sail room." + canvas_note(sj_canvas),
+        "of the jib, with the bowsprit reefed or not; in the sail room."
+        + canvas_note(sj_canvas, storm=True),
     )
     b.line("storm_jib.halyard", "halyard", sj, rating=rope_kn(3.0, 2))
     b.sided("storm_jib.sheet", "sheet", sj, rating=rope_kn(3.0))
@@ -4814,11 +4839,12 @@ def brig(out_dir="data/ships"):
         x_m=round(fss_clew_x + fss_foot * FT / 3.0, 1),
         centre_height_m=round(deck_height + (1.5 + fss_leech * FT / 3.0), 1),
         canvas_no=storm_canvas[0],
-        cloth_rating_kn=cloth(fss_area, storm_canvas[0]),
+        cloth_rating_kn=storm_cloth(fss_area),
         bent=False,
         note=f"fore storm staysail {fss_area} m2 on the fore stay (Luce 1884 ch. X), cut as "
         f"the frigate's: Kipping's fore staysail, foot {fss_foot:.0f} ft, leech "
-        f"{fss_leech:.0f} ft (the course's depth); in the sail room." + canvas_note(storm_canvas),
+        f"{fss_leech:.0f} ft (the course's depth); in the sail room."
+        + canvas_note(storm_canvas, storm=True),
     )
     b.line("fore.storm_staysail.halyard", "halyard", fss, rating=rope_kn(3.0, 2))
     b.sided("fore.storm_staysail.sheet", "sheet", fss, rating=rope_kn(3.0, 3))
@@ -4838,12 +4864,12 @@ def brig(out_dir="data/ships"):
         x_m=round(mast_x["fore"] + (2.0 * head_x / 3.0) * FT, 1),
         centre_height_m=round(deck_height + (12.0 + head_z + 7.0) / 3.0 * FT, 1),
         canvas_no=storm_canvas[0],
-        cloth_rating_kn=cloth(mss_area, storm_canvas[0]),
+        cloth_rating_kn=storm_cloth(mss_area),
         bent=False,
         note=f"main storm staysail {mss_area} m2 on the main stay (Luce 1884 ch. X: 'the "
         "storm-staysails set on the respective lower-stays'): tack at the fore mast collar, "
         "head 0.6 up the stay, clew 7 ft above the deck (as the frigate's mizzen storm "
-        "staysail; 0.6 judgement); in the sail room." + canvas_note(storm_canvas),
+        "staysail; 0.6 judgement); in the sail room." + canvas_note(storm_canvas, storm=True),
     )
     b.line("main.storm_staysail.halyard", "halyard", mss, rating=rope_kn(3.0, 2))
     b.sided("main.storm_staysail.sheet", "sheet", mss, rating=rope_kn(3.0, 3))
@@ -4873,7 +4899,7 @@ def brig(out_dir="data/ships"):
         ),
         centre_height_m=round(deck_height + st_z * FT, 1),
         canvas_no=storm_canvas[0],
-        cloth_rating_kn=cloth(st_area, storm_canvas[0]),
+        cloth_rating_kn=storm_cloth(st_area),
         bent=False,
         in_place_of="main.spanker",
         note=f"storm trysail {st_area} m2 on the main gaff and boom (Steel 1794, 'Sloop's "
@@ -4881,7 +4907,7 @@ def brig(out_dir="data/ships"):
         f"of the spanker's), foot {st_foot:.0f} ft (three times the head), luff "
         f"{st_luff:.0f} ft (0.85 of the spanker's hoist, judgement), after-leech an eighth "
         "deeper; three reef-bands; bent in place of the spanker; in the sail room."
-        + canvas_note(storm_canvas),
+        + canvas_note(storm_canvas, storm=True),
     )
     b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(4.0, 2), parts=2)
     b.line("storm_trysail.outhaul", "outhaul", st, rating=rope_kn(3.0))

@@ -34,7 +34,7 @@ from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
 
-__all__ = ["NO_PORTS_WORDS", "PILOT_VERBS", "check", "execute", "number_in"]
+__all__ = ["CONN_VERBS", "NO_PORTS_WORDS", "PILOT_VERBS", "check", "execute", "number_in"]
 
 NO_PORTS_WORDS = "There is no port to deal with: the ship is not in a world with a chart."
 
@@ -42,6 +42,8 @@ Result = tuple[str, str, dict[str, Any]]
 
 # The pilot's orders (package 37h), the port's business as the boat and the market are
 PILOT_VERBS = ("take the pilot", "decline the pilot", "hail the pilot")
+# The pilot's conn (package 45): given, and taken back
+CONN_VERBS = ("let the pilot take her in", "let the pilot take her out", "i have the conn")
 
 
 def number_in(text: str) -> tuple[float | None, str]:
@@ -127,6 +129,14 @@ def execute(ship: Any, order: Order) -> Result:
     verb = order.verb
     rest = (order.object or "").strip()
     ports = _ports(ship)
+    if verb in CONN_VERBS:
+        # package 45: the pilot conns her in or out along his port's track; `I have the
+        # conn` (or any helm order of the officer's) takes her back
+        if verb == "i have the conn":
+            text = ports.take_conn_back()
+            return "port.conn", text, {"verb": verb, "level": 1, "conn": False}
+        text = ports.give_conn(inward=verb.endswith(" in"))
+        return "port.conn", text, {"verb": verb, "level": 1, "conn": True}
     if verb in PILOT_VERBS:
         # package 37h: the answer to the pilot's hail; she shortens sail or heaves to as
         # the hail asked when she is still too fast for him to board

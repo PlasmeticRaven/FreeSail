@@ -4405,3 +4405,106 @@ On the build machine under a load of about twenty (three other blocks' suites an
 | `GATE_6A_FAKE_CAPTAIN_DIGEST` (truth 78) | b00ac08c3f63e84c | aed776858a4ccf54 |
 
 The failing seven: `test_the_merchant_passage_at_seed_7_has_its_own_constants`, `test_the_passage_for_gate_5b_at_seed_7_has_its_own_constants`, `test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_hours`, `test_the_naval_cruise_at_seed_7_has_its_own_constants`, `test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants`, `test_truth_77_the_two_scenarios_sail_under_their_books_with_the_captain_named_and_aside` (its first assertion, the merchant's digest; what follows it unread), `test_truth_78_the_fake_captain_commands_the_merchant_passage_by_its_book_and_six_orders`. The alternative, keeping a nation out of the Channel pilot's news, has no source; the lead's to choose.
+
+## Package 45: the fixes from gate m6a's first runs (2026-10-11)
+
+The owner's notes of the first runs (`docs/playtests/2026-10-11-gate-m6a-owner-runs/`), one
+package in two parts; the brief in `docs/dev/M6-WorkPackages.md`. Part B was cut short by
+the owner's weekly limit: what was built is below with its measure, what was not is said.
+
+### Part A: the pictures, the chart whole, the charted places, the courses by way of marks
+
+- **The pictures that reach the model** (`tests/test_pictures.py`: Playwright on the
+  pre-installed Chromium, the API door against `tests/messages_api.py` and the MCP bridge,
+  the PNG decoded with Pillow and judged not blank by its spread and its dark fraction). Found
+  before the fix: the ship's view was blank in truth, two faults together: the offscreen
+  svg's own hiding style (`display: none` on the root) was serialised into the picture, and
+  the stylesheet keyed its fills on the page's `#ship-view` id, so every fill computed to
+  black on the copy; the chart picture was the page's own canvas, whatever span and size the
+  player had. After: both drawn on fixed offscreen canvases with their own backgrounds (the
+  chart 1200 by 900, the ship 960 by 720), the chart centred on the account at the span asked
+  (harbour, coast, passage, whole, the browser's own stops), not blank on the first turn nor
+  after a shelving; a shelved picture's stub says it was shown and put back.
+- **The chart whole in play**: `region:` means the chart that holds it (`chart_holding`,
+  `atlantic-east` for every region of the line); the browser's block carries every region (1.7
+  MB), the map culls and decimates; measured in the browser test's Chromium: the whole chart
+  drawn in about 20 ms on screen, 10 to 20 ms as a picture, the harbour span 3 ms. The pins
+  that moved for it (tests that assumed one region) say `chart="channel-west"` instead.
+- **Every charted place** (spec M6 §26, as written there): answered by reading and one sail,
+  the schooner from Falmouth round Ushant to Corunna's road by the player's courses
+  (`data/scenarios/falmouth-to-corunna.yaml`, four days); nothing between Falmouth and Funchal
+  is unmerged; the ports outside the Channel carry no tracks and are approached by the outer
+  road; the tide is one gauge beyond 45 N and the weather PROVISIONAL from Biscay south.
+- **Courses by way of marks** (`via`): `shape a course for Lisbon via Ushant and Finisterre`
+  and an intent's `via`; the frigate sails Falmouth to Finisterre on the whole chart in
+  `tests/test_via.py` (slow). Found on the way: the straight line Ushant to Lisbon crosses
+  Galicia, so the seaward side of a mark is read from the sea room about it at a league and at
+  three; `Corunna` is a road and not a town on the chart (`place_of`).
+
+### Part B: the helm, the pilot, the merchant's entry, tack or wear, the gale, the glass, the storm sails
+
+What each item did is in spec M6 §4 (as built, Part B). The figures:
+
+- **The helm braced sharp up** (`tests/test_gale.py`): sharp up and kept full and by, 4.0
+  knots and more, never aback, 78 to 92 degrees from the true wind (the old rule); after `trim
+  sails` 4.5 to 5.5 knots at 64 to 71 degrees, as 37p measured her. The cap at seven points
+  apparent (`FULL_AND_BY_MOST`) and the watch's brace-up for the helm came from the gale trial
+  (the frigate steady "full and by" at 105 degrees apparent with her yards square, running at
+  seven knots onto the Léon coast) and from the frigate off Falmouth (boxed off after a gust,
+  kept "full and by" at 130 degrees apparent by the mean luff of yards trimmed for the
+  quartering wind, two hours and a half north-east onto the Dodman at four knots; the same
+  frigate now braces up at four minutes and sails NNW at five knots).
+- **The storm sails** (`storm_loads.py`, the probe): the mizzen storm staysail's cloth rating
+  was the plain canvas's 0.209 kN per square metre, which the apparent wind of a whole gale
+  on a staysail sheeted hard exceeds at fifty knots; the stay and the sheet held. Rated for
+  seventy knots apparent (`STORM_CANVAS_APPARENT_KN`, `STORM_FORCE_KN_PER_M2_AT_46_KN`), 2.56
+  times the plain rating, the four ship files regenerated (the storm ratings alone moved);
+  `tests/test_gale.py` holds the storm staysails through a whole gale and a storm at 55 and 65
+  knots true.
+- **The pilot's conn** (`tests/test_ports.py`): from five miles south of Falmouth's outer road
+  the pilot given the conn took her straight for Carrick Road onto the Black Rock while
+  warning of it (a first version); he now keeps her off two points on the hand his warning
+  names and she anchors in Carrick Road in eighty minutes, his fix said once at the first
+  minute. The wardroom save (`captain-and-officer-wardroom-test-initial-save.json`) was not
+  replayed with the conn: left undone.
+- **The leeway in a course**: the gale trial's master, shaping a course for the station as
+  she filled away with sternway on her, allowed "fourteen points and a half of leeway" (the
+  model's leeway with sternway is a hundred and sixty degrees), steered E by S for a W course
+  and wore her round for it onto the land. Allowed only with headway and never more than four
+  points (Norie's table of lee-way, close-reefed topsails).
+- **The gale rows**: a first version brought the gale row six knots sooner when the glass
+  fell and left the gale-over row where it was, a band two knots wide in a gusty wind: hove to
+  and filled away by turns (the first run of the station trial, eighteen state changes before
+  noon). The gale-over line now moves with the gale line and waits ten minutes under its line
+  (`gale_over_minutes`). A second thrash (fifty state changes) was the nearest coast point's
+  bearing flipping between two shores off Ushant across the lee cone's edge: the land to
+  leeward is now read over the whole lee sector along the chart (`_lee_land_nm`). A third,
+  the sea room and the lee shore widened by half when worsening, put the station itself inside
+  the no-sea-room line: dropped.
+
+**The station trials, before and after** (the probe at seed 7, twenty hours, a sample a minute;
+before on the tree at e249084, which reproduces the 37p pins to the digest):
+
+| | the station in a gale, before | after | Ushant under her lee, before | after | the stranger, before | after |
+|---|---|---|---|---|---|---|
+| hove to | 09:24 (wind 44); on passage 14:29, keeping station; hove to 16:02; beating 16:04 to the end under the main topsail at two knots | kept the station by the wind from 06:30 to 09:33 under close-reefed topsails, no sea room to heave to (Ushant within ten miles to leeward); hove to 09:33 (wind 44); on passage 12:33, keeping station 12:35; hove to 15:38; on passage 18:18, beating 18:19 to the end under plain sail | 09:24; on passage 14:29 to the end | 06:30; by turns of lee shore and gale (on passage 07:19, keeping station 07:21, hove to 08:11, on passage 10:24, hove to 11:55, on passage 12:33, beating 12:35) | chasing 06:34, within hail 06:43, the station 06:44 | chasing 06:33, the stranger to windward and never within hail, the chase given up 10:51 |
+| minutes aback (longest) | 6 (2) | 170 (58): taken aback every three minutes from 18:52 to 19:53 under plain sail by the wind in 25 knots | 49 (5) | 143 (38) | 6 (1) | 10 (4) |
+| aground | no | no (a first version 16:39 on the Léon coast; a second 23:09 beating for the station from east of Ushant) | no | no (a first version 23:01, a mile off Ushant after the gale) | no | no |
+| sail after the gale | never made (37p's open point) | 20:30: the topgallant masts swayed up, the reefs out, plain sail (the gale's end by the rule at 20:00) | never | 20:29 to 20:59, the flying jib bent anew | | |
+
+The brief's measures: hove to before the wind is over forty where the glass fell fast, not
+met on the station trial for want of sea room (the fall came with Ushant under her lee, and
+the doctrine keeps her sailing); under way for the station under plain sail within two hours
+of the gale's end, met (20:30 against 20:00) but she is aback by turns for the hour before
+it, which the before tree never was: the ship by the wind after a gale is M5 §33 item 16.
+The stranger trial's chase is the chase rule's own (the stranger drawn forward 145 degrees
+and to windward in the first half hour, the frigate's course by the wind now differing from
+37p's by the helm's cap); not this package's to tune, said for the lead.
+
+### Pins moved (one slow run on the final tree, the lead's word; no confirming run)
+
+PINS_TABLE
+
+### The suite, as run
+
+SUITE_WORDS

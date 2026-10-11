@@ -182,7 +182,7 @@ sails:
   centre_height_m: 5.8
   canvas_no: 2
   cloth_rating_kn: 17.3
-# storm trysail 56 m2 (Steel 1794, 'Cutter's trysail'): head 11 ft (two-fifths of the mainsail's), fore-leech 26 ft (three-fourths of the mainsail's), after-leech a sixth deeper, foot 33 ft (three-fourths of the mainsail's, judgement); three reef-bands; bent to the gaff and boom in place of the mainsail; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, 'Cutter's trysail' (OCR line 14359): No. 1 or 2); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# storm trysail 56 m2 (Steel 1794, 'Cutter's trysail'): head 11 ft (two-fifths of the mainsail's), fore-leech 26 ft (three-fourths of the mainsail's), after-leech a sixth deeper, foot 33 ft (three-fourths of the mainsail's, judgement); three reef-bands; bent to the gaff and boom in place of the mainsail; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, 'Cutter's trysail' (OCR line 14359): No. 1 or 2); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: storm_trysail
   class: gaff
   mast: main.mast
@@ -193,10 +193,10 @@ sails:
   x_m: -2.9
   centre_height_m: 5.9
   canvas_no: 1
-  cloth_rating_kn: 20.1
+  cloth_rating_kn: 51.5
   bent: false
   in_place_of: main.sail
-# storm jib 36 m2, two-thirds of the jib (Steel 1794 p. 190, the sloop's jibs); its tack on the traveller at the reefed bowsprit's end, 21 ft before the stem, its centre lower as its size is smaller (judgement); set in place of the jib, with the bowsprit reefed or not; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, the sloop's jibs (p. 190): 'No. 1 or 2 ... two-thirds of the size of the first jib, and is used in stormy weather, in lieu of a larger one'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# storm jib 36 m2, two-thirds of the jib (Steel 1794 p. 190, the sloop's jibs); its tack on the traveller at the reefed bowsprit's end, 21 ft before the stem, its centre lower as its size is smaller (judgement); set in place of the jib, with the bowsprit reefed or not; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, the sloop's jibs (p. 190): 'No. 1 or 2 ... two-thirds of the size of the first jib, and is used in stormy weather, in lieu of a larger one'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: storm_jib
   class: jibheaded
   stay: jib.stay
@@ -204,7 +204,7 @@ sails:
   x_m: 8.5
   centre_height_m: 4.8
   canvas_no: 1
-  cloth_rating_kn: 12.9
+  cloth_rating_kn: 33.1
   bent: false
   in_place_of: jib
 lines:
