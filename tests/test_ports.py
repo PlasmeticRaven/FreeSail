@@ -32,8 +32,18 @@ START = datetime(1805, 6, 10, 10, 0)
 
 
 def world_at(
-    where, ship=FRIGATE, heading=20.0, speed=0.0, start=START, wind=225.0, wind_kn=12.0, **kw
+    where,
+    ship=FRIGATE,
+    heading=20.0,
+    speed=0.0,
+    start=START,
+    wind=225.0,
+    wind_kn=12.0,
+    chart="channel-west",
+    **kw,
 ):
+    # `chart="channel-west"` is the Channel's region alone, as these tests were pinned
+    # (package 45: a scenario's `region:` now means the whole chart; a test says `chart:`)
     sc = Scenario(
         start_time=start,
         wind_from_deg=wind,
@@ -43,7 +53,7 @@ def world_at(
         ship_heading_deg=heading,
         ship_speed_kn=speed,
         position=where,
-        region="channel-west",
+        chart=chart,
         **kw,
     )
     return make_world(7, ship, sc)

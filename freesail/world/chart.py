@@ -799,6 +799,23 @@ def chart_names(manifest: dict[str, Any]) -> list[str]:
     return list(manifest.get("charts") or {}) + list(manifest.get("regions") or {})
 
 
+def chart_holding(region: str, root: Path = CHARTS_DIR) -> str:
+    """The name of the chart in play for a scenario that names a region (package 45, the
+    owner's question 3 of gate m6a: the chart shows one region where the game should show
+    the world as built): the first chart of the manifest's `charts:` that holds the region,
+    so that `region: channel-west` means the region she starts in on the whole chart; the
+    region's own name where no chart holds it (a chart of that one region, as package 38
+    had it), and a chart's own name as given. A scenario that wants one region alone says
+    `chart: <region>` outright, which only a test should."""
+    manifest = load_manifest(root)
+    if region in (manifest.get("charts") or {}):
+        return region
+    for name, spec in (manifest.get("charts") or {}).items():
+        if region in [str(r) for r in (spec.get("regions") or [])]:
+            return str(name)
+    return region
+
+
 def _present(entry: dict[str, Any] | None, root: Path) -> dict[str, Path]:
     """The tiles of a manifest entry (the world's, the Atlantic's or a corridor's) that are
     actually present on disk, by name and path: the world and the Atlantic are the tool's

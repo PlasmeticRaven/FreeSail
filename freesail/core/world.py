@@ -403,7 +403,13 @@ class World:
         self.chart: Any = None
         self.lookout: Any = None
         self._aground: bool = False
-        chart_name = self.scenario.chart or self.scenario.region
+        chart_name = self.scenario.chart
+        if not chart_name and self.scenario.region:
+            # the chart whole in play (package 45): a region named is the region she
+            # starts in on the chart that holds it; `chart:` names a chart outright
+            from freesail.world.chart import chart_holding
+
+            chart_name = chart_holding(self.scenario.region)
         if chart_name:
             from freesail.world.chart import load_chart
             from freesail.world.lookout import Lookout

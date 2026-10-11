@@ -187,8 +187,18 @@ def test_the_position_and_the_region_are_saved_and_a_replay_follows_them():
 def test_a_region_needs_a_position_and_a_position_inside_it():
     with pytest.raises(ValueError, match="gives no position"):
         point_world(region="channel-west")
+    # package 45: `chart: channel-west` is a chart of that one region (package 38's
+    # reading, a test's); `region: channel-west` is the region she starts in on the whole
+    # chart that holds it, so a position in Biscay is inside it
     with pytest.raises(ValueError, match="outside the chart region"):
-        point_world(region="channel-west", position={"lat_deg": 40.0, "lon_deg": -20.0})
+        point_world(chart="channel-west", position={"lat_deg": 40.0, "lon_deg": -20.0})
+    whole = point_world(region="channel-west", position={"lat_deg": 44.0, "lon_deg": -8.0})
+    assert (
+        whole.chart.name == "atlantic-east"
+        and whole.chart.region_at(whole.position) == "biscay-south"
+    )
+    alone = point_world(chart="channel-west", position={"lat_deg": 49.0, "lon_deg": -6.0})
+    assert alone.chart.name == "channel-west" and alone.chart.regions == ["channel-west"]
     with pytest.raises(ValueError, match="no chart region named"):
         point_world(region="the-moon", position={"lat_deg": 49.0, "lon_deg": -6.0})
 
