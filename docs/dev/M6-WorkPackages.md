@@ -961,7 +961,21 @@ Opus. Spec M6 §13 (the pictures) and §26 (the chart line's end: the chart in p
    through the MCP bridge, asks `chart` and `ship_view`, and asserts at the far end that
    an image block arrived whose PNG decodes to the page's size and is not blank (the
    pixels' variance above a floor, dark strokes present), on the first turn and on the
-   next. The lead's reading of the likely faults, to be confirmed or refuted by the test:
+   next. **The owner's reading of his transcript (2026-10-11), which the test must bear
+   out or refute first:** the chart did reach the model (its first words on it named the
+   Manacles two miles and a half on the quarter, the track past the Old Wall and two
+   strangers by their bearings, which are the picture's and not the readings'); the model
+   then shelved the book itself, the door rebuilt the conversation with the book's line in
+   the picture's place, and the model, reading its own history with no image in it,
+   "corrected" itself and said it had never seen one. The ship's view it called a blank
+   white frame before any shelving, which is a first-hand report. So there are two faults
+   and not one: the ship's view likely blank in truth, and the shelved picture's stub
+   telling the model nothing of what it saw. For the second: the book's line for a
+   shelved picture says plainly what it was and that it was shown ("the ship's view from
+   the leeward beam at 05:50, shown to you and put back; ask again for a fresh one"), the
+   station's brief says that a shelved picture was seen and is not re-sent, and a picture
+   is not put back by itself before the model has answered once after seeing it. The
+   lead's reading of the other likely faults, to be confirmed or refuted by the test:
    the chart picture is the on-screen canvas (`chartPicture` returns `seaMap.canvas`),
    which is unsized or stale when the map's pane is not the one shown or the tab is in
    the background; the ship's view is an SVG serialised with computed styles and drawn
