@@ -33,3 +33,9 @@ the lead:
 The measure for both, when they come: the strain truths (a sail settled or shivering
 carries less than one drawing), the speed truths (a sail spilled slows her by what it
 should), and the gale trials of package 40c under 37p's trim.
+
+## Taking on water (M7)
+
+The owner, 2026-10-11, on gate m6a's gale runs (his note 3b): water taken by damage, by
+heeling with heavy seas and rain, foundering, battening down the hatches, the pumps and
+the hands at them; a sea-keeping thread of its own beside the powder's milestone.

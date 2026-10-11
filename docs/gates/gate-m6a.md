@@ -177,6 +177,20 @@ step, for every model to be seated.
 The verdict and the rulings go in this document and in `docs/DesignProposal.md`; the
 playtest records under `docs/playtests/`.
 
+**The owner's runs, 2026-10-11.** The trials, the trade runs and the wardroom game were
+run and the owner's notes are kept verbatim with his saves in
+`docs/playtests/2026-10-11-gate-m6a-owner-runs/`. What they found, in short: the helm full
+and by with the yards braced sharp up pinches her until she is aback (right after `trim
+sails`); the storm staysail blown out at a gust of the whole gale; missed stays under short
+sail beating off the land after the gale; the merchant captain balking an entrance with
+the wind on the beam and anchoring three times where once and the boat would have served;
+the pictures not reaching the model (a white image, or the book's line and no picture);
+the ship aground on the Filletes with the pilot aboard, the account moved by a cast of the
+lead and the pilot's "deeper water to starboard" read against it; and the chart showing
+one region where the game should show the world as built. The fixes are packages 45a and
+45b (`docs/dev/M6-WorkPackages.md`), and the gate `m6a-2` carries them with the runs that
+prove them; the verdict of this gate is given with that one.
+
 ## What this gate does not do
 
 Other ships with captains, the crewed promotion, the regatta and the two new hulls (6c); the

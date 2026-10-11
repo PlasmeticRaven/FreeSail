@@ -25,6 +25,8 @@ tuning notes and a report to the lead at the end.
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart and the ship's view as images through the doors that carry one (the consent revision moved to 42a) | merged 2026-10-10 (the key from the credential store first; the acts beside the log; the pictures from the open page; OpenRouter on a mock only; thinking cannot be switched off on the current models, so no-effort is the model's default) |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
+| 45a | Opus | The pictures that reach the model and are not blank, the chart whole in play, every charted place reachable, courses by way of marks (the owner's notes of 2026-10-11 on gate m6a) | briefed 2026-10-11 for the owner's approval; gate m6a-2 after it |
+| 45b | Opus | The helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass as a stimulus, the storm sails (the owner's notes of 2026-10-11) | briefed 2026-10-11 for the owner's approval; runs beside 45a |
 | 43b | Opus | The lugger and the smack; the world's business | brief to write |
 | 44 | Opus | The regatta harness and the parity tests | brief to write |
 
@@ -930,6 +932,213 @@ recipe would then take `fill_mean_level_m` and the region be rebuilt); a weather
 the Strait's Levanter and Poniente, which needs a printed table; Tangier has no gauge in
 TICON; the braza's vara of Burgos from memory; a pace measurement with the port files of
 six blocks loaded in every world, which the lead takes at the merge.
+
+## Packages 45a and 45b: the fixes from gate m6a's first runs (the owner's notes of 2026-10-11, `docs/playtests/2026-10-11-gate-m6a-owner-runs/`)
+
+Two Opus packages that run together in two worktrees, or one after the other if the owner
+prefers one agent; briefed from the owner's notes on his runs of gate m6a and the lead's
+reading of the code behind each note. The gate `m6a-2` is cut when both are in, with the
+runs suggested at the end of this section. The rules of every package hold (no model
+identifier in any file; nothing under `docs/agents/consent/` touched; the recorded
+passages and the trials replay to their digests or are re-pinned once, at the end, with
+the reason beside each pin; ruff clean; the fast tier; the slow tier of the truths and the
+trials once, whole). Both packages move pins: 45a by putting every scenario on the whole
+chart, 45b by the helm's mark braced sharp up and the captain's rules. Each re-pins once
+on its own final tree, and the second to merge re-measures on the merged tree, the
+builder resolving against the head when the lead asks.
+
+### Package 45a: the pictures that work, the chart whole, every charted place reachable (`client/app.js`, `client/map.js`, `client/shipview.js`, `freesail/ui/server.py` for the painter; `freesail/agents/pictures.py`, `tools.py`, `api.py`, `mcp_server.py` for the picture's road to the model; `freesail/world/scenarios.py`, `chart.py`, `freesail/api/queries.py` for the chart whole; `freesail/world/captains.py` and `orders/navigation.py` for `via`; the scenario files; `docs/agents/Harness.md`, the primer's chapter on the chart and chapter 19; `docs/TechnicalSpec-M6.md` §13 and §26 as built; `docs/dev/TuningNotes.md`; `tests/test_pictures.py` new with a real browser, `test_api_door.py`, `test_mcp_server.py`, `test_chart.py`, `test_scenarios.py`, `test_ports.py`, `test_known_truths.py` re-pinned once if the chart moves them)
+
+Opus. Spec M6 §13 (the pictures) and §26 (the chart line's end: the chart in play).
+
+1. **The pictures reach the model, and are not blank.** The owner's wardroom run (item 11
+   of the gate): the model captain said the `ship_view` call "returned only its catalogue
+   line to me and no picture at all", and the chart and the ship's view were reported as
+   a white image. Find the fault by reproducing it, not by reading: a test that opens
+   the game's page in the pre-installed Chromium through Playwright (the module is
+   installed for the tests; `/opt/pw-browsers/chromium`, no download), seats a station
+   through the API door against the fake Messages server (`tests/messages_api.py`) and
+   through the MCP bridge, asks `chart` and `ship_view`, and asserts at the far end that
+   an image block arrived whose PNG decodes to the page's size and is not blank (the
+   pixels' variance above a floor, dark strokes present), on the first turn and on the
+   next. The lead's reading of the likely faults, to be confirmed or refuted by the test:
+   the chart picture is the on-screen canvas (`chartPicture` returns `seaMap.canvas`),
+   which is unsized or stale when the map's pane is not the one shown or the tab is in
+   the background; the ship's view is an SVG serialised with computed styles and drawn
+   through an `Image`, whose background is the page's and not the picture's; and on the
+   model's side the picture's result may already be its book's line when the door
+   rebuilds the conversation (`tools.py` where "a picture is a book"; `api.py` where the
+   conversation is rebuilt after a shelving), so the model sees the handle and never the
+   image. Fix what the test finds: draw each picture on an offscreen canvas of a fixed
+   size (the chart 1200 by 900, the ship's view 960 by 720, scaled to `MAX_PX`) that does
+   not depend on the page's layout or the pane shown, with the picture's own background
+   (the chart's paper, the view's sea and sky), and make the picture's first result carry
+   the image whatever the door's rebuilding does, shelved only after its turns as the
+   design says. Say in the Harness note what a station sees.
+2. **The chart picture at a scale.** `chart` takes an optional span: `harbour` (two miles
+   across), `coast` (twenty), `passage` (a hundred and fifty) and `whole` (the chart's
+   envelope), centred on the account (the truth is never drawn), the page's current view
+   when none is said; the tool's words say the span and the scale bar is in the picture.
+   The same spans in the browser's own chart as zoom stops, if they are not there already.
+3. **The chart whole in play.** The game's chart is the whole `atlantic-east` chart
+   wherever a scenario names a region of it: `region: channel-west` in a scenario file
+   means the region she starts in on the whole chart, not a chart of one region (package
+   38's `region` as a one-region chart stays for a file that says `chart: channel-west`
+   outright, which only a test should). The console and the server need no flag. The
+   browser's chart and the chart picture then show every block as built, the corridor's
+   coast between them, and the Western Islands, at any zoom; the map culls its coast and
+   features to the view and draws a coarse coast at the small scales, so the page stays as
+   quick as it was with one region (measure the draw at the whole span and at the harbour
+   span, and say the figures). `queries.chart_block` carries every region's coast and
+   features and the chart's envelope. Every scenario under `data/scenarios/` and the
+   trials run on the whole chart; measure every pinned passage and trial on it and re-pin
+   once what moves, with the reason (the lead expects little or nothing to move, the
+   Channel's passages lying inside `channel-west` with the nearest neighbour two degrees
+   off; if a pin moves for a feature of another region seen across a seam or a coast
+   found where there was none, say which); the pace tests with the chart whole in place of
+   the region, measured alone.
+4. **Every charted place reachable.** A fast test that every port of every region has
+   its `to_sea` and `from_sea` tracks in water on the whole chart, its outer road inside
+   the chart, its pilot's cruising ground likewise, and its tide, weather box and
+   directions answered; a slow test that, for every port in the manifest, the cutter put
+   six miles off the port's outer road on the whole chart with a fair wind and `shape a
+   course for <port>` is hailed by the pilot's boat within two hours of the ship's time.
+   Where a port fails, fix the port's file or the machinery and say which. A passage
+   between blocks sailed once as the proof the seams are nothing in play: the schooner
+   from Falmouth to Corunna by the player's own courses round Ushant and across the Bay
+   (a scenario file `data/scenarios/falmouth-to-corunna.yaml` with its book), the log
+   read for anything odd at 48 N and 45.9 N (the sightings, the tide, the coast by
+   account), and the time it took said.
+5. **Courses and intents by way of marks.** The planner lays a straight line and the
+   coast is in its way for any passage round a cape: `shape a course for Lisbon via
+   Ushant, Finisterre` and `trade tin from Falmouth to Lisbon via Ushant, Finisterre` take
+   `via` marks (features by name, or a pricked position), sailed in order, each left on
+   the hand the straight line from the one before puts it; the rules-based captain's plan
+   carries the legs. No routing: a captain or player with no `via` sails the straight
+   line as before, and the spec says so (the land-avoiding route is the planner's open
+   item, M7's or later). Tested on the frigate Falmouth to Lisbon via Ushant and
+   Finisterre on the whole chart, run until Finisterre is passed.
+6. **Notes and spec.** §13 and §26 as built; `docs/agents/Harness.md` on the pictures as
+   they are now; the primer's chart chapter on the chart whole and the spans; the tuning
+   notes with the pictures' test, the pins moved and the draw's figures.
+
+### Package 45b: the helm braced sharp up, the pilot who knows his water, the captain's sea sense, the storm sails (`freesail/physics/hull.py` for the mark braced sharp up; `freesail/world/ports.py` and `reckoning.py` for the pilot's fix and his conn; `freesail/orders/verbs.py`, `navigation.py` and `data/vocabulary.yaml` for `let the pilot take her in` and `I have the conn`; `freesail/world/captains.py` and `data/captains/*.yaml` for the entry and the trade from the road, tack or wear, sail after the gale, the glass; `data/ships/*.yaml` for the storm sails' strength; the primer's chapters 9, 16 and 17; `docs/TechnicalSpec-M6.md` §4 as built, `docs/TechnicalSpec-M5.md` §33 an item; `docs/dev/TuningNotes.md`; `tests/test_gale.py`, `test_ports.py`, `test_reckoning.py`, `test_captains.py`, `test_captain_trials.py` and `test_known_truths.py` re-pinned once)
+
+Opus, from the lead's rules below and the owner's notes; the trials are the measure, as
+for 37p.
+
+1. **Full and by with the yards braced sharp up** (the owner's note 1 and 1b: "far too
+   close to the wind, loses way, sails aback, boxes off, repeats", and right after `trim
+   sails`). The rule: the helmsman's mark is the highest square sail set only when the
+   yards stand in the period's trim by level (the upper yards in from the lower,
+   `trim.UPPER_YARDS_IN_DEG`); with the yards braced sharp up, where the upper yards stand
+   as sharp as the lower or sharper and the lowest sail lifts first, he keeps her by the
+   old rule, the mean luff and its margin (`FULL_AND_BY_MARGIN`), never nearer, as he
+   does already under reefed topsails and under the topsails alone. `hull.full_and_by_angle`
+   reads whether the trim is staggered (a flag the trim sets, `helm_mark_staggered` or
+   the like, false after `brace sharp up` and true after `trim sails` on a wind). Test:
+   the frigate braced sharp up and kept full and by in fifteen knots for fifteen minutes
+   keeps her way (four knots and more) and is never aback; the same ship after `trim
+   sails` lies as 37p measured her (67.5°, five knots). Say in the primer's chapter 9
+   what the two trims are for: `trim sails` for the helmsman's mark and the average, the
+   yards sharp up for the hand on the helm who wants the last half point. The
+   captain's books use `trim sails` where they brace: check the starter book and the
+   doctrine and say what you changed.
+2. **The pilot who knows his water** (the wardroom run: aground on the Filletes with the
+   account and its doubt nowhere near them after a cast of the lead moved the account; the
+   pilot's "the deeper water is to starboard" read against the account's chart). Three
+   rules. (a) The pilot aboard and in sight of his marks fixes her: while he is aboard,
+   within his port's ground and the visibility a mile or more, the account is brought to
+   the truth with a doubt of a cable every five minutes, said once in the log as the
+   pilot's fix ("The pilot has her by his marks: ...") and not again until he leaves or
+   the weather thickens; by the lead and the time run in thick weather, as now, no fix.
+   (b) His warnings name the hand and the mark as a pilot would: "The pilot warns: the
+   Filletes a cable on the larboard bow; leave them to larboard, the deeper water is to
+   starboard", the hand relative to her head, and when the danger lies on the hand he
+   names as the deeper one he says so plainly ("keep her off, the Filletes are under the
+   lee bow"). (c) `let the pilot take her in` (and `let the pilot take her out`) hands him
+   the conn: he conns her along his track by the conning words and courses, each line in
+   the log as the pilot's ("The pilot: starboard a point; steer NE by E"), through to the
+   anchorage, where he says where to let go; `I have the conn` (or any helm order of the
+   officer's) takes her back, said in the log; the rules-based captain gives him the conn
+   where his doctrine now conns by the rhumb line (40c's inner leg) and the merchant
+   passage's book does the same, the passages re-pinned for it. The authority is the
+   officer's (a passenger cannot). Tests on the merchant passage's Brest entry and on
+   Falmouth's; the wardroom save of the owner's run replayed from before the grounding
+   with the pilot given the conn and the Filletes left to larboard is the proof, its log
+   in the notes.
+3. **The merchant captain's entry and his business from the road** (the owner's notes 8
+   to 10: two entrances balked with the wind on the beam because the inner mooring lay
+   dead to windward; a third anchor; "anchoring in a road and in range may be our best bet
+   for trading, as a baseline"). Rules: (a) he goes in as far as the wind serves: the
+   inner track's legs are judged one by one, and he anchors at the last anchorage of the
+   track he can reach on legs no nearer the wind than six points, not at the outer road
+   when only the last leg is foul; (b) at anchor within the port's reach (`IN_PORT_NM`,
+   two miles of the port's roads or mooring, by his account) he is in port and does his
+   business from the road by the boat, as the port already allows; waiting for the wind
+   to go further in is only for a port whose anchorage is beyond the reach; (c) the port
+   files say which of their anchorages are within reach of the town (a `reach_nm` on the
+   port, two miles by default; Falmouth's outer road and Carrick Road both within it).
+   Tested on the trade trials (the stranger and the thick trials) and the merchant
+   passage: the schooner anchors once and trades, and the trials' logs say so; the pins
+   re-measured.
+4. **Tack or wear** (notes 4 and 7: missed stays under a reefed main topsail and
+   staysails, and after the headsails blew out). The captain's rule, in the doctrine as
+   data: he wears instead of tacking when her sail is short (no headsail set, or the
+   topsails close-reefed, or the wind over thirty knots) or after she has missed stays
+   once in the hour; the doctrine's "the offing" and the beating book put her about by a
+   word that chooses (`go about` or a new `put her about` that the engine resolves to
+   `tack ship` or `wear ship` by the same rule, so a player has it too); near the land to
+   leeward (the offing under two miles) he tacks regardless, since wearing loses the
+   ground, and the log says the choice and why. Tests on the lee-shore trial: no missed
+   stays after the gale, the choice said; the gale trial re-measured.
+5. **Sail after the gale** (37p's open point and note 6: beating under the main topsail
+   and two staysails to the end, the headsails blown out). After the gale (the wind under
+   twenty-five knots for half an hour) he makes sail again whatever his state, the rule
+   in `_work` and not in the hove-to book alone; a headsail blown out of its bolt-ropes
+   is replaced from the sail room where a spare is carried (the order exists or is
+   found: `bend a new jib`, `shift the fore topmast staysail`; if the engine has no such
+   order, say so and give the smallest one), the captain ordering it when the wind is
+   under thirty and the sea allows, and the officer able to. The station trial's end
+   measured: under way for the station under plain sail or the topsails within two hours
+   of the gale's end.
+6. **The glass as a stimulus** (note 4c). The captain reads the glass's tendency and the
+   sky as the weather's trend: `weather worsening` (the glass falling fast, or the wind
+   risen by a force within the hour) brings the heavy-weather behaviour a step sooner
+   (sea room taken, the land given a wider berth, sail shortened by the book's next line
+   before the gale line is reached), `weather mending` (the glass rising, the wind eased
+   a force) allows the fair-weather behaviour a step sooner (sail made, the station or
+   the passage resumed); the thresholds in the doctrine files with their sources (the
+   period's words on the glass: Luce 1884 ch. XXVI or Fitzroy's rules, which the
+   references may hold; judgement marked where none). Tests on the gale trial: hove to
+   before the wind is over forty where the glass fell fast, and under way again sooner
+   after; the trial re-measured.
+7. **The storm sails** (notes 3 and 5: the mizzen storm staysail split and blew out of
+   the bolt-ropes at 10:01 in both gale trials, in a gust of the whole gale). Storm sails
+   are of the strongest canvas and set for the gale: find why the model blows one out at
+   a gust of sixty-five knots (the cloth's strength, the sheet's strain, the stay, the
+   sail's rating) and make them stand what they are for, no storm sail set as the heavy
+   weather book sets it blowing out under seventy knots apparent, with the period source
+   for the figure (Luce 1884 ch. X on storm canvas; Steel on the cloth) or judgement
+   marked; the jib and the fore topmast staysail in the first version of 37p's rule (a
+   head sail the storm staysail replaces, taken in at three quarters of its rating) keep
+   that rule. Test in `tests/test_gale.py`; the gale trials re-measured and the sail-loss
+   row of 37p's table given again.
+8. **Notes and spec.** §4 as built for the captain's new rules, §33 an item for the helm
+   braced sharp up and the storm sails, the primer's chapters, the tuning notes with the
+   trials before and after each rule and every pin moved.
+
+### Gate m6a-2, to be cut when 45a and 45b are in
+
+A small gate on the same document's form, carrying the fixes and these runs: the four
+trials again with the owner's notes 1, 4, 6 and 8 in hand (the helm full and by after
+`brace sharp up` and after `trim sails`; the choice to wear; sail after the gale; one
+anchor and the business done from the road); the wardroom game with `chart` at each span
+and `ship_view` seen by the model and by the owner; the merchant passage into Brest with
+the pilot given the conn; a passage of the owner's own from Falmouth into Biscay or to
+Lisbon on the whole chart, the browser's chart followed the whole way; and, if the owner
+has the evening for it, the frigate from Funchal to Angra on the widened corridor with the
+landfall on Pico. The verdict of m6a and the verdict of m6a-2 are the owner's together.
 
 ## Packages 39c to 39f: the last four blocks of the chart line (the same files as 39a and 39b under each block's names; `data/scenarios/<block>.yaml` and `.orders` new per block; `docs/TechnicalSpec-M6.md` §26 as built; `docs/dev/TuningNotes.md`)
 
