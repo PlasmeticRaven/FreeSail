@@ -88,6 +88,8 @@ __all__ = [
     "Intent",
     "Leg",
     "Perception",
+    "split_via",
+    "way_marks",
     "Planner",
     "actor_for",
     "load_doctrine",
@@ -217,6 +219,7 @@ class Intent:
     radius_nm: float = 5.0
     between: str = ""
     done: bool = False
+    via: tuple[str, ...] = ()  # the marks sailed by on the way, in order (package 45)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -228,7 +231,158 @@ class Intent:
             "destination": self.destination,
             "radius_nm": self.radius_nm,
             "done": self.done,
+            "via": list(self.via),
         }
+
+
+# `via` in an intent or a course (package 45): `trade tin from Falmouth to Lisbon via
+# Ushant, Finisterre`, `shape a course for Lisbon via Ushant and Finisterre`; the marks
+# are features by name or positions pricked on the chart, sailed in order.
+_VIA = re.compile(r"\s+via\s+", re.IGNORECASE)
+_VIA_SPLIT = re.compile(r"\s*,\s*|\s+and\s+then\s+|\s+then\s+|\s+and\s+", re.IGNORECASE)
+
+
+def split_via(words: str, world: Any = None) -> tuple[str, list[str]]:
+    """The destination's words and the marks after `via`, in order; no marks when the
+    words have no `via`. The marks are parted at commas, `and` and `then`; where an
+    order's grammar has dropped the commas ('via ushant finisterre'), the words are
+    parted into the marks the chart knows, greedily from the left, when `world` is
+    given."""
+    parts = _VIA.split(str(words).strip(), maxsplit=1)
+    if len(parts) == 1:
+        return parts[0].strip(), []
+    marks = [m.strip().rstrip(".") for m in _VIA_SPLIT.split(parts[1]) if m.strip(" .")]
+    if world is not None:
+        parted: list[str] = []
+        for m in marks:
+            parted += _part_marks(world, m) if _mark(world, m) is None else [m]
+        marks = parted
+    return parts[0].strip(), marks
+
+
+def _part_marks(world: Any, words: str) -> list[str]:
+    """Words naming several marks run together, parted into the marks the chart knows,
+    the longest first from the left ('ushant finisterre', 'the lizard 48 20 n 4 36 w');
+    the words whole when no parting works (the caller refuses them)."""
+    tokens = words.split()
+    out: list[str] = []
+    i = 0
+    while i < len(tokens):
+        taken = None
+        for j in range(len(tokens), i, -1):
+            cand = " ".join(tokens[i:j])
+            if _mark(world, cand) is not None:
+                taken = (cand, j)
+                break
+        if taken is None:
+            return [words]
+        out.append(taken[0])
+        i = taken[1]
+    return out
+
+
+# A mark sailed by (`via`) that is land or a danger is given a berth to seaward: the
+# point `VIA_BERTH_NM` from it on the bearing with the most sea room about the mark, among
+# equals the one toward the hand the straight line from the mark before to the mark after
+# puts it, and moved out until the shore is the planner's offing from the point; the mark
+# is then left on the hand the point puts it. A mark that is water (a road, an anchorage,
+# a sounding, a transit, a named stretch of sea or a pricked position) is sailed to itself.
+WATER_KINDS = frozenset({"anchorage", "road", "bottom", "transit", "place"})
+WAY_BEARINGS = 16
+WAY_FAR_NM = 8.0  # the second read of the sea room about a mark (judgement: three leagues)
+# The berth given a mark sailed by: five miles (Norie 1805 and the Channel pilots give
+# Ushant "a berth of two or three leagues"; the planner's offing of a league is a headland's
+# on a coast, where a cape is passed closer; judgement between them), moved out by miles
+# until the shore is the planner's offing from the point itself.
+VIA_BERTH_NM = 5.0
+WAY_OUT_STEPS_NM = (0.0, 1.0, 2.0, 3.0, 4.0)
+
+
+def way_marks(
+    world: Any, start: Position, marks: list[str], end: Position | None
+) -> list[tuple[str, Position, str]]:
+    """The waypoints of a way by marks (package 45): for each mark in order, the words an
+    order takes for the point to shape for, its position, and the hand it is left on
+    ('leaving Ushant to larboard, a league to the westward of it'; '' for a mark sailed
+    to). Refused in words (ValueError) for a mark the chart has not got. No routing
+    between one point and the next: the straight line, as the plan's."""
+    chart = getattr(world, "chart", None)
+    found: list[tuple[str, Position, Any]] = []
+    for words in marks:
+        m = _mark(world, words)
+        if m is None:
+            raise ValueError(f"'{words}' names no mark of the chart to sail by.")
+        f = chart.find_feature(" ".join(str(words).split())) if chart is not None else None
+        if f is None and chart is not None:
+            f = chart.feature(str(words).strip())
+        found.append((m[0], m[1], f))
+    out: list[tuple[str, Position, str]] = []
+    before = start
+    for i, (name, pos, f) in enumerate(found):
+        after = found[i + 1][1] if i + 1 < len(found) else end
+        if f is None or f.kind in WATER_KINDS or chart is None:
+            out.append((name, pos, ""))
+            before = pos
+            continue
+        if after is None:
+            after = pos
+        brg_line, _ = bearing_and_distance(before, after)
+        brg_mark, d_mark = bearing_and_distance(before, pos)
+        off_line = d_mark * math.sin(math.radians(brg_mark - brg_line))  # + to starboard
+        # the perpendicular from the mark toward the line: the hand the line prefers
+        prefer = (brg_line - 90.0) % 360.0 if off_line > 0 else (brg_line + 90.0) % 360.0
+        toward = _seaward_bearing(chart, pos, prefer)
+        point = units.point_name(math.radians(toward), full=True)
+        toward = units.rad_to_deg(units.parse_course(point))
+        miles = VIA_BERTH_NM
+        for step in WAY_OUT_STEPS_NM:
+            at = destination(pos, toward, (VIA_BERTH_NM + step) * units.NAUTICAL_MILE)
+            miles = VIA_BERTH_NM + step
+            if _sea_room_m(chart, at) >= OFFING_NM * units.NAUTICAL_MILE:
+                break
+        brg_w, _ = bearing_and_distance(before, at)
+        side = math.sin(math.radians(brg_mark - brg_w))
+        hand = "starboard" if side > 0 else "larboard"
+        how_far = "a league" if miles == 3.0 else f"{int(miles)} miles"
+        words = f"{how_far} {point} of {name}"
+        said = f"leaving {name} to {hand}, {how_far} to the {_toward_words(toward)} of it"
+        out.append((words, at, said))
+        before = at
+    return out
+
+
+def _sea_room_m(chart: Any, at: Position) -> float:
+    try:
+        found = chart.coast_distance(at)
+    except Exception:  # noqa: BLE001 - beyond the chart's field
+        return math.inf
+    return math.inf if found is None else float(found[0])
+
+
+def _seaward_bearing(chart: Any, place: Position, prefer_deg: float) -> float:
+    """The bearing from a mark toward the most sea room, over `WAY_BEARINGS` bearings: the
+    room read `OFFING_NM` off the mark and again `WAY_FAR_NM` off it, summed to the nearest
+    mile (a league off a cape every side but the land's reads much the same; three leagues
+    off, the bay behind it is shore and the sea is open), and among equals the bearing
+    nearest `prefer_deg` (as `station_off` finds a station, to the westward among equals)."""
+    best: tuple[float, float, float] | None = None
+    cap = 30.0 * units.NAUTICAL_MILE
+    for i in range(WAY_BEARINGS):
+        bearing = 360.0 * i / WAY_BEARINGS
+        room = 0.0
+        for radius_nm in (OFFING_NM, WAY_FAR_NM):
+            there = destination(place, bearing, radius_nm * units.NAUTICAL_MILE)
+            room += min(_sea_room_m(chart, there), cap)
+        near = math.cos(math.radians(bearing - prefer_deg))
+        key = (round(room / units.NAUTICAL_MILE), near)
+        if best is None or key > (best[0], best[1]):
+            best = (key[0], key[1], bearing)
+    return best[2] if best is not None else prefer_deg
+
+
+def _toward_words(bearing_deg: float) -> str:
+    names = ("northward", "eastward", "southward", "westward")
+    return names[int(((bearing_deg + 45.0) % 360.0) // 90.0)]
 
 
 _TRADE = re.compile(
@@ -259,6 +413,14 @@ def read_intent(world: Any, words: str) -> Intent:
     def group(m: re.Match[str], name: str) -> str:
         return said[m.start(name) : m.end(name)] if m.group(name) else ""
 
+    def to_and_via(words: str) -> tuple[str, tuple[str, ...]]:
+        # the marks sailed by on the way (package 45), each checked against the chart
+        dest, marks = split_via(words, world)
+        for mark in marks:
+            if _mark(world, mark) is None:
+                raise ValueError(f"'{mark}' names no mark of the chart to sail by, in '{said}'.")
+        return _place_id(world, dest), tuple(marks)
+
     m = _TRADE.match(text)
     if m:
         tons = None
@@ -267,9 +429,15 @@ def read_intent(world: Any, words: str) -> Intent:
             if tons is None:
                 raise ValueError(f"'{m.group('tons')}' is no number of tons in '{words}'.")
         a = _place_id(world, group(m, "a"))
-        b = _place_id(world, group(m, "b"))
+        b, via = to_and_via(group(m, "b"))
         return Intent(
-            "trade", said, cargo=m.group("cargo").strip(), tons=tons, origin=a, destination=b
+            "trade",
+            said,
+            cargo=m.group("cargo").strip(),
+            tons=tons,
+            origin=a,
+            destination=b,
+            via=via,
         )
     m = _STATION.match(text)
     if m:
@@ -280,14 +448,17 @@ def read_intent(world: Any, words: str) -> Intent:
         )
     m = _LETTER.match(text)
     if m:
-        return Intent("letter", said, destination=_place_id(world, group(m, "b")))
+        b, via = to_and_via(group(m, "b"))
+        return Intent("letter", said, destination=b, via=via)
     m = _HOME.match(text)
     if m:
-        return Intent("home", said, destination=_place_id(world, group(m, "b")))
+        b, via = to_and_via(group(m, "b"))
+        return Intent("home", said, destination=b, via=via)
     m = _PASSAGE.match(text)
     if m:
         a = _place_id(world, group(m, "a")) if m.group("a") else ""
-        return Intent("passage", said, origin=a, destination=_place_id(world, group(m, "b")))
+        b, via = to_and_via(group(m, "b"))
+        return Intent("passage", said, origin=a, destination=b, via=via)
     raise ValueError(
         f"'{words}' is no intent a captain knows: say 'trade <cargo> from <A> to <B>', 'keep "
         "the station off <place> within <n> miles', 'carry this letter to <place>', 'run "
@@ -767,6 +938,7 @@ class Planner:
         if port_to is not None:
             approach = self._port_track(port_to, "from_sea")
             first = approach[0].position if approach else port_to.outer_road.position
+            legs += self._via_legs(legs[-1].position if legs else start, intent.via, first)
             legs += self._sea_legs(legs[-1].position if legs else start, first)
             legs += approach
             if not any(leg.kind == "road" for leg in legs):
@@ -794,10 +966,25 @@ class Planner:
             return legs
         place = self._place(intent.destination)
         if place is not None:
+            legs += self._via_legs(legs[-1].position if legs else start, intent.via, place[1])
             legs += self._sea_legs(legs[-1].position if legs else start, place[1])
             legs.append(
                 Leg(place[0], place[1], "anchorage" if intent.kind == "home" else "to", 0.5)
             )
+        return legs
+
+    def _via_legs(self, a: Position, via: tuple[str, ...], end: Position) -> list[Leg]:
+        """The legs by the intent's marks (package 45), each a `via` leg reached within two
+        miles by account or passed abeam, with the sea route between one and the next
+        where the straight line is not clear; no routing where none are named."""
+        legs: list[Leg] = []
+        if not via:
+            return legs
+        at = a
+        for words, pos, hand in way_marks(self.world, a, list(via), end):
+            legs += self._sea_legs(at, pos)
+            legs.append(Leg(words, pos, "via", 2.0, said=hand))
+            at = pos
         return legs
 
     def _place(self, words: str) -> tuple[str, Position] | None:
@@ -1678,7 +1865,9 @@ class Captain:
         it within its distance (the account between the log's heaves swings, and the
         merchant book turned at a meridian for that): the mark bears abaft the beam of
         the leg's own direction, from the mark before it."""
-        if leg.kind not in ("to", "out") or self.leg_i == 0 or leg.reached_nm > 1.0:
+        if leg.kind == "via":
+            pass  # a mark sailed by (package 45) is left on its hand, however far off
+        elif leg.kind not in ("to", "out") or self.leg_i == 0 or leg.reached_nm > 1.0:
             return False
         nav = getattr(self.world, "navigation", None)
         here = nav.account_now() if nav is not None else None
@@ -1708,6 +1897,14 @@ class Captain:
         if leg.kind == "station":
             self._enter("keeping station")
             return
+        if leg.kind == "via" and leg.said:
+            world.record(
+                Severity.NOTABLE,
+                "captain.plan",
+                f"{self.name}: {leg.words} passed, {leg.said}.",
+                actor=actor_for(self.state or "on passage"),
+                data={"leg": leg.to_dict()},
+            )
         self._advance()
         if self.leg_i < len(self.legs):
             self._shape_leg()
@@ -1743,7 +1940,17 @@ class Captain:
         if start is None:
             return
         departing = p.in_port or self._departing
-        self.legs = Planner(self.world).legs_for(self.intent, start, departing)
+        try:
+            self.legs = Planner(self.world).legs_for(self.intent, start, departing)
+        except ValueError as e:
+            # a mark of the way the chart has not got (package 45): said once, no plan
+            self.world.record(
+                Severity.URGENT,
+                "captain.plan",
+                f"{self.name} cannot lay the plan for {self.intent.words}: {e}",
+                actor=actor_for(self.state or "on passage"),
+            )
+            self.legs = []
         self.leg_i = 0
         said = "; ".join(lg.words for lg in self.legs) or "no legs"
         self.world.record(

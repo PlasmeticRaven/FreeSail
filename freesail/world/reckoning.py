@@ -230,6 +230,13 @@ NO_WAY_KN = 0.5
 # grain (half a knot, JUDGEMENT; to the knot when it must stand alone), now says how her
 # way over the interval stood to her way when the log was hove, and the read is allowed
 # by that part, within these bounds (JUDGEMENT: beyond them he would heave the log).
+# A way by marks (package 45): a mark is reached by account within this, as the
+# planner's open-sea marks are (the account a mile or two out by the afternoon), or
+# passed abeam; the master's own order for the next course goes under a rule's actor
+# (not journaled, not the player's hand: a deterministic function of the course given).
+WAY_REACHED_NM = 2.0
+WAY_ACTOR = "standing order 'the way by marks'"
+
 WAY_BY_EYE_GRAIN_KN = 0.5
 WAY_ALLOWANCE_LEAST = 0.25
 WAY_ALLOWANCE_MOST = 2.0
@@ -2085,6 +2092,15 @@ class Navigation:
         self._lunar_in_hand: str | None = None
         self._lunar_pending: tuple[int, Any] | None = None
         self.variation = Variation(self.errors.variation_allowed_deg, "the chart of 1794")
+        # a course shaped by way of marks (package 45): the mark in hand, its position,
+        # the hand it is left on, the heading given for it and where she was, and the
+        # marks to come (the destination last), each {words, lat_deg, lon_deg, hand}
+        self.way_mark = ""
+        self.way_target: Position | None = None
+        self.way_hand = ""
+        self.way_heading = 0.0
+        self.way_from: Position | None = None
+        self.way: list[dict[str, Any]] = []
         # the captain's tide (package 34; spec M5 §16; T §2, §5): the epitome's table of
         # high water at full and change, the scenario's choice or the ship's (a ship of
         # war carries Norie's hours and minutes, the rest Moore's points), and Moore's
@@ -2161,6 +2177,8 @@ class Navigation:
             elif kind == LUNAR_TAKEN_KIND:
                 self._lunar_taken()
         t = world.clock.ship_time
+        if t.second == 0 and self.way_mark:
+            self._tend_way()
         if self.chronometer is not None:
             said = self.chronometer.tick(t)
             if said:
@@ -4415,6 +4433,91 @@ class Navigation:
         )
         return f"{head}: {tide['words']}.", {"by": "book", "tide": tide}
 
+    # -- the way by marks (package 45) -----------------------------------------------------
+
+    def set_way(
+        self, mark: str, target: Position, hand: str, heading: float, rest: list[dict[str, Any]]
+    ) -> None:
+        """A course shaped by way of marks: the mark shaped for now, its position, the
+        hand it is left on, the heading given for it, and the marks to come (the
+        destination last), each with its words, its position and its hand."""
+        self.way_mark = mark
+        self.way_target = target
+        self.way_hand = hand
+        self.way_heading = float(heading)
+        self.way_from = self.account_now()
+        self.way = list(rest)
+
+    def drop_way(self, why: str = "") -> None:
+        if self.way_mark and why:
+            self.world.record(
+                Severity.ROUTINE,
+                "navigation.way",
+                f"The way by marks is dropped: {why}.",
+                data={"left": [self.way_mark, *(x["words"] for x in self.way)]},
+            )
+        self.way_mark = ""
+        self.way_target = None
+        self.way_hand = ""
+        self.way = []
+
+    def way_words(self) -> str:
+        """The way kept, for a reading or a line: '' when none."""
+        if not self.way_mark:
+            return ""
+        then = ", then ".join(x["words"] for x in self.way)
+        return f"for {self.way_mark}, then {then}" if then else f"for {self.way_mark}"
+
+    def _tend_way(self) -> None:
+        """Once a minute while a way is kept: the next course shaped when the mark in hand
+        is reached by account (`WAY_REACHED_NM`) or passed abeam of the line from where the
+        course was shaped; the way dropped when the helm has been given another course."""
+        from freesail.ship.parts import HelmMode
+
+        world = self.world
+        dyn = world.ship.dyn
+        if dyn.helm_mode is HelmMode.HEADING and abs(
+            units.wrap_pi(dyn.target_heading - self.way_heading)
+        ) > math.radians(1.0):
+            self.drop_way("the helm was given another course")
+            return
+        if self.way_target is None or self.way_from is None:
+            return
+        here = self.account_now()
+        brg, dist = bearing_and_distance(here, self.way_target)
+        along, _ = bearing_and_distance(self.way_from, self.way_target)
+        passed = abs(units.wrap_pi(math.radians(brg - along))) > math.pi / 2.0
+        reached = dist <= WAY_REACHED_NM * units.NAUTICAL_MILE
+        if not reached and not passed:
+            return
+        mark, hand = self.way_mark, self.way_hand
+        if not self.way:
+            self.drop_way()
+            return
+        nxt, rest = self.way[0], self.way[1:]
+        how = "reached" if reached else "passed abeam"
+        said = f"{mark} {how}" + (f", {hand}" if hand else "")
+        said += f"; the course shaped for {nxt['words']}"
+        self.drop_way()
+        # the next point shaped for by its own words (a place, a point off one, a pricked
+        # position), the master's order under the way's actor; the way kept on with what
+        # is left, the hands as they were worked when the course was given
+        e = world.submit(
+            f"shape a course for {nxt['words']}", actor=WAY_ACTOR, said=f"By the way shaped: {said}"
+        )
+        if e.kind == "order.rejected" or not rest:
+            return
+        heading = (e.data or {}).get("heading")
+        if not isinstance(heading, int | float):
+            heading = float(dyn.target_heading)
+        self.set_way(
+            nxt["words"],
+            Position(float(nxt["lat_deg"]), float(nxt["lon_deg"])),
+            str(nxt.get("hand") or ""),
+            float(heading),
+            rest,
+        )
+
     def shape_course(self, place: str) -> tuple[float, str, dict[str, Any]]:
         """`shape a course for <place>`: the course from the reckoning to the chart's
         place (never from the truth), made good against the tide the master allows
@@ -4433,6 +4536,9 @@ class Navigation:
                 feature = f
                 break
         if feature is None:
+            found = self.place_of(place)  # a port by its name: its road (package 45)
+            if found is not None:
+                return self.shape_for(found[0], found[1], found[2])
             kinds = ("town", "place", "anchorage", "road", "headland", "island")
             known = sorted({f.name for f in chart.features.values() if f.kind in kinds})
             names = ", ".join(known[:12])
@@ -4661,24 +4767,45 @@ class Navigation:
             raise OrderError(f"The chart has nothing named {name!r}.")
         return feature
 
-    def by_chart(self, name: str) -> dict[str, Any] | None:
-        """`the bearing of <mark> by the chart` and `the distance to <mark>`: from the
-        account brought up to now to the charted feature, in sight or not, "by account"
-        in the words; None where the chart has no such name."""
+    def place_of(self, name: str) -> tuple[Position, str, Any] | None:
+        """A place of the chart by its name: a charted feature (its position, its name,
+        the feature), or a port of the world's by its name, whose place is its road (its
+        feature where the road has one; package 45: Corunna is a port with a harbour on
+        the chart and no town feature named for it). None for a name the chart and the
+        ports have not got."""
         chart = self.world.chart
         if chart is None or not name:
             return None
         feature = chart.find_feature(name)
-        if feature is None:
+        if feature is not None:
+            return feature.position, feature.name, feature
+        ports = getattr(self.world, "ports", None)
+        port = ports.find(name) if ports is not None and hasattr(ports, "find") else None
+        if port is None:
             return None
+        spot = port.outer_road
+        f = chart.feature(spot.feature_id) if getattr(spot, "feature_id", "") else None
+        return spot.position, f"{spot.name} ({port.name}'s road)", f
+
+    def by_chart(self, name: str) -> dict[str, Any] | None:
+        """`the bearing of <mark> by the chart` and `the distance to <mark>`: from the
+        account brought up to now to the charted feature (or a port, by its road), in
+        sight or not, "by account" in the words; None where the chart has no such name."""
+        chart = self.world.chart
+        if chart is None or not name:
+            return None
+        found = self.place_of(name)
+        if found is None:
+            return None
+        position, said, feature = found
         now = self.account_now()
-        bearing, dist = bearing_and_distance(now, feature.position)
+        bearing, dist = bearing_and_distance(now, position)
         heading = math.radians(bearing)
         laid = (heading + self.errors.course_error_rad(heading)) % units.TWO_PI  # by compass
         nm = dist / units.NAUTICAL_MILE
         return {
-            "id": feature.id,
-            "name": feature.name,
+            "id": feature.id if feature is not None else said,
+            "name": feature.name if feature is not None else said,
             "bearing": laid,
             "bearing_true_deg": round(bearing, 1),
             "metres": dist,

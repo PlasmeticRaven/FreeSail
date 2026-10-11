@@ -64,6 +64,7 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
     "test_captain_trials.py": frozenset(  # package 40c: the captain's trials, 16 hours each
         {"station_stranger", "station_gale", "station_lee_shore", "trade_stranger", "trade_thick"}
     ),
+    "test_via.py": frozenset({"frigate_via"}),  # package 45: the frigate to Finisterre, days
     "test_ships_hierarchy.py": frozenset(
         {
             "frigate_sweep",
