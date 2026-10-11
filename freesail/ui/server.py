@@ -75,7 +75,7 @@ hosts too on `--agents-port`): a language model's door is a client of this game.
                                         made, its bytes (package 42; `agents.pictures`)
 
 The pictures (package 42, item 4; `Easel`): a tool's request for the chart or the ship's
-view goes to the open page as `{"type": "picture", "id", "view", "facing", "max_px",
+view goes to the open page as `{"type": "picture", "id", "view", "facing", "span", "max_px",
 "max_bytes"}` on the socket; the page draws it as the player sees it and posts it back,
 `POST /api/picture/{id}?width=W&height=H` with the image as the body (or `?failed=WORDS`).
 
@@ -586,7 +586,7 @@ class Easel:
         self._pending: dict[str, dict[str, Any]] = {}
         self._kept: OrderedDict[str, Any] = OrderedDict()
 
-    def paint(self, view: str, facing: str, stamp: str) -> Any:
+    def paint(self, view: str, facing: str, stamp: str, span: str = "") -> Any:
         import secrets
 
         from freesail.agents import pictures as P
@@ -605,6 +605,7 @@ class Easel:
                 "view": view,
                 "facing": deg,
                 "facing_words": said,
+                "span": span if view == P.CHART else "",  # package 45: the chart's span
                 "max_px": P.MAX_PX,
                 "max_bytes": P.MAX_BYTES,
             }
@@ -620,7 +621,7 @@ class Easel:
         if slot["why"]:
             return f"The open page could not draw it ({slot['why']})"
         media, data, width, height = slot["post"]
-        pic = P.Picture(pid, media, data, width, height, view, said, stamp)
+        pic = P.Picture(pid, media, data, width, height, view, said, stamp, span)
         with self._lock:
             self._kept[pid] = pic
             while len(self._kept) > P.KEPT:

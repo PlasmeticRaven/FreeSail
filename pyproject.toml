@@ -13,7 +13,10 @@ dependencies = [
 
 [project.optional-dependencies]
 # The tests exercise both doors of the harness, so `dev` brings `agents` with it.
-dev = ["pytest>=8.0", "pytest-xdist>=3.5", "ruff==0.15.8", "freesail[agents]"]
+# The pictures' test (tests/test_pictures.py, package 45) drives the pre-installed Chromium through
+# Playwright and decodes the PNGs with Pillow; it skips cleanly where either is missing. Never
+# `playwright install` on the build machine: the browser is at PLAYWRIGHT_BROWSERS_PATH.
+dev = ["pytest>=8.0", "pytest-xdist>=3.5", "ruff==0.15.8", "freesail[agents]", "playwright>=1.49", "pillow>=10"]
 server = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
 # The two doors of the agent harness (docs/agents/Harness.md): the Python MCP SDK for the
 # MCP server (its version 2, where the server class is MCPServer, once FastMCP), and httpx

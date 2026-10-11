@@ -23,6 +23,16 @@ the reply that asked it (`Harness`, "shown").
 
 The tools that make pictures (`tools.PICTURE_TOOLS`) are offered only at the doors that
 carry an image (`tools.PICTURE_DOORS`): the local runner's models read words.
+
+**Package 45.** The page draws each picture on an offscreen canvas of a fixed size that
+owes nothing to its layout (`client/app.js`: the chart 1200 by 900, the ship's view 960
+by 720, scaled to `MAX_PX`), with the picture's own background; the chart is centred on
+the account at a **span** (`SPANS`: `harbour`, two miles across; `coast`, twenty;
+`passage`, a hundred and fifty; `whole`, the chart's envelope), or at the page's own view
+when none is said, and the tool's words say which. A shelved picture's stub says what it
+was and that it was shown (`harness.Harness._stub`), since a model reading its own
+history with the picture gone from it concluded it had never seen one (the owner's
+wardroom run of gate m6a).
 """
 
 from __future__ import annotations
@@ -38,14 +48,29 @@ __all__ = [
     "SHIP",
     "Painter",
     "Picture",
+    "SPANS",
+    "SPAN_WORDS",
     "facing_of",
     "paint",
     "painter_of",
     "set_painter",
+    "span_of",
 ]
 
 CHART = "chart"
 SHIP = "ship"
+
+# The chart picture's spans (package 45): miles across the shorter way, centred on the
+# account; "whole" is the chart's envelope, which the page works from the chart's bounds.
+# Judgement: a harbour's approach, a day's coast, a passage's leg, and the chart as built.
+SPANS: dict[str, float | None] = {"harbour": 2.0, "coast": 20.0, "passage": 150.0, "whole": None}
+SPAN_WORDS: dict[str, str] = {
+    "harbour": "the harbour span, two miles across",
+    "coast": "the coast span, twenty miles across",
+    "passage": "the passage span, a hundred and fifty miles across",
+    "whole": "the whole chart as built",
+    "": "the page's own view",
+}
 
 # The bound on a picture (judgement: a chart or a ship's view at the page's own size is a
 # few hundred kilobytes as a PNG; the Messages API takes an image of five megabytes, and a
@@ -111,6 +136,7 @@ class Picture:
     view: str
     facing: str
     stamp: str
+    span: str = ""  # the chart's span (package 45): a key of SPANS, or "" for the page's view
 
     def note(self) -> dict[str, Any]:
         """What is kept of it in the transcript: everything but the picture."""
@@ -123,23 +149,33 @@ class Picture:
             "width": self.width,
             "height": self.height,
             "stamp": self.stamp,
+            **({"span": self.span} if self.view == CHART else {}),
         }
 
+    def title(self) -> str:
+        """The short name of the picture, for its book's handle and its stub."""
+        if self.view == CHART:
+            return f"the chart at {self.stamp} ({SPAN_WORDS.get(self.span, self.span)})"
+        return f"the ship's view from {self.facing} at {self.stamp}"
+
     def words(self) -> str:
-        what = (
-            "The chart as the player sees it"
-            if self.view == CHART
-            else f"The ship as the viewer shows her, seen from {self.facing}"
-        )
+        if self.view == CHART:
+            what = (
+                "The chart by the ship's account, the ship at the centre, "
+                f"{SPAN_WORDS.get(self.span, self.span)} (the scale bar is drawn on it)"
+            )
+        else:
+            what = f"The ship as the viewer shows her, seen from {self.facing}"
         return (
             f"{what}, at {self.stamp}: a picture of {self.width} by {self.height} pixels. It "
             "is a book: shelve puts it back, and it goes back by itself after three of your "
-            "turns."
+            "turns; once put back, your conversation holds a line saying you were shown it, "
+            "and asking again draws a fresh one."
         )
 
 
 class Painter(Protocol):
-    def paint(self, view: str, facing: str, stamp: str) -> Picture | str:
+    def paint(self, view: str, facing: str, stamp: str, span: str = "") -> Picture | str:
         """A picture of the view, or the words why there is none."""
         ...
 
@@ -210,7 +246,22 @@ def facing_of(words: str) -> tuple[float | None, str]:
     return float(d), said
 
 
-def paint(world: Any, view: str, facing: str = "") -> Picture | str:
+def span_of(words: str) -> str:
+    """The chart's span from the tool's words: a key of `SPANS`, or "" for none (the
+    page's own view). Refused in words otherwise."""
+    w = " ".join(str(words or "").lower().split()).removeprefix("the ").removesuffix(" span")
+    if w in ("", "page", "the page's view", "as shown", "current"):
+        return ""
+    if w in SPANS:
+        return w
+    raise ValueError(
+        f"'{words}' is not a span of the chart: say harbour (two miles across), coast "
+        "(twenty), passage (a hundred and fifty) or whole (the chart as built), or nothing "
+        "for the view the page shows."
+    )
+
+
+def paint(world: Any, view: str, facing: str = "", span: str = "") -> Picture | str:
     """The picture of a view through the World's painter, or the words why there is
     none (no page open, the page did not answer, a picture too large)."""
     from freesail import units
@@ -219,4 +270,8 @@ def paint(world: Any, view: str, facing: str = "") -> Picture | str:
     if painter is None:
         return "No browser is open on this game (the picture is drawn by the open page)"
     stamp = units.time_stamp(world.clock.ship_time)
-    return painter.paint(view, facing, stamp)
+    try:
+        return painter.paint(view, facing, stamp, span)
+    except TypeError:
+        # a painter of a test's own, from before the span (package 45)
+        return painter.paint(view, facing, stamp)

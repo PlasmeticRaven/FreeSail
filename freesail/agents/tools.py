@@ -954,14 +954,14 @@ def shelve(world: World, station: str, book: str = "") -> str:
     return _harness(world, station).shelve(str(book or ""))
 
 
-def _picture(world: World, view: str, facing: str = "") -> Any:
+def _picture(world: World, view: str, facing: str = "", span: str = "") -> Any:
     """A picture of a view (package 42, item 4): `{"picture": its note, "words": ...}`, which
     a door that carries images shows by the picture's id; where none can be had, the words
-    why and the readings the picture would have shown."""
+    why and the readings the picture would have shown. `span` is the chart's (package 45)."""
     from freesail.agents import pictures as P
 
     _, said = P.facing_of(facing) if view == P.SHIP else (None, "")
-    made = P.paint(world, view, facing if view == P.SHIP else "")
+    made = P.paint(world, view, facing if view == P.SHIP else "", span if view == P.CHART else "")
     if isinstance(made, P.Picture):
         return {"picture": made.note(), "words": made.words()}
     keys = P.CHART_WORDS if view == P.CHART else P.SHIP_WORDS
@@ -975,8 +975,14 @@ def _picture(world: World, view: str, facing: str = "") -> Any:
     }
 
 
-def chart(world: World, station: str) -> Any:
-    return _picture(world, "chart")
+def chart(world: World, station: str, span: str = "") -> Any:
+    from freesail.agents import pictures as P
+
+    try:
+        key = P.span_of(span)
+    except ValueError as e:
+        return str(e)
+    return _picture(world, "chart", span=key)
 
 
 def ship_view(world: World, station: str, facing: str = "") -> Any:
@@ -1255,12 +1261,17 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "chart",
-            "The chart as the player sees it, as a picture: the coast, the soundings and "
-            "the marks, the ship's track and her reckoning, the bearings and the player's "
-            "pencil, at the scale and the centre he has it. Drawn by the game's open "
-            "browser page; with none open, the readings it would have shown, in words. A "
-            "picture is a book: shelve puts it back.",
-            {},
+            "The chart as a picture, the ship by her account at the centre: the coast, the "
+            "marks and the dangers, the track by account, the bearings, the soundings and "
+            "the player's pencil, with a scale bar. Drawn by the game's open browser page "
+            "at the span asked; with none open, the readings it would have shown, in words. "
+            "A picture is a book: shelve puts it back, and its line then says you were "
+            "shown it; ask again for a fresh one.",
+            {
+                "span": "string, optional: how much of the chart, centred on the account: "
+                "'harbour' (two miles across), 'coast' (twenty), 'passage' (a hundred and "
+                "fifty) or 'whole' (the chart as built); nothing for the view the page shows",
+            },
             chart,
         ),
         Tool(
@@ -1268,7 +1279,8 @@ TOOLS: dict[str, Tool] = {
             "The ship as the game's viewer draws her, as a picture: her hull, spars and "
             "sails as they are set, from where you stand. Drawn by the game's open browser "
             "page; with none open, the readings it would have shown, in words. A picture is "
-            "a book: shelve puts it back.",
+            "a book: shelve puts it back, and its line then says you were shown it; ask "
+            "again for a fresh one.",
             {
                 "facing": "string, optional: where you stand, in degrees from the bow, "
                 "clockwise (0 right ahead, 90 the starboard beam, 180 right astern, 270 the "
@@ -1451,14 +1463,20 @@ def book_of(name: str, args: dict[str, Any], result: Any) -> tuple[str, str] | N
         and isinstance(result, dict)
         and isinstance(result.get("picture"), dict)
     ):
-        # a picture is a book (package 42): shelved, it is no longer sent
+        # a picture is a book (package 42): shelved, it is no longer sent; its handle says
+        # the span (package 45) and its stub that it was shown (`harness.Harness._stub`)
+        from freesail.agents import pictures as P
+
         pic = result["picture"]
         size = f"{pic.get('width')} by {pic.get('height')} pixels"
         if pic.get("view") == "chart":
-            return f"the chart at {pic.get('stamp')}, {size}", "chart()"
+            span = str(pic.get("span") or "")
+            said = P.SPAN_WORDS.get(span, span)
+            again = f"chart(span='{span}')" if span else "chart()"
+            return f"the chart at {pic.get('stamp')} ({said}), {size}", again
         facing = str(pic.get("facing") or "abeam to leeward")
         return (
-            f"the ship from {facing} at {pic.get('stamp')}, {size}",
+            f"the ship's view from {facing} at {pic.get('stamp')}, {size}",
             f"ship_view(facing='{args.get('facing') or 'leeward'}')",
         )
     if name == "read_journal" and isinstance(result, dict) and "entries" in result:

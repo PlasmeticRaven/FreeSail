@@ -74,9 +74,23 @@
   // a metre, the ship's length in fifty), and four hundred miles across three hundred
   // pixels at least.
   var MAX_SCALE = 1;
-  var MIN_SCALE = 300 / (400 * U.NAUTICAL_MILE);
+  var MIN_SCALE = 300 / (1400 * U.NAUTICAL_MILE);
+  // The chart's spans (package 45): miles across the shorter way, centred on the ship by
+  // account; 'whole' is the chart's envelope. The picture a station asks for is drawn at
+  // one of these, and the browser's chart has them as zoom stops.
+  var SPANS = { harbour: 2, coast: 20, passage: 150 };
+  var PICTURE_MARGIN = 1.05; // the whole chart's envelope with a little sea round it
+  // The coast's decimation while drawing (package 45): a point nearer than this to the
+  // last point drawn, in pixels, is left out, so the whole chart's coast at a small scale
+  // is a few thousand strokes and not a million.
+  var COAST_STEP_PX = 0.75;
   // Names on the chart when a mile is this many pixels (package 32's rule).
   var NAMES_AT_PX_PER_MILE = 30;
+  // The minor marks (rocks, ledges, shoals, anchorages, towers and the like) when a mile
+  // is this many pixels (package 45): at a passage's scale the headlands, islands, lights
+  // and towns stand alone, as a small-scale chart prints them.
+  var MINOR_AT_PX_PER_MILE = 4;
+  var MAJOR = { headland: 1, island: 1, light: 1, town: 1, hill: 1 };
 
   function clampScale(scale) {
     return Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale));
@@ -124,10 +138,21 @@
 
   /** The graticule's step and the scale bar's, for a view `span` metres across. */
   function gridStep(span) {
+    if (span > 500 * U.NAUTICAL_MILE) return 100 * U.NAUTICAL_MILE;
     if (span > 100 * U.NAUTICAL_MILE) return 20 * U.NAUTICAL_MILE;
     if (span > 20 * U.NAUTICAL_MILE) return 5 * U.NAUTICAL_MILE;
     if (span > 20 * U.CABLE) return U.NAUTICAL_MILE;
     return U.CABLE;
+  }
+
+  /** The words cut to `width` pixels with an ellipsis, so a long line stays in the frame. */
+  function fitWords(ctx, words, width) {
+    if (ctx.measureText(words).width <= width) return words;
+    var cut = words;
+    while (cut.length > 1 && ctx.measureText(cut + "\u2026").width > width) {
+      cut = cut.slice(0, Math.max(1, Math.floor(cut.length * 0.9)));
+    }
+    return cut.replace(/[,;]?\s*\S*$/, "") + "\u2026";
   }
 
   function stepWords(step) {
@@ -259,6 +284,7 @@
     roseHit: roseHit,
     bearingOfPixel: bearingOfPixel,
     ZOOM_STEP: ZOOM_STEP,
+    SPANS: SPANS,
     MAX_SCALE: MAX_SCALE,
     MIN_SCALE: MIN_SCALE,
     fitView: fitView,
@@ -737,12 +763,32 @@
         return r.ok ? r.json() : null;
       })
       .then(function (chart) {
-        self.chart = chart;
+        self.setChart(chart);
         self.redraw(); // the coast at once, not at the next snapshot (a held clock sends none)
       })
       .catch(function () {
         self.chart = null;
       });
+  };
+
+  /** The chart as the server gives it, with each coast line's box ([west, south, east,
+   *  north]) worked once, so a drawing culls the lines outside its view (package 45: the
+   *  whole chart's coast is some two hundred thousand points). */
+  Map.prototype.setChart = function (chart) {
+    this.chart = chart;
+    this.coastBoxes = [];
+    if (!chart || !chart.coast) return;
+    this.coastBoxes = chart.coast.map(function (line) {
+      var box = [Infinity, Infinity, -Infinity, -Infinity];
+      for (var i = 0; i < line.length; i++) {
+        var lon = line[i][0], lat = line[i][1];
+        if (lon < box[0]) box[0] = lon;
+        if (lat < box[1]) box[1] = lat;
+        if (lon > box[2]) box[2] = lon;
+        if (lat > box[3]) box[3] = lat;
+      }
+      return box;
+    });
   };
 
   Map.prototype.record = function (snap) {
@@ -817,23 +863,34 @@
     return true;
   }
 
-  Map.prototype.drawChart = function (ctx, frame, toPx, scale, cw, ch, year, inkColour, landColour) {
+  Map.prototype.drawChart = function (ctx, frame, toPx, scale, cw, ch, year, inkColour, landColour, v) {
     var chart = this.chart;
     if (!chart || !frame.geo) return;
-    // the coast
+    // the view's box in latitude and longitude, with a margin, for the culling
+    var margin = 40;
+    var lo = frame.at(v.cx - (cw / 2 + margin) / scale, v.cy - (ch / 2 + margin) / scale);
+    var hi = frame.at(v.cx + (cw / 2 + margin) / scale, v.cy + (ch / 2 + margin) / scale);
+    var boxes = this.coastBoxes || [];
+    // the coast, each line outside the view left out, the points nearer than a pixel
+    // to the last one drawn left out
     ctx.strokeStyle = inkColour;
     ctx.fillStyle = landColour;
     ctx.lineWidth = 1;
-    var margin = 40;
-    chart.coast.forEach(function (line) {
-      var first = true, seen = false;
+    var step = COAST_STEP_PX;
+    chart.coast.forEach(function (line, k) {
+      var box = boxes[k];
+      if (box && (box[2] < lo.lon || box[0] > hi.lon || box[3] < lo.lat || box[1] > hi.lat)) return;
+      var first = true, seen = false, lx = 0, ly = 0, n = line.length;
       ctx.beginPath();
-      for (var i = 0; i < line.length; i++) {
+      for (var i = 0; i < n; i++) {
         var m = frame.of(line[i][1], line[i][0]);
         var q = toPx(m[0], m[1]);
+        if (!first && i < n - 1 && Math.abs(q[0] - lx) < step && Math.abs(q[1] - ly) < step) continue;
         if (q[0] > -margin && q[0] < cw + margin && q[1] > -margin && q[1] < ch + margin) seen = true;
         if (first) ctx.moveTo(q[0], q[1]);
         else ctx.lineTo(q[0], q[1]);
+        lx = q[0];
+        ly = q[1];
         first = false;
       }
       if (seen) ctx.stroke();
@@ -845,11 +902,14 @@
       byId[f.id] = f;
     });
     var label = namesShown(scale); // names when a mile is thirty pixels
+    var minor = scale * U.NAUTICAL_MILE > MINOR_AT_PX_PER_MILE; // the minor marks too
     ctx.font = "11px serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
     chart.features.forEach(function (f) {
       if (f.kind === "light" && !lit(f, year)) return;
+      if (!minor && !MAJOR[f.kind]) return;
+      if (f.lat_deg < lo.lat || f.lat_deg > hi.lat || f.lon_deg < lo.lon || f.lon_deg > hi.lon) return;
       var sym = SYMBOL[f.kind] || "point";
       if (sym === "none") {
         if (f.kind === "transit" && f.marks && f.marks.length === 2 && byId[f.marks[0]] && byId[f.marks[1]]) {
@@ -1052,33 +1112,9 @@
     ctx.textBaseline = "alphabetic";
   };
 
-  Map.prototype.draw = function (snap) {
-    var canvas = this.canvas;
-    var ctx = canvas.getContext("2d");
-    var dpr = window.devicePixelRatio || 1;
-    var cw = canvas.clientWidth || 300;
-    var ch = canvas.clientHeight || 300;
-    if (canvas.width !== Math.round(cw * dpr) || canvas.height !== Math.round(ch * dpr)) {
-      canvas.width = Math.round(cw * dpr);
-      canvas.height = Math.round(ch * dpr);
-    }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var styles = getComputedStyle(document.documentElement);
-    var seaColour = styles.getPropertyValue("--map-sea").trim() || "#7b98a8";
-    var inkColour = styles.getPropertyValue("--map-ink").trim() || "#2b2b2b";
-    var trackColour = styles.getPropertyValue("--map-track").trim() || "#f2e9d6";
-    var landColour = styles.getPropertyValue("--map-land").trim() || "#d9cfb4";
-    ctx.fillStyle = seaColour;
-    ctx.fillRect(0, 0, cw, ch);
-
-    if (snap.reckoning) this.askChart();
-    var frame = frameOf(snap);
-    var ship = snap.ship;
-    var s0 = frame.ship;
-    // scale: fit the track (the last hour's on the plane, the account's last few hours
-    // on the chart) and at least a few cables around the ship; with a chart, a few miles,
-    // so the coast is seen; and the whole ellipse. The player's zoom and pan (33d) are
-    // drawn instead when given.
+  /** The track's points in the frame's metres: the account's last few hours on the chart,
+   *  the plane's own track on the plane, and the ellipse's extent. */
+  Map.prototype.trackPoints = function (snap, frame) {
     var pts = [];
     if (frame.geo) {
       var rk = snap.reckoning;
@@ -1095,9 +1131,99 @@
         pts.push([p.x, p.y]);
       });
     }
+    return pts;
+  };
+
+  /** The view for a span on a drawing of cw by ch pixels: one of SPANS centred on the
+   *  ship by account, so many miles across the shorter way; 'whole' the chart's envelope
+   *  centred on its middle, the ship drawn where her account puts her (null without a
+   *  chart); null for a span not known. */
+  Map.prototype.spanView = function (span, frame, cw, ch) {
+    if (SPANS[span]) {
+      return { scale: Math.min(cw, ch) / (SPANS[span] * U.NAUTICAL_MILE), cx: frame.ship[0], cy: frame.ship[1] };
+    }
+    if (span !== "whole" || !this.chart || !this.chart.bounds || !frame.geo) return null;
+    var b = this.chart.bounds;
+    var sw = frame.of(b.south, b.west), ne = frame.of(b.north, b.east);
+    var w = Math.max(ne[0] - sw[0], 1), h = Math.max(ne[1] - sw[1], 1);
+    return { scale: Math.min(cw / w, ch / h) / PICTURE_MARGIN, cx: (sw[0] + ne[0]) / 2, cy: (sw[1] + ne[1]) / 2 };
+  };
+
+  /** The browser's zoom stop at a span (package 45): the ship followed at a span's
+   *  scale, or the whole chart held at its middle. */
+  Map.prototype.showSpan = function (span) {
+    var d = this.drawn;
+    if (!d) return;
+    var v = this.spanView(span, d.frame, d.cw, d.ch);
+    if (!v) return;
+    if (span === "whole") this.view = { scale: clampScale(v.scale), follow: false, at: d.frame.at(v.cx, v.cy) };
+    else this.view = { scale: clampScale(v.scale), follow: true };
+    this.redraw();
+  };
+
+  /** The chart as a picture (package 45): drawn on `canvas` at its own size, centred on
+   *  the ship by account, `span` miles across the shorter way (one of SPANS or 'whole'),
+   *  or at the view the page shows when none is said. The on-screen drawing is not
+   *  touched. Returns the span drawn, in words. */
+  Map.prototype.paint = function (snap, canvas, span) {
+    var cw = canvas.width, ch = canvas.height;
+    var ctx = canvas.getContext("2d");
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    var frame = frameOf(snap);
+    var v = span ? this.spanView(span, frame, cw, ch) : null;
+    var said = span;
+    if (!v) {
+      // the page's own view: the same metres across the shorter way as the player sees,
+      // the ship at the centre
+      var d = this.drawn;
+      var least = this.chart && frame.geo ? 4 * U.NAUTICAL_MILE : 3 * U.CABLE;
+      var shown = d ? d.view : fitView(this.trackPoints(snap, frame), frame.ship, least, cw, ch);
+      var metres = d ? Math.min(d.cw, d.ch) / shown.scale : Math.min(cw, ch) / shown.scale;
+      v = { scale: Math.min(cw, ch) / metres, cx: frame.ship[0], cy: frame.ship[1] };
+      said = "the page's view";
+    }
+    this._render(ctx, snap, frame, v, cw, ch, true);
+    return said;
+  };
+
+  Map.prototype.draw = function (snap) {
+    var canvas = this.canvas;
+    var ctx = canvas.getContext("2d");
+    var dpr = window.devicePixelRatio || 1;
+    var cw = canvas.clientWidth || 300;
+    var ch = canvas.clientHeight || 300;
+    if (canvas.width !== Math.round(cw * dpr) || canvas.height !== Math.round(ch * dpr)) {
+      canvas.width = Math.round(cw * dpr);
+      canvas.height = Math.round(ch * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (snap.reckoning) this.askChart();
+    var frame = frameOf(snap);
+    // scale: fit the track (the last hour's on the plane, the account's last few hours
+    // on the chart) and at least a few cables around the ship; with a chart, a few miles,
+    // so the coast is seen; and the whole ellipse. The player's zoom and pan (33d) are
+    // drawn instead when given.
+    var pts = this.trackPoints(snap, frame);
     var least = this.chart && frame.geo ? 4 * U.NAUTICAL_MILE : 3 * U.CABLE;
-    var v = this.viewFor(fitView(pts, s0, least, cw, ch), frame);
+    var v = this.viewFor(fitView(pts, frame.ship, least, cw, ch), frame);
     this.drawn = { snap: snap, frame: frame, view: v, cw: cw, ch: ch };
+    this._render(ctx, snap, frame, v, cw, ch, false);
+  };
+
+  /** The drawing itself, on `ctx` of `cw` by `ch` pixels at the view `v`: the chart under
+   *  everything, the graticule, the track, the pencil, the ship, the margins' words; for a
+   *  picture (package 45) without the rose and the tool's prompt, which are the hand's. */
+  Map.prototype._render = function (ctx, snap, frame, v, cw, ch, picture) {
+    var styles = getComputedStyle(document.documentElement);
+    var seaColour = styles.getPropertyValue("--map-sea").trim() || "#7b98a8";
+    var inkColour = styles.getPropertyValue("--map-ink").trim() || "#2b2b2b";
+    var trackColour = styles.getPropertyValue("--map-track").trim() || "#f2e9d6";
+    var landColour = styles.getPropertyValue("--map-land").trim() || "#d9cfb4";
+    ctx.fillStyle = seaColour;
+    ctx.fillRect(0, 0, cw, ch);
+    var ship = snap.ship;
+    var s0 = frame.ship;
+    var pts = this.trackPoints(snap, frame);
     var scale = v.scale; // px per metre
     var span = Math.min(cw, ch) / scale; // the view's width, the shorter way, in metres
     var cx = v.cx;
@@ -1108,7 +1234,7 @@
 
     // the chart under everything else
     var year = snap.ship_time ? parseInt(snap.ship_time.slice(0, 4), 10) : 1805;
-    this.drawChart(ctx, frame, toPx, scale, cw, ch, year, inkColour, landColour);
+    this.drawChart(ctx, frame, toPx, scale, cw, ch, year, inkColour, landColour, v);
 
     // a light graticule every cable or mile (or five or twenty miles, zoomed out)
     var step = gridStep(span);
@@ -1244,7 +1370,16 @@
     }
     if (this.chart && frame.geo && snap.lookout && snap.lookout.count) {
       ctx.textAlign = "left";
-      ctx.fillText("in sight: " + snap.lookout.words, 12, 100);
+      ctx.fillText(fitWords(ctx, "in sight: " + snap.lookout.words, cw - 24), 12, 100);
+    }
+    if (picture) {
+      ctx.textAlign = "center";
+      ctx.font = "12px sans-serif";
+      ctx.fillStyle = inkColour;
+      var across = span > 2 * U.NAUTICAL_MILE ? Math.round(span / U.NAUTICAL_MILE) + " miles across" : Math.round(span / U.CABLE) + " cables across";
+      var centred = Math.abs(cx - s0[0]) < 1 && Math.abs(cy - s0[1]) < 1 ? "the ship at the centre" : "the ship by her account";
+      ctx.fillText("the chart by account, " + across + ", " + centred, cw / 2, 16);
+      return;
     }
     // the tool in hand, in words, top middle
     if (this.tool) {

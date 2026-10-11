@@ -1217,7 +1217,7 @@ def test_the_chart_and_the_ships_view_come_as_images_drawn_by_the_open_page(tmp_
         images = [c for c in result.content if c.type == "image"]
         assert len(images) == 1 and images[0].mime_type == "image/png"
         assert base64.standard_b64decode(images[0].data) == png(6, 5)
-    assert "The chart as the player sees it" in text(chart) and "6 by 5 pixels" in text(chart)
+    assert "The chart by the ship's account" in text(chart) and "6 by 5 pixels" in text(chart)
     assert "seen from the starboard beam" in text(ship)
     assert [a["view"] for a in asked] == ["chart", "ship"] and asked[1]["facing"] == 90.0
     assert "not a place to stand" in text(wrong)
