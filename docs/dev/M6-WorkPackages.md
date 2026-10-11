@@ -25,8 +25,7 @@ tuning notes and a report to the lead at the end.
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart and the ship's view as images through the doors that carry one (the consent revision moved to 42a) | merged 2026-10-10 (the key from the credential store first; the acts beside the log; the pictures from the open page; OpenRouter on a mock only; thinking cannot be switched off on the current models, so no-effort is the model's default) |
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook | brief to write |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
-| 45a | Opus | The pictures that reach the model and are not blank, the chart whole in play, every charted place reachable, courses by way of marks (the owner's notes of 2026-10-11 on gate m6a) | briefed 2026-10-11 for the owner's approval; gate m6a-2 after it |
-| 45b | Opus | The helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass as a stimulus, the storm sails (the owner's notes of 2026-10-11) | briefed 2026-10-11 for the owner's approval; runs beside 45a |
+| 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | approved and launched 2026-10-11; gate m6a-2 after it |
 | 43b | Opus | The lugger and the smack; the world's business | brief to write |
 | 44 | Opus | The regatta harness and the parity tests | brief to write |
 
@@ -933,23 +932,25 @@ the Strait's Levanter and Poniente, which needs a printed table; Tangier has no 
 TICON; the braza's vara of Burgos from memory; a pace measurement with the port files of
 six blocks loaded in every world, which the lead takes at the merge.
 
-## Packages 45a and 45b: the fixes from gate m6a's first runs (the owner's notes of 2026-10-11, `docs/playtests/2026-10-11-gate-m6a-owner-runs/`)
+## Package 45: the fixes from gate m6a's first runs (the owner's notes of 2026-10-11, `docs/playtests/2026-10-11-gate-m6a-owner-runs/`; one Fable package by the owner's word, in two parts below)
 
-Two Opus packages that run together in two worktrees, or one after the other if the owner
-prefers one agent; briefed from the owner's notes on his runs of gate m6a and the lead's
-reading of the code behind each note. The gate `m6a-2` is cut when both are in, with the
-runs suggested at the end of this section. The rules of every package hold (no model
-identifier in any file; nothing under `docs/agents/consent/` touched; the recorded
-passages and the trials replay to their digests or are re-pinned once, at the end, with
-the reason beside each pin; ruff clean; the fast tier; the slow tier of the truths and the
-trials once, whole). Both packages move pins: 45a by putting every scenario on the whole
-chart, 45b by the helm's mark braced sharp up and the captain's rules. Each re-pins once
-on its own final tree, and the second to merge re-measures on the merged tree, the
-builder resolving against the head when the lead asks.
+**Fable**, one package, by the owner's word of 2026-10-11: the two parts below were briefed
+as two Opus packages and are joined, with the senior engineer's leeway on every
+design-relevant decision. **Each item states an intent and a way the lead read for it;
+the intent binds, the way does not.** Where a better way is found, take it, and say in the
+report what was done instead and why; where the lead's reading of a fault proves wrong on
+reproduction, follow the fault. The rules of every package hold (no model identifier in
+any file; nothing under `docs/agents/consent/` touched; the recorded passages and the
+trials replay to their digests or are re-pinned once, at the end, with the reason beside
+each pin; ruff clean; the fast tier; the slow tier of the truths and the trials once,
+whole). The package moves pins twice over (the chart whole; the helm braced sharp up and
+the captain's rules): re-pin once, on the final tree, every passage and trial, the old
+figure beside the new. The gate `m6a-2` is cut when it is in, with the runs at the end of
+this section.
 
-### Package 45a: the pictures that work, the chart whole, every charted place reachable (`client/app.js`, `client/map.js`, `client/shipview.js`, `freesail/ui/server.py` for the painter; `freesail/agents/pictures.py`, `tools.py`, `api.py`, `mcp_server.py` for the picture's road to the model; `freesail/world/scenarios.py`, `chart.py`, `freesail/api/queries.py` for the chart whole; `freesail/world/captains.py` and `orders/navigation.py` for `via`; the scenario files; `docs/agents/Harness.md`, the primer's chapter on the chart and chapter 19; `docs/TechnicalSpec-M6.md` §13 and §26 as built; `docs/dev/TuningNotes.md`; `tests/test_pictures.py` new with a real browser, `test_api_door.py`, `test_mcp_server.py`, `test_chart.py`, `test_scenarios.py`, `test_ports.py`, `test_known_truths.py` re-pinned once if the chart moves them)
+### Part A: the pictures that work, the chart whole, the question of every charted place (`client/app.js`, `client/map.js`, `client/shipview.js`, `freesail/ui/server.py` for the painter; `freesail/agents/pictures.py`, `tools.py`, `api.py`, `mcp_server.py` for the picture's road to the model; `freesail/world/scenarios.py`, `chart.py`, `freesail/api/queries.py` for the chart whole; `freesail/world/captains.py` and `orders/navigation.py` for `via`; the scenario files; `docs/agents/Harness.md`, the primer's chapter on the chart and chapter 19; `docs/TechnicalSpec-M6.md` §13 and §26 as built; `docs/dev/TuningNotes.md`; `tests/test_pictures.py` new with a real browser, `test_api_door.py`, `test_mcp_server.py`, `test_chart.py`, `test_scenarios.py`, `test_ports.py`, `test_known_truths.py` re-pinned once if the chart moves them)
 
-Opus. Spec M6 §13 (the pictures) and §26 (the chart line's end: the chart in play).
+Spec M6 §13 (the pictures) and §26 (the chart line's end: the chart in play).
 
 1. **The pictures reach the model, and are not blank.** The owner's wardroom run (item 11
    of the gate): the model captain said the `ship_view` call "returned only its catalogue
@@ -1011,18 +1012,20 @@ Opus. Spec M6 §13 (the pictures) and §26 (the chart line's end: the chart in p
    off; if a pin moves for a feature of another region seen across a seam or a coast
    found where there was none, say which); the pace tests with the chart whole in place of
    the region, measured alone.
-4. **Every charted place reachable.** A fast test that every port of every region has
-   its `to_sea` and `from_sea` tracks in water on the whole chart, its outer road inside
-   the chart, its pilot's cruising ground likewise, and its tide, weather box and
-   directions answered; a slow test that, for every port in the manifest, the cutter put
-   six miles off the port's outer road on the whole chart with a fair wind and `shape a
-   course for <port>` is hailed by the pilot's boat within two hours of the ship's time.
-   Where a port fails, fix the port's file or the machinery and say which. A passage
-   between blocks sailed once as the proof the seams are nothing in play: the schooner
-   from Falmouth to Corunna by the player's own courses round Ushant and across the Bay
-   (a scenario file `data/scenarios/falmouth-to-corunna.yaml` with its book), the log
-   read for anything odd at 48 N and 45.9 N (the sightings, the tide, the coast by
-   account), and the time it took said.
+4. **The question of every charted place** (the owner: "is the game currently built so
+   that I can start a game in Falmouth and just sail to Madeira, or is anything not merged
+   or properly set up for actual play?"). Answer it by reading and by one sail, not by a
+   sweep: what in the world, the chart, the ports, the tide, the weather and the planner
+   stands between a player who starts at Falmouth and Funchal road, on the whole chart;
+   whether every block's ports, pilots, markets and anchorages are wired as the Channel's
+   are, and which are not; what a passage across a seam meets (the sightings, the tide,
+   the coast by account at 48 N and 45.9 N). Sail the schooner once from Falmouth round
+   Ushant into the Bay by the player's own courses (a scenario file
+   `data/scenarios/falmouth-to-corunna.yaml` with its book) far enough to cross the first
+   seam and read the log for anything odd, and say how long the whole passage to Corunna
+   would take at her pace. Fix what is plainly broken on the way and small; list the rest.
+   The answer goes in the report and in §26 as a short "the chart in play" note; the owner
+   tests the rest in play himself.
 5. **Courses and intents by way of marks.** The planner lays a straight line and the
    coast is in its way for any passage round a cape: `shape a course for Lisbon via
    Ushant, Finisterre` and `trade tin from Falmouth to Lisbon via Ushant, Finisterre` take
@@ -1036,10 +1039,9 @@ Opus. Spec M6 §13 (the pictures) and §26 (the chart line's end: the chart in p
    they are now; the primer's chart chapter on the chart whole and the spans; the tuning
    notes with the pictures' test, the pins moved and the draw's figures.
 
-### Package 45b: the helm braced sharp up, the pilot who knows his water, the captain's sea sense, the storm sails (`freesail/physics/hull.py` for the mark braced sharp up; `freesail/world/ports.py` and `reckoning.py` for the pilot's fix and his conn; `freesail/orders/verbs.py`, `navigation.py` and `data/vocabulary.yaml` for `let the pilot take her in` and `I have the conn`; `freesail/world/captains.py` and `data/captains/*.yaml` for the entry and the trade from the road, tack or wear, sail after the gale, the glass; `data/ships/*.yaml` for the storm sails' strength; the primer's chapters 9, 16 and 17; `docs/TechnicalSpec-M6.md` §4 as built, `docs/TechnicalSpec-M5.md` §33 an item; `docs/dev/TuningNotes.md`; `tests/test_gale.py`, `test_ports.py`, `test_reckoning.py`, `test_captains.py`, `test_captain_trials.py` and `test_known_truths.py` re-pinned once)
+### Part B: the helm braced sharp up, the pilot who knows his water, the captain's sea sense, the storm sails (`freesail/physics/hull.py` for the mark braced sharp up; `freesail/world/ports.py` and `reckoning.py` for the pilot's fix and his conn; `freesail/orders/verbs.py`, `navigation.py` and `data/vocabulary.yaml` for `let the pilot take her in` and `I have the conn`; `freesail/world/captains.py` and `data/captains/*.yaml` for the entry and the trade from the road, tack or wear, sail after the gale, the glass; `data/ships/*.yaml` for the storm sails' strength; the primer's chapters 9, 16 and 17; `docs/TechnicalSpec-M6.md` §4 as built, `docs/TechnicalSpec-M5.md` §33 an item; `docs/dev/TuningNotes.md`; `tests/test_gale.py`, `test_ports.py`, `test_reckoning.py`, `test_captains.py`, `test_captain_trials.py` and `test_known_truths.py` re-pinned once)
 
-Opus, from the lead's rules below and the owner's notes; the trials are the measure, as
-for 37p.
+From the lead's rules below and the owner's notes; the trials are the measure, as for 37p.
 
 1. **Full and by with the yards braced sharp up** (the owner's note 1 and 1b: "far too
    close to the wind, loses way, sails aback, boxes off, repeats", and right after `trim
@@ -1142,7 +1144,7 @@ for 37p.
    braced sharp up and the storm sails, the primer's chapters, the tuning notes with the
    trials before and after each rule and every pin moved.
 
-### Gate m6a-2, to be cut when 45a and 45b are in
+### Gate m6a-2, to be cut when 45 is in
 
 A small gate on the same document's form, carrying the fixes and these runs: the four
 trials again with the owner's notes 1, 4, 6 and 8 in hand (the helm full and by after

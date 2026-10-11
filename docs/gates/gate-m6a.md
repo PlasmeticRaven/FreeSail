@@ -187,8 +187,8 @@ the wind on the beam and anchoring three times where once and the boat would hav
 the pictures not reaching the model (a white image, or the book's line and no picture);
 the ship aground on the Filletes with the pilot aboard, the account moved by a cast of the
 lead and the pilot's "deeper water to starboard" read against it; and the chart showing
-one region where the game should show the world as built. The fixes are packages 45a and
-45b (`docs/dev/M6-WorkPackages.md`), and the gate `m6a-2` carries them with the runs that
+one region where the game should show the world as built. The fixes are package 45
+(`docs/dev/M6-WorkPackages.md`), and the gate `m6a-2` carries them with the runs that
 prove them; the verdict of this gate is given with that one.
 
 ## What this gate does not do

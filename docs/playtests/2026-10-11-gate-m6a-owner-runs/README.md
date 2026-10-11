@@ -2,7 +2,7 @@
 
 The owner's notes on his runs of gate m6a's items, as written (the file `m6a_notes.txt`),
 with the saves of each run under `saves/`. The lead's reading of them and the package they
-brought (45a and 45b) are in `docs/dev/M6-WorkPackages.md`; the verdict and the rulings in
+brought (45) are in `docs/dev/M6-WorkPackages.md`; the verdict and the rulings in
 `docs/gates/gate-m6a.md` and `docs/DesignProposal.md`. The saves are the owner's data files
 as he sent them, kept for the record and for replay (`--load`), not read by any test.
 
