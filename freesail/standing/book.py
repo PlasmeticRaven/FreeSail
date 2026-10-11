@@ -62,6 +62,10 @@ def check_places(rule: Rule, world: Any) -> None:
                 continue
             for place in clause.params:
                 if chart.find_feature(place) is None and R._pricked(place) is None:
+                    # a port by its name (its road) and a point off a place are places too
+                    # (package 45: `Navigation.place_of`, the one reader of a place's words)
+                    if world.navigation.place_of(place) is not None:
+                        continue
                     raise OrderError(_no_such_place(chart, place, clause.reading))
 
 

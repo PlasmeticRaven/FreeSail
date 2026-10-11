@@ -10,11 +10,12 @@ the captain's first orders:
     latitude_deg: 50.0               # the sun's (spec M4 §5), on the endless plane
     position: 49 52 N 6 10 W         # or {lat_deg: 49.87, lon_deg: -6.17}: the geographic
                                      # frame (spec M5 §9); the sun then reads the ship's
-    region: channel-west             # a chart region of data/charts/manifest.yaml (spec M5
-                                     # §10): the depth, the coast, the lookout's features
-    chart: atlantic-east             # or a chart of the manifest's `charts:` (spec M6 §26,
-                                     # package 38): its regions and the corridor under them;
-                                     # `region` is a chart of that one region, as before
+    region: channel-west             # the region she starts in, on the whole chart that
+                                     # holds it (spec M6 §26; package 45: `atlantic-east`
+                                     # for every region of the line), or
+    chart: atlantic-east             # a chart of the manifest's `charts:` outright, or a
+                                     # region's name as a chart of that one region (package
+                                     # 38's reading, which only a test should want)
     ship:
       file: data/ships/frigate-36.yaml
       heading_deg: 180

@@ -1,0 +1,78 @@
+# FreeSail: Falmouth round Ushant into the Bay, for Corunna, by the player's own courses
+# (spec M6 §26, "the chart in play"; package 45, Part A item 4: the owner's question
+# whether a game may start at Falmouth and sail to Madeira). The American topsail schooner
+# Speedwell of the merchant passage, a neutral, from off Falmouth's outer road at six in
+# the morning of 12 June 1805, under way with the land in sight, sailed by the book beside
+# this file (falmouth-to-corunna.orders): her course shaped for Corunna by way of Ushant
+# (`shape a course for Corunna via Ushant`, package 45: the island left to larboard, five
+# miles to the northward and westward of it, the straight line across the Bay after), the
+# courses worked afresh from the account every hour, the bearings of the land every glass
+# while it is in sight, the lead in Corunna's pilot water, the pilot taken at his hail and
+# the anchor let go in the harbour inside San Antón. She crosses the Channel region's
+# seam at 48 N south of Ushant and Biscay north's at 45.9 N, on the whole chart
+# (`region: channel-west` is the region she starts in; the chart in play is
+# `atlantic-east`), with the corridor's water under her between the blocks' tiles. Given
+# to either driver with --scenario:
+#     py -m freesail.ui.console --scenario data/scenarios/falmouth-to-corunna.yaml
+# and printed whole by
+#     py tools/day_log.py data/scenarios/falmouth-to-corunna.yaml --hours 60 --reckoning
+#
+# The weather is pinned so that the passage is the same on every machine: a westerly of
+# fourteen knots backing west-south-west for the Channel, then north-west and north for
+# the Bay, which is the Derrotero's wind for Corunna's mouth (the first and fourth
+# quadrants); the sky clear over the old high. Sailed once at seed 7 for the package's
+# notes (docs/dev/TuningNotes.md, package 45); not a gate's and not pinned.
+
+name: Falmouth round Ushant into the Bay, for Corunna
+seed: 7
+start: 1805-06-12T06:00
+position: 50 06 N 5 00 W            # a mile and a half south of the outer road, the land in sight
+region: channel-west
+nation: united-states
+ship:
+  file: data/ships/topsail-schooner.yaml
+  heading_deg: 190
+  speed_kn: 4
+  glass: true
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.9}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                     # the better table, which has Corunna (data/tides/establishments.yaml)
+  almanac: 1805
+
+cargo:
+  purse_pounds: 800
+
+ports: [falmouth, plymouth, brest, corunna, ferrol]
+
+weather:
+  wind:
+    - {at: 1805-06-12T04:00, from_deg: 270, knots: 14, air_mass: neutral}
+    - {at: 1805-06-12T18:00, from_deg: 250, knots: 13}
+    - {at: 1805-06-13T06:00, from_deg: 300, knots: 12}
+    - {at: 1805-06-13T18:00, from_deg: 340, knots: 11}
+    - {at: 1805-06-14T06:00, from_deg: 10, knots: 10}
+  background:
+    {hpa: 1020, gradient_hpa_per_100km: 0.3, high_toward_deg: 220}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-11T12:00, x_km: 300, y_km: -500, hpa: 1024}
+        - {at: 1805-06-14T12:00, x_km: 500, y_km: -600, hpa: 1022}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders: [data/scenarios/falmouth-to-corunna.orders]
+
+orders:
+  - set plain sail
+  - shape a course for Corunna via Ushant

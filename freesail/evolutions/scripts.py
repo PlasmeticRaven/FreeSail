@@ -4377,6 +4377,7 @@ def keep_full_and_by(ship: Ship, runner: Any, dt: float = 1.0) -> None:
         return
     aback = float(getattr(st, "seconds_aback", 0.0))
     memo = st.extra
+    _brace_up_for_the_helm(ship, runner, memo)
     if dyn.u < -units.knots_to_ms(IN_IRONS_KN):
         memo["in_irons_s"] = float(memo.get("in_irons_s", 0.0)) + dt
     else:
@@ -4408,6 +4409,59 @@ def keep_full_and_by(ship: Ship, runner: Any, dt: float = 1.0) -> None:
         runner.start(ship, "box_off", "ship", {})
     except OrderError as e:
         ship.note("notable", "evolution.failed", f"Could not box her off: {e}", ship.name)
+
+
+# The yards stand braced for a wind this much abaft the helmsman's widest full and by
+# (`hull.FULL_AND_BY_MOST`) before the watch braces up for him: a point (package 45).
+BRACE_FOR_HELM_RAD = POINT
+
+
+def _brace_up_for_the_helm(ship: Ship, runner: Any, memo: dict[str, Any]) -> None:
+    """Full and by with the yards braced for another wind (package 45; the frigate off
+    Falmouth, boxed off after a gust, her yards then trimmed for the quartering wind
+    she had paid off to: the helm hard over at a knot and a half for an hour, the sails
+    at their luff and no way to come up with; the gale trial's frigate the same with her
+    yards square after running): the sails' mean luff as braced lies more than a point
+    abaft the helmsman's widest angle, so the watch braces sharp up for him, once an
+    episode, with no manoeuvre or bracing in hand, not lying to, free of the anchor and
+    the ground; the trim at steady then finds the period's angles. Luce 1884 ch. XXIV:
+    "By the wind" is the yards braced up as well as the helm."""
+    from freesail.physics.hull import FULL_AND_BY_MARGIN, FULL_AND_BY_MOST
+
+    luff = ship.extra.get("luff_angle")
+    if not isinstance(luff, int | float):
+        return
+    if float(luff) + FULL_AND_BY_MARGIN <= FULL_AND_BY_MOST + BRACE_FOR_HELM_RAD:
+        memo.pop("braced_for_helm", None)
+        return
+    if memo.get("braced_for_helm"):
+        return
+    if "hove_to" in ship.extra or ship.extra.get("aground"):
+        return
+    tackle = ship.extra.get("ground_tackle")
+    if tackle is not None and any(a.down for a in tackle.anchors):
+        return
+    if not any(sl.is_set and sl.cls == "square" for sl in ship.sails.values()):
+        return
+    for inst in getattr(runner, "instances", None) or ():
+        if inst.evo.id in HELM_MANOEUVRES or inst.evo.id in ("box_off", "brace", "trim_sails"):
+            return
+    memo["braced_for_helm"] = True
+    from freesail import orders
+
+    try:
+        _, text, _ = orders.handle(ship, "brace sharp up")
+    except OrderError as e:
+        ship.note("notable", "evolution.failed", f"Could not brace up for the helm: {e}", ship.name)
+        return
+    ship.note(
+        "notable",
+        "helm.brace_up",
+        "The yards stand braced for a wind abaft the beam and she is kept full and by: brace "
+        f"up for the helm. {text}",
+        ship.name,
+        {"luff_deg": round(math.degrees(float(luff)), 1)},
+    )
 
 
 def _topsails_on(ship: Ship, yards: list[Spar]) -> list:

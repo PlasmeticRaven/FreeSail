@@ -275,6 +275,49 @@ def test_under_reefed_topsails_the_mark_is_the_topsail_and_the_angle_wider():
     assert reefed_angle >= old - 1e-9
 
 
+def _kept_full_and_by(trim: str, knots: float = 15.0, ticks: int = 900):
+    """The frigate under plain sail, the yards as `trim` leaves them, kept full and by:
+    (her mean speed after five minutes, her least, her mean angle off the true wind, the
+    ticks she was aback)."""
+    world = world_for(FRIGATE, 300.0, knots)
+    world.submit("set plain sail")
+    world.run(400)
+    world.submit(trim)
+    world.run(120)
+    world.submit("keep her full and by")
+    speeds, offs, aback = [], [], 0
+    for i in range(ticks):
+        if trim == "trim sails" and i % 120 == 0:
+            world.submit("trim sails")
+        world.tick()
+        speeds.append(units.ms_to_knots(world.ship.dyn.u))
+        offs.append(off_wind(world))
+        if any(s.backed for s in world.ship.sails.values() if s.is_set):
+            aback += 1
+    tail = slice(300, None)
+    mean = sum(speeds[tail]) / len(speeds[tail])
+    return mean, min(speeds[tail]), sum(offs[tail]) / len(offs[tail]), aback, world
+
+
+def test_full_and_by_with_the_yards_braced_sharp_up_keeps_her_way_and_is_never_aback():
+    """Package 45 (the owner's notes 1 and 1b of gate m6a: braced sharp up and kept full
+    and by she pinched until she was aback, boxed off and repeated; right after `trim
+    sails` she steered well). The helmsman's mark is the highest sail only under the
+    period's trim by level, where it lifts first; with every yard at its limit the
+    courses lift first (`hull.helm_mark_staggered` False) and he keeps her by the old
+    rule, the mean luff and its margin: four knots and more, never aback. After `trim
+    sails` she lies as 37p measured her, about 67.5 degrees from the wind at five knots."""
+    mean, least, off, aback, world = _kept_full_and_by("brace sharp up")
+    assert not hp.helm_mark_staggered(world.ship)
+    assert mean >= 4.0 and least >= 4.0, (mean, least)
+    assert aback == 0
+    assert 78.0 < off < 92.0, off  # the old rule's angle, as before package 37p and wider
+    mean, least, off, aback, world = _kept_full_and_by("trim sails")
+    assert hp.helm_mark_staggered(world.ship)
+    assert 4.5 < mean < 5.5 and 64.0 < off < 71.0, (mean, off)
+    assert aback == 0
+
+
 def test_a_schooner_keeps_the_mean_of_her_sails():
     """A fore-and-after sails by her fore-and-aft canvas with the topsail shaking."""
     world = full_and_by(SCHOONER, ticks=300)
@@ -311,6 +354,36 @@ def test_set_the_storm_staysails_bends_them_sets_them_and_takes_in_what_they_rep
     said = [x.text for x in events(world, "sail.storm_canvas")]
     assert any("in place of the fore topmast staysail and the jib" in t for t in said)
     assert world.submit("set the storm staysails").kind == "order.rejected"
+
+
+@pytest.mark.parametrize("knots", [55.0, 70.0])
+def test_the_storm_staysails_stand_a_whole_gale_and_a_storm(knots):
+    """Package 45, Part B item 7 (the owner's notes 3 and 5: the mizzen storm staysail
+    split and blew out of the bolt-ropes at 10:01 in both gale trials, in a gust of the
+    whole gale). Rated by the square metre as the working canvas, a storm staysail bore
+    its rating at forty knots apparent and blew out at sixty: the cloth's rating, not the
+    sheet's nor the stay's (the probe in docs/dev/TuningNotes.md, package 45). Storm
+    canvas is rated for the wind it is cut for (`parts.storm_cloth_rating_for`, seventy
+    knots apparent at a strain of 1.35): set in fifty-five and in seventy knots of true
+    wind for a quarter of an hour, each storm staysail stands, loaded under its rating,
+    and nothing blows out; the fore topmast staysail keeps its rating and 37p's rule."""
+    from freesail.ship.parts import storm_cloth_rating_for
+
+    world = world_for(FRIGATE, 300.0, knots, speed=3.0)
+    world.submit("set the storm staysails")
+    world.run(900)
+    ship = world.ship
+    for sid in ("fore.storm_staysail", "mizzen.storm_staysail"):
+        sail = ship.sails[sid]
+        assert sail.state is SailState.SET, (sid, sail.state)
+        assert sail.rating_kn == storm_cloth_rating_for(sail.area_m2)
+        assert sail.strain_ratio < 1.0, (sid, sail.strain_ratio)
+    fore_jib, fore_storm = ship.sails["fore.topmast_staysail"], ship.sails["fore.storm_staysail"]
+    assert fore_jib.rating_kn < fore_storm.rating_kn
+    assert not [e for e in world.log if "blew out" in e.text], [
+        e.text for e in world.log if "blew out" in e.text
+    ]
+    assert units.ms_to_knots(ship.dyn.apparent_wind_speed) > 40.0
 
 
 def test_a_schooner_sets_her_storm_jib():

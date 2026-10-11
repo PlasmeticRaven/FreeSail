@@ -85,6 +85,35 @@ def cloth_rating_for(area_m2: float, canvas_no: int) -> float:
     return round(CLOTH_KN_PER_M2_NO2 * canvas_strength(canvas_no) * area_m2, 1)
 
 
+# Storm canvas is rated for the wind it is cut for (package 45, Part B item 7; the gale
+# trials of 37p and the owner's runs: the mizzen storm staysail "split and blew out of the
+# bolt-ropes" at 10:01 in a gust of the whole gale). Rated by the square metre as the
+# working canvas is, at 1.12 of No. 2 (Luce 1884 App. E), a storm staysail of 36 m2 bore
+# 12.9 kN and the model's force on it reached that at 40 knots apparent, so it was blowing
+# out, by the strain's rule, at 55 to 60 knots in the wind it exists for. Luce 1884 ch. X:
+# "Storm-sails are made of the strongest canvas", and they are the sail she lies to under
+# in a whole gale (Luce 1866's journal scale, "10. Whole gale; close reefed main topsail",
+# "11. Storm"; Luce 1884 ch. XXIX, 'Lying to'). So a storm sail's cloth rating is the
+# model's own force on a jib-headed sail at STORM_CANVAS_APPARENT_KN of apparent wind
+# (seventy knots: force 11, with the way she makes lying to; judgement on the scale),
+# divided by STORM_CANVAS_RATIO (1.35: the sail wears there and stands, and blows out for
+# certain, at BLOW_OUT_RATIO, at about eighty knots apparent). The force per square metre
+# is the model's at a jib-headed sail's working angle (physics/sails.py: 0.536 kN/m2 at 46
+# knots apparent, measured in the probe of docs/dev/TuningNotes.md, package 45), scaled
+# as the square of the wind. The jib and the fore topmast staysail keep their ratings
+# and 37p's rule (taken in at three quarters of their rating).
+STORM_CANVAS_APPARENT_KN = 70.0
+STORM_CANVAS_RATIO = 1.35
+STORM_FORCE_KN_PER_M2_AT_46_KN = 0.536
+
+
+def storm_cloth_rating_for(area_m2: float) -> float:
+    """A storm sail's cloth rating, kN: what stands STORM_CANVAS_APPARENT_KN apparent at a
+    strain ratio of STORM_CANVAS_RATIO (above)."""
+    force = STORM_FORCE_KN_PER_M2_AT_46_KN * (STORM_CANVAS_APPARENT_KN / 46.0) ** 2 * area_m2
+    return round(force / STORM_CANVAS_RATIO, 1)
+
+
 def worn_cloth_fraction(condition: float) -> float:
     """The share of its new strength a sail of this condition (0..100) still bears."""
     c = min(max(condition, 0.0), 100.0) / 100.0

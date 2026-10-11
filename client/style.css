@@ -143,45 +143,47 @@ main {
 #command { flex: 1; font: inherit; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; padding: 4px 6px; border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); color: var(--ink); }
 #command:focus { outline: none; border-color: var(--accent); }
 
-/* the ship view */
-#ship-view { flex: 1; width: 100%; height: 100%; min-height: 0; display: block; background: var(--sky); }
-#ship-view .sky { fill: var(--sky); }
-#ship-view .sea { fill: var(--sea); }
-#ship-view .sea-line { stroke: var(--sea-line); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
-#ship-view .caption { fill: var(--ink-soft); font-family: inherit; }
+/* the ship view: the page's (#ship-view) and the picture's offscreen copy share the class
+   (package 45), so the copy's computed styles are the page's and not black */
+#ship-view { flex: 1; width: 100%; height: 100%; min-height: 0; display: block; }
+.ship-view { background: var(--sky); }
+.ship-view .sky { fill: var(--sky); }
+.ship-view .sea { fill: var(--sea); }
+.ship-view .sea-line { stroke: var(--sea-line); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.ship-view .caption { fill: var(--ink-soft); font-family: inherit; }
 
-#ship-view .hull { stroke: var(--hull-far); stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
-#ship-view .hull.side { fill: var(--hull); }
-#ship-view .hull.deck { fill: var(--deck); }
-#ship-view .hull.transom { fill: var(--transom); }
+.ship-view .hull { stroke: var(--hull-far); stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.ship-view .hull.side { fill: var(--hull); }
+.ship-view .hull.deck { fill: var(--deck); }
+.ship-view .hull.transom { fill: var(--transom); }
 
-#ship-view .spar { stroke: var(--spar); stroke-linecap: round; vector-effect: non-scaling-stroke; }
-#ship-view .spar.mast { stroke-width: 3.2px; }
-#ship-view .spar.topmast { stroke-width: 2.4px; }
-#ship-view .spar.topgallant_mast { stroke-width: 1.7px; }
-#ship-view .spar.royal_mast { stroke-width: 1.2px; }
-#ship-view .spar.bowsprit { stroke-width: 2.8px; }
-#ship-view .spar.jib_boom { stroke-width: 1.8px; }
-#ship-view .spar.flying_jib_boom { stroke-width: 1.2px; }
-#ship-view .spar.yard, #ship-view .spar.lug_yard, #ship-view .spar.lateen_yard { stroke-width: 1.9px; }
-#ship-view .spar.gaff, #ship-view .spar.boom, #ship-view .spar.sprit { stroke-width: 1.7px; }
-#ship-view .spar.studdingsail_boom { stroke-width: 1px; }
-#ship-view .spar.wrecked { stroke: var(--spar-wrecked); stroke-dasharray: 5 4; }
-#ship-view .spar.sent_down { stroke-dasharray: 2 4; opacity: 0.5; }
+.ship-view .spar { stroke: var(--spar); stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.ship-view .spar.mast { stroke-width: 3.2px; }
+.ship-view .spar.topmast { stroke-width: 2.4px; }
+.ship-view .spar.topgallant_mast { stroke-width: 1.7px; }
+.ship-view .spar.royal_mast { stroke-width: 1.2px; }
+.ship-view .spar.bowsprit { stroke-width: 2.8px; }
+.ship-view .spar.jib_boom { stroke-width: 1.8px; }
+.ship-view .spar.flying_jib_boom { stroke-width: 1.2px; }
+.ship-view .spar.yard, .ship-view .spar.lug_yard, .ship-view .spar.lateen_yard { stroke-width: 1.9px; }
+.ship-view .spar.gaff, .ship-view .spar.boom, .ship-view .spar.sprit { stroke-width: 1.7px; }
+.ship-view .spar.studdingsail_boom { stroke-width: 1px; }
+.ship-view .spar.wrecked { stroke: var(--spar-wrecked); stroke-dasharray: 5 4; }
+.ship-view .spar.sent_down { stroke-dasharray: 2 4; opacity: 0.5; }
 
-#ship-view .sail { fill: var(--canvas); stroke: var(--canvas-edge); stroke-width: 0.8px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
-#ship-view .sail.furled { fill: var(--canvas-furled); }
-#ship-view .sail.in_the_gear, #ship-view .sail.loosed { fill: var(--canvas-loose); }
-#ship-view .sail.sheeted { fill: var(--canvas-loose); }
-#ship-view .sail.set { fill: var(--canvas); }
-#ship-view .sail.backed { fill: var(--canvas-backed); }
-#ship-view .sail.blown_out { fill: none; stroke: var(--torn); stroke-dasharray: 3 2; }
-#ship-view .sail.wrecked { fill: none; stroke: var(--spar-wrecked); stroke-dasharray: 4 3; }
-#ship-view .sail.reefed { stroke-width: 1.2px; }
+.ship-view .sail { fill: var(--canvas); stroke: var(--canvas-edge); stroke-width: 0.8px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.ship-view .sail.furled { fill: var(--canvas-furled); }
+.ship-view .sail.in_the_gear, .ship-view .sail.loosed { fill: var(--canvas-loose); }
+.ship-view .sail.sheeted { fill: var(--canvas-loose); }
+.ship-view .sail.set { fill: var(--canvas); }
+.ship-view .sail.backed { fill: var(--canvas-backed); }
+.ship-view .sail.blown_out { fill: none; stroke: var(--torn); stroke-dasharray: 3 2; }
+.ship-view .sail.wrecked { fill: none; stroke: var(--spar-wrecked); stroke-dasharray: 4 3; }
+.ship-view .sail.reefed { stroke-width: 1.2px; }
 
-#ship-view .line { stroke: var(--rope); stroke-width: 0.6px; opacity: 0.28; vector-effect: non-scaling-stroke; }
-#ship-view .line.busy { stroke: var(--rope-busy); stroke-width: 1.4px; opacity: 1; }
-#ship-view .line.parted { stroke-dasharray: 2 2; opacity: 0.6; }
+.ship-view .line { stroke: var(--rope); stroke-width: 0.6px; opacity: 0.28; vector-effect: non-scaling-stroke; }
+.ship-view .line.busy { stroke: var(--rope-busy); stroke-width: 1.4px; opacity: 1; }
+.ship-view .line.parted { stroke-dasharray: 2 2; opacity: 0.6; }
 
 /* instruments */
 .instruments { margin: 0; padding: 8px 12px; display: grid; grid-template-columns: max-content 1fr; column-gap: 12px; row-gap: 3px; overflow-y: auto; font-size: 13px; }

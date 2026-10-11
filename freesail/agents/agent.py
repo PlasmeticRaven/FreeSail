@@ -1819,7 +1819,10 @@ SHELF_WORDS = (
     f"by itself after {number_words(SHELF_LIFE_TURNS)} more of your turns, and the next "
     "sample says so. The library is always there: any book opens again at any time with "
     "the same call, under a new number. Your journal is where to keep what you took from "
-    "a page."
+    "a page. A picture (the chart, the ship's view, where your door carries one) is a book "
+    "too: a shelved picture was seen by you and is not sent again; its place in your "
+    "conversation holds a line saying what it was and that you were shown it, and the "
+    "same call draws a fresh one."
 )
 
 # The sentences of the head's opt-out item asked for in the consent record of

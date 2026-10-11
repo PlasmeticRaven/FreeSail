@@ -32,8 +32,18 @@ START = datetime(1805, 6, 10, 10, 0)
 
 
 def world_at(
-    where, ship=FRIGATE, heading=20.0, speed=0.0, start=START, wind=225.0, wind_kn=12.0, **kw
+    where,
+    ship=FRIGATE,
+    heading=20.0,
+    speed=0.0,
+    start=START,
+    wind=225.0,
+    wind_kn=12.0,
+    chart="channel-west",
+    **kw,
 ):
+    # `chart="channel-west"` is the Channel's region alone, as these tests were pinned
+    # (package 45: a scenario's `region:` now means the whole chart; a test says `chart:`)
     sc = Scenario(
         start_time=start,
         wind_from_deg=wind,
@@ -43,7 +53,7 @@ def world_at(
         ship_heading_deg=heading,
         ship_speed_kn=speed,
         position=where,
-        region="channel-west",
+        chart=chart,
         **kw,
     )
     return make_world(7, ship, sc)
@@ -1265,9 +1275,10 @@ def test_the_pilot_warns_of_a_danger_ahead_by_name_in_time_to_act():
     warns = events(w, "port.pilot_warns")
     rock = [e for e in warns if e.data["danger"] == "black-rock-falmouth"]
     assert len(rock) == 1 and rock[0].severity is Severity.URGENT
+    # package 45: the hand to leave it on, as a pilot would say it
     assert rock[0].text == (
-        "The pilot warns: the Black Rock five cables ahead, right ahead; the deeper water is "
-        "to starboard."
+        "The pilot warns: the Black Rock five cables ahead, right ahead; leave it to larboard, "
+        "the deeper water is to starboard."
     )
     assert struck.tick - rock[0].tick >= 300  # in time to act
     assert speaks_of_danger(rock[0].kind, rock[0].data) == "the pilot's warning"
@@ -1322,6 +1333,72 @@ def test_the_pilot_is_put_off_at_the_anchor_and_the_pilotage_paid_once():
     paid = [x[1:] for x in w.purse.entries if "pilotage" in str(x[2])]
     assert paid == [(-5.0, "pilotage, Falmouth")]
     assert w.ports.pilot is None and w.people.find("the pilot") is None
+
+
+def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_the_black_rock():
+    """Package 45 (Part B item 2c; the owner's wardroom game, aground on the Filletes with
+    the pilot aboard warning): `let the pilot take her in` gives him the conn, and he
+    conns her along his port's track from where she is to the berth under the rules
+    actor, every course a helm order of his that the log shows; a danger on his line is
+    kept off two points on the hand his own warning names (the Black Rock, which a first
+    version ran her onto); his fix brings the account to the truth, said once; at the
+    last mark he says where to let go and his conn is done. `I have the conn` or any
+    helm order of the officer's takes her back, and he says so."""
+    from freesail.world.ports import PILOT_ACTOR
+
+    w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=5.0, wind=225.0)
+    _pilot_aboard(w)
+    w.submit("set plain sail")
+    w.submit("steer north")
+    w.run(600)
+    e = w.submit("let the pilot take her in")
+    assert e.kind == "port.conn" and e.text == (
+        "The pilot, Mr Pascoe, has the conn to take her in: by 1 mark to Carrick Road; 'I have "
+        "the conn', or a helm order, takes her back."
+    )
+    assert w.ports.conn and [m[0] for m in w.ports.conn_track] == ["Carrick Road"]
+    berth = run_until(w, "port.pilot_berth", 120)
+    assert berth.text.startswith(
+        "The pilot: this is the berth, Carrick Road; let go when you please. Carrick Road, "
+    )
+    assert not w.ports.conn and not events(w, "ship.aground")
+    fixes = events(w, "port.pilot_fix")
+    assert len(fixes) == 1 and fixes[0].text.startswith("The pilot has her by his marks: ")
+    conned = [x for x in events(w, "helm.order") if x.actor == PILOT_ACTOR]
+    assert conned and conned[0].text == "Helm ordered: steer N (0°)."
+    said = [x.text for x in events(w, "order.accepted") if x.actor == PILOT_ACTOR]
+    assert said[0] == "The pilot: steady as she goes; steer N for Carrick Road."
+    kept_off = [s for s in said if "leaving the Black Rock to starboard" in s]
+    assert kept_off
+    assert kept_off[0].startswith("The pilot: port 2 points; steer NNW for Carrick Road")
+    warned = [x.text for x in events(w, "port.pilot_warns")]
+    assert any("the Black Rock" in t and "leave it to starboard" in t for t in warned)
+    e = w.submit("come to an anchor")
+    assert e.kind == "order.accepted"
+    w.run(900)
+    assert w.at_anchor and w.ports.in_port() is not None and w.ports.in_port().id == "falmouth"
+    # the officer takes her back, by the words or by a helm order of his own
+    w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=5.0, wind=225.0)
+    _pilot_aboard(w)
+    w.submit("set plain sail")
+    w.submit("steer north")
+    w.run(600)
+    e = w.submit("I have the conn")
+    assert e.kind == "order.rejected" and "The pilot has not the conn" in e.text
+    assert w.submit("let the pilot take her in").kind == "port.conn"
+    w.run(300)
+    e = w.submit("I have the conn")
+    assert e.text == "I have the conn; Mr Pascoe stands by and will still warn of his water."
+    assert not w.ports.conn
+    assert w.submit("let the pilot take her in").kind == "port.conn"
+    w.run(300)
+    assert w.submit("steer NNW").kind == "helm.order"
+    w.run(60)
+    assert not w.ports.conn
+    assert [x.text for x in events(w, "port.pilot_conn")] == [
+        "The pilot gives her up: the conn taken back.",
+        "The pilot gives her up: you have her, sir (the helm was given another course).",
+    ]
 
 
 def test_a_hail_never_asks_a_ship_at_anchor_to_shorten_sail():

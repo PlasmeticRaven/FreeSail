@@ -446,7 +446,14 @@ def test_the_readings_on_a_ship_with_a_chart_and_on_one_without():
     assert queries.snapshot(without)["reckoning"] is None
     assert queries.snapshot(without)["lookout"] is None
     block = queries.chart_block(with_chart)
-    assert block["region"] == REGION and len(block["coast"]) > 100 and len(block["features"]) >= 150
+    # package 45: a scenario that names a region sails the whole chart that holds it, and
+    # the browser's block carries every region's coast and features and the envelope
+    assert (
+        block["region"] == "atlantic-east"
+        and with_chart.chart.region_at(with_chart.position) == REGION
+    )
+    assert len(block["coast"]) > 100 and len(block["features"]) >= 150
+    assert block["bounds"]["south"] <= 32.0 and block["bounds"]["north"] >= 51.0
     assert queries.chart_block(without) is None
     assert any(line.startswith("In sight:") for line in with_chart.summary_lines())
 

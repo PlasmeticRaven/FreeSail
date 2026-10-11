@@ -1463,6 +1463,8 @@ in (then 5b), double altitudes, the kedge, interiors beyond a name and a descrip
      over the ground), from 4.4; the hull's resistance astern is still its resistance
      ahead (the owner's ruling, spec 3b §9).
 
+16. **The ship by the wind after a gale, and the wear that will not come round (package 45, 2026-10-11).** On the station trial, filled away from lying a-try with the wind at thirty knots and plain sail set by the hove-to book's "under way again", the frigate is taken aback every three minutes for an hour and more (leeway thirty to sixty degrees to larboard between), the helm full and by and the yards braced sharp up; a wear ordered by the master's course in thirty knots under close-reefed topsails "would not come round" four times in the day, and once worn she has no way to come to with. The helm's part was mended (the mark under the period's trim only, full and by forward of the beam, the yards braced up for it); what is left is the hull's and the sails': the gripe with no way on her (item 12), the sails' drive at the luff under reefs, and the wear's own helm. Also found: the master allowed the leeway the model read while she had sternway (a hundred and sixty degrees) in a course, now capped at Norie's four points and allowed only with headway; and a course for a point through the land is said ("the line crosses the land about Keller") and not acted on, so a station whose circle reaches the land is kept off it by a book line and not by a mark round it (package 45's `via` would serve).
+
 ## 34. The scoping draft's rulings (record)
 
 The questions put to the owner on 2026-09-29 and the rulings: 1, a real sea with older

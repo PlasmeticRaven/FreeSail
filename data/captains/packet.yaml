@@ -12,6 +12,8 @@ source: "spec M6 §4; the Post Office packets' standing orders of the period, fr
 thresholds:
   gale_kn: {value: 38, source: "a packet carries on; she heaves to at a strong gale, force 8's upper half; judgement on Beaufort's scale"}
   gale_over_kn: {value: 30, source: "judgement"}
+  # package 45: the wind under the gale-over line for so many minutes together before she fills away, not on a lull of a gusty wind (Luce 1884 ch. XXIX p. 479, sail not made again too rapidly; the figure judgement); while the glass falls the line comes down with the gale line by `worsening_sooner_kn`, the band between them kept
+  gale_over_minutes: {value: 10, source: "a glass is too long with the wind easing and a minute is a lull; judgement"}
   shorten_sail_kn: {value: 33, source: "a packet shortens sail later than a merchantman (judgement, three knots over the starter book's figure)"}
   sea_room_nm: {value: 10, source: "as the merchant's"}
   lee_shore_nm: {value: 6, source: "two leagues, spec M6 §4"}
@@ -22,6 +24,31 @@ thresholds:
   leg_reached_nm: {value: 2, source: "as the merchant's"}
   anchor_within_nm: {value: 0.5, source: "as the merchant's"}
   road_cables: {value: 3, source: "spec M6 §4"}
+  # Package 45. The entry (item 3a): see freesail/world/captains.py ENTRY_POINTS (six points).
+  # Tack or wear (item 4): she wears when her sail is short or the wind over `wear_wind_kn`,
+  # or after she has missed stays within the hour, and tacks regardless with the land to
+  # leeward within `tack_regardless_nm` (freesail/orders/navigation.py `put her about`).
+  wear_wind_kn: {value: 30, source: "the starter book's shorten-sail line, where the strain truths bite; Luce 1884 ch. XXIV, 'To Wear Ship' in a gale when she will not stay; judgement on the figure"}
+  tack_regardless_nm: {value: 2, source: "the planner's danger berth doubled: wearing a ship's length and more to leeward with the land two miles off is the ground she cannot spare; judgement"}
+  # Sail after the gale (item 5): the wind under `sail_again_kn` for `sail_again_minutes`
+  # and sail is made again whatever his state (Luce 1884 ch. XXIX p. 479, 'After the gale
+  # abates, sail should not be made upon the vessel too rapidly'; the half hour judgement).
+  sail_again_kn: {value: 25, source: "the gate day's book's twenty-five knots for half an hour (package 37p); judgement"}
+  sail_again_minutes: {value: 30, source: "as above; halved when the glass is rising"}
+  # The glass (item 6): the weather is worsening when the glass falls fast or the wind has
+  # risen by `worsening_wind_kn` within the hour, mending when the glass rises or the wind
+  # has eased by `mending_wind_kn`; worsening brings the gale rows `worsening_sooner_kn`
+  # sooner (a first version widened the sea room and the lee shore by half as well, and
+  # on the station fifteen miles off Ushant it had her heave to and fill away by turns);
+  # mending
+  # lets the gale-over row come `mending_sooner_kn` sooner and worsening holds it down by
+  # `worsening_sooner_kn` (Luce 1884 ch. XXVIII, the
+  # barometer as the instrument of warning; FitzRoy's rules, "a rapid fall of the
+  # barometer, a blow soon"; the knots and the hour judgement).
+  worsening_wind_kn: {value: 6, source: "a force of Beaufort's scale in the twenties and thirties is five to seven knots; judgement"}
+  mending_wind_kn: {value: 6, source: "as above"}
+  worsening_sooner_kn: {value: 6, source: "a force; judgement"}
+  mending_sooner_kn: {value: 4, source: "less than a force, so that she does not fill away into the gale's tail; judgement"}
 
 books:
   on passage:
@@ -47,7 +74,7 @@ books:
     - 'standing order "under way again": at filled away then set plain sail'
   beating:
     - 'standing order "the leg": every glass, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
-    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then tack ship'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
     - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
     - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
     - 'standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix'
@@ -106,4 +133,8 @@ transitions:
   - {from: running for shelter, on: weather clear, to: on passage}
   - {from: evading, on: stranger lost, to: on passage}
   - {from: at anchor, on: under way, to: on passage}
+  # package 45 (item 3b): at anchor within the port's reach she is in port, and does her
+  # business from the road by the boat; the wind to go farther in is waited for only at a
+  # port whose anchorage is beyond the reach (the road of Bertheaume, eight miles from Brest)
+  - {from: at anchor, on: anchored in port, to: in port}
   - {from: in distress, on: afloat, to: on passage}

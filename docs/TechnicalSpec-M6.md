@@ -340,6 +340,55 @@ notes (the ship aback in a gale for hours, driven to leeward; `shorten sail` and
 headsails), for a package of its own.
 
 
+**As built (package 45, Part B, 2026-10-11; the owner's notes of gate m6a's first runs).**
+*The helm full and by* (`physics/hull.py`): the helmsman's mark is the highest sail only
+under the period's trim by level, where it lifts before the rest (`helm_mark_staggered`,
+`STAGGER_LEAST`); with every yard braced to its limit the courses lift first and he keeps
+her by the old rule, the mean luff and its margin (four knots and more, never aback,
+`tests/test_gale.py`); and full and by is forward of the beam whatever the yards stand at
+(`FULL_AND_BY_MOST`, seven points apparent), the mean luff of yards braced for a quartering
+wind having kept her "full and by" at a hundred and thirty degrees onto the Dodman; the
+watch braces sharp up for a helm kept full and by with the yards for another wind
+(`scripts._brace_up_for_the_helm`, `helm.brace_up`), once an episode. *The pilot*
+(`world/ports.py`): aboard within his port's ground and in sight of his marks he fixes her,
+the account brought to the truth with a cable's doubt every five minutes and said once
+(`port.pilot_fix`); his warnings name the hand to leave the danger on; `let the pilot
+take her in` / `out` gives him the conn (`give_conn`, `port.conn`), and he conns her
+along his port's track from where she is under the rules actor (`PILOT_ACTOR`), each
+course a helm order of his in the log, a danger on his line kept off two points on the
+hand his warning names (`_conn_keep_off`; a first version ran her onto the Black Rock while
+he warned of it), the berth said at the last mark; `I have the conn` or any helm order of
+the officer's takes her back, said. The captain's and the merchant's books give him the
+conn in pilot water and keep quiet while he has it (`Captain._conn_for`, the hourly "the
+leg" left out). *The merchant's entry* (`captains.py`): the inner track judged leg by leg
+from the leg in hand, a leg nearer the wind than `ENTRY_POINTS` (six) not beaten, and she
+anchors at the last road or anchorage she can reach (`_entry_stop_for`); at anchor within
+the port's reach (`Port.reach_nm`, two miles by default; Falmouth's outer road and Carrick
+Road within) she is in port and trades from the road by the boat. *Tack or wear*
+(`orders/navigation.py` `put her about`, `put_about_choice`): she wears with no head sail
+set, the topsails close-reefed, the wind over `wear_wind_kn` (thirty) or stays missed
+within the hour, tacks regardless with the land to leeward within `tack_regardless_nm`
+(two), and the log says why (`ship.put_about`); the beating and station books put her
+about by it. *Sail after the gale* (`Captain._weather_work`): the wind under `sail_again_kn`
+for `sail_again_minutes` and he makes sail again whatever his state (the topgallant masts
+swayed up, the reefs out, plain sail), a head sail blown out bent anew from the sail
+room (`bend a new jib`). *The glass* (`_read_trend`): worsening when the glass falls fast or
+the wind has risen a force within the hour, mending when it rises or the wind has eased
+as much; worsening brings the gale row and the book's shorten-sail line a force sooner
+and holds the gale-over line down with them, mending brings the gale-over line four knots
+sooner and halves the half hour; the gale-over row waits `gale_over_minutes` (ten) under
+its line, not a lull. *The land to leeward* (`_lee_land_nm`): the lee sector six points
+either side of dead to leeward, read along the chart's coast from the account by rays a
+point apart, in place of the nearest coast point's bearing (which flipped between two
+shores off Ushant and had her heave to and fill away by turns fifty times in a
+forenoon). *The storm canvas* (`ship/parts.py`, `tools/gen_ships.py`): rated for seventy
+knots apparent (`STORM_CANVAS_APPARENT_KN`), the cause of the owner's blown-out storm
+staysails being a rating by the plain canvas's square metre. The thresholds are in the
+doctrines with their sources; the trials' figures and the pins moved are in the tuning
+notes (package 45). Not built: the station's circle through the land is still met by
+"the offing" line and not by a mark round it; after the gale the frigate under plain
+sail by the wind is aback by turns for an hour (the tuning notes, and M5 §33).
+
 ### 5. The officer's own reckoning (`freesail/world/reckoning.py`; `freesail/agents/tools.py`)
 
 G19's small step, true to the period: an officer may keep a reckoning of his own from the
@@ -819,6 +868,33 @@ the journal, the transcript, the log or the save. With no page open the tool say
 gives the readings the picture would have shown. Tested against a local server in the
 Messages API's shape (`tests/test_api_door.py`, truth 86) and the MCP bridge's own client
 (`tests/test_mcp_server.py`); no model was seated.
+
+**As built (package 45, 2026-10-11): the pictures that reach the model.** The owner's
+wardroom run (gate m6a, item 11) had the ship's view "a blank white frame" and the chart
+first seen and then disbelieved. A test with a real browser (`tests/test_pictures.py`:
+Playwright on the pre-installed Chromium, the game's own server on a port, a station
+seated through the API door against the fake Messages server and through the MCP
+bridge, the PNG at the far end decoded and measured) found two faults in the page and
+one in the shelf. The ship's view was blank in truth: the offscreen `<svg>` the page
+drew it in carried the style that hid it (`position: absolute; left: -10000px`) into
+the serialised picture, which the SVG image honoured, so the drawing lay ten thousand
+pixels off the frame and the PNG was transparent (shown white); and the stylesheet keyed
+the view's colours on the page's `#ship-view`, which the copy had not, so every fill
+computed to black. The chart was drawn from the page's own canvas at the size and the
+view the pane happened to have. Both pictures are now drawn on offscreen canvases of a
+fixed size with their own backgrounds (`client/app.js`: the chart `CHART_PX`, 1200 by
+900, by the map's own renderer `SeaMap.paint`, centred on the account at a span; the
+ship's view `SHIP_PX`, 960 by 720, in a copy with the stylesheet's class `.ship-view`,
+hidden by a holder round it and painted on the view's own sky), so neither depends on the
+page's layout, the pane shown or the tab's being in front. `chart` takes a `span`
+(`pictures.SPANS`: `harbour` two miles across, `coast` twenty, `passage` a hundred and
+fifty, `whole` the chart's envelope; none for the page's own view), said in the tool's
+words and drawn with a scale bar; the browser's chart has the same spans as zoom stops.
+The shelf: a shelved picture's stub says what it was and that it was shown and put back
+(`harness.Harness._stub`), the brief's shelf words say a shelved picture was seen and is
+not re-sent, and the shelf-life (three of the model's turns after the one it was read
+in) was found to stand: a picture is seen in three requests before it goes back. The
+draw's figures are in `docs/dev/TuningNotes.md` (package 45).
 
 ### 14. The replay driven by the transcript (`freesail/core/replay.py`, `freesail/agents/harness.py`)
 
@@ -1446,6 +1522,46 @@ gate's), and the tuning notes' section. The size of each region is the Channel's
 18 MB committed); six of them and the corridor bring the chart to about 130 MB, the
 largest thing in the repository by far. The owner's ruling 5: committed, a price to pay
 for now, made more efficient later or accepted.
+
+**The chart whole in play (package 45, 2026-10-11).** A scenario's `region:` is the
+region she starts in on the chart that holds it (`chart.chart_holding`: `atlantic-east`
+for every region of the line), so every scenario under `data/scenarios/` and every trial
+sails the whole chart with no flag; `chart: <region>` names a chart of one region
+outright, which only a test does. The browser's block (`queries.chart_block`) carries
+every region's coast and features and the chart's envelope (1.7 MB for the whole), the
+map culls its coast and features to the view and decimates the coast to the pixel at
+small scales (`SeaMap.setChart`, `drawChart`), and the whole chart draws in about twenty
+milliseconds on screen and ten to twenty as a picture, the harbour span in three. **The
+chart in play, from Falmouth to Funchal road** (the owner's question of 2026-10-11,
+answered by reading and one sail): nothing is unmerged. Every port of the eight regions
+loads on the whole chart with its pilot, its market and its yard or chandlers; the
+Channel's and `channel-mid`'s ports carry the planner's `tracks:` (to sea, from sea, in),
+the other blocks' ports none, so a captain approaches Brest by the Goulet's marks but
+Corunna, Lisbon or Funchal by their outer road and anchorage alone (the planner's rule
+for a port without tracks); every port outside the Channel but Cadiz, Gibraltar, Algeciras,
+Rochefort and St Malo says `datum: unverified`. The straight line from Falmouth's outer
+road to Funchal road (211°, 1,175 miles) is clear by the chart in the captain's hands
+once she is off the land (a mark off Falmouth first): the Channel region's tiles to
+48 N, the corridor's water across the Bay and down to Madeira with Biscay south's tiles
+touched at the Galician corner, no coast nearer than sixty miles, and `bound for
+Funchal` from Falmouth is one leg of 1,100 miles after the port's track to sea. The tide
+is the Channel's blend to about 45 N and the nearest gauge alone beyond it, marked far
+(off Lisbon and at Funchal the master says the tide here may differ by hours); the
+weather's boxes are PROVISIONAL from Biscay south. Sailed once: the schooner from off
+Falmouth round Ushant into the Bay by the player's own courses
+(`data/scenarios/falmouth-to-corunna.yaml`, `shape a course for Corunna via Ushant`): the
+point off Ushant passed abeam at 20:58 on the first day, fifteen hours out, the course
+shaped for Corunna by the master, the Channel's seam at 48 N and Biscay north's at
+45.9 N crossed with nothing odd in the log (the land out of sight, the noons within the
+master's doubt, 148 and 119 miles a day as the wind went north and light); sixty hours
+brought her to 45° 29' N, 6° 51' W, and the whole passage to Corunna is about four days
+at her pace. Found and fixed on the way: a port's name was not a place a course could
+be shaped for or a distance asked to where the chart has no town feature named for it
+(Corunna, Funchal road), and is now, its road standing for it; the Falmouth pilot's
+cutter followed a ship she could not catch a hundred miles to Ushant and hailed her
+there, and now goes home beyond twice her cruising ground. Left: the planner routes
+nothing (a `via` lays the marks, §4), the blocks' ports want their tracks, and the
+regatta's course is still to be sailed whole.
 
 The voyage itself, Falmouth to Funchal, is a course for the regatta (§21) and the first
 free passage with no marks for a week: the reckoning by the log and the noon sight alone,

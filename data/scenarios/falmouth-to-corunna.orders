@@ -1,0 +1,36 @@
+# FreeSail: the player's own courses, Falmouth round Ushant into the Bay for Corunna
+# (package 45, Part A item 4; the scenario beside this file). The merchant passage's
+# routines (data/scenarios/merchant-passage.orders) for the trim, the bearings and the
+# weather, and the course by way of a mark (`via`, package 45) for the passage itself.
+
+# The course: Corunna by way of Ushant, the island left to larboard five miles off, the
+# straight line across the Bay after. The master keeps the way: as the point off Ushant
+# is reached or passed abeam he shapes the next course himself, said in the log. The
+# course is worked afresh from the account every hour, by way of Ushant while the island
+# is still ahead (within a hundred miles of Falmouth the point off it is not yet passed)
+# and straight for Corunna after, since the leeway and the stream set her off a long leg.
+standing order "the course across, by Ushant": every hour, if the distance to Falmouth is under 100 miles and the distance to Ushant is over 8 miles then shape a course for Corunna via Ushant
+standing order "the course across the Bay": every hour, if the distance to Falmouth is over 100 miles and the distance to Corunna is over 10 miles then shape a course for Corunna
+
+# The yards and the sheets (the merchant passage's rules; not while she is hove to).
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
+
+# The departure and the landfall: a bearing of the land every glass while it is in
+# sight, and a fix by cross bearings after it.
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
+
+# The weather: sail shortened over thirty knots, made again when it has eased (the
+# starter book's figures); the day is pinned fine, so these sleep.
+standing order "shorten sail for weather": when the true wind exceeds 30 knots for 2 minutes then shorten sail
+standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the fore topsail is reefed then shake out the reefs in the topsails; set plain sail
+
+# Corunna: the lead every five minutes within two leagues of the harbour, the pilot taken
+# at his hail (the fore topsail in for his boat), and the anchor let go in the harbour
+# inside San Antón at the first cast under ten fathoms within a mile and a half of it
+# (Tofiño 1789 p. 13: a frigate with San Antonio NE in six or seven brazas, mud).
+standing order "the lead in pilot water": every 5 minutes, if the distance to the harbour of Corunna is under 6 miles then heave the lead
+standing order "the pilot boards": at the pilot's hail then take in the fore topsail; take the pilot
+standing order "the pilot aboard": at the pilot aboard then set plain sail
+standing order "the anchorage": at a sounding, if the distance to the harbour of Corunna is under 1.5 miles and the depth of water is under 10 fathoms and the speed is over 2 knots then come to an anchor

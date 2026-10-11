@@ -54,7 +54,7 @@
 
   <section id="ship-panel" class="panel">
     <div class="panel-head"><span>Ship</span><span class="hint">[ and ] turn the view; \ returns to leeward</span></div>
-    <svg id="ship-view" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="the ship, drawn from her part graph"></svg>
+    <svg id="ship-view" class="ship-view" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="the ship, drawn from her part graph"></svg>
   </section>
 
   <section id="instruments-panel" class="panel">
@@ -88,6 +88,11 @@
     <div class="panel-head"><span>Map</span><span class="hint">
       <button id="btn-map-centre" type="button" title="centre on the ship and follow her (the wheel zooms, a drag pans)">centre</button>
       <button id="btn-map-fit" type="button" title="the whole track and the ship, as at first">fit</button>
+      <!-- package 45: the spans, the chart's zoom stops and the picture's -->
+      <button type="button" data-span="harbour" title="two miles across, the ship followed">harbour</button>
+      <button type="button" data-span="coast" title="twenty miles across">coast</button>
+      <button type="button" data-span="passage" title="a hundred and fifty miles across">passage</button>
+      <button type="button" data-span="whole" title="the whole chart as built">whole</button>
       <!-- package 37n: the chart's tools; the keys work while the chart has the focus -->
       <button id="btn-map-rose" type="button" title="the protractor rose: drag its centre, turn its rim (r)">rose</button>
       <button id="btn-map-line" type="button" data-tool="line" title="lay a line between two clicks (l)">line</button>

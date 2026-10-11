@@ -548,7 +548,7 @@ sails:
   centre_height_m: 26.3
   canvas_no: 7
   cloth_rating_kn: 3.4
-# fore storm staysail 28 m2 on the fore stay (Luce 1884 ch. X), cut as the frigate's: Kipping's fore staysail, foot 27 ft, leech 22 ft (the course's depth); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# fore storm staysail 28 m2 on the fore stay (Luce 1884 ch. X), cut as the frigate's: Kipping's fore staysail, foot 27 ft, leech 22 ft (the course's depth); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: fore.storm_staysail
   class: jibheaded
   stay: fore.stay
@@ -556,9 +556,9 @@ sails:
   x_m: 12.7
   centre_height_m: 5.2
   canvas_no: 1
-  cloth_rating_kn: 10.0
+  cloth_rating_kn: 25.7
   bent: false
-# main storm staysail 27 m2 on the main stay (Luce 1884 ch. X: 'the storm-staysails set on the respective lower-stays'): tack at the fore mast collar, head 0.6 up the stay, clew 7 ft above the deck (as the frigate's mizzen storm staysail; 0.6 judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# main storm staysail 27 m2 on the main stay (Luce 1884 ch. X: 'the storm-staysails set on the respective lower-stays'): tack at the fore mast collar, head 0.6 up the stay, clew 7 ft above the deck (as the frigate's mizzen storm staysail; 0.6 judgement); in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: main.storm_staysail
   class: jibheaded
   stay: main.stay
@@ -566,9 +566,9 @@ sails:
   x_m: 3.8
   centre_height_m: 6.5
   canvas_no: 1
-  cloth_rating_kn: 9.7
+  cloth_rating_kn: 24.8
   bent: false
-# storm trysail 77 m2 on the main gaff and boom (Steel 1794, 'Sloop's trysail, or storm mainsail', as the schooner's): head 13 ft (two-fifths of the spanker's), foot 38 ft (three times the head), luff 31 ft (0.85 of the spanker's hoist, judgement), after-leech an eighth deeper; three reef-bands; bent in place of the spanker; in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# storm trysail 77 m2 on the main gaff and boom (Steel 1794, 'Sloop's trysail, or storm mainsail', as the schooner's): head 13 ft (two-fifths of the spanker's), foot 38 ft (three times the head), luff 31 ft (0.85 of the spanker's hoist, judgement), after-leech an eighth deeper; three reef-bands; bent in place of the spanker; in the sail room. Canvas No. 1 (Luce 1884 ch. X p. 171 (Tables.md §1): every storm sail of No. 1; Luce 1884 ch. X, 'Storm-Sails are made of the strongest canvas'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: storm_trysail
   class: gaff
   mast: main.mast
@@ -579,7 +579,7 @@ sails:
   x_m: -8.9
   centre_height_m: 7.6
   canvas_no: 1
-  cloth_rating_kn: 27.6
+  cloth_rating_kn: 70.8
   bent: false
   in_place_of: main.spanker
 lines:

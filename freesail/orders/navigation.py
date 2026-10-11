@@ -784,6 +784,187 @@ def _off_a_place(world: Any, said: str) -> tuple[Any, str] | None:
     return target, f"{distance} {units.point_name(toward, full=True)} of {feature.name}"
 
 
+# `put her about` (package 45, Part B item 4; the owner's notes 4 and 7 of gate m6a: missed
+# stays under a reefed main topsail and staysails, and after the headsails blew out). She
+# wears when her sail is short or she has lately missed stays, and tacks regardless with
+# the land close to leeward, since wearing loses the ground. The figures are the
+# doctrine's where a captain gives the order (`data/captains/*.yaml`: `wear_wind_kn`,
+# `tack_regardless_nm`) and these by default: thirty knots is the starter book's shorten-
+# sail line and Luce's "To wear ship ... in a gale"; two miles is the planner's danger
+# berth doubled (judgement); an hour is a watch's half.
+WEAR_WIND_KN = 30.0
+TACK_REGARDLESS_NM = 2.0
+MISSED_STAYS_WITHIN_S = 3600
+CLOSE_REEF = 3
+
+
+def put_about_choice(ship: Any) -> tuple[str, str]:
+    from freesail.world.reckoning import miles_words
+
+    """('tack ship' | 'wear ship', why): the rule above, read from the ship and the
+    readings (her sails, the wind, the nearest land to leeward, the log's missed stays)."""
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    readings = getattr(world, "readings", None)
+    reasons: list[str] = []
+    # the land to leeward: tack regardless within TACK_REGARDLESS_NM
+    close = None
+    wind_from = None
+    if readings is not None:
+        near = readings.value("nearest_land")
+        frm = readings.value("mean_true_wind_from")
+        if frm is None:
+            frm = readings.value("true_wind_from")
+        wind_from = float(frm) if frm is not None else None
+        if isinstance(near, dict) and near.get("metres") is not None and wind_from is not None:
+            brg = near.get("bearing_deg")
+            if brg is None and near.get("bearing"):
+                try:
+                    brg = units.rad_to_deg(units.parse_course(str(near["bearing"])))
+                except (ValueError, units.CourseError):
+                    brg = None
+            if brg is not None:
+                toward = (units.rad_to_deg(wind_from) + 180.0) % 360.0
+                to_lee = abs(units.wrap_pi(math.radians(float(brg) - toward))) < math.radians(67.5)
+                if to_lee:
+                    close = float(near["metres"]) / units.NAUTICAL_MILE
+    if close is not None and close < TACK_REGARDLESS_NM:
+        return "tack ship", (
+            f"the land {miles_words(close)} to leeward, where wearing would lose the ground"
+        )
+    sails = getattr(ship, "sails", {}) or {}
+    groups = getattr(ship, "groups", {}) or {}
+    head = [
+        sails[sid]
+        for g in ("jibs", "staysails", "head sails")
+        for sid in groups.get(g, [])
+        if sid in sails
+    ]
+    if not head:
+        head = [sl for sl in sails.values() if sl.cls == "jibheaded" and sl.x_m > 0]
+    if head and not any(sl.is_set for sl in head):
+        reasons.append("no head sail set")
+    topsails = [sails[sid] for sid in groups.get("topsails", []) if sid in sails]
+    if (
+        topsails
+        and all(sl.reefs >= CLOSE_REEF for sl in topsails if sl.is_set)
+        and any(sl.is_set for sl in topsails)
+    ):
+        reasons.append("the topsails close-reefed")
+    wind_kn = None
+    if readings is not None:
+        w = readings.value("mean_true_wind_speed")
+        if w is None:
+            w = readings.value("true_wind_speed")
+        wind_kn = units.ms_to_knots(float(w)) if w is not None else None
+    if wind_kn is not None and wind_kn > WEAR_WIND_KN:
+        reasons.append(f"the wind {wind_kn:.0f} knots")
+    log = getattr(world, "log", None)
+    tick = world.clock.tick
+    if log is not None:
+        since = log.since(max(0, tick - MISSED_STAYS_WITHIN_S))
+        missed = [e for e in since if e.kind == "ship.missed_stays"]
+        if missed:
+            reasons.append("she missed stays within the hour")
+    if reasons:
+        return "wear ship", ", ".join(reasons)
+    return "tack ship", "her sail is whole and the wind moderate"
+
+
+def put_about(ship: Any) -> Result:
+    """`put her about`: tacks or wears by `put_about_choice`, the choice and its reason
+    said before the manoeuvre's own line."""
+    from freesail import orders
+
+    verb, why = put_about_choice(ship)
+    choice = "wearing" if verb == "wear ship" else "tacking"
+    # the choice said as a note of the ship's (the World drops an evolution order's own
+    # text when the runner has logged its start), before the manoeuvre's own line
+    note = getattr(ship, "note", None)
+    if callable(note):
+        note(
+            "notable",
+            "ship.put_about",
+            f"Put about: {choice}, {why}.",
+            data={"put_about": verb, "why": why},
+        )
+    kind, text, data = orders.handle(ship, verb)
+    data = dict(data or {})
+    data["put_about"] = verb
+    data["why"] = why
+    return kind, f"{choice.capitalize()}, {why}. {text}".strip(), data
+
+
+def _target_of(world: Any, nav: Any, place: str) -> tuple[Any, str, Any]:
+    """A place's position, its words and its feature (None for a point): a pricked
+    position, a point off a place, or a feature of the chart; refused in words."""
+    pricked = _position_in(place)
+    if pricked is not None:
+        from freesail.world.geo import format_position
+
+        return pricked, format_position(pricked), None
+    off = _off_a_place(world, place)
+    if off is not None:
+        return off[0], off[1], None
+    found = nav.place_of(place)  # a feature, or a port by its name (its road)
+    if found is None:
+        raise OrderError(_no_place_words(world.chart, place))
+    return found
+
+
+def _shape_the_way(ship: Any, nav: Any, dest: str, via: list[str]) -> Result:
+    """`shape a course for <place> via <mark>, <mark>` (package 45): the way's points
+    worked by `captains.way_marks` (a mark that is land or a danger passed a league off,
+    on the hand the straight line puts it; a mark that is water sailed to), the course
+    shaped for the first, the rest kept by the master (`Navigation.way`). No routing
+    between the marks: the straight line between one and the next, as the plan's."""
+    from freesail.world.captains import way_marks
+
+    world = nav.world
+    end, end_words, _ = _target_of(world, nav, dest)
+    try:
+        points = way_marks(world, nav.account_now(), via, end)
+    except ValueError as e:
+        raise OrderError(str(e)) from None
+    first = points[0]
+    heading, words, shaped = nav.shape_for(first[1], first[0])
+    rest = [
+        {"words": w, "said": w, "lat_deg": p.lat_deg, "lon_deg": p.lon_deg, "hand": h}
+        for w, p, h in points[1:]
+    ]
+    # the destination by the words given (a port's name, a place, a point): what the
+    # master shapes for when the way comes to it; its full name (`said`) in the lines
+    rest.append(
+        {
+            "words": dest,
+            "said": end_words,
+            "lat_deg": end.lat_deg,
+            "lon_deg": end.lon_deg,
+            "hand": "",
+        }
+    )
+    then = "; then " + ", then ".join(x["said"] for x in rest)
+    hands = "; ".join(h for _, _, h in points if h)
+    words = words.rstrip(".") + then + (f" ({hands})" if hands else "") + "."
+    nav.set_way(first[0], first[1], first[2], heading, rest)
+    judged = judge_course(ship, heading, helm_order=False)
+    if judged.branch == "helm":
+        _, helm_text, helm_data = steer_degrees(ship, units.rad_to_deg(heading))
+    else:
+        helm_text, helm_data = carry_out(ship, judged)
+        words = words.rstrip(".") + f". {judged.words}."
+    data = {"verb": "shape a course for", "level": 1, "place": first[0], "heading": heading}
+    data |= shaped
+    data["helm"] = helm_data
+    data["via"] = [x["said"] for x in rest]
+    if judged.branch != "helm":
+        data["judged"] = judged.branch
+    if judged.full_and_by:
+        data["course_not_laid"] = True
+    return "helm.set", f"{words} {helm_text}".rstrip(), data
+
+
 def _no_place_words(chart: Any, place: str) -> str:
     """The refusal for a place the chart has not got, with the nearest names it has."""
     if chart is None:
@@ -971,10 +1152,16 @@ def check(ship: Any, order: Order) -> None:
     if verb == "shape a course for":
         if not rest:
             raise OrderError("Shape a course for where? Name a place of the chart.")
-        if _position_in(rest) is not None or _off_a_place(world, rest) is not None:
-            return
-        if chart.find_feature(rest) is None:
-            raise OrderError(_no_place_words(chart, rest))
+        from freesail.world.captains import split_via
+
+        dest, via = split_via(rest, world)
+        if not dest:
+            raise OrderError("Shape a course for where? Name the place before 'via'.")
+        for place in [dest, *via]:
+            if _position_in(place) is not None or _off_a_place(world, place) is not None:
+                continue
+            if chart.find_feature(place) is None and _navigation(ship).place_of(place) is None:
+                raise OrderError(_no_place_words(chart, place))
         return
 
 
@@ -1068,10 +1255,21 @@ def execute(ship: Any, order: Order) -> Result:
             raise OrderError(f"'{m.group('dir')}' is not a compass point to allow the set toward.")
         text, data = nav.allow_set(knots, toward)
         return "reckoning.set_allowance", _whose(ship, text), {"verb": verb, "level": 1} | data
+    if verb == "put her about":
+        return put_about(ship)
     if verb == "shape a course for":
         if not rest:
             raise OrderError("Shape a course for where? Name a place of the chart.")
         nav = _navigation(ship)
+        from freesail.world.captains import split_via
+
+        rest, via = split_via(rest, nav.world)
+        if via:
+            # a course by way of marks (package 45): the first mark shaped for now, the
+            # rest kept by the master, who shapes each next course as a mark is reached or
+            # passed abeam, said in the log; a helm order of the officer's drops the way
+            return _shape_the_way(ship, nav, rest, via)
+        nav.drop_way()
         pricked = _position_in(rest)
         off = _off_a_place(nav.world, rest) if pricked is None else None
         if pricked is not None:

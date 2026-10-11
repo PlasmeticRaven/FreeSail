@@ -1961,10 +1961,25 @@ class Harness:
             if b.state == WENT_BACK
             else "shelved"
         )
-        entry["result"] = (
-            f"You read {b.title}, at {b.opened}; {how} (book {b.number}). "
-            f"{b.reopen} opens it again."
-        )
+        if b.reopen.startswith(tuple(f"{t}(" for t in tools.PICTURE_TOOLS)):
+            # a picture's stub says plainly what it was and that it was shown (package 45:
+            # the owner's model captain, reading its history with the picture gone from
+            # it, "corrected" itself and said it had never seen one)
+            put_back = (
+                f"put back by itself after {number_words(SHELF_LIFE_TURNS)} of your turns"
+                if b.state == WENT_BACK
+                else "put back at your word"
+            )
+            entry["result"] = (
+                f"A picture: {b.title}, shown to you here and {put_back} (book {b.number}); "
+                f"the picture itself is not sent again. You saw it; what you took from it "
+                f"belongs in your journal. {b.reopen} draws a fresh one."
+            )
+        else:
+            entry["result"] = (
+                f"You read {b.title}, at {b.opened}; {how} (book {b.number}). "
+                f"{b.reopen} opens it again."
+            )
         results[b.slot] = entry
         self.turns[b.at] = Turn(DATA, {**turn.content, "tool_results": results})
         self.revision += 1

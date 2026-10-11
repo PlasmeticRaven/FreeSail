@@ -439,22 +439,78 @@ def full_and_by_angle(ship: Ship) -> float:
     Falmouth under her topsails and jib in twelve knots the frigate made 2.1 knots so, 3.6
     by the old rule, and the pilot's boat never came off for him (tests/test_ports.py).
     Luce's "Keep her a good full!" (1884, ch. XXIV, p. 414).
+    **The yards braced sharp up** (package 45; the owner's notes 1 and 1b of gate m6a:
+    "far too close to the wind, loses way, sails aback, boxes off, repeats", and right
+    after `trim sails` full and by "seemed to work more correctly"): the mark is the
+    highest sail only when the yards stand in the period's trim by level, where it lifts
+    before the rest and the rest stand a clean full while it trembles. With every yard
+    braced to its limit (`brace sharp up`), the upper yards stand as sharp as the lower
+    or sharper and the lowest sail lifts first (`helm_rest` at or beyond `helm_mark`): a
+    helmsman who kept the topgallant trembling then would have the courses shaking and
+    the way off her, which is what the owner saw. He reads the trim from the sails
+    themselves (`helm_mark_staggered`: the mark's lift before the rest's by more than
+    the model's twist allows to be noise, `STAGGER_LEAST`) and keeps her by the old rule
+    when it is not staggered, the mean luff and its margin, as he does under reefed
+    topsails and under the topsails alone. `trim sails` is for the helmsman's mark; the
+    yards sharp up are for the hand on the helm who wants the last half point.
     A fore-and-after, or a ship with no square sail drawing: the area-weighted mean of
     her sails' luffing angles (package 4) and the margin, as before."""
     luff = ship.extra.get("luff_angle")
     old = (luff if isinstance(luff, int | float) else FULL_AND_BY_DEFAULT_LUFF) + (
         FULL_AND_BY_MARGIN
     )
+    # the mean luff and the mark are the sails' as they stand braced: with the yards
+    # square after running, or braced for a wind on the quarter she was boxed off to,
+    # they lift at a beam wind or wider, and a helmsman who kept them "just lifting"
+    # would keep her off the wind, where the trim at steady braces them for that and
+    # holds her there (package 45: the gale trial's frigate, told full and by with her
+    # yards square, steady at 105 degrees apparent and the land ahead; the frigate off
+    # Falmouth boxed off after a gust and sailed north-east for two hours and a half
+    # "full and by" at 130 degrees, onto the Dodman). Full and by is forward of the beam:
+    # he brings her up to `FULL_AND_BY_MOST` at the widest and the trim follows him.
+    old = min(old, FULL_AND_BY_MOST)
     mark = ship.extra.get("helm_mark")
     if isinstance(mark, int | float):
         rest = ship.extra.get("helm_rest")
         lifts = max(mark, rest) if isinstance(rest, int | float) else mark
         wanted = lifts + MARK_MARGIN
         sail = ship.sails.get(str(ship.extra.get("helm_mark_sail")))
-        if (sail is not None and sail.reefs > 0) or ship.extra.get("helm_mark_alone"):
+        if (
+            (sail is not None and sail.reefs > 0)
+            or ship.extra.get("helm_mark_alone")
+            or not helm_mark_staggered(ship)
+        ):
             wanted = max(wanted, old)
-        return wanted + full_for_way(ship)
+        return min(wanted, FULL_AND_BY_MOST) + full_for_way(ship)
     return old
+
+
+# The mark lifts before the rest by at least this (radians) for the trim to count as the
+# period's trim by level, where the highest sail is the helmsman's mark (package 45):
+# judgement, half the step `trim.UPPER_YARDS_IN_DEG` gives a level (37p's measure: the
+# topgallant lifts 1.5° before the topsail under the trim, and after it with the yards
+# braced sharp up the courses lift first).
+STAGGER_LEAST = math.radians(0.5)
+
+# The widest apparent wind a helmsman's full and by keeps, whatever the yards stand at
+# (radians; package 45): seven points. Close-hauled is six points from the true wind
+# (Luce 1884 ch. XXIV; Fincham 1843 art. 99, "seldom within six points"), which at her
+# way is five and a half to six and a half apparent; the old rule with every yard braced
+# to its limit measures up to seven (tests/test_gale.py, 78 to 92 degrees true at four
+# knots). Wider than that the yards are braced for another wind.
+FULL_AND_BY_MOST = 7.0 * math.pi / 16.0
+
+
+def helm_mark_staggered(ship: Ship) -> bool:
+    """Whether the yards stand in the period's trim by level, read from the sails: the
+    highest sail set (the mark) lifts at a wider apparent wind than the first of the rest
+    by `STAGGER_LEAST` or more; True as well with no rest to read (one level of square
+    sail drawing, which `helm_mark_alone` judges apart)."""
+    mark = ship.extra.get("helm_mark")
+    rest = ship.extra.get("helm_rest")
+    if not isinstance(mark, int | float) or not isinstance(rest, int | float):
+        return True
+    return mark - rest >= STAGGER_LEAST
 
 
 def full_for_way(ship: Ship) -> float:

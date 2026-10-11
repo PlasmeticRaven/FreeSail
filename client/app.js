@@ -20,11 +20,19 @@
  * Escape puts a tool down. The marks are sent to /api/marks and come back on the socket.
  *
  * Package 42, the pictures: a model's `chart` or `ship_view` tool asks the open page, on
- * the socket ({type: "picture", id, view, facing, max_px}), for the chart as the player
- * sees it or the ship from the facing asked; the page draws it with its own drawing (the
- * chart's canvas as it stands; the ship's view drawn again in an offscreen SVG at that
- * facing, its styles written into it, onto a canvas), scales it to max_px on its longer
- * side and posts it as a PNG to /api/picture/{id}, or says why it could not.
+ * the socket ({type: "picture", id, view, facing, span, max_px}), for the chart or the
+ * ship from the facing asked; the page draws it with its own drawing, scales it to max_px
+ * on its longer side and posts it as a PNG to /api/picture/{id}, or says why it could not.
+ *
+ * Package 45: each picture is drawn on an offscreen canvas of a fixed size that owes
+ * nothing to the page's layout or the pane shown (the chart CHART_PX, 1200 by 900, centred
+ * on the account at the span asked or the page's view; the ship's view SHIP_PX, 960 by
+ * 720, on its own sky), since the page's own canvas was the picture before and the ship's
+ * view came out blank: the offscreen <svg> carried the style that hid it (position:
+ * absolute; left: -10000px) into the serialised picture, which the SVG image honoured,
+ * and the stylesheet's colours were keyed on the page's #ship-view, which the copy had
+ * not, so every fill computed to black. The copy now has the class the stylesheet keys on
+ * (.ship-view) and is hidden by a holder round it, never by its own style.
  */
 (function (root) {
   "use strict";
@@ -137,7 +145,13 @@
     };
   }
 
-  // -- the pictures (package 42) -----------------------------------------------------
+  // -- the pictures (package 42; package 45 the fixed canvases and the spans) -----------
+
+  var CHART_PX = [1200, 900];
+  var SHIP_PX = [960, 720];
+  // the styles written into the ship's picture, which an image does not read from the page
+  var STYLED = ["fill", "fill-opacity", "stroke", "stroke-width", "stroke-opacity", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "vector-effect", "opacity", "font-size", "font-family", "display", "visibility"];
+  var lastPaint = { view: "", ms: 0, span: "" }; // the last picture's drawing time, for a measure
 
   /** A canvas no larger than `maxPx` on its longer side, drawn from `source`. */
   function fitted(source, maxPx) {
@@ -151,25 +165,44 @@
     return c;
   }
 
-  function chartPicture() {
-    if (state.snapshot) seaMap.draw(state.snapshot);
-    return Promise.resolve(seaMap.canvas);
+  /** The chart as a picture: an offscreen canvas of CHART_PX, the chart drawn on it by
+   *  the map's own renderer, centred on the account at the span asked (harbour, coast,
+   *  passage, whole) or at the page's view when none is said (package 45). */
+  function chartPicture(req) {
+    if (!state.snapshot) return Promise.reject(new Error("the chart has no snapshot yet"));
+    var c = document.createElement("canvas");
+    c.width = CHART_PX[0];
+    c.height = CHART_PX[1];
+    var t0 = root.performance ? root.performance.now() : 0;
+    var span = seaMap.paint(state.snapshot, c, req.span || "");
+    lastPaint = { view: "chart", ms: (root.performance ? root.performance.now() : 0) - t0, span: span };
+    return Promise.resolve(c);
   }
 
-  var STYLED = ["fill", "fill-opacity", "stroke", "stroke-width", "stroke-opacity", "stroke-dasharray", "opacity", "font-size", "font-family", "display", "visibility"];
-
+  /** The ship's view as a picture: the viewer's drawing again at the facing asked, in an
+   *  offscreen <svg> of SHIP_PX with the stylesheet's class, its computed styles written
+   *  into it, serialised and drawn through an Image onto a canvas filled first with the
+   *  view's own sky (package 45: see the head of this file for what was blank before). */
   function shipPicture(req) {
     if (!state.ship || !state.snapshot) return Promise.reject(new Error("the viewer has no ship drawn yet"));
     var snap = state.snapshot;
     var facing = req.facing === null || req.facing === undefined ? P.leewardFacing(snap.ship.tack) : U.rad(req.facing);
-    var w = Math.max(svg.clientWidth || 0, 640), h = Math.max(svg.clientHeight || 0, 480);
+    var w = SHIP_PX[0], h = SHIP_PX[1];
+    var t0 = root.performance ? root.performance.now() : 0;
+    // the holder hides the copy; the copy's own style carries nothing but the viewer's
+    var holder = document.createElement("div");
+    holder.style.position = "absolute";
+    holder.style.left = "-10000px";
+    holder.style.top = "0";
+    holder.style.width = w + "px";
+    holder.style.height = h + "px";
     var off = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    off.setAttribute("class", svg.getAttribute("class") || "");
+    off.setAttribute("class", "ship-view");
     off.setAttribute("width", w);
     off.setAttribute("height", h);
-    off.style.position = "absolute";
-    off.style.left = "-10000px";
-    document.body.appendChild(off);
+    holder.appendChild(off);
+    document.body.appendChild(holder);
+    var sky;
     try {
       var scene = P.project(P.buildSkeleton(state.ship, snap), facing, snap.ship.heel);
       root.ShipView.render(off, scene, {
@@ -177,6 +210,7 @@
         facingWords: req.facing_words || facingWords(facing),
         heelWords: U.formatSigned(snap.ship.heel, "to starboard", "to larboard"),
       });
+      sky = getComputedStyle(off).backgroundColor;
       // the page's styles written into the picture, which an image does not read
       Array.prototype.forEach.call(off.querySelectorAll("*"), function (node) {
         var cs = getComputedStyle(node);
@@ -185,7 +219,7 @@
       });
       var text = new XMLSerializer().serializeToString(off);
     } finally {
-      document.body.removeChild(off);
+      document.body.removeChild(holder);
     }
     return new Promise(function (ok, no) {
       var img = new Image();
@@ -193,7 +227,11 @@
         var c = document.createElement("canvas");
         c.width = w;
         c.height = h;
-        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        var ctx = c.getContext("2d");
+        ctx.fillStyle = sky && sky !== "rgba(0, 0, 0, 0)" ? sky : "#dfe7ea";
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        lastPaint = { view: "ship", ms: (root.performance ? root.performance.now() : 0) - t0, span: "" };
         ok(c);
       };
       img.onerror = function () { no(new Error("the ship's view did not draw")); };
@@ -201,10 +239,19 @@
     });
   }
 
+  /** A picture drawn on request, for a measure or a test: `picture('chart', 'whole')` or
+   *  `picture('ship', 90)`; resolves to {width, height, ms, span, png} (a data URL). */
+  function picture(view, arg) {
+    var made = view === "chart" ? chartPicture({ span: arg || "" }) : shipPicture({ facing: arg });
+    return made.then(function (c) {
+      return { width: c.width, height: c.height, ms: lastPaint.ms, span: lastPaint.span, png: c.toDataURL("image/png") };
+    });
+  }
+
   function paintFor(req) {
     var made;
     try {
-      made = req.view === "chart" ? chartPicture() : shipPicture(req);
+      made = req.view === "chart" ? chartPicture(req) : shipPicture(req);
     } catch (e) {
       made = Promise.reject(e);
     }
@@ -565,6 +612,12 @@
     $("btn-map-fit").addEventListener("click", function () {
       seaMap.fit();
     });
+    // the spans as zoom stops (package 45): the ship followed, so many miles across
+    Array.prototype.forEach.call(document.querySelectorAll("[data-span]"), function (b) {
+      b.addEventListener("click", function () {
+        seaMap.showSpan(b.getAttribute("data-span"));
+      });
+    });
     // the chart's tools (package 37n)
     seaMap.sink = markSink();
     $("btn-map-rose").addEventListener("click", function () {
@@ -617,6 +670,6 @@
     connect();
   }
 
-  root.FreeSailApp = { init: init, state: state, drawShip: drawShip };
+  root.FreeSailApp = { init: init, state: state, drawShip: drawShip, picture: picture };
   document.addEventListener("DOMContentLoaded", init);
 })(window);

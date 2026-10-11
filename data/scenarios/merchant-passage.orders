@@ -158,7 +158,12 @@ standing order "the flood": at the turn to the flood, if the daylight is day and
 # Package 37e: the allowance for the set is the master's own now, in the course shaped
 # (37d's second pass had laid the point a cable and a half south for it). The mouth's
 # point is laid at 48 19.75 N, on the line she is to make good under Petit Minou (below).
-standing order "for the Goulet": at under way, if the distance to the road of Bertheaume is under 4 miles then set plain sail; shape a course for 48 19.75 N 4 38 W
+# Package 45: the pilot of Brest, who knows his water, is given the conn through the Goulet
+# (`let the pilot take her in`): he conns her by the port's own marks (data/ports/brest.yaml,
+# `tracks: in`) from where she truly is, the account brought to his fix every five minutes,
+# and says where to let go in the Bay. The points below, which the book conned her by from
+# an account that lagged her on the flood, are kept as the pilot's track in the port file.
+standing order "for the Goulet": at under way, if the distance to the road of Bertheaume is under 4 miles then set plain sail; let the pilot take her in
 
 # The Goulet on the flood by the pass north of the Mingan and the Fillettes (Faden 1793,
 # p. 57: range either shore and fear nothing, but not the middle), by points pricked on
@@ -185,12 +190,12 @@ standing order "for the Goulet": at under way, if the distance to the road of Be
 # log's heaves swings) and the hand lead kept going within six miles of the Goulet's
 # middle, the road to the Bay (the Regulations of 1806, the Pilot's articles; the
 # Master's art. XXIX).
-standing order "the mouth of the Goulet": when the distance to 48 19.75 N 4 38 W is under 0.4 miles then shape a course for 48 20.45 N 4 35.3 W
-standing order "under Petit Minou": when the reckoning is east of 4 37.1 W and the distance to 48 20.45 N 4 35.3 W is under 2 miles then shape a course for 48 20.45 N 4 35.3 W
-standing order "north of the Mingan": when the reckoning is east of 4 35.3 W and the distance to 48 20.45 N 4 35.3 W is under 1 mile then shape a course for 48 20.5 N 4 34.5 W
-standing order "north of the Fillettes": when the reckoning is east of 4 34.5 W and the distance to 48 20.5 N 4 34.5 W is under 1 mile then shape a course for 48 20.75 N 4 33.5 W
-standing order "under Portzic": when the reckoning is east of 4 33.5 W and the distance to 48 20.75 N 4 33.5 W is under 1 mile then shape a course for 48 21 N 4 31.5 W
-standing order "into the Bay": when the distance to 48 21 N 4 31.5 W is under 0.4 miles then shape a course for the Bay of Brest
+# standing order "the mouth of the Goulet": when the distance to 48 19.75 N 4 38 W is under 0.4 miles then shape a course for 48 20.45 N 4 35.3 W
+# standing order "under Petit Minou": when the reckoning is east of 4 37.1 W and the distance to 48 20.45 N 4 35.3 W is under 2 miles then shape a course for 48 20.45 N 4 35.3 W
+# standing order "north of the Mingan": when the reckoning is east of 4 35.3 W and the distance to 48 20.45 N 4 35.3 W is under 1 mile then shape a course for 48 20.5 N 4 34.5 W
+# standing order "north of the Fillettes": when the reckoning is east of 4 34.5 W and the distance to 48 20.5 N 4 34.5 W is under 1 mile then shape a course for 48 20.75 N 4 33.5 W
+# standing order "under Portzic": when the reckoning is east of 4 33.5 W and the distance to 48 20.75 N 4 33.5 W is under 1 mile then shape a course for 48 21 N 4 31.5 W
+# standing order "into the Bay": when the distance to 48 21 N 4 31.5 W is under 0.4 miles then shape a course for the Bay of Brest
 # Package 37e: the fix is taken again after the bearing in pilot water (37d's second
 # pass had left the bearing alone, as a stopgap, the book's points being tuned to an
 # account that lagged her on the flood).
