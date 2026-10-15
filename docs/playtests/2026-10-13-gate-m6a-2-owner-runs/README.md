@@ -1,13 +1,15 @@
-# Gate m6a-2: the owner's runs (notes of 2026-10-13, in progress)
+# Gate m6a-2: the owner's runs (notes of 2026-10-13 to 2026-10-15)
 
 The owner's notes on his runs of the build merged from package 45 on 2026-10-11 (the branch
 at commit 3609fd7; the saves stamp themselves `m6a`, the build name not yet moved), as
-written (`m6a-2_notes.txt`), with the saves of each run under `saves/`. The checkpoints that
-came with them (`.checkpoint`, gzip) are not kept: a save replays by itself. The lead's cold
-read is in the conversation of 2026-10-13 and the items go to the packages named there; the
-verdict and the rulings in `docs/gates/gate-m6a-2.md` and `docs/DesignProposal.md`. The saves
-are the owner's data files as he sent them, kept for the record and for replay (`--load`),
-not read by any test.
+written (`m6a-2_notes.txt`, the second sending superseding the first with items 16 to 25
+added), with the saves of each run under `saves/`: the first eight as sent, the eight that
+came after gzipped to keep the repository light (unpack to `--load`). The checkpoints that
+came with the first sending are not kept: a save replays by itself. The lead's cold read and
+the routing of each note to a package or a milestone are in `docs/dev/M6-WorkPackages.md`
+("The owner's runs of m6a-2, read"); the verdict and the rulings in `docs/gates/gate-m6a-2.md`
+and `docs/DesignProposal.md`. The saves are the owner's data files as he sent them, kept for
+the record and for replay, not read by any test.
 
 ## The saves
 
@@ -16,16 +18,25 @@ not read by any test.
 | `m6a-2-cutter-voyage-anchor-in-Cariño.json` | A merchant cutter, free | cutter | 1018824 (11 d 19:00 from the start) | 1104 KB |
 | `m6a-2-cutter-voyage-beat-away-from-Lisbon.json` | A merchant cutter, free | cutter | 1472866 (17 d 01:07 from the start) | 2819 KB |
 | `m6a-2-cutter-voyage.json` | A merchant cutter, free | cutter | 642087 (7 d 10:21 from the start) | 732 KB |
+| `m6a-2-merchant-schooner-business-complete-at-Rochefort.json.gz` (gzip; unpack to load) | A merchant schooner, free | topsail-schooner | 647276 (7 d 11:47 from the start) | 7157 KB |
+| `m6a-2-merchant-schooner-into-Basque-Road.json.gz` (gzip; unpack to load) | A merchant schooner, free | topsail-schooner | 506791 (5 d 20:46 from the start) | 6859 KB |
+| `m6a-2-merchant-ship-anchored-in-Corunna.json.gz` (gzip; unpack to load) | A merchant ship, free | frigate-36 | 906464 (10 d 11:47 from the start) | 3824 KB |
+| `m6a-2-merchant-ship-into-Biscay.json.gz` (gzip; unpack to load) | A merchant ship, free | frigate-36 | 416590 (4 d 19:43 from the start) | 1875 KB |
+| `m6a-2-muster-test.json.gz` (gzip; unpack to load) | A merchant schooner, free | topsail-schooner | 734598 (8 d 12:03 from the start) | 7160 KB |
+| `m6a-2-schooner-voyage.json.gz` (gzip; unpack to load) | A merchant schooner, free | topsail-schooner | 140834 (1 d 15:07 from the start) | 2653 KB |
+| `m6a-real-voyage-anchored-in-Corunna.json.gz` (gzip; unpack to load) | A merchant brig, free | brig | 1323006 (15 d 07:30 from the start) | 4509 KB |
 | `m6a-real-voyage-bound-for-corunna.json` | A merchant brig, free | brig | 294821 (3 d 09:53 from the start) | 3167 KB |
 | `m6a-real-voyage-guernsey.json` | A merchant brig, free | brig | 212854 (2 d 11:07 from the start) | 3257 KB |
+| `m6a-real-voyage-tacking-into-Corunna.json.gz` (gzip; unpack to load) | A merchant brig, free | brig | 1257439 (14 d 13:17 from the start) | 4491 KB |
 | `m6a-real-voyage-tacking-out-of-biscay.json` | A merchant brig, free | brig | 787014 (9 d 02:36 from the start) | 3182 KB |
 | `m6a-real-voyage-wind-in-biscay.json` | A merchant brig, free | brig | 693042 (8 d 00:30 from the start) | 3181 KB |
 | `m6a-real-voyage.json` | A merchant brig, free | brig | 125683 (1 d 10:54 from the start) | 1907 KB |
 
-Two voyages: the merchant brig from Falmouth to Torbay and Guernsey, then bound for
-Corunna across Biscay, beating out of it; and the merchant cutter's voyage, beating away
-from Lisbon and anchoring in Cariño. The wardroom stations seated through the doors are in
-the saves' `stations` and `station_acts`.
+Four voyages: the merchant brig Falmouth to Torbay and Guernsey, then across Biscay and
+tacking into Corunna; the merchant cutter beating away from Lisbon and anchoring in
+Cariño; the merchant schooner into the Basque Road with her business done at Rochefort; the
+merchant ship into Biscay and anchored in Corunna; and a muster test. The wardroom stations
+seated through the doors are in the saves' `stations` and `station_acts`.
 
 ## The notes, verbatim
 
@@ -44,8 +55,17 @@ the saves' `stations` and `station_acts`.
 10. Multiple times in this versions' playtesting models have tried to speak to members of the crew or characters in the world that weren't stationed/couldn't be spoken to. We'll want director mode to include the ability for a director to "respond" as characters that have not been seated or aren't currently seatable. This will want a generic "world say" or "person say" that the director can use to fill in small characters or world bits that don't need a full seat. We'll also want to consider the director being able to create "people" that can persist in the world and be used durably, along with allowing the ability to fill in the edge cases where needed.
 11. Shape a course via trigger needs some adjustment, regularly triggers too far from marks causing turns too early and possibly navigation hazards unnecessarily when using marks near to the coast.
 12. Models (local and free ones, usually) tend to try to shape a course directly to points without considering the land in between, and also not noticing/ignoring the message that says that the line crosses land. Not necessarily something to change right away functionally, just an observation. Probably a result of not reading the library before acting, as "shape a course for x miles south of y" is already present in game.
-13. Along with general crew consuming provisions and water, named people including the player should have hunger, thirst, and fatigue that increase with time and cause notable then urgent messages (even better if they're only sent/shown to the relevant person who is stationed), for example, "you're feeling a bit drowsy", "you're quite thirsty, a drink would be great right about now", "you're absolutely starving, you really must eat something", perhaps three to five levels for each stat, hunger resolved by eating action (takes from stores, must go to a place with food to eat i.e. cabin, below, the shore, etc.), drinking resolved by drinking (same as eating), fatigue resolved by resting (going below to sleep). Tie in with health mechanics for M7, hunger and thirst eventually cause death, fatigue eventually forces sleep by collapse, surgeon looks after unhealthy crew if one is onboard, general crew eat and drink on the schedule in the same way they rest now, people eat, drink, and rest automatically the same way they currently rest when no one is seated or stationed, and by self-orders otherwise.
+13. Along with general crew consuming provisions and water, named people including the player should have hunger, thirst, and fatigue that increase with time and cause notable then urgent messages (even better if they're only sent/shown to the relevant person who is stationed), for example, "you're feeling a bit drowsy", "you're quite thirsty, a drink would be great right about now", "you're absolutely starving, you really must eat something", perhaps three to five levels for each stat, hunger resolved by eating action (takes from stores, must go to a place with food to eat i.e. cabin, below, the shore, etc.), drinking resolved by drinking (same as eating), fatigue resolved by resting (going below to sleep). Tie in with health mechanics for M7, hunger and thirst eventually cause death, fatigue eventually forces sleep by collapse, surgeon looks after unhealthy crew if one is onboard, general crew eat and drink on the schedule in the same way they rest now, people eat, drink, and rest automatically the same way they currently rest when no one is seated or stationed, and by self-orders otherwise. Opus 5.5 master suggested adding a "stand by, asleep below until called" option as a tie in, not a bad idea I think. That, and a warning not too make the needs too much busywork that might distract from the seamanship. Agreed, eating and drinking once a day to keep the hunger fulfilled, sleeping every 1-2 days for fatigue seems like a reasonable start for people. Also suggested was automatic eating and drinking even for stations unless otherwise chosen, I say possibly, but start with manual for filled stations I think for testing.
 14. Image tools on the local harness.
-15. A word said between people in a location that is heard by another might want to count as "a word on deck" for the sake of waking stand-bys.
-16. Let's consider a review pass on the overall current structure of the orders system (vocabulary, grammar, duplication, extensibility concerns, recommendations for improvement/consolidation/extension).
+15. Let's consider a review pass on the overall current structure of the orders system (vocabulary, grammar, duplication, extensibility concerns, recommendations for improvement/consolidation/extension).
+16. Note after further testing on the image tool belief problem: it was possibly just a problem with expectation, as after being told to use the image tool, not to shelf it right away, and to journal that they had seen the image and what they took from it, they seemed to no longer misbelieve their own report. Only the immediate shelf after seeing the image and making one entry seemed like a problem. Inconclusive overall, but possibly not as big of a problem as thought.
+17. Reviewing the OpenRouter consent prompt as used, it states "the lookout, the master, a captain of another ship, stations speaking to one another and an API door are to come, and are described now so that an answer covers them." Currently these roles and conditions exist, so the brief needs updating here.
+18. The captain/officer should be able to send a hail, even if it goes through the lookout automatically when not seated, or the lookout is prompted for it when seated.
+19. It's time to consider signals, as they may be useful in the design of the rules-based captains and how they interact, along with perhaps some basic hail syntax for non-model captains.
+20. Fog/weather changes on a regular cycle become predictable, very often a change comes exactly at the 4 hour mark, needs some refinement for smoother/less predictable changes.
+21. Consider how the journal is currently attached to the *station* versus how it and the durable information might be attached to the *person*, so that they can move between stations or however without their memory being attached to the station, rather, with it attached to their *persona*
+22. Locational knowledge? Only seeing non-urgent events when they occur in a certain location? For example, in the cabin, you don't get every event that happens on deck? Thoughts? Perhaps a step too far, but could be interesting if we move towards a more grounded representation of any character, human-or-model controlled. Consider feasibility.
+23. A world order for the director and for scenarios to place a "point of interest" or "detail mark" with a description and a location somewhere in the world, for dynamic/scripted lesser events/world colour/small details. The point of interest when placed would show up in the log if it is within range of the ship with it's bearing, range, and description (as with any other seen mark), and otherwise would be spottable when the player ship comes in to visibility range.
+24. When sending a boat ashore at a port, one might hear a handful of trade rumors about high or low prices in various goods at various ports.
+25. The "her sails lifting...keep her away, or she will be taken aback" line very often leads models to immediately bear away, when often the problem is either that the ship isn't trimmed properly for the situation, and they don't realize it, or that the speed is causing the apparent wind to come forward, also usually remedied by trimming the sails, or bracing sharp up. Basically, though, it often causes the wrong behavior, since it says to keep away, assuming that the sails are properly trimmed and that the situation is one of a steering problem, when usually it isn't entirely, it's a problem of the sails not being trimmed. Could be an example of not reading the primer. First idea: trimming for certain reaches: trim for close hauled (like brace up but for every sail), trim for the wind abeam, trim for the wind large, trim to run before the wind. Useful for a player, and also for an AI who might benefit from pre-setting their trim before ordering a turn or particular reach. Might be an overcomplication and the problem was circumstantial. Thinking about it more, let's leave it for the regatta to help decide.
 ```
