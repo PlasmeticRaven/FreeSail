@@ -1,0 +1,322 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6a",
+    "rules": "21316ed8aec1f034"
+  },
+  "builds": [
+    {
+      "name": "m6a",
+      "rules": "21316ed8aec1f034"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "A captain's trial, the station off Ushant and a stranger",
+    "start_time": "1805-06-14T04:00:00",
+    "wind_from_deg": 270.0,
+    "wind_speed_kn": 14.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 200.0,
+    "ship_speed_kn": 6.0,
+    "latitude_deg": 48.5,
+    "position": {
+      "lat_deg": 48.5,
+      "lon_deg": -5.416666666666667
+    },
+    "region": "channel-west",
+    "chart": null,
+    "weather": [
+      {
+        "at": "1805-06-14T00:00:00",
+        "from_deg": 270.0,
+        "knots": 14.0,
+        "air_mass": "neutral"
+      },
+      {
+        "at": "1805-06-15T12:00:00",
+        "from_deg": 280.0,
+        "knots": 12.0
+      }
+    ],
+    "systems": [
+      {
+        "name": "the old high over Biscay",
+        "kind": "high",
+        "radius_km": 900,
+        "track": [
+          {
+            "at": "1805-06-13T12:00:00",
+            "x_km": 300,
+            "y_km": -500,
+            "hpa": 1022
+          },
+          {
+            "at": "1805-06-15T12:00:00",
+            "x_km": 500,
+            "y_km": -600,
+            "hpa": 1020
+          }
+        ]
+      }
+    ],
+    "climatology": false,
+    "background": {
+      "hpa": 1018.0,
+      "gradient_hpa_per_100km": 0.4,
+      "high_toward_deg": 200.0
+    },
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": true,
+    "instrument": "sextant",
+    "current": null,
+    "sky": {
+      "sky": "clear",
+      "weather": "fine",
+      "visibility": "the horizon"
+    },
+    "chronometer": null,
+    "epitome": "norie",
+    "nation": "britain",
+    "people": [],
+    "papers": {
+      "chart": {
+        "year": 1804
+      },
+      "almanac": 1805
+    },
+    "cargo": {
+      "purse_pounds": 0.0,
+      "goods": {}
+    },
+    "ports": [
+      "falmouth",
+      "plymouth",
+      "brest"
+    ],
+    "ships": [],
+    "world_orders": [
+      {
+        "at": "1805-06-14T06:00:00",
+        "order": "ship: a brig-sloop \"Palinure\" of France at 48 44 N 5 20 W, bound for 48 15 N 5 30 W, no colours"
+      }
+    ],
+    "intent": "keep the station off Ushant within 15 miles",
+    "books": []
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 11099,
+  "journal": [
+    [
+      0,
+      "captain",
+      "set plain sail"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "set plain sail"
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book of standing orders is empty. Begin with none, give your own, or load the starter book: read the standing orders from data/standing_orders/starter.orders (the primer's chapter 11, 'The starting book', gives each routine with its reason).",
+        "data": {}
+      }
+    },
+    {
+      "tick": 911,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 911,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 1501,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 1501,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 2110,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 2110,
+          "kind": "ship.aback"
+        }
+      }
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "wear at the hour",
+      "text": "standing order \"wear at the hour\": every 2 hours, if a stranger in sight is not in sight and the distance to 48 33.3 N 5 26.6 W is under 30 miles then wear ship",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "by the wind",
+      "text": "standing order \"by the wind\": at wore then keep her full and by",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 10116,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "back to the station",
+      "text": "standing order \"back to the station\": every watch, if a stranger in sight is not in sight and the distance to 48 33.3 N 5 26.6 W is over 15 miles then shape a course for 48 33.3 N 5 26.6 W",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "a sail on the station",
+      "text": "standing order \"a sail on the station\": at a sail sighted then make her out",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "trim to the course",
+      "text": "standing order \"trim to the course\": at steady on the course, if the manoeuvre in hand is not hove to then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 10249,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "trim on a shift",
+      "text": "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "tend the sheets",
+      "text": "standing order \"tend the sheets\": every glass, if the manoeuvre in hand is not hove to then trim the sheets",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "bearings",
+      "text": "standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land; take a fix",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "the morning sight",
+      "text": "standing order \"the morning sight\": at two bells, if the daylight is day then take a sight for the longitude",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "shorten sail for weather",
+      "text": "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then shorten sail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 9840,
+      "book": "keeping station"
+    },
+    {
+      "name": "sail after the gale",
+      "text": "standing order \"sail after the gale\": when the true wind is under 25 knots for 30 minutes, if the main topsail is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 9840,
+      "book": "keeping station"
+    }
+  ],
+  "agents": [],
+  "agent_journals": {},
+  "world_orders": [
+    {
+      "tick": 7200,
+      "source": "the scenario",
+      "order": "ship: a brig-sloop \"Palinure\" of France at 48 44 N 5 20 W, bound for 48 15 N 5 30 W, no colours",
+      "result": "done",
+      "words": "a brig-sloop of war, sixteen ports a side 'Palinure' of France put on the sea, bound for 48 15 n 5 30 w"
+    }
+  ],
+  "chart_marks": [],
+  "station_acts": [],
+  "stations": {
+    "bound": [],
+    "unbound": []
+  }
+}

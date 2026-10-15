@@ -1,0 +1,370 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6a",
+    "rules": "21316ed8aec1f034"
+  },
+  "builds": [
+    {
+      "name": "m6a",
+      "rules": "21316ed8aec1f034"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "A captain's trial, the station off Ushant in a gale",
+    "start_time": "1805-06-14T04:00:00",
+    "wind_from_deg": 270.0,
+    "wind_speed_kn": 14.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 200.0,
+    "ship_speed_kn": 6.0,
+    "latitude_deg": 48.5,
+    "position": {
+      "lat_deg": 48.5,
+      "lon_deg": -5.666666666666667
+    },
+    "region": "channel-west",
+    "chart": null,
+    "weather": [
+      {
+        "at": "1805-06-14T00:00:00",
+        "from_deg": 270.0,
+        "knots": 14.0,
+        "air_mass": "neutral"
+      },
+      {
+        "at": "1805-06-14T10:00:00",
+        "from_deg": 265.0,
+        "knots": 44.0
+      },
+      {
+        "at": "1805-06-14T18:00:00",
+        "from_deg": 270.0,
+        "knots": 30.0
+      },
+      {
+        "at": "1805-06-14T22:00:00",
+        "from_deg": 280.0,
+        "knots": 16.0
+      },
+      {
+        "at": "1805-06-15T12:00:00",
+        "from_deg": 290.0,
+        "knots": 14.0
+      }
+    ],
+    "systems": [
+      {
+        "name": "the old high over Biscay",
+        "kind": "high",
+        "radius_km": 900,
+        "track": [
+          {
+            "at": "1805-06-13T12:00:00",
+            "x_km": 300,
+            "y_km": -500,
+            "hpa": 1018
+          },
+          {
+            "at": "1805-06-15T12:00:00",
+            "x_km": 500,
+            "y_km": -600,
+            "hpa": 1016
+          }
+        ]
+      }
+    ],
+    "climatology": false,
+    "background": {
+      "hpa": 1004.0,
+      "gradient_hpa_per_100km": 1.2,
+      "high_toward_deg": 200.0
+    },
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": true,
+    "instrument": "sextant",
+    "current": null,
+    "sky": {
+      "sky": "overcast",
+      "weather": "squally",
+      "visibility": "a few miles"
+    },
+    "chronometer": null,
+    "epitome": "norie",
+    "nation": "britain",
+    "people": [],
+    "papers": {
+      "chart": {
+        "year": 1804
+      },
+      "almanac": 1805
+    },
+    "cargo": {
+      "purse_pounds": 0.0,
+      "goods": {}
+    },
+    "ports": [
+      "falmouth",
+      "plymouth",
+      "brest"
+    ],
+    "ships": [],
+    "world_orders": [],
+    "intent": "keep the station off Ushant within 15 miles",
+    "books": []
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 74280,
+  "journal": [
+    [
+      0,
+      "captain",
+      "set plain sail"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "set plain sail"
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book of standing orders is empty. Begin with none, give your own, or load the starter book: read the standing orders from data/standing_orders/starter.orders (the primer's chapter 11, 'The starting book', gives each routine with its reason).",
+        "data": {}
+      }
+    },
+    {
+      "tick": 8348,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 8348,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 21687,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Mizzen storm staysail split and blew out of the bolt-ropes.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 21687,
+          "kind": "sail.blown_out"
+        }
+      }
+    },
+    {
+      "tick": 44029,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Missed stays: she lost her way before her head came up to the wind. Up helm; square the yards; flatten in the head sheets.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 44029,
+          "kind": "ship.missed_stays"
+        }
+      }
+    },
+    {
+      "tick": 45411,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Missed stays: she lost her way before her head came up to the wind. Up helm; square the yards; flatten in the head sheets.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 45411,
+          "kind": "ship.missed_stays"
+        }
+      }
+    },
+    {
+      "tick": 45632,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 45632,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 47083,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Missed stays: she lost her way before her head came up to the wind. Up helm; square the yards; flatten in the head sheets.",
+        "data": {
+          "from": 300.0,
+          "to": 1.0,
+          "tick": 47083,
+          "kind": "ship.missed_stays"
+        }
+      }
+    },
+    {
+      "tick": 47271,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 47271,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 48997,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Missed stays: she lost her way before her head came up to the wind. Up helm; square the yards; flatten in the head sheets.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 48997,
+          "kind": "ship.missed_stays"
+        }
+      }
+    },
+    {
+      "tick": 70607,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Missed stays: she lost her way before her head came up to the wind. Up helm; square the yards; flatten in the head sheets.",
+        "data": {
+          "from": 300.0,
+          "to": 1.0,
+          "tick": 70607,
+          "kind": "ship.missed_stays"
+        }
+      }
+    },
+    {
+      "tick": 70889,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 70889,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 74217,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Missed stays: she lost her way before her head came up to the wind. Up helm; square the yards; flatten in the head sheets.",
+        "data": {
+          "from": 300.0,
+          "to": 1.0,
+          "tick": 74217,
+          "kind": "ship.missed_stays"
+        }
+      }
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "the leg",
+      "text": "standing order \"the leg\": every glass, if the distance to 48 33.3 N 5 26.6 W is over 15 miles then shape a course for 48 33.3 N 5 26.6 W",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 17,
+      "last_fired_tick": 74040,
+      "given_tick": 43440,
+      "book": "beating"
+    },
+    {
+      "name": "the offing",
+      "text": "standing order \"the offing\": when the nearest land is under 3 miles then tack ship",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 43680,
+      "given_tick": 43440,
+      "book": "beating"
+    },
+    {
+      "name": "trim to the course",
+      "text": "standing order \"trim to the course\": at steady on the course, if the manoeuvre in hand is not hove to then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 17,
+      "last_fired_tick": 73050,
+      "given_tick": 43440,
+      "book": "beating"
+    },
+    {
+      "name": "tend the sheets",
+      "text": "standing order \"tend the sheets\": every glass, if the manoeuvre in hand is not hove to then trim the sheets",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 17,
+      "last_fired_tick": 74040,
+      "given_tick": 43440,
+      "book": "beating"
+    },
+    {
+      "name": "bearings",
+      "text": "standing order \"bearings\": every glass, if the land is in sight then take a bearing of the land; take a fix",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 17,
+      "last_fired_tick": 74040,
+      "given_tick": 43440,
+      "book": "beating"
+    }
+  ],
+  "agents": [],
+  "agent_journals": {},
+  "world_orders": [],
+  "chart_marks": [],
+  "station_acts": [],
+  "stations": {
+    "bound": [],
+    "unbound": []
+  }
+}

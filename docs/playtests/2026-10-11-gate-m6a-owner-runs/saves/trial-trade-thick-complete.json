@@ -1,0 +1,175 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6a",
+    "rules": "21316ed8aec1f034"
+  },
+  "builds": [
+    {
+      "name": "m6a",
+      "rules": "21316ed8aec1f034"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "A captain's trial, a merchant schooner in thick weather",
+    "start_time": "1805-06-14T06:00:00",
+    "wind_from_deg": 270.0,
+    "wind_speed_kn": 14.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 60.0,
+    "ship_speed_kn": 5.0,
+    "latitude_deg": 49.833333333333336,
+    "position": {
+      "lat_deg": 49.833333333333336,
+      "lon_deg": -5.2
+    },
+    "region": "channel-west",
+    "chart": null,
+    "weather": [
+      {
+        "at": "1805-06-14T00:00:00",
+        "from_deg": 270.0,
+        "knots": 14.0,
+        "air_mass": "neutral"
+      },
+      {
+        "at": "1805-06-15T12:00:00",
+        "from_deg": 280.0,
+        "knots": 12.0
+      }
+    ],
+    "systems": [
+      {
+        "name": "the old high over Biscay",
+        "kind": "high",
+        "radius_km": 900,
+        "track": [
+          {
+            "at": "1805-06-13T12:00:00",
+            "x_km": 300,
+            "y_km": -500,
+            "hpa": 1022
+          },
+          {
+            "at": "1805-06-15T12:00:00",
+            "x_km": 500,
+            "y_km": -600,
+            "hpa": 1020
+          }
+        ]
+      }
+    ],
+    "climatology": false,
+    "background": {
+      "hpa": 1018.0,
+      "gradient_hpa_per_100km": 0.4,
+      "high_toward_deg": 200.0
+    },
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": true,
+    "instrument": "octant",
+    "current": null,
+    "sky": {
+      "sky": "thick",
+      "weather": "fog",
+      "visibility": "a mile"
+    },
+    "chronometer": null,
+    "epitome": "moore",
+    "nation": "britain",
+    "people": [
+      {
+        "role": "master",
+        "skill": 0.8
+      }
+    ],
+    "papers": {
+      "chart": {
+        "year": 1804
+      },
+      "almanac": 1805
+    },
+    "cargo": {
+      "purse_pounds": 1000.0,
+      "goods": {}
+    },
+    "ports": [
+      "falmouth",
+      "plymouth",
+      "brest",
+      "roscoff",
+      "st-marys"
+    ],
+    "ships": [],
+    "world_orders": [],
+    "intent": "bound for Falmouth",
+    "books": []
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/topsail-schooner.yaml"
+  },
+  "end_tick": 38760,
+  "journal": [
+    [
+      0,
+      "captain",
+      "set plain sail"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "set plain sail"
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book of standing orders is empty. Begin with none, give your own, or load the starter book: read the standing orders from data/standing_orders/starter.orders (the primer's chapter 11, 'The starting book', gives each routine with its reason).",
+        "data": {}
+      }
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "the tide to go in",
+      "text": "standing order \"the tide to go in\": at the turn to the flood, if the daylight is day and the visibility is not a mile and the visibility is not a cable then get under way on the starboard tack and steer N",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 17280,
+      "book": "at anchor"
+    },
+    {
+      "name": "under way for the port",
+      "text": "standing order \"under way for the port\": at under way then set plain sail",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 17280,
+      "book": "at anchor"
+    }
+  ],
+  "agents": [],
+  "agent_journals": {},
+  "world_orders": [],
+  "chart_marks": [],
+  "station_acts": [],
+  "stations": {
+    "bound": [],
+    "unbound": []
+  }
+}

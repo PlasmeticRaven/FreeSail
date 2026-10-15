@@ -1,0 +1,441 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6a",
+    "rules": "572673ff75ffd2a1"
+  },
+  "builds": [
+    {
+      "name": "m6a",
+      "rules": "572673ff75ffd2a1"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "The merchant passage by intent, Falmouth for Brest",
+    "start_time": "1805-06-12T05:00:00",
+    "wind_from_deg": 270.0,
+    "wind_speed_kn": 14.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 190.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.1631,
+    "position": {
+      "lat_deg": 50.1631,
+      "lon_deg": -5.0345
+    },
+    "region": "channel-west",
+    "chart": null,
+    "weather": [
+      {
+        "at": "1805-06-12T05:00:00",
+        "from_deg": 270.0,
+        "knots": 14.0,
+        "air_mass": "neutral"
+      },
+      {
+        "at": "1805-06-13T00:00:00",
+        "from_deg": 290.0,
+        "knots": 12.0
+      },
+      {
+        "at": "1805-06-13T12:00:00",
+        "from_deg": 315.0,
+        "knots": 10.0
+      },
+      {
+        "at": "1805-06-14T06:00:00",
+        "from_deg": 340.0,
+        "knots": 10.0
+      }
+    ],
+    "systems": [
+      {
+        "name": "the old high over Biscay",
+        "kind": "high",
+        "radius_km": 900,
+        "track": [
+          {
+            "at": "1805-06-11T12:00:00",
+            "x_km": 300,
+            "y_km": -500,
+            "hpa": 1024
+          },
+          {
+            "at": "1805-06-13T12:00:00",
+            "x_km": 500,
+            "y_km": -600,
+            "hpa": 1022
+          }
+        ]
+      }
+    ],
+    "climatology": false,
+    "background": {
+      "hpa": 1018.0,
+      "gradient_hpa_per_100km": 0.4,
+      "high_toward_deg": 200.0
+    },
+    "glass": false,
+    "air_mass": "neutral",
+    "sea": true,
+    "instrument": "octant",
+    "current": null,
+    "sky": {
+      "sky": "clear",
+      "weather": "fine",
+      "visibility": "the horizon"
+    },
+    "chronometer": null,
+    "epitome": "moore",
+    "nation": "united-states",
+    "people": [
+      {
+        "role": "master",
+        "skill": 0.9
+      }
+    ],
+    "papers": {
+      "chart": {
+        "year": 1804
+      },
+      "almanac": 1805,
+      "price_lists": [
+        "falmouth"
+      ]
+    },
+    "cargo": {
+      "purse_pounds": 6000.0,
+      "goods": {}
+    },
+    "ports": [
+      "falmouth",
+      "plymouth",
+      "brest"
+    ],
+    "ships": [
+      {
+        "id": "two-brothers",
+        "description": "merchant brig",
+        "name": "Two Brothers",
+        "nation": "britain",
+        "position": "49 18 N 6 18 W",
+        "goal": "bound from the Longships for the Eddystone",
+        "colours": "none"
+      },
+      {
+        "id": "nancy",
+        "description": "merchant brig",
+        "name": "Nancy",
+        "nation": "britain",
+        "position": "50 05 N 4 30 W",
+        "goal": "bound from the Eddystone for 49 20 N 6 20 W"
+      },
+      {
+        "id": "lark",
+        "description": "cutter",
+        "name": "Lark",
+        "nation": "britain",
+        "position": "49 55 N 5 45 W",
+        "goal": "patrolling off the Wolf within 4 miles"
+      },
+      {
+        "id": "diamond",
+        "description": "frigate",
+        "name": "Diamond",
+        "nation": "britain",
+        "position": "48 20 N 5 20 W",
+        "goal": "patrolling off the soundings seven leagues south-west of Ushant within 8 miles"
+      },
+      {
+        "id": "harpy",
+        "description": "brig-sloop",
+        "name": "Harpy",
+        "nation": "britain",
+        "position": "48 05 N 5 40 W",
+        "goal": "patrolling off the soundings south-west of Ushant within 10 miles"
+      },
+      {
+        "id": "palinure",
+        "description": "brig-sloop",
+        "name": "Palinure",
+        "nation": "france",
+        "position": "the Raz",
+        "goal": "running home to Brest",
+        "colours": "none"
+      },
+      {
+        "id": "hirondelle",
+        "description": "schooner",
+        "name": "Hirondelle",
+        "nation": "france",
+        "position": "the Isle of Saints",
+        "goal": "bound for Camaret road"
+      },
+      {
+        "id": "betsey",
+        "description": "schooner",
+        "name": "Betsey",
+        "nation": "united-states",
+        "position": "49 18 N 4 54 W",
+        "goal": "bound for Falmouth"
+      },
+      {
+        "id": "anna-maria",
+        "description": "merchant brig",
+        "name": "Anna Maria",
+        "nation": "denmark",
+        "position": "49 30 N 4 40 W",
+        "goal": "bound for 48 30 N 5 40 W"
+      },
+      {
+        "id": "bom-jesus",
+        "description": "merchant brig",
+        "name": "Bom Jesus",
+        "nation": "portugal",
+        "position": "48 40 N 5 50 W",
+        "goal": "bound for the Start"
+      },
+      {
+        "id": "indefatigable",
+        "description": "frigate",
+        "name": "Indefatigable",
+        "nation": "britain",
+        "position": "Cawsand Bay",
+        "goal": "bound for the soundings south-west of Ushant"
+      },
+      {
+        "id": "swift",
+        "description": "cutter",
+        "name": "Swift",
+        "nation": "britain",
+        "position": "49 40 N 5 20 W",
+        "goal": "carrying the mail to Plymouth"
+      }
+    ],
+    "world_orders": [
+      {
+        "at": "1805-06-12T12:00:00",
+        "order": "weather: waypoint for \"the old high over Biscay\" at 1805-06-14T12:00 600 -700 1020"
+      },
+      {
+        "at": "1805-06-13T06:00:00",
+        "order": "message: at Brest from the agent of the owners: \"The tin will fetch its price; the Prefect maritime asks that the papers be shown at the castle.\""
+      }
+    ],
+    "intent": "trade tin from Falmouth to Brest",
+    "books": []
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/topsail-schooner.yaml"
+  },
+  "end_tick": 140598,
+  "journal": [
+    [
+      0,
+      "captain",
+      "let go the best bower"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "let go the best bower"
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "notable",
+        "kind": "seat.taken",
+        "text": "The player takes the passenger's station (the player, through the browser, at the passenger's station); his orders are judged by the station's authority and the captain's word, and there is no deck at it.",
+        "data": {
+          "station": "passenger",
+          "door": "browser"
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book of standing orders is empty. Begin with none, give your own, or load the starter book: read the standing orders from data/standing_orders/starter.orders (the primer's chapter 11, 'The starting book', gives each routine with its reason).",
+        "data": {}
+      }
+    },
+    {
+      "tick": 17760,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: The pilot warns: the Black Rock five cables ahead, on the starboard bow; the deeper water is to larboard.",
+        "data": {
+          "from": 300.0,
+          "to": 1.0,
+          "tick": 17760,
+          "kind": "port.pilot_warns"
+        }
+      }
+    },
+    {
+      "tick": 36179,
+      "line": {
+        "severity": "routine",
+        "kind": "agent.refused",
+        "text": "The passenger may not what is she without the captain: a passenger gives no order of the ship. 'what is she' not carried out.",
+        "data": {
+          "order": "what is she",
+          "station": "passenger",
+          "seat": true
+        }
+      }
+    },
+    {
+      "tick": 36190,
+      "actor": "the passenger (the player)",
+      "order": "ask the captain What is she?"
+    },
+    {
+      "tick": 104940,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: The pilot warns: the Buzec six cables ahead, right ahead; the deeper water is to starboard.",
+        "data": {
+          "from": 300.0,
+          "to": 1.0,
+          "tick": 104940,
+          "kind": "port.pilot_warns"
+        }
+      }
+    },
+    {
+      "tick": 107940,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: The pilot warns: the Mingan nine cables ahead, right ahead; the deeper water is to larboard.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 107940,
+          "kind": "port.pilot_warns"
+        }
+      }
+    },
+    {
+      "tick": 108240,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: The Mingan close ahead, fine on the starboard bow, four cables! She will be on it in three minutes.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 108240,
+          "kind": "lookout.land_ahead"
+        }
+      }
+    }
+  ],
+  "standing_orders": [],
+  "agents": [],
+  "agent_journals": {
+    "passenger": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 2 bells (05:00)",
+        "kind": "agent.stationed",
+        "text": "Seated as the player, through the browser, at the passenger's station.",
+        "by": "the player"
+      },
+      {
+        "tick": 36179,
+        "stamp": "Afternoon watch (15:02)",
+        "kind": "agent.refused",
+        "text": "Refused: The passenger may not what is she without the captain: a passenger gives no order of the ship. 'what is she' not carried out.",
+        "by": "the player"
+      }
+    ]
+  },
+  "world_orders": [
+    {
+      "tick": 25200,
+      "source": "the scenario",
+      "order": "weather: waypoint for \"the old high over Biscay\" at 1805-06-14T12:00 600 -700 1020",
+      "result": "done",
+      "words": "a waypoint appended to the old high over Biscay"
+    },
+    {
+      "tick": 90000,
+      "source": "the scenario",
+      "order": "message: at Brest from the agent of the owners: \"The tin will fetch its price; the Prefect maritime asks that the papers be shown at the castle.\"",
+      "result": "done",
+      "words": "a letter from the agent of the owners left at Brest"
+    }
+  ],
+  "chart_marks": [],
+  "station_acts": [
+    {
+      "tick": 140598,
+      "after_inputs": 9,
+      "station": "passenger",
+      "seat_state": {
+        "agent.session_kind": "a play session with a human captain at the prompt",
+        "agent.state": "stationed",
+        "agent.stationed_tick": 0,
+        "agent.last_sample_tick": null,
+        "agent.last_heard_tick": 0,
+        "agent.stand_by": null,
+        "agent.paused_tick": null,
+        "agent.pause_reason": "",
+        "agent.released_reason": "",
+        "agent.released_tick": null,
+        "agent.question": null,
+        "agent.word": null,
+        "agent.notices": [],
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0,
+        "agent.empty_count": 0,
+        "agent.nudged_for": null,
+        "agent.samples": 0,
+        "agent.deck": false,
+        "agent.deck_tick": null,
+        "agent.deck_stamp": "",
+        "agent.told": [],
+        "agent.allowances": {},
+        "agent.seatings": 1,
+        "agent.left_by": "",
+        "agent.no_return": false,
+        "agent.grants": {
+          "__tuple__": []
+        },
+        "agent.general": false,
+        "agent.general_words": "",
+        "agent.deck_lost": "",
+        "agent.leavings": {
+          "__tuple__": []
+        },
+        "agent.relieved": "",
+        "agent.question_by": "",
+        "agent.question_text": "",
+        "agent.asked": [],
+        "agent.heard": [],
+        "model_name": "the player",
+        "door": "browser",
+        "_deck_was": null
+      }
+    }
+  ],
+  "stations": {
+    "bound": [],
+    "unbound": []
+  }
+}
