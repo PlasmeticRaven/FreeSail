@@ -23,12 +23,12 @@ tuning notes and a report to the lead at the end.
 | 42a | Opus | The consent brief revised once from 40's draft, describing in kind all of 6b and 6c that the rule watches; the watched sections pinned; the re-asks the owner's | merged 2026-10-10 (decision 42: the added sentences approved; the re-asks the owner's) |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | merged 2026-10-10 (stations bound at run time, a passenger station, the pace rule as one object the drivers share; no pin moved) |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart and the ship's view as images through the doors that carry one (the consent revision moved to 42a) | merged 2026-10-10 (the key from the credential store first; the acts beside the log; the pictures from the open page; OpenRouter on a mock only; thinking cannot be switched off on the current models, so no-effort is the model's default) |
-| 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook; **the rules-based captain for the other ships** (the owner's question of 2026-10-11: a far-detail vessel today sails her scenario's plan and carries no brain; `captains.resolve_state` takes only on passage and hove to, and nothing drives it, since the captain perceives through the player's ship's readings; a perception from a vessel's own truth and the states resolved into far-detail plans are 43's, not a small change) | brief to write, after gate m6a-2 |
+| 43 | Fable | Other ships with captains: the measurement first, the brain on the far body (the rules-based captain for the other ships), the crewed promotion and the guard, a model captain of another ship kept across the switch, the director's seat hook and the live world order | briefed 2026-10-15 for the owner's approval, after 45c's and beside it |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
-| 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | built 2026-10-11 (Part A whole; Part B as the tuning notes say, cut short by the owner's limit, its pins from one slow run); gate m6a-2 after it |
+| 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | merged 2026-10-11 as committed so far (the owner's word, to play it) and 2026-10-15 whole, with every pin re-measured; the naval cruise's two truths strict expected failures for 45c; gate m6a-2 not cut |
 | 43b | Opus | The lugger and the smack; the world's business (spec §19), with the trade rumours a boat brings back from the shore (the owner's note 24) | brief to write |
 | 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | brief to write |
-| 45c | Opus | The fixes from gate m6a-2's runs that are this milestone's (the owner's notes of 2026-10-13 to 15, read below): a picture shelved by the model's hand only, the shelf taking a note; the boat ghosted hauling out; a save loaded to an earlier tick; `via` triggering too early near the coast; the weather's four-hour cadence; the picture tools at the local runner where its model reads an image; a point of interest placed by a world order; the groundwork for stations that multiply (a station's kind in the ship file's form, two officers on a frigate, the journal keyed to the person) | brief to write, after 45's merge (the owner, 2026-10-15: no package of this milestone beyond it; gate m6a-2 not cut) |
+| 45c | Opus | Package 45's tail (the naval cruise restored, the chase, sail after the gale by steps, the pilot's conn through the Goulet and its design) and the owner's small fixes from gate m6a-2's runs (a picture put back by hand with a note, the ghosted boat and `--until`, the weather's cadence, the OpenRouter exchanges, `muster` in the browser, the unheld lookout, the sails-lifting line, the pictures at the local runner, a point of interest, world orders not shown as sent, the stations' groundwork) | briefed 2026-10-15 for the owner's approval; the milestone's last new package |
 
 Package 37m (the helm through the wind) is milestone 5's last, briefed in
 `M5-WorkPackages.md`, launched beside 38 on 2026-10-09 and merged after it: 38 moves no
@@ -1156,6 +1156,238 @@ the pilot given the conn; a passage of the owner's own from Falmouth into Biscay
 Lisbon on the whole chart, the browser's chart followed the whole way; and, if the owner
 has the evening for it, the frigate from Funchal to Angra on the widened corridor with the
 landfall on Pico. The verdict of m6a and the verdict of m6a-2 are the owner's together.
+
+## Package 45, as merged (2026-10-11 in part, 2026-10-15 whole)
+
+The builder's notes are the record (`docs/dev/TuningNotes.md`, the package's section; spec
+M6 §4, §13 and §26 as built; `docs/agents/Harness.md` on the pictures). What landed,
+against the intents: the real-browser test found the ship's view blank in truth (the
+offscreen svg's own hiding style serialised into the picture, the page's stylesheet keyed
+on its id so every fill computed black) and the chart drawn from the page's canvas at
+whatever span; both now on fixed offscreen canvases with their own backgrounds, the chart
+at harbour, coast, passage or whole, the shelved stub saying it was shown. The chart whole
+in play (`region:` the region she starts in on `atlantic-east`), culled and decimated,
+twenty milliseconds for the whole on screen. The question of every charted place answered
+in §26 ("the chart in play"): nothing unmerged between Falmouth and Funchal road; the ports
+beyond the Channel have no `tracks:` and are approached by the outer road; the tide one
+gauge beyond 45 N; the weather PROVISIONAL from Biscay south; the schooner sailed Falmouth
+round Ushant to Corunna's road in four days with the seams quiet. `via` marks, a berth off
+a land mark reached within half a mile (the owner's note 11). Part B: the helm's mark only
+under the period's trim and the old rule braced sharp up, with two deviations the faults
+forced (full and by capped at seven points apparent; the watch braces sharp up for a helm
+kept full and by with the yards for another wind); the pilot's fix by his marks, his
+warnings naming the hand, `let the pilot take her in/out` and `I have the conn`, the conn
+keeping her off charted dangers and shoal water; the merchant's entry leg by leg and his
+business from the road within the port's reach (the trade trials end in port from the road,
+one anchor); `put her about` choosing tack or wear with its reason; sail after the gale
+whatever the state and `bend a new jib`; the glass as a stimulus with its sources; the
+storm sails rated for seventy knots apparent (the cause was the cloth rated per square
+metre of plain canvas), the ship files regenerated; the master's leeway allowance capped at
+Norie's four points and only with headway. Pins re-measured once with the old figure
+beside each; the suites as run: the slow tier whole 3,479 passed, 12 expected failures, the
+6 failures the pins then written in; the confirming run; the fast tier 3,222; the pace
+tests alone 5.
+
+**Regressions and work left, all to 45c unless said:**
+
+1. **The naval cruise** (gate 5c's book-sailed truth) no longer meets the admiral's cutter
+   at 85437 but at 91022, is chasing it when the Palinure appears on her quarter, never
+   reads the letter nor speaks the brig, and wears three times where she wore eight: her
+   track on station moved under the helm rules, and the builder had not the budget to find
+   which of the three (the mark only under the period's trim; the seven-point cap; the
+   watch bracing sharp up for the helm). Its two truths are strict expected failures with
+   the reason. The one place the floor moved.
+2. **The chase rule loses a stranger that crosses ahead** (the station trial: within hail
+   at 06:43 before, never after; the chase lead puts her across the brig's bows and the
+   chase is given up at 10:51).
+3. **Aback by turns after the gale** under plain sail by the wind: the hove-to book's
+   "under way again: set plain sail" fires at thirty knots and more (the station trial
+   aback 170 minutes in the hour after it where it was 6); the builder suggests the
+   topsails first. M5 §33 item 16 names it.
+4. **Brest's `in` track** is the book's points pricked for a lagging account; conned on the
+   truth she grounds under Petit Minou, so the pilot's conn through the Goulet is not
+   runnable until the track is re-pricked for the true channel; the merchant-passage book
+   keeps its own Goulet lines. Gate item 5 runs at Falmouth meanwhile.
+5. The wardroom save's replay from before the Filletes grounding with the pilot given the
+   conn: not done.
+6. The station's circle through the land is still met by "the offing" line and not by a
+   mark round it (`via` would serve the doctrine).
+7. The gale trials' figures before and after (the builder's table): hove to 09:24 then
+   09:33 on the station trial for want of sea room until then, never aground, sail made
+   again at 20:30 where it never was; the lee-shore trial hove to at 06:30 on the falling
+   glass, eleven states by turns, never aground, aback 143 minutes where 49.
+
+## Package 45c: the fixes from gate m6a-2's runs and package 45's tail (`freesail/physics/hull.py`, `evolutions/trim.py` and `data/captains/*.yaml` for the cruise's track and the sail after the gale; `freesail/world/captains.py` for the chase; `freesail/world/ports.py`, `reckoning.py` and `data/ports/brest.yaml` for the pilot's conn and his hand; `freesail/agents/pictures.py`, `tools.py`, `harness.py`, `api.py`, `local.py` for the shelving by hand, the OpenRouter dialect's exchanges and the pictures at the local runner; `freesail/world/boats.py` or where the boat lives, `core/replay.py`, `ui/console.py` and `ui/server.py` for the ghosted boat and `--until`; `freesail/world/weather.py` and `weather_script.py` for the cadence; `freesail/ui/server.py` and `client/` for `muster` and the state; `freesail/world/orders.py` and `core/events.py` for the point of interest and the world order's visibility; `freesail/world/stations.py`, `people.py`, `agents/journal.py`, `data/people/*.yaml` for the stations' groundwork; the primer where the words change; `docs/TechnicalSpec-M6.md` §4, §11, §13 and §23 as built; `docs/dev/TuningNotes.md`; the tests of each, `tests/test_known_truths.py` and `test_captain_trials.py` re-pinned once)
+
+Opus. The milestone's last new package (the owner's word of 2026-10-15). Each item is an
+intent with the lead's reading of a way; the intent binds. The owner's notes and the
+lead's interview are in `docs/playtests/2026-10-13-gate-m6a-2-owner-runs/README.md` and
+"The owner's runs of m6a-2, read" above, with his saves for the reproductions. The rules
+of every package hold; the pins re-measured once at the end with the old figure beside
+each and the reason.
+
+**Part A: package 45's tail (the regressions its builder left).**
+
+1. **The naval cruise restored** (gate 5c's book-sailed truth, two strict expected failures
+   now). Find which of 45's three helm changes moved the frigate's track on station (the
+   mark only under the period's trim; the seven-point cap on full and by; the watch bracing
+   sharp up for a helm kept full and by with the yards for another wind), by sailing the
+   cruise with each undone in turn, and mend it so that she meets the admiral's cutter,
+   reads the letter, speaks the brig and wears watch by watch as the truth says, without
+   undoing what the change was for (the gale trials and `tests/test_gale.py` hold). The
+   lead's suspicion is the watch bracing sharp up: on station by the wind under the cruise's
+   book the yards were trimmed for the wind by `trim sails`, and a watch that braces sharp
+   up for the helm puts her six points off instead of seven. Lift the expected failures and
+   re-pin.
+2. **The chase rule.** A stranger that crosses ahead is lost (the station trial: within hail
+   at 06:43 before 45, never after; the chase lead puts her across the brig's bows and the
+   chase is given up at 10:51). Luce 1884 p. 553 on keeping the chase on the same bearing
+   is the rule the captain has; the lead's reading is that the lead angle is held when the
+   bearing is drawing ahead and should be eased to steer for her when she is crossing. Mend
+   it so the trial's chase closes within hail again, and say the rule in the doctrine file.
+3. **Sail after the gale by steps.** The hove-to book's "under way again: set plain sail"
+   fires at thirty knots and more and leaves her aback by turns (the station trial aback
+   170 minutes in the hour after it, 6 before): the topsails first when the wind is between
+   twenty-five and thirty, plain sail only under twenty-five for half an hour, the courses
+   last; M5 §33 item 16 closed or narrowed. The trials re-measured.
+4. **The pilot's conn through the Goulet, and his conn's design.** (a) Brest's `tracks: in`
+   are the book's points pricked for a lagging account; re-prick them for the true channel
+   from the chart's own soundings and features (the Goulet's marks are in
+   `data/charts/features/channel-west.yaml`), the merchant-passage book keeping its own
+   lines, so that the pilot conns her into the Bay of Brest on the truth without touching
+   the ground; prove it from the owner's wardroom save of gate m6a
+   (`docs/playtests/2026-10-11-gate-m6a-owner-runs/saves/`), replayed to before the
+   Filletes grounding with `let the pilot take her in` given, the log in the notes.
+   (b) The conn's design (the owner, 2026-10-15): a pilot's conn is promised only along his
+   track from the pilot station inward, leg by leg; boarding elsewhere, he first cons her
+   to join the track, at the station or at the nearest leg she is already inside, by a
+   joining leg laid with the captain's planner (`Planner`, the offing and the danger berth),
+   and where no clear joining leg is found within the planner's rounds he says so and takes
+   her only from the station ("bring her to the station first, and I will take her in").
+   (c) His warning's hand was wrong at Rochefort (the deeper water said to larboard where the
+   entrance lay to starboard: `docs/playtests/2026-10-13-gate-m6a-2-owner-runs/saves/`, the
+   schooner into the Basque Road): the sign or the frame, from the ship's head as a pilot
+   speaks; a test on that save's position.
+
+**Part B: the owner's notes, the small fixes.**
+
+5. **A picture put back by the model's hand only** (notes 2, 4, 16): no picture goes back
+   by itself; `shelve` takes a note the model writes, kept in the log's line with the time
+   the picture was open ("put back the ship's view of 05:50; seen: the fore topsail aback");
+   the station's brief says to journal what a picture showed before putting it back. The
+   real-browser test extended by one turn.
+6. **The ghosted boat, and a save loaded to a tick** (note 3; the owner's answer: the ship's
+   own boat, ordered ashore as the anchor was being let go). Reproduce from his save
+   (`m6a-real-voyage-anchored-in-Corunna` or the Cariño one, by the log's time of the
+   order), mend the boat's state machine so an order that waits on hands while the ship
+   comes to clears or is refused in words, and give `--load <save> --until <tick>` (the
+   console and the browser's load alike: the world replayed to the tick and handed over
+   there), since a save replays by acts.
+7. **The weather's four-hour cadence** (note 20): a change coming on the hour of the
+   script's or the systems' cadence shows; smoothed and jittered under the seed so that
+   nothing lands on the four-hour mark by habit, the recorded passages re-pinned if they
+   move (say so; the lead expects they will).
+8. **The OpenRouter dialect's exchanges and unread replies** (the interview; the owner could
+   not get `--exchanges` to write): the file is wired into the API model and not the
+   OpenRouter model, which is the fault. The OpenRouter model keeps exchanges and writes the
+   file as the API model does; every reply the runner cannot read is written whole so it
+   can be diagnosed; the common shapes a free model returns (a reasoning field beside the
+   content, a tool call written in the text, an empty content with a finish reason) are
+   read; the `--help` says the file's form (a path outside the repository, appended to).
+9. **`muster` and the state in the browser** (the interview): the browser takes `muster`
+   and shows what the console's state view shows, in the pane that fits.
+10. **The lookout unheld** (the interview): `ask the lookout ...` and `tell the lookout ...`
+    with nobody at the station are answered by the rules from the readings, as the
+    lookout's own hails are; the pilot already answers.
+11. **The sails-lifting line names the cause** (notes 25 and 3): when the yards are not
+    trimmed for the course the line says so ("her sails lifting: the yards are not trimmed
+    for this course; trim sails, or keep her away"), the trims by point of sail left to the
+    regatta (44).
+12. **The picture tools at the local runner** (note 14): offered where the runner's model
+    reads an image (the local runner's API takes one for some models; detect or declare it
+    in the runner's settings), the words as now otherwise.
+13. **A point of interest by world order** (note 23): `mark: <description> at <position>`
+    (and in a scenario file), a feature of the world seen as a mark is seen, with its
+    bearing, range and description in the log when in sight; saved and replayed.
+14. **A world order not shown as sent** (decision 46): the world-order channel's lines
+    marked for the record only; the stations' samples and the browser's play log leave them
+    out; a scenario file's world orders the same; a test with a letter sent by world order
+    seen in no sample before the boat brings it.
+15. **The groundwork for stations that multiply** (the owner, 2026-10-15): the ship file's
+    `stations:` form takes a kind beside the holder where the name is not the kind's
+    (`second officer: {kind: officer of the watch, holder: second lieutenant}`); the doors
+    seat a station by its name; the journal and a station's durable memory are keyed to the
+    person and not the station's name, so that a person moved to another station, or two of
+    a kind, keep their own; a test with two officers on the frigate, each with a journal.
+16. **Two judgements, said in the report:** a course a model station shapes across the land
+    (note 12) refused outright unless `via` or an offing is given, or left as the warning it
+    is; and the officer's doubt of the tide off Torbay (note 1), one look at Torbay's tide
+    against channel-mid's gauge.
+17. **Notes and spec**: §4, §11, §13 and §23 as built; the primer where the words changed;
+    the tuning notes with the cruise's finding, the trials before and after, every pin
+    moved and the suite as run.
+
+## Package 43: other ships with captains (`freesail/world/captains.py` for the perception from a vessel's own truth and the brain at the roll-up's cadence; `freesail/world/ships.py` for the states resolved into far-detail plans, `Vessel.promote` and the demotion, the cap and the guard; `freesail/core/world.py` for the measurement and the pace; `freesail/agents/agent.py`, `harness.py`, `tools.py`, the doors, `seat.py` for a station on another ship kept across the switch; `freesail/world/orders.py`, `ui/console.py`, `ui/server.py` and `client/` for `seat:`, `unseat:` and the live world order; `data/captains/*.yaml`; `data/scenarios/`; the primer's chapters 15, 17 and 19; `docs/agents/Harness.md`; `docs/TechnicalSpec-M6.md` §19 (the promotion and the guard), §20, §23 as built; `docs/dev/TuningNotes.md`; `tests/test_captains.py`, `test_ships.py`, `test_captain_trials.py` (the trials with a brain in the stranger), `test_known_truths.py` truths of §24, re-pinned once)
+
+Fable. Spec M6 §19 (the crewed promotion and the far-detail guard; the world's business is
+43b's), §20 and §23; decisions 40, 43 and 45; the owner's word of 2026-10-11 and 2026-10-15
+(the rules-based captain at far detail first; the director's own voice and the observed
+world left to M7b). Each item an intent with the lead's reading; the intent binds. The
+measurement comes first (§19, the owner's rule).
+
+1. **The measurement, first.** Twelve fully crewed ships under rules-based captains ticked
+   at once in the Channel beside the frigate, the pace measured on the quiet build machine
+   (truth 51's form), and from it the promotion range, the cap and the strategy chosen and
+   written in the notes before anything is built on them: the horizon's range with
+   hysteresis and a cap, or every ship in a region promoted with a vectorised hot loop if
+   the figure demands it (the spec's reading: near fifty ticks a second for twelve, under
+   the sixty times the owner plays at).
+2. **The brain on the far body** (the owner's first want). A far-detail vessel carries a
+   rules-based captain: a perception built from her own truth at the roll-up's cadence (her
+   position, the wind and weather at it, the nearest land and sea room, the ships in sight
+   by the same visibility the player's lookout has, the player's ship among them, her
+   nation's stance to each), the doctrine of her role run on it, and every state of the
+   machine resolved into a far-detail plan (`captains.resolve_state`: investigating,
+   chasing, evading, running for shelter, at anchor, in port, in distress, as well as on
+   passage and hove to), the plan layer's own shape of each (a course shaped, sail as a
+   state, heaving to, the chase and the intent's changes). The scenario's `ship:` world
+   order and a scenario file's ships take an `intent:` and a doctrine by nation and role;
+   a ship without one sails her plan as now. The captain's trials gain a brain in the
+   stranger: the Palinure that sees the frigate and acts (evading, or investigating in her
+   turn), the trials re-pinned for it and their logs read for what the two captains make
+   of each other; a hail syntax between rules-based captains if it falls out of the
+   meeting (a word in the log at hailing distance; the owner's note 19), signals left to
+   M7.
+3. **The crewed promotion, and the guard** (§19). Within the measured range of the centre
+   (the player's ship, or the ship the game follows with the player at a door) a vessel
+   becomes a full part-and-crew ship from her file with her captain's orders through the
+   same channel, her lookout, her account and her book; beyond it she is demoted with her
+   state folded back; the cap with the nearest first and a ship in dealings with the
+   player before a nearer one that is not; hysteresis so a ship at the edge does not flap;
+   the pace truth of M5 §30 holding with the cap full; the far-detail guard refusing a leg
+   across the coast when the scenario loads (and `via` for a plan that must round a cape,
+   from 45's work).
+4. **A model captain of another ship** (§20; decision 40). `--station captain --ship <id>`
+   seats a model (or the player) as the captain of a vessel, with her brief, her readings
+   and her account under the pace rule; the station kept across the switch, working the
+   far body in the plan layer's shape when she is demoted and the full surface when she is
+   promoted, the sample saying which; the journal keyed to the person (45c's groundwork) so
+   the switch loses nothing. A fake proves it; a model is the owner's run.
+5. **The director's seat hook, and the live world order** (§23; the interview of
+   2026-10-15). `seat: <model> as captain of <ship> for <budget>` and `unseat: <ship>` on
+   the world-order channel, refused without a consent record, an owner's grant or budget;
+   and a **live world order at the console and the browser** (a `world:` prefix at the
+   prompt, the player's and a director's door to come, authority the owner's), without
+   which the rules-based captains cannot be tested in play; decision 46 holds (the order
+   not shown as sent). Nothing else of the director: not his voice, not the observed world
+   with no player's ship (M7b), though the hook assumes no player's ship where that costs
+   nothing.
+6. **Truths and the gate's items** (§24): the far-detail captain's trials, the promotion
+   with the cap, the station across the switch, the seat hook; the trials and passages
+   re-pinned once with the reasons.
+7. **Notes and spec**: §19, §20, §23 and §4 as built; the primer; the Harness note on a
+   station on another ship; the tuning notes with the measurement, the range and the cap,
+   and the trials' logs with two captains.
 
 ## The owner's runs of m6a-2, read (the lead, 2026-10-15; the notes in `docs/playtests/2026-10-13-gate-m6a-2-owner-runs/`)
 
