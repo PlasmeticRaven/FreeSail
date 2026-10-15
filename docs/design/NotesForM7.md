@@ -39,3 +39,22 @@ should), and the gale trials of package 40c under 37p's trim.
 The owner, 2026-10-11, on gate m6a's gale runs (his note 3b): water taken by damage, by
 heeling with heavy seas and rain, foundering, battening down the hatches, the pumps and
 the hands at them; a sea-keeping thread of its own beside the powder's milestone.
+
+## From gate m6a-2's runs (the owner, 2026-10-13 to 15; the lead's routing in `docs/dev/M6-WorkPackages.md`)
+
+- **The gybe as an evolution, and sails that do not flip** (note 7): a fore-and-aft sail
+  sheeted out and filled from aft is not gybed by a wind that backs a point; the gybe takes
+  its time and carries its risk, as the tack does; the lugger's dipping lug is the same
+  thread; the viewer shows it. With the halyards and the vangs above, M7's fine control.
+- **Provisions, water, hunger, thirst and fatigue** (notes 8 and 13): the crew eat and drink
+  on the schedule as they rest; named people and the player have the three needs in three
+  to five steps with notable then urgent lines to the person stationed, eased by eating,
+  drinking and sleeping below (at a place with food, or the shore); tied to health and the
+  surgeon; death by hunger or thirst, collapse by fatigue; the master's "stand by, asleep
+  below until called"; once a day to eat and drink, a sleep every day or two; automatic
+  where nobody is seated, by hand at a filled station to begin with. Not busywork.
+- **People moving between places; books drafted; the papers kept in a place; locational
+  knowledge; the journal with the person** (notes 9, 21, 22): the director's milestone's
+  immersion thread.
+- **Signals, and a hail syntax between captains** (note 19): with combat.
+- **The viewer's layering and lighting** (note 6): later.

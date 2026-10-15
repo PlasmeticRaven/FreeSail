@@ -26,8 +26,10 @@ tuning notes and a report to the lead at the end.
 | 43 | Fable | The crewed promotion, a model captain of another ship, the far-detail guard, the director's seat hook; **the rules-based captain for the other ships** (the owner's question of 2026-10-11: a far-detail vessel today sails her scenario's plan and carries no brain; `captains.resolve_state` takes only on passage and hove to, and nothing drives it, since the captain perceives through the player's ship's readings; a perception from a vessel's own truth and the states resolved into far-detail plans are 43's, not a small change) | brief to write, after gate m6a-2 |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
 | 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | built 2026-10-11 (Part A whole; Part B as the tuning notes say, cut short by the owner's limit, its pins from one slow run); gate m6a-2 after it |
-| 43b | Opus | The lugger and the smack; the world's business | brief to write |
-| 44 | Opus | The regatta harness and the parity tests | brief to write |
+| 43b | Opus | The lugger and the smack; the world's business (spec §19), with the trade rumours a boat brings back from the shore (the owner's note 24) | brief to write |
+| 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | brief to write |
+| 46 | Opus | The test battery made cheap: a package runs the fast tier and the slow tests of the files it touches; the recorded passages proved by replaying their saved logs, not by sailing them again; the whole slow tier on GitHub's machine at a merge and a gate; the trials shortened to the hours each needs (the owner, 2026-10-11: "the test suite is just killing us on usage") | brief to write, first after gate m6a-2 |
+| 45c | Opus | The fixes from gate m6a-2's runs that are this milestone's (the owner's notes of 2026-10-13 to 15, read below): a picture shelved by the model's hand only, the shelf taking a note; the boat ghosted hauling out; a save loaded to an earlier tick; `via` triggering too early near the coast; the weather's four-hour cadence; a hail from the captain or the officer; the picture tools at the local runner where its model reads an image | brief to write, after 46 |
 
 Package 37m (the helm through the wind) is milestone 5's last, briefed in
 `M5-WorkPackages.md`, launched beside 38 on 2026-10-09 and merged after it: 38 moves no
@@ -1155,6 +1157,44 @@ the pilot given the conn; a passage of the owner's own from Falmouth into Biscay
 Lisbon on the whole chart, the browser's chart followed the whole way; and, if the owner
 has the evening for it, the frigate from Funchal to Angra on the widened corridor with the
 landfall on Pico. The verdict of m6a and the verdict of m6a-2 are the owner's together.
+
+## The owner's runs of m6a-2, read (the lead, 2026-10-15; the notes in `docs/playtests/2026-10-13-gate-m6a-2-owner-runs/`)
+
+Sixteen saves over four voyages on package 45's build before its pins and notes were in:
+the chart whole sailed from Falmouth to Guernsey, across Biscay to Corunna, into the
+Basque Road and to Rochefort's market, and the cutter from Lisbon to Cariño. The lead's
+cold read of each note, and where it goes:
+
+| Note | The read | Where |
+|---|---|---|
+| 1, the chart whole; the officer's doubt of the tides off Torbay | The chart works across the seams. The tide east of 3 W is channel-mid's gauges blended with the Channel's; a doubt said by a model is worth one look at Torbay's tide against the gauge, not more. | 45c, a look; else an observation |
+| 2, 4, 16, the pictures and the shelving | The owner's second finding (16) is the key: the picture put back by itself before the model has written what it saw is the fault, not the shelving as such. Rule: a picture is put back by the model's hand only, never by itself; `shelve` takes a note the model writes, kept in the log's line with the time the picture was open ("put back the ship's view of 05:50; seen: ..."); the station's brief says to journal what a picture showed before shelving it. Package 45's stub already says a shelved picture was shown. | 45c |
+| 3, the boat ghosted hauling out; a save loaded to an earlier tick | A fault of the boat's state machine when its order waits on hands and the work clears (reproduce from the save). `--load <save> --until <tick>` is cheap now that a save replays by acts: the world replayed to the tick and handed over there. | 45c |
+| 5, the rules-based captain at far detail first; a world observed with no player | 43's ground, as already noted: the far-detail brain first, the crewed promotion for ships close in. A world with no player's ship, watched from the director's station with world orders, is the director's seat hook (spec §23) taken one step further; 43 builds the hook so that a scenario may have no player's ship. | 43 |
+| 6, the viewer's layering and lighting | Later. | M7 or after, noted |
+| 7, the sails flipping across at a shift astern; a gybe as an evolution | Right, and physics: a fore-and-aft sail sheeted out and filled from aft is not gybed by a wind that backs a point; the gybe is an evolution with its time and its risk, as the tack is; the lugger's dipping lug is the same thread. | M7's fine-control module, noted with the halyards and the vangs |
+| 8, 13, provisions, water, hunger, thirst, fatigue; sleep below until called | The crew do not eat today (the rest schedule exists). A needs system is a milestone's thread of its own, tied to the surgeon and health (M7), with the owner's and the master's caution on busywork: once a day to eat and drink, a sleep every day or two, automatic where nobody is seated. | M7, noted with the owner's design |
+| 9, people moving between places; books drafted; the papers kept in a place | The director's milestone's immersion thread (M7b), beside 21 and 22. | M7b, noted |
+| 10, the director answering as an unseated character; `person say`; people made durably | 43's director hook gains `say as <person>: ...` and `person: make ...` as world orders, since the hook is built then and the words are small; the director's own door is M7b's. | 43 |
+| 11, `via` triggering too early near the coast | 45's builder looks once at the trigger (a mark passed abeam or reached) at its hand-back; else 45c. | 45 or 45c |
+| 12, models shaping courses through the land | An observation; the primer has the words. The "line crosses land" message could refuse the course outright for a model station unless `via` or an offing is given: a judgement for 45c, said in the brief. | 45c, a judgement |
+| 14, the picture tools at the local runner | Where the runner's model reads an image (the local runner's API takes one for some models), the tools are offered; else the words as now. | 45c |
+| 15, a review of the orders system | A review, not a build: the vocabulary, the grammar, the duplication, the extensibility, with recommendations; the lead or an Opus reviewer, a report in `docs/dev/`, before M7's orders are written. | M6's end, a review package (47) |
+| 17, the consent brief's stale sentence | True: the lookout, the master, stations speaking and the API door exist now. The brief is revised only by a package the spec names, with the re-asks: one revision at 43's end covers the model captain of another ship too. | 42b, after 43 |
+| 18, a hail from the captain or the officer | Through the lookout when nobody is seated, the lookout prompted when seated: a small order. | 45c |
+| 19, signals and a hail syntax for rules-based captains | The rules-based captains' interaction is 43's; signals are a thread of M7 (combat) and noted there, with a hail syntax between captains in 43 if it falls out of the far-detail brain. | 43 in part; M7, noted |
+| 20, the weather changing on the four-hour mark | The weather script's or the systems' cadence showing through: smoothed and jittered. | 45c |
+| 21, the journal attached to the person, not the station | A design point for 43's model captain of another ship and for M7b: the persona carries its journal between stations. Noted for both. | 43 to consider; M7b |
+| 22, locational knowledge | Later, with 9. | M7b, noted |
+| 23, a point of interest placed by a world order | Small and useful for scenarios now; a world order `mark: <description> at <position>`, seen as a mark is seen. | 43 (with the director hook's world orders) |
+| 24, trade rumours from the boat ashore | The world's business. | 43b |
+| 25, trims for a point of sail | The regatta decides, as the owner says. | 44 |
+
+**The plan for the rest of the milestone**, for the owner's word: 45 finished and gate
+m6a-2 cut (pre-approved); then 46 (the test battery, first, since every package after it
+runs cheaper); then 45c beside 43 (43 on Fable, 45c on Opus, no files shared but the
+captain's); then 43b and 44 on Opus together; then 42b (the consent revision, the re-asks
+the owner's) and 47 (the orders review); gate 6c with the regatta; the milestone's close.
 
 ## Packages 39c to 39f: the last four blocks of the chart line (the same files as 39a and 39b under each block's names; `data/scenarios/<block>.yaml` and `.orders` new per block; `docs/TechnicalSpec-M6.md` §26 as built; `docs/dev/TuningNotes.md`)
 
