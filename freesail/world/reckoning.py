@@ -2016,6 +2016,13 @@ class Navigation:
     # the mark the last bearing was taken of (package 37d), for a second of the same mark
     # crossed with it; a class default, so that a checkpoint from before loads with it
     _last_bearing_mark: str | None = None
+    # Package 45, the same: the way kept by marks (`set_way`), none in a checkpoint from
+    # before
+    way_mark: str = ""
+    way_target: Position | None = None
+    way_hand: str = ""
+    way_heading: float = 0.0
+    way_from: Position | None = None
     # Package 37e, each with a plain class default for the same reason. The master's
     # sailing directions, looked up at their first use; the traverse board's four states
     # (`_peg`: `_run_n` None is a board from before, counted the old way once); her drift

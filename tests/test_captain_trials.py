@@ -45,15 +45,20 @@ def books(world: World) -> list[str]:
 # package 37p: chasing at 9240 and keeping station again at 9840 (7260 and 7980 before),
 # within hail at 9798 (7972 before): the stranger made out half an hour later, the
 # frigate by the wind under the period's trim (TuningNotes, package 37p)
+# package 45: chasing at 9180 and the station again at 24660 (9240 and 9840 at 37p): by the
+# wind under the helm's new rules she meets the brig differently, the chase's lead puts her
+# across the brig's bows and the brig draws forward 145 degrees and to windward in the first
+# half hour; she is never within hail and the chase is given up at 10:51 (the chase rule's
+# own, said for the lead in docs/dev/TuningNotes.md, package 45)
 TRIAL_STATION_STRANGER_STATES = [
     (300, "keeping station"),
     (7200, "investigating a stranger"),
-    (9240, "chasing"),
-    (9840, "keeping station"),
+    (9180, "chasing"),
+    (24660, "keeping station"),
 ]
-TRIAL_STATION_STRANGER_WITHIN_HAIL_TICK = 9798
-TRIAL_STATION_STRANGER_LINES = 961  # package 37p (889 before)
-TRIAL_STATION_STRANGER_DIGEST = "11dc95ebe098c244"  # package 37p (01fb6bd6ab67f42c before)
+TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [9798] at package 37p
+TRIAL_STATION_STRANGER_LINES = 972  # package 45 (961 at package 37p)
+TRIAL_STATION_STRANGER_DIGEST = "c3763573a2f44dff"  # package 45 (11dc95ebe098c244 at 37p)
 
 
 @pytest.fixture(scope="module")
@@ -75,7 +80,7 @@ def test_the_station_is_to_seaward_of_its_place_and_the_stranger_is_chased(stati
     assert states(w) == TRIAL_STATION_STRANGER_STATES
     assert books(w)[:3] == ["keeping station", "investigating a stranger", "chasing"]
     hail = [e.tick for e in w.log if e.kind == "sail.within_hail"]
-    assert hail[:1] == [TRIAL_STATION_STRANGER_WITHIN_HAIL_TICK]
+    assert hail[:1] == TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS
     assert not [e for e in w.log if e.kind == "ship.aground"]
     assert cap.state == "keeping station"
     assert len(w.log) == TRIAL_STATION_STRANGER_LINES
@@ -85,15 +90,20 @@ def test_the_station_is_to_seaward_of_its_place_and_the_stranger_is_chased(stati
 # package 37p: lying a-try from 19440 to 37740 (before, the land under her lee by 25860
 # as she drove up-Channel aback, and hove to again at 26520), on passage and keeping
 # station again at 37740 and 37860, the gale's second hove-to at 43320
+# package 45: the station kept by the wind from 06:30 to 09:33 with Ushant within ten miles
+# to leeward (no sea room: the land read over the whole lee sector), hove to at 19980 (19440
+# at 37p), on passage and the station again at 30780 and 30900 (37740, 37860), hove to again
+# 41880 (43320), on passage and beating from 51480; sail made again at 20:30 after the gale,
+# and she is aback by turns for the hour before it (docs/dev/TuningNotes.md, package 45)
 TRIAL_STATION_GALE_FIRST_STATES = [
     (300, "keeping station"),
-    (19440, "hove to for weather"),
-    (37740, "on passage"),
-    (37860, "keeping station"),
-    (43320, "hove to for weather"),
+    (19980, "hove to for weather"),
+    (30780, "on passage"),
+    (30900, "keeping station"),
+    (41880, "hove to for weather"),
 ]
-TRIAL_STATION_GALE_LINES = 1423  # package 37p (745 before)
-TRIAL_STATION_GALE_DIGEST = "6bd09ffa7b4cefad"  # package 37p (4c544addc681f505 before)
+TRIAL_STATION_GALE_LINES = 1399  # package 45 (1423 at package 37p)
+TRIAL_STATION_GALE_DIGEST = "3f0d36bbff4af262"  # package 45 (6bd09ffa7b4cefad at 37p)
 
 
 @pytest.fixture(scope="module")
@@ -124,13 +134,25 @@ def test_in_a_gale_with_sea_room_she_heaves_to_and_claws_off_a_lee_shore_by_turn
 
 # package 37p: lying a-try from 19440 and on passage from 37740 to the end (before,
 # beating at 37860, hove to again at 42900, on passage 45120 and beating 45180)
+# package 45: hove to at 06:30 as the glass falls (the gale line a force sooner), and then
+# by turns of the lee shore (Ushant within six miles over the lee sector) and the gale with
+# sea room again, beating from 12:35 and sail made again after the gale (37p: hove to 19440,
+# on passage 37740 to the end under the main topsail); never aground
 TRIAL_STATION_LEE_SHORE_STATES = [
     (300, "keeping station"),
-    (19440, "hove to for weather"),
-    (37740, "on passage"),
+    (9000, "hove to for weather"),
+    (11940, "on passage"),
+    (12060, "keeping station"),
+    (15060, "hove to for weather"),
+    (23040, "on passage"),
+    (23100, "beating"),
+    (23100, "keeping station"),
+    (28500, "hove to for weather"),
+    (30780, "on passage"),
+    (30900, "beating"),
 ]
-TRIAL_STATION_LEE_SHORE_LINES = 1668  # package 37p (570 before)
-TRIAL_STATION_LEE_SHORE_DIGEST = "2b0c13f40e670548"  # package 37p (dca2273da941e096 before)
+TRIAL_STATION_LEE_SHORE_LINES = 2129  # package 45 (1668 at package 37p)
+TRIAL_STATION_LEE_SHORE_DIGEST = "b7cbfbe33e2ed631"  # package 45 (2b0c13f40e670548 at 37p)
 
 
 @pytest.fixture(scope="module")
@@ -156,18 +178,19 @@ def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_s
 
 # package 37p: on passage again at 8100 (8040), at anchor 33960 (34080) and 40980
 # (39720), the bower let go at 34292 and 41307 (34413 and 40105)
+# package 45 (item 3): at anchor within the port's reach she is in port and does her
+# business from the road by the boat; the second anchorage of 37p (at anchor 33960, under
+# way 38160 for the wind, at anchor again 40980) is not sought
 TRIAL_TRADE_STRANGER_STATES = [
     (300, "on passage"),
     (3660, "evading"),
     (8100, "on passage"),
-    (33960, "at anchor"),
-    (38160, "on passage"),
-    (40980, "at anchor"),
+    (35100, "in port"),
 ]
-TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [34292, 41307]
-TRIAL_TRADE_STRANGER_LINES = 1252  # package 37p (1193 before)
+TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [35075]  # [34292, 41307] at package 37p
+TRIAL_TRADE_STRANGER_LINES = 1165  # package 45 (1252 at package 37p)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
-TRIAL_TRADE_STRANGER_DIGEST = "ee34f4a9db0a5c8c"
+TRIAL_TRADE_STRANGER_DIGEST = "da925d122083caee"  # package 45 (ee34f4a9db0a5c8c before)
 
 
 @pytest.fixture(scope="module")
@@ -193,22 +216,24 @@ def test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_win
     assert anchored == TRIAL_TRADE_STRANGER_ANCHORED_TICKS
     waits = [e for e in w.log if "the wind does not serve to enter Falmouth" in e.text]
     assert len(waits) == 2
-    assert cap.state == "at anchor" and cap.intent is not None and not cap.intent.done
+    assert cap.state == "in port" and cap.intent is not None  # at anchor before package 45
     assert not [e for e in w.log if e.kind == "ship.aground"]
     assert len(w.log) == TRIAL_TRADE_STRANGER_LINES
     assert w.log.digest()[:16] == TRIAL_TRADE_STRANGER_DIGEST
 
 
 # package 37p: at anchor at 17280 (17220), the bower let go at 17688 (17669)
+# package 45 (item 3): at anchor in the outer road, within Falmouth's reach, she is in port
 TRIAL_TRADE_THICK_STATES = [
     (300, "on passage"),
     (300, "running for shelter"),
-    (17280, "at anchor"),
+    (14400, "at anchor"),  # 17280 at package 37p
+    (14820, "in port"),
 ]
-TRIAL_TRADE_THICK_ANCHORED_TICK = 17688
-TRIAL_TRADE_THICK_LINES = 553  # package 37p (539 before)
+TRIAL_TRADE_THICK_ANCHORED_TICK = 14775  # package 45 (17688 at package 37p)
+TRIAL_TRADE_THICK_LINES = 482  # package 45 (553 at package 37p)
 # decision 45, the pilot's news: 50901cf162ea95aa before; package 37p (10fee882c789666e before)
-TRIAL_TRADE_THICK_DIGEST = "03c66821e0c356b3"
+TRIAL_TRADE_THICK_DIGEST = "590cfb8f12834ac7"  # package 45 (03c66821e0c356b3 before)
 
 
 @pytest.fixture(scope="module")
@@ -227,7 +252,7 @@ def test_in_thick_weather_near_the_land_the_merchant_runs_for_the_road_and_waits
     assert states(w) == TRIAL_TRADE_THICK_STATES
     assert [e.tick for e in w.log if e.kind == "ship.anchored"] == [TRIAL_TRADE_THICK_ANCHORED_TICK]
     assert not [e for e in w.log if e.kind == "ship.aground"]
-    assert w.captain.state == "at anchor"
+    assert w.captain.state == "in port"  # package 45: the outer road is within Falmouth's reach
     assert len(w.log) == TRIAL_TRADE_THICK_LINES
     assert w.log.digest()[:16] == TRIAL_TRADE_THICK_DIGEST
 

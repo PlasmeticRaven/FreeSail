@@ -676,6 +676,16 @@ class Ports:
     # pilot aboard has asked for his boat, whether he came aboard inward bound, the
     # dangers he has named, when he last warned of shoal water, and whether he has said
     # that he cannot see his marks.
+    # Package 45, the same: the pilot's fix and his conn, none in a checkpoint from before
+    fix_tick: int | None = None
+    fix_said: bool = False
+    conn: bool = False
+    conn_inward: bool = True
+    conn_track: tuple = ()  # reassigned as a list by `give_conn`, never mutated in place
+    conn_i: int = 0
+    conn_heading: float | None = None
+    conn_bearing: float | None = None
+    conn_order_tick: int | None = None
     hail_answer: str = ""
     hail_count: int = 0
     hail_tick: int | None = None
