@@ -3472,7 +3472,9 @@ def test_the_passage_in_thick_weather_makes_its_landfall_wrong_on_the_reckoning(
     # package 37p: put about, she came up with too little way, was taken aback and boxed
     # off by the helm (54424, two minutes aback), and the book's "keep her full" bore her
     # away a point twice, so that she ends on a compass course (full and by before it)
-    assert world.ship.dyn.helm_mode.value == "heading"
+    # package 45: full and by at the end (the course for Falmouth lies too near the wind to
+    # be laid, and the helm's rules keep her so without the box-off of 37p)
+    assert world.ship.dyn.helm_mode.value == "full_and_by"
     assert len(log) == GATE_5B_THICK_LINES and log.digest()[:16] == GATE_5B_THICK_DIGEST
 
 
@@ -4315,11 +4317,13 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     # the Iroise passed, the course for the points off Bertheaume shaped; the one cast at
     # its mark (see the docstring)
     assert _by_order(log, "the course for the Iroise") and _by_order(log, "past the Iroise")
-    # package 37j: she passes the mark wide by account and casts nothing there (the test
-    # after this one)
+    # package 45: by the wind under the helm's rules she comes to the Iroise's mark within
+    # the book's distance again, brings to and casts there (37j to 37p: wide by account,
+    # nothing cast; the test after this one)
     deep = [e for e in log if e.kind == "sounding" and e.data.get("deep")]
-    assert deep == [] and not _by_order(log, "bring to in the Iroise")
-    assert len([e for e in hove if e.tick > 80000]) == 0
+    assert [e.tick for e in deep] == [GATE_5C_MERCHANT_IROISE_CAST_TICK]
+    assert _by_order(log, "bring to in the Iroise")
+    assert len([e for e in hove if e.tick > 80000]) == 1
     # the road of Bertheaume on the ebb by the lead, the pilot aboard at the anchor; the
     # turn to the flood by daylight the same forenoon, and the Goulet on it
     anchored = [e for e in log if e.kind == "ship.anchored"]
@@ -4328,7 +4332,9 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     ] == GATE_5C_MERCHANT_ANCHORED_TICKS  # Carrick Road, Bertheaume, Brest
     # package 37j: at the first cast under thirteen fathoms, the lead's (nine since package
     # 37p, eight and a half before)
-    assert "in nine fathoms" in anchored[1].text and aboard[1].tick < anchored[1].tick
+    # package 45: eight fathoms and a half in the road of Bertheaume (nine at 37p)
+    assert "in eight fathoms and a half" in anchored[1].text
+    assert aboard[1].tick < anchored[1].tick
     # package 37e: standing in from the second point the course for the road is worked
     # again every five minutes, for the water she is then in
     assert len(_by_order(log, "the course for the road")) >= 4
@@ -4391,16 +4397,11 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     assert len(log) == GATE_5C_MERCHANT_LINES and log.digest()[:16] == GATE_5C_MERCHANT_DIGEST
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Package 37j: the course for the Passage de l'Iroise shaped at 02:00 on the 13th, "
-    "nineteen miles off, is not worked again once Ushant is within ten miles, and she passes "
-    "the mark more than a mile and a half off by account; 'bring to in the Iroise' never fires "
-    "and the deep-sea lead is not hove there (90241 before). The book is not tuned here "
-    "(docs/dev/TuningNotes.md, package 37j). For the lead. Package 37m: still so, the cause "
-    "being no course across the wind; with the lead's dropped rule she casts and is then "
-    "taken aback gybing by the helm, a fore-and-after's turn (TuningNotes, package 37m).",
-)
+# Package 37j to 37p: an expected failure (the course for the Passage de l'Iroise shaped
+# nineteen miles off was not worked again once Ushant was within ten miles, and she passed
+# the mark more than a mile and a half off by account; 'bring to in the Iroise' never fired).
+# Package 45: she comes to the mark by the wind under the helm's rules and casts there at
+# 90318 (90241 before 37j); the expectation of failure lifted, the test as written.
 def test_the_merchant_passage_casts_the_deep_sea_lead_at_the_iroises_mark(gate_5c_merchant):
     """The beat of the merchant passage as pinned until package 37j: brought to once
     within a mile and a half of the Passage de l'Iroise and the deep-sea lead hove, which
@@ -4763,7 +4764,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # quarterdeck carries its place and its hearers (none) in its data, as every say does now
 # (the owner's ruling of 2026-10-10); aa42746f61de91d1 at 37p, a2cd045b9bcc93f8 before it
 # decision 45, the pilot's news: b00ac08c3f63e84c before
-GATE_6A_FAKE_CAPTAIN_DIGEST = "9793dab8a6f4d4ee"
+GATE_6A_FAKE_CAPTAIN_DIGEST = "1b821bb2b8d9732a"  # package 45 (9793dab8a6f4d4ee before)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):

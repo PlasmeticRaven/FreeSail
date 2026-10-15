@@ -215,7 +215,7 @@ def test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_win
     anchored = [e.tick for e in w.log if e.kind == "ship.anchored"]
     assert anchored == TRIAL_TRADE_STRANGER_ANCHORED_TICKS
     waits = [e for e in w.log if "the wind does not serve to enter Falmouth" in e.text]
-    assert len(waits) == 2
+    assert len(waits) == 0  # package 45: in port from the road, no wait to go in (2 before)
     assert cap.state == "in port" and cap.intent is not None  # at anchor before package 45
     assert not [e for e in w.log if e.kind == "ship.aground"]
     assert len(w.log) == TRIAL_TRADE_STRANGER_LINES

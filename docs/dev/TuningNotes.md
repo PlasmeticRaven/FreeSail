@@ -4439,7 +4439,14 @@ the owner's weekly limit: what was built is below with its measure, what was not
   and an intent's `via`; the frigate sails Falmouth to Finisterre on the whole chart in
   `tests/test_via.py` (slow). Found on the way: the straight line Ushant to Lisbon crosses
   Galicia, so the seaward side of a mark is read from the sea room about it at a league and at
-  three; `Corunna` is a road and not a town on the chart (`place_of`).
+  three; `Corunna` is a road and not a town on the chart (`place_of`). The owner's note 11
+  of gate m6a-2 (the way turning too early at marks near the coast, cutting the corner toward
+  the land), looked at once: the berth laid five miles off a land mark was "reached" by
+  account two miles short of it, as an open-sea mark is, and the next course shaped from
+  there; a berth (the way's `hand` names the side it is left on) is now reached within half
+  a mile or passed abeam (`WAY_BERTH_REACHED_NM`). The sea-room reading that lays the berth
+  and the two-mile reach of a water mark are as they were; whether that was the whole of
+  what the owner saw is for his next run.
 
 ### Part B: the helm, the pilot, the merchant's entry, tack or wear, the gale, the glass, the storm sails
 
@@ -4531,10 +4538,27 @@ naval cruise (below).
 for the Goulet in place of its six pricked points: the book's own five-minute course line
 took the conn back from him ninety seconds later ("you have her, sir"), nobody conned her,
 and she grounded under the Mingan and lay there to the end, the tin unsold. The book keeps
-its own points (the captain's doctrine gives the conn, and keeps its course lines quiet while
-he has it; a book of the player's that gives him the conn must do the same, which the dialect
-cannot say yet: for the lead). The checkpoint tests of older saves found the new fields of the
-reckoning and the ports missing on load: class defaults, as 37e and 37h did.
+its own points and the pilot's conn is the player's to give there (gate m6a-2's item 5);
+since that finding a course of a standing order's (the actor `standing order '...'`, the
+player's book or a doctrine's) does not take her back from the pilot while he has the conn:
+he gives his course again at once, and only the officer's own hand (`steer`, a course, a
+manoeuvre, `I have the conn`) takes her. **Left undone: the Goulet by the pilot's conn.**
+With that in place the player's `let the pilot take her in` on the merchant passage at the
+flood (gate m6a-2's item 5) has the pilot con her for the port file's `in` marks, which are
+the book's own pricked points; the book sails them from an account that lags her on the
+flood (37d's finding), so the true line from point to point passes the Mingan within two
+cables and crosses the land under Petit Minou (the master says so when the book shapes it),
+and conned on the truth she takes the ground under Petit Minou at five knots, twice in two
+runs, the shoal keep-off (two points toward the deeper water, as for a charted danger)
+turning her back for the mark too soon. The pilot's conn stands at Falmouth
+(`tests/test_ports.py`); Brest wants its `tracks: in` pricked for the true channel (north of
+the Mingan and the Fillettes, mid-channel) before the item can be run: for the lead. The checkpoint tests of older saves found the new
+fields of the reckoning and the ports missing on load: class defaults, as 37e and 37h did.
+**Found by the pins**: the merchant passage under its own book now comes to the Iroise's
+mark within the book's distance, brings to and casts the deep-sea lead there (37j to 37p: wide
+by account, nothing cast; the expected failure lifted); the thick-weather passage ends full
+and by (the course for Falmouth too near the wind), where 37p's helm had boxed her off onto a
+compass course.
 
 
 ### The suite, as run

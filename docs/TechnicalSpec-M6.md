@@ -360,8 +360,11 @@ hand his warning names (`_conn_keep_off`; a first version ran her onto the Black
 he warned of it), the berth said at the last mark; `I have the conn` or any helm order of
 the officer's takes her back, said. The captain's doctrine gives him the conn in pilot
 water and keeps its course lines quiet while he has it (`Captain._conn_for`, the hourly "the
-leg" left out); the merchant passage's book keeps its own Goulet points (given the conn, its
-five-minute course line took her back from him and she grounded: the tuning notes). *The merchant's entry* (`captains.py`): the inner track judged leg by leg
+leg" left out); the merchant passage's book keeps its own Goulet points, and a standing order's course
+does not take her back from him (he gives his own again). Not built: the Goulet by his conn,
+the port's `in` marks being the book's points pricked for an account that lags her, which
+conned on the truth put her ashore under Petit Minou (the tuning notes); Brest's track for
+the pilot is the lead's. *The merchant's entry* (`captains.py`): the inner track judged leg by leg
 from the leg in hand, a leg nearer the wind than `ENTRY_POINTS` (six) not beaten, and she
 anchors at the last road or anchorage she can reach (`_entry_stop_for`); at anchor within
 the port's reach (`Port.reach_nm`, two miles by default; Falmouth's outer road and Carrick
