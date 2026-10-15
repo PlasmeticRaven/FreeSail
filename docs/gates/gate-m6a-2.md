@@ -1,7 +1,9 @@
 # Gate M6a-2: the fixes from the owner's first runs
 
-**Verdict:** open. The build `m6a-2`, cut at package 45's merge (branch `gates/m6a-2`,
-tag `gate-m6a-2`, the release's zip), a small gate on gate m6a's document carrying the
+**Verdict:** not cut. The owner's word of 2026-10-15: the gate is folded into the milestone's
+last (gate 6c, at the end of M6's work), his runs of 2026-10-13 to 15 on package 45's build
+(`docs/playtests/2026-10-13-gate-m6a-2-owner-runs/`) standing as its runs. The document stays
+as drafted for that gate's items. It was to be a small gate on gate m6a's document carrying the
 fixes the owner's runs of 2026-10-11 brought
 (`docs/playtests/2026-10-11-gate-m6a-owner-runs/`; package 45 in
 `docs/dev/M6-WorkPackages.md`). The verdict of m6a and of this gate are the owner's

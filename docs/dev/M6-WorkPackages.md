@@ -28,7 +28,7 @@ tuning notes and a report to the lead at the end.
 | 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | built 2026-10-11 (Part A whole; Part B as the tuning notes say, cut short by the owner's limit, its pins from one slow run); gate m6a-2 after it |
 | 43b | Opus | The lugger and the smack; the world's business (spec §19), with the trade rumours a boat brings back from the shore (the owner's note 24) | brief to write |
 | 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | brief to write |
-| 45c | Opus | The fixes from gate m6a-2's runs that are this milestone's (the owner's notes of 2026-10-13 to 15, read below): a picture shelved by the model's hand only, the shelf taking a note; the boat ghosted hauling out; a save loaded to an earlier tick; `via` triggering too early near the coast; the weather's four-hour cadence; the picture tools at the local runner where its model reads an image; a point of interest placed by a world order; the groundwork for stations that multiply (a station's kind in the ship file's form, two officers on a frigate, the journal keyed to the person) | brief to write, after gate m6a-2 (the owner, 2026-10-15: no package of this milestone beyond it) |
+| 45c | Opus | The fixes from gate m6a-2's runs that are this milestone's (the owner's notes of 2026-10-13 to 15, read below): a picture shelved by the model's hand only, the shelf taking a note; the boat ghosted hauling out; a save loaded to an earlier tick; `via` triggering too early near the coast; the weather's four-hour cadence; the picture tools at the local runner where its model reads an image; a point of interest placed by a world order; the groundwork for stations that multiply (a station's kind in the ship file's form, two officers on a frigate, the journal keyed to the person) | brief to write, after 45's merge (the owner, 2026-10-15: no package of this milestone beyond it; gate m6a-2 not cut) |
 
 Package 37m (the helm through the wind) is milestone 5's last, briefed in
 `M5-WorkPackages.md`, launched beside 38 on 2026-10-09 and merged after it: 38 moves no
@@ -1205,8 +1205,8 @@ station, or two of a kind, keep their own; a test with two officers on the friga
 is 45c's, as groundwork; the movement, the needs and the director's voice are M7b's.
 
 **The plan for the rest of the milestone** (the owner's word of 2026-10-15: no package
-beyond 45c; the test battery stays as it is, the usage eaten): 45 finished and gate m6a-2
-cut (pre-approved); 45c beside 43 (43 on Fable, 45c on Opus); then 43b and 44 on Opus
+beyond 45c; the test battery stays as it is, the usage eaten): 45 finished and merged, gate m6a-2 not cut (the owner, 2026-10-15: folded into the
+milestone's last gate, his runs standing); 45c beside 43 (43 on Fable, 45c on Opus); then 43b and 44 on Opus
 together; then 42b (the consent revision, the re-asks the owner's) and the orders review
 as the lead's own report rather than a package; gate 6c with the regatta; the milestone's
 close, and the director's milestone next.
