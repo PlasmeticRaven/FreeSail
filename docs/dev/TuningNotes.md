@@ -4526,12 +4526,12 @@ naval cruise (below).
 | gate 5b thick: tacked, lines, digest | 54057, 495, `14e161308e0944f9` | 54063, 472, `e358748a1eae5fc6` | the helm by the wind off Black Head |
 | gate 5c merchant: pilot aboard, left, anchored, sail off the Lizard, Iroise cast, Goulet, tin sold, lines, digest | [16200, 94380], [18300, 121380], [57, 98515, 116276], 25740, 90241, 112189, 125110, 3015, `c5b94f5b43a10a48` | [16200, 96540], [18300, 121500], [57, 100616, 116411], 26100, 90318, 112142, 125387, 3092, `3dfe7b9c9c8fc271` | the schooner by the wind under the helm's rules; the voyage whole, the tin sold at £270 as before |
 | gate 5c cruise: lines, digest | 2177, `2bba9b084d3e88a3` | 1930, `dc6454f37d060818` | **a regression, for the lead**: on her station under the helm's rules the frigate meets the admiral's cutter at 91022 (85437), is chasing it when the Palinure is put on the sea on her quarter at 90000, never reads the letter nor speaks the brig, wears three times; the two cruise tests are `xfail(strict)` with this reason and the digest pinned as the run gave it |
-| gate 6a intent: states, pilot aboard, left, anchored, brought up, boat for prices, lines, digest | beating 22920, on passage 27720, in port 111300; [17700, 102360]; [20040, 120720]; [57, 111272]; 112191; 112260; 2019; `bbb8a8e5405f9511` | 22740, 27480, 111180; [17700, 101100]; [19920, 120960]; [57, 111149]; 112079; 112140; 2027; `84f7e0f03ae15d2f` | the pilot of Brest given the conn by the captain and she anchors two minutes sooner; sold at 119640 as before |
+| gate 6a intent: states, pilot aboard, left, anchored, brought up, boat for prices, lines, digest | beating 22920, on passage 27720, in port 111300; [17700, 102360]; [20040, 120720]; [57, 111272]; 112191; 112260; 2019; `bbb8a8e5405f9511` | 22740, 27480, 111180; [17700, 101100]; [19920, 114300]; [57, 111153]; 112069; 112140; 2114; `3f2356a885167274` | the pilot of Brest given the conn by the captain, she anchors two minutes sooner and he is put off at the berth; sold at 118980 |
 | truths 78 and 79 (the fake captain on the merchant passage): anchored, lines, digest | [57, 98515, 116276], the merchant's lines + 13, `9793dab8a6f4d4ee` | the merchant's anchored ticks; see the suite below | with the merchant passage |
 | the station and a stranger: states, within hail, lines, digest | chasing 9240, the station 9840; 9798; 961; `11dc95ebe098c244` | chasing 9180, the station 24660; never; 972; `c3763573a2f44dff` | the chase's lead puts her across the brig's bows (above); the chase rule's, for the lead |
 | the station in a gale: first states, lines, digest | hove to 19440, on passage 37740, keeping station 37860, hove to 43320; 1423; `6bd09ffa7b4cefad` | 19980, 30780, 30900, 41880; 1399; `3f0d36bbff4af262` | no sea room read over the lee sector till 09:33; never aground |
 | Ushant under her lee: states, lines, digest | hove to 19440, on passage 37740; 1668; `2b0c13f40e670548` | eleven states from hove to at 9000 to beating at 30900; 2129; `b7cbfbe33e2ed631` | the lee shore and the gale by turns, sail made after it; never aground |
-| the merchant and a privateer: states, anchored, lines, digest | at anchor 33960, on passage 38160, at anchor 40980; [34292, 41307]; 1252; `ee34f4a9db0a5c8c` | in port 35100; [35075]; 1165; `da925d122083caee` | item 3: in port within the port's reach, her business from the road |
+| the merchant and a privateer: states, anchored, lines, digest | at anchor 33960, on passage 38160, at anchor 40980; [34292, 41307]; 1252; `ee34f4a9db0a5c8c` | in port 35340; [35292]; 1170; `e6146a7456fc0a9b` | item 3: in port within the port's reach, her business from the road |
 | the merchant in thick weather: states, anchored, lines, digest | at anchor 17280; 17688; 553; `03c66821e0c356b3` | at anchor 14400, in port 14820; 14775; 482; `590cfb8f12834ac7` | the same |
 
 **Tried and taken back.** The merchant passage's book was given `let the pilot take her in`
@@ -4563,4 +4563,22 @@ compass course.
 
 ### The suite, as run
 
-SUITE_WORDS
+On the build machine (four cores, nothing else of the owner's running; the first slow run was
+cut by the owner's weekly limit and the machine restarted under it, so the runs below are the
+ones that completed after the merge of the branch head `claude/dreamy-darwin-d77nty`):
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- The slow tier once, whole, on the merged tree (`--slow -n 4 -m "not pace"`): 3,497 ran, 3,479
+  passed, 12 expected failures, 6 failed, every one a pin of this package's (the merchant
+  passage's cast at the Iroise's mark and its constants, the privateer trial's wait in the
+  road, truth 78's digest, the thick-weather passage's helm at the end, and the replay's
+  fingerprint test, which read the tree while it was being edited); written in as above.
+- The confirming run of the pinned files (`tests/test_known_truths.py`, `test_captain_trials.py`,
+  `test_via.py`, `test_replay.py`, `--slow -n 4`): 134 ran, 123 passed, 9 expected failures
+  (the cruise's two among them), 2 failed, both moved by the last change (a standing order's
+  course no longer takes the conn from the pilot: the intent scenario's sale and the privateer
+  trial's anchoring moved by a few minutes); those two re-measured once more and confirmed
+  alone, with truths 78 and 79 and the thick-weather trial beside them, all passing.
+- The fast tier once on the final tree (`-n 4`): 3,222 passed, none failed.
+- The pace tests alone, the machine quiet (`--slow -m pace`): 5 passed.
+

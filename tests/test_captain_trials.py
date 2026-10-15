@@ -185,12 +185,12 @@ TRIAL_TRADE_STRANGER_STATES = [
     (300, "on passage"),
     (3660, "evading"),
     (8100, "on passage"),
-    (35100, "in port"),
+    (35340, "in port"),
 ]
-TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [35075]  # [34292, 41307] at package 37p
-TRIAL_TRADE_STRANGER_LINES = 1165  # package 45 (1252 at package 37p)
+TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [35292]  # [34292, 41307] at package 37p
+TRIAL_TRADE_STRANGER_LINES = 1170  # package 45 (1252 at package 37p)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
-TRIAL_TRADE_STRANGER_DIGEST = "da925d122083caee"  # package 45 (ee34f4a9db0a5c8c before)
+TRIAL_TRADE_STRANGER_DIGEST = "e6146a7456fc0a9b"  # package 45 (ee34f4a9db0a5c8c before)
 
 
 @pytest.fixture(scope="module")

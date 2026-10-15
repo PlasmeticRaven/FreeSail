@@ -4594,17 +4594,17 @@ GATE_6A_INTENT_STATES = [  # (tick, state): the books loaded and unloaded by nam
     (111180, "in port"),  # anchored in the Bay of Brest (111300 at package 37p)
 ]
 GATE_6A_INTENT_PILOT_ABOARD_TICKS = [17700, 101100]  # Tregenza out; Le Floch in (102360 at 37p)
-GATE_6A_INTENT_PILOT_LEFT_TICKS = [19920, 120960]  # package 45 ([20040, 120720] at 37p)
+GATE_6A_INTENT_PILOT_LEFT_TICKS = [19920, 114300]  # package 45 ([20040, 120720] at 37p)
 GATE_6A_INTENT_NOON_TICKS = [25200, 111660]
-GATE_6A_INTENT_ANCHORED_TICKS = [57, 111149]  # Carrick Road; the Bay (111272 at 37p; the conn)
-GATE_6A_INTENT_BROUGHT_UP_TICK = 112079  # package 45 (112191 at 37p)
+GATE_6A_INTENT_ANCHORED_TICKS = [57, 111153]  # Carrick Road; the Bay (111272 at 37p; the conn)
+GATE_6A_INTENT_BROUGHT_UP_TICK = 112069  # package 45 (112191 at 37p)
 GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 112140  # the boat for the prices (112260 at 37p)
-GATE_6A_INTENT_SOLD_TICK = 119640  # 47 tons at £270; the purse £13,045 (120180 before 37p)
-GATE_6A_INTENT_LINES = 2027  # package 45 (2019 at package 37p)
+GATE_6A_INTENT_SOLD_TICK = 118980  # 47 tons at £270 (119640 at 37p; the pilot put off sooner)
+GATE_6A_INTENT_LINES = 2114  # package 45 (2019 at package 37p)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
-GATE_6A_INTENT_DIGEST = "84f7e0f03ae15d2f"  # package 45 (bbb8a8e5405f9511 before)
+GATE_6A_INTENT_DIGEST = "3f2356a885167274"  # package 45 (bbb8a8e5405f9511 before)
 
 
 @pytest.fixture(scope="module")
@@ -4669,7 +4669,8 @@ def test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants(gate_6a
     assert [e.tick for e in log if e.kind == "reckoning.noon"] == GATE_6A_INTENT_NOON_TICKS
     assert [e.tick for e in log if e.kind == "ship.anchored"] == GATE_6A_INTENT_ANCHORED_TICKS
     # package 37p: in 13 fathoms (twelve and a half before)
-    assert "in 13 fathoms" in [e for e in log if e.kind == "ship.anchored"][1].text
+    # package 45: twelve fathoms where the pilot conned her to (13 at 37p)
+    assert "in twelve fathoms" in [e for e in log if e.kind == "ship.anchored"][1].text
     brought = [e.tick for e in log if e.kind == "ship.brought_up"]
     assert brought[-1] == GATE_6A_INTENT_BROUGHT_UP_TICK
     prices = [e for e in _by_rule(log) if "for the prices" in e.text]
