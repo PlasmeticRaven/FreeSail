@@ -1189,6 +1189,51 @@ cold read of each note, and where it goes:
 | 24, trade rumours from the boat ashore | The world's business. | 43b |
 | 25, trims for a point of sail | The regatta decides, as the owner says. | 44 |
 
+**The interview** (the lead's questions and the owner's answers, 2026-10-15), and what it
+adds to 45c and 43:
+
+- Every entry and every tack of the voyages was the owner's own hand, with models in the
+  other stations; the rules-based captain was not tried beyond the trials, because a world
+  order through the scenario file is too unwieldy for live testing. **43's seat hook must
+  give a live world order at the console and the browser** (the director's door proper
+  stays M7b's), or the far-detail captains cannot be tested in play.
+- **The pilot's conn steered straight for a mark behind an island** (the schooner into
+  Rochefort), and his first warning gave the deeper water to larboard where the entrance
+  lay to starboard. Two faults for 45c, reproduced from the owner's save: the conn must
+  follow the port's own track leg by leg, never a straight line to an inner mark; and the
+  hand in the warning is wrong in sign or in frame (from the ship's head, as a pilot
+  speaks). The owner's reading that `shape a course` only warns of land and does nothing
+  about it is right and is the planner's open item.
+- **`via` marks trigger miles short** even with a tight reckoning, and a reached mark must
+  then be struck from the standing order by hand. 45c: a mark counts as reached within a
+  mile (or passed abeam within a mile of the line), and reached marks drop from the list
+  by themselves, the log saying so.
+- **The OpenRouter door's three-failure limit** was hit often by a free model (the runner
+  could not read a reply's shape; which shape is unknown). 45c: every unread reply is
+  written whole to the exchanges file so it can be diagnosed, and the common shapes a
+  free model returns (reasoning fields, a tool call written as text) are read.
+- **`muster` works at the console and not in the browser**, and some of the console's state
+  is not to be found in the browser. 45c: the browser takes `muster` and shows what the
+  console's state view shows.
+- **Models address the lookout when nobody holds the station** (and the pilot, which works,
+  and people ashore, which is M7b's). 45c: `ask the lookout` and `tell the lookout` are
+  answered from the readings by the rules when the station is unheld, as the lookout's own
+  hails are.
+- **The ghosted boat** was the ship's own, ordered ashore as the anchor was being let go.
+  45c reproduces it from the save.
+- **The stand-by misunderstood; models waking too often on long legs at 300x.** 45c: the
+  brief's words on the stand-by's forms made plain, with an "urgent only" stand-by named
+  as such; the owner expects the needs system (M7) to help in its own way.
+- **"Her sails lifting ... keep her away, or she will be taken aback"** misleads a model
+  when the trim is the matter. 45c: the line names the cause when the yards are not trimmed
+  for the course ("her sails lifting: the yards are not trimmed for this course; trim
+  sails, or keep her away"), the trims by point of sail left to the regatta (note 25).
+- **The tides** read right on further testing; the Torbay doubt was circumstantial.
+- The fun is the arrival: the wind coming round, the fix, the pilot, the soundings and the
+  models all aligning; the tedium is a model waking at every notable event on a static
+  leg. The owner looks to the director for tailored moments, and to a local-model director
+  for solo play.
+
 **The groundwork for stations that multiply** (the owner, 2026-10-15: every stationed
 person with the same basic, non-hierarchical reach, tell and ask between any two, the
 movement, needs and domain orders to come; several stations of one kind on a ship, the
