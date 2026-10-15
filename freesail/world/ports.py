@@ -676,6 +676,16 @@ class Ports:
     # pilot aboard has asked for his boat, whether he came aboard inward bound, the
     # dangers he has named, when he last warned of shoal water, and whether he has said
     # that he cannot see his marks.
+    # Package 45, the same: the pilot's fix and his conn, none in a checkpoint from before
+    fix_tick: int | None = None
+    fix_said: bool = False
+    conn: bool = False
+    conn_inward: bool = True
+    conn_track: tuple = ()  # reassigned as a list by `give_conn`, never mutated in place
+    conn_i: int = 0
+    conn_heading: float | None = None
+    conn_bearing: float | None = None
+    conn_order_tick: int | None = None
     hail_answer: str = ""
     hail_count: int = 0
     hail_tick: int | None = None
@@ -1701,14 +1711,28 @@ class Ports:
             for e in log.since(self.conn_order_tick):
                 if e.tick <= self.conn_order_tick and e.kind != "helm.set":
                     continue
-                if e.kind == "helm.set" and e.actor != PILOT_ACTOR:
+                if e.actor == PILOT_ACTOR:
+                    continue
+                # a course of the player's own book, standing from before he was given her
+                # (the merchant passage's five-minute course for the road took her back
+                # from him ninety seconds after the book itself gave him the conn, and she
+                # grounded in the Goulet with nobody conning): the pilot has the conn, and
+                # gives his course again at once; the officer's own hand takes her back
+                book = str(e.actor).startswith("standing order '")
+                if e.kind == "helm.set":
+                    if book:
+                        self.conn_bearing = None
+                        continue
                     self._conn_off("you have her, sir (the helm was given another course)")
                     return
-                if e.kind == "order.accepted" and e.actor != PILOT_ACTOR:
+                if e.kind == "order.accepted":
                     order = str((e.data or {}).get("order") or "")
                     if order.split(" ")[:1] in (["tack"], ["wear"], ["heave"], ["steer"]) or (
                         order.startswith(("keep her", "shape a course", "put her about"))
                     ):
+                        if book:
+                            self.conn_bearing = None
+                            continue
                         self._conn_off("you have her, sir (the helm was given another course)")
                         return
         if world.at_anchor:
@@ -1765,17 +1789,27 @@ class Ports:
         tide = float(getattr(self.world, "tide_height_m", 0.0) or 0.0)
         hull = getattr(self.world.ship, "hull", None)
         draught = float(hull.spec.draught_m) if hull is not None else 0.0
-        found = chart.dangers_ahead(
-            pos, brg_deg, ahead, PILOT_WARN_ABEAM_M, tide, draught + PILOT_UNDER_KEEL_M
-        )
-        if not found:
+        wants = draught + PILOT_UNDER_KEEL_M
+        found = chart.dangers_ahead(pos, brg_deg, ahead, PILOT_WARN_ABEAM_M, tide, wants)
+        if found:
+            f, _along, _off, side = found[0]
+            deeper = "larboard" if side > 0 else "starboard"
+            leave = "starboard" if deeper == "larboard" else "larboard"
+            turn = -1.0 if deeper == "larboard" else 1.0
+            course = units.wrap_2pi(math.radians(brg_deg) + turn * PILOT_CONN_KEEP_OFF_RAD)
+            return course, f"{f.name} to {leave}"
+        # the water shoaling on the line (the depth field, as his warning reads it): the
+        # course laid off toward the deeper side the same way
+        shoal = chart.shoal_ahead(pos, brg_deg, ahead, wants, tide)
+        if shoal is None:
             return None
-        f, _along, _off, side = found[0]
-        deeper = "larboard" if side > 0 else "starboard"
-        leave = "starboard" if deeper == "larboard" else "larboard"
-        turn = -1.0 if deeper == "larboard" else 1.0
+        _along, _depth, side = shoal
+        if side == 0:
+            return None
+        deeper = "starboard" if side > 0 else "larboard"
+        turn = 1.0 if side > 0 else -1.0
         course = units.wrap_2pi(math.radians(brg_deg) + turn * PILOT_CONN_KEEP_OFF_RAD)
-        return course, f"{f.name} to {leave}"
+        return course, f"the shoal water to {'larboard' if side > 0 else 'starboard'}"
 
     def _conn_order(self, port: Port, wanted: float, mark: str, now: int) -> None:
         world = self.world

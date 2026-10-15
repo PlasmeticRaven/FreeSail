@@ -229,7 +229,7 @@ verbs:
   # loses the ground; the log says the choice and why. `tack ship` and `wear ship` are the
   # orders that choose for you.
   put her about:
-    synonyms: [put her round, tack or wear, about or wear, put the ship about, put about]
+    synonyms: [put her round, put the ship about, put about]
     object: navigation
     level: 1
   wear ship:

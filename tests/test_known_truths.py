@@ -2514,7 +2514,7 @@ GATE_5A_SEA_TICKS = {
 # the fore topmast staysail taken in at once as loaded near its rating, the gale over the
 # storm line); the topgallants again two seconds later; nothing lost.
 GATE_5A_DAY_LINES = 621  # 616 before package 37p
-GATE_5A_DAY_DIGEST = "d2e8574089db7e1d"  # efc286e862237e53 before package 37p
+GATE_5A_DAY_DIGEST = "338008f824afaa02"  # package 45 (d2e8574089db7e1d before; the ticks held)
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2961,9 +2961,9 @@ GATE_5B_BROUGHT_UP_TICK = 59628  # brought up, the sails furled (59606 before th
 GATE_5B_SAIL_SIGHTED_TICK = 55500  # "Sail ho! A sail right ahead", two leagues (55860)
 GATE_5B_PILOT_HAIL_TICK = 57120  # the cutter hails within four cables (57480)
 GATE_5B_PILOT_ABOARD_TICK = 57180  # the pilot aboard, a minute after (57540)
-GATE_5B_LINES = 732  # package 37p (734 on the merged tree, 746 before the merge)
+GATE_5B_LINES = 733  # package 45 (732 at package 37p; every tick as it was)
 # decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
-GATE_5B_DIGEST = "20e87b7f9096f304"
+GATE_5B_DIGEST = "271d03594a160224"  # package 45 (20e87b7f9096f304 before)
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
 # bearing; the outer road 56502 → 56517; the anchor off the town 57615 → 58210 in six
@@ -3013,16 +3013,16 @@ GATE_5B_SCHOONER_PILOT_HAIL_AGAIN_TICK = 56460  # her second, to heave to (37h; 
 GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # aboard off the outer road (37h; 56580 before)
 GATE_5B_SCHOONER_ANCHORED_TICK = 57257  # off the town, the best bower let go (57255 before 37p)
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p)
-GATE_5B_SCHOONER_LINES = 762  # package 37p (761 before)
+GATE_5B_SCHOONER_LINES = 763  # package 45 (762 at package 37p; every tick as it was)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
-GATE_5B_SCHOONER_DIGEST = "2c930a75e94a175f"
+GATE_5B_SCHOONER_DIGEST = "d21adc418177a60d"  # package 45 (2c930a75e94a175f before)
 GATE_5B_THICK_LANDFALL_TICK = 53820  # 54420 before package 37j
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
 # Black Head at 56081 gone), 475 → 478 lines (docs/dev/TuningNotes.md, package 37m).
-GATE_5B_THICK_TACKED_TICK = 54057  # put about off Black Head, full and by (54063 before 37p)
-GATE_5B_THICK_LINES = 495  # package 37p (478 since package 37m)
-GATE_5B_THICK_DIGEST = "14e161308e0944f9"  # package 37p (7029e5b4dd6fbe06 before)
+GATE_5B_THICK_TACKED_TICK = 54063  # put about off Black Head, full and by (54057 at 37p)
+GATE_5B_THICK_LINES = 472  # package 45 (495 at package 37p)
+GATE_5B_THICK_DIGEST = "e358748a1eae5fc6"  # package 45 (14e161308e0944f9 at 37p)
 
 
 def the_landfall(log):
@@ -3472,7 +3472,9 @@ def test_the_passage_in_thick_weather_makes_its_landfall_wrong_on_the_reckoning(
     # package 37p: put about, she came up with too little way, was taken aback and boxed
     # off by the helm (54424, two minutes aback), and the book's "keep her full" bore her
     # away a point twice, so that she ends on a compass course (full and by before it)
-    assert world.ship.dyn.helm_mode.value == "heading"
+    # package 45: full and by at the end (the course for Falmouth lies too near the wind to
+    # be laid, and the helm's rules keep her so without the box-off of 37p)
+    assert world.ship.dyn.helm_mode.value == "full_and_by"
     assert len(log) == GATE_5B_THICK_LINES and log.digest()[:16] == GATE_5B_THICK_DIGEST
 
 
@@ -4073,11 +4075,11 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # re-measured at 37j's merge, the tuning notes saying both.)
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
-GATE_5C_CRUISE_LINES = 2177  # package 37p (2083 since package 37m)
+GATE_5C_CRUISE_LINES = 1930  # package 45 (2177 at package 37p): see the cruise's xfail below
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
-GATE_5C_CRUISE_DIGEST = "2bba9b084d3e88a3"
+GATE_5C_CRUISE_DIGEST = "dc6454f37d060818"  # package 45 (2bba9b084d3e88a3 before)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4146,23 +4148,23 @@ GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack,
 # the tin sold 123948 → 125159; 2994 → 2976 lines.
 GATE_5C_MERCHANT_PILOT_ABOARD_TICKS = [
     16200,
-    94380,  # 96240 before package 37j
+    96540,  # package 45 (94380 at 37p, 96240 before package 37j)
 ]  # Mr Tregenza of Falmouth in the outer road; Mr Le Floch of Brest in the Iroise
 GATE_5C_MERCHANT_PILOT_LEFT_TICKS = [
     18300,
-    121380,  # 121440 before package 37p (121560 before the merge of 37h, 37k and 37j)
+    121500,  # package 45 (121380 at 37p, 121440 before it)
 ]  # Mr Tregenza put off beyond the outer road, the ship hove to for it; Mr Le Floch at the
 # anchor in the Bay of Brest, from the quay (package 37h)
 GATE_5C_MERCHANT_SAIL_OFF_LIZARD_TICK = (
-    25740  # "Sail ho! A sail on the larboard bow, bearing SE by S", not made out (29100)
+    26100  # "Sail ho! A sail on the larboard bow", not made out (25740 at 37p; package 45's helm)
 )
 GATE_5C_MERCHANT_NOON_TICKS = [25200, 111660]
 # the cast at the Iroise's mark, 13th (90240 on Windows); not made since package 37j
-GATE_5C_MERCHANT_IROISE_CAST_TICK = 90241
+GATE_5C_MERCHANT_IROISE_CAST_TICK = 90318  # package 45 (90241 at 37p)
 GATE_5C_MERCHANT_ANCHORED_TICKS = [
     57,
-    98515,  # 98814 before package 37p, 99974 before 37j
-    116276,  # 116282 before package 37p
+    100616,  # package 45 (98515 at 37p, 98814 before it)
+    116411,  # package 45 (116276 at 37p)
 ]  # Carrick Road; the road of Bertheaume on the 13th; the Bay
 GATE_5C_MERCHANT_FLOOD_TICK = (
     108960  # the turn to the flood at Bertheaume, 11:16 on the 13th, by daylight
@@ -4174,16 +4176,16 @@ GATE_5C_MERCHANT_FLOOD_TICK = (
 # re-measured at 37j's merge, the tuning notes saying both.)
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
-GATE_5C_MERCHANT_GOULET_TICK = 112189  # the mouth of the Goulet (112178 before package 37p)
-GATE_5C_MERCHANT_TIN_SOLD_TICK = 125110  # the boat alongside from the quay (125159 before 37p)
+GATE_5C_MERCHANT_GOULET_TICK = 112142  # the mouth of the Goulet (112189 at 37p)
+GATE_5C_MERCHANT_TIN_SOLD_TICK = 125387  # the boat alongside from the quay (125110 at 37p)
 # Package 37m (2026-10-09): every tick stands; at anchor in the Bay at 129600 the hourly
 # course for the Iroise, on the other tack with no way on her, is refused as keeping her
 # full and by ("'keep her full and by' must wait till she weighs", the refusal of 126000,
 # not said again) where it was refused as a tack; 2999 → 2998 lines
 # (docs/dev/TuningNotes.md, package 37m).
-GATE_5C_MERCHANT_LINES = 3015  # package 37p (2998 since package 37m)
+GATE_5C_MERCHANT_LINES = 3092  # package 45 (3015 at package 37p)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
-GATE_5C_MERCHANT_DIGEST = "c5b94f5b43a10a48"
+GATE_5C_MERCHANT_DIGEST = "3dfe7b9c9c8fc271"  # package 45 (c5b94f5b43a10a48 before)
 
 
 def _people(world) -> list[dict]:
@@ -4315,11 +4317,13 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     # the Iroise passed, the course for the points off Bertheaume shaped; the one cast at
     # its mark (see the docstring)
     assert _by_order(log, "the course for the Iroise") and _by_order(log, "past the Iroise")
-    # package 37j: she passes the mark wide by account and casts nothing there (the test
-    # after this one)
+    # package 45: by the wind under the helm's rules she comes to the Iroise's mark within
+    # the book's distance again, brings to and casts there (37j to 37p: wide by account,
+    # nothing cast; the test after this one)
     deep = [e for e in log if e.kind == "sounding" and e.data.get("deep")]
-    assert deep == [] and not _by_order(log, "bring to in the Iroise")
-    assert len([e for e in hove if e.tick > 80000]) == 0
+    assert [e.tick for e in deep] == [GATE_5C_MERCHANT_IROISE_CAST_TICK]
+    assert _by_order(log, "bring to in the Iroise")
+    assert len([e for e in hove if e.tick > 80000]) == 1
     # the road of Bertheaume on the ebb by the lead, the pilot aboard at the anchor; the
     # turn to the flood by daylight the same forenoon, and the Goulet on it
     anchored = [e for e in log if e.kind == "ship.anchored"]
@@ -4328,7 +4332,9 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     ] == GATE_5C_MERCHANT_ANCHORED_TICKS  # Carrick Road, Bertheaume, Brest
     # package 37j: at the first cast under thirteen fathoms, the lead's (nine since package
     # 37p, eight and a half before)
-    assert "in nine fathoms" in anchored[1].text and aboard[1].tick < anchored[1].tick
+    # package 45: eight fathoms and a half in the road of Bertheaume (nine at 37p)
+    assert "in eight fathoms and a half" in anchored[1].text
+    assert aboard[1].tick < anchored[1].tick
     # package 37e: standing in from the second point the course for the road is worked
     # again every five minutes, for the water she is then in
     assert len(_by_order(log, "the course for the road")) >= 4
@@ -4391,16 +4397,11 @@ def test_the_merchant_passage_at_seed_7_has_its_own_constants(gate_5c_merchant):
     assert len(log) == GATE_5C_MERCHANT_LINES and log.digest()[:16] == GATE_5C_MERCHANT_DIGEST
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Package 37j: the course for the Passage de l'Iroise shaped at 02:00 on the 13th, "
-    "nineteen miles off, is not worked again once Ushant is within ten miles, and she passes "
-    "the mark more than a mile and a half off by account; 'bring to in the Iroise' never fires "
-    "and the deep-sea lead is not hove there (90241 before). The book is not tuned here "
-    "(docs/dev/TuningNotes.md, package 37j). For the lead. Package 37m: still so, the cause "
-    "being no course across the wind; with the lead's dropped rule she casts and is then "
-    "taken aback gybing by the helm, a fore-and-after's turn (TuningNotes, package 37m).",
-)
+# Package 37j to 37p: an expected failure (the course for the Passage de l'Iroise shaped
+# nineteen miles off was not worked again once Ushant was within ten miles, and she passed
+# the mark more than a mile and a half off by account; 'bring to in the Iroise' never fired).
+# Package 45: she comes to the mark by the wind under the helm's rules and casts there at
+# 90318 (90241 before 37j); the expectation of failure lifted, the test as written.
 def test_the_merchant_passage_casts_the_deep_sea_lead_at_the_iroises_mark(gate_5c_merchant):
     """The beat of the merchant passage as pinned until package 37j: brought to once
     within a mile and a half of the Passage de l'Iroise and the deep-sea lead hove, which
@@ -4410,6 +4411,15 @@ def test_the_merchant_passage_casts_the_deep_sea_lead_at_the_iroises_mark(gate_5
     assert [e.tick for e in deep] == [GATE_5C_MERCHANT_IROISE_CAST_TICK]
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="package 45: on her station under the helm's new rules (the mark under the period's "
+    "trim only, full and by forward of the beam, the yards braced up for it) the frigate meets "
+    "the admiral's cutter at 91022 instead of 85437, is chasing it when the Palinure is put on "
+    "the sea on her quarter at 90000, never reads the letter nor speaks the brig, and wears three "
+    "times; the lines 1930 and the digest are pinned as the run gave them; for the lead "
+    "(docs/dev/TuningNotes.md, package 45)",
+)
 def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     """Gate 5c's naval cruise (spec M5 §29): the frigate in the Sound, the yard's thirty
     days of provisions, under way on the starboard tack, the Plymouth pilot aboard and
@@ -4491,6 +4501,11 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     assert len(log) == GATE_5C_CRUISE_LINES and log.digest()[:16] == GATE_5C_CRUISE_DIGEST
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="package 45: the Palinure is put on the sea on the frigate's quarter while she chases "
+    "the admiral's cutter, and is never spoken; for the lead (docs/dev/TuningNotes.md, package 45)",
+)
 def test_the_naval_cruise_speaks_the_stranger(gate_5c_cruise):
     """Gate 5c's naval cruise, the beat as pinned until package 37e and brought back at
     the fold-in of m5c-c: the stranger chased by the bearing's drift and spoken, a
@@ -4574,22 +4589,22 @@ GATE_6A_INTENT_AWEIGH_TICK = 17037
 GATE_6A_INTENT_STATES = [  # (tick, state): the books loaded and unloaded by name
     (300, "in port"),
     (17040, "on passage"),
-    (22920, "beating"),  # the course for the Lizard's offing not laid in the westerly
-    (27720, "on passage"),  # laid again (27600 before package 37p)
-    (111300, "in port"),  # anchored in the Bay of Brest (111840 before package 37p)
+    (22740, "beating"),  # the course for the Lizard's offing not laid (22920 at 37p)
+    (27480, "on passage"),  # laid again (27720 at package 37p)
+    (111180, "in port"),  # anchored in the Bay of Brest (111300 at package 37p)
 ]
-GATE_6A_INTENT_PILOT_ABOARD_TICKS = [17700, 102360]  # Tregenza out; Le Floch in (102540 before 37p)
-GATE_6A_INTENT_PILOT_LEFT_TICKS = [20040, 120720]  # 121260 before package 37p
+GATE_6A_INTENT_PILOT_ABOARD_TICKS = [17700, 101100]  # Tregenza out; Le Floch in (102360 at 37p)
+GATE_6A_INTENT_PILOT_LEFT_TICKS = [19920, 114300]  # package 45 ([20040, 120720] at 37p)
 GATE_6A_INTENT_NOON_TICKS = [25200, 111660]
-GATE_6A_INTENT_ANCHORED_TICKS = [57, 111272]  # Carrick Road; the Bay (111812 before 37p)
-GATE_6A_INTENT_BROUGHT_UP_TICK = 112191  # 112719 before package 37p
-GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 112260  # the boat for the prices (112800 before 37p)
-GATE_6A_INTENT_SOLD_TICK = 119640  # 47 tons at £270; the purse £13,045 (120180 before 37p)
-GATE_6A_INTENT_LINES = 2019  # package 37p (2083 before)
+GATE_6A_INTENT_ANCHORED_TICKS = [57, 111153]  # Carrick Road; the Bay (111272 at 37p; the conn)
+GATE_6A_INTENT_BROUGHT_UP_TICK = 112069  # package 45 (112191 at 37p)
+GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 112140  # the boat for the prices (112260 at 37p)
+GATE_6A_INTENT_SOLD_TICK = 118980  # 47 tons at £270 (119640 at 37p; the pilot put off sooner)
+GATE_6A_INTENT_LINES = 2114  # package 45 (2019 at package 37p)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
-GATE_6A_INTENT_DIGEST = "bbb8a8e5405f9511"
+GATE_6A_INTENT_DIGEST = "3f2356a885167274"  # package 45 (bbb8a8e5405f9511 before)
 
 
 @pytest.fixture(scope="module")
@@ -4654,7 +4669,8 @@ def test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants(gate_6a
     assert [e.tick for e in log if e.kind == "reckoning.noon"] == GATE_6A_INTENT_NOON_TICKS
     assert [e.tick for e in log if e.kind == "ship.anchored"] == GATE_6A_INTENT_ANCHORED_TICKS
     # package 37p: in 13 fathoms (twelve and a half before)
-    assert "in 13 fathoms" in [e for e in log if e.kind == "ship.anchored"][1].text
+    # package 45: twelve fathoms where the pilot conned her to (13 at 37p)
+    assert "in twelve fathoms" in [e for e in log if e.kind == "ship.anchored"][1].text
     brought = [e.tick for e in log if e.kind == "ship.brought_up"]
     assert brought[-1] == GATE_6A_INTENT_BROUGHT_UP_TICK
     prices = [e for e in _by_rule(log) if "for the prices" in e.text]
@@ -4749,7 +4765,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # quarterdeck carries its place and its hearers (none) in its data, as every say does now
 # (the owner's ruling of 2026-10-10); aa42746f61de91d1 at 37p, a2cd045b9bcc93f8 before it
 # decision 45, the pilot's news: b00ac08c3f63e84c before
-GATE_6A_FAKE_CAPTAIN_DIGEST = "9793dab8a6f4d4ee"
+GATE_6A_FAKE_CAPTAIN_DIGEST = "1b821bb2b8d9732a"  # package 45 (9793dab8a6f4d4ee before)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):

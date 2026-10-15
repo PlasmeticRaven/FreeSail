@@ -235,6 +235,11 @@ NO_WAY_KN = 0.5
 # passed abeam; the master's own order for the next course goes under a rule's actor
 # (not journaled, not the player's hand: a deterministic function of the course given).
 WAY_REACHED_NM = 2.0
+# A berth laid off a mark that is land or a danger (`way_hand` names the hand it is left on)
+# is not reached two miles short of it: the owner's note 11 of gate m6a-2 (the way turned
+# too early at marks near the coast and cut the corner toward the land); she comes up to it
+# within half a mile, or passes it abeam. Judgement.
+WAY_BERTH_REACHED_NM = 0.5
 WAY_ACTOR = "standing order 'the way by marks'"
 
 WAY_BY_EYE_GRAIN_KN = 0.5
@@ -2016,6 +2021,13 @@ class Navigation:
     # the mark the last bearing was taken of (package 37d), for a second of the same mark
     # crossed with it; a class default, so that a checkpoint from before loads with it
     _last_bearing_mark: str | None = None
+    # Package 45, the same: the way kept by marks (`set_way`), none in a checkpoint from
+    # before
+    way_mark: str = ""
+    way_target: Position | None = None
+    way_hand: str = ""
+    way_heading: float = 0.0
+    way_from: Position | None = None
     # Package 37e, each with a plain class default for the same reason. The master's
     # sailing directions, looked up at their first use; the traverse board's four states
     # (`_peg`: `_run_n` None is a board from before, counted the old way once); her drift
@@ -4502,7 +4514,8 @@ class Navigation:
         brg, dist = bearing_and_distance(here, self.way_target)
         along, _ = bearing_and_distance(self.way_from, self.way_target)
         passed = abs(units.wrap_pi(math.radians(brg - along))) > math.pi / 2.0
-        reached = dist <= WAY_REACHED_NM * units.NAUTICAL_MILE
+        within = WAY_BERTH_REACHED_NM if self.way_hand else WAY_REACHED_NM
+        reached = dist <= within * units.NAUTICAL_MILE
         if not reached and not passed:
             return
         mark, hand = self.way_mark, self.way_hand
