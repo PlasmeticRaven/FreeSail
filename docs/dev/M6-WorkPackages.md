@@ -1199,19 +1199,34 @@ adds to 45c and 43:
   stays M7b's), or the far-detail captains cannot be tested in play.
 - **The pilot's conn steered straight for a mark behind an island** (the schooner into
   Rochefort), and his first warning gave the deeper water to larboard where the entrance
-  lay to starboard. Two faults for 45c, reproduced from the owner's save: the conn must
-  follow the port's own track leg by leg, never a straight line to an inner mark; and the
-  hand in the warning is wrong in sign or in frame (from the ship's head, as a pilot
-  speaks). The owner's reading that `shape a course` only warns of land and does nothing
-  about it is right and is the planner's open item.
-- **`via` marks trigger miles short** even with a tight reckoning, and a reached mark must
-  then be struck from the standing order by hand. 45c: a mark counts as reached within a
-  mile (or passed abeam within a mile of the line), and reached marks drop from the list
-  by themselves, the log saying so.
+  lay to starboard. Two faults for 45c, reproduced from the owner's save. The owner's
+  refinement of 2026-10-15 on the first: a pilot who boards at any point cannot promise a
+  safe conn by steering for his track's next mark from wherever he is. The design: the
+  pilot's conn is the port's track from the pilot station inward, leg by leg; boarding
+  elsewhere, he first cons her to join the track (at the pilot station, or at the nearest
+  leg she is already inside of) by a joining leg laid with the captain's planner, which
+  clears headlands and dangers with the offing (`Planner`, `OFFING_NM`, `DANGER_BERTH_NM`),
+  and where no clear joining leg is found within the planner's rounds he says so and
+  keeps the conn only from the pilot station ("bring her to the station first, and I will
+  take her in"). The warning's hand is wrong in sign or in frame (from the ship's head, as
+  a pilot speaks). The owner's reading that `shape a course` only warns of land and does
+  nothing about it is right and is the planner's open item.
+- **`via` marks trigger miles short** even with a tight reckoning. 45c: the trigger's
+  radius only (a mark reached within a mile, or passed abeam within a mile of the line).
+  The rest is a design think, not a patch (the owner, 2026-10-15): the way `shape a course`
+  is used in play is a standing order that reshapes it on a cadence, and a `via` list under
+  such an order must be struck and rewritten by hand as each mark is reached, where
+  `via` on its own strikes them as they are passed. Whether a shaped course should be kept
+  by the master without a standing order (45 made the master keep the way for a `via`
+  course), and the standing-order form that follows, is for the orders review.
 - **The OpenRouter door's three-failure limit** was hit often by a free model (the runner
-  could not read a reply's shape; which shape is unknown). 45c: every unread reply is
-  written whole to the exchanges file so it can be diagnosed, and the common shapes a
-  free model returns (reasoning fields, a tool call written as text) are read.
+  could not read a reply's shape; which shape is unknown), and `--exchanges` wrote nothing
+  whatever path the owner gave it: the lead's reading of `api.py` is that the file is
+  wired into the API model only and not into the OpenRouter dialect's model, which is the
+  fault. 45c: the OpenRouter model keeps exchanges and writes the file as the API model
+  does, every unread reply written whole so it can be diagnosed, the common shapes a free
+  model returns (reasoning fields, a tool call written as text) read, and the `--help`
+  saying the file's form (a path outside the repository, appended to).
 - **`muster` works at the console and not in the browser**, and some of the console's state
   is not to be found in the browser. 45c: the browser takes `muster` and shows what the
   console's state view shows.
@@ -1221,9 +1236,11 @@ adds to 45c and 43:
   hails are.
 - **The ghosted boat** was the ship's own, ordered ashore as the anchor was being let go.
   45c reproduces it from the save.
-- **The stand-by misunderstood; models waking too often on long legs at 300x.** 45c: the
-  brief's words on the stand-by's forms made plain, with an "urgent only" stand-by named
-  as such; the owner expects the needs system (M7) to help in its own way.
+- **The stand-by misunderstood; models waking too often on long legs at 300x.** The owner,
+  2026-10-15: behavioural and by the model (a stand-by well used by one, a stack of eight
+  conditions by another, several conditions never used by a third though told it may; the
+  master the station that used several most). Not a patch beyond the brief's words made
+  plain; the owner expects the needs system (M7) to help in its own way.
 - **"Her sails lifting ... keep her away, or she will be taken aback"** misleads a model
   when the trim is the matter. 45c: the line names the cause when the yards are not trimmed
   for the course ("her sails lifting: the yards are not trimmed for this course; trim
