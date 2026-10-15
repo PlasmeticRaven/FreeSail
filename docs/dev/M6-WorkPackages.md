@@ -1251,6 +1251,14 @@ adds to 45c and 43:
   leg. The owner looks to the director for tailored moments, and to a local-model director
   for solo play.
 
+**A world order not shown as sent** (the owner's design note of 2026-10-15, decision 46):
+the play log the player and the stations read carries a world order's effects, never the
+order; the order stays in the full record for the director's view, the save and the
+replay. 45c: a line's visibility (the world-order channel's lines marked for the record
+only), the samples and the browser's play log leaving them out, the scenario file's world
+orders the same; a test with a letter sent by world order, seen in no sample before the
+boat brings it.
+
 **The groundwork for stations that multiply** (the owner, 2026-10-15: every stationed
 person with the same basic, non-hierarchical reach, tell and ask between any two, the
 movement, needs and domain orders to come; several stations of one kind on a ship, the
