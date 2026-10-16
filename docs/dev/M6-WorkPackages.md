@@ -1615,7 +1615,7 @@ cold read of each note, and where it goes:
 | 11, `via` triggering too early near the coast | 45's builder looks once at the trigger (a mark passed abeam or reached) at its hand-back; else 45c. | 45 or 45c |
 | 12, models shaping courses through the land | An observation; the primer has the words. The "line crosses land" message could refuse the course outright for a model station unless `via` or an offing is given: a judgement for 45c, said in the brief. | 45c, a judgement |
 | 14, the picture tools at the local runner | Where the runner's model reads an image (the local runner's API takes one for some models), the tools are offered; else the words as now. | 45c |
-| 15, a review of the orders system | A review, not a build: the vocabulary, the grammar, the duplication, the extensibility, with recommendations; the lead's own report in `docs/dev/`, before M7's orders are written. | M6's end, the lead's report |
+| 15, a review of the orders system | A review, not a build: the vocabulary, the grammar, the duplication, the extensibility, with recommendations. Deferred (the owner, 2026-10-16): a cold review by a Fable subagent if and when it is run, the director's milestone first. | deferred |
 | 17, the consent brief's stale sentence | True: the lookout, the master, stations speaking and the API door exist now. The brief is revised only by a package the spec names, with the re-asks: one revision at 43's end covers the model captain of another ship too. | 42b, after 43 |
 | 18, a hail to a nearby ship | The owner's clarification of 2026-10-15: a wish to hail another ship with a message, which is M7's (with signals) and the director's; not a feature now. What it showed is the groundwork below. | M7, M7b |
 | 19, signals and a hail syntax for rules-based captains | The rules-based captains' interaction is 43's; signals are a thread of M7 (combat) and noted there, with a hail syntax between captains in 43 if it falls out of the far-detail brain. | 43 in part; M7, noted |
@@ -1714,9 +1714,10 @@ is 45c's, as groundwork; the movement, the needs and the director's voice are M7
 **The plan for the rest of the milestone** (the owner's word of 2026-10-15: no package
 beyond 45c; the test battery stays as it is, the usage eaten): 45 finished and merged, gate m6a-2 not cut (the owner, 2026-10-15: folded into the
 milestone's last gate, his runs standing); 45c beside 43 (43 on Fable, 45c on Opus); then 43b and 44 on Opus
-together; then 42b (the consent revision, the re-asks the owner's) and the orders review
-as the lead's own report rather than a package; gate 6c with the regatta; the milestone's
-close, and the director's milestone next.
+together; then 42b (the consent revision, the re-asks the owner's); gate 6c with the regatta; the
+milestone's close, and the director's milestone next. The orders review is deferred (the
+owner, 2026-10-16): run, if and when, as a cold review by a Fable subagent, not by the
+lead; the owner's priority is to reach and if possible pass M7b.
 
 ## Packages 39c to 39f: the last four blocks of the chart line (the same files as 39a and 39b under each block's names; `data/scenarios/<block>.yaml` and `.orders` new per block; `docs/TechnicalSpec-M6.md` §26 as built; `docs/dev/TuningNotes.md`)
 
