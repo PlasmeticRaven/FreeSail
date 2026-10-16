@@ -17,9 +17,9 @@ the decisions of October grow it to five parts:
 - **7b-iii. The observed world:** a world with no player's ship, watched from the
   director's station with world orders; the player at a station on another ship; the
   replay of such a station from a save.
-- **7b-iv. People in places:** movement between places aboard and ashore, the player on the
-  shore; what is heard where; books drafted; the papers kept in a place; the equal reach
-  between stationed persons.
+- **7b-iv. People in places:** a person's place as an aspect of his state, aboard or
+  ashore, tied to what he can do there; the player on the shore; books drafted; the equal
+  reach between stationed persons. (Not a simulation of each place: the owner, 2026-10-16.)
 - **7b-v. Needs:** provisions and water consumed, hunger, thirst and fatigue in a few steps
   with the master's cautions, "stand by, asleep below until called", the hooks for M7's
   health.
@@ -208,8 +208,11 @@ player's (43's checkpoint carries the other ship whole; the acts are keyed by sh
 
 ### 14. Places and movement (`freesail/world/people.py`, `places.py` new; `data/people/*.yaml`; `data/ports/*.yaml`)
 
-The ship's places as M6 §2 named them (the quarterdeck, the deck, the tops, the cabin,
-the wardroom, below, the galley, the hold) become somewhere a person is and may go: `go to
+A place is an aspect of a person's state, not a simulation of its own (the owner,
+2026-10-16: "the goal of locations needn't be super deep simulation of each location, but
+just an aspect of each person's status, as well as tying in to the actions they can
+perform"). The ship's places as M6 §2 named them (the quarterdeck, the deck, the tops, the
+cabin, the wardroom, below, the galley, the hold) are where a person is and may go: `go to
 the cabin`, `go below`, `go on deck`, `go ashore` (by the boat, at a port's reach), `come
 aboard`; a person's place in his state and the muster; the player's place as a person's
 (the player is on the quarterdeck by default, may be in the cabin or ashore, and acts where
@@ -217,26 +220,21 @@ he is: the market only ashore or by the boat, the helm only on deck). A port's p
 ashore (the quay, the market, the counting house, the tavern, the pilots' office), each with
 what can be done there and who is found there (§8's people and the port's own).
 
-### 15. What is heard where (`core/events.py`; `harness.py`)
+### 15. What is heard where: dropped
 
-A word said in a place is heard in that place and the places that hear it (the quarterdeck
-hears the deck, the cabin hears neither but the knock at the door); the log a station
-reads carries what its person could hear and see from where he is for the routine and the
-notable, and everything urgent (the ship's safety is everyone's); the player's own log the
-same for his place, with the full log a reading apart (`the log` whole) so that nothing is
-lost to him. A word heard counts as "a word on deck" for the stand-bys (the owner's note
-15). **A step the owner called possibly too far; built behind one switch
-(`scenario.hearing: by place | all`), `all` the default until the gate says otherwise.**
+Locational knowledge (a station's log carrying only what its person could hear from where
+he is) is dropped as an overcomplication for now (the owner, 2026-10-16). Every station
+reads the log as it does today. One small thing stays from the owner's note 15: a word
+said between people and heard by another counts as "a word on deck" for the stand-bys.
 
-### 16. Books drafted, and the papers in their place (`freesail/agents/tools.py`; `data/papers/`)
+### 16. Books drafted (`freesail/agents/tools.py`; `data/papers/`)
 
 `draft a book "night orders": ...` writes a standing-orders sheet, a note for the ship's
 papers or a manifest to buy and sell several goods at once, as a book in the library with
 the person's mark, the record for the immersion and the use functional (the sheet becomes
-the standing orders when posted, the manifest the trade when given to the boat); the
-papers and the books kept in their place aboard (the cabin's desk, the master's chest, the
-purser's slops) so that reading one means being where it is or sending for it, behind the
-same switch as §15.
+the standing orders when posted, the manifest the trade when given to the boat). The papers
+kept in a place aboard, read only where they are, is dropped as an overcomplication for now
+(the owner, 2026-10-16): the library is read from anywhere, as today.
 
 ### 17. The equal reach (`tools.py`; `stations.py`)
 
@@ -248,10 +246,9 @@ place and watch.
 
 ### 18. Truths for 7b-iv
 
-- 100. A person who goes below is in the muster below and hears the deck's routine no
-  more with hearing by place; an urgent line reaches him; `go on deck` brings him back.
-- 101. The player ashore buys at the market in person; aboard, by the boat; the papers
-  read where they are.
+- 100. A person who goes below is below in the muster and the state; an order of the
+  deck's from him is refused in words until `go on deck` brings him back.
+- 101. The player ashore buys at the market in person; aboard, by the boat.
 - 102. A drafted manifest given to the boat trades its goods in one errand; a drafted
   night-orders sheet posted is the standing orders.
 
@@ -302,7 +299,7 @@ and the needs a model's person may have.
 One gate, the owner's runs on the playtest form: a directed quiet passage on a local model
 (the solo mode the owner looks to) and on a hosted model; the director's log read after;
 an observed world for a day with the business on; the player ashore at Falmouth and in the
-cabin; a drafted manifest's trade; a week's needs; the regatta's course with a director
+cabin (his place and what he can do there); a drafted manifest's trade; a week's needs; the regatta's course with a director
 seated above it. The lead's first play is at the director's station, as decision 39 held.
 
 ## 24. Packages (outline; the allocation)
@@ -320,9 +317,9 @@ In waves, written for the owner's approval in turn, each launched on his word:
 - **51 (Fable): the observed world** (§11, §12) after 50: the followed ship in place of the
   given one across the World, the player on another ship, the replay of a station there.
   Cross-cutting and design-heavy.
-- **52 (Opus): the director's voice** (§8, §9) and **what is heard where** (§15) after 50
-  and 53: people from words, `say as`, the asked unseated person answered by the director,
-  the hearing by place behind its switch.
+- **52 (Opus): the director's voice** (§8, §9) after 50 and 53: people from words, `say
+  as`, the asked unseated person answered by the director; the word heard counting as a
+  word on deck (§15).
 - **55 (Opus): the solo director and the gate's scenarios** after 51 and 52: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
