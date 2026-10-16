@@ -27,7 +27,7 @@ tuning notes and a report to the lead at the end.
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
 | 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | merged 2026-10-11 as committed so far (the owner's word, to play it) and 2026-10-15 whole, with every pin re-measured; the naval cruise's two truths strict expected failures for 45c; gate m6a-2 not cut |
 | 43b | Opus | The lugger and the smack; the world's business (spec §19) with the trade rumours; the ports' faults from 43 and 45c (the anchorage's let-go, the Goulet on a flood, Torbay's stream, the pilot's routine bearings) and the captain's beating flap | approved and launched 2026-10-16, beside 44 |
-| 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | approved and launched 2026-10-16, beside 43b |
+| 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | merged 2026-10-16; the trims kept, nine digests re-pinned for the lifting line's words |
 | 42b | Opus | The consent brief revised once for 6c: the stale sentence, a model as the captain of another ship kept across the switch, the director's seat, the regatta, the pictures; the re-asks the owner's | briefed 2026-10-16, to run after 43b and 44 |
 | 45c | Opus | Package 45's tail (the naval cruise restored, the chase, sail after the gale by steps, the pilot's conn through the Goulet and its design) and the owner's small fixes from gate m6a-2's runs (a picture put back by hand with a note, the ghosted boat and `--until`, the weather's cadence, the OpenRouter exchanges, `muster` in the browser, the unheld lookout, the sails-lifting line, the pictures at the local runner, a point of interest, world orders not shown as sent, the stations' groundwork) | merged 2026-10-16, the first of the two; the milestone's last new package |
 
@@ -1389,6 +1389,50 @@ measurement comes first (§19, the owner's rule).
 7. **Notes and spec**: §19, §20, §23 and §4 as built; the primer; the Harness note on a
    station on another ship; the tuning notes with the measurement, the range and the cap,
    and the trials' logs with two captains.
+
+## Package 44, as merged (2026-10-16)
+
+The builder's notes are the record (`docs/dev/TuningNotes.md`, its section; spec §21 and
+§22 as built; Harness §18). The regatta: a course file over a scenario, its own start
+orders, a finish (a place and a radius), a limit and marks rounded by a line laid to
+seaward; the agents `rules`, `fake`, `local`, `api` and `replay`; the score the time to
+the line with damage, groundings, fatigue and the purse; every run's log and row under
+`docs/playtests/regatta/<date>/<course>/` and the date's table rebuilt. The builder's ways,
+accepted by the lead: every agent under plain sail at the gun (the rules-based captain
+started under way with none set made none for a day); the model doors run inside the
+regatta's process at lockstep; a model refused before the gun without a standing consent
+record, no consent conversation begun; a model's name replaced by its kind before anything
+is written; the crossing's finish three miles round Bertheaume's road. The first table at
+seed 7: Ushant to Falmouth, the rules-based captain 14 h 46 m and the fake trimmed for the
+point 14 h 25 m, the fake under `trim sails` or no trim short and aground; Falmouth to
+Bertheaume, the captain 27 h 36 m, the fake short with ten groundings; Falmouth to Funchal,
+the captain 9.7 miles short with nine groundings under Machico (the planner across the
+land), the fake 906 short. **The trims by a point of sail are kept**, as "`trim sails` for the
+wind that point will give" rather than fixed brace steps (six, eight, twelve and sixteen
+points off), the side from the course the helm is steering for: a half-hour's miles made
+good after a turn 2.9 against 3.5, 2.3 against 2.9, aback against 2.4, 1.9 against 3.7 on
+the frigate; better in four turns of six on the schooner, worse hauling up from the quarter
+(she gripes with her sheets flat before she comes round), the caveat in primer 4; the
+lifting line reads "trim for close hauled, or keep her away", which alone moved nine
+digests, re-pinned. The parity tests: 78 readings, 302 verbs, 21 console commands, 17
+snapshot blocks and 16 tools enumerated; `muster` the one gap, closed; the clock, saving,
+loading, quitting, the world orders, the driver's verbs, the station-only tools and the
+stores' answers listed by design; the fake and the console give ten orders to one log.
+Suites: the slow tier over the truths, the trials and its files 165 passed, 8 expected
+failures, the 10 moved pins then written in; the fast tier 3,272; the pace tests 6.
+
+**The lead's decisions at the merge:** the trims, the flying start and the three-mile finish
+accepted; the whole logs kept but gzipped (the rows and the table plain), which 55's
+regatta runs follow; the consent revision (42b) names the regatta and the owner runs the
+re-asks before any model goes on a course.
+
+**Findings routed on:** the planner across the land (open, the milestone's known item;
+Machico, the Manacles and Keller); a `via` water mark struck as passed abeam 1,500 miles
+off and the next leg after a land berth laid across Keller (43b at its merge: a water mark
+passed only within two miles); the rules-based captain making no sail when he starts under
+way with none set (43b at its merge); the schooner's gripe with her sheets flat before she
+comes round (noted for M7's fine control); the agents race in copies of the course, never
+on one sea together (later); the scripted captain reads no warnings (as designed).
 
 ## Package 43, as merged (2026-10-16)
 
