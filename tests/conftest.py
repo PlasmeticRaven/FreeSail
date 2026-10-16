@@ -323,6 +323,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_ports.py::test_a_fast_ship_is_hailed_to_shorten_sail_and_the_boat_keeps_company_until_she_does",
         "test_ports.py::test_hail_the_pilot_hails_his_boat_in_sight_and_takes_him",
         "test_ports.py::test_the_pilot_is_put_off_at_the_anchor_and_the_pilotage_paid_once",
+        # package 43b: the owner's wardroom save replayed to the Goulet, twice
+        "test_ports.py::test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood[113000]",
+        "test_ports.py::test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood[114000]",
     }
 )
 

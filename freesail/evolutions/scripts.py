@@ -5770,10 +5770,57 @@ def _scope_warning(ship: Ship, anchor: Any, depth_m: float, scope_m: float) -> s
     return f"With {out} out she will swing {how} the land{where}."
 
 
+# The water a master wants under her keel at low water where he lets go (package 43b; the
+# trade trial's schooner decided in five fathoms by the chart and let go five minutes and
+# four cables on in two and a half, and took the ground aft riding to the ebb): a fathom,
+# judgement ("good ground" in the period's words is a depth she rides in at every state of
+# the tide; Falconer 1780, ANCHOR-ground: "neither too deep, too shallow, nor rocky").
+UNDER_KEEL_AT_LOW_M = units.FATHOM
+# Standing back for good water (package 43b): she is given this long to come back to the
+# water of the sounding that decided the anchorage before the let-go is refused.
+STAND_BACK_TIMEOUT_S = 600.0
+
+
+def too_little_water(ship: Ship, depth_m: float) -> str | None:
+    """The cast before the let-go (package 43b): 'the lead gives four fathoms and a half;
+    by the master's tide two fathoms at low water, and she draws eleven feet' when the
+    water the lead finds, less the fall the master reckons to low water (his own tide,
+    `_low_water_warning`'s), leaves her less than `UNDER_KEEL_AT_LOW_M` under her keel;
+    else None. With no master's tide to reckon by, None."""
+    world = _world_of(ship)
+    nav = getattr(world, "navigation", None)
+    fall = getattr(nav, "tide_height_by_master_m", None)
+    if fall is None:
+        return None
+    at_low = depth_m - float(fall())
+    draught = float(ship.hull.spec.draught_m)
+    if at_low >= draught + UNDER_KEEL_AT_LOW_M:
+        return None
+    feet = int(round(units.m_to_feet(draught)))
+    there = "no water" if at_low <= 0.0 else _depth_words(at_low)
+    return (
+        f"the lead gives {_depth_words(depth_m)}; by the master's tide {there} at low water, "
+        f"and she draws {feet} feet"
+    )
+
+
 class ComeToAnchorScript(_AnchorScript):
-    """Come to an anchor as Luce has it (data/evolutions/come_to_anchor.yaml)."""
+    """Come to an anchor as Luce has it (data/evolutions/come_to_anchor.yaml).
+
+    Package 43b (the trade trial's grounding, package 43's strict expected failure): the
+    lead is cast again before the let-go. Where the water, less the master's fall to low
+    water, leaves her under a fathom beneath her keel (`too_little_water`), the anchor is
+    not let go: she stands back for the water of the sounding that decided the anchorage,
+    her topsails and head sails sheeted home again, and rounds to there; a second cast as
+    short refuses the let-go in words, as a master would."""
 
     let_go_depth: float | None = None  # "in twelve fathoms": the depth to let go in, metres
+    # package 43b: where the anchorage was decided (the plane's metres) and its water, the
+    # sails taken in to round to, and whether she has stood back for good water once
+    decided_at: tuple[float, float] | None = None
+    decided_depth: float | None = None
+    rounded_in: tuple[str, ...] = ()
+    stood_back = False
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -5823,6 +5870,8 @@ class ComeToAnchorScript(_AnchorScript):
     def begin(self, words: dict[str, Any]) -> None:
         ship = self.ship
         depth = _water_depth(ship)
+        self.decided_at = (float(ship.dyn.x), float(ship.dyn.y))
+        self.decided_depth = depth
         if self.let_go_depth is not None and (depth is None or depth > self.let_go_depth):
             self.phase = "stand_on"
             self.phase_t = 0.0
@@ -5849,6 +5898,76 @@ class ComeToAnchorScript(_AnchorScript):
                 sl.state = SailState.IN_THE_GEAR
         if light or any(True for _ in lowest_square_sails(ship)):
             self.note("Haul taut! In studding sails, royals and topgallants; up courses.")
+
+    def _stand_back(self, short: str) -> bool:
+        """Too little water at the let-go (package 43b): the topsails and the head sails
+        taken in to round to are sheeted home again and she stands back for the water of
+        the sounding that decided the anchorage. False when there is no such place to go
+        back to (an anchoring with no sounding at its start)."""
+        if self.decided_at is None or self.decided_depth is None:
+            return False
+        if too_little_water(self.ship, self.decided_depth):
+            return False  # the water she decided in was as short: nothing to go back to
+        ship = self.ship
+        self.stood_back = True
+        self.phase = "stand_back"
+        self.phase_t = 0.0
+        set_again = []
+        for sid in self.rounded_in:
+            sl = ship.sails.get(sid)
+            if sl is not None and sl.state is SailState.IN_THE_GEAR and not sl.wrecked:
+                sl.state = SailState.SET
+                set_again.append(sl)
+        heads = [sl for sl in set_again if sl.cls == "jibheaded"]
+        if heads:
+            draw_sheets(ship, heads)
+        dyn = ship.dyn
+        dyn.helm_mode = HelmMode.HEADING
+        dyn.target_heading = self._bearing_to_decided()
+        dyn.steady = False
+        self.note(
+            f"Belay the anchor: {short}. Sheet home again; stand back for "
+            f"{_depth_words(self.decided_depth)}, where the lead called the ground good."
+        )
+        return True
+
+    def _bearing_to_decided(self) -> float:
+        assert self.decided_at is not None
+        dx = self.decided_at[0] - float(self.ship.dyn.x)
+        dy = self.decided_at[1] - float(self.ship.dyn.y)
+        return units.wrap_2pi(math.atan2(dx, dy))
+
+    def _standing_back(self, wind: Wind) -> None:
+        """Back for good water: rounded to again where the lead gives it, or at the place
+        of the sounding that decided; refused after `STAND_BACK_TIMEOUT_S`."""
+        ship = self.ship
+        assert self.decided_at is not None
+        dx = self.decided_at[0] - float(ship.dyn.x)
+        dy = self.decided_at[1] - float(ship.dyn.y)
+        depth = _water_depth(ship)
+        good = depth is not None and too_little_water(ship, depth) is None
+        if good or math.hypot(dx, dy) <= units.CABLE:
+            for sid in self.rounded_in:
+                sl = ship.sails.get(sid)
+                if sl is not None and sl.is_set:
+                    sl.state = SailState.IN_THE_GEAR
+            self.phase = "round_to"
+            self.phase_t = 0.0
+            self.heading_target = self._stronger(wind)
+            dyn = ship.dyn
+            dyn.helm_mode = HelmMode.HEADING
+            dyn.target_heading = self.heading_target
+            dyn.steady = False
+            self.note(
+                f"The lead calls {_depth_words(depth)}. Clew up; haul down the jib. Helm down for "
+                f"{units.point_name(self.heading_target)}."
+            )
+            return
+        ship.dyn.target_heading = math.atan2(dx, dy) % (2.0 * math.pi)
+        if self.phase_t >= STAND_BACK_TIMEOUT_S:
+            self.fail(
+                f"she could not get back to the water she decided in; {_depth_words(depth)} here"
+            )
 
     def _stronger(self, wind: Wind) -> float:
         """The heading to come to: the stream's if it runs stronger than
@@ -5891,6 +6010,7 @@ class ComeToAnchorScript(_AnchorScript):
                 # the topsails clewed up and the jib hauled down as she comes to; the
                 # spanker kept to bring her up (Luce p. 569); a lugger's dipping lugs lowered,
                 # her mizen kept (package 43b)
+                rounded_in = []
                 for sl in ship.sails.values():
                     if sl.is_set and (
                         sl.cls == "square"
@@ -5898,6 +6018,8 @@ class ComeToAnchorScript(_AnchorScript):
                         or (sl.cls == "lug" and sl.dipping)
                     ):
                         sl.state = SailState.IN_THE_GEAR
+                        rounded_in.append(sl.id)
+                self.rounded_in = tuple(rounded_in)
                 _belay_held_work(ship)  # the sail work waiting for hands finds no sail now
                 self.note(
                     f"Let go the topsail sheets; clew up; haul down the jib. Helm down for "
@@ -5911,6 +6033,12 @@ class ComeToAnchorScript(_AnchorScript):
             if way <= 0.3 or self.phase_t >= timeout:
                 if depth is None:
                     self.fail("no bottom here to anchor in")
+                    return
+                short = too_little_water(ship, depth)
+                if short and self.let_go_depth is None:
+                    if not self.stood_back and self._stand_back(short):
+                        return
+                    self.fail(f"{short}; too little water to let go in")
                     return
                 self.phase = "veer"
                 self.phase_t = 0.0
@@ -5933,6 +6061,9 @@ class ComeToAnchorScript(_AnchorScript):
                 _anchoring_warnings(
                     ship, self.anchor, depth, self.target, self.params.get("fathoms")
                 )
+            return
+        if self.phase == "stand_back":
+            self._standing_back(wind)
             return
         if self.phase == "veer":
             if self._veer(dt, factor, self.target, "veer_fathoms_per_s"):

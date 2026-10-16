@@ -1425,6 +1425,16 @@ def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_th
     assert conned and conned[0].text == "Helm ordered: steer N (0°)."
     said = [x.text for x in events(w, "order.accepted") if x.actor == PILOT_ACTOR]
     assert said[0] == "The pilot: steady as she goes; steer N for Falmouth outer road."
+    # package 43b: his routine corrections (under two points) are routine lines, a turn
+    # of two points and more is notable, as an order of the officer's would be
+    for x in events(w, "order.accepted"):
+        if x.actor != PILOT_ACTOR or "; steer " not in x.text:
+            continue
+        count = x.text.split("; steer ")[0].split()[-2]
+        if count == "2":
+            continue  # a point and a half and more is said as two, and is either
+        big = count.isdigit()
+        assert x.severity.value == ("notable" if big else "routine"), x.text
     kept_off = [s for s in said if "leaving the Black Rock to starboard" in s]
     assert kept_off
     # the outer road passed abeam (45c: beyond his mark along the leg), the Black Rock is on
@@ -1800,3 +1810,40 @@ def test_the_straits_ports_stand_on_the_blocks_marks_and_the_stances_of_three_na
     assert spaniard.ports.stance(spaniard.ports.ports["gibraltar"]) == "hostile"
     assert spaniard.ports.stance(spaniard.ports.ports["ceuta"]) == "open"
     assert spaniard.ports.stance(spaniard.ports.ports["tangier"]) == "neutral"
+
+
+WARDROOM_SAVE = (
+    "docs/playtests/2026-10-11-gate-m6a-owner-runs/saves/"
+    "captain-and-officer-wardroom-test-initial-save.json"
+)
+
+
+@pytest.mark.parametrize("until", [113000, 114000])
+def test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood(until):
+    """Package 43b, from the owner's wardroom save (data, loaded by the game's replay to
+    the tick): the pilot given the conn off Bertheaume on the flood with the wind at
+    north-west put her on the Mingan at a minute past one, his turn into the Goulet laid
+    from where she was with nothing for the flood setting her up onto the rocks. He
+    allows for the set before his turn now (`Ports._turn_high`: his aim held up to
+    windward of his mark by what the stream will set her on the leg, in clear water),
+    and she comes to his berth in the Bay of Brest with water under her."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    w, _report = replay.load_report(
+        WARDROOM_SAVE, ship_factory, replay_anyway=True, until_tick=until
+    )
+    assert w.clock.tick == until
+    assert w.submit("let the pilot take her in").kind == "port.conn"
+    least = math.inf
+    for _ in range(110):
+        w.run(60)
+        assert not w.ship.extra.get("aground"), w.clock.ship_time
+        depth = w.ship.extra.get("water_depth_m")
+        if depth is not None:
+            least = min(least, depth)
+        if events(w, "port.pilot_berth"):
+            break
+    berth = events(w, "port.pilot_berth")
+    assert berth and berth[-1].text.startswith("The pilot: this is the berth, the Bay of Brest")
+    assert units.m_to_fathoms(least) >= 9.0

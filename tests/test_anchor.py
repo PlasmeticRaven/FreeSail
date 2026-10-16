@@ -640,3 +640,22 @@ def test_her_draught_is_a_reading():
     assert R.REGISTRY.get("draught").kind == "depth"
     assert "her draught" in R.REGISTRY.words() and "what she draws" in R.REGISTRY.words()
     assert w.readings["draught"] == pytest.approx(w.ship.hull.spec.draught_m)
+
+
+def test_the_cast_before_the_let_go_refuses_water_the_masters_tide_leaves_too_little_of():
+    """Package 43b (the trade trial's grounding: she let go in four fathoms and a half on
+    the top of the tide and lay aground at low water): the lead's cast at the let-go,
+    less the fall the master reckons to low water by his own tide, must leave her a
+    fathom under her keel (`UNDER_KEEL_AT_LOW_M`), or the anchor is belayed and she stands
+    back for the water where the lead called the ground good (the script's own; the
+    trade trial in tests/test_captain_trials.py sails it)."""
+    from freesail.evolutions import scripts as S
+
+    w = road_world(SCHOONER)
+    fall = w.navigation.tide_height_by_master_m()
+    draught = float(w.ship.hull.spec.draught_m)
+    short = S.too_little_water(w.ship, draught + fall + 0.5 * S.UNDER_KEEL_AT_LOW_M)
+    assert short is not None and short.startswith("the lead gives ")
+    assert "at low water, and she draws " in short
+    assert S.too_little_water(w.ship, draught + fall + 2.0 * S.UNDER_KEEL_AT_LOW_M) is None
+    assert S.UNDER_KEEL_AT_LOW_M == units.FATHOM

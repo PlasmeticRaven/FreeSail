@@ -205,6 +205,26 @@ areas:
       strongest_h: -0.5
       judgement: [set, rates]
       source: "the hour is the period's own: Bowditch 1802's headland table, the Start, the current runs 2h 30m after high water, so its strength is half an hour before high water; the set and the rates are the world's rounded, JUDGEMENT"
+  # Package 43b (45c's finding, the owner's note 1): Torbay lay in the open Channel's area
+  # and ran its stream inside the bay, 1.3 knots at springs, where the bay between Hope's
+  # Nose and the Berry Head has next to none; the bay its own area, west of the line of the
+  # two heads.
+  - id: torbay
+    chart: channel-west
+    name: Torbay
+    polygon: [[50.390, -3.60], [50.390, -3.485], [50.475, -3.485], [50.475, -3.60]]
+    axis_deg: 20
+    spring_kn: 0.2
+    neap_kn: 0.1
+    phase_h: -3.0
+    source: "JUDGEMENT: the bay between Hope's Nose and the Berry Head, open to the eastward and three miles deep (Imray 1874, 'Tor Bay', pp. 67 to 68), out of the Channel's stream, which runs across its mouth; Imray gives the bay no stream, and the modern atlas's weak figure for the bay (under a quarter of a knot) is from memory, unverified; the axis along the line of the heads, the timing a harbour's"
+    book:
+      set: NNE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: no stream worth the reckoning within the bay (Imray 1874, 'Tor Bay', pp. 67 to 68, gives it none)"
   - id: scilly-and-lands-end
     chart: channel-west
     name: between Scilly and the Land's End

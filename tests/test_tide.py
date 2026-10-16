@@ -883,3 +883,21 @@ def test_the_straits_gauges_are_read_and_held_and_would_move_no_channel_position
         assert blended.constants_at(pos)[1] == tide.constants_at(pos)[1]
     _, own = blended.constants_at(gib)
     assert abs(own["M2"][0] - 0.307) < 0.02
+
+
+def test_torbay_is_its_own_water_with_next_to_no_stream(tide):
+    """Package 43b: Torbay was the open Channel's water and set a ship at anchor in
+    Brixham road by the Channel's knot and more; the bay is its own stream area now
+    (Imray 1874 gives it "little stream"), with a fifth of a knot at springs, while off
+    the Berry Head the Channel's stream runs as before."""
+    brixham_road = Position(50.410, -3.508)
+    torbay = Position(50.445, -3.545)
+    off_berry_head = Position(50.40, -3.44)
+    assert tide.area_at(brixham_road).id == "torbay"
+    assert tide.area_at(torbay).id == "torbay"
+    assert tide.area_at(off_berry_head).id != "torbay"
+    day = datetime(FULL_MOON_1805_06.year, FULL_MOON_1805_06.month, FULL_MOON_1805_06.day)
+    inside = max(tide.at(brixham_road, day + timedelta(hours=h)).stream_kn for h in range(25))
+    outside = max(tide.at(off_berry_head, day + timedelta(hours=h)).stream_kn for h in range(25))
+    assert inside <= 0.25 < outside
+    assert T.load_directions().by_id("torbay").spring_kn == 0.0
