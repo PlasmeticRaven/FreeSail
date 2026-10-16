@@ -79,6 +79,16 @@ def test_every_course_reads_and_says_its_start_finish_limit_and_agents():
     assert "funchal" in (funchal.ports or [])
 
 
+def test_a_course_may_be_sailed_in_another_ship(short_course):
+    """`ship:` in the course (or `--ship` for one run) puts another ship file on the same
+    course, so that a new hull sails it beside the others."""
+    course = RG.load_course(short_course.path)
+    course.ship = "data/ships/cutter.yaml"
+    world = RG.course_world(course)
+    assert world.ship.save_ref()["path"].endswith("cutter.yaml")
+    assert RG.course_world(short_course).ship.save_ref()["path"].endswith("frigate-36.yaml")
+
+
 def test_a_course_file_without_its_finish_is_refused_in_words(tmp_path):
     p = tmp_path / "bad.yaml"
     p.write_text("name: x\nscenario: data/scenarios/gate-5b-passage.yaml\ntime_limit_hours: 1\n")

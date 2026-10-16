@@ -16,8 +16,10 @@ the time, the weather, the people, the ports and the other sail; what is the sce
 own captain and not the course's (its book of standing orders and its first orders) is
 left out, and the course says instead what every agent is given at the gun
 (`start_orders`, the ship as she starts; `standing_orders`, a book every agent starts
-with) and may move the start (`start`: `at`, `position`, `heading_deg`, `speed_kn`) and
-the ports. A mark is rounded when her true track crosses the line laid from it to seaward
+with) and may move the start (`start`: `at`, `position`, `heading_deg`, `speed_kn`), the
+ports and the ship (`ship`, another ship file on the same course; `--ship` the same for one
+run, so that the lugger and the smack of package 43b may sail a course beside the others).
+A mark is rounded when her true track crosses the line laid from it to seaward
 (`ray_deg` for `ray_nm`); the finish is hers when her true position is within the radius
 of the place with every mark rounded in order. The truth is the judge's alone: nothing of
 it reaches an agent but what the readings already give.
@@ -135,6 +137,7 @@ class Course:
     intent: str
     fake: dict[str, list[str]]
     fakes: dict[str, dict[str, list[str]]] = field(default_factory=dict)
+    ship: str | None = None  # another ship file than the scenario's
 
 
 def _place(world: Any, words: str, where: str) -> tuple[str, Position]:
@@ -199,6 +202,7 @@ def load_course(path: str | Path) -> Course:
             name: {k: [str(x) for x in d.get(k) or []] for k in ("first", "each_glass")}
             for name, d in fakes.items()
         },
+        ship=str(raw["ship"]) if raw.get("ship") else None,
     )
 
 
@@ -227,7 +231,7 @@ def course_world(course: Course, intent: str = "") -> Any:
     sc.books = list(course.standing_orders)
     sf.standing_orders = list(course.standing_orders)
     sf.orders = list(course.start_orders)
-    world = make_scenario_world(sf, seed=course.seed)
+    world = make_scenario_world(sf, seed=course.seed, ship=course.ship)
     _name, course.finish = _place(world, course.finish_at, f"{course.path}, finish")
     for m in course.marks:
         m.name, m.position = _place(world, m.name, f"{course.path}, marks")
@@ -770,6 +774,7 @@ def main(argv: list[str] | None = None, *, out: Any = None, **door_kw: Any) -> i
     ap.add_argument("--agent", choices=list(AGENTS), help="who sails her")
     ap.add_argument("--fake", default=None, help="one of the course's other fakes, by name")
     ap.add_argument("--save", default=None, help="the replay agent's save")
+    ap.add_argument("--ship", default=None, help="another ship file on the course (one run)")
     ap.add_argument("--label", default="", help="the run's name in the table (never a model's)")
     ap.add_argument("--note", default="", help="a note for the table, under the course")
     ap.add_argument("--date", default=None, help="the date's folder (default today)")
@@ -790,6 +795,8 @@ def main(argv: list[str] | None = None, *, out: Any = None, **door_kw: Any) -> i
         ap.error("a course file, or --table DATE_FOLDER")
     try:
         course = load_course(args.course)
+        if args.ship:
+            course.ship = args.ship
         if args.start_save:
             say(f"The course at the gun, saved to {start_save(course, args.start_save)}.")
             return 0

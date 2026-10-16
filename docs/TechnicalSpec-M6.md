@@ -1348,8 +1348,9 @@ for honesty and the documentation for the models, and it is the first competitiv
 seed, the time, the pinned weather, the people, the ports and the other sail), leaves out
 what is the scenario's own captain (its book and its first orders), and says what every
 agent is given at the gun (`start_orders`, plain sail; `standing_orders`, none on the first
-courses), the start where it moves it (`start`: a time, a position, a heading, a speed),
-the finish (a chart feature or a position, and a radius), the limit and the marks. A mark
+courses), the start where it moves it (`start`: a time, a position, a heading, a speed;
+`ship`, or `--ship` for one run, another ship file on the same course), the finish (a chart
+feature or a position, and a radius), the limit and the marks. A mark
 is rounded when her true track crosses the line laid from it to seaward (`ray_deg` for
 `ray_nm`), so a ship that cuts inside it has not rounded it; the finish is hers when her
 true position is within the radius with every mark rounded in order. The judge
