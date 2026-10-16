@@ -23,7 +23,7 @@ tuning notes and a report to the lead at the end.
 | 42a | Opus | The consent brief revised once from 40's draft, describing in kind all of 6b and 6c that the rule watches; the watched sections pinned; the re-asks the owner's | merged 2026-10-10 (decision 42: the added sentences approved; the re-asks the owner's) |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | merged 2026-10-10 (stations bound at run time, a passenger station, the pace rule as one object the drivers share; no pin moved) |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart and the ship's view as images through the doors that carry one (the consent revision moved to 42a) | merged 2026-10-10 (the key from the credential store first; the acts beside the log; the pictures from the open page; OpenRouter on a mock only; thinking cannot be switched off on the current models, so no-effort is the model's default) |
-| 43 | Fable | Other ships with captains: the measurement first, the brain on the far body (the rules-based captain for the other ships), the crewed promotion and the guard, a model captain of another ship kept across the switch, the director's seat hook and the live world order | approved and launched 2026-10-16, beside 45c |
+| 43 | Fable | Other ships with captains: the measurement first, the brain on the far body (the rules-based captain for the other ships), the crewed promotion and the guard, a model captain of another ship kept across the switch, the director's seat hook and the live world order | merged 2026-10-16, with 45c merged in its worktree; the trade trial's grounding at the anchorage a strict expected failure for the lead |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
 | 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | merged 2026-10-11 as committed so far (the owner's word, to play it) and 2026-10-15 whole, with every pin re-measured; the naval cruise's two truths strict expected failures for 45c; gate m6a-2 not cut |
 | 43b | Opus | The lugger and the smack; the world's business (spec §19), with the trade rumours a boat brings back from the shore (the owner's note 24) | brief to write |
@@ -1388,6 +1388,56 @@ measurement comes first (§19, the owner's rule).
 7. **Notes and spec**: §19, §20, §23 and §4 as built; the primer; the Harness note on a
    station on another ship; the tuning notes with the measurement, the range and the cap,
    and the trials' logs with two captains.
+
+## Package 43, as merged (2026-10-16)
+
+The builder's notes are the record (`docs/dev/TuningNotes.md`, "Package 43: other ships
+with captains"; spec §4, §19, §20, §23, §24 and §27 as built; Harness §17; primer 15, 17,
+19). **The measurement**: a crewed ship costs most of her tick in the sails' forces (82 per
+cent in `compute_sail_forces`), the far bodies a sixth, the judgement under three per cent;
+twelve crewed ships gave 34 ticks a second on the slower machine and 56 on the faster, three
+gave 100 to 114 and 169; so the strategy is the horizon's with a cap: promoted within four
+miles (the rig made out), demoted beyond six, the cap three, a ship in dealings with the
+player (a chase, an investigation, within hail, for a glass) promoted before a nearer idle
+one and kept while the dealing lasts, never promoted at anchor, in port, running for shelter
+or in distress; truth 88 pins the floor of sixty with the cap full. **The brain on the far
+body** lives in `freesail/world/brains.py` (the truth-road proof on `captains.py` must keep
+holding; the shared judgement is a mixin): a perception from the vessel's own truth at the
+roll-up's cadence, every state resolved into a far plan, `intent:` on a scenario's ships and
+at the end of the `ship:` order, roles by description with a new `cruiser` doctrine, the
+stimuli `overmatched`, `stranger near` and `chase stale` with a given-up memory (the first
+trials had both captains chase and run for fifteen hours), one line in the log when two
+captains speak within the player's sight. **The promotion** is a World of her own from her
+file sharing the parent's chart, tide and weather, the state folded in and back and mirrored
+each minute. **The guard**: a captain's plan across the land refused at its making; a
+goal-only scripted ship's leg across the coast a warning printed with the scenario's lines,
+not a refusal (six of the recorded passages' dozen have such a leg no passage sees). **A
+station on another ship** (`--station captain --ship <id>` at every door) keeps across the
+switch: the full surface promoted, the plan layer's shape demoted with deck orders refused in
+words, the sample saying which; truth 89. **The seat hook**: `seat: <model> as captain of
+<ship> for <n> samples|hours` and `unseat:`, refused without a consent record, the scenario's
+`director:` grant or budget; **the live world order** `world: <order>` at the console prompt
+and the browser's order box, journaled, saved, replayed, kept for the record only (decision
+46). The trials with a brain in the stranger: the Palinure investigates, is made out, is
+overmatched and evades, the frigate gives up a stale chase and returns to her station; the
+Renard chases the schooner, which hauls off twenty-four times and loses her, beats up and
+anchors in Carrick Road on the evening ebb, **and takes the ground aft at 21:48**: the
+anchorage decided soundly in five fathoms, the bower let go five minutes and four cables
+later over two, a fault of the anchoring's domain, so the trade trial is a strict expected
+failure with its pins asserted first. Pins: the two stranger trials only, by design. Suites
+on the merged tree: the fast tier 3,255 passed; the truths' and trials' slow tier 102 passed,
+8 expected failures; the pace tests alone 6 with the cap full.
+
+**Open, for the lead or the owner:** (1) the let-go at the anchorage (a sounding at the
+let-go, or the way off her first), then the trade trial's expected failure lifted and
+re-pinned; (2) the beating rule and the passage rule trading the deck every two minutes as
+an evasion ends (45c's rule, on the merged tree); (3) the goal-only guard as a warning (the
+lead agrees); (4) the merchant passages' pace test ran in the fast tier and read the load:
+the lead has made every pace measurement slow as well as `pace`, so the fast tier measures
+none and the release runs them alone; (5) the player at `--seat captain --ship` and the
+replay of a station on another ship from a save are M7b's; (6) what 42b's consent brief must
+say is in the builder's report and the tuning notes (a model as the captain of another
+ship, kept across the switch; the director's seat by the owner's grant and budget).
 
 ## Package 45c, as merged (2026-10-16)
 

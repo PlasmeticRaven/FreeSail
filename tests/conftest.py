@@ -423,7 +423,11 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         if _is_slow(item):
             item.add_marker(pytest.mark.slow)
         if _is_pace(item):
+            # a pace measurement is never the fast tier's: under `-n` beside the other
+            # workers it reads the load (package 43's finding on the merchant passages'
+            # floor); the release runs them alone, after the rest
             item.add_marker(pytest.mark.pace)
+            item.add_marker(pytest.mark.slow)
     run_slow = (
         config.getoption("--slow")
         or "slow" in (config.getoption("markexpr") or "")
