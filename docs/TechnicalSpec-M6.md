@@ -1279,6 +1279,93 @@ pickler and `_rebind`); a save replays the promotions from the scenario, the bra
 the crewed Worlds being deterministic from the seed and her id. The world's business, the
 lugger and the smack are 43b's.
 
+**As built (package 43b, 2026-10-16; `tools/gen_ships.py`, `freesail/world/business.py`,
+`data/business.yaml`, `freesail/world/ports.py`, `freesail/evolutions/scripts.py`; the
+figures in `docs/dev/TuningNotes.md`, package 43b).** *The two hulls*, files from the
+generator beside the four: the **lugger** (`data/ships/lugger.yaml`), the chasse-marée
+*Éclair* of 1795 by Forfait's Table VII (her masts by her breadth, the main 3.455 B, the
+fore 2.759 B, the mizen 1.888 B; her yards by her length; the heels and rakes Fincham's),
+three lugs, the fore and the main dipping and the mizen a standing lug sheeted to an
+outrigger, a square topsail over the fore and the main, a jib and a flying jib on a running
+bowsprit, and the *taille-vent*, the main lug's storm canvas bent to its yard in its place;
+and the **smack** (`data/ships/smack.yaml`), the Culloden smack of 1746 with her spars by
+Steel's rules for a cutter (the mast in one 3.75 B, the boom two thirds of it, the gaff three
+fifths of the boom, the cross-jack three fifths, the topsail yard four fifths) and
+Holdsworth's well amidships (`hold.well_m3`, the schema's new key), on the cutter's rules.
+The lug was already a class of the sails' tables; what 43b adds is the **dipping lug**
+(`SailSpec.dipping`): on the weather side of its mast a lug sets against the mast and draws
+two thirds of its area (`physics.sails.against_the_mast`, judgement); the tack lowers the
+dipping lugs at `ready about` and dips them round the mast as she comes through the wind,
+not at once but in a minute and a half (`scripts.LugDip` in `TackScript`), the wear dips
+them as the wind comes aft, `dip the foresail` does it alone for a lug left against its mast
+(`data/evolutions/dip_lug.yaml`, lowered, shifted and hoisted, two minutes and a half), and
+she heaves to with her dipping lugs lowered, under her mizen and her jib (under the fore lug
+she forereached at near five knots). The lug's own evolutions are `set_lug`, `take_in_lug`,
+`reef_lug`, `shake_out_lug` and `trim_lug_sheet`; a lug yard is no braced yard
+(`Spar.is_yard`). The gybe is milestone 7's. The hierarchy truths of M5 §19 run over six
+vessels (`tests/test_ships_hierarchy.py`): the lugger lies nearest the wind of the six (44°,
+her best to windward at 52°), the smack (eight men; swept with all hands called, the watch
+alone too few to set her canvas in the sweep's time) sails as a small cutter.
+
+*The world's business* (`business.Business`; the figures and the names `data/business.yaml`,
+every one judgement). A scenario says `business: on`, `off` or a density; nothing said is
+off, and so are the recorded passages and the trials, whose saves and pins are as before
+(the Scenario's dict leaves the key out when off); the four merchant ships' free games say
+on. At the start, in the region the player starts in (`chart.region_at`), drawn under the
+World's own `business` stream (the far ships' sailing factors too, so that it moves no other
+draw): **traders** lying at the anchorages of the region's ports, their wait in port part
+done (`in_port_hours_drawn`), and at the region's edges bound in, each on a route from a
+port where a good is cheap to one where it is dear by the ports' market tables as of the
+day (`Market.price`, the ratio at least `price_ratio_least`, the better ratios the likelier),
+under her own nation's flag where both ports take it and else a neutral's both take, drawn;
+of those in port a third (`outward_bound_share`) load for a market beyond the region, their
+intent a mark five miles beyond an edge open to the sea; **fishermen**, a smack or a lugger
+of the port that sells fish nearest a ground (a `bottom` or `bank` feature of the chart in
+ten to eighty fathoms, two miles and more off the coast, its port within forty-five miles),
+whose intent `fish on <ground> for <hours> hours from <port>` (the new `fish` kind of
+`captains.read_intent`) is worked as a station of a mile and a half by the fisherman's
+doctrine (`data/captains/fisherman.yaml`, the merchant's thresholds, every book empty) and,
+the hours done, becomes `run home to <port>`; a fisherman is never crewed
+(`crews.FAR_ONLY_ROLES`), the spec's far detail in the business; **cruisers**, a sloop or a
+cutter of each nation at war on a station the cruiser's doctrine names for her
+(`data/captains/cruiser.yaml`, `stations:`, within the region). Once an hour of ship's time
+a trader may come in at an edge or sail from a port and a fisherman put out
+(`arrivals_per_hour`), up to `most_ships`. A ship whose business is done goes in at her
+port and is gone (the brains' own rule), or, bound beyond the region, is put out of the
+world a mile beyond its edge (`Business.tick`, "left at the edge"). The far-detail guard
+holds: a ship drawn in port is planned out by her port's track (`departing` in the vessel's
+spec), an arrival only from an edge point whose straight line to the port's approach is
+clear, a route whose plan the guard refuses is not drawn again that day, and a port whose
+own tracks the guard refuses at far detail is left out of the trade (Roscoff's track to sea
+past the Isle of Bas; St Mary's road behind the islands, the port having no inner track):
+the tracks' data, for the lead. Nothing of the draw is a line of the player's log;
+`Business.drawn` is the record the tests and the notes read. **The rumours** (the owner's
+note 24): where the business is on, the boat sent ashore for the prices brings back, a
+routine line after the list (`port.rumour`), two or three words of prices dear or cheap
+(by `rumours.ratio`) at the ports the market knows within `rumours.within_nm`, drawn from
+their tables as of the day and said as rumour. No price is moved by what is carried.
+
+*The ports' faults.* (a) **The let-go** (the trade trial's grounding): the cast at the
+let-go, less the fall the master reckons to low water by his own tide, must leave a fathom
+under her keel (`scripts.too_little_water`, `UNDER_KEEL_AT_LOW_M`), or the anchor is
+belayed and she stands back once for the water where the lead called the ground good at
+the decision, and rounds to there; with none, the evolution fails in words. (b) **The
+Goulet on the flood** (the owner's wardroom save, on the Mingan at one in the afternoon):
+the pilot allows for the set before his turn (`Ports._turn_high`): his aim held up to the
+side the stream sets from by what it will set her on the leg as she will lie (`_made_good_on`,
+her heading as near as she lies with a point's margin, the stream added), capped at three
+cables and kept in clear water, recomputed at each look until it holds. (c) **Torbay** is
+its own stream area (`data/tides/streams.yaml`, a fifth of a knot at springs; the
+directions' book gives it none), where it was the open Channel's. (d) **The pilot's
+words**: his corrections of under two points are routine lines, his turns of two points and
+more and his warnings as they were. *The beating flap* (the trade trial's captain trading
+`on passage` and `beating` every two minutes): one rule decides (`Judgement._course_verdict`,
+the course shaped against the wind of the minute, not laid nearer than her close-hauled
+angle and the shaping's half point, laid half a point freer, and between the two as it was),
+and the state moves on a verdict held the doctrine's `beating_dwell_minutes` (ten); and a
+friend made out in an investigation is a stranger no more (the business's cruiser had
+investigated a neutral lying in Roscoff every minute).
+
 ### 20. A model captain of another ship (`freesail/agents/`; `freesail/world/ships.py`)
 
 A station on another ship: `--station captain --ship <id>` seats a model as the captain of
