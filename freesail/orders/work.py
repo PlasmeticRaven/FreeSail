@@ -130,8 +130,19 @@ def execute(ship: Ship, order: grammar.Order, vocab: Vocabulary | None = None) -
                 f"'belay that' or 'belay all work'. {_listing(runner, work)}"
             )
         chosen, said = _named(ship, runner, work, text, vocab)
+    # the boat away from the side on her errand is no work of the deck's to belay (package
+    # 45c): she comes back when it is done; belaying her made her vanish from the water
+    away = [i for i in chosen if _boat_away(i)]
+    chosen = [i for i in chosen if not _boat_away(i)]
+    if not chosen:
+        raise OrderError(
+            "The boat is away from the ship on her errand; she comes back alongside when it "
+            "is done, and is no work of the deck's to belay."
+        )
     belayed = runner.belay(ship, chosen)
     text = _line(order.verb, belayed)
+    if away:
+        text += " The boat is away on her errand and comes back when it is done."
     data = {
         "verb": order.verb,
         "level": 1,
@@ -140,6 +151,13 @@ def execute(ship: Ship, order: grammar.Order, vocab: Vocabulary | None = None) -
         "subjects": [b["subject"] for b in belayed],
     }
     return "work.belayed", text, data
+
+
+def _boat_away(inst: Instance) -> bool:
+    """Whether the work is the boat's, begun and gone from the ship's side (package 45c)."""
+    if inst.evo.id != "send_boat" or inst.waiting or inst.script is None:
+        return False
+    return inst.script.phase not in ("ready", "hoist_out")
 
 
 def _line(verb: str, belayed: list[dict[str, Any]]) -> str:

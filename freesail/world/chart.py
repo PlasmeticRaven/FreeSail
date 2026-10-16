@@ -187,6 +187,14 @@ LAND_KINDS = frozenset({"headland", "island", "hill", "town", "place"})
 DANGER_KINDS = frozenset({"rock", "ledge", "drying"})
 
 
+# How far either side of a shoal ahead the pilot looks for the deeper water (package 45c;
+# judgement: a mile, the breadth of a road; `Chart.shoal_ahead`), and by how much the
+# deepest water on one side must pass the other's to be the channel (half a fathom, the
+# least the lead tells apart; judgement).
+SHOAL_SIDE_REACH_M = 10.0 * units.CABLE
+SHOAL_SIDE_MARGIN_M = units.fathoms_to_m(0.5)
+
+
 class ChartError(ValueError):
     """A chart that cannot be read, in words that name the file."""
 
@@ -1454,13 +1462,15 @@ class Chart:
         when: datetime,
         moonlit: bool = False,
         tide_m: float = 0.0,
+        extra: Any = (),
     ) -> list[Sighting]:
         """The features in sight from a height of eye: within the geographic horizon,
         within the weather's visibility, and by each feature's own rule; nearest first.
         A light at night by its luminous range in the weather (`luminous_range_nm`); the
         land on a moonlit night at `MOONLIT_LAND_NM` (package 33b); a danger only while
         the tide leaves its head above the water (package 34: the Black Rock shows at
-        half tide, the Penwin is awash at low water and covered after)."""
+        half tide, the Penwin is awash at low water and covered after). `extra` are
+        features of the world beside the chart's (a point of interest, package 45c)."""
         vis_nm = math.inf if visibility_nm is None else float(visibility_nm)
         eye_nm = horizon_nm(height_of_eye_m)
         night_land = MOONLIT_LAND_NM if moonlit else NIGHT_LAND_NM
@@ -1475,6 +1485,9 @@ class Chart:
             # a peak beyond the search's reach is judged by its own horizon (package 39e)
             ids = {f.id for f in candidates}
             candidates += [f for f in self.tall if f.id not in ids]
+        for f in extra:
+            if bearing_and_distance(pos, f.position)[1] <= reach_nm * units.NAUTICAL_MILE:
+                candidates.append(f)
         for f in candidates:
             seen_as = self._seen_as(f, daylight, year)
             if seen_as is None:
@@ -1614,27 +1627,56 @@ class Chart:
         step_m: float = units.CABLE,
         side_m: float = 2.0 * units.CABLE,
     ) -> tuple[float, float, int] | None:
-        """Where the water shoals ahead of her on a track (package 37h: the pilot's
-        warning of the depth, from the true chart): the first point a `step_m` apart along
+        """Where the water shoals ahead of her on a track (package 37h: the pilot's warning
+        of the depth, from the true chart): the first point a `step_m` apart along
         the line toward `toward_deg` for `distance_m` where the chart's depth with the
         tide's `tide_m` over it is less than `wants_m`, as (the distance along, the depth
         at the datum there, the side the deeper water lies: +1 starboard, -1 larboard, 0
-        neither, by the depth `side_m` either side of it); None when it does not shoal."""
+        neither); None when it does not shoal. The side is the channel's, read a cable at
+        a time out to `SHOAL_SIDE_REACH_M` either side (`_deeper_side`; package 45c: the
+        owner's schooner off the Isle of Aix was told the deeper water was to larboard, by
+        the depth two cables either side of the shoal, where the channel to the road of
+        Aix lay to starboard)."""
         steps = int(distance_m // step_m)
         for k in range(1, steps + 1):
             p = destination(pos, toward_deg, k * step_m)
             d = self.depth_at(p)
             if d is None or d + tide_m >= wants_m:
                 continue
-            starboard = self.depth_at(destination(p, toward_deg + 90.0, side_m))
-            larboard = self.depth_at(destination(p, toward_deg - 90.0, side_m))
-            s = -math.inf if starboard is None else float(starboard)
-            lb = -math.inf if larboard is None else float(larboard)
-            side = 0
-            if max(s, lb) > d:
-                side = 1 if s > lb else -1 if lb > s else 0
+            side = self._deeper_side(p, toward_deg, d, wants_m, tide_m, side_m)
             return k * step_m, float(d), side
         return None
+
+    def _deeper_side(
+        self, p: Position, toward_deg: float, d: float, wants_m: float, tide_m: float, side_m: float
+    ) -> int:
+        """The side of the line toward `toward_deg` through `p` where the deeper water
+        lies, as a pilot means it (+1 starboard, -1 larboard, 0 neither; package 45c):
+        the side whose deepest water within `SHOAL_SIDE_REACH_M` is the deeper by
+        `SHOAL_SIDE_MARGIN_M` or more (the channel, not the cable either side); where the
+        two are alike, the side where water that serves her lies nearest; else the deeper
+        of the two at `side_m`, the rule before."""
+
+        def depth(bearing: float, off: float) -> float:
+            got = self.depth_at(destination(p, bearing, off))
+            return -math.inf if got is None else float(got)
+
+        n = int(SHOAL_SIDE_REACH_M // units.CABLE)
+        star = [depth(toward_deg + 90.0, k * units.CABLE) for k in range(1, n + 1)]
+        lar = [depth(toward_deg - 90.0, k * units.CABLE) for k in range(1, n + 1)]
+        if max(star) - max(lar) >= SHOAL_SIDE_MARGIN_M:
+            return 1
+        if max(lar) - max(star) >= SHOAL_SIDE_MARGIN_M:
+            return -1
+        for s, lb in zip(star, lar, strict=True):
+            s_ok, lb_ok = s + tide_m >= wants_m, lb + tide_m >= wants_m
+            if s_ok != lb_ok:
+                return 1 if s_ok else -1
+        s = depth(toward_deg + 90.0, side_m)
+        lb = depth(toward_deg - 90.0, side_m)
+        if max(s, lb) > d:
+            return 1 if s > lb else -1 if lb > s else 0
+        return 0
 
     def line_shore(
         self,

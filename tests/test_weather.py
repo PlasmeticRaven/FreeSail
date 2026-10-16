@@ -223,21 +223,27 @@ def test_the_sector_table_gives_the_sky_the_weather_the_visibility_and_the_air_m
         assert c.visibility in W.VISIBILITY_WORDS and c.air_mass in W.AIR_MASSES
 
 
-def test_the_skys_noise_holds_for_a_watch_and_differs_between_watches():
+def test_the_skys_noise_holds_for_a_while_and_keeps_no_hour():
+    """The sky's noise makes the hours differ and holds for an hour and more at a time
+    (package 45c, the owner's note 20 of gate m6a-2: the change came on the four-hour mark
+    of the noise's blocks and showed; the blocks' edges are now jittered under the seed by
+    up to an hour and a half and the noise smoothed across them, so that no change lands
+    on the four-hour mark by habit)."""
     w = weather_with(low(x=0, y=500))
-    words = {
-        (
-            w.conditions_at(0.0, 0.0, T0 + timedelta(hours=h)).sky,
-            w.conditions_at(0.0, 0.0, T0 + timedelta(hours=h)).weather,
-        )
-        for h in range(0, 48)
-    }
-    assert len(words) > 1, "the noise makes two watches differ"
-    block = [
-        w.conditions_at(0.0, 0.0, T0 + timedelta(minutes=m)).sky
-        for m in range(0, 60 * W.SKY_NOISE_HOURS, 15)
-    ]
-    assert len(set(block)) == 1, "and holds for a watch"
+    changes = []
+    was = None
+    for m in range(0, 96 * 60, 5):
+        when = T0 + timedelta(minutes=m)
+        c = w.conditions_at(0.0, 0.0, when)
+        now = (c.sky, c.weather)
+        if was is not None and now != was:
+            changes.append(when)
+        was = now
+    assert len(changes) > 4, "the noise makes the hours differ"
+    on_the_mark = [t for t in changes if t.hour % W.SKY_NOISE_HOURS == 0 and t.minute == 0]
+    assert len(on_the_mark) <= 1, on_the_mark
+    gaps = [(b - a).total_seconds() / 60.0 for a, b in zip(changes, changes[1:], strict=False)]
+    assert min(gaps) >= 60.0, "and holds for an hour and more"
 
 
 def test_the_hooks_for_the_coast_are_inert_until_5b():

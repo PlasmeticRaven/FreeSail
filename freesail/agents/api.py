@@ -75,7 +75,15 @@ scanned for the key before it is written.
 The **OpenRouter dialect** (decision 31): `--dialect openrouter` speaks the
 chat-completions shape the local runner speaks (`OpenRouterModel`, a `LocalModel` with
 the key in its header), with its own key (the account `openrouter`, `FREESAIL_OPENROUTER_KEY`,
-`OPENROUTER_API_KEY`) and base URL.
+`OPENROUTER_API_KEY`) and base URL. Package 45c (the owner's interview of 2026-10-15: the
+three-failure limit hit often by a free model, and `--exchanges` writing nothing, the file
+having been wired into the API model alone): the dialect writes the `--exchanges` file as
+the API model does, every exchange appended as one JSON object a line, and a reply it
+cannot read is written there whole (or, with no file named, said whole at the terminal)
+with a few words of its shape (`local._shape_words`: an error served with its 200, the
+keys it had); the shapes a free model commonly returns are read (`local.calls_in_text`: a
+tool call written in the text; a content part marked as reasoning left out of the words;
+the completions form's `text`; an empty reply's finish reason said).
 
 Tested against a local HTTP server speaking the Messages API's shape
 (`tests/test_api_door.py`), never the API itself.
@@ -904,8 +912,8 @@ class OpenRouterModel(local.LocalModel):
     another model wrote not passed on."""
 
     def __init__(self, endpoint: str, key: str, **kw: Any):
+        self._key = key  # set first, so that the exchanges file is scrubbed of it
         super().__init__(endpoint, **kw)
-        self._key = key
         self.client.headers["Authorization"] = "Bear" + "er " + key
 
     def server_words(self) -> str:
@@ -991,7 +999,14 @@ def main(
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true")
     ap.add_argument("--handover-reserve", type=local.reserve_form, action="append")
-    ap.add_argument("--exchanges", default=None, help="a file the request and reply bodies go to")
+    ap.add_argument(
+        "--exchanges",
+        default=None,
+        metavar="FILE",
+        help="a file outside the repository that every exchange is appended to, one JSON "
+        "object a line ({'request': ..., 'reply': ...}: the bodies, never a header, the key "
+        "scrubbed), at either dialect; a reply the door cannot read is written there whole",
+    )
     args = ap.parse_args(argv)
     openrouter = args.dialect == "openrouter"
     account = OPENROUTER_ACCOUNT if openrouter else KEYRING_ACCOUNT
@@ -1049,6 +1064,7 @@ def main(
             max_reply=args.max_reply,
             timeout=args.request_timeout,
             say=show,
+            exchanges_file=args.exchanges,
         )
     else:
         model = ApiModel(

@@ -262,6 +262,10 @@ def lead_words(words: str) -> str:
 
 _ORDER = {"danger": 0, "sail": 1, "light": 2, "land": 3, "mark": 4}
 
+# The ids of the points of interest a world order puts in the world (`mark:`, package 45c;
+# `freesail.world.orders._mark`).
+INTEREST_PREFIX = "interest-"
+
 # The words the lookout's sail is asked for by (`find`), for a bearing of her (package 35).
 _SAIL_WORDS = frozenset(
     {
@@ -340,6 +344,31 @@ class Lookout:
     _ahead_notable: bool = False
     _ahead_urgent: bool = False
     _ahead_clear: int = 0
+    # package 45c (the chase): her own run through the water, east and north in metres,
+    # pegged at each look (once a minute) by her heading and her way, as the officer keeps
+    # his course and his log; a chase reads his own way across the line of sight from it
+    # between two bearings (`orders.navigation._chase_course`). A plain default, so that a
+    # checkpoint from before loads with it.
+    own_run: tuple[float, float] = (0.0, 0.0)
+    _run_tick: int | None = None
+
+    def peg_own_run(self, world: Any) -> tuple[float, float]:
+        """Her run through the water to now, pegged by the heading and the way since the
+        last peg (package 45c)."""
+        tick = int(world.clock.tick)
+        last = self._run_tick
+        self._run_tick = tick
+        dyn = getattr(getattr(world, "ship", None), "dyn", None)
+        if last is None or dyn is None or tick <= last:
+            return self.own_run
+        dt = float(tick - last)
+        way = float(dyn.u)
+        east, north = self.own_run
+        self.own_run = (
+            east + way * dt * math.sin(float(dyn.heading)),
+            north + way * dt * math.cos(float(dyn.heading)),
+        )
+        return self.own_run
 
     def look(self, world: Any) -> list[tuple[Severity, str, str, dict[str, Any]]]:
         """Look from the masthead now: the sightings kept for the reading, and the log's
@@ -349,6 +378,7 @@ class Lookout:
         pos = world.position
         if pos is None:
             return []
+        self.peg_own_run(world)
         if self._stream is None:
             rng = getattr(world, "rng", None)
             self._stream = rng.stream("lookout") if rng is not None else random.Random(0)
@@ -387,6 +417,7 @@ class Lookout:
             world.clock.ship_time,
             self.moonlit,
             tide_m=float(getattr(world, "tide_height_m", 0.0)),  # a rock covered (34)
+            extra=getattr(world, "marks_of_interest", ()),  # a world order's (45c)
         )
         # the shore itself, at every look (package 37d: it was looked for only when no
         # headland of the chart was in sight, so off any named coast the nearest land
@@ -539,6 +570,8 @@ class Lookout:
             # the shore read from the corridor or the world (package 38): the line says
             # which chart it was read from, at a headland's scale
             d["scale"] = s.feature.says
+        if s.feature.id.startswith(INTEREST_PREFIX):
+            d["description"] = s.feature.says  # a point of interest's (package 45c)
         return d | {
             "relative": relative_words(math.radians(s.bearing_deg) - heading_rad),
             "estimate": estimate_words(s.judged_m),
@@ -1015,6 +1048,10 @@ class Lookout:
             # a rock that covers and dries is "showing" when it is seen (package 34)
             showing = " showing" if s.feature.kind == "drying" else ""
             return f"{head}{showing} bearing {point}, distant {distance}: a danger."
+        if s.feature.id.startswith(INTEREST_PREFIX):
+            # a point of interest (package 45c): its description, where it lies from her
+            # head, its bearing and its distance, as the shore is said
+            return f"{head} {relative}, bearing {point}, distant {distance}."
         return f"{head} bearing {point}, distant {distance}."
 
     # -- for the bearing taken (package 33a, spec M5 §13, §15) ---------------------------

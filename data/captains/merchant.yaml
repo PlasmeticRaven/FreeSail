@@ -44,6 +44,14 @@ thresholds:
   # abates, sail should not be made upon the vessel too rapidly'; the half hour judgement).
   sail_again_kn: {value: 25, source: "the gate day's book's twenty-five knots for half an hour (package 37p); judgement"}
   sail_again_minutes: {value: 30, source: "as above; halved when the glass is rising"}
+  # Package 45c: by steps, the captain's own (freesail/world/captains.py `_weather_work`):
+  # the topsails as they stand reefed when the wind has been under `shorten_sail_kn` this
+  # long; the topgallant masts swayed up, the reefs out and the jib at the line above;
+  # the rest of the plain sail, the courses last, this much longer under it and the reefs
+  # out (Luce 1884 ch. XXIX p. 479; the minutes judgement). Plain sail at once had the
+  # frigate aback by turns for an hour.
+  topsails_again_minutes: {value: 10, source: "as gale_over_minutes: a lull is not the gale's end; judgement"}
+  courses_again_minutes: {value: 15, source: "the courses last, a quarter of an hour after the rest; judgement"}
   # The glass (item 6): the weather is worsening when the glass falls fast or the wind has
   # risen by `worsening_wind_kn` within the hour, mending when the glass rises or the wind
   # has eased by `mending_wind_kn`; worsening brings the gale rows `worsening_sooner_kn`
@@ -75,12 +83,13 @@ books:
     # rapidly"; the gate day's book's twenty-five knots for half an hour, judgement): in
     # the captain's trials the frigate kept her station all the afternoon after the gale
     # under the close-reefed main topsail alone, aback by turns
-    - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
+    # package 45c: sail after the gale is the captain's own, by steps (thresholds above)
     - 'standing order "the pilot boards": at the pilot''s hail then take in the {light_sail}; take the pilot'
     - 'standing order "the pilot aboard": at the pilot aboard then set plain sail'
     - 'standing order "the pilot put off": at the pilot asks to be put off then heave to'
     - 'standing order "the pilot off": at the pilot off then fill away'
-    - 'standing order "under way again": at filled away then set plain sail'
+    # package 45c: not in a blow; after a gale the captain makes sail by steps
+    - 'standing order "under way again": at filled away, if the true wind is under {sail_again_kn} knots then set plain sail'
   beating:
     - 'standing order "the leg": every glass, if the distance to {mark} is over {reached} miles then shape a course for {mark}'
     - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
@@ -93,7 +102,7 @@ books:
     # rapidly"; the gate day's book's twenty-five knots for half an hour, judgement): in
     # the captain's trials the frigate kept her station all the afternoon after the gale
     # under the close-reefed main topsail alone, aback by turns
-    - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
+    # package 45c: sail after the gale is the captain's own, by steps (thresholds above)
   hove to for weather:
     - 'standing order "bearings hove to": every glass, if the land is in sight then take a bearing of the land; take a fix'
     # package 37p: the gale's lines while she lies to (Luce 1884, ch. XXIX, 'Reducing Sail

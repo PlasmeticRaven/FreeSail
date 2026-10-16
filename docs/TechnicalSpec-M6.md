@@ -393,6 +393,49 @@ notes (package 45). Not built: the station's circle through the land is still me
 "the offing" line and not by a mark round it; after the gale the frigate under plain
 sail by the wind is aback by turns for an hour (the tuning notes, and M5 §33).
 
+**As built (package 45c, 2026-10-16; package 45's tail).** *Sail after the gale, by steps*
+(`Captain._weather_work`, the thresholds `topsails_again_minutes` and
+`courses_again_minutes` in every doctrine): the topsails set when the wind has been under
+his shorten-sail line ten minutes; under `sail_again_kn` (twenty-five) for
+`sail_again_minutes` (half an hour, a quarter with the glass rising) the topgallant masts
+swayed up only with the land not under her lee within `lee_shore_nm` (else when it is no
+longer, said so), the reefs shaken out, a blown head sail bent anew and the jib set; the
+courses last, `set plain sail` a quarter of an hour after the reefs are out (`Perception.
+topsails_all_set`, `courses_set`); the book lines that made all sail at once are gone, and
+the hove-to book's "under way again" sets plain sail only under the sail-again line. A
+King's ship keeping station is put about for `land ahead` and `land close ahead` (the lee
+shore trial ran on at dusk under plain sail at seven knots past both cries). *The chase*
+(`orders.navigation._chase_course`; the rule in `data/captains/kings-ship.yaml`): `give
+chase` takes a stranger in sight first and keeps the chase in hand only while she is one (the
+admiral's cutter, her colours made out and her letter read, was chased two hours more with
+the Palinure in sight); the lead is
+reckoned from the chase's drift across the line of sight and the chaser's own way across
+it from her run between the two bearings (`Lookout.own_run`, pegged each look), capped at
+seventy degrees (`CHASE_LEAD_MAX_DEG`; forty-five left a brig crossing at her own speed
+ahead of her); a bearing drawn more than `CHASE_CROSSED_DEG` (forty-five) since the last is
+a chase that has crossed, and the course is laid for her bearing again. *The pilot's conn*
+(`world/ports.py`): Brest's `tracks: in` pricked again for the true channel from the
+chart's soundings, north of the Mingan and the Fillettes in eight fathoms and more
+(`data/ports/brest.yaml`, the merchant passage's book keeping its own points); his conn is
+promised only along his track from his station inward (`inward_track`, `_joined_track`):
+at the station or inside a leg from there, else by a clear line to the first mark of the
+track ahead of her (the station or one beyond it), else by a joining leg round the land laid with
+the captain's planner in the pilot's own offing and berth (`Planner.clear` and
+`_round_headland` with `offing_nm`, `berth_nm`, `end_skip_m`; `PILOT_JOIN_OFFING_NM`,
+`PILOT_JOIN_BERTH_NM`), and where none is clear within the planner's rounds he says "bring
+her to the station first, ... and I will take her in"; leg by leg he cons for a point on
+the leg two cables ahead of her (`_along_the_leg`), takes up the next leg when she is
+beyond his mark (`_beyond_the_leg`), keeps her off only a danger his line runs over and no
+farther than his mark, allows for the stream across his line (`_for_the_stream`), cons no
+nearer the wind than she lies (`_as_she_will_lie`, "as near as she will
+lie"), and has the yards trimmed at his word for a turn of two points and more
+(`PILOT_TRIM_POINTS`). *His warning's hand*: the deeper side of a shoal ahead is the
+channel's, read a mile either side by half a fathom's margin
+(`chart._deeper_side`), and the hands are named from the ship's head
+(`ports._warn`); at the owner's place off the Isle of Aix it reads to starboard, where the
+old two-cable rule read to larboard. The figures, the Goulet's proof from the owner's
+wardroom save and the cruise's finding are in the tuning notes (package 45c).
+
 ### 5. The officer's own reckoning (`freesail/world/reckoning.py`; `freesail/agents/tools.py`)
 
 G19's small step, true to the period: an officer may keep a reckoning of his own from the
@@ -756,6 +799,23 @@ work, and the pace rule moved no tick of any recorded passage (no pin moved).
   its own journal (truth 85's first half; the transcript-driven replay on a build whose
   sampling differs is package 42's).
 
+**As built (package 45c, 2026-10-16; the owner's notes of gate m6a-2).** *Stations that
+multiply, the groundwork*: the ship file's `stations:` takes a kind beside the holder where
+the name is not the kind's (`second officer: {kind: officer of the watch, holder: second
+lieutenant}` on the frigate; `people.Wardroom.kinds`, `world.stations._file_kinds`); the
+doors seat a station by its name, its brief and authority the kind's; the journal is keyed
+to the person who holds the station (`agents.journal.journal_of`, `World.person_journals`),
+not to the station's name, so that a person moved keeps his own and two of a kind keep
+theirs apart (`tests/test_wardroom_doors.py`, two officers on the frigate). *The lookout
+unheld*: `ask the lookout` and `tell the lookout` with nobody at the station are answered by
+the ship's own masthead from the readings by the rules (`orders.stations._the_masthead_
+answers`), as its hails are. *The browser's order box* answers `state`, `muster`, `the sail
+room` and `the booms` as the console does, a line for the player that is not the log's
+(`ui.server.Driver._console_query`). *The local runner's pictures*: `chart` and `ship_view`
+offered where the runner's model reads an image, detected from the server (`/props`
+modalities, Ollama's `/api/show` capabilities) or declared (`--pictures yes|no`), the
+picture sent as an image part after the tool's result (`agents.local.LocalModel`).
+
 ### 12. The pace rule (`freesail/ui/server.py`, `core/world.py`; `freesail/agents/harness.py`)
 
 The owner's testing setting, built as the default (his ruling 2): **the clock slows to
@@ -900,6 +960,24 @@ not re-sent, and the shelf-life (three of the model's turns after the one it was
 in) was found to stand: a picture is seen in three requests before it goes back. The
 draw's figures are in `docs/dev/TuningNotes.md` (package 45).
 
+**As built (package 45c, 2026-10-16; the owner's notes 2, 4 and 16 of gate m6a-2).** *A
+picture is put back by the model's hand only*: the shelf-life passes it by
+(`Harness._shelf_life`), so it stays until the model shelves it; `shelve` takes a `note`,
+kept with the picture's book (`Book.note`) and on its stub with the time it was drawn ("A
+picture: put back the chart at 05:50 ... (book 3); seen: <the note>. It was shown to you
+here and put back at your word ..."; with no note the stub says none was written), and in
+the transcript's `door_act` entry, so that a replay puts it back with the same words; the
+brief's shelf words tell the model to write in its journal before it shelves one
+(`agent.SHELF_WORDS`). The real-browser test (`tests/test_pictures.py`) runs one turn more:
+the journal written, the picture shelved with its note, the stub read back. *The
+OpenRouter dialect's exchanges* (the interview): `--exchanges FILE` writes there as the
+Anthropic dialect does, one JSON line a request (`request`, the body with no header and no
+key, `status`, `reply`), appended, the file outside the game's folder as `--help` says; a
+reply the door cannot read is written there whole and its shape said in the terminal; the
+free models' common shapes are read (`local.REASONING_PARTS`, the `reasoning` field beside
+empty content; `local.calls_in_text`, a call written in the text as a tag, a fenced block
+or the reply's whole object; empty content with its finish reason said).
+
 ### 14. The replay driven by the transcript (`freesail/core/replay.py`, `freesail/agents/harness.py`)
 
 Decision 36 left it for this milestone: a replay promised on any build. Today a station's
@@ -963,6 +1041,13 @@ stand-by on two conditions, the master's figure adopted at noon and the passenge
 unbound under its fake: both roads to the log that was played and its journals, and the
 acts' road on a build that samples each station at every other glass
 (`tests/test_replay.py::test_five_stations_of_the_wardroom_replay_by_their_acts_on_a_build_whose_sampling_differs`).
+
+**As built (package 45c): a save loaded to an earlier tick** (the owner's note 3 of gate
+m6a-2). `--load SAVE --until TICK` at the console and the browser's server
+(`replay.load_report(..., until_tick=)`): the save's checkpoint is passed by (it is the
+end's), the world replayed by its acts to the tick and handed over there, the report saying
+it was loaded short of its end; a tick outside the save, or `--until` without `--load`, is
+refused in words (`tests/test_replay.py`).
 
 ### 15. Consent: one revision for 6a and 6b (`docs/agents/ConsentBrief.md`; `docs/agents/consent/`)
 
@@ -1161,6 +1246,20 @@ stand-down with the director's note). The budget is the owner's setting: how man
 seats the director may hold at once and in a voyage. A model seating a model is a kind of
 thing the consent brief must say (§15 names it for the re-ask with the rest). Nothing else
 of the director is built here.
+
+**As built (package 45c, 2026-10-16).** *A world order not shown as sent* (decision 46):
+the channel's line (`world.order`) is for the record only (`core.events.RECORD_ONLY_KINDS`,
+`for_the_record`): kept in the log, the save and the digest, left out of every station's
+sample, its `read_log`, and the browser's play log and `/api/log`; a scenario file's world
+orders the same; a letter sent by world order is seen in no sample before the boat brings it
+(`tests/test_agents.py`). *A point of interest* (the owner's note 23): `mark: <description>
+at <place or position>`, from a scenario file or the harness, puts a feature of the world
+(`World.marks_of_interest`, never the shared chart's) that the lookout sees as a mark is
+seen, by day and twilight at a mark's height (`orders.MARK_HEIGHT_M`), its line its
+description, where it lies from her head, its bearing and its distance ("A wreck, her masts
+showing above the water abeam to larboard, bearing E, distant three miles."); saved and
+replayed as every world order is, refused at the captain's prompt (`tests/
+test_world_orders.py`).
 
 ### 24. Truths for 6c (behavioural)
 

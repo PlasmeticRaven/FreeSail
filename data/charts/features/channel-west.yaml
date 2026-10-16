@@ -2021,10 +2021,11 @@ features:
     kind: anchorage
     name: the Bay of Brest
     modern: Rade de Brest
-    lat_deg: 48.32500
-    lon_deg: -4.46000
+    lat_deg: 48.33500
+    lon_deg: -4.49000
     height_m: 0
     depth_fathoms: 12
+    fix: "package 45c: moved from 48.325 N 4.46 W, where the chart's own soundings give two fathoms off the Plougastel shore, to the open bay a mile and a half south-east of the town in twelve, as Faden's 8, 10 or 16 fathoms on mud and the feature's own depth say; the pilot's conn ended his track on the shoal"
     bottom: "mud"
     source: "Faden 1793, 'Bay of Brest', p. 57: within the Bay of Brest you anchor where you please in 8, 10 or 16 fathoms, muddy ground; high water at half after four, the sea rising 5 fathoms French measure"
     says: "Within the Bay of Brest you anchor where you please in eight, ten or sixteen fathoms on mud; it is high water at half after four and the tide rises five fathoms."

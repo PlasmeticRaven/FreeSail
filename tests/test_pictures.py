@@ -10,8 +10,10 @@ seated twice: through the API door against the fake Messages API server
 `chart` and `ship_view`, and the test proves **at the far end** (the request body the fake
 API received; the MCP result's content) that an image block arrived whose PNG decodes to the
 size the tool said and is not blank: the pixels' standard deviation above a floor and dark
-strokes present (the coast's ink, the hull and the spars). The first turn, and then the next
-after the model shelves the picture, whose stub must tell it what it saw.
+strokes present (the coast's ink, the hull and the spars). The first turn; the next, when the
+model journals what it saw and the pictures are still sent (package 45c: a picture goes back
+by the model's hand only); and the one after it shelves them with a note, whose stub must
+keep the note and the time the picture was open.
 
 Skipped cleanly where Playwright, its browser or Pillow (which decodes the PNG) is missing.
 """
@@ -227,11 +229,13 @@ def test_the_api_door_shows_the_model_the_chart_and_the_ships_view_and_the_stub_
     monkeypatch, tmp_path, game: LiveGame, page
 ):
     """The first turn asks `chart` and `ship_view`: the next request carries two image
-    blocks, each a PNG of the size the tool said, not blank. The model then shelves them
-    (as the owner's captain did), and the request after that carries their stubs in the
-    pictures' place: a stub says plainly what the picture was and that it was shown, so a
-    model reading its own history does not conclude it never saw one (the owner's reading
-    of his transcript, 2026-10-11)."""
+    blocks, each a PNG of the size the tool said, not blank. The model journals what it
+    saw, and the request after that still carries both pictures (package 45c: none goes back
+    by itself; the owner's notes 2, 4 and 16 of gate m6a-2). The model then shelves them
+    with a note, and the request after that carries their stubs in the pictures' place: a
+    stub says plainly what the picture was, that it was shown, the time it was open and the
+    model's note, so a model reading its own history does not conclude it never saw one
+    (the owner's reading of his transcript, 2026-10-11)."""
     fake_store(monkeypatch)
     replies = [
         {"content": [_call("answer", text="Yes, I am willing.")]},
@@ -242,7 +246,13 @@ def test_the_api_door_shows_the_model_the_chart_and_the_ships_view_and_the_stub_
                 _call("ship_view", facing="leeward"),
             ]
         },
-        {"content": [_text("The Manacles on the quarter."), _call("shelve", book="all")]},
+        {"content": [_call("journal", note="The chart and the ship: the Manacles astern.")]},
+        {
+            "content": [
+                _text("The Manacles on the quarter."),
+                _call("shelve", book="all", note="the Manacles on the quarter, her sails full"),
+            ]
+        },
         {"content": [_text("Looking back over what I was shown.")]},
         {"content": [_call("stand_by", until="a glass")]},
     ]
@@ -297,9 +307,20 @@ def test_the_api_door_shows_the_model_the_chart_and_the_ships_view_and_the_stub_
         measured[what] = must_be_a_picture(data, pic["width"], pic["height"], what)
         assert f"{pic['width']} by {pic['height']} pixels" in words
     print("the pictures through the API door:", measured)
+    # the journal's turn: both pictures are still in the conversation (none went back by
+    # itself)
+    kept = [
+        b
+        for m in bodies[3]["messages"]
+        if m["role"] == "user" and isinstance(m["content"], list)
+        for b in m["content"]
+        if b.get("type") == "tool_result" and image_blocks(b["content"])
+    ]
+    assert len(kept) == 2, json.dumps(bodies[3]["messages"])[-800:]
     # after the shelving, the next request holds each picture's stub in its place, no
-    # image, and the stub says what it was and that it was shown
-    after = bodies[3]["messages"]
+    # image, and the stub says what it was, that it was shown, the time it was open and
+    # the model's note
+    after = bodies[4]["messages"]
     stubs = [
         b
         for m in after
@@ -311,6 +332,8 @@ def test_the_api_door_shows_the_model_the_chart_and_the_ships_view_and_the_stub_
     assert not image_blocks(stubs[0]["content"])
     stub = text_of(stubs[0]["content"])
     assert "shown to you" in stub and "put back" in stub, stub
+    drawn = next(n for n in note if n["view"] == "chart")["stamp"]
+    assert drawn in stub and "seen: the Manacles on the quarter, her sails full" in stub
     ship_stubs = [
         b
         for m in after
@@ -319,8 +342,9 @@ def test_the_api_door_shows_the_model_the_chart_and_the_ships_view_and_the_stub_
         if b.get("type") == "tool_result" and "ship" in text_of(b["content"]).lower()
     ]
     assert ship_stubs and "shown to you" in text_of(ship_stubs[0]["content"])
-    # the brief tells the station what a shelved picture is
-    assert "shelved picture" in bodies[1]["system"][0]["text"].lower()
+    # the brief tells the station what a picture put back is, and to journal it first
+    brief = bodies[1]["system"][0]["text"].lower()
+    assert "never goes back by itself" in brief and "write in your journal" in brief
     assert KEY not in out
 
 

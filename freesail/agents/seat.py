@@ -50,7 +50,7 @@ from freesail.agents.agent import (
     station_name,
 )
 from freesail.agents.harness import Harness
-from freesail.agents.journal import Journal
+from freesail.agents.journal import Journal, journal_of
 from freesail.core.events import Severity
 from freesail.orders.errors import OrderError
 
@@ -161,7 +161,7 @@ class PlayerSeat:
         self.agent = AgentState(self.station, session_kind=SESSION_PLAY)
         self.agent.stationed_tick = world.clock.tick
         self.agent.last_heard_tick = world.clock.tick
-        self.journal: Journal = world.agent_journals.setdefault(name, Journal(name))
+        self.journal: Journal = journal_of(world, name)  # the person's (package 45c)
         self.model_name = "the player"
         self.door = str(door or "console")
         world.player_seat = self  # type: ignore[attr-defined]

@@ -15,8 +15,11 @@ the ship's state readings are the words of the view, which the station has).
 **Shelved as the library is.** A picture is a book (`tools.book_of`): its result in the
 conversation is its handle, its words and the picture's id; a door that carries images
 (the MCP bridge, the API door) fetches the picture by its id from the game and shows it,
-and once the book is shelved, or goes back after its turns, the result is its line and
-the picture is no longer sent. The picture itself is held by the painter in memory, the
+and once the book is shelved the result is its line and the picture is no longer sent.
+A picture never goes back by itself (package 45c, the owner's notes 2, 4 and 16 of gate
+m6a-2: a model whose picture went back unbidden took it that it had never seen one): the
+model puts it back with `shelve` and a note of what it saw, kept in the line with the
+time the picture was open. The picture itself is held by the painter in memory, the
 newest `KEPT` of them, and never enters the journal, the transcript, a save or the log; a
 note that it was shown, with its size and the angle asked, is kept in the transcript with
 the reply that asked it (`Harness`, "shown").
@@ -168,8 +171,9 @@ class Picture:
             what = f"The ship as the viewer shows her, seen from {self.facing}"
         return (
             f"{what}, at {self.stamp}: a picture of {self.width} by {self.height} pixels. It "
-            "is a book: shelve puts it back, and it goes back by itself after three of your "
-            "turns; once put back, your conversation holds a line saying you were shown it, "
+            "is a book that stays until you put it back (it never goes back by itself): "
+            "write in your journal what it shows, then shelve it with a note of what you saw; "
+            "your conversation then holds a line with the time it was open and your note, "
             "and asking again draws a fresh one."
         )
 

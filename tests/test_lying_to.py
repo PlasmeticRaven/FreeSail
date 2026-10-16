@@ -917,6 +917,28 @@ def test_her_sails_lifting_is_said_before_she_is_taken_aback():
     assert R.EVENTS["her sails lifting"].kind == "ship.lifting"
 
 
+def test_her_sails_lifting_with_the_yards_trimmed_for_another_wind_names_the_trim():
+    """Package 45c (the owner's notes 25 and 3 of gate m6a-2: "it says to keep away ... when
+    usually it isn't entirely, it's a problem of the sails not being trimmed"): with the
+    yards trimmed for the wind on the quarter and the wind heading her by a point at a
+    time on a compass course, the line names the trim first, the yards having a good deal
+    still to come before they stand braced up on this tack."""
+    w = world_for(FRIGATE, 225.0, 14.0)
+    n0 = len(w.log.all())
+    for _ in range(12):
+        shift_the_wind(w, -1.0)  # backing: ahead of her on the starboard bow
+        w.run(40)
+        if [e for e in w.log.all()[n0:] if e.kind == "ship.lifting"]:
+            break
+    lines = [e for e in w.log.all()[n0:] if e.kind == "ship.lifting"]
+    assert lines, [(e.kind, e.text) for e in w.log.all()[n0:]]
+    assert lines[0].text.endswith(
+        " on the starboard bow: the yards are not trimmed for this course; trim sails, or "
+        "keep her away."
+    ), lines[0].text
+    assert lines[0].data["untrimmed"] and lines[0].data["room_deg"] >= 8.0
+
+
 def test_no_lifting_line_under_full_and_by_in_a_steady_breeze():
     """Full and by the helmsman keeps her a margin outside her luffing angle: nothing
     lifts, and the line is not said."""

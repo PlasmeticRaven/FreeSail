@@ -64,7 +64,7 @@ from freesail.agents.agent import (
     number_words,
 )
 from freesail.api import readings as R
-from freesail.core.events import Severity
+from freesail.core.events import Severity, for_the_record
 from freesail.orders.errors import OrderError
 from freesail.orders.vocabulary import load_vocabulary
 
@@ -360,7 +360,11 @@ def read_log(
     else:
         since = int(since_tick)
     limit = READ_LOG_LIMIT if count is None else max(1, min(int(count), READ_LOG_MAX))
-    events = [e for e in world.log if e.tick >= since and e.severity.rank >= sev.rank]
+    events = [
+        e
+        for e in world.log
+        if e.tick >= since and e.severity.rank >= sev.rank and not for_the_record(e)
+    ]  # decision 46: a world order as given is not a station's to read
     if before_tick is not None:
         events = [e for e in events if e.tick < int(before_tick)]
     omitted = max(0, len(events) - limit)
@@ -902,7 +906,9 @@ def read_journal(
     the harness's lines ('harness'), or every entry. Each entry says whose it is, since
     the journal is the station's record and a relief reads what the holder before it
     wrote there."""
-    book = world.agent_journals.get(station)
+    from freesail.agents.journal import journal_seen
+
+    book = journal_seen(world, station)  # the person's (package 45c)
     if book is None or not len(book):
         return f"The {station}'s journal is empty."
     limit = READ_JOURNAL_DEFAULT if count is None else max(0, int(count))
@@ -950,8 +956,8 @@ def answer(world: World, station: str, text: str) -> str:
     return _harness(world, station).answer(str(text))
 
 
-def shelve(world: World, station: str, book: str = "") -> str:
-    return _harness(world, station).shelve(str(book or ""))
+def shelve(world: World, station: str, book: str = "", note: str = "") -> str:
+    return _harness(world, station).shelve(str(book or ""), str(note or ""))
 
 
 def _picture(world: World, view: str, facing: str = "", span: str = "") -> Any:
@@ -1251,12 +1257,17 @@ TOOLS: dict[str, Tool] = {
         Tool(
             "shelve",
             "Put a book back on the shelf: book='book 7' for one, a topic's name ('primer "
-            "3') for its open books, nothing for every open book. From then on your "
-            "conversation holds the book's line and not its pages. A book left open goes back "
-            f"by itself after {number_words(SHELF_LIFE_TURNS)} more of your turns. Any book "
-            "opens again on request, under a new number; keep what you took from a page in "
-            "your journal.",
-            {"book": "string, optional: 'book 7', a topic's name, or nothing for all"},
+            "3') for its open books, nothing for every open book; note='...' what you took "
+            "from it, kept in its line. From then on your conversation holds the book's line "
+            "and not its pages. A book left open goes back by itself after "
+            f"{number_words(SHELF_LIFE_TURNS)} more of your turns; a picture stays until you "
+            "put it back. Any book opens again on request, under a new number; keep what you "
+            "took from a page or a picture in your journal before you put it back.",
+            {
+                "book": "string, optional: 'book 7', a topic's name, or nothing for all",
+                "note": "string, optional: what it showed you, kept in its line ('the fore "
+                "topsail aback')",
+            },
             shelve,
         ),
         Tool(
@@ -1265,8 +1276,9 @@ TOOLS: dict[str, Tool] = {
             "marks and the dangers, the track by account, the bearings, the soundings and "
             "the player's pencil, with a scale bar. Drawn by the game's open browser page "
             "at the span asked; with none open, the readings it would have shown, in words. "
-            "A picture is a book: shelve puts it back, and its line then says you were "
-            "shown it; ask again for a fresh one.",
+            "A picture is a book that stays in your conversation until you put it back: "
+            "journal what it showed, then shelve it with a note, and its line keeps the note "
+            "and the time it was open; ask again for a fresh one.",
             {
                 "span": "string, optional: how much of the chart, centred on the account: "
                 "'harbour' (two miles across), 'coast' (twenty), 'passage' (a hundred and "
@@ -1279,8 +1291,9 @@ TOOLS: dict[str, Tool] = {
             "The ship as the game's viewer draws her, as a picture: her hull, spars and "
             "sails as they are set, from where you stand. Drawn by the game's open browser "
             "page; with none open, the readings it would have shown, in words. A picture is "
-            "a book: shelve puts it back, and its line then says you were shown it; ask "
-            "again for a fresh one.",
+            "a book that stays until you put it back: journal what it showed, then shelve it "
+            "with a note, and its line keeps the note and the time it was open; ask again for "
+            "a fresh one.",
             {
                 "facing": "string, optional: where you stand, in degrees from the bow, "
                 "clockwise (0 right ahead, 90 the starboard beam, 180 right astern, 270 the "

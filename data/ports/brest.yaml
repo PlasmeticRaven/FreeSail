@@ -92,18 +92,28 @@ crew_pool:
 
 closed_to: []
 
-# The port's tracks (spec M6 §4; package 40), for the rules-based captain's planner, in
-# the merchant passage's own marks (data/scenarios/merchant-passage.orders, whose
-# comments give the reasons): `from_sea`, from the Passage de l'Iroise (Faden 1793 p. 61,
-# the common track to and from Brest) by a point south of the Gouemont and the Vandrée
-# and one in the channel between La Parquette and the Basses du Lis (Faden p. 57, the
-# Iroise's entrance) to the road of Bertheaume, where a ship from sea waits for her
-# pilot and for the flood (no ship takes the Goulet against the ebb); `in`, the Goulet
-# on the flood by the pass north of the Mingan and the Fillettes (Faden p. 57: range
-# either shore and fear nothing, but not the middle), by points pricked in the deep water
-# from the mouth, under Petit Minou, north of the Mingan and the Fillettes, to the inner
-# end under Portzic, and so to the Bay of Brest; `to_sea`, the reverse to the Iroise.
+# The port's tracks (spec M6 §4; package 40), for the rules-based captain's planner and
+# the pilot's conn: `from_sea`, from the Passage de l'Iroise (Faden 1793 p. 61, the common
+# track to and from Brest) by a point south of the Gouemont and the Vandrée and one in the
+# channel between La Parquette and the Basses du Lis (Faden p. 57, the Iroise's entrance)
+# to the road of Bertheaume, the pilots' station, where a ship from sea waits for her
+# pilot and for the flood (no ship takes the Goulet against the ebb); `in`, from the
+# station through the Goulet on the flood by the pass north of the Mingan and the
+# Fillettes (Faden p. 57: range either shore and fear nothing, but not the middle) to the
+# Bay of Brest; `to_sea`, the reverse to the Iroise.
+# Package 45c: the `in` marks pricked again for the true channel from the chart's own
+# soundings (the depth field of data/charts/, its grid read a cable and a half apart over
+# the Goulet, and the features of channel-west.yaml), where package 40 had taken the
+# merchant passage's book points, pricked for an account that lags her on the flood, and
+# the pilot conning her on the truth put her ashore under Petit Minou: the mouth in
+# twenty-five fathoms half a mile south of Petit Minou; the deep water under it in
+# twenty-four, three cables off its three-fathom ledge; the pass north of the Mingan,
+# two cables north of the rock in sixteen to twenty fathoms with the north shore's
+# five-fathom line a cable and a half beyond; the inner Goulet in twenty-two to
+# twenty-five, the Fillettes six cables to the south; under Portzic in nineteen, the
+# Pointe des Espagnols four cables to the south; and the Bay. The merchant passage's book
+# keeps its own points (data/scenarios/merchant-passage.orders).
 tracks:
   from_sea: [iroise, 48 16.5 N 4 48 W, 48 18.3 N 4 43.5 W, bertheaume-road]
-  in: [48 19.75 N 4 38 W, 48 20.45 N 4 35.3 W, 48 20.5 N 4 34.5 W, 48 20.75 N 4 33.5 W, 48 21 N 4 31.5 W, rade-de-brest]
-  to_sea: [48 21 N 4 31.5 W, 48 20.75 N 4 33.5 W, 48 20.5 N 4 34.5 W, 48 20.45 N 4 35.3 W, 48 19.75 N 4 38 W, bertheaume-road, 48 18.3 N 4 43.5 W, 48 16.5 N 4 48 W, iroise]
+  in: [48 19.53 N 4 37.8 W, 48 19.92 N 4 36.36 W, 48 20.27 N 4 35.76 W, 48 20.46 N 4 35.22 W, 48 20.55 N 4 34.2 W, 48 20.76 N 4 33.12 W, 48 21 N 4 31.5 W, rade-de-brest]
+  to_sea: [48 21 N 4 31.5 W, 48 20.76 N 4 33.12 W, 48 20.55 N 4 34.2 W, 48 20.46 N 4 35.22 W, 48 20.27 N 4 35.76 W, 48 19.92 N 4 36.36 W, 48 19.53 N 4 37.8 W, bertheaume-road, 48 18.3 N 4 43.5 W, 48 16.5 N 4 48 W, iroise]

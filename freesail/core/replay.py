@@ -625,18 +625,32 @@ def check_replay(
 
 
 def load_report(
-    path: str | Path, ship_factory: ShipFactory | None = None, replay_anyway: bool = False
+    path: str | Path,
+    ship_factory: ShipFactory | None = None,
+    replay_anyway: bool = False,
+    until_tick: int | None = None,
 ) -> tuple[World, LoadReport]:
     """A saved game at its last tick with the report of how it was loaded: from its
     checkpoint when one lies beside it, belongs to it and reads (its log's digest
     checked); else by replaying its journal under `check_replay`'s rule, which refuses
     (`ReplayRefused`) another build's game with a station's transcript in it unless
     `replay_anyway`. Every failure to read a checkpoint is "could not be read", with the
-    error's words."""
+    error's words. `until_tick` (package 45c, the owner's note 3 of gate m6a-2: "the
+    ability to load a saved game to an earlier tick"): the game replayed to that tick and
+    handed over there, everything the save holds after it left out; a checkpoint, being
+    the save's last tick, is not read for it."""
     data = load_file(path)
+    if until_tick is not None:
+        until_tick = int(until_tick)
+        if not 0 <= until_tick <= int(data["end_tick"]):
+            raise ValueError(
+                f"--until {until_tick}: the save runs from tick 0 to tick {data['end_tick']}."
+            )
     cp = checkpoint_path(path)
     why = NO_CHECKPOINT
-    if cp.exists():
+    if until_tick is not None:
+        why = f"not read: the game is replayed to tick {until_tick}, short of its end"
+    elif cp.exists():
         try:
             header, world = read_checkpoint(cp)
         except Exception as e:  # noqa: BLE001  (an import error, a class reshaped, a bad file)
@@ -675,7 +689,12 @@ def load_report(
                     ]
                 return world, report
     report = check_replay(data, path, replay_anyway, why)
-    world = replay(data, ship_factory, road=report.road)
+    world = replay(data, ship_factory, until_tick=until_tick, road=report.road)
+    if until_tick is not None and until_tick < int(data["end_tick"]):
+        report.words.append(
+            f"Replayed to tick {until_tick} of the save's {data['end_tick']} and handed over "
+            "there: what the save holds after it is left out, and the game goes on from it."
+        )
     # the player's pencil on the chart (package 37n): a replay makes none of it, and a
     # load gives the save's back as the save has it, so that a game loaded at the console
     # and saved again keeps it; the browser's server reads and cleans it for the chart

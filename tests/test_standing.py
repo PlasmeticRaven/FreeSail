@@ -1747,7 +1747,7 @@ def test_the_station_verbs_after_then_are_resolved_when_the_order_is_given():
     assert e.text.endswith(
         "In standing order 'l', 'tell the purser to look sharp' is refused: there is no "
         "purser aboard yet; a standing order may tell or ask the watcher or the officer of "
-        "the watch or the master or the lookout or the passenger."
+        "the watch or the master or the lookout or the passenger or the second officer."
     )
     assert [r.name for r in w.standing.book] == ["sea", "q"]
 

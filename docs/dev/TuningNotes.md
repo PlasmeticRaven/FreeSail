@@ -4582,3 +4582,244 @@ ones that completed after the merge of the branch head `claude/dreamy-darwin-d77
 - The fast tier once on the final tree (`-n 4`): 3,222 passed, none failed.
 - The pace tests alone, the machine quiet (`--slow -m pace`): 5 passed.
 
+
+## Package 45c: package 45's tail and the fixes from gate m6a-2's runs (2026-10-16)
+
+The brief in `docs/dev/M6-WorkPackages.md` (Package 45c); the owner's notes of gate m6a-2
+in `docs/playtests/2026-10-13-gate-m6a-2-owner-runs/README.md`. What each item built is in
+spec M6 §4, §11, §13, §14 and §23 (as built, package 45c). Measured on the build machine
+(four cores) with package 43's own suites running beside mine for most of the session (a
+load of five to six): no pin depends on the load; the pace tests were run alone at the end.
+
+### The naval cruise: the finding
+
+The brief's reading (one of package 45's three helm changes moved the cruise) did not hold.
+Each undone on the package-45 tree (A, the helmsman's mark under the period's trim only; B,
+full and by capped at seven points; C, the watch bracing up for the helm), the cruise ran
+to 34 hours: B and C each gave the unmodified run to the digest (the cutter within hail at
+91022, three wears, 1531 lines, `67ca692be24fe39e`); A met the cutter at 90936 and wore four
+times; none brought back the story. Bisected over package 45's own commits instead (the
+trees at `e249084`, `52ded5f`, `2a49071` and `41e6287`, the cruise run whole on each): the
+first three meet the cutter at 85437, read the letter at 85497 and speak the brig at 93493
+with six wears in 34 hours (`417e1dc220b442a2`); `41e6287` gives package 45's figures. The
+first line to differ is the Plymouth pilot's fix at 7980 (08:13 on the 12th, the account
+brought to the truth); the true track is the same to the tick until 14:00 (28800), when
+the course the book shapes for the station from that truer account is a degree off the old
+(SW by S, 209 degrees, against SSW, 208), and the tracks part from there by more each hour.
+So nothing was wrong with the helm: the frigate reached her station on another track, the
+admiral's cutter came up with her an hour and a half later (07:17 on the 13th), and the
+Palinure, which the scenario puts on the sea at seven "five leagues on the frigate's bow"
+where the frigate had been, was put astern of a frigate still chasing the cutter (a
+stranger until her colours were made out). The chase rule then made it worse: `give chase`
+kept the chase in hand (the cutter, her letter read, British) for two hours with the
+Palinure in sight (item 2, below).
+
+The mend, both halves: the chase rule (item 2), and the Palinure re-placed by the
+scenario's author where his words put her, five leagues on the frigate's bow, at 10:30 on
+the 13th as she stands for the station's south-west end (`data/scenarios/naval-cruise.yaml`;
+48 30.6 N 5 30.3 W). With the chase rule alone and the brig at seven, the frigate turned for
+the brig astern, the cutter caught her at 08:36, the brig crossed and ran NE by N, and a
+stern chase of twelve hours spoke her at 20:33 with four wears in the two days. With the
+brig re-placed: the cutter within hail at 07:17 (91024) and the letter read (91084), the
+brig sighted on the starboard bow at 10:45 (103500) and chased at once, made out, spoken
+under no colours at 11:55 (107738), lost astern at 15:23 (120180), twelve wears in the two
+days, never aground; 2287 lines, `493d888d874aa358`. The two strict xfails are lifted; the
+save the cruise's fixture writes moves from 08:00 to noon on the 13th, so that the brig is
+spoken before it (the pins below).
+
+### The chase (item 2)
+
+The fault, from the station-and-stranger trial at one sample a second: at the second
+bearing the chase's lead took the chaser's own way across the line of sight from her
+course at that moment, so that a chase begun as she turned read her whole turn as the
+brig's drift and led her across the brig's bows at the forty-five-degree cap, and the brig,
+crossing at her own speed two miles off, crossed ahead of the cap and drew aft for good.
+The rule as mended (`orders/navigation.py` `_chase_course`; `data/captains/kings-ship.yaml`
+says it): the stranger before any sail spoken; the chaser's own way across from her own
+run through the water between the two bearings (`Lookout.own_run`, pegged at each look);
+the lead to seventy degrees; a bearing drawn more than forty-five degrees since the last is
+a chase that has crossed, and the course is laid for her bearing again. The trial
+(`trial-station-stranger`, twenty hours): before, chasing at 06:33, the stranger never
+within hail and the chase given up at 10:51; after, chasing at 06:33 with the course led
+seventy degrees, within hail at 06:53 (10423), on the station at 06:54 and wearing every
+second hour after; minutes a sail aback, sampled each minute, 10 (4 together) before and 8
+(2) after; 889 lines, `3c2aba8b08fd1f63`.
+
+### Sail after the gale, by steps (item 3)
+
+The station trials before (the tree at package 45's head) and after, twenty hours at seed 7,
+a sample each minute (the minutes any square sail stood aback, and the longest run of them):
+
+| | the station in a gale, before | after | Ushant under her lee, before | after |
+|---|---|---|---|---|
+| sail after the gale | 20:30 all at once (masts, reefs, plain sail) | topsails 18:27; masts, reefs and jib 20:30; plain sail, the courses last, 21:19 | 20:29 to 20:59 all at once | topsails 14:45; reefs and jib 20:29, the masts waiting for sea room (never swayed up, the land under her lee); plain sail 20:44 |
+| minutes aback (longest) | 170 (58) | 24 (3) | 146 (38) | 32 (3) |
+| aground | no | no | no | no |
+| lines, digest | 1399, `3f0d36bbff4af262` | 1429, `94d2943d029d197d` | 2129, `b7cbfbe33e2ed631` | 1665, `fe10b699baf92229` |
+
+Three first versions grounded on the lee-shore trial and are why the steps are as they are:
+the courses set while the watch was still shaking out reefs (a tack's yards left untrimmed
+for want of hands; aback, astern onto the Léon coast); the topgallant masts swayed up with
+the land under her lee (all hands at the mast-ropes twenty minutes; the offing's tack held,
+missed stays, the hour's wear onto the land); and under plain sail at dusk, the lookout's
+"land ahead" and "land close ahead" ignored by the station book, which ran her on at seven
+knots (the station books now put her about for both). M5 §33 item 16 is narrowed (said
+there).
+
+### The Goulet by the pilot's conn (item 4)
+
+**The track** (`data/ports/brest.yaml`, `tracks: in`), pricked from the chart's own depth
+field (a map of it at a quarter of a cable) for the true channel north of the Mingan and
+the Fillettes, in eight fathoms and more: 48 19.53 N 4 37.8 W, 48 19.92 N 4 36.36 W, 48
+20.27 N 4 35.76 W, 48 20.46 N 4 35.22 W, 48 20.55 N 4 34.2 W, 48 20.76 N 4 33.12 W, 48 21 N
+4 31.5 W, the Bay of Brest; the road of the Bay (`rade-de-brest`) moved off the two-fathom
+bank (48.325 N 4.46 W) onto its twelve (48.335 N 4.49 W). The chart's field shows no water
+south of the Fillettes (two fathoms and less to the shore), as the owner's passenger said.
+The merchant passage's book keeps its own points.
+
+**The probes on the truth** (`let the pilot take her in`, a sample a minute):
+
+| From | Ship, wind, time | Marks | Least water | Ended |
+|---|---|---|---|---|
+| the road of Bertheaume (his station) | schooner, WNW 12 kn, 09:00 | 8 | 9.0 fathoms | the berth at 11:00 (`tests/test_ports.py`) |
+| the Goulet's mouth | frigate, WNW 14 kn, 13:00 | 7 | 14.2 | the berth at 13:45 |
+| the Iroise, 48.30 N 4.76 W | frigate, W 12 kn, 09:00 | 8 (joined at his first mark) | 10.7 | the berth at 11:23 |
+
+His one warning on each run is the Mingan's, "leave it to starboard", as his track does.
+
+The first versions in the mouth put the frigate on the Mingan (a keep-off laid at the
+warning's berth off a danger the line passed clear of, onto the north shore's ledge, and
+a look-ahead run on past his turning mark) and then on the Fillettes (taken aback, conned
+for a mark the stream had set her past); the conn as built is the spec's (§4, as built).
+
+**The owner's wardroom save** (`captain-and-officer-wardroom-test-initial-save.json`, the
+merchant passage by intent; she took the ground on the Fillettes at 115383 under the
+models' own helm, the pilot aboard since 111000 and never given the conn): replayed on the
+final tree by its acts to a tick (`replay.replay(..., until_tick=)`, as `--until` does), the
+pilot given the conn there with `let the pilot take her in`, and run on with nobody at the
+stations (the save's book and the rules-based captain on deck):
+
+- **From 114700** (12:51, two cables south of the track's second leg, E by N at five knots,
+  the wind WNW ten knots, the flood): he joins at his second mark and takes her in. The
+  log: 12:51:40 *The pilot: port 5 points; steer NNE for 48 19.92 N 4 36.36 W, as near as
+  she will lie.* / *The pilot: trim to it.* 13:00 *starboard half a point; steer NE by N
+  for 48 20.27 N 4 35.76 W, as near as she will lie.* 13:15 *steady as she goes; steer NE
+  by N for 48 20.76 N 4 33.12 W, ...* 13:19 *port half a point; steer NNE for 48 21 N 4
+  31.5 W, ...* 13:30 *starboard 8 points; steer ESE for the Bay of Brest.* 13:31 to 13:49
+  the helm brought round to S by his half points; 13:50 *The pilot: this is the berth, the
+  Bay of Brest; let go when you please.* Least water under her nine fathoms; no warning.
+- **From 114000 and from 113000** (12:40 and 12:23, south-west of the mouth): he joins at
+  his first mark and cons her by the track, and she takes the ground on the Mingan at 13:04
+  and 13:02. The flood sets her east across the second and third legs, the wind at NW to
+  NNW will not let her lie the course that makes the leg good (the stream's allowance and
+  "as near as she will lie" together leave her a point short), and she sags onto the rock
+  four cables south of the track. **Left for the lead**: a pilot who allows for the set
+  before the turn (laying his track higher on the flood with the wind northerly), or a
+  conn that lays a fresh line from where she is when she cannot make his leg good; neither
+  is built.
+- **Tried and taken back.** The wind over the water for "as near as she will lie" (the
+  flood drawing it ahead): both 114700 and 113000 then grounded, 114700 on the Fillettes.
+  The shortest way along the track a clear line joins: from 113000 it joined at the fifth
+  mark by a line between the Mingan and the Fillettes. A first `_joined_track` sent her
+  from the mouth back to Bertheaume, to windward; she stood on close-hauled onto the north
+  shore. The rules-based captain's course for the anchorage at his state's change took her
+  back from the pilot in the Goulet: his course lines now stay quiet while the pilot has
+  the conn on any leg.
+
+**The warning's hand (4c).** The owner's save at Rochefort
+(`m6a-2-merchant-schooner-business-complete-at-Rochefort.json.gz`) does not replay to its fingerprint on
+this tree; at its place as reconstructed (46.02 N 1.145 W, heading 119 degrees, low water at
+02:00 on 27 September) the old rule (the nearer side's water within two cables) said "the
+deeper water is to larboard", toward Aix's bank; the channel's side read a mile either way
+says starboard, toward the road (`tests/test_ports.py`).
+
+### The ghosted boat (item 6)
+
+Reproduced from the owner's save `m6a-real-voyage-guernsey.json`, replayed on the tree
+before this package to 212700: `Send the boat ashore with the purser` at 209444, while all
+hands were bringing her to an anchor, waited for hands ("Not hands enough on deck to send
+boat; the hands are coming to anchor"); when the anchoring ended, `scripts._belay_held_work`
+belayed every waiting work (as a manoeuvre's held sail work is meant to be) with no line,
+the boat's errand among them, and `ports.boat` was left "hoisting out" to the end of the
+game ("The launch is away already" to every order after). The same replay with the boat's
+errand kept through the anchoring: hoisted out at 210211, away at 210563 with Mr Porter,
+landed at 212247. The other Corunna and Cariño saves were looked at first and show no ghost.
+Mended twice over: the boat's errand is anchor work and waits on (`ANCHOR_WORK_KEPT`); and a
+boat whose work leaves the runner other than by her return (belayed, refused, failed) is at
+the booms again in words (`Ports._boat_kept`, `boat.stood_down`); a boat away from the side
+is not belayed (`orders/work.py`).
+
+### The rest of Part B, briefly
+
+- **The weather's cadence (7)**: the sky's noise blocks keep four hours, their edges each
+  moved by a seeded jitter of up to an hour and a half (`weather.sky_block`), the noise
+  smoothed across them; over four days at the test's place no change falls on the four-hour
+  mark and none comes within an hour of another (`tests/test_weather.py`).
+- **The OpenRouter exchanges (8)**, **muster in the browser (9)**, **the lookout unheld
+  (10)**, **the sails lifting (11)**, **the local runner's pictures (12)**, **the point of
+  interest (13)**, **the world order not shown (14)** and **the stations' groundwork (15)**:
+  each with its test (`test_api_door.py`, `test_server.py`, `test_wardroom_doors.py`,
+  `test_lying_to.py`, `test_local_runner.py`, `test_world_orders.py`, `test_agents.py`).
+
+### The two judgements (item 16)
+
+- **A course shaped across the land by a model station** (note 12): left as the warning it
+  is. The master's line already says it in so many words ("the line crosses the land about
+  ..."), and refusing it would take from the captain a course he means to alter before the
+  land, which the period's masters shaped and the rules-based captain's planner lays every
+  leg past; the owner calls it an observation, and its cure is the brief's and the
+  library's (`shape a course for <n> miles south of <place>`, `via`), which the models did
+  not read. Not changed.
+- **The officer's doubt of the tide off Torbay** (note 1), one look: the world's tide at
+  Torbay is the blend of Devonport (27 miles) and Weymouth (41) by the inverse square:
+  establishment 5h 32m local, spring range 3.96 metres, mean level 3.09 metres above the
+  datum. The period's table says six hours (Norie and Moore alike); the Admiralty's modern
+  figures for Torquay, from memory and unverified, are near Devonport's high water and a
+  half hour after, a spring range near 4.2 metres. So the height is near enough, the high
+  water perhaps half an hour early. The stream is the larger fault: Torbay lies in the
+  `mid-channel` stream area, so the world runs the open Channel's stream inside the bay,
+  1.3 knots at springs, where the bay has next to none. That is what an officer at anchor
+  in Torbay would doubt. Not changed here (a stream area of its own for Torbay, with the
+  passages that pass it re-pinned, is a data change for the lead).
+
+### Pins moved (the slow tier once on the final tree, the fixtures dumped where a test's first mismatch hid the rest)
+
+| Pin | Before (package 45) | After | Why |
+|---|---|---|---|
+| gate 5a day: lines, digest | 621, `338008f824afaa02` | 620, `a235022bc8bf8bc7` | the sky's blocks jittered (item 7); every pinned tick held |
+| gate 5b schooner: digest | `d21adc418177a60d` | `edea58e34efd05c4` | a line's words; every tick and the 763 lines held |
+| gate 5c merchant: the pilot left, anchored in the Bay, tin sold, lines, digest | 121500, 116411, 125387, 3092, `3dfe7b9c9c8fc271` | 121620, 115547, 123272, 3079, `adf0ec6041c6e71d` | the Bay of Brest's road moved off the two-fathom bank onto its twelve (item 4a): she lets go fourteen minutes sooner; the book's own Goulet points as they were |
+| gate 5c cruise: world orders, cutter, letter, stranger sighted, chase, spoken, lost, save, lines, digest | 90000 (the Palinure at 07:00), 85437 at 37p (91022 at 45), 85497, 90000, 90000, 93493 (never at 45), 103260, 26 h, 1930, `dc6454f37d060818` | 102600 (at 10:30), 91024, 91084, 103500, 103501, 107738, 120180, 30 h, 2287, `493d888d874aa358` | the chase rule and the Palinure re-placed (items 1 and 2, above); the two strict xfails lifted |
+| truth 78 (the fake captain on the merchant passage): anchored, digest | the merchant's, `1b821bb2b8d9732a` | the merchant's, `e0762f5a6a5e926e` | with the merchant passage (3079 + 13 lines) |
+| gate 6a intent: in port, the pilot left, anchored in the Bay (13½ fathoms), brought up, boat for prices, sold, lines, digest | 111180, 114300, 111153 (12½ fathoms), 112069, 112140, 118980, 2114, `3f2356a885167274` | 111420, 121020, 111370, 112302, 112380, 119820, 2357, `60ecf7b8a93932bb` | the pilot's conn by his track from Bertheaume leg by leg (item 4b): two hours in the Goulet with the book's bearings every five minutes (240 lines more), the Bay's road moved; his cutter comes for him at 120660 |
+| the station and a stranger: states, within hail, lines, digest | chasing 9180, the station 24660, never, 972, `c3763573a2f44dff` | chasing 9180, the station 10440, [10423], 889, `3c2aba8b08fd1f63` | the chase rule (item 2) |
+| the station in a gale: lines, digest | 1399, `3f0d36bbff4af262` | 1429, `94d2943d029d197d` | sail after the gale by steps (item 3); the first states held |
+| Ushant under her lee: states, lines, digest | eleven states to beating at 30900, 2129, `b7cbfbe33e2ed631` | eight, on passage 27240 and keeping station 27300, 1665, `fe10b699baf92229` | the hove-to book no longer sets plain sail in thirty knots; sail by steps (item 3) |
+| the merchant and a privateer: in port, anchored, lines, digest | 35340, [35292], 1170, `e6146a7456fc0a9b` | 35640, [35630], 1176, `db253be58da059ca` | the pilot's conn into Falmouth by his track from his station, the outer road (item 4b) |
+| the merchant in thick weather: digest | `590cfb8f12834ac7` | `f39f5c6f393dd75d` | a line's words; every tick and the 482 lines held |
+
+Also moved, not a pin: `tests/test_ports.py`'s Falmouth conn (two marks, the outer road his
+station, the Black Rock kept off on the leg to Carrick Road), `test_weather.py`'s sky test
+(rewritten for the jittered blocks), `test_standing.py`'s list of stations a standing
+order may tell (the frigate's second officer), `test_captain_rules.py`'s two tests of sail
+after the gale (by steps) and one added (the masts wait for sea room).
+
+### The suite, as run
+
+On the build machine (four cores), package 43's suites running beside mine from its own
+worktree the whole session (a load of five to seven); the session's container was restarted
+once, and every run below was started after it:
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- The slow tier once, whole, on the final code (`--slow -n 4 -m "not pace"`): 3,515 ran,
+  3,492 passed, 10 expected failures, 13 failed, every one a pin of this package's or the
+  captain's module reading the chart's depth field (mended); re-pinned as above.
+- The confirming run of the pinned files (`tests/test_known_truths.py`,
+  `test_captain_trials.py`, `test_captains.py`, `test_ports.py`, `--slow -n 4`): all passed
+  but the expected failures.
+- The fast tier once on the final tree (`-n 4`): 3,240 passed, none failed.
+- The pace tests (`--slow -m pace`): three of five passed; the day under systems and the
+  gate's day with the region loaded fell short of the five hundred ticks a second (436)
+  with package 43's suites at a load of five beside them. The same measure on the tree
+  before this package, run straight after under the same load, gave 404 to 471 ticks a
+  second against 357 to 463 on this one: the load's, not the package's; for a quiet machine.
