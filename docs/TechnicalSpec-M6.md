@@ -393,6 +393,25 @@ notes (package 45). Not built: the station's circle through the land is still me
 "the offing" line and not by a mark round it; after the gale the frigate under plain
 sail by the wind is aback by turns for an hour (the tuning notes, and M5 §33).
 
+**As built (package 43, 2026-10-16): one brain, two bodies.** The judgement is one class
+shared by the two bodies (`captains.Judgement`: the weather's trend, the chase's log and
+every stimulus of the doctrine's table on a `Perception`, whoever built it), `Captain` the
+near body (the player's ship, and a promoted vessel in her own World, whose doings are
+orders) and `brains.FarCaptain` the far body (whose doings are a plan). The far captain's
+perception is built from the vessel's own truth (`brains.perceive_vessel`), which is why he
+lives in `freesail/world/brains.py` and not here: `captains.py` keeps its proof of reading
+no truth. Two stimuli and a row are new: `overmatched` (an enemy of a bigger class within
+the hostile distance, by `SIZE_RANK` from the lookout's words or the vessel's description;
+the player's own class by her file) and `stranger near` (a stranger within `investigate_nm`),
+the cruiser's doctrine's (`data/captains/cruiser.yaml`, the fifth role: a brig-sloop or a
+cutter of the Navy on passage); and `chase stale` (a chase that has not gained a mile in
+`chase_stale_hours`, three, given up), the King's ship's and the cruiser's. The strangers'
+items of the perception carry each sail's class. `resolve_state` moved to `brains.py` with
+every state resolved for a vessel with a brain, and keeps its two-state form for one
+without; `captains.resolve_state` still answers through a lazy hook. The crewed promotion
+(§19) changes the body only: the brain's state is folded into the near captain
+(`FarCaptain.fold_in`: `_enter` loads the state's book) and back (`fold_back`).
+
 ### 5. The officer's own reckoning (`freesail/world/reckoning.py`; `freesail/agents/tools.py`)
 
 G19's small step, true to the period: an officer may keep a reckoning of his own from the
@@ -1104,6 +1123,77 @@ centre is the ship the game follows, which is the one the chart draws. The far-d
 that the gate 5c ruling never had, a leg across the coast refused when the scenario loads,
 is built here with the promotion.
 
+**As built (package 43, 2026-10-16; `freesail/world/brains.py`, `crews.py`, `ships.py`; the
+measurement and the figures in `docs/dev/TuningNotes.md`, package 43).** *The measurement
+first.* Twelve fully crewed ships under rules-based captains ticked at once in the Channel
+beside the frigate (each a World of her own from her file): a crewed ship costs what the
+player's frigate costs, since four fifths of a tick is the sails' physics (`compute_sail_
+forces`, four substeps a tick) and the brain, the book and the reckoning cost little; on the
+build machine the frigate alone runs about 560 ticks a second quiet, with one crewed ship
+about half that, with three about 140, with six about 80 and with twelve about 45, under
+the sixty times the owner plays at, as the spec's reading said. So the strategy is **the
+horizon's range with hysteresis and a cap**, not every ship in a region (that wants the
+vectorised hot loop of the risk table, sized by this measurement for a later milestone):
+`crews.CREWED_NM` four miles (where the tops make out her rig and read her sails),
+`CREWED_DEMOTE_NM` six (half an hour's sailing apart, so a ship at the edge does not flap),
+`CREWED_CAP` three (the whole over twice sixty times on the build machine and over four
+times it on the owner's), the pace truth 88 asserting `CREWED_FLOOR_TICKS_S` (sixty) with the
+cap full. *The brain on the far body* (`brains.FarCaptain`): a vessel whose scenario entry
+or `ship:` world order gives her an `intent:` carries a rules-based captain of her own, the
+same doctrine and the same judgement as the player's (`captains.Judgement`, the stimuli and
+the trend shared), on a perception built from her own truth once a minute
+(`brains.perceive_vessel`: her position, the wind at her, the player's visibility and the
+daylight, the nearest land and the land to leeward by the chart from where she is, her
+anchor, the port she lies off, the ships in sight from her masthead by the horizon with the
+player's ship among them under `PLAYER_ID`, each made out at the lookout's distances, her
+nation's stance to each); every state resolved into a plan of the far body
+(`brains.resolve_state`: on passage the intent's legs by the planner, keeping station the
+square about `station_off`, hove to no way, investigating and chasing a `chase` leg to
+hailing distance, evading an `away` leg, running for shelter the nearest open road and the
+anchor, at anchor and in port an `anchor` leg, her business in port a wait of
+`IN_PORT_WAIT_S`); the doctrine by her description and her intent (`role_of_vessel`: a
+frigate the King's ship's, a brig-sloop or a cutter on a station the **cruiser's**,
+`data/captains/cruiser.yaml` new, which makes out a stranger within `investigate_nm`,
+chases what she can fight and hauls off from a superior class, the stimulus `overmatched`
+by the hull's class `SIZE_RANK`; a letter the packet's; the rest the merchant's); a chase
+that has not gained a mile in `chase_stale_hours` given up (`chase stale`, the King's
+ship's and the cruiser's rows: the trials' two captains had chased and run for fifteen
+hours). Nothing of a far captain's mind is a line of the player's log: `FarCaptain.history`
+is the record the tests and the notes read. A vessel without an intent sails her goal's
+plan as before, and no recorded passage moves. **The hail between captains**: within hail
+a captain speaks the sail he closed, both sides spoken (`speak`); when it is the player's
+ship the `sail.within_hail` line carries the doctrine's hail words, and when two other sail
+speak one another in sight of the player's lookout a routine `sail.spoke` line says so in his
+words for them; signals are M7's. *The far-detail guard* (`ships.land_crossing`): a
+captain's plan across the land is refused at her making (the planner routes her by the
+tracks and the offing, so it is the chart's data that fails); a goal's straight leg that
+crosses the land is a warning on the vessel printed with the scenario's lines
+(`scenarios.guard_lines`) and not a refusal: six of the recorded passages' dozen ships sail
+across a cape at far detail, and refusing them would have moved every pin for a sight no
+passage takes; said in the notes for 43b, whose generated ships take the planner's route.
+*The crewed promotion* (`crews.CrewedWorld`): within the range a vessel with a brain
+becomes a World of her own, `make_ship` from her file at her truth with her way and her
+sail set on the rig (`_set_sail`, trimmed for the tack), her company mustered, her stations
+bound, her account within half a mile, her lookout, her book and her `Captain` with the
+brain's intent, role and state folded in (`FarCaptain.fold_in`: the state's book loads,
+the stranger in hand and the sails spoken carried); the chart, the tide table and the
+weather the parent's (`_follow_weather`: the parent's systems' wind at her own place on the
+parent's plane; the sky and the visibility the parent's at the ship); the other sail and
+the player's ship seen through a view of the parent's vessels (`CrewView`, the player a
+vessel of her file's description); her log her own; her orders through her own channel
+under the rules actor, never in the player's log; the far body mirrored from her every
+tick (`mirror`), so that the player's lookout hails one sail. Beyond the range, or when she
+comes to an anchor (the port's business is the far brain's wait, not a crewed stranger's,
+until 43b), she is demoted: her truth and her captain's state folded back
+(`FarCaptain.fold_back`) and her World dropped, or kept in the far shape for a station
+seated on her (§20). The cap holds the nearest first and a ship in dealings with the
+player (within hail, or chasing, investigating or evading him within the last glass,
+`dealing_tick`) before a nearer one that is not, a dealing ship within the range taking the
+farthest idle ship's place. A checkpoint carries a crewed ship whole (`core.replay`, the
+pickler and `_rebind`); a save replays the promotions from the scenario, the brains and
+the crewed Worlds being deterministic from the seed and her id. The world's business, the
+lugger and the smack are 43b's.
+
 ### 20. A model captain of another ship (`freesail/agents/`; `freesail/world/ships.py`)
 
 A station on another ship: `--station captain --ship <id>` seats a model as the captain of
@@ -1125,6 +1215,34 @@ sample says which shape she is in. The crewed promotion brings the full surface 
 beneath the same station with no reseat, and the log says both. One rule for the rules,
 a model and the player, and the same for the player's own ship if it is ever demoted
 (it is not, in this milestone). The director's seating of such a captain is §23.
+
+**As built (package 43, 2026-10-16; `crews.station_world`, `CrewedWorld.shape`,
+`submit_far`; `remote.Desk` with `ship`; the doors' `--ship`).** `--station captain --ship
+<id or name>` at the MCP bridge, the local runner and the API door (the REPL builds its own
+world and has no other ship) seats a model as the captain of a vessel with a captain of her
+own (an intent; one without is refused in words with the world order that gives her one),
+in her own World: promoted when she is within the range, else her World made in the **far
+shape**, where the far body moves her and the World mirrors it each second for the
+station's readings (`far_tick`, `mirror_far`: her place, her head and way, the wind at her,
+the account brought to her truth once a minute, her lookout's sightings, the bells, no
+physics, no book, no judgement of the near captain's, the brain standing aside while the
+station holds the deck and standing in when its door is silent). The station is kept across
+the switch with no reseat: demoted, her World changes shape and the log says so, urgent, so
+that a station standing by is woken; promoted again, the body is remade from her file
+beneath the same World and station (`_to_full`) and the log says so. In the far shape
+`submit` works the plan layer's own orders (`FAR_SHAPE_WORDS`: a course shaped or steered,
+heave to and fill away, give chase and haul off, sail made or shortened as a state, the
+anchor and weighing, the station kept) on the far body, answers the readings, the
+conversation and the book's listing through the grammar, and refuses the rest in words
+naming the shape's orders; every sample carries a notice of the shape when it changes
+(`Harness._station_notices`, `crews.shape_words`). The desk keys such a seat by the ship
+and the station (`seat_key`), every call carrying `ship`; the pace rule, the unattended
+check, the desk's listing and `--lockstep` walk every ship's stations
+(`harness.all_agents`); the brief's head says her voyage, her ship and her people from her
+own World. A fake proves it (`tests/test_crews.py`, truth 89); a model is the owner's run.
+Left undone: the player at `--seat captain --ship` (the drivers' centre, chart and prompt
+follow the player's ship; the observed world is M7b's), and a save of such a game replays
+the parent's stations only (a checkpoint carries the station on the other ship whole).
 
 ### 21. The regatta harness (`tools/regatta.py` new; `data/regatta/*.yaml` new; `tests/test_regatta.py`)
 
@@ -1162,6 +1280,30 @@ seats the director may hold at once and in a voyage. A model seating a model is 
 thing the consent brief must say (§15 names it for the re-ask with the rest). Nothing else
 of the director is built here.
 
+**As built (package 43, 2026-10-16; `world/orders.py` `_seat`, `_unseat`; `crews.
+enforce_budgets`; `ui/console.py` `live_world_order`).** `seat: <the model's exact name>
+as captain of <ship> for <n> samples` (or `<n> hours`) is refused in words when no consent
+record holds a yes with the drill passed for that model (the game's own records, the
+directory the drivers were started with), when the owner's grant does not name it or there
+is none (the scenario's `director:` block: `models`, `seats` at once, `seats_in_voyage`),
+when the seats at once or in the voyage are spent, when the ship is not on the sea or has
+no captain of her own; else the seat is held on the World (`director_seats`, by the ship's
+id, with the budget and its tick), her World made in the shape her distance gives, and a
+door that comes for that model and that ship is admitted as any door is, the game counting
+the budget once a minute and standing the station down, with the reason, when it is spent.
+`unseat: <ship>[, <note>]` stands a station held on her down by the director with his note
+and gives the seat back. The director's own door and agent are M7b's; the hook assumes no
+player's ship where that costs nothing (a bare World refuses in words). **The live world
+order** (the owner's interview of 2026-10-15): `world: <order>` at the console's prompt and
+in the browser's order box is the owner's order to the world through the channel, journaled
+at its tick with the source "the owner", saved and replayed (truth 72); the bare order stays
+the captain's grammar's refusal (truth 71). Decision 46 holds: the order's own line is for
+the record, as package 45c marks it. **For the consent brief's revision (42b)**: a model
+seated as the captain of another ship, a ship beside the player's with her own company and
+log, whose orders are hers and whose station keeps across the far-detail switch; and a model
+seating a model, the director's seat under the owner's grant and budget, by his word and
+never a model's own.
+
 ### 24. Truths for 6c (behavioural)
 
 87. A brig promoted within the range sails the same track at full detail as her polar gave
@@ -1172,6 +1314,14 @@ of the director is built here.
 90. The regatta runs the 5b passage under the rules-based captain and a scripted fake and
     scores both; the rules-based captain's run replays to its digest.
 91. The parity test finds no reading and no verb on one surface and not the other.
+
+*As built (package 43): 87 in `tests/test_crews.py` (the brig promoted within four miles
+sails within a mile and a half of the far body's easting over the hour and demotes to the
+same plan), 88 the `pace` test there with the cap full against `CREWED_FLOOR_TICKS_S`, 89
+the fake captain seated on the brig through the agent API with `ship`, kept across the
+switch; the far-detail captain's trials in `test_captain_trials.py` and `test_brains.py`
+(the two captains' states read from the brain's history and the log); the seat hook and the
+live world order in `test_seat_hook.py`. 90 and 91 are 44's.*
 
 ### 25. Gate 6c (outline)
 
@@ -1577,7 +1727,11 @@ the lunar if the moon serves, the landfall on Porto Santo. It is what the owner 
 
 The pace truth of M5 §30 with the full-sim cap filled (§19); the wardroom's three
 stations sampled at a glass each under the pace rule at 60x, measured on the build machine;
-the chart's queries across regions no slower than within one (C §5.5's figures).
+the chart's queries across regions no slower than within one (C §5.5's figures). *As built
+(package 43): the frigate with the cap full, three crewed ships beside her, holds sixty
+ticks a second on the build machine (`crews.CREWED_FLOOR_TICKS_S`; measured about 140
+quiet), the sixty times the owner plays at; the figures of one to twelve crewed ships are
+in the tuning notes.*
 
 ## 28. Packages (outline; the heavy ones to Fable)
 

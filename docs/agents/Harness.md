@@ -386,3 +386,25 @@ py -m freesail.agents.api --game http://localhost:8000 --model "THE MODEL'S NAME
 **The replay.** Everything a station does to the game is the game's input from this package on (section 12), and so is a station bound or unbound by hand (section 15): a game played with the API door, or any other, replays on a later build to the same log. The transcript is kept as the record.
 
 Tested against a small server in the tests that speaks the API's shape (`tests/test_api_door.py`, truth 86): no model is asked and no network used.
+
+## 17. A station on another ship, and the live world order (package 43)
+
+The other sail have captains of their own now (spec M6 §4 and §19; `docs/primer/15-other-sail.md`): a ship put on the sea with an `intent:` (in the scenario file's `ships:` entry, or at the end of the `ship:` world order, `..., bound for Brest, no colours, intent: run home to Brest`) carries a rules-based captain who sees, judges and acts from her own deck, and within four miles of your ship she becomes a full ship beside yours, her company mustered, her sails under the same physics, her captain's orders in her own log. **A model may be seated as the captain of such a ship**: at every door, `--station captain --ship <her name or id>` (the MCP bridge's and the local runner's and the API door's flag; the REPL builds its own world and has no other ship):
+
+```
+py -m freesail.agents.local --game http://localhost:8000 --endpoint http://127.0.0.1:8080 --seed 7 --station captain --ship Palinure
+py -m freesail.agents.api --game http://localhost:8000 --model "THE MODEL'S NAME, AS THE API NAMES IT" --station captain --ship Palinure
+```
+
+The consent step is the same (the game's own records; the station is a kind of thing the brief's next revision, 42b, must say); the brief says her voyage (her intent), her ship, her nation and her people from her own wardroom file; her log is her own, and `the captain` in your order box still reads your ship's. **The station keeps across the far-detail switch** (spec M6 §20; your clarification of 2026-10-09, decision 40): while she is within the range of your ship the model has the whole surface, every reading and every order; sailed beyond six miles she is demoted to far detail and the station is not stood down but moves up a layer, working her in the plan layer's own shape (`shape a course for <place>`, `steer <course>`, `heave to`, `fill away`, `give chase`, `haul off`, `make sail`, `shorten sail`, `come to an anchor`, `weigh`, `keep the station`; the readings, the conversation and the book's listing answered; an order of the deck refused in words naming these), and the sample says which shape she is in; near again, the full surface returns beneath the same station with no reseat, and her log says both (urgent lines, so a station standing by is woken). A ship without a captain of her own is refused (`give her an intent first`); the clock's pace rule, `--lockstep`, the unattended bound and the game's `state` count her station among your ship's (`captain of Palinure`). What follows a meeting (the hail answered, the colours, the chase to a conclusion) is milestone 7's; in this build she trades, cruises, keeps company or evades, and you may play against her from your own deck.
+
+**The live world order** (your interview of 2026-10-15): a world order typed at the console's prompt or in the browser's order box with the prefix `world:` is yours to the world, through the channel the scenario files use, journaled at its tick with the source "the owner", saved and replayed:
+
+```
+world: ship: a brig-sloop "Palinure" of France at 48 44 N 5 20 W, bound for the Start, no colours, intent: run home to Brest
+world: ship "Palinure": intent keep the station off Ushant within 15 miles
+world: message: by a cutter from Plymouth from the port admiral: "Rejoin without delay."
+world: weather: waypoint for "the low" at 1805-06-13T16:00 -100 400 988
+```
+
+Without the prefix the order is refused as it always was (the captain plays the ship and not the world); with it, it is the owner's word. The order's own line is for the record and not the play log (decision 46, package 45c). **The director's seat hook** (spec M6 §23) is two more orders of the channel, built for the director of milestone 7b and usable now by you: `world: seat: <the model's exact name> as captain of <ship> for 20 samples` (or `for 2 hours`) holds a seat for that model on that ship under your grant and budget, refused in words without a consent record holding its yes, without a grant naming it (the scenario file's `director: {models: [...], seats: 1, seats_in_voyage: 3}`), or with the seats spent; a door that then comes for that model and that ship is admitted as any door is, and the game stands the station down when the budget is spent. `world: unseat: <ship>, <your note>` stands it down at once. Nothing else of the director is here: not his voice, not his door, not a world with no player's ship.

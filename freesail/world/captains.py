@@ -1373,9 +1373,25 @@ class Judgement:
     _wind_log: list[tuple[int, float]]
     _business: dict[str, Any]
     _waiting_at_road: bool
+    # the strangers this captain has done with (package 43): a chase given up as stale is
+    # not taken up again while she is in sight, as a sail spoken is a stranger no more
+    given_up: set[str] = frozenset()  # type: ignore[assignment]
 
     def _inner_leg(self) -> bool:
         return False
+
+    def _spoken(self, s: dict[str, Any]) -> bool:
+        """Whether a sail is a stranger no more to this captain: spoken within hail (the
+        lookout's flag), or her chase given up (`given_up`)."""
+        sid = str(s.get("id") or "")
+        return (
+            bool(s.get("spoken"))
+            or sid in (self.given_up or ())
+            or sid in (getattr(self, "spoken_ids", None) or ())
+        )
+
+    def _unspoken(self, p: Perception) -> list[dict[str, Any]]:
+        return [s for s in p.strangers if not self._spoken(s)]
 
     def _read_trend(self, p: Perception) -> str:
         """The weather's trend (package 45, Part B item 6): "worsening" when the glass is
@@ -1444,6 +1460,11 @@ class Judgement:
             return
         for t in self.doctrine.from_state(self.state):
             if self._stimulus(t.on, p) and not (t.unless and self._stimulus(t.unless, p)):
+                if t.on == "chase stale" and self._stranger is not None:
+                    # the chase given up: she is done with, and not closed again in sight
+                    if not isinstance(self.given_up, set):
+                        self.given_up = set()
+                    self.given_up.add(str(self._stranger))
                 self._enter(t.to)
                 return
 
@@ -1454,7 +1475,7 @@ class Judgement:
             s
             for s in p.strangers
             if self._is_enemy(s)
-            and not s.get("spoken")
+            and not self._spoken(s)
             and s.get("estimate_m") is not None
             and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
             and int(s.get("size") or 0) > int(p.own_size or 0)
@@ -1513,11 +1534,11 @@ class Judgement:
         if name == "overmatched":
             return self._overmatched(p, float(th("stranger_hostile_nm", 6))) is not None
         if name == "stranger":
-            return any(not s.get("spoken") for s in p.strangers)
+            return any(not self._spoken(s) for s in p.strangers)
         if name == "stranger near":
             within = float(th("investigate_nm", 10))
             return any(
-                not s.get("spoken")
+                not self._spoken(s)
                 and s.get("estimate_m") is not None
                 and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within
                 for s in p.strangers
@@ -1528,10 +1549,10 @@ class Judgement:
             if self._stranger is None:
                 return not p.strangers
             return not any(
-                s.get("id") == self._stranger and not s.get("spoken") for s in p.strangers
+                s.get("id") == self._stranger and not self._spoken(s) for s in p.strangers
             )
         if name == "stranger spoken":
-            return any(s.get("id") == self._stranger and s.get("spoken") for s in p.strangers)
+            return any(s.get("id") == self._stranger and self._spoken(s) for s in p.strangers)
         if name == "enemy made out":
             return any(
                 s.get("id") == self._stranger and self._is_enemy(s) for s in p.strangers
@@ -1627,6 +1648,7 @@ class Captain(Judgement):
         self._entry_stop: int | None = None  # the inner leg he anchors at, the wind foul beyond
         self._stranger: str | None = None
         self._departing = ""  # the port she sails from, for the plan's first legs
+        self.given_up: set[str] = set()  # the chases given up (package 43)
         self.error = ""
         if self.intent_words:
             try:
@@ -2604,7 +2626,7 @@ class Captain(Judgement):
             self._stranger = near.get("id") if near else None
 
     def _nearest_stranger(self, p: Perception) -> dict[str, Any] | None:
-        items = [s for s in p.strangers if not s.get("spoken")]
+        items = self._unspoken(p)
         if not items:
             return None
         return min(items, key=lambda s: s.get("estimate_m") or math.inf)
@@ -2623,7 +2645,7 @@ class Captain(Judgement):
             s
             for s in p.strangers
             if self._is_enemy(s)
-            and not s.get("spoken")
+            and not self._spoken(s)
             and s.get("estimate_m") is not None
             and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
         ]

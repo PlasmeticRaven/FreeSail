@@ -50,15 +50,20 @@ def books(world: World) -> list[str]:
 # across the brig's bows and the brig draws forward 145 degrees and to windward in the first
 # half hour; she is never within hail and the chase is given up at 10:51 (the chase rule's
 # own, said for the lead in docs/dev/TuningNotes.md, package 45)
+# package 43: the Palinure has a captain of her own (the cruiser's doctrine, brains.py): she
+# investigates the frigate at 06:00, makes her out overmatched and evades; the frigate
+# chases from 9360 (06:36) and gives the chase up at 18660 (09:11) under the new rule of
+# a chase that has not gained a mile in three hours (`chase stale`; 24660 at package 45,
+# the old rule's), and the brig is bound on her way and gone before the end
 TRIAL_STATION_STRANGER_STATES = [
     (300, "keeping station"),
     (7200, "investigating a stranger"),
-    (9180, "chasing"),
-    (24660, "keeping station"),
+    (9360, "chasing"),  # 9180 at package 45
+    (18660, "keeping station"),  # 24660 at package 45
 ]
 TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [9798] at package 37p
-TRIAL_STATION_STRANGER_LINES = 972  # package 45 (961 at package 37p)
-TRIAL_STATION_STRANGER_DIGEST = "c3763573a2f44dff"  # package 45 (11dc95ebe098c244 at 37p)
+TRIAL_STATION_STRANGER_LINES = 843  # package 43 (972 at package 45, 961 at 37p)
+TRIAL_STATION_STRANGER_DIGEST = "2e2054eff683661c"  # package 43 (c3763573a2f44dff at 45)
 
 
 @pytest.fixture(scope="module")
@@ -70,8 +75,10 @@ def test_the_station_is_to_seaward_of_its_place_and_the_stranger_is_chased(stati
     """`keep the station off Ushant within 15 miles`: the station mark is the point the
     radius from the island with the most sea room, to the westward (`captains.station_off`),
     never the island itself, which the first trial ran her onto; the stranger put on the sea
-    by the director is investigated, made out, chased and spoken within the hour, and the
-    station kept again, the books loaded and unloaded by name."""
+    by the director (with a captain of her own since package 43, who investigates the frigate
+    and runs from her) is investigated, made out and chased, the chase given up when it has
+    not gained a mile in three hours, and the station kept again, the books loaded and
+    unloaded by name."""
     w = station_stranger
     cap = w.captain
     assert cap.role == "kings-ship" and cap.intent is not None and cap.intent.kind == "station"
@@ -181,16 +188,23 @@ def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_s
 # package 45 (item 3): at anchor within the port's reach she is in port and does her
 # business from the road by the boat; the second anchorage of 37p (at anchor 33960, under
 # way 38160 for the wind, at anchor again 40980) is not sought
+# package 43: the Renard has a captain of her own (the cruiser's doctrine): she chases the
+# schooner from 05:05 and gives the chase up at 08:05 (`chase stale`); the schooner hauls
+# off until the brig is lost to sight at 08:50 (8100 at package 45, when the brig held a
+# fixed course), is set back four hours to the westward by it, beats up to Falmouth on a
+# foul wind from 17:17, anchors in the road at 20:43 and is in port at 20:49 (13:54 at 45)
 TRIAL_TRADE_STRANGER_STATES = [
     (300, "on passage"),
     (3660, "evading"),
-    (8100, "on passage"),
-    (35340, "in port"),
+    (17400, "on passage"),  # 8100 at package 45
+    (47820, "beating"),
+    (60180, "at anchor"),
+    (60540, "in port"),  # 35340 at package 45
 ]
-TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [35292]  # [34292, 41307] at package 37p
-TRIAL_TRADE_STRANGER_LINES = 1170  # package 45 (1252 at package 37p)
+TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [60514]  # [35292] at package 45, [34292, 41307] at 37p
+TRIAL_TRADE_STRANGER_LINES = 1495  # package 43 (1170 at package 45, 1252 at 37p)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
-TRIAL_TRADE_STRANGER_DIGEST = "e6146a7456fc0a9b"  # package 45 (ee34f4a9db0a5c8c before)
+TRIAL_TRADE_STRANGER_DIGEST = "dc48169a96264348"  # package 43 (e6146a7456fc0a9b at 45)
 
 
 @pytest.fixture(scope="module")
@@ -201,11 +215,11 @@ def trade_stranger():
 def test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_wind(trade_stranger):
     """A British schooner bound for Falmouth (the merchant's doctrine by her wardroom
     file's binding, a master commanding, whatever the muster says), a French brig-sloop
-    within two miles: evading, hauling off every ten minutes until she is lost to sight,
+    within two miles (and a captain of her own since package 43, who chases for three hours
+    and gives it up): evading, hauling off every ten minutes until she is lost to sight,
     then on passage again; the pilot taken off Falmouth; and in pilot water a course the
     wind will not allow is not beaten (the first trial beat her onto the Black Rock): she
-    comes to an anchor in the outer road and waits, the at-anchor book trying again on
-    the flood by day; twice in this run, and at anchor at its end."""
+    comes to an anchor in the outer road and is in port from it at the end."""
     w = trade_stranger
     cap = w.captain
     assert cap.role == "merchant"

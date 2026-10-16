@@ -273,7 +273,7 @@ def test_a_cruiser_chases_a_merchant_she_can_fight_and_speaks_her_within_hail(fa
     spoken = False
     for _ in range(14 * 6):
         w.run(600)
-        if b.id in s.brain._spoken and s.id in b.brain._spoken:
+        if b.id in s.brain.spoken_ids and s.id in b.brain.spoken_ids:
             spoken = True
             break
     assert spoken

@@ -376,7 +376,13 @@ def mirror(vessel: Any, crew: CrewedWorld, minute: bool) -> None:
         vessel.speed_kn = units.ms_to_knots(float(getattr(dyn, "speed", 0.0) or 0.0))
     if minute:
         vessel.sail_state = _sail_state_of(crew)
-        vessel.state = crew.captain.state or vessel.state
+        state = crew.captain.state or vessel.state
+        brain = vessel.brain
+        if brain is not None and state and (not brain.history or brain.history[-1][1] != state):
+            # the brain's record runs on through the near body (one brain, two bodies)
+            brain.history.append((crew.parent.clock.tick, state))
+            brain.state = state
+        vessel.state = state
 
 
 # ---------------------------------------------------------------------------

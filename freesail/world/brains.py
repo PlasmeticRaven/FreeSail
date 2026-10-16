@@ -137,7 +137,7 @@ def perceive_vessel(world: Any, vessel: Any, brain: Any = None) -> Perception:
             p.reach_nm = float(getattr(best[0], "reach_nm", IN_PORT_NM))
             if p.anchor_down and best[1] <= p.reach_nm:
                 p.in_port = best[0].id
-    spoken = brain._spoken if brain is not None else set()
+    spoken = brain.spoken_ids if brain is not None else set()
     glass_for = brain._stranger if brain is not None else None
     p.strangers = world.vessels.strangers_of(world, vessel, spoken, glass_for)
     return p
@@ -228,7 +228,8 @@ class FarCaptain(Judgement):
         self._wind_log: list[tuple[int, float]] = []
         self._gale_over_since: int | None = None
         self._stranger: str | None = None
-        self._spoken: set[str] = set()
+        self.spoken_ids: set[str] = set()
+        self.given_up: set[str] = set()
         self._business: dict[str, Any] = {}
         self._waiting_at_road = False
         self.last_judged = -1
@@ -253,7 +254,7 @@ class FarCaptain(Judgement):
             "intent": self.intent.to_dict() if self.intent else None,
             "state": self.state,
             "stranger": self._stranger,
-            "spoken": sorted(self._spoken),
+            "spoken": sorted(self.spoken_ids),
             "history": [list(h) for h in self.history],
         }
 
@@ -373,7 +374,7 @@ class FarCaptain(Judgement):
             s
             for s in p.strangers
             if self._is_enemy(s)
-            and not s.get("spoken")
+            and not self._spoken(s)
             and s.get("estimate_m") is not None
             and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
         ]
@@ -438,7 +439,7 @@ class FarCaptain(Judgement):
             self._in_port(p)
 
     def _nearest_stranger(self, p: Perception) -> dict[str, Any] | None:
-        items = [s for s in p.strangers if not s.get("spoken")]
+        items = self._unspoken(p)
         if not items:
             return None
         return min(items, key=lambda s: s.get("estimate_m") or math.inf)
@@ -455,14 +456,14 @@ class FarCaptain(Judgement):
 
     def speak(self, other_id: str) -> None:
         """A sail spoken by this captain, and he by her."""
-        if other_id in self._spoken:
+        if other_id in self.spoken_ids:
             return
-        self._spoken.add(other_id)
+        self.spoken_ids.add(other_id)
         vessels = self.world.vessels
         other = vessels.get(other_id)
         brain = getattr(other, "brain", None) if other is not None else None
         if brain is not None:
-            brain._spoken.add(self.vessel.id)
+            brain.spoken_ids.add(self.vessel.id)
         if other_id != PLAYER_ID and hasattr(vessels, "spoke"):
             vessels.spoke(self.vessel, other_id)
 
@@ -516,7 +517,8 @@ class FarCaptain(Judgement):
         captain._wind_log = list(self._wind_log)
         captain._gale_over_since = self._gale_over_since
         captain._stranger = self._stranger
-        captain.spoken_ids = set(self._spoken)
+        captain.spoken_ids = set(self.spoken_ids)
+        captain.given_up = set(self.given_up)
         captain.last_judged = -1
         if self.state is not None and self.state not in ("in distress",):
             captain._enter(self.state)
@@ -528,7 +530,8 @@ class FarCaptain(Judgement):
         self._wind_log = list(captain._wind_log)
         self._gale_over_since = captain._gale_over_since
         self._stranger = captain._stranger
-        self._spoken |= set(getattr(captain, "spoken_ids", set()))
+        self.spoken_ids |= set(getattr(captain, "spoken_ids", set()))
+        self.given_up |= set(getattr(captain, "given_up", set()) or set())
         state = captain.state or "on passage"
         if state in ("beating", "in distress"):
             state = "on passage"
