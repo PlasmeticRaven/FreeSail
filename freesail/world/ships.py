@@ -182,6 +182,18 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "rig": "a brig",
         "what": "a merchant brig, deep laden",
     },
+    # package 43b (spec M6 §19): the chasse-marée on the Éclair of 1795 and the smack on the
+    # Culloden of 1746, the coaster and the fisherman of the world's business
+    "lugger": {
+        "file": "data/ships/lugger.yaml",
+        "rig": "a lugger",
+        "what": "a chasse-marée, three-masted under lugs",
+    },
+    "smack": {
+        "file": "data/ships/smack.yaml",
+        "rig": "a smack",
+        "what": "a fishing smack, her well amidships",
+    },
 }
 _DESCRIPTION_WORDS = {
     "a frigate": "frigate",
@@ -204,6 +216,16 @@ _DESCRIPTION_WORDS = {
     "brig-sloop": "brig-sloop",
     "a sloop of war": "brig-sloop",
     "the navy's brig": "brig-sloop",
+    "a lugger": "lugger",
+    "lugger": "lugger",
+    "a chasse-maree": "lugger",
+    "chasse-maree": "lugger",
+    "a chasse-marée": "lugger",
+    "chasse-marée": "lugger",
+    "a smack": "smack",
+    "smack": "smack",
+    "a fishing smack": "smack",
+    "fishing smack": "smack",
 }
 
 

@@ -15,6 +15,20 @@ when the files were built are in docs/dev/TuningNotes.md, "Where the ships stand
 - 75: the cutter's beam reach in 15 knots of wind under plain sail is 6 to 8 knots.
 - 76: the brig's beam reach is 7 to 9 knots, within a knot of the frigate's, and, as the
   frigate's, her fastest point of sailing.
+
+Package 43b extends them to six vessels (spec M6 §19): the lugger Éclair (the chasse-marée
+by Forfait's Table VII, dipping lugs) and the smack Culloden (cutter-rigged by Steel's
+proportions, with a well). Their crews are small (thirty and eight), so their polars are
+taken with all hands called before the sail is set, as a small craft makes sail; the
+sweeps are the frigate's form. The figures and the bands' reasons are in
+docs/dev/TuningNotes.md, package 43b.
+
+- 73 extended: a lugger lies as close to the wind as the cutter or closer ("Luggers sail
+  well close hauled, and very near the wind", Steel 1794 vol. I, LUGGER); the smack, on
+  the cutter's rules, lies as the cutter does within a degree.
+- 75 extended: the lugger's beam reach in 15 knots is 7 to 9.5 knots, faster than the
+  cutter's ("construits pour la marche", Lescallier 1791 p. 408); the smack's is 5 to 7,
+  slower than the cutter's on her forty feet of water-line.
 """
 
 from __future__ import annotations
@@ -25,16 +39,39 @@ import pytest
 
 from tests.test_known_truths import (
     FRIGATE,
+    POLAR_ANGLES,
     SCHOONER,
     argmax_speed,
     best_sustained_course,
+    make,
     pointing_sweep,
     polar,
+    reading,
+    settle,
+    tack_for,
 )
+
+
+def polar_all_hands(ship, angles=POLAR_ANGLES) -> dict[int, dict]:
+    """The plain-sail polar in fifteen knots with all hands called first (package 43b):
+    the smack's eight men, the watch alone, took eleven minutes to set her three sails and
+    she lost her way and fell off before she had them."""
+    out = {}
+    for twa in angles:
+        world = make(ship, float(twa))
+        settle(
+            world,
+            ["call all hands", "set plain sail", f"brace sharp up on the {tack_for(twa)} tack"],
+        )
+        out[twa] = reading(world)
+    return out
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CUTTER = str(ROOT / "data" / "ships" / "cutter.yaml")
 BRIG = str(ROOT / "data" / "ships" / "brig.yaml")
+LUGGER = str(ROOT / "data" / "ships" / "lugger.yaml")
+SMACK = str(ROOT / "data" / "ships" / "smack.yaml")
 
 HALF_A_POINT = 5.625
 
@@ -119,3 +156,80 @@ def test_the_four_ships_stand_in_order_on_a_beam_reach(cutter_polar, brig_polar,
     frigate; every one under her hull speed with the wind abeam in fifteen knots."""
     assert cutter_polar[90]["speed"] < brig_polar[90]["speed"] < 9.5
     assert brig_polar[90]["speed"] <= frigate_polar[90]["speed"] + 0.5
+
+
+# ---------------------------------------------------------------------------
+# Package 43b: the lugger and the smack, six vessels
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def lugger_sweep():
+    return pointing_sweep(LUGGER)
+
+
+@pytest.fixture(scope="module")
+def smack_sweep():
+    return pointing_sweep(SMACK)
+
+
+@pytest.fixture(scope="module")
+def lugger_polar():
+    return polar_all_hands(LUGGER)
+
+
+@pytest.fixture(scope="module")
+def smack_polar():
+    return polar_all_hands(SMACK)
+
+
+def test_truth_73_extended_the_lugger_lies_closer_than_the_cutter(lugger_sweep, cutter_sweep):
+    """The lug is the weatherly sail of the period (Steel 1794, LUGGER: "Luggers sail well
+    close hauled, and very near the wind"; Forfait 1788 p. 53): she lies as close as the
+    cutter or closer (52 degrees against 58 when built), and holds way inside five points."""
+    best_l, closest_l = best_sustained_course(lugger_sweep)
+    best_c, _ = best_sustained_course(cutter_sweep)
+    assert 46.0 <= best_l <= 60.0, f"lugger's best course {best_l} deg off"
+    assert best_l <= best_c
+    assert closest_l < 50.0
+
+
+def test_truth_73_extended_the_smack_lies_as_the_cutter(smack_sweep, cutter_sweep):
+    """Cutter-rigged on the cutter's rules (Lescallier 1791 p. 420: "le Gréement est
+    semblable à celui des Sloops"), she lies as the cutter does (58 and 58 when built)."""
+    best_s, closest_s = best_sustained_course(smack_sweep)
+    best_c, _ = best_sustained_course(cutter_sweep)
+    assert abs(best_s - best_c) <= 2.0, f"smack {best_s}, cutter {best_c}"
+    assert closest_s < 54.0
+
+
+def test_truth_75_extended_the_luggers_beam_reach(lugger_polar, cutter_polar):
+    """Built for speed ("pour la marche", Lescallier 1791 p. 408) on 55 ft of water-line:
+    7 to 9.5 knots on a beam reach in fifteen, faster than the cutter (8.2 when built),
+    under her hull speed, and stiff for the sail she carries (Forfait p. 53)."""
+    speed = lugger_polar[90]["speed"]
+    assert 7.0 <= speed <= 9.5, f"lugger's beam reach {speed:.1f} kn"
+    assert speed > cutter_polar[90]["speed"]
+    assert lugger_polar[90]["heel"] < 15.0
+
+
+def test_truth_75_extended_the_smacks_beam_reach(smack_polar, cutter_polar):
+    """Forty feet of water-line: 5 to 7 knots on a beam reach in fifteen (6.2 when built),
+    slower than the cutter, and stiff."""
+    speed = smack_polar[90]["speed"]
+    assert 5.0 <= speed <= 7.0, f"smack's beam reach {speed:.1f} kn"
+    assert speed < cutter_polar[90]["speed"]
+    assert smack_polar[90]["heel"] < 10.0
+
+
+def test_the_six_vessels_stand_in_order_on_a_beam_reach(
+    smack_polar, cutter_polar, lugger_polar, brig_polar, frigate_polar
+):
+    """By their length on the water and their canvas: the smack below the cutter below the
+    lugger; the brig and the frigate within a knot and a half of the lugger, the larger
+    hulls not slower by more."""
+    smack, cutter = smack_polar[90]["speed"], cutter_polar[90]["speed"]
+    lugger, brig = lugger_polar[90]["speed"], brig_polar[90]["speed"]
+    assert smack < cutter < lugger
+    assert abs(brig - lugger) <= 1.5
+    assert frigate_polar[90]["speed"] >= lugger - 1.5

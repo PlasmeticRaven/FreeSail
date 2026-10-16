@@ -74,6 +74,11 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
             "frigate_polar",
             "cutter_polar",
             "brig_polar",
+            # package 43b: the lugger and the smack beside them
+            "lugger_sweep",
+            "smack_sweep",
+            "lugger_polar",
+            "smack_polar",
         }
     ),
     "test_checkpoint.py": frozenset({"saved"}),

@@ -124,6 +124,16 @@ BLANKET_OTHER = 0.15
 BLANKET_RANGE_MAST_HEIGHTS = 3.0  # how far downwind the shadow reaches
 RUNNING_AWA = units.deg_to_rad(150.0)  # "running": wind within 30° of dead astern
 
+# A dipping lug on the weather side of its mast (package 43b): after going about with no
+# dip, its yard and cloth lie on the old side and the wind presses the sail against the
+# mast, which belly it out of its shape and spoil the luff, so that it draws with this part
+# of its cloth until it is dipped round to the lee side (Forfait 1788 pp. 5 to 6: the lug
+# keeps two thirds of its cloth to leeward of the mast, and in going about the yard is
+# lowered and shifted "de côté"; Steel 1794 vol. I, LUGGER: "When this is often repeated,
+# they loose ground in stays"). How much it loses no source says: judgement, the third of
+# the cloth that the mast cuts across in the period's words, the luff in the mast's lee.
+LUG_AGAINST_MAST_AREA = 2.0 / 3.0
+
 # The deck-level apparent wind is what a man on deck feels: deck plus head height.
 WIND_EYE_HEIGHT_M = 1.5
 
@@ -584,11 +594,14 @@ def _read_rig(ship: Ship) -> _Rig:
             side_sign = reading.side if reading.side is not None else lee
             held, flogging = reading.held_to_windward, reading.free
             working = reading.working.id if reading.working is not None else None
+        area = sail.area_m2 * max(1.0 - cls.reef_factor * reefs, 0.0)
+        if against_the_mast(sail, side_sign):
+            area *= LUG_AGAINST_MAST_AREA
         drawing.append(
             _Drawing(
                 sail=sail,
                 cls=cls,
-                area=sail.area_m2 * max(1.0 - cls.reef_factor * reefs, 0.0),
+                area=area,
                 goose_winged=sail.state is SailState.GOOSE_WINGED,
                 square_faced=square_faced,
                 studding=sail.cls == "studding",
@@ -636,6 +649,15 @@ def _read_rig(ship: Ship) -> _Rig:
         windage_heights=heights,
         reach=_blanket_reach(ship),
     )
+
+
+def against_the_mast(sail: Sail, side_sign: float) -> bool:
+    """A dipping lug whose cloth lies on the weather side of its mast (package 43b): its
+    sheet holds it to leeward (`side_sign`, +1 starboard) while its yard is slung on the
+    other side (`Sail.lug_side`). A lug not yet hoisted on a side is clear of the mast."""
+    if not sail.dipping or sail.lug_side is None or side_sign == 0.0:
+        return False
+    return (sail.lug_side == "starboard") != (side_sign > 0.0)
 
 
 def _blanket_reach(ship: Ship) -> float:

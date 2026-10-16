@@ -1,0 +1,32 @@
+# Reef a lug sail (package 43b): lower the yard a reef's depth, haul down the reef tackle
+# at the tack and the earing at the clew, tie the points along the foot, and hoist again.
+# The lugger's sails were reefed along the foot (Holdsworth 1874 pp. 104 to 105, the
+# Yarmouth luggers; Fincham 1843 p. 59: "two sets of sails, large and small"), and in a
+# blow the main lug was shifted for the taille-vent (Forfait p. 52: `shift the main lug`
+# bends the taille-vent in its place). Times judgement.
+id: reef_lug
+verb: reef
+applies_to: {class: lug}
+params: {reefs: 1}
+preconditions:
+  - {check: sail.state == set, reason: "The {sail} is {state}; it must be set to be reefed."}
+  - {check: sail.reef_bands > 0, reason: "The {sail} has no reef bands."}
+  - {check: sail.reefs < sail.reef_bands, reason: "The {sail} is close reefed already.", done: true}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: settle
+    duration_s: 30
+    log: "Settled the {sail} halyard."
+  - do: reef
+    duration_s: 120
+    sets: {sail.reefs: "min(sail.reefs + params.reefs, sail.reef_bands)"}
+    log: "Hauled down the reef tackle and the earing of the {sail} and tied the points."
+  - do: hoist
+    duration_s: 45
+    via: halyard_of(sail)
+on_start: {log: "Hands to reef the {sail}."}
+on_complete: {log: "Reefed the {sail}; now {state}.", kind: sail.reefed, severity: notable}
+on_fail: {log: "Could not reef the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 6, rating: able, stations: [forecastle, afterguard]}
+source: "Holdsworth 1874 pp. 104 to 105; Fincham 1843 p. 59; Forfait 1788 p. 52"

@@ -1,0 +1,49 @@
+# FreeSail: the afterguard of the smack (spec M6 §2; package 43b): the master, who commands
+# her, and his mate, with a boy to carry the word, as a fishing smack of eight men had
+# them (Holdsworth 1874 p. 141: the cod smacks' crews, a master, a mate and hands, six or
+# seven of them apprentices). The form and the reading are frigate-36.yaml's (see its
+# head); the names are the muster's, drawn under the seed from the english list. The
+# outlines are judgement.
+
+ship: data/ships/smack.yaml
+
+# The harness's stations bound to a person by his role: the officer of the watch is the
+# mate, and so is the master's station, as the cutter's (a smack carries no master beside
+# the man who commands her).
+stations:
+  captain: master
+  officer of the watch: mate
+  master: mate
+
+wardroom:
+  - role: master
+    post: true
+    rank: master
+    station: the command
+    place: quarterdeck
+    traits: [weather-wise, close with his money, knows every ground from the Start to the Lizard]
+    history: "Bred to the line fishery out of Brixham; master of this smack five years."
+    brief: >-
+      The smack, her people, her lines and her well are his: the ground fished, the tide
+      worked, the market for the catch.
+  - role: mate
+    post: true
+    rank: mate
+    station: the mate's
+    place: quarterdeck
+    traits: [patient, strong in the arms, a good hand at the lines]
+    history: "Served his time in the smack as an apprentice."
+    brief: >-
+      The deck in his watch under the master's orders, the lines shot and hauled, the
+      well and the boat.
+  - role: boy
+    drawn: {station: afterguard, rating: ordinary}
+    messenger: true
+    rank: boy
+    station: the master's messenger
+    place: quarterdeck
+    traits: [small, cheerful, always cold]
+    history: "An apprentice of the parish, bound to the master last Lady Day."
+    brief: >-
+      Carries the master's word about the smack (pass the word for, send for).
+    note: An apprentice boy as the messenger (judgement; Holdsworth p. 141, the smacks' apprentices).

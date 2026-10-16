@@ -176,6 +176,8 @@ SIZE_RANK: dict[str, int] = {
     "merchant brig": 2,
     "schooner": 1,
     "cutter": 1,
+    "lugger": 1,  # package 43b: a chasse-marée of a hundred tons, the cutter's class
+    "smack": 0,  # a fishing smack of thirty-five tons is nobody's match
 }
 _SIZE_WORDS: tuple[tuple[str, int], ...] = (
     ("frigate", 3),
@@ -183,6 +185,9 @@ _SIZE_WORDS: tuple[tuple[str, int], ...] = (
     ("brig", 2),
     ("schooner", 1),
     ("cutter", 1),
+    ("lugger", 1),
+    ("chasse-mar", 1),
+    ("smack", 0),
 )
 
 

@@ -1,0 +1,26 @@
+# Take in a lug sail (package 43b): let go the halyard and lower the yard on deck, the
+# sail gathered in along it and stopped, the tack unhooked. A lug is not brailed up nor
+# furled aloft: it comes down with its yard ("amener tout-à-fait la vergue", Forfait 1788
+# p. 6; the chasse-marée's mainsail "qu'on amène sur le pont", Willaumez 1831,
+# CHASSE-MARÉE), so it is left stowed. Times judgement.
+id: take_in_lug
+verb: take_in
+applies_to: {class: lug}
+preconditions:
+  - {check: "sail.state in [set, loosed, in_the_gear]", reason: "The {sail} is {state}; there is nothing to take in.", done: true}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: lower
+    duration_s: 30
+    if: "sail.state in [set, loosed]"
+    sets: {sail.state: in_the_gear}
+    log: "Lowered the {sail} and its yard on deck."
+  - do: stow
+    duration_s: 60
+    sets: {sail.state: furled, sail.lug_side: none}
+on_start: {log: "Hands to the {sail} halyard; lower away."}
+on_complete: {log: "Took in the {sail}; the yard is on deck.", kind: sail.taken_in, severity: notable}
+on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 6, rating: ordinary, stations: [forecastle, afterguard]}
+source: "Forfait 1788 p. 6; Willaumez 1831, CHASSE-MARÉE (OCR)"

@@ -227,7 +227,10 @@ class Spar(Part):
 
     @property
     def is_yard(self) -> bool:
-        return self.cls in {"yard", "lug_yard", "lateen_yard"}
+        """A yard that is braced. A lug's yard has no braces and no lifts ("les ralingues
+        en font l'office", Forfait 1788 p. 53): its sail is trimmed by the sheet, as a
+        fore-and-aft sail's is (package 43b), so it is no yard of the braces' orders."""
+        return self.cls in {"yard", "lateen_yard"}
 
     @property
     def strain_ratio(self) -> float:
@@ -246,6 +249,13 @@ class Sail(Part):
     cloth_rating_kn: float = 0.0
     canvas_no: int | None = None  # the canvas of the sail now bent (spec 3b §6.1)
     in_place_of: str | None = None  # the sail this one is bent instead of (spec 3b §6.4)
+    # A dipping lug (package 43b): the side of its mast its yard and cloth lie on now,
+    # 'starboard' or 'larboard' (None: not yet hoisted on a side, as a sail furled or
+    # drawn for a polar). On the lee side it stands clear of the mast; on the weather side,
+    # after a tack with no dip, it lies against the mast and draws badly
+    # (`physics.sails.LUG_AGAINST_MAST_AREA`) until it is dipped (dip_lug.yaml).
+    dipping: bool = False
+    lug_side: str | None = None
     state: SailState = SailState.FURLED
     reefs: int = 0
     # A fore-and-aft sail's angle from the centreline, radians: since package 32e (spec M5
@@ -280,6 +290,7 @@ class Sail(Part):
             cloth_rating_kn=cloth,
             canvas_no=s.canvas_no,
             in_place_of=s.in_place_of,
+            dipping=bool(getattr(s, "dipping", False)),
             # storm canvas and the occasional sails start the voyage in the sail room
             state=SailState.FURLED if s.bent else SailState.UNBENT,
         )

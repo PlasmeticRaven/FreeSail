@@ -7,8 +7,9 @@ tons, sparred by Fincham 1843 p. 67 and canvassed by Steel 1794) and the brig
 Harpy of 1796 (316 tons, Fincham p. 88). The ranges here are wide enough for
 tuning within the type and narrow enough that a slip of a decimal, a spar drawn
 at the wrong scale or a sail area doubled in a hand edit fails.
-`tools/gen_ships.py` is the source of all four files; the last test regenerates
-them and compares.
+`tools/gen_ships.py` is the source of all six files (package 43b adds the lugger
+Éclair of 1795 by Forfait's Table VII and the smack Culloden of 1746 by Steel's
+proportions); the last test regenerates them and compares.
 """
 
 from __future__ import annotations
@@ -29,6 +30,18 @@ FRIGATE = ROOT / "data" / "ships" / "frigate-36.yaml"
 SCHOONER = ROOT / "data" / "ships" / "topsail-schooner.yaml"
 CUTTER = ROOT / "data" / "ships" / "cutter.yaml"
 BRIG = ROOT / "data" / "ships" / "brig.yaml"
+LUGGER = ROOT / "data" / "ships" / "lugger.yaml"  # package 43b
+SMACK = ROOT / "data" / "ships" / "smack.yaml"  # package 43b
+
+
+@pytest.fixture(scope="module")
+def lugger():
+    return load_ship(LUGGER)
+
+
+@pytest.fixture(scope="module")
+def smack():
+    return load_ship(SMACK)
 
 
 @pytest.fixture(scope="module")
@@ -357,9 +370,92 @@ def test_brig_sail_plan_follows_fincham(brig):
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# the lugger: L'Éclair of 1795 by Forfait's Table VII (package 43b)
+# ---------------------------------------------------------------------------
+
+
+def test_lugger_hull_is_the_eclair_of_101_tons(lugger):
+    """59 ft 3 in on the range of the deck, 45 ft 11 in keel for tonnage, 20 ft 4 in
+    breadth, 7 ft in the hold, 101 tons (RMG ZAZ6306); beamy, a third of her length."""
+    h = lugger.hull.spec
+    assert units.feet_to_m(45.9) < h.length_waterline_m < units.feet_to_m(59.25)
+    assert 6.1 <= h.beam_m <= 6.3  # 20 ft 4 in
+    assert 2.5 <= h.length_waterline_m / h.beam_m <= 2.9
+    assert 85_000 <= h.displacement_kg <= 130_000  # about her 101 tons burthen
+    assert 9.0 <= h.hull_speed_kn <= 10.5
+
+
+def test_lugger_rig_follows_forfaits_table_vii(lugger):
+    """Forfait 1788 Table VII, the 60-pied column: the masts on her breadth (main 3.455 B,
+    fore 2.759 B, mizen 1.888 B), the yards on her length (main 0.573 L, fore 0.454 L, mizen
+    0.364 L); three masts with lugs, the fore and main dipping, the mizen a standing lug;
+    lug topsails trimmed as square topsails; two jibs on a running bowsprit; the working
+    canvas near 4.037 L x B; the taille-vent in the sail room, half the main lug."""
+    on_deck = units.feet_to_m(59.25)
+    lugs = {s.id: s for s in lugger.sails.values() if s.cls == "lug"}
+    assert set(lugs) == {"fore.lug", "main.lug", "mizen.lug", "taille_vent"}
+    assert lugs["fore.lug"].dipping and lugs["main.lug"].dipping
+    assert not lugs["mizen.lug"].dipping and not lugs["taille_vent"].dipping
+    assert lugs["taille_vent"].in_place_of == "main.lug"
+    assert 0.4 <= lugs["taille_vent"].area_m2 / lugs["main.lug"].area_m2 <= 0.6
+    sp = lugger.spars
+    for name, frac in (("main", 0.573), ("fore", 0.454), ("mizen", 0.364)):
+        yard = sp[f"{name}.lug_yard"]
+        assert yard.cls == "lug_yard" and not yard.is_yard  # no braces: trimmed by the sheet
+        assert abs(yard.length_m / on_deck - frac) < 0.01
+    assert sp["main.mast"].height_m > sp["fore.mast"].height_m > sp["mizen.mast"].height_m
+    assert sp["fore.mast"].x_m > 0.0 > sp["main.mast"].x_m > sp["mizen.mast"].x_m
+    assert all(lugger.sails[t].cls == "square" for t in ("fore.topsail", "main.topsail"))
+    assert sp["bowsprit"].running
+    beam = lugger.hull.spec.beam_m
+    forfait = 4.037 * on_deck * beam
+    working = area_of(lugger, "all sail")
+    assert 0.9 * forfait <= working <= 1.15 * forfait
+    assert lugger.spec.warnings == []
+
+
+# ---------------------------------------------------------------------------
+# the smack: Culloden of 1746 by Steel's proportions (package 43b)
+# ---------------------------------------------------------------------------
+
+
+def test_smack_hull_is_the_culloden_of_35_tons(smack):
+    """43 ft on the gun deck, 34 ft keel, 14 ft breadth, 35 tons (Charnock vol. III p.
+    274); drawing about Chapman's English smack's 6.3 ft; a well amidships."""
+    h = smack.hull.spec
+    assert units.feet_to_m(34.0) < h.length_waterline_m < units.feet_to_m(43.0)
+    assert 4.2 <= h.beam_m <= 4.4  # 14 ft
+    assert units.feet_to_m(5.5) <= h.draught_m <= units.feet_to_m(7.0)
+    assert 35_000 <= h.displacement_kg <= 55_000
+    assert smack.spec.hold is not None and (smack.spec.hold.well_m3 or 0.0) > 0.0
+
+
+def test_smack_rig_follows_steels_proportions(smack):
+    """Steel 1794 vol. I p. 41: the mast and topmast in one, 3 3/4 the breadth; the boom
+    2/3 of the mast, the gaff 3/5 of the boom, the cross-jack yard 3/5 of the mast, the
+    topsail yard 4/5 of it; a running bowsprit; plain sail the mainsail, the foresail and
+    the jib."""
+    sp = smack.spars
+    whole = units.feet_to_m(3.75 * 14.0)
+    masts = [s for s in sp.values() if s.cls in ("mast", "topmast")]
+    assert [m.id for m in masts] == ["main.mast"]  # in one stick
+    assert 0.8 * whole <= sp["main.mast"].height_m <= whole
+    assert abs(sp["main.boom"].length_m / whole - 2.0 / 3.0) < 0.02
+    assert abs(sp["main.gaff"].length_m / sp["main.boom"].length_m - 0.6) < 0.02
+    assert abs(sp["square_sail.yard"].length_m / whole - 0.6) < 0.02
+    assert abs(sp["topsail.yard"].length_m / sp["square_sail.yard"].length_m - 0.8) < 0.02
+    assert sp["bowsprit"].running
+    assert set(smack.groups["plain sail"]) == {"main.sail", "fore.staysail", "jib"}
+    assert smack.spec.crew is not None and smack.spec.crew.complement == 8
+    assert smack.spec.warnings == []
+
+
 @pytest.mark.parametrize(
     "path, phrases",
     [
+        (LUGGER, ["mainsail", "foresail", "mizen", "tapecul", "taille-vent", "storm lug", "lugs"]),
+        (SMACK, ["mainsail", "foresail", "crossjack", "trysail", "head sails"]),
         (
             FRIGATE,
             [
@@ -443,7 +539,7 @@ def test_generator_reproduces_the_committed_files(tmp_path):
         cwd=ROOT,
         capture_output=True,
     )
-    for committed in (FRIGATE, SCHOONER, CUTTER, BRIG):
+    for committed in (FRIGATE, SCHOONER, CUTTER, BRIG, LUGGER, SMACK):
         made = out / committed.name
         assert made.exists()
         # Compare as text so that a Windows checkout with CRLF endings

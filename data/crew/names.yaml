@@ -87,3 +87,20 @@ american:
     Dennis, Pinkney, Fortune, Freeman, Lecompte, Cuffee, Paul, Wheeler, Dashiell, Travers,
     Skinner, Cannon, Hooper, Kemp, Hurd,
   ]
+# french: a chasse-marée's crew of Brittany and Normandy (package 43b, the lugger): the
+#   saints' names of the parish registers (Jean, Yves, Guillaume, Hervé) and the Breton
+#   and Norman surnames of the coast (Le Gall, Kerjean, Le Goff, Tanguy, Lemarchand),
+#   judgement after the period's registers; a muster book wrote them in full.
+french:
+  given: [
+    Jean, Pierre, Yves, Guillaume, François, Joseph, Louis, Jacques, René, Hervé,
+    Alain, Corentin, Mathurin, Julien, Nicolas, Olivier, Michel, Gilles, Yann, Goulven,
+    Tugdual, Malo, Ronan, Gabriel, Antoine, Charles, Claude, Étienne, Laurent, Vincent,
+  ]
+  surnames: [
+    Le Gall, Le Goff, Le Bihan, Le Roux, Le Floch, Le Moal, Le Guen, Le Meur, Le Corre, Le Brun,
+    Kerjean, Kervella, Kerdraon, Tanguy, Guillou, Prigent, Quéré, Riou, Salaün, Thomas,
+    Morvan, Cariou, Jaouen, Nédélec, Pennec, Pichon, Rolland, Simon, Hamon, Hervé,
+    Lemarchand, Lefebvre, Leroux, Lecoq, Delaunay, Duval, Marie, Lebas, Hébert, Gosselin,
+    Surcouf, Porcher, Jégou, Briand, Gauthier, Allain, Bourdon, Collet, Fleury, Renaud,
+  ]

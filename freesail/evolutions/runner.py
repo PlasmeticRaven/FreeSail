@@ -630,6 +630,16 @@ class Runner:
         def any_set(sails: Any) -> bool:
             return any(getattr(s, "is_set", False) for s in (sails or []))
 
+        def lee_side() -> str:
+            # the lee side as the deck reads the wind (a dipping lug is hoisted on it,
+            # package 43b): starboard with the wind on the larboard side
+            return "larboard" if ship.dyn.apparent_wind_angle >= 0.0 else "starboard"
+
+        def against_the_mast(sail: Any) -> bool:
+            # a dipping lug lying on the weather side of its mast (package 43b)
+            side = getattr(sail, "lug_side", None)
+            return bool(getattr(sail, "dipping", False)) and side not in (None, lee_side())
+
         functions = {
             "yard_of": ship.yard_of,
             "sail_of": ship.sail_of,
@@ -654,6 +664,8 @@ class Runner:
             "tack_sign": tack_sign,
             "close_hauled": close_hauled,
             "any_set": any_set,
+            "lee_side": lee_side,
+            "against_the_mast": against_the_mast,
         }
         return expr.Env(names, functions)
 
