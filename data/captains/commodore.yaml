@@ -14,6 +14,8 @@ source: "spec M6 §4; the convoy instructions of the period, from memory (the es
 thresholds:
   gale_kn: {value: 36, source: "a convoy's escort heaves to with the convoy at a fresh gale; judgement on Beaufort's scale"}
   gale_over_kn: {value: 28, source: "judgement"}
+  beating_dwell_minutes: {value: 10, source: "package 43b: the beating book taken up and given up on a verdict that has stood ten minutes, not on one course's word (the trade trial traded the deck every two minutes as an evasion ended); judgement, as gale_over_minutes"}
+  beating_band_points: {value: 0.5, source: "package 43b: the course laid again only half a point freer than the shaping's edge, so that a course on the edge of the wind is one verdict and not two by turns; judgement"}
   # package 45: the wind under the gale-over line for so many minutes together before she fills away, not on a lull of a gusty wind (Luce 1884 ch. XXIX p. 479, sail not made again too rapidly; the figure judgement); while the glass falls the line comes down with the gale line by `worsening_sooner_kn`, the band between them kept
   gale_over_minutes: {value: 10, source: "a glass is too long with the wind easing and a minute is a lull; judgement"}
   shorten_sail_kn: {value: 28, source: "an escort keeps her sail to the convoy's, which is the slowest ship's; judgement, two knots under the starter book's figure"}

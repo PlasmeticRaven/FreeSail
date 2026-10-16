@@ -96,8 +96,9 @@ def test_every_doctrine_loads_with_sources_states_and_stimuli_the_captain_knows(
             assert t.frm in C.STATES and t.to in C.STATES
             assert t.on in C.STIMULI, f"{role}: {t.on}"
             assert not t.unless or t.unless in C.STIMULI
-    with pytest.raises(ValueError, match="no doctrine for the role 'fisherman'"):
-        C.load_doctrine("fisherman")
+    # the fisherman is package 43b's (the world's business); a role with no file is refused
+    with pytest.raises(ValueError, match="no doctrine for the role 'privateer'"):
+        C.load_doctrine("privateer")
 
 
 def test_every_book_line_of_every_doctrine_parses_in_the_dialect_on_every_ship():

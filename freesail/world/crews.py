@@ -80,6 +80,10 @@ PROMOTION_ACCOUNT_SIGMA_NM = 0.5
 # The states a crewed vessel is demoted in, and a far one not promoted in: the port's
 # business is not the crewed body's (see the module's head).
 _NOT_CREWED_STATES = frozenset({"at anchor", "in port", "running for shelter", "in distress"})
+# The roles never crewed (package 43b): the fisherman of the world's business is at far
+# detail only (spec M6 §19: "both at far detail in the world's business ... and at full
+# detail in the regatta").
+FAR_ONLY_ROLES = frozenset({"fisherman"})
 
 
 class CrewView:
@@ -540,6 +544,7 @@ def switch(world: World) -> None:
         if (v.crew is None or v.crew.shape == "far")
         and far_nm[v.id] <= CREWED_NM
         and (v.brain.state or "on passage") not in _NOT_CREWED_STATES
+        and getattr(v.brain, "role", "") not in FAR_ONLY_ROLES
     ]
     wanted.sort(key=lambda v: (not _dealing(world, v), far_nm[v.id]))
     for v in wanted:

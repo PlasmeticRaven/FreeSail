@@ -21,6 +21,8 @@ source: "spec M6 §4; the merchant passage's book (data/scenarios/merchant-passa
 thresholds:
   gale_kn: {value: 34, source: "Beaufort's force 8, a fresh gale, 34 to 40 knots, in which a merchantman of 1805 shortened to close-reefed topsails and lay to with sea room (judgement on the scale)"}
   gale_over_kn: {value: 28, source: "she fills away when the wind has eased under force 7, a moderate gale (judgement)"}
+  beating_dwell_minutes: {value: 10, source: "package 43b: the beating book taken up and given up on a verdict that has stood ten minutes, not on one course's word (the trade trial traded the deck every two minutes as an evasion ended); judgement, as gale_over_minutes"}
+  beating_band_points: {value: 0.5, source: "package 43b: the course laid again only half a point freer than the shaping's edge, so that a course on the edge of the wind is one verdict and not two by turns; judgement"}
   # package 45: the wind under the gale-over line for so many minutes together before she fills away, not on a lull of a gusty wind (Luce 1884 ch. XXIX p. 479, sail not made again too rapidly; the figure judgement); while the glass falls the line comes down with the gale line by `worsening_sooner_kn`, the band between them kept
   gale_over_minutes: {value: 10, source: "a glass is too long with the wind easing and a minute is a lull; judgement"}
   shorten_sail_kn: {value: 30, source: "the starter book's 'shorten sail for weather' at thirty knots, where the strain truths begin to bite (docs/dev/TuningNotes.md)"}
