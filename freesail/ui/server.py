@@ -1300,9 +1300,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.watcher:
         station_watcher(world, args.watcher, out=sys.stdout)
     if scenario_file is not None:
-        from freesail.world.scenarios import begin
+        from freesail.world.scenarios import begin, guard_lines
 
-        for line in scenario_file.lines():
+        for line in scenario_file.lines() + guard_lines(world):
             print(line)
         begin(world, scenario_file)
     if args.standing_orders:

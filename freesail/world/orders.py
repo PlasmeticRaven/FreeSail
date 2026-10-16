@@ -228,11 +228,34 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 
 _SHIP_NEW = re.compile(
     r"^ship:\s*(?P<desc>(?:a|an|the)\s+[\w' -]+?)\s+\"(?P<name>[^\"]+)\"\s+of\s+"
-    r"(?P<nation>[\w' -]+?)\s+at\s+(?P<where>.+?)\s*,\s*(?P<goal>.+?)"
-    r"(?P<nocolours>,\s*no\s+colours)?\s*$",
+    r"(?P<nation>[\w' -]+?)\s+at\s+(?P<where>.+?)\s*,\s*(?P<goal>.+?)\s*$",
     re.I,
 )
 _SHIP_GOAL = re.compile(r"^ship\s+\"(?P<name>[^\"]+)\"\s*:\s*(?P<goal>.+?)\s*$", re.I)
+# The tails after a new ship's goal (package 43): `, no colours` and `, intent: <the
+# intent in words>` (a brain on her far body, `captains.FarCaptain`), in either order; and
+# `ship "X": intent <words>`, a brain given to a ship on the sea or her intent changed.
+_SHIP_TAIL = re.compile(r",\s*(?P<tail>no\s+colours|intent:?\s+[^,]+?)\s*$", re.I)
+_INTENT_TAIL = re.compile(r"^intent:?\s+(?P<words>.+?)\s*$", re.I)
+
+
+def _peel_tails(goal: str) -> tuple[str, bool, str]:
+    """(the goal, no colours, the intent's words) from a new ship's words after her
+    place, the tails peeled from the end in either order."""
+    no_colours, intent = False, ""
+    while True:
+        m = _SHIP_TAIL.search(goal)
+        if m is None:
+            return goal.strip(), no_colours, intent
+        tail = m.group("tail")
+        im = _INTENT_TAIL.match(tail)
+        if im:
+            intent = im.group("words").strip()
+        else:
+            no_colours = True
+        goal = goal[: m.start()]
+
+
 _LETTER = re.compile(
     r"^(?P<goal>carrying\s+a\s+(?:letter|message|dispatch|despatch)(?:\s+from\s+"
     r"(?P<origin>.+?))?\s+to\s+the\s+ship)\s*:\s*\"(?P<text>[^\"]*)\"\s*$",
@@ -248,6 +271,33 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         vessel = world.vessels.find(m.group("name"))
         if vessel is None:
             raise WorldOrderError(f"No ship named {m.group('name')!r} is on the sea.")
+        im = _INTENT_TAIL.match(m.group("goal"))
+        if im:
+            # a brain given to a ship on the sea, or her intent changed (package 43)
+            from freesail.world.brains import FarCaptain
+
+            try:
+                vessel.warning = ""  # the guard's word on her goal's legs: her captain plans anew
+                if vessel.brain is None:
+                    vessel.brain = FarCaptain(world, vessel, im.group("words"))
+                    vessel.intent_words = vessel.brain.intent_words
+                    vessel.brain._plan()
+                    words = f"the captain of {vessel.name} given an intent"
+                else:
+                    if vessel.crew is not None and getattr(vessel.crew, "captain", None):
+                        vessel.crew.captain.set_intent(im.group("words"))
+                    vessel.brain.set_intent(im.group("words"))
+                    vessel.intent_words = vessel.brain.intent_words
+                    words = f"the intent of {vessel.name}'s captain changed"
+            except ValueError as e:
+                raise WorldOrderError(str(e)) from None
+            if vessel.warning:
+                raise WorldOrderError(f"{vessel.name} {vessel.warning}")
+            vessel.done = False
+            return f"{words}: {vessel.brain.intent.words}", {
+                "id": vessel.id,
+                "intent": vessel.brain.intent.words,
+            }
         from freesail.world.ships import _goal_plan
 
         try:
@@ -261,12 +311,13 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if m is None:
         raise WorldOrderError(
             "A ship order is 'ship: a <description> \"<name>\" of <nation> at <place>, <goal>' "
-            "or 'ship \"<name>\": <goal>'."
+            "(then ', no colours' and ', intent: <the intent>' as wanted) or 'ship \"<name>\": "
+            "<goal>' or 'ship \"<name>\": intent <the intent>'."
         )
     nation = world.nations.find(m.group("nation"))
     if nation is None:
         raise WorldOrderError(f"'{m.group('nation')}' is no nation of the table.")
-    goal = m.group("goal").strip()
+    goal, no_colours, intent = _peel_tails(m.group("goal"))
     letter: dict[str, Any] | None = None
     lm = _LETTER.match(goal)
     if lm:
@@ -278,8 +329,10 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         "nation": nation.id,
         "position": m.group("where"),
         "goal": goal,
-        "colours": "none" if m.group("nocolours") else "shown",
+        "colours": "none" if no_colours else "shown",
     }
+    if intent:
+        spec["intent"] = intent
     if letter is not None:
         spec["letter"] = {
             "text": letter["text"],
@@ -291,9 +344,12 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     except (ValueError, KeyError) as e:
         raise WorldOrderError(str(e)) from None
     world.vessels.add(vessel)
+    brain = f", her captain's intent {vessel.intent_words}" if vessel.brain is not None else ""
+    guard = f" ({vessel.warning})" if vessel.warning else ""
+    words = f"{vessel.what} {vessel.name!r} of {nation.name} put on the sea, {vessel.goal}"
     return (
-        f"{vessel.what} {vessel.name!r} of {nation.name} put on the sea, {vessel.goal}",
-        {"id": vessel.id, "goal": vessel.goal, "nation": nation.id},
+        words + brain + guard,
+        {"id": vessel.id, "goal": vessel.goal, "nation": nation.id, "intent": vessel.intent_words},
     )
 
 

@@ -850,7 +850,9 @@ def main(argv: list[str] | None = None) -> int:
         free_running=args.free_running,
     )
     if scenario_file is not None:
-        for line in scenario_file.lines():
+        from freesail.world.scenarios import guard_lines
+
+        for line in scenario_file.lines() + guard_lines(world):
             console._print(line)
     for e in world.log.all():
         console._print(e.line())

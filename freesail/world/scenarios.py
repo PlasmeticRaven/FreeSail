@@ -213,6 +213,23 @@ class ScenarioFile:
         return out
 
 
+def guard_lines(world: Any) -> list[str]:
+    """The far-detail guard's words on the other sail at the start (package 43; spec M6
+    §19), for the driver to print with the scenario's lines, the author's view: a ship
+    without a brain whose goal's straight legs cross the land (a ship with a brain is
+    refused at the making instead, her captain's plan being the planner's). Nothing of
+    this is a line of the log."""
+    vessels = getattr(world, "vessels", None)
+    out: list[str] = []
+    for v in getattr(vessels, "vessels", None) or []:
+        if v.warning:
+            out.append(
+                f"  The far-detail guard: {v.name} ({v.goal}) {v.warning} at far detail, where "
+                "no ship takes the ground; give her a way by marks, or a captain (intent:)."
+            )
+    return out
+
+
 def _time(value: Any, where: str) -> datetime:
     if isinstance(value, datetime):
         return value
