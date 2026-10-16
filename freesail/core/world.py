@@ -215,6 +215,10 @@ class Scenario:
     # save says by what she was sailed. A save from before loads with neither.
     intent: str = ""
     books: list[str] = field(default_factory=list)
+    # Package 43 (spec M6 §23): the owner's grant to the director, {"models": [the exact
+    # names], "seats": how many at once, "seats_in_voyage": how many in all}; empty where
+    # the owner gave none, and the seat hook refuses. A save from before loads with none.
+    director: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -381,6 +385,14 @@ class World:
     # figure as last seen and the metres come home since the dragging began, across the
     # spells of it (the physics counts each spell afresh). A class default, as above.
     _drag_seen: dict[str, tuple[float, float]] | None = None
+    # Package 43 (spec M6 §23): the director's seats held on the other ships, by the
+    # ship's id (`world.orders.director_seats`), how many were made in the voyage, and
+    # the consent records' directory the seat hook reads (the drivers set it from
+    # `--consent-records`; the repository's by default). Class defaults for a checkpoint
+    # from before.
+    director_seats: dict[str, dict[str, Any]] | None = None
+    director_seats_made: int = 0
+    consent_records_dir: Any = None
 
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
         # the build's stamp, worked once at the start (package 37d)

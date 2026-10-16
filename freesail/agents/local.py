@@ -1226,6 +1226,15 @@ def main(
         "ship has not got",
     )
     ap.add_argument(
+        "--ship",
+        default="",
+        help=(
+            "the other ship the station is on, by her name or id (package 43; spec M6 §20): "
+            "a model captain of a vessel with a captain of her own (an intent), kept across "
+            "the far-detail switch"
+        ),
+    )
+    ap.add_argument(
         "--cadence",
         choices=list(CADENCES),
         default=None,
@@ -1276,7 +1285,9 @@ def main(
     reserve = handover_reserve_tokens(args.handover_reserve, context)
     if context and station_name(args.station) not in ("watcher",):
         print(handover_words(args.handover_reserve, context, reserve), file=out, flush=True)
-    game = GameClient(args.game, args.station, transport=game_transport, http=game_http)
+    game = GameClient(
+        args.game, args.station, transport=game_transport, http=game_http, ship=args.ship
+    )
     try:
         first = game.station(
             identity,

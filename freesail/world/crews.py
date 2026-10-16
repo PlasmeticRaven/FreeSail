@@ -208,12 +208,20 @@ class CrewedWorld(World):
 
     # -- the far shape (spec M6 §20) ----------------------------------------------------
 
-    def far_tick(self) -> None:
-        """The World in the far shape, each second: the clock kept with the parent's,
-        the body's truth mirrored into the ship and the account, the lookout once a
-        minute, the stations sampled; no physics, no book, no judgement of the near
-        captain's (the brain has her)."""
-        self.clock.advance()
+    def submit(
+        self, text: str, actor: str = "captain", said: str | None = None, routine: bool = False
+    ) -> Any:
+        """An order to the crewed ship: the World's own at full detail; in the far shape
+        the plan layer's (`submit_far`: the far-shape orders on the body, the readings and
+        the conversation through the grammar, the rest refused in words)."""
+        if getattr(self, "shape", "full") == "far":
+            return submit_far(self, text, actor, said, routine)
+        return super().submit(text, actor=actor, said=said, routine=routine)
+
+    def mirror_far(self) -> None:
+        """The far body's truth into this World's ship and position (the far shape):
+        called each second of the tick and again after the far body has moved at the
+        minute, so that the station's readings and the body are one."""
         v = self.vessel
         self._position = v.position
         self._geo_last = (self.ship_x, self.ship_y)
@@ -223,13 +231,23 @@ class CrewedWorld(World):
             dyn.target_heading = dyn.heading
             dyn.u = dyn.speed = units.knots_to_ms(v.speed_kn)
             dyn.v = 0.0
+
+    def far_tick(self) -> None:
+        """The World in the far shape, each second: the clock kept with the parent's,
+        the body's truth mirrored into the ship and the account, the lookout once a
+        minute, the stations sampled; no physics, no book, no judgement of the near
+        captain's (the brain has her)."""
+        self.clock.advance()
+        self.mirror_far()
         self._follow_weather()
         self.wind.step(1.0, self.wind_record.mean_speed())
         self.wind_record.add(self.wind.effective_speed, self.wind.direction_from)
         if self.clock.ship_time.second == 0:
             self.conditions = self.parent.conditions
             if self.navigation is not None:
-                self.navigation.reckoning.set_position(v.position, self.clock.tick, sigma_nm=0.25)
+                self.navigation.reckoning.set_position(
+                    self.vessel.position, self.clock.tick, sigma_nm=0.25
+                )
             if self.lookout is not None:
                 for severity, kind, text, data in self.lookout.look(self):
                     self.record(severity, kind, text, data=data)
@@ -366,8 +384,20 @@ def mirror(vessel: Any, crew: CrewedWorld, minute: bool) -> None:
 # ---------------------------------------------------------------------------
 
 
+def _crew_ids(world: World) -> tuple[str, ...]:
+    """Every vessel with a World of her own, full or far in shape: the parent ticks each
+    (`Vessels.tick_crews`, gated on `crewed_ids`)."""
+    return tuple(v.id for v in world.vessels.vessels if v.crew is not None and not v.done)
+
+
 def crewed(world: World) -> list[Any]:
-    return [v for v in world.vessels.vessels if v.crew is not None and not v.done]
+    """The vessels at full detail now (a station's World kept in the far shape is not
+    one: it costs little and counts nothing against the cap)."""
+    return [
+        v
+        for v in world.vessels.vessels
+        if v.crew is not None and v.crew.shape == "full" and not v.done
+    ]
 
 
 def promote(world: World, vessel: Any) -> CrewedWorld:
@@ -379,7 +409,7 @@ def promote(world: World, vessel: Any) -> CrewedWorld:
     crew = CrewedWorld(world, vessel)
     vessel.crew = crew
     vessel.detail = "crewed"
-    world.vessels.crewed_ids = tuple(v.id for v in crewed(world))
+    world.vessels.crewed_ids = _crew_ids(world)
     return crew
 
 
@@ -407,7 +437,7 @@ def _to_full(vessel: Any) -> None:
     if brain is not None:
         brain.fold_in(crew.captain)
     crew.record(
-        Severity.NOTABLE,
+        Severity.URGENT,
         "crew.promoted",
         f"{vessel.name} at full detail again: her company at their stations, the deck "
         "and the sails hers to work by every order.",
@@ -428,9 +458,11 @@ def demote(world: World, vessel: Any) -> None:
         brain.fold_back(crew.captain)
     seated = any(not h.agent.released for h in crew.agents.values())
     if seated:
+        # urgent in her log (package 43): the station's whole surface changes, and a
+        # station standing by is woken to be told its shape
         crew.shape = "far"
         crew.record(
-            Severity.NOTABLE,
+            Severity.URGENT,
             "crew.demoted",
             f"{vessel.name} at far detail: beyond the range of the ship, her body is the "
             "plan's; the station keeps, in the plan layer's shape (a course shaped, sail as "
@@ -440,11 +472,37 @@ def demote(world: World, vessel: Any) -> None:
     else:
         vessel.crew = None
         vessel.detail = "far"
-    world.vessels.crewed_ids = tuple(v.id for v in crewed(world))
+    world.vessels.crewed_ids = _crew_ids(world)
 
 
 def _dealing(world: World, vessel: Any) -> bool:
     return vessel.dealing_tick >= 0 and world.clock.tick - vessel.dealing_tick <= DEALING_S
+
+
+def enforce_budgets(world: World) -> None:
+    """The director's seats' budgets (spec M6 §23; `orders._seat`): a station held on a
+    ship under a director's seat is stood down, with the reason, when its samples or its
+    hours are spent, and the seat given back; once a minute."""
+    seats = getattr(world, "director_seats", None) or {}
+    if not seats:
+        return
+    for vessel in list(world.vessels.vessels):
+        seat = seats.get(vessel.id)
+        crew = vessel.crew
+        if seat is None or crew is None:
+            continue
+        for h in list(crew.agents.values()):
+            if h.agent.released or h.model_name != seat.get("model"):
+                continue
+            spent = False
+            if seat.get("unit") == "hours":
+                spent = world.clock.tick - int(seat.get("tick", 0)) >= float(seat["budget"]) * 3600
+            else:
+                spent = int(getattr(h.agent, "samples", 0) or 0) >= int(seat["budget"])
+            if spent:
+                why = f"the director's budget of {seat['budget']:g} {seat['unit']} is spent"
+                h.stand_down(why, by="the director")
+                seats.pop(vessel.id, None)
 
 
 def switch(world: World) -> None:
@@ -473,7 +531,7 @@ def switch(world: World) -> None:
     wanted = [
         v
         for v in with_brain
-        if v.crew is None
+        if (v.crew is None or v.crew.shape == "far")
         and far_nm[v.id] <= CREWED_NM
         and (v.brain.state or "on passage") not in _NOT_CREWED_STATES
     ]
@@ -492,3 +550,271 @@ def switch(world: World) -> None:
         farthest = max(idle, key=lambda c: far_nm.get(c.id, 0.0))
         demote(world, farthest)
         promote(world, v)
+
+
+# ---------------------------------------------------------------------------
+# A station on another ship, kept across the switch (spec M6 §20; decision 40)
+# ---------------------------------------------------------------------------
+
+# The orders the far shape works, in the plan layer's own terms (spec M6 §20: "courses
+# shaped, sail made or shortened as a state, heaving to, the chase and the intent's
+# changes"); everything else of the ship's is refused in words naming these, and the
+# readings, the deck's conversation and the book's listing are answered as at full
+# detail, from what the far body has.
+FAR_SHAPE_WORDS = (
+    "shape a course for <a place or a position>",
+    "steer <a course>",
+    "heave to",
+    "fill away",
+    "give chase",
+    "haul off",
+    "make sail",
+    "shorten sail",
+    "come to an anchor",
+    "weigh",
+    "keep the station",
+)
+FAR_SHAPE_REFUSAL = (
+    "She is at far detail, beyond the range of the ship: her body is the plan's, and the "
+    "orders that work it are " + ", ".join(FAR_SHAPE_WORDS) + ". The readings, the "
+    "conversation and the book's listing are answered; the whole surface returns when she "
+    "is near again, with no reseat."
+)
+
+
+def station_world(parent: World, words: str) -> tuple[Any, CrewedWorld]:
+    """The World a station on another ship is seated in (`--station captain --ship <id>`):
+    the vessel by her id or her name, her crewed World (promoted when she is within the
+    range, else made in the far shape, where it mirrors the far body for the station's
+    readings until the promotion brings the full surface back beneath the same station).
+    Refused in words (ValueError) for a ship not on the sea or one without a captain of
+    her own (no intent: give her one with `ship "<name>": intent <words>`)."""
+    vessel = parent.vessels.find(words)
+    if vessel is None or vessel.done:
+        names = ", ".join(v.name for v in parent.vessels.active() if v.description) or "none"
+        raise ValueError(f"No ship named {words!r} is on the sea; the sail: {names}.")
+    if vessel.brain is None:
+        raise ValueError(
+            f"{vessel.name} has no captain of her own to be seated for: give her an intent "
+            f"first (the world order 'ship \"{vessel.name}\": intent <the intent>')."
+        )
+    if vessel.crew is not None:
+        return vessel, vessel.crew
+    centre = parent.position
+    nm = (
+        bearing_and_distance(centre, vessel.position)[1] / units.NAUTICAL_MILE
+        if centre is not None
+        else math.inf
+    )
+    full = nm <= CREWED_NM and len(crewed(parent)) < CREWED_CAP
+    crew = CrewedWorld(parent, vessel)
+    vessel.crew = crew
+    vessel.detail = "crewed"
+    if not full:
+        crew.shape = "far"
+        crew.record(
+            Severity.NOTABLE,
+            "crew.demoted",
+            f"{vessel.name} at far detail: beyond the range of the ship, her body is the "
+            "plan's; a station here works it in the plan layer's shape (a course shaped, sail "
+            "as a state, heaving to, the chase, the intent) until she is near again.",
+            data={"id": vessel.id},
+        )
+    parent.vessels.crewed_ids = _crew_ids(parent)
+    return vessel, crew
+
+
+def _place_for(world: World, words: str) -> tuple[Position, str] | None:
+    from freesail.world.ships import place_position
+
+    return place_position(world, words)
+
+
+def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] | None:
+    """An order of the far shape carried out on the far body (the plan): (kind, the
+    line, data); None when the words are none of the far shape's. Refused in words
+    (OrderError) when a place is not the chart's."""
+    import re
+
+    from freesail.orders.errors import OrderError
+
+    v = crew.vessel
+    brain = v.brain
+    low = " ".join(text.lower().split()).rstrip(".")
+    m = re.match(r"^(?:shape|lay) (?:a |the )?course for (?P<place>.+)$", low)
+    if m:
+        found = _place_for(crew.parent, m.group("place"))
+        if found is None:
+            raise OrderError(f"The chart knows no place named {m.group('place')!r}.")
+        v.saved_plan = None
+        v.plan = [("to", found[0], found[1])]
+        v.tack = 0.0
+        if brain is not None:
+            brain.planned = True
+        return "helm.set", f"Shaped a course for {found[1]} (the plan's leg).", {"place": found[1]}
+    m = re.match(r"^steer (?P<course>.+)$", low)
+    if m:
+        try:
+            rad = units.parse_course(m.group("course"))
+        except Exception:  # noqa: BLE001 - the units' own reader
+            rad = None
+        if rad is None:
+            raise OrderError(f"{m.group('course')!r} is no course to steer.")
+        from freesail.world.geo import destination
+
+        far = destination(v.position, units.rad_to_deg(rad) % 360.0, 60.0 * units.NAUTICAL_MILE)
+        v.saved_plan = None
+        v.plan = [("to", far, f"a course {units.point_name(rad)}")]
+        v.tack = 0.0
+        return "helm.set", f"Helm ordered: steer {units.point_name(rad)} (the plan's course).", {}
+    if low in ("heave to", "lie to", "bring her to"):
+        if not v.plan or v.plan[0][0] != "lie_to":
+            v.saved_plan = list(v.plan)
+            v.plan = [("lie_to", math.inf)]
+        return "ship.hove_to", "Hove to (the far body lies to, drifting a knot to leeward).", {}
+    if low in ("fill away", "fill", "get her way on"):
+        if v.plan and v.plan[0][0] == "lie_to":
+            v.plan = list(v.saved_plan or [])
+            v.saved_plan = None
+            v.lying_to_s = 0.0
+        return "ship.filled_away", "Filled away; the plan's leg again.", {}
+    if low in ("give chase", "chase", "chase the stranger", "stand after her"):
+        if brain is None:
+            return None
+        from freesail.world.brains import HAIL_REACH_M, perceive_vessel
+
+        p = perceive_vessel(crew.parent, v, brain)
+        near = brain._nearest_stranger(p)
+        if near is None:
+            raise OrderError("No sail in sight to chase.")
+        brain._stranger = str(near["id"])
+        v.saved_plan = v.saved_plan or list(v.plan)
+        v.plan = [("chase", brain._stranger, HAIL_REACH_M)]
+        return "helm.set", f"Gave chase to {near.get('known') or 'a sail'} {near['relative']}.", {}
+    if low in ("haul off", "haul off from her", "bear up and run"):
+        if brain is None:
+            return None
+        from freesail.world.brains import perceive_vessel
+
+        p = perceive_vessel(crew.parent, v, brain)
+        near = brain._nearest_stranger(p)
+        if near is None:
+            raise OrderError("No sail in sight to haul off from.")
+        brain._stranger = str(near["id"])
+        v.saved_plan = v.saved_plan or list(v.plan)
+        v.plan = [("away", brain._stranger)]
+        return (
+            "helm.set",
+            f"Hauled off from {near.get('known') or 'a sail'} {near['relative']}.",
+            {},
+        )
+    if low in ("make sail", "make all sail", "set plain sail", "set all plain sail"):
+        v.sail_order = "under plain sail"
+        return "sail.set", "Plain sail made (as a state of the far body).", {}
+    if low in ("shorten sail", "reef the topsails", "shorten sail for weather"):
+        v.sail_order = "under reefed topsails"
+        return "sail.reefed", "Sail shortened: the topsails reefed, the courses in (a state).", {}
+    if low in ("come to an anchor", "let go the anchor", "anchor", "let go the best bower"):
+        if not (v.plan and v.plan[0][0] == "anchor"):
+            v.saved_plan = list(v.plan)
+        v.plan = [("anchor", "")]
+        return (
+            "ship.anchored",
+            "Came to an anchor where she is (the far body rides head to wind).",
+            {},
+        )
+    if low in ("weigh", "weigh anchor", "get under way", "up anchor"):
+        if v.plan and v.plan[0][0] == "anchor":
+            v.plan = list(v.saved_plan or [])
+            v.saved_plan = None
+        if not v.plan and brain is not None:
+            brain.planned = False
+            brain._plan()
+        return "ship.under_way", "Under way again; the plan's leg.", {}
+    if low in ("keep the station", "back to the station", "resume the station"):
+        if brain is None or brain.intent is None or brain.intent.kind != "station":
+            raise OrderError("She has no station to keep: her intent is not a station's.")
+        brain._enter("keeping station")
+        return "helm.set", "The station kept again (the plan's square about it).", {}
+    return None
+
+
+def _is_a_reading(crew: CrewedWorld, text: str) -> bool:
+    """Whether the words ask a reading, a query or the deck's conversation, which the far
+    shape answers through the ship's grammar (nothing of them moves the body)."""
+    from freesail.orders import prompt, read_whole, stations
+    from freesail.orders.errors import OrderError
+    from freesail.orders.vocabulary import load_vocabulary
+    from freesail.standing import grammar as standing
+
+    ship = crew.ship
+    if stations.recognises(text, ship) is not None:
+        return True
+    if standing.recognises(text) in ("standing orders", "show standing order"):
+        return True
+    vocab = load_vocabulary()
+    try:
+        order = read_whole(ship, text, vocab)
+    except OrderError:
+        try:
+            return prompt.answer_unparsed(ship, text, vocab) is not None
+        except OrderError:
+            return False
+    return order.verb in vocab.readings
+
+
+def submit_far(crew: CrewedWorld, text: str, actor: str, said: str | None, routine: bool) -> Any:
+    """`World.submit` in the far shape: a far-shape order on the plan, a reading or the
+    conversation through the grammar, anything else refused in words."""
+    from freesail.orders.errors import OrderError
+
+    text = " ".join(text.split())
+    if _is_a_reading(crew, text):
+        return World.submit(crew, text, actor=actor, said=said, routine=routine)
+    try:
+        found = far_order(crew, text)
+    except OrderError as e:
+        return crew.record(
+            Severity.ROUTINE,
+            "order.rejected",
+            f"Order not carried out ({text!r}): {e}",
+            actor=actor,
+            data={"order": text, "reason": str(e)},
+        )
+    if found is None:
+        return crew.record(
+            Severity.ROUTINE,
+            "order.rejected",
+            f"Order not carried out ({text!r}): {FAR_SHAPE_REFUSAL}",
+            actor=actor,
+            data={"order": text, "reason": FAR_SHAPE_REFUSAL, "far_shape": True},
+        )
+    kind, words, data = found
+    crew.record(
+        Severity.ROUTINE,
+        "order.accepted",
+        f"{said}." if said else f"Order: {text}.",
+        actor=actor,
+        data={"order": text, "far_shape": True},
+    )
+    return crew.record(Severity.ROUTINE, kind, words, actor=actor, data=data | {"far_shape": True})
+
+
+def shape_words(crew: CrewedWorld) -> str:
+    """The notice a station on another ship is given of her shape (spec M6 §20: the
+    sample says which)."""
+    v = crew.vessel
+    if crew.shape == "far":
+        return (
+            f"{v.name} is at far detail, beyond the range of the player's ship: her body is "
+            "the plan's, moved once a minute by her polar in the wind at her. Your orders "
+            "work it in the plan layer's shape: " + ", ".join(FAR_SHAPE_WORDS) + ". The "
+            "readings are the far body's (her place, the wind, what her lookout sees); the "
+            "sails, the hands and the book are as they stood when she was last at full "
+            "detail. When she is near the ship again the whole surface returns beneath this "
+            "station, with no reseat, and the log says so."
+        )
+    return (
+        f"{v.name} is at full detail beside the player's ship: her hull and rig under the "
+        "physics, her company at their stations, every order of the ship's yours."
+    )

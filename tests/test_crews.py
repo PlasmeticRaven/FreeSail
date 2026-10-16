@@ -203,3 +203,148 @@ def test_truth_88_with_the_cap_full_the_pace_holds():
         w.run(1000)
         best = max(best, 1000 / (time.perf_counter() - t0))
     assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second"
+
+
+# -- a station on another ship, kept across the switch (spec M6 §20; truth 89) -------------
+
+
+def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_across_the_switch(
+    tmp_path,
+):
+    """Through the agent API with `ship`: the fake captain seated on the brig (promoted,
+    three miles off) with her brief naming her, her voyage and the shape; his order goes
+    through her own channel and is in her log, not the player's; the player's lookout sees
+    her as a sail. Sailed beyond the range she is demoted and the station keeps, in the far
+    shape: the sample says so, a course shaped works the far body, an order of the deck is
+    refused in words; brought near again the full surface returns beneath the same
+    station, said in her log, with no reseat. A ship without a captain of her own, or not
+    on the sea, is refused in words."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.agents import consent
+    from freesail.ui.server import Driver, create_app
+
+    w = hove_to_world()
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    put(w, "cutter", "britain", "49 32 N 5 32 W", "bound for Falmouth", name="Lark")
+    w.run(61)
+    assert b.crew is not None and b.crew.shape == "full"
+    records = tmp_path / "consent"
+    records.mkdir()
+    weights = "made-up-crew-model-9b.Q4_K_M.gguf"
+    consent.Record(
+        weights, "a test runtime", "2026-10-16", consent.YES, answer="Yes.", drill="passed"
+    ).write(records)
+    driver = Driver(w, compression=60.0)
+    app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
+    with TestClient(app) as http:
+        r = http.post(
+            "/api/agents/captain", json={"model_name": weights, "door": "mcp", "ship": "Lark"}
+        )
+        assert r.status_code == 404 and "no captain of her own" in r.json()["detail"]
+        r = http.post(
+            "/api/agents/captain", json={"model_name": weights, "door": "mcp", "ship": "Z"}
+        )
+        assert r.status_code == 404 and "No ship named 'Z'" in r.json()["detail"]
+        a = http.post(
+            "/api/agents/captain", json={"model_name": weights, "door": "mcp", "ship": "X"}
+        ).json()
+        assert a["phase"] == "station" and a["station"] == "captain"
+        key = a["key"]
+        crew = b.crew
+        h = crew.agents["captain"]
+        assert "captain" not in w.agents and h.world is crew
+        brief = h.brief.text()
+        assert "X at full detail" in brief or "at full detail" in brief
+        assert crew.captain.seated and not crew.captain.commands
+        # the station's first sample says the shape
+        first = a["turns"][-1]["content"] if a.get("turns") else {}
+        assert "full detail" in str(first) or any(
+            "full detail" in str(t) for t in a.get("turns", [])
+        )
+        # his order goes through her own channel, into her log and not the player's
+        http.post(
+            "/api/agents/captain/reply",
+            json={
+                "text": "",
+                "calls": [{"name": "submit_order", "args": {"text": "set the royals"}}],
+                "key": key,
+                "ship": "X",
+            },
+        )
+        assert any(e.actor == "the captain" and "royals" in e.text for e in crew.log)
+        assert not any(e.actor == "the captain" and "royals" in e.text for e in w.log)
+        # the pace rule counts her station among the ship's
+        state = http.get("/api/state").json()["driver"]
+        assert state["pace"]["open"] and "captain of X" in state["pace"]["open"][0]["station"]
+        stations = http.get("/api/agents").json()["stations"]
+        assert any(d.get("ship") == "X" and d.get("shape") == "full" for d in stations)
+        # a stand-by, so that the sample closes and the game runs on
+        http.post(
+            "/api/agents/captain/reply",
+            json={
+                "text": "",
+                "calls": [{"name": "stand_by", "args": {"until": "eight bells"}}],
+                "key": key,
+                "ship": "X",
+            },
+        )
+        # the player's lookout sees her as a sail
+        assert any(e.kind == "lookout.sighting" and "brig" in e.text for e in w.log)
+        # sailed beyond the range she is demoted; the station keeps, in the far shape
+        w.world_order('ship "X": intent bound for 49 30 N 6 30 W')
+        for _ in range(400):
+            driver.tick(60)
+            if crew.shape == "far":
+                break
+        assert crew.shape == "far" and b.crew is crew and crew.agents["captain"] is h
+        assert any(e.kind == "crew.demoted" for e in crew.log)
+        assert b.detail == "crewed" and b.plan and b.plan[0][0] == "to"
+        # the far body moves her by the plan each minute, mirrored into her World
+        p0 = crew.position
+        driver.tick(120)
+        assert crew.position != p0 and crew.position == b.position
+        # an order of the deck is refused in words, a course shaped works the far body;
+        # the next sample says the shape
+        r = http.post(
+            "/api/agents/captain/reply",
+            json={
+                "text": "",
+                "calls": [
+                    {"name": "submit_order", "args": {"text": "take in the royals"}},
+                    {"name": "submit_order", "args": {"text": "shape a course for Falmouth"}},
+                    {"name": "stand_by", "args": {"until": "eight bells"}},
+                ],
+                "key": key,
+                "ship": "X",
+            },
+        ).json()
+        refused = [e for e in crew.log if e.kind == "order.rejected" and "royals" in e.text]
+        assert refused and "far detail" in refused[-1].text
+        assert b.plan[0][0] == "to" and b.plan[0][2] == "Falmouth"
+        assert [e for e in crew.log if e.kind == "helm.set" and "Falmouth" in e.text]
+        assert r
+        told = False
+        for _ in range(300):
+            driver.tick(60)
+            turns = http.get(
+                "/api/agents/captain/turns", params={"since": 0, "key": key, "ship": "X"}
+            ).json()["turns"]
+            if any("far detail" in str(x) for x in turns):
+                told = True
+                break
+        assert told
+        # near again: the full surface returns beneath the same station, no reseat
+        b.position = w.position.advanced(0.0, 3.0 * units.NAUTICAL_MILE)
+        driver.tick(61)
+        assert crew.shape == "full" and crew.agents["captain"] is h and b.crew is crew
+        assert any("full detail again" in e.text for e in crew.log)
+        assert crew.ship.spec.source.endswith("brig.yaml") and crew.captain.seated
+        http.post(
+            "/api/agents/captain/release",
+            json={"reason": "the test is done", "key": key, "ship": "X"},
+        )
+        assert h.agent.released

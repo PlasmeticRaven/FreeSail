@@ -267,6 +267,7 @@ class Seat:
     context_tokens: int | None = None  # the door's context, for the handover (package 37)
     reserve_tokens: int | None = None  # the handover's reserve, when the door gave one (37g)
     cadence: str = ""  # the seating's cadence, when the door asked one (package 41)
+    ship: str = ""  # the other ship the station is on, as the door named her (package 43)
     key: str = ""  # the seating's key, given once to the door that stationed (package 37g)
     left_at: str = ""  # the station this identity left by its own word, when it is asked again
     phase: str = CONSENT
@@ -318,6 +319,12 @@ class Seat:
     @property
     def who(self) -> str:
         return f"{self.model_name}, through {DOORS[self.door][1]}"
+
+
+def seat_key(station: str, ship: str = "") -> str:
+    """The desk's key for a seat: the station's name, and on another ship (package 43)
+    the ship's before it ('palinure/captain')."""
+    return f"{ship.lower()}/{station}" if ship else station
 
 
 class Desk:
@@ -380,8 +387,18 @@ class Desk:
             raise DeskError(400, f"There is no door '{door}'; the doors: {', '.join(DOORS)}.")
         kind = str(body.get("session_kind") or "play").lower()
         session = SESSION_TEST if kind == "test" else SESSION_PLAY
+        ship = " ".join(str(body.get("ship") or "").split())
         with self.lock:
             world = self.world()
+            if ship:
+                # a station on another ship (package 43; spec M6 §20): her own World,
+                # promoted or in the far shape, found by her id or her name
+                from freesail.world.crews import station_world
+
+                try:
+                    _vessel, world = station_world(world, ship)
+                except ValueError as e:
+                    raise DeskError(404, str(e)) from None
             _name, make = station_factory(world, name)
             if make is None:
                 # the ship has no such station: the binding on the World decides (41)
@@ -390,7 +407,8 @@ class Desk:
                     f"There is no station '{name}' aboard; the stations: "
                     f"{', '.join(stations_aboard(world))}.",
                 )
-            seat = self.seats.get(name)
+            key_name = seat_key(name, ship)
+            seat = self.seats.get(key_name)
             if seat is not None and seat.world is not None and seat.world is not world:
                 seat = None  # the game was replaced (the console's replay): a new seat
             if seat is not None and not seat.released:
@@ -442,6 +460,7 @@ class Desk:
                 key=_new_key(),
                 world=world,
                 cadence=cadence,
+                ship=ship,
             )
             ask_again = bool(body.get("ask_again"))
             opted_out = decided.ask_again and not ask_again
@@ -485,7 +504,7 @@ class Desk:
             else:
                 seat.words = why
                 self._take_station(seat, record)
-            self.seats[name] = seat
+            self.seats[key_name] = seat
             self.changed()
             return self._answer(seat, 0) | {"since": 0, "key": seat.key}
 
@@ -656,7 +675,12 @@ class Desk:
     # -- the turns --------------------------------------------------------------------
 
     def turns(
-        self, name: str, since: int = 0, wait: float = 0.0, key: str | None = None
+        self,
+        name: str,
+        since: int = 0,
+        wait: float = 0.0,
+        key: str | None = None,
+        ship: str | None = None,
     ) -> dict[str, Any]:
         """`GET /api/agents/<station>/turns?since=N&wait=S&key=K`: the turns from `since`
         on, as soon as there are any, or none after `wait` real seconds (at most
@@ -666,7 +690,7 @@ class Desk:
         deadline = time.monotonic() + wait
         while True:
             with self.lock:
-                seat = self._seat(name, key)
+                seat = self._seat(name, key, ship)
                 stream = seat.stream()
                 n = max(0, min(int(since or 0), len(stream)))
                 now = time.monotonic()
@@ -696,7 +720,7 @@ class Desk:
         )
         cut = " ".join(str(body.get("cut_off") or "").split())
         with self.lock:
-            seat = self._seat(name, body.get("key"))
+            seat = self._seat(name, body.get("key"), body.get("ship"))
             since = body.get("since")
             before = len(seat.stream()) if since is None else int(since)
             if seat.phase == STOPPED:
@@ -907,13 +931,15 @@ class Desk:
 
     # -- the owner's word, the release --------------------------------------------------
 
-    def owner(self, name: str, text: str, key: str | None = None) -> dict[str, Any]:
+    def owner(
+        self, name: str, text: str, key: str | None = None, ship: str | None = None
+    ) -> dict[str, Any]:
         """`POST /api/agents/<station>/owner` with `{text}`: the owner's reply to what the
         model wrote in the consent conversation, put to it as the developer's words; a
         blank reply stops the step without a record. After the answer, the developer's
         word before the record closes; a blank one closes it at once."""
         with self.lock:
-            seat = self._seat(name, key)
+            seat = self._seat(name, key, ship)
             conv = seat.conv
             if seat.phase != CONSENT or conv is None or conv.waiting != consent.OWNER_TURN:
                 raise DeskError(409, "Nothing the model wrote is waiting for the owner's reply.")
@@ -937,7 +963,9 @@ class Desk:
             self.changed()
             return self._answer(seat, before)
 
-    def release(self, name: str, reason: str, key: str | None = None) -> dict[str, Any]:
+    def release(
+        self, name: str, reason: str, key: str | None = None, ship: str | None = None
+    ) -> dict[str, Any]:
         """`POST /api/agents/<station>/release` with `{reason, key}`: the door is going
         (it closed, its client disconnected, Ctrl-C). A station is stood down with a save
         and the reason journaled; a consent conversation ends without a record. Only the
@@ -945,7 +973,7 @@ class Desk:
         stood down another door's station)."""
         reason = " ".join(str(reason or "").split()) or "the door closed"
         with self.lock:
-            seat = self._seat(name, key)
+            seat = self._seat(name, key, ship)
             if seat.phase == CONSENT:
                 seat.phase = STOPPED
                 seat.conv = None
@@ -961,7 +989,13 @@ class Desk:
             return self._answer(seat, len(seat.stream()))
 
     def library(
-        self, name: str, topic: str, section: str = "", find: str = "", key: str | None = None
+        self,
+        name: str,
+        topic: str,
+        section: str = "",
+        find: str = "",
+        key: str | None = None,
+        ship: str | None = None,
     ) -> str:
         """`GET /api/agents/<station>/library?topic=...&section=...&find=...`: a page of
         the reference library as the library tool gives it, read without a turn (it
@@ -970,12 +1004,14 @@ class Desk:
         seating's key, as every read for that station does (package 37g); the library
         itself is open to a door that holds no station yet."""
         with self.lock:
-            seat = self.seats.get(station_name(name))
+            seat = self.seats.get(seat_key(station_name(name), str(ship or "")))
             if seat is not None and not seat.released and seat.key:
-                self._seat(name, key)
+                self._seat(name, key, ship)
             return str(tools.library(self.world(), name, topic or "contents", section, find))
 
-    def picture(self, name: str, picture_id: str, key: str | None = None) -> Any:
+    def picture(
+        self, name: str, picture_id: str, key: str | None = None, ship: str | None = None
+    ) -> Any:
         """`GET /api/agents/<station>/picture/<id>?key=K`: a picture a tool of the
         station's made (package 42, item 4), as the painter holds it, for the door that
         shows it; wants the seating's key, as every read for a held station does. 404 when
@@ -983,7 +1019,7 @@ class Desk:
         from freesail.agents import pictures
 
         with self.lock:
-            self._seat(name, key)
+            self._seat(name, key, ship)
             painter = pictures.painter_of(self.world())
         pic = painter.get(str(picture_id)) if painter is not None else None
         if pic is None:
@@ -1001,11 +1037,12 @@ class Desk:
             if (
                 seat.phase == STATION
                 and h is not None
-                and seat.world is world
+                and (seat.world is world or getattr(seat.world, "parent", None) is world)
                 and isinstance(h.model, RemoteModel)
                 and h.floor == "model"
             ):
-                return f"the {seat.station}"
+                aboard = f" of {seat.ship}" if seat.ship else ""
+                return f"the {seat.station}{aboard}"
         return None
 
     def stations(self) -> list[dict[str, Any]]:
@@ -1016,7 +1053,7 @@ class Desk:
         for the snapshot, `GET /api/agents` and the console's `state`."""
         world = self.world()
         out: list[dict[str, Any]] = []
-        for h in world.agents.values():
+        for name, h, w in harness_mod.all_agents(world):
             d = h.snapshot()
             d.update(
                 model_name=h.model_name,
@@ -1024,12 +1061,19 @@ class Desk:
                 phase=STATION,
                 floor=h.floor,
             )
+            if w is not world:
+                # a station on another ship (package 43): named with her, and her shape
+                d["station"] = name
+                d["ship"] = getattr(getattr(w, "vessel", None), "name", "")
+                d["shape"] = getattr(w, "shape", "")
             d["line"] = _station_line(d)
             out.append(d)
         for seat in self.seats.values():
-            if seat.phase == STATION or seat.station in world.agents:
+            if seat.phase == STATION or (not seat.ship and seat.station in world.agents):
                 continue
-            if seat.world is not None and seat.world is not world:
+            if seat.world is not None and not (
+                seat.world is world or getattr(seat.world, "parent", None) is world
+            ):
                 continue
             if seat.phase == CONSENT and seat.conv is not None:
                 waiting = seat.conv.waiting
@@ -1064,13 +1108,14 @@ class Desk:
 
     # -- helpers ----------------------------------------------------------------------
 
-    def _seat(self, name: str, key: str | None = None) -> Seat:
+    def _seat(self, name: str, key: str | None = None, ship: str | None = None) -> Seat:
         """The seat of a station for a call that carries its seating's key (package 37g,
         item 1). No seat: 404 (the game holds none for this station: it was restarted, or
         nothing was stationed). A missing or another seating's key: 409, in words that
-        say the station is held and by which identity, and that nothing was run."""
+        say the station is held and by which identity, and that nothing was run. `ship`
+        names another ship the station is on (package 43)."""
         name = station_name(name)  # 'officer' names the officer of the watch (package 37)
-        seat = self.seats.get(name)
+        seat = self.seats.get(seat_key(name, " ".join(str(ship or "").split())))
         if seat is None:
             raise DeskError(
                 404,
@@ -1214,11 +1259,14 @@ class GameClient:
         *,
         transport: Any = None,
         http: Any = None,
+        ship: str = "",
     ):
         import httpx
 
         self.base = game.strip().rstrip("/")
         self.name = station
+        # another ship the station is on (package 43; `--ship`), sent with every call
+        self.ship = " ".join(str(ship or "").split())
         # one read timeout covers every request: the longest poll the game allows, and room
         timeout = httpx.Timeout(HTTP_SLACK_S, read=TURNS_WAIT_MAX_S + HTTP_SLACK_S)
         self.http = http or httpx.Client(base_url=self.base, transport=transport, timeout=timeout)
@@ -1298,6 +1346,8 @@ class GameClient:
         }
         if cadence:
             body["cadence"] = cadence  # the seating's cadence (package 41; spec M6 §12)
+        if self.ship:
+            body["ship"] = self.ship  # a station on another ship (package 43)
         if context_tokens:
             body["context_tokens"] = int(context_tokens)  # for the handover (package 37)
         if handover_reserve:
@@ -1314,9 +1364,12 @@ class GameClient:
 
     def turns(self, wait: float = 0.0) -> dict[str, Any]:
         """The turns past the cursor, waiting up to `wait` real seconds for them."""
-        params = {"since": self.cursor, "wait": wait, "key": self.key}
+        params = {"since": self.cursor, "wait": wait, "key": self.key, **self._ship_param()}
         path = f"/api/agents/{self.name}/turns"
         return self._took(self._request("GET", path, params=params))
+
+    def _ship_param(self) -> dict[str, str]:
+        return {"ship": self.ship} if self.ship else {}
 
     def reply(
         self, reply: Reply, advance: bool = True, cut_off: str | None = None
@@ -1325,7 +1378,7 @@ class GameClient:
         leaves the cursor where it is (a read made beside a call that is waiting, whose
         own poll reads the turns on from there). `cut_off`, the door's words, says that no
         reply was to be had (package 37i, item 1): the turn ends with nothing done."""
-        body = reply.to_dict() | {"since": self.cursor, "key": self.key}
+        body = reply.to_dict() | {"since": self.cursor, "key": self.key, **self._ship_param()}
         if cut_off:
             body["cut_off"] = cut_off
         path = f"/api/agents/{self.name}/reply"
@@ -1334,17 +1387,19 @@ class GameClient:
 
     def owner(self, text: str) -> dict[str, Any]:
         path = f"/api/agents/{self.name}/owner"
-        answer = self._request("POST", path, json={"text": text, "key": self.key})
+        body = {"text": text, "key": self.key, **self._ship_param()}
+        answer = self._request("POST", path, json=body)
         return answer
 
     def release(self, reason: str) -> dict[str, Any]:
         path = f"/api/agents/{self.name}/release"
-        body = {"reason": reason, "key": self.key}
+        body = {"reason": reason, "key": self.key, **self._ship_param()}
         return self._took(self._request("POST", path, json=body))
 
     def library(self, topic: str, section: str = "", find: str = "") -> str:
         path = f"/api/agents/{self.name}/library"
         params = {"topic": topic, "section": section, "find": find, "key": self.key}
+        params.update(self._ship_param())
         answer = self._request("GET", path, params=params)
         return str(answer.get("text", ""))
 
@@ -1355,7 +1410,8 @@ class GameClient:
 
         path = f"/api/agents/{self.name}/picture/{picture_id}"
         try:
-            r = self.http.request("GET", f"{self.base}{path}", params={"key": self.key})
+            params = {"key": self.key, **self._ship_param()}
+            r = self.http.request("GET", f"{self.base}{path}", params=params)
         except httpx.HTTPError:
             return None
         if r.status_code != 200:

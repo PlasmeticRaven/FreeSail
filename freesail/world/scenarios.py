@@ -535,6 +535,21 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         if not isinstance(raw["intent"], str) or not sc.intent:
             raise ScenarioError(f"{where}, intent: the captain's intent in words.")
     sc.books = list(standing_orders)
+    # Package 43 (spec M6 §23): the owner's grant to the director
+    if raw.get("director") is not None:
+        grant = raw["director"]
+        if not isinstance(grant, dict):
+            raise ScenarioError(f"{where}, director: a mapping of models, seats, seats_in_voyage.")
+        try:
+            sc.director = {
+                "models": [str(x) for x in (grant.get("models") or [])],
+                "seats": int(grant.get("seats", 1) or 0),
+                "seats_in_voyage": int(grant.get("seats_in_voyage", grant.get("seats", 1)) or 0),
+            }
+        except (TypeError, ValueError):
+            raise ScenarioError(
+                f"{where}, director: seats and seats_in_voyage are numbers."
+            ) from None
     return ScenarioFile(
         path=str(path),
         scenario=sc,

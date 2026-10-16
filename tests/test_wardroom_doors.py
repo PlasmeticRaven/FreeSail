@@ -595,7 +595,12 @@ def test_the_rules_based_captain_gives_a_seated_officer_the_deck_and_takes_it_ba
     taken = [e for e in world.log if e.kind == "agent.deck" and e.data.get("by") == "rule"]
     assert taken[-1].data["deck"] == "taken" and not oh.agent.deck
     assert "takes the deck for a judgement that needs it: evading" in taken[-1].text
-    world.run(8100 - world.clock.tick)
+    # the privateer has a brain since package 43 and chases her (the trial's stranger):
+    # the quiet state comes when the chase is given up or she is lost, within the day
+    for _ in range(16):
+        world.run(3600)
+        if cap.state == "on passage":
+            break
     assert cap.state == "on passage" and oh.agent.deck
 
 

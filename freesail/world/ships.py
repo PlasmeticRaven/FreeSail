@@ -456,6 +456,7 @@ class Vessel:
     crew: Any = None
     dealing_tick: int = -1
     warning: str = ""
+    sail_order: str = ""  # a station's sail as a state in the far shape (`crews.far_order`)
 
     @property
     def height_m(self) -> float:
@@ -512,7 +513,7 @@ class Vessel:
             return "at anchor"
         if lying_to or wind_kn > LIE_TO_OVER_KN:
             return "lying to"
-        if wind_kn > REEF_OVER_KN:
+        if self.sail_order == "under reefed topsails" or wind_kn > REEF_OVER_KN:
             return "under reefed topsails"
         return "under plain sail"
 
@@ -1169,21 +1170,25 @@ class Vessels:
         if self._spoke_lines is None:
             self._spoke_lines = []
         for v in self.vessels:
-            if v.done or v.brain is None or v.crew is not None:
+            if v.done or v.brain is None or (v.crew is not None and v.crew.shape == "full"):
                 continue
             v.brain.tick()
         for v in self.vessels:
-            if v.done or v.detail == "near" or v.crew is not None:
+            if v.done or v.detail == "near" or (v.crew is not None and v.crew.shape == "full"):
                 continue
             v.tick(world, dt)
+            if v.crew is not None:
+                v.crew.mirror_far()  # a station's World in the far shape follows the move
         lines.extend(self._spoke_lines)
         self._spoke_lines = []
         lines.extend(self._promote_and_hail(world))
         if any(v.brain is not None for v in self.vessels) or self.crewed_ids:
-            # the crewed promotion by the range and the cap (package 43; `world.crews`)
-            from freesail.world.crews import switch
+            # the crewed promotion by the range and the cap (package 43; `world.crews`),
+            # and the director's seats' budgets (spec M6 §23)
+            from freesail.world.crews import enforce_budgets, switch
 
             switch(world)
+            enforce_budgets(world)
         self.vessels = [v for v in self.vessels if not v.done]
         return lines
 

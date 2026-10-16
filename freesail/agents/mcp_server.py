@@ -1287,6 +1287,15 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     ap.add_argument(
+        "--ship",
+        default="",
+        help=(
+            "the other ship the station is on, by her name or id (package 43; spec M6 §20): "
+            "a model captain of a vessel with a captain of her own (an intent), kept across "
+            "the far-detail switch"
+        ),
+    )
+    ap.add_argument(
         "--cadence",
         choices=list(CADENCES),
         default=None,
@@ -1310,7 +1319,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
     args = ap.parse_args(argv)
 
-    game = GameClient(args.game, args.station)
+    game = GameClient(args.game, args.station, ship=args.ship)
     bridge = Bridge(
         game,
         args.model_name,

@@ -184,10 +184,30 @@ def station_watcher(world: World, kind: str, out=None) -> Any:
     return h
 
 
+# The live world order at the prompt (package 43; spec M6 §23): `world: <order>`, the owner's
+# order to the world through the channel of spec M5 §26, which the captain's grammar refuses
+# without the prefix (the game's promise that the captain plays the ship and not the world:
+# the prefix is the owner's word, at the console and in the browser alike). Its source in
+# the journal, for the record, the save and the replay.
+LIVE_WORLD_ORDER_PREFIX = "world:"
+LIVE_WORLD_ORDER_SOURCE = "the owner"
+
+
+def live_world_order(line: str) -> str | None:
+    """The order after `world:` at the prompt, or None for any other line."""
+    text = " ".join(str(line).split())
+    if not text.lower().startswith(LIVE_WORLD_ORDER_PREFIX):
+        return None
+    rest = text[len(LIVE_WORLD_ORDER_PREFIX) :].strip()
+    return rest or None
+
+
 def check_agents_unattended(world: World) -> None:
     """The driver's half of the unattended bound (spec M4 §11): ten real minutes of a
     pause with no answer stands the agent down. Called from the drivers' clock loops."""
-    for agent in list(world.agents.values()):
+    from freesail.agents.harness import all_agents
+
+    for _name, agent, _w in all_agents(world):
         agent.check_unattended()
 
 
@@ -483,6 +503,13 @@ class Console:
                 self._print("Say 'replay somewhere.json'.")
             else:
                 self._replay(paths[0], replay_anyway=anyway or self.replay_anyway)
+        elif live_world_order(line) is not None:
+            # the live world order (package 43; spec M6 §23; the owner's interview of
+            # 2026-10-15): `world: <order>` at the prompt is the owner's order to the
+            # world, through the channel, journaled at its tick with its source
+            e = self.world.world_order(live_world_order(line), source=LIVE_WORLD_ORDER_SOURCE)
+            if e.data.get("result") == "refused":
+                self._print(e.text)
         else:
             seat = getattr(self.world, "player_seat", None)
             if seat is not None and not seat.agent.released:
@@ -634,6 +661,7 @@ class Console:
         }
         if records_dir:
             options["records_dir"] = records_dir
+            self.world.consent_records_dir = records_dir  # the seat hook reads them (package 43)
         if saves_dir:
             options["saves_dir"] = saves_dir
         router = agent_routes(self.lock, lambda: self.world, **options)

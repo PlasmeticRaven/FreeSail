@@ -280,6 +280,13 @@ class FarCaptain(Judgement):
         self.last_judged = tick
         if self.vessel.done:
             return
+        crew = getattr(self.vessel, "crew", None)
+        near = getattr(crew, "captain", None) if crew is not None else None
+        if near is not None and near.seated and not near.stand_in:
+            # a model (or the player) at the captain's station of this ship, kept across
+            # the switch in the far shape (spec M6 §20): the body is theirs to work; the
+            # brain stands in when the door is silent, as the near captain does
+            return
         p = perceive_vessel(world, self.vessel, self)
         self._read_trend(p)
         if self.state is None:
