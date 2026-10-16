@@ -497,10 +497,10 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     brain = f", her captain's intent {vessel.intent_words}" if vessel.brain is not None else ""
     guard = f" ({vessel.warning})" if vessel.warning else ""
     words = f"{vessel.what} {vessel.name!r} of {nation.name} put on the sea, {vessel.goal}"
-    return (
-        words + brain + guard,
-        {"id": vessel.id, "goal": vessel.goal, "nation": nation.id, "intent": vessel.intent_words},
-    )
+    data = {"id": vessel.id, "goal": vessel.goal, "nation": nation.id}
+    if vessel.intent_words:
+        data["intent"] = vessel.intent_words  # on a ship with a brain only: the old pins stand
+    return words + brain + guard, data
 
 
 # ---------------------------------------------------------------------------
