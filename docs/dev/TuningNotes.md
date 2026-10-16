@@ -4823,3 +4823,337 @@ once, and every run below was started after it:
   with package 43's suites at a load of five beside them. The same measure on the tree
   before this package, run straight after under the same load, gave 404 to 471 ticks a
   second against 357 to 463 on this one: the load's, not the package's; for a quiet machine.
+
+## Package 43: other ships with captains (2026-10-16)
+
+Package 43 (spec M6 §4, §19, §20 and §23 as built; the brief in `docs/dev/M6-WorkPackages.md`;
+decisions 40, 43 and 45; the owner's word of 2026-10-11 and 2026-10-15: the rules-based
+captain at far detail first, the director's voice and the observed world left to M7b). The
+measurement first, then the brain on the far body, the crewed promotion and its guard, a
+model captain of another ship kept across the switch, the director's seat hook and the live
+world order. Built beside package 45c from the same head (`35d31d6`); no file of 45c's
+list is touched but `captains.py` (the judgement moved into a mixin, the stimuli added at
+the end of the table), `orders.py` (the `ship:` order's tails and two channels appended),
+`stations.py` untouched.
+
+### The measurement, first (item 1)
+
+`scratchpad/p43/measure.py` (kept out of the repository): the station-stranger trial's
+frigate under her captain (truth 51's form: a thousand ticks to settle, the best of three
+thousands), then the same with the merchant passage's dozen ships at far detail, then with
+one, three, six and twelve **fully crewed ships** beside her, each a World of her own from
+one of the four files at a place in the Channel with an intent and a rules-based captain
+(`make_world` + `set plain sail`), all ticked in lockstep in one process. The build machine
+has four cores; package 45c's suites ran beside this package all day and no quiet window
+held for the length of a run (the third run began at a load of 0.5 and 45c's four workers
+were up again before its first figure), so the load is given with each figure. The
+measurement is one thread and the box has four cores: the three runs agree within a tenth
+at loads from 1.6 to 5, so the table is the best of the three and stands for the quiet
+machine within that tenth.
+
+| Run | First run (load) | Second (load) | Third (load) | Best | After the restart, the merged tree (load) |
+|---|---|---|---|---|---|
+| The frigate alone (the station trial) | 393 (2.8) | 424 (2.3) | 478 (2.2) | **478** | 772 (3.1) |
+| The frigate with the dozen ships at far detail | 399 (3.3) | 372 (2.5) | 411 (3.0) | **411** | 686 (3.6) |
+| The frigate with one crewed ship | 190 (4.1) | 260 (2.7) | 226 (3.8) | **260** | 354 (4.2) |
+| with three crewed ships (the cap) | 114 (4.5) | 100 (2.6) | 100 (4.4) | **114** | 169 (4.4) |
+| with six | 56 (4.9) | 56 (1.7) | 55 (4.8) | **56** | 98 (4.7) |
+| with twelve | 31 (4.9) | 34 (4.0) | 33 (5.0) | **34** | 56 (4.9) |
+
+The session's container was restarted twice during the package and came back the second
+time on a faster machine: the last column is the merged tree there, and the tree before the
+merge measured the same on it (705 alone, 718 with the dozen at far detail, 234 with three
+crewed, against 667, 764 and 212 for the merged tree in the same minutes), so the gain is
+the machine's and not package 45c's. The constants were chosen on the slower machine's
+figures (the first five columns), which is the one the floors of truth 51 were set on.
+
+**What costs.** A crewed ship costs what the player's frigate costs, a little under three
+milliseconds a tick on this machine under load: the profile of three crewed ships (cProfile,
+600 ticks) puts 82 per cent of the tick in `physics/integrate.step` → `sails.compute_sail_
+forces` (four substeps a tick, 7,200 calls in 1,800 ticks), the sheets' readings and the
+strain next, and the standing runtime, the captain's judgement, the reckoning and the lookout
+under three per cent together. The far-detail body costs a tenth of a tick a minute (package
+36's figure stands: the dozen at far detail cost a sixth of the tick, the lookout's pairwise
+work, not the bodies). So twelve crewed ships at once are thirty-four ticks a second, half
+the sixty times the owner plays at, as the spec's reading said, and a world with every ship in a region crewed
+wants the vectorised hot loop of the risk table (the sails' forces for many hulls in one
+pass), which is a later milestone's and is sized by this table.
+
+**The strategy chosen: the horizon's range with hysteresis and a cap** (`crews.py`).
+
+| Constant | Value | Why |
+|---|---|---|
+| `CREWED_NM` | 4 miles | promoted where the tops make out her rig and read her sails' state (`ships.RIG_MADE_OUT_NM`): nearer than that the far body's words ("under plain sail") are read against a hull the viewer could draw; farther, a far body and a crewed one are the same sail to the lookout |
+| `CREWED_DEMOTE_NM` | 6 miles | hysteresis of two miles, half an hour's sailing apart at four knots, so that a ship at the edge does not flap between bodies (M5 §25's two and three miles for the near-detail switch, widened) |
+| `CREWED_CAP` | 3 | the frigate with three crewed ships runs 100 to 114 ticks a second on the build machine, near twice the sixty times the owner plays at; four would be near eighty (six run at 56), too close to the sixty for a machine with other work on it |
+| `CREWED_FLOOR_TICKS_S` | 60 | the pace truth 88 with the cap full: sixty times, the owner's play speed, on the build machine (a little over half the figure measured, as truth 51's floor is half its measurement; the truth's own frigate lies hove to and its three brigs are under sail, and it passed under a load of four) |
+| `DEALING_S` | a glass | a ship within hail, or chasing, investigating or evading the player, within the last glass is in dealings with him: promoted before a nearer ship that is not, and not demoted beyond six miles while the dealing lasts |
+| the cap's order | the nearest first; a dealing ship within the range takes the farthest idle crewed ship's place | spec M6 §19 |
+| not promoted, and demoted | at anchor, in port, running for shelter, in distress | the port's business (the pilot's boat, the market) is the player's ship's machinery and the far brain's wait; a crewed stranger in pilot water would send a cutter that steers for the player (judgement; 43b's ground) |
+
+### The brain on the far body (item 2; `freesail/world/brains.py`, `data/captains/cruiser.yaml`)
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| `JUDGE_EVERY_S` (the far brain's cadence) | 60 s | the roll-up's cadence, as the near captain's and the body's | by test |
+| `IN_PORT_WAIT_S` | 12 hours | her business in port is a wait: a tide and a day's dealing (the near captain's business is the boat, the prices and the purse, which the far body has not; 43b's small economy); judgement | `test_brains` |
+| `AT_ANCHOR_LEAST_S` | an hour | at anchor in shelter she weighs when the weather clears by day and not on a clearing of a minute; judgement | by test |
+| `HAIL_REACH_M` | four cables (`ships.HAIL_NM`) | a chase closes to hailing distance and speaks her there | by test |
+| `SIZE_RANK` | frigate 3, brig 2, schooner and cutter 1 | the catalogue's hierarchy of size (spec M5 §25); the cruiser's judgement of a superior force until the guns are M7's | by test |
+| `cruiser.yaml` `investigate_nm` | 10 miles | a sail within ten miles on passage is closed and made out, as the cruise's book closes a stranger on the station; judgement | the trials |
+| `cruiser.yaml` `stranger_hostile_nm` | 6 miles | a superior enemy made out within two leagues is hauled off from; her colours are made out at two miles | the trials |
+| `cruiser.yaml`, `kings-ship.yaml` `chase_stale_hours` | 3 hours | a chase that has not gained a mile in a watch of chasing is given up, and the chase is not taken up again while she is in sight (`Judgement.given_up`): the first runs had the two captains chase and run for fifteen hours at the same speed, and the frigate take up the chase again a minute after giving it up; judgement on the figure | the trials |
+| `cruiser.yaml` `hail` | "What ship is that?" | Luce 1884 ch. XX, the custom of the hail; the words judgement | by test |
+| the player's visibility for every brain | the parent's conditions at the ship | the brief's "the same visibility the player's lookout has"; the systems' conditions at each vessel would cost a `conditions_at` a vessel a minute, and the weather of a day is one weather over the Channel | judgement |
+| the far brain's lookout | by eye; the glass for the one stranger in hand | the near captain's book sends the glass aloft at each sighting | judgement |
+
+How the brain is made: `captains.Judgement` is the one judgement (the trend, the chase's
+log, every stimulus) shared by `Captain` (the near body) and `brains.FarCaptain` (the far
+body); the far captain's perception is `brains.perceive_vessel`, from the vessel's own truth
+(her position, the wind at her by `Vessel._wind_at`, the chart's coast and the lee sector's
+rays from where she is, the ships in sight from her masthead by the horizon formula over the
+parent's vessels and the player's ship as a vessel of her file's description,
+`Vessels.player_shadow`); the states resolve into plans (`brains.resolve_state`). The far
+brain lives in `brains.py` and not `captains.py` because it reads the truth, and
+`tests/test_captains.py` proves that `captains.py` does not: the grep proof holds unchanged.
+Nothing of a far captain's mind is a line of the player's log; `FarCaptain.history` is the
+record, and runs on through the near body while she is promoted (`crews.mirror`).
+
+**The far-detail guard** (item 3): a captain's plan is the planner's (the ports' tracks and
+the common tracks, a headland given an offing), and a plan that still crosses the land is
+refused at her making (`ships.land_crossing`: the first and last cable of a leg not tried).
+The brief read the guard as a refusal of every ship's leg across the coast at load. Measured
+first (`scratchpad/p43/guard_probe.py`): six of the recorded passages' dozen scripted ships
+have a goal's straight leg across a cape (the Palinure from the Raz to Brest, the Hirondelle
+from the Isle of Saints to Camaret road, the Bom Jesus for the Start, the Indefatigable out
+of Cawsand Bay, the Swift for Plymouth; the cruise's Diamond's square off the Raz), which no
+passage ever sees (none comes within sight of those legs' land), and refusing them would
+have moved every pin of every passage and trial for a sight nobody takes. So a goal's leg
+across the land is a warning on the vessel, printed with the scenario's lines when the game
+starts (`scenarios.guard_lines`, the author's view, never a line of the log), and the
+refusal is a captain's. 43b, whose generated ships take the planner's route, closes it.
+
+### The trials with a brain in the stranger: what the two captains made of each other
+
+The stranger of the two stranger trials was given a brain (`intent:` at the end of her world
+order; the cruiser's doctrine by her description, a brig-sloop of France). Read from the
+brain's history and the player's log (`scratchpad/p43/smoke_brain.py`, `debug_trial.py`),
+twenty hours at seed 7:
+
+- **The station and a stranger** (the frigate on her station off Ushant; the Palinure put on
+  the sea three leagues north at 06:00, bound south across the station). The Palinure sees the
+  frigate at once, six miles off, a sail, and closes her to make her out (investigating);
+  within four miles at 06:30 she is promoted, her captain the same brain in a crewed body.
+  At 06:36 both make the other out: the frigate's glass makes her a brig-sloop of war under no
+  colours and the frigate chases; the Palinure makes the frigate out for what she is, an
+  enemy of a bigger class within two leagues, and hauls off (`overmatched`: evading). The
+  frigate chases her until 09:11 (09:16 on the merged tree, under 45c's chase rule) without
+  gaining a mile (the brig seven knots on a reach to the frigate's five and a half) and
+  gives the chase up as stale, the station shaped for; the
+  Palinure, lost to sight by 09:45, goes back on passage and is demoted at 10:30, twelve miles
+  off. Standing south on her passage she raises the frigate again at noon, closes her again
+  to make her out (she cannot know it is the same sail until she has), is promoted at 12:30,
+  makes her out and hauls off again; the frigate, who has done with her (`given_up`), keeps
+  her station. Before this package the stranger sailed her straight leg across the station
+  and was chased across the frigate's bows and lost at 10:51. States: the frigate keeping
+  station 300, investigating 7200, chasing 9360, keeping station 18660, (investigating and
+  chasing again at 18720 and 18780 in the run before the given-up rule, and twice more); the
+  Palinure on passage and investigating 7200, evading 9360, on passage 20700, investigating
+  27060, evading 30000.
+- **The merchant and a privateer** (the schooner bound for Falmouth; the Renard put on the sea
+  within two miles at 05:00). The Renard is promoted at her making (two miles off) and her
+  captain makes the schooner out at once: a smaller class, an enemy once her colours show,
+  and he chases (investigating at 05:00, chasing at 05:05); the schooner evades from 05:01,
+  hauling off every ten minutes under all sail. The two are matched on a reach (the brig six
+  and a half knots to the schooner's seven), and after three hours without a mile gained the
+  Renard gives up the chase at 08:05 and goes on her passage, demoted at 08:35 as the dealing
+  lapses and she passes six miles; the schooner hauls off until the brig is out of sight
+  right astern at 08:50 (twenty-three hauls; the Renard is a sail three leagues off again at
+  09:38 on her passage north, never made out, lost at 13:29), and is forty miles to the
+  south-westward of where the old run was by then. She raises the Lizard at 14:07, takes the
+  pilot's cutter off Falmouth at 18:40, beats from 17:17 (the wind foul for the entrance by
+  the evening), anchors in the outer road at 20:43 (the bower let go at 60514) and is in port
+  from the road at 20:49 (13:54 before this package, when the Renard sailed on her leg and
+  the schooner evaded forty minutes and lost her). Before the given-up rule the brig chased
+  her for eight hours, taking the chase up again a minute after each stale giving-up, and the
+  schooner evaded all the forenoon and again in the afternoon. States: the schooner on
+  passage 300, evading 3660, on passage 17400, beating 47820, at anchor 60180, in port 60540;
+  the Renard investigating 3600, chasing 3900, on passage 14700. On the merged tree (45c's
+  pilot's conn from his station and its beating rule) the same meeting ends with the brig
+  out of sight at 08:58, the schooner beating by turns and anchoring in Carrick Road on the
+  evening ebb at 19:23, in port at 19:24 and aground at 21:48 (the pins and the grounding,
+  below).
+
+The promotion's part in the trials: both strangers are crewed while within four miles or in
+dealings with the player (the chase), so the meetings are sailed at full detail, each brig's
+sails under the physics, and the far body takes her up again when the dealing is over and
+she is beyond six miles; the brain's history runs through both bodies.
+
+### A model captain of another ship, across the switch (item 4)
+
+`--station captain --ship <name or id>` at the MCP bridge, the local runner and the API door
+(`remote.Desk` with `ship`, the seat keyed by the ship and the station; `GameClient(ship=)`
+sends it with every call). `crews.station_world` finds her and makes her World in the shape
+her distance gives; `CrewedWorld.shape` is "full" or "far", `far_tick` the far shape's tick
+(the clock, the body mirrored into the ship and the account, the wind at her, the lookout
+once a minute, the bells, the stations sampled), `submit_far` the far shape's orders
+(`FAR_SHAPE_WORDS`), `shape_words` the sample's notice. The switch's lines in her log are
+urgent, so that a station standing by is woken to be told its shape. The fake proves it
+(`tests/test_crews.py`, truth 89): seated on the brig three miles off, his order in her log
+and not the player's, the player's lookout seeing one sail, the pace rule counting her
+station, demoted with the station kept, a course shaped working the far body and an order
+of the deck refused in words, promoted again beneath the same station with no reseat.
+**Left undone**: the player at `--seat captain --ship` (the drivers' centre, chart and prompt
+follow the player's ship; a world watched from another ship is the observed world of M7b),
+and a save of a game with a station on another ship replays the player's ship's stations
+only (the checkpoint carries the other ship's whole).
+
+### The seat hook and the live world order (item 5)
+
+`world: <order>` at the console's prompt and in the browser's order box (`ui/console.py`
+`live_world_order`; the server's driver the same): the owner's order to the world,
+journaled with the source "the owner", saved and replayed; the bare order stays the
+grammar's refusal (truth 71). `seat: <model> as captain of <ship> for <n> samples|hours`
+and `unseat: <ship>[, <note>]` (`world/orders.py` `_seat`, `_unseat`): refused in words
+without a consent record holding the model's yes with the drill passed (the records'
+directory the drivers were started with, `world.consent_records_dir`), without an owner's
+grant naming the model (the scenario's `director:` block), with the seats at once or in the
+voyage spent, for a ship not on the sea or without a captain of her own; held on the World
+otherwise, her World made, the budget counted once a minute (`crews.enforce_budgets`) and
+the station stood down by the director when it is spent. The hook assumes no player's ship
+where that costs nothing (a bare World refuses in words). **The consent brief's revision
+(42b) must say**: that a model may be seated as the captain of another ship beside the
+player's, with her own company, log and account, its orders the ship's and its station kept
+across the far-detail switch; and that a model may be seated by a model, the director's
+seat, only under the owner's grant and budget and never by a model's own word.
+
+### Found on the way
+
+- **The first trials' captains chased and ran for fifteen hours** at the same speed, and the
+  frigate took the chase up again a minute after giving it up (the stranger still in sight is
+  a stranger again): the `chase stale` stimulus and `Judgement.given_up` (above).
+- **A crewed ship was promoted aback**: the polar's trimmer (`ships._trim_for`) sets the yards
+  for one tack with no sign, and the brig heading NE in a westerly had her yards braced for
+  the other; `crews._set_sail` trims for the apparent wind from her heading, her way and the
+  wind at her, signed by the tack (`parts.Spar.brace_angle`, positive for the starboard tack).
+- **The station's World in the far shape stopped ticking** when `crewed_ids` counted the
+  full-shape ships alone (the cap's list): the parent ticks every World a vessel has,
+  whatever its shape (`crews._crew_ids`), and the cap counts the full ones (`crews.crewed`).
+- **A far-shape station's reply came out of turn**: a notable line of the switch did not wake
+  a station standing by; the switch's lines are urgent in her log.
+- **The lookout's `estimate_m` is the truth at far detail**: the far brain's strangers carry
+  the true distance (pairwise distance and visibility at the roll-up's cadence, spec M6 §4),
+  the player's lookout his estimate; the two agree within the estimate's error.
+- **`world.vessels` in `captains.py`** failed the module's proof of reading no truth, which
+  is why the brain lives in `brains.py` and `captains.py` answers `resolve_state` and the rest
+  through a lazy hook.
+- **The `ship:` order's tails** (`, no colours`, `, intent: ...`) are peeled from the end in
+  either order (`orders._peel_tails`); the intent's words may not hold a comma (`via` marks
+  joined with `and`).
+- **The `ask the lookout` form in chapter 19** stands as package 41 wrote it; nothing of the
+  primer's orders blocks moved.
+
+### The merge with package 45c (`aba2269`)
+
+Package 45c was merged on the branch head (`a8512dc`) while
+this package's work was committed and tested; the head was merged into this worktree at the
+end and resolved. Six files conflicted, all of them both packages adding at the same place:
+`data/vocabulary.yaml` and `world/orders.py` (the world order's channels: `mark` is 45c's,
+`seat` and `unseat` this package's, the one list `weather, ship, message, port, person,
+captain, mark, seat, unseat` in the regex, the tuple and the file; the `_mark` and the
+`_seat`/`_unseat` blocks beside each other), `agents/local.py` (the runner's `--pictures`
+beside `--ship`), `agents/remote.py` (the seat's `pictures` beside its `ship`),
+`docs/TechnicalSpec-M6.md` (both as-built paragraphs in §4 and §23) and
+`tests/test_captain_trials.py` (the two stranger trials' pins, re-measured below). What
+auto-merged and was tested after: `captains.py` (45c's sail after the gale by steps and its
+chase rule under this package's `Judgement` mixin, the truth-road proof holding),
+`core/world.py`, `core/replay.py`, `ui/console.py`, `ui/server.py`, `agents/harness.py`,
+`agents/api.py`, the primer's three chapters and `Harness.md`. 45c's journals keyed to the
+person and the station's kind beside its holder need nothing of this package: a station on
+another ship sits in her own World, whose journals and people are hers. The pace measured on
+the merged tree and on the tree before the merge in the same minutes is the same (above).
+
+### Pins moved (the two stranger trials, the only pins this package moves by design)
+
+Every recorded passage's and trial's pin was re-measured on the final tree before the merge
+(the whole slow tier) and the truths' and the trials' once more on the merged tree (below);
+only the two stranger trials moved, by design (the stranger has a captain now). Every other
+pin held, including those 45c moved: the cruise restored with the Palinure at 10:30, the
+merchant passage's road, the intent's conn from Bertheaume, the gate's days, the saves.
+
+| Pin (`tests/test_captain_trials.py`) | Package 45c (the head) | Package 43, merged | Why |
+|---|---|---|---|
+| `TRIAL_STATION_STRANGER_STATES` | keeping station 300, investigating 7200, chasing 9180, keeping station 10440 | 300, 7200, chasing **9360**, keeping station **18960** | the Palinure investigates the frigate and hauls off when she has made her out (06:36, the frigate making her out and chasing in the same minute, three minutes after 45c's, where the brig held her leg); the frigate never gains a mile in three hours on a brig that runs and gives the chase up at 09:16 under the new rule (45c's mended chase spoke a brig that did not run at 10423) |
+| `TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS` | `[10423]` | `[]` | she runs; never within hail |
+| `TRIAL_STATION_STRANGER_LINES`, `_DIGEST` | 889, `3c2aba8b08fd1f63` | **714**, `9e0bc47304373987` | the chase three hours without the hail's lines, and the station quiet after |
+| `TRIAL_TRADE_STRANGER_STATES` | on passage 300, evading 3660, on passage 8100, in port 35640 | 300, 3660, on passage **17880**, beating 18000, on passage 18120, beating 18240, on passage 39060, beating 44220, on passage 51720, **in port 55440** | the Renard chases for three hours instead of holding her leg; the schooner is driven forty miles to the south-westward, beats up by turns and comes into Carrick Road on the evening ebb, five and a half hours later than at 45c; the four changes of state in six minutes at 08:58 are 45c's beating rule and the passage rule trading the deck as the evasion ends, for the lead |
+| `TRIAL_TRADE_STRANGER_ANCHORED_TICKS` | `[35630]` | `[55413]` | the bower let go at 19:23 |
+| `TRIAL_TRADE_STRANGER_LINES`, `_DIGEST` | 1176, `db253be58da059ca` | **1556**, `f7ad5b1e06dd737e` | twenty-four hauls, the beats, and the grounding |
+
+**The grounding, for the lead** (`test_the_merchant_hauls_off_from_a_privateer...` is
+`xfail(strict)` with the reason, the pins proved before the expected failure): on the
+merged tree the schooner's anchorage standing order decides to anchor at 19:18 ("And a
+quarter seven; good ground. Two fathoms and a half of tide allowed by the epitome: five
+fathoms on the chart"), all hands are called, and the bower is let go at 19:23 with her way
+on, after "Land ahead, on the starboard bow, four cables" and a course shaped for Carrick
+Road, "in four fathoms and a half", which is two of the chart; riding to the ebb she takes
+the ground aft on mud at 21:48 ("two fathoms of water by the chart, and she draws 11
+feet... the tide falling"), to float at half past seven in the morning. The anchoring's
+decision is sound and its let-go is not: five minutes and four cables of way on between
+them, into shoaling water, with no second sounding at the let-go. That is the domain of the
+merchant doctrine's standing order (`data/captains/merchant.yaml`, "the anchorage": at a
+sounding within 1.8 miles of the anchorage under `anchorage_fathoms` with way on, come to an
+anchor) and of the come-to-an-anchor evolution (`orders/ground_tackle.py`,
+`evolutions/scripts.py`), not this package's, and the trial is pinned as the run gave it
+rather than mended from here; a sounding at the let-go, or the way taken off her first,
+would be the mend. Before the merge
+(45c's pilot's conn and the beating rule not yet in) the same trial anchored at 20:43 in the
+road and lay there to the end, never aground.
+
+### The suite, as run
+
+All on the build machine (four cores) with package 45c's suites running beside, the load
+average five to eight through every run but the pace tests' start; the session's container
+was restarted once in the middle and every run begun again from nothing.
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`), first on the tree at
+  `32411b9`: 3,235 passed, 2 failed. One was truth 71's list of the world order's channels,
+  which `data/vocabulary.yaml` keeps beside `orders.CHANNELS` and this package had not
+  given the two new channels (fixed, `3208944`); the other was the merchant passages' pace
+  floor (`test_the_pace_at_the_merchant_passages_start...`, 396 against 500 at a load of
+  eight), which passed alone after (and at a load of four). Once more on the tree before
+  the merge (`8755edc`): 3,236 passed, the pace floor alone failing under a load of seven.
+  **On the merged tree (`aba2269`): 3,255 passed, none failed** (the machine after the
+  restart, the load two to four).
+- The slow tier once whole (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m "not
+  pace"`, the tree at `3208944`, four hours under the load): 3,500 passed, 12 expected
+  failures, 2 failed. One was the fingerprint test of `test_replay.py`, which compares the
+  tree's fingerprint cached at the run's start with one taken afresh, and the vocabulary's
+  fix above was committed into the tree while it ran (passed alone after). The other was
+  **truth 77 on the naval cruise**, whose digest came out `9621c146eec60f03` against the
+  pinned `dc6454f37d060818` with the same 1,930 lines: the cruise run on the base tree and
+  on this one and the two logs diffed event by event (`scratchpad/p43/cruise_dump.py`)
+  differed in one field, the `ship:` world order's journal data carrying `intent: ""` for
+  a ship given none. The field is written only for a ship with a brain now (`8755edc`), and
+  the cruise's events are the base tree's line for line, digest `dc6454f37d060818`. Every
+  other pin of the recorded passages, the gate's days, the saves replayed, the gale, the
+  lee shore and the thick trial held; the two stranger trials moved as the table above says.
+  The cruise's two `xfail(strict)` tests of package 45 stand as they were (the x's).
+- The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`), with truth
+  88's cap full: 6 passed; the machine was quiet at their start (0.5) and 45c's four
+  workers came up during them (load four at the end).
+- The two stranger trials and the cruise once more on the tree before the merge, after the
+  two small fixes: the run was lost to the container's second restart; the merged tree's
+  run below covers it.
+- **On the merged tree**: the targeted suites first (`--slow` over `test_brains`,
+  `test_crews` but truth 88, `test_seat_hook`, `test_world_orders`, `test_captains`,
+  `test_captain_rules`, `test_agents`, `test_api_door`, `test_local_runner`,
+  `test_wardroom_doors`, `test_server`, `test_replay`, `test_scenarios`, `test_standing`):
+  552 passed, none failed; the pace tests alone (`--slow -m pace`): 6 passed, the
+  machine quiet at their start; the fast tier as above; and **the truths' and the trials'
+  slow tier once whole** (`python3 -m pytest --slow tests/test_known_truths.py
+  tests/test_captain_trials.py -m "not pace" -n 4`): **102 passed, 8 expected failures,
+  none failed** (the expected failures the truths' own and the trade trial's grounding
+  above), every pin of the passages, the gate's days, the cruise and the trials standing
+  as 45c pinned them but the two stranger trials' (the table above).
