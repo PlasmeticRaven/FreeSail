@@ -659,3 +659,49 @@ def test_the_cast_before_the_let_go_refuses_water_the_masters_tide_leaves_too_li
     assert "at low water, and she draws " in short
     assert S.too_little_water(w.ship, draught + fall + 2.0 * S.UNDER_KEEL_AT_LOW_M) is None
     assert S.UNDER_KEEL_AT_LOW_M == units.FATHOM
+
+
+def test_a_let_go_in_short_water_is_belayed_and_she_stands_back_and_lets_go_in_good():
+    """Package 43b, the trade trial's grounding as it was: she decides for an anchor in
+    six fathoms and a half off Carrick Road on the evening ebb of 14 June, and is carried,
+    as the trial's schooner was by her way, onto the four and a half fathoms by the
+    Castle's shore before the let-go. The cast at the let-go belays the anchor, she
+    stands back for the water she decided in, and lets go where the lead gives enough."""
+    import math
+
+    from freesail.world.geo import Position
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 14, 19, 18, 0),
+        wind_from_deg=259.0,
+        wind_speed_kn=13.5,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=340.0,
+        ship_speed_kn=4.0,
+        position={"lat_deg": 50.1425, "lon_deg": -5.0395},
+        region=REGION,
+        ports=["falmouth"],
+        epitome="moore",
+        people=[{"role": "master", "skill": 0.8}],
+        nation="britain",
+    )
+    w = make_world(7, SCHOONER, sc)
+    w.submit("set the foresail")
+    w.submit("set the mainsail")
+    assert w.submit("come to an anchor").kind == "order.accepted"
+    w.run(170)
+    shoal = Position(50.14839, -5.04231)  # where the trial's bower went down in 4 1/2
+    brg, dist = bearing_and_distance(w.position, shoal)
+    w.ship.dyn.x += dist * math.sin(math.radians(brg))
+    w.ship.dyn.y += dist * math.cos(math.radians(brg))
+    w.run(1200)
+    steps = [e.text for e in events(w, "evolution.step")]
+    belay = [t for t in steps if t.startswith("Belay the anchor: the lead gives four fathoms")]
+    assert belay and "stand back for six fathoms and a half" in belay[0]
+    (anchored,) = events(w, "ship.anchored")
+    assert anchored.tick > w.log[0].tick + 600
+    from freesail.evolutions import scripts as S
+
+    assert S.too_little_water(w.ship, float(w.ship.extra["water_depth_m"])) is None
+    assert w.at_anchor and not events(w, "ship.aground")

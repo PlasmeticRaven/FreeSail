@@ -5779,6 +5779,9 @@ UNDER_KEEL_AT_LOW_M = units.FATHOM
 # Standing back for good water (package 43b): she is given this long to come back to the
 # water of the sounding that decided the anchorage before the let-go is refused.
 STAND_BACK_TIMEOUT_S = 600.0
+# ...and stands back a minute at least before the place of that sounding rounds her to
+# again (judgement: a cable and more at three knots).
+STAND_BACK_LEAST_S = 60.0
 
 
 def too_little_water(ship: Ship, depth_m: float) -> str | None:
@@ -5946,7 +5949,11 @@ class ComeToAnchorScript(_AnchorScript):
         dy = self.decided_at[1] - float(ship.dyn.y)
         depth = _water_depth(ship)
         good = depth is not None and too_little_water(ship, depth) is None
-        if good or math.hypot(dx, dy) <= units.CABLE:
+        # back at the place of the sounding that decided, after a minute of standing back
+        # at least (a let-go refused within a cable of it would otherwise round her to
+        # again where she lies, in the same short water)
+        back = math.hypot(dx, dy) <= units.CABLE and self.phase_t >= STAND_BACK_LEAST_S
+        if good or back:
             for sid in self.rounded_in:
                 sl = ship.sails.get(sid)
                 if sl is not None and sl.is_set:
