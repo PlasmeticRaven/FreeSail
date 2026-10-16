@@ -1,0 +1,40 @@
+# FreeSail: the regatta's first course (spec M6 §21; package 44), the passage of gate 5b.
+#
+# The frigate from off Ushant at four in the morning of 10 June 1805 to Falmouth's outer
+# road, on the passage's own day: its ship, seed, start, pinned weather and sky
+# (data/scenarios/gate-5b-passage.yaml). What is the passage's and not the course's is
+# left out: its book (the recorded passage's own captain, which sails it by lines written
+# for that day) and its first orders. At the gun she lies where the passage begins, under
+# plain sail (`start_orders`, given to every agent alike), and from then on the agent
+# sails her: the rules-based captain on his intent, a fake by its script, a model at the
+# captain's station through its door, or a human's save replayed.
+#
+#     py tools/regatta.py data/regatta/ushant-to-falmouth.yaml --agent rules
+#     py tools/regatta.py data/regatta/ushant-to-falmouth.yaml --agent fake
+#
+# The finish is a line about a place: she is in when her true position is within the
+# radius of the outer road (the pilot's ground off Pendennis, data/ports/falmouth.yaml),
+# every mark rounded first (none on this course). Ninety-six miles; the passage's book
+# brought her up there in fourteen hours, so thirty is the limit.
+
+name: Ushant to Falmouth
+scenario: data/scenarios/gate-5b-passage.yaml
+seed: 7
+start_orders: [set plain sail]
+standing_orders: []
+finish: {at: falmouth-outer-road, radius_nm: 1.0}
+time_limit_hours: 30
+marks: []
+intent: bound for Falmouth          # the rules-based captain's, and nobody else's
+fake:                                # the scripted captain's orders (freesail/agents/fake.py)
+  first: [shape a course for Falmouth outer road via 50 00 N 4 57 W, trim sails]
+  each_glass: [take a bearing of the land, take a fix, trim sails]
+# the trims by a point of sail against `trim sails` on the cadence (the owner's note 25;
+# package 44's judgement, docs/dev/TuningNotes.md): `--fake <name>` runs one of these
+fakes:
+  trim for the point:
+    first: [shape a course for Falmouth outer road via 50 00 N 4 57 W, "{point}"]
+    each_glass: [take a bearing of the land, take a fix, "{point}"]
+  no trim:
+    first: [shape a course for Falmouth outer road via 50 00 N 4 57 W]
+    each_glass: [take a bearing of the land, take a fix]

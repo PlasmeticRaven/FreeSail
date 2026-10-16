@@ -5157,3 +5157,268 @@ was restarted once in the middle and every run begun again from nothing.
   none failed** (the expected failures the truths' own and the trade trial's grounding
   above), every pin of the passages, the gate's days, the cruise and the trials standing
   as 45c pinned them but the two stranger trials' (the table above).
+
+
+## Package 44: the regatta, the trims by a point of sail, the parity tests (2026-10-16)
+
+Package 44 (spec M6 §21 and §22 as built; the brief in `docs/dev/M6-WorkPackages.md`; the
+owner's note 25 of gate m6a-2, the trims by a point of sail judged at the regatta; truths
+90 and 91). Built beside package 43b from the same head (`a7e5693`). No model was run: the
+regatta's model doors are proved against the fake model server and the fake Messages
+server, and the first table is the rules-based captain's and the scripted captain's.
+
+### The regatta as built (item 1)
+
+`tools/regatta.py` and the three courses of `data/regatta/` (spec §21 as built;
+`docs/agents/Harness.md` section 18). Where the brief's way was taken and where another:
+
+- **A course is a scenario file and a course file over it**, not a scenario of its own: the
+  course names the recorded passage's (or the voyage's) scenario and leaves out what is the
+  scenario's own captain (its book and its first orders), so that every agent starts from
+  the same sea, the same weather and the same ship, and the course can never drift from
+  the passage it is run on. The recorded passages' files are run, never pinned here.
+- **Every agent is given plain sail at the gun.** On the first try the rules-based captain
+  on the 5b passage's start, no sail set and under way off Ushant, made no sail for
+  twenty-six hours (his doctrine makes sail when he weighs, and she was not at anchor): a
+  flying start under plain sail is the course's, the same for every agent. The captain's
+  gap is the lead's (below).
+- **The model doors run in the regatta's own process** as clients of a game it hosts (the
+  browser game's app served to the door as the doors' own tests serve it), rather than the
+  owner starting a game and a door in two terminals: one command runs a course, the clock
+  held at the gun until the station is taken and in lockstep after, run as fast as the
+  machine allows between turns. The door's own flags pass through after `--`.
+- **Consent on record only**: `remote.Desk.on_record_only` refuses before the gun, in words,
+  a model with no record, a brief changed since its record, a re-ask or a drill due; no
+  consent conversation is begun at the regatta. Every record now in `docs/agents/consent/`
+  predates the brief of 42a, so every model the owner has is refused by the regatta until
+  he has put the question again in a game (decision 42's re-asks, his).
+- **No model is named in the repository by a run**: the log and the row put a model's
+  identity, wherever the log has it, as its kind of agent ("a local model through its
+  runner") before anything is written; the run's save, which holds the identity as the
+  consent and the replay need it, goes to `saves/regatta/` (git ignores it).
+- **The human replay** is a save of the course begun from `--start-save` (the course at the
+  gun), replayed by its journal and judged as it sails (`core.replay.replay` takes an
+  `on_tick` that stops it at the line); a save of another start is refused in words.
+- **The judge** rounds a mark when her true track crosses the line laid from it to seaward,
+  and finishes her within the radius once every mark is rounded. The finish of the second
+  course is three miles about the road of Bertheaume: the pilot's track into Brest (the
+  port file's `from_sea` and `in`) passes 2.3 to 2.8 miles from the road's own point, and
+  the rules-based captain bound for Brest went by it inside that and into the Goulet; a
+  mile would have scored him as never arriving.
+- **The scripted captain** (`fake.captain_on_the_course`): the course's orders at the gun
+  and at each glass, standing by until the next. Its first scripts, a course shaped for the
+  port by name and trimmed each glass, put the frigate on the Manacles and the schooner on
+  Keller off Ushant: `shape a course` lays the line from the account and warns of the land
+  it crosses, and a script does not read the warning. The scripts in the course files now
+  prick their courses clear (by way of 50 00 N 4 57 W off the Manacles, west of Ushant,
+  west of Finisterre) and take a bearing and a fix each glass; even so it takes the ground
+  on both Channel courses by account and is carried off on the third (below). A model
+  reads the master's words; the fake is the floor of what a station without judgement makes of a course.
+
+### The first table (seed 7, `docs/playtests/regatta/2026-10-16/table.md`)
+
+Each run at lockstep on this tree; the logs, the rows and the table beside them; the saves
+under `saves/regatta/`. Fatigue is the company's mean at the end and the most an hour's
+mean reached (0 fresh, 1 worn out).
+
+| Course | Agent | Finished | Elapsed, or to go at the limit | Marks | Damage | Groundings | Fatigue | Purse | Lines, digest |
+|---|---|---|---|---|---|---|---|---|---|
+| Ushant to Falmouth (30 h) | the rules-based captain | yes | 14 h 46 m | none | none | none | 0.02, 0.03 | none | 570, `da873c7f2ce5fbec` |
+| | the scripted captain (`trim sails`) | no | 1.1 miles | none | none | 4, the first at 14 h 38 m, a mile and a tenth from the line at seven knots and a half | 0.01, 0.03 | none | 907, `b681a27dc0db7a0d` |
+| | the scripted captain (`trim for <point>`) | yes | 14 h 25 m | none | none | none | 0.02, 0.03 | none | 508, `341954f339736409` |
+| | the scripted captain (no trim) | no | 2.7 miles | none | none | 2, the first at 21 h 55 m | 0.01, 0.03 | none | 715, `317f0b447cbcbc75` |
+| Falmouth to the road of Bertheaume (40 h) | the rules-based captain | yes | 27 h 36 m | none | none | none | 0.02, 0.09 | £5,996 (£4, the pilot) | 1551, `c328954e9d792928` |
+| | the scripted captain | no | 8.6 miles | none | none | 10, the first at 30 h 53 m | 0.01, 0.12 | £6,000 | 1246, `a6023fa88339d2e9` |
+| Falmouth to Funchal road (384 h) | the rules-based captain | no | 9.7 miles | Ushant 26 h 27 m, Finisterre 116 h 38 m | none | 9, the first at 298 h 59 m under Machico | 0.01, 0.05 | £800 | 8371, `2f64490ea1d079ad` |
+| | the scripted captain | no | 906 miles | Ushant 17 h 05 m | none | none | 0.01, 0.03 | £800 | 10212, `1e61315cc123ea45` |
+
+What the table says. **The rules-based captain** is the regatta's standard on the two
+Channel courses: the 5b passage in 14 h 46 m (the passage's own book, which heaves to for
+the soundings and takes the noon sight, reaches the same road at 16 h 12 m) and the crossing in 27 h 36 m, by the soundings and
+the Iroise with the pilot, nothing carried away, never aground. On the voyage to Madeira he
+rounded Ushant and Finisterre and made his landfall on the island's north-east end, under
+São Lourenço and Machico, on the thirteenth day; his course for Funchal road from there
+was shaped across the land ("the line crosses the land about Machico"), he took the ground
+on the ebb, and each flood that floated her he shaped the same course and took it again,
+nine times, 9.7 miles from the road at the limit. That is the planner's open item (the
+owner's reading of 2026-10-15 that `shape a course` warns of the land and does nothing
+about it): a fault for the lead, and the regatta's first finding. **The scripted captain**
+took the ground on both Channel courses, by account and through the master's warnings,
+which a script does not read, and on the voyage to Madeira was carried far to the westward
+on a leg of four hundred miles (finding 5 below) and ended 906 miles short; on the first
+course trimmed for the point of sail it came in first, 21 minutes ahead of the rules-based
+captain. The purse moved once, by the Brest pilot's fee (£4, paid as he left her clear of
+the road). Fatigue stayed fresh throughout: no course has the crew at the braces for long
+(nobody reefs; the weather is pinned fair).
+
+### The trims by a point of sail: kept (item 2)
+
+`trim for close hauled`, `trim for the wind abeam`, `trim for the wind large` (or `for the
+wind on the quarter`) and `trim to run` (`orders/verbs.py`, `POINT_TRUE_WIND_DEG`,
+`point_wind`, `course_steered_for`; the phrases in `data/vocabulary.yaml`). The brief's way
+was the period's trim by level close-hauled and the yards squared by fixed steps for the
+rest (the brace table's 30° and 15° from square); by the model's own rule the steps would
+be wrong for its sails, whose best angle of attack is reckoned from the apparent wind (`trim sails`
+puts the yards some 60° from square with the wind abeam, the apparent wind being well
+forward of the beam at the frigate's speed, where the table's "up" is 30°). So the trims
+were built as `trim sails` for a named wind: each point a true wind's angle off the bow
+(close-hauled six points, Fincham's and what the period's trim gives the frigate full and
+by; abeam eight; large twelve; a run sixteen), the apparent wind reckoned from the true
+wind she has and her way now, the yards and the sheets trimmed for it by `trim sails`'s
+rule (close-hauled the period's trim by level whatever her way), on the side the wind will
+be on when she is on the course the helm, or a tack or a wear ordered for a course, is
+steering for. The side was the first version's fault: from a run hauled up to the wind
+abeam (the helm wearing her round for it) the yards were braced for the tack she happened
+to be on dead before it, and she was aback for half an hour (2.0 knots against 6.7 with no
+trim at all); taken from the course steered for, 7.5 knots.
+
+**Where they gain**: when the helm and the trim are ordered in one breath, as a model's
+station orders them before it stands by for a glass. `trim sails` then trims for the wind
+she had. The measure (`scratchpad/p44/turns.py`, kept out of the repository): fifteen knots
+from the north, the ship under plain sail trimmed on her first heading, the helm ordered to
+a new one with the trim; the miles made good along the new course in the half hour after.
+
+| The frigate | steer and `trim sails` | steer and the point's trim | steer, `trim sails` 15 min after | steer alone |
+|---|---|---|---|---|
+| E to SE (the wind large) | 2.93 | **3.52** | 3.30 | 3.03 |
+| E to S (a run) | 2.25 | **2.89** | 2.56 | 2.22 |
+| SE to ENE (close-hauled) | -0.43 (aback) | **2.36** | 0.07 | 0.14 |
+| S to E (the wind abeam; worn round) | 1.91 | **3.70** | 3.52 | 3.28 |
+| E to ENE (close-hauled) | 2.56 | 2.56 | 2.05 | 1.59 |
+| SE to SSE (the wind large) | 3.11 | 3.11 | 3.16 | 3.16 |
+
+| The topsail schooner | steer and `trim sails` | steer and the point's trim | steer, `trim sails` 15 min after | steer alone |
+|---|---|---|---|---|
+| E to SE | 2.72 | **3.28** | 2.96 | 2.64 |
+| E to S | 2.14 | **2.70** | 2.32 | 1.97 |
+| SE to ENE | **0.75** | -0.17 (aback) | 0.42 | **0.75** |
+| S to E | 1.46 | **3.33** | 2.32 | 1.46 |
+| E to ENE | 2.66 | **3.37** | 2.87 | 2.46 |
+| SE to SSE | 2.85 | 2.85 | 2.86 | 2.85 |
+
+**Against the helm's mark** (`scratchpad/p44/mark.py`): from the wind abeam, hauling her
+wind full and by with the trim in the same breath, made good to windward in the hour after.
+The frigate: `keep her full` with `trim sails` 1.54 miles at 4.8 knots, with `trim for close
+hauled` the same (the apparent wind abeam is on a wind for her yards already: both trims
+brace up by level); steered six points off by compass, 1.57 at 5.1 either way. The
+schooner: full and by with `trim sails` 0.88 at 7.2 knots, with `trim for close hauled`
+0.35 at 2.6 and four minutes aback; by compass six points off with `trim for close hauled`
+**2.24** at 6.8, with `trim sails` 1.67.
+
+**On the first course** (the table above): the scripted captain trimmed for the point came
+in at 14 h 25 m; with `trim sails` on the cadence it took the ground a mile and a tenth
+from the line at 14 h 38 m; with no trim after the gun it was aground at
+21 h 55 m 2.7 miles short. The wind is free from the gun to the line on that course (SW
+backing W on a northerly course), so the helm's mark never applies there, and the courses'
+different landfalls are partly the account's; the turns are the measure, the course the
+check.
+
+**The judgement: kept.** They gain or hold in eleven of the twelve turns, and in the
+three that matter most (bearing away, hauling up from the quarter, and coming to from a
+run) by a fifth to the whole of the distance; with the helm full and by on a square-rigger
+they are `trim sails`. **The case against**: the schooner hauling her wind under her
+fore-and-aft sails, from the quarter to close-hauled or full and by, does worse with her
+sheets hauled flat before she has come to: she gripes past her course and is aback (the
+gripe the 37p notes name). The primer's chapter 4 says so: for a schooner hauling her wind,
+the helm first and the trim when she is round. **The sails-lifting line** (45c's, the yards
+not trimmed for the course) now names `trim for close hauled` (`physics/integrate.py`;
+`tests/test_lying_to.py`); the primer's chapters 4 and 5 say the orders and the line.
+
+### The parity tests (item 3)
+
+`tests/test_parity.py` (spec §22 as built). The enumeration, every entry checked:
+
+| Surface | Entries | The captain's station | Differences |
+|---|---|---|---|
+| The readings registry | 78 rows | every row asked at the console's prompt and by `submit_order` at the same tick gives the same words; every row a sample carries is in the `readings` tool in the registry's words | by design: the parametric rows are asked by name (the sails' states the tool's `sails`), the absent row refused alike, the pace the driver's and never carried |
+| The vocabulary's verbs | 302 (the readings' verbs among them) | every verb passes the captain's domain | by design: the driver's five (`hold`, `go`, `time`, `read the standing orders from`, `muster`), refused to the ship by the grammar from both |
+| The console's commands and the browser's order line | 21 | each has its road (`state`, the stores' queries, `standing orders`, the stations' sentences, `log` as `read_log`, `help` as `library`) | by design: the clock, the save and the load, reading a book from the disk, `quit`, a world order |
+| The browser's snapshot | 17 blocks | each names the readings and tools that show it | none |
+| The station's tools | 16 | each names the player's counterpart | by design: the journal, the stand-by, the shelf, the hand-over, the stand-down, the opt-out |
+
+**The gap found and closed**: `muster`. The console printed the watch bill and the browser
+answered it (45c), and a station asking for it was told "'muster' is a console command, not
+an order to the ship". `submit_order('muster')` at any station now answers from
+`api.queries.muster_lines`, as the console prints it, logged by neither. **The same orders,
+the same log** (truth 91): the fake captain gives ten orders one a sample on the 5b
+passage's world with the console on the same game; the console gives them at the same
+ticks to a second game; the logs are the same line for line, but for whose each order's
+line says it was and for the stores' answers (`the sail room`, `the booms`), which the
+console prints for the one who asked and a station gets as its tool's result and a log
+line: listed by design (the console's and the browser's own query of the stores never
+reaches the World; a station's is a query through the order line as the player's
+`show the sail room` is).
+
+### Found on the way, for the lead
+
+1. **The planner's course across the land** (the regatta's first finding): the rules-based
+   captain's course for Funchal road from the island's north-east end crosses the land
+   about Machico; he grounds on it nine times in four days. The same warning-not-avoiding
+   put the scripted captain on the Manacles and on Keller. The owner's reading of
+   2026-10-15 stands as the planner's open item.
+2. **The rules-based captain on passage makes no sail when he starts under way with none
+   set** (the 5b start without its first orders: twenty-six hours at two knots under bare
+   poles). The courses give plain sail at the gun; the doctrine's want is the lead's.
+3. **`via` a land mark and the next leg**: a berth off Ushant "passed abeam" five miles
+   north of it, the leg to the next mark laid from where she is crosses Keller (the master
+   says so). The scripts prick their courses; whether the way should lay its next leg
+   round the mark it has just passed is the orders review's.
+4. **The schooner's gripe hauling her wind** with her sheets flat aft before she has come
+   to (above).
+5. **A water mark of the way passed abeam far off** (the scripted captain on the voyage to
+   Madeira): the leg from west of Ushant to 42 55 N 9 50 W, 386 miles, steered with "the
+   ebb, a knot and a half to the SW" allowed off Ushant, ended with the mark "passed
+   abeam" when the next leg, for Funchal, was 1,562 miles: she had been carried far to the
+   westward of the mark and of Finisterre (the judge never had her round it), and the
+   voyage ended 906 miles short. Whether a tidal allowance laid near the land holds on a
+   leg of four hundred miles, and whether a mark passed abeam at any distance is struck,
+   are the way's and the master's; reproduce from the run's save
+   (`saves/regatta/2026-10-16-falmouth-to-funchal-fake.json`, not kept in the repository:
+   `py tools/regatta.py data/regatta/falmouth-to-funchal.yaml --agent fake` makes it again
+   in half an hour).
+
+### Pins moved
+
+One cause moves them all: the sails-lifting line's words, "... the yards are not trimmed for
+this course; trim for close hauled, or keep her away." where it was "trim sails, or keep her
+away" (45c's line, said when the yards could come a good deal sharper on this tack). Every
+tick, every line count and every other pinned figure stands; the trims themselves move
+nothing (no book uses them), and `trim sails` is the same order to the byte. Checked on the
+thick-weather trade trial: its log with the old words put back has the old digest
+(`scratchpad/p44/olddigest.py`, one line changed). Measured once on this tree by the slow
+tier over the truths, the trials and this package's files, the old figure beside each new
+one in the test files.
+
+| Pin | Lines (unchanged) | Before (45c, 43) | After |
+|---|---|---|---|
+| `GATE_5B_SCHOONER_DIGEST` | 763 | `edea58e34efd05c4` | `c01e6e0ff56503c8` |
+| `GATE_5C_CRUISE_DIGEST` (the cruise and truth 77) | 2287 | `493d888d874aa358` | `a46aa710b77a9d6a` |
+| `GATE_5C_MERCHANT_DIGEST` (the passage and truth 77) | 3079 | `adf0ec6041c6e71d` | `efdd3ae1bb9711be` |
+| `GATE_6A_INTENT_DIGEST` | 2357 | `60ecf7b8a93932bb` | `89e89858a56398c9` |
+| `GATE_6A_FAKE_CAPTAIN_DIGEST` (truth 78) | 3092 | `e0762f5a6a5e926e` | `c266f45bb9e7fe6f` |
+| `TRIAL_STATION_STRANGER_DIGEST` | 714 | `9e0bc47304373987` (43) | `8dc4b6b51d3bfa8f` |
+| `TRIAL_STATION_GALE_DIGEST` | 1429 | `94d2943d029d197d` | `692b5e910adb1d55` |
+| `TRIAL_STATION_LEE_SHORE_DIGEST` | 1665 | `fe10b699baf92229` | `53c27cbdc3c37f2c` |
+| `TRIAL_TRADE_THICK_DIGEST` | 482 | `f39f5c6f393dd75d` | `7915dc59337bd31d` |
+
+The 5b passage (the frigate), its thick-weather passage, the gate's days and the trade
+trial with the stranger say no such line and stand as they were.
+
+### The suite, as run
+
+On the build machine (four cores, package 43b's suites running beside this package's all
+day, the load between 5 and 8): `python3 -m ruff check .` and `python3 -m ruff format
+--check .` clean. **The slow tier once** over the truths, the trials and this package's
+files (`python3 -m pytest --slow -n 3 -m "not pace" tests/test_known_truths.py
+tests/test_captain_trials.py tests/test_regatta.py tests/test_parity.py
+tests/test_trim_order.py tests/test_lying_to.py`): 183 ran, 165 passed, 8 expected
+failures (the truths' own and the trade trial's grounding, as 43 left them), 10 failed,
+every one a digest moved by the lifting line's words (the table above; truth 77 reads the
+cruise's and the merchant passage's); re-pinned, and **the confirming run** of the ten
+alone: 10 passed. Truths 90 and 91 passed in it. **The fast tier** (`python3 -m pytest -n
+4 -q -p no:cacheprovider`): 3,272 passed, none failed, 290 slow tests left out. **The pace
+tests alone** (`--slow -m pace`, the trim touched): 6 passed, at a load of 6.
+
+The regatta's runs for the first table took from two minutes (the frigate's course) to
+half an hour (the voyage to Madeira's 384 hours) each, at 300 to 800 ticks a second under
+that load; the crossing, with the merchant passage's dozen sail beside her, three to five.

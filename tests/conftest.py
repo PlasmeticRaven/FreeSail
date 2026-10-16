@@ -80,6 +80,7 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
     "test_routine.py": frozenset({"a_day"}),
     "test_staying.py": frozenset({"frigate_by_the_wind"}),
     "test_studding.py": frozenset({"brought_up"}),
+    "test_regatta.py": frozenset({"first_course_runs"}),  # package 44: truth 90, two passages
 }
 
 # The other tests at or over the threshold: the mean of two whole-suite runs at `-n 4`
@@ -318,6 +319,13 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_ports.py::test_a_fast_ship_is_hailed_to_shorten_sail_and_the_boat_keeps_company_until_she_does",
         "test_ports.py::test_hail_the_pilot_hails_his_boat_in_sight_and_takes_him",
         "test_ports.py::test_the_pilot_is_put_off_at_the_anchor_and_the_pilotage_paid_once",
+        # package 44: a short course sailed by two agents and replayed, a human's game
+        # replayed, the API door's run, and truth 91's two games of two hours
+        "test_regatta.py::test_the_short_course_under_the_rules_and_the_fake_scores_both_and_writes_the_table",
+        "test_regatta.py::test_a_humans_game_of_the_course_is_replayed_and_judged",
+        "test_regatta.py::test_a_hosted_model_with_consent_on_record_sails_the_course_through_the_api_door",
+        "test_parity.py::test_truth_91_a_fake_captain_and_the_console_give_the_same_orders_to_the_same_log",
+        "test_trim_order.py::test_trimmed_for_the_point_in_the_same_breath_she_makes_more_than_by_trim_sails",
     }
 )
 

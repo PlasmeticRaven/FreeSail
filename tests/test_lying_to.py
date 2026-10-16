@@ -933,8 +933,8 @@ def test_her_sails_lifting_with_the_yards_trimmed_for_another_wind_names_the_tri
     lines = [e for e in w.log.all()[n0:] if e.kind == "ship.lifting"]
     assert lines, [(e.kind, e.text) for e in w.log.all()[n0:]]
     assert lines[0].text.endswith(
-        " on the starboard bow: the yards are not trimmed for this course; trim sails, or "
-        "keep her away."
+        " on the starboard bow: the yards are not trimmed for this course; trim for close "
+        "hauled, or keep her away."
     ), lines[0].text
     assert lines[0].data["untrimmed"] and lines[0].data["room_deg"] >= 8.0
 

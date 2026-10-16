@@ -414,3 +414,33 @@ world: weather: waypoint for "the low" at 1805-06-13T16:00 -100 400 988
 ```
 
 Without the prefix the order is refused as it always was (the captain plays the ship and not the world); with it, it is the owner's word. The order's own line is for the record and not the play log (decision 46, package 45c). **The director's seat hook** (spec M6 §23) is two more orders of the channel, built for the director of milestone 7b and usable now by you: `world: seat: <the model's exact name> as captain of <ship> for 20 samples` (or `for 2 hours`) holds a seat for that model on that ship under your grant and budget, refused in words without a consent record holding its yes, without a grant naming it (the scenario file's `director: {models: [...], seats: 1, seats_in_voyage: 3}`), or with the seats spent; a door that then comes for that model and that ship is admitted as any door is, and the game stands the station down when the budget is spent. `world: unseat: <ship>, <your note>` stands it down at once. Nothing else of the director is here: not his voice, not his door, not a world with no player's ship.
+
+## 18. The regatta: a course sailed by an agent, and scored (package 44)
+
+The regatta (spec M6 §21) sails a fixed course at a fixed seed under one agent at a time and scores the run: the elapsed time from the gun to the finish line, with the damage, the groundings, the crew's fatigue and the purse beside it. It is your tool for judging the physics and the documentation against the models, and the first competitive mode. One command runs a course; there is no game to start first, since the regatta hosts the game itself and the door runs beside it.
+
+**The courses** are in `data/regatta/`: `ushant-to-falmouth.yaml` (the frigate, gate 5b's passage), `falmouth-to-bertheaume.yaml` (the schooner across the Channel, the merchant passage's crossing) and `falmouth-to-funchal.yaml` (the schooner to Madeira on the whole chart, by way of Ushant and Cape Finisterre, each left to larboard). Each says which scenario gives the ship, the time and the weather, what every agent is given at the gun (plain sail), the finish (a place and a radius) and the limit, and the marks: a mark is rounded when her track crosses the line laid from it to seaward, so a ship that cuts inside it has not rounded it. The judge reads her true position, which no agent ever reads. `--ship data/ships/cutter.yaml` (or `ship:` in a course file) sails the same course in another ship, so that a new hull is tried beside the others.
+
+**The agents**, by `--agent`:
+
+```
+py tools/regatta.py data/regatta/ushant-to-falmouth.yaml --agent rules
+py tools/regatta.py data/regatta/ushant-to-falmouth.yaml --agent fake
+py tools/regatta.py data/regatta/ushant-to-falmouth.yaml --agent local -- --endpoint http://127.0.0.1:8080 --seed 7
+py tools/regatta.py data/regatta/ushant-to-falmouth.yaml --agent api -- --model "THE MODEL'S NAME, AS THE API NAMES IT" --effort high
+py tools/regatta.py data/regatta/ushant-to-falmouth.yaml --agent replay --save saves/my-run.json
+```
+
+- `rules`: the rules-based captain on the course's intent, nobody seated.
+- `fake`: the scripted captain at the captain's station (`--fake NAME` runs one of the course's other scripts, as the trims by a point of sail were judged).
+- `local`: a model under `llama-server` or Ollama through the local runner (section 5). Start the model server as always; everything after `--` is the runner's own flags (`--endpoint`, `--seed`, `--model`, `--ctx`, `--max-reply`, `--cadence`, `--pictures`, ...). `--station captain` is given for you.
+- `api`: a model through the API door (section 16), the key from your credential store as always; after `--` the door's flags (`--model` is required, `--effort`, `--dialect openrouter`, `--max-reply`, ...).
+- `replay`: your own game of the course. `py tools/regatta.py <course> --start-save saves/gun.json` writes the course at the gun as a save; load it (`py -m freesail.ui.console --load saves/gun.json`, or the browser's server with `--load`), sail her in, and save; `--agent replay --save` your save replays it by its journal and judges it as it sails. A save that did not start from the course's gun is refused in words.
+
+**Consent.** The regatta runs a model only with its consent on record: a yes that stands for the brief as it is, with the drill passed (the captain's station drills). Without one the door is refused before the gun in words that say why (`The regatta runs no model whose consent is not on record ...`), the runner or the door ends with exit code 5, and nothing is written; no consent question is put at the regatta. Put the question in a game first, at the captain's station (section 14), and come back. The regatta is a kind of session the consent brief's next revision (package 42b) names.
+
+**At lockstep.** The scripted agents answer within the tick. For a model's door the clock holds at the gun until the station is taken, and after that holds for every turn while the door has the floor (section 8), so a slow model loses no time to its thinking: the race is the ship's time, not the machine's. The station is sampled every glass and on the notable and urgent lines (`--cadence` after `--` changes it). When she crosses the line, or the limit is reached, the regatta stands the station down with your own `stand down the captain` and the door ends (exit code 3).
+
+**What it writes.** Each run writes, under `docs/playtests/regatta/<date>/<course>/`, its log (the play log as the log has it) and its row (`<agent>.json`), and writes the date's table (`docs/playtests/regatta/<date>/table.md`) again from every row of the date: a course to a section, the finishers first by their time. A model is named in the table and the log by its kind and its door ("a local model through its runner", "a hosted model through the API door"), never by its name, which the regatta puts in place of the name wherever the log has it; `--label` names a run beside its kind (a second run the same day is kept as `local-2`), and `--note` adds a line under the course. The run's save goes to `saves/regatta/`, from which it replays to the digest the row gives; copy the date's folder back into the repository with the gate report as you do the consent records. `--no-write` scores a run and writes nothing; `--table <date folder>` writes a table again from its rows.
+
+The first table, the rules-based captain and the scripted captain on the three courses at seed 7, is in `docs/playtests/regatta/2026-10-16/` (tuning notes, package 44). No model has been run on a course yet; that is yours.

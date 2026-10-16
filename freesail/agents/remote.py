@@ -362,6 +362,10 @@ class Desk:
         self.changed = changed or (lambda: None)
         self.today = today
         self.seats: dict[str, Seat] = {}
+        # the regatta's rule (package 44; spec M6 §21): a model whose consent is not on
+        # record (no record that proceeds, a re-ask or a drill due) is refused in words,
+        # and no consent conversation is begun; the question is put in a game, not a race
+        self.on_record_only = False
 
     # -- stationing ------------------------------------------------------------------
 
@@ -492,6 +496,10 @@ class Desk:
                 seat.left_at = decided.left_at
             elif kind == consent.CONSENT_KIND:
                 told = consent.why_again(model_name, self.records_dir, door, ask_again)
+            if kind and self.on_record_only:
+                words = not_on_record_words(model_name, why)
+                self.say(f"FreeSail: {words}")
+                raise DeskError(403, words)
             if kind:
                 self._begin_consent(
                     seat,
@@ -1194,6 +1202,15 @@ class Desk:
                 "record": consent._rel(seat.record.path),
             }
         return out
+
+
+def not_on_record_words(model_name: str, why: str) -> str:
+    """The regatta's refusal of a model whose consent is not on record (package 44)."""
+    return (
+        f"The regatta runs no model whose consent is not on record (spec M6 §21), and "
+        f"{model_name} is not seated: {why}. The consent question is put in a game, at the "
+        "game's own consent step (docs/agents/Harness.md); then the regatta may run it."
+    )
 
 
 def _new_key() -> str:

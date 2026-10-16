@@ -1,0 +1,73 @@
+{
+  "course": "falmouth-to-funchal",
+  "course_name": "Falmouth to Funchal road",
+  "agent": "rules",
+  "label": "rules",
+  "kind": "the rules-based captain",
+  "door": "in the game, on the course's intent",
+  "note": "",
+  "seed": 7,
+  "finished": false,
+  "elapsed_s": null,
+  "elapsed": "",
+  "ran_s": 1382400,
+  "time_limit_s": 1382400,
+  "marks": [
+    {
+      "mark": "Ushant",
+      "tick": 95274
+    },
+    {
+      "mark": "Cape Finisterre",
+      "tick": 419891
+    }
+  ],
+  "damage": [],
+  "groundings": [
+    {
+      "tick": 1076395,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at three knots, heeling 0 degrees, the tide falling."
+    },
+    {
+      "tick": 1098623,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at one knot and a half, heeling 0 degrees, the tide rising."
+    },
+    {
+      "tick": 1099614,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at two knots and a half, heeling 0 degrees, the tide rising."
+    },
+    {
+      "tick": 1100650,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at three knots, heeling 0 degrees, the tide rising."
+    },
+    {
+      "tick": 1101780,
+      "text": "She has taken the ground forward: one fathom and a half of water by the chart, and she draws 11 feet; she struck at two knots and a half, heeling 0 degrees, the tide rising."
+    },
+    {
+      "tick": 1104244,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at half a knot, heeling 0 degrees, the tide rising."
+    },
+    {
+      "tick": 1106044,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at half a knot, heeling 0 degrees, the tide rising."
+    },
+    {
+      "tick": 1152064,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at half a knot, heeling 0 degrees, the tide rising."
+    },
+    {
+      "tick": 1241705,
+      "text": "She has taken the ground forward: one fathom and a half of water by the chart, and she draws 11 feet; she struck at half a knot, heeling 0 degrees, the tide rising."
+    }
+  ],
+  "fatigue": 0.008,
+  "fatigue_words": "fresh",
+  "fatigue_most": 0.05,
+  "purse": 800.0,
+  "purse_change": 0.0,
+  "lines": 8371,
+  "digest": "2f64490ea1d079ad",
+  "miles_to_go": 9.7,
+  "save": "saves/regatta/2026-10-16-falmouth-to-funchal-rules.json"
+}

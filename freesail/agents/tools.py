@@ -473,6 +473,14 @@ def submit_order(world: World, station: str, text: str, danger: str = "") -> str
     danger = " ".join(str(danger or "").split())
     if not text:
         return "An order needs some words."
+    if is_muster(text):
+        # the muster (package 44; spec M6 §22, the parity test's finding): the console's
+        # and the browser's query of the watch bill, which the grammar refuses to the ship
+        # as the driver's; answered here from the same function, at every station, never
+        # logged or journaled, as the console prints it
+        from freesail.api import queries
+
+        return "\n".join(queries.muster_lines(world))
     harness = world.agents.get(station)
     st = harness.station if harness is not None else None
     how = ""
@@ -516,6 +524,14 @@ def submit_order(world: World, station: str, text: str, danger: str = "") -> str
     if danger and how and how != DANGER:
         return f"{e.text} (The order was yours to give already; the danger's word was not needed.)"
     return e.text
+
+
+def is_muster(text: str) -> bool:
+    """'muster', 'muster the crew' and the vocabulary's other words for it (the console's
+    own test, `ui.console.Console._is_muster`)."""
+    from freesail.orders.vocabulary import key
+
+    return load_vocabulary().phrase_to_verb.get(key(text)) == "muster"
 
 
 # What `submit_order('hand over the deck')` answers a station with authority: the deck is
