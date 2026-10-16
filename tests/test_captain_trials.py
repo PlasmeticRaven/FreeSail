@@ -50,15 +50,19 @@ def books(world: World) -> list[str]:
 # across the brig's bows and the brig draws forward 145 degrees and to windward in the first
 # half hour; she is never within hail and the chase is given up at 10:51 (the chase rule's
 # own, said for the lead in docs/dev/TuningNotes.md, package 45)
+# package 45c: the chase rule mended (the chaser's own way across the line of sight from her
+# run between the bearings, the lead to seventy degrees, a crossed chase laid for her
+# bearing again): chasing at 9180, within hail at 10423 and keeping station at 10440
+# (never within hail and the station at 24660 at package 45; docs/dev/TuningNotes.md, 45c)
 TRIAL_STATION_STRANGER_STATES = [
     (300, "keeping station"),
     (7200, "investigating a stranger"),
     (9180, "chasing"),
-    (24660, "keeping station"),
+    (10440, "keeping station"),  # 24660 at package 45
 ]
-TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [9798] at package 37p
-TRIAL_STATION_STRANGER_LINES = 972  # package 45 (961 at package 37p)
-TRIAL_STATION_STRANGER_DIGEST = "c3763573a2f44dff"  # package 45 (11dc95ebe098c244 at 37p)
+TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = [10423]  # never at 45; [9798] at 37p
+TRIAL_STATION_STRANGER_LINES = 889  # package 45c (972 at package 45, 961 at package 37p)
+TRIAL_STATION_STRANGER_DIGEST = "3c2aba8b08fd1f63"  # package 45c (c3763573a2f44dff at 45)
 
 
 @pytest.fixture(scope="module")
@@ -102,8 +106,10 @@ TRIAL_STATION_GALE_FIRST_STATES = [
     (30900, "keeping station"),
     (41880, "hove to for weather"),
 ]
-TRIAL_STATION_GALE_LINES = 1399  # package 45 (1423 at package 37p)
-TRIAL_STATION_GALE_DIGEST = "3f0d36bbff4af262"  # package 45 (6bd09ffa7b4cefad at 37p)
+# package 45c: the first states as they were; sail made again by steps after the gale
+# (topsails 18:27, masts, reefs and jib 20:30, plain sail 21:19), keeping station at 63720
+TRIAL_STATION_GALE_LINES = 1429  # package 45c (1399 at package 45, 1423 at package 37p)
+TRIAL_STATION_GALE_DIGEST = "94d2943d029d197d"  # package 45c (3f0d36bbff4af262 at 45)
 
 
 @pytest.fixture(scope="module")
@@ -138,21 +144,22 @@ def test_in_a_gale_with_sea_room_she_heaves_to_and_claws_off_a_lee_shore_by_turn
 # by turns of the lee shore (Ushant within six miles over the lee sector) and the gale with
 # sea room again, beating from 12:35 and sail made again after the gale (37p: hove to 19440,
 # on passage 37740 to the end under the main topsail); never aground
+# package 45c: lying a-try from 08:11 to 11:34 (the hove-to book's "under way again" no
+# longer sets plain sail in thirty knots; at package 45 on passage at 23040, hove to again
+# at 28500 and beating from 30900), then keeping station; sail made again by steps (topsails 14:45,
+# reefs and jib 20:29 with the masts waiting for sea room, plain sail 20:44); never aground
 TRIAL_STATION_LEE_SHORE_STATES = [
     (300, "keeping station"),
     (9000, "hove to for weather"),
     (11940, "on passage"),
     (12060, "keeping station"),
     (15060, "hove to for weather"),
-    (23040, "on passage"),
-    (23100, "beating"),
-    (23100, "keeping station"),
-    (28500, "hove to for weather"),
-    (30780, "on passage"),
-    (30900, "beating"),
+    (27240, "on passage"),  # 23040 at package 45, then by turns to 30900
+    (27300, "beating"),
+    (27300, "keeping station"),
 ]
-TRIAL_STATION_LEE_SHORE_LINES = 2129  # package 45 (1668 at package 37p)
-TRIAL_STATION_LEE_SHORE_DIGEST = "b7cbfbe33e2ed631"  # package 45 (2b0c13f40e670548 at 37p)
+TRIAL_STATION_LEE_SHORE_LINES = 1665  # package 45c (2129 at package 45, 1668 at 37p)
+TRIAL_STATION_LEE_SHORE_DIGEST = "fe10b699baf92229"  # package 45c (b7cbfbe33e2ed631 at 45)
 
 
 @pytest.fixture(scope="module")
@@ -185,12 +192,12 @@ TRIAL_TRADE_STRANGER_STATES = [
     (300, "on passage"),
     (3660, "evading"),
     (8100, "on passage"),
-    (35340, "in port"),
+    (35640, "in port"),  # package 45c (35340 at 45): the pilot's conn from his station
 ]
-TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [35292]  # [34292, 41307] at package 37p
-TRIAL_TRADE_STRANGER_LINES = 1170  # package 45 (1252 at package 37p)
+TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [35630]  # 45c ([35292] at 45; [34292, 41307] at 37p)
+TRIAL_TRADE_STRANGER_LINES = 1176  # package 45c (1170 at package 45, 1252 at package 37p)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
-TRIAL_TRADE_STRANGER_DIGEST = "e6146a7456fc0a9b"  # package 45 (ee34f4a9db0a5c8c before)
+TRIAL_TRADE_STRANGER_DIGEST = "db253be58da059ca"  # package 45c (e6146a7456fc0a9b at 45)
 
 
 @pytest.fixture(scope="module")
@@ -233,7 +240,9 @@ TRIAL_TRADE_THICK_STATES = [
 TRIAL_TRADE_THICK_ANCHORED_TICK = 14775  # package 45 (17688 at package 37p)
 TRIAL_TRADE_THICK_LINES = 482  # package 45 (553 at package 37p)
 # decision 45, the pilot's news: 50901cf162ea95aa before; package 37p (10fee882c789666e before)
-TRIAL_TRADE_THICK_DIGEST = "590cfb8f12834ac7"  # package 45 (03c66821e0c356b3 before)
+# package 45c: every tick and the lines as they were; a line's words moved (the pilot's
+# conn and the weather's sky, both this package's)
+TRIAL_TRADE_THICK_DIGEST = "f39f5c6f393dd75d"  # package 45c (590cfb8f12834ac7 at 45)
 
 
 @pytest.fixture(scope="module")

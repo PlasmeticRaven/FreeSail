@@ -778,9 +778,8 @@ def _off_the_land(chart: Any, head: Position, where: Position, offing_nm: float)
     want = 1.5 * offing_nm * units.NAUTICAL_MILE
     for k in range(1, 37):
         p = destination(where, bearing, k * units.CABLE / 2.0)
-        depth = chart.depth_at(p)
-        if depth is None or depth <= 0.0:
-            continue
+        # by the chart's shore and not its soundings (the captain's chart, never the
+        # world's depth field): on the land the nearest dry ground is under her
         shore = chart.nearest_shore(p, within_m=want)
         if shore is None or shore.distance_m >= want:
             return p
