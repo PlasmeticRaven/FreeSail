@@ -85,6 +85,7 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
     "test_routine.py": frozenset({"a_day"}),
     "test_staying.py": frozenset({"frigate_by_the_wind"}),
     "test_studding.py": frozenset({"brought_up"}),
+    "test_business.py": frozenset({"busy"}),  # package 43b: a region peopled, 8 to 11 s loaded
 }
 
 # The other tests at or over the threshold: the mean of two whole-suite runs at `-n 4`
@@ -326,6 +327,8 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 43b: the owner's wardroom save replayed to the Goulet, twice
         "test_ports.py::test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood[113000]",
         "test_ports.py::test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood[114000]",
+        # package 43b: two worlds at anchor in Carrick Road, the boat ashore and back (36 s)
+        "test_business.py::test_the_boat_ashore_brings_the_rumours_off_only_where_the_business_is_on",
     }
 )
 

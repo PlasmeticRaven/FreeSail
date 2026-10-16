@@ -219,6 +219,11 @@ class Scenario:
     # names], "seats": how many at once, "seats_in_voyage": how many in all}; empty where
     # the owner gave none, and the seat hook refuses. A save from before loads with none.
     director: dict[str, Any] = field(default_factory=dict)
+    # Package 43b (spec M6 §19): the world's business, `business:` in the scenario file
+    # (on, off, or a density; `freesail.world.business`); None, off, for every scenario that
+    # says nothing, the recorded passages among them. Left out of the dict when off, so that
+    # a save of a game without it reads as it did.
+    business: Any = None
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -232,6 +237,8 @@ class Scenario:
                     setattr(self, f.name, f.default_factory())
         d = asdict(self)
         d["start_time"] = self.start_time.isoformat()
+        if d.get("business") in (None, "", "off", 0, 0.0, False):
+            d.pop("business", None)
         return d
 
     @classmethod
@@ -391,6 +398,8 @@ class World:
     # `--consent-records`; the repository's by default). Class defaults for a checkpoint
     # from before.
     director_seats: dict[str, dict[str, Any]] | None = None
+    # package 43b: the world's business (`freesail.world.business.Business`), None when off
+    business: Any = None
     director_seats_made: int = 0
     consent_records_dir: Any = None
 
@@ -668,6 +677,16 @@ class World:
             for spec in self.scenario.ships:
                 self.vessels.serial += 1
                 self.vessels.add(vessel_from_spec(self, dict(spec), self.vessels.serial))
+        # the world's business (package 43b; spec M6 §19): the region's trade, fishermen and
+        # cruisers drawn under the seed on top of the scenario's own ships, when it says so
+        self.business = None
+        if getattr(self.scenario, "business", None) not in (None, "", "off"):
+            from freesail.world.business import Business, business_density
+
+            density = business_density(self.scenario.business)
+            if density > 0.0:
+                self.business = Business(self, density)
+                self.business.start()
         # The readings (spec M4 §2): one view per tick and per order, read by the standing
         # orders, the snapshot and the agents alike.
         self._readings_key: tuple[int, int] | None = None
@@ -1098,6 +1117,10 @@ class World:
         minute, at the roll-up's cadence and no oftener; a near-detail one every second;
         both before the lookout looks (`_tick_chart`). The lines their own events make
         (a letter brought alongside, a stranger within hail) are recorded here."""
+        business = getattr(self, "business", None)
+        if business is not None and self._position is not None:
+            if self.clock.ship_time.second == 0:
+                business.tick()  # the draw and the ships beyond the edge (package 43b)
         if self._position is None or not self.vessels.vessels:
             return
         if getattr(self.vessels, "crewed_ids", ()):

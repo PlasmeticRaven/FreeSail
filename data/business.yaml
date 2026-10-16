@@ -1,0 +1,103 @@
+# FreeSail: the world's business (spec M6 §19, "the world generates the business: the small
+# step now, the loop later"; package 43b). Read by freesail/world/business.py when a
+# scenario says `business: on` (or a density); the recorded passages say `off` and are
+# sailed by their own named ships, so that they pin. Every figure here is JUDGEMENT on the
+# period's traffic, said so; the ships' names are the common names of their nations'
+# merchant lists of the war, from memory.
+#
+# What is drawn, under the seed (the World's `business` stream, apart from every other):
+# the trade of the ports of the region in play, a cargo carried from a port where its price
+# is low to one where it is high (the ports' own market tables, `data/ports/*.yaml`, as of
+# the day), under a flag the port of destination will take; the fishermen on the grounds
+# of the coast's features (a bottom or a bank the lead finds at sea, worked from the
+# nearest port that sells fish), a smack or a lugger; the cruisers of the nations at war
+# on the stations the cruiser's doctrine names (`data/captains/cruiser.yaml`, `stations:`);
+# each with an intent and a captain of her own (package 43's brains), at the chart's edges
+# coming in and in the ports, and leaving at the edges or going in when her business is
+# done. No supply and demand: what the ships carry moves no price (a later milestone's).
+
+# The population of a region the size of the western Channel (four degrees by three) at
+# density 1, the scenario's `business: on`; a density scales every figure (judgement: the
+# Channel's traffic of a summer day as the recorded passages' dozen sketched it, the
+# coasting trade and the fishermen thinner in war).
+population:
+  traders_in_port: 3      # merchantmen lying in the region's ports at the start, bound away
+  traders_at_sea: 3       # merchantmen at the edges, coming in for a port of the region
+  fishermen: 4            # smacks and luggers on the grounds or bound for them
+  cruisers_per_side: 1    # a cruiser of each nation at war on a station of her own
+# A ship arrives at an edge, bound in, or sails from a port, bound away, by the draw once
+# an hour with these chances at density 1 (judgement: about six traders and two fishermen
+# a day across the region), so long as the region holds fewer than `most_ships`.
+arrivals_per_hour:
+  trader: 0.25
+  fisherman: 0.08
+most_ships: 16
+
+# A cargo is carried where its price at the destination is this many times its price at
+# the port it was bought in or more (the ports' tables as of the day); the trader carries
+# from forty to the most her hold takes, in tons (judgement).
+price_ratio_least: 1.3
+cargo_tons: [30, 120]
+# The share of the traders drawn in port that load for a market beyond the region (the
+# ocean trade, Lisbon's and the Americas'), outward bound: she sails for a mark beyond an
+# edge open to the sea and leaves the region there (judgement: a third).
+outward_bound_share: 0.34
+# Her wait in port before she sails (package 43's `IN_PORT_WAIT_S`, twelve hours, is the
+# brains'; a ship drawn in port at the start has had part of it): judgement.
+in_port_hours_drawn: [1, 11]
+
+# A fishing ground: a feature of the chart of kind `bottom` or `bank` with a sounding of so
+# many fathoms, so far from the coast, and a port within reach that sells fish (pilchards,
+# fish, cod) to be her home; a trip of so many hours on the ground (Holdsworth 1874 pp. 137
+# to 139: a shot of the lines and the hauling, a tide or two; the trawl smacks out for days).
+fishing:
+  depth_fathoms: [10, 80]
+  off_the_coast_nm: 2
+  home_within_nm: 45
+  trip_hours: [8, 30]
+  goods: [fish, pilchards, cod, herring, sardines, mackerel]
+
+# The hull a trader of each nation is drawn from, in turn under the seed (judgement: the
+# French coasting trade in chasse-marées, the British in brigs and schooners, the Americans
+# in schooners, the Danes in brigs).
+trader_kinds:
+  britain: [merchant brig, schooner, merchant brig]
+  france: [lugger, lugger, schooner]
+  spain: [merchant brig, lugger]
+  united-states: [schooner, schooner, merchant brig]
+  denmark: [merchant brig]
+  portugal: [merchant brig, schooner]
+  default: [merchant brig]
+# The neutral flags a cargo for an enemy's port is carried under (judgement: the Americans
+# and the Danes carried most of the neutral trade of 1805).
+neutrals: [united-states, denmark, portugal]
+# A fisherman of each nation: Brixham's trawl smacks, Cornwall's luggers, Brittany's
+# chasse-marées (judgement).
+fisher_kinds:
+  britain: [smack, smack, lugger]
+  france: [lugger]
+  default: [smack]
+
+names:
+  britain: [Betsey, Nancy, Two Brothers, Mary, Friendship, Industry, Endeavour, Hope, Fortitude, Providence, Polly, Sally, Brothers, Union, Ann, Liberty, Diligence, Good Intent, Prosperous, Speedwell]
+  france: [Saint-Pierre, Bonne-Mère, Marie-Anne, Deux-Frères, Notre-Dame-de-Bon-Secours, Jeune-Henriette, Espérance, Sainte-Anne, Saint-Yves, Aimable-Rose, Hirondelle, Saint-Guénolé]
+  spain: [San José, Nuestra Señora del Carmen, San Antonio, Santa Rosa, La Esperanza]
+  united-states: [Polly, Hannah, Sally, Two Sisters, Commerce, Enterprise, Lydia, Eliza, Rising Sun, Columbia]
+  denmark: [Anna Maria, Fortuna, Haabet, Christiane, Frederik, Twende Brødre]
+  portugal: [Bom Jesus, Nossa Senhora da Conceição, São Pedro, Esperança]
+  default: [Fortune, Hope, Endeavour]
+
+# The cruisers' names (judgement, names of the period's lists not taken by a recorded
+# passage's own ships: the Harpy, the Palinure and the Renard are theirs).
+cruiser_names:
+  britain: [Cruizer, Snake, Busy, Fly, Scorpion, Rattler, Sparrowhawk, Cygnet, Nimble, Active]
+  france: [Bayonnaise, Vigilante, Diligente, Sans-Souci, Général-Ernouf, Brave, Hasard, Vengeur]
+
+# The rumours of the quay (the owner's note 24): the boat sent ashore for the prices brings
+# back two or three words of prices high or low at the ports the market knows (the ports of
+# the region and those within `rumour_within_nm`), drawn from those ports' own tables, true
+# as of the day, said as rumour; a price is told when it is this far from the port's own.
+rumours:
+  within_nm: 250
+  how_many: [2, 3]
+  ratio: 1.3
