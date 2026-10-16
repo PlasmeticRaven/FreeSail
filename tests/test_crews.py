@@ -183,7 +183,8 @@ def test_truth_87_the_brig_promoted_sails_near_the_track_her_polar_gave_her():
 def test_truth_88_with_the_cap_full_the_pace_holds():
     """Truth 88: the frigate with the cap full (three crewed ships beside her) ticks at
     not less than `CREWED_FLOOR_TICKS_S` a second on the build machine, the sixty times
-    the owner plays at (measured about 140 quiet; docs/dev/TuningNotes.md, package 43)."""
+    the owner plays at (100 to 114 measured with the three under sail beside her;
+    docs/dev/TuningNotes.md, package 43)."""
     w = hove_to_world()
     for i, lat in enumerate(("49 31 N", "49 32 N", "49 33 N")):
         put(
