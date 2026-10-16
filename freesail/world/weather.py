@@ -236,6 +236,13 @@ SKY_SIGNS: dict[str, str] = {
 # The sky's and the weather's noise holds for this many hours before it is drawn afresh
 # (judgement: a watch; the words change with the sector and the front's distance sooner).
 SKY_NOISE_HOURS = 4
+# Package 45c (the owner's note 20 of gate m6a-2: "very often a change comes exactly at the
+# 4 hour mark"): the blocks' edges are not the watch's but each moved off it under the
+# seed by up to this many hours either way, to the second (`sky_block`), so that a change
+# of the sky's noise, the weather's or the fog's comes at no hour by habit; a block is then
+# one to seven hours long, four on the mean (judgement: under half a block, so that the
+# edges keep their order).
+SKY_EDGE_JITTER_H = 1.5
 # The log's line when the weather changes, by the weather it becomes, or by (was, now).
 WEATHER_LINES: dict[Any, str] = {
     "rain": "Rain set in.",
@@ -343,6 +350,38 @@ def _noise(seed: int, key: str) -> float:
     but the systems' draws)."""
     h = hashlib.blake2b(f"{seed}:{key}".encode(), digest_size=8).digest()
     return int.from_bytes(h, "big") / 2**64
+
+
+def sky_block(seed: int, when: datetime) -> int:
+    """The sky's noise block `when` falls in (package 45c): the k-th block begins at
+    `SKY_NOISE_HOURS` times k hours from the epoch moved by its own seeded jitter of up to
+    `SKY_EDGE_JITTER_H` either way, so that the edges keep no hour; a function of the seed
+    and the moment alone, as the noise is."""
+    span = SKY_NOISE_HOURS * 3600.0
+    t = _seconds(when)
+    k = int(t // span)
+
+    def edge(i: int) -> float:
+        return i * span + (2.0 * _noise(seed, f"sky-edge:{i}") - 1.0) * SKY_EDGE_JITTER_H * 3600.0
+
+    if t < edge(k):
+        return k - 1
+    if t >= edge(k + 1):
+        return k + 1
+    return k
+
+
+def sky_block_share(seed: int, when: datetime) -> tuple[int, float]:
+    """The block `when` falls in and how far through it, 0 to 1 (package 45c), for the
+    noise that is smoothed across the blocks' edges rather than stepped at them."""
+    span = SKY_NOISE_HOURS * 3600.0
+    k = sky_block(seed, when)
+
+    def edge(i: int) -> float:
+        return i * span + (2.0 * _noise(seed, f"sky-edge:{i}") - 1.0) * SKY_EDGE_JITTER_H * 3600.0
+
+    a, b = edge(k), edge(k + 1)
+    return k, max(0.0, min(1.0, (_seconds(when) - a) / (b - a)))
 
 
 def tendency_words(change_in: float | None) -> str | None:
@@ -1347,10 +1386,14 @@ class Weather:
         with a little seeded noise by the hour so that two hours differ; and the pressure."""
         when = when or self.now
         sec = self.sector_at(x_km, y_km, when)
-        block = int(_seconds(when) // 3600) // SKY_NOISE_HOURS
+        block, share = sky_block_share(self.seed, when)
         n1 = _noise(self.seed, f"sky:{block}")
         n2 = _noise(self.seed, f"weather:{block}")
-        jitter = 0.8 + 0.4 * n1  # the distance thresholds move by a fifth either way
+        # the distance thresholds move by a fifth either way, smoothly from one block's
+        # draw to the next's (package 45c), so that a front's weather comes on with its
+        # distance and not at a block's edge
+        n1_next = _noise(self.seed, f"sky:{block + 1}")
+        jitter = 0.8 + 0.4 * (n1 + (n1_next - n1) * share)
         sky, signs, weather, vis = "detached clouds", "", "fine", "the horizon"
         dawn = 3 <= when.hour < 6
         if sec.sector == "ahead":
@@ -1509,7 +1552,7 @@ class Weather:
         gx, gy = self.geostrophic_at(x_km, y_km)
         if units.ms_to_knots(math.hypot(gx, gy) * SURFACE_SCALE) > FOG_MAX_WIND_KN:
             return False
-        block = int(_seconds(when) // 3600) // SKY_NOISE_HOURS
+        block = sky_block(self.seed, when)
         chance = FOG_CHANCE_BY_MONTH[when.month - 1] * FOG_CONDITIONAL_FACTOR
         return _noise(self.seed, f"fog:{block}") < chance
 

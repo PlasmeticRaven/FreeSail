@@ -457,6 +457,27 @@ def test_the_completion_route_is_the_consoles_completer(client, world):
     assert len(world.log) == n, "a completion is a read, never a line in the log"
 
 
+def test_muster_and_state_at_the_browsers_order_line_answer_as_the_console_does(client, world):
+    """Package 45c (the owner's interview of 2026-10-15: `muster` worked at the console and
+    not in the browser, and some of the console's state was not to be found there): the
+    browser's order line takes `muster`, `state`, `the sail room` and `the booms`, answered
+    with the console's own lines as one event for the log pane, never journaled or logged."""
+    from freesail.api import queries
+
+    n_log, n_journal = len(world.log), len(world.journal)
+    got = client.post("/api/order", json={"text": "muster"}).json()
+    assert got["kind"] == "query.muster"
+    assert got["text"].split("\n") == list(queries.muster_lines(world))
+    state = client.post("/api/order", json={"text": "state"}).json()
+    assert state["kind"] == "query.state"
+    assert state["text"].split("\n")[: len(world.summary_lines())] == world.summary_lines()
+    room = client.post("/api/order", json={"text": "the sail room"}).json()
+    assert room["kind"] == "query.sail_room"
+    assert len(world.log) == n_log and len(world.journal) == n_journal
+    offered = client.get("/api/complete", params={"line": "mu"}).json()["suggestions"]
+    assert "muster" in offered
+
+
 def test_the_library_routes_serve_every_topic_and_section_as_the_tool_does(client, world):
     """`/api/library` is the model's `library` tool's own page (the same text from the same
     Markdown), and `/api/library/topics` names every topic the contents names with every

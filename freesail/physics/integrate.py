@@ -225,6 +225,19 @@ def _note_lifting(ship: Ship, st: hp.HullState, dt: float, standing: bool) -> No
             data={**data, "sail": sail},
         )
         return
+    room = _room_to_brace_up(ship, st.awa)
+    if room >= YARDS_UNTRIMMED_DEG:
+        # package 45c (the owner's notes 25 and 3 of gate m6a-2: the line had models bear
+        # away when the trim was the matter): the yards could come a good deal sharper on
+        # this tack, so the cause is said first
+        ship.note(
+            "notable",
+            "ship.lifting",
+            f"Her sails lifting, the wind {deg}° on the {side} bow: the yards are not trimmed "
+            "for this course; trim sails, or keep her away.",
+            data={**data, "untrimmed": True, "room_deg": round(room, 1)},
+        )
+        return
     ship.note(
         "notable",
         "ship.lifting",
@@ -232,6 +245,31 @@ def _note_lifting(ship: Ship, st: hp.HullState, dt: float, standing: bool) -> No
         "be taken aback.",
         data=data,
     )
+
+
+# The yards are "not trimmed for this course" when a square sail set has this many degrees
+# still to come before its yard stands braced up to its limit on the tack the wind is on
+# (package 45c; judgement: more than the trim's own stagger by level and the after yards'
+# few degrees sharper, short of a point, so that a ship braced up by `trim sails` or
+# `brace sharp up` is never told so).
+YARDS_UNTRIMMED_DEG = 8.0
+
+
+def _room_to_brace_up(ship: Ship, awa: float) -> float:
+    """How far (degrees) the square yard with the most still to come could be braced up
+    on the tack the apparent wind is on: its limit less its angle that way; more than its
+    limit when it is braced for the other tack. 0 with no square sail set."""
+    tack = 1.0 if awa >= 0 else -1.0
+    most = 0.0
+    for sl in ship.sails.values():
+        if not sl.is_set or sl.cls != "square":
+            continue
+        yard = ship.yard_of(sl)
+        if yard is None or yard.brace_limit <= 0.0:
+            continue
+        room = units.rad_to_deg(yard.brace_limit - tack * yard.brace_angle)
+        most = max(most, room)
+    return most
 
 
 def _note_yards_by_hand(ship: Ship, st: hp.HullState, dt: float) -> None:

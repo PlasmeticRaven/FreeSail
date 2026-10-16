@@ -515,6 +515,74 @@ def test_a_station_asks_another_and_the_answer_comes_back_or_the_asker_is_told()
     assert ch2.agent.asked == []
 
 
+def test_the_lookout_unheld_is_answered_by_the_ships_own_lookout_from_the_readings():
+    """Package 45c (the owner's interview of 2026-10-15: models addressed the lookout when
+    nobody held the station): `ask the lookout ...` and `tell the lookout ...` with nobody
+    at the masthead are answered by the ship's own lookout from what is in sight, as his
+    hails are made; the told word is kept for whoever takes the station, as before; a
+    book's question to nobody is refused as it was."""
+    world = off_the_lizard()
+    asked = world.submit("ask the lookout what sail is in sight")
+    assert asked.kind == "agent.asked" and asked.data["by_rule"]
+    assert asked.text.startswith("The masthead answers the captain (nobody holds the lookout's")
+    seen = world.readings.value("strangers")["words"]
+    assert seen in asked.text
+    told = world.submit("tell the lookout to keep a sharp eye to windward")
+    assert told.kind == "agent.told" and told.data["kept"] and told.data["by_rule"]
+    assert "The masthead answers: aye aye, sir; in sight: " in told.text
+    land = world.submit("ask the lookout whether the land is in sight")
+    assert land.data["by_rule"] and "nobody holds the lookout's station" in land.text
+    assert "Lizard" in land.text, land.text
+    # with a station at the masthead the question goes to it, as before
+    seated(world, LOOKOUT, [Reply()] * 4)
+    held = world.submit("ask the lookout what she is")
+    assert held.kind == "agent.asked" and not held.data.get("by_rule")
+
+
+def test_two_officers_on_the_frigate_each_keep_their_own_journal_which_goes_with_the_person():
+    """Package 45c, the groundwork for stations that multiply (the owner's word of
+    2026-10-15; his note 21 of gate m6a-2): the ship file's `stations:` takes a kind beside
+    the holder (`second officer: {kind: officer of the watch, holder: second lieutenant}`),
+    a door seats the station by its name, and the journal is the person's and not the
+    station's name's: two officers of one kind keep their own, and a person moved to
+    another station takes his journal with him."""
+    from freesail.agents.journal import journal_of
+    from freesail.agents.remote import make_station
+
+    world = frigate_world()
+    stations = world.stations
+    assert "second officer" in stations.names()
+    second = stations.binding("second officer")
+    assert second.kind == "officer of the watch" and second.person
+    first = stations.binding("officer of the watch")
+    assert first.person and first.person != second.person
+    st = make_station(world, "second officer", SamplingPolicy.in_lockstep(EVERY))
+    assert st.name == "second officer" and st.domain == officer(world=world).domain
+
+    def note(words: str) -> Reply:
+        return reply("", call("journal", note=words))
+
+    h1 = seated(world, OFFICER, [note("The first lieutenant's note.")] + [Reply()] * 6)
+    fake = Fake([note("The second lieutenant's note.")] + [Reply()] * 6)
+    h2 = Harness(world, st, fake, save=lambda w, why: None)
+    h2.model_name, h2.door = "the fake second officer", "runner"
+    h2.start()
+    world.run(2 * EVERY)
+    j1, j2 = journal_of(world, OFFICER), journal_of(world, "second officer")
+    assert j1 is not j2 and j1 is h1.journal and j2 is h2.journal
+    assert [e.text for e in j1.entries if e.own] == ["The first lieutenant's note."]
+    assert [e.text for e in j2.entries if e.own] == ["The second lieutenant's note."]
+    assert world.person_journals[first.person] is j1
+    assert world.person_journals[second.person] is j2
+    # the second lieutenant moved to the officer of the watch's station: his journal goes
+    # with him, and the first lieutenant's stays his
+    h1.stand_down("the test", by="the captain")
+    h2.stand_down("the test", by="the captain")
+    stations.bind(OFFICER, second.person)
+    assert journal_of(world, OFFICER) is j2
+    assert world.person_journals[first.person] is j1
+
+
 def test_a_say_at_the_prompt_is_the_captains_and_a_station_may_not_give_the_owners_sentences():
     world = frigate_world()
     oh = seated(world, OFFICER, [Reply()] * 4)

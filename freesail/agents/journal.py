@@ -31,6 +31,8 @@ __all__ = [
     "WORD_PASSED_KIND",
     "Journal",
     "JournalEntry",
+    "journal_of",
+    "journal_seen",
 ]
 
 # The kinds of entry that are the model's own words: the journal tool's notes, and the
@@ -68,6 +70,55 @@ class JournalEntry:
         if self.by:
             d["by"] = self.by
         return d
+
+
+def _holder_name(world: Any, station: str) -> str:
+    """The name of the person the station is bound to now, or "" for nobody named (the
+    watcher's, a passenger's before anyone is aboard, a world with no people)."""
+    stations = getattr(world, "stations", None)
+    if stations is None:
+        return ""
+    try:
+        person = stations.holder(station)
+    except Exception:  # a people's build that cannot run binds nobody
+        return ""
+    return str(getattr(person, "name", "") or "")
+
+
+def journal_of(world: Any, station: str) -> Journal:
+    """The journal a station writes in and reads back (package 45c, the owner's word of
+    2026-10-15 and his note 21 of gate m6a-2): the journal of the person who holds the
+    station, so that a person moved to another station, or two stations of one kind held
+    by two people, keep their own; a station bound to nobody named keeps one of its own
+    name, as before. Kept on the World by station name (`World.agent_journals`, which the
+    save and `show the officer's journal` read) and by person (`World.person_journals`),
+    the two names one object, re-pointed when the station's holder changes."""
+    journals = world.agent_journals
+    who = _holder_name(world, station)
+    if not who:
+        return journals.setdefault(station, Journal(station))
+    by_person = getattr(world, "person_journals", None)
+    if by_person is None:  # a World from before package 45c (a checkpoint)
+        by_person = world.person_journals = {}
+    journal = by_person.get(who)
+    if journal is None:
+        # the person's first station: the journal kept under its name until now is his
+        journal = journals.get(station)
+        if journal is None or journal in by_person.values():
+            journal = Journal(station)
+        by_person[who] = journal
+    journals[station] = journal
+    return journal
+
+
+def journal_seen(world: Any, station: str) -> Journal | None:
+    """The station's journal as `journal_of` finds it, or None when there is none yet; a
+    read, which makes none."""
+    who = _holder_name(world, station)
+    by_person = getattr(world, "person_journals", None) or {}
+    if who and who in by_person:
+        return by_person[who]
+    return world.agent_journals.get(station)
 
 
 class Journal:

@@ -183,6 +183,18 @@ def rolls_up(compression: float) -> bool:
     return compression >= ROLLUP_FROM
 
 
+# Lines for the record only (decision 46; package 45c): a world order as given is kept in
+# the full record (the log's store, the save, the replay, the director's view) and never
+# in a station's sample, its `read_log` or the browser's play log, which carry only its
+# effects as they are met. Marked by kind, so that no line's words or digest move.
+RECORD_ONLY_KINDS = frozenset({"world.order"})
+
+
+def for_the_record(e: Event) -> bool:
+    """Whether the line is for the record only and left out of the play log (decision 46)."""
+    return getattr(e, "kind", "") in RECORD_ONLY_KINDS
+
+
 def kept(e: Event) -> bool:
     """A line the roll-up shows as it is: notable and urgent lines, the captain's and the
     driver's own, and every station's (`STATION_ACTORS`)."""

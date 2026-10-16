@@ -95,10 +95,26 @@ class Stations:
 
     # -- what is aboard -----------------------------------------------------------------
 
+    def _file_kinds(self) -> dict[str, str]:
+        """The wardroom file's stations named other than their kind, by name -> kind
+        (package 45c: `second officer: {kind: officer of the watch, holder: second
+        lieutenant}`); none for a ship without a file or a world with no people."""
+        people = getattr(self.world, "people", None)
+        try:
+            wardroom = people.wardroom if people is not None else None
+        except Exception:  # a people's build that cannot run names none
+            wardroom = None
+        kinds = getattr(wardroom, "kinds", None) or {}
+        return {n: k for n, k in kinds.items() if k in self.kinds()}
+
     def names(self) -> tuple[str, ...]:
-        """The stations aboard now: every kind's own station unless unbound, and the
-        stations bound by hand under other names, in the kinds' order then the hand's."""
+        """The stations aboard now: every kind's own station unless unbound, the wardroom
+        file's stations named other than their kind (package 45c), and the stations bound
+        by hand under other names, in the kinds' order, then the file's, then the hand's."""
         out = [k for k in self.kinds() if k not in self._unbound]
+        for name in self._file_kinds():
+            if name not in out and name not in self._unbound:
+                out.append(name)
         for name in self._bound:
             if name not in out and name not in self._unbound:
                 out.append(name)
@@ -117,6 +133,10 @@ class Stations:
         if key in self.kinds():
             person = self._file_holder(key)
             return Binding(key, key, person.name if person is not None else "")
+        kind = self._file_kinds().get(key)
+        if kind is not None:
+            person = self._file_holder(key)
+            return Binding(key, kind, person.name if person is not None else "")
         return None
 
     def kind_of(self, name: str) -> str | None:

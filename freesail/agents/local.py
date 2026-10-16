@@ -248,6 +248,85 @@ IDENTITY_HASH_KEYS: tuple[str, ...] = ("model_sha256", "model_hash")
 # not give the reasoning apart: what is left is what the model said.
 THINKING = re.compile(r"(?s)^\s*<think>.*?(?:</think>|$)")
 
+# A content part a server marks as the model's reasoning, not its words (package 45c).
+REASONING_PARTS = frozenset({"reasoning", "thinking", "reasoning_content"})
+
+# A tool call a model writes in its text instead of the API's field (package 45c, the
+# owner's free models at the OpenRouter door): `<tool_call>{...}</tool_call>`, a fenced
+# block of JSON, or the whole text one JSON object, each `{"name": ..., "arguments": {...}}`
+# (or "parameters", or OpenAI's `{"function": {"name", "arguments"}}`).
+_TOOL_CALL_TAG = re.compile(r"(?s)<tool_call>\s*(\{.*?\})\s*</tool_call>")
+_FENCED_JSON = re.compile(r"(?s)```(?:json)?\s*(\{.*?\})\s*```")
+
+
+def _call_of(obj: Any) -> tuple[str, dict[str, Any]] | None:
+    """A written call's name and arguments, or None when the object is not one."""
+    if not isinstance(obj, dict):
+        return None
+    fn = obj.get("function") if isinstance(obj.get("function"), dict) else obj
+    name = fn.get("name")
+    args = fn.get("arguments", fn.get("parameters", {}))
+    if isinstance(args, str):
+        try:
+            args = json.loads(args) if args.strip() else {}
+        except ValueError:
+            return None
+    if not isinstance(name, str) or not name or not isinstance(args, dict):
+        return None
+    return name, dict(args)
+
+
+def calls_in_text(text: str) -> tuple[str, list[tuple[str, dict[str, Any]]]]:
+    """The tool calls written in a reply's text, and the text without them (package 45c).
+    Only what reads as a call is taken; any other JSON is left as words."""
+    found: list[tuple[str, dict[str, Any]]] = []
+
+    def take(m: re.Match[str]) -> str:
+        try:
+            got = _call_of(json.loads(m.group(1)))
+        except ValueError:
+            got = None
+        if got is None:
+            return m.group(0)
+        found.append(got)
+        return ""
+
+    rest = _TOOL_CALL_TAG.sub(take, text)
+    rest = _FENCED_JSON.sub(take, rest)
+    if not found and rest.strip().startswith("{"):
+        try:
+            got = _call_of(json.loads(rest))
+        except ValueError:
+            got = None
+        if got is not None:
+            found.append(got)
+            rest = ""
+    return (rest.strip() if found else text), found
+
+
+def _shape_words(r: httpx.Response) -> str:
+    """What the reply that could not be read was, in a few words (package 45c): not
+    JSON; an error object served with its 200; or the keys it had."""
+    try:
+        data = r.json()
+    except ValueError:
+        return f"not JSON, {len(r.text)} characters"
+    if not isinstance(data, dict):
+        return f"a JSON {type(data).__name__}, not an object"
+    err = data.get("error")
+    if err is not None:
+        said = err.get("message") if isinstance(err, dict) else err
+        return f"an error in place of a reply: {str(said)[:300]}"
+    choices = data.get("choices")
+    if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+        if choices[0].get("error") is not None:
+            e = choices[0]["error"]
+            said = e.get("message") if isinstance(e, dict) else e
+            return f"an error in place of the choice: {str(said)[:300]}"
+        return "a choice with the keys " + ", ".join(sorted(choices[0]))
+    return "an object with the keys " + ", ".join(sorted(data))
+
+
 # A refusal's words, read for its size: "the request exceeds the available context size",
 # "the input length exceeds the context length"; and the counts in them, "(103679 tokens)".
 OVERSIZE_WORDS = ("exceed", "too long", "too large", "longer than", "larger than")
@@ -278,6 +357,8 @@ class LocalModel:
         on_reply: Callable[[Reply], None] | None = None,
         max_reply: int = REPLY_MAX_TOKENS,
         say: Callable[[str], None] | None = None,
+        exchanges_file: str | None = None,
+        fetch_picture: Callable[[str], tuple[str, bytes] | None] | None = None,
     ):
         base = endpoint.strip().rstrip("/")
         base = base.removesuffix("/v1")
@@ -297,6 +378,14 @@ class LocalModel:
         self.offered_tools: tuple[str, ...] | None = None  # set by the harness
         self.failed: str | None = None  # words for the owner once the endpoint fails
         self.exchanges: list[dict[str, Any]] = []  # each response message as served
+        # package 45c (the owner's interview of 2026-10-15: `--exchanges` wrote nothing at
+        # the OpenRouter door): the request's body and the reply's, one JSON object a line,
+        # appended to this file when it is named; a reply the runner cannot read is written
+        # whole, so that it can be diagnosed
+        self.exchanges_file = exchanges_file
+        # package 45c (the owner's note 14 of gate m6a-2): a picture the game drew, fetched
+        # by its id, sent as an image after the tool results where the model reads one
+        self.fetch_picture = fetch_picture
         self.dropped_turns = 0  # turns left out of the last request for the budget
         self._props: dict[str, Any] | None = None
         self._props_read = False
@@ -603,18 +692,34 @@ class LocalModel:
                 d = t.content
                 if "tool_results" in d:
                     results = list(d["tool_results"])
+                    images: list[dict[str, Any]] = []
                     for k, cid in enumerate(last_ids):
                         res = results[k] if k < len(results) else None
                         if res is None:
                             content = "Not run: this turn's budget for it was spent."
                         else:
                             value = res.get("result")
+                            image = self._image_part(value)
+                            if image is not None:
+                                images.append(image)
                             content = (
                                 value
                                 if isinstance(value, str)
                                 else json.dumps(value, ensure_ascii=False)
                             )
                         out.append({"role": "tool", "tool_call_id": cid, "content": content})
+                    if images:
+                        # a tool message carries words only in the chat-completions form:
+                        # the pictures follow as a user message of image parts (package 45c)
+                        out.append(
+                            {
+                                "role": "user",
+                                "content": [
+                                    {"type": "text", "text": "The pictures your tools drew:"},
+                                    *images,
+                                ],
+                            }
+                        )
                     last_ids = []
                     continue
                 answer_the_ids()
@@ -742,11 +847,21 @@ class LocalModel:
         string that is not JSON gives no arguments, and the tool says what it needs);
         `raw` the content and then the calls as served, so the scan sees every word."""
         content = message.get("content") or ""
-        if isinstance(content, list):  # content parts
-            content = "".join(str(p.get("text", "")) for p in content if isinstance(p, dict))
+        if isinstance(content, list):  # content parts, a model's reasoning parts left out
+            content = "".join(
+                str(p.get("text", ""))
+                for p in content
+                if isinstance(p, dict) and str(p.get("type", "text")) not in REASONING_PARTS
+            )
         content = str(content)
         calls: list[ToolCall] = []
         served: list[dict[str, Any]] = []
+        if not message.get("tool_calls"):
+            # a tool call written in the text (package 45c: a free model's common shape)
+            content, written = calls_in_text(content)
+            for name, args in written:
+                calls.append(ToolCall(name, args))
+                served.append({"name": name, "arguments": json.dumps(args, ensure_ascii=False)})
         for tc in message.get("tool_calls") or []:
             fn = tc.get("function") or {}
             name = str(fn.get("name", ""))
@@ -818,12 +933,13 @@ class LocalModel:
             except httpx.HTTPError as e:
                 self._failure(f"The model server at {self.base} did not answer: {e}.")
                 return None
+            self._keep(body, r)
             if r.status_code != 200:
                 size = self._refused_for_size(r)
                 if size is None:
                     self._failure(
                         f"The model server at {self.base} answered {r.status_code}: "
-                        f"{_error_words(r)}"
+                        f"{_error_words(r)}{self._kept_words(r)}"
                     )
                     return None
                 refused += 1
@@ -854,7 +970,8 @@ class LocalModel:
             read = self._read(r)
             if read is None:
                 self._failure(
-                    f"The model server at {self.base} sent a reply the runner cannot read."
+                    f"The model server at {self.base} sent a reply the runner cannot read "
+                    f"({_shape_words(r)}){self._kept_words(r, whole=True)}"
                 )
                 return None
             message, finish, counts = read
@@ -874,7 +991,12 @@ class LocalModel:
             if not first_cut:
                 first_cut = why
                 notice = CUT_WORDS.format(limit=self.max_reply) if why == "cut" else EMPTY_WORDS
-                self._tell(f"{self._cut_words(why)}; it is asked once more, with the reason.")
+                ended = (
+                    f" (it ended '{finish}')" if finish and finish not in ("stop", "length") else ""
+                )
+                self._tell(
+                    f"{self._cut_words(why)}{ended}; it is asked once more, with the reason."
+                )
                 last_messages = None
                 continue
             # cut off or empty again: the turn ends with nothing done
@@ -891,6 +1013,81 @@ class LocalModel:
                 )
             )
             return Reply(text="", calls=(), raw=reply.raw)
+
+    # -- the pictures (package 45c) -----------------------------------------------------
+
+    def _image_part(self, value: Any) -> dict[str, Any] | None:
+        """A picture's result as an image part (a data URL), fetched from the game by its
+        id; None for any other result, or when it cannot be had (the words stand)."""
+        if not isinstance(value, dict) or not isinstance(value.get("picture"), dict):
+            return None
+        pid = value["picture"].get("id")
+        if self.fetch_picture is None or not pid:
+            return None
+        try:
+            got = self.fetch_picture(str(pid))
+        except Exception:  # noqa: BLE001  (a game gone, a picture dropped)
+            got = None
+        if got is None:
+            return None
+        media, data = got
+        import base64
+
+        url = f"data:{media};base64,{base64.standard_b64encode(data).decode('ascii')}"
+        return {"type": "image_url", "image_url": {"url": url}}
+
+    def reads_pictures(self) -> bool | None:
+        """Whether the served model reads an image, as the server says (package 45c):
+        llama-server's `/props` `modalities.vision`, or Ollama's `/api/show` capabilities
+        naming `vision`; None when the server does not say."""
+        try:
+            props = self.props()
+        except DoorError:
+            props = None
+        if isinstance(props, dict):
+            modal = props.get("modalities")
+            if isinstance(modal, dict) and "vision" in modal:
+                return bool(modal.get("vision"))
+        try:
+            r = self.client.post("/api/show", json={"model": self.model or self._served_name})
+            caps = r.json().get("capabilities") if r.status_code == 200 else None
+        except (httpx.HTTPError, ValueError, AttributeError):
+            caps = None
+        if isinstance(caps, list):
+            return "vision" in [str(c) for c in caps]
+        return None
+
+    # -- the exchanges kept (package 45c) ------------------------------------------------
+
+    def _scrub(self, text: str) -> str:
+        """The text with the door's key taken out, where it has one (the OpenRouter
+        dialect's); the local runner has none."""
+        key = str(getattr(self, "_key", "") or "")
+        return text.replace(key, "[the key]") if key else text
+
+    def _keep(self, body: dict[str, Any], r: httpx.Response) -> None:
+        """An exchange written to the owner's file when one is named: the request's body
+        and the reply's as served (its JSON, or its text whole when it is none), never a
+        header, scanned for the key first; one JSON object a line, appended."""
+        if not self.exchanges_file:
+            return
+        try:
+            reply: Any = r.json()
+        except ValueError:
+            reply = r.text
+        entry = {"request": body, "status": r.status_code, "reply": reply}
+        line = self._scrub(json.dumps(entry, ensure_ascii=False, default=str))
+        with open(self.exchanges_file, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+
+    def _kept_words(self, r: httpx.Response, whole: bool = False) -> str:
+        """Where the reply is to be read: the exchanges file when one is named, else (for
+        a reply the runner cannot read) the reply itself, whole, at this terminal."""
+        if self.exchanges_file:
+            return f"; the reply is written whole to {self.exchanges_file}"
+        if whole:
+            return f"; the reply as served: {self._scrub(r.text)}"
+        return ""
 
     # -- the reply's end, the server's count, a refusal for size (package 37i) ----------
 
@@ -914,6 +1111,9 @@ class LocalModel:
         if isinstance(choices, list) and choices and isinstance(choices[0], dict):
             message = choices[0].get("message")
             finish = choices[0].get("finish_reason")
+            if not isinstance(message, dict) and isinstance(choices[0].get("text"), str):
+                # the completions form (package 45c): the text where the message would be
+                message = {"role": "assistant", "content": choices[0]["text"]}
         else:
             message = data.get("message")
             finish = data.get("done_reason")
@@ -1233,6 +1433,14 @@ def main(
         "'events' (on events only; the station's own lines are kept whatever it is)",
     )
     ap.add_argument("--session", choices=("play", "test"), default="play")
+    ap.add_argument(
+        "--pictures",
+        choices=("auto", "yes", "no"),
+        default="auto",
+        help="offer the picture tools (the chart, the ship's view), sent as images: 'auto' "
+        "where the server says its model reads one (llama-server's /props modalities, "
+        "Ollama's capabilities), 'yes' or 'no' to say so yourself (package 45c)",
+    )
     ap.add_argument("--ask-again", action="store_true", help="put the consent question again")
     ap.add_argument(
         "--handover-reserve",
@@ -1276,7 +1484,22 @@ def main(
     reserve = handover_reserve_tokens(args.handover_reserve, context)
     if context and station_name(args.station) not in ("watcher",):
         print(handover_words(args.handover_reserve, context, reserve), file=out, flush=True)
+    pictures = args.pictures == "yes"
+    if args.pictures == "auto":
+        pictures = bool(model.reads_pictures())
+    print(
+        "The picture tools are offered: the server says its model reads an image."
+        if pictures and args.pictures == "auto"
+        else "The picture tools are offered, as --pictures yes says."
+        if pictures
+        else "The picture tools are not offered (the model reads words; --pictures yes "
+        "offers them where it reads an image).",
+        file=out,
+        flush=True,
+    )
     game = GameClient(args.game, args.station, transport=game_transport, http=game_http)
+    if pictures:
+        model.fetch_picture = game.picture
     try:
         first = game.station(
             identity,
@@ -1291,6 +1514,7 @@ def main(
             context_tokens=context,
             handover_reserve=reserve,
             cadence=args.cadence or "",
+            pictures=pictures,
         )
     except GameError as e:
         print(e.words, file=out, flush=True)

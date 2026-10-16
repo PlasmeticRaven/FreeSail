@@ -358,12 +358,10 @@ def give(world: Any, entry: dict[str, Any], build: Callable[[dict[str, Any]], An
         world.submit(d["order"], actor=d["actor"], said=d.get("said"), routine=d.get("routine"))
         return
     if "note" in entry:
-        from freesail.agents.journal import Journal
+        from freesail.agents.journal import journal_of
 
         d = entry["note"]
-        world.agent_journals.setdefault(station, Journal(station)).append(
-            world, d["text"], kind=d["kind"], by=d.get("by") or ""
-        )
+        journal_of(world, station).append(world, d["text"], kind=d["kind"], by=d.get("by") or "")
         return
     if "state" in entry:
         h = world.agents.get(station)
