@@ -3972,7 +3972,7 @@ GATE_5C_CRUISE_HOURS = 48
 GATE_5C_MERCHANT_SAVE_TICK = 12 * 3600  # 17:00 on the 12th, the Channel crossing
 # 08:00 on the 13th (09:00 before package 37d; the chase in hand then, and since package
 # 37e lost half an hour before)
-GATE_5C_CRUISE_SAVE_TICK = 26 * 3600
+GATE_5C_CRUISE_SAVE_TICK = 30 * 3600  # 12:00 on the 13th, the brig spoken (26 h before 45c)
 GATE_5C_SHIPS = 12  # the dozen ships of each scenario, the player's not among them
 # the naval cruise's ticks at seed 7
 GATE_5C_CRUISE_YARD_TICK = 5460  # thirty days' provisions off from the King's yard
@@ -3999,7 +3999,7 @@ GATE_5C_CRUISE_PILOT_LEFT_TICK = 10980  # put off into his cutter, the ship hove
 GATE_5C_CRUISE_WORLD_ORDERS = [
     (14400, "the scenario"),
     (86400, "the scenario"),
-    (90000, "the scenario"),
+    (102600, "the scenario"),  # package 45c: the Palinure at 10:30 (90000, 07:00, before)
 ]
 # Package 37e (the account; a course shaped to make good): every tick to the pilot's
 # leaving stands. The course for the station, shaped as she fills away (11273), is SSW
@@ -4028,9 +4028,9 @@ GATE_5C_CRUISE_WORLD_ORDERS = [
 # at 90000 as before, spoken 93979 → 93663, out of sight astern 98040 → 97560; thirteen
 # wears and a tack in the two days (fourteen wears); 2065 → 2083 lines.
 GATE_5C_CRUISE_CUTTER_HAIL_TICK = (
-    85437  # the admiral's cutter within hail on the 13th (84631 before package 37p)
+    91024  # the admiral's cutter within hail on the 13th (85437 at 37p; 91022 at package 45)
 )
-GATE_5C_CRUISE_LETTER_READ_TICK = 85497  # the letter read a minute after (84691 before 37p)
+GATE_5C_CRUISE_LETTER_READ_TICK = 91084  # the letter read a minute after (85497 at 37p)
 # Package 37d: the departure fixed by cross bearings off Plymouth and the account a line
 # from each bearing after; every tick to the first noon stands, the station is reached on
 # another track, the Palinure is raised on the larboard bow seven minutes later (91380;
@@ -4061,10 +4061,17 @@ GATE_5C_CRUISE_LETTER_READ_TICK = 85497  # the letter read a minute after (84691
 # owner's Windows figures by two lines and two ticks (the anchor in the Bay 115815,
 # 115817; 2994 lines, 2992): pinned here as measured, the difference recorded as an
 # open item.
-GATE_5C_CRUISE_STRANGER_SIGHTED_TICK = 90000  # the Palinure, "a sail right ahead" (90120)
-GATE_5C_CRUISE_CHASE_TICK = 90000  # the chase given at the sighting (90121)
-GATE_5C_CRUISE_SPOKEN_TICK = 93493  # within hail under no colours (93663 before package 37p)
-GATE_5C_CRUISE_CHASE_LOST_TICK = 103260  # the brig out of sight astern (97560 before 37p)
+# Package 45c (2026-10-16): the Palinure re-placed by the scenario at 10:30 on the 13th,
+# five leagues on the frigate's bow as she stands for the station's south-west end (at
+# 07:00 since package 45's helm she was put on the sea astern of the frigate while the
+# frigate still chased the admiral's cutter, and never spoken; the chase rule mended
+# beside it, docs/dev/TuningNotes.md, package 45c): the cutter within hail at 07:17 and
+# the letter read, the brig sighted on the starboard bow at 10:45, chased, spoken at 11:55
+# under no colours and lost astern at 15:23; twelve wears in the two days.
+GATE_5C_CRUISE_STRANGER_SIGHTED_TICK = 103500  # the Palinure on the bow (90000 before 45c)
+GATE_5C_CRUISE_CHASE_TICK = 103501  # the chase given at the sighting (90000 before 45c)
+GATE_5C_CRUISE_SPOKEN_TICK = 107738  # within hail under no colours (93493 at 37p)
+GATE_5C_CRUISE_CHASE_LOST_TICK = 120180  # the brig out of sight astern (103260 at 37p)
 GATE_5C_CRUISE_NOON_TICKS = [21600, 108240]
 GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the chase
 # Package 37k (2026-10-09): every tick and the true track held; two lines more, "Her sails
@@ -4075,11 +4082,11 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # re-measured at 37j's merge, the tuning notes saying both.)
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
-GATE_5C_CRUISE_LINES = 1930  # package 45 (2177 at package 37p): see the cruise's xfail below
+GATE_5C_CRUISE_LINES = 2287  # package 45c (1930 at package 45, 2177 at package 37p)
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
-GATE_5C_CRUISE_DIGEST = "dc6454f37d060818"  # package 45 (2bba9b084d3e88a3 before)
+GATE_5C_CRUISE_DIGEST = "493d888d874aa358"  # package 45c (dc6454f37d060818 at 45)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4411,15 +4418,6 @@ def test_the_merchant_passage_casts_the_deep_sea_lead_at_the_iroises_mark(gate_5
     assert [e.tick for e in deep] == [GATE_5C_MERCHANT_IROISE_CAST_TICK]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="package 45: on her station under the helm's new rules (the mark under the period's "
-    "trim only, full and by forward of the beam, the yards braced up for it) the frigate meets "
-    "the admiral's cutter at 91022 instead of 85437, is chasing it when the Palinure is put on "
-    "the sea on her quarter at 90000, never reads the letter nor speaks the brig, and wears three "
-    "times; the lines 1930 and the digest are pinned as the run gave them; for the lead "
-    "(docs/dev/TuningNotes.md, package 45)",
-)
 def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     """Gate 5c's naval cruise (spec M5 §29): the frigate in the Sound, the yard's thirty
     days of provisions, under way on the starboard tack, the Plymouth pilot aboard and
@@ -4465,8 +4463,8 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     assert len(wore) >= GATE_5C_CRUISE_WEARS_AT_LEAST
     # the stranger: on the sea by the scenario's order, sighted at the horizon, made out
     # by the glass and the tops, chased by the bearing's drift, spoken under no colours
-    by_name = {v["name"]: v for v in vessels_at_save}  # at 08:00 on the 13th, the chase in hand
-    # package 37p: spoken at 93493, a minute and more before the save (not yet before it)
+    by_name = {v["name"]: v for v in vessels_at_save}  # at noon on the 13th (45c; 08:00 before)
+    # package 45c: spoken at 107738, five minutes before the save at noon
     assert by_name["Palinure"]["spoken"] is True
     assert "Palinure" in by_name and by_name["Palinure"]["nation"] == "france"
     sighted = [
@@ -4501,18 +4499,15 @@ def test_the_naval_cruise_at_seed_7_has_its_own_constants(gate_5c_cruise):
     assert len(log) == GATE_5C_CRUISE_LINES and log.digest()[:16] == GATE_5C_CRUISE_DIGEST
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="package 45: the Palinure is put on the sea on the frigate's quarter while she chases "
-    "the admiral's cutter, and is never spoken; for the lead (docs/dev/TuningNotes.md, package 45)",
-)
 def test_the_naval_cruise_speaks_the_stranger(gate_5c_cruise):
     """Gate 5c's naval cruise, the beat as pinned until package 37e and brought back at
     the fold-in of m5c-c: the stranger chased by the bearing's drift and spoken, a
     brig-sloop of war under no colours (within hail at 08:08 on the 13th, 94091; 95189
     after 37d), the chase given up at her hail. Between 37e and the fold-in she was
     chased and lost: the scenario put her where the frigate had been at seven, and the
-    chase 175 degrees round by the helm alone laid every square sail aback."""
+    chase 175 degrees round by the helm alone laid every square sail aback. Package 45
+    put her astern of the frigate still chasing the admiral's cutter, never spoken; 45c
+    puts her on the frigate's bow at half past ten, spoken at 11:55 (107738)."""
     world, _moments, _saved = gate_5c_cruise
     log = world.log
     spoken = [e for e in log if e.kind == "sail.within_hail" and "brig-sloop" in e.text]

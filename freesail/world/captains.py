@@ -769,6 +769,24 @@ def load_tracks(world: Any) -> list[Track]:
     return out
 
 
+def _off_the_land(chart: Any, head: Position, where: Position, offing_nm: float) -> Position | None:
+    """A point half as far again as `offing_nm` off the shore of the land the line meets,
+    out from the land's charted point through `where` (package 45c, the pilot's joining
+    leg); None when the land runs on beyond a league that way."""
+    bearing, _ = bearing_and_distance(head, where)
+    # half as far again, so that the line between two such marks keeps the offing
+    want = 1.5 * offing_nm * units.NAUTICAL_MILE
+    for k in range(1, 37):
+        p = destination(where, bearing, k * units.CABLE / 2.0)
+        depth = chart.depth_at(p)
+        if depth is None or depth <= 0.0:
+            continue
+        shore = chart.nearest_shore(p, within_m=want)
+        if shore is None or shore.distance_m >= want:
+            return p
+    return None
+
+
 class Planner:
     """The legs an intent makes over the chart, from the account (never the truth).
 
@@ -815,22 +833,32 @@ class Planner:
 
     # -- the sea route -----------------------------------------------------------------
 
-    def clear(self, a: Position, b: Position) -> bool:
+    def clear(
+        self,
+        a: Position,
+        b: Position,
+        offing_nm: float = OFFING_NM,
+        berth_nm: float = DANGER_BERTH_NM,
+        end_skip_m: float = units.CABLE,
+    ) -> bool:
         """Whether the straight line from a to b keeps the offing off the shore and the
-        berth off the charted dangers, by the chart in the captain's hands."""
+        berth off the charted dangers, by the chart in the captain's hands. `offing_nm`
+        and `berth_nm` are the captain's at sea; the pilot lays a joining leg in his own
+        water with his own, the last of it, his station under the land, his own ground
+        (`end_skip_m`; package 45c, `ports.PILOT_JOIN_OFFING_NM`)."""
         chart = getattr(self.world, "chart", None)
         if chart is None:
             return True
         shore = chart.line_shore(
             a,
             b,
-            OFFING_NM * units.NAUTICAL_MILE,
-            skip_start_m=OFFING_NM * units.NAUTICAL_MILE,
-            skip_end_m=units.CABLE,
+            offing_nm * units.NAUTICAL_MILE,
+            skip_start_m=offing_nm * units.NAUTICAL_MILE,
+            skip_end_m=end_skip_m,
         )
-        if shore is not None and (shore[2] or shore[0] < OFFING_NM * units.NAUTICAL_MILE):
+        if shore is not None and (shore[2] or shore[0] < offing_nm * units.NAUTICAL_MILE):
             return False
-        for _f, _off, crosses in chart.line_passes(a, b, DANGER_BERTH_NM * units.NAUTICAL_MILE):
+        for _f, _off, crosses in chart.line_passes(a, b, berth_nm * units.NAUTICAL_MILE):
             if crosses:
                 return False
         return True
@@ -898,28 +926,32 @@ class Planner:
         path.reverse()
         return [nodes[i] for i in path if i != e]
 
-    def _round_headland(self, start: Position, end: Position) -> list[tuple[str, Position]]:
+    def _round_headland(
+        self,
+        start: Position,
+        end: Position,
+        offing_nm: float = OFFING_NM,
+        berth_nm: float = DANGER_BERTH_NM,
+        end_skip_m: float = units.CABLE,
+    ) -> list[tuple[str, Position]]:
         """A straight line that the shore or a danger stands across, with no track to
         take: the nearest headland (or island, or danger) to where the line meets the
         land is given an offing to seaward, and the two halves tried again, a few
         rounds at most; what cannot be cleared is left as it is, the master's warning
-        on the course shaped saying what it crosses."""
+        on the course shaped saying what it crosses. The offing and the berth are the
+        captain's at sea unless given (package 45c: the pilot's joining leg)."""
         chart = getattr(self.world, "chart", None)
         if chart is None:
             return []
         marks: list[tuple[str, Position]] = []
         a = start
         for _ in range(PLANNER_ROUNDS):
-            if self.clear(a, end):
+            if self.clear(a, end, offing_nm, berth_nm, end_skip_m):
                 break
-            shore = chart.line_shore(
-                a, end, OFFING_NM * units.NAUTICAL_MILE, skip_end_m=units.CABLE
-            )
+            shore = chart.line_shore(a, end, offing_nm * units.NAUTICAL_MILE, skip_end_m=end_skip_m)
             where = shore[1] if shore is not None else None
             if where is None:
-                for f, _off, crosses in chart.line_passes(
-                    a, end, DANGER_BERTH_NM * units.NAUTICAL_MILE
-                ):
+                for f, _off, crosses in chart.line_passes(a, end, berth_nm * units.NAUTICAL_MILE):
                     if crosses:
                         where = f.position
                         break
@@ -936,7 +968,13 @@ class Planner:
             bearing, _ = bearing_and_distance(head.position, where)
             trend = chart.coast_trend(head.position, 3.0 * units.NAUTICAL_MILE)
             away = (trend[0] + 180.0) % 360.0 if trend is not None else bearing
-            off = destination(head.position, away, OFFING_NM * units.NAUTICAL_MILE)
+            off = destination(head.position, away, offing_nm * units.NAUTICAL_MILE)
+            if offing_nm < OFFING_NM:
+                # a pilot's offing in his own water (package 45c): an island or a point
+                # is longer than his two cables and a half, so the mark is laid that far
+                # off its shore, out from it through where the line meets the land, and
+                # not that far from its charted point (the Isle of Aix, a mile long)
+                off = _off_the_land(chart, head.position, where, offing_nm) or off
             mark = (plain_position(off), off)
             if marks and marks[-1][0] == mark[0]:
                 break  # the same headland again: no way round by this rule
@@ -1107,6 +1145,10 @@ class Perception:
     headsails_bent: list[str] = field(default_factory=list)
     topsail_reefs: int = 0
     storm_staysails_set: bool = False
+    # package 45c: every topsail set, and a course (or a schooner's gaff sail) set, for
+    # the steps of sail after the gale
+    topsails_all_set: bool = True
+    courses_set: bool = True
     pilot_conn: bool = False
     reach_nm: float = IN_PORT_NM
 
@@ -1206,6 +1248,17 @@ class Perception:
             r = view.value("sail", sid)
             if isinstance(r, dict) and str(r.get("state") or "") == "set":
                 p.topsail_reefs = max(p.topsail_reefs, int(r.get("reefs") or 0))
+            elif isinstance(r, dict):
+                p.topsails_all_set = False
+        lower = [sid for sid in groups.get("courses", []) if sid in groups.get("plain sail", [])]
+        lower = lower or [
+            sid for sid in groups.get("gaff sails", []) if sid in groups.get("plain sail", [])
+        ]
+        if lower:
+            p.courses_set = any(
+                isinstance(r, dict) and str(r.get("state") or "") == "set"
+                for r in (view.value("sail", sid) for sid in lower)
+            )
         for sid in groups.get("storm staysails", []) or groups.get("storm canvas", []):
             r = view.value("sail", sid)
             if isinstance(r, dict) and str(r.get("state") or "") == "set":
@@ -1963,6 +2016,7 @@ class Captain:
         if p.wind_kn >= shorten_kn:
             self._business["gale_met"] = True
             self._business.pop("made_sail_after", None)
+            self._business.pop("sail_step", None)
         if p.wind_kn < again_kn:
             if self._calm_since is None:
                 self._calm_since = p.tick
@@ -1983,26 +2037,90 @@ class Captain:
             self.give("shorten sail", why="the glass falling and the wind rising")
         if p.wind_kn < shorten_kn - float(th("worsening_sooner_kn", 6)):
             self._business.pop("shortened_sooner", None)
-        # sail again after the gale: half an hour under the line, and not too soon
-        calm = self._calm_since is not None and p.tick - self._calm_since >= minutes * 60.0
+        # sail again after the gale, by steps (package 45c; Luce 1884 ch. XXIX p. 479:
+        # "After the gale abates, sail should not be made upon the vessel too rapidly"):
+        # the topsails as they stand reefed when the wind has been under the shorten-sail
+        # line for `topsails_again_minutes`; the topgallant masts swayed up, the reefs out
+        # and the jib when it has been under `sail_again_kn` for `sail_again_minutes`; the
+        # rest of the plain sail, the courses last, when it has stayed under that line
+        # `courses_again_minutes` more and the reefs are out (a first version set the
+        # courses while the watch was still shaking out the reefs: the yards went untrimmed
+        # after a tack for want of hands, and off the Léon coast she lay aback by turns,
+        # went astern and took the ground in the lee-shore trial). Package 45's one step
+        # (plain sail at once, and the books' "under way again" at the fill away in thirty
+        # knots) had the frigate in the station trial aback by turns for the hour after it.
+        steps = self._business
+        if p.wind_kn < shorten_kn:
+            steps.setdefault("easing_since", p.tick)
+        else:
+            steps.pop("easing_since", None)
+        gale = bool(steps.get("gale_met")) and sailing and not lying
+        easing = steps.get("easing_since")
         if (
-            self._business.get("gale_met")
-            and calm
-            and sailing
-            and not lying
-            and not self._business.get("made_sail_after")
-            and (p.topsail_reefs > 0 or p.storm_staysails_set or p.headsails_blown)
+            gale
+            and not steps.get("sail_step")
+            and easing is not None
+            and p.tick - int(easing) >= float(th("topsails_again_minutes", 10)) * 60.0
+            and not p.topsails_all_set
         ):
-            self._business["made_sail_after"] = True
-            self._business.pop("gale_met", None)
+            steps["sail_step"] = 1
+            self.give("set the topsails", why="the gale easing")
+        calm = self._calm_since is not None and p.tick - self._calm_since >= minutes * 60.0
+        # the topgallant masts are all hands at the mast-ropes for half an hour and more,
+        # which holds a tack the offing asks for: not with the land under her lee within
+        # `lee_shore_nm`, where they wait for the sea room (the lee-shore trial off the Léon
+        # coast, a first version: the offing's tack waited twenty minutes behind them, she
+        # missed stays, fell off along the shore and took the ground at the hour's wear); the
+        # reefs, the jib and the courses do not wait, since she claws off under them
+        sea_room = p.lee_land_nm is None or p.lee_land_nm > float(th("lee_shore_nm", 6))
+        if (
+            gale
+            and calm
+            and sea_room
+            and int(steps.get("sail_step") or 0) >= 2
+            and steps.get("masts_wait")
+        ):
+            steps.pop("masts_wait", None)
+            self.give("sway up the topgallant masts", why="the land no longer under her lee")
+        if (
+            gale
+            and calm
+            and int(steps.get("sail_step") or 0) < 2
+            and (
+                p.topsail_reefs > 0
+                or p.storm_staysails_set
+                or p.headsails_blown
+                or not p.topsails_all_set
+                or not p.courses_set
+            )
+        ):
+            steps["sail_step"] = 2
+            steps["sail_step_tick"] = p.tick
             why = "the gale over" + (", the weather mending" if self.trend == "mending" else "")
             if p.topsail_reefs > 0 or p.storm_staysails_set:
-                self.give("sway up the topgallant masts", why=why)
+                if sea_room:
+                    self.give("sway up the topgallant masts", why=why)
+                else:
+                    steps["masts_wait"] = True
                 self.give("shake out the reefs in the topsails", why=why)
             for sid in p.headsails_blown:
                 if p.wind_kn < float(th("wear_wind_kn", 30)):
                     self.give(f"bend a new {self._sail_name(sid)}", why="blown out in the gale")
-            self.give("set plain sail", why=why)
+            if not p.topsails_all_set:
+                self.give("set the topsails", why=why)
+            self.give("set the jib", why=why)
+        if (
+            gale
+            and calm
+            and int(steps.get("sail_step") or 0) == 2
+            and p.topsail_reefs == 0
+            and p.tick - int(steps.get("sail_step_tick") or p.tick)
+            >= float(th("courses_again_minutes", 15)) * 60.0
+        ):
+            steps["sail_step"] = 3
+            steps["made_sail_after"] = True
+            steps.pop("gale_met", None)
+            self.give("set plain sail", why="the courses last, the gale over")
         # a head sail bent again after the gale, and not yet set
         if (
             self._business.get("made_sail_after")
@@ -2284,10 +2402,13 @@ class Captain:
             return
         leg = self.legs[self.leg_i]
         self.leg_shaped_tick = self.world.clock.tick
+        p = Perception.read(self.world)
+        if p.pilot_conn:
+            # the pilot has her (package 45), on any leg (45c: the owner's merchantman,
+            # given to the pilot in the Goulet, was taken back from him by the captain's
+            # course for the anchorage at his state's change, and stood out for the Iroise)
+            return
         if self._inner_leg():
-            p = Perception.read(self.world)
-            if p.pilot_conn:
-                return  # the pilot has her (package 45)
             # the entry judged leg by leg (package 45, item 3a): the legs he can reach
             self._entry_stop = self._entry_stop_for(p)
             if (
