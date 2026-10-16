@@ -57,7 +57,7 @@ standing order "within hail": at a sail within hail then heave to
 
 ## What a world order is, and why you cannot give one
 
-The scenario files of this milestone put the other sail on the sea, and may change the world as the day goes on: a weather system appended or a waypoint added to one; a ship put on the sea with a goal, or her goal changed; a letter left at a port or sent out by a cutter; a port closed to a nation or a price moved; a person named aboard or ashore. Each is a **world order**, an order to the world and not to the ship, and the scenario gives it at a time (`world_orders:` in `data/scenarios/*.yaml`); the lead's test harness may give one too, and the director of a later milestone will. Every world order is journaled at its tick with its source and written in the log at the driver's mark, so that a voyage replays exactly and can be read afterwards for what was arranged:
+The scenario files of this milestone put the other sail on the sea, and may change the world as the day goes on: a weather system appended or a waypoint added to one; a ship put on the sea with a goal, or her goal changed; a letter left at a port or sent out by a cutter; a port closed to a nation or a price moved; a person named aboard or ashore; a point of interest put somewhere in the world (`mark: a wreck, her masts showing above the water at 49 58 N 5 16 W`, package 45c), which the lookout sees as a mark when it comes in sight, its description, bearing and distance in his line. Each is a **world order**, an order to the world and not to the ship, and the scenario gives it at a time (`world_orders:` in `data/scenarios/*.yaml`); the lead's test harness may give one too, and the director of a later milestone will. Every world order is journaled at its tick with its source and written in the log at the driver's mark, so that a voyage replays exactly and can be read afterwards for what was arranged; that line is for the record only (decision 46, package 45c): the stations' samples and the browser's play log leave it out, so that nobody aboard learns of the cutter before her sail is hailed:
 
 ```
 World order (the scenario): a cutter sent from Plymouth with a letter from the port admiral.
@@ -73,6 +73,7 @@ The captain cannot give one. The grammar knows the channel's words and refuses t
 # rejected: port brest: closed to the United States
 # rejected: message: at Brest from the Prefect maritime: "The captain is begged to dine."
 # rejected: person: agent "Mr Fox" ashore at Brest
+# rejected: mark: a cask adrift at 49 58 N 5 16 W
 # rejected: world order: a gale tonight
 ```
 
