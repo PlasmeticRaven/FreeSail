@@ -13,7 +13,9 @@
 #
 #     py tools/regatta.py data/regatta/falmouth-to-bertheaume.yaml --agent rules
 #
-# A hundred and five miles; the limit forty hours.
+# The line is three miles about the road, so that it takes in the Goulet's mouth south of it,
+# which the pilot's track into Brest passes two miles and a half from the road itself. A
+# hundred and five miles; the limit forty hours.
 
 name: Falmouth to the road of Bertheaume
 scenario: data/scenarios/merchant-passage.yaml
@@ -25,10 +27,10 @@ start:
   speed_kn: 4
 start_orders: [set plain sail]
 standing_orders: []
-finish: {at: bertheaume-road, radius_nm: 1.0}
+finish: {at: bertheaume-road, radius_nm: 3.0}   # the road and the Goulet's mouth south of it
 time_limit_hours: 40
 marks: []
 intent: bound for Brest
 fake:
-  first: [shape a course for the road of Bertheaume via 50 00 N 4 57 W and Ushant and Iroise, trim sails]
+  first: [shape a course for 48 18.3 N 4 43.5 W via 50 00 N 4 57 W and 48 35 N 5 30 W and 48 15 N 5 05 W and 48 16.5 N 4 48 W, trim sails]
   each_glass: [take a bearing of the land, take a fix, trim sails]

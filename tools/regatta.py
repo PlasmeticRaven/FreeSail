@@ -667,7 +667,9 @@ def table_lines(runs_dir: str | Path) -> list[str]:
     by_course: dict[str, list[dict[str, Any]]] = {}
     for r in rows:
         by_course.setdefault(r["course"], []).append(r)
-    for course_id, course_rows in by_course.items():
+    # the courses by their length (their limits), the agents finishers first by their time
+    ordered = sorted(by_course.items(), key=lambda kv: (kv[1][0]["time_limit_s"], kv[0]))
+    for course_id, course_rows in ordered:
         course_rows.sort(
             key=lambda r: (not r["finished"], r["elapsed_s"] or 0, r.get("miles_to_go") or 0)
         )
@@ -695,10 +697,18 @@ def _cells(r: dict[str, Any]) -> list[str]:
     finished = "yes" if r["finished"] else f"no, {r.get('miles_to_go', '?')} miles to go"
     elapsed = r["elapsed"] or f"(ran {hours_words(r['ran_s'])})"
     marks = ", ".join(f"{m['mark']} {hours_words(m['tick'])}" for m in r["marks"]) or "none"
-    damage = "; ".join(r["damage"]) if r["damage"] else "none"
+    damage = (
+        f"{len(r['damage'])}: " + "; ".join(_clause(d) for d in r["damage"][:3])
+        if r["damage"]
+        else "none"
+    )
+    if len(r["damage"]) > 3:
+        damage += "; ..."
+    first = r["groundings"][0] if r["groundings"] else None
     ground = (
-        "; ".join(f"{hours_words(g['tick'])}: {g['text']}" for g in r["groundings"])
-        if r["groundings"]
+        f"{len(r['groundings'])}, the first at {hours_words(first['tick'])}: "
+        f"{_clause(first['text'])}"
+        if first
         else "none"
     )
     fatigue = f"{r['fatigue']:.2f} ({r['fatigue_words']}), {r['fatigue_most']:.2f}"
@@ -706,7 +716,14 @@ def _cells(r: dict[str, Any]) -> list[str]:
         purse = "none"
     else:
         change = r["purse_change"] or 0.0
-        purse = f"£{r['purse']:,.0f}" + (f" ({change:+,.0f})" if change else " (as at the gun)")
+        moved = (
+            f"£{-change:,.0f} spent"
+            if change < 0
+            else f"£{change:,.0f} gained"
+            if change > 0
+            else "as at the gun"
+        )
+        purse = f"£{r['purse']:,.0f} ({moved})"
     return [
         who,
         r["door"],
@@ -719,6 +736,13 @@ def _cells(r: dict[str, Any]) -> list[str]:
         purse,
         f"{r['lines']}, `{r['digest']}`",
     ]
+
+
+def _clause(text: str) -> str:
+    """A log line's first clause, for a cell: 'She has taken the ground forward: two
+    fathoms ...' is 'She has taken the ground forward, two fathoms ...' to its first stop."""
+    head = text.split(";")[0].split(". ")[0].rstrip(".")
+    return head.replace(": ", ", ", 1)
 
 
 def write_table(runs_dir: str | Path) -> Path:

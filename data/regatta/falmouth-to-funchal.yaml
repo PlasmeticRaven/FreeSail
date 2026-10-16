@@ -29,5 +29,5 @@ marks:
   - {at: Cape Finisterre, leave: to larboard, ray_deg: 270, ray_nm: 80}
 intent: bound for Funchal via Ushant, Finisterre
 fake:
-  first: [shape a course for Funchal via 50 00 N 4 57 W and Ushant and Finisterre, trim sails]
+  first: [shape a course for Funchal via 50 00 N 4 57 W and 48 35 N 5 30 W and 42 55 N 9 50 W, trim sails]
   each_glass: [take a bearing of the land, take a fix, trim sails]
