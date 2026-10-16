@@ -78,7 +78,16 @@ verbs:
                tend sheets, tend the sheets and braces,
                trim sails with the head yards sharper, trim sails head yards sharper,
                trim the sails with the head yards sharper,
-               trim the yards with the head yards sharper, trim the yards head yards sharper]
+               trim the yards with the head yards sharper, trim the yards head yards sharper,
+               trim for close hauled, trim for close-hauled, trim sails for close hauled,
+               trim for the wind abeam, trim for a wind abeam, trim sails for the wind abeam,
+               trim for the wind large, trim for a large wind, trim for the wind on the quarter,
+               trim sails for the wind large, trim to run, trim for a run, trim sails to run,
+               trim to run before the wind]
+    # Package 44 (the owner's note 25 of gate m6a-2, judged at the regatta): the trims by
+    # a point of sail set every sail for the point named rather than for the wind she has
+    # now (`phrase_modifiers`: `point`), so that a captain who bears away or hauls his
+    # wind may trim in the same breath as the helm order (verbs.py, `_trim`).
     object: yards
     level: 1
   haul:
@@ -1298,6 +1307,21 @@ phrase_modifiers:
   trim the sails with the head yards sharper: {head_sharper: true}
   trim the yards with the head yards sharper: {head_sharper: true}
   trim the yards head yards sharper: {head_sharper: true}
+  # package 44: the trims by a point of sail (verbs.py, `POINT_TRUE_WIND_DEG`)
+  trim for close hauled: {point: close hauled}
+  trim for close-hauled: {point: close hauled}
+  trim sails for close hauled: {point: close hauled}
+  trim for the wind abeam: {point: the wind abeam}
+  trim for a wind abeam: {point: the wind abeam}
+  trim sails for the wind abeam: {point: the wind abeam}
+  trim for the wind large: {point: the wind large}
+  trim for a large wind: {point: the wind large}
+  trim for the wind on the quarter: {point: the wind large}
+  trim sails for the wind large: {point: the wind large}
+  trim to run: {point: a run}
+  trim for a run: {point: a run}
+  trim sails to run: {point: a run}
+  trim to run before the wind: {point: a run}
 
 # Words after a line's name that mean "all the way in": "haul the jib sheet
 # aft", "haul the topsail sheets home".
