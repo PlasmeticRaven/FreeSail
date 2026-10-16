@@ -26,8 +26,9 @@ tuning notes and a report to the lead at the end.
 | 43 | Fable | Other ships with captains: the measurement first, the brain on the far body (the rules-based captain for the other ships), the crewed promotion and the guard, a model captain of another ship kept across the switch, the director's seat hook and the live world order | merged 2026-10-16, with 45c merged in its worktree; the trade trial's grounding at the anchorage a strict expected failure for the lead |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
 | 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | merged 2026-10-11 as committed so far (the owner's word, to play it) and 2026-10-15 whole, with every pin re-measured; the naval cruise's two truths strict expected failures for 45c; gate m6a-2 not cut |
-| 43b | Opus | The lugger and the smack; the world's business (spec §19), with the trade rumours a boat brings back from the shore (the owner's note 24) | brief to write |
-| 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | brief to write |
+| 43b | Opus | The lugger and the smack; the world's business (spec §19) with the trade rumours; the ports' faults from 43 and 45c (the anchorage's let-go, the Goulet on a flood, Torbay's stream, the pilot's routine bearings) and the captain's beating flap | briefed 2026-10-16 for the owner's approval |
+| 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | briefed 2026-10-16 for the owner's approval, beside 43b |
+| 42b | Opus | The consent brief revised once for 6c: the stale sentence, a model as the captain of another ship kept across the switch, the director's seat, the regatta, the pictures; the re-asks the owner's | briefed 2026-10-16, to run after 43b and 44 |
 | 45c | Opus | Package 45's tail (the naval cruise restored, the chase, sail after the gale by steps, the pilot's conn through the Goulet and its design) and the owner's small fixes from gate m6a-2's runs (a picture put back by hand with a note, the ghosted boat and `--until`, the weather's cadence, the OpenRouter exchanges, `muster` in the browser, the unheld lookout, the sails-lifting line, the pictures at the local runner, a point of interest, world orders not shown as sent, the stations' groundwork) | merged 2026-10-16, the first of the two; the milestone's last new package |
 
 Package 37m (the helm through the wind) is milestone 5's last, briefed in
@@ -1488,6 +1489,110 @@ of Torbay's own (a chart-data patch; the passages near it would move); (3) the i
 scenario's conn from Bertheaume adds 240 lines of pilot-water bearings to its log, which
 may want a quieter severity; (4) the Palinure's hour in the cruise's scenario is no longer
 the author's "at seven".
+
+## Package 43b: the lugger and the smack, and the world's business (`tools/gen_ships.py` and `data/ships/lugger.yaml`, `smack.yaml` new; `freesail/ship/`, `freesail/evolutions/` for the lug sail and its dipping; `freesail/world/ports.py`, `business.py` new or where the ports' voyages are drawn, `freesail/world/ships.py` and `brains.py` for the drawn ships' intents; `data/ports/*.yaml` for what each port wants and sends; `freesail/world/ports.py` for the anchorage's let-go, the rumours and the Goulet's set; `data/tides/streams.yaml` for Torbay; `freesail/world/captains.py` for the beating flap; the primer's chapters 2 and 15; `docs/TechnicalSpec-M6.md` §19 as built; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_hierarchy.py` or its kin extended to six vessels, `test_business.py` new, `test_ports.py`, `test_captain_trials.py` re-pinned once)
+
+Opus. Spec M6 §19 (the two hulls and the world's business); decisions 42 (the lugger on
+the Éclair chasse-marée, the smack on the Culloden smack of 1746, `docs/design/VesselReferences-2026-10.md`
+the source), 43, 46; the open items of 43 and 45c that are the ports' and the captain's. Each
+item an intent with the lead's reading; the intent binds.
+
+1. **Two hulls from the generator.** The lugger (the chasse-marée on the Éclair's lines by
+   Forfait, three masts with dipping lugs and the taille-vent, the figures in the references
+   note) and the smack (the Culloden smack, cutter-rigged with a well, Steel's spars,
+   Holdsworth's well) as files from `tools/gen_ships.py`, each sailing through the same
+   orders as the cutter; the lug sail brought to the generator and the catalogue with its
+   rig-specific evolution, the dipping lug at the tack (the proposal's §4.4), written as the
+   running bowsprit was for the cutter, the gybe as an evolution left to M7 (the owner's
+   note 7) but the dip not instant; the hierarchy truths of M5 §19 extended to six vessels;
+   no verification against a source beyond the references note until M8.
+2. **The world generates the business** (§19's first paragraph: the small step now, the
+   loop later). The ports draw voyages from their markets and the nations table (a cargo
+   wanted where its price is high from where it is low), the fishing grounds from the
+   coast's features (the smack and the lugger at far detail in the fisherman's role), the
+   naval stations from the war (a cruiser on the station the doctrine names); ships drawn
+   under the seed at the chart's edges and in the ports with intents (43's brains), leaving
+   at the edges when their business is done; a scenario may still name its ships and the
+   recorded passages do, so that they pin; a `business:` key in the scenario (`on`, `off`,
+   a density) with the recorded passages off; no supply-and-demand loop (later). The
+   rumours (the owner's note 24): the boat ashore brings back two or three words of prices
+   high or low at ports the market knows, drawn from the ports' own tables, true as of the
+   day and said as rumour.
+3. **The ports' faults from 43 and 45c.** (a) The anchorage's let-go: the trade trial's
+   schooner decided soundly in five fathoms and let go five minutes and four cables later
+   over two (43's strict expected failure): the come-to-an-anchor evolution takes the way
+   off her at the sounding that decided, or casts again before the let-go and refuses it
+   over too little water, as a master would; the trial's expected failure lifted and
+   re-pinned. (b) The Goulet's conn from south-west of the mouth on a flood with a northerly
+   puts her on the Mingan (45c's open item 1): the pilot allows for the set before his turn,
+   or lays a fresh line when she cannot make his leg good, proved on the wardroom save from
+   113000. (c) Torbay a stream area of its own with next to no stream, the passages near it
+   re-pinned (45c's finding). (d) The intent scenario's conn from Bertheaume adds 240 lines
+   of pilot-water bearings: a quieter severity for the pilot's routine bearings, the
+   urgent ones unchanged.
+4. **The captain's flap**: the beating rule and the passage rule trade the deck every two
+   minutes as an evasion ends (43's finding on the merged tree): one rule decides, with a
+   dwell, in the doctrine; the trade trial re-pinned.
+5. **Notes and spec**: §19 as built; the primer's chapters; the tuning notes with the two
+   hulls' figures, the business's draw at seed 7 for a day in the Channel (how many ships,
+   where, what they carry), the ports' fixes with the trials' figures, every pin moved.
+
+## Package 44: the regatta and the parity tests (`tools/regatta.py` new; `data/regatta/*.yaml` new; `tests/test_regatta.py`, `tests/test_parity.py` new; `freesail/agents/fake.py` for the scripted agent; `docs/playtests/regatta/` for the runs; `freesail/evolutions/trim.py` and the vocabulary if the trims by point of sail are built; `docs/TechnicalSpec-M6.md` §21 and §22 as built; `docs/dev/TuningNotes.md`)
+
+Opus. Spec M6 §21 and §22; the owner's note 25 (the trims by a point of sail, judged here).
+
+1. **The regatta harness** (§21): a course is a scenario with a start, a finish line (a place
+   and a radius), a time limit and marks to round; the first courses the 5b passage (Ushant
+   to Falmouth), the merchant passage's crossing and Falmouth to Funchal road on the whole
+   chart; the agents the rules-based captain, a fake with a script, a local model through
+   its runner, a hosted model through the API door and a human replay (a save's journal);
+   the score the elapsed time to the line with damage, grounding, the crew's fatigue and the
+   purse as columns; the harness runs each agent at lockstep, writes a table and a log per
+   run under `docs/playtests/regatta/<date>/`, refuses a model whose consent is not on
+   record; the first table run with the rules-based captain and the fake on all three
+   courses at seed 7 and kept.
+2. **The trims by a point of sail** (the owner's note 25, judged here): `trim for close
+   hauled`, `trim for the wind abeam`, `trim for the wind large`, `trim to run` as orders
+   that set every sail for the point named (the period's trim by level for the first, the
+   yards squared by steps for the rest, the fore-and-aft sails' sheets with them), run on
+   the regatta's first course against `trim sails` on the cadence and against the helm's
+   mark: kept if they gain or steady the model stations, dropped with the figures if not;
+   the sails-lifting line pointing at them if kept.
+3. **The parity tests** (§22): the captain's station's observation surface is the player's
+   (every reading the console answers the station answers from the same function), its
+   action surface the player's (every verb the vocabulary has the station may submit,
+   filtered only by authority), nothing reachable by one and not the other; a test
+   enumerates both from the registries and fails on any difference; a second seats a fake
+   captain and the console on one game and gives the same orders to the same log. Where the
+   enumeration finds a difference that is a real gap, close it; where it is by design (the
+   director's world orders, the owner's own words), list it in the test.
+4. **Notes and spec**: §21 and §22 as built; the tuning notes with the first regatta table
+   and the trims' figures.
+
+## Package 42b: the consent brief revised for 6c (`docs/agents/ConsentBrief.md`; `docs/agents/README.md` where the revision is recorded; `freesail/agents/consent.py` only if the re-ask's words need it; `tests/test_officer.py`'s digest pin and watched sections; `docs/TechnicalSpec-M6.md` §15 as built; `docs/dev/TuningNotes.md`)
+
+Opus, after 43b and 44, so that one revision covers the milestone: spec §15; decision 42
+(the brief's form as 42a left it); the owner's note 17 (the stale sentence: the lookout, the
+master, stations speaking to one another and the API door exist now); 43's report on what
+the brief must say. The brief is edited by this package only, its sentences drafted for the
+owner's approval before they are written (the draft under `docs/playtests/drafts/`), the
+whole-file digest re-pinned once, the re-asks the owner's.
+
+1. The stale sentence rewritten in the present: the lookout's, the master's and a
+   passenger's stations, stations speaking to one another, the API door and the local
+   runner's pictures as they are.
+2. A model as the captain of another ship than the player's, with her own company, log,
+   account and orders, kept across the far-detail switch (the full surface within four
+   miles, the plan layer's shape beyond six, no reseat, the sample saying which); the
+   player's lookout seeing her as a sail.
+3. The director's seat: a model seated on a ship by the owner's grant and a budget of
+   samples or hours, only with that model's own consent record standing, stood down when
+   the budget is spent or by `unseat:`, by the owner's word and never a model's own; a
+   model seating a model named as a kind of thing the answer covers.
+4. The regatta: a model run on a course beside other agents with its times kept under
+   `docs/playtests/regatta/`, refused without consent.
+5. The pictures as they are (shelved by the model's hand with its note); the journal
+   carried by the person across stations.
 
 ## The owner's runs of m6a-2, read (the lead, 2026-10-15; the notes in `docs/playtests/2026-10-13-gate-m6a-2-owner-runs/`)
 
