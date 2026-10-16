@@ -1564,9 +1564,19 @@ class Harness:
             out[k] = v
         return out
 
+    _shape_told: str | None = None  # the shape of another ship last told (package 43)
+
     def _station_notices(self) -> None:
         """What a station's own sample carries as a notice (package 41): the master's
-        slate while a working is open, told once (`reckoning.Navigation.working_notice`)."""
+        slate while a working is open, told once (`reckoning.Navigation.working_notice`);
+        and on another ship (package 43; spec M6 §20) her shape, told at the start and
+        whenever it changes across the switch."""
+        shape = getattr(self.world, "shape", None)
+        if shape is not None and shape != self._shape_told and not self.conversation:
+            from freesail.world.crews import shape_words
+
+            self._shape_told = shape
+            self.agent.notices.append(shape_words(self.world))
         if self.station.name != MASTER or self.conversation:
             return
         nav = getattr(self.world, "navigation", None)
@@ -4233,13 +4243,30 @@ def deliver_answer(
         held.note(said, kind="agent.told")
 
 
+def all_agents(world: Any) -> list[tuple[str, Any, Any]]:
+    """Every harness of a game, as (the station's name for the driver, the harness, its
+    World): the player's ship's under their own names, and those on the other ships
+    (package 43; spec M6 §20) as 'captain of <ship>', each in that ship's own World."""
+    out: list[tuple[str, Any, Any]] = []
+    for name, h in (getattr(world, "agents", None) or {}).items():
+        out.append((name, h, world))
+    for v in getattr(getattr(world, "vessels", None), "vessels", None) or []:
+        crew = getattr(v, "crew", None)
+        if crew is None:
+            continue
+        for name, h in (getattr(crew, "agents", None) or {}).items():
+            out.append((f"{name} of {v.name}", h, crew))
+    return out
+
+
 def open_samples(world: Any) -> list[dict[str, Any]]:
     """The samples open on the ship now (the pace rule, spec M6 §12; package 41): each
     station whose floor is a model's, with since when (the tick and the stamp) and why.
     A replay's recorded station (`Playback`) is no model thinking and never counts, so
-    a replay runs at the driver's set compression."""
+    a replay runs at the driver's set compression. A station on another ship (package
+    43) counts as one of the ship's, under the pace rule like any."""
     out: list[dict[str, Any]] = []
-    for name, h in (getattr(world, "agents", None) or {}).items():
+    for name, h, _w in all_agents(world):
         if isinstance(h.model, Playback) or not h.started or h.agent.released:
             continue
         sample = h.open_sample

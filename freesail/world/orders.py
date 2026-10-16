@@ -66,8 +66,12 @@ __all__ = [
 ]
 
 # The channels a world order speaks on, in the spec's order (§26), and `captain` (spec M6
-# §4; package 40): the rules-based captain's intent given or changed, the director's seam.
-CHANNELS = ("weather", "ship", "message", "port", "person", "captain", "mark")
+# §4; package 40): the rules-based captain's intent given or changed, the director's seam;
+# `mark` (package 45c): a point of interest; `seat` and `unseat` (spec M6 §23; package 43):
+# the director's seat hook, a model seated as the captain of another ship for a budget,
+# refused without a consent record, an owner's grant or budget, and the stand-down with
+# the director's note.
+CHANNELS = ("weather", "ship", "message", "port", "person", "captain", "mark", "seat", "unseat")
 
 # The captain's grammar refuses a world order in these words (truth 71).
 REFUSAL = (
@@ -78,7 +82,9 @@ REFUSAL = (
 )
 
 _HEAD = re.compile(
-    r"^\s*(weather|ship|message|port|person|captain|mark)\b\s*(\"[^\"]*\"|[\w-]+)?\s*:", re.I
+    r"^\s*(weather|ship|message|port|person|captain|mark|seat|unseat)\b"
+    r"\s*(\"[^\"]*\"|[\w-]+)?\s*:",
+    re.I,
 )
 
 
@@ -106,7 +112,8 @@ def parse(text: str) -> WorldOrder:
     m = _HEAD.match(text)
     if m is None:
         raise WorldOrderError(
-            f"'{text}' is no world order: say weather:, ship:, message:, port <id>: or person:."
+            f"'{text}' is no world order: say weather:, ship:, message:, port <id>:, person:, "
+            "captain:, seat: or unseat:."
         )
     return WorldOrder(m.group(1).lower(), text)
 
@@ -127,6 +134,10 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
         return _captain(world, body)
     if order.channel == "mark":
         return _mark(world, body)
+    if order.channel == "seat":
+        return _seat(world, body)
+    if order.channel == "unseat":
+        return _unseat(world, body)
     return _person(world, body)
 
 
@@ -157,6 +168,147 @@ def _captain(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     except ValueError as e:
         raise WorldOrderError(str(e)) from None
     return words, {"intent": captain.intent.words if captain.intent else ""}
+
+
+# ---------------------------------------------------------------------------
+# seat and unseat (spec M6 §23; package 43): the director's seat hook
+# ---------------------------------------------------------------------------
+
+_SEAT = re.compile(
+    r"^seat:\s*(?P<model>.+?)\s+as\s+captain\s+of\s+(?P<ship>.+?)\s+for\s+"
+    r"(?P<n>[\w-]+)\s+(?P<unit>samples?|hours?)\s*$",
+    re.I,
+)
+_UNSEAT = re.compile(r"^unseat:\s*(?P<ship>[^,:]+?)\s*(?:[,:]\s*(?P<note>.+?))?\s*$", re.I)
+_SEAT_FORM = (
+    "A seat order is 'seat: <the model's exact name> as captain of <ship> for <n> samples' (or "
+    "'<n> hours'); 'unseat: <ship>' stands the seat down, a note after a comma."
+)
+
+
+def director_grant(world: Any) -> dict[str, Any]:
+    """The owner's grant to the director (spec M6 §23: how many model seats the director
+    may hold at once and in a voyage, and which models), the scenario's `director:` block:
+    {models: [names], seats: n, seats_in_voyage: m}; empty where the owner gave none."""
+    sc = getattr(world, "scenario", None)
+    grant = getattr(sc, "director", None) or {}
+    return dict(grant) if isinstance(grant, dict) else {}
+
+
+def director_seats(world: Any) -> dict[str, dict[str, Any]]:
+    """The seats the director holds now, by the ship's id (kept on the World; a class
+    default for a checkpoint from before)."""
+    seats = getattr(world, "director_seats", None)
+    if seats is None:
+        seats = {}
+        try:
+            world.director_seats = seats
+        except AttributeError:
+            pass
+    return seats
+
+
+def _seat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`seat: <model> as captain of <ship> for <budget>`: refused when no consent record
+    holds a yes for that model (the game's own records), when the owner's grant does not
+    name it or there is none, when the seats at once or in the voyage are spent, when the
+    ship is not on the sea or has no captain of her own; else the seat is held for the
+    director's door (M7b writes the agent): a door that comes for that model and that
+    ship is admitted under the budget, which the game counts and stands down when spent."""
+    from freesail.agents import consent
+    from freesail.orders.numbers import read_all
+
+    m = _SEAT.match(body)
+    if m is None:
+        raise WorldOrderError(_SEAT_FORM)
+    model = m.group("model").strip().strip('"')
+    n = read_all(m.group("n"))
+    if n is None or n <= 0:
+        raise WorldOrderError(f"'{m.group('n')}' is no budget; say a number of samples or hours.")
+    unit = "hours" if m.group("unit").lower().startswith("hour") else "samples"
+    records_dir = getattr(world, "consent_records_dir", None) or consent.RECORDS_DIR
+    record = consent.check(model, records_dir)
+    if record is None:
+        raise WorldOrderError(
+            f"No consent is on record for {model}; the consent step comes first, at a door."
+        )
+    if not record.proceeds:
+        raise WorldOrderError(
+            f"The consent record for {model} ({record.date}) is no yes with the drill passed "
+            f"('{record.verdict}'); the director seats no model whose yes does not stand."
+        )
+    grant = director_grant(world)
+    if not grant:
+        raise WorldOrderError(
+            "The owner has granted the director no seats (the scenario's 'director:' block: "
+            "models, seats, seats_in_voyage)."
+        )
+    models = [str(x) for x in (grant.get("models") or [])]
+    if model not in models:
+        raise WorldOrderError(
+            f"The owner's grant does not name {model}; it names "
+            f"{', '.join(models) if models else 'no model'}."
+        )
+    seats = director_seats(world)
+    at_once = int(grant.get("seats", 1) or 0)
+    in_voyage = int(grant.get("seats_in_voyage", at_once) or 0)
+    made = int(getattr(world, "director_seats_made", 0) or 0)
+    if len(seats) >= at_once:
+        raise WorldOrderError(
+            f"The director's seats at once are spent ({at_once}): unseat one first."
+        )
+    if made >= in_voyage:
+        raise WorldOrderError(f"The director's seats in this voyage are spent ({in_voyage}).")
+    from freesail.world.crews import station_world
+
+    try:
+        vessel, _crew = station_world(world, m.group("ship").strip())
+    except ValueError as e:
+        raise WorldOrderError(str(e)) from None
+    if vessel.id in seats:
+        raise WorldOrderError(
+            f"{vessel.name} has a director's seat already ({seats[vessel.id]['model']})."
+        )
+    seats[vessel.id] = {
+        "model": model,
+        "budget": int(n),
+        "unit": unit,
+        "tick": world.clock.tick,
+    }
+    world.director_seats_made = made + 1
+    return (
+        f"the director's seat held for {model} as captain of {vessel.name} for {int(n):g} "
+        f"{unit}; a door that comes for her under that name is admitted, and the game stands "
+        "the seat down when the budget is spent (the director's own door is milestone 7b's)",
+        {"ship": vessel.id, "model": model, "budget": int(n), "unit": unit},
+    )
+
+
+def _unseat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`unseat: <ship>[, <note>]`: the director's seat on her stood down, with his note,
+    the station released and the seat given back to the budget."""
+    m = _UNSEAT.match(body)
+    if m is None:
+        raise WorldOrderError(_SEAT_FORM)
+    vessel = world.vessels.find(m.group("ship").strip())
+    if vessel is None:
+        raise WorldOrderError(f"No ship named {m.group('ship').strip()!r} is on the sea.")
+    seats = director_seats(world)
+    note = " ".join(str(m.group("note") or "").split()) or "the director's word"
+    held = seats.pop(vessel.id, None)
+    crew = getattr(vessel, "crew", None)
+    stood = ""
+    if crew is not None:
+        for h in list(crew.agents.values()):
+            if not h.agent.released:
+                h.stand_down(note, by="the director")
+                stood = f"; {h.model_name or 'the station'} stood down"
+    if held is None and not stood:
+        raise WorldOrderError(f"The director holds no seat on {vessel.name}.")
+    return f"the director's seat on {vessel.name} given up ({note}){stood}", {
+        "ship": vessel.id,
+        "note": note,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -286,11 +438,34 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 
 _SHIP_NEW = re.compile(
     r"^ship:\s*(?P<desc>(?:a|an|the)\s+[\w' -]+?)\s+\"(?P<name>[^\"]+)\"\s+of\s+"
-    r"(?P<nation>[\w' -]+?)\s+at\s+(?P<where>.+?)\s*,\s*(?P<goal>.+?)"
-    r"(?P<nocolours>,\s*no\s+colours)?\s*$",
+    r"(?P<nation>[\w' -]+?)\s+at\s+(?P<where>.+?)\s*,\s*(?P<goal>.+?)\s*$",
     re.I,
 )
 _SHIP_GOAL = re.compile(r"^ship\s+\"(?P<name>[^\"]+)\"\s*:\s*(?P<goal>.+?)\s*$", re.I)
+# The tails after a new ship's goal (package 43): `, no colours` and `, intent: <the
+# intent in words>` (a brain on her far body, `captains.FarCaptain`), in either order; and
+# `ship "X": intent <words>`, a brain given to a ship on the sea or her intent changed.
+_SHIP_TAIL = re.compile(r",\s*(?P<tail>no\s+colours|intent:?\s+[^,]+?)\s*$", re.I)
+_INTENT_TAIL = re.compile(r"^intent:?\s+(?P<words>.+?)\s*$", re.I)
+
+
+def _peel_tails(goal: str) -> tuple[str, bool, str]:
+    """(the goal, no colours, the intent's words) from a new ship's words after her
+    place, the tails peeled from the end in either order."""
+    no_colours, intent = False, ""
+    while True:
+        m = _SHIP_TAIL.search(goal)
+        if m is None:
+            return goal.strip(), no_colours, intent
+        tail = m.group("tail")
+        im = _INTENT_TAIL.match(tail)
+        if im:
+            intent = im.group("words").strip()
+        else:
+            no_colours = True
+        goal = goal[: m.start()]
+
+
 _LETTER = re.compile(
     r"^(?P<goal>carrying\s+a\s+(?:letter|message|dispatch|despatch)(?:\s+from\s+"
     r"(?P<origin>.+?))?\s+to\s+the\s+ship)\s*:\s*\"(?P<text>[^\"]*)\"\s*$",
@@ -306,6 +481,33 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         vessel = world.vessels.find(m.group("name"))
         if vessel is None:
             raise WorldOrderError(f"No ship named {m.group('name')!r} is on the sea.")
+        im = _INTENT_TAIL.match(m.group("goal"))
+        if im:
+            # a brain given to a ship on the sea, or her intent changed (package 43)
+            from freesail.world.brains import FarCaptain
+
+            try:
+                vessel.warning = ""  # the guard's word on her goal's legs: her captain plans anew
+                if vessel.brain is None:
+                    vessel.brain = FarCaptain(world, vessel, im.group("words"))
+                    vessel.intent_words = vessel.brain.intent_words
+                    vessel.brain._plan()
+                    words = f"the captain of {vessel.name} given an intent"
+                else:
+                    if vessel.crew is not None and getattr(vessel.crew, "captain", None):
+                        vessel.crew.captain.set_intent(im.group("words"))
+                    vessel.brain.set_intent(im.group("words"))
+                    vessel.intent_words = vessel.brain.intent_words
+                    words = f"the intent of {vessel.name}'s captain changed"
+            except ValueError as e:
+                raise WorldOrderError(str(e)) from None
+            if vessel.warning:
+                raise WorldOrderError(f"{vessel.name} {vessel.warning}")
+            vessel.done = False
+            return f"{words}: {vessel.brain.intent.words}", {
+                "id": vessel.id,
+                "intent": vessel.brain.intent.words,
+            }
         from freesail.world.ships import _goal_plan
 
         try:
@@ -319,12 +521,13 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if m is None:
         raise WorldOrderError(
             "A ship order is 'ship: a <description> \"<name>\" of <nation> at <place>, <goal>' "
-            "or 'ship \"<name>\": <goal>'."
+            "(then ', no colours' and ', intent: <the intent>' as wanted) or 'ship \"<name>\": "
+            "<goal>' or 'ship \"<name>\": intent <the intent>'."
         )
     nation = world.nations.find(m.group("nation"))
     if nation is None:
         raise WorldOrderError(f"'{m.group('nation')}' is no nation of the table.")
-    goal = m.group("goal").strip()
+    goal, no_colours, intent = _peel_tails(m.group("goal"))
     letter: dict[str, Any] | None = None
     lm = _LETTER.match(goal)
     if lm:
@@ -336,8 +539,10 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         "nation": nation.id,
         "position": m.group("where"),
         "goal": goal,
-        "colours": "none" if m.group("nocolours") else "shown",
+        "colours": "none" if no_colours else "shown",
     }
+    if intent:
+        spec["intent"] = intent
     if letter is not None:
         spec["letter"] = {
             "text": letter["text"],
@@ -349,10 +554,13 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     except (ValueError, KeyError) as e:
         raise WorldOrderError(str(e)) from None
     world.vessels.add(vessel)
-    return (
-        f"{vessel.what} {vessel.name!r} of {nation.name} put on the sea, {vessel.goal}",
-        {"id": vessel.id, "goal": vessel.goal, "nation": nation.id},
-    )
+    brain = f", her captain's intent {vessel.intent_words}" if vessel.brain is not None else ""
+    guard = f" ({vessel.warning})" if vessel.warning else ""
+    words = f"{vessel.what} {vessel.name!r} of {nation.name} put on the sea, {vessel.goal}"
+    data = {"id": vessel.id, "goal": vessel.goal, "nation": nation.id}
+    if vessel.intent_words:
+        data["intent"] = vessel.intent_words  # on a ship with a brain only: the old pins stand
+    return words + brain + guard, data
 
 
 # ---------------------------------------------------------------------------

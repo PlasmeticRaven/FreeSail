@@ -48,7 +48,10 @@ weather:
   sea: true
 
 world_orders:
-  - {at: 1805-06-14T06:00, order: 'ship: a brig-sloop "Palinure" of France at 48 44 N 5 20 W, bound for 48 15 N 5 30 W, no colours'}
+  # package 43: the stranger has a brain (the cruiser's doctrine, data/captains/cruiser.yaml)
+  # and an intent of her own, so that the two captains judge one another: she makes out the
+  # frigate, an enemy of a bigger class, and hauls off; the frigate chases
+  - {at: 1805-06-14T06:00, order: 'ship: a brig-sloop "Palinure" of France at 48 44 N 5 20 W, bound for 48 15 N 5 30 W, no colours, intent: bound for 48 15 N 5 30 W'}
 
 orders:
   - set plain sail

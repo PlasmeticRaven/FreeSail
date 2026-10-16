@@ -996,6 +996,15 @@ def main(
         "lookout or a passenger; package 41): the game refuses in words one the ship has not got",
     )
     ap.add_argument("--cadence", choices=list(CADENCES), default=None, help="the seating's cadence")
+    ap.add_argument(
+        "--ship",
+        default="",
+        help=(
+            "the other ship the station is on, by her name or id (package 43; spec M6 §20): "
+            "a model captain of a vessel with a captain of her own (an intent), kept across "
+            "the far-detail switch"
+        ),
+    )
     ap.add_argument("--session", choices=("play", "test"), default="play")
     ap.add_argument("--ask-again", action="store_true")
     ap.add_argument("--handover-reserve", type=local.reserve_form, action="append")
@@ -1045,7 +1054,9 @@ def main(
         print(f"The API door does not start: {why}", file=out, flush=True)
         return local.EXIT_UNREACHABLE
     print(f"The key is read from {where}; it is sent in the request's header only.", file=out)
-    game = GameClient(args.game, args.station, transport=game_transport, http=game_http)
+    game = GameClient(
+        args.game, args.station, transport=game_transport, http=game_http, ship=args.ship
+    )
 
     def fetch(pid: str) -> tuple[str, bytes] | None:
         return game.picture(pid)

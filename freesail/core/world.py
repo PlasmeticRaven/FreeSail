@@ -215,6 +215,10 @@ class Scenario:
     # save says by what she was sailed. A save from before loads with neither.
     intent: str = ""
     books: list[str] = field(default_factory=list)
+    # Package 43 (spec M6 §23): the owner's grant to the director, {"models": [the exact
+    # names], "seats": how many at once, "seats_in_voyage": how many in all}; empty where
+    # the owner gave none, and the seat hook refuses. A save from before loads with none.
+    director: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -381,6 +385,14 @@ class World:
     # figure as last seen and the metres come home since the dragging began, across the
     # spells of it (the physics counts each spell afresh). A class default, as above.
     _drag_seen: dict[str, tuple[float, float]] | None = None
+    # Package 43 (spec M6 §23): the director's seats held on the other ships, by the
+    # ship's id (`world.orders.director_seats`), how many were made in the voyage, and
+    # the consent records' directory the seat hook reads (the drivers set it from
+    # `--consent-records`; the repository's by default). Class defaults for a checkpoint
+    # from before.
+    director_seats: dict[str, dict[str, Any]] | None = None
+    director_seats_made: int = 0
+    consent_records_dir: Any = None
 
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
         # the build's stamp, worked once at the start (package 37d)
@@ -1088,6 +1100,9 @@ class World:
         (a letter brought alongside, a stranger within hail) are recorded here."""
         if self._position is None or not self.vessels.vessels:
             return
+        if getattr(self.vessels, "crewed_ids", ()):
+            # the crewed ships beside her, each a World of her own (package 43)
+            self.vessels.tick_crews(self)
         lines = self.vessels.tick_near(self)
         if self.clock.ship_time.second == 0:
             lines = lines + self.vessels.tick(self)
@@ -1603,12 +1618,10 @@ class World:
 
     # -- time ----------------------------------------------------------------
 
-    def tick(self) -> None:
-        """Advance the world by one game second."""
-        self.clock.advance()
-        if self._scenario_order_i < len(self._scenario_orders):
-            # the scenario's world orders due now, before the weather moves (package 36)
-            self._tick_world_orders()
+    def _follow_weather(self) -> None:
+        """The wind's base from the weather every tick: the systems moved and their
+        surface wind at the ship, or the pinned script's wind (a crewed vessel's own
+        World follows its parent's weather instead, `world.crews`, package 43)."""
         if self.systems is not None:
             # the systems move every tick (microseconds: a bell and two segments a system);
             # the sky and the glass are read once a minute (`_observe_weather`)
@@ -1620,6 +1633,19 @@ class World:
             self.wind.air_mass = self.weather.air_mass_at(
                 self.clock.ship_time, self.scenario.air_mass
             )
+
+    def _tick_weather_minute(self) -> None:
+        """The minute's sky and glass, where the world keeps systems."""
+        if self.systems is not None:
+            self._tick_weather()
+
+    def tick(self) -> None:
+        """Advance the world by one game second."""
+        self.clock.advance()
+        if self._scenario_order_i < len(self._scenario_orders):
+            # the scenario's world orders due now, before the weather moves (package 36)
+            self._tick_world_orders()
+        self._follow_weather()
         # the ten-minute mean, which the gusts and squalls are drawn as multiples of (spec
         # M5 §3; under every wind since package 31b)
         self.wind.step(1.0, self.wind_record.mean_speed())
@@ -1640,8 +1666,8 @@ class World:
                 },
             )
         self._log_wind_shift()
-        if self.systems is not None and self.clock.ship_time.second == 0:
-            self._tick_weather()
+        if self.clock.ship_time.second == 0:
+            self._tick_weather_minute()
         if self.sea is not None:
             # the sea once a minute, the motion every tick, before the ship feels them
             if self.clock.ship_time.second == 0:

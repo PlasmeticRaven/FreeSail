@@ -445,6 +445,18 @@ class Vessel:
     # crewed promotion. A vessel in a checkpoint from before loads on passage.
     state: str = "on passage"
     saved_plan: list[tuple[Any, ...]] | None = None
+    # the brain on the far body (package 43; spec M6 §4, §19): a vessel given an `intent:`
+    # carries a `captains.FarCaptain`, who judges once a minute from her truth and lays
+    # her plan state by state; a vessel without one sails her goal's plan as before. Her
+    # crewed body while she is promoted (`crews.CrewedWorld`), the tick of her last
+    # dealing with the player (a chase, a hail: the cap's order), and a warning the guard
+    # gives at her making (a leg across the land, a plan that cannot be laid).
+    intent_words: str = ""
+    brain: Any = None
+    crew: Any = None
+    dealing_tick: int = -1
+    warning: str = ""
+    sail_order: str = ""  # a station's sail as a state in the far shape (`crews.far_order`)
 
     @property
     def height_m(self) -> float:
@@ -496,12 +508,33 @@ class Vessel:
         wind = world.wind
         return math.degrees(wind.base_direction) % 360.0, float(wind.base_speed)
 
-    def _state_for(self, wind_kn: float, lying_to: bool) -> str:
+    def _state_for(self, wind_kn: float, lying_to: bool, at_anchor: bool = False) -> str:
+        if at_anchor:
+            return "at anchor"
         if lying_to or wind_kn > LIE_TO_OVER_KN:
             return "lying to"
-        if wind_kn > REEF_OVER_KN:
+        if self.sail_order == "under reefed topsails" or wind_kn > REEF_OVER_KN:
             return "under reefed topsails"
         return "under plain sail"
+
+    def _target_of(self, world: Any, target_id: Any) -> tuple[Position, float, float] | None:
+        """Where a chase's or an evasion's target is now and her way over the ground
+        (metres a second east and north): the player's ship (`captains.PLAYER_ID`), or
+        another vessel; None when she is gone."""
+        from freesail.world.brains import PLAYER_ID
+
+        if target_id == PLAYER_ID:
+            pos = world.position
+            if pos is None:
+                return None
+            east, north = _ship_velocity(world)
+            return pos, east, north
+        other = world.vessels.get(str(target_id)) if target_id else None
+        if other is None or other.done:
+            return None
+        ms = units.knots_to_ms(other.speed_kn)
+        rad = math.radians(other.heading_deg)
+        return other.position, ms * math.sin(rad), ms * math.cos(rad)
 
     def pace_kn(self, course_deg: float, wind_from_deg: float, wind_kn: float) -> float:
         """Her speed through the water on a course in a wind, by her polar and her
@@ -521,6 +554,11 @@ class Vessel:
         way: a pilot cutter steering for where the ship was, beating, fell astern of a
         schooner crossing her at four knots and never came up with her (truth 70)."""
         east, north = _ship_velocity(world)
+        return self._intercept_moving(target, east, north)
+
+    def _intercept_moving(self, target: Position, east: float, north: float) -> Position:
+        """`_intercept` for any target with a way over the ground (package 43: a chase
+        between vessels)."""
         if abs(east) + abs(north) < 0.05:
             return target
         own = max(units.knots_to_ms(max(self.speed_kn, VESSEL_MIN_SPEED_KN)), 0.25)
@@ -574,7 +612,52 @@ class Vessel:
         kind = leg[0]
         wind_from, wind_ms = self._wind_at(world)
         wind_kn = units.ms_to_knots(wind_ms)
-        self.sail_state = self._state_for(wind_kn, kind == "lie_to")
+        self.sail_state = self._state_for(wind_kn, kind == "lie_to", kind == "anchor")
+        if kind == "anchor":
+            # at anchor (package 43, the brain's states): she rides head to wind, no way,
+            # no drift, until her captain weighs
+            self.heading_deg = wind_from % 360.0
+            self.speed_kn = 0.0
+            self.tack = 0.0
+            return
+        if kind in ("chase", "away"):
+            # the brain's chase of a stranger, or her flight from one (package 43): the
+            # target's place now, the course for it or away from it by the polar's rule
+            found = self._target_of(world, leg[1])
+            if found is None:
+                self.plan.pop(0)
+                return
+            pos, east, north = found
+            if kind == "chase":
+                target = self._intercept_moving(pos, east, north)
+                arrive_m = float(leg[2]) * ARRIVE_FRACTION if len(leg) > 2 else units.CABLE
+                bearing, distance = bearing_and_distance(self.position, target)
+                if distance <= arrive_m + 1.0:
+                    return  # within hail: she keeps her distance, and her captain speaks her
+            else:
+                bearing, distance = bearing_and_distance(self.position, pos)
+                bearing = (bearing + 180.0) % 360.0
+                arrive_m = -1.0
+            if self.sail_state == "lying to":
+                self.heading_deg = (wind_from + 90.0) % 360.0
+                self.speed_kn = 0.0
+                self._drift(world, (wind_from + 180.0) % 360.0, units.knots_to_ms(LYING_TO_KN), dt)
+                return
+            course = self._course_for(bearing, wind_from, wind_kn)
+            if self.detail == "near":
+                swing = units.rad_to_deg(units.wrap_pi(math.radians(course - self.heading_deg)))
+                limit = NEAR_TURN_DEG_S * dt
+                course = (self.heading_deg + max(-limit, min(limit, swing))) % 360.0
+            self.heading_deg = course
+            self.speed_kn = self.pace_kn(course, wind_from, wind_kn)
+            step = units.knots_to_ms(self.speed_kn) * dt
+            if kind == "chase" and course == bearing and step >= distance - arrive_m:
+                step = max(0.0, distance - arrive_m)
+            rad = math.radians(course)
+            self.position = self.position.advanced(step * math.sin(rad), step * math.cos(rad))
+            self.distance_run_m += step
+            self._stream(world, dt)
+            return
         if kind == "lie_to":
             self.lying_to_s += dt
             # hove to she drifts to leeward at a knot, as the player does (truth 28)
@@ -714,8 +797,8 @@ class Vessel:
         return 0, "a sail"
 
     def course_words(self) -> str:
-        if self.sail_state == "lying to":
-            return "lying to"
+        if self.sail_state in ("lying to", "at anchor"):
+            return self.sail_state
         point = units.point_name(math.radians(self.heading_deg))
         return f"standing to the {_ward(self.heading_deg)} ({point}), {self.sail_state}"
 
@@ -759,7 +842,7 @@ class Vessel:
         )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d: dict[str, Any] = {
             "id": self.id,
             "name": self.name,
             "kind": self.kind,
@@ -777,6 +860,15 @@ class Vessel:
             "hailed": self.hailed,
             "spoken": self.spoken,  # the book's: a sail spoken is a stranger no more
         }
+        if self.brain is not None:
+            # the brain's record (package 43), on a vessel with an intent only: nothing new
+            # in the pinned form of a vessel without one
+            d["intent"] = self.intent_words
+            d["brain"] = self.brain.to_dict()
+            d["crewed"] = self.crew is not None
+        if self.warning:
+            d["warning"] = self.warning
+        return d
 
 
 # ---------------------------------------------------------------------------
@@ -950,7 +1042,63 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         if plan and len(plan[0]) > 1 and isinstance(plan[0][1], Position)
         else 0.0
     )
+    intent = " ".join(str(spec.get("intent") or "").split())
+    if intent:
+        # the brain on the far body (package 43): her captain, who lays her plan from the
+        # intent over the chart at his first judgement; refused in words when the intent
+        # is none a captain knows
+        from freesail.world.brains import FarCaptain
+
+        vessel.intent_words = intent
+        vessel.brain = FarCaptain(world, vessel, intent)
+        vessel.brain._plan()
+        if vessel.warning:
+            raise ValueError(vessel.warning)
+        crossing = land_crossing(world, vessel.position, vessel.plan)
+        if crossing:
+            # the far-detail guard (spec M6 §19): a captain's plan across the land is
+            # refused at her making, not sailed
+            raise ValueError(f"{name}'s plan {crossing}; give her a way by marks (via)")
+        vessel.heading_deg = (
+            bearing_and_distance(position, vessel.plan[0][1])[0]
+            if vessel.plan and len(vessel.plan[0]) > 1 and isinstance(vessel.plan[0][1], Position)
+            else vessel.heading_deg
+        )
+    else:
+        # the guard's word on a ship without a brain, whose plan is the goal's straight
+        # legs (the recorded passages' dozen are such, and six of them sail across a cape
+        # at far detail: the measurement in docs/dev/TuningNotes.md, package 43); the
+        # driver prints it with the scenario's lines, and nothing of it is in the log
+        crossing = land_crossing(world, vessel.position, vessel.plan)
+        if crossing:
+            vessel.warning = f"her plan {crossing}"
     return vessel
+
+
+def land_crossing(world: Any, start: Position, plan: list[tuple[Any, ...]]) -> str:
+    """The far-detail guard (package 43; spec M6 §19): the first leg of a plan whose
+    straight line crosses dry ground on the chart in words ('crosses the land on the leg
+    to Brest'), or "" when every leg keeps clear or the world has no chart. A leg's first
+    and last cable are not tried (she lies where she lies; a place may be the shore)."""
+    chart = getattr(world, "chart", None)
+    if chart is None:
+        return ""
+    a = start
+    for leg in plan:
+        if len(leg) < 2 or not isinstance(leg[1], Position):
+            continue
+        b = leg[1]
+        try:
+            hit = chart.line_shore(
+                a, b, units.CABLE, skip_start_m=units.CABLE, skip_end_m=units.CABLE
+            )
+        except Exception:  # noqa: BLE001 - beyond the chart's field
+            hit = None
+        if hit is not None and hit[2]:
+            name = str(leg[2]) if len(leg) > 2 and leg[2] else "her mark"
+            return f"crosses the land on the leg to {name}"
+        a = b
+    return ""
 
 
 # ---------------------------------------------------------------------------
@@ -962,10 +1110,21 @@ class Vessels:
     """The vessels of one World, ticked once a game minute (`World.tick`; a near-detail
     vessel every second), and what the lookout can see of them."""
 
+    # Package 43: the player's ship as the far-detail brains see her (`player_shadow`), the
+    # lines the brains' meetings make before the tick records them, and the crewed
+    # promotion's bookkeeping (`crews.promote_and_demote`). Class defaults, so that a
+    # checkpoint from before loads with them.
+    _shadow: Vessel | None = None
+    _spoke_lines: list[tuple[Any, ...]] | None = None
+    crewed_ids: tuple[str, ...] = ()
+
     def __init__(self, world: Any = None) -> None:
         self.world = world
         self.vessels: list[Vessel] = []
         self.serial = 0
+        self._shadow = None
+        self._spoke_lines = []
+        self.crewed_ids = ()
 
     def add(self, vessel: Vessel) -> Vessel:
         """A vessel put on the sea; her nation's colours' words from the table when
@@ -1005,13 +1164,190 @@ class Vessels:
         (`tick_near`). Returns the lines the vessels' own events make (a letter brought
         alongside, a vessel within hail), for the World to record."""
         lines: list[tuple[Any, ...]] = []
+        # the brains judge first, once a minute, from their own truth (package 43): what
+        # each sees of the others is as they stood at the minute's start, as the player's
+        # lookout sees them
+        if self._spoke_lines is None:
+            self._spoke_lines = []
         for v in self.vessels:
-            if v.done or v.detail == "near":
+            if v.done or v.brain is None or (v.crew is not None and v.crew.shape == "full"):
+                continue
+            v.brain.tick()
+        for v in self.vessels:
+            if v.done or v.detail == "near" or (v.crew is not None and v.crew.shape == "full"):
                 continue
             v.tick(world, dt)
+            if v.crew is not None:
+                v.crew.mirror_far()  # a station's World in the far shape follows the move
+        lines.extend(self._spoke_lines)
+        self._spoke_lines = []
         lines.extend(self._promote_and_hail(world))
+        if any(v.brain is not None for v in self.vessels) or self.crewed_ids:
+            # the crewed promotion by the range and the cap (package 43; `world.crews`),
+            # and the director's seats' budgets (spec M6 §23)
+            from freesail.world.crews import enforce_budgets, switch
+
+            switch(world)
+            enforce_budgets(world)
         self.vessels = [v for v in self.vessels if not v.done]
         return lines
+
+    def tick_crews(self, world: Any) -> None:
+        """Every second: each crewed vessel's own World ticked (her physics, her book,
+        her captain, her stations), and her truth mirrored into the far body's record
+        (package 43; `world.crews`); a World kept in the far shape for a seated station
+        mirrors the far body instead."""
+        if not self.crewed_ids:
+            return
+        from freesail.world.crews import mirror
+
+        minute = world.clock.ship_time.second == 0
+        for v in self.vessels:
+            crew = v.crew
+            if crew is None or v.done:
+                continue
+            if crew.shape == "far":
+                crew.far_tick()
+                continue
+            crew.tick()
+            mirror(v, crew, minute)
+
+    # -- what a far-detail brain sees (package 43) ----------------------------------------
+
+    def player_shadow(self, world: Any) -> Vessel | None:
+        """The player's ship as the brains of the other sail see her: a vessel of her
+        file's description under the id `captains.PLAYER_ID`, at her truth, her colours
+        taken as shown, her sail state by her manoeuvre; None on the endless plane. Kept
+        and brought up once a minute; never in `vessels`."""
+        from freesail.world.brains import PLAYER_ID
+        from freesail.world.captains import _is_kings_ship
+
+        pos = getattr(world, "position", None)
+        if pos is None:
+            return None
+        ship = world.ship
+        s = self._shadow
+        if s is None:
+            source = str(getattr(getattr(ship, "spec", None), "source", "") or "")
+            key = ""
+            for k, d in DESCRIPTIONS.items():
+                if source and d["file"].split("/")[-1] == source.replace("\\", "/").split("/")[-1]:
+                    key = k
+                    if k != "merchant brig":
+                        break
+            if key in ("merchant brig", "brig-sloop"):
+                key = "brig-sloop" if _is_kings_ship(world) else "merchant brig"
+            d = description(key) if key else {"file": source, "rig": "a ship", "what": "a ship"}
+            ports = getattr(world, "ports", None)
+            nation_id = str(getattr(ports, "ship_nation", "") or "britain")
+            try:
+                nation = world.nations.get(nation_id)
+            except KeyError:
+                nation = None
+            s = Vessel(
+                id=PLAYER_ID,
+                name=str(getattr(ship, "name", "") or "the ship"),
+                kind=d["rig"],
+                ship_file=d["file"] or source,
+                nation=nation_id,
+                position=pos,
+                colours=getattr(nation, "colours", ""),
+                flag=getattr(nation, "flag", ""),
+                nation_adjective=getattr(nation, "adjective", ""),
+                description=key,
+                what=d["what"],
+            )
+            self._shadow = s
+        s.position = pos
+        s.heading_deg = units.rad_to_deg(float(ship.heading)) % 360.0
+        s.speed_kn = units.ms_to_knots(_ship_speed_ms(ship))
+        manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")
+        if getattr(world, "at_anchor", False):
+            s.sail_state = "at anchor"
+        elif manoeuvre in ("hove to", "heaving to"):
+            s.sail_state = "lying to"
+        else:
+            s.sail_state = "under plain sail"
+        return s
+
+    def strangers_of(
+        self, world: Any, vessel: Vessel, spoken: set[str], glass_for: str | None = None
+    ) -> list[dict[str, Any]]:
+        """The sail in sight from a vessel's masthead, in the form the captain's
+        `strangers` reading gives (package 43, `captains.Perception.of_vessel`): every
+        other vessel and the player's ship within the horizon her rig's height and the
+        other's give, within the player's visibility, by day (at night close aboard, as
+        the land is), each made out at the lookout's distances by eye (the glass aloft for
+        the one her captain has in hand), her nation when her colours are shown and made
+        out, `spoken` for a sail spoken; the distance is her truth, nearest first."""
+        from freesail.world.chart import NIGHT_LAND_NM
+        from freesail.world.lookout import relative_words
+
+        conditions = getattr(world, "conditions", None)
+        vis_nm = float(conditions.visibility_nm) if conditions is not None else math.inf
+        daylight = str(world.daylight)
+        pos, eye = vessel.position, vessel.height_m
+        heading = math.radians(vessel.heading_deg)
+        items: list[dict[str, Any]] = []
+        others: list[Vessel] = [o for o in self.vessels if o is not vessel and not o.done]
+        shadow = self.player_shadow(world)
+        if shadow is not None:
+            others.append(shadow)
+        for o in others:
+            bearing, distance = bearing_and_distance(pos, o.position)
+            nm = distance / units.NAUTICAL_MILE
+            limit = min(vis_nm, horizon_nm(eye, o.height_m))
+            if o.seen_within_nm is not None:
+                limit = min(limit, o.seen_within_nm)
+            if daylight != "day":
+                limit = min(limit, NIGHT_LAND_NM)
+            if nm > limit:
+                continue
+            level, _ = o.made_out(distance, glass=(o.id == glass_for))
+            colours = level >= 2 and o.shows_colours and bool(o.nation_adjective)
+            items.append(
+                {
+                    "id": o.id,
+                    "bearing_deg": round(bearing, 1),
+                    "bearing": units.point_name(math.radians(bearing)),
+                    "relative": relative_words(math.radians(bearing) - heading),
+                    "estimate_m": round(distance),
+                    "made_out": level,
+                    "known": o.words_at(level),
+                    "nation": o.nation if colours else None,
+                    "spoken": o.id in spoken,
+                    "size": _size_of(o),
+                }
+            )
+        items.sort(key=lambda s: s["estimate_m"])
+        return items
+
+    def spoke(self, a: Vessel, b_id: str) -> None:
+        """Two sail within hail of one another, one of them speaking the other (package
+        43; the owner's note 19: a word in the log at hailing distance): a routine line
+        when the player's lookout has both in sight, in the words he has for them; nothing
+        otherwise, since a meeting beyond his horizon is no line of his log."""
+        from freesail.core.events import Severity
+
+        world = self.world
+        lookout = getattr(world, "lookout", None)
+        if lookout is None or self._spoke_lines is None:
+            return
+        seen = getattr(lookout, "_sails_seen", {}) or {}
+        wa, wb = seen.get(f"sail:{a.id}"), seen.get(f"sail:{b_id}")
+        if not wa or not wb:
+            return
+        brain = a.brain
+        hail = brain.doctrine.threshold("hail", "") if brain is not None and brain.doctrine else ""
+        said = f" {wa} hails her" + (f": {hail!r}" if hail else "") + "."
+        self._spoke_lines.append(
+            (
+                Severity.ROUTINE,
+                "sail.spoke",
+                f"{wa} and {wb[:1].lower() + wb[1:]} are within hail of one another.{said}",
+                {"id": a.id, "other": b_id},
+            )
+        )
 
     def tick_near(self, world: Any, dt: float = 1.0) -> list[tuple[Any, ...]]:
         """Every second: the near-detail vessels only."""
@@ -1042,10 +1378,26 @@ class Vessels:
                 v.promote(True)
             elif v.detail == "near" and nm > NEAR_DEMOTE_NM:
                 v.promote(False)
+            brain = v.brain
+            if brain is not None and (
+                nm <= HAIL_NM
+                or (
+                    brain._stranger == _player_id()
+                    and brain.state in ("investigating a stranger", "chasing", "evading")
+                )
+            ):
+                # in dealings with the player (package 43): a chase, a hail; the cap's order
+                v.dealing_tick = world.clock.tick
             if nm <= HAIL_NM and not v.hailed:
                 v.hailed = True
                 v.spoken = True
                 words = v.what or v.name
+                hail = ""
+                if brain is not None:
+                    # her captain speaks the ship (package 43; the owner's note 19)
+                    brain.speak(_player_id())
+                    said = brain.doctrine.threshold("hail", "") if brain.doctrine else ""
+                    hail = f" She hails: {said!r}." if said else ""
                 if v.letter is not None:
                     v.alongside = True
                     lines.append(
@@ -1066,7 +1418,7 @@ class Vessels:
                             Severity.NOTABLE,
                             "sail.within_hail",
                             f"{_head(words)} is within hail, {v.course_words()}; "
-                            f"{v.colours_words()}.",
+                            f"{v.colours_words()}.{hail}",
                             {"id": v.id, "letter": False},
                         )
                     )
@@ -1101,6 +1453,30 @@ class Vessels:
 
     def to_dict(self) -> list[dict[str, Any]]:
         return [v.to_dict() for v in self.vessels]
+
+
+def _player_id() -> str:
+    from freesail.world.brains import PLAYER_ID
+
+    return PLAYER_ID
+
+
+def _size_of(v: Vessel) -> int:
+    """A vessel's class for a cruiser's judgement of a superior force (package 43;
+    `captains.SIZE_RANK`): by her description, or her file's where she has none (the
+    pilot's cutter)."""
+    from freesail.world.captains import SIZE_RANK, size_of_file
+
+    if v.description:
+        return SIZE_RANK.get(v.description, 0)
+    return size_of_file(v.ship_file)
+
+
+def _ship_speed_ms(ship: Any) -> float:
+    dyn = getattr(ship, "dyn", None)
+    if dyn is not None:
+        return float(getattr(dyn, "speed", 0.0) or 0.0)
+    return float(getattr(ship, "speed", 0.0) or 0.0)
 
 
 def _ship_velocity(world: Any) -> tuple[float, float]:

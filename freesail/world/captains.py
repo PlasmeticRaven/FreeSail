@@ -86,6 +86,7 @@ __all__ = [
     "Captain",
     "Doctrine",
     "Intent",
+    "Judgement",
     "Leg",
     "Perception",
     "split_via",
@@ -96,8 +97,8 @@ __all__ = [
     "load_tracks",
     "plain_position",
     "read_intent",
-    "resolve_state",
     "role_for",
+    "size_of_words",
     "state_of_actor",
 ]
 
@@ -120,8 +121,10 @@ STATES: tuple[str, ...] = (
     "engaging",
 )
 
-# The roles the doctrine files give (the fisherman is 43b's).
-ROLES: tuple[str, ...] = ("kings-ship", "merchant", "packet", "commodore")
+# The roles the doctrine files give (the fisherman is 43b's); the cruiser (package 43) is
+# the small man-of-war on passage, a brig-sloop or a cutter of the Navy, who makes out a
+# stranger, chases what she can fight and hauls off from what she cannot.
+ROLES: tuple[str, ...] = ("kings-ship", "merchant", "packet", "commodore", "cruiser")
 
 # The kinds of intent the captain reads.
 INTENT_KINDS: tuple[str, ...] = ("trade", "station", "letter", "home", "passage")
@@ -157,10 +160,52 @@ CAPTAIN_ON_DECK_STATES: frozenset[str] = frozenset(
     }
 )
 
-# The states the far-detail body resolves in this package (spec M6 §4, "one brain, two
-# bodies"; 43 fills the rest with the crewed promotion): on passage is her plan, hove to
-# is no way.
+# The states the far-detail body resolves without a brain (spec M6 §4, "one brain, two
+# bodies"; package 40): on passage is her plan, hove to is no way. A vessel with a brain
+# (`brains.FarCaptain`, package 43) resolves every state of the machine
+# (`brains.resolve_state`); the brain lives in `freesail.world.brains`, apart from this
+# module, which reads no truth (see `tests/test_captains.py`).
 FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather")
+
+# The class of a hull by what the tops make out of her, for the cruiser's judgement of a
+# superior force (`overmatched`): a frigate over a brig over a schooner or a cutter
+# (judgement on the catalogue's hierarchy of size, spec M5 §25; the guns are M7's).
+SIZE_RANK: dict[str, int] = {
+    "frigate": 3,
+    "brig-sloop": 2,
+    "merchant brig": 2,
+    "schooner": 1,
+    "cutter": 1,
+}
+_SIZE_WORDS: tuple[tuple[str, int], ...] = (
+    ("frigate", 3),
+    ("a ship", 3),
+    ("brig", 2),
+    ("schooner", 1),
+    ("cutter", 1),
+)
+
+
+def size_of_words(known: str) -> int:
+    """The class of a sail from the lookout's words for her ('a brig-sloop of war,
+    sixteen ports a side, standing ...'): nought while she is 'a sail'."""
+    head = str(known or "").split(",")[0].split(";")[0].lower()
+    for word, rank in _SIZE_WORDS:
+        if word in head:
+            return rank
+    return 0
+
+
+def size_of_file(ship_file: Any) -> int:
+    """The class of the player's own ship by her file (`ships.DESCRIPTIONS`)."""
+    from freesail.world.ships import DESCRIPTIONS
+
+    name = Path(str(ship_file or "")).name
+    for key, d in DESCRIPTIONS.items():
+        if Path(d["file"]).name == name:
+            return SIZE_RANK.get(key, 0)
+    return 0
+
 
 # The rule of the road's reach: a few cables (judgement; the hail is at four).
 ROAD_CABLES = 3.0
@@ -1060,11 +1105,13 @@ class Planner:
 # ---------------------------------------------------------------------------
 
 
-def _lee_land_nm(world: Any, p: Perception) -> float | None:
+def _lee_land_nm(world: Any, p: Perception, here: Position | None = None) -> float | None:
     """The nearest land within the lee sector, in miles: the lookout's land when it bears
     within the sector, and the chart's coast along rays from the account a point apart
     through it (`LEE_SECTOR_POINTS` either side of dead to leeward, `LEE_RAY_NM` long);
-    None with no wind, no account or nothing within the rays."""
+    None with no wind, no account or nothing within the rays. `here` is the point the
+    rays are cast from when it is not the player's account (a far-detail vessel's own
+    truth, package 43)."""
     if p.wind_from_deg is None:
         return None
     toward = (p.wind_from_deg + 180.0) % 360.0
@@ -1074,14 +1121,17 @@ def _lee_land_nm(world: Any, p: Perception) -> float | None:
     if p.nearest_land_nm is not None and land is not None:
         if abs(units.wrap_pi(math.radians(land - toward))) < half:
             best = p.nearest_land_nm
-    nav = getattr(world, "navigation", None)
     chart = getattr(world, "chart", None)
-    if nav is None or chart is None:
+    if chart is None:
         return best
-    try:
-        here = nav.account_now()
-    except Exception:  # noqa: BLE001 - no account yet
-        here = None
+    if here is None:
+        nav = getattr(world, "navigation", None)
+        if nav is None:
+            return best
+        try:
+            here = nav.account_now()
+        except Exception:  # noqa: BLE001 - no account yet
+            here = None
     if here is None:
         return best
     reach = LEE_RAY_NM * units.NAUTICAL_MILE
@@ -1150,11 +1200,15 @@ class Perception:
     courses_set: bool = True
     pilot_conn: bool = False
     reach_nm: float = IN_PORT_NM
+    # package 43: her own class and each stranger's (`SIZE_RANK`), for a cruiser's judgement
+    # of a superior force; the port she lies off, for a far-detail body
+    own_size: int = 0
 
     @classmethod
     def read(cls, world: Any) -> Perception:
         view = world.readings
         p = cls(tick=world.clock.tick, now=world.clock.ship_time)
+        p.own_size = size_of_file(getattr(getattr(world.ship, "spec", None), "source", ""))
         wind = view.value("mean_true_wind_speed")
         if wind is None:
             wind = view.value("true_wind_speed")
@@ -1207,7 +1261,12 @@ class Perception:
             p.lee_land_nm = _lee_land_nm(world, p)
         strangers = view.value("strangers")
         if isinstance(strangers, dict):
-            p.strangers = list(strangers.get("items") or [])
+            # each with her class by the lookout's words (package 43), on a copy: the
+            # reading's own items are the registry's
+            p.strangers = [
+                dict(s, size=size_of_words(str(s.get("known") or "")))
+                for s in (strangers.get("items") or [])
+            ]
         port = view.value("port")
         if isinstance(port, dict):
             p.port_distance_nm = port.get("distance_nm")
@@ -1338,10 +1397,272 @@ STIMULI: tuple[str, ...] = (
     "aground",
     "afloat",
     "cargo done",
+    # package 43 (the cruiser's doctrine): an enemy of a bigger class within the hostile
+    # distance; a stranger within `investigate_nm` of a ship on passage; a chase that has
+    # not closed in `chase_stale_hours`
+    "overmatched",
+    "stranger near",
+    "chase stale",
 )
 
 
-class Captain:
+class Judgement:
+    """The brain's judgement, shared by the two bodies (spec M6 §4, "one brain, two
+    bodies"; package 43): the weather's trend and the doctrine's transitions on a
+    `Perception`, whoever built it. `Captain` (the near body: the player's ship or a
+    promoted vessel, whose doings are orders) and `FarCaptain` (the far body, whose
+    doings are a plan) both carry a `doctrine`, a `state`, a `trend`, the wind's log, the
+    stranger in hand and a `_business` dict, and each gives the few hooks the stimuli
+    ask of its body (`_inner_leg`, `_waiting_at_road`, `_shelter_port`, `_nearest_enemy`,
+    `_is_enemy`, `_ready_for_sea`, `_enter`)."""
+
+    doctrine: Doctrine | None
+    state: str | None
+    trend: str
+    intent: Intent | None
+    _stranger: str | None
+    _gale_over_since: int | None
+    _wind_log: list[tuple[int, float]]
+    _business: dict[str, Any]
+    _waiting_at_road: bool
+    # the strangers this captain has done with (package 43): a chase given up as stale is
+    # not taken up again while she is in sight, as a sail spoken is a stranger no more
+    given_up: set[str] = frozenset()  # type: ignore[assignment]
+
+    def _inner_leg(self) -> bool:
+        return False
+
+    def _spoken(self, s: dict[str, Any]) -> bool:
+        """Whether a sail is a stranger no more to this captain: spoken within hail (the
+        lookout's flag), or her chase given up (`given_up`)."""
+        sid = str(s.get("id") or "")
+        return (
+            bool(s.get("spoken"))
+            or sid in (self.given_up or ())
+            or sid in (getattr(self, "spoken_ids", None) or ())
+        )
+
+    def _unspoken(self, p: Perception) -> list[dict[str, Any]]:
+        return [s for s in p.strangers if not self._spoken(s)]
+
+    def _read_trend(self, p: Perception) -> str:
+        """The weather's trend (package 45, Part B item 6): "worsening" when the glass is
+        falling fast or the wind has risen by a force (`worsening_wind_kn`) within the
+        hour; "mending" when the glass is rising or the wind has eased by as much; else
+        "". Luce 1884 ch. XXVIII on the barometer as the instrument of warning, and
+        FitzRoy's rules of the glass (a rapid fall, a blow soon; "long foretold, long
+        last"); the force's knots and the hour judgement."""
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        self._wind_log.append((p.tick, p.wind_kn))
+        self._wind_log = [x for x in self._wind_log if p.tick - x[0] <= TREND_HOUR_S]
+        risen = p.wind_kn - self._wind_log[0][1]
+        worsening = p.glass_falling_fast or risen >= float(th("worsening_wind_kn", 6))
+        mending = p.glass_tendency in ("rising", "rising fast") or risen <= -float(
+            th("mending_wind_kn", 6)
+        )
+        self.trend = "worsening" if worsening else "mending" if mending else ""
+        # the gale-over line as the trend moves it, and how long the wind has stood under
+        # it: sooner by `mending_sooner_kn` with the glass rising, lower by
+        # `worsening_sooner_kn` with the glass falling (as the gale line is), so that the
+        # two lines keep their band apart
+        line = float(th("gale_over_kn", 28))
+        if self.trend == "mending":
+            line += float(th("mending_sooner_kn", 4))
+        elif self.trend == "worsening":
+            line -= float(th("worsening_sooner_kn", 6))
+        if p.wind_kn < line:
+            if self._gale_over_since is None:
+                self._gale_over_since = p.tick
+        else:
+            self._gale_over_since = None
+        self._read_chase(p)
+        return self.trend
+
+    def _read_chase(self, p: Perception) -> None:
+        """The chase's log (package 43): the stranger in hand's distance at each
+        judgement while she is chased or closed, for the `chase stale` stimulus (a chase
+        that has not closed in `chase_stale_hours` is given up: the trials' two captains
+        chased and ran for fifteen hours without a cable gained)."""
+        log = getattr(self, "_chase_log", None)
+        if log is None:
+            log = self._chase_log = []
+        if self.state not in ("investigating a stranger", "chasing") or self._stranger is None:
+            log.clear()
+            return
+        for s in p.strangers:
+            if s.get("id") == self._stranger and s.get("estimate_m") is not None:
+                if log and log[-1][2] != self._stranger:
+                    log.clear()
+                log.append((p.tick, float(s["estimate_m"]), self._stranger))
+                return
+
+    def _chase_stale(self, hours: float) -> bool:
+        log = getattr(self, "_chase_log", None) or []
+        if len(log) < 2:
+            return False
+        span = hours * 3600.0
+        if log[-1][0] - log[0][0] < span:
+            return False
+        then = next(d for t, d, _ in log if log[-1][0] - t <= span)
+        return log[-1][1] >= then - units.NAUTICAL_MILE
+
+    def _transitions(self, p: Perception) -> None:
+        if self.doctrine is None or self.state is None:
+            return
+        for t in self.doctrine.from_state(self.state):
+            if self._stimulus(t.on, p) and not (t.unless and self._stimulus(t.unless, p)):
+                if t.on == "chase stale" and self._stranger is not None:
+                    # the chase given up: she is done with, and not closed again in sight
+                    if not isinstance(self.given_up, set):
+                        self.given_up = set()
+                    self.given_up.add(str(self._stranger))
+                self._enter(t.to)
+                return
+
+    def _overmatched(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
+        """An enemy of a bigger class than her own within `within_nm` (package 43, the
+        cruiser's judgement of a superior force), by what the tops have made out."""
+        enemies = [
+            s
+            for s in p.strangers
+            if self._is_enemy(s)
+            and not self._spoken(s)
+            and s.get("estimate_m") is not None
+            and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
+            and int(s.get("size") or 0) > int(p.own_size or 0)
+        ]
+        if not enemies:
+            return None
+        return min(enemies, key=lambda s: float(s["estimate_m"]))
+
+    def _stimulus(self, name: str, p: Perception) -> bool:
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        # the glass as a stimulus (package 45, Part B item 6): worsening brings the
+        # heavy-weather rows a step sooner, mending the fair-weather rows
+        # (a first version widened the sea room and the lee shore by half as well when the
+        # glass fell: on the station fifteen miles off Ushant that put the station itself
+        # inside the no-sea-room line, and she hove to and filled away by turns all the
+        # forenoon of the gale trial; the two lines stand as the doctrine gives them)
+        sooner = float(th("worsening_sooner_kn", 6)) if self.trend == "worsening" else 0.0
+        if name == "weather worsening":
+            return self.trend == "worsening"
+        if name == "weather mending":
+            return self.trend == "mending"
+        if name == "gale":
+            return p.wind_kn >= float(th("gale_kn", 34)) - sooner and p.manoeuvre not in (
+                "hove to",
+                "heaving to",
+            )
+        if name == "gale over":
+            # under the line for `gale_over_minutes` together, not on a lull (the first
+            # version filled her away ten minutes after she hove to, on a lull of the
+            # gusty wind, and she thrashed between the two books all the forenoon of the
+            # station trial); and while the glass falls the line comes down with the gale
+            # line, so that the band between them is never narrowed to a gust's width
+            since = self._gale_over_since
+            minutes = float(th("gale_over_minutes", 10))
+            return since is not None and p.tick - since >= minutes * 60.0
+        if name == "lee shore":
+            # the land within the lee sector (`_lee_land_nm`: the lookout's land when it
+            # bears so, and the chart's coast along the account's rays through the sector)
+            return p.lee_land_nm is not None and p.lee_land_nm <= float(th("lee_shore_nm", 6))
+        if name == "no sea room":
+            # the land to leeward within the sea room a night's drift hove to wants
+            # (package 40c): she heaves to only with sea room, and leaves it for a lee
+            # shore within `lee_shore_nm`, the two thresholds apart so that she does not
+            # heave to and fill away by turns at one line
+            return p.lee_land_nm is not None and p.lee_land_nm <= float(th("sea_room_nm", 10))
+        if name == "thick near the land":
+            thick = p.visibility in ("a mile", "a cable")
+            dist = p.nearest_land_nm if p.nearest_land_nm is not None else p.coast_by_account_nm
+            near = dist is not None and dist < float(th("shelter_land_nm", 12))
+            return thick and near and self._shelter_port(p) is not None
+        if name == "weather clear":
+            return p.visibility not in ("a mile", "a cable")
+        if name == "hostile stranger":
+            return self._nearest_enemy(p, float(th("stranger_hostile_nm", 6))) is not None
+        if name == "overmatched":
+            return self._overmatched(p, float(th("stranger_hostile_nm", 6))) is not None
+        if name == "stranger":
+            return any(not self._spoken(s) for s in p.strangers)
+        if name == "stranger near":
+            within = float(th("investigate_nm", 10))
+            return any(
+                not self._spoken(s)
+                and s.get("estimate_m") is not None
+                and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within
+                for s in p.strangers
+            )
+        if name == "chase stale":
+            return self._chase_stale(float(th("chase_stale_hours", 3)))
+        if name == "stranger lost":
+            if self._stranger is None:
+                return not p.strangers
+            return not any(
+                s.get("id") == self._stranger and not self._spoken(s) for s in p.strangers
+            )
+        if name == "stranger spoken":
+            return any(s.get("id") == self._stranger and self._spoken(s) for s in p.strangers)
+        if name == "enemy made out":
+            return any(
+                s.get("id") == self._stranger and self._is_enemy(s) for s in p.strangers
+            ) or any(
+                s.get("id") == self._stranger
+                and s.get("made_out", 0) >= 2
+                and s.get("nation") is None
+                for s in p.strangers
+            )
+        if name == "friend made out":
+            return any(
+                s.get("id") == self._stranger and s.get("nation") and not self._is_enemy(s)
+                for s in p.strangers
+            )
+        if name == "course not laid":
+            # in pilot water a foul wind is waited out at anchor, not beaten (`_passage`)
+            return bool(self._business.get("course_not_laid")) and not self._inner_leg()
+        if name == "course laid":
+            return not self._business.get("course_not_laid")
+        if name == "at the road":
+            return bool(self._waiting_at_road)
+        if name == "under way":
+            return not p.anchor_down and not p.aground and not p.anchoring
+        if name == "anchored":
+            return p.anchor_down
+        if name == "anchored in port":
+            return p.anchor_down and bool(p.in_port)
+        if name == "sheltered":
+            return p.anchor_down
+        if name == "aground":
+            return p.aground
+        if name == "afloat":
+            return not p.aground
+        if name == "ready for sea":
+            return self._ready_for_sea(p)
+        if name == "cargo done":
+            return bool(self.intent and self.intent.done)
+        return False
+
+    # the hooks each body gives (the near body's are `Captain`'s own methods)
+
+    def _enter(self, state: str) -> None:  # pragma: no cover - the bodies' own
+        raise NotImplementedError
+
+    def _shelter_port(self, p: Perception) -> Any:
+        return None
+
+    def _is_enemy(self, s: dict[str, Any]) -> bool:
+        return False
+
+    def _nearest_enemy(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
+        return None
+
+    def _ready_for_sea(self, p: Perception) -> bool:
+        return False
+
+
+class Captain(Judgement):
     """The rules-based captain of the player's ship: named after the person who commands
     her, with the scenario's book or his intent; the state machine, the plan and the
     doctrine; and the stand-in for a model at the captain's station."""
@@ -1379,6 +1700,7 @@ class Captain:
         self._entry_stop: int | None = None  # the inner leg he anchors at, the wind foul beyond
         self._stranger: str | None = None
         self._departing = ""  # the port she sails from, for the plan's first legs
+        self.given_up: set[str] = set()  # the chases given up (package 43)
         self.error = ""
         if self.intent_words:
             try:
@@ -1817,144 +2139,7 @@ class Captain:
         elif state == "evading":
             self._haul_off(Perception.read(world))
 
-    # -- the doctrine's transitions ----------------------------------------------------
-
-    def _read_trend(self, p: Perception) -> str:
-        """The weather's trend (package 45, Part B item 6): "worsening" when the glass is
-        falling fast or the wind has risen by a force (`worsening_wind_kn`) within the
-        hour; "mending" when the glass is rising or the wind has eased by as much; else
-        "". Luce 1884 ch. XXVIII on the barometer as the instrument of warning, and
-        FitzRoy's rules of the glass (a rapid fall, a blow soon; "long foretold, long
-        last"); the force's knots and the hour judgement."""
-        d = self.doctrine
-        th = d.threshold if d is not None else (lambda k, v=None: v)
-        self._wind_log.append((p.tick, p.wind_kn))
-        self._wind_log = [x for x in self._wind_log if p.tick - x[0] <= TREND_HOUR_S]
-        risen = p.wind_kn - self._wind_log[0][1]
-        worsening = p.glass_falling_fast or risen >= float(th("worsening_wind_kn", 6))
-        mending = p.glass_tendency in ("rising", "rising fast") or risen <= -float(
-            th("mending_wind_kn", 6)
-        )
-        self.trend = "worsening" if worsening else "mending" if mending else ""
-        # the gale-over line as the trend moves it, and how long the wind has stood under
-        # it: sooner by `mending_sooner_kn` with the glass rising, lower by
-        # `worsening_sooner_kn` with the glass falling (as the gale line is), so that the
-        # two lines keep their band apart
-        line = float(th("gale_over_kn", 28))
-        if self.trend == "mending":
-            line += float(th("mending_sooner_kn", 4))
-        elif self.trend == "worsening":
-            line -= float(th("worsening_sooner_kn", 6))
-        if p.wind_kn < line:
-            if self._gale_over_since is None:
-                self._gale_over_since = p.tick
-        else:
-            self._gale_over_since = None
-        return self.trend
-
-    def _transitions(self, p: Perception) -> None:
-        if self.doctrine is None or self.state is None:
-            return
-        for t in self.doctrine.from_state(self.state):
-            if self._stimulus(t.on, p) and not (t.unless and self._stimulus(t.unless, p)):
-                self._enter(t.to)
-                return
-
-    def _stimulus(self, name: str, p: Perception) -> bool:
-        d = self.doctrine
-        th = d.threshold if d is not None else (lambda k, v=None: v)
-        # the glass as a stimulus (package 45, Part B item 6): worsening brings the
-        # heavy-weather rows a step sooner, mending the fair-weather rows
-        # (a first version widened the sea room and the lee shore by half as well when the
-        # glass fell: on the station fifteen miles off Ushant that put the station itself
-        # inside the no-sea-room line, and she hove to and filled away by turns all the
-        # forenoon of the gale trial; the two lines stand as the doctrine gives them)
-        sooner = float(th("worsening_sooner_kn", 6)) if self.trend == "worsening" else 0.0
-        if name == "weather worsening":
-            return self.trend == "worsening"
-        if name == "weather mending":
-            return self.trend == "mending"
-        if name == "gale":
-            return p.wind_kn >= float(th("gale_kn", 34)) - sooner and p.manoeuvre not in (
-                "hove to",
-                "heaving to",
-            )
-        if name == "gale over":
-            # under the line for `gale_over_minutes` together, not on a lull (the first
-            # version filled her away ten minutes after she hove to, on a lull of the
-            # gusty wind, and she thrashed between the two books all the forenoon of the
-            # station trial); and while the glass falls the line comes down with the gale
-            # line, so that the band between them is never narrowed to a gust's width
-            since = self._gale_over_since
-            minutes = float(th("gale_over_minutes", 10))
-            return since is not None and p.tick - since >= minutes * 60.0
-        if name == "lee shore":
-            # the land within the lee sector (`_lee_land_nm`: the lookout's land when it
-            # bears so, and the chart's coast along the account's rays through the sector)
-            return p.lee_land_nm is not None and p.lee_land_nm <= float(th("lee_shore_nm", 6))
-        if name == "no sea room":
-            # the land to leeward within the sea room a night's drift hove to wants
-            # (package 40c): she heaves to only with sea room, and leaves it for a lee
-            # shore within `lee_shore_nm`, the two thresholds apart so that she does not
-            # heave to and fill away by turns at one line
-            return p.lee_land_nm is not None and p.lee_land_nm <= float(th("sea_room_nm", 10))
-        if name == "thick near the land":
-            thick = p.visibility in ("a mile", "a cable")
-            dist = p.nearest_land_nm if p.nearest_land_nm is not None else p.coast_by_account_nm
-            near = dist is not None and dist < float(th("shelter_land_nm", 12))
-            return thick and near and self._shelter_port(p) is not None
-        if name == "weather clear":
-            return p.visibility not in ("a mile", "a cable")
-        if name == "hostile stranger":
-            return self._nearest_enemy(p, float(th("stranger_hostile_nm", 6))) is not None
-        if name == "stranger":
-            return any(not s.get("spoken") for s in p.strangers)
-        if name == "stranger lost":
-            if self._stranger is None:
-                return not p.strangers
-            return not any(
-                s.get("id") == self._stranger and not s.get("spoken") for s in p.strangers
-            )
-        if name == "stranger spoken":
-            return any(s.get("id") == self._stranger and s.get("spoken") for s in p.strangers)
-        if name == "enemy made out":
-            return any(
-                s.get("id") == self._stranger and self._is_enemy(s) for s in p.strangers
-            ) or any(
-                s.get("id") == self._stranger
-                and s.get("made_out", 0) >= 2
-                and s.get("nation") is None
-                for s in p.strangers
-            )
-        if name == "friend made out":
-            return any(
-                s.get("id") == self._stranger and s.get("nation") and not self._is_enemy(s)
-                for s in p.strangers
-            )
-        if name == "course not laid":
-            # in pilot water a foul wind is waited out at anchor, not beaten (`_passage`)
-            return bool(self._business.get("course_not_laid")) and not self._inner_leg()
-        if name == "course laid":
-            return not self._business.get("course_not_laid")
-        if name == "at the road":
-            return bool(self._waiting_at_road)
-        if name == "under way":
-            return not p.anchor_down and not p.aground and not p.anchoring
-        if name == "anchored":
-            return p.anchor_down
-        if name == "anchored in port":
-            return p.anchor_down and bool(p.in_port)
-        if name == "sheltered":
-            return p.anchor_down
-        if name == "aground":
-            return p.aground
-        if name == "afloat":
-            return not p.aground
-        if name == "ready for sea":
-            return self._ready_for_sea(p)
-        if name == "cargo done":
-            return bool(self.intent and self.intent.done)
-        return False
+    # -- the doctrine's transitions: `Judgement` (the mixin shared with the far body) --
 
     # -- the work of each state ---------------------------------------------------------
 
@@ -2561,7 +2746,7 @@ class Captain:
             self._stranger = near.get("id") if near else None
 
     def _nearest_stranger(self, p: Perception) -> dict[str, Any] | None:
-        items = [s for s in p.strangers if not s.get("spoken")]
+        items = self._unspoken(p)
         if not items:
             return None
         return min(items, key=lambda s: s.get("estimate_m") or math.inf)
@@ -2580,7 +2765,7 @@ class Captain:
             s
             for s in p.strangers
             if self._is_enemy(s)
-            and not s.get("spoken")
+            and not self._spoken(s)
             and s.get("estimate_m") is not None
             and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
         ]
@@ -2743,32 +2928,14 @@ def _road_rule(ours: dict[str, Any], hers: dict[str, Any]) -> tuple[str, str]:
     return "", "neither by the wind; we stand on"
 
 
-# ---------------------------------------------------------------------------
-# The far-detail body as an interface (spec M6 §4, §19; 43 fills it)
-# ---------------------------------------------------------------------------
+# The far-detail brain's names, reached here for the callers that know the brain by this
+# module (package 43): `freesail.world.brains` imports this module, so it is loaded late.
+_BRAINS = ("FarCaptain", "PLAYER_ID", "perceive_vessel", "resolve_state", "role_of_vessel")
 
 
-def resolve_state(vessel: Any, state: str) -> bool:
-    """The state machine's state resolved into a far-detail plan on a vessel of
-    `freesail.world.ships` (one brain, two bodies): `hove to for weather` is no way, she
-    lies to until told otherwise; `on passage` is her goal's plan, kept. The other
-    states are 43's with the crewed promotion, and are refused here (False) so that no
-    body is moved by a state it cannot resolve. Returns whether the state was resolved."""
-    if state not in STATES:
-        raise ValueError(f"'{state}' is no state of the machine.")
-    if state not in FAR_DETAIL_STATES:
-        return False
-    if state == "hove to for weather":
-        if vessel.state != state:
-            vessel.saved_plan = list(vessel.plan)
-            vessel.plan = [("lie_to", math.inf)]
-    elif state == "on passage":
-        if (
-            vessel.state == "hove to for weather"
-            and getattr(vessel, "saved_plan", None) is not None
-        ):
-            vessel.plan = list(vessel.saved_plan)
-            vessel.saved_plan = None
-            vessel.lying_to_s = 0.0
-    vessel.state = state
-    return True
+def __getattr__(name: str) -> Any:
+    if name in _BRAINS:
+        from freesail.world import brains
+
+        return getattr(brains, name)
+    raise AttributeError(name)

@@ -54,7 +54,9 @@ weather:
   sea: true
 
 world_orders:
-  - {at: 1805-06-14T05:00, order: 'ship: a brig-sloop "Renard" of France at 49 22 N 5 21 W, bound for 49 50 N 5 00 W'}
+  # package 43: the privateer has a brain (the cruiser's doctrine) and an intent of her
+  # own: she makes out the schooner, an enemy she can fight, and chases; the merchant evades
+  - {at: 1805-06-14T05:00, order: 'ship: a brig-sloop "Renard" of France at 49 22 N 5 21 W, bound for 49 50 N 5 00 W, intent: bound for 49 50 N 5 00 W'}
 
 orders:
   - set plain sail

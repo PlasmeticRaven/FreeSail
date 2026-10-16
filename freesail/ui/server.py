@@ -134,6 +134,7 @@ from freesail.core.world import UNLOGGED_KINDS, World
 from freesail.ui.console import (
     ALARM_SPEED,
     FREE_RUNNING_HELP,
+    LIVE_WORLD_ORDER_SOURCE,
     PACE_FREE,
     PACE_LOCKSTEP,
     PACE_RULE,
@@ -148,6 +149,7 @@ from freesail.ui.console import (
     check_agents_unattended,
     clamp_compression,
     eased_words,
+    live_world_order,
     loaded_words,
     read_standing_orders,
     read_standing_orders_path,
@@ -443,6 +445,13 @@ class Driver:
             if path is not None:
                 # `save PATH`, as in the console: writing the disk is the driver's too
                 return self._save(path)
+            live = live_world_order(text)
+            if live is not None:
+                # the live world order (package 43; spec M6 §23): the owner's, as at the console
+                e = self.world.world_order(live, source=LIVE_WORLD_ORDER_SOURCE)
+                if not self._ease_for_station():
+                    self.emit_snapshot()
+                return e
             seat = getattr(self.world, "player_seat", None)
             if seat is not None and not seat.agent.released:
                 # the player's seat at a station (package 40): the line is the owner's
@@ -781,11 +790,14 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
 
     # Each call that reads, speaks or orders for a station carries its seating's key
     # (package 37g, item 1; `remote.Desk`): `key` in the query of a GET and in the body of
-    # a POST. A call without it is refused in words (409), and nothing is run.
+    # a POST. A call without it is refused in words (409), and nothing is run. A station
+    # on another ship (package 43) names her with `ship`, in the query or the body.
 
     @router.get("/api/agents/{station}/turns")
-    def api_turns(station: str, since: int = 0, wait: float = 0.0, key: str = "") -> JSONResponse:
-        return call(desk.turns, station, since, wait, key)
+    def api_turns(
+        station: str, since: int = 0, wait: float = 0.0, key: str = "", ship: str = ""
+    ) -> JSONResponse:
+        return call(desk.turns, station, since, wait, key, ship)
 
     @router.post("/api/agents/{station}/reply")
     def api_reply(station: str, body: dict[str, Any]) -> JSONResponse:
@@ -793,25 +805,38 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
 
     @router.post("/api/agents/{station}/owner")
     def api_owner(station: str, body: dict[str, Any]) -> JSONResponse:
-        return call(desk.owner, station, str(body.get("text") or ""), body.get("key"))
+        return call(
+            desk.owner, station, str(body.get("text") or ""), body.get("key"), body.get("ship")
+        )
 
     @router.post("/api/agents/{station}/release")
     def api_release(station: str, body: dict[str, Any]) -> JSONResponse:
-        return call(desk.release, station, str(body.get("reason") or ""), body.get("key"))
+        return call(
+            desk.release,
+            station,
+            str(body.get("reason") or ""),
+            body.get("key"),
+            body.get("ship"),
+        )
 
     @router.get("/api/agents/{station}/library")
     def api_library(
-        station: str, topic: str = "contents", section: str = "", find: str = "", key: str = ""
+        station: str,
+        topic: str = "contents",
+        section: str = "",
+        find: str = "",
+        key: str = "",
+        ship: str = "",
     ) -> JSONResponse:
         def read(*args: Any) -> dict[str, Any]:
             return {"text": desk.library(*args)}
 
-        return call(read, station, topic, section, find, key)
+        return call(read, station, topic, section, find, key, ship)
 
     @router.get("/api/agents/{station}/picture/{pid}")
-    def api_agent_picture(station: str, pid: str, key: str = "") -> Response:
+    def api_agent_picture(station: str, pid: str, key: str = "", ship: str = "") -> Response:
         try:
-            pic = desk.picture(station, pid, key)
+            pic = desk.picture(station, pid, key, ship)
         except DeskError as e:
             raise HTTPException(status_code=e.status, detail=e.words) from None
         return Response(content=pic.data, media_type=pic.media_type)
@@ -1116,6 +1141,7 @@ def create_app(
     options: dict[str, Any] = {"game": game, "lockstep": driver.lockstep, "say": say}
     if consent_records is not None:
         options["records_dir"] = consent_records
+        driver.world.consent_records_dir = consent_records  # the seat hook's (package 43)
     if saves_dir is not None:
         options["saves_dir"] = saves_dir
     router = agent_routes(
@@ -1366,9 +1392,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.watcher:
         station_watcher(world, args.watcher, out=sys.stdout)
     if scenario_file is not None:
-        from freesail.world.scenarios import begin
+        from freesail.world.scenarios import begin, guard_lines
 
-        for line in scenario_file.lines():
+        for line in scenario_file.lines() + guard_lines(world):
             print(line)
         begin(world, scenario_file)
     if args.standing_orders:

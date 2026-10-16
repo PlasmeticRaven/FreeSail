@@ -273,7 +273,7 @@ class _Pickler(pickle.Pickler):
     def reducer_override(self, obj: Any) -> Any:  # type: ignore[override]
         cls = type(obj)
         name = f"{cls.__module__}.{cls.__qualname__}"
-        if name == "freesail.core.world.World":
+        if name in ("freesail.core.world.World", "freesail.world.crews.CrewedWorld"):
             state = dict(obj.__dict__)
             state["chart"] = None
             state["_readings_view"] = None
@@ -433,6 +433,10 @@ def _rebind(world: World) -> None:
         from freesail.api.session import rebind_hooks
 
         rebind_hooks(ship)
+    for v in getattr(getattr(world, "vessels", None), "vessels", None) or []:
+        # a crewed vessel's own World (package 43): rebound as the parent is
+        if getattr(v, "crew", None) is not None:
+            _rebind(v.crew)
     if world.agents:
         # a station loaded from its checkpoint has played its transcript already: it gets
         # a spent `Playback`, as a replayed one has once its replies are given, so that the

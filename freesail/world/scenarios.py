@@ -213,6 +213,23 @@ class ScenarioFile:
         return out
 
 
+def guard_lines(world: Any) -> list[str]:
+    """The far-detail guard's words on the other sail at the start (package 43; spec M6
+    §19), for the driver to print with the scenario's lines, the author's view: a ship
+    without a brain whose goal's straight legs cross the land (a ship with a brain is
+    refused at the making instead, her captain's plan being the planner's). Nothing of
+    this is a line of the log."""
+    vessels = getattr(world, "vessels", None)
+    out: list[str] = []
+    for v in getattr(vessels, "vessels", None) or []:
+        if v.warning:
+            out.append(
+                f"  The far-detail guard: {v.name} ({v.goal}) {v.warning} at far detail, where "
+                "no ship takes the ground; give her a way by marks, or a captain (intent:)."
+            )
+    return out
+
+
 def _time(value: Any, where: str) -> datetime:
     if isinstance(value, datetime):
         return value
@@ -518,6 +535,21 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         if not isinstance(raw["intent"], str) or not sc.intent:
             raise ScenarioError(f"{where}, intent: the captain's intent in words.")
     sc.books = list(standing_orders)
+    # Package 43 (spec M6 §23): the owner's grant to the director
+    if raw.get("director") is not None:
+        grant = raw["director"]
+        if not isinstance(grant, dict):
+            raise ScenarioError(f"{where}, director: a mapping of models, seats, seats_in_voyage.")
+        try:
+            sc.director = {
+                "models": [str(x) for x in (grant.get("models") or [])],
+                "seats": int(grant.get("seats", 1) or 0),
+                "seats_in_voyage": int(grant.get("seats_in_voyage", grant.get("seats", 1)) or 0),
+            }
+        except (TypeError, ValueError):
+            raise ScenarioError(
+                f"{where}, director: seats and seats_in_voyage are numbers."
+            ) from None
     return ScenarioFile(
         path=str(path),
         scenario=sc,
