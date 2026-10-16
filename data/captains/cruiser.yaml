@@ -30,6 +30,7 @@ thresholds:
   stranger_hostile_nm: {value: 6, source: "an enemy she cannot fight (a bigger class) made out within two leagues is hauled off from; her colours are made out at two miles and her rig at four, so this is the first she can know; judgement"}
   investigate_nm: {value: 10, source: "a sail within ten miles on passage is closed and made out, as the cruise's book closes a stranger on the station (Luce 1884 p. 553 on chasing; the distance judgement)"}
   stranger_chase_nm: {value: 25, source: "as the King's ship's"}
+  chase_stale_hours: {value: 3, source: "a watch of chasing without a mile gained is given up (the trials' brig chased a schooner fifteen hours without closing her); judgement"}
   offing_nm: {value: 3, source: "a league; judgement"}
   leg_reached_nm: {value: 2, source: "as the merchant's"}
   anchor_within_nm: {value: 0.5, source: "as the merchant's"}
@@ -140,6 +141,8 @@ transitions:
   - {from: chasing, on: overmatched, to: evading}
   - {from: chasing, on: stranger spoken, to: on passage}
   - {from: chasing, on: stranger lost, to: on passage}
+  - {from: chasing, on: chase stale, to: on passage}
+  - {from: investigating a stranger, on: chase stale, to: on passage}
   - {from: evading, on: stranger lost, to: on passage}
   - {from: evading, on: gale, to: hove to for weather, unless: no sea room}
   - {from: at anchor, on: under way, to: on passage}

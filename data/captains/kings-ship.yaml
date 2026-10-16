@@ -25,6 +25,10 @@ thresholds:
   shelter_within_nm: {value: 0, source: "none: see shelter_land_nm"}
   stranger_hostile_nm: {value: 0, source: "a King's ship hauls off from nobody; nought turns the stimulus off (evading is for a ship that cannot fight, milestone 7's judgement)"}
   stranger_chase_nm: {value: 25, source: "a stranger within twenty-five miles of the station is chased, as the cruise's book has it (the distance from the station, not the stranger)"}
+  # package 43: a chase that has not gained a mile in so many hours is given up (the
+  # trials' frigate chased a brig to windward for eight hours and a half without closing
+  # her, once the stranger had a brain and ran); judgement on the figure
+  chase_stale_hours: {value: 3, source: "a watch of chasing without a mile gained; judgement"}
   offing_nm: {value: 3, source: "a league; judgement"}
   leg_reached_nm: {value: 2, source: "as the merchant's"}
   anchor_within_nm: {value: 0.5, source: "as the merchant's"}
@@ -160,6 +164,8 @@ transitions:
   - {from: investigating a stranger, on: stranger lost, to: keeping station}
   - {from: chasing, on: stranger spoken, to: keeping station}
   - {from: chasing, on: stranger lost, to: keeping station}
+  - {from: chasing, on: chase stale, to: keeping station}
+  - {from: investigating a stranger, on: chase stale, to: keeping station}
   - {from: at anchor, on: under way, to: on passage}
   # package 45 (item 3b): at anchor within the port's reach she is in port, and does her
   # business from the road by the boat; the wind to go farther in is waited for only at a

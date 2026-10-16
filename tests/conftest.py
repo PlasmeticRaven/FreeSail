@@ -137,6 +137,11 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_hands.py::test_belaying_a_tack_is_not_the_tacks_belay_and_the_work_it_held_resumes",
         "test_hands.py::test_compatibility_one_evolution_with_the_watch_on_deck[fill_away]",
         "test_hands.py::test_compatibility_one_evolution_with_the_watch_on_deck[heave_to]",
+        # package 43: the crewed promotion's long runs (a brig promoted, sailed beyond the
+        # range and demoted, an hour's track compared, a checkpoint with a crewed ship)
+        "test_crews.py::test_a_vessel_with_a_brain_within_the_range_is_promoted_and_demoted_beyond_it",
+        "test_crews.py::test_truth_87_the_brig_promoted_sails_near_the_track_her_polar_gave_her",
+        "test_crews.py::test_a_checkpoint_carries_a_crewed_ship_and_ticks_on_alike",
         "test_hands.py::test_compatibility_one_evolution_with_the_watch_on_deck[tack]",
         "test_hands.py::test_compatibility_one_evolution_with_the_watch_on_deck[wear]",
         "test_hands.py::test_tack_ship_belays_the_topgallant_being_set_and_it_resumes_after",

@@ -1346,9 +1346,11 @@ STIMULI: tuple[str, ...] = (
     "afloat",
     "cargo done",
     # package 43 (the cruiser's doctrine): an enemy of a bigger class within the hostile
-    # distance; a stranger within `investigate_nm` of a ship on passage
+    # distance; a stranger within `investigate_nm` of a ship on passage; a chase that has
+    # not closed in `chase_stale_hours`
     "overmatched",
     "stranger near",
+    "chase stale",
 )
 
 
@@ -1406,7 +1408,36 @@ class Judgement:
                 self._gale_over_since = p.tick
         else:
             self._gale_over_since = None
+        self._read_chase(p)
         return self.trend
+
+    def _read_chase(self, p: Perception) -> None:
+        """The chase's log (package 43): the stranger in hand's distance at each
+        judgement while she is chased or closed, for the `chase stale` stimulus (a chase
+        that has not closed in `chase_stale_hours` is given up: the trials' two captains
+        chased and ran for fifteen hours without a cable gained)."""
+        log = getattr(self, "_chase_log", None)
+        if log is None:
+            log = self._chase_log = []
+        if self.state not in ("investigating a stranger", "chasing") or self._stranger is None:
+            log.clear()
+            return
+        for s in p.strangers:
+            if s.get("id") == self._stranger and s.get("estimate_m") is not None:
+                if log and log[-1][2] != self._stranger:
+                    log.clear()
+                log.append((p.tick, float(s["estimate_m"]), self._stranger))
+                return
+
+    def _chase_stale(self, hours: float) -> bool:
+        log = getattr(self, "_chase_log", None) or []
+        if len(log) < 2:
+            return False
+        span = hours * 3600.0
+        if log[-1][0] - log[0][0] < span:
+            return False
+        then = next(d for t, d, _ in log if log[-1][0] - t <= span)
+        return log[-1][1] >= then - units.NAUTICAL_MILE
 
     def _transitions(self, p: Perception) -> None:
         if self.doctrine is None or self.state is None:
@@ -1491,6 +1522,8 @@ class Judgement:
                 and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within
                 for s in p.strangers
             )
+        if name == "chase stale":
+            return self._chase_stale(float(th("chase_stale_hours", 3)))
         if name == "stranger lost":
             if self._stranger is None:
                 return not p.strangers

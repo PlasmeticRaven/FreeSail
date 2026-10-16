@@ -1179,8 +1179,33 @@ class Vessels:
         lines.extend(self._spoke_lines)
         self._spoke_lines = []
         lines.extend(self._promote_and_hail(world))
+        if any(v.brain is not None for v in self.vessels) or self.crewed_ids:
+            # the crewed promotion by the range and the cap (package 43; `world.crews`)
+            from freesail.world.crews import switch
+
+            switch(world)
         self.vessels = [v for v in self.vessels if not v.done]
         return lines
+
+    def tick_crews(self, world: Any) -> None:
+        """Every second: each crewed vessel's own World ticked (her physics, her book,
+        her captain, her stations), and her truth mirrored into the far body's record
+        (package 43; `world.crews`); a World kept in the far shape for a seated station
+        mirrors the far body instead."""
+        if not self.crewed_ids:
+            return
+        from freesail.world.crews import mirror
+
+        minute = world.clock.ship_time.second == 0
+        for v in self.vessels:
+            crew = v.crew
+            if crew is None or v.done:
+                continue
+            if crew.shape == "far":
+                crew.far_tick()
+                continue
+            crew.tick()
+            mirror(v, crew, minute)
 
     # -- what a far-detail brain sees (package 43) ----------------------------------------
 

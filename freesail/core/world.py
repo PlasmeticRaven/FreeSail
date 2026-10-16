@@ -1085,6 +1085,9 @@ class World:
         (a letter brought alongside, a stranger within hail) are recorded here."""
         if self._position is None or not self.vessels.vessels:
             return
+        if getattr(self.vessels, "crewed_ids", ()):
+            # the crewed ships beside her, each a World of her own (package 43)
+            self.vessels.tick_crews(self)
         lines = self.vessels.tick_near(self)
         if self.clock.ship_time.second == 0:
             lines = lines + self.vessels.tick(self)
@@ -1600,12 +1603,10 @@ class World:
 
     # -- time ----------------------------------------------------------------
 
-    def tick(self) -> None:
-        """Advance the world by one game second."""
-        self.clock.advance()
-        if self._scenario_order_i < len(self._scenario_orders):
-            # the scenario's world orders due now, before the weather moves (package 36)
-            self._tick_world_orders()
+    def _follow_weather(self) -> None:
+        """The wind's base from the weather every tick: the systems moved and their
+        surface wind at the ship, or the pinned script's wind (a crewed vessel's own
+        World follows its parent's weather instead, `world.crews`, package 43)."""
         if self.systems is not None:
             # the systems move every tick (microseconds: a bell and two segments a system);
             # the sky and the glass are read once a minute (`_observe_weather`)
@@ -1617,6 +1618,19 @@ class World:
             self.wind.air_mass = self.weather.air_mass_at(
                 self.clock.ship_time, self.scenario.air_mass
             )
+
+    def _tick_weather_minute(self) -> None:
+        """The minute's sky and glass, where the world keeps systems."""
+        if self.systems is not None:
+            self._tick_weather()
+
+    def tick(self) -> None:
+        """Advance the world by one game second."""
+        self.clock.advance()
+        if self._scenario_order_i < len(self._scenario_orders):
+            # the scenario's world orders due now, before the weather moves (package 36)
+            self._tick_world_orders()
+        self._follow_weather()
         # the ten-minute mean, which the gusts and squalls are drawn as multiples of (spec
         # M5 §3; under every wind since package 31b)
         self.wind.step(1.0, self.wind_record.mean_speed())
@@ -1637,8 +1651,8 @@ class World:
                 },
             )
         self._log_wind_shift()
-        if self.systems is not None and self.clock.ship_time.second == 0:
-            self._tick_weather()
+        if self.clock.ship_time.second == 0:
+            self._tick_weather_minute()
         if self.sea is not None:
             # the sea once a minute, the motion every tick, before the ship feels them
             if self.clock.ship_time.second == 0:

@@ -175,7 +175,7 @@ def test_every_state_resolves_into_a_plan_with_a_brain_and_two_without():
         B.resolve_state(b, "fishing", brain)
 
 
-def test_the_body_moves_by_the_brains_plan_a_chase_closes_and_a_flight_opens():
+def test_the_body_moves_by_the_brains_plan_a_chase_closes_and_a_flight_opens(far_only):
     """A chase leg steers to intercept the stranger and stops within hail; an away leg
     steers the reciprocal of her bearing; at anchor she rides head to wind with no way."""
     w = world_at(49.5, -5.5)
@@ -202,7 +202,16 @@ def test_the_body_moves_by_the_brains_plan_a_chase_closes_and_a_flight_opens():
 # -- the two captains judge one another --------------------------------------------------
 
 
-def test_a_cruiser_makes_out_the_frigate_an_enemy_of_a_bigger_class_and_hauls_off():
+@pytest.fixture
+def far_only(monkeypatch):
+    """The far brain alone: no crewed promotion within the range (package 43, `crews`),
+    so that the brain's own judgement is what the test reads."""
+    from freesail.world import crews
+
+    monkeypatch.setattr(crews, "CREWED_CAP", 0)
+
+
+def test_a_cruiser_makes_out_the_frigate_an_enemy_of_a_bigger_class_and_hauls_off(far_only):
     """The cruiser's doctrine: a stranger within ten miles is closed (investigating); the
     frigate's colours made out, an enemy of a bigger class within two leagues, she is
     `overmatched` and evades; lost to sight she goes on passage. Her history is the
@@ -233,7 +242,7 @@ def test_a_cruiser_makes_out_the_frigate_an_enemy_of_a_bigger_class_and_hauls_of
     assert w.vessels.to_dict()[0]["brain"]["state"] == "evading"
 
 
-def test_a_cruiser_chases_a_merchant_she_can_fight_and_speaks_her_within_hail():
+def test_a_cruiser_chases_a_merchant_she_can_fight_and_speaks_her_within_hail(far_only):
     """Two vessels: the French brig-sloop closes the British schooner (a smaller class,
     an enemy once her colours are made out), chases her to hailing distance and speaks
     her; the merchant hauls off meanwhile; spoken, both go on their way, and the line
@@ -330,7 +339,7 @@ def test_the_ship_world_order_takes_an_intent_and_gives_a_brain_to_a_ship_on_the
     assert copy.vessels.find("Lark").brain.to_dict() == w.vessels.find("Lark").brain.to_dict()
 
 
-def test_a_station_intent_at_far_detail_keeps_the_station_off_the_place_to_seaward():
+def test_a_station_intent_at_far_detail_keeps_the_station_off_the_place_to_seaward(far_only):
     w = world_at(49.5, -5.5)
     k = put(
         w,
