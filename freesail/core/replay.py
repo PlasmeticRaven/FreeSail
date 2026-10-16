@@ -143,11 +143,14 @@ def replay(
     ship_factory: ShipFactory | None = None,
     until_tick: int | None = None,
     road: str | None = None,
+    on_tick: Callable[[World], bool] | None = None,
 ) -> World:
     """Rebuild a world and run it to `until_tick` (default: the save's end tick),
     re-submitting journaled orders at their ticks. A save with a station aboard replays
     by the road `road_of` gives (package 42): by its transcript, or by its stations' acts,
-    each given at its tick after as many inputs as came before it in play."""
+    each given at its tick after as many inputs as came before it in play. `on_tick` is
+    called after every tick with the world and stops the replay there when it answers
+    true (package 44: the regatta judges a human replay's course as it is sailed)."""
     road = road_of(data, road)
     world = build_world(data, ship_factory, road)
     end = data["end_tick"] if until_tick is None else min(until_tick, data["end_tick"])
@@ -199,6 +202,8 @@ def replay(
         if world.clock.tick >= end:
             break
         world.tick()
+        if on_tick is not None and on_tick(world):
+            break
     if road == BY_ACTS:
         # the stations take up the game where the replay leaves them, their record the
         # save's transcript as far as the replay went

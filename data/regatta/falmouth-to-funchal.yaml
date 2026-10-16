@@ -1,0 +1,33 @@
+# FreeSail: the regatta's third course (spec M6 §21 and §26; package 44), the voyage to
+# Madeira on the whole chart.
+#
+# The topsail schooner Speedwell from off Falmouth's outer road at six in the morning of
+# 12 June 1805 (data/scenarios/falmouth-to-corunna.yaml: her ship, seed, start under way,
+# papers and purse, the pinned westerly for the Channel backing and then veering
+# north-westerly and northerly for the Bay, the clear sky over the old high) to Funchal
+# road, by way of Ushant and Cape Finisterre, each left to larboard: a mark is rounded
+# when her track crosses the line laid from it to seaward (`ray_deg`, for `ray_nm`), so a
+# ship that cuts inside Ushant through the Four, or inside Finisterre, has not rounded it.
+# The pinned wind's last waypoint, northerly at ten knots on the 14th, holds for the rest
+# of the voyage (the Portuguese trade, near enough for a course). The ports she may speak
+# are the voyage's and Funchal's.
+#
+#     py tools/regatta.py data/regatta/falmouth-to-funchal.yaml --agent rules
+#
+# Some 1,250 miles; the limit sixteen days.
+
+name: Falmouth to Funchal road
+scenario: data/scenarios/falmouth-to-corunna.yaml
+seed: 7
+ports: [falmouth, plymouth, brest, corunna, ferrol, lisbon, funchal, porto-santo]
+start_orders: [set plain sail]
+standing_orders: []
+finish: {at: funchal-road, radius_nm: 1.5}
+time_limit_hours: 384
+marks:
+  - {at: Ushant, leave: to larboard, ray_deg: 270, ray_nm: 40}
+  - {at: Cape Finisterre, leave: to larboard, ray_deg: 270, ray_nm: 80}
+intent: bound for Funchal via Ushant, Finisterre
+fake:
+  first: [shape a course for Funchal via 50 00 N 4 57 W and Ushant and Finisterre, trim sails]
+  each_glass: [take a bearing of the land, take a fix, trim sails]

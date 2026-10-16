@@ -1,0 +1,34 @@
+# FreeSail: the regatta's second course (spec M6 §21; package 44), the merchant passage's
+# crossing.
+#
+# The topsail schooner Speedwell of the merchant passage (data/scenarios/merchant-
+# passage.yaml: her ship, seed, papers, purse, the pinned westerly veering north-westerly,
+# the clear sky over the old high, and the dozen sail of the Channel's traffic) across the
+# Channel from off Falmouth to the road of Bertheaume, where the pilots of Brest come off.
+# The passage's own book, its business at Falmouth and its Goulet are left out: the course
+# begins a mile and a half south of the outer road at six in the morning of 12 June,
+# under way at four knots (as the voyage for Corunna begins, falmouth-to-corunna.yaml),
+# and she is given plain sail at the gun. No mark: the agent chooses her road into the
+# Iroise, round Ushant or through the Four, and the grounding column says what it cost.
+#
+#     py tools/regatta.py data/regatta/falmouth-to-bertheaume.yaml --agent rules
+#
+# A hundred and five miles; the limit forty hours.
+
+name: Falmouth to the road of Bertheaume
+scenario: data/scenarios/merchant-passage.yaml
+seed: 7
+start:
+  at: 1805-06-12T06:00
+  position: 50 06 N 5 00 W
+  heading_deg: 190
+  speed_kn: 4
+start_orders: [set plain sail]
+standing_orders: []
+finish: {at: bertheaume-road, radius_nm: 1.0}
+time_limit_hours: 40
+marks: []
+intent: bound for Brest
+fake:
+  first: [shape a course for the road of Bertheaume via 50 00 N 4 57 W and Ushant and Iroise, trim sails]
+  each_glass: [take a bearing of the land, take a fix, trim sails]
