@@ -117,8 +117,10 @@ result in the conversation is replaced by its stub ("You read primer 3, reefing,
 shelved (book 7). library(...) opens it again."), so from the model's next request on
 only the line remains. A book left open goes back by itself after `SHELF_LIFE_TURNS` of
 the model's turns after the one it was read in, the stub in its place and a notice in
-the next sample. The model's turns are counted where a sample ends (`_end_sample`), so a
-replay shelves at the same points; a shelve is a tool call in a reply, so the
+the next sample; a picture never does (package 45c): it is put back by the model's hand,
+`shelve` taking a note of what it showed that the stub keeps with the time it was open.
+The model's turns are counted where a sample ends (`_end_sample`), so a replay shelves
+at the same points; a shelve is a tool call in a reply, so the
 transcript holds it. A shelved turn is served as its stub from then on: the
 conversation is changed in place and `revision` counts the changes, which the agent API
 carries so that a door rebuilding its messages from the game's turns knows to read them
@@ -195,11 +197,11 @@ from freesail.agents.agent import (
     voyage_words,
 )
 from freesail.agents.fake import Transcript
-from freesail.agents.journal import HANDOVER_KIND, WORD_PASSED_KIND, Journal
+from freesail.agents.journal import HANDOVER_KIND, WORD_PASSED_KIND, Journal, journal_of
 from freesail.agents.model import DATA, MODEL, OPERATOR, Model, Reply, Sample, ToolCall, Turn
 from freesail.api import readings as R
 from freesail.core import acts
-from freesail.core.events import Event, Rollup, RollupView, Severity
+from freesail.core.events import Event, Rollup, RollupView, Severity, for_the_record
 from freesail.orders.errors import OrderError
 
 if TYPE_CHECKING:
@@ -542,6 +544,12 @@ class Book:
     state: str = OPEN
     slot: int | None = None  # the result's index among its reply's tool results
     at: int | None = None  # the index of the tool-results turn in `Harness.turns`
+    note: str = ""  # what the model wrote of it as it put it back (package 45c)
+
+    @property
+    def picture(self) -> bool:
+        """A picture (the chart, the ship's view): put back by the model's hand only."""
+        return self.reopen.startswith(tuple(f"{t}(" for t in tools.PICTURE_TOOLS))
 
     @property
     def handle(self) -> str:
@@ -553,6 +561,11 @@ class Book:
 
 
 class Harness:
+    # Package 45c (the owner's note 14 of gate m6a-2): the picture tools offered at a door
+    # that does not always carry an image (the local runner), when its seating says its
+    # model reads one. A class default, so that a checkpoint from before loads with it.
+    pictures: bool = False
+
     # A station's place among the inputs (package 37d): the count of the World's inputs
     # (orders given, refused and answered, and the lines a driver wrote) when the station
     # was taken, which a replay seats it by; None for a save from before, which is seated
@@ -634,7 +647,7 @@ class Harness:
         self.save_fn = save
         self.door_note = door_note
         self.agent = AgentState(station, session_kind=session_kind)
-        self.journal: Journal = world.agent_journals.setdefault(station.name, Journal(station.name))
+        self.journal: Journal = journal_of(world, station.name)  # the person's (45c)
         self.turns: list[Turn] = []
         self.transcript: list[dict[str, Any]] = []
         self.brief: Brief | None = None
@@ -779,8 +792,9 @@ class Harness:
     def tool_names(self) -> tuple[str, ...]:
         """The tools this harness runs, in the table's order: all of `tools.TOOLS`, or
         the allow-list when one is set."""
-        # the picture tools at a door that carries an image (package 42)
-        names = tools.tool_names(self.door in tools.PICTURE_DOORS)
+        # the picture tools at a door that carries an image (package 42), and at the
+        # local runner when its model reads one (package 45c: `pictures`, its seating's)
+        names = tools.tool_names(self.door in tools.PICTURE_DOORS or self.pictures)
         if self.allowed_tools is None:
             return names
         return tuple(n for n in names if n in self.allowed_tools)
@@ -1135,7 +1149,11 @@ class Harness:
         # the lines since the last look, less any a sample has carried already (a question
         # sampled on the order, after the lines of its tick: package 31c, a standing
         # order's `ask`, whose firing line is notable, sampled once and not twice)
-        new = [world.log[i] for i in range(max(self._seen_log, self._sample_seen), len(world.log))]
+        new = [
+            world.log[i]
+            for i in range(max(self._seen_log, self._sample_seen), len(world.log))
+            if not for_the_record(world.log[i])  # decision 46: a world order is not seen
+        ]
         self._seen_log = len(world.log)
         if self._open is not None:
             # the floor is the model's: a sampling point folds into the open sample
@@ -1488,7 +1506,7 @@ class Harness:
         compression = getattr(world, "compression", 1.0)
         kept: list[Event | Rollup] = []
         for e in events:
-            if e.actor != mine:
+            if e.actor != mine and not for_the_record(e):
                 kept.extend(self._rollup.feed(e, compression))
         # the captain's own lines are never left out (package 37g, item 9; the review's
         # 5.4: his helm orders and his changes to the book reached a waking officer only
@@ -1971,24 +1989,27 @@ class Harness:
             if b.state == WENT_BACK
             else "shelved"
         )
-        if b.reopen.startswith(tuple(f"{t}(" for t in tools.PICTURE_TOOLS)):
+        if b.picture:
             # a picture's stub says plainly what it was and that it was shown (package 45:
             # the owner's model captain, reading its history with the picture gone from
-            # it, "corrected" itself and said it had never seen one)
-            put_back = (
-                f"put back by itself after {number_words(SHELF_LIFE_TURNS)} of your turns"
-                if b.state == WENT_BACK
-                else "put back at your word"
+            # it, "corrected" itself and said it had never seen one); package 45c: it is put
+            # back by the model's hand only, and the line keeps the note the model wrote of
+            # it with the time it was open (the owner's notes 2, 4 and 16 of gate m6a-2)
+            seen = (
+                f"; seen: {b.note}"
+                if b.note
+                else "; you wrote no note of what it showed as you put it back"
             )
             entry["result"] = (
-                f"A picture: {b.title}, shown to you here and {put_back} (book {b.number}); "
-                f"the picture itself is not sent again. You saw it; what you took from it "
-                f"belongs in your journal. {b.reopen} draws a fresh one."
+                f"A picture: put back {b.title} (book {b.number}){seen}. "
+                f"It was shown to you here and put back at your word; the picture itself is "
+                f"not sent again. {b.reopen} draws a fresh one."
             )
         else:
+            noted = f" Your note: {b.note}" if b.note else ""
             entry["result"] = (
                 f"You read {b.title}, at {b.opened}; {how} (book {b.number}). "
-                f"{b.reopen} opens it again."
+                f"{b.reopen} opens it again.{noted}"
             )
         results[b.slot] = entry
         self.turns[b.at] = Turn(DATA, {**turn.content, "tool_results": results})
@@ -1999,7 +2020,9 @@ class Harness:
         turns after the one it was read in goes back, and the next sample says so."""
         self.turns_ended += 1
         for b in self.books:
-            if b.state != OPEN or b.at is None:
+            if b.state != OPEN or b.at is None or b.picture:
+                # a picture never goes back by itself (package 45c): the model saw it go
+                # and took it that it had never seen one
                 continue
             if self.turns_ended - b.turn > SHELF_LIFE_TURNS:
                 b.state = WENT_BACK
@@ -2020,11 +2043,14 @@ class Harness:
             f"your conversation holds its line and not its pages. {again}"
         )
 
-    def shelve(self, words: str = "") -> str:
-        """`shelve(book)`: a handle ("book 7", "7"), a topic's words ("primer 3", which
-        puts back every open book whose name holds them), or nothing for every open book.
+    def shelve(self, words: str = "", note: str = "") -> str:
+        """`shelve(book, note)`: a handle ("book 7", "7"), a topic's words ("primer 3",
+        which puts back every open book whose name holds them), or nothing for every open
+        book; `note` what the model took from it, kept in each book's line (package 45c:
+        for a picture, "put back the ship's view of 05:50; seen: the fore topsail aback").
         The shelved books' results are replaced by their lines at once, so the model's
         next request carries the lines only."""
+        note = " ".join(str(note or "").split())
         key = " ".join(str(words or "").lower().split()).strip(" .'\"")
         open_now = self.open_books()
         if key in ("", "all", "every book", "all books", "everything"):
@@ -2048,6 +2074,7 @@ class Harness:
                     return f"No open book is called '{words}'; {self._open_words(open_now)}"
         for b in chosen:
             b.state = SHELVED
+            b.note = note
             self._stub(b)  # a book opened in this same reply is stubbed when it is placed
         names = "; ".join(b.named for b in chosen)
         if self.keeps_its_own:
@@ -2086,9 +2113,17 @@ class Harness:
         playtest 11's finding 5: the journal was refused while standing by)."""
         if c.name in ("shelve", "journal"):
             key = "book" if c.name == "shelve" else "note"
-            if [k for k in c.args if k != key] or (c.name == "journal" and key not in c.args):
+            extra = ("note",) if c.name == "shelve" else ()
+            if [k for k in c.args if k != key and k not in extra] or (
+                c.name == "journal" and key not in c.args
+            ):
                 return tools.call(self.world, self.station.name, c.name, c.args)
-            return self.door_act(c.name, str(c.args.get(key) or ""), "out of turn")
+            return self.door_act(
+                c.name,
+                str(c.args.get(key) or ""),
+                "out of turn",
+                note=str(c.args.get("note") or "") if c.name == "shelve" else "",
+            )
         result = tools.call(self.world, self.station.name, c.name, c.args)
         found = tools.book_of(c.name, c.args, result) if c.name in tools.BOOK_TOOLS else None
         if found is None:
@@ -2446,7 +2481,7 @@ class Harness:
         return False
 
     @acts.frame
-    def door_act(self, act: str, reason: str, by: str, final: bool = False) -> Any:
+    def door_act(self, act: str, reason: str, by: str, final: bool = False, note: str = "") -> Any:
         """A stop that comes from outside the loop, which a replay could not otherwise
         know of: a door's release (the door closed, the client went away, Ctrl-C), the
         token sent out of turn, the driver's ten real minutes of a pause unanswered (the
@@ -2493,6 +2528,8 @@ class Harness:
         }
         if final and act == "leave":
             entry["final"] = True
+        if note and act == "shelve":
+            entry["note"] = note  # package 45c: recorded only when given
         self.transcript.append(entry)
         if act == "reseat":
             # a released station seated again (package 37; 37g: by the same identity or
@@ -2512,7 +2549,7 @@ class Harness:
             book.state = ASIDE
             return book
         elif act == "shelve":
-            return self.shelve(reason)
+            return self.shelve(reason, note)
         elif act == "journal":
             return self._note_aside(reason)
         elif act == "stand_by":
@@ -2627,7 +2664,11 @@ class Harness:
             if self.agent.released and act not in ACTS_ON_A_RELEASED_STATION:
                 return
             self.door_act(
-                act, str(e.get("reason", "")), str(e.get("by", "")), final=bool(e.get("final"))
+                act,
+                str(e.get("reason", "")),
+                str(e.get("by", "")),
+                final=bool(e.get("final")),
+                note=str(e.get("note", "")),
             )
 
     # -- the deck (package 37; spec M5 §29; as package 37g has it) ------------------------

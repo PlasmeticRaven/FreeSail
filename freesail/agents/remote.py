@@ -268,6 +268,7 @@ class Seat:
     reserve_tokens: int | None = None  # the handover's reserve, when the door gave one (37g)
     cadence: str = ""  # the seating's cadence, when the door asked one (package 41)
     ship: str = ""  # the other ship the station is on, as the door named her (package 43)
+    pictures: bool = False  # the door's model reads an image (the local runner's; 45c)
     key: str = ""  # the seating's key, given once to the door that stationed (package 37g)
     left_at: str = ""  # the station this identity left by its own word, when it is asked again
     phase: str = CONSENT
@@ -461,6 +462,7 @@ class Desk:
                 world=world,
                 cadence=cadence,
                 ship=ship,
+                pictures=bool(body.get("pictures")),
             )
             ask_again = bool(body.get("ask_again"))
             opted_out = decided.ask_again and not ask_again
@@ -615,6 +617,7 @@ class Desk:
             seat.base = 0
         h.model_name = seat.model_name
         h.door = seat.door
+        h.pictures = seat.pictures
         if seat.context_tokens:
             h.budget_tokens = seat.context_tokens
         if seat.reserve_tokens:
@@ -643,6 +646,7 @@ class Desk:
                 h.budget_tokens = seat.context_tokens = int(body["context_tokens"])
             if body.get("handover_reserve"):
                 h.reserve_tokens = seat.reserve_tokens = int(body["handover_reserve"])
+            h.pictures = seat.pictures = bool(body.get("pictures"))
             h.door_act("door", seat.model_name, door)
             since = len(seat.archive) + len(h.turns) - seat.base
             h.take_over(h.model, save=self._saver(seat), door_note=self._note(seat, seat.record))
@@ -1335,6 +1339,7 @@ class GameClient:
         context_tokens: int | None = None,
         handover_reserve: int | None = None,
         cadence: str = "",
+        pictures: bool = False,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
             "model_name": model_name,
@@ -1352,6 +1357,8 @@ class GameClient:
             body["context_tokens"] = int(context_tokens)  # for the handover (package 37)
         if handover_reserve:
             body["handover_reserve"] = int(handover_reserve)  # its reserve in tokens (37g)
+        if pictures:
+            body["pictures"] = True  # the door's model reads an image (package 45c)
         # the answer carries the turns from where this door starts reading (the start, or
         # the brief sent again when it attaches) and the index to read on from
         self.key = ""

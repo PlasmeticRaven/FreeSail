@@ -1,6 +1,6 @@
 """The console driver: runs a world, prints the log, reads orders from stdin.
 
-    python -m freesail.ui.console [ship] [--seed N] [--time N] [--load SAVE]
+    python -m freesail.ui.console [ship] [--seed N] [--time N] [--load SAVE [--until TICK]]
                                   [--scenario FILE] [--standing-orders FILE]
                                   [--watcher fake] [--agents-port N] [--lockstep]
                                   [--consent-records DIR] [--saves DIR] [--seat officer]
@@ -739,16 +739,23 @@ def start_world(args: argparse.Namespace) -> tuple[World, Any]:
     scenario file read, if any."""
     from freesail.api.session import make_world, ship_factory
 
+    if getattr(args, "until", None) is not None and not getattr(args, "load", None):
+        raise SystemExit("--until is a tick of a save: say --load SAVE --until TICK.")
     if getattr(args, "load", None):
         # from the checkpoint beside the save when it belongs to it (package 33a: seconds
         # for a day's save), else by replaying the journal; another build's game with a
         # station's transcript in it is not replayed unless asked for (package 37d)
         try:
             world, report = replay_mod.load_report(
-                args.load, ship_factory, replay_anyway=bool(getattr(args, "replay_anyway", False))
+                args.load,
+                ship_factory,
+                replay_anyway=bool(getattr(args, "replay_anyway", False)),
+                until_tick=getattr(args, "until", None),
             )
         except replay_mod.ReplayRefused as refused:
             raise SystemExit("\n".join(refused.report.words)) from None
+        except ValueError as e:
+            raise SystemExit(str(e)) from None
         if report.how == "replay":
             restore_python_rules(world, replay_mod.load_file(args.load))
         world.loaded_from = report.how  # type: ignore[attr-defined]
@@ -784,6 +791,14 @@ REPLAY_ANYWAY_FLAG = "--replay-anyway"
 SEAT_HELP = (
     "seat the player at a station below the captain's ('officer'): his orders are judged "
     "by that station's authority and the captain's word (package 40; spec M6 §3)"
+)
+
+# `--until TICK` with `--load` (package 45c): the save replayed to that tick and handed
+# over there, as a save replays by its acts.
+UNTIL_FLAG = "--until"
+UNTIL_HELP = (
+    "with --load: replay the save to this tick (a tick of the save, the clock's count from "
+    "its start) and take the game up there, leaving out what came after it"
 )
 
 REPLAY_ANYWAY_HELP = (
@@ -823,6 +838,7 @@ def main(argv: list[str] | None = None) -> int:
         "--time", "--speed", type=float, default=1.0, help="compression, game s per real s"
     )
     ap.add_argument("--load", help="save file to replay and continue from")
+    ap.add_argument(UNTIL_FLAG, type=int, default=None, metavar="TICK", help=UNTIL_HELP)
     ap.add_argument(REPLAY_ANYWAY_FLAG, action="store_true", help=REPLAY_ANYWAY_HELP)
     ap.add_argument(
         "--scenario",

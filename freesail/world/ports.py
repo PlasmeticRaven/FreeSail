@@ -84,7 +84,7 @@ import yaml
 
 from freesail import units
 from freesail.core.events import Severity
-from freesail.world.geo import Position, bearing_and_distance, distance_words
+from freesail.world.geo import Position, bearing_and_distance, destination, distance_words
 from freesail.world.people import Message, Person
 from freesail.world.places import Hold, Purse, pounds_words
 
@@ -213,7 +213,42 @@ PILOT_CONN_MARK_M = 2.0 * units.CABLE
 # off the line, past a rock's warning berth (`PILOT_WARN_ABEAM_M`). Judgement.
 PILOT_CONN_KEEP_OFF_RAD = 2.0 * units.POINT
 PILOT_CONN_TURN_RAD = units.POINT / 2.0
+# A danger is on his line when the line passes within its own extent and this much more
+# (package 45c; judgement: none beyond the extent, a cable for a point rock).
+PILOT_CONN_ON_THE_LINE_M = 0.0
+# He cons her for a point on his leg this far ahead of where she is abreast of it (package
+# 45c; judgement: a ship's turning circle and a half, a minute and a half at five knots).
+PILOT_CONN_AHEAD_M = 2.0 * units.CABLE
+# He cons her no nearer the wind than she lies close-hauled and this much more, full and by
+# (package 45c; judgement: half a point, so that she is kept full with the yards braced up).
+PILOT_LIE_MARGIN_RAD = 0.5 * units.POINT
+# A course of his this many points from her head has the yards trimmed to it at his word
+# (package 45c; judgement: a turn the old trim will not carry).
+PILOT_TRIM_POINTS = 2.0
+PILOT_TRIM_EVERY_S = 120  # once for a turn, not at each minute's order of it (judgement)
+# He allows for the stream across his line, reckoning her way at no less than this and the
+# allowance at no more than three points (package 45c; judgement: a vessel under sail in
+# a tideway, and the most a pilot would lay her off his line).
+PILOT_STREAM_WAY_KN = 3.0
+PILOT_STREAM_MOST_RAD = 3.0 * units.POINT
 PILOT_ACTOR = "standing order 'the pilot'"
+# The conn's design (package 45c; the owner's refinement of 2026-10-15): a pilot's conn is
+# promised only along his track from the pilot station inward, leg by leg. Boarding
+# elsewhere he first cons her to join it: at the nearest leg she is already inside of
+# (within `PILOT_LEG_INSIDE_M` of it, between its marks), else at the station by a joining
+# leg laid with the captain's planner (`captains.Planner.clear` and its rounds about a
+# headland), with his own offing and berth in his own water where the planner's are the
+# sea's (a league off the shore would never let him join a road under the land): two
+# cables and a half off the shore and a cable off a charted danger (judgement: the
+# warning's own berth, `PILOT_WARN_ABEAM_M`, and as far again off the shore for the set).
+# Where no clear joining leg is found within the planner's rounds he says so, and takes
+# her only from the station. At the station itself (within `PILOT_AT_STATION_M`) he takes
+# her from there. Elsewhere he joins his track at the first mark of it ahead of her that a
+# clear line reaches, the station or one beyond it, and not back at the station astern.
+PILOT_LEG_INSIDE_M = 3.0 * units.CABLE
+PILOT_AT_STATION_M = 4.0 * units.CABLE
+PILOT_JOIN_OFFING_NM = 0.25
+PILOT_JOIN_BERTH_NM = 0.1
 
 IN_PORT_NM = 2.0
 # -- the boat (judgement) --
@@ -463,6 +498,26 @@ class Port:
         return best[0], best[1] / units.NAUTICAL_MILE
 
 
+def _beyond_the_leg(a: Position, b: Position, p: Position) -> bool:
+    """Whether `p` is beyond the leg's end `b` along the line from `a` (package 45c);
+    False for a leg shorter than a cable."""
+    if bearing_and_distance(a, b)[1] < units.CABLE:
+        return False
+    return _off_the_leg(a, b, p)[1] >= 1.0
+
+
+def _off_the_leg(a: Position, b: Position, p: Position) -> tuple[float, float]:
+    """How far `p` lies off the leg from `a` to `b` (metres, on the flat at its latitude)
+    and how far along it, as a share of the leg (0 at `a`, 1 at `b`)."""
+    dx, dy = a.offset_to(b)
+    px, py = a.offset_to(p)
+    length2 = dx * dx + dy * dy
+    if length2 < 1.0:
+        return math.hypot(px, py), 0.0
+    share = (px * dx + py * dy) / length2
+    return abs(px * dy - py * dx) / math.sqrt(length2), share
+
+
 def port_files(root: Path = PORTS_DIR) -> dict[str, Path]:
     return {p.stem: p for p in sorted(root.glob("*.yaml"))}
 
@@ -686,6 +741,8 @@ class Ports:
     conn_heading: float | None = None
     conn_bearing: float | None = None
     conn_order_tick: int | None = None
+    conn_leg_from: Position | None = None  # where the leg in hand begins (package 45c)
+    conn_trim_tick: int = -(10**9)  # when he last had the yards trimmed to his course (45c)
     hail_answer: str = ""
     hail_count: int = 0
     hail_tick: int | None = None
@@ -844,6 +901,8 @@ class Ports:
                     self._apply_job(job)
         if world.clock.ship_time.second == 0 and self.ports and world.position is not None:
             self._tick_pilot(now)
+        if self.boat.away and world.clock.ship_time.second == 0:
+            self._boat_kept()
 
     def _record(
         self, severity: Severity, kind: str, text: str, data: dict[str, Any] | None = None
@@ -1509,13 +1568,23 @@ class Ports:
         draught = float(hull.spec.draught_m) if hull is not None else 0.0
         wants = draught + PILOT_UNDER_KEEL_M
         lead = "The pilot, by the lead and the time run" if thick else "The pilot warns"
-        for f, along, _off, side in chart.dangers_ahead(
+        # the hands as a pilot names them, from the ship's head (package 45c: they were
+        # the track's, the course over the ground, which the stream sets her along)
+        dyn = getattr(world.ship, "dyn", None)
+        head = float(dyn.heading) if dyn is not None else math.radians(track)
+
+        def hand_of(bearing_deg: float) -> str:
+            rel = units.wrap_pi(math.radians(bearing_deg) - head)
+            return "starboard" if rel >= 0.0 else "larboard"
+
+        for f, along, _off, _side in chart.dangers_ahead(
             pos, track, ahead, PILOT_WARN_ABEAM_M, tide, wants
         ):
             if f.id in self.warned:
                 continue
             self.warned = (*self.warned, f.id)
-            deeper = "larboard" if side > 0 else "starboard"
+            danger_hand = hand_of(bearing_and_distance(pos, f.position)[0])
+            deeper = "larboard" if danger_hand == "starboard" else "starboard"
             where = f"{distance_words(max(along, units.CABLE))} ahead"
             text = f"{lead}: {f.name} {where}; the deeper water is to {deeper}."
             if not thick:
@@ -1563,7 +1632,7 @@ class Ports:
         self.shoal_warned_tick = now
         water = depth + tide
         what = "the shore" if water <= 0.0 else f"shoal water, {fathoms_words(water)},"
-        deeper = {1: "starboard", -1: "larboard"}.get(side)
+        deeper = hand_of(track + 90.0 * side) if side else None
         hand = f"the deeper water is to {deeper}" if deeper else "the deeper water is astern"
         self._record(
             Severity.URGENT,
@@ -1636,24 +1705,25 @@ class Ports:
         port = self.ports[self.pilot_port]
         pos = world.position
         if inward:
-            marks = self._track_marks(port, "in")
-            end = port.anchorage
-            if not marks or bearing_and_distance(marks[-1][1], end.position)[1] > units.CABLE:
-                marks.append((end.name, end.position))
+            joined = self._joined_track(port, pos)
+            if isinstance(joined, str):
+                raise OrderError(joined)
+            self.conn_track = joined
         else:
             marks = self._track_marks(port, "to_sea")
             if not marks:
                 marks = [(port.outer_road.name, port.outer_road.position)]
-        # the marks already astern of her are not conned for: a mark farther from the
-        # track's end than she is herself has been passed
-        goal = marks[-1][1]
-        here = bearing_and_distance(pos, goal)[1] if pos is not None else math.inf
-        keep = [m for m in marks[:-1] if bearing_and_distance(m[1], goal)[1] < here]
-        self.conn_track = [*keep, marks[-1]]
+            # the marks already astern of her are not conned for: a mark farther from the
+            # track's end than she is herself has been passed
+            goal = marks[-1][1]
+            here = bearing_and_distance(pos, goal)[1] if pos is not None else math.inf
+            keep = [m for m in marks[:-1] if bearing_and_distance(m[1], goal)[1] < here]
+            self.conn_track = [*keep, marks[-1]]
         self.conn_i = 0
         self.conn_inward = inward
         self.conn_heading = None
         self.conn_bearing = None
+        self.conn_leg_from = pos
         self.conn = True
         way = "in" if inward else "out"
         words = (
@@ -1663,6 +1733,91 @@ class Ports:
         )
         self._conn(port, world.clock.tick)
         return words
+
+    def inward_track(self, port: Port) -> list[tuple[str, Position]]:
+        """The pilot's track inward (package 45c): his station, the port's `in` marks and
+        the anchorage, each as (words, position); the station left out where it is the
+        anchorage itself (Rochefort's road of Aix)."""
+        from freesail.world.captains import _mark
+
+        track: list[tuple[str, Position]] = []
+        station = _mark(self.world, port.pilot.station) if port.pilot.station else None
+        if station is None:
+            station = (port.outer_road.name, port.outer_road.position)
+        track.append(station)
+        for m in self._track_marks(port, "in"):
+            if bearing_and_distance(track[-1][1], m[1])[1] > units.CABLE:
+                track.append(m)
+        end = port.anchorage
+        if bearing_and_distance(track[-1][1], end.position)[1] > units.CABLE:
+            track.append((end.name, end.position))
+        return track
+
+    def _joined_track(self, port: Port, pos: Position | None) -> list[tuple[str, Position]] | str:
+        """The marks the pilot cons her by inward (package 45c): from the station along his
+        track when she is at it; from the end of the nearest leg she is already inside of;
+        else by a clear line to the first mark of his track ahead of her (the station or
+        one beyond it), and on from there; else by a joining leg round the land to the station, laid
+        with the captain's planner; or the words of his refusal when no clear joining leg
+        is to be had."""
+        from freesail.world.captains import Planner
+
+        track = self.inward_track(port)
+        if pos is None:
+            return track[1:] or track
+        station_words, station = track[0]
+        if bearing_and_distance(pos, station)[1] <= PILOT_AT_STATION_M:
+            return track[1:] or track
+        inside: list[tuple[float, int]] = []
+        for i in range(len(track) - 1):
+            off, share = _off_the_leg(track[i][1], track[i + 1][1], pos)
+            if 0.0 <= share <= 1.0 and off <= PILOT_LEG_INSIDE_M:
+                inside.append((off, i))
+        if inside:
+            _, i = min(inside)
+            return track[i + 1 :]
+        planner = Planner(self.world)
+        offing, berth = PILOT_JOIN_OFFING_NM, PILOT_JOIN_BERTH_NM
+        # at the first mark of his track ahead of her that a clear line reaches (package
+        # 45c): ahead by the leg she lies nearest, its end when she is abreast of it or
+        # beyond its start, its start when she is short of it; she is conned there and on
+        # along the track, and not back to the station to windward of her (the owner's
+        # merchantman south of the Goulet's track, sent back NNE for Bertheaume, stood on
+        # close-hauled onto the north shore; from the Goulet's mouth, taken aback and set
+        # onto the Fillettes). A first version took the shortest clear way by the track,
+        # which joined it at its fifth mark by a line between the Mingan and the Fillettes.
+        first = 0
+        if len(track) > 1:
+            legs = [_off_the_leg(track[k][1], track[k + 1][1], pos) for k in range(len(track) - 1)]
+
+            def _off(k: int) -> float:
+                off, share = legs[k]
+                if 0.0 <= share <= 1.0:
+                    return off
+                end = track[k][1] if share < 0.0 else track[k + 1][1]
+                return bearing_and_distance(pos, end)[1]
+
+            k = min(range(len(legs)), key=_off)
+            first = k + 1 if legs[k][1] > 0.0 else k
+        for k in range(first, len(track)):
+            skip_end = PILOT_AT_STATION_M if k == 0 else units.CABLE
+            if planner.clear(pos, track[k][1], offing, berth, skip_end):
+                return track[k:]
+        joining: list[tuple[str, Position]] = []
+        skip = PILOT_AT_STATION_M  # the station's own water, his ground
+        if not planner.clear(pos, station, offing, berth, skip):
+            joining = planner._round_headland(pos, station, offing, berth, skip)
+            legs = [pos, *(m[1] for m in joining), station]
+            if not joining or not all(
+                planner.clear(a, b, offing, berth, skip if b is station else units.CABLE)
+                for a, b in zip(legs, legs[1:], strict=False)
+            ):
+                name = self.pilot.name if self.pilot is not None else "The pilot"
+                return (
+                    f"{name}: bring her to the station first, {station_words}, and I will take "
+                    "her in; from here I know no clear way to my track."
+                )
+        return [*joining, *track]
 
     def take_conn_back(self, why: str = "") -> str:
         """`I have the conn`: the officer takes her back from the pilot, who stands by and
@@ -1677,6 +1832,7 @@ class Ports:
 
     def _conn_off(self, why: str, said: bool = True) -> None:
         self.conn = False
+        self.conn_leg_from = None
         self.conn_heading = None
         self.conn_bearing = None
         self.conn_order_tick = None
@@ -1741,11 +1897,19 @@ class Ports:
         while self.conn_i < len(self.conn_track):
             words, mark = self.conn_track[self.conn_i]
             brg, dist = bearing_and_distance(pos, mark)
+            leg_from = self.conn_leg_from or pos
             heading = float(dyn.heading)
             abaft = abs(units.wrap_pi(math.radians(brg) - heading)) > math.pi / 2.0
             last = self.conn_i == len(self.conn_track) - 1
-            if dist <= PILOT_CONN_MARK_M or (abaft and not last and dist <= 6.0 * units.CABLE):
+            # beyond the mark along his leg (package 45c): the stream sets her past a
+            # turning mark a cable or two off it, and he takes up the next leg there and
+            # does not haul her back to a mark astern of her; the berth the same, within
+            # the station's reach of it
+            beyond = _beyond_the_leg(leg_from, mark, pos)
+            reach = PILOT_AT_STATION_M if last else 6.0 * units.CABLE
+            if dist <= PILOT_CONN_MARK_M or ((beyond or (abaft and not last)) and dist <= reach):
                 self.conn_i += 1
+                self.conn_leg_from = mark  # the next leg begins at the mark passed (45c)
                 if last:
                     berth = port.pilot.words.get("anchorage", "") if port.pilot.words else ""
                     self._record(
@@ -1758,12 +1922,25 @@ class Ports:
                     self._conn_off("her berth is under her", said=False)
                     return
                 continue
+            # leg by leg (package 45c): he cons her along the leg from the mark before,
+            # for a point on it a little ahead of her, and not straight for the mark from
+            # wherever the stream has set her (the frigate in the Goulet's mouth, set a
+            # cable south of his turning mark, was steered for the next across the Mingan)
+            brg = self._along_the_leg(leg_from, mark, pos, brg)
             wanted = math.radians(brg)
             # a danger on the line to the mark (package 45): he keeps her off it on the
             # hand his own warning names, two points from the line, till it is passed
-            kept_off = self._conn_keep_off(port, pos, brg)
+            kept_off = self._conn_keep_off(port, pos, brg, dist)
             if kept_off is not None:
                 wanted, words = kept_off[0], f"{words}, leaving {kept_off[1]}"
+            # the line is the one she is to make good over the ground; he allows for the
+            # stream across it (package 45c: in the Goulet's flood the schooner, conned for
+            # her mark by its bearing at two knots through the water, was set bodily onto
+            # the Mingan)
+            wanted = self._for_the_stream(wanted)
+            lies = self._as_she_will_lie(wanted)
+            if lies is not None:
+                wanted, words = lies, f"{words}, as near as she will lie"
             fresh = self.conn_bearing is None or dyn.helm_mode is not HelmMode.HEADING
             # the course given again when the mark's bearing has drawn half a point from
             # the bearing it was last given for, so that a bearing on a point's edge does
@@ -1772,7 +1949,62 @@ class Ports:
                 self._conn_order(port, wanted, words, now)
             return
 
-    def _conn_keep_off(self, port: Port, pos: Position, brg_deg: float) -> tuple[float, str] | None:
+    def _for_the_stream(self, line: float) -> float:
+        """The heading that makes good `line` (radians true) over the ground against the
+        stream where she is, as the pilot knows his water (package 45c): the stream's part
+        across the line taken out by her way through the water, reckoned at no less than
+        `PILOT_STREAM_WAY_KN`, the allowance no more than `PILOT_STREAM_MOST_RAD`."""
+        ship = self.world.ship
+        dyn = getattr(ship, "dyn", None)
+        if dyn is None:
+            return line
+        from freesail.physics.integrate import water_velocity
+
+        wx, wy = water_velocity(ship)
+        # the stream across the line, positive to the right of it
+        across = wx * math.cos(line) - wy * math.sin(line)
+        way = max(float(dyn.u), units.knots_to_ms(PILOT_STREAM_WAY_KN))
+        allow = math.asin(max(-1.0, min(1.0, across / way)))
+        allow = max(-PILOT_STREAM_MOST_RAD, min(PILOT_STREAM_MOST_RAD, allow))
+        return units.wrap_2pi(line - allow)
+
+    def _as_she_will_lie(self, wanted: float) -> float | None:
+        """The course nearest `wanted` she will lie, full and by on the tack she is on,
+        when `wanted` is nearer the wind than that (package 45c): a pilot does not con a
+        ship into the wind's eye (the frigate in the Goulet's mouth, the wind at WNW, was
+        given NW by turns and taken aback onto the Fillettes); None when she lies it."""
+        from freesail.evolutions.scripts import close_hauled_true_angle
+
+        wind = getattr(self.world, "wind", None)
+        if wind is None:
+            return None
+        wind_from = float(wind.direction_from)
+        closest = close_hauled_true_angle(self.world.ship) + PILOT_LIE_MARGIN_RAD
+        x = units.wrap_pi(wanted - wind_from)
+        if abs(x) >= closest:
+            return None
+        own = units.wrap_pi(float(self.world.ship.dyn.heading) - wind_from)
+        sign = 1.0 if (own if abs(own) > 1e-6 else x) >= 0.0 else -1.0
+        return units.wrap_2pi(wind_from + sign * closest)
+
+    def _along_the_leg(self, a: Position, b: Position, pos: Position, to_mark: float) -> float:
+        """The bearing the pilot steers for along the leg from `a` to `b`: a point on the
+        leg `PILOT_CONN_AHEAD_M` beyond where she is abreast of it, or the mark itself when
+        that is nearer (package 45c); the mark's own bearing when the leg has no length or
+        she is past its end."""
+        leg_brg, length = bearing_and_distance(a, b)
+        if length < units.CABLE:
+            return to_mark
+        _off, share = _off_the_leg(a, b, pos)
+        along = max(0.0, share) * length + PILOT_CONN_AHEAD_M
+        if along >= length:
+            return to_mark
+        aim = destination(a, leg_brg, along)
+        return bearing_and_distance(pos, aim)[0]
+
+    def _conn_keep_off(
+        self, port: Port, pos: Position, brg_deg: float, to_mark_m: float = math.inf
+    ) -> tuple[float, str] | None:
         """The course to steer for the mark with a charted danger on the line kept off
         (package 45): the first danger `dangers_ahead` finds on the line to the mark
         within the warning distance (as `_warn` reads it, with the water the ship wants)
@@ -1785,12 +2017,19 @@ class Ports:
             return None
         east, north = self._ground_velocity()
         speed = max(math.hypot(east, north), units.knots_to_ms(2.0))
-        ahead = max(PILOT_WARN_MIN_M, speed * PILOT_WARN_AHEAD_S)
+        # no farther than his mark (package 45c): past it the track turns, and the line
+        # run on beyond a turning mark found the Goulet's north shore and laid her off it
+        # toward the Mingan
+        ahead = min(max(PILOT_WARN_MIN_M, speed * PILOT_WARN_AHEAD_S), to_mark_m + units.CABLE)
         tide = float(getattr(self.world, "tide_height_m", 0.0) or 0.0)
         hull = getattr(self.world.ship, "hull", None)
         draught = float(hull.spec.draught_m) if hull is not None else 0.0
         wants = draught + PILOT_UNDER_KEEL_M
-        found = chart.dangers_ahead(pos, brg_deg, ahead, PILOT_WARN_ABEAM_M, tide, wants)
+        # a danger the line itself runs over (within its own extent, a cable for a rock),
+        # not one it passes clear of: his track through the north pass of the Goulet
+        # leaves the Mingan two cables to starboard, and a keep-off at the warning's berth
+        # laid her two points onto the north shore's ledge (package 45c)
+        found = chart.dangers_ahead(pos, brg_deg, ahead, PILOT_CONN_ON_THE_LINE_M, tide, wants)
         if found:
             f, _along, _off, side = found[0]
             deeper = "larboard" if side > 0 else "starboard"
@@ -1843,6 +2082,13 @@ class Ports:
             self.conn_heading = units.parse_course(point)
         self.conn_order_tick = now
         self.conn_bearing = wanted
+        if points >= PILOT_TRIM_POINTS and now - self.conn_trim_tick >= PILOT_TRIM_EVERY_S:
+            self.conn_trim_tick = now
+            # a turn of two points and more: the yards and sheets trimmed to it at his word
+            # (package 45c; the owner's merchantman, put five points up for the Goulet's
+            # track with her yards for a broad reach, was taken aback and set onto the
+            # Fillettes by the flood)
+            world.submit("trim sails", actor=PILOT_ACTOR, said="The pilot: trim to it")
 
     # -- the pilot's words -----------------------------------------------------------------
 
@@ -2606,6 +2852,7 @@ class Ports:
         runner = world.ship.extra.get("evolutions")
         if runner is None:
             raise OrderError("There is no one to man the boat: no evolution runner is fitted.")
+        was = self.boat
         self.boat = BoatState(
             away=True,
             boat_id=boat.id,
@@ -2617,7 +2864,14 @@ class Ports:
             since_tick=world.clock.tick,
             people=list(people or []),
         )
-        return runner.start(world.ship, "send_boat", "her", {"errand": errand, "port": port.id})
+        try:
+            return runner.start(world.ship, "send_boat", "her", {"errand": errand, "port": port.id})
+        except OrderError:
+            # the order refused (package 45c): the boat stays at the booms, and nobody is
+            # left sitting in her
+            self.boat = was
+            self._people_back(people or [])
+            raise
 
     def send_boat(self, words: str) -> tuple[str, dict[str, Any]]:
         """`send the boat ashore [with the purser | with <person> | for the prices | with
@@ -2659,6 +2913,51 @@ class Ports:
             errand = "yard"
         text = self._send_boat(port, errand, carrying, people)
         return text, {"port": port.id, "errand": errand, "people": people}
+
+    def _people_back(self, people: list[str]) -> None:
+        for pid in people:
+            p = self.world.people.find(pid)
+            if p is not None:
+                p.aboard = True
+                p.where = "deck"
+
+    def _boat_kept(self) -> None:
+        """The boat's state kept with her work (package 45c; the owner's note 3 of gate
+        m6a-2, "the ghosted boat"): once a minute, a boat said to be away whose work is no
+        longer in the runner's hands (the order belayed, or refused or failed when its turn
+        came after waiting on the hands as the ship came to) is not left "hoisting out" for
+        ever, refusing every boat order after it: she was never hoisted out, she is at the
+        booms again, whoever was to go in her is on deck, and the log says so. A boat
+        already away is not belayed (`orders.work`), so that she cannot vanish from the
+        water; were she found so, she is brought alongside as on her return."""
+        runner = self.world.ship.extra.get("evolutions")
+        if runner is None:
+            return
+        if any(i.evo.id == "send_boat" for i in getattr(runner, "instances", [])):
+            return
+        name = self.boat.boat_name
+        head = f"{name[:1].upper()}{name[1:]}"
+        port = self.ports.get(self.boat.port_id)
+        if self.boat.phase != "hoisting out" and port is not None:
+            for severity, kind, text, data in self._boat_back(port):
+                self._record(severity, kind, text, data)
+            return
+        people = [
+            self.world.people.find(pid).name
+            for pid in self.boat.people
+            if self.world.people.find(pid) is not None
+        ]
+        self._people_back(self.boat.people)
+        errand = _errand_words(self.boat.errand)
+        self.boat = BoatState(boat_name=name, boat_id=self.boat.boat_id)
+        who = f"; {_and(people)} on deck again" if people else ""
+        self._record(
+            Severity.NOTABLE,
+            "boat.stood_down",
+            f"{head} was not sent away {errand}: the work to send her was belayed or could not "
+            f"be carried out; she is at the booms{who}. Send her again when you please.",
+            {"boat": self.boat.boat_id, "people": list(people)},
+        )
 
     def boat_phase(self, phase: str) -> list[tuple[Severity, str, str, dict[str, Any]]]:
         """The boat's script says where it is (`SendBoatScript`): the lines, and what the

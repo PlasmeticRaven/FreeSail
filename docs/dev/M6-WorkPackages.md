@@ -23,12 +23,12 @@ tuning notes and a report to the lead at the end.
 | 42a | Opus | The consent brief revised once from 40's draft, describing in kind all of 6b and 6c that the rule watches; the watched sections pinned; the re-asks the owner's | merged 2026-10-10 (decision 42: the added sentences approved; the re-asks the owner's) |
 | 41 | Fable | The wardroom: several doors, the pace rule, the deck's conversation, the master's and the lookout's stations, the stand-by on several conditions | merged 2026-10-10 (stations bound at run time, a passenger station, the pace rule as one object the drivers share; no pin moved) |
 | 42 | Opus | The API door and its security pass; the transcript-driven replay; the chart and the ship's view as images through the doors that carry one (the consent revision moved to 42a) | merged 2026-10-10 (the key from the credential store first; the acts beside the log; the pictures from the open page; OpenRouter on a mock only; thinking cannot be switched off on the current models, so no-effort is the model's default) |
-| 43 | Fable | Other ships with captains: the measurement first, the brain on the far body (the rules-based captain for the other ships), the crewed promotion and the guard, a model captain of another ship kept across the switch, the director's seat hook and the live world order | briefed 2026-10-15 for the owner's approval, after 45c's and beside it |
+| 43 | Fable | Other ships with captains: the measurement first, the brain on the far body (the rules-based captain for the other ships), the crewed promotion and the guard, a model captain of another ship kept across the switch, the director's seat hook and the live world order | approved and launched 2026-10-16, beside 45c |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
 | 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | merged 2026-10-11 as committed so far (the owner's word, to play it) and 2026-10-15 whole, with every pin re-measured; the naval cruise's two truths strict expected failures for 45c; gate m6a-2 not cut |
 | 43b | Opus | The lugger and the smack; the world's business (spec §19), with the trade rumours a boat brings back from the shore (the owner's note 24) | brief to write |
 | 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | brief to write |
-| 45c | Opus | Package 45's tail (the naval cruise restored, the chase, sail after the gale by steps, the pilot's conn through the Goulet and its design) and the owner's small fixes from gate m6a-2's runs (a picture put back by hand with a note, the ghosted boat and `--until`, the weather's cadence, the OpenRouter exchanges, `muster` in the browser, the unheld lookout, the sails-lifting line, the pictures at the local runner, a point of interest, world orders not shown as sent, the stations' groundwork) | briefed 2026-10-15 for the owner's approval; the milestone's last new package |
+| 45c | Opus | Package 45's tail (the naval cruise restored, the chase, sail after the gale by steps, the pilot's conn through the Goulet and its design) and the owner's small fixes from gate m6a-2's runs (a picture put back by hand with a note, the ghosted boat and `--until`, the weather's cadence, the OpenRouter exchanges, `muster` in the browser, the unheld lookout, the sails-lifting line, the pictures at the local runner, a point of interest, world orders not shown as sent, the stations' groundwork) | merged 2026-10-16, the first of the two; the milestone's last new package |
 
 Package 37m (the helm through the wind) is milestone 5's last, briefed in
 `M5-WorkPackages.md`, launched beside 38 on 2026-10-09 and merged after it: 38 moves no
@@ -1388,6 +1388,56 @@ measurement comes first (§19, the owner's rule).
 7. **Notes and spec**: §19, §20, §23 and §4 as built; the primer; the Harness note on a
    station on another ship; the tuning notes with the measurement, the range and the cap,
    and the trials' logs with two captains.
+
+## Package 45c, as merged (2026-10-16)
+
+The builder's notes are the record (`docs/dev/TuningNotes.md`, its section; spec §4, §11,
+§13 and §23 as built; the primer and the Harness note). The cruise's drift was not the helm
+rules at all: bisected to 45's Part B commit, the first line to differ was the Plymouth
+pilot's fix correcting her account, which made the course for the station a degree
+different; the cutter then reached her an hour and a half later and the old chase rule
+kept chasing the cutter after its letter was read. Mended by the chase rule (a stranger
+chased first, a chase kept only while she is a stranger; the lead up to 70°, the bearing
+swinging more than 45° in a glass read as a crossing and the course laid for her again;
+written in the King's ship's doctrine) and by placing the Palinure at 10:30 five leagues on
+the bow as the scenario's own comment says; the cruise meets the cutter, reads the letter,
+speaks the brig and wears twelve times, both expected failures lifted. Sail after the gale
+by steps (the topsails after ten minutes under the shorten-sail line, masts with sea room,
+reefs and jib after half an hour under 25 knots, the courses last): aback 24 and 32 minutes
+in the gale trials where 170 and 146, never aground, and a King's ship on station put about
+for land ahead. The Goulet's `in` track pricked again from the chart north of the Mingan
+and the Fillettes in eight fathoms and more, the Bay's road moved onto its twelve; the conn
+as the owner designed it (from the station or inside a leg, else joined at the first clear
+mark ahead or by a planner leg, else "bring her to the station first"), leg by leg with the
+stream allowed for and never nearer the wind than she lies; the wardroom save replayed from
+114700 berths her in nine fathoms. The warning's hand now from the ship's head. The boat:
+coming to anchor silently belayed every waiting job, the boat's errand among them, which
+left her hoisting out for ever; the errand survives, an orphaned order is put back in
+words, a boat away cannot be belayed; `--load SAVE --until TICK` at the console and the
+browser. Part B whole: the picture put back only by the model's hand with its note; the
+picture tools at the local runner; the weather's blocks jittered; the OpenRouter exchanges
+file and the free models' reply shapes; muster and the state in the browser; the unheld
+lookout answered; the lifting line naming untrimmed yards; `mark:`; world orders kept for
+the record only; the station's kind beside its holder, journals keyed to the person. Pins
+re-measured (the 5a day for the jitter; the merchant passage's road; the intent's conn from
+Bertheaume; the cruise; the five trials). Suites: the slow tier whole 3,492 passed, 10
+expected failures, the 13 failures its pins then written in; the confirming run clean; the
+fast tier 3,240; the pace tests 3 of 5 under 43's load (436 against 500, the tree before the
+package no better under the same load), to be run again on the quiet machine at 43's merge.
+
+**Judgements taken:** a course a model shapes across the land stays a warning, not a
+refusal; Torbay's tide height is near enough and its fault is the stream: the bay sits in
+the mid-Channel stream area and gets 1.3 knots at springs where the real bay has next to
+none.
+
+**Open, for the lead or the owner:** (1) the Goulet's conn from south-west of the mouth on
+a flood with a northerly still puts her on the Mingan from earlier ticks of the wardroom
+save (the set carries her east across his legs): a pilot who allows for the set before his
+turn, or a conn that lays a fresh line when she cannot make his leg good; (2) a stream area
+of Torbay's own (a chart-data patch; the passages near it would move); (3) the intent
+scenario's conn from Bertheaume adds 240 lines of pilot-water bearings to its log, which
+may want a quieter severity; (4) the Palinure's hour in the cruise's scenario is no longer
+the author's "at seven".
 
 ## The owner's runs of m6a-2, read (the lead, 2026-10-15; the notes in `docs/playtests/2026-10-13-gate-m6a-2-owner-runs/`)
 

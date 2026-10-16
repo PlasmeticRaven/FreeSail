@@ -27,6 +27,9 @@ SOUTH_OF_FALMOUTH = {"lat_deg": 50.05, "lon_deg": -5.03}  # five miles south of 
 FALMOUTH_OUTER = {"lat_deg": 50.133, "lon_deg": -5.035}
 CARRICK_ROAD = {"lat_deg": 50.160, "lon_deg": -5.034}
 THE_RADE_INNER = {"lat_deg": 48.345, "lon_deg": -4.470}  # the Bay of Brest, within the Goulet
+BERTHEAUME = {"lat_deg": 48.3418, "lon_deg": -4.6900}  # the pilots of Brest's station
+BASQUE_ROAD = {"lat_deg": 46.045, "lon_deg": -1.26}
+OFF_AIX = {"lat_deg": 46.020, "lon_deg": -1.145}  # the owner's schooner, north-east of Aix
 THE_SOUND = {"lat_deg": 50.345, "lon_deg": -4.150}  # Plymouth Sound, within the anchorage
 START = datetime(1805, 6, 10, 10, 0)
 
@@ -572,6 +575,55 @@ def test_a_kedge_is_laid_out_by_the_boat_to_the_bearing_given():
 # ---------------------------------------------------------------------------
 # The boat, the market, the yard and the crew pool
 # ---------------------------------------------------------------------------
+
+
+def test_a_boat_order_that_comes_to_nothing_leaves_her_at_the_booms_and_one_away_is_not_belayed():
+    """Package 45c, item 6 (the owner's note 3 of gate m6a-2, "the ghosted boat"): the boat
+    ordered ashore as the ship came to, her work belayed before she left the side (or
+    refused or failed when its turn came), was left "hoisting out" for ever, every boat order
+    after it refused as "away already". The boat's state now goes with her work: she is at
+    the booms again, said in words, and may be sent again; and a boat already away is no
+    work of the deck's to belay, so that she cannot vanish from the water."""
+    w = at_anchor_in(CARRICK_ROAD)
+    e = w.submit("send the boat ashore")
+    assert e.kind == "order.accepted" and w.ports.boat.away
+    w.run(30)
+    e = w.submit("belay all work")
+    assert e.kind == "work.belayed"
+    w.run(60)
+    stood = events(w, "boat.stood_down")
+    assert not w.ports.boat.away and len(stood) == 1
+    assert "was not sent away for the prices and what news there is" in stood[0].text
+    assert stood[0].text.endswith("she is at the booms. Send her again when you please.")
+    e = w.submit("send the boat ashore")
+    assert e.kind == "order.accepted"
+    run_until(w, "boat.away", 20)
+    e = w.submit("belay all work")
+    assert e.kind == "order.rejected" and "The boat is away from the ship on her errand" in e.text
+    assert w.ports.boat.away
+    run_until(w, "boat.alongside", 240)
+    assert not w.ports.boat.away and len(events(w, "boat.stood_down")) == 1
+
+
+def test_the_boat_sent_while_all_hands_bring_her_to_waits_for_them_and_goes():
+    """Package 45c, item 6, the owner's own case (`m6a-real-voyage-guernsey.json`, replayed
+    to 212700 on the tree before: 'Send the boat ashore with the purser' at 209444 waited
+    for hands while all hands brought her to an anchor, was belayed with no line when the
+    anchoring ended, as the sail work held then is, and the launch stood "hoisting out" to
+    the end of the game). The boat's errand waits on through the anchoring and goes."""
+    w = world_at(CARRICK_ROAD, heading=200.0, speed=2.0)
+    w.run(30)
+    e = w.submit("bring her to an anchor")
+    assert e.kind == "order.accepted"
+    run_until(w, "ship.anchored", 20)
+    e = w.submit("send the boat ashore")
+    assert e.kind == "order.accepted" and w.ports.boat.away
+    w.run(5)
+    waits = [x.text for x in events(w, "evolution.waiting") if "send boat" in x.text]
+    assert waits == ["Not hands enough on deck to send boat; the hands are coming to anchor."]
+    away = run_until(w, "boat.away", 90)
+    assert away.text.startswith("The launch away for ")
+    assert not events(w, "boat.stood_down")
 
 
 def test_the_boats_errand_ashore_brings_the_prices_off_and_the_orders_refuse_in_words_otherwise():
@@ -1352,11 +1404,16 @@ def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_th
     w.submit("steer north")
     w.run(600)
     e = w.submit("let the pilot take her in")
+    # package 45c: his conn is promised along his track from his station, the outer
+    # road, which he cons her to first by a clear joining leg from five miles off
     assert e.kind == "port.conn" and e.text == (
-        "The pilot, Mr Pascoe, has the conn to take her in: by 1 mark to Carrick Road; 'I have "
-        "the conn', or a helm order, takes her back."
+        "The pilot, Mr Pascoe, has the conn to take her in: by 2 marks to Carrick Road; 'I "
+        "have the conn', or a helm order, takes her back."
     )
-    assert w.ports.conn and [m[0] for m in w.ports.conn_track] == ["Carrick Road"]
+    assert w.ports.conn and [m[0] for m in w.ports.conn_track] == [
+        "Falmouth outer road",
+        "Carrick Road",
+    ]
     berth = run_until(w, "port.pilot_berth", 120)
     assert berth.text.startswith(
         "The pilot: this is the berth, Carrick Road; let go when you please. Carrick Road, "
@@ -1367,10 +1424,12 @@ def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_th
     conned = [x for x in events(w, "helm.order") if x.actor == PILOT_ACTOR]
     assert conned and conned[0].text == "Helm ordered: steer N (0°)."
     said = [x.text for x in events(w, "order.accepted") if x.actor == PILOT_ACTOR]
-    assert said[0] == "The pilot: steady as she goes; steer N for Carrick Road."
+    assert said[0] == "The pilot: steady as she goes; steer N for Falmouth outer road."
     kept_off = [s for s in said if "leaving the Black Rock to starboard" in s]
     assert kept_off
-    assert kept_off[0].startswith("The pilot: port 2 points; steer NNW for Carrick Road")
+    # the outer road passed abeam (45c: beyond his mark along the leg), the Black Rock is on
+    # the leg to Carrick Road
+    assert kept_off[0].endswith("for Carrick Road, leaving the Black Rock to starboard.")
     warned = [x.text for x in events(w, "port.pilot_warns")]
     assert any("the Black Rock" in t and "leave it to starboard" in t for t in warned)
     e = w.submit("come to an anchor")
@@ -1399,6 +1458,94 @@ def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_th
         "The pilot gives her up: the conn taken back.",
         "The pilot gives her up: you have her, sir (the helm was given another course).",
     ]
+
+
+def _conn_from(where, port, region, start, heading, ship=SCHOONER):
+    w = world_at(
+        where,
+        ship=ship,
+        heading=heading,
+        speed=4.0,
+        wind=300.0,
+        start=start,
+        chart=None,
+        region=region,
+        nation="united-states",
+    )
+    _pilot_aboard(w, port)
+    w.submit("set plain sail")
+    w.run(60)
+    return w
+
+
+def test_the_pilot_of_brest_takes_her_through_the_goulet_on_the_truth_from_his_station():
+    """Package 45c, item 4a: Brest's `in` track pricked again for the true channel from
+    the chart's own soundings (it was the merchant book's points, pricked for an account
+    that lags her on the flood, and conned on the truth she took the ground under Petit
+    Minou): from the road of Bertheaume, his station, the pilot cons her through the
+    Goulet north of the Mingan into the Bay of Brest, never in less than eight fathoms
+    and never warning of the shore (the Mingan named, left to starboard), and says
+    where to let go."""
+    from freesail.world.ports import PILOT_ACTOR
+
+    w = _conn_from(BERTHEAUME, "brest", "channel-west", datetime(1805, 6, 13, 9, 0), 110.0)
+    e = w.submit("let the pilot take her in")
+    assert e.kind == "port.conn" and "by 8 marks to the Bay of Brest" in e.text
+    least = math.inf
+    for _ in range(150):
+        w.run(60)
+        depth = w.chart.depth_at(w.position)
+        least = min(least, depth + w.tide_height_m)
+        if events(w, "port.pilot_berth") or events(w, "ship.aground"):
+            break
+    assert events(w, "port.pilot_berth") and not events(w, "ship.aground")
+    assert least > units.fathoms_to_m(8.0)
+    # the only warning his own: the Mingan, left to starboard as his track leaves it
+    warned = [x.text for x in events(w, "port.pilot_warns")]
+    assert all("the Mingan" in t and "leave it to starboard" in t for t in warned), warned
+    said = [x.text for x in events(w, "order.accepted") if x.actor == PILOT_ACTOR]
+    assert said[0].endswith("for 48 19.53 N 4 37.8 W.")
+
+
+def test_the_pilot_joins_his_track_by_a_planned_leg_or_asks_for_the_station_first():
+    """Package 45c, item 4b (the owner's refinement of 2026-10-15): boarding away from his
+    station, the pilot first cons her to join his track, by a joining leg laid with the
+    captain's planner round the land in his way (the Basque Road to the road of Aix by the
+    south of the Isle of Aix), and where none is clear he says so and takes her only from
+    the station."""
+    w = _conn_from(BASQUE_ROAD, "rochefort", "biscay-north", datetime(1805, 9, 27, 6, 0), 120.0)
+    e = w.submit("let the pilot take her in")
+    assert e.kind == "port.conn" and "to the road of Aix" in e.text
+    track = [m[1] for m in w.ports.conn_track]
+    assert len(track) >= 2 and all(p.lat_deg < 46.016 for p in track[1:])  # south of Aix
+    for _ in range(90):
+        w.run(60)
+        if events(w, "port.pilot_berth") or events(w, "ship.aground"):
+            break
+    assert events(w, "port.pilot_berth") and not events(w, "ship.aground")
+    # in the Pertuis Breton, north of the Isle of Re, no clear leg is found in his own
+    # water within the planner's rounds: he asks for the station first
+    north_of_re = {"lat_deg": 46.25, "lon_deg": -1.40}
+    w = _conn_from(north_of_re, "rochefort", "biscay-north", datetime(1805, 9, 27, 6, 0), 90.0)
+    e = w.submit("let the pilot take her in")
+    assert e.kind == "order.rejected" and not w.ports.conn
+    assert "bring her to the station first, the road of Aix, and I will take her in" in e.text
+
+
+def test_the_pilots_deeper_water_is_the_channels_named_from_the_ships_head():
+    """Package 45c, item 4c (the owner's schooner off the Isle of Aix: "the deeper water is
+    to larboard" where the entrance lay to starboard): the side of a shoal ahead is the
+    channel's, read a mile either side of it and not two cables, and named from the
+    ship's head as a pilot speaks. At the owner's place (the save's position as this build
+    replays it, at low water) the deeper water is the road of Aix's, to starboard."""
+    w = _conn_from(OFF_AIX, "rochefort", "biscay-north", datetime(1805, 9, 27, 2, 0), 119.0)
+    w.submit("steer 119")
+    for _ in range(4):
+        w.run(60)
+        if events(w, "port.pilot_warns"):
+            break
+    warned = events(w, "port.pilot_warns")
+    assert warned and warned[0].text.endswith("the deeper water is to starboard."), warned
 
 
 def test_a_hail_never_asks_a_ship_at_anchor_to_shorten_sail():

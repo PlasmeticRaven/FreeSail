@@ -5345,17 +5345,27 @@ class _AnchorScript(Script):
         return d
 
 
+# The work that waits on at anchor when she comes to (package 45c): the boat's errand.
+ANCHOR_WORK_KEPT = frozenset({"send_boat"})
+
+
 def _belay_held_work(ship: Ship) -> None:
     """The sail work the manoeuvre belayed, or that waited its turn for hands while all
     hands were at the anchor, is not taken up at anchor (the runner resumes a manoeuvre's
     belayed work when all hands are done, decision 25; a sail half set when she came to
     anchor is furled with the rest and its order is done with, and a trim that waited
-    finds no sail to trim)."""
+    finds no sail to trim). The boat's errand is not sail work and is anchor work: it
+    waits on for its hands and goes when they are free (package 45c, the owner's ghosted
+    boat: sent ashore at Guernsey while all hands brought her to, it was belayed here with
+    no line, and the boat's state left 'hoisting out' for ever)."""
     runner = ship.extra.get("evolutions")
     if runner is None or not hasattr(runner, "belay"):
         return
     held = [
-        i for i in runner.instances if getattr(i, "paused", False) or getattr(i, "waiting", False)
+        i
+        for i in runner.instances
+        if (getattr(i, "paused", False) or getattr(i, "waiting", False))
+        and getattr(getattr(i, "evo", None), "id", "") not in ANCHOR_WORK_KEPT
     ]
     if held:
         runner.belay(ship, held)

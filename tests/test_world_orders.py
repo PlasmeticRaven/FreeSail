@@ -288,3 +288,33 @@ def test_an_appended_system_lives_among_the_climatologys_and_a_scenario_file_is_
     assert sf.scenario.epitome == "moore" and sf.scenario.papers["chart"] == {"year": 1804}
     assert any("Other sail on the sea" in ln for ln in sf.lines())
     assert any("World orders by time" in ln for ln in sf.lines())
+
+
+def test_a_point_of_interest_by_world_order_is_seen_as_a_mark_with_its_description():
+    """Package 45c, item 13 (the owner's note 23 of gate m6a-2): `mark: <description> at
+    <place>` puts a point of interest in the world, the scenario's at its time or the
+    harness's; the lookout sees it as a mark when it is in sight (a mark beyond the horizon
+    is not seen), the log's line its description, where it lies from her head, its bearing
+    and its distance; the order itself is the record's, refused at the captain's prompt;
+    saved and replayed, the digests one."""
+    wreck = "a wreck, her masts showing above the water"
+    sc_orders = [{"at": "1805-06-12T10:01", "order": f"mark: {wreck} at 49 36 N 5 20 W"}]
+    w = world_for(world_orders=sc_orders)
+    w.world_order("mark: a cask adrift at 49 36 N 4 40 W", "the test")  # 26 miles east
+    w.run(300)
+    seen = [
+        e for e in events(w, "lookout.sighting") if e.data.get("id", "").startswith("interest-")
+    ]
+    assert [e.data["description"] for e in seen] == [wreck]
+    line = seen[0].text
+    assert line.startswith(
+        "A wreck, her masts showing above the water abeam to larboard, bearing E, distant "
+    )
+    assert [o["result"] for o in w.save()["world_orders"]] == ["done", "done"]
+    refused = w.submit(f"mark: {wreck} at 49 36 N 5 20 W")
+    assert refused.kind == "order.rejected"
+    assert w.world_order("mark: a wreck at nowhere at all", "the test").data["result"] == "refused"
+    saved = w.save()
+    copy = replay.replay(saved, ship_factory)
+    assert copy.log.digest() == w.log.digest()
+    assert [f.name for f in copy.marks_of_interest] == ["a cask adrift", wreck]

@@ -5,7 +5,7 @@
                                  [--lockstep] [--ease-on-station]
                                  [--consent-records DIR] [--saves DIR]
     python -m freesail.ui.server --scenario data/scenarios/gate-4c-day.yaml [...]
-    python -m freesail.ui.server --load SAVE [--replay-anyway] [...]
+    python -m freesail.ui.server --load SAVE [--until TICK] [--replay-anyway] [...]
 
 then open http://localhost:8000. `--scenario FILE` starts from a scenario file (its
 ship, start, weather script, seed, standing orders and first orders; spec M4 §19);
@@ -13,6 +13,8 @@ ship, start, weather script, seed, standing orders and first orders; spec M4 §1
 `--load` does (spec M4 §21): from the checkpoint beside it, else by a replay of its
 journal, and the terminal says which and why. A save written by another build that holds
 a station's transcript is not replayed unless `--replay-anyway` is given (package 37d).
+`--until TICK` with it (package 45c) replays the save to that tick and takes the game up
+there, as the console's does.
 
 Routes (spec §9.2):
 
@@ -117,7 +119,16 @@ from fastapi.staticfiles import StaticFiles
 from freesail import units
 from freesail.api import queries
 from freesail.core import replay as replay_mod
-from freesail.core.events import Event, Rollup, RollupView, Severity, Shown, kept, rolls_up
+from freesail.core.events import (
+    Event,
+    Rollup,
+    RollupView,
+    Severity,
+    Shown,
+    for_the_record,
+    kept,
+    rolls_up,
+)
 from freesail.core.events import rollup as rolled
 from freesail.core.world import UNLOGGED_KINDS, World
 from freesail.ui.console import (
@@ -131,6 +142,8 @@ from freesail.ui.console import (
     REPLAY_ANYWAY_HELP,
     SEAT_HELP,
     SPEED_WORDS,
+    UNTIL_FLAG,
+    UNTIL_HELP,
     Pace,
     book_words,
     check_agents_unattended,
@@ -241,6 +254,8 @@ class Driver:
             self._alarm = e  # eased once the tick is over (`_run_ticks`)
         if e.kind in STATION_SPEAKS and self._heard is None and e.actor.startswith("the "):
             self._heard = (e.actor.removeprefix("the "), "speaks")  # `--ease-on-station`
+        if for_the_record(e):
+            return  # decision 46: the play log carries a world order's effects, not the order
         for x in self._view.feed(e, self.compression):
             self._emit_shown(x)
 
@@ -400,7 +415,9 @@ class Driver:
         driver's compression, the hour still open left for the live view to close."""
         return [
             x.to_dict() if isinstance(x, Rollup) else event_dict(x)
-            for x in rolled(self.world.log.tail(n), self.compression)
+            for x in rolled(
+                [e for e in self.world.log.tail(n) if not for_the_record(e)], self.compression
+            )
         ]
 
     def tick(self, n: int) -> None:
@@ -412,6 +429,13 @@ class Driver:
 
     def submit(self, text: str) -> Event:
         with self.lock:
+            asked = self._console_query(text)
+            if asked is not None:
+                # the console's own queries (package 45c, the owner's interview of
+                # 2026-10-15: `muster` worked at the console and not in the browser): the
+                # lines sent to the pages as the master's slate is, never journaled
+                self._emit({"type": "event", "event": event_dict(asked)})
+                return asked
             path = read_standing_orders_path(text)
             if path is not None:
                 # the driver's command, as in the console (spec M4 §3): reading the disk
@@ -443,6 +467,46 @@ class Driver:
             if not self._ease_for_station():
                 self.emit_snapshot()
             return e
+
+    def _console_query(self, text: str) -> Event | None:
+        """`state`, `muster`, `the sail room` and `the booms` typed at the browser's order
+        line (package 45c): what the console prints for them, as one event the log pane
+        shows and nothing writes, or None for any other line."""
+        from freesail.ui.console import Console
+
+        said = " ".join(str(text).lower().split())
+        world = self.world
+        if said == "state":
+            lines = list(world.summary_lines())
+            if self.desk is not None:
+                lines += list(self.desk.lines())
+            else:
+                lines += [
+                    f"The {a.station.name}: {a.agent.words()}." for a in world.agents.values()
+                ]
+            held = self.held_for()
+            if held is not None:
+                lines.append(f"The clock waits for {held} (--lockstep).")
+            elif world.agents:
+                lines.append(self.pace.words(self.compression))
+            kind = "query.state"
+        elif Console._is_muster(said):
+            lines, kind = list(queries.muster_lines(world)), "query.muster"
+        elif said in ("the sail room", "sail room"):
+            lines, kind = list(queries.sail_room_lines(world)), "query.sail_room"
+        elif said in queries.BOOMS_QUERIES:
+            lines, kind = list(queries.booms_lines(world)), "query.booms"
+        else:
+            return None
+        return Event(
+            tick=world.clock.tick,
+            ship_time=world.clock.ship_time,
+            severity=Severity.ROUTINE,
+            kind=kind,
+            text="\n".join(lines),
+            actor="driver",
+            data={"lines": lines},
+        )
 
     def read_standing_orders(self, path: str) -> Event:
         with self.lock:
@@ -786,10 +850,10 @@ def agent_routes(lock: Any, world: Callable[[], World], **desk_options: Any) -> 
 # ---------------------------------------------------------------------------
 
 # The console's own words, which its completer offers and the browser's order line does
-# not take: the instruments are its `state` and `muster`, the log panel its `log`, the
-# browser its `quit`; `replay` is `--load`. Everything else the completer offers is
-# offered as it is (`freesail.orders.complete`).
-CONSOLE_ONLY = ("state", "muster", "log", "replay ", "help", "quit")
+# not take: the log panel is its `log`, the browser its `quit`; `replay` is `--load`.
+# Everything else the completer offers is offered as it is (`freesail.orders.complete`);
+# since package 45c `state` and `muster` are the browser's too (`Driver._console_query`).
+CONSOLE_ONLY = ("log", "replay ", "help", "quit")
 
 # The station the browser's captain reads the library as. The library serves every
 # station the same pages (`tools.library`); the name only fills its signature.
@@ -1129,6 +1193,7 @@ def create_app(
             events = driver.world.log.since(since) if since is not None else driver.world.log.all()
             if until is not None:
                 events = [e for e in events if e.tick <= until]
+            events = [e for e in events if not for_the_record(e)]  # decision 46
             events = events[-max(1, min(limit, 5000)) :]
             return JSONResponse([event_dict(e) for e in events])
 
@@ -1286,6 +1351,7 @@ def main(argv: list[str] | None = None) -> int:
         "--time", "--speed", type=float, default=1.0, help="compression, game s per real s"
     )
     ap.add_argument("--load", help="save file to replay and continue from (spec M4 §21)")
+    ap.add_argument(UNTIL_FLAG, type=int, default=None, metavar="TICK", help=UNTIL_HELP)
     ap.add_argument(REPLAY_ANYWAY_FLAG, action="store_true", help=REPLAY_ANYWAY_HELP)
     ap.add_argument(
         "--scenario",

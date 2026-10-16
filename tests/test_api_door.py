@@ -457,6 +457,91 @@ def test_the_openrouter_dialect_sends_the_key_in_the_header_only():
     assert KEY not in json.dumps(m.exchanges)
 
 
+def test_the_openrouter_dialect_writes_the_exchanges_file_and_every_unread_reply_whole(tmp_path):
+    """Package 45c (the owner's interview of 2026-10-15: `--exchanges` wrote nothing at the
+    OpenRouter door, and a free model's replies hit the three-failure limit unread): the
+    dialect appends every exchange to the file as the API model does, the key scrubbed,
+    and a reply it cannot read is written there whole with a few words of its shape."""
+    replies = [
+        {"error": {"message": "Provider returned error", "code": 502}},
+        {
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": 'I will look.\n<tool_call>{"name": "readings", '
+                        '"arguments": {}}</tool_call>',
+                    },
+                    "finish_reason": "stop",
+                }
+            ]
+        },
+    ]
+
+    def server(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/api/v1/models":
+            return httpx.Response(200, json={"data": [{"id": "made-up/model-7"}]})
+        if request.url.path != "/api/v1/chat/completions":
+            return httpx.Response(404)
+        body = json.loads(request.content)
+        data = dict(replies.pop(0))
+        data["model"] = body["model"]
+        return httpx.Response(200, json=data)
+
+    said: list[str] = []
+    path = tmp_path / "exchanges.jsonl"
+    m = api.OpenRouterModel(
+        "https://openrouter.test/api",
+        KEY,
+        model="made-up/model-7",
+        transport=httpx.MockTransport(server),
+        say=said.append,
+        exchanges_file=str(path),
+    )
+    turns = [Turn(OPERATOR, "The brief."), Turn(DATA, {"reason": "x", "readings": {}, "log": []})]
+    assert m.reply(turns) is None
+    assert "an error in place of a reply: Provider returned error" in m.last_error
+    assert f"the reply is written whole to {path}" in m.last_error
+    r = m.reply(turns)
+    assert r is not None and r.text == "I will look." and [c.name for c in r.calls] == ["readings"]
+    lines = [json.loads(x) for x in path.read_text("utf-8").splitlines()]
+    assert len(lines) == 2
+    assert lines[0]["reply"]["error"]["message"] == "Provider returned error"
+    assert lines[1]["request"]["model"] == "made-up/model-7" and "messages" in lines[1]["request"]
+    assert KEY not in path.read_text("utf-8")
+
+
+def test_the_runner_reads_the_shapes_a_free_model_returns():
+    """Package 45c: a tool call written in the text (tagged, fenced, or the whole reply
+    one object), a content part marked as reasoning, and the completions form's text."""
+    from freesail.agents import local
+
+    tagged = local.LocalModel.parse(
+        {
+            "content": 'Aye.<tool_call>{"name": "order", "arguments": {"text": "trim sails"}}'
+            "</tool_call>"
+        }
+    )
+    assert tagged.text == "Aye." and tagged.calls[0].args == {"text": "trim sails"}
+    fenced = local.LocalModel.parse(
+        {"content": '```json\n{"name": "stand_by", "parameters": {"until": "a glass"}}\n```'}
+    )
+    assert fenced.text == "" and fenced.calls[0].name == "stand_by"
+    whole = local.LocalModel.parse(
+        {"content": '{"function": {"name": "journal", "arguments": "{\\"note\\": \\"x\\"}"}}'}
+    )
+    assert whole.calls[0].name == "journal" and whole.calls[0].args == {"note": "x"}
+    words = local.LocalModel.parse({"content": 'The bearing is {"steady": true}.'})
+    assert not words.calls and words.text == 'The bearing is {"steady": true}.'
+    parts = local.LocalModel.parse(
+        {"content": [{"type": "reasoning", "text": "hmm"}, {"type": "text", "text": "Aye."}]}
+    )
+    assert parts.text == "Aye."
+    r = httpx.Response(200, json={"choices": [{"text": "Aye.", "finish_reason": "stop"}]})
+    message, finish, _ = local.LocalModel._read(r)
+    assert message["content"] == "Aye." and finish == "stop"
+
+
 # ---------------------------------------------------------------------------
 # No key in the repository (item 2)
 # ---------------------------------------------------------------------------

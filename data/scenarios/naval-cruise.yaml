@@ -22,7 +22,10 @@
 # where the captain is (truth 68's chain). On the forenoon of the 13th, as she stands
 # back for the station, a sail is sighted ahead (a world order of this file: a French
 # brig-sloop out of Brest standing up-Channel for the trade under no colours, placed by
-# the author, who sees the world, five leagues on the frigate's bow at seven), made out
+# the author, who sees the world, five leagues on the frigate's bow at half past ten as
+# she stands for the station's south-west end; package 45c moved her there from seven,
+# where since package 45's helm she was put on the sea astern of the frigate while the
+# frigate still chased the admiral's cutter, and was never spoken), made out
 # and chased, the frigate's helm put for her bearing each glass while she is a stranger
 # (Luce 1884 p. 553: "keeping the chase on the same compass bearing"), until she is
 # within hail; the brig runs on at her plan's speed and the frigate returns to her
@@ -111,7 +114,7 @@ ships:
 world_orders:
   - {at: 1805-06-12T10:00, order: 'message: by a cutter from Plymouth from the port admiral: "Rejoin the squadron off the Black Rocks without delay; the enemy is reported out of Rochefort."'}
   - {at: 1805-06-13T06:00, order: 'weather: waypoint for "the old high over Biscay" at 1805-06-14T12:00 600 -700 1020'}
-  - {at: 1805-06-13T07:00, order: 'ship: a brig-sloop "Palinure" of France at 48 32 N 5 23 W, bound for the Start, no colours'}
+  - {at: 1805-06-13T10:30, order: 'ship: a brig-sloop "Palinure" of France at 48 30.6 N 5 30.3 W, bound for the Start, no colours'}
 
 standing_orders:
   - data/scenarios/naval-cruise.orders

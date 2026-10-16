@@ -34,6 +34,10 @@ stations:
   # the master's station (spec M6 §11; package 41): the frigate's master, the
   # navigator, whose working a model at the station does when he would
   master: master
+  # package 45c (the owner's word of 2026-10-15, stations that multiply): a second station
+  # of the officer of the watch's kind, held by the second lieutenant, named as it is not
+  # the kind's; a person's journal is his own at whichever station he holds
+  second officer: {kind: officer of the watch, holder: second lieutenant}
 
 wardroom:
   - role: captain

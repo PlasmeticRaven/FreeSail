@@ -735,6 +735,45 @@ def test_a_stand_by_that_ended_the_turn_is_answered_in_the_messages():
     assert "You stood by until a glass" in msgs[4]["content"]
 
 
+def test_the_picture_tools_at_the_local_runner_where_its_model_reads_an_image():
+    """Package 45c (the owner's note 14 of gate m6a-2): the runner learns from the server
+    whether its model reads an image (llama-server's `/props` modalities, Ollama's
+    capabilities), or is told with `--pictures`; a harness seated so offers `chart` and
+    `ship_view`, and the picture a tool drew is sent after the tool results as an image
+    part, fetched from the game by its id."""
+    from freesail.agents import pictures
+
+    seeing = llama(props={"model_path": GGUF, "modalities": {"vision": True}})
+    assert model_for(seeing).reads_pictures() is True
+    blind = llama(props={"model_path": GGUF, "modalities": {"vision": False}})
+    assert model_for(blind).reads_pictures() is False
+    assert model_for(llama(props=None)).reads_pictures() is None
+
+    class Painter:
+        def paint(self, view, facing, stamp, span=""):
+            return pictures.Picture("p1", "image/png", b"png!", 1200, 900, view, facing, stamp)
+
+        def get(self, pid):
+            return None
+
+    world = point_world()
+    pictures.set_painter(world, Painter())
+    server = llama([message("", ("chart", "{}")), message("I see it.")])
+    m = model_for(server, fetch_picture=lambda pid: ("image/png", b"png!"))
+    h = Harness(world, watcher(SamplingPolicy.in_lockstep(600)), m)
+    h.door, h.pictures = "runner", True
+    h.start()
+    assert "chart" in h.tool_names and "ship_view" in h.tool_names
+    world.run(A_GLASS_S)
+    msgs = server.bodies[1]["messages"]
+    shown = [x for x in msgs if x["role"] == "user" and isinstance(x["content"], list)]
+    assert shown and shown[0]["content"][1]["image_url"]["url"].startswith("data:image/png;base64,")
+    pictures.set_painter(world, None)
+    plain = Harness(point_world(), watcher(SamplingPolicy.in_lockstep(600)), model_for(llama()))
+    plain.door = "runner"
+    assert "chart" not in plain.tool_names
+
+
 def tool_contents(body: dict[str, Any]) -> list[str]:
     return [m["content"] for m in body["messages"] if m["role"] == "tool"]
 

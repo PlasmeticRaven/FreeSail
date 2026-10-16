@@ -9,10 +9,12 @@ A station is a post a model or you may hold through a door: the watcher's, the o
 ```orders frigate plain-sail
 the stations
 tell the master we shall want the reckoning worked at the fix
-# rejected: ask the lookout what sail is in sight
+ask the lookout what sail is in sight
 ```
 
-(The word to the master is kept in his station's journal for whoever takes it, as chapter 16 has it; the question to the lookout is refused because nobody holds that station in this book's ship: a question wants somebody to answer it.)
+(The word to the master is kept in his station's journal for whoever takes it, as chapter 16 has it; the question to the lookout, with nobody at that station in this book's ship, is answered by the ship's own masthead from what is in sight, by the rules, as its hails are (package 45c; it was refused, and the owner's models asked the masthead all the same).)
+
+A station's name need not be its kind's (package 45c): the ship's file may say `second officer: {kind: officer of the watch, holder: second lieutenant}`, and a door seats it by its name, with the kind's brief and authority. Its journal is the person's who holds it, not the station's name's, so that a person moved to another station keeps his own and two officers of the watch keep theirs apart.
 
 ## The master's station
 
@@ -61,7 +63,7 @@ Since package 43 the other sail have captains of their own (chapters 15 and 17),
 
 ## The pictures a station may ask for
 
-At the API door and over MCP a station has two tools more than the words: `chart`, the chart by the ship's account at a span (`harbour`, `coast`, `passage`, `whole`, or the view your page shows), and `ship_view`, the ship as the viewer draws her from a facing. Your open browser page draws them on canvases of its own (package 45: not from your screen, so the pane you have forward and the tab's being behind another change nothing) and the game sends them to the station in the tool's result, the words beside the picture saying what it is and its size. A picture is a book: it costs its tokens on every turn until the station shelves it or it goes back by itself after three turns, and its place in the conversation then holds a line saying what it was and that it was shown, so a model reading back does not take the stub for a picture it never saw. With the console and no page open the tool gives the readings the picture would have shown.
+At the API door and over MCP a station has two tools more than the words: `chart`, the chart by the ship's account at a span (`harbour`, `coast`, `passage`, `whole`, or the view your page shows), and `ship_view`, the ship as the viewer draws her from a facing. Your open browser page draws them on canvases of its own (package 45: not from your screen, so the pane you have forward and the tab's being behind another change nothing) and the game sends them to the station in the tool's result, the words beside the picture saying what it is and its size. A picture is a book: it costs its tokens on every turn until the station shelves it, and it never goes back by itself (package 45c: a book does after three turns, and the owner's models, finding a picture gone so, doubted they had seen it). Write in your journal what it showed before you shelve it, and give `shelve` a note of it: its place in the conversation then holds a line saying what it was, that it was shown, the time it was drawn and your note, so a model reading back does not take the stub for a picture it never saw. The local runner offers the two tools too when its model reads an image (`--pictures`). With the console and no page open the tool gives the readings the picture would have shown.
 
 ## The pace, and the cadence
 

@@ -198,14 +198,22 @@ def _position_in(words: str) -> Any:
 # it, for the same sail, reads how the bearing has drawn since the last and works the
 # lead that brings the drift to nothing, as the master would on the slate: the chase's
 # way across the line of sight is the lookout's estimate of her distance times the rate
-# the bearing draws, together with his own way across it on the course he has been
-# steering; the lead off her bearing is the angle whose sine is that over his own speed.
-# Everything in it is his (the bearing, the glass, the estimate, which is a third out at
-# the worst, his log and his course); the lead is capped (judgement: a bearing that
-# swings fast is a close pass, and the lead would otherwise put her head anywhere), and
-# the course is never nearer the wind than she lies close-hauled, when she is put
-# close-hauled on the tack nearer the course (judgement).
-CHASE_LEAD_MAX_DEG = 45.0
+# the bearing draws, together with his own way across it, which is his own run through
+# the water between the two bearings by his course and his log (package 45c:
+# `Lookout.own_run`, pegged each minute; it was the course she was on at the second
+# bearing, so that a chase begun as she turned read her whole turn as the chase's drift
+# and led her across the brig's bows at the cap); the lead off her bearing is the angle
+# whose sine is that over his own speed. Everything in it is his (the bearing, the glass,
+# the estimate, which is a third out at the worst, his log and his course). The lead is
+# capped (judgement: short of the right angle, beyond which she would be running from
+# the line of sight; 45 degrees before package 45c, which left a brig crossing at her own
+# speed two miles off to cross ahead of her); a bearing that has swung more than
+# `CHASE_CROSSED_DEG` since the last is a chase that has crossed her bows or passed close,
+# and she is steered for her bearing again (the bearing's drift over the interval says
+# nothing of the rate now); and the course is never nearer the wind than she lies
+# close-hauled, when she is put close-hauled on the tack nearer the course (judgement).
+CHASE_LEAD_MAX_DEG = 70.0
+CHASE_CROSSED_DEG = 45.0
 CHASE_STEADY_DEG = 0.5  # a drift below this is 'the bearing steady'
 CHASE_MIN_INTERVAL_S = 60.0  # two orders within a minute read no drift
 
@@ -223,30 +231,44 @@ def _chase_course(world: Any, sighting: Any) -> tuple[float, str]:
     bearing = float(sighting.bearing_deg)
     tick = int(world.clock.tick)
     heading_deg = units.rad_to_deg(float(world.ship.heading)) % 360.0
+    peg = getattr(lookout, "peg_own_run", None)
+    run = peg(world) if peg is not None else None
     last = chases.get(fid)
-    chases[fid] = (tick, bearing)
+    chases[fid] = (tick, bearing) if run is None else (tick, bearing, run[0], run[1])
     words = ""
     course = bearing
     if last is not None and tick - last[0] >= CHASE_MIN_INTERVAL_S:
         drift = units.rad_to_deg(units.wrap_pi(math.radians(bearing - last[1])))
+        way = (
+            "aft"
+            if (drift > 0) == (units.wrap_pi(math.radians(bearing - heading_deg)) < 0)
+            else "forward"
+        )
         if abs(drift) < CHASE_STEADY_DEG:
             words = ", the bearing steady"
-        else:
-            way = (
-                "aft"
-                if (drift > 0) == (units.wrap_pi(math.radians(bearing - heading_deg)) < 0)
-                else "forward"
+        elif abs(drift) > CHASE_CROSSED_DEG:
+            words = (
+                f", drawing {way} {abs(drift):.0f} degrees since the last: she has crossed, "
+                "and the course is laid for her bearing again"
             )
+        else:
             words = f", drawing {way} {abs(drift):.0f} degrees since the last"
             lead = drift
             dyn = getattr(world.ship, "dyn", None)
             speed = float(dyn.speed) if dyn is not None else 0.0
             estimate = getattr(sighting, "estimate_m", None)
             if estimate and speed > 0.1:
-                rate = math.radians(drift) / float(tick - last[0])  # rad/s, clockwise
-                across = float(estimate) * rate / speed + math.sin(
-                    math.radians(heading_deg - bearing)
-                )
+                dt = float(tick - last[0])
+                rate = math.radians(drift) / dt  # rad/s, clockwise
+                if run is not None and len(last) >= 4:
+                    # his own way across the line of sight, from his run between the
+                    # bearings, across the mean of the two
+                    mean = math.radians(last[1] + drift / 2.0)
+                    de, dn = run[0] - float(last[2]), run[1] - float(last[3])
+                    own_across = (de * math.cos(mean) - dn * math.sin(mean)) / dt
+                else:
+                    own_across = speed * math.sin(math.radians(heading_deg - bearing))
+                across = (float(estimate) * rate + own_across) / speed
                 lead = units.rad_to_deg(math.asin(max(-0.95, min(0.95, across))))
             lead = max(-CHASE_LEAD_MAX_DEG, min(CHASE_LEAD_MAX_DEG, lead))
             course = (bearing + lead) % 360.0
@@ -1323,11 +1345,21 @@ def execute(ship: Any, order: Order) -> Result:
         if which and sighting is None:
             raise OrderError(f"Nothing in sight answers to {which!r}; the strangers are listed.")
         if sighting is None:
-            # the chase in hand is kept while she is in sight (a second sail nearer does
-            # not take the helm from her); else the nearest sail
+            # the chase in hand is kept while she is in sight and a stranger (a second sail
+            # nearer does not take the helm from her); else the nearest stranger; else the
+            # nearest sail. Package 45c: a sail spoken, or whose colours are made out for
+            # the ship's own nation's, is no stranger and is not kept as the chase (the
+            # naval cruise chased the admiral's cutter for two hours after her letter was
+            # aboard, the French brig in sight on her quarter)
             chases = getattr(lookout, "_chases", None) or {}
-            in_hand = [s for s in sails if s.feature.id in chases]
-            sighting = min(in_hand or sails, key=lambda s: s.distance_m)
+            ports = getattr(world, "ports", None)
+            own = ports.ship_nation if ports is not None else None
+            known = lookout.stranger(world, float(world.ship.heading), own)
+            ids = {i["id"] for i in known["items"]}
+            strangers = [s for s in sails if s.feature.modern in ids]
+            pool = strangers or sails
+            in_hand = [s for s in pool if s.feature.id in chases]
+            sighting = min(in_hand or pool, key=lambda s: s.distance_m)
         from freesail.world.lookout import relative_words
 
         heading = float(world.ship.heading)

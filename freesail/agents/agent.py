@@ -1820,9 +1820,13 @@ SHELF_WORDS = (
     "sample says so. The library is always there: any book opens again at any time with "
     "the same call, under a new number. Your journal is where to keep what you took from "
     "a page. A picture (the chart, the ship's view, where your door carries one) is a book "
-    "too: a shelved picture was seen by you and is not sent again; its place in your "
-    "conversation holds a line saying what it was and that you were shown it, and the "
-    "same call draws a fresh one."
+    "too, but it never goes back by itself: it stays in your conversation until you put "
+    "it back. Before you do, write in your journal what it showed you; then shelve it with "
+    "a note (shelve(book='book 3', note='the fore topsail aback')), and its place in your "
+    "conversation holds a line with the time it was drawn and your note ('put back the "
+    "ship's view from abeam to leeward at 05:50 ... (book 3); seen: the fore topsail "
+    "aback'). A picture "
+    "put back was seen by you and is not sent again; the same call draws a fresh one."
 )
 
 # The sentences of the head's opt-out item asked for in the consent record of

@@ -647,6 +647,9 @@ class World:
         # ticks by `_tick_world_orders` and kept in `world_orders` with their source, the
         # harness's with them (`world_order`).
         self.world_orders: list[dict[str, Any]] = []
+        # the points of interest a world order has put in the world (`mark:`, package
+        # 45c): features of the world, not of the shared chart, seen by the lookout
+        self.marks_of_interest: list[Any] = []
         self._scenario_orders: list[tuple[int, str]] = sorted(
             (
                 int(

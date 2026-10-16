@@ -545,6 +545,10 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
         return _deck(ship, agents, verb, text, seat)
     if verb == "ask":
         station, question = _split_ask(text, ship)
+        if not by and _kind_of(ship, station) == "lookout" and _held_now(ship, station) is None:
+            # package 45c (the owner's interview of 2026-10-15): the masthead answers from
+            # what is in sight when nobody holds the station, as its own hails are made
+            return _the_masthead_answers(ship, station, question, speaker, said_by)
         agent = _manned(agents, station, seat)
         if speaker is not None and speaker["station"] == station:
             raise OrderError(f"The {station} asks itself nothing; ask another station.")
@@ -561,7 +565,17 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             # the captain's own word is kept (a station a replay has yet to seat is held by
             # nobody yet); a standing order's firing to nobody is refused as it always was,
             # or a book would fill the journal every glass
-            return _keep_word(ship, station, words)
+            kept = _keep_word(ship, station, words)
+            if _kind_of(ship, station) == "lookout":
+                # package 45c: the ship's own lookout at the masthead answers the word
+                kind, said, data = kept
+                return (
+                    kind,
+                    f"{said}. The masthead answers: aye aye, sir; in sight: "
+                    f"{_in_sight_words(ship)}",
+                    {**data, "by_rule": True},
+                )
+            return kept
         agent = _manned(agents, station, seat)
         return (
             "agent.told",
@@ -573,7 +587,11 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
         m = _JOURNAL.match(norm)
         assert m is not None
         station = _station_in(m.group("who") or m.group("who2") or "", ship) or ""
-        journal = journals.get(station)
+        from freesail.agents.journal import journal_seen
+        from freesail.orders.prompt import world_of
+
+        world = world_of(ship)
+        journal = journal_seen(world, station) if world is not None else journals.get(station)
         if journal is None:
             raise OrderError(f"There is no {station}'s journal; no {station} has been stationed.")
         # a query, like `state` and the book's listing: answered in the log, not journaled
@@ -591,11 +609,76 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     return "agent.resume", agent.resume("the captain"), {"station": station}
 
 
+def _kind_of(ship: Any, station: str) -> str:
+    """The kind of the station of that name aboard (package 45c): its binding's, else the
+    name."""
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    stations = getattr(world, "stations", None) if world is not None else None
+    binding = stations.binding(station) if stations is not None else None
+    return binding.kind if binding is not None else station
+
+
+# The words of a question to the masthead that ask for the land, or for the other sail
+# (package 45c); any other question is answered with everything in sight.
+_LAND_WORDS = ("land", "shore", "coast", "light", "mark", "headland", "rock", "breakers")
+_SAIL_WORDS = ("sail", "ship", "stranger", "vessel", "brig", "cutter", "frigate", "colours")
+
+
+def _in_sight_words(ship: Any, about: str = "") -> str:
+    """What the ship's own lookout can say from the readings (package 45c): the strangers
+    with what is made out of each when the question is of the other sail, the land when
+    it is of the land, else everything in sight by the last look."""
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    view = getattr(world, "readings", None) if world is not None else None
+    if view is None:
+        return "nothing to be seen from the masthead"
+    q = about.lower()
+    if any(w in q for w in _SAIL_WORDS):
+        got = view.value("strangers")
+        if isinstance(got, dict):
+            return str(got.get("words") or "no sail in sight")
+    if any(w in q for w in _LAND_WORDS):
+        got = view.value("land")
+        if isinstance(got, dict):
+            nearest = got.get("nearest")
+            if isinstance(nearest, dict) and nearest.get("words"):
+                return str(nearest["words"])
+            return f"land {got.get('words') or 'not in sight'}"
+    got = view.value("in_sight")
+    if isinstance(got, dict):
+        return str(got.get("words") or "nothing in sight")
+    return "nothing to be seen from the masthead"
+
+
+def _the_masthead_answers(
+    ship: Any, station: str, question: str, speaker: Any, said_by: dict[str, Any]
+) -> tuple[str, str, dict[str, Any]]:
+    """`ask the lookout <question>` with nobody at the lookout's station (package 45c; the
+    owner's interview of 2026-10-15, models addressing the lookout when nobody held it):
+    the ship's own lookout answers from the readings, as his hails are made, and the
+    answer is the order's line, so that the asker has it at once."""
+    if not " ".join(str(question).split()):
+        raise OrderError(f"Ask the {station} what? Say the question after the name.")
+    words = _in_sight_words(ship, question)
+    who = f"the {speaker['station']}" if speaker else "the captain"
+    return (
+        "agent.asked",
+        f"The masthead answers {who} (nobody holds the {station}'s station; the ship's own "
+        f"lookout): {words}.",
+        {"station": station, "question": question, "by_rule": True, **said_by}
+        | ({"speaker": speaker["station"]} if speaker else {}),
+    )
+
+
 def _keep_word(ship: Any, station: str, words: str) -> tuple[str, str, dict[str, Any]]:
     """`tell the <station> <words>` to a station nobody holds (package 37l; the review of
     gate 5c's playtests, G17: the words were refused and lost): kept in the station's
     journal and passed to whoever takes it next, in its first sample; the log says so."""
-    from freesail.agents.journal import WORD_KEPT_KIND, Journal
+    from freesail.agents.journal import WORD_KEPT_KIND, journal_of
     from freesail.orders.prompt import world_of
 
     words = " ".join(str(words).split())
@@ -605,7 +688,7 @@ def _keep_word(ship: Any, station: str, words: str) -> tuple[str, str, dict[str,
     journals = (getattr(ship, "extra", None) or {}).get("agent_journals")
     if world is None or journals is None:
         raise OrderError(f"There is no {station} at the station; nobody has been stationed there.")
-    journal = journals.setdefault(station, Journal(station))
+    journal = journal_of(world, station)  # the person's (package 45c)
     journal.append(
         world, f"The captain's word, kept for whoever takes the station: {words}", WORD_KEPT_KIND
     )

@@ -38,6 +38,14 @@ thresholds:
   # abates, sail should not be made upon the vessel too rapidly'; the half hour judgement).
   sail_again_kn: {value: 25, source: "the gate day's book's twenty-five knots for half an hour (package 37p); judgement"}
   sail_again_minutes: {value: 30, source: "as above; halved when the glass is rising"}
+  # Package 45c: by steps, the captain's own (freesail/world/captains.py `_weather_work`):
+  # the topsails as they stand reefed when the wind has been under `shorten_sail_kn` this
+  # long; the topgallant masts swayed up, the reefs out and the jib at the line above;
+  # the rest of the plain sail, the courses last, this much longer under it and the reefs
+  # out (Luce 1884 ch. XXIX p. 479; the minutes judgement). Plain sail at once had the
+  # frigate aback by turns for an hour.
+  topsails_again_minutes: {value: 10, source: "as gale_over_minutes: a lull is not the gale's end; judgement"}
+  courses_again_minutes: {value: 15, source: "the courses last, a quarter of an hour after the rest; judgement"}
   # The glass (item 6): the weather is worsening when the glass falls fast or the wind has
   # risen by `worsening_wind_kn` within the hour, mending when the glass rises or the wind
   # has eased by `mending_wind_kn`; worsening brings the gale rows `worsening_sooner_kn`
@@ -67,7 +75,7 @@ books:
     # rapidly"; the gate day's book's twenty-five knots for half an hour, judgement): in
     # the captain's trials the frigate kept her station all the afternoon after the gale
     # under the close-reefed main topsail alone, aback by turns
-    - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
+    # package 45c: sail after the gale is the captain's own, by steps (thresholds above)
     - 'standing order "a sail on passage": at a sail sighted then make her out'
     - 'standing order "the lead in pilot water": every 5 minutes, if the distance to {anchorage} is under 6 miles then heave the lead'
     - 'standing order "the anchorage": at a sounding, if the distance to {anchorage} is under 1.8 miles and the depth of water is under {anchorage_fathoms} fathoms and the speed is over 2 knots then come to an anchor'
@@ -102,6 +110,12 @@ books:
     # circle through Ushant), and after the gale, sail made again, she keeps her station
     # at seven knots: the land within the offing puts her about, as the beating book has it
     - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
+    # package 45c: and the lookout's cry of land ahead, which is heard when the shore is too
+    # dim for its distance (the lee-shore trial at dusk after the gale, plain sail made again:
+    # "Land right ahead, nine cables", the land out of sight to the offing's reading, and she
+    # ran on at seven knots); a ship on her station never stands into the land
+    - 'standing order "land ahead": at land ahead then put her about'
+    - 'standing order "land close ahead": at land close ahead then put her about'
     - 'standing order "by the wind": at wore then keep her full and by'
     - 'standing order "back to the station": every watch, if a stranger in sight is not in sight and the distance to {station} is over {radius} miles then shape a course for {station}'
     - 'standing order "a sail on the station": at a sail sighted then make her out'
@@ -113,7 +127,7 @@ books:
     # rapidly"; the gate day's book's twenty-five knots for half an hour, judgement): in
     # the captain's trials the frigate kept her station all the afternoon after the gale
     # under the close-reefed main topsail alone, aback by turns
-    - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
+    # package 45c: sail after the gale is the captain's own, by steps (thresholds above)
   in distress: []
   engaging: []
 

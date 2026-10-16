@@ -177,6 +177,10 @@ class Wardroom:
     ship_file: str
     outlines: tuple[Outline, ...]
     stations: dict[str, str]  # the harness's station name -> a role
+    # package 45c: a station whose name is not its kind's, by name -> its kind (`second
+    # officer: {kind: officer of the watch, holder: second lieutenant}`); empty for a file
+    # whose every station is named as its kind
+    kinds: dict[str, str] = field(default_factory=dict)
 
     @property
     def posts(self) -> list[str]:
@@ -230,10 +234,20 @@ def _wardroom(path: str) -> Wardroom:
                 note=" ".join(str(entry.get("note") or "").split()),
             )
         )
-    stations = {
-        " ".join(str(k).lower().split()): " ".join(str(v).lower().split())
-        for k, v in (raw.get("stations") or {}).items()
-    }
+    stations: dict[str, str] = {}
+    kinds: dict[str, str] = {}
+    for k, v in (raw.get("stations") or {}).items():
+        name = " ".join(str(k).lower().split())
+        if isinstance(v, dict):
+            # package 45c: a kind beside the holder, where the name is not the kind's
+            holder = v.get("holder")
+            if not holder:
+                raise ValueError(f"{path}, stations: the {name}'s station wants a holder.")
+            stations[name] = " ".join(str(holder).lower().split())
+            if v.get("kind"):
+                kinds[name] = " ".join(str(v["kind"]).lower().split())
+        else:
+            stations[name] = " ".join(str(v).lower().split())
     roles = {o.role for o in outlines}
     for station, role in stations.items():
         if role not in roles:
@@ -241,7 +255,7 @@ def _wardroom(path: str) -> Wardroom:
                 f"{path}, stations: the {station}'s station is bound to '{role}', which the "
                 "wardroom has not got."
             )
-    return Wardroom(path, str(raw.get("ship") or ""), tuple(outlines), stations)
+    return Wardroom(path, str(raw.get("ship") or ""), tuple(outlines), stations, kinds)
 
 
 def load_wardroom(ship_file: str | Path | None) -> Wardroom | None:

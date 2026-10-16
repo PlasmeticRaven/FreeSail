@@ -2061,6 +2061,111 @@ def test_a_book_left_open_goes_back_after_the_shelf_life_and_the_next_sample_say
     ]
 
 
+class _Painter:
+    """A painter of the test's own: a picture of the size asked, no browser."""
+
+    def __init__(self) -> None:
+        self.kept: dict[str, Any] = {}
+
+    def paint(self, view: str, facing: str, stamp: str, span: str = "") -> Any:
+        from freesail.agents import pictures
+
+        pic = pictures.Picture(
+            f"p{len(self.kept) + 1}", "image/png", b"png", 1200, 900, view, facing, stamp, span
+        )
+        self.kept[pic.id] = pic
+        return pic
+
+    def get(self, picture_id: str) -> Any:
+        return self.kept.get(picture_id)
+
+
+def test_a_picture_never_goes_back_by_itself_and_its_line_keeps_the_note_and_the_time():
+    """Package 45c (the owner's notes 2, 4 and 16 of gate m6a-2): a picture is put back by
+    the model's hand only, never by the shelf-life, and `shelve` takes a note of what it
+    showed, which the picture's line keeps with the time it was open; a note on a book is
+    kept in its line too."""
+    from freesail.agents import pictures
+
+    world = point_world()
+    pictures.set_painter(world, _Painter())
+    h, fake, _ = stationed(
+        world,
+        [reply("", call("chart", span="coast"), call("library", topic="primer 3")), "One."],
+        when_done=Reply("Nothing new."),
+    )
+    for _ in range(5):
+        world.run(EVERY)
+    assert h.turns_ended > harness_mod.SHELF_LIFE_TURNS + 1
+    chart, book = h.books
+    assert chart.picture and chart.state == "open"
+    assert book.state == "went back"
+    answer = h.shelve("book 1", "the Lizard abeam, the coast clear to leeward")
+    assert answer.startswith("Shelved: book 1 (the chart at ")
+    stub = h.turns[chart.at].content["tool_results"][chart.slot]["result"]
+    assert stub == (
+        "A picture: put back the chart at Morning watch, 8 bells (04:00) (the coast span, "
+        "twenty miles across), 1200 by 900 pixels (book 1); seen: the Lizard abeam, the coast "
+        "clear to leeward. It was shown to you here and put back at your word; the picture "
+        "itself is not sent again. chart(span='coast') draws a fresh one."
+    )
+    pictures.set_painter(world, None)
+
+
+def test_a_letter_sent_by_world_order_is_seen_in_no_sample_before_the_boat_brings_it():
+    """Decision 46 (package 45c): a world order as given is kept in the full record (the
+    log's store, the save) and never in a station's sample, its `read_log` or the browser's
+    play log; the play log carries its effects as they are met. A letter left at Brest by
+    world order is seen by the station only when the boat brings it off."""
+    import datetime as dt
+
+    from freesail.core.events import for_the_record
+    from freesail.ui.server import Driver
+
+    letter = "The Prefect maritime begs the captain to dine on Thursday."
+    sc = Scenario(
+        start_time=dt.datetime(1805, 6, 12, 9, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=250.0,
+        position={"lat_deg": 48.345, "lon_deg": -4.470},  # the Bay of Brest
+        region="channel-west",
+        cargo={"purse_pounds": 200.0},
+    )
+    world = make_world(7, "data/ships/topsail-schooner.yaml", sc)
+    world.run(60)
+    world.submit("let go the best bower")
+    world.run(300)
+    h, fake, _ = stationed(
+        world, [Reply("Aye.")] * 2, st=station(every=300), when_done=Reply("Nothing new.")
+    )
+    e = world.world_order(f'message: at Brest from the Prefect maritime: "{letter}"', "the test")
+    assert e.kind == "world.order" and for_the_record(e) and e in world.log.all()
+    world.run(600)
+    world.submit("send the boat ashore")
+    for _ in range(240):
+        world.run(60)
+        if [x for x in world.log if x.kind == "message.received"]:
+            break
+    world.run(600)
+    received = next(x for x in world.log if x.kind == "message.received")
+    for turns in fake.seen:
+        for t in turns:
+            if t.role != DATA:
+                continue
+            said = json.dumps(t.content, default=str)
+            assert "World order" not in said and "world.order" not in said
+            if letter in said:
+                assert t.content.get("tick", received.tick) >= received.tick
+    assert any(letter in json.dumps(t.content, default=str) for turns in fake.seen for t in turns)
+    lines = tools.read_log(world, "watcher", since_tick=0)["lines"]
+    assert not [x for x in lines if "World order" in str(x)]
+    shown = Driver(world).shown_log(5000)
+    assert not [x for x in shown if x.get("kind") == "world.order"]
+
+
 def test_the_brief_and_the_tools_say_what_shelving_does_the_number_and_the_journal():
     world = point_world()
     h, _, _ = stationed(world, ["Aye."])

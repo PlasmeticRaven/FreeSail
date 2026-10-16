@@ -175,45 +175,59 @@ def test_worsening_brings_the_gale_line_a_force_sooner_and_the_gale_over_line_wa
 # -- sail after the gale, whatever his state (item 5) -------------------------------------
 
 
-def test_after_the_gale_he_makes_sail_again_whatever_his_state_and_bends_a_new_jib():
+def test_after_the_gale_he_makes_sail_again_by_steps_whatever_his_state_and_bends_a_new_jib():
+    """Package 45c, item 3 (package 45 made all sail at once, and the frigate under plain
+    sail by the wind after the gale was aback by turns for an hour): the topsails when the
+    wind has been under the shorten-sail line ten minutes; the topgallant masts, the reefs,
+    a blown head sail bent anew and the jib when it has been under the sail-again line for
+    the half hour; the courses last, plain sail, a quarter of an hour after the reefs are
+    out."""
     _, cap = station_captain()
     given: list[tuple[str, str]] = []
     cap.give = lambda text, why="": given.append((text, why))  # type: ignore[method-assign]
     th = cap.doctrine.threshold
     again, minutes = float(th("sail_again_kn")), float(th("sail_again_minutes"))
-    assert (again, minutes) == (25.0, 30.0)
-    # the gale met (over the shorten-sail line), the topsails reefed, the jib blown out
+    tops, courses = float(th("topsails_again_minutes")), float(th("courses_again_minutes"))
+    assert (again, minutes, tops, courses) == (25.0, 30.0, 10.0, 15.0)
+    # the gale met (over the shorten-sail line), the topsails handed, the jib blown out
     cap._read_trend(C.Perception(tick=0, wind_kn=38.0))
-    cap._weather_work(C.Perception(tick=0, wind_kn=38.0, topsail_reefs=3), set())
+    cap._weather_work(C.Perception(tick=0, wind_kn=38.0, topsails_all_set=False), set())
     assert cap._business.get("gale_met") and given == []
+    # under the shorten-sail line ten minutes: the topsails, as they stand reefed
+    for tick in (60, 60 + int(tops * 60)):
+        p = C.Perception(tick=tick, wind_kn=28.0, topsail_reefs=3, topsails_all_set=False)
+        cap._weather_work(p, set())
+    assert given == [("set the topsails", "the gale easing")]
+    given.clear()
     # under twenty-five knots: the half hour not yet run
-    blown = C.Perception(tick=600, wind_kn=20.0, topsail_reefs=3, headsails_blown=["fore.jib"])
-    cap._read_trend(blown)
+    blown = C.Perception(tick=1800, wind_kn=20.0, topsail_reefs=3, headsails_blown=["fore.jib"])
     cap._weather_work(blown, set())
-    assert given == [] and cap._calm_since == 600
-    # the half hour run: the topgallant masts swayed up, the reefs out, a new jib bent,
-    # plain sail set, in his state of keeping station (no hove-to book loaded)
+    assert given == [] and cap._calm_since == 1800
+    # the half hour run: the topgallant masts swayed up, the reefs out, a new jib bent and
+    # set, in his state of keeping station (no hove-to book loaded); not the courses yet
     later = C.Perception(
-        tick=600 + int(minutes * 60), wind_kn=20.0, topsail_reefs=3, headsails_blown=["fore.jib"]
+        tick=1800 + int(minutes * 60), wind_kn=20.0, topsail_reefs=3, headsails_blown=["fore.jib"]
     )
-    cap._read_trend(later)
     cap._weather_work(later, set())
     assert cap.state == "keeping station"
     assert [t for t, _ in given] == [
         "sway up the topgallant masts",
         "shake out the reefs in the topsails",
         "bend a new fore jib",
-        "set plain sail",
+        "set the jib",
     ]
-    # the wind fell from thirty-eight to twenty within the hour: the weather mending
-    assert {why for _, why in given} == {
-        "the gale over, the weather mending",
-        "blown out in the gale",
-    }
+    assert {why for _, why in given} == {"the gale over", "blown out in the gale"}
+    # the reefs not yet out a quarter of an hour on: the courses wait for them
+    t2 = later.tick + int(courses * 60)
+    cap._weather_work(C.Perception(tick=t2, wind_kn=20.0, topsail_reefs=1), set())
+    assert len(given) == 4
+    # the reefs out: plain sail, the courses last
+    cap._weather_work(C.Perception(tick=t2 + 60, wind_kn=20.0, topsail_reefs=0), set())
+    assert given[4:] == [("set plain sail", "the courses last, the gale over")]
     assert cap._business.get("made_sail_after") and not cap._business.get("gale_met")
     # not given twice
-    cap._weather_work(later, set())
-    assert len(given) == 4
+    cap._weather_work(C.Perception(tick=t2 + 120, wind_kn=20.0, topsail_reefs=0), set())
+    assert len(given) == 5
 
 
 def test_with_the_glass_rising_he_makes_sail_in_a_quarter_hour_and_shortens_sooner_when_it_falls():
@@ -231,9 +245,13 @@ def test_with_the_glass_rising_he_makes_sail_in_a_quarter_hour_and_shortens_soon
     assert [t for t, _ in given] == [
         "sway up the topgallant masts",
         "shake out the reefs in the topsails",
-        "set plain sail",
+        "set the jib",
     ]
     assert all(why == "the gale over, the weather mending" for _, why in given)
+    p = C.Perception(tick=60 + 30 * 60, wind_kn=20.0, topsail_reefs=0, glass_tendency="rising")
+    cap._read_trend(p)
+    cap._weather_work(p, set())
+    assert given[-1] == ("set plain sail", "the courses last, the gale over")
     # the glass falling fast with the wind at twenty-five, plain sail set: the book's
     # shorten-sail line (thirty) comes a force sooner
     given.clear()
@@ -243,6 +261,25 @@ def test_with_the_glass_rising_he_makes_sail_in_a_quarter_hour_and_shortens_soon
     assert given == [("shorten sail", "the glass falling and the wind rising")]
     cap._weather_work(p, set())
     assert len(given) == 1
+
+
+def test_after_the_gale_the_topgallant_masts_wait_for_sea_room():
+    """Package 45c (the lee-shore trial, a first version: the topgallant masts held the
+    offing's tack twenty minutes, she missed stays and took the ground): with the land
+    under her lee within `lee_shore_nm` the masts wait, and go up when it is not."""
+    _, cap = station_captain()
+    given: list[tuple[str, str]] = []
+    cap.give = lambda text, why="": given.append((text, why))  # type: ignore[method-assign]
+    cap._weather_work(C.Perception(tick=0, wind_kn=38.0, topsail_reefs=3), set())
+    for tick in (60, 60 + 30 * 60):
+        cap._weather_work(
+            C.Perception(tick=tick, wind_kn=20.0, topsail_reefs=3, lee_land_nm=4.0), set()
+        )
+    assert [t for t, _ in given] == ["shake out the reefs in the topsails", "set the jib"]
+    cap._weather_work(
+        C.Perception(tick=60 + 31 * 60, wind_kn=20.0, topsail_reefs=1, lee_land_nm=9.0), set()
+    )
+    assert given[-1] == ("sway up the topgallant masts", "the land no longer under her lee")
 
 
 # -- in port within the port's reach (item 3) ---------------------------------------------

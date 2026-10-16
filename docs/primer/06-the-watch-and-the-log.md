@@ -34,7 +34,7 @@ On deck at any moment are the watch whose turn it is, the idlers by day, and eve
   Forenoon watch, 8 bells (08:00)  Eight bells. The larboard watch relieved the deck.
 ```
 
-A hand at work when his watch is relieved stays until the job is done, then goes below. `state` shows the watch in one line, and **muster** (a console command like `state`, never an order to the ship) reads the whole bill: each station with its hands on deck, below and at work, and how tired they are, in the words *fresh*, *tired* and *worn out*; then the officers by name. The frigate at the start of the voyage:
+A hand at work when his watch is relieved stays until the job is done, then goes below. `state` shows the watch in one line, and **muster** (a command of the console and of the browser's order box like `state`, never an order to the ship) reads the whole bill: each station with its hands on deck, below and at work, and how tired they are, in the words *fresh*, *tired* and *worn out*; then the officers by name. The frigate at the start of the voyage:
 
 ```
 > muster

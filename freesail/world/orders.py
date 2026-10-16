@@ -34,11 +34,18 @@ The words, one order a line, the channel first:
     port falmouth: price of tin 130
     person: supercargo "Mr Pentreath" aboard in the cabin
     person: agent "Mr Fox" ashore at Brest
+    mark: a wreck, her masts showing above the water at 49 58 N 5 16 W
 
 A ship's goal is one of `freesail.world.ships._goal_plan`: trading A to B, bound from A
 for B, patrolling off <place> within <n> miles, running home to <place>, carrying the
 mail to <place>, carrying a letter to the ship. A place is a port by name, a feature of
 the chart by name, or a position. The descriptions are `ships.DESCRIPTIONS`.
+
+A point of interest (`mark:`, package 45c, the owner's note 23 of gate m6a-2): a thing of
+the world with a description at a place, seen by the lookout as a mark is seen (by day and
+twilight, at a mark's height), its bearing, distance and description in the log when it
+comes in sight; it is the world's (`World.marks_of_interest`), not the chart's, and is
+saved and replayed as every world order is.
 """
 
 from __future__ import annotations
@@ -60,10 +67,11 @@ __all__ = [
 
 # The channels a world order speaks on, in the spec's order (§26), and `captain` (spec M6
 # §4; package 40): the rules-based captain's intent given or changed, the director's seam;
-# `seat` and `unseat` (spec M6 §23; package 43): the director's seat hook, a model seated
-# as the captain of another ship for a budget, refused without a consent record, an
-# owner's grant or budget, and the stand-down with the director's note.
-CHANNELS = ("weather", "ship", "message", "port", "person", "captain", "seat", "unseat")
+# `mark` (package 45c): a point of interest; `seat` and `unseat` (spec M6 §23; package 43):
+# the director's seat hook, a model seated as the captain of another ship for a budget,
+# refused without a consent record, an owner's grant or budget, and the stand-down with
+# the director's note.
+CHANNELS = ("weather", "ship", "message", "port", "person", "captain", "mark", "seat", "unseat")
 
 # The captain's grammar refuses a world order in these words (truth 71).
 REFUSAL = (
@@ -74,7 +82,8 @@ REFUSAL = (
 )
 
 _HEAD = re.compile(
-    r"^\s*(weather|ship|message|port|person|captain|seat|unseat)\b\s*(\"[^\"]*\"|[\w-]+)?\s*:",
+    r"^\s*(weather|ship|message|port|person|captain|mark|seat|unseat)\b"
+    r"\s*(\"[^\"]*\"|[\w-]+)?\s*:",
     re.I,
 )
 
@@ -123,6 +132,8 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
         return _port(world, body)
     if order.channel == "captain":
         return _captain(world, body)
+    if order.channel == "mark":
+        return _mark(world, body)
     if order.channel == "seat":
         return _seat(world, body)
     if order.channel == "unseat":
@@ -297,6 +308,55 @@ def _unseat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     return f"the director's seat on {vessel.name} given up ({note}){stood}", {
         "ship": vessel.id,
         "note": note,
+    }
+
+
+# ---------------------------------------------------------------------------
+# mark (package 45c): a point of interest
+# ---------------------------------------------------------------------------
+
+# the description greedy, so that the last ' at ' is the place's
+_MARK = re.compile(r"^mark:\s*(?P<desc>.+)\s+at\s+(?P<where>.+?)\s*$", re.I)
+# a mark's height above the sea for the horizon (judgement: a hull and her masts, a
+# boat, a cask, a raft: a mark's ten metres, `chart.DEFAULT_HEIGHT_M["mark"]`)
+MARK_HEIGHT_M = 10.0
+
+
+def _mark(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`mark: <description> at <place>`: a point of interest put in the world, which the
+    lookout sees as a mark when it is in sight (`Lookout.look`)."""
+    from freesail.world.chart import Feature
+    from freesail.world.ships import place_position
+
+    m = _MARK.match(body)
+    if m is None:
+        raise WorldOrderError("A mark order is 'mark: <description> at <place or position>'.")
+    desc = m.group("desc").strip().strip('"').strip()
+    if not desc:
+        raise WorldOrderError("A mark wants a description: 'mark: <description> at <place>'.")
+    found = place_position(world, m.group("where"))
+    if found is None:
+        raise WorldOrderError(f"'{m.group('where')}' is no position and no place of the chart.")
+    marks = world.marks_of_interest
+    fid = f"interest-{len(marks) + 1}"
+    pos = found[0]
+    marks.append(
+        Feature(
+            id=fid,
+            kind="mark",
+            name=desc,
+            lat_deg=pos.lat_deg,
+            lon_deg=pos.lon_deg,
+            height_m=MARK_HEIGHT_M,
+            source="a world order",
+            says=desc,
+        )
+    )
+    return f"a mark put in the world, {desc}, at {found[1]}", {
+        "id": fid,
+        "description": desc,
+        "lat_deg": round(pos.lat_deg, 5),
+        "lon_deg": round(pos.lon_deg, 5),
     }
 
 

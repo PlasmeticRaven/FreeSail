@@ -313,6 +313,39 @@ def test_the_fingerprint_is_of_the_code_and_the_data_and_not_of_the_line_endings
     assert time.perf_counter() - t0 < 0.5
 
 
+def test_a_save_is_loaded_to_an_earlier_tick_and_goes_on_from_there(tmp_path):
+    """Package 45c (the owner's note 3 of gate m6a-2: "the ability to load a saved game to
+    an earlier tick would be useful"): `--load SAVE --until TICK` replays the save to that
+    tick, past its checkpoint, and hands the game over there; the console's start takes
+    it, and a tick outside the save is refused in words."""
+    import argparse
+
+    import pytest
+
+    from freesail.api.session import ship_factory
+    from freesail.ui.console import start_world
+
+    original = _watched_game()
+    path = replay.save_to_file(original, tmp_path / "game.json")
+    end = original.clock.tick
+    half = end // 2
+    world, report = replay.load_report(path, ship_factory, until_tick=half)
+    assert world.clock.tick == half and report.how == "replay"
+    assert report.checkpoint.startswith("not read: the game is replayed to tick")
+    assert any(f"Replayed to tick {half} of the save's {end}" in w for w in report.words)
+    straight = replay.replay(original.save(), ship_factory, until_tick=half)
+    assert world.log.digest() == straight.log.digest()
+    world.run(60)  # and the game goes on from there
+    assert world.clock.tick == half + 60
+    args = argparse.Namespace(load=str(path), until=half, replay_anyway=False)
+    w2, _ = start_world(args)
+    assert w2.clock.tick == half
+    with pytest.raises(SystemExit, match="the save runs from tick 0 to tick"):
+        start_world(argparse.Namespace(load=str(path), until=end + 10, replay_anyway=False))
+    with pytest.raises(SystemExit, match="say --load SAVE --until TICK"):
+        start_world(argparse.Namespace(load=None, until=5, scenario=None))
+
+
 def test_load_says_which_road_it_took_and_why_a_checkpoint_was_not_taken(tmp_path, monkeypatch):
     """Item 2: none beside the save; not this save's; could not be read, with the error's
     words, an import error among them (it escaped `load` before). A save of this build
