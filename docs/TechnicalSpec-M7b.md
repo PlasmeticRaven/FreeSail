@@ -23,6 +23,10 @@ the decisions of October grow it to five parts:
 - **7b-v. Needs:** provisions and water consumed, hunger, thirst and fatigue in a few steps
   with the master's cautions, "stand by, asleep below until called", the hooks for M7's
   health.
+- **7b-vi. Fishing, and the glass on a near ship:** fishing for the player at the level the
+  game can honestly simulate, with the far-detail fisherman given the same catch so the two
+  bodies agree; and what the glass shows of a near ship's work and manoeuvre in hand (the
+  owner, 2026-10-17).
 
 *Proves: a voyage is two stories, the one the player lived and the one that was arranged;
 and the world runs, peopled and observed, with no player's ship at all.*
@@ -286,6 +290,51 @@ the last step's urgent line and a person who falls asleep where he is.
 
 ---
 
+## Part 7b-vi: Fishing, and the glass on a near ship
+
+### 21a. Fishing for the player, and the fisherman's catch (`freesail/evolutions/`, `freesail/world/business.py`, `ports.py`, `data/fishing/*.yaml` new; the smack's and the lugger's files)
+
+Fishing exists in m6c as a far-detail behaviour only (the `fish` intent and the fisherman's
+doctrine, no catch). The owner, 2026-10-17: a player who wants to fish at the level the game
+can reasonably simulate should be able to; not a fishing simulation, but researched
+grounds, real catches to market, reasonable period evolutions, and the well's spoilage. So:
+the fishing grounds of each region as features with their season, their fish and their
+yield (the pilchard fishery of Cornwall by the seine and the drift net, the mackerel and
+the herring, the Channel's trawl grounds, the Biscay sardine, from the period's and the
+fisheries' sources, verified or marked); the evolutions of the gear (the nets shot and
+hauled, the lines, the trawl towed under easy sail, the seine with the boats), with the
+hands at them and their hours; the catch into the hold or the well by the ground, the
+season, the hours and the weather, the well keeping fish alive for so long and the hold's
+salt or none (the spoilage); sold at a port that buys fish at its price. The far-detail
+fisherman given the same catch and the same spoilage, so a fishing smack of the business
+and the player's are one thing at two details. The smack and the lugger carry the gear
+their files say.
+
+### 21b. The glass on a near ship (`freesail/world/lookout.py`, `ships.py`, `crews.py`)
+
+What the glass shows of a near ship beyond her rig and her colours: her manoeuvre and her
+work in hand, by tiers of distance in daylight and clear weather, the lead's reading for
+the owner's word: **within two miles**, what any seaman reads at a look (under way or at
+anchor, which tack, hove to, tacking or wearing, running, her sail set or shortening);
+**within eight cables**, the work on deck and aloft (reefing, making or taking in sail, a
+boat hoisting out or in, the hands at the nets or the lines, the anchor coming up);
+**within four cables**, the evolution's own words as the log would say them of the player's
+ship ("the hands are hauling the seine", "she is hove to on the starboard tack, main
+topsail aback"). A crewed ship gives the true evolution's name; a far-detail vessel the
+words her plan's leg and her sail state give; at night and in thick weather only what the
+visibility allows. Asked through `the glass on <ship>` or given by the lookout when a ship
+is made out and when her work changes.
+
+### 21c. Truths for 7b-vi
+
+- 105. The smack on a pilchard ground in season, the seine shot and hauled, fills her well
+  by the ground's yield; the fish sold at Falmouth at the market's price; a well kept too
+  long spoils its catch.
+- 106. The business's fisherman on the same ground brings home the same catch at far
+  detail.
+- 107. The glass on the Palinure hove to at a mile says she is hove to and on which tack;
+  at four cables the main topsail aback; at night, only her light if any.
+
 ## 22. Consent (one revision for the milestone)
 
 The consent brief is revised once more by a named package at the milestone's end, the
@@ -299,7 +348,8 @@ and the needs a model's person may have.
 One gate, the owner's runs on the playtest form: a directed quiet passage on a local model
 (the solo mode the owner looks to) and on a hosted model; the director's log read after;
 an observed world for a day with the business on; the player ashore at Falmouth and in the
-cabin (his place and what he can do there); a drafted manifest's trade; a week's needs; the regatta's course with a director
+cabin (his place and what he can do there); a day's fishing in the smack and the catch sold;
+the glass on a near ship; a drafted manifest's trade; a week's needs; the regatta's course with a director
 seated above it. The lead's first play is at the director's station, as decision 39 held.
 
 ## 24. Packages (outline; the allocation)
@@ -320,7 +370,10 @@ In waves, written for the owner's approval in turn, each launched on his word:
 - **52 (Opus): the director's voice** (§8, §9) after 50 and 53: people from words, `say
   as`, the asked unseated person answered by the director; the word heard counting as a
   word on deck (§15).
-- **55 (Opus): the solo director and the gate's scenarios** after 51 and 52: the starter
+- **56 (Opus): fishing, and the glass on a near ship** (§21a, §21b), beside 51 and 52: the
+  grounds researched, the gear's evolutions, the catch and the well, the fisherman's parity,
+  the glass's tiers.
+- **55 (Opus): the solo director and the gate's scenarios** after 51, 52 and 56: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
 

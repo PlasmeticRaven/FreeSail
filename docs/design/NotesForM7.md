@@ -94,4 +94,4 @@ the hands at them; a sea-keeping thread of its own beside the powder's milestone
   as the business does: an evolution (the nets or the lines shot and hauled, hours on the
   ground, the hands at it), a catch into the hold by the ground, the season and the hours,
   sold at a port that buys fish, and the far-detail fisherman given the same catch so the
-  two bodies agree. A small package of M7's or M7b's, the owner's call.
+  two bodies agree. The owner, 2026-10-17: an M7b package (56, `docs/TechnicalSpec-M7b.md` §21a), with the glass on a near ship (§21b).
