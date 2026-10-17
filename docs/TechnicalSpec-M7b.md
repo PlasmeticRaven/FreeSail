@@ -869,6 +869,12 @@ In waves, written for the owner's approval in turn, each launched on his word:
   triangular, each with Steel's page beside it), the orders and the heavy-weather book
   reading them, the ship file regenerated, the pins it moves re-measured once; the brig's
   set checked against Steel's for a brig (the owner's finding at gate 6c, 2026-10-17).
+  **And the chasse-marée's rig** (the owner's notes on the Éclair's first cruise, 2026-10-17,
+  `docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`): lug topsails in place of
+  the square ones, trimmed with the lugs as fore-and-aft sails; the lugs drawn slung a third
+  from the fore end and set to leeward of the mast on either tack; the viewer's draw order
+  by the aspect (the sail before the mast hides it from ahead, the mast the sail from
+  astern) and the yards' brace shown in the picture.
 - **58 (Opus): the captain's sea sense, third pass**, from the owner's runs of gate 6c
   (`docs/dev/M6-WorkPackages.md`, "The notes of 2026-10-17, read"): the offing by the
   account not its doubt, the guard against land ahead within the visibility, the book
