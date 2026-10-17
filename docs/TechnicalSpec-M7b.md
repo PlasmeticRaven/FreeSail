@@ -464,6 +464,57 @@ editing. The scenario is proved by loading it as the console would.
 - 110. The settings file holds no key; the credential store does; a model's name in it never
   enters the repository, a save or a log.
 
+## Part 7b-viii: A ship bought (the owner's design goal of 2026-10-17)
+
+### 21g. The goal, and the lead's reading
+
+The player builds a purse trading in the cutter and moors in a large, busy port. The
+director notices the purse and the port. The player sends the purser ashore to look for a
+ship to buy; the director sees it, and by its doing the purser finds a schooner for sale
+and says so. The player sells the cutter, moves her people and hands out, buys the
+schooner and takes her up as his ship, the same people and hands aboard her.
+
+**On the shape of 50 and 52** the director can set the scene and do none of the sale: it
+reads the boat's going in the log and the port in the truth (the player's purse and cargo
+are added to the truth's snapshot: small, 50 or 51); it may speak as the purser when the
+boat returns (§9; he is a person nobody holds), make a broker from words (§8), put a
+schooner at the port (§3) and send a merchant's message; but no ship has an owner or a
+price, the boat brings back prices and letters only, nothing credits the purse for a hull
+or moves hands between ships, and the player's ship is the World's one ship. The purser is
+a role of the muster, not a station a model holds.
+
+**The bridge is four general things, no "buy a ship" feature among them:**
+
+1. **A ship is a World with a vessel; the player's ship is the one held** (§11, §12,
+   package 51): taking up the schooner is her promotion to crewed from her ship file, as
+   promotion builds a World today, the player seated as her captain, the cutter a vessel
+   in the world thereafter; the replay keys acts by ship.
+2. **People are of the world, not of the ship** (§14, package 53): a person's place may be
+   aboard a named ship or ashore at a port; the company moves by each going ashore and
+   coming aboard her, the hands as a count by one order (`transfer the people and the
+   hands to the "Fly"`); the journals keyed to the person travel.
+3. **Ownership and price as facts the port's business knows** (package 60, new): a vessel
+   at a port may be for sale at an asking price; busy ports generate listings by their
+   size (`data/business.yaml`); the director places one by a tail on the ship order
+   (`ship: a topsail schooner "Fly" of britain at Falmouth, for sale at £900`), doubted
+   as any order; `buy the ship "Fly"` and `sell the ship` join the market orders beside the
+   goods, the yard valuing a hull by tonnage and condition, the purse by the same channel.
+4. **An errand ashore** (§14, §17; package 60): `send <person> ashore to <errand>`, answered
+   from the port's facts first and by the director second (§9), reported when the boat
+   returns. A model at the purser's station is optional later, through stations as data.
+
+With these the director's part is to put facts in the world (the listing, the broker, the
+purser's words); the sale, the transfer and the taking-up are the player's ordinary port
+orders, and neither side needs a script. The scenario is a gate 7b item.
+
+### 21h. Truths for 7b-viii
+
+- 99c. The player sells the cutter at Falmouth, buys a listed schooner, transfers the people
+  and the hands by one order, and sails her out; the save replays across the two ships with
+  the journals of the people intact.
+- 99d. A director's listing by the ship order is found by the purser's errand and reported
+  in the purser's words when the boat returns; the play log never shows the order.
+
 ## 22. Consent (one revision for the milestone)
 
 The consent brief is revised once more by a named package at the milestone's end, the
@@ -522,7 +573,11 @@ In waves, written for the owner's approval in turn, each launched on his word:
   by the owner on Windows; the Windows-only pieces (the desktop client's configuration path,
   the settings' place, a shortcut) small and tested by path, with a local session on the
   owner's machine kept as the fallback if the browser's opening or the shortcut want it.
-- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57, 58 and 59: the starter
+- **60 (Opus): a ship bought** (§21g) after 51 and 53: listings by the port's business and
+  by the director's ship order, the hull's valuation, the ship bought and sold through the
+  market orders, the transfer of the people and the hands, the errand ashore; the goal's
+  scenario for the gate.
+- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57, 58, 59 and 60: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
 
