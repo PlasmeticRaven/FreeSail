@@ -152,6 +152,27 @@ class Stations:
             return Binding(key, kind, person.name if person is not None else "")
         return None
 
+    def resolve(self, words: str) -> str:
+        """The station's name from the words a door or the console says for it (package
+        53; spec M7b §17): its name, its alias (`officer 2` for the second officer), or
+        its person's name or role (`Mr Russell`, `the third lieutenant`), the station
+        bound to him; the words as said otherwise, for the caller's own refusal."""
+        from freesail.agents.agent import station_name
+
+        key = station_name(_key(words))
+        if not key or key in self.names():
+            return key
+        people = getattr(self.world, "people", None)
+        try:
+            person = people.find(key) if people is not None else None
+        except Exception:  # a people's build that cannot run names nobody
+            person = None
+        if person is not None:
+            for name in self.names():
+                if self.holder(name) is person:
+                    return name
+        return key
+
     def kind_of(self, name: str) -> str | None:
         b = self.binding(name)
         return b.kind if b is not None else None

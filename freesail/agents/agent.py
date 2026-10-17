@@ -129,8 +129,12 @@ __all__ = [
     "StandBy",
     "Station",
     "domain_of",
+    "make_bound",
     "officer",
     "officer_rank",
+    "officer_rank_of",
+    "officer_stations",
+    "officers_words",
     "station_name",
     "watcher",
 ]
@@ -219,6 +223,14 @@ STATION_ALIASES: dict[str, str] = {
     "the deck": OFFICER,
     "the masthead": LOOKOUT,
     "masthead": LOOKOUT,
+    # several stations of the officer's kind (package 53; spec M7b §17): the officers by
+    # their number, the first the officer of the watch's own station, the others as the
+    # wardroom file names them (`second officer`, `third officer`)
+    "officer 1": OFFICER,
+    "first officer": OFFICER,
+    "officer 2": "second officer",
+    "officer 3": "third officer",
+    "officer 4": "fourth officer",
 }
 
 # The stations the game can man now, each with its brief and a door to it (`watcher`,
@@ -1398,26 +1410,112 @@ def station_outline(world: Any, station: str) -> str:
 
 
 def officer(
-    policy: SamplingPolicy | None = None, patience_s: int = OFFICER_PATIENCE_S, world: Any = None
+    policy: SamplingPolicy | None = None,
+    patience_s: int = OFFICER_PATIENCE_S,
+    world: Any = None,
+    name: str = OFFICER,
 ) -> Station:
     """The officer of the watch (package 37): levels 0 to 2 within `OFFICER_DOMAIN`,
     sampled as the watcher is, an hour of patience, the person of 35 whose place the
     model takes named in the brief, his rank the station's standing orders', and the
-    fitness drill before the station brief."""
+    fitness drill before the station brief. `name` is the station's name where a ship has
+    several of the kind (package 53: `second officer`, the second lieutenant's): the
+    person, the rank and the outline are that station's holder's, and the brief says who
+    is first and whose watch is whose (`officers_words`)."""
     default = SamplingPolicy.periodic(A_GLASS_S) | SamplingPolicy.on_events()
-    person, rank = officer_rank(world)
+    if name == OFFICER:
+        person, rank = officer_rank(world)
+    else:
+        person, role = station_holder(world, name, ("the lieutenant", "lieutenant"))
+        rank = officer_rank_of(role)
+    brief = OFFICER_BRIEF.format(person=person)
+    several = officers_words(world, name)
+    if several:
+        brief = f"{brief}\n\n{several}"
     return Station(
-        OFFICER,
+        name,
         Authority.OFFICER_2,
         policy or default,
         patience_s,
-        OFFICER_BRIEF.format(person=person),
+        brief,
         domain=OFFICER_DOMAIN,
         person=person,
         rank=rank,
         drill=True,
-        outline=station_outline(world, OFFICER),
+        outline=station_outline(world, name),
     )
+
+
+def officer_rank_of(role: str) -> str:
+    """A role's rank among the standing orders' ranks (`standing.rules.RANKS`): a role
+    that is one as it stands, any lieutenant but the first a lieutenant, else the
+    lieutenant's (package 53: the second officer's standing orders are given by the
+    lieutenant)."""
+    from freesail.standing.rules import RANKS
+
+    role = " ".join(str(role or "").lower().split())
+    if role in RANKS:
+        return role
+    return "lieutenant"
+
+
+def officer_stations(world: Any) -> list[str]:
+    """The stations of the officer of the watch's kind aboard, the officer of the watch's
+    own first (package 53; 45c's groundwork: `second officer: {kind: officer of the watch,
+    holder: second lieutenant}`)."""
+    stations = getattr(world, "stations", None)
+    if stations is None:
+        return [OFFICER]
+    try:
+        names = [n for n in stations.names() if stations.kind_of(n) == OFFICER]
+    except Exception:  # a world whose people cannot be mustered names none
+        return [OFFICER]
+    return sorted(names, key=lambda n: (n != OFFICER,))
+
+
+def officers_words(world: Any, me: str) -> str:
+    """Who is first among a ship's officers of the watch and whose watch is whose, for
+    each one's brief (spec M7b §17; package 53): "" where the ship has one."""
+    names = officer_stations(world)
+    if world is None or len(names) < 2:
+        return ""
+    parts = []
+    for name in names:
+        try:
+            holder = world.stations.holder(name)
+        except Exception:
+            holder = None
+        if holder is None:
+            parts.append(f"the {name} (nobody named)")
+            continue
+        keeps = f"the {holder.watch} watch" if holder.watch else "no watch"
+        if name == names[0]:
+            keeps = f"the first, {keeps}"
+        parts.append(f"the {name} ({holder.name}, {holder.role}, {keeps})")
+    return (
+        "The officers of the watch: "
+        + "; ".join(parts)
+        + f". You are the {me}. The captain gives the deck to any of you; one who keeps a "
+        "watch hands it at the change of the watch to the officer whose watch comes on deck, "
+        "where his station is held."
+    )
+
+
+def make_bound(make: Any, name: str, policy: Any = None, world: Any = None) -> Station:
+    """A station made by its kind's factory under the name the ship binds it by (package
+    53): a factory that takes the name (the officer's) makes the station for that name's
+    holder; any other is renamed, as package 41 renamed a station bound by hand."""
+    import dataclasses
+    import inspect
+
+    try:
+        takes_name = "name" in inspect.signature(make).parameters
+    except (TypeError, ValueError):
+        takes_name = False
+    st = make(policy, world=world, name=name) if takes_name else make(policy, world=world)
+    if st.name != name:
+        st = dataclasses.replace(st, name=name)
+    return st
 
 
 # The captain's station brief (spec M6 §3; package 40), in the consent brief's voice: the

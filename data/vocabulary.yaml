@@ -797,7 +797,35 @@ verbs:
     object: person
     level: 1
   come on deck:
-    synonyms: [come up on deck, come up, go on deck, on deck, come on deck again, up on deck]
+    synonyms: [come up on deck, come up, go on deck, on deck, come on deck again, up on deck,
+               go up on deck]
+    object: person
+    level: 1
+  # People in places (spec M7b §14, §17; package 53; `freesail/world/movement.py`): any
+  # person, the player among them, goes where his duty allows and is where he went; the
+  # giver of the order is the one who goes (the captain at the prompt, a station's person
+  # at his station). `go below` and `come on deck` above are every person's too (the
+  # captain's to his cabin, an officer's to the gunroom); `go ashore` is by the boat at a
+  # port's reach, and `come aboard` sends the boat for him. Ashore, `go to the market` and
+  # the port's other places.
+  go to:
+    synonyms: [go into the, go into, go to the, go down to the, go up to the, go forward to the,
+               go aft to the, walk to the, step into the, step over to the, go across to the,
+               go round to the]
+    object: person
+    level: 1
+  go aloft:
+    synonyms: [go up aloft, go into the tops, go up into the tops, go up to the tops, lay aloft]
+    object: person
+    level: 1
+  go ashore:
+    synonyms: [go on shore, step ashore, land me, put me ashore, go ashore in the boat,
+               take the boat ashore]
+    object: person
+    level: 1
+  come aboard:
+    synonyms: [come off to the ship, go aboard, go back aboard, return aboard, return to the ship,
+               go off to the ship, take me off, come back aboard]
     object: person
     level: 1
   ask the pilot:
@@ -953,6 +981,35 @@ verbs:
   belay all standing orders:
     synonyms: [belay the standing orders, belay every standing order, cancel all standing orders]
     object: standing
+    level: 2
+  # Books drafted (spec M7b §16; package 53; `freesail/world/books.py`): a standing-orders
+  # sheet, a note for the ship's papers or a manifest of goods to buy and sell, written by
+  # the person who drafts it with his mark, kept in the library ('books', read from
+  # anywhere); `post the book` makes a sheet's orders the standing orders, `give the book`
+  # trades a manifest by the boat in one errand. `orders.handle` hands these to the
+  # books' module before the imperative parser sees them, as it hands the standing
+  # dialect to its grammar; they are listed here so that completion and the hints know
+  # the words.
+  draft a book:
+    synonyms: [draft the book, write a book, draft a sheet, draft a note, draft a manifest,
+               write a note, write a manifest]
+    object: book
+    level: 2
+  post the book:
+    synonyms: [post book, post the sheet, post the night orders]
+    object: book
+    level: 2
+  give the book:
+    synonyms: [give book, send the book, give the manifest, send the manifest]
+    object: book
+    level: 2
+  the books:
+    synonyms: [books, the books drafted, list the books]
+    object: book
+    level: 2
+  show the book:
+    synonyms: [show book, read the book, read book]
+    object: book
     level: 2
   # The station sentences (milestone 4b, spec M4 §12): what the captain says to an
   # agent's station. `orders.handle` hands them to `freesail.orders.stations` before the

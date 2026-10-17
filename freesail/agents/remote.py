@@ -194,6 +194,8 @@ def station_factory(world: Any, name: str) -> tuple[str, Any]:
     stations = getattr(world, "stations", None)
     if stations is None:
         return name, STATION_FACTORIES.get(name)
+    # by its number or its person (package 53: 'officer 2', 'Mr Russell')
+    name = stations.resolve(name)
     return name, stations.factory(name)
 
 
@@ -212,12 +214,9 @@ def make_station(world: Any, name: str, policy: SamplingPolicy | None) -> Any:
             f"There is no station '{name}' aboard; the stations: "
             f"{', '.join(stations_aboard(world))}.",
         )
-    st = make(policy, world=world)
-    if st.name != name:
-        import dataclasses
+    from freesail.agents.agent import make_bound
 
-        st = dataclasses.replace(st, name=name)
-    return st
+    return make_bound(make, name, policy, world)
 
 
 CONSENT, STATION, STOPPED = "consent", "station", "stopped"
@@ -406,7 +405,7 @@ class Desk:
                     _vessel, world = station_world(world, ship)
                 except ValueError as e:
                     raise DeskError(404, str(e)) from None
-            _name, make = station_factory(world, name)
+            name, make = station_factory(world, name)
             if make is None:
                 # the ship has no such station: the binding on the World decides (41)
                 raise DeskError(

@@ -333,6 +333,9 @@ class Person:
     up: bool = False  # called from his watch below: not asleep again until his watch
     outline: Outline | None = None
     station: str = ""
+    # the place ashore he went to at his port (package 53; spec M7b §14: the quay, the
+    # market, ...; `places.port_places`): "" for where his role is found, or the quay
+    ashore_at: str = ""
 
     @property
     def rank(self) -> str:
@@ -350,6 +353,9 @@ class Person:
         """His place now, the mirror's for the master ('on deck' is the quarterdeck,
         'below' the gunroom where he works his sights)."""
         if self.mirror is not None:
+            if not self.aboard:
+                # ashore or in the boat (package 53: the master who commands goes ashore)
+                return self.place
             if self.mirror.place == "on deck":
                 return "quarterdeck"
             # below: the cabin when he went below as the captain, else the gunroom where
@@ -740,13 +746,23 @@ class People:
     def state_words(self, p: Person) -> str:
         """'on the quarterdeck', 'below, asleep', 'ashore', 'in the boat', 'sick', 'at the
         lunar, below'."""
-        if not p.aboard and p.where in ("shore", "boat", "cutter"):
+        if not p.aboard and p.where == "shore":
+            # ashore at his port, at one of its places (package 53; spec M7b §14)
+            from freesail.world.movement import ashore_words
+
+            return ashore_words(self.world, p)
+        if not p.aboard and p.where in ("boat", "cutter"):
             return place_words(p.where)
         if p.sick:
             return "sick, in the sick berth"
         deck = self._at_the_station(p)
         if deck is True:
-            return ON_DECK_WORDS
+            # package 53: the deck is his, wherever he went with it
+            return (
+                ON_DECK_WORDS
+                if p.where in ("quarterdeck", "deck")
+                else (f"with the deck, {place_words(p.where)}")
+            )
         if self._in_command(p):
             return f"in command, {place_words(p.where)}"
         if p.occupied:
@@ -763,7 +779,12 @@ class People:
             # pilot, not a pilot by trade made from words, package 52)
             return "at the gangway, waiting for his boat"
         if deck is False:
-            return OFF_WATCH_WORDS
+            # package 53: off watch where he is (on the quarterdeck, as he was, or below)
+            return (
+                OFF_WATCH_WORDS
+                if p.where == "quarterdeck"
+                else (f"{OFF_WATCH_WORDS}, {place_words(p.where)}")
+            )
         if self._asleep(p):
             return "below, asleep"
         return place_words(p.where)
@@ -778,11 +799,33 @@ class People:
         ship is Milestone 6's."""
         agents = getattr(self.world, "agents", None) or {}
         harness = agents.get("officer of the watch")
+        if harness is None or harness.agent.released or harness.station.person != p.name:
+            # package 53: an officer of the watch's kind under another name (the second
+            # officer), where a ship has several
+            harness = next(
+                (
+                    h
+                    for name, h in agents.items()
+                    if name != "officer of the watch"
+                    and h.station.person == p.name
+                    and not h.agent.released
+                    and getattr(h.station.domain, "deck", False)
+                    and self._officer_kind(name)
+                ),
+                None,
+            )
         if harness is None or harness.agent.released:
             return None
         if harness.station.person != p.name:
             return None
         return bool(harness.agent.deck)
+
+    def _officer_kind(self, name: str) -> bool:
+        stations = getattr(self.world, "stations", None)
+        try:
+            return stations is not None and stations.kind_of(name) == "officer of the watch"
+        except Exception:  # a binding that cannot be read names none
+            return False
 
     def _in_command(self, p: Person) -> bool:
         """Whether this person is in command (package 40): a model holds the captain's

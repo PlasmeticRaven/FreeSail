@@ -339,6 +339,13 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_regatta.py::test_a_hosted_model_with_consent_on_record_sails_the_course_through_the_api_door",
         "test_parity.py::test_truth_91_a_fake_captain_and_the_console_give_the_same_orders_to_the_same_log",
         "test_trim_order.py::test_trimmed_for_the_point_in_the_same_breath_she_makes_more_than_by_trim_sails",
+        # package 53: the boat's errands ashore and back at anchor in Carrick Road, and a
+        # watch of three officers with the deck passing by the bill (truths 7b-100 to 102)
+        "test_known_truths.py::test_truth_7b_100_a_person_who_goes_below_is_below_and_his_deck_order_refused_until_up",
+        "test_known_truths.py::test_truth_7b_101_the_player_ashore_buys_at_the_market_in_person_and_aboard_by_the_boat",
+        "test_known_truths.py::test_truth_7b_102_a_drafted_manifest_trades_in_one_errand_and_a_posted_sheet_stands",
+        "test_orders_places.py::test_the_deck_passes_among_the_officers_at_the_change_of_the_watch_by_the_bill",
+        "test_orders_places.py::test_the_player_ashore_is_out_of_hail_of_the_ship_and_cannot_send_her_boat",
     }
 )
 

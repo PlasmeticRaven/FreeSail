@@ -869,14 +869,16 @@ def test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_co
         return reply("", call("readings"))
 
     h, fake, _ = seated(world, [answer_the_ask], loop=True)
-    h.budget_tokens = 16384
-    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 16384
+    # package 53: the frigate's officer is told who is first among her three officers and
+    # whose watch is whose, which took his brief past the fraction of sixteen thousand
+    h.budget_tokens = 17000
+    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 17000
     while h.revision == 0:
         world.run(EVERY)  # the ask rides a sample; the fake answers it; the fold ends the turn
         assert world.clock.tick < 20 * EVERY, "the ask never came"
     ask = next(n for d in data_turns(fake) for n in d.get("notices") or [] if "handover note" in n)
     assert ask.startswith("Your conversation since the brief has reached about ")
-    assert "of the 16,384 tokens this door gives you" in ask
+    assert "of the 17,000 tokens this door gives you" in ask
     before = 0
     noted = [e for e in h.journal.entries if e.kind == "agent.handover"]
     assert len(noted) == 1 and noted[0].text == f"Handover note (the watch so far): {NOTE}"

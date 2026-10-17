@@ -134,3 +134,15 @@ tracks:
   to_sea: [falmouth-outer-road, 50 00 N 4 57 W, 49 52 N 5 06 W]
   from_sea: [49 52 N 5 06 W, 50 00 N 4 57 W, falmouth-outer-road]
   in: [carrick-road]
+
+# The port's own places ashore (package 53; spec M7b §14), beside every port's (the quay,
+# the market, the counting house, the tavern, the pilots' office: freesail/world/places.py
+# PORT_PLACES). Each: what is done there and who is found there, in words (judgement: the
+# Falmouth packets sailed from the port for Lisbon, the West Indies and the Americas from
+# 1689 to 1850, and their agent's office kept the mails and the passages).
+places:
+  - id: packet_office
+    name: the packet office
+    done: "the mails for Lisbon, the West Indies and the Americas are made up, and passages in the packets taken"
+    found: "the packets' agent and his clerk, and passengers waiting on a packet"
+    roles: [packet agent, postmaster, passenger]

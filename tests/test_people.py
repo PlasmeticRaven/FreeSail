@@ -314,7 +314,9 @@ def test_a_person_made_from_words_has_his_outline_from_them():
     assert gill.role == "merchant" and gill.outline.rank == "merchant of Brest"
     assert gill.outline.age == 45 and gill.aboard and gill.where == "cabin"
     said = " ".join(w.people.describe())
-    assert "Mr Fox, pilot of Brest: ashore." in said and "Jenkins: in the gunroom." in said
+    # ashore at his port, where his role is found (package 53: the pilots' office)
+    assert "Mr Fox, pilot of Brest: ashore at Brest, at the pilots' office." in said
+    assert "Jenkins: in the gunroom." in said
     # refused in words: a name taken, a place that is none, a port that is none
     for text, words in (
         ('person: make "Mr Fox", a cooper', "among the people already"),

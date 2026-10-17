@@ -117,3 +117,13 @@ tracks:
   from_sea: [iroise, 48 16.5 N 4 48 W, 48 18.3 N 4 43.5 W, bertheaume-road]
   in: [48 19.53 N 4 37.8 W, 48 19.92 N 4 36.36 W, 48 20.27 N 4 35.76 W, 48 20.46 N 4 35.22 W, 48 20.55 N 4 34.2 W, 48 20.76 N 4 33.12 W, 48 21 N 4 31.5 W, rade-de-brest]
   to_sea: [48 21 N 4 31.5 W, 48 20.76 N 4 33.12 W, 48 20.55 N 4 34.2 W, 48 20.46 N 4 35.22 W, 48 20.27 N 4 35.76 W, 48 19.92 N 4 36.36 W, 48 19.53 N 4 37.8 W, bertheaume-road, 48 18.3 N 4 43.5 W, 48 16.5 N 4 48 W, iroise]
+
+# The port's own places ashore (package 53; spec M7b §14), beside every port's
+# (freesail/world/places.py PORT_PLACES). Judgement: the arsenal at Brest under the
+# maritime prefect, through whom a French ship of war's business went.
+places:
+  - id: prefecture
+    name: the maritime prefecture
+    done: "a ship of war's orders and her business with the arsenal are seen to"
+    found: "the maritime prefect's officers and clerks"
+    roles: [prefect, commissary]

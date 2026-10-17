@@ -66,6 +66,7 @@ from freesail.agents.agent import (
 from freesail.api import readings as R
 from freesail.core.events import Severity, for_the_record
 from freesail.orders.errors import OrderError
+from freesail.orders.people import MOVE_VERBS
 from freesail.orders.vocabulary import load_vocabulary
 
 if TYPE_CHECKING:
@@ -716,6 +717,14 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
             # the deck's conversation is every station's (package 41): say, tell, ask
             return text, "", DOMAIN
         return text, f"{who} may not {text}: {_STATION_WHY}.", ""
+    from freesail.world import books as books_mod
+
+    book_verb = books_mod.recognises(text)
+    if book_verb is not None:
+        # a book drafted, posted or given (spec M7b §16; package 53): drafting and reading
+        # are every person's; a sheet posted is his standing orders, each in his rank and
+        # within his domain; a manifest given to the boat is the port's business
+        return text, _book_judged(world, station, text, book_verb, vocab), DOMAIN
     try:
         order = imperative.parse(ship, text, vocab)
     except OrderError:
@@ -725,6 +734,10 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
         if order is None:
             return text, "", ""  # the grammar's own refusal, through `World.submit`
     spec = vocab.verbs[order.verb]
+    if order.verb in MOVE_VERBS:
+        # the equal reach (spec M7b §17; package 53): every stationed person goes where his
+        # duty allows, whatever his domain; his duty is the movement's own check
+        return text, "", DOMAIN
     why = domain.why_not(order.verb, spec.object, spec.level)
     if why is None:
         return text, "", DOMAIN
@@ -761,6 +774,60 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
     elif opens:
         said += DANGER_ROUTE
     return text, said, ""
+
+
+def _book_judged(world: World, station: str, text: str, verb: str, vocab: Any) -> str:
+    """A book's sentence from a station (package 53): the refusal in words, or "". A
+    sheet posted is judged order by order as a standing order the station gives (its
+    rank, its domain); a manifest given to the boat as the boat sent on the port's
+    business; drafting and reading are anyone's."""
+    from freesail.world import books as books_mod
+
+    if verb not in ("post the book", "give the book"):
+        return ""
+    who = f"The {station}"
+    try:
+        _verb, phrase = books_mod._matched(text)
+        rest = books_mod._after_phrase(text, phrase or "")
+        title, _after = books_mod._title(rest, phrase or "")
+        if verb == "post the book" and (phrase or "").endswith("night orders"):
+            title = "night orders"
+    except OrderError:
+        return ""  # the book's own refusal, through `World.submit`
+    book = books_mod.books_of(world).find(title) if title else None
+    if book is None:
+        return ""  # the book's own refusal
+    if verb == "give the book":
+        why = _holder(world, station).domain.why_not("send the boat", "port", "1")
+        if why is None:
+            return ""
+        return (
+            f"{who} may not give the manifest '{book.title}' to the boat without the "
+            f"captain: {why}."
+        )
+    for line in book.lines:
+        _, why = _standing_by_rank(world, station, line, vocab)
+        if why:
+            return f"{who} may not post the sheet '{book.title}': {why}"
+    return ""
+
+
+def reach_order(world: World, text: str) -> bool:
+    """Whether an order is of the equal reach (spec M7b §17; package 53), given with the
+    deck or without: a move of the giver's own (`go below`, `go to the gunroom`, `go
+    ashore`), or a book drafted or read."""
+    from freesail.world import books as books_mod
+
+    verb = books_mod.recognises(text)
+    if verb is not None:
+        return verb in ("draft a book", "the books", "show the book")
+    try:
+        from freesail.orders import grammar as imperative
+
+        order = imperative.parse(world.ship, text, load_vocabulary())
+    except Exception:  # noqa: BLE001  (words the grammar refuses, or a point ship)
+        return False
+    return order.verb in MOVE_VERBS
 
 
 def _granted(world: World, harness: Any, order: Any, spec: Any, vocab: Any) -> bool | str | None:
@@ -1557,6 +1624,7 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
         and (
             own_reckoning_order(world, str(args.get("text", "")))
             or conversation_order(world, str(args.get("text", "")))
+            or reach_order(world, str(args.get("text", "")))
         )
     )
     if (
@@ -2222,6 +2290,32 @@ def _papers_topic(world: World) -> Topic:
     )
 
 
+def _books_topic(world: World) -> Topic:
+    """The books drafted aboard (spec M7b §16; package 53; `freesail.world.books`): each a
+    section by its title, its page the drafter's lines with his mark, read from anywhere
+    (the papers kept in a place are dropped, the owner's ruling of 2026-10-16)."""
+    drafted = getattr(world, "books", None)
+    books = list(getattr(drafted, "items", None) or [])
+    sections = []
+    for k, book in enumerate(books, 1):
+        text = "\n".join(book.page())
+        sections.append(Section(str(k), book.title, text, text, by_line=True))
+    if not sections:
+        text = "No books have been drafted aboard: 'draft a book \"<title>\": <lines>' writes one."
+        return Topic("books", "the books drafted", "the books drafted: none", text)
+    whole = "\n\n".join(
+        ["The books drafted aboard, each with its drafter's mark.", *(s.text for s in sections)]
+    )
+    return Topic(
+        "books",
+        "the books drafted",
+        f"the books drafted: {len(sections)}, each by its title",
+        whole,
+        tuple(sections),
+        whole_words="every book",
+    )
+
+
 def _topic(world: World, key: str) -> Topic | str:
     """The topic a call names, or the refusal in words."""
     if key.startswith("primer"):
@@ -2238,6 +2332,8 @@ def _topic(world: World, key: str) -> Topic | str:
         return _ship_topic(world)
     if key in ("papers", "the papers", "the ships papers", "the ship's papers", "ships papers"):
         return _papers_topic(world)
+    if key in ("books", "the books", "books drafted", "the books drafted"):
+        return _books_topic(world)
     if key in ("standing orders", "the book", "book", "the standing orders"):
         text = "\n".join(world.standing.book.lines())
         return Topic("standing orders", "the standing orders", text, text)
@@ -2258,6 +2354,9 @@ def _every_topic(world: World) -> list[Topic]:
         _ship_topic(world),
         _papers_topic(world),
     ]
+    drafted = _books_topic(world)
+    if drafted.sections:
+        out.append(drafted)
     for key in ("standing orders", "tools"):
         top = _topic(world, key)
         assert isinstance(top, Topic)
@@ -2421,6 +2520,14 @@ def _contents(world: World) -> str:
         if papers.sections
         else f"  papers: the ship's papers: none aboard ({size_words(tokens(papers.whole))})"
     )
+    drafted = _books_topic(world)
+    if drafted.sections:
+        # package 53: the books drafted aboard, listed once there is one
+        lines.append(
+            f"  books: the books drafted aboard, {len(drafted.sections)}, each by its title "
+            f"({'; '.join(s.heading for s in drafted.sections)}): "
+            f"{size_words(tokens(drafted.whole))} whole"
+        )
     book = "\n".join(world.standing.book.lines())
     lines.append(
         f"  standing orders: the book of standing orders as it stands, {size_words(tokens(book))}"

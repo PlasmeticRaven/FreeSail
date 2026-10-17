@@ -5701,3 +5701,248 @@ def test_truth_7b_97_say_as_a_held_station_is_refused(voiced_watch):
     assert "Captain Bowen" not in names and "Mr Pearce" not in names
     held = [o for o in world.world_orders if o["order"].startswith("say as the captain")]
     assert not held  # refused at the door: never an order on the channel
+
+
+# ---------------------------------------------------------------------------
+# Milestone 7b, part iv: people in places (package 53; spec M7b §14, §16 to §18): truths
+# 7b-100 to 7b-102. 100 on the frigate at seed 7 off the Lizard with a fake officer of the
+# watch who goes below with the deck and comes up again; 101 and 102 on the schooner at
+# anchor in Carrick Road, the player ashore and aboard, a manifest and a sheet drafted. No
+# recorded passage's pin moves: none moves a person, drafts a book or goes ashore, and a
+# world in which nobody moves is as it was (the place's checks muster nobody).
+# ---------------------------------------------------------------------------
+
+PLACES_EVERY = 600  # the officer sampled every ten minutes, in lockstep
+
+
+def _officer_below_and_up():
+    from freesail.agents import Fake, Harness, SamplingPolicy, call, reply
+    from freesail.agents.agent import officer
+
+    world = _directed_world()
+    world.submit("set plain sail")
+    world.run(60)
+    script = [
+        reply("", call("stand_by", until="ten minutes")),
+        reply(
+            "",
+            call("submit_order", text="go below"),
+            call("submit_order", text="set the royals"),
+            call("stand_by", until="a glass"),
+        ),
+        reply(
+            "",
+            call("submit_order", text="go on deck"),
+            call("submit_order", text="set the royals"),
+            call("stand_by", until="a watch"),
+        ),
+    ]
+    oh = Harness(
+        world,
+        officer(SamplingPolicy.in_lockstep(PLACES_EVERY, "notable", "urgent"), world=world),
+        Fake(script, when_done=reply("All well.")),
+        save=lambda w, r: None,
+    )
+    oh.model_name, oh.door = "the fake officer", "mcp"
+    oh.start()
+    # the deck given once he is seated, so that a replay by the acts finds him there
+    assert world.submit("you have the deck").kind == "agent.deck"
+    return world, oh
+
+
+def _until_line(world, kind: str, n: int, seconds: int = 3600) -> None:
+    """Run the world a minute at a time until it has `n` lines of `kind`."""
+    for _ in range(seconds // 60):
+        if len(events(world, kind)) >= n:
+            return
+        world.run(60)
+    raise AssertionError(f"no {n} lines of {kind} in {seconds} s")
+
+
+def test_truth_7b_100_a_person_who_goes_below_is_below_and_his_deck_order_refused_until_up(
+    tmp_path,
+):
+    """Spec M7b §18, truth 100: "A person who goes below is below in the muster and the
+    state; an order of the deck's from him is refused in words until `go on deck` brings
+    him back." The officer of the watch (a fake at his station, with the deck) goes below:
+    the gunroom is his place, the people and the muster say so, and his order to set the
+    royals is refused in words naming the way back; a glass later he comes on deck and
+    the same order is carried out. The player at the prompt alike: the captain in his cabin
+    is refused the helm and given it on the quarterdeck. The game saved and replayed by the
+    transcript and by the acts is the same log."""
+    from freesail.api import queries
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+
+    world, oh = _officer_below_and_up()
+    _until_line(world, "person.moved", 1)
+    pearce = world.stations.holder("officer of the watch")
+    assert pearce.where == "gunroom"
+    assert world.people.state_words(pearce) == "with the deck, in the gunroom"
+    assert f"{pearce.name}, with the deck, in the gunroom" in queries.muster_lines(world)[-1]
+    moved = events(world, "person.moved")
+    assert [e.text for e in moved] == [f"{pearce.name} went below to the gunroom."]
+    refused = [e for e in events(world, "order.rejected") if "royals" in e.text]
+    assert refused and refused[0].text.endswith(
+        "You are in the gunroom; go on deck to make or take in sail."
+    )
+    assert not any("royal" in e.text for e in events(world, "evolution.started"))
+    _until_line(world, "person.moved", 2)
+    assert pearce.where == "quarterdeck"
+    assert world.people.state_words(pearce) == "on deck, with the watch"
+    assert (
+        events(world, "person.moved")[-1].text == f"{pearce.name} came on deck, to the quarterdeck."
+    )
+    taken = [e for e in events(world, "order.accepted") if "royals" in e.text]
+    assert taken and taken[0].actor == "the officer of the watch"
+    # the player at the prompt is a person with a place too: the captain below is refused
+    # the helm, and has it on the quarterdeck
+    assert world.submit("go below").kind == "captain.below"
+    e = world.submit("steer south-west")
+    assert e.kind == "order.rejected"
+    assert e.text.endswith("You are in the cabin; go on deck to give the helm an order.")
+    assert world.submit("come on deck").kind == "captain.on_deck"
+    assert world.submit("steer south-west").kind != "order.rejected"
+    world.run(60)
+    path = replay_mod.save_to_file(world, tmp_path / "places.json", checkpoint=False)
+    data = replay_mod.load_file(path)
+    for road in (replay_mod.BY_TRANSCRIPT, replay_mod.BY_ACTS):
+        copy = replay_mod.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == world.log.digest(), road
+        assert copy.stations.holder("officer of the watch").where == "quarterdeck", road
+        assert copy.people.captain.where == "quarterdeck", road
+
+
+def _ashore_in_falmouth(**kw):
+    world = _in_port(CARRICK_ROAD_5C, cargo={"purse_pounds": 3000.0}, **kw)
+    world.run(60)
+    return world
+
+
+def _until(world, done, minutes: int = 300) -> None:
+    for _ in range(minutes):
+        if done():
+            return
+        world.run(60)
+    raise AssertionError("not done in time")
+
+
+def test_truth_7b_101_the_player_ashore_buys_at_the_market_in_person_and_aboard_by_the_boat(
+    tmp_path,
+):
+    """Spec M7b §18, truth 101: "The player ashore buys at the market in person; aboard, by
+    the boat." The schooner at anchor in Carrick Road; her master (the player) goes ashore
+    by the boat and is landed at the quay; his deck's orders refused there, his bargain
+    refused until he goes to the market; there he buys ten tons of tin in person (the
+    prices read there, the boat at the booms, the tin off by the port's lighter); `come
+    aboard` sends the boat for him; aboard, a bargain goes by the boat as it always did.
+    The save replayed is the same log."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+
+    world = _ashore_in_falmouth()
+    master = world.people.captain
+    e = world.submit("go ashore")
+    assert e.kind == "order.accepted" and world.ports.boat.errand == "landing"
+    _until(world, lambda: not world.ports.boat.away)
+    assert not master.aboard and master.where == "shore" and master.port == "falmouth"
+    assert world.people.state_words(master) == "ashore at Falmouth, on the quay"
+    assert any(
+        x.text == f"{master.name} landed at the quay at Falmouth."
+        for x in events(world, "person.ashore")
+    )
+    assert (
+        "the market: the port's goods are bought and sold in person"
+        in world.submit("the port").text.lower()
+    )
+    e = world.submit("set the jib")
+    assert e.text.endswith(
+        "You are ashore at Falmouth, on the quay; come aboard to make or take in sail."
+    )
+    e = world.submit("buy 10 tons of tin")
+    assert e.text.endswith("go to the market to buy and sell in person.")
+    assert world.submit("go to the market").kind == "person.moved"
+    purse = world.purse.pounds
+    e = world.submit("buy 10 tons of tin")
+    assert e.kind == "market.bargain" and e.data["by"] == "person", e.text
+    assert e.text.startswith(
+        f"{master.name} at the market of Falmouth, in person: bought 10 tons of tin"
+    )
+    assert not world.ports.boat.away  # no boat: in person
+    price = e.data["bargains"][0]["price_pounds"]
+    assert world.purse.pounds == pytest.approx(purse - 10 * price)
+    assert "falmouth" in world.ports.price_lists  # read at the market
+    _until(world, lambda: world.hold.goods.get("tin", 0.0) >= 10.0)
+    bought = events(world, "market.bought")[-1]
+    assert "came off by the lighter from Falmouth" in bought.text and bought.data["by"] == "lighter"
+    assert world.submit("come aboard").kind == "order.accepted"
+    _until(world, lambda: master.aboard and not world.ports.boat.away)
+    assert any(
+        x.text == f"{master.name} came aboard from the boat." for x in events(world, "person.came")
+    )
+    # aboard, by the boat
+    e = world.submit("buy 5 tons of tin")
+    assert e.kind == "market.bargain" and "the boat goes for it" in e.text
+    assert world.ports.boat.away and world.ports.boat.errand == "purchase"
+    _until(world, lambda: not world.ports.boat.away)
+    assert world.hold.goods["tin"] == pytest.approx(15.0)
+    path = replay_mod.save_to_file(world, tmp_path / "ashore.json", checkpoint=False)
+    copy = replay_mod.replay(replay_mod.load_file(path), ship_factory)
+    assert copy.log.digest() == world.log.digest()
+
+
+def test_truth_7b_102_a_drafted_manifest_trades_in_one_errand_and_a_posted_sheet_stands(
+    tmp_path,
+):
+    """Spec M7b §18, truth 102: "A drafted manifest given to the boat trades its goods in
+    one errand; a drafted night-orders sheet posted is the standing orders." The schooner
+    in Carrick Road with the prices known: a manifest drafted to buy tin and salt and sell
+    none is given to the boat, and the boat goes once for both, which come off together; a
+    sheet of two standing orders drafted and posted is in the book in the master's rank and
+    fires; both books are in the library with his mark, read from anywhere; the save
+    replayed is the same log and the same books."""
+    from freesail.agents import tools
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+    from freesail.world.books import books_of
+
+    world = _ashore_in_falmouth(papers={"price_lists": ["falmouth"]})
+    master = world.people.captain
+    e = world.submit('draft a book "cargo": buy 10 tons of tin; buy 4 tons of salt')
+    assert e.kind == "book.drafted" and "a manifest of 2 bargains" in e.text
+    before = len(events(world, "boat.away"))
+    purse = world.purse.pounds
+    e = world.submit('give the book "cargo" to the boat')
+    assert e.kind == "market.bargain" and e.data["by"] == "boat", e.text
+    assert e.text.startswith("By the manifest 'cargo': bought 10 tons of tin")
+    paid = e.data["paid_pounds"]
+    assert world.purse.pounds == pytest.approx(purse - paid)
+    _until(world, lambda: not world.ports.boat.away)
+    assert len(events(world, "boat.away")) == before + 1  # one errand for both
+    assert world.hold.goods["tin"] == pytest.approx(10.0)
+    assert world.hold.goods["salt"] == pytest.approx(4.0)
+    e = world.submit(
+        'draft a book "night orders": standing order "lead": every glass then heave the lead; '
+        '"dusk": at sunset then heave the lead'
+    )
+    assert e.kind == "book.drafted" and "a standing-orders sheet of 2 orders" in e.text
+    e = world.submit('post the book "night orders"')
+    assert e.kind == "book.posted", e.text
+    names = [r.name for r in world.standing.book.rules]
+    assert "lead" in names and "dusk" in names
+    assert all(
+        r.given_by == "captain" for r in world.standing.book.rules if r.name in ("lead", "dusk")
+    )
+    world.run(1800)
+    assert any(
+        x.actor == "standing order 'lead'" for x in world.log.all() if x.kind == "order.accepted"
+    )
+    books = books_of(world).items
+    assert [b.title for b in books] == ["cargo", "night orders"]
+    assert all(b.mark == master.name for b in books)
+    page = tools.library(world, "officer of the watch", "books", "night orders")
+    assert f"drafted by {master.name}" in page and "heave the lead" in page
+    path = replay_mod.save_to_file(world, tmp_path / "books.json", checkpoint=False)
+    copy = replay_mod.replay(replay_mod.load_file(path), ship_factory)
+    assert copy.log.digest() == world.log.digest()
+    assert [b.title for b in books_of(copy).items] == ["cargo", "night orders"]

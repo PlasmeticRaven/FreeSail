@@ -38,6 +38,11 @@ stations:
   # of the officer of the watch's kind, held by the second lieutenant, named as it is not
   # the kind's; a person's journal is his own at whichever station he holds
   second officer: {kind: officer of the watch, holder: second lieutenant}
+  # package 53 (spec M7b §17, several stations of one kind): the third lieutenant's, the
+  # larboard watch to the second's starboard; the doors name them by their number
+  # (`officer 2`, `officer 3`) or their person, and the deck passes between them at the
+  # change of the watch by the bill
+  third officer: {kind: officer of the watch, holder: third lieutenant}
 
 wardroom:
   - role: captain

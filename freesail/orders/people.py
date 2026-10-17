@@ -8,6 +8,17 @@ named few aboard.
     ask the pilot <question>        the pilot answers from his knowledge of his port: the
                                     tide, the channel, the marks, the anchorage, the news
 
+People in places (spec M7b §14; package 53; `freesail.world.movement`): the giver of the
+order goes, the captain at the prompt or a station's person at his station.
+
+    go below                        the captain to his cabin; anyone else to his berth
+    come on deck                    to the quarterdeck (the deck for the idlers' chiefs)
+    go to the gunroom               any place aboard his duty allows (not the captain's
+                                    cabin); ashore, the port's places: `go to the market`
+    go aloft                        into the tops
+    go ashore                       by the boat, at a port's reach, landed at the quay
+    come aboard                     the boat sent for him from the ship at his port
+
 Each is a verb of `data/vocabulary.yaml` with the object `person`: the grammar takes the
 words after the verb as they are, and this module reads a role or a name from them. The
 people themselves are `freesail.world.people.People`, reached through the World the ship
@@ -23,7 +34,17 @@ from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
 
-__all__ = ["NO_PEOPLE_WORDS", "check", "execute"]
+__all__ = ["MOVE_VERBS", "NO_PEOPLE_WORDS", "check", "execute"]
+
+# The people's verbs that move the giver (package 53; `freesail.world.movement`).
+MOVE_VERBS: tuple[str, ...] = (
+    "go below",
+    "come on deck",
+    "go to",
+    "go aloft",
+    "go ashore",
+    "come aboard",
+)
 
 NO_PEOPLE_WORDS = "There is nobody to send for: the ship is not in a world."
 
@@ -53,16 +74,8 @@ def execute(ship: Any, order: Order) -> Result:
             )
         text, data = people.send_for(who)
         return "person.sent_for", text, {"verb": verb, "level": 1} | data
-    if verb == "go below":
-        if rest:
-            raise OrderError(f"'go below' takes nothing after it; '{rest}' was not understood.")
-        text, data = people.captain_moves(below=True)
-        return "captain.below", text, {"verb": verb, "level": 1} | data
-    if verb == "come on deck":
-        if rest:
-            raise OrderError(f"'come on deck' takes nothing after it; '{rest}' was not understood.")
-        text, data = people.captain_moves(below=False)
-        return "captain.on_deck", text, {"verb": verb, "level": 1} | data
+    if verb in MOVE_VERBS:
+        return _move(ship, world, people, order, verb, rest)
     if verb == "ask the pilot":
         ports = getattr(world, "ports", None)
         if ports is None or ports.pilot is None:
@@ -71,6 +84,39 @@ def execute(ship: Any, order: Order) -> Result:
         answer = ports.answer(question or "the channel")
         return "pilot.answered", answer, {"verb": verb, "level": 1, "question": question}
     raise OrderError(f"'{verb}' is not an order about the people this ship knows.")
+
+
+def _move(ship: Any, world: Any, people: Any, order: Order, verb: str, rest: str) -> Result:
+    """The giver of the order goes (package 53; `freesail.world.movement`): the captain's
+    own `go below` and `come on deck` as they always were, every other move by the
+    movement's verbs, for whoever gives it."""
+    from freesail.world import movement
+
+    actor = (getattr(ship, "extra", None) or {}).get("order_actor") or "captain"
+    person = movement.person_of_actor(world, actor) or people.captain
+    captain = person is people.captain and person.aboard
+    if verb in ("go below", "come on deck") and rest:
+        raise OrderError(f"'{verb}' takes nothing after it; '{rest}' was not understood.")
+    if captain and verb == "go below" and person.where != "cabin":
+        text, data = people.captain_moves(below=True)
+        return "captain.below", text, {"verb": verb, "level": 1} | data
+    if captain and verb == "come on deck" and person.where not in movement.DECK_PLACES:
+        text, data = people.captain_moves(below=False)
+        return "captain.on_deck", text, {"verb": verb, "level": 1} | data
+    if captain and verb in ("go below", "come on deck"):
+        raise OrderError(f"You are {movement.where_words(world, person)} already.")
+    if verb == "go to" and not rest:
+        raise OrderError("Go where? Say 'go to the gunroom', 'go below', 'come on deck'.")
+    if verb in ("go ashore", "come aboard") and rest:
+        raise OrderError(f"'{verb}' takes nothing after it; '{rest}' was not understood.")
+    if verb == "go ashore":
+        kind, text, data = movement.go_ashore(world, person)
+    elif verb == "come aboard":
+        kind, text, data = movement.come_aboard(world, person)
+    else:
+        words = rest or order.verb_phrase
+        kind, text, data = movement.go(world, person, verb, words)
+    return kind, text, {"verb": verb, "level": 1} | data
 
 
 def check(ship: Any, order: Order) -> None:
@@ -97,5 +143,7 @@ def check(ship: Any, order: Order) -> None:
         if world.people.find(who) is None and _words(who) not in ROLE_WORDS:
             names = ", ".join(x.name for x in world.people.all)
             raise OrderError(f"Nobody aboard answers to '{who}'; the people are {names}.")
-    elif verb in ("go below", "come on deck") and rest:
+    elif verb in ("go below", "come on deck", "go ashore", "come aboard") and rest:
         raise OrderError(f"'{verb}' takes nothing after it; '{rest}' was not understood.")
+    elif verb == "go to" and not rest:
+        raise OrderError("Go where? Say 'go to the gunroom', 'go below', 'come on deck'.")

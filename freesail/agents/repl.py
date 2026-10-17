@@ -383,18 +383,19 @@ def open_world(
 
 
 def _station(args: argparse.Namespace, world: World | None = None) -> Station:
+    from freesail.agents.agent import make_bound
+
     name = station_name(args.station)
     stations = getattr(world, "stations", None)
+    if stations is not None:
+        name = stations.resolve(name)  # by its number or its person (package 53)
     make = stations.factory(name) if stations is not None else STATIONS.get(name)
     if make is None:
         aboard = stations.names() if stations is not None else tuple(STATIONS)
         raise SystemExit(f"No station '{args.station}' aboard; the stations: {', '.join(aboard)}.")
-    st = make(SamplingPolicy.in_lockstep(int(args.every), "notable", "urgent"), world=world)
-    if st.name != name:
-        import dataclasses
-
-        st = dataclasses.replace(st, name=name)  # bound by hand under its own name (41)
-    return st
+    # bound under its own name (41), made for its holder (53)
+    policy = SamplingPolicy.in_lockstep(int(args.every), "notable", "urgent")
+    return make_bound(make, name, policy, world)
 
 
 def _save_fn(path: str):
