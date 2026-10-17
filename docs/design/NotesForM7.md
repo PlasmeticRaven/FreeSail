@@ -283,14 +283,19 @@ model captain at the flagship is the orchestrator the owner saw in play; station
 a standing-order kind ("keep station two cables astern of the flagship"); the formations
 (line ahead, line abreast, the order of sailing) are the book's.
 
-**Six on six is a tuning problem with one design decision.** Twelve crewed Worlds are beyond
-the cap on any machine we have. The decision: a third shape between far and crewed, a
-*fighting shape*, carrying the motion model, the guns, the damage and the sail state at
-coarse steps, without the reckoning, the log and the people; the lead's guess a fifth of a
-crewed World's cost, which puts twelve ships within reach at a low tick rate with the
-player's ship and her immediate opponent fully crewed. The pace rule eases the clock in
-action and a battle at 1x is acceptable. Measured with `tools/pace.py` before anything is
-promised.
+**Six on six is a tuning problem, and the lead's first reading was too dark.** The owner's
+figure (2026-10-17): the frigate with twelve crewed ships runs at 95 ticks a second on his
+machine, a tick a second of ship's time, so twelve crewed Worlds run at 95x there with
+nothing to spare and at 30x with plenty, and a battle wants 1x to 5x. So no third shape is
+needed for the target. Two cautions: combat adds cost per ship (the guns served, the damage
+worked, each rules captain thinking harder and oftener, every crewed lookout watching
+eleven others, which grows with the square of the number), so a fighting ship at five times
+a sailing one turns 95 into 19, still above the five a battle wants; and the cap is a budget
+knob (`--crewed-cap`, `tools/pace.py --ships N`), raised for a battle's scenario and kept at
+three on the open sea. A *fighting shape* (the motion model, the guns, the damage and the
+sail state at coarse steps, without the reckoning, the log and the people) stays as a
+fallback if the measured cost of combat breaks the figure, not a plan. Measured as combat
+lands, the owner's 95 the baseline.
 
 **The order to build it:** M7a single-ship action (gunnery, damage, boarding, striking, the
 prize, health and the surgeon), gated on a frigate action (the Indefatigable); M7b
