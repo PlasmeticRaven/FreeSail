@@ -311,6 +311,19 @@ drunk by the crew at a cost and by a person only by his own choice.
 - Water is a gallon a man a day (the figure the ship files were sized at); the brief's
   quart is a man's own drink.
 
+**The drink sequence (the owner's question of 2026-10-17, for a second pass on 54's ration
+data; Opus-sized, with 58 or 55):** the Navy's drink was a gallon of small beer a man a day,
+which kept only weeks in cask; after it, the Regulations' substitutes by station, a pint of
+wine (the Mediterranean) or half a pint of spirits (rum in the West Indies and at sea,
+brandy or arrack where the victualler had them), the spirit issued as grog three or four
+of water to one in two halves at noon and in the evening (Vernon, 1740), which also made
+foul cask water drinkable; the French wine and eau-de-vie, a Breton chasse-marée's people
+cider. So: beer as a store with its life in weeks, the substitute by the ship's station and
+nation, the grog issue as a routine event taking its water, the stores reading saying
+which drink the people are on, the temper line when the spirit is stopped (a punishment)
+or short, the director's stove cask gaining its meaning; rum is not a preservative of
+drink but what is drunk after the beer.
+
 **Open items, carried:** `send for` does not wake a stationed person asleep by his needs;
 `take in water` with no figure completes to a fraction of a ton; the waking place after 53.
 
