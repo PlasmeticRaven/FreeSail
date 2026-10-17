@@ -981,7 +981,7 @@ def test_the_bridge_runs_over_stdio_against_a_game_on_a_local_port(tmp_path):
     finally:
         server.should_exit = True
         runner.join(timeout=10)
-    assert got["tools"] == [*TOOLS, "say"]
+    assert got["tools"] == [*tools.tool_names(pictures=True), "say"]  # not the director's (50)
     assert "This is a message from the developer of a game" in got["first"]
     assert "This is a message from the harness of FreeSail" in got["yes"]
     assert "reason: the glass" in got["say"]
