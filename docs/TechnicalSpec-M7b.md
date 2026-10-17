@@ -910,7 +910,12 @@ In waves, written for the owner's approval in turn, each launched on his word:
   and yard sorted against its own mast where it stands (the rake corrected), a lug cut at
   its mast; a flying sail sent down is not drawn and its yard lies on deck; the brace was
   drawn before and is now said in the yard's title too. Truths 7b-111 and 7b-112 (numbered
-  after the spec's 110). The tuning notes, "Package 57", have the figures and the pins.
+  after the spec's 110). A staysail between the masts stowed on its stay has half its
+  class's furled windage (judgement, set between truths 8 and 10), and its sheet is sized
+  to its cloth. The captain's gale trial (`trial-station-gale`) falls otherwise from its
+  first course under the new rig and takes the ground among the Molène islands after two
+  failed wears: an expected failure, for package 58. The tuning notes, "Package 57", have
+  the figures and the pins.
 - **58 (Opus): the captain's sea sense, third pass**, from the owner's runs of gate 6c
   (`docs/dev/M6-WorkPackages.md`, "The notes of 2026-10-17, read"): the offing by the
   account not its doubt, the guard against land ahead within the visibility, the book
