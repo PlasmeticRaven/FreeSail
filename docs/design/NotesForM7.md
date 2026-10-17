@@ -201,3 +201,15 @@ boat lost), judged by the closing speed and the angle; worth building even if th
 nearly removes it from play. The lookout's and the officer's words before a close pass,
 the rules captain's avoidance and the far ships' are the parts that make it rare; the
 consequence is what makes keeping clear matter.
+
+## The captain as orchestrator (the owner, 2026-10-17, after the Éclair's first cruise)
+
+The owner's observation from play: a good model captain with a lesser model as officer
+acts as an orchestrator by nature, giving the deck and the ordinary work to the officer and
+keeping the decisions; "a ship is basically a natural agentic harness". The cruise's
+usage: the lead's model at the officer's station for a day and a night of ship's time
+cost a few per cent of the plan's allowance, so the heavy models are for the captain's and
+the director's stations and a lesser model does the officer's busywork well. For the
+allocation of models to stations in the harbour's settings (59) and the gate's scenarios
+(55): the captain and the director heavy, the officer, lookout and master light.
+

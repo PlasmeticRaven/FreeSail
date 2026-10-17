@@ -29,8 +29,12 @@ beside them (`pictures/`).
   two-thirds of the yard and sail lie abaft the mast, and the sail is set on the lee side of
   the mast (dipped round it at each tack; a standing lug stays on its side). The viewer
   draws the yard centred on the mast and the sail on the mast's line; it should draw the
-  yard slung a third from its fore end and the sail on the lee side (the owner's "two-thirds
-  to windward" read as the slinging; to be confirmed with him), on either tack and running.
+  yard slung a third from its fore end and the sail on the lee side, on either tack and
+  running. **Confirmed by the owner** (the same day): "two thirds of the sail to leeward of
+  the mast", the yard slung about a third from the fore end, so that more of the yard and
+  sail lie abaft the mast at every trim but nearly square, where it shows as an offset
+  square; and the same for the settee and lateen sails, whose yards were not centred athwart
+  the mast either.
 - Item 5: the viewer's draw order is by a fixed list, not by the aspect: from ahead the sail
   before the mast should hide it and from astern the mast should hide the sail; the painter
   orders the parts by their depth from the viewer. With it, the finding of the cruise that
