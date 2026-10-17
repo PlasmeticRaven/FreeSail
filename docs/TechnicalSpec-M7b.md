@@ -661,6 +661,41 @@ orders, and neither side needs a script. The scenario is a gate 7b item.
 - 99d. A director's listing by the ship order is found by the purser's errand and reported
   in the purser's words when the boat returns; the play log never shows the order.
 
+## Part 7b-ix: The land-avoiding route (provisional; the owner, 2026-10-17)
+
+### 21i. The route over the chart's own data (`freesail/world/captains.py` `Planner`; `freesail/world/chart.py`; `freesail/world/brains.py`; `orders/`)
+
+Brought into M7b from the carried items on the owner's word ("pretty important and not
+combat-centric"); booked provisionally, to be planned in full at its briefing. **Today**
+the planner (`Planner.legs_for`) joins the period's common tracks where the chart has them
+and otherwise lays the straight line, giving a headland in the way an offing (`OFFING_NM`
+3, `DANGER_BERTH_NM` 1, `PLANNER_ROUNDS` 6) and leaving the rest to `via` marks given by
+hand; the known failures are the legs laid across the land (Machico, the Manacles, Keller;
+a next leg after a land berth laid across Keller; the owner's runs of gate 6c), the
+pilot's joining leg found clear only within the rounds, and the tracks into Roscoff and
+St Mary's and the reach into Brest (package 58's notes).
+
+**The intent:** a course shaped for a place, by the player or by any captain the game
+sails, is laid clear of the land and the charted dangers over the chart's own data, from
+the account and never the truth, with the offing and the berth as the captain's book has
+them; the legs are said in the log as the captain's plan ("by Ushant, then Finisterre")
+and `via` marks still bind where given. **The lead's reading of a way:** a graph over the
+coast's outward corners pushed out by the offing and the dangers pushed out by the berth,
+searched for the shortest clear path, cached per chart and refreshed when the offing
+changes; cheap enough for a far ship's brain at promotion and under the pace budget
+(`tools/pace.py` measures it); the pilot's joining leg and the rules captain's offing
+rule (58) drawn from the same path; the lay line (the open item of 43b) considered beside
+it, since a route that cannot be laid on the wind is laid in boards. The deep-sea tiles'
+rule and the held gauges stay where they are. Builder Fable (geometry and design heavy);
+sequenced at briefing beside 51 and before the half of 58 that lays tracks, so that 58
+measures against it rather than around it.
+
+### 21j. Truths for 7b-ix (provisional)
+
+- 99e. The frigate shaped for Lisbon from Falmouth with no `via` clears Ushant and
+  Finisterre by the offing; the brig shaped for Funchal clears Machico; the smack shaped for
+  Falmouth from the Lizard clears the Manacles; each on the whole chart, run until past.
+
 ## 22. Consent (one revision for the milestone)
 
 The consent brief is revised once more by a named package at the milestone's end, the
@@ -723,7 +758,10 @@ In waves, written for the owner's approval in turn, each launched on his word:
   by the director's ship order, the hull's valuation, the ship bought and sold through the
   market orders, the transfer of the people and the hands, the errand ashore; the goal's
   scenario for the gate.
-- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57, 58, 59 and 60: the starter
+- **61 (Fable, provisional): the land-avoiding route** (§21i) beside 51 and before 58's
+  tracks: the route over the chart's own data for every captain and the player, the legs
+  said as the plan, the pilot's joining leg from the same path; planned in full at briefing.
+- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57, 58, 59, 60 and 61: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
 
@@ -733,11 +771,11 @@ Gate 7b after 55, carrying gate 6c's untested items (decision 50).
 
 Powder, damage and the prize (M7); the ends of the needs and the surgeon (M7's health); the
 gybe as an evolution and the sails at fine control (M7); signals and the hail between ships
-(M7); two directors competing; a land-avoiding route for the planner; the supply-and-demand
+(M7); two directors competing; the supply-and-demand
 loop; the orders system's review (deferred to a cold review).
 
 ## 26. Open items carried in
 
 From M6: the Goulet on a flood (43b), Torbay's stream (43b), the held gauges' blend, the
-deep-sea tiles' rule, the land-avoiding route, the test battery's cost (eaten by the owner's
+deep-sea tiles' rule, the land-avoiding route (brought in as 61, §21i), the test battery's cost (eaten by the owner's
 word), the orders review (deferred).
