@@ -222,12 +222,34 @@ ship the player is aboard, the player seated under the same contract as a model 
 a save with a station on another ship replays that station's acts as it replays the
 player's (43's checkpoint carries the other ship whole; the acts are keyed by ship).
 
+### 12a. The director's chart (`freesail/agents/pictures.py`, `tools.py`; `client/map.js` or a painter of the server's own)
+
+The director holds the `chart` tool today as every station does through a door that
+carries pictures, and package 50 says at that station what the picture is: the player's
+chart as the browser page draws it, the player's ship by her account, no other ship and no
+truth on it (the owner's question of 2026-10-17; the truth is in words from `truth`). A
+director planning from it would read the captain's guess as the world. This section gives
+it a chart of its own: every ship drawn where she truly is and named, the player's ship by
+truth with her account faintly beside it and the master's doubt about the account, the
+coast, the dangers and the marks as the chart has them; `span` as the player's chart has
+it, centred on a named ship or a named place (`chart span=coast at="Palinure"`), the
+followed ship when none is named (§11). **The design question is where it is drawn.** The
+browser page paints every picture today, and sending it the truth for an off-screen draw
+puts the truth on the player's machine; the builder chooses between a painter of the
+server's own for this one view (preferred: headless, no page needed, and nothing of the
+truth leaves the server) and the page painting it from a truth the server sends for that
+draw alone, with the lead's reading of the cost in the hand-back. The picture is a book as
+every picture is (shelved with a note). The director has no `ship_view`.
+
 ### 13. Truths for 7b-iii
 
 - 98. A world with no player's ship runs a day at seed 7 with the business on and a
   director observing; followed ships change the centre; the pace truth holds.
 - 99. The player at the captain's station of the Palinure sails her through the station
   trial; the save replays with his acts.
+- 99a. The director's chart at seed 7 with the business on shows every ship where the truth
+  has her and the player's ship by truth and by account; the player's chart, drawn in the
+  same minute, shows none of the truth.
 
 ## Part 7b-iv: People in places
 
@@ -433,9 +455,9 @@ In waves, written for the owner's approval in turn, each launched on his word:
   journal keyed to the person is in. No dependence on 50.
 - **54 (Opus): needs** (§19, §20) beside 50 and 53: the rations, the three needs, the
   sleep below. Data and rules on the people, no dependence on the director.
-- **51 (Fable): the observed world** (§11, §12) after 50: the followed ship in place of the
-  given one across the World, the player on another ship, the replay of a station there.
-  Cross-cutting and design-heavy.
+- **51 (Fable): the observed world** (§11, §12, §12a) after 50: the followed ship in place of the
+  given one across the World, the player on another ship, the replay of a station there,
+  and the director's chart (the owner's word of 2026-10-17). Cross-cutting and design-heavy.
 - **52 (Opus): the director's voice** (§8, §9) after 50, brought forward with it: people
   from words, `say as`, the asked unseated person answered by the director; the word heard
   counting as a word on deck (§15); and a station below the captain's told the truth of who
