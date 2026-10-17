@@ -565,11 +565,15 @@ def direct_the_voyage(orders: Sequence[str] = (), reenter: bool = True) -> Any:
                 if r.get("name") != "world_order":
                     continue
                 said = str(r.get("result") or "")
-                if said.startswith("Doubted") and reenter and state["pending"] is not None:
+                again = said.startswith(("Doubted", "The game has no way"))
+                if again and reenter and state["pending"] is not None:
+                    # the doubt read, or the game's honest answer that it has no way to do
+                    # the thing as said: entered again with a reason, so that the record
+                    # holds the re-entry or the attempt (the owner's refinement)
                     text = state["pending"]
                     state["pending"] = None
                     return Reply(
-                        text="The doubt is read; the story wants it all the same.",
+                        text="The answer is read; the story wants it all the same.",
                         calls=(
                             ToolCall(
                                 "world_order",

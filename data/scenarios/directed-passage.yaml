@@ -1,0 +1,102 @@
+# FreeSail: the merchant passage by intent with a director above it (spec M7b §2 to §6;
+# package 50). The scenario of merchant-intent.yaml whole (the same ship, day, weather,
+# ports and other sail; the rules-based captain sailing her by his intent when nobody holds
+# the captain's station), with the director's station bound on the World by the quiet-passage
+# brief (data/director/briefs/quiet-passage.yaml): a model seated at it through any door
+# (--station director), or the player (--seat director), shapes the passage through world
+# orders alone, within the brief's limits and the channel's doubt, and the director's log is
+# read with 'the director's log'. Nothing is pinned on this file: the director's acts are the
+# model's, and a world with no director seated at it sails merchant-intent.yaml's passage.
+#     py -m freesail.ui.server --scenario data/scenarios/directed-passage.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/directed-passage.yaml --seat director
+
+name: The merchant passage by intent, directed on the quiet-passage brief
+seed: 7
+start: 1805-06-12T05:00
+position: {lat_deg: 50.1631, lon_deg: -5.0345}   # Carrick Road, the usual anchorage (Imray 1874 p. 90)
+region: channel-west
+nation: united-states
+ship:
+  file: data/ships/topsail-schooner.yaml
+  heading_deg: 190
+  glass: false
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+# The captain's intent (spec M6 §4): the goal he sails by, with no book. The cargo's tons
+# are the purse's and the hold's to decide.
+intent: trade tin from Falmouth to Brest
+
+people:
+  - {role: master, skill: 0.9}    # a master who can work a lunar (spec M5 §27): his skill set
+
+papers:
+  chart: {year: 1804}
+  epitome: moore                  # a merchantman's epitome
+  almanac: 1805
+  price_lists: [falmouth]         # the list the supercargo brought off the day before
+
+cargo:
+  purse_pounds: 6000
+
+ports: [falmouth, plymouth, brest]
+
+weather:
+  wind:
+    - {at: 1805-06-12T05:00, from_deg: 270, knots: 14, air_mass: neutral}
+    - {at: 1805-06-13T00:00, from_deg: 290, knots: 12}
+    - {at: 1805-06-13T12:00, from_deg: 315, knots: 10}
+    - {at: 1805-06-14T06:00, from_deg: 340, knots: 10}
+  background:
+    {hpa: 1018, gradient_hpa_per_100km: 0.4, high_toward_deg: 200}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-11T12:00, x_km: 300, y_km: -500, hpa: 1024}
+        - {at: 1805-06-13T12:00, x_km: 500, y_km: -600, hpa: 1022}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+# The other sail on the sea at the start: the merchant passage's dozen.
+ships:
+  - {id: two-brothers, description: merchant brig, name: Two Brothers, nation: britain,
+     position: 49 18 N 6 18 W, goal: "bound from the Longships for the Eddystone", colours: none}
+  - {id: nancy, description: merchant brig, name: Nancy, nation: britain,
+     position: 50 05 N 4 30 W, goal: "bound from the Eddystone for 49 20 N 6 20 W"}
+  - {id: lark, description: cutter, name: Lark, nation: britain,
+     position: 49 55 N 5 45 W, goal: "patrolling off the Wolf within 4 miles"}
+  - {id: diamond, description: frigate, name: Diamond, nation: britain,
+     position: 48 20 N 5 20 W, goal: "patrolling off the soundings seven leagues south-west of Ushant within 8 miles"}
+  - {id: harpy, description: brig-sloop, name: Harpy, nation: britain,
+     position: 48 05 N 5 40 W, goal: "patrolling off the soundings south-west of Ushant within 10 miles"}
+  - {id: palinure, description: brig-sloop, name: Palinure, nation: france,
+     position: the Raz, goal: "running home to Brest", colours: none}
+  - {id: hirondelle, description: schooner, name: Hirondelle, nation: france,
+     position: the Isle of Saints, goal: "bound for Camaret road"}
+  - {id: betsey, description: schooner, name: Betsey, nation: united-states,
+     position: 49 18 N 4 54 W, goal: "bound for Falmouth"}
+  - {id: anna-maria, description: merchant brig, name: Anna Maria, nation: denmark,
+     position: 49 30 N 4 40 W, goal: "bound for 48 30 N 5 40 W"}
+  - {id: bom-jesus, description: merchant brig, name: Bom Jesus, nation: portugal,
+     position: 48 40 N 5 50 W, goal: "bound for the Start"}
+  - {id: indefatigable, description: frigate, name: Indefatigable, nation: britain,
+     position: Cawsand Bay, goal: "bound for the soundings south-west of Ushant"}
+  - {id: swift, description: cutter, name: Swift, nation: britain,
+     position: 49 40 N 5 20 W, goal: "carrying the mail to Plymouth"}
+
+# The world orders by time (spec M5 §26): the merchant passage's.
+world_orders:
+  - {at: 1805-06-12T12:00, order: 'weather: waypoint for "the old high over Biscay" at 1805-06-14T12:00 600 -700 1020'}
+  - {at: 1805-06-13T06:00, order: 'message: at Brest from the agent of the owners: "The tin will fetch its price; the Prefect maritime asks that the papers be shown at the castle."'}
+
+orders:
+  - let go the best bower
+
+# The director (spec M7b §4; package 50): the player's brief, a starter's name here; the
+# grant of seats on other ships (spec M6 §23) is the owner's to fill in with a model's name.
+director:
+  brief: quiet-passage

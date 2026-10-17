@@ -103,6 +103,7 @@ CHAPTERS = [
     # chapter's other anchor blocks, which work cables with none down (package 40b)
     "17-the-captain.md",  # package 40b: its block was never read
     "18-lessons.md",  # package 40b
+    "20-the-director.md",  # package 50: the world orders refused at the prompt
 ]
 
 DRIVER_COMMANDS = frozenset(

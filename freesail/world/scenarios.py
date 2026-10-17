@@ -63,6 +63,13 @@ ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
          position: 49 50 N 5 30 W, goal: "trading Falmouth to the Lizard", colours: shown}
     world_orders:                    # orders to the world by time (§26; freesail.world.orders)
       - {at: 1805-06-12T14:00, order: 'message: at Brest from the Prefect maritime: "..."'}
+    director:                        # the director (spec M6 §23; M7b §4, package 50)
+      brief: quiet-passage           # the player's brief: a starter's name (data/director/
+                                     # briefs/), a file, or the mapping itself; the station
+                                     # is bound on the World when the game is made
+      models: [the model's exact name]   # the owner's grant of seats on other ships (43)
+      seats: 1
+      seats_in_voyage: 3
     standing_orders:                 # files read at the start, in order
       - data/standing_orders/starter.orders
     orders:                          # the captain's first orders, given at tick 0

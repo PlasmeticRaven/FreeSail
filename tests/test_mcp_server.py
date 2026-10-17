@@ -290,7 +290,7 @@ def test_the_library_is_served_as_resources_and_the_brief_as_a_resource_and_a_pr
     assert "This is a message from the harness of FreeSail" in brief
     # the old captain prompt is gone; the officer's `take_the_watch` is package 37's, and
     # the captain's station's `take_command` package 40's
-    assert sorted(prompts) == ["brief", "keep_watch", "take_command", "take_the_watch"]
+    assert sorted(prompts) == ["brief", "direct", "keep_watch", "take_command", "take_the_watch"]
     assert prompt.messages[0].content.text == brief
     assert watch.messages[0].content.text == M.KEEP_WATCH
     assert b.briefed  # the prompt is the brief put into the conversation

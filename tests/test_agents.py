@@ -53,7 +53,6 @@ from freesail.agents import (
     narrator,
     reply,
     restore,
-    tool_names,
     tools,
     watcher,
 )
@@ -298,7 +297,8 @@ def test_the_tools_are_the_nine_of_the_spec_and_shelve_with_a_description_each()
         assert t.description.endswith(".") and len(t.description) > 40
     with_authority = {"submit_order", "hand_over", "handover_note", "world_order", "truth"}
     assert {n for n, t in TOOLS.items() if t.director_only} == {"world_order", "truth"}
-    assert "world_order" not in tool_names() and "truth" in tool_names(director=True)
+    assert "world_order" not in tools.tool_names()
+    assert "truth" in tools.tool_names(director=True)
     assert all(TOOLS[n].needs_authority for n in with_authority)
     assert not any(t.needs_authority for n, t in TOOLS.items() if n not in with_authority)
     # the deck is wanted for an order and for handing it over, not for the watch's note

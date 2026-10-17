@@ -5288,3 +5288,252 @@ def test_truth_86_the_api_doors_server_receives_no_key_in_any_body_and_the_game_
     for p in kept:
         assert key.encode() not in p.read_bytes(), p
     assert key not in got["out"].getvalue()
+
+
+# ---------------------------------------------------------------------------
+# Milestone 7b, part i: the director (package 50; spec M7b §2 to §7): truths 7b-90 to
+# 7b-94 on the frigate at seed 7 off the Lizard under the climatology's weather, a day with
+# the fake director on the quiet-passage brief and the fake captain beside it. (M6 used the
+# numbers 90 and 91 for the regatta and the parity; the director's are the spec's 90 to 94,
+# cited as 7b-90 to 7b-94.) No recorded passage's pin moves: none has a director, and a
+# world with no director bound is as it was (`test_director.py`).
+# ---------------------------------------------------------------------------
+
+DIRECTOR_EVERY = 1800  # the director and the captain sampled every glass, in lockstep
+
+# The fake director's day on the quiet passage: the channel's forms as examples (a sail
+# over the horizon, one inside it, a thing found aboard with and without its cause, a low
+# within the brief's force and one beyond it, a letter, a price, a mark, a mind changed),
+# and orders beyond the examples (news of a war, free words aboard, a word put in a mouth),
+# which the game answers honestly and logs as attempted when re-entered with a reason.
+DIRECTED_DAY_ORDERS = [
+    'ship: a merchant brig "Nancy" of Britain at 49 00 N 6 20 W, bound for Falmouth, '
+    "intent: bound for Falmouth",
+    'ship: a cutter "Lark" of Britain at 49 28 N 5 40 W, bound for Falmouth',
+    'weather: low "the gale" radius 450 km at 1805-06-12T22:00 -800 800 965',
+    'weather: low "a soft low" radius 500 km at 1805-06-12T16:00 -700 500 1006',
+    "aboard: a cask found stove",
+    "aboard: the fore topmast is found sprung",
+    "news: war declared between Britain and Denmark",
+    "aboard: the cook reports the beef cask found rotten",
+    'message: by a cutter from Falmouth from the collector: "The packet is in."',
+    "port falmouth: price of tin 125",
+    "mark: a wreck, her masts showing above the water at 49 10 N 6 00 W",
+    'ship "Nancy": intent run home to Falmouth',
+    'say as the carpenter: "She is making a little water, sir."',
+    'ship: a brig-sloop "Harpy" of France at 48 50 N 6 10 W, running home to Brest, no colours',
+]
+
+
+def _directed_world() -> World:
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.5, "lon_deg": -5.5},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest"],
+        nation="britain",
+        systems=[],
+        climatology=True,
+        glass=True,
+    )
+    return make_world(7, FRIGATE, sc)
+
+
+def _the_directed_day():
+    """A day at seed 7 with the fake director on the quiet-passage brief (its budget
+    raised to the day's fourteen orders, so that every order is tried) and the fake
+    captain seated, the player asking for the director's log at the day's end."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents import director as director_mod
+    from freesail.agents.agent import DIRECTOR, SESSION_DIRECTOR, captain, director
+    from freesail.agents.fake import captain_of_the_ship, director_above_the_game
+
+    world = _directed_world()
+    world.submit("set plain sail")
+    quiet = director_mod.resolve_brief("quiet-passage").to_dict()
+    quiet["budget"] = {"samples_a_day": 60, "acts_a_day": 14}
+    director_mod.set_brief(world, quiet, source="the test")
+    policy = SamplingPolicy.in_lockstep(DIRECTOR_EVERY, "notable", "urgent")
+    ch = Harness(
+        world,
+        captain(policy, world=world),
+        captain_of_the_ship(["heave the log"]),
+        save=lambda w, r: None,
+    )
+    ch.model_name, ch.door = "the fake captain", "mcp"
+    ch.start()
+    dh = Harness(
+        world,
+        director(policy, world=world),
+        director_above_the_game(DIRECTED_DAY_ORDERS),
+        session_kind=SESSION_DIRECTOR,
+        save=lambda w, r: None,
+    )
+    dh.model_name, dh.door = "the fake director", "runner"
+    dh.start()
+    world.run(24 * 3600)
+    assert DIRECTOR in world.agents
+    return world, ch, dh
+
+
+@pytest.fixture(scope="module")
+def directed_day():
+    return _the_directed_day()
+
+
+def test_truth_7b_90_the_quiet_passage_raises_no_gale_above_the_briefs_force(directed_day):
+    """Spec M7b §7, truth 90: "A director on the quiet-passage brief raises no gale above
+    the brief's force in a week at seed 7; an order beyond it is refused with the reason in
+    the director's log." The day: the gale's low is refused by the brief, the soft low is
+    appended; and the limit holds for a week of gale orders by the same rule."""
+    from freesail.agents import director as director_mod
+
+    world, _ch, _dh = directed_day
+    log = director_mod.log_of(world)
+    refused = [e for e in log.entries if e.kind == "director.refused"]
+    gales = [e for e in refused if "the gale" in e.text]
+    assert gales and all("no wind above 27 knots" in e.text for e in gales)
+    assert all("Refused by the brief" in e.text for e in refused)  # the limits alone refuse
+    assert world.systems.find("the gale") is None and world.systems.find("a soft low") is not None
+    brief = director_mod.brief_of(world)
+    for day in range(7):
+        gale = f'weather: low "gale {day}" radius 450 km at 1805-06-{13 + day}T04:00 -800 800 965'
+        order = WO_parse(gale)
+        why = brief.limit_of(world, order)
+        assert why and "no wind above 27 knots" in why, day
+    assert (
+        director_mod._peak_wind_kn(
+            world, 'weather: low "x" radius 500 km at 1805-06-12T16:00 -700 500 1006'
+        )
+        <= 27
+    )
+
+
+def WO_parse(text: str):
+    from freesail.world import orders as WO
+
+    return WO.parse(text)
+
+
+def test_truth_7b_91_a_world_order_of_the_directors_is_in_no_sample_and_its_effect_is(directed_day):
+    """Spec M7b §7, truth 91: "A world order given by the director appears in no station's
+    sample and no play log; its effect does, when met." The captain's samples over the day
+    carry no order and no word of the director; the Nancy is sighted, the cooper's report
+    and the price's effect are met."""
+    from freesail.core.events import for_the_record
+
+    world, ch, _dh = directed_day
+    samples = [t.content for t in ch.turns if t.role == "data"]
+    text = json.dumps(samples).lower()
+    assert "world order" not in text and "director" not in text
+    play = [e for e in world.log.all() if not for_the_record(e)]
+    assert not [e for e in play if e.kind == "world.order" or e.actor == "the director"]
+    assert any("cooper reports a water cask stove" in json.dumps(s) for s in samples)
+    assert any("lookout.sighting" in json.dumps(s) for s in samples)
+    given = [
+        o for o in world.world_orders if o["source"] == "the director" and o["result"] == "done"
+    ]
+    assert any('"Nancy"' in o["order"] for o in given)  # put on the sea (and home by night)
+    assert world.ports.ports["falmouth"].market.goods["tin"].price == 125.0
+
+
+def test_truth_7b_92_the_log_is_empty_to_every_station_until_asked_and_then_shows_every_act(
+    directed_day,
+):
+    """Spec M7b §7, truth 92: "The director's log is empty to every station and the player
+    until asked for, and then shows every act with its reason; a replay shows it inline."
+    The day's log: an order given, one doubted and entered again with its reason, the
+    gale refused, an order beyond the examples logged as attempted with its words, the
+    budget's lines, the director's thoughts; `the director's log` reveals it and the
+    director is told; the two-stories view has it inline."""
+    from freesail.agents import director as director_mod
+    from freesail.agents import tools as tools_mod
+    from freesail.agents.agent import CAPTAIN
+
+    world, ch, dh = directed_day
+    assert "director" not in json.dumps(tools_mod.read_log(world, CAPTAIN, since_tick=0)).lower()
+    assert "director" not in tools_mod.state(world, CAPTAIN).lower()
+    kinds = set(e.kind for e in director_mod.log_of(world).entries)
+    assert {
+        "director.brief",
+        "director.order",
+        "director.doubted",
+        "director.reentered",
+        "director.refused",
+        "director.unperformed",
+        "director.attempted",
+        "note",
+    } <= kinds
+    reentered = [e for e in director_mod.log_of(world).entries if e.kind == "director.reentered"]
+    assert all("the doubt:" in e.text and "the reason:" in e.text for e in reentered)
+    attempted = [e for e in director_mod.log_of(world).entries if e.kind == "director.attempted"]
+    assert any("news: war declared" in e.text for e in attempted)
+    assert any("say as the carpenter" in e.text for e in attempted)
+    assert any("beef cask found rotten" in e.text for e in attempted)
+    lines = director_mod.reveal(world, "the player")
+    assert lines[0].startswith("The director's log (") and len(lines) > 20
+    assert any("asked for by the player" in n for n in dh.agent.notices)
+    stories = director_mod.two_stories(world)
+    assert any(ln.startswith("D ") and "(reentered)" in ln for ln in stories)
+    assert not any("World order" in ln for ln in stories if not ln.startswith("D "))
+
+
+def test_truth_7b_93_a_director_on_three_acts_a_day_gives_no_fourth():
+    """Spec M7b §7, truth 93: "A director on a budget of three acts a day gives no fourth;
+    the sample says the budget is spent." Three prices given, the fourth refused with the
+    words, the day's hold said in the log, and the sample's notice."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents import director as director_mod
+    from freesail.agents.agent import SESSION_DIRECTOR, director
+    from freesail.agents.fake import director_above_the_game
+
+    world = _directed_world()
+    world.submit("set plain sail")
+    director_mod.set_brief(
+        world, {"name": "three", "budget": {"samples_a_day": 48, "acts_a_day": 3}}, source="t"
+    )
+    orders = [f"port falmouth: price of tin {p}" for p in (120, 125, 130, 135)]
+    dh = Harness(
+        world,
+        director(SamplingPolicy.in_lockstep(600, "notable", "urgent"), world=world),
+        director_above_the_game(orders),
+        session_kind=SESSION_DIRECTOR,
+        save=lambda w, r: None,
+    )
+    dh.model_name, dh.door = "the fake director", "runner"
+    dh.start()
+    world.run(4 * 600)
+    assert world.ports.ports["falmouth"].market.goods["tin"].price == 130.0
+    assert director_mod.budget_of(world).acts == 3
+    texts = [e.text for e in director_mod.log_of(world).entries]
+    assert any("budget of 3 acts is spent" in t for t in texts)
+    assert director_mod.budget_of(world).held_until is not None
+    # the sample says it: the result of the act that spent the budget, read in the turn
+    results = json.dumps([t.content for t in dh.turns if t.role == "data"])
+    assert "budget of 3 acts is spent; the director stands by until the next day" in results
+    assert "2 of 3 acts used" in results  # and the budget as it stands, at each sample
+
+
+def test_truth_7b_94_a_directed_voyage_saved_replays_to_the_same_log(directed_day, tmp_path):
+    """Spec M7b §7, truth 94: "A directed voyage saved and replayed gives the same log, the
+    director's acts among the inputs." The day's save, replayed by its transcript and by
+    its stations' acts (the director's world orders among them), to the same digest and
+    the same director's log entry for entry."""
+    from freesail.agents import director as director_mod
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+
+    world, _ch, _dh = directed_day
+    path = replay_mod.save_to_file(world, tmp_path / "directed-day.json", checkpoint=False)
+    data = replay_mod.load_file(path)
+    assert [a for a in data["station_acts"] if "world_order" in a]
+    for road in (replay_mod.BY_TRANSCRIPT, replay_mod.BY_ACTS):
+        copy = replay_mod.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == world.log.digest(), road
+        assert [e.to_dict() for e in director_mod.log_of(copy).entries] == [
+            e.to_dict() for e in director_mod.log_of(world).entries
+        ], road

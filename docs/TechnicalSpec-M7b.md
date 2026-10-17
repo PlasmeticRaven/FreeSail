@@ -70,6 +70,36 @@ it, the tide, the people aboard every ship and their states, the markets, the ne
 reading surface of its own (`readings.director`), listed in the parity test as by design
 (the director is not a station on a ship).
 
+**As built (package 50, 2026-10-17; `freesail/agents/director.py`; `tests/test_director.py`;
+`docs/primer/20-the-director.md`; `docs/agents/Harness.md` §19).** The kind `director` is a
+factory in `agent.STATION_FACTORIES` and a `WORLD_KINDS` entry: a kind that is the game's and
+not a ship's, which `world.stations.Stations.names()` lists only when it was bound
+(`bind("director", "", kind="director")`), so that a world with no director is as it was
+(every pinned passage stands). It is bound when a brief is given: by a scenario's `director:
+{brief: ...}` at the World's making, by `director: brief ...` at the prompt (an input,
+`director_brief`, replayed), or when the player sits at it (`--seat director`, the binding
+an input before the seat's line). Its `Authority.DIRECTOR` and `DIRECTOR_DOMAIN` refuse every
+order of any ship in words, the deck's conversation included (it has no place aboard:
+`STATION_PLACES[DIRECTOR]` is none, so nothing said on deck reaches it and it says nothing
+there); the readings and the queries pass. Its tools are the station's own (`tools.
+DIRECTOR_TOOLS`, `Tool.director_only`, offered at the director's station alone and refused in
+words at every other): `world_order(text)`, the channel's door with the brief's limits and
+the doubt (`director.direct`), and `truth()`, the reading surface; beside the library, the
+journal (which is the director's log), `read_journal`, `stand_by`, `stand_down`, `opt_out`,
+`shelve`, `readings`, `read_log`, `state` and `submit_order` for the readings; never
+`hand_over` or `handover_note`. The session kind is its own (`SESSION_DIRECTOR`: above the
+game, the player at the prompt of his ship below it). **The truth** is `readings.
+director_readings(world)`, a surface and not a registry row (a row is read at the prompt
+and at every station alike, and truth 81 gives the captain no road to the truth): every
+ship's true position, heading, speed, sail and state with her captain's intent and her
+brain's state, her bearing and distance from the player's ship; the weather as it is at the
+ship and as the systems will make it a watch on (the systems moved along their tracks or
+by their velocities, read, and put back), with the systems by name; the tide; the people
+aboard every crewed ship; the markets' prices; the wars and the ports' news. A book, put
+back with `shelve`. The lead's `readings.director` is this function; the parity test lists
+the two tools as by design (`TOOL_COUNTERPARTS`) and the console's three requests
+(`the director's log`, `two stories`, `director:`) as the player's own.
+
 ### 3. The world orders (`freesail/world/orders.py`)
 
 The channel as M5 and M6 built it, with the orders the director needs added and the
@@ -103,6 +133,47 @@ by which the sets of reasonable acts are refined. Only the brief's hard limits (
 player's own) refuse outright. The doubt and the refusal both go to the director's log, not
 the play log.
 
+**As built (package 50).** `aboard:` is a channel of its own (`CHANNELS`, the vocabulary's
+list), its things the table's (`data/director/aboard.yaml`, `orders.aboard_table`): `the
+<spar> is found sprung` (the spar's condition cut to the table's thirty, so that it carries
+away the sooner under a press of sail; the carpenter's report), `a cask found stove` (a ton
+of water from the stores; the cooper's), `a seam found working` (the carpenter's report;
+nothing of the hull is modelled yet, said so in the table), `the water found foul` (the
+stores' water marked foul, `Stores.foul`, said on the purser's page and left for package
+54's needs); each a notable `aboard.found` line of the play log that never names the order.
+`news:` and `letter:` are not channels: the news is a port's and the nations' (read in the
+truth), a letter is `message:` as it stands; the brief's "as they stand" is kept so. **The
+doubt** is `orders.doubt(world, order)`, by channel (the primer's chapter 20 has the table):
+a new sail inside the lookout's horizon in clear daylight (the height of a brig's trucks,
+cut to the visibility) or on the land by the chart; a mark inside the horizon; a low deeper
+than the season's floor for the month and the box (`MonthTable.central_hpa`), a deep low
+(twelve hectopascals under the background) within three hundred kilometres out of a glass
+that has not been falling, a waypoint faster than the season's fastest low with a half over
+or deepening below the floor; a cutter with a letter from a port beyond sixty miles; a price
+moved by more than three parts in ten; a thing found aboard with no cause (`plausible_when`:
+a strain line of the spar's or above the figure in the last watch, or a fresh mean wind; a
+sea beyond smooth; five days out). A mind changed, a person named, a letter left at a port, a
+port's stance and the seat are never doubted. `parse` peels the `[reason: ...]` tail into
+`WorldOrder.reason` (`split_reason`); the channel is never doubted for the scenario or the
+owner's `world:` order, which are their own word: the doubt is the director's door's
+(`director.direct`). **The owner's refinement (2026-10-17)**: the forms, and every domain's
+contents (the table's things, the weather's changes, the kinds of ship and intent), are given
+to the director as examples of reasonable orders and never as the list of what is allowed,
+and the brief says that within each domain and in domains the examples do not name the
+director should attempt whatever it thinks reasonable. So an order in no form the game has,
+or free words a table does not know (`aboard: the cook reports the beef cask found rotten`,
+`news: war declared ...`, `say as the carpenter: ...`), is not refused as "not allowed" but
+answered honestly (`director.NO_WAY_WORDS`: the game has no way to do this as said; say it
+another way, or enter it again with a `[reason: ...]` and it will be logged as attempted),
+written in the log as `director.unperformed`; entered again with its reason it is written
+as `director.attempted` with the words and the reason, performed not at all, counted against
+no budget: the data for what to build next. The brief's limits alone refuse
+(`director.refused`). A world order given while a station acts is the station's act
+(`core.acts`, kind `world_order`, applied aside so that its effects' lines are the order's
+own), never an input, and a replay by the acts gives it again through the channel; the
+player's order at his seat is an input of its own (`director_order`), replayed through the
+director's door so that the doubt and the log are what they were.
+
 ### 4. The brief and its guardrails (`data/director/briefs/*.yaml`; `freesail/agents/director.py`)
 
 The player writes the brief: the tone of the voyage (a quiet passage, a hard-luck cruise, a
@@ -115,6 +186,29 @@ is refused as outside the brief, and the refusal logged. Starter briefs under
 `data/director/briefs/` (a quiet passage, an interesting passage, a hard cruise, a chase),
 one of them the gate's.
 
+**As built (package 50; `director.DirectorBrief`).** A brief is `name`, `tone`, `challenge`,
+`limits`, `cadence` (`glass` or `watch`) and `budget` (`samples_a_day`, `acts_a_day`), from
+a starter's name (`quiet-passage`, with or without its article), a file, the mapping itself,
+or the player's words at the prompt (`director: brief <words>`: the tone, no limits beyond
+the channel's doubt, the defaults for the rest; `director: brief` alone reads it). The
+scenario's `director: {brief: ...}` is read at the load (refused in words when it cannot
+be) and kept in the scenario as the mapping, so that the save carries it whole and the
+replay has it from tick 0; the prompt's is an input. The limits the channel enforces
+(`DirectorBrief.limit_of`): `wind_max_kn` (or `gale_max_force`, turned to knots by the
+Admiralty scale's tops), judged by the surface wind a `weather:` order's system would make
+at its tightest (the Gaussian bell's steepest gradient at one radius, the gradient-wind
+rule and `SURFACE_SCALE`, as the systems' own wind is made: a low of 965 hPa and 450 km
+blows 42 knots, one of 1000 hPa 16); `enemy_heaviest` (a `ship:` whose nation is at war with
+the ship's own and whose description ranks above the limit by `captains.SIZE_RANK`);
+`nobody_dies` (a thing found aboard whose `harm` is deadly: none in the table yet);
+`the_war_as_it_is` (a port closed to or opened to the ship's own nation);
+`the_chart_as_it_is` (declared, refusing nothing yet: a mark is not the chart). The brief's
+body is the last part of the station brief, after the fixed part (`DIRECTOR_BRIEF`), and the
+station is refreshed with it when the brief changes or a save is loaded. The four starters:
+the quiet passage (force 6, a cutter, four acts a day; the gate's), the interesting passage
+(force 7, a brig, six), the hard cruise (force 9, a frigate, eight) and the chase (force 7, a
+brig, six).
+
 ### 5. Sampling, the budget and the clock (`harness.py`; `core/world.py`)
 
 The director samples on notable events and on the slow clock (every glass by default,
@@ -124,6 +218,19 @@ it in samples per day of the ship's time and in acts per day (so that it cannot 
 day a hurricane); spent, it stands by until the next day; said in its log. The owner's
 compression is untouched: a director that stands by for a watch lets the player run at
 300x.
+
+**As built (package 50; `director.DayBudget`, `World.director_state`).** The cadence is the
+brief's: `cadence_policy("glass", "director", world=)` reads every watch where the brief
+says so, every glass else, and the notable and urgent lines at either; a door's `--cadence`
+stands over it. The budget is counted by the ship's calendar day on the World (so that a
+model's harness and the player's seat share one count), the samples at each sample (a
+fold into an open turn is none), the acts at each world order performed (a doubt, a
+refusal, an attempt and an unperformed order cost none). Either count spent, the director is
+held until the tick the ship's day turns (`held_until`), said in its log and in the result
+of the act that spent it: no sample opens meanwhile, whatever the policy, a stand-by or an
+urgent line would do; the day turned, the next sample says the budget is renewed. Every
+sample carries the budget as it stands in a notice. The save holds the brief and the day's
+counts (`"director"`); a replay by the acts re-counts the acts and takes the save's samples.
 
 ### 6. The director's log, hidden and revealed (`freesail/agents/journal.py`; `core/replay.py`; `ui/`)
 
@@ -141,6 +248,27 @@ station and the player (a director you can see coming is not a director), and:
 The browser gains a pane for the director's log, shut during play and opened by the same
 request; the console the reading.
 
+**As built (package 50).** The director's log is the station's own journal (`journal_of(world,
+"director")`, bound to no person; `director.KINDS`): `director.brief`, `.order`, `.doubted`,
+`.reentered` (the act, the doubt and the reason in one entry), `.refused`, `.unperformed`,
+`.attempted`, `.budget`, `.revealed`, and `note` for a thought (the `journal` tool, the free
+text of a reply and an `answer`, none of which is a line of the play log). It is kept in
+the save as a station's journal is (`agent_journals["director"]`) and replayed as a
+station's notes are, by either road. **Hidden**: every line of the director's in the log
+(its seating, its stand-bys, its leaving, its binding) carries the actor `the director`,
+which `events.for_the_record` makes record-only beside the `world.order` kind, so that no
+station's sample or `read_log`, no browser play log or `/api/log`, and now the console's
+own view carry it; the director is left out of the `state` tool and the `stations` reading
+as the other stations read them; `ask`, `tell` and `show the journal of` the director are
+refused in words. **Revealed**: `the director's log` at the console or in the browser's
+order box (`director.reveal`): a driver's line `director.revealed` for the record (an
+input, replayed), the log's entry, the director's notice in its next sample, and the lines;
+the browser's pane (`#director-panel`, in the ship view's place beside the play log) opens
+on the answer and is shut until then; `GET /api/director/log` is the same reveal. **Inline
+in the replay**: `two stories [N]` (`director.two_stories`) prints the play log with the
+director's log inline by tick, each of its entries marked `D`. A director that stands down
+leaves its note in its log, and its line says only that it left a note there.
+
 ### 7. Truths for 7b-i (behavioural)
 
 - 90. A director on the quiet-passage brief raises no gale above the brief's force in a
@@ -153,6 +281,20 @@ request; the console the reading.
   budget is spent.
 - 94. A directed voyage saved and replayed gives the same log, the director's acts among
   the inputs.
+
+**As built (package 50; `tests/test_known_truths.py`, truths 7b-90 to 7b-94; M6 had used the
+numbers 90 and 91 for the regatta and the parity, so the director's are cited as 7b-90 to
+7b-94).** The frigate at seed 7 off the Lizard under the climatology's weather, a day with
+the fake director (`fake.director_above_the_game`) on the quiet-passage brief and the fake
+captain beside it. 7b-90: the gale's low refused by the brief with the reason, the soft low
+appended, and the limit holding for a week of gale orders by the same rule. 7b-91: the
+captain's nineteen samples carry no order and no word of the director; the cooper's report
+and the sail sighted are in them. 7b-92: the log empty to every station until asked, then
+every act with its reason, the two-stories view inline. 7b-93: three prices given on a
+budget of three acts, the fourth refused with the words, the hold said. 7b-94: the day's
+save replayed by the transcript and by the acts to the same digest and the same director's
+log entry for entry. No recorded passage's pin moved: none has a director, and a world with
+no director bound is as it was (`tests/test_director.py`).
 
 ## Part 7b-ii: The director's voice
 
