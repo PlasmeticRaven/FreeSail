@@ -117,8 +117,12 @@ TRIAL_STATION_GALE_FIRST_STATES = [
 ]
 # package 45c: the first states as they were; sail made again by steps after the gale
 # (topsails 18:27, masts, reefs and jib 20:30, plain sail 21:19), keeping station at 63720
-TRIAL_STATION_GALE_LINES = 1429  # package 45c (1399 at package 45, 1423 at package 37p)
-TRIAL_STATION_GALE_DIGEST = "692b5e910adb1d55"  # 44, a line's words (94d2943d029d197d at 45c)
+# package 43b: the first states as they were; the beating book after the gale loaded at
+# 52140, ten minutes later than at 51540 (the beating verdict's dwell), and the evening's
+# tacks fall otherwise: she misses stays twice in plain sail after 18:00 and lies aback by
+# turns for half an hour (36 lines of sails backed and filled, 4 before) before she wears
+TRIAL_STATION_GALE_LINES = 1640  # package 43b (1429 at 45c, 1399 at package 45)
+TRIAL_STATION_GALE_DIGEST = "c0aa397523ea2972"  # 43b (692b5e910adb1d55 at 44)
 
 
 @pytest.fixture(scope="module")
@@ -164,11 +168,12 @@ TRIAL_STATION_LEE_SHORE_STATES = [
     (12060, "keeping station"),
     (15060, "hove to for weather"),
     (27240, "on passage"),  # 23040 at package 45, then by turns to 30900
-    (27300, "beating"),
+    # package 43b: beating and keeping station in the one minute at 27300 before, the
+    # beating rule's two verdicts by turns; the verdict's dwell leaves the station alone
     (27300, "keeping station"),
 ]
-TRIAL_STATION_LEE_SHORE_LINES = 1665  # package 45c (2129 at package 45, 1668 at 37p)
-TRIAL_STATION_LEE_SHORE_DIGEST = "53c27cbdc3c37f2c"  # 44, a line's words (fe10b699baf92229 at 45c)
+TRIAL_STATION_LEE_SHORE_LINES = 1660  # package 43b (1665 at 45c, 2129 at 45, 1668 at 37p)
+TRIAL_STATION_LEE_SHORE_DIGEST = "0686965a0871299c"  # 43b (53c27cbdc3c37f2c at 44)
 
 
 @pytest.fixture(scope="module")
@@ -225,7 +230,9 @@ TRIAL_TRADE_STRANGER_STATES = [
 TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [56498]  # [55413] at 43 ([35630] at 45c, [35292] at 45)
 TRIAL_TRADE_STRANGER_LINES = 1624  # package 43b (1556 at 43, 1176 at 45c, 1170 at 45)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
-TRIAL_TRADE_STRANGER_DIGEST = "acd7581476d8ee74"  # package 43b (f7ad5b1e06dd737e at 43)
+# package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
+# words 44's (acd7581476d8ee74 on 43b's branch)
+TRIAL_TRADE_STRANGER_DIGEST = "6b8c9c7406821465"  # package 43b (f7ad5b1e06dd737e at 43)
 
 
 @pytest.fixture(scope="module")
