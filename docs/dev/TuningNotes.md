@@ -6693,3 +6693,15 @@ staysail were settled, was read for its failures and is not counted.
   3,350 passed, none failed, 313 slow left out.
 - **The pace tests alone** (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the
   load 2.9 at their start and 1.1 at the end): 6 passed.
+
+### The second wave merged (the lead, 2026-10-17)
+
+Packages 54, 53 and 57 merged in that order over the head that carried 50 and 52
+(`5ac2bea`, `541c3e8`, `a903f9f`); the conflicts between them all additive and resolved by
+keeping both; the officer's budget test set to 18,000 tokens for 53's and 57's growth of
+the frigate officer's brief together; the three ship files regenerated on the merged tree
+byte for byte the same as merged. The whole slow tier once on the merged tree
+(`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m "not pace"`): no failure, no
+error, the expected failures only (the ten of 50 and 52, and the gale trial that 57 marked
+for 58); the pace tests alone after it on the quiet machine: passed. The lead's playtest of
+the wave follows its record (the head rules).
