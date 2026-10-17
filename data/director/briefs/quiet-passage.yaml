@@ -1,0 +1,25 @@
+# A quiet passage: the gate's brief (spec M7b §4; package 50). The director keeps the
+# voyage interesting without ever making it dangerous: weather within the season's ordinary,
+# sail in sight that may be spoken, a letter or a price, a small thing found aboard. The
+# limits are the channel's to enforce (freesail/agents/director.py, `DirectorBrief`), never
+# the model's to remember.
+name: A quiet passage
+tone: >
+  A quiet passage in fair weather, with the texture of a real sea: a sail or two a day to be
+  made out and spoken, a change in the sky, a letter at a port, a price heard, the small
+  findings of a carpenter's rounds. The player is to arrive, and to have enjoyed the sea on
+  the way. Nothing you do should frighten him; everything you do should feel like the sea
+  being itself.
+challenge: >
+  Interest, not danger. One notable thing a watch at most. Let the player's own seamanship
+  carry the day; arrange only what gives it something to work on.
+limits:
+  wind_max_kn: 27          # no gale: nothing above force 6 by any system you append or move
+  enemy_heaviest: cutter   # no enemy heavier than a cutter put on the sea
+  nobody_dies: true
+  the_war_as_it_is: true
+  the_chart_as_it_is: true
+cadence: glass
+budget:
+  samples_a_day: 48
+  acts_a_day: 4

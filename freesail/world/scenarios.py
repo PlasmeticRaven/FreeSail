@@ -564,6 +564,17 @@ def load_scenario(path: str | Path) -> ScenarioFile:
             raise ScenarioError(
                 f"{where}, director: seats and seats_in_voyage are numbers."
             ) from None
+        if grant.get("brief") is not None:
+            # package 50 (spec M7b §4): the player's brief for the director, a starter's
+            # name, a file's path or the mapping itself, read now so that a bad one is
+            # refused at the load and kept as read so that the save carries it whole
+            from freesail.agents.director import resolve_brief
+
+            try:
+                brief = resolve_brief(grant["brief"], source=f"the scenario ({where})")
+            except (ValueError, OSError) as e:
+                raise ScenarioError(f"{where}, director.brief: {e}") from None
+            sc.director["brief"] = brief.to_dict()
     return ScenarioFile(
         path=str(path),
         scenario=sc,

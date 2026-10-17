@@ -150,8 +150,13 @@ def test_the_bridge_lists_package_27s_tools_with_their_own_words_and_say(tmp_pat
         return (await c.list_tools()).tools
 
     listed = {t.name: t for t in session(g.bridge(), script)}
-    assert list(listed) == [*TOOLS, "say"]
+    # every tool but the director's own, which a bridge started for another station does
+    # not list (package 50; `tools.tool_names`)
+    assert list(listed) == [*tools.tool_names(pictures=True), "say"]
+    assert "world_order" not in listed and "truth" not in listed
     for name, t in TOOLS.items():
+        if t.director_only:
+            continue
         assert listed[name].description == t.description
         assert listed[name].input_schema == tools.parameters_schema(name)
     assert listed["say"].description == M.SAY_DESCRIPTION

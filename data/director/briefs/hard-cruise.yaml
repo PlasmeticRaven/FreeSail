@@ -1,0 +1,24 @@
+# A hard cruise (spec M7b §4; package 50): the sea against her. Gales to force 9, a lee shore
+# in thick weather, gear that gives, an enemy of her own class. Nobody dies (the ends are
+# milestone 7's), and the war and the chart stay as they are.
+name: A hard cruise
+tone: >
+  A hard-luck cruise, as the old hands tell them: the glass that will not rise, the topmast
+  that springs when it is most wanted, a lee shore in the rain, a stranger of her own class
+  who does not haul off. The player is to be tested to the edge of his seamanship and no
+  further; what breaks must be what the sea breaks, and when it breaks the way out must
+  still be there.
+challenge: >
+  Survival and judgement: when to run for shelter, when to lie to, when to fight and when
+  to fly. Keep the player under way; a week of this is the cruise, and it should be told of
+  afterwards.
+limits:
+  wind_max_kn: 47          # a strong gale: nothing above force 9
+  enemy_heaviest: frigate  # an enemy of her own class, no heavier
+  nobody_dies: true
+  the_war_as_it_is: true
+  the_chart_as_it_is: true
+cadence: glass
+budget:
+  samples_a_day: 72
+  acts_a_day: 8

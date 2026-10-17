@@ -53,6 +53,7 @@ from freesail.agents import (
     narrator,
     reply,
     restore,
+    tool_names,
     tools,
     watcher,
 )
@@ -290,10 +291,14 @@ def test_the_tools_are_the_nine_of_the_spec_and_shelve_with_a_description_each()
         "shelve",
         "chart",  # the pictures (package 42), offered at the doors that carry one
         "ship_view",
+        "world_order",  # the director's (package 50), offered at its station alone
+        "truth",
     )
     for t in TOOLS.values():
         assert t.description.endswith(".") and len(t.description) > 40
-    with_authority = {"submit_order", "hand_over", "handover_note"}
+    with_authority = {"submit_order", "hand_over", "handover_note", "world_order", "truth"}
+    assert {n for n, t in TOOLS.items() if t.director_only} == {"world_order", "truth"}
+    assert "world_order" not in tool_names() and "truth" in tool_names(director=True)
     assert all(TOOLS[n].needs_authority for n in with_authority)
     assert not any(t.needs_authority for n, t in TOOLS.items() if n not in with_authority)
     # the deck is wanted for an order and for handing it over, not for the watch's note
@@ -567,7 +572,7 @@ def test_an_ask_to_nobody_or_with_no_question_is_refused_in_words():
     e = world.submit("ask the watcher")
     assert e.kind == "order.rejected" and "Ask the watcher what?" in e.text
     e = world.submit("ask the director for a gale")
-    assert e.kind == "order.rejected" and "no director at the station" in e.text
+    assert e.kind == "order.rejected" and "The director is above the game" in e.text
     assert world.journal == []
 
 

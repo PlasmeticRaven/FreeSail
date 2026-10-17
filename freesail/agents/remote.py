@@ -615,12 +615,17 @@ class Desk:
         else:
             _name, make = station_factory(world, seat.station)
             kind = next((k for k, f in STATION_FACTORIES.items() if f is make), seat.station)
-            policy = cadence_policy(seat.cadence, kind, self.lockstep) if seat.cadence else None
+            policy = (
+                cadence_policy(seat.cadence, kind, self.lockstep, world=world)
+                if seat.cadence
+                else None
+            )
             if policy is None:
-                # the station's own default cadence, in lockstep when the game is
+                # the station's own default cadence, in lockstep when the game is (the
+                # director's the brief's, package 50)
                 every, events = A_GLASS_S, frozenset({"notable", "urgent"})
                 policy = SamplingPolicy(every, events, lockstep=self.lockstep)
-                policy = cadence_policy("glass", kind, self.lockstep) or policy
+                policy = cadence_policy("glass", kind, self.lockstep, world=world) or policy
             h = Harness(
                 world,
                 make_station(world, seat.station, policy),

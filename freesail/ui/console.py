@@ -38,6 +38,15 @@ Driver commands (not ship orders, not journaled):
                     orders to the watcher's station, when one is stationed
                     (--watcher fake stations a scripted one; spec M4 §12)
     log [N]         print the last N log entries (default 20)
+    the director's log
+                    the director's log, hidden until asked for (spec M7b §6; package 50):
+                    every act with its reason; the director is told you asked
+    two stories [N] the last N lines of the play log with the director's log inline,
+                    each of its entries marked D (the replay view)
+    director: brief WORDS or FILE
+                    the player's brief for the director (a starter's name: quiet-passage,
+                    interesting-passage, hard-cruise, chase; a file; or your words); with
+                    nothing after it, the brief as it stands
     save PATH       write a save file
     replay PATH     rebuild a world from a save and continue from it; a save of another
                     build that holds a station's transcript is refused in words unless
@@ -61,7 +70,7 @@ from freesail import units
 from freesail.agents.seat import seat_player
 from freesail.api import queries
 from freesail.core import replay as replay_mod
-from freesail.core.events import Event, RollupView, Severity, Shown
+from freesail.core.events import Event, RollupView, Severity, Shown, for_the_record
 from freesail.core.world import UNLOGGED_KINDS, Scenario, World
 from freesail.ship.stub import OrderError
 
@@ -203,6 +212,52 @@ def live_world_order(line: str) -> str | None:
         return None
     rest = text[len(LIVE_WORLD_ORDER_PREFIX) :].strip()
     return rest or None
+
+
+# The director's log asked for by name (spec M7b §6; package 50), at the console and in the
+# browser's order box alike; and the brief given at the prompt (§4).
+DIRECTORS_LOG_WORDS = ("the director's log", "the directors log", "director's log", "directors log")
+DIRECTOR_BRIEF_PREFIX = "director:"
+
+
+def directors_log_asked(line: str) -> bool:
+    return " ".join(str(line).lower().split()).rstrip(".?!") in DIRECTORS_LOG_WORDS
+
+
+def director_brief_words(line: str) -> str | None:
+    """The words after `director: brief` (or `director:` alone), or None for any other
+    line; "" for the brief asked for as it stands."""
+    text = " ".join(str(line).split())
+    if not text.lower().startswith(DIRECTOR_BRIEF_PREFIX):
+        return None
+    rest = text[len(DIRECTOR_BRIEF_PREFIX) :].strip()
+    if rest.lower().startswith("brief"):
+        rest = rest[len("brief") :].strip(" :,")
+    return rest
+
+
+def give_director_brief(world: World, words: str, source: str) -> list[str]:
+    """`director: brief <words>`: the brief set (an input), its words for the one who gave
+    it; `director: brief` alone, the brief as it stands."""
+    from freesail.agents import director as director_mod
+
+    if not words:
+        brief = director_mod.brief_of(world)
+        if brief is None:
+            return [
+                "No brief is given yet. Say 'director: brief <words>', or a starter's name: "
+                + ", ".join(director_mod.starter_briefs())
+                + "."
+            ]
+        return brief.body().splitlines()
+    try:
+        brief = director_mod.set_brief(world, words, source=source)
+    except (ValueError, OSError) as e:
+        return [f"The brief was not taken: {e}"]
+    return [
+        f"The director's brief is given ({brief.source}): {brief.name}.",
+        *brief.body().splitlines(),
+    ]
 
 
 def check_agents_unattended(world: World) -> None:
@@ -384,6 +439,11 @@ class Console:
             and self._alarm is None
         ):
             self._alarm = e  # eased once the tick is over (`_run`)
+        if for_the_record(e):
+            # decision 46 and the director's lines (spec M7b §6; package 50): the play log
+            # at the console carries a world order's effects, never the order, nor the
+            # director's coming and going; 'the director's log' reads them
+            return
         for x in self._view.feed(e, self.compression):
             self._show(x)
 
@@ -492,7 +552,24 @@ class Console:
         elif cmd == "log":
             n = int(args[0]) if args else 20
             for e in self.world.log.tail(n):
-                self._print(e.line())
+                if not for_the_record(e):
+                    self._print(e.line())
+        elif directors_log_asked(line):
+            # the director's log revealed on request (spec M7b §6; package 50): a driver's
+            # line for the record, which the director is told of, and the lines
+            from freesail.agents import director as director_mod
+
+            for s in director_mod.reveal(self.world, "the player"):
+                self._print(s)
+        elif cmd == "two" and args[:1] == ["stories"]:
+            from freesail.agents import director as director_mod
+
+            n = int(args[1]) if len(args) > 1 else None
+            for s in director_mod.two_stories(self.world, n):
+                self._print(s)
+        elif director_brief_words(line) is not None:
+            for s in give_director_brief(self.world, director_brief_words(line), "the player"):
+                self._print(s)
         elif cmd == "save":
             if not args:
                 self._print("Say 'save somewhere.json'.")
@@ -793,7 +870,9 @@ DEFAULT_SEED = 1805
 REPLAY_ANYWAY_FLAG = "--replay-anyway"
 SEAT_HELP = (
     "seat the player at a station below the captain's ('officer'): his orders are judged "
-    "by that station's authority and the captain's word (package 40; spec M6 §3)"
+    "by that station's authority and the captain's word (package 40; spec M6 §3); or at the "
+    "director's ('director'), above the game, where a bare world order is the director's "
+    "through the channel's doubt and the brief's limits (package 50; spec M7b §2)"
 )
 
 # `--until TICK` with `--load` (package 45c): the save replayed to that tick and handed

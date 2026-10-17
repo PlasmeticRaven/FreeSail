@@ -148,7 +148,10 @@ from freesail.ui.console import (
     book_words,
     check_agents_unattended,
     clamp_compression,
+    director_brief_words,
+    directors_log_asked,
     eased_words,
+    give_director_brief,
     live_world_order,
     loaded_words,
     read_standing_orders,
@@ -496,6 +499,21 @@ class Driver:
             lines, kind = list(queries.sail_room_lines(world)), "query.sail_room"
         elif said in queries.BOOMS_QUERIES:
             lines, kind = list(queries.booms_lines(world)), "query.booms"
+        elif directors_log_asked(said):
+            # the director's log revealed (spec M7b §6; package 50): the lines to the page
+            # that asked, which opens its pane, shut during play
+            from freesail.agents import director as director_mod
+
+            lines, kind = list(director_mod.reveal(world, "the player")), "query.director_log"
+        elif said.startswith("two stories"):
+            from freesail.agents import director as director_mod
+
+            words = said.removeprefix("two stories").strip()
+            n = int(words) if words.isdigit() else None
+            lines, kind = list(director_mod.two_stories(world, n)), "query.two_stories"
+        elif director_brief_words(text) is not None:
+            lines = give_director_brief(world, director_brief_words(text) or "", "the player")
+            kind = "query.director_brief"
         else:
             return None
         return Event(
@@ -1196,6 +1214,17 @@ def create_app(
             events = [e for e in events if not for_the_record(e)]  # decision 46
             events = events[-max(1, min(limit, 5000)) :]
             return JSONResponse([event_dict(e) for e in events])
+
+    @app.get("/api/director/log")
+    def api_director_log() -> JSONResponse:
+        """The director's log revealed (spec M7b §6; package 50): asking is the player's
+        act, for the record, and the director is told of it."""
+        from freesail.agents import director as director_mod
+
+        with driver.lock:
+            lines = director_mod.reveal(driver.world, "the player")
+            entries = [e.to_dict() for e in director_mod.log_of(driver.world).entries]
+        return JSONResponse({"lines": lines, "entries": entries})
 
     @app.get("/api/save")
     def api_save() -> JSONResponse:

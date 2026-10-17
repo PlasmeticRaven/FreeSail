@@ -56,6 +56,9 @@ __all__ = [
     "CAPTAIN_DOMAIN",
     "CAPTAIN_PATIENCE_S",
     "CADENCES",
+    "DIRECTOR",
+    "DIRECTOR_DOMAIN",
+    "DIRECTOR_PATIENCE_S",
     "DOMAINS",
     "LOOKOUT",
     "LOOKOUT_BRIEF",
@@ -98,6 +101,7 @@ __all__ = [
     "OFFICER_DOMAIN",
     "OFFICER_PATIENCE_S",
     "OPT_OUT_TOKEN",
+    "SESSION_DIRECTOR",
     "SESSION_PLAY",
     "SESSION_RACE",
     "SESSION_SOLO",
@@ -154,6 +158,12 @@ SESSION_RACE = (
     "a race: a fixed course sailed and timed, its score set beside other agents' runs of "
     "it, with no human captain over you"
 )
+# The director's (spec M7b §2; package 50): above the game, the player at the prompt of
+# his ship below it, nobody over it but the owner at the door.
+SESSION_DIRECTOR = (
+    "a play session at the director's station, above the game: the player sails his ship "
+    "below you, and nobody is over you but the owner at the door"
+)
 
 # The stations the order grammar knows by name (`ask the watcher ...`), whether or not one
 # is manned; the later ones are milestones 6 and 7b's.
@@ -181,6 +191,13 @@ LOOKOUT = "lookout"
 # held by a person of the muster or one who comes aboard, so that a person brought
 # aboard by the director later has a station to stand in before he is bound to another.
 PASSENGER = "passenger"
+# The director's station (spec M7b §2; package 50): above the game, bound on the World to
+# no person of any ship, the world orders its hand (`freesail.agents.director`).
+DIRECTOR = "director"
+# The kinds of station that are the game's and not a ship's (`world.stations.Stations.
+# names`): aboard only when bound by hand or by a scenario's `director:` block, never by
+# default, so that a world with no director seated is as it was.
+WORLD_KINDS: tuple[str, ...] = (DIRECTOR,)
 
 # A station's shorter names at the prompt and at the doors (`ask the officer ...`,
 # `--station officer`), each to the station's name.
@@ -780,6 +797,51 @@ PASSENGER_DOMAIN = Domain(
     deck=False,
 )
 
+# The director's domain (spec M7b §2; package 50): no order of any ship, not even the
+# deck's conversation (the director has no place aboard; its words are its log's); the
+# readings and the queries, so that the player's ship's instruments are read beside the
+# truth. A domain so that every order of the ship's is refused in words.
+DIRECTOR_DOMAIN_WORDS = (
+    "The director gives no order of any ship: every order of the ship's, the deck's "
+    "conversation included, is refused in words, and you are not asked to give one. The "
+    "world orders are your hand (the world_order tool), and the truth tool your eyes; the "
+    "readings of the player's ship are hers as she knows them, beside the truth. There is "
+    "no deck at this station and nothing gives or takes one."
+)
+_DIRECTOR = "the director gives no order of any ship: the world orders are its hand"
+
+DIRECTOR_DOMAIN = Domain(
+    levels=frozenset(),
+    objects=frozenset({"query", "reading"}),
+    verbs=frozenset(),
+    refused=tuple(
+        (key, _DIRECTOR)
+        for key in (
+            "object:heading",
+            "object:points",
+            "object:navigation",
+            "object:sail",
+            "object:yards",
+            "object:line",
+            "object:wreck",
+            "object:work",
+            "object:none",
+            "object:anchor",
+            "object:person",
+            "object:port",
+            "object:station",
+            "object:standing",
+            "belay all standing orders",
+        )
+    ),
+    words=DIRECTOR_DOMAIN_WORDS,
+    course=_COURSE_ORDERS,
+    general=frozenset(),
+    kept_back=(),
+    danger=frozenset(),
+    deck=False,
+)
+
 # The domains by the name a save keeps them under (`Station.save`, `Station.load`).
 DOMAINS: dict[str, Domain] = {
     "officer": OFFICER_DOMAIN,
@@ -787,6 +849,7 @@ DOMAINS: dict[str, Domain] = {
     "master": MASTER_DOMAIN,
     "lookout": LOOKOUT_DOMAIN,
     "passenger": PASSENGER_DOMAIN,
+    "director": DIRECTOR_DOMAIN,
 }
 
 
@@ -819,6 +882,8 @@ def domain_of(station: Any) -> Domain | None:
         return LOOKOUT_DOMAIN
     if name == PASSENGER:
         return PASSENGER_DOMAIN
+    if name == DIRECTOR:
+        return DIRECTOR_DOMAIN
     return domain
 
 
@@ -860,6 +925,15 @@ class Authority(Enum):
                 "each. The owner is always at the door: his words reach you as the owner's, "
                 "and 'stand down the captain' is his."
             )
+        if self is Authority.DIRECTOR:
+            # the director (spec M7b §2; package 50): the world orders, never the ship's
+            return (
+                f"{domain.words if domain is not None else ''} Your authority is the owner's "
+                "on the world-order channel and nothing on any ship's: a world order is "
+                "checked against the player's brief (refused outside it) and the channel's "
+                "doubt (doubted, entered again with a reason) before the world hears it, and "
+                "each is written in the director's log, never the play log."
+            ).strip()
         if domain is not None and not domain.deck:
             # a station with a domain and no deck (package 41): the master's, the lookout's
             return (
@@ -1002,7 +1076,7 @@ def _kinds_words(kinds: frozenset[str]) -> str:
 
 
 def cadence_policy(
-    cadence: str, station: str = "", lockstep: bool = False
+    cadence: str, station: str = "", lockstep: bool = False, world: Any = None
 ) -> SamplingPolicy | None:
     """A seating's cadence as a policy (spec M6 §12; package 41): 'glass' is every glass
     and on the notable and urgent events (every station's default); 'watch' every watch
@@ -1014,6 +1088,13 @@ def cadence_policy(
     if key not in CADENCES:
         return None
     kinds = {LOOKOUT: LOOKOUT_KINDS, MASTER: MASTER_KINDS}.get(station, frozenset())
+    if station == DIRECTOR and key == "glass" and world is not None:
+        # the director's slow clock is the brief's (spec M7b §5): every watch when it says
+        from freesail.agents.director import brief_of
+
+        brief = brief_of(world)
+        if brief is not None and brief.cadence == "watch":
+            key = "watch"
     # the lookout is woken by an urgent line as every station is, and by the masthead's
     # own lines, never by the quarterdeck's notable ones (a say on the quarterdeck is not
     # heard at the masthead, truth 84)
@@ -1072,6 +1153,12 @@ class Station:
     def __post_init__(self) -> None:
         # the station's lines are kept as they are at any speed (package 29b)
         STATION_ACTORS.add(station_actor(self.name))
+        if self.name == DIRECTOR:
+            # the director's lines are for the record only (spec M7b §6; package 50): no
+            # station's sample and no play log carries them
+            from freesail.core.events import RECORD_ONLY_ACTORS
+
+            RECORD_ONLY_ACTORS.add(station_actor(self.name))
 
     @property
     def title(self) -> str:
@@ -1633,7 +1720,25 @@ def session_kind_of(asked: str, station_kind: str, *, race: bool = False) -> str
         return SESSION_TEST
     if station_kind == CAPTAIN:
         return SESSION_SOLO
+    if station_kind == DIRECTOR:
+        return SESSION_DIRECTOR
     return SESSION_PLAY
+
+
+# The director's patience: a watch, the watcher's (judgement: its clock is slow by design,
+# and a director with nothing to arrange has nothing to say).
+DIRECTOR_PATIENCE_S = A_WATCH_S
+
+
+def director(
+    policy: SamplingPolicy | None = None, patience_s: int = DIRECTOR_PATIENCE_S, world: Any = None
+) -> Station:
+    """The director's station (spec M7b §2; package 50), made in `freesail.agents.
+    director` (the brief's body is the player's); here so that the factories are one
+    table."""
+    from freesail.agents import director as director_mod
+
+    return director_mod.director(policy, patience_s, world=world)
 
 
 # The kinds of station, each by its factory `(policy, patience_s, world=...)`: what a
@@ -1647,6 +1752,7 @@ STATION_FACTORIES: dict[str, Any] = {
     MASTER: master,
     LOOKOUT: lookout,
     PASSENGER: passenger,
+    DIRECTOR: director,
 }
 
 # Where each station stands when its person is not placed by the people (package 41; the
@@ -1662,7 +1768,7 @@ STATION_PLACES: dict[str, str] = {
     MASTER: "quarterdeck",
     LOOKOUT: "masthead",
     PASSENGER: "quarterdeck",
-    "director": "quarterdeck",
+    DIRECTOR: "",  # above the game: no place aboard, nothing said or heard on deck (50)
 }
 
 

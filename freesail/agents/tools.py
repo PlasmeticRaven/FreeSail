@@ -141,7 +141,17 @@ FIND_LIMIT = 8
 
 # The tools whose results may be books (the harness gives each a handle): every library
 # read, and a read_log longer than `agent.BOOK_SIZE_TOKENS`.
-BOOK_TOOLS: tuple[str, ...] = ("library", "read_log", "read_journal", "chart", "ship_view")
+BOOK_TOOLS: tuple[str, ...] = (
+    "library",
+    "read_log",
+    "read_journal",
+    "chart",
+    "ship_view",
+    "truth",  # the director's (package 50): large, and put back like a page
+)
+# The director's own tools (spec M7b §2; package 50): offered at the director's station
+# alone, refused in words at every other.
+DIRECTOR_TOOLS: tuple[str, ...] = ("world_order", "truth")
 
 # The tools that make a picture (package 42, item 4; `agents.pictures`), and the doors
 # that carry one (an MCP client reads an image in a tool's result; the API door sends it
@@ -392,10 +402,45 @@ def readings(world: World, station: str) -> dict[str, Any]:
 
 
 def state(world: World, station: str) -> str:
+    from freesail.agents.agent import DIRECTOR
+
     lines = list(world.summary_lines())
     for agent in world.agents.values():
+        if agent.station.name == DIRECTOR and station != DIRECTOR:
+            continue  # a director you can see is not a director (spec M7b §6; package 50)
         lines.append(f"The {agent.station.name}: {agent.agent.words()}.")
     return "\n".join(lines)
+
+
+def world_order(world: World, station: str, text: str) -> str:
+    """The director's hand (spec M7b §3; package 50): a world order through the channel's
+    door, the brief's limits and the doubt before it, logged in the director's log and
+    never the play log (`freesail.agents.director.direct`)."""
+    from freesail.agents import director as director_mod
+    from freesail.agents.agent import DIRECTOR
+
+    harness = world.agents.get(station)
+    if harness is None or harness.station.name != DIRECTOR:
+        return (
+            f"The {station} gives no world order: the world is the director's, the "
+            "scenario's and the owner's to order (spec M6 §23)."
+        )
+    return director_mod.direct(world, text, by=harness.model_name)
+
+
+def truth(world: World, station: str) -> dict[str, Any]:
+    """The truth (spec M7b §2; package 50): every ship's true position, heading, sail and
+    state, the weather as it is and as the systems will make it, the tide, the people and
+    their states, the markets and the news; the director's alone."""
+    from freesail.agents.agent import DIRECTOR
+
+    harness = world.agents.get(station)
+    if harness is None or harness.station.name != DIRECTOR:
+        return {
+            "refused": f"The {station} does not see the truth: the truth is the director's "
+            "(spec M7b §2); a station on a ship reads her readings and her log."
+        }
+    return R.director_readings(world)
 
 
 LIBRARY_TOPICS = (
@@ -487,6 +532,24 @@ def submit_order(world: World, station: str, text: str, danger: str = "") -> str
     if st is not None and st.has_authority:
         if " ".join(text.lower().split()).rstrip(".!") == "hand over the deck":
             return HAND_OVER_BY_TOOL
+        if st.name == "director" and (
+            orders_mod_recognises_world(text) or stations_recognises(world, text)
+        ):
+            # the director (package 50): a world order goes through its own tool, and the
+            # deck's conversation is nobody's at a station with no place aboard
+            if orders_mod_recognises_world(text):
+                return (
+                    "A world order is given with the world_order tool at this station, not "
+                    "with submit_order; it is then judged by the brief and the channel's "
+                    "doubt and written in the director's log."
+                )
+            return _refuse(
+                world,
+                station,
+                text,
+                "The director gives no order of any ship, the deck's conversation included: "
+                "it has no place aboard, and its words are its log's.",
+            )
         text, why, how = judge(world, station, text, danger)
         if why:
             return _refuse(world, station, text, why)
@@ -524,6 +587,21 @@ def submit_order(world: World, station: str, text: str, danger: str = "") -> str
     if danger and how and how != DANGER:
         return f"{e.text} (The order was yours to give already; the danger's word was not needed.)"
     return e.text
+
+
+def orders_mod_recognises_world(text: str) -> bool:
+    from freesail.world import orders as world_channel
+
+    return world_channel.recognises(text)
+
+
+def stations_recognises(world: World, text: str) -> bool:
+    from freesail.orders import stations
+
+    try:
+        return stations.recognises(text, world.ship) in stations.CONVERSATION_VERBS
+    except Exception:  # noqa: BLE001  (a point ship: no sentences to read)
+        return False
 
 
 def is_muster(text: str) -> bool:
@@ -626,6 +704,14 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
             # resume; the sentence is the captain's own, so the grammar reads it as his
             return text, "", DOMAIN
         if sentence in stations.CONVERSATION_VERBS:
+            if getattr(harness.station, "name", "") == "director":
+                # the director has no place aboard (package 50): its words are its log's
+                return (
+                    text,
+                    f"{who} gives no order of any ship, the deck's conversation included: "
+                    "it has no place aboard, and its words are its log's.",
+                    "",
+                )
             # the deck's conversation is every station's (package 41): say, tell, ask
             return text, "", DOMAIN
         return text, f"{who} may not {text}: {_STATION_WHY}.", ""
@@ -1080,6 +1166,7 @@ class Tool:
     fn: Callable[..., Any]
     needs_authority: bool = False  # refused from a station whose authority is none
     needs_deck: bool = False  # refused from a station with a domain that has not the deck
+    director_only: bool = False  # the director's own (package 50), offered there alone
 
 
 TOOLS: dict[str, Tool] = {
@@ -1317,14 +1404,55 @@ TOOLS: dict[str, Tool] = {
             },
             ship_view,
         ),
+        Tool(
+            "world_order",
+            "The director's hand (spec M7b §3): an order to the world, not to any ship, in "
+            "the channel's words ('weather: ...', 'ship: ...', 'ship \"X\": intent ...', "
+            "'aboard: ...', 'message: ...', 'port <id>: ...', 'mark: ...', 'seat: ...', "
+            "'unseat: ...'; the library's grammar topic has every form). Checked first "
+            "against the player's brief (refused outside it, with the reason) and then by "
+            "the channel's doubt: an order the simulation could not have produced from where "
+            "it is is not performed, and the result says why and that you may enter it again "
+            "with a [reason: ...] at its end, which performs it and keeps the act, the doubt "
+            "and your reason together. Counted against the day's acts. Written in the "
+            "director's log, never the play log, which carries the effects alone.",
+            {"text": "string: the world order, with '[reason: ...]' at its end when entered again"},
+            world_order,
+            needs_authority=True,
+            director_only=True,
+        ),
+        Tool(
+            "truth",
+            "The truth, the director's alone (spec M7b §2): every ship's true position, "
+            "heading, speed, sail and state with her captain's intent, the weather as it is "
+            "at the player's ship and as the systems will make it for the next watch, the "
+            "tide, the people aboard every crewed ship and their states, the markets' "
+            "prices and the news. A book: large, and put back with shelve.",
+            {},
+            truth,
+            needs_authority=True,
+            director_only=True,
+        ),
     )
 }
 
 
-def tool_names(pictures: bool = False) -> tuple[str, ...]:
+def tool_names(pictures: bool = False, director: bool = False) -> tuple[str, ...]:
     """The tools in the table's order; the picture tools only when asked for (a door that
-    carries an image; package 42)."""
-    return tuple(n for n in TOOLS if pictures or n not in PICTURE_TOOLS)
+    carries an image; package 42); the director's own tools at the director's station
+    alone, and the deck's (hand_over, handover_note) not there (package 50)."""
+    out = []
+    for n, t in TOOLS.items():
+        if n in PICTURE_TOOLS and not pictures:
+            continue
+        if t.director_only and not director:
+            continue
+        if director and t.needs_deck and n != "submit_order":
+            continue
+        if director and n == "handover_note":
+            continue
+        out.append(n)
+    return tuple(out)
 
 
 def parameters_schema(name: str) -> dict[str, Any]:
@@ -1508,6 +1636,9 @@ def book_of(name: str, args: dict[str, Any], result: Any) -> tuple[str, str] | N
             f"the ship's view from {facing} at {pic.get('stamp')}, {size}",
             f"ship_view(facing='{args.get('facing') or 'leeward'}')",
         )
+    if name == "truth" and isinstance(result, dict) and "refused" not in result:
+        # the truth is a book (package 50): the whole world at a moment, put back when read
+        return f"the truth at {result.get('stamp', '')}".rstrip(), "truth()"
     if name == "read_journal" and isinstance(result, dict) and "entries" in result:
         # a long read of the journal is a book too (package 37g): the two long games'
         # journals came to about ten thousand tokens each

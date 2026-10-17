@@ -1,0 +1,23 @@
+# A chase (spec M7b §4; package 50): one pursuer, set on early and kept on; the weather the
+# chase's ally or the player's by turns; the land where it tells. No gale: a chase in a gale
+# is a story about the gale.
+name: A chase
+tone: >
+  A chase across a day and a night: a brig-sloop or a privateer schooner that makes her out
+  on the first morning and will not let her go. The wind shifts when it matters, the fog
+  comes down when it would, the coast offers a trick to the one who knows it. One story,
+  told hard.
+challenge: >
+  Sailing to windward or to leeward against a determined pursuer; the use of the night, the
+  weather and the land. Keep the pursuer honest (she sails as the physics lets her); keep
+  the player's chances real.
+limits:
+  wind_max_kn: 33          # fresh: nothing above force 7
+  enemy_heaviest: brig     # the pursuer a brig-sloop or a schooner, no heavier
+  nobody_dies: true
+  the_war_as_it_is: true
+  the_chart_as_it_is: true
+cadence: glass
+budget:
+  samples_a_day: 72
+  acts_a_day: 6

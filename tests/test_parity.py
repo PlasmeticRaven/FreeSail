@@ -86,6 +86,11 @@ CONSOLE_COMMANDS = {
     "quit": "by design: the station's own leaving is `stand_down`; the game is the owner's",
     "world:": "by design: a world order is the scenario's, the director's and the owner's "
     "(spec M6 §23); refused to the captain at the prompt and at the station alike",
+    # the director's (spec M7b §4 and §6; package 50): the owner's and the player's own
+    "the director's log": "by design: the player's reveal of the director's log (spec M7b "
+    "§6), which the director is told of; no station reads it",
+    "two stories": "by design: the replay view, the player's",
+    "director:": "by design: the player's brief for the director (spec M7b §4)",
 }
 
 # The browser's snapshot (`api.queries.snapshot`, the instruments and the chart's pane):
@@ -134,6 +139,12 @@ TOOL_COUNTERPARTS = {
     "stand_down": "by design: the station's leaving; the player's seat is stood down with "
     "'stand down the <station>'",
     "opt_out": "by design: the model's withdrawal (docs/agents/ConsentBrief.md)",
+    # the director's (spec M7b §2; package 50): a station above the game, not on a ship;
+    # offered at its station alone and refused in words at every other
+    "world_order": "by design: the director's hand (spec M7b §3); the owner's is the `world:` "
+    "prefix at the prompt; refused to the captain at the prompt and at the station alike",
+    "truth": "by design: the director's reading surface (spec M7b §2; `readings."
+    "director_readings`), which no station on a ship and no prompt reads (truth 81)",
 }
 
 # The vocabulary's verbs a station may not submit: the driver's, which the grammar refuses

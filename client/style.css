@@ -232,6 +232,16 @@ main {
 .instruments label.option input { vertical-align: -2px; margin: 0 4px 0 0; }
 #i-clock.eased { color: var(--accent); }
 
+/* package 50: the director's log, in the ship view's place while open, beside the play log */
+#director-panel { grid-column: 2 / span 2; grid-row: 1; }
+#director-panel[hidden] { display: none; }
+body.director-open #ship-panel { display: none; }
+body.director-open #library-panel { display: none; }
+.director-log { flex: 1; min-height: 0; margin: 0; padding: 8px 12px; overflow: auto; white-space: pre-wrap; font-size: 12.5px; line-height: 1.45; font-family: ui-monospace, Menlo, Consolas, monospace; }
+@media (max-width: 1099px) {
+  #director-panel { grid-column: 2; grid-row: 1; }
+}
+
 /* package 33d: the library and the ship's papers, in the ship view's place while open */
 #library-panel { grid-column: 2 / span 2; grid-row: 1; }
 #library-panel[hidden] { display: none; }

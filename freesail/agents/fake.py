@@ -48,6 +48,7 @@ __all__ = [
     "narrator",
     "officer_of_the_watch",
     "passenger_aboard",
+    "director_above_the_game",
     "point_of_sail",
     "point_trim",
     "reply",
@@ -547,3 +548,49 @@ def passenger_aboard(remarks: Sequence[str] = ()) -> Fake:
         return Reply(calls=(ToolCall("stand_by", {"until": "eight bells"}),))
 
     return Fake([turn], loop=True)
+
+
+def direct_the_voyage(orders: Sequence[str] = (), reenter: bool = True) -> Any:
+    """The scripted director's rule (package 50; spec M7b §2 to §5): at each sample one
+    world order from the list, in order, through `world_order`; an order the channel
+    doubts is entered again with a reason when `reenter` (so that the doubt and the
+    re-entry are both on the record), else let be; a thought in the log after each; when
+    the list is spent, a stand-by until the next watch."""
+    state = {"i": 0, "pending": None}
+
+    def rule(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
+        if "tool_results" in last:
+            results = last["tool_results"]
+            for r in results:
+                if r.get("name") != "world_order":
+                    continue
+                said = str(r.get("result") or "")
+                if said.startswith("Doubted") and reenter and state["pending"] is not None:
+                    text = state["pending"]
+                    state["pending"] = None
+                    return Reply(
+                        text="The doubt is read; the story wants it all the same.",
+                        calls=(
+                            ToolCall(
+                                "world_order",
+                                {"text": f"{text} [reason: the story wants it; the fake's]"},
+                            ),
+                        ),
+                    )
+            state["pending"] = None
+            return Reply(text="Arranged; the play log will carry what comes of it.")
+        if state["i"] < len(orders):
+            text = orders[state["i"]]
+            state["i"] += 1
+            state["pending"] = text
+            return Reply(
+                text=f"Arranging: {text}", calls=(ToolCall("world_order", {"text": text}),)
+            )
+        return Reply(calls=(ToolCall("stand_by", {"until": "a watch"}),))
+
+    return rule
+
+
+def director_above_the_game(orders: Sequence[str] = (), reenter: bool = True) -> Fake:
+    """The scripted director (package 50): `direct_the_voyage` as a fake, looped."""
+    return Fake([direct_the_voyage(orders, reenter)], loop=True)

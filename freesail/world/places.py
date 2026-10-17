@@ -263,10 +263,14 @@ class Stores:
     water_tons: float = 0.0
     provisions_days: float = 0.0
     slops_issued_pounds: float = 0.0
+    # the water found foul (package 50, the director's `aboard:`; the needs of package 54
+    # read it): a class default, so that a checkpoint from before loads with it
+    foul: bool = False
 
     def lines(self, complement: int) -> list[str]:
+        foul = ", found foul" if getattr(self, "foul", False) else ""
         return [
-            f"Water: {_tons(self.water_tons)} in the ground tier.",
+            f"Water: {_tons(self.water_tons)} in the ground tier{foul}.",
             f"Provisions: {self.provisions_days:.0f} days at full allowance for {complement} men.",
             "Nothing is yet expended against them; the books stand as the ship was stored.",
         ]

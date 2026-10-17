@@ -36,6 +36,7 @@ from typing import TYPE_CHECKING, Any
 
 from freesail.agents.agent import (
     CAPTAIN,
+    DIRECTOR,
     LOOKOUT,
     MASTER,
     OFFICER,
@@ -51,11 +52,10 @@ from freesail.agents.agent import (
 )
 from freesail.agents.harness import Harness
 from freesail.agents.journal import Journal, journal_of
-from freesail.core.events import Severity
+from freesail.core.events import Event, Severity
 from freesail.orders.errors import OrderError
 
 if TYPE_CHECKING:
-    from freesail.core.events import Event
     from freesail.core.world import World
 
 __all__ = [
@@ -81,6 +81,7 @@ SEAT_STATIONS: dict[str, str] = {
     "lookout": LOOKOUT,
     "masthead": LOOKOUT,
     "passenger": PASSENGER,
+    "director": DIRECTOR,  # above the game (spec M7b §2; package 50)
 }
 # The kinds the player is not seated at.
 NOT_A_SEAT: tuple[str, ...] = (CAPTAIN, "watcher")
@@ -93,6 +94,10 @@ def seat_station(world: Any, station: str) -> tuple[str, Any]:
     key = station_name(" ".join(str(station).lower().split()))
     name = SEAT_STATIONS.get(key, key)
     stations = getattr(world, "stations", None)
+    if name == DIRECTOR and stations is not None and not stations.aboard(DIRECTOR):
+        # the director's station is bound on the World when the player sits at it
+        # (package 50): an input, so that a replay binds it again before the seat
+        stations.bind(DIRECTOR, "", kind=DIRECTOR)
     kind = stations.kind_of(name) if stations is not None else name
     if kind is None or kind in NOT_A_SEAT or kind not in STATION_FACTORIES:
         aboard = (
@@ -394,6 +399,10 @@ class PlayerSeat:
         low = line.lower()
         if low.startswith("answer ") or low == "answer":
             return self.answer(line[len("answer") :])
+        if self.station.name == DIRECTOR and not self.agent.released:
+            answered = self._direct(line)
+            if answered is not None:
+                return answered
         if self.agent.released or world_orders.recognises(line):
             return self.world.submit(line)
         sentence = stations.recognises(line, self.world.ship)
@@ -402,6 +411,39 @@ class PlayerSeat:
         # the deck's conversation is the seat's own (package 41): the player at his
         # station says, tells and asks as that station
         return self.submit(line)
+
+    def _direct(self, line: str) -> Event | None:
+        """The player at the director's seat (spec M7b §2; package 50): a bare world
+        order is the director's, through the channel's door with the brief's limits and
+        the doubt (`director.direct`), its answer for the player alone; 'the truth' the
+        director's reading. None for any other line."""
+        from freesail.agents import director as director_mod
+        from freesail.api import readings as R
+        from freesail.world import orders as world_orders
+
+        low = line.lower().rstrip(".?")
+        if low in ("the truth", "truth"):
+            words = R.director_readings(self.world)["words"]
+            return self._answer_event("director.answer", words)
+        if world_orders.recognises(line) and not low.startswith("world order"):
+            words = director_mod.direct(
+                self.world, line, by=self.model_name, road=director_mod.INPUT
+            )
+            return self._answer_event("director.answer", words)
+        return None
+
+    def _answer_event(self, kind: str, words: str) -> Event:
+        """An answer for the player at his seat and for nobody else (`UNLOGGED_KINDS`):
+        printed, never a line of the log."""
+        return Event(
+            tick=self.world.clock.tick,
+            ship_time=self.world.clock.ship_time,
+            severity=Severity.ROUTINE,
+            kind=kind,
+            text=words,
+            actor=self.order_actor,
+            data={"station": self.station.name, "seat": True},
+        )
 
     def submit(self, text: str, danger: str = "") -> Event:
         """An order of the player's at his seat, judged as a model's at the station would
