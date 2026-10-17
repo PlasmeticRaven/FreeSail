@@ -5926,6 +5926,12 @@ brief.
   twice: the order is applied aside now (`acts.aside`), as a station's order to the ship is.
 - `station.bound` for the director was a line of the play log: the binding's line carries
   the director's actor now, and so is for the record.
+- The picture tools at the director's station (the lead's note of the same day): `chart`
+  stays, for planning, described there as what it truly shows (the player's chart by her
+  account, no other ship, nothing of the truth: `Tool.at_director`, sent by every door);
+  `ship_view` is not offered (the director stands on no deck) and is refused in words if
+  called by name. The brief says the picture is not the truth. A director's own chart,
+  every ship drawn where she truly is, is left for a package of its own.
 
 ### Pins moved
 

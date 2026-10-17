@@ -87,7 +87,11 @@ words at every other): `world_order(text)`, the channel's door with the brief's 
 the doubt (`director.direct`), and `truth()`, the reading surface; beside the library, the
 journal (which is the director's log), `read_journal`, `stand_by`, `stand_down`, `opt_out`,
 `shelve`, `readings`, `read_log`, `state` and `submit_order` for the readings; never
-`hand_over` or `handover_note`. The session kind is its own (`SESSION_DIRECTOR`: above the
+`hand_over` or `handover_note`; at a door that carries pictures, `chart` and not `ship_view`
+(the director stands on no deck; `call` refuses the view in words), the chart's words at
+this station its own (`Tool.at_director`, `tools.description_of`): the player's chart as
+the browser page draws it, his ship by her account and no other ship, nothing of the
+truth, for planning; a director's own chart is a package to come. The session kind is its own (`SESSION_DIRECTOR`: above the
 game, the player at the prompt of his ship below it). **The truth** is `readings.
 director_readings(world)`, a surface and not a registry row (a row is read at the prompt
 and at every station alike, and truth 81 gives the captain no road to the truth): every

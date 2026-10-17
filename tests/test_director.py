@@ -140,6 +140,16 @@ def test_the_station_is_made_with_the_players_brief_after_the_fixed_part_and_the
     h = seat_director(w, [Reply()])
     assert "world_order" in h.tool_names and "truth" in h.tool_names
     assert "hand_over" not in h.tool_names and "handover_note" not in h.tool_names
+    # the pictures at this station (the lead's note): the chart for planning, said to be the
+    # player's and not the truth; no ship's view above the game
+    at_door = T.tool_names(pictures=True, director=True)
+    assert "chart" in at_door and "ship_view" not in at_door
+    assert "ship_view" in T.tool_names(pictures=True)
+    assert "no other ship is on it" in T.description_of("chart", director=True)
+    assert T.description_of("chart", director=True) != T.description_of("chart")
+    assert T.description_of("truth", director=True) == T.TOOLS["truth"].description
+    assert "stands on no deck" in T.call(w, DIRECTOR, "ship_view", {})
+    assert "the chart tool is not the truth" in st.brief
     head = h.brief.text()
     assert "taking the station of the director" in head and SESSION_DIRECTOR in head
     assert "The voyage:" in head  # the voyage's words, as the captain's brief has them

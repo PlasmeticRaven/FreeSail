@@ -1200,12 +1200,19 @@ def build_server(bridge: Bridge) -> MCPServer:
     """The MCP server over a bridge: package 27's tools with their own names and words,
     `say`, the library as resources (read from the game), the brief as a prompt and a
     resource, and `keep_watch`, a prompt for the owner to start a watch with."""
+    director = bridge.game.name == "director"
     offered = tools.tool_names(
         pictures=True,  # the pictures this door carries (42)
-        director=bridge.game.name == "director",  # its own tools (50)
+        director=director,  # its own tools, and the chart's words for it (50)
     )
     mcp_tools = [
-        _tool(bridge, name, t.description, tools.parameters_schema(name), list(t.params))
+        _tool(
+            bridge,
+            name,
+            tools.description_of(name, director=director),
+            tools.parameters_schema(name),
+            list(t.params),
+        )
         for name, t in tools.TOOLS.items()
         if name in offered
     ]

@@ -94,6 +94,7 @@ __all__ = [
     "PICTURE_DOORS",
     "PICTURE_TOOLS",
     "chart",
+    "description_of",
     "parameters_schema",
     "ship_view",
     "read_journal",
@@ -1167,6 +1168,9 @@ class Tool:
     needs_authority: bool = False  # refused from a station whose authority is none
     needs_deck: bool = False  # refused from a station with a domain that has not the deck
     director_only: bool = False  # the director's own (package 50), offered there alone
+    # what the models read at the director's station when it differs (package 50; the
+    # lead's note of 2026-10-17: the chart there is the player's, not the truth)
+    at_director: str = ""
 
 
 TOOLS: dict[str, Tool] = {
@@ -1388,6 +1392,18 @@ TOOLS: dict[str, Tool] = {
                 "fifty) or 'whole' (the chart as built); nothing for the view the page shows",
             },
             chart,
+            at_director=(
+                "The player's chart as the game's open browser page draws it, for your "
+                "planning (the coast, the marks and the dangers, the soundings, the track by "
+                "account and the player's pencil, with a scale bar), and nothing of the "
+                "truth: the player's ship is drawn where her own reckoning puts her, not "
+                "where she is, and no other ship is on it at all. The truth's positions are "
+                "in words from truth. Drawn at the span asked; with no page open, the "
+                "readings it would have shown, in words. A picture is a book that stays in "
+                "your conversation until you put it back: journal what it showed, then "
+                "shelve it with a note, and its line keeps the note and the time it was "
+                "open; ask again for a fresh one."
+            ),
         ),
         Tool(
             "ship_view",
@@ -1449,10 +1465,20 @@ def tool_names(pictures: bool = False, director: bool = False) -> tuple[str, ...
             continue
         if director and t.needs_deck and n != "submit_order":
             continue
-        if director and n == "handover_note":
+        if director and n in ("handover_note", "ship_view"):
+            # no handover above the game; and the director stands on no deck, so there
+            # is no ship's view from its station (the chart stays, for planning)
             continue
         out.append(n)
     return tuple(out)
+
+
+def description_of(name: str, *, director: bool = False) -> str:
+    """A tool's words as a door sends them: the table's, or at the director's station the
+    tool's own words for it when it has them (the chart: the player's chart by her
+    account and no truth on it; package 50)."""
+    t = TOOLS[name]
+    return t.at_director if director and t.at_director else t.description
 
 
 def parameters_schema(name: str) -> dict[str, Any]:
@@ -1483,6 +1509,8 @@ def tool_lines() -> list[str]:
     for t in TOOLS.values():
         params = ", ".join(f"{k} ({v})" for k, v in t.params.items()) or "no arguments"
         out.append(f"{t.name}: {t.description} Takes: {params}.")
+        if t.at_director:
+            out.append(f"{t.name}, at the director's station: {t.at_director}")
     return out
 
 
@@ -1496,6 +1524,14 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
         return f"There is no tool named '{name}'; the tools are {', '.join(TOOLS)}."
     harness = world.agents.get(station)
     authority = harness.station.authority if harness is not None else None
+    if name == "ship_view" and getattr(authority, "value", "") == "director":
+        # the director stands on no deck (package 50): the chart is the player's, by her
+        # account, and the truth is in words
+        return (
+            "The director stands on no deck: there is no ship's view from this station. "
+            "The chart is the player's chart by her account, for planning, with no other "
+            "ship on it; the truth's positions are in words from truth."
+        )
     if tool.needs_authority and (authority is None or not authority.may_submit_orders):
         sentence = f"The {station} has no authority to give orders."
         what = " ".join(str(args.get("text", "")).split())

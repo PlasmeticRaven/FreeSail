@@ -108,7 +108,7 @@ from freesail.agents.agent import CADENCES, TURN_ENDS_WORDS, station_name
 from freesail.agents.harness import conversation_text
 from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError
-from freesail.agents.tools import TOOLS, parameters_schema, tool_names
+from freesail.agents.tools import TOOLS, description_of, parameters_schema, tool_names
 
 __all__ = [
     "DOOR_WORDS",
@@ -565,10 +565,11 @@ class ApiModel:
 
     def tools_schema(self) -> list[dict[str, Any]]:
         names = self.offered_tools if self.offered_tools is not None else tool_names()
+        director = "world_order" in names  # the director's station alone is offered it (50)
         return [
             {
                 "name": n,
-                "description": TOOLS[n].description,
+                "description": description_of(n, director=director),
                 "input_schema": parameters_schema(n),
             }
             for n in names

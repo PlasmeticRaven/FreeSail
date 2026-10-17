@@ -107,6 +107,7 @@ A bare world order typed there is the director's, through the channel's door: do
 | `--seat director` | at the console and the browser | you at the director's station; a bare world order there is the director's |
 | `the truth` | at the director's seat | the world as it is: every ship, the weather now and in a watch, the tide, the people, the markets, the news |
 | `--station director` | at the MCP bridge, the local runner and the API door | a model at the director's station, when the game has a brief for one |
+| `chart(span)` | at a door that carries pictures | the player's chart as the browser draws it, his ship by her account and no other ship: for planning, not the truth; there is no `ship_view` above the game |
 | `world_order(text)` | the station's tool | a world order through the brief's limits and the channel's doubt, logged in the director's log |
 | `<order> [reason: ...]` | | an order doubted, entered again with its reason and performed; one the game cannot perform, logged as attempted |
 | `aboard: the fore topmast is found sprung` | `aboard: a cask found stove`, `aboard: a seam found working`, `aboard: the water found foul` | a thing found aboard, from the table, the people's report in the play log |

@@ -448,7 +448,11 @@ DIRECTOR_BRIEF = (
     "the weather as it is and as the systems will make it for the next watch, the tide, "
     "the people aboard every ship and their states, the markets and the news), and you "
     "shape the voyage the player sails below you through world orders alone (the "
-    "world_order tool). The forms the game performs today are given as examples of "
+    "world_order tool). Where your door carries pictures, the chart tool is not the truth: "
+    "it is the player's chart as the browser draws it, his ship where her reckoning puts "
+    "her and no other ship on it, for your planning of the coast, the marks and the "
+    "dangers; the truth's positions are in words. The forms the game performs today are "
+    "given as examples of "
     "reasonable orders, not as the whole of what you may try: the weather ('weather: low "
     "\"the low\" radius 450 km fronts 140 300 at <time> <x_km> <y_km> <hPa>', 'weather: "
     'waypoint for "the low" at <time> <x_km> <y_km> <hPa>\'), a ship put on the sea or a '
