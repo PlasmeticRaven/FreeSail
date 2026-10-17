@@ -422,6 +422,70 @@ def test_the_doors_name_the_captains_station():
     assert frigate_world().stations.factory(CAPTAIN) is STATIONS[CAPTAIN]
 
 
+def test_the_session_a_station_is_told_is_true_and_no_captain_is_told_a_human_captain_commands(
+    tmp_path,
+):
+    """Package 42b (the owner's ruling of 2026-10-17; disclosure, commitment 1): the kind
+    of session a station's brief names is chosen from what is true of it. A model at the
+    captain's station, of the player's ship or of another (and so at a seat the director's
+    hook made, which a door takes the same way), is told play for its own sake with no
+    human captain over it, never "a human captain at the prompt": the owner at the door is
+    no captain at its prompt. A station below the captain's is told play with the human
+    captain, as before; a door's `test` is a test; and at the regatta's desk every station
+    is told it is in a race, whatever its door asked (`tools/regatta.py` sets the desk's
+    `race`; its local runner's test says so too)."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.agents import consent
+    from freesail.agents.agent import (
+        SESSION_PLAY,
+        SESSION_RACE,
+        SESSION_SOLO,
+        SESSION_TEST,
+        session_kind_of,
+    )
+    from freesail.ui.server import Driver, create_app
+    from tests.test_brains import put, world_at
+
+    weights = "made-up-session-model-9b.Q4_K_M.gguf"  # made up: no model is named here
+    records = tmp_path / "consent"
+    records.mkdir()
+    consent.Record(weights, "r", "2026-10-17", consent.YES, answer="Yes.", drill="passed").write(
+        records
+    )
+
+    def told(world, station: str, race: bool = False, **body: Any) -> str:
+        driver = Driver(world)
+        app = create_app(driver, game="g", consent_records=records, saves_dir=tmp_path / "s")
+        driver.desk.race = race
+        said = {"model_name": weights, "door": "mcp"} | body
+        a = TestClient(app).post(f"/api/agents/{station}", json=said)
+        assert a.status_code == 200 and a.json()["phase"] == "station", a.text
+        h = world.agents.get(station)
+        if h is None:  # a station on another ship lives on her own World
+            h = world.vessels.find(body["ship"]).crew.agents[station]
+        text = h.brief.text()
+        assert f"This session is {h.agent.session_kind}." in text
+        return h.agent.session_kind
+
+    human = "a human captain at the prompt"
+    assert human in SESSION_PLAY and all(human not in s for s in (SESSION_SOLO, SESSION_RACE))
+    assert told(frigate_world(), CAPTAIN) == SESSION_SOLO
+    assert told(frigate_world(), OFFICER) == SESSION_PLAY
+    assert told(frigate_world(), CAPTAIN, session_kind="test") == SESSION_TEST
+    assert told(frigate_world(), CAPTAIN, race=True) == SESSION_RACE
+    assert told(frigate_world(), CAPTAIN, race=True, session_kind="test") == SESSION_RACE
+    # the captain of another ship, as a door seats her (and as the director's seat does)
+    w = world_at(49.5, -5.5)
+    put(w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth")
+    assert told(w, CAPTAIN, ship="X") == SESSION_SOLO
+    # the rule itself, for the kinds the doors do not reach here
+    assert session_kind_of("play", "master") == SESSION_PLAY
+    assert session_kind_of("PLAY", CAPTAIN) == SESSION_SOLO
+    assert session_kind_of("", "lookout", race=True) == SESSION_RACE
+
+
 def test_a_game_with_the_captain_seated_saves_and_replays_to_the_same_digest(tmp_path):
     """The station's transcript in the save: the game replays with the captain seated,
     his orders given again from his transcript at their ticks, the digest the same."""

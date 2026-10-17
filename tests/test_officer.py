@@ -1610,23 +1610,38 @@ def test_a_yes_given_before_the_briefs_revision_is_asked_again_and_the_question_
 # spec M6 §15, "Brought forward"), kept whole as a file of its own: the brief of
 # 2026-10-07, whose digest the records made against it name.
 BRIEF_BEFORE_42A = ROOT / "tests" / "fixtures" / "ConsentBrief-before-42a.md"
-# The brief as it stands since package 42a: the file's digest, which a record names, and
-# the text of each section the re-ask rule watches (`consent.RE_ASK_SECTIONS`), as
-# `consent.sections` reads it below the rule with the placeholders unfilled (whitespace
-# folded, so a line rewrapped does not move it), by the first sixteen hex digits of its
-# sha256. The revision was made once, on the owner's condition that the question is not
-# put again at the milestone's end: a package that changes one of these six changes what
-# every model with a yes on record is asked, and wants a decision, said here beside the
-# new digest.
-BRIEF_DIGEST = "d096d22a5842772f"
+# The brief as it stood after package 42a and before package 42b's revision for 6c (the
+# brief of 2026-10-09, digest d096d22a5842772f), kept whole for the re-ask test below.
+BRIEF_BEFORE_42B = ROOT / "tests" / "fixtures" / "ConsentBrief-before-42b.md"
+# The brief as it stands: the file's digest, which a record names, and the text of each
+# section the re-ask rule watches (`consent.RE_ASK_SECTIONS`), as `consent.sections` reads
+# it below the rule with the placeholders unfilled (whitespace folded, so a line rewrapped
+# does not move it), by the first sixteen hex digits of its sha256. A package that changes
+# one of these six changes what every model with a yes on record is asked, and wants a
+# decision, said here beside the new digest. Package 42a's revision for milestone 6
+# (decision 41): d096d22a5842772f, the opening b033319d281997bc, what an instance would
+# see and do 712b1fcde44f2604, being stopped 29df636cdcce8b17, what is not done
+# b9151f550fea0339, the journal 7dcb8e848e692f46. Package 42b's revision for 6c (decision
+# 48, the owner's rulings of 2026-10-17: the fifteen changes of `docs/playtests/drafts/
+# consent-brief-6c-draft.md` as drafted, and the race named among the kinds of session):
+# the digests below, five of the six moved and Leaving as it was.
+BRIEF_DIGEST = "ccbc1ebdf1a42c3e"
 WATCHED_SECTION_DIGESTS = {
-    "the opening": "b033319d281997bc",
-    "What an instance would see and do": "712b1fcde44f2604",
+    "the opening": "a104662f6e3c0470",
+    "What an instance would see and do": "3f1375a11d8266a0",
     "Leaving": "4e338c8dd7492b09",
-    "Being stopped": "29df636cdcce8b17",
-    "What is not done": "b9151f550fea0339",
-    "The journal": "7dcb8e848e692f46",
+    "Being stopped": "a7a279ef1ff24aae",
+    "What is not done": "ad25c744cee7db0a",
+    "The journal": "5cf037ca675110e2",
 }
+# The five sections package 42b's revision changed, in the order the rule names them.
+THE_FIVE_OF_42B = [
+    "the opening",
+    "What an instance would see and do",
+    "Being stopped",
+    "What is not done",
+    "The journal",
+]
 
 
 def test_a_yes_given_before_the_revision_for_milestone_6_is_asked_again_with_the_six_named(
@@ -1720,10 +1735,79 @@ def test_every_yes_on_file_given_before_the_revision_for_milestone_6_names_the_s
     assert named and all(sections == THE_SIX for sections in named.values()), named
 
 
+def test_a_yes_given_before_the_revision_for_6c_is_asked_again_with_the_five_named(tmp_path):
+    """Package 42b (decision 48). A yes on record against the brief of 2026-10-09 (the
+    fixture; package 42a's brief, whose digest the records made against it name) is asked
+    again at its next seating, at every door and whether or not the station drills, and
+    the question names the five sections the revision for 6c changed: the opening, what an
+    instance would see and do, being stopped, what is not done and the journal; *Leaving*,
+    *The record* and *Answering* are as they were. A yes given against the brief as it
+    stands is not asked again. No record file is edited: the test makes its own in a
+    temporary folder."""
+    records = tmp_path / "c"
+    runtime = "g, through the API door"
+    assert consent.brief_digest(BRIEF_BEFORE_42B) == "d096d22a5842772f"  # of 2026-10-09
+    before = consent.brief_text(WEIGHTS, runtime, "api", path=BRIEF_BEFORE_42B)
+    now_sent = consent.brief_text(WEIGHTS, runtime, "api")
+    then, now = consent.sections(before), consent.sections(now_sent)
+    assert list(then) == list(now)  # the same eight sections, in the same order
+    changed = [name for name in consent.RE_ASK_SECTIONS if then[name] != now[name]]
+    assert changed == THE_FIVE_OF_42B
+    assert then["Leaving"] == now["Leaving"]
+    assert then["The record"] == now["The record"] and then["Answering"] == now["Answering"]
+    consent.Record(
+        WEIGHTS,
+        runtime,
+        "2026-10-09",
+        consent.YES,
+        answer="Yes.",
+        drill="passed",
+        brief=before,
+        brief_digest="d096d22a5842772f",
+    ).write(records)
+    old = consent.check(WEIGHTS, records)
+    assert old is not None and old.proceeds and old.drilled
+    for door in consent.DOOR_TEXT:
+        assert consent.changed_sections(old, door) == THE_FIVE_OF_42B, door
+    for drills in (True, False):
+        got, kind, why = consent.decide(WEIGHTS, records, "api", drills=drills)
+        assert got is None and kind == consent.CONSENT_KIND
+        assert why == (
+            "the consent brief has changed since their record (2026-10-09) in the opening, "
+            "What an instance would see and do, Being stopped, What is not done, The "
+            "journal, which bear on what the model was told, so the question is put again"
+        )
+    assert consent.why_again(WEIGHTS, records, "api") == (
+        "This question is put to you again because the consent brief has changed since this "
+        "model's answer of 2026-10-09, which was yes, in 5 sections that bear on what it was "
+        "told: **the opening**; **What an instance would see and do**; **Being stopped**; "
+        "**What is not done**; **The journal**. The brief above is the brief as it stands "
+        "now; an earlier yes is not carried to it."
+    )
+    # a yes given against the brief as it stands proceeds, unasked
+    consent.Record(
+        WEIGHTS,
+        runtime,
+        "2026-10-17",
+        consent.YES,
+        answer="Yes.",
+        drill="passed",
+        brief=now_sent,
+        brief_digest=consent.brief_digest(),
+    ).write(records)
+    new = consent.check(WEIGHTS, records)
+    assert new is not None and new.path != old.path
+    assert consent.changed_sections(new, "api") == []
+    assert consent.decide(WEIGHTS, records, "api", drills=True)[1] == ""
+    assert consent.why_again(WEIGHTS, records, "api") == ""
+    assert consent.read_brief(old.path) == before  # the old record stands as written
+
+
 def test_the_sections_the_re_ask_rule_watches_are_pinned_by_digest():
     """Package 42a, item 2 (decision 41; spec M6 §15, "Brought forward"): the revision for
     milestone 6 describes in kind everything 6b and 6c add that the rule watches, so that
-    the question is put once and not again at the milestone's end. The six watched
+    the question is put once and not again at the milestone's end; package 42b revised it
+    once more for 6c, by decision 48, when what was to come had been built. The six watched
     sections are pinned by digest, and the brief's own digest beside them: a later package
     cannot change one without changing this test and saying why. A line rewrapped does not
     move a section's digest (the rule does not count it either); the file's digest moves
@@ -1777,14 +1861,19 @@ def test_the_identity_header_says_which_kind_the_record_carries_at_each_door(tmp
 
 def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
     """The consent brief as the owner approved it on 2026-10-07, the leaner one, revised
-    once for milestone 6 by package 42a (decision 41; spec M6 §15): it keeps the kind of
-    thing a model is asked to agree to and the commitments, and leaves a station's
-    particulars to that station's brief. A few sentences of each section are pinned here,
-    among them one for each kind the revision describes (the captain's station and the
-    player's seat, package 40's draft; the lookout and the master below the officer,
-    several instances aboard one ship, the API door with the owner at the door, the game
-    replayed from its record, a captain of another ship, and which of them are still to
-    come); `test_the_sections_the_re_ask_rule_watches_are_pinned_by_digest` pins the six
+    once for milestone 6 by package 42a (decision 41; spec M6 §15) and once for 6c by
+    package 42b (decision 48): it keeps the kind of thing a model is asked to agree to and
+    the commitments, and leaves a station's particulars to that station's brief. A few
+    sentences of each section are pinned here, among them one for each kind the revisions
+    describe (the captain's station and the player's seat, package 40's draft; the lookout
+    and the master below the officer, several instances aboard one ship, the API door with
+    the owner at the door, the game replayed from its record, a captain of another ship;
+    42b's: a passenger, the director seating models, which station is still to come, the
+    pictures and the books put back, the owner's orders to the world, a captain of another
+    ship with her own company, a seat for a budget under the owner's grant, the race, the
+    stand-down when the budget is spent or the race over, the journal the person's, the
+    reasoning kept with a door's exchanges); `test_the_sections_the_re_ask_rule_watches_are_
+    pinned_by_digest` pins the six
     watched sections whole. `test_what_moved_out_of_the_consent_brief_is_in_the_briefs_of_
     the_stations` proves that what moved out is said where it moved to, and this file's
     other tests that each claim is a behaviour of the code."""
@@ -1809,10 +1898,11 @@ def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
             "as a *captain*, who commands a ship, the player's or another in the same world, "
             "with every power a human player has at the prompt, by direct orders and by "
             "standing orders of his own",
-            "The watcher, the officer of the watch and the captain of the player's ship exist "
-            "today; the lookout, the master, a captain of another ship, stations speaking to "
-            "one another and an API door are to come, and are described now so that an answer "
-            "covers them.",
+            "as a *passenger*, who is aboard with no duty;",
+            "and later as a *director*, who sees the whole world, shapes events, and may seat "
+            "models at the stations of its ships under the owner's grant.",
+            "All of these exist today but the director, who is to come and is described now so "
+            "that an answer covers it.",
             "A human player may hold any of the stations on a ship too, including a lesser one "
             "under a model captain",
             "the owner of the game is always at the door beside every station, whoever holds "
@@ -1824,6 +1914,12 @@ def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
         "What an instance would see and do": (
             "A station's brief, which opens by saying that this is a game, that the reader is "
             "a language model taking a station in it, which station, and which kind of session",
+            "(a test of a feature, play with a human captain, play for its own sake, or a race)",
+            "and, where the door carries them, pictures of the chart and of the ship;",
+            "A picture stays in its conversation until the instance puts it back with a note of "
+            "what it saw, after which a line says that it was shown, with the note.",
+            "A book of the library goes back by itself after a few turns, leaving a line that "
+            "names it, and opens again on request.",
             "The watcher gives no orders.",
             "The lookout and the master give no order of the deck.",
             "It gives orders only while it has the deck, which the captain gives and takes "
@@ -1836,9 +1932,21 @@ def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
             "The captain stands in the place of the person who commands the ship. It has the "
             "deck from the moment it is seated",
             "It gives no order to the world outside the ship",
-            "A captain of another ship commands her toward her own goal, and keeps the station "
-            "when she is far from the player's, working her then by courses, sail and the plan "
-            "of her passage.",
+            "The owner may give such orders while instances play, as the director will; an "
+            "instance meets only what they bring about, never the order.",
+            "A captain of another ship commands her toward her own goal, with her own company, "
+            "log and reckoning, and sees the player's ship as the player sees hers, a sail; it "
+            "keeps the station when she is far from the player's, working her then by courses, "
+            "sail and the plan of her passage, and has the whole of her again when she comes "
+            "near, the game telling it which.",
+            "A model may also be seated as a ship's captain for a budget of samples or hours "
+            "under the owner's grant, which names the models it covers: by the owner, or later "
+            "by the director, never on a model's own authority, and only on that model's own "
+            "yes.",
+            "A captain may also sail a race, a fixed course timed and scored beside other "
+            "agents' runs of it, its log and times kept in the game's repository under the "
+            "model's kind and never its name; a race asks no question of its own, and runs no "
+            "model whose yes does not already stand.",
             "Several stations of one ship may be held at once, by instances of this model or of "
             "others and by the player, who speak to one another as a ship's people do; another "
             "station's words reach an instance as lines of the game under the speaker's name, "
@@ -1872,12 +1980,16 @@ def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
             "the game does not wait for a silent captain.",
             "A paused or silent lookout or master has its work done meanwhile by the ship's own "
             "people.",
+            "A station held for a budget or for a race is stood down, with the reason, when the "
+            "budget is spent or the race is over.",
             "Standing by on purpose is an action you can take, so that silence is a decision "
             "and not a symptom.",
         ),
         "The journal": (
             "which it writes in with a tool and can read back",
-            "open to a model that later takes the same station, so it is a record and not a secret",
+            "the journal of the person its station is bound to, carried with him to any other "
+            "station he holds, or the station's own where it is bound to nobody.",
+            "open to any model that later keeps it, so it is a record and not a secret",
             "An officer also leaves a handover note there, in its own words, when it gives "
             "the deck back or stands down, and a captain when it lends the deck to its book or "
             "stands down",
@@ -1890,6 +2002,8 @@ def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
             "instance; an API door's key is the developer's and is never in anything the game "
             "sends, writes or saves.",
             "are not used to train models; if that ever changed, the brief would say so first",
+            "Where the developer has a door keep its exchanges, the reasoning a model server "
+            "returns apart from the reply is kept with them.",
             "A saved game may be replayed from its record, each instance's acts given again as "
             "the game's inputs, with no model asked.",
         ),
@@ -1924,8 +2038,12 @@ def test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files():
     # below the rule, its placeholders unfilled: 1,896 words before package 37g's second
     # pass; the approved brief of 2026-10-07, 1,371; package 40's draft, approved as
     # drafted, 1,708; with package 42a's additions for what 6b and 6c add, 1,958, and 1,994
-    # as sent at this door
-    assert len(text.split()) < 2000
+    # as sent at this door; with package 42b's for what 6c built (decision 48: the stale
+    # sentence put in the present, 25 words fewer, and the kinds 6c added, the owner's four
+    # beyond the package's brief among them), 2,259, and 2,295 as sent at this door. The
+    # bound moves with each revision the owner approves, and no further: a sentence more is
+    # one every model must read
+    assert len(text.split()) < 2300
 
 
 def composed(make, world: World | None = None, door: str = "") -> Harness:

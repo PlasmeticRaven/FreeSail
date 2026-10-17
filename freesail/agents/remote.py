@@ -98,10 +98,10 @@ from freesail.agents.agent import (
     CADENCES,
     OPT_OUT_TOKEN,
     SESSION_PLAY,
-    SESSION_TEST,
     STATION_FACTORIES,
     SamplingPolicy,
     cadence_policy,
+    session_kind_of,
     station_name,
 )
 from freesail.agents.harness import Harness, Playback, full_stop
@@ -366,6 +366,9 @@ class Desk:
         # record (no record that proceeds, a re-ask or a drill due) is refused in words,
         # and no consent conversation is begun; the question is put in a game, not a race
         self.on_record_only = False
+        # the regatta's too (package 42b): every station seated here is told it is in a
+        # race, whatever session its door asked for (`agent.session_kind_of`)
+        self.race = False
 
     # -- stationing ------------------------------------------------------------------
 
@@ -390,8 +393,7 @@ class Desk:
             )
         if door not in DOORS:
             raise DeskError(400, f"There is no door '{door}'; the doors: {', '.join(DOORS)}.")
-        kind = str(body.get("session_kind") or "play").lower()
-        session = SESSION_TEST if kind == "test" else SESSION_PLAY
+        asked_kind = str(body.get("session_kind") or "play").lower()
         ship = " ".join(str(body.get("ship") or "").split())
         with self.lock:
             world = self.world()
@@ -412,6 +414,11 @@ class Desk:
                     f"There is no station '{name}' aboard; the stations: "
                     f"{', '.join(stations_aboard(world))}.",
                 )
+            # the kind of session the station is told, from what is true of it (package
+            # 42b): a race at the regatta; a captain, of this ship or another, has no human
+            # captain at its prompt
+            station_kind = next((k for k, f in STATION_FACTORIES.items() if f is make), name)
+            session = session_kind_of(asked_kind, station_kind, race=self.race)
             key_name = seat_key(name, ship)
             seat = self.seats.get(key_name)
             if seat is not None and seat.world is not None and seat.world is not world:

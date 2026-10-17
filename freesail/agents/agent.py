@@ -73,6 +73,7 @@ __all__ = [
     "STATION_FACTORIES",
     "captain",
     "cadence_policy",
+    "session_kind_of",
     "lookout",
     "master",
     "passenger",
@@ -98,6 +99,7 @@ __all__ = [
     "OFFICER_PATIENCE_S",
     "OPT_OUT_TOKEN",
     "SESSION_PLAY",
+    "SESSION_RACE",
     "SESSION_SOLO",
     "SESSION_TEST",
     "SHELF_LIFE_TURNS",
@@ -141,10 +143,17 @@ A_WATCH_S = R.INTERVALS["a watch"]
 BRIEF_LOG_LINES = 20
 
 # The kinds of session the disclosure names (`docs/agents/ConsentBrief.md`: some sessions
-# test a feature, some are play with a human captain, some are play for its own sake).
+# test a feature, some are play with a human captain, some are play for its own sake, and
+# some are a race). Which one a station is told is chosen from what is true of it
+# (`session_kind_of`; package 42b, the owner's ruling of 2026-10-17): the owner at the
+# door is not a human captain at the prompt of the ship a model commands.
 SESSION_TEST = "a test session, exercising a feature of the game with a scripted or live model"
 SESSION_PLAY = "a play session with a human captain at the prompt"
-SESSION_SOLO = "a play session for its own sake, with no human captain present"
+SESSION_SOLO = "a play session for its own sake, with no human captain over you"
+SESSION_RACE = (
+    "a race: a fixed course sailed and timed, its score set beside other agents' runs of "
+    "it, with no human captain over you"
+)
 
 # The stations the order grammar knows by name (`ask the watcher ...`), whether or not one
 # is manned; the later ones are milestones 6 and 7b's.
@@ -1608,6 +1617,23 @@ def passenger(
         drill=False,
         outline=station_outline(world, PASSENGER),
     )
+
+
+def session_kind_of(asked: str, station_kind: str, *, race: bool = False) -> str:
+    """The kind of session a station is told it is in, from what is true of it (package
+    42b; the owner's ruling of 2026-10-17): a race at the regatta, whatever the door was
+    asked; a test when the door asks one; at the captain's station, of the player's ship or
+    another, and so at a seat the director's hook made, play for its own sake, since the
+    one who commands is the model and the owner at the door is no captain at its prompt;
+    else play with the human captain at the prompt. `asked` is the door's word (`play`,
+    `test`); `station_kind` the station's kind (`CAPTAIN`, `OFFICER`, ...)."""
+    if race:
+        return SESSION_RACE
+    if str(asked or "").strip().lower() == "test":
+        return SESSION_TEST
+    if station_kind == CAPTAIN:
+        return SESSION_SOLO
+    return SESSION_PLAY
 
 
 # The kinds of station, each by its factory `(policy, patience_s, world=...)`: what a

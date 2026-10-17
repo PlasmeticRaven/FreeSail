@@ -1117,6 +1117,42 @@ brief's digest is `d096d22a5842772f`, and the six sections' digests are pinned
 (`WATCHED_SECTION_DIGESTS`). 1,958 words below the rule against 1,371 (the draft, 1,708).
 No model was seated and no re-ask run.
 
+**As built (package 42b, 2026-10-17; decision 48).** Revised once more for 6c, when what
+42a described as to come had been built and the owner found the brief saying otherwise
+(his note 17 of gate m6a-2): the package drafted the revision first
+(`docs/playtests/drafts/consent-brief-6c-draft.md`, fifteen numbered changes, four of
+them beyond its brief), and the owner approved all fifteen as drafted, with the race named
+among the kinds of session. *The opening* names a passenger, and the director as one who
+may seat models at the stations of the world's ships under the owner's grant; the stale
+sentence reads "All of these exist today but the director, who is to come and is
+described now so that an answer covers it." *What an instance would see and do* names
+the race among the kinds of session; the pictures of the chart and the ship where the
+door carries them, a picture put back only by the instance's own hand with its note, and
+a book of the library that goes back by itself; the owner's orders to the world while
+instances play, of which an instance meets only what they bring about; a captain of
+another ship with her own company, log and reckoning, who sees the player's ship as the
+player sees hers and has the whole of her again when she comes near (§20); a model seated
+as a ship's captain for a budget under the owner's grant, by the owner or later the
+director and never on a model's own authority, only on its own yes (§23); and the race,
+its log and times kept under the model's kind, which asks no question of its own (§21).
+*Being stopped* says a station held for a budget or a race is stood down, with the reason,
+when the budget is spent or the race is over; *The journal* that it is the person's,
+carried with him to any station he holds, or the station's own where it is bound to
+nobody (package 45c); *What is not done* that the reasoning a server returns apart from
+the reply is kept with a door's exchanges where the developer has them kept. *Leaving*,
+*The record* and *Answering* are unchanged. Against the brief of 2026-10-09 (kept as
+`tests/fixtures/ConsentBrief-before-42b.md`, `-text`) the rule names five watched
+sections for a yes given against it; a yes given before 42a is still asked with all six.
+The brief's digest is `ccbc1ebdf1a42c3e`, the six sections re-pinned. 2,259 words below
+the rule (2,295 as sent at the runner's door; the bound in `tests/test_officer.py` moved
+from 2,000 to 2,300). **The session's kind told true** (the owner's ruling of the same
+day): `agent.session_kind_of` chooses it from the station, so that a model at the
+captain's station, of the player's ship or another and so at a seat the director's hook
+made, is told "a play session for its own sake, with no human captain over you", never
+that a human captain is at the prompt; the regatta's desk (`remote.Desk.race`) and its
+scripted captain tell every station it is in a race; a door's `test` is a test. No model
+was seated and no re-ask run.
+
 ### 16. Truths for 6b (behavioural)
 
 82. Two fake stations on one ship through two in-process doors, captain and officer, play
