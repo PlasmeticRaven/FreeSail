@@ -230,3 +230,16 @@ allocation of models to stations in the harbour's settings (59) and the gate's s
   of intent and no call gets, in the next sample, "you said you would set the lugs; nothing
   was ordered". For 58 or the harness's own notes.
 
+## Time, and being cut off (the owner and the lead, 2026-10-17)
+
+The owner: playing without lockstep is "the closest you'll get to experiencing time", since
+the ship sails on while the model thinks and the next sample brings what it missed; a true
+time sim would stream every tick's lines to the model mid-thought, but that is probably
+wasteful and overwhelming. The lead: nothing reaches an API model mid-reply, but the thing
+wanted is the interruption, not the stream, and the local runner could have it cheaply: a
+reply generated as a stream is stopped when an urgent line arrives, the half-reply dropped
+and the model asked again with the line at the top, as a shout from the deck cuts an
+officer off. A few lines in the runner, nothing in the game; the API doors keep the wake at
+the boundary as now. Every tick's lines would be the opposite of time: the log already does
+the editing a mind does. A thought for the local runner, not a package.
+
