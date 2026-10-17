@@ -1956,3 +1956,25 @@ with the others; its seam with `portugal` is its only neighbour.
   1810s and after, the four-sided staysails gave way to triangles as the stays were set up
   lower and the sails cut narrower (Lever's and Luce's plates), so a frigate of 1805 sits
   at the change: the brief says which shape each sail takes with Steel's page beside it.
+
+### The notes of 2026-10-17, read (the lead)
+
+| Note | The read | Where |
+|---|---|---|
+| 1, the gale trial aground on Molène: a bearing taken while standing out triggered a tack back toward the islands; aground on a steady tack with land in sight | Two faults of the captain's: the account's doubt, not the account, drives "the offing" (the uncertainty was not trusted within two miles on the heading she grounded on), and a bearing that moves the account re-fires the tack; and the far-detail guard against land ahead did not fire within the visibility. | M7b, package 58 |
+| 2, the lee-shore trial: aback often, the fore topmast staysail blown out and never shifted, the trim not often enough; the offing kept when the shore was near | `bend a new jib` exists since 45c but the book did not call for the staysail; the trim's cadence under the beating book; the aback count the gale's known residue. | 58 |
+| 3, the standard book should take bearings or a fix when the doubt is wide and a mark is in sight | Right, and simple: a book line "when the reckoning's doubt is over two miles and a mark is in sight then take a bearing of it", the lessons' forms. | 58 (the book), the primer |
+| 4, the merchant passage aground coming to anchor at Bertheaume without the pilot's conn; the book's course close to the ground | 43b moved the road onto its twelve fathoms and the pilot's conn is the sound entry (note 6); the book's own track into the road is pricked close: re-prick it as the Goulet's was. | 58 |
+| 5, a sighting should say the other ship's heading relative to ours, as the period said it | "Standing to the south-west", "on the larboard tack standing towards us", "with the wind abaft the beam": the lookout's words for a sail made out, by her aspect and her course. | 56 (the glass on a near ship) |
+| 6, Brest with the pilot given the conn, smooth on the ebb, business done | The gate's item 5 passed. | — |
+| 7, the chase: more sail could have been set | The lead's take: yes. The period's chase made every sail the weather allowed (studding sails, royals) and the King's ship's doctrine should carry it ("in a chase, make all sail the wind and the sea allow, the book's weather lines still over it"); a model captain does it by instinct, the rules must be told. | 58 |
+| 8, 9, the station: the Palinure seen pulls her south and the station is missed; "wear at the hour" fires while she is making for the station and keeps her to the south-west | The station's regain is a leg the wearing order should not cut: the book's "wear at the hour" only within the station's radius (it says so, but the distance read was wrong or the leg was inside it), and a stranger seen does not change the course until the doctrine says investigate. | 58 |
+| 10, the cruise met the cutter and spoke the brig | The gate's item 8 passed in part (the cruise). | — |
+
+**Package 58 (M7b, Opus): the captain's sea sense, third pass**, from these notes and the
+open items of 43b and 44: the offing by the account not its doubt, a bearing not re-firing
+the tack, the guard against land ahead within the visibility; the book taking a bearing
+when the doubt is wide and a mark is in sight; the headsail shifted when blown out; the
+trim's cadence under the beating book; the merchant book's track into Bertheaume's road
+re-pricked; all sail in a chase; the station's regain against the wearing order; the lay
+line and the sea-route mark passed; Roscoff's and St Mary's tracks for far detail.

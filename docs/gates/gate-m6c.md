@@ -1,6 +1,6 @@
 # Gate M6c: Other ships with captains, the regatta, and the fixes of m6a-2 (the milestone's last)
 
-**Verdict:** open. The build `m6c`, cut 2026-10-17 at package 42b's merge, the milestone's last
+**Verdict:** run in part (the owner, 2026-10-17: `docs/playtests/2026-10-17-gate-m6c-owner-runs/`; items 1 to 3, 5 and 8 run, the rest deferred to the director's milestone's gate by decision 50, the director's station brought forward). The build `m6c`, cut 2026-10-17 at package 42b's merge, the milestone's last
 (branch `gates/m6c`, tag `gate-m6c`, the release's zip), after packages 45 and 45c (the
 fixes from the owner's runs of m6a), 43 (other ships with captains), 43b (the lugger and
 the smack, the world's business, the ports' faults), 44 (the regatta, the trims by a point

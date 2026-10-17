@@ -94,8 +94,14 @@ guardrail enforced on every one:
 
 Every order is journaled at its tick, replays, and is kept for the record only (decision
 46): the play log carries the effects (the sail sighted, the glass falling, the carpenter's
-report), never the order. An order that would not be a plausible cause is refused with the
-reason, and the refusal goes to the director's log, not the play log.
+report), never the order. **An order that would not be a plausible cause is doubted, not
+refused** (the owner, 2026-10-17, decision 50): the channel states the reason the act is
+doubted and says that if the director thinks the act still reasonable it may be entered
+again with a `[reason: ...]`, and it will be logged and performed; entered so, it is done,
+and the director's log keeps the act, the doubt and the reason together, which is the data
+by which the sets of reasonable acts are refined. Only the brief's hard limits (§4, the
+player's own) refuse outright. The doubt and the refusal both go to the director's log, not
+the play log.
 
 ### 4. The brief and its guardrails (`data/director/briefs/*.yaml`; `freesail/agents/director.py`)
 
@@ -360,9 +366,9 @@ seated above it. The lead's first play is at the director's station, as decision
 
 In waves, written for the owner's approval in turn, each launched on his word:
 
-- **50 (Fable): the director proper** (§2 to §7): the station, the channel's guardrails
-  and the brief's enforcement, the budget, the hidden log and its reveal, the replay view.
-  First, and design-heavy throughout.
+- **50 (Fable): the director proper** (§2 to §7): the station, the channel's doubt and the
+  brief's limits, the budget, the hidden log and its reveal, the replay view. **Brought
+  forward to the close of M6 by decision 50**, with 52 after it; design-heavy throughout.
 - **53 (Opus): people in places** (§14, §16, §17) beside 50: movement and places, the
   books drafted, the papers in their place, the equal reach and several of a kind; the
   journal keyed to the person is in. No dependence on 50.
@@ -371,9 +377,10 @@ In waves, written for the owner's approval in turn, each launched on his word:
 - **51 (Fable): the observed world** (§11, §12) after 50: the followed ship in place of the
   given one across the World, the player on another ship, the replay of a station there.
   Cross-cutting and design-heavy.
-- **52 (Opus): the director's voice** (§8, §9) after 50 and 53: people from words, `say
-  as`, the asked unseated person answered by the director; the word heard counting as a
-  word on deck (§15).
+- **52 (Opus): the director's voice** (§8, §9) after 50, brought forward with it: people
+  from words, `say as`, the asked unseated person answered by the director; the word heard
+  counting as a word on deck (§15); and a station below the captain's told the truth of who
+  commands (42b's leftover).
 - **56 (Opus): fishing, and the glass on a near ship** (§21a, §21b), beside 51 and 52: the
   grounds researched, the gear's evolutions, the catch and the well, the fisherman's parity,
   the glass's tiers.
@@ -384,11 +391,18 @@ In waves, written for the owner's approval in turn, each launched on his word:
   triangular, each with Steel's page beside it), the orders and the heavy-weather book
   reading them, the ship file regenerated, the pins it moves re-measured once; the brig's
   set checked against Steel's for a brig (the owner's finding at gate 6c, 2026-10-17).
-- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56 and 57: the starter
+- **58 (Opus): the captain's sea sense, third pass**, from the owner's runs of gate 6c
+  (`docs/dev/M6-WorkPackages.md`, "The notes of 2026-10-17, read"): the offing by the
+  account not its doubt, the guard against land ahead within the visibility, the book
+  taking a bearing when the doubt is wide, the headsail shifted, the trim's cadence, the
+  merchant book's track into Bertheaume's road, all sail in a chase, the station's regain
+  against the wearing order, the lay line and the sea-route mark, Roscoff's and St Mary's
+  tracks. Beside 53 and 54.
+- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57 and 58: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
 
-Gate 7b after 55.
+Gate 7b after 55, carrying gate 6c's untested items (decision 50).
 
 ## 25. What this milestone does not do
 
