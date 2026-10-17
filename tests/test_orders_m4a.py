@@ -119,7 +119,7 @@ TRIM_TABLE: list[tuple[str, ok | no]] = [
     ),
     ("tend sheets", ok(sheets=["mizzen.spanker", "fore.topmast_staysail", "jib"])),
     ("trim the sheets", ok(sheets=["mizzen.spanker", "fore.topmast_staysail", "jib"])),
-    ("trim the fore royal", no(["The fore royal is furled; there is no sail to trim."])),
+    ("trim the fore royal", no(["The fore royal is sent down; there is no sail to trim."])),
     ("trim the main mast", no(["The main mast is not a yard; trim a sail or a yard."])),
     ("trim the fore topsail sheet", no(["Which fore topsail sheet"])),
     ("trim the weather main brace", no(["is not a sail; trim a sail or a yard."])),

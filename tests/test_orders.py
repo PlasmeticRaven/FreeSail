@@ -96,7 +96,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, "make sail on the main topgallant", ok(evo="set_square", subjects=["main.topgallant"])),
     (F, "set the main t'gallant", ok(evo="set_square", subjects=["main.topgallant"])),
     (F, "set the main topgallant sail", ok(evo="set_square", subjects=["main.topgallant"])),
-    (F, "set the fore royal", ok(evo="set_square", subjects=["fore.royal"])),
+    (F, "set the fore royal", ok(evo="set_flying", subjects=["fore.royal"])),  # package 57
     (F, "set the foresail", ok(evo="set_square", subjects=["fore.course"])),
     (F, "set the fore course", ok(evo="set_square", subjects=["fore.course"])),
     (F, "set the mainsail", ok(evo="set_square", subjects=["main.course"])),
@@ -119,16 +119,16 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (
         F,
         "set the royals",
-        ok(evo="set_square", subjects={"fore.royal", "main.royal", "mizzen.royal"}),
+        ok(evo="set_flying", subjects={"fore.royal", "main.royal", "mizzen.royal"}),
     ),
     (F, "set the t'gallants", ok(evo="set_square", count=3)),
     (F, "set the courses", ok(evo="set_square", subjects={"fore.course", "main.course"})),
     (F, "set the headsails", ok(evo="set_jibheaded", count=3)),
-    (F, "set the square sails", ok(evo="set_square", count=11)),
-    (F, "set the fore-and-aft sails", ok(count=5)),
+    (F, "set the square sails", ok(count=11)),  # the royals set flying (package 57)
+    (F, "set the fore-and-aft sails", ok(count=11)),  # Steel's staysails (package 57)
     (F, "set plain sail", ok(count=11, text=["Set plain sail"])),
     (F, "set the plain sail", ok(count=11)),
-    (F, "make all sail", ok(count=26, text=["Make all sail"])),
+    (F, "make all sail", ok(count=32, text=["Make all sail"])),  # package 57: +6 staysails
     # -- studding sails and sides ------------------------------------------------
     (F, "set studdingsails, both sides", ok(evo="set_studding", count=10)),
     (F, "set the stuns'ls both sides", ok(evo="set_studding", count=10)),
@@ -197,9 +197,9 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (F, "brace the mizzen gaff sharp up", no(["gaff, not a yard"])),
     (F, "brace the spanker square", no(["gaff sail", "no yard to brace"])),
     (F, "furl the spanker", no(["gaff sail is not furled", "take it in"])),
-    (F, "reef the fore royal", no(["no reef bands"])),
+    (F, "reef the fore royal", no(["set flying", "never reefed"])),  # package 57
     (F, "shake out the reef in the fore topsail", no(["no reef in the fore topsail"])),
-    (F, "take in the royals", no(["Nothing done", "already furled"])),
+    (F, "take in the royals", no(["Nothing done", "already sent down"])),  # package 57
     (F, "clew up the main course", no(["already furled"])),
     (F, "set the fore topsail sharp up", no(["'sharp up' belongs with 'brace'"])),
     (F, "haul the main brace, weather, two reefs", no(["reefs belongs with"])),
@@ -719,7 +719,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     # -- package 32b: the brig Harpy, the frigate less a mast --------------------------
     (B, "set the fore topsail", ok(evo="set_square", subjects=["fore.topsail"])),
     (B, "set the topsails", ok(evo="set_square", subjects=["fore.topsail", "main.topsail"])),
-    (B, "set the royals", ok(evo="set_square", subjects={"fore.royal", "main.royal"})),
+    (B, "set the royals", ok(evo="set_flying", subjects={"fore.royal", "main.royal"})),
     (B, "set the courses", ok(evo="set_square", count=2)),
     (B, "set the mainsail", ok(evo="set_square", subjects=["main.course"])),
     (B, "set the spanker", ok(evo="set_gaff", subjects=["main.spanker"])),
@@ -727,12 +727,12 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (B, "set the boom mainsail", ok(evo="set_gaff", subjects=["main.spanker"])),
     (B, "set the jib", ok(evo="set_jibheaded", subjects=["jib"])),
     (B, "set the flying jib", ok(evo="set_jibheaded", subjects=["flying_jib"])),
-    (B, "set the middle staysail", ok(evo="set_jibheaded", subjects=["main.topmast_staysail"])),
+    (B, "set the middle staysail", ok(evo="set_jibheaded", subjects=["main.middle_staysail"])),
     (B, "set the headsails", ok(evo="set_jibheaded", count=3)),
-    (B, "set the staysails", ok(evo="set_jibheaded", count=4)),
-    (B, "set the square sails", ok(evo="set_square", count=8)),
+    (B, "set the staysails", ok(evo="set_jibheaded", count=5)),  # Steel's middle staysail
+    (B, "set the square sails", ok(count=8)),  # the royals set flying (package 57)
     (B, "set plain sail", ok(count=9)),
-    (B, "make all sail", ok(count=25)),
+    (B, "make all sail", ok(count=26)),  # package 57: Steel's middle staysail
     (B, "set the studdingsails, both sides", ok(evo="set_studding", count=10)),
     (B, "set the stuns'ls, starboard", ok(evo="set_studding", count=5)),
     (B, "set the main topmast studdingsail", no(["Which main topmast studdingsail"])),
@@ -1456,7 +1456,7 @@ def test_shorten_sail_on_a_ship_under_all_sail():
     _, log, _ = orders.handle(ship, "shorten sail")
     evos = {(e, s) for e, s, _ in runner.started}
     assert ("take_in_studding", "fore.topmast.studdingsail.starboard") in evos
-    assert ("take_in_square", "main.royal") in evos
+    assert ("take_in_flying", "main.royal") in evos
     assert ("take_in_jibheaded", "flying_jib") in evos
     assert ("take_in_square", "mizzen.topgallant") in evos
     assert ("reef_square", "main.topsail") in evos

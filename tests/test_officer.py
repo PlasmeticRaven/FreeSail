@@ -869,14 +869,16 @@ def test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_co
         return reply("", call("readings"))
 
     h, fake, _ = seated(world, [answer_the_ask], loop=True)
-    h.budget_tokens = 16384
-    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 16384
+    # package 57: the frigate's eight new sails in the readings and the brief made the
+    # conversation at the seat 9,978 tokens (under 9,830 before): the budget a thousand more
+    h.budget_tokens = 17408
+    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 17408
     while h.revision == 0:
         world.run(EVERY)  # the ask rides a sample; the fake answers it; the fold ends the turn
         assert world.clock.tick < 20 * EVERY, "the ask never came"
     ask = next(n for d in data_turns(fake) for n in d.get("notices") or [] if "handover note" in n)
     assert ask.startswith("Your conversation since the brief has reached about ")
-    assert "of the 16,384 tokens this door gives you" in ask
+    assert "of the 17,408 tokens this door gives you" in ask
     before = 0
     noted = [e for e in h.journal.entries if e.kind == "agent.handover"]
     assert len(noted) == 1 and noted[0].text == f"Handover note (the watch so far): {NOTE}"
@@ -3751,7 +3753,10 @@ def test_a_course_across_the_wind_under_the_grant_to_steer_puts_her_about():
     # going astern at three knots, and was judged to have way enough to stay; with the
     # keel's grip astern she falls off and fills and comes to again, and has not)
     world.submit("brace sharp up on the larboard tack")
-    world.submit("steer 70")
+    # package 57: steered a point freer than before (70), the windage of the staysails
+    # stowed on their stays between the masts having her luff and go aback at 70 while the
+    # sail was still being set
+    world.submit("steer 80")
     world.run(1500)
     seated(world, ["Aye."], when_done=Reply())
     world.submit("you may steer")

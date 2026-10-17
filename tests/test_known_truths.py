@@ -3149,8 +3149,10 @@ def test_truth_59_a_cast_of_the_deep_sea_lead_moves_the_reckoning_onto_the_conto
     # package 37j: the cast reduced by the master's tide above his chart's datum (a metre
     # and a tenth here), the contour matched within his doubt at another point of it,
     # where the bottom shelves less: a line of six miles (a mile and a half before), and
-    # the account moved five miles and a half (five) to the SSE (SE by S)
-    assert cast.text.endswith("The account moved five miles and a half to the SSE.")
+    # the account moved five miles and a half (five) to the SSE (SE by S); package 57: two
+    # leagues to the S by E (five miles and a half to the SSE), the frigate brought to for
+    # the cast under her new rig aloft (Steel's staysails stowed, the royals sent down)
+    assert cast.text.endswith("The account moved two leagues to the S by E.")
     assert 0.5 < cast.data["line_sigma_nm"] < 7.0
     # the lead reads the tide (package 34): the cast is laid on the chart less the master's
     # own allowance for it, by his almanac. Weighed, the account comes ninety-six parts in
