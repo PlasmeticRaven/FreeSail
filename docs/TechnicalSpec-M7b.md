@@ -579,7 +579,10 @@ order is carried out): the deck's orders (the vocabulary's sail, yards, line, he
 none, wreck, work and anchor objects, and the master's helm verbs `put her about`, `shape a
 course for`, `give chase`) from the quarterdeck or the deck alone, refused in words naming
 the way back ("You are in the cabin; go on deck to give the helm an order."; "You are ashore
-at Falmouth, on the quay; come aboard to make or take in sail."); the boat sent and a man sent
+at Falmouth, on the quay; come aboard to make or take in sail."), where he is being where he
+went by his own word (the reckoning's own taking of the master below to his sights is not his
+going below, and the schooner's master who is her captain gives his orders from there as
+before; a station bound to nobody named moves nobody); the boat sent and a man sent
 for from aboard alone; the market ashore in person at the market, else by the boat from
 aboard as always (`movement.market_way`; `Ports.trade_list(person=)`: the prices read at the
 market and the price list his, the purse paid at once, the purchase off by the port's lighter
