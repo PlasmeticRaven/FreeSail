@@ -307,8 +307,12 @@ hands at them and their hours; the catch into the hold or the well by the ground
 season, the hours and the weather, the well keeping fish alive for so long and the hold's
 salt or none (the spoilage); sold at a port that buys fish at its price. The far-detail
 fisherman given the same catch and the same spoilage, so a fishing smack of the business
-and the player's are one thing at two details. The smack and the lugger carry the gear
-their files say.
+and the player's are one thing at two details; **and the crewed promotion includes the
+fishermen** (the owner, 2026-10-17): a fishing vessel near the player is promoted like any
+other and fishes at full detail by the same evolutions under her rules-based captain, so
+that the glass on her shows the work truly and the promotion's rule has no exception to
+confuse (43b's "never crewed" is lifted; the cap's order unchanged). The smack and the lugger
+carry the gear their files say.
 
 ### 21b. The glass on a near ship (`freesail/world/lookout.py`, `ships.py`, `crews.py`)
 

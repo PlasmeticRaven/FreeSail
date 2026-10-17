@@ -95,3 +95,50 @@ the hands at them; a sea-keeping thread of its own beside the powder's milestone
   ground, the hands at it), a catch into the hold by the ground, the season and the hours,
   sold at a port that buys fish, and the far-detail fisherman given the same catch so the
   two bodies agree. The owner, 2026-10-17: an M7b package (56, `docs/TechnicalSpec-M7b.md` §21a), with the glass on a near ship (§21b).
+
+## Signalling, and how ships speak at any range (the owner's question of 2026-10-17; the lead's impression)
+
+The owner: for any ship the basic lights and the bell for night and fog; the private signals
+of at least Britain and France where period sources give them; hailing at close range built
+with basic function for no model while free when a model holds either or both roles; the
+different cases considered before building, and how many covered without a model on the
+actor's or the director's side. The lead's impression, for the specification of M7:
+
+- **Channels by medium and range, each a thing the ship models:** the **hail** by the
+  speaking trumpet within hail (the existing four cables), words; the **colours** (shown,
+  struck, false: M7's); the **private signal**, the recognition challenge and its reply, by
+  flags by day as far as flags are made out and by lights or false fires by night, a table
+  per nation changed by the month and carried as a paper; the **signal book**, a numerary
+  vocabulary of orders and news to a consort or a convoy by day (Popham's telegraphic
+  signals of 1803 and the Admiralty's signal book of 1799; the French *Signaux de jour et de
+  nuit* and du Pavillon's tables; the convoy instructions for merchantmen), a small set by
+  night (lights, false fires, rockets, guns) and in fog (guns, the bell, the drum or horn at
+  intervals); **the lights** carried by order (a stern lantern, top lights for a squadron
+  keeping station, the fishing boat's lantern on her nets, merchantmen often none) and the
+  **bell** at anchor in fog, as the custom and the Regulations have them (Falconer, Lever,
+  the Regulations and Instructions; the sources verified or marked).
+- **Three bodies for each channel, as the orders have:** the rules answer by tables (a
+  rules-based captain answers a hail with the standard exchange: what ship, whence, whither,
+  cargo, news, by her nation and her stance, a privateer under false colours lying; answers
+  the private signal rightly if her papers hold it and wrongly or not at all if not, which
+  is the tell; makes and answers the convoy's and the squadron's signals; fires the gun to
+  leeward and hoists the ensign union down in distress; keeps the fog signals and the
+  lights by the standing orders); a model speaks free words in a hail and chooses a signal
+  from the book's vocabulary by a tool; the player types the hail, `make the signal <number
+  or its meaning>`, `show the private signal`, `answer the private signal`, `hoist the
+  lights`, `ring the bell`. The director may put words in any unheld mouth (`say as`).
+- **Perception is the lookout's:** a signal is seen under the same visibility, range and
+  daylight as a sail, misread at the edge of range, "she makes a signal we cannot read"
+  without the book; the signal book and the month's private signals are papers in the
+  ship's library (a captured book is a thing of M7's prizes).
+- **Without a model**, the rules cover: the standard hail's half-dozen questions and their
+  answers; the challenge and reply; some thirty signals of the convoy and the squadron
+  (make sail, shorten sail, tack, wear, close round the commodore, enemy in sight bearing so,
+  chase, recall, anchor); distress; the fog signals and the lights by the book. A model is
+  wanted only for talk beyond the standard exchange, and the director only to shape it.
+- **The cases to consider before building:** rules to rules (two far-detail or crewed
+  captains meeting: the exchange written to the log once, the stances read); rules to the
+  player; player to a model; model to model; a convoy under a commodore with the player in
+  it or over it; a chase with false colours and the private signal unanswered; night and
+  fog with no flags; a signal made to a ship beyond hail and the time it takes to read and
+  answer; what the far body can do (make and answer by table) against the crewed one.
