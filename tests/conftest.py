@@ -60,6 +60,7 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
             "gate_6a_intent",  # package 40: the schooner on an intent alone, 36 hours
             "gate_6a_fake_captain",  # package 40: the merchant passage under the fake captain
             "directed_day",  # package 50: a day with the fake director, truths 7b-90 to 94
+            "voiced_watch",  # package 52: two hours of the director's voice, truths 7b-95 to 97
         }
     ),
     "test_captain_trials.py": frozenset(  # package 40c: the captain's trials, 16 hours each

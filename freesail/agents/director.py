@@ -48,8 +48,16 @@ is a driver's line for the record and which the director is told of in its next 
 shown beside the play log at each tick by `two_stories` (the console's `two stories`); the
 browser's pane for it is shut during play and opened by the same request.
 
-What is left for package 52 (the director's voice): `person:` making a person from words and
-`say as <person>`; `ask the <role>` of an unseated person waiting a sample for the director.
+**The director's voice** (spec M7b §8, §9; package 52). `person:` makes a person from words
+and moves him, `say as <person>: <his words>` speaks as a person nobody holds (the channel's,
+`freesail.world.orders`), and **the rule of reach** refuses outright, in words that name the
+stations held, an order that would speak as, move, or bind a station to a person a model or
+the player holds (`direct`, before the brief's limits). A question put to a person nobody
+holds (`ask the cook ...`, `ask Mr Fox ...`), with a director seated, waits for it
+(`ask_unheld`): the director is told in its next sample and may answer as him with `say
+as`, which costs none of the day's acts (`answer_questions`); the asker's stand-by wakes at
+the answer or, unanswered, after a glass (`QUESTION_BOUND_S`). With no director seated the
+rules answer as they did.
 """
 
 from __future__ import annotations
@@ -83,17 +91,22 @@ __all__ = [
     "FORCE_KNOTS",
     "KINDS",
     "NO_BRIEF_WORDS",
+    "QUESTION_BOUND_S",
     "REVEALED_KIND",
     "DayBudget",
     "DirectorBrief",
+    "answer_questions",
+    "ask_unheld",
     "brief_of",
     "budget_of",
     "direct",
     "director",
     "log_lines",
     "log_of",
+    "pending_for",
     "resolve_brief",
     "reveal",
+    "seated",
     "set_brief",
     "two_stories",
 ]
@@ -143,6 +156,10 @@ KINDS: dict[str, str] = {
     "director.budget": "the day's budget spent or renewed",
     "director.revealed": "the player asked for the log",
     "director.brief": "the brief given or changed",
+    "director.asked": (
+        "a question or a word put to a person nobody holds, for the director to answer as him "
+        "(package 52)"
+    ),
     "note": "a thought the director wrote (the journal tool, or its free text)",
 }
 
@@ -465,11 +482,17 @@ DIRECTOR_BRIEF = (
     "price ('port brest: closed to Britain', 'port falmouth: price of tin 130'), a point of "
     "interest ('mark: a wreck, her masts showing at 49 58 N 5 16 W'), a person named "
     '(\'person: supercargo "Mr Pentreath" aboard in the cabin\', \'person: agent "Mr Fox" '
-    "ashore at Brest'), and a model seated as the captain of another ship under the owner's "
+    "ashore at Brest'), a person made from words, moved, or bound to a station of the ship "
+    '(\'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest, who knew the '
+    "captain's father'; 'person: \"Mr Fox\" comes aboard as master'; 'person: \"Mr Fox\" "
+    "goes ashore'; 'person: \"Mr Fox\" leaves the ship at Falmouth'), words in the mouth of "
+    "a person nobody holds, heard where he is and journaled as his ('say as the cook: "
+    '"Pease and pork, sir."\'; \'say as Mr Fox: "I knew your father, sir."\'), and a model '
+    "seated as the captain of another ship under the owner's "
     "grant ('seat: <the model's exact name> as captain of <ship> for 20 samples', 'unseat: "
     "<ship>'). The library's grammar topic lists every form. An order beyond the examples "
-    "is to be attempted when you think it reasonable (news of a war or a peace, a person "
-    "made from words, a word put in a mouth, a thing of the sea the forms do not name): "
+    "is to be attempted when you think it reasonable (news of a war or a peace, a thing of "
+    "the sea the forms do not name): "
     "the game answers honestly when it has no way to do a thing as said, and asks you to "
     "say it another way or to enter it again with a [reason: ...], which logs it as "
     "attempted, so that the record says what is good, bad, useful or useless and what the "
@@ -486,7 +509,15 @@ DIRECTOR_BRIEF = (
     "result says why, and if you think the act still reasonable you may enter it again with "
     "a [reason: ...] at its end, and it will be logged and performed, the act, the doubt and "
     "your reason kept together. Only the player's own limits in his brief below refuse "
-    "outright, and the result says which.\n\n"
+    "outright, and the result says which; and the rule of reach, which is this: you speak "
+    "as anyone no model or player holds, never as a held station, whose words are its "
+    "holder's own, and you move nobody held and bind nobody to a held station; such an "
+    "order is refused, and the result names the stations held.\n\n"
+    "A question put to a person nobody holds (the cook, the carpenter, a person you made) "
+    "comes to you in your next sample, with whom it was put by and until when it waits: "
+    "answer it as him with 'say as <him>: <his words>' if you will, which costs none of "
+    "the day's acts; unanswered within a glass, no answer comes, and the asker is told "
+    "so. A word told him comes to you the same, and wants no answer.\n\n"
     "Nothing you do is shown as done: the play log the player and the stations read carries "
     "only the effects as they are met (the sail sighted, the glass falling, the carpenter's "
     "report), never the order. Your words are not a line of the log either: what you write "
@@ -821,7 +852,11 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         # no form the game has (the owner's refinement of 2026-10-17): answered honestly,
         # never as "not allowed"; entered again with a reason, logged as attempted
         return _no_way(world, bare, reason, str(e), by)
-    if b.acts >= acts_allowed:
+    # an answer to a question put to a person nobody holds costs no act (package 52)
+    free = order.channel == "say" and pending_for(
+        world, getattr(world_orders.say_as_person(world, order.text), "name", "")
+    )
+    if b.acts >= acts_allowed and not free:
         words = (
             f"The day's budget of {acts_allowed} acts is spent: nothing more is performed "
             "until the next day of the ship's time. The order was not given."
@@ -830,6 +865,21 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         if b.held_until is None:
             _hold(world, f"The day's budget of {acts_allowed} acts is spent")
         return words
+    reach_why = world_orders.reach(world, order)
+    if reach_why:
+        # the rule of reach (spec M7b §9; package 52): a refusal in words, the stations held
+        # named, so that the director knows whom it may speak as
+        log.append(
+            world,
+            f"Refused by the rule of reach: {order.text} ({reach_why})",
+            kind="director.refused",
+            by=by,
+        )
+        return (
+            f"Refused, by the rule of reach: {reach_why}. The director speaks as, moves and "
+            "binds nobody a model or the player holds; the stations held now: "
+            f"{world_orders.held_words(world)}."
+        )
     if brief is not None:
         why = brief.limit_of(world, order)
         if why:
@@ -861,7 +911,8 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
     if result != "done":
         why = done.removeprefix("not carried out: ")
         return _no_way(world, order.text, order.reason, why, by)
-    b.acts += 1
+    if not free:
+        b.acts += 1
     if order.reason:
         log.append(
             world,
@@ -873,11 +924,185 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
     else:
         log.append(world, f"Given: {order.text}; {done}", kind="director.order", by=by)
     tail = ""
-    if b.acts >= acts_allowed:
+    if b.acts >= acts_allowed and not free:
         tail = " " + _hold(world, f"The day's budget of {acts_allowed} acts is spent")
     left = acts_allowed - b.acts
+    cost = "an answer, counted against nothing; " if free else ""
     return (
         f"Done: {done} The play log will carry its effects as they are met, never the "
-        f"order. ({left} {'act' if left == 1 else 'acts'} of the day's {acts_allowed} left.)"
-        f"{tail}"
+        f"order. ({cost}{left} {'act' if left == 1 else 'acts'} of the day's {acts_allowed} "
+        f"left.){tail}"
     )
+
+
+# ---------------------------------------------------------------------------
+# The voice: questions put to a person nobody holds (spec M7b §9; package 52)
+# ---------------------------------------------------------------------------
+
+# A question put to a person nobody holds waits this long for the director's answer (spec
+# M7b §9: the asker's stand-by wakes at the answer or after a glass; the harness's
+# `PERSON_ANSWER_BOUND_S` is the same glass).
+QUESTION_BOUND_S = A_GLASS_S
+
+
+def seated(world: Any) -> Any:
+    """The director's station held now (a model's harness or the player's seat), or None."""
+    from freesail.agents.harness import holder_of
+
+    return holder_of(world, DIRECTOR)
+
+
+def questions_of(world: Any) -> list[dict[str, Any]]:
+    """The questions put to people nobody holds that wait for the director's answer, kept on
+    the World (a checkpoint from before has none)."""
+    found = getattr(world, "unheld_questions", None)
+    if found is None:
+        found = []
+        try:
+            world.unheld_questions = found
+        except AttributeError:
+            pass
+    return found
+
+
+def pending_for(world: Any, name: str) -> bool:
+    """Whether a question put to the person of that name waits for an answer now."""
+    now = world.clock.tick
+    return bool(name) and any(
+        q["person"] == name and now - int(q["tick"]) <= QUESTION_BOUND_S
+        for q in questions_of(world)
+    )
+
+
+def _person_where(world: Any, person: Any) -> str:
+    from freesail.world.places import place_words
+
+    if person.aboard:
+        return place_words(world.people.effective_place(person))
+    ports = getattr(world, "ports", None)
+    port = ports.ports.get(person.port) if (ports is not None and person.port) else None
+    return f"ashore at {port.name}" if port is not None else place_words(person.where)
+
+
+def _who(person: Any) -> str:
+    role = person.role
+    if not role or role in ("captain", "commander") or role.lower() in person.name.lower():
+        return person.name
+    return f"{person.name}, the {role}"
+
+
+def _tell_director(world: Any, text: str) -> None:
+    """Words for the director's next sample (a word, which wakes a stand-by), or for the
+    player at its seat, with what he was told."""
+    held = seated(world)
+    if held is None:
+        return
+    a = held.agent
+    if hasattr(held, "_poll"):
+        a.word = f"{a.word}\n{text}" if a.word else text
+    else:
+        a.told.append(text)
+
+
+def ask_unheld(
+    world: Any,
+    person: Any,
+    words: str,
+    verb: str = "ask",
+    speaker: dict[str, str] | None = None,
+    journal: bool = True,
+) -> tuple[str, str, dict[str, Any]]:
+    """`ask` or `tell` put to a person nobody holds while a director is seated (spec M7b
+    §9; package 52): the line for the log, said where it was said; the director told in its
+    next sample, in the director's log (`director.asked`), and the person's journal; a
+    question kept for the director's answer for `QUESTION_BOUND_S`, and the asking station
+    told the answer when it comes (`answer_questions`) or, without one, after a glass
+    (`Harness._tick_asked`). Returns (kind, text, data) as the station sentences do."""
+    from freesail.agents.agent import CAPTAIN, place_of
+    from freesail.agents.harness import PERSON_ASKED, holder_of
+    from freesail.agents.journal import HEARD_KIND, person_journal
+    from freesail.world.places import place_words
+
+    words = " ".join(str(words).split())
+    asker = speaker["words"] if speaker else "the captain"
+    asker_at = speaker["place"] if speaker else place_words(place_of(world, CAPTAIN))
+    who, where = _who(person), _person_where(world, person)
+    head = asker[:1].upper() + asker[1:]
+    data: dict[str, Any] = {"person": person.name, "unheld": True}
+    if speaker is not None:
+        data["speaker"] = speaker["station"]
+    tick = world.clock.tick
+    if verb == "ask":
+        question = words.rstrip("?")
+        if not question:
+            raise ValueError(f"Ask {who} what? Say the question after his name.")
+        questions_of(world).append(
+            {
+                "tick": tick,
+                "person": person.name,
+                "question": question,
+                "asker": speaker["station"] if speaker else "",
+            }
+        )
+        if speaker is not None:
+            asking = holder_of(world, speaker["station"])
+            if asking is not None:
+                if getattr(asking.agent, "asked", None) is None:
+                    asking.agent.asked = []
+                asking.agent.asked.append((PERSON_ASKED + person.name, question, tick))
+        until = (world.clock.ship_time + timedelta(seconds=QUESTION_BOUND_S)).strftime("%H:%M")
+        _tell_director(
+            world,
+            f"{head}, {asker_at}, asks {who}, {where}, whom nobody holds: {question}? He is "
+            f"yours to answer in his own words if you will, with world_order('say as "
+            f"{person.name}: <his words>') before {until}; an answer to a question costs none "
+            "of the day's acts. Unanswered within a glass, no answer comes, and the asker is "
+            "told so.",
+        )
+        person_journal(world, person).append(world, f"Asked by {asker}: {question}?", HEARD_KIND)
+        log_of(world).append(
+            world, f"Asked of {who} ({where}) by {asker}: {question}?", kind="director.asked"
+        )
+        data["question"] = question
+        return "agent.asked", f"{head}, {asker_at}, asks {who} ({where}): {question}?", data
+    if not words:
+        raise ValueError(f"Tell {who} what? Say the words after his name.")
+    _tell_director(
+        world,
+        f"{head}, {asker_at}, to {who}, {where}, whom nobody holds: {words}. No answer is "
+        f"owed; you may answer as him with world_order('say as {person.name}: <his words>').",
+    )
+    if journal:  # a word to an unheld station is kept in its journal already (37l)
+        person_journal(world, person).append(world, f"Told by {asker}: {words}", HEARD_KIND)
+    log_of(world).append(world, f"Told {who} ({where}) by {asker}: {words}", kind="director.asked")
+    data["words"] = words
+    return "agent.told", f"{head}, {asker_at}, to {who} ({where}): {words}", data
+
+
+def answer_questions(world: Any, person: Any, words: str, where: str) -> int:
+    """A person nobody holds has spoken (`say as`): every question put to him that waits
+    is answered by his words, the asking station told (`harness.deliver_answer`, which ends
+    its wait and wakes its stand-by); the questions lapsed past the bound are let go.
+    Returns how many were answered."""
+    from freesail.agents.harness import PERSON_ASKED, deliver_answer
+
+    now = world.clock.tick
+    answered, kept = 0, []
+    for q in questions_of(world):
+        if now - int(q["tick"]) > QUESTION_BOUND_S:
+            continue  # lapsed: the asker was told after a glass
+        if q["person"] != person.name:
+            kept.append(q)
+            continue
+        answered += 1
+        if q["asker"]:
+            deliver_answer(
+                world,
+                str(q["asker"]),
+                PERSON_ASKED + person.name,
+                f"{_who(person)}, {where},",
+                str(q["question"]),
+                words,
+            )
+    world.unheld_questions = kept
+    return answered

@@ -277,3 +277,80 @@ def test_the_pilot_is_a_person_aboard_of_his_port_and_waits_for_his_boat():
         w.readings.words("people")
     )
     assert w.people.where_is("the pilot")["state"] == "at the gangway, waiting for his boat"
+
+
+# ---------------------------------------------------------------------------
+# Package 52 (spec M7b §8, §9): people made from words, the company's people by trade, the
+# galley and earshot
+# ---------------------------------------------------------------------------
+
+
+def test_a_person_made_from_words_has_his_outline_from_them():
+    """`person: make "<name>", ...`: who he is, his age, where he is and his history from
+    the words in any order, kept as his outline; a role or none; among the people from
+    then on, by his name and by his role."""
+    w = world_for(ports=["falmouth", "brest"])
+    for text in (
+        'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest, who knew the '
+        "captain's father",
+        'person: make "Mrs Tregarthen", aboard in the cabin, a widow, aged forty, going home',
+        'person: make "Jenkins", in the gunroom',
+        'person: make "Mr Gill", a merchant of Brest, 45 years old',
+    ):
+        e = w.world_order(text, "the test")
+        assert e.data["result"] == "done", e.text
+    fox = w.people.find("Mr Fox")
+    assert fox.role == "pilot" and not fox.aboard and fox.port == "brest"
+    assert fox.outline.age == 60 and fox.outline.rank == "Guernsey pilot"
+    assert fox.outline_words() == (
+        "Mr Fox, Guernsey pilot, sixty years of age, who knew the captain's father."
+    )
+    widow = w.people.find("Mrs Tregarthen")
+    assert widow.aboard and widow.where == "cabin" and widow.outline.age == 40
+    assert widow.outline.history == "going home" and w.people.find("the widow") is widow
+    jenkins = w.people.find("Jenkins")
+    assert jenkins.role == "" and jenkins.where == "gunroom"
+    gill = w.people.find("Mr Gill")
+    assert gill.role == "merchant" and gill.outline.rank == "merchant of Brest"
+    assert gill.outline.age == 45 and gill.aboard and gill.where == "cabin"
+    said = " ".join(w.people.describe())
+    assert "Mr Fox, pilot of Brest: ashore." in said and "Jenkins: in the gunroom." in said
+    # refused in words: a name taken, a place that is none, a port that is none
+    for text, words in (
+        ('person: make "Mr Fox", a cooper', "among the people already"),
+        ('person: make "Mr Hale", aboard in the crow\'s nest', "no place aboard"),
+        ('person: make "Mr Hale", ashore at Atlantis', "no port of the world"),
+    ):
+        e = w.world_order(text, "the test")
+        assert e.data["result"] == "refused" and words in e.text, e.text
+
+
+def test_a_man_of_the_muster_by_his_trade_is_drawn_only_when_the_voice_reaches_him():
+    """The cook is an idler of the muster, not one of the named few: nobody finds him and
+    `the people` does not list him until the director's voice reaches for him
+    (`of_the_company`), when he is drawn under his own name at the galley, and is the
+    same man after."""
+    w = world_for()
+    before = w.people.describe()
+    assert w.people.find("the cook") is None
+    look = w.people.of_the_company("the cook", draw=False)
+    assert look is not None and look.where == "galley" and w.people.find("the cook") is None
+    assert w.people.describe() == before  # a look draws nobody
+    cook = w.people.of_the_company("the cook")
+    sailor = w.ship.extra["crew"].by_id[cook.sailor_id]
+    assert sailor.trade == "cook" and cook.name.endswith(sailor.name.split()[-1])
+    assert w.people.find("the cook") is cook and w.people.of_the_company("cook") is cook
+    assert w.people.describe()[-1] == f"{cook.name}, cook: in the galley."
+    assert w.people.of_the_company("the cooper").where == "hold"
+    assert w.people.of_the_company("the ship's astrologer") is None
+
+
+def test_the_galley_is_a_place_and_the_open_deck_is_within_earshot():
+    from freesail.world import places as PL
+
+    assert PL.PLACES["galley"].name == "the galley" and not PL.PLACES["galley"].below
+    assert PL.place_words("galley") == "in the galley"
+    assert PL.earshot("galley") == PL.earshot("quarterdeck") == {"quarterdeck", "deck", "galley"}
+    assert PL.earshot("cabin") == {"cabin"} and PL.earshot("tops") == {"tops"}
+    w = world_for()
+    assert "the galley" in w.readings["places"]["words"]

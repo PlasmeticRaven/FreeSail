@@ -418,7 +418,8 @@ class Desk:
             # 42b): a race at the regatta; a captain, of this ship or another, has no human
             # captain at its prompt
             station_kind = next((k for k, f in STATION_FACTORIES.items() if f is make), name)
-            session = session_kind_of(asked_kind, station_kind, race=self.race)
+            # and a station below the captain's is told who commands (package 52)
+            session = session_kind_of(asked_kind, station_kind, race=self.race, world=world)
             key_name = seat_key(name, ship)
             seat = self.seats.get(key_name)
             if seat is not None and seat.world is not None and seat.world is not world:

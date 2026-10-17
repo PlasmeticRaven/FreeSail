@@ -1424,13 +1424,17 @@ TOOLS: dict[str, Tool] = {
             "world_order",
             "The director's hand (spec M7b §3): an order to the world, not to any ship, in "
             "the channel's words ('weather: ...', 'ship: ...', 'ship \"X\": intent ...', "
-            "'aboard: ...', 'message: ...', 'port <id>: ...', 'mark: ...', 'seat: ...', "
-            "'unseat: ...'; the library's grammar topic has every form). Checked first "
-            "against the player's brief (refused outside it, with the reason) and then by "
+            "'aboard: ...', 'message: ...', 'port <id>: ...', 'mark: ...', 'person: make "
+            "\"<name>\", ...', 'person: \"<name>\" comes aboard as <station>', 'say as "
+            "<person>: <his words>', 'seat: ...', 'unseat: ...'). Checked first against the "
+            "rule of reach (nobody a model or the player holds is spoken for, moved or bound; "
+            "refused, the stations held named), then against the player's brief (refused "
+            "outside it, with the reason) and then by "
             "the channel's doubt: an order the simulation could not have produced from where "
             "it is is not performed, and the result says why and that you may enter it again "
             "with a [reason: ...] at its end, which performs it and keeps the act, the doubt "
-            "and your reason together. Counted against the day's acts. Written in the "
+            "and your reason together. Counted against the day's acts (an answer as a "
+            "person to a question put to him, none). Written in the "
             "director's log, never the play log, which carries the effects alone.",
             {"text": "string: the world order, with '[reason: ...]' at its end when entered again"},
             world_order,

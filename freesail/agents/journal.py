@@ -33,6 +33,7 @@ __all__ = [
     "JournalEntry",
     "journal_of",
     "journal_seen",
+    "person_journal",
 ]
 
 # The kinds of entry that are the model's own words: the journal tool's notes, and the
@@ -45,6 +46,11 @@ OWN_KINDS: tuple[str, ...] = ("note", HANDOVER_KIND)
 # first sample, with a line that says they were passed.
 WORD_KEPT_KIND = "agent.word_kept"
 WORD_PASSED_KIND = "agent.word_passed"
+# A person nobody holds, spoken for by the director (package 52; spec M7b §9): his words,
+# journaled as his, and what was said to him or asked of him, in his own journal (the
+# person's, package 45c), which a model or the player bound to him later reads back.
+SAID_KIND = "person.said"
+HEARD_KIND = "person.heard"
 
 
 @dataclass(frozen=True)
@@ -108,6 +114,31 @@ def journal_of(world: Any, station: str) -> Journal:
             journal = Journal(station)
         by_person[who] = journal
     journals[station] = journal
+    return journal
+
+
+def person_journal(world: Any, person: Any) -> Journal:
+    """The journal of a person, whether or not he holds a station (package 52): his own,
+    kept by his name (`World.person_journals`), the same object `journal_of` gives the
+    station he is or will be bound to, so that what he said while nobody held him is in
+    the journal the next holder reads back."""
+    name = str(getattr(person, "name", person) or "")
+    by_person = getattr(world, "person_journals", None)
+    if by_person is None:  # a World from before package 45c (a checkpoint)
+        by_person = world.person_journals = {}
+    journal = by_person.get(name)
+    if journal is not None:
+        return journal
+    stations = getattr(world, "stations", None)
+    for station in stations.names() if stations is not None else ():
+        try:
+            holder = stations.holder(station)
+        except Exception:  # a people's build that cannot run binds nobody
+            holder = None
+        if holder is not None and holder.name == name:
+            return journal_of(world, station)  # his station's, now his by name
+    journal = Journal(name)
+    by_person[name] = journal
     return journal
 
 

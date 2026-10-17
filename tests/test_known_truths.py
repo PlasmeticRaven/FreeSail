@@ -5304,8 +5304,9 @@ DIRECTOR_EVERY = 1800  # the director and the captain sampled every glass, in lo
 # The fake director's day on the quiet passage: the channel's forms as examples (a sail
 # over the horizon, one inside it, a thing found aboard with and without its cause, a low
 # within the brief's force and one beyond it, a letter, a price, a mark, a mind changed),
-# and orders beyond the examples (news of a war, free words aboard, a word put in a mouth),
-# which the game answers honestly and logs as attempted when re-entered with a reason.
+# and orders beyond the examples (news of a war, free words aboard, words in the mouth of a
+# stranger never made: package 52 gave the voice to the people the world has), which the
+# game answers honestly and logs as attempted when re-entered with a reason.
 DIRECTED_DAY_ORDERS = [
     'ship: a merchant brig "Nancy" of Britain at 49 00 N 6 20 W, bound for Falmouth, '
     "intent: bound for Falmouth",
@@ -5320,7 +5321,7 @@ DIRECTED_DAY_ORDERS = [
     "port falmouth: price of tin 125",
     "mark: a wreck, her masts showing above the water at 49 10 N 6 00 W",
     'ship "Nancy": intent run home to Falmouth',
-    'say as the carpenter: "She is making a little water, sir."',
+    'say as the harbourmaster of Falmouth: "The packet is in."',
     'ship: a brig-sloop "Harpy" of France at 48 50 N 6 10 W, running home to Brest, no colours',
 ]
 
@@ -5472,7 +5473,7 @@ def test_truth_7b_92_the_log_is_empty_to_every_station_until_asked_and_then_show
     assert all("the doubt:" in e.text and "the reason:" in e.text for e in reentered)
     attempted = [e for e in director_mod.log_of(world).entries if e.kind == "director.attempted"]
     assert any("news: war declared" in e.text for e in attempted)
-    assert any("say as the carpenter" in e.text for e in attempted)
+    assert any("say as the harbourmaster" in e.text for e in attempted)
     assert any("beef cask found rotten" in e.text for e in attempted)
     lines = director_mod.reveal(world, "the player")
     assert lines[0].startswith("The director's log (") and len(lines) > 20
@@ -5537,3 +5538,166 @@ def test_truth_7b_94_a_directed_voyage_saved_replays_to_the_same_log(directed_da
         assert [e.to_dict() for e in director_mod.log_of(copy).entries] == [
             e.to_dict() for e in director_mod.log_of(world).entries
         ], road
+
+
+# ---------------------------------------------------------------------------
+# Milestone 7b, part ii: the director's voice (package 52; spec M7b §8 to §10): truths
+# 7b-95 to 7b-97 on the frigate at seed 7 off the Lizard, two hours with the fake director
+# on the quiet-passage brief giving its voice, and a fake officer of the watch beside it
+# who asks the cook a question. No recorded passage's pin moves: none has a director or a
+# `person:` order.
+# ---------------------------------------------------------------------------
+
+VOICE_EVERY = 600  # the director and the officer sampled every ten minutes, in lockstep
+
+# The director's two hours: a person made from words, brought aboard (doubted, the port
+# beyond a boat's reach, and entered again with its reason) and bound to the master's
+# station; a word put in the mouth of the captain (the player at the prompt) and of the
+# officer (a model), each refused by the rule of reach; and the new master's own words.
+VOICED_ORDERS = [
+    'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Falmouth, who knew the '
+    "captain's father",
+    'person: "Mr Fox" comes aboard as master',
+    'say as the captain: "Make it so."',
+    'say as Mr Pearce: "All well forward, sir."',
+    'say as Mr Fox: "I knew your father, sir."',
+]
+COOKS_ANSWER = "Pease and pork, sir, and duff on Sunday."
+
+
+def _the_voiced_watch():
+    from freesail.agents import Fake, Harness, SamplingPolicy, call, reply
+    from freesail.agents import director as director_mod
+    from freesail.agents.agent import SESSION_DIRECTOR, director, officer
+    from freesail.agents.fake import director_above_the_game
+
+    world = _directed_world()
+    world.submit("set plain sail")
+    quiet = director_mod.resolve_brief("quiet-passage").to_dict()
+    quiet["budget"] = {"samples_a_day": 60, "acts_a_day": 8}
+    director_mod.set_brief(world, quiet, source="the test")
+    policy = SamplingPolicy.in_lockstep(VOICE_EVERY, "notable", "urgent")
+    cook = world.people.of_the_company("the cook", draw=False)
+    dh = Harness(
+        world,
+        director(policy, world=world),
+        director_above_the_game(VOICED_ORDERS, answers={cook.name: COOKS_ANSWER}),
+        session_kind=SESSION_DIRECTOR,
+        save=lambda w, r: None,
+    )
+    dh.model_name, dh.door = "the fake director", "runner"
+    dh.start()
+    oh = Harness(
+        world,
+        officer(policy, world=world),
+        Fake(
+            [
+                reply("", call("stand_by", until="a glass")),
+                reply(
+                    "",
+                    call("submit_order", text="ask the cook what is for dinner"),
+                    call("stand_by", until="a watch"),
+                ),
+            ],
+            when_done=reply("Thank you, cook."),
+        ),
+        save=lambda w, r: None,
+    )
+    oh.model_name, oh.door = "the fake officer", "mcp"
+    oh.start()
+    world.run(2 * 3600)
+    return world, dh, oh
+
+
+@pytest.fixture(scope="module")
+def voiced_watch():
+    return _the_voiced_watch()
+
+
+def test_truth_7b_95_a_person_made_from_words_is_on_the_muster_holds_his_station_and_replays(
+    voiced_watch, tmp_path
+):
+    """Spec M7b §10, truth 95: "A person made from words is on the muster of the ship he
+    joins, holds the station he is bound to, and is there after a save and a replay." Mr
+    Fox, made at Falmouth and brought aboard (the doubt and the reason in the director's
+    log), is among the people, holds the master's station (a model seated there is in his
+    place, his outline in its brief), speaks in his own name, and is all of it again in the
+    save replayed by the transcript and by the acts, to the same digest."""
+    from freesail.agents import director as director_mod
+    from freesail.agents.agent import master
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+
+    world, _dh, _oh = voiced_watch
+    fox = world.people.find("Mr Fox")
+    assert fox is not None and fox.aboard and fox.outline.age == 60
+    assert any(line.startswith("Mr Fox, pilot") for line in world.people.describe())
+    assert world.stations.holder("master") is fox
+    st = master(world=world)
+    assert st.person == "Mr Fox" and "Guernsey pilot" in st.outline
+    kinds = [e.kind for e in director_mod.log_of(world).entries]
+    assert "director.doubted" in kinds and "director.reentered" in kinds
+    spoke = [e.text for e in world.log.all() if e.kind == "person.spoke"]
+    assert "Mr Fox, the pilot, on the quarterdeck: I knew your father, sir." in spoke
+    path = replay_mod.save_to_file(world, tmp_path / "voiced.json", checkpoint=False)
+    data = replay_mod.load_file(path)
+    for road in (replay_mod.BY_TRANSCRIPT, replay_mod.BY_ACTS):
+        copy = replay_mod.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == world.log.digest(), road
+        again = copy.people.find("Mr Fox")
+        assert again is not None and again.outline == fox.outline, road
+        assert copy.stations.holder("master") is again, road
+
+
+def test_truth_7b_96_a_question_to_the_cook_is_answered_in_his_words_with_a_director_seated(
+    voiced_watch,
+):
+    """Spec M7b §10, truth 96: "A question to the cook, with a director seated, is answered
+    in the cook's words at the galley and heard by those within earshot; with none, by the
+    rules as before." The officer asks; the director, told in its sample, answers as the
+    cook (no act counted); the line is the cook's at the galley, heard by the officer on
+    the quarterdeck, and the answer wakes the officer's stand-by. With no director seated
+    the question is refused in the words it always was."""
+    world, dh, oh = voiced_watch
+    cook = world.people.find("the cook")
+    assert cook is not None and cook.where == "galley"
+    said = f"{cook.name}, the cook, in the galley: {COOKS_ANSWER}"
+    spoke = [e for e in world.log.all() if e.kind == "person.spoke" and e.text == said]
+    assert spoke and spoke[0].data["heard_by"] == ["officer of the watch"]
+    asked = [e for e in world.log.all() if e.kind == "agent.asked" and "the cook" in e.text]
+    assert asked and asked[0].tick < spoke[0].tick <= asked[0].tick + 1800
+    director_samples = json.dumps([t.content for t in dh.turns if t.role == "data"])
+    assert "whom nobody holds: what is for dinner?" in director_samples
+    officer_samples = json.dumps([t.content for t in oh.turns if t.role == "data"])
+    assert f"answers your question (what is for dinner?): {COOKS_ANSWER}" in officer_samples
+    given = [o for o in world.world_orders if o["order"].startswith("say as " + cook.name)]
+    assert given and given[0]["result"] == "done"
+    # with none seated: the rules, as before (a world with the brief and no director, and
+    # one with neither, refuse it alike)
+    alone = _directed_world()
+    plain = make_world(7, FRIGATE, alone.scenario)
+    from freesail.agents import director as director_mod
+
+    director_mod.set_brief(alone, "quiet-passage", source="the test")
+    a = alone.submit("ask the cook what is for dinner")
+    b = plain.submit("ask the cook what is for dinner")
+    assert a.kind == b.kind == "order.rejected" and a.text == b.text
+    assert alone.people.find("the cook") is None
+
+
+def test_truth_7b_97_say_as_a_held_station_is_refused(voiced_watch):
+    """Spec M7b §10, truth 97: "`say as` a held station is refused." The director's words
+    put in the captain's mouth (the player at the prompt) and the officer's (a model) are
+    refused by the rule of reach in its log, the stations held named, no act counted and
+    no word said in either name."""
+    from freesail.agents import director as director_mod
+
+    world, _dh, _oh = voiced_watch
+    refused = [e for e in director_mod.log_of(world).entries if e.kind == "director.refused"]
+    assert len(refused) == 2 and all("rule of reach" in e.text for e in refused)
+    assert "say as the captain" in refused[0].text and "player at the prompt" in refused[0].text
+    assert "say as Mr Pearce" in refused[1].text and "held by a model" in refused[1].text
+    names = [e.data.get("person") for e in world.log.all() if e.kind == "person.spoke"]
+    assert "Captain Bowen" not in names and "Mr Pearce" not in names
+    held = [o for o in world.world_orders if o["order"].startswith("say as the captain")]
+    assert not held  # refused at the door: never an order on the channel

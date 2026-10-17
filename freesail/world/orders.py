@@ -59,6 +59,17 @@ port she is far from, a thing found aboard with no cause), and the director's ch
 with a `[reason: ...]` at its end (`parse` peels it into `WorldOrder.reason`), the order is
 performed and the director's log keeps the act, the doubt and the reason together. The
 scenario's and the owner's orders are never doubted: the doubt is the director's channel's.
+
+**The director's voice (spec M7b §8, §9; package 52).** `person:` makes a person from words
+and moves him (`person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest, who knew
+the captain's father`; `person: "Mr Fox" comes aboard as master`; `person: "Mr Fox" goes
+ashore`; `person: "Mr Fox" leaves the ship at Falmouth`), and `say as <person>: <his
+words>` (a channel of its own, `say`) puts words in the mouth of a person nobody holds: a
+line of the play log in his name where he is, heard by the stations within earshot and
+journaled as his, never the order. **The rule of reach**: nobody speaks as, moves or binds
+a station to a person a model or the player holds (`reach`), whoever gives the order; the
+refusal says which stations are held. The movements are doubted where no boat could carry
+him (a port beyond `BOAT_REACH_NM`); a person made and a word said are not.
 """
 
 from __future__ import annotations
@@ -83,7 +94,11 @@ __all__ = [
     "apply",
     "doubt",
     "parse",
+    "held_stations",
+    "held_words",
+    "reach",
     "recognises",
+    "say_as_person",
     "split_reason",
 ]
 
@@ -104,6 +119,7 @@ CHANNELS = (
     "seat",
     "unseat",
     "aboard",
+    "say",
 )
 
 # The captain's grammar refuses a world order in these words (truth 71).
@@ -114,9 +130,11 @@ REFUSAL = (
     "and reads what the lookout sees."
 )
 
+# `say as <person>: <words>` (package 52) is the `say` channel's; a bare `say <words>` is the
+# deck's conversation and no world order.
 _HEAD = re.compile(
-    r"^\s*(weather|ship|message|port|person|captain|mark|seat|unseat|aboard)\b"
-    r"\s*(\"[^\"]*\"|[\w-]+)?\s*:",
+    r"^\s*(?:(weather|ship|message|port|person|captain|mark|seat|unseat|aboard)\b"
+    r"\s*(\"[^\"]*\"|[\w-]+)?\s*:|(say)\s+as\s+[^:]+:)",
     re.I,
 )
 # The director's reason at the end of an order entered again after a doubt (decision 50):
@@ -160,9 +178,9 @@ def parse(text: str) -> WorldOrder:
     if m is None:
         raise WorldOrderError(
             f"'{text}' is no world order: say weather:, ship:, message:, port <id>:, person:, "
-            "captain:, mark:, aboard:, seat: or unseat:."
+            "captain:, mark:, aboard:, seat:, unseat: or say as <person>:."
         )
-    return WorldOrder(m.group(1).lower(), text, reason)
+    return WorldOrder((m.group(1) or m.group(3)).lower(), text, reason)
 
 
 def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
@@ -187,6 +205,12 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
         return _unseat(world, body)
     if order.channel == "aboard":
         return _aboard(world, body)
+    held = reach(world, order)
+    if held:
+        # the rule of reach (package 52): whoever gives the order
+        raise WorldOrderError(f"{held}; the stations held now: {held_words(world)}")
+    if order.channel == "say":
+        return _say_as(world, body)
     return _person(world, body)
 
 
@@ -733,15 +757,305 @@ _PERSON = re.compile(
 )
 
 
+# A person made from words (spec M7b §8; package 52): `person: make "<name>"` and, after
+# commas, what the words say of him in any order: a role ('a Guernsey pilot', with an age
+# at its end, 'of sixty'), an age ('aged sixty', 'sixty years old'), a place aboard ('aboard
+# in the cabin', 'in the gunroom') or ashore ('ashore at Brest', 'at Brest'), and any other
+# words as his line of history.
+_MAKE = re.compile(r'^person:\s*make\s+"(?P<name>[^"]+)"\s*(?:,\s*(?P<rest>.*?))?\s*$', re.I)
+# A person moved: `person: "Mr Fox" comes aboard [as <station>]`, `... goes ashore`,
+# `... leaves the ship at <port>` (the name quoted, or bare before the verb).
+_MOVE = re.compile(
+    r'^person:\s*(?:"(?P<name>[^"]+)"|(?P<bare>.+?))\s+(?P<move>comes\s+aboard'
+    r"(?:\s+as\s+(?:the\s+|a\s+|an\s+)?(?P<station>.+?))?|goes\s+ashore"
+    r"|leaves\s+the\s+ship\s+at\s+(?P<port>.+?))\s*$",
+    re.I,
+)
+_AGE = re.compile(
+    r"^(?:aged\s+(?P<a>[\w -]+?)(?:\s+years?)?|(?P<b>[\w -]+?)\s+years?(?:\s+old|\s+of\s+age)?"
+    r"|of\s+(?P<c>[\w -]+?)(?:\s+years?(?:\s+of\s+age)?)?)$",
+    re.I,
+)
+_ROLE_AGE = re.compile(
+    r"^(?P<head>.+?)\s+of\s+(?P<n>[\w -]+?)(?:\s+years?(?:\s+of\s+age)?)?$", re.I
+)
+_ABOARD_AT = re.compile(r"^(?:aboard|on\s+board)(?:\s+(?:in|on)\s+(?P<place>.+))?$", re.I)
+_IN_PLACE = re.compile(r"^(?:in|on)\s+(?P<place>.+)$", re.I)
+_ASHORE_AT = re.compile(r"^ashore(?:\s+(?:at|in)\s+(?P<port>.+))?$", re.I)
+_AT_PORT = re.compile(r"^(?:at|of)\s+(?P<port>.+)$", re.I)
+# A person put ashore or taken aboard by a boat within this many miles of the port's roads
+# (judgement: a shore boat or the pilot's comes off to a ship lying off the port, and the
+# pilots board at their stations some miles out; spec M7b §8's movements are doubted beyond).
+BOAT_REACH_NM = 6.0
+# A person made from words with no skill said has the old form's (`person: ... skill`).
+MADE_SKILL = 0.7
+
+
+def _age_of(words: str) -> int:
+    """An age in years from the words ('sixty', '60', 'sixty two'), or 0."""
+    from freesail.orders.numbers import read_all
+
+    n = read_all(" ".join(str(words).replace("-", " ").split()))
+    return int(n) if n is not None and 0 < n < 120 else 0
+
+
+def _role_of(words: str) -> tuple[str, list[str]]:
+    """(the role, the words that qualify it) from 'Guernsey pilot', 'merchant of Brest',
+    'retired master's mate': the role the people's table knows at its end, else its last
+    word; the rest kept as said."""
+    from freesail.world.people import ROLE_WORDS
+
+    quals: list[str] = []
+    om = re.match(r"^(?P<head>.+?)\s+(?P<of>of\s+.+)$", words, re.I)
+    if om is not None:
+        words, quals = om.group("head"), [om.group("of")]
+    parts = words.split()
+    low = [w.lower() for w in parts]
+    for n in range(min(3, len(parts)), 0, -1):
+        tail = " ".join(low[-n:])
+        if tail in ROLE_WORDS:
+            head = " ".join(parts[:-n])
+            return ROLE_WORDS[tail], [x for x in [head, *quals] if x]
+    head = " ".join(parts[:-1])
+    return (low[-1] if low else ""), [x for x in [head, *quals] if x]
+
+
+def _port_miles(world: Any, port: Any) -> float | None:
+    """The miles from the ship to the port's nearest roads or mooring, or None."""
+    pos = getattr(world, "position", None)
+    if pos is None or port is None:
+        return None
+    return float(port.nearest_spot(pos)[1])
+
+
+def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]:
+    """`person: make "<name>", <the words>`: a person with an outline from the words, among
+    the world's people from now on (spec M7b §8; package 52)."""
+    from freesail.world.people import TRADE_PLACES, Outline, Person
+    from freesail.world.places import PLACES, Places, place_words
+
+    name = " ".join(str(name).split())
+    if not name:
+        raise WorldOrderError(
+            "A person made from words wants a name: 'person: make \"Mr Fox\", ...'."
+        )
+    if world.people.find(name) is not None:
+        raise WorldOrderError(f"{name} is among the people already.")
+    ports = getattr(world, "ports", None)
+    places = Places()
+    role, quals, age, history, rank = "", [], 0, [], ""
+    aboard: bool | None = None
+    place, port_words = "", ""
+    for phrase in [" ".join(x.split()) for x in str(rest).split(",") if x.strip()]:
+        low = phrase.lower()
+        am = _AGE.match(low)
+        if am is not None and _age_of(am.group("a") or am.group("b") or am.group("c") or ""):
+            age = _age_of(am.group("a") or am.group("b") or am.group("c") or "")
+            continue
+        m = _ABOARD_AT.match(phrase)
+        if m is not None:
+            aboard = True
+            found = places.find(m.group("place")) if m.group("place") else None
+            if m.group("place") and (found is None or not found.aboard):
+                raise WorldOrderError(
+                    f"'{m.group('place')}' is no place aboard; the places are "
+                    f"{', '.join(p.name for p in PLACES.values() if p.aboard)}."
+                )
+            place = found.id if found is not None else ""
+            continue
+        m = _ASHORE_AT.match(phrase)
+        if m is not None:
+            aboard, port_words = False, (m.group("port") or "").strip()
+            continue
+        if not role and low.startswith(("a ", "an ", "the ")):
+            words = phrase.split(None, 1)[1] if " " in phrase else ""
+            rm = _ROLE_AGE.match(words)
+            if rm is not None and _age_of(rm.group("n")):
+                age, words = _age_of(rm.group("n")), rm.group("head")
+            role, quals = _role_of(words)
+            rank = " ".join(words.split())  # who he is, as said: 'Guernsey pilot'
+            continue
+        m = _IN_PLACE.match(phrase)
+        found = places.find(m.group("place")) if m is not None else None
+        if found is not None and found.aboard:
+            aboard, place = True, found.id
+            continue
+        m = _AT_PORT.match(phrase)
+        if m is not None and ports is not None and ports.find(m.group("port")) is not None:
+            aboard, port_words = False, m.group("port").strip()
+            continue
+        history.append(phrase)
+    port = None
+    if aboard is False:
+        if port_words:
+            port = ports.find(port_words) if ports is not None else None
+            if port is None:
+                raise WorldOrderError(f"'{port_words}' is no port of the world.")
+        else:
+            near = ports.nearest() if ports is not None else None
+            if near is None:
+                raise WorldOrderError("Ashore where? Say 'ashore at <port>'.")
+            port = near[0]
+    else:
+        aboard = True
+        place = place or TRADE_PLACES.get(role, "cabin")
+    outline = Outline(
+        role=role,
+        rank=rank or role,
+        place=place if aboard else "",
+        history="; ".join(history),
+        age=age,
+        said=" ".join(str(rest).split()),
+    )
+    pid = re.sub(r"[^a-z0-9]+", "_", f"{role} {name}".lower()).strip("_")
+    person = Person(
+        pid,
+        name,
+        role,
+        MADE_SKILL,
+        place=place if aboard else "shore",
+        aboard=bool(aboard),
+        port=port.id if port is not None else None,
+        outline=outline,
+    )
+    world.people.add(person)
+    where = place_words(place) if aboard else f"ashore at {port.name}"
+    data: dict[str, Any] = {"id": pid, "name": name, "role": role, "aboard": bool(aboard)}
+    if age:
+        data["age"] = age
+    if aboard:
+        data["place"] = place
+    else:
+        data["port"] = port.id
+    return f"{person.outline_words().rstrip('.')}; made from words, {where}", data
+
+
+def _station_key(words: str) -> str:
+    from freesail.agents.agent import station_name
+
+    return station_name(" ".join(str(words).lower().split()).removesuffix("'s station"))
+
+
+def _move_person(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
+    """`person: "Mr Fox" comes aboard [as <station>]`, `... goes ashore`, `... leaves the
+    ship at <port>` (spec M7b §8; package 52): the person moved, his coming or going a
+    line of the play log, a station bound to him or unbound from him with its own line."""
+    from freesail.world.places import place_words
+
+    name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
+    person = world.people.find(name)
+    if person is None:
+        raise WorldOrderError(
+            f"Nobody named {name} is among the people; make him first: 'person: make "
+            f'"{name}", ...\'.'
+        )
+    move = " ".join(m.group("move").lower().split())
+    stations = world.stations
+    ports = getattr(world, "ports", None)
+    data: dict[str, Any] = {"person": person.name}
+    if move.startswith("comes aboard"):
+        said = []
+        if not person.aboard:
+            came = ports.ports.get(person.port) if (ports is not None and person.port) else None
+            person.aboard = True
+            person.where = "quarterdeck"
+            whence = f" from {came.name}" if came is not None else ""
+            world.record(
+                Severity.NOTABLE,
+                "person.aboard",
+                f"{person.name} came aboard{whence}.",
+                data={"person": person.name, "from": came.id if came is not None else ""},
+            )
+            said.append(f"{person.name} came aboard{whence}")
+            data["came_aboard"] = True
+        station = m.group("station")
+        if station:
+            key = _station_key(station)
+            if stations.aboard(key) or key in stations.kinds():
+                stations.bind(key, person, quiet=True)
+                person.station = key
+                said.append(f"the {key}'s station bound to him")
+                data["station"] = key
+            else:
+                role = " ".join(station.lower().split())
+                person.role = role
+                said.append(f"borne as {role} (no station of that name aboard)")
+                data["role"] = role
+        if not said:
+            raise WorldOrderError(
+                f"{person.name} is aboard already ({world.people.state_words(person)})."
+            )
+        return "; ".join(said), data
+    # ashore: by the boat, at the nearest port or the one named
+    if not person.aboard:
+        raise WorldOrderError(f"{person.name} is {place_words(person.where)} already.")
+    if person is world.people.captain or person.mirror is not None:
+        does = "commands" if person is world.people.captain else "keeps the reckoning"
+        raise WorldOrderError(
+            f"{person.name} {does} and cannot be put ashore by the game yet (the player "
+            "ashore, and a ship left to her officers, are spec M7b §14's)"
+        )
+    if move.startswith("goes ashore"):
+        near = ports.nearest() if ports is not None else None
+        if near is None:
+            raise WorldOrderError(
+                "No port is near to put him ashore at; say 'leaves the ship at <port>'."
+            )
+        port = near[0]
+    else:
+        port = ports.find(m.group("port")) if ports is not None else None
+        if port is None:
+            raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
+    for st in stations.names():
+        try:
+            holder = stations.holder(st)
+        except Exception:  # a people's build that cannot run binds nobody
+            holder = None
+        if holder is not person:
+            continue
+        # the station goes back to the person the wardroom file binds it to, where he is
+        # aboard and another (Mr Fox, brought aboard as master, leaves: the master's is Mr
+        # Harvey's again); else it is unbound, with nobody left to hold it
+        try:
+            kept = stations._file_holder(st)
+        except Exception:  # a people's build that cannot run binds nobody
+            kept = None
+        if kept is not None and kept is not person and kept.aboard:
+            stations.bind(st, kept, quiet=True)
+        else:
+            stations.unbind(st, why=f"{person.name} went ashore at {port.name}", quiet=True)
+    person.station = ""
+    person.aboard = False
+    person.place = "shore"
+    person.port = port.id
+    verb = "went ashore at" if move.startswith("goes") else "left the ship at"
+    world.record(
+        Severity.NOTABLE,
+        "person.ashore",
+        f"{person.name} {verb} {port.name}.",
+        data={"person": person.name, "port": port.id},
+    )
+    data["port"] = port.id
+    return f"{person.name} {verb} {port.name}", data
+
+
 def _person(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     from freesail.world.people import Person
     from freesail.world.places import PLACES
 
+    mm = _MAKE.match(body)
+    if mm is not None:
+        return _make_person(world, mm.group("name"), mm.group("rest") or "")
+    mv = _MOVE.match(body)
+    if mv is not None:
+        return _move_person(world, mv)
     m = _PERSON.match(body)
     if m is None:
         raise WorldOrderError(
-            "A person order is 'person: <role> \"<name>\" aboard in the <place>' or 'person: "
-            '<role> "<name>" ashore at <port>\'.'
+            'A person order is \'person: make "<name>", <who he is, his age, where he is, his '
+            "history>', 'person: \"<name>\" comes aboard [as <station>]', 'person: \"<name>\" "
+            "goes ashore', 'person: \"<name>\" leaves the ship at <port>', 'person: <role> "
+            '"<name>" aboard in the <place>\' or \'person: <role> "<name>" ashore at <port>\'.'
         )
     role = m.group("role").strip().lower()
     name = m.group("name").strip()
@@ -767,6 +1081,203 @@ def _person(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
     world.people.add(Person(pid, name, role, skill, place="shore", aboard=False, port=port.id))
     return f"{name}, {role}, ashore at {port.name}", {"id": pid, "role": role, "port": port.id}
+
+
+# ---------------------------------------------------------------------------
+# say as (spec M7b §9; package 52): words in the mouth of a person nobody holds
+# ---------------------------------------------------------------------------
+
+_SAY_AS = re.compile(r"^say\s+as\s+(?P<who>[^:]+?)\s*:\s*(?P<words>.*?)\s*$", re.I)
+# The log's kind for a person's words said by the director's voice: a word on deck.
+PERSON_SPOKE_KIND = "person.spoke"
+_QUOTES = "\"'\u201c\u201d\u2018\u2019"
+
+
+def _say_as_parts(world: Any, body: str, draw: bool) -> tuple[Any, str]:
+    """(the person, his words) of a `say as` order; the man of the muster by his trade
+    drawn into the people only when `draw` (`People.of_the_company`)."""
+    m = _SAY_AS.match(body)
+    if m is None:
+        raise WorldOrderError("A word put in a mouth is 'say as <person>: <his words>'.")
+    words = m.group("words").strip()
+    if len(words) >= 2 and words[0] in _QUOTES and words[-1] in _QUOTES:
+        words = words[1:-1].strip()
+    if not words:
+        raise WorldOrderError("Say what as him? Put his words after the colon.")
+    who = " ".join(m.group("who").split()).strip(_QUOTES)
+    people = getattr(world, "people", None)
+    person = people.of_the_company(who, draw=draw) if people is not None else None
+    if person is None:
+        raise WorldOrderError(
+            f"nobody answering to '{who}' is among the people or the ship's company; a person "
+            'ashore or a stranger is made first (\'person: make "<name>", <who he is>, '
+            "<where>')"
+        )
+    return person, words
+
+
+def say_as_person(world: Any, body: str) -> Any:
+    """The person a `say as` order names, drawn into nothing (for the director's door and
+    the rule of reach); None when it names nobody."""
+    try:
+        return _say_as_parts(world, body, draw=False)[0]
+    except WorldOrderError:
+        return None
+
+
+def _hearers(world: Any, place: str) -> list[Any]:
+    """The stations held (not the director's, which has no place aboard) within earshot of
+    a word said in `place` (`places.earshot`), each with its place."""
+    from freesail.agents.agent import DIRECTOR, place_of
+    from freesail.agents.harness import _stations_held
+    from freesail.world.places import earshot
+
+    near = earshot("quarterdeck" if place == "deck" else place) | earshot(place)
+    return [
+        h
+        for h in _stations_held(world)
+        if h.station.name != DIRECTOR and place_of(world, h.station.name) in near
+    ]
+
+
+def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`say as <person>: <his words>`: a line of the play log in his name where he is
+    (`person.spoke`, notable: a word on deck for the stand-bys), heard by the stations
+    within earshot in their next samples, journaled as his (`journal.person_journal`); an
+    answer to a question put to him while nobody held him goes back to the asker
+    (`director.answer_questions`). A person ashore is heard aboard only while the ship
+    lies within a boat's reach of his port."""
+    from freesail.agents.journal import SAID_KIND, person_journal
+    from freesail.world.places import place_words
+
+    person, words = _say_as_parts(world, body, draw=True)
+    people = world.people
+    if person.aboard:
+        place = people.effective_place(person)
+        where = place_words(place)
+        heard = _hearers(world, place)
+    else:
+        ports = getattr(world, "ports", None)
+        port = ports.ports.get(person.port) if (ports is not None and person.port) else None
+        miles = _port_miles(world, port)
+        if port is None or miles is None or miles > BOAT_REACH_NM:
+            at = f" at {port.name}, {miles:.0f} miles off" if (port and miles is not None) else ""
+            raise WorldOrderError(
+                f"nobody aboard can hear {person.name}: he is {place_words(person.where)}{at}; "
+                f"a letter carries his words ('message: at <port> from {person.name}: "
+                '"..."\'), or he comes aboard'
+            )
+        place, where, heard = "shore", f"ashore at {port.name}", []
+    role = person.role
+    tail = f", the {role}" if role and role not in ("captain", "commander") else ""
+    if role and role.lower() in person.name.lower():
+        tail = ""
+    line = f"{person.name}{tail}, {where}: {words}"
+    for h in heard:
+        h.hear(line)
+    names = [h.station.name for h in heard]
+    world.record(
+        Severity.NOTABLE,
+        PERSON_SPOKE_KIND,
+        line,
+        data={
+            "person": person.name,
+            "role": role,
+            "place": place,
+            "where": where,
+            "words": words,
+            "heard_by": names,
+        },
+    )
+    person_journal(world, person).append(world, f"Said, {where}: {words}", kind=SAID_KIND)
+    from freesail.agents.director import answer_questions
+
+    answered = answer_questions(world, person, words, where)
+    heard_words = f", heard by the {', the '.join(names)}" if names else ""
+    data: dict[str, Any] = {"person": person.name, "heard_by": names}
+    if answered:
+        data["answered"] = answered
+    return f"{person.name} spoke {where}{heard_words}", data
+
+
+def held_stations(world: Any) -> list[tuple[str, str, str]]:
+    """The stations of the ship held now, as (the station, its person's name or "", who
+    holds it): a model's, the player's seat, and the captain's by the player at the prompt
+    while no model holds it and the player is seated nowhere else (package 52; the rule of
+    reach)."""
+    from freesail.agents.agent import CAPTAIN, DIRECTOR
+    from freesail.agents.harness import _stations_held
+
+    out: list[tuple[str, str, str]] = []
+    stations = getattr(world, "stations", None)
+    seat = getattr(world, "player_seat", None)
+    held: set[str] = set()
+    for h in _stations_held(world):
+        name = h.station.name
+        if name == DIRECTOR:
+            continue
+        try:
+            holder = stations.holder(name) if stations is not None else None
+        except Exception:  # a people's build that cannot run binds nobody
+            holder = None
+        who = "the player at his seat" if h is seat else "a model"
+        out.append((name, holder.name if holder is not None else "", who))
+        held.add(name)
+    if CAPTAIN not in held and (seat is None or seat.agent.released):
+        people = getattr(world, "people", None)
+        try:
+            cap = people.captain if people is not None else None
+        except Exception:  # a world with no muster
+            cap = None
+        out.append((CAPTAIN, cap.name if cap is not None else "", "the player at the prompt"))
+    return out
+
+
+def held_words(world: Any) -> str:
+    """The stations held now in words, for the rule of reach's refusal and the truth."""
+    parts = []
+    for station, person, who in held_stations(world):
+        parts.append(f"the {station} ({person + ', ' if person else ''}{who})")
+    return "; ".join(parts) if parts else "none"
+
+
+def reach(world: Any, order: WorldOrder) -> str | None:
+    """**The rule of reach** (spec M7b §9; package 52): why the order would speak as, move,
+    or bind a station to a person a model or the player holds, in words, or None. The
+    director speaks as anyone nobody holds and never as a held station, whose words are
+    its holder's own; and so moves nobody held and binds nobody to a held station."""
+    if order.channel not in ("say", "person"):
+        return None
+    held = {person: (station, who) for station, person, who in held_stations(world) if person}
+    stations_held = {station: who for station, _person, who in held_stations(world)}
+    if order.channel == "say":
+        person = say_as_person(world, order.text)
+        if person is not None and person.name in held:
+            station, who = held[person.name]
+            return (
+                f"{person.name} is the {station}'s, held by {who}: his words are his holder's "
+                "own, and nobody speaks as a held station"
+            )
+        return None
+    m = _MOVE.match(order.text)
+    if m is None:
+        return None
+    name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
+    person = world.people.find(name)
+    if person is not None and person.name in held:
+        station, who = held[person.name]
+        return (
+            f"{person.name} is the {station}'s, held by {who}: nobody moves or binds a person "
+            "a model or the player holds"
+        )
+    if m.group("station"):
+        key = _station_key(m.group("station"))
+        if key in stations_held:
+            return (
+                f"the {key}'s station is held by {stations_held[key]}: nobody binds another "
+                "person to a station a model or the player holds"
+            )
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -914,10 +1425,11 @@ def doubt(world: Any, order: WorldOrder) -> str | None:
     season's floor, a near deep low out of a steady glass, a waypoint faster than the
     season's lows move or deeper than its floor; `message: by a cutter from <port>` beyond
     the letter's reach; `port: price of` beyond the market's ordinary swing; `aboard:` a
-    thing with no cause (the table's `plausible_when`). The rest (`ship "X": intent`,
-    `person:`, `captain:`, `seat:`, `unseat:`, a letter left at a port, a port closed or
-    opened) are never doubted: a mind changed, a person's errand and the owner's grant want
-    no cause of the sea's."""
+    thing with no cause (the table's `plausible_when`); `person:` a person moved where no
+    boat could carry him (package 52). The rest (`ship "X": intent`, a person made or named,
+    `say as`, `captain:`, `seat:`, `unseat:`, a letter left at a port, a port closed or
+    opened) are never doubted: a mind changed, a person's errand, a man's words and the
+    owner's grant want no cause of the sea's."""
     body = order.text
     try:
         if order.channel == "ship":
@@ -932,6 +1444,8 @@ def doubt(world: Any, order: WorldOrder) -> str | None:
             return _doubt_port(world, body)
         if order.channel == "aboard":
             return _doubt_aboard(world, body)
+        if order.channel == "person":
+            return _doubt_person(world, body)
     except WorldOrderError:
         return None  # a malformed order is the channel's own refusal, not a doubt
     return None
@@ -1124,6 +1638,52 @@ def _doubt_port(world: Any, body: str) -> str | None:
         return (
             f"the price of {good.good} at {port.name} moved by {swing:.0%} in a word, where a "
             f"market moves by a few parts in ten; it stood at £{good.price:g} a ton"
+        )
+    return None
+
+
+def _doubt_person(world: Any, body: str) -> str | None:
+    """A person moved where no boat could carry him (package 52): coming aboard from a port
+    she is beyond a boat's reach of, going ashore with no port within it, leaving the ship
+    at a port beyond it. A person made from words, and a word said, are never doubted: a
+    supernumerary the story names, and a man's words, want no cause of the sea's."""
+    from freesail.world.places import place_words
+
+    m = _MOVE.match(body)
+    if m is None:
+        return None
+    name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
+    person = world.people.find(name)
+    ports = getattr(world, "ports", None)
+    if person is None or ports is None or getattr(world, "position", None) is None:
+        return None
+    move = " ".join(m.group("move").lower().split())
+    if move.startswith("comes aboard"):
+        if person.aboard:
+            return None
+        port = ports.ports.get(person.port) if person.port else None
+        miles = _port_miles(world, port)
+        if port is not None and miles is not None and miles > BOAT_REACH_NM:
+            return (
+                f"{person.name} is {place_words(person.where)} at {port.name}, and she is "
+                f"{miles:.0f} miles from it: no boat brings a man off so far "
+                f"({BOAT_REACH_NM:g} miles at the most)"
+            )
+        return None
+    if move.startswith("goes ashore"):
+        near = ports.nearest()
+        if near is not None and near[1] > BOAT_REACH_NM:
+            return (
+                f"the nearest port, {near[0].name}, is {near[1]:.0f} miles off: no boat puts a "
+                f"man ashore so far ({BOAT_REACH_NM:g} miles at the most)"
+            )
+        return None
+    port = ports.find(m.group("port") or "")
+    miles = _port_miles(world, port)
+    if port is not None and miles is not None and miles > BOAT_REACH_NM:
+        return (
+            f"she is {miles:.0f} miles from {port.name}: no boat puts a man ashore there from "
+            f"so far ({BOAT_REACH_NM:g} miles at the most)"
         )
     return None
 

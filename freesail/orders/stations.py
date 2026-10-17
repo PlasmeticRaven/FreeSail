@@ -58,6 +58,16 @@ yet"); at a firing it is delivered as the captain's own word or question would b
 the log names the standing order as the speaker: "By standing order 'sea': the captain to
 the watcher: the sea is getting up". The runtime says which order is firing
 (`standing.runtime.Runtime.firing`).
+
+**A person nobody holds, with a director seated** (spec M7b §9; package 52). `ask` and
+`tell` put to a person of the ship's company nobody holds (a station unheld that is bound
+to him, `ask the first lieutenant ...` with nobody at the officer of the watch's; or a
+person no station is bound to, `ask the cook ...`, `tell Mr Fox ...`, a man of the muster
+by his trade among them) go to the director when one is seated (`director.ask_unheld`): the
+line is said where it was said, the director answers as him with `say as` or lets it be,
+and a question waits a glass. With no director seated, and for the stations whose rules
+answer (the masthead's sight, the master's reckoning), everything is as it was; a person
+a model or the player holds is never reached so (the rule of reach).
 """
 
 from __future__ import annotations
@@ -299,6 +309,9 @@ def recognises(text: str, ship: Any = None) -> str | None:
             whole = f"{who} {m.group('q') or ''}"
             station = _station_in(whole, ship)
             if station is None:
+                found = _unheld_person(ship, whole)
+                if found is not None and found[0] is not None:
+                    return verb  # a person nobody holds, for the director (package 52)
                 continue
             if verb == "ask" and station == "master" and _held_now(ship, station) is None:
                 # `ask the master the reckoning` with nobody at the master's station is
@@ -553,6 +566,10 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
                 f"'{norm}' is the captain's own word to the {OFFICER}, not a standing order's."
             )
         return _deck(ship, agents, verb, text, seat)
+    if verb in ("ask", "tell") and not by:
+        routed = _to_the_director(ship, text, verb, speaker)
+        if routed is not None:
+            return routed
     if verb == "ask":
         station, question = _split_ask(text, ship)
         if not by and _kind_of(ship, station) == "lookout" and _held_now(ship, station) is None:
@@ -617,6 +634,89 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             {"station": station},
         )
     return "agent.resume", agent.resume("the captain"), {"station": station}
+
+
+def _unheld_person(ship: Any, who: str) -> tuple[Any, int] | None:
+    """A person nobody holds whom the words begin with (package 52), and how many words
+    name him, while a director is seated: one of the people or a man of the muster by his
+    trade (`People.of_the_company`, drawing nobody), not a person a model or the player
+    holds. None with no director seated, so that the rules answer as they did."""
+    from freesail.agents import director as director_mod
+    from freesail.orders.prompt import world_of
+    from freesail.world import orders as world_orders
+
+    world = world_of(ship)
+    if world is None or director_mod.seated(world) is None:
+        return None
+    people = getattr(world, "people", None)
+    if people is None:
+        return None
+    held = {person for _st, person, _who in world_orders.held_stations(world) if person}
+    words = " ".join(str(who).split()).split()
+    for n in range(min(4, len(words)), 0, -1):
+        head = " ".join(words[:n])
+        try:
+            person = people.of_the_company(head, draw=False)
+        except Exception:  # a world with no muster
+            person = None
+        if person is not None:
+            return (None, n) if person.name in held else (person, n)
+    return None
+
+
+def _to_the_director(
+    ship: Any, text: str, verb: str, speaker: dict[str, str] | None
+) -> tuple[str, str, dict[str, Any]] | None:
+    """`ask` or `tell` put to a person nobody holds, with a director seated (package 52):
+    the line, the director told (`director.ask_unheld`); None where the sentence is the
+    rules' as before (no director, a station held, the masthead, a person held)."""
+    from freesail.agents import director as director_mod
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    if world is None or director_mod.seated(world) is None:
+        return None
+    norm = " ".join(text.split())
+    head = r"(?:tell|say\s+to)" if verb == "tell" else "ask"
+    m = re.match(rf"^{head}\s+(?:the\s+)?(?P<rest>.+)$", norm, re.I)
+    rest = m.group("rest") if m else norm
+    station = _station_in(normalise(rest), ship)
+    if station is not None:
+        if _held_now(ship, station) is not None or _kind_of(ship, station) == "lookout":
+            return None
+        stations = getattr(world, "stations", None)
+        person = stations.holder(station) if stations is not None else None
+        found = _unheld_person(ship, person.name) if person is not None else None
+        if found is None or found[0] is None:
+            return None
+        station, words = _split_ask(text, ship, verb=verb)
+        if verb == "tell":
+            # the word kept for whoever takes the station, as before, and the director told
+            kept = _keep_word(ship, station, words)
+            director_mod.ask_unheld(world, found[0], words, "tell", speaker, journal=False)
+            return kept
+    else:
+        found = _unheld_person(ship, normalise(rest))
+        if found is None or found[0] is None:
+            return None
+        n = found[1]
+        words = " ".join(rest.split()[n:]).lstrip(",:").strip()
+        for lead in ("to ", "for "):
+            if words.lower().startswith(lead) and len(words.split()) > 1:
+                words = words[len(lead) :]
+                break
+    if speaker is not None and found[0] is not None:
+        bound = getattr(world, "stations", None)
+        if bound is not None and bound.holder(speaker["station"]) is found[0]:
+            raise OrderError(f"The {speaker['station']} asks itself nothing; ask another.")
+    person = found[0]
+    if person not in world.people.all:
+        # a man of the muster by his trade, drawn now that he is spoken to
+        person = world.people.of_the_company(person.role) or person
+    try:
+        return director_mod.ask_unheld(world, person, words, verb, speaker)
+    except ValueError as e:
+        raise OrderError(str(e)) from None
 
 
 def _station_named(norm: str, verb: str, ship: Any) -> str | None:

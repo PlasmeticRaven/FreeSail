@@ -48,6 +48,7 @@ __all__ = [
     "Places",
     "Purse",
     "Stores",
+    "earshot",
     "place_words",
 ]
 
@@ -116,6 +117,13 @@ PLACES: dict[str, Place] = {
             below=True,
         ),
         Place(
+            "galley",
+            "the galley",
+            "the cook-room under the forecastle, where the coppers boil the company's "
+            "victuals in the cook's charge (judgement: a frigate's of the period, under the "
+            "forecastle and open to the waist; a small vessel's is her caboose on deck)",
+        ),
+        Place(
             "boat",
             "the boat",
             "the ship's boat, hoisted out and away on an errand, or alongside",
@@ -135,6 +143,20 @@ PLACES: dict[str, Place] = {
         ),
     )
 }
+
+
+# The places open to one another on the upper deck (package 52, spec M7b §9: a word said
+# where a person is, heard by those within earshot): the quarterdeck, the waist and
+# forecastle, and the galley under the forecastle, open to the waist. Below, aloft and off
+# the ship, a word is heard only in its own place (judgement: the bulkheads and the height
+# of the tops; the lookout's hail from the masthead carries by its own rule).
+OPEN_DECK: frozenset[str] = frozenset({"quarterdeck", "deck", "galley"})
+
+
+def earshot(place_id: str) -> frozenset[str]:
+    """The places within earshot of a word said in `place_id`: the open deck's three for
+    any of them, else the place alone."""
+    return OPEN_DECK if place_id in OPEN_DECK else frozenset({place_id})
 
 
 def place_words(place_id: str) -> str:

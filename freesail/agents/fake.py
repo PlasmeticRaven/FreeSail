@@ -550,15 +550,37 @@ def passenger_aboard(remarks: Sequence[str] = ()) -> Fake:
     return Fake([turn], loop=True)
 
 
-def direct_the_voyage(orders: Sequence[str] = (), reenter: bool = True) -> Any:
+# The director's sample words for a question put to a person nobody holds (package 52;
+# `director.ask_unheld`): the order it is told to answer with, and whom.
+_ANSWER_AS = re.compile(r"world_order\('say as (?P<who>[^:]+): <his words>'\)")
+
+
+def direct_the_voyage(
+    orders: Sequence[str] = (),
+    reenter: bool = True,
+    answers: dict[str, str] | None = None,
+) -> Any:
     """The scripted director's rule (package 50; spec M7b §2 to §5): at each sample one
     world order from the list, in order, through `world_order`; an order the channel
     doubts is entered again with a reason when `reenter` (so that the doubt and the
     re-entry are both on the record), else let be; a thought in the log after each; when
-    the list is spent, a stand-by until the next watch."""
+    the list is spent, a stand-by until the next watch. With `answers` (package 52, the
+    director's voice), a question put to a person nobody holds is answered first, as him,
+    in the words the map gives for his name (or 'Aye, sir.')."""
     state = {"i": 0, "pending": None}
 
     def rule(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
+        if answers is not None and "tool_results" not in last:
+            asked = _ANSWER_AS.findall(str(last.get("word") or ""))
+            if asked:
+                calls = tuple(
+                    ToolCall(
+                        "world_order",
+                        {"text": f'say as {who}: "{answers.get(who, "Aye, sir.")}"'},
+                    )
+                    for who in dict.fromkeys(asked)
+                )
+                return Reply(text="Answered as him.", calls=calls)
         if "tool_results" in last:
             results = last["tool_results"]
             for r in results:
@@ -595,6 +617,9 @@ def direct_the_voyage(orders: Sequence[str] = (), reenter: bool = True) -> Any:
     return rule
 
 
-def director_above_the_game(orders: Sequence[str] = (), reenter: bool = True) -> Fake:
-    """The scripted director (package 50): `direct_the_voyage` as a fake, looped."""
-    return Fake([direct_the_voyage(orders, reenter)], loop=True)
+def director_above_the_game(
+    orders: Sequence[str] = (), reenter: bool = True, answers: dict[str, str] | None = None
+) -> Fake:
+    """The scripted director (package 50): `direct_the_voyage` as a fake, looped; with
+    `answers`, the voice of package 52."""
+    return Fake([direct_the_voyage(orders, reenter, answers)], loop=True)
