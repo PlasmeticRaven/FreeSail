@@ -357,3 +357,41 @@ def test_a_station_intent_at_far_detail_keeps_the_station_off_the_place_to_seawa
         bearing_and_distance(mark, leg[1])[1] <= 15.0 * units.NAUTICAL_MILE + 1.0 for leg in k.plan
     )
     _ = destination
+
+
+def test_the_beating_verdict_is_one_rule_held_ten_minutes_with_a_band_between():
+    """Package 43b: the trade trial's captain traded `on passage` and `beating` every two
+    minutes as an evasion ended, the beating rule and the passage rule each giving the
+    other verdict on a course shaped on the edge of the wind. One rule decides now (the
+    course shaped against the wind of the minute: not laid nearer than her close-hauled
+    angle and the shaping's half point, laid only half a point freer, and between the two
+    as it was), and the book is taken up or given up on a verdict that has stood the
+    doctrine's ten minutes."""
+    w = world_at(49.5, -5.5)
+    v = put(
+        w,
+        "merchant brig",
+        "britain",
+        {"lat_deg": 49.5, "lon_deg": -5.5},
+        "bound for Brest",
+        intent="bound for Brest",
+    )
+    brain = v.brain
+    point = 11.25
+    brain._business.update(course_heading_deg=0.0, course_closest_deg=6.0 * point)
+    edge = 6.5 * point
+
+    def p(tick, wind_from):
+        return C.Perception(tick=tick, wind_from_deg=wind_from)
+
+    assert not brain._stimulus("course not laid", p(0, 5.0 * point))
+    assert not brain._stimulus("course not laid", p(540, 5.0 * point))
+    assert brain._stimulus("course not laid", p(600, 5.0 * point))
+    # within the band: the verdict stands as it was
+    assert brain._course_verdict(p(660, edge + 0.25 * point)) == "not laid"
+    # freer than the band: laid, and acted on only when it has stood ten minutes
+    assert brain._course_verdict(p(720, edge + 0.75 * point)) == "laid"
+    assert not brain._stimulus("course laid", p(1260, edge + 0.75 * point))
+    assert brain._stimulus("course laid", p(1320, edge + 0.75 * point))
+    assert brain._course_verdict(p(1380, edge + 0.25 * point)) == "laid"
+    assert brain.doctrine.threshold("beating_dwell_minutes") == 10

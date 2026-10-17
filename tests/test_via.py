@@ -209,3 +209,38 @@ def test_the_frigate_passes_ushant_and_finisterre_on_their_hands_on_the_whole_ch
     assert not [e for e in w.log if e.kind == "ship.aground"]
     assert w.position.lat_deg < 42.9
     assert w.captain.intent is not None and w.captain.intent.via == ("Ushant", "Finisterre")
+
+
+def test_a_mark_is_passed_abeam_only_within_two_miles_of_it_or_of_its_line():
+    """Package 43b, from package 44's regatta: a water mark far to windward was taken as
+    passed abeam while she was miles from it, the bearing alone abaft the line's beam. A
+    mark is passed only within two miles of it or of the line to it
+    (`reckoning.WAY_PASSED_WITHIN_NM`)."""
+    from freesail import units
+    from freesail.world.geo import destination, off_the_line_m
+
+    sf = load_scenario(FALMOUTH_LESSON)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    w.run(120)
+    nav = w.navigation
+    assert w.submit("shape a course for Lisbon via Ushant and Finisterre").kind == "helm.set"
+    here = nav.account_now()
+    nm = units.NAUTICAL_MILE
+    # the mark ten miles south and ten east of her, its line running north from twenty
+    # miles south of it: she lies ten miles off the line, the mark abaft its beam
+    mark = destination(destination(here, 180.0, 10 * nm), 90.0, 10 * nm)
+    nav.way_target = mark
+    nav.way_from = destination(mark, 180.0, 20 * nm)
+    assert off_the_line_m(nav.way_from, mark, here) > 9 * nm
+    w.run(60)
+    assert not [x for x in w.log if x.text.startswith("By the way shaped")]
+    assert nav.way_mark == "5 miles north-west of Ushant"
+    # within two miles of the line, the same mark abaft the beam is passed
+    here = nav.account_now()
+    mark = destination(here, 180.0, 10 * nm)
+    nav.way_target = destination(mark, 90.0, 1 * nm)
+    nav.way_from = destination(nav.way_target, 0.0, -20 * nm)
+    w.run(60)
+    said = [x for x in w.log if x.text.startswith("By the way shaped")]
+    assert said and "5 miles north-west of Ushant passed abeam" in said[-1].text

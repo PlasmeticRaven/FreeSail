@@ -96,8 +96,9 @@ def test_every_doctrine_loads_with_sources_states_and_stimuli_the_captain_knows(
             assert t.frm in C.STATES and t.to in C.STATES
             assert t.on in C.STIMULI, f"{role}: {t.on}"
             assert not t.unless or t.unless in C.STIMULI
-    with pytest.raises(ValueError, match="no doctrine for the role 'fisherman'"):
-        C.load_doctrine("fisherman")
+    # the fisherman is package 43b's (the world's business); a role with no file is refused
+    with pytest.raises(ValueError, match="no doctrine for the role 'privateer'"):
+        C.load_doctrine("privateer")
 
 
 def test_every_book_line_of_every_doctrine_parses_in_the_dialect_on_every_ship():
@@ -424,3 +425,21 @@ def test_the_far_detail_body_resolves_on_passage_and_hove_to_and_refuses_the_res
     assert all(x.state == "on passage" and x.saved_plan is None for x in world.vessels.vessels)
     assert "state" not in world.vessels.to_dict()[0]  # nothing new in the pinned form
     _ = destination
+
+
+def test_a_captain_under_way_with_no_sail_set_makes_plain_sail():
+    """Package 43b, from package 44's regatta: the rules-based captain started under way
+    with no sail set made none for a day. Entering on passage with none set he makes plain
+    sail, as after weighing (the topsails alone over the doctrine's shortening line)."""
+    w = world_at(49.8, -5.2)
+    assert not any(s.is_set for s in w.ship.sails.values())
+    w.world_order("captain: intent bound for Plymouth")
+    w.run(360)  # his first judgement at five minutes
+    made = [
+        e
+        for e in w.log
+        if e.kind == "order.accepted" and "set plain sail" in e.data.get("order", "")
+    ]
+    assert made, [e.text for e in w.log if e.kind == "order.accepted"]
+    w.run(1200)
+    assert any(s.is_set for s in w.ship.sails.values())

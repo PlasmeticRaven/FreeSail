@@ -1,0 +1,48 @@
+# Dip a lug (package 43b; the proposal's §4.4, the lugger's rig-specific evolution, written
+# as the running bowsprit was for the cutter, package 32b). A dipping lug's yard is slung at
+# a third of its length on one side of the mast with two thirds of the sail to leeward; its
+# tack and sheet cannot change roles as a square sail's do, so after going about the sail
+# lies against the mast on the new weather side (`physics.sails.LUG_AGAINST_MAST_AREA`)
+# until it is shifted: "il faut, quand on vire de bord, amener tout-à-fait la vergue,
+# démarrer la drisse, changer la voile de côté pour la hisser ensuite" (Forfait 1788
+# p. 6); "amener la vergue tout bas, démarrer sa drisse, & changer la voile de côté"
+# (Lescallier 1791 pp. 391 to 392); "To the lee-clue of the sail is a sheet, and to the
+# windward-clue a tack, which is occasionally shifted as the vessel goes about. When this
+# is often repeated, they loose ground in stays" (Steel 1794 vol. I, LUGGER). The tack and
+# the wear dip their lugs as part of the manoeuvre (`scripts.LugDip`); this is the order
+# by itself, for a lug left on the wrong side. Not instant: lowered right down, the yard
+# passed round abaft the mast, the tack shifted to the new weather bow, hoisted again.
+# No period figure for the time: two minutes and a half, judgement (the dip of later
+# boatmen round the mast without lowering, which was quicker, is not in the period's
+# texts, `docs/design/VesselReferences-2026-10.md` § 1.4).
+id: dip_lug
+verb: dip
+applies_to: {class: lug}
+preconditions:
+  - {check: sail.dipping, reason: "The {sail} is a standing lug tacked at the foot of its mast; it is not dipped."}
+  - {check: sail.state == set, reason: "The {sail} is {state}; only a lug that is set is dipped. Set it, and it is hoisted on the lee side."}
+  - {check: "against_the_mast(sail)", reason: "The {sail} lies to leeward of its mast already.", done: true}
+  - {check: "not wrecked(halyard_of(sail))", reason: "{parted}"}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: lower
+    duration_s: 30
+    sets: {sail.state: in_the_gear}
+    log: "Lowered the {sail} right down and cast off the halyard."
+  - do: shift
+    duration_s: 60
+    sets: {sail.lug_side: "lee_side()"}
+    log: "Passed the {sail}'s yard round abaft the mast and shifted the tack to the weather bow."
+  - do: hoist
+    duration_s: 60
+    via: halyard_of(sail)
+    sets: {sail.state: set}
+on_start: {log: "Dip the {sail}! Hands to the halyard and the tack."}
+on_complete: {log: "Dipped the {sail}; it stands to leeward of the mast.", kind: sail.dipped, severity: notable}
+on_fail: {log: "Could not dip the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the lugger's forecastlemen and afterguard; Forfait p. 54: the lugger "exige un
+# équipage d'élite & fort nombreux"; the number judgement
+crew: {hands: 6, rating: able, stations: [forecastle, afterguard]}
+source: "Forfait 1788 pp. 5 to 6; Lescallier 1791 pp. 391 to 392; Steel 1794 vol. I, LUGGER"

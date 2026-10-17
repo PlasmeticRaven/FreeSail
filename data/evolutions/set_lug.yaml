@@ -1,0 +1,41 @@
+# Set a lug sail (package 43b; the lugger's fore, main and mizen lugs, the taille-vent):
+# cast off the stops, hook the tack, hoist the yard by its halyard to a foot below the
+# sheave and haul aft the sheet. A dipping lug is hoisted on the lee side of its mast,
+# two thirds of its cloth to leeward ("de forte qu'il y a toujours deux tiers de la voile
+# d'un côté du mât & sous le vent", Forfait 1788 pp. 5 to 6); the side it lies on is its
+# `lug_side`, which the dip changes (dip_lug.yaml). No braces and no lifts: "les ralingues
+# en font l'office" (Forfait p. 53), and the sheet holds the trim as a fore-and-aft sail's
+# does. Times judgement, as set_gaff's: a lug is lighter work than a gaff sail, one
+# halyard and no throat and peak to sway up together.
+id: set_lug
+verb: set
+applies_to: {class: lug}
+preconditions:
+  - {check: sail.state != set, reason: "The {sail} is set already.", done: true}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; a new one must be bent."}
+  - {check: "not wrecked(sheets_of(sail)) and not wrecked(halyard_of(sail))", reason: "{parted}"}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: cast_off_stops
+    duration_s: 30
+    if: sail.state == furled
+    sets: {sail.state: loosed}
+    log: "Cast off the stops of the {sail} and hooked the tack."
+  - do: clear_away
+    instead_of: cast_off_stops
+    duration_s: 10
+    if: sail.state == in_the_gear
+    sets: {sail.state: loosed}
+  - do: hoist
+    duration_s: 75
+    via: halyard_of(sail)
+    sets: {sail.state: set, sail.lug_side: "lee_side()", sail.sheet_angle: "clamp(abs(dyn.apparent_wind_angle) - deg(25), deg(8), deg(85))"}
+on_start: {log: "Hands to the {sail} halyard and tack."}
+on_complete: {log: "Set the {sail}.", kind: sail.set, severity: notable}
+on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the forecastlemen and the afterguard of a small craft (judgement: a lugger has no
+# tops, and "ils exigent un équipage d'élite & fort nombreux", Forfait p. 54)
+crew: {hands: 6, rating: ordinary, stations: [forecastle, afterguard]}
+source: "Forfait 1788 pp. 5 to 6 and 52 to 55 (the lug and the chasse-marée); Lescallier 1791 pp. 391 to 392; Steel 1794 vol. I, LUGGER"

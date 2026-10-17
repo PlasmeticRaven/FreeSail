@@ -1,0 +1,26 @@
+# Shake a reef out of a lug sail (package 43b): settle the halyard, cast off the points
+# and the earing, hoist away. Times judgement.
+id: shake_out_lug
+verb: shake_out
+applies_to: {class: lug}
+params: {reefs: 1}
+preconditions:
+  - {check: sail.state == set, reason: "The {sail} is {state}; set it before shaking out a reef."}
+  - {check: sail.reefs > 0, reason: "The {sail} has no reef in it."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: settle
+    duration_s: 20
+  - do: shake_out
+    duration_s: 90
+    sets: {sail.reefs: "max(sail.reefs - params.reefs, 0)"}
+    log: "Cast off the reef points of the {sail}."
+  - do: hoist
+    duration_s: 45
+    via: halyard_of(sail)
+on_start: {log: "Hands to shake a reef out of the {sail}."}
+on_complete: {log: "Shook the reef out of the {sail}; now {state}.", kind: sail.reef_shaken_out, severity: notable}
+on_fail: {log: "Could not shake out the reef in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 6, rating: ordinary, stations: [forecastle, afterguard]}
+source: "Holdsworth 1874 pp. 104 to 105 (judgement on the work)"

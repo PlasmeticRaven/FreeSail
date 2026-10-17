@@ -132,7 +132,7 @@ ROPE_KN_PER_SQ_IN = round(1044.9 * 4.44822 / 1000.0 / 3.0, 4)  # 1.5493
 
 # The engine's force coefficient at the peak of each class's curve (data/sail_classes.yaml,
 # |(C_L, C_D)| at the best angle). Package 10: if the curves change, change these and rerun.
-PEAK_COEFF = {"square": 1.23, "studding": 1.25, "gaff": 1.29, "jibheaded": 1.32}
+PEAK_COEFF = {"square": 1.23, "studding": 1.25, "gaff": 1.29, "jibheaded": 1.32, "lug": 1.29}
 
 # Sustained load / static peak-coefficient load, measured with tools/measure_loads.py on the
 # frigate on a beam reach with the yards trimmed to the wind: 0.9 at 35 knots under all
@@ -5207,6 +5207,1388 @@ def brig_crew(b):
     )
 
 
+# ---------------------------------------------------------------------------
+# The lugger: the chasse-marée on the Éclair of 1795 (package 43b; spec M6 §19; decision 42)
+# ---------------------------------------------------------------------------
+#
+# Sources (docs/design/VesselReferences-2026-10.md § 1, decision 42). The hull is L'Éclair,
+# a French gun-lugger taken by Strachan's squadron and "taken off afloat" at Portsmouth on
+# 2 July 1795 (RMG ZAZ6306, read from the plan): 59 ft 3 in on the range of the deck, 45 ft
+# 11 in keel for tonnage, 20 ft 4 in breadth extreme, 7 ft 0 in depth in hold, 101 tons
+# (the Navy's rule on 45 ft 11 in by 20 ft 4 in gives 100 92/94), three guns. The rig is
+# Forfait's Table VII, *Lougres ou woguers*, the 60-pied column (1788 p. 75): the masts in
+# terms of the breadth, the yards in terms of the length; main mast 3.455 B, fore 2.759 B,
+# mizen (tapecul) 1.888 B, topmasts 1.091 B, bowsprit 2.649 B; main yard 0.573 L, fore
+# 0.454 L, main topsail yard 0.424 L, fore 0.393 L, mizen yard and outrigger 0.364 L; the
+# main mast 0.040 L abaft the middle, the fore 0.364 L before it, the mizen "le plus près
+# qu'on peut du couronnement"; rakes 1 in, 4 lignes and 2 in per foot; the sail area 4.037
+# L x B, its centre 0.024 L abaft the middle and 1.576 B high. The references note warns
+# that her breadth is 0.343 of her length, beamier than Forfait's luggers, so that masts on
+# her breadth come tall, and asks the area and the centre checked: the masts are set on her
+# breadth here, since the area then keeps Forfait's own coefficient on her own L x B (the
+# yards on her length, the masts' height on her breadth: area goes as L x B either way),
+# and the check is printed in the file's comments (the masts on the length instead would
+# give 0.75 of it, a lugger under-canvassed by her own author's rule). Heels below the
+# load line by Fincham's chasse-marée (1843 p. 61: main 0.26 B, fore 0.17 B, mizen 0.08 B
+# for the lugger). The lugs are dipping lugs, slung at a third of the yard (Forfait pp. 5
+# to 6; Lescallier 1791 pp. 391 to 392; Steel 1794 vol. I, LUGGER), the yard peaked at
+# 60 to 70 degrees to the mast and hoisted to a foot below the sheave (Forfait p. 53); the
+# lug topsails have braces, lifts and bowlines and are trimmed as square topsails (Forfait
+# p. 53: "les huniers seuls"); the mizen a lug sheeted to its outrigger and not dipped
+# (Holdsworth 1874 p. 104's "working mizen"; judgement); the bowsprit runs on a chevalet
+# (Forfait p. 53), the cutter's running bowsprit; the storm suit is the taille-vent, a lug
+# of about half the mainsail's area tacked at the foot of the mast (Forfait p. 52;
+# Lescallier pp. 408 to 409; Willaumez 1831, TAILLE-VENT), its yard 0.7 of the main yard
+# (Fincham's chasse-marée's second suit).
+
+LUGGER_CANVAS: dict[str, tuple[int, str]] = {
+    "lug": (
+        2,
+        "judgement: no period number for a lug found; the cutter's mainsail's, Steel 1794 p. "
+        "120, No. 1 or 2, for the sail that drives her",
+    ),
+    "mizen": (3, "judgement: a lighter lug than the fore and main"),
+    "topsail": (
+        6,
+        f"{STEEL_SM} p. 125, 'Sloop's topsail': No. 6 or 7, the lugger's topsails as light",
+    ),
+    "jib": (2, f"{STEEL_SM}, 'Smack's jib' (OCR line 15709): No. 1 or 2"),
+    "flying jib": (6, "judgement: a light outer jib"),
+    "taille-vent": (1, "judgement: the storm lug, of the heaviest"),
+    "storm jib": (
+        1,
+        f"{STEEL_SM}, the sloop's jibs (p. 190): 'No. 1 or 2 ... used in stormy weather'",
+    ),
+}
+
+LUGGER_TOPSAIL_ROPE = {
+    "halyard": 2.5,
+    "sheet": 2.5,
+    "brace": 1.75,
+    "lift": 1.75,
+    "clewline": 1.75,
+    "buntline": 1.5,
+    "bowline": 1.75,
+    "reef_tackle": 1.75,
+}
+LUGGER_POSTS, LUGGER_DRAWN = wardroom("lugger")
+
+
+def _quad_area_centroid(pts):
+    """The area and the centroid of a four-cornered sail by its corners (x, z), feet."""
+    a = cx = cz = 0.0
+    n = len(pts)
+    for i in range(n):
+        x1, z1 = pts[i]
+        x2, z2 = pts[(i + 1) % n]
+        cross = x1 * z2 - x2 * z1
+        a += cross
+        cx += (x1 + x2) * cross
+        cz += (z1 + z2) * cross
+    a *= 0.5
+    return abs(a), cx / (6.0 * a), cz / (6.0 * a)
+
+
+def lugger(out_dir="data/ships"):
+    dw = dict(DESIGN_WIND_KN, lug=45.0)  # a lug is carried reefed in a gale, as a gaff sail
+    # -- hull ---------------------------------------------------------------------------
+    lod_ft = 59.25  # the range of the deck (RMG ZAZ6306)
+    keel_ft = 45.0 + 11.0 / 12.0
+    beam_ft = 20.0 + 4.0 / 12.0
+    burthen = 101.0
+    lwl_ft = 55.0  # judgement: between the keel and the deck, a raking stem and post
+    # draught: deep aft for grip (Willaumez 1831, CHASSE-MARÉE: the main mast "très incliné
+    # sur l'arrière" over a hull drawing most aft); judgement, 8 ft 6 in aft and 5 ft 6 in
+    # forward, the mean a foot over her depth in hold (7 ft 0 in), the keel and floors
+    draught_aft_ft = 8.5
+    draught_fwd_ft = 5.5
+    draught_ft = (draught_aft_ft + draught_fwd_ft) / 2.0
+    lwl, beam, draught = ft(lwl_ft), ft(beam_ft), ft(draught_ft)
+    displacement = round(lwl * beam * draught * 0.45 * 1025.0, -3)
+    deck_height = 1.0  # judgement: about 3 ft 3 in of side above the water
+    deck_above_lwl_ft = deck_height / FT
+    L, B = lod_ft, beam_ft
+
+    b = Builder(
+        "Éclair",
+        "lugger",
+        "L'Éclair, a French gun-lugger of the war taken in 1795 and taken off afloat at "
+        "Portsmouth (RMG ZAZ6306): 101 tons burthen, 59 ft 3 in on the range of the deck, 45 "
+        "ft 11 in keel for tonnage, 20 ft 4 in breadth, 7 ft depth in hold, three guns (guns "
+        "are not parts until milestone 7); a chasse-marée of three masts with dipping lugs, "
+        "lug topsails, a lug mizen to an outrigger and jibs on a running bowsprit, by "
+        "Forfait 1788's Table VII (the 60-pied lougre), with the taille-vent for a blow; "
+        "see tools/gen_ships.py for every rule.",
+        {
+            "length_waterline_m": lwl,
+            "beam_m": beam,
+            "draught_m": draught,
+            "displacement_kg": displacement,
+            "gm_m": 1.2,
+            "clr_x_m": -1.6,
+            "lateral_area_m2": round(lwl * draught * 0.85),
+            "hull_speed_kn": round(1.34 * math.sqrt(lwl_ft), 1),
+            "deck_height_m": deck_height,
+            "rudder": {"area_m2": 1.4, "max_angle_deg": 35, "rate_deg_s": 5.0, "span_m": 2.5},
+        },
+        {
+            "length_waterline_m": f"{lwl_ft:.0f} ft: judgement between the {keel_ft:.1f} ft keel "
+            f"for tonnage and the {lod_ft} ft on the range of the deck (RMG ZAZ6306).",
+            "beam_m": "20 ft 4 in extreme (RMG ZAZ6306; the inch figure may carry a half).",
+            "draught_m": f"{draught_ft:.1f} ft mean: {draught_aft_ft} ft aft, {draught_fwd_ft} ft "
+            "forward (judgement: a chasse-marée drew most aft; her depth in hold 7 ft 0 in, the "
+            "plan).",
+            "displacement_kg": "LWL x beam x draught x Cb 0.45 x 1025, about her 101 tons "
+            "burthen (Cb judgement, the cutter's: a beamy hull, fine at the ends for speed: "
+            "luggers were built 'pour la marche', Lescallier 1791 p. 408).",
+            "gm_m": "3 ft 11 in: judgement; a beamy hull that carried a great press of sail high "
+            "when others reefed (Forfait 1788 p. 53), stiffer than the cutter.",
+            "clr_x_m": "5 ft 3 in abaft the middle: judgement, measured (docs/dev/TuningNotes.md, "
+            "package 43b). At 2 ft abaft, near Forfait's centre of effort (0.024 L abaft, Table "
+            "VII), the great lugs to leeward griped her up into the wind as she gathered way "
+            "with the rudder hard over; here she carries four degrees of weather helm at seven "
+            "points and is nearly balanced close-hauled.",
+            "lateral_area_m2": "LWL x draught x 0.85 (the cutter's rule).",
+            "hull_speed_kn": f"1.34 sqrt({lwl_ft:.0f} ft).",
+            "deck_height_m": "The deck about 3 ft 3 in above the water (judgement).",
+            "rudder": "A blade about 8 ft deep (judgement).",
+        },
+    )
+
+    def m(x_ft):
+        return round(x_ft * FT, 1)
+
+    peak = math.radians(25.0)  # the yard at 65 degrees to the mast (Forfait p. 53: 60 to 70)
+    prov = " Provisional (truth 9), see gen_ships.py."
+    masts = {
+        # name: (Forfait's factor of B, place in ft before the middle, rake in/ft, heel/B)
+        "fore": (2.759, 0.364 * L, 4.0 / 12.0, 0.17),
+        "main": (3.455, -0.040 * L, 1.0, 0.26),
+        "mizen": (1.888, -(L / 2.0 - 1.0), 2.0, 0.08),
+    }
+    yards = {"fore": 0.454 * L, "main": 0.573 * L, "mizen": 0.364 * L}
+    topsail_yards = {"fore": 0.393 * L, "main": 0.424 * L}
+    topmast_ft = 1.091 * B
+    stem_x_ft = lwl_ft / 2.0 + 1.0
+    built = {}
+    lug_areas = {}
+    lines_canvas = {
+        "fore": LUGGER_CANVAS["lug"],
+        "main": LUGGER_CANVAS["lug"],
+        "mizen": LUGGER_CANVAS["mizen"],
+    }
+    lug_rope = {"fore": 3.0, "main": 3.5, "mizen": 2.5}
+    for name, (factor, x_ft, rake_in, heel_b) in masts.items():
+        total = factor * B
+        heel = heel_b * B
+        above = total - heel - deck_above_lwl_ft
+        rake_deg = round(math.degrees(math.atan(rake_in / 12.0)), 1)
+        rake = math.tan(math.radians(rake_deg))
+        yard_ft = yards[name]
+        sling_h = above - 1.0  # hoisted to a foot below the sheave (Forfait p. 53)
+        mast_at_sling = x_ft - rake * sling_h
+        throat = (
+            mast_at_sling + yard_ft / 3.0 * math.cos(peak),
+            sling_h - yard_ft / 3.0 * math.sin(peak),
+        )
+        peak_pt = (
+            mast_at_sling - 2.0 * yard_ft / 3.0 * math.cos(peak),
+            sling_h + 2.0 * yard_ft / 3.0 * math.sin(peak),
+        )
+        if name == "mizen":
+            # a standing lug: its tack at the mast, its clew to the outrigger's end over the
+            # stern (0.364 L, two thirds of it outboard: judgement)
+            tack = (x_ft + 1.0, 3.0)
+            clew = (x_ft - 2.0 / 3.0 * 0.364 * L, 4.0)
+        elif name == "fore":
+            # the fore lug's tack at the stem head (Willaumez: the fore mast two or three feet
+            # abaft the stem head; Holdsworth p. 104: the tack to a bumkin outside the stem),
+            # its foot 0.9 of its yard (judgement, the narrower foot of a sail tacked forward)
+            tack = (stem_x_ft, 3.0)
+            clew = (tack[0] - 0.9 * yard_ft, 3.0)
+        else:
+            # the main lug's tack on the deck under its throat, before the mast; the foot as
+            # long as the yard (judgement)
+            tack = (throat[0], 3.0)
+            clew = (tack[0] - 1.0 * yard_ft, 3.0)
+        area_ft2, cx, cz = _quad_area_centroid([tack, throat, peak_pt, clew])
+        area = round(area_ft2 * FT * FT)
+        centre_h = round(deck_height + cz * FT, 1)
+        lug_areas[name] = (area, cx, cz)
+        mast = b.spar(
+            f"{name}.mast",
+            "mast",
+            x_m=m(x_ft),
+            rake_deg=rake_deg,
+            height_m=ft(above),
+            rating_kn=design_kn([(area, centre_h, "lug")], dw["lower"]),
+            note=f"the {name} mast {total:.0f} ft heel to head, {factor} of the breadth "
+            f"(Forfait 1788 Table VII p. 75, the 60-pied lougre), {above:.0f} ft above the deck; "
+            f"the heel {heel:.1f} ft below the water-line ({heel_b} B, Fincham 1843 p. 61); "
+            f"stationed {abs(x_ft):.1f} ft {'before' if x_ft > 0 else 'abaft'} the middle "
+            f"(Forfait); raking {rake_deg} deg ({rake_in:.2g} in to the foot, Forfait). A few "
+            "shrouds a side with runners (BASTAQUE, Willaumez 1831), the lee ones slacked to "
+            f"trim the lug (Forfait p. 53).{prov}",
+        )
+        yard = b.spar(
+            f"{name}.lug_yard",
+            "lug_yard",
+            on=mast,
+            length_m=ft(yard_ft),
+            height_m=ft(sling_h),
+            rating_kn=design_kn([(area, centre_h, "lug")], dw["lug"]),
+            note=f"the {name} lug's yard {yard_ft:.1f} ft ({yards[name] / L:.3f} of the length, "
+            "Forfait Table VII), slung at a third of its length and peaked at 65 degrees to the "
+            "mast (Forfait p. 53: 60 to 70), hoisted to a foot below the sheave; no braces and no "
+            f"lifts ('les ralingues en font l'office', Forfait p. 53).{prov}",
+        )
+        dipping = name != "mizen"
+        canvas = lines_canvas[name]
+        sail = b.sail(
+            f"{name}.lug",
+            "lug",
+            yard=yard,
+            mast=mast,
+            area_m2=area,
+            reef_bands=2 if dipping else 1,
+            x_m=m(cx),
+            centre_height_m=centre_h,
+            canvas_no=canvas[0],
+            cloth_rating_kn=cloth(area, canvas[0]),
+            dipping=dipping or None,
+            note=(
+                f"the {name} lug, {area} m2, a dipping lug: two thirds of its cloth to leeward "
+                "of the mast and its tack shifted in going about (Forfait pp. 5 to 6; Lescallier "
+                "pp. 391 to 392; Steel 1794, LUGGER); its corners the tack, the yard's two ends "
+                "and the clew, the foot as long as the yard (judgement); two reef-bands "
+                "(judgement; Fincham p. 59: luggers carried 'two sets of sails, large and "
+                "small')."
+                if dipping
+                else f"the mizen lug (tapecul), {area} m2: a standing lug, tacked at the mast and "
+                "sheeted to its outrigger over the stern, not dipped in going about (Holdsworth "
+                "1874 p. 104: the Yarmouth luggers' 'working mizen'; judgement); one reef-band."
+            )
+            + canvas_note(canvas),
+        )
+        b.line(
+            f"{name}.lug_yard.halyard",
+            "halyard",
+            yard,
+            rating=rope_kn(lug_rope[name], 2),
+            note=f"the {name} lug's halyard, {lug_rope[name]} in, two parts (judgement): 'a "
+            "halyard to each sail' (Forfait p. 53)."
+            if name == "fore"
+            else None,
+        )
+        b.line(f"{name}.lug.tack", "tack", sail, rating=rope_kn(lug_rope[name]))
+        b.line(
+            f"{name}.lug.sheet",
+            "sheet",
+            sail,
+            rating=rope_kn(lug_rope[name] - 0.5, 2),
+            parts=2,
+            note="the sheet to the lee clew, shifted with the tack in going about (Steel 1794, "
+            "LUGGER); two parts (judgement)."
+            if name == "main"
+            else (
+                "the mizen's sheet, rove through the outrigger's end ('bout-dehors de tapecul', "
+                "0.364 L, Forfait Table VII); two parts (judgement)."
+                if name == "mizen"
+                else None
+            ),
+        )
+        b.sided(
+            f"{name}.shrouds", "shroud", mast, rating=rope_kn(5.0 if name != "mizen" else 3.5, 2)
+        )
+        b.line(f"{name}.stay", "stay", mast, rating=rope_kn(5.0 if name != "mizen" else 3.5))
+        built[name] = (mast, yard, sail, above, x_ft, rake, centre_h)
+
+    # the topsails on the fore and main topmasts, fidded abaft the lower mast heads in iron
+    # rings (Steel 1794, LUGGER; Lescallier p. 408), with braces, lifts and bowlines
+    topsails = []
+    topsail_yards_built = []
+    topmasts = []
+    for name in ("fore", "main"):
+        mast, yard, sail, above, x_ft, rake, _ch = built[name]
+        hoist = 0.75 * topmast_ft  # the quarter of it in the doubling (judgement)
+        tm = b.spar(
+            f"{name}.topmast",
+            "topmast",
+            steps_on=mast,
+            height_m=ft(hoist),
+            rating_kn=None,
+            note=f"the {name} topmast {topmast_ft:.0f} ft, 1.091 of the breadth (Forfait Table "
+            f"VII), fidded abaft the mast head in an iron ring (Steel 1794, LUGGER), "
+            f"{hoist:.0f} ft above "
+            "the cap (judgement: a quarter of it in the doubling).",
+        )
+        ty_len = topsail_yards[name]
+        ty_h = above + hoist - 1.0
+        depth = ty_h - (above - 1.0)
+        ts_area = round(0.85 * ty_len * depth * FT * FT)
+        ts_z = above - 1.0 + 0.5 * depth
+        ts_centre = round(deck_height + ts_z * FT, 1)
+        b.doc["spars"][-1]["rating_kn"] = design_kn([(ts_area, ts_centre, "square")], dw["topsail"])
+        ty = b.spar(
+            f"{name}.topsail.yard",
+            "yard",
+            on=tm,
+            length_m=ft(ty_len),
+            height_m=ft(ty_h),
+            brace_limit_deg=64,
+            rating_kn=design_kn([(ts_area, ts_centre, "square")], dw["topsail"]),
+            note=f"the {name} topsail yard {ty_len:.1f} ft ({ty_len / L:.3f} of the length, "
+            "Forfait "
+            "Table VII); the lug topsails alone have braces, lifts and bowlines (Forfait p. 53), "
+            "and are trimmed as square topsails; braces 64 deg from square (the cutter's topsail "
+            f"yard's, judgement).{prov}",
+        )
+        ts = b.sail(
+            f"{name}.topsail",
+            "square",
+            yard=ty,
+            area_m2=ts_area,
+            reef_bands=1,
+            x_m=m(x_ft - rake * ts_z),
+            centre_height_m=ts_centre,
+            canvas_no=LUGGER_CANVAS["topsail"][0],
+            cloth_rating_kn=cloth(ts_area, LUGGER_CANVAS["topsail"][0]),
+            note=f"the {name} topsail {ts_area} m2: {depth:.0f} ft deep between its yard and the "
+            "lug's yard, 0.85 of its yard broad (judgement); one reef-band."
+            + canvas_note(LUGGER_CANVAS["topsail"]),
+        )
+        square_sail_lines(b, ts, ty, LUGGER_TOPSAIL_ROPE, hoisting=True, reef=True, bowline=True)
+        topsails.append(ts)
+        topsail_yards_built.append(ty)
+        topmasts.append(tm)
+
+    # -- the head: the running bowsprit and two jibs ---------------------------------------
+    fore_mast, _fy, fore_lug, fore_above, fore_x, fore_rake, _fc = built["fore"]
+    bowsprit_ft = 2.649 * B
+    bowsprit_out = 0.55 * bowsprit_ft  # judgement: the rest inboard on the chevalet
+    bowsprit_reefed = bowsprit_out * 2.0 / 3.0
+    stem_x = round(stem_x_ft * FT, 1)
+
+    def jib_sail(sid, tack_x, head_h, clew, sheet_in, canvas, stay, halyard_spar, words):
+        tack = (tack_x, 3.0)
+        head = (fore_x - fore_rake * head_h, head_h)
+        luff = math.hypot(head[0] - tack[0], head[1] - tack[1])
+        luff_used = 0.85 * luff
+        head = (
+            tack[0] + (head[0] - tack[0]) * 0.85,
+            tack[1] + (head[1] - tack[1]) * 0.85,
+        )
+        area_ft2 = 0.5 * abs(
+            (head[0] - tack[0]) * (clew[1] - tack[1]) - (head[1] - tack[1]) * (clew[0] - tack[0])
+        )
+        area = round(area_ft2 * FT * FT)
+        x = (tack[0] + head[0] + clew[0]) / 3.0
+        z = (tack[1] + head[1] + clew[1]) / 3.0
+        sail = b.sail(
+            sid,
+            "jibheaded",
+            stay=stay,
+            halyard_spar=halyard_spar,
+            area_m2=area,
+            x_m=m(x),
+            centre_height_m=round(deck_height + z * FT, 1),
+            canvas_no=canvas[0],
+            cloth_rating_kn=cloth(area, canvas[0]),
+            note=f"{words} {area} m2: luff {luff_used:.0f} ft, 0.85 of the line from its halyard "
+            "to "
+            "its tack (Fincham art. 87's rule for a cutter's jib, judgement for a lugger's)."
+            + canvas_note(canvas),
+        )
+        b.line(f"{sid}.halyard", "halyard", sail, rating=rope_kn(sheet_in, 2))
+        b.sided(f"{sid}.sheet", "sheet", sail, rating=rope_kn(sheet_in))
+        b.line(f"{sid}.downhaul", "downhaul", sail, rating=rope_kn(sheet_in - 0.5))
+        return sail, area, x, z
+
+    bowsprit = b.spar(
+        "bowsprit",
+        "bowsprit",
+        x_m=stem_x,
+        length_m=ft(bowsprit_out),
+        height_m=1.5,
+        running=True,
+        housed_length_m=ft(bowsprit_reefed),
+        rigged_out=True,
+        rating_kn=None,
+        note=f"the running bowsprit, {bowsprit_ft:.0f} ft in all, 2.649 of the breadth (Forfait "
+        f"Table VII), long and little steeved (1 3/4 in to the foot, Forfait; Lescallier p. 408); "
+        f"{bowsprit_out:.0f} ft outboard rigged out (0.55 of it, judgement), running in and out "
+        "on a chevalet and an iron collar at the stem so that the jibs' effect is set 'plus ou "
+        f"moins' (Forfait p. 53); reefed, {bowsprit_reefed:.0f} ft outboard (a third in, the "
+        f"cutter's rule).{prov}",
+    )
+    b.line(
+        "bowsprit.heel_rope",
+        "outhaul",
+        bowsprit,
+        rating=rope_kn(3.5, 2),
+        note="the heel-rope that runs the bowsprit out and in (the cutter's; judgement).",
+    )
+    b.line("bobstay", "stay", bowsprit, rating=rope_kn(5.0))
+    b.line(
+        "jib.stay",
+        "stay",
+        fore_mast,
+        rating=rope_kn(3.5),
+        note="the jib's luff line from the fore mast head; the jibs set flying on travellers.",
+    )
+    b.line("flying_jib.stay", "stay", topmasts[0], rating=rope_kn(2.5))
+    jib, jib_area, jib_x, jib_z = jib_sail(
+        "jib",
+        stem_x_ft + bowsprit_reefed - 0.75,
+        fore_above - 2.0,
+        (stem_x_ft, 4.0),
+        3.0,
+        LUGGER_CANVAS["jib"],
+        "jib.stay",
+        None,
+        "the jib (the inner), its tack at the reefed bowsprit's end, set whether the bowsprit "
+        "is reefed or rigged out;",
+    )
+    fjib, fjib_area, fjib_x, fjib_z = jib_sail(
+        "flying_jib",
+        stem_x_ft + bowsprit_out - 0.75,
+        fore_above + 0.75 * topmast_ft - 1.0,
+        (stem_x_ft + 0.5 * bowsprit_reefed, 6.0),
+        2.5,
+        LUGGER_CANVAS["flying jib"],
+        "flying_jib.stay",
+        bowsprit,
+        "the flying jib (the outer), its tack on the traveller at the bowsprit end, which wants "
+        "the bowsprit rigged out (halyard_spar), from the fore topmast head ('un beaupré surmonté "
+        "de deux ou plusieurs focs', Forfait p. 53);",
+    )
+    b.doc["spars"][[s["id"] for s in b.doc["spars"]].index("bowsprit")]["rating_kn"] = design_kn(
+        [
+            (jib_area, round(deck_height + jib_z * FT, 1), "jibheaded"),
+            (fjib_area, round(deck_height + fjib_z * FT, 1), "jibheaded"),
+        ],
+        dw["lower"],
+    )
+    b.line("jib.outhaul", "outhaul", jib, rating=rope_kn(2.5))
+    b.line("flying_jib.outhaul", "outhaul", fjib, rating=rope_kn(2.0))
+
+    # -- storm canvas: the taille-vent and a storm jib -------------------------------------
+    main_mast, main_yard, main_lug, main_above, main_x, main_rake, main_centre = built["main"]
+    main_area, main_cx, main_cz = lug_areas["main"]
+    tv_area = round(0.5 * main_area)
+    tv_cz = 0.8 * main_cz  # a smaller yard hoisted lower (judgement)
+    canvas = LUGGER_CANVAS["taille-vent"]
+    tv = b.sail(
+        "taille_vent",
+        "lug",
+        yard=main_yard,
+        mast=main_mast,
+        area_m2=tv_area,
+        reef_bands=1,
+        x_m=m(main_x - main_rake * tv_cz + 0.1 * yards["main"]),
+        centre_height_m=round(deck_height + tv_cz * FT, 1),
+        canvas_no=canvas[0],
+        cloth_rating_kn=storm_cloth(tv_area),
+        bent=False,
+        in_place_of="main.lug",
+        note=f"the taille-vent {tv_area} m2, about half the main lug (Forfait p. 52; Willaumez "
+        "1831, TAILLE-VENT), its yard 0.7 of the main yard (Fincham 1843 p. 61, the chasse-marée's "
+        "second suit; the file bends it to the main lug's yard), tacked at the foot of the mast "
+        "and not to the side, so that it needs no shifting and is safe aback ('quand le Bâtiment "
+        "vient vent devant, la plus grande portion de la voile se range dans la direction du "
+        "vent', Forfait p. 52): a standing lug; set in place of the main lug in blowing weather; "
+        "in the sail room." + canvas_note(canvas, storm=True),
+    )
+    b.line("taille_vent.tack", "tack", tv, rating=rope_kn(3.0))
+    b.line("taille_vent.sheet", "sheet", tv, rating=rope_kn(3.0, 2), parts=2)
+    sj_area = round(2.0 / 3.0 * jib_area)
+    sj_canvas = LUGGER_CANVAS["storm jib"]
+    sj = b.sail(
+        "storm_jib",
+        "jibheaded",
+        stay="jib.stay",
+        area_m2=sj_area,
+        x_m=m(jib_x - 2.0),
+        centre_height_m=round((deck_height + jib_z * FT) * math.sqrt(2.0 / 3.0), 1),
+        canvas_no=sj_canvas[0],
+        cloth_rating_kn=storm_cloth(sj_area),
+        bent=False,
+        in_place_of="jib",
+        note=f"storm jib {sj_area} m2, two-thirds of the jib (Steel 1794 p. 190, the sloop's), "
+        "its tack at the reefed bowsprit's end; in the sail room."
+        + canvas_note(sj_canvas, storm=True),
+    )
+    b.line("storm_jib.halyard", "halyard", sj, rating=rope_kn(3.0, 2))
+    b.sided("storm_jib.sheet", "sheet", sj, rating=rope_kn(3.0))
+    b.line("storm_jib.downhaul", "downhaul", sj, rating=rope_kn(2.5))
+
+    lugs = [built[n][2] for n in ("fore", "main", "mizen")]
+    head_sails = [jib, fjib]
+    # Forfait's check on the whole (Table VII, the 60-pied column): the sail area 4.037 L x B,
+    # its centre of effort 0.024 L abaft the middle and 1.576 B above the water
+    working = [(lug_areas[n][0], lug_areas[n][1]) for n in ("fore", "main", "mizen")]
+    sails_doc = {sd["id"]: sd for sd in b.doc["sails"]}
+    for sid in [s for s in topsails] + head_sails:
+        sd = sails_doc[sid]
+        working.append((sd["area_m2"], sd["x_m"] / FT))
+    total_m2 = sum(a for a, _ in working)
+    ce_ft = sum(a * x for a, x in working) / total_m2
+    forfait_m2 = 4.037 * L * B * FT * FT
+    b.notes["fore.mast"] = (
+        b.notes["fore.mast"]
+        + f" Forfait's check (Table VII, 60 pieds): the working canvas {total_m2:.0f} m2 against "
+        f"4.037 L x B = {forfait_m2:.0f} m2 on her length and breadth; its centre "
+        f"{abs(ce_ft) / L:.3f} L {'abaft' if ce_ft < 0 else 'before'} the middle against his "
+        "0.024 L abaft."
+    )
+
+    b.group("lugs", lugs)
+    b.group("dipping lugs", lugs[:2])
+    b.group("topsails", topsails)
+    b.group("square sails", topsails)
+    b.group("headsails", head_sails)
+    b.group("jibs", head_sails)
+    b.group("fore-and-aft sails", head_sails + lugs)
+    b.group("light sails", [fjib])
+    b.group("plain sail", lugs + topsails + [jib])
+    b.group("all sail", lugs + topsails + head_sails)
+    b.group("yards", topsail_yards_built)
+    b.group("topsail yards", topsail_yards_built)
+    b.group("lower masts", [built[n][0] for n in ("fore", "main", "mizen")])
+    b.group("topmasts", topmasts)
+    b.group("storm canvas", [tv, sj])
+    b.group(
+        "topsail bowlines", [f"{n}.topsail.bowline.{s}" for n in ("fore", "main") for s in SIDES]
+    )
+    b.alias("topsail bowline", "topsail bowlines")
+    b.alias("the fore lug", "fore.lug")
+    b.alias("foresail", "fore.lug")
+    b.alias("the foresail", "fore.lug")
+    b.alias("mainsail", "main.lug")
+    b.alias("the mainsail", "main.lug")
+    b.alias("the main", "main.lug")
+    b.alias("mizen", "mizen.lug")
+    b.alias("the mizen", "mizen.lug")
+    b.alias("tapecul", "mizen.lug")
+    b.alias("taille-vent", "taille_vent")
+    b.alias("storm lug", "taille_vent")
+    b.alias("head sails", "headsails")
+    b.descriptions(
+        [
+            (
+                "lugger",
+                "a lugger",
+                "a chasse-marée, three-masted under lugs",
+                "L'Éclair's hull (RMG ZAZ6306) as the Breton and Norman coaster, fisherman or "
+                "privateer of the war (Forfait 1788 pp. 52 to 55; spec M6 §19; judgement on the "
+                "words).",
+            )
+        ]
+    )
+    ground_tackle_for(b, burthen, beam_ft, draught_ft)
+    lugger_crew(b)
+    hold_for(b, burthen, False, "a chasse-marée, a coaster deep in the hold: judgement")
+    b.boats(
+        BOATS_NOTE,
+        boat_entries(
+            lod_ft,
+            False,
+            [
+                ("boat", "yawl", "the boat", 1.0, "The lugger's boat, a yawl (judgement)."),
+            ],
+        ),
+    )
+    b.dump(
+        os.path.join(out_dir, "lugger.yaml"),
+        "# The lugger: L'Éclair, a French gun-lugger taken in 1795 (RMG ZAZ6306), 101 tons, 59 ft\n"
+        "# 3 in on deck by 20 ft 4 in, as the chasse-marée of the war (docs/design/\n"
+        "# VesselReferences-2026-10.md § 1, decision 42). Generated by tools/gen_ships.py;\n"
+        "# edit that script and rerun, do not edit this file. Spars: Forfait 1788, Table VII\n"
+        "# (p. 75, the 60-pied lougre), the masts on her breadth and the yards on her length;\n"
+        "# heels: Fincham 1843 p. 61; the\n"
+        "# lug and its dip: Forfait pp. 5 to 6 and 52 to 55, Lescallier 1791 pp. 391 to 392 and\n"
+        "# 408 to 409, Steel 1794 vol. I, LUGGER. Units: metres, m2, kg, kN. Comments mark\n"
+        "# judgements. Package 43b (spec M6 §19; the proposal's §4.4): the lug and its dip are\n"
+        "# the engine's additions, as the running bowsprit was the cutter's.\n",
+    )
+
+
+def lugger_crew(b):
+    b.crew(
+        [
+            (
+                ("complement",),
+                30,
+                "Thirty: judgement. Forfait 1788 p. 54: the war lugger 'exige un équipage "
+                "d'élite & "
+                "fort nombreux'; no figure for her complement was found (the references note).",
+            ),
+            (
+                ("names",),
+                "french",
+                "A Breton and Norman crew: the french list in data/crew/names.yaml.",
+            ),
+            (
+                ("stations", "forecastle"),
+                10,
+                "Hands per station, both watches together; no tops: the fore lug, the jibs and "
+                "the bowsprit, 10, judgement.",
+            ),
+            (
+                ("stations", "afterguard"),
+                10,
+                "Afterguard, at the main and mizen lugs: 10, judgement.",
+            ),
+            (("stations", "waisters"), 5, "Waisters: 5, judgement."),
+            (("stations", "idlers"), 2, "Idlers: the cook and a carpenter (spec M3 2.3)."),
+            (
+                ("ratings", "able"),
+                0.7,
+                "Share of the seamen by rating: 'un équipage d'élite' (Forfait p. 54). Able: 0.70.",
+            ),
+            (("ratings", "ordinary"), 0.25, "Ordinary: 0.25, judgement."),
+            (("ratings", "landsman"), 0.05, "Landsmen: 0.05, judgement."),
+        ]
+        + [
+            (
+                ("posts", post),
+                None,
+                "Station holders by post (spec M3 2.3): the master who commands her, his mate "
+                "and the boatswain; names are drawn at muster."
+                if i == 0
+                else None,
+            )
+            for i, post in enumerate(LUGGER_POSTS)
+        ]
+        + [
+            (("idlers_by_trade", "cook"), 1, "The cook: 1, judgement."),
+            (("idlers_by_trade", "carpenter's crew"), 1, "A carpenter: 1, judgement."),
+            (
+                ("stores", "water_tons"),
+                4,
+                "Stores for a month (judgement): 30 men at a gallon a day is about 4 tons.",
+            ),
+            (("stores", "provisions_days"), 30, "Provisions: a month (judgement)."),
+            (("stores", "spare_spars"), {}, None),
+            (("stores", "cordage_fathoms"), 80, "Spare rope (judgement)."),
+        ]
+    )
+    b.people(
+        "The named people beyond the posts (package 43b): a boy as the messenger; see "
+        "tools/gen_ships.py.",
+        LUGGER_DRAWN,
+    )
+    b.spare_spars(
+        "The booms: a spare lug yard and a spare topmast (judgement: the lugger's masting 'est "
+        "sujette à des accidens fréquens', Forfait p. 54).",
+        [
+            ("lug_yard", 1, "A spare lug yard (judgement)."),
+            ("topmast", 1, "A spare topmast (judgement)."),
+        ],
+    )
+    b.sail_room(
+        "The sail room (spec 3b §6.3), every sail new; see tools/gen_ships.py.",
+        [
+            ("main.lug", LUGGER_CANVAS["lug"][0], "A spare main lug and jib (judgement)."),
+            ("jib", LUGGER_CANVAS["jib"][0], None),
+            (
+                "taille_vent",
+                LUGGER_CANVAS["taille-vent"][0],
+                "The taille-vent for a blow and a storm jib (Forfait p. 52).",
+            ),
+            ("storm_jib", LUGGER_CANVAS["storm jib"][0], None),
+        ],
+    )
+
+
+# ---------------------------------------------------------------------------
+# The smack: the Culloden smack of 1746 (package 43b; spec M6 §19; decision 42)
+# ---------------------------------------------------------------------------
+#
+# Sources (docs/design/VesselReferences-2026-10.md § 2, the owner's choice of 2026-10-10,
+# decision 42). The hull is the Navy's smack Culloden, stationed in Scotland, built at
+# Plymouth in 1746 by B. Slade: gun deck 43 ft, keel 34 ft 0 in, breadth 14 ft 0 in, depth
+# 5 ft 6 in, 35 tons, 8 men, 2 guns (Charnock 1802 vol. III p. 274, Hoys and Transports,
+# read from the page image). The Navy's rule passes: 34 x 14 x 7 / 94 = 35.4 tons. The
+# check on her shape is Chapman's English smack for flatfish (1768, plate LIX No. 3: 38.2
+# ft between perpendiculars, 13.3 ft moulded, 6.3 ft draught). The spars are Steel's
+# "Proportions of masts, yards, &c. for sloops, smacks, and hoys" (1794 vol. I p. 41, read
+# from the page image): the mast and topmast in one, 3 3/4 the breadth; to the hounds 3/4
+# of the whole; the boom 2/3 of the mast, the gaff 3/5 of the boom; the cross-jack (square
+# sail) yard 3/5 of the mast, the topsail yard 4/5 of the cross-jack yard; the bowsprit 5/9
+# of the mast (the fraction's small type uncertain). The bowsprit runs in a ring of iron
+# and comes inboard (Lescallier 1791 p. 420: "leur bout de beaupré est mobile dans un
+# cercle de fer qui le contient, & peut se rentrer très-facilement en-dedans du
+# Bâtiment"), the cutter's running bowsprit; her foresail carries a bonnet more often than
+# reef bands (Steel, 'Smack's foresail'). The rules for the sails' shapes are the
+# cutter's, Fincham's arts. 86 and 87, for want of a smack's own (Lescallier: "le
+# Gréement est semblable à celui des Sloops"). The well is Holdsworth's (1874 pp. 139 to
+# 140): two water-tight bulkheads across the vessel amidships, holes bored in her bottom,
+# the well-deck holding the water's level; its size is judgement. Her trade (Holdsworth
+# pp. 137 to 141, 231 to 232): a Harwich welled cod smack of the North Sea working
+# longlines on the Dogger, or a trawler; in the game, the fisherman of the Channel's
+# grounds at far detail and a small handy vessel in the regatta (spec M6 §19, §21).
+
+SMACK_CANVAS: dict[str, tuple[int, str]] = {
+    "main.sail": (
+        2,
+        f"{STEEL_SM} p. 120, 'Cutter's mainsail' (a smack is rigged as a sloop): No. 1 or 2",
+    ),
+    "fore.staysail": (2, f"{STEEL_SM}, 'Smack's foresail' (OCR line 15622): No. 1 or 2"),
+    "jib": (2, f"{STEEL_SM}, 'Smack's jib' (OCR line 15709): No. 1 or 2"),
+    "square_sail": (
+        6,
+        f"{STEEL_SM} p. 124, 'Sloop's square-sail, or cross-jack': No. 6 or 7; the heavier taken",
+    ),
+    "topsail": (6, f"{STEEL_SM} p. 125, 'Sloop's topsail': No. 6 or 7"),
+    "storm trysail": (1, f"{STEEL_SM}, 'Cutter's trysail' (OCR line 14359): No. 1 or 2"),
+    "storm jib": (
+        1,
+        f"{STEEL_SM}, the sloop's jibs (p. 190): 'No. 1 or 2 ... two-thirds of the size of the "
+        "first jib, and is used in stormy weather, in lieu of a larger one'",
+    ),
+}
+
+# Rope sizes: the cutter's square sail's and topsail's (judgement: a smack of 35 tons, a
+# third of the cutter's, her gear a size lighter), rated by Luce 1866 ch. IV.
+SMACK_ROPE = {
+    "square_sail": {
+        "halyard": 2.5,
+        "sheet": 2.25,
+        "brace": 1.5,
+        "lift": 1.5,
+        "clewline": 1.5,
+        "buntline": 1.25,
+        "bowline": 1.5,
+        "reef_tackle": 1.5,
+    },
+    "topsail": {
+        "halyard": 2.0,
+        "sheet": 2.0,
+        "brace": 1.25,
+        "lift": 1.25,
+        "clewline": 1.25,
+        "buntline": 1.0,
+        "bowline": 1.25,
+        "reef_tackle": 1.25,
+    },
+}
+SMACK_POSTS, SMACK_DRAWN = wardroom("smack")
+
+
+def smack(out_dir="data/ships"):
+    dw = dict(DESIGN_WIND_KN, square_sail=22.0)  # the square sail a fair-wind sail, as the cutter's
+    # -- hull ---------------------------------------------------------------------------
+    lod_ft = 43.0  # the gun deck (Charnock)
+    keel_ft = 34.0
+    beam_ft = 14.0
+    burthen = 35.0
+    lwl_ft = 40.0  # judgement between the keel and the deck: a plumb stem, a raking post
+    # draught: the cutter's rule for the type, half her breadth aft, and a foot and a half
+    # less forward; the mean 6 ft 3 in, Chapman's English smack's 6.3 ft the check
+    draught_aft_ft = 0.5 * beam_ft
+    draught_fwd_ft = draught_aft_ft - 1.5
+    draught_ft = (draught_aft_ft + draught_fwd_ft) / 2.0
+    lwl, beam, draught = ft(lwl_ft), ft(beam_ft), ft(draught_ft)
+    # Displacement: Cb 0.45, the cutter's (Holdsworth p. 66: the old smacks "were built
+    # with the principal object of living through anything"); the well's water is counted
+    # in it, since it moves with her though it buoys her not (judgement on Holdsworth's well).
+    displacement = round(lwl * beam * draught * 0.45 * 1025.0, -2)
+    deck_height = 0.75  # judgement: low-sided, about 2 ft 6 in above the water
+    deck_above_lwl_ft = deck_height / FT
+    rake_deg = round(math.degrees(math.atan(1.5 / 36.0)), 1)  # Steel: cutters 1.5 in to the yard
+
+    b = Builder(
+        "Culloden",
+        "smack",
+        "The Navy's smack Culloden (built at Plymouth by B. Slade, 1746, stationed in "
+        "Scotland): 35 tons burthen, 43 ft on the gun deck, 34 ft keel, 14 ft breadth, 5 ft "
+        "6 in depth, 8 men and 2 guns (Charnock 1802 vol. III p. 274); cutter-rigged with "
+        "a running bowsprit (Lescallier 1791 p. 420) by Steel's proportions for sloops, smacks "
+        "and hoys (1794 vol. I p. 41), with a well amidships (Holdsworth 1874 pp. 139 to 140; "
+        "Steel 1805, WELL). The fisherman of the Channel's grounds and the small handy vessel "
+        "of the regatta (spec M6 §19); see tools/gen_ships.py for every rule.",
+        {
+            "length_waterline_m": lwl,
+            "beam_m": beam,
+            "draught_m": draught,
+            "displacement_kg": displacement,
+            "gm_m": 0.9,
+            "clr_x_m": -0.3,
+            "lateral_area_m2": round(lwl * draught * 0.85),
+            "hull_speed_kn": round(1.34 * math.sqrt(lwl_ft), 1),
+            "deck_height_m": deck_height,
+            "rudder": {"area_m2": 0.7, "max_angle_deg": 35, "rate_deg_s": 6.0, "span_m": 2.0},
+        },
+        {
+            "length_waterline_m": f"{lwl_ft:.0f} ft: judgement between the {keel_ft:.0f} ft keel "
+            f"and the {lod_ft:.0f} ft gun deck (Charnock vol. III p. 274), a plumb stem and a "
+            "raking post.",
+            "beam_m": "14 ft 0 in (Charnock vol. III p. 274).",
+            "draught_m": f"{draught_ft:.2f} ft mean: {draught_aft_ft:.1f} ft aft, half her breadth "
+            f"(the cutter's rule for the type, judgement), {draught_fwd_ft:.1f} ft forward; "
+            "Chapman's English smack (1768, plate LIX No. 3) draws 6.3 ft. Her depth in hold, 5 "
+            "ft 6 in (Charnock), is the check that she is not deeper.",
+            "displacement_kg": "LWL x beam x draught x Cb 0.45 x 1025, about 1.3 x the 35 tons "
+            "burthen: the cutter's block (judgement; Holdsworth p. 66, the old smacks 'built with "
+            "the principal object of living through anything'). The well's water counts in it: it "
+            "moves with her though it buoys her not (hold.well_m3; judgement on Holdsworth).",
+            "gm_m": "3 ft: judgement; a smack was stiff and heavily ballasted, a little less "
+            "than the cutter's 3 ft 7 in on her narrower beam.",
+            "clr_x_m": "Judgement, as the cutter's: the centre of pressure a little before the "
+            "middle so that she is nearly balanced close-hauled and carries a little weather helm "
+            "on a beam reach (measured; docs/dev/TuningNotes.md, package 43b).",
+            "lateral_area_m2": "LWL x draught x 0.85 for a deep full profile (the cutter's rule).",
+            "hull_speed_kn": f"1.34 sqrt({lwl_ft:.0f} ft).",
+            "deck_height_m": "The deck about 2 ft 6 in above the water (judgement).",
+            "rudder": "A blade about 6 ft 6 in deep by 1 ft 2 in (judgement, the cutter's in "
+            "small).",
+        },
+    )
+
+    # -- spars by Steel's proportions for sloops, smacks and hoys (1794 vol. I p. 41) ------
+    mast_total = 3.75 * beam_ft  # mast and topmast in one, 3 3/4 the breadth
+    hounds_from_heel = 0.75 * mast_total  # to the hounds 3/4 of the whole
+    below_lwl = 0.269 * beam_ft  # the cutter's heel below the water-line (Fincham p. 67)
+    step_to_deck = below_lwl + deck_above_lwl_ft
+    mast_above = mast_total - step_to_deck
+    hounds_above = hounds_from_heel - step_to_deck
+    boom_ft = 2.0 / 3.0 * mast_total
+    gaff_ft = 3.0 / 5.0 * boom_ft
+    sq_yard = 3.0 / 5.0 * mast_total  # the cross-jack yard
+    ts_yard = 4.0 / 5.0 * sq_yard
+    bowsprit_ft = 5.0 / 9.0 * mast_total
+    bowsprit_housed = 0.60 * beam_ft  # inboard, the cutter's rule (Fincham)
+    bowsprit_out = bowsprit_ft - bowsprit_housed
+    bowsprit_reefed = bowsprit_out * 2.0 / 3.0
+    # the mast stepped well forward for a large mainsail (Holdsworth pp. 70 to 71, of the
+    # trawl smacks), 0.15 of the water-line before the middle (judgement; the cutter's 0.101)
+    mast_x_ft = 0.15 * lwl_ft
+    mast_x = round(mast_x_ft * FT, 1)
+    stem_x_ft = lwl_ft / 2.0 + 1.0
+    stem_x = round(stem_x_ft * FT, 1)
+    rake = math.tan(math.radians(rake_deg))
+
+    def raked(z_above_deck_ft):
+        return mast_x_ft - rake * z_above_deck_ft
+
+    def m(x_ft):
+        return round(x_ft * FT, 1)
+
+    nock = hounds_above - 0.045 * hounds_from_heel
+    boom_h = 4.0  # judgement: the boom's jaws 4 ft above the deck
+    gaff_rise = math.tan(math.radians(27.0))
+    sq_yard_h = hounds_above  # the square sail's yard hoisted to the hounds
+    ts_yard_h = mast_above - 1.5  # the topsail's under the masthead
+
+    def trapezoid(head_ft, foot_ft, depth_ft):
+        return round((head_ft + foot_ft) / 2.0 * depth_ft * FT * FT)
+
+    main_foot = 0.92 * boom_ft
+    main_head_ft = 0.92 * gaff_ft
+    main_hoist = nock - boom_h
+    main_area = round(
+        (
+            (main_foot + main_head_ft) / 2.0 * main_hoist
+            + 0.5 * main_head_ft * gaff_rise * main_head_ft
+        )
+        * FT
+        * FT
+    )
+    main_z = boom_h + 0.45 * main_hoist
+    main_centre = round(deck_height + main_z * FT, 1)
+    sq_depth = 0.8 * main_hoist
+    sq_area = round(0.9 * sq_yard * sq_depth * FT * FT)
+    sq_z = sq_yard_h - 0.45 * sq_depth
+    sq_centre = round(deck_height + sq_z * FT, 1)
+    ts_depth = ts_yard_h - sq_yard_h
+    ts_area = trapezoid(0.82 * ts_yard, 0.9 * sq_yard, ts_depth)
+    ts_z = sq_yard_h + 0.5 * ts_depth
+    ts_centre = round(deck_height + ts_z * FT, 1)
+    # the foresail on the forestay from the hounds to the stem head (Fincham art. 87)
+    fs_tack = (stem_x_ft, 1.0)
+    fs_head_full = (raked(hounds_above), hounds_above)
+    stay_len = math.hypot(fs_head_full[0] - fs_tack[0], fs_head_full[1] - fs_tack[1])
+    fs_luff = 0.85 * stay_len
+    fs_foot = 0.9 * (stem_x_ft - mast_x_ft)
+    fs_leech = 0.8 * fs_luff
+    s = (fs_luff + fs_foot + fs_leech) / 2.0
+    fs_area = round(math.sqrt(s * (s - fs_luff) * (s - fs_foot) * (s - fs_leech)) * FT * FT)
+    fs_head = (
+        fs_tack[0] + (fs_head_full[0] - fs_tack[0]) * fs_luff / stay_len,
+        fs_tack[1] + (fs_head_full[1] - fs_tack[1]) * fs_luff / stay_len,
+    )
+    fs_clew = (stem_x_ft - fs_foot, 3.0)
+    fs_x = (fs_tack[0] + fs_head[0] + fs_clew[0]) / 3.0
+    fs_z = (fs_tack[1] + fs_head[1] + fs_clew[1]) / 3.0
+    # the jib: tack 9 in short of the bowsprit end, luff 0.8 of the line from the mast's
+    # head above the hounds to the tack (Fincham art. 87), clew at the stem head
+    jib_tack = (stem_x_ft + bowsprit_out - 0.75, 2.0)
+    jib_halyard_h = hounds_above + 0.5 * (mast_above - hounds_above)
+    jib_halyard = (raked(jib_halyard_h), jib_halyard_h)
+    jib_stay_len = math.hypot(jib_halyard[0] - jib_tack[0], jib_halyard[1] - jib_tack[1])
+    jib_luff = 0.8 * jib_stay_len
+    jib_head = (
+        jib_tack[0] + (jib_halyard[0] - jib_tack[0]) * jib_luff / jib_stay_len,
+        jib_tack[1] + (jib_halyard[1] - jib_tack[1]) * jib_luff / jib_stay_len,
+    )
+    jib_clew = (stem_x_ft, 3.5)
+    jib_area = round(
+        0.5
+        * abs(
+            (jib_head[0] - jib_tack[0]) * (jib_clew[1] - jib_tack[1])
+            - (jib_head[1] - jib_tack[1]) * (jib_clew[0] - jib_tack[0])
+        )
+        * FT
+        * FT
+    )
+    jib_x = (jib_tack[0] + jib_head[0] + jib_clew[0]) / 3.0
+    jib_z = (jib_tack[1] + jib_head[1] + jib_clew[1]) / 3.0
+    prov = " Provisional (truth 9), see gen_ships.py."
+
+    mast = b.spar(
+        "main.mast",
+        "mast",
+        x_m=mast_x,
+        rake_deg=rake_deg,
+        height_m=ft(mast_above),
+        rating_kn=design_kn(
+            [
+                (main_area, main_centre, "gaff"),
+                (sq_area, sq_centre, "square"),
+                (ts_area, ts_centre, "square"),
+                (fs_area, round(deck_height + fs_z * FT, 1), "jibheaded"),
+                (jib_area, round(deck_height + jib_z * FT, 1), "jibheaded"),
+            ],
+            dw["lower"],
+        ),
+        note=f"the mast and topmast in one stick, {mast_total:.1f} ft heel to head, 3 3/4 the "
+        f"breadth (Steel 1794 vol. I p. 41, sloops, smacks and hoys), {mast_above:.0f} ft above "
+        f"the deck; the hounds 3/4 of the whole from the heel ({hounds_above:.0f} ft above the "
+        f"deck); stepped {below_lwl:.1f} ft below the water-line (Fincham's cutter, 0.269 of "
+        f"the breadth); raking {rake_deg} deg (Steel: cutters 1.5 in to the yard); stationed "
+        f"0.15 of the water-line before the middle, well forward for a large mainsail "
+        f"(Holdsworth 1874 pp. 70 to 71; judgement on the figure). No topmast to strike: the "
+        f"topsail yard crosses the mast's own head.{prov}",
+    )
+    gaff = b.spar(
+        "main.gaff",
+        "gaff",
+        on=mast,
+        length_m=ft(gaff_ft),
+        height_m=ft(nock),
+        rating_kn=design_kn([(main_area, main_centre, "gaff")], dw["gaff"]),
+        note=f"gaff {gaff_ft:.0f} ft, 3/5 of the boom (Steel p. 41); its jaws at the nock, "
+        f"{nock:.0f} ft above the deck (the cutter's rule after Fincham art. 89).",
+    )
+    boom = b.spar(
+        "main.boom",
+        "boom",
+        on=mast,
+        length_m=ft(boom_ft),
+        height_m=ft(boom_h),
+        horse_m=round(0.5 * beam, 1),
+        rating_kn=design_kn([(main_area, main_centre, "gaff")], dw["gaff"]),
+        note=f"boom {boom_ft:.0f} ft, 2/3 of the mast (Steel p. 41), over the counter; "
+        f"{boom_h:.0f} ft above the deck (judgement); horse_m " + HORSE_NOTE,
+    )
+    sqy = b.spar(
+        "square_sail.yard",
+        "yard",
+        on=mast,
+        length_m=ft(sq_yard),
+        height_m=ft(sq_yard_h),
+        brace_limit_deg=58,
+        rating_kn=design_kn([(sq_area, sq_centre, "square")], dw["square_sail"]),
+        note=f"the cross-jack yard {sq_yard:.1f} ft, 3/5 of the mast (Steel p. 41), the square "
+        "sail's, hoisted to the hounds; braces 58 deg from square, as the cutter's (judgement). "
+        "Willaumez 1831, SMACK: a square sail hoisted and lowered with its yard." + prov,
+    )
+    sq = b.sail(
+        "square_sail",
+        "square",
+        yard=sqy,
+        area_m2=sq_area,
+        reef_bands=1,
+        x_m=m(raked(sq_z)),
+        centre_height_m=sq_centre,
+        canvas_no=SMACK_CANVAS["square_sail"][0],
+        cloth_rating_kn=cloth(sq_area, SMACK_CANVAS["square_sail"][0]),
+        note=f"square sail {sq_area} m2 (Steel 1794 p. 124, 'Sloop's square-sail, or "
+        f"cross-jack': {sq_depth:.0f} ft deep, four-fifths of the mainsail's fore-leech; one "
+        "reef-band, judgement); a fair-wind sail, in the light sails."
+        + canvas_note(SMACK_CANVAS["square_sail"]),
+    )
+    square_sail_lines(b, sq, sqy, SMACK_ROPE["square_sail"], hoisting=True, reef=True, bowline=True)
+    tsy = b.spar(
+        "topsail.yard",
+        "yard",
+        on=mast,
+        length_m=ft(ts_yard),
+        height_m=ft(ts_yard_h),
+        brace_limit_deg=64,
+        rating_kn=design_kn([(ts_area, ts_centre, "square")], dw["topsail"]),
+        note=f"topsail yard {ts_yard:.1f} ft, 4/5 of the cross-jack yard (Steel p. 41), on the "
+        "mast's head above the hounds; braces 64 deg from square, as the cutter's (judgement)."
+        + prov,
+    )
+    ts = b.sail(
+        "topsail",
+        "square",
+        yard=tsy,
+        area_m2=ts_area,
+        x_m=m(raked(ts_z)),
+        centre_height_m=ts_centre,
+        canvas_no=SMACK_CANVAS["topsail"][0],
+        cloth_rating_kn=cloth(ts_area, SMACK_CANVAS["topsail"][0]),
+        note=f"topsail {ts_area} m2, {ts_depth:.0f} ft deep between its yard and the square "
+        "sail's (Steel 1794 p. 125; Willaumez 1831, SMACK: her topsail, when she carries one, "
+        "hollow in the foot and sheeted to the deck); light canvas."
+        + canvas_note(SMACK_CANVAS["topsail"]),
+    )
+    square_sail_lines(b, ts, tsy, SMACK_ROPE["topsail"], hoisting=True)
+    mainsail = b.sail(
+        "main.sail",
+        "gaff",
+        mast=mast,
+        gaff=gaff,
+        boom=boom,
+        area_m2=main_area,
+        reef_bands=3,
+        x_m=m(raked(main_z) - 0.4 * main_foot),
+        centre_height_m=main_centre,
+        canvas_no=SMACK_CANVAS["main.sail"][0],
+        cloth_rating_kn=cloth(main_area, SMACK_CANVAS["main.sail"][0]),
+        note=f"mainsail {main_area} m2: foot {main_foot:.0f} ft (0.92 of the boom), head "
+        f"{main_head_ft:.0f} ft (0.92 of the gaff), hoist {main_hoist:.0f} ft to the nock, the "
+        "gaff peaked 27 degrees (the cutter's rules, Fincham arts. 86 and 87); three reef-bands "
+        "(judgement; the cutter's four on a larger sail)." + canvas_note(SMACK_CANVAS["main.sail"]),
+    )
+    b.line("main.gaff.throat_halyard", "throat_halyard", gaff, rating=rope_kn(2.5, 3))
+    b.line("main.gaff.peak_halyard", "peak_halyard", gaff, rating=rope_kn(2.0, 4))
+    b.line(
+        "main.sail.sheet",
+        "sheet",
+        mainsail,
+        rating=rope_kn(2.75, 3),
+        parts=3,
+        note="2.75 in, a threefold purchase on the boom (judgement, the cutter's in small).",
+    )
+    b.line("main.sail.outhaul", "outhaul", mainsail, rating=rope_kn(1.75))
+    b.sided("main.gaff.vang", "vang", gaff, rating=rope_kn(1.5))
+    # -- the head: the running bowsprit, the forestay, the foresail and the jib ----------
+    bowsprit = b.spar(
+        "bowsprit",
+        "bowsprit",
+        x_m=stem_x,
+        length_m=ft(bowsprit_out),
+        height_m=1.0,
+        running=True,
+        housed_length_m=ft(bowsprit_reefed),
+        rigged_out=True,
+        rating_kn=design_kn(
+            [(jib_area, round(deck_height + jib_z * FT, 1), "jibheaded")], dw["lower"]
+        ),
+        note=f"the running bowsprit: {bowsprit_ft:.0f} ft in all, 5/9 of the mast (Steel p. 41, "
+        f"the fraction uncertain in the small type), {bowsprit_housed:.0f} ft of it inboard "
+        f"(the cutter's 0.60 of the breadth) and {bowsprit_out:.0f} ft outboard rigged out; it "
+        "runs in a ring of iron and comes inboard (Lescallier 1791 p. 420), as the cutter's "
+        f"does; reefed, {bowsprit_reefed:.0f} ft outboard (a third in, the cutter's)."
+        f"{prov}",
+    )
+    b.line(
+        "bowsprit.heel_rope",
+        "outhaul",
+        bowsprit,
+        rating=rope_kn(2.5, 2),
+        note="the heel-rope that runs the bowsprit out and in (Steel 1794, HEEL-ROPE); 2.5 in, "
+        "two parts (judgement).",
+    )
+    b.line(
+        "fore.stay",
+        "stay",
+        mast,
+        rating=rope_kn(5.0),
+        note="the forestay, from the hounds to the stem head; the foresail sets on it with "
+        "hanks (Steel 1794, 'Smack's foresail'). 5 in (judgement).",
+    )
+    b.line(
+        "jib.stay",
+        "stay",
+        mast,
+        rating=rope_kn(3.0),
+        note="the jib's luff line from the mast's head to the bowsprit end: the jib sets flying "
+        "on the traveller (Steel 1794, 'Smack's jib': 'hoists by haliards, without a stay'), "
+        "named so that the engine and the viewer find its luff, as the cutter's. 3 in "
+        "(judgement).",
+    )
+    b.sided(
+        "main.shrouds",
+        "shroud",
+        mast,
+        rating=rope_kn(4.5, 3),
+        note="3 shrouds of 4.5 in a side (judgement).",
+    )
+    b.sided(
+        "main.runner",
+        "backstay",
+        mast,
+        rating=rope_kn(3.0, 2),
+        note="the runners, a pair (judgement, the cutter's backstays in small).",
+    )
+    b.line("bobstay", "stay", bowsprit, rating=rope_kn(4.5))
+    foresail = b.sail(
+        "fore.staysail",
+        "jibheaded",
+        stay="fore.stay",
+        area_m2=fs_area,
+        x_m=m(fs_x),
+        centre_height_m=round(deck_height + fs_z * FT, 1),
+        canvas_no=SMACK_CANVAS["fore.staysail"][0],
+        cloth_rating_kn=cloth(fs_area, SMACK_CANVAS["fore.staysail"][0]),
+        note=f"the foresail on the forestay, {fs_area} m2 (Fincham art. 87's rules, the cutter's: "
+        f"foot {fs_foot:.0f} ft, luff {fs_luff:.0f} ft, leech {fs_leech:.0f} ft). Steel's smack's "
+        "foresail has two reef bands 'sometimes, but a bonnet is more frequently used'; the "
+        "catalogue reefs no jib-headed sail and has no bonnet yet."
+        + canvas_note(SMACK_CANVAS["fore.staysail"]),
+    )
+    b.line("fore.staysail.halyard", "halyard", foresail, rating=rope_kn(2.0, 2))
+    b.sided("fore.staysail.sheet", "sheet", foresail, rating=rope_kn(2.0))
+    b.line("fore.staysail.downhaul", "downhaul", foresail, rating=rope_kn(1.5))
+    jib = b.sail(
+        "jib",
+        "jibheaded",
+        stay="jib.stay",
+        halyard_spar=bowsprit,
+        area_m2=jib_area,
+        x_m=m(jib_x),
+        centre_height_m=round(deck_height + jib_z * FT, 1),
+        canvas_no=SMACK_CANVAS["jib"][0],
+        cloth_rating_kn=cloth(jib_area, SMACK_CANVAS["jib"][0]),
+        note=f"the jib, {jib_area} m2 (Fincham art. 87's rules, the cutter's): tack 9 in short of "
+        f"the bowsprit end, {jib_tack[0] - stem_x_ft:.0f} ft before the stem, luff "
+        f"{jib_luff:.0f} ft, clew at the stem head; it wants the bowsprit rigged out "
+        "(halyard_spar), as the cutter's." + canvas_note(SMACK_CANVAS["jib"]),
+    )
+    b.line("jib.halyard", "halyard", jib, rating=rope_kn(2.5, 2))
+    b.sided("jib.sheet", "sheet", jib, rating=rope_kn(2.25))
+    b.line("jib.downhaul", "downhaul", jib, rating=rope_kn(1.75))
+    b.line(
+        "jib.outhaul",
+        "outhaul",
+        jib,
+        rating=rope_kn(1.75),
+        note="the traveller's outhaul (Lever 1808, 'The Jib'; judgement for the size).",
+    )
+    head_sails = [foresail, jib]
+    # -- storm canvas: the cutter's rules ------------------------------------------------
+    storm_canvas = SMACK_CANVAS["storm trysail"]
+    st_head = 0.4 * main_head_ft
+    st_luff = 0.75 * main_hoist
+    st_leech = st_luff * 7.0 / 6.0
+    st_foot = 0.75 * main_foot
+    st_area = round((st_head + st_foot) / 2.0 * (st_luff + st_leech) / 2.0 * FT * FT)
+    st_z = boom_h + 0.45 * st_luff
+    st = b.sail(
+        "storm_trysail",
+        "gaff",
+        mast=mast,
+        gaff=gaff,
+        boom=boom,
+        area_m2=st_area,
+        reef_bands=2,
+        x_m=m(raked(st_z) - 0.4 * st_foot),
+        centre_height_m=round(deck_height + st_z * FT, 1),
+        canvas_no=storm_canvas[0],
+        cloth_rating_kn=storm_cloth(st_area),
+        bent=False,
+        in_place_of="main.sail",
+        note=f"storm trysail {st_area} m2 by the cutter's rules (Steel 1794, 'Cutter's "
+        "trysail'), bent in place of the mainsail; in the sail room."
+        + canvas_note(storm_canvas, storm=True),
+    )
+    b.line("storm_trysail.sheet", "sheet", st, rating=rope_kn(2.75, 3), parts=3)
+    b.line("storm_trysail.outhaul", "outhaul", st, rating=rope_kn(1.75))
+    sj_area = round(2.0 / 3.0 * jib_area)
+    sj_tack_x = stem_x_ft + bowsprit_reefed - 0.75
+    sj_x = (sj_tack_x + jib_head[0] + jib_clew[0]) / 3.0
+    sj_canvas = SMACK_CANVAS["storm jib"]
+    sj = b.sail(
+        "storm_jib",
+        "jibheaded",
+        stay="jib.stay",
+        area_m2=sj_area,
+        x_m=m(sj_x),
+        centre_height_m=round((deck_height + jib_z * FT) * math.sqrt(2.0 / 3.0), 1),
+        canvas_no=sj_canvas[0],
+        cloth_rating_kn=storm_cloth(sj_area),
+        bent=False,
+        in_place_of="jib",
+        note=f"storm jib {sj_area} m2, two-thirds of the jib (Steel 1794 p. 190), its tack at the "
+        "reefed bowsprit's end; in the sail room." + canvas_note(sj_canvas, storm=True),
+    )
+    b.line("storm_jib.halyard", "halyard", sj, rating=rope_kn(2.25, 2))
+    b.sided("storm_jib.sheet", "sheet", sj, rating=rope_kn(2.25))
+    b.line("storm_jib.downhaul", "downhaul", sj, rating=rope_kn(1.75))
+    storm = [st, sj]
+
+    # groups: the smack's working sail is her mainsail, foresail and jib (Holdsworth pp. 70
+    # to 71 and 137 to 139: under easy sail to shoot the lines, the foresail lowered to haul
+    # them); the square sail and the topsail are her light canvas, for a fair wind
+    b.group("courses", [sq])
+    b.group("topsails", [ts])
+    b.group("square sails", [sq, ts])
+    b.group("headsails", head_sails)
+    b.group("jibs", [jib])
+    b.group("staysails", [foresail])
+    b.group("gaff sails", [mainsail])
+    b.group("fore-and-aft sails", head_sails + [mainsail])
+    b.group("light sails", [sq, ts])
+    b.group("plain sail", [mainsail, foresail, jib])
+    b.group("all sail", [mainsail, sq, ts, foresail, jib])
+    b.group("yards", [sqy, tsy])
+    b.group("main yards", [sqy, tsy])
+    b.group("lower yards", [sqy])
+    b.group("topsail yards", [tsy])
+    b.group("lower masts", [mast])
+    b.group("storm canvas", storm)
+    b.group("square sail bowlines", [f"square_sail.bowline.{s}" for s in SIDES])
+    b.alias("square sail bowline", "square sail bowlines")
+    b.alias("mainsail", "main.sail")
+    b.alias("the main", "main.sail")
+    b.alias("foresail", "fore.staysail")
+    b.alias("the fore", "fore.staysail")
+    b.alias("the crossjack", "square_sail")
+    b.alias("the crossjack yard", "square_sail.yard")
+    b.alias("trysail", "storm_trysail")
+    b.alias("storm mainsail", "storm_trysail")
+    b.alias("head sails", "headsails")
+    b.alias("the mast", "main.mast")
+    b.alias("main mast", "main.mast")
+    b.descriptions(
+        [
+            (
+                "smack",
+                "a smack",
+                "a fishing smack, her well amidships",
+                "The Culloden smack's hull (Charnock vol. III p. 274) as the fisherman of the "
+                "Channel's grounds (spec M6 §19; judgement on the words).",
+            )
+        ]
+    )
+    ground_tackle_for(b, burthen, beam_ft, draught_ft)
+    smack_crew(b)
+    hold_for(b, burthen, False, "a fishing smack's hold forward and aft of her well: judgement")
+    well_m3 = round(10.0 * 8.0 * 4.0 * FT**3, 1)  # judgement: 10 ft by 8 by 4 below the water
+    b.doc["hold"]["well_m3"] = well_m3
+    b.hold_note += (
+        f" The well, {well_m3} m3 (10 ft by 8 by 4 ft below the water-line, judgement), the "
+        "water-tight compartment amidships open to the sea through holes in her bottom "
+        "(Holdsworth 1874 pp. 139 to 140; Steel 1805, WELL), where the live cod are kept."
+    )
+    b.boats(
+        BOATS_NOTE,
+        boat_entries(
+            lod_ft,
+            False,
+            [
+                (
+                    "boat",
+                    "yawl",
+                    "the boat",
+                    0.8,
+                    "The smack's boat, for the lines and the shore (Holdsworth pp. 137 to 139; "
+                    "judgement on the size).",
+                )
+            ],
+        ),
+    )
+    b.dump(
+        os.path.join(out_dir, "smack.yaml"),
+        "# The smack: Culloden, the Navy's smack of 1746 (B. Slade, Plymouth), 35 tons, 43 ft on\n"
+        "# the gun deck by 14 ft (Charnock 1802 vol. III p. 274; docs/design/VesselReferences-\n"
+        "# 2026-10.md § 2, decision 42). Generated by tools/gen_ships.py; edit that script and\n"
+        "# rerun, do not edit this file. Spars: Steel 1794 vol. I p. 41, 'Proportions of masts,\n"
+        "# yards, &c. for sloops, smacks, and hoys'; the sails' shapes the cutter's (Fincham 1843\n"
+        "# arts. 86, 87); canvas: Steel's smack's and sloop's sails; the running bowsprit:\n"
+        "# Lescallier 1791 p. 420; the well: Holdsworth 1874 pp. 139 to 140. Units: metres, m2,\n"
+        "# kg, kN. Comments mark judgements. Package 43b (spec M6 §19): no engine change but the\n"
+        "# hold's well.\n",
+    )
+
+
+def smack_crew(b):
+    b.crew(
+        [
+            (
+                ("complement",),
+                8,
+                "Eight: the Culloden's men (Charnock vol. III p. 274); Holdsworth's cod smacks of "
+                "twice her tonnage carried nine to eleven (p. 141).",
+            ),
+            (("names",), "english", "A smack's crew: the english list in data/crew/names.yaml."),
+            (
+                ("stations", "forecastle"),
+                3,
+                "Hands per station, both watches together; a smack has no tops: three for the "
+                "head sails, the bowsprit and the lines, judgement.",
+            ),
+            (("stations", "afterguard"), 2, "Afterguard, at the main sheet: 2, judgement."),
+            (("stations", "idlers"), 1, "The cook (spec M3 2.3)."),
+            (
+                ("ratings", "able"),
+                0.8,
+                "Share of the seamen by rating: fishermen bred to it (judgement). Able: 0.80.",
+            ),
+            (("ratings", "ordinary"), 0.2, "Ordinary: 0.20, the apprentices (Holdsworth p. 141)."),
+            (("ratings", "landsman"), 0.0, "No landsmen."),
+        ]
+        + [
+            (
+                ("posts", post),
+                None,
+                "Station holders by post (spec M3 2.3): the master who commands her and his "
+                "mate; names are drawn at muster."
+                if i == 0
+                else None,
+            )
+            for i, post in enumerate(SMACK_POSTS)
+        ]
+        + [
+            (("idlers_by_trade", "cook"), 1, "The cook: 1, judgement."),
+            (
+                ("stores", "water_tons"),
+                1,
+                "Stores for a fortnight on the grounds (judgement): water for eight men, a ton.",
+            ),
+            (("stores", "provisions_days"), 14, "Provisions: a fortnight (judgement)."),
+            (("stores", "spare_spars"), {}, None),
+            (("stores", "cordage_fathoms"), 40, "Spare rope (judgement)."),
+        ]
+    )
+    b.people(
+        "The named people beyond the posts (package 43b): the boy as the messenger; see "
+        "tools/gen_ships.py.",
+        SMACK_DRAWN,
+    )
+    b.spare_spars(
+        "The booms: a spare topsail yard (judgement).",
+        [("yard", 1, "A spare topsail yard (judgement).")],
+    )
+    b.sail_room(
+        "The sail room (spec 3b §6.3), every sail new; see tools/gen_ships.py.",
+        [
+            ("jib", SMACK_CANVAS["jib"][0], "A spare jib (judgement)."),
+            (
+                "storm_trysail",
+                SMACK_CANVAS["storm trysail"][0],
+                "Storm canvas, one of each (spec 3b §6.4, judgement).",
+            ),
+            ("storm_jib", SMACK_CANVAS["storm jib"][0], None),
+        ],
+    )
+
+
 if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else "data/ships"
     os.makedirs(out, exist_ok=True)
@@ -5214,4 +6596,6 @@ if __name__ == "__main__":
     schooner(out)
     cutter(out)
     brig(out)
+    lugger(out)
+    smack(out)
     print(f"written to {out}", file=sys.stderr)

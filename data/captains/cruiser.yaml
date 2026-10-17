@@ -21,6 +21,8 @@ source: "spec M6 §4 and §19; kings-ship.yaml for the station and the chase; th
 thresholds:
   gale_kn: {value: 38, source: "between the merchantman's force 8 and the King's ship's force 9: a brig-sloop lies to sooner than a frigate; judgement on Beaufort's scale"}
   gale_over_kn: {value: 30, source: "judgement, between the two"}
+  beating_dwell_minutes: {value: 10, source: "package 43b: the beating book taken up and given up on a verdict that has stood ten minutes, not on one course's word (the trade trial traded the deck every two minutes as an evasion ended); judgement, as gale_over_minutes"}
+  beating_band_points: {value: 0.5, source: "package 43b: the course laid again only half a point freer than the shaping's edge, so that a course on the edge of the wind is one verdict and not two by turns; judgement"}
   gale_over_minutes: {value: 10, source: "as the King's ship's"}
   shorten_sail_kn: {value: 30, source: "the starter book's thirty knots"}
   sea_room_nm: {value: 10, source: "as the merchant's; judgement"}
@@ -45,6 +47,28 @@ thresholds:
   mending_sooner_kn: {value: 4, source: "as above"}
   station_wear_hours: {value: 2, source: "the cruise's book: wore ship at the end of every second hour"}
   hail: {value: "What ship is that?", source: "the hail of a King's ship coming up with a stranger (Luce 1884 ch. XX, the custom of the hail); the words judgement"}
+
+# The stations a cruiser of each nation keeps (package 43b; spec M6 §19: "the naval
+# stations from the war (a cruiser on the station the doctrine names)"): the world's
+# business puts a cruiser of a nation at war on one of hers within the region in play
+# (`freesail/world/business.py`), a brig-sloop or a hired cutter, her intent `keep the
+# station off <place> within <n> miles`. The places are features of the chart; the stations
+# are the war's as remembered, UNVERIFIED (the inshore squadron off the Black Rocks and
+# Ushant in the blockade of Brest, 1803 to 1805; the cruisers off the Lizard and the Start
+# for the trade coming up Channel; the French privateers and corvettes off the Isle of Bas,
+# the Sept Iles and the Lizard against it).
+stations:
+  britain:
+    - {place: the Black Rocks, within_nm: 8, kind: brig-sloop}
+    - {place: Ushant, within_nm: 12, kind: brig-sloop}
+    - {place: the Lizard, within_nm: 10, kind: cutter}
+    - {place: the Start, within_nm: 10, kind: cutter}
+  france:
+    - {place: Isle of Bas, within_nm: 10, kind: brig-sloop, colours: none}
+    - {place: Sept Iles, within_nm: 10, kind: brig-sloop, colours: none}
+    - {place: the Lizard, within_nm: 20, kind: brig-sloop, colours: none}
+  spain: []
+  batavian-republic: []
 
 books:
   on passage:

@@ -5422,3 +5422,279 @@ tests alone** (`--slow -m pace`, the trim touched): 6 passed, at a load of 6.
 The regatta's runs for the first table took from two minutes (the frigate's course) to
 half an hour (the voyage to Madeira's 384 hours) each, at 300 to 800 ticks a second under
 that load; the crossing, with the merchant passage's dozen sail beside her, three to five.
+
+## Package 43b: the lugger and the smack, the world's business, the ports' faults (2026-10-16)
+
+Package 43b (spec M6 §19 as built; the brief in `docs/dev/M6-WorkPackages.md`; decision 42
+for the two hulls' references, `docs/design/VesselReferences-2026-10.md`; the owner's notes
+of gate m6a for the ports' faults and the rumours). Built in a worktree of its own beside
+package 44 (the regatta, the parity tests, the trims) from the same head (`a7e5693`); the
+two hulls were committed first (`2e4d852`), as the brief asked, so that 44 could take them;
+the rest touches `freesail/world/` (`business.py` new, `brains.py`, `captains.py`,
+`crews.py`, `ports.py`, `ships.py`, `scenarios.py`), `freesail/core/world.py` (the
+`business:` key and the minute's hook), `freesail/evolutions/scripts.py` (the let-go's cast),
+`data/` (`business.yaml` and `captains/fisherman.yaml` new, the doctrines' two beating
+thresholds and the cruiser's `stations:`, the Torbay stream, four free scenarios' `business:
+on`), and no file of 44's list but `scripts.py`, whose tack and wear the dip touches at
+their ends (`LugDip`), named in the hulls' commit.
+
+### The two hulls (item 1; `tools/gen_ships.py`, `data/ships/lugger.yaml`, `smack.yaml`)
+
+| Figure | The lugger (*Éclair*, 1795) | The smack (*Culloden*, 1746) | Source |
+|---|---|---|---|
+| On the water | 55 ft (16.8 m) by 20 ft 4 in, 7 ft mean draught, 101 tons | 40 ft (12.2 m) by 14 ft, 6 ft 3 in mean, 46 tons | RMG ZAZ6306 (the lugger); Charnock 1802 vol. III p. 274 (the smack); the water-line between keel and deck, the draughts and the blocks (0.45) judgement, the cutter's |
+| Masts and yards | on her breadth: main 3.455 B, fore 2.759 B, mizen 1.888 B; the yards on her length; topmasts 1.091 B; running bowsprit 2.649 B | the mast in one 3.75 B, the boom two thirds of it, the gaff three fifths of the boom, cross-jack three fifths, topsail yard four fifths | Forfait 1788 Table VII (the 60-pied lougre); Steel 1794 vol. I p. 41; heels Fincham 1843 p. 61 |
+| Working canvas | 476 m² (three lugs, two topsails, the jib); Forfait's 4.037 L B gives 452 m², five per cent less | plain sail 115 m² (mainsail, foresail, jib) | Forfait p. 75; Steel's smack's sails |
+| Centre of effort | 0.016 L before the middle, against Forfait's 0.024 L abaft | as the cutter's | Forfait Table VII; measured below |
+| Lateral centre (`clr_x_m`) | 1.6 m abaft the middle (judgement, measured: at 0.6 m the great lugs griped her up into the wind with the rudder hard over at seven points; at 1.6 m four degrees of weather helm at seven points and nearly balanced close-hauled) | 0.3 m abaft, as the cutter | the yaw trials of the build |
+| Company | thirty, French names (`data/crew/names.yaml`'s new list) | eight | RMG; Charnock |
+| The well | | 10 by 8 by 4 ft, 9.1 m³ (`hold.well_m3`, the schema's new key) | Holdsworth 1874 pp. 139 to 140 |
+
+**The masts on her breadth.** Forfait's Table VII gives the lugger's masts as multiples of
+her breadth and her yards of her length; on her length the masts would have given three
+quarters of the canvas his own rule of 4.037 L B asks, and on her breadth they give five per
+cent over it. Taken on the breadth, as the table's own column says; for the lead, since the
+centre of effort then falls a little before the middle where Forfait has it abaft (0.016 L
+before against 0.024 L abaft): the yards' slings a third along them and the tacks at the
+masts' feet put it there, and the hull's lateral centre was moved abaft to balance her
+(above) rather than the canvas moved.
+
+**What she sails** (the hierarchy truths of M5 §19 extended to six vessels,
+`tests/test_ships_hierarchy.py`; fifteen knots of true wind, plain sail, all hands called
+first for the two new hulls, since the smack's eight men in one watch could not set her
+canvas in the sweep's time):
+
+| True wind angle | 50° | 60° | 70° | 90° | 110° | 130° | 150° | 170° |
+|---|---|---|---|---|---|---|---|---|
+| The lugger, knots | 5.4 | 6.6 | 7.3 | 8.25 | 8.2 | 7.7 | 6.6 | 6.2 |
+| The smack, knots | 4.0 | 5.4 | 5.8 | 6.2 | | 5.5 | | |
+
+The lugger's best course to windward 52° and her nearest 44° (the cutter's 58° and 48°, the
+schooner's 58°), heeling 11.3° with the wind abeam; the smack's best 58° and nearest 46°, as
+the cutter. Their far-detail polars (`ships.far_polar`) come to within a tenth of these (the
+lugger's row at fifteen knots peaks at 8.27, the smack's at 6.0).
+
+**The lug and its dip.** The lug's curve and its trim were already in the sails' tables;
+the dipping lug (`SailSpec.dipping`) is new. Against its mast (on the weather side) a lug
+draws two thirds of its area (`LUG_AGAINST_MAST_AREA`, judgement: Forfait p. 6 and Lescallier
+p. 392 say only that it sets badly so). The tack lowers the two dipping lugs at `ready about`
+("lower the foresail and the mainsail") and dips them as she comes through the wind, a minute
+and a half (`dip_s`, judgement), finishing only when they are hoisted on the new lee side:
+the lugger's tack in fifteen knots takes 136 seconds. A missed stays hoists them again
+(`hoist_lugs_s`, 45) before the evolution fails. The wear dips them as the wind comes aft.
+`dip the foresail` alone: lower 30 s, shift 60, hoist 60. Hove to under the fore lug she
+forereached at 4.7 knots; the heave-to lowers both dipping lugs, and she lies 65° off at 2.2
+knots under the mizen and the jib. Left for milestone 7, said in the spec: the gybe of a lug,
+the dip in a boxhaul and in filling away, and the strain of a lug aback against its mast
+(Forfait's rule 2).
+
+### The world's business (item 2; `freesail/world/business.py`, `data/business.yaml`)
+
+Every figure of `data/business.yaml` is judgement and says so: the population at density 1
+(three traders in port, three at the edges, four fishermen, a cruiser a side), the hourly
+chances (a trader 0.25, a fisherman 0.08), `most_ships` 16, the least ratio of prices 1.3,
+the cargo 30 to 120 tons, the wait in port already done 1 to 11 hours, the fishing grounds
+10 to 80 fathoms two miles off the coast with a home within 45 miles, the trips 8 to 30
+hours, the third of the in-port traders outward bound, the rumours within 250 miles.
+
+**What the guard refused, and the mends.** The first draw put the in-port traders at the
+outer road with plans laid as if at sea, and the far-detail guard refused a third of them
+(Cawsand Bay to the Sound across Penlee, Bertheaume to St Mary's); arrivals at the northern
+edge, on the Bristol Channel's side, were refused for Brest and St Mary's across Cornwall.
+Now a ship drawn in port lies at the anchorage and is planned out by her port's own track
+(`departing`, the vessel spec's new key, as `_in_port` plans one that sails); an arrival is
+drawn only at an edge point whose straight line to the port's approach is clear; a route
+refused once is not drawn again that day; and a port whose own tracks the guard refuses is
+left out: **Roscoff** (its track to sea from the road of the Isle of Bas crosses the island
+on the guard's straight line, at 48° 47.7' N 4° 00.1' W) and **St Mary's** (no tracks; the
+straight line from the mouth of St Mary's Sound to the road crosses the Garrison). Both are
+the tracks' data, for the lead; a far ship sailing those lines would go through the land.
+The first draw of seed 7 tried thirty-four plans for eleven ships, a second and a half
+of the planner's sea routes each under the profiler; now one plan a ship, the draw at the
+start in seven seconds on the loaded machine.
+
+**The draw at seed 7, a day and a half in the Channel** (`merchant-cutter.yaml` with
+`business: on`, the region channel-west, the start 05:00 on 12 June 1805, run 36 hours of
+ship's time in 685 seconds at a load of four to six; `scratchpad/p43b/business_day.py`):
+
+| | Drawn | Where | What | How it ended by 36 hours |
+|---|---|---|---|---|
+| At the start: 3 traders in port | the Danish brig *Haabet*, Brest to Falmouth, 81 tons of wine; the Danish brig *Fortuna*, Falmouth outward bound for 47° 55' N 5° 24' W, 88 tons of coal; the American schooner *Sally*, Plymouth to Brest, 96 tons of pilchards | the Bay of Brest, Carrick Road, Plymouth Sound | neutral flags for the enemy's port (Britain and France at war) | *Haabet* ran for shelter three times in the thick and lies in Bertheaume road, in port; *Fortuna* still off Falmouth (50° 01' N), her passage taken up afresh seven times by the crewed promotion's fold-backs within the player's range and twice run for shelter; *Sally* off the Iroise |
+| 3 traders at the edges | the Danish brig *Christiane* for Brest (pilchards), the American schooner *Enterprise* for Brest (coal), the Portuguese brig *Esperança* for Falmouth (brandy) | the western and southern edges | | *Enterprise* in at Brest at 112080 (31 hours) and gone; the others nearing their ports |
+| 4 fishermen | the smack *Endeavour* on the Poll Bank from St Mary's (10 hours); the luggers *Saint-Yves* in the Iroise (15 hours) and *Jeune-Henriette* on the soundings south-west of Ushant (20 hours) from Brest; the smack *Industry* on the oozy ground off the Eddystone from Plymouth (9 hours) | on their grounds | | *Endeavour* home and gone at 13 hours, *Industry* at 15, *Saint-Yves* at 29½ (her trip, then the thick); *Jeune-Henriette* twice evading a stranger, her twenty hours worked, bound home |
+| 2 cruisers | the British cutter *Sparrowhawk* off the Lizard, the French brig-sloop *Diligente* off the Sept Iles | on their stations | | keeping station; *Sparrowhawk* investigated a stranger three times and went back to her station each time (before the friend's mend below, a cruiser took the same neutral for a stranger every minute) |
+| 8 by the hourly draw | 5 traders (Plymouth's four, one outward bound; one from Brest outward bound), 3 fishermen (two from Brest, one from Plymouth) | in port | coal, copper ore, pilchards, salt beef, wine | at sea, or in port again after a run for shelter |
+
+Twenty ships in all, sixteen at sea at the end; the player's lookout at anchor in Carrick
+Road hailed twelve sails in the day and a half. No ship left at the edge within the 36
+hours: the outward-bound traders that got clear of the land were still on their way to
+their marks beyond it (the edge's leaving is proved by `tests/test_business.py`). The run shows two
+things of package 43's brains, not this package's: a ship drawn at Brest's anchorage in the
+Bay of Brest starts "at anchor" and not "in port", since the port's reach is read from the
+outer road (Bertheaume) eight miles off, so her drawn wait is not counted; and the thick
+weather of the climatology sends every ship near the land into a road by turns, where she
+waits her twelve hours in port again (*Haabet*, *Friendship*).
+
+**The rumours.** Off where the business is off: the recorded passages' boats bring what they
+brought. Drawn at the start of the same day for the three ports with markets the boat
+goes to: at Falmouth "The talk on the quay, as the boat's crew heard it: wine cheap at
+Brest, coal dear at Brest and salt cheap at Brest. Rumour, no more."; at Plymouth copper
+ore, pilchards and coal dear at Brest; at Brest pilchards cheap at Plymouth, copper ore cheap
+at Falmouth and wine dear at Plymouth (the war's half on the enemy's goods in the tables;
+`tests/test_business.py` checks every word true by them).
+
+### The ports' faults (item 3)
+
+**(a) The let-go** (`scripts.too_little_water`, `ComeToAnchorScript`). The trade trial's
+schooner let go at 19:23 in four fathoms and a half, the master's tide leaving two at low
+water for her eleven feet, and lay aground on the ebb at 21:48. The cast at the let-go, less
+the master's own fall to low water, must leave her a fathom under her keel; if not, the
+anchor is belayed and she stands back once for the water where the lead called the ground
+good at the decision, a minute at least (`STAND_BACK_LEAST_S`) and ten at most, and rounds
+to there. From the trial's old trajectory (a checkpoint at 52000, before the beating rule's
+mend): "Belay the anchor: the lead gives four fathoms and a half; by the master's tide two
+fathoms at low water, and she draws 11 feet. Sheet home again; stand back for ..." at 19:23,
+"The lead calls five fathoms" at 19:28 and the bower let go in five at 19:28:50; afloat
+through the ebb. `tests/test_anchor.py` carries her onto that shoal from six fathoms and a
+half and proves it. With the beating rule's mend (below) the trial itself now comes in at
+19:41 into fifteen and a half and never wants the cast: the xfail lifted, the trial
+re-pinned (the table below).
+
+**(b) The Goulet on the flood** (`Ports._turn_high`). From the owner's wardroom save, loaded
+by the game's replay to the tick and the pilot given the conn (`scratchpad/p43b/
+goulet_probe2.py`, run with `-I`; `tests/test_ports.py` the slow test):
+
+| From | Before (the head) | After |
+|---|---|---|
+| 113000 (12:23) | aground on the Mingan at 13:03 | the berth at 13:44, at anchor 13:50 in 13 fathoms; the least water 11.6 fathoms |
+| 114000 (12:40) | aground on the Mingan at 13:05 | the berth at 13:46, at anchor 13:56 in 14 fathoms; the least water 12.3 fathoms |
+| 114700 (12:52) | the berth at 13:50 (package 45c's case) | the berth at 13:50; the least water 10.9 fathoms |
+
+The wind north-westerly, 308° to 320°, at ten knots; the flood setting her up the Goulet and
+onto the rocks as she turned in from the line of Bertheaume. His aim is held up to the side
+the stream sets from by the set over the leg as she will lie (`_made_good_on`: her heading as
+near as she lies with a point of margin for the wind's drawing ahead, which the first
+version lacked: the wind drew from 308° to 320° and his aim came out none), capped at three
+cables, in clear water and with a clear line, recomputed at each look until it holds.
+
+**(c) Torbay** (`data/tides/streams.yaml`, the area `torbay`, between Hope's Nose and the
+Berry Head): the bay was the open Channel's water.
+
+| At Brixham road (the anchorage) and in the bay | Springs, the strongest in a day | Neaps |
+|---|---|---|
+| Before (mid-channel) | 1.35 knots | 1.11 knots |
+| After (torbay: 0.2 and 0.1 by the table) | 0.17 knots | 0.14 knots |
+
+Off the Berry Head the Channel's stream runs as before. The rates are judgement (Imray 1874:
+"there is little stream in the bay"; the modern atlas's under a quarter of a knot from memory,
+unverified); the directions' book gives the bay none.
+
+**(d) The pilot's words.** His corrections of under two points (`PILOT_TRIM_POINTS`) are
+routine lines; his turns of two points and more, "trim to it" (now routine too) and his
+warnings stand. The intent scenario's conn from Bertheaume had added two hundred and forty
+notable lines to its log (45c's open item 3).
+
+### The beating flap (item 4; `captains.Judgement._course_verdict`)
+
+The trade trial's captain traded `on passage` and `beating` every two minutes at 08:58 as the
+evasion ended (17880 to 18240): the beating rule and the passage rule were two rules, each
+state's first course, shaped on the edge of the wind, giving the other's verdict. One rule
+decides now: the course last shaped against the wind of the minute, not laid nearer than her
+close-hauled angle and the shaping's half point (`COURSE_NOT_LAID_MARGIN_POINTS`), laid only
+half a point freer (`beating_band_points`, the doctrines'), and between the two as it was; and
+the state moves on a verdict that has stood `beating_dwell_minutes` (ten, as `gale_over_minutes`).
+Both thresholds are in the merchant's, the King's ship's, the cruiser's, the packet's, the
+commodore's and the fisherman's doctrines. In the trial the flap is gone; she beats from
+31740 to 38340 and from 44880 to 56340.
+
+**Found on the way**: the cruiser's `friend made out` left her free to take the same sail for
+a stranger the next minute (the business's *Bayonnaise* off the Isle of Bas investigated a
+neutral lying in Roscoff every minute for a day); a friend made out is now remembered as one
+given up (`Judgement._transitions`). No pin moved for it (the four below are the
+dwell's).
+
+### The regatta's two findings, at the merge (the lead's word of 2026-10-17)
+
+Package 44 merged on the head (`62f0981`) and into this branch (`a93d1c6`); its two small
+findings in the captain and the course are mended here (`47014f7`):
+
+- **A mark passed abeam far off** (`reckoning.WAY_PASSED_WITHIN_NM`, two miles): the
+  master's way by marks and the captain's legs (`Captain._passed`) take a mark as passed
+  abeam only within two miles of it or of the line to it (`geo.off_the_line_m`, the
+  cross-track distance), where the bearing alone abaft the line's beam had passed a water
+  mark far to windward. `tests/test_via.py` has it both ways.
+- **Under way with no sail set** (`Captain._sail_if_none`): entering on passage, beating or
+  running for shelter under way with none set, he makes plain sail (the topsails alone over
+  `shorten_sail_kn`), as after weighing. `tests/test_captains.py`: off the Lizard with
+  every sail furled, "setting plain sail (under way with no sail set)" at his first
+  judgement.
+
+No pin moved for either.
+
+**The lugger on a course** (`tools/regatta.py data/regatta/falmouth-to-bertheaume.yaml
+--agent rules --ship data/ships/lugger.yaml`, written to the scratchpad, not the
+repository): she does not finish in the forty hours, 72.8 miles short, where the course's
+own schooner finishes in 28 h 12 m. She is not slow (the log gives eight to nine knots
+close-hauled), but the second leg of the planner's route, the point 49° 52' N 5° 06' W
+west of the Lizard dead to windward, is never reached: the beating book's `the leg` tacks
+her every half hour, her boards at eight knots four miles long against the leg's
+two-mile reach, and she straddles the mark to the end (61 tacks; the schooner's
+shorter boards came within the reach after three hours). A mark of the sea route that is
+not a port's has no "passed abeam" (`Captain._passed` is for the inner tracks and the
+`via` marks), so nothing takes her on. For the lead: a sea-route mark passed within two
+miles of its line (the rule above) or a board laid to the mark's lay line would mend it;
+it is the captain's and was not done here. The schooner's own run on the same tree:
+1,844 lines, digest `e1fa1852d36bdc6d`; the lugger's 3,350, `c3c66e99ee1ada66`.
+
+### Pins moved (the slow tier on 43b's tree, then the truths' and the trials' on the merged)
+
+The whole slow tier ran once on 43b's tree before the merge (`4cab6d7`, below); of the
+recorded passages' and the trials' pins only the four below moved, and the head's
+re-pinned digests (44's sails-lifting words) are taken where 43b moves nothing. On the
+merged tree the truths' and the trials' slow tier once whole gave the same four, re-pinned
+from a dump of each run (`scratchpad/p43b/pins_trial.py`, `pins_intent.py`) and the four
+tests run again to pass. Every one is the beating verdict's dwell (item 4); the let-go's
+cast, the Goulet's turn, Torbay, the pilot's words, the friend made out, the two regatta
+findings and the business (off in every pinned scenario) moved none.
+
+| Pin | Before (the head) | Package 43b | Why |
+|---|---|---|---|
+| `TRIAL_TRADE_STRANGER_STATES` | on passage 300, evading 3660, on passage 17880, beating 18000, on passage 18120, beating 18240, on passage 39060, beating 44220, on passage 51720, in port 55440 | 300, 3660, 17880, **beating 31740, on passage 38340, beating 44880, on passage 56340, in port 56520** | the flap at 08:58 gone (four changes of state in six minutes); the beats fall otherwise and she comes into Carrick Road at 19:41 |
+| `TRIAL_TRADE_STRANGER_ANCHORED_TICKS` | `[55413]` | `[56498]` | let go in fifteen fathoms and a half at 19:41, where the cast does not want her to stand back |
+| `TRIAL_TRADE_STRANGER_LINES`, `_DIGEST` | 1556, `f7ad5b1e06dd737e` (43's; the head left the xfail's digest) | **1624**, `6b8c9c7406821465` (`acd7581476d8ee74` on 43b's branch, the same ticks and lines) | the beats, and no grounding; **the xfail lifted** |
+| `TRIAL_STATION_LEE_SHORE_STATES` | ... on passage 27240, beating 27300, keeping station 27300 | ... on passage 27240, keeping station 27300 | the minute's beating, the two rules' verdicts by turns, gone |
+| `TRIAL_STATION_LEE_SHORE_LINES`, `_DIGEST` | 1665, `53c27cbdc3c37f2c` | **1660**, `0686965a0871299c` | the beating book's lines of that minute |
+| `TRIAL_STATION_GALE_LINES`, `_DIGEST` | 1429, `692b5e910adb1d55` | **1640**, `c0aa397523ea2972` | the first five states as they were; the beating book after the gale at 52140, ten minutes after 51540, and the evening's tacks fall otherwise: two missed stays in plain sail after 18:00 and half an hour aback by turns (36 lines of sails backed and filled against 4) before she wears; for the lead, the frigate's stays in that sea, not this package's |
+| `GATE_6A_INTENT_STATES` | in port 300, on passage 17040, beating 22740, on passage 27480, in port 111420 | 300, 17040, **beating 23340, on passage 27960, at anchor 103980, in port 104340** | the beat ten minutes later and laid again eight minutes later; she comes to the road of Bertheaume eight minutes later than before, the flood no longer serves for the Goulet, and the at-anchor book's "the tide to go in" anchors her in the road, where she is in port (package 45's rule) |
+| `GATE_6A_INTENT_PILOT_ABOARD_TICKS`, `_PILOT_LEFT_TICKS` | `[17700, 101100]`, `[19920, 121020]` | `[17700, 101580]`, `[19920]` | Le Floch boards eight minutes later and stays aboard to take her in; the Goulet is not sailed in the 36 hours |
+| `GATE_6A_INTENT_ANCHORED_TICKS`, `_BROUGHT_UP_TICK`, `_BOAT_FOR_PRICES_TICK`, `_SOLD_TICK` | `[57, 111370]`, 112302, 112380, 119820 | `[57, 104295]`, 105260, 105360, 124320 | in the road of Bertheaume in eight fathoms and a half (the Bay in thirteen and a half before); the business from the road by the boat |
+| `GATE_6A_INTENT_LINES`, `_DIGEST` | 2357, `89e89858a56398c9` | **1684**, `c5060beaa8b991cd` | the pilot's conn through the Goulet (two hundred and forty lines of it at 45c) not sailed |
+
+For the lead: the intent scenario's new day is the doctrine's own and plausible (a ship that
+misses the tide at Bertheaume waits for it), but it no longer proves the conn through the
+Goulet that 45c pinned; the wardroom save's two runs in `tests/test_ports.py` (above) prove
+the conn on the flood now.
+
+### The suite, as run
+
+On the build machine (four cores), package 44's slow suites running beside this package's
+for most of the evening (the load four to eight), the pace tests alone at the end.
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean, on 43b's tree
+  and on the merged.
+- **The slow tier once whole on 43b's tree** (`python3 -m pytest --slow -n 4 -q -p
+  no:cacheprovider -m "not pace"`, `4cab6d7`, about three hours under the load): 3,547
+  passed, 10 expected failures, 8 failed. Four were the counts this package changes
+  (the library's evolutions, 67 to 73; the French name list in `test_crew_model`, twice;
+  Torbay among the western Channel's stream areas and its book's rates, twice in
+  `test_tide`), mended in `1aef0d5`; the other four the pins above. An earlier start of the
+  run was stopped when the let-go's stand-back was found to round her to again within a
+  cable (`36c0e89`) and again for a French given name in the muster list that is also a
+  product's name (`4cab6d7`).
+- **On the merged tree** (`47014f7`): the fast tier (`python3 -m pytest -n 4 -q -p
+  no:cacheprovider`): **3,293 passed, none failed** (305 slow tests left out). The truths'
+  and the trials' slow tier once whole (`python3 -m pytest --slow tests/test_known_truths.py
+  tests/test_captain_trials.py -m "not pace" -n 4`): 99 passed, 7 expected failures, 4
+  failed (the four pins above), re-pinned (`e1a54f6`) and the four run again: passed.
+- The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the merged
+  tree, the machine quiet: load 1.2 at their start and 0.9 at the end): 6 passed.

@@ -34,6 +34,7 @@ from freesail import units
 __all__ = [
     "EARTH_RADIUS_M",
     "name_words",
+    "off_the_line_m",
     "HORIZON_NM_PER_ROOT_METRE",
     "LEAGUE_M",
     "Position",
@@ -170,6 +171,16 @@ def destination(a: Position, bearing_deg: float, distance_m: float) -> Position:
         math.sin(theta) * math.sin(d) * math.cos(la), math.cos(d) - math.sin(la) * math.sin(lb)
     )
     return Position(math.degrees(lb), _wrap_lon(math.degrees(lon)))
+
+
+def off_the_line_m(start: Position, end: Position, here: Position) -> float:
+    """How far `here` lies off the great circle through `start` and `end`, in metres (the
+    cross-track distance, either side)."""
+    brg_line, _ = bearing_and_distance(start, end)
+    brg_here, dist = bearing_and_distance(start, here)
+    d = dist / EARTH_RADIUS_M
+    x = math.asin(max(-1.0, min(1.0, math.sin(d) * math.sin(math.radians(brg_here - brg_line)))))
+    return abs(x) * EARTH_RADIUS_M
 
 
 def horizon_nm(height_of_eye_m: float, height_of_object_m: float = 0.0) -> float:

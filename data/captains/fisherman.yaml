@@ -1,0 +1,73 @@
+# FreeSail: the doctrine of a fishing master (spec M6 §19; package 43b). The form is
+# merchant.yaml's (see its head). The smack and the lugger of the world's business, at far
+# detail only (`freesail/world/crews.py` never crews a fisherman: the spec puts them at
+# far detail in the business and at full detail in the regatta): a trip to a ground drawn
+# from the coast's features, the ground worked as a station of a mile or two for the
+# trip's hours (Holdsworth 1874 pp. 137 to 139: the lines shot under easy sail with the
+# wind free, the smack hove to while the tide runs, the lines hauled by short tacks), and
+# home to the port she sailed from, where she goes in and is gone from the sea. She runs
+# from an enemy made out near her, heaves to in a gale with sea room and claws off a lee
+# shore, as a merchantman does. Her books are empty: the far body works each state by its
+# plan (`freesail/world/brains.py`, `resolve_state`), and she is never crewed.
+
+role: fisherman
+name: a fishing master
+source: "spec M6 §19; Holdsworth 1874 pp. 65 to 72 (trawling) and 137 to 141 (the welled cod smacks and their lines); merchant.yaml for the gale and the stranger"
+
+thresholds:
+  gale_kn: {value: 34, source: "as the merchant's: Beaufort's force 8"}
+  gale_over_kn: {value: 28, source: "as the merchant's"}
+  gale_over_minutes: {value: 10, source: "as the merchant's"}
+  beating_dwell_minutes: {value: 10, source: "package 43b, as the merchant's"}
+  beating_band_points: {value: 0.5, source: "package 43b, as the merchant's"}
+  sea_room_nm: {value: 10, source: "as the merchant's"}
+  lee_shore_nm: {value: 6, source: "as the merchant's"}
+  shelter_land_nm: {value: 12, source: "as the merchant's: a smack runs for the road in thick weather near the land"}
+  shelter_within_nm: {value: 20, source: "as the merchant's"}
+  stranger_hostile_nm: {value: 6, source: "as the merchant's: an enemy made out within two leagues is run from"}
+  offing_nm: {value: 3, source: "as the merchant's"}
+  leg_reached_nm: {value: 2, source: "as the merchant's"}
+  anchor_within_nm: {value: 0.5, source: "as the merchant's"}
+  road_cables: {value: 3, source: "as the merchant's"}
+
+books:
+  on passage: []
+  beating: []
+  hove to for weather: []
+  running for shelter: []
+  at anchor: []
+  in port: []
+  investigating a stranger: []
+  chasing: []
+  evading: []
+  keeping station: []
+  in distress: []
+  engaging: []
+
+transitions:
+  - {from: keeping station, on: aground, to: in distress}
+  - {from: on passage, on: aground, to: in distress}
+  - {from: beating, on: aground, to: in distress}
+  - {from: hove to for weather, on: aground, to: in distress}
+  - {from: evading, on: aground, to: in distress}
+  - {from: at anchor, on: aground, to: in distress}
+  - {from: in port, on: under way, to: on passage}
+  - {from: on passage, on: anchored in port, to: in port}
+  - {from: on passage, on: hostile stranger, to: evading}
+  - {from: on passage, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: on passage, on: thick near the land, to: running for shelter}
+  - {from: keeping station, on: hostile stranger, to: evading}
+  - {from: keeping station, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: keeping station, on: thick near the land, to: running for shelter}
+  - {from: beating, on: hostile stranger, to: evading}
+  - {from: beating, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: beating, on: anchored in port, to: in port}
+  - {from: hove to for weather, on: gale over, to: on passage}
+  - {from: hove to for weather, on: lee shore, to: on passage}
+  - {from: running for shelter, on: sheltered, to: at anchor}
+  - {from: running for shelter, on: weather clear, to: on passage}
+  - {from: evading, on: stranger lost, to: on passage}
+  - {from: evading, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: at anchor, on: under way, to: on passage}
+  - {from: at anchor, on: anchored in port, to: in port}
+  - {from: in distress, on: afloat, to: on passage}

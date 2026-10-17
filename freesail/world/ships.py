@@ -182,6 +182,18 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "rig": "a brig",
         "what": "a merchant brig, deep laden",
     },
+    # package 43b (spec M6 §19): the chasse-marée on the Éclair of 1795 and the smack on the
+    # Culloden of 1746, the coaster and the fisherman of the world's business
+    "lugger": {
+        "file": "data/ships/lugger.yaml",
+        "rig": "a lugger",
+        "what": "a chasse-marée, three-masted under lugs",
+    },
+    "smack": {
+        "file": "data/ships/smack.yaml",
+        "rig": "a smack",
+        "what": "a fishing smack, her well amidships",
+    },
 }
 _DESCRIPTION_WORDS = {
     "a frigate": "frigate",
@@ -204,6 +216,16 @@ _DESCRIPTION_WORDS = {
     "brig-sloop": "brig-sloop",
     "a sloop of war": "brig-sloop",
     "the navy's brig": "brig-sloop",
+    "a lugger": "lugger",
+    "lugger": "lugger",
+    "a chasse-maree": "lugger",
+    "chasse-maree": "lugger",
+    "a chasse-marée": "lugger",
+    "chasse-marée": "lugger",
+    "a smack": "smack",
+    "smack": "smack",
+    "a fishing smack": "smack",
+    "fishing smack": "smack",
 }
 
 
@@ -1001,8 +1023,13 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         position = found[0]
     name = str(spec.get("name") or f"{key} {serial}")
     plan, cycle, goal = _goal_plan(world, str(spec.get("goal") or "bound for Falmouth"), position)
-    stream = world.rng.stream("ships")
-    factor = SAILING_FACTOR_MIN + (1.0 - SAILING_FACTOR_MIN) * stream.random()
+    if spec.get("sailing_factor") is not None:
+        # drawn by the caller from its own stream (the world's business, package 43b, so
+        # that its ships move no draw of the scenario's)
+        factor = float(spec["sailing_factor"])
+    else:
+        stream = world.rng.stream("ships")
+        factor = SAILING_FACTOR_MIN + (1.0 - SAILING_FACTOR_MIN) * stream.random()
     shows = str(spec.get("colours", "shown")).lower() not in ("none", "no", "false", "hidden")
     vessel = Vessel(
         id=str(spec.get("id") or f"ship-{serial}"),
@@ -1051,6 +1078,10 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
 
         vessel.intent_words = intent
         vessel.brain = FarCaptain(world, vessel, intent)
+        if spec.get("departing"):
+            # lying in a port (the world's business, package 43b): her plan goes out by
+            # the port's track, as a ship's that sails from it does
+            vessel.brain._departing = str(spec["departing"])
         vessel.brain._plan()
         if vessel.warning:
             raise ValueError(vessel.warning)

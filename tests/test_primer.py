@@ -76,6 +76,7 @@ SHIP_FILES = {
     "schooner": ROOT / "data" / "ships" / "topsail-schooner.yaml",
     "cutter": ROOT / "data" / "ships" / "cutter.yaml",
     "brig": ROOT / "data" / "ships" / "brig.yaml",
+    "lugger": ROOT / "data" / "ships" / "lugger.yaml",  # package 43b: chapter 2's lug
 }
 SPECS = {name: load_spec(path) for name, path in SHIP_FILES.items()}
 

@@ -232,6 +232,23 @@ PILOT_TRIM_EVERY_S = 120  # once for a turn, not at each minute's order of it (j
 PILOT_STREAM_WAY_KN = 3.0
 PILOT_STREAM_MOST_RAD = 3.0 * units.POINT
 PILOT_ACTOR = "standing order 'the pilot'"
+# The set allowed for before his turn (package 43b; 45c's open item 1, the owner's wardroom
+# save from 113000 and 114000: on a flood with the wind at NW the leg from the Goulet's
+# second mark to its third, NE, could not be made good, the stream's allowance capped and
+# she as near as she would lie, and the flood set her bodily across it onto the Mingan): a
+# pilot who knows the next leg will not be made good under this wind with the stream on her
+# bow takes his turning mark high, to the side the stream sets from, by as much as she will
+# sag over the leg, so that her course made good from there runs down onto his next mark;
+# no more than `PILOT_TURN_HIGH_MOST_M` off the mark (judgement: three cables, the width of
+# the Goulet's pass between the north shore and the Mingan), and only into water she has
+# under her with a fathom beneath her keel, on a clear line from the leg's start.
+PILOT_TURN_HIGH_MOST_M = 3.0 * units.CABLE
+PILOT_TURN_HIGH_LEAST_RAD = math.radians(3.0)
+# He reckons the next leg a point closer to the wind than she lies now: the wind of the
+# owner's save drew a point ahead (WNW to NW) in the quarter of an hour between his taking
+# up the leg to his turning mark and her coming to it (judgement: a point, the wind's
+# wander of a gusty day).
+PILOT_SET_WIND_MARGIN_RAD = units.POINT
 # The conn's design (package 45c; the owner's refinement of 2026-10-15): a pilot's conn is
 # promised only along his track from the pilot station inward, leg by leg. Boarding
 # elsewhere he first cons her to join it: at the nearest leg she is already inside of
@@ -742,6 +759,8 @@ class Ports:
     conn_bearing: float | None = None
     conn_order_tick: int | None = None
     conn_leg_from: Position | None = None  # where the leg in hand begins (package 45c)
+    # package 43b: a turning mark taken high for the set on the leg after it, by its index
+    conn_aims: dict | None = None
     conn_trim_tick: int = -(10**9)  # when he last had the yards trimmed to his course (45c)
     hail_answer: str = ""
     hail_count: int = 0
@@ -1720,6 +1739,7 @@ class Ports:
             keep = [m for m in marks[:-1] if bearing_and_distance(m[1], goal)[1] < here]
             self.conn_track = [*keep, marks[-1]]
         self.conn_i = 0
+        self.conn_aims = {}
         self.conn_inward = inward
         self.conn_heading = None
         self.conn_bearing = None
@@ -1896,6 +1916,8 @@ class Ports:
             return
         while self.conn_i < len(self.conn_track):
             words, mark = self.conn_track[self.conn_i]
+            # his turning mark taken high for the set on the leg after it (package 43b)
+            mark = self._turn_high(self.conn_i, mark)
             brg, dist = bearing_and_distance(pos, mark)
             leg_from = self.conn_leg_from or pos
             heading = float(dyn.heading)
@@ -1948,6 +1970,88 @@ class Ports:
             if fresh or abs(units.wrap_pi(wanted - self.conn_bearing)) >= PILOT_CONN_TURN_RAD:
                 self._conn_order(port, wanted, words, now)
             return
+
+    def _turn_high(self, i: int, mark: Position) -> Position:
+        """Where he steers for the conn track's mark `i` (package 43b): the mark itself, or
+        a point off it to the side the stream sets from when the leg after it will not be
+        made good (`_made_good_on`): as far off as she will sag over that leg, at most
+        `PILOT_TURN_HIGH_MOST_M`, into clear water on a clear line. Reckoned afresh each
+        time he looks while she stands for the mark, and kept once it is taken high."""
+        aims = self.conn_aims
+        if aims is None:
+            aims = self.conn_aims = {}
+        if aims.get(i) is not None:
+            return aims[i]  # once taken high, kept so for the leg
+        if i + 1 >= len(self.conn_track):
+            return mark  # the berth: no turn after it
+        nxt = self.conn_track[i + 1][1]
+        leg_brg, length = bearing_and_distance(mark, nxt)
+        if length < units.CABLE:
+            return mark
+        made = self._made_good_on(math.radians(leg_brg))
+        if made is None:
+            return mark
+        sag = units.wrap_pi(made - math.radians(leg_brg))
+        if abs(sag) < PILOT_TURN_HIGH_LEAST_RAD:
+            return mark
+        off_m = min(PILOT_TURN_HIGH_MOST_M, length * abs(math.tan(sag)))
+        # the set carries her to the right of the leg (sag clockwise): take the mark to its left
+        side = -90.0 if sag > 0.0 else 90.0
+        start = self.conn_leg_from or self.world.position
+        for share in (1.0, 0.75, 0.5, 0.25):
+            aim = destination(mark, (leg_brg + side) % 360.0, off_m * share)
+            if self._water_for(aim) and (start is None or self._clear_line(start, aim)):
+                aims[i] = aim
+                return aim
+        return mark
+
+    def _made_good_on(self, line: float) -> float | None:
+        """Her course made good over the ground (radians true) when conned for `line`
+        under this wind and stream, as the pilot reckons it (package 43b): None when she
+        lies the course the stream's allowance asks; else the course she lies on the
+        line's side of the wind, with her way and the stream added."""
+        ship = self.world.ship
+        dyn = getattr(ship, "dyn", None)
+        wind = getattr(self.world, "wind", None)
+        if dyn is None or wind is None:
+            return None
+        from freesail.evolutions.scripts import close_hauled_true_angle
+        from freesail.physics.integrate import water_velocity
+
+        wanted = self._for_the_stream(line)
+        wind_from = float(wind.direction_from)
+        closest = close_hauled_true_angle(ship) + PILOT_LIE_MARGIN_RAD + PILOT_SET_WIND_MARGIN_RAD
+        x = units.wrap_pi(wanted - wind_from)
+        if abs(x) >= closest:
+            return None
+        heading = units.wrap_2pi(wind_from + (1.0 if x >= 0.0 else -1.0) * closest)
+        way = max(float(dyn.u), units.knots_to_ms(PILOT_STREAM_WAY_KN))
+        wx, wy = water_velocity(ship)
+        east = way * math.sin(heading) + wx
+        north = way * math.cos(heading) + wy
+        return units.wrap_2pi(math.atan2(east, north))
+
+    def _water_for(self, pos: Position) -> bool:
+        """Water enough under her there now, a fathom beneath her keel (package 43b)."""
+        chart = getattr(self.world, "chart", None)
+        if chart is None:
+            return True
+        depth = chart.depth_at(pos)
+        if depth is None:
+            return False
+        tide = float(getattr(self.world, "tide_height_m", 0.0) or 0.0)
+        hull = getattr(self.world.ship, "hull", None)
+        draught = float(hull.spec.draught_m) if hull is not None else 0.0
+        return float(depth) + tide >= draught + PILOT_UNDER_KEEL_M
+
+    def _clear_line(self, a: Position, b: Position) -> bool:
+        """The line from `a` to `b` clear of the shore and the charted dangers in the
+        pilot's own water (his joining leg's offing and berth; package 43b)."""
+        from freesail.world.captains import Planner
+
+        return Planner(self.world).clear(
+            a, b, PILOT_JOIN_OFFING_NM, PILOT_JOIN_BERTH_NM, units.CABLE
+        )
 
     def _for_the_stream(self, line: float) -> float:
         """The heading that makes good `line` (radians true) over the ground against the
@@ -2068,7 +2172,12 @@ class Ports:
                 count = f"{int(round(points))} points"
             how = f"{side} {count}"
         said = f"The pilot: {how}; steer {point} for {mark}"
-        e = world.submit(f"steer {point}", actor=PILOT_ACTOR, said=said)
+        # his routine corrections are routine lines (package 43b; 45c's open item 3: the
+        # intent scenario's conn from Bertheaume added two hundred and forty lines to its
+        # log, his course every few minutes a notable line); a turn of `PILOT_TRIM_POINTS`
+        # and more stays notable, and his warnings are what they were
+        quiet = points < PILOT_TRIM_POINTS
+        e = world.submit(f"steer {point}", actor=PILOT_ACTOR, said=said, routine=quiet)
         if e.kind == "order.rejected":
             self._conn_off(f"his course was refused ({e.data.get('reason', '')})")
             return
@@ -2088,7 +2197,9 @@ class Ports:
             # (package 45c; the owner's merchantman, put five points up for the Goulet's
             # track with her yards for a broad reach, was taken aback and set onto the
             # Fillettes by the flood)
-            world.submit("trim sails", actor=PILOT_ACTOR, said="The pilot: trim to it")
+            world.submit(
+                "trim sails", actor=PILOT_ACTOR, said="The pilot: trim to it", routine=True
+            )
 
     # -- the pilot's words -----------------------------------------------------------------
 
@@ -3088,6 +3199,12 @@ class Ports:
                         {"port": port.id, "prices": dict(listed)},
                     )
                 )
+                # the rumours of the quay (package 43b; the owner's note 24), where the
+                # world's business is on
+                business = getattr(world, "business", None)
+                rumour = business.rumour(port) if business is not None else ""
+                if rumour:
+                    lines.append((Severity.ROUTINE, "port.rumour", rumour, {"port": port.id}))
             elif kind == "letter":
                 message = Message(
                     str(item["text"]),

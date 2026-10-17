@@ -157,6 +157,25 @@ The tack or the wear ends by steering the course (chapter 5), so you need not gi
 
 Those are the frigate's, close-hauled on the starboard tack heading WNW in a northerly; the last is notable, and is followed within seconds by her sails lifting and "Taken aback". `tack`, `wear` and `heave to` by their own words are unchanged: they are the manoeuvre, not a course.
 
+### The lug, and the smack
+
+**The lugger** (package 43b; `data/ships/lugger.yaml`), the chasse-marée of the French coast of the Channel, carries her canvas on three masts under lugsails, with a topsail over the fore and the main lug and a jib on a running bowsprit. A lugsail is four-sided, bent to a yard slung about a third of its length from its fore end and hoisted to the masthead; it sets fore and aft like a gaff sail, its tack down at the deck before the mast and its sheet aft. The fore and the main lugs are **dipping lugs**: the yard is on one side of the mast, and the sail stands well only when that is the lee side; on the other it lies against the mast, which bellies it and spoils its set (the game takes a third of its area from it so). When she goes about the lugs are lowered at `ready about` and dipped round the mast as she comes through the wind, the yard's fore end carried round abaft the mast and the sail hoisted on the new lee side; it is not done in a moment, a minute and a half for the pair, and she gathers way only as they are up again. A wear dips them as the wind comes aft. `dip the foresail` (or `dip the mainsail`) does it alone, for a lug left against its mast by a shift of the wind: lowered, shifted round and hoisted, two minutes and a half; a lug already on the lee side of its mast is said so, and nothing is done. The mizen is a standing lug sheeted to an outrigger over the stern, and never dips; the *taille-vent* is the main lug's storm canvas, bent to its yard in its place (`bend the taille-vent`). When she heaves to, the dipping lugs come down and she lies to under her mizen and her jib.
+
+She lies nearer the wind than any square-rigged ship: on the trial in fifteen knots she lies 44° from the true wind and makes her best to windward at 52°, against the cutter's 48° and 58° and the frigate's six points, and she runs eight knots and a quarter with the wind abeam. The lug's sheet is worked as the gaff's (chapter 4), and a lug's gybe, with its dip as the wind crosses the stern, is milestone 7's.
+
+```orders lugger furled
+set the lugs
+set the jib
+trim the foresail
+dip the foresail
+dip the mainsail
+reef the mainsail
+bend the taille-vent
+take in the mizen
+```
+
+**The smack** (`data/ships/smack.yaml`), the Culloden smack of 1746 as Steel gives her spars, is a cutter-rigged fishing vessel with a well amidships, eight men and forty-six tons; she sails as the cutter does, in a smaller way: six knots and a quarter with the wind abeam, her best to windward at 58° and 46° her nearest. Both are on the sea in the world's business (chapter 15) as fishermen.
+
 ### Conning the helm
 
 The rest of the conning words (Luce 1866, ch. XXIV, 'Conning'; Falconer, *Helm*) speak to the wheel rather than to the course, and the game takes them as they were meant:

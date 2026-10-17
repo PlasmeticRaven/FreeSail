@@ -121,13 +121,15 @@ STATES: tuple[str, ...] = (
     "engaging",
 )
 
-# The roles the doctrine files give (the fisherman is 43b's); the cruiser (package 43) is
-# the small man-of-war on passage, a brig-sloop or a cutter of the Navy, who makes out a
-# stranger, chases what she can fight and hauls off from what she cannot.
-ROLES: tuple[str, ...] = ("kings-ship", "merchant", "packet", "commodore", "cruiser")
+# The roles the doctrine files give; the cruiser (package 43) is the small man-of-war on
+# passage, a brig-sloop or a cutter of the Navy, who makes out a stranger, chases what she
+# can fight and hauls off from what she cannot; the fisherman (package 43b) works a
+# fishing ground for a trip and goes home, at far detail only.
+ROLES: tuple[str, ...] = ("kings-ship", "merchant", "packet", "commodore", "cruiser", "fisherman")
 
-# The kinds of intent the captain reads.
-INTENT_KINDS: tuple[str, ...] = ("trade", "station", "letter", "home", "passage")
+# The kinds of intent the captain reads (package 43b: `fish`, a trip to a fishing ground
+# and home again, the world's business).
+INTENT_KINDS: tuple[str, ...] = ("trade", "station", "letter", "home", "passage", "fish")
 
 # The actor a judgement's order carries; the World knows it as a rule's and does not
 # journal it (`core.world.RULES_ACTOR_PREFIXES`).
@@ -176,6 +178,8 @@ SIZE_RANK: dict[str, int] = {
     "merchant brig": 2,
     "schooner": 1,
     "cutter": 1,
+    "lugger": 1,  # package 43b: a chasse-marée of a hundred tons, the cutter's class
+    "smack": 0,  # a fishing smack of thirty-five tons is nobody's match
 }
 _SIZE_WORDS: tuple[tuple[str, int], ...] = (
     ("frigate", 3),
@@ -183,6 +187,9 @@ _SIZE_WORDS: tuple[tuple[str, int], ...] = (
     ("brig", 2),
     ("schooner", 1),
     ("cutter", 1),
+    ("lugger", 1),
+    ("chasse-mar", 1),
+    ("smack", 0),
 )
 
 
@@ -289,6 +296,8 @@ class Intent:
     between: str = ""
     done: bool = False
     via: tuple[str, ...] = ()  # the marks sailed by on the way, in order (package 45)
+    # package 43b: a fishing trip's hours on the ground; `origin` is then her home port
+    hours: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -301,7 +310,7 @@ class Intent:
             "radius_nm": self.radius_nm,
             "done": self.done,
             "via": list(self.via),
-        }
+        } | ({"hours": self.hours} if self.hours is not None else {})
 
 
 # `via` in an intent or a course (package 45): `trade tin from Falmouth to Lisbon via
@@ -466,6 +475,11 @@ _LETTER = re.compile(
     r"^carry\s+(?:this|a|the)\s+(?:letter|message|dispatch|despatch)\s+to\s+(?P<b>.+)$"
 )
 _HOME = re.compile(r"^run\s+home\s+(?:to|for)\s+(?P<b>.+)$")
+# package 43b: `fish on the Eddystone ground for 20 hours from Plymouth`
+_FISH = re.compile(
+    r"^fish\s+(?:on|at|over)\s+(?P<ground>.+?)(?:\s+within\s+(?P<radius>[\d.]+)\s+miles?)?"
+    r"\s+for\s+(?P<hours>[\d.]+)\s+hours?\s+(?:from|out\s+of)\s+(?P<home>.+)$"
+)
 _PASSAGE = re.compile(r"^(?:bound|passage|sail)\s+(?:from\s+(?P<a>.+?)\s+)?(?:for|to)\s+(?P<b>.+)$")
 
 
@@ -523,6 +537,20 @@ def read_intent(world: Any, words: str) -> Intent:
     if m:
         b, via = to_and_via(group(m, "b"))
         return Intent("home", said, destination=b, via=via)
+    m = _FISH.match(text)
+    if m:
+        # a fishing trip (package 43b): to the ground, worked as a station of a mile or two
+        # for the hours, and home to the port she sailed from
+        ground = _place_id(world, group(m, "ground"))
+        home = _place_id(world, group(m, "home"))
+        return Intent(
+            "fish",
+            said,
+            origin=home,
+            destination=ground,
+            radius_nm=float(m.group("radius") or 1.5),
+            hours=float(m.group("hours")),
+        )
     m = _PASSAGE.match(text)
     if m:
         a = _place_id(world, group(m, "a")) if m.group("a") else ""
@@ -1033,7 +1061,7 @@ class Planner:
         port_from = self._port(departing) if departing else None
         if port_from is not None:
             legs += self._port_track(port_from, "to_sea")
-        if intent.kind == "station":
+        if intent.kind in ("station", "fish"):
             place = self._place(intent.destination)
             if place is not None:
                 mark = station_off(self.world, place[1], intent.radius_nm)
@@ -1517,6 +1545,13 @@ class Judgement:
                     if not isinstance(self.given_up, set):
                         self.given_up = set()
                     self.given_up.add(str(self._stranger))
+                if t.on == "friend made out" and self._stranger is not None:
+                    # a friend made out is a stranger no more (package 43b: the business's
+                    # cruiser off the Isle of Bas made out a neutral lying in Roscoff every
+                    # minute, and took her for a stranger again the minute after)
+                    if not isinstance(self.given_up, set):
+                        self.given_up = set()
+                    self.given_up.add(str(self._stranger))
                 self._enter(t.to)
                 return
 
@@ -1621,9 +1656,9 @@ class Judgement:
             )
         if name == "course not laid":
             # in pilot water a foul wind is waited out at anchor, not beaten (`_passage`)
-            return bool(self._business.get("course_not_laid")) and not self._inner_leg()
+            return self._course_dwelt(p, "not laid") and not self._inner_leg()
         if name == "course laid":
-            return not self._business.get("course_not_laid")
+            return self._course_dwelt(p, "laid")
         if name == "at the road":
             return bool(self._waiting_at_road)
         if name == "under way":
@@ -1643,6 +1678,50 @@ class Judgement:
         if name == "cargo done":
             return bool(self.intent and self.intent.done)
         return False
+
+    def _course_verdict(self, p: Perception) -> str:
+        """Whether the course shaped for the leg is laid, by one rule (package 43b; the
+        trade trial's beating rule and passage rule traded the deck every two minutes as
+        an evasion ended, each state's first course, shaped on the edge of the wind, giving
+        the other verdict): the course last shaped by his rule (`course_heading_deg`)
+        against the wind of the minute, not laid nearer the wind than her close-hauled
+        angle and the shaping's margin (`COURSE_NOT_LAID_MARGIN_POINTS`), laid only
+        `beating_band_points` freer than that, and between the two as it was. With no
+        course shaped yet, the helm's own word on the last (`course_not_laid`)."""
+        from freesail.orders.navigation import COURSE_NOT_LAID_MARGIN_POINTS
+
+        b = self._business
+        heading = b.get("course_heading_deg")
+        closest = b.get("course_closest_deg")
+        before = b.get("course_verdict")
+        if heading is None or closest is None or p.wind_from_deg is None:
+            verdict = "not laid" if b.get("course_not_laid") else "laid"
+        else:
+            th = self.doctrine.threshold if self.doctrine else (lambda _k, d=None: d)
+            point = units.rad_to_deg(units.POINT)
+            off = abs((float(heading) - float(p.wind_from_deg) + 180.0) % 360.0 - 180.0)
+            edge = float(closest) + COURSE_NOT_LAID_MARGIN_POINTS * point
+            band = float(th("beating_band_points", 0.5)) * point
+            if off < edge:
+                verdict = "not laid"
+            elif off >= edge + band:
+                verdict = "laid"
+            else:
+                verdict = before or ("not laid" if b.get("course_not_laid") else "laid")
+        if verdict != before:
+            b["course_verdict"] = verdict
+            b["course_verdict_since"] = p.tick
+        return verdict
+
+    def _course_dwelt(self, p: Perception, wanted: str) -> bool:
+        """The verdict `wanted` held for the doctrine's `beating_dwell_minutes` (package
+        43b): the beating book is taken up, and given up, on a verdict that has stood a
+        while, never on one course's word."""
+        if self._course_verdict(p) != wanted:
+            return False
+        th = self.doctrine.threshold if self.doctrine else (lambda _k, d=None: d)
+        since = int(self._business.get("course_verdict_since", p.tick))
+        return p.tick - since >= float(th("beating_dwell_minutes", 10)) * 60.0
 
     # the hooks each body gives (the near body's are `Captain`'s own methods)
 
@@ -2116,6 +2195,11 @@ class Captain(Judgement):
             # 40c: the schooner left the road under her topsail alone): he gives it at
             # `ship.under_way` himself (`_work`)
             self._business["weighing"] = True
+        elif state in ("on passage", "beating", "running for shelter") and old != "at anchor":
+            # under way with no sail set (package 43b, from package 44's regatta: a captain
+            # started so made none for a day): sail made as after weighing, the topsails
+            # alone in a wind over the doctrine's shortening line
+            self._sail_if_none()
         if state != "at anchor":
             self._fill_away_first()
             manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")
@@ -2182,6 +2266,23 @@ class Captain(Judgement):
             self._business["brought_up"] = True
         if "ship.under_way" in kinds or "ship.aweigh" in kinds:
             self._business.pop("brought_up", None)
+
+    def _sail_if_none(self) -> None:
+        """Plain sail made when she is under way with none set (package 43b), the topsails
+        alone over `shorten_sail_kn`; nothing when a sail is set or the anchor is down."""
+        world = self.world
+        ship = getattr(world, "ship", None)
+        if ship is None or any(s.is_set for s in ship.sails.values()):
+            return
+        p = Perception.read(world)
+        if p.anchor_down or p.anchoring or p.aground:
+            return
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        if p.wind_kn > float(th("shorten_sail_kn", 30)):
+            self.give("set the topsails", why="under way with no sail set, the wind strong")
+        else:
+            self.give("set plain sail", why="under way with no sail set")
 
     def _weather_work(self, p: Perception, kinds: set[str]) -> None:
         """Sail after the gale, whatever his state (package 45, Part B item 5; 37p's open
@@ -2339,7 +2440,19 @@ class Captain(Judgement):
         leg = self.legs[self.leg_i]
         for e in events:
             if e.kind == "helm.set" and state_of_actor(str(e.actor or "")) is not None:
-                self._business["course_not_laid"] = bool((e.data or {}).get("course_not_laid"))
+                data = e.data or {}
+                self._business["course_not_laid"] = bool(data.get("course_not_laid"))
+                # the course shaped and her close-hauled angle, for the one rule's verdict
+                # (package 43b, `_course_verdict`)
+                if data.get("heading") is not None:
+                    from freesail.evolutions.scripts import close_hauled_true_angle
+
+                    self._business["course_heading_deg"] = (
+                        units.rad_to_deg(float(data["heading"])) % 360.0
+                    )
+                    self._business["course_closest_deg"] = units.rad_to_deg(
+                        close_hauled_true_angle(self.world.ship)
+                    )
         if "ship.filled_away" in kinds and p.manoeuvre not in ("hove to", "heaving to"):
             if leg.kind != "out":
                 self._shape_leg()
@@ -2482,8 +2595,16 @@ class Captain(Judgement):
         else:
             return False
         along, _ = bearing_and_distance(start, leg.position)
-        to_mark, _ = bearing_and_distance(here, leg.position)
-        return abs(units.wrap_pi(math.radians(to_mark - along))) > math.pi / 2.0
+        to_mark, dist = bearing_and_distance(here, leg.position)
+        if abs(units.wrap_pi(math.radians(to_mark - along))) <= math.pi / 2.0:
+            return False
+        # abeam only within two miles of the mark or of the line to it (package 43b, the
+        # master's way's rule, `WAY_PASSED_WITHIN_NM`: the regatta's mark far to windward)
+        from freesail.world.geo import off_the_line_m
+        from freesail.world.reckoning import WAY_PASSED_WITHIN_NM
+
+        near = WAY_PASSED_WITHIN_NM * units.NAUTICAL_MILE
+        return dist <= near or off_the_line_m(start, leg.position, here) <= near
 
     def _leg_reached(self, leg: Leg, p: Perception) -> None:
         world = self.world

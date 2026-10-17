@@ -338,6 +338,12 @@ class SailSpec:
     canvas_no: int | None = None  # the canvas it is made of, 1 the heaviest (spec 3b §6.1)
     bent: bool = True  # false: the sail starts the voyage in the sail room (spec 3b §6.4)
     in_place_of: str | None = None  # the sail it is bent instead of (a storm mizzen: spanker)
+    # Package 43b (the proposal's §4.4, the lugger's rig-specific evolution): a dipping lug,
+    # its yard slung at a third of its length on one side of the mast and its tack shifted
+    # in going about (Forfait 1788 pp. 5 to 6; Steel 1794 vol. I, LUGGER), which must be
+    # dipped round the mast to the new lee side; a standing lug (a mizen, the taille-vent
+    # tacked at the foot of the mast) is not dipped.
+    dipping: bool = False
 
 
 @dataclass
@@ -439,6 +445,11 @@ class HoldSpec:
     stores, which the manifest counts the cargo against."""
 
     capacity_tons: float
+    # Package 43b: a fishing smack's well (Holdsworth 1874 pp. 139 to 140; Steel 1805,
+    # WELL), the water-tight compartment amidships open to the sea, in cubic metres; it
+    # gives her no buoyancy and its water moves with her (the hull's displacement counts
+    # it). None: she has none.
+    well_m3: float | None = None
 
 
 @dataclass
@@ -556,14 +567,17 @@ def _parse_hold(raw: Any, source: str) -> HoldSpec:
     if not isinstance(raw, dict):
         raise ShipFileError(f"{source}: 'hold' is not a mapping.")
     for key in raw:
-        if key != "capacity_tons":
+        if key not in ("capacity_tons", "well_m3"):
             raise ShipFileError(f"{source}: the hold has '{key}', which it does not take.")
     tons = _num(raw, "capacity_tons", "the hold", source)
     if tons < 0.0:
         raise ShipFileError(
             f"{source}: the hold's capacity is {tons:g} tons; it cannot be less than nothing."
         )
-    return HoldSpec(capacity_tons=tons)
+    well = _num(raw, "well_m3", "the hold", source, required=False)
+    if well is not None and well < 0.0:
+        raise ShipFileError(f"{source}: the well is {well:g} cubic metres; it cannot be less.")
+    return HoldSpec(capacity_tons=tons, well_m3=well)
 
 
 def _parse_boats(raw: Any, source: str) -> list[BoatSpec]:
@@ -800,6 +814,11 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
             f"{source}: {where} has bent = {bent!r}; say true (bent to its spar) or false "
             f"(in the sail room)."
         )
+    dipping = s.get("dipping", False)
+    if not isinstance(dipping, bool):
+        raise ShipFileError(f"{source}: {where} has dipping = {dipping!r}; say true or false.")
+    if dipping and cls != "lug":
+        raise ShipFileError(f"{source}: {where} is a {cls} sail; only a lug is dipped.")
     return SailSpec(
         id=sid,
         cls=cls,
@@ -813,6 +832,7 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
         canvas_no=_canvas_no(s.get("canvas_no"), where, source),
         bent=bent,
         in_place_of=_str(s, "in_place_of", where, source, required=False),
+        dipping=dipping,
     )
 
 

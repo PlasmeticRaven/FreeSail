@@ -407,8 +407,8 @@ def _sail_evolution(
 
 
 # The classes of sail that `furl` takes in (package 37l): handed and stowed, not furled on
-# a spar.
-FURLED_AS_TAKEN_IN = ("jibheaded", "studding")
+# a spar. A lug comes down on deck with its yard and is stowed there (package 43b).
+FURLED_AS_TAKEN_IN = ("jibheaded", "studding", "lug")
 
 
 def _sail_params(order: Order) -> dict[str, Any]:

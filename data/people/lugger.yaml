@@ -1,0 +1,56 @@
+# FreeSail: the afterguard of the lugger (spec M6 §2; package 43b): the master (the patron)
+# who commands her, his mate and the boatswain, with a boy to carry the word, as the
+# cutter's. A chasse-marée's people were Bretons and Normans; the names are the muster's,
+# drawn under the seed from the french list. The form and the reading are frigate-36.yaml's
+# (see its head). The outlines are judgement.
+
+ship: data/ships/lugger.yaml
+
+# The harness's stations bound to a person by his role, as the cutter's: the officer of the
+# watch is the mate, and so is the master's station.
+stations:
+  captain: master
+  officer of the watch: mate
+  master: mate
+
+wardroom:
+  - role: master
+    post: true
+    rank: master
+    station: the command
+    place: quarterdeck
+    traits: [quick, proud of his lugs, never reefs while the sails will stand]
+    history: "Born at Saint-Malo; master of chasse-marées in the coasting trade since the peace of 1783."
+    brief: >-
+      The lugger, her people and her business are his: the course, the lugs dipped or
+      shifted for the taille-vent, the port's dealing.
+  - role: mate
+    post: true
+    rank: mate
+    station: the mate's
+    place: quarterdeck
+    traits: [steady, careful of the weather, a Morbihan man]
+    history: "A fisherman of the Morbihan before the war."
+    brief: >-
+      The deck in his watch under the master's standing orders, the lugs, the sheets and
+      the lead.
+  - role: boatswain
+    post: true
+    rank: boatswain
+    station: the rigging and the boat
+    place: deck
+    traits: [loud, quick aloft, mends anything]
+    history: "Twenty years in luggers and chasse-marées."
+    brief: >-
+      The rigging, the running bowsprit, the yards and the tacks, the cable and the boat.
+  - role: boy
+    drawn: {station: afterguard, rating: landsman}
+    messenger: true
+    rank: boy
+    station: the master's messenger
+    place: quarterdeck
+    traits: [thin, barefoot, sings]
+    history: "Shipped at Roscoff last spring."
+    brief: >-
+      Carries the master's word about the lugger (pass the word for, send for).
+    note: A boy as the messenger (judgement).

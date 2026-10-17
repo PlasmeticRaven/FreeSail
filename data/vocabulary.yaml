@@ -324,6 +324,13 @@ verbs:
     synonyms: [run in]
     object: sail
     level: 1
+  dip:
+    # A dipping lug shifted round its mast to the lee side (package 43b; dip_lug.yaml):
+    # "changer la voile de côté" (Forfait 1788 p. 6). A tack or a wear dips the lugs as
+    # part of the manoeuvre; this is the order by itself.
+    synonyms: [dip the yard of]
+    object: sail
+    level: 1
   # Spars aloft (Luce 1884, ch. XX, 'Sending up and down topgallant-masts';
   # ch. XXIX, 'Preparations for a Gale'). The whole order is the verb: every
   # mast of that kind the ship has.
@@ -1158,9 +1165,14 @@ evolutions:
     square: reef_square
     gaff: reef_gaff
     bowsprit: reef_bowsprit  # package 32b: a cutter's running bowsprit, run in to its reef
+    lug: reef_lug  # package 43b
   shake out:
     square: shake_out_square
     gaff: shake_out_gaff
+    lug: shake_out_lug  # package 43b
+  # package 43b: a dipping lug shifted round its mast to the lee side
+  dip:
+    lug: dip_lug
   brace: brace
   square: brace
   back: brace
@@ -1175,16 +1187,19 @@ evolutions:
     gaff: bend_sail
     jibheaded: bend_sail
     studding: bend_sail
+    lug: bend_sail  # package 43b: the lugger's lugs and the taille-vent
   unbend:
     square: unbend_sail
     gaff: unbend_sail
     jibheaded: unbend_sail
     studding: unbend_sail
+    lug: unbend_sail  # package 43b: the lugger's lugs and the taille-vent
   shift:
     square: shift_sail
     gaff: shift_sail
     jibheaded: shift_sail
     studding: shift_sail
+    lug: shift_sail  # package 43b: the lugger's lugs and the taille-vent
     spar: shift_spar  # package 30b: any spar carried away, for a spare of its class
   cut away: clear_wreck
   send down: clear_wreck
@@ -1229,7 +1244,7 @@ evolutions:
   trim:
     gaff: trim_gaff_sheet
     jibheaded: trim_jib_sheet
-    lug: trim_gaff_sheet
+    lug: trim_lug_sheet  # package 43b
     lateen: trim_gaff_sheet
     sprit: trim_gaff_sheet
 

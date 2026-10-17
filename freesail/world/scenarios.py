@@ -392,6 +392,15 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         if s.get("position") is None or not str(s.get("goal") or "").strip():
             raise ScenarioError(f"{where}, ships {i + 1}: a ship needs a position and a goal.")
     sc.ships = [{str(k): v for k, v in s.items()} for s in ships_raw]
+    # the world's business (package 43b; spec M6 §19): on, off or a density; off when not said
+    if raw.get("business") is not None:
+        from freesail.world.business import business_density
+
+        try:
+            density = business_density(raw["business"])
+        except ValueError as e:
+            raise ScenarioError(f"{where}, {e}") from None
+        sc.business = "off" if density <= 0.0 else ("on" if density == 1.0 else density)
     orders_raw = raw.get("world_orders") or []
     if not isinstance(orders_raw, list):
         raise ScenarioError(f"{where}, world_orders: a list of {{at, order}}.")

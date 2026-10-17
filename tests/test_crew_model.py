@@ -203,9 +203,11 @@ def test_other_malformed_crew_sections(frigate_data):
 
 def test_the_name_lists():
     data = yaml.safe_load(NAMES_PATH.read_text(encoding="utf-8"))
-    assert set(data) == {"english", "american"}
-    for lists in data.values():
-        assert len(lists["given"]) >= 60 and len(lists["surnames"]) >= 200
+    assert set(data) == {"english", "american", "french"}  # the French: package 43b's lugger
+    for which, lists in data.items():
+        # the French list is a chasse-marée's of thirty men, not a frigate's company
+        least = (30, 40) if which == "french" else (60, 200)
+        assert len(lists["given"]) >= least[0] and len(lists["surnames"]) >= least[1]
         for names in lists.values():
             assert len(set(names)) == len(names)
             assert all(isinstance(n, str) and n.strip() == n and n for n in names)
@@ -220,8 +222,8 @@ def test_given_names_are_abbreviated_as_a_muster_book_would(frigate_crew):
 
 def test_an_unknown_name_list_is_refused():
     spec = copy.deepcopy(load_ship(SCHOONER).spec.crew)
-    spec.names = "french"
-    with pytest.raises(ShipFileError, match="'french' names"):
+    spec.names = "dutch"  # package 43b: the French list is the lugger's now
+    with pytest.raises(ShipFileError, match="'dutch' names"):
         muster(spec, random.Random(1))
 
 

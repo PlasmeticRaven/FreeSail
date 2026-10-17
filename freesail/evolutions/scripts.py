@@ -216,13 +216,19 @@ def head_sails(ship: Ship) -> list[Sail]:
 
 def boom_sails(ship: Ship) -> list[Sail]:
     """The gaff sails set on a boom (a ship's spanker, a fore-and-after's mainsail): the
-    sails whose sheet a tack hauls aft and holds over (package 32e)."""
+    sails whose sheet a tack hauls aft and holds over (package 32e). A standing lug (a
+    lugger's mizen sheeted to its outrigger, the taille-vent tacked at the foot of the
+    mast) is worked as they are, its sheet hauled aft to bring her up: "les focs & le
+    tapecul ... favorisent & accélèrent efficacement le mouvement giratoire" (Forfait 1788
+    p. 53; package 43b)."""
     return [
         sl
         for sl in ship.sails.values()
         if sl.is_set
-        and sl.cls == "gaff"
-        and ship.spar_of_role(sl, "boom") is not None
+        and (
+            (sl.cls == "gaff" and ship.spar_of_role(sl, "boom") is not None)
+            or (sl.cls == "lug" and not sl.dipping)
+        )
         and ship.sheets_of(sl)
     ]
 
@@ -318,6 +324,86 @@ def shift_sheets_over(ship: Ship, new_lee: str, wind: Wind, way: float) -> None:
     draw_sheets(ship, sails, new_lee, full_and_by_apparent(ship, wind, way))
 
 
+def dipping_lugs(ship: Ship) -> list[Sail]:
+    """The dipping lugs set (package 43b): a lugger's fore and main lugs."""
+    return [
+        sl
+        for sl in ship.sails.values()
+        if sl.cls == "lug" and sl.dipping and sl.is_set and ship.sheets_of(sl)
+    ]
+
+
+class LugDip:
+    """The dipping lugs of a manoeuvre through the wind (package 43b; the proposal's
+    §4.4): lowered right down as she goes about, the yards passed round the masts and the
+    tacks shifted, and hoisted again on the new lee side, which takes the hands `seconds`
+    and is not instant ("il faut, quand on vire de bord, amener tout-à-fait la vergue,
+    démarrer la drisse, changer la voile de côté pour la hisser ensuite", Forfait 1788 p. 6;
+    "When this is often repeated, they loose ground in stays", Steel 1794 vol. I, LUGGER).
+    While they are down she goes about on her way, her jibs and her mizen ("le Bâtiment
+    seroit forcé de virer sur son aire ... sans l'addition des focs & du tapecul", Forfait
+    p. 53). A vessel with no dipping lug set has nothing here and is done at once."""
+
+    def __init__(self, ship: Ship):
+        self.ship = ship
+        self.ids = [sl.id for sl in dipping_lugs(ship)]
+        self.side: str | None = None
+        self.left_s = 0.0
+        self.lowered = False
+        self.done = not self.ids
+
+    def _lugs(self) -> list[Sail]:
+        return [self.ship.sails[i] for i in self.ids if not self.ship.sails[i].wrecked]
+
+    def names(self) -> str:
+        return names_of_sails(self.ship, self._lugs()).replace("the ", "", 1)
+
+    def lower(self) -> str:
+        """Lower the lugs right down; the order's words ("" with none)."""
+        if not self.ids or self.lowered:
+            return ""
+        self.lowered = True
+        for sl in self._lugs():
+            sl.state = SailState.IN_THE_GEAR
+        return f"lower the {self.names()}"
+
+    def dip(self, side: str, seconds: float) -> None:
+        """Pass the yards round to `side` and hoist again there, over `seconds`."""
+        if not self.ids:
+            return
+        self.lower()
+        self.side = side
+        self.left_s = max(seconds, 0.0)
+        self.done = False
+
+    def advance(self, dt: float, factor: float, awa: float | None = None) -> bool:
+        """The dip's work; when it is done the lugs are hoisted on their side with their
+        sheets drawn for `awa` (the deck's reading when None). Returns whether done."""
+        if self.done or self.side is None:
+            return self.done
+        self.left_s -= dt / max(factor, 1e-6)
+        if self.left_s > 0.0:
+            return False
+        lugs = [sl for sl in self._lugs() if sl.state is SailState.IN_THE_GEAR]
+        for sl in lugs:
+            sl.state = SailState.SET
+            sl.lug_side = self.side
+        if lugs:
+            draw_sheets(self.ship, lugs, None, awa)
+            for sl in lugs:
+                for ln in self.ship.sheets_of(sl):
+                    ln.held_side = None  # a lug's single sheet lies to leeward of the wind
+            self.ship.note(
+                "routine",
+                "evolution.step",
+                f"Dipped the {self.names()}; hoisted on the {self.side} side, to leeward of "
+                "the masts.",
+                self.ship.name,
+            )
+        self.done = True
+        return True
+
+
 def innermost_head_sail(ship: Ship, standing: bool = False) -> Sail | None:
     """The head sail nearest the mast (the fore staysail, or the jib if it is alone): the
     sheet a fore-and-after hauls to windward to heave to (Luce 1884, ch. XXXIV). With
@@ -378,12 +464,9 @@ def standing_sail_on(ship: Ship, yards: list[Spar]) -> Sail | None:
 
 
 def working_yards(ship: Ship) -> list[Spar]:
-    """Every yard that can be braced: yard-like, not wrecked, not sent down."""
-    return [
-        s
-        for s in ship.spars.values()
-        if s.cls in YARD_LIKE_CLASSES and not s.wrecked and not s.sent_down
-    ]
+    """Every yard that can be braced: a braced yard (`Spar.is_yard`: not a lug's, which has
+    no braces, package 43b), not wrecked, not sent down."""
+    return [s for s in ship.spars.values() if s.is_yard and not s.wrecked and not s.sent_down]
 
 
 def _masts_with_yards(ship: Ship) -> list[Spar]:
@@ -873,10 +956,12 @@ class TackScript(Script):
         # package 37m: the course she is put about for, and her paying off to it
         self.steer = CourseToSteer(params)
         self.paying: YardSwing | None = None
+        self.dip: LugDip | None = None  # package 43b: the dipping lugs
 
     # class defaults for the fields package 37m added (a checkpoint from an earlier build)
     steer: CourseToSteer | None = None
     paying: YardSwing | None = None
+    dip: LugDip | None = None
     paid_off = False
     pay_t = 0.0
     retrim_in = 0.0
@@ -993,7 +1078,16 @@ class TackScript(Script):
             words += "; ease off the head sheets"
         if self.booms:
             words += f"; haul aft the {self._boom_words().replace('the ', '')} sheet"
+        # a lugger's dipping lugs come down as she goes about (package 43b)
+        self.dip = LugDip(self.ship)
+        lowered = self.dip.lower()
+        if lowered:
+            words += f"; {lowered}"
         self.note(words + ".", "helm.order")
+
+    def _lugs_down(self) -> bool:
+        """The dipping lugs not yet hoisted again (package 43b)."""
+        return self.dip is not None and not self.dip.done
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         if self.phase == "in_studding_sails":
@@ -1013,14 +1107,21 @@ class TackScript(Script):
         rel = wind_rel(self.ship, wind)
         ch = close_hauled_true_angle(self.ship)
         brace_s = self.timing_value("brace_s", 45.0)
+        if self.dip is not None:
+            self.dip.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.speed_at_helm))
         if self.phase == "missed":
             # the yards squared as a brace, with hands and time; then she has missed stays
             assert self.squaring is not None
-            if self.squaring.advance(dt, factor):
+            squared = self.squaring.advance(dt, factor)
+            if squared and not self._lugs_down():
                 self.fail(self.miss_reason)
             return
         if not self.through and self.sign * rel < 0 and abs(rel) < math.pi / 2:
             self.through = True
+            if self.dip is not None and self.dip.ids:
+                # through the wind: the lugs dipped round to the new lee side (package 43b)
+                self.dip.dip(self.old_side(weather=True), self.timing_value("dip_s", 90.0))
+                self.note(f"Dip the {self.dip.names()}; shift the tacks to the weather bow.")
             if self.hung:
                 self.note("Her head is through the wind; the head sails aback pay her off.")
                 # the boom no longer held over: its sail draws on the new tack
@@ -1119,9 +1220,10 @@ class TackScript(Script):
             self.new_course = units.wrap_2pi(wind.direction_from + self.sign * ch)
             dyn.target_heading = self.new_course
             error = abs(units.wrap_pi(dyn.heading - self.new_course))
-            if error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0)) or (
-                self.t_steady >= self.timing_value("steady_timeout_s", 120.0)
-            ):
+            if (
+                error <= units.deg_to_rad(self.timing_value("steady_deg", 5.0))
+                or (self.t_steady >= self.timing_value("steady_timeout_s", 120.0))
+            ) and not self._lugs_down():
                 if self.steer is not None and self.steer.given:
                     self._to_the_course(wind)
                 else:
@@ -1229,6 +1331,9 @@ class TackScript(Script):
         self.phase = "missed"
         yards = self.head + self.after
         self.squaring = YardSwing(yards, [0.0] * len(yards), self.timing_value("brace_s", 45.0))
+        if self.dip is not None and self.dip.lowered:
+            # the lugs hoisted again where they lie, on the old tack's lee side (package 43b)
+            self.dip.dip(self.old_side(weather=False), self.timing_value("hoist_lugs_s", 45.0))
         # the head sheets flattened in on the old tack; the boom's sheet eased right off
         sheets_to(self.ship, self.heads, self.old_side(weather=False), None)
         for sl in self.booms:
@@ -1324,9 +1429,11 @@ class WearScript(Script):
         # package 37m: the course she is worn for, and whether her yards are trimmed for
         # it rather than braced sharp up
         self.steer = CourseToSteer(params)
+        self.dip: LugDip | None = None  # package 43b: the dipping lugs
 
     # class defaults for the fields package 37m added (a checkpoint from an earlier build)
     steer: CourseToSteer | None = None
+    dip: LugDip | None = None
     for_the_course = False
     full_and_by = False
 
@@ -1420,13 +1527,22 @@ class WearScript(Script):
                 # "when the wind is aft shift over the boom and head sheets" (Luce 1884,
                 # ch. XXXIV, 'To Wear'; package 32e): every fore-and-aft sheet to the new
                 # tack's lee side (the old weather side), trimmed for the wind she comes to
-                shift_sheets_over(
-                    self.ship, "starboard" if self.sign > 0 else "larboard", wind, self.way_before
-                )
+                new_lee = "starboard" if self.sign > 0 else "larboard"
+                shift_sheets_over(self.ship, new_lee, wind, self.way_before)
+                # a lugger's dipping lugs are not gybed: lowered and dipped round to the new
+                # lee side as the wind comes aft (package 43b; the gybe as an evolution of
+                # its own is M7's, the owner's note 7)
+                self.dip = LugDip(self.ship)
+                dipped = ""
+                if self.dip.ids:
+                    dipped = f" Lowered the {self.dip.names()} to dip them."
+                    self.dip.dip(new_lee, self.timing_value("dip_s", 90.0))
                 self.note(
                     "Wind aft. Squared the head yards; shifted over the sheets; hauled out "
-                    "and braced up."
+                    "and braced up." + dipped
                 )
+        if self.dip is not None:
+            self.dip.advance(dt, factor, full_and_by_apparent(self.ship, wind, self.way_before))
         if self.phase == "come_to":
             sharp_up = -self.sign  # braced sharp up for the new tack
             course_rel = 0.0
@@ -1485,7 +1601,7 @@ class WearScript(Script):
                 else:
                     follow_wind(self.head, rel, ch, max_step)
                     head_done = False
-            if steady and after_done and head_done:
+            if steady and after_done and head_done and (self.dip is None or self.dip.done):
                 if self.for_the_course:
                     sails = head_sails(self.ship) + boom_sails(self.ship)
                     draw_sheets(self.ship, sails + shifted_sails(self.ship), _lee_name(sharp_up))
@@ -2122,6 +2238,16 @@ class HeaveToScript(Script):
         courses = [sl for sl in lowest_square_sails(self.ship) if sl.is_set]
         for sl in courses:
             sl.state = SailState.IN_THE_GEAR
+        # a lugger (package 43b): her dipping lugs are lowered as a ship's courses are
+        # hauled up, and she lies to under her topsails, the main to the mast, her jib and
+        # her mizen sheeted flat (judgement: a lug cannot be laid aback, and a great lug
+        # aback is the accident "qui ne se peut sauver que par un miracle", Forfait 1788
+        # p. 52; under the fore lug alone she forereached at nearly five knots)
+        lowered = dipping_lugs(self.ship)
+        for sl in lowered:
+            sl.state = SailState.IN_THE_GEAR
+        if lowered:
+            sheets_to(self.ship, boom_sails(self.ship), None, None)
         drivers = after_gaff_sails(self.ship)
         # The driver: brailed up on a ship whose backed yards are amidships and whose
         # mizzen topsail, full, balances her (package 10; the frigate with it set came head
@@ -2142,6 +2268,8 @@ class HeaveToScript(Script):
         words = []
         if courses:
             words.append("hauled up the courses")
+        if lowered:
+            words.append(f"lowered {names_of_sails(self.ship, lowered)}")
         if drivers:
             words.append(f"brailed up {names_of_sails(self.ship, drivers)}")
         if eased:
@@ -5642,10 +5770,60 @@ def _scope_warning(ship: Ship, anchor: Any, depth_m: float, scope_m: float) -> s
     return f"With {out} out she will swing {how} the land{where}."
 
 
+# The water a master wants under her keel at low water where he lets go (package 43b; the
+# trade trial's schooner decided in five fathoms by the chart and let go five minutes and
+# four cables on in two and a half, and took the ground aft riding to the ebb): a fathom,
+# judgement ("good ground" in the period's words is a depth she rides in at every state of
+# the tide; Falconer 1780, ANCHOR-ground: "neither too deep, too shallow, nor rocky").
+UNDER_KEEL_AT_LOW_M = units.FATHOM
+# Standing back for good water (package 43b): she is given this long to come back to the
+# water of the sounding that decided the anchorage before the let-go is refused.
+STAND_BACK_TIMEOUT_S = 600.0
+# ...and stands back a minute at least before the place of that sounding rounds her to
+# again (judgement: a cable and more at three knots).
+STAND_BACK_LEAST_S = 60.0
+
+
+def too_little_water(ship: Ship, depth_m: float) -> str | None:
+    """The cast before the let-go (package 43b): 'the lead gives four fathoms and a half;
+    by the master's tide two fathoms at low water, and she draws eleven feet' when the
+    water the lead finds, less the fall the master reckons to low water (his own tide,
+    `_low_water_warning`'s), leaves her less than `UNDER_KEEL_AT_LOW_M` under her keel;
+    else None. With no master's tide to reckon by, None."""
+    world = _world_of(ship)
+    nav = getattr(world, "navigation", None)
+    fall = getattr(nav, "tide_height_by_master_m", None)
+    if fall is None:
+        return None
+    at_low = depth_m - float(fall())
+    draught = float(ship.hull.spec.draught_m)
+    if at_low >= draught + UNDER_KEEL_AT_LOW_M:
+        return None
+    feet = int(round(units.m_to_feet(draught)))
+    there = "no water" if at_low <= 0.0 else _depth_words(at_low)
+    return (
+        f"the lead gives {_depth_words(depth_m)}; by the master's tide {there} at low water, "
+        f"and she draws {feet} feet"
+    )
+
+
 class ComeToAnchorScript(_AnchorScript):
-    """Come to an anchor as Luce has it (data/evolutions/come_to_anchor.yaml)."""
+    """Come to an anchor as Luce has it (data/evolutions/come_to_anchor.yaml).
+
+    Package 43b (the trade trial's grounding, package 43's strict expected failure): the
+    lead is cast again before the let-go. Where the water, less the master's fall to low
+    water, leaves her under a fathom beneath her keel (`too_little_water`), the anchor is
+    not let go: she stands back for the water of the sounding that decided the anchorage,
+    her topsails and head sails sheeted home again, and rounds to there; a second cast as
+    short refuses the let-go in words, as a master would."""
 
     let_go_depth: float | None = None  # "in twelve fathoms": the depth to let go in, metres
+    # package 43b: where the anchorage was decided (the plane's metres) and its water, the
+    # sails taken in to round to, and whether she has stood back for good water once
+    decided_at: tuple[float, float] | None = None
+    decided_depth: float | None = None
+    rounded_in: tuple[str, ...] = ()
+    stood_back = False
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -5695,6 +5873,8 @@ class ComeToAnchorScript(_AnchorScript):
     def begin(self, words: dict[str, Any]) -> None:
         ship = self.ship
         depth = _water_depth(ship)
+        self.decided_at = (float(ship.dyn.x), float(ship.dyn.y))
+        self.decided_depth = depth
         if self.let_go_depth is not None and (depth is None or depth > self.let_go_depth):
             self.phase = "stand_on"
             self.phase_t = 0.0
@@ -5721,6 +5901,80 @@ class ComeToAnchorScript(_AnchorScript):
                 sl.state = SailState.IN_THE_GEAR
         if light or any(True for _ in lowest_square_sails(ship)):
             self.note("Haul taut! In studding sails, royals and topgallants; up courses.")
+
+    def _stand_back(self, short: str) -> bool:
+        """Too little water at the let-go (package 43b): the topsails and the head sails
+        taken in to round to are sheeted home again and she stands back for the water of
+        the sounding that decided the anchorage. False when there is no such place to go
+        back to (an anchoring with no sounding at its start)."""
+        if self.decided_at is None or self.decided_depth is None:
+            return False
+        if too_little_water(self.ship, self.decided_depth):
+            return False  # the water she decided in was as short: nothing to go back to
+        ship = self.ship
+        self.stood_back = True
+        self.phase = "stand_back"
+        self.phase_t = 0.0
+        set_again = []
+        for sid in self.rounded_in:
+            sl = ship.sails.get(sid)
+            if sl is not None and sl.state is SailState.IN_THE_GEAR and not sl.wrecked:
+                sl.state = SailState.SET
+                set_again.append(sl)
+        heads = [sl for sl in set_again if sl.cls == "jibheaded"]
+        if heads:
+            draw_sheets(ship, heads)
+        dyn = ship.dyn
+        dyn.helm_mode = HelmMode.HEADING
+        dyn.target_heading = self._bearing_to_decided()
+        dyn.steady = False
+        self.note(
+            f"Belay the anchor: {short}. Sheet home again; stand back for "
+            f"{_depth_words(self.decided_depth)}, where the lead called the ground good."
+        )
+        return True
+
+    def _bearing_to_decided(self) -> float:
+        assert self.decided_at is not None
+        dx = self.decided_at[0] - float(self.ship.dyn.x)
+        dy = self.decided_at[1] - float(self.ship.dyn.y)
+        return units.wrap_2pi(math.atan2(dx, dy))
+
+    def _standing_back(self, wind: Wind) -> None:
+        """Back for good water: rounded to again where the lead gives it, or at the place
+        of the sounding that decided; refused after `STAND_BACK_TIMEOUT_S`."""
+        ship = self.ship
+        assert self.decided_at is not None
+        dx = self.decided_at[0] - float(ship.dyn.x)
+        dy = self.decided_at[1] - float(ship.dyn.y)
+        depth = _water_depth(ship)
+        good = depth is not None and too_little_water(ship, depth) is None
+        # back at the place of the sounding that decided, after a minute of standing back
+        # at least (a let-go refused within a cable of it would otherwise round her to
+        # again where she lies, in the same short water)
+        back = math.hypot(dx, dy) <= units.CABLE and self.phase_t >= STAND_BACK_LEAST_S
+        if good or back:
+            for sid in self.rounded_in:
+                sl = ship.sails.get(sid)
+                if sl is not None and sl.is_set:
+                    sl.state = SailState.IN_THE_GEAR
+            self.phase = "round_to"
+            self.phase_t = 0.0
+            self.heading_target = self._stronger(wind)
+            dyn = ship.dyn
+            dyn.helm_mode = HelmMode.HEADING
+            dyn.target_heading = self.heading_target
+            dyn.steady = False
+            self.note(
+                f"The lead calls {_depth_words(depth)}. Clew up; haul down the jib. Helm down for "
+                f"{units.point_name(self.heading_target)}."
+            )
+            return
+        ship.dyn.target_heading = math.atan2(dx, dy) % (2.0 * math.pi)
+        if self.phase_t >= STAND_BACK_TIMEOUT_S:
+            self.fail(
+                f"she could not get back to the water she decided in; {_depth_words(depth)} here"
+            )
 
     def _stronger(self, wind: Wind) -> float:
         """The heading to come to: the stream's if it runs stronger than
@@ -5761,10 +6015,18 @@ class ComeToAnchorScript(_AnchorScript):
                 dyn.target_heading = self.heading_target
                 dyn.steady = False
                 # the topsails clewed up and the jib hauled down as she comes to; the
-                # spanker kept to bring her up (Luce p. 569)
+                # spanker kept to bring her up (Luce p. 569); a lugger's dipping lugs lowered,
+                # her mizen kept (package 43b)
+                rounded_in = []
                 for sl in ship.sails.values():
-                    if sl.is_set and (sl.cls == "square" or sl.cls == "jibheaded"):
+                    if sl.is_set and (
+                        sl.cls == "square"
+                        or sl.cls == "jibheaded"
+                        or (sl.cls == "lug" and sl.dipping)
+                    ):
                         sl.state = SailState.IN_THE_GEAR
+                        rounded_in.append(sl.id)
+                self.rounded_in = tuple(rounded_in)
                 _belay_held_work(ship)  # the sail work waiting for hands finds no sail now
                 self.note(
                     f"Let go the topsail sheets; clew up; haul down the jib. Helm down for "
@@ -5778,6 +6040,12 @@ class ComeToAnchorScript(_AnchorScript):
             if way <= 0.3 or self.phase_t >= timeout:
                 if depth is None:
                     self.fail("no bottom here to anchor in")
+                    return
+                short = too_little_water(ship, depth)
+                if short and self.let_go_depth is None:
+                    if not self.stood_back and self._stand_back(short):
+                        return
+                    self.fail(f"{short}; too little water to let go in")
                     return
                 self.phase = "veer"
                 self.phase_t = 0.0
@@ -5800,6 +6068,9 @@ class ComeToAnchorScript(_AnchorScript):
                 _anchoring_warnings(
                     ship, self.anchor, depth, self.target, self.params.get("fathoms")
                 )
+            return
+        if self.phase == "stand_back":
+            self._standing_back(wind)
             return
         if self.phase == "veer":
             if self._veer(dt, factor, self.target, "veer_fathoms_per_s"):
@@ -6467,6 +6738,8 @@ def _set_fore_and_aft(ship: Ship, sails: list[Sail], tack: str) -> None:
         if sl.state in (SailState.FURLED, SailState.LOOSED, SailState.IN_THE_GEAR):
             sl.state = SailState.SET
             sl.reefs = 0
+        if sl.dipping:
+            sl.lug_side = lee  # a dipping lug hoisted on the tack's lee side (package 43b)
     drawing = [sl for sl in sails if sl.is_set]
     if drawing:
         draw_sheets(ship, drawing, lee)

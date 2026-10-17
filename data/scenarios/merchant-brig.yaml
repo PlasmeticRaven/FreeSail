@@ -68,6 +68,10 @@ cargo:
 
 ports: [falmouth, plymouth, brest, roscoff, st-marys]
 
+# The world's business (spec M6 §19; package 43b, `data/business.yaml`): the region's
+# trade, fishermen and cruisers drawn under the seed beside the sail named below.
+business: on
+
 weather:
   climatology: true
 

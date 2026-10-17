@@ -155,6 +155,8 @@ def role_of_vessel(vessel: Any, intent: Intent | None) -> str:
     packet's; a merchant brig, a schooner or a cutter in trade is the merchant's."""
     key = str(getattr(vessel, "description", "") or "")
     kind = intent.kind if intent is not None else ""
+    if kind == "fish":
+        return "fisherman"  # package 43b: the smack and the lugger on a ground
     if kind == "letter":
         return "packet"
     if key == "frigate":
@@ -301,9 +303,13 @@ class FarCaptain(Judgement):
             return "in port"
         if p.anchor_down:
             return "at anchor"
-        if self.intent is not None and self.intent.kind == "station" and self._on_station():
+        if self._stationed() and self._on_station():
             return "keeping station"
         return "on passage"
+
+    def _stationed(self) -> bool:
+        """A station's intent, or a fishing trip's ground worked as one (package 43b)."""
+        return self.intent is not None and self.intent.kind in ("station", "fish")
 
     def _enter(self, state: str) -> None:
         old = self.state
@@ -315,6 +321,7 @@ class FarCaptain(Judgement):
         resolve_state(self.vessel, state, self)
         if state == "keeping station":
             self._business.pop("hauled_off", None)
+            self._business.pop("fishing_tick", None)  # the trip's hours counted on the ground
         if state in ("investigating a stranger", "chasing", "evading"):
             self._business["since"] = self.world.clock.tick
         if old in ("investigating a stranger", "chasing", "evading") and state not in (
@@ -346,7 +353,7 @@ class FarCaptain(Judgement):
         self.planned = True
 
     def _station_mark(self) -> Position | None:
-        if self.intent is None or self.intent.kind != "station":
+        if not self._stationed():
             return None
         place = _mark(self.world, self.intent.destination)
         if place is None:
@@ -408,15 +415,20 @@ class FarCaptain(Judgement):
     def _ready_for_sea(self, p: Perception) -> bool:
         """In port her business is a wait (`IN_PORT_WAIT_S`), the tide taken to serve."""
         since = self._state_entered
-        return bool(p.in_port and since is not None and p.tick - since >= IN_PORT_WAIT_S)
+        # a ship the world's business drew lying in port (package 43b) has had some hours of
+        # her wait before the draw
+        before = float(self._business.get("drawn_in_port_s", 0.0) or 0.0)
+        return bool(p.in_port and since is not None and p.tick - since >= IN_PORT_WAIT_S - before)
 
     # -- the work of each state ---------------------------------------------------------
 
     def _work(self, p: Perception) -> None:
         state = self.state
         if state == "on passage":
-            if self.intent is not None and self.intent.kind == "station" and self._on_station():
+            if self._stationed() and self._on_station():
                 self._enter("keeping station")
+        elif state == "keeping station" and self.intent is not None and self.intent.kind == "fish":
+            self._fishing(p)
         elif state in ("investigating a stranger", "chasing"):
             if self._stranger is None or not any(
                 s.get("id") == self._stranger for s in p.strangers
@@ -437,6 +449,29 @@ class FarCaptain(Judgement):
                 self._weigh()
         elif state == "in port":
             self._in_port(p)
+
+    def _fishing(self, p: Perception) -> None:
+        """The fishing trip (package 43b): the hours of the intent worked on the ground, the
+        time kept across a detour (a gale, a stranger run from), then home to the port she
+        sailed from, where she goes in and is gone from the sea (`_in_port`)."""
+        intent = self.intent
+        assert intent is not None
+        b = self._business
+        last = b.get("fishing_tick")
+        b["fishing_s"] = float(b.get("fishing_s", 0.0)) + (
+            0.0 if last is None else float(p.tick - int(last))
+        )
+        b["fishing_tick"] = p.tick
+        if b["fishing_s"] < float(intent.hours or 0.0) * 3600.0:
+            return
+        home = intent.origin
+        port = getattr(self.world, "ports", None)
+        found = port.find(home) if port is not None and getattr(port, "ports", None) else None
+        name = found.name if found is not None else home
+        self.set_intent(f"run home to {name}")
+        self.role = "fisherman"
+        self.doctrine = load_doctrine("fisherman")
+        self._enter("on passage")
 
     def _nearest_stranger(self, p: Perception) -> dict[str, Any] | None:
         items = self._unspoken(p)
