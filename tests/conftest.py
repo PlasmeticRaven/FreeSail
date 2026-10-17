@@ -96,6 +96,9 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
 # on the build machine with three other suites running beside them (2026-10-01).
 SLOW_TESTS: frozenset[str] = frozenset(
     {
+        # package 57: the lugger through a tack and a wear, and the frigate in the gale trial
+        "test_known_truths.py::test_truth_7b_111_the_luggers_lugs_lie_to_leeward_and_none_is_aback_through_a_tack_and_a_wear",
+        "test_known_truths.py::test_truth_7b_112_the_frigate_lies_to_under_her_main_staysail_by_the_heavy_weather_book",
         "test_agent_api.py::test_a_game_with_a_remote_agent_replays_to_the_same_digest",
         "test_agent_api.py::test_a_station_the_game_mans_itself_is_refused_and_a_loaded_games_is_taken_over",
         "test_agent_api.py::test_a_whole_session_through_the_routes",

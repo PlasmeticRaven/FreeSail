@@ -249,6 +249,25 @@ FRIGATE_CANVAS: dict[str, tuple[int, str]] = {
         5,
         f"{STEEL_SM}, 'Main topmast staysail': No. 5 or 6; {KIPPING_SM}: No. 6 in the royal navy",
     ),
+    # package 57: the staysails between the masts from Steel's articles (the OCR's lines
+    # 12222 to 12820; 'Mizen staysail', 'Middle staysail' and the rest)
+    "main.staysail": (
+        2,
+        f"{STEEL_SM}, 'Main staysail': 'made of canvas No. 1 to 3', the middle taken",
+    ),
+    "middle_staysail": (6, f"{STEEL_SM}, 'Middle staysail': 'No. 6, or 7', the heavier"),
+    "main.topgallant_staysail": (7, f"{STEEL_SM}, 'Main topgallant staysail': 'canvas No. 7'"),
+    "mizzen.staysail": (2, f"{STEEL_SM}, 'Mizen staysail': 'No. 2 or 3', the heavier"),
+    "mizzen.topmast_staysail": (
+        7,
+        "Steel 1794's navy number as docs/references/RigGeometryNotes.md reads it (No. 7); his "
+        "article is not in the OCR",
+    ),
+    "mizzen.topgallant_staysail": (
+        8,
+        f"judgement: {STEEL_SM}, 'Royal staysails': 'canvas No. 8 ... the same as a "
+        "topgallant-staysail', the lightest of his numbers for the lightest of the staysails",
+    ),
     "lower studding": (
         6,
         f"{KIPPING_SM}, 'On Studding-sails': 'Under frigates of the second class to frigates "
@@ -821,6 +840,20 @@ class Builder:
         self.whole_ship_groups()
         self.rate_spars()
         text = yaml.safe_dump(self.doc, sort_keys=False, allow_unicode=True, width=100)
+        # a sail's corners (package 57) on one line, as pairs: `corners_m: [[x, z], ...]`
+        text = re.sub(
+            r"^(  corners_m:)\n((?:  - - \S+\n    - \S+\n)+)",
+            lambda mo: (
+                mo.group(1)
+                + " ["
+                + ", ".join(
+                    f"[{a}, {c}]" for a, c in re.findall(r"  - - (\S+)\n    - (\S+)\n", mo.group(2))
+                )
+                + "]\n"
+            ),
+            text,
+            flags=re.M,
+        )
         out = []
         in_hull = False
         in_crew = False
@@ -890,6 +923,358 @@ class Builder:
         # LF and UTF-8 on every platform (the comments carry the section sign and the degree)
         with open(path, "w", newline="\n", encoding="utf-8") as f:
             f.write(header + "\n".join(out) + "\n")
+
+
+# -- the staysails between the masts (package 57) ---------------------------------------
+# Steel 1794 vol. I, 'The Practice of Sail-making' (the OCR's lines 12222 to 12820), for the
+# navy: the main staysail "is triangular, square on the foot ... extended upon the
+# main-staysail-stay, between the main and fore masts, so that the foot will clear the boat
+# upon the booms"; the mizen staysail "is quadrilateral, square on the foot ... it has a
+# bunt two-fifths of the depth of the leech in the navy ... The foot drops within 6 or 7
+# feet of the quarter-deck"; the main topmast staysail "is quadrilateral, cut square on the
+# foot ... The leech is 4 or 5 yards deeper than the [main topsail], and there are one or
+# two cloths more in the foot than the leech is yards in depth ... The bunt is two-fifths
+# of the depth of the leech"; the middle staysail "is quadrilateral ... It has a square
+# bunt five-twelfths of the depth of the leech ... The leech is from 4 to 7 yards deeper
+# than the [main topgallant sail], and there are from 6 to 8 cloths more in the foot than
+# the leech is yards in depth. Sloops and brigs in the navy have only from one to three";
+# the main topgallant staysail "is quadrilateral ... It has a [bunt] from one-third to
+# three-sevenths of the depth of the leech ... The leech is nearly of the same depth as
+# the leech of the middle-staysail ... from 3 to 6 cloths more in the foot than the leech
+# is yards in depth". His rule for the canvas (p. 96) groups the "Mizen staysails,
+# main-topmast-staysails, middle staysails, and main-topgallant-staysails" as the
+# four-sided ones and the "Main staysails, fore staysails, jibs" as the triangles. Each is
+# cut here as he cuts it: the head along its stay, the leech and the bunt square to the
+# foot (upright), the leech's depth and the foot's cloths by his rule where he gives them.
+CLOTH_FT = 2.0  # a cloth of the navy's canvas, 24 inches (Steel's cloths; Lever 1808)
+# The leech of a staysail hoisted to a mast head hangs clear before the top (or the
+# cross-trees) under that head: a tenth of the lower yard of its mast before the mast for
+# a top, a tenth of the topsail yard for the cross-trees (judgement: the top's half-breadth
+# fore and aft; Steel's peak is at the head, its leech before the top's rim).
+TOP_REACH_OF_YARD = 0.1
+
+
+def stay_sail_cut(upper, lower, leech, *, peak_x=None, peak_z=None, foot=None, bunt=None):
+    """A staysail cut on its stay, square on the foot (package 57): `upper` and `lower` the
+    stay's ends (x forward of midships, height above the deck, metres), the peak on the
+    stay at `peak_x` (or at the height `peak_z`), the leech `leech` metres upright under
+    it to the clew, and the foot forward from the clew to the tack: `foot` metres long (the
+    nock on the stay over the tack), or as long as a bunt of `bunt` of the leech makes it;
+    with neither, a triangle whose tack is on the stay. The corners: [tack, nock, peak,
+    clew], or [tack, peak, clew]."""
+    (xu, zu), (xl, zl) = upper, lower
+    slope = (zl - zu) / (xl - xu)
+
+    def z_at(x):
+        return zu + (x - xu) * slope
+
+    def x_at(z):
+        return xu + (z - zu) / slope
+
+    if peak_z is not None:
+        peak = (x_at(peak_z), peak_z)
+    else:
+        peak = (peak_x, z_at(peak_x))
+    clew = (peak[0], peak[1] - leech)
+    if foot is None and bunt is None:
+        return [(x_at(clew[1]), clew[1]), peak, clew]
+    if foot is not None:
+        nock = (peak[0] + foot, z_at(peak[0] + foot))
+    else:
+        nz = peak[1] - (1.0 - bunt) * leech
+        nock = (x_at(nz), nz)
+    return [(nock[0], clew[1]), nock, peak, clew]
+
+
+def stay_point(upper, lower, x):
+    """The height of a stay at `x` (metres; its ends as `stay_sail_cut` takes them)."""
+    (xu, zu), (xl, zl) = upper, lower
+    return zu + (x - xu) * (zl - zu) / (xl - xu)
+
+
+def staysail_from_cut(b, sid, stay, corners, deck_height, canvas, rope_in, words):
+    """The staysail of these corners on its stay, its area and centre from them, its
+    halyard, sheets and downhaul (sizes judgement, as the frigate's head sails')."""
+    area_m2, cx, cz = _quad_area_centroid(corners)
+    area = round(area_m2)
+    shape = "a triangle" if len(corners) == 3 else "four-sided"
+    if len(corners) == 4:
+        tack, nock, peak, clew = corners
+        cut = (
+            f"leech {peak[1] - clew[1]:.1f} m, bunt {nock[1] - tack[1]:.1f} m "
+            f"({(nock[1] - tack[1]) / (peak[1] - clew[1]):.2f} of the leech), foot "
+            f"{nock[0] - clew[0]:.1f} m ({(nock[0] - clew[0]) / FT / CLOTH_FT:.0f} cloths)"
+        )
+    else:
+        tack, peak, clew = corners
+        cut = f"leech {peak[1] - clew[1]:.1f} m, foot {tack[0] - clew[0]:.1f} m"
+    s = b.sail(
+        sid,
+        "jibheaded",
+        stay=stay,
+        area_m2=area,
+        x_m=round(cx, 1),
+        centre_height_m=round(deck_height + cz, 1),
+        canvas_no=canvas[0],
+        cloth_rating_kn=cloth(area, canvas[0]),
+        corners_m=[[round(x, 2), round(z, 2)] for x, z in corners],
+        note=f"{sid.replace('_', ' ').replace('.', ' ')} {area} m2, {shape}, square on the "
+        f"foot (Steel 1794 vol. I, Sail-making): {cut}; {words}" + canvas_note(canvas),
+    )
+    # the sheet bears its sail: a rope whose working load is half the cloth's rating, so
+    # that the cloth strains before the sheet parts (judgement; the strain rule parts a
+    # line at 1.5 of its rating and a sail takes 0.6 of its pull on its sheet), the given
+    # size the least
+    rope_in = max(
+        rope_in, math.ceil(4.0 * math.sqrt(0.5 * cloth(area, canvas[0]) / ROPE_KN_PER_SQ_IN)) / 4.0
+    )
+    b.line(f"{sid}.halyard", "halyard", s, rating=rope_kn(rope_in, 2))
+    b.sided(
+        f"{sid}.sheet",
+        "sheet",
+        s,
+        rating=rope_kn(rope_in),
+        note=f"{rope_in} in, to bear its sail: its working load half the cloth's rating "
+        "(judgement).",
+    )
+    b.line(f"{sid}.downhaul", "downhaul", s, rating=rope_kn(quarter(rope_in * 0.8)))
+    return s
+
+
+def between_the_masts(b, *, geom, mast_x, rake_deg, deck_height, ahead, after, canvas, brig):
+    """The staysails between the mast `ahead` and the mast `after` of a ship or a brig by
+    Steel's rules (package 57; see above): the main (or the mizen) staysail, the topmast
+    staysail, the middle staysail (on the main only) and the topgallant staysail, with the
+    stays the new ones set on. Returns the sails, foremost level first."""
+    ga, gf = geom[after], geom[ahead]
+
+    def mx(name, z_m):
+        return mast_x[name] - math.tan(math.radians(rake_deg[name])) * z_m
+
+    def head(g, level):
+        h = g["above"] + (g["t_hoist"] if level >= 1 else 0) + (g["g_hoist"] if level >= 2 else 0)
+        return ft(h)
+
+    def at(name, level):
+        z = head(geom[name], level)
+        return (mx(name, z), z)
+
+    top_z = ft(ga["above"])  # the after mast's top, at its lower mast head
+    top_x = mx(after, top_z) + TOP_REACH_OF_YARD * ft(ga["yard"])
+    xtree_x = mx(after, head(ga, 1)) + TOP_REACH_OF_YARD * ft(ga["topsail_yard"])
+    topsail_yd = (ga["topsail_h"] - ga["yard_h"]) / 3.0
+    tg_yd = (ga["tg_h"] - ga["topsail_h"]) / 3.0
+    yards_of_main = 1.0 if after == "main" else 5.0 / 7.0  # judgement: the mizen's 5/7
+    out = []
+    if after == "main":
+        # the main staysail: a triangle on the main staysail stay (a brig's on her main stay,
+        # "in small ships" as Steel has the mizen staysail on the mizen stay), its foot clear
+        # of the boats on the booms, a fifth of the main mast's height above the deck
+        # (judgement), its peak before the top
+        if brig:
+            stay = "main.stay"
+        else:
+            stay = b.line(
+                "main.staysail.stay",
+                "stay",
+                "main.mast",
+                rating=rope_kn(9.0),
+                note="the main staysail stay, from the main mast head to a luff round the "
+                "foremast (Steel 1794 vol. I, 'The main-staysail': 'The upper end clinches round "
+                "the main-mast-head above the rigging and the lower end sets up with a "
+                "luff-tackle round the foremast'); 9 in, judgement.",
+            )
+        foot_z = 0.2 * ft(ga["above"])
+        ends = (at("main", 0), (mx(ahead, 1.0), 1.0))
+        peak_z = stay_point(*ends, top_x)
+        corners = stay_sail_cut(*ends, peak_z - foot_z, peak_x=top_x)
+        out.append(
+            staysail_from_cut(
+                b,
+                "main.staysail",
+                stay,
+                corners,
+                deck_height,
+                canvas["main.staysail"],
+                3.5 if not brig else 3.0,
+                "its tack at the stay over the boats on the booms (a fifth of the main mast's "
+                "height above the deck, judgement), its peak before the main top. 'This sail is "
+                "seldom used in large vessels' (Steel), and lying to under it is 'a mean between "
+                "the two others' (Steel 1794 vol. II, 'Lying-to under the main staysail').",
+            )
+        )
+    else:
+        # the mizen staysail: four-sided, a bunt of two-fifths of the leech, on its own stay
+        # in a ship from the mizen mast head to the deck abaft the main mast (Steel), its foot
+        # within 6 or 7 feet of the quarter-deck, its peak before the mizen top
+        stay = b.line(
+            "mizzen.staysail.stay",
+            "stay",
+            "mizzen.mast",
+            rating=rope_kn(6.0),
+            note="the mizen staysail stay (Steel 1794 vol. I, 'The mizen-staysail': 'clinches "
+            "round the head of the mizen-mast, then reeves through a thimble ... in a collar "
+            "lashed round the main-mast, and sets up ... [to] an eye-bolt in the deck abaft the "
+            "mast. In small ships, the mizen-staysail bends to the mizen-stay'); 6 in, "
+            "judgement.",
+        )
+        ends = (at("mizzen", 0), (mx(ahead, 0.0) - 1.0, 0.0))
+        leech = stay_point(*ends, top_x) - ft(6.5)
+        corners = stay_sail_cut(*ends, leech, peak_x=top_x, bunt=0.4)
+        out.append(
+            staysail_from_cut(
+                b,
+                "mizzen.staysail",
+                stay,
+                corners,
+                deck_height,
+                canvas["mizzen.staysail"],
+                3.0,
+                "the bunt two-fifths of the leech and the foot 6 ft 6 in above the deck "
+                "(Steel's 'within 6 or 7 feet of the quarter-deck'), its peak before the mizen "
+                "top.",
+            )
+        )
+    # the topmast staysail: the main's leech 4 or 5 yards (4.5) deeper than the main topsail,
+    # its foot a cloth or two (1.5) more than the leech's yards (Steel); the mizen's the
+    # main's rule on its own topsail and five-sevenths of it (judgement: Steel's mizen
+    # topmast staysail is not in the OCR; Luce's mizen yards are 5/7 of the main's)
+    if after == "main":
+        mts_stay = "main.topmast.stay"
+        mts_lower = at(ahead, 0)
+        leech_yd = topsail_yd + 4.5
+        foot_ft = (leech_yd + 1.5) * CLOTH_FT
+    else:
+        mts_stay = b.line(
+            "mizzen.topmast.stay",
+            "stay",
+            "mizzen.topmast",
+            rating=rope_kn(4.5),
+            note="the mizen topmast stay, to a collar at the fore part of the main mast 'close "
+            "up to the bibs' (Steel 1794 vol. I, 'The mizen topmast-stay'); 4.5 in, judgement; "
+            "the mizen topmast staysail sets on it.",
+        )
+        mts_lower = (mx(ahead, ft(gf["above"] - gf["head"])), ft(gf["above"] - gf["head"]))
+        main_topsail_yd = (gf["topsail_h"] - gf["yard_h"]) / 3.0
+        leech_yd = (main_topsail_yd + 4.5) * yards_of_main
+        foot_ft = (main_topsail_yd + 4.5 + 1.5) * CLOTH_FT * yards_of_main
+    corners = stay_sail_cut(
+        at(after, 1), mts_lower, ft(3.0 * leech_yd), peak_x=top_x, foot=ft(foot_ft)
+    )
+    words = (
+        "the leech 4 or 5 yards deeper than the main topsail, a cloth or two more in the foot "
+        "than the leech's yards (Steel; the mean of each taken), the bunt as the stay leaves it "
+        "(Steel: two-fifths of the leech), its peak before the main top."
+        if after == "main"
+        else "the main topmast staysail's rule on the main's topsail and five-sevenths of it "
+        "(judgement: Steel's article is not in the OCR), the bunt as the stay leaves it, its "
+        "peak before the mizen top."
+    )
+    sid = f"{after}.topmast_staysail"
+    out.append(
+        staysail_from_cut(
+            b, sid, mts_stay, corners, deck_height, canvas[sid], 3.0 if not brig else 2.5, words
+        )
+    )
+    if after == "main":
+        # the middle staysail, on its own stay from the main topmast head to the fore topmast
+        # under the parral ('a strap or grommet made fast round the fore-topmast, under the
+        # parral', Steel 1794 vol. I, 'The middle-staysail'): a third of the topmast's hoist
+        # above the fore cap (judgement)
+        mid_stay = b.line(
+            "middle_staysail.stay",
+            "stay",
+            "main.topmast",
+            rating=rope_kn(4.0 if not brig else 3.0),
+            note="the middle staysail stay, from the main topmast head to a grommet round the "
+            "fore topmast under the parral (Steel 1794 vol. I, 'The middle-staysail'), a third "
+            "of the topmast's hoist above the fore cap (judgement); size judgement.",
+        )
+        low_z = ft(gf["above"] + 0.35 * gf["t_hoist"])
+        mid_leech_yd = tg_yd + 5.5
+        mid_cloths = mid_leech_yd + (2.0 if brig else 7.0)
+        corners = stay_sail_cut(
+            at("main", 1),
+            (mx(ahead, low_z), low_z),
+            ft(3.0 * mid_leech_yd),
+            peak_x=top_x,
+            foot=ft(mid_cloths * CLOTH_FT),
+        )
+        out.append(
+            staysail_from_cut(
+                b,
+                "middle_staysail",
+                mid_stay,
+                corners,
+                deck_height,
+                canvas["middle_staysail"],
+                2.5 if not brig else 2.0,
+                "the leech 4 to 7 yards (5.5) deeper than the main topgallant sail, "
+                + (
+                    "two cloths more in the foot than the leech's yards ('Sloops and brigs in "
+                    "the navy have only from one to three')"
+                    if brig
+                    else "7 cloths more in the foot than the leech's yards (6 to 8)"
+                )
+                + " (Steel), the bunt as the stay leaves it (Steel: five-twelfths of the "
+                "leech), its peak before the main top.",
+            )
+        )
+    else:
+        mid_leech_yd = (
+            gf["tg_h"] - gf["topsail_h"]
+        ) / 3.0 + 5.5  # the main's middle staysail's leech
+    # the topgallant staysail: the main's leech nearly the middle staysail's, 3 to 6 cloths
+    # (4.5) more in the foot (Steel); the mizen's five-sevenths of it (judgement), on the
+    # mizen topgallant stay that 'trices up to the main-topmast-head' (Steel)
+    if after == "main":
+        tg_stay = "main.topgallant.stay"
+        if not brig:
+            tg_stay = b.line(
+                "main.topgallant.stay",
+                "stay",
+                "main.topgallant_mast",
+                rating=rope_kn(3.5),
+                note="the main topgallant stay, through a block at the fore topmast head and "
+                "down to the fore top (Steel 1794 vol. I, 'The main-topgallant-stay'); 3.5 in, "
+                "judgement; the main topgallant staysail sets on it.",
+            )
+    else:
+        tg_stay = b.line(
+            "mizzen.topgallant.stay",
+            "stay",
+            "mizzen.topgallant_mast",
+            rating=rope_kn(3.0),
+            note="the mizen topgallant stay, which 'trices up to the main-topmast-head' (Steel "
+            "1794 vol. I); 3 in, judgement; the mizen topgallant staysail sets on it.",
+        )
+    tg_leech_yd = mid_leech_yd * yards_of_main
+    tg_foot_ft = (mid_leech_yd + 4.5) * CLOTH_FT * yards_of_main
+    corners = stay_sail_cut(
+        at(after, 2), at(ahead, 1), ft(3.0 * tg_leech_yd), peak_x=xtree_x, foot=ft(tg_foot_ft)
+    )
+    sid = f"{after}.topgallant_staysail"
+    out.append(
+        staysail_from_cut(
+            b,
+            sid,
+            tg_stay,
+            corners,
+            deck_height,
+            canvas[sid],
+            2.0,
+            (
+                "the leech nearly the middle staysail's, 4 or 5 cloths more in the foot than "
+                "the leech's yards (Steel: 3 to 6), the bunt as the stay leaves it (Steel: a "
+                "third to three-sevenths of the leech), its peak before the topmast cross-trees."
+                if after == "main"
+                else "the main topgallant staysail's rule and five-sevenths of it (judgement; "
+                "Steel's 'Royal staysails ... the same as a topgallant-staysail'), its peak "
+                "before the mizen topmast cross-trees."
+            ),
+        )
+    )
+    return out
 
 
 def square_sail_lines(b, sail, yard, sizes, hoisting, course=False, reef=False, bowline=False):
@@ -1263,6 +1648,9 @@ def frigate(out_dir="data/ships"):
                 yard=yard,
                 area_m2=area,
                 reef_bands=reef,
+                # package 57: the royals set flying (Steel 1794 vol. I p. 214, ROYALS "Are set
+                # flying"), sent down on deck with their yards when taken in
+                flying=True if level == "royal" else None,
                 x_m=raked_x(x, FRIGATE_RAKE_DEG[name], centre),
                 centre_height_m=centre,
                 canvas_no=canvas[0],
@@ -1461,21 +1849,19 @@ def frigate(out_dir="data/ships"):
         b.sided(f"{sid}.sheet", "sheet", s, rating=rope_kn(size))
         b.line(f"{sid}.downhaul", "downhaul", s, rating=rope_kn(quarter(size * 0.8)))
         headsails.append(s)
-    mts = b.sail(
-        "main.topmast_staysail",
-        "jibheaded",
-        stay="main.topmast.stay",
-        area_m2=80,
-        x_m=6.0,
-        centre_height_m=18.0,
-        canvas_no=FRIGATE_CANVAS["main.topmast_staysail"][0],
-        cloth_rating_kn=cloth(80, FRIGATE_CANVAS["main.topmast_staysail"][0]),
-        note="main topmast staysail 80 m2 (judgement)."
-        + canvas_note(FRIGATE_CANVAS["main.topmast_staysail"]),
+    # package 57 (gate 6c's finding; the owner's word of 2026-10-17): the staysails between
+    # the masts by Steel's list for a ship, the main topmast staysail among them (80 m2 of
+    # judgement before), each cut as Steel cuts it (`between_the_masts`)
+    staysail_kw = dict(
+        geom=geom,
+        mast_x=mast_x,
+        rake_deg=FRIGATE_RAKE_DEG,
+        deck_height=deck_height,
+        canvas=FRIGATE_CANVAS,
+        brig=False,
     )
-    b.line("main.topmast_staysail.halyard", "halyard", mts, rating=rope_kn(3.0, 2))
-    b.sided("main.topmast_staysail.sheet", "sheet", mts, rating=rope_kn(3.0))
-    b.line("main.topmast_staysail.downhaul", "downhaul", mts, rating=rope_kn(2.5))
+    between = between_the_masts(b, ahead="fore", after="main", **staysail_kw)
+    between += between_the_masts(b, ahead="main", after="mizzen", **staysail_kw)
 
     # studding sails on fore and main: lower (fore only), topmast, topgallant. The boom is
     # linked to the sail's own yard (so both go with it) and sits where it is rigged: the
@@ -1768,11 +2154,22 @@ def frigate(out_dir="data/ships"):
     b.group("royals", sails_by_level["royal"])
     b.group("headsails", headsails)
     b.group("jibs", headsails[1:])
-    b.group("staysails", headsails[:1] + [mts])
+    b.group("staysails", headsails[:1] + between)
+    # Steel's staysails between the masts as one group, so the sail line and an order can
+    # name them where the fore topmast staysail is set with plain sail (package 57)
+    b.group("staysails between the masts", between)
     b.group("studdingsails", stuns)
     b.group("square sails", sum(sails_by_level.values(), []))
-    b.group("fore-and-aft sails", headsails + [mts, spanker])
-    b.group("light sails", sails_by_level["royal"] + [headsails[2], mts] + stuns)
+    b.group("fore-and-aft sails", headsails + between + [spanker])
+    # the light staysails: the middle staysail and the topgallant staysails, of No. 6 to 8,
+    # with the main topmast staysail as before; the main and mizen staysails, of No. 2, are
+    # not light canvas (package 57)
+    light_staysails = [s for s in between if s not in ("main.staysail", "mizzen.staysail")]
+    b.group("light sails", sails_by_level["royal"] + [headsails[2]] + light_staysails + stuns)
+    # lying to (package 57): Steel 1794 vol. II, 'Lying-to under the main staysail' and 'the
+    # preferable way is under the fore staysail, the main staysail, and mizen staysail'; the
+    # fore and mizen storm staysails stand for his fore and mizen in a gale, as M6 left them
+    b.group("lying-to staysails", ["main.staysail"])
     b.group(
         "plain sail",
         sails_by_level["course"]
@@ -1781,7 +2178,7 @@ def frigate(out_dir="data/ships"):
         + headsails[:2]
         + [spanker],
     )
-    b.group("all sail", sum(sails_by_level.values(), []) + headsails + [mts, spanker] + stuns)
+    b.group("all sail", sum(sails_by_level.values(), []) + headsails + between + [spanker] + stuns)
     for name in ("fore", "main", "mizzen"):
         b.group(
             f"{name} yards",
@@ -1828,7 +2225,14 @@ def frigate(out_dir="data/ships"):
     b.alias("spanker gaff", "mizzen.gaff")
     b.alias("fore topmast staysail", "fore.topmast_staysail")
     b.alias("main topmast staysail", "main.topmast_staysail")
-    b.alias("middle staysail", "main.topmast_staysail")
+    # package 57: the middle staysail (`middle_staysail`) is its own sail now (Steel), not
+    # another name for the main topmast staysail
+    b.alias("main staysail", "main.staysail")
+    b.alias("main topgallant staysail", "main.topgallant_staysail")
+    for word in ("mizzen", "mizen"):
+        b.alias(f"{word} staysail", "mizzen.staysail")
+        b.alias(f"{word} topmast staysail", "mizzen.topmast_staysail")
+        b.alias(f"{word} topgallant staysail", "mizzen.topgallant_staysail")
     b.alias("stuns'ls", "studdingsails")
     b.alias("studding sails", "studdingsails")
     b.alias("kites", "studdingsails")
@@ -4200,6 +4604,11 @@ BRIG_CANVAS: dict[str, tuple[int, str]] = {
         "jib",
         "flying_jib",
         "main.topmast_staysail",
+        # package 57: Steel's own numbers for the brig's staysails, which were judgement
+        # before (No. 5 for the main staysail, No. 7 for the main topgallant)
+        "main.staysail",
+        "middle_staysail",
+        "main.topgallant_staysail",
         "lower studding",
         "topmast studding",
         "topgallant studding",
@@ -4213,16 +4622,6 @@ BRIG_CANVAS.update(
             f"{STEEL_SM} p. 119, 'A brig's mainsail' (the boom mainsail on the gaff and boom): "
             "'made of canvas No. 5 or 6', the heavier taken; a brig's is lighter than a "
             f"ship's spanker of No. 2 ({LUCE_171})",
-        ),
-        "main.staysail": (
-            5,
-            f"{STEEL_SM}, 'Main staysail' (OCR line 12222; a ship's, 'commonly [bent] in brigs', "
-            "line 24277): judgement at the main topmast staysail's number, No. 5",
-        ),
-        "main.topgallant_staysail": (
-            7,
-            f"{STEEL_SM}, 'Main topgallant staysail' (OCR line 12782): judgement at the "
-            "flying jib's number, No. 7, the lightest of her staysails",
         ),
     }
 )
@@ -4542,6 +4941,7 @@ def brig(out_dir="data/ships"):
                 yard=yard,
                 area_m2=area,
                 reef_bands=reef,
+                flying=True if level == "royal" else None,  # package 57, as the frigate's
                 x_m=raked_x(x, rake_deg[name], centre, deck_height),
                 centre_height_m=centre,
                 canvas_no=canvas[0],
@@ -4733,44 +5133,23 @@ def brig(out_dir="data/ships"):
         b.sided(f"{sid}.sheet", "sheet", s, rating=rope_kn(size))
         b.line(f"{sid}.downhaul", "downhaul", s, rating=rope_kn(quarter(size * 0.8)))
         headsails.append(s)
-    # the staysails between the masts: main, main topmast and main topgallant (spec M5 §25;
-    # Steel's main staysail "commonly [bent] in brigs"), each a judgement from its stay's run
-    between = []
-    for sid, stay, area, x, h, size in (
-        ("main.staysail", "main.stay", 40, round(mast_x["fore"] - 5.0, 1), 8.0, 3.0),
-        (
-            "main.topmast_staysail",
-            "main.topmast.stay",
-            35,
-            round(mast_x["fore"] - 6.0, 1),
-            14.0,
-            2.5,
-        ),
-        (
-            "main.topgallant_staysail",
-            "main.topgallant.stay",
-            18,
-            round(mast_x["fore"] - 7.0, 1),
-            20.0,
-            2.0,
-        ),
-    ):
-        s = b.sail(
-            sid,
-            "jibheaded",
-            stay=stay,
-            area_m2=area,
-            x_m=x,
-            centre_height_m=h,
-            canvas_no=BRIG_CANVAS[sid][0],
-            cloth_rating_kn=cloth(area, BRIG_CANVAS[sid][0]),
-            note=f"{sid.replace('_', ' ').replace('.', ' ')} {area} m2 between the masts "
-            "(judgement from the stay's run)." + canvas_note(BRIG_CANVAS[sid]),
-        )
-        b.line(f"{sid}.halyard", "halyard", s, rating=rope_kn(size, 2))
-        b.sided(f"{sid}.sheet", "sheet", s, rating=rope_kn(size))
-        b.line(f"{sid}.downhaul", "downhaul", s, rating=rope_kn(quarter(size * 0.8)))
-        between.append(s)
+    # the staysails between the masts (package 57): Steel's for a brig, whose sails are
+    # "similar to those on the main and fore masts of a ship" and whose main staysail is
+    # "commonly [bent] in brigs": the main, main topmast, middle and main topgallant
+    # staysails, the middle new ("Sloops and brigs in the navy have only from one to three
+    # [cloths] more"), each cut by Steel's rule as the frigate's (`between_the_masts`); they
+    # were triangles of judgement from the stays' runs before
+    between = between_the_masts(
+        b,
+        geom=geom,
+        mast_x=mast_x,
+        rake_deg=rake_deg,
+        deck_height=deck_height,
+        ahead="fore",
+        after="main",
+        canvas=BRIG_CANVAS,
+        brig=True,
+    )
 
     # studding sails on fore and main by the frigate's rule: lower (fore only), topmast and
     # topgallant, the booms on the yards; the swinging boom 0.6 of the lower yard (Fincham)
@@ -4944,10 +5323,12 @@ def brig(out_dir="data/ships"):
     b.group("headsails", headsails)
     b.group("jibs", headsails[1:])
     b.group("staysails", headsails[:1] + between)
+    b.group("staysails between the masts", between)  # package 57, as the frigate's
     b.group("studdingsails", stuns)
     b.group("square sails", sum(sails_by_level.values(), []))
     b.group("fore-and-aft sails", headsails + between + [spanker])
-    b.group("light sails", sails_by_level["royal"] + [headsails[2], between[2]] + stuns)
+    b.group("light sails", sails_by_level["royal"] + [headsails[2]] + between[2:] + stuns)
+    b.group("lying-to staysails", ["main.staysail"])  # package 57, as the frigate's
     b.group(
         "plain sail",
         sails_by_level["course"]
@@ -4996,7 +5377,6 @@ def brig(out_dir="data/ships"):
     b.alias("fore topmast staysail", "fore.topmast_staysail")
     b.alias("main staysail", "main.staysail")
     b.alias("main topmast staysail", "main.topmast_staysail")
-    b.alias("middle staysail", "main.topmast_staysail")
     b.alias("main topgallant staysail", "main.topgallant_staysail")
     b.alias("stuns'ls", "studdingsails")
     b.alias("studding sails", "studdingsails")
@@ -5290,10 +5670,6 @@ LUGGER_TOPSAIL_ROPE = {
     "sheet": 2.5,
     "brace": 1.75,
     "lift": 1.75,
-    "clewline": 1.75,
-    "buntline": 1.5,
-    "bowline": 1.75,
-    "reef_tackle": 1.75,
 }
 LUGGER_POSTS, LUGGER_DRAWN = wardroom("lugger")
 
@@ -5396,6 +5772,7 @@ def lugger(out_dir="data/ships"):
     stem_x_ft = lwl_ft / 2.0 + 1.0
     built = {}
     lug_areas = {}
+    lug_cut = {}  # package 57: each lug's corners in feet, its mast at the sling, the sling
     lines_canvas = {
         "fore": LUGGER_CANVAS["lug"],
         "main": LUGGER_CANVAS["lug"],
@@ -5439,6 +5816,7 @@ def lugger(out_dir="data/ships"):
         area = round(area_ft2 * FT * FT)
         centre_h = round(deck_height + cz * FT, 1)
         lug_areas[name] = (area, cx, cz)
+        lug_cut[name] = (tack, throat, peak_pt, clew, mast_at_sling, sling_h)
         mast = b.spar(
             f"{name}.mast",
             "mast",
@@ -5480,6 +5858,9 @@ def lugger(out_dir="data/ships"):
             canvas_no=canvas[0],
             cloth_rating_kn=cloth(area, canvas[0]),
             dipping=dipping or None,
+            # package 57: the cut as the generator works it, for the drawing: the yard slung a
+            # third from its fore end, two thirds of the sail abaft the mast
+            corners_m=[[m(px), m(pz)] for px, pz in (tack, throat, peak_pt, clew)],
             note=(
                 f"the {name} lug, {area} m2, a dipping lug: two thirds of its cloth to leeward "
                 "of the mast and its tack shifted in going about (Forfait pp. 5 to 6; Lescallier "
@@ -5527,13 +5908,25 @@ def lugger(out_dir="data/ships"):
         b.line(f"{name}.stay", "stay", mast, rating=rope_kn(5.0 if name != "mizen" else 3.5))
         built[name] = (mast, yard, sail, above, x_ft, rake, centre_h)
 
-    # the topsails on the fore and main topmasts, fidded abaft the lower mast heads in iron
-    # rings (Steel 1794, LUGGER; Lescallier p. 408), with braces, lifts and bowlines
+    # the lug topsails on the fore and main topmasts, fidded abaft the lower mast heads in
+    # iron rings (Steel 1794, LUGGER; Lescallier 1791 p. 408: each mast with "un mât de hune
+    # ... à l'arrière ... dans un cercle de fer", and lug topsails). Package 57 (the owner's
+    # notes 1 to 4 of the Éclair's first cruise): they are lugs, not square topsails: a yard
+    # slung a third from its fore end on the topmast, peaked as the lower lug's, the clew
+    # sheeted to the lower lug's peak and the tack to the lower mast head, so that the sail
+    # lies as the lower lug lies, on its side of the mast, and is trimmed with it by the
+    # lower lug's sheet. Forfait's braces and lifts (p. 53: "les huniers seuls ont des bras,
+    # des balancines & des boulines") are kept for the setting and the picture, not for a
+    # square trim; his bowlines are left out, the tack doing a lug's bowline's office
+    # (judgement). Set flying (the owner's note of 2026-10-17): swayed up from the deck with
+    # the sail bent and sent down whole, never reefed aloft; in a breeze the topmast itself
+    # is struck.
     topsails = []
     topsail_yards_built = []
     topmasts = []
     for name in ("fore", "main"):
         mast, yard, sail, above, x_ft, rake, _ch = built[name]
+        tack_lo, _throat_lo, peak_lo, _clew_lo, mast_at_sling_lo, sling_lo = lug_cut[name]
         hoist = 0.75 * topmast_ft  # the quarter of it in the doubling (judgement)
         tm = b.spar(
             f"{name}.topmast",
@@ -5542,46 +5935,73 @@ def lugger(out_dir="data/ships"):
             height_m=ft(hoist),
             rating_kn=None,
             note=f"the {name} topmast {topmast_ft:.0f} ft, 1.091 of the breadth (Forfait Table "
-            f"VII), fidded abaft the mast head in an iron ring (Steel 1794, LUGGER), "
-            f"{hoist:.0f} ft above "
-            "the cap (judgement: a quarter of it in the doubling).",
+            f"VII), fidded abaft the mast head in an iron ring (Steel 1794, LUGGER; Lescallier "
+            f"1791 p. 408), {hoist:.0f} ft above the cap (judgement: a quarter of it in the "
+            "doubling); struck and housed in a breeze, the topsail being sent down.",
         )
         ty_len = topsail_yards[name]
         ty_h = above + hoist - 1.0
-        depth = ty_h - (above - 1.0)
-        ts_area = round(0.85 * ty_len * depth * FT * FT)
-        ts_z = above - 1.0 + 0.5 * depth
-        ts_centre = round(deck_height + ts_z * FT, 1)
-        b.doc["spars"][-1]["rating_kn"] = design_kn([(ts_area, ts_centre, "square")], dw["topsail"])
+        sling = (x_ft - rake * ty_h, ty_h)
+        ts_throat = (
+            sling[0] + ty_len / 3.0 * math.cos(peak),
+            sling[1] - ty_len / 3.0 * math.sin(peak),
+        )
+        ts_peak = (
+            sling[0] - 2.0 * ty_len / 3.0 * math.cos(peak),
+            sling[1] + 2.0 * ty_len / 3.0 * math.sin(peak),
+        )
+        ts_tack = (mast_at_sling_lo, sling_lo)  # at the lower mast head, by the slings
+        ts_clew = peak_lo  # sheeted to the lower lug's peak
+        ts_area_ft2, ts_cx, ts_cz = _quad_area_centroid([ts_tack, ts_throat, ts_peak, ts_clew])
+        ts_area = round(ts_area_ft2 * FT * FT)
+        ts_centre = round(deck_height + ts_cz * FT, 1)
+        b.doc["spars"][-1]["rating_kn"] = design_kn([(ts_area, ts_centre, "lug")], dw["topsail"])
         ty = b.spar(
-            f"{name}.topsail.yard",
-            "yard",
+            f"{name}.topsail.lug_yard",
+            "lug_yard",
             on=tm,
             length_m=ft(ty_len),
             height_m=ft(ty_h),
-            brace_limit_deg=64,
-            rating_kn=design_kn([(ts_area, ts_centre, "square")], dw["topsail"]),
-            note=f"the {name} topsail yard {ty_len:.1f} ft ({ty_len / L:.3f} of the length, "
-            "Forfait "
-            "Table VII); the lug topsails alone have braces, lifts and bowlines (Forfait p. 53), "
-            "and are trimmed as square topsails; braces 64 deg from square (the cutter's topsail "
-            f"yard's, judgement).{prov}",
+            rating_kn=design_kn([(ts_area, ts_centre, "lug")], dw["topsail"]),
+            note=f"the {name} topsail's yard {ty_len:.1f} ft ({ty_len / L:.3f} of the length, "
+            "Forfait Table VII), a lug yard slung a third from its fore end and peaked as the "
+            "lower lug's (Steel 1794, LUGGER: 'one on each lower-mast and topmast'); its braces "
+            "and lifts are Forfait's (p. 53) for the setting and the picture: the sail is "
+            f"trimmed by the lower lug's sheet, not braced.{prov}",
         )
         ts = b.sail(
             f"{name}.topsail",
-            "square",
+            "lug",
             yard=ty,
+            mast=tm,
             area_m2=ts_area,
-            reef_bands=1,
-            x_m=m(x_ft - rake * ts_z),
+            flying=True,
+            sheeted_to=sail,
+            x_m=m(ts_cx),
             centre_height_m=ts_centre,
             canvas_no=LUGGER_CANVAS["topsail"][0],
             cloth_rating_kn=cloth(ts_area, LUGGER_CANVAS["topsail"][0]),
-            note=f"the {name} topsail {ts_area} m2: {depth:.0f} ft deep between its yard and the "
-            "lug's yard, 0.85 of its yard broad (judgement); one reef-band."
-            + canvas_note(LUGGER_CANVAS["topsail"]),
+            corners_m=[[m(px), m(pz)] for px, pz in (ts_tack, ts_throat, ts_peak, ts_clew)],
+            note=f"the {name} lug topsail {ts_area} m2 (Lescallier 1791 p. 408: 'des huniers à "
+            "bourcet'; the owner's notes of 2026-10-17): its corners the tack at the lower mast "
+            "head, its yard's two ends, and the clew at the lower lug's peak, to which it is "
+            "sheeted, so that it lies on the lower lug's side of the mast and at its angle; set "
+            "flying, sent down whole, no reef-band." + canvas_note(LUGGER_CANVAS["topsail"]),
         )
-        square_sail_lines(b, ts, ty, LUGGER_TOPSAIL_ROPE, hoisting=True, reef=True, bowline=True)
+        r = LUGGER_TOPSAIL_ROPE
+        b.line(f"{ts}.halyard", "halyard", ty, rating=rope_kn(r["halyard"], 2))
+        b.line(
+            f"{ts}.sheet",
+            "sheet",
+            ts,
+            rating=rope_kn(r["sheet"]),
+            note="the lug topsail's sheet, to the lower lug's peak (package 57); one part."
+            if name == "fore"
+            else None,
+        )
+        b.line(f"{ts}.tack", "tack", ts, rating=rope_kn(r["sheet"]))
+        b.sided(f"{ts}.brace", "brace", ty, rating=rope_kn(r["brace"]))
+        b.sided(f"{ts}.lift", "lift", ty, rating=rope_kn(r["lift"]))
         topsails.append(ts)
         topsail_yards_built.append(ty)
         topmasts.append(tm)
@@ -5769,22 +6189,20 @@ def lugger(out_dir="data/ships"):
     b.group("lugs", lugs)
     b.group("dipping lugs", lugs[:2])
     b.group("topsails", topsails)
-    b.group("square sails", topsails)
+    # package 57: the lug topsails are lugs, set flying; she has no square sail and no yard
+    # that is braced
+    b.group("lug topsails", topsails)
+    b.group("flying sails", topsails)
     b.group("headsails", head_sails)
     b.group("jibs", head_sails)
-    b.group("fore-and-aft sails", head_sails + lugs)
+    b.group("fore-and-aft sails", head_sails + lugs + topsails)
     b.group("light sails", [fjib])
     b.group("plain sail", lugs + topsails + [jib])
     b.group("all sail", lugs + topsails + head_sails)
-    b.group("yards", topsail_yards_built)
     b.group("topsail yards", topsail_yards_built)
     b.group("lower masts", [built[n][0] for n in ("fore", "main", "mizen")])
     b.group("topmasts", topmasts)
     b.group("storm canvas", [tv, sj])
-    b.group(
-        "topsail bowlines", [f"{n}.topsail.bowline.{s}" for n in ("fore", "main") for s in SIDES]
-    )
-    b.alias("topsail bowline", "topsail bowlines")
     b.alias("the fore lug", "fore.lug")
     b.alias("foresail", "fore.lug")
     b.alias("the foresail", "fore.lug")

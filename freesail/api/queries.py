@@ -274,6 +274,7 @@ def snapshot(world: World) -> dict[str, Any]:
             "backed": s.backed,
             "shivering": s.shivering,  # a studding sail too near the wind (spec 3b §7)
             "sheet_angle": s.sheet_angle,
+            "lug_side": _lug_side(ship, s),  # package 57: a lug drawn on its side of the mast
         }
         for s in ship.sails.values()
     ]
@@ -344,7 +345,24 @@ def _sail_entry(s: Sail) -> dict[str, Any]:
         "state": _sail_state(s),
         "reefs": s.reefs,
         "sheet_angle": s.sheet_angle,
+        # package 57: the drawing's lug on its side, the flying sail sent down, the cut
+        "dipping": s.dipping,
+        "flying": s.flying,
+        "sheeted_to": s.sheeted_to,
+        "corners_m": _corners_of(s),
     }
+
+
+def _corners_of(s: Sail) -> list[list[float]] | None:
+    spec = getattr(s, "corners_m", None)
+    return [[float(x), float(z)] for x, z in spec] if spec else None
+
+
+def _lug_side(ship: Ship, s: Sail) -> str | None:
+    """The side of its mast a lug lies on (package 43b), a lug topsail its lower lug's
+    (package 57: its clew is sheeted to that lug's yard)."""
+    host = ship.sails.get(s.sheeted_to) if s.sheeted_to else None
+    return host.lug_side if host is not None else s.lug_side
 
 
 def _line_entry(ln: Line) -> dict[str, Any]:

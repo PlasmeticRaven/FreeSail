@@ -186,7 +186,9 @@ def test_the_body_moves_by_the_brains_plan_a_chase_closes_and_a_flight_opens(far
     for _ in range(30):
         b.tick(w, 60.0)
     _, d1 = bearing_and_distance(b.position, w.position)
-    assert d1 < d0 - 2 * units.NAUTICAL_MILE
+    # package 57: she closes 3,702 m in the half hour (3,709 before, two miles and 5 m),
+    # her polar a little slower with Steel's four staysails stowed between the masts
+    assert d1 < d0 - 1.9 * units.NAUTICAL_MILE
     B.resolve_state(b, "evading", b.brain)
     for _ in range(30):
         b.tick(w, 60.0)

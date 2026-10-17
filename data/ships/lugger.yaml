@@ -49,13 +49,13 @@ hull:
     rate_deg_s: 5.0
     span_m: 2.5
 spars:
-# the fore mast 56 ft heel to head, 2.759 of the breadth (Forfait 1788 Table VII p. 75, the 60-pied lougre), 49 ft above the deck; the heel 3.5 ft below the water-line (0.17 B, Fincham 1843 p. 61); stationed 21.6 ft before the middle (Forfait); raking 1.6 deg (0.33 in to the foot, Forfait). A few shrouds a side with runners (BASTAQUE, Willaumez 1831), the lee ones slacked to trim the lug (Forfait p. 53). Provisional (truth 9), see gen_ships.py. Forfait's check (Table VII, 60 pieds): the working canvas 476 m2 against 4.037 L x B = 452 m2 on her length and breadth; its centre 0.016 L before the middle against his 0.024 L abaft. Rating: fore.lug, fore.topsail, jib in 55 kn -> 90.3 kN.
+# the fore mast 56 ft heel to head, 2.759 of the breadth (Forfait 1788 Table VII p. 75, the 60-pied lougre), 49 ft above the deck; the heel 3.5 ft below the water-line (0.17 B, Fincham 1843 p. 61); stationed 21.6 ft before the middle (Forfait); raking 1.6 deg (0.33 in to the foot, Forfait). A few shrouds a side with runners (BASTAQUE, Willaumez 1831), the lee ones slacked to trim the lug (Forfait p. 53). Provisional (truth 9), see gen_ships.py. Forfait's check (Table VII, 60 pieds): the working canvas 472 m2 against 4.037 L x B = 452 m2 on her length and breadth; its centre 0.000 L before the middle against his 0.024 L abaft. Rating: fore.lug, fore.topsail, jib in 55 kn -> 89.5 kN.
 - id: fore.mast
   class: mast
   x_m: 6.6
   rake_deg: 1.6
   height_m: 15.0
-  rating_kn: 90.3
+  rating_kn: 89.5
 # the fore lug's yard 26.9 ft (0.454 of the length, Forfait Table VII), slung at a third of its length and peaked at 65 degrees to the mast (Forfait p. 53: 60 to 70), hoisted to a foot below the sheave; no braces and no lifts ('les ralingues en font l'office', Forfait p. 53). Provisional (truth 9), see gen_ships.py. Rating: fore.lug in 45 kn -> 37.8 kN.
 - id: fore.lug_yard
   class: lug_yard
@@ -63,13 +63,13 @@ spars:
   length_m: 8.2
   height_m: 14.7
   rating_kn: 37.8
-# the main mast 70 ft heel to head, 3.455 of the breadth (Forfait 1788 Table VII p. 75, the 60-pied lougre), 62 ft above the deck; the heel 5.3 ft below the water-line (0.26 B, Fincham 1843 p. 61); stationed 2.4 ft abaft the middle (Forfait); raking 4.8 deg (1 in to the foot, Forfait). A few shrouds a side with runners (BASTAQUE, Willaumez 1831), the lee ones slacked to trim the lug (Forfait p. 53). Provisional (truth 9), see gen_ships.py. Rating: main.lug, main.topsail in 55 kn -> 120.1 kN.
+# the main mast 70 ft heel to head, 3.455 of the breadth (Forfait 1788 Table VII p. 75, the 60-pied lougre), 62 ft above the deck; the heel 5.3 ft below the water-line (0.26 B, Fincham 1843 p. 61); stationed 2.4 ft abaft the middle (Forfait); raking 4.8 deg (1 in to the foot, Forfait). A few shrouds a side with runners (BASTAQUE, Willaumez 1831), the lee ones slacked to trim the lug (Forfait p. 53). Provisional (truth 9), see gen_ships.py. Rating: main.lug, main.topsail in 55 kn -> 120.6 kN.
 - id: main.mast
   class: mast
   x_m: -0.7
   rake_deg: 4.8
   height_m: 18.8
-  rating_kn: 120.1
+  rating_kn: 120.6
 # the main lug's yard 34.0 ft (0.573 of the length, Forfait Table VII), slung at a third of its length and peaked at 65 degrees to the mast (Forfait p. 53: 60 to 70), hoisted to a foot below the sheave; no braces and no lifts ('les ralingues en font l'office', Forfait p. 53). Provisional (truth 9), see gen_ships.py. Rating: main.lug in 45 kn -> 66.9 kN.
 - id: main.lug_yard
   class: lug_yard
@@ -91,34 +91,32 @@ spars:
   length_m: 6.6
   height_m: 9.9
   rating_kn: 16.3
-# the fore topmast 22 ft, 1.091 of the breadth (Forfait Table VII), fidded abaft the mast head in an iron ring (Steel 1794, LUGGER), 17 ft above the cap (judgement: a quarter of it in the doubling). Rating: fore.topsail in 40 kn -> 9.6 kN.
+# the fore topmast 22 ft, 1.091 of the breadth (Forfait Table VII), fidded abaft the mast head in an iron ring (Steel 1794, LUGGER; Lescallier 1791 p. 408), 17 ft above the cap (judgement: a quarter of it in the doubling); struck and housed in a breeze, the topsail being sent down. Rating: fore.topsail in 40 kn -> 9.2 kN.
 - id: fore.topmast
   class: topmast
   steps_on: fore.mast
   height_m: 5.1
-  rating_kn: 9.6
-# the fore topsail yard 23.3 ft (0.393 of the length, Forfait Table VII); the lug topsails alone have braces, lifts and bowlines (Forfait p. 53), and are trimmed as square topsails; braces 64 deg from square (the cutter's topsail yard's, judgement). Provisional (truth 9), see gen_ships.py. Rating: fore.topsail in 40 kn -> 9.6 kN.
-- id: fore.topsail.yard
-  class: yard
+  rating_kn: 9.2
+# the fore topsail's yard 23.3 ft (0.393 of the length, Forfait Table VII), a lug yard slung a third from its fore end and peaked as the lower lug's (Steel 1794, LUGGER: 'one on each lower-mast and topmast'); its braces and lifts are Forfait's (p. 53) for the setting and the picture: the sail is trimmed by the lower lug's sheet, not braced. Provisional (truth 9), see gen_ships.py. Rating: fore.topsail in 40 kn -> 9.2 kN.
+- id: fore.topsail.lug_yard
+  class: lug_yard
   'on': fore.topmast
   length_m: 7.1
   height_m: 19.8
-  brace_limit_deg: 64
-  rating_kn: 9.6
-# the main topmast 22 ft, 1.091 of the breadth (Forfait Table VII), fidded abaft the mast head in an iron ring (Steel 1794, LUGGER), 17 ft above the cap (judgement: a quarter of it in the doubling). Rating: main.topsail in 40 kn -> 10.6 kN.
+  rating_kn: 9.2
+# the main topmast 22 ft, 1.091 of the breadth (Forfait Table VII), fidded abaft the mast head in an iron ring (Steel 1794, LUGGER; Lescallier 1791 p. 408), 17 ft above the cap (judgement: a quarter of it in the doubling); struck and housed in a breeze, the topsail being sent down. Rating: main.topsail in 40 kn -> 10.9 kN.
 - id: main.topmast
   class: topmast
   steps_on: main.mast
   height_m: 5.1
-  rating_kn: 10.6
-# the main topsail yard 25.1 ft (0.424 of the length, Forfait Table VII); the lug topsails alone have braces, lifts and bowlines (Forfait p. 53), and are trimmed as square topsails; braces 64 deg from square (the cutter's topsail yard's, judgement). Provisional (truth 9), see gen_ships.py. Rating: main.topsail in 40 kn -> 10.6 kN.
-- id: main.topsail.yard
-  class: yard
+  rating_kn: 10.9
+# the main topsail's yard 25.1 ft (0.424 of the length, Forfait Table VII), a lug yard slung a third from its fore end and peaked as the lower lug's (Steel 1794, LUGGER: 'one on each lower-mast and topmast'); its braces and lifts are Forfait's (p. 53) for the setting and the picture: the sail is trimmed by the lower lug's sheet, not braced. Provisional (truth 9), see gen_ships.py. Rating: main.topsail in 40 kn -> 10.9 kN.
+- id: main.topsail.lug_yard
+  class: lug_yard
   'on': main.topmast
   length_m: 7.7
   height_m: 23.6
-  brace_limit_deg: 64
-  rating_kn: 10.6
+  rating_kn: 10.9
 # the running bowsprit, 54 ft in all, 2.649 of the breadth (Forfait Table VII), long and little steeved (1 3/4 in to the foot, Forfait; Lescallier p. 408); 30 ft outboard rigged out (0.55 of it, judgement), running in and out on a chevalet and an iron collar at the stem so that the jibs' effect is set 'plus ou moins' (Forfait p. 53); reefed, 20 ft outboard (a third in, the cutter's rule). Provisional (truth 9), see gen_ships.py. Rating: flying_jib in 55 kn -> 21.8 kN.
 - id: bowsprit
   class: bowsprit
@@ -142,6 +140,7 @@ sails:
   canvas_no: 2
   cloth_rating_kn: 34.2
   dipping: true
+  corners_m: [[8.7, 0.9], [8.6, 13.6], [1.2, 17.1], [1.3, 0.9]]
 # the main lug, 182 m2, a dipping lug: two thirds of its cloth to leeward of the mast and its tack shifted in going about (Forfait pp. 5 to 6; Lescallier pp. 391 to 392; Steel 1794, LUGGER); its corners the tack, the yard's two ends and the clew, the foot as long as the yard (judgement); two reef-bands (judgement; Fincham p. 59: luggers carried 'two sets of sails, large and small'). Canvas No. 2 (judgement: no period number for a lug found; the cutter's mainsail's, Steel 1794 p. 120, No. 1 or 2, for the sail that drives her); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: main.lug
   class: lug
@@ -154,6 +153,7 @@ sails:
   canvas_no: 2
   cloth_rating_kn: 58.2
   dipping: true
+  corners_m: [[0.9, 0.9], [0.9, 17.0], [-8.5, 21.4], [-9.5, 0.9]]
 # the mizen lug (tapecul), 49 m2: a standing lug, tacked at the mast and sheeted to its outrigger over the stern, not dipped in going about (Holdsworth 1874 p. 104: the Yarmouth luggers' 'working mizen'; judgement); one reef-band. Canvas No. 3 (judgement: a lighter lug than the fore and main); cloth 0.282 kN/m2, 0.88 of No. 2 by Luce App. E.
 - id: mizen.lug
   class: lug
@@ -165,26 +165,33 @@ sails:
   centre_height_m: 6.9
   canvas_no: 3
   cloth_rating_kn: 13.8
-# the fore topsail 31 m2: 17 ft deep between its yard and the lug's yard, 0.85 of its yard broad (judgement); one reef-band. Canvas No. 6 (Steel 1794 vol. I, Sail-making p. 125, 'Sloop's topsail': No. 6 or 7, the lugger's topsails as light); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
+  corners_m: [[-8.4, 0.9], [-8.4, 9.0], [-14.4, 11.8], [-13.1, 1.2]]
+# the fore lug topsail 28 m2 (Lescallier 1791 p. 408: 'des huniers à bourcet'; the owner's notes of 2026-10-17): its corners the tack at the lower mast head, its yard's two ends, and the clew at the lower lug's peak, to which it is sheeted, so that it lies on the lower lug's side of the mast and at its angle; set flying, sent down whole, no reef-band. Canvas No. 6 (Steel 1794 vol. I, Sail-making p. 125, 'Sloop's topsail': No. 6 or 7, the lugger's topsails as light); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: fore.topsail
-  class: square
-  yard: fore.topsail.yard
-  area_m2: 31
-  reef_bands: 1
-  x_m: 6.1
-  centre_height_m: 18.3
+  class: lug
+  yard: fore.topsail.lug_yard
+  mast: fore.topmast
+  area_m2: 28
+  flying: true
+  sheeted_to: fore.lug
+  x_m: 4.3
+  centre_height_m: 19.2
   canvas_no: 6
-  cloth_rating_kn: 7.1
-# the main topsail 33 m2: 17 ft deep between its yard and the lug's yard, 0.85 of its yard broad (judgement); one reef-band. Canvas No. 6 (Steel 1794 vol. I, Sail-making p. 125, 'Sloop's topsail': No. 6 or 7, the lugger's topsails as light); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
+  cloth_rating_kn: 6.4
+  corners_m: [[6.2, 14.7], [8.2, 18.8], [1.7, 21.8], [1.2, 17.1]]
+# the main lug topsail 32 m2 (Lescallier 1791 p. 408: 'des huniers à bourcet'; the owner's notes of 2026-10-17): its corners the tack at the lower mast head, its yard's two ends, and the clew at the lower lug's peak, to which it is sheeted, so that it lies on the lower lug's side of the mast and at its angle; set flying, sent down whole, no reef-band. Canvas No. 6 (Steel 1794 vol. I, Sail-making p. 125, 'Sloop's topsail': No. 6 or 7, the lugger's topsails as light); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: main.topsail
-  class: square
-  yard: main.topsail.yard
-  area_m2: 33
-  reef_bands: 1
-  x_m: -2.5
-  centre_height_m: 22.0
+  class: lug
+  yard: main.topsail.lug_yard
+  mast: main.topmast
+  area_m2: 32
+  flying: true
+  sheeted_to: main.lug
+  x_m: -4.6
+  centre_height_m: 23.1
   canvas_no: 6
-  cloth_rating_kn: 7.5
+  cloth_rating_kn: 7.3
+  corners_m: [[-2.3, 18.5], [-0.4, 22.5], [-7.3, 25.7], [-8.5, 21.4]]
 # the jib (the inner), its tack at the reefed bowsprit's end, set whether the bowsprit is reefed or rigged out; 32 m2: luff 44 ft, 0.85 of the line from its halyard to its tack (Fincham art. 87's rule for a cutter's jib, judgement for a lugger's). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Smack's jib' (OCR line 15709): No. 1 or 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: jib
   class: jibheaded
@@ -313,142 +320,69 @@ lines:
   class: stay
   of: mizen.mast
   rating_kn: 19.0
-- id: fore.topsail.yard.halyard
+- id: fore.topsail.halyard
   class: halyard
-  of: fore.topsail.yard
-  rating_kn: 9.7
-- id: fore.topsail.yard.brace.starboard
-  class: brace
-  of: fore.topsail.yard
-  side: starboard
-  rating_kn: 4.7
-- id: fore.topsail.yard.brace.larboard
-  class: brace
-  of: fore.topsail.yard
-  side: larboard
-  rating_kn: 4.7
-- id: fore.topsail.yard.lift.starboard
-  class: lift
-  of: fore.topsail.yard
-  side: starboard
-  rating_kn: 4.7
-- id: fore.topsail.yard.lift.larboard
-  class: lift
-  of: fore.topsail.yard
-  side: larboard
-  rating_kn: 4.7
-- id: fore.topsail.sheet.starboard
+  of: fore.topsail.lug_yard
+  rating_kn: 19.4
+# the lug topsail's sheet, to the lower lug's peak (package 57); one part.
+- id: fore.topsail.sheet
   class: sheet
   of: fore.topsail
-  side: starboard
   rating_kn: 9.7
-- id: fore.topsail.sheet.larboard
-  class: sheet
+- id: fore.topsail.tack
+  class: tack
   of: fore.topsail
-  side: larboard
   rating_kn: 9.7
-- id: fore.topsail.clewline.starboard
-  class: clewline
-  of: fore.topsail
+- id: fore.topsail.brace.starboard
+  class: brace
+  of: fore.topsail.lug_yard
   side: starboard
   rating_kn: 4.7
-- id: fore.topsail.clewline.larboard
-  class: clewline
-  of: fore.topsail
+- id: fore.topsail.brace.larboard
+  class: brace
+  of: fore.topsail.lug_yard
   side: larboard
   rating_kn: 4.7
-- id: fore.topsail.buntline
-  class: buntline
-  of: fore.topsail
-  rating_kn: 3.5
-# fore.topsail bowline, one a side with its bridles: hauls the weather leech forward on a wind (Luce 1884 ch. IX, 'Bowlines'; ch. X, 'two bowline-cringles and one bridle on each leech'; Kipping, Sails and Sailmaking, the 1847 text); a lighter rope than the sheet, 1.75 in (judgement), rated by Luce 1866 ch. IV.
-- id: fore.topsail.bowline.starboard
-  class: bowline
-  of: fore.topsail
+- id: fore.topsail.lift.starboard
+  class: lift
+  of: fore.topsail.lug_yard
   side: starboard
   rating_kn: 4.7
-- id: fore.topsail.bowline.larboard
-  class: bowline
-  of: fore.topsail
+- id: fore.topsail.lift.larboard
+  class: lift
+  of: fore.topsail.lug_yard
   side: larboard
   rating_kn: 4.7
-- id: fore.topsail.reef_tackle.starboard
-  class: reef_tackle
-  of: fore.topsail
-  side: starboard
-  rating_kn: 4.7
-- id: fore.topsail.reef_tackle.larboard
-  class: reef_tackle
-  of: fore.topsail
-  side: larboard
-  rating_kn: 4.7
-- id: main.topsail.yard.halyard
+- id: main.topsail.halyard
   class: halyard
-  of: main.topsail.yard
-  rating_kn: 9.7
-- id: main.topsail.yard.brace.starboard
-  class: brace
-  of: main.topsail.yard
-  side: starboard
-  rating_kn: 4.7
-- id: main.topsail.yard.brace.larboard
-  class: brace
-  of: main.topsail.yard
-  side: larboard
-  rating_kn: 4.7
-- id: main.topsail.yard.lift.starboard
-  class: lift
-  of: main.topsail.yard
-  side: starboard
-  rating_kn: 4.7
-- id: main.topsail.yard.lift.larboard
-  class: lift
-  of: main.topsail.yard
-  side: larboard
-  rating_kn: 4.7
-- id: main.topsail.sheet.starboard
+  of: main.topsail.lug_yard
+  rating_kn: 19.4
+- id: main.topsail.sheet
   class: sheet
   of: main.topsail
-  side: starboard
   rating_kn: 9.7
-- id: main.topsail.sheet.larboard
-  class: sheet
+- id: main.topsail.tack
+  class: tack
   of: main.topsail
-  side: larboard
   rating_kn: 9.7
-- id: main.topsail.clewline.starboard
-  class: clewline
-  of: main.topsail
+- id: main.topsail.brace.starboard
+  class: brace
+  of: main.topsail.lug_yard
   side: starboard
   rating_kn: 4.7
-- id: main.topsail.clewline.larboard
-  class: clewline
-  of: main.topsail
+- id: main.topsail.brace.larboard
+  class: brace
+  of: main.topsail.lug_yard
   side: larboard
   rating_kn: 4.7
-- id: main.topsail.buntline
-  class: buntline
-  of: main.topsail
-  rating_kn: 3.5
-# main.topsail bowline, one a side with its bridles: hauls the weather leech forward on a wind (Luce 1884 ch. IX, 'Bowlines'; ch. X, 'two bowline-cringles and one bridle on each leech'; Kipping, Sails and Sailmaking, the 1847 text); a lighter rope than the sheet, 1.75 in (judgement), rated by Luce 1866 ch. IV.
-- id: main.topsail.bowline.starboard
-  class: bowline
-  of: main.topsail
+- id: main.topsail.lift.starboard
+  class: lift
+  of: main.topsail.lug_yard
   side: starboard
   rating_kn: 4.7
-- id: main.topsail.bowline.larboard
-  class: bowline
-  of: main.topsail
-  side: larboard
-  rating_kn: 4.7
-- id: main.topsail.reef_tackle.starboard
-  class: reef_tackle
-  of: main.topsail
-  side: starboard
-  rating_kn: 4.7
-- id: main.topsail.reef_tackle.larboard
-  class: reef_tackle
-  of: main.topsail
+- id: main.topsail.lift.larboard
+  class: lift
+  of: main.topsail.lug_yard
   side: larboard
   rating_kn: 4.7
 # the heel-rope that runs the bowsprit out and in (the cutter's; judgement).
@@ -551,7 +485,8 @@ groups:
   topsails: &id001
   - fore.topsail
   - main.topsail
-  square sails: *id001
+  lug topsails: *id001
+  flying sails: *id001
   headsails: &id002
   - jib
   - flying_jib
@@ -562,6 +497,8 @@ groups:
   - fore.lug
   - main.lug
   - mizen.lug
+  - fore.topsail
+  - main.topsail
   light sails:
   - flying_jib
   plain sail:
@@ -579,10 +516,9 @@ groups:
   - main.topsail
   - jib
   - flying_jib
-  yards: &id003
-  - fore.topsail.yard
-  - main.topsail.yard
-  topsail yards: *id003
+  topsail yards:
+  - fore.topsail.lug_yard
+  - main.topsail.lug_yard
   lower masts:
   - fore.mast
   - main.mast
@@ -593,13 +529,7 @@ groups:
   storm canvas:
   - taille_vent
   - storm_jib
-  topsail bowlines:
-  - fore.topsail.bowline.starboard
-  - fore.topsail.bowline.larboard
-  - main.topsail.bowline.starboard
-  - main.topsail.bowline.larboard
 aliases:
-  topsail bowline: topsail bowlines
   the fore lug: fore.lug
   foresail: fore.lug
   the foresail: fore.lug

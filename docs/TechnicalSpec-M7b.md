@@ -1087,6 +1087,47 @@ In waves, written for the owner's approval in turn, each launched on his word:
   from the fore end and set to leeward of the mast on either tack; the viewer's draw order
   by the aspect (the sail before the mast hides it from ahead, the mast the sail from
   astern) and the yards' brace shown in the picture.
+
+  **As built (package 57).** The staysails between the masts are Steel's list for a ship
+  (1794 vol. I, Sail-making): the main, main topmast, middle and main topgallant staysails
+  between the fore and the main, the mizzen, mizzen topmast and mizzen topgallant staysails
+  between the main and the mizzen, each cut in `tools/gen_ships.py` (`between_the_masts`,
+  `stay_sail_cut`) as Steel cuts it, square on the foot with the head on its stay, the
+  leech's depth and the foot's cloths by his rule where he gives one and the bunt as the
+  stay then leaves it, his page and the rule in the comment beside each; the stays they set
+  on are new where the file had none (the main staysail stay, the middle staysail stay, the
+  main topgallant stay, the mizzen staysail stay, the mizzen topmast and topgallant stays).
+  The shapes are Steel's own and not the brief's reading: his main staysail is triangular
+  and every other staysail between the masts four-sided, the topgallant staysails among
+  them (his canvas rule groups them with the middle staysail; the tuning notes say so). A
+  sail's cut is in its file (`corners_m`, a new key) and the viewer draws it from there. The
+  brig's set is Steel's for a brig, the middle staysail added and the canvas his numbers.
+  Lying to (Steel 1794 vol. II, 'Lying-to under the main staysail'): `lie a-try` sets the
+  file's `lying-to staysails` (the main staysail) short of the storm line, and over it the
+  storm staysails stand for it as package 37p left them, `shorten sail` and `set the storm
+  staysails` taking the main staysail in. **A sail set flying** is a handling class carried
+  as a key beside the sail's cut (`flying: true`), since its curve is its cut's (a royal is
+  a square sail, a lug topsail a lug): it is swayed up from the deck with its yard and sent
+  down whole (`set_flying`, `take_in_flying`), never reefed, a furled one *sent down* in the
+  log's and the readings' words with its yard on deck; the frigate's and the brig's royals
+  (Steel p. 214, ROYALS "Are set flying") and the lugger's topsails are in it. **The
+  chasse-marée's topsails** are lugs on lug yards on the topmasts, slung a third from the
+  fore end, their tacks at the lower mast heads and their clews sheeted to the lower lugs'
+  peaks (`sheeted_to`, a new key): the sheet reading of a lug topsail is its lower lug's
+  (`evolutions/trim.py`), so it lies on the same side and angle, goes round with it at the
+  dip and flogs while it is lowered; Forfait's braces and lifts are on its yard, none braced
+  by an order. **The viewer** draws a lug from its cut on its side of the mast, swung about
+  its slings by the sheet's angle, two thirds of it abaft and to leeward, nearly square and
+  offset when running, lowered on deck; a square yard is slung before its mast, every sail
+  and yard sorted against its own mast where it stands (the rake corrected), a lug cut at
+  its mast; a flying sail sent down is not drawn and its yard lies on deck; the brace was
+  drawn before and is now said in the yard's title too. Truths 7b-111 and 7b-112 (numbered
+  after the spec's 110). A staysail between the masts stowed on its stay has half its
+  class's furled windage (judgement, set between truths 8 and 10), and its sheet is sized
+  to its cloth. The captain's gale trial (`trial-station-gale`) falls otherwise from its
+  first course under the new rig and takes the ground among the Molène islands after two
+  failed wears: an expected failure, for package 58. The tuning notes, "Package 57", have
+  the figures and the pins.
 - **58 (Opus): the captain's sea sense, third pass**, from the owner's runs of gate 6c
   (`docs/dev/M6-WorkPackages.md`, "The notes of 2026-10-17, read"): the offing by the
   account not its doubt, the guard against land ahead within the visibility, the book

@@ -63,7 +63,10 @@
         node = el("line", { class: cls, x1: f.pts[0].x.toFixed(2), y1: f.pts[0].y.toFixed(2), x2: f.pts[1].x.toFixed(2), y2: f.pts[1].y.toFixed(2) }, rig);
         // a yard's hoist (package 37n): lowered on the cap, or between while it is worked
         var hoist = f.hoist === 0 ? ", lowered" : f.hoist > 0 && f.hoist < 1 ? ", hoisting or settling" : "";
-        title(node, f.id.replace(/\./g, " ") + " (" + f.cls.replace(/_/g, " ") + ", " + f.state.replace(/_/g, " ") + hoist + ")");
+        // package 57 (the lead's finding of 18:29): the yard's brace in words beside its drawing
+        var deg = f.brace != null ? Math.round((Math.abs(f.brace) * 180) / Math.PI) : null;
+        var braced = deg === null ? "" : deg === 0 ? ", square" : ", braced " + deg + "\u00b0 from square";
+        title(node, f.id.replace(/\./g, " ") + " (" + f.cls.replace(/_/g, " ") + ", " + f.state.replace(/_/g, " ") + hoist + braced + ")");
       } else if (f.kind === "sail") {
         var scls = "sail " + f.cls + " " + f.state + (f.backed ? " backed" : "") + (f.reefs ? " reefed" : "") + (f.busy ? " busy" : "");
         node = el("path", { class: scls, d: root.Projection.pathData(f.path, true) }, rig);

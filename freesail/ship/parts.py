@@ -256,6 +256,13 @@ class Sail(Part):
     # (`physics.sails.LUG_AGAINST_MAST_AREA`) until it is dipped (dip_lug.yaml).
     dipping: bool = False
     lug_side: str | None = None
+    # Package 57: a sail set flying (the lug topsails, the royals of 1794): furled, it is on
+    # deck with its yard, sent down whole; its yard is swayed up with it bent when it is set
+    # (data/evolutions/set_flying.yaml). A lug topsail's lower lug, to whose yard its clew is
+    # sheeted (`sheeted_to`): it lies as that lug lies (evolutions/trim.py, `read_sheet`).
+    flying: bool = False
+    sheeted_to: str | None = None
+    corners_m: list[tuple[float, float]] | None = None  # the cut, for the drawing (package 57)
     state: SailState = SailState.FURLED
     reefs: int = 0
     # A fore-and-aft sail's angle from the centreline, radians: since package 32e (spec M5
@@ -291,6 +298,9 @@ class Sail(Part):
             canvas_no=s.canvas_no,
             in_place_of=s.in_place_of,
             dipping=bool(getattr(s, "dipping", False)),
+            flying=bool(getattr(s, "flying", False)),
+            sheeted_to=getattr(s, "sheeted_to", None),
+            corners_m=getattr(s, "corners_m", None),
             # storm canvas and the occasional sails start the voyage in the sail room
             state=SailState.FURLED if s.bent else SailState.UNBENT,
         )
@@ -328,9 +338,16 @@ class Sail(Part):
     def is_fore_and_aft(self) -> bool:
         return self.cls in {"gaff", "jibheaded", "lug", "lateen", "sprit"}
 
+    @property
+    def sent_down(self) -> bool:
+        """A flying sail stowed: on deck with its yard (package 57)."""
+        return self.flying and self.state is SailState.FURLED
+
     def describe_state(self) -> str:
         if self.wrecked:
             return "wrecked"
+        if self.sent_down:
+            return "sent down"
         if self.state is SailState.SET and self.reefs:
             return f"set, {self.reefs} reef{'s' if self.reefs > 1 else ''}"
         return self.state.value.replace("_", " ")
@@ -401,6 +418,13 @@ class Line(Part):
 # ships in art. 102, which her other measures shared. The topmast rigging is not
 # touched, so only the lower yard gains.
 CATHARPIN_GAIN_DEG = 4.0
+
+
+def flying_down(ship: Any, spar: Spar) -> bool:
+    """A yard sent down on deck with the flying sail bent to it (package 57: a royal of
+    1794, a lug topsail): every sail on it set flying and stowed."""
+    sails = [sl for sl in ship.sails.values() if sl.roles.get("yard") == spar.id]
+    return bool(sails) and all(sl.sent_down for sl in sails)
 
 
 def lower_yards(ship: Any, mast: Spar) -> list[Spar]:

@@ -563,6 +563,8 @@ class Runner:
         )
         if wanted == "sail" and isinstance(subject, Sail):
             return  # any sail: bending, unbending and shifting (package 19)
+        if wanted == "flying" and isinstance(subject, Sail) and subject.flying:
+            return  # a sail set flying, of whatever cut (package 57)
         if wanted == "spar" and isinstance(subject, Spar):
             return  # any spar: shifting one for a spare (package 30b)
         if wanted == "part" and isinstance(subject, Sail | Spar):

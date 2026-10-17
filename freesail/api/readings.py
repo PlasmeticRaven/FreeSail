@@ -144,6 +144,7 @@ SAIL_STATE_WORDS: tuple[str, ...] = (
     "loosed",
     "sheeted",
     "unbent",
+    "sent down",  # package 57: a flying sail stowed on deck with its yard
     "goose winged",
     "reefed",
     "wrecked",
@@ -854,6 +855,8 @@ def sail_reading(ship: Any, sail: Sail) -> dict[str, Any]:
     from freesail.physics.strain import baggy_luff
 
     state = "wrecked" if sail.wrecked else sail.state.value
+    if not sail.wrecked and getattr(sail, "sent_down", False):
+        state = "sent_down"  # package 57: a flying sail stowed, on deck with its yard
     drawing = sail.state in (SailState.SET, SailState.GOOSE_WINGED) and not sail.wrecked
     shaking = False
     if drawing and not sail.backed:

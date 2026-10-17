@@ -139,7 +139,8 @@ class InstantRunner:
     def _apply(ship: Ship, evo: str, subject: str, p: dict[str, Any]) -> None:
         if evo.startswith("set_"):
             ship.sails[subject].state = SailState.SET
-        elif evo == "take_in_studding":
+        elif evo in ("take_in_studding", "take_in_flying"):
+            # a flying sail is sent down whole (package 57): stowed, as a studding sail is
             ship.sails[subject].state = SailState.FURLED
         elif evo.startswith("take_in_"):
             ship.sails[subject].state = SailState.IN_THE_GEAR

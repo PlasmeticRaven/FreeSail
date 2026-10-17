@@ -2,7 +2,7 @@
 
 ## Plain sail
 
-*Plain sail* is the working canvas of the ship: on the frigate the courses, the three topsails, the three topgallants, the fore topmast staysail, the jib and the spanker; on the schooner the foresail, mainsail, fore topsail, fore topgallant, fore staysail and jib. Everything beyond it, the royals, the flying jib, the main topmast staysail, the gaff topsail and the studding sails, is *light sail* or *all sail*. The ship file's `plain sail` and `all sail` groups say exactly which sails these are for each ship.
+*Plain sail* is the working canvas of the ship: on the frigate the courses, the three topsails, the three topgallants, the fore topmast staysail, the jib and the spanker; on the schooner the foresail, mainsail, fore topsail, fore topgallant, fore staysail and jib. Everything beyond it, the royals, the flying jib, the staysails between the masts, the gaff topsail and the studding sails, is *light sail* or *all sail*. The ship file's `plain sail` and `all sail` groups say exactly which sails these are for each ship.
 
 One order does it:
 
@@ -61,13 +61,12 @@ take in the studdingsails
 take in the royals
 take in the flying jib
 take in the topgallants
-furl the royals
 furl the topgallants
 haul down the main topmast staysail
 # rejected: take in the royals
 ```
 
-The last is refused with "Nothing done: the fore royal is already furled; the main royal is already furled; the mizzen royal is already furled."
+The last is refused with "Nothing done: the fore royal is already sent down; the main royal is already sent down; the mizzen royal is already sent down." A royal is set flying (chapter 1; package 57): `set the royals` sways each yard up from the deck with the sail bent and hoists it, a couple of minutes' work for a few hands on deck, and `take in the royals` lowers the yard and sends it down whole, so that a royal is never furled aloft and there is no furling it after (`furl the royals` takes in any that are set). The lugger's lug topsails are set flying in the same way (chapter 2).
 
 The period words for taking in are particular to the sail, and the parser keeps them so (Luce 1866, ch. XXIII, 'To take in a Course', 'To take in a Topsail', 'The Spanker': "Up mainsail and spanker!"). A course is **hauled up** by its clew garnets and buntlines; a topsail or a light sail is **clewed up**; a spanker is **brailed up**; a jib is **hauled down**; a studding sail is taken in. `take in`, `douse` and `hand` suit any sail. Use the wrong word and the ship corrects you: "A gaff sail is brailed up, not clewed up; say 'brail up the mizzen spanker' or 'take in the mizzen spanker'."
 
@@ -126,7 +125,7 @@ Work in hand, or waiting for hands, is stopped with `belay`. "Avast" is the peri
 
 ## Reefing
 
-"The intention of the reef is to reduce the surface of the sail in proportion to the increase of the wind; for which reason there are several reefs parallel to each other in the superior sails" (Falconer, *Reef*). The topsails have three reef bands; the courses one; the spanker two; the schooner's mainsail three and her foresail and topsail two. Royals, topgallants and head sails have none and cannot be reefed.
+"The intention of the reef is to reduce the surface of the sail in proportion to the increase of the wind; for which reason there are several reefs parallel to each other in the superior sails" (Falconer, *Reef*). The topsails have three reef bands; the courses one; the spanker two; the schooner's mainsail three and her foresail and topsail two. Royals, topgallants and head sails have none and cannot be reefed; a sail set flying (the royals, the lugger's lug topsails) is "set flying and is never reefed aloft; it is taken in whole and sent down", and `shorten sail` takes the lugger's lug topsails in before it reefs anything.
 
 To reef a topsail the halyards are settled and the yard clewed down, the reef tackles hauled out, the topmen lay out along the yard, pass the earings at the yardarms and tie the points along the band, and the yard is hoisted again (Luce 1866, ch. XXVII Reefing, 'Reefing and Hoisting'; Lever, 'Reefing Topsails'). The log:
 

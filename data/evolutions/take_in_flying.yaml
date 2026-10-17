@@ -1,0 +1,29 @@
+# Take in a sail set flying (package 57): let go the sheet, lower the yard by its halyard
+# and send it down on deck whole with the sail bent to it; nothing is furled aloft and
+# nothing is reefed (Steel 1794 vol. I p. 214: royals "set flying"; Falconer 1780, ROYAL;
+# the owner's note of 2026-10-17: the lug topsail "sent down whole when taken in", and in
+# a breeze the topmast itself struck). Taken in so, the sail is sent down: on deck with its
+# yard until it is swayed up again (set_flying.yaml). Times judgement: half a minute to
+# lower, a minute to send the yard down and stow it.
+id: take_in_flying
+verb: take_in
+applies_to: {class: flying}
+preconditions:
+  - {check: "sail.state in [set, sheeted, loosed, in_the_gear, goose_winged]", reason: "The {sail} is {state}; there is nothing to take in.", done: true}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: lower
+    duration_s: 30
+    if: "sail.state in [set, sheeted, loosed, goose_winged]"
+    via: halyard_of(sail)
+    sets: {sail.state: in_the_gear}
+    log: "Let go the {sail} sheet and lowered the yard."
+  - do: send_down
+    duration_s: 60
+    sets: {sail.state: furled}
+on_start: {log: "Hands to the {sail} halyard and sheet; lower away."}
+on_complete: {log: "Took in the {sail}; sent down on deck with its yard.", kind: sail.taken_in, severity: notable}
+on_fail: {log: "Could not take in the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 4, rating: ordinary, stations: [forecastle, afterguard, topmen]}
+source: "Steel 1794 vol. I p. 214, ROYALS; Falconer 1780, ROYAL; the owner's note of 2026-10-17"

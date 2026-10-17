@@ -424,7 +424,19 @@ def read_sheet(ship: Ship, sail: Sail) -> SheetReading:
     tighter of two), at that sheet's angle; a boomed sail with one sheet lies to leeward,
     or on the side its sheet is held over to; with no sheet belayed it flogs. A sail with
     no sheet at all in the file keeps the angle it has.
+
+    A lug topsail (package 57) is sheeted to its lower lug's yard: it lies as that lug lies,
+    on its side and at its angle, and draws only while that lug is set and its own sheet is
+    belayed to the yard (the lower lug lowered for the dip takes the topsail's clew down
+    with it, and it flogs).
     """
+    host = sheet_host(ship, sail)
+    if host is not None:
+        own = ship.sheets_of(sail)
+        hr = read_sheet(ship, host)
+        loose = bool(own) and not any(ln.state is LineState.BELAYED for ln in own)
+        free = hr.free or loose or not host.is_set
+        return SheetReading(hr.angle, hr.side, hr.held_to_windward, free, None)
     all_sheets = ship.sheets_of(sail)
     if not all_sheets:
         return SheetReading(sail.sheet_angle, None, False, False, None)
@@ -449,6 +461,12 @@ def read_sheet(ship: Ship, sail: Sail) -> SheetReading:
         side = lee
     angle = geo.angle_from_hauled(working.hauled)
     return SheetReading(angle, side, side != lee, False, working)
+
+
+def sheet_host(ship: Ship, sail: Sail) -> Sail | None:
+    """The lower lug a lug topsail's clew is sheeted to (package 57), or None."""
+    host_id = getattr(sail, "sheeted_to", None)
+    return ship.sails.get(host_id) if host_id else None
 
 
 def refresh_reading(ship: Ship, sail: Sail) -> SheetReading:
@@ -484,7 +502,16 @@ def set_sheet_angle(ship: Ship, sail: Sail, angle: float, side: str | None = Non
     sheets of a pair are belayed alike and the sail lies to leeward of whatever wind
     comes (`read_sheet`'s tie goes to the lee sheet): the state a sail is set in before
     the first tick. Returns the angle the sheet gives (the class's floor at least, its
-    ceiling at most)."""
+    ceiling at most). A lug topsail (package 57) has its sheet hauled home to its lower
+    lug's yard and lies as that lug lies, whatever angle is asked."""
+    if sheet_host(ship, sail) is not None:
+        for ln in ship.sheets_of(sail):
+            if ln.state is not LineState.PARTED:
+                ln.hauled = 1.0
+                ln.state = LineState.BELAYED
+                ln.held_side = None
+        refresh_reading(ship, sail)
+        return sail.sheet_angle
     geo = sheet_geometry(ship, sail)
     angle = max(geo.floor, min(geo.ceiling, angle))
     no_reading = ship.dyn.apparent_wind_angle == 0.0 and ship.dyn.apparent_wind_speed == 0.0

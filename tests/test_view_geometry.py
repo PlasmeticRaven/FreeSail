@@ -39,6 +39,7 @@ FRIGATE = "data/ships/frigate-36.yaml"
 SCHOONER = "data/ships/topsail-schooner.yaml"
 CUTTER = "data/ships/cutter.yaml"  # package 32b: the four ships
 BRIG = "data/ships/brig.yaml"
+LUGGER = "data/ships/lugger.yaml"  # package 57
 NODE = shutil.which("node")
 needs_node = pytest.mark.skipif(NODE is None, reason="Node is not installed")
 
@@ -78,6 +79,7 @@ def ship_state(ship, awa=WIND_ON_THE_LARBOARD_BOW, tack="larboard") -> dict:
                 "reefs": s.reefs,
                 "sheet_angle": s.sheet_angle,
                 "backed": s.backed,
+                "lug_side": s.lug_side,  # package 57
             }
             for s in ship.sails.values()
         ],
@@ -225,7 +227,7 @@ def test_sails_are_drawn_far_to_near_by_their_centres(tmp_path):
         const centres = {};
         const key = x => x.id + (x.piece ? ':' + x.piece : '');
         sk.figures.filter(x => x.kind === 'sail').forEach(
-            x => { centres[key(x)] = proj(x.centre).depth; });
+            x => { centres[key(x)] = proj(x.sortAt || x.centre).depth; });
         return sc.figures.filter(x => x.kind === 'sail').map(
             x => [key(x), x.depth, centres[key(x)]]);
         """,
@@ -674,3 +676,217 @@ def test_struck_topmasts_are_housed_with_their_yards_on_the_caps(tmp_path):
     assert "fore.topsail" in got["sails"]  # furled on its yard on the cap
     assert "fore.topgallant_mast" not in got["masts"]
     assert "fore.topgallant.yard" not in got["yards"] and "fore.topgallant" not in got["sails"]
+
+
+# ---------------------------------------------------------------------------
+# Package 57: the lug on its side, the draw order by the aspect, the brace shown, the
+# flying sail sent down, Steel's four-sided staysails (the owner's notes of the Eclair's
+# first cruise, 2026-10-17; the lead's finding of 18:29)
+# ---------------------------------------------------------------------------
+
+
+def lugger_by_the_wind(tack: str, sheet_deg: float = 20.0, topsails: bool = True) -> dict:
+    """The lugger's lugs (and lug topsails) set on the lee side of `tack`, sheeted
+    `sheet_deg` off the centreline: the graph and snapshot."""
+    ship = make_ship(LUGGER)
+    lee = "larboard" if tack == "starboard" else "starboard"
+    ids = ["fore.lug", "main.lug", "mizen.lug"]
+    if topsails:
+        ids += ["fore.topsail", "main.topsail"]
+    for sid in ids:
+        sail = ship.sails[sid]
+        sail.state = SailState.SET
+        sail.sheet_angle = math.radians(sheet_deg)
+        if sail.dipping:
+            sail.lug_side = lee
+    awa = math.radians(50.0) * (1.0 if tack == "starboard" else -1.0)
+    return ship_state(ship, awa=awa, tack=tack)
+
+
+LUG_FIGURES = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    const fig = id => sk.figures.filter(f => f.id === id);
+    const out = {};
+    ['fore', 'main'].forEach(n => {
+      const y = sk.spars[n + '.lug_yard'];
+      const m = sk.spars[n + '.mast'];
+      const pieces = fig(n + '.lug');
+      const ts = fig(n + '.topsail');
+      out[n] = {
+        throat: y.a, peak: y.b, mx: m.xAt(y.centre[2]),
+        pieces: pieces.map(f => [f.piece || '', f.centre]),
+        corners: pieces[0].corners,
+        topsail: ts.length ? ts[0].corners : null,
+      };
+    });
+    return out;
+"""
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_lugs_are_drawn_to_leeward_slung_a_third_from_their_fore_ends(tmp_path, tack):
+    got = run_js(tmp_path, lugger_by_the_wind(tack), LUG_FIGURES)
+    lee = -1.0 if tack == "starboard" else 1.0  # +1 starboard
+    for name in ("fore", "main"):
+        g = got[name]
+        throat, peak, mx = g["throat"], g["peak"], g["mx"]
+        # slung a third from the fore end: a third of the yard before the mast, two thirds
+        # abaft it (Forfait pp. 5 to 6; the owner's confirmation of 2026-10-17)
+        forward, abaft = throat[0] - mx, mx - peak[0]
+        assert forward > 0.0 and abaft > 0.0, name
+        assert abaft / forward == pytest.approx(2.0, rel=0.15), name
+        # the yard's after end and the clew to leeward, the fore end nearer the centreline
+        clew = g["corners"][2]
+        assert peak[1] * lee > 0.5 and clew[1] * lee > 0.5, name
+        assert throat[1] * lee < peak[1] * lee, name
+        # cut at the mast: the part abaft it, the larger, lies to leeward
+        pieces = dict(g["pieces"])
+        assert set(pieces) == {"forward", "abaft"}, name
+        assert pieces["abaft"][1] * lee > 0.0, name
+        # the lug topsail lies with it, its clew at the lower lug's peak
+        ts = g["topsail"]
+        assert ts is not None and ts[2][1] * lee > 0.0, name
+        assert ts[2] == pytest.approx(peak, abs=1e-6), name
+
+
+@needs_node
+def test_a_lug_running_is_an_offset_square_two_thirds_to_one_side(tmp_path):
+    got = run_js(tmp_path, lugger_by_the_wind("starboard", sheet_deg=85.0), LUG_FIGURES)
+    throat, peak = got["main"]["throat"], got["main"]["peak"]
+    # nearly square across the ship, two thirds of the yard to leeward of the mast
+    assert peak[1] < 0.0 < throat[1]
+    assert abs(peak[1]) == pytest.approx(2.0 * abs(throat[1]), rel=0.25)
+
+
+@needs_node
+def test_a_lowered_lug_lies_on_deck_and_a_sent_down_topsail_is_not_drawn(tmp_path):
+    data = lugger_by_the_wind("starboard", topsails=False)
+    for s in data["snap"]["sails"]:
+        if s["id"] == "main.lug":
+            s["state"] = "in_the_gear"
+    got = run_js(
+        tmp_path,
+        data,
+        """
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        const ids = sk.figures.filter(f => f.kind === 'sail').map(f => f.id);
+        const ty = sk.figures.filter(f => f.id === 'main.topsail.lug_yard')[0];
+        return {ids: ids, yard: sk.spars['main.lug_yard'].a, ty: ty.pts[0], tys: ty.state};
+        """,
+    )
+    deck = data["graph"]["hull"]["deck_height_m"]
+    assert "main.lug" in got["ids"] and "main.topsail" not in got["ids"]
+    assert got["yard"][2] < deck + 1.0  # the lug lowered on deck with its yard
+    assert got["ty"][2] < deck + 1.0 and got["tys"] == "sent_down_flying"
+
+
+FIGURE_ORDER = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    const out = {};
+    [[0, 'ahead'], [Math.PI, 'astern']].forEach(([f, k]) => {
+      out[k] = P.project(sk, f, 0).figures.map(x => x.id + (x.piece ? ':' + x.piece : ''));
+    });
+    return out;
+"""
+
+
+@needs_node
+@pytest.mark.parametrize("path", [FRIGATE, BRIG])
+def test_from_ahead_the_sail_hides_its_mast_and_from_astern_the_mast_hides_the_sail(tmp_path, path):
+    ship = make_ship(path)
+    for sid in ship.groups["plain sail"]:
+        ship.sails[sid].state = SailState.SET
+    got = run_js(tmp_path, ship_state(ship), FIGURE_ORDER)
+    ahead, astern = got["ahead"], got["astern"]
+    for sail, mast in (
+        ("main.topsail", "main.topmast"),
+        ("main.course", "main.mast"),
+        ("fore.topgallant", "fore.topgallant_mast"),
+        ("fore.topsail", "fore.topmast"),
+    ):
+        # painted later is nearer: from ahead the sail, from astern the mast
+        assert ahead.index(sail) > ahead.index(mast), (sail, "ahead")
+        assert astern.index(mast) > astern.index(sail), (sail, "astern")
+
+
+@needs_node
+def test_from_ahead_a_lugs_fore_third_hides_its_mast_and_from_astern_the_mast_the_rest(
+    tmp_path,
+):
+    got = run_js(tmp_path, lugger_by_the_wind("starboard"), FIGURE_ORDER)
+    ahead, astern = got["ahead"], got["astern"]
+    assert ahead.index("main.lug:forward") > ahead.index("main.mast")
+    assert ahead.index("main.mast") > ahead.index("main.lug:abaft")
+    assert astern.index("main.lug:abaft") > astern.index("main.mast")
+    assert astern.index("main.mast") > astern.index("main.lug:forward")
+
+
+@needs_node
+@pytest.mark.parametrize("brace_deg", [0.0, 30.0, 60.0])
+def test_the_yards_brace_is_shown_from_the_beam(tmp_path, brace_deg):
+    """The lead's finding of 18:29: a yard braced sharp up shows its breadth from the beam,
+    a square yard is seen end on; the drawing is the yard's brace, foreshortened."""
+    ship = make_ship(FRIGATE)
+    yard = ship.spars["main.topsail.yard"]
+    yard.brace_angle = math.radians(brace_deg)
+    got = run_js(
+        tmp_path,
+        ship_state(ship),
+        """
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        const sc = P.project(sk, Math.PI / 2, 0);
+        const y = sc.figures.filter(f => f.id === 'main.topsail.yard')[0];
+        return Math.abs(y.pts[1].x - y.pts[0].x);
+        """,
+    )
+    assert got == pytest.approx(yard.length_m * math.sin(math.radians(brace_deg)), abs=0.05)
+
+
+@needs_node
+def test_a_royal_sent_down_is_not_drawn_and_its_yard_lies_on_deck(tmp_path):
+    ship = make_ship(FRIGATE)
+    for sid in ship.groups["plain sail"]:
+        ship.sails[sid].state = SailState.SET
+    assert ship.sails["main.royal"].sent_down  # set flying: on deck until swayed up
+    got = run_js(
+        tmp_path,
+        ship_state(ship),
+        """
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        const ids = sk.figures.filter(f => f.kind === 'sail').map(f => f.id);
+        const y = sk.figures.filter(f => f.id === 'main.royal.yard')[0];
+        const braces = sk.figures.filter(f => f.kind === 'line' && f.of === 'main.royal.yard');
+        return {ids: ids, z: y.pts[0][2], dz: y.pts[1][2] - y.pts[0][2], braces: braces.length};
+        """,
+    )
+    assert "main.royal" not in got["ids"] and "main.topgallant" in got["ids"]
+    assert got["z"] < 3.0 and abs(got["dz"]) < 1e-6  # on deck, fore and aft
+    assert got["braces"] == 0
+
+
+@needs_node
+def test_steels_staysails_are_drawn_from_their_cut(tmp_path):
+    ship = make_ship(FRIGATE)
+    for sid in ("main.topmast_staysail", "main.staysail", "mizzen.staysail"):
+        ship.sails[sid].state = SailState.SET
+    graph = {s["id"]: s for s in queries.ship_graph(ship)["sails"]}
+    assert len(graph["main.topmast_staysail"]["corners_m"]) == 4  # Steel: quadrilateral
+    assert len(graph["mizzen.staysail"]["corners_m"]) == 4
+    assert len(graph["main.staysail"]["corners_m"]) == 3  # Steel: triangular
+    got = run_js(
+        tmp_path,
+        ship_state(ship),
+        """
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        const out = {};
+        sk.figures.filter(f => f.kind === 'sail').forEach(f => {
+          (out[f.id] = out[f.id] || []).push(f.path.length);
+        });
+        return out;
+        """,
+    )
+    # the four-sided sail's outline has a side more than the triangle's (whole or cut at a
+    # mast, its pieces flattened)
+    assert sum(got["main.topmast_staysail"]) >= 5
+    assert got["mizzen.staysail"] and got["main.staysail"]

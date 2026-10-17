@@ -227,7 +227,7 @@ def boom_sails(ship: Ship) -> list[Sail]:
         if sl.is_set
         and (
             (sl.cls == "gaff" and ship.spar_of_role(sl, "boom") is not None)
-            or (sl.cls == "lug" and not sl.dipping)
+            or (sl.cls == "lug" and not sl.dipping and not sl.sheeted_to)
         )
         and ship.sheets_of(sl)
     ]
@@ -4119,6 +4119,7 @@ class LooseToDryScript(PhasedScript):
             for s in self.ship.sails.values()
             if s.state is SailState.FURLED
             and s.cls != "studding"
+            and not s.flying  # package 57: a flying sail sent down is on deck, not aloft
             and not s.wrecked
             and _chain_standing(self.ship, s)
         ]
@@ -4645,8 +4646,33 @@ class LieATryScript(Script):
         out += [sl for sl in ship.sails.values() if sl.id in drivers and sl not in out]
         return out
 
+    def _lying_staysails(self) -> list:
+        """The ship file's `lying-to staysails` (package 57) that are bent, sound and not
+        set: the main staysail of a ship or a brig; none over the storm line, where the
+        storm staysails stand for it (`orders.storm.STORM_CANVAS_KN`; Steel 1794 vol. II:
+        "preferable when it blows strong enough for that sail to support the rolling of the
+        ship")."""
+        from freesail.orders import storm
+
+        ship = self.ship
+        wind = storm.true_wind_kn(ship)
+        if wind is not None and wind >= storm.STORM_CANVAS_KN:
+            return []
+        return [
+            ship.sails[sid]
+            for sid in ship.groups.get("lying-to staysails", [])
+            if sid in ship.sails
+            and not ship.sails[sid].wrecked
+            and ship.sails[sid].state in (SailState.FURLED, SailState.LOOSED, SailState.IN_THE_GEAR)
+        ]
+
     def holds(self) -> set[str]:
-        return {self.ship.name} | {y.id for y in self.yards} | {s.id for s in self._to_hand()}
+        return (
+            {self.ship.name}
+            | {y.id for y in self.yards}
+            | {s.id for s in self._to_hand()}
+            | {s.id for s in self._lying_staysails()}
+        )
 
     def check(self, words: dict[str, Any]) -> str | None:
         if not self.topsails:
@@ -4680,6 +4706,18 @@ class LieATryScript(Script):
         dyn.helm_mode = HelmMode.RUDDER
         dyn.target_rudder = self.sign * units.deg_to_rad(self.timing_value("helm_deg", 5.0))
         dyn.steady = False
+        # package 57: the staysail she lies to under set with them, Steel's main staysail
+        # (1794 vol. II, 'Lying-to under the main staysail': "a mean between the two others
+        # ... the ship will veer under that sail"; "the preferable way is under the fore
+        # staysail, the main staysail, and mizen staysail"), the ship file's `lying-to
+        # staysails`, where it is bent and not set; its sheet aft as the head sails'
+        lying = self._lying_staysails()
+        for sl in lying:
+            sl.state = SailState.SET
+            sl.reefs = 0
+        if lying:
+            sheets_to(self.ship, lying, None, None)
+            self.note(f"Set {_names(self.ship, lying)} to lie to under.")
         # the staysails' sheets hauled aft (package 32e: the sheet holds the trim, and a
         # staysail left at a reaching trim lets her come up inside five points)
         sheets_to(self.ship, head_sails(self.ship), None, None)
@@ -6022,7 +6060,7 @@ class ComeToAnchorScript(_AnchorScript):
                     if sl.is_set and (
                         sl.cls == "square"
                         or sl.cls == "jibheaded"
-                        or (sl.cls == "lug" and sl.dipping)
+                        or (sl.cls == "lug" and (sl.dipping or bool(sl.sheeted_to)))
                     ):
                         sl.state = SailState.IN_THE_GEAR
                         rounded_in.append(sl.id)

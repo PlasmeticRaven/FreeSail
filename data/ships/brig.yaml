@@ -113,25 +113,25 @@ spars:
   height_m: 29.9
   brace_limit_deg: 66
   rating_kn: 2.4
-# main lower mast: 65 ft heel to head (Fincham p. 88: hounded 1.93 x the breadth, the head 0.1933 of that), 53 ft above the deck, stepped 6.9 ft below the water-line (Fincham); raking 4.0 deg (Fincham p. 88: 10 in in 12 ft); stationed 0.147 of the water-line abaft the middle (Fincham pp. 83, 88; Steel 1794: the main two-thirds of the length abaft the stem, the fore three twentieths). Provisional (truth 9), see gen_ships.py. Rating: main.course, main.topsail, main.topgallant, main.royal, main.spanker, main.staysail, main.topmast_staysail, main.topgallant_staysail in 55 kn -> 304.1 kN.
+# main lower mast: 65 ft heel to head (Fincham p. 88: hounded 1.93 x the breadth, the head 0.1933 of that), 53 ft above the deck, stepped 6.9 ft below the water-line (Fincham); raking 4.0 deg (Fincham p. 88: 10 in in 12 ft); stationed 0.147 of the water-line abaft the middle (Fincham pp. 83, 88; Steel 1794: the main two-thirds of the length abaft the stem, the fore three twentieths). Provisional (truth 9), see gen_ships.py. Rating: main.course, main.topsail, main.topgallant, main.royal, main.spanker, main.staysail, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 55 kn -> 436.6 kN.
 - id: main.mast
   class: mast
   x_m: -3.9
   rake_deg: 4.0
   height_m: 16.1
-  rating_kn: 304.1
-# main topmast: 37 ft (Fincham p. 88: the main's hounded 1.13 x the breadth, the fore's 0.945 of the main's, the head 0.1585 of the hounded length), 21 ft of it above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: main.topsail, main.topgallant, main.royal, main.topmast_staysail, main.topgallant_staysail in 40 kn -> 79.6 kN.
+  rating_kn: 436.6
+# main topmast: 37 ft (Fincham p. 88: the main's hounded 1.13 x the breadth, the fore's 0.945 of the main's, the head 0.1585 of the hounded length), 21 ft of it above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: main.topsail, main.topgallant, main.royal, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 40 kn -> 144.8 kN.
 - id: main.topmast
   class: topmast
   steps_on: main.mast
   height_m: 6.5
-  rating_kn: 79.6
-# main topgallant mast: hounded 22 ft, 0.765 x the breadth (Fincham p. 88), 16 ft above the topmast cap. Provisional (truth 9), see gen_ships.py. Rating: main.topgallant, main.royal, main.topgallant_staysail in 25 kn -> 12.1 kN.
+  rating_kn: 144.8
+# main topgallant mast: hounded 22 ft, 0.765 x the breadth (Fincham p. 88), 16 ft above the topmast cap. Provisional (truth 9), see gen_ships.py. Rating: main.topgallant, main.royal, main.topgallant_staysail in 25 kn -> 19.5 kN.
 - id: main.topgallant_mast
   class: topgallant_mast
   steps_on: main.topmast
   height_m: 5.0
-  rating_kn: 12.1
+  rating_kn: 19.5
 # main royal mast: the topgallant mast's pole, 16 ft, 0.75 of its hounded length (Fincham p. 88), on which the royal sets; Steel 1794's brig of 200 tons carries a topgallant-royal mast, so the royals are hers by her date (spec M5 §25). Provisional (truth 9), see gen_ships.py. Rating: main.royal in 20 kn -> 2.4 kN.
 - id: main.royal_mast
   class: royal_mast
@@ -333,6 +333,7 @@ sails:
   yard: fore.royal.yard
   area_m2: 28
   reef_bands: 0
+  flying: true
   x_m: 8.3
   centre_height_m: 29.0
   canvas_no: 8
@@ -373,6 +374,7 @@ sails:
   yard: main.royal.yard
   area_m2: 28
   reef_bands: 0
+  flying: true
   x_m: -6.0
   centre_height_m: 31.2
   canvas_no: 8
@@ -416,33 +418,46 @@ sails:
   centre_height_m: 10.5
   canvas_no: 7
   cloth_rating_kn: 6.6
-# main staysail 40 m2 between the masts (judgement from the stay's run). Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Main staysail' (OCR line 12222; a ship's, 'commonly [bent] in brigs', line 24277): judgement at the main topmast staysail's number, No. 5); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E.
+# main staysail 57 m2, a triangle, square on the foot (Steel 1794 vol. I, Sail-making): leech 11.2 m, foot 10.3 m; its tack at the stay over the boats on the booms (a fifth of the main mast's height above the deck, judgement), its peak before the main top. 'This sail is seldom used in large vessels' (Steel), and lying to under it is 'a mean between the two others' (Steel 1794 vol. II, 'Lying-to under the main staysail'). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Main staysail': 'made of canvas No. 1 to 3', the middle taken); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: main.staysail
   class: jibheaded
   stay: main.stay
-  area_m2: 40
-  x_m: 3.9
-  centre_height_m: 8.0
-  canvas_no: 5
-  cloth_rating_kn: 9.8
-# main topmast staysail 35 m2 between the masts (judgement from the stay's run). Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Main topmast staysail': No. 5 or 6; Kipping 1847 (1898 printing), Sails and Sailmaking: No. 6 in the royal navy); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E.
+  area_m2: 57
+  x_m: -0.0
+  centre_height_m: 8.4
+  canvas_no: 2
+  cloth_rating_kn: 18.2
+  corners_m: [[6.83, 3.22], [-3.45, 14.38], [-3.45, 3.22]]
+# main topmast staysail 113 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 14.1 m, bunt 7.8 m (0.55 of the leech), foot 10.3 m (17 cloths); the leech 4 or 5 yards deeper than the main topsail, a cloth or two more in the foot than the leech's yards (Steel; the mean of each taken), the bunt as the stay leaves it (Steel: two-fifths of the leech), its peak before the main top. Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Main topmast staysail': No. 5 or 6; Kipping 1847 (1898 printing), Sails and Sailmaking: No. 6 in the royal navy); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E.
 - id: main.topmast_staysail
   class: jibheaded
   stay: main.topmast.stay
-  area_m2: 35
-  x_m: 2.9
-  centre_height_m: 14.0
+  area_m2: 113
+  x_m: 1.2
+  centre_height_m: 14.4
   canvas_no: 5
-  cloth_rating_kn: 8.5
-# main topgallant staysail 18 m2 between the masts (judgement from the stay's run). Canvas No. 7 (Steel 1794 vol. I, Sail-making, 'Main topgallant staysail' (OCR line 12782): judgement at the flying jib's number, No. 7, the lightest of her staysails); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E.
+  cloth_rating_kn: 27.6
+  corners_m: [[6.85, 7.26], [6.85, 15.07], [-3.45, 21.36], [-3.45, 7.26]]
+# middle staysail 66 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 10.1 m, bunt 6.5 m (0.64 of the leech), foot 7.9 m (13 cloths); the leech 4 to 7 yards (5.5) deeper than the main topgallant sail, two cloths more in the foot than the leech's yards ('Sloops and brigs in the navy have only from one to three') (Steel), the bunt as the stay leaves it (Steel: five-twelfths of the leech), its peak before the main top. Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Middle staysail': 'No. 6, or 7', the heavier); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
+- id: middle_staysail
+  class: jibheaded
+  stay: middle_staysail.stay
+  area_m2: 66
+  x_m: 0.2
+  centre_height_m: 17.3
+  canvas_no: 6
+  cloth_rating_kn: 15.1
+  corners_m: [[4.45, 11.57], [4.45, 18.07], [-3.45, 21.67], [-3.45, 11.57]]
+# main topgallant staysail 72 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 10.1 m, bunt 5.2 m (0.52 of the leech), foot 9.4 m (15 cloths); the leech nearly the middle staysail's, 4 or 5 cloths more in the foot than the leech's yards (Steel: 3 to 6), the bunt as the stay leaves it (Steel: a third to three-sevenths of the leech), its peak before the topmast cross-trees. Canvas No. 7 (Steel 1794 vol. I, Sail-making, 'Main topgallant staysail': 'canvas No. 7'); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E.
 - id: main.topgallant_staysail
   class: jibheaded
   stay: main.topgallant.stay
-  area_m2: 18
-  x_m: 1.9
-  centre_height_m: 20.0
+  area_m2: 72
+  x_m: -0.1
+  centre_height_m: 22.2
   canvas_no: 7
-  cloth_rating_kn: 3.8
+  cloth_rating_kn: 15.4
+  corners_m: [[5.14, 16.78], [5.14, 22.02], [-4.26, 26.88], [-4.26, 16.78]]
 # fore lower studding sail 38 m2: 0.4 of the yard wide, as deep as the sail beside it (judgement, as the frigate's). Canvas No. 6 (Kipping 1847 (1898 printing), Sails and Sailmaking, 'On Studding-sails': 'Under frigates of the second class to frigates of the sixth class inclusive, the lower and top studding-sails are made of No. 6'; Steel 1794 vol. I, Sail-making, 'Lower Fore Studdingsails': No. 6 or 7); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: fore.lower.studdingsail.starboard
   class: studding
@@ -1231,6 +1246,7 @@ lines:
   class: halyard
   of: main.staysail
   rating_kn: 27.9
+# 3.0 in, to bear its sail: its working load half the cloth's rating (judgement).
 - id: main.staysail.sheet.starboard
   class: sheet
   of: main.staysail
@@ -1248,39 +1264,65 @@ lines:
 - id: main.topmast_staysail.halyard
   class: halyard
   of: main.topmast_staysail
-  rating_kn: 19.4
+  rating_kn: 27.9
+# 3.0 in, to bear its sail: its working load half the cloth's rating (judgement).
 - id: main.topmast_staysail.sheet.starboard
   class: sheet
   of: main.topmast_staysail
   side: starboard
-  rating_kn: 9.7
+  rating_kn: 13.9
 - id: main.topmast_staysail.sheet.larboard
   class: sheet
   of: main.topmast_staysail
   side: larboard
-  rating_kn: 9.7
+  rating_kn: 13.9
 - id: main.topmast_staysail.downhaul
   class: downhaul
   of: main.topmast_staysail
-  rating_kn: 6.2
+  rating_kn: 9.7
+# the middle staysail stay, from the main topmast head to a grommet round the fore topmast under the parral (Steel 1794 vol. I, 'The middle-staysail'), a third of the topmast's hoist above the fore cap (judgement); size judgement.
+- id: middle_staysail.stay
+  class: stay
+  of: main.topmast
+  rating_kn: 13.9
+- id: middle_staysail.halyard
+  class: halyard
+  of: middle_staysail
+  rating_kn: 15.7
+# 2.25 in, to bear its sail: its working load half the cloth's rating (judgement).
+- id: middle_staysail.sheet.starboard
+  class: sheet
+  of: middle_staysail
+  side: starboard
+  rating_kn: 7.8
+- id: middle_staysail.sheet.larboard
+  class: sheet
+  of: middle_staysail
+  side: larboard
+  rating_kn: 7.8
+- id: middle_staysail.downhaul
+  class: downhaul
+  of: middle_staysail
+  rating_kn: 4.7
 - id: main.topgallant_staysail.halyard
   class: halyard
   of: main.topgallant_staysail
-  rating_kn: 12.4
+  rating_kn: 15.7
+# 2.25 in, to bear its sail: its working load half the cloth's rating (judgement).
 - id: main.topgallant_staysail.sheet.starboard
   class: sheet
   of: main.topgallant_staysail
   side: starboard
-  rating_kn: 6.2
+  rating_kn: 7.8
 - id: main.topgallant_staysail.sheet.larboard
   class: sheet
   of: main.topgallant_staysail
   side: larboard
-  rating_kn: 6.2
+  rating_kn: 7.8
 - id: main.topgallant_staysail.downhaul
   class: downhaul
   of: main.topgallant_staysail
-  rating_kn: 3.5
+  rating_kn: 4.7
 - id: fore.lower.studdingsail.starboard.halyard
   class: halyard
   of: fore.lower.studdingsail.starboard
@@ -1510,6 +1552,12 @@ groups:
   - fore.topmast_staysail
   - main.staysail
   - main.topmast_staysail
+  - middle_staysail
+  - main.topgallant_staysail
+  staysails between the masts:
+  - main.staysail
+  - main.topmast_staysail
+  - middle_staysail
   - main.topgallant_staysail
   studdingsails:
   - fore.lower.studdingsail.starboard
@@ -1537,12 +1585,14 @@ groups:
   - flying_jib
   - main.staysail
   - main.topmast_staysail
+  - middle_staysail
   - main.topgallant_staysail
   - main.spanker
   light sails:
   - fore.royal
   - main.royal
   - flying_jib
+  - middle_staysail
   - main.topgallant_staysail
   - fore.lower.studdingsail.starboard
   - fore.lower.studdingsail.larboard
@@ -1554,6 +1604,8 @@ groups:
   - main.topmast.studdingsail.larboard
   - main.topgallant.studdingsail.starboard
   - main.topgallant.studdingsail.larboard
+  lying-to staysails:
+  - main.staysail
   plain sail:
   - fore.course
   - main.course
@@ -1578,6 +1630,7 @@ groups:
   - flying_jib
   - main.staysail
   - main.topmast_staysail
+  - middle_staysail
   - main.topgallant_staysail
   - main.spanker
   - fore.lower.studdingsail.starboard
@@ -1717,7 +1770,6 @@ aliases:
   fore topmast staysail: fore.topmast_staysail
   main staysail: main.staysail
   main topmast staysail: main.topmast_staysail
-  middle staysail: main.topmast_staysail
   main topgallant staysail: main.topgallant_staysail
   stuns'ls: studdingsails
   studding sails: studdingsails

@@ -374,7 +374,8 @@ def test_a_sounding_moves_the_account_onto_the_charts_contour_consistent_with_th
     # line six miles and a tenth at this seed)
     assert cast.data["how"] == K.WEIGHED and 1.0 < cast.data["line_sigma_nm"] < 7.0
     assert "; fine grey sand with black specks. The account moved " in cast.text
-    assert " to the SE" in cast.text or " to the SSE" in cast.text  # toward the deep water
+    # toward the deep water (package 57: to the S by E under her new rig aloft)
+    assert any(f" to the {w}" in cast.text for w in ("SE", "SSE", "S by E"))
     shoal = w.chart.depth_at(Position(50.0, -5.10))
     assert abs(depth_at_account - cast_on_the_chart) < 0.5 * abs(shoal - cast_on_the_chart)
     # within nine fathoms of the truth: the lead's error and the master's allowance for
@@ -1674,8 +1675,10 @@ def test_hove_to_the_master_reckons_her_drift_and_the_run_since_noon_takes_it():
     reckoned = miles_between(account, nav.account_now())
     assert drifted > 3.0 and 0.6 * drifted < reckoned < 1.4 * drifted
     # a third of her drift (1.68 miles of 5.0 since package 37j: the account worked at the
-    # heave-to itself, where the setting of it by hand left the board begun before)
-    assert error_nm(w) < drifted / 2.8
+    # heave-to itself, where the setting of it by hand left the board begun before; 1.82 of
+    # 5.0 since package 57, the brig's drift under Steel's staysails stowed and her royals
+    # sent down)
+    assert error_nm(w) < drifted / 2.6
     run, course = nav.since_noon_reading()
     assert run == pytest.approx(nav.reckoning.run_since_noon_nm + nav._run_since_step_nm())
     assert run > 0.6 * drifted and course is not None
