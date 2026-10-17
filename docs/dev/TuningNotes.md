@@ -5959,3 +5959,98 @@ ran once at the end (below).
   station is not offered the director's two: that test mended.
 - The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`), on the
   quiet machine after the slow tier: 6 passed in 151 s.
+
+## Package 52: the director's voice (2026-10-17)
+
+Package 52 (spec M7b §8, §9, §10 and §15 as built; decisions 43, 46 and 50; the brief in
+`docs/dev/M7b-WorkPackages.md`). People made from words and moved, `say as` a person nobody
+holds, the rule of reach, the asked unseated person answered by the director, the word heard
+a word on deck, and a station below the captain's told who commands; proven against the fake
+director given a voice (`fake.director_above_the_game(..., answers=)`) in
+`tests/test_director.py`, `test_world_orders.py`, `test_people.py`, `test_captain.py` and
+truths 7b-95 to 7b-97 (`tests/test_known_truths.py`). No model was seated.
+
+### The constants, with their reasons
+
+| Constant | Value | Why |
+|---|---|---|
+| `orders.BOAT_REACH_NM` | 6 miles | a shore boat or the pilot's comes off to a ship lying off the port, and the pilots board at their stations some miles out (Falmouth's within two of the town, Bertheaume's eight from Brest); a person moved farther is doubted |
+| `orders.MADE_SKILL` | 0.7 | the old form's (`person: ... skill`) where the words say none |
+| a made person's place where none is said | the cabin, or his trade's | a supernumerary's berth is aft; the cook's is the galley |
+| `people.TRADE_PLACES` | the cook the galley, the cooper the hold, the stewards, servants and surgeon's mates the gunroom, the clerk the cabin, the sailmaker's crew the sail room, any other trade the deck | where the trade's work is |
+| `places.OPEN_DECK` (earshot) | the quarterdeck, the deck, the galley | the upper deck open fore and aft, the galley under the forecastle open to the waist; below and aloft each place hears itself (the masthead's hail carries by its own rule, as before) |
+| `director.QUESTION_BOUND_S`, `harness.PERSON_ANSWER_BOUND_S` | a glass | the spec's bound: the asker's stand-by wakes at the answer or after a glass |
+| an answer's cost | no act | words in answer to a question are the ship's life, not the director's shaping of the voyage; a word unasked costs an act like any order, so a chatty director spends its day |
+| `person.spoke`'s severity | notable | a person's words are the story's, as a station's word on deck with authority is |
+
+### What the doubt caught in a fake director's day
+
+The frigate at seed 7 off the Lizard (42 miles from Falmouth, 76 from Brest) under the
+climatology, the fake captain and a fake officer of the watch seated beside the fake director
+on the quiet passage (its acts raised to fourteen), everything sampled every glass in lockstep,
+a day of the ship's time (140 s on the build machine; the run script in the session's
+scratchpad, `voice_day.py`). The director's twelve orders, one a sample, a doubted one entered
+again with the fake's reason, and the officer asking the cook and then the boatswain:
+
+| The order | What the game did |
+|---|---|
+| `person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Falmouth, who knew the captain's father` | given, never doubted: "Mr Fox, Guernsey pilot, sixty years of age, who knew the captain's father" |
+| `person: "Mr Fox" comes aboard as master` | doubted (42 miles from Falmouth: no boat brings a man off so far); entered again: "Mr Fox came aboard from Falmouth." and the master's station bound to him |
+| `person: make "Mr Gill", a merchant of Bristol, aboard in the cabin, aged forty-five` | given: "merchant of Bristol, forty-five years of age", in the cabin |
+| `say as the cook: "The beef is three years in the cask, sir."` | given: the cook drawn from the muster (Mr Squire), his words in the galley, heard by the captain and the officer on the quarterdeck |
+| `say as the captain: "Make it so."` | refused by the rule of reach (the captain held by a model) |
+| `say as Mr Pearce: "All well forward, sir."` | refused by the rule of reach (the officer held by a model) |
+| `say as Mr Fox: "I knew your father, sir."` | given, on the quarterdeck |
+| `person: "Mr Gill" goes ashore` | doubted (the nearest port 42 miles off); entered again: ashore at Falmouth |
+| `person: "Mr Fox" leaves the ship at Brest` | doubted (76 miles); entered again: ashore at Brest (the master's station then unbound; mended since, below) |
+| `say as the harbourmaster of Falmouth: "The packet is in."` | no way as said (nobody of that name: make him first); entered again, logged as attempted |
+| `person: "Mr Fox" comes aboard as officer of the watch` | refused by the rule of reach (the station held by a model) |
+| `say as the carpenter: "Two feet in the well, sir, and holding."` | given, on the deck |
+| the officer's `ask the cook what is for dinner`, then `ask the boatswain how the boats are` | each put to the director at 10:30 (`director.asked`) and answered by it the same minute as the man ("Pease and pork, sir."; the boatswain the fake's "Aye, sir."), no act counted; the answers back to the officer as words |
+
+The day's director's log: 7 orders given, 3 doubted and 3 entered again, 3 refused (every one
+by the rule of reach; the brief refused nothing), 1 unperformed and 1 attempted, 2 questions
+put to it, 32 thoughts, the budget renewed at midnight; 453 lines of play log and 49 for the
+record only; the captain's samples with no word of the director or an order in them. What it
+says of the forms: the doubt by a boat's reach caught every move made from the open sea, as
+meant, and nothing else; the rule of reach is the one refusal a director meets beside the
+brief, and the three it met name the stations held, so a model told once knows whom it may
+speak as.
+
+### Found on the way
+
+- `say as the carpenter: ...` was package 50's example of an order beyond the forms (truth
+  7b-92's directed day and `test_director.py`'s unperformable orders); the voice performs it
+  now, so both take a stranger never made in its place (`say as the harbourmaster of
+  Falmouth`), unperformed and attempted as before, and the directed day's play log is as it
+  was.
+- A person leaving the ship unbound his station outright, so that Mr Fox, brought aboard as
+  master and put ashore, took the master's station off the ship with him: his station now goes
+  back to the wardroom file's holder where that is another man and aboard (the master's to Mr
+  Harvey), and is unbound only where he was that man (the second officer's, Mr Pascoe's).
+- A load handed over at a tick before the save's end (`load_report(until_tick=)`) gave back
+  the save's bindings as they stood at its end: a binding a later `person:` order made would
+  have named a person who was nobody yet. The save's bindings are given back only when it
+  was replayed to its end (the replay makes them from their inputs since package 42, and from
+  the world orders since this one).
+- The people's state "at the gangway, waiting for his boat" was said of anyone whose role is
+  pilot while the port's pilot waited; a pilot by trade made from words is not the port's
+  pilot, so it is said of the port's pilot alone. A pilot by trade with a port is still listed
+  "pilot of <port>" in `the people`, which is true of him and left.
+- `People.find` finds a person by a role the people's table does not name ('the cook', 'the
+  supercargo', a made person's role) after every name, so that nothing it found before is
+  found otherwise.
+- The director's station brief says "the library's grammar topic lists every form"; the
+  grammar topic does not hold the world orders (it never did). The `world_order` tool's
+  description no longer says so; the brief's fixed sentence is left for the lead.
+
+### Pins moved
+
+None. No recorded passage has a director or a `person:` or `say as` order; the cook is drawn
+only when the voice reaches him; the word heard adds nothing to any line's data and the
+standing orders' event is unchanged; the session kind is not written to the log. The slow
+tier whole ran once at the end (below), every pinned passage's digest with it.
+
+### The suite, as run
+
+SUITE_RESULTS

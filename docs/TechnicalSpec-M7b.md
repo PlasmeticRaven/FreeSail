@@ -326,6 +326,43 @@ master`, M6 §11's outline), may be ashore at a port, and is saved and replayed.
 "Mr Fox" goes ashore`, `... leaves the ship at <port>`. The director's chief tool for the
 story; the player's too, at the console, for scenarios.
 
+**As built (package 52, 2026-10-17; `freesail/world/orders.py`, `people.py`, `places.py`;
+`tests/test_people.py`, `test_world_orders.py`, `test_director.py`; truth 7b-95).**
+`person: make "<name>"` and, after commas in any order, what the words say of him: who he
+is (`a Guernsey pilot`, an age at its end, `of sixty`), an age (`aged forty-five`, `sixty
+years old`), a place aboard (`aboard in the cabin`, `in the gunroom`) or ashore (`ashore at
+Brest`, `at Brest`), and any other words as his line of history. The role is the people's
+table's word at the end of who he is (`pilot`, `master's mate`), else its last word, or
+none; who he is as said is his rank (`Guernsey pilot`, `merchant of Bristol`); the outline
+keeps the age and the words he was made from (`Outline.age`, `Outline.said`) and says him
+in one sentence ("Mr Fox, Guernsey pilot, sixty years of age, who knew the captain's
+father."), which is what a model bound to him reads in its brief. With no place said he is
+aboard, in the cabin (his trade's place for a cook or a cooper); ashore with no port, at
+the nearest. He is among the world's people from then on (`the people`, `where is`, `find`
+by his name and, after every name, by his role). The moves: `person: "Mr Fox" comes
+aboard [as <station>]` (from his port to the quarterdeck, a notable `person.aboard` line;
+a station of that name or kind bound to him, quietly within the order so that the replay
+binds it again, with its own `station.bound` line; `as <a role no station has>` bears him
+in that role and binds nothing), `person: "Mr Fox" goes ashore` (at the nearest port) and
+`person: "Mr Fox" leaves the ship at <port>` (a notable `person.ashore` line; a station
+bound to him goes back to the wardroom file's holder where he is another and aboard, the
+master's to Mr Harvey, and is unbound else). The man who keeps the reckoning and the one
+who commands are not put ashore (the player ashore is §14's). **The doubt** (decision 50):
+a move where no boat could carry him, beyond `BOAT_REACH_NM` (six miles, judgement: a
+shore boat or a pilot's comes off to a ship lying off the port) of his port or the one
+named; a person made and a word said are never doubted (a supernumerary the story names,
+and a man's words, want no cause of the sea's). The old forms (`person: <role> "<name>"
+aboard in the <place>`, `... ashore at <port>`) stand as they were. Saved and replayed as
+the world order that made him (the input, or the director's act), the binding with it; a
+load gives the save's bindings back only when the save was replayed to its end, since a
+person made after the tick handed over at is nobody yet. **A man of the muster by his
+trade** (the cook, the cooper, a steward: an idler the named few do not hold) is found by
+his trade when the voice reaches him (`People.of_the_company`) and drawn from the muster
+under his own name at his trade's place (`TRADE_PLACES`: the cook in the galley, the
+cooper in the hold), one of the people from then on; nothing draws him otherwise, so a
+world in which nobody speaks as him or asks him is as it was. **The galley** is a place
+now (under the forecastle, open to the waist), listed after the hold.
+
 ### 9. Speaking as the world (`orders.py` `say as`; `harness.py`)
 
 `say as <person>: <words>` puts words in a person's mouth: a person of the ship's company
@@ -337,6 +374,59 @@ whose words are its own. `ask the <role>` and `tell the <role>` to an unseated p
 sample for the director when one is seated (the rules answer as now when none is), with a
 bound (the asker's stand-by wakes at the answer or after a glass).
 
+**As built (package 52; `orders.py` `say as`, `reach`; `director.py` `ask_unheld`,
+`answer_questions`; `orders/stations.py`; `harness.py`; truths 7b-96, 7b-97).** `say as
+<person>: <his words>` is the `say` channel's (a bare `say <words>` is the deck's
+conversation still): the person is one of the people or a man of the muster by his trade
+(§8); his words, quotes peeled, are a notable `person.spoke` line of the play log in his
+name where he is ("Mr Squire, the cook, in the galley: Pease and pork, sir."), never the
+order, heard by the stations held within earshot (`places.earshot`: the quarterdeck, the
+deck and the galley open to one another, every other place alone), each told in its next
+sample under `heard`, and journaled as his (`journal.person_journal`, `person.said`: his
+journal by his name, the same object the station bound to him reads back, package 45c). A
+person ashore is heard aboard only while the ship lies within a boat's reach of his port;
+farther, and for a stranger never made, the game has no way to do it as said, and says
+how (a letter, or make him first). **The rule of reach** (`orders.reach`): nobody speaks
+as, moves, or binds another to the station of, a person a model or the player holds (a
+harness, the player's seat, the captain by the player at the prompt while no model holds
+it and he is seated nowhere else: `held_stations`). It holds whoever gives the order (the
+channel refuses it in `apply`), and at the director's door it is a refusal before the
+brief's limits, in the director's log as `director.refused`, its words naming the stations
+held ("the stations held now: the officer of the watch (Mr Pearce, a model); the captain
+(Captain Bowen, the player at the prompt)"); the truth reads them too. Moving a held
+person and binding a held station are read as within the rule (the holder's person is
+his to move), the lead's to confirm. **The asked unseated person**: with a director seated
+(a model's harness or the player's seat), `ask` and `tell` put to a person nobody holds (a
+station unheld bound to him: `ask the first lieutenant ...` with nobody at the officer's;
+or a person no station is bound to: `ask the cook ...`, `tell Mr Fox ...`) are said where
+they were said ("The officer of the watch (Mr Pearce), on the quarterdeck, asks Mr Squire,
+the cook (in the galley): what is for dinner?"), journaled in his journal and the
+director's log (`director.asked`), and put to the director as a word in its next sample,
+waking its stand-by, with whom it was put by and until when it waits. Its answer as him
+(`say as`) costs none of the day's acts and goes back to the asking station as a word
+under his name (`harness.deliver_answer`), ending its wait and waking its stand-by; with
+no answer in a glass (`QUESTION_BOUND_S`) the asker is told so by a word, which wakes it
+too. A word told an unheld station is kept in its journal as before and the director told
+besides. With no director seated, everything is as it was: `ask the cook` is refused in
+the words it always was, and no man is drawn. The stations whose rules answer keep them
+whoever is above (the masthead's sight, package 45c; the master's reckoning, the reading
+form): the facts are the game's and the lead's reading is that the player should not wait
+a glass on a model for what the game knows. `ask the director`, `tell the director` and
+`show the director's journal` stay refused: a word to it from the prompt would want the
+order's accepted line kept from the play log, which is `World.submit`'s and beyond this
+package; the player's word reaches it by the brief (`director: brief ...`).
+
+**The truth of who commands** (42b's leftover; `agent.commander_of`, `under_whom`). A
+station below the captain's is told in its session kind who commands: "a play session with
+a human captain at the prompt" (and, where the rules-based captain sails her by his
+intent, "...; the game's rules-based captain sails her by his book under him until he
+takes her in hand"); "a play session for its own sake, with no human captain over you; a
+model holds the captain's station and commands the ship"; or "...; the game's rules-based
+captain commands the ship by his book" (the player seated elsewhere, or the ship
+another's). The kinds before the semicolon are the consent brief's, unchanged. The desk
+tells it at the seating (`session_kind_of(..., world=)`), and the station's next sample
+says so once when it changes ("Who commands has changed: this session is now ...").
+
 ### 10. Truths for 7b-ii
 
 - 95. A person made from words is on the muster of the ship he joins, holds the station
@@ -344,6 +434,21 @@ bound (the asker's stand-by wakes at the answer or after a glass).
 - 96. A question to the cook, with a director seated, is answered in the cook's words at
   the galley and heard by those within earshot; with none, by the rules as before.
 - 97. `say as` a held station is refused.
+
+**As built (package 52; `tests/test_known_truths.py`, truths 7b-95 to 7b-97).** The frigate
+at seed 7 off the Lizard under the climatology's weather, two hours with the fake director
+on the quiet-passage brief giving its voice (`fake.director_above_the_game(..., answers=)`)
+and a fake officer of the watch who asks the cook. 7b-95: Mr Fox made at Falmouth, brought
+aboard as master (doubted, forty-two miles off, and entered again with the reason), among
+the people, the master's station his (a model seated there is in his place, his outline
+in its brief), his own words said on the quarterdeck; the save replayed by the transcript
+and by the acts to the same digest, Fox and his binding the same. 7b-96: the officer's
+question to the cook, the director's sample carrying it, the cook's answer at the galley
+heard by the officer and returned to him as a word within the glass, no act counted; with
+no director seated, the refusal word for word as in a world with no brief. 7b-97: the
+captain's and the officer's mouths refused by the rule of reach in the director's log, no
+word said in either name, never an order on the channel. No recorded passage's pin moved:
+none has a director or a `person:` order, and a world with neither is as it was.
 
 ## Part 7b-iii: The observed world
 
@@ -457,6 +562,17 @@ Locational knowledge (a station's log carrying only what its person could hear f
 he is) is dropped as an overcomplication for now (the owner, 2026-10-16). Every station
 reads the log as it does today. One small thing stays from the owner's note 15: a word
 said between people and heard by another counts as "a word on deck" for the stand-bys.
+
+**As built (package 52; `harness.Harness._heard_between`; `tests/test_director.py`).** A
+stand-by until "a word on deck" ends, as before, at a `say` (`agent.spoke`), and now also
+at a word said between people that the station heard: a word told (`agent.told`), a
+question (`agent.asked`), an answer (`agent.said`) or a person's words (`person.spoke`),
+said by another and not to the station itself (whose own word wakes it as a word), within
+earshot of where the station is (the speaker's place by `place_of`, the captain's for the
+player at the prompt; `places.earshot`) or named among its hearers. The captain's word to
+the master on the quarterdeck wakes the officer standing by there; the same word from the
+cabin does not. The standing orders' event of the same words is unchanged (it reads the
+log's kind alone), and nothing is added to any line's data, so no pin moves.
 
 ### 16. Books drafted (`freesail/agents/tools.py`; `data/papers/`)
 
