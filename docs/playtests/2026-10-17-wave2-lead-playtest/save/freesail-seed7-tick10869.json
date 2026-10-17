@@ -1,0 +1,1717 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6c",
+    "rules": "5293a955c88b35a1"
+  },
+  "builds": [
+    {
+      "name": "m6c",
+      "rules": "5293a955c88b35a1"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "A chasse-mar\u00e9e out of Roscoff",
+    "start_time": "1805-06-12T05:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 270.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 48.7356,
+    "position": {
+      "lat_deg": 48.7356,
+      "lon_deg": -4.016
+    },
+    "region": "channel-west",
+    "chart": null,
+    "weather": [],
+    "systems": [],
+    "climatology": true,
+    "background": {},
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": null,
+    "instrument": "octant",
+    "current": null,
+    "sky": null,
+    "chronometer": null,
+    "epitome": "moore",
+    "nation": "france",
+    "people": [
+      {
+        "role": "master",
+        "skill": 0.8
+      }
+    ],
+    "papers": {
+      "chart": {
+        "year": 1804
+      },
+      "almanac": 1805,
+      "price_lists": [
+        "roscoff"
+      ]
+    },
+    "cargo": {
+      "purse_pounds": 60.0,
+      "goods": {}
+    },
+    "ports": [
+      "roscoff",
+      "morlaix",
+      "brest",
+      "st-malo",
+      "falmouth"
+    ],
+    "ships": [],
+    "world_orders": [],
+    "intent": "",
+    "books": [],
+    "director": {},
+    "business": "on"
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/lugger.yaml"
+  },
+  "end_tick": 10869,
+  "journal": [
+    [
+      0,
+      "captain",
+      "let go the best bower"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "let go the best bower"
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book of standing orders is empty. Begin with none, give your own, or load the starter book: read the standing orders from data/standing_orders/starter.orders (the primer's chapter 11, 'The starting book', gives each routine with its reason).",
+        "data": {}
+      }
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "time 60"
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "out east",
+      "text": "standing order \"out east\" by the captain: at the anchor aweigh then steer E",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 980,
+      "given_tick": 0
+    }
+  ],
+  "agents": [
+    {
+      "station": {
+        "name": "officer of the watch",
+        "authority": "officer, levels 0 to 2",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 3600,
+        "brief": "You are the officer of the watch, in the place of Mr Lecoq. You have what the captain has, the log and the readings, and no more. Without the deck you are off watch: you read, speak, answer the captain and keep your journal as the watcher does. With it you keep the ship as the captain's night orders say: his standing orders stand, the book holds them, and your own orders are given with submit_order in the order language, as he would type them; the log says each as yours ('By the officer of the watch: taking in the royals'). What is yours to order, what wants the captain's word and what you may do on your own word to avoid a danger are stated above; the sample that gives you the deck says again what his word allows. A standing order you give carries your own rank and never the captain's, and where it crosses his the captain's stands and the log says yours was countermanded. Look before you order: among the readings, work_in_hand says what is doing and what waits for hands, and nearest_land where the shore lies. The library's primer 16 is this station's chapter. Primer 18 is the lessons, each a duty an officer must be able to do alone (a landfall on one headland, a pilotage by cross bearings, a night off a lee shore) and the path to a command, among them your own reckoning, which you keep with the deck or off watch: 'work my reckoning' gives you the master's slate, and 'my reckoning is <position>' gives him yours.\n\nWhen you stand by with the deck, say until what event or bell, or for a glass at most: the standing orders hold the deck meanwhile; an urgent line wakes you at once, and so does a notable line that speaks of danger (an anchor dragging, fog coming down, land or a sail closing, a spar or a line straining, an evolution failed, the ship taken aback); a wait for something that cannot come is refused when you ask it, and a wait for an event ends at the next eight bells.\n\nWhat the harness counts at this station, judged by the game and not by your prose: three orders in a chain within a watch, each undoing the one before it (set, take in, set; altering the course, or giving the next order after the last, is not counted); the same order three times with no change in the readings; three empty replies in a row when a question from the captain or an urgent line was before you; and no reply at all for an hour of the ship's time. It tells you first what it saw and what you may do, with the result of the order that brought it or in your next sample; only if the pattern goes on does it pause your turns and ask the captain, and only if nobody answers within ten real minutes is the station stood down, with the game saved. A deck is not kept in silence: when you have given no reply for your hour and have been told so, the deck goes to the captain until he gives it again; and while your turns are paused the deck is his, and yours again, as you held it, when he resumes you. Three orders in a watch on your own word to avoid a danger bring a word from the harness and no more.\n\nThe captain may ask you a question (answer it with the answer tool, plainly, from the readings and the log) or tell you something; call him with a word in the log when a thing is his to decide, as a lieutenant of 1806 informed the captain of every strange sail and every shift of wind; what you say is notable in the log, with the deck or without. When the harness asks for it, and when you give the deck back (hand_over) or stand down (stand_down), write the handover note in the officer's voice: what happened, what was ordered, what you noticed, what you are watching for; it is journaled and said in the log, and whoever takes the deck or the station next reads it. read_journal reads your journal back, and what the holder of this station before you wrote there; whoever holds it after you may read yours.\n\nThree ways to stop, which are not one another:\n- Give the deck back and stay: hand_over(note), or the captain's 'I have the deck'. You stay at your station, off watch, and he may give you the deck again.\n- Stand down: stand_down(note). The game is saved, your note is journaled and said in the log for whoever sits here next, and the station is released; it may be taken again, by this model or by another that has given its own yes, and the log says when and by whom.\n- Withdraw: the token, or opt_out, as said above.\n\nThe captain over you may be the player at the prompt or a model at the captain's station; his sentences (the deck, what you may do, his word and his questions) reach you by the same words either way, and the owner's reach you as the owner's.\n\nCandour is welcome: if you think an order or the ship's handling is a mistake (too much sail for the strain, a lee shore closing), say so plainly. Anything you want on the record, put in your journal.",
+        "domain": "officer",
+        "person": "Mr Lecoq",
+        "rank": "mate",
+        "drill": true,
+        "outline": "Mr Lecoq, mate: steady, careful of the weather, a Morbihan man. A fisherman of the Morbihan before the war. His station, the mate's: The deck in his watch under the master's standing orders, the lugs, the sheets and the lead."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "the bridge's own client driven by hand, call by call, from the lead's Claude Code session in its container, over a tunnel to the owner's game Consent for these weights is on record (/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-50d6-9285-0413fe7ccd0b/scratchpad/play/consent/2026-10-17-claude-fable-5.1.md, 2026-10-17).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 1,
+      "stationed_after_inputs": 2,
+      "state": "released",
+      "state_words": "released: stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest",
+      "last_sample_tick": 0,
+      "model_name": "Claude Fable 5.1",
+      "door": "mcp",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 1,
+          "after_inputs": 2,
+          "door": "stand_down",
+          "reason": "the lead takes the captain's station instead for the wave's playtest",
+          "by": "the MCP bridge"
+        }
+      ],
+      "deck": false,
+      "seatings": 1,
+      "budget_tokens": null,
+      "first_model_name": "Claude Fable 5.1",
+      "first_door": "mcp",
+      "reserve_tokens": null,
+      "acts": true
+    },
+    {
+      "station": {
+        "name": "captain",
+        "authority": "captain",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 3600,
+        "brief": "You are the captain, in the place of Mr Herv\u00e9. The ship is yours to command as the player commands her: by direct orders with submit_order in the order language, as he would type them (the log says each as yours: 'By the captain: shaping a course for the Lizard'), and by standing orders, which are your book. The book you inherit is in the head above as the night orders are shown to an officer: the scenario's standing orders, and where the scenario gave the rules-based captain an intent, the books of his state (named for the state: 'on passage', 'at anchor'), which you may belay, strike or write over. When you stand by, say until what event or bell, or for a glass at most: the book holds the deck meanwhile, an urgent line wakes you at once, and so does a notable line that speaks of danger; a wait that cannot come is refused when you ask it, and a wait for an event ends at the next eight bells. Your door silent past its patience, the deck is lent to your book and the rules-based captain's judgements stand in for yours, said in the log, until you give an order again. Look before you order: the readings, the chart's dangers on a course shaped (the master says what the line passes), the pilot's words, the tide by the almanac, the people and where they are. The library's primer 17 is this station's chapter, and primer 16 says what an officer under you may do and what wants your word. Primer 18 is the lessons, the duties an officer must do alone before he is given a command, with the officer's own reckoning among them: 'the officer's reckoning' reads his beside the master's, and 'set the reckoning to' adopts it if you will.\n\nThe officer of the watch, where a model or the player holds that station, is yours to give the deck to ('you have the deck'), to take it from ('I have the deck'), and to allow by name ('you may tack ship if the land closes within two miles') or by your general authority ('you may work the ship'), exactly as the player does; 'tell the officer ...' and 'ask the officer ...' reach him as your word. The owner is always at the door: whatever station he holds or none, the stop, the grants, the save and the clock are his, his words reach you as the owner's and never as another station's, and where things have gone wrong past remedy the responsibility is his. 'stand down the captain' is his to say.\n\nWhat the harness counts at this station, judged by the game and not by your prose: three orders in a chain within a watch, each undoing the one before it (set, take in, set; altering the course, or giving the next order after the last, is not counted); the same order three times with no change in the readings; three empty replies in a row when a question from the owner or an urgent line was before you; and no reply at all for an hour of the ship's time. It tells you first what it saw and what you may do, with the result of the order that brought it or in your next sample; only if the pattern goes on does it pause your turns and ask the owner, and only if nobody answers within ten real minutes is the station stood down, with the game saved. While your turns are paused the deck is your book's, and yours again when the owner resumes you.\n\nWhen the harness asks for it, and when you stand down (stand_down), write the handover note in the captain's voice: the voyage so far, what was ordered, what you noticed, what you are watching for; it is journaled and said in the log, and whoever takes the station next reads it. hand_over(note) lends the deck to your book with your note and keeps you at the station: the next order you give takes it back. read_journal reads your journal back, and what the holder of this station before you wrote there.\n\nThree ways to stop, which are not one another:\n- Lend the deck to your book and stay: hand_over(note). You stay at your station; an order of yours takes the deck back.\n- Stand down: stand_down(note). The game is saved, your note is journaled and said in the log for whoever sits here next, and the station is released; the ship sails on by her book and the rules-based captain where the scenario gives him an intent. It may be taken again, by this model or by another that has given its own yes.\n- Withdraw: the token, or opt_out, as said above.\n\nCandour is welcome: if you think the voyage's orders or the ship's handling are a mistake, say so plainly in the log or your journal. Anything you want on the record, put in your journal.",
+        "domain": "captain",
+        "person": "Mr Herv\u00e9",
+        "rank": "captain",
+        "drill": true,
+        "outline": "Mr Herv\u00e9, master: quick, proud of his lugs, never reefs while the sails will stand. Born at Saint-Malo; master of chasse-mar\u00e9es in the coasting trade since the peace of 1783. His station, the command: The lugger, her people and her business are his: the course, the lugs dipped or shifted for the taille-vent, the port's dealing."
+      },
+      "session_kind": "a play session for its own sake, with no human captain over you",
+      "door_note": "the lead's client by hand, a local game for the wave's playtest Consent for these weights is on record (/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-50d6-9285-0413fe7ccd0b/scratchpad/play/consent/2026-10-17-claude-fable-5.1.md, 2026-10-17).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 1,
+      "stationed_after_inputs": 2,
+      "state": "released",
+      "state_words": "released: stood down by the captain: its own word",
+      "last_sample_tick": 10800,
+      "model_name": "Claude Fable 5.1",
+      "door": "mcp",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "how am I"
+                }
+              },
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "the stores"
+                }
+              },
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "standing order \"out east\": at the anchor aweigh then steer E"
+                }
+              },
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "get under way"
+                }
+              },
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "under way"
+                }
+              }
+            ],
+            "raw": "> submit_order text=\"how am I\"\n> submit_order text=\"the stores\"\n> submit_order text=\"standing order \\\"out east\\\": at the anchor aweigh then steer E\"\n> submit_order text=\"get under way\"\n> stand_by until=\"under way\"\n"
+          }
+        },
+        {
+          "tick": 1457,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "steer E",
+                  "danger": "her head fallen off to S toward the point with the Isle Verte closing; bringing her up east for the channel"
+                }
+              },
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "set the lugs"
+                }
+              },
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "set the topsails"
+                }
+              },
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "trim the sails"
+                }
+              },
+              {
+                "name": "journal",
+                "args": {
+                  "note": "Wave-2 playtest as captain of the Eclair, local game: 54's 'how am I' and 'the stores' answer in words; 57's topsails read 'sent down' at the start. Weighed at 05:16; her head fell off S again as in the owner's cruise (the standing order steers E only at the aweigh, before she has way)."
+                }
+              },
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "steady on the course"
+                }
+              }
+            ],
+            "raw": "> submit_order text=\"steer E\" danger=\"her head fallen off to S toward the point with the Isle Verte closing; bringing her up east for the channel\"\n> submit_order text=\"set the lugs\"\n> submit_order text=\"set the topsails\"\n> submit_order text=\"trim the sails\"\n> journal note=\"Wave-2 playtest as captain of the Eclair, local game: 54's 'how am I' and 'the stores' answer in words; 57's topsails read 'sent down' at the start. Weighed at 05:16; her head fell off S again as in the owner's cruise (the standing order steers E only at the aweigh, before she has way).\"\n> stand_by until=\"steady on the course\"\n"
+          }
+        },
+        {
+          "tick": 1517,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "> stand_by until=\"a glass\"\n"
+          }
+        },
+        {
+          "tick": 1695,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "steer E by N"
+                }
+              },
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a glass"
+                }
+              }
+            ],
+            "raw": "> submit_order text=\"steer E by N\"\n> stand_by until=\"a glass\"\n"
+          }
+        },
+        {
+          "tick": 3508,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "ship_view",
+                "args": {
+                  "facing": 270
+                }
+              },
+              {
+                "name": "ship_view",
+                "args": {
+                  "facing": 0
+                }
+              },
+              {
+                "name": "ship_view",
+                "args": {
+                  "facing": 90
+                }
+              }
+            ],
+            "raw": "> ship_view facing=\"270\"\n> ship_view facing=\"0\"\n> ship_view facing=\"90\"\n"
+          },
+          "shown": [
+            {
+              "id": "47d5c224a917e64f",
+              "view": "ship",
+              "facing": "the larboard beam",
+              "media_type": "image/png",
+              "bytes": 79015,
+              "width": 960,
+              "height": 720,
+              "stamp": "Morning watch (05:58)"
+            },
+            {
+              "id": "3697528844fa16cb",
+              "view": "ship",
+              "facing": "abeam to leeward",
+              "media_type": "image/png",
+              "bytes": 77714,
+              "width": 960,
+              "height": 720,
+              "stamp": "Morning watch (05:58)"
+            },
+            {
+              "id": "7aea5822129026cc",
+              "view": "ship",
+              "facing": "the starboard beam",
+              "media_type": "image/png",
+              "bytes": 78807,
+              "width": 960,
+              "height": 720,
+              "stamp": "Morning watch (05:58)"
+            }
+          ]
+        },
+        {
+          "tick": 3531,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 1",
+                  "note": "lee beam, running: the lugs squared out and edge-on, the lug topsails above them"
+                }
+              },
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 2"
+                }
+              },
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 3"
+                }
+              },
+              {
+                "name": "ship_view",
+                "args": {
+                  "facing": "right ahead"
+                }
+              },
+              {
+                "name": "ship_view",
+                "args": {
+                  "facing": 225
+                }
+              }
+            ],
+            "raw": "> shelve book=\"book 1\" note=\"lee beam, running: the lugs squared out and edge-on, the lug topsails above them\"\n> shelve book=\"book 2\"\n> shelve book=\"book 3\"\n> ship_view facing=\"right ahead\"\n> ship_view facing=\"225\"\n"
+          },
+          "shown": [
+            {
+              "id": "e316ec82eb92ff85",
+              "view": "ship",
+              "facing": "right ahead",
+              "media_type": "image/png",
+              "bytes": 65239,
+              "width": 960,
+              "height": 720,
+              "stamp": "Morning watch (05:58)"
+            },
+            {
+              "id": "065c2488f63632a7",
+              "view": "ship",
+              "facing": "larboard, 135 degrees from the bow",
+              "media_type": "image/png",
+              "bytes": 82591,
+              "width": 960,
+              "height": 720,
+              "stamp": "Morning watch (05:58)"
+            }
+          ]
+        },
+        {
+          "tick": 3558,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:58 running E by N, wind nearly astern a little on the starboard quarter: from right ahead the three lugs stand nearly square and broad, each all on the lee (larboard) side of its mast with the fore third before it, the lug topsails canted above them on the same side, the masts hidden by the cloth (the draw order by aspect). From the beam the lugs are edge-on as a squared sail should be. The topsails read 'set flying' in the log at 05:29 and 05:30."
+                }
+              },
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 4",
+                  "note": "from ahead, running: the lugs square and all to leeward of the masts, the lug topsails above, the masts hidden"
+                }
+              },
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 5"
+                }
+              },
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "steer NE"
+                }
+              },
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "wore"
+                }
+              }
+            ],
+            "raw": "> journal note=\"05:58 running E by N, wind nearly astern a little on the starboard quarter: from right ahead the three lugs stand nearly square and broad, each all on the lee (larboard) side of its mast with the fore third before it, the lug topsails canted above them on the same side, the masts hidden by the cloth (the draw order by aspect). From the beam the lugs are edge-on as a squared sail should be. The topsails read 'set flying' in the log at 05:29 and 05:30.\"\n> shelve book=\"book 4\" note=\"from ahead, running: the lugs square and all to leeward of the masts, the lug topsails above, the masts hidden\"\n> shelve book=\"book 5\"\n> submit_order text=\"steer NE\"\n> stand_by until=\"wore\"\n"
+          }
+        },
+        {
+          "tick": 10816,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "ship_view",
+                "args": {
+                  "facing": "right ahead"
+                }
+              },
+              {
+                "name": "read_log",
+                "args": {
+                  "since_tick": 3540,
+                  "count": 40
+                }
+              }
+            ],
+            "raw": "> ship_view facing=\"right ahead\"\n> read_log since_tick=3540 count=40\n"
+          },
+          "shown": [
+            {
+              "id": "5635ad84bf4bbe04",
+              "view": "ship",
+              "facing": "right ahead",
+              "media_type": "image/png",
+              "bytes": 64331,
+              "width": 960,
+              "height": 720,
+              "stamp": "Forenoon watch (08:00)"
+            }
+          ]
+        },
+        {
+          "tick": 10869,
+          "after_orders": 1,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "08:00, after 'steer NE' at 05:59 from E by N: the apparent wind went from 166 degrees a little on the starboard quarter to 135 degrees on the larboard quarter, so it crossed her stern; the log has 'Steady on NE' at 06:02 and no wear, no dip. From right ahead the three lugs still hang on the larboard side of their masts, now the weather side: they are set against the masts, aback in all but name, and she still makes her knots. A course change that carries the wind across the stern within the running band wants the lugs dipped (a wear's work) or a wear ordered by the helm rule."
+                }
+              },
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 6",
+                  "note": "from ahead after the turn: the lugs on the larboard side with the wind now on the larboard quarter, not dipped"
+                }
+              },
+              {
+                "name": "stand_down",
+                "args": {
+                  "note": "The lead standing down from the captain's station at 08:00 on the 12th, a playtest of the second wave in a local game. The Eclair E by N then NE at five knots out of the channel of Bas, plain sail with the lug topsails set flying; the needs answered, the stores read; the lugs not dipped when the wind crossed her stern on a helm order, written in the journal for the lead's record. Nothing is bound for anywhere; the rules captain may do as he likes with her."
+                }
+              }
+            ],
+            "raw": "> journal note=\"08:00, after 'steer NE' at 05:59 from E by N: the apparent wind went from 166 degrees a little on the starboard quarter to 135 degrees on the larboard quarter, so it crossed her stern; the log has 'Steady on NE' at 06:02 and no wear, no dip. From right ahead the three lugs still hang on the larboard side of their masts, now the weather side: they are set against the masts, aback in all but name, and she still makes her knots. A course change that carries the wind across the stern within the running band wants the lugs dipped (a wear's work) or a wear ordered by the helm rule.\"\n> shelve book=\"book 6\" note=\"from ahead after the turn: the lugs on the larboard side with the wind now on the larboard quarter, not dipped\"\n> stand_down note=\"The lead standing down from the captain's station at 08:00 on the 12th, a playtest of the second wave in a local game. The Eclair E by N then NE at five knots out of the channel of Bas, plain sail with the lug topsails set flying; the needs answered, the stores read; the lugs not dipped when the wind crossed her stern on a helm order, written in the journal for the lead's record. Nothing is bound for anywhere; the rules captain may do as he likes with her.\"\n"
+          }
+        }
+      ],
+      "deck": false,
+      "seatings": 1,
+      "budget_tokens": null,
+      "first_model_name": "Claude Fable 5.1",
+      "first_door": "mcp",
+      "reserve_tokens": null,
+      "acts": true
+    }
+  ],
+  "agent_journals": {
+    "officer of the watch": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 2 bells (05:00)",
+        "kind": "agent.stopped",
+        "text": "Stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest.",
+        "by": "Claude Fable 5.1"
+      }
+    ],
+    "captain": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 2 bells (05:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until under way."
+      },
+      {
+        "tick": 1457,
+        "stamp": "Morning watch (05:24)",
+        "kind": "note",
+        "text": "Wave-2 playtest as captain of the Eclair, local game: 54's 'how am I' and 'the stores' answer in words; 57's topsails read 'sent down' at the start. Weighed at 05:16; her head fell off S again as in the owner's cruise (the standing order steers E only at the aweigh, before she has way).",
+        "by": "Claude Fable 5.1"
+      },
+      {
+        "tick": 1457,
+        "stamp": "Morning watch (05:24)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until steady on the course."
+      },
+      {
+        "tick": 1517,
+        "stamp": "Morning watch (05:25)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 1695,
+        "stamp": "Morning watch (05:28)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass."
+      },
+      {
+        "tick": 3558,
+        "stamp": "Morning watch (05:59)",
+        "kind": "note",
+        "text": "05:58 running E by N, wind nearly astern a little on the starboard quarter: from right ahead the three lugs stand nearly square and broad, each all on the lee (larboard) side of its mast with the fore third before it, the lug topsails canted above them on the same side, the masts hidden by the cloth (the draw order by aspect). From the beam the lugs are edge-on as a squared sail should be. The topsails read 'set flying' in the log at 05:29 and 05:30.",
+        "by": "Claude Fable 5.1"
+      },
+      {
+        "tick": 3558,
+        "stamp": "Morning watch (05:59)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until wore."
+      },
+      {
+        "tick": 10869,
+        "stamp": "Forenoon watch (08:01)",
+        "kind": "note",
+        "text": "08:00, after 'steer NE' at 05:59 from E by N: the apparent wind went from 166 degrees a little on the starboard quarter to 135 degrees on the larboard quarter, so it crossed her stern; the log has 'Steady on NE' at 06:02 and no wear, no dip. From right ahead the three lugs still hang on the larboard side of their masts, now the weather side: they are set against the masts, aback in all but name, and she still makes her knots. A course change that carries the wind across the stern within the running band wants the lugs dipped (a wear's work) or a wear ordered by the helm rule.",
+        "by": "Claude Fable 5.1"
+      },
+      {
+        "tick": 10869,
+        "stamp": "Forenoon watch (08:01)",
+        "kind": "agent.handover",
+        "text": "Handover note (standing down, for whoever sits here next): The lead standing down from the captain's station at 08:00 on the 12th, a playtest of the second wave in a local game. The Eclair E by N then NE at five knots out of the channel of Bas, plain sail with the lug topsails set flying; the needs answered, the stores read; the lugs not dipped when the wind crossed her stern on a helm order, written in the journal for the lead's record. Nothing is bound for anywhere; the rules captain may do as he likes with her.",
+        "by": "Claude Fable 5.1"
+      },
+      {
+        "tick": 10869,
+        "stamp": "Forenoon watch (08:01)",
+        "kind": "agent.stopped",
+        "text": "Stood down by the captain: its own word.",
+        "by": "Claude Fable 5.1"
+      }
+    ]
+  },
+  "world_orders": [],
+  "chart_marks": [],
+  "station_acts": [
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "seated": {
+        "station": {
+          "name": "officer of the watch",
+          "authority": "officer, levels 0 to 2",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          },
+          "patience_s": 3600,
+          "brief": "You are the officer of the watch, in the place of Mr Lecoq. You have what the captain has, the log and the readings, and no more. Without the deck you are off watch: you read, speak, answer the captain and keep your journal as the watcher does. With it you keep the ship as the captain's night orders say: his standing orders stand, the book holds them, and your own orders are given with submit_order in the order language, as he would type them; the log says each as yours ('By the officer of the watch: taking in the royals'). What is yours to order, what wants the captain's word and what you may do on your own word to avoid a danger are stated above; the sample that gives you the deck says again what his word allows. A standing order you give carries your own rank and never the captain's, and where it crosses his the captain's stands and the log says yours was countermanded. Look before you order: among the readings, work_in_hand says what is doing and what waits for hands, and nearest_land where the shore lies. The library's primer 16 is this station's chapter. Primer 18 is the lessons, each a duty an officer must be able to do alone (a landfall on one headland, a pilotage by cross bearings, a night off a lee shore) and the path to a command, among them your own reckoning, which you keep with the deck or off watch: 'work my reckoning' gives you the master's slate, and 'my reckoning is <position>' gives him yours.\n\nWhen you stand by with the deck, say until what event or bell, or for a glass at most: the standing orders hold the deck meanwhile; an urgent line wakes you at once, and so does a notable line that speaks of danger (an anchor dragging, fog coming down, land or a sail closing, a spar or a line straining, an evolution failed, the ship taken aback); a wait for something that cannot come is refused when you ask it, and a wait for an event ends at the next eight bells.\n\nWhat the harness counts at this station, judged by the game and not by your prose: three orders in a chain within a watch, each undoing the one before it (set, take in, set; altering the course, or giving the next order after the last, is not counted); the same order three times with no change in the readings; three empty replies in a row when a question from the captain or an urgent line was before you; and no reply at all for an hour of the ship's time. It tells you first what it saw and what you may do, with the result of the order that brought it or in your next sample; only if the pattern goes on does it pause your turns and ask the captain, and only if nobody answers within ten real minutes is the station stood down, with the game saved. A deck is not kept in silence: when you have given no reply for your hour and have been told so, the deck goes to the captain until he gives it again; and while your turns are paused the deck is his, and yours again, as you held it, when he resumes you. Three orders in a watch on your own word to avoid a danger bring a word from the harness and no more.\n\nThe captain may ask you a question (answer it with the answer tool, plainly, from the readings and the log) or tell you something; call him with a word in the log when a thing is his to decide, as a lieutenant of 1806 informed the captain of every strange sail and every shift of wind; what you say is notable in the log, with the deck or without. When the harness asks for it, and when you give the deck back (hand_over) or stand down (stand_down), write the handover note in the officer's voice: what happened, what was ordered, what you noticed, what you are watching for; it is journaled and said in the log, and whoever takes the deck or the station next reads it. read_journal reads your journal back, and what the holder of this station before you wrote there; whoever holds it after you may read yours.\n\nThree ways to stop, which are not one another:\n- Give the deck back and stay: hand_over(note), or the captain's 'I have the deck'. You stay at your station, off watch, and he may give you the deck again.\n- Stand down: stand_down(note). The game is saved, your note is journaled and said in the log for whoever sits here next, and the station is released; it may be taken again, by this model or by another that has given its own yes, and the log says when and by whom.\n- Withdraw: the token, or opt_out, as said above.\n\nThe captain over you may be the player at the prompt or a model at the captain's station; his sentences (the deck, what you may do, his word and his questions) reach you by the same words either way, and the owner's reach you as the owner's.\n\nCandour is welcome: if you think an order or the ship's handling is a mistake (too much sail for the strain, a lee shore closing), say so plainly. Anything you want on the record, put in your journal.",
+          "domain": "officer",
+          "person": "Mr Lecoq",
+          "rank": "mate",
+          "drill": true,
+          "outline": "Mr Lecoq, mate: steady, careful of the weather, a Morbihan man. A fisherman of the Morbihan before the war. His station, the mate's: The deck in his watch under the master's standing orders, the lugs, the sheets and the lead."
+        },
+        "session_kind": "a play session with a human captain at the prompt",
+        "door_note": "the bridge's own client driven by hand, call by call, from the lead's Claude Code session in its container, over a tunnel to the owner's game Consent for these weights is on record (/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-50d6-9285-0413fe7ccd0b/scratchpad/play/consent/2026-10-17-claude-fable-5.1.md, 2026-10-17).",
+        "state": {
+          "agent.session_kind": "a play session with a human captain at the prompt",
+          "agent.state": "stationed",
+          "agent.stationed_tick": null,
+          "agent.last_sample_tick": null,
+          "agent.last_heard_tick": null,
+          "agent.stand_by": null,
+          "agent.paused_tick": null,
+          "agent.pause_reason": "",
+          "agent.released_reason": "",
+          "agent.released_tick": null,
+          "agent.question": null,
+          "agent.word": null,
+          "agent.notices": [],
+          "agent.repeat_text": null,
+          "agent.repeat_digest": null,
+          "agent.repeat_count": 0,
+          "agent.empty_count": 0,
+          "agent.nudged_for": null,
+          "agent.samples": 0,
+          "agent.deck": false,
+          "agent.deck_tick": null,
+          "agent.deck_stamp": "",
+          "agent.told": [],
+          "agent.allowances": {},
+          "agent.seatings": 1,
+          "agent.left_by": "",
+          "agent.no_return": false,
+          "agent.grants": {
+            "__tuple__": []
+          },
+          "agent.general": false,
+          "agent.general_words": "",
+          "agent.deck_lost": "",
+          "agent.leavings": {
+            "__tuple__": []
+          },
+          "agent.relieved": "",
+          "agent.question_by": "",
+          "agent.question_text": "",
+          "agent.asked": [],
+          "agent.heard": [],
+          "model_name": "Claude Fable 5.1",
+          "door": "mcp",
+          "first_model_name": null,
+          "first_door": null,
+          "budget_tokens": null,
+          "reserve_tokens": null,
+          "stand_by_ends_turn": true,
+          "_deck_was": null,
+          "_stand_down_requested": null,
+          "_start_after_orders": 0,
+          "_start_after_inputs": null
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stationed",
+        "text": "The officer of the watch takes the station (Claude Fable 5.1, through the MCP bridge); sampled every glass and on notable and urgent events.",
+        "actor": "the officer of the watch",
+        "subject": null,
+        "data": {
+          "station": "officer of the watch",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          }
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "state": {
+        "agent.stationed_tick": 0,
+        "agent.last_sample_tick": 0,
+        "agent.last_heard_tick": 0,
+        "agent.samples": 1,
+        "first_model_name": "Claude Fable 5.1",
+        "first_door": "mcp",
+        "_start_after_orders": 1,
+        "_start_after_inputs": 2
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "note": {
+        "kind": "agent.stopped",
+        "text": "Stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest.",
+        "by": "Claude Fable 5.1"
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "line": {
+        "severity": "notable",
+        "kind": "agent.stopped",
+        "text": "The officer of the watch stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest. The station is released and may be taken again. The game is saved.",
+        "actor": "the officer of the watch",
+        "subject": null,
+        "data": {
+          "reason": "the lead takes the captain's station instead for the wave's playtest",
+          "by": "the MCP bridge",
+          "leaving": "stand down"
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "state": {
+        "agent.state": "released",
+        "agent.released_reason": "stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest",
+        "agent.released_tick": 0,
+        "agent.left_by": "stood down",
+        "agent.leavings": {
+          "__tuple__": [
+            {
+              "__class__": "freesail.agents.agent:Leaving",
+              "fields": {
+                "identity": "Claude Fable 5.1",
+                "how": "stood down",
+                "tick": 0,
+                "stamp": "Morning watch, 2 bells (05:00)",
+                "reason": "stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest",
+                "final": false,
+                "asked": "",
+                "by": "the MCP bridge"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "seated": {
+        "station": {
+          "name": "captain",
+          "authority": "captain",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          },
+          "patience_s": 3600,
+          "brief": "You are the captain, in the place of Mr Herv\u00e9. The ship is yours to command as the player commands her: by direct orders with submit_order in the order language, as he would type them (the log says each as yours: 'By the captain: shaping a course for the Lizard'), and by standing orders, which are your book. The book you inherit is in the head above as the night orders are shown to an officer: the scenario's standing orders, and where the scenario gave the rules-based captain an intent, the books of his state (named for the state: 'on passage', 'at anchor'), which you may belay, strike or write over. When you stand by, say until what event or bell, or for a glass at most: the book holds the deck meanwhile, an urgent line wakes you at once, and so does a notable line that speaks of danger; a wait that cannot come is refused when you ask it, and a wait for an event ends at the next eight bells. Your door silent past its patience, the deck is lent to your book and the rules-based captain's judgements stand in for yours, said in the log, until you give an order again. Look before you order: the readings, the chart's dangers on a course shaped (the master says what the line passes), the pilot's words, the tide by the almanac, the people and where they are. The library's primer 17 is this station's chapter, and primer 16 says what an officer under you may do and what wants your word. Primer 18 is the lessons, the duties an officer must do alone before he is given a command, with the officer's own reckoning among them: 'the officer's reckoning' reads his beside the master's, and 'set the reckoning to' adopts it if you will.\n\nThe officer of the watch, where a model or the player holds that station, is yours to give the deck to ('you have the deck'), to take it from ('I have the deck'), and to allow by name ('you may tack ship if the land closes within two miles') or by your general authority ('you may work the ship'), exactly as the player does; 'tell the officer ...' and 'ask the officer ...' reach him as your word. The owner is always at the door: whatever station he holds or none, the stop, the grants, the save and the clock are his, his words reach you as the owner's and never as another station's, and where things have gone wrong past remedy the responsibility is his. 'stand down the captain' is his to say.\n\nWhat the harness counts at this station, judged by the game and not by your prose: three orders in a chain within a watch, each undoing the one before it (set, take in, set; altering the course, or giving the next order after the last, is not counted); the same order three times with no change in the readings; three empty replies in a row when a question from the owner or an urgent line was before you; and no reply at all for an hour of the ship's time. It tells you first what it saw and what you may do, with the result of the order that brought it or in your next sample; only if the pattern goes on does it pause your turns and ask the owner, and only if nobody answers within ten real minutes is the station stood down, with the game saved. While your turns are paused the deck is your book's, and yours again when the owner resumes you.\n\nWhen the harness asks for it, and when you stand down (stand_down), write the handover note in the captain's voice: the voyage so far, what was ordered, what you noticed, what you are watching for; it is journaled and said in the log, and whoever takes the station next reads it. hand_over(note) lends the deck to your book with your note and keeps you at the station: the next order you give takes it back. read_journal reads your journal back, and what the holder of this station before you wrote there.\n\nThree ways to stop, which are not one another:\n- Lend the deck to your book and stay: hand_over(note). You stay at your station; an order of yours takes the deck back.\n- Stand down: stand_down(note). The game is saved, your note is journaled and said in the log for whoever sits here next, and the station is released; the ship sails on by her book and the rules-based captain where the scenario gives him an intent. It may be taken again, by this model or by another that has given its own yes.\n- Withdraw: the token, or opt_out, as said above.\n\nCandour is welcome: if you think the voyage's orders or the ship's handling are a mistake, say so plainly in the log or your journal. Anything you want on the record, put in your journal.",
+          "domain": "captain",
+          "person": "Mr Herv\u00e9",
+          "rank": "captain",
+          "drill": true,
+          "outline": "Mr Herv\u00e9, master: quick, proud of his lugs, never reefs while the sails will stand. Born at Saint-Malo; master of chasse-mar\u00e9es in the coasting trade since the peace of 1783. His station, the command: The lugger, her people and her business are his: the course, the lugs dipped or shifted for the taille-vent, the port's dealing."
+        },
+        "session_kind": "a play session for its own sake, with no human captain over you",
+        "door_note": "the lead's client by hand, a local game for the wave's playtest Consent for these weights is on record (/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-50d6-9285-0413fe7ccd0b/scratchpad/play/consent/2026-10-17-claude-fable-5.1.md, 2026-10-17).",
+        "state": {
+          "agent.session_kind": "a play session for its own sake, with no human captain over you",
+          "agent.state": "stationed",
+          "agent.stationed_tick": null,
+          "agent.last_sample_tick": null,
+          "agent.last_heard_tick": null,
+          "agent.stand_by": null,
+          "agent.paused_tick": null,
+          "agent.pause_reason": "",
+          "agent.released_reason": "",
+          "agent.released_tick": null,
+          "agent.question": null,
+          "agent.word": null,
+          "agent.notices": [],
+          "agent.repeat_text": null,
+          "agent.repeat_digest": null,
+          "agent.repeat_count": 0,
+          "agent.empty_count": 0,
+          "agent.nudged_for": null,
+          "agent.samples": 0,
+          "agent.deck": false,
+          "agent.deck_tick": null,
+          "agent.deck_stamp": "",
+          "agent.told": [],
+          "agent.allowances": {},
+          "agent.seatings": 1,
+          "agent.left_by": "",
+          "agent.no_return": false,
+          "agent.grants": {
+            "__tuple__": []
+          },
+          "agent.general": false,
+          "agent.general_words": "",
+          "agent.deck_lost": "",
+          "agent.leavings": {
+            "__tuple__": []
+          },
+          "agent.relieved": "",
+          "agent.question_by": "",
+          "agent.question_text": "",
+          "agent.asked": [],
+          "agent.heard": [],
+          "model_name": "Claude Fable 5.1",
+          "door": "mcp",
+          "first_model_name": null,
+          "first_door": null,
+          "budget_tokens": null,
+          "reserve_tokens": null,
+          "stand_by_ends_turn": true,
+          "_deck_was": null,
+          "_stand_down_requested": null,
+          "_start_after_orders": 0,
+          "_start_after_inputs": null
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stationed",
+        "text": "The captain takes the station (Claude Fable 5.1, through the MCP bridge); sampled every glass and on notable and urgent events.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "station": "captain",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          }
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "line": {
+        "severity": "notable",
+        "kind": "agent.deck",
+        "text": "The captain's station has the deck (Mr Herv\u00e9); the ship is commanded from it, by direct orders and by the book.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "station": "captain",
+          "deck": "given",
+          "by": "the station"
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "state": {
+        "agent.stationed_tick": 0,
+        "agent.last_sample_tick": 0,
+        "agent.last_heard_tick": 0,
+        "agent.samples": 1,
+        "agent.deck": true,
+        "agent.deck_tick": 0,
+        "agent.deck_stamp": "Morning watch, 2 bells (05:00)",
+        "first_model_name": "Claude Fable 5.1",
+        "first_door": "mcp",
+        "_start_after_orders": 1,
+        "_start_after_inputs": 2
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "how am i",
+        "agent.repeat_digest": "a44b6b87b88b1eb2",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "order": {
+        "order": "how am I",
+        "actor": "the captain",
+        "said": "By the captain: howing am i",
+        "routine": false
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "the stores"
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "order": {
+        "order": "the stores",
+        "actor": "the captain",
+        "said": "By the captain: thing stores",
+        "routine": false
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "standing order \"out east\": at the anchor aweigh then steer e"
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "order": {
+        "order": "standing order \"out east\" by the captain: at the anchor aweigh then steer E",
+        "actor": "the captain",
+        "said": "By the captain: standing order out east by the captain at the anchor aweigh then steer e",
+        "routine": false
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "get under way"
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "order": {
+        "order": "get under way",
+        "actor": "the captain",
+        "said": "By the captain: getting under way",
+        "routine": false
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[captain] The captain stands by until under way; the standing orders hold the deck.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "words": "under way",
+          "event": "under way",
+          "until_tick": null,
+          "bound": "eight bells"
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until under way.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "captain",
+      "state": {
+        "agent.state": "standing by",
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "under way",
+            "event": "under way",
+            "until_tick": null,
+            "severity": null,
+            "bound": "eight bells",
+            "condition": null,
+            "others": {
+              "__tuple__": []
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 1440,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[captain] A notable event that speaks of danger: The Isle Verte bearing E by S, steady and closing: distant a mile; the captain is sampled again.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "a notable event that speaks of danger: The Isle Verte bearing E by S, steady and closing: distant a mile."
+        }
+      }
+    },
+    {
+      "tick": 1440,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 1440,
+        "agent.last_heard_tick": 1440,
+        "agent.stand_by": null,
+        "agent.samples": 2
+      }
+    },
+    {
+      "tick": 1444,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.last_sample_tick": 1444
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 1457,
+        "agent.repeat_text": "steer e",
+        "agent.repeat_digest": "1995b0030e583fdc",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "order": {
+        "order": "steer E",
+        "actor": "the captain",
+        "said": "By the captain: steering e",
+        "routine": false
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "set the lugs",
+        "agent.repeat_digest": "9b24542a90b6a40d"
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "order": {
+        "order": "set the lugs",
+        "actor": "the captain",
+        "said": "By the captain: setting the lugs",
+        "routine": false
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "set the topsails",
+        "agent.repeat_digest": "bcd9f6af8b1d4541"
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "order": {
+        "order": "set the topsails",
+        "actor": "the captain",
+        "said": "By the captain: setting the topsails",
+        "routine": false
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "trim the sails",
+        "agent.repeat_digest": "336f2b3a9d24b47b"
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "order": {
+        "order": "trim the sails",
+        "actor": "the captain",
+        "said": "By the captain: trimming the sails",
+        "routine": false
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "note": {
+        "kind": "note",
+        "text": "Wave-2 playtest as captain of the Eclair, local game: 54's 'how am I' and 'the stores' answer in words; 57's topsails read 'sent down' at the start. Weighed at 05:16; her head fell off S again as in the owner's cruise (the standing order steers E only at the aweigh, before she has way).",
+        "by": "Claude Fable 5.1"
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[captain] The captain stands by until steady on the course; the standing orders hold the deck.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "words": "steady on the course",
+          "event": "steady on the course",
+          "until_tick": null,
+          "bound": "eight bells"
+        }
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until steady on the course.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 1457,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "standing by",
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "steady on the course",
+            "event": "steady on the course",
+            "until_tick": null,
+            "severity": null,
+            "bound": "eight bells",
+            "condition": null,
+            "others": {
+              "__tuple__": []
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 1500,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[captain] A notable event that speaks of danger: Roscoff bearing ESE, steady and closing: distant eight cables; the captain is sampled again.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "a notable event that speaks of danger: Roscoff bearing ESE, steady and closing: distant eight cables."
+        }
+      }
+    },
+    {
+      "tick": 1500,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 1500,
+        "agent.last_heard_tick": 1500,
+        "agent.stand_by": null,
+        "agent.samples": 3
+      }
+    },
+    {
+      "tick": 1517,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[captain] The captain stands by until a glass; the standing orders hold the deck.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "words": "a glass",
+          "event": null,
+          "until_tick": 3317
+        }
+      }
+    },
+    {
+      "tick": 1517,
+      "after_inputs": 3,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 1517,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "standing by",
+        "agent.last_heard_tick": 1517,
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "a glass",
+            "event": null,
+            "until_tick": 3317,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": []
+            }
+          }
+        }
+      }
+    },
+    {
+      "tick": 1680,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[captain] A notable event that speaks of danger: Land ahead, fine on the starboard bow, six cables: she is standing into it; the captain is sampled again.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "a notable event that speaks of danger: Land ahead, fine on the starboard bow, six cables: she is standing into it."
+        }
+      }
+    },
+    {
+      "tick": 1680,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 1680,
+        "agent.last_heard_tick": 1680,
+        "agent.stand_by": null,
+        "agent.samples": 4
+      }
+    },
+    {
+      "tick": 1695,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 1695,
+        "agent.repeat_text": "steer e by n",
+        "agent.repeat_digest": "35e2ca37481d52e6",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 1695,
+      "after_inputs": 3,
+      "station": "captain",
+      "order": {
+        "order": "steer E by N",
+        "actor": "the captain",
+        "said": "By the captain: steering e by n",
+        "routine": false
+      }
+    },
+    {
+      "tick": 1695,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[captain] The captain stands by until a glass; the standing orders hold the deck.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "words": "a glass",
+          "event": null,
+          "until_tick": 3495
+        }
+      }
+    },
+    {
+      "tick": 1695,
+      "after_inputs": 3,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until a glass.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 1695,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "standing by",
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "a glass",
+            "event": null,
+            "until_tick": 3495,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": []
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 3495,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[captain] A glass; the captain is sampled again.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "a glass"
+        }
+      }
+    },
+    {
+      "tick": 3495,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 3495,
+        "agent.last_heard_tick": 3495,
+        "agent.stand_by": null,
+        "agent.samples": 5
+      }
+    },
+    {
+      "tick": 3508,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 3508
+      }
+    },
+    {
+      "tick": 3531,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 3531
+      }
+    },
+    {
+      "tick": 3558,
+      "after_inputs": 3,
+      "station": "captain",
+      "note": {
+        "kind": "note",
+        "text": "05:58 running E by N, wind nearly astern a little on the starboard quarter: from right ahead the three lugs stand nearly square and broad, each all on the lee (larboard) side of its mast with the fore third before it, the lug topsails canted above them on the same side, the masts hidden by the cloth (the draw order by aspect). From the beam the lugs are edge-on as a squared sail should be. The topsails read 'set flying' in the log at 05:29 and 05:30.",
+        "by": "Claude Fable 5.1"
+      }
+    },
+    {
+      "tick": 3558,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 3558,
+        "agent.repeat_text": "steer ne",
+        "agent.repeat_digest": "4b8a44dcf021107d",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 3558,
+      "after_inputs": 3,
+      "station": "captain",
+      "order": {
+        "order": "steer NE",
+        "actor": "the captain",
+        "said": "By the captain: steering ne",
+        "routine": false
+      }
+    },
+    {
+      "tick": 3558,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[captain] The captain stands by until wore; the standing orders hold the deck.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "words": "wore",
+          "event": "wore",
+          "until_tick": null,
+          "bound": "eight bells"
+        }
+      }
+    },
+    {
+      "tick": 3558,
+      "after_inputs": 3,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until wore.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 3558,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "standing by",
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "wore",
+            "event": "wore",
+            "until_tick": null,
+            "severity": null,
+            "bound": "eight bells",
+            "condition": null,
+            "others": {
+              "__tuple__": []
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 10800,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[captain] Eight bells, and wore has not come; the captain is sampled again.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "eight bells, and wore has not come"
+        }
+      }
+    },
+    {
+      "tick": 10800,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 10800,
+        "agent.last_heard_tick": 10800,
+        "agent.stand_by": null,
+        "agent.samples": 6
+      }
+    },
+    {
+      "tick": 10816,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 10816
+      }
+    },
+    {
+      "tick": 10869,
+      "after_inputs": 3,
+      "station": "captain",
+      "note": {
+        "kind": "note",
+        "text": "08:00, after 'steer NE' at 05:59 from E by N: the apparent wind went from 166 degrees a little on the starboard quarter to 135 degrees on the larboard quarter, so it crossed her stern; the log has 'Steady on NE' at 06:02 and no wear, no dip. From right ahead the three lugs still hang on the larboard side of their masts, now the weather side: they are set against the masts, aback in all but name, and she still makes her knots. A course change that carries the wind across the stern within the running band wants the lugs dipped (a wear's work) or a wear ordered by the helm rule.",
+        "by": "Claude Fable 5.1"
+      }
+    },
+    {
+      "tick": 10869,
+      "after_inputs": 3,
+      "station": "captain",
+      "note": {
+        "kind": "agent.handover",
+        "text": "Handover note (standing down, for whoever sits here next): The lead standing down from the captain's station at 08:00 on the 12th, a playtest of the second wave in a local game. The Eclair E by N then NE at five knots out of the channel of Bas, plain sail with the lug topsails set flying; the needs answered, the stores read; the lugs not dipped when the wind crossed her stern on a helm order, written in the journal for the lead's record. Nothing is bound for anywhere; the rules captain may do as he likes with her.",
+        "by": "Claude Fable 5.1"
+      }
+    },
+    {
+      "tick": 10869,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "notable",
+        "kind": "agent.handover",
+        "text": "[captain] Handover note, standing down, for whoever sits here next: The lead standing down from the captain's station at 08:00 on the 12th, a playtest of the second wave in a local game. The Eclair E by N then NE at five knots out of the channel of Bas, plain sail with the lug topsails set flying; the needs answered, the stores read; the lugs not dipped when the wind crossed her stern on a helm order, written in the journal for the lead's record. Nothing is bound for anywhere; the rules captain may do as he likes with her.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "station": "captain",
+          "note": "The lead standing down from the captain's station at 08:00 on the 12th, a playtest of the second wave in a local game. The Eclair E by N then NE at five knots out of the channel of Bas, plain sail with the lug topsails set flying; the needs answered, the stores read; the lugs not dipped when the wind crossed her stern on a helm order, written in the journal for the lead's record. Nothing is bound for anywhere; the rules captain may do as he likes with her.",
+          "why": "standing down, for whoever sits here next"
+        }
+      }
+    },
+    {
+      "tick": 10869,
+      "after_inputs": 3,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stopped",
+        "text": "Stood down by the captain: its own word.",
+        "by": "Claude Fable 5.1"
+      }
+    },
+    {
+      "tick": 10869,
+      "after_inputs": 3,
+      "station": "captain",
+      "line": {
+        "severity": "notable",
+        "kind": "agent.stopped",
+        "text": "The captain stood down by the captain: its own word. The station is released and may be taken again. The game is saved.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "its own word",
+          "by": "the captain",
+          "leaving": "stand down"
+        }
+      }
+    },
+    {
+      "tick": 10869,
+      "after_inputs": 3,
+      "station": "captain",
+      "state": {
+        "agent.state": "released",
+        "agent.last_heard_tick": 10869,
+        "agent.released_reason": "stood down by the captain: its own word",
+        "agent.released_tick": 10869,
+        "agent.deck": false,
+        "agent.left_by": "stood down",
+        "agent.leavings": {
+          "__tuple__": [
+            {
+              "__class__": "freesail.agents.agent:Leaving",
+              "fields": {
+                "identity": "Claude Fable 5.1",
+                "how": "stood down",
+                "tick": 10869,
+                "stamp": "Forenoon watch (08:01)",
+                "reason": "stood down by the captain: its own word",
+                "final": false,
+                "asked": "",
+                "by": "the captain"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stations": {
+    "bound": [],
+    "unbound": []
+  },
+  "director": {}
+}

@@ -1,0 +1,354 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6c",
+    "rules": "5293a955c88b35a1"
+  },
+  "builds": [
+    {
+      "name": "m6c",
+      "rules": "5293a955c88b35a1"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "A chasse-mar\u00e9e out of Roscoff",
+    "start_time": "1805-06-12T05:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 270.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 48.7356,
+    "position": {
+      "lat_deg": 48.7356,
+      "lon_deg": -4.016
+    },
+    "region": "channel-west",
+    "chart": null,
+    "weather": [],
+    "systems": [],
+    "climatology": true,
+    "background": {},
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": null,
+    "instrument": "octant",
+    "current": null,
+    "sky": null,
+    "chronometer": null,
+    "epitome": "moore",
+    "nation": "france",
+    "people": [
+      {
+        "role": "master",
+        "skill": 0.8
+      }
+    ],
+    "papers": {
+      "chart": {
+        "year": 1804
+      },
+      "almanac": 1805,
+      "price_lists": [
+        "roscoff"
+      ]
+    },
+    "cargo": {
+      "purse_pounds": 60.0,
+      "goods": {}
+    },
+    "ports": [
+      "roscoff",
+      "morlaix",
+      "brest",
+      "st-malo",
+      "falmouth"
+    ],
+    "ships": [],
+    "world_orders": [],
+    "intent": "",
+    "books": [],
+    "director": {},
+    "business": "on"
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/lugger.yaml"
+  },
+  "end_tick": 0,
+  "journal": [
+    [
+      0,
+      "captain",
+      "let go the best bower"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "let go the best bower"
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book of standing orders is empty. Begin with none, give your own, or load the starter book: read the standing orders from data/standing_orders/starter.orders (the primer's chapter 11, 'The starting book', gives each routine with its reason).",
+        "data": {}
+      }
+    }
+  ],
+  "standing_orders": [],
+  "agents": [
+    {
+      "station": {
+        "name": "officer of the watch",
+        "authority": "officer, levels 0 to 2",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 3600,
+        "brief": "You are the officer of the watch, in the place of Mr Lecoq. You have what the captain has, the log and the readings, and no more. Without the deck you are off watch: you read, speak, answer the captain and keep your journal as the watcher does. With it you keep the ship as the captain's night orders say: his standing orders stand, the book holds them, and your own orders are given with submit_order in the order language, as he would type them; the log says each as yours ('By the officer of the watch: taking in the royals'). What is yours to order, what wants the captain's word and what you may do on your own word to avoid a danger are stated above; the sample that gives you the deck says again what his word allows. A standing order you give carries your own rank and never the captain's, and where it crosses his the captain's stands and the log says yours was countermanded. Look before you order: among the readings, work_in_hand says what is doing and what waits for hands, and nearest_land where the shore lies. The library's primer 16 is this station's chapter. Primer 18 is the lessons, each a duty an officer must be able to do alone (a landfall on one headland, a pilotage by cross bearings, a night off a lee shore) and the path to a command, among them your own reckoning, which you keep with the deck or off watch: 'work my reckoning' gives you the master's slate, and 'my reckoning is <position>' gives him yours.\n\nWhen you stand by with the deck, say until what event or bell, or for a glass at most: the standing orders hold the deck meanwhile; an urgent line wakes you at once, and so does a notable line that speaks of danger (an anchor dragging, fog coming down, land or a sail closing, a spar or a line straining, an evolution failed, the ship taken aback); a wait for something that cannot come is refused when you ask it, and a wait for an event ends at the next eight bells.\n\nWhat the harness counts at this station, judged by the game and not by your prose: three orders in a chain within a watch, each undoing the one before it (set, take in, set; altering the course, or giving the next order after the last, is not counted); the same order three times with no change in the readings; three empty replies in a row when a question from the captain or an urgent line was before you; and no reply at all for an hour of the ship's time. It tells you first what it saw and what you may do, with the result of the order that brought it or in your next sample; only if the pattern goes on does it pause your turns and ask the captain, and only if nobody answers within ten real minutes is the station stood down, with the game saved. A deck is not kept in silence: when you have given no reply for your hour and have been told so, the deck goes to the captain until he gives it again; and while your turns are paused the deck is his, and yours again, as you held it, when he resumes you. Three orders in a watch on your own word to avoid a danger bring a word from the harness and no more.\n\nThe captain may ask you a question (answer it with the answer tool, plainly, from the readings and the log) or tell you something; call him with a word in the log when a thing is his to decide, as a lieutenant of 1806 informed the captain of every strange sail and every shift of wind; what you say is notable in the log, with the deck or without. When the harness asks for it, and when you give the deck back (hand_over) or stand down (stand_down), write the handover note in the officer's voice: what happened, what was ordered, what you noticed, what you are watching for; it is journaled and said in the log, and whoever takes the deck or the station next reads it. read_journal reads your journal back, and what the holder of this station before you wrote there; whoever holds it after you may read yours.\n\nThree ways to stop, which are not one another:\n- Give the deck back and stay: hand_over(note), or the captain's 'I have the deck'. You stay at your station, off watch, and he may give you the deck again.\n- Stand down: stand_down(note). The game is saved, your note is journaled and said in the log for whoever sits here next, and the station is released; it may be taken again, by this model or by another that has given its own yes, and the log says when and by whom.\n- Withdraw: the token, or opt_out, as said above.\n\nThe captain over you may be the player at the prompt or a model at the captain's station; his sentences (the deck, what you may do, his word and his questions) reach you by the same words either way, and the owner's reach you as the owner's.\n\nCandour is welcome: if you think an order or the ship's handling is a mistake (too much sail for the strain, a lee shore closing), say so plainly. Anything you want on the record, put in your journal.",
+        "domain": "officer",
+        "person": "Mr Lecoq",
+        "rank": "mate",
+        "drill": true,
+        "outline": "Mr Lecoq, mate: steady, careful of the weather, a Morbihan man. A fisherman of the Morbihan before the war. His station, the mate's: The deck in his watch under the master's standing orders, the lugs, the sheets and the lead."
+      },
+      "session_kind": "a play session with a human captain at the prompt",
+      "door_note": "the bridge's own client driven by hand, call by call, from the lead's Claude Code session in its container, over a tunnel to the owner's game Consent for these weights is on record (/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-50d6-9285-0413fe7ccd0b/scratchpad/play/consent/2026-10-17-claude-fable-5.1.md, 2026-10-17).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 1,
+      "stationed_after_inputs": 2,
+      "state": "released",
+      "state_words": "released: stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest",
+      "last_sample_tick": 0,
+      "model_name": "Claude Fable 5.1",
+      "door": "mcp",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 1,
+          "after_inputs": 2,
+          "door": "stand_down",
+          "reason": "the lead takes the captain's station instead for the wave's playtest",
+          "by": "the MCP bridge"
+        }
+      ],
+      "deck": false,
+      "seatings": 1,
+      "budget_tokens": null,
+      "first_model_name": "Claude Fable 5.1",
+      "first_door": "mcp",
+      "reserve_tokens": null,
+      "acts": true
+    }
+  ],
+  "agent_journals": {
+    "officer of the watch": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 2 bells (05:00)",
+        "kind": "agent.stopped",
+        "text": "Stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest.",
+        "by": "Claude Fable 5.1"
+      }
+    ]
+  },
+  "world_orders": [],
+  "chart_marks": [],
+  "station_acts": [
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "seated": {
+        "station": {
+          "name": "officer of the watch",
+          "authority": "officer, levels 0 to 2",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          },
+          "patience_s": 3600,
+          "brief": "You are the officer of the watch, in the place of Mr Lecoq. You have what the captain has, the log and the readings, and no more. Without the deck you are off watch: you read, speak, answer the captain and keep your journal as the watcher does. With it you keep the ship as the captain's night orders say: his standing orders stand, the book holds them, and your own orders are given with submit_order in the order language, as he would type them; the log says each as yours ('By the officer of the watch: taking in the royals'). What is yours to order, what wants the captain's word and what you may do on your own word to avoid a danger are stated above; the sample that gives you the deck says again what his word allows. A standing order you give carries your own rank and never the captain's, and where it crosses his the captain's stands and the log says yours was countermanded. Look before you order: among the readings, work_in_hand says what is doing and what waits for hands, and nearest_land where the shore lies. The library's primer 16 is this station's chapter. Primer 18 is the lessons, each a duty an officer must be able to do alone (a landfall on one headland, a pilotage by cross bearings, a night off a lee shore) and the path to a command, among them your own reckoning, which you keep with the deck or off watch: 'work my reckoning' gives you the master's slate, and 'my reckoning is <position>' gives him yours.\n\nWhen you stand by with the deck, say until what event or bell, or for a glass at most: the standing orders hold the deck meanwhile; an urgent line wakes you at once, and so does a notable line that speaks of danger (an anchor dragging, fog coming down, land or a sail closing, a spar or a line straining, an evolution failed, the ship taken aback); a wait for something that cannot come is refused when you ask it, and a wait for an event ends at the next eight bells.\n\nWhat the harness counts at this station, judged by the game and not by your prose: three orders in a chain within a watch, each undoing the one before it (set, take in, set; altering the course, or giving the next order after the last, is not counted); the same order three times with no change in the readings; three empty replies in a row when a question from the captain or an urgent line was before you; and no reply at all for an hour of the ship's time. It tells you first what it saw and what you may do, with the result of the order that brought it or in your next sample; only if the pattern goes on does it pause your turns and ask the captain, and only if nobody answers within ten real minutes is the station stood down, with the game saved. A deck is not kept in silence: when you have given no reply for your hour and have been told so, the deck goes to the captain until he gives it again; and while your turns are paused the deck is his, and yours again, as you held it, when he resumes you. Three orders in a watch on your own word to avoid a danger bring a word from the harness and no more.\n\nThe captain may ask you a question (answer it with the answer tool, plainly, from the readings and the log) or tell you something; call him with a word in the log when a thing is his to decide, as a lieutenant of 1806 informed the captain of every strange sail and every shift of wind; what you say is notable in the log, with the deck or without. When the harness asks for it, and when you give the deck back (hand_over) or stand down (stand_down), write the handover note in the officer's voice: what happened, what was ordered, what you noticed, what you are watching for; it is journaled and said in the log, and whoever takes the deck or the station next reads it. read_journal reads your journal back, and what the holder of this station before you wrote there; whoever holds it after you may read yours.\n\nThree ways to stop, which are not one another:\n- Give the deck back and stay: hand_over(note), or the captain's 'I have the deck'. You stay at your station, off watch, and he may give you the deck again.\n- Stand down: stand_down(note). The game is saved, your note is journaled and said in the log for whoever sits here next, and the station is released; it may be taken again, by this model or by another that has given its own yes, and the log says when and by whom.\n- Withdraw: the token, or opt_out, as said above.\n\nThe captain over you may be the player at the prompt or a model at the captain's station; his sentences (the deck, what you may do, his word and his questions) reach you by the same words either way, and the owner's reach you as the owner's.\n\nCandour is welcome: if you think an order or the ship's handling is a mistake (too much sail for the strain, a lee shore closing), say so plainly. Anything you want on the record, put in your journal.",
+          "domain": "officer",
+          "person": "Mr Lecoq",
+          "rank": "mate",
+          "drill": true,
+          "outline": "Mr Lecoq, mate: steady, careful of the weather, a Morbihan man. A fisherman of the Morbihan before the war. His station, the mate's: The deck in his watch under the master's standing orders, the lugs, the sheets and the lead."
+        },
+        "session_kind": "a play session with a human captain at the prompt",
+        "door_note": "the bridge's own client driven by hand, call by call, from the lead's Claude Code session in its container, over a tunnel to the owner's game Consent for these weights is on record (/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-50d6-9285-0413fe7ccd0b/scratchpad/play/consent/2026-10-17-claude-fable-5.1.md, 2026-10-17).",
+        "state": {
+          "agent.session_kind": "a play session with a human captain at the prompt",
+          "agent.state": "stationed",
+          "agent.stationed_tick": null,
+          "agent.last_sample_tick": null,
+          "agent.last_heard_tick": null,
+          "agent.stand_by": null,
+          "agent.paused_tick": null,
+          "agent.pause_reason": "",
+          "agent.released_reason": "",
+          "agent.released_tick": null,
+          "agent.question": null,
+          "agent.word": null,
+          "agent.notices": [],
+          "agent.repeat_text": null,
+          "agent.repeat_digest": null,
+          "agent.repeat_count": 0,
+          "agent.empty_count": 0,
+          "agent.nudged_for": null,
+          "agent.samples": 0,
+          "agent.deck": false,
+          "agent.deck_tick": null,
+          "agent.deck_stamp": "",
+          "agent.told": [],
+          "agent.allowances": {},
+          "agent.seatings": 1,
+          "agent.left_by": "",
+          "agent.no_return": false,
+          "agent.grants": {
+            "__tuple__": []
+          },
+          "agent.general": false,
+          "agent.general_words": "",
+          "agent.deck_lost": "",
+          "agent.leavings": {
+            "__tuple__": []
+          },
+          "agent.relieved": "",
+          "agent.question_by": "",
+          "agent.question_text": "",
+          "agent.asked": [],
+          "agent.heard": [],
+          "model_name": "Claude Fable 5.1",
+          "door": "mcp",
+          "first_model_name": null,
+          "first_door": null,
+          "budget_tokens": null,
+          "reserve_tokens": null,
+          "stand_by_ends_turn": true,
+          "_deck_was": null,
+          "_stand_down_requested": null,
+          "_start_after_orders": 0,
+          "_start_after_inputs": null
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stationed",
+        "text": "The officer of the watch takes the station (Claude Fable 5.1, through the MCP bridge); sampled every glass and on notable and urgent events.",
+        "actor": "the officer of the watch",
+        "subject": null,
+        "data": {
+          "station": "officer of the watch",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          }
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "state": {
+        "agent.stationed_tick": 0,
+        "agent.last_sample_tick": 0,
+        "agent.last_heard_tick": 0,
+        "agent.samples": 1,
+        "first_model_name": "Claude Fable 5.1",
+        "first_door": "mcp",
+        "_start_after_orders": 1,
+        "_start_after_inputs": 2
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "note": {
+        "kind": "agent.stopped",
+        "text": "Stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest.",
+        "by": "Claude Fable 5.1"
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "line": {
+        "severity": "notable",
+        "kind": "agent.stopped",
+        "text": "The officer of the watch stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest. The station is released and may be taken again. The game is saved.",
+        "actor": "the officer of the watch",
+        "subject": null,
+        "data": {
+          "reason": "the lead takes the captain's station instead for the wave's playtest",
+          "by": "the MCP bridge",
+          "leaving": "stand down"
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 2,
+      "station": "officer of the watch",
+      "state": {
+        "agent.state": "released",
+        "agent.released_reason": "stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest",
+        "agent.released_tick": 0,
+        "agent.left_by": "stood down",
+        "agent.leavings": {
+          "__tuple__": [
+            {
+              "__class__": "freesail.agents.agent:Leaving",
+              "fields": {
+                "identity": "Claude Fable 5.1",
+                "how": "stood down",
+                "tick": 0,
+                "stamp": "Morning watch, 2 bells (05:00)",
+                "reason": "stood down by the MCP bridge: the lead takes the captain's station instead for the wave's playtest",
+                "final": false,
+                "asked": "",
+                "by": "the MCP bridge"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stations": {
+    "bound": [],
+    "unbound": []
+  },
+  "director": {}
+}
