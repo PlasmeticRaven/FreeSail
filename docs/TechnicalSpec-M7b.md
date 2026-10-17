@@ -101,7 +101,16 @@ again with a `[reason: ...]`, and it will be logged and performed; entered so, i
 and the director's log keeps the act, the doubt and the reason together, which is the data
 by which the sets of reasonable acts are refined. Only the brief's hard limits (§4, the
 player's own) refuse outright. The doubt and the refusal both go to the director's log, not
-the play log.
+the play log. **The orders are examples, not a rule** (the owner, 2026-10-17): the director
+is not told that only certain orders are allowed; its brief says that a set of reasonable
+orders is given as examples and that orders beyond them should be attempted when thought
+reasonable, so that in testing the director is unconstrained within the plausible-cause
+rule and tries a wide variety of things, and the record shows what is good, bad, useful or
+useless. An order in a form the game has no way to perform is answered honestly ("the game
+has no way to do this as said; say it another way, or enter it again with a `[reason:]` and
+it will be logged as attempted"), and re-entered with its reason it is logged in the
+director's log as an attempted act the game could not perform, with the words: the data for
+what to build next.
 
 ### 4. The brief and its guardrails (`data/director/briefs/*.yaml`; `freesail/agents/director.py`)
 

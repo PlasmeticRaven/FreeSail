@@ -61,7 +61,12 @@ intent with the lead's reading; the intent binds.
    is performed, and the director's log keeps the act, the doubt and the reason together.
    The brief's hard limits (item 3) refuse outright, with the reason. Both the doubt and the
    refusal go to the director's log, never the play log; the effects alone reach the play
-   log (decision 46, as 45c built it).
+   log (decision 46, as 45c built it). **The orders are examples, not a rule** (the owner,
+   2026-10-17, sent to the builder in flight): the director's brief never says only certain
+   orders are allowed; it says a set of reasonable orders is given as examples and others
+   should be attempted when thought reasonable; an order in a form the game cannot perform
+   is answered honestly and, re-entered with its reason, logged as an attempted act the game
+   could not do, with the words, for the record.
 3. **The brief and its limits** (§4): the player's brief as a file beside the scenario
    (`scenario.director.brief`) or given at the console (`director: brief ...`), with the tone
    of the voyage, the challenge wanted and the limits set (no gale above such a force, no
