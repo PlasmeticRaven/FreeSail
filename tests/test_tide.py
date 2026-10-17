@@ -351,7 +351,8 @@ def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_
         assert said.source, said.id  # whose each figure is
         assert ("rates" in said.judgement) != (said.id in PERIOD_RATES), said.id
         assert said.rate_kn(1.0) == said.spring_kn and said.rate_kn(0.0) == said.neap_kn
-        assert said.neap_kn < said.rate_kn(0.5) < said.spring_kn
+        if said.spring_kn > 0.0:  # package 43b: Torbay's book gives it no stream
+            assert said.neap_kn < said.rate_kn(0.5) < said.spring_kn
     # the Fromveur at neaps is the book's half of springs, not the world's five knots
     # (the owner's ruling of 2026-10-07), and is marked judgement
     fromveur = book.by_id("the-fromveur")
@@ -456,8 +457,9 @@ def test_the_stream_areas_belong_to_a_chart_and_beyond_them_there_is_no_stream(t
     assert all(a.chart in names for a in tide.areas), [a.chart for a in tide.areas]
     # the Channel's areas as package 34 and 37e made them, and the blocks' beside them
     channel = [a.id for a in tide.areas if a.chart == "channel-west"]
+    # package 43b: fourteen with Torbay
     assert (
-        len(channel) == 13 and channel[-1] == "mid-channel" and tide.areas[-1].id == "mid-channel"
+        len(channel) == 14 and channel[-1] == "mid-channel" and tide.areas[-1].id == "mid-channel"
     )
     # package 39a: the Channel east's areas lie east of 3 W, where no Channel west
     # position reaches, and come before the open Channel, whose bounds hold them
