@@ -333,6 +333,9 @@ class Person:
     up: bool = False  # called from his watch below: not asleep again until his watch
     outline: Outline | None = None
     station: str = ""
+    # his hunger, thirst and fatigue (package 54; `world.needs.Needs`), made at the first
+    # look: None for a person of a checkpoint from before, and until then
+    needs: Any = None
 
     @property
     def rank(self) -> str:
@@ -744,6 +747,13 @@ class People:
             return place_words(p.where)
         if p.sick:
             return "sick, in the sick berth"
+        needs = p.needs
+        if needs is not None and needs.by_hand and needs.asleep:
+            # a stationed person asleep by his own needs (package 54): turned in below, or
+            # fallen asleep where he stood
+            if needs.asleep == "below":
+                return f"asleep, {place_words(p.where)}"
+            return f"asleep where he stood, {place_words(p.where)}"
         deck = self._at_the_station(p)
         if deck is True:
             return ON_DECK_WORDS

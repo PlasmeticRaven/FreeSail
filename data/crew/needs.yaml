@@ -1,0 +1,70 @@
+# The needs of the named people (spec M7b §20; package 54): hunger, thirst and fatigue,
+# each in steps by the hours since he last ate, drank or slept, rising with the ship's
+# time (`freesail/world/needs.py`).
+#
+# The owner's rulings: by hand at a filled station (`eat`, `drink`, `sleep` as the person's
+# own orders, `stand by, asleep below until called`), automatic where nobody is seated and
+# for the crew; never busywork: no line until the second step, and the lines spaced by
+# watches (a notable line waits for the change of the watch, at most one a watch; an
+# urgent one is said at once). The lines go to the person stationed only, never to the
+# log. Once a day to eat and drink and a sleep every day or two keep a man below every
+# line; the hours are judgement, set so (TuningNotes, "Package 54", has the reasons). The
+# ends (death by hunger or thirst, collapse, the surgeon) are M7's with health: the steps
+# stop at the last one's urgent line and, for fatigue, a man who falls asleep where he is.
+#
+# Each step: the hours at which it begins, the words for the man (after "you are"), and
+# its severity: silent (the first step, never said), notable or urgent.
+
+hunger:
+  steps:
+    - {hours: 12, words: hungry, severity: silent}
+    - {hours: 30, words: quite hungry, severity: notable}
+    - {hours: 40, words: very hungry, severity: notable}
+    - {hours: 48, words: absolutely starving, severity: urgent}
+
+thirst:
+  steps:
+    - {hours: 10, words: thirsty, severity: silent}
+    - {hours: 28, words: quite thirsty, severity: notable}
+    - {hours: 38, words: parched, severity: notable}
+    - {hours: 46, words: desperately thirsty, severity: urgent}
+
+fatigue:
+  steps:
+    - {hours: 20, words: tired, severity: silent}
+    - {hours: 36, words: feeling a bit drowsy, severity: notable}
+    - {hours: 44, words: very tired, severity: notable}
+    - {hours: 50, words: hardly able to keep your eyes open, severity: urgent}
+    # the last: he falls asleep where he is, and sleeps until called or rested
+    - {hours: 56, words: asleep where you stood, severity: urgent, asleep: true}
+  # Hours of waking made up by an hour of sleep: below in his cot or hammock, and where he
+  # fell asleep (judgement: a watch below of four hours makes up a day and more, a night of
+  # eight two days and more; a man asleep against a gun sleeps half as well).
+  sleep_below_per_hour: 8
+  sleep_where_he_is_per_hour: 4
+  # A person who is also a hand (drawn from a station of the muster, not the quarterdeck):
+  # his fatigue is the crew's (`crew/hands.py`, 0 fresh to 1 done in), read at these bounds
+  # for the steps above in turn (judgement: the muster's words for the crew's fatigue,
+  # `crew/model.py`, at about the same places). The watch bill rests him as it rests the
+  # hands, so he never falls asleep where he is.
+  hand_bounds: [0.3, 0.5, 0.7, 0.85]
+
+# Where a man may eat at a table (the cabin, the gunroom, the galley's mess, the shore);
+# anywhere else aboard a biscuit and a piece of cheese are brought up from the stores.
+# Eating draws on the ship's provisions only as his share of the day's ration does.
+places_with_food: [cabin, gunroom, galley, hold, shore]
+
+# On short allowance a meal leaves him this many hours on the clock (half a meal: the
+# Regulations' Art. III has every man equal in point of victualling, the officers too).
+short_allowance_hours_left: 8
+
+# Where a man turns in below, by his role (judgement: the captain in his cot in the cabin,
+# the officers and the warrant officers in their cabins off the gunroom); any other below.
+berths:
+  captain: cabin
+  commander: cabin
+  default: gunroom
+
+# Drinking the water found foul (package 50's `aboard:`) gripes a man: it puts this many
+# hours on his fatigue (judgement; health is M7's).
+foul_water_hours: 6

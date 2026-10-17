@@ -16,6 +16,8 @@
 #   driver    a console command that reached the ship by mistake
 #   wreck     a spar or a sail in a wreck, or nothing (meaning every wreck aboard)
 #   query     nothing: a question answered in the log and never journaled
+#   needs     a person's own: eat, drink, sleep (package 54), answered to him alone
+#   allowance the people's allowance of provisions, the captain's (package 54)
 # `level` is the control ladder level of docs/DesignProposal.md §2.2.
 # ---------------------------------------------------------------------------
 verbs:
@@ -1122,6 +1124,50 @@ verbs:
     synonyms: [load the standing orders from, read standing orders from]
     object: driver
     level: driver
+  # The needs (spec M7b §19, §20; package 54; `freesail/orders/needs.py`). A person's own
+  # orders, at whatever station he holds and from the player at the prompt (object
+  # `needs`, which every station's domain allows): answered to him alone and never
+  # written in the log. `drink the foul water` drinks the water found foul at a cost.
+  # `sleep` turns the player in below; a model's station turns in with its own stand-by,
+  # `stand by, asleep below until called`.
+  eat:
+    synonyms: [eat something, have something to eat, get something to eat, take a meal,
+               have a meal, dine, have dinner, have breakfast, have supper, break my fast]
+    object: needs
+    level: 1
+  drink:
+    synonyms: [drink something, have a drink, take a drink, have something to drink,
+               drink water, drink some water, drink my beer, drink beer]
+    object: needs
+    level: 1
+  drink the foul water:
+    synonyms: [drink the water all the same, drink the foul water all the same,
+               drink foul water]
+    object: needs
+    level: 1
+  sleep:
+    synonyms: [turn in, go to sleep, get some sleep, sleep below, go below and sleep,
+               turn in below, take some sleep]
+    object: needs
+    level: 1
+  how am i:
+    synonyms: [my needs, how do i feel, how am i doing, am i hungry, am i tired, am i thirsty]
+    object: needs
+    level: reading
+  # The allowance (the Regulations of 1806, Sect. IX, Chap. I, Art. III): the captain's
+  # order, every man alike; object `allowance`, the captain's alone.
+  short allowance:
+    synonyms: [put the people to short allowance, put the people on short allowance,
+               put the ship's company to short allowance, put the men on short allowance,
+               go to short allowance, half allowance, put the people to half allowance]
+    object: allowance
+    level: 1
+  whole allowance:
+    synonyms: [full allowance, put the people to whole allowance,
+               put the people back to whole allowance, put the people to full allowance,
+               back to full allowance, back to whole allowance, go to full allowance]
+    object: allowance
+    level: 1
   # Console and client control. If one of these reaches the ship, the
   # captain typed it at the wrong prompt; say so.
   hold:

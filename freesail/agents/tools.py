@@ -328,15 +328,18 @@ def _and_list(names: list[str]) -> str:
 # not the world answers an order, so a bell struck between two submissions of the same
 # order is not "a change in the readings" (spec §11; judgement).
 WELFARE_CLOCK_KINDS: tuple[str, ...] = ("watch", "bells", "daylight")
+# ...and the readings that fall with the clock, by id: the stores, drawn down at the meals
+# whether or not an order is answered (package 54).
+WELFARE_CLOCK_ROWS: tuple[str, ...] = ("stores",)
 
 
 def readings_digest(world: World) -> str:
     """A digest of the readings in words, for the welfare detector: "no change in the
     readings" means the words a model would read are the same, the clock's rows apart
-    (`WELFARE_CLOCK_KINDS`)."""
+    (`WELFARE_CLOCK_KINDS`) and the stores, which fall with it (`WELFARE_CLOCK_ROWS`)."""
     words = readings_words(world)
     for row in R.REGISTRY:
-        if row.kind in WELFARE_CLOCK_KINDS:
+        if row.kind in WELFARE_CLOCK_KINDS or row.id in WELFARE_CLOCK_ROWS:
             words.pop(row.id, None)
     text = json.dumps(words, sort_keys=True)
     return hashlib.sha256(text.encode()).hexdigest()[:16]
@@ -1308,8 +1311,13 @@ TOOLS: dict[str, Tool] = {
             "you stand by for that came while your call was on its way wakes you at once. "
             "An urgent line in the log ends any stand-by and wakes you, its line named as "
             "the reason; the notable lines logged while you stood by come with the sample "
-            "that wakes you, counted and listed.",
-            {"until": "string: the event, the interval, 'a notable event' or 'an urgent event'"},
+            "that wakes you, counted and listed. 'asleep below until called' turns your "
+            "person in below to sleep: a word or a question to you, an urgent line, or your "
+            "rest wakes you (refused with the deck below the captain's).",
+            {
+                "until": "string: the event, the interval, 'a notable event', 'an urgent "
+                "event', or 'asleep below until called'"
+            },
             stand_by,
         ),
         Tool(

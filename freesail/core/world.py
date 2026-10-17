@@ -282,7 +282,9 @@ RULE_ACTOR_PREFIXES = (STANDING_ACTOR_PREFIX, CAPTAIN_RULE_PREFIX)
 # 40b): the master's slate, which an officer works his own reckoning from. `submit` hands
 # such an answer back as an Event it does not record; a station reads it in its tool's
 # result, and the console and the browser show it to the player who asked.
-UNLOGGED_KINDS = frozenset({"query.slate", "director.answer"})
+# A person's own needs (package 54: `eat`, `drink`, `sleep`, `how am I`) are answered to
+# him the same way: the needs show only to the person stationed, never in the log.
+UNLOGGED_KINDS = frozenset({"query.slate", "director.answer", "needs.answer"})
 
 # The motion's words must hold this long before the log says they changed (spec M5 §4;
 # judgement: five minutes, so a roll hovering about "rolling" and "rolling easily" is
@@ -660,6 +662,13 @@ class World:
             float(getattr(stores_spec, "provisions_days", 0.0) or 0.0),
         )
         self.ports = Ports(self)
+        # the needs (spec M7b §19, §20; package 54): the people's hunger, thirst and
+        # fatigue, by hand at a station held and by the routine elsewhere, told to the
+        # person stationed alone (`world.needs`); the stores' fall at the meals is
+        # `crew.victuals`'s, ticked with them
+        from freesail.world.needs import NeedsKeeper
+
+        self.needs = NeedsKeeper(self)
         # The other sail on the sea at the start and the world orders by time (spec M5 §25
         # to §27; package 36; `freesail.world.ships`, `freesail.world.orders`): the ships
         # are the scenario's state, as the people are; the orders are applied at their
@@ -1463,6 +1472,11 @@ class World:
         extra = getattr(self.ship, "extra", None)
         if isinstance(extra, dict):
             extra[ORDER_ACTOR] = actor
+        needs = getattr(self, "needs", None)
+        if needs is not None and not standing:
+            # the player who gives an order is awake (package 54): it wakes him where his
+            # needs had him asleep; nothing of it is written
+            needs.heard_order(actor)
         try:
             try:
                 kind, log_text, data = self.ship.handle_order(text)
@@ -1776,6 +1790,11 @@ class World:
                 else:
                     severity, kind, text, subject, data = note
                     self.record(severity, kind, text, subject=subject, data=data)
+        if self.clock.ship_time.second == 0:
+            # the needs once a minute (package 54): the meals' fall of the stores, which
+            # writes nothing unless one runs out, and the people's needs, told to the
+            # person stationed and never to the log
+            self._tick_needs()
         bells = self.clock.bells()
         if bells is not None:
             self.record(
@@ -1801,6 +1820,19 @@ class World:
     def run(self, ticks: int) -> None:
         for _ in range(ticks):
             self.tick()
+
+    def _tick_needs(self) -> None:
+        from freesail.crew import victuals
+
+        for severity, kind, text, data in victuals.tick(self):
+            self.record(severity, kind, text, data=data)
+        needs = getattr(self, "needs", None)
+        if needs is None:
+            # a checkpoint from before package 54: the keeper made now
+            from freesail.world.needs import NeedsKeeper
+
+            needs = self.needs = NeedsKeeper(self)
+        needs.tick()
 
     # -- queries -------------------------------------------------------------
 

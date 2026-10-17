@@ -388,6 +388,19 @@ class StoresSpec:
 
 
 @dataclass
+class RationSpec:
+    """The ration the ship is victualled by (spec M7b §19; package 54): the table of
+    `data/crew/ration.yaml` it is served from, and the water drawn from the ground tier a
+    man a day, in gallons, for his drink, his grog and the coppers."""
+
+    table: str = "navy"
+    water_gallons: float = 1.0
+
+
+RATION_KEYS = ("table", "water_gallons")
+
+
+@dataclass
 class PersonRoleSpec:
     """A named role beyond the posts (package 35, spec M5 §22): the role's words, the
     station the person is drawn from at muster, the rating wanted (None: any), and
@@ -411,6 +424,7 @@ class CrewSpec:
     idlers_by_trade: dict[str, int]  # in the file's order
     stores: StoresSpec = field(default_factory=StoresSpec)
     people: list[PersonRoleSpec] = field(default_factory=list)  # package 35
+    ration: RationSpec = field(default_factory=RationSpec)  # package 54
 
     @property
     def seamen(self) -> int:
@@ -1149,6 +1163,7 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
             "idlers_by_trade",
             "stores",
             "people",  # package 35
+            "ration",  # package 54
         ):
             raise ShipFileError(f"{source}: the crew section has '{key}', which it does not take.")
 
@@ -1293,4 +1308,28 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
         idlers_by_trade=trades,
         stores=stores,
         people=people,
+        ration=_parse_ration(c.get("ration"), source),
     )
+
+
+def _parse_ration(r: Any, source: str) -> RationSpec:
+    """The crew's `ration:` block (package 54): the table's name and the water a man a
+    day; absent, the Navy's table and a gallon."""
+    if r is None:
+        return RationSpec()
+    if not isinstance(r, dict):
+        raise ShipFileError(f"{source}: the crew's 'ration' is not a mapping.")
+    for key in r:
+        if key not in RATION_KEYS:
+            raise ShipFileError(f"{source}: the crew's ration has '{key}', which it does not take.")
+    spec = RationSpec()
+    if r.get("table") is not None:
+        spec.table = str(r["table"]).strip()
+    if r.get("water_gallons") is not None:
+        v = r["water_gallons"]
+        if isinstance(v, bool) or not isinstance(v, int | float) or v < 0:
+            raise ShipFileError(
+                f"{source}: the ration's water_gallons is {v!r}; it must be a number, not negative."
+            )
+        spec.water_gallons = float(v)
+    return spec

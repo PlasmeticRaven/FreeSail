@@ -6066,3 +6066,154 @@ tier whole ran once at the end (below), every pinned passage's digest with it.
   build machine; every recorded passage's pin held.
 - The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`), on the
   quiet machine after the slow tier: 6 passed in some 150 s.
+
+## Package 54: needs (2026-10-17)
+
+Package 54 (spec M7b §19, §20 and §21 as built; the owner's rulings of 2026-10-15, by hand at
+a filled station and never busywork; the brief in `docs/dev/M7b-WorkPackages.md`). The
+company eat and drink the Regulations' ration at the meals and the stores fall as a reading;
+short allowance is the captain's order, with its cost to the hands and a line on their
+temper; the water found foul is drunk at a cost or not drunk; a person at a station held has
+hunger, thirst and fatigue in steps, sees to them by his own orders and a stand-by asleep
+below, and is told of them alone, never the log. Proven in `tests/test_stores.py` (new),
+`tests/test_people.py` and truths 7b-103 and 7b-104 (`tests/test_known_truths.py`, the
+fixture `needs_days`). No model was seated.
+
+### The ration, with its sources
+
+`data/crew/ration.yaml`; each ship file's `crew.ration` names the table and the water.
+
+| Figure | Value | Source |
+|---|---|---|
+| the day's proportion a man | a pound of biscuit and a gallon of beer daily; two pounds of beef Tuesday and Saturday; a pound of pork and half a pint of pease Sunday and Thursday; on Monday, Wednesday and Friday a pint of oatmeal, two ounces of butter and four of cheese, with half a pint of pease Wednesday and Friday | the Regulations and Instructions of 1806 (the 1808 printing beside the sources, near line 16655 of the OCR), Sect. IX, Chap. I, Art. I: the heads (biscuit in pounds, beer in gallons wine measure, beef and pork in pounds, pease and oatmeal in pints Winchester, sugar, butter and cheese in ounces) and the days are legible; **the figures are lost to the OCR** and are given as the printed table is commonly reproduced (the weekly seven pounds of biscuit, seven gallons of beer, four of beef, two of pork, two pints of pease, three of oatmeal, six ounces of butter, twelve of cheese). To be checked against the printed page by the owner. The table's **sugar** column is left out: its figures are not legible and the builder does not know them |
+| what stands for a gallon of beer | a pint of wine, or half a pint of rum, brandy or other spirits | Art. II, legible |
+| short allowance | the commander's in "cases of absolute necessity", every man alike, the officers too, the men paid for the deficiency | Art. III, legible |
+| short allowance's share | a half | the brief and truth 7b-103; the period's commonest was "six upon four", two thirds, which `ration.yaml`'s `short_allowance` takes if the owner prefers it |
+| the meals | breakfast 08:00, dinner 12:00, supper 16:00, a third of the day's ration each | judgement: the watch bill's custom; the sources give the hours, not the shares |
+| water a man a day | a gallon, for his drink, the grog and the coppers | judgement: the figure every ship file's water was sized at ("at a gallon a man a day it is some twelve weeks for 264", spec M3 2.3 after Winfield). The brief's "a quart of water" is a man's own drink where beer is out; the stores' fall counts the coppers and the grog too |
+| a ton of water | 252 gallons | a tun of four hogsheads, wine measure, the gauge the Regulations give the beer by (Art. VII); judgement for the water |
+| the master's report of the water | at noon, the beer and water expended in the last twenty-four hours and what remains | the Regulations' Master, art. XIV (legible); the purser's reading says the same at any hour |
+
+The frigate's 264 draw 264 gallons, 1.05 tons, a day: her hundred tons last 95 days and her
+120 days of provisions 120, at full allowance; at short allowance 191 and 240.
+
+### The steps' hours, with their reasons
+
+`data/crew/needs.yaml`. The rule for all three: once a day to eat and drink and a sleep every
+day or two keep a man clear of every line, and two days without bring every urgent line and,
+on the third, sleep where he stands.
+
+| Need | Steps (hours; the first silent) | Why |
+|---|---|---|
+| thirst | thirsty 10; quite thirsty 28; parched 38; desperately thirsty 46 (urgent) | the second step past a day and a watch, so that drinking at any hour once a day is never told; the urgent before two days are out, a man going without water failing sooner than without food |
+| hunger | hungry 12; quite hungry 30; very hungry 40; absolutely starving 48 (urgent) | the same, two hours behind thirst, so that the first line at noon of the second day names both |
+| fatigue | tired 20; a bit drowsy 36; very tired 44; hardly able to keep your eyes open 50 (urgent); asleep where he stands 56 | "a sleep every day or two": a night's sleep each day never reaches the second step, a day and a half without does; asleep in the forenoon or afternoon of the third day |
+
+| Constant | Value | Why |
+|---|---|---|
+| a notable line | at the change of the watch, one a watch, the needs risen since said together | the owner's "spaced by watches"; a man's needs come to him at the bells, not by the minute |
+| an urgent line | at once | the last step is not a thing to wait for |
+| sleep below | eight hours of waking made up an hour | a watch below of four hours makes up a day and more, a night of eight two days: "a night below" resets the truth's player |
+| asleep where he fell | four to the hour | a man asleep against a gun sleeps half as well |
+| too rested to sleep | under an hour of waking | he would wake at once |
+| half a meal at short allowance | eight hours left on his clock | every man equal in victualling (Art. III); a man eating once a day at short allowance comes to the lines sooner |
+| the foul water drunk | six hours on his fatigue | it gripes him; health is M7's |
+| a hand's fatigue | the crew's, at 0.3, 0.5, 0.7 and 0.85 for the four steps | about where the muster's words for the crew's fatigue change (`crew/model.py`); the watch bill rests him, so never asleep where he stands |
+| the crew's hardship | short allowance its shortfall (0.5), a store run out the whole (1), the water foul 0.25 | judgement |
+| the routine's rates under hardship h | work and idleness `1 + 0.5 h`, rest `1 - 0.5 h` | at half allowance a hand tires a quarter faster and rests a quarter less; at nought the rates are as they were, to the bit (`tests/test_stores.py`) |
+
+### What two days of play showed
+
+The truth's fixture (the frigate at seed 7 on the plane, 06:00 on 10 June to 05:00 on the
+13th, the player at the prompt as the console has him; 3 minutes on the build machine under
+the other packages' load). His lines, as the console prints them:
+
+```
+* Afternoon watch, 8 bells (12:00)  You are quite thirsty and quite hungry. ('drink' and 'eat')        [the 11th]
+* First watch, 8 bells (20:00)  You are parched and feeling a bit drowsy. ('drink' and 'sleep')
+* Middle watch, 8 bells (00:00)  You are very hungry. ('eat')                                          [the 12th]
+! Morning watch, 8 bells (04:00)  You are desperately thirsty and very tired. ('drink' and 'sleep')
+! Morning watch, 4 bells (06:00)  You are absolutely starving. ('eat')
+! Forenoon watch (08:01)  You are hardly able to keep your eyes open. ('sleep')
+! Afternoon watch (14:01)  You have fallen asleep where you stood, on the quarterdeck. Your next order wakes you. ('sleep')
+* Afternoon watch, 6 bells (15:00)  You wake, on the quarterdeck.                               [his `eat`]
+! Last dog watch (18:56)  You have fallen asleep where you stood, on the quarterdeck. Your next order wakes you. ('sleep')
+* First watch, 8 bells (20:00)  You wake, on the quarterdeck.                                  [his `whole allowance`]
+* Middle watch (02:29)  You wake, rested, on the quarterdeck.                                          [the 13th]
+```
+
+Eleven lines in two days and a half, five of them urgent, none in the log. His `eat` at 15:00
+on the 12th woke him: "A biscuit and a piece of cheese are brought up from the stores; you
+eat on the quarterdeck, the first since 06:00 on 10 June." An hour asleep against the guns
+had made up only four hours of the fifty-six he owed, and he fell asleep where he stood again
+before the last dog watch was out: what a man past his last step wants is his cot, which he
+took at 20:00 ("You turn in below, in the cabin."), waking rested at 02:29 and going back on
+deck. The stores: a day's meals took 1.0 day of provisions and 1.05 tons of water ("water 99
+tons for 94.5 days, provisions for 119 days"); `short allowance` at 15:00 on the 12th said
+"The ship's company put to short allowance, half the whole, every man aboard alike and the
+officers with them; the purser keeps the savings to be paid them. The people take it
+sullenly. At this allowance the provisions for 235 days and the water for 186.", and supper
+took a sixth of a day ("provisions for 117 days (234 at short allowance)"; the purser's page,
+"Water: 97 tons in the ground tier, for 185.2 days at short allowance"); `whole allowance` at
+20:00 ("the people take it cheerfully") put them back. These two lines are the log's only
+lines of the stores or the needs in the 186 of the three days. The model's side is
+`tests/test_people.py`: the officer of the watch's sample carried "You are quite thirsty.
+(submit_order('drink'))" at the glass after the change of the watch and `needs: quite
+thirsty`; his `stand by, asleep below until called` was refused with the deck and, without
+it, turned him in to the gunroom with the stand-by's line ("[officer of the watch] Turned in
+below, in the gunroom, asleep until called."); the captain's word woke him and he was back on
+the quarterdeck, the sample saying so first.
+
+### Found on the way
+
+- **Nobody at the prompt in a passage.** The rule of reach's `held_stations` has the player
+  at the prompt hold the captain's station in every world with no model there; read so, every
+  recorded passage's captain would have had his needs by hand and fallen asleep on the third
+  day. The needs take the player to be at the prompt when a driver listens for his lines (the
+  console, the browser) or once he has given an order of his own needs, so that a test or a
+  passage sailed by its book has nobody there and the people are never built for the needs'
+  sake. The rule of reach is untouched.
+- **The stores in the welfare detector.** The welfare digest left out the clock's rows; the
+  stores now fall with the clock at the meals, and are left out with them
+  (`tools.WELFARE_CLOCK_ROWS`), so that a repeated order across a meal is still seen as
+  repeated.
+- The purser's page said "Nothing is yet expended against them; the books stand as the ship
+  was stored" always; it says so now only until the first meal, then what is expended.
+- The primer's `the stores` example in chapter 14 reads "water 100 tons for 95.5 days", and
+  `tests/test_places.py`'s purser's page "Water: 100 tons in the ground tier, for 95.5 days at
+  full allowance." (package 35's assertion, mended to the new page).
+- `take in water` with no figure completes the water to the ship file's allowance, which is
+  now a fraction of a ton after the meals ("3.7 tons of water"); left as it reads.
+- A woken person goes back where he turned in from: package 53's `go on deck` is not yet on
+  this branch, and an officer woken in the gunroom would otherwise hear only the gunroom
+  until it is. The lead may prefer him to stay below once 53 is merged (`needs.wake`).
+- `send for` a stationed person asleep by his needs does not wake him; the messenger finds
+  him as the bill says. Left for 53's reach or M7.
+- Sibling agents of this session share the session's scratchpad directory: a log written there
+  under a common name is overwritten by another's run (this package's first fast tier was so
+  read wrongly and run again under its own name).
+
+### Pins moved
+
+None. No recorded passage has anybody at the prompt or a station's person past a day and a
+watch without food; the stores' fall writes no line (a store runs out in none); the hands'
+hardship is nought at whole allowance with sweet water and leaves the routine's rates
+unchanged to the bit; the needs' answers are unlogged; a sample's `needs` is absent while no
+need shows. The slow tier whole ran once at the end (below), every pinned passage's digest
+with it.
+
+### The suite, as run
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- The package's own tests as written: `test_stores.py` 9 (new), `test_people.py` 7 new,
+  truths 7b-103 and 7b-104 (the fixture `needs_days`, three days of the frigate, some three
+  minutes to build), all passing; `test_places.py`'s purser's page mended (above).
+- The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`) on the tree before the last
+  commit: all passed but the purser's page (mended) and the fingerprint test, the tree edited
+  under it, as packages 50's and 52's.
+- The whole slow tier (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m "not pace"`)
+  once on the final tree, the fast tier with it: 3,656 passed, 10 xfailed (the same ten as
+  packages 50's and 52's), none failed, in two hours and ten minutes on the build machine
+  under two other packages' runs; every recorded passage's pin held.
+- The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`) after it, the
+  machine quieter but one other package's slow tier still running: 6 passed in 152 s.

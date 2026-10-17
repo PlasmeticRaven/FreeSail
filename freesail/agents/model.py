@@ -150,6 +150,9 @@ class Sample:
     # deck's conversation, package 41), each line under the speaker's name and with where
     # he stood; absent when nothing was
     heard: list[str] | None = None
+    # the station's person's needs at a step that is said (package 54: 'quite thirsty and
+    # feeling a bit drowsy'); absent while none is
+    needs: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -159,11 +162,23 @@ class Sample:
             d.pop("word", None)
         if not d.get("heard"):
             d.pop("heard", None)
+        if not d.get("needs"):
+            d.pop("needs", None)
         # the harness's notices first after the stamp and the reason (the first of them,
         # after a stand-by, says that the model stood by: package 28c), then the question
         # and the stand-by's digest, then the log and the readings; a door that sends the
         # sample as JSON sends it in this order
-        first = ("tick", "stamp", "reason", "notices", "question", "word", "heard", "stood_by")
+        first = (
+            "tick",
+            "stamp",
+            "reason",
+            "notices",
+            "question",
+            "word",
+            "heard",
+            "needs",
+            "stood_by",
+        )
         return {k: d[k] for k in first if k in d} | {k: v for k, v in d.items() if k not in first}
 
 

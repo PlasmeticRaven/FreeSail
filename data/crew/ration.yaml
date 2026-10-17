@@ -1,0 +1,76 @@
+# The ration (spec M7b §19; package 54): the daily proportion of provisions a man, the
+# meals it is served at, and what the water in the ground tier is drawn down by.
+#
+# The Navy's table is the Regulations and Instructions relating to His Majesty's Service at
+# Sea (13th edition, 1806, printed 1808), Sect. IX, Chap. I, Art. I, "Allowance of
+# Provisions", pp. 287 to 288 of the 1808 printing (docs/references/admiralty/
+# regulations-and-instructions-1808-ocr.txt, near line 16655): its heads (biscuit in pounds
+# avoirdupois, beer in gallons wine measure, beef and pork in pounds, pease and oatmeal in
+# pints Winchester measure, sugar, butter and cheese in ounces) and its days are legible in
+# the OCR; its figures are lost to it, and are given here as the printed table has them
+# (a pound of biscuit and a gallon of beer every day; two pounds of beef on Tuesday and
+# Saturday; a pound of pork with half a pint of pease on Sunday and Thursday; the banyan
+# days, Monday, Wednesday and Friday, a pint of oatmeal, two ounces of butter and four of
+# cheese, with half a pint of pease on Wednesday and Friday: the weekly proportion seven
+# pounds of biscuit, seven gallons of beer, four pounds of beef, two of pork, two pints of
+# pease, three of oatmeal, six ounces of butter and twelve of cheese), to be checked against
+# the printed page (TuningNotes, "Package 54"). The 1806 table has a column for sugar, whose
+# figures the OCR loses and the builder does not know: it is left out, not guessed. Art. II
+# gives the substitutes legibly: "a pint of Wine, or half a pint of Rum, Brandy, or other
+# Spirits, holds proportion to a gallon of Beer". Art. III leaves the shortening of the
+# allowance to the commander "in cases of absolute necessity", the men "duly paid for the
+# deficiency", and all "equal in point of victualling": no officer at whole while the rest
+# are at short allowance.
+#
+# A ship file names its table and the water a man a day (`crew.ration`); a ship whose file
+# keeps no stores is not victualled.
+
+tables:
+  navy:
+    source: >-
+      Regulations and Instructions relating to His Majesty's Service at Sea, 1806 (1808
+      printing), Sect. IX, Chap. I, Art. I, the table of the daily proportion of
+      provisions; the substitutes Art. II, the short allowance Art. III
+    # the day's proportion a man, by the day of the week
+    days:
+      sunday: {biscuit_lb: 1, beer_gal: 1, pork_lb: 1, pease_pt: 0.5}
+      monday: {biscuit_lb: 1, beer_gal: 1, oatmeal_pt: 1, butter_oz: 2, cheese_oz: 4}
+      tuesday: {biscuit_lb: 1, beer_gal: 1, beef_lb: 2}
+      wednesday: {biscuit_lb: 1, beer_gal: 1, pease_pt: 0.5, oatmeal_pt: 1, butter_oz: 2, cheese_oz: 4}
+      thursday: {biscuit_lb: 1, beer_gal: 1, pork_lb: 1, pease_pt: 0.5}
+      friday: {biscuit_lb: 1, beer_gal: 1, pease_pt: 0.5, oatmeal_pt: 1, butter_oz: 2, cheese_oz: 4}
+      saturday: {biscuit_lb: 1, beer_gal: 1, beef_lb: 2}
+    # Art. II: what holds proportion to a gallon of beer, in words for the purser's page
+    in_lieu_of_beer: a pint of wine or half a pint of rum, brandy or other spirits
+
+# How the day's species are said on the purser's page, in the table's order.
+words:
+  biscuit_lb: [pound of biscuit, pounds of biscuit]
+  beer_gal: [gallon of beer, gallons of beer]
+  beef_lb: [pound of beef, pounds of beef]
+  pork_lb: [pound of pork, pounds of pork]
+  pease_pt: [pint of pease, pints of pease]
+  oatmeal_pt: [pint of oatmeal, pints of oatmeal]
+  butter_oz: [ounce of butter, ounces of butter]
+  cheese_oz: [ounce of cheese, ounces of cheese]
+
+# The meals the ration is served at, by the hour of the ship's day, and the share of the
+# day's provisions and water each draws (judgement: breakfast at eight bells in the morning
+# watch, dinner at noon, supper at the change of the afternoon watch, as the watch bill's
+# custom has the hands below and on deck changed about them; the period's books give the
+# hours and not the shares, so each meal a third).
+meals:
+  - {hour: 8, name: breakfast}
+  - {hour: 12, name: dinner}
+  - {hour: 16, name: supper}
+
+# A ton of water in the ground tier, in gallons: a tun of four hogsheads, 252 gallons wine
+# measure, the measure the Regulations gauge the beer by (Art. VII: "the contents in gallons
+# wine measure"); the water in the ship files is in tons so counted (judgement on the
+# period's measure of a leaguer or a butt of water by the tun).
+water_gallons_a_ton: 252
+
+# Short allowance (Art. III): the share of the whole allowance served while the captain
+# keeps the people at short allowance. The period's commonest was "six upon four", two
+# thirds; the brief and truth 7b-103 halve it, and the half stands (TuningNotes).
+short_allowance: 0.5

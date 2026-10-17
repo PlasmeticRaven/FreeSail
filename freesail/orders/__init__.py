@@ -192,6 +192,11 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import port
 
         return port.execute(ship, order)
+    if vocab.verbs[order.verb].object in ("needs", "allowance"):
+        # a person's own needs and the people's allowance (spec M7b §19, §20; package 54)
+        from freesail.orders import needs
+
+        return needs.execute(ship, order)
     if order.verb == "set" and ("reefs" in order.modifiers or "close" in order.modifiers):
         return _set_reefed(ship, order, vocab)
     return verbs.execute(ship, order, vocab)

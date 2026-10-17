@@ -2870,6 +2870,26 @@ CUTTER_POSTS, CUTTER_DRAWN = wardroom("cutter")
 BRIG_POSTS, BRIG_DRAWN = wardroom("brig")
 
 
+def ration_entries(whose):
+    """The crew's `ration:` block (package 54, spec M7b §19): the table of
+    data/crew/ration.yaml the ship is served from and the water a man a day. `whose` says
+    why the Navy's table serves her, after its source."""
+    return [
+        (
+            ("ration", "table"),
+            "navy",
+            "The ration (package 54, spec M7b 19): the Navy's table, the Regulations of 1806 "
+            f"(Sect. IX, Chap. I, Art. I), as data/crew/ration.yaml gives it; {whose}.",
+        ),
+        (
+            ("ration", "water_gallons"),
+            1,
+            "Water drawn a man a day for his drink, his grog and the coppers: a gallon, the "
+            "figure her water above is reckoned at (judgement).",
+        ),
+    ]
+
+
 def frigate_crew(b):
     posts_note = (
         "Station holders by post (spec M3 2.3): the commissioned officers, then the standing "
@@ -2971,6 +2991,7 @@ def frigate_crew(b):
                 600,
                 "Spare rope in the boatswain's store (judgement).",
             ),
+            *ration_entries("a King's ship"),
         ]
     )
     # The people (package 35, spec M5 §22): the named few beyond the posts. The master's
@@ -3154,6 +3175,7 @@ def schooner_crew(b):
             (("stores", "provisions_days"), 60, "Provisions: two months (judgement)."),
             (("stores", "spare_spars"), {}, None),  # the booms, by class: below
             (("stores", "cordage_fathoms"), 150, "Spare rope (judgement)."),
+            *ration_entries("a private ship of war's articles promised the like (judgement)"),
         ]
     )
     # The people (package 35, spec M5 §22): the master and a mate are posts already; a boy
@@ -4089,6 +4111,7 @@ def cutter_crew(b):
             (("stores", "provisions_days"), 30, "Provisions: a month (judgement)."),
             (("stores", "spare_spars"), {}, None),  # the booms, by class: below
             (("stores", "cordage_fathoms"), 80, "Spare rope (judgement)."),
+            *ration_entries("a revenue cruiser victualled as the King's ships (judgement)"),
         ]
     )
     # The people (package 35, spec M5 §22): a boy of the afterguard carries the word
@@ -5149,6 +5172,7 @@ def brig_crew(b):
                 300,
                 "Spare rope in the boatswain's store (judgement).",
             ),
+            *ration_entries("a King's ship"),
         ]
     )
     # The people (package 35, spec M5 §22): a master's mate and a midshipman as the
@@ -5871,6 +5895,10 @@ def lugger_crew(b):
             (("stores", "provisions_days"), 30, "Provisions: a month (judgement)."),
             (("stores", "spare_spars"), {}, None),
             (("stores", "cordage_fathoms"), 80, "Spare rope (judgement)."),
+            *ration_entries(
+                "the measure for a French vessel too, whose own ration the references do not "
+                "give (judgement)"
+            ),
         ]
     )
     b.people(
@@ -6564,6 +6592,7 @@ def smack_crew(b):
             (("stores", "provisions_days"), 14, "Provisions: a fortnight (judgement)."),
             (("stores", "spare_spars"), {}, None),
             (("stores", "cordage_fathoms"), 40, "Spare rope (judgement)."),
+            *ration_entries("the measure for a smack's men, found by her owner (judgement)"),
         ]
     )
     b.people(

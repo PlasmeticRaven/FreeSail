@@ -1880,6 +1880,11 @@ crew:
     - kind: storm_trysail
       canvas_no: 1
       condition: 100
+  ration:
+    # The ration (package 54, spec M7b 19): the Navy's table, the Regulations of 1806 (Sect. IX, Chap. I, Art. I), as data/crew/ration.yaml gives it; a King's ship.
+    table: navy
+    # Water drawn a man a day for his drink, his grog and the coppers: a gallon, the figure her water above is reckoned at (judgement).
+    water_gallons: 1
   # The named people beyond the posts (package 35, spec M5 §22): each drawn from his station at muster, the counts above unchanged; see tools/gen_ships.py.
   people:
   # A master's mate, an able seaman of the forecastle (the Regulations of 1806, the Master, art. XXVIII).

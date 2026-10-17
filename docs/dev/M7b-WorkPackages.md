@@ -27,7 +27,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 50 | Fable | The director proper: the station above the game, the world orders doubted not refused, the brief and its limits, the budget, the hidden log revealed on request and inline in replays | briefed 2026-10-17, brought forward to the close of M6 (decision 50); approved and launched the same day; **built the same day** (spec §2 to §7 as built, the Harness's §19, the primer's chapter 20, the tuning notes; the owner's refinement of the examples-not-a-rule framing in the brief and the channel); **merged 2026-10-17** (the record below) |
 | 52 | Opus | The director's voice: people from words, `say as`, the unseated answered; the word heard a word on deck; the truth of who commands told to every station | briefed 2026-10-17, after 50; **built the same day** (spec §8, §9, §10 and §15 as built; the Harness's §19; the primer's chapters 19 and 20; the tuning notes, "Package 52"; truths 7b-95 to 7b-97); **merged 2026-10-17** (the record below) |
 | 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | briefed 2026-10-17; approved and launched the same day, the three together |
-| 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | briefed 2026-10-17; approved and launched the same day, the three together |
+| 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | briefed 2026-10-17; approved and launched the same day, the three together; **built the same day** (spec §19, §20 and §21 as built; the Harness's §20; the primer's chapters 14 and 19; the tuning notes, "Package 54"; truths 7b-103 and 7b-104); **merged 2026-10-17** (the record below) |
 | 51 | Fable | The observed world: the followed ship in place of the given one, no player's ship, the player on another ship, the replay of a station there; the director's chart, the truth drawn (spec §12a); provisionally the director's focus and the ships' logs by kind and tick range (spec §12b; both the owner's word of 2026-10-17) | brief to write, after 50 |
 | 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | briefed 2026-10-17, for the owner's approval |
 | 57 | Opus | The frigate's staysails from Steel's list through the generator, the period's shapes; the chasse-marée's rig put right (lug topsails, not square; the lugs slung a third from the fore end and set to leeward of the mast; the trim rule reading a lug as fore-and-aft) and the viewer's draw order by aspect and the brace shown (the owner's notes of the Éclair's first cruise, `docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`) | briefed 2026-10-17; approved and launched the same day, the three together |
@@ -190,6 +190,38 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
    its session kind, as 42b told the captain's station (its leftover).
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
+
+### Package 54 as merged (2026-10-17)
+
+Merged `--no-ff` from the builder's worktree (three commits on `e9c9581`; 38 files, ~2,600
+lines), ruff clean, the fast tier run on the merged tree by the lead; the builder's whole
+slow tier (3,656 passed, 10 xfailed, under the other packages' load) and the pace tests
+passed on the final tree (`docs/dev/TuningNotes.md`, "Package 54"). Built as briefed: the
+ration as data (`data/crew/ration.yaml`, the Regulations of 1806), the stores falling at
+the meals as a reading and never a line, the purser's books, short and whole allowance as
+the captain's orders with the hands' hardship, the needs in steps on `Person` ticked by
+`world/needs.py` from `data/crew/needs.yaml`, the lines to the person alone, `eat`,
+`drink`, `sleep`, `how am I`, and the stand-by asleep below until called. No pin moved.
+
+**Taken another way, accepted by the lead:** the player counts as present for the needs
+only while a driver listens (the console or the browser) or after he has given an order
+about his own needs, so that a book-sailed passage has nobody hungry at the prompt (the
+rule of reach's reading would have given every recorded captain needs by hand); a woken
+person returns to where he turned in from until 53's `go on deck` is in; foul water is
+drunk by the crew at a cost and by a person only by his own choice.
+
+**For the owner's ruling:**
+
+- The ration's figures were given as the printed table is commonly reproduced, the OCR
+  losing them; **to be checked against the page** (Regulations 1806, Sect. IX, Chap. I,
+  Art. I); the sugar column left out.
+- Short allowance is a half, as the brief said; the period's commonest was "six upon
+  four", two thirds: one value in `ration.yaml` if the owner prefers it.
+- Water is a gallon a man a day (the figure the ship files were sized at); the brief's
+  quart is a man's own drink.
+
+**Open items, carried:** `send for` does not wake a stationed person asleep by his needs;
+`take in water` with no figure completes to a fraction of a ton; the waking place after 53.
 
 ## Package 53: people in places (`freesail/world/people.py`, `places.py`; `data/people/*.yaml`, `data/ports/*.yaml` for the ports' places and people; `freesail/orders/` and `data/vocabulary.yaml` for `go`, `come aboard`, `draft a book`, `post`, the market in person; `freesail/orders/port.py`; `freesail/agents/tools.py` for the drafted book and the equal reach; `freesail/world/stations.py` and `agents/seat.py` for several stations of a kind; `docs/agents/Harness.md`; the primer; `docs/TechnicalSpec-M7b.md` §14, §16, §17 as built; `docs/dev/TuningNotes.md`; `tests/test_people.py`, `test_places.py` new, `test_orders_*`, `test_known_truths.py` truths 100 to 102)
 
