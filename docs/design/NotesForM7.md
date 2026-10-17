@@ -58,3 +58,20 @@ the hands at them; a sea-keeping thread of its own beside the powder's milestone
   immersion thread.
 - **Signals, and a hail syntax between captains** (note 19): with combat.
 - **The viewer's layering and lighting** (note 6): later.
+
+## The vessels and the chart of milestone 7 (the owner, 2026-10-17)
+
+- **Vessels:** the *Indefatigable* (the razee frigate), and a privateer schooner, either the
+  *Grecian* or the *Prince de Neufchatel* (alike in rig and dimensions; the one with the
+  better sources), to fill the ship list with combat-ready vessels for powder.
+- **The lugger's balance** (43b): the masts scaled on her breadth by Forfait's column, the
+  hull's lateral centre moved a metre aft to balance her; the owner may go to a mix of mast
+  rake and the mizzen's place after sailing her, or keep the rake and the mizzen where a
+  source has them and move the lateral centre instead.
+- **The lay line** for the captain's beating (the lugger on the regatta's crossing tacked
+  sixty-one times and never passed a sea-route mark); **Roscoff's and St Mary's tracks**
+  re-pricked for far detail so the business may use them: the next milestone's captain's
+  and chart packages, unless testing shows them seriously wanting.
+- **The chart's next goal:** the owner's question of 2026-10-17 (the Mediterranean, or the
+  Great Lakes and North America for 1812, or the Caribbean for the West Indies station); the
+  lead's opinion in the conversation of that day.
