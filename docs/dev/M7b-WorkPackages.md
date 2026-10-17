@@ -280,7 +280,10 @@ set) and his notes on the Éclair's first cruise (`docs/playtests/2026-10-17-ecl
    taken aback on a shift or a turn (three times in the owner's cruise). *The lead's
    reading:* a class for the lug topsail, trimmed as a lug with the lower lug's sheet and
    dip, keeping the braces and lifts Forfait gives them (pp. 52 to 55, cited in the file)
-   for the setting and the picture, not for a square trim; the lugs slung a third of the
+   for the setting and the picture, not for a square trim (Lescallier 1791 p. 408, in
+   `docs/design/VesselReferences.md`, has the lugger's masts each with a topmast fidded
+   abaft in an iron ring and *lug topsails*: the sail is a lug, whatever tackle it
+   carries; the owner's citation of 2026-10-17); the lugs slung a third of the
    yard from the fore end with two thirds of the sail abaft and to leeward of the mast,
    dipped round it at the tack (the owner's confirmation of 2026-10-17; the settee and
    lateen rule alike where the generator meets them later); the lugger's pins re-measured
