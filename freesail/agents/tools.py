@@ -269,6 +269,7 @@ SAIL_LINE_ORDER: tuple[str, ...] = (
     "loosed",
     "in the gear",
     "furled",
+    "sent down",  # package 57: a flying sail on deck with its yard
     "unbent",
 )
 

@@ -8,7 +8,9 @@
 #   hand_sails  every other square sail is hauled up or clewed up, the studding
 #               sails taken in, the jibs hauled down (the ship file's `jibs`
 #               group) and the spanker brailed up; the staysails stand (hand_s)
-#   brace       the topsail yards braced sharp up for the tack she is on and
+#   brace       the staysail she lies to under set (package 57: the ship file's
+#               `lying-to staysails`, Steel's main staysail, 1794 vol. II, "Lying-to
+#               under the main staysail"), the topsail yards braced sharp up for the tack she is on and
 #               the helm put a little a-lee (helm_deg); she comes up to about
 #               five points off the wind and lies there, drifting to leeward
 # Luce's fore storm staysail is the fore topmast staysail here. His "probably

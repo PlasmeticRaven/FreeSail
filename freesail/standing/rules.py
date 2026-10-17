@@ -120,6 +120,8 @@ def _sail_is(reading: dict[str, Any], word: str) -> bool:
         return bool(reading["aback"])
     if word == "reefed":
         return state == "set" and reading["reefs"] > 0
+    if word == "furled" and state == "sent_down":
+        return True  # package 57: a flying sail sent down is stowed, as a furled one is
     return state == word.replace(" ", "_")
 
 

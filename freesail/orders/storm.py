@@ -71,6 +71,14 @@ def storm_staysails(ship: Ship) -> list[Sail]:
     return sorted(sails, key=lambda sl: -sl.x_m)
 
 
+def lying_to_staysails(ship: Ship) -> list[Sail]:
+    """The staysails a ship lies to under short of the storm line (package 57): the ship
+    file's `lying-to staysails`, Steel's main staysail."""
+    return [
+        ship.sails[sid] for sid in ship.groups.get("lying-to staysails") or [] if sid in ship.sails
+    ]
+
+
 def _replaced(ship: Ship, storm: Sail, foremost: bool) -> list[Sail]:
     """What a storm staysail takes the place of as it is set: for the foremost, the
     ordinary head sails on its stay and forward of it (`REPLACED_AFT_M`: a fore-and-after
@@ -173,6 +181,15 @@ def set_storm_staysails(
             failed.append(f"the {name}: {str(e).rstrip('.')}")
             continue
         subjects.append(storm.id)
+    # package 57: in a whole gale the storm staysails stand for the main staysail she lay to
+    # under short of it (`lying_to_staysails`): it is taken in as they stand
+    for sail in lying_to_staysails(ship):
+        if sail.is_set and not _work_on(ship, sail.id):
+            try:
+                texts.append(_run(ship, f"take in the {_name(ship, sail)}", vocab))
+            except OrderError:
+                continue
+            subjects.append(sail.id)
     if not subjects:
         if failed:
             raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
@@ -292,6 +309,18 @@ def _ease_the_loaded(ship: Ship, storm: Sail, vocab: Vocabulary) -> None:
         )
 
 
+def flying_topsail_lines(ship: Ship) -> list[str]:
+    """`shorten sail`'s first lines in a ship whose topsails are set flying (package 57; the
+    lugger's lug topsails, "sent down whole ... taken in whole as the wind rises", the
+    owner's note of 2026-10-17): each set one taken in, so that the list's reef of the
+    topsails passes over them."""
+    return [
+        f"take in the {_name(ship, ship.sails[sid])}"
+        for sid in ship.groups.get("topsails") or []
+        if sid in ship.sails and ship.sails[sid].flying and ship.sails[sid].is_set
+    ]
+
+
 def shorten_sail_lines(ship: Ship, true_wind_kn: float | None) -> list[str]:
     """What `shorten sail` adds to its list (see the module's head): each jib loaded to
     `HEAD_SAIL_IN_RATIO` of its rating or more, outermost first; and over the storm line
@@ -305,6 +334,17 @@ def shorten_sail_lines(ship: Ship, true_wind_kn: float | None) -> list[str]:
         if rating > 0.0 and sail.load_kn / rating >= HEAD_SAIL_IN_RATIO:
             lines.append(f"take in the {_name(ship, sail)}")
     lines += _after_sail_lines(ship)
+    over_the_line = true_wind_kn is not None and true_wind_kn >= STORM_CANVAS_KN
+    # package 57: the staysail she lies to under (Steel's main staysail, the file's
+    # `lying-to staysails`) taken in over the storm line or loaded as a jib is, the storm
+    # staysails standing for it in a whole gale (Luce 1884, ch. XXIX: "lying to under
+    # close-reefed main topsail, fore storm staysail"); Steel has it "preferable when it
+    # blows strong enough for that sail to support the rolling of the ship"
+    for sail in lying_to_staysails(ship):
+        rating = sail.effective_cloth_rating_kn
+        loaded = rating > 0.0 and sail.load_kn / rating >= HEAD_SAIL_IN_RATIO
+        if sail.is_set and (over_the_line or loaded):
+            lines.append(f"take in the {_name(ship, sail)}")
     storms = storm_staysails(ship)
     stormy = {sl.id for sl in storms}
     # the head sails the foremost storm staysail replaces, loaded to their ratings: the
@@ -322,7 +362,6 @@ def shorten_sail_lines(ship: Ship, true_wind_kn: float | None) -> list[str]:
         for sl in heads
         if f"take in the {_name(ship, sl)}" not in lines
     )
-    over_the_line = true_wind_kn is not None and true_wind_kn >= STORM_CANVAS_KN
     if (over_the_line or strained) and any(not sl.is_set for sl in storms):
         lines.append("set the storm staysails")
     return lines

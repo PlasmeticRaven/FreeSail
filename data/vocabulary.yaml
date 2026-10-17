@@ -1151,6 +1151,7 @@ evolutions:
     lug: set_lug
     lateen: set_lateen
     sprit: set_sprit
+    flying: set_flying  # package 57: a sail set flying, of whatever cut (royals, lug topsails)
   take in:
     square: take_in_square
     gaff: take_in_gaff
@@ -1159,6 +1160,7 @@ evolutions:
     lug: take_in_lug
     lateen: take_in_lateen
     sprit: take_in_sprit
+    flying: take_in_flying  # package 57: lowered and sent down whole
   furl:
     square: furl_square
   reef:

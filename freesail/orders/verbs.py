@@ -58,7 +58,9 @@ from freesail.ship.parts import (
     Sail,
     SailState,
     Spar,
+    flying_down,
     lower_yards,
+    on_deck,
     sync_catharpins,
 )
 
@@ -343,6 +345,10 @@ def _sail_evolution(
             _sail_hint(ship, part),
         )
 
+    if group is not None and verb in ("reef", "shake out"):
+        # a group's reef passes over a sail set flying (package 57): it is never reefed,
+        # and `shorten sail` takes it in whole by its own line
+        sails = [sail for sail in sails if not sail.flying]
     if not sails:
         raise errors.NothingToDoError(f"Every sail of the {res.name} was already ordered.")
     started: list[dict[str, Any]] = []
@@ -361,7 +367,7 @@ def _sail_evolution(
     extra, call = _hands_params(
         ship,
         order,
-        [mapping[sail.cls] for sail in to_start],
+        [mapping[evolution_key(sail, mapping)] for sail in to_start],
         _group_label(verb, res.name, group) if len(to_start) > 1 else None,
     )
     params.update(extra)
@@ -371,7 +377,7 @@ def _sail_evolution(
             failed.append(reason)
             failed_ids.append(sail.id)
             continue
-        evo = mapping[sail.cls]
+        evo = mapping[evolution_key(sail, mapping)]
         p = dict(params)
         if verb in SAIL_SCRIPT_VERBS:
             p["sail"] = sail.id
@@ -407,8 +413,15 @@ def _sail_evolution(
 
 
 # The classes of sail that `furl` takes in (package 37l): handed and stowed, not furled on
-# a spar. A lug comes down on deck with its yard and is stowed there (package 43b).
-FURLED_AS_TAKEN_IN = ("jibheaded", "studding", "lug")
+# a spar. A lug comes down on deck with its yard and is stowed there (package 43b); a sail
+# set flying is sent down whole (package 57).
+FURLED_AS_TAKEN_IN = ("jibheaded", "studding", "lug", "flying")
+
+
+def evolution_key(sail: Sail, mapping: dict[str, Any]) -> str:
+    """The key a sail verb's evolution is found by: 'flying' for a sail set flying where
+    the verb has an evolution for it (set, take in: package 57), else the sail's class."""
+    return "flying" if sail.flying and "flying" in mapping else sail.cls
 
 
 def _sail_params(order: Order) -> dict[str, Any]:
@@ -451,7 +464,7 @@ def _sail_check(
         if sail.cls != "gaff":
             return f"{name} is a {sail.cls} sail; it has no peak to drop"
         return vocab.refusals["scandalise"].format(name=name[4:]).rstrip(".")
-    if sail.cls not in mapping:
+    if evolution_key(sail, mapping) not in mapping:
         template = vocab.refusals.get(verb, "'{verb}' has no meaning for a {class} sail")
         return template.format(name=name[4:], **{"class": sail.cls, "verb": verb}).rstrip(".")
     if verb == "set" and sail.state is SailState.SET:
@@ -461,7 +474,9 @@ def _sail_check(
         if unsuited:
             return unsuited
     if verb in ("take in", "furl") and sail.state is SailState.FURLED:
-        return f"{name} is already furled"
+        return f"{name} is already {'sent down' if sail.flying else 'furled'}"
+    if verb in ("reef", "shake out") and sail.flying:
+        return f"{name} is set flying and is never reefed aloft; it is taken in whole and sent down"
     if verb in ("reef", "shake out") and sail.reef_bands == 0:
         return vocab.refusals[verb].format(name=name[4:]).rstrip(".")
     if verb == "reef":
@@ -652,6 +667,9 @@ def _brace(
     if yards and all(y.id in skip for y in yards):
         raise errors.NothingToDoError(f"Every yard of the {object_name} was already ordered.")
     yards = [y for y in yards if y.id not in skip]
+    # a yard sent down with its flying sail (package 57: the royals of 1794) is on deck and
+    # is passed over, unless it is all that was named
+    yards = [y for y in yards if not flying_down(ship, y)] or yards
     if not yards:
         raise OrderError("This ship has no yards to brace.")
     if vocab.brace_modes[mode] == "wind":
@@ -688,7 +706,7 @@ def _brace(
     texts: list[str] = []
     failed: list[str] = []
     failed_ids: list[str] = []
-    workable = [y for y in yards if not (y.wrecked or y.sent_down)]
+    workable = [y for y in yards if not (y.wrecked or on_deck(ship, y))]
     # Where each yard goes: the mode's angle within its limit; sharp up on a wind
     # across the masts, the after yards sharper than the head yards (spec 3b §2.2).
     targets: dict[str, float] = {}
@@ -723,7 +741,7 @@ def _brace(
             failed.append(f"{name} is carried away")
             failed_ids.append(yard.id)
             continue
-        if yard.sent_down:
+        if on_deck(ship, yard):
             failed.append(f"{name} is sent down")
             failed_ids.append(yard.id)
             continue
@@ -1050,7 +1068,11 @@ def _trim(
         sync_catharpins(ship)  # the limits as the lower rigging stands now
         runner = runner_of(ship)
         if yards is None:
-            yards = [y for y in ship.spars.values() if y.is_yard and y.id not in skip]
+            yards = [
+                y
+                for y in ship.spars.values()
+                if y.is_yard and y.id not in skip and not flying_down(ship, y)
+            ]
         # a trim in hand is not stacked behind (package 29b: a standing order that trims on a
         # shift, firing while the watch is at the braces): a yard still waiting its turn
         # takes the new angle, and one being braced now is left to finish
@@ -1059,7 +1081,7 @@ def _trim(
             for i in getattr(runner, "instances", ())
             if i.evo.id == vocab.evolutions["brace"] and i.params.get("mode") == "to the wind"
         }
-        workable = [y for y in yards if not (y.wrecked or y.sent_down)]
+        workable = [y for y in yards if not (y.wrecked or on_deck(ship, y))]
         # the trim is reckoned on the whole rig and the yards ordered take theirs from it
         # (package 37p): a topsail trimmed by name lies where `trim sails` puts it, a step
         # in from its course, and not at its own limit
@@ -1067,7 +1089,7 @@ def _trim(
         rig = workable + [
             y
             for y in ship.spars.values()
-            if y.is_yard and y.id not in ordered and not (y.wrecked or y.sent_down)
+            if y.is_yard and y.id not in ordered and not (y.wrecked or on_deck(ship, y))
         ]
         targets: dict[str, float] = {}
         wants: dict[str, float] = {}
@@ -1115,7 +1137,7 @@ def _trim(
             extra = {**extra, "log_group": new_group()}
         for yard in yards:
             name = resolve.the(ship, yard.id)
-            if yard.wrecked or yard.sent_down:
+            if yard.wrecked or on_deck(ship, yard):
                 # said as one clause of the line, "the topgallant and royal yards are on
                 # deck", not as a "Not ..." list (package 31b; playtest 11's finding 8)
                 failed.append(f"{name} is {'carried away' if yard.wrecked else 'sent down'}")
@@ -1161,11 +1183,19 @@ def _trim(
         # fore-and-aft sail's sheet is worked to the wind by its own evolution, with hands
         # and time; a sheet within a degree of its trim, belayed to leeward, stands
         sheet_evos = vocab.evolutions.get("trim") or {}
-        candidates = [
-            sail
-            for sail in (named_sheets if named_sheets is not None else ship.sails.values())
-            if sail.is_set and sail.is_fore_and_aft and sail.cls in sheet_evos
-        ]
+        candidates = []
+        for sail in named_sheets if named_sheets is not None else ship.sails.values():
+            # a lug topsail's sheet is to its lower lug's yard (package 57): the lower lug
+            # is trimmed, and it with it
+            host = yard_trim.sheet_host(ship, sail)
+            sail = host if host is not None else sail
+            if (
+                sail.is_set
+                and sail.is_fore_and_aft
+                and sail.cls in sheet_evos
+                and sail not in candidates
+            ):
+                candidates.append(sail)
         runner = runner_of(ship)
         if do_yards:
             extra_s = {k: v for k, v in extra.items() if k != "log_group"}
@@ -1489,7 +1519,7 @@ def _adjacent_refusals(ship: Ship, proposed: dict[str, float]) -> dict[str, str]
             (
                 y
                 for y in ship.spars.values()
-                if y.is_yard and not (y.wrecked or y.sent_down) and ship.mast_of(y) is mast
+                if y.is_yard and not (y.wrecked or on_deck(ship, y)) and ship.mast_of(y) is mast
             ),
             key=lambda y: y.height_m,
         )

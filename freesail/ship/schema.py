@@ -42,6 +42,13 @@ the named roles beyond the posts (a master's mate, a midshipman as messenger: ea
 drawn from a station at muster, a `PersonRoleSpec`). A file without them has
 `hold = None`, no boats, and the posts alone for people; the ports' orders are refused
 in words on such a ship.
+
+Package 57 (the rig through the generator) adds three keys to a sail: `flying: true`, a
+sail set flying (its yard swayed up from the deck with the sail bent, sent down whole when
+it is taken in, never reefed aloft: the lugger's lug topsails, the royals of 1794);
+`sheeted_to`, a lug topsail's lower lug, to whose yard its clew is sheeted; and
+`corners_m`, the sail's corners as it is cut, for the drawing (a lug's tack, throat, peak
+and clew; a staysail's tack, nock, peak and clew, or tack, peak and clew for a triangle).
 """
 
 from __future__ import annotations
@@ -344,6 +351,20 @@ class SailSpec:
     # dipped round the mast to the new lee side; a standing lug (a mizen, the taille-vent
     # tacked at the foot of the mast) is not dipped.
     dipping: bool = False
+    # Package 57 (the owner's note of 2026-10-17 on the lug topsail; Steel 1794 vol. I p. 214,
+    # ROYALS "Are set flying"): a sail set flying, its yard swayed up from the deck with the
+    # sail bent and sent down whole when it is taken in, worked by hands on deck, never
+    # reefed aloft. Furled, it is on deck, sent down ("sent down" in the log's words).
+    flying: bool = False
+    # Package 57: a lug topsail's clew sheeted to the lower lug's yard (its peak), so that it
+    # lies as the lower lug lies and on its side of the mast: the lower lug's sail id.
+    sheeted_to: str | None = None
+    # Package 57: the sail's corners in the fore-and-aft plane as it is cut, for the
+    # drawing: [x forward of midships, height above the deck] in metres, as the spars'
+    # heights. A lug's [tack, throat, peak, clew]; a staysail's [tack, nock, peak, clew] when
+    # it is four-sided, [tack, peak, clew] when it is a triangle. None: drawn by its class's
+    # rule from its spars and its area.
+    corners_m: list[tuple[float, float]] | None = None
 
 
 @dataclass
@@ -819,6 +840,19 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
         raise ShipFileError(f"{source}: {where} has dipping = {dipping!r}; say true or false.")
     if dipping and cls != "lug":
         raise ShipFileError(f"{source}: {where} is a {cls} sail; only a lug is dipped.")
+    flying = s.get("flying", False)
+    if not isinstance(flying, bool):
+        raise ShipFileError(f"{source}: {where} has flying = {flying!r}; say true or false.")
+    if flying and reef > 0:
+        raise ShipFileError(
+            f"{source}: {where} is set flying and has {reef} reef band(s); a flying sail is "
+            "never reefed aloft, it is taken in whole."
+        )
+    sheeted_to = _str(s, "sheeted_to", where, source, required=False)
+    if sheeted_to is not None and cls != "lug":
+        raise ShipFileError(
+            f"{source}: {where} is a {cls} sail; only a lug topsail is sheeted to another sail."
+        )
     return SailSpec(
         id=sid,
         cls=cls,
@@ -833,7 +867,33 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
         bent=bent,
         in_place_of=_str(s, "in_place_of", where, source, required=False),
         dipping=dipping,
+        flying=flying,
+        sheeted_to=sheeted_to,
+        corners_m=_corners(s.get("corners_m"), where, source),
     )
+
+
+def _corners(v: Any, where: str, source: str) -> list[tuple[float, float]] | None:
+    """A sail's corners (package 57): three or four [x, height] pairs of numbers, or None."""
+    if v is None:
+        return None
+    ok = isinstance(v, list) and len(v) in (3, 4)
+    pts: list[tuple[float, float]] = []
+    for p in v if ok else []:
+        if (
+            not isinstance(p, list | tuple)
+            or len(p) != 2
+            or not all(isinstance(c, int | float) and not isinstance(c, bool) for c in p)
+        ):
+            ok = False
+            break
+        pts.append((float(p[0]), float(p[1])))
+    if not ok:
+        raise ShipFileError(
+            f"{source}: {where} has corners_m = {v!r}; give three or four [x, height] pairs "
+            "in metres."
+        )
+    return pts
 
 
 def _canvas_no(v: Any, where: str, source: str) -> int | None:
@@ -960,6 +1020,13 @@ def validate(spec: ShipSpec) -> None:
                 boom.cls in FORE_AND_AFT_SPAR_CLASSES or _on_fore_and_aft(boom, spars)
             ):
                 raise ShipFileError(f"{src}: studding sail '{sl.id}' needs a 'side'.")
+        if sl.sheeted_to is not None:
+            host = sails.get(sl.sheeted_to)
+            if host is None or host is sl or host.cls != "lug":
+                raise ShipFileError(
+                    f"{src}: sail '{sl.id}' is sheeted to '{sl.sheeted_to}', which is not "
+                    "another lug in the ship."
+                )
         if sl.in_place_of is not None:
             other = sails.get(sl.in_place_of)
             if other is None or other is sl:

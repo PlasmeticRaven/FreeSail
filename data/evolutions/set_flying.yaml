@@ -1,0 +1,45 @@
+# Set a sail set flying (package 57): the lugger's lug topsails, the royals of 1794. The
+# yard is swayed up from the deck with the sail bent to it by the hands on deck at the
+# halyard, the gear put on at the masthead, the sheet hauled home (a royal's to the
+# topgallant yardarms, a lug topsail's to its lower lug's yard, whose peak it is sheeted
+# to) and the yard hoisted; nothing is loosed aloft, for nothing was furled there. Steel
+# 1794 vol. I p. 214: "ROYALS Are set flying. The haliards hitch round the slings of the
+# yard and through the sheave-hole in the topgallant-mast-head, and lead down upon deck";
+# Lescallier 1791 p. 408, the lugger's lug topsails on topmasts fidded abaft the lower mast
+# heads; the owner's note of 2026-10-17 (the lug topsail swayed up from the deck and sent
+# down whole). Times judgement: a light yard swayed up by its own halyard, a minute and a
+# half to the masthead and its gear on, half a minute to sheet home and hoist it taut.
+id: set_flying
+verb: set
+applies_to: {class: flying}
+preconditions:
+  - {check: sail.state != set, reason: "The {sail} is set already.", done: true}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out of the bolt-ropes; a new one must be bent."}
+  - {check: sail.state != unbent, reason: "The {sail} is unbent; bend a sail to the yard first."}
+  - {check: "not wrecked(sheets_of(sail)) and not wrecked(halyard_of(sail))", reason: "{parted}"}
+requires:
+  - {check: not sail.wrecked, reason: "the {sail} is wrecked"}
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked or sent down"}
+steps:
+  - do: sway_up
+    duration_s: 90
+    if: sail.state == furled
+    sets: {sail.state: loosed}
+    log: "Swayed up the {sail}'s yard from the deck with the sail bent."
+  - do: sheet_home
+    duration_s: 15
+    if: sail.state == loosed or sail.state == in_the_gear
+    sets: {sail.state: sheeted}
+  - do: hoist
+    duration_s: 30
+    via: halyard_of(sail)
+    sets: {sail.state: set}
+on_start:
+  log: "Hands to the {sail} halyard; sway up the yard."
+  from: {in_the_gear: "Man the {sail} halyard and sheet; hoist away."}
+on_complete: {log: "Set the {sail}, flying.", kind: sail.set, severity: notable}
+on_fail: {log: "Could not set the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: hands on deck at the halyard and the sheet, one at the masthead to put on the gear
+# (Luce 1884, ch. XXIX: "the topmen on deck take off the royal halliards"; judgement)
+crew: {hands: 4, rating: ordinary, stations: [forecastle, afterguard, topmen]}
+source: "Steel 1794 vol. I p. 214, ROYALS ('Are set flying'); Lescallier 1791 p. 408 (the lugger's lug topsails); Forfait 1788 pp. 52 to 55; the owner's note of 2026-10-17"

@@ -104,7 +104,8 @@ def test_frigate_plain_sail_area_is_in_period(frigate):
     # about 17,000 sq ft; a 36 carried 14,000 to 20,000 sq ft of plain sail
     assert 1_300 <= plain <= 1_860
     all_sail = area_of(frigate, "all sail")
-    assert 2_000 <= all_sail <= 3_000
+    # package 57: Steel's staysails between the masts in all sail (about 680 m2 of them)
+    assert 2_600 <= all_sail <= 3_300
     # the main topsail is the largest sail, then the main course
     areas = {s.id: s.area_m2 for s in frigate.sails.values()}
     assert max(areas, key=areas.get) == "main.topsail"
@@ -343,7 +344,7 @@ def test_brig_sail_plan_follows_fincham(brig):
     three reef bands), the frigate's head sails and studding sails scaled to her."""
     plain = area_of(brig, "plain sail")
     assert 680 <= plain <= 850
-    assert 1150 <= area_of(brig, "all sail") <= 1400
+    assert 1350 <= area_of(brig, "all sail") <= 1600  # package 57: Steel's four staysails
     areas = {s.id: s.area_m2 for s in brig.sails.values()}
     assert areas["main.spanker"] == max(areas.values())  # the boom mainsail is her great sail
     assert areas["main.topsail"] >= areas["fore.topsail"] > areas["fore.course"]
@@ -390,11 +391,19 @@ def test_lugger_rig_follows_forfaits_table_vii(lugger):
     """Forfait 1788 Table VII, the 60-pied column: the masts on her breadth (main 3.455 B,
     fore 2.759 B, mizen 1.888 B), the yards on her length (main 0.573 L, fore 0.454 L, mizen
     0.364 L); three masts with lugs, the fore and main dipping, the mizen a standing lug;
-    lug topsails trimmed as square topsails; two jibs on a running bowsprit; the working
+    lug topsails, lugs set flying and sheeted to the lower lugs' peaks (package 57); two
+    jibs on a running bowsprit; the working
     canvas near 4.037 L x B; the taille-vent in the sail room, half the main lug."""
     on_deck = units.feet_to_m(59.25)
     lugs = {s.id: s for s in lugger.sails.values() if s.cls == "lug"}
-    assert set(lugs) == {"fore.lug", "main.lug", "mizen.lug", "taille_vent"}
+    assert set(lugs) == {
+        "fore.lug",
+        "main.lug",
+        "mizen.lug",
+        "taille_vent",
+        "fore.topsail",
+        "main.topsail",
+    }
     assert lugs["fore.lug"].dipping and lugs["main.lug"].dipping
     assert not lugs["mizen.lug"].dipping and not lugs["taille_vent"].dipping
     assert lugs["taille_vent"].in_place_of == "main.lug"
@@ -406,7 +415,14 @@ def test_lugger_rig_follows_forfaits_table_vii(lugger):
         assert abs(yard.length_m / on_deck - frac) < 0.01
     assert sp["main.mast"].height_m > sp["fore.mast"].height_m > sp["mizen.mast"].height_m
     assert sp["fore.mast"].x_m > 0.0 > sp["main.mast"].x_m > sp["mizen.mast"].x_m
-    assert all(lugger.sails[t].cls == "square" for t in ("fore.topsail", "main.topsail"))
+    for name in ("fore", "main"):
+        ts = lugger.sails[f"{name}.topsail"]
+        assert ts.cls == "lug" and ts.flying and ts.sheeted_to == f"{name}.lug"
+        assert ts.reef_bands == 0 and ts.state.value == "furled" and ts.sent_down
+        yard = lugger.yard_of(ts)
+        assert yard.cls == "lug_yard" and lugger.parent_of(yard).cls == "topmast"
+        assert lugger.braces_of(yard)  # Forfait's braces kept for the setting, not a trim
+    assert not any(s.cls == "square" for s in lugger.sails.values())
     assert sp["bowsprit"].running
     beam = lugger.hull.spec.beam_m
     forfait = 4.037 * on_deck * beam

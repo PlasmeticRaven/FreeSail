@@ -99,7 +99,7 @@ from freesail.physics.strain import (  # package 22: the worn-canvas luff term
     FLOGGING_LOAD_MULTIPLIER,
     baggy_luff,
 )
-from freesail.ship.parts import Line, LineState, Sail, SailState, Spar
+from freesail.ship.parts import Line, LineState, Sail, SailState, Spar, flying_down
 
 if TYPE_CHECKING:
     from freesail.physics.wind import Wind
@@ -595,7 +595,12 @@ def _read_rig(ship: Ship) -> _Rig:
             held, flogging = reading.held_to_windward, reading.free
             working = reading.working.id if reading.working is not None else None
         area = sail.area_m2 * max(1.0 - cls.reef_factor * reefs, 0.0)
-        if against_the_mast(sail, side_sign):
+        host = yard_trim.sheet_host(ship, sail)
+        if against_the_mast(sail, side_sign) or (
+            host is not None and against_the_mast(host, side_sign)
+        ):
+            # a lug topsail goes round with its lower lug (package 57): against the mast
+            # while that lug is, until it is dipped
             area *= LUG_AGAINST_MAST_AREA
         drawing.append(
             _Drawing(
@@ -637,7 +642,8 @@ def _read_rig(ship: Ship) -> _Rig:
             idle_windage.append((area, h, sail.x_m - clr_x, slot(h)))
     spar_windage = []
     for spar, height, lever in _spar_places(ship):
-        area = _spar_windage_area(spar)
+        # a yard sent down with its flying sail is on deck (package 57)
+        area = 0.0 if flying_down(ship, spar) else _spar_windage_area(spar)
         if area > 0:
             spar_windage.append((area, height, lever, slot(height)))
     return _Rig(
@@ -1517,6 +1523,8 @@ def _sail_windage_area(ship: Ship, sail: Sail) -> float:
     if wrecked:
         return sail.area_m2 * cls.furled_windage * WRECK_MULTIPLIER
     if sail.state is SailState.FURLED:
+        if sail.flying:
+            return 0.0  # sent down on deck with its yard (package 57)
         return sail.area_m2 * cls.furled_windage
     if sail.state in (SailState.SET, SailState.GOOSE_WINGED):
         # set on a spar that is sent down: as good as furled
