@@ -255,7 +255,7 @@ FRIGATE_CANVAS: dict[str, tuple[int, str]] = {
         2,
         f"{STEEL_SM}, 'Main staysail': 'made of canvas No. 1 to 3', the middle taken",
     ),
-    "main.middle_staysail": (6, f"{STEEL_SM}, 'Middle staysail': 'No. 6, or 7', the heavier"),
+    "middle_staysail": (6, f"{STEEL_SM}, 'Middle staysail': 'No. 6, or 7', the heavier"),
     "main.topgallant_staysail": (7, f"{STEEL_SM}, 'Main topgallant staysail': 'canvas No. 7'"),
     "mizzen.staysail": (2, f"{STEEL_SM}, 'Mizen staysail': 'No. 2 or 3', the heavier"),
     "mizzen.topmast_staysail": (
@@ -1021,8 +1021,22 @@ def staysail_from_cut(b, sid, stay, corners, deck_height, canvas, rope_in, words
         note=f"{sid.replace('_', ' ').replace('.', ' ')} {area} m2, {shape}, square on the "
         f"foot (Steel 1794 vol. I, Sail-making): {cut}; {words}" + canvas_note(canvas),
     )
+    # the sheet bears its sail: a rope whose working load is half the cloth's rating, so
+    # that the cloth strains before the sheet parts (judgement; the strain rule parts a
+    # line at 1.5 of its rating and a sail takes 0.6 of its pull on its sheet), the given
+    # size the least
+    rope_in = max(
+        rope_in, math.ceil(4.0 * math.sqrt(0.5 * cloth(area, canvas[0]) / ROPE_KN_PER_SQ_IN)) / 4.0
+    )
     b.line(f"{sid}.halyard", "halyard", s, rating=rope_kn(rope_in, 2))
-    b.sided(f"{sid}.sheet", "sheet", s, rating=rope_kn(rope_in))
+    b.sided(
+        f"{sid}.sheet",
+        "sheet",
+        s,
+        rating=rope_kn(rope_in),
+        note=f"{rope_in} in, to bear its sail: its working load half the cloth's rating "
+        "(judgement).",
+    )
     b.line(f"{sid}.downhaul", "downhaul", s, rating=rope_kn(quarter(rope_in * 0.8)))
     return s
 
@@ -1168,7 +1182,7 @@ def between_the_masts(b, *, geom, mast_x, rake_deg, deck_height, ahead, after, c
         # parral', Steel 1794 vol. I, 'The middle-staysail'): a third of the topmast's hoist
         # above the fore cap (judgement)
         mid_stay = b.line(
-            "main.middle_staysail.stay",
+            "middle_staysail.stay",
             "stay",
             "main.topmast",
             rating=rope_kn(4.0 if not brig else 3.0),
@@ -1189,11 +1203,11 @@ def between_the_masts(b, *, geom, mast_x, rake_deg, deck_height, ahead, after, c
         out.append(
             staysail_from_cut(
                 b,
-                "main.middle_staysail",
+                "middle_staysail",
                 mid_stay,
                 corners,
                 deck_height,
-                canvas["main.middle_staysail"],
+                canvas["middle_staysail"],
                 2.5 if not brig else 2.0,
                 "the leech 4 to 7 yards (5.5) deeper than the main topgallant sail, "
                 + (
@@ -2141,6 +2155,9 @@ def frigate(out_dir="data/ships"):
     b.group("headsails", headsails)
     b.group("jibs", headsails[1:])
     b.group("staysails", headsails[:1] + between)
+    # Steel's staysails between the masts as one group, so the sail line and an order can
+    # name them where the fore topmast staysail is set with plain sail (package 57)
+    b.group("staysails between the masts", between)
     b.group("studdingsails", stuns)
     b.group("square sails", sum(sails_by_level.values(), []))
     b.group("fore-and-aft sails", headsails + between + [spanker])
@@ -2208,9 +2225,9 @@ def frigate(out_dir="data/ships"):
     b.alias("spanker gaff", "mizzen.gaff")
     b.alias("fore topmast staysail", "fore.topmast_staysail")
     b.alias("main topmast staysail", "main.topmast_staysail")
-    # package 57: the middle staysail is its own sail now (Steel), not the main topmast's
+    # package 57: the middle staysail (`middle_staysail`) is its own sail now (Steel), not
+    # another name for the main topmast staysail
     b.alias("main staysail", "main.staysail")
-    b.alias("middle staysail", "main.middle_staysail")
     b.alias("main topgallant staysail", "main.topgallant_staysail")
     for word in ("mizzen", "mizen"):
         b.alias(f"{word} staysail", "mizzen.staysail")
@@ -4567,7 +4584,7 @@ BRIG_CANVAS: dict[str, tuple[int, str]] = {
         # package 57: Steel's own numbers for the brig's staysails, which were judgement
         # before (No. 5 for the main staysail, No. 7 for the main topgallant)
         "main.staysail",
-        "main.middle_staysail",
+        "middle_staysail",
         "main.topgallant_staysail",
         "lower studding",
         "topmast studding",
@@ -5283,6 +5300,7 @@ def brig(out_dir="data/ships"):
     b.group("headsails", headsails)
     b.group("jibs", headsails[1:])
     b.group("staysails", headsails[:1] + between)
+    b.group("staysails between the masts", between)  # package 57, as the frigate's
     b.group("studdingsails", stuns)
     b.group("square sails", sum(sails_by_level.values(), []))
     b.group("fore-and-aft sails", headsails + between + [spanker])
@@ -5336,7 +5354,6 @@ def brig(out_dir="data/ships"):
     b.alias("fore topmast staysail", "fore.topmast_staysail")
     b.alias("main staysail", "main.staysail")
     b.alias("main topmast staysail", "main.topmast_staysail")
-    b.alias("middle staysail", "main.middle_staysail")
     b.alias("main topgallant staysail", "main.topgallant_staysail")
     b.alias("stuns'ls", "studdingsails")
     b.alias("studding sails", "studdingsails")

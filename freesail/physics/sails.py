@@ -1513,6 +1513,16 @@ def _apply_loads(ship: Ship, sail: Sail, force_kn: float, d: _Drawing | None = N
 # ---------------------------------------------------------------------------
 
 
+# A staysail between the masts hauled down lies along its stay by its downhauler, half
+# the windage of its class furled (package 57; judgement). With the class's whole windage
+# the seven of Steel's list, the mizzen's well abaft the centre of lateral resistance, cost
+# the frigate truth 10's tack (-0.4 m gained from 292.5 degrees, it was -37 and the others
+# fell); with none, her heel under plain sail in thirty knots fell to 19.97 degrees,
+# short of truth 8's twenty (20.21 before). Half gives 50.8, -37.4 and 25.0 m and 20.11
+# degrees, and the main topmast staysail's stowed windage (165 m2) about its old one (80).
+STOWED_STAYSAIL_WINDAGE = 0.5
+
+
 def _sail_windage_area(ship: Ship, sail: Sail) -> float:
     cls = SAIL_CLASSES.get(sail.cls)
     if cls is None or sail.state is SailState.UNBENT:
@@ -1525,6 +1535,11 @@ def _sail_windage_area(ship: Ship, sail: Sail) -> float:
     if sail.state is SailState.FURLED:
         if sail.flying:
             return 0.0  # sent down on deck with its yard (package 57)
+        if sail.corners_m and sail.cls == "jibheaded":
+            # a staysail cut on its stay (package 57), hauled down: it lies along the stay
+            # by its downhauler, half its class's furled windage (judgement; the jibs keep
+            # their class's, as before)
+            return sail.area_m2 * cls.furled_windage * STOWED_STAYSAIL_WINDAGE
         return sail.area_m2 * cls.furled_windage
     if sail.state in (SailState.SET, SailState.GOOSE_WINGED):
         # set on a spar that is sent down: as good as furled

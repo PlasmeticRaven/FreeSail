@@ -2444,6 +2444,7 @@ SAIL_WORDS = sorted(
                 "blown_out",
                 "unbent",
                 "goose_winged",
+                "sent_down",  # package 57: a flying sail on deck with its yard
             )
         ),
     },
@@ -2527,8 +2528,10 @@ def test_a_sample_after_the_first_carries_only_what_changed_and_the_sails_in_one
 
 def test_the_sail_line_names_the_ships_groups_and_says_every_sail():
     world = frigate_world()
+    # package 57: the royals are set flying, and furled they are sent down on deck
     assert tools.sail_line(world) == (
-        "all sail furled; the storm canvas and the occasional sails unbent"
+        "plain sail, the studdingsails, the staysails between the masts and the flying jib"
+        " furled; the royals sent down; the storm canvas and the occasional sails unbent"
     )
     world.submit("make plain sail")
     world.run(900)

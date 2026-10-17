@@ -321,7 +321,7 @@ def test_brig_is_the_frigate_less_a_mast():
         "fore.topmast_staysail",
         "main.staysail",
         "main.topmast_staysail",
-        "main.middle_staysail",  # package 57: Steel's set for a brig
+        "middle_staysail",  # package 57: Steel's set for a brig
         "main.topgallant_staysail",
     ]
     assert len(ship.groups["studdingsails"]) == 10

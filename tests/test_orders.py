@@ -727,7 +727,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (B, "set the boom mainsail", ok(evo="set_gaff", subjects=["main.spanker"])),
     (B, "set the jib", ok(evo="set_jibheaded", subjects=["jib"])),
     (B, "set the flying jib", ok(evo="set_jibheaded", subjects=["flying_jib"])),
-    (B, "set the middle staysail", ok(evo="set_jibheaded", subjects=["main.middle_staysail"])),
+    (B, "set the middle staysail", ok(evo="set_jibheaded", subjects=["middle_staysail"])),
     (B, "set the headsails", ok(evo="set_jibheaded", count=3)),
     (B, "set the staysails", ok(evo="set_jibheaded", count=5)),  # Steel's middle staysail
     (B, "set the square sails", ok(count=8)),  # the royals set flying (package 57)

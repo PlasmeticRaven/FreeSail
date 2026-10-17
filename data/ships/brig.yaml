@@ -113,14 +113,14 @@ spars:
   height_m: 29.9
   brace_limit_deg: 66
   rating_kn: 2.4
-# main lower mast: 65 ft heel to head (Fincham p. 88: hounded 1.93 x the breadth, the head 0.1933 of that), 53 ft above the deck, stepped 6.9 ft below the water-line (Fincham); raking 4.0 deg (Fincham p. 88: 10 in in 12 ft); stationed 0.147 of the water-line abaft the middle (Fincham pp. 83, 88; Steel 1794: the main two-thirds of the length abaft the stem, the fore three twentieths). Provisional (truth 9), see gen_ships.py. Rating: main.course, main.topsail, main.topgallant, main.royal, main.spanker, main.staysail, main.topmast_staysail, main.middle_staysail, main.topgallant_staysail in 55 kn -> 436.6 kN.
+# main lower mast: 65 ft heel to head (Fincham p. 88: hounded 1.93 x the breadth, the head 0.1933 of that), 53 ft above the deck, stepped 6.9 ft below the water-line (Fincham); raking 4.0 deg (Fincham p. 88: 10 in in 12 ft); stationed 0.147 of the water-line abaft the middle (Fincham pp. 83, 88; Steel 1794: the main two-thirds of the length abaft the stem, the fore three twentieths). Provisional (truth 9), see gen_ships.py. Rating: main.course, main.topsail, main.topgallant, main.royal, main.spanker, main.staysail, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 55 kn -> 436.6 kN.
 - id: main.mast
   class: mast
   x_m: -3.9
   rake_deg: 4.0
   height_m: 16.1
   rating_kn: 436.6
-# main topmast: 37 ft (Fincham p. 88: the main's hounded 1.13 x the breadth, the fore's 0.945 of the main's, the head 0.1585 of the hounded length), 21 ft of it above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: main.topsail, main.topgallant, main.royal, main.topmast_staysail, main.middle_staysail, main.topgallant_staysail in 40 kn -> 144.8 kN.
+# main topmast: 37 ft (Fincham p. 88: the main's hounded 1.13 x the breadth, the fore's 0.945 of the main's, the head 0.1585 of the hounded length), 21 ft of it above the lower cap. Provisional (truth 9), see gen_ships.py. Rating: main.topsail, main.topgallant, main.royal, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 40 kn -> 144.8 kN.
 - id: main.topmast
   class: topmast
   steps_on: main.mast
@@ -438,10 +438,10 @@ sails:
   canvas_no: 5
   cloth_rating_kn: 27.6
   corners_m: [[6.85, 7.26], [6.85, 15.07], [-3.45, 21.36], [-3.45, 7.26]]
-# main middle staysail 66 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 10.1 m, bunt 6.5 m (0.64 of the leech), foot 7.9 m (13 cloths); the leech 4 to 7 yards (5.5) deeper than the main topgallant sail, two cloths more in the foot than the leech's yards ('Sloops and brigs in the navy have only from one to three') (Steel), the bunt as the stay leaves it (Steel: five-twelfths of the leech), its peak before the main top. Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Middle staysail': 'No. 6, or 7', the heavier); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
-- id: main.middle_staysail
+# middle staysail 66 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 10.1 m, bunt 6.5 m (0.64 of the leech), foot 7.9 m (13 cloths); the leech 4 to 7 yards (5.5) deeper than the main topgallant sail, two cloths more in the foot than the leech's yards ('Sloops and brigs in the navy have only from one to three') (Steel), the bunt as the stay leaves it (Steel: five-twelfths of the leech), its peak before the main top. Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Middle staysail': 'No. 6, or 7', the heavier); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
+- id: middle_staysail
   class: jibheaded
-  stay: main.middle_staysail.stay
+  stay: middle_staysail.stay
   area_m2: 66
   x_m: 0.2
   centre_height_m: 17.3
@@ -1246,6 +1246,7 @@ lines:
   class: halyard
   of: main.staysail
   rating_kn: 27.9
+# 3.0 in, to bear its sail: its working load half the cloth's rating (judgement).
 - id: main.staysail.sheet.starboard
   class: sheet
   of: main.staysail
@@ -1263,62 +1264,65 @@ lines:
 - id: main.topmast_staysail.halyard
   class: halyard
   of: main.topmast_staysail
-  rating_kn: 19.4
+  rating_kn: 27.9
+# 3.0 in, to bear its sail: its working load half the cloth's rating (judgement).
 - id: main.topmast_staysail.sheet.starboard
   class: sheet
   of: main.topmast_staysail
   side: starboard
-  rating_kn: 9.7
+  rating_kn: 13.9
 - id: main.topmast_staysail.sheet.larboard
   class: sheet
   of: main.topmast_staysail
   side: larboard
-  rating_kn: 9.7
+  rating_kn: 13.9
 - id: main.topmast_staysail.downhaul
   class: downhaul
   of: main.topmast_staysail
-  rating_kn: 6.2
+  rating_kn: 9.7
 # the middle staysail stay, from the main topmast head to a grommet round the fore topmast under the parral (Steel 1794 vol. I, 'The middle-staysail'), a third of the topmast's hoist above the fore cap (judgement); size judgement.
-- id: main.middle_staysail.stay
+- id: middle_staysail.stay
   class: stay
   of: main.topmast
   rating_kn: 13.9
-- id: main.middle_staysail.halyard
+- id: middle_staysail.halyard
   class: halyard
-  of: main.middle_staysail
-  rating_kn: 12.4
-- id: main.middle_staysail.sheet.starboard
+  of: middle_staysail
+  rating_kn: 15.7
+# 2.25 in, to bear its sail: its working load half the cloth's rating (judgement).
+- id: middle_staysail.sheet.starboard
   class: sheet
-  of: main.middle_staysail
+  of: middle_staysail
   side: starboard
-  rating_kn: 6.2
-- id: main.middle_staysail.sheet.larboard
+  rating_kn: 7.8
+- id: middle_staysail.sheet.larboard
   class: sheet
-  of: main.middle_staysail
+  of: middle_staysail
   side: larboard
-  rating_kn: 6.2
-- id: main.middle_staysail.downhaul
+  rating_kn: 7.8
+- id: middle_staysail.downhaul
   class: downhaul
-  of: main.middle_staysail
-  rating_kn: 3.5
+  of: middle_staysail
+  rating_kn: 4.7
 - id: main.topgallant_staysail.halyard
   class: halyard
   of: main.topgallant_staysail
-  rating_kn: 12.4
+  rating_kn: 15.7
+# 2.25 in, to bear its sail: its working load half the cloth's rating (judgement).
 - id: main.topgallant_staysail.sheet.starboard
   class: sheet
   of: main.topgallant_staysail
   side: starboard
-  rating_kn: 6.2
+  rating_kn: 7.8
 - id: main.topgallant_staysail.sheet.larboard
   class: sheet
   of: main.topgallant_staysail
   side: larboard
-  rating_kn: 6.2
+  rating_kn: 7.8
 - id: main.topgallant_staysail.downhaul
   class: downhaul
   of: main.topgallant_staysail
-  rating_kn: 3.5
+  rating_kn: 4.7
 - id: fore.lower.studdingsail.starboard.halyard
   class: halyard
   of: fore.lower.studdingsail.starboard
@@ -1548,7 +1552,12 @@ groups:
   - fore.topmast_staysail
   - main.staysail
   - main.topmast_staysail
-  - main.middle_staysail
+  - middle_staysail
+  - main.topgallant_staysail
+  staysails between the masts:
+  - main.staysail
+  - main.topmast_staysail
+  - middle_staysail
   - main.topgallant_staysail
   studdingsails:
   - fore.lower.studdingsail.starboard
@@ -1576,14 +1585,14 @@ groups:
   - flying_jib
   - main.staysail
   - main.topmast_staysail
-  - main.middle_staysail
+  - middle_staysail
   - main.topgallant_staysail
   - main.spanker
   light sails:
   - fore.royal
   - main.royal
   - flying_jib
-  - main.middle_staysail
+  - middle_staysail
   - main.topgallant_staysail
   - fore.lower.studdingsail.starboard
   - fore.lower.studdingsail.larboard
@@ -1621,7 +1630,7 @@ groups:
   - flying_jib
   - main.staysail
   - main.topmast_staysail
-  - main.middle_staysail
+  - middle_staysail
   - main.topgallant_staysail
   - main.spanker
   - fore.lower.studdingsail.starboard
@@ -1761,7 +1770,6 @@ aliases:
   fore topmast staysail: fore.topmast_staysail
   main staysail: main.staysail
   main topmast staysail: main.topmast_staysail
-  middle staysail: main.middle_staysail
   main topgallant staysail: main.topgallant_staysail
   stuns'ls: studdingsails
   studding sails: studdingsails

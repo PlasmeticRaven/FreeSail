@@ -909,7 +909,8 @@ def test_lying_a_try_in_a_gale_with_the_topgallant_masts_down():
     ticks(w, 1500)
     assert events(w, "ship.hove_to")
     set_now = sorted(s.id for s in w.ship.sails.values() if s.is_set)
-    assert set_now == ["fore.topmast_staysail", "main.topsail"]
+    # package 57: and Steel's main staysail she lies to under short of the storm line
+    assert set_now == ["fore.topmast_staysail", "main.staysail", "main.topsail"]
     assert 45.0 <= off_wind(w) <= 70.0  # about five points off
     assert abs(units.ms_to_knots(w.ship.dyn.u)) < 2.5
     with pytest.raises(OrderError, match="lying to already"):
@@ -994,11 +995,14 @@ def test_sending_down_the_topgallant_masts_at_once_loses_nothing_in_thirty_minut
     assert w.ship.spars["fore.royal.yard"].sent_down
     assert not w.ship.sails["fore.royal"].is_set
     # the sail work in hand on the topgallant masts was belayed (the rest ran on: spec M3
-    # §3.4 as the owner ruled at gate 4c), and the royals refused after
+    # §3.4 as the owner ruled at gate 4c), and the royals refused after. Package 57: the
+    # royals are set flying from the deck (Steel 1794 vol. I p. 214), quicker than laid
+    # aloft and loosed; the fore royal is up before the yards come down (and goes down
+    # with its yard), the main royal's hoist ends after and is refused
     belayed = [e for e in w.log if e.kind == "evolution.belayed"]
     assert any("fore topgallant" in e.text for e in belayed)
     assert any(
-        e.kind == "evolution.failed" and e.text.startswith("Could not set the fore royal")
+        e.kind == "evolution.failed" and e.text.startswith("Could not set the main royal")
         for e in w.log
     )
     assert events(w, "spar.sent_down")

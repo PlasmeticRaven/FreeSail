@@ -166,7 +166,8 @@ def test_readings_are_the_physics_own_numbers(world: World):
     # every sail: state as the part has it
     for sid, sail in world.ship.sails.items():
         v = r.value("sail", sid)
-        assert v["state"] == sail.state.value
+        # package 57: a flying sail furled reads as sent down
+        assert v["state"] == ("sent_down" if sail.sent_down else sail.state.value)
         assert v["reefs"] == sail.reefs
         assert v["aback"] == (sail.backed and sail.state is SailState.SET)
     # the hands: the watch bill's count and fatigue in the crew's own words

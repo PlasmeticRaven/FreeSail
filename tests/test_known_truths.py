@@ -927,18 +927,23 @@ def test_truth_22_same_seed_same_muster_same_log_and_a_replay_reproduces_it():
 def gale(send_down: bool, royal_condition: float | None = None):
     """Gate M2 item 9 (35 knots, all sail made and braced up) and, at the start of the
     second ten minutes, the topgallant masts sent down, or not. Milestone 3b: the royals
-    may be bent worn, at `royal_condition` (truth 27)."""
+    may be bent worn, at `royal_condition` (truth 27). Package 57: the royals are set
+    flying from the deck (Steel 1794 vol. I p. 214) and are up in under ten minutes where
+    laid aloft and loosed they were not, so "in time" is the fifth minute, while their
+    yards are being swayed up, not the tenth (the topgallant masts were sent down at the
+    tenth minute before package 57)."""
     world = from_rest(FRIGATE, heading_deg=270.0, knots_=35.0)
     if royal_condition is not None:
         for sid in world.ship.groups["royals"]:
             world.ship.sails[sid].condition = royal_condition
     world.submit("make all sail")
     world.submit("brace up on the starboard tack")
-    run(world, 600)
-    world.submit("make all sail")
-    world.submit("trim sails")
+    run(world, 300)
     if send_down:
         world.submit("send down the topgallant masts")
+    run(world, 300)
+    world.submit("make all sail")
+    world.submit("trim sails")
     for i in range(1800):
         if i in (600, 1200):
             world.submit("trim sails")
@@ -1618,9 +1623,11 @@ def test_truth_35_shorten_sail_fires_once_after_two_minutes_over_thirty_and_not_
     assert rule.fired == 2
     # the routine's two minutes are long for studding sails before the wind in 32 knots:
     # every boom whips on the first second of the blow and one carries away on the
-    # second, before the routine can fire (docs/dev/TuningNotes.md, milestone 4a)
+    # second, before the routine can fire (docs/dev/TuningNotes.md, milestone 4a); since
+    # package 57 (Steel's staysails in all sail) the main topmast boom goes first, where the
+    # fore topgallant boom went before
     lost = events(world, "spar.carried_away")
-    assert lost and lost[0].subject == "fore.topgallant.studdingsail_boom.larboard"
+    assert lost and lost[0].subject == "main.topmast.studdingsail_boom.larboard"
     assert all("studdingsail_boom" in (e.subject or "") for e in lost), "booms, nothing else"
 
 

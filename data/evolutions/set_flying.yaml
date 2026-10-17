@@ -34,6 +34,13 @@ steps:
     duration_s: 30
     via: halyard_of(sail)
     sets: {sail.state: set}
+  # as set_square's haul_aboard: passed over once the sail is set, but the yard and mast
+  # are looked at once more when the hoist ends, so a royal hoisted while its topgallant
+  # mast is being struck is refused, not set on a yard already on deck (truth 23)
+  - do: haul_taut
+    duration_s: 10
+    if: sail.state != set
+    sets: {sail.state: set}
 on_start:
   log: "Hands to the {sail} halyard; sway up the yard."
   from: {in_the_gear: "Man the {sail} halyard and sheet; hoist away."}

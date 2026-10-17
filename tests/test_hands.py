@@ -1020,8 +1020,8 @@ def test_three_topsails_are_reefed_together_each_up_to_its_party_and_the_surplus
 
 def test_a_reef_short_of_its_party_begins_short_and_fills_as_hands_come_free():
     """The third topsail of "reef the topsails" given while the watch is setting the
-    royals: the first two take their parties from the deck and the third of the watch
-    below who come up at the call, the third begins with what is left and says so once,
+    royals and the staysails: the first two take their parties from the deck and the third
+    of the watch below who come up at the call, the third begins with what is left and says so once,
     routine, and fills to its party as the rest come up; the manoeuvres keep taking
     everyone (truth 19's tack), and the masts do too."""
     w = world(FRIGATE, heading=90.0, speed_kn=4.0)
@@ -1033,6 +1033,10 @@ def test_a_reef_short_of_its_party_begins_short_and_fills_as_hands_come_free():
     assert 80 <= len(deck_aloft) < 120  # one watch: two parties and part of a third
     n0 = len(w.log)
     w.submit("set the royals")
+    # package 57: the royals are set flying by four hands each on deck (set_flying.yaml),
+    # where twelve laid aloft to loose each before; the staysails between the masts keep
+    # the watch as busy as the royals did
+    w.submit("set the staysails")
     w.submit("reef the topsails, one reef")
     snap = {s["subject"]: s for s in runner.in_progress()}
     assert snap["fore.topsail"]["hands"] == snap["main.topsail"]["hands"] == 40
@@ -1041,7 +1045,8 @@ def test_a_reef_short_of_its_party_begins_short_and_fills_as_hands_come_free():
     w.run(120)  # the watch below comes up over a minute and a half
     snap = {s["subject"]: s for s in runner.in_progress()}
     assert snap["mizzen.topsail"]["hands"] == 40
-    assert all(snap[r]["hands"] == 12 for r in ("fore.royal", "main.royal", "mizzen.royal"))
+    # four hands each to sway up and set a flying royal (set_flying.yaml, package 57)
+    assert all(snap[r]["hands"] == 4 for r in ("fore.royal", "main.royal", "mizzen.royal"))
     short = [e for e in log_after(w, n0) if e.kind == "evolution.short_handed"]
     assert len(short) == 1 and short[0].text.startswith(
         f"Only {number_words(third)} hands to the mizzen topsail; the rest are setting"
