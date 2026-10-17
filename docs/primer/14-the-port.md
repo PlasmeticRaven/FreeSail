@@ -28,9 +28,34 @@ Passed the word for Mr Chambers by Mr Jarvis; he is on the deck.
 Mr Chambers came aft, sent for.
 ```
 
-`send for` (or `pass the word for`, or `call the carpenter`) sends the messenger; the man comes to where the captain is a minute later, which is the time it takes to pass the word along a frigate's deck, and the log says he came. Send for him again while he is on his way and you are told he is sent for already; send for a man who is at a task (the master at his day's work, chapter 10) and you are told when he will be free. `go below` (or `retire to the cabin`, which is the form this book shows, since `go` alone is a console command) puts the captain in his cabin and leaves the deck to the officer of the watch; `come on deck` brings him up. A man sent for comes to the cabin when the captain is below. At night a watch-keeper in his watch below is asleep by the bill, and `where is` says so; sent for, he is up, and does not turn in again that watch.
+`send for` (or `pass the word for`, or `call the carpenter`) sends the messenger; the man comes to where the captain is a minute later, which is the time it takes to pass the word along a frigate's deck, and the log says he came. Send for him again while he is on his way and you are told he is sent for already; send for a man who is at a task (the master at his day's work, chapter 10) and you are told when he will be free. `go below` (or `retire to the cabin`) puts the captain in his cabin and leaves the deck to the officer of the watch; `come on deck` brings him up. A man sent for comes to the cabin when the captain is below. (At the console `go` alone runs the clock; `go below`, with words after it, is an order.) At night a watch-keeper in his watch below is asleep by the bill, and `where is` says so; sent for, he is up, and does not turn in again that watch.
 
 A person is a name, a role, a skill, a place and a state, and no more. There is no sickness model yet beyond a flag, and no character.
+
+**Where you are is what you can do** (spec M7b §14, package 53). You are a person too: the captain at the prompt, on the quarterdeck unless you went elsewhere, and a model or you at a station is that station's person. Anyone goes where his duty allows: `go to the gunroom`, `go to the hold`, `go aloft`, `go below` (the captain to his cabin, an officer to the gunroom), `come on deck`; the captain's cabin is his own, and another man comes to it when he is sent for. (The blocks of this book show `walk to the gunroom` and `lay aloft`, the same orders, since its checker takes a line beginning `go` for the console's.) **The deck's orders are given from the deck**: the sails, the yards and the lines, the helm and the course, the anchors and all hands, from the quarterdeck or the waist; from below they are refused in words that say how to get back.
+
+```orders frigate plain-sail
+walk to the gunroom
+# rejected: set the royals
+# rejected: steer south-west
+where is the captain
+the people
+send for the master
+come on deck
+set the royals
+lay aloft
+come on deck
+# rejected: come on deck
+```
+
+```
+Captain Bowen went below to the gunroom.
+Order not carried out ('set the royals'): You are in the gunroom; go on deck to make or
+take in sail.
+Where is the captain: Captain Bowen, in the gunroom.
+```
+
+The muster ends with where each of the people is, and `the people` and `where is` say it in the same words ("off watch, in the gunroom" for an officer at his station who went below). Nothing moves a man by himself but the boat and the watch's routine: the bill's sleepers, the man sent for, the officer coming up to take the deck.
 
 ## The places and the papers
 
@@ -220,6 +245,35 @@ the boats
 
 At sea every one of the port's orders is refused in words: she is not in port, and the boat has nowhere to go.
 
+**Ashore yourself** (package 53). At anchor in a port, `go ashore` hoists out the boat with you in it and lands you at the quay; she comes back without you. The port has its places, each a name with what is done there and who is found there: the quay, the market, the counting house, the tavern and the pilots' office at every port, and a port's own beside them (Falmouth's packet office; Plymouth's dockyard and the port admiral's office; Brest's maritime prefecture). `the port`, in port, reads them, with anyone of the story's people ashore there by name. `go to the market` takes you there, and there you **buy in person**: `buy ten tons of tin` is struck on the spot, at the prices you read on the stalls (the price list is yours to bring off), the purse is paid at once, and the tin comes off by the port's lighter, the log saying when it is in the hold; the boat stays at the booms. Aboard, the market is by the boat as above. Ashore the deck's orders are refused (*You are ashore at Falmouth, on the quay; come aboard to make or take in sail.*), and so is the boat, which is the ship's; the ship's people are out of hail (`tell the mate ...` is refused: a letter by the boat reaches him). `come aboard` sends the boat from the ship for you; you step into her at the quay and come aboard with her.
+
+```
+The long-boat away for the quay at Falmouth with Mr Travers, to land a person who stays
+ashore.
+Mr Travers landed at the quay at Falmouth.
+Mr Travers went to the market at Falmouth: the port's goods are bought and sold in
+person at the prices of the day, and carted to the quay for the lighter.
+Mr Travers at the market of Falmouth, in person: bought 10 tons of tin at £120 a ton;
+£1200 paid; the lighter brings it off. The purse: £1800.
+10 tons of tin came off by the lighter from Falmouth and were struck down into the hold;
+the manifest 10 tons of tin; room for 102 tons.
+```
+
+**Books drafted** (spec M7b §16). A captain writes things down: night orders, a note for the ship's papers, a list of goods for the purser to buy and sell. `draft a book "<its title>": <its lines>`, with `;` between the lines, writes a book in the library with your mark and the hour. Every line a standing order (chapter 9's dialect; the words `standing order` may be left off) makes a **sheet**; every line a bargain a **manifest**; anything else a **note**. A line the ship cannot read refuses the draft, and says which. `post the book "night orders"` makes a sheet's orders standing orders, in your rank; `give the book "cargo" to the boat` strikes a manifest's bargains together at the port's prices and sends the boat once for them all, every bargain weighed before any is struck. `the books` lists them and `show the book "cargo"` reads one; a station reads them in the library under `books`, from anywhere.
+
+```orders frigate plain-sail
+draft a book "night orders": standing order "lead": every glass then heave the lead; "dusk": at sunset then take in the royals
+draft a book "cargo": buy 20 tons of tin; sell 5 tons of salt
+draft a book "the passage": We made the Lizard at noon and spoke the Falmouth packet.
+the books
+show the book "the passage"
+post the book "night orders"
+the standing orders
+# rejected: give the book "cargo" to the boat
+# rejected: post the book "the passage"
+# rejected: draft a book "worse": buy tin
+```
+
 ## Getting under way, with the tide
 
 Chapter 13's `weigh` is the anchor and nothing else: heave short, break out, cat and fish, and she lies with the anchor at the bows and no sail set, which is what the word meant. `get under way` is Luce's whole sequence (ch. XXI): all hands up anchor, the messenger passed and the bars shipped; heave short; the sail-loosers aloft and the topsails let fall, sheeted home and hoisted; the after yards braced for the tack she is to cast on and the head yards abox; heave round until the cable is up and down and the anchor is aweigh; the jib hoisted and the helm a-lee for the stern-board; and when she has paid off seven points, the head yards braced round and the spanker set, the anchor catted and fished as she gathers way. From the outer road a frigate is twenty-five minutes about it and comes out under topsails and jib at four knots.
@@ -310,8 +364,17 @@ The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco 
 | `the people` | `who is aboard`, `the officers` | each person by name and role, with his place and state |
 | `where is the master` | `where is the carpenter`, `where is the pilot` | one person's place and state; refused in words for a name not aboard |
 | `send for the master` | `pass the word for the carpenter`, `call the surgeon` | the messenger goes; he comes to where the captain is a minute later |
-| `go below` | `go to the cabin` | the captain to his cabin |
-| `come on deck` | `come up` | the captain to the quarterdeck |
+| `go below` | `go to the cabin` | the captain to his cabin; anyone else to his berth below |
+| `come on deck` | `come up`, `go on deck` | to the quarterdeck (the deck for the boatswain and the idlers' chiefs) |
+| `go to the gunroom` | `go to the hold`, `go into the tops`; ashore `go to the market`, `go to the tavern` | anywhere aboard but the captain's cabin; ashore, the port's places |
+| `go aloft` | `go up aloft` | into the tops |
+| `go ashore` | `step ashore` | by the boat, landed at the quay in port |
+| `come aboard` | `return aboard` | the boat sent for you at the quay |
+| `draft a book "<title>": <lines>` | `write a note "<title>": ...` | a sheet, a manifest or a note in the library with your mark |
+| `post the book "<title>"` | `post the night orders` | a sheet's orders made standing orders, in your rank |
+| `give the book "<title>" to the boat` | | a manifest's bargains struck together, the boat sent once |
+| `the books` | | the books drafted, with their marks |
+| `show the book "<title>"` | `read the book "<title>"` | one book's page |
 | `ask the pilot about the channel` | `ask the pilot for the marks`, `ask the pilot about the anchorage`, `ask the pilot when the tide serves`, `ask the pilot for the news` | the port file's words, and the world's high water at the port |
 | `the places` | | the places aboard, each a name and a description |
 | `the manifest` | `the cargo`, `the hold` | the cargo by tons and the room left |
@@ -328,7 +391,7 @@ The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco 
 | `the boats` | | every boat she carries, by length, oars and crew |
 | `the prices` | `the market`, `the price list` | the last list the boat brought off |
 | `send the boat ashore` | `send the boat ashore with the purser`, `send the boat ashore with a letter`, `away the boat` | the boat to the quay and back with the prices, the letters and whoever went |
-| `buy twenty tons of tin` | `sell twenty tons of tin` | the bargain at the port's price; the boat for the goods |
+| `buy twenty tons of tin` | `sell twenty tons of tin` | the bargain at the port's price; aboard, the boat for the goods; ashore at the market, in person, the goods by the lighter |
 | `demand a topmast from the yard` | `buy a suit of sails from the chandlers`, `indent for cordage` | the yard's job, with its time and its cost |
 | `take in water` | `take in twenty tons of water`, `water ship` | the water completed, or so many tons |
 | `take in provisions` | `take in provisions for thirty days`, `victual the ship` | the provisions, by the day |

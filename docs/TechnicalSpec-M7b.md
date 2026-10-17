@@ -556,6 +556,54 @@ he is: the market only ashore or by the boat, the helm only on deck). A port's p
 ashore (the quay, the market, the counting house, the tavern, the pilots' office), each with
 what can be done there and who is found there (§8's people and the port's own).
 
+**As built (package 53, 2026-10-17; `freesail/world/movement.py` new, `places.py`,
+`people.py`, `ports.py`; `freesail/orders/people.py`, `port.py`, `orders/__init__.py`;
+`data/vocabulary.yaml`; `data/ports/falmouth.yaml`, `plymouth.yaml`, `brest.yaml`;
+`tests/test_orders_places.py`; truths 7b-100 and 7b-101).** **Who goes** is the giver of the
+order (`movement.person_of_actor`): the captain for the player at the prompt, the station's
+person for a model at its station or the player at his seat; a standing order's firing, a
+rule and the director have no place and nothing checks them. `go below` (the captain to his
+cabin as always, `captain.below`; anyone else to his berth, the gunroom or his trade's
+place), `come on deck` (the quarterdeck for the captain and the officers, the deck for the
+rest), `go to the <place>` and `go aloft`, each a `person.moved` line; his duty allows every
+place aboard but the captain's cabin, which a man reaches by being sent for. `go ashore`
+sends the boat with him to the quay of the port she lies in (the errand `landing`) and she
+comes back without him (`person.ashore`: "Mr Travers landed at the quay at Falmouth."); `come
+aboard` sends her from the ship lying at his port (`fetch`), and he steps in at the quay and
+comes aboard with her (`person.came`). A man with the deck at his station hands it over
+first; the master who keeps the reckoning does not leave the ship unless he commands her
+(the schooner's and the cutter's). Ashore he is at one of the port's places
+(`Person.ashore_at`: the quay where the boat landed him; a person made ashore, where his role
+is found). **What he can do where he is** (`movement.check`, from `orders.handle` before an
+order is carried out): the deck's orders (the vocabulary's sail, yards, line, heading, points,
+none, wreck, work and anchor objects, and the master's helm verbs `put her about`, `shape a
+course for`, `give chase`) from the quarterdeck or the deck alone, refused in words naming
+the way back ("You are in the cabin; go on deck to give the helm an order."; "You are ashore
+at Falmouth, on the quay; come aboard to make or take in sail."); the boat sent and a man sent
+for from aboard alone; the market ashore in person at the market, else by the boat from
+aboard as always (`movement.market_way`; `Ports.trade_list(person=)`: the prices read at the
+market and the price list his, the purse paid at once, the purchase off by the port's lighter
+as a job of `BOAT_ASHORE_S["purchase"]`, `LIGHTER_S_PER_TON` a ton and the pull to the ship:
+"10 tons of tin came off by the lighter from Falmouth and were struck down into the hold");
+every other order (the people's, the port's business by the boat, the reckoning's, the book,
+the deck's conversation, the readings) from anywhere he is. The state and the muster say his
+place: `the people` and `where is` ("ashore at Falmouth, at the market"; an officer at his
+station "off watch, in the gunroom", "with the deck, in the gunroom"), and the muster ends
+with the people's places. Nothing moves a person's place by itself but the boat and the
+watch's routine (the bill's sleepers, the man sent for, the officer coming up to relieve the
+deck, §17). **A world in which nobody moves is as it was**: the place's checks do nothing until
+the people are mustered (any move musters them), so that no recorded passage's line moves.
+**The port's places** (`places.PORT_PLACES`, `port_places`): the quay, the market, the counting
+house, the tavern and the pilots' office at every port, each with what is done there and who
+is found there in words, and a port's own beside them from `places:` in its file (Falmouth's
+packet office; Plymouth's dockyard and the port admiral's office; Brest's maritime
+prefecture). `the port` at anchor in a port reads them after its line, with the world's
+people ashore at each by name (package 52's people made ashore are found where the words put
+them, `person: make "Mr Gill", a merchant, ashore at Falmouth, in the tavern`, else where their
+role is: a pilot at the pilots' office, a merchant at the counting house, anyone else on the
+quay); at sea it is as it was. At the console `go` alone still runs the clock; with words after it, it
+is an order.
+
 ### 15. What is heard where: dropped
 
 Locational knowledge (a station's log carrying only what its person could hear from where
@@ -583,6 +631,31 @@ the standing orders when posted, the manifest the trade when given to the boat).
 kept in a place aboard, read only where they are, is dropped as an overcomplication for now
 (the owner, 2026-10-16): the library is read from anywhere, as today.
 
+**As built (package 53; `freesail/world/books.py` new; `orders/__init__.py`;
+`agents/tools.py`; `data/vocabulary.yaml`, the object `book`; `tests/test_orders_places.py`;
+truth 7b-102).** `draft a book "<title>": <its lines, ; between them>`, read before the grammar
+as the standing dialect is: every line a standing order (`standing order "x": ...`, or `"x":
+...` with the words left out) makes a **sheet**, each read by the standing grammar at the
+drafting; every line a bargain (`buy <n> tons of <good>`, `sell ...`, `and` between bargains
+split) a **manifest**, read as the market reads one; anything else a **note**, kept as
+written. A line of a sheet or a manifest the ship cannot read refuses the draft whole in
+words, as do a title the library has already and no lines. The book carries the drafter's
+mark (his name, by the order's actor as §14 reads it) and his rank, the day and the hour
+(`book.drafted`); it is kept on the World (`books_of`), made again by a replay from the order
+that drafted it, and served by the library under `books` to every station from anywhere (a
+section a book; listed in the contents once there is one), and at the prompt by `the books`
+and `show the book "<title>"`. `post the book "<title>"` (or `post the night orders`) enters
+a sheet's orders in the book in the poster's rank (`book.posted`): a line naming another rank
+is refused, an order of the same name the poster gave (any, for the captain) is struck and
+entered anew, and a sheet that would write over another's order is refused whole. `give the
+book "<title>" to the boat` strikes a manifest's bargains together and sends the boat once
+(`Ports.trade_list`: every bargain read and weighed first, the room in the hold net of what is
+sold and the purse net of what is taken, one that cannot be struck refusing the whole), from
+aboard alone. From a station: drafting and reading are anyone's; a sheet posted is judged
+order by order as the standing orders the station gives (its rank, its domain;
+`tools._book_judged`); a manifest given to the boat as the boat sent on the port's business,
+kept back from an officer as that is. The papers kept in a place are not built.
+
 ### 17. The equal reach (`tools.py`; `stations.py`)
 
 Every stationed person has the same basic reach: tell and ask any other person aboard or
@@ -591,6 +664,35 @@ domain orders are the station's authority as now. Several stations of one kind o
 (45c's groundwork): the frigate's lieutenants as officers under the first, each with his
 place and watch.
 
+**As built (package 53; `agents/tools.py`, `agent.py`, `seat.py`, `remote.py`,
+`repl.py`, `watches.py` new; `world/stations.py`; `orders/stations.py`; `core/world.py`;
+`data/people/frigate-36.yaml`; `tests/test_orders_places.py`).** **The equal reach**
+(`tools.judge`, `tools.reach_order`): a station's own move (`go below`, `come on deck`, `go
+to ...`, `go aloft`, `go ashore`, `come aboard`) and a book drafted or read are every
+station's whatever its domain, with the deck or without; a word or a question (`tell`, `ask`:
+package 41's to a station, package 52's to a person nobody holds through a director) reaches a
+person within hail (`movement.within_hail`, `orders.stations._within_hail`: both aboard, or
+both ashore at one port; out of hail it is refused, "A letter by the boat reaches him, or go
+where he is."); the readings, the library and the journal from anywhere, as before; the domain
+orders stay the station's authority. A word told a person nobody holds with no director
+seated stays refused, as truth 96 has the question. **Several stations of one kind**: the
+frigate's file binds the third lieutenant as `third officer` beside package 45c's `second
+officer` (each `{kind: officer of the watch}`); the doors and the seat name them by their
+number (`officer 2`, `officer 3`; `officer 1` the officer of the watch's own;
+`agent.STATION_ALIASES`) or by their person (`--seat "Mr Russell"`; `Stations.resolve`). The
+officer's factory takes the station's name (`agent.officer(name=)`, `agent.make_bound`), so
+that the second officer is made for Mr Pascoe in the lieutenant's rank (until now a station
+renamed kept the first lieutenant's person and outline in its brief), and each officer's brief
+says who is first and whose watch is whose (`agent.officers_words`). `Mr Russell, you have the
+deck` (or `third officer, you have the deck`) gives the deck to his station, and `I have the
+deck` takes it from whichever has it. **The deck by the watch bill** (`agents.watches`, on the
+hour from `World.tick`): where two officers' stations are held (a model's or the player's) and
+the one with the deck keeps a watch, at the change of the watch the deck passes to the officer
+whose watch comes on deck, he on the quarterdeck, given it as at the captain's words (the night
+orders, the grants, the last handover note), with one notable `watch.deck_passed` line; the
+first lieutenant keeps no watch and keeps it until the captain takes it, and an officer whose
+relief nobody holds keeps it.
+
 ### 18. Truths for 7b-iv
 
 - 100. A person who goes below is below in the muster and the state; an order of the
@@ -598,6 +700,22 @@ place and watch.
 - 101. The player ashore buys at the market in person; aboard, by the boat.
 - 102. A drafted manifest given to the boat trades its goods in one errand; a drafted
   night-orders sheet posted is the standing orders.
+
+**As built (package 53; `tests/test_known_truths.py`, truths 7b-100 to 7b-102).** 7b-100:
+the frigate at seed 7 off the Lizard with a fake officer of the watch given the deck, who goes
+below (the gunroom his place in the people and the muster, "with the deck, in the gunroom"),
+is refused `take in the royals` in the words naming the way back, and a glass later comes on
+deck and has it carried out; the captain at the prompt alike, refused the helm in his cabin;
+the save replayed by the transcript and by the acts to the same digest. 7b-101: the schooner
+at anchor in Carrick Road, her master (the player) landed at the quay by the boat, refused the
+deck and then the market until he goes to it, buying ten tons of tin there in person with the
+boat at the booms and the tin off by the lighter, brought aboard by `come aboard`, and aboard
+buying by the boat; the save replayed to the same digest. 7b-102: the same road, a manifest of
+two purchases given to the boat trading them in one errand, and a sheet of two standing
+orders posted, in the book in the master's rank and firing; both books in the library with his
+mark from the officer's station; the save replayed to the same digest and the same books. No
+recorded passage's pin moved: none moves a person, goes ashore or drafts a book, and the
+place's checks muster nobody.
 
 ## Part 7b-v: Needs
 
