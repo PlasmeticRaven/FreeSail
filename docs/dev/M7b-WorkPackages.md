@@ -19,7 +19,7 @@ slow tier once at the end; a section in the tuning notes and a report to the lea
 | 52 | Opus | The director's voice: people from words, `say as`, the unseated answered; the word heard a word on deck; the truth of who commands told to every station | briefed 2026-10-17, after 50 |
 | 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | brief to write |
 | 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | brief to write |
-| 51 | Fable | The observed world: the followed ship in place of the given one, no player's ship, the player on another ship, the replay of a station there; the director's chart, the truth drawn (spec §12a; the owner's word of 2026-10-17) | brief to write, after 50 |
+| 51 | Fable | The observed world: the followed ship in place of the given one, no player's ship, the player on another ship, the replay of a station there; the director's chart, the truth drawn (spec §12a); provisionally the director's focus and the ships' logs by kind and tick range (spec §12b; both the owner's word of 2026-10-17) | brief to write, after 50 |
 | 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | brief to write |
 | 57 | Opus | The frigate's staysails from Steel's list through the generator, the period's shapes | brief to write |
 | 58 | Opus | The captain's sea sense, third pass (the owner's runs of gate 6c) | brief to write |

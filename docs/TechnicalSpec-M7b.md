@@ -241,6 +241,32 @@ truth leaves the server) and the page painting it from a truth the server sends 
 draw alone, with the lead's reading of the cost in the hand-back. The picture is a book as
 every picture is (shelved with a note). The director has no `ship_view`.
 
+### 12b. The director's attention: focus, and the ships' logs (provisional; `freesail/agents/tools.py`, `harness.py`; `crews.py`)
+
+Booked provisionally on the owner's word of 2026-10-17, to be kept or dropped by what the
+first director runs want. Package 50's director reads one log, the player's ship's, and
+the truth as a snapshot (§2); what a crewed ship does between its samples reaches it only
+as a changed state. This section gives it attention and history:
+
+- **Focus.** `focus ship="Palinure"` and `unfocus`: a focused ship's notable lines arrive in
+  the director's sample tagged with her name, as an urgent line wakes a watcher, until it
+  unfocuses her; several at once, up to the crewed cap, since a dealing with the player's
+  ship is always between two or more. Focus is attention, not the centre: it does not
+  promote her, move the chart or change the pace (the centre is `follow`'s, §11). A far
+  ship focused gives her state changes in words, the sample saying she is in the far
+  shape; a director that wants her crewed early says so by a world order in plain words,
+  doubted as any other, and the owner's cap stands.
+- **The ships' logs.** The log tool takes a ship and a kind family (`read_log ship="Palinure"
+  kind="sighting" since_tick=.. before_tick=..`; the kinds the log's own: helm, sail,
+  sighting, hail, business, ground, damage, people), paged and bounded as it is today; a
+  book, shelved. A far ship, which has no log, keeps a short story of her brain's state
+  changes with their ticks (a few lines a day), served by the same call. **A crewed ship
+  that demotes keeps her log** as a sealed record keyed to her for the director's reading
+  (today her World and her log are dropped); its weight in the save is measured in the
+  hand-back.
+- Notable lines of the player's ship's log reach the director as today; nothing here
+  changes what any station on a ship may read.
+
 ### 13. Truths for 7b-iii
 
 - 98. A world with no player's ship runs a day at seed 7 with the business on and a
@@ -250,6 +276,9 @@ every picture is (shelved with a note). The director has no `ship_view`.
 - 99a. The director's chart at seed 7 with the business on shows every ship where the truth
   has her and the player's ship by truth and by account; the player's chart, drawn in the
   same minute, shows none of the truth.
+- 99b (provisional). A director focusing the Palinure is woken by her taking the ground
+  within her own log's tick; a director reading her log by kind and tick range gets the
+  same lines her captain's station would; a demoted ship's log is still read.
 
 ## Part 7b-iv: People in places
 
@@ -455,7 +484,7 @@ In waves, written for the owner's approval in turn, each launched on his word:
   journal keyed to the person is in. No dependence on 50.
 - **54 (Opus): needs** (§19, §20) beside 50 and 53: the rations, the three needs, the
   sleep below. Data and rules on the people, no dependence on the director.
-- **51 (Fable): the observed world** (§11, §12, §12a) after 50: the followed ship in place of the
+- **51 (Fable): the observed world** (§11, §12, §12a, §12b provisional) after 50: the followed ship in place of the
   given one across the World, the player on another ship, the replay of a station there,
   and the director's chart (the owner's word of 2026-10-17). Cross-cutting and design-heavy.
 - **52 (Opus): the director's voice** (§8, §9) after 50, brought forward with it: people
