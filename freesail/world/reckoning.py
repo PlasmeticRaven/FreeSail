@@ -94,6 +94,7 @@ from freesail.world.geo import (
     estimate_words,
     format_position,
     name_words,
+    off_the_line_m,
 )
 from freesail.world.lookout import DISTANCE_BY_ESTIMATION_FRACTION as _LOOKOUT_ESTIMATE_FRACTION
 
@@ -240,6 +241,11 @@ WAY_REACHED_NM = 2.0
 # too early at marks near the coast and cut the corner toward the land); she comes up to it
 # within half a mile, or passes it abeam. Judgement.
 WAY_BERTH_REACHED_NM = 0.5
+# A mark is passed abeam only within this of it or of the line to it (package 43b, from
+# package 44's regatta: a water mark far to windward was taken as passed abeam while she was
+# miles from it and from its line, the bearing alone abaft the line's beam). Judgement, the
+# open-sea mark's own reach.
+WAY_PASSED_WITHIN_NM = 2.0
 WAY_ACTOR = "standing order 'the way by marks'"
 
 WAY_BY_EYE_GRAIN_KN = 0.5
@@ -4514,6 +4520,9 @@ class Navigation:
         brg, dist = bearing_and_distance(here, self.way_target)
         along, _ = bearing_and_distance(self.way_from, self.way_target)
         passed = abs(units.wrap_pi(math.radians(brg - along))) > math.pi / 2.0
+        if passed:
+            near = WAY_PASSED_WITHIN_NM * units.NAUTICAL_MILE
+            passed = dist <= near or off_the_line_m(self.way_from, self.way_target, here) <= near
         within = WAY_BERTH_REACHED_NM if self.way_hand else WAY_REACHED_NM
         reached = dist <= within * units.NAUTICAL_MILE
         if not reached and not passed:

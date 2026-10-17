@@ -2195,6 +2195,11 @@ class Captain(Judgement):
             # 40c: the schooner left the road under her topsail alone): he gives it at
             # `ship.under_way` himself (`_work`)
             self._business["weighing"] = True
+        elif state in ("on passage", "beating", "running for shelter") and old != "at anchor":
+            # under way with no sail set (package 43b, from package 44's regatta: a captain
+            # started so made none for a day): sail made as after weighing, the topsails
+            # alone in a wind over the doctrine's shortening line
+            self._sail_if_none()
         if state != "at anchor":
             self._fill_away_first()
             manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")
@@ -2261,6 +2266,23 @@ class Captain(Judgement):
             self._business["brought_up"] = True
         if "ship.under_way" in kinds or "ship.aweigh" in kinds:
             self._business.pop("brought_up", None)
+
+    def _sail_if_none(self) -> None:
+        """Plain sail made when she is under way with none set (package 43b), the topsails
+        alone over `shorten_sail_kn`; nothing when a sail is set or the anchor is down."""
+        world = self.world
+        ship = getattr(world, "ship", None)
+        if ship is None or any(s.is_set for s in ship.sails.values()):
+            return
+        p = Perception.read(world)
+        if p.anchor_down or p.anchoring or p.aground:
+            return
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        if p.wind_kn > float(th("shorten_sail_kn", 30)):
+            self.give("set the topsails", why="under way with no sail set, the wind strong")
+        else:
+            self.give("set plain sail", why="under way with no sail set")
 
     def _weather_work(self, p: Perception, kinds: set[str]) -> None:
         """Sail after the gale, whatever his state (package 45, Part B item 5; 37p's open
@@ -2573,8 +2595,16 @@ class Captain(Judgement):
         else:
             return False
         along, _ = bearing_and_distance(start, leg.position)
-        to_mark, _ = bearing_and_distance(here, leg.position)
-        return abs(units.wrap_pi(math.radians(to_mark - along))) > math.pi / 2.0
+        to_mark, dist = bearing_and_distance(here, leg.position)
+        if abs(units.wrap_pi(math.radians(to_mark - along))) <= math.pi / 2.0:
+            return False
+        # abeam only within two miles of the mark or of the line to it (package 43b, the
+        # master's way's rule, `WAY_PASSED_WITHIN_NM`: the regatta's mark far to windward)
+        from freesail.world.geo import off_the_line_m
+        from freesail.world.reckoning import WAY_PASSED_WITHIN_NM
+
+        near = WAY_PASSED_WITHIN_NM * units.NAUTICAL_MILE
+        return dist <= near or off_the_line_m(start, leg.position, here) <= near
 
     def _leg_reached(self, leg: Leg, p: Perception) -> None:
         world = self.world
