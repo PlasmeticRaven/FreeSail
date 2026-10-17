@@ -54,7 +54,9 @@ def run_js(tmp_path: Path, data: dict, body: str):
         f"const out = (function () {{ {body} }})();\n"
         "process.stdout.write(JSON.stringify(out));\n"
     )
-    res = subprocess.run([NODE, "-e", script], capture_output=True, text=True, timeout=60)
+    res = subprocess.run(
+        [NODE, "-e", script], capture_output=True, text=True, encoding="utf-8", timeout=60
+    )
     assert res.returncode == 0, res.stderr
     return json.loads(res.stdout)
 

@@ -72,7 +72,11 @@ def measure(worlds, label):
             for w in worlds:
                 w.tick()
         best = max(best, 1000 / (time.perf_counter() - t0))
-    print(f"{label}: {best:.0f} ticks a second (load {os.getloadavg()[0]:.2f})", flush=True)
+    try:
+        load = f"load {os.getloadavg()[0]:.2f}"
+    except (AttributeError, OSError):  # Windows has no load average
+        load = "load not read on this platform"
+    print(f"{label}: {best:.0f} ticks a second ({load})", flush=True)
     return best
 
 

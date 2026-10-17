@@ -557,6 +557,7 @@ def test_no_file_of_the_repository_holds_the_shape_of_a_key():
             cwd=ROOT,
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=True,
         ).stdout.splitlines()
     except (OSError, subprocess.CalledProcessError):

@@ -40,7 +40,11 @@ def run_js(tmp_path: Path, module: Path, data: object, body: str):
         f"const out = (function () {{ {body} }})();\n"
         "process.stdout.write(JSON.stringify(out));\n"
     )
-    res = subprocess.run([NODE, "-e", script], capture_output=True, text=True, timeout=60)
+    # the page's words are UTF-8 whatever the console's code page (the owner's run on
+    # Windows read the degree sign as two characters, m6c)
+    res = subprocess.run(
+        [NODE, "-e", script], capture_output=True, text=True, encoding="utf-8", timeout=60
+    )
     assert res.returncode == 0, res.stderr
     return json.loads(res.stdout)
 

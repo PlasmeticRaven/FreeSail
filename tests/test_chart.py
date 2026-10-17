@@ -202,6 +202,7 @@ def test_the_regions_tiles_are_present_committed_and_under_the_brief_size(manife
         cwd=ROOT,
         capture_output=True,
         text=True,
+        encoding="utf-8",
         check=False,
     ).stdout.split()
     # package 38: the corridor's folder is the one thing under tiles/1/ the repository
@@ -979,14 +980,16 @@ def test_the_corridor_is_committed_from_gebco_with_its_source_licence_and_checks
         total += path.stat().st_size
     budget = CORRIDOR_WIDENED_BUDGET_BYTES if widened else CORRIDOR_BUDGET_BYTES
     assert len(entry["tiles"]) == (48 if widened else 30) and total == entry["bytes"] < budget
-    tracked = subprocess.run(
-        ["git", "ls-files", f"data/charts/{entry['folder']}"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    ).stdout.split()
-    assert len(tracked) == len(entry["tiles"]), "the corridor's tiles are committed"
+    if (ROOT / ".git").exists():  # a gate's zip has no history to ask (the owner, m6c)
+        tracked = subprocess.run(
+            ["git", "ls-files", f"data/charts/{entry['folder']}"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        ).stdout.split()
+        assert len(tracked) == len(entry["tiles"]), "the corridor's tiles are committed"
     # the tile carries the distance field, so a landfall over the corridor is a landfall
     lv = load_chart(WHOLE).levels[-1]
     tile = lv.tile_at(OFF_LISBON.lat_deg, OFF_LISBON.lon_deg)
