@@ -16,7 +16,7 @@ slow tier once at the end; a section in the tuning notes and a report to the lea
 | Package | Builder | What | State |
 |---|---|---|---|
 | 50 | Fable | The director proper: the station above the game, the world orders doubted not refused, the brief and its limits, the budget, the hidden log revealed on request and inline in replays | briefed 2026-10-17, brought forward to the close of M6 (decision 50); approved and launched the same day; **built the same day** (spec §2 to §7 as built, the Harness's §19, the primer's chapter 20, the tuning notes; the owner's refinement of the examples-not-a-rule framing in the brief and the channel); **merged 2026-10-17** (the record below) |
-| 52 | Opus | The director's voice: people from words, `say as`, the unseated answered; the word heard a word on deck; the truth of who commands told to every station | briefed 2026-10-17, after 50; **built the same day** (spec §8, §9, §10 and §15 as built; the Harness's §19; the primer's chapters 19 and 20; the tuning notes, "Package 52"; truths 7b-95 to 7b-97) |
+| 52 | Opus | The director's voice: people from words, `say as`, the unseated answered; the word heard a word on deck; the truth of who commands told to every station | briefed 2026-10-17, after 50; **built the same day** (spec §8, §9, §10 and §15 as built; the Harness's §19; the primer's chapters 19 and 20; the tuning notes, "Package 52"; truths 7b-95 to 7b-97); **merged 2026-10-17** (the record below) |
 | 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | brief to write |
 | 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | brief to write |
 | 51 | Fable | The observed world: the followed ship in place of the given one, no player's ship, the player on another ship, the replay of a station there; the director's chart, the truth drawn (spec §12a); provisionally the director's focus and the ships' logs by kind and tick range (spec §12b; both the owner's word of 2026-10-17) | brief to write, after 50 |
@@ -126,6 +126,34 @@ above the game). No pin moved.
 - The builder mended `tests/test_rollup.py`'s server speed test to the thousand of the
   compression change (one assertion that the slow tier on the main line had failed since
   `b9052c5`); kept.
+
+### Package 52 as merged (2026-10-17)
+
+Merged `--no-ff` from the builder's worktree (five commits on `e06b5d3`; 26 files, ~2,200
+lines), ruff clean, the fast tier run on the merged tree by the lead; the builder's slow
+tier alone and the pace tests passed on the final tree (`docs/dev/TuningNotes.md`,
+"Package 52"). Built as briefed. No pin moved. The truth's snapshot now carries the
+player's purse and cargo and the stations held (package 50's open item, closed).
+
+**Taken another way, accepted by the lead, for the owner's overrule if he wants it:**
+
+- **The rule of reach extended** from speaking to moving and binding: a held person is his
+  holder's to move, and no other person is bound to a held station; refused outright in
+  words naming the stations held, logged `director.refused`. Conservative (it refuses
+  more, never less), and in the spirit of §9; spec §9 says so.
+- The stations the rules answer (the masthead, the master's reckoning) answer by their
+  rules whoever is seated above: the game's facts, which the player should not wait a
+  glass for.
+- `ask the director`, `tell the director` and `show the director's journal` stay refused:
+  the player's accepted order line would go to the play log, which wants a change in
+  `World.submit`; the player reaches the director by `director: brief ...`. A word to the
+  director is 55's or a later package's, when wanted.
+- Truth 7b-92's directed day uses `say as the harbourmaster of Falmouth` for its order the
+  game cannot perform, since `say as the carpenter` now performs; the play log unchanged.
+
+**Open items, carried:** `news:` as a channel; a word from the player to the director; the
+director's fixed brief says the grammar topic lists every form, which it never has; a pilot
+by trade with a port listed "pilot of <port>".
 
 ## Package 52: the director's voice (`freesail/world/people.py`, `orders.py` `person:` and `say as`; `freesail/agents/harness.py`, `agent.py` for the asked unseated person and the session kind; `freesail/core/events.py` for the word heard; `freesail/world/stations.py`; `docs/agents/Harness.md`; the primer's chapter 19 and the director's; `docs/TechnicalSpec-M7b.md` §8, §9 and §15 as built; `docs/dev/TuningNotes.md`; `tests/test_people.py`, `test_world_orders.py`, `test_director.py`, `test_captain.py`, `test_known_truths.py` truths 95 to 97)
 
