@@ -213,3 +213,20 @@ the director's stations and a lesser model does the officer's busywork well. For
 allocation of models to stations in the harbour's settings (59) and the gate's scenarios
 (55): the captain and the director heavy, the officer, lookout and master light.
 
+## Two harness notes from the Éclair's first cruise (the owner and the lead, 2026-10-17)
+
+- **A turn left open under lockstep.** The lead's door sent a stand-by the game refused
+  (a wait for the pilot aboard with no sail in sight), did not read the refusal, and polled
+  for a turn that could not come while it held the floor; under `--lockstep` the clock
+  froze until the owner intervened. The door's fault first (the bridge returns a refused
+  stand-by as the call's result, which a model reads); but the harness could say it louder:
+  a refused stand-by is a notice at the head of the answer, and the turn's state ("the
+  floor is still yours") is in every answer's words. Lockstep itself was not needed: the
+  pace rule's default (1x while a sample is open) would have served and cannot freeze.
+  The owner wants a run without lockstep to see.
+- **Narration for action.** The owner's standing observation: a model says "I'll do x and
+  y right away" and ends its turn with no call. The harness counts three empty replies
+  before a question or an urgent line; a smaller nudge catches it sooner: a reply with words
+  of intent and no call gets, in the next sample, "you said you would set the lugs; nothing
+  was ordered". For 58 or the harness's own notes.
+
