@@ -345,6 +345,50 @@ is made out and when her work changes.
 - 107. The glass on the Palinure hove to at a mile says she is hove to and on which tack;
   at four cables the main topsail aback; at night, only her light if any.
 
+## Part 7b-vii: The launcher, the scenario maker and the settings
+
+### 21d. The harbour: a launcher in the browser (`freesail/ui/harbour.py` new, served by `ui/server.py`; `client/harbour.html`, `harbour.js` new; `freesail/__main__.py`; `freesail/settings.py` new)
+
+The owner, 2026-10-17: the terminals, the flags, the desktop client's configuration and the
+scenarios made by hand in a file have become tedious, and any long use or a presentation
+wants a launcher, a scenario maker and settings. The lead's reading, for the owner's word:
+the launcher is a page of the game's own server, not a program apart, so that it runs the
+same on Windows and elsewhere and is tested here headless with the browser the tests
+already drive. `py -m freesail` (a `__main__`) starts the server and opens **the harbour**:
+a page that lists the scenarios (the game's and the player's own), the ships, the seats and
+the doors; starts a game with the choices made (the flags of the console and the server
+become the page's controls: the seed, the seat, the crewed budget, the compression, the
+business, a director's brief); shows which doors are up and which stations are held; and
+holds the **settings** (`settings.py`, a file in the player's own place outside the
+repository, `%APPDATA%\FreeSail\settings.yaml` on Windows and the XDG place elsewhere):
+the key in the credential store as 42 left it, the model names the player uses for each
+door (outside the repository, so a model's name may live there), the local runner's
+endpoint, the default seat and compression, where the saves go. The **doors** from the
+harbour: a button that writes the desktop client's MCP entry into its configuration file
+(the path by platform, the player confirming, the entry shown first), the API door and the
+local runner started as the server's subprocesses with their flags from the settings and
+their output in a pane, each stoppable. The console stays as it is for those who want it.
+
+### 21e. The scenario maker (`client/harbour.js`; `freesail/world/scenarios.py` `write_scenario`)
+
+A form on the harbour that writes a scenario file from choices, in the file's own form so
+that a hand may still edit it: the ship, the start (a port's road or a position pricked on
+the chart), the date and hour, the weather (a preset of the climatology's, or a scripted day
+from the forms the primer gives), the other ships with their intents, the business on or
+off, the crewed budget, the standing orders (a starter book, or a drafted one), the stations
+and who holds them, a director's brief from the starters or the player's own; saved under
+the player's scenarios place and listed by the harbour; loaded back into the form for
+editing. The scenario is proved by loading it as the console would.
+
+### 21f. Truths for 7b-vii
+
+- 108. `py -m freesail` opens the harbour, a game is started from it with a seat and a
+  director's brief, and the doors' states are shown true.
+- 109. A scenario written by the maker loads in the console and the server as a hand-made
+  one does, and reads back into the form unchanged.
+- 110. The settings file holds no key; the credential store does; a model's name in it never
+  enters the repository, a save or a log.
+
 ## 22. Consent (one revision for the milestone)
 
 The consent brief is revised once more by a named package at the milestone's end, the
@@ -359,7 +403,7 @@ One gate, the owner's runs on the playtest form: a directed quiet passage on a l
 (the solo mode the owner looks to) and on a hosted model; the director's log read after;
 an observed world for a day with the business on; the player ashore at Falmouth and in the
 cabin (his place and what he can do there); a day's fishing in the smack and the catch sold;
-the glass on a near ship; a drafted manifest's trade; a week's needs; the regatta's course with a director
+the glass on a near ship; a game started from the harbour with a scenario the maker wrote; a drafted manifest's trade; a week's needs; the regatta's course with a director
 seated above it. The lead's first play is at the director's station, as decision 39 held.
 
 ## 24. Packages (outline; the allocation)
@@ -398,7 +442,12 @@ In waves, written for the owner's approval in turn, each launched on his word:
   merchant book's track into Bertheaume's road, all sail in a chase, the station's regain
   against the wearing order, the lay line and the sea-route mark, Roscoff's and St Mary's
   tracks. Beside 53 and 54.
-- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57 and 58: the starter
+- **59 (Opus): the harbour, the scenario maker and the settings** (§21d to §21f), beside
+  53 and 54: a page of the game's own server, so built and tested here headless and proved
+  by the owner on Windows; the Windows-only pieces (the desktop client's configuration path,
+  the settings' place, a shortcut) small and tested by path, with a local session on the
+  owner's machine kept as the fallback if the browser's opening or the shortcut want it.
+- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57, 58 and 59: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
 
