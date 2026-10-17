@@ -142,3 +142,51 @@ actor's or the director's side. The lead's impression, for the specification of 
   it or over it; a chase with false colours and the private signal unanswered; night and
   fog with no flags; a signal made to a ship beyond hail and the time it takes to read and
   answer; what the far body can do (make and answer by table) against the crewed one.
+
+### The period's signals, named rightly (the lead, 2026-10-17, on the owner's intent)
+
+The owner's intent: a squadron's commander hoisting a message to his consorts ("England
+expects that every man will do his duty") and the basic commands by which the naval work of
+the period was conducted, so that intent passes by signal between most ships. The period's
+systems, which the design should model by their own names:
+
+- **The numerary signal book** (Howe's of 1790, the Admiralty's *Signal Book for the Ships
+  of War* of 1799): ten numeral flags with a substitute and a preparative; a hoist is a
+  number, and the number is an order or a piece of news in the book, some four hundred of
+  them: form the line, tack in succession, make more sail, chase, engage the enemy more
+  closely (No. 16), anchor, the compass and the number flags as qualifiers. **This is the
+  working language of a squadron and the one the rules can act on**: each entry maps to an
+  intent or an order the rules-based captain understands when the sender commands him.
+- **The telegraphic signals** (Popham's *Telegraphic Signals, or Marine Vocabulary*, 1800,
+  the 1803 edition at Trafalgar): with the telegraph flag up, the numbers refer to a
+  dictionary of words and phrases, so any sentence is spelt word by word and, for a word the
+  book lacks, letter by letter ("expects" was in the book and "confides" was not; "duty" was
+  spelt). Twelve hoists for Nelson's sentence, a minute or more a hoist to make, as long to
+  read and repeat, the repeating frigates relaying down the line. **This is the free
+  sentence by flags**, slow and for daylight, and the one a model or the player writes.
+- **The private signals** are the recognition signals only: a challenge and its reply,
+  issued under seal and changed by the month, by flags by day and by lights or false fires
+  by night; the answer wrong or wanting is the tell that she is an enemy. A small table per
+  nation per month, kept as a paper.
+- **Night and fog**: lanterns in their numbers and places, false fires, rockets and guns by
+  the night signal book; guns, muskets, the bell and the drum at intervals in fog; a few
+  dozen meanings, not a vocabulary.
+- **Merchantmen under convoy**: the Admiralty's *Signals and Instructions for Ships under
+  Convoy*, a short book of its own (make sail, shorten sail, tack, wear, close round the
+  commodore, enemy in sight, anchor); Marryat's code is 1817 and too late.
+- **The French**: du Pavillon's *Tableau des signaux* and the numerary system that followed
+  it, on Gallica; a research spree to find the editions before M7 is specified.
+
+**How the design would take them:** a signal as a thing hoisted (the book, the numbers, by
+whom, where, when, answered or not); the books as data with their sources
+(`data/signals/`), each numerary entry mapped to the intent or order it means; orders by
+meaning rather than number (`make the signal to chase`, `make the telegraphic signal:
+England expects ...`, `answer the signal`, `repeat it`, `haul it down`), the hoisting an
+evolution with the hands at the halyards and a minute a hoist; reading at the other end by
+the lookout's sight of the flags (range by their size, the light and the glass), the book
+aboard, and a minute to look it up, the answering pennant shown; the receiving rules
+captain acting by doctrine when the sender commands him (a `squadron:` or `convoy:`
+relation beside the nations' stances) and logging it otherwise; a model given the meaning
+in words and answering by meaning or by a free sentence; the private signals a separate
+table; night and fog their own small books. Nothing of this needs a model for the squadron's
+and the convoy's ordinary work.
