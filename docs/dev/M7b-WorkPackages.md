@@ -15,7 +15,7 @@ slow tier once at the end; a section in the tuning notes and a report to the lea
 
 | Package | Builder | What | State |
 |---|---|---|---|
-| 50 | Fable | The director proper: the station above the game, the world orders doubted not refused, the brief and its limits, the budget, the hidden log revealed on request and inline in replays | briefed 2026-10-17, brought forward to the close of M6 (decision 50); approved and launched the same day; **built the same day** (spec §2 to §7 as built, the Harness's §19, the primer's chapter 20, the tuning notes; the owner's refinement of the examples-not-a-rule framing in the brief and the channel), the report to the lead |
+| 50 | Fable | The director proper: the station above the game, the world orders doubted not refused, the brief and its limits, the budget, the hidden log revealed on request and inline in replays | briefed 2026-10-17, brought forward to the close of M6 (decision 50); approved and launched the same day; **built the same day** (spec §2 to §7 as built, the Harness's §19, the primer's chapter 20, the tuning notes; the owner's refinement of the examples-not-a-rule framing in the brief and the channel); **merged 2026-10-17** (the record below) |
 | 52 | Opus | The director's voice: people from words, `say as`, the unseated answered; the word heard a word on deck; the truth of who commands told to every station | briefed 2026-10-17, after 50 |
 | 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | brief to write |
 | 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | brief to write |
@@ -94,6 +94,37 @@ intent with the lead's reading; the intent binds.
    chapter for the director (what it may do, the plausible cause, the `[reason:]`); the
    tuning notes (what the doubt caught in the first runs, the acts the starter briefs made
    on a day at seed 7, the suite as run).
+
+### Package 50 as merged (2026-10-17)
+
+Merged `--no-ff` from the builder's worktree (seven commits on `dc69b78`; 47 files, ~4,150
+lines), ruff clean, the fast tier run on the merged tree by the lead; the builder's slow
+tier whole and the pace tests alone passed on the final tree (`docs/dev/TuningNotes.md`,
+"Package 50"). Built as briefed, with both of the owner's refinements of the day (every
+domain's contents as examples, not a rule; an order the game cannot perform answered
+honestly and logged as attempted when re-entered with a reason) and the lead's note on the
+pictures (`chart` kept and described as the player's chart by account; no `ship_view`
+above the game). No pin moved.
+
+**Open items, carried:**
+
+- `news:` and `letter:` are not channels (`message:` stands for a letter); both are
+  attempted-and-logged today. A channel for the news when a package wants it (52 or 55).
+- `nobody_dies` and `the_chart_as_it_is` are declared in the brief's limits and read to the
+  director in words, with nothing yet for them to refuse.
+- The player's purse and cargo are not in the truth's snapshot (the owner's design goal of
+  the same day, spec §21g): 51 or 52 adds them.
+- `ask the director`, `tell the director` and `show the director's journal` are refused
+  until 52 gives the director a voice.
+- The director's truths are `7b-90` to `7b-94` in `tests/test_known_truths.py`; M6 had used
+  90 and 91 for its own, so the prefix tells them apart; left as named.
+- Truth 90 is measured over a day of ship's time, not a week (a day shows every kind of
+  entry; the week would cost a quarter of an hour a brief).
+- A director's own chart: spec §12a, package 51. The director's attention and the ships'
+  logs: spec §12b, provisional, package 51.
+- The builder mended `tests/test_rollup.py`'s server speed test to the thousand of the
+  compression change (one assertion that the slow tier on the main line had failed since
+  `b9052c5`); kept.
 
 ## Package 52: the director's voice (`freesail/world/people.py`, `orders.py` `person:` and `say as`; `freesail/agents/harness.py`, `agent.py` for the asked unseated person and the session kind; `freesail/core/events.py` for the word heard; `freesail/world/stations.py`; `docs/agents/Harness.md`; the primer's chapter 19 and the director's; `docs/TechnicalSpec-M7b.md` §8, §9 and §15 as built; `docs/dev/TuningNotes.md`; `tests/test_people.py`, `test_world_orders.py`, `test_director.py`, `test_captain.py`, `test_known_truths.py` truths 95 to 97)
 

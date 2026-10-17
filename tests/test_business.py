@@ -29,11 +29,16 @@ SCHOONER = "data/ships/topsail-schooner.yaml"
 SCENARIOS = Path("data/scenarios")
 # the free-play scenarios whose region the business peoples (package 43b): every other
 # scenario, the recorded passages and the trials among them, says nothing and is off
+# The free games with the business on: the four merchant ships', and the owner's two
+# testing scenarios of 2026-10-17 (the smack out of Falmouth, the lugger out of Roscoff);
+# never a recorded passage, whose pins stand on a sea with nobody else on it.
 BUSY_SCENARIOS = {
     "merchant-brig.yaml",
     "merchant-cutter.yaml",
     "merchant-schooner-plymouth.yaml",
     "merchant-ship.yaml",
+    "smack-falmouth.yaml",
+    "lugger-roscoff.yaml",
 }
 
 
