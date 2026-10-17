@@ -610,6 +610,37 @@ in the ship files), the purser's reading says what remains and for how long, the
 sells them, short allowance is an order with its effect on the hands and their temper,
 water found foul is a thing the director may do aboard (§3).
 
+**As built (package 54, 2026-10-17; `freesail/crew/victuals.py` new, `crew/routine.py`,
+`world/places.py` `Stores`, `api/readings.py`, `ship/schema.py` and `tools/gen_ships.py` for
+`crew.ration`; `data/crew/ration.yaml` new; `tests/test_stores.py` new; truth 7b-103).** The
+ration is data (`data/crew/ration.yaml`): the Navy's table of the Regulations of 1806 (Sect.
+IX, Chap. I, Art. I, the 1808 printing in `docs/references/admiralty/`) by the day of the
+week, a pound of biscuit and a gallon of beer every day, beef on Tuesday and Saturday, pork
+and pease on Sunday and Thursday, oatmeal, butter and cheese on the banyan days (the table's
+heads and the substitutes of Art. II are legible in the OCR, its figures are not, and are
+given as the printed table has them, to be checked; its sugar column is left out, not
+guessed); the meals at eight, noon and four, a third of the day's ration each (judgement);
+252 gallons to the ton of water (a tun, wine measure); short allowance a half. Each ship file
+names its table and the water a man a day in a `crew.ration` block (`table: navy`,
+`water_gallons: 1`, the figure her water was sized at), written by the generator for all
+six. At each meal (`victuals.tick`, once a minute from the World) the provisions fall by the
+meal's share in days at full allowance for the company mustered and the water by its share
+of the company's gallons, at the allowance she is at; nothing of it is a line: the purser's
+reading (`the stores`, and the purser's books) says what remains, for how long at the
+allowance (the water's days and the provisions'), what is expended since she was stored and
+the day's proportion a man. The log hears of the stores when one runs out ("The last of the
+water started at supper: the ground tier is dry", notable, once) and of `short allowance` and
+`whole allowance`, the captain's orders (object `allowance`, outside every lesser domain),
+whose notable line says the share, that every man is alike, and the people's temper ("The
+people take it sullenly"). The hands: the routine's fatigue rates scaled by a hardship
+(`Routine.hardship`, 0 to 1, set from the stores each minute): short allowance its
+shortfall, a store run out the whole, the water found foul a quarter (drunk in the grog and
+the coppers at a cost); work and idleness tire `1 + 0.5 h` as fast and rest makes up `1 -
+0.5 h` as much (judgement); at nought the routine is as it was to the bit. The market and the
+yard sell water and provisions as before (`take in water`, `take in provisions`). A ship
+whose file keeps neither is not victualled. Class defaults on `Stores` and `Routine` let a
+checkpoint from before load.
+
 ### 20. Hunger, thirst and fatigue (`freesail/world/people.py`)
 
 Named people, the player among them, have the three needs in three to five steps each,
@@ -623,6 +654,48 @@ seated and for the crew; `stand by, asleep below until called` as a stand-by of 
 or thirst, collapse by fatigue, the surgeon) are M7's with health; this milestone stops at
 the last step's urgent line and a person who falls asleep where he is.
 
+**As built (package 54; `freesail/world/needs.py` new, `people.py` `Person.needs` and the
+asleep state's words, `core/world.py`, `agents/harness.py`, `agents/model.py` `Sample.needs`,
+`agents/tools.py`, `orders/needs.py` new, `data/vocabulary.yaml`, `ui/console.py`,
+`ui/server.py`; `data/crew/needs.yaml` new; `tests/test_people.py`; truth 7b-104).** The
+needs live on the person (`Person.needs`, made at the first look) and are kept by the
+World's `NeedsKeeper` once a minute: the hours since he last ate and drank, and for fatigue
+the hours of waking he owes, made up eight to the hour asleep below and four where he fell
+asleep. The steps are `data/crew/needs.yaml`'s (hunger at 12, 30, 40 and 48 hours; thirst at
+10, 28, 38 and 46; fatigue at 20, 36, 44, 50 and, the last, asleep where he stands at 56;
+judgement, set so that once a day to eat and drink and a sleep every day or two keep a man
+clear of every line, and two days without bring every urgent line and the third the sleep).
+**By hand at a filled station**: the person of a model's station, of the player's seat, and
+the captain while the player is at the prompt (a driver listening, or after an order of his
+own needs) and no model holds the captain's station (`held_stations`, package 52); taken in
+hand from what the routine made of him (fed at the last meal, awake since the morning watch,
+none of it before the scenario began), and given back to the routine when nobody holds him.
+Everyone else is reckoned by the clock, never shown. A person who is also a hand (drawn
+from a station of the muster) has the crew's fatigue read at the file's bounds (`crew/
+hands.py` stays the crew's), and the watch bill rests him. **The lines**: the first step
+never; a notable line at the change of the watch, at most one a watch, every need risen
+since said together; an urgent one at once; nothing while he sleeps. They go to the person
+stationed alone: a model's next sample as a notice ("You are quite thirsty.
+(submit_order('drink'))") and its `needs` while any shows; the player's through the keeper's
+listeners (the console prints the line, the server sends it to the pages as an event), never
+the log. **His orders** (object `needs`, every station's domain): `eat` (at a table in the
+cabin, the gunroom, the galley or ashore; elsewhere a biscuit and cheese brought up from the
+stores; half a meal at short allowance; refused when the provisions are expended), `drink`
+(the scuttle-butt on deck; his beer when the water is foul; `drink the foul water` at six
+hours on his fatigue), `sleep` (the player below to his berth, the cabin for the man who
+commands, the gunroom else, until his next order, an urgent line or rested; refused with the
+deck below the captain's and within the hour of his last sleep; called, he goes back where
+he turned in from) and `how am I`; each answered to him as an unlogged kind
+(`needs.answer`, `UNLOGGED_KINDS`), kept in the inputs so that a replay answers it again.
+A model turns in with `stand by, asleep below until called` (`harness.ASLEEP_BELOW`), its own
+stand-by line in the log, woken by a word, a question, an urgent line or its rest; at
+fatigue's last step the harness stands it by asleep where it stood (`fall_asleep`), quietly,
+its journal saying so; an urgent need wakes any other stand-by. The player asleep is woken by
+his next order (`World.submit`). The people's state says "asleep, in the cabin" or "asleep
+where he stood, on the quarterdeck" for a stationed person asleep by his needs. While a
+model holds the captain's station the owner at the prompt has no needs and `eat` is refused
+in words.
+
 ### 21. Truths for 7b-v
 
 - 103. The frigate's provisions fall by the ration for her complement; the purser's
@@ -630,6 +703,21 @@ the last step's urgent line and a person who falls asleep where he is.
 - 104. A player who neither eats nor sleeps for two days reads the urgent lines in order
   and is asleep on the third; eating from the stores and a night below reset them; an
   unseated person's needs never show.
+
+**As built (package 54; `tests/test_known_truths.py`, truths 7b-103 and 7b-104).** The
+frigate at seed 7 on the plane from 06:00 on 10 June to 05:00 on the 13th with the player at
+the prompt (a listener, as the console), the fixture `needs_days` of the slow tier. 7b-103: a
+day's three meals take a day of provisions and 264/252 tons of water; the reading says
+"water 99 tons for 94.5 days, provisions for 119 days"; a meal at short allowance takes a
+sixth of a day and the reading doubles the days; the order's notable line with the temper is
+the one line of the stores in the log. 7b-104: the player's lines in order (thirst and
+hunger at noon on the 11th, parched and drowsy at the first watch, very hungry at midnight,
+then urgent: desperately thirsty, absolutely starving, hardly able to keep his eyes open) and
+asleep where he stood at 14:01 on the 12th; eating and drinking wake him, a night below
+rests him, and at five on the 13th nothing is said of him; the first lieutenant, whom nobody
+holds, is the routine's; no line of the needs in the log. No recorded passage's pin moved: a
+passage has nobody at the prompt, the stores' fall writes nothing, and the routine's
+hardship is nought at whole allowance with sweet water.
 
 ---
 

@@ -165,7 +165,9 @@ def test_every_paper_is_a_thing_with_a_keeper_and_a_place_and_the_stores_own_wor
     assert by["the boatswain's store book"].lines == cordage(w.ship).inventory_lines()
     assert by["the establishment of ground tackle"].lines == ground_tackle(w.ship).describe()
     assert by["the manifest"].lines[0].startswith("The hold stows 93 tons of cargo")
-    assert by["the purser's books"].lines[0] == "Water: 100 tons in the ground tier."
+    assert by["the purser's books"].lines[0] == (
+        "Water: 100 tons in the ground tier, for 95.5 days at full allowance."  # package 54
+    )
     epitome = by["the epitome's table of the establishments"]
     assert epitome.keeper == "master" and epitome.place == "cabin"
     assert "Falmouth: 5h 15m at full and change; springs rise 15 feet." in epitome.lines

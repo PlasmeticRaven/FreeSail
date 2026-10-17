@@ -328,15 +328,18 @@ def _and_list(names: list[str]) -> str:
 # not the world answers an order, so a bell struck between two submissions of the same
 # order is not "a change in the readings" (spec §11; judgement).
 WELFARE_CLOCK_KINDS: tuple[str, ...] = ("watch", "bells", "daylight")
+# ...and the readings that fall with the clock, by id: the stores, drawn down at the meals
+# whether or not an order is answered (package 54).
+WELFARE_CLOCK_ROWS: tuple[str, ...] = ("stores",)
 
 
 def readings_digest(world: World) -> str:
     """A digest of the readings in words, for the welfare detector: "no change in the
     readings" means the words a model would read are the same, the clock's rows apart
-    (`WELFARE_CLOCK_KINDS`)."""
+    (`WELFARE_CLOCK_KINDS`) and the stores, which fall with it (`WELFARE_CLOCK_ROWS`)."""
     words = readings_words(world)
     for row in R.REGISTRY:
-        if row.kind in WELFARE_CLOCK_KINDS:
+        if row.kind in WELFARE_CLOCK_KINDS or row.id in WELFARE_CLOCK_ROWS:
             words.pop(row.id, None)
     text = json.dumps(words, sort_keys=True)
     return hashlib.sha256(text.encode()).hexdigest()[:16]
