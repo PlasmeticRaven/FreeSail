@@ -5701,3 +5701,82 @@ def test_truth_7b_97_say_as_a_held_station_is_refused(voiced_watch):
     assert "Captain Bowen" not in names and "Mr Pearce" not in names
     held = [o for o in world.world_orders if o["order"].startswith("say as the captain")]
     assert not held  # refused at the door: never an order on the channel
+
+
+# ---------------------------------------------------------------------------
+# Package 57: the rig through the generator (spec M7b §24; the owner's notes of the
+# Éclair's first cruise, 2026-10-17, and his finding at gate 6c). Truths 7b-111 and 7b-112,
+# numbered after the spec's 110 (the brief's "after 7b-104" taken as the next free numbers,
+# 105 to 110 being 56's and 59's). The lugger's lug topsails are lugs set flying, sheeted
+# to the lower lugs' peaks; the frigate lies to under Steel's main staysail with the storm
+# staysails M6 left.
+# ---------------------------------------------------------------------------
+
+LUGGER = "data/ships/lugger.yaml"
+
+
+def _lug_sides(world) -> dict[str, str | None]:
+    from freesail.api import queries
+
+    snap = queries.snapshot(world)
+    return {s["id"]: s["lug_side"] for s in snap["sails"] if s["class"] == "lug"}
+
+
+def test_truth_7b_111_the_luggers_lugs_lie_to_leeward_and_none_is_aback_through_a_tack_and_a_wear():
+    """Package 57 (the owner's notes 1 to 4 of the Éclair's first cruise): the lugger
+    close-hauled on either tack at seed 7 shows every lug to leeward of its mast, the lug
+    topsails with their lower lugs (the snapshot the picture is drawn from), and no sail is
+    aback through a tack and a wear: her topsails were square and braced as yards before,
+    and caught the wind on the wrong side three times in the cruise."""
+    world = make(LUGGER, 300.0)  # sixty degrees off a fifteen-knot northerly, starboard tack
+    settle(world, ["set plain sail"])
+    ship = world.ship
+    assert all(ship.sails[s].is_set for s in ("fore.topsail", "main.topsail"))
+    for lee, order in (("larboard", "tack ship"), ("starboard", "wear ship")):
+        sides = _lug_sides(world)
+        for sid in ("fore.lug", "main.lug", "fore.topsail", "main.topsail"):
+            assert sides[sid] == lee, (sid, sides)  # the lee side of the tack she is on
+        start = world.clock.tick
+        world.submit(order)
+        backed = set()
+        for _ in range(900):
+            world.tick()
+            backed |= {s.id for s in ship.sails.values() if s.backed}
+        assert not backed, (order, backed)
+        aback = [e.text for e in world.log if e.tick > start and e.kind == "ship.aback"]
+        assert not aback, (order, aback)
+        done = "ship.tacked" if order == "tack ship" else "ship.wore"
+        assert [e for e in world.log if e.tick > start and e.kind == done], order
+        run(world, 300, 120)
+    sides = _lug_sides(world)
+    assert ship.dyn.tack == "starboard" and sides["main.topsail"] == "larboard"
+
+
+def test_truth_7b_112_the_frigate_lies_to_under_her_main_staysail_by_the_heavy_weather_book():
+    """Package 57 (the owner's finding at gate 6c): the frigate in the gale trial
+    (`trial-station-gale`, seed 7), hove to for weather by the captain's book, lies a-try
+    under the close-reefed main topsail, the storm staysails as package 37p left them and
+    Steel's main staysail ("Lying-to under the main staysail ... a mean between the two
+    others", Steel 1794 vol. II); as the wind passes the storm line the main staysail is
+    taken in and the storm staysails stand for it ("preferable when it blows strong enough
+    for that sail to support the rolling of the ship"), and nothing blows it out. Seven
+    hours: her first hove-to of the gale."""
+    from tests.test_captain_trials import trial
+
+    world = trial("trial-station-gale", hours=7)
+    log = list(world.log)
+    hove = [
+        e.tick
+        for e in log
+        if e.kind == "captain.state" and e.data["state"] == "hove to for weather"
+    ]
+    set_at = [e.tick for e in log if e.text == "Set the main staysail to lie to under."]
+    lying = [e.tick for e in log if e.kind == "ship.hove_to"]
+    taken = [e.tick for e in log if e.text == "Hauled down the main staysail."]
+    assert hove and set_at and lying and taken, (hove, set_at, lying, taken)
+    assert hove[0] < set_at[0] <= lying[0] < taken[0]  # lying a-try under it, then in
+    ship = world.ship
+    assert "hove_to" in ship.extra and ship.extra["hove_to"]["how"] == "a-try"
+    assert all(ship.sails[s].is_set for s in ship.groups["storm staysails"])
+    assert not ship.sails["main.staysail"].is_set
+    assert ship.sails["main.staysail"].state.value != "blown_out"
