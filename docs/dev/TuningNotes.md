@@ -6053,4 +6053,16 @@ tier whole ran once at the end (below), every pinned passage's digest with it.
 
 ### The suite, as run
 
-SUITE_RESULTS
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- The package's own tests as written: `test_people.py` 3 new, `test_world_orders.py` 4 new,
+  `test_director.py` 7 new, `test_captain.py` 1 new, truths 7b-95 to 7b-97 3 (the fixture
+  `voiced_watch`, two hours, a day fixture of the slow tier: 13 s to build), all passing.
+- The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`) on the final tree: 3,337
+  passed, none failed, 311 slow left out (an earlier run with the tree edited under it
+  failed the fingerprint test alone, as package 50's did).
+- The slow tier alone (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m "slow and
+  not pace"`, after the fast tier on the same tree, so that every test ran once): 296
+  passed, 10 xfailed (the same ten as package 50's), none failed, in half an hour on the
+  build machine; every recorded passage's pin held.
+- The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`), on the
+  quiet machine after the slow tier: 6 passed in some 150 s.
