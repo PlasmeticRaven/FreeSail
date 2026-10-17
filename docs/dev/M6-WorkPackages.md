@@ -26,7 +26,7 @@ tuning notes and a report to the lead at the end.
 | 43 | Fable | Other ships with captains: the measurement first, the brain on the far body (the rules-based captain for the other ships), the crewed promotion and the guard, a model captain of another ship kept across the switch, the director's seat hook and the live world order | merged 2026-10-16, with 45c merged in its worktree; the trade trial's grounding at the anchorage a strict expected failure for the lead |
 | 37p | Opus | The yards and the helm by the wind, and the ship in a gale: three levels of bracing, the helm's mark the highest sail set, storm canvas, the recovery from aback; every passage re-pinned once | merged 2026-10-10, with 41 and 42 merged in its worktree; gate 6a cut after it |
 | 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | merged 2026-10-11 as committed so far (the owner's word, to play it) and 2026-10-15 whole, with every pin re-measured; the naval cruise's two truths strict expected failures for 45c; gate m6a-2 not cut |
-| 43b | Opus | The lugger and the smack; the world's business (spec §19) with the trade rumours; the ports' faults from 43 and 45c (the anchorage's let-go, the Goulet on a flood, Torbay's stream, the pilot's routine bearings) and the captain's beating flap | approved and launched 2026-10-16, beside 44 |
+| 43b | Opus | The lugger and the smack; the world's business (spec §19) with the trade rumours; the ports' faults from 43 and 45c (the anchorage's let-go, the Goulet on a flood, Torbay's stream, the pilot's routine bearings) and the captain's beating flap | merged 2026-10-17, the milestone's last build; 44 merged in its worktree |
 | 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | merged 2026-10-16; the trims kept, nine digests re-pinned for the lifting line's words |
 | 42b | Opus | The consent brief revised once for 6c: the stale sentence, a model as the captain of another ship kept across the switch, the director's seat, the regatta, the pictures; the re-asks the owner's | briefed 2026-10-16, to run after 43b and 44 |
 | 45c | Opus | Package 45's tail (the naval cruise restored, the chase, sail after the gale by steps, the pilot's conn through the Goulet and its design) and the owner's small fixes from gate m6a-2's runs (a picture put back by hand with a note, the ghosted boat and `--until`, the weather's cadence, the OpenRouter exchanges, `muster` in the browser, the unheld lookout, the sails-lifting line, the pictures at the local runner, a point of interest, world orders not shown as sent, the stations' groundwork) | merged 2026-10-16, the first of the two; the milestone's last new package |
@@ -1389,6 +1389,48 @@ measurement comes first (§19, the owner's rule).
 7. **Notes and spec**: §19, §20, §23 and §4 as built; the primer; the Harness note on a
    station on another ship; the tuning notes with the measurement, the range and the cap,
    and the trials' logs with two captains.
+
+## Package 43b, as merged (2026-10-17)
+
+The builder's notes are the record (`docs/dev/TuningNotes.md`, "Package 43b"; spec §19 as
+built; primer 2 and 15). The lugger on the Éclair's lines (Forfait's Table VII; the masts
+scaled on her breadth, the table's own column, which puts her centre of effort a little
+before the middle where Forfait has it abaft, balanced by the hull's lateral centre moved a
+metre aft: the lead accepts the judgement and records it) makes 8.25 knots with the wind
+abeam in fifteen and lies as close as 44°; the smack on the Culloden's with Holdsworth's
+well 6.2 knots and 46°; the dipping lug built into the tack and the wear and alone as `dip
+the foresail`, a lug against its mast drawing two thirds, the lugs lowered to heave to; the
+hierarchy truths to six vessels. The world's business under a `business:` key, off unless a
+scenario says on and on in the four free merchant scenarios only, the recorded passages
+untouched and proved so: traders where the destination's price is 1.3 times the origin's
+under a flag both ports accept, fishermen on their grounds never promoted, a cruiser on
+station for each nation at war, a draw every hour, the guard kept, a ship in port planned
+out by her port's track, an arrival only from an edge with a clear line in; at seed 7 twelve
+ships at the start and eight more in thirty-six hours, wine, coal, pilchards, brandy, copper
+ore and salt beef; the quay's rumours true as of the day. The ports' faults: the let-go
+stands her back when the cast less the master's fall to low water leaves less than a
+fathom under her keel (the trade trial afloat in Carrick Road, its expected failure
+lifted); the Goulet on a flood with the set allowed for before the turn (the wardroom save
+from 113000 and 114000 berthed in thirteen and fourteen fathoms); Torbay its own stream
+area (0.17 knots at springs where 1.35); the pilot's corrections under two points routine.
+The beating flap: one rule with a half-point band and a ten-minute dwell, which moved the
+trials and the intent scenario (she reaches Bertheaume eight minutes later, misses the tide
+and does her business from the road, the Goulet passage now proved by the wardroom-save
+tests alone: the lead accepts the doctrine's rule). The regatta's two findings fixed: a
+mark passed only within two miles; a captain under way with no sail makes sail. Suites on
+the merged tree: the fast tier 3,293; the truths' and trials' slow tier 99 passed, 7 expected
+failures, the four pins then written in; the pace tests 6 on a quiet machine.
+
+**Open, recorded for the next captain's package or the chart's patches:** (1) the lugger on
+the regatta's crossing tacks sixty-one times and never reaches the sea-route mark west of
+the Lizard: the beating order tacks her every half hour and a sea-route mark is never taken
+as passed, so a lay-line rule, or the two-mile rule extended to sea-route marks, is wanted;
+(2) Roscoff and St Mary's are out of the business, their own tracks crossing land at far
+detail; (3) Brest's reach is measured from Bertheaume eight miles off, so a ship in the Bay
+is not in port, and thick weather sends far-detail ships into a road to wait twelve hours
+again and again; (4) a stand-back from water too shallow at the let-go fails in words; (5)
+M7's: the gybe of a lug, the dip in a boxhaul and when filling away, the strain on a lug
+pressed aback.
 
 ## Package 44, as merged (2026-10-16)
 
