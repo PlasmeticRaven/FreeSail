@@ -108,6 +108,11 @@ def test_the_port_in_port_says_its_places_and_who_is_found_there():
     assert "The packet office:" in said
     at_sea = world_at().submit("the port").text
     assert "ashore:" not in at_sea
+    # the words that make a person may put him at a place ashore
+    e = w.world_order('person: make "Mr Gill", a merchant, ashore at Falmouth, in the tavern', "t")
+    assert e.data["result"] == "done" and "ashore at Falmouth, in the tavern" in e.text
+    gill = w.people.find("Mr Gill")
+    assert gill.ashore_at == "tavern" and gill.outline.history == ""
 
 
 # ---------------------------------------------------------------------------
