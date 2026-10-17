@@ -66,7 +66,7 @@ from freesail.agents.agent import (
 from freesail.api import readings as R
 from freesail.core.events import Severity, for_the_record
 from freesail.orders.errors import OrderError
-from freesail.orders.people import MOVE_VERBS
+from freesail.orders.people import REACH_VERBS
 from freesail.orders.vocabulary import load_vocabulary
 
 if TYPE_CHECKING:
@@ -734,9 +734,10 @@ def judge(world: World, station: str, text: str, danger: str = "") -> tuple[str,
         if order is None:
             return text, "", ""  # the grammar's own refusal, through `World.submit`
     spec = vocab.verbs[order.verb]
-    if order.verb in MOVE_VERBS:
+    if order.verb in REACH_VERBS:
         # the equal reach (spec M7b §17; package 53): every stationed person goes where his
-        # duty allows, whatever his domain; his duty is the movement's own check
+        # duty allows, whatever his domain (his duty is the movement's own check), and asks
+        # what is ashore
         return text, "", DOMAIN
     why = domain.why_not(order.verb, spec.object, spec.level)
     if why is None:
@@ -827,7 +828,7 @@ def reach_order(world: World, text: str) -> bool:
         order = imperative.parse(world.ship, text, load_vocabulary())
     except Exception:  # noqa: BLE001  (words the grammar refuses, or a point ship)
         return False
-    return order.verb in MOVE_VERBS
+    return order.verb in REACH_VERBS
 
 
 def _granted(world: World, harness: Any, order: Any, spec: Any, vocab: Any) -> bool | str | None:

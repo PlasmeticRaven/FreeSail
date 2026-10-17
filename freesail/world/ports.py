@@ -2426,13 +2426,6 @@ class Ports:
             # package 39d: only a blockaded port's reading carries its state, so an open
             # port's reading is what it was
             out.update({"state": port.state, "blockaded_by": by})
-        if in_port is not None:
-            # package 53 (spec M7b §14): the port's places ashore, what is done in each and
-            # who is found there, the world's people ashore there by name; in port alone,
-            # so that the reading at sea is what it was
-            lines = self.places_lines(port)
-            out["words"] += "; ashore: " + " ".join(lines)
-            out["places"] = lines
         return out
 
     def places_lines(self, port: Port) -> list[str]:

@@ -828,6 +828,14 @@ verbs:
                go off to the ship, take me off, come back aboard]
     object: person
     level: 1
+  # The port's places, what is done in each and who is found there (package 53): asked in
+  # port or ashore, answered in words and never journaled, as a reading is; not a reading
+  # of the registry, so that no sample and no pinned passage's `the port` carries it.
+  the places ashore:
+    synonyms: [the port's places, places ashore, the places of the port, what is ashore,
+               the places in the port]
+    object: person
+    level: 1
   ask the pilot:
     synonyms: [ask the pilot about, ask the pilot for, ask the pilot when, ask the pilot how,
                ask the pilot where, ask the pilot what, ask pilot]

@@ -252,9 +252,14 @@ def _who(ship: Any, world: Any) -> tuple[str, str]:
     if actor.startswith(("standing order ", "captain's rule ")) or actor == "the director":
         raise OrderError("A book is drafted and posted by a person aboard, in his own hand.")
     person = person_of_actor(world, actor)
-    if actor == "captain" or person is None:
+    if actor == "captain":
         captain = world.people.captain
         return captain.name, "captain"
+    if person is None:
+        who = actor.split(" (", 1)[0].removeprefix("the ")
+        raise OrderError(
+            f"Nobody is named at the {who}'s station: a book is drafted in a person's hand."
+        )
     station = actor.split(" (", 1)[0].removeprefix("the ").strip()
     rank = ""
     held = (getattr(world, "agents", None) or {}).get(station)

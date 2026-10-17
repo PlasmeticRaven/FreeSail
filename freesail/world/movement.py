@@ -73,6 +73,7 @@ __all__ = [
     "is_deck_order",
     "market_way",
     "person_of_actor",
+    "places_ashore",
     "within_hail",
 ]
 
@@ -273,7 +274,12 @@ def check(ship: Any, verb: str, obj: str) -> None:
     if person is None:
         return
     if is_deck_order(verb, obj):
-        if person.aboard and person.where in DECK_PLACES:
+        # where he went by his own word: the master's reckoning takes him below to his
+        # sights and his day's work by its own rule (his mirror), which is not his going
+        # below, and the captain who is the schooner's master gives his orders from there
+        # as he always did (the owner's wardroom save, replayed: package 53)
+        here = person.place if (person.mirror is not None and person.aboard) else person.where
+        if person.aboard and here in DECK_PLACES:
             return
         if not person.aboard and person.where == "shore":
             raise OrderError(
@@ -284,7 +290,7 @@ def check(ship: Any, verb: str, obj: str) -> None:
                 f"You are {place_words(person.where)}; you must be aboard and on deck to "
                 f"{_what(verb, obj)}."
             )
-        raise OrderError(f"You are {place_words(person.where)}; go on deck to {_what(verb, obj)}.")
+        raise OrderError(f"You are {place_words(here)}; go on deck to {_what(verb, obj)}.")
     if not person.aboard and verb in ("send the boat", "send for"):
         what = "send the boat" if verb == "send the boat" else "send for a man aboard"
         raise OrderError(
@@ -313,6 +319,28 @@ def market_way(world: Any, actor: str | None) -> Any:
             f"You are {ashore_words(world, person)}; go to the market to buy and sell in person."
         )
     return person
+
+
+def places_ashore(world: Any, person: Any = None) -> tuple[str, dict[str, Any]]:
+    """`the places ashore`: the places of the port the asker is ashore at, or of the port
+    the ship lies in, each with what is done there and who is found there, the world's
+    people ashore at each by name (spec M7b §14; package 53). Refused in words at sea."""
+    ports = getattr(world, "ports", None)
+    port = None
+    if person is not None and not person.aboard and person.where == "shore":
+        port = _port_of(world, person)
+    if port is None and ports is not None and ports.ports:
+        port = ports.in_port()
+    if port is None:
+        raise OrderError(
+            "She is not in port: the places ashore are a port's, asked at anchor in its "
+            "roads or ashore."
+        )
+    lines = ports.places_lines(port)
+    return f"The places ashore at {port.name}: " + " ".join(lines), {
+        "port": port.id,
+        "places": lines,
+    }
 
 
 def within_hail(world: Any, a: Any, b: Any) -> bool:

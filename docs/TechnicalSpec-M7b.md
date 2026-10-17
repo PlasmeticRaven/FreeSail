@@ -597,12 +597,15 @@ the people are mustered (any move musters them), so that no recorded passage's l
 house, the tavern and the pilots' office at every port, each with what is done there and who
 is found there in words, and a port's own beside them from `places:` in its file (Falmouth's
 packet office; Plymouth's dockyard and the port admiral's office; Brest's maritime
-prefecture). `the port` at anchor in a port reads them after its line, with the world's
-people ashore at each by name (package 52's people made ashore are found where the words put
-them, `person: make "Mr Gill", a merchant, ashore at Falmouth, in the tavern`, else where their
-role is: a pilot at the pilots' office, a merchant at the counting house, anyone else on the
-quay); at sea it is as it was. At the console `go` alone still runs the clock; with words after it, it
-is an order.
+prefecture). `the places ashore` (or `the port's places`), asked at anchor in a port or
+ashore, reads them in words, with the world's people ashore at each by name (package 52's
+people made ashore are found where the words put them, `person: make "Mr Gill", a merchant,
+ashore at Falmouth, in the tavern`, else where their role is: a pilot at the pilots' office, a
+merchant at the counting house, anyone else on the quay); a question answered in the log and
+never journaled, and not a reading of the registry, so that `the port` and every sample are
+what they were (the lead's reading had them in `the port`, whose words a pinned passage
+asks for in port: truth 78's). At the console `go` alone still runs the clock; with words
+after it, it is an order.
 
 ### 15. What is heard where: dropped
 

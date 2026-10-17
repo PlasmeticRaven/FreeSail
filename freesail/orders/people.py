@@ -34,7 +34,7 @@ from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
 
-__all__ = ["MOVE_VERBS", "NO_PEOPLE_WORDS", "check", "execute"]
+__all__ = ["MOVE_VERBS", "NO_PEOPLE_WORDS", "REACH_VERBS", "check", "execute"]
 
 # The people's verbs that move the giver (package 53; `freesail.world.movement`).
 MOVE_VERBS: tuple[str, ...] = (
@@ -45,6 +45,9 @@ MOVE_VERBS: tuple[str, ...] = (
     "go ashore",
     "come aboard",
 )
+# The verbs of the equal reach (spec M7b §17): every station's, whatever its domain, with
+# the deck or without: its own moves, and the port's places asked.
+REACH_VERBS: tuple[str, ...] = (*MOVE_VERBS, "the places ashore")
 
 NO_PEOPLE_WORDS = "There is nobody to send for: the ship is not in a world."
 
@@ -76,6 +79,13 @@ def execute(ship: Any, order: Order) -> Result:
         return "person.sent_for", text, {"verb": verb, "level": 1} | data
     if verb in MOVE_VERBS:
         return _move(ship, world, people, order, verb, rest)
+    if verb == "the places ashore":
+        # the port's places (package 53): a question, answered and never journaled
+        from freesail.world import movement
+
+        actor = (getattr(ship, "extra", None) or {}).get("order_actor") or "captain"
+        text, data = movement.places_ashore(world, movement.person_of_actor(world, actor))
+        return "query.places", text, {"verb": verb} | data
     if verb == "ask the pilot":
         ports = getattr(world, "ports", None)
         if ports is None or ports.pilot is None:
@@ -93,7 +103,16 @@ def _move(ship: Any, world: Any, people: Any, order: Order, verb: str, rest: str
     from freesail.world import movement
 
     actor = (getattr(ship, "extra", None) or {}).get("order_actor") or "captain"
-    person = movement.person_of_actor(world, actor) or people.captain
+    person = movement.person_of_actor(world, actor)
+    if person is None:
+        # a station bound to nobody named (a passenger's, the watcher's), a standing order's
+        # firing or a rule: nobody to go anywhere, and never the captain in his place
+        who = actor.split(" (", 1)[0].removeprefix("the ")
+        raise OrderError(
+            f"Nobody is named at the {who}'s station: there is no person to go anywhere."
+            if actor.startswith("the ")
+            else "A rule moves nobody; a person goes where he is ordered by his own word."
+        )
     captain = person is people.captain and person.aboard
     if verb in ("go below", "come on deck") and rest:
         raise OrderError(f"'{verb}' takes nothing after it; '{rest}' was not understood.")

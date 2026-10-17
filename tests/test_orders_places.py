@@ -102,12 +102,13 @@ def test_the_port_in_port_says_its_places_and_who_is_found_there():
     w.world_order('person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Falmouth', "t")
     fox = w.people.find("Mr Fox")
     assert w.people.state_words(fox) == "ashore at Falmouth, at the pilots' office"
-    said = w.submit("the port").text
-    assert "ashore: The quay: the boats land" in said
+    said = w.submit("the places ashore").text
+    assert said.startswith("The places ashore at Falmouth: The quay: the boats land")
+    assert "ashore" not in w.submit("the port").text  # the reading is what it was
     assert "The pilots' office: a pilot is engaged" in said and "and Mr Fox." in said
     assert "The packet office:" in said
-    at_sea = world_at().submit("the port").text
-    assert "ashore:" not in at_sea
+    at_sea = world_at().submit("the places ashore")
+    assert at_sea.kind == "order.rejected" and "She is not in port" in at_sea.text
     # the words that make a person may put him at a place ashore
     e = w.world_order('person: make "Mr Gill", a merchant, ashore at Falmouth, in the tavern', "t")
     assert e.data["result"] == "done" and "ashore at Falmouth, in the tavern" in e.text
@@ -181,6 +182,11 @@ def test_an_officer_goes_below_at_his_station_and_the_cabin_is_the_captains():
     said = tools.call(w, OFFICER, "submit_order", {"text": "come on deck"})
     assert said == f"{pearce.name} came on deck, to the quarterdeck."
     assert w.people.state_words(pearce) == "off watch"
+    # a station bound to nobody named moves nobody, and never the captain in his place
+    seat_player(w, "passenger")
+    e = w.submit("go to the hold", actor="the passenger (the player)")
+    assert e.kind == "order.rejected" and "Nobody is named at the passenger's station" in e.text
+    assert w.people.captain.where == "quarterdeck"
 
 
 def test_the_player_ashore_is_out_of_hail_of_the_ship_and_cannot_send_her_boat():
@@ -194,7 +200,8 @@ def test_the_player_ashore_is_out_of_hail_of_the_ship_and_cannot_send_her_boat()
     assert w.submit("go to the tavern").text.startswith(f"{master.name} went to the tavern")
     assert "in the tavern already" in w.submit("go to the tavern").text
     assert w.people.state_words(master) == "ashore at Falmouth, in the tavern"
-    assert "The tavern:" in w.submit("the port").text and master.name in w.submit("the port").text
+    said = w.submit("the places ashore").text
+    assert "The tavern:" in said and f"and {master.name}." in said
 
 
 def test_the_master_who_keeps_the_reckoning_does_not_leave_the_ship_but_the_commanding_one_may():

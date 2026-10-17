@@ -5853,7 +5853,7 @@ def test_truth_7b_101_the_player_ashore_buys_at_the_market_in_person_and_aboard_
     )
     assert (
         "the market: the port's goods are bought and sold in person"
-        in world.submit("the port").text.lower()
+        in world.submit("the places ashore").text.lower()
     )
     e = world.submit("set the jib")
     assert e.text.endswith(
