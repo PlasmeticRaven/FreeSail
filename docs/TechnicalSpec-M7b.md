@@ -243,10 +243,17 @@ every picture is (shelved with a note). The director has no `ship_view`.
 
 ### 12b. The director's attention: focus, and the ships' logs (provisional; `freesail/agents/tools.py`, `harness.py`; `crews.py`)
 
-Booked provisionally on the owner's word of 2026-10-17, to be kept or dropped by what the
-first director runs want. Package 50's director reads one log, the player's ship's, and
-the truth as a snapshot (§2); what a crewed ship does between its samples reaches it only
-as a changed state. This section gives it attention and history:
+Booked on the owner's word of 2026-10-17; the mechanics provisional, kept or reshaped by
+what the first director runs want, the goal not: **the director can know the basic
+history of any ship, far-detail or not.** Package 50's director reads one log, the player's
+ship's, and the truth as a snapshot (§2); what a crewed ship does between its samples
+reaches it only as a changed state. The owner's three tiers of attention order what
+reaches it unasked: first the player's ship, where events matter most (her notable lines
+in every sample, as today); second the ships involved with the player's in one way or
+another, which need close attention (focused, below); third the ships not likely to be
+involved, which need some attention or which the director wants for a reason of its own
+(the truth's snapshot, and their history on request). This section gives it the attention
+and the history:
 
 - **Focus.** `focus ship="Palinure"` and `unfocus`: a focused ship's notable lines arrive in
   the director's sample tagged with her name, as an urgent line wakes a watcher, until it
@@ -259,8 +266,10 @@ as a changed state. This section gives it attention and history:
 - **The ships' logs.** The log tool takes a ship and a kind family (`read_log ship="Palinure"
   kind="sighting" since_tick=.. before_tick=..`; the kinds the log's own: helm, sail,
   sighting, hail, business, ground, damage, people), paged and bounded as it is today; a
-  book, shelved. A far ship, which has no log, keeps a short story of her brain's state
-  changes with their ticks (a few lines a day), served by the same call. **A crewed ship
+  book, shelved. A far ship, which has no log, keeps a short story of her own: her brain's
+  state changes with their ticks, her port calls and her cargo's business, what she sighted
+  and who hailed her, as the far shape records them (a few lines a day), served by the same
+  call, so that the basic history of every ship is there to be read whatever her shape. **A crewed ship
   that demotes keeps her log** as a sealed record keyed to her for the director's reading
   (today her World and her log are dropped); its weight in the save is measured in the
   hand-back.
