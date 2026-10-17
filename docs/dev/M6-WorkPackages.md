@@ -28,7 +28,7 @@ tuning notes and a report to the lead at the end.
 | 45 | Fable | The fixes from gate m6a's first runs, one package by the owner's word: the pictures that reach the model and are not blank, the chart whole in play, the question of every charted place, courses by way of marks; the helm full and by braced sharp up, the pilot who fixes her and takes the conn, the merchant's entry and his business from the road, tack or wear, sail after the gale, the glass, the storm sails | merged 2026-10-11 as committed so far (the owner's word, to play it) and 2026-10-15 whole, with every pin re-measured; the naval cruise's two truths strict expected failures for 45c; gate m6a-2 not cut |
 | 43b | Opus | The lugger and the smack; the world's business (spec §19) with the trade rumours; the ports' faults from 43 and 45c (the anchorage's let-go, the Goulet on a flood, Torbay's stream, the pilot's routine bearings) and the captain's beating flap | merged 2026-10-17, the milestone's last build; 44 merged in its worktree |
 | 44 | Opus | The regatta harness and the parity tests; the trims for a point of sail judged there (the owner's note 25) | merged 2026-10-16; the trims kept, nine digests re-pinned for the lifting line's words |
-| 42b | Opus | The consent brief revised once for 6c: the stale sentence, a model as the captain of another ship kept across the switch, the director's seat, the regatta, the pictures; the re-asks the owner's | launched 2026-10-17 in two steps: the draft for the owner's approval first, the brief written after his word |
+| 42b | Opus | The consent brief revised once for 6c: the stale sentence, a model as the captain of another ship kept across the switch, the director's seat, the regatta, the pictures; the re-asks the owner's | merged 2026-10-17: the fifteen changes approved and written (decision 48), five watched sections moved, the session kind told true; the re-asks the owner's |
 | 45c | Opus | Package 45's tail (the naval cruise restored, the chase, sail after the gale by steps, the pilot's conn through the Goulet and its design) and the owner's small fixes from gate m6a-2's runs (a picture put back by hand with a note, the ghosted boat and `--until`, the weather's cadence, the OpenRouter exchanges, `muster` in the browser, the unheld lookout, the sails-lifting line, the pictures at the local runner, a point of interest, world orders not shown as sent, the stations' groundwork) | merged 2026-10-16, the first of the two; the milestone's last new package |
 
 Package 37m (the helm through the wind) is milestone 5's last, briefed in
@@ -1389,6 +1389,24 @@ measurement comes first (§19, the owner's rule).
 7. **Notes and spec**: §19, §20, §23 and §4 as built; the primer; the Harness note on a
    station on another ship; the tuning notes with the measurement, the range and the cap,
    and the trials' logs with two captains.
+
+## Package 42b, as merged (2026-10-17)
+
+The brief revised with the owner's fifteen approved changes (decision 48), written by a
+script that checked each replacement, the brief as it stood kept as a fixture; the digest
+`ccbc1ebdf1a42c3e` (was `d096d22a5842772f`); five of the six watched sections changed (the
+opening, what an instance sees and does, being stopped, what is not done, the journal), so a
+yes given against the brief of 2026-10-09 is asked again with the five named, a yes from
+before 42a with all six; the regatta and the director's seat refuse every model until its
+re-ask is a yes; 2,259 words below the rule, the test's bound moved to 2,300. The session
+kind told true: a race at the regatta, a test when asked, "a play session for its own sake,
+with no human captain over you" at any captain's station (the player's ship or another, a
+director's seat), play with a human captain otherwise; not written to the log, no pin moved.
+Suites: the consent, officer and captain tests 121; the fast tier 3,295. **Open:** a station
+below the captain's is still told a human captain is at the prompt when the captain is a
+model or the rules (outside the ruling; M7b's voice package or a small fix). The two
+Harness lines that named this revision as pending are brought up to date by the lead at
+the merge. The re-asks are the owner's, before any model is seated again.
 
 ## Package 43b, as merged (2026-10-17)
 
