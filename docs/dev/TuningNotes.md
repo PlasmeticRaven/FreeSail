@@ -6066,3 +6066,134 @@ tier whole ran once at the end (below), every pinned passage's digest with it.
   build machine; every recorded passage's pin held.
 - The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`), on the
   quiet machine after the slow tier: 6 passed in some 150 s.
+
+## Package 53: people in places (2026-10-17)
+
+Package 53 (spec M7b §14, §16, §17 and §18 as built; the owner's rulings of 2026-10-16, a
+place an aspect of a person's state and the papers kept in a place dropped; the brief in
+`docs/dev/M7b-WorkPackages.md`). A person's place tied to what he can do there, the player
+ashore at a port's places, the market in person, books drafted and used, the equal reach,
+and several stations of the officer's kind with the deck passing among them by the watch
+bill; proven in `tests/test_orders_places.py` (new) and truths 7b-100 to 7b-102
+(`tests/test_known_truths.py`). No model was seated.
+
+### The constants, with their reasons
+
+| Constant | Value | Why |
+|---|---|---|
+| `movement.DECK_PLACES` | the quarterdeck, the deck | "the helm only on deck" (spec §14); the waist and forecastle are the deck's as much as the quarterdeck, and an order called from the tops or the galley is not the deck's word |
+| `movement.DECK_OBJECTS`, `DECK_NAVIGATION` | the vocabulary's sail, yards, line, heading, points, none, wreck, work, anchor; the master's `put her about`, `shape a course for`, `give chase` | the orders a captain gives on deck; the master's sights, the log and the lead, the reckoning worked below, the people, the port's business by the boat, the book and the conversation are given where a man is |
+| `movement.BERTH_BELOW` and the berths | the gunroom; the captain's cabin; a trade's `TRADE_PLACES` place | where a man goes when he goes below: the officers' mess, the captain's own cabin, the cook's galley |
+| `movement.CABIN_ROLES` | the captain, the commander, his clerk, steward and servants (and a man made in the cabin) | the cabin is the captain's apartment with a sentry at the door; anyone else is sent for to it |
+| `places.PORT_PLACES` | the quay, the market, the counting house, the tavern, the pilots' office | the period seaport's places for a ship's business, each with what is done there and who is found there; judgement, no simulation of any (the owner's ruling) |
+| `places.DEFAULT_ASHORE` | the quay | where the boat lands a man, and where anyone ashore with no role of a place is found |
+| the ports' own places | Falmouth's packet office, Plymouth's dockyard and the port admiral's office, Brest's maritime prefecture | the business a ship had at each (the Falmouth packets, the King's yard at Plymouth Dock, the arsenal at Brest); judgement, in the files' words |
+| `ports.BOAT_ASHORE_S["landing"]`, `["fetch"]` | 300 s each | a man landed or taken off at the steps in five minutes; the errand's business is his, not the boat's |
+| the lighter's time for goods bought in person | `BOAT_ASHORE_S["purchase"]` + `LIGHTER_S_PER_TON` a ton + the pull to the ship at `BOAT_PACE_KN` | the boat's own figures for a purchase, the goods weighed and carted to the quay and off by the lighter, so that in person is no quicker than by the boat; only the boat is spared |
+| the deck by the bill | on the hour, at a change of `bill.watch_on_duty` | the watches and the dog watches change on the hour; the officer whose watch comes on deck relieves the one with the deck |
+
+### What a day of play showed
+
+The frigate at seed 7 west of the Lizard under plain sail, steering SSW, the fake captain at
+the captain's station and three fake officers at the officer of the watch's, the second
+officer's (asked for as `officer 2`) and the third officer's, all sampled every glass in
+lockstep, a day of the ship's time (158 s on the loaded build machine; the script in the
+session's scratchpad, `p53/day.py`). What it showed:
+
+| When | What |
+|---|---|
+| 06:20 | the captain drafted the night orders (a sheet of two, `lead` and `dusk`) and posted them, in the book in his rank; the lead was then hove every glass, 48 times in the day, and `dusk` fired at sunset (refused, the royals already furled, as a captain's would be) |
+| 06:20 | `Mr Pascoe, you have the deck` from the captain's station went to the second officer's station by his name |
+| 06:20 | the second officer went below at his station, was refused `take in the royals` in the gunroom ("You are in the gunroom; go on deck to make or take in sail."), and came on deck |
+| 06:24 | the captain went below, was refused `steer SW` in his cabin ("...go on deck to give the helm an order."), and at 06:34 drafted a note of the passage (three lines), came on deck and steered |
+| 06:52 to 07:22 | the captain went to the gunroom and came on deck again |
+| 12:00 to 04:00 | the deck passed by the bill six times between the second and the third officers (noon, the two dog watches, eight bells at night, midnight and four), and never to the first lieutenant, who keeps no watch |
+
+871 lines in the day; no person moved but by his own order, the boat or the bill. The
+schooner's master ashore at Falmouth (truths 7b-101 and 7b-102) was landed at the quay by the
+long-boat from Carrick Road, bought ten tons of tin at the market in person (in the hold by
+the lighter after the purchase's hour ashore, three minutes a ton and the pull), and came off
+in the boat sent for him; aboard again, his bargain went by the boat as it always did.
+
+### Found on the way
+
+- The second officer's station (package 45c) was made by the officer's factory and renamed,
+  so that its person, its rank and its outline were the first lieutenant's: a model seated
+  there was told it stood "in the place of Mr Pearce". The factory takes the station's name
+  now (`agent.officer(name=)`, `make_bound` at every door and the seat), and the second
+  officer is Mr Pascoe's, in the lieutenant's rank.
+- `go below`, `go ashore`, `go to the gunroom` at the console all ran the clock: the
+  console read any line beginning `go` as its own command. `go` alone runs it now, and
+  anything after it makes the line an order.
+- The master's mirror read "below" as the gunroom wherever he was, so that the schooner's
+  master (her captain) put ashore would have been in his gunroom; a person not aboard is
+  where he went.
+- The standing dialect has its own `;` between a rule's orders (`then take in the royals;
+  take in the topgallant sails`), which is the books' separator between lines: in a sheet a
+  segment that begins no new order is read as the order's tail.
+- The primer's checker skips a line beginning `go` as the console's, so its blocks show the
+  same orders as `walk to the gunroom` and `lay aloft`, and the prose says so.
+- `tests/test_officer.py`'s handover test sat a token under three fifths of a 16,384-token
+  door with the frigate officer's brief; the officers' words (about eighty tokens) took it
+  over, and its door gives 17,000 now. A local model with a sixteen-thousand context at the
+  frigate's officer's station starts within a hair of the handover's ask: a note for the
+  lead.
+- The officer's domain keeps back `go below` and `come on deck` ("the captain's own going
+  below is his", package 37g, when those orders moved the captain alone); a station's own
+  move is the equal reach now and is judged before the domain, so the two entries are moot
+  and left in the table for the lead.
+- The lead's reading put the port's places in `the port`; the slow tier's first run moved
+  truth 78's pin (`GATE_6A_FAKE_CAPTAIN_DIGEST`, `c266f45bb9e7fe6f` to `db8a283d590be094`,
+  the line count the same), because the fake captain asks `the port` at anchor in Falmouth
+  and its words grew. The places are their own question now (`the places ashore`, answered
+  in the log and never journaled, not a reading of the registry, so that no sample carries
+  it), `the port` is what it was, and the pin is back to `c266f45bb9e7fe6f`.
+- The same run grounded the owner's wardroom save replayed to the Goulet (`test_ports.py`'s
+  pilot on the flood, at 114,000): the schooner's master is her captain and keeps the
+  reckoning, and the reckoning takes him below to his sights by its own rule (his mirror),
+  so that the model captain's `ease the main sheet` at 72,140 was refused "in the gunroom".
+  The deck's check reads where a man went by his own word (`Person.place` beside the
+  mirror), not where the reckoning sits him, and the save replays as it did. The same
+  replay showed the player at the passenger's seat (bound to nobody named) typing `go to the
+  hold`, which moved the captain in his place: a station bound to nobody moves nobody now,
+  and drafts no book.
+- The spelling hints for an order the ship does not know may now name the new verbs
+  (`show a light`: "did you mean 'show the book' or 'show standing order'?", where it named
+  the master's journal); no pinned passage has such a refusal.
+- `Stations.words` says "a officer of the watch's" for the second and third officers; left
+  as it was (the reading's words, a test's).
+- Building the people is not free of effects (a scenario's names given to the muster and
+  the master), so nothing new here musters them for nothing: the place's checks, the hail,
+  the muster's line, the port's places and the deck by the bill all read the people only
+  once they are mustered, and a world where nobody moves is as it was, line for line.
+
+### Pins moved
+
+None in the end. The slow tier's first run moved truth 78's
+(`GATE_6A_FAKE_CAPTAIN_DIGEST`, `c266f45bb9e7fe6f` to `db8a283d590be094`, its 3,092 lines the
+same in number, the fake captain's `the port` at anchor in Falmouth carrying the port's
+places); the places were made their own question and the pin is `c266f45bb9e7fe6f` again
+(above). No other recorded passage moves a person, goes ashore or drafts a book, and the
+place's checks, the hail, the muster's line and the deck by the bill muster nobody, so that a
+world in which nobody moves is as it was.
+
+### The suite, as run
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- The package's own tests: `tests/test_orders_places.py` 15 (new), truths 7b-100 to 7b-102;
+  `test_people.py`, `test_standing.py` and `test_officer.py` brought to the new words (the
+  made pilot ashore at the pilots' office; the third officer among the stations a standing
+  order may address; the handover test's door of 17,000). Five of the new tests are in
+  `conftest.SLOW_TESTS` (the boat's errands ashore and back, a day of three officers).
+- The whole slow tier (`-m "not pace"`) was run once on the tree before the last fixes
+  (`7f0ce93`'s parent): everything passed but truth 78's pin and the Goulet's replay of the
+  owner's save at 114,000, both mended in `7f0ce93` (above). The container restarted during
+  the rerun of the whole on the final tree, so the final tree has: the fast tier
+  (`python3 -m pytest -n 4 -q -p no:cacheprovider`) 3,374 passed, none failed, 316 slow left
+  out; the slow tier of the files touched (`--slow -m "slow and not pace"` over
+  `test_known_truths.py`, `test_ports.py`, `test_orders_places.py`, `test_people.py`,
+  `test_places.py`, `test_officer.py`, `test_standing.py`, `test_world_orders.py`,
+  `test_director.py`, `test_wardroom_doors.py`, `test_captain.py`, `test_primer.py`) 104
+  passed, 7 xfailed, none failed, truth 78 and the Goulet's two among them; the pace tests
+  alone (`--slow -m pace`) 6 passed in some 150 s, on a machine shared with two other
+  packages' suites (load about nine).
