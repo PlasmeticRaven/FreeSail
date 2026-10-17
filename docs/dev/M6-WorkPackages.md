@@ -1928,3 +1928,31 @@ area from the directions, the epitome's places. A scenario: the frigate from Cad
 through the Strait to Gibraltar's bay against the inset, with the land of both shores in
 sight; sailed once at seed 7; not a gate's. Built last in the voyage's order but launched
 with the others; its seam with `portugal` is its only neighbour.
+
+## The owner's runs of gate 6c, read as they come (2026-10-17)
+
+- **The frigate's staysails are short of her complement.** Her file carries the fore
+  topmast staysail, the jib, the flying jib, the main topmast staysail and the two storm
+  staysails; Steel's sail list for a frigate of her class gives beside them the main
+  staysail, the middle staysail, the main topgallant staysail, the mizzen staysail, the
+  mizzen topmast staysail and the mizzen topgallant staysail (and a fore staysail that the
+  jib had mostly displaced by 1805). The brig's set (main, main topmast, main topgallant
+  staysails) is complete for a brig; the schooner's and the cutter's are theirs. The fix is
+  the generator's (`tools/gen_ships.py`, the main topmast staysail as the pattern, Steel's
+  dimensions and canvas numbers from the OCR under `docs/references/steel/`), with the
+  shapes right for the period (below), the sail-handling orders and the heavy-weather book
+  reading them, and the ship file regenerated: a small Opus package by the owner's word,
+  folded into the gate as 37's fold-ins were, with the pins it moves re-measured once.
+- **Quadrilateral or triangular** (the lead's reading for the brief, to be checked against
+  Steel's sailmaking tables): through the eighteenth century the lower and the topmast
+  staysails between the masts were commonly four-sided, their head set on the stay by hanks
+  for only part of its length and a short luff from the head's lower end down to the tack,
+  which stood abaft the mast below on a staysail stay or a tack lashing: a stay rising
+  steeply from the deck gives a triangle little area low down, and a tack carried aft of
+  the mast's foot clears the forecastle, the boats and the gear in the waist while keeping
+  the canvas where it draws; the main staysail, the middle staysail and the mizzen staysail
+  were so cut in Steel's day, the main topmast staysail cut either way, the topgallant
+  staysails triangular, and the head sails on the bowsprit's stays triangular. By the
+  1810s and after, the four-sided staysails gave way to triangles as the stays were set up
+  lower and the sails cut narrower (Lever's and Luce's plates), so a frigate of 1805 sits
+  at the change: the brief says which shape each sail takes with Steel's page beside it.
