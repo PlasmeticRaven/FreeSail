@@ -921,6 +921,19 @@ loop; the orders system's review (deferred to a cold review).
 
 ## 26. Open items carried in
 
+**The chart's drawn coast at the harbours** (the owner's finding on the Éclair's first
+cruise, 2026-10-17; the lead's measurement): the coast the chart draws and the lookout's
+nearest land come from the region's level-2 contour of the EMODnet grid (cells of about
+115 m), while the grounding test reads the finest tile under the keel, the harbour patch
+where one exists (Roscoff has one, its shoalest sounding 6.6 m above the datum). At the
+eastern narrows of the channel of Bas the drawn coast's gap is 92 m, half a cable, though
+the depth cells along the track held six fathoms: the ship sailed through a channel the
+chart draws as all but closed, with "the land a cable" at every reading. For 61's
+preparation or a chart item of its own: draw the coast and read the nearest land from the
+finest level where a harbour patch exists, or from the Histolitt shoreline for the French
+harbours, so that the picture, the lookout and the keel agree; and the owner to try the
+passage himself first, since the lead's run is one data point.
+
 From M6: the Goulet on a flood (43b), Torbay's stream (43b), the held gauges' blend, the
 deep-sea tiles' rule, the land-avoiding route (brought in as 61, §21i), the test battery's cost (eaten by the owner's
 word), the orders review (deferred).
