@@ -690,6 +690,17 @@ rule and the held gauges stay where they are. Builder Fable (geometry and design
 sequenced at briefing beside 51 and before the half of 58 that lays tracks, so that 58
 measures against it rather than around it.
 
+**The owner's framing (2026-10-17), which governs the briefing:** models should for the
+most part not need an automatic route's hand-holding; the route is mostly for the
+rules-based captains, and for a model that misreads or ignores the land-crossing warning
+or does not grasp the situation. So **a simple solution may be acceptable, nothing
+over-designed**; the design starts from the scenarios where the rules-based captains want
+it and from where a route would plainly fail or be counter-productive (a route laid round
+a headland the captain meant to close; a board the route cannot know; a chart whose data
+is thin), and not from the general problem. **Before it is briefed, more testing of the
+captains' present behaviour and its edge cases, by the owner in play**; the briefing
+draws on those notes, and the lead's reading above is one way, not the plan.
+
 ### 21j. Truths for 7b-ix (provisional)
 
 - 99e. The frigate shaped for Lisbon from Falmouth with no `via` clears Ushant and

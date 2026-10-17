@@ -190,3 +190,14 @@ relation beside the nations' stances) and logging it otherwise; a model given th
 in words and answering by meaning or by a free sentence; the private signals a separate
 table; night and fog their own small books. Nothing of this needs a model for the squadron's
 and the convoy's ordinary work.
+
+## Ship collision (the owner, 2026-10-17)
+
+Noted while passing close by other ships in the gate 6c runs: two ships touching has no
+consequence today. For M7's consideration: a collision between the player's ship and
+another (or two crewed ships) has consequences, probably disastrous (spars carried away, a
+bowsprit through the other's rigging, the hull stove, both ships locked until cleared, a
+boat lost), judged by the closing speed and the angle; worth building even if the tuning
+nearly removes it from play. The lookout's and the officer's words before a close pass,
+the rules captain's avoidance and the far ships' are the parts that make it rare; the
+consequence is what makes keeping clear matter.
