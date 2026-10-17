@@ -723,6 +723,11 @@ crew:
     - kind: storm_jib
       canvas_no: 1
       condition: 100
+  ration:
+    # The ration (package 54, spec M7b 19): the Navy's table, the Regulations of 1806 (Sect. IX, Chap. I, Art. I), as data/crew/ration.yaml gives it; a revenue cruiser victualled as the King's ships (judgement).
+    table: navy
+    # Water drawn a man a day for his drink, his grog and the coppers: a gallon, the figure her water above is reckoned at (judgement).
+    water_gallons: 1
   # The named people beyond the posts (package 35, spec M5 §22); see tools/gen_ships.py.
   people:
   # A boy as the messenger (judgement).

@@ -2066,14 +2066,27 @@ def _purse(world: Any, _: str | None) -> dict[str, Any] | None:
 
 
 def _stores(world: Any, _: str | None) -> dict[str, Any] | None:
+    """The purser's reading (package 54): what remains and, where the ship is victualled,
+    for how long at the allowance she is at; the stores fall at the meals and the reading
+    says so, never the log."""
     stores = getattr(world, "stores", None)
     if stores is None:
         return None
-    return {
-        "words": stores.words(),
+    from freesail.crew import victuals
+
+    fed = victuals.victualled(world)
+    water_days = victuals.water_days(world) if fed else None
+    out = {
+        "words": stores.words(water_days),
         "water_tons": stores.water_tons,
         "provisions_days": stores.provisions_days,
     }
+    if fed:
+        left = victuals.provisions_days_left(world)
+        out["water_days"] = round(water_days, 1) if water_days is not None else None
+        out["provisions_days_left"] = round(left, 1) if left is not None else None
+        out["allowance"] = float(getattr(stores, "allowance", 1.0))
+    return out
 
 
 def _epitome(world: Any, _: str | None) -> dict[str, Any] | None:
@@ -2226,7 +2239,8 @@ REGISTRY.add(
         "ground",
         "",
         _stores,
-        description="the purser's stores: water by the ton, provisions by the day",
+        description="the purser's stores: water by the ton, provisions by the day, and for "
+        "how long at the allowance she is at",
         none_words=_no_people_words,
     )
 )

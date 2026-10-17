@@ -316,8 +316,9 @@ class Domain:
     deck: bool = True
 
     def why_not(self, verb: str, spec_object: str, level: str) -> str | None:
-        """Why the domain refuses a verb, or None when it allows it."""
-        if verb in self.verbs:
+        """Why the domain refuses a verb, or None when it allows it. A person's own needs
+        (package 54: eat, drink, sleep) are every station's, whatever its domain."""
+        if verb in self.verbs or spec_object == "needs":
             return None
         for key, why in self.refused:
             # the reason the domain gives for the thing itself comes before its level

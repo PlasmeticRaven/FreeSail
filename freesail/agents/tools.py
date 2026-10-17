@@ -1308,8 +1308,13 @@ TOOLS: dict[str, Tool] = {
             "you stand by for that came while your call was on its way wakes you at once. "
             "An urgent line in the log ends any stand-by and wakes you, its line named as "
             "the reason; the notable lines logged while you stood by come with the sample "
-            "that wakes you, counted and listed.",
-            {"until": "string: the event, the interval, 'a notable event' or 'an urgent event'"},
+            "that wakes you, counted and listed. 'asleep below until called' turns your "
+            "person in below to sleep: a word or a question to you, an urgent line, or your "
+            "rest wakes you (refused with the deck below the captain's).",
+            {
+                "until": "string: the event, the interval, 'a notable event', 'an urgent "
+                "event', or 'asleep below until called'"
+            },
             stand_by,
         ),
         Tool(

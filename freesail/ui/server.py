@@ -231,6 +231,10 @@ class Driver:
         self._thread: threading.Thread | None = None
         self._ticks_since_snapshot = 0
         self.world.log.subscribe(self._on_event)
+        # the player's own needs (package 54): sent to the pages as a line, kept nowhere
+        needs = getattr(self.world, "needs", None)
+        if needs is not None:
+            needs.listen(self._on_need)
 
     # -- listeners ----------------------------------------------------------
 
@@ -261,6 +265,11 @@ class Driver:
             return  # decision 46: the play log carries a world order's effects, not the order
         for x in self._view.feed(e, self.compression):
             self._emit_shown(x)
+
+    def _on_need(self, e: Event) -> None:
+        """A line of the player's own needs (package 54): to the pages as an event the
+        log pane shows, never written in the log."""
+        self._emit({"type": "event", "event": event_dict(e)})
 
     def _emit_shown(self, x: Shown) -> None:
         if isinstance(x, Rollup):

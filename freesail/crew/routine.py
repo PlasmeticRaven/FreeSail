@@ -56,6 +56,14 @@ FATIGUE_AT_WORK_ALOFT = 0.10  # at work aloft: loosing, furling, reefing
 # Once, for a hand turned up out of his sleep by a call for all hands at night.
 FATIGUE_ALL_HANDS_AT_NIGHT = 0.20  # broken sleep costs more than the work; truth 20 (TuningNotes)
 
+# What the company's victualling costs the hands (package 54; `crew.victuals.hardship`, 0 to
+# 1: short allowance its shortfall, nothing to serve the whole, the water found foul a
+# quarter): the work's fatigue rises and the rest's falls by these shares of it (judgement:
+# at half allowance a hand tires a quarter faster and rests a quarter less; with nothing to
+# serve, half).
+HARDSHIP_WORK = 0.5
+HARDSHIP_REST = 0.5
+
 # Night, for sleep and for the cost of a call: from the end of the second dog watch to the
 # start of the morning watch. Hours of ship's time.
 NIGHT_BEGINS_HOUR = 20
@@ -78,6 +86,10 @@ def _bells_words(bells: int) -> str:
 
 class Routine:
     """The watch routine of one ship's company, driven by the World once a tick."""
+
+    # what the company's victualling costs the hands (package 54), set by
+    # `crew.victuals`; a class default, so that a checkpoint from before loads with it
+    hardship: float = 0.0
 
     def __init__(self, crew: Crew, clock: Any):
         self.crew = crew
@@ -179,6 +191,13 @@ class Routine:
         idle = FATIGUE_ON_DECK_IDLE * scale
         rest = FATIGUE_ASLEEP_BELOW if is_night(self.clock.ship_time) else FATIGUE_BELOW_BY_DAY
         rest *= scale
+        h = self.hardship
+        if h:
+            # short allowance, nothing to serve, the water foul (package 54): the hands
+            # tire the faster and rest the less; at nought the rates are as they were
+            harder = 1.0 + HARDSHIP_WORK * h
+            aloft, work, idle = aloft * harder, work * harder, idle * harder
+            rest *= 1.0 - HARDSHIP_REST * h
         crew = self.crew
         watch = bill.watch_on_deck(crew, self.clock)
         up = bill.idlers_up(self.clock)

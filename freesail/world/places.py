@@ -13,7 +13,7 @@ What the places hold is counted in three small ledgers: the **hold** (the room f
 cargo, from the ship file, and the goods in it by tons), the **purse** (the captain's
 or the owner's money, in pounds, which the market and the yard move) and the **stores**
 (water by the ton and provisions by the day, from the ship file's `crew.stores`, which
-the yard and the market fill; nothing yet consumes them, and the file says so).
+the yard and the market fill and the meals draw down by the ration, package 54).
 
 The **papers** are things aboard, each with a keeper and a place, each only as current
 as its last entry (`data/papers/papers.yaml`): the sailmaker's account, the manifest,
@@ -278,9 +278,9 @@ class Purse:
 @dataclass
 class Stores:
     """The purser's stores: water by the ton and provisions by the day for the
-    complement, from the ship file; filled by the yard and the market. Consumption is
-    not modelled yet (spec M3 §10 says which milestone consumes each), and the page
-    says so."""
+    complement, from the ship file; filled by the yard and the market, and drawn down at
+    the meals by the ration (`crew.victuals`, package 54): what remains and for how long
+    is the purser's reading, never a line of the log."""
 
     water_tons: float = 0.0
     provisions_days: float = 0.0
@@ -288,17 +288,67 @@ class Stores:
     # the water found foul (package 50, the director's `aboard:`; the needs of package 54
     # read it): a class default, so that a checkpoint from before loads with it
     foul: bool = False
+    # package 54: the share of the whole allowance served (short allowance, the
+    # Regulations' Art. III), and what the meals have drawn since she was stored; class
+    # defaults, as `foul`
+    allowance: float = 1.0
+    expended_days: float = 0.0
+    expended_tons: float = 0.0
 
-    def lines(self, complement: int) -> list[str]:
+    def lines(
+        self, complement: int, water_days: float | None = None, day_words: str = ""
+    ) -> list[str]:
+        """The purser's page: the water and how long it lasts, the provisions and how
+        long, the allowance, what is expended, and the day's proportion a man."""
         foul = ", found foul" if getattr(self, "foul", False) else ""
-        return [
-            f"Water: {_tons(self.water_tons)} in the ground tier{foul}.",
-            f"Provisions: {self.provisions_days:.0f} days at full allowance for {complement} men.",
-            "Nothing is yet expended against them; the books stand as the ship was stored.",
+        allowance = float(getattr(self, "allowance", 1.0))
+        at = "at full allowance" if allowance >= 1.0 else "at short allowance"
+        water = f"Water: {_tons(self.water_tons)} in the ground tier{foul}"
+        if water_days is not None:
+            water += f", for {_days(water_days)} {at}"
+        out = [
+            water + ".",
+            f"Provisions: {self.provisions_days:.0f} days at full allowance for {complement} men"
+            + (
+                f", {self.provisions_days / allowance:.0f} at the short allowance the people "
+                "are at."
+                if allowance < 1.0
+                else "."
+            ),
         ]
+        days = float(getattr(self, "expended_days", 0.0))
+        tons = float(getattr(self, "expended_tons", 0.0))
+        if days > 0 or tons > 0:
+            out.append(
+                f"Expended since she was stored: {_tons(tons)} of water and "
+                f"{_days(days)} of provisions."
+            )
+        else:
+            out.append(
+                "Nothing is yet expended against them; the books stand as the ship was stored."
+            )
+        if day_words:
+            out.append(f"{day_words}.")
+        return out
 
-    def words(self) -> str:
-        return f"water {_tons(self.water_tons)}, provisions for {self.provisions_days:.0f} days"
+    def words(self, water_days: float | None = None) -> str:
+        allowance = float(getattr(self, "allowance", 1.0))
+        water = f"water {_tons(self.water_tons)}"
+        if water_days is not None:
+            water += f" for {_days(water_days)}"
+        if getattr(self, "foul", False):
+            water += ", found foul"
+        provisions = f"provisions for {self.provisions_days:.0f} days"
+        if allowance < 1.0:
+            provisions += f" ({self.provisions_days / allowance:.0f} at short allowance)"
+        return f"{water}, {provisions}"
+
+
+def _days(days: float) -> str:
+    n = round(float(days), 1)
+    if n == int(n):
+        n = int(n)
+    return f"{n} day{'s' if n != 1 else ''}"
 
 
 def pounds_words(pounds: float) -> str:
@@ -446,8 +496,14 @@ class Papers:
             stores = getattr(world, "stores", None)
             crew = ship.extra.get("crew") if hasattr(ship, "extra") else None
             complement = crew.complement if crew is not None else 0
-            return (
-                stores.lines(complement) if stores is not None else ["No stores are kept."]
+            if stores is None:
+                return ["No stores are kept."], keeper
+            from freesail.crew import victuals
+
+            if not victuals.victualled(world):
+                return stores.lines(complement), keeper
+            return stores.lines(
+                complement, victuals.water_days(world), victuals.day_words(world)
             ), keeper
         if source == "epitome":
             nav = getattr(world, "navigation", None)

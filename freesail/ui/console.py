@@ -427,9 +427,21 @@ class Console:
     def _attach(self) -> None:
         self.world.log.subscribe(self._on_event)
         self.world.compression = self.compression
+        # the player's own needs (package 54): told to him at the prompt, never logged
+        needs = getattr(self.world, "needs", None)
+        if needs is not None:
+            needs.listen(self._on_need)
 
     def _detach(self) -> None:
         self.world.log.unsubscribe(self._on_event)
+        needs = getattr(self.world, "needs", None)
+        if needs is not None:
+            needs.unlisten(self._on_need)
+
+    def _on_need(self, e: Event) -> None:
+        """A line of the player's own needs (package 54): printed as a line of the log
+        is, and kept nowhere."""
+        self._print(e.line())
 
     def _on_event(self, e: Event) -> None:
         if (

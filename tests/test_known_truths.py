@@ -5701,3 +5701,127 @@ def test_truth_7b_97_say_as_a_held_station_is_refused(voiced_watch):
     assert "Captain Bowen" not in names and "Mr Pearce" not in names
     held = [o for o in world.world_orders if o["order"].startswith("say as the captain")]
     assert not held  # refused at the door: never an order on the channel
+
+
+# ---------------------------------------------------------------------------
+# Truths 7b-103 and 7b-104 (spec M7b §21; package 54): the needs. The frigate at seed 7 on
+# the plane with the player at the prompt (a driver listening, as the console does), from
+# 06:00 on 10 June to 05:00 on the 13th: two days and more neither eating nor drinking nor
+# sleeping, asleep where he stood on the third, then fed, put to short allowance, a night
+# below. No recorded passage's pin moves: the needs show to the person stationed alone,
+# never in the log, and the stores' fall is a reading.
+# ---------------------------------------------------------------------------
+
+NEEDS_START = datetime(1805, 6, 10, 6, 0)
+
+
+def _hours(h: float) -> int:
+    return int(h * 3600)
+
+
+def _the_needs_days():
+    world = make_world(7, FRIGATE, Scenario(start_time=NEEDS_START, gustiness=0.0, variability=0.0))
+    told = []
+    world.needs.listen(told.append)
+    moments = {}
+
+    def stores():
+        s = world.stores
+        return (s.provisions_days, s.water_tons, world.readings.words("stores"))
+
+    run(world, _hours(24) + 60)  # 06:01 on the 11th: a day's three meals served
+    moments["a day"] = stores()
+    moments["the first lieutenant"] = world.people.find("first lieutenant").needs
+    run(world, _hours(57) - world.clock.tick)  # 15:00 on the 12th, asleep since 14:01
+    moments["asleep"] = (
+        world.people.captain.needs.asleep,
+        world.people.state_words(world.people.captain),
+    )
+    answers = {o: world.submit(o) for o in ("eat", "drink")}
+    moments["before short"] = stores()
+    answers["short allowance"] = world.submit("short allowance")
+    run(world, _hours(58) - world.clock.tick)  # 16:00, supper at half the whole: 16:01
+    run(world, 60)
+    moments["after supper"] = stores()
+    moments["the purser's books"] = world.papers.page("the purser's books").lines
+    run(world, _hours(62) - world.clock.tick)  # 20:00: whole allowance, a meal, and below
+    answers["whole allowance"] = world.submit("whole allowance")
+    answers.update({f"{o} at night": world.submit(o) for o in ("eat", "drink", "sleep")})
+    run(world, _hours(71) - world.clock.tick)  # 05:00 on the 13th
+    return world, told, moments, answers
+
+
+@pytest.fixture(scope="module")
+def needs_days():
+    return _the_needs_days()
+
+
+def test_truth_7b_103_the_frigates_provisions_fall_by_the_ration_and_short_allowance_halves_it(
+    needs_days,
+):
+    """Spec M7b §21, truth 103: "The frigate's provisions fall by the ration for her
+    complement; the purser's reading says the days remaining; short allowance halves it."
+    A day's meals take a day of provisions and 264 gallons of water for her 264; the
+    reading says the days her water and her provisions last; at short allowance a meal
+    takes half its share and the days are doubled; and none of it is a line of the log
+    but the captain's order with the people's temper."""
+    world, _told, moments, answers = needs_days
+    days, tons, words = moments["a day"]
+    assert days == pytest.approx(119.0) and tons == pytest.approx(100 - 264 / 252)
+    assert words == "water 99 tons for 94.5 days, provisions for 119 days"
+    before, after = moments["before short"], moments["after supper"]
+    assert before[0] - after[0] == pytest.approx(1 / 6)  # a third of a day, at half
+    assert before[1] - after[1] == pytest.approx(264 / 252 / 6)
+    assert f"({after[0] * 2:.0f} at short allowance)" in after[2]
+    e = answers["short allowance"]
+    assert e.kind == "stores.allowance" and "take it sullenly" in e.text
+    assert [x.kind for x in world.log if x.kind.startswith("stores.")] == ["stores.allowance"] * 2
+    assert "back to whole allowance" in answers["whole allowance"].text
+    page = moments["the purser's books"]
+    assert page[0].endswith("days at short allowance.")
+    assert page[1].endswith("at the short allowance the people are at.")
+
+
+def test_truth_7b_104_a_player_without_food_or_sleep_reads_the_urgent_lines_and_sleeps_on_the_third(
+    needs_days,
+):
+    """Spec M7b §21, truth 104: "A player who neither eats nor sleeps for two days reads
+    the urgent lines in order and is asleep on the third; eating from the stores and a
+    night below reset them; an unseated person's needs never show." The lines at the
+    prompt, notable at the change of the watch and urgent at once, thirst, hunger and then
+    fatigue; asleep where he stood on the 12th; eating and drinking wake him and a night
+    below rests him, and at five on the 13th nothing is said of him; the first lieutenant,
+    whom nobody holds, is the routine's and told nothing; no line of the needs in the log."""
+    world, told, moments, answers = needs_days
+    said = [(e.ship_time.strftime("%d %H:%M"), e.severity.value, e.text) for e in told]
+    assert said[:7] == [
+        ("11 12:00", "notable", "You are quite thirsty and quite hungry. ('drink' and 'eat')"),
+        ("11 20:00", "notable", "You are parched and feeling a bit drowsy. ('drink' and 'sleep')"),
+        ("12 00:00", "notable", "You are very hungry. ('eat')"),
+        ("12 04:00", "urgent", "You are desperately thirsty and very tired. ('drink' and 'sleep')"),
+        ("12 06:00", "urgent", "You are absolutely starving. ('eat')"),
+        ("12 08:01", "urgent", "You are hardly able to keep your eyes open. ('sleep')"),
+        (
+            "12 14:01",
+            "urgent",
+            "You have fallen asleep where you stood, on the quarterdeck. Your next order "
+            "wakes you. ('sleep')",
+        ),
+    ]
+    assert moments["asleep"] == ("where he is", "asleep where he stood, on the quarterdeck")
+    assert said[7] == ("12 15:00", "notable", "You wake, on the quarterdeck.")
+    assert answers["eat"].text.startswith(
+        "A biscuit and a piece of cheese are brought up from the stores; you eat on the "
+        "quarterdeck, the first since 06:00 on 10 June"
+    )
+    assert answers["drink"].text.startswith("You drink at the scuttle-butt")
+    assert answers["sleep at night"].text.startswith("You turn in below, in the cabin.")
+    assert said[-1][1:] == ("notable", "You wake, rested, on the quarterdeck.")
+    cap = world.people.captain
+    assert world.needs.words(cap) == "" and not cap.needs.asleep
+    # an unseated person's needs never show
+    assert {e.data["person"] for e in told} == {cap.name}
+    first = moments["the first lieutenant"]
+    assert first is None or not first.by_hand
+    assert not [e for e in world.log if e.kind.startswith("needs.")]
+    assert all(e.kind == "needs.answer" for k, e in answers.items() if "allowance" not in k)

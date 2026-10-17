@@ -354,3 +354,187 @@ def test_the_galley_is_a_place_and_the_open_deck_is_within_earshot():
     assert PL.earshot("cabin") == {"cabin"} and PL.earshot("tops") == {"tops"}
     w = world_for()
     assert "the galley" in w.readings["places"]["words"]
+
+
+# ---------------------------------------------------------------------------
+# The needs (spec M7b §20; package 54): hunger, thirst and fatigue in steps, by hand at a
+# filled station, told to the person stationed alone and never to the log
+# ---------------------------------------------------------------------------
+
+
+def _at_the_prompt(start=datetime(1805, 6, 10, 11, 58)):
+    """A frigate with the player at the prompt (a driver listening for his lines), taken
+    in hand at the first minute; the lines he is told, as the console would print them."""
+    w = world_for(start=start)
+    told = []
+    w.needs.listen(told.append)
+    w.run(60)
+    cap = w.people.captain
+    assert cap.needs is not None and cap.needs.by_hand
+    return w, cap, told
+
+
+def _behind(w, n, hours_ate=0.0, hours_drank=0.0, awake=None):
+    now = w.clock.tick
+    n.ate = now - int(hours_ate * 3600)
+    n.drank = now - int(hours_drank * 3600)
+    if awake is not None:
+        n.awake_h, n.at = awake, now
+
+
+def test_the_player_at_the_prompt_is_told_his_needs_at_the_change_of_the_watch_and_nobody_else():
+    """No line until the second step; a notable line waits for the change of the watch and
+    names together every need that has risen; nothing of it is in the log, and nobody
+    unseated is told anything or has needs by hand."""
+    w, cap, told = _at_the_prompt()
+    lines = len(w.log)
+    _behind(w, cap.needs, hours_ate=31, hours_drank=29, awake=21)  # at 11:59
+    w.run(30)  # not yet the change of the watch
+    assert told == []
+    w.run(31)  # 12:00, eight bells: the afternoon watch
+    assert [(e.severity.value, e.text) for e in told] == [
+        ("notable", "You are quite thirsty and quite hungry. ('drink' and 'eat')")
+    ]
+    assert told[0].kind == "needs.felt" and told[0].data["person"] == cap.name
+    # tired (the first step) is never said; and nothing in the log
+    assert w.needs.words(cap) == "quite thirsty, quite hungry and tired"
+    assert not [e for e in w.log.all()[lines:] if e.kind.startswith("needs.")]
+    first = w.people.find("first lieutenant")
+    assert first.needs is None or not first.needs.by_hand
+    assert w.needs.showing(first) == ""
+
+
+def test_an_urgent_need_is_said_at_once_and_a_notable_one_once_a_watch():
+    w, cap, told = _at_the_prompt(start=datetime(1805, 6, 10, 12, 30))
+    _behind(w, cap.needs, hours_drank=37.99)
+    w.run(120)  # parched at 38 hours: notable, which waits for the watch
+    assert told == []
+    _behind(w, cap.needs, hours_drank=46, hours_ate=1)
+    w.run(60)
+    assert [e.text for e in told] == ["You are desperately thirsty. ('drink')"]
+    assert told[0].severity.value == "urgent"
+    w.run(3600)
+    assert len(told) == 1  # told once a step
+
+
+def test_eat_and_drink_are_the_persons_own_answered_to_him_and_never_logged():
+    w, cap, told = _at_the_prompt()
+    _behind(w, cap.needs, hours_ate=31, hours_drank=29)
+    lines = len(w.log)
+    e = w.submit("eat")
+    assert e.kind == "needs.answer" and e.text.startswith(
+        "A biscuit and a piece of cheese are brought up from the stores; you eat on the "
+        "quarterdeck, the first since"
+    )
+    assert w.submit("drink").text.startswith("You drink at the scuttle-butt, the first since")
+    assert len(w.log) == lines  # answered to him, never a line of the log
+    assert ("captain", "eat") not in [(a, t) for _, a, t in w.journal]
+    assert {"tick": w.clock.tick, "actor": "captain", "order": "eat"} in w.inputs
+    assert w.needs.words(cap) == ""
+    w.submit("go below")
+    assert w.submit("eat").text.startswith("You eat in the cabin")
+    # the water found foul: his beer, or the foul water at a cost
+    w.stores.foul = True
+    assert w.submit("drink").text.startswith("The water being foul, you drink your beer")
+    awake = cap.needs.awake_h
+    assert w.submit("drink the foul water").text.startswith("You drink the foul water")
+    assert cap.needs.awake_h == pytest.approx(awake + 6)
+    # on short allowance a meal is half a meal
+    w.submit("short allowance")
+    assert "half meal" in w.submit("eat").text
+    assert cap.needs.ate == w.clock.tick - 8 * 3600
+    assert w.submit("how am i").text.startswith("You are ")
+
+
+def test_sleep_turns_the_player_in_below_and_his_next_order_or_his_rest_wakes_him():
+    w, cap, told = _at_the_prompt()
+    _behind(w, cap.needs, awake=40)
+    e = w.submit("sleep")
+    assert e.kind == "needs.answer" and e.text.startswith("You turn in below, in the cabin.")
+    assert cap.where == "cabin" and w.people.state_words(cap) == "asleep, in the cabin"
+    w.run(3600)
+    assert cap.needs.awake_h == pytest.approx(32, abs=0.1)  # eight hours made up an hour
+    w.submit("how am i")  # his next order wakes him, back where he turned in from
+    assert not cap.needs.asleep and cap.where == "quarterdeck"
+    assert told[-1].text == "You wake, on the quarterdeck."
+    w.submit("sleep")
+    w.run(4 * 3600 + 60)
+    assert not cap.needs.asleep and cap.needs.awake_h == 0.0
+    assert told[-1].text == "You wake, rested, on the quarterdeck."
+
+
+def test_at_the_last_step_he_falls_asleep_where_he_stood_and_his_next_order_wakes_him():
+    w, cap, told = _at_the_prompt()
+    _behind(w, cap.needs, awake=55.99)
+    w.run(120)
+    assert cap.needs.asleep == "where he is" and cap.where == "quarterdeck"
+    assert told[-1].severity.value == "urgent" and told[-1].text.startswith(
+        "You have fallen asleep where you stood, on the quarterdeck. Your next order wakes you."
+    )
+    assert w.people.state_words(cap) == "asleep where he stood, on the quarterdeck"
+    w.submit("eat")
+    assert not cap.needs.asleep
+
+
+def test_a_models_station_reads_its_needs_in_its_sample_and_turns_in_with_a_stand_by():
+    """The officer of the watch held by a fake: his needs ride his samples (`needs` and a
+    notice), never the log; `stand by, asleep below until called` is refused with the deck
+    and turns him in without it; a word wakes him, back where he was. The captain, with
+    nobody at the prompt, is the routine's."""
+    from freesail.agents import Fake, Harness, SamplingPolicy, call, reply
+    from freesail.agents.agent import officer
+    from freesail.agents.model import DATA
+
+    w = world_for(start=datetime(1805, 6, 10, 11, 58))
+    st = officer(SamplingPolicy.in_lockstep(600), world=w)
+    script = [
+        reply("", call("stand_by", until="asleep below until called")),
+        "Aye.",
+        "Off watch, sir.",
+        reply("", call("stand_by", until="asleep below until called")),
+        "Awake, sir.",
+    ]
+    fake = Fake(script, loop=False)
+    h = Harness(w, st, fake, save=lambda w_, why: None)
+    w.submit("you have the deck")
+    h.start()
+    pearce = w.stations.holder("officer of the watch")
+    w.run(60)
+    assert pearce.needs.by_hand and not getattr(w.people.captain.needs, "by_hand", False)
+    data = [t.content for t in h.turns if t.role == DATA and "tool_results" in t.content]
+    assert "has the deck: a man does not turn in on watch" in str(data[0])
+    w.submit("I have the deck")  # a word: sampled, off watch
+    _behind(w, pearce.needs, hours_drank=29, awake=30)
+    w.run(600)  # the change of the watch at 12:00, and the glass at 12:08: he turns in
+    samples = [t.content for t in h.turns if t.role == DATA and "reason" in t.content]
+    last = samples[-1]
+    assert last["reason"] == "the interval" and last["needs"] == "quite thirsty"
+    assert "You are quite thirsty. (submit_order('drink'))" in last["notices"]
+    assert not [e for e in w.log if e.kind.startswith("needs.")]
+    assert pearce.needs.asleep == "below" and pearce.where == "gunroom"
+    assert w.log.of_kind("agent.stood_by")[-1].text == (
+        "[officer of the watch] Turned in below, in the gunroom, asleep until called."
+    )
+    assert w.people.state_words(pearce) == "asleep, in the gunroom"
+    w.submit("tell the officer the wind is backing")
+    w.tick()
+    assert not pearce.needs.asleep and pearce.where == "quarterdeck"
+    woke = [t.content for t in h.turns if t.role == DATA and "reason" in t.content][-1]
+    assert woke["notices"][0].startswith("You stood by until asleep below until called")
+    assert "You wake, on the quarterdeck." in woke["notices"]
+
+
+def test_at_the_prompt_the_owner_has_no_needs_while_a_model_holds_the_captain():
+    from freesail.agents import Fake, Harness, SamplingPolicy
+    from freesail.agents.agent import captain
+
+    w = world_for()
+    h = Harness(
+        w,
+        captain(SamplingPolicy.in_lockstep(600), world=w),
+        Fake(["Aye."]),
+        save=lambda w_, why: None,
+    )
+    h.start()
+    e = w.submit("eat")
+    assert e.kind == "order.rejected" and "you are the owner, not the captain" in e.text

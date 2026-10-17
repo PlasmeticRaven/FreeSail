@@ -386,6 +386,24 @@ SAMPLE_ROUTINE_LINES = 40
 # answer is owed.
 A_WORD = "a word from the captain"
 
+# The needs' stand-bys (package 54; spec M7b §20): asleep below by the station's own word
+# (the master's suggestion), and asleep where he stood when his fatigue's last step takes
+# him. Each ends when he is called (a word, a question), at an urgent line, or when he
+# wakes rested; neither is bound by the deck's eight bells.
+ASLEEP_BELOW = "asleep below until called"
+ASLEEP_WHERE = "asleep where you stood until called"
+ASLEEP_WORDS = frozenset(
+    {
+        ASLEEP_BELOW,
+        "asleep below",
+        "asleep below until i am called",
+        "asleep until called",
+        "asleep",
+        "turned in",
+        "turned in until called",
+    }
+)
+
 # The deck's conversation (spec M6 §11; package 41). What a sample's `heard` holds: the
 # words said in the station's own place by another station or the player, each under
 # the speaker's name and with where he stood; no answer is owed and no sample is forced
@@ -1539,6 +1557,11 @@ class Harness:
 
     def _resume_from_stand_by(self, reason: str) -> None:
         a = self.agent
+        if a.stand_by is not None and a.stand_by.words in (ASLEEP_BELOW, ASLEEP_WHERE):
+            # package 54: called, or rested; he wakes, and goes back where he turned in from
+            person, keeper = self._person_and_needs()
+            if person is not None and keeper is not None:
+                keeper.wake(person, self, "rested" if reason == WOKE_RESTED else "")
         digest = self._stood_by_digest(reason.rstrip(".!"))
         a.state = STATIONED
         a.stand_by = None
@@ -1594,6 +1617,7 @@ class Harness:
             notices=list(a.notices),
             word=a.word,
             heard=list(getattr(a, "heard", None) or []) or None,
+            needs=self._needs_showing(),
         )
         a.notices = []
         a.word = None  # carried once; no answer is owed (package 29, `tell`)
@@ -1767,6 +1791,7 @@ class Harness:
             o.word = f"{o.word}\n{delta.word}" if o.word else delta.word
         if delta.heard:
             o.heard = [*(o.heard or []), *delta.heard]
+        o.needs = delta.needs
         if new_question or delta.word is not None:
             # the captain's word landed while the turn was open (package 37g, item 3): if
             # the model closes this turn with a stand-by before it has read this fold,
@@ -3370,6 +3395,8 @@ class Harness:
                 if words not in R.EVENTS and article + said in R.EVENTS:
                     words = article + said
         world = self.world
+        if words in ASLEEP_WORDS:
+            return StandBy(ASLEEP_BELOW)  # package 54: turned in below, until called
         if words in R.EVENTS:
             spec = R.EVENTS[words]
             if spec.absent:
@@ -3443,6 +3470,8 @@ class Harness:
         sb = read
         words = sb.words
         a = self.agent
+        if sb.words == ASLEEP_BELOW:
+            return self._turn_in(sb)
         if a.has_deck and any(p.until_tick is not None for p in sb.parts):
             # a station with the deck stands by until an event or a bell, not for longer
             # (package 37; the cold review's third item): the deck is not left
@@ -3502,6 +3531,117 @@ class Harness:
         self._stand_by_watch = None
         self._stand_by_due = self._in_flight(sb, out_of_turn)
         return f"Standing by until {words}; you will be sampled then."
+
+    # -- the needs (package 54; spec M7b §20) -------------------------------------------
+
+    def _person_and_needs(self) -> tuple[Any, Any]:
+        """The person the station holds and the World's needs keeper; (None, None) for a
+        station that holds nobody named (the director's, a station unbound)."""
+        world = self.world
+        keeper = getattr(world, "needs", None)
+        stations = getattr(world, "stations", None)
+        if keeper is None or stations is None or self.conversation or self._is_directors:
+            return None, None
+        try:
+            person = stations.holder(self.station.name)
+        except Exception:  # noqa: BLE001  (a people's build that cannot run binds nobody)
+            person = None
+        return person, keeper
+
+    def _needs_showing(self) -> str | None:
+        """What the sample carries as `needs`: the station's person's needs at a step that
+        is said, in words; None while none is (never busywork)."""
+        if self.conversation:
+            return None
+        person, keeper = self._person_and_needs()
+        if person is None or getattr(person, "needs", None) is None:
+            return None
+        return keeper.showing(person) or None
+
+    def _turn_in(self, sb: StandBy) -> str:
+        """`stand by, asleep below until called` (the master's suggestion): the person
+        turns in below and the station stands by until he is called (a word, a question),
+        an urgent line, or he wakes rested. Refused with the deck below the captain's: a
+        man does not turn in on watch."""
+        world = self.world
+        a = self.agent
+        person, keeper = self._person_and_needs()
+        if person is None:
+            return (
+                f"The {self.station.name}'s station holds no person to turn in; stand by for "
+                "an event, a bell or an interval instead."
+            )
+        if a.has_deck and not self._is_captains:
+            return (
+                f"The {self.station.name} has the deck: a man does not turn in on watch. Hand "
+                "the deck over first (hand_over), then stand by asleep below."
+            )
+        rested = keeper.too_rested(person)
+        if rested:
+            return rested
+        keeper.sleep_below(person)
+        a.state = STANDING_BY
+        a.stand_by = sb
+        a.last_heard_tick = world.clock.tick
+        out_of_turn = self._open is None
+        where = place_words_of(world, person)
+        world.record(
+            Severity.ROUTINE,
+            "agent.stood_by",
+            f"{self.mark} Turned in below, {where}, asleep until called.",
+            actor=self.actor,
+            data=sb.to_dict(),
+        )
+        if not out_of_turn:
+            self._wait_from = (len(world.log), world.clock.stamp())
+        self._stood_at = (sb.words, world.clock.stamp())
+        self.journal.append(
+            world, f"Turned in below, {where}, asleep until called.", kind="agent.stood_by"
+        )
+        a.nudged_for = None
+        a.repeat_text, a.repeat_digest, a.repeat_count = None, None, 0
+        self._sample_repeated = False
+        self._stand_by_watch = None
+        self._stand_by_due = self._in_flight(sb, out_of_turn)
+        return (
+            f"Turned in below, {where}; you sleep until you are called, an urgent line wakes you, "
+            "and you wake of yourself when you are rested."
+        )
+
+    def fall_asleep(self) -> bool:
+        """His fatigue's last step: he falls asleep where he stood, and the station stands
+        by until he is called (`ASLEEP_WHERE`). Nothing is written in the log: the needs
+        show to the person alone; his own journal says it. False, and nothing done, while
+        the model has the floor or the station is paused or released (the next minute's
+        look tries again)."""
+        a = self.agent
+        if not self.started or a.released or a.paused or self._open is not None:
+            return False
+        world = self.world
+        a.state = STANDING_BY
+        a.stand_by = StandBy(ASLEEP_WHERE)
+        a.last_heard_tick = world.clock.tick
+        self._wait_from = (len(world.log), world.clock.stamp())
+        self._stood_at = (ASLEEP_WHERE, world.clock.stamp())
+        self._stand_by_watch = None
+        self._stand_by_due = None
+        self.journal.append(world, "Fell asleep where he stood.", kind="agent.stood_by")
+        return True
+
+    def wake_rested(self) -> None:
+        """He woke rested (`world.needs`): the stand-by ends at the harness's next look."""
+        sb = self.agent.stand_by
+        if self.agent.standing_by and sb is not None and sb.words in (ASLEEP_BELOW, ASLEEP_WHERE):
+            self._stand_by_due = WOKE_RESTED
+
+    def need_urgent(self, text: str) -> None:
+        """An urgent need (`world.needs`): it wakes a stand-by as an urgent line does,
+        but not a man asleep, whom his needs told nothing while he slept."""
+        sb = self.agent.stand_by
+        if not self.agent.standing_by or sb is None or sb.words in (ASLEEP_BELOW, ASLEEP_WHERE):
+            return
+        if self._stand_by_due is None:
+            self._stand_by_due = f"an urgent need: {text}"
 
     def _cannot_come(self, sb: StandBy) -> str | None:
         """Why a station with the deck cannot stand by for this, in words, or None when
@@ -4091,6 +4231,19 @@ ACTS_ON_A_RELEASED_STATION = ("reseat", "asked")
 
 # The bell a station with the deck is bound by (package 37g, item 4).
 EIGHT_BELLS = "eight bells"
+
+
+# What ends a stand-by asleep when he has slept enough (package 54).
+WOKE_RESTED = "you woke, rested"
+
+
+def place_words_of(world: Any, person: Any) -> str:
+    """'in the cabin', 'on the quarterdeck': where a person is, for the needs' lines."""
+    from freesail.world.places import place_words
+
+    people = getattr(world, "people", None)
+    where = people.effective_place(person) if people is not None else person.where
+    return place_words(where)
 
 
 def _bells_to_come(now: Any) -> list[tuple[str, str]]:
