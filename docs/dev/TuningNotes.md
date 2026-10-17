@@ -5798,3 +5798,20 @@ No recorded passage is touched: the session's kind is not in the log.
 - The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`): **3,295 passed, none
   failed** (305 slow tests left out). The slow tier was not run: the package moves no
   recorded passage, since the session's kind is not in the log.
+
+### The pace on the owner's machine (2026-10-17, `tools/pace.py`, with a browser and a video open beside)
+
+| Measure | Ticks a second |
+|---|---|
+| The frigate alone (the station trial) | 1,111 |
+| With the dozen ships at far detail | 1,102 |
+| With 1 crewed ship | 594 |
+| With 3 crewed ships | 281 |
+| With 6 crewed ships | 160 |
+| With 12 crewed ships | 95 |
+
+Against the build machine's 616 alone and 194 with three: the owner's machine is near twice
+as fast, and twelve crewed ships still tick above the sixty of his play at 60x. The owner's
+reading, for the lead's word: a compression of 1000x as an option at least while no ship is
+promoted (the frigate alone ticks at 1,111), and the crewed budget adjustable (the range and
+the cap, or the cap alone) rather than fixed at the build machine's three.
