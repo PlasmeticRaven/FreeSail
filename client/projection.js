@@ -100,6 +100,19 @@
   // the steps of the square sail's evolutions that move its yard (data/evolutions/*_square.yaml):
   // hoisting or settling the halyards, halfway; reefing or shaking out, down on the cap
   var STEP_HOIST = { hoist: 0.5, settle_halyards: 0.5, clew_down: 0.5, reef: 0, shake_out: 0 };
+  // Package 57 (the owner's notes 4 and 5 of the Éclair's first cruise; the lead's finding
+  // of 18:29). A square yard is slung before its mast, the sail hanging before the yard, so
+  // that from ahead the sail hides the mast and from astern the mast hides the sail: the
+  // yard's slings stand this fraction of the beam before the mast (judgement: the mast's
+  // half-diameter and the yard's, about a twentieth of the beam). A lug lies on the lee side
+  // of its mast, slung a third of its yard from the fore end with two thirds of the sail
+  // abaft the mast (Forfait 1788 pp. 5 to 6; Steel 1794, LUGGER), the whole cut swung about
+  // its slings by the sheet's angle: the slings this fraction of the beam to leeward of the
+  // mast (judgement: the mast's half-diameter). A lug lowered, or a sail set flying and sent
+  // down, lies on deck with its yard, this high above the deck (judgement).
+  var YARD_BEFORE_MAST_OF_BEAM = 0.05;
+  var LUG_LEE_OF_MAST_OF_BEAM = 0.03;
+  var ON_DECK_M = 0.6;
 
   // -- vectors ----------------------------------------------------------------
 
@@ -298,6 +311,77 @@
         reefs: s.reefs != null ? s.reefs : spec.reefs || 0,
         sheet_angle: s.sheet_angle != null ? s.sheet_angle : spec.sheet_angle || 0,
         backed: !!s.backed,
+        lug_side: s.lug_side != null ? s.lug_side : spec.lug_side || null,
+      };
+    }
+    var beamM = hull.beam_m || 8;
+    var yardBefore = YARD_BEFORE_MAST_OF_BEAM * beamM;
+    var lugLee = LUG_LEE_OF_MAST_OF_BEAM * beamM;
+    /** A sail set flying and stowed (package 57): sent down on deck with its yard. */
+    function sentDownFlying(spec) {
+      return !!(spec && spec.flying) && sailDyn(spec).state === "furled";
+    }
+    /** The sail whose yard this is, if any. */
+    function sailOnYard(yardId) {
+      var on = (sailsBySpar[yardId] || []).filter(function (s) {
+        return (s.roles || {}).yard === yardId;
+      });
+      var bent = on.filter(function (s) {
+        return sailDyn(s).state !== "unbent";
+      });
+      return bent[0] || on[0] || null;
+    }
+    /** Whether a yard is on deck with its flying sail sent down (package 57). */
+    function yardOnDeck(yardId) {
+      var list = (sailsBySpar[yardId] || []).filter(function (s) {
+        return (s.roles || {}).yard === yardId;
+      });
+      return list.length > 0 && list.every(sentDownFlying);
+    }
+    /** The side a lug lies on, +1 starboard: its own (package 43b), its lower lug's for a lug
+     *  topsail (package 57), else the lee side of the tack. */
+    function lugSideSign(spec) {
+      var host = spec.sheeted_to ? sailSpecs[spec.sheeted_to] : null;
+      var side = sailDyn(spec).lug_side || (host ? sailDyn(host).lug_side : null);
+      if (!side) side = tack === "starboard" ? "larboard" : "starboard";
+      return sideSign(side);
+    }
+    /** Whether a lug is hoisted (set, or drawn as set: blown out, wrecked, goose-winged). */
+    function lugHoisted(spec) {
+      var st = sailDyn(spec).state;
+      return st === "set" || st === "goose_winged" || st === "blown_out" || st === "wrecked";
+    }
+    /** A lug cut from its file (package 57): its corners [tack, throat, peak, clew] in the
+     *  fore-and-aft plane, swung about its slings (a third along the yard from the throat;
+     *  a lug topsail about its lower lug's, to whose peak its clew is sheeted) by the
+     *  sheet's angle to the side it lies on, two thirds of it abaft the mast, the slings on
+     *  the lee side of the mast; lowered, along the deck. `mastAt(id)` places a mast.
+     *  Returns {pts, pivotMast, sling, along, normal, onDeck}, or null with no cut. */
+    function lugCut(spec, mastAt) {
+      if (!spec || !spec.corners_m || spec.corners_m.length !== 4) return null;
+      var host = spec.sheeted_to ? sailSpecs[spec.sheeted_to] : null;
+      var pivot = host && host.corners_m ? host : spec;
+      var pc = pivot.corners_m;
+      var sx = pc[1][0] + (pc[2][0] - pc[1][0]) / 3;
+      var sz = pc[1][1] + (pc[2][1] - pc[1][1]) / 3;
+      var M = mastAt((pivot.roles || {}).mast);
+      var shift = M && M.xAt ? M.xAt(deck + sz) - sx : 0;
+      var down = !lugHoisted(spec) || (host && !lugHoisted(host));
+      var a = sailDyn(host || spec).sheet_angle || 0;
+      var ss = lugSideSign(spec);
+      var ca = Math.cos(a), sa = Math.sin(a);
+      var pts = spec.corners_m.map(function (q) {
+        var dx = q[0] - sx;
+        if (down) return v(sx + shift + dx, 0, deck + ON_DECK_M);
+        return v(sx + shift + dx * ca, ss * (lugLee - dx * sa), deck + q[1]);
+      });
+      var along = down ? [-1, 0, 0] : [-ca, ss * sa, 0];
+      return {
+        pts: pts,
+        pivotMast: M,
+        along: along,
+        normal: cross(along, [0, 0, 1]),
+        onDeck: down,
       };
     }
     /** Whether a studding sail boom is rigged out: the snapshot's state (spec 3b §7), else
@@ -450,6 +534,39 @@
           r.a = rootP;
           r.b = v(rootP[0] + Math.sqrt(Math.max(L * L - dz2 * dz2, 0)), 0, rootP[2] + dz2);
           r.tip = r.b;
+        } else if (where && spec.class === "lug_yard" && lugCut(sailOnYard(id), resolve)) {
+          // package 57: a lug's yard from its cut, slung a third from its fore end on its
+          // side of the mast, or on deck while its lug is lowered or sent down
+          var lc = lugCut(sailOnYard(id), resolve);
+          var lsp = sailOnYard(id);
+          var throatP = lc.pts[1], peakP = lc.pts[2];
+          r.x = lc.pivotMast ? lc.pivotMast.x : spec.x_m || 0;
+          r.a = throatP;
+          r.b = peakP;
+          r.centre = lerp(throatP, peakP, 1 / 3);
+          r.half = (spec.length_m || len(sub(peakP, throatP))) / 2;
+          r.arm = norm(sub(peakP, throatP));
+          r.normal = lc.normal;
+          r.brace = 0;
+          r.hoist = lc.onDeck ? 0 : 1;
+          r.onDeck = lc.onDeck;
+          r.flyingDown = sentDownFlying(lsp);
+        } else if (where && spec.class === "yard" && yardOnDeck(id)) {
+          // package 57: a royal set flying and sent down: its yard on deck, fore and aft,
+          // beside the foot of its lower mast
+          var lowerM = resolve(chainTop(spec));
+          var Ld = spec.length_m || 0;
+          r.x = lowerM ? lowerM.x : spec.x_m || 0;
+          r.centre = v(r.x, 0.25 * beamM, deck + ON_DECK_M);
+          r.arm = [1, 0, 0];
+          r.half = Ld / 2;
+          r.a = sub(r.centre, mul(r.arm, r.half));
+          r.b = add(r.centre, mul(r.arm, r.half));
+          r.normal = [0, 1, 0];
+          r.brace = 0;
+          r.hoist = 0;
+          r.onDeck = true;
+          r.flyingDown = true;
         } else if (YARD_CLASSES[spec.class]) {
           var th = braceAngle(spec);
           // at its hoist (package 37n): the file's height, or lowered on the cap of the mast
@@ -481,6 +598,8 @@
             z = lowered + r.hoist * (hoisted - lowered);
           }
           r.x = parent ? (parent.xAt ? parent.xAt(z) : parent.x) : spec.x_m || 0;
+          // package 57: a square yard is slung before its mast (YARD_BEFORE_MAST_OF_BEAM)
+          if (spec.class === "yard" && parent && MAST_CLASSES[parent.cls]) r.x += yardBefore;
           r.centre = v(r.x, 0, z);
           r.arm = [Math.sin(th), Math.cos(th), 0]; // direction of the starboard yardarm
           r.half = L / 2;
@@ -690,6 +809,12 @@
         busy: !!busy[s.id],
       };
       if (r.hoist !== undefined) fig.hoist = r.hoist; // a yard: 1 at its hoist, 0 lowered
+      if (r.flyingDown) fig.state = "sent_down_flying"; // package 57: on deck with its sail
+      if (s.class === "yard" && !r.onDeck) fig.brace = r.brace || 0; // package 57: said in its title
+      if (YARD_CLASSES[s.class] && r.parent && !r.onDeck) {
+        fig.mastId = r.parent.id; // the painter's correction for the mast's rake (package 57)
+        fig.centre = r.centre;
+      }
       figures.push(fig);
     });
 
@@ -810,15 +935,16 @@
      *  the mast into the part forward and the part abaft, each with its own centre, so
      *  that the mast can be drawn between them; any other sail as it is. */
     function piecesAtMast(fig) {
-      if (!fig.stay || !fig.path) return [fig];
+      if (!(fig.stay || fig.cutMast) || !fig.path) return [fig];
       var pts = flattenPath(fig.path);
       var minX = Infinity, maxX = -Infinity;
       pts.forEach(function (p) {
         minX = Math.min(minX, p[0]);
         maxX = Math.max(maxX, p[0]);
       });
-      for (var i = 0; i < lowerMasts.length; i++) {
-        var m = lowerMasts[i];
+      var cutAt = fig.cutMast ? [fig.cutMast] : lowerMasts; // a lug at its own mast (package 57)
+      for (var i = 0; i < cutAt.length; i++) {
+        var m = cutAt[i];
         var mx = m.xAt ? m.xAt(fig.centre[2]) : m.x;
         if (mx <= minX + 0.3 || mx >= maxX - 0.3) continue;
         var halves = splitAtX(pts, mx);
@@ -902,6 +1028,7 @@
       var roles = spec.roles || {};
       var cls = spec.class;
       if (dyn.state === "unbent") return; // nothing on the yard: the sail is in the sail room
+      if (sentDownFlying(spec)) return; // package 57: sent down on deck with its yard
       var onDeck = Object.keys(roles).some(function (role) {
         var target = roles[role];
         var sp = spars[target] || (lineOf[target] ? spars[lineOf[target].of] : null);
@@ -917,6 +1044,20 @@
           var cut = squareCut(spec, dyn, Y);
           corners = cut.corners;
           depth = cut.depth;
+        } else if (cls === "lug" && spec.corners_m) {
+          // package 57: a lug from its cut, on its side of the mast (`lugCut`)
+          var lcut = lugCut(spec, function (mid) {
+            return spars[mid];
+          });
+          var lp = lcut.pts; // tack, throat, peak, clew
+          var lfig = sailFigure(spec, dyn, [lp[1], lp[2], lp[3], lp[0]], lcut.normal, Y, len(sub(lp[2], lp[3])));
+          if (lcut.onDeck) lfig.path = bundle(lp[1], lp[2], 0.3);
+          lfig.cutMast = lcut.pivotMast;
+          lfig.mastId = lcut.pivotMast ? lcut.pivotMast.id : null;
+          piecesAtMast(lfig).forEach(function (f) {
+            figures.push(f);
+          });
+          return;
         } else {
           // a lug or a lateen: from its yard's ends, its area over the yard
           var L = Y.half * 2;
@@ -935,7 +1076,9 @@
           figures.push(gw);
           return;
         }
-        figures.push(sailFigure(spec, dyn, corners, Y.normal, Y, depth));
+        var sqFig = sailFigure(spec, dyn, corners, Y.normal, Y, depth);
+        sqFig.mastId = Y.parent ? Y.parent.id : null;
+        figures.push(sqFig);
       } else if (cls === "gaff" || cls === "sprit") {
         var M = spars[roles.mast];
         var G = spars[roles.gaff || roles.sprit];
@@ -960,6 +1103,7 @@
         var normalG = cross(G.dir, [0, 0, 1]);
         var cornersG = [throat, peak, clew, tackPt];
         var fig = sailFigure(spec, dyn, cornersG, normalG, Bm || M, luff);
+        fig.mastId = M.id;
         if (dyn.state === "furled") {
           fig.path = Bm ? bundle(Bm.a, Bm.b, 0.3 + 0.02 * (Bm.spec.length_m || 0)) : bundle(v(M.x, 0.15, footZ), v(M.x, 0.15, throat[2]), 0.5);
         } else if (dyn.state === "in_the_gear") {
@@ -972,7 +1116,22 @@
         var stay = roles.stay ? stayFoot[roles.stay] : null;
         var Mm = roles.mast ? spars[roles.mast] : null;
         var head, tackJ, clewJ, along, normalJ, sparFor;
-        if (stay && stay.abaft) {
+        var nockJ = null;
+        if (spec.corners_m && spec.corners_m.length >= 3) {
+          // package 57: a staysail cut as its file has it (Steel's shapes: a triangle, or
+          // four-sided with a bunt), its head on the stay and its tack fast, the clew swung
+          // to leeward about the tack by the sheet
+          var cm = spec.corners_m;
+          var four = cm.length === 4;
+          var tq = cm[0], pq = four ? cm[2] : cm[1], cq = four ? cm[3] : cm[2];
+          tackJ = v(tq[0], 0, deck + tq[1]);
+          head = v(pq[0], 0, deck + pq[1]);
+          if (four) nockJ = v(cm[1][0], 0, deck + cm[1][1]);
+          along = sheetDirection(dyn.sheet_angle, tack);
+          clewJ = add(add(tackJ, mul(along, Math.abs(cq[0] - tq[0]))), v(0, 0, cq[1] - tq[1]));
+          normalJ = cross(along, norm(sub(head, nockJ || tackJ)));
+          sparFor = { a: tackJ, b: lerp(tackJ, head, 0.35) };
+        } else if (stay && stay.abaft) {
           // a jib-headed sail on a stay with no run (the storm mizzen), from its file: a
           // right-angled triangle whose luff stands up the stay from its tack and whose foot
           // runs aft towards the taffrail ("the foot is extended towards the taffarel by a
@@ -1047,6 +1206,12 @@
         } else {
           var bellyJ = dyn.state === "set" ? mul(bellyDirection(normalJ, wind), 2 * BELLY * Math.min(len(sub(clewJ, tackJ)), len(sub(head, tackJ)))) : [0, 0, 0];
           figJ.path = [[tackJ], [lerp(tackJ, head, 0.5), head], [add(lerp(head, clewJ, 0.5), bellyJ), clewJ], [add(lerp(clewJ, tackJ, 0.5), mul(bellyJ, 0.6)), tackJ]];
+          if (nockJ) {
+            // four-sided: the head from the nock to the peak along the stay, the bunt from
+            // the tack up to the nock
+            figJ.path = [[nockJ], [lerp(nockJ, head, 0.5), head], [add(lerp(head, clewJ, 0.5), bellyJ), clewJ], [add(lerp(clewJ, tackJ, 0.5), mul(bellyJ, 0.6)), tackJ], [lerp(tackJ, nockJ, 0.5), nockJ]];
+            figJ.centre = centroid([tackJ, nockJ, head, clewJ]);
+          }
         }
         // a staysail that crosses a mast is drawn in two parts, each in its own place along
         // the view axis (spec M0-M2 §12 item 9)
@@ -1123,7 +1288,7 @@
       var state = (snapLines[ln.id] || {}).state || ln.state || "belayed";
       if (ln.class === "brace") {
         var Y = spars[ln.of];
-        if (!Y || !Y.arm || sentDown(Y)) return;
+        if (!Y || !Y.arm || sentDown(Y) || Y.onDeck) return;
         var ss = sideSign(ln.side);
         var from = ss > 0 ? Y.b : Y.a;
         var m = mastAftOf(Y.x);
@@ -1135,7 +1300,15 @@
         if (!sf || sf.state === "furled" || !sf.corners) return;
         if (sf.state === "goose_winged" && ln.side === (tack === "starboard" ? "larboard" : "starboard")) return; // the lee clew is up
         var pts;
-        if (sf.corners.length === 4 && (sf.cls === "square" || sf.cls === "lug" || sf.cls === "lateen")) {
+        var sheetSpec = sailSpecs[ln.of] || {};
+        if (sf.cls === "lug" && sheetSpec.corners_m) {
+          // package 57: a lug's sheet from its clew aft to the lee side; a lug topsail's is
+          // at its lower lug's peak, where its clew is, and is not drawn
+          if (sheetSpec.sheeted_to) return;
+          var lc2 = sf.corners[2];
+          var lugLeeSide = lc2[1] >= 0 ? 1 : -1;
+          pts = [lc2, v(lc2[0] - 1, (lugLeeSide * beam) / 2, deck)];
+        } else if (sf.corners.length === 4 && (sf.cls === "square" || sf.cls === "lug" || sf.cls === "lateen")) {
           var s2 = sideSign(ln.side);
           var Yy = spars[((sailSpecs[ln.of] || {}).roles || {}).yard];
           var clew = s2 > 0 ? sf.corners[2] : sf.corners[3];
@@ -1176,6 +1349,20 @@
       }
       return headRig.length ? headRig[0].b : v(stemX, 0, deck);
     }
+
+    // Package 57 (the owner's note 5): the painter sets a sail or a yard against its mast
+    // as it stands at its own height, not the mast's middle: a raked mast's middle is
+    // forward of its upper part, and a topsail set before the topmast's head was drawn
+    // behind the mast from ahead. Each carries the point it is sorted by, its centre moved
+    // fore and aft by the mast's middle less the mast where the sail is.
+    figures.forEach(function (f) {
+      if (!f.mastId || !f.centre) return;
+      var mr = spars[f.mastId];
+      if (!mr || !mr.a || !mr.b) return;
+      var mid = lerp(mr.a, mr.b, 0.5);
+      var here = mr.xAt ? mr.xAt(f.centre[2]) : mr.x;
+      f.sortAt = add(f.centre, v(mid[0] - here, 0, 0));
+    });
 
     // -- the hull --------------------------------------------------------------------
 
@@ -1300,7 +1487,7 @@
       if (p.y > maxY) maxY = p.y;
     }
     skeleton.figures.forEach(function (f) {
-      var g = { kind: f.kind, id: f.id, cls: f.cls, state: f.state, side: f.side, part: f.part, of: f.of, busy: f.busy, backed: f.backed, reefs: f.reefs, piece: f.piece, hoist: f.hoist };
+      var g = { kind: f.kind, id: f.id, cls: f.cls, state: f.state, side: f.side, part: f.part, of: f.of, busy: f.busy, backed: f.backed, reefs: f.reefs, piece: f.piece, hoist: f.hoist, brace: f.brace };
       var all = [];
       if (f.path) {
         g.path = projectPath(f.path, proj);
@@ -1316,7 +1503,9 @@
       all.forEach(note);
       // a sail stands where its centre is along the view axis (spec M0-M2 §12 item 9),
       // not where the mean of its outline's control points happens to fall
-      g.depth = f.kind === "sail" && f.centre ? proj(f.centre).depth : meanDepth(all);
+      // package 57: a sail or a yard by its point against its mast (`sortAt`)
+      var at = f.sortAt || (f.kind === "sail" ? f.centre : null);
+      g.depth = at ? proj(at).depth : meanDepth(all);
       out.push(g);
     });
     // The fixed scale (spec M3 §9 item 14): the frame of the full rig, every spar as the
@@ -1396,6 +1585,9 @@
       HEAD_SPREAD: HEAD_SPREAD,
       YARD_ON_CAP_M: YARD_ON_CAP_M,
       HOUSED_ABOVE_CAP_M: HOUSED_ABOVE_CAP_M,
+      YARD_BEFORE_MAST_OF_BEAM: YARD_BEFORE_MAST_OF_BEAM,
+      LUG_LEE_OF_MAST_OF_BEAM: LUG_LEE_OF_MAST_OF_BEAM,
+      ON_DECK_M: ON_DECK_M,
     },
   };
 });

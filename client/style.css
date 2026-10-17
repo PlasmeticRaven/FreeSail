@@ -170,6 +170,7 @@ main {
 .ship-view .spar.studdingsail_boom { stroke-width: 1px; }
 .ship-view .spar.wrecked { stroke: var(--spar-wrecked); stroke-dasharray: 5 4; }
 .ship-view .spar.sent_down { stroke-dasharray: 2 4; opacity: 0.5; }
+.ship-view .spar.sent_down_flying { opacity: 0.7; } /* package 57: a flying sail's yard on deck */
 
 .ship-view .sail { fill: var(--canvas); stroke: var(--canvas-edge); stroke-width: 0.8px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .ship-view .sail.furled { fill: var(--canvas-furled); }
