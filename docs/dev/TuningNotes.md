@@ -6204,4 +6204,16 @@ with it.
 
 ### The suite, as run
 
-SUITE_RESULTS
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- The package's own tests as written: `test_stores.py` 9 (new), `test_people.py` 7 new,
+  truths 7b-103 and 7b-104 (the fixture `needs_days`, three days of the frigate, some three
+  minutes to build), all passing; `test_places.py`'s purser's page mended (above).
+- The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`) on the tree before the last
+  commit: all passed but the purser's page (mended) and the fingerprint test, the tree edited
+  under it, as packages 50's and 52's.
+- The whole slow tier (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m "not pace"`)
+  once on the final tree, the fast tier with it: 3,656 passed, 10 xfailed (the same ten as
+  packages 50's and 52's), none failed, in two hours and ten minutes on the build machine
+  under two other packages' runs; every recorded passage's pin held.
+- The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`) after it, the
+  machine quieter but one other package's slow tier still running: 6 passed in 152 s.
