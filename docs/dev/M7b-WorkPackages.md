@@ -11,6 +11,15 @@ a change moves them, with the old figure beside the new and the reason in the tu
 notes; the fast tier and the slow tier of the files touched before the report, the whole
 slow tier once at the end; a section in the tuning notes and a report to the lead.
 
+**The lead plays** (the owner, 2026-10-17, after the Éclair's first cruise): a merged
+package gets a short run by the lead at a station of a local game here before its record
+closes, the log, the saves and the notes filed under `docs/playtests/`, the consent record
+of such a run kept out of the repository (`--consent-records` elsewhere). The notes keep
+two kinds apart: **findings grounded in the log**, each with its line and its tick, and
+**impressions from the station** (what the lead could or could not tell, wanted or missed),
+marked as such and put to the owner, who decides whether they are design; a run that
+wants a captain is played with the owner over the tunnel, without lockstep.
+
 ## Waves
 
 | Package | Builder | What | State |
