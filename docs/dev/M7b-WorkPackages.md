@@ -29,7 +29,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | briefed 2026-10-17; approved and launched the same day, the three together |
 | 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | briefed 2026-10-17; approved and launched the same day, the three together |
 | 51 | Fable | The observed world: the followed ship in place of the given one, no player's ship, the player on another ship, the replay of a station there; the director's chart, the truth drawn (spec §12a); provisionally the director's focus and the ships' logs by kind and tick range (spec §12b; both the owner's word of 2026-10-17) | brief to write, after 50 |
-| 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | brief to write |
+| 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | briefed 2026-10-17, for the owner's approval |
 | 57 | Opus | The frigate's staysails from Steel's list through the generator, the period's shapes; the chasse-marée's rig put right (lug topsails, not square; the lugs slung a third from the fore end and set to leeward of the mast; the trim rule reading a lug as fore-and-aft) and the viewer's draw order by aspect and the brace shown (the owner's notes of the Éclair's first cruise, `docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`) | briefed 2026-10-17; approved and launched the same day, the three together |
 | 58 | Opus | The captain's sea sense, third pass (the owner's runs of gate 6c); a leg re-laid as the stream changes; the sample's deltas, the `ahead` reading and the cost of thinking (the owner's observation of 2026-10-17) | brief to write |
 | 59 | Opus | The harbour: a launcher in the browser, the scenario maker, the settings and the doors started from it (the owner, 2026-10-17) | brief to write |
@@ -321,3 +321,78 @@ set) and his notes on the Éclair's first cruise (`docs/playtests/2026-10-17-ecl
    and one that the frigate lies to under a staysail by the heavy-weather book in the
    gale trial; §24's 57 as built; the tuning notes (Steel's and Forfait's pages, the pins
    moved, found on the way).
+
+## Package 56: fishing, and the glass on a near ship (`data/fishing/*.yaml` new; `freesail/evolutions/scripts.py` and the registry for the gear's evolutions; `freesail/world/business.py` the fisherman's catch and the grounds; `freesail/world/ports.py` the market buying fish; `freesail/world/places.py` the well and the hold's salt; `freesail/world/crews.py` the fishermen promoted; `data/captains/fisherman.yaml`; `data/business.yaml`; `data/ships/smack.yaml` and `lugger.yaml` through `tools/gen_ships.py` for the gear; `freesail/world/lookout.py`, `ships.py` the glass by tiers and the sighting's course; `data/vocabulary.yaml` and `freesail/orders/` for the fishing orders and `the glass on <ship>`; the primer (the fisherman's chapter); `docs/agents/Harness.md` only where a reading's words change; `docs/TechnicalSpec-M7b.md` §21a, §21b as built; `docs/dev/TuningNotes.md`; `tests/test_fishing.py` new, `test_business.py`, `test_lookout.py`, `test_crews.py`, `test_known_truths.py` truths 105 to 107)
+
+Opus, beside 53, 54 and 57, after them if the owner would rather one wave at a time; no
+dependence on the director. Spec M7b §21a to §21c; the owner's rulings of 2026-10-17 (a
+player may fish at the level the game can reasonably simulate: researched grounds, real
+catches to market, reasonable period evolutions, the well's spoilage, no fishing simulation;
+the fishermen included in the crewed promotion; the fisherman's parity). The ground is
+m6c's fisherman at far detail (`business.py` `_fisherman`, `grounds()`, the `fish` intent,
+`data/captains/fisherman.yaml`, never crewed), the smack's well (`hold.well_m3`,
+Holdsworth 1874 pp. 139 to 141 as `smack.yaml` cites), and the market's fish goods
+(`data/business.yaml`). The sources the repository already holds: Holdsworth 1874 (the
+trawl smacks pp. 65 to 72, the longlines pp. 137 to 139, the luggers pp. 104 to 105 and 291
+to 294; `docs/design/VesselReferences-2026-10.md`); the pilchard seine and drift fishery of
+Cornwall, the Brixham trawl, the Channel mackerel and herring drift, and the Breton sardine
+want the period's own sources found and cited, or the figure marked a judgement. The
+business is off in every recorded passage: **no pin moves**; prove it by the digests the
+tests keep. Each item an intent with the lead's reading; the intent binds.
+
+1. **The grounds as data** (§21a): each region's fishing grounds as a table keyed to the
+   chart's features (`data/fishing/<region>.yaml`): the ground, its fish by season, its
+   depth, its gear, and its yield (so much a boat an hour of fishing at the gear, with the
+   weather's and the hour's effect: the pilchard shoals of summer and autumn off Cornwall
+   by the seine from the shore's huers and by the drift net at night, the mackerel in
+   spring and summer by the drift, the herring in autumn, the Channel's trawl grounds for
+   sole and turbot, the cod and ling on the lines, the Biscay sardine), each figure with
+   its source or "judgement". *The lead's reading:* `grounds()` already picks the features
+   by kind, depth and distance; the table names them and gives them a season and a yield,
+   and a ground the table does not name keeps the business's default.
+2. **The gear's evolutions** (§21a): the orders and the evolutions of the gear, with the
+   hands at them, their hours and their weather limits: `shoot the nets` and `haul the
+   nets` (the drift, by night, the ship lying to her nets), `shoot the seine` and `haul
+   the seine` (with the boats, in a bay, by day), `set the lines` and `haul the lines`,
+   `shoot the trawl` and `haul the trawl` (towed under easy sail, so many hours a tow);
+   the smack and the lugger carry the gear their files say and no other (the generator
+   gives each her gear with its source). *The lead's reading:* the evolution scripts as
+   the registry has them, each a few steps with the hands and the time; a ship fishing is
+   "at her nets" in `work_in_hand`, her way and helm bound by the gear (lying to the
+   drift nets, towing the trawl at two or three knots), and a sail set beyond the gear's
+   allowance is refused in words.
+3. **The catch, the well and the hold** (§21a): the catch by the ground, the season, the
+   hours fished and the weather, into the well (alive, for so many days) or the hold (salted
+   where salt is aboard, else spoiling in so many hours in summer and more in winter);
+   the purser's and the master's readings say what is aboard and its state; a port that
+   buys fish takes it at its price and credits the purse; the spoilage said in the log once
+   a day and at the sale. Truth 105. *The lead's reading:* the well is a `Hold` of its own
+   with a life in hours on its fish; the hold's fish a good with a `spoils_at` tick;
+   `data/business.yaml`'s fish goods take a price at the ports that buy them.
+4. **The fisherman's parity, and the fishermen promoted** (§21a; the owner's question
+   "can a player sailing the smack fish as much as a far-detail ship?"): the business's
+   fisherman draws the same catch at the same rate on the same ground and sells it at
+   home (truth 106); the crewed promotion includes the fishermen: 43b's "never crewed"
+   lifted in `crews.py` and `business.py`, the cap's order unchanged, a promoted
+   fisherman fishing by the same evolutions under his rules-based captain and the
+   fisherman's doctrine (the tuning notes say what the doctrine needed), the glass on
+   her showing the work truly. *The lead's reading:* one catch function for both details,
+   called by the evolution at full detail and by the far shape's clock at far detail.
+5. **The glass on a near ship, by tiers** (§21b): what the glass shows beyond her rig and
+   colours, in daylight and clear weather: within two miles what any seaman reads at a
+   look (under way or at anchor, which tack, hove to, tacking or wearing, running, her
+   sail set or shortening); within eight cables the work on deck and aloft (reefing,
+   making or taking in sail, a boat hoisting out or in, the hands at the nets or the
+   lines, the anchor coming up); within four cables the evolution's own words as the log
+   would say them of the player's ship; a crewed ship the true evolution's name, a far
+   vessel the words her plan's leg and her sail state give; at night and in thick weather
+   only what the visibility allows. Asked by `the glass on <ship>` and given by the
+   lookout when a ship is made out and when her work changes. Truth 107. **And a sighting
+   says her heading** (the owner's note 5 at gate 6c): every line that reports a sail
+   made out gives her relative bearing and the course she stands ("a brig on the larboard
+   quarter, bearing WSW, standing to the eastward"), as the strangers reading does today,
+   in the lookout's lines and in the sample's words.
+6. **Truths 105 to 107 and the records**: §21a, §21b as built; the primer's chapter for
+   the fisherman (the grounds and the gear in the period's words); the tuning notes (the
+   yields with their sources, the spoilage's hours, the glass's tiers, found on the way,
+   pins unmoved by digest, the suite's results); the waves row for 56.
