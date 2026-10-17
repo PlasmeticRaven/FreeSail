@@ -427,11 +427,6 @@ def flying_down(ship: Any, spar: Spar) -> bool:
     return bool(sails) and all(sl.sent_down for sl in sails)
 
 
-def on_deck(ship: Any, spar: Spar) -> bool:
-    """A yard not aloft: sent down by its own evolution, or with its flying sail."""
-    return spar.sent_down or flying_down(ship, spar)
-
-
 def lower_yards(ship: Any, mast: Spar) -> list[Spar]:
     """The yards slung on a lower mast itself: a ship's course yard, the crossjack.
     A topsail schooner's masts have none (her topsail yard is on the fore topmast)."""

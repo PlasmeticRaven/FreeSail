@@ -4119,6 +4119,7 @@ class LooseToDryScript(PhasedScript):
             for s in self.ship.sails.values()
             if s.state is SailState.FURLED
             and s.cls != "studding"
+            and not s.flying  # package 57: a flying sail sent down is on deck, not aloft
             and not s.wrecked
             and _chain_standing(self.ship, s)
         ]

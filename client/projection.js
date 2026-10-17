@@ -342,7 +342,9 @@
      *  topsail (package 57), else the lee side of the tack. */
     function lugSideSign(spec) {
       var host = spec.sheeted_to ? sailSpecs[spec.sheeted_to] : null;
-      var side = sailDyn(spec).lug_side || (host ? sailDyn(host).lug_side : null);
+      var side = host ? sailDyn(host).lug_side : spec.dipping ? sailDyn(spec).lug_side : null;
+      // a standing lug (the mizen, the taille-vent) is not dipped: its sheet holds it to
+      // leeward of the tack it is on, whichever side of the mast its yard hangs
       if (!side) side = tack === "starboard" ? "larboard" : "starboard";
       return sideSign(side);
     }

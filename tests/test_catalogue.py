@@ -757,9 +757,11 @@ def test_loose_sails_to_dry_and_furl_all():
     runner.start(ship, "loose_sails_to_dry", "ship")
     notes = run(runner, ship, wind)
     loosed = [s for s in ship.sails.values() if s.state is SailState.LOOSED]
-    assert len(loosed) == 15  # every furled sail but the ten studding sails
-    assert all(s.cls != "studding" for s in loosed)
-    assert "Loosed 15 sails to dry." in texts(notes)
+    # every furled sail but the ten studding sails and the royals, which are set flying and
+    # sent down on deck (package 57, which added six staysails between the masts)
+    assert len(loosed) == 18
+    assert all(s.cls != "studding" and not s.flying for s in loosed)
+    assert "Loosed 18 sails to dry." in texts(notes)
     runner.start(ship, "furl_all", "ship")
     notes = run(runner, ship, wind)
     # every sail bent is furled; storm canvas and the occasional sails (milestone 3b) stay

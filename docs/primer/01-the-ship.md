@@ -58,13 +58,13 @@ A **yard** is the spar a square sail hangs from, slung across the mast (Falconer
 | mizzen topgallant yard | **mizzen topgallant** | none |
 | mizzen royal yard | **mizzen royal** | none |
 
-The **courses** are the lowest square sails (Falconer, *Courses*); the mizzen carries no course, which is why the crossjack yard is bare. The **topsails** are the working sails of the ship and carry three reefs (Falconer, *Reef*: "the top-sails of ships are usually furnished with three reefs"). The **topgallants** and **royals** are the light sails, first in and last out.
+The **courses** are the lowest square sails (Falconer, *Courses*); the mizzen carries no course, which is why the crossjack yard is bare. The **topsails** are the working sails of the ship and carry three reefs (Falconer, *Reef*: "the top-sails of ships are usually furnished with three reefs"). The **topgallants** and **royals** are the light sails, first in and last out. The royals are **set flying** (Steel 1794 vol. I p. 214, ROYALS: "Are set flying"): the yard is swayed up from the deck with the sail bent to it when the royal is set, and sent down on deck whole when it is taken in, so that a royal not set is **sent down**, its yard on deck and nothing aloft (package 57). It is never reefed and never furled aloft; `furl the royals` takes them in.
 
 Abaft all is the **spanker** on the **mizzen gaff** and **mizzen boom**, a gaff sail with two reef bands. Falconer's *Driver* is a lighter sail set in its place in fair winds; by 1805 the two words meant the same thing and the game takes *spanker*, *driver* or simply *the mizzen* for it (Falconer, *Mizen*: "the aftermost or hindmost of the fixed sails of a ship, extended sometimes by a gaff").
 
 ### Headsails and staysails
 
-Set on the stays running forward from the masts (Falconer, *Stay*, *Jib*): the **fore topmast staysail** on the fore topmast stay, the **jib** on the jib stay, the **flying jib** on the flying jib stay. These three are the **headsails**. The **main topmast staysail** sets between the masts. Together with the spanker they are the ship's **fore-and-aft sails**.
+Set on the stays running forward from the masts (Falconer, *Stay*, *Jib*): the **fore topmast staysail** on the fore topmast stay, the **jib** on the jib stay, the **flying jib** on the flying jib stay. These three are the **headsails**. Between the masts are the staysails of Steel's list for a ship (1794 vol. I, Sail-making; package 57): between the fore and the main the **main staysail** on the main staysail stay, the **main topmast staysail**, the **middle staysail** on its own stay above it and the **main topgallant staysail**; between the main and the mizzen the **mizzen staysail**, the **mizzen topmast staysail** and the **mizzen topgallant staysail**. Each is cut as Steel cuts it, square on the foot with its head on the stay: the main staysail a triangle, the rest four-sided, with a short luff (the *bunt*) from the stay down to the tack, as the staysails between the masts were in his day. The main and mizzen staysails are of heavy canvas, No. 2; the upper ones are light sails. Together with the spanker they are the ship's **fore-and-aft sails**.
 
 ### Studding sails
 
@@ -137,10 +137,10 @@ A group name orders every member at once, and each member gets its own evolution
 | **courses** | fore and main course |
 | **topsails**, **topgallants**, **royals** | the three of each |
 | **headsails** | fore topmast staysail, jib, flying jib |
-| **staysails** | fore and main topmast staysails |
+| **staysails** | the fore topmast staysail and the seven between the masts |
 | **studdingsails** (*stuns'ls*, *kites*) | all ten; add a side to take one side |
 | **square sails** | courses, topsails, topgallants, royals |
-| **fore-and-aft sails** | headsails, main topmast staysail, spanker |
+| **fore-and-aft sails** | headsails, the staysails between the masts, spanker |
 | **plain sail** | courses, topsails, topgallants, fore topmast staysail, jib, spanker |
 | **all sail** | everything |
 | **fore yards**, **main yards**, **mizzen yards** | the yards on that mast |
@@ -233,7 +233,7 @@ The refusals name what she has instead: "There is no such part as the fore topsa
 
 ## The brig *Harpy*: a brig-sloop of 316 tons
 
-The frigate less a mast: **fore** and **main**, each a lower mast, topmast, topgallant mast and royal pole, three yards and a royal yard on each, tops on both, a bowsprit with a jib-boom and a flying jib-boom, and a gaff and boom on the main for the **spanker** (*the driver*, *the boom mainsail*, *the trysail*: a brig's is all four), which is the largest sail she has. Everything in the frigate's table that is not the mizzen's is hers, at her size: the courses, topsails, topgallants and royals, the fore topmast staysail, jib and flying jib, the main staysail, main topmast staysail (*the middle staysail*) and main topgallant staysail, ten studding sails, and the storm staysails and storm trysail in the sail room. The **head yards** are the fore's and the **after yards** the main's, so *square the after yards* and *back the main topsail* work as they do on the frigate; there is no crossjack, no mizzen and nothing of the mizzen's to name.
+The frigate less a mast: **fore** and **main**, each a lower mast, topmast, topgallant mast and royal pole, three yards and a royal yard on each, tops on both, a bowsprit with a jib-boom and a flying jib-boom, and a gaff and boom on the main for the **spanker** (*the driver*, *the boom mainsail*, *the trysail*: a brig's is all four), which is the largest sail she has. Everything in the frigate's table that is not the mizzen's is hers, at her size: the courses, topsails, topgallants and royals, the fore topmast staysail, jib and flying jib, the main staysail (a triangle), main topmast staysail, middle staysail and main topgallant staysail (four-sided), Steel's set for a brig, whose middle staysail has "only from one to three [cloths] more in the foot" than a ship's (package 57; the middle staysail was the main topmast staysail's other name before), ten studding sails, and the storm staysails and storm trysail in the sail room. The **head yards** are the fore's and the **after yards** the main's, so *square the after yards* and *back the main topsail* work as they do on the frigate; there is no crossjack, no mizzen and nothing of the mizzen's to name.
 
 ```orders brig
 set the fore topsail
@@ -244,6 +244,8 @@ set the spanker
 ease the spanker sheet
 brail up the driver
 set the middle staysail
+set the main staysail
+set the main topgallant staysail
 set the fore topmast studdingsail, larboard
 square the after yards
 back the main topsail

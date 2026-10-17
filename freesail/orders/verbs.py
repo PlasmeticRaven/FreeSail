@@ -58,9 +58,7 @@ from freesail.ship.parts import (
     Sail,
     SailState,
     Spar,
-    flying_down,
     lower_yards,
-    on_deck,
     sync_catharpins,
 )
 
@@ -667,9 +665,6 @@ def _brace(
     if yards and all(y.id in skip for y in yards):
         raise errors.NothingToDoError(f"Every yard of the {object_name} was already ordered.")
     yards = [y for y in yards if y.id not in skip]
-    # a yard sent down with its flying sail (package 57: the royals of 1794) is on deck and
-    # is passed over, unless it is all that was named
-    yards = [y for y in yards if not flying_down(ship, y)] or yards
     if not yards:
         raise OrderError("This ship has no yards to brace.")
     if vocab.brace_modes[mode] == "wind":
@@ -706,7 +701,7 @@ def _brace(
     texts: list[str] = []
     failed: list[str] = []
     failed_ids: list[str] = []
-    workable = [y for y in yards if not (y.wrecked or on_deck(ship, y))]
+    workable = [y for y in yards if not (y.wrecked or y.sent_down)]
     # Where each yard goes: the mode's angle within its limit; sharp up on a wind
     # across the masts, the after yards sharper than the head yards (spec 3b §2.2).
     targets: dict[str, float] = {}
@@ -741,7 +736,7 @@ def _brace(
             failed.append(f"{name} is carried away")
             failed_ids.append(yard.id)
             continue
-        if on_deck(ship, yard):
+        if yard.sent_down:
             failed.append(f"{name} is sent down")
             failed_ids.append(yard.id)
             continue
@@ -1068,11 +1063,7 @@ def _trim(
         sync_catharpins(ship)  # the limits as the lower rigging stands now
         runner = runner_of(ship)
         if yards is None:
-            yards = [
-                y
-                for y in ship.spars.values()
-                if y.is_yard and y.id not in skip and not flying_down(ship, y)
-            ]
+            yards = [y for y in ship.spars.values() if y.is_yard and y.id not in skip]
         # a trim in hand is not stacked behind (package 29b: a standing order that trims on a
         # shift, firing while the watch is at the braces): a yard still waiting its turn
         # takes the new angle, and one being braced now is left to finish
@@ -1081,7 +1072,7 @@ def _trim(
             for i in getattr(runner, "instances", ())
             if i.evo.id == vocab.evolutions["brace"] and i.params.get("mode") == "to the wind"
         }
-        workable = [y for y in yards if not (y.wrecked or on_deck(ship, y))]
+        workable = [y for y in yards if not (y.wrecked or y.sent_down)]
         # the trim is reckoned on the whole rig and the yards ordered take theirs from it
         # (package 37p): a topsail trimmed by name lies where `trim sails` puts it, a step
         # in from its course, and not at its own limit
@@ -1089,7 +1080,7 @@ def _trim(
         rig = workable + [
             y
             for y in ship.spars.values()
-            if y.is_yard and y.id not in ordered and not (y.wrecked or on_deck(ship, y))
+            if y.is_yard and y.id not in ordered and not (y.wrecked or y.sent_down)
         ]
         targets: dict[str, float] = {}
         wants: dict[str, float] = {}
@@ -1137,7 +1128,7 @@ def _trim(
             extra = {**extra, "log_group": new_group()}
         for yard in yards:
             name = resolve.the(ship, yard.id)
-            if yard.wrecked or on_deck(ship, yard):
+            if yard.wrecked or yard.sent_down:
                 # said as one clause of the line, "the topgallant and royal yards are on
                 # deck", not as a "Not ..." list (package 31b; playtest 11's finding 8)
                 failed.append(f"{name} is {'carried away' if yard.wrecked else 'sent down'}")
@@ -1519,7 +1510,7 @@ def _adjacent_refusals(ship: Ship, proposed: dict[str, float]) -> dict[str, str]
             (
                 y
                 for y in ship.spars.values()
-                if y.is_yard and not (y.wrecked or on_deck(ship, y)) and ship.mast_of(y) is mast
+                if y.is_yard and not (y.wrecked or y.sent_down) and ship.mast_of(y) is mast
             ),
             key=lambda y: y.height_m,
         )
