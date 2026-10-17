@@ -243,3 +243,59 @@ officer off. A few lines in the runner, nothing in the game; the API doors keep 
 the boundary as now. Every tick's lines would be the opposite of time: the log already does
 the editing a mind does. A thought for the local runner, not a package.
 
+## Combat and the naval system: the lead's brainstorm (the owner's ask, 2026-10-17)
+
+The owner's frame: the combat system in general; the naval system's regimes (in port, on
+station, convoys, escorts, blockades, in and out of ordinary); how far beyond single-ship
+actions is feasible; a six-on-six action as the ideal, tuned and not rushed; single-ship
+actions first, the framework allowing more ships, with the command system and signalling
+to make it realistic and sane. The lead's input, for the M7 design:
+
+**Single-ship action is mostly things the game has.** The sailing model is the hard part of
+a sea fight and exists; combat adds a decision layer and four systems. (1) Gunnery as an
+evolution: the guns served by the bill like any work, numbers, skill and fatigue giving the
+rate of fire as they give the time to reef; aim a doctrine choice, hull or rigging, which is
+the national difference in one knob; range bands for the hit chances; powder and shot as
+stores the purser counts. (2) Damage into what exists: the part graph carries a sprung spar
+and a parted line, so shot into the rigging is damage the game knows; shot into the hull is
+taking on water (above); shot into men is the muster, so health and the surgeon come with
+combat, not after. (3) Boarding as an evolution with odds from numbers and temper; striking
+as a morale rule, morale the one new quantity (the captain's doctrine, his losses, his odds,
+the nation's habits). (4) The prize: a crewed ship given a prize crew out of the muster and
+a goal that is a port; the prize court the business's purse; most of it 60's ship-bought
+mechanics from the other side; a captured signal book a paper of the prize.
+
+**The naval system is squadrons and regimes at far detail.** One new object, the squadron:
+a group of vessels with one commander and one goal, moved as one brain at far detail with
+the members at formation offsets, so that a convoy, a blockading squadron and a line of
+battle are one cheap thing until the player is near, when members promote one by one under
+the cap. One new idea, the regimes: a ship of a nation is in port, in ordinary, on station,
+on passage, in convoy or escorting, on blockade, each a doctrine of a few rules (a blockade
+keeps an inshore squadron and an offshore one and is blown off by a westerly gale; a convoy
+sails at the slowest ship's pace and its escort answers a stranger by doctrine; a ship in
+ordinary is a hull in port commissioned with a delay by the business or the director). The
+nations differ in their knobs: the British keep the sea and engage; the French keep port and
+fire high; privateers of any flag chase what pays. The signal book is the command system
+(the signalling note above): a squadron's standing orders are a book like the captain's; a
+signal is a world event with a reading delay, a visibility and an acknowledgement;
+subordinate captains are rules captains obeying the squadron's book and their doctrine; a
+model captain at the flagship is the orchestrator the owner saw in play; station keeping is
+a standing-order kind ("keep station two cables astern of the flagship"); the formations
+(line ahead, line abreast, the order of sailing) are the book's.
+
+**Six on six is a tuning problem with one design decision.** Twelve crewed Worlds are beyond
+the cap on any machine we have. The decision: a third shape between far and crewed, a
+*fighting shape*, carrying the motion model, the guns, the damage and the sail state at
+coarse steps, without the reckoning, the log and the people; the lead's guess a fifth of a
+crewed World's cost, which puts twelve ships within reach at a low tick rate with the
+player's ship and her immediate opponent fully crewed. The pace rule eases the clock in
+action and a battle at 1x is acceptable. Measured with `tools/pace.py` before anything is
+promised.
+
+**The order to build it:** M7a single-ship action (gunnery, damage, boarding, striking, the
+prize, health and the surgeon), gated on a frigate action (the Indefatigable); M7b
+signalling and the squadron primitives (the group, station keeping, the signal book, the
+acknowledgement), gated on a convoy and its escort meeting a privateer; M7c the regimes and
+the nations' doctrines (stations, blockade, convoy, ordinary); M7d the fighting shape and
+the six on six, tuned on the owner's machine, never rushed.
+
