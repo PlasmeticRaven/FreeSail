@@ -91,14 +91,15 @@ def scopes(world):
 
 @pytest.fixture(scope="module")
 def moored_brig(tmp_path_factory):
-    """The brig moored in Carrick Road by `let go` and `moor`: eighty-two fathoms on each
-    bower, riding by the best bower. Kept as a checkpoint, and each test takes a fresh
-    copy of her."""
+    """The brig moored in Carrick Road by `let go` and `moor`: eighty-three fathoms on each
+    bower (eighty-two before package 57: she drives a little further under Steel's
+    staysails stowed between the masts before she brings up), riding by the best bower.
+    Kept as a checkpoint, and each test takes a fresh copy of her."""
     w = at_anchor(BRIG)
     assert w.submit("moor").kind == "order.accepted"
     run_until(w, "ship.moored", 90)
     w.run(600)
-    assert scopes(w) == {"best_bower": 82, "small_bower": 82}
+    assert scopes(w) == {"best_bower": 83, "small_bower": 83}
     assert ground_tackle(w.ship).riding_by().id == "best_bower"
     return replay.write_checkpoint(w, tmp_path_factory.mktemp("moored") / "brig.ckpt")
 
@@ -121,15 +122,15 @@ def moored(path):
         ("veer to 90 fathoms on the best bower", "best_bower", 90),
         ("veer the small bower to 90 fathoms", "small_bower", 90),
         ("veer to 90 fathoms on the small bower", "small_bower", 90),
-        # and a bare number is so much more
-        ("veer 10 fathoms", "best_bower", 92),
-        ("veer the small bower 10 fathoms", "small_bower", 92),
-        ("veer 10 fathoms on the small bower", "small_bower", 92),
+        # and a bare number is so much more (from 83 since package 57, 82 before)
+        ("veer 10 fathoms", "best_bower", 93),
+        ("veer the small bower 10 fathoms", "small_bower", 93),
+        ("veer 10 fathoms on the small bower", "small_bower", 93),
         # `heave in` to a scope, or so much, with or without the anchor's name (item 8)
         ("heave in to 70 fathoms", "best_bower", 70),
-        ("heave in 10 fathoms", "best_bower", 72),
+        ("heave in 10 fathoms", "best_bower", 73),
         ("heave in the small bower to 70 fathoms", "small_bower", 70),
-        ("heave in 10 fathoms on the small bower", "small_bower", 72),
+        ("heave in 10 fathoms on the small bower", "small_bower", 73),
     ],
 )
 def test_the_cable_worked_is_the_named_anchors_and_to_is_kept(moored_brig, order, anchor, fathoms):
@@ -141,7 +142,7 @@ def test_the_cable_worked_is_the_named_anchors_and_to_is_kept(moored_brig, order
     assert w.submit(order).kind == "order.accepted"
     w.run(600)
     other = "small_bower" if anchor == "best_bower" else "best_bower"
-    assert scopes(w) == {anchor: fathoms, other: 82}
+    assert scopes(w) == {anchor: fathoms, other: 83}
     name = ground_tackle(w.ship).get(anchor).name
     said = events(w, "cable.hove_in" if order.startswith("heave") else "cable.veered")[-1]
     assert said.text.split(".")[0].endswith(f"on {name}") or f"on {name}," in said.text
@@ -152,7 +153,7 @@ def test_the_refusals_name_the_anchor_she_rides_by_and_what_would_do_it(moored_b
     # a "to" that is less than what is out is refused, with the order that does it
     e = w.submit("veer to 60 fathoms")
     assert e.kind == "order.rejected"
-    assert "the best bower has eighty-two fathoms out already" in e.data["reason"]
+    assert "the best bower has eighty-three fathoms out already" in e.data["reason"]
     assert "heave in to 60 fathoms" in e.data["reason"]
     # an anchor that is not down: never another anchor in silence
     for order in ("veer the sheet anchor to 90 fathoms", "weigh the kedge", "heave in the kedge"):
@@ -171,7 +172,7 @@ def test_the_refusals_name_the_anchor_she_rides_by_and_what_would_do_it(moored_b
     assert "heave in to 20 fathoms" in e.data["reason"]
     e = w.submit("weigh 20 fathoms")
     assert e.kind == "order.rejected" and "takes no number" in e.data["reason"]
-    assert scopes(w) == {"best_bower": 82, "small_bower": 82}
+    assert scopes(w) == {"best_bower": 83, "small_bower": 83}
 
 
 def test_heave_short_takes_the_anchor_named_and_veers_the_other_cable_as_it_comes(moored_brig):

@@ -1675,7 +1675,7 @@ def test_hove_to_the_master_reckons_her_drift_and_the_run_since_noon_takes_it():
     reckoned = miles_between(account, nav.account_now())
     assert drifted > 3.0 and 0.6 * drifted < reckoned < 1.4 * drifted
     # a third of her drift (1.68 miles of 5.0 since package 37j: the account worked at the
-    # heave-to itself, where the setting of it by hand left the board begun before; 1.84 of
+    # heave-to itself, where the setting of it by hand left the board begun before; 1.82 of
     # 5.0 since package 57, the brig's drift under Steel's staysails stowed and her royals
     # sent down)
     assert error_nm(w) < drifted / 2.6

@@ -3753,10 +3753,7 @@ def test_a_course_across_the_wind_under_the_grant_to_steer_puts_her_about():
     # going astern at three knots, and was judged to have way enough to stay; with the
     # keel's grip astern she falls off and fills and comes to again, and has not)
     world.submit("brace sharp up on the larboard tack")
-    # package 57: steered a point freer than before (70), the windage of the staysails
-    # stowed on their stays between the masts having her luff and go aback at 70 while the
-    # sail was still being set
-    world.submit("steer 80")
+    world.submit("steer 70")
     world.run(1500)
     seated(world, ["Aye."], when_done=Reply())
     world.submit("you may steer")
