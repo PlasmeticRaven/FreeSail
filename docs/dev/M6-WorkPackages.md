@@ -1941,8 +1941,8 @@ with the others; its seam with `portugal` is its only neighbour.
   the generator's (`tools/gen_ships.py`, the main topmast staysail as the pattern, Steel's
   dimensions and canvas numbers from the OCR under `docs/references/steel/`), with the
   shapes right for the period (below), the sail-handling orders and the heavy-weather book
-  reading them, and the ship file regenerated: a small Opus package by the owner's word,
-  folded into the gate as 37's fold-ins were, with the pins it moves re-measured once.
+  reading them, and the ship file regenerated: an M7b package by the owner's word of
+  2026-10-17 (57 in `docs/TechnicalSpec-M7b.md` §24), not a fold-in of this gate.
 - **Quadrilateral or triangular** (the lead's reading for the brief, to be checked against
   Steel's sailmaking tables): through the eighteenth century the lower and the topmast
   staysails between the masts were commonly four-sided, their head set on the stay by hanks

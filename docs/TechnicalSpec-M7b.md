@@ -377,7 +377,14 @@ In waves, written for the owner's approval in turn, each launched on his word:
 - **56 (Opus): fishing, and the glass on a near ship** (§21a, §21b), beside 51 and 52: the
   grounds researched, the gear's evolutions, the catch and the well, the fisherman's parity,
   the glass's tiers.
-- **55 (Opus): the solo director and the gate's scenarios** after 51, 52 and 56: the starter
+- **57 (Opus): the frigate's staysails** beside 53 and 54: her complement between the masts
+  from Steel's list (the main, middle, main topgallant, mizzen, mizzen topmast and mizzen
+  topgallant staysails) through the generator with Steel's dimensions and canvas numbers,
+  the shapes of the period (the lower and middle staysails four-sided, the topgallants
+  triangular, each with Steel's page beside it), the orders and the heavy-weather book
+  reading them, the ship file regenerated, the pins it moves re-measured once; the brig's
+  set checked against Steel's for a brig (the owner's finding at gate 6c, 2026-10-17).
+- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56 and 57: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
 
