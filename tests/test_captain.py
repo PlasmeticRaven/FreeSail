@@ -637,3 +637,54 @@ def test_the_console_and_the_server_take_the_seat_flag():
         src = Path(module.__file__).read_text(encoding="utf-8")
         assert '"--seat"' in src and "seat.route(" in src, module.__name__
     assert "officer" in console.SEAT_HELP
+
+
+def test_a_station_below_the_captains_is_told_who_commands_in_its_session_kind():
+    """Package 52 (42b's leftover): a station below the captain's is told who commands, in
+    its session kind: the human captain at the prompt (and the rules-based captain under
+    him where he sails her by his intent); a model at the captain's station; the
+    rules-based captain by his book with the player seated elsewhere. Told at the seating
+    through the door, and once in a sample when it changes; a test or a race says nothing
+    of it."""
+    from freesail.agents.agent import (
+        COMMANDS_MODEL,
+        COMMANDS_RULES,
+        COMMANDS_RULES_UNDER,
+        OFFICER,
+        SESSION_PLAY,
+        SESSION_SOLO,
+        SESSION_TEST,
+        officer,
+        session_kind_of,
+    )
+
+    w = frigate_world()
+    assert session_kind_of("play", OFFICER, world=w) == SESSION_PLAY
+    assert session_kind_of("test", OFFICER, world=w) == SESSION_TEST
+    intent = scenario_world(INTENT)
+    assert intent.captain.commands
+    told = session_kind_of("play", OFFICER, world=intent)
+    assert told == f"{SESSION_PLAY}; {COMMANDS_RULES_UNDER}"
+    assert "a human captain at the prompt" in told
+    seat_player(intent, "master")
+    told = session_kind_of("play", OFFICER, world=intent)
+    assert told == f"{SESSION_SOLO}; {COMMANDS_RULES}" and "no human captain" in told
+    # the officer seated under the player at the prompt; a model then takes the captain's
+    w = frigate_world()
+    oh = Harness(
+        w,
+        officer(SamplingPolicy.in_lockstep(EVERY, "notable", "urgent"), world=w),
+        Fake(["Noted."], loop=True),
+        session_kind=session_kind_of("play", OFFICER, world=w),
+        save=lambda w, why: None,
+    )
+    oh.start()
+    w.run(EVERY)
+    assert "Who commands" not in json.dumps([t.content for t in oh.turns if t.role == "data"])
+    assert session_kind_of("play", OFFICER, world=w) == SESSION_PLAY
+    seated(w, ["Aye."], loop=True)
+    told = session_kind_of("play", OFFICER, world=w)
+    assert told == f"{SESSION_SOLO}; {COMMANDS_MODEL}"
+    w.run(EVERY + 1)
+    samples = json.dumps([t.content for t in oh.turns if t.role == "data"])
+    assert samples.count("Who commands has changed") == 1 and COMMANDS_MODEL in samples

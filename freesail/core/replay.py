@@ -734,9 +734,12 @@ def load_report(
     # and saved again keeps it; the browser's server reads and cleans it for the chart
     # (`ui.server.take_marks`)
     world.chart_marks = [dict(m) for m in data.get("chart_marks") or [] if isinstance(m, dict)]
-    # the stations bound and unbound by hand (package 41): a replay re-makes none of it
-    # (the world order that will drive it is M7b's), so a load gives the save's back
-    if hasattr(world, "stations"):
+    # the stations bound and unbound by hand (package 41): a replay re-makes them from their
+    # inputs (package 42) and from the world orders that drive them (package 52's
+    # `person:`), and a load gives the save's back for a save from before; only when it
+    # was replayed to its end, since a binding made after the tick handed over at is
+    # not yet made (a person made from words later is nobody yet)
+    if hasattr(world, "stations") and (until_tick is None or until_tick >= int(data["end_tick"])):
         world.stations.load(data.get("stations"))
     # the director's budget as the save had it (package 50): a replay by the acts drives
     # no sample, so the day's samples are the save's; the brief is replayed by its input

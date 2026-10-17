@@ -1598,7 +1598,7 @@ reading_words:
 # two lists one.
 # ---------------------------------------------------------------------------
 world_orders:
-  channels: [weather, ship, message, port, person, captain, mark, seat, unseat, aboard]  # mark: package 45c; seat, unseat: 43; aboard: 50
+  channels: [weather, ship, message, port, person, captain, mark, seat, unseat, aboard, say]  # mark: package 45c; seat, unseat: 43; aboard: 50; say (say as <person>:): 52
   words: [world order, order to the world, order the world]
   refusal: "That is an order to the world, not to the ship: the weather, the other sail, a message, a port and the people ashore are the scenario's and the director's to order, journaled at the driver's mark; the captain orders his ship, sends the boat and reads what the lookout sees."
 

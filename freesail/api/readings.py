@@ -3091,6 +3091,14 @@ def director_readings(world: Any) -> dict[str, Any]:
     cap = getattr(world, "captain", None)
     if cap is not None:
         own["captain"] = cap.words() if hasattr(cap, "words") else str(cap.state)
+    # the player's purse and cargo (package 52; the open item of 50, the owner's goal of
+    # 2026-10-17, spec §21g): what he has to trade with and what is in his hold
+    purse = getattr(world, "purse", None)
+    if purse is not None:
+        own["purse"] = purse.words()
+    hold = getattr(world, "hold", None)
+    if hold is not None:
+        own["cargo"] = hold.words()
     ships.append(own)
     vessels = getattr(getattr(world, "vessels", None), "vessels", None) or []
     for v in vessels:
@@ -3168,6 +3176,14 @@ def director_readings(world: Any) -> dict[str, Any]:
                 news.append(f"{port.name} is closed to {', '.join(port.closed_to)}")
     out["markets"] = markets
     out["news"] = news
+    # the stations held, by whom (package 52): the rule of reach's, whom the director may
+    # not speak as, move or bind
+    from freesail.world.orders import held_words
+
+    try:
+        out["stations_held"] = held_words(world)
+    except Exception:  # noqa: BLE001  (a world with no muster or stations)
+        pass
     out["words"] = _truth_words(out)
     return out
 
@@ -3233,6 +3249,8 @@ def _truth_words(d: dict[str, Any]) -> str:
         bits.append(f"heading {s['heading']}, {s['speed']}")
         if s.get("sail"):
             bits.append(f"sail: {s['sail']}")
+        if s.get("purse"):
+            bits.append(f"the purse {s['purse']}, the hold {s.get('cargo', '')}")
         if s.get("from_the_ship"):
             bits.append(f"from the ship {s['from_the_ship']}")
         if s.get("intent"):
@@ -3247,4 +3265,6 @@ def _truth_words(d: dict[str, Any]) -> str:
     parts.append(weather)
     if d.get("tide"):
         parts.append(f"the tide: {d['tide']['words']}")
+    if d.get("stations_held"):
+        parts.append(f"the stations held (the rule of reach): {d['stations_held']}")
     return ". ".join(parts) + "."

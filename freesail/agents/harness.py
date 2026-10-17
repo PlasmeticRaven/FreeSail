@@ -402,6 +402,20 @@ NO_ANSWER_WORDS = (
     "No answer has come from the {hearer} to your question ({question}?) within {span}; "
     "it may still come, or ask again, or decide without it."
 )
+# A question put to a person nobody holds (package 52; spec M7b §9): the asker's entry in
+# its `asked` (the director's `PERSON_ASKED` before his name), the bound of its wait (the
+# director's `QUESTION_BOUND_S`, a glass), and the words when no answer came in it.
+PERSON_ASKED = "person:"
+PERSON_ANSWER_BOUND_S = A_GLASS_S
+NO_PERSON_ANSWER_WORDS = (
+    "No answer came from {person} to your question ({question}?) within a glass; ask "
+    "again, or decide without it."
+)
+# The lines of words said between people (package 52; spec M7b §15, the owner's note 15 of
+# gate m6a-2): a word told, a question put, an answer, a person's words. Heard by a
+# station within earshot of the speaker, each counts as "a word on deck" for its stand-by.
+WORDS_BETWEEN_PEOPLE = ("agent.told", "agent.asked", "agent.said", "person.spoke")
+WORD_ON_DECK = "a word on deck"  # the event's words (`readings.EVENTS`)
 
 # The nudge (spec §11), in the consent brief's voice: what was seen, what may be done.
 NUDGE_REPEAT = (
@@ -1352,12 +1366,41 @@ class Harness:
             for e in lines:
                 if R.event_matches(spec, e.kind, e.data):
                     return sb.words, e
+            if sb.event == WORD_ON_DECK:
+                for e in lines:
+                    if self._heard_between(e):
+                        return sb.words, e
         if sb.severity is not None:
             floor = Severity(sb.severity).rank
             for e in lines:
                 if e.actor != self.actor and e.severity.rank >= floor:
                     return f"a {e.severity.value} event: {e.text}", e
         return None
+
+    def _heard_between(self, e: Event) -> bool:
+        """Whether the line is a word said between people that this station heard (package
+        52; spec M7b §15): a word told, a question, an answer or a person's words, said by
+        another and not to this station (whose own word wakes it as a word), within earshot
+        of where this station is (`places.earshot`), or named among its hearers."""
+        if e.kind not in WORDS_BETWEEN_PEOPLE or e.actor == self.actor:
+            return False
+        name = self.station.name
+        data = e.data or {}
+        if name in (data.get("heard_by") or ()):
+            return True
+        if e.kind == "person.spoke":
+            return False  # its hearers are named
+        speaker = str(
+            data.get("speaker") or (data.get("station") if e.kind == "agent.said" else "")
+        )
+        addressee = str(data.get("to") if e.kind == "agent.said" else data.get("station") or "")
+        if name in (speaker, addressee) or data.get("by"):
+            return False  # his own words, a word to him, or a standing order's
+        from freesail.world.places import earshot
+
+        world = self.world
+        said_at = place_of(world, speaker or CAPTAIN)
+        return place_of(world, name) in earshot(said_at)
 
     def _in_flight(self, sb: StandBy, out_of_turn: bool) -> str | None:
         """For a stand-by just taken: the reason it ends at once, when what it waits for
@@ -1584,6 +1627,9 @@ class Harness:
         return out
 
     _shape_told: str | None = None  # the shape of another ship last told (package 43)
+    # who commands, as last told to a station below the captain's (package 52): None while
+    # its session kind says it as it was told at the seating
+    _session_told: str | None = None
 
     def _budget_held(self) -> bool:
         """The director held for a spent budget until the next day (spec M7b §5; package
@@ -1620,6 +1666,7 @@ class Harness:
 
             self._shape_told = shape
             self.agent.notices.append(shape_words(self.world))
+        self._commander_notice()
         if self.station.name != MASTER or self.conversation:
             return
         nav = getattr(self.world, "navigation", None)
@@ -1629,6 +1676,30 @@ class Harness:
             # the working marked told is the navigation's, journaled as the station's act
             # so that a replay by the acts marks it too (package 42)
             acts.record(self.world, self.station.name, "working_told", True)
+
+    def _commander_notice(self) -> None:
+        """A station below the captain's told in its session kind who commands (package
+        52): when that changes while it holds the station (a model takes the captain's
+        station or leaves it, the player sits elsewhere, the rules-based captain takes her
+        or gives her back), the next sample says so, once."""
+        from freesail.agents.agent import (
+            SESSION_PLAY,
+            SESSION_SOLO,
+            Authority,
+            commander_of,
+            under_whom,
+        )
+
+        a = self.agent
+        if self.conversation or self._is_directors or self.station.authority is Authority.CAPTAIN:
+            return
+        told = self._session_told or a.session_kind
+        if not told.startswith((SESSION_PLAY, SESSION_SOLO)):
+            return  # a test or a race says nothing of who commands
+        now = under_whom(commander_of(self.world))
+        if now != told:
+            self._session_told = now
+            a.notices.append(f"Who commands has changed: this session is now {now}.")
 
     def _sample(self, reason: str, stood_by: dict[str, Any] | None = None) -> None:
         a = self.agent
@@ -3523,6 +3594,17 @@ class Harness:
         tick = world.clock.tick
         kept: list[tuple[str, str, int]] = []
         for hearer, question, since in asked:
+            if hearer.startswith(PERSON_ASKED):
+                # a person nobody holds, asked while a director sat (package 52): a glass
+                # for its answer, then the asker is told, by a word that wakes a stand-by
+                if tick - since >= PERSON_ANSWER_BOUND_S:
+                    said = NO_PERSON_ANSWER_WORDS.format(
+                        person=hearer[len(PERSON_ASKED) :], question=question
+                    )
+                    a.word = f"{a.word}\n{said}" if a.word else said
+                    continue
+                kept.append((hearer, question, since))
+                continue
             held = holder_of(world, hearer)
             patience = int(getattr(getattr(held, "station", None), "patience_s", 0) or A_GLASS_S)
             if held is None or getattr(held.agent, "released", False):

@@ -40,6 +40,19 @@ file's posts and drawn roles into the ship file, so the muster and the people ag
 names stay the muster's, drawn under the seed; a scenario may name any person by his
 role (`people: [{role: master, name: Mr Pentreath}]` renames the master; a role the
 muster has not got is a person added, as before).
+
+**People made from words, and the company's people by trade** (spec M7b §8; package 52).
+A person may be made from the director's or the player's words (`person: make "Mr Fox", a
+Guernsey pilot of sixty, ashore at Brest, who knew the captain's father`; `freesail.world.
+orders`): a name, a role or none, an age, a place aboard or a port ashore and a line of
+history, kept as his outline (`Outline.age`, `Outline.said`, the words he was made from),
+among the world's people from then on, saved and replayed as the world order that made him
+is. He may come aboard, be bound to a station of the ship, go ashore and leave her at a
+port. And a man of the muster whom the named few do not hold (the cook, the cooper, a
+steward: an idler by his trade) is found by his trade when the director's voice reaches for
+him (`of_the_company`): drawn from the muster under his own name, at his trade's place (the
+cook at the galley), and one of the people from then on. Nothing draws him otherwise, so a
+world in which nobody speaks as him or asks him is as it was.
 """
 
 from __future__ import annotations
@@ -60,6 +73,7 @@ __all__ = [
     "PASS_THE_WORD_S",
     "PEOPLE_DIR",
     "ROLE_WORDS",
+    "TRADE_PLACES",
     "WATCH_KEEPERS",
     "Message",
     "Outline",
@@ -131,6 +145,21 @@ ROLE_WORDS: dict[str, str] = {
     "pilot": "pilot",
 }
 
+# Where a man of the muster by his trade is found when the director's voice reaches for him
+# (package 52; `People.of_the_company`): the cook at his coppers in the galley, the cooper
+# at his casks in the hold, the stewards and servants with their masters aft and below,
+# the clerk at the captain's papers (judgement: where the trade's work is; any other trade
+# on the deck).
+TRADE_PLACES: dict[str, str] = {
+    "cook": "galley",
+    "cooper": "hold",
+    "steward": "gunroom",
+    "servant": "gunroom",
+    "surgeon's mate": "gunroom",
+    "clerk": "cabin",
+    "sailmaker's crew": "sail_room",
+}
+
 
 @dataclass(frozen=True)
 class Outline:
@@ -149,9 +178,21 @@ class Outline:
     drawn: dict[str, str] = field(default_factory=dict)  # {station, rating} for a drawn role
     messenger: bool = False
     note: str = ""  # the generator's note above the role's line in the ship file
+    # a person made from words (package 52): his age in years (0 for none said) and the
+    # words he was made from, as given
+    age: int = 0
+    said: str = ""
 
     def words(self, name: str) -> str:
         """The outline in a sentence or two, for a brief and for `where is`."""
+        if self.said:
+            # a person made from words (package 52): his name, who he is, his age and his
+            # history in one sentence, as the words gave them
+            said = [name, self.rank, *self.traits]
+            if self.age:
+                said.append(_age_words(self.age))
+            said += [h.strip() for h in self.history.split(";")]
+            return " ".join((", ".join(x for x in said if x).rstrip(".") + ".").split())
         head = f"{name}, {self.rank}" if self.rank else name
         parts = [head]
         if self.traits:
@@ -636,7 +677,54 @@ class People:
         for p in self.people:
             if _words(p.surname) == key or _words(p.name) == key:
                 return p
+        # a role the table does not name ('the cook', 'the supercargo', a person made from
+        # words by his role; package 52), after every name, so that nothing found before
+        # is found otherwise
+        for p in self.people:
+            if p.role and _words(p.role) == key:
+                return p
         return None
+
+    def of_the_company(self, words: str, draw: bool = True) -> Person | None:
+        """A person of the ship's company by the words (spec M7b §9; package 52): one of
+        the people (`find`), or a man of the muster by his trade whom the named few do not
+        hold ('the cook', 'the cooper', 'a steward'), drawn from the muster under his own
+        name at his trade's place and added to the people when `draw` (else returned and
+        not added, for a reading that changes nothing). None when nobody answers."""
+        found = self.find(words)
+        if found is not None:
+            return found
+        key = _words(words)
+        for lead in ("a ", "an ", "ship's ", "ships "):
+            key = key.removeprefix(lead)
+        crew = (getattr(self.world.ship, "extra", None) or {}).get("crew")
+        if crew is None or not key:
+            return None
+        used = {p.sailor_id for p in self.people if p.sailor_id}
+        sailor = next(
+            (
+                s
+                for s in crew.sailors
+                if s.trade and _words(s.trade) == key and s.id not in used and s.fit
+            ),
+            None,
+        )
+        if sailor is None:
+            return None
+        trade = str(sailor.trade)
+        pid = trade.replace(" ", "_").replace("'", "")
+        n = sum(1 for p in self.people if p.role == trade)
+        person = Person(
+            pid + (f"_{n + 1}" if n else ""),
+            _address(trade, sailor.name),
+            trade,
+            float(sailor.skill_deck),
+            place=TRADE_PLACES.get(trade, "deck"),
+            sailor_id=sailor.id,
+        )
+        if draw:
+            self.add(person)
+        return person
 
     def add(self, person: Person) -> Person:
         self._build()
@@ -665,10 +753,14 @@ class People:
             return f"at the {p.task}, {place_words(p.where)}"
         if p.pending is not None:
             return f"sent for, on his way to {PLACES[p.pending[0]].name}"
-        if p.role == "pilot" and getattr(
-            getattr(self.world, "ports", None), "pilot_boat_asked", False
+        ports = getattr(self.world, "ports", None)
+        if (
+            p.role == "pilot"
+            and getattr(ports, "pilot_boat_asked", False)
+            and getattr(ports, "pilot", None) in (None, p)
         ):
-            # package 37h: his charge done, he waits for his boat to put him off
+            # package 37h: his charge done, he waits for his boat to put him off (the port's
+            # pilot, not a pilot by trade made from words, package 52)
             return "at the gangway, waiting for his boat"
         if deck is False:
             return OFF_WATCH_WORDS
@@ -742,7 +834,7 @@ class People:
         self._build()
         out = []
         for p in self.people:
-            role = "" if p.role in ("captain", "commander") else f", {p.role}"
+            role = "" if p.role in ("captain", "commander", "") else f", {p.role}"
             if p.role == "pilot" and p.port:
                 # package 37h: the pilot of his port, a supernumerary aboard
                 port = (getattr(getattr(self.world, "ports", None), "ports", None) or {}).get(
@@ -987,3 +1079,42 @@ def _words(text: str) -> str:
         if t.startswith(lead):
             t = t[len(lead) :]
     return t
+
+
+def _age_words(age: int) -> str:
+    """'sixty years of age' (package 52), in words up to a hundred."""
+    return f"{_number_words(age)} years of age"
+
+
+_UNITS = (
+    "",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+)
+_TENS = ("", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety")
+
+
+def _number_words(n: int) -> str:
+    if n <= 0 or n >= 100:
+        return str(n)
+    if n < 20:
+        return _UNITS[n]
+    tens, unit = divmod(n, 10)
+    return _TENS[tens] + (f"-{_UNITS[unit]}" if unit else "")

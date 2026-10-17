@@ -277,7 +277,7 @@ def test_an_order_the_game_has_no_way_to_perform_is_answered_honestly_and_logged
         "news: war declared between Britain and Denmark",
         "aboard: the cook reports the beef cask found rotten",
         "weather: a squall line from the north-west in forty minutes",
-        'say as the carpenter: "She is making a little water, sir."',
+        'say as the harbourmaster of Falmouth: "The packet is in."',
     ):
         said = D.direct(w, text, by="the test")
         assert said.startswith("The game has no way to do this as said"), (text, said)
@@ -753,3 +753,179 @@ def test_the_time_and_the_dates_of_the_budget_are_the_ships():
     late.run(30)
     assert D.next_day_tick(late) - late.clock.tick == 30
     assert R.director_readings(w)["stamp"]
+
+
+# ---------------------------------------------------------------------------
+# Package 52 (spec M7b §8, §9, §15): the director's voice
+# ---------------------------------------------------------------------------
+
+
+def seat_officer(w: World, script: Any) -> Harness:
+    from freesail.agents.agent import officer
+
+    fake = script if hasattr(script, "reply") else Fake(script, loop=False, when_done=reply("Aye."))
+    h = Harness(
+        w,
+        officer(SamplingPolicy.in_lockstep(EVERY, "notable", "urgent"), world=w),
+        fake,
+        save=lambda w, why: None,
+    )
+    h.model_name, h.door = "the fake officer", "mcp"
+    h.start()
+    return h
+
+
+def sample_words(h: Harness) -> str:
+    return json.dumps([t.content for t in h.turns if t.role == "data"])
+
+
+def test_the_rule_of_reach_is_a_refusal_in_the_directors_log_naming_the_stations_held():
+    """Spec M7b §9: the director speaks as anyone no model or player holds, never as a held
+    station: refused outright in words that name the stations held, in its log, counted
+    against nothing; and the same person unheld is spoken for."""
+    w = directed()
+    said = D.direct(w, 'say as the captain: "Make it so."', by="the test")
+    assert said.startswith("Refused, by the rule of reach: Captain Bowen is the captain's")
+    assert "the stations held now: the captain (Captain Bowen, the player at the prompt)" in said
+    assert log_kinds(w)[-1] == "director.refused" and "rule of reach" in log_texts(w)[-1]
+    assert D.budget_of(w).acts == 0 and not [e for e in w.log.all() if e.kind == "person.spoke"]
+    said = D.direct(w, 'say as the carpenter: "She is making a little water, sir."', by="t")
+    assert said.startswith("Done: Mr Chambers spoke on the deck") and D.budget_of(w).acts == 1
+
+
+def test_a_person_made_by_the_director_is_its_act_doubted_by_the_boats_reach_and_logged():
+    w = directed()
+    said = D.direct(w, 'person: make "Mr Fox", a pilot, ashore at Brest', by="the test")
+    assert said.startswith("Done: Mr Fox, pilot; made from words, ashore at Brest")
+    said = D.direct(w, 'person: "Mr Fox" comes aboard as master', by="the test")
+    assert said.startswith("Doubted, not performed: Mr Fox is ashore at Brest")
+    said = D.direct(
+        w, 'person: "Mr Fox" comes aboard as master [reason: a fishing boat brought him]', "t"
+    )
+    assert said.startswith("Done: Mr Fox came aboard from Brest")
+    assert w.stations.holder("master").name == "Mr Fox"
+    assert log_kinds(w)[-3:] == ["director.order", "director.doubted", "director.reentered"]
+
+
+def test_a_question_to_a_person_nobody_holds_waits_for_the_director_and_is_answered_as_him():
+    """Spec M7b §9: `ask the cook ...` from a station, with a director seated, goes to the
+    director's next sample (and its log); the director answers as him with `say as`, which
+    costs no act; the answer is the cook's words in the galley, heard within earshot, and
+    goes back to the asker as a word, which wakes its stand-by."""
+    w = directed()
+    dh = seat_director(w, director_above_the_game([], answers={}))
+    oh = seat_officer(
+        w,
+        [
+            reply(
+                "",
+                call("submit_order", text="ask the cook what is for dinner"),
+                call("stand_by", until="a watch"),
+            ),
+            "Thank you, cook.",
+        ],
+    )
+    w.run(2 * EVERY)
+    cook = w.people.find("the cook")
+    assert cook is not None and cook.where == "galley"
+    asked = [e for e in w.log.all() if e.kind == "agent.asked"]
+    assert asked and asked[0].text == (
+        f"The officer of the watch (Mr Pearce), on the quarterdeck, asks {cook.name}, the "
+        "cook (in the galley): what is for dinner?"
+    )
+    spoke = [e for e in w.log.all() if e.kind == "person.spoke"]
+    assert spoke and spoke[0].text == f"{cook.name}, the cook, in the galley: Aye, sir."
+    assert "officer of the watch" in spoke[0].data["heard_by"]
+    assert "whom nobody holds: what is for dinner?" in sample_words(dh)
+    assert f"{cook.name}, the cook, in the galley, answers your question" in sample_words(oh)
+    # the stand-by was for a watch, and the run is less: the answer woke it
+    assert D.budget_of(w).acts == 0  # an answer is counted against nothing
+    assert "director.asked" in log_kinds(w) and not D.questions_of(w)
+    assert not oh.agent.asked  # the wait ended
+
+
+def test_unanswered_the_askers_stand_by_wakes_after_a_glass():
+    w = directed()
+    seat_director(w, director_above_the_game([]))  # a director that never answers
+    oh = seat_officer(
+        w,
+        [
+            reply(
+                "",
+                call("submit_order", text="ask the cook what is for dinner"),
+                call("stand_by", until="a watch"),
+            ),
+            "Very well.",
+        ],
+    )
+    w.run(EVERY + A_GLASS)
+    assert "No answer came from" in sample_words(oh) and "what is for dinner?) within a glass" in (
+        sample_words(oh)
+    )
+    assert not oh.agent.asked
+    assert not [e for e in w.log.all() if e.kind == "person.spoke"]
+
+
+A_GLASS = 1800
+
+
+def test_with_no_director_seated_the_rules_answer_as_they_did():
+    """The question to the cook with no director: refused as before, in the same words
+    (a world with a brief and none seated, and a world with neither); the masthead
+    answers from what is in sight whoever is seated above."""
+    plain = world_at(49.5, -5.5)
+    briefed = directed()
+    for w in (plain, briefed):
+        e = w.submit("ask the cook what is for dinner")
+        assert e.kind == "order.rejected" and "not an order this ship understands" in e.text
+    assert w.people.find("the cook") is None
+    seat_director(briefed, director_above_the_game([]))
+    e = briefed.submit("ask the lookout what is in sight")
+    assert e.kind == "agent.asked" and "The masthead answers" in e.text
+
+
+def test_an_answer_costs_no_act_and_an_unasked_word_does():
+    w = directed({"name": "one act", "budget": {"samples_a_day": 48, "acts_a_day": 1}})
+    seat_director(w, director_above_the_game([]))
+    w.submit("ask the cook what is for dinner")
+    said = D.direct(w, 'say as the cook: "Pease and pork, sir."', by="the test")
+    assert "an answer, counted against nothing; 1 act of the day's 1 left" in said
+    said = D.direct(w, 'say as the cook: "And duff on Sunday."', by="the test")
+    assert said.startswith("Done:") and D.budget_of(w).acts == 1
+
+
+def test_a_word_said_between_people_and_heard_is_a_word_on_deck_for_the_stand_bys():
+    """Spec M7b §15 (the owner's note 15 of gate m6a-2): a word said between people and
+    heard by another counts as "a word on deck" for the stand-bys: the captain's word to
+    the master on the quarterdeck wakes the officer standing by there; the same word from
+    the cabin does not; a person's words heard in the galley do."""
+    from freesail.agents.agent import master
+
+    def stood(w: World) -> Harness:
+        oh = seat_officer(w, [call("stand_by", until="a word on deck"), "Heard."])
+        mh = Harness(
+            w,
+            master(SamplingPolicy.in_lockstep(EVERY, "notable", "urgent"), world=w),
+            Fake([call("stand_by", until="a watch")], loop=True),
+            save=lambda w, why: None,
+        )
+        mh.model_name, mh.door = "the fake master", "mcp"
+        mh.start()
+        w.run(60)
+        assert oh.agent.standing_by
+        return oh
+
+    w = world_at(49.5, -5.5)
+    oh = stood(w)
+    w.submit("tell the master we make for Falmouth")
+    w.run(2)
+    assert not oh.agent.standing_by
+    w = world_at(49.5, -5.5)
+    oh = stood(w)
+    w.submit("go below")
+    w.submit("tell the master we make for Falmouth")
+    w.run(2)
+    assert oh.agent.standing_by  # said in the cabin: not heard on deck
+    w.world_order('say as the cook: "Dinner, sir."', "the test")
+    w.run(2)
+    assert not oh.agent.standing_by

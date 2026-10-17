@@ -76,7 +76,9 @@ __all__ = [
     "STATION_FACTORIES",
     "captain",
     "cadence_policy",
+    "commander_of",
     "session_kind_of",
+    "under_whom",
     "lookout",
     "master",
     "passenger",
@@ -163,6 +165,17 @@ SESSION_RACE = (
 SESSION_DIRECTOR = (
     "a play session at the director's station, above the game: the player sails his ship "
     "below you, and nobody is over you but the owner at the door"
+)
+# Who commands, told to a station below the captain's in its session kind (package 52; the
+# leftover of 42b's ruling): the kinds above are the consent brief's, and the words after
+# the semicolon say who is over the station. A model at the captain's station, or the
+# rules-based captain by his book with the player seated elsewhere, is no human captain
+# over it (play for its own sake); the player at the prompt is, and the rules-based
+# captain may be sailing her by his book under him.
+COMMANDS_MODEL = "a model holds the captain's station and commands the ship"
+COMMANDS_RULES = "the game's rules-based captain commands the ship by his book"
+COMMANDS_RULES_UNDER = (
+    "the game's rules-based captain sails her by his book under him until he takes her in hand"
 )
 
 # The stations the order grammar knows by name (`ask the watcher ...`), whether or not one
@@ -1706,14 +1719,36 @@ def passenger(
     )
 
 
-def session_kind_of(asked: str, station_kind: str, *, race: bool = False) -> str:
+def commander_of(world: Any) -> str:
+    """Who commands the ship a station is on (package 52): "model" while a model holds the
+    captain's station; "rules" while the rules-based captain commands by his book and no
+    human captain is at the prompt (the player seated at another station, or the ship
+    another's, whose captain is her own); "rules under" while he sails her by his book with
+    the player at the prompt over him; "human" else: the player at the prompt."""
+    held = (getattr(world, "agents", None) or {}).get(CAPTAIN)
+    if held is not None and not held.agent.released and held.started:
+        return "model"
+    seat = getattr(world, "player_seat", None)
+    at_prompt = (seat is None or seat.agent.released) and getattr(world, "parent", None) is None
+    cap = getattr(world, "captain", None)
+    commands = bool(cap is not None and getattr(cap, "commands", False))
+    if not at_prompt:
+        return "rules"
+    return "rules under" if commands else "human"
+
+
+def session_kind_of(asked: str, station_kind: str, *, race: bool = False, world: Any = None) -> str:
     """The kind of session a station is told it is in, from what is true of it (package
     42b; the owner's ruling of 2026-10-17): a race at the regatta, whatever the door was
     asked; a test when the door asks one; at the captain's station, of the player's ship or
     another, and so at a seat the director's hook made, play for its own sake, since the
     one who commands is the model and the owner at the door is no captain at its prompt;
     else play with the human captain at the prompt. `asked` is the door's word (`play`,
-    `test`); `station_kind` the station's kind (`CAPTAIN`, `OFFICER`, ...)."""
+    `test`); `station_kind` the station's kind (`CAPTAIN`, `OFFICER`, ...). With `world`, a
+    station below the captain's is told who commands (package 52, `commander_of`): under a
+    model captain or the rules-based captain with no human captain at the prompt, play for
+    its own sake and by whom; with the player at the prompt, play with a human captain, and
+    the rules-based captain under him where he sails her."""
     if race:
         return SESSION_RACE
     if str(asked or "").strip().lower() == "test":
@@ -1722,6 +1757,19 @@ def session_kind_of(asked: str, station_kind: str, *, race: bool = False) -> str
         return SESSION_SOLO
     if station_kind == DIRECTOR:
         return SESSION_DIRECTOR
+    if world is None:
+        return SESSION_PLAY
+    return under_whom(commander_of(world))
+
+
+def under_whom(commander: str) -> str:
+    """The session kind of a station below the captain's, by who commands (`commander_of`)."""
+    if commander == "model":
+        return f"{SESSION_SOLO}; {COMMANDS_MODEL}"
+    if commander == "rules":
+        return f"{SESSION_SOLO}; {COMMANDS_RULES}"
+    if commander == "rules under":
+        return f"{SESSION_PLAY}; {COMMANDS_RULES_UNDER}"
     return SESSION_PLAY
 
 

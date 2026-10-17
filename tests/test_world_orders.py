@@ -40,9 +40,8 @@ def world_for(ship: str = FRIGATE, **kw):
         gustiness=0.0,
         variability=0.0,
         ship_heading_deg=180.0,
-        position=OPEN_WATER,
         region="channel-west",
-        **kw,
+        **({"position": OPEN_WATER} | kw),
     )
     return make_world(7, ship, sc)
 
@@ -318,3 +317,155 @@ def test_a_point_of_interest_by_world_order_is_seen_as_a_mark_with_its_descripti
     copy = replay.replay(saved, ship_factory)
     assert copy.log.digest() == w.log.digest()
     assert [f.name for f in copy.marks_of_interest] == ["a cask adrift", wreck]
+
+
+# ---------------------------------------------------------------------------
+# Package 52 (spec M7b §8, §9): people made from words and moved, `say as`, the rule of
+# reach, and the movements' doubt
+# ---------------------------------------------------------------------------
+
+OFF_FALMOUTH = {"lat_deg": 50.10, "lon_deg": -5.00}  # some two miles off Falmouth's roads
+
+
+def _fake_officer(w):
+    from freesail.agents import Fake, Harness, SamplingPolicy
+    from freesail.agents.agent import officer
+
+    h = Harness(
+        w,
+        officer(SamplingPolicy.in_lockstep(600, "notable", "urgent"), world=w),
+        Fake(["Noted."], loop=True),
+        save=lambda w, why: None,
+    )
+    h.model_name, h.door = "the fake officer", "mcp"
+    h.start()
+    return h
+
+
+def test_a_person_made_from_words_comes_aboard_is_bound_and_goes_ashore():
+    """`person: "Mr Fox" comes aboard as master`: aboard from his port, the master's station
+    bound to him (its own line), his journal the station's; `leaves the ship at <port>` and
+    `goes ashore`: ashore at the port, his station unbound; each a line of the play log,
+    the order the record's. The master who keeps the reckoning and the captain cannot be
+    put ashore; a person never made is refused, with how to make him."""
+    from freesail.agents.agent import master
+    from freesail.agents.journal import journal_of, person_journal
+
+    w = world_for(position=OFF_FALMOUTH, ports=["falmouth", "brest"])
+    for text in (
+        'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Falmouth',
+        'person: "Mr Fox" comes aboard as master',
+    ):
+        assert w.world_order(text, "the test").data["result"] == "done"
+    fox = w.people.find("Mr Fox")
+    assert fox.aboard and fox.where == "quarterdeck" and w.stations.holder("master") is fox
+    assert events(w, "person.aboard")[-1].text == "Mr Fox came aboard from Falmouth."
+    assert events(w, "station.bound")[-1].text == "The master's station is bound (Mr Fox)."
+    assert journal_of(w, "master") is person_journal(w, fox)
+    assert master(world=w).person == "Mr Fox"  # a model seated there is in his place
+    e = w.world_order('person: "Mr Fox" leaves the ship at Falmouth', "the test")
+    assert e.data["result"] == "done" and not fox.aboard and fox.port == "falmouth"
+    assert events(w, "person.ashore")[-1].text == "Mr Fox left the ship at Falmouth."
+    assert not w.stations.aboard("master")  # the station went with him
+    e = w.world_order('person: "Mr Pascoe" goes ashore', "the test")
+    assert e.data["result"] == "done" and not w.stations.aboard("second officer")
+    for text, words in (
+        ('person: "Mr Harvey" goes ashore', "keeps the reckoning"),
+        ('person: "Captain Bowen" goes ashore', "held by the player at the prompt"),
+        ('person: "Mr Nobody" comes aboard', "make him first"),
+        ('person: "Mr Fox" goes ashore', "ashore already"),
+        ('person: "Mr Pearce" comes aboard', "aboard already"),
+    ):
+        e = w.world_order(text, "the test")
+        assert e.data["result"] == "refused" and words in e.text, e.text
+
+
+def test_the_movements_are_doubted_beyond_a_boats_reach_and_a_person_made_or_a_word_never():
+    w = world_for(ports=["falmouth", "brest"])  # 35 miles off Falmouth
+    w.world_order('person: make "Mr Fox", a pilot, ashore at Brest', "the test")
+    doubt = WO.doubt(w, WO.parse('person: "Mr Fox" comes aboard as master'))
+    assert "no boat brings a man off so far" in doubt and "Brest" in doubt
+    assert "no boat puts a man ashore" in WO.doubt(w, WO.parse('person: "Mr Pearce" goes ashore'))
+    left = WO.doubt(w, WO.parse('person: "Mr Pearce" leaves the ship at Falmouth'))
+    assert "35 miles from Falmouth" in left
+    for text in (
+        'person: make "Mr Gill", a merchant, aboard in the cabin',
+        'say as the carpenter: "She is making a little water, sir."',
+    ):
+        assert WO.doubt(w, WO.parse(text)) is None
+    near = world_for(position=OFF_FALMOUTH, ports=["falmouth", "brest"])
+    near.world_order('person: make "Mr Fox", a pilot, ashore at Falmouth', "the test")
+    assert WO.doubt(near, WO.parse('person: "Mr Fox" comes aboard')) is None
+    assert WO.doubt(near, WO.parse('person: "Mr Pearce" goes ashore')) is None
+
+
+def test_say_as_puts_words_in_a_mouth_heard_within_earshot_and_journaled_as_his():
+    """`say as <person>: <words>`: his words a notable line of the play log where he is
+    (never the order), heard by the stations within earshot (the officer on the
+    quarterdeck hears the cook in the galley, open to the waist; nobody hears the purser
+    in the gunroom), and in his journal as his. A man of the muster by his trade is drawn
+    when he is spoken for; a person ashore is heard only within a boat's reach of his
+    port; a stranger never made is nobody."""
+    from freesail.agents.journal import SAID_KIND, person_journal
+    from freesail.core.events import for_the_record
+
+    w = world_for(position=OFF_FALMOUTH, ports=["falmouth", "brest"])
+    officer_h = _fake_officer(w)
+    w.run(1)
+    for text in (
+        'say as the cook: "Pease and pork, sir."',
+        "say as the purser: The slops are short of shoes.",
+    ):
+        assert w.world_order(text, "the test").data["result"] == "done"
+    cook = w.people.find("the cook")
+    spoke = events(w, "person.spoke")
+    assert spoke[0].text == f"{cook.name}, the cook, in the galley: Pease and pork, sir."
+    assert spoke[0].severity.value == "notable" and not for_the_record(spoke[0])
+    assert spoke[0].data["heard_by"] == ["officer of the watch"]
+    assert spoke[1].data["heard_by"] == [] and spoke[1].data["where"] == "in the gunroom"
+    assert officer_h.agent.heard[-1] == spoke[0].text
+    entries = person_journal(w, cook).entries
+    assert entries[-1].kind == SAID_KIND and "Pease and pork, sir." in entries[-1].text
+    w.world_order('person: make "Mr Fox", an agent, ashore at Falmouth', "the test")
+    w.world_order('person: make "Mr Roy", an agent, ashore at Brest', "the test")
+    assert w.world_order('say as Mr Fox: "The packet is in."', "t").data["result"] == "done"
+    said = events(w, "person.spoke")[-1].text
+    assert said == "Mr Fox, the agent, ashore at Falmouth: The packet is in."
+    far = w.world_order('say as Mr Roy: "Bonjour."', "t")
+    assert far.data["result"] == "refused" and "nobody aboard can hear Mr Roy" in far.text
+    none = w.world_order('say as the harbourmaster: "Welcome."', "t")
+    assert none.data["result"] == "refused" and "make" in none.text
+    assert w.submit('say as the cook: "Aye."').kind == "order.rejected"  # the captain's prompt
+    assert WO.recognises('say as the cook: "Aye."') and not WO.recognises("say all is well")
+
+
+def test_the_rule_of_reach_refuses_a_held_station_and_names_the_stations_held():
+    """Nobody speaks as, moves or binds a station to a person a model or the player holds,
+    whoever gives the order: the captain (the player at the prompt), the officer (a model);
+    the refusal names the stations held. Unheld, the same person is spoken for."""
+    from freesail.agents.seat import seat_player
+
+    w = world_for(position=OFF_FALMOUTH, ports=["falmouth"])
+    assert WO.held_words(w) == "the captain (Captain Bowen, the player at the prompt)"
+    w.world_order('say as Mr Pearce: "All well forward, sir."', "the test")
+    assert events(w, "person.spoke")[-1].text.startswith("Mr Pearce, the first lieutenant")
+    _fake_officer(w)
+    w.run(1)
+    assert WO.held_words(w) == (
+        "the officer of the watch (Mr Pearce, a model); the captain (Captain Bowen, the "
+        "player at the prompt)"
+    )
+    w.world_order('person: make "Mr Fox", a pilot, aboard', "the test")
+    for text, words in (
+        ('say as Mr Pearce: "Aye."', "Mr Pearce is the officer of the watch's, held by a model"),
+        ('say as the captain: "Make it so."', "held by the player at the prompt"),
+        ('person: "Mr Pearce" goes ashore', "nobody moves or binds a person"),
+        ('person: "Mr Fox" comes aboard as officer of the watch', "nobody binds another"),
+    ):
+        e = w.world_order(text, "the test")
+        assert e.data["result"] == "refused" and words in e.text, e.text
+        assert "the stations held now: the officer of the watch (Mr Pearce, a model)" in e.text
+    # the player seated at the master's: the captain is nobody's at the prompt, the master his
+    seat_player(w, "master")
+    held = WO.held_words(w)
+    assert "the master (Mr Harvey, the player at his seat)" in held and "captain" not in held
