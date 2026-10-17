@@ -17,11 +17,11 @@ slow tier once at the end; a section in the tuning notes and a report to the lea
 |---|---|---|---|
 | 50 | Fable | The director proper: the station above the game, the world orders doubted not refused, the brief and its limits, the budget, the hidden log revealed on request and inline in replays | briefed 2026-10-17, brought forward to the close of M6 (decision 50); approved and launched the same day; **built the same day** (spec §2 to §7 as built, the Harness's §19, the primer's chapter 20, the tuning notes; the owner's refinement of the examples-not-a-rule framing in the brief and the channel); **merged 2026-10-17** (the record below) |
 | 52 | Opus | The director's voice: people from words, `say as`, the unseated answered; the word heard a word on deck; the truth of who commands told to every station | briefed 2026-10-17, after 50; **built the same day** (spec §8, §9, §10 and §15 as built; the Harness's §19; the primer's chapters 19 and 20; the tuning notes, "Package 52"; truths 7b-95 to 7b-97); **merged 2026-10-17** (the record below) |
-| 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | brief to write |
-| 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | brief to write |
+| 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | briefed 2026-10-17, for the owner's approval |
+| 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | briefed 2026-10-17, for the owner's approval |
 | 51 | Fable | The observed world: the followed ship in place of the given one, no player's ship, the player on another ship, the replay of a station there; the director's chart, the truth drawn (spec §12a); provisionally the director's focus and the ships' logs by kind and tick range (spec §12b; both the owner's word of 2026-10-17) | brief to write, after 50 |
 | 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | brief to write |
-| 57 | Opus | The frigate's staysails from Steel's list through the generator, the period's shapes; the chasse-marée's rig put right (lug topsails, not square; the lugs slung a third from the fore end and set to leeward of the mast; the trim rule reading a lug as fore-and-aft) and the viewer's draw order by aspect and the brace shown (the owner's notes of the Éclair's first cruise, `docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`) | brief to write |
+| 57 | Opus | The frigate's staysails from Steel's list through the generator, the period's shapes; the chasse-marée's rig put right (lug topsails, not square; the lugs slung a third from the fore end and set to leeward of the mast; the trim rule reading a lug as fore-and-aft) and the viewer's draw order by aspect and the brace shown (the owner's notes of the Éclair's first cruise, `docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`) | briefed 2026-10-17, for the owner's approval |
 | 58 | Opus | The captain's sea sense, third pass (the owner's runs of gate 6c) | brief to write |
 | 59 | Opus | The harbour: a launcher in the browser, the scenario maker, the settings and the doors started from it (the owner, 2026-10-17) | brief to write |
 | 60 | Opus | A ship bought (the owner's design goal of 2026-10-17; spec §21g): listings, the hull's valuation, the ship bought and sold through the market orders, the transfer of the people and the hands, the errand ashore | brief to write, after 51 and 53 |
@@ -181,3 +181,118 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
    its session kind, as 42b told the captain's station (its leftover).
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
+
+## Package 53: people in places (`freesail/world/people.py`, `places.py`; `data/people/*.yaml`, `data/ports/*.yaml` for the ports' places and people; `freesail/orders/` and `data/vocabulary.yaml` for `go`, `come aboard`, `draft a book`, `post`, the market in person; `freesail/orders/port.py`; `freesail/agents/tools.py` for the drafted book and the equal reach; `freesail/world/stations.py` and `agents/seat.py` for several stations of a kind; `docs/agents/Harness.md`; the primer; `docs/TechnicalSpec-M7b.md` §14, §16, §17 as built; `docs/dev/TuningNotes.md`; `tests/test_people.py`, `test_places.py` new, `test_orders_*`, `test_known_truths.py` truths 100 to 102)
+
+Opus, beside 54 and 57; no dependence on the director. The ground is 52's people made from
+words (a person made ashore at a port, come aboard, gone ashore; the galley a place) and
+M6's places of the ship. Spec M7b §14, §16, §17; the owner's rulings of 2026-10-16 (a place is
+an aspect of a person's state, not a simulation; the papers kept in a place are dropped).
+Each item an intent with the lead's reading; the intent binds.
+
+1. **Places and movement** (§14): any person, the player among them, goes where his duty
+   allows and is where he went: `go to the cabin`, `go below`, `go on deck`, `go ashore` (by
+   the boat, at a port's reach), `come aboard`; his place in his state and in the muster;
+   and what he can do depends on it: the deck's orders from the quarterdeck or the deck,
+   the market ashore in person or by the boat from aboard, a book read from anywhere (the
+   owner's ruling). *The lead's reading:* the places exist (`places.PLACES`, `Person.where`);
+   the work is the verbs, the player as a person with a place (on the quarterdeck by
+   default), and the check in the order's domain with the refusal in words naming the way
+   back ("you are in the cabin; go on deck to give the helm an order"). A stationed person
+   below is below in the muster and his deck orders are refused until he comes up (truth
+   100). Nothing moves a person's place by itself but the boat and the watch's routine.
+2. **The port's places** (§14): the quay, the market, the counting house, the tavern, the
+   pilots' office, each with what is done there and who is found there (the port's own
+   people: the harbourmaster, a merchant, the pilots; 52's people placed there by
+   `person: make ... ashore at <port>`); the player ashore buys at the market in person,
+   aboard by the boat (truth 101). *The lead's reading:* a default set of places for every
+   port in `data/ports/` with a port's own additions, read as words into `the port` and
+   `where is`; a person ashore is at one of them; the market's orders check the place.
+3. **Books drafted** (§16): `draft a book "night orders": ...` writes a standing-orders
+   sheet, a note for the ship's papers or a manifest to buy and sell several goods at once,
+   a book in the library with the person's mark; `post the book "night orders"` makes the
+   sheet the standing orders, `give the book "manifest" to the boat` trades it in one
+   errand (truth 102). The papers kept in a place aboard are not built.
+4. **The equal reach** (§17): every stationed person may tell and ask any person aboard or
+   within hail, go where his duty allows, read what is where he is, journal and stand by;
+   the domain orders stay the station's authority. **Several stations of one kind**: the
+   frigate's lieutenants as officers under the first, each with his place and his watch,
+   the deck passing among them by the watch bill. *The lead's reading:* 45c's groundwork
+   (`Stations.bind(name, person, kind)`) takes a second officer as `officer 2` of kind
+   officer; the brief tells each who is first and whose watch is whose; `--seat` and the
+   doors name him by his number or his person.
+5. **Truths 100 to 102 and the records**: §14, §16, §17 as built; the Harness and the primer
+   where they speak of places and the reach; the tuning notes.
+
+## Package 54: needs (`freesail/crew/` the bill and the routine; `freesail/world/places.py` `Stores`; `freesail/world/people.py`; `data/ships/*.yaml` the rations and the stores; `freesail/orders/` and `data/vocabulary.yaml` for `short allowance`, `eat`, `drink`, `sleep`; `freesail/api/readings.py` the purser's reading and the person's needs; `freesail/agents/harness.py` the stand-by asleep below; `docs/agents/Harness.md`; the primer; `docs/TechnicalSpec-M7b.md` §19, §20 as built; `docs/dev/TuningNotes.md`; `tests/test_stores.py` new, `test_people.py`, `test_known_truths.py` truths 103 and 104)
+
+Opus, beside 53 and 57; data and rules on the people, no dependence on the director. Spec
+M7b §19, §20; the owner's rulings (by hand at a filled station to begin with, 2026-10-15;
+never busywork). Each item an intent with the lead's reading; the intent binds.
+
+1. **Provisions and water** (§19): the crew eat and drink on the watches' schedule; the
+   ship's provisions and water fall by the ration a day for her complement (the period's
+   ration from the Regulations, the figures in the ship files: a pound of biscuit, a pound
+   of salt meat or its day's kind, a gallon of beer or a quart of water); the purser's
+   reading says what remains and for how long; the market sells them; `short allowance`
+   is an order that halves the ration with its effect on the hands (the crew factor's
+   fatigue and a line on their temper); water found foul (50's `aboard:`) is drunk at a
+   cost or not drunk. Truth 103. *The lead's reading:* `Stores` already counts water by the
+   ton and provisions by the day; the day's fall by the complement is the new rule, and
+   the reading its words; the ration table is data.
+2. **Hunger, thirst and fatigue** (§20): named people, the player among them, have the three
+   needs in three to five steps each, rising with the ship's time, eased by eating and
+   drinking at a place with food (the cabin, the wardroom, below, the shore) or from the
+   stores, and by sleeping below; notable then urgent lines to the person stationed only
+   ("you are feeling a bit drowsy", "you are quite thirsty", "you are absolutely
+   starving"); once a day to eat and drink and a sleep every day or two; by hand at a
+   filled station (`eat`, `drink`, `sleep` as orders of the person), automatic where
+   nobody is seated and for the crew; `stand by, asleep below until called` a stand-by
+   of its own; never busywork: no line until the second step, and the lines spaced by
+   watches. The milestone stops at the last step's urgent line and a person who falls
+   asleep where he is; the ends are M7's with health. Truth 104. *The lead's reading:* the
+   needs live on `Person` beside his place, stepped by the routine's clock; the crew's
+   fatigue (`crew/hands.py`) stays the crew's and the people's fatigue mirrors it for a
+   person who is also a hand.
+3. **Truths 103 and 104 and the records**: §19, §20 as built; the Harness (the needs in a
+   station's sample; the stand-by asleep); the primer; the tuning notes with the steps'
+   hours and the reasons.
+
+## Package 57: the rig through the generator (`tools/gen_ships.py`; `data/ships/frigate-36.yaml`, `brig.yaml`, `lugger.yaml` regenerated; `freesail/ship/` the sails' classes and the trim; the heavy-weather books (`data/standing_orders/`, `freesail/world/captains.py`); `client/shipview.js` and `freesail/agents/pictures.py` for the picture; `docs/dev/TuningNotes.md`; `docs/TechnicalSpec-M7b.md` §24's 57 as built; `tests/test_ships.py`, `test_shipview.py` or where the viewer's scene is tested, `test_known_truths.py` a truth for the lugger's lugs and one for the frigate's staysails)
+
+Opus, beside 53 and 54. The owner's findings at gate 6c (the frigate's staysails; the brig's
+set) and his notes on the Éclair's first cruise (`docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`, with his pictures). The ship files are generated: every change goes through `tools/gen_ships.py` with its source cited beside it, as the files do today, never by hand. Each item an intent with the lead's reading; the intent binds.
+
+1. **The frigate's staysails from Steel's list**: her complement between the masts (the
+   main, middle, main topgallant, mizzen, mizzen topmast and mizzen topgallant staysails)
+   with Steel's dimensions and canvas numbers, the shapes of the period (the lower and
+   middle staysails four-sided, the topgallant staysails triangular), each with Steel's
+   page beside it in the generator; the orders to set and take them in; the heavy-weather
+   books reading them (lying to under a staysail; the storm staysails as M6's package left
+   them); the ship file regenerated; **the pins it moves re-measured once**, the old figure
+   beside the new and the reason in the tuning notes; the brig's set checked against
+   Steel's for a brig and put right where it differs.
+2. **The chasse-marée's rig put right** (the owner's notes 1 to 4): her topsails are lug
+   topsails, fore-and-aft sails set above the lower lugs and trimmed with them, not square
+   topsails braced by the yards; today `lugger.yaml` classes them `square` with Forfait's
+   braces and lifts, and the trim rule braces them as yards while the lugs are sheeted as
+   fore-and-aft sails, so that the two disagree at every point of sailing and the ship is
+   taken aback on a shift or a turn (three times in the owner's cruise). *The lead's
+   reading:* a class for the lug topsail, trimmed as a lug with the lower lug's sheet and
+   dip, keeping the braces and lifts Forfait gives them (pp. 52 to 55, cited in the file)
+   for the setting and the picture, not for a square trim; the lugs slung a third of the
+   yard from the fore end with two thirds of the sail abaft and to leeward of the mast,
+   dipped round it at the tack (the owner's confirmation of 2026-10-17; the settee and
+   lateen rule alike where the generator meets them later); the lugger's pins re-measured
+   once as in item 1. Where Forfait and the owner's reading of the lug topsail differ, say
+   so in the tuning notes and take Forfait for the parts and the owner for the handling.
+3. **The viewer and the picture** (the owner's note 5 and the lead's finding of 18:29):
+   the draw order by the aspect (the sail before the mast hides it from ahead; from
+   astern the mast hides the sail), the yards' brace shown in the drawing, the lug drawn
+   on its side of the mast with the yard slung as the file has it, on either tack and
+   running; the station's picture (`pictures.py`) the same, since it is the page's drawing.
+4. **Truths and the records**: a truth that the lugger close-hauled on either tack at seed
+   7 shows every lug to leeward of its mast and no sail aback through a tack and a wear,
+   and one that the frigate lies to under a staysail by the heavy-weather book in the
+   gale trial; §24's 57 as built; the tuning notes (Steel's and Forfait's pages, the pins
+   moved, found on the way).
