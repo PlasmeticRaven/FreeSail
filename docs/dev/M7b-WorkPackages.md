@@ -289,6 +289,19 @@ set) and his notes on the Éclair's first cruise (`docs/playtests/2026-10-17-ecl
    lateen rule alike where the generator meets them later); the lugger's pins re-measured
    once as in item 1. Where Forfait and the owner's reading of the lug topsail differ, say
    so in the tuning notes and take Forfait for the parts and the owner for the handling.
+   **Set flying** (the owner's note of 2026-10-17, the lead's reading agreeing): the lug
+   topsail is a flying sail, its yard swayed up from the deck with the sail bent on the
+   topmast halyard, sheeted to the lower lug yard's peak, and sent down whole when taken
+   in; nothing is furled aloft, and in a breeze the topmast itself is struck and housed
+   (Forfait pp. 52 to 55 and Lescallier p. 408 for the lugger; the Deal and Cornish
+   luggers alike). The same class covers the royals of Steel's day, set flying with the
+   yard sent up and down with the sail and sent down at night or in a breeze (Steel 1794;
+   Falconer, art. ROYAL), and the studding sails later. So a sail class *flying*, with two
+   states, *sent down* (on deck or in the top) and *swayed up*, worked by hands on deck
+   rather than topmen aloft, never reefed aloft, and taken in whole as the wind rises; the
+   lugger's topsails in it now, the frigate's royals where Steel's practice of 1794
+   supports it (the builder checks Steel's article and says in the tuning notes where the
+   sources disagree), the viewer drawing a sent-down sail as absent and its yard on deck.
 3. **The viewer and the picture** (the owner's note 5 and the lead's finding of 18:29):
    the draw order by the aspect (the sail before the mast hides it from ahead; from
    astern the mast hides the sail), the yards' brace shown in the drawing, the lug drawn
