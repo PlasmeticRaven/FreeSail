@@ -882,6 +882,18 @@ In waves, written for the owner's approval in turn, each launched on his word:
   merchant book's track into Bertheaume's road, all sail in a chase, the station's regain
   against the wearing order, the lay line and the sea-route mark, Roscoff's and St Mary's
   tracks. Beside 53 and 54.
+  **And the sample's deltas** (the owner's observation of 2026-10-17 after the Éclair's
+  cruise: a model acts on a snapshot while a human watches the change, and the delta,
+  with time folded in, is what it cannot intuit): the head of every station's sample says
+  what changed since its last turn as rates over the time elapsed ("since your last turn,
+  twenty-three minutes: the land has closed from three miles to nine cables; the wind has
+  backed two points; the water has shoaled from thirteen fathoms to eight"); an "at this
+  rate" reading, `ahead`, of what she meets on this course and speed with the stream
+  allowed within the hour and when (the rules captain's time-to-danger as words for every
+  station: "the Triagons abeam in forty minutes at two miles; the land under Cézembre
+  close aboard in an hour and a quarter"); and the cost of thinking, the ship's time the
+  station's last turn took, said in the sample so that a slow door stands by for shorter
+  intervals. The parity test lists `ahead` for every station.
 - **59 (Opus): the harbour, the scenario maker and the settings** (§21d to §21f), beside
   53 and 54: a page of the game's own server, so built and tested here headless and proved
   by the owner on Windows; the Windows-only pieces (the desktop client's configuration path,
