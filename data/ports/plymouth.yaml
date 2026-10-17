@@ -105,3 +105,18 @@ tracks:
   to_sea: [cawsand-bay, 50 11 N 4 18 W]
   from_sea: [50 11 N 4 18 W, cawsand-bay]
   in: [plymouth-sound-anchorage]
+
+# The port's own places ashore (package 53; spec M7b §14), beside every port's
+# (freesail/world/places.py PORT_PLACES). Judgement: the King's dockyard at Plymouth Dock
+# and the port admiral's office, through which a ship of war's orders came.
+places:
+  - id: dockyard
+    name: the dockyard
+    done: "a ship of war's demands are surveyed and supplied from the King's stores"
+    found: "the master attendant, the storekeeper and the shipwrights"
+    roles: [master attendant, storekeeper, shipwright]
+  - id: port_admiral
+    name: the port admiral's office
+    done: "a ship of war's orders are given and her letters taken"
+    found: "the port admiral's secretary and the officers waiting on him"
+    roles: [port admiral, secretary, flag lieutenant]

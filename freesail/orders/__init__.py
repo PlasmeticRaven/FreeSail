@@ -84,6 +84,11 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
         # a sentence to an agent's station (spec M4 §12): `ask the watcher ...`, `stand
         # down the watcher`, `resume the watcher`, `show the watcher's journal`
         return stations.handle(ship, text)
+    from freesail.world import books
+
+    if books.recognises(text):
+        # a book drafted, posted, given to the boat or read (spec M7b §16; package 53)
+        return books.handle(ship, text)
     vocab = load_vocabulary()
     refused = vocab.refused(text)
     if refused is not None:
@@ -109,6 +114,14 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
     if order.verb in vocab.readings:
         # a reading asked at the prompt (package 33c): a query, in the registry's words
         return prompt.answer(ship, order, text, vocab)
+    spec = vocab.verbs.get(order.verb)
+    if spec is not None:
+        # where the giver is (spec M7b §14; package 53, truth 100): the deck's orders from
+        # the quarterdeck or the deck, the boat sent from aboard; refused in words naming
+        # the way back. Nothing for an order with no person behind it.
+        from freesail.world import movement
+
+        movement.check(ship, order.verb, spec.object)
     runner = ship.extra.get("evolutions") if hasattr(ship, "extra") else None
     giving = getattr(runner, "giving", None)
     if giving is None:

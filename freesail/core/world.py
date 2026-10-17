@@ -1813,6 +1813,17 @@ class World:
         captain = getattr(self, "captain", None)
         if captain is not None:
             captain.tick()
+        # the deck passing among the officers of the watch by the bill (spec M7b §17;
+        # package 53): on the hour, where two of their stations are held
+        when = self.clock.ship_time
+        if (
+            when.second == 0
+            and when.minute == 0
+            and (self.agents or getattr(self, "player_seat", None))
+        ):
+            from freesail.agents import watches
+
+            watches.tick(self)
         # the agents (spec M4 §11): after the book, so a sample carries the tick whole
         for agent in list(self.agents.values()):
             agent.on_tick()

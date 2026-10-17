@@ -26,7 +26,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 |---|---|---|---|
 | 50 | Fable | The director proper: the station above the game, the world orders doubted not refused, the brief and its limits, the budget, the hidden log revealed on request and inline in replays | briefed 2026-10-17, brought forward to the close of M6 (decision 50); approved and launched the same day; **built the same day** (spec §2 to §7 as built, the Harness's §19, the primer's chapter 20, the tuning notes; the owner's refinement of the examples-not-a-rule framing in the brief and the channel); **merged 2026-10-17** (the record below) |
 | 52 | Opus | The director's voice: people from words, `say as`, the unseated answered; the word heard a word on deck; the truth of who commands told to every station | briefed 2026-10-17, after 50; **built the same day** (spec §8, §9, §10 and §15 as built; the Harness's §19; the primer's chapters 19 and 20; the tuning notes, "Package 52"; truths 7b-95 to 7b-97); **merged 2026-10-17** (the record below) |
-| 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | briefed 2026-10-17; approved and launched the same day, the three together |
+| 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | briefed 2026-10-17; approved and launched the same day, the three together; **built the same day** (spec §14, §16, §17 and §18 as built; the Harness's §21; the primer's chapters 14 and 19; the tuning notes, "Package 53"; truths 7b-100 to 7b-102); **merged 2026-10-17** (the record below) |
 | 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | briefed 2026-10-17; approved and launched the same day, the three together; **built the same day** (spec §19, §20 and §21 as built; the Harness's §20; the primer's chapters 14 and 19; the tuning notes, "Package 54"; truths 7b-103 and 7b-104); **merged 2026-10-17** (the record below) |
 | 51 | Fable | The observed world: the followed ship in place of the given one, no player's ship, the player on another ship, the replay of a station there; the director's chart, the truth drawn (spec §12a); provisionally the director's focus and the ships' logs by kind and tick range (spec §12b; both the owner's word of 2026-10-17) | brief to write, after 50 |
 | 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | briefed 2026-10-17, for the owner's approval |
@@ -190,6 +190,45 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
    its session kind, as 42b told the captain's station (its leftover).
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
+
+### Package 53 as merged (2026-10-17)
+
+Merged `--no-ff` from the builder's worktree (six commits on `e9c9581`; 37 files, ~3,200
+lines) over package 54's merge, the conflicts in the people file, the truths, the Harness,
+the tuning notes and the waves table resolved by the lead by keeping both packages'
+additions (the Harness's new sections are §20 the needs and §21 people in places); ruff
+clean; the fast tier on the merged tree by the lead. The builder's whole slow tier ran once
+on the tree before its last fixes (the two failures it found mended), its rerun cut off by
+the container's restart; the slow tier of the twelve files touched passed on the final tree
+and the pace tests alone; **the whole slow tier runs once on the merged tree when 57 lands**
+(`docs/dev/TuningNotes.md`, "Package 53"). No pin moved in the end: truth 78's digest had
+moved when the port's places were put in `the port`, and is back since they are their own
+question, `the places ashore`.
+
+Built as briefed: `go below`, `come on deck`, `go to the <place>`, `go aloft`, `go ashore`
+and `come aboard`; the deck's orders only from the quarterdeck or the deck, refused
+elsewhere in words naming the way back; the captain's cabin his own; every port with a
+quay, market, counting house, tavern and pilots' office and three ports with places of
+their own; the player at the market in person; `draft a book`, `post the book`, `give the
+book ... to the boat`; the equal reach; the frigate's third officer, officers by number or
+by person, the deck passing by the bill at the change of the watch, the first lieutenant
+keeping no watch. New modules `world/movement.py`, `world/books.py`, `agents/watches.py`.
+
+**Taken another way, accepted by the lead:** the port's places are their own question and
+not part of `the port` (the pin); where a man is for the deck's check is where he went by
+his own word, not where the reckoning sits the master; a station bound to nobody moves
+nobody. **Found and fixed on the way:** 45c's second officer briefed in the first's
+person's place; the owner's wardroom save grounding at the Goulet in replay from the
+master-captain sat below by the reckoning.
+
+**Open items, carried:** `tell` to a person nobody holds refused with no director seated
+(truth 96); the officer domain's kept-back `go below`/`come on deck` entries moot; the
+frigate officer's brief near 16k tokens (the handover test's door at 17,000); `the stations`
+says "a officer of the watch's"; going ashore leaves the master-captain's reckoning
+running; only three ports have places of their own; a model captain's station holds the
+deck by right while an officer also holds it (as before); after 54's merge, a woken person
+should stay below rather than return to where he turned in (54's note, now that `go on
+deck` exists).
 
 ### Package 54 as merged (2026-10-17)
 

@@ -846,6 +846,7 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
     role, quals, age, history, rank = "", [], 0, [], ""
     aboard: bool | None = None
     place, port_words = "", ""
+    ashore_said: list[tuple[str, str]] = []
     for phrase in [" ".join(x.split()) for x in str(rest).split(",") if x.strip()]:
         low = phrase.lower()
         am = _AGE.match(low)
@@ -884,6 +885,11 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
         if m is not None and ports is not None and ports.find(m.group("port")) is not None:
             aboard, port_words = False, m.group("port").strip()
             continue
+        # a place ashore ('in the tavern', 'at the counting house'; package 53), read once
+        # the port is known, and his history's words else
+        m = _IN_PLACE.match(phrase) or _AT_PORT.match(phrase)
+        if m is not None:
+            ashore_said.append((phrase, m.groupdict().get("place") or m.group("port") or ""))
         history.append(phrase)
     port = None
     if aboard is False:
@@ -899,6 +905,16 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
     else:
         aboard = True
         place = place or TRADE_PLACES.get(role, "cabin")
+    ashore_at = ""
+    if not aboard and port is not None:
+        from freesail.world.places import find_port_place
+
+        for phrase, words in ashore_said:
+            found = find_port_place(port, words)
+            if found is not None:
+                ashore_at = found.id
+                history.remove(phrase)
+                break
     outline = Outline(
         role=role,
         rank=rank or role,
@@ -917,9 +933,14 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
         aboard=bool(aboard),
         port=port.id if port is not None else None,
         outline=outline,
+        ashore_at=ashore_at,
     )
     world.people.add(person)
     where = place_words(place) if aboard else f"ashore at {port.name}"
+    if ashore_at:
+        from freesail.world.movement import ashore_place_words
+
+        where += f", {ashore_place_words(ashore_at, port)}"
     data: dict[str, Any] = {"id": pid, "name": name, "role": role, "aboard": bool(aboard)}
     if age:
         data["age"] = age
@@ -927,6 +948,8 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
         data["place"] = place
     else:
         data["port"] = port.id
+        if ashore_at:
+            data["ashore_at"] = ashore_at
     return f"{person.outline_words().rstrip('.')}; made from words, {where}", data
 
 

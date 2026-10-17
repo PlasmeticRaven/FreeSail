@@ -48,6 +48,7 @@ from freesail.agents.agent import (
     AgentState,
     domain_of,
     door_words,
+    make_bound,
     station_name,
 )
 from freesail.agents.harness import Harness
@@ -94,6 +95,9 @@ def seat_station(world: Any, station: str) -> tuple[str, Any]:
     key = station_name(" ".join(str(station).lower().split()))
     name = SEAT_STATIONS.get(key, key)
     stations = getattr(world, "stations", None)
+    if stations is not None and name != DIRECTOR:
+        # by its number or its person (package 53: '--seat "officer 2"', '--seat "Mr Russell"')
+        name = stations.resolve(name)
     if name == DIRECTOR and stations is not None and not stations.aboard(DIRECTOR):
         # the director's station is bound on the World when the player sits at it
         # (package 50): an input, so that a replay binds it again before the seat
@@ -157,12 +161,9 @@ class PlayerSeat:
         if old is not None and not old.agent.released:
             raise OrderError(f"The player is seated already, at the {old.station.name}'s station.")
         self.world = world
-        self.station = make(world=world)
-        if self.station.name != name:
-            # a station bound by hand under its own name (package 41)
-            import dataclasses
-
-            self.station = dataclasses.replace(self.station, name=name)
+        # a station bound under its own name (package 41), made for its holder where its
+        # kind's factory takes the name (package 53: the second officer's)
+        self.station = make_bound(make, name, None, world)
         self.agent = AgentState(self.station, session_kind=SESSION_PLAY)
         self.agent.stationed_tick = world.clock.tick
         self.agent.last_heard_tick = world.clock.tick

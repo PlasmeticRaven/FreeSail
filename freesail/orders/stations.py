@@ -567,6 +567,7 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             )
         return _deck(ship, agents, verb, text, seat)
     if verb in ("ask", "tell") and not by:
+        _within_hail(ship, text, verb)
         routed = _to_the_director(ship, text, verb, speaker)
         if routed is not None:
             return routed
@@ -634,6 +635,51 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             {"station": station},
         )
     return "agent.resume", agent.resume("the captain"), {"station": station}
+
+
+def _within_hail(ship: Any, text: str, verb: str) -> None:
+    """The reach of a word or a question (spec M7b §17; package 53): to a person aboard
+    from aboard, or ashore from ashore at the same port; aboard and ashore are out of hail
+    of each other, and the refusal says so and what reaches him (a letter by the boat).
+    Nothing is checked where the people have not been mustered (nobody has moved)."""
+    from freesail.orders.prompt import world_of
+    from freesail.world import movement
+
+    world = world_of(ship)
+    if world is None or not movement._mustered(world):
+        return
+    actor = str((getattr(ship, "extra", None) or {}).get("order_actor") or "captain")
+    me = movement.person_of_actor(world, actor)
+    if me is None:
+        return
+    norm = " ".join(text.split())
+    head = r"(?:tell|say\s+to)" if verb == "tell" else "ask"
+    m = re.match(rf"^{head}\s+(?:the\s+)?(?P<rest>.+)$", norm, re.I)
+    rest = normalise(m.group("rest") if m else norm)
+    station = _station_in(rest, ship)
+    stations = getattr(world, "stations", None)
+    them = None
+    if station is not None and stations is not None:
+        try:
+            them = stations.holder(station)
+        except Exception:  # a binding that cannot be read names nobody
+            them = None
+    else:
+        words = rest.split()
+        for n in range(min(4, len(words)), 0, -1):
+            try:
+                them = world.people.find(" ".join(words[:n]))
+            except Exception:
+                them = None
+            if them is not None:
+                break
+    if them is None or them is me or movement.within_hail(world, me, them):
+        return
+    raise OrderError(
+        f"{them.name} is {movement.where_words(world, them)}, and you are "
+        f"{movement.where_words(world, me)}: he is out of hail. A letter by the boat reaches "
+        "him, or go where he is."
+    )
 
 
 def _unheld_person(ship: Any, who: str) -> tuple[Any, int] | None:
@@ -864,6 +910,8 @@ def _deck(
                     "station or its person before the comma ('master, you may heave to')."
                 )
             target = named
+    elif verb in ("you have the deck", "i have the deck"):
+        target = _officer_meant(ship, agents, verb, deck, seat)
     agent = _held(agents, target, seat)
     if agent is None:
         if target == OFFICER:
@@ -876,16 +924,18 @@ def _deck(
         m = _GIVE_DECK.match(deck)
         assert m is not None
         who = " ".join((m.group("who") or "").split())
+        if who and target != OFFICER and _station_in(normalise(who), ship) == target:
+            who = ""  # the station named by its number or its person: he is the one meant
         return (
             "agent.deck",
             agent.give_deck(by="the captain", name=who),
-            {"station": OFFICER, "deck": "given", "name": who},
+            {"station": target, "deck": "given", "name": who},
         )
     if verb == "i have the deck":
         return (
             "agent.deck",
             agent.take_deck(by="the captain"),
-            {"station": OFFICER, "deck": "taken"},
+            {"station": target, "deck": "taken"},
         )
     if verb == GENERAL_GRANT:
         _, words = _general(text) or (verb, "")
@@ -916,6 +966,34 @@ def _deck(
         agent.allow(grant.verb, grant.words, grant=grant),
         {"station": target, "allowed": grant.verb, "words": grant.words, "thing": grant.thing},
     )
+
+
+def _officer_meant(ship: Any, agents: dict[str, Any], verb: str, deck: str, seat: Any) -> str:
+    """Which officer's station the deck's sentence is to, where a ship has several of the
+    kind (package 53; spec M7b §17): `Mr Russell, you have the deck` or `third officer,
+    you have the deck` to the station his name or its own names; `I have the deck` from
+    whichever of them has it; the officer of the watch's otherwise, as always."""
+    from freesail.agents.agent import officer_stations
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    if world is None:
+        return OFFICER
+    officers = officer_stations(world)
+    if len(officers) < 2:
+        return OFFICER
+    if verb == "you have the deck":
+        m = _GIVE_DECK.match(deck)
+        who = " ".join(((m.group("who") if m else "") or "").split())
+        named = _station_in(normalise(who), ship) if who else None
+        if named in officers:
+            return named
+        return OFFICER
+    for name in officers:
+        held = _held(agents, name, seat)
+        if held is not None and getattr(held.agent, "deck", False):
+            return name
+    return OFFICER
 
 
 def _verb_in(rest: str) -> tuple[str | None, str]:

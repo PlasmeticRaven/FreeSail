@@ -39,17 +39,24 @@ import yaml
 from freesail import units
 
 __all__ = [
+    "DEFAULT_ASHORE",
     "PAPERS_PATH",
     "PLACES",
+    "PORT_PLACES",
     "Hold",
     "Paper",
     "Papers",
     "Place",
     "Places",
+    "PortPlace",
     "Purse",
     "Stores",
+    "ashore_place_of",
     "earshot",
+    "find_port_place",
     "place_words",
+    "port_place_lines",
+    "port_places",
 ]
 
 PAPERS_PATH = Path(__file__).resolve().parents[2] / "data" / "papers" / "papers.yaml"
@@ -192,6 +199,137 @@ class Places:
     def describe(self) -> list[str]:
         """`the places`: each place aboard with its description."""
         return [f"{p.name[:1].upper()}{p.name[1:]}: {p.description}." for p in PLACES.values()]
+
+
+# ---------------------------------------------------------------------------
+# The port's places (spec M7b §14; package 53)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class PortPlace:
+    """A place ashore at a port: a name, what is done there and who is found there, in
+    words, no more (the owner, 2026-10-16: a place is an aspect of a person's state, not
+    a simulation). `roles` are the roles of a person made ashore who is found there by
+    default (`ashore_place_of`)."""
+
+    id: str
+    name: str  # "the quay"
+    done: str  # what is done there
+    found: str  # who is found there, in words
+    roles: tuple[str, ...] = ()
+
+
+# Every port's places, in the order `the port` lists them (judgement on the period's
+# seaport: the quay where the boats land and the lighters load, the market and its
+# dealers, the merchants' counting houses, the tavern where the talk is, the pilots'
+# office or their watch-house). A port's file may add its own (`places:` in
+# `data/ports/<port>.yaml`: the packet office at Falmouth, the dockyard at Plymouth).
+PORT_PLACES: dict[str, PortPlace] = {
+    p.id: p
+    for p in (
+        PortPlace(
+            "quay",
+            "the quay",
+            "the boats land and take off people and letters, and the lighters load",
+            "the harbourmaster, the watermen and the lightermen",
+            ("harbourmaster", "waterman", "lighterman", "boatman"),
+        ),
+        PortPlace(
+            "market",
+            "the market",
+            "the port's goods are bought and sold in person at the prices of the day, and "
+            "carted to the quay for the lighter",
+            "the dealers and the factors",
+            ("dealer", "factor", "chandler", "trader"),
+        ),
+        PortPlace(
+            "counting_house",
+            "the counting house",
+            "the merchants' business: freights, bills and cargoes for another port",
+            "the merchants and their clerks",
+            ("merchant", "clerk", "agent", "supercargo", "owner", "banker", "consul"),
+        ),
+        PortPlace(
+            "tavern",
+            "the tavern",
+            "the talk of the port is heard, and hands and passages are asked after",
+            "seamen ashore, masters of merchantmen and the talk of the quay",
+            ("seaman", "master", "mate", "landlord", "publican", "smuggler"),
+        ),
+        PortPlace(
+            "pilots_office",
+            "the pilots' office",
+            "a pilot is engaged and the state of the channel and the tides asked",
+            "the pilots of the port not at their stations",
+            ("pilot",),
+        ),
+    )
+}
+
+# Where a person ashore is when nothing said puts him elsewhere (judgement): the quay,
+# where the boat landed him.
+DEFAULT_ASHORE = "quay"
+
+
+def port_places(port: Any) -> dict[str, PortPlace]:
+    """A port's places: every port's (`PORT_PLACES`) and its file's own additions
+    (`Port.places`, read from `places:` in the file), by id, in that order."""
+    out = dict(PORT_PLACES)
+    for entry in getattr(port, "places", None) or []:
+        pid = _place_key(str(entry.get("id") or entry.get("name") or ""))
+        if not pid:
+            continue
+        name = str(entry.get("name") or pid.replace("_", " "))
+        if not name.lower().startswith("the "):
+            name = f"the {name}"
+        out[pid] = PortPlace(
+            pid,
+            name,
+            " ".join(str(entry.get("done") or "").split()),
+            " ".join(str(entry.get("found") or "").split()),
+            tuple(str(r).lower() for r in (entry.get("roles") or [])),
+        )
+    return out
+
+
+def find_port_place(port: Any, words: str) -> PortPlace | None:
+    """A place of the port by any of its words ('the market', 'market', 'the pilots
+    office', 'counting house'); None when the port has none so called."""
+    key = _place_key(words)
+    for p in port_places(port).values():
+        if key in (p.id, _place_key(p.name)):
+            return p
+    return None
+
+
+def ashore_place_of(port: Any, role: str) -> str:
+    """Where a person ashore at a port is found by his role when nothing said puts him
+    elsewhere: a pilot at the pilots' office, a merchant at the counting house, a dealer
+    at the market; anyone else on the quay (`DEFAULT_ASHORE`)."""
+    words = " ".join(str(role or "").lower().split())
+    last = words.split()[-1] if words else ""
+    for p in port_places(port).values():
+        if words in p.roles or last in p.roles:
+            return p.id
+    return DEFAULT_ASHORE
+
+
+def port_place_lines(port: Any, people_there: dict[str, list[str]] | None = None) -> list[str]:
+    """`the port`'s places in words, one a line: each with what is done there and who is
+    found there, the people of the world ashore there by name after them."""
+    out = []
+    for p in port_places(port).values():
+        names = (people_there or {}).get(p.id) or []
+        found = p.found + (f"; and {', '.join(names)}" if names else "")
+        out.append(f"{p.name[:1].upper()}{p.name[1:]}: {p.done}; found there, {found}.")
+    return out
+
+
+def _place_key(words: str) -> str:
+    text = str(words).lower().replace("’", "'").replace("'", "").replace("-", " ")
+    text = " ".join(text.replace("_", " ").split()).removeprefix("the ")
+    return text.replace(" ", "_")
 
 
 # ---------------------------------------------------------------------------

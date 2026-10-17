@@ -176,6 +176,16 @@ def execute(ship: Any, order: Order) -> Result:
         return "yard.demanded", text, {"verb": verb, "level": 1} | data
     if verb in ("buy", "sell"):
         bargains = _bargains(rest)
+        from freesail.world import movement
+
+        actor = (ship.extra or {}).get("order_actor") or "captain"
+        person = movement.market_way(world_of(ship), actor)
+        if person is not None:
+            # ashore at the market, in person (spec M7b §14; package 53, truth 101): the
+            # prices read there, the goods by the port's lighter, no boat
+            read = [(verb, *_tons_and_good(words, verb)) for words in bargains]
+            text, data = ports.trade_list(read, person=person)
+            return "market.bargain", text, {"verb": verb, "level": 1} | data
         if len(bargains) == 1:
             tons, good = _tons_and_good(rest, verb)
             text, data = ports.trade(verb, tons, good)

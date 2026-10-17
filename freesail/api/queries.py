@@ -519,7 +519,18 @@ def muster_lines(world: World) -> list[str]:
     if crew is None:
         return ["There is no ship's company mustered in this ship."]
     sail_room(world.ship)  # gives the crew its sail room for the muster's line (spec 3b §6.3)
-    return crew.describe(world.clock)
+    lines = crew.describe(world.clock)
+    people = getattr(world, "people", None)
+    if people is not None and getattr(people, "_built", False):
+        # the named few in their places (spec M7b §14; package 53, truth 100): where each
+        # is, by his state, as `the people` says it; once they are mustered, so that the
+        # muster (a driver's query, never replayed) musters nobody
+        lines.append(
+            "The people's places: "
+            + "; ".join(f"{p.name}, {people.state_words(p)}" for p in people.all)
+            + "."
+        )
+    return lines
 
 
 def sail_room_lines(world: World) -> list[str]:

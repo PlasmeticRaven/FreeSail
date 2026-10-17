@@ -505,7 +505,9 @@ class Console:
         elif cmd == "hold":
             self.running = False
             self._print("Clock held.")
-        elif cmd == "go":
+        elif cmd == "go" and not args:
+            # `go` alone runs the clock; `go below`, `go ashore`, `go to the gunroom` are the
+            # person's own moves (package 53), orders to the ship like any other
             self.running = True
             self._print(f"Clock running at {self.compression:g}x.")
         elif cmd in SPEED_WORDS:
