@@ -193,14 +193,14 @@ def test_the_console_prints_the_rollup_at_sixty_and_every_line_below():
         assert e.line() in text
 
 
-def test_speed_and_time_are_one_word_and_run_to_three_hundred():
+def test_speed_and_time_are_one_word_and_run_to_a_thousand():
     out = io.StringIO()
     con = Console(World(seed=3), out=out)
     con.handle_line("speed 120")
     assert con.compression == 120 and con.world.compression == 120
-    con.handle_line("time 600")
-    assert con.compression == MAX_COMPRESSION == 300
-    assert "Compression 300x (the most there is)." in out.getvalue()
+    con.handle_line("time 6000")
+    assert con.compression == MAX_COMPRESSION == 1000
+    assert "Compression 1000x (the most there is)." in out.getvalue()
     con.handle_line("speed 5")
     assert con.compression == 5
 

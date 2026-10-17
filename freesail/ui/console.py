@@ -9,7 +9,7 @@
 `data/scenarios/gate-4c-day.yaml`): its ship, start, latitude and weather script, its
 seed unless `--seed` is given, its standing orders and first orders.
 
-Compression runs to `MAX_COMPRESSION` (300, spec M4 §20). At `events.ROLLUP_FROM` (60)
+Compression runs to `MAX_COMPRESSION` (1000; spec M4 §20 said 300). At `events.ROLLUP_FROM` (60)
 and above the log is rolled up: notable and urgent lines and the captain's own as they
 are, each hour's routine lines in one line marked `=` (`events.RollupView`, the same view
 the server and a model's samples use). An urgent line while the clock runs faster than
@@ -23,7 +23,7 @@ browser's. `--lockstep` holds the clock while a door has the floor.
 Driver commands (not ship orders, not journaled):
     hold            pause the clock
     go              run the clock
-    speed N         set compression to N game seconds per real second, up to 300
+    speed N         set compression to N game seconds per real second, up to 1000
     time N          the same as speed N
     tick N          advance N ticks, then hold
     state           print a summary of the ship and the weather
@@ -69,9 +69,12 @@ HELP = __doc__.split("Driver commands")[1] if __doc__ else ""
 
 READ_STANDING_ORDERS = ("read the standing orders from", "load the standing orders from")
 
-# The fastest the clock runs, game seconds a real second (spec M4 §20: "The server and
-# console take `speed N` up to 300"): a day in under five minutes.
-MAX_COMPRESSION = 300.0
+# The fastest the clock runs, game seconds a real second (spec M4 §20 said 300, "a day in
+# under five minutes"; the lead, 2026-10-17, on the owner's machine ticking the frigate
+# alone at eleven hundred a second: 1000, a day in a minute and a half, the drivers easing
+# to what the tick gives when crewed ships are beside and to 1x while a model's sample is
+# open).
+MAX_COMPRESSION = 1000.0
 # The slowest, so that `speed 0` still moves.
 MIN_COMPRESSION = 0.1
 # Auto-slow on alarm (spec M4 open item 8, the owner's ruling (b)): an urgent line while the
@@ -870,6 +873,22 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     ap.add_argument("--seat", help=SEAT_HELP)
+    ap.add_argument(
+        "--crewed-cap",
+        type=int,
+        help=(
+            "the crewed promotion's cap (how many ships beside yours are fully crewed at "
+            "once; the build machine's 3; tools/pace.py measures yours)"
+        ),
+    )
+    ap.add_argument(
+        "--crewed-range",
+        type=float,
+        help=(
+            "the crewed promotion's range in miles (the build machine's 4; demoted two miles "
+            "beyond)"
+        ),
+    )
     ap.add_argument("--free-running", action="store_true", help=FREE_RUNNING_HELP)
     args = ap.parse_args(argv)
 
@@ -883,6 +902,12 @@ def main(argv: list[str] | None = None) -> int:
         begin(world, scenario_file)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
+    if args.crewed_cap is not None or args.crewed_range is not None:
+        from freesail.world.crews import crewed_settings_of
+
+        world.crewed_settings = crewed_settings_of(
+            {"cap": args.crewed_cap, "range_nm": args.crewed_range}, "the flags"
+        )
     if args.seat:
         seat_player(world, args.seat, door="console")
 

@@ -2043,6 +2043,15 @@ ticks a second on the build machine (`crews.CREWED_FLOOR_TICKS_S`; measured abou
 quiet), the sixty times the owner plays at; the figures of one to twelve crewed ships are
 in the tuning notes.*
 
+**As built, after the gate (the lead, 2026-10-17).** The owner's machine ticks the frigate
+alone at 1,111 a second, twelve crewed ships at 95 (`tools/pace.py`, the tuning notes). So
+the crewed promotion's budget is a setting and not a constant: `crewed: {cap: N, range_nm:
+X}` in a scenario file, `--crewed-cap` and `--crewed-range` on the console and the server
+winning over it, the build machine's three and four the defaults, the demotion two miles
+beyond the range, a ship in dealings with the player still first; and the compression runs
+to 1000 (M4 §20 said 300), the drivers easing to what the tick gives with crewed ships
+beside and to 1x while a model's sample is open as before.
+
 ## 28. Packages (outline; the heavy ones to Fable)
 
 In waves, written for the owner's approval in turn, each launched on his word:

@@ -224,6 +224,11 @@ class Scenario:
     # says nothing, the recorded passages among them. Left out of the dict when off, so that
     # a save of a game without it reads as it did.
     business: Any = None
+    # The lead, 2026-10-17 (the owner's pace figures, TuningNotes): the crewed promotion's
+    # budget, `crewed: {cap: N, range_nm: X}` in the scenario file, None for the build
+    # machine's defaults (`freesail.world.crews`); the drivers' flags override it. Left out
+    # of the dict when None.
+    crewed: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -239,6 +244,8 @@ class Scenario:
         d["start_time"] = self.start_time.isoformat()
         if d.get("business") in (None, "", "off", 0, 0.0, False):
             d.pop("business", None)
+        if not d.get("crewed"):
+            d.pop("crewed", None)
         return d
 
     @classmethod

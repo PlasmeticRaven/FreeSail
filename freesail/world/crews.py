@@ -46,6 +46,8 @@ from freesail.world.geo import Position, bearing_and_distance
 __all__ = [
     "CREWED_CAP",
     "CREWED_DEMOTE_NM",
+    "crewed_settings_of",
+    "settings",
     "CREWED_FLOOR_TICKS_S",
     "CREWED_NM",
     "DEALING_S",
@@ -515,6 +517,43 @@ def enforce_budgets(world: World) -> None:
                 seats.pop(vessel.id, None)
 
 
+def crewed_settings_of(raw: Any, where: str = "the scenario") -> dict[str, Any]:
+    """`crewed: {cap: N, range_nm: X}` read from a scenario file or a driver's flags: the
+    cap a whole number (0 promotes nobody), the range in miles over nought; refused in
+    words otherwise."""
+    if not isinstance(raw, dict):
+        raise ValueError(f"{where}: `crewed` is a mapping with `cap` and `range_nm`, not {raw!r}.")
+    out: dict[str, Any] = {}
+    if raw.get("cap") is not None:
+        cap = int(raw["cap"])
+        if cap < 0:
+            raise ValueError(f"{where}: the crewed cap is a whole number, not {raw['cap']!r}.")
+        out["cap"] = cap
+    if raw.get("range_nm") is not None:
+        rng = float(raw["range_nm"])
+        if rng <= 0:
+            raise ValueError(f"{where}: the crewed range is in miles over nought, not {rng!r}.")
+        out["range_nm"] = rng
+    return out
+
+
+def settings(world: Any) -> tuple[int, float, float]:
+    """The promotion's budget for this world: (the cap, the range in miles, the demotion
+    distance), the build machine's constants unless a driver's flags
+    (`world.crewed_settings`) or the scenario (`scenario.crewed`) say otherwise; the
+    demotion keeps its two miles of hysteresis beyond the range (the lead, 2026-10-17, on
+    the owner's machine ticking twelve crewed ships above sixty a second)."""
+    chosen: dict[str, Any] = {}
+    sc = getattr(world, "scenario", None)
+    if isinstance(getattr(sc, "crewed", None), dict):
+        chosen.update(sc.crewed)
+    if isinstance(getattr(world, "crewed_settings", None), dict):
+        chosen.update(world.crewed_settings)
+    cap = int(chosen.get("cap", CREWED_CAP))
+    rng = float(chosen.get("range_nm", CREWED_NM))
+    return cap, rng, rng + (CREWED_DEMOTE_NM - CREWED_NM)
+
+
 def switch(world: World) -> None:
     """The crewed promotion by the distance from the centre, once a minute: demoted
     beyond `CREWED_DEMOTE_NM` or when she anchors; promoted within `CREWED_NM` up to the
@@ -524,6 +563,7 @@ def switch(world: World) -> None:
     centre = world.position
     if centre is None:
         return
+    cap, within_nm, demote_nm = settings(world)
     vessels = world.vessels
     with_brain = [v for v in vessels.vessels if v.brain is not None and not v.done]
     if not with_brain and not vessels.crewed_ids:
@@ -534,7 +574,7 @@ def switch(world: World) -> None:
     # demotions
     for v in list(crewed(world)):
         state = v.crew.captain.state if v.crew.shape == "full" else v.brain.state
-        beyond = far_nm.get(v.id, math.inf) > CREWED_DEMOTE_NM
+        beyond = far_nm.get(v.id, math.inf) > demote_nm
         if (beyond and not _dealing(world, v)) or state in _NOT_CREWED_STATES:
             demote(world, v)
     # promotions, dealings first and then the nearest
@@ -542,14 +582,14 @@ def switch(world: World) -> None:
         v
         for v in with_brain
         if (v.crew is None or v.crew.shape == "far")
-        and far_nm[v.id] <= CREWED_NM
+        and far_nm[v.id] <= within_nm
         and (v.brain.state or "on passage") not in _NOT_CREWED_STATES
         and getattr(v.brain, "role", "") not in FAR_ONLY_ROLES
     ]
     wanted.sort(key=lambda v: (not _dealing(world, v), far_nm[v.id]))
     for v in wanted:
         held = crewed(world)
-        if len(held) < CREWED_CAP:
+        if len(held) < cap:
             promote(world, v)
             continue
         if not _dealing(world, v):

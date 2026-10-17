@@ -293,7 +293,7 @@
     return post("/api/driver", { action: action, value: value });
   }
 
-  // `speed N` and `time N` are the same (spec M4 §20: up to 300, the server clamps)
+  // `speed N` and `time N` are the same (spec M4 §20 said 300, now 1000; the server clamps)
   var DRIVER_WORDS = { hold: 1, go: 1, speed: 1, time: 1, tick: 1 };
 
   function submitLine(text) {

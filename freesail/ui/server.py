@@ -28,7 +28,7 @@ Routes (spec §9.2):
                         the same file `save PATH` writes; the browser can keep it
     POST /api/order     {"text": "..."} -> the accepted or rejected event
     POST /api/driver    {"action": "hold"|"go"|"speed"|"time"|"tick", "value": N}
-                        (speed and time are the same: compression up to 300)
+                        (speed and time are the same: compression up to 1000)
                         or {"action": "standing_orders", "value": FILE} to read a file
                         of standing orders (also `read the standing orders from FILE`
                         on the command line, as in the console), or
@@ -322,7 +322,7 @@ class Driver:
             self.emit_snapshot()
 
     def set_compression(self, value: float) -> None:
-        """`speed N` (or `time N`), up to 300 (spec M4 §20). The player's choice clears
+        """`speed N` (or `time N`), up to 1000 (spec M4 §20 said 300). The player's choice clears
         the auto-slow notice; an hour the roll-up holds is let go when the speed comes
         down below its threshold."""
         with self.lock:
@@ -1383,6 +1383,22 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--saves", help="where a released station saves the game (default saves/)")
     ap.add_argument("--seat", help=SEAT_HELP)
+    ap.add_argument(
+        "--crewed-cap",
+        type=int,
+        help=(
+            "the crewed promotion's cap (how many ships beside yours are fully crewed at "
+            "once; the build machine's 3; tools/pace.py measures yours)"
+        ),
+    )
+    ap.add_argument(
+        "--crewed-range",
+        type=float,
+        help=(
+            "the crewed promotion's range in miles (the build machine's 4; demoted two miles "
+            "beyond)"
+        ),
+    )
     ap.add_argument("--free-running", action="store_true", help=FREE_RUNNING_HELP)
     args = ap.parse_args(argv)
 
@@ -1399,6 +1415,12 @@ def main(argv: list[str] | None = None) -> int:
         begin(world, scenario_file)
     if args.standing_orders:
         read_standing_orders(world, args.standing_orders)
+    if args.crewed_cap is not None or args.crewed_range is not None:
+        from freesail.world.crews import crewed_settings_of
+
+        world.crewed_settings = crewed_settings_of(
+            {"cap": args.crewed_cap, "range_nm": args.crewed_range}, "the flags"
+        )
     if args.seat:
         from freesail.agents.seat import seat_player
 

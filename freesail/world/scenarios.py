@@ -392,6 +392,11 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         if s.get("position") is None or not str(s.get("goal") or "").strip():
             raise ScenarioError(f"{where}, ships {i + 1}: a ship needs a position and a goal.")
     sc.ships = [{str(k): v for k, v in s.items()} for s in ships_raw]
+    # the crewed promotion's budget (the lead, 2026-10-17): `crewed: {cap: N, range_nm: X}`
+    if raw.get("crewed") is not None:
+        from freesail.world.crews import crewed_settings_of
+
+        sc.crewed = crewed_settings_of(raw["crewed"], where)
     # the world's business (package 43b; spec M6 §19): on, off or a density; off when not said
     if raw.get("business") is not None:
         from freesail.world.business import business_density

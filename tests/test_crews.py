@@ -349,3 +349,35 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
             json={"reason": "the test is done", "key": key, "ship": "X"},
         )
         assert h.agent.released
+
+
+def test_the_crewed_budget_is_a_setting_of_the_scenario_or_the_flags():
+    """The lead, 2026-10-17: the cap and the range are the build machine's constants
+    unless the scenario or the drivers' flags say otherwise (`crews.settings`); a cap of one
+    promotes one of two ships within the range, and the flags win over the scenario."""
+    w = hove_to_world()
+    assert K.settings(w) == (K.CREWED_CAP, K.CREWED_NM, K.CREWED_DEMOTE_NM)
+    w.crewed_settings = K.crewed_settings_of({"cap": 1, "range_nm": 5}, "the flags")
+    assert K.settings(w) == (1, 5.0, 7.0)
+    ships = [
+        put(
+            w,
+            "merchant brig",
+            "britain",
+            f"{lat} 5 30 W",
+            "bound for Falmouth",
+            "bound for Falmouth",
+            name=f"C{i}",
+        )
+        for i, lat in enumerate(("49 31 N", "49 32 N"))
+    ]
+    w.run(61)
+    assert [v.crew is not None for v in ships] == [True, False]
+    import pytest
+
+    with pytest.raises(ValueError):
+        K.crewed_settings_of({"cap": -1})
+    with pytest.raises(ValueError):
+        K.crewed_settings_of({"range_nm": 0})
+    with pytest.raises(ValueError):
+        K.crewed_settings_of("three")
