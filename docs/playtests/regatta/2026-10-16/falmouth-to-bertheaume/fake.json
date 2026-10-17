@@ -1,0 +1,68 @@
+{
+  "course": "falmouth-to-bertheaume",
+  "course_name": "Falmouth to the road of Bertheaume",
+  "agent": "fake",
+  "label": "fake",
+  "kind": "the scripted captain",
+  "door": "in the game, at the captain's station",
+  "note": "the course's script: a course pricked by way of 50 00 N 4 57 W, west of Ushant and into the Iroise, `trim sails` at the gun and each glass, a bearing and a fix each glass",
+  "seed": 7,
+  "finished": false,
+  "elapsed_s": null,
+  "elapsed": "",
+  "ran_s": 144000,
+  "time_limit_s": 144000,
+  "marks": [],
+  "damage": [],
+  "groundings": [
+    {
+      "tick": 111226,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at five knots and a half, heeling 1 degrees, the tide rising."
+    },
+    {
+      "tick": 112279,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at five knots, heeling 1 degrees, the tide rising."
+    },
+    {
+      "tick": 113366,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at three knots, heeling 1 degrees, the tide rising."
+    },
+    {
+      "tick": 114376,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at four knots and a half, heeling 2 degrees, the tide rising."
+    },
+    {
+      "tick": 115517,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at one knot, heeling 2 degrees, the tide rising."
+    },
+    {
+      "tick": 116540,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at half a knot, heeling 2 degrees, the tide rising."
+    },
+    {
+      "tick": 117624,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at one knot, heeling 1 degrees, the tide rising."
+    },
+    {
+      "tick": 118819,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at one knot, heeling 2 degrees, the tide rising."
+    },
+    {
+      "tick": 120263,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at one knot, heeling 2 degrees, the tide rising."
+    },
+    {
+      "tick": 122364,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 11 feet; she struck at one knot, heeling 2 degrees, the tide rising."
+    }
+  ],
+  "fatigue": 0.008,
+  "fatigue_words": "fresh",
+  "fatigue_most": 0.116,
+  "purse": 6000.0,
+  "purse_change": 0.0,
+  "lines": 1246,
+  "digest": "a6023fa88339d2e9",
+  "miles_to_go": 8.6,
+  "save": "saves/regatta/2026-10-16-falmouth-to-bertheaume-fake.json"
+}

@@ -22,7 +22,8 @@ starts over with `loop=True`. `Transcript` plays back a recorded transcript and 
 `None` when it is spent, which leaves the sample open: the replay of a saved game
 (`harness.restore`) and the REPL's turn mode both rest on it. `narrator()` is the small
 built-in script the drivers run for `--watcher fake`: a line at each sample from the
-readings, and an answer to a question.
+readings, and an answer to a question. `captain_on_the_course` is the regatta's scripted
+captain (package 44, `tools/regatta.py`): a course's orders at the gun and at each glass.
 """
 
 from __future__ import annotations
@@ -40,14 +41,18 @@ __all__ = [
     "Transcript",
     "call",
     "captain_of_the_ship",
+    "captain_on_the_course",
     "keep_the_command",
     "lookout_at_the_masthead",
     "master_of_the_reckoning",
     "narrator",
     "officer_of_the_watch",
     "passenger_aboard",
+    "point_of_sail",
+    "point_trim",
     "reply",
     "say",
+    "sail_the_course",
     "silence",
     "work_the_slate",
 ]
@@ -434,6 +439,93 @@ def lookout_at_the_masthead() -> Fake:
     """The fake at the lookout's station: a hail for what the masthead sees, nothing
     else."""
     return Fake([keep_a_lookout], loop=True)
+
+
+# The scripted captain of the regatta (package 44; spec M6 §21): a course sailed by a
+# script, the stand-in for a model at the captain's station on a course. It takes the
+# command, gives its first orders together, and at every sample after (each glass, and any
+# urgent line that wakes it) gives its orders of the glass and stands by until the next.
+# `{point}` in an order is the point of sail she is on, read from the sample's words (the
+# true wind's point against her heading): the trims by a point of sail are judged so.
+
+# The points of sail by the true wind's angle off the bow, in degrees: within seven points
+# close-hauled, to ten points the wind abeam, to fourteen the wind large, abaft that a run
+# (the primer's chapter 2; the bounds are the points between, judgement).
+POINTS_OF_SAIL: tuple[tuple[float, str], ...] = (
+    (78.75, "close hauled"),
+    (112.5, "the wind abeam"),
+    (157.5, "the wind large"),
+    (180.0, "a run"),
+)
+
+
+def _degrees_in(words: Any) -> float | None:
+    m = re.search(r"\((\d+(?:\.\d+)?)°\)", str(words))
+    return float(m.group(1)) if m else None
+
+
+def point_of_sail(readings: dict[str, Any]) -> str | None:
+    """The point of sail the readings' words put her on ('close hauled', 'the wind
+    abeam', 'the wind large', 'a run'), or None when they do not say."""
+    from freesail import units
+
+    heading = _degrees_in(readings.get("heading"))
+    wind = str(readings.get("true_wind_from") or "").removeprefix("from ").strip()
+    rad = units.parse_compass_point(wind) if wind else None
+    if heading is None or rad is None:
+        return None
+    off = abs((math.degrees(rad) - heading + 180.0) % 360.0 - 180.0)
+    return next(name for most, name in POINTS_OF_SAIL if off <= most)
+
+
+def point_trim(point: str) -> str:
+    """The order that trims for a point of sail (package 44)."""
+    return "trim to run" if point == "a run" else f"trim for {point}"
+
+
+def sail_the_course(first: Sequence[str] = (), each_glass: Sequence[str] = ()) -> Any:
+    state = {"took": False}
+
+    def orders(texts: Sequence[str], turns: Sequence[Turn]) -> tuple[ToolCall, ...]:
+        r = readings_so_far(turns)
+        point = point_of_sail(r)
+        out = []
+        for text in texts:
+            if "{point}" in text:
+                if point is None:
+                    continue
+                text = text.replace("{point}", point_trim(point))
+            out.append(ToolCall("submit_order", {"text": text}))
+        return tuple(out)
+
+    def turn(last: dict[str, Any], turns: Sequence[Turn]) -> Reply:
+        if "tool_results" in last:
+            return Reply()
+        question = last.get("question")
+        if question:
+            text = narrate(last, turns)
+            answer = text.calls[0].args["text"] if text.calls else text.text or "Nothing to report."
+            return Reply(calls=(ToolCall("answer", {"text": answer}),))
+        wait = ToolCall("stand_by", {"until": "a glass"})
+        if not state["took"]:
+            state["took"] = True
+            return Reply(
+                text="I have the command.",
+                calls=(
+                    ToolCall("journal", {"note": "Took the command at the gun."}),
+                    *orders(first, turns),
+                    wait,
+                ),
+            )
+        return Reply(calls=(*orders(each_glass, turns), wait))
+
+    return turn
+
+
+def captain_on_the_course(first: Sequence[str] = (), each_glass: Sequence[str] = ()) -> Fake:
+    """The fake at the captain's station on a regatta's course (package 44): `first` given
+    at the gun, `each_glass` at every sample after, standing by until a glass between."""
+    return Fake([sail_the_course(first, each_glass)], loop=True)
 
 
 def passenger_aboard(remarks: Sequence[str] = ()) -> Fake:

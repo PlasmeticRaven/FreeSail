@@ -1,0 +1,36 @@
+{
+  "course": "ushant-to-falmouth",
+  "course_name": "Ushant to Falmouth",
+  "agent": "fake",
+  "label": "no-trim",
+  "kind": "the scripted captain",
+  "door": "in the game, at the captain's station",
+  "note": "the trims judged: the same script and no trim at all after the gun",
+  "seed": 7,
+  "finished": false,
+  "elapsed_s": null,
+  "elapsed": "",
+  "ran_s": 108000,
+  "time_limit_s": 108000,
+  "marks": [],
+  "damage": [],
+  "groundings": [
+    {
+      "tick": 78959,
+      "text": "She has taken the ground forward: two fathoms and a half of water by the chart, and she draws 15 feet; she struck at three knots, heeling 1 degrees, the tide rising."
+    },
+    {
+      "tick": 81063,
+      "text": "She has taken the ground forward: two fathoms of water by the chart, and she draws 15 feet; she struck at two knots and a half, heeling 0 degrees, the tide rising."
+    }
+  ],
+  "fatigue": 0.013,
+  "fatigue_words": "fresh",
+  "fatigue_most": 0.028,
+  "purse": 0.0,
+  "purse_change": 0.0,
+  "lines": 715,
+  "digest": "317f0b447cbcbc75",
+  "miles_to_go": 2.7,
+  "save": "saves/regatta/2026-10-16-ushant-to-falmouth-no-trim.json"
+}

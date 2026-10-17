@@ -3015,7 +3015,7 @@ GATE_5B_SCHOONER_ANCHORED_TICK = 57257  # off the town, the best bower let go (5
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p)
 GATE_5B_SCHOONER_LINES = 763  # package 45 (762 at package 37p; every tick as it was)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
-GATE_5B_SCHOONER_DIGEST = "edea58e34efd05c4"  # package 45c, a line's words (d21adc418177a60d at 45)
+GATE_5B_SCHOONER_DIGEST = "c01e6e0ff56503c8"  # 44, a line's words (edea58e34efd05c4 at 45c)
 GATE_5B_THICK_LANDFALL_TICK = 53820  # 54420 before package 37j
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4086,7 +4086,7 @@ GATE_5C_CRUISE_LINES = 2287  # package 45c (1930 at package 45, 2177 at package 
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
-GATE_5C_CRUISE_DIGEST = "493d888d874aa358"  # package 45c (dc6454f37d060818 at 45)
+GATE_5C_CRUISE_DIGEST = "a46aa710b77a9d6a"  # 44, a line's words (493d888d874aa358 at 45c)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4192,7 +4192,7 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 # (docs/dev/TuningNotes.md, package 37m).
 GATE_5C_MERCHANT_LINES = 3079  # package 45c (3092 at package 45, 3015 at package 37p)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
-GATE_5C_MERCHANT_DIGEST = "adf0ec6041c6e71d"  # package 45c (3dfe7b9c9c8fc271 at 45)
+GATE_5C_MERCHANT_DIGEST = "efdd3ae1bb9711be"  # 44, a line's words (adf0ec6041c6e71d at 45c)
 
 
 def _people(world) -> list[dict]:
@@ -4603,7 +4603,7 @@ GATE_6A_INTENT_LINES = 2357  # package 45c (2114 at package 45, 2019 at package 
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
-GATE_6A_INTENT_DIGEST = "60ecf7b8a93932bb"  # package 45c (3f2356a885167274 at 45)
+GATE_6A_INTENT_DIGEST = "89e89858a56398c9"  # 44, a line's words (60ecf7b8a93932bb at 45c)
 
 
 @pytest.fixture(scope="module")
@@ -4765,7 +4765,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # quarterdeck carries its place and its hearers (none) in its data, as every say does now
 # (the owner's ruling of 2026-10-10); aa42746f61de91d1 at 37p, a2cd045b9bcc93f8 before it
 # decision 45, the pilot's news: b00ac08c3f63e84c before
-GATE_6A_FAKE_CAPTAIN_DIGEST = "e0762f5a6a5e926e"  # package 45c (1b821bb2b8d9732a at 45)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "c266f45bb9e7fe6f"  # 44, a line's words (e0762f5a6a5e926e at 45c)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):

@@ -1430,6 +1430,59 @@ writes a table and a log per run under `docs/playtests/regatta/<date>/`, and ref
 run a model whose consent is not on record. It is the owner's tool for tuning the physics
 for honesty and the documentation for the models, and it is the first competitive mode.
 
+**As built (package 44, 2026-10-16; `tools/regatta.py`, `data/regatta/*.yaml`,
+`docs/agents/Harness.md` section 18).** A course file names its scenario (the ship, the
+seed, the time, the pinned weather, the people, the ports and the other sail), leaves out
+what is the scenario's own captain (its book and its first orders), and says what every
+agent is given at the gun (`start_orders`, plain sail; `standing_orders`, none on the first
+courses), the start where it moves it (`start`: a time, a position, a heading, a speed;
+`ship`, or `--ship` for one run, another ship file on the same course), the finish (a chart
+feature or a position, and a radius), the limit and the marks. A mark
+is rounded when her true track crosses the line laid from it to seaward (`ray_deg` for
+`ray_nm`), so a ship that cuts inside it has not rounded it; the finish is hers when her
+true position is within the radius with every mark rounded in order. The judge
+(`regatta.Judge`) reads the truth tick by tick and nothing of it reaches an agent. The
+first three courses: `ushant-to-falmouth` (the 5b passage's frigate to Falmouth's outer
+road, a mile), `falmouth-to-bertheaume` (the merchant passage's schooner from off
+Falmouth, its business and its Goulet left out, to three miles about the road of
+Bertheaume, which takes in the Goulet's mouth the pilot's track passes) and
+`falmouth-to-funchal` (the schooner of the voyage for Corunna to Funchal road on the whole
+chart, Ushant and Cape Finisterre each left to larboard). **The agents**: `rules`, the
+rules-based captain on the course's `intent` with nobody seated; `fake`, the scripted
+captain at the captain's station (`fake.captain_on_the_course`: the course's orders at the
+gun and at each glass, `{point}` the trim for the point of sail she is on), sampled every
+glass and on the notable and urgent lines in lockstep, answering within the tick; `local`
+and `api`, a model at the captain's station through the local runner or the API door,
+the game hosted by the regatta (the browser game's app served to the door in the same
+process, as the doors' tests serve it) and the door run beside it with its own flags
+after `--`, the clock held at the gun until the station is taken and while the door has
+the floor after (`--lockstep`'s rule, run as fast as the machine allows between), the
+station stood down by the owner's sentence when the course is run; `replay`, a human's
+save of the course (begun from `--start-save`, the course at the gun) replayed by its
+journal and judged as it sails (`core.replay.replay`'s `on_tick`), a save of another start
+refused in words. **Consent**: the regatta's desk takes a model only on a record that
+stands (`remote.Desk.on_record_only`): no record, a brief changed since it, a re-ask or a
+drill due are refused before the gun in words that say why, with no consent conversation
+begun and nothing written; the question is put in a game. **The score** (`regatta.score`):
+the elapsed time to the line, or the miles to go at the limit; the marks with their
+times; the damage (spars carried away, sails blown out, lines and cables parted, from the
+log's kinds); each grounding with its time and words; the crew's fatigue (the company's
+mean at the end and the most an hour's mean reached); the purse at the end with its
+change; the log's lines and digest. **The records**: each run's log (every line as the
+log has it) and row (`<agent>.json`) under `docs/playtests/regatta/<date>/<course>/`, the
+date's `table.md` written again from every row, the finishers first by their time; an
+agent named by its kind and its door, and a model's name, wherever the log has it, put as
+its kind before anything is written, so that no model is named in the repository; the
+run's save under `saves/regatta/`, from which it replays to its digest (truth 90). The
+first table (the rules-based captain and the scripted captain on the three courses at
+seed 7, and the trims by a point of sail judged on the first) is in
+`docs/playtests/regatta/2026-10-16/` and the tuning notes (package 44). No model was run.
+Tested in `tests/test_regatta.py`: the courses read, the judge's marks and line, a short
+course under the two scripted agents with the table and the replay, the model named as
+its kind, the local runner and the API door against the fake model server and the fake
+Messages server (seated with a record, refused without), a human's game replayed, and,
+slow, truth 90 on the first course.
+
 ### 22. Parity tests (`tests/test_parity.py` new)
 
 The proposal's fourth principle made a test: the captain's station's observation surface
@@ -1439,6 +1492,41 @@ station may submit, filtered only by the station's authority), and nothing is re
 by one that is not by the other. A test enumerates both from the registries and fails on
 any difference; a second seats a fake captain and the console on the same game and gives
 the same orders to the same log.
+
+**As built (package 44, 2026-10-16; `tests/test_parity.py`).** Five enumerations and the
+log. (1) **The readings**: every row of the registry (`api.readings.REGISTRY`), a
+parametric row with a parameter, asked at the console's prompt and by the captain's
+station's `submit_order` at the same tick, gives the same words (`orders.prompt`, the one
+function); every row a sample carries is in the `readings` tool with the registry's own
+words; the rows it does not carry are listed with their road (a parametric row asked by
+name, the sails' states as the tool's `sails`; an absent row refused alike; the pace, the
+driver's, asked by name and never carried). (2) **The verbs**: every verb of the
+vocabulary passes the captain's station's domain but the driver's (`hold`, `go`, `time`,
+`read the standing orders from`, `muster`), which the grammar refuses to the ship from the
+console's line and the station alike (the console takes them first as its own commands).
+(3) **The console's commands** (its help and the browser's order line): each has the
+station's road (`state` the `state` tool; `the sail room`, `the booms` and `standing
+orders` through `submit_order`; `log` the `read_log` tool; the stations' sentences through
+`submit_order`; `help` the `library` tool) or is the owner's by design (the clock, the
+save and the load, reading a book from the disk, `quit`, and a world order, which is the
+scenario's, the director's and the owner's and refused to the captain at both). (4) **The
+browser's snapshot**: each block names the readings or tools that show the station what it
+shows. (5) **The station's tools**: each names the player's counterpart, or why it is the
+station's own (the journal, the stand-by, the shelf, the hand-over, the stand-down and the
+opt-out). A row, a verb, a command, a block or a tool added without its road fails the
+test until it is given one. **The gap found and closed**: `muster`, the watch bill station
+by station, which the console printed and the browser answered (45c) and the grammar
+refused to a station as a console command; a station's `submit_order('muster')` (and the
+vocabulary's other words for it) is answered now from `api.queries.muster_lines`, as the
+console prints it, logged by neither (`agents.tools.is_muster`). **The same orders, the
+same log** (truth 91): a fake captain at the captain's station of the 5b passage's world
+(its book and first orders left out), a console on the same game, gives ten orders one a
+sample in lockstep (sail, a reading, the helm, the trim, the muster, a store's question,
+an order refused, a standing order, the log, a sail); the console gives the same ten at
+the same ticks to a second game of the seed; the logs are the same line for line, but for
+whose each order's own line says it was, and the stores' answers, which the console prints
+for the one who asked where a station's is its tool's result and the log's line (listed by
+design). No other difference was found.
 
 ### 23. The director's seat as a hook (`freesail/world/orders.py`; the director itself is M7b)
 
@@ -1507,7 +1595,7 @@ same plan), 88 the `pace` test there with the cap full against `CREWED_FLOOR_TIC
 the fake captain seated on the brig through the agent API with `ship`, kept across the
 switch; the far-detail captain's trials in `test_captain_trials.py` and `test_brains.py`
 (the two captains' states read from the brain's history and the log); the seat hook and the
-live world order in `test_seat_hook.py`. 90 and 91 are 44's.*
+live world order in `test_seat_hook.py`. As built (package 44): 90 in `tests/test_regatta.py` (the first course under the rules-based captain and the scripted captain, both scored, the rules-based captain finishing within the limit and his run replaying to its digest at the line), 91 in `tests/test_parity.py` (the enumeration of both surfaces, and the fake captain and the console giving the same orders to the same log).*
 
 ### 25. Gate 6c (outline)
 

@@ -1,0 +1,44 @@
+{
+  "course": "ushant-to-falmouth",
+  "course_name": "Ushant to Falmouth",
+  "agent": "fake",
+  "label": "fake",
+  "kind": "the scripted captain",
+  "door": "in the game, at the captain's station",
+  "note": "the course's script: a course shaped for Falmouth outer road by way of 50 00 N 4 57 W, `trim sails` at the gun and at each glass, a bearing and a fix each glass",
+  "seed": 7,
+  "finished": false,
+  "elapsed_s": null,
+  "elapsed": "",
+  "ran_s": 108000,
+  "time_limit_s": 108000,
+  "marks": [],
+  "damage": [],
+  "groundings": [
+    {
+      "tick": 52681,
+      "text": "She has taken the ground forward, on good ground: two fathoms and a half of water by the chart, and she draws 15 feet; she struck at seven knots and a half, heeling 4 degrees, the tide falling."
+    },
+    {
+      "tick": 79816,
+      "text": "She has taken the ground forward, on good ground: two fathoms and a half of water by the chart, and she draws 15 feet; she struck at half a knot, heeling 3 degrees, the tide rising."
+    },
+    {
+      "tick": 81377,
+      "text": "She has taken the ground forward, on good ground: two fathoms and a half of water by the chart, and she draws 15 feet; she struck at half a knot, heeling 3 degrees, the tide rising."
+    },
+    {
+      "tick": 83297,
+      "text": "She has taken the ground forward, on good ground: two fathoms and a half of water by the chart, and she draws 15 feet; she struck at half a knot, heeling 3 degrees, the tide rising."
+    }
+  ],
+  "fatigue": 0.013,
+  "fatigue_words": "fresh",
+  "fatigue_most": 0.03,
+  "purse": 0.0,
+  "purse_change": 0.0,
+  "lines": 907,
+  "digest": "b681a27dc0db7a0d",
+  "miles_to_go": 1.1,
+  "save": "saves/regatta/2026-10-16-ushant-to-falmouth-fake.json"
+}

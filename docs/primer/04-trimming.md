@@ -239,6 +239,30 @@ trim sails
 
 `trim the yards` is what Luce means by "trim the yards, haul taut the lifts and braces" after a tack or a wear; `trim the sheets` is "trim aft the head sheets"; `trim sails` is both. `brace the yards to the wind` is `trim the yards` by another name, and takes the yards you name.
 
+### Trimming for a point of sail
+
+`trim sails` trims for the wind she has now. When you order the helm and the trim in one breath (`steer SE` and `trim sails`, as a captain does who means to stand by until the next glass), the braces are manned before she has come round, and the yards go to the wind she had: bear away from a beam wind and they stand braced up for it until somebody trims again; haul your wind from a run and they are still square when she comes to, and she is aback. Name the point instead, and every sail is trimmed for the wind she will have there (package 44, the owner's note 25; kept on the regatta's measure, `docs/dev/TuningNotes.md`):
+
+| Order | The point | The true wind off her bow |
+|---|---|---|
+| `trim for close hauled` | by the wind, full and by | six points: the period's trim by level (above), whatever her way |
+| `trim for the wind abeam` | a reach | eight points |
+| `trim for the wind large` (or `for the wind on the quarter`) | the wind free, on the quarter | twelve points |
+| `trim to run` (or `trim for a run`) | before the wind | sixteen points: the yards square |
+
+The yards and the fore-and-aft sheets are trimmed as `trim sails` trims them, for the apparent wind the point gives at the way she has now and the true wind she has now, on the side the wind will be on when she is on the course the helm is steering for (a wear or a tack ordered for a course counts as that course). Given before the helm order, the trim is for the side she is on. The log says the point and the wind it was trimmed for: "Braced twelve yards for the wind large, the wind to come, 118° on the larboard quarter, abaft the beam". Once she is on her point the two trims agree; trim again (either order) when the wind shifts.
+
+```orders frigate plain-sail
+trim for close hauled
+trim for the wind abeam
+trim for the wind large
+trim for the wind on the quarter
+trim to run
+trim for a run
+```
+
+The regatta's measure (the frigate and the schooner in fifteen knots, the half hour after the helm order): bearing away from the wind abeam to the wind on the quarter, the frigate makes 3.5 miles trimmed for the point in the same breath against 2.9 with `trim sails` in the same breath; from a run to the wind abeam 3.7 against 1.9; hauling her wind from the quarter to close-hauled 2.4 against nothing at all (she lay aback). The schooner hauling her wind from the quarter does no better trimmed for the point: her sheets flat aft before she has come to make her gripe past her course, and she is aback; for her, put the helm over first and trim when she is round.
+
 ## Pointing: how close she lies, and what it costs
 
 How near the wind a ship will lie is not a number in her file. It comes out of how sharp her yards can be braced, how flat her sails stand, how her masts are trimmed against each other and how she is steered, and each of those is a thing the period did and the game does. What she makes of it: under plain sail in a 15-knot breeze the frigate's best course to windward is about 64° off the wind (5.7 points), and she holds two thirds of her beam-reach speed to 68°, six points, which is Fincham's "seldom within six points" for a long frigate; the schooner holds the same to 56°, five points (`docs/dev/TuningNotes.md`, truths 1, 2 and 32).

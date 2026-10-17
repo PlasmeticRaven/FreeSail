@@ -912,6 +912,67 @@ def _mark_by_hand(ship: Ship, yard_ids: set[str], by_hand: bool) -> None:
         ship.extra.pop(YARDS_BY_HAND, None)
 
 
+# The trims by a point of sail (package 44; the owner's note 25 of gate m6a-2, judged at the
+# regatta): `trim for close hauled`, `trim for the wind abeam`, `trim for the wind large`
+# and `trim to run` set every sail for the point named, as `trim sails` sets them for the
+# wind she has, so that a captain who orders the helm and the trim in one breath has the
+# sails trimmed for where she is going rather than where she was. The point is the true
+# wind's angle off the bow: six points close-hauled (Fincham 1843's "seldom within six
+# points" for a long ship, and what the period's trim gives the frigate full and by,
+# package 37p), eight abeam, twelve on the quarter for the wind large, sixteen before it;
+# the apparent wind is reckoned from the true wind now and the way she has now, and the
+# yards and the sheets are trimmed for it by the rule `trim sails` uses (close-hauled that
+# is the period's trim by level, `trim.by_level`). The tack is the one she is on.
+POINT = "point"
+POINT_TRUE_WIND_DEG: dict[str, float] = {
+    "close hauled": 67.5,
+    "the wind abeam": 90.0,
+    "the wind large": 135.0,
+    "a run": 180.0,
+}
+
+
+def point_wind(ship: Ship, point: str, sign: float) -> float:
+    """The apparent wind's angle (radians, signed by the side: + the wind on the
+    starboard side) that the point of sail named gives her, from the true wind she has and
+    her way through the water now. The side is the one the wind will be on when she is on
+    the course the helm is steering for (an order to the helm given in the same breath:
+    from a run to the wind abeam, the side is the new course's and not the old run's),
+    else the tack she is on (`sign`)."""
+    d = ship.dyn
+    true = math.radians(POINT_TRUE_WIND_DEG[point])
+    # the true wind from the apparent wind and her way: the apparent wind is the true
+    # wind and the wind of her own motion, which blows from ahead at her speed
+    ax = d.apparent_wind_speed * math.cos(d.apparent_wind_angle)
+    ay = d.apparent_wind_speed * math.sin(d.apparent_wind_angle)
+    way = max(d.u, 0.0)
+    tw = math.hypot(ax - way, ay)
+    course = course_steered_for(ship)
+    if course is not None and tw > 0.0:
+        # the true wind's bearing off the bow of the course steered for
+        off = units.wrap_pi(math.atan2(ay, ax - way) + d.heading - course)
+        if POINT_SIDE_CLEAR < abs(off) < math.pi - POINT_SIDE_CLEAR:
+            sign = 1.0 if off > 0.0 else -1.0
+    return sign * math.atan2(tw * math.sin(true), tw * math.cos(true) + way)
+
+
+def course_steered_for(ship: Ship) -> float | None:
+    """The course she is coming to (radians): a tack's or a wear's course ordered, while
+    she is put about for it, else the helm's when it steers a heading; None by the wind."""
+    for inst in reversed(list(getattr(runner_of(ship), "instances", ()))):
+        course = (getattr(inst, "params", None) or {}).get("course_deg")
+        if course is not None:
+            return math.radians(float(course))
+    d = ship.dyn
+    return d.target_heading if d.helm_mode is HelmMode.HEADING else None
+
+
+# The wind is said to be on a side of the course steered for only when it is this far off
+# her head or her stern (a few degrees, judgement): dead before it or in the eye of it, the
+# tack she is on stands.
+POINT_SIDE_CLEAR = math.radians(5.0)
+
+
 def _trim(
     ship: Ship,
     order: Order,
@@ -936,8 +997,9 @@ def _trim(
     from freesail.physics.sails import SAIL_CLASSES
 
     named_sheets: list[Sail] | None = None  # "trim the jib": that sail's sheet only
+    point = order.modifiers.get(POINT) if order.verb == "trim" else None
     if order.verb == "trim":
-        _no_stray_modifiers(order, {"manner", "hands_from", HEAD_YARDS_SHARPER})
+        _no_stray_modifiers(order, {"manner", "hands_from", HEAD_YARDS_SHARPER, POINT})
         # "trim sails with the head yards sharper" trims yards and sheets alike
         phrase = order.verb_phrase.split(" with the ")[0].replace(" head yards sharper", "")
         do_yards = "sheet" not in phrase
@@ -967,8 +1029,13 @@ def _trim(
         raise OrderError(HOVE_TO_TRIM_WORDS)
     if d.apparent_wind_speed < 0.5:
         raise OrderError("There is no wind to trim to.")
-    awa = abs(d.apparent_wind_angle)
     sign = 1.0 if d.tack == "starboard" else -1.0
+    # the wind the sails are trimmed for: the apparent wind she has, or (package 44) the
+    # one the point of sail named will give her at the way she has now
+    awa_signed = d.apparent_wind_angle if point is None else point_wind(ship, str(point), sign)
+    awa = abs(awa_signed)
+    if point is not None:
+        sign = 1.0 if awa_signed >= 0.0 else -1.0  # the side the point's wind will be on
 
     started: list[dict[str, Any]] = []
     failed: list[str] = []
@@ -1009,6 +1076,8 @@ def _trim(
             cls = SAIL_CLASSES.get(sail.cls if sail else "square") or SAIL_CLASSES["square"]
             chord = min(max(awa - cls.peak_alpha, 0.0), math.pi / 2)
             want = math.pi / 2 - chord
+            if point == "close hauled":
+                want = math.pi / 2  # braced up by level, whatever her way now (package 44)
             targets[yard.id] = min(want, yard.brace_limit)
             wants[yard.id] = want
         # on a wind: the lowest yard of every mast wants to go sharper than it can (package
@@ -1062,7 +1131,7 @@ def _trim(
                 "target_deg": round(units.rad_to_deg(target), 2),
                 "target_angle": target,
                 "mode": "to the wind",
-                "tack": d.tack,
+                "tack": d.tack if point is None else ("starboard" if sign > 0 else "larboard"),
                 **extra,
             }
             waiting = in_hand.get(yard.id)
@@ -1113,7 +1182,7 @@ def _trim(
             extra_s = {**extra_s, "log_group": new_group()}
         for sail in candidates:
             name = resolve.the(ship, sail.id)
-            wanted = yard_trim.wanted_sheet_angle(sail.cls, d.apparent_wind_angle)
+            wanted = yard_trim.wanted_sheet_angle(sail.cls, awa_signed)
             reading = yard_trim.read_sheet(ship, sail)
             if (
                 not reading.free
@@ -1163,10 +1232,10 @@ def _trim(
             else f"{number_words(len(started))} yard{'s' if len(started) != 1 else ''}"
         )
         how = yard_trim.difference_words(staggered)
+        to = "to the wind" if point is None else f"for {point}, the wind to come"
         parts.append(
-            f"Braced {which} to the wind, {units.rad_to_deg(awa):.0f}° "
-            f"{units.wind_bearing_words(awa if d.tack == 'starboard' else -awa)}"
-            + (f", {how}" if how else "")
+            f"Braced {which} {to}, {units.rad_to_deg(awa):.0f}° "
+            f"{units.wind_bearing_words(awa if sign > 0.0 else -awa)}" + (f", {how}" if how else "")
         )
     if trimmed:
         sheets = "sheet" if len(trimmed) == 1 and named_sheets is not None else "sheets"
@@ -1205,6 +1274,8 @@ def _trim(
     }
     if order.verb != "trim":
         data.update({"object": object_name, "mode": "to the wind", "tack": d.tack})
+    if point is not None:
+        data.update({"point": point, "awa_deg": round(units.rad_to_deg(awa_signed), 1)})
     # an order whose braces log as one line logs its own line too (the runner writes no
     # "Man the braces" for them)
     grouped = any(x["params"].get("log_group") for x in started)

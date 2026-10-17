@@ -232,3 +232,100 @@ def test_the_trim_line_says_the_yards_on_deck_as_a_clause_and_not_as_a_refusal()
     assert e.text.endswith(
         "; the fore royal yard is on deck and the main topgallant yard is carried away."
     )
+
+
+# ---------------------------------------------------------------------------
+# Package 44: the trims by a point of sail (the owner's note 25, kept at the regatta)
+# ---------------------------------------------------------------------------
+
+
+def _targets(runner) -> dict[str, float]:
+    return {s: p["target_angle"] for e, s, p in runner.started if e == "brace"}
+
+
+def test_a_point_of_sail_is_trimmed_for_the_wind_it_will_give_not_the_wind_she_has():
+    """`trim for the wind large`, `trim to run` and `trim for close hauled` trim every
+    yard for the point named, from the true wind and her way now: on a reach the large
+    trim braces the yards in from where `trim sails` puts them, the run squares them, and
+    close-hauled is the period's trim by level whatever her way (each level in from the
+    one below, the after yards sharper)."""
+    from freesail.orders.verbs import POINT_TRUE_WIND_DEG
+
+    assert set(POINT_TRUE_WIND_DEG) == {"close hauled", "the wind abeam", "the wind large", "a run"}
+    now, now_runner = frigate(70.0)  # a reach on the starboard tack
+    handle(now, "trim the yards")
+    reach = _targets(now_runner)
+    ship, runner = frigate(70.0)
+    ship.dyn.u = 3.0
+    kind, text, data = handle(ship, "trim for the wind large")
+    large = _targets(runner)
+    assert data["point"] == "the wind large" and data["awa_deg"] > 90.0
+    assert text.startswith("Braced twelve yards for the wind large, the wind to come, ")
+    assert all(0.0 <= large[y] < reach[y] for y in reach)
+    ship, runner = frigate(70.0)
+    handle(ship, "trim to run")
+    assert all(abs(v) < 1e-9 for v in _targets(runner).values())
+    ship, runner = frigate(110.0)  # well free, and still: close-hauled is braced up by level
+    ship.dyn.u = 0.0
+    handle(ship, "trim for close hauled")
+    close = _targets(runner)
+    fore, topsail = close["fore.yard"], close["fore.topsail.yard"]
+    assert fore == pytest.approx(ship.spars["fore.yard"].brace_limit)
+    assert topsail == pytest.approx(fore - math.radians(2.0))
+    assert close["main.yard"] > fore  # the after yards sharper (spec 3b §2.2)
+
+
+def test_the_point_is_trimmed_on_the_side_of_the_course_the_helm_steers_for():
+    """Before the wind (the tack a toss-up) and the helm ordered to bring her to the wind
+    abeam: the yards are braced for the side the wind will be on when she is round, not
+    the tack she happened to be on."""
+    from freesail.ship.parts import HelmMode
+
+    for course, sign in ((90.0, -1.0), (270.0, 1.0)):
+        ship, runner = frigate(179.0)  # running, the wind from the north, heading south
+        ship.dyn.heading = math.radians(180.0)
+        ship.dyn.helm_mode = HelmMode.HEADING
+        ship.dyn.target_heading = math.radians(course)
+        ship.dyn.u = 3.0
+        _kind, _text, data = handle(ship, "trim for the wind abeam")
+        assert math.copysign(1.0, data["awa_deg"]) == sign, course
+        assert all(math.copysign(1.0, v) == sign for v in _targets(runner).values() if v)
+
+
+@pytest.mark.parametrize(
+    "said",
+    ["trim for close-hauled", "trim sails for the wind abeam", "trim for the wind on the quarter"],
+)
+def test_the_points_other_words_are_taken(said):
+    ship, runner = frigate(70.0)
+    kind, text, data = handle(ship, said)
+    assert data["point"] in ("close hauled", "the wind abeam", "the wind large")
+
+
+def test_trimmed_for_the_point_in_the_same_breath_she_makes_more_than_by_trim_sails():
+    """The regatta's measure in small (TuningNotes, package 44): the frigate in fifteen
+    knots from the north, on the wind abeam, ordered to bear away to SE with the trim in
+    the same breath; trimmed for the wind large she runs further in the half hour after
+    than trimmed for the wind she had, whose yards stay braced for the beam."""
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    made = {}
+    for trim in ("trim sails", "trim for the wind large"):
+        w = make_world(
+            7,
+            "data/ships/frigate-36.yaml",
+            Scenario(wind_from_deg=0.0, ship_heading_deg=90.0, gustiness=0.0, variability=0.0),
+        )
+        w.submit("set plain sail")
+        w.run(900)
+        w.submit("trim sails")
+        w.run(900)
+        w.submit("steer SE")
+        w.submit(trim)
+        x0, y0 = w.ship.dyn.x, w.ship.dyn.y
+        w.run(1800)
+        se = math.radians(135.0)
+        dx, dy = w.ship.dyn.x - x0, w.ship.dyn.y - y0
+        made[trim] = (dx * math.sin(se) + dy * math.cos(se)) / units.NAUTICAL_MILE
+    assert made["trim for the wind large"] > made["trim sails"] + 0.3, made

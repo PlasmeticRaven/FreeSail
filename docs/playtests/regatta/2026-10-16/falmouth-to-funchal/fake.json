@@ -1,0 +1,32 @@
+{
+  "course": "falmouth-to-funchal",
+  "course_name": "Falmouth to Funchal road",
+  "agent": "fake",
+  "label": "fake",
+  "kind": "the scripted captain",
+  "door": "in the game, at the captain's station",
+  "note": "the course's script: a course for Funchal pricked by way of 50 00 N 4 57 W, west of Ushant and west of Finisterre, `trim sails` at the gun and each glass, a bearing and a fix each glass",
+  "seed": 7,
+  "finished": false,
+  "elapsed_s": null,
+  "elapsed": "",
+  "ran_s": 1382400,
+  "time_limit_s": 1382400,
+  "marks": [
+    {
+      "mark": "Ushant",
+      "tick": 61505
+    }
+  ],
+  "damage": [],
+  "groundings": [],
+  "fatigue": 0.01,
+  "fatigue_words": "fresh",
+  "fatigue_most": 0.034,
+  "purse": 800.0,
+  "purse_change": 0.0,
+  "lines": 10212,
+  "digest": "1e61315cc123ea45",
+  "miles_to_go": 906.0,
+  "save": "saves/regatta/2026-10-16-falmouth-to-funchal-fake.json"
+}

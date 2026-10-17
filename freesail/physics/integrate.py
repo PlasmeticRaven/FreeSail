@@ -229,12 +229,13 @@ def _note_lifting(ship: Ship, st: hp.HullState, dt: float, standing: bool) -> No
     if room >= YARDS_UNTRIMMED_DEG:
         # package 45c (the owner's notes 25 and 3 of gate m6a-2: the line had models bear
         # away when the trim was the matter): the yards could come a good deal sharper on
-        # this tack, so the cause is said first
+        # this tack, so the cause is said first; and (package 44, the owner's note 25, the
+        # trims by a point of sail kept at the regatta) the trim named is the point's
         ship.note(
             "notable",
             "ship.lifting",
             f"Her sails lifting, the wind {deg}° on the {side} bow: the yards are not trimmed "
-            "for this course; trim sails, or keep her away.",
+            "for this course; trim for close hauled, or keep her away.",
             data={**data, "untrimmed": True, "room_deg": round(room, 1)},
         )
         return

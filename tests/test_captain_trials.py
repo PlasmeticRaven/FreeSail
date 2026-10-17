@@ -69,7 +69,7 @@ TRIAL_STATION_STRANGER_STATES = [
 ]
 TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [10423] at 45c; never at 45
 TRIAL_STATION_STRANGER_LINES = 714  # package 43 (889 at package 45c, 972 at 45, 961 at 37p)
-TRIAL_STATION_STRANGER_DIGEST = "9e0bc47304373987"  # package 43 (3c2aba8b08fd1f63 at 45c)
+TRIAL_STATION_STRANGER_DIGEST = "8dc4b6b51d3bfa8f"  # 44, a line's words (9e0bc47304373987 at 43)
 
 
 @pytest.fixture(scope="module")
@@ -118,7 +118,7 @@ TRIAL_STATION_GALE_FIRST_STATES = [
 # package 45c: the first states as they were; sail made again by steps after the gale
 # (topsails 18:27, masts, reefs and jib 20:30, plain sail 21:19), keeping station at 63720
 TRIAL_STATION_GALE_LINES = 1429  # package 45c (1399 at package 45, 1423 at package 37p)
-TRIAL_STATION_GALE_DIGEST = "94d2943d029d197d"  # package 45c (3f0d36bbff4af262 at 45)
+TRIAL_STATION_GALE_DIGEST = "692b5e910adb1d55"  # 44, a line's words (94d2943d029d197d at 45c)
 
 
 @pytest.fixture(scope="module")
@@ -168,7 +168,7 @@ TRIAL_STATION_LEE_SHORE_STATES = [
     (27300, "keeping station"),
 ]
 TRIAL_STATION_LEE_SHORE_LINES = 1665  # package 45c (2129 at package 45, 1668 at 37p)
-TRIAL_STATION_LEE_SHORE_DIGEST = "fe10b699baf92229"  # package 45c (b7cbfbe33e2ed631 at 45)
+TRIAL_STATION_LEE_SHORE_DIGEST = "53c27cbdc3c37f2c"  # 44, a line's words (fe10b699baf92229 at 45c)
 
 
 @pytest.fixture(scope="module")
@@ -270,7 +270,7 @@ TRIAL_TRADE_THICK_LINES = 482  # package 45 (553 at package 37p)
 # decision 45, the pilot's news: 50901cf162ea95aa before; package 37p (10fee882c789666e before)
 # package 45c: every tick and the lines as they were; a line's words moved (the pilot's
 # conn and the weather's sky, both this package's)
-TRIAL_TRADE_THICK_DIGEST = "f39f5c6f393dd75d"  # package 45c (590cfb8f12834ac7 at 45)
+TRIAL_TRADE_THICK_DIGEST = "7915dc59337bd31d"  # 44, a line's words (f39f5c6f393dd75d at 45c)
 
 
 @pytest.fixture(scope="module")
