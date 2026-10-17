@@ -416,7 +416,7 @@ def run_fake(course: Course, name: str | None = None, say: Any = print) -> tuple
     """The scripted captain at the captain's station, in the game, sampled every glass and
     on the notable and urgent lines in lockstep (it answers within the tick)."""
     from freesail.agents import Harness, SamplingPolicy
-    from freesail.agents.agent import A_GLASS_S, captain
+    from freesail.agents.agent import A_GLASS_S, SESSION_RACE, captain
     from freesail.agents.fake import captain_on_the_course
 
     orders = fake_orders(course, name)
@@ -426,6 +426,7 @@ def run_fake(course: Course, name: str | None = None, say: Any = print) -> tuple
         world,
         station,
         captain_on_the_course(orders["first"], orders["each_glass"]),
+        session_kind=SESSION_RACE,
         save=lambda w, why: "",
     )
     h.model_name = "the scripted captain"
@@ -525,6 +526,7 @@ def run_door(
     )
     desk = driver.desk
     desk.on_record_only = True  # the regatta runs no model without its consent on record
+    desk.race = True  # and tells it the session is a race (package 42b)
     http = TestClient(app)
     out = out or sys.stdout
     argv = ["--game", "http://regatta", "--station", "captain", *door_argv]

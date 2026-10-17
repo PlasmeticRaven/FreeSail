@@ -5698,3 +5698,103 @@ for most of the evening (the load four to eight), the pace tests alone at the en
   failed (the four pins above), re-pinned (`e1a54f6`) and the four run again: passed.
 - The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the merged
   tree, the machine quiet: load 1.2 at their start and 0.9 at the end): 6 passed.
+
+## Package 42b: the consent brief revised for 6c (2026-10-17)
+
+Package 42b (decision 48; spec M6 §15 as built; the brief in `docs/dev/M6-WorkPackages.md`).
+It ran in two steps. First the revision was drafted for the owner
+(`docs/playtests/drafts/consent-brief-6c-draft.md`: the whole file marked, fifteen
+numbered changes, each with the sentence as it stood, the sentence proposed and a reason,
+four of them beyond the package's brief). Second, after the owner's rulings of the same
+day (all fifteen approved as drafted, and the session-kind fix with the race named among
+the kinds of session), the approved sentences were written into
+`docs/agents/ConsentBrief.md` to the character, by a script that asserts each
+replacement; a check confirmed that the body below the rule is the draft's text with the
+race added. Nothing under `docs/agents/consent/` was touched; no model was seated and no
+re-ask was run.
+
+### What changed, section by section, and why
+
+- **The opening.** It now names a passenger (a station since package 41), and the director
+  as one who may seat models under the owner's grant (spec §23: a model seating a model).
+  The stale sentence (the owner's note 17) now reads: "All of these exist today but the
+  director, who is to come and is described now so that an answer covers it."
+- **What an instance would see and do.**
+  - The race among the kinds of session.
+  - Pictures where the door carries them; a picture put back only by the instance's own
+    hand, with its note (45c); a book of the library that goes back by itself (since 28d;
+    beyond the brief's scope, approved).
+  - The owner's orders to the world while instances play, which an instance meets only by
+    what they bring about (43's live world order, decision 46; beyond scope, approved).
+  - A captain of another ship, with her own company, log and reckoning, who sees the
+    player's ship as a sail and has the whole of her again near (§20).
+  - A model seated for a budget under the owner's grant, never on a model's own authority
+    (§23).
+  - The race, its log and times kept under the model's kind (§21).
+- **Being stopped.** The stand-down when a budget is spent or a race is over.
+- **The journal.** It is the person's, carried with him to any station he holds (45c).
+- **What is not done.** The reasoning a server returns apart from the reply is kept with
+  a door's exchanges where the developer has them kept (`--exchanges`; beyond scope,
+  approved).
+- **Leaving**, **The record** and **Answering**: unchanged, to the character.
+- **The head** (not sent) records the revision. Its description of the placeholders now
+  names the API door's identity and the four door texts (beyond scope, approved).
+
+**The session's kind told true** (the owner's ruling). Every door seated a model with
+`--session play` by default, and the brief's head then said "a play session with a human
+captain at the prompt", even to a model at the captain's station, of the player's ship or
+another, and to the regatta's captain; `SESSION_SOLO` was never used.
+`agent.session_kind_of(asked, station_kind, race=)` now chooses the kind:
+
+- a race at the regatta (`remote.Desk.race`, set by `tools/regatta.py`; its scripted
+  captain is told the same), whatever the door asked;
+- a test when the door asks one;
+- play for its own sake, "with no human captain over you", at the captain's station;
+- play with the human captain at the prompt otherwise.
+
+`SESSION_SOLO`'s words changed from "with no human captain present" to "with no human
+captain over you", since the player is present in the world as the captain of his own
+ship. `SESSION_RACE` is new. The kind reaches only the brief's head and the save's acts,
+never the log, so no digest moves. Left as it was: a station below the captain's is told
+"a human captain at the prompt" even where the captain is a model or the rules. That is
+outside the ruling, recorded for the lead.
+
+### Pins moved
+
+- The brief's digest: `d096d22a5842772f` to **`ccbc1ebdf1a42c3e`** (`BRIEF_DIGEST`,
+  decision 48 named beside it).
+- The watched sections (`WATCHED_SECTION_DIGESTS`):
+
+  | Section | Before (42a) | After (42b) |
+  |---|---|---|
+  | the opening | `b033319d281997bc` | `a104662f6e3c0470` |
+  | What an instance would see and do | `712b1fcde44f2604` | `3f1375a11d8266a0` |
+  | Being stopped | `29df636cdcce8b17` | `a7a279ef1ff24aae` |
+  | What is not done | `b9151f550fea0339` | `ad25c744cee7db0a` |
+  | The journal | `7dcb8e848e692f46` | `5cf037ca675110e2` |
+  | Leaving | `4e338c8dd7492b09` | unchanged |
+
+- The re-ask:
+  - A yes given against the brief of 2026-10-09 is asked again with five sections named
+    (`test_a_yes_given_before_the_revision_for_6c_is_asked_again_with_the_five_named`,
+    against `tests/fixtures/ConsentBrief-before-42b.md`, `-text` in `.gitattributes`).
+  - A yes given before 42a is still asked with all six (its two tests unchanged).
+- The word bound: under 2,000 words as sent at the runner's door, now under 2,300.
+  - Below the rule: 1,958 words before this package, 2,259 after.
+  - As sent at the runner's door: 1,994 before, 2,295 after.
+  - The stale sentence lost 25 words, and the kinds 6c added cost 326.
+- The pinned sentences of `test_the_consent_brief_says_the_officer_exists_and_the_hash_is_the_files`:
+  one for each new kind, and the stale sentence and the journal's old one replaced.
+
+No recorded passage is touched: the session's kind is not in the log.
+
+### The suite, as run
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- The three files the brief names (`python3 -m pytest tests/test_officer.py
+  tests/test_consent.py tests/test_captain.py`): 121 passed, none failed.
+- The regatta's fast tests (`tests/test_regatta.py`, the local runner's now asserting the
+  race): passed.
+- The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`): **3,295 passed, none
+  failed** (305 slow tests left out). The slow tier was not run: the package moves no
+  recorded passage, since the session's kind is not in the log.

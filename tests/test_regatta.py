@@ -303,6 +303,12 @@ def test_a_local_model_with_consent_on_record_sails_the_course_through_its_runne
     assert stationed and stationed[0].startswith("The captain takes the station")
     by_him = [e.text for e in world.log if e.actor == "the captain" and e.kind == "order.accepted"]
     assert any("steering n" in t.lower() for t in by_him), by_him
+    # the station is told it is in a race, not play with a human captain (package 42b)
+    from freesail.agents.agent import SESSION_RACE
+
+    h = world.agents["captain"]
+    assert h.agent.session_kind == SESSION_RACE
+    assert f"This session is {SESSION_RACE}." in h.brief.text()
     row = RG.score(short_course, world, judge, "local", identity=identity)
     assert row["kind"] == "a local model through its runner" and row["finished"]
 
