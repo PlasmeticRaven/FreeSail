@@ -75,3 +75,23 @@ the hands at them; a sea-keeping thread of its own beside the powder's milestone
 - **The chart's next goal:** the owner's question of 2026-10-17 (the Mediterranean, or the
   Great Lakes and North America for 1812, or the Caribbean for the West Indies station); the
   lead's opinion in the conversation of that day.
+
+## The world's business beyond one region, and fishing for the player (the owner and the lead, 2026-10-17)
+
+- **The business follows the player's ship.** Package 43b draws the business within the
+  region the scenario starts in. The owner's requirement: the draw tracks the player's ship
+  (or the followed ship) so that a passage into a new region finds new business about her;
+  and, to consider, a low-level simulation in every region so that a region entered is
+  already peopled; and any kind of ship passing between regions or routed to distant ports
+  and places in other regions. M7's design point: combat wants long-distance chases,
+  convoys, war and actions, and long-distance trading and intents. At the least, the
+  business's region tracks where the player's ship is.
+- **Fishing is a far-detail behaviour only** in m6c: a smack or a lugger of the business is
+  given the `fish` intent (a ground from the coast's features at the right depth, so many
+  hours on it, home again), by the fisherman's doctrine, never crewed; no catch is modelled
+  (she carries nothing home, the ports' pilchards are the market's own) and the player at
+  the smack's helm has no order to fish, no gear and no hold filling. For the player to fish
+  as the business does: an evolution (the nets or the lines shot and hauled, hours on the
+  ground, the hands at it), a catch into the hold by the ground, the season and the hours,
+  sold at a port that buys fish, and the far-detail fisherman given the same catch so the
+  two bodies agree. A small package of M7's or M7b's, the owner's call.
