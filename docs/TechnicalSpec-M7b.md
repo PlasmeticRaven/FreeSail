@@ -106,7 +106,13 @@ is not told that only certain orders are allowed; its brief says that a set of r
 orders is given as examples and that orders beyond them should be attempted when thought
 reasonable, so that in testing the director is unconstrained within the plausible-cause
 rule and tries a wide variety of things, and the record shows what is good, bad, useful or
-useless. An order in a form the game has no way to perform is answered honestly ("the game
+useless. The same holds in every domain's contents, not the order forms alone (the owner's
+clarification of the same day): the things found aboard, the weather's changes, the kinds
+of ship and intent, the news and the letters are each given as examples of reasonable
+things, never as the list of what is allowed, and the brief says that within each domain,
+and in domains the examples do not name, the director should attempt whatever it thinks
+reasonable; the tables are what the game can do, not what the director may say. An order
+in a form the game has no way to perform is answered honestly ("the game
 has no way to do this as said; say it another way, or enter it again with a `[reason:]` and
 it will be logged as attempted"), and re-entered with its reason it is logged in the
 director's log as an attempted act the game could not perform, with the words: the data for
