@@ -161,6 +161,11 @@ def test_the_bridge_lists_package_27s_tools_with_their_own_words_and_say(tmp_pat
         assert listed[name].input_schema == tools.parameters_schema(name)
     assert listed["say"].description == M.SAY_DESCRIPTION
     assert g.world.agents == {}  # listing the tools stations nobody
+    # a bridge started with `--station director` lists the director's own tools too (50)
+    d = M.Bridge(GameClient("http://testserver", "director", http=g.http), WEIGHTS, wait=5.0)
+    listed = {t.name for t in session(d, script)}
+    assert "world_order" in listed and "truth" in listed
+    assert listed == {*tools.tool_names(pictures=True, director=True), "say"}
 
 
 def test_each_tool_runs_in_the_game_through_the_bridge_with_the_authority_check(tmp_path):

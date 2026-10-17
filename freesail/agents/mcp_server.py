@@ -1202,7 +1202,7 @@ def build_server(bridge: Bridge) -> MCPServer:
     resource, and `keep_watch`, a prompt for the owner to start a watch with."""
     offered = tools.tool_names(
         pictures=True,  # the pictures this door carries (42)
-        director=getattr(bridge.game, "station", "") == "director",  # its own tools (50)
+        director=bridge.game.name == "director",  # its own tools (50)
     )
     mcp_tools = [
         _tool(bridge, name, t.description, tools.parameters_schema(name), list(t.params))

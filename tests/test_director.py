@@ -144,6 +144,7 @@ def test_the_station_is_made_with_the_players_brief_after_the_fixed_part_and_the
     assert "taking the station of the director" in head and SESSION_DIRECTOR in head
     assert "The voyage:" in head  # the voyage's words, as the captain's brief has them
     assert "no order of any ship" in head
+    assert "his standing orders as the book holds" not in head  # no captain over the director
     # the fixed brief head's order holds (truth 46), whatever the station brief says
     assert h.brief.order == ("disclosure", "opt_out", "documentation", "authority", "situation")
 

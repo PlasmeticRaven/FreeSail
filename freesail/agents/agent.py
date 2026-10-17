@@ -2084,11 +2084,15 @@ class Brief:
                 else:
                     said = [str(g) for g in allowances]
                 authority += f" The captain's word allows by name: {'; '.join(said)}."
-            book = "\n".join(f"  {ln}" for ln in (night_orders or [])) or ("  (the book is empty)")
-            authority += (
-                "\n\nThe captain's night orders, his standing orders as the book holds them "
-                f"(library(topic='standing orders') reads them again):\n{book}"
-            )
+            if station.authority is not Authority.DIRECTOR:
+                # the director has no captain over it; the book is the ship's (package 50)
+                book = "\n".join(f"  {ln}" for ln in (night_orders or [])) or (
+                    "  (the book is empty)"
+                )
+                authority += (
+                    "\n\nThe captain's night orders, his standing orders as the book holds "
+                    f"them (library(topic='standing orders') reads them again):\n{book}"
+                )
         items = {
             "disclosure": (
                 "This is a message from the harness of FreeSail, a game, and not part of the "
