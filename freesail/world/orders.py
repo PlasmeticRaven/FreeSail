@@ -1011,7 +1011,18 @@ def _move_person(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
             holder = stations.holder(st)
         except Exception:  # a people's build that cannot run binds nobody
             holder = None
-        if holder is person:
+        if holder is not person:
+            continue
+        # the station goes back to the person the wardroom file binds it to, where he is
+        # aboard and another (Mr Fox, brought aboard as master, leaves: the master's is Mr
+        # Harvey's again); else it is unbound, with nobody left to hold it
+        try:
+            kept = stations._file_holder(st)
+        except Exception:  # a people's build that cannot run binds nobody
+            kept = None
+        if kept is not None and kept is not person and kept.aboard:
+            stations.bind(st, kept, quiet=True)
+        else:
             stations.unbind(st, why=f"{person.name} went ashore at {port.name}", quiet=True)
     person.station = ""
     person.aboard = False

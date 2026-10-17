@@ -366,7 +366,8 @@ def test_a_person_made_from_words_comes_aboard_is_bound_and_goes_ashore():
     e = w.world_order('person: "Mr Fox" leaves the ship at Falmouth', "the test")
     assert e.data["result"] == "done" and not fox.aboard and fox.port == "falmouth"
     assert events(w, "person.ashore")[-1].text == "Mr Fox left the ship at Falmouth."
-    assert not w.stations.aboard("master")  # the station went with him
+    assert w.stations.holder("master").name == "Mr Harvey"  # the file's again
+    assert events(w, "station.bound")[-1].text == "The master's station is bound (Mr Harvey)."
     e = w.world_order('person: "Mr Pascoe" goes ashore', "the test")
     assert e.data["result"] == "done" and not w.stations.aboard("second officer")
     for text, words in (
