@@ -150,12 +150,22 @@ def test_the_bridge_lists_package_27s_tools_with_their_own_words_and_say(tmp_pat
         return (await c.list_tools()).tools
 
     listed = {t.name: t for t in session(g.bridge(), script)}
-    assert list(listed) == [*TOOLS, "say"]
+    # every tool but the director's own, which a bridge started for another station does
+    # not list (package 50; `tools.tool_names`)
+    assert list(listed) == [*tools.tool_names(pictures=True), "say"]
+    assert "world_order" not in listed and "truth" not in listed
     for name, t in TOOLS.items():
+        if t.director_only:
+            continue
         assert listed[name].description == t.description
         assert listed[name].input_schema == tools.parameters_schema(name)
     assert listed["say"].description == M.SAY_DESCRIPTION
     assert g.world.agents == {}  # listing the tools stations nobody
+    # a bridge started with `--station director` lists the director's own tools too (50)
+    d = M.Bridge(GameClient("http://testserver", "director", http=g.http), WEIGHTS, wait=5.0)
+    listed = {t.name for t in session(d, script)}
+    assert "world_order" in listed and "truth" in listed
+    assert listed == {*tools.tool_names(pictures=True, director=True), "say"}
 
 
 def test_each_tool_runs_in_the_game_through_the_bridge_with_the_authority_check(tmp_path):
@@ -285,7 +295,7 @@ def test_the_library_is_served_as_resources_and_the_brief_as_a_resource_and_a_pr
     assert "This is a message from the harness of FreeSail" in brief
     # the old captain prompt is gone; the officer's `take_the_watch` is package 37's, and
     # the captain's station's `take_command` package 40's
-    assert sorted(prompts) == ["brief", "keep_watch", "take_command", "take_the_watch"]
+    assert sorted(prompts) == ["brief", "direct", "keep_watch", "take_command", "take_the_watch"]
     assert prompt.messages[0].content.text == brief
     assert watch.messages[0].content.text == M.KEEP_WATCH
     assert b.briefed  # the prompt is the brief put into the conversation
@@ -971,7 +981,7 @@ def test_the_bridge_runs_over_stdio_against_a_game_on_a_local_port(tmp_path):
     finally:
         server.should_exit = True
         runner.join(timeout=10)
-    assert got["tools"] == [*TOOLS, "say"]
+    assert got["tools"] == [*tools.tool_names(pictures=True), "say"]  # not the director's (50)
     assert "This is a message from the developer of a game" in got["first"]
     assert "This is a message from the harness of FreeSail" in got["yes"]
     assert "reason: the glass" in got["say"]

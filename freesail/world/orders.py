@@ -46,23 +46,45 @@ the world with a description at a place, seen by the lookout as a mark is seen (
 twilight, at a mark's height), its bearing, distance and description in the log when it
 comes in sight; it is the world's (`World.marks_of_interest`), not the chart's, and is
 saved and replayed as every world order is.
+
+**The director's additions (spec M7b §3; package 50).** `aboard: <a thing found aboard>`
+(`data/director/aboard.yaml`: a spar found sprung, a cask stove, a seam working, the water
+foul), each a report of the ship's own people in the play log with what it does in the part
+graph or the stores; and **the feasibility check, which doubts and does not refuse**
+(decision 50): `doubt(world, order)` says why an order is one the simulation could not have
+produced on its own from where it is (a sail put inside the player's horizon in clear
+weather, a low out of a steady glass or deeper than the season's floor, a cutter sent from a
+port she is far from, a thing found aboard with no cause), and the director's channel
+(`freesail/agents/director.py`) answers with the reason and the owner's words: entered again
+with a `[reason: ...]` at its end (`parse` peels it into `WorldOrder.reason`), the order is
+performed and the director's log keeps the act, the doubt and the reason together. The
+scenario's and the owner's orders are never doubted: the doubt is the director's channel's.
 """
 
 from __future__ import annotations
 
+import functools
+import math
 import re
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Any
+
+from freesail import units
+from freesail.core.events import Severity
 
 __all__ = [
     "CHANNELS",
     "REFUSAL",
     "WorldOrder",
     "WorldOrderError",
+    "aboard_table",
     "apply",
+    "doubt",
     "parse",
     "recognises",
+    "split_reason",
 ]
 
 # The channels a world order speaks on, in the spec's order (§26), and `captain` (spec M6
@@ -71,7 +93,18 @@ __all__ = [
 # the director's seat hook, a model seated as the captain of another ship for a budget,
 # refused without a consent record, an owner's grant or budget, and the stand-down with
 # the director's note.
-CHANNELS = ("weather", "ship", "message", "port", "person", "captain", "mark", "seat", "unseat")
+CHANNELS = (
+    "weather",
+    "ship",
+    "message",
+    "port",
+    "person",
+    "captain",
+    "mark",
+    "seat",
+    "unseat",
+    "aboard",
+)
 
 # The captain's grammar refuses a world order in these words (truth 71).
 REFUSAL = (
@@ -82,10 +115,13 @@ REFUSAL = (
 )
 
 _HEAD = re.compile(
-    r"^\s*(weather|ship|message|port|person|captain|mark|seat|unseat)\b"
+    r"^\s*(weather|ship|message|port|person|captain|mark|seat|unseat|aboard)\b"
     r"\s*(\"[^\"]*\"|[\w-]+)?\s*:",
     re.I,
 )
+# The director's reason at the end of an order entered again after a doubt (decision 50):
+# `[reason: the story wants her there]`, peeled off and kept apart.
+_REASON = re.compile(r"\s*\[\s*reason\s*:\s*(?P<reason>[^\]]*)\]\s*$", re.I)
 
 
 class WorldOrderError(ValueError):
@@ -95,7 +131,8 @@ class WorldOrderError(ValueError):
 @dataclass(frozen=True)
 class WorldOrder:
     channel: str
-    text: str  # the order as given, which is what the journal keeps
+    text: str  # the order as given, which is what the journal keeps (the reason peeled off)
+    reason: str = ""  # the director's `[reason: ...]`, when the order was entered again
 
 
 def recognises(text: str) -> bool:
@@ -107,15 +144,25 @@ def recognises(text: str) -> bool:
     return _HEAD.match(low) is not None
 
 
-def parse(text: str) -> WorldOrder:
+def split_reason(text: str) -> tuple[str, str]:
+    """(the order, the director's reason): the `[reason: ...]` at the end peeled off,
+    "" when there is none (package 50; decision 50)."""
     text = " ".join(str(text).split())
+    rm = _REASON.search(text)
+    if rm is None:
+        return text, ""
+    return text[: rm.start()].rstrip(), " ".join(rm.group("reason").split())
+
+
+def parse(text: str) -> WorldOrder:
+    text, reason = split_reason(text)
     m = _HEAD.match(text)
     if m is None:
         raise WorldOrderError(
             f"'{text}' is no world order: say weather:, ship:, message:, port <id>:, person:, "
-            "captain:, seat: or unseat:."
+            "captain:, mark:, aboard:, seat: or unseat:."
         )
-    return WorldOrder(m.group(1).lower(), text)
+    return WorldOrder(m.group(1).lower(), text, reason)
 
 
 def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
@@ -138,6 +185,8 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
         return _seat(world, body)
     if order.channel == "unseat":
         return _unseat(world, body)
+    if order.channel == "aboard":
+        return _aboard(world, body)
     return _person(world, body)
 
 
@@ -718,3 +767,409 @@ def _person(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
     world.people.add(Person(pid, name, role, skill, place="shore", aboard=False, port=port.id))
     return f"{name}, {role}, ashore at {port.name}", {"id": pid, "role": role, "port": port.id}
+
+
+# ---------------------------------------------------------------------------
+# aboard (spec M7b §3; package 50): a thing found aboard, from the table
+# ---------------------------------------------------------------------------
+
+ABOARD_PATH = Path(__file__).resolve().parents[2] / "data" / "director" / "aboard.yaml"
+# A spar found sprung keeps this much of its condition when the table gives no figure.
+SPRUNG_CONDITION = 30.0
+# The watch the strain is looked back over for a spar found sprung (`strained`).
+STRAINED_LOOKBACK_S = 4 * 3600
+# The mean wind, in knots, above which a spar may spring without a strain line of its own.
+STRAINED_WIND_KN = 20.0
+
+
+@functools.lru_cache(maxsize=1)
+def aboard_table(path: str = str(ABOARD_PATH)) -> list[dict[str, Any]]:
+    """The things that may be found aboard (`data/director/aboard.yaml`), as the file has
+    them."""
+    import yaml
+
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    out = []
+    for d in raw.get("things") or []:
+        if not isinstance(d, dict) or not d.get("id") or not d.get("words"):
+            raise ValueError(f"{path}: each thing wants an id and its words.")
+        out.append(dict(d))
+    return out
+
+
+def _spar_by_name(ship: Any, words: str) -> str | None:
+    """A spar of the ship by her own name for it ('the fore topmast'), or None."""
+    from freesail.orders.resolve import display_name
+
+    key = " ".join(str(words).lower().split()).removeprefix("the ").strip()
+    for sid in getattr(ship, "spars", None) or ():
+        if display_name(ship, sid).lower().removeprefix("the ").strip() == key:
+            return sid
+    return None
+
+
+def _aboard_match(world: Any, body: str) -> tuple[dict[str, Any], str | None] | None:
+    """The table's thing the words name and, for a spar's, the spar's id: None when no
+    thing's words fit."""
+    said = " ".join(re.sub(r"^aboard\s*:", "", body, flags=re.I).split()).lower().rstrip(".")
+    ship = getattr(world, "ship", None)
+    for thing in aboard_table():
+        for form in thing["words"]:
+            form = " ".join(str(form).lower().split())
+            if "{spar}" not in form:
+                if said == form:
+                    return thing, None
+                continue
+            head, _, tail = form.partition("{spar}")
+            head, tail = head.strip(), tail.strip()
+            if not (said.startswith(head) and said.endswith(tail)):
+                continue
+            inner = said[len(head) : len(said) - len(tail)].strip()
+            if not inner:
+                continue
+            sid = _spar_by_name(ship, inner)
+            if sid is not None:
+                return thing, sid
+    return None
+
+
+def _aboard(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`aboard: <a thing found aboard>`: the thing's effect in the part graph or the
+    stores, and its people's report as a notable line of the play log (the order itself
+    is for the record only, decision 46)."""
+    from freesail.orders.resolve import display_name
+
+    found = _aboard_match(world, body)
+    if found is None:
+        forms = "; ".join(
+            str(t["words"][0]).replace("{spar}", "the <spar>") for t in aboard_table()
+        )
+        raise WorldOrderError(f"An aboard order is one of the table's things: {forms}.")
+    thing, sid = found
+    ship = world.ship
+    effect = dict(thing.get("effect") or {})
+    name = f"the {display_name(ship, sid)}" if sid is not None else ""
+    data: dict[str, Any] = {"thing": thing["id"]}
+    if "spar_condition" in effect:
+        spar = ship.parts[sid]
+        was = float(getattr(spar, "condition", 100.0))
+        spar.condition = min(was, float(effect.get("spar_condition") or SPRUNG_CONDITION))
+        data.update({"spar": sid, "condition": spar.condition, "was": was})
+        what = f"{name} sprung (its condition {spar.condition:g})"
+    elif "water_tons" in effect:
+        stores = getattr(world, "stores", None)
+        lost = float(effect["water_tons"])
+        if stores is not None:
+            taken = min(lost, max(0.0, float(stores.water_tons)))
+            stores.water_tons = max(0.0, float(stores.water_tons) - lost)
+            data.update({"water_tons_lost": taken, "water_tons": stores.water_tons})
+        what = f"a cask stove, {lost:g} ton of water lost"
+    elif effect.get("water_foul"):
+        stores = getattr(world, "stores", None)
+        if stores is not None:
+            stores.foul = True
+        data["water_foul"] = True
+        what = "the water found foul"
+    else:
+        what = f"{thing['id'].replace('_', ' ')} reported (nothing of the hull is modelled yet)"
+        data["report_only"] = True
+    report = str(thing.get("report") or "").replace("{spar}", name)
+    report = report[:1].upper() + report[1:]
+    world.record(Severity.NOTABLE, "aboard.found", report, data=data)
+    return f"found aboard: {what}", data
+
+
+# ---------------------------------------------------------------------------
+# The feasibility check (spec M7b §3; decision 50): doubted, not refused
+# ---------------------------------------------------------------------------
+
+# The sentence the director is answered with after the doubt's reason (the owner's words,
+# decision 50).
+REENTER_WORDS = (
+    "If you think the action you requested is still reasonable, you may enter it again "
+    "along with a [reason: ...], and it will be logged and performed."
+)
+# A cutter with a letter is sent from a port within this of the ship; sent from farther, a
+# port could not know where to find her (judgement: a day's sail for a cutter).
+LETTER_REACH_NM = 60.0
+# A price changed by more than this share of its standing is a market out of its ordinary.
+PRICE_SWING = 0.3
+# A low appended with its centre within this of the ship, deep, is a gale out of a steady
+# glass: the glass would have been falling for a day before such a centre came so near.
+LOW_NEAR_KM = 300.0
+# ...and "deep" is an anomaly below this many hPa under the month's background.
+LOW_DEEP_HPA = 12.0
+# The visibility, in miles, at or above which the weather is clear for the horizon's doubt.
+CLEAR_NM = 10.0
+# A sail's height for the horizon a new ship is doubted inside (a brig's trucks, metres).
+SAIL_HEIGHT_M = 30.0
+
+
+def doubt(world: Any, order: WorldOrder) -> str | None:
+    """Why the order is one the simulation could not have produced on its own from where
+    it is, in words, or None when it is a plausible cause. Never a refusal: the channel
+    says the reason and the director decides (decision 50). The checks, by channel:
+    `ship:` a new sail inside the player's horizon in clear weather by day, or on the
+    land; `mark:` a mark inside the horizon by day; `weather:` a low deeper than the
+    season's floor, a near deep low out of a steady glass, a waypoint faster than the
+    season's lows move or deeper than its floor; `message: by a cutter from <port>` beyond
+    the letter's reach; `port: price of` beyond the market's ordinary swing; `aboard:` a
+    thing with no cause (the table's `plausible_when`). The rest (`ship "X": intent`,
+    `person:`, `captain:`, `seat:`, `unseat:`, a letter left at a port, a port closed or
+    opened) are never doubted: a mind changed, a person's errand and the owner's grant want
+    no cause of the sea's."""
+    body = order.text
+    try:
+        if order.channel == "ship":
+            return _doubt_ship(world, body)
+        if order.channel == "mark":
+            return _doubt_mark(world, body)
+        if order.channel == "weather":
+            return _doubt_weather(world, body)
+        if order.channel == "message":
+            return _doubt_message(world, body)
+        if order.channel == "port":
+            return _doubt_port(world, body)
+        if order.channel == "aboard":
+            return _doubt_aboard(world, body)
+    except WorldOrderError:
+        return None  # a malformed order is the channel's own refusal, not a doubt
+    return None
+
+
+def _horizon(world: Any) -> tuple[float | None, bool]:
+    """(the lookout's reach in miles now, whether it is clear daylight): the horizon the
+    masthead gives a sail, cut to the visibility; None without a chart or a position."""
+    lookout = getattr(world, "lookout", None)
+    pos = getattr(world, "position", None)
+    if lookout is None or pos is None:
+        return None, False
+    from freesail.world.chart import NIGHT_LAND_NM
+    from freesail.world.geo import horizon_nm
+
+    day = str(getattr(world, "daylight", "")) == "day"
+    conditions = getattr(world, "conditions", None)
+    vis = conditions.visibility_nm if conditions is not None else math.inf
+    reach = min(vis, horizon_nm(lookout.height_of_eye_m, SAIL_HEIGHT_M))
+    if not day:
+        reach = min(reach, NIGHT_LAND_NM)
+    return reach, day and vis >= CLEAR_NM
+
+
+def _doubt_ship(world: Any, body: str) -> str | None:
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.ships import place_position
+
+    m = _SHIP_NEW.match(body)
+    if m is None:
+        return None  # a goal or an intent changed: a mind changed wants no cause
+    found = place_position(world, m.group("where"))
+    if found is None:
+        return None
+    pos = found[0]
+    chart = getattr(world, "chart", None)
+    if chart is not None and chart.contains(pos):
+        depth = chart.depth_at(pos)
+        if depth is not None and depth <= 0.0:
+            return (
+                f"the place {found[1]} is on the land by the chart: a ship put there would be "
+                "aground, and no ship sails from dry land"
+            )
+    reach, clear = _horizon(world)
+    here = getattr(world, "position", None)
+    if reach is None or here is None or not clear:
+        return None
+    nm = bearing_and_distance(here, pos)[1] / units.NAUTICAL_MILE
+    if nm <= reach:
+        return (
+            f"a sail put on the sea {nm:.1f} miles off is inside the lookout's horizon "
+            f"({reach:.0f} miles in this visibility, by day): she would have been seen coming "
+            "up over it, and appears from nothing"
+        )
+    return None
+
+
+def _doubt_mark(world: Any, body: str) -> str | None:
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.ships import place_position
+
+    m = _MARK.match(body)
+    if m is None:
+        return None
+    found = place_position(world, m.group("where"))
+    reach, clear = _horizon(world)
+    here = getattr(world, "position", None)
+    if found is None or reach is None or here is None or not clear:
+        return None
+    nm = bearing_and_distance(here, found[0])[1] / units.NAUTICAL_MILE
+    if nm <= reach:
+        return (
+            f"a mark put {nm:.1f} miles off is inside the lookout's horizon ({reach:.0f} "
+            "miles in this visibility, by day): it would have been in sight already"
+        )
+    return None
+
+
+def _month_table(world: Any) -> Any:
+    """The climatology's table for the month and the box she is in (the Channel's where
+    the world keeps none), for the season's bounds."""
+    from freesail.world.weather import load_climatology
+
+    systems = getattr(world, "systems", None)
+    try:
+        if systems is not None and getattr(systems, "climatology", None) is not None:
+            return systems._table(world.clock.ship_time)
+        clim = load_climatology()
+        origin = getattr(world, "origin", None)
+        box = (
+            clim.box_at(origin.lat_deg, origin.lon_deg) if origin is not None else clim.default_box
+        )
+        return box.month(world.clock.ship_time.month)
+    except Exception:  # noqa: BLE001  (no table: no bound to doubt by)
+        return None
+
+
+def _glass_steady(world: Any) -> bool:
+    """Whether the glass has not been falling: no glass, no tendency yet, or its words
+    steady or rising."""
+    glass = getattr(world, "glass", None)
+    tendency = glass.tendency() if glass is not None else None
+    if not tendency:
+        return True
+    words = str(tendency.get("words", "")).lower()
+    return not words.startswith("falling")
+
+
+def _doubt_weather(world: Any, body: str) -> str | None:
+    systems = getattr(world, "systems", None)
+    table = _month_table(world)
+    m = _SYSTEM.match(body)
+    if m is not None and m.group("kind").lower() == "low":
+        hpa = float(m.group("hpa"))
+        if table is not None and hpa < table.central_hpa[2]:
+            return (
+                f"a low of {hpa:g} hPa is deeper than the season's floor for these waters "
+                f"({table.central_hpa[2]:g} hPa in {table.name})"
+            )
+        if systems is not None:
+            x, y = float(m.group("x")), float(m.group("y"))
+            near = math.hypot(x - world.ship_x_km, y - world.ship_y_km)
+            background = float(systems.background_hpa)
+            if near <= LOW_NEAR_KM and background - hpa >= LOW_DEEP_HPA and _glass_steady(world):
+                return (
+                    f"a low {background - hpa:.0f} hPa deep put {near:.0f} km from the ship "
+                    "out of a steady glass: the glass would have been falling for a day before "
+                    "such a centre came so near"
+                )
+        return None
+    m = _WAYPOINT.match(body)
+    if m is not None and systems is not None:
+        system = systems.find(m.group("name"))
+        if system is None or not system.track or table is None:
+            return None
+        last = system.track[-1]
+        at = _time(m.group("at"))
+        hours = (at - last.at).total_seconds() / 3600.0
+        if hours <= 0:
+            return None
+        km = math.hypot(float(m.group("x")) - last.x_km, float(m.group("y")) - last.y_km)
+        fastest = table.speed_kn[1] * 1.852 * 1.5  # the season's fastest low, with a half over
+        if km / hours > fastest:
+            return (
+                f"the waypoint moves {system.name} at {km / hours:.0f} km an hour, faster than "
+                f"the season's lows move ({table.speed_kn[1]:g} knots at the most in {table.name})"
+            )
+        if system.kind == "low" and float(m.group("hpa")) < table.central_hpa[2]:
+            return (
+                f"the waypoint deepens {system.name} to {float(m.group('hpa')):g} hPa, below "
+                f"the season's floor ({table.central_hpa[2]:g} hPa in {table.name})"
+            )
+    return None
+
+
+def _doubt_message(world: Any, body: str) -> str | None:
+    from freesail.world.geo import bearing_and_distance
+
+    m = _MESSAGE_BY.match(body)
+    ports = getattr(world, "ports", None)
+    here = getattr(world, "position", None)
+    if m is None or ports is None or here is None:
+        return None
+    port = ports.find(m.group("port"))
+    if port is None:
+        return None
+    nm = bearing_and_distance(here, port.shore.position)[1] / units.NAUTICAL_MILE
+    if nm > LETTER_REACH_NM:
+        return (
+            f"a cutter sent from {port.name} with a letter for a ship {nm:.0f} miles off: the "
+            f"port could not know where to find her beyond {LETTER_REACH_NM:g} miles"
+        )
+    return None
+
+
+def _doubt_port(world: Any, body: str) -> str | None:
+    m = _PORT.match(body)
+    ports = getattr(world, "ports", None)
+    if m is None or ports is None or m.group("what").lower() != "price of":
+        return None
+    port = ports.find(m.group("port").strip('"'))
+    pm = re.match(r"^(?P<good>.+?)\s+(?P<pounds>[\d.]+)$", m.group("rest").strip())
+    if port is None or pm is None:
+        return None
+    good = port.market.find(pm.group("good"))
+    if good is None or not good.price:
+        return None
+    swing = abs(float(pm.group("pounds")) - float(good.price)) / float(good.price)
+    if swing > PRICE_SWING:
+        return (
+            f"the price of {good.good} at {port.name} moved by {swing:.0%} in a word, where a "
+            f"market moves by a few parts in ten; it stood at £{good.price:g} a ton"
+        )
+    return None
+
+
+def _doubt_aboard(world: Any, body: str) -> str | None:
+    from freesail.orders.resolve import display_name
+
+    found = _aboard_match(world, body)
+    if found is None:
+        return None
+    thing, sid = found
+    when = dict(thing.get("plausible_when") or {})
+    ship = world.ship
+    name = f"the {display_name(ship, sid)}" if sid is not None else ""
+    why = str(thing.get("doubt") or "the thing has no cause in the ship's state").replace(
+        "{spar}", name
+    )
+    if "strained" in when:
+        bar = float(when["strained"])
+        # a strain line of the spar's in the last watch, or a fresh mean wind
+        since = world.clock.tick - STRAINED_LOOKBACK_S
+        for e in reversed(world.log.all()):
+            if e.tick < since:
+                break
+            if e.kind.startswith("strain.") and (
+                e.data.get("part") == sid or float(e.data.get("ratio", 0.0) or 0.0) >= bar
+            ):
+                return None
+        record = getattr(world, "wind_record", None)
+        mean = record.mean_speed() if record is not None else None
+        if mean is not None and units.ms_to_knots(mean) >= STRAINED_WIND_KN:
+            return None
+        spar = ship.parts.get(sid) if sid is not None else None
+        if spar is not None and float(getattr(spar, "strain_ratio", 0.0)) >= bar:
+            return None
+        return why
+    if "sea_above" in when:
+        sea = getattr(world, "sea", None)
+        words = str(getattr(sea, "words", "") or "").lower() if sea is not None else ""
+        calm = [str(w).lower() for w in (when["sea_above"] or [])]
+        if sea is None or any(words == c or words.startswith(c) for c in calm):
+            return why
+        return None
+    if "days_out" in when:
+        days = world.clock.tick / 86400.0
+        if days < float(when["days_out"]):
+            return why
+        return None
+    return None

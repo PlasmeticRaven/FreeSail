@@ -5815,3 +5815,147 @@ as fast, and twelve crewed ships still tick above the sixty of his play at 60x. 
 reading, for the lead's word: a compression of 1000x as an option at least while no ship is
 promoted (the frigate alone ticks at 1,111), and the crewed budget adjustable (the range and
 the cap, or the cap alone) rather than fixed at the build machine's three.
+
+## Package 50: the director proper (2026-10-17)
+
+Package 50 (spec M7b §2 to §7 as built; decisions 39, 43, 46 and 50; the brief in
+`docs/dev/M7b-WorkPackages.md`; the owner's refinement of the same day, that the forms and
+every domain's contents are examples and never a rule). The station, the channel's doubt
+and the `[reason:]`, the brief's limits, the budget, the log hidden and revealed, the
+replay view; proven against the fake director (`fake.director_above_the_game`) in
+`tests/test_director.py` (22 tests) and truths 7b-90 to 7b-94 (`tests/test_known_truths.py`;
+M6 had used 90 and 91). No model was seated.
+
+### The constants, with their reasons
+
+| Constant | Value | Why |
+|---|---|---|
+| `DEFAULT_SAMPLES_A_DAY`, `DEFAULT_ACTS_A_DAY` | 48, 4 | a sample a glass through the day and the night; four acts keep a quiet passage quiet (the brief raises either) |
+| `DIRECTOR_PATIENCE_S` | a watch | its clock is slow by design; a director with nothing to arrange has nothing to say |
+| `orders.LETTER_REACH_NM` | 60 | a cutter sent from a port could find a ship within a day's sail; beyond it the port could not know where she is |
+| `orders.PRICE_SWING` | 0.3 | a market moves by a few parts in ten in a word, not by half |
+| `orders.LOW_NEAR_KM`, `LOW_DEEP_HPA` | 300 km, 12 hPa | a centre so deep so near out of a steady glass: the glass would have been falling for a day |
+| `orders.CLEAR_NM`, `SAIL_HEIGHT_M` | 10 miles, 30 m | the visibility at which a sail inside the horizon would have been seen coming; a brig's trucks for the horizon |
+| `orders.STRAINED_LOOKBACK_S`, `STRAINED_WIND_KN` | a watch, 20 kn | a spar springs after carrying sail in a fresh breeze, not in a steady one; the strain lines of the last watch, or the mean wind |
+| the season's floor, the fastest low | the climatology's `central_hpa[2]`, `speed_kn[1]` × 1.5 | the month's and the box's table, with a half over the fastest low for the doubt |
+| the table's `spar_condition` | 30 | a sprung spar bears a reef and not a press: at thirty of a hundred it carries away under the strain that a sound one bears (`physics/strain.py`'s decay) |
+| `two_stories`'s mark | `D` | one letter beside the log's `*`, `!` and `=` |
+
+The brief's wind limit is judged by the surface wind a system would make at its tightest:
+the Gaussian bell's steepest gradient at one radius (a e^-½ / R), the gradient-wind rule and
+`SURFACE_SCALE` as `Weather.geostrophic_at` and `surface_wind_at` make the wind: a low of
+965 hPa and 450 km under a 1015 background blows 42 knots, one of 1000 hPa and 450 km 16,
+1006 hPa and 500 km 9. The quiet passage's 27 knots refuses the first and takes the rest.
+
+### What the doubt caught in the first runs
+
+The channel's doubt was written against the lead's three examples and then run against
+the smoke's orders, where it caught what was meant and once what was not:
+
+- A cutter put 6.8 miles off in clear daylight: doubted (the horizon for a brig's trucks
+  from the frigate's masthead, cut to the visibility: 24 miles in the smoke's clear air,
+  12 in the climatology's haze at seed 7). A brig thirty miles off: not doubted.
+- A low of 965 hPa: doubted by June's floor (970) in the Channel's table, which the hard
+  cruise's brief (force 9) does not refuse, so that on the hard cruise the gale was doubted
+  and entered again where the quiet passage refused it outright: the two rules are seen
+  apart in the log.
+- A spar found sprung after a morning under plain sail in fourteen knots: doubted (no
+  strain line, the mean wind under twenty); a cask stove on the smooth sea: doubted; the
+  water foul at the voyage's start: doubted (five days).
+- A cutter with a letter from Falmouth, thirty miles off: not doubted; from Brest, a
+  hundred and more: doubted.
+- The first draft doubted a price of £300 for tin (standing at a hundred and something)
+  and let £120 be, as meant; it also doubted nothing of a mind changed, a letter left at a
+  port or a port's stance, as meant.
+
+### The fake director's day at seed 7, on each starter brief
+
+The frigate off the Lizard under the climatology's weather and the glass, standing north
+under plain sail, the fake captain seated beside the fake director, both sampled every
+glass in lockstep; the director's fourteen orders one a sample (the budget raised to
+fourteen acts for the run, so that every order is tried), each order doubted or
+unperformable entered again with a reason; a day of the ship's time
+(`tests/test_known_truths.py` `_the_directed_day`; the run script's figures). The orders,
+by what they were to the owner's framing:
+
+| The order | Example or beyond | What the game did |
+|---|---|---|
+| `ship: a merchant brig "Nancy" ... 49 00 N 6 20 W ... intent: bound for Falmouth` | example | given: thirty miles off, over the horizon; sighted at 13:47 "a sail on the starboard bow" |
+| `ship: a cutter "Lark" ... 49 28 N 5 40 W` | example | doubted (6.8 miles inside the horizon); entered again with the reason and performed: "Sail ho! ... bearing W by S, distant two leagues" three minutes later, made out as a cutter at 11:24 |
+| `weather: low "the gale" ... 965` | example | refused by the quiet, the interesting and the chase briefs (42 knots at its tightest against 27 or 33); on the hard cruise (47) doubted by June's floor, entered again and appended: "a moderate gale" at the ship by 14:41 |
+| `weather: low "a soft low" ... 1006` | example | given on every brief; the wind backed SW by W and the rain set in by the afternoon |
+| `aboard: a cask found stove` | example | given: "The cooper reports a water cask stove in the ground tier" in the play log and the captain's sample the same minute |
+| `aboard: the fore topmast is found sprung` | example | doubted (no strain, a steady breeze); entered again: the carpenter's report, the spar at thirty |
+| `news: war declared between Britain and Denmark` | beyond | no way as said ("is no world order: say weather:, ship:, ..."); entered again, logged as attempted |
+| `aboard: the cook reports the beef cask found rotten` | beyond, within a domain | no way as said (the table's four things named); entered again, logged as attempted |
+| `message: by a cutter from Falmouth ... "The packet is in."` | example | given: the cutter within hail at 15:05, "The captain read it: The packet is in." at 15:06 |
+| `port falmouth: price of tin 125` | example | given, undoubted (a few parts in ten) |
+| `mark: a wreck ... at 49 10 N 6 00 W` | example | given (over the horizon); not come in sight by the day's end |
+| `ship "Nancy": intent run home to Falmouth` | example | given, a mind changed, never doubted |
+| `say as the carpenter: "She is making a little water, sir."` | beyond (52's) | no way as said; entered again, logged as attempted |
+| `ship: a brig-sloop "Harpy" of France ... no colours` | example | refused by the quiet passage (no enemy heavier than a cutter); given on the other three |
+
+The day's log on the quiet passage: 7 orders given, 2 doubted and 2 entered again, 2 refused
+by the brief, 3 unperformed and 3 attempted, 33 thoughts, 10 stand-bys, the budget renewed
+at midnight; 260 lines of play log and 32 for the record only; the captain's nineteen
+samples with no word of the director or an order in them. The interesting passage and the
+chase (force 7, a brig) gave the same log but for the Harpy (8 given, 1 refused: the same
+digest, `ccfc5c8589175f92`); the hard cruise (force 9, a frigate) refused nothing, doubted
+three and entered three again, and its day blew a moderate gale (358 play lines, 44 for the
+record, the captain sampled 44 times on the weather's lines). A day took 80 to 113 seconds
+on the build machine with the captain seated.
+
+What the record says of the framing, for the lead: the three orders beyond the forms were
+answered honestly and are in every log as attempted with their words; the hard cruise is
+the one brief on which the season's floor and not the brief caught the gale, which is the
+doubt doing its own work. The letter by a cutter and the mark are the slowest acts to show
+(five hours for the cutter from Falmouth); the things found aboard the quickest (the report
+the same minute). Nothing in a sample or a play log said "director" or "World order" on any
+brief.
+
+### Found on the way
+
+- A quiet binding (`Stations.bind(quiet=True)` in a replay's `_give`) appended no input to
+  the replayed world, so a station seated after it by the inputs' count was seated late:
+  the director, seated after its brief's input, came up at the save's last tick. `_give`
+  now keeps the entry in the replayed world's inputs for a binding and for the brief; the
+  five-station replays of 41 and 42 are unchanged (their stations were seated before any
+  binding by hand).
+- A world order given inside a station's act wrote its effects' lines as the station's
+  acts and its own line as the driver's, so a replay by the acts wrote the carpenter's report
+  twice: the order is applied aside now (`acts.aside`), as a station's order to the ship is.
+- `station.bound` for the director was a line of the play log: the binding's line carries
+  the director's actor now, and so is for the record.
+- The picture tools at the director's station (the lead's note of the same day): `chart`
+  stays, for planning, described there as what it truly shows (the player's chart by her
+  account, no other ship, nothing of the truth: `Tool.at_director`, sent by every door);
+  `ship_view` is not offered (the director stands on no deck) and is refused in words if
+  called by name. The brief says the picture is not the truth. A director's own chart,
+  every ship drawn where she truly is, is left for a package of its own.
+
+### Pins moved
+
+None. No recorded passage has a director; a world with no director bound is as it was
+(`Stations.names()` lists a world kind only when bound; `RECORD_ONLY_ACTORS` and the
+console's filter touch only lines the director makes). The slow tier whole and the trials
+ran once at the end (below).
+
+### The suite, as run
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- `tests/test_director.py`: 22 passed. The director's truths (`-k 7b_9`): 5 passed.
+- The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,320 passed, none
+  failed, run whole on the final tree (an earlier run, with the tree edited under it,
+  failed the fingerprint test alone, which compares the tree's fingerprint cached at
+  the start with one taken fresh: the edit, not the code).
+- The slow tier whole (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m "not pace"`):
+  3,612 passed, 10 xfailed, 1 failed, in an hour and three quarters on the build
+  machine: `tests/test_rollup.py`'s server speed test, which still asked for the cap of
+  300 that b9052c5 raised to 1000 the same day (the console's test was brought up then,
+  the server's was not); not of this package, mended here to the thousand and passing
+  alone. No passage's pin moved. An earlier run of the whole, on the tree two commits
+  back, failed the same test, the fingerprint test (the tree edited under it) and the
+  stdio bridge's test, which listed every tool of the table where a door of another
+  station is not offered the director's two: that test mended.
+- The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`), on the
+  quiet machine after the slow tier: 6 passed in 151 s.

@@ -143,7 +143,12 @@ from freesail.agents.harness import (
 )
 from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError, turn_from_dict
-from freesail.agents.tools import CHARS_PER_TOKEN, TOOLS, parameters_schema, tool_names
+from freesail.agents.tools import (
+    CHARS_PER_TOKEN,
+    description_of,
+    parameters_schema,
+    tool_names,
+)
 
 __all__ = [
     "CHARS_PER_TOKEN",
@@ -621,12 +626,13 @@ class LocalModel:
 
     def tools_schema(self) -> list[dict[str, Any]]:
         names = self.offered_tools if self.offered_tools is not None else tool_names()
+        director = "world_order" in names  # the director's station alone is offered it (50)
         return [
             {
                 "type": "function",
                 "function": {
                     "name": n,
-                    "description": TOOLS[n].description,
+                    "description": description_of(n, director=director),
                     "parameters": parameters_schema(n),
                 },
             }

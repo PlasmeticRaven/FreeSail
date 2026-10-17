@@ -132,7 +132,8 @@
         });
         onSnapshot(data.snapshot);
       } else if (data.type === "event") {
-        log.add(data.event);
+        if (data.event.kind === "query.director_log") openDirectorLog(data.event);
+        else log.add(data.event);
       } else if (data.type === "rollup") {
         log.addRollup(data.rollup);
       } else if (data.type === "snapshot") {
@@ -339,6 +340,25 @@
   function closeLibrary() {
     $("library-panel").hidden = true;
     document.body.classList.remove("library-open");
+    drawShip();
+    $("command").focus();
+  }
+
+  // -- the director's log (spec M7b §6; package 50) --------------------------------------
+  // Shut during play; opened by the player's own request at the order line ('the
+  // director's log'), which the game records and tells the director of. Shown beside the
+  // play log, in the ship view's place, every act with its stamp and its reason.
+
+  function openDirectorLog(e) {
+    var lines = (e.data && e.data.lines) || String(e.text || "").split("\n");
+    $("director-log").textContent = lines.join("\n");
+    $("director-panel").hidden = false;
+    document.body.classList.add("director-open");
+  }
+
+  function closeDirectorLog() {
+    $("director-panel").hidden = true;
+    document.body.classList.remove("director-open");
     drawShip();
     $("command").focus();
   }
@@ -600,6 +620,7 @@
       if (document.body.classList.contains("library-open")) closeLibrary();
       else openLibrary("");
     });
+    $("btn-director-close").addEventListener("click", closeDirectorLog);
     var ease = $("opt-ease-on-station");
     if (ease) {
       ease.addEventListener("change", function () {

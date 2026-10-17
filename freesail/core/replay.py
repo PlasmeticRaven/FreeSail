@@ -233,8 +233,33 @@ def _give(world: World, entry: dict[str, Any]) -> None:
     if "world_order" in entry:
         world.world_order(str(entry["world_order"]), source=str(entry.get("source", "")))
         return
+    if "director_order" in entry:
+        # the player's order at the director's seat (package 50): through the director's
+        # door again, so that the doubt, the budget and the log are what they were
+        from freesail.agents import director as director_mod
+
+        world.inputs.append(dict(entry))
+        director_mod.direct(
+            world,
+            str(entry["director_order"]),
+            by=str(entry.get("by") or ""),
+            road=director_mod.REPLAY,
+        )
+        return
+    if "director_brief" in entry:
+        # the director's brief given at the console (package 50), an input since it was;
+        # given quietly, so the input is kept here, where the replayed world's count of
+        # its inputs seats a station after it as the play did
+        from freesail.agents.director import set_brief
+
+        world.inputs.append(dict(entry))
+        set_brief(world, entry["director_brief"], source=str(entry.get("source", "")), quiet=True)
+        return
     if "binding" in entry:
-        # a station bound or unbound (package 41), an input since package 42
+        # a station bound or unbound (package 41), an input since package 42; kept in the
+        # replayed world's inputs (package 50: a quiet binding appended none, and a station
+        # seated after it by the inputs' count was seated late)
+        world.inputs.append(dict(entry))
         b = entry["binding"]
         stations = getattr(world, "stations", None)
         if stations is not None:
@@ -713,6 +738,13 @@ def load_report(
     # (the world order that will drive it is M7b's), so a load gives the save's back
     if hasattr(world, "stations"):
         world.stations.load(data.get("stations"))
+    # the director's budget as the save had it (package 50): a replay by the acts drives
+    # no sample, so the day's samples are the save's; the brief is replayed by its input
+    budget = (data.get("director") or {}).get("budget")
+    if budget and report.how != "checkpoint":
+        from freesail.agents.director import DayBudget
+
+        world.director_state = DayBudget.from_dict(budget)
     return world, report
 
 

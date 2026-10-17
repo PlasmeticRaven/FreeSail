@@ -109,6 +109,12 @@ def capturing(world: Any) -> bool:
     return bool(f) and f[-1].capture
 
 
+def acting_station(world: Any) -> str:
+    """The station acting now ("" when none is)."""
+    f = _frames(world)
+    return f[-1].station if f else ""
+
+
 def _entry(world: Any, station: str, kind: str, payload: Any) -> None:
     world.station_acts.append(
         {
@@ -388,8 +394,23 @@ def _working_told(world: Any, station: str, payload: Any) -> None:
         w["told"] = True
 
 
+def _world_order(world: Any, station: str, payload: Any) -> None:
+    """A world order the director gave (package 50): carried out again through the
+    channel with its source, as the tool did (its line is the driver's, written by the
+    carrying out; the director's log's entries are the station's notes, given apart)."""
+    d = payload or {}
+    world._apply_world_order(str(d.get("text") or ""), str(d.get("source") or "the director"))
+    from freesail.agents import director as director_mod
+
+    if d.get("source") == director_mod.SOURCE:
+        director_mod.budget_of(world).acts += 1  # the day's count, as the tool counted it
+
+
 # Appliers for acts of other kinds (`record`), by kind: `fn(world, station, payload)`.
-APPLIERS: dict[str, Callable[[Any, str, Any], None]] = {"working_told": _working_told}
+APPLIERS: dict[str, Callable[[Any, str, Any], None]] = {
+    "working_told": _working_told,
+    "world_order": _world_order,
+}
 
 
 # ---------------------------------------------------------------------------

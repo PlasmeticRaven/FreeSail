@@ -161,6 +161,7 @@ from freesail.agents.agent import (
     BRIEF_LOG_LINES,
     CAPTAIN,
     CAPTAIN_BRIEF,
+    DIRECTOR,
     GENERAL_KEPT_BACK_WORDS,
     GENERAL_WITHIN_WORDS,
     LEAVING_WORDS,
@@ -254,8 +255,9 @@ __all__ = [
 TOOL_CALLS_PER_SAMPLE = ORDERS_PER_TURN
 READS_PER_SAMPLE = READS_PER_TURN
 
-# The tools that are orders, counted against the station's orders.
-ORDER_TOOLS = ("submit_order",)
+# The tools that are orders, counted against the station's orders (the director's world
+# order among them, package 50).
+ORDER_TOOLS = ("submit_order", "world_order")
 
 # The tools the budget does not count, always run however many calls came before
 # (package 29c, playtest 8: the model's `answer` was its ninth call, after six library
@@ -791,13 +793,22 @@ class Harness:
     @property
     def tool_names(self) -> tuple[str, ...]:
         """The tools this harness runs, in the table's order: all of `tools.TOOLS`, or
-        the allow-list when one is set."""
+        the allow-list when one is set; the director's own tools at the director's
+        station alone, and none of the deck's there (package 50)."""
         # the picture tools at a door that carries an image (package 42), and at the
         # local runner when its model reads one (package 45c: `pictures`, its seating's)
-        names = tools.tool_names(self.door in tools.PICTURE_DOORS or self.pictures)
+        names = tools.tool_names(
+            self.door in tools.PICTURE_DOORS or self.pictures, director=self._is_directors
+        )
         if self.allowed_tools is None:
             return names
         return tuple(n for n in names if n in self.allowed_tools)
+
+    @property
+    def _is_directors(self) -> bool:
+        """Whether this is the director's station (spec M7b §2; package 50): above the
+        game, its words its log's and its lines for the record only."""
+        return self.station.name == DIRECTOR and not self.conversation
 
     # -- start -------------------------------------------------------------------------
 
@@ -941,6 +952,8 @@ class Harness:
             )
         if not self._wants_deck:
             deck = ""  # no deck at the master's or the lookout's station (package 41)
+        if self._is_directors:
+            night_orders, general, grants = None, "", []  # no book of its own (package 50)
         self.brief = Brief.build(
             self.station,
             self.agent.session_kind,
@@ -953,7 +966,7 @@ class Harness:
             deck=deck,
             general=general,
             journal=self.journal_words(),
-            voyage=voyage_words(world) if self._is_captains else "",
+            voyage=voyage_words(world) if (self._is_captains or self._is_directors) else "",
         )
         self.turns.append(Turn(OPERATOR, self.brief.text()))
         return self.brief
@@ -1007,6 +1020,10 @@ class Harness:
             brief = LOOKOUT_BRIEF
         elif st.name == "watcher" and not st.has_authority:
             brief = WATCHER_BRIEF
+        elif st.name == DIRECTOR and st.domain is not None:
+            from freesail.agents.director import station_brief_text
+
+            brief = station_brief_text(self.world)
         else:
             return
         if st.brief == brief:
@@ -1162,6 +1179,8 @@ class Harness:
                 self._poll()
             return
         a = self.agent
+        if self._is_directors and self._budget_held():
+            return  # the day's budget spent: held until the next day (spec M7b §5)
         if a.paused:
             # the human's answer, or the driver's ten real minutes (`check_unattended`)
             return
@@ -1566,6 +1585,30 @@ class Harness:
 
     _shape_told: str | None = None  # the shape of another ship last told (package 43)
 
+    def _budget_held(self) -> bool:
+        """The director held for a spent budget until the next day (spec M7b §5; package
+        50): no sample opens, whatever the policy or a stand-by would do, and the log
+        said so when the budget was spent."""
+        from freesail.agents import director as director_mod
+
+        return director_mod.held(self.world)
+
+    def _director_notices(self, sample: bool) -> None:
+        """What the director's sample carries as a notice (package 50): the day's budget
+        renewed, the sample counted against it (a sample, not a fold), and the budget as
+        it stands."""
+        from freesail.agents import director as director_mod
+
+        world = self.world
+        renewed = director_mod.renew(world)
+        if renewed:
+            self.agent.notices.append(renewed)
+        if sample:
+            spent = director_mod.count_sample(world)
+            if spent:
+                self.agent.notices.append(spent)
+        self.agent.notices.append(director_mod.budget_words(world))
+
     def _station_notices(self) -> None:
         """What a station's own sample carries as a notice (package 41): the master's
         slate while a working is open, told once (`reckoning.Navigation.working_notice`);
@@ -1589,6 +1632,8 @@ class Harness:
 
     def _sample(self, reason: str, stood_by: dict[str, Any] | None = None) -> None:
         a = self.agent
+        if self._is_directors:
+            self._director_notices(sample=True)
         self._station_notices()
         sample = self._build_sample(reason)
         sample.stood_by = stood_by
@@ -1619,6 +1664,8 @@ class Harness:
         next turn carries everything since its last reply. The World does not wait."""
         o = self._open
         assert o is not None
+        if self._is_directors:
+            self._director_notices(sample=False)
         self._station_notices()
         delta = self._build_sample(reason)
         self.agent.last_sample_tick = self.world.clock.tick
@@ -1812,6 +1859,11 @@ class Harness:
         data: dict[str, Any] = {"station": self.station.name}
         if own_word:
             data["own_word"] = True
+        if self._is_directors:
+            # the director's words are a thought in its log (spec M7b §6; package 50),
+            # never a line of the play log: no station and not the player hears them
+            self.note(text, kind="note")
+            return
         say_aboard(self.world, self.station.name, self.who_words, text, data, self.actor)
 
     def _over_budget(self, c: ToolCall) -> str | None:
@@ -1888,6 +1940,10 @@ class Harness:
                 result = f"{result}\n\n{NUDGE_WITH_RESULT}{self._nudge_for_result}"
             self._nudge_for_result = None
             return result
+        if c.name == "world_order":
+            # the director's hand (package 50): the same order three times with no change
+            # in the world is the repeat detector's, as the ship's orders are
+            self._note_submission(str(c.args.get("text", "")))
         result = tools.call(self.world, self.station.name, c.name, c.args)
         if (
             c.name in tools.PICTURE_TOOLS
@@ -2992,6 +3048,17 @@ class Harness:
 
     def _say_handover(self, note: str, why: str) -> None:
         self.note(f"Handover note ({why}): {note}", kind=HANDOVER_KIND)
+        if self._is_directors:
+            # the note is the director's log's (spec M7b §6): the line says only that it
+            # left, and is for the record as every line of the director's is
+            self.world.record(
+                Severity.ROUTINE,
+                "agent.handover",
+                f"{self.mark} The director leaves a note in its log, {why}.",
+                actor=self.actor,
+                data={"station": self.station.name, "why": why},
+            )
+            return
         self.world.record(
             Severity.NOTABLE,
             "agent.handover",
@@ -3400,6 +3467,10 @@ class Harness:
         text = " ".join(str(text).split())
         if not text:
             return "An answer needs some words."
+        if self._is_directors:
+            # nobody asks the director (package 50): the words go to its log as a thought
+            self.note(text, kind="note")
+            return "Written in the director's log; nobody asked, and no station hears it."
         a = self.agent
         question = a.question
         asker = a.question_by

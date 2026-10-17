@@ -41,7 +41,7 @@
     <div class="command-line">
       <span class="prompt">&gt;</span>
       <input id="command" type="text" autocomplete="off" spellcheck="false"
-             placeholder="an order, or hold / go / speed 30 / tick 600 / library / world: ..."
+             placeholder="an order, or hold / go / speed 30 / tick 600 / library / world: ... / the director's log"
              aria-describedby="hint">
     </div>
     <!-- the console's completer as the line is typed (package 33d): Tab takes the first,
@@ -51,6 +51,13 @@
 
   <!-- the library and the ship's papers (package 33d), in the ship view's place while open -->
   <section id="library-panel" class="panel" hidden></section>
+
+  <!-- the director's log (spec M7b §6; package 50): shut during play, opened by the same
+       request that reveals it ('the director's log' at the order line), beside the play log -->
+  <section id="director-panel" class="panel" hidden>
+    <div class="panel-head"><span>The director's log</span><span class="hint"><button id="btn-director-close" type="button" title="shut the pane">close</button></span></div>
+    <pre id="director-log" class="director-log"></pre>
+  </section>
 
   <section id="ship-panel" class="panel">
     <div class="panel-head"><span>Ship</span><span class="hint">[ and ] turn the view; \ returns to leeward</span></div>

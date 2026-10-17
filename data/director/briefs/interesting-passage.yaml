@@ -1,0 +1,22 @@
+# An interesting passage (spec M7b §4; package 50): the sea at its ordinary, with more in
+# it: a stranger whose colours are not shown, a front that comes a little sooner than the
+# glass promised, a letter that changes the errand. Fresh weather is allowed; a gale is not.
+name: An interesting passage
+tone: >
+  A passage with things in it. Strangers that must be made out before they are trusted, a
+  front that arrives with the glass falling, a price or a letter that tempts a change of
+  plan, the carpenter with a report. The player should be kept thinking, never kept afraid.
+challenge: >
+  Judgement under some pressure: what is that sail, and should she run or stand on; does the
+  glass warrant a reef now; is the letter to be believed. Two notable things a watch at
+  most; the weather fresh, never a gale.
+limits:
+  wind_max_kn: 33          # the fresh gale's edge: nothing above force 7
+  enemy_heaviest: brig     # no enemy heavier than a brig
+  nobody_dies: true
+  the_war_as_it_is: true
+  the_chart_as_it_is: true
+cadence: glass
+budget:
+  samples_a_day: 48
+  acts_a_day: 6

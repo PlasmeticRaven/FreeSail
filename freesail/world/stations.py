@@ -107,11 +107,24 @@ class Stations:
         kinds = getattr(wardroom, "kinds", None) or {}
         return {n: k for n, k in kinds.items() if k in self.kinds()}
 
+    @staticmethod
+    def _world_kinds() -> tuple[str, ...]:
+        from freesail.agents.agent import WORLD_KINDS
+
+        return WORLD_KINDS
+
     def names(self) -> tuple[str, ...]:
         """The stations aboard now: every kind's own station unless unbound, the wardroom
         file's stations named other than their kind (package 45c), and the stations bound
-        by hand under other names, in the kinds' order, then the file's, then the hand's."""
-        out = [k for k in self.kinds() if k not in self._unbound]
+        by hand under other names, in the kinds' order, then the file's, then the hand's.
+        A kind that is the game's and not a ship's (the director's, package 50) is aboard
+        only when it was bound."""
+        world_kinds = self._world_kinds()
+        out = [
+            k
+            for k in self.kinds()
+            if k not in self._unbound and (k not in world_kinds or k in self._bound)
+        ]
         for name in self._file_kinds():
             if name not in out and name not in self._unbound:
                 out.append(name)
@@ -130,7 +143,7 @@ class Stations:
             return None
         if key in self._bound:
             return self._bound[key]
-        if key in self.kinds():
+        if key in self.kinds() and key not in self._world_kinds():
             person = self._file_holder(key)
             return Binding(key, key, person.name if person is not None else "")
         kind = self._file_kinds().get(key)
@@ -169,6 +182,8 @@ class Stations:
             who = self._bound[key].person
             people = getattr(self.world, "people", None)
             return people.find(who) if (who and people is not None) else None
+        if key in self._world_kinds():
+            return None
         return self._file_holder(key)
 
     def words(self) -> list[str]:
@@ -234,6 +249,7 @@ class Stations:
             BOUND_KIND,
             text,
             data={"station": key, "kind": kind, "person": who},
+            **self._actor_of(kind),
         )
         return text
 
@@ -259,8 +275,22 @@ class Stations:
         self._bound.pop(key, None)
         self._unbound.add(key)
         text = f"The {key}'s station is unbound: {why}."
-        self._record(Severity.ROUTINE, UNBOUND_KIND, text, data={"station": key, "why": why})
+        self._record(
+            Severity.ROUTINE,
+            UNBOUND_KIND,
+            text,
+            data={"station": key, "why": why},
+            **self._actor_of(self.kind_of(key) or key),
+        )
         return text
+
+    def _actor_of(self, kind: str) -> dict[str, str]:
+        """The actor of a binding's line: the game's, but a world kind's (the director's,
+        package 50) its own, whose lines are for the record only (`events.for_the_record`:
+        a director you can see coming is not a director)."""
+        from freesail.core.events import station_actor
+
+        return {"actor": station_actor(kind)} if kind in self._world_kinds() else {}
 
     def _record(self, *args: Any, **kw: Any) -> Any:
         """The binding's own line: the input's, never a station's act, even when a

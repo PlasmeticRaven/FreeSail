@@ -236,12 +236,12 @@ def test_the_server_sends_rollups_at_sixty_and_events_below():
     assert [r.text for r in shown if isinstance(r, Rollup)] == [r["text"] for r in rolls]
 
 
-def test_the_server_takes_speed_to_three_hundred_and_serves_the_store_by_ticks():
+def test_the_server_takes_speed_to_a_thousand_and_serves_the_store_by_ticks():
     driver = Driver(frigate())
     app = create_app(driver)
     with TestClient(app) as client:
-        r = client.post("/api/driver", json={"action": "speed", "value": 1000})
-        assert r.json()["compression"] == 300.0
+        r = client.post("/api/driver", json={"action": "speed", "value": 6000})
+        assert r.json()["compression"] == 1000.0  # the most there is since b9052c5
         client.post("/api/order", json={"text": "set plain sail"})
         client.post("/api/driver", json={"action": "tick", "value": 3700})
         with client.websocket_connect("/ws") as ws:

@@ -15,7 +15,7 @@ slow tier once at the end; a section in the tuning notes and a report to the lea
 
 | Package | Builder | What | State |
 |---|---|---|---|
-| 50 | Fable | The director proper: the station above the game, the world orders doubted not refused, the brief and its limits, the budget, the hidden log revealed on request and inline in replays | briefed 2026-10-17, brought forward to the close of M6 (decision 50); approved and launched the same day |
+| 50 | Fable | The director proper: the station above the game, the world orders doubted not refused, the brief and its limits, the budget, the hidden log revealed on request and inline in replays | briefed 2026-10-17, brought forward to the close of M6 (decision 50); approved and launched the same day; **built the same day** (spec §2 to §7 as built, the Harness's §19, the primer's chapter 20, the tuning notes; the owner's refinement of the examples-not-a-rule framing in the brief and the channel), the report to the lead |
 | 52 | Opus | The director's voice: people from words, `say as`, the unseated answered; the word heard a word on deck; the truth of who commands told to every station | briefed 2026-10-17, after 50 |
 | 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | brief to write |
 | 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | brief to write |

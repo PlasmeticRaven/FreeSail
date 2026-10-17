@@ -346,6 +346,19 @@ TAKE_COMMAND = (
     "at each of your turns. The owner is at the door and his words reach you as the owner's."
 )
 
+# ...and to take the director's station (package 50; spec M7b §2): above the game, the
+# world orders its hand, the log its record.
+DIRECT = (
+    "Please connect to the FreeSail game through its tools and read what its harness sends "
+    "you first. If it offers you the director's station, read the player's brief at the end "
+    "of the station brief and shape the voyage as it asks, through world orders alone "
+    "(world_order) and through plausible causes: the truth tool shows you the world as it "
+    "is, the forms the game performs are examples and not the whole of what you may try, "
+    "and an order the channel doubts may be entered again with a [reason: ...]. Write your "
+    "reasons in your journal, which is the director's log; hand the floor back with "
+    "stand_by at each of your turns, for a glass, a watch or an event."
+)
+
 CONSENT, STATION, STOPPED = "consent", "station", "stopped"
 
 # The model name `.mcp.json` carries until the owner sets it: the bridge stations nobody
@@ -1187,10 +1200,21 @@ def build_server(bridge: Bridge) -> MCPServer:
     """The MCP server over a bridge: package 27's tools with their own names and words,
     `say`, the library as resources (read from the game), the brief as a prompt and a
     resource, and `keep_watch`, a prompt for the owner to start a watch with."""
+    director = bridge.game.name == "director"
+    offered = tools.tool_names(
+        pictures=True,  # the pictures this door carries (42)
+        director=director,  # its own tools, and the chart's words for it (50)
+    )
     mcp_tools = [
-        _tool(bridge, name, t.description, tools.parameters_schema(name), list(t.params))
+        _tool(
+            bridge,
+            name,
+            tools.description_of(name, director=director),
+            tools.parameters_schema(name),
+            list(t.params),
+        )
         for name, t in tools.TOOLS.items()
-        if name in tools.tool_names(pictures=True)  # the pictures this door carries (42)
+        if name in offered
     ]
     mcp_tools.append(_tool(bridge, "say", SAY_DESCRIPTION, SAY_SCHEMA, ["text"]))
     srv = MCPServer("freesail", instructions=INSTRUCTIONS, tools=mcp_tools)
@@ -1261,6 +1285,17 @@ def build_server(bridge: Bridge) -> MCPServer:
     def take_command() -> str:
         return TAKE_COMMAND
 
+    @srv.prompt(
+        name="direct",
+        description=(
+            "Ask the model to connect to the FreeSail game as the director, above the game, "
+            "and shape the voyage through world orders by the player's brief (the bridge "
+            "started with --station director; package 50)."
+        ),
+    )
+    def direct() -> str:
+        return DIRECT
+
     return srv
 
 
@@ -1282,8 +1317,9 @@ def main(argv: list[str] | None = None) -> int:
         help=(
             "the station asked for, by its name aboard: the watcher, the officer of the "
             "watch ('officer', package 37), the captain (package 40), the master, the "
-            "lookout or a passenger (package 41); the game refuses in words a station the "
-            "ship has not got"
+            "lookout or a passenger (package 41), or the director above the game (package "
+            "50, when the game has a brief for one); the game refuses in words a station "
+            "the ship has not got"
         ),
     )
     ap.add_argument(

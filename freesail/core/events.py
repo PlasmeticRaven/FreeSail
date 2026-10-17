@@ -187,12 +187,20 @@ def rolls_up(compression: float) -> bool:
 # the full record (the log's store, the save, the replay, the director's view) and never
 # in a station's sample, its `read_log` or the browser's play log, which carry only its
 # effects as they are met. Marked by kind, so that no line's words or digest move.
-RECORD_ONLY_KINDS = frozenset({"world.order"})
+RECORD_ONLY_KINDS = frozenset({"world.order", "director.revealed"})
+# ...and the actors whose every line is for the record (spec M7b §6; package 50): the
+# director's station, whose seating, stand-bys and leaving no station and no play log
+# sees (a director you can see coming is not a director); added as its station is made
+# (`agents.agent.Station`), so that a world with no director has the set empty.
+RECORD_ONLY_ACTORS: set[str] = {"the director"}
 
 
 def for_the_record(e: Event) -> bool:
-    """Whether the line is for the record only and left out of the play log (decision 46)."""
-    return getattr(e, "kind", "") in RECORD_ONLY_KINDS
+    """Whether the line is for the record only and left out of the play log (decision 46;
+    the director's own lines, spec M7b §6)."""
+    return (
+        getattr(e, "kind", "") in RECORD_ONLY_KINDS or getattr(e, "actor", "") in RECORD_ONLY_ACTORS
+    )
 
 
 def kept(e: Event) -> bool:

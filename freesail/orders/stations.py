@@ -528,6 +528,16 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
     by, officer = _speaker(ship)
     said_by = {"by": by} if by else {}
     speaker = _station_speaking(ship) if not by else None
+    if verb in ("ask", "tell", "show the journal of"):
+        # the director is above the game (spec M7b §6; package 50): nobody asks it or tells
+        # it on deck, and its journal is its log, read by name and never in the play log
+        named = _station_named(norm, verb, ship)
+        if named == "director":
+            raise OrderError(
+                "The director is above the game: nobody asks or tells it on deck, and its "
+                "log is read by name, 'the director's log', at the prompt (the player's "
+                "brief is given with 'director: brief ...')."
+            )
     if verb in ("say", "hail"):
         return _say(ship, verb, text)
     if verb in (
@@ -607,6 +617,19 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             {"station": station},
         )
     return "agent.resume", agent.resume("the captain"), {"station": station}
+
+
+def _station_named(norm: str, verb: str, ship: Any) -> str | None:
+    """The station a sentence names, for the director's refusal (package 50)."""
+    if verb == "show the journal of":
+        m = _JOURNAL.match(norm)
+        who = (m.group("who") or m.group("who2") or "") if m else ""
+        return _station_in(who, ship)
+    try:
+        station, _ = _split_ask(norm, ship, verb=verb)
+    except OrderError:
+        return None
+    return station
 
 
 def _kind_of(ship: Any, station: str) -> str:

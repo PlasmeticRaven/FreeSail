@@ -2847,8 +2847,8 @@ def _stations(world: Any, _: str | None) -> dict[str, Any] | None:
     rows = []
     for name in stations.names():
         b = stations.binding(name)
-        if b is None:
-            continue
+        if b is None or b.kind == "director":
+            continue  # the director is not a ship's station (package 50), and is not seen
         held = _station_held(world, name)
         rows.append(
             {
@@ -3052,3 +3052,199 @@ def tendency_in_words(value: dict[str, Any]) -> str:
     if one is not None:
         parts.append(f"{_inches_words(one)} in the last hour")
     return f"{words}; {', '.join(parts)}" if parts else words
+
+
+# ---------------------------------------------------------------------------
+# Package 50 (spec M7b §2): the truth, the director's reading surface. Not a row of the
+# registry (a row is the ship's, read at the prompt and by every station alike: truth 81
+# gives the captain no road to the truth), but a surface of its own that the `truth` tool
+# serves the director's station alone, listed in the parity test as by design.
+# ---------------------------------------------------------------------------
+
+# How far ahead the systems are read for "the weather as the systems will make it".
+TRUTH_AHEAD_S = 4 * 3600
+
+
+def director_readings(world: Any) -> dict[str, Any]:
+    """The truth as the director reads it: every ship's true position, heading, speed,
+    sail and state (the player's first, by her name, then every vessel on the sea with her
+    captain's intent and her brain's state where she has one); the weather as it is at
+    the player's ship and as the systems will make it a watch on, with the systems by
+    name; the tide; the people aboard every crewed ship and their states; the markets'
+    prices; the news (the wars, and each port's). In words and as data."""
+    from freesail.world.geo import bearing_and_distance, format_position
+
+    out: dict[str, Any] = {"stamp": world.clock.stamp()}
+    here = getattr(world, "position", None)
+    ships: list[dict[str, Any]] = []
+    ship = world.ship
+    own: dict[str, Any] = {
+        "name": getattr(ship, "name", "the ship"),
+        "position": format_position(here) if here is not None else "on the plane",
+        "heading": units.format_heading(float(ship.heading)),
+        "speed": f"{_knots_of(world):.1f} knots",
+    }
+    if hasattr(ship, "sails"):
+        from freesail.api.queries import sail_set_line
+
+        own["sail"] = sail_set_line(ship).removeprefix("Sail set: ")
+    cap = getattr(world, "captain", None)
+    if cap is not None:
+        own["captain"] = cap.words() if hasattr(cap, "words") else str(cap.state)
+    ships.append(own)
+    vessels = getattr(getattr(world, "vessels", None), "vessels", None) or []
+    for v in vessels:
+        if v.done:
+            continue
+        d: dict[str, Any] = {
+            "name": v.name,
+            "what": v.what or v.kind,
+            "nation": v.nation,
+            "colours": "shown" if v.shows_colours else "none",
+            "position": format_position(v.position),
+            "heading": units.format_heading(units.deg_to_rad(v.heading_deg)),
+            "speed": f"{v.speed_kn:.1f} knots",
+            "sail": v.sail_state,
+            "detail": v.detail,
+            "goal": v.goal,
+        }
+        if here is not None:
+            bearing, distance = bearing_and_distance(here, v.position)
+            d["from_the_ship"] = (
+                f"bearing {units.format_heading(bearing)}, "
+                f"{distance / units.NAUTICAL_MILE:.1f} miles"
+            )
+        if v.brain is not None:
+            d["intent"] = v.intent_words
+            d["state"] = getattr(v.brain, "state", v.state)
+        if v.letter is not None:
+            d["letter"] = f"from {getattr(v.letter, 'origin', '')}"
+        ships.append(d)
+    out["ships"] = ships
+    out["weather"] = _truth_weather(world)
+    ts = getattr(world, "tide_state", None)
+    if ts is not None:
+        out["tide"] = {
+            "height_m": round(float(ts.height_m), 2),
+            "rising": bool(ts.rising),
+            "stream": f"{float(ts.rate_kn):.1f} knots along {ts.axis_deg:.0f} degrees",
+            "words": (
+                f"{'the flood' if ts.rising else 'the ebb'}, {float(ts.height_m):.1f} m "
+                f"above the datum, the stream {float(ts.rate_kn):.1f} knots"
+            ),
+        }
+    people: dict[str, list[str]] = {}
+    own_people = getattr(world, "people", None)
+    if own_people is not None:
+        try:
+            people[own["name"]] = own_people.describe()
+        except Exception:  # noqa: BLE001  (a ship without a muster)
+            pass
+    for v in vessels:
+        crew = getattr(v, "crew", None)
+        if crew is not None and getattr(crew, "people", None) is not None:
+            try:
+                people[v.name] = crew.people.describe()
+            except Exception:  # noqa: BLE001
+                pass
+    out["people"] = people
+    ports = getattr(world, "ports", None)
+    markets: dict[str, dict[str, float]] = {}
+    news: list[str] = []
+    nations = getattr(world, "nations", None)
+    if nations is not None:
+        for w in nations.wars:
+            a, b = w["between"]
+            news.append(f"{nations.get(a).name} and {nations.get(b).name} are at war")
+    if ports is not None:
+        for port in ports.ports.values():
+            if port.market.goods:
+                markets[port.name] = {
+                    g: round(float(x.price), 1) for g, x in port.market.goods.items()
+                }
+            for line in port.news:
+                news.append(f"at {port.name}: {line}")
+            if port.closed_to:
+                news.append(f"{port.name} is closed to {', '.join(port.closed_to)}")
+    out["markets"] = markets
+    out["news"] = news
+    out["words"] = _truth_words(out)
+    return out
+
+
+def _knots_of(world: Any) -> float:
+    dyn = getattr(world.ship, "dyn", None)
+    if dyn is not None:
+        return units.ms_to_knots(float(getattr(dyn, "speed", 0.0)))
+    return units.ms_to_knots(float(getattr(world.ship, "speed", 0.0)))
+
+
+def _truth_weather(world: Any) -> dict[str, Any]:
+    """The weather as it is at the ship and as the systems will make it a watch on: the
+    systems moved along their tracks (scripted) or by their velocity (seeded) and read at
+    the ship's place now, then put back; the systems by name beside it."""
+    from datetime import timedelta
+
+    strength = units.describe_wind_strength(world.wind.effective_speed)
+    out: dict[str, Any] = {"wind_now": f"{world.wind.describe()}, {strength}"}
+    conditions = getattr(world, "conditions", None)
+    if conditions is not None:
+        out["sky"] = conditions.sky
+        out["weather_words"] = conditions.weather
+        out["visibility"] = conditions.visibility
+        out["pressure_hpa"] = round(float(conditions.pressure_hpa), 1)
+    systems = getattr(world, "systems", None)
+    if systems is None:
+        out["systems"] = "none: the scenario pins its wind"
+        return out
+    out["systems"] = systems.describe()
+    then = world.clock.ship_time + timedelta(seconds=TRUTH_AHEAD_S)
+    kept = [(s, s.x_km, s.y_km, s.anomaly_hpa) for s in systems.systems]
+    try:
+        from freesail.world.weather import _track_at
+
+        for s in systems.systems:
+            if s.scripted and s.track:
+                x, y, hpa = _track_at(s.track, s.track_times, then)
+                s.x_km, s.y_km, s.anomaly_hpa = x, y, hpa - systems.background_hpa
+            else:
+                hours = TRUTH_AHEAD_S / 3600.0
+                s.x_km, s.y_km = s.x_km + s.vx_kmh * hours, s.y_km + s.vy_kmh * hours
+        direction, speed = systems.surface_wind_at(world.ship_x_km, world.ship_y_km, then)
+        out["wind_in_a_watch"] = (
+            f"{units.point_name(direction)} {units.ms_to_knots(speed):.0f} knots by the "
+            "systems, at the ship's place now"
+        )
+    except Exception as e:  # noqa: BLE001  (a system that cannot be moved: say so)
+        out["wind_in_a_watch"] = f"not to be had ({type(e).__name__})"
+    finally:
+        for s, x, y, a in kept:
+            s.x_km, s.y_km, s.anomaly_hpa = x, y, a
+    return out
+
+
+def _truth_words(d: dict[str, Any]) -> str:
+    parts = []
+    for s in d.get("ships") or []:
+        bits = [s["name"]]
+        if s.get("what"):
+            bits.append(s["what"])
+        bits.append(f"at {s['position']}")
+        bits.append(f"heading {s['heading']}, {s['speed']}")
+        if s.get("sail"):
+            bits.append(f"sail: {s['sail']}")
+        if s.get("from_the_ship"):
+            bits.append(f"from the ship {s['from_the_ship']}")
+        if s.get("intent"):
+            bits.append(f"intent {s['intent']} ({s.get('state', '')})")
+        elif s.get("goal"):
+            bits.append(s["goal"])
+        parts.append("; ".join(bits))
+    w = d.get("weather") or {}
+    weather = f"the wind {w.get('wind_now', '')}"
+    if w.get("wind_in_a_watch"):
+        weather += f"; in a watch {w['wind_in_a_watch']}"
+    parts.append(weather)
+    if d.get("tide"):
+        parts.append(f"the tide: {d['tide']['words']}")
+    return ". ".join(parts) + "."

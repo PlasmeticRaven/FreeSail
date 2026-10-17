@@ -1,0 +1,52 @@
+# The things a director may have found aboard the player's ship (spec M7b §3, `aboard:`;
+# package 50): each is a report of the ship's own people (the carpenter's, the cooper's, the
+# purser's) with what it does in the part graph or the stores, and the condition under which
+# the simulation could have produced it on its own. An `aboard:` order whose condition does
+# not hold is doubted, not refused (decision 50): the channel says why, and the director may
+# enter it again with a `[reason: ...]`.
+#
+# Fields: `words` are the forms the order takes after `aboard:` (`{spar}` stands for a spar
+# of the ship by her own name for it: "the fore topmast"); `report` is the notable line the
+# play log carries, said by the ship's people and never naming the order; `effect` is what
+# changes (`spar_condition`: the spar's condition set to the figure, so that it carries away
+# the sooner under a press of sail, as a sprung spar does; `water_tons`: taken from the
+# stores; `water_foul`: the stores' water marked foul, which the purser's page says and
+# which the needs of package 54 read; `report_only`: nothing modelled yet, said so);
+# `plausible_when` names the condition (`strained`: the spar has borne a strain above the
+# figure of its rating in the last watch, or the mean wind has been fresh; `sea_above`: the
+# sea's words beyond the ones named, so that she has been working; `days_out`: the ship's
+# time since the voyage began); `harm` is `none`, `hurt` or `deadly`, and a brief with
+# `nobody_dies` refuses the deadly.
+things:
+  - id: spar_sprung
+    words: ["{spar} is found sprung", "{spar} found sprung", "{spar} sprung"]
+    source: Falconer 1780, SPRUNG ("the state of a mast or yard when it is cracked or split by the violence of the wind")
+    report: "The carpenter reports {spar} sprung: it will not bear a press of sail, and he asks that it be fished when the weather serves."
+    effect: {spar_condition: 30}
+    plausible_when: {strained: 0.6}
+    doubt: "nothing has strained {spar}: she has carried no press of sail in the last watch, and a spar does not spring of itself in a steady breeze"
+    harm: none
+  - id: cask_stove
+    words: ["a cask found stove", "a cask is found stove", "a water cask stove", "a cask stove"]
+    source: Falconer 1780, STOWAGE; the ground tier of the hold
+    report: "The cooper reports a water cask stove in the ground tier: a ton of water lost to the bilge."
+    effect: {water_tons: 1.0}
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
+    doubt: "she lies easy on a smooth sea: nothing has started a cask in the tier"
+    harm: none
+  - id: seam_working
+    words: ["a seam found working", "a seam is found working", "a seam working", "she is found making water"]
+    source: Falconer 1780, LEAK; the well sounded each watch
+    report: "The carpenter reports a seam working below the wale on the weather side; the well is to be sounded every glass."
+    effect: {report_only: true}
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
+    doubt: "she has not been working in a sea: a seam opens under a labouring ship, not at her ease"
+    harm: none
+  - id: water_foul
+    words: ["the water is found foul", "the water found foul", "the water foul"]
+    source: the purser's casks; Regulations and Instructions 1806, the Purser
+    report: "The purser reports the water in the ground tier foul: the hands turn from it, and he asks that she water at the first port."
+    effect: {water_foul: true}
+    plausible_when: {days_out: 5}
+    doubt: "she watered within the week: casks do not foul in five days"
+    harm: none

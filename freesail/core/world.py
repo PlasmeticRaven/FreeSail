@@ -218,6 +218,9 @@ class Scenario:
     # Package 43 (spec M6 §23): the owner's grant to the director, {"models": [the exact
     # names], "seats": how many at once, "seats_in_voyage": how many in all}; empty where
     # the owner gave none, and the seat hook refuses. A save from before loads with none.
+    # Package 50 (spec M7b §4): `brief` beside them, the player's brief for the director
+    # (a starter's name, a file, or the mapping itself), which binds the director's station
+    # on the World when the game is made (`freesail.agents.director`).
     director: dict[str, Any] = field(default_factory=dict)
     # Package 43b (spec M6 §19): the world's business, `business:` in the scenario file
     # (on, off, or a density; `freesail.world.business`); None, off, for every scenario that
@@ -279,7 +282,7 @@ RULE_ACTOR_PREFIXES = (STANDING_ACTOR_PREFIX, CAPTAIN_RULE_PREFIX)
 # 40b): the master's slate, which an officer works his own reckoning from. `submit` hands
 # such an answer back as an Event it does not record; a station reads it in its tool's
 # result, and the console and the browser show it to the player who asked.
-UNLOGGED_KINDS = frozenset({"query.slate"})
+UNLOGGED_KINDS = frozenset({"query.slate", "director.answer"})
 
 # The motion's words must hold this long before the log says they changed (spec M5 §4;
 # judgement: five minutes, so a roll hovering about "rolling" and "rolling easily" is
@@ -729,6 +732,17 @@ class World:
         self.captain = Captain(
             self, intent=self.scenario.intent or None, books=tuple(self.scenario.books)
         )
+        # The director (spec M7b §2 to §6; package 50): the player's brief, given by the
+        # scenario here or at the console later (`agents.director.set_brief`, an input), the
+        # day's budget, and the station bound on the World when a brief is given; a world
+        # with none is as it was.
+        self.director_brief: Any = None
+        self.director_state: Any = None
+        brief_spec = (self.scenario.director or {}).get("brief") if self.scenario.director else None
+        if brief_spec:
+            from freesail.agents.director import set_brief
+
+            set_brief(self, brief_spec, source="the scenario", quiet=True)
         self.record(
             Severity.NOTABLE,
             "world.start",
@@ -768,6 +782,12 @@ class World:
         )
         if self._acts_frames:
             acts.line(self, e)  # a station's line, journaled as its act (package 42)
+        if kind == "director.revealed":
+            # the player asked for the director's log (spec M7b §6; package 50): the log's
+            # entry and the director's notice, made or replayed alike
+            from freesail.agents.director import noticed_reveal
+
+            noticed_reveal(self, e)
         return e
 
     # -- the sun -------------------------------------------------------------
@@ -1142,10 +1162,22 @@ class World:
     # -- the world-order channel (spec M5 §26; package 36) -----------------------------
 
     def world_order(self, text: str, source: str = "the harness") -> Event:
-        """A world order from outside the scenario (the lead's test harness; the director
-        of milestone 7b): journaled in `inputs` at this tick with its source, so that a
-        replay gives it again, then carried out and logged at the driver's mark."""
+        """A world order from outside the scenario (the lead's test harness; the owner's
+        live order; the director of milestone 7b): journaled in `inputs` at this tick with
+        its source, so that a replay gives it again, then carried out and logged at the
+        driver's mark. Given while a station acts (the director's, package 50) it is the
+        station's act (`core.acts`, journaled as one and given again by a replay by the
+        acts; a replay by the transcript gives it again through the tool), never an
+        input, as a station's orders to the ship are."""
         text = " ".join(str(text).split())
+        if acts.capturing(self):
+            acts.record(
+                self, acts.acting_station(self), "world_order", {"text": text, "source": source}
+            )
+            with acts.aside(self):
+                # what the order writes (the carpenter's report, the driver's line) is the
+                # order's own, given again by the act, as a station's order's lines are
+                return self._apply_world_order(text, source)
         self.inputs.append({"tick": self.clock.tick, "world_order": text, "source": str(source)})
         return self._apply_world_order(text, source)
 
@@ -1862,7 +1894,23 @@ class World:
             # the stations bound and unbound by hand (package 41), for the reader and a
             # load; a replay re-makes a binding from the world order that made it (M7b)
             "stations": self.stations.to_dict() if hasattr(self, "stations") else {},
+            # the director (spec M7b §4 to §6; package 50): the brief as it stands and the
+            # day's budget, for the reader and a load; the director's log is the station's
+            # journal (`agent_journals["director"]`), replayed as a station's notes are
+            "director": self._director_block(),
         }
+
+    def _director_block(self) -> dict[str, Any]:
+        from freesail.agents.director import DirectorBrief
+
+        brief = getattr(self, "director_brief", None)
+        state = getattr(self, "director_state", None)
+        out: dict[str, Any] = {}
+        if isinstance(brief, DirectorBrief):
+            out["brief"] = brief.to_dict()
+        if state is not None and hasattr(state, "to_dict"):
+            out["budget"] = state.to_dict()
+        return out
 
 
 # The ground-tackle evolutions (`data/evolutions/`): while one is in hand the World does
