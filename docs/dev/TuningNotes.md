@@ -5944,7 +5944,18 @@ ran once at the end (below).
 
 - `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
 - `tests/test_director.py`: 22 passed. The director's truths (`-k 7b_9`): 5 passed.
-- The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`): FAST_RESULT.
+- The fast tier (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,320 passed, none
+  failed, run whole on the final tree (an earlier run, with the tree edited under it,
+  failed the fingerprint test alone, which compares the tree's fingerprint cached at
+  the start with one taken fresh: the edit, not the code).
 - The slow tier whole (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m "not pace"`):
-  SLOW_RESULT.
-- The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`): PACE_RESULT.
+  3,612 passed, 10 xfailed, 1 failed, in an hour and three quarters on the build
+  machine: `tests/test_rollup.py`'s server speed test, which still asked for the cap of
+  300 that b9052c5 raised to 1000 the same day (the console's test was brought up then,
+  the server's was not); not of this package, mended here to the thousand and passing
+  alone. No passage's pin moved. An earlier run of the whole, on the tree two commits
+  back, failed the same test, the fingerprint test (the tree edited under it) and the
+  stdio bridge's test, which listed every tool of the table where a door of another
+  station is not offered the director's two: that test mended.
+- The pace tests alone (`python3 -m pytest --slow -m pace -p no:cacheprovider`), on the
+  quiet machine after the slow tier: 6 passed in 151 s.
