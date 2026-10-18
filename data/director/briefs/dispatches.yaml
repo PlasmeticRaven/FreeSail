@@ -1,0 +1,30 @@
+# The dispatches (the owner's scenario of 2026-10-18 for the director's test): a cutter
+# carrying a sealed packet from Falmouth to Plymouth, a King's frigate put on the sea
+# with the weather gage to stop and search her midway, the packet barely not found if she
+# is searched, a gun to leeward if she will not stop, and the packet landed at Plymouth.
+# The beats are the director's story to tell, not a script: the captain's choices decide
+# which of them happen, and the director's log keeps what it tried.
+name: The dispatches
+tone: >
+  A day's run along the Cornish coast with something aboard that must not be found. A man
+  from the Custom House comes off at Falmouth with a sealed packet and a word in the
+  captain's ear; a frigate of the Navy is on the sea to windward midway to Plymouth with
+  orders to stop and search every sail; if the cutter heaves to she is searched and the
+  packet is barely not found; if she runs, a gun to leeward and a chase; at Plymouth a
+  man is waiting on the Barbican for the packet. The weather is the story's ally when it
+  helps and the player's when it is fair: one shift, or a fog bank, where it tells.
+challenge: >
+  A merchant captain's judgement against the King's ship: to heave to or to run, and
+  what to say when boarded. Keep the frigate honest (she sails as the physics lets her
+  and her people speak as the Navy's would); keep the cutter's chances real; never tell
+  the captain what the packet is.
+limits:
+  wind_max_kn: 30          # a fresh breeze at most: a chase, not a gale
+  enemy_heaviest: brig     # no enemy heavier than a brig; the frigate is the King's
+  nobody_dies: true
+  the_war_as_it_is: true
+  the_chart_as_it_is: true
+cadence: glass
+budget:
+  samples_a_day: 48
+  acts_a_day: 10
