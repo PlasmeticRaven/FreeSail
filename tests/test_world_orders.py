@@ -605,7 +605,7 @@ def test_the_hand_on_a_crewed_ship_is_her_captains_order_held_a_glass_and_refuse
     assert said and str(said[-1].actor).startswith("captain's rule")
     assert not [x for x in w.log if "By the captain" in x.text and not for_the_record(x)]
     cap = crew.captain
-    assert cap.over_head_until == w.clock.tick + 1800 and not cap.commands
+    assert cap.over_head_until == crew.clock.tick + 1800 and not cap.commands
     assert cap.state is None and cap.to_dict()["over_head"] == "heave to"
     assert crew.standing.books_loaded() == []
     w.run(900)
@@ -631,3 +631,46 @@ def test_the_hand_on_a_crewed_ship_is_her_captains_order_held_a_glass_and_refuse
     assert "Hazard's captain (" in e.text and "is held by a model" in e.text
     assert "write to him instead ('message: ...')" in e.text
     assert WO.reach(w, WO.parse('ship "Hazard": order heave to'))
+
+
+def test_the_hold_crosses_the_promotion_both_ways():
+    """A far ship hove to by the hand and promoted inside the glass heaves to at full detail
+    by her captain's words, the first of her new log's, and he holds by it the rest of the
+    glass; demoted while held, the far body lies to and her far captain keeps the hold."""
+    from freesail import units
+    from freesail.world import crews as K
+    from tests.test_brains import put
+
+    w = world_for(ports=["falmouth"])
+    w.submit("heave to")
+    v = put(
+        w,
+        "brig-sloop",
+        "britain",
+        "49 38 N 5 10 W",
+        "bound for Falmouth",
+        "keep the station off the Lizard within 10 miles",
+        name="Hazard",
+    )
+    w.run(60)
+    assert v.crew is None
+    w.world_order('ship "Hazard": order heave to', "the test")
+    until = v.brain.over_head["until"]
+    v.position = w.position.advanced(0.0, 3.0 * units.NAUTICAL_MILE)
+    w.run(61)
+    crew = v.crew
+    assert crew is not None and crew.shape == "full" and v.brain.over_head is None
+    left = until - w.clock.tick
+    assert crew.captain.over_head_until == crew.clock.tick + left and crew.captain.state is None
+    assert [e.text for e in crew.log if e.text.startswith("By the captain")] == [
+        "By the captain: heaving to."
+    ]
+    w.run(600)
+    assert crew.readings.value("manoeuvre_in_hand") == "hove to" and not crew.captain.commands
+    w.run(until - w.clock.tick + 60)
+    assert crew.captain.over_head_until is None and crew.captain.commands
+    w.world_order('ship "Hazard": order heave to', "the test")
+    w.run(300)
+    K.demote(w, v)
+    assert v.crew is None and v.plan[0][0] == "lie_to"
+    assert v.brain.over_head is not None and v.brain.over_head["order"] == "heave to"

@@ -652,8 +652,21 @@ class FarCaptain(Judgement):
             # an order over his head carried across (package 62): the near captain holds by
             # it for the rest of its glass, then takes her up from where she is
             self.over_head = None
-            captain.over_head_until = int(held["until"])
+            # the parent's tick into her World's own, which counts from her promotion
+            left = int(held["until"]) - int(self.world.clock.tick)
+            captain.over_head_until = int(captain.world.clock.tick) + left
             captain.over_head_order = str(held.get("order") or "")
+            plan = self.vessel.plan
+            if plan and plan[0][0] == "lie_to":
+                # the far body lay to by his order: the near body heaves to by it, his words
+                # the first of her new log's
+                from freesail.world.captains import actor_for
+
+                captain.world.submit(
+                    "heave to",
+                    actor=actor_for(self.state or "on passage"),
+                    said="By the captain: heaving to",
+                )
             return
         self.over_head = None
         if self.state is not None and self.state not in ("in distress",):
@@ -676,10 +689,16 @@ class FarCaptain(Judgement):
         self.state = None
         self.last_judged = -1
         self._enter(state)
-        until = getattr(captain, "over_head_until", None)
-        if until is not None and self.world.clock.tick < int(until):
+        near_until = getattr(captain, "over_head_until", None)
+        near_world = getattr(captain, "world", None)
+        left = None
+        if near_until is not None and near_world is not None:
+            # her World's own tick (it counts from her promotion) into the parent's
+            left = int(near_until) - int(near_world.clock.tick)
+        if left is not None and left > 0:
             # an order over his head carried back (package 62): the plan just laid kept to be
             # taken up when the glass is out, the far body lying to if the near one was
+            until = int(self.world.clock.tick) + left
             v = self.vessel
             stash = (list(v.plan), None if v.saved_plan is None else list(v.saved_plan), "")
             readings = getattr(getattr(captain, "world", None), "readings", None)

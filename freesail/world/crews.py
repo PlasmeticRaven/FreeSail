@@ -1041,7 +1041,8 @@ def _hand_crewed(vessel: Any, crew: CrewedWorld, text: str, until: int) -> str:
     if e.kind == "order.rejected":
         why = str((e.data or {}).get("reason") or e.text).rstrip(".")
         raise ValueError(f"{vessel.name}'s captain could not give it as said: {why}")
-    cap.over_his_head(text, until)
+    # her own clock: a crewed World counts its ticks from her promotion
+    cap.over_his_head(text, int(crew.clock.tick) + (until - int(crew.parent.clock.tick)))
     return f"{vessel.name}'s captain gave it as his own, at full detail ({said})"
 
 
