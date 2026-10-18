@@ -6157,3 +6157,187 @@ def test_truth_7b_112_the_frigate_lies_to_under_her_main_staysail_by_the_heavy_w
     assert all(ship.sails[s].is_set for s in ship.groups["storm staysails"])
     assert not ship.sails["main.staysail"].is_set
     assert ship.sails["main.staysail"].state.value != "blown_out"
+
+
+# Package 56: fishing, and the glass on a near ship (spec M7b §21a to §21c). Truths 7b-105
+# to 7b-107. 105 and 106 on the Culloden smack and the business's smack on the seine
+# ground in Gerrans Bay at seed 7, an August forenoon, the wind ten knots from the west;
+# 107 on the frigate with the Palinure lying to at a mile, at four cables and by night. No
+# recorded passage's pin moves by the fishing: the business is off in every one, and a
+# ship that carries no gear has no fishery (the digests the tests keep).
+# ---------------------------------------------------------------------------
+
+
+def _gerrans_world(ship="data/ships/smack.yaml", lat=50.195, lon=-4.945, hour=9):
+    sc = Scenario(
+        start_time=datetime(1805, 8, 14, hour, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=10.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        region="channel-west",
+        ports=["falmouth", "plymouth"],
+        nation="britain",
+    )
+    return make_world(7, ship, sc)
+
+
+def _one_shot_of_the_seine(world):
+    """The seine shot, an hour fished, hauled: the player's evolutions through the orders."""
+    world.submit("shoot the seine")
+    while world.fishery.out is None:
+        world.run(60)
+    while world.fishery.out.fished_s < 3600:
+        world.run(60)
+    world.submit("haul the seine")
+    while world.fishery.out is not None:
+        world.run(60)
+    caught: dict[str, float] = {}
+    for lot in world.fishery.catch.lots:
+        caught[lot.fish] = caught.get(lot.fish, 0.0) + lot.tons
+    return caught
+
+
+@pytest.fixture(scope="module")
+def gerrans_seine():
+    world = _gerrans_world()
+    caught = _one_shot_of_the_seine(world)
+    return world, caught
+
+
+def test_truth_7b_105_the_smacks_seine_fills_her_well_the_catch_sells_at_falmouth_and_spoils_kept(
+    gerrans_seine,
+):
+    """Spec M7b §21c, truth 105: "The smack on a pilchard ground in season, the seine
+    shot and hauled, fills her well by the ground's yield; the fish sold at Falmouth at
+    the market's price; a well kept too long spoils its catch." Gerrans Bay in August by
+    day: an hour of the seine takes the ground's three tons of pilchards an hour and its
+    ton of mackerel (data/fishing/channel-west.yaml) at ten knots of wind, by the one
+    catch function; the well's three tons are filled and the rest goes into the hold; the
+    same catch landed at Falmouth's quay sells at the quay's price; kept a day in the
+    well, the pilchards there spoil and are said to."""
+    import copy
+
+    from freesail.world import fishing as F
+
+    world, caught = gerrans_seine
+    ground = F.find_ground(world, "gerrans-bay")
+    hour = F.take(ground, "seine", datetime(1805, 8, 14, 10), "day", 10.0, 3600.0)
+    assert caught == pytest.approx(hour, rel=1e-6)
+    catch = world.fishery.catch
+    assert catch.in_well() == pytest.approx(catch.well_tons) == pytest.approx(3.0)
+    hauled = [e for e in world.log if e.kind == "fishing.hauled"]
+    assert len(hauled) == 1 and "Struck down" in hauled[0].text
+    assert "in the well" in hauled[0].text
+    # the catch carried into Carrick Road and sold on the quay
+    quay = _gerrans_world(lat=50.163, lon=-5.0345)
+    quay.submit("let go the best bower")
+    quay.run(600)
+    quay.fishery.catch = copy.deepcopy(catch)
+    for lot in quay.fishery.catch.lots:
+        lot.caught_tick = quay.clock.tick
+        lot.spoils_tick = None if lot.spoils_tick is None else quay.clock.tick + 3600
+    worth = sum(F.price_of(f, False) * t for f, t in caught.items())
+    before = quay.purse.pounds
+    sold = quay.submit("sell the catch")
+    assert sold.kind == "fishing.sold" and "Falmouth" in sold.text
+    assert quay.purse.pounds - before == pytest.approx(worth)
+    # kept a day: the well's pilchards spoil (a pilchard keeps 24 hours in its water)
+    world.run(25 * 3600)
+    turned = [e for e in world.log if e.kind == "fishing.spoiled"]
+    assert any("in the well" in e.text and "pilchards" in e.text for e in turned)
+    assert all(lot.spoiled for lot in world.fishery.catch.lots if lot.fish == "pilchards")
+
+
+def test_truth_7b_106_the_business_fisherman_on_the_same_ground_brings_home_the_same_catch(
+    gerrans_seine,
+):
+    """Spec M7b §21c, truth 106: "The business's fisherman on the same ground brings home
+    the same catch at far detail." A smack of the business on the Gerrans seine ground for
+    two hours from Falmouth, the player's frigate twenty miles off (beyond the crewed
+    range): her far body shoots the seine by the evolution's own time, fishes an hour by
+    the one catch function and hauls, and the catch is the player's to the ounce; she runs
+    home, and her catch is landed at Falmouth's quay (the sale in her record)."""
+    from freesail.world.ships import vessel_from_spec
+
+    _world, caught = gerrans_seine
+    far = _gerrans_world(ship="data/ships/frigate-36.yaml", lat=49.85, lon=-5.2)
+    far.vessels.serial += 1
+    v = vessel_from_spec(
+        far,
+        {
+            "description": "smack",
+            "name": "Brothers",
+            "nation": "britain",
+            "position": {"lat_deg": 50.195, "lon_deg": -4.945},
+            "goal": "bound for Falmouth",
+            "intent": "fish on the seine ground in Gerrans Bay for 2 hours from Falmouth",
+        },
+        far.vessels.serial,
+    )
+    far.vessels.add(v)
+    while v.brain.intent.kind == "fish":
+        far.run(60)
+    assert v.crew is None and v.fishing is not None
+    took: dict[str, float] = {}
+    for lot in v.fishing.catch.lots:
+        took[lot.fish] = took.get(lot.fish, 0.0) + lot.tons
+    assert took == pytest.approx(caught, rel=1e-9)
+    for _ in range(24 * 60):
+        if v.done:
+            break
+        far.run(60)
+    landed = v.fishing.catch.landed
+    assert v.done and landed and landed[0]["port"] == "falmouth"
+    home = dict(landed[0]["sold"])
+    for fish, tons in landed[0]["spoiled"].items():
+        home[fish] = home.get(fish, 0.0) + tons
+    assert sum(home.values()) == pytest.approx(sum(caught.values()), rel=1e-3)
+
+
+def _palinure_at(distance_nm: float, hour: int = 11):
+    from freesail.world.geo import destination
+    from freesail.world.ships import vessel_from_spec
+
+    world = _gerrans_world(ship="data/ships/frigate-36.yaml", lat=49.80, lon=-5.0, hour=hour)
+    where = destination(world.position, 90.0, distance_nm * 1852.0)
+    world.vessels.serial += 1
+    v = vessel_from_spec(
+        world,
+        {
+            "id": "palinure",
+            "description": "brig-sloop",
+            "name": "Palinure",
+            "nation": "france",
+            "position": where.to_dict(),
+            "goal": "bound for 49 48 N 4 30 W",
+        },
+        world.vessels.serial,
+    )
+    v.plan = [("lie_to", math.inf)]
+    world.vessels.add(v)
+    world.run(120)
+    return world
+
+
+def test_truth_7b_107_the_glass_on_the_palinure_hove_to_by_tiers_and_by_night():
+    """Spec M7b §21c, truth 107: "The glass on the Palinure hove to at a mile says she is
+    hove to and on which tack; at four cables the main topsail aback; at night, only her
+    light if any." The French brig-sloop lying to east of the frigate, the wind from the
+    west: at a mile the glass says she is hove to on the larboard tack and nothing of her
+    sails; within four cables the evolution's words, her main topsail aback; by night no
+    light shows and nothing of her work is made out. The lookout says the glass unasked
+    when she comes within its tiers."""
+    world = _palinure_at(1.0)
+    e = world.submit("the glass on the brig")
+    assert e.kind == "lookout.glass" and "hove to on the larboard tack" in e.text, e.text
+    assert "aback" not in e.text
+    said = [x for x in world.log if x.kind == "lookout.glass"]
+    assert said and "hove to on the larboard tack" in said[0].text
+    near = _palinure_at(0.35)
+    e = near.submit("the glass on the brig")
+    assert "hove to on the larboard tack, main topsail aback" in e.text, e.text
+    night = _palinure_at(0.35, hour=23)
+    e = night.submit("the glass on the brig")
+    assert "no light shows" in e.text and "aback" not in e.text, e.text

@@ -152,7 +152,7 @@ def test_the_cruisers_keep_the_stations_their_doctrine_names_for_nations_at_war(
         assert apart <= float(m.group(2)) + 1.0
 
 
-def test_a_fisherman_works_her_ground_for_her_hours_and_runs_home_and_is_never_crewed(busy):
+def test_a_fisherman_works_her_ground_for_her_hours_and_runs_home_and_is_crewed_when_near(busy):
     fishermen = [d for d in busy.business.drawn if d.kind == "fishing"]
     assert fishermen
     grounds = {f.id for f, _home in busy.business.grounds()}
@@ -179,11 +179,13 @@ def test_a_fisherman_works_her_ground_for_her_hours_and_runs_home_and_is_never_c
     world.vessels.add(v)
     brain = v.brain
     assert brain.role == "fisherman" and brain.intent.hours == 1.0
-    # within the crewed range of the player, and never promoted: a far-detail fisherman
+    # within the crewed range of the player, and promoted like any other ship since
+    # package 56 (spec M7b §21a: 43b's "never crewed" lifted, the cap's order unchanged)
     world.run(120)
     assert brain.state == "keeping station"
-    assert v.crew is None or v.crew.shape == "far"
-    assert "fisherman" in CR.FAR_ONLY_ROLES
+    assert v.crew is not None and v.crew.shape == "full"
+    assert v.crew.captain.role == "fisherman" and v.crew.captain.state == "keeping station"
+    assert CR.FAR_ONLY_ROLES == frozenset()
     p = perceive_vessel(world, v, brain)
     brain._business["fishing_s"] = 3600.0 - 60.0
     brain._business["fishing_tick"] = p.tick - 60

@@ -576,6 +576,12 @@ def _place_id(world: Any, words: str) -> str:
         feature = chart.find_feature(text)
         if feature is not None:
             return feature.id
+        # a fishing ground of the tables (package 56): its feature, or where it is pricked
+        from freesail.world.fishing import find_ground
+
+        ground = find_ground(world, text)
+        if ground is not None:
+            return ground.feature or plain_position(ground.position)
     try:
         return format_position(parse_position(text))
     except ValueError:
@@ -1064,7 +1070,13 @@ class Planner:
         if intent.kind in ("station", "fish"):
             place = self._place(intent.destination)
             if place is not None:
-                mark = station_off(self.world, place[1], intent.radius_nm)
+                # a fishing trip's mark is the ground itself (package 56): a seine ground
+                # lies in a bay, where a station kept a league off would be on the land
+                mark = (
+                    place[1]
+                    if intent.kind == "fish"
+                    else station_off(self.world, place[1], intent.radius_nm)
+                )
                 legs += self._sea_legs(legs[-1].position if legs else start, mark)
                 legs.append(Leg(plain_position(mark), mark, "station", intent.radius_nm))
             return legs
@@ -2859,7 +2871,12 @@ class Captain(Judgement):
         return float(found["metres"]) / units.NAUTICAL_MILE <= self.intent.radius_nm * 2.0
 
     def _station(self, p: Perception) -> None:
-        return  # the book keeps the station; the transitions watch for a sail
+        # the book keeps the station; the transitions watch for a sail. A fisherman on her
+        # ground works her gear (package 56; the fishermen promoted, spec M7b §21a)
+        if self.role == "fisherman" and self.intent is not None and self.intent.kind == "fish":
+            from freesail.world import fishing
+
+            fishing.captain_work(self, p)
 
     def _keep_stranger(self, p: Perception) -> None:
         if self._stranger is None:

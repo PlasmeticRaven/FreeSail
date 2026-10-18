@@ -13,7 +13,10 @@ own (package 43's brains, `freesail.world.brains`), on top of whatever ships it 
 - **the fishermen** on the grounds the coast's features give (a `bottom` or a `bank` the
   lead finds at sea, `fishing.depth_fathoms`, off the coast), a smack or a lugger of the
   nearest port that sells fish, on a trip of some hours and home again (the `fish` intent
-  and the fisherman's doctrine, `data/captains/fisherman.yaml`; never crewed);
+  and the fisherman's doctrine, `data/captains/fisherman.yaml`), her catch by the grounds'
+  tables (`data/fishing/`, `world.fishing`: the same catch at the same rate as the player's,
+  sold at her home's fish quay, truth 106), and crewed like any other ship near the player
+  since package 56;
 - **the cruisers** of the nations at war on the stations the cruiser's doctrine names for
   her nation (`data/captains/cruiser.yaml`, `stations:`) within the region.
 
@@ -113,6 +116,7 @@ class Drawn:
     carries: str = ""
     ended: str = ""
     ended_tick: int | None = None
+    landed: str = ""  # a fisherman's catch sold at her home (package 56)
 
     def to_dict(self) -> dict[str, Any]:
         return {k: v for k, v in self.__dict__.items() if v not in ("", None)}

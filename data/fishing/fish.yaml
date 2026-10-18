@@ -1,0 +1,160 @@
+# FreeSail: the fish, the gear's fishing and the fish quays (package 56, spec M7b §21a). Read
+# by freesail/world/fishing.py beside the grounds of each region (data/fishing/<region>.yaml).
+# Not a fishing simulation (the owner, 2026-10-17): researched grounds, real catches to
+# market, the period's evolutions and the well's spoilage. Every figure carries its source
+# or the word "judgement" with its reasoning; the sources are the ones the repository holds
+# or that were read for this package:
+#   Holdsworth 1874, Deep-Sea Fishing and Fishing Boats (docs/references/holdsworth/, the
+#     OCR read for this package): the trawl pp. 47 to 86, the drift nets pp. 98 to 132, the
+#     seans pp. 156 to 160, the longlines and handlines pp. 136 to 141, the Cornish
+#     stations and the pilchard curing pp. 187 to 196;
+#   the Encyclopaedia Britannica, 4th edition (1810), CLUPEA (the pilchard, after Pennant
+#     and Borlase), read 2026-10-17 at jimclifford.ca/early_encyclopedia_britannica: the
+#     shoals "off the Cornish coasts about the middle of July, disappearing the beginning
+#     of winter"; 7,000 hogsheads enclosed at once in St Ives bay in 1767; the hogshead
+#     exported at "£1. 13s. 3d." one year with another, 1747 to 1756.
+# A ton here is the fish's own weight, fresh: Holdsworth p. 194 packs "about 2500"
+# pilchards in a hogshead pressed to "four hundredweight gross", so a ton is five
+# hogsheads, some 12,500 pilchards.
+
+# -- the fish -----------------------------------------------------------------------------
+# For each: the word the quays and the log use; whether it lives in a smack's well (Steel
+# 1805, WELL: "to contain live fish ... and preserved alive"; Holdsworth p. 138, the cod
+# "put alive into the well") and for how many days; how long, in hours, a fish that does
+# not live there keeps in the well's running water; how long it keeps fresh in the hold
+# in summer (May to September) and in winter, unsalted; and its price a ton at the quay,
+# fresh and salted. Nothing was iced in 1805 (Holdsworth's index: "Mr. Hewett's
+# introduction of ice", long after), so a fresh fish is sold within a day or two or it
+# is salted or lost; round fish suffer more than flat (p. 85: "Round-fish at all times
+# suffer more than flat-fish"). The hours are judgement on that, the mackerel the
+# shortest (the Billingsgate rule that mackerel are sold on Sundays, memory), the flat
+# fish the longest.
+fish:
+  pilchards:
+    words: pilchards
+    well: false
+    well_hours: 24
+    keeps_hours: {summer: 12, winter: 30}
+    price: {fresh: 6, salted: 10}
+    source: "price judgement: the cured hogshead at £1 13s 3d (EB 1810, CLUPEA, 1747 to 1756) is about £8 the ton cured at mid-century, Falmouth's market file £14 in 1805 from memory; the green fish sold to the cellars at less than half the cured, the salt, the pressing and the women's work being the curer's (Holdsworth pp. 193 to 194); keeping judgement"
+  mackerel:
+    words: mackerel
+    well: false
+    well_hours: 16
+    keeps_hours: {summer: 8, winter: 24}
+    price: {fresh: 9, salted: 10}
+    source: "judgement: the most perishable of the round fish and the dearest fresh in the season; salted little in England"
+  herring:
+    words: herrings
+    well: false
+    well_hours: 20
+    keeps_hours: {summer: 12, winter: 30}
+    price: {fresh: 6, salted: 9}
+    source: "judgement; Holdsworth p. 34: the fat herrings 'must be eaten without delay'"
+  sardines:
+    words: sardines
+    well: false
+    well_hours: 18
+    keeps_hours: {summer: 10, winter: 24}
+    price: {fresh: 8, salted: 14}
+    source: "judgement: the Breton sardine is the pilchard's kin, pressed in casks at Port Louis and Belle Isle (the ports' files' 'pilchards' at £25 to £26 the ton pressed, judgement); the green fish at a third"
+  soles and turbot:
+    words: soles and turbot
+    well: true
+    well_days: 4
+    keeps_hours: {summer: 30, winter: 72}
+    price: {fresh: 25, salted: 12}
+    source: "judgement: the trawl's prime fish, the dearest at market; flat fish keep best (Holdsworth p. 85); the Barking and Harwich well smacks carried fish alive to London (pp. 231 to 232), four days in the well judgement"
+  plaice and hake:
+    words: plaice and hake
+    well: false
+    well_hours: 36
+    keeps_hours: {summer: 20, winter: 48}
+    price: {fresh: 7, salted: 9}
+    source: "judgement: the trawl's 'offal' fish, four-fifths of the take 'of the inferior kinds mostly consumed by the poorer classes' (Holdsworth p. 24); the hake of the Brixham and Plymouth trawlers early in the year (p. 78)"
+  cod:
+    words: cod
+    well: true
+    well_days: 10
+    keeps_hours: {summer: 24, winter: 72}
+    price: {fresh: 12, salted: 18}
+    source: "Holdsworth pp. 138, 140: the cod put alive into the well, 'some mortality also among the healthy fish ... from their being knocked about in the vessel during bad weather'; ten days judgement, a Dogger voyage; prices judgement against the ports' files' salt fish at £20 to £30"
+  ling and conger:
+    words: ling and conger
+    well: false
+    well_hours: 36
+    keeps_hours: {summer: 24, winter: 72}
+    price: {fresh: 8, salted: 14}
+    source: "judgement; St Mary's file's 'ling and cod salted on the isles' at £20"
+
+# -- the gear's fishing ------------------------------------------------------------------
+# For each kind of gear: the hours a shot fishes before the net is full or the tide done
+# (more in the water takes no more); the most wind it is shot or worked in, in knots; the
+# sails she may set while it is out (the groups or the names of her file), any other
+# refused in words; the way through the water it fishes at, where the gear wants a way
+# (the trawl), outside which it takes nothing; and the words for her at it.
+gear:
+  trawl:
+    hours_a_shot: 6
+    most_wind_kn: 30
+    way_kn: [1.0, 4.0]
+    sails: [plain sail, courses, storm canvas]
+    at_it: towing her trawl
+    hands_at_it: hands at the trawl warp
+    source: "Holdsworth pp. 70 to 71 and 77 to 78: towed with the tide 'for five or six hours, under easy sail', at 'from half a knot to a knot and a half faster than the tide', two or two and a half knots for the hake; the wind judgement, a trawler working in a fresh breeze"
+  drift nets:
+    hours_a_shot: 12
+    most_wind_kn: 27
+    sails: [mizen, the mizen, storm canvas, trysail]
+    at_it: riding to her nets
+    hands_at_it: hands at the nets
+    source: "Holdsworth pp. 98 to 99, 106 to 111: shot at sunset before the wind over the quarter and ridden to through the night, the fish striking 'just after sunset and before sunrise'; a night's work, judgement; the wind judgement, force six"
+  seine:
+    hours_a_shot: 1
+    most_wind_kn: 16
+    sails: [plain sail, storm canvas]
+    at_it: her boat at the seine
+    hands_at_it: the boat's crew at the seine
+    source: "Holdsworth pp. 157 to 159: the sean shot round the shoal from rowing boats, 'except very near the land or in the smooth water of sheltered bays'; a shot encloses what it encloses, an hour judgement; the wind judgement, the boats' smooth water"
+  lines:
+    hours_a_shot: 6
+    most_wind_kn: 24
+    sails: [plain sail, storm canvas]
+    at_it: lying to her lines
+    hands_at_it: hands at the lines
+    source: "Holdsworth pp. 137 to 139: shot across the tide under easy sail, the smack hove to 'till the tide has nearly done', a tide of six hours; the wind judgement"
+
+# A ground the tables do not name (a bottom or a bank the business's fishermen work by the
+# coast's features alone, `business.grounds`) keeps this default: the lines and the trawl
+# for the common fish all the year (judgement, the business's own default of 43b, now with
+# a yield).
+default:
+  - {fish: plaice and hake, gear: trawl, months: all, when: any, tons_per_hour: 0.04, source: "judgement: the plainer half of a trawl ground's take (data/fishing/channel-west.yaml, the Eddystone)"}
+  - {fish: ling and conger, gear: lines, months: all, when: any, tons_per_hour: 0.03, source: "judgement, as the soundings' lines"}
+  - {fish: ling and conger, gear: drift nets, months: [], when: night, tons_per_hour: 0.0, source: "nothing for the nets off a named ground: judgement"}
+
+# The well: a ton of fish to three cubic metres of her well (judgement: live fish want their
+# water; Chapman's sumpar of 44 ft carried 150 lispund of fish, some 1.3 tons, in her well,
+# docs/design/VesselReferences-2026-10.md); the salt a ton of fish takes in the hold, a
+# third of its weight (judgement on Holdsworth p. 193: 'alternate layers of coarse salt
+# and fish' in the bulk); a salted fish keeps beyond any voyage the game sails.
+well_tons_per_m3: 0.33
+salt_per_ton: 0.33
+
+# The quays that buy fresh fish and salted (the fish quay, apart from the port's cargo
+# market of data/ports/*.yaml, which deals in the cured hogshead): each port's price
+# beside the fish's own above (judgement: dearer at the towns away from the fishery, as
+# Plymouth's market file has it for the pilchards; the French ports for the sardine).
+markets:
+  falmouth: {factor: 1.0}
+  plymouth: {factor: 1.1}
+  st-marys: {factor: 0.9}
+  torbay: {factor: 1.1}
+  dartmouth: {factor: 1.05}
+  weymouth: {factor: 1.1}
+  brest: {factor: 1.2}
+  roscoff: {factor: 1.0}
+  morlaix: {factor: 1.05}
+  lorient: {factor: 1.0}
+  le-palais: {factor: 0.95}
+  st-malo: {factor: 1.1}

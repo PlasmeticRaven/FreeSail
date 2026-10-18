@@ -1,0 +1,24 @@
+# Haul the trawl (package 56). "The hands are turned up, the stopper of the trawl-warp is
+# cast off ... and the vessel swings round with her head to the trawl, and very soon
+# also head to wind"; the foresail and any light sails got in, two hands at the winch
+# heaving in the warp, "a tedious process at the best of times, seldom occupying less than
+# three-quarters of an hour, and in bad weather sometimes taking two or three hours"
+# (Holdsworth 1874 p. 79): three quarters of an hour, the weather's factor stretching it.
+# The take struck down into the well and the hold, salted where salt is aboard.
+#
+# The script (freesail/evolutions/scripts.py, FishingGearScript) holds the gear and not the
+# ship; the order's checks (the gear she carries, the ground she is on, its season, the
+# hour and the wind) are freesail/orders/fishing.py's.
+id: haul_trawl
+verb: haul the trawl
+applies_to: {class: ship}
+script: fishing_gear
+params: {gear: trawl, action: haul, ground: null}
+preconditions: []
+timing:
+  haul_s: 2700
+on_start: {log: "All hands to haul the trawl; heave in the warp."}
+on_complete: {log: "{catch}", kind: fishing.hauled, severity: notable}
+on_fail: {log: "Could not haul the trawl: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Holdsworth 1874 p. 79 (heaving up the trawl, three quarters of an hour to two or three)"

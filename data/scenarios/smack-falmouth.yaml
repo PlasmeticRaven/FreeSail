@@ -2,8 +2,10 @@
 # of package 43b). The Cornish smack on the Culloden's lines, British, lying in Carrick Road
 # on an August morning in the pilchard season, the world's business about her: the Poll Bank
 # off Scilly and the oozy ground off the Eddystone are the grounds the business's fishermen
-# work from Falmouth and Plymouth, and the market buys pilchards and fish. No order to fish
-# exists yet (milestone 7b, package 56): she sails as a cutter does, with a well. Given to
+# work from Falmouth and Plymouth, and the market buys pilchards and fish. Since package 56
+# she fishes: the seine in Gerrans Bay by day, the trawl on the Eddystone's ground, the
+# lines on the soundings ('the fishing grounds', 'shoot the seine', 'haul the seine',
+# 'sell the catch'; data/fishing/ and the primer's chapter for the fisherman). Given to
 # either driver with --scenario:
 #     py -m freesail.ui.server --scenario data/scenarios/smack-falmouth.yaml
 #     py -m freesail.ui.console --scenario data/scenarios/smack-falmouth.yaml

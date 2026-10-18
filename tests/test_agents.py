@@ -1847,8 +1847,9 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # and the port's five (package 35: get under way, moor, unmoor, the kedge, the boat),
     # and `heave in` (package 37f: heave_in.yaml), and `box her off` (package 37p:
     # box_off.yaml), and the lug's six (package 43b: set, take in, reef, shake out, dip and
-    # trim its sheet)
-    assert "75 evolutions; the list about" in contents  # package 57: set_flying, take_in_flying
+    # trim its sheet), and the fishing gear's eight (package 56: the trawl, the nets, the
+    # seine and the lines, each shot and hauled)
+    assert "83 evolutions; the list about" in contents  # package 57: set_flying, take_in_flying
     # the ship's papers are a topic beside the ship (package 35), listed with their handles
     assert "  papers: the ship's papers, 8 aboard" in contents and "the manifest" in contents
 

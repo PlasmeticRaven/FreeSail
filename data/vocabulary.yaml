@@ -1233,6 +1233,72 @@ verbs:
                back to full allowance, back to whole allowance, go to full allowance]
     object: allowance
     level: 1
+  # The fishing gear, the catch and the fish quay (spec M7b §21a; package 56;
+  # `freesail/orders/fishing.py`): the master's orders to the hands at the gear, refused in
+  # words on a ship that carries none of it; object `fishing`, the captain's.
+  shoot the trawl:
+    synonyms: [put the trawl over, put over the trawl, shoot the beam trawl, put the trawl down]
+    object: fishing
+    level: 1
+  haul the trawl:
+    synonyms: [heave up the trawl, heave in the trawl, haul in the trawl, get the trawl aboard,
+               haul up the trawl]
+    object: fishing
+    level: 1
+  shoot the nets:
+    synonyms: [shoot the drift nets, shoot the fleet, put the nets over, shoot the fleet of nets]
+    object: fishing
+    level: 1
+  haul the nets:
+    synonyms: [haul the drift nets, haul in the nets, haul the fleet, heave in the nets,
+               get the nets aboard]
+    object: fishing
+    level: 1
+  shoot the seine:
+    synonyms: [shoot the sean, shoot the seyn, shoot the tuck seine, shoot the tuck sean,
+               away the seine, shoot the seine round the shoal]
+    object: fishing
+    level: 1
+  haul the seine:
+    synonyms: [haul the sean, tuck the seine, tuck the sean, haul in the seine, tuck the fish]
+    object: fishing
+    level: 1
+  set the lines:
+    synonyms: [shoot the lines, shoot the longlines, set the longlines, pay out the lines,
+               make a shot of the lines]
+    object: fishing
+    level: 1
+  haul the lines:
+    synonyms: [haul the longlines, haul in the lines, haul up the lines]
+    object: fishing
+    level: 1
+  shoot the gear:
+    synonyms: [make a shot, shoot the fishing gear]
+    object: fishing
+    level: 1
+  haul the gear:
+    synonyms: [haul the fishing gear, haul in the gear, haul up the gear]
+    object: fishing
+    level: 1
+  sell the catch:
+    synonyms: [land the catch, sell the fish, land the fish, sell our catch, land and sell the catch]
+    object: fishing
+    level: 1
+  the catch:
+    synonyms: [the fish aboard, what fish is aboard, how is the catch]
+    object: fishing
+    level: reading
+  the fishing grounds:
+    synonyms: [the grounds, what grounds are near, the grounds about her, where are the fish]
+    object: fishing
+    level: reading
+  # The glass on a near ship (spec M7b §21b; package 56; `freesail/orders/glass.py`): what
+  # the glass makes out of her manoeuvre and her work, by her distance, the daylight and
+  # the weather; object `glass`, a reading every station may ask.
+  the glass on:
+    synonyms: [glass on, put the glass on, train the glass on, the glass to]
+    object: glass
+    level: reading
   # Console and client control. If one of these reaches the ship, the
   # captain typed it at the wrong prompt; say so.
   hold:

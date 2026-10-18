@@ -82,10 +82,13 @@ PROMOTION_ACCOUNT_SIGMA_NM = 0.5
 # The states a crewed vessel is demoted in, and a far one not promoted in: the port's
 # business is not the crewed body's (see the module's head).
 _NOT_CREWED_STATES = frozenset({"at anchor", "in port", "running for shelter", "in distress"})
-# The roles never crewed (package 43b): the fisherman of the world's business is at far
-# detail only (spec M6 §19: "both at far detail in the world's business ... and at full
-# detail in the regatta").
-FAR_ONLY_ROLES = frozenset({"fisherman"})
+# The roles never crewed: none since package 56 (spec M7b §21a; the owner, 2026-10-17:
+# "the crewed promotion includes the fishermen"). Package 43b kept the fisherman of the
+# world's business at far detail only; a fishing vessel near the player is now promoted
+# like any other, the cap's order unchanged, and fishes at full detail by the same
+# evolutions under her rules-based captain (`world.fishing.captain_work`). The name is
+# kept, empty, for the rule's one place.
+FAR_ONLY_ROLES: frozenset[str] = frozenset()
 
 
 class CrewView:
@@ -169,6 +172,18 @@ class CrewedWorld(World):
             self.ship.extra["vessels_view"] = True
         self.conditions = parent.conditions
         _set_sail(self, vessel.sail_state)
+        # a fishing vessel's fishery is one object for her two bodies (package 56): the
+        # gear in the water and the catch the far body had, or this World's made from her
+        # file given to the far body
+        shared = getattr(vessel, "fishing", None)
+        if shared is not None:
+            self.fishery = shared
+        elif getattr(self, "fishery", None) is not None:
+            vessel.fishing = self.fishery
+        if getattr(self, "fishery", None) is not None:
+            from freesail.world.fishing import rig_gear_drag
+
+            rig_gear_drag(self, self.fishery)
         if self.navigation is not None and self.position is not None:
             self.navigation.reckoning.set_position(
                 self.position, self.clock.tick, sigma_nm=PROMOTION_ACCOUNT_SIGMA_NM
@@ -445,6 +460,10 @@ def _to_full(vessel: Any) -> None:
     crew._position = vessel.position
     crew.shape = "full"
     _set_sail(crew, vessel.sail_state)
+    if getattr(crew, "fishery", None) is not None:
+        from freesail.world.fishing import rig_gear_drag
+
+        rig_gear_drag(crew, crew.fishery)  # the trawl down on the new body (package 56)
     brain = vessel.brain
     if brain is not None:
         brain.fold_in(crew.captain)

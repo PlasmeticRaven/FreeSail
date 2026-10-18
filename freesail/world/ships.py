@@ -479,6 +479,10 @@ class Vessel:
     dealing_tick: int = -1
     warning: str = ""
     sail_order: str = ""  # a station's sail as a state in the far shape (`crews.far_order`)
+    # a fishing vessel's fishery (package 56; `world.fishing.Fishery`): her gear, the gear
+    # in the water and her catch, one object for her far body and her crewed World; None
+    # until she fishes (and in a checkpoint from before)
+    fishing: Any = None
 
     @property
     def height_m(self) -> float:

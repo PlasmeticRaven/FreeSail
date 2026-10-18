@@ -351,6 +351,11 @@ class Lookout:
     # checkpoint from before loads with it.
     own_run: tuple[float, float] = (0.0, 0.0)
     _run_tick: int | None = None
+    # package 56 (the glass on a near ship, spec M7b §21b): what the glass last showed of
+    # each sail within two miles, as (the nearest tier yet, her state, her work, her
+    # light), so that the lookout says it when she is made out and when her work changes;
+    # a plain default, so that a checkpoint from before loads with it
+    _glass_said: dict[str, tuple[Any, ...]] = field(default_factory=dict)
 
     def peg_own_run(self, world: Any) -> tuple[float, float]:
         """Her run through the water to now, pegged by the heading and the way since the
@@ -626,10 +631,14 @@ class Lookout:
                 self._sail_known[fid] = v.words_at(level)
                 out.append(self._made_out_line(v, s, level, words, relative, glass=False))
             seen[fid] = f"{_head(self._sail_word(v, level))} {relative}"
+            glass = self._glass_line(world, v, s, level, relative)
+            if glass is not None:
+                out.append(glass)
         for fid, where in list(self._sails_seen.items()):
             if fid not in seen:
                 self._sail_said.pop(fid, None)
                 self._sail_known.pop(fid, None)
+                getattr(self, "_glass_said", {}).pop(fid, None)
                 out.append(
                     (
                         Severity.ROUTINE,
@@ -640,6 +649,75 @@ class Lookout:
                 )
         self._sails_seen = seen
         return out
+
+    def _glass_line(
+        self, world: Any, v: Any, s: Sighting, level: int, relative: str
+    ) -> tuple[Severity, str, str, dict[str, Any]] | None:
+        """The glass on a near sail (package 56; spec M7b §21b), said by the lookout when
+        she comes within its tiers and when what it shows of her changes: her state at a
+        look within two miles, her work within eight cables, the evolution's words within
+        four; by night only her light, if she shows one. A boat under oars is not
+        glassed unasked."""
+        if getattr(v, "boat", False):
+            return None
+        said = getattr(self, "_glass_said", None)
+        if said is None:
+            said = self._glass_said = {}
+        tier, words = glass_words(world, v, s.distance_m)
+        fid = s.feature.id
+        if tier == 0 or (tier == -1 and not words.startswith("only her light")):
+            said.pop(fid, None)
+            return None
+        st = glass_state(world, v)
+        # a change of her state, her work or her light, or a nearer tier than any yet; her
+        # point of sailing alone is not a change (it moves with every shaped course), nor
+        # the steps of one piece of work, nor her drifting out of a tier
+        state = (st["look"].split(",")[0], st["work"], st["light"])
+        last = said.get(fid)
+        if last is not None and last[1:] == state and tier <= last[0]:
+            return None
+        said[fid] = (max(tier, last[0] if last is not None else tier), *state)
+        who = self._sail_word(v, max(level, 1))
+        text = f"The glass on {who} {relative}: {words}."
+        data = {
+            "id": v.id,
+            "tier": tier,
+            "words": words,
+            "relative": relative,
+            "bearing_deg": round(s.bearing_deg, 1),
+            "crewed": bool(st.get("crewed")),
+        }
+        return Severity.ROUTINE, "lookout.glass", text, data
+
+    def glass_on(self, world: Any, which: str | None = None) -> tuple[str, dict[str, Any]]:
+        """`the glass on <ship>` (package 56; spec M7b §21b): what the glass shows of the
+        sail named (by her name when made out, her rig, or 'the sail'), or the nearest:
+        her rig and colours as `make her out` gives them, and her manoeuvre and her work
+        by the tiers of her distance, the daylight and the weather. Refused in words with
+        no sail in sight."""
+        text, data = self.make_out(world, which)
+        sails = [x for x in self.sightings if x.seen_as == "sail"]
+        s = self.find(which) if which else None
+        if s is None:
+            s = min(sails, key=lambda x: x.distance_m)
+        v = self._vessel(world, s)
+        if v is None:
+            return text, data
+        tier, words = glass_words(world, v, s.distance_m)
+        if tier == 0:
+            more = (
+                " At this distance the glass shows nothing of her work."
+                if str(world.daylight) != "night"
+                else ""
+            )
+            return text + more, data | {"tier": 0}
+        if tier == -1:
+            rel = relative_words(math.radians(s.bearing_deg) - float(world.ship.heading))
+            return f"The glass on the sail {rel}: {words}.", data | {
+                "tier": -1,
+                "glass_words": words,
+            }
+        return f"{text} The glass shows her {words}.", data | {"tier": tier, "glass_words": words}
 
     def sail_name(self, fid: str, default: str = "a sail") -> str:
         """How a sail is named in an order's words from what has been made out of her so
@@ -661,18 +739,22 @@ class Lookout:
     ) -> tuple[Severity, str, str, dict[str, Any]]:
         who = self._sail_word(v, level - 1 if level > 1 else 0)
         colours = level >= 2 and v.shows_colours and bool(v.nation_adjective)
+        # package 56 (the owner's note 5 at gate 6c): every line that reports a sail made
+        # out gives her relative bearing, her compass bearing and the course she stands
+        point = units.point_name(math.radians(s.bearing_deg))
+        where = f"{relative}, bearing {point}"
         if glass:
-            text = f"The glass aloft makes out {who} {relative}: {words}."
+            text = f"The glass aloft makes out {who} {where}: {words}."
         elif level == 1:
-            text = f"{_head(who)} {relative} is {words}."
+            text = f"{_head(who)} {where}, is {words}."
         elif level == 2:
             text = (
-                f"{_head(who)} {relative} shows {v.colours_words()}."
+                f"{_head(who)} {where}, {v.course_words()}, shows {v.colours_words()}."
                 if colours
-                else (f"{_head(who)} {relative} is {v.colours_words()}.")
+                else (f"{_head(who)} {where}, {v.course_words()}, is {v.colours_words()}.")
             )
         else:
-            text = f"{_head(who)} {relative} is {words}."
+            text = f"{_head(who)} {where}, is {words}."
         data = {
             "id": v.id,
             "level": level,
@@ -1124,17 +1206,21 @@ class Lookout:
             words += "; the chart ends here"
         return {"count": len(items), "words": words, "items": items}
 
-    def sail(self, heading_rad: float) -> dict[str, Any]:
+    def sail(self, heading_rad: float, world: Any = None) -> dict[str, Any]:
         """`a sail in sight` (package 35; the row the registry held absent since M4): in
-        sight or not, with the nearest sail and the lookout's words for each."""
+        sight or not, with the nearest sail and the lookout's words for each; the course
+        she stands once her rig is made out (package 56, the owner's note 5 at gate 6c:
+        "a brig on the larboard quarter, bearing WSW, standing to the eastward")."""
         sails = sorted(
             (s for s in self.sightings if s.seen_as == "sail"), key=lambda s: s.distance_m
         )
-        items = [
-            self._data(s, heading_rad)
-            | {"words": self.words(s, heading_rad).removeprefix("Sail ho! ").rstrip(".")}
-            for s in sails
-        ]
+        items = []
+        for s in sails:
+            words = self.words(s, heading_rad).removeprefix("Sail ho! ").rstrip(".")
+            v = self._vessel(world, s) if world is not None else None
+            if v is not None and self._sail_said.get(s.feature.id, 0) >= 1:
+                words += f", {v.course_words()}"
+            items.append(self._data(s, heading_rad) | {"words": words})
         if not items:
             return {"in_sight": False, "words": "not in sight", "count": 0, "items": []}
         words = "in sight: " + items[0]["words"]
@@ -1208,3 +1294,245 @@ def _said_metres(estimate_m: float) -> float:
     if nm < 6.0:
         return max(1, round(nm)) * units.NAUTICAL_MILE
     return max(2, round(nm / 3.0)) * 3.0 * units.NAUTICAL_MILE
+
+
+# ---------------------------------------------------------------------------
+# The glass on a near ship (package 56; spec M7b §21b)
+# ---------------------------------------------------------------------------
+
+# The tiers of what the glass shows of a near ship beyond her rig and colours, in daylight
+# and clear weather (the lead's reading for the owner's word, spec M7b §21b): within two
+# miles what any seaman reads at a look (under way or at anchor, which tack, hove to,
+# tacking or wearing, running, her sail set or shortening); within eight cables the work
+# on deck and aloft (reefing, making or taking in sail, a boat hoisting out or in, the
+# hands at the nets or the lines, the anchor coming up); within four cables the
+# evolution's own words as the log would say them of the player's ship. Judgement on the
+# period's day glass at sea; the visibility bounds each, and at the twilight the glass
+# reaches a tier less.
+GLASS_LOOK_NM = 2.0
+GLASS_WORK_NM = 0.8
+GLASS_WORDS_NM = 0.4
+# By night a ship is a shape within a mile at most (a hull's loom, judgement), and only a
+# light tells anything of her: a fishing vessel at her gear hangs a lantern in her
+# rigging (judgement: the drift-boats' lights of the Act of 1868 in Holdsworth 1874 are
+# later than the period, and a lantern at the nets was the fishermen's own custom); a
+# King's ship cruising or a merchantman shows none.
+GLASS_NIGHT_NM = 1.0
+# The sails a far-detail ship lies to with aback, by her rig's word (judgement on the
+# heave-to evolution's rule, `data/evolutions/heave_to.yaml`: the mast that carries the
+# most square sail; a fore-and-after's head sheet to windward).
+_HOVE_TO_ABACK = {
+    "a ship": "main topsail aback",
+    "a brig": "main topsail aback",
+    "a schooner": "fore topsail aback",
+    "a cutter": "foresail to windward",
+    "a smack": "foresail to windward",
+    "a lugger": "mizen sheeted flat",
+}
+# The work's words at the second tier, from the work in hand's gerund (the runner's
+# `doing`): what a seaman tells of the hands at a glance at eight cables.
+_WORK_KINDS = (
+    ("reefing", "hands aloft reefing"),
+    ("shaking out", "hands aloft shaking out a reef"),
+    ("furling", "hands aloft furling"),
+    ("taking in", "taking in sail"),
+    ("clewing", "taking in sail"),
+    ("hauling down", "taking in sail"),
+    ("setting the lines", "the hands at the lines"),
+    ("setting", "making sail"),
+    ("sending down", "sending down her upper spars"),
+    ("swaying up", "swaying up her upper spars"),
+    ("weighing", "her anchor coming up"),
+    ("heaving in", "her anchor coming up"),
+    ("heaving short", "her anchor coming up"),
+    ("getting under way", "her anchor coming up"),
+    ("sending boat", "a boat hoisting out or in"),
+    ("shooting the trawl", "the hands at the trawl"),
+    ("hauling the trawl", "the hands at the trawl"),
+    ("shooting the nets", "the hands at the nets"),
+    ("hauling the nets", "the hands at the nets"),
+    ("shooting the seine", "her boat at the seine"),
+    ("hauling the seine", "her boat at the seine"),
+    ("hauling the lines", "the hands at the lines"),
+)
+_SHORTENING = ("reefing", "taking in", "furling", "clewing", "hauling down")
+_MAKING = ("setting the", "shaking out")
+
+
+def _tack_from_wind(heading_deg: float, wind_from_deg: float) -> tuple[str, float]:
+    """(the tack, the wind's angle off her bow in degrees): starboard with the wind on the
+    starboard side."""
+    rel = (wind_from_deg - heading_deg) % 360.0
+    tack = "starboard" if rel <= 180.0 else "larboard"
+    off = rel if rel <= 180.0 else 360.0 - rel
+    return tack, off
+
+
+def _sailing_words(off_deg: float) -> str:
+    """Close-hauled, with the wind abeam, on the quarter, or running before it: her point
+    of sailing as a seaman reads it from her yards and her heel (judgement on the
+    points)."""
+    if off_deg < 70.0:
+        return "close-hauled"
+    if off_deg < 112.5:
+        return "with the wind abeam"
+    if off_deg < 157.5:
+        return "with the wind on the quarter"
+    return "running before it"
+
+
+def glass_state(world: Any, vessel: Any) -> dict[str, Any]:
+    """What a near ship is doing, as the glass may make it out at each tier: `look` (at a
+    look, two miles), `work` (the work on deck and aloft, eight cables), `words` (the
+    evolution's own words, four cables), and `light` (her lantern by night, or "").
+    A crewed ship gives the true evolution's name; a far-detail vessel the words her
+    plan's leg and her sail state give."""
+    crew = getattr(vessel, "crew", None)
+    if crew is not None and getattr(crew, "shape", "") == "full":
+        return _glass_crewed(crew)
+    return _glass_far(world, vessel)
+
+
+def _glass_crewed(crew: Any) -> dict[str, Any]:
+    from freesail.evolutions.runner import part_name
+    from freesail.evolutions.scripts import sail_name_on
+
+    ship = crew.ship
+    extra = getattr(ship, "extra", None) or {}
+    runner = extra.get("evolutions")
+    doing = [
+        runner.doing(inst)
+        for inst in getattr(runner, "instances", None) or ()
+        if not inst.waiting and not inst.paused
+    ]
+    fishery = getattr(crew, "fishery", None)
+    out = fishery.out if fishery is not None else None
+    manoeuvre = str(crew.readings.value("manoeuvre_in_hand") or "")
+    heading = units.rad_to_deg(float(ship.dyn.heading)) % 360.0
+    wind_from = units.rad_to_deg(float(crew.wind.direction_from)) % 360.0
+    tack, off = _tack_from_wind(heading, wind_from)
+    hove = extra.get("hove_to")
+    if crew.at_anchor:
+        look = "at anchor"
+    elif hove is not None:
+        tack = "starboard" if float(hove.get("sign", 1.0)) > 0 else "larboard"
+        look = f"hove to on the {tack} tack"
+    elif manoeuvre in ("tacking", "wearing", "heaving to", "filling away", "box hauling"):
+        look = manoeuvre
+    else:
+        look = f"under way on the {tack} tack, {_sailing_words(off)}"
+    if not crew.at_anchor:
+        if any(d.startswith(_SHORTENING) for d in doing):
+            look += ", shortening sail"
+        elif any(d.startswith(_MAKING) and "lines" not in d for d in doing):
+            look += ", making sail"
+    work: list[str] = []
+    for d in doing:
+        for key, said in _WORK_KINDS:
+            if d.startswith(key):
+                if said not in work:
+                    work.append(said)
+                break
+    if out is not None and out.state == "fishing" and out.doing_words() not in work:
+        work.append(out.doing_words())
+    words = list(doing)
+    if hove is not None:
+        yards = [ship.spars[y] for y in hove.get("yards") or [] if y in ship.spars]
+        if yards:
+            words.insert(0, f"hove to on the {tack} tack, {sail_name_on(ship, yards)} aback")
+        elif hove.get("headsail"):
+            head = part_name(ship, hove["headsail"])
+            words.insert(0, f"hove to on the {tack} tack, the {head} sheet to windward")
+    if out is not None and out.state == "fishing":
+        words.append(out.doing_words())
+    light = f"a lantern in her rigging, {out.doing_words()}" if out is not None else ""
+    return {
+        "look": look,
+        "work": ", ".join(work),
+        "words": "; ".join(words),
+        "light": light,
+        "crewed": True,
+    }
+
+
+def _glass_far(world: Any, vessel: Any) -> dict[str, Any]:
+    plan = getattr(vessel, "plan", None) or []
+    leg = plan[0][0] if plan else ""
+    wind_from, _ = vessel._wind_at(world)
+    tack, off = _tack_from_wind(float(vessel.heading_deg), float(wind_from))
+    state = str(vessel.sail_state or "")
+    fishing = getattr(vessel, "fishing", None)
+    out = fishing.out if fishing is not None else None
+    phase = str(getattr(fishing, "far_phase", "") or "") if fishing is not None else ""
+    lying = state == "lying to" or leg == "lie_to"
+    if leg == "anchor" or state == "at anchor":
+        look = "at anchor"
+    elif lying:
+        look = f"hove to on the {tack} tack"
+    else:
+        look = f"under way on the {tack} tack, {_sailing_words(off)}, {state}"
+    work: list[str] = []
+    words: list[str] = []
+    if lying:
+        aback = _HOVE_TO_ABACK.get(str(vessel.kind), "her sails aback")
+        words.append(f"hove to on the {tack} tack, {aback}")
+    if phase.startswith(("shoot:", "haul:")):
+        from freesail.world.fishing import gear_spec
+
+        kind = phase.split(":", 1)[1] or (out.kind if out is not None else "trawl")
+        act = "shooting" if phase.startswith("shoot:") else "hauling"
+        work.append(str(gear_spec(kind).get("hands_at_it") or "hands at the gear"))
+        noun = {"drift nets": "the nets", "lines": "the lines", "seine": "the seine"}.get(
+            kind, "the trawl"
+        )
+        words.append(f"the hands are {act} {noun}")
+    elif out is not None and out.state == "fishing":
+        work.append(out.doing_words())
+        words.append(out.doing_words())
+    light = f"a lantern in her rigging, {out.doing_words()}" if out is not None else ""
+    return {
+        "look": look,
+        "work": ", ".join(work),
+        "words": "; ".join(words),
+        "light": light,
+        "crewed": False,
+    }
+
+
+def glass_tier(world: Any, distance_m: float) -> tuple[int, str]:
+    """The tier the glass reaches at this distance in this light and weather: 0 nothing
+    beyond her rig and colours, 1 a look, 2 her work, 3 the evolution's words, -1 by
+    night within `GLASS_NIGHT_NM` (her light, if any); and the light."""
+    nm = float(distance_m) / units.NAUTICAL_MILE
+    daylight = str(getattr(world, "daylight", "day"))
+    conditions = getattr(world, "conditions", None)
+    vis = float(getattr(conditions, "visibility_nm", 99.0) or 99.0) if conditions else 99.0
+    if daylight == "night":
+        return (-1, "night") if nm <= min(GLASS_NIGHT_NM, vis) else (0, "night")
+    tier = 0
+    for t, reach in ((3, GLASS_WORDS_NM), (2, GLASS_WORK_NM), (1, GLASS_LOOK_NM)):
+        if nm <= min(reach, vis):
+            tier = t
+            break
+    if daylight != "day" and tier > 0:
+        tier -= 1
+    return tier, daylight
+
+
+def glass_words(world: Any, vessel: Any, distance_m: float) -> tuple[int, str]:
+    """What the glass shows of her now (spec M7b §21b): (the tier, the words); -1 the
+    night's light or its want, 0 nothing beyond her rig and colours."""
+    tier, _light = glass_tier(world, distance_m)
+    if tier == 0:
+        return 0, ""
+    st = glass_state(world, vessel)
+    if tier == -1:
+        if st["light"]:
+            return -1, f"only her light: {st['light']}"
+        return -1, "no light shows; nothing of her work is to be made out in the dark"
+    said = st["look"]
+    if tier >= 2 and st["work"]:
+        said += f", {st['work']}"
+    if tier >= 3 and st["words"]:
+        said += f"; {st['words']}"
+    return tier, said

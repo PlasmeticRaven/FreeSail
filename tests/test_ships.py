@@ -292,8 +292,9 @@ def test_make_her_out_sends_a_glass_aloft_and_give_chase_puts_the_helm_for_her_b
     assert w.readings["strangers"]["items"][0]["made_out"] == 0
     e = w.submit("make her out")
     assert e.kind == "lookout.made_out" and e.data["glass"] and e.data["level"] == 1
+    # package 56 (the owner's note 5 at gate 6c): the line gives her bearing by compass
     assert e.text.startswith(
-        "The glass aloft makes out the sail abeam to larboard: a brig, standing"
+        "The glass aloft makes out the sail abeam to larboard, bearing E: a brig, standing"
     )
     assert w.readings["strangers"]["items"][0]["made_out"] == 1
     # a sail beyond the glass's reach: nothing more, and the words say why

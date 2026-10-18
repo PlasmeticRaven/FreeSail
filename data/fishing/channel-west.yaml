@@ -1,0 +1,101 @@
+# FreeSail: the fishing grounds of the western Channel (package 56, spec M7b §21a), the
+# chart's region `channel-west`. Each ground keyed to a feature of the chart where it has
+# one (`feature:`, the business's grounds among them: `business.grounds()` finds them by
+# kind, depth and distance, and this table names their season and yield), else pricked at
+# a position with its source (`position:`, the bays where the seans and the drivers
+# worked, which the chart names no feature for); its radius in miles; and its fish, each
+# with the gear that takes it, the months (1 to 12, or `all`), when it is taken (`night`,
+# `day` or `any`), and the yield: tons of fish an hour of the gear fishing, for one
+# vessel at the gear her file carries. The yields are judgement throughout, with the
+# reasoning; the seasons and the gear the sources'. The fish, the gear and the quays are
+# data/fishing/fish.yaml's.
+#
+# The yields' reasoning, once (judgement): a ton is five pressed hogsheads (Holdsworth
+# p. 194, 2,500 pilchards to the hogshead at 4 cwt). A small sean worked by a smack's
+# boat encloses fifteen hogsheads or so of a shoal in its hour (three tons), against the
+# great seans of St Ives that took "as many as 5500 hogsheads" from one shoal (p. 194)
+# and 7,000 in 1767 (EB 1810, CLUPEA). A fleet of drift nets takes six to eight
+# hogsheads of pilchards in a night's eight dark hours (a fifth of a ton an hour), the
+# change of light worth half as much again (pp. 98 to 99); mackerel and herring a little
+# less. A small trawler's haul of five or six hours brings up half a ton, a fifth of it
+# soles and turbot (p. 24: four-fifths of the take "of the inferior kinds"). A smack's
+# lines take a few hundredweight a tide.
+
+region: channel-west
+grounds:
+  - id: gerrans-bay
+    name: the seine ground in Gerrans Bay
+    position: {lat_deg: 50.1950, lon_deg: -4.9450}
+    radius_nm: 1.5
+    source: "Holdsworth 1874 pp. 194 to 195: 'Pilchard-seaning is carried on more regularly on the southern coast; but the nets are fewer'; the bay under the Nare Head (the chart's Bizzies) as the seine ground nearest Falmouth, judgement on the place"
+    fish:
+      - {fish: pilchards, gear: seine, months: [7, 8, 9, 10, 11, 12], when: day, tons_per_hour: 3.0, source: "season Holdsworth p. 130 ('from July to December') and EB 1810 ('about the middle of July'); yield judgement, a small sean's fifteen hogsheads"}
+      - {fish: mackerel, gear: seine, months: [6, 7, 8], when: day, tons_per_hour: 1.0, source: "Holdsworth p. 128: after spawning 'towards the middle of July ... draw nearer the land'; yield judgement"}
+  - id: st-ives-bay
+    name: the seine ground in St Ives Bay
+    position: {lat_deg: 50.2200, lon_deg: -5.4550}
+    radius_nm: 1.5
+    source: "Holdsworth 1874 pp. 188 to 189: the seaning ground 'on the western side of the bay', its six stems, the fishery 'from September to November'"
+    fish:
+      - {fish: pilchards, gear: seine, months: [9, 10, 11], when: day, tons_per_hour: 3.0, source: "season Holdsworth p. 188; yield judgement, as Gerrans Bay"}
+  - id: mounts-bay
+    name: the drift ground in Mount's Bay
+    position: {lat_deg: 50.0500, lon_deg: -5.4800}
+    radius_nm: 3.0
+    source: "Holdsworth 1874 p. 188: Penzance, 'or Mount's Bay as it might be more properly described', one of the two principal stations, its drift-boats famous"
+    fish:
+      - {fish: pilchards, gear: drift nets, months: [7, 8, 9, 10, 11, 12], when: night, tons_per_hour: 0.2, source: "season Holdsworth p. 130; yield judgement, a fleet's six to eight hogsheads a night"}
+      - {fish: mackerel, gear: drift nets, months: [3, 4, 5, 6], when: night, tons_per_hour: 0.15, source: "Holdsworth p. 127: the Cornish fishery 'towards the end of February, and it extends into June'; yield judgement"}
+      - {fish: ling and conger, gear: lines, months: all, when: any, tons_per_hour: 0.03, source: "judgement"}
+  - id: eddystone
+    name: the oozy ground off the Eddystone
+    feature: eddystone-oozy-ground
+    radius_nm: 3.0
+    source: "the chart's feature; the Plymouth trawlers' ground 'only a few miles from the land' (Holdsworth 1874 p. 44)"
+    fish:
+      - {fish: soles and turbot, gear: trawl, months: all, when: any, tons_per_hour: 0.02, source: "judgement, a fifth of a small trawler's haul"}
+      - {fish: plaice and hake, gear: trawl, months: all, when: any, tons_per_hour: 0.06, source: "judgement; the hake 'in the early part of the year' (Holdsworth p. 78)"}
+      - {fish: mackerel, gear: drift nets, months: [4, 5, 6, 7], when: night, tons_per_hour: 0.15, source: "Holdsworth p. 128: 'May, June, and July are the months in which most of these fish are caught by drift-nets in the English Channel'; yield judgement"}
+      - {fish: herring, gear: drift nets, months: [10, 11, 12], when: night, tons_per_hour: 0.12, source: "judgement: the Channel's autumn herring, which the Hastings men take 'in October and November' (Holdsworth p. 128)"}
+      - {fish: ling and conger, gear: lines, months: all, when: any, tons_per_hour: 0.03, source: "judgement"}
+  - id: torbay-ground
+    name: the trawling ground off Berry Head
+    position: {lat_deg: 50.4050, lon_deg: -3.4300}
+    radius_nm: 3.0
+    source: "Holdsworth 1874 pp. 200 to 203: Brixham 'long famous for' its trawlers, their grounds near the land; the place judgement"
+    fish:
+      - {fish: soles and turbot, gear: trawl, months: all, when: any, tons_per_hour: 0.025, source: "judgement, the Brixham men's best ground"}
+      - {fish: plaice and hake, gear: trawl, months: all, when: any, tons_per_hour: 0.06, source: "judgement"}
+  - id: poll-bank
+    name: the Poll Bank
+    feature: poll-bank
+    radius_nm: 3.0
+    source: "the chart's feature, off Scilly"
+    fish:
+      - {fish: cod, gear: lines, months: [10, 11, 12, 1, 2, 3, 4], when: any, tons_per_hour: 0.05, source: "judgement: the cod off the land in winter (Holdsworth pp. 137 to 141)"}
+      - {fish: ling and conger, gear: lines, months: all, when: any, tons_per_hour: 0.03, source: "judgement"}
+      - {fish: mackerel, gear: drift nets, months: [2, 3, 4, 5, 6], when: night, tons_per_hour: 0.15, source: "Holdsworth p. 127: the mackerel 'caught sometimes as early as January 60 miles west of the Land's End'; yield judgement"}
+      - {fish: pilchards, gear: drift nets, months: [7, 8, 9], when: night, tons_per_hour: 0.15, source: "Holdsworth p. 130: 'found south rather than west of the Land's End', few 'farther at sea than 10 or 12 miles': less here, judgement"}
+  - id: iroise
+    name: the Passage de l'Iroise
+    feature: iroise
+    radius_nm: 3.0
+    source: "the chart's feature; the Breton sardine of the Brest and Douarnenez boats (judgement on the place)"
+    fish:
+      - {fish: sardines, gear: drift nets, months: [6, 7, 8, 9, 10], when: day, tons_per_hour: 0.15, source: "judgement: the Breton sardine taken in drift nets by day with salted cod's roe ('rogue') thrown to raise it, the undecked boats of the coast (the Musée de la Pêche, Concarneau, read 2026-10-17 at artsandculture.google.com: 'first fished using roe (salted cod eggs) with different types of nets'); the season and the yield judgement"}
+      - {fish: ling and conger, gear: lines, months: all, when: any, tons_per_hour: 0.03, source: "judgement"}
+  - id: soundings-off-ushant
+    name: the soundings south-west of Ushant
+    feature: soundings-off-ushant
+    radius_nm: 4.0
+    source: "the chart's feature"
+    fish:
+      - {fish: ling and conger, gear: lines, months: all, when: any, tons_per_hour: 0.04, source: "judgement: deep water, the lines' ground"}
+      - {fish: cod, gear: lines, months: [11, 12, 1, 2, 3], when: any, tons_per_hour: 0.03, source: "judgement"}
+  - id: soundings-off-ushant-near
+    name: the soundings seven leagues south-west of Ushant
+    feature: soundings-off-ushant-near
+    radius_nm: 4.0
+    source: "the chart's feature"
+    fish:
+      - {fish: ling and conger, gear: lines, months: all, when: any, tons_per_hour: 0.04, source: "judgement, as the outer soundings"}

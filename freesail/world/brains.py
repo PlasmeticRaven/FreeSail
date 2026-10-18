@@ -358,6 +358,8 @@ class FarCaptain(Judgement):
         place = _mark(self.world, self.intent.destination)
         if place is None:
             return None
+        if self.intent.kind == "fish":
+            return place[1]  # the ground itself (package 56; `Planner.legs_for`)
         return station_off(self.world, place[1], self.intent.radius_nm)
 
     def _on_station(self) -> bool:
@@ -456,14 +458,20 @@ class FarCaptain(Judgement):
         sailed from, where she goes in and is gone from the sea (`_in_port`)."""
         intent = self.intent
         assert intent is not None
+        from freesail.world import fishing
+
         b = self._business
         last = b.get("fishing_tick")
-        b["fishing_s"] = float(b.get("fishing_s", 0.0)) + (
-            0.0 if last is None else float(p.tick - int(last))
-        )
+        step = 0.0 if last is None else float(p.tick - int(last))
+        b["fishing_s"] = float(b.get("fishing_s", 0.0)) + step
         b["fishing_tick"] = p.tick
+        # package 56: her gear worked on the ground by the same evolutions' times and the
+        # same catch function as the player's (truth 106), the take struck below
+        if step > 0.0:
+            fishing.far_work(self.world, self.vessel, step)
         if b["fishing_s"] < float(intent.hours or 0.0) * 3600.0:
             return
+        fishing.trip_done_far(self.world, self.vessel)
         home = intent.origin
         port = getattr(self.world, "ports", None)
         found = port.find(home) if port is not None and getattr(port, "ports", None) else None
@@ -523,6 +531,8 @@ class FarCaptain(Judgement):
             return
         port = p.in_port
         if self.intent.kind in ("passage", "home", "letter") and port == self.intent.destination:
+            if self.role == "fisherman":
+                self._land_the_catch(port)
             self.intent.done = True
             self.vessel.done = True
             return
@@ -537,6 +547,26 @@ class FarCaptain(Judgement):
             self.vessel.saved_plan = None
             self._plan()
             self.vessel.tack = 0.0
+
+    def _land_the_catch(self, port_id: str) -> None:
+        """The fisherman home (package 56): her catch sold at her port's fish quay at the
+        player's price (`fishing.land_far`), the sale in the business's record."""
+        from freesail.world import fishing
+
+        ports = getattr(self.world, "ports", None)
+        port = ports.ports.get(port_id) if ports is not None else None
+        if port is None:
+            return
+        record = fishing.land_far(self.world, self.vessel, port)
+        business = getattr(self.world, "business", None)
+        if record is None or business is None:
+            return
+        for d in business.drawn:
+            if d.id == self.vessel.id:
+                tons = sum(record["sold"].values())
+                d.landed = f"{tons:.1f} tons sold at {port.name} for £{record['pounds']:.0f}" + (
+                    f", {sum(record['spoiled'].values()):.1f} spoiled" if record["spoiled"] else ""
+                )
 
     # -- across the crewed promotion (spec M6 §19, §20) --------------------------------
 
