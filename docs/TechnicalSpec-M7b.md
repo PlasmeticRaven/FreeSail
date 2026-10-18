@@ -1094,9 +1094,11 @@ explained against each other (the settings' seat, the scenario's `stations:` and
 not explained where they are set, though the parser holds every help line; one model per
 door, so several models at several stations want several settings files, where a
 per-station entry is wanted; the maker without the papers (the chronometer first) and the
-people, which the loader reads; and no way to name the stations or write their briefings
-per scenario, which the owner hoped for (`stations:` holds holders only, the only
-scenario-level brief being the director's). The refinement is package 64, briefed after
+people, which the loader reads; and no way to write the people aboard into a scenario by
+name with a short brief each, which the owner hoped for (`people:` takes a role, a name, a
+skill and a place; the character, rank, traits, history and station brief, is the ship's
+wardroom file's `Outline` per role, the same in every scenario; the owner's clarification
+of the same day: the people, not the stations). The refinement is package 64, briefed after
 the owner's testing round; `docs/dev/M7b-WorkPackages.md`, "The harbour's second pass".
 
 ### 21e. The scenario maker (`client/harbour.js`; `freesail/world/scenarios.py` `write_scenario`)

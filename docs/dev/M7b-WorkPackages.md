@@ -37,7 +37,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 61 | Fable | The land-avoiding route, provisional (spec §21i; the owner, 2026-10-17, brought in from the carried items): the course laid clear of the land and the dangers over the chart's own data for every captain and the player, the legs said as the plan | to plan in full at briefing; beside 51, before 58's tracks |
 | 62 | Opus | The director's hand: an order of a ship's own grammar given to her captain's station by the director as his own, far and crewed, refused where a model or the player holds him (spec §3; the owner's proposal of 2026-10-18); the director seated in a ship as a later item | briefed, approved and launched 2026-10-18 beside 59; **built the same day** (spec §3 as built; the Harness's §19; the primer's chapter 20; the tuning notes, "Package 62"; truth 7b-113); the director seated in a ship not built |
 | 63 | Opus | The boat (spec §21k; the owner, 2026-10-18): towing by the boat by an oar force on the hull, the boat as a vessel the player can pull or sail (the seat on another vessel), the kedge's false denial mended; kedging itself needs no package, the pull being in the anchor physics already | brief to write; after 51 |
-| 64 | Opus | The harbour's second pass (spec §21d, "The owner's first use"; the owner, 2026-10-18): the page made clear to a newcomer, the flags explained where they are set, several models and stations configured without several settings files, the maker given the papers (the chronometer first) and the stations' names and briefings per scenario | noted, not immediate; brief after the owner's testing round |
+| 64 | Opus | The harbour's second pass (spec §21d, "The owner's first use"; the owner, 2026-10-18): the page made clear to a newcomer, the flags explained where they are set, several models and stations configured without several settings files, the maker given the papers (the chronometer first) and the people aboard by name with a short brief each per scenario | noted, not immediate; brief after the owner's testing round |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
 
 ## The testing round after 59 (the owner, 2026-10-18)
@@ -84,13 +84,15 @@ His points, each set beside what the build has, so that the brief starts from fa
   (chart, epitome, almanac, chronometer, price lists) and `people:`, and the form has
   neither; the maker writes only the fields it shows. Package 64 adds the papers (the
   chronometer first) and the people.
-- **Stations' names and briefings per scenario.** He hoped to name the stations and write
-  their briefings per scenario; there is no such field (`stations:` is holders only; the
-  people's names come from `people:` by role; the only scenario-level brief is the
-  director's). A design item for the brief: a `stations:` entry that may carry a name, a
-  role's person and a briefing read to the holder at the station as the director's brief is
-  read to him, by the Harness's existing form of a brief (spec §21d, "The owner's first
-  use").
+- **The people's names and briefs per scenario** (his clarification of the same day: not
+  the stations, the particular people aboard). He hoped to name the people and write each a
+  short brief in the scenario. The loader's `people:` entry takes a role, a name, a skill
+  and a place, so a name can be given today; the character itself (rank, traits, a line of
+  history, the station brief) is the ship's wardroom file's (`data/people/<ship>.yaml`,
+  an `Outline` per role), the same for every scenario, and the maker's form has no people
+  at all. Package 64 gives the scenario's person his outline's fields over the file's (a
+  short brief at least, traits and history where written) and the maker a people section
+  with name, role and brief, so that a scenario can say who Mr Pearce is in this story.
 
 Recorded here and in spec §21d so that the refinement is briefed after the owner's testing
 round, with what the round adds.
