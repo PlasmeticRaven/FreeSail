@@ -2968,9 +2968,9 @@ GATE_5B_BROUGHT_UP_TICK = 59603  # brought up, the sails furled (package 57; 596
 GATE_5B_SAIL_SIGHTED_TICK = 55620  # "Sail ho! A sail right ahead" (package 57; 55500)
 GATE_5B_PILOT_HAIL_TICK = 57240  # the cutter hails within four cables (package 57; 57120)
 GATE_5B_PILOT_ABOARD_TICK = 57300  # the pilot aboard, a minute after (package 57; 57180)
-GATE_5B_LINES = 729  # package 57 (733 at package 45, 732 at package 37p)
+GATE_5B_LINES = 733  # package 56, the glass (729 at package 57)
 # decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
-GATE_5B_DIGEST = "5f682b9f676a2db4"  # package 57 (271d03594a160224 at package 45)
+GATE_5B_DIGEST = "c8c81b7617e4e0fd"  # package 56, the glass (5f682b9f676a2db4 at 57)
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
 # bearing; the outer road 56502 → 56517; the anchor off the town 57615 → 58210 in six
@@ -3020,9 +3020,9 @@ GATE_5B_SCHOONER_PILOT_HAIL_AGAIN_TICK = 56460  # her second, to heave to (37h; 
 GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # aboard off the outer road (37h; 56580 before)
 GATE_5B_SCHOONER_ANCHORED_TICK = 57257  # off the town, the best bower let go (57255 before 37p)
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p)
-GATE_5B_SCHOONER_LINES = 763  # package 45 (762 at package 37p; every tick as it was)
+GATE_5B_SCHOONER_LINES = 768  # package 56, the glass (763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
-GATE_5B_SCHOONER_DIGEST = "c01e6e0ff56503c8"  # 44, a line's words (edea58e34efd05c4 at 45c)
+GATE_5B_SCHOONER_DIGEST = "b7c16adc612bd01a"  # package 56, the glass (c01e6e0ff56503c8 at 44)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4092,11 +4092,11 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # re-measured at 37j's merge, the tuning notes saying both.)
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
-GATE_5C_CRUISE_LINES = 2225  # package 57 (2287 at package 45c, 1930 at package 45)
+GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
-GATE_5C_CRUISE_DIGEST = "087fdfacfc6381f1"  # package 57 (a46aa710b77a9d6a at 44)
+GATE_5C_CRUISE_DIGEST = "728522e26dd25a49"  # package 56, the glass (087fdfacfc6381f1 at 57)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4200,9 +4200,9 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 # full and by ("'keep her full and by' must wait till she weighs", the refusal of 126000,
 # not said again) where it was refused as a tack; 2999 → 2998 lines
 # (docs/dev/TuningNotes.md, package 37m).
-GATE_5C_MERCHANT_LINES = 3080  # package 57 (3079 at package 45c, 3092 at package 45)
+GATE_5C_MERCHANT_LINES = 3098  # package 56, the glass (3080 at package 57)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
-GATE_5C_MERCHANT_DIGEST = "06b14a75a5eaae8b"  # package 57 (efdd3ae1bb9711be at 44)
+GATE_5C_MERCHANT_DIGEST = "05f0f4aba2eddbc0"  # package 56, the glass (06b14a75a5eaae8b at 57)
 
 
 def _people(world) -> list[dict]:
@@ -4618,11 +4618,11 @@ GATE_6A_INTENT_ANCHORED_TICKS = [57, 104295]  # Carrick Road; Bertheaume (the Ba
 GATE_6A_INTENT_BROUGHT_UP_TICK = 105260  # package 43b (112302 at 45c, 112069 at 45)
 GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 105360  # the boat for the prices (112380 at 45c)
 GATE_6A_INTENT_SOLD_TICK = 124320  # 47 tons at £270 (119820 at 45c, 118980 at 45)
-GATE_6A_INTENT_LINES = 1684  # package 43b (2357 at 45c: the Goulet's conn, 2114 at 45)
+GATE_6A_INTENT_LINES = 1698  # package 56, the glass (1684 at package 43b)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
-GATE_6A_INTENT_DIGEST = "93981cc47f5524e6"  # package 57 (c5060beaa8b991cd at 43b)
+GATE_6A_INTENT_DIGEST = "90061f779b7db484"  # package 56, the glass (93981cc47f5524e6 at 57)
 
 
 @pytest.fixture(scope="module")
@@ -4786,7 +4786,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # quarterdeck carries its place and its hearers (none) in its data, as every say does now
 # (the owner's ruling of 2026-10-10); aa42746f61de91d1 at 37p, a2cd045b9bcc93f8 before it
 # decision 45, the pilot's news: b00ac08c3f63e84c before
-GATE_6A_FAKE_CAPTAIN_DIGEST = "0e089f1279e03928"  # package 57 (c266f45bb9e7fe6f at 44)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "f996530d5a041abc"  # package 56, the glass (0e089f1279e03928 at 57)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
