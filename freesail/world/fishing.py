@@ -1003,7 +1003,7 @@ def sail_allowed(fishery: Fishery | None, ship: Any, sail_id: str) -> str | None
         return None
     at = str(gear_spec(fishery.out.kind).get("at_it") or "at her gear")
     return (
-        f"she is {at}; the {fishery.out.name.removeprefix('the ')} allows "
+        f"{fishery.out.name} is in the water ({at}); it allows "
         f"{', '.join(str(w) for w in allowed_words) or 'no sail'} and no more. Haul "
         f"{fishery.out.name} first"
     )

@@ -62,6 +62,7 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
             "directed_day",  # package 50: a day with the fake director, truths 7b-90 to 94
             "voiced_watch",  # package 52: two hours of the director's voice, truths 7b-95 to 97
             "needs_days",  # package 54: three days of the player's needs, truths 7b-103 and 104
+            "gerrans_seine",  # package 56: the smack's seine shot and hauled, truths 105, 106
         }
     ),
     "test_captain_trials.py": frozenset(  # package 40c: the captain's trials, 16 hours each
@@ -350,6 +351,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7b_102_a_drafted_manifest_trades_in_one_errand_and_a_posted_sheet_stands",
         "test_orders_places.py::test_the_deck_passes_among_the_officers_at_the_change_of_the_watch_by_the_bill",
         "test_orders_places.py::test_the_player_ashore_is_out_of_hail_of_the_ship_and_cannot_send_her_boat",
+        # package 56: a day of the catch's spoilage and a shot of the seine checkpointed
+        "test_fishing.py::test_the_spoilage_is_said_when_a_lot_turns_and_once_a_day_and_salt_keeps",
+        "test_fishing.py::test_a_checkpoint_keeps_the_gear_in_the_water_and_the_catch_and_goes_on_the_same",
     }
 )
 

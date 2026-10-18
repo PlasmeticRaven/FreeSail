@@ -598,7 +598,7 @@ boats:
   tons: 0.1
 # The fishing gear (package 56, spec M7b §21a): what she carries and no other, each with its source; the evolutions that work it are data/evolutions/shoot_*.yaml and haul_*.yaml, its fishing the grounds' of data/fishing/; see tools/gen_ships.py.
 gear:
-# A beam trawl of 36 ft, the smallest of the deep-sea trawls and the Yarmouth men's (Holdsworth 1874 pp. 47, 50), towed with the tide under easy sail at half a knot to a knot and a half faster than the stream, five or six hours a haul, and hove up by the winch in three quarters of an hour (pp. 70 to 71, 77 to 79); the warp 120 fathoms, judgement.
+# A beam trawl of 36 ft, the smallest of the deep-sea trawls and the Yarmouth men's (Holdsworth 1874 pp. 47, 59), towed with the tide under easy sail at half a knot to a knot and a half faster than the stream, five or six hours a haul, and hove up by the winch in three quarters of an hour (pp. 70 to 71, 77 to 79); the warp 120 fathoms, judgement.
 - id: trawl
   kind: trawl
   name: the trawl

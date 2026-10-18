@@ -302,3 +302,22 @@ def test_the_business_yaml_still_names_the_fish_goods_and_the_quays_are_ports():
 
     for pid in data["markets"]:
         assert os.path.exists(f"data/ports/{pid}.yaml"), pid
+
+
+def test_a_checkpoint_keeps_the_gear_in_the_water_and_the_catch_and_goes_on_the_same(tmp_path):
+    from freesail.core import replay
+
+    w = world_at()
+    w.submit("shoot the seine")
+    while w.fishery.out is None:
+        w.run(60)
+    w.run(600)
+    w.fishery.catch.stow({"cod": 0.4}, w.clock.tick, w.clock.ship_time)
+    path = replay.write_checkpoint(w, tmp_path / "smack.checkpoint")
+    _header, copy = replay.read_checkpoint(path)
+    assert copy.fishery.out is not None and copy.fishery.out.kind == "seine"
+    assert copy.fishery.catch.tons() == pytest.approx(0.4)
+    w.run(600)
+    copy.run(600)
+    assert copy.fishery.out.taken == w.fishery.out.taken
+    assert copy.log.digest() == w.log.digest()

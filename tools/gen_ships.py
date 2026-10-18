@@ -7023,7 +7023,7 @@ def smack(out_dir="data/ships"):
                 "the trawl",
                 {"beam_ft": 36.0, "length_fathoms": 120},
                 "A beam trawl of 36 ft, the smallest of the deep-sea trawls and the Yarmouth "
-                "men's (Holdsworth 1874 pp. 47, 50), towed with the tide under easy sail at half "
+                "men's (Holdsworth 1874 pp. 47, 59), towed with the tide under easy sail at half "
                 "a knot to a knot and a half faster than the stream, five or six hours a haul, "
                 "and hove up by the winch in three quarters of an hour (pp. 70 to 71, 77 to "
                 "79); the warp 120 fathoms, judgement.",

@@ -1531,8 +1531,16 @@ def glass_words(world: Any, vessel: Any, distance_m: float) -> tuple[int, str]:
             return -1, f"only her light: {st['light']}"
         return -1, "no light shows; nothing of her work is to be made out in the dark"
     said = st["look"]
+    rest: list[str] = []
+    if tier >= 3 and st["words"]:
+        rest = st["words"].split("; ")
+        head = said.split(",")[0]
+        if rest[0].startswith(head):
+            # the evolution's own words for her state stand for the look's ("hove to on
+            # the larboard tack, main topsail aback")
+            said = rest.pop(0) + said[len(head) :]
     if tier >= 2 and st["work"]:
         said += f", {st['work']}"
-    if tier >= 3 and st["words"]:
-        said += f"; {st['words']}"
+    if rest:
+        said += "; " + "; ".join(rest)
     return tier, said
