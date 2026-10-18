@@ -112,7 +112,17 @@ bearings (fixed the same day), the lookout no person for `say as`, no gun or sig
 ashore (53), Plymouth's market without tin against the scenario's own intent and no mate
 in its people (the scenario), the director's stand-by unbreakable by his own word and the
 truth not a meanwhile read (50), the pilot leaving at six knots (ports), the budget of ten
-acts spent before a boarding (the brief). **Open for the owner:** whether the return
+acts spent before a boarding (the brief). **The captain's debrief** (Opus 5.5, relayed by the owner; `captain-debrief.md` beside the
+notes) adds twelve more, routed in the notes: a word on deck waking a station out of
+earshot with an empty sample and orders dropped during a stand-by (50, the harness); the
+deck's rule in the sample's state line; the master's courses across the land (61); the
+sample repeating the history (58's deltas); a pending-reply sign and "say to <person>" as a
+thread (52); the director's words ahead of the state, the guineas not in the purse (50's
+brief, 53); the consent brief still saying the director is "to come" (55); no status line
+of the captain's own place and state and the ship's readings reaching him ashore (51, 54,
+spec §14); the boat's round trip with no waterman to hire (53); and the fixed seat, with
+the captain's own account of what would make the places real. The owner's save at the
+stand-down is in the folder. **Open for the owner:** whether the return
 passage is played on the same save with tomorrow's budget.
 
 ## Package 50: the director proper (`freesail/agents/director.py` new; `agent.py`, `tools.py`, `harness.py`, `journal.py`, `seat.py`, the doors `remote.py`, `mcp_server.py`, `local.py`, `api.py`; `freesail/world/orders.py` for the channel's doubt and the brief's limits; `freesail/api/readings.py` for the truth's readings; `freesail/world/stations.py` for the director's binding; `freesail/core/world.py` and `core/replay.py` for the director's log in the save and the replay; `freesail/ui/console.py`, `ui/server.py` and `client/` for the director's station at the prompt, the log's pane and the replay view; `data/director/briefs/*.yaml` and `data/director/aboard.yaml` new; `docs/agents/Harness.md` a section; `docs/primer/` a chapter for the director; `docs/TechnicalSpec-M7b.md` §2 to §7 as built; `docs/dev/TuningNotes.md`; `tests/test_director.py` new, `test_world_orders.py`, `test_parity.py` (the director's surface by design), `test_replay.py`, `test_known_truths.py` truths 90 to 94)

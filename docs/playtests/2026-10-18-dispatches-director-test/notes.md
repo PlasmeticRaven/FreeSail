@@ -116,3 +116,55 @@ Findings 1 (fixed), 2, 3 (M7), 4, 5 and 15 to package 62's open items and 58; 6,
 to 53's open items; 7 and 8 to the scenario (`dispatches-falmouth.yaml`: a mate in its
 people; a cargo Plymouth buys); 9 to the harness (50); 10 to the owner's sight-across-land
 note; 11 to 37h/ports; 14 to the business; 16 to the pace notes.
+
+## The save and the captain's debrief
+
+The owner's save at the director's stand-down is `freesail-seed7-tick47089.json` (the
+replay form: the inputs, the world orders, the station acts and the journals; the
+director's journal of 57 entries holds every act, the refused lookout and the stand-down
+note). The captain's debrief, relayed by the owner, is `captain-debrief.md`; the director's
+stand-down note never reached the owner in the game, which is right (it is the director's
+log's). What the captain adds to the findings above, and where it goes:
+
+17. **A word on deck woke the captain with an empty sample**: Mr Veale spoke at the counting
+    house at 15:44 in the minute the captain left it for the market; the officer aboard
+    heard him (a person ashore is heard aboard within a boat's reach) and the captain,
+    out of earshot, was woken for the kind of line and given no line. He concluded nobody
+    would answer. A stand-by's event should wake only a station the line reaches, and a
+    word said to a person should answer with who heard it (50; 53).
+18. **Orders given while standing by are dropped** ("Nothing was run"), at the captain's
+    station as at the director's: the captain lost three before he saw the pattern. A
+    model's order or word should end its own stand-by and run (50; the harness).
+19. **The deck taken implicitly** by the captain's orders, the officer's then refused, and
+    "you have the deck" refused because he had it: the deck's rule wants saying in the
+    sample's state line (the harness; the officer's brief).
+20. **The master's courses across the land** twice, Penlee at a cable unnamed while the
+    Dragstone at four cables was: 61's provisional item, and the danger reading's nearest
+    land.
+21. **The sample repeats the history** of what was said to the officer and the whole list of
+    sail in sight each time: the deltas item (58), a compact sample.
+22. **A pending reply**: "say to <person>" as a thread, "<person> answers" as an event, and a
+    sign that a reply is pending; the captain's one wish (52's open items; the director's
+    questions already come to him with a deadline, the asker should see the same).
+23. **The director's words ahead of the state**: the guineas not in the purse, a buyer the
+    market did not know, no order to hand a thing over. Either the director's speech is
+    kept inside what the game can carry out, or his words can change state through the
+    forms (a sum paid: `aboard:`/`port:`; a buyer for one cargo). The brief should say the
+    first until the second exists (50's brief; 53).
+24. **The consent brief says the director is "to come"**: out of date since package 50; the
+    brief's own rule is that its wording matters. Package 55's revision (the lead edits no
+    consent file before it).
+25. **The needs never showed** in thirteen hours, nor any line of the captain's own state or
+    place: the always-present status line ("You: the captain, ashore at Plymouth, at the
+    market; on your feet since 05:02") is wanted, and when he is ashore the ship's readings
+    should come by report or sight only (51's observed world and 54's needs; spec §14).
+26. **The boat's round trip** left the captain two hours on the quay with no waterman to
+    hire, though the quay names them (53's open items).
+27. **Smaller**: the noon sight four miles south of the reckoning moved the account two
+    cables; the anchor read "dragging" after she held; many short stand-bys returned
+    nothing; "on the deck" for "on the quarterdeck" after coming aboard.
+28. **The fixed seat**: the captain's own reading of why moving aboard bought nothing (the
+    sample reaches him everywhere) and what would make the places real (the masthead's
+    horizon, the cabin's chart and quiet, the gunroom's day's work, the shore reached by
+    boat or letter), with tiredness the reason to go below: the owner's intent for 53 and
+    54 said back by a player, and the design item for 51.
