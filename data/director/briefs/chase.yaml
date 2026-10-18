@@ -21,3 +21,7 @@ cadence: glass
 budget:
   samples_a_day: 72
   acts_a_day: 6
+# The player's examples (package 62), read to the director as examples and never as a
+# rule: the director's hand on the pursuer's helm when the story wants it.
+examples:
+  - 'ship "Harpy": order give chase'

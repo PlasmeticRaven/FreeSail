@@ -12,12 +12,15 @@ tone: >
   orders to stop and search every sail; if the cutter heaves to she is searched and the
   packet is barely not found; if she runs, a gun to leeward and a chase; at Plymouth a
   man is waiting on the Barbican for the packet. The weather is the story's ally when it
-  helps and the player's when it is fair: one shift, or a fog bank, where it tells.
+  helps and the player's when it is fair: one shift, or a fog bank, where it tells. The
+  frigate's captain is the director's hand while nobody holds him: he heaves to close
+  aboard to send his boat, gives chase when she runs, fills away when the search is done,
+  each in the frigate's own log as his.
 challenge: >
   A merchant captain's judgement against the King's ship: to heave to or to run, and
-  what to say when boarded. Keep the frigate honest (she sails as the physics lets her
-  and her people speak as the Navy's would); keep the cutter's chances real; never tell
-  the captain what the packet is.
+  what to say when boarded. Keep the frigate honest (she sails as the physics lets her,
+  her captain gives no order a captain would not, and her people speak as the Navy's
+  would); keep the cutter's chances real; never tell the captain what the packet is.
 limits:
   wind_max_kn: 30          # a fresh breeze at most: a chase, not a gale
   enemy_heaviest: brig     # no enemy heavier than a brig; the frigate is the King's
@@ -28,3 +31,10 @@ cadence: glass
 budget:
   samples_a_day: 48
   acts_a_day: 10
+# The player's examples (package 62), read to the director as examples and never as a
+# rule: the frigate put on the sea to windward, then the director's hand on her captain.
+examples:
+  - 'ship: a frigate "Medusa" of Britain at 49 55 N 4 35 W, bound for Plymouth, intent: keep the station off the Deadman within 8 miles'
+  - 'ship "Medusa": order give chase'
+  - 'ship "Medusa": order heave to'
+  - 'ship "Medusa": order fill away'

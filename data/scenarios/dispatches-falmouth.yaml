@@ -26,7 +26,7 @@ wind:
 
 # The captain's intent (spec M6 §4): the rules captain sails by it when nobody holds the
 # station; a model captain reads it as his night orders.
-intent: carry a cargo of tin from Falmouth to Plymouth
+intent: trade tin from Falmouth to Plymouth
 
 people:
   - {role: master, skill: 0.9}
@@ -40,7 +40,9 @@ papers:
 cargo:
   purse_pounds: 400
 
-ports: [falmouth, plymouth]   # Fowey has no port file yet: named, the scenario did not load (package 59)
+# Fowey has no port file yet (data/ports/): the scenario named it and could not load
+# (packages 59 and 62, found on the way by both); the two ports of the passage stand.
+ports: [falmouth, plymouth]
 business: on
 
 # A south-westerly day: fair for Plymouth along the coast, and a frigate to the southward

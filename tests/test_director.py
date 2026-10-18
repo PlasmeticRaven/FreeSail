@@ -935,3 +935,103 @@ def test_a_word_said_between_people_and_heard_is_a_word_on_deck_for_the_stand_by
     w.world_order('say as the cook: "Dinner, sir."', "the test")
     w.run(2)
     assert not oh.agent.standing_by
+
+
+# ---------------------------------------------------------------------------
+# The director's hand (spec M7b §3; package 62)
+# ---------------------------------------------------------------------------
+
+NANCY = (
+    'ship: a merchant brig "Nancy" of Britain at 49 00 N 6 20 W, bound for Falmouth, '
+    "intent: bound for Falmouth"
+)
+
+
+def test_the_hand_is_among_the_examples_with_its_refusal_and_the_starters_offer_it():
+    """The director's station brief names the hand among the examples of reasonable orders
+    (the orders are examples, not a rule), with its refusal where a captain is held; each
+    starter brief offers an order by the hand as the player's own example, read to the
+    director after the tone."""
+    brief = D.DIRECTOR_BRIEF
+    assert "'ship \"Harpy\": order heave to'" in brief and "'ship \"Harpy\": crewed'" in brief
+    assert "no order goes through a captain a model or the player holds" in brief
+    assert "in her own log as her captain's, never yours" in brief
+    for name in D.starter_briefs():
+        b = D.resolve_brief(name)
+        assert any(": order " in x for x in b.examples), name
+        assert "examples, not a rule" in b.body() and b.to_dict()["examples"] == list(b.examples)
+    chase = D.resolve_brief("chase")
+    assert chase.examples == ('ship "Harpy": order give chase',)
+    assert "examples" not in D.DirectorBrief.from_dict({"name": "x"}).to_dict()
+    one = D.DirectorBrief.from_dict({"examples": 'ship "A": order heave to'})
+    assert one.examples == ('ship "A": order heave to',)
+
+
+def test_the_dispatches_scenario_loads_with_its_brief_and_a_captain_who_reads_his_intent():
+    """The owner's scenario for the director's test (package 62 found it unable to load:
+    Fowey has no port file, and its intent was no intent a captain knows): the World is
+    made, the director bound on the dispatches brief with the hand in its examples, and the
+    rules captain reads his intent."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(ROOT / "data/scenarios/dispatches-falmouth.yaml")
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    b = D.brief_of(w)
+    assert b is not None and b.name == "The dispatches" and DIRECTOR in w.stations.names()
+    assert 'ship "Medusa": order give chase' in b.examples
+    assert w.captain.intent is not None and not w.captain.error
+    assert w.business is not None and set(w.ports.ports) == {"falmouth", "plymouth"}
+
+
+def test_the_fake_director_uses_the_hand_doubted_reentered_attempted_and_replayed(tmp_path):
+    """A fake director puts a trader on the sea, brings her to by her captain's order,
+    lets go her anchor where the chart doubts it and enters it again with its reason, and asks
+    what the far shape cannot carry, logged as attempted: the director's log keeps every
+    act as the director's, her story says the orders as her captain's, the play log and the
+    captain's samples carry nothing of them; saved, the voyage replays by both roads to the
+    same log and the same story."""
+    w = directed("chase")
+    ch = seat_captain(w)
+    seat_director(
+        w,
+        director_above_the_game(
+            [
+                NANCY,
+                'ship "Nancy": order heave to',
+                'ship "Nancy": order come to an anchor',
+                'ship "Nancy": order set the fore royal',
+            ]
+        ),
+    )
+    w.run(2 * EVERY)
+    kinds = log_kinds(w)
+    for kind in (
+        "director.order",
+        "director.doubted",
+        "director.reentered",
+        "director.unperformed",
+        "director.attempted",
+    ):
+        assert kind in kinds, kind
+    texts = log_texts(w)
+    assert any(t.startswith('Given: ship "Nancy": order heave to;') for t in texts)
+    assert any("fathoms by the chart" in t and t.startswith("Entered again") for t in texts)
+    assert any("the orders the far shape carries are" in t for t in texts)
+    v = w.vessels.find("Nancy")
+    said = [s for _t, s in v.story]
+    assert said[:2] == ["By the captain: heaving to.", "By the captain: coming to an anchor."]
+    assert D.budget_of(w).acts == 3
+    play = [e for e in w.log.all() if not for_the_record(e)]
+    assert _no_director_in([e.text for e in play])
+    assert not [e for e in play if "By the captain" in e.text or "Nancy" in e.text]
+    samples = [t.content for t in ch.turns if t.role == "data"]
+    assert not [s for s in samples if "By the captain" in json.dumps(s)]
+    path = tmp_path / "hand.json"
+    replay.save_to_file(w, path)
+    data = replay.load_file(path)
+    for road in (replay.BY_TRANSCRIPT, replay.BY_ACTS):
+        copy = replay.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == w.log.digest(), road
+        assert log_texts(copy) == texts, road
+        assert copy.vessels.find("Nancy").story == v.story, road

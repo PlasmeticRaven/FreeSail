@@ -29,6 +29,15 @@ A vessel within a port's reach, at anchor, in port or running for shelter is not
 promoted, and a crewed vessel that comes to an anchor is demoted: the port's business
 (the pilot, the boat, the market) is the player's ship's machinery and the far brain's
 wait (`brains.IN_PORT_WAIT_S`), not a crewed stranger's, until the world's business (43b).
+
+**The director's hand** (spec M7b §3; package 62; `hand`): an order of a ship's own grammar
+given to her captain's station as his own, by the world order `ship "X": order ...`.
+Crewed, through her World as his order under his rules' actor; at far detail through the
+far shape's orders (`far_order` on the far body, or `submit_far` where a station keeps her
+World in the far shape); her log says it as his, a far body with no World keeping the line
+in her short story (`Vessel.story`). Her captain holds by it a glass (`HAND_HOLD_S`) or
+until the next order to her, then sails by his intent again; `ask_crewed` makes a far ship
+within the range a crewed one first, the cap and its order unchanged.
 """
 
 from __future__ import annotations
@@ -53,7 +62,12 @@ __all__ = [
     "DEALING_S",
     "CrewView",
     "CrewedWorld",
+    "HAND_HOLD_S",
+    "ask_crewed",
+    "captain_held_by",
     "crewed",
+    "hand",
+    "her_log",
     "demote",
     "promote",
     "switch",
@@ -888,3 +902,270 @@ def shape_words(crew: CrewedWorld) -> str:
         f"{v.name} is at full detail beside the player's ship: her hull and rig under the "
         "physics, her company at their stations, every order of the ship's yours."
     )
+
+
+# ---------------------------------------------------------------------------
+# The director's hand (spec M7b §3; package 62): an order of a ship's own grammar given to
+# her captain's station as his own
+# ---------------------------------------------------------------------------
+
+# How long her captain holds by an order given over his head before his intent is his
+# again (the lead's reading of the brief, item 1: a heave-to held until the director's next
+# order to her or a glass, then his intent again; judgement: a glass is long enough for a
+# boat to board and search and for his own rules not to undo the order at their next
+# judgement, short enough that a forgotten order does not keep her lying to all day). The
+# director's next order to her sets it again from then; `carry on` ends it sooner.
+HAND_HOLD_S = 1800
+# The words that give her back to her captain before the glass is out (`captain: carry
+# on`'s word, said of another ship).
+CARRY_ON_WORDS = ("carry on", "carry on with your intent", "as you were")
+
+
+class _FarBody:
+    """The far body as `far_order` reads it, for a vessel with no World of her own: her
+    vessel and the parent's sea, which is all the far shape's orders want."""
+
+    def __init__(self, parent: World, vessel: Any) -> None:
+        self.parent = parent
+        self.vessel = vessel
+
+
+def captain_held_by(vessel: Any) -> tuple[str, str] | None:
+    """(her captain's name, who holds his station: "a model" or "the player at his seat")
+    when a model or the player holds the captain's station of her World, kept at full
+    detail or in the far shape; None when nobody does (spec M7b §3, the rule of reach)."""
+    crew = getattr(vessel, "crew", None)
+    if crew is None:
+        return None
+    from freesail.agents.agent import CAPTAIN
+    from freesail.agents.harness import _stations_held
+
+    seat = getattr(crew, "player_seat", None)
+    for h in _stations_held(crew):
+        if h.station.name != CAPTAIN:
+            continue
+        who = "the player at his seat" if h is seat else "a model"
+        try:
+            person = crew.stations.holder(CAPTAIN)
+        except Exception:  # noqa: BLE001 - a muster that cannot run binds nobody
+            person = None
+        return (person.name if person is not None else "her captain"), who
+    return None
+
+
+def _as_said(ship: Any, text: str) -> str:
+    """'heave to' -> 'heaving to', by her own ship's grammar where she has one."""
+    from freesail.standing.runtime import said_as_done
+
+    try:
+        return said_as_done(ship, text)
+    except Exception:  # noqa: BLE001 - a far body has no parts to read the words by
+        from freesail.evolutions.runner import gerund
+
+        words = text.split()
+        return " ".join([gerund(words[0]), *words[1:]]) if words else text
+
+
+def her_log(parent: World, vessel: Any, text: str) -> None:
+    """A line of her own log: her World's when she has one, else the far body's short
+    story (`Vessel.story`; spec M7b §12b's ground, since a far ship has no log of her own)."""
+    crew = getattr(vessel, "crew", None)
+    if crew is not None:
+        crew.record(Severity.ROUTINE, "captain.order", text, data={"id": vessel.id})
+        return
+    vessel.story = (*tuple(getattr(vessel, "story", ()) or ()), (parent.clock.tick, text))
+
+
+def _until_words(parent: World, until: int) -> str:
+    from datetime import timedelta
+
+    when = parent.clock.ship_time + timedelta(seconds=int(until) - int(parent.clock.tick))
+    return when.strftime("%H:%M")
+
+
+def hand(parent: World, vessel: Any, text: str) -> str:
+    """**The director's hand** (spec M7b §3; package 62): `text`, an order of her own
+    grammar, given to her captain's station as his own. Crewed, through her World as his
+    order under his rules' actor, his own domain and nothing more (her grammar refuses what
+    he could not do), her log saying it as his ("By the captain: heaving to"); at far detail
+    through the far shape's orders (`far_order`, and `submit_far` where a station keeps her
+    World in the far shape), the line in her log or the far body's story. Her captain is
+    told it came over his head: he holds by it until the director's next order to her or a
+    glass (`HAND_HOLD_S`), then sails by his intent again; `carry on` gives her back sooner.
+    The rule of reach is the channel's (`orders.reach`). Returns the words for the
+    channel's line; raises ValueError in words when she cannot carry it as said."""
+    from freesail.world import orders as world_orders
+
+    text = " ".join(str(text).split()).rstrip(".")
+    if not text:
+        raise ValueError("an order to her captain wants its words ('order heave to')")
+    if world_orders.recognises(text):
+        raise ValueError(
+            "that is an order to the world, not to her: her captain orders his ship, and the "
+            "world's orders are the channel's own, given as themselves"
+        )
+    if text.lower() in CARRY_ON_WORDS:
+        return _carry_on(vessel)
+    until = int(parent.clock.tick) + HAND_HOLD_S
+    crew = vessel.crew
+    full = crew is not None and crew.shape == "full"
+    if full:
+        words = _hand_crewed(vessel, crew, text, until)
+    else:
+        words = _hand_far(parent, vessel, text, until)
+    if vessel.brain is None and not full:
+        return (
+            f"{words}; she has no captain of her own beyond her goal, and the order stands "
+            "until the next ('fill away', 'shape a course for <a place>')"
+        )
+    return (
+        f"{words}; her captain holds by it until {_until_words(parent, until)} or the next "
+        "order to her, then sails by his intent again"
+    )
+
+
+_READING_WORDS = (
+    "that is a reading or a word on her deck, not an order: her captain reads her for "
+    "himself, and the truth reads her for the director"
+)
+
+
+def _hand_crewed(vessel: Any, crew: CrewedWorld, text: str, until: int) -> str:
+    from freesail.world.captains import actor_for
+
+    if _is_a_reading(crew, text):
+        raise ValueError(_READING_WORDS)
+    cap = crew.captain
+    said = f"By the captain: {_as_said(crew.ship, text)}"
+    e = crew.submit(text, actor=actor_for(cap.state or "on passage"), said=said)
+    if e.kind == "order.rejected":
+        why = str((e.data or {}).get("reason") or e.text).rstrip(".")
+        raise ValueError(f"{vessel.name}'s captain could not give it as said: {why}")
+    # her own clock: a crewed World counts its ticks from her promotion
+    cap.over_his_head(text, int(crew.clock.tick) + (until - int(crew.parent.clock.tick)))
+    return f"{vessel.name}'s captain gave it as his own, at full detail ({said})"
+
+
+def _hand_far(parent: World, vessel: Any, text: str, until: int) -> str:
+    from freesail.orders.errors import OrderError
+    from freesail.world.captains import actor_for
+
+    crew = vessel.crew
+    brain = vessel.brain
+    stash = (
+        list(vessel.plan),
+        None if vessel.saved_plan is None else list(vessel.saved_plan),
+        str(getattr(vessel, "sail_order", "") or ""),
+    )
+    said = f"By the captain: {_as_said(None, text)}"
+    if crew is not None:
+        # a station keeps her World in the far shape: the far orders through it, as the
+        # station's own are (`submit_far`), her World's log saying it as his
+        if _is_a_reading(crew, text):
+            raise ValueError(_READING_WORDS)
+        actor = actor_for(getattr(brain, "state", None) or vessel.state or "on passage")
+        e = submit_far(crew, text, actor, said, False)
+        if e.kind == "order.rejected":
+            data = e.data or {}
+            if data.get("far_shape"):
+                raise ValueError(far_no_way(parent, vessel))
+            raise ValueError(str(data.get("reason") or e.text).rstrip("."))
+        words = e.text.rstrip(".")
+    else:
+        try:
+            found = far_order(_FarBody(parent, vessel), text)  # type: ignore[arg-type]
+        except OrderError as e:
+            raise ValueError(str(e).rstrip(".")) from None
+        if found is None:
+            raise ValueError(far_no_way(parent, vessel))
+        words = found[1].rstrip(".")
+        her_log(parent, vessel, f"{said}.")
+    if brain is not None:
+        brain.over_his_head(text, until, stash)
+    return f"{vessel.name}'s captain gave it as his own, at far detail ({said}): {words}"
+
+
+def far_no_way(parent: World, vessel: Any) -> str:
+    """Why the far shape cannot carry an order, in words: the orders it carries, and, when
+    she is within the promotion's range, that the director may ask for her crewed first."""
+    why = (
+        f"{vessel.name} is at far detail: her body is the plan's, and the orders the far shape "
+        "carries are " + ", ".join(FAR_SHAPE_WORDS)
+    )
+    centre = parent.position
+    if centre is None or vessel.brain is None:
+        return why
+    cap, within_nm, _ = settings(parent)
+    nm = bearing_and_distance(centre, vessel.position)[1] / units.NAUTICAL_MILE
+    if nm <= within_nm:
+        why += (
+            f"; she is within the range of the ship ({nm:.1f} miles), so you may ask for her "
+            f"crewed first ('ship \"{vessel.name}\": crewed'), the cap allowing "
+            f"({len(crewed(parent))} of {cap} at full detail now), and give it her at full "
+            "detail"
+        )
+    return why
+
+
+def ask_crewed(parent: World, vessel: Any) -> str:
+    """`ship "<name>": crewed` (package 62): a far ship within the promotion's range made a
+    crewed ship now, so that an order the far shape cannot carry may be given her at full
+    detail; refused in words beyond the range, in a state no ship is crewed in, or with the
+    cap full (the owner's budget and the cap's order stand). Returns the words."""
+    crew = vessel.crew
+    if crew is not None and crew.shape == "full":
+        raise ValueError(f"{vessel.name} is at full detail already")
+    if vessel.brain is None:
+        raise ValueError(
+            f"{vessel.name} has no captain of her own to be crewed for: give her an intent "
+            f"first ('ship \"{vessel.name}\": intent <the intent>')"
+        )
+    centre = parent.position
+    cap, within_nm, _ = settings(parent)
+    nm = (
+        bearing_and_distance(centre, vessel.position)[1] / units.NAUTICAL_MILE
+        if centre is not None
+        else math.inf
+    )
+    if nm > within_nm:
+        raise ValueError(
+            f"{vessel.name} is {nm:.1f} miles from the ship, beyond the promotion's range of "
+            f"{within_nm:g}: a ship is crewed only near the ship (the owner's budget)"
+        )
+    state = vessel.brain.state or "on passage"
+    if state in _NOT_CREWED_STATES:
+        raise ValueError(
+            f"{vessel.name} is {state}, and a ship {state} is not crewed: the port's business "
+            "is her far captain's"
+        )
+    held = crewed(parent)
+    if len(held) >= cap:
+        names = ", ".join(v.name for v in held)
+        raise ValueError(
+            f"the crewed cap is full ({cap}: {names}); the cap and its order stand (the "
+            "nearest first, a ship in dealings with the player before a nearer one), and she "
+            "takes her turn"
+        )
+    crew = promote(parent, vessel)
+    return (
+        f"{vessel.name} at full detail: her company mustered, her captain "
+        f"{crew.captain.name} in command"
+    )
+
+
+def _carry_on(vessel: Any) -> str:
+    """`ship "<name>": order carry on`: her captain given her back before the glass is out,
+    his intent and his plan taken up again."""
+    crew = vessel.crew
+    none = f"{vessel.name}'s captain is under no order of yours: he sails by his intent"
+    if crew is not None and crew.shape == "full":
+        cap = crew.captain
+        if getattr(cap, "over_head_until", None) is None:
+            raise ValueError(none)
+        cap.take_up_again()
+        return f"{vessel.name}'s captain carries on: his intent again"
+    brain = vessel.brain
+    if brain is None or getattr(brain, "over_head", None) is None:
+        raise ValueError(none)
+    brain.take_up_again()
+    return f"{vessel.name}'s captain carries on: his plan taken up again"

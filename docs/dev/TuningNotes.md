@@ -7009,3 +7009,161 @@ On the build machine (four cores), beside package 62's builder; logs in the scra
   report, at the lead's word: the lead's merge run is the whole slow tier's.
 - **The pace tests alone** (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the
   load 1.6 at their start): 6 passed (`pace.log`).
+
+
+## Package 62: the director's hand (2026-10-18)
+
+Spec M7b §3 ("The director's hand", the owner's proposal of 2026-10-18); decisions 46 and 50;
+the brief's four items, the third (the director seated in a ship) not built. Built in the
+worktree off `06015d3`, beside 59. No new module: the hand is `crews.hand` (with
+`ask_crewed`, `captain_held_by`, `her_log`, `HAND_HOLD_S`), the `ship` channel's `order` and
+`crewed` tails in `orders.py` (`_hand`, `_hand_reach`, `_doubt_hand`, `is_hand`), the hold on
+both captains (`Captain.over_his_head`, `FarCaptain.over_his_head`, `take_up_again`), the far
+body's short story (`Vessel.story`), and the brief's `examples`.
+
+### What the far shape could and could not carry
+
+The far shape's eleven orders (`crews.FAR_SHAPE_WORDS`) carry what a captain's hand on a far
+ship mostly wants: `heave to` (the plan's `lie_to`, the far body drifting a knot to leeward,
+her sail "lying to"), `fill away`, `shape a course for <place>`, `steer <course>`, `give
+chase` and `haul off` (the nearest stranger her masthead sees), `make sail` and `shorten
+sail` as a state, `come to an anchor`, `weigh`, `keep the station`. `far_order` reads only
+her vessel and the parent's sea, so a far body with no World of her own is given it through
+a light stand-in (`_FarBody`), and no World is made for one order (a far-shaped World costs a
+ship from her file and a tick each second for as long as it is kept). What it could not
+carry, answered as the game's honest "no way as said" naming the eleven:
+
+- a sail by name (`set the fore royal`, `set the fore topgallant`), a boat lowered, a gun:
+  the far body has no sails, boats or guns, only a sail state;
+- a reading or a sentence of her deck (`the glass`, `you have the deck`): no order, and the
+  truth reads her for the director;
+- `give chase` with no sail in her horizon: the far shape's own refusal ("No sail in sight
+  to chase"), which the fake director entered again with its reason and which was then
+  logged as attempted, not performed (the honest road for an order performed and refused);
+- a world order inside the hand (`ship "X": order port falmouth: ...`): no order of hers.
+
+Within the promotion's range the answer adds `ship "X": crewed`: the ship made a crewed one
+now when the cap has room and her state allows (not at anchor, in port, running for shelter
+or in distress), refused in words beyond the range or with the cap full; the cap and its
+order (dealings first, then the nearest) are untouched, and a ship crewed so is demoted by
+the same switch as any other. It counts as an act of the day's budget (an act is a world
+order performed); judgement, for the lead to overrule if a promotion should be free.
+
+### How her captain takes up his plan after an order over his head
+
+The lead's reading, kept: he holds by it a glass (`HAND_HOLD_S`, 1,800 s) or until the
+director's next order to her, which sets the glass again, then his intent again; `ship "X":
+order carry on` (`captain: carry on`'s word, said of another ship) gives her back sooner.
+
+- **The far captain** (`FarCaptain.over_his_head`): before the far order touches the body,
+  her plan, her saved plan and her sail order are kept (the first order's only, so that a
+  second order over his head does not keep the first one's plan as his); meanwhile he does
+  not judge (his tick returns before the perception, as it does under a seated station);
+  the glass out, the plan, the saved plan and the sail order are laid back, the lying-to
+  time cleared, a plan laid afresh if there was none, and his judgement runs that same
+  minute from where she is. Her story says it: "The captain takes up his plan again (bound
+  for Falmouth)."
+- **The crewed captain** (`Captain.over_his_head`): his state's book is struck as at the
+  player's hand (so that no standing order of his fights the heave-to), his state cleared,
+  his judgements held (`commands` false); the glass out, he commands again as at `captain:
+  carry on`, his legs and business cleared, and his first state is entered afresh, which
+  fills away from the heave-to (`_fill_away_first`) and shapes his leg: in the trial the
+  brig-sloop filled away and stood for her station within the minute.
+- **Across the promotion**: promoted inside the glass, the near captain holds by it for the
+  rest of it, and a far body lying to by his order heaves to at full detail by his words,
+  the first line of her new log; demoted inside it, the far body lies to if the near one was
+  hove to or heaving to, and the far captain keeps the hold with the plan just laid. **A
+  crewed World counts its ticks from her promotion** (her clock is her own): the hold is
+  kept in her World's ticks and converted at each crossing (found on the way, by the test:
+  the parent's tick had held the crewed captain the longer by her age).
+- A far vessel with no captain of her own (a goal and no intent) obeys and holds by it
+  until the next order; nothing of hers judges.
+
+### The doubt and the reach
+
+A captain's order is a plausible cause of itself; the doubt bites only where the order is
+implausible for her (judgements): an anchor let go deeper than thirty fathoms by the chart
+(a bower's cable of a hundred to a hundred and twenty fathoms wants a scope of three or
+four, and the period's roads lie in five to twenty; the business's trader in the western
+approaches lay in eighty), plain sail in a wind at her over thirty-four knots (force 8), and
+a chase given by a master of the merchant's, the fisherman's or the packet's doctrine.
+Entered again with a reason, each is done. The rule of reach refuses outright, logged
+`director.refused` and costing no act, where a model or the player holds her captain's
+station (`_stations_held` of her World, kept full or in the far shape) and for the player's
+own ship, by her name or "the ship". A seat the director holds for a model under the owner's
+grant and not yet taken is no holder: the hand works on her until the door comes.
+
+### What the dispatches scenario showed
+
+The dispatches scenario (`data/scenarios/dispatches-falmouth.yaml`, seed 7, the business on)
+**did not load**: Fowey has no port file, and the World stopped at its making; its intent
+("carry a cargo of tin from Falmouth to Plymouth") was no intent a captain knows, so the
+rules captain never commanded. Both put right (the two ports of the passage; `trade tin from
+Falmouth to Plymouth`), with a test that the World is made, the director bound and the
+captain reading his intent. With Falmouth and Plymouth alone the business draws no trader
+(no route with a price ratio of 1.3): five fishermen for the Eddystone ground and two French
+brig-sloops on their stations off the Black Rocks and the Isle of Bas. So the far trader of
+the truth is the business's at seed 7 in the free-play water off the Lizard
+(`test_business.world_with("on")`: the Haabet, bound for Falmouth a hundred and thirty miles
+off, among four traders on passage).
+
+With a fake director on the dispatches brief:
+
+- **On a far trader**: `ship "Haabet": order heave to` brought her to at once, her story "By
+  the captain: heaving to.", her plan `lie_to`, her sail lying to; the glass out at 10:30 she
+  took up her plan (seven knots under plain sail, bound for Falmouth) and her story said so;
+  `set the fore topgallant` was answered with the far shape's eleven; `come to an anchor`
+  doubted (eighty fathoms); `give chase` doubted (the merchant's doctrine); `ship "Speedwell"`
+  (the player's schooner) refused as the player's own ship.
+- **On a crewed cruiser**: the frigate of the brief's example put on the sea twenty-three
+  miles south-east of the cutter (the first place tried, fourteen miles off, doubted inside
+  the horizon; "the Dodman" unknown to the chart, whose name is "the Deadman", so the
+  example says that) closed with the cutter by her own doctrine (investigating a stranger)
+  and was promoted at 2.4 miles; `order give chase` and `order heave to` were her captain's,
+  "By the captain: giving chase." and "By the captain: heaving to." in her log under his
+  rules' actor, and she lay hove to at a knot and a half; the player's log carried only the
+  lookout's lines of her. In the truth's water the brig-sloop on her station did the same,
+  the player's lookout saying her glass ("heaving to", "hove to on the starboard tack").
+- **Against a fake captain holding her**: the same order refused, "Hazard's captain
+  (Captain Reynolds) is held by a model: his orders are his holder's own, and nobody gives
+  one through him; write to him instead ('message: ...')", in the director's log as refused.
+
+### Found on the way
+
+- The dispatches scenario could not load (above); fixed.
+- A crewed World's clock counts from her promotion (above); the hold is kept in her ticks.
+- **"Write to him" is not yet a road**: `message:` reaches the player's ship alone (left at a
+  port for the pilot, or by a cutter to "the ship"); a letter to a model captain of another
+  ship has no form. The refusal says the brief's words; whether a letter to another ship
+  (through her World's door or by a boat) is 55's or a later package's is the lead's.
+- The director's "Done:" answer runs its two sentences together ("... then sails by his
+  intent again The play log will carry ...") because the channel's words are cut of their
+  full stop; as it has been since 50, left (tests read its head).
+- A far vessel's story is read by no tool yet (12b's ships' logs, package 51); it is in the
+  vessel's dict and the save.
+
+### Pins
+
+**No pin moves.** No digest or line count in `tests/` changed (`git diff 06015d3 -- tests`
+touches no `_DIGEST` or `_LINES`), and every pinned passage of the slow tier passes against
+its figure (below): the business is off in every recorded passage and no director is seated
+in one, and every new path is gated on the hand (a hold that is `None` by a class default, a
+story that is empty and absent from a vessel's dict, a brief's examples absent from its dict
+when there are none).
+
+### The suite, as run
+
+On the build machine (four cores), 59 building beside it; the code and data as committed in
+`42bc2ee`, the records in `16bce6e` (this section after them).
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,438 passed, none
+  failed, 324 slow left out. (A first run, with the source edited under it, failed the
+  fingerprint test's "this tree's own, timed afresh", the tree having changed between its
+  two readings; on the unchanged tree it passes.)
+- **The slow tier once whole** (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m
+  "not pace"`): 3,745 passed, 11 expected failures (the ten of 50 and 52, and 57's gale
+  trial, the lead's debt for 58), none failed and no error; every pinned digest among them.
+  A first whole run was cut off by the container's restart and run again from the start.
+- **The pace tests alone** (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the
+  load 1.0 at their start and at the end): 6 passed.

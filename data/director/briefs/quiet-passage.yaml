@@ -23,3 +23,7 @@ cadence: glass
 budget:
   samples_a_day: 48
   acts_a_day: 4
+# The player's examples (package 62), read to the director as examples and never as a
+# rule: the director's hand on a trader it has put on the sea, so that she may be spoken.
+examples:
+  - 'ship "Nancy": order heave to'

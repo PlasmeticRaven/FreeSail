@@ -283,6 +283,13 @@ class FarCaptain(Judgement):
         self.last_judged = tick
         if self.vessel.done:
             return
+        held = getattr(self, "over_head", None)
+        if held is not None:
+            # an order given over his head by the director's hand (package 62): he holds by
+            # it until the director's next order to her or a glass, then his plan again
+            if tick < int(held["until"]):
+                return
+            self.take_up_again()
         crew = getattr(self.vessel, "crew", None)
         near = getattr(crew, "captain", None) if crew is not None else None
         if near is not None and near.seated and not near.stand_in:
@@ -568,6 +575,61 @@ class FarCaptain(Judgement):
                     f", {sum(record['spoiled'].values()):.1f} spoiled" if record["spoiled"] else ""
                 )
 
+    # -- an order over his head (spec M7b §3; package 62) ------------------------------
+
+    # the director's order he holds by: {order, until, plan, saved, sail_order}, the plan as
+    # it stood before the first of them; None when he sails by his own judgement (a class
+    # default, so that a checkpoint from before loads with none)
+    over_head: dict[str, Any] | None = None
+
+    def over_his_head(
+        self, order: str, until: int, stash: tuple[list[Any], list[Any] | None, str]
+    ) -> None:
+        """An order of the far shape's given to her as his own by the director's hand: he
+        is told it came over his head, so that he holds by it until `until` (or the
+        director's next order to her, which sets it again) and does not fight it with his
+        own judgement, his plan as it stood before the first of them kept to be taken up
+        again (`take_up_again`)."""
+        held = self.over_head
+        if held is None:
+            plan, saved, sail_order = stash
+            self.over_head = {
+                "order": order,
+                "until": int(until),
+                "plan": list(plan),
+                "saved": None if saved is None else list(saved),
+                "sail_order": sail_order,
+            }
+        else:
+            held["order"], held["until"] = order, int(until)
+
+    def take_up_again(self) -> None:
+        """The glass out (or `carry on`): his plan as it stood before the director's order
+        laid on the far body again, his sail his own, and his judgement given from this
+        minute; said in her log."""
+        held = self.over_head
+        if held is None:
+            return
+        self.over_head = None
+        v = self.vessel
+        v.plan = list(held.get("plan") or [])
+        saved = held.get("saved")
+        v.saved_plan = None if saved is None else list(saved)
+        v.sail_order = str(held.get("sail_order") or "")
+        v.lying_to_s = 0.0
+        v.tack = 0.0
+        if not v.plan and self.intent is not None and not self.intent.done:
+            self.planned = False
+            self._plan()
+        self.last_judged = self.world.clock.tick
+        from freesail.world.crews import her_log
+
+        her_log(
+            self.world,
+            v,
+            f"The captain takes up his plan again ({self.intent.words if self.intent else ''}).",
+        )
+
     # -- across the crewed promotion (spec M6 §19, §20) --------------------------------
 
     def fold_in(self, captain: Captain) -> None:
@@ -585,6 +647,28 @@ class FarCaptain(Judgement):
         captain.spoken_ids = set(self.spoken_ids)
         captain.given_up = set(self.given_up)
         captain.last_judged = -1
+        held = getattr(self, "over_head", None)
+        if held is not None and self.world.clock.tick < int(held["until"]):
+            # an order over his head carried across (package 62): the near captain holds by
+            # it for the rest of its glass, then takes her up from where she is
+            self.over_head = None
+            # the parent's tick into her World's own, which counts from her promotion
+            left = int(held["until"]) - int(self.world.clock.tick)
+            captain.over_head_until = int(captain.world.clock.tick) + left
+            captain.over_head_order = str(held.get("order") or "")
+            plan = self.vessel.plan
+            if plan and plan[0][0] == "lie_to":
+                # the far body lay to by his order: the near body heaves to by it, his words
+                # the first of her new log's
+                from freesail.world.captains import actor_for
+
+                captain.world.submit(
+                    "heave to",
+                    actor=actor_for(self.state or "on passage"),
+                    said="By the captain: heaving to",
+                )
+            return
+        self.over_head = None
         if self.state is not None and self.state not in ("in distress",):
             captain._enter(self.state)
 
@@ -605,6 +689,23 @@ class FarCaptain(Judgement):
         self.state = None
         self.last_judged = -1
         self._enter(state)
+        near_until = getattr(captain, "over_head_until", None)
+        near_world = getattr(captain, "world", None)
+        left = None
+        if near_until is not None and near_world is not None:
+            # her World's own tick (it counts from her promotion) into the parent's
+            left = int(near_until) - int(near_world.clock.tick)
+        if left is not None and left > 0:
+            # an order over his head carried back (package 62): the plan just laid kept to be
+            # taken up when the glass is out, the far body lying to if the near one was
+            until = int(self.world.clock.tick) + left
+            v = self.vessel
+            stash = (list(v.plan), None if v.saved_plan is None else list(v.saved_plan), "")
+            readings = getattr(getattr(captain, "world", None), "readings", None)
+            manoeuvre = str(readings.value("manoeuvre_in_hand") or "") if readings else ""
+            if manoeuvre in ("hove to", "heaving to"):
+                v.plan = [("lie_to", math.inf)]
+            self.over_his_head(str(getattr(captain, "over_head_order", "") or ""), until, stash)
 
 
 # Within hail, in metres (`ships.HAIL_NM`, four cables), the distance a chase or an
