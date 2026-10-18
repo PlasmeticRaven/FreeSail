@@ -335,7 +335,13 @@ def test_the_aboard_orders_do_what_the_table_knows_and_reach_the_play_log_as_a_r
 
 def test_the_starter_briefs_load_and_the_console_brief_is_words_alone():
     names = D.starter_briefs()
-    assert names == ["chase", "hard-cruise", "interesting-passage", "quiet-passage"]
+    assert names == [
+        "chase",
+        "dispatches",  # the owner's story brief for the director's test (2026-10-18)
+        "hard-cruise",
+        "interesting-passage",
+        "quiet-passage",
+    ]
     for name in names:
         b = D.resolve_brief(name)
         assert b.tone and b.challenge and b.limits.get("nobody_dies") and b.acts_a_day > 0

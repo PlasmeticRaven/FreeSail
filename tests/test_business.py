@@ -39,6 +39,7 @@ BUSY_SCENARIOS = {
     "merchant-ship.yaml",
     "smack-falmouth.yaml",
     "lugger-roscoff.yaml",
+    "dispatches-falmouth.yaml",  # the director's test of 2026-10-18, the business about her
 }
 
 
