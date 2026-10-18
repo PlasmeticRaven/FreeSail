@@ -824,6 +824,10 @@ def _emit(key: str, value: Any, indent: int) -> list[str]:
     pad = " " * indent
     if isinstance(value, bool) and key == "business":
         return [f"{pad}{key}: {'on' if value else 'off'}"]  # the hand's words, read the same
+    if isinstance(value, str) and len(value) > _FLOW_LIST_MAX - indent:
+        folded = _folded(key, value, indent)
+        if folded:
+            return folded
     if _plain(value) or not value:
         return [f"{pad}{key}: {_flow(value)}".rstrip()]
     if isinstance(value, dict):
@@ -844,6 +848,30 @@ def _emit(key: str, value: Any, indent: int) -> list[str]:
     for item in value:
         out += _emit_item(item, indent + 2)
     return out
+
+
+def _folded(key: str, value: str, indent: int, width: int = 92) -> list[str] | None:
+    """A long sentence as a hand writes it, folded (`key: >-` and the words wrapped
+    beneath), or None where folding would not read back as the same words (a line break,
+    a double space, a space at either end)."""
+    if "\n" in value or "  " in value or value != value.strip() or "\t" in value:
+        return None
+    pad = " " * (indent + 2)
+    lines: list[str] = []
+    line = ""
+    for w in value.split(" "):
+        if line and len(pad) + len(line) + 1 + len(w) > width:
+            lines.append(pad + line)
+            line = w
+        else:
+            line = f"{line} {w}" if line else w
+    lines.append(pad + line)
+    out = [f"{' ' * indent}{key}: >-"] + lines
+    try:
+        back = yaml.safe_load("\n".join(ln[indent:] for ln in out))
+    except yaml.YAMLError:
+        return None
+    return out if back == {key: value} else None
 
 
 def _flow_wrapped(prefix: str, value: dict[str, Any], width: int = 92) -> list[str]:
