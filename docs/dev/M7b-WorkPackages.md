@@ -304,6 +304,13 @@ none).
 **Open items, carried:** `send down the topgallant masts` belays only work in hand (a sail
 ordered after it can be set on a mast being struck and comes down with it; as before).
 
+**Mended by the lead after the owner's test of the build (2026-10-18):** the lugger's
+sent-down topsails were drawn in the viewer; the game says `sent_down` for a flying sail
+stowed and the projection recognised only `furled`, so the sail was neither hidden nor put
+on deck. `client/projection.js` now treats `sent_down` as stowed: the sail is not drawn and
+its yard lies on deck, as 57 meant (proved in a headless page: the topsail figures gone,
+the lug yards in the sent-down state, before and after compared).
+
 ### Package 53 as merged (2026-10-17)
 
 Merged `--no-ff` from the builder's worktree (six commits on `e9c9581`; 37 files, ~3,200

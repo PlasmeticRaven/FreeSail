@@ -52,7 +52,7 @@
   var MAST_CLASSES = { mast: 1, topmast: 1, topgallant_mast: 1, royal_mast: 1 };
   var HEAD_CLASSES = { bowsprit: 1, jib_boom: 1, flying_jib_boom: 1 };
   var YARD_CLASSES = { yard: 1, lug_yard: 1, lateen_yard: 1 };
-  var FURLED_ISH = { furled: 1 };
+  var FURLED_ISH = { furled: 1, sent_down: 1 }; // sent_down: a flying sail stowed (package 57)
   var GATHERED = { in_the_gear: 1, loosed: 1 };
   // States in which a sail draws and bellies: set, and goose-winged (half of it set).
   var DRAWING = { set: 1, goose_winged: 1 };
@@ -319,7 +319,10 @@
     var lugLee = LUG_LEE_OF_MAST_OF_BEAM * beamM;
     /** A sail set flying and stowed (package 57): sent down on deck with its yard. */
     function sentDownFlying(spec) {
-      return !!(spec && spec.flying) && sailDyn(spec).state === "furled";
+      // the game says `sent_down` for a flying sail stowed (the owner's finding of 2026-10-18:
+      // the lugger's topsails drawn at the masthead while sent down), `furled` for a bent one
+      var st = sailDyn(spec).state;
+      return !!(spec && spec.flying) && (st === "sent_down" || st === "furled");
     }
     /** The sail whose yard this is, if any. */
     function sailOnYard(yardId) {
