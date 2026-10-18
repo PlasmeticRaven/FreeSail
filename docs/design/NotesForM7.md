@@ -304,3 +304,21 @@ acknowledgement), gated on a convoy and its escort meeting a privateer; M7c the 
 the nations' doctrines (stations, blockade, convoy, ordinary); M7d the fighting shape and
 the six on six, tuned on the owner's machine, never rushed.
 
+## Temperature (the owner's question, 2026-10-18; the lead's reading)
+
+**The first layer is nearly free:** the weather already has a climatology by month and
+region, air masses on the wind (`air_mass:` in the scenario files), systems with fronts and
+the sea state; temperature is derived from them (a sea-surface temperature by month and
+region, the air from the air mass over it, a small diurnal swing at sea, a drop behind a
+cold front) and shown as one more reading in the period's words and scale ("the
+thermometer: 58° in the shade, the sea 54°", Fahrenheit; a thermometer ordinary aboard by
+1805, air and sea in captains' logs from the 1780s, the sea by a bucket), in the master's
+noon entry. **What it buys at once:** fog by its right cause, advection (warm air over a cold
+sea, the June fogs off Brittany), which a master expects from the two readings and a model
+captain can be taught; 56's spoilage and 54's thirst keyed to temperature instead of the
+month, which carries the Mediterranean and the Caribbean of M7's chart without new rules.
+**The second layer, M7 with a northern or winter scenario:** rain to snow below about 35°,
+spray freezing on the rigging in a gale below the sea's freezing, the water casks frozen,
+the watch on deck tiring faster in the cold. Place: the reading and the fog mechanism in
+M7b's last package or 58; the cold's hazards with M7.
+
