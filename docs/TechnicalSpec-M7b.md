@@ -125,6 +125,18 @@ guardrail enforced on every one:
   `letter:` as they stand.
 - **The mark:** 45c's `mark:` point of interest.
 - **The seat:** 43's `seat:` and `unseat:` by the owner's grant and budget.
+- **The director's hand** (the owner's proposal of 2026-10-18; package 62): `ship "<name>":
+  order <an order of the ship's own grammar>` passes the order to her captain's station as
+  his own: her log says "by the captain: ...", the director's log keeps it as the director's
+  act with its doubt and reason, at far detail through the far orders that stations on
+  other ships use (`crews.far_order`, `submit_far`), when she is crewed through her World
+  as any captain's order; refused in words where a model or a player holds her captain
+  (the rule of reach: the director writes to him by letter instead). No seating and no
+  model: the minute that matters, a hail, a heave-to, a boat lowered, is the director's
+  without a second conversation. **The director seated in her** is the same package's
+  second item, later: the director takes a ship's captain's station outright, her log and
+  readings in its samples beside the truth while it holds her, for the hours that want
+  judgement rather than a rule.
 
 Every order is journaled at its tick, replays, and is kept for the record only (decision
 46): the play log carries the effects (the sail sighted, the glass falling, the carpenter's
@@ -1156,6 +1168,10 @@ In waves, written for the owner's approval in turn, each launched on his word:
   by the director's ship order, the hull's valuation, the ship bought and sold through the
   market orders, the transfer of the people and the hands, the errand ashore; the goal's
   scenario for the gate.
+- **62 (Opus): the director's hand** (§3), beside 59: an order of a ship's own grammar
+  given to her captain's station by the director as his own, at far detail and crewed, refused
+  where a model or the player holds him; the director seated in a ship as its second item
+  when wanted. A day's package in the channel and the far orders.
 - **61 (Fable, provisional): the land-avoiding route** (§21i) beside 51 and before 58's
   tracks: the route over the chart's own data for every captain and the player, the legs
   said as the plan, the pilot's joining leg from the same path; planned in full at briefing.

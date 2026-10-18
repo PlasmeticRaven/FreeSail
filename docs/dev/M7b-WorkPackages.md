@@ -35,6 +35,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 59 | Opus | The harbour: a launcher in the browser, the scenario maker, the settings and the doors started from it (the owner, 2026-10-17) | briefed 2026-10-18, for the owner's approval; to run after 56, then the owner's testing round of the director, the needs, the captains, the scenario maker and the rest |
 | 60 | Opus | A ship bought (the owner's design goal of 2026-10-17; spec §21g): listings, the hull's valuation, the ship bought and sold through the market orders, the transfer of the people and the hands, the errand ashore | brief to write, after 51 and 53 |
 | 61 | Fable | The land-avoiding route, provisional (spec §21i; the owner, 2026-10-17, brought in from the carried items): the course laid clear of the land and the dangers over the chart's own data for every captain and the player, the legs said as the plan | to plan in full at briefing; beside 51, before 58's tracks |
+| 62 | Opus | The director's hand: an order of a ship's own grammar given to her captain's station by the director as his own, far and crewed, refused where a model or the player holds him (spec §3; the owner's proposal of 2026-10-18); the director seated in a ship as a later item | brief to write; recommended beside 59 so the dispatches test has it |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
 
 ## The testing round after 59 (the owner, 2026-10-18)
