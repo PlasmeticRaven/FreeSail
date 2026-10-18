@@ -20,3 +20,7 @@ cadence: glass
 budget:
   samples_a_day: 48
   acts_a_day: 6
+# The player's examples (package 62), read to the director as examples and never as a
+# rule: the director's hand on a stranger, turned for a port with her news.
+examples:
+  - 'ship "Lark": order shape a course for Falmouth'

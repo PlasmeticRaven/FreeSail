@@ -142,10 +142,16 @@ FORCE_KNOTS: dict[int, float] = {
 # The kinds of the director's log (`Journal` entries under the station's name): the acts,
 # each with its reason, beside the harness's own lines (stood by, nudged, paused, stopped).
 KINDS: dict[str, str] = {
-    "director.order": "a world order given and performed",
+    "director.order": (
+        "a world order given and performed (the hand's order to another ship's captain, "
+        "given as his own, among them: package 62)"
+    ),
     "director.doubted": "an order doubted by the channel, with the reason, and not performed",
     "director.reentered": "an order entered again with its reason after a doubt, and performed",
-    "director.refused": "an order refused by the brief's limits, with the reason",
+    "director.refused": (
+        "an order refused by the brief's limits, or by the rule of reach (a held station, a "
+        "held captain), with the reason"
+    ),
     "director.attempted": (
         "an order the game has no way to perform as said, entered again with a reason: "
         "logged as attempted and not performed, the data for what to build next"
@@ -191,6 +197,9 @@ class DirectorBrief:
     samples_a_day: int = DEFAULT_SAMPLES_A_DAY
     acts_a_day: int = DEFAULT_ACTS_A_DAY
     source: str = "the console"
+    # the player's own examples of orders the story might want (package 62: the starters'
+    # hand among them), read to the director as examples and never as a rule
+    examples: tuple[str, ...] = ()
 
     @classmethod
     def from_dict(cls, d: dict[str, Any], source: str = "a file") -> DirectorBrief:
@@ -201,6 +210,10 @@ class DirectorBrief:
         if cadence not in ("glass", "watch"):
             raise ValueError(f"A brief's cadence is 'glass' or 'watch', not {cadence!r}.")
         limits = dict(d.get("limits") or {})
+        raw_examples = d.get("examples") or ()
+        if isinstance(raw_examples, str):
+            raw_examples = (raw_examples,)
+        examples = tuple(" ".join(str(x).split()) for x in raw_examples if str(x).strip())
         if "gale_max_force" in limits and "wind_max_kn" not in limits:
             force = int(limits.pop("gale_max_force"))
             limits["wind_max_kn"] = FORCE_KNOTS.get(force, FORCE_KNOTS[12])
@@ -213,6 +226,7 @@ class DirectorBrief:
             samples_a_day=max(1, int(budget.get("samples_a_day", DEFAULT_SAMPLES_A_DAY) or 1)),
             acts_a_day=max(0, int(budget.get("acts_a_day", DEFAULT_ACTS_A_DAY) or 0)),
             source=str(d.get("source") or source),
+            examples=examples,
         )
 
     @classmethod
@@ -241,7 +255,7 @@ class DirectorBrief:
             "cadence": self.cadence,
             "budget": {"samples_a_day": self.samples_a_day, "acts_a_day": self.acts_a_day},
             "source": self.source,
-        }
+        } | ({"examples": list(self.examples)} if self.examples else {})
 
     # -- the words the model reads ----------------------------------------------------
 
@@ -271,6 +285,12 @@ class DirectorBrief:
             lines.append(f"The tone: {self.tone}")
         if self.challenge:
             lines.append(f"The challenge wanted: {self.challenge}")
+        if self.examples:
+            said = "; ".join(f"'{x}'" for x in self.examples)
+            lines.append(
+                f"Orders the player offers as examples of what the story may want (examples, "
+                f"not a rule): {said}."
+            )
         lines.append(
             f"The limits, which the channel enforces whatever you ask: {self.limits_words()}."
         )
@@ -487,7 +507,15 @@ DIRECTOR_BRIEF = (
     "captain's father'; 'person: \"Mr Fox\" comes aboard as master'; 'person: \"Mr Fox\" "
     "goes ashore'; 'person: \"Mr Fox\" leaves the ship at Falmouth'), words in the mouth of "
     "a person nobody holds, heard where he is and journaled as his ('say as the cook: "
-    '"Pease and pork, sir."\'; \'say as Mr Fox: "I knew your father, sir."\'), and a model '
+    '"Pease and pork, sir."\'; \'say as Mr Fox: "I knew your father, sir."\'), an order of '
+    "another ship's own grammar given to her captain as his own, her log saying it as his "
+    "and he holding by it a glass or until your next order to her, then his intent again "
+    "('ship \"Harpy\": order heave to', 'ship \"Harpy\": order give chase', 'ship "
+    '"Harpy": order carry on\' to give her back sooner; at far detail she carries what the '
+    "far shape carries, a course shaped or steered, heaving to and filling away, the chase "
+    "or hauling off, sail made or shortened, an anchor and weighing, the station kept, and "
+    "within the range of the player's ship you may ask for her crewed first, 'ship "
+    '"Harpy": crewed\', the cap allowing), and a model '
     "seated as the captain of another ship under the owner's "
     "grant ('seat: <the model's exact name> as captain of <ship> for 20 samples', 'unseat: "
     "<ship>'). The library's grammar topic lists every form. An order beyond the examples "
@@ -512,7 +540,12 @@ DIRECTOR_BRIEF = (
     "outright, and the result says which; and the rule of reach, which is this: you speak "
     "as anyone no model or player holds, never as a held station, whose words are its "
     "holder's own, and you move nobody held and bind nobody to a held station; such an "
-    "order is refused, and the result names the stations held.\n\n"
+    "order is refused, and the result names the stations held. So too your hand: no order "
+    "goes through a captain a model or the player holds, nor any of the player's own ship; "
+    "it is refused in words, and you may write to him instead. Her captain's order is a "
+    "plausible cause of itself; it is doubted only where it is implausible for her (an "
+    "anchor let go too deep for her cables, plain sail in a gale, a merchantman giving "
+    "chase).\n\n"
     "A question put to a person nobody holds (the cook, the carpenter, a person you made) "
     "comes to you in your next sample, with whom it was put by and until when it waits: "
     "answer it as him with 'say as <him>: <his words>' if you will, which costs none of "
@@ -520,7 +553,8 @@ DIRECTOR_BRIEF = (
     "so. A word told him comes to you the same, and wants no answer.\n\n"
     "Nothing you do is shown as done: the play log the player and the stations read carries "
     "only the effects as they are met (the sail sighted, the glass falling, the carpenter's "
-    "report), never the order. Your words are not a line of the log either: what you write "
+    "report), never the order; an order by your hand is in her own log as her captain's, "
+    "never yours. Your words are not a line of the log either: what you write "
     "in a reply, and your journal, go to the director's log, which no station and not the "
     "player sees until he asks for it by name ('the director's log'), at any time; you are "
     "told in your sample when he has. In a replay it is shown beside the play log, so that "
@@ -875,6 +909,12 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
             kind="director.refused",
             by=by,
         )
+        if world_orders.is_hand(order):
+            # the hand (package 62): no order through a captain a model or the player holds
+            return (
+                f"Refused, by the rule of reach: {reach_why}. The director gives no order "
+                "through a captain a model or the player holds."
+            )
         return (
             f"Refused, by the rule of reach: {reach_why}. The director speaks as, moves and "
             "binds nobody a model or the player holds; the stations held now: "

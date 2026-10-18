@@ -70,6 +70,18 @@ journaled as his, never the order. **The rule of reach**: nobody speaks as, move
 a station to a person a model or the player holds (`reach`), whoever gives the order; the
 refusal says which stations are held. The movements are doubted where no boat could carry
 him (a port beyond `BOAT_REACH_NM`); a person made and a word said are not.
+
+**The director's hand (spec M7b §3; package 62).** `ship "<name>": order <an order of her
+own grammar>` passes the order to her captain's station as his own (`crews.hand`): crewed,
+through her World as his order under his rules' actor (her grammar is his domain), at far
+detail through the far shape's orders (`crews.far_order`, `submit_far`); her log says it as
+his ("By the captain: heaving to"), never a line of the player's log; he holds by it a glass
+or until the next order to her, then sails by his intent again (`ship "X": order carry on`
+sooner). What the far shape cannot carry is answered in words naming what it can, and
+within the promotion's range `ship "X": crewed` asks for her at full detail first, the cap
+and its order unchanged. The rule of reach refuses it where a model or the player holds her
+captain, and for the player's own ship (`reach`); the doubt bites only where her captain's
+order is implausible for her (`_doubt_hand`).
 """
 
 from __future__ import annotations
@@ -98,6 +110,7 @@ __all__ = [
     "held_words",
     "reach",
     "recognises",
+    "is_hand",
     "say_as_person",
     "split_reason",
 ]
@@ -520,6 +533,11 @@ _SHIP_GOAL = re.compile(r"^ship\s+\"(?P<name>[^\"]+)\"\s*:\s*(?P<goal>.+?)\s*$",
 # `ship "X": intent <words>`, a brain given to a ship on the sea or her intent changed.
 _SHIP_TAIL = re.compile(r",\s*(?P<tail>no\s+colours|intent:?\s+[^,]+?)\s*$", re.I)
 _INTENT_TAIL = re.compile(r"^intent:?\s+(?P<words>.+?)\s*$", re.I)
+# The director's hand (spec M7b §3; package 62): `ship "X": order <an order of her own
+# grammar>`, given to her captain's station as his own; and `ship "X": crewed`, a far ship
+# within the promotion's range asked for at full detail first.
+_HAND_TAIL = re.compile(r"^order:?\s+(?P<words>.+?)\s*$", re.I)
+_CREWED_TAIL = re.compile(r"^(?:crewed|at\s+full\s+detail)\.?$", re.I)
 
 
 def _peel_tails(goal: str) -> tuple[str, bool, str]:
@@ -551,6 +569,9 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 
     m = _SHIP_GOAL.match(body)
     if m:
+        hm = _HAND_TAIL.match(m.group("goal"))
+        if hm or _CREWED_TAIL.match(m.group("goal")):
+            return _hand(world, m.group("name"), hm.group("words") if hm else None)
         vessel = world.vessels.find(m.group("name"))
         if vessel is None:
             raise WorldOrderError(f"No ship named {m.group('name')!r} is on the sea.")
@@ -634,6 +655,76 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if vessel.intent_words:
         data["intent"] = vessel.intent_words  # on a ship with a brain only: the old pins stand
     return words + brain + guard, data
+
+
+def is_hand(order: WorldOrder) -> bool:
+    """Whether the order is the director's hand (`ship "X": order ...`; package 62)."""
+    if order.channel != "ship":
+        return False
+    m = _SHIP_GOAL.match(order.text)
+    return m is not None and _HAND_TAIL.match(m.group("goal")) is not None
+
+
+def _players_ship(world: Any, name: str) -> bool:
+    """Whether a ship's name in an order is the player's own ship's."""
+    key = " ".join(str(name).lower().split()).removeprefix("the ")
+    ship = getattr(world, "ship", None)
+    own = " ".join(str(getattr(ship, "name", "") or "").lower().split()).removeprefix("the ")
+    return bool(key) and key in ("ship", own)
+
+
+def _hand_reach(world: Any, name: str) -> str | None:
+    """The rule of reach for the hand (spec M7b §3; package 62): why no order may be given
+    through her captain, in words, or None. The player's own ship is never the hand's (her
+    captain is the player's at the prompt, or a model's); a ship whose captain's station a
+    model or the player holds is his holder's to order."""
+    if _players_ship(world, name):
+        from freesail.agents.agent import CAPTAIN
+
+        who = next((w for st, _p, w in held_stations(world) if st == CAPTAIN), "the player")
+        return (
+            f"{name} is the player's own ship, and her captain is held by {who}: the director "
+            "moves no sail of hers and gives no order of hers"
+        )
+    vessel = world.vessels.find(name)
+    if vessel is None or vessel.done:
+        return None
+    from freesail.world.crews import captain_held_by
+
+    held = captain_held_by(vessel)
+    if held is None:
+        return None
+    person, who = held
+    return (
+        f"{vessel.name}'s captain ({person}) is held by {who}: his orders are his holder's own, "
+        "and nobody gives one through him; write to him instead ('message: ...')"
+    )
+
+
+def _hand(world: Any, name: str, words: str | None) -> tuple[str, dict[str, Any]]:
+    """`ship "X": order <words>` (the hand) or `ship "X": crewed` (words None): see
+    `crews.hand` and `crews.ask_crewed`; the rule of reach whoever gives it."""
+    from freesail.world import crews
+
+    held = _hand_reach(world, name)
+    if held:
+        raise WorldOrderError(held)
+    vessel = world.vessels.find(name)
+    if vessel is None or vessel.done:
+        raise WorldOrderError(f"No ship named {name!r} is on the sea.")
+    try:
+        if words is None:
+            said = crews.ask_crewed(world, vessel)
+        else:
+            said = crews.hand(world, vessel, words)
+    except ValueError as e:
+        raise WorldOrderError(str(e).rstrip(".")) from None
+    data: dict[str, Any] = {"id": vessel.id}
+    if words is None:
+        data["crewed"] = True
+    else:
+        data["hand"] = " ".join(words.split())
+    return said, data
 
 
 # ---------------------------------------------------------------------------
@@ -1269,6 +1360,13 @@ def reach(world: Any, order: WorldOrder) -> str | None:
     or bind a station to a person a model or the player holds, in words, or None. The
     director speaks as anyone nobody holds and never as a held station, whose words are
     its holder's own; and so moves nobody held and binds nobody to a held station."""
+    if order.channel == "ship":
+        # the director's hand (package 62): no order through a captain a model or the
+        # player holds, and none of the player's own ship
+        m = _SHIP_GOAL.match(order.text)
+        if m is None or _HAND_TAIL.match(m.group("goal")) is None:
+            return None
+        return _hand_reach(world, m.group("name"))
     if order.channel not in ("say", "person"):
         return None
     held = {person: (station, who) for station, person, who in held_stations(world) if person}
@@ -1449,7 +1547,9 @@ def doubt(world: Any, order: WorldOrder) -> str | None:
     season's lows move or deeper than its floor; `message: by a cutter from <port>` beyond
     the letter's reach; `port: price of` beyond the market's ordinary swing; `aboard:` a
     thing with no cause (the table's `plausible_when`); `person:` a person moved where no
-    boat could carry him (package 52). The rest (`ship "X": intent`, a person made or named,
+    boat could carry him (package 52); `ship "X": order ...` (the hand, package 62) an
+    anchor let go too deep for her cables, plain sail in a gale, a chase by a merchantman,
+    a fisherman or a packet. The rest (`ship "X": intent`, a person made or named,
     `say as`, `captain:`, `seat:`, `unseat:`, a letter left at a port, a port closed or
     opened) are never doubted: a mind changed, a person's errand, a man's words and the
     owner's grant want no cause of the sea's."""
@@ -1497,6 +1597,10 @@ def _doubt_ship(world: Any, body: str) -> str | None:
     from freesail.world.geo import bearing_and_distance
     from freesail.world.ships import place_position
 
+    g = _SHIP_GOAL.match(body)
+    hm = _HAND_TAIL.match(g.group("goal")) if g is not None else None
+    if g is not None and hm is not None:
+        return _doubt_hand(world, g.group("name"), hm.group("words"))
     m = _SHIP_NEW.match(body)
     if m is None:
         return None  # a goal or an intent changed: a mind changed wants no cause
@@ -1523,6 +1627,73 @@ def _doubt_ship(world: Any, body: str) -> str | None:
             f"({reach:.0f} miles in this visibility, by day): she would have been seen coming "
             "up over it, and appears from nothing"
         )
+    return None
+
+
+# The hand's doubt (package 62; the lead's reading: a captain's order is always a plausible
+# cause, so the doubt bites only where the order itself is implausible for her). An anchor
+# let go deeper than this many fathoms by the chart (judgement: a bower's cable of a hundred
+# to a hundred and twenty fathoms wants a scope of three or four, and the period's roads lie
+# in five to twenty; beyond thirty no master lets go); plain sail made in a wind at her over
+# this many knots (force 8, a gale, the top of force 7 being 33); a chase given by a master
+# whose doctrine is these roles', who runs from a stranger or keeps his course.
+HAND_ANCHOR_FATHOMS = 30.0
+HAND_GALE_KN = 34.0
+HAND_PEACEFUL_ROLES = ("merchant", "fisherman", "packet")
+_HAND_ANCHOR = re.compile(
+    r"^(?:come to (?:an |the )?anchor|let go the (?:best |small |sheet )?(?:bower|anchor)|anchor)"
+    r"\b",
+    re.I,
+)
+_HAND_SAIL = re.compile(
+    r"^(?:make (?:all )?sail|set (?:all )?(?:plain )?sail|set all plain sail|set the "
+    r"(?:royals|topgallants|topgallant sails|studdingsails))\b",
+    re.I,
+)
+_HAND_CHASE = re.compile(r"^(?:give chase|chase\b|stand after)", re.I)
+
+
+def _doubt_hand(world: Any, name: str, words: str) -> str | None:
+    """Why the order given through her captain is implausible for her, or None (package
+    62): an anchor let go too deep for her cables, plain sail in a gale, a chase by a
+    merchantman, a fisherman or a packet. A captain's order is a plausible cause, so the
+    rest are never doubted."""
+    vessel = world.vessels.find(name)
+    if vessel is None or vessel.done:
+        return None
+    low = " ".join(str(words).lower().split()).rstrip(".")
+    if _HAND_ANCHOR.match(low):
+        chart = getattr(world, "chart", None)
+        depth = None
+        if chart is not None and chart.contains(vessel.position):
+            depth = chart.depth_at(vessel.position)
+        fathoms = None if depth is None else float(depth) / units.FATHOM
+        if fathoms is not None and fathoms > HAND_ANCHOR_FATHOMS:
+            return (
+                f"{vessel.name} lies in {fathoms:.0f} fathoms by the chart, deeper than any "
+                f"scope of her cables would hold in (no master lets go beyond "
+                f"{HAND_ANCHOR_FATHOMS:.0f})"
+            )
+        return None
+    if _HAND_SAIL.match(low):
+        kn = units.ms_to_knots(float(vessel._wind_at(world)[1]))
+        if kn > HAND_GALE_KN:
+            return (
+                f"the wind at {vessel.name} is {kn:.0f} knots, a gale: no master makes plain "
+                "sail in it"
+            )
+        return None
+    if _HAND_CHASE.match(low):
+        crew = getattr(vessel, "crew", None)
+        if crew is not None and crew.shape == "full":
+            role = str(getattr(crew.captain, "role", "") or "")
+        else:
+            role = str(getattr(vessel.brain, "role", "") or "")
+        if role in HAND_PEACEFUL_ROLES:
+            return (
+                f"{vessel.name}'s master sails by the {role}'s doctrine: he runs from a "
+                "stranger or keeps his course, and gives chase to nobody"
+            )
     return None
 
 

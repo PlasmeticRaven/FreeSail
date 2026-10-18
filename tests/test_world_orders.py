@@ -14,6 +14,7 @@ import pytest
 
 from freesail.api.session import make_world, ship_factory
 from freesail.core import replay
+from freesail.core.events import for_the_record
 from freesail.core.world import Scenario
 from freesail.orders.vocabulary import load_vocabulary
 from freesail.world import orders as WO
@@ -470,3 +471,163 @@ def test_the_rule_of_reach_refuses_a_held_station_and_names_the_stations_held():
     seat_player(w, "master")
     held = WO.held_words(w)
     assert "the master (Mr Harvey, the player at his seat)" in held and "captain" not in held
+
+
+# ---------------------------------------------------------------------------
+# The director's hand (spec M7b §3; package 62)
+# ---------------------------------------------------------------------------
+
+
+def test_the_hand_gives_a_far_ship_her_captains_order_and_he_takes_up_his_plan_after_a_glass():
+    """`ship "X": order <words>`: at far detail through the far shape's orders, her log (the
+    far body's story) saying it as her captain's, never a line of the player's log; he holds
+    by it a glass, then his plan again; `carry on` sooner; what the far shape cannot carry
+    answered in words naming what it can; a world order is no order of hers; the player's
+    own ship is never the hand's."""
+    from tests.test_brains import put
+
+    w = world_for(ports=["falmouth", "plymouth"])
+    v = put(
+        w, "merchant brig", "britain", "49 40 N 4 55 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(60)
+    assert v.detail == "far" and v.plan and v.plan[0][0] == "to"
+    before = list(v.plan)
+    e = w.world_order('ship "X": order heave to', "the test")
+    assert e.data["result"] == "done" and e.data["hand"] == "heave to", e.text
+    assert "her captain holds by it until 10:31" in e.text
+    assert v.plan == [("lie_to", float("inf"))] and v.story[-1][1] == "By the captain: heaving to."
+    assert v.brain.over_head["until"] == w.clock.tick + 1800
+    assert not [x for x in w.log if "By the captain" in x.text and not for_the_record(x)]
+    assert v.to_dict()["story"] == [[w.clock.tick, "By the captain: heaving to."]]
+    # his judgement held: a glass lying to, then his plan again, said in her story
+    w.run(1200)
+    assert v.plan[0][0] == "lie_to" and v.sail_state == "lying to"
+    w.run(660)
+    assert v.brain.over_head is None and v.plan[0][0] == "to" and v.plan[0][1:] == before[0][1:]
+    assert v.story[-1][1] == "The captain takes up his plan again (bound for Falmouth)."
+    # 'carry on' gives her back before the glass is out
+    w.world_order('ship "X": order heave to', "the test")
+    e = w.world_order('ship "X": order carry on', "the test")
+    assert e.data["result"] == "done" and "carries on" in e.text
+    assert v.plan[0][0] == "to" and v.brain.over_head is None
+    e = w.world_order('ship "X": order carry on', "the test")
+    assert e.data["result"] == "refused" and "under no order of yours" in e.text
+    # what the far shape cannot carry, and a world order, in words
+    e = w.world_order('ship "X": order set the fore royal', "the test")
+    assert e.data["result"] == "refused" and "the orders the far shape carries are" in e.text
+    assert "crewed first" not in e.text  # she is far beyond the range of the ship
+    e = w.world_order('ship "X": order port falmouth: price of tin 130', "the test")
+    assert e.data["result"] == "refused" and "an order to the world, not to her" in e.text
+    e = w.world_order('ship "X": crewed', "the test")
+    assert e.data["result"] == "refused" and "beyond the promotion's range" in e.text
+    e = w.world_order('ship "Amazon": order heave to', "the test")
+    assert e.data["result"] == "refused" and "the player's own ship" in e.text
+    assert "held by the player at the prompt" in e.text
+    # a World kept in the far shape (a station on her): through `submit_far`, her log
+    from freesail.world import crews as K
+
+    _v, crew = K.station_world(w, "X")
+    assert crew.shape == "far"
+    e = w.world_order('ship "X": order heave to', "the test")
+    assert e.data["result"] == "done" and v.plan[0][0] == "lie_to", e.text
+    said = [x for x in crew.log if x.text == "By the captain: heaving to."]
+    assert said and str(said[0].actor).startswith("captain's rule")
+
+
+def test_the_hand_is_doubted_only_where_her_captains_order_is_implausible_for_her():
+    """A captain's order is a plausible cause: never doubted but an anchor let go too deep
+    for her cables, plain sail in a gale, a chase by a merchantman; the scenario's and the
+    owner's never at all (the doubt is the director's door's)."""
+    from tests.test_brains import put
+
+    w = world_for(ports=["falmouth"])
+    put(w, "merchant brig", "britain", "49 40 N 4 55 W", "bound for Falmouth", "bound for Falmouth")
+    put(
+        w,
+        "brig-sloop",
+        "britain",
+        "49 30 N 5 50 W",
+        "bound for Falmouth",
+        "keep the station off the Lizard within 10 miles",
+        name="Hazard",
+    )
+    w.run(60)
+
+    def doubt(text):
+        return WO.doubt(w, WO.parse(text))
+
+    assert doubt('ship "X": order heave to') is None
+    assert doubt('ship "X": order shape a course for Plymouth') is None
+    deep = doubt('ship "X": order come to an anchor')
+    assert deep and "fathoms by the chart" in deep and "no master lets go beyond 30" in deep
+    chase = doubt('ship "X": order give chase')
+    assert chase and "the merchant's doctrine" in chase
+    assert doubt('ship "Hazard": order give chase') is None  # a cruiser chases
+    assert doubt('ship "X": order make sail') is None  # fourteen knots: no gale
+    assert WO.reach(w, WO.parse('ship "X": order heave to')) is None
+
+
+def test_the_hand_on_a_crewed_ship_is_her_captains_order_held_a_glass_and_refused_when_held():
+    """Within the range a far ship may be asked for crewed first (the cap and its order
+    stand); crewed, the order is her World's as her captain's, under his rules' actor and his
+    domain, her log saying it as his; his book struck and his judgement held a glass, then
+    his intent again, filling away; refused in words, naming who holds him, where a fake
+    captain holds her captain's station."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents.agent import captain
+    from freesail.agents.fake import captain_of_the_ship
+    from freesail.world import crews as K
+    from tests.test_brains import put
+
+    w = world_for(ports=["falmouth"])
+    w.submit("heave to")
+    v = put(
+        w,
+        "brig-sloop",
+        "britain",
+        "49 38 N 5 22 W",
+        "bound for Falmouth",
+        "keep the station off the Lizard within 10 miles",
+        name="Hazard",
+    )
+    e = w.world_order('ship "Hazard": crewed', "the test")
+    assert e.data["result"] == "done" and "Hazard at full detail" in e.text, e.text
+    crew = v.crew
+    assert crew is not None and crew.shape == "full" and K.crewed(w) == [v]
+    e = w.world_order('ship "Hazard": crewed', "the test")
+    assert e.data["result"] == "refused" and "at full detail already" in e.text
+    w.run(600)
+    assert crew.captain.commands
+    e = w.world_order('ship "Hazard": order heave to', "the test")
+    assert e.data["result"] == "done" and "at full detail" in e.text, e.text
+    said = [x for x in crew.log if x.text == "By the captain: heaving to."]
+    assert said and str(said[-1].actor).startswith("captain's rule")
+    assert not [x for x in w.log if "By the captain" in x.text and not for_the_record(x)]
+    cap = crew.captain
+    assert cap.over_head_until == w.clock.tick + 1800 and not cap.commands
+    assert cap.state is None and cap.to_dict()["over_head"] == "heave to"
+    assert crew.standing.books_loaded() == []
+    w.run(900)
+    assert crew.readings.value("manoeuvre_in_hand") == "hove to"
+    # her grammar is the domain: what she cannot do is refused in her words
+    e = w.world_order('ship "Hazard": order sell the tin', "the test")
+    assert e.data["result"] == "refused" and "Hazard's captain could not give it" in e.text
+    # the glass out: his intent again, filling away
+    w.run(1000)
+    assert cap.over_head_until is None and cap.commands and cap.state is not None
+    assert any("filling away" in x.text for x in crew.log if x.tick > said[-1].tick + 1700)
+    # a fake captain at her captain's station: refused in words, naming who holds him
+    h = Harness(
+        crew,
+        captain(SamplingPolicy.in_lockstep(600, "notable", "urgent"), world=crew),
+        captain_of_the_ship([]),
+        save=lambda w, why: None,
+    )
+    h.model_name, h.door = "the fake captain", "mcp"
+    h.start()
+    e = w.world_order('ship "Hazard": order heave to', "the test")
+    assert e.data["result"] == "refused", e.text
+    assert "Hazard's captain (" in e.text and "is held by a model" in e.text
+    assert "write to him instead ('message: ...')" in e.text
+    assert WO.reach(w, WO.parse('ship "Hazard": order heave to'))

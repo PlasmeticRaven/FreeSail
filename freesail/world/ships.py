@@ -483,6 +483,10 @@ class Vessel:
     # in the water and her catch, one object for her far body and her crewed World; None
     # until she fishes (and in a checkpoint from before)
     fishing: Any = None
+    # the far body's short story of her own (package 62; spec M7b §12b's ground): the lines
+    # her captain's orders given by the director's hand say in her log while she has no
+    # World of her own, as (tick, words); empty in a checkpoint from before
+    story: tuple[tuple[int, str], ...] = ()
 
     @property
     def height_m(self) -> float:
@@ -894,6 +898,11 @@ class Vessel:
             d["crewed"] = self.crew is not None
         if self.warning:
             d["warning"] = self.warning
+        story = getattr(self, "story", ()) or ()
+        if story:
+            # her captain's orders by the director's hand (package 62): only where there
+            # are some, so that every pinned form stands
+            d["story"] = [list(line) for line in story]
         return d
 
 

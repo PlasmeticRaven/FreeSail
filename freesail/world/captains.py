@@ -1823,7 +1823,10 @@ class Captain(Judgement):
         """Whether his judgements are given now: an intent, and no model at the
         captain's station with the deck (or that model's door silent, the stand-in)."""
         return (
-            self.active and (not self.seated or self.stand_in) and not getattr(self, "aside", False)
+            self.active
+            and (not self.seated or self.stand_in)
+            and not getattr(self, "aside", False)
+            and getattr(self, "over_head_until", None) is None
         )
 
     def book_words(self) -> str:
@@ -1867,7 +1870,12 @@ class Captain(Judgement):
             "stand_in": self.stand_in,
             "seated": self.seated,
             "commands": self.commands,
-        }
+        } | (
+            # an order over his head (package 62), only while there is one
+            {"over_head": self.over_head_order}
+            if getattr(self, "over_head_until", None) is not None
+            else {}
+        )
 
     # -- the intent changed (a world order) ----------------------------------------------
 
@@ -1922,12 +1930,47 @@ class Captain(Judgement):
         self.last_judged = -1
         return f"{self.name} carries on: {self.intent.words if self.intent else ''}"
 
+    # -- an order over his head (spec M7b §3; package 62) ------------------------------
+
+    # the director's hand: the tick until which he holds by an order given over his head as
+    # his own, and its words; None when he sails by his own judgement (class defaults, so
+    # that a checkpoint from before loads with none)
+    over_head_until: int | None = None
+    over_head_order: str = ""
+
+    def over_his_head(self, text: str, until: int) -> None:
+        """An order of her own grammar given to her as his by the director's hand: he is
+        told it came over his head, so that his book is struck as at the player's hand (no
+        rule of his fights it) and his judgements are held until `until`, the director's
+        next order to her setting it again; his intent and plan are kept, and taken up from
+        where she is when the glass is out (`take_up_again`). Nothing of it is said: the
+        order is in her log as his."""
+        if self.over_head_until is None and self.state is not None:
+            self._leave(self.state)
+            self.state = None
+        self.over_head_until = int(until)
+        self.over_head_order = " ".join(str(text).split())
+
+    def take_up_again(self) -> None:
+        """The glass out (or the director's `carry on`): he commands again from where she
+        is, his plan worked afresh at his next judgement, as at `captain: carry on`."""
+        if self.over_head_until is None:
+            return
+        self.over_head_until = None
+        self.over_head_order = ""
+        self.legs, self.leg_i, self.leg_shaped_tick = [], 0, None
+        self._business = {}
+        self.last_judged = -1
+
     # -- the tick ---------------------------------------------------------------------
 
     def tick(self) -> None:
         """Once a minute, when his judgements are given: perceive, judge the doctrine's
         transitions, and work the state."""
         world = self.world
+        until = getattr(self, "over_head_until", None)
+        if until is not None and world.clock.tick >= until:
+            self.take_up_again()
         if not self.commands:
             self._seen_log = len(world.log)
             return

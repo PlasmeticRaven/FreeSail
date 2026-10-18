@@ -6341,3 +6341,93 @@ def test_truth_7b_107_the_glass_on_the_palinure_hove_to_by_tiers_and_by_night():
     night = _palinure_at(0.35, hour=23)
     e = night.submit("the glass on the brig")
     assert "no light shows" in e.text and "aback" not in e.text, e.text
+
+
+# Package 62: the director's hand (spec M7b §3; the owner's proposal of 2026-10-18). Truth
+# 7b-113, numbered after 7b-112: an order of a ship's own grammar given by the director to
+# her captain's station as his own, far and crewed, and refused where a model holds him.
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7b_113_the_hand_brings_a_far_trader_to_heaves_a_crewed_cruiser_to_and_is_refused():
+    """Spec M7b §3 and package 62's truth: "at seed 7 with the business on, the director's
+    `ship "X": order heave to` brings a far trader to, her log saying it as her captain's
+    and the play log of the player's ship showing only what the lookout sees, and the same
+    order to a crewed cruiser heaves her to under her captain's domain, and is refused where
+    a fake captain holds her." The schooner off the Lizard with the business on (seed 7), a
+    King's brig-sloop on her station two miles off and promoted; a fake director on the
+    dispatches brief gives each its captain's heave-to: the business's trader, at far
+    detail a hundred miles off, lies to, her story saying it as her captain's; the cruiser's
+    own World takes it as her captain's order under his rules' actor, his book struck, and
+    she heaves to; the player's log carries no order, only the lookout's lines of the
+    cruiser; a fake captain then seated on the cruiser, the same order is refused in words
+    and logged so."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents import director as D
+    from freesail.agents.agent import captain
+    from freesail.agents.fake import captain_of_the_ship, director_above_the_game
+    from freesail.core.events import for_the_record
+    from tests.test_brains import put
+    from tests.test_business import world_with
+    from tests.test_director import seat_director
+
+    world = world_with("on")
+    assert world.seed == 7 and world.business is not None
+    trader = next(
+        v
+        for v in world.vessels.vessels
+        if v.brain is not None
+        and v.brain.role == "merchant"
+        and v.detail == "far"
+        and v.plan
+        and v.plan[0][0] == "to"
+    )
+    cruiser = put(
+        world,
+        "brig-sloop",
+        "britain",
+        "50 02 N 4 58 W",
+        "bound for Falmouth",
+        "keep the station off the Lizard within 10 miles",
+        name="Hazard",
+    )
+    world.submit("heave to")
+    D.set_brief(world, "dispatches", source="the truth")
+    world.run(61)
+    crew = cruiser.crew
+    assert crew is not None and crew.shape == "full" and crew.captain.role == "cruiser"
+    hand = f'ship "{trader.name}": order heave to'
+    seat_director(world, director_above_the_game([hand, 'ship "Hazard": order heave to']))
+    world.run(1300)
+    texts = [e.text for e in D.log_of(world).entries]
+    assert any(t.startswith(f"Given: {hand};") for t in texts)
+    assert any(t.startswith('Given: ship "Hazard": order heave to;') for t in texts)
+    # the far trader brought to, her log (the far body's story) saying it as her captain's
+    assert trader.plan[0][0] == "lie_to" and trader.sail_state == "lying to"
+    assert trader.speed_kn == pytest.approx(0.0, abs=0.1)
+    assert [s for _t, s in trader.story] == ["By the captain: heaving to."]
+    # the crewed cruiser hove to by her captain's order, his book struck, his rule's actor
+    said = [e for e in crew.log if e.text == "By the captain: heaving to."]
+    assert len(said) == 1 and str(said[0].actor).startswith("captain's rule")
+    assert crew.readings.value("manoeuvre_in_hand") == "hove to"
+    assert crew.captain.over_head_order == "heave to" and not crew.captain.commands
+    # the player's log: nothing of the orders, the cruiser only as the lookout sees her
+    play = [e for e in world.log.all() if not for_the_record(e)]
+    assert not [e for e in play if "By the captain" in e.text or trader.name in e.text]
+    seen = [e for e in play if "brig" in e.text.lower() and e.tick > 61]
+    assert seen and all(e.kind.startswith("lookout.") for e in seen)
+    assert any("hove to" in e.text or "heaving to" in e.text for e in seen)
+    # a fake captain at her captain's station: the same order refused in words
+    held = Harness(
+        crew,
+        captain(SamplingPolicy.in_lockstep(600, "notable", "urgent"), world=crew),
+        captain_of_the_ship([]),
+        save=lambda w, why: None,
+    )
+    held.model_name, held.door = "the fake captain", "mcp"
+    held.start()
+    said = D.direct(world, 'ship "Hazard": order heave to', by="the fake director")
+    assert said.startswith("Refused, by the rule of reach: Hazard's captain (")
+    assert "is held by a model" in said and "write to him instead" in said
+    assert D.log_of(world).entries[-1].kind == "director.refused"
+    assert len([e for e in crew.log if e.text == "By the captain: heaving to."]) == 1
