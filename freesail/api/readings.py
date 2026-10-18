@@ -3154,9 +3154,9 @@ def director_readings(world: Any) -> dict[str, Any]:
             "goal": v.goal,
         }
         if here is not None:
-            bearing, distance = bearing_and_distance(here, v.position)
+            bearing, distance = bearing_and_distance(here, v.position)  # degrees true
             d["from_the_ship"] = (
-                f"bearing {units.format_heading(bearing)}, "
+                f"bearing {units.format_heading(units.deg_to_rad(bearing))}, "
                 f"{distance / units.NAUTICAL_MILE:.1f} miles"
             )
         if v.brain is not None:
