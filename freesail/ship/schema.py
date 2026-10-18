@@ -43,6 +43,11 @@ drawn from a station at muster, a `PersonRoleSpec`). A file without them has
 `hold = None`, no boats, and the posts alone for people; the ports' orders are refused
 in words on such a ship.
 
+Package 56 (spec M7b §21a) adds the fishing gear: an optional `gear:` list (each piece
+with its kind, the trawl, the drift nets, the seine or the lines, its name and its size
+where the file gives it, a `GearSpec`); a file without it carries none, and the fishing
+orders are refused in words on such a ship.
+
 Package 57 (the rig through the generator) adds three keys to a sail: `flying: true`, a
 sail set flying (its yard swayed up from the deck with the sail bent, sent down whole when
 it is taken in, never reefed aloft: the lugger's lug topsails, the royals of 1794);
@@ -502,6 +507,27 @@ class BoatSpec:
     tons: float
 
 
+@dataclass
+class GearSpec:
+    """A piece of fishing gear the vessel carries (package 56, spec M7b §21a): its kind
+    (the trawl, the drift nets, the seine, the lines), the name the hands use, and its
+    size in the period's terms where the file gives it (a trawl's beam in feet, a fleet's
+    or a seine's length in fathoms, the nets in a fleet, the hooks on the lines). The
+    gear's evolutions (`data/evolutions/shoot_*.yaml`, `haul_*.yaml`) and its fishing
+    (`freesail/world/fishing.py`) read the kind; a vessel shoots only what she carries."""
+
+    id: str
+    kind: str
+    name: str
+    beam_ft: float | None = None
+    length_fathoms: float | None = None
+    nets: int | None = None
+    hooks: int | None = None
+
+
+GEAR_KINDS = ("trawl", "drift nets", "seine", "lines")
+GEAR_KEYS = ("id", "kind", "name", "beam_ft", "length_fathoms", "nets", "hooks")
+
 BOAT_KINDS = ("launch", "long-boat", "barge", "pinnace", "cutter", "yawl", "jolly boat", "punt")
 BOAT_KEYS = ("id", "kind", "name", "length_ft", "oars", "crew", "tons")
 PERSON_ROLE_KEYS = ("role", "station", "rating", "messenger")
@@ -524,6 +550,7 @@ class ShipSpec:
     ground_tackle: GroundTackleSpec | None = None  # None: no anchors (package 34)
     hold: HoldSpec | None = None  # None: no room for a cargo (package 35)
     boats: list[BoatSpec] = field(default_factory=list)  # none: no boat to send (package 35)
+    gear: list[GearSpec] = field(default_factory=list)  # none: no fishing gear (package 56)
 
 
 # ---------------------------------------------------------------------------
@@ -592,6 +619,7 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         ),
         hold=_parse_hold(data["hold"], source) if data.get("hold") is not None else None,
         boats=_parse_boats(data["boats"], source) if data.get("boats") is not None else [],
+        gear=_parse_gear(data["gear"], source) if data.get("gear") is not None else [],
     )
     validate(spec)
     return spec
@@ -653,6 +681,46 @@ def _parse_boats(raw: Any, source: str) -> list[BoatSpec]:
         if boats[-1].length_ft <= 0.0 or boats[-1].crew <= 0:
             raise ShipFileError(f"{source}: {where} has no length or no crew.")
     return boats
+
+
+def _parse_gear(raw: Any, source: str) -> list[GearSpec]:
+    """The `gear:` list (package 56): each piece of fishing gear with its kind and name,
+    and its size where the file gives it."""
+    if not isinstance(raw, list):
+        raise ShipFileError(f"{source}: 'gear' is not a list.")
+    gear: list[GearSpec] = []
+    seen: set[str] = set()
+    for i, g in enumerate(raw):
+        where = f"gear #{i + 1}"
+        if not isinstance(g, dict):
+            raise ShipFileError(f"{source}: {where} is not a mapping.")
+        for key in g:
+            if key not in GEAR_KEYS:
+                raise ShipFileError(f"{source}: {where} has '{key}', which gear does not take.")
+        gid = _str(g, "id", where, source)
+        if gid in seen:
+            raise ShipFileError(f"{source}: the gear lists '{gid}' twice.")
+        seen.add(gid)
+        where = f"gear '{gid}'"
+        kind = _str(g, "kind", where, source)
+        if kind not in GEAR_KINDS:
+            raise ShipFileError(
+                f"{source}: {where} is of kind '{kind}'; say one of {', '.join(GEAR_KINDS)}."
+            )
+        nets = _num(g, "nets", where, source, required=False)
+        hooks = _num(g, "hooks", where, source, required=False)
+        gear.append(
+            GearSpec(
+                id=gid,
+                kind=kind,
+                name=_str(g, "name", where, source, required=False) or f"the {kind}",
+                beam_ft=_num(g, "beam_ft", where, source, required=False),
+                length_fathoms=_num(g, "length_fathoms", where, source, required=False),
+                nets=int(nets) if nets is not None else None,
+                hooks=int(hooks) if hooks is not None else None,
+            )
+        )
+    return gear
 
 
 def _parse_ground_tackle(raw: Any, source: str) -> GroundTackleSpec:

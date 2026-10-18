@@ -655,3 +655,17 @@ boats:
   oars: 4
   crew: 5
   tons: 0.1
+# The fishing gear (package 56, spec M7b §21a): what she carries and no other, each with its source; the evolutions that work it are data/evolutions/shoot_*.yaml and haul_*.yaml, its fishing the grounds' of data/fishing/; see tools/gen_ships.py.
+gear:
+# A fleet of drift nets for the pilchard, the mackerel, the herring and the sardine, shot at sunset over the quarter before the wind and ridden to by night (Holdsworth 1874 pp. 98 to 99, 106 to 111: a herring fleet a mile and a quarter, the pilchard nets of Cornwall 'about the size of those for herrings, but with a smaller mesh'); sixty nets and a thousand fathoms for her size, judgement.
+- id: drift_nets
+  kind: drift nets
+  name: the drift nets
+  nets: 60
+  length_fathoms: 1000
+# Longlines for the cod, the ling and the conger, shot under easy sail across the tide and hauled by short tacks (Holdsworth 1874 pp. 137 to 139: 180 lines of 40 fathoms and 4,680 hooks for a smack of 68 tons); half of it for a coaster's hands, judgement.
+- id: lines
+  kind: lines
+  name: the lines
+  length_fathoms: 3600
+  hooks: 2340

@@ -724,6 +724,19 @@ class Builder:
             if text:
                 self.boat_notes[("boats", bid)] = text
 
+    def gear(self, note, entries):
+        """The `gear:` list (package 56, spec M7b §21a) from (id, kind, name, sizes, note)
+        entries, `sizes` a mapping of the period's figures (beam_ft, length_fathoms, nets,
+        hooks); the note above each piece's line and `note` above the section."""
+        self.doc["gear"] = [
+            {"id": gid, "kind": kind, "name": name, **sizes}
+            for gid, kind, name, sizes, _ in entries
+        ]
+        self.gear_notes = {("section",): note}
+        for gid, _, _, _, text in entries:
+            if text:
+                self.gear_notes[("gear", gid)] = text
+
     def people(self, note, entries):
         """The crew's `people:` list (package 35, spec M5 §22) from (role, station,
         rating, messenger, note) entries: the named roles beyond the posts, each drawn
@@ -861,6 +874,8 @@ class Builder:
         store_key = ""
         in_tackle = False
         in_boats = False
+        in_gear = False
+        gear_notes = getattr(self, "gear_notes", {})
         for line in text.splitlines():
             if line.startswith("hull:"):
                 in_hull = True
@@ -895,6 +910,19 @@ class Builder:
                 note = self.boat_notes.get(("boats", m.group(1)))
                 if note:
                     out.append("# " + note)
+            # the fishing gear (package 56), noted as the boats are
+            if line.startswith("gear:"):
+                in_boats = False
+                in_gear = True
+                note = gear_notes.get(("section",))
+                if note:
+                    out.append("# " + note)
+            elif in_gear and not line.startswith("  ") and not line.startswith("- "):
+                in_gear = False
+            if in_gear and (m := re.match(r"^- id: (\S+)$", line)):
+                note = gear_notes.get(("gear", m.group(1)))
+                if note:
+                    out.append("# " + note)
             if in_crew:
                 note = None
                 if m := re.match(r"^    - kind: (\S+)$", line):
@@ -914,7 +942,7 @@ class Builder:
                 if note:
                     out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
             m = re.match(r"^- id: (\S+)$", line)
-            if m and m.group(1) in self.notes and not in_boats:
+            if m and m.group(1) in self.notes and not in_boats and not in_gear:
                 out.append("# " + self.notes[m.group(1)])
             m = re.match(r"^  (\w+):", line) if in_hull else None
             if m and m.group(1) in self.hull_notes:
@@ -6240,6 +6268,33 @@ def lugger(out_dir="data/ships"):
             ],
         ),
     )
+    b.gear(
+        GEAR_NOTE,
+        [
+            (
+                "drift_nets",
+                "drift nets",
+                "the drift nets",
+                {"nets": 60, "length_fathoms": 1000},
+                "A fleet of drift nets for the pilchard, the mackerel, the herring and the "
+                "sardine, shot at sunset over the quarter before the wind and ridden to by "
+                "night (Holdsworth 1874 pp. 98 to 99, 106 to 111: a herring fleet a mile and a "
+                "quarter, the pilchard nets of Cornwall 'about the size of those for herrings, "
+                "but with a smaller mesh'); sixty nets and a thousand fathoms for her size, "
+                "judgement.",
+            ),
+            (
+                "lines",
+                "lines",
+                "the lines",
+                {"length_fathoms": 3600, "hooks": 2340},
+                "Longlines for the cod, the ling and the conger, shot under easy sail across "
+                "the tide and hauled by short tacks (Holdsworth 1874 pp. 137 to 139: 180 lines "
+                "of 40 fathoms and 4,680 hooks for a smack of 68 tons); half of it for a "
+                "coaster's hands, judgement.",
+            ),
+        ],
+    )
     b.dump(
         os.path.join(out_dir, "lugger.yaml"),
         "# The lugger: L'Éclair, a French gun-lugger taken in 1795 (RMG ZAZ6306), 101 tons, 59 ft\n"
@@ -6253,6 +6308,16 @@ def lugger(out_dir="data/ships"):
         "# judgements. Package 43b (spec M6 §19; the proposal's §4.4): the lug and its dip are\n"
         "# the engine's additions, as the running bowsprit was the cutter's.\n",
     )
+
+
+# The fishing gear (package 56, spec M7b §21a): what each fishing hull carries, and no
+# other; the gear's evolutions are data/evolutions/shoot_*.yaml and haul_*.yaml, its
+# fishing freesail/world/fishing.py with the grounds of data/fishing/.
+GEAR_NOTE = (
+    "The fishing gear (package 56, spec M7b §21a): what she carries and no other, each with "
+    "its source; the evolutions that work it are data/evolutions/shoot_*.yaml and "
+    "haul_*.yaml, its fishing the grounds' of data/fishing/; see tools/gen_ships.py."
+)
 
 
 def lugger_crew(b):
@@ -6948,6 +7013,44 @@ def smack(out_dir="data/ships"):
                 )
             ],
         ),
+    )
+    b.gear(
+        GEAR_NOTE,
+        [
+            (
+                "trawl",
+                "trawl",
+                "the trawl",
+                {"beam_ft": 36.0, "length_fathoms": 120},
+                "A beam trawl of 36 ft, the smallest of the deep-sea trawls and the Yarmouth "
+                "men's (Holdsworth 1874 pp. 47, 50), towed with the tide under easy sail at half "
+                "a knot to a knot and a half faster than the stream, five or six hours a haul, "
+                "and hove up by the winch in three quarters of an hour (pp. 70 to 71, 77 to "
+                "79); the warp 120 fathoms, judgement.",
+            ),
+            (
+                "lines",
+                "lines",
+                "the lines",
+                {"length_fathoms": 3600, "hooks": 2340},
+                "Longlines, 90 lines of 40 fathoms and 2,340 hooks baited with whelks: half of "
+                "the 68-ton cod smack's string (Holdsworth 1874 pp. 137 to 139), judgement on "
+                "her size; the cod put alive into the well.",
+            ),
+            (
+                "seine",
+                "seine",
+                "the seine",
+                {"length_fathoms": 80},
+                "A tuck-sean of 80 fathoms, eight deep at the sleeves and ten at the bunt, shot "
+                "round a shoal from the boat in a bay by day and tucked into the boat at once "
+                "(Holdsworth 1874 p. 158: 'where only one net is used for the whole process ... "
+                "the net is called ... either a stop-sean or a tuck-sean'). The pilchard seans "
+                "of St Ives and the south coast were the seine companies' with their own boats "
+                "(pp. 188 to 195); a smack's own small sean worked by her boat is judgement, "
+                "for the spec's truth 105.",
+            ),
+        ],
     )
     b.dump(
         os.path.join(out_dir, "smack.yaml"),
