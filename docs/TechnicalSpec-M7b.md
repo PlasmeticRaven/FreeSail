@@ -1110,6 +1110,46 @@ draws on those notes, and the lead's reading above is one way, not the plan.
   Finisterre by the offing; the brig shaped for Funchal clears Machico; the smack shaped for
   Falmouth from the Lizard clears the Manacles; each on the whole chart, run until past.
 
+## Part 7b-x: Kedging (the owner, 2026-10-18)
+
+### 21k. The ship moved by her anchor (`freesail/evolutions/scripts.py` `LayOutKedgeScript`, `HeaveInScript`; `data/evolutions/`; `freesail/physics/`; `freesail/orders/ground_tackle.py`; the captains' books)
+
+"We have most everything we need, and it is a useful thing we're missing" (the owner).
+What exists: `lay out a kedge [to the <point>] [<n> fathoms]` carries the kedge out by the
+boat and lets it go (built for a ship aground, `world/ground.py`); `heave in` and `heave
+short` work the cable at the capstan with the hands; the boat with her crew; the kedge in
+every ship file with her cable. What is missing is that heaving on a laid anchor moves her
+when she is afloat, and the sequence that makes a passage of it:
+
+- **The pull.** Heaving in on an anchor that holds, with the ship afloat, draws her toward
+  it: the cable's pull as a force on the hull against her resistance and the tide, the
+  rate by the hands at the bars and the scope (a few tens of yards a minute; the
+  period's figures or a judgement in the tuning notes), the anchor breaking out when she
+  is over it; the same for the bowers at short stay, which is how a ship "hove up to her
+  anchor" through the water.
+- **Kedging as a passage.** `kedge her out to <the point or bearing>`: the kedge carried
+  out ahead to the cable's length, let go, hove in to short stay, weighed, carried out
+  again, until the point is reached or the order ends; the boat's trips and the hands'
+  fatigue counted; a calm or a foul wind in a road (Roscoff's road with the wind in the
+  west, the Goulet becalmed on the ebb) the cases; `stop kedging` ends it with the kedge
+  aboard. Sail set while kedging is refused or allowed as the wind serves (judgement).
+- **Warping** along a hawser to a buoy, a quay or another ship is the same mechanics with
+  another holdfast; booked here, built when the ports have their posts and buoys (M7's
+  harbour work), not in this package.
+- **The books.** The rules captain lays out a kedge to get off the ground where the tide
+  will not lift her (ground.py's case), and kedges out of a road where the wind is foul
+  and the tide slack when his intent wants him at sea and the wait is long (58's
+  judgement of the wait); the primer's chapter on the ground tackle gains the kedge's
+  work in the period's words (Falconer, KEDGE and WARP; Luce on kedging).
+
+### 21l. Truths for 7b-x
+
+- 113. The cutter becalmed in Carrick Road kedges a mile to the Black Rock in so many
+  hours by the boat's trips, the kedge weighed and carried out each time; the account
+  follows her.
+- 114. A ship aground on the flood lays out a kedge and heaves herself off as the tide
+  makes, the log saying the pull and the floating.
+
 ## 22. Consent (one revision for the milestone)
 
 The consent brief is revised once more by a named package at the milestone's end, the
@@ -1238,7 +1278,10 @@ In waves, written for the owner's approval in turn, each launched on his word:
 - **61 (Fable, provisional): the land-avoiding route** (§21i) beside 51 and before 58's
   tracks: the route over the chart's own data for every captain and the player, the legs
   said as the plan, the pilot's joining leg from the same path; planned in full at briefing.
-- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57, 58, 59, 60 and 61: the starter
+- **63 (Opus): kedging** (§21k), beside 58: the pull of a laid anchor moving her when afloat,
+  kedging as a passage with the boat's trips, the captains' books using it; warping booked
+  for M7's harbours.
+- **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57, 58, 59, 60, 61 and 63: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
 
