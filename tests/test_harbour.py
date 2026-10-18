@@ -515,7 +515,10 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
     pg.wait_for_function(
         "document.getElementById('g-director').textContent === 'The dispatches'", timeout=10_000
     )
-    assert "officer of the watch" in pg.inner_text("#g-stations")
+    pg.wait_for_function(
+        "document.getElementById('g-stations').textContent.indexOf('officer of the watch') >= 0",
+        timeout=10_000,
+    )
     assert pg.inner_text("#status") == "a game in play"
     # the maker: each of the owner's scenarios read into the form and saved, byte for byte
     pg.click("nav.tabs button[data-tab=maker]")

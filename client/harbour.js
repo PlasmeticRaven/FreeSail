@@ -253,7 +253,7 @@
       show($("start-words"), r.lines.join("\n"));
       $("start-words").classList.remove("refusal");
       $("btn-to-game").hidden = false;
-      onState(Object.assign({}, harbour.state || { stations: [], doors: [], desktop: { entries: [] }, credential: [] }, { game: r.game }));
+      return api("GET", "/api/harbour/state").then(onState); // the new game's stations at once
     }).catch(function (e) {
       show($("start-words"), e.message);
       $("start-words").classList.add("refusal");
