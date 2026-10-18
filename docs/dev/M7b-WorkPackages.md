@@ -213,6 +213,54 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
 
+### Package 62 as merged (2026-10-18)
+
+Merged `--no-ff` from the builder's worktree (six commits on `06015d3`; 20 files, ~1,300
+lines) over 59, with four conflicts of the appended kind (the tuning notes, the truths,
+the waves table, the dispatches scenario's Fowey comment), each kept from both sides by the
+lead; ruff clean; the builder's fast tier (3,438 passed), whole slow tier (3,745 passed, the
+same 11 expected failures as before, 57's gale trial among them) and pace tests (6 passed,
+load about 1) all passed on its final tree; **the whole slow tier on the merged wave (59
+with 62) is the lead's and recorded below.** Built as briefed: `ship "X": order <an order
+of her own grammar>` passes the order to her captain's station as his own, crewed through
+her World's `submit` under his rules' actor (her grammar his domain, a reading or a deck
+sentence no order), far through the far shape's orders (its eleven named in the refusal
+where it cannot carry one); her log says it as his ("By the captain: heaving to"), a far
+body with no World given a short story for it (`Vessel.story`, the ground for §12b); the
+director's log keeps the act; he holds by it a glass or until the next order to her, then
+his intent again, `order carry on` sooner, and the hold carries across promotion and
+demotion in her own World's ticks (found on the way: a crewed World's clock counts from her
+promotion); the rule of reach refuses it where a model or the player holds her captain and
+for the player's own ship by name or "the ship"; the doubt bites only where the order is
+implausible for her (an anchor deeper than 30 fathoms, plain sail above 34 knots, a chase
+by a merchantman, fisherman or packet), and it is the director's door's, never the owner's
+own. **Taken another way, accepted:** `ship "X": crewed` offered in the no-way answer within
+the promotion's range, the cap and its order unchanged, counting as one of the day's acts
+(the owner may rule it free); briefs gain an optional `examples:` list read as "examples,
+not a rule", each starter brief with one hand example and the dispatches brief with the
+frigate's captain as the hand. **Not built, as briefed:** the director seated in a ship.
+
+**The lead's short play (a script on the dispatches world):** the frigate of the brief's
+example put on the sea and her station laid; `order heave to` done as her captain's, her
+story saying it, her sail lying to within the minute, the hold said until 05:40; `set the
+main topgallant` refused with the eleven; `come to an anchor` done at the World's own order
+line in 41 fathoms, which is right (the doubt is the director's door's: asked, the door
+says "42 fathoms by the chart, deeper than any scope of her cables would hold in"); `carry
+on` gave her back, and her plan was at once a chase of the nearest stranger, her own
+doctrine as a King's ship, not her station; the player's ship refused by name and as "the
+ship". Nothing found beyond what the builder recorded.
+
+**Found and fixed on the way:** the dispatches scenario's intent ("carry a cargo of tin")
+was no intent a captain knows, now `trade tin from Falmouth to Plymouth`; with Falmouth and
+Plymouth alone the business draws no trader on that water (the truth's trader is the
+free-play water's). **Open items, carried:** "write to him" is not yet a road (`message:`
+reaches only the player's ship; a letter to another ship's captain wants a form, 55 or
+later); a seat the director holds for a model not yet arrived does not block the hand; a far
+ship with no intent holds the order until the next; no tool reads a far ship's story yet
+(51); the director's "Done:" reply runs two sentences together since 50; **for the
+dispatches test, the King's ship's doctrine still has no "stop and search", so the frigate's
+stopping of the cutter is the director's hand by the brief's examples.**
+
 ### Package 59 as merged (2026-10-18)
 
 Merged `--no-ff` from the builder's worktree (eight commits on `06015d3`; 24 files, ~4,800
