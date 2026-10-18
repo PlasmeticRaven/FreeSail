@@ -1186,6 +1186,10 @@ preparation or a chart item of its own: draw the coast and read the nearest land
 finest level where a harbour patch exists, or from the Histolitt shoreline for the French
 harbours, so that the picture, the lookout and the keel agree; and the owner to try the
 passage himself first, since the lead's run is one data point.
+**The owner's check of 2026-10-18** (`docs/playtests/2026-10-18-owner-chart-checks/`): the
+same at Santoña (the road drawn inside a closed polygon) and Passages (the inlet drawn as
+detached fragments, the contour cut at the patch's edge); with the channel of Bas, the
+Goulet and Carrick Road, the test cases of the fix.
 
 From M6: the Goulet on a flood (43b), Torbay's stream (43b), the held gauges' blend, the
 deep-sea tiles' rule, the land-avoiding route (brought in as 61, §21i), the test battery's cost (eaten by the owner's
