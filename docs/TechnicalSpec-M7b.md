@@ -205,6 +205,50 @@ own), never an input, and a replay by the acts gives it again through the channe
 player's order at his seat is an input of its own (`director_order`), replayed through the
 director's door so that the doubt and the log are what they were.
 
+**As built (package 62, 2026-10-18; `freesail/world/crews.py` `hand`; `orders.py`;
+`tests/test_world_orders.py`, `test_director.py`, truth 7b-113).** The hand is the `ship`
+channel's: `ship "<name>": order <words>` (`orders._hand`, `is_hand`) hands the words to
+`crews.hand`. **Crewed**, they go to her World's `submit` as her captain's order under his
+rules' actor (`captains.actor_for` his state: not journaled in her World, the director's act
+or input being the record), so that her grammar is his domain and nothing more: what she
+cannot do is refused in her own words, a reading or a sentence of her deck is no order, a
+world order inside the hand is no order of hers. **At far detail**, through the far shape's
+orders: `far_order` on the far body (a light stand-in for her World, `_FarBody`, since
+`far_order` reads only her vessel and the parent's sea), or `submit_far` where a station keeps
+her World in the far shape. **Her log says it as his**: "By the captain: heaving to." in her
+World's log, or, for a far body with no World, in her **short story** (`Vessel.story`, the
+ground of §12b's "a far ship keeps a short story of her own", saved in her dict only when
+there is one); never a line of the player's log, whose lookout sees what she does (the glass
+on her heaving to). **Her captain is told it came over his head**: the crewed `Captain`
+(`over_his_head`) has his state's book struck as at the player's hand and his judgements held;
+the far `FarCaptain` (`over_his_head`) keeps the plan as it stood before the first such order
+and does not judge; either holds a glass (`crews.HAND_HOLD_S`, 1,800 s) or until the
+director's next order to her, which sets it again, then takes her up again from where she
+is (the near captain's first state entered afresh, filling away from a heave-to; the far
+plan laid back, its sail order with it; a line in her log); `ship "X": order carry on` gives
+her back sooner. The hold crosses the promotion both ways. A far vessel with no captain of
+her own (a goal and no intent) obeys and holds by it until the next order. **What the far
+shape cannot carry** (a sail by name, a boat lowered) is answered as the game's honest "no
+way as said", naming the eleven orders it carries (`crews.FAR_SHAPE_WORDS`), logged
+unperformed or, with a reason, attempted; within the promotion's range the answer adds that
+the director may ask for her crewed first: `ship "X": crewed` (`crews.ask_crewed`) promotes
+her now when the cap has room and she is in no state a ship is not crewed in, and is refused
+in words beyond the range or with the cap full, the cap and its order unchanged (the owner's
+budget). **The rule of reach** (`orders.reach`, `_hand_reach`; `crews.captain_held_by`):
+refused outright, logged `director.refused`, where a model or the player holds her captain's
+station ("Hazard's captain (Captain Reynolds) is held by a model: his orders are his holder's
+own, and nobody gives one through him; write to him instead ('message: ...')"), and for the
+player's own ship whoever holds her. **The doubt** (`_doubt_hand`): an anchor let go deeper
+than thirty fathoms by the chart, plain sail made in a wind at her over thirty-four knots,
+a chase given by a master of the merchant's, the fisherman's or the packet's doctrine; the
+rest of a captain's orders are plausible causes of themselves. The director's log keeps the
+act as every act (`director.order`, `.doubted`, `.reentered`, `.unperformed`, `.attempted`,
+`.refused`), its kinds' descriptions naming the hand. The station brief names the hand
+among the examples with its refusal, and a brief may carry the player's own `examples`
+(each starter one order by the hand; the dispatches brief the frigate's four), read to the
+director as examples, not a rule. **The director seated in a ship** (the paragraph above) is
+not built.
+
 ### 4. The brief and its guardrails (`data/director/briefs/*.yaml`; `freesail/agents/director.py`)
 
 The player writes the brief: the tone of the voyage (a quiet passage, a hard-luck cruise, a

@@ -1,6 +1,6 @@
 # 20. The director
 
-Every station before this one is a person aboard a ship: the officer of the watch, the captain, the master, the lookout, a passenger, a captain of another ship. This chapter gives the game a station that is on no ship at all: **the director**, who sits above the game, sees the world as it is, and shapes the voyage you sail through the world the ship is in. A language model may hold it through any door; you may hold it yourself at the console or in the browser; and whoever holds it, you read what it did and why only when you ask, so that a voyage becomes two stories: the one you lived and the one that was arranged. Everything here is spec M7b §2 to §6 as package 50 built them, and §8 and §9 as package 52 gave the director a voice (people made from words, words in the mouths of those nobody holds), on the proposal's §7.6 and the owner's rulings of October (decisions 39, 43, 46 and 50; the end of the chapter says which).
+Every station before this one is a person aboard a ship: the officer of the watch, the captain, the master, the lookout, a passenger, a captain of another ship. This chapter gives the game a station that is on no ship at all: **the director**, who sits above the game, sees the world as it is, and shapes the voyage you sail through the world the ship is in. A language model may hold it through any door; you may hold it yourself at the console or in the browser; and whoever holds it, you read what it did and why only when you ask, so that a voyage becomes two stories: the one you lived and the one that was arranged. Everything here is spec M7b §2 to §6 as package 50 built them, §8 and §9 as package 52 gave the director a voice (people made from words, words in the mouths of those nobody holds), and §3's hand as package 62 gave it another ship's captain's order, on the proposal's §7.6 and the owner's rulings of October (decisions 39, 43, 46 and 50; the end of the chapter says which).
 
 ## What the director is, and the one rule
 
@@ -48,6 +48,7 @@ The channel keeps the one rule with the director, and it does so by the owner's 
 | `port <id>: price of ...` | the price moves by more than three parts in ten in a word |
 | `aboard: ...` | the thing has no cause in the ship's state: a spar found sprung with no strain on it and no fresh wind in the last watch, a cask stove or a seam working on a smooth sea, the water foul within five days of the voyage's start |
 | `person: "<name>" comes aboard ...`, `goes ashore`, `leaves the ship at <port>` | no boat could carry him: she is more than six miles from his port, the nearest, or the one named |
+| `ship "<name>": order ...` (the hand) | the order is implausible for her: an anchor let go deeper than thirty fathoms by the chart, plain sail in a wind over thirty-four knots, a chase by a merchantman, a fisherman or a packet |
 
 A mind changed (`ship "X": intent ...`), a letter left at a port, a port closed or opened, a person named or made from words, a word said as someone, and the seat under your grant are never doubted. Your own live order (`world: ...` at the prompt) is never doubted either: it is the owner's word.
 
@@ -69,6 +70,23 @@ Since package 52 the director may make the people its story needs and speak for 
 ```
 
 At your prompt both are world orders, refused as chapter 15 has them; at the director's seat, or after `world:`, they are the director's and the owner's.
+
+## The director's hand: another ship's captain's order, as his own
+
+Since package 62 the director may give another ship an order of her own grammar through her captain, as his own (spec M7b §3; the owner's proposal of 2026-10-18): the minute that matters, a heave-to, a chase, a course for the port, without seating anyone.
+
+`ship "Harpy": order heave to` passes *heave to* to the Harpy's captain's station. In her own log it is his: *By the captain: heaving to.* The director's log keeps it as the director's act, with its doubt and its reason as every act; your play log never carries it, and what you meet is what your lookout sees (*The glass on the brig-sloop of war on the starboard bow: heaving to.*). Her captain is told the order came over his head, so that he does not fight it: he holds by it a glass, or until the director's next order to her, and then sails by his intent again (filling away, the course for his station shaped anew); `ship "Harpy": order carry on` gives her back to him sooner.
+
+- **Crewed** (near you, at full detail), the order is her World's as any order of her captain's, under his own domain and nothing more: whatever her captain could not do, the director cannot do through him, and her grammar refuses it in her words.
+- **At far detail** she carries only what the far shape carries: a course shaped or steered, heave to, fill away, give chase, haul off, make or shorten sail, come to an anchor, weigh, keep the station. A sail by name or a boat lowered is answered honestly, *the game has no way to do this as said*, naming what she can carry, and logged as attempted if entered again with a reason. Within the promotion's range the answer adds that the director may ask for her crewed first: `ship "Harpy": crewed` makes her a full ship now if the crewed cap has room (the cap and its order are yours and unchanged), and the order is then hers at full detail. A far ship has no log of her own: the line goes into her short story, which the director's truth will read when package 51 gives it the ships' logs.
+- **Doubted** only where the order itself is implausible for her, since a captain's order is a plausible cause of itself: an anchor let go deeper than thirty fathoms by the chart, plain sail in a gale, a merchantman, a fisherman or a packet giving chase. Entered again with a `[reason: ...]`, it is done.
+- **Refused where a model or you hold her captain** (the rule of reach): *Hazard's captain (Captain Reynolds) is held by a model: his orders are his holder's own, and nobody gives one through him; write to him instead*. Your own ship is never the hand's, whoever holds her.
+
+```orders frigate plain-sail
+# rejected: ship "Harpy": order heave to
+```
+
+At your prompt it is a world order like any other, refused as chapter 15 has it; at the director's seat, or after `world:` as the owner, it is the hand.
 
 ## The brief and its limits
 
@@ -136,9 +154,11 @@ A bare world order typed there is the director's, through the channel's door: do
 | `person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Falmouth` | `..., aboard in the cabin`, `..., aged forty-five`, `..., who knew the captain's father` | a person made from words, with his outline, among the people from then on |
 | `person: "Mr Fox" comes aboard as master` | `person: "Mr Fox" goes ashore`, `person: "Mr Fox" leaves the ship at Brest` | a person moved, a station bound to him or given back; doubted beyond a boat's reach |
 | `say as the cook: "Pease and pork, sir."` | `say as Mr Fox: ...`, `say as the carpenter: ...` | words in the mouth of a person nobody holds, heard within earshot, in his journal; refused for a held station |
+| `ship "Harpy": order heave to` | `... order give chase`, `... order shape a course for Falmouth`, `... order carry on` | the director's hand: an order of her own grammar given to her captain as his own, in her log as his; held a glass, then his intent again; at far detail what the far shape carries; refused where a model or you hold her captain |
+| `ship "Harpy": crewed` | | a far ship within the promotion's range made a full ship now, the cap allowing |
 | `ask the cook what is for dinner` | `tell the boatswain <words>`, with a director seated | a question to a person nobody holds, put to the director; its answer as him back to the asker, or after a glass the asker told none came |
 | `director: {brief: quiet-passage}` | in a scenario file, beside `models`, `seats`, `seats_in_voyage` | the brief given by the scenario, the station bound when the game is made |
 
 ## Where it comes from
 
-The proposal's §7.6 (the director as an agent on a different channel, acting only through plausible causes, its actions visible after the fact, sampling on events and a slow clock, with a brief as the guardrail); decision 39 (the lead's first play is at the director's station), decision 43 (stations are data bound at run time, so that a station on no ship is a binding like any), decision 46 (a world order is never shown as sent) and decision 50 (the director brought forward; a world order doubted, not refused; the brief's hard limits refusals), with the owner's refinement of 2026-10-17 that the forms and the tables are examples and not a rule. The sources of the things found aboard are in the table itself (Falconer 1780, SPRUNG; the Regulations and Instructions of 1806, the Purser). The design is spec M7b §2 to §6, and §8, §9 and §15 for the voice; the packages are 50 and 52 in `docs/dev/M7b-WorkPackages.md`, and their days' figures are in `docs/dev/TuningNotes.md` under each.
+The proposal's §7.6 (the director as an agent on a different channel, acting only through plausible causes, its actions visible after the fact, sampling on events and a slow clock, with a brief as the guardrail); decision 39 (the lead's first play is at the director's station), decision 43 (stations are data bound at run time, so that a station on no ship is a binding like any), decision 46 (a world order is never shown as sent) and decision 50 (the director brought forward; a world order doubted, not refused; the brief's hard limits refusals), with the owner's refinement of 2026-10-17 that the forms and the tables are examples and not a rule. The sources of the things found aboard are in the table itself (Falconer 1780, SPRUNG; the Regulations and Instructions of 1806, the Purser). The hand is the owner's proposal of 2026-10-18. The design is spec M7b §2 to §6, §8, §9 and §15 for the voice, and §3's paragraph on the hand; the packages are 50, 52 and 62 in `docs/dev/M7b-WorkPackages.md`, and their days' figures are in `docs/dev/TuningNotes.md` under each.
