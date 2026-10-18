@@ -1087,6 +1087,18 @@ words (`EXIT_UNREACHABLE`: it could not reach the game or its model, or would no
 A shortcut that starts the harbour (`FreeSail.cmd` on the Windows desktop) is shown and
 written on the word. Truth 7b-108.
 
+**The owner's first use (2026-10-18; package 64, provisional).** The harbour as merged works
+and is not yet a usable interface: unclear to a newcomer; the station and seat settings not
+explained against each other (the settings' seat, the scenario's `stations:` and the doors'
+"on another ship" are three notions and the page says nothing of which is which); the flags
+not explained where they are set, though the parser holds every help line; one model per
+door, so several models at several stations want several settings files, where a
+per-station entry is wanted; the maker without the papers (the chronometer first) and the
+people, which the loader reads; and no way to name the stations or write their briefings
+per scenario, which the owner hoped for (`stations:` holds holders only, the only
+scenario-level brief being the director's). The refinement is package 64, briefed after
+the owner's testing round; `docs/dev/M7b-WorkPackages.md`, "The harbour's second pass".
+
 ### 21e. The scenario maker (`client/harbour.js`; `freesail/world/scenarios.py` `write_scenario`)
 
 A form on the harbour that writes a scenario file from choices, in the file's own form so

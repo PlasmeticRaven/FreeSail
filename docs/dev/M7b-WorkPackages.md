@@ -37,6 +37,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 61 | Fable | The land-avoiding route, provisional (spec §21i; the owner, 2026-10-17, brought in from the carried items): the course laid clear of the land and the dangers over the chart's own data for every captain and the player, the legs said as the plan | to plan in full at briefing; beside 51, before 58's tracks |
 | 62 | Opus | The director's hand: an order of a ship's own grammar given to her captain's station by the director as his own, far and crewed, refused where a model or the player holds him (spec §3; the owner's proposal of 2026-10-18); the director seated in a ship as a later item | briefed, approved and launched 2026-10-18 beside 59; **built the same day** (spec §3 as built; the Harness's §19; the primer's chapter 20; the tuning notes, "Package 62"; truth 7b-113); the director seated in a ship not built |
 | 63 | Opus | The boat (spec §21k; the owner, 2026-10-18): towing by the boat by an oar force on the hull, the boat as a vessel the player can pull or sail (the seat on another vessel), the kedge's false denial mended; kedging itself needs no package, the pull being in the anchor physics already | brief to write; after 51 |
+| 64 | Opus | The harbour's second pass (spec §21d, "The owner's first use"; the owner, 2026-10-18): the page made clear to a newcomer, the flags explained where they are set, several models and stations configured without several settings files, the maker given the papers (the chronometer first) and the stations' names and briefings per scenario | noted, not immediate; brief after the owner's testing round |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
 
 ## The testing round after 59 (the owner, 2026-10-18)
@@ -58,6 +59,41 @@ several chats (one desktop entry per station). **The director's test, in two sha
 2. **An Opus captain, the owner officer, the lead director**: the stress case, a model
    captain pushing at his authority as the shape that first wanted a director; the next
    usage window.
+
+## The harbour's second pass (the owner, 2026-10-18; package 64, not immediate)
+
+The owner's word on the harbour as merged: it works, but it is not yet a usable interface
+as such, would not be clear at all to a newcomer, and is confusing and not fully featured.
+His points, each set beside what the build has, so that the brief starts from facts:
+
+- **The stations and the seats.** He could not tell how the station and seat settings work
+  together. The page has the settings' default seat (the game tab's `--seat`), the
+  scenario's `stations:` field (who holds each: player, model, rules; the player at one
+  seat at most) and the doors tab's "on another ship"; three notions with one word between
+  them and no sentence on the page saying which is which. Package 64 says it once, in the
+  page's own words, and makes the three one control if it can.
+- **The flags.** The settings tab does not say what the flags are or what each does. The
+  server's parser has every flag's help line already (`server_parser`); the page should show
+  them beside the controls, not only in `--help`.
+- **Several models and stations.** He does not see how several models or stations, each with
+  its own flags and configuration, are set up efficiently: the settings hold one model per
+  door, so two models at two stations today want two settings files (`--settings`). The
+  brief wants a per-station entry (station, door, model, flags), the desktop entries and
+  the door panes drawn from it.
+- **The maker's missing fields.** He could not add a chronometer. The loader reads `papers:`
+  (chart, epitome, almanac, chronometer, price lists) and `people:`, and the form has
+  neither; the maker writes only the fields it shows. Package 64 adds the papers (the
+  chronometer first) and the people.
+- **Stations' names and briefings per scenario.** He hoped to name the stations and write
+  their briefings per scenario; there is no such field (`stations:` is holders only; the
+  people's names come from `people:` by role; the only scenario-level brief is the
+  director's). A design item for the brief: a `stations:` entry that may carry a name, a
+  role's person and a briefing read to the holder at the station as the director's brief is
+  read to him, by the Harness's existing form of a brief (spec §21d, "The owner's first
+  use").
+
+Recorded here and in spec §21d so that the refinement is briefed after the owner's testing
+round, with what the round adds.
 
 ## Package 50: the director proper (`freesail/agents/director.py` new; `agent.py`, `tools.py`, `harness.py`, `journal.py`, `seat.py`, the doors `remote.py`, `mcp_server.py`, `local.py`, `api.py`; `freesail/world/orders.py` for the channel's doubt and the brief's limits; `freesail/api/readings.py` for the truth's readings; `freesail/world/stations.py` for the director's binding; `freesail/core/world.py` and `core/replay.py` for the director's log in the save and the replay; `freesail/ui/console.py`, `ui/server.py` and `client/` for the director's station at the prompt, the log's pane and the replay view; `data/director/briefs/*.yaml` and `data/director/aboard.yaml` new; `docs/agents/Harness.md` a section; `docs/primer/` a chapter for the director; `docs/TechnicalSpec-M7b.md` §2 to §7 as built; `docs/dev/TuningNotes.md`; `tests/test_director.py` new, `test_world_orders.py`, `test_parity.py` (the director's surface by design), `test_replay.py`, `test_known_truths.py` truths 90 to 94)
 
