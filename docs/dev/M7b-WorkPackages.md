@@ -32,7 +32,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | briefed 2026-10-17; approved the same day, held until the second wave landed, launched on its merge |
 | 57 | Opus | The frigate's staysails from Steel's list through the generator, the period's shapes; the chasse-marée's rig put right (lug topsails, not square; the lugs slung a third from the fore end and set to leeward of the mast; the trim rule reading a lug as fore-and-aft) and the viewer's draw order by aspect and the brace shown (the owner's notes of the Éclair's first cruise, `docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`) | briefed 2026-10-17; approved and launched the same day, the three together; **built the same day** (spec §24's 57 as built; the primer's chapters 1 to 3; the tuning notes, "Package 57"; truths 7b-111 and 7b-112); **merged 2026-10-17** (the record below) |
 | 58 | Opus | The captain's sea sense, third pass (the owner's runs of gate 6c); a leg re-laid as the stream changes; the sample's deltas, the `ahead` reading and the cost of thinking (the owner's observation of 2026-10-17); the lugs dipped or a wear ordered when a helm order carries the wind across the stern, and the course given when she gathers way, not at the aweigh (the lead's wave-2 playtest, `docs/playtests/2026-10-17-wave2-lead-playtest/notes.md`) | brief to write |
-| 59 | Opus | The harbour: a launcher in the browser, the scenario maker, the settings and the doors started from it (the owner, 2026-10-17) | brief to write |
+| 59 | Opus | The harbour: a launcher in the browser, the scenario maker, the settings and the doors started from it (the owner, 2026-10-17) | briefed 2026-10-18, for the owner's approval; to run after 56, then the owner's testing round of the director, the needs, the captains, the scenario maker and the rest |
 | 60 | Opus | A ship bought (the owner's design goal of 2026-10-17; spec §21g): listings, the hull's valuation, the ship bought and sold through the market orders, the transfer of the people and the hands, the errand ashore | brief to write, after 51 and 53 |
 | 61 | Fable | The land-avoiding route, provisional (spec §21i; the owner, 2026-10-17, brought in from the carried items): the course laid clear of the land and the dangers over the chart's own data for every captain and the player, the legs said as the plan | to plan in full at briefing; beside 51, before 58's tracks |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
@@ -532,3 +532,62 @@ tests keep. Each item an intent with the lead's reading; the intent binds.
    the fisherman (the grounds and the gear in the period's words); the tuning notes (the
    yields with their sources, the spoilage's hours, the glass's tiers, found on the way,
    pins unmoved by digest, the suite's results); the waves row for 56.
+
+## Package 59: the harbour (`freesail/__main__.py` new; `freesail/settings.py` new; `freesail/ui/harbour.py` new, served by `ui/server.py`; `client/harbour.html`, `harbour.js`, `style.css`; `freesail/world/scenarios.py` `write_scenario` and the loader; `freesail/agents/api.py`, `local.py`, `mcp_server.py` only as the harbour starts them; `docs/agents/Harness.md` a section on the harbour and the settings; `README.md` the start line; the primer's first chapter where it says how to start; `docs/TechnicalSpec-M7b.md` §21d, §21e as built; `docs/dev/TuningNotes.md`; `tests/test_harbour.py` new, `test_settings.py` new, `test_scenarios.py`, `test_known_truths.py` truths 108 to 110)
+
+Opus, after 56; the owner's testing round follows it, so this is the package that makes
+the rest reachable. Spec M7b §21d to §21f; the owner's word of 2026-10-17 (the terminals,
+the flags, the desktop client's configuration and the scenarios by hand have become
+tedious; a launcher, a scenario maker and settings). The page is the game's own server's,
+built and tested here headless with the browser the tests drive (the pre-installed Chromium
+through Playwright, `executablePath` `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`,
+no install), and proved by the owner on Windows; the Windows-only pieces (the desktop
+client's configuration path, the settings' place, a shortcut) small and tested by path. The
+console stays as it is. Each item an intent with the lead's reading; the intent binds.
+
+1. **The harbour page** (§21d): `py -m freesail` (a `__main__`) starts the server and opens
+   the browser on the harbour, a page that lists the scenarios (the game's under
+   `data/scenarios/` and the player's own under his scenarios place), the ships, the seats
+   and the doors; starts a game with the choices made (the console's and the server's flags
+   as the page's controls: the seed, the seat, the ship on another vessel, the crewed cap
+   and range, the compression, the business, a director's brief from the starters or a
+   file, the standing orders, lockstep or the pace rule); shows which doors are up and
+   which stations are held by whom; and leads to the game's page. A game started from the
+   harbour is the server's game as today, and the harbour stays reachable at its own path
+   while it runs. *The lead's reading:* the server already carries every flag; the harbour
+   is a form over `start_world` and the driver, and a started game is one server process, so
+   the harbour restarts the world in place rather than spawning a second server.
+2. **The settings** (§21d; `settings.py`): a file in the player's own place outside the
+   repository (`%APPDATA%\FreeSail\settings.yaml` on Windows, the XDG config place
+   elsewhere), holding the model names the player uses at each door (a model's name may
+   live there and nowhere in the repository, a save or a log: truth 110), the local
+   runner's endpoint and its flags, the default seat, compression and crewed budget, where
+   the saves and the player's scenarios go; the key stays in the credential store as 42
+   left it and is never in the file; the harbour reads and writes the settings with a form,
+   and the flags given on a command line win over them for that run.
+3. **The doors from the harbour** (§21d): a button that writes the desktop client's MCP
+   entry (the `.mcp.json` form with `py` on Windows and `python3` elsewhere, the game's
+   address, the model name from the settings) into the client's configuration file at the
+   platform's path, the entry shown first and the player confirming; the API door and the
+   local runner started as the server's subprocesses with their flags from the settings,
+   their output in a pane on the harbour, each stoppable; the stations held shown live.
+   *The lead's reading:* the subprocesses are the existing modules with their command
+   lines, nothing re-implemented; a door that dies is said so in its pane.
+4. **The scenario maker** (§21e): a form that writes a scenario file in the file's own form
+   (`write_scenario`, YAML with the comments a hand would want), from choices: the ship,
+   the start (a port's road from the chart's ports, or a position pricked on the chart's
+   picture), the date and hour, the weather (a preset of the climatology's for the month,
+   or a scripted day in the forms the primer gives), the other ships with their intents,
+   the business on or off, the crewed budget, the standing orders (a starter book or a
+   drafted one), the stations and who holds them (a seat for the player; a model's door),
+   a director's brief; saved under the player's scenarios place and listed by the harbour;
+   loaded back into the form for editing and written again unchanged where nothing was
+   changed (truth 109). The scenario is proved by loading it as the console would before
+   it is saved, and a refusal is shown in the form's words. The owner's two scenarios of
+   2026-10-17 (`smack-falmouth.yaml`, `lugger-roscoff.yaml`) and `directed-passage.yaml` are
+   the examples the form must round-trip.
+5. **Truths 108 to 110 and the records**: the Harness's section on the harbour and the
+   settings (and a line on the headless start: the clock held until the driver says `go`,
+   `time` a console command, from the lead's wave-2 playtest); the README's start line
+   (`py -m freesail`); the primer's first chapter; §21d, §21e as built; the tuning notes
+   (found on the way, the Windows pieces tested by path, pins unmoved by digest, the suite).
