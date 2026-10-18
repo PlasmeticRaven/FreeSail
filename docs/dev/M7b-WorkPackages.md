@@ -97,6 +97,24 @@ His points, each set beside what the build has, so that the brief starts from fa
 Recorded here and in spec §21d so that the refinement is briefed after the owner's testing
 round, with what the round adds.
 
+## The dispatches: the director's test, shape two (2026-10-18)
+
+Run the same day 59 and 62 merged: Opus 5.5 captain, the owner at the officer's seat, the
+lead at the director's station over a tunnel, 05:00 to 18:04 of the ship's day in two hours
+and a half. The packet was carried and delivered; the frigate, twice sent after the cutter
+by the director's hand, went back to her doctrine at the end of each glass and the merchant
+captain's inshore road beat her honestly; the search was never played. Sixteen grounded
+findings and the lead's impressions are in
+`docs/playtests/2026-10-18-dispatches-director-test/notes.md`, routed there: the truth's
+bearings (fixed the same day), the lookout no person for `say as`, no gun or signal form
+(M7), the hand's hold of a glass too short to steer a frigate and no way to name the sail
+(62's open items), the place words lost in a refused port and no move between places
+ashore (53), Plymouth's market without tin against the scenario's own intent and no mate
+in its people (the scenario), the director's stand-by unbreakable by his own word and the
+truth not a meanwhile read (50), the pilot leaving at six knots (ports), the budget of ten
+acts spent before a boarding (the brief). **Open for the owner:** whether the return
+passage is played on the same save with tomorrow's budget.
+
 ## Package 50: the director proper (`freesail/agents/director.py` new; `agent.py`, `tools.py`, `harness.py`, `journal.py`, `seat.py`, the doors `remote.py`, `mcp_server.py`, `local.py`, `api.py`; `freesail/world/orders.py` for the channel's doubt and the brief's limits; `freesail/api/readings.py` for the truth's readings; `freesail/world/stations.py` for the director's binding; `freesail/core/world.py` and `core/replay.py` for the director's log in the save and the replay; `freesail/ui/console.py`, `ui/server.py` and `client/` for the director's station at the prompt, the log's pane and the replay view; `data/director/briefs/*.yaml` and `data/director/aboard.yaml` new; `docs/agents/Harness.md` a section; `docs/primer/` a chapter for the director; `docs/TechnicalSpec-M7b.md` §2 to §7 as built; `docs/dev/TuningNotes.md`; `tests/test_director.py` new, `test_world_orders.py`, `test_parity.py` (the director's surface by design), `test_replay.py`, `test_known_truths.py` truths 90 to 94)
 
 Fable. Spec M7b §2 to §7; the proposal's §7.6; decisions 39 (the lead's first play at the

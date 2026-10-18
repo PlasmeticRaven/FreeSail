@@ -1,0 +1,2 @@
+> journal note="14:42, the boat away for the Barbican steps with the captain, to land him. Mr Veale speaks to him on the quay when he is landed; I look again in a glass."
+> stand_by until="a glass or the boat alongside or a message or a word on deck"

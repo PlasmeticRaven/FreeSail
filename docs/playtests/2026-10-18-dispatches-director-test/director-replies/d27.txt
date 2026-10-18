@@ -1,0 +1,2 @@
+> journal note="14:26, brought up in Cawsand Bay in seven fathoms and a half, the best bower, the sails coming in. Mr Veale is made and on the quay at Plymouth, four miles by boat round Penlee and up the Sound. Two acts left today: his words when the captain or his boat reaches him, and one in hand. I wait for the boat away, a word on deck or the change of the watch."
+> stand_by until="the boat away or a message or a word on deck or the change of the watch"

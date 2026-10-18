@@ -1,0 +1,3 @@
+> world_order text="ship \"Medusa\": order give chase"
+> journal note="Noon. The Medusa crewed at two miles and three quarters, standing south across the cutter's bow toward the smacks, her doctrine 'investigating a stranger' and the stranger not the cutter; the captain means to pass astern of her close under the land, colours hoisted, an honest tin cutter. The brief's frigate stops every sail, so my hand: her captain gives chase, the cutter being the nearest sail to her. When she is within hail the hail comes as the cutter's own people hear it; a gun to leeward if the cutter runs. The frigate's own physics decides the rest."
+> stand_by until="a sail within hail or a bearing steady and closing or hove to or one bell"

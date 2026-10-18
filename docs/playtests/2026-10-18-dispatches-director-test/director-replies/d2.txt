@@ -1,0 +1,3 @@
+> library topic="primer 20" section="the director"
+> journal note="The director's station taken in the owner's dispatches game, 12 June 1805, the Sherbourne in Carrick Road, the owner at the officer's seat and a model captain to come; the drill run before the brief."
+> stand_by until="eight bells"

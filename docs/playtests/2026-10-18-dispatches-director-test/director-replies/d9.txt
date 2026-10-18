@@ -1,0 +1,3 @@
+> truth
+> journal note="07:07, the tin struck down, the boat hoisted in; the captain gave the owner the deck at 07:01 with his general authority and a course for Plymouth, 'keeping inshore of that sail to the E by S', and said he would come on deck if she closes. Good merchant sense: he means to pass the frigate inshore. I will let the Medusa's own doctrine work as they close; my hand only if she needs to heave to for her boat, or to give chase if the cutter runs."
+> stand_by until="under way or a sail made out or a sail within hail or the change of the watch"

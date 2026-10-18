@@ -1,0 +1,4 @@
+> truth
+> world_order text="ship: a frigate \"Medusa\" of Britain at 49 55 N 4 35 W, bound for Plymouth, intent: keep the station off the Deadman within 8 miles"
+> journal note="The dispatches, 05:00, the director's opening. The frigate Medusa is put on the sea twenty-odd miles to the south-east on her station off the Deadman, well outside the cutter's horizon from Carrick Road, so that she is simply there when the cutter comes along the coast, under her own doctrine until my hand is wanted. The Custom House man waits until the captain is seated (nobody holds the captain yet; the owner is at the officer's seat): he will come off then, with the packet and a word in the captain's ear. The cutter lies with every sail furled and no anchor down, making sternway in the flood with Trefusis Point three cables off: her rules captain's to mind, not mine; I note it for the record."
+> stand_by until="a notable event or three bells"
