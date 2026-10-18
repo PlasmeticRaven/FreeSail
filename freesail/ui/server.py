@@ -1318,6 +1318,19 @@ def create_app(
             driver.remove_listener(listener)
 
     app.mount("/client", StaticFiles(directory=str(client_dir)), name="client")
+
+    # The page's scripts are revalidated on every load (the owner's finding of 2026-10-18: a
+    # new build's viewer drawn by the browser's cached projection.js for hours, the heuristic
+    # freshness of a static file with a Last-Modified and no Cache-Control). `no-cache` is
+    # not "do not cache": the browser keeps the file and asks whether it changed, which the
+    # ETag answers in a few bytes.
+    @app.middleware("http")
+    async def _revalidate_client_files(request, call_next):  # type: ignore[no-untyped-def]
+        response = await call_next(request)
+        if request.url.path.startswith("/client/") or request.url.path in ("/", "/index.html"):
+            response.headers["Cache-Control"] = "no-cache"
+        return response
+
     return app
 
 
