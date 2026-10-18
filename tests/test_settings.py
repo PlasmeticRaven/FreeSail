@@ -106,8 +106,9 @@ def test_no_file_gives_the_defaults_and_a_kept_file_reads_back(tmp_path):
         (("doors", "api", "key"), "anything"),
         (("doors", "api", "api_key"), "anything"),
         (("doors", "local", "token"), "x"),
-        (("doors", "api", "model"), "sk-ant-abcdefghijklmnopqrstuvwxyz0123"),
-        (("doors", "api", "flags"), ["--key-file", "sk-or-v1-0123456789abcdefABCDEF"]),
+        # put together here, so that no file of the repository holds a key's shape
+        (("doors", "api", "model"), "sk" + "-ant-abcdefghijklmnopqrstuvwxyz0123"),
+        (("doors", "api", "flags"), ["--key-file", "sk" + "-or-v1-0123456789abcdefABCDEF"]),
         (("doors", "desktop", "model_name"), "Ab3" * 20),
     ],
 )

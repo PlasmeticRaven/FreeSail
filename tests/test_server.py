@@ -644,13 +644,15 @@ def test_ease_on_station_when_a_station_speaks_and_the_option_by_the_driver(tmp_
 
 
 def test_the_server_takes_the_ease_on_station_flag():
-    """`--ease-on-station` on the command line reaches the driver (`main`)."""
+    """`--ease-on-station` on the command line reaches the driver (`main`; the flags in
+    `server_parser` since package 59, which the harbour's launcher takes too)."""
     import inspect
 
     from freesail.ui import server
 
+    assert server.server_parser().parse_args(["--ease-on-station"]).ease_on_station
     src = inspect.getsource(server.main)
-    assert '"--ease-on-station"' in src and "ease_on_station=args.ease_on_station" in src
+    assert "ease_on_station=args.ease_on_station" in src
 
 
 def test_the_chart_block_is_unchanged_by_the_zoom():
