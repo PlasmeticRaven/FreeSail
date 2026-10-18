@@ -669,14 +669,23 @@ class Lookout:
             said.pop(fid, None)
             return None
         st = glass_state(world, v)
-        # a change of her state, her work or her light, or a nearer tier than any yet; her
-        # point of sailing alone is not a change (it moves with every shaped course), nor
-        # the steps of one piece of work, nor her drifting out of a tier
+        # a change of her state, her work or her light, or a nearer tier than any yet, that
+        # changes the words; her point of sailing alone is not a change (it moves with every
+        # shaped course), nor the steps of one piece of work, nor her drifting out of a
+        # tier; and not oftener than `GLASS_REPEAT_MIN` (the latest said when it is due)
         state = (st["look"].split(",")[0], st["work"], st["light"])
+        minute = int(world.clock.tick) // 60
         last = said.get(fid)
-        if last is not None and last[1:] == state and tier <= last[0]:
-            return None
-        said[fid] = (max(tier, last[0] if last is not None else tier), *state)
+        if last is not None:
+            best, last_state, last_words, last_minute = last
+            if (last_state == state and tier <= best) or words == last_words:
+                return None
+            if minute - last_minute < GLASS_REPEAT_MIN:
+                return None
+            tier_seen = max(tier, best)
+        else:
+            tier_seen = tier
+        said[fid] = (tier_seen, state, words, minute)
         who = self._sail_word(v, max(level, 1))
         text = f"The glass on {who} {relative}: {words}."
         data = {
@@ -1318,6 +1327,9 @@ GLASS_WORDS_NM = 0.4
 # later than the period, and a lantern at the nets was the fishermen's own custom); a
 # King's ship cruising or a merchantman shows none.
 GLASS_NIGHT_NM = 1.0
+# The lookout says what the glass shows of a sail unasked no oftener than this, in minutes
+# (judgement: a pilot's cutter rounding to and filling by turns is not a line a minute).
+GLASS_REPEAT_MIN = 5
 # The sails a far-detail ship lies to with aback, by her rig's word (judgement on the
 # heave-to evolution's rule, `data/evolutions/heave_to.yaml`: the mast that carries the
 # most square sail; a fore-and-after's head sheet to windward).
@@ -1381,6 +1393,16 @@ def _sailing_words(off_deg: float) -> str:
     return "running before it"
 
 
+def _under_way(tack: str, off_deg: float) -> str:
+    """'under way on the starboard tack, close-hauled'; running before it, no tack (the
+    wind dead astern is on neither side, and a ship yawing before it would be read on
+    each by turns)."""
+    sailing = _sailing_words(off_deg)
+    if sailing == "running before it":
+        return f"under way, {sailing}"
+    return f"under way on the {tack} tack, {sailing}"
+
+
 def glass_state(world: Any, vessel: Any) -> dict[str, Any]:
     """What a near ship is doing, as the glass may make it out at each tier: `look` (at a
     look, two miles), `work` (the work on deck and aloft, eight cables), `words` (the
@@ -1420,7 +1442,7 @@ def _glass_crewed(crew: Any) -> dict[str, Any]:
     elif manoeuvre in ("tacking", "wearing", "heaving to", "filling away", "box hauling"):
         look = manoeuvre
     else:
-        look = f"under way on the {tack} tack, {_sailing_words(off)}"
+        look = _under_way(tack, off)
     if not crew.at_anchor:
         if any(d.startswith(_SHORTENING) for d in doing):
             look += ", shortening sail"
@@ -1470,7 +1492,7 @@ def _glass_far(world: Any, vessel: Any) -> dict[str, Any]:
     elif lying:
         look = f"hove to on the {tack} tack"
     else:
-        look = f"under way on the {tack} tack, {_sailing_words(off)}, {state}"
+        look = f"{_under_way(tack, off)}, {state}"
     work: list[str] = []
     words: list[str] = []
     if lying:

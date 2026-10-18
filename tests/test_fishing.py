@@ -288,9 +288,9 @@ def test_a_made_out_line_gives_her_bearing_and_the_course_she_stands():
     for e in made:
         assert ", bearing " in e.text, e.text
     glass = [e for e in w.log.since(0) if e.kind == "lookout.glass"]
-    assert glass and "under way on the" in glass[0].text
+    assert glass and "under way, running before it" in glass[0].text  # wind astern: no tack
     e = w.submit("the glass on the brig")
-    assert e.kind == "lookout.glass" and "under way on the" in e.text, e.text
+    assert e.kind == "lookout.glass" and "under way, running before it" in e.text, e.text
     assert math.isfinite(v.heading_deg)
 
 
