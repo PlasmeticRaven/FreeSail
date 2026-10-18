@@ -568,8 +568,16 @@ console stays as it is. Each item an intent with the lead's reading; the intent 
 3. **The doors from the harbour** (§21d): a button that writes the desktop client's MCP
    entry (the `.mcp.json` form with `py` on Windows and `python3` elsewhere, the game's
    address, the model name from the settings) into the client's configuration file at the
-   platform's path, the entry shown first and the player confirming; the API door and the
-   local runner started as the server's subprocesses with their flags from the settings,
+   platform's path, the entry shown first and the player confirming; **one entry per
+   station the player ticks**, named `freesail-<station>` (`freesail-captain`,
+   `freesail-officer`, `freesail-director`, ...), since the desktop client starts each
+   configured server once and shares it across its chats, so that several chats hold
+   several stations of one game through several bridges (the owner's testing regime,
+   2026-10-18), and the Harness gains a short section on holding several stations from
+   several chats (each chat told its station and to use that server's tools alone; consent
+   asked once per model name; a second chat reaching for a held station attaches to it);
+   the API door and the local runner started as the server's subprocesses with their flags
+   from the settings,
    their output in a pane on the harbour, each stoppable; the stations held shown live.
    *The lead's reading:* the subprocesses are the existing modules with their command
    lines, nothing re-implemented; a door that dies is said so in its pane.
