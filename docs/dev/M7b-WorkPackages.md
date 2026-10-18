@@ -37,6 +37,26 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 61 | Fable | The land-avoiding route, provisional (spec §21i; the owner, 2026-10-17, brought in from the carried items): the course laid clear of the land and the dangers over the chart's own data for every captain and the player, the legs said as the plan | to plan in full at briefing; beside 51, before 58's tracks |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
 
+## The testing round after 59 (the owner, 2026-10-18)
+
+After 56 and 59 land, the owner tests the director, the needs, the filled-out rules
+captains, the scenario maker and the rest in play over the week, several stations held from
+several chats (one desktop entry per station). **The director's test, in two shapes:**
+
+1. **The owner captain, an Opus officer, the lead director** on a voyage short by distance
+   and busy (a port to leave, a stranger or two, weather with room to change, a letter, a
+   person made; the smack Falmouth to Fowey or the cutter Falmouth to Plymouth with the
+   business on), made with 59's scenario maker, the director's brief and limits written by
+   the owner there; no lockstep, the pace rule as it is, the tunnel as before. The director
+   enters what it wants, doubted or not, re-entered with its reason, so that the log carries
+   the attempts as well as the acts (the data the doubted-not-refused rule exists for); the
+   officer's cold reactions to strangers and to the director's weather watched by the owner
+   from the captain's chair. First, while the lead's usage is near its limit: the director
+   samples by the watch and on notable events.
+2. **An Opus captain, the owner officer, the lead director**: the stress case, a model
+   captain pushing at his authority as the shape that first wanted a director; the next
+   usage window.
+
 ## Package 50: the director proper (`freesail/agents/director.py` new; `agent.py`, `tools.py`, `harness.py`, `journal.py`, `seat.py`, the doors `remote.py`, `mcp_server.py`, `local.py`, `api.py`; `freesail/world/orders.py` for the channel's doubt and the brief's limits; `freesail/api/readings.py` for the truth's readings; `freesail/world/stations.py` for the director's binding; `freesail/core/world.py` and `core/replay.py` for the director's log in the save and the replay; `freesail/ui/console.py`, `ui/server.py` and `client/` for the director's station at the prompt, the log's pane and the replay view; `data/director/briefs/*.yaml` and `data/director/aboard.yaml` new; `docs/agents/Harness.md` a section; `docs/primer/` a chapter for the director; `docs/TechnicalSpec-M7b.md` §2 to §7 as built; `docs/dev/TuningNotes.md`; `tests/test_director.py` new, `test_world_orders.py`, `test_parity.py` (the director's surface by design), `test_replay.py`, `test_known_truths.py` truths 90 to 94)
 
 Fable. Spec M7b §2 to §7; the proposal's §7.6; decisions 39 (the lead's first play at the
