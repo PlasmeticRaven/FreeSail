@@ -97,6 +97,12 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
 # on the build machine with three other suites running beside them (2026-10-01).
 SLOW_TESTS: frozenset[str] = frozenset(
     {
+        # package 59: the maker's proofs (a World made for each) and the harbour in the browser
+        "test_harbour.py::test_the_maker_reads_proves_and_saves_in_the_players_place",
+        "test_harbour.py::test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip",
+        "test_harbour.py::test_the_api_door_started_from_the_harbour_seats_its_station_and_is_stopped",
+        "test_known_truths.py::test_truth_7b_108_py_m_freesail_opens_the_harbour_and_shows_a_started_game_and_the_doors",
+        "test_known_truths.py::test_truth_7b_109_a_scenario_by_the_maker_loads_as_a_hand_made_one_and_reads_back_unchanged",
         # package 57: the lugger through a tack and a wear, and the frigate in the gale trial
         "test_known_truths.py::test_truth_7b_111_the_luggers_lugs_lie_to_leeward_and_none_is_aback_through_a_tack_and_a_wear",
         "test_known_truths.py::test_truth_7b_112_the_frigate_lies_to_under_her_main_staysail_by_the_heavy_weather_book",

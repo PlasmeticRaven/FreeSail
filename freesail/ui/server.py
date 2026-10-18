@@ -230,6 +230,7 @@ class Driver:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._ticks_since_snapshot = 0
+        self._replace_hooks: list[Callable[[World, World], None]] = []  # `replace_world`
         self.world.log.subscribe(self._on_event)
         # the player's own needs (package 54): sent to the pages as a line, kept nowhere
         needs = getattr(self.world, "needs", None)
@@ -646,6 +647,57 @@ class Driver:
         if self._thread is not None:
             self._thread.join(timeout=2.0)
             self._thread = None
+
+    # -- a new game in place (package 59: the harbour) ---------------------------------
+
+    def replace_world(
+        self,
+        world: World,
+        compression: float = 1.0,
+        pace: str = PACE_RULE,
+        ease_on_station: bool | None = None,
+    ) -> None:
+        """Take up another World in place of this one (the harbour's new game, spec M7b
+        §21d): the clock held, the old World let go (its log no longer heard), the new one
+        heard, its pace and compression set, the pages told to start again. The agent
+        API's seats of the old game are left to the desk, which seats anew in a game it
+        did not seat them in (`remote.Desk.station`); the doors ask again."""
+        with self.lock:
+            self.running = False
+            old = self.world
+            if self._on_event in old.log._subscribers:
+                old.log.unsubscribe(self._on_event)
+            old_needs = getattr(old, "needs", None)
+            if old_needs is not None:
+                old_needs.unlisten(self._on_need)
+            self.world = world
+            self.lockstep = pace == PACE_LOCKSTEP
+            self.pace = Pace(world, pace)
+            if ease_on_station is not None:
+                self.ease_on_station = bool(ease_on_station)
+            self._view = RollupView()
+            self._alarm = None
+            self._heard = None
+            self.eased = None
+            self._ticks_since_snapshot = 0
+            self.compression = clamp_compression(compression)
+            world.compression = self.compression
+            world.log.subscribe(self._on_event)
+            self._samples_seen = self._samples_now()
+            needs = getattr(world, "needs", None)
+            if needs is not None:
+                needs.listen(self._on_need)
+            if self.desk is not None:
+                self.desk.lockstep = self.lockstep
+            for fn in list(self._replace_hooks):
+                fn(old, world)
+            # every open page reads the new game from its start (`client/app.js`)
+            self._emit({"type": "restart"})
+
+    def on_replace(self, fn: Callable[[World, World], None]) -> None:
+        """Call `fn(old, new)` when a World is taken up in place of another (the app's
+        painter and consent records go with the new World)."""
+        self._replace_hooks.append(fn)
 
 
 def switched_on(value: Any) -> bool:
@@ -1154,7 +1206,12 @@ def create_app(
     consent_records: Path | str | None = None,
     saves_dir: Path | str | None = None,
     say: Callable[[str], None] | None = None,
+    harbour: Any = None,
 ) -> FastAPI:
+    """The game's app around a driver. `harbour` is the launcher's (`ui.harbour.Harbour`,
+    package 59), made here with the game already started when none is given, so that the
+    harbour is at `/harbour` whichever way the server was started."""
+
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         driver.start()
@@ -1162,6 +1219,8 @@ def create_app(
             yield
         finally:
             driver.stop()
+            if app.state.harbour is not None:
+                app.state.harbour.close()  # its doors stopped with the server
 
     app = FastAPI(title="FreeSail", lifespan=lifespan)
     app.state.driver = driver
@@ -1186,8 +1245,31 @@ def create_app(
     app.state.easel = easel
     app.include_router(picture_routes(easel))
 
-    @app.get("/")
-    def index() -> FileResponse:
+    def taken_up(old: World, new: World) -> None:
+        # the harbour's new game (package 59): the painter and the records go with it
+        pictures.set_painter(new, easel)
+        if consent_records is not None:
+            new.consent_records_dir = consent_records
+
+    driver.on_replace(taken_up)
+    # the harbour (package 59; spec M7b §21d), at its own path while a game runs
+    from freesail.ui.harbour import Harbour, harbour_routes
+
+    if harbour is None:
+        harbour = Harbour(
+            driver, consent_records=consent_records, saves_dir=saves_dir, started=True
+        )
+    harbour.client_dir = client_dir
+    app.state.harbour = harbour
+    app.include_router(harbour_routes(harbour))
+
+    @app.get("/", response_model=None)
+    def index() -> Response:
+        if not harbour.started:
+            # `py -m freesail` with no game yet: the harbour first
+            from fastapi.responses import RedirectResponse
+
+            return RedirectResponse("/harbour")
         return FileResponse(client_dir / "index.html", media_type="text/html")
 
     @app.get("/api/ship")
@@ -1381,8 +1463,10 @@ def start_server_world(args: argparse.Namespace) -> tuple[World, Any]:
     return world, scenario_file
 
 
-def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="FreeSail local server")
+def server_parser(description: str = "FreeSail local server") -> argparse.ArgumentParser:
+    """The server's command line, which the harbour's launcher (`py -m freesail`) takes
+    too (package 59): every flag a control of the harbour's page."""
+    ap = argparse.ArgumentParser(description=description)
     ap.add_argument("ship", nargs="?", help="ship file, e.g. data/ships/frigate-36.yaml")
     ap.add_argument("--seed", type=int, help="the seed (default a scenario's, else 1805)")
     ap.add_argument(
@@ -1438,20 +1522,38 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     ap.add_argument("--free-running", action="store_true", help=FREE_RUNNING_HELP)
-    args = ap.parse_args(argv)
+    ap.add_argument(
+        "--business",
+        choices=("on", "off"),
+        help="the world's business on or off, over the scenario's (package 59; spec M6 §19)",
+    )
+    ap.add_argument(
+        "--director-brief",
+        metavar="BRIEF",
+        help=(
+            "a brief for the director above the game, as 'director: brief' takes it: a "
+            "starter's name (data/director/briefs/), a file, or words (package 59; spec M7b §4)"
+        ),
+    )
+    return ap
 
-    import uvicorn
 
+def prepare_game(args: argparse.Namespace, say: Callable[[str], None] = print) -> World:
+    """The server's game from its command line, every step the server has always taken in
+    its order (the World, the watcher, the scenario's orders, the standing orders, the
+    crewed budget, the director's brief, the player's seat, the book's opening words), the
+    lines for the terminal given to `say`. The harbour's new game is made by this too
+    (package 59: a game started from the harbour is the server's game)."""
     world, scenario_file = start_server_world(args)
-    if args.watcher:
+    if getattr(args, "watcher", None):
         station_watcher(world, args.watcher, out=sys.stdout)
     if scenario_file is not None:
         from freesail.world.scenarios import begin, guard_lines
 
         for line in scenario_file.lines() + guard_lines(world):
-            print(line)
+            say(line)
         begin(world, scenario_file)
-    if args.standing_orders:
+    if getattr(args, "standing_orders", None):
         read_standing_orders(world, args.standing_orders)
     if args.crewed_cap is not None or args.crewed_range is not None:
         from freesail.world.crews import crewed_settings_of
@@ -1459,20 +1561,35 @@ def main(argv: list[str] | None = None) -> int:
         world.crewed_settings = crewed_settings_of(
             {"cap": args.crewed_cap, "range_nm": args.crewed_range}, "the flags"
         )
-    if args.seat:
+    if getattr(args, "director_brief", None):
+        for line in give_director_brief(world, args.director_brief, "the player"):
+            say(line)
+    # the player's seat: the flag's, else the scenario file's (`stations:`, package 59);
+    # `--seat captain` is the captain's prompt, his own, and no seat
+    seat = args.seat or (scenario_file.player_seat if scenario_file is not None else None)
+    if seat and " ".join(str(seat).lower().split()) != "captain":
         from freesail.agents.seat import seat_player
 
-        seat_player(world, args.seat, door="browser")
+        seat_player(world, seat, door="browser")
     # package 33c (decision 30): the starter book is a choice; the opening words, on the
     # terminal and as the browser's first driver line, say how to load it or begin with none
     opening = book_words(world)
-    print(opening)
+    say(opening)
     if not args.load:
         world.record_driver("routine", "driver.book", opening)
     if args.load:
         # the road taken and why, in the same words at every door (package 37d)
         for line in loaded_words(world, args.load):
-            print(line)
+            say(line)
+    return world
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = server_parser().parse_args(argv)
+
+    import uvicorn
+
+    world = prepare_game(args)
     driver = Driver(
         world,
         compression=args.time,
@@ -1487,6 +1604,7 @@ def main(argv: list[str] | None = None) -> int:
         saves_dir=args.saves,
         say=say_to_terminal,
     )
+    app.state.harbour.game_url = f"http://localhost:{args.port}"  # the doors' address
     print(f"FreeSail server. Seed {world.seed}. Open http://{args.host}:{args.port}/")
     print(
         f"A model's door connects to http://localhost:{args.port} (docs/agents/Harness.md)"
