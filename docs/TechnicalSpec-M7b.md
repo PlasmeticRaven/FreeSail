@@ -1133,6 +1133,16 @@ when she is afloat, and the sequence that makes a passage of it:
   fatigue counted; a calm or a foul wind in a road (Roscoff's road with the wind in the
   west, the Goulet becalmed on the ebb) the cases; `stop kedging` ends it with the kedge
   aboard. Sail set while kedging is refused or allowed as the wind serves (judgement).
+- **Towing by the boat** (the owner, 2026-10-18): `tow her with the boat [to <the point
+  or bearing>]`, the boat ahead on a tow-line with her oars, the ship's head brought round
+  or the ship moved at the boat's pace against her resistance and the tide (a quarter of a
+  knot to a knot for a cutter or a lugger by the boat's size and hands; little or nothing
+  for the frigate, whose boats towed her head round in a calm and no more: the period's
+  practice and a judgement in the tuning notes); the boat's crew tiring by the hour; `the
+  boat alongside` ends it; refused in a sea the boat cannot work in. The same force on the
+  hull as the kedge's pull, so one mechanic serves both; the books use the boat to bring
+  her head round in a calm and to tow a small vessel clear of a danger the tide sets her
+  on.
 - **Warping** along a hawser to a buoy, a quay or another ship is the same mechanics with
   another holdfast; booked here, built when the ports have their posts and buoys (M7's
   harbour work), not in this package.
@@ -1149,6 +1159,9 @@ when she is afloat, and the sequence that makes a passage of it:
   follows her.
 - 114. A ship aground on the flood lays out a kedge and heaves herself off as the tide
   makes, the log saying the pull and the floating.
+- 115. The lugger becalmed with the ebb setting her toward the Lavandière is towed clear by
+  her boat at half a knot; the frigate's boats bring her head round in a calm and move her
+  no distance worth the account's notice.
 
 ## 22. Consent (one revision for the milestone)
 
@@ -1278,9 +1291,9 @@ In waves, written for the owner's approval in turn, each launched on his word:
 - **61 (Fable, provisional): the land-avoiding route** (§21i) beside 51 and before 58's
   tracks: the route over the chart's own data for every captain and the player, the legs
   said as the plan, the pilot's joining leg from the same path; planned in full at briefing.
-- **63 (Opus): kedging** (§21k), beside 58: the pull of a laid anchor moving her when afloat,
-  kedging as a passage with the boat's trips, the captains' books using it; warping booked
-  for M7's harbours.
+- **63 (Opus): kedging and towing by the boat** (§21k), beside 58: the pull of a laid anchor
+  moving her when afloat, kedging as a passage with the boat's trips, the boat towing by the
+  same force, the captains' books using both; warping booked for M7's harbours.
 - **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57, 58, 59, 60, 61 and 63: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
