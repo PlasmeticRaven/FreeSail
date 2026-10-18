@@ -1110,63 +1110,51 @@ draws on those notes, and the lead's reading above is one way, not the plan.
   Finisterre by the offing; the brig shaped for Funchal clears Machico; the smack shaped for
   Falmouth from the Lizard clears the Manacles; each on the whole chart, run until past.
 
-## Part 7b-x: Kedging (the owner, 2026-10-18)
+## Part 7b-x: The boat (the owner, 2026-10-18)
 
-### 21k. The ship moved by her anchor (`freesail/evolutions/scripts.py` `LayOutKedgeScript`, `HeaveInScript`; `data/evolutions/`; `freesail/physics/`; `freesail/orders/ground_tackle.py`; the captains' books)
+### 21k. Towing by the boat, and the boat as a vessel (`freesail/physics/` an oar force on a hull; `freesail/evolutions/`; `data/ships/boat-*.yaml` through `tools/gen_ships.py`; `freesail/world/crews.py` the boat crewed; `freesail/orders/`; the viewer)
 
-"We have most everything we need, and it is a useful thing we're missing" (the owner).
-What exists: `lay out a kedge [to the <point>] [<n> fathoms]` carries the kedge out by the
-boat and lets it go (built for a ship aground, `world/ground.py`); `heave in` and `heave
-short` work the cable at the capstan with the hands; the boat with her crew; the kedge in
-every ship file with her cable; **and the pull itself** (`physics/anchor.py`, package 34):
-heaving in shortens the scope, the cable comes taut and pulls at the hawse, her head
-swings to the pull and she comes ahead to her anchor, so that a kedge laid out and hove
-short already draws her toward it (the owner's test on the m6c build, 2026-10-18: the kedge
-laid ninety fathoms to the west of a ship heading north, and heaving short brought her head
-to the westward; no coincidence). What is missing is the sequence that makes a passage of
-it, the boat towing, and the books; and one fault seen in that test: **a false denial**,
-"the boat was not sent away", said while the lay-out evolution went on and completed, to be
-found and mended here.
+**Kedging needs no package.** The owner's test on the m6c build (2026-10-18): a kedge laid
+out ninety fathoms to the west of a ship heading north and hove short brought her head to
+the westward and drew her toward it; the pull has been in the anchor physics since package
+34 (heaving in shortens the scope, the cable comes taut at the hawse, her head swings to the
+pull and she comes ahead), so kedging by hand is lay out, heave short, weigh, lay out again,
+and the rules captain is not given it until a case calls for it. One fault from that test
+is mended here: a **false denial**, "the boat was not sent away", said while the lay-out
+evolution went on and completed.
 
-- **The pull's figures.** The rate of heaving by the hands at the bars and the scope (a
-  few tens of yards a minute; the period's figures or a judgement in the tuning notes) is
-  checked against what the physics gives, and the anchor breaks out when she is over it,
-  as the weigh script has it.
-- **Kedging as a passage.** `kedge her out to <the point or bearing>`: the kedge carried
-  out ahead to the cable's length, let go, hove in to short stay, weighed, carried out
-  again, until the point is reached or the order ends; the boat's trips and the hands'
-  fatigue counted; a calm or a foul wind in a road (Roscoff's road with the wind in the
-  west, the Goulet becalmed on the ebb) the cases; `stop kedging` ends it with the kedge
-  aboard. Sail set while kedging is refused or allowed as the wind serves (judgement).
-- **Towing by the boat** (the owner, 2026-10-18): `tow her with the boat [to <the point
-  or bearing>]`, the boat ahead on a tow-line with her oars, the ship's head brought round
-  or the ship moved at the boat's pace against her resistance and the tide (a quarter of a
-  knot to a knot for a cutter or a lugger by the boat's size and hands; little or nothing
-  for the frigate, whose boats towed her head round in a calm and no more: the period's
-  practice and a judgement in the tuning notes); the boat's crew tiring by the hour; `the
-  boat alongside` ends it; refused in a sea the boat cannot work in. The same force on the
-  hull as the kedge's pull, so one mechanic serves both; the books use the boat to bring
-  her head round in a calm and to tow a small vessel clear of a danger the tide sets her
-  on.
-- **Warping** along a hawser to a buoy, a quay or another ship is the same mechanics with
-  another holdfast; booked here, built when the ports have their posts and buoys (M7's
-  harbour work), not in this package.
-- **The books.** The rules captain lays out a kedge to get off the ground where the tide
-  will not lift her (ground.py's case), and kedges out of a road where the wind is foul
-  and the tide slack when his intent wants him at sea and the wait is long (58's
-  judgement of the wait); the primer's chapter on the ground tackle gains the kedge's
-  work in the period's words (Falconer, KEDGE and WARP; Luce on kedging).
+**Towing by the boat:** `tow her with the boat [to <the point or bearing>]`, the boat ahead
+on a tow-line with her oars, the ship's head brought round or the ship moved at the boat's
+pace against her resistance and the tide (a quarter of a knot to a knot for a cutter or a
+lugger by the boat's size and hands; little or nothing for the frigate, whose boats towed
+her head round in a calm and no more: the period's practice and a judgement in the tuning
+notes); the boat's crew tiring by the hour; `the boat alongside` ends it; refused in a sea
+the boat cannot work in. The force is an **oar force on a hull** by the hands at the oars
+and their fatigue, one mechanic for the tow and for the boat herself.
+
+**The boat as a vessel** (the owner: the player can now go aboard the boat, 53's places,
+and the larger boats should be able to be rigged with a very simple rig, or at least
+ordered under sweeps): each ship's boat gets a ship file through the generator (a 16-ft
+boat with four oars and a sprit or lug sail stepped at will, the frigate's launch and
+cutter larger, with their sources or the word judgement), and is a vessel of the world
+when manned and away from the ship: crewed by the promotion's machinery (her own World,
+small), the oars her propulsion by the oar force and the sail when stepped, the sweeps'
+order (`give way`, `lie on your oars`, `step the mast`, `set the lug`, `pull for <the
+point>`); **the player aboard her** by `go to the boat` and the seat on another vessel
+(51's `--seat captain --ship "the boat"`, or the console's seat following him into her),
+her readings his while he is in her, the ship's again when he comes aboard; the errands
+(ashore, the kedge, the tow, the pilot) done by her as before when nobody is in her;
+the viewer drawing her under oars or sail; the account following the boat as a vessel's.
+After 51, which gives the player a seat on another vessel.
 
 ### 21l. Truths for 7b-x
 
-- 113. The cutter becalmed in Carrick Road kedges a mile to the Black Rock in so many
-  hours by the boat's trips, the kedge weighed and carried out each time; the account
-  follows her.
-- 114. A ship aground on the flood lays out a kedge and heaves herself off as the tide
-  makes, the log saying the pull and the floating.
-- 115. The lugger becalmed with the ebb setting her toward the Lavandière is towed clear by
+- 113. The lugger becalmed with the ebb setting her toward the Lavandière is towed clear by
   her boat at half a knot; the frigate's boats bring her head round in a calm and move her
   no distance worth the account's notice.
+- 114. The player in the cutter's boat pulls ashore at Falmouth from Carrick Road under
+  oars, steps the mast and sails her back under her lug, the readings his in the boat and
+  the ship's again aboard; the boat's errands run as before with nobody in her.
 
 ## 22. Consent (one revision for the milestone)
 
@@ -1296,9 +1284,9 @@ In waves, written for the owner's approval in turn, each launched on his word:
 - **61 (Fable, provisional): the land-avoiding route** (§21i) beside 51 and before 58's
   tracks: the route over the chart's own data for every captain and the player, the legs
   said as the plan, the pilot's joining leg from the same path; planned in full at briefing.
-- **63 (Opus): kedging and towing by the boat** (§21k), beside 58: the pull of a laid anchor
-  moving her when afloat, kedging as a passage with the boat's trips, the boat towing by the
-  same force, the captains' books using both; warping booked for M7's harbours.
+- **63 (Opus): the boat** (§21k), after 51: towing by the boat by an oar force on the hull,
+  the boat as a vessel the player can pull or sail with the seat on another vessel, the
+  kedge's false denial mended; kedging itself needs no package (the pull exists).
 - **55 (Opus): the solo director and the gate's scenarios** after 51, 52, 56, 57, 58, 59, 60, 61 and 63: the starter
   briefs, the local-model director's run, the directed regatta course, the consent
   revision drafted for the owner (§22), the gate document.
