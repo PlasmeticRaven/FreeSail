@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FreeSail · the harbour</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M3 13h10l-1 2H4z%27 fill=%27%234a3d31%27/%3E%3Cpath d=%27M8 1v12M8 3l5 8H8z%27 fill=%27%23ece5d3%27 stroke=%27%233b3128%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/client/style.css">
+</head>
+<!-- The harbour (package 59; spec M7b §21d, §21e): a page of the game's own server. A new
+     game from the server's flags as controls, the doors and the stations held, the
+     desktop client's entries, the scenario maker and the settings. -->
+<body class="harbour">
+<header>
+  <span class="brand">FreeSail</span>
+  <span class="ship-name">the harbour</span>
+  <span class="spacer"></span>
+  <nav class="tabs" role="tablist">
+    <button type="button" data-tab="game" class="active" role="tab">game</button>
+    <button type="button" data-tab="doors" role="tab">doors</button>
+    <button type="button" data-tab="maker" role="tab">scenario maker</button>
+    <button type="button" data-tab="settings" role="tab">settings</button>
+  </nav>
+  <a id="to-game" class="harbour-link" href="/" title="the game's page">the game</a>
+  <span id="status" class="bad">connecting</span>
+</header>
+
+<main class="harbour-main">
+
+<!-- ======================= the game ======================= -->
+<section class="tab-page" data-page="game">
+  <div class="panel">
+    <div class="panel-head"><span>In play</span><span class="hint" id="game-clock"></span></div>
+    <dl class="instruments" id="game-state">
+      <dt>Game</dt><dd id="g-title" class="wrap"></dd>
+      <dt>Ship</dt><dd id="g-ship"></dd>
+      <dt>Ship's time</dt><dd id="g-stamp"></dd>
+      <dt>Seed</dt><dd id="g-seed"></dd>
+      <dt>The player</dt><dd id="g-seat" class="wrap"></dd>
+      <dt>Director</dt><dd id="g-director" class="wrap"></dd>
+      <dt>Pace</dt><dd id="g-pace"></dd>
+      <dt>Stations</dt><dd><ul id="g-stations" class="plain-list"></ul></dd>
+      <dt>Doors</dt><dd><ul id="g-doors" class="plain-list"></ul></dd>
+    </dl>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span>A new game</span><span class="hint">the server's flags, as the page's controls; the clock held until you say go</span></div>
+    <form id="start-form" class="form-grid" autocomplete="off">
+      <label>From
+        <select id="s-from">
+          <option value="scenario">a scenario</option>
+          <option value="ship">a ship file</option>
+          <option value="load">a save</option>
+        </select></label>
+      <label class="from from-scenario">Scenario <select id="s-scenario"></select></label>
+      <label class="from from-ship" hidden>Ship <select id="s-ship"></select></label>
+      <label class="from from-load" hidden>Save <input id="s-load" type="text" placeholder="the save file's path"></label>
+      <label>Seed <input id="s-seed" type="number" placeholder="the scenario's"></label>
+      <label>Your seat <select id="s-seat"></select></label>
+      <label>Compression <input id="s-time" type="number" min="0.1" max="1000" step="any"></label>
+      <label>Pace <select id="s-pace">
+          <option value="rule">the pace rule (1x while a model's sample is open)</option>
+          <option value="lockstep">lockstep (the clock waits for a door)</option>
+          <option value="free">free-running</option>
+        </select></label>
+      <label>Crewed cap <input id="s-crewed-cap" type="number" min="0" step="1" placeholder="the machine's"></label>
+      <label>Crewed range (miles) <input id="s-crewed-range" type="number" min="0" step="any" placeholder="the machine's"></label>
+      <label>Business <select id="s-business">
+          <option value="">as the scenario says</option>
+          <option value="on">on</option>
+          <option value="off">off</option>
+        </select></label>
+      <label>Director's brief <select id="s-brief"></select></label>
+      <label id="s-brief-file-label" hidden>Brief file <input id="s-brief-file" type="text" placeholder="a brief's file, or your words"></label>
+      <label>Standing orders <select id="s-book"></select></label>
+      <label class="check"><input id="s-ease" type="checkbox"> ease to 1x when a station is sampled or speaks</label>
+      <div class="form-actions">
+        <button id="btn-start" type="submit">start the game</button>
+        <a id="btn-to-game" class="harbour-link" href="/" hidden>go to the game</a>
+      </div>
+    </form>
+    <pre id="start-words" class="words" hidden></pre>
+  </div>
+</section>
+
+<!-- ======================= the doors ======================= -->
+<section class="tab-page" data-page="doors" hidden>
+  <div class="panel">
+    <div class="panel-head"><span>The stations for the doors</span><span class="hint">one desktop entry, or one door, per station ticked</span></div>
+    <div class="form-grid">
+      <fieldset class="checks" id="d-stations"></fieldset>
+      <label>On another ship <input id="d-ship" type="text" placeholder="her name or id, else your own"></label>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span>The desktop client</span><span class="hint" id="d-desktop-path"></span></div>
+    <p class="note">Each station ticked gets its own entry, <code>freesail-&lt;station&gt;</code>: the client starts each configured bridge once and shares it among its chats, so one chat holds one station by its own entry's tools. Quit the client fully and start it again after writing. Present now: <span id="d-present"></span></p>
+    <div class="form-actions">
+      <button id="btn-desktop-show" type="button">show the entries</button>
+      <button id="btn-desktop-write" type="button" disabled>write them into the client's file</button>
+    </div>
+    <pre id="d-desktop-text" class="words" hidden></pre>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span>The API door and the local runner</span><span class="hint">started by the server with their flags from the settings</span></div>
+    <div class="form-actions">
+      <button id="btn-door-api" type="button">start the API door</button>
+      <button id="btn-door-local" type="button">start the local runner</button>
+    </div>
+    <ul id="d-credential" class="plain-list muted"></ul>
+    <p id="d-door-error" class="refusal" hidden></p>
+    <div id="d-panes"></div>
+  </div>
+</section>
+
+<!-- ======================= the scenario maker ======================= -->
+<section class="tab-page" data-page="maker" hidden>
+  <div class="panel">
+    <div class="panel-head"><span>The scenario maker</span><span class="hint">the file's own form; read back, written again unchanged where nothing changed</span></div>
+    <div class="form-actions">
+      <select id="m-pick"></select>
+      <button id="btn-m-read" type="button">read into the form</button>
+      <button id="btn-m-new" type="button">a new scenario</button>
+      <span id="m-source" class="muted"></span>
+    </div>
+    <form id="maker" class="maker" autocomplete="off">
+      <fieldset><legend>The day</legend>
+        <label>Name <input data-field="name" data-kind="text" type="text"></label>
+        <label>Seed <input data-field="seed" data-kind="number" type="number" step="1"></label>
+        <label>Start <input data-field="start" data-kind="text" type="text" placeholder="1805-06-12T05:00"></label>
+        <label>Nation <select data-field="nation" data-kind="select" data-options="nations"></select></label>
+      </fieldset>
+      <fieldset><legend>The ship</legend>
+        <label>Ship file <select data-field="ship.file" data-kind="select" data-options="ships"></select></label>
+        <label>Heading <input data-field="ship.heading_deg" data-kind="number" type="number" step="any"></label>
+        <label class="check"><input data-field="ship.glass" data-kind="bool" type="checkbox"> she carries a glass</label>
+        <label>Instrument <select data-field="ship.instrument" data-kind="select"><option value=""></option><option>octant</option><option>sextant</option></select></label>
+        <label>Purse (£) <input data-field="cargo.purse_pounds" data-kind="number" type="number" step="any"></label>
+        <label class="wide">Intent <input data-field="intent" data-kind="text" type="text" placeholder="the captain's intent: trade tin from Falmouth to Plymouth"></label>
+      </fieldset>
+      <fieldset><legend>The start</legend>
+        <label>A port's road <select id="m-port"></select></label>
+        <label>Region <select data-field="region" data-kind="select" data-options="regions"></select></label>
+        <label>Latitude <input id="m-lat" data-field="position" data-kind="position" type="number" step="any"></label>
+        <label>Longitude <input id="m-lon" data-field="position" data-kind="position" type="number" step="any"></label>
+        <div class="wide chart-wrap"><canvas id="m-chart" width="640" height="420" title="click to prick the start on the chart"></canvas></div>
+      </fieldset>
+      <fieldset><legend>The weather</legend>
+        <label>Weather <select id="m-weather-mode" data-field="weather" data-kind="weather">
+            <option value="">as written</option>
+            <option value="climatology">the month's climatology</option>
+            <option value="pinned">the wind pinned by the hour</option>
+          </select></label>
+        <span id="m-weather-said" class="muted wide"></span>
+        <table class="rows wide" id="m-wind" data-field="weather" data-kind="weather">
+          <thead><tr><th>at</th><th>from (deg)</th><th>knots</th><th>air</th><th></th></tr></thead><tbody></tbody>
+        </table>
+        <div class="form-actions wide"><button type="button" id="btn-m-wind-add">a waypoint more</button></div>
+      </fieldset>
+      <fieldset><legend>The sea about her</legend>
+        <label>Business <select data-field="business" data-kind="business"><option value=""></option><option value="on">on</option><option value="off">off</option></select></label>
+        <label>Crewed cap <input data-field="crewed.cap" data-kind="number" type="number" step="1"></label>
+        <label>Crewed range (miles) <input data-field="crewed.range_nm" data-kind="number" type="number" step="any"></label>
+        <label class="wide">Ports <input data-field="ports" data-kind="csv" type="text" placeholder="falmouth, plymouth, brest"></label>
+        <table class="rows wide" id="m-ships" data-field="ships" data-kind="ships">
+          <thead><tr><th>id</th><th>description</th><th>name</th><th>nation</th><th>position</th><th>intent (goal)</th><th>colours</th><th></th></tr></thead><tbody></tbody>
+        </table>
+        <div class="form-actions wide"><button type="button" id="btn-m-ship-add">another sail</button></div>
+        <table class="rows wide" id="m-world-orders" data-field="world_orders" data-kind="world_orders">
+          <thead><tr><th>at</th><th>world order</th><th></th></tr></thead><tbody></tbody>
+        </table>
+        <div class="form-actions wide"><button type="button" id="btn-m-order-add">a world order by time</button></div>
+      </fieldset>
+      <fieldset><legend>The orders</legend>
+        <div class="wide checks" id="m-books" data-field="standing_orders" data-kind="books"></div>
+        <label class="wide">A drafted book <textarea id="m-book" rows="3" placeholder="standing orders of your own, written beside the scenario as its .orders file"></textarea></label>
+        <label class="wide">First orders <textarea data-field="orders" data-kind="lines" rows="3" placeholder="one order a line, given at tick 0"></textarea></label>
+      </fieldset>
+      <fieldset><legend>The stations and who holds them</legend>
+        <div class="wide station-holders" id="m-stations"></div>
+      </fieldset>
+      <fieldset><legend>The director</legend>
+        <label>Brief <select id="m-brief-mode" data-field="director" data-kind="director">
+            <option value="">no director</option>
+            <option value="starter">a starter</option>
+            <option value="named">a file, or words</option>
+            <option value="written">written here</option>
+          </select></label>
+        <label id="m-brief-starter-label">Starter <select id="m-brief-starter" data-field="director" data-kind="director"></select></label>
+        <label id="m-brief-named-label" class="wide">File or words <input id="m-brief-named" data-field="director" data-kind="director" type="text"></label>
+        <div id="m-brief-written" class="wide brief-written">
+          <div class="form-actions"><select id="m-brief-from"></select><button type="button" id="btn-m-brief-from">start from this starter</button></div>
+          <label>Name <input data-brief="name" type="text"></label>
+          <label class="wide">Tone <textarea data-brief="tone" rows="3"></textarea></label>
+          <label class="wide">Challenge <textarea data-brief="challenge" rows="2"></textarea></label>
+          <label>Wind at most (knots) <input data-brief="limits.wind_max_kn" data-num="1" type="number" step="any"></label>
+          <label>Gale at most (force) <input data-brief="limits.gale_max_force" data-num="1" type="number" step="1"></label>
+          <label>Enemy heaviest <input data-brief="limits.enemy_heaviest" type="text" placeholder="brig"></label>
+          <label class="check"><input data-brief="limits.nobody_dies" type="checkbox"> nobody dies</label>
+          <label class="check"><input data-brief="limits.the_war_as_it_is" type="checkbox"> the war as it is</label>
+          <label class="check"><input data-brief="limits.the_chart_as_it_is" type="checkbox"> the chart as it is</label>
+          <label>Cadence <select data-brief="cadence"><option value=""></option><option>glass</option><option>watch</option></select></label>
+          <label>Samples a day <input data-brief="budget.samples_a_day" data-num="1" type="number" step="1"></label>
+          <label>Acts a day <input data-brief="budget.acts_a_day" data-num="1" type="number" step="1"></label>
+        </div>
+      </fieldset>
+      <div class="form-actions maker-actions">
+        <label>File name <input id="m-name" type="text" placeholder="my-passage"></label>
+        <label class="check"><input id="m-overwrite" type="checkbox"> write over one of that name</label>
+        <button id="btn-m-prove" type="button">prove it</button>
+        <button id="btn-m-save" type="submit">save in my scenarios</button>
+        <span id="m-place" class="muted"></span>
+      </div>
+    </form>
+    <p id="m-refusal" class="refusal" hidden></p>
+    <pre id="m-words" class="words" hidden></pre>
+    <pre id="m-text" class="words scenario-text" hidden></pre>
+  </div>
+</section>
+
+<!-- ======================= the settings ======================= -->
+<section class="tab-page" data-page="settings" hidden>
+  <div class="panel">
+    <div class="panel-head"><span>The settings</span><span class="hint" id="st-path"></span></div>
+    <p class="note">Kept outside the game's folder; a flag given on a command line wins over them for that run. <b>No key is kept here</b>: the API door's key stays in the credential store (<code>py -m freesail.agents.api --store-key</code>). A model's name may live here, and nowhere in the repository, a save or a log.</p>
+    <ul id="st-credential" class="plain-list muted"></ul>
+    <form id="settings" class="form-grid" autocomplete="off">
+      <fieldset class="wide"><legend>The game's defaults</legend>
+        <label>Seat <input data-set="game.seat" type="text" placeholder="the captain at the prompt"></label>
+        <label>Compression <input data-set="game.compression" data-num="1" type="number" step="any"></label>
+        <label>Pace <select data-set="game.pace"><option>rule</option><option>lockstep</option><option>free</option></select></label>
+        <label>Crewed cap <input data-set="game.crewed.cap" data-num="1" type="number" step="1"></label>
+        <label>Crewed range <input data-set="game.crewed.range_nm" data-num="1" type="number" step="any"></label>
+        <label>Port <input data-set="server.port" data-num="1" type="number" step="1"></label>
+        <label class="check"><input data-set="server.open_browser" type="checkbox"> open the browser at the start</label>
+      </fieldset>
+      <fieldset class="wide"><legend>The places</legend>
+        <label class="wide">Saves <input data-set="places.saves" type="text"></label>
+        <label class="wide">Your scenarios <input data-set="places.scenarios" type="text"></label>
+        <label class="wide">Consent records <input data-set="places.consent_records" type="text" placeholder="the game's own (docs/agents/consent); read at the server's start"></label>
+        <label class="wide">The desktop client's file <input data-set="places.desktop_config" type="text"></label>
+      </fieldset>
+      <fieldset class="wide"><legend>The desktop client's bridge</legend>
+        <label class="wide">Model's name <input data-set="doors.desktop.model_name" type="text" placeholder="exactly as the client's model menu shows it"></label>
+        <label>Command <input data-set="doors.desktop.command" type="text" placeholder="py on Windows, python3 elsewhere"></label>
+        <label>Wait (s) <input data-set="doors.desktop.wait" data-num="1" type="number" step="any"></label>
+      </fieldset>
+      <fieldset class="wide"><legend>The API door</legend>
+        <label class="wide">Model <input data-set="doors.api.model" type="text" placeholder="exactly as the API knows it"></label>
+        <label>Dialect <select data-set="doors.api.dialect"><option>anthropic</option><option>openrouter</option></select></label>
+        <label>Effort <input data-set="doors.api.effort" type="text"></label>
+        <label class="wide">Flags <input data-set="doors.api.flags" data-list="1" type="text" placeholder="--cadence watch"></label>
+      </fieldset>
+      <fieldset class="wide"><legend>The local runner</legend>
+        <label class="wide">Endpoint <input data-set="doors.local.endpoint" type="text"></label>
+        <label>Model <input data-set="doors.local.model" type="text"></label>
+        <label class="wide">Flags <input data-set="doors.local.flags" data-list="1" type="text" placeholder="--ctx 32768 --seed 7"></label>
+      </fieldset>
+      <div class="form-actions wide">
+        <button id="btn-settings-save" type="submit">keep the settings</button>
+        <button id="btn-shortcut-show" type="button">a shortcut to the harbour</button>
+        <button id="btn-shortcut-write" type="button" hidden>write the shortcut</button>
+      </div>
+    </form>
+    <p id="st-refusal" class="refusal" hidden></p>
+    <pre id="st-words" class="words" hidden></pre>
+  </div>
+</section>
+
+</main>
+<script src="/client/harbour.js"></script>
+</body>
+</html>

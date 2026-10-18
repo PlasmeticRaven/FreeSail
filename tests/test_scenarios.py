@@ -120,3 +120,117 @@ def test_portugal_is_a_passage_on_the_whole_chart_from_oporto_to_the_road_of_bel
     assert chart.depth_at(bar) > 10.0 and world.tide.area_at(bar).id == "tagus-bar"
     assert begin(world, sf) >= 10
     assert not [e for e in world.log if e.kind == "order.rejected"]
+
+
+# ---------------------------------------------------------------------------
+# Package 59 (spec M7b §21e): a scenario written as well as read
+# ---------------------------------------------------------------------------
+
+SCENARIOS = ROOT / "data" / "scenarios"
+THE_FOUR = ("smack-falmouth", "lugger-roscoff", "directed-passage", "dispatches-falmouth")
+
+
+def test_every_scenario_of_the_game_is_written_again_byte_for_byte_with_nothing_changed():
+    """The maker's promise (truth 7b-109's half): the text a file's fields were read from,
+    written with those same fields, is the same text, every comment kept."""
+    from freesail.world.scenarios import read_scenario_text, scenario_text
+
+    files = sorted(SCENARIOS.glob("*.yaml"))
+    assert len(files) > 25
+    for path in files:
+        text, fields = read_scenario_text(path)
+        assert scenario_text(fields, text) == text, path.name
+
+
+def test_a_change_rewrites_its_own_field_and_keeps_every_other_line_and_comment():
+    from freesail.world.scenarios import read_scenario_text, scenario_text
+
+    text, fields = read_scenario_text(SCENARIOS / "directed-passage.yaml")
+    fields["seed"] = 9
+    fields["position"] = {"lat_deg": 50.0, "lon_deg": -5.1}
+    fields["stations"] = {"officer": "player", "captain": "model"}
+    del fields["ships"]
+    out = scenario_text(fields, text)
+    old, new = text.splitlines(), out.splitlines()
+    assert "seed: 9" in new and "seed: 7" not in new
+    # the comment beside the position kept on its new line
+    assert any(
+        ln.startswith("position: {lat_deg: 50.0, lon_deg: -5.1}") and "Imray 1874" in ln
+        for ln in new
+    )
+    # the other sail gone with its comment; the stations put in before the director
+    assert "ships:" not in new and not any("merchant passage's dozen" in ln for ln in new)
+    assert new.index("stations: {officer: player, captain: model}") < new.index("director:")
+    # every other line as it was, the header and the weather's comments among them
+    kept = [ln for ln in old if ln in new]
+    assert old[:12] == new[:12] and len(kept) > len(old) - 40
+
+
+def test_a_new_scenario_is_in_the_hands_form_and_loads_as_the_hand_written_one(tmp_path):
+    """Written from the fields alone (a new file), each of the owner's scenarios loads to
+    the same Scenario as its hand-written file, and reads back to itself."""
+    from freesail.world.scenarios import read_scenario_text, scenario_text, write_scenario
+
+    for stem in THE_FOUR:
+        text, fields = read_scenario_text(SCENARIOS / f"{stem}.yaml")
+        path = write_scenario(fields, tmp_path / f"{stem}.yaml")
+        new = path.read_text(encoding="utf-8")
+        assert new.startswith("# FreeSail: ") and "py -m freesail.ui.server --scenario" in new
+        assert "# The ship: her file" in new
+        assert (
+            load_scenario(path).scenario.__dict__
+            == load_scenario(SCENARIOS / f"{stem}.yaml").scenario.__dict__
+        )
+        again_text, again = read_scenario_text(path)
+        assert scenario_text(again, again_text) == new
+
+
+def test_a_windows_written_file_keeps_its_line_endings(tmp_path):
+    from freesail.world.scenarios import newline_of, read_scenario_text, write_scenario
+
+    src = tmp_path / "crlf.yaml"
+    src.write_bytes((SCENARIOS / "smack-falmouth.yaml").read_bytes().replace(b"\n", b"\r\n"))
+    text, fields = read_scenario_text(src)
+    assert newline_of(src) == "\r\n"
+    out = write_scenario(fields, tmp_path / "out.yaml", text, newline=newline_of(src))
+    assert out.read_bytes() == src.read_bytes()
+
+
+def test_the_stations_and_who_holds_them_are_read_and_the_players_seat_given(tmp_path):
+    from freesail.world.scenarios import ScenarioError
+
+    p = tmp_path / "s.yaml"
+    p.write_text("name: s\nstations: {captain: model, officer: player, director: model}\n")
+    sf = load_scenario(p)
+    assert sf.stations == {"captain": "model", "officer": "player", "director": "model"}
+    assert sf.player_seat == "officer"
+    p.write_text("name: s\nstations: {captain: player}\n")
+    assert load_scenario(p).player_seat is None  # the captain at the prompt is no seat
+    for bad, words in (
+        ("stations: {officer: player, director: player}", "one station"),
+        ("stations: {officer: somebody}", "not a holder"),
+        ("stations: [officer]", "a mapping"),
+    ):
+        p.write_text(f"name: s\n{bad}\n")
+        try:
+            load_scenario(p)
+        except ScenarioError as e:
+            assert words in str(e)
+        else:
+            raise AssertionError(bad)
+
+
+def test_a_scenarios_seat_is_the_players_at_either_driver_unless_the_flag_says_otherwise(
+    tmp_path,
+):
+    from freesail.ui.server import prepare_game, server_parser
+
+    p = tmp_path / "seated.yaml"
+    text = (SCENARIOS / "lesson-falmouth.yaml").read_text(encoding="utf-8")
+    p.write_text(text + "\nstations: {officer: player}\n", encoding="utf-8")
+    args = server_parser().parse_args(["--scenario", str(p)])
+    world = prepare_game(args, say=lambda line: None)
+    assert world.player_seat.station.name == "officer of the watch"
+    args = server_parser().parse_args(["--scenario", str(p), "--seat", "captain"])
+    world = prepare_game(args, say=lambda line: None)
+    assert getattr(world, "player_seat", None) is None  # the flag wins over the file

@@ -2,6 +2,8 @@
 
 Every noun the parser accepts is a part of the ship, a group of parts, or an alias for one, and all of them come from the ship file (`data/ships/frigate-36.yaml`, `data/ships/topsail-schooner.yaml`). This chapter walks the two ships from forward to aft and from the deck upward, naming each part as an officer of 1805 would have named it, so that you can point at anything. Definitions are Falconer's unless another source is given.
 
+To go aboard, type `py -m freesail` in the game's folder (`python3 -m freesail` off Windows): the harbour opens in your browser, where you choose a scenario or a ship, your station, the speed of the clock and, if you like, a director above the game, and *start the game*; *go to the game* then opens the ship, with the clock held until you say `go`. The harbour also makes scenarios of your own and connects a model to a station (the harness's section 22). The console of the later chapters (`python -m freesail.ui.console ...`) is the same game at a terminal.
+
 ## How names work
 
 A part has an id in the file, such as `fore.topsail.yard`, and the parser accepts it as words: "fore topsail yard". It also accepts the contractions a seaman would use (Falconer prints them; Luce speaks them): *tops'l*, *t'gallant*, *stuns'l*, *cro'jack*, *stays'l*, *halliard*. Apostrophes may be left out. "Port" is accepted for larboard and echoed in the log as larboard. "The" is ignored.

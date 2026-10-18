@@ -863,9 +863,13 @@ def start_world(args: argparse.Namespace) -> tuple[World, Any]:
             raise SystemExit("--wind and --scenario: the scenario's weather script is the wind.")
         if args.heading is not None:
             sf.scenario.ship_heading_deg = args.heading
+        if getattr(args, "business", None):  # the server's flag (package 59), over the file's
+            sf.scenario.business = args.business
         return make_scenario_world(sf, seed=args.seed, ship=args.ship), sf
     seed = args.seed if args.seed is not None else DEFAULT_SEED
     scenario = Scenario()
+    if getattr(args, "business", None):
+        scenario.business = args.business
     if args.wind:
         d, s = args.wind.split(",")
         scenario.wind_from_deg, scenario.wind_speed_kn = float(d), float(s)
@@ -1001,8 +1005,10 @@ def main(argv: list[str] | None = None) -> int:
         world.crewed_settings = crewed_settings_of(
             {"cap": args.crewed_cap, "range_nm": args.crewed_range}, "the flags"
         )
-    if args.seat:
-        seat_player(world, args.seat, door="console")
+    # the player's seat: the flag's, else the scenario file's (`stations:`, package 59)
+    seat = args.seat or (scenario_file.player_seat if scenario_file is not None else None)
+    if seat and " ".join(str(seat).lower().split()) != "captain":  # the captain's is his own
+        seat_player(world, seat, door="console")
 
     console = Console(
         world,

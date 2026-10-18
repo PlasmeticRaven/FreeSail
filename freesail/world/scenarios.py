@@ -74,6 +74,10 @@ ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
       - data/standing_orders/starter.orders
     orders:                          # the captain's first orders, given at tick 0
       - set plain sail
+    stations:                        # who holds the stations (package 59): `player` the
+      officer: player                # player's seat (as --seat, which wins), `model` a
+      captain: model                 # model's door (the harbour offers it), `rules` the
+      director: model                # game's own; one seat for the player at most
 
 The papers may be given whole (§27) under `papers:`: `chart: {year: 1804}`, `epitome:
 norie`, `almanac: 1805`, `chronometer: {...}` (the ship's line wins where both say),
@@ -84,10 +88,19 @@ holds it and a replay follows it; the standing orders and the first orders are g
 orders, journaled like any, so a replay gives them again. A driver builds the World with
 `start`: the ship, the watcher (if asked for) and then the files and the orders, which is
 the order `--standing-orders` has always kept.
+
+A scenario is written as well as read (package 59; spec M7b §21e): `write_scenario` puts a
+mapping of these fields in a file of this form, with the comments a hand would want; given
+the text the mapping was read from, it keeps every top-level block of that text whose value
+is unchanged, comments and all, and writes again only the blocks that changed, so that a
+file read into the harbour's scenario maker and written with nothing changed is the same
+file, byte for byte.
 """
 
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
@@ -125,6 +138,18 @@ class ScenarioFile:
     ship_file: str | None = None
     standing_orders: list[str] = field(default_factory=list)
     orders: list[str] = field(default_factory=list)
+    # who holds the stations (package 59): the station's name to player, model or rules
+    stations: dict[str, str] = field(default_factory=dict)
+
+    @property
+    def player_seat(self) -> str | None:
+        """The station the file seats the player at (`stations: {officer: player}`), as
+        `--seat` would; None when he is the captain at the prompt or the file says nothing.
+        A seat given on the command line wins."""
+        for name, holder in self.stations.items():
+            if holder == "player" and name != "captain":
+                return name
+        return None
 
     @property
     def script(self) -> WeatherScript | None:
@@ -589,7 +614,40 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         ship_file=str(ship["file"]) if ship.get("file") else None,
         standing_orders=standing_orders,
         orders=[str(x) for x in raw.get("orders") or []],
+        stations=_stations(raw.get("stations"), where),
     )
+
+
+# Who may hold a station in a scenario file (package 59): the player's seat, a model's
+# door, or the game's own (the rules-based captain, a station nobody holds).
+STATION_HOLDERS = ("player", "model", "rules")
+
+
+def _stations(value: Any, where: str) -> dict[str, str]:
+    """`stations:`, read: each station's holder, one seat for the player at most."""
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise ScenarioError(
+            f"{where}, stations: a mapping of each station to who holds it "
+            f"({', '.join(STATION_HOLDERS)})."
+        )
+    out: dict[str, str] = {}
+    for k, v in value.items():
+        name = " ".join(str(k).lower().split())
+        holder = " ".join(str(v).lower().split())
+        if holder not in STATION_HOLDERS:
+            raise ScenarioError(
+                f"{where}, stations {name}: '{v}' is not a holder; say "
+                f"{', '.join(STATION_HOLDERS[:-1])} or {STATION_HOLDERS[-1]}."
+            )
+        out[name] = holder
+    players = [k for k, v in out.items() if v == "player"]
+    if len(players) > 1:
+        raise ScenarioError(
+            f"{where}, stations: the player holds one station, not {' and '.join(players)}."
+        )
+    return out
 
 
 def make_scenario_world(sf: ScenarioFile, seed: int | None = None, ship: str | None = None):
@@ -617,3 +675,414 @@ def begin(world: World, sf: ScenarioFile) -> int:
         world.submit(text)
         n += 1
     return n
+
+
+# ---------------------------------------------------------------------------
+# Writing a scenario (package 59; spec M7b §21e): the harbour's scenario maker
+# ---------------------------------------------------------------------------
+
+# The fields in the order a new file is written in (the docstring's); a field not named
+# here goes at the end. And the comment a hand would want above each section.
+FIELD_ORDER: tuple[str, ...] = (
+    "name",
+    "seed",
+    "start",
+    "latitude_deg",
+    "position",
+    "region",
+    "chart",
+    "nation",
+    "ship",
+    "wind",
+    "intent",
+    "people",
+    "papers",
+    "cargo",
+    "ports",
+    "business",
+    "crewed",
+    "current",
+    "weather",
+    "ships",
+    "world_orders",
+    "standing_orders",
+    "orders",
+    "stations",
+    "director",
+)
+
+SECTION_COMMENTS: dict[str, str] = {
+    "position": "Where she lies at the start: a port's road from the chart, or a place pricked "
+    "on it, with the chart's region.",
+    "ship": "The ship: her file, her heading, the glass and the master's instrument.",
+    "intent": "The captain's intent (spec M6 §4): the rules captain sails by it when nobody "
+    "holds the station; a model captain reads it as his night orders.",
+    "people": "People beyond the muster's posts.",
+    "papers": "The ship's papers: the chart's year, the epitome, the almanac, the price lists.",
+    "cargo": "The purse and the hold.",
+    "ports": "The ports in play, and their state at the start.",
+    "business": "The world's business (spec M6 §19): the trade, the fishermen and the cruisers "
+    "drawn under the seed.",
+    "crewed": "The crewed promotion's budget: how many ships beside hers are fully crewed at "
+    "once, and within how many miles.",
+    "weather": "The weather: the month's climatology, or the wind pinned by the hour (the "
+    "primer's forms).",
+    "ships": "The other sail on the sea at the start, each with her intent.",
+    "world_orders": "The world orders by time.",
+    "standing_orders": "The standing orders read at the start.",
+    "orders": "The captain's first orders, given at tick 0.",
+    "stations": "Who holds the stations: player (your seat), model (a model's door), rules "
+    "(the game's own).",
+    "director": "The director above the game (spec M7b §4): the player's brief, a starter's "
+    "name, a file or the brief itself, with its limits.",
+}
+
+_KEY_LINE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*)\s*:(?:\s|$)")
+_FLOW_DICT_MAX = 60  # characters: a mapping of plain values this short is written on one line
+_FLOW_LIST_MAX = 90  # and a list of plain values
+
+
+def scenario_value(value: Any) -> Any:
+    """A scenario's value as JSON carries it (the harbour's form): dates and times as their
+    ISO words, tuples as lists, a mapping's keys as words."""
+    if isinstance(value, datetime | date):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {str(k): scenario_value(v) for k, v in value.items()}
+    if isinstance(value, list | tuple):
+        return [scenario_value(v) for v in value]
+    return value
+
+
+def _same_value(v: Any) -> Any:
+    """A value for comparing what a form sent with what a file held: a whole float is its
+    integer (a form's 190 is a file's 190.0); a boolean stays a boolean."""
+    v = scenario_value(v)
+    if isinstance(v, bool) or v is None or isinstance(v, str):
+        return v
+    if isinstance(v, int | float):
+        f = float(v)
+        return int(f) if f.is_integer() else f
+    if isinstance(v, dict):
+        return {k: _same_value(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [_same_value(x) for x in v]
+    return v
+
+
+def same_fields(a: Any, b: Any) -> bool:
+    """Whether two scenarios' fields (or two fields) say the same, as `_same_value` reads them."""
+    return json.dumps(_same_value(a), sort_keys=True) == json.dumps(_same_value(b), sort_keys=True)
+
+
+def read_scenario_text(path: str | Path) -> tuple[str, dict[str, Any]]:
+    """A scenario file's text and its fields as the harbour's form takes them. Raises
+    `ScenarioError` (or `OSError`) in words."""
+    p = Path(path)
+    text = p.read_text(encoding="utf-8")
+    try:
+        raw = yaml.safe_load(text) or {}
+    except yaml.YAMLError as e:
+        raise ScenarioError(f"{p}: not a YAML file ({e}).") from None
+    if not isinstance(raw, dict):
+        raise ScenarioError(f"{p}: a scenario file is a mapping of fields.")
+    return text, scenario_value(raw)
+
+
+def _flow(value: Any) -> str:
+    """One value in YAML's flow form, on one line."""
+    text = yaml.safe_dump(
+        value, default_flow_style=True, width=1 << 20, allow_unicode=True, sort_keys=False
+    ).strip()
+    if text.endswith("\n..."):
+        text = text[: -len("\n...")].strip()
+    elif text == "...":
+        text = ""
+    return text
+
+
+def _plain(value: Any) -> bool:
+    return not isinstance(value, dict | list)
+
+
+def _flat(value: Any) -> bool:
+    """A mapping or a list that may go on one line: plain values, or (in a mapping) lists
+    of plain values."""
+    if isinstance(value, dict):
+        return all(
+            _plain(v) or (isinstance(v, list) and all(_plain(x) for x in v)) for v in value.values()
+        )
+    if isinstance(value, list):
+        return all(_plain(v) for v in value)
+    return True
+
+
+def _emit(key: str, value: Any, indent: int) -> list[str]:
+    """The lines of `key: value` at an indent, in the hand's form: a plain value on the key's
+    line; a short plain mapping or list in flow; a list of mappings an item a line, in flow
+    where the item is plain and else as a block; any other mapping as a block."""
+    pad = " " * indent
+    if isinstance(value, bool) and key == "business":
+        return [f"{pad}{key}: {'on' if value else 'off'}"]  # the hand's words, read the same
+    if isinstance(value, str) and len(value) > _FLOW_LIST_MAX - indent:
+        folded = _folded(key, value, indent)
+        if folded:
+            return folded
+    if _plain(value) or not value:
+        return [f"{pad}{key}: {_flow(value)}".rstrip()]
+    if isinstance(value, dict):
+        flow = _flow(value)
+        if _flat(value) and len(flow) <= _FLOW_DICT_MAX:
+            return [f"{pad}{key}: {flow}"]
+        out = [f"{pad}{key}:"]
+        for k, v in value.items():
+            out += _emit(str(k), v, indent + 2)
+        return out
+    if all(_plain(v) for v in value):
+        flow = _flow(value)
+        sentences = any(isinstance(v, str) and " " in v for v in value)
+        if len(flow) <= _FLOW_LIST_MAX and not sentences:
+            return [f"{pad}{key}: {flow}"]
+        return [f"{pad}{key}:"] + [f"{pad}  - {_flow(v)}" for v in value]
+    out = [f"{pad}{key}:"]
+    for item in value:
+        out += _emit_item(item, indent + 2)
+    return out
+
+
+def _folded(key: str, value: str, indent: int, width: int = 92) -> list[str] | None:
+    """A long sentence as a hand writes it, folded (`key: >-` and the words wrapped
+    beneath), or None where folding would not read back as the same words (a line break,
+    a double space, a space at either end)."""
+    if "\n" in value or "  " in value or value != value.strip() or "\t" in value:
+        return None
+    pad = " " * (indent + 2)
+    lines: list[str] = []
+    line = ""
+    for w in value.split(" "):
+        if line and len(pad) + len(line) + 1 + len(w) > width:
+            lines.append(pad + line)
+            line = w
+        else:
+            line = f"{line} {w}" if line else w
+    lines.append(pad + line)
+    out = [f"{' ' * indent}{key}: >-"] + lines
+    try:
+        back = yaml.safe_load("\n".join(ln[indent:] for ln in out))
+    except yaml.YAMLError:
+        return None
+    return out if back == {key: value} else None
+
+
+def _flow_wrapped(prefix: str, value: dict[str, Any], width: int = 92) -> list[str]:
+    """A plain mapping in flow after `prefix`, wrapped between its entries at `width` as a
+    hand wraps the other sail's lines, the next lines under the brace's first entry."""
+    entries = [_flow({k: v})[1:-1] for k, v in value.items()]
+    lines: list[str] = []
+    line = prefix + "{"
+    for i, e in enumerate(entries):
+        piece = e + ("}" if i == len(entries) - 1 else ",")
+        if i and len(line) + 1 + len(piece) > width:
+            lines.append(line)
+            line = " " * (len(prefix) + 1) + piece
+        else:
+            line += ("" if i == 0 else " ") + piece
+    lines.append(line)
+    return lines
+
+
+def _emit_item(item: Any, indent: int) -> list[str]:
+    pad = " " * indent
+    if isinstance(item, dict) and item and _flat(item):
+        return _flow_wrapped(f"{pad}- ", item)
+    if not isinstance(item, dict) or not item:
+        return [f"{pad}- {_flow(item)}"]
+    out: list[str] = []
+    for i, (k, v) in enumerate(item.items()):
+        lines = _emit(str(k), v, indent + 2)
+        if i == 0:
+            lines[0] = f"{pad}- {lines[0].lstrip()}"
+        out += lines
+    return out
+
+
+def _comment_lines(words: str, width: int = 92) -> list[str]:
+    out: list[str] = []
+    line = "#"
+    for w in words.split():
+        if len(line) + 1 + len(w) > width:
+            out.append(line)
+            line = "#"
+        line += " " + w
+    out.append(line)
+    return out
+
+
+def _section(key: str, value: Any) -> list[str]:
+    """A field's lines with its section's comment above it."""
+    words = SECTION_COMMENTS.get(key)
+    return (_comment_lines(words) if words else []) + _emit(key, value, 0)
+
+
+def _header(raw: dict[str, Any], path: str | None) -> list[str]:
+    name = str(raw.get("name") or "a scenario")
+    where = Path(path).as_posix() if path else "<this file>"
+    return [
+        *_comment_lines(
+            f"FreeSail: {name}. Made with the harbour's scenario maker (py -m freesail; "
+            "package 59) in the form a hand writes (freesail/world/scenarios.py names every "
+            "field), so that it may be edited here as well as in the harbour. Given to either "
+            "driver with --scenario:"
+        ),
+        f"#     py -m freesail.ui.server --scenario {where}",
+        f"#     py -m freesail.ui.console --scenario {where}",
+        "",
+    ]
+
+
+def _ordered(raw: dict[str, Any]) -> list[str]:
+    known = [k for k in FIELD_ORDER if k in raw]
+    return known + [k for k in raw if k not in FIELD_ORDER]
+
+
+@dataclass
+class _Block:
+    """A top-level field of a file's text, by line: its comments just above it, its key's
+    line, and one past its body's last line."""
+
+    key: str
+    lead: int
+    start: int
+    end: int
+
+
+def _blocks(lines: list[str]) -> list[_Block]:
+    """The top-level fields of a file's lines. A field's leading comments are the comment
+    lines at the margin just above its key, with no blank line between; its body runs to
+    its last indented line before the next field's comments (a margin comment or a blank
+    line after it belongs to the space between)."""
+    starts = [(m.group(1), i) for i, ln in enumerate(lines) if (m := _KEY_LINE.match(ln))]
+    blocks: list[_Block] = []
+    for key, i in starts:
+        floor = blocks[-1].start + 1 if blocks else 0
+        lead = i
+        while lead - 1 >= floor and lines[lead - 1].startswith("#"):
+            lead -= 1
+        blocks.append(_Block(key, lead, i, i + 1))
+    for n, b in enumerate(blocks):
+        stop = blocks[n + 1].lead if n + 1 < len(blocks) else len(lines)
+        for j in range(b.start + 1, stop):
+            if lines[j].strip() and not lines[j].startswith("#"):
+                b.end = j + 1
+    return blocks
+
+
+def _inline_comment(line: str) -> str:
+    """A field's comment beside it on its one line (`position: {...}   # Carrick Road`),
+    found where cutting it leaves the same value; '' when there is none."""
+    body = line.rstrip("\n")
+    for m in reversed(list(re.finditer(r"\s+#", body))):
+        try:
+            if yaml.safe_load(body[: m.start()]) == yaml.safe_load(body):
+                return body[m.start() :]
+        except yaml.YAMLError:
+            continue
+    return ""
+
+
+def scenario_text(
+    raw: dict[str, Any], original: str | None = None, path: str | Path | None = None
+) -> str:
+    """The text of a scenario file holding the fields `raw` (spec M7b §21e). Without
+    `original`, a new file in the hand's form: a header saying how to start it, each
+    section under its comment. With the text the fields were read from, that text with the
+    changed fields alone written again: a field unchanged keeps its lines and the comments
+    above and beside it (so nothing changed is the same text, byte for byte); a field taken
+    out goes with its comments; a field put in goes after the field it follows in the
+    hand's order, under its section's comment. Proved before it is returned: the text read
+    back says the same fields, else `ScenarioError`."""
+    raw = {str(k): v for k, v in raw.items()}
+    if original is None or not _blocks(original.splitlines(keepends=True)):
+        lines = _header(raw, str(path) if path else None)
+        for i, key in enumerate(_ordered(raw)):
+            if i and key in SECTION_COMMENTS:
+                lines.append("")
+            lines += _section(key, raw[key]) if key in SECTION_COMMENTS else _emit(key, raw[key], 0)
+        text = "\n".join(lines) + "\n"
+    else:
+        text = _rewrite(raw, original)
+    try:
+        back = yaml.safe_load(text) or {}
+    except yaml.YAMLError as e:  # pragma: no cover - a fault of the writer's
+        raise ScenarioError(f"the scenario's text is not YAML ({e}).") from None
+    if not same_fields(back, raw):
+        raise ScenarioError("the scenario's text does not read back as its fields.")
+    return text
+
+
+def _rewrite(raw: dict[str, Any], original: str) -> str:
+    try:
+        old = yaml.safe_load(original) or {}
+    except yaml.YAMLError:
+        old = {}
+    old = old if isinstance(old, dict) else {}
+    lines = original.splitlines(keepends=True)
+    if lines and not lines[-1].endswith("\n"):
+        lines[-1] += "\n"
+    blocks = _blocks(lines)
+    present = {b.key for b in blocks}
+    order = _ordered(raw)
+    # the fields put in, each after the nearest field before it in the hand's order
+    added: dict[str, list[str]] = {}
+    for key in order:
+        if key in present:
+            continue
+        before = (
+            [k for k in FIELD_ORDER[: FIELD_ORDER.index(key)] if k in present]
+            if (key in FIELD_ORDER)
+            else [b.key for b in blocks]
+        )
+        anchor = before[-1] if before else ""
+        added.setdefault(anchor, [])
+        added[anchor] += ["\n"] + [ln + "\n" for ln in _section(key, raw[key])]
+    out = list(lines[: blocks[0].lead])
+    if "" in added:
+        out += added[""][1:] + ["\n"]
+    for n, b in enumerate(blocks):
+        stop = blocks[n + 1].lead if n + 1 < len(blocks) else len(lines)
+        tail = lines[b.end : stop]
+        if b.key not in raw:
+            if tail and not tail[0].strip():
+                tail = tail[1:]  # the field cut, with its comments and the blank line after
+        elif b.key in old and same_fields(old[b.key], raw[b.key]):
+            out += lines[b.lead : b.end]
+        else:
+            new = _emit(b.key, raw[b.key], 0)
+            if b.end - b.start == 1 and len(new) == 1:
+                new[0] += _inline_comment(lines[b.start])  # its comment beside it, kept
+            out += lines[b.lead : b.start] + [ln + "\n" for ln in new]
+        out += added.get(b.key, [])
+        out += tail
+    return "".join(out)
+
+
+def newline_of(path: str | Path) -> str:
+    """The line ending a file was written with ('\\r\\n' where Windows wrote it), so that
+    one written again keeps it; '\\n' for a file that is not there."""
+    try:
+        return "\r\n" if b"\r\n" in Path(path).read_bytes() else "\n"
+    except OSError:
+        return "\n"
+
+
+def write_scenario(
+    raw: dict[str, Any], path: str | Path, original: str | None = None, newline: str = "\n"
+) -> Path:
+    """Write a scenario's file (`scenario_text`), making its folder, with the line ending
+    given (the original's, `newline_of`), never the platform's by default."""
+    p = Path(path)
+    text = scenario_text(raw, original, path=p)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with p.open("w", encoding="utf-8", newline=newline) as f:
+        f.write(text)
+    return p

@@ -6923,3 +6923,89 @@ commit; the code as committed in `7014e9b`).
   `test_fishing.py`, `test_regatta.py`) found the ten pins above, re-measured once.
 - **The pace tests alone** (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the
   load 1.1 at their start and at the end): 6 passed.
+
+## Package 59: the harbour (2026-10-18)
+
+The launcher, the scenario maker and the settings (spec M7b §21d to §21f; the owner, 2026-10-17;
+`docs/dev/M7b-WorkPackages.md`, "Package 59"). Built on `06015d3` beside package 62. No
+simulation figure was tuned: the package is a page, a writer of files and a settings file.
+
+### What was built, and the reading taken
+
+- **`py -m freesail`** (`freesail/__main__.py`) takes the server's whole command line, the
+  settings giving its defaults, and serves the harbour at `/harbour` in the same server.
+  The lead's reading held: the harbour is a form over the server's own start
+  (`server.prepare_game`, the server's `main` factored with every step in its old order) and
+  the driver (`Driver.replace_world`), one process, the game replaced in place.
+- **The scenario writer** keeps the file's own text wherever a field is unchanged. No
+  comment-keeping YAML library is installed (only PyYAML), so the writer cuts the text into
+  its top-level fields by line and rewrites only the changed ones; the form, for its part,
+  writes over the fields read only those the player touched. Together: **every scenario of
+  `data/scenarios/` (all 28) is written again byte for byte with nothing changed**, the
+  owner's four among them both by the writer and through the page in the browser.
+- **`stations:`** is a new field of the scenario file (the brief's "the stations and who
+  holds them"), read by the loader; its player's seat is taken by both drivers as `--seat`,
+  the flag winning. The console's only change is that line (and `--seat captain` now means
+  no seat, where it was refused in words); it is otherwise as it was.
+- **The doors** are the modules' own command lines run by the server (`sys.executable -m
+  freesail.agents.api` or `.local`); their stdin is a line in the pane, which is where the
+  owner answers a model in the consent conversation, as at the door's terminal.
+- **The key is never taken by the harbour**: it is put in the store at a terminal with
+  `--store-key` (package 42), and the harbour says only whether the store holds one. A form
+  field that carried a key to the server would be one more road for it; the brief's "the key
+  stays in the credential store as 42 left it" is read so.
+
+### Found on the way
+
+- **The dispatches scenario did not load at either driver**: it names the port `fowey`,
+  which has no file in `data/ports/` (the loader refuses: "no port file for 'fowey'"). The
+  tests only read its `business:`. Fowey taken out of its ports with a comment beside the
+  line; a Fowey port file (its roads, pilot and market with their sources) is content for a
+  later package, and the testing round's "the smack Falmouth to Fowey" wants it.
+- The server's `/` served the game page whatever the World; with no game yet it now leads
+  to the harbour (only under `py -m freesail`; a server started with a game is as before).
+- A station released by its door stays in the desk's list with its model's name (its line
+  says it is released): the harbour shows the list as the desk gives it.
+
+### The Windows pieces, tested by path
+
+On this Linux machine, by the platform's name and the environment given
+(`tests/test_settings.py`): the settings at `%APPDATA%\FreeSail\settings.yaml` (and the
+profile's `AppData\Roaming` when `APPDATA` is unset); the desktop client's file at
+`%APPDATA%\Claude\claude_desktop_config.json`; the entry's command `py`; the shortcut
+`%USERPROFILE%\Desktop\FreeSail.cmd` with its exact text (`cd /d "<folder>"`, `py -m
+freesail`, CRLF); a scenario written from a CRLF file keeps its CRLF. Not proved here: the
+client reading the written file, the shortcut double-clicked, a door stopped on Windows (no
+SIGINT there: it is terminated and the game releases its station), the browser opened by
+`webbrowser`. The owner's steps for these are in the report.
+
+### Pins unmoved
+
+No recorded passage, trial, day or regatta moves: the World is touched only by the start
+the server always made (now named `prepare_game`) and by `stations:`, which no recorded
+scenario has. The slow tier below passes against every digest and count it keeps (the
+recorded days, passages, cruise and trials of 4c to 6c, the director's and the ports' days,
+56's fishing and 57's rig), unchanged from `06015d3`.
+
+### The suite, as run
+
+On the build machine (four cores), beside package 62's builder; logs in the scratchpad's
+`p59/`.
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- **The fast tier** on the final code (`1e066d9`; `python3 -m pytest -n 4 -q -p
+  no:cacheprovider`): 3,460 passed, none failed, 329 slow left out (`fast2.log`). The first
+  run found two of the package's own: key-shaped test values the repository's key scan
+  caught (now put together at run time), and the server's flag test reading `main` where
+  the flags had moved to `server_parser` (now reads both).
+- **The slow tier of the files touched** (`test_harbour.py`, `test_settings.py`,
+  `test_scenarios.py`, `test_server.py`, `test_business.py`, `test_console.py`,
+  `test_api_door.py`, truths 7b-108 to 7b-110): passed but for a race in the harbour's
+  browser test (the stations shown from the poll before the start's own state; the page
+  now reads the state at once after a start, rerun and passed) and three pace tests, which
+  were run there by mistake beside 62's suite and belong alone (`slow-touched.log`).
+- **The slow tier whole** (`-m "not pace"`) was **cut off at 24 % by the container's
+  restart**, no test failed in what ran (`slow-whole.log`); not run again before the
+  report, at the lead's word: the lead's merge run is the whole slow tier's.
+- **The pace tests alone** (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the
+  load 1.6 at their start): 6 passed (`pace.log`).

@@ -9,6 +9,13 @@ Status: gate 5c passed (owner, 2026-10-08: a pass on the gate's build and a prov
 Requires Python 3.11 or newer.
 
 ```
+py -m pip install -e ".[dev,server,agents]"     # once (python3 in place of py off Windows)
+py -m freesail                                  # the harbour: start a game in the browser
+```
+
+`py -m freesail` starts the game's server and opens **the harbour** in the browser (package 59; `docs/agents/Harness.md` §22): a game started from a page with the server's flags as its controls (a scenario, the seat, the compression, the pace, a director's brief), the stations held and the doors up, the desktop client's entries written one per station, the API door and the local runner started with their panes, the scenario maker (a scenario read into a form and written back in the file's own form, unchanged where nothing changed) and your settings (`%APPDATA%\FreeSail\settings.yaml` on Windows; no key is ever in it). The clock is held at the start until you say `go`. The commands below are the same game by hand:
+
+```
 python -m pip install -e ".[dev]"
 python -m pytest -n auto      # the fast tier of the tests; add --slow for the whole suite (docs/gates/README.md)
 python -m freesail.ui.console data/ships/frigate-36.yaml --seed 7 --wind 0,15 --heading 293

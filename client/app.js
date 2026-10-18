@@ -142,6 +142,9 @@
         seaMap.setMarks(data.marks);
       } else if (data.type === "picture") {
         paintFor(data);
+      } else if (data.type === "restart") {
+        // a new game taken up from the harbour (package 59): the page reads it from its start
+        location.reload();
       }
     };
   }

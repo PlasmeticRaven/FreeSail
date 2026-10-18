@@ -6341,3 +6341,247 @@ def test_truth_7b_107_the_glass_on_the_palinure_hove_to_by_tiers_and_by_night():
     night = _palinure_at(0.35, hour=23)
     e = night.submit("the glass on the brig")
     assert "no light shows" in e.text and "aback" not in e.text, e.text
+
+
+# ---------------------------------------------------------------------------
+# Package 59: the harbour, the scenario maker and the settings (spec M7b §21d to §21f).
+# Truths 7b-108 to 7b-110. The model names are placeholders; the settings, the client's
+# file and the scenarios go to a temporary directory; the credential store is the test's.
+# ---------------------------------------------------------------------------
+
+PLACEHOLDER_MODEL = "placeholder-model-for-truth-110"  # made up: no model is named here
+HARBOUR_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _harbour_settings(tmp_path, **doors):
+    from freesail import settings as S
+
+    path = tmp_path / "player" / "settings.yaml"
+    s = S.load_settings(path)
+    s["places"]["desktop_config"] = str(tmp_path / "Claude" / "claude_desktop_config.json")
+    s["places"]["consent_records"] = str(tmp_path / "consent")
+    for door, values in doors.items():
+        s["doors"][door].update(values)
+    S.save_settings(s, path)
+    return path
+
+
+def test_truth_7b_108_py_m_freesail_opens_the_harbour_and_shows_a_started_game_and_the_doors(
+    tmp_path,
+):
+    """Spec M7b §21f, truth 108: "`py -m freesail` opens the harbour, a game is started
+    from it with a seat and a director's brief, and the doors' states are shown true." The
+    launcher run as the owner runs it (its own process, the browser not opened): the game's
+    page leads to the harbour; a game started there with the officer's seat and the
+    dispatches brief, the clock held; the desktop client's entries for the captain and the
+    director written and shown present; a local runner started with nobody serving its
+    model shown ended with its exit code, and the player shown at his station."""
+    import os
+    import socket
+    import subprocess
+    import time
+
+    httpx = pytest.importorskip("httpx")
+    pytest.importorskip("fastapi")
+    settings = _harbour_settings(tmp_path, local={"endpoint": "http://127.0.0.1:9"})
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+    proc = subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "freesail",
+            "--no-browser",
+            "--port",
+            str(port),
+            "--settings",
+            str(settings),
+        ],
+        cwd=str(tmp_path),  # from anywhere: the launcher goes to the game's folder
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        env={**os.environ, "PYTHONPATH": str(HARBOUR_ROOT)},
+    )
+    url = f"http://127.0.0.1:{port}"
+    try:
+        with httpx.Client(base_url=url, timeout=60) as c:
+            deadline = time.monotonic() + 60
+            while True:
+                try:
+                    first = c.get("/", follow_redirects=False)
+                    break
+                except httpx.TransportError:
+                    assert proc.poll() is None and time.monotonic() < deadline
+                    time.sleep(0.2)
+            assert first.status_code == 307 and first.headers["location"] == "/harbour"
+            assert "the harbour" in c.get("/harbour").text
+            r = c.post(
+                "/api/harbour/start",
+                json={
+                    "scenario": "data/scenarios/dispatches-falmouth.yaml",
+                    "seat": "officer",
+                    "director_brief": "dispatches",
+                },
+            )
+            assert r.status_code == 200, r.text
+            game = r.json()["game"]
+            assert game["started"] and not game["running"]
+            assert game["seat"] == "the player at the officer of the watch's station"
+            assert game["director"] == "The dispatches"
+            written = c.post(
+                "/api/harbour/desktop", json={"stations": ["captain", "director"], "write": True}
+            ).json()
+            assert written["written"]
+            d = c.post("/api/harbour/doors", json={"door": "local", "station": "captain"}).json()
+            assert d["state"] == "running"
+            deadline = time.monotonic() + 60
+            while c.get(f"/api/harbour/doors/{d['id']}").json()["state"] == "running":
+                assert time.monotonic() < deadline
+                time.sleep(0.2)
+            state = c.get("/api/harbour/state").json()
+            assert state["desktop"]["entries"] == ["freesail-captain", "freesail-director"]
+            (door,) = state["doors"]
+            assert door["state"] == "ended" and door["code"] == 2
+            assert door["words"] == "The local runner at the captain: ended (exit code 2)."
+            assert [(s["station"], s["holder"]) for s in state["stations"]] == [
+                ("officer of the watch", "the player")
+            ]
+            assert c.get("/", follow_redirects=False).status_code == 200
+    finally:
+        proc.terminate()
+        out, _ = proc.communicate(timeout=30)
+    assert f"FreeSail harbour. Open http://localhost:{port}/harbour" in out
+    assert "held until the driver says go" in out
+
+
+def test_truth_7b_109_a_scenario_by_the_maker_loads_as_a_hand_made_one_and_reads_back_unchanged(
+    tmp_path,
+):
+    """Spec M7b §21f, truth 109: "A scenario written by the maker loads in the console and
+    the server as a hand-made one does, and reads back into the form unchanged." The
+    owner's smack out of Falmouth written by the maker as a new file (its fields alone, in
+    the maker's own words): at the console's start and the server's, its World is the
+    hand-made file's, the same Scenario and the same log over ten minutes (the anchor let go,
+    the business drawn about her); read back into the
+    form and written again, the same bytes; and the hand-made file itself read into the
+    form and written with nothing changed is itself."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.core.world import Scenario, World
+    from freesail.ui.console import start_world
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver, create_app, prepare_game, server_parser
+    from freesail.world.scenarios import begin
+
+    settings = _harbour_settings(tmp_path)
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    app = create_app(driver, harbour=Harbour(driver, settings_path=settings))
+    hand = HARBOUR_ROOT / "data" / "scenarios" / "smack-falmouth.yaml"
+    with TestClient(app) as c:
+        got = c.get("/api/harbour/scenario", params={"path": "data/scenarios/smack-falmouth.yaml"})
+        fields = got.json()["fields"]
+        made = c.post("/api/harbour/scenario", json={"fields": fields, "name": "smack"}).json()
+        path = Path(made["path"])
+        text = path.read_text(encoding="utf-8")
+        assert text != hand.read_text(encoding="utf-8")  # the maker's own words
+        assert text.startswith("# FreeSail: A smack out of Falmouth.")
+
+        def console(p: Path) -> World:
+            world, sf = start_world(server_parser().parse_args(["--scenario", str(p)]))
+            begin(world, sf)
+            world.run(600)
+            return world
+
+        def server(p: Path) -> World:
+            world = prepare_game(
+                server_parser().parse_args(["--scenario", str(p)]), say=lambda line: None
+            )
+            world.run(600)
+            return world
+
+        for drive in (console, server):
+            a, b = drive(hand), drive(path)
+            assert a.scenario.__dict__ == b.scenario.__dict__
+            assert a.log.digest() == b.log.digest(), drive.__name__
+        # read back into the form and written again: unchanged
+        back = c.get("/api/harbour/scenario", params={"path": str(path)}).json()
+        c.post(
+            "/api/harbour/scenario",
+            json={"fields": back["fields"], "source": str(path), "name": "smack"},
+        )
+        assert path.read_text(encoding="utf-8") == text
+        # and the hand-made one, written from the form with nothing changed, is itself
+        again = c.post(
+            "/api/harbour/scenario",
+            json={"fields": fields, "source": "data/scenarios/smack-falmouth.yaml", "name": "hand"},
+        ).json()
+        assert Path(again["path"]).read_bytes() == hand.read_bytes()
+
+
+def test_truth_7b_110_the_settings_hold_no_key_and_a_models_name_in_them_reaches_no_save_or_log(
+    tmp_path, monkeypatch
+):
+    """Spec M7b §21f, truth 110: "The settings file holds no key; the credential store does;
+    a model's name in it never enters the repository, a save or a log." The key in the
+    (test's) credential store: the settings refuse it in any field, and the harbour says
+    only that the store holds one. The model's name in the settings at every door: kept in
+    the settings file (outside the repository, which refuses a settings file inside it) and
+    the desktop client's file (likewise); a game started from the harbour and saved, its
+    log and its save hold no word of it; nor does anything the harbour says."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+    from messages_api import fake_store
+
+    from freesail import settings as S
+    from freesail.agents.api import KEYRING_ACCOUNT, KEYRING_SERVICE
+    from freesail.core.world import Scenario, World
+    from freesail.ui.harbour import Harbour
+    from freesail.ui.server import Driver, create_app
+
+    store = fake_store(monkeypatch)
+    key = "a-test-key-of-no-account-0123456789"
+    store.set_password(KEYRING_SERVICE, KEYRING_ACCOUNT, key)
+    path = _harbour_settings(
+        tmp_path,
+        desktop={"model_name": PLACEHOLDER_MODEL},
+        api={"model": PLACEHOLDER_MODEL},
+        local={"model": PLACEHOLDER_MODEL},
+    )
+    kept = path.read_text(encoding="utf-8")
+    assert PLACEHOLDER_MODEL in kept and key not in kept
+    assert not S.inside_repository(path)
+    with pytest.raises(S.SettingsError):
+        S.save_settings(S.load_settings(path), HARBOUR_ROOT / "settings.yaml")
+    for where in (("doors", "api", "effort"), ("doors", "api", "key")):
+        s = S.load_settings(path)
+        s[where[0]][where[1]][where[2]] = key
+        with pytest.raises(S.SettingsError):
+            S.save_settings(s, path)
+    assert path.read_text(encoding="utf-8") == kept
+    driver = Driver(World(seed=1805, scenario=Scenario()))
+    app = create_app(driver, harbour=Harbour(driver, settings_path=path))
+    said: list[str] = []
+    with TestClient(app) as c:
+        said.append(c.get("/api/harbour/state").text)
+        assert "is in the credential store" in said[-1]
+        r = c.post(
+            "/api/harbour/start",
+            json={"scenario": "data/scenarios/directed-passage.yaml", "seat": "director"},
+        )
+        said.append(r.text)
+        d = c.post("/api/harbour/desktop", json={"stations": ["captain"], "write": True}).json()
+        assert PLACEHOLDER_MODEL in Path(d["path"]).read_text(encoding="utf-8")
+        assert not S.inside_repository(d["path"])
+        c.post("/api/driver", json={"action": "tick", "value": 600})
+        save = tmp_path / "game.json"
+        c.post("/api/driver", json={"action": "save", "value": str(save)})
+        said.append(c.get("/api/log", params={"limit": 5000}).text)
+        said.append(c.get("/api/harbour/state").text)
+        said.append(c.get("/api/save").text)
+    assert save.exists()
+    for words in [save.read_text(encoding="utf-8"), *said]:
+        assert PLACEHOLDER_MODEL not in words and key not in words
+    assert key not in Path(d["path"]).read_text(encoding="utf-8")

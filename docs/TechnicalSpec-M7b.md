@@ -993,6 +993,56 @@ harbour: a button that writes the desktop client's MCP entry into its configurat
 local runner started as the server's subprocesses with their flags from the settings and
 their output in a pane, each stoppable. The console stays as it is for those who want it.
 
+**As built (package 59; `freesail/__main__.py`, `freesail/settings.py`,
+`freesail/ui/harbour.py`, `client/harbour.html`, `harbour.js`; `docs/agents/Harness.md`
+§22).** `py -m freesail` takes the server's own command line (`server.server_parser`, two
+flags added to it: `--business on|off` and `--director-brief BRIEF`) with `--no-browser` and
+`--settings FILE`; the settings give the flags' defaults (`ap.set_defaults`), so a flag given
+wins for the run; it goes to the game's folder (the paths given made absolute first) and
+serves the harbour at `/harbour`, opening the browser on it. With no scenario, ship or save
+named, no game is in play: the server holds a point-ship World at tick 0 and `/` leads to
+`/harbour` until a game is started. **A game started from the harbour is the server's
+game**: the page's choices become the flags' namespace and the server's own
+`prepare_game` (the server's `main` factored, every step in its old order: the World, the
+scenario's lines and orders, the standing orders, the crewed budget, the director's brief,
+the seat, the book's opening words) makes it; `Driver.replace_world` takes it up in place
+(the clock held, the old World's log no longer heard, the pace and compression set, the
+painter and the consent records moved to it, `{"type": "restart"}` to every open page,
+which reloads), one server process with the harbour reachable throughout. The page's
+controls are the flags: the scenario (the game's and the player's own, by name), a ship
+file, a save, the seed, the seat (as the scenario says, the captain at the prompt, or a
+station below or above), the compression, the pace (the pace rule, lockstep,
+free-running), the crewed cap and range, the business, a director's brief (a starter, a
+file or words), the standing orders and the easing on a station. It shows the game in play,
+the stations held and by whom (the agent API's, a model's through its door, and the
+player's seat), the doors started from it and the desktop client's entries present.
+**The settings** (`freesail/settings.py`): `%APPDATA%\FreeSail\settings.yaml` on Windows,
+`~/Library/Application Support/FreeSail/` on macOS, `$XDG_CONFIG_HOME/freesail/` elsewhere,
+`FREESAIL_SETTINGS` naming another: the server's host, port and whether to open the browser;
+the game's default seat, compression, pace and crewed budget; the places of the saves, the
+player's scenarios (both beside the settings unless named; never inside the repository),
+the consent records (the game's own unless named) and the desktop client's file; per door
+the model's name, the API door's dialect, effort and flags, the local runner's endpoint,
+model and flags. A field named for a key, a value of a key's shape, or a value holding the
+key the credential store has, is refused in words and nothing is written; the harbour says
+only whether the store holds a key (truth 7b-110). The harbour does not take a key: it is
+put in the store at a terminal (`py -m freesail.agents.api --store-key`), as package 42 left
+it. **The doors**: one desktop entry per station ticked, `freesail-<station>` (and
+`freesail-<station>-<ship>` on another ship), in `.mcp.json`'s form (`py` on Windows,
+`python3` elsewhere; the game's address; `--station`; `--model-name` from the settings or a
+placeholder that says to set it; the game's folder on `PYTHONPATH`), the client's whole file
+shown as it would read first and written only on the player's word with the old file kept
+beside it (`.bak`), every other server in it kept. The API door and the local runner are
+started as the server's subprocesses with their own command lines (`python -m
+freesail.agents.api` or `.local`, `--game`, `--station`, `--ship`, the settings' model and
+flags; nothing re-implemented), their output in a pane with a line to their terminal for
+the owner's word in a consent conversation, each stoppable (the door's own Ctrl-C where the
+platform has a signal for it, then its station released at the game by the desk as the
+door's Ctrl-C releases it); a door that ends says so in its pane with its exit code in
+words (`EXIT_UNREACHABLE`: it could not reach the game or its model, or would not start).
+A shortcut that starts the harbour (`FreeSail.cmd` on the Windows desktop) is shown and
+written on the word. Truth 7b-108.
+
 ### 21e. The scenario maker (`client/harbour.js`; `freesail/world/scenarios.py` `write_scenario`)
 
 A form on the harbour that writes a scenario file from choices, in the file's own form so
@@ -1003,6 +1053,49 @@ off, the crewed budget, the standing orders (a starter book, or a drafted one), 
 and who holds them, a director's brief from the starters or the player's own; saved under
 the player's scenarios place and listed by the harbour; loaded back into the form for
 editing. The scenario is proved by loading it as the console would.
+
+**As built (package 59; `freesail/world/scenarios.py` `scenario_text`, `write_scenario`,
+`read_scenario_text`, `stations:`; `Harbour.prove`, `save_scenario`; `client/harbour.js`).**
+The writer works on the file's own fields (a mapping, as YAML reads it, dates in their ISO
+words). Without the text they were read from it writes a new file in the hand's form: a
+header saying what made it and how to start it at either driver, the fields in the
+docstring's order, each section under a comment a hand would want, a plain mapping or list
+in flow, the other sail and the waypoints an item a line wrapped as a hand wraps them, the
+first orders a line each, `business: on|off` in the hand's words. **With the text it was
+read from, only the changed fields are written again**: the file is cut into its top-level
+fields (each with the margin comments just above it and its body to its last indented
+line), an unchanged field keeps its lines and every comment above and beside it, a changed
+one is written in the hand's form under its own comments (a one-line field keeps the
+comment beside it), a field taken out goes with its comments, a field put in goes after
+the field it follows in the hand's order under its section's comment; the line ending is
+the original's (`newline_of`: a file Windows wrote keeps its CRLF). Every text is proved to
+read back as its fields before it is returned. **Every scenario of `data/scenarios/` is
+written again byte for byte with nothing changed**, and written as a new file each loads to
+the same `Scenario`; through the page, the owner's four (`smack-falmouth`,
+`lugger-roscoff`, `directed-passage`, `dispatches-falmouth`) read into the form and saved
+are their own bytes (`tests/test_harbour.py`). The form keeps the fields it read and writes
+over them only those the player touched, so that an untouched field is never rewritten by
+the form's own reading of it. Its parts: the day (name, seed, start, nation); the ship
+(file, heading, the glass, the instrument, the purse, the intent); the start (a port's road
+from the ports' files placed by the chart's features, a region, or a position pricked on
+a simplified drawing of the region's coast, `GET /api/harbour/chart`); the weather (the
+month's climatology, the wind pinned by the hour in a table of waypoints, or as written, a
+hand's systems kept untouched); the business, the crewed budget, the ports, the other sail
+with their intents in a table (a row's other fields kept), the world orders by time; the
+starter books and a drafted book (written beside the scenario as `<name>.orders` and named
+in its standing orders), the first orders; the stations and who holds them; the director's
+brief as a starter, a file or words, or written in the form (name, tone, challenge, the
+limits, the cadence, the budget), started from a starter if wished. **`stations:`** is a new
+field of the file (`{captain: model, officer: player, director: model}`; holders `player`,
+`model`, `rules`; one seat for the player), read by the loader, and the player's seat it
+names is taken by either driver as `--seat` would take it, the flag winning (`--seat
+captain` now means the captain's prompt, no seat, where it was refused). **The proof** is
+the console's road: the text loaded by `load_scenario`, its World made, its standing
+orders and first orders given (an order refused is a refusal), the player's seat found;
+the loader's refusal shown in the form in its own words with no temporary file named
+(`data/ships/nope.yaml: no such ship file.`). Saved only under the player's scenarios
+place (never inside the repository), a name already there refused unless the player says
+to write over it; listed by the harbour as his own and read back from there. Truth 7b-109.
 
 ### 21f. Truths for 7b-vii
 
