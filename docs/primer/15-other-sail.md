@@ -20,12 +20,12 @@ A sail is seen from the masthead at the distance the horizon gives for the looko
 Sail ho! A sail on the larboard bow, bearing SW by S, distant three leagues.
 ```
 
-Then, as she nears, the tops make out more of her at the period's distances, each a routine line as it changes: her rig and her course within four miles, her colours or their want within two, what she is within a mile and a half.
+Then, as she nears, the tops make out more of her at the period's distances, each a routine line as it changes: her rig and her course within four miles, her colours or their want within two, what she is within a mile and a half. Every such line gives where she lies from your head, her bearing by compass and the course she stands (package 56, the owner's note at gate 6c), so that a line read alone tells you where she is going:
 
 ```
-The sail on the larboard bow is a brig, standing to the eastward (E by N), under plain sail.
-The brig on the larboard bow shows British colours, the red ensign.
-The brig on the larboard bow is a merchant brig, deep laden.
+The sail on the larboard bow, bearing SW by S, is a brig, standing to the eastward (E by N), under plain sail.
+The brig on the larboard bow, bearing SW by S, standing to the eastward (E by N), under plain sail, shows British colours, the red ensign.
+The brig on the larboard bow, bearing SSW, is a merchant brig, deep laden, standing to the eastward (E by N), under plain sail; British colours, the red ensign.
 ```
 
 A ship that shows no colours is said so, and that is all the lookout can say of her nation: "The brig on the larboard bow is a stranger, her colours not made out." A sail that goes over the horizon is lost: "The sail on the larboard quarter is out of sight." The pilot cutter of chapter 14 is one of these vessels and follows the same rules: "a cutter standing out from the land" at four miles, "the Falmouth pilot's cutter" within a mile and a half.
@@ -37,6 +37,19 @@ the strangers
 what sail is in sight
 a sail in sight
 ```
+
+## The glass on a near ship
+
+Nearer still, the glass shows what she is doing, by tiers of her distance in daylight and clear weather (package 56; spec M7b §21b): within two miles what any seaman reads at a look, under way or at anchor, on which tack, hove to, tacking or wearing, running, her sail set or shortening; within eight cables the work on deck and aloft, the hands reefing, making or taking in sail, a boat hoisting out or in, the hands at the nets or the lines, the anchor coming up; within four cables the evolution's own words, as the log would say them of your own ship. A crewed ship (within the promotion's four miles) gives the true evolution; a ship at far detail what her plan and her sail give. The visibility bounds each tier, at the twilight the glass reaches a tier less, and by night only her light tells anything, if she shows one: a fishing vessel at her nets hangs a lantern in her rigging, a King's ship cruising shows none. The lookout says the glass unasked when she comes within its tiers and when what it shows of her changes, not oftener than every five minutes (a ship running before it is read on neither tack), and `the glass on the brig` (or `the glass on` with her name or the sail) asks it:
+
+```
+The glass on the brig-sloop of war abeam to starboard: hove to on the larboard tack.
+The glass aloft makes out the brig abeam to starboard, bearing E: a brig-sloop of war, sixteen ports a side, lying to; a stranger, her colours not made out. The glass shows her hove to on the larboard tack, main topsail aback.
+```
+
+The first at a mile, the second at four cables, the Palinure lying to east of the frigate with the wind in the west (truth 7b-107); by night at four cables: "The glass on the sail abeam to starboard: no light shows; nothing of her work is to be made out in the dark." A fisherman near you, crewed, is read the same way: "The glass on the fishing smack on the starboard bow: under way on the starboard tack, with the wind abeam, her boat at the seine.", then "hove to on the starboard tack, her boat at the seine" as she lies by while it fishes (chapter 21).
+
+The tiers' distances are judgement on the period's day glass at sea, named in `docs/dev/TuningNotes.md`, package 56.
 
 ## Making her out, and the chase
 
@@ -93,6 +106,7 @@ Two scenarios ship with this milestone and are the gate's: **the merchant passag
 | `a stranger in sight` | `a stranger` | the strangers alone: every sail until her colours are made out, and one under none or another nation's after; for the book, `if a stranger in sight is in sight` |
 | `a sail in sight` | `the stranger`, `the pilot cutter` | in sight or not, with the nearest sail's words |
 | `make her out` | `make out the sail`, `make out the stranger`, `make out the brig`, `send a glass aloft`, `what is she` | a glass aloft: her rig, her course, her colours, as the distance allows |
+| `the glass on the brig` | `the glass on`, `glass on`, `put the glass on`, `train the glass on`, `the glass to` | what the glass shows of her manoeuvre and her work, by the tiers of her distance; every station may ask it |
 | `give chase` | `chase`, `chase the stranger`, `chase the brig`, `stand after her` | the helm put for her bearing, led by the bearing's drift when given again |
 | `take a bearing of the stranger` | `take a bearing of the sail`, `take a bearing of the brig` | a bearing of a sail, for the master's account |
 | `at a sail sighted` | `at sail ho`, `at a sail made out`, `at a stranger's colours made out`, `at a sail lost`, `at a sail within hail`, `at the pilot's hail`, `at the cargo aboard`, `at the turn to the flood`, `at the turn to the ebb`, `at the course shaped`, `at steady on the course`, `at the pilot asks to be put off` | the events, for the book |

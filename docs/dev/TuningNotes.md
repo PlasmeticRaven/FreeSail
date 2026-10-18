@@ -6705,3 +6705,204 @@ byte for byte the same as merged. The whole slow tier once on the merged tree
 error, the expected failures only (the ten of 50 and 52, and the gale trial that 57 marked
 for 58); the pace tests alone after it on the quiet machine: passed. The lead's playtest of
 the wave follows its record (the head rules).
+
+
+## Package 56: fishing, and the glass on a near ship (2026-10-18)
+
+Spec M7b §21a to §21c; the brief's six items. Built in the worktree off `91711a0` (packages
+50, 52, 53, 54 and 57 merged). New: `freesail/world/fishing.py`, `freesail/orders/fishing.py`
+and `glass.py`, `data/fishing/fish.yaml`, `channel-west.yaml` and `biscay-north.yaml`, the
+gear's eight evolutions (`data/evolutions/shoot_trawl.yaml`, `haul_trawl`, `shoot_nets`,
+`haul_nets`, `shoot_seine`, `haul_seine`, `set_lines`, `haul_lines`), `tests/test_fishing.py`
+and the primer's chapter 21.
+
+### The sources found, and what each gave
+
+- **Holdsworth 1874**, *Deep-Sea Fishing and Fishing Boats*, the OCR the repository holds
+  (`docs/references/holdsworth/`), read for this package beyond the pages 43b cited: the
+  pilchard drift fishery "begins on the Cornish coast in July, and is carried on till
+  December", few pilchards "farther at sea than 10 or 12 miles ... south rather than west of
+  the Land's End" (p. 130); the mackerel "towards the end of February ... into June", "May,
+  June, and July are the months in which most of these fish are caught by drift-nets in the
+  English Channel" (pp. 127 to 128); drift-net fishing "carried on only at night", the fish
+  striking "just after sunset and before sunrise" (pp. 98 to 99), the nets shot at sunset
+  before the wind over the quarter (pp. 106 to 107), a herring fleet a mile and a quarter
+  and the Cornish pilchard nets "about the size of those for herrings, but with a smaller
+  mesh" (pp. 110 to 111); the trawl towed with the tide "for five or six hours, under easy
+  sail" at "from half a knot to a knot and a half faster than the tide" (pp. 70 to 71,
+  77 to 78), the warp hove in "seldom occupying less than three-quarters of an hour, and in
+  bad weather sometimes taking two or three hours" (p. 79), the deep-sea trawls of 36 to 50
+  ft (p. 47), the Plymouth and Brixham grounds "only a few miles from the land" (p. 44),
+  four-fifths of a trawler's take "of the inferior kinds" (p. 24); the sean worked from
+  rowing boats "very near the land or in the smooth water of sheltered bays", the single
+  "stop-sean or tuck-sean" where the fish are "tucked" into the boat at once (pp. 157 to
+  159); the St Ives sean fishery "from September to November" (p. 188), "2500" pilchards to
+  the hogshead pressed to "four hundredweight gross", "5500 hogsheads" once from one shoal,
+  the curing in "alternate layers of coarse salt and fish" (pp. 193 to 194), the south
+  coast's seans fewer and smaller (pp. 194 to 195); the longlines and the cod alive in the
+  well (pp. 137 to 141).
+- **The Encyclopaedia Britannica, 4th edition (1810), CLUPEA** (after Pennant and Borlase;
+  read 2026-10-17 at jimclifford.ca's transcription): the pilchards "off the Cornish coasts
+  about the middle of July, disappearing the beginning of winter"; 7,000 hogsheads enclosed
+  in St Ives bay in 1767; the hogshead exported at "£1. 13s. 3d." one year with another,
+  1747 to 1756. (It gives 35,000 fish to the hogshead, against Holdsworth's 2,500 of the
+  pressed cask; the Britannica's figure reads as a misprint and is not used.)
+- **The Breton sardine**: no period page reached. The Musée de la Pêche at Concarneau's
+  text (read 2026-10-17 at artsandculture.google.com) gives the undecked boats, the half of
+  France's catch in the eighteenth century, and the fish "first fished using roe (salted
+  cod eggs) with different types of nets"; Duhamel du Monceau's *Traité des pêches* and
+  Robin's *Pêcheurs bretons sous l'Ancien régime* are the sources to read next. The
+  sardine's season (June to October) and its by-day drift are judgement on that.
+- **Not reached**: a period figure for any boat's catch by the hour or the night, for the
+  Brixham trawl's haul, or for the price of green fish at the quay. Every yield and price
+  below is judgement, with its reasoning in the data's own comments.
+
+### The yields (tons of fish an hour of the gear fishing, one vessel's gear)
+
+The reasoning (judgement throughout, anchored on Holdsworth's hogshead: a ton is five
+pressed hogsheads, some 12,500 pilchards):
+
+| Gear and fish | Yield | Reasoning |
+|---|---|---|
+| tuck-sean, pilchards (Gerrans Bay July to December, St Ives Bay September to November, by day) | 3.0 t/h, an hour a shot | a small sean's fifteen hogsheads of a shoal, against the great seans' thousands (p. 194; EB 1810's 7,000) |
+| tuck-sean, mackerel (Gerrans Bay June to August) | 1.0 t/h | the mackerel near the land after mid-July (p. 128), fewer |
+| drift nets, pilchards (Mount's Bay, by night) | 0.2 t/h, half again at the twilight | six to eight hogsheads in a night's eight dark hours |
+| drift nets, mackerel and herring | 0.12 to 0.15 t/h | a little less than the pilchards |
+| drift nets, Breton sardine (Iroise, Glenan, Belle Isle, by day) | 0.12 to 0.15 t/h | as the pilchard's drift |
+| trawl, soles and turbot / plaice and hake | 0.02 to 0.025 / 0.05 to 0.06 t/h, six hours a shot | half a ton a haul of five or six hours, a fifth of it prime (p. 24) |
+| lines, cod / ling and conger | 0.03 to 0.05 / 0.03 to 0.04 t/h, six hours a shot | a few hundredweight a tide |
+| a ground the tables do not name | trawl 0.04, lines 0.03 | the default |
+
+The wind takes the work: full to six tenths of the gear's most (the trawl 30 knots, the
+nets 27, the lines 24, the seine 16), half at the most, nothing beyond; the trawl takes
+nothing outside one to four knots through the water.
+
+### The spoilage's hours
+
+Nothing was iced in 1805. A fish that lives in the well (cod ten days, soles and turbot
+four) is alive there; one that does not (pilchards a day, herring 20 hours, sardines 18,
+mackerel 16, plaice, hake, ling and conger 36) keeps cool in its running water. In the hold
+unsalted: pilchards 12 hours in summer (May to September) and 30 in winter, mackerel 8 and
+24, herring 12 and 30, sardines 10 and 24, the flat fish 30 and 72, plaice and hake 20 and
+48, cod, ling and conger 24 and 72; salted (a third of the fish's weight of salt from the
+hold), beyond any voyage. The well holds a ton of fish to three cubic metres (the
+Culloden's 9.1, three tons; Chapman's sumpar's 150 lispund, about 1.3 tons, the check).
+Judgement throughout, on Holdsworth's "Round-fish at all times suffer more than flat-fish"
+(p. 85) and the fat herrings that "must be eaten without delay" (p. 34).
+
+### The fish quays
+
+Each fish a price a ton fresh and salted (`fish.yaml`), each quay a factor on it (Falmouth
+1.0, Plymouth, Torbay and Weymouth 1.1, St Mary's 0.9, Brest 1.2, ...). Pilchards fresh £6
+the ton: the cured hogshead's £1 13s 3d of 1747 to 1756 (EB 1810) is about £8 the ton
+cured at mid-century and Falmouth's market file has £14 in 1805 from memory; the green fish
+to the cellars at under half the cured, the salt, the pressing and the women's work being
+the curer's. The others in proportion (soles and turbot £25, cod £12, mackerel £9, sardines
+£8, herring £6, plaice and hake £7, ling and conger £8). The ports' cargo markets
+(`data/ports/*.yaml`) are untouched: they deal in the cured hogshead, and a new good there
+would move every price list a recorded passage brings off.
+
+### The gear and its evolutions' times
+
+The shots by the watch (three hands, four for the nets), the hauls all hands: the trawl
+shot in a quarter of an hour and hauled in three quarters (Holdsworth p. 79); the nets half
+an hour and two hours; the seine twenty minutes and an hour; the lines an hour (3,600
+fathoms at four knots) and three. **The trawl's drag** on her way, 1,200 N for a metre a
+second squared (`fishing.TRAWL_DRAG`), measured on the smack at seed 7 under plain sail on a
+beam reach: 5.3 knots without it, 2.2 with it in fourteen knots of wind, 6.7 and 3.1 in
+twenty (2,400 N gave 1.5 to 2.1, too slow for Holdsworth's "a knot and a half faster than
+the tide").
+
+### The doctrine, and the fishermen promoted
+
+The fisherman's doctrine needed nothing in its tables: the gear's rule is the fishing
+module's, one for both bodies (`far_work` at far detail, `captain_work` at full, from
+`Captain._station`). What it needed in code: a fishing trip's mark is the ground itself
+(`Planner.legs_for` and `FarCaptain._station_mark`), not a station a league off, which put
+a bay's station on the land (the Gerrans ground's station fell at 4° 59' W, ashore); and a
+ground pricked at a position is an intent's place (`captains._place_id`).
+
+### The glass's tiers
+
+Two miles for a look (her state, her tack, tacking or wearing, running, sail set or
+shortening), eight cables for her work (reefing, sail made or taken in, a boat, the anchor
+coming up, the hands at the gear), four cables for the evolution's own words; each bounded
+by the visibility, a tier less at the twilight; by night within a mile only a light, and a
+fishing vessel at her gear the only ship that shows one. Judgement on the period's day glass
+and the brief's reading. The lookout says it unasked when a sail comes within the tiers and
+when her state, her work or her light changes, never for her point of sailing alone (a far
+ship's moves with every course shaped) nor for the steps of one piece of work (the first
+run said "tacking" three times in three minutes as the tack's steps went by), nor for a
+boat under oars.
+
+### Found on the way
+
+- The `station_off` rule for a station's mark rounds the room to a league and then prefers
+  the west: in a bay every bearing has under a league of room, and the west won, on the
+  land. Fishing no longer uses it; a cruiser's station in a bay would meet it still.
+- A smack hove to has the heave-to's four hands tending her sheets (`heave_to.yaml`
+  `keep_hands`), most of a smack's watch: the crewed fisherman's haul of the seine waited
+  for all hands and went slowly (an hour and a half for the hour's work). The hauls are
+  all hands for that reason; the heave-to's hands are the frigate's figure, and a small
+  vessel's would want its own.
+- The far fisherman's way home to Falmouth from Gerrans Bay is the port's track from the
+  sea, out round to 49° 52' N before turning in: twenty miles for seven. Hauled at 11:00 she
+  was in at 22:14, her hold's pilchards with three quarters of an hour to spare before they
+  turned (truth 106 compares the catch at the haul and the tons landed, sold or spoiled, so
+  that a slower passage home does not fail it).
+
+### Pins
+
+**The fishing moved no pin.** The business is off in every recorded passage and no
+recorded ship carries gear (a ship with none has no fishery: `world.fishery` is None, and
+no line, reading or draw of hers changes); lifting the never-crewed rule changes nothing
+where no fisherman is drawn. **The glass and the sightings' words moved ten tests' pins,
+against the brief's "no pin moves"**: every recorded passage or trial in which a sail
+comes within two miles by day (the pilot cutters of Falmouth and Plymouth, the strangers
+of the trials) now has the lookout's glass lines, and every made-out line her bearing and
+course. Item 5 asks for exactly these lines, so they cannot be had without moving a digest;
+the head rule's re-measure was taken, the old figure beside each, and the move proved to be
+those words alone, two ways:
+
+- **By count**: each passage's lines rose by exactly its glass lines (the 5b passage 729
+  to 733 with 4; the 5b schooner 763 to 768 with 5; the naval cruise 2,225 to 2,242 with
+  17; the merchant passage 3,080 to 3,098 with 18 and the fake captain's 3,093 to 3,111 with
+  the same 18; the 6a intent 1,684 to 1,698 with 14; the station-stranger trial 754 to 756
+  with 2, the trade-stranger 1,521 to 1,534 with 13, the trade-thick 482 to 489 with 7);
+  every tick pinned in those tests stands.
+- **By digest**: the ten moved tests run with the package's lookout words switched off (a
+  pytest plugin kept out of the repository, which puts back the made-out line as it was at
+  `91711a0` and says no glass line unasked; everything else of the package in place) pass
+  against their old pins, digests and counts (`-p p56_oldwords`, the scratchpad's
+  `p56/plug/p56_oldwords.py`; run on `4c0e1bb`):
+
+```
+PYTHONPATH=<scratch>/p56/plug python3 -m pytest -p p56_oldwords --slow -n 4 -q -p no:cacheprovider <the ten>
+..........                                                               [100%]
+```
+
+| Pin | Old | New |
+|---|---|---|
+| `GATE_5B_LINES`, `GATE_5B_DIGEST` | 729, 5f682b9f676a2db4 | 733, c8c81b7617e4e0fd |
+| `GATE_5B_SCHOONER_LINES`, `_DIGEST` | 763, c01e6e0ff56503c8 | 768, b7c16adc612bd01a |
+| `GATE_5C_CRUISE_LINES`, `_DIGEST` | 2225, 087fdfacfc6381f1 | 2242, 728522e26dd25a49 |
+| `GATE_5C_MERCHANT_LINES`, `_DIGEST` (truths 77, 78 read them) | 3080, 06b14a75a5eaae8b | 3098, 05f0f4aba2eddbc0 |
+| `GATE_6A_FAKE_CAPTAIN_DIGEST` (its lines the merchant's and 13) | 0e089f1279e03928 | f996530d5a041abc |
+| `GATE_6A_INTENT_LINES`, `_DIGEST` | 1684, 93981cc47f5524e6 | 1698, 90061f779b7db484 |
+| `TRIAL_STATION_STRANGER_LINES`, `_DIGEST` | 754, 1e9fbcf3ce7497bc | 756, 9c24b2e01bb801e7 |
+| `TRIAL_TRADE_STRANGER_LINES`, `_DIGEST` | 1521, e73870448a788eac | 1534, 7b8012b076ebea42 |
+| `TRIAL_TRADE_THICK_LINES`, `_DIGEST` | 482, 7915dc59337bd31d | 489, ce964d9f346034de |
+
+**Unmoved**: gate 5a's day, the 5b thick passage, gate 4c's day, the gale and lee-shore
+trials (no sail within two miles by day), the regatta, the director's and the ports' days,
+and every other figure the slow tier keeps. The first measurement (before the glass was
+quietened) had 24 glass lines on the merchant passage where the pilot's cutter rounded to
+and filled by turns; the rule now says a sail again only when the words change with her
+state, her work, her light or a nearer tier, not oftener than five minutes, and reads a ship
+running before it on neither tack.
+
+**For the lead and the owner**: if the brief's "no pin moves" is to hold, the glass's lines
+can be made asked-only (`the glass on <ship>`) and the made-out lines kept as they were,
+which gives up the lookout's unasked glass and the owner's note 5 in the log; the lead's
+reading here is that item 5 wants them, and the head rule's re-measure covers it.
+
