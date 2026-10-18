@@ -6903,6 +6903,23 @@ running before it on neither tack.
 
 **For the lead and the owner**: if the brief's "no pin moves" is to hold, the glass's lines
 can be made asked-only (`the glass on <ship>`) and the made-out lines kept as they were,
-which gives up the lookout's unasked glass and the owner's note 5 in the log; the lead's
-reading here is that item 5 wants them, and the head rule's re-measure covers it.
+which gives up the lookout's unasked glass and the owner's note 5 in the log; the
+builder's reading is that item 5 wants them, and the head rule's re-measure covers it.
 
+
+### The suite, as run
+
+On the build machine (four cores), the only builder; the final tree `80e1c4a` (the records'
+commit; the code as committed in `7014e9b`).
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,429 passed, none
+  failed, 324 slow left out.
+- **The slow tier once whole** (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m
+  "not pace"`): 3,736 passed, 11 expected failures (the ten of 50 and 52, and 57's gale
+  trial, the lead's debt for 58), none failed and no error. Before it, the slow tier of the
+  files touched (`test_known_truths.py`, `test_captain_trials.py`, `test_ships.py`,
+  `test_brains.py`, `test_business.py`, `test_crews.py`, `test_lookout.py`,
+  `test_fishing.py`, `test_regatta.py`) found the ten pins above, re-measured once.
+- **The pace tests alone** (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the
+  load 1.1 at their start and at the end): 6 passed.
