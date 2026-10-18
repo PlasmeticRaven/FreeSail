@@ -213,6 +213,55 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
 
+### Package 59 as merged (2026-10-18)
+
+Merged `--no-ff` from the builder's worktree (eight commits on `06015d3`; 24 files, ~4,800
+lines), no conflict with main's no-cache middleware (the harbour's own page added to its
+list by the lead), ruff clean, the fast tier on the merged tree by the lead; the builder's
+fast tier (3,460 passed) and the pace tests alone passed on its final tree, and its whole
+slow tier was cut off at 24% by a container restart with nothing failed, so **the whole slow
+tier runs once on the merged wave (59 with 62)** and its result is recorded there. Built as
+briefed: `py -m freesail` takes the server's whole command line (plus `--no-browser`,
+`--settings`), the settings giving the flags' defaults and a flag winning; the server's
+`main` factored into `server_parser` and `prepare_game`, every step in its old order, so
+that a game started from the page is the server's game, taken up in place by
+`Driver.replace_world` with the clock held and the open pages told to reload; two flags
+added to the server (`--business`, `--director-brief`); the settings at
+`%APPDATA%\FreeSail\settings.yaml` (XDG elsewhere, `FREESAIL_SETTINGS`) refusing in words a
+field named for a key, a value with a key's shape, the key the credential store holds, and
+a settings file or a saves or scenarios place inside the repository; **the harbour never
+takes a key**, only says whether the store holds one; one desktop entry per station
+(`freesail-<station>`), the client's whole file shown before it is written, `.bak` kept,
+other servers untouched; the API door and the local runner as the server's subprocesses
+with panes, a line for the owner's word, and stop (SIGINT, terminate on Windows; the
+station released either way); the scenario maker rewriting only the top-level fields that
+changed and keeping the rest byte for byte (all 28 scenarios written back identically when
+nothing changes; CRLF kept), proving a scenario as the console loads it before saving, and
+a new `stations:` field for who holds each station, which both drivers seat as `--seat`
+would. **Taken another way, accepted:** `--seat captain` now means the captain at the
+prompt and no seat (it was refused); "the ship on another vessel" is the doors' `--ship`
+only, there being no player-on-another-ship flag yet (package 51's).
+
+**Found and fixed on the way:** `dispatches-falmouth.yaml` named `fowey`, which has no port
+file, and loaded at no driver; Fowey is out of its ports with a comment (62's builder met
+the same and mended the intent; the merge of 62 keeps both). **The testing round's "smack
+Falmouth to Fowey" needs a Fowey port file first.**
+
+**The lead's note, an open item:** the harbour's writing routes (the settings, the desktop
+client's file, the shortcut, a scenario saved to the player's place, a door started on the
+owner's API credit) answer any client the game's server answers. On the owner's machine
+that is the owner; behind a tunnel, as in the lead's shared play, it is anyone with the
+URL, as the order line already is. The writes are confined to the player's own places and
+the credential store is never read out, so this is recorded and not mended here; a token
+for the harbour, or a flag that closes it, when the tunnel is a practice rather than a
+test.
+
+**Pins:** none moved; the World is touched only by the server's start and by `stations:`,
+which no recorded scenario has. **Open items, carried:** a Fowey port file; on Windows a
+stopped door is terminated rather than given Ctrl-C; the consent records' place in the
+settings takes effect at the server's restart; the owner's eight steps to prove it on
+Windows are in the builder's report and the tuning notes ("Package 59").
+
 ### Package 56 as merged (2026-10-18)
 
 Merged `--no-ff` from the builder's worktree (seven commits on `91711a0`; 51 files, ~3,700

@@ -1409,7 +1409,8 @@ def create_app(
     @app.middleware("http")
     async def _revalidate_client_files(request, call_next):  # type: ignore[no-untyped-def]
         response = await call_next(request)
-        if request.url.path.startswith("/client/") or request.url.path in ("/", "/index.html"):
+        fresh = ("/", "/index.html", "/harbour")  # the harbour's page too (package 59)
+        if request.url.path.startswith("/client/") or request.url.path in fresh:
             response.headers["Cache-Control"] = "no-cache"
         return response
 
