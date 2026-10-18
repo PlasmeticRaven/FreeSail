@@ -1118,15 +1118,20 @@ draws on those notes, and the lead's reading above is one way, not the plan.
 What exists: `lay out a kedge [to the <point>] [<n> fathoms]` carries the kedge out by the
 boat and lets it go (built for a ship aground, `world/ground.py`); `heave in` and `heave
 short` work the cable at the capstan with the hands; the boat with her crew; the kedge in
-every ship file with her cable. What is missing is that heaving on a laid anchor moves her
-when she is afloat, and the sequence that makes a passage of it:
+every ship file with her cable; **and the pull itself** (`physics/anchor.py`, package 34):
+heaving in shortens the scope, the cable comes taut and pulls at the hawse, her head
+swings to the pull and she comes ahead to her anchor, so that a kedge laid out and hove
+short already draws her toward it (the owner's test on the m6c build, 2026-10-18: the kedge
+laid ninety fathoms to the west of a ship heading north, and heaving short brought her head
+to the westward; no coincidence). What is missing is the sequence that makes a passage of
+it, the boat towing, and the books; and one fault seen in that test: **a false denial**,
+"the boat was not sent away", said while the lay-out evolution went on and completed, to be
+found and mended here.
 
-- **The pull.** Heaving in on an anchor that holds, with the ship afloat, draws her toward
-  it: the cable's pull as a force on the hull against her resistance and the tide, the
-  rate by the hands at the bars and the scope (a few tens of yards a minute; the
-  period's figures or a judgement in the tuning notes), the anchor breaking out when she
-  is over it; the same for the bowers at short stay, which is how a ship "hove up to her
-  anchor" through the water.
+- **The pull's figures.** The rate of heaving by the hands at the bars and the scope (a
+  few tens of yards a minute; the period's figures or a judgement in the tuning notes) is
+  checked against what the physics gives, and the anchor breaks out when she is over it,
+  as the weigh script has it.
 - **Kedging as a passage.** `kedge her out to <the point or bearing>`: the kedge carried
   out ahead to the cable's length, let go, hove in to short stay, weighed, carried out
   again, until the point is reached or the order ends; the boat's trips and the hands'
