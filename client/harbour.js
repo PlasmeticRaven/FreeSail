@@ -855,6 +855,7 @@
     var g = (settings && settings.game) || {};
     $("s-time").value = g.compression || 1;
     $("s-pace").value = g.pace || "rule";
+    if (g.seat && cat.seats.indexOf(g.seat) >= 0) $("s-seat").value = g.seat; // the settings' seat
     if (g.crewed) {
       $("s-crewed-cap").value = g.crewed.cap === null || g.crewed.cap === undefined ? "" : g.crewed.cap;
       $("s-crewed-range").value = g.crewed.range_nm === null || g.crewed.range_nm === undefined ? "" : g.crewed.range_nm;
