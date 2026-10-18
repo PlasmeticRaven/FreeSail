@@ -40,7 +40,7 @@ papers:
 cargo:
   purse_pounds: 400
 
-ports: [falmouth, fowey, plymouth]
+ports: [falmouth, plymouth]   # Fowey has no port file yet: named, the scenario did not load (package 59)
 business: on
 
 # A south-westerly day: fair for Plymouth along the coast, and a frigate to the southward
