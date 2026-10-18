@@ -32,10 +32,10 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | briefed 2026-10-17; approved the same day, held until the second wave landed, launched on its merge; **built 2026-10-18** (spec §21a and §21b as built; the primer's chapter 21, the fisherman, and chapter 15's glass; the tuning notes, "Package 56"; truths 7b-105 to 7b-107); **merged 2026-10-18** (the record below) |
 | 57 | Opus | The frigate's staysails from Steel's list through the generator, the period's shapes; the chasse-marée's rig put right (lug topsails, not square; the lugs slung a third from the fore end and set to leeward of the mast; the trim rule reading a lug as fore-and-aft) and the viewer's draw order by aspect and the brace shown (the owner's notes of the Éclair's first cruise, `docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`) | briefed 2026-10-17; approved and launched the same day, the three together; **built the same day** (spec §24's 57 as built; the primer's chapters 1 to 3; the tuning notes, "Package 57"; truths 7b-111 and 7b-112); **merged 2026-10-17** (the record below) |
 | 58 | Opus | The captain's sea sense, third pass (the owner's runs of gate 6c); a leg re-laid as the stream changes; the sample's deltas, the `ahead` reading and the cost of thinking (the owner's observation of 2026-10-17); the lugs dipped or a wear ordered when a helm order carries the wind across the stern, and the course given when she gathers way, not at the aweigh (the lead's wave-2 playtest, `docs/playtests/2026-10-17-wave2-lead-playtest/notes.md`) | brief to write |
-| 59 | Opus | The harbour: a launcher in the browser, the scenario maker, the settings and the doors started from it (the owner, 2026-10-17) | briefed 2026-10-18, for the owner's approval; to run after 56, then the owner's testing round of the director, the needs, the captains, the scenario maker and the rest |
+| 59 | Opus | The harbour: a launcher in the browser, the scenario maker, the settings and the doors started from it (the owner, 2026-10-17) | briefed 2026-10-18; approved and launched 2026-10-18 beside 62; the owner's testing round follows |
 | 60 | Opus | A ship bought (the owner's design goal of 2026-10-17; spec §21g): listings, the hull's valuation, the ship bought and sold through the market orders, the transfer of the people and the hands, the errand ashore | brief to write, after 51 and 53 |
 | 61 | Fable | The land-avoiding route, provisional (spec §21i; the owner, 2026-10-17, brought in from the carried items): the course laid clear of the land and the dangers over the chart's own data for every captain and the player, the legs said as the plan | to plan in full at briefing; beside 51, before 58's tracks |
-| 62 | Opus | The director's hand: an order of a ship's own grammar given to her captain's station by the director as his own, far and crewed, refused where a model or the player holds him (spec §3; the owner's proposal of 2026-10-18); the director seated in a ship as a later item | brief to write; recommended beside 59 so the dispatches test has it |
+| 62 | Opus | The director's hand: an order of a ship's own grammar given to her captain's station by the director as his own, far and crewed, refused where a model or the player holds him (spec §3; the owner's proposal of 2026-10-18); the director seated in a ship as a later item | briefed, approved and launched 2026-10-18 beside 59 |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
 
 ## The testing round after 59 (the owner, 2026-10-18)
@@ -659,3 +659,48 @@ console stays as it is. Each item an intent with the lead's reading; the intent 
    `time` a console command, from the lead's wave-2 playtest); the README's start line
    (`py -m freesail`); the primer's first chapter; §21d, §21e as built; the tuning notes
    (found on the way, the Windows pieces tested by path, pins unmoved by digest, the suite).
+
+## Package 62: the director's hand (`freesail/world/orders.py` the `ship "<name>": order ...` form, its doubt and its apply; `freesail/world/crews.py` `far_order` and `submit_far` for a far ship, her World's `submit` for a crewed one; `freesail/agents/director.py` the log's kinds and the brief's examples; `freesail/world/captains.py` only if a far captain's state must be told of an order given over his head; `data/director/briefs/*.yaml` the examples; `docs/agents/Harness.md` the director's section; the primer's director chapter; `docs/TechnicalSpec-M7b.md` §3 as built; `docs/dev/TuningNotes.md`; `tests/test_world_orders.py`, `test_director.py`, `test_known_truths.py` one truth after 7b-112)
+
+Opus, beside 59; a day's package in the channel and the far orders, for the dispatches
+test (`data/scenarios/dispatches-falmouth.yaml`, `data/director/briefs/dispatches.yaml`).
+Spec M7b §3's paragraph "The director's hand" (the owner's proposal of 2026-10-18);
+decisions 46 and 50. The ground: 43's stations on other ships give orders to a far ship
+through `crews.far_order` and `submit_far` (helm, sail and the intents the far shape can
+carry) and to a crewed ship through her own World; 50's `director.direct` is the one road
+for every director order; 52's rule of reach refuses the director's voice where a model or
+the player holds the person. Each item an intent with the lead's reading; the intent binds.
+
+1. **The hand.** `ship "<name>": order <an order of the ship's own grammar>` passes the
+   order to her captain's station as his own: her log says it as his ("By the captain:
+   heaving to"), never as the director's; the director's log keeps it as the director's act
+   with its doubt and reason as every act (decision 46: the play log carries the effect,
+   never the order). At far detail the order goes through `far_order`/`submit_far`, and an
+   order the far shape cannot carry (a sail by name, a boat lowered) is answered as the
+   game's honest "no way as said" and logged as attempted, unless she is within the
+   promotion's range, when the director may ask for her crewed first (the cap's order
+   unchanged: the owner's budget stands). Crewed, the order goes to her World as her
+   captain's, under her captain's own domain and nothing more (the director cannot do
+   through her captain what her captain could not). **Refused in words where a model or
+   the player holds her captain** (the rule of reach): "her captain is held by ...; write
+   to him" (`message:`). *The lead's reading:* a captain's order is always a plausible
+   cause, so the channel's doubt bites only where the order itself is implausible for her
+   (a frigate told to anchor in forty fathoms off a lee shore: doubted, re-entered with a
+   reason, performed); the far captain's brain is told the order came over his head so
+   that his plan resumes after it rather than fighting it (a heave-to held until the
+   director's next order or a glass, then his intent again).
+2. **The brief and the examples.** The director's station brief names the hand among the
+   examples of reasonable orders ("the orders are examples, not a rule"), with its refusal
+   where a captain is held; the starter briefs' examples gain one each where it fits (the
+   chase: the pursuer's helm when the story wants it); the dispatches brief's story reads
+   with the hand in it.
+3. **The director seated in a ship** is booked and **not built here**: the lead's reading
+   is written in the spec's §3 for a later package (her log and readings in the director's
+   samples beside the truth while it holds her).
+4. **A truth and the records:** a truth that, at seed 7 with the business on, the director's
+   `ship "X": order heave to` brings a far trader to, her log saying it as her captain's and
+   the play log of the player's ship showing only what the lookout sees, and the same order
+   to a crewed cruiser heaves her to under her captain's domain, and is refused where a
+   fake captain holds her; §3 as built; the Harness and the primer; the tuning notes (what
+   the far shape could and could not carry, found on the way, pins unmoved by digest: the
+   business is off in every recorded passage and no director is seated in one).
