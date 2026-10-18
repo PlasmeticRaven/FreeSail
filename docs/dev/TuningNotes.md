@@ -7064,3 +7064,20 @@ its figure (below): the business is off in every recorded passage and no directo
 in one, and every new path is gated on the hand (a hold that is `None` by a class default, a
 story that is empty and absent from a vessel's dict, a brief's examples absent from its dict
 when there are none).
+
+### The suite, as run
+
+On the build machine (four cores), 59 building beside it; the code and data as committed in
+`42bc2ee`, the records in `16bce6e` (this section after them).
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,438 passed, none
+  failed, 324 slow left out. (A first run, with the source edited under it, failed the
+  fingerprint test's "this tree's own, timed afresh", the tree having changed between its
+  two readings; on the unchanged tree it passes.)
+- **The slow tier once whole** (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m
+  "not pace"`): 3,745 passed, 11 expected failures (the ten of 50 and 52, and 57's gale
+  trial, the lead's debt for 58), none failed and no error; every pinned digest among them.
+  A first whole run was cut off by the container's restart and run again from the start.
+- **The pace tests alone** (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the
+  load 1.0 at their start and at the end): 6 passed.
