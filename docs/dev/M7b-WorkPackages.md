@@ -221,7 +221,7 @@ the waves table, the dispatches scenario's Fowey comment), each kept from both s
 lead; ruff clean; the builder's fast tier (3,438 passed), whole slow tier (3,745 passed, the
 same 11 expected failures as before, 57's gale trial among them) and pace tests (6 passed,
 load about 1) all passed on its final tree; **the whole slow tier on the merged wave (59
-with 62) is the lead's and recorded below.** Built as briefed: `ship "X": order <an order
+with 62) is the lead's: run once on `4f58fd2`, `-m "not pace"`, every test passed with the same 11 expected failures as before and none failed, and the pace tests alone (load under 1) 6 passed.** Built as briefed: `ship "X": order <an order
 of her own grammar>` passes the order to her captain's station as his own, crewed through
 her World's `submit` under his rules' actor (her grammar his domain, a reading or a deck
 sentence no order), far through the far shape's orders (its eleven named in the refusal
