@@ -256,6 +256,20 @@ the credential store is never read out, so this is recorded and not mended here;
 for the harbour, or a flag that closes it, when the tunnel is a practice rather than a
 test.
 
+**The lead's short play (headless, port 8059, a settings file in the scratchpad):** `/`
+led to `/harbour`; the state read true before any game (no stations, no doors, the credential
+store unreadable here and said so in words); the dispatches started from the page with the
+officer's seat and the dispatches brief, the game's API answering for the *Sherbourne* at
+once and the order line refusing the officer an order before "you have the deck", as the
+console would; a second start in place put the *Culloden* in her room; the smack read through
+the maker and saved under another name with its fields as read came back byte for byte, and
+saved with no fields it kept the file's comments and nothing else (the route takes the whole
+document, the page sending the fields read with the touched ones over them, so this is the
+API's contract and not the page's fault, noted for whoever drives the route by hand); the
+desktop entries for the captain and the director showed one per station with the model's
+name left to be set; the local runner started at a dead endpoint ended with exit 2 and its
+pane said why. Nothing found that the owner's Windows steps would not find first.
+
 **Pins:** none moved; the World is touched only by the server's start and by `stations:`,
 which no recorded scenario has. **Open items, carried:** a Fowey port file; on Windows a
 stopped door is terminated rather than given Ctrl-C; the consent records' place in the
