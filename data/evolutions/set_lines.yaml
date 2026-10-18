@@ -1,0 +1,23 @@
+# Set the lines (package 56). "When a 'shot' is to be made, the smack is put under easy
+# sail, and kept as much as possible with the wind free, so as to make a fair straight
+# course whilst the line is being paid out", across the tide, anchored every forty
+# fathoms and buoyed every mile; then she "heaves-to in the neighbourhood till the tide
+# has nearly done" (Holdsworth 1874 pp. 137 to 139). An hour to pay out 3,600 fathoms at
+# four knots: the arithmetic of her file's lines.
+#
+# The script (freesail/evolutions/scripts.py, FishingGearScript) holds the gear and not the
+# ship; the order's checks (the gear she carries, the ground she is on, its season, the
+# hour and the wind) are freesail/orders/fishing.py's.
+id: set_lines
+verb: set the lines
+applies_to: {class: ship}
+script: fishing_gear
+params: {gear: lines, action: shoot, ground: null}
+preconditions: []
+timing:
+  shoot_s: 3600
+on_start: {log: "Hands to the lines; pay out as she goes with the wind free."}
+on_complete: {log: "The lines are out, buoyed and anchored across the tide.", kind: fishing.shot, severity: notable}
+on_fail: {log: "Could not set the lines: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 3, rating: ordinary, stations: [forecastle, afterguard]}
+source: "Holdsworth 1874 pp. 137 to 139 (shooting the longlines)"

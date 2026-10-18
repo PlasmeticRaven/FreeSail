@@ -1,0 +1,21 @@
+# Shoot the seine (package 56). The boat away with the sean in her stern, rowed round the
+# shoal and the net thrown over as she goes, "near the land or in the smooth water of
+# sheltered bays" (Holdsworth 1874 pp. 157 to 159), by day; the boat's crew at it while the
+# smack lies by. Twenty minutes to row round: judgement.
+#
+# The script (freesail/evolutions/scripts.py, FishingGearScript) holds the gear and not the
+# ship; the order's checks (the gear she carries, the ground she is on, its season, the
+# hour and the wind) are freesail/orders/fishing.py's.
+id: shoot_seine
+verb: shoot the seine
+applies_to: {class: ship}
+script: fishing_gear
+params: {gear: seine, action: shoot, ground: null}
+preconditions: []
+timing:
+  shoot_s: 1200
+on_start: {log: "Away the boat with the seine; row round the shoal."}
+on_complete: {log: "The seine is round the shoal, its ends brought together.", kind: fishing.shot, severity: notable}
+on_fail: {log: "Could not shoot the seine: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 3, rating: ordinary, stations: [forecastle, afterguard]}
+source: "Holdsworth 1874 pp. 157 to 159 (sean-fishing: the boat, the tuck-sean)"

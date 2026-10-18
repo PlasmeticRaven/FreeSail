@@ -29,7 +29,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 53 | Opus | People in places: a person's place as an aspect of his state tied to what he can do, the player ashore, books drafted, the equal reach, several stations of a kind | briefed 2026-10-17; approved and launched the same day, the three together; **built the same day** (spec §14, §16, §17 and §18 as built; the Harness's §21; the primer's chapters 14 and 19; the tuning notes, "Package 53"; truths 7b-100 to 7b-102); **merged 2026-10-17** (the record below) |
 | 54 | Opus | Needs: provisions and water, hunger, thirst and fatigue in a few steps, sleep below | briefed 2026-10-17; approved and launched the same day, the three together; **built the same day** (spec §19, §20 and §21 as built; the Harness's §20; the primer's chapters 14 and 19; the tuning notes, "Package 54"; truths 7b-103 and 7b-104); **merged 2026-10-17** (the record below) |
 | 51 | Fable | The observed world: the followed ship in place of the given one, no player's ship, the player on another ship, the replay of a station there; the director's chart, the truth drawn (spec §12a); provisionally the director's focus and the ships' logs by kind and tick range (spec §12b; both the owner's word of 2026-10-17) | brief to write, after 50 |
-| 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | briefed 2026-10-17; approved the same day, held until the second wave landed, launched on its merge |
+| 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | briefed 2026-10-17; approved the same day, held until the second wave landed, launched on its merge; **built 2026-10-18** (spec §21a and §21b as built; the primer's chapter 21, the fisherman, and chapter 15's glass; the tuning notes, "Package 56"; truths 7b-105 to 7b-107); **merged 2026-10-18** (the record below) |
 | 57 | Opus | The frigate's staysails from Steel's list through the generator, the period's shapes; the chasse-marée's rig put right (lug topsails, not square; the lugs slung a third from the fore end and set to leeward of the mast; the trim rule reading a lug as fore-and-aft) and the viewer's draw order by aspect and the brace shown (the owner's notes of the Éclair's first cruise, `docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`) | briefed 2026-10-17; approved and launched the same day, the three together; **built the same day** (spec §24's 57 as built; the primer's chapters 1 to 3; the tuning notes, "Package 57"; truths 7b-111 and 7b-112); **merged 2026-10-17** (the record below) |
 | 58 | Opus | The captain's sea sense, third pass (the owner's runs of gate 6c); a leg re-laid as the stream changes; the sample's deltas, the `ahead` reading and the cost of thinking (the owner's observation of 2026-10-17); the lugs dipped or a wear ordered when a helm order carries the wind across the stern, and the course given when she gathers way, not at the aweigh (the lead's wave-2 playtest, `docs/playtests/2026-10-17-wave2-lead-playtest/notes.md`) | brief to write |
 | 59 | Opus | The harbour: a launcher in the browser, the scenario maker, the settings and the doors started from it (the owner, 2026-10-17) | briefed 2026-10-18, for the owner's approval; to run after 56, then the owner's testing round of the director, the needs, the captains, the scenario maker and the rest |
@@ -211,6 +211,45 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
    its session kind, as 42b told the captain's station (its leftover).
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
+
+### Package 56 as merged (2026-10-18)
+
+Merged `--no-ff` from the builder's worktree (seven commits on `91711a0`; 51 files, ~3,700
+lines), ruff clean, the fast tier on the merged tree by the lead; the builder's whole slow
+tier and the pace tests passed on its final tree (`docs/dev/TuningNotes.md`, "Package 56").
+Built as briefed: the grounds of the western Channel and the north of the Bay as data keyed
+to the chart's features (Holdsworth 1874 and the Britannica of 1810 where they speak;
+**every yield, keeping time and quay price a judgement with its reasoning**, the Breton
+sardine's period source unread); the gear in the smack's and the lugger's files through the
+generator (a 36-ft beam trawl, longlines and a small tuck-sean; drift nets and lines) and no
+other ship's; eight evolutions with the hands, the hours, the sail each allows and the
+trawl's drag on her way; one catch function for the player's ship, a crewed fisherman and
+the far body; the well first then the hold, the salt, the spoilage; twelve fish quays with
+prices apart from the cargo markets; the never-crewed rule lifted and the crewed fisherman's
+captain working his gear; the glass by tiers, quieter after the recorded passages showed it
+chattering, and every made-out line giving her bearing and the course she stands.
+
+**The lead's ruling on the pins:** the brief said no pin moves, meaning the fishing; the
+builder proved the fishing moved none (the ten moved tests pass against their old pins with
+the package's lookout words switched off by a plugin kept out of the repository), and the
+ten that moved did so by their new lines alone, each passage's count up by exactly its
+glass lines and every pinned tick standing. The sighting's course was the owner's own
+finding at gate 6c and the glass's lines are the package's point, so the moves are the
+head rule's case, re-measured once with the old figure beside the new: **accepted**. The
+alternative, the glass asked-only and the made-out lines as they were, would drop the
+owner's note.
+
+**Taken another way, accepted:** the smack's tuck-sean is a judgement (Holdsworth's seans
+belonged to shore companies) so that truth 105 can stand; the drift nets bind her by the
+sail allowance and heaving to, with no drag; the catch is said once a day at eight and when
+it turns. **Found and fixed on the way:** a fishing trip's mark is the ground itself (the
+old station-off rule put a bay's station on the land).
+
+**Open items, carried:** the heave-to's four tending hands are the frigate's figure and a
+small vessel wants its own; `station_off` still puts a cruiser's station in a bay on the
+land; a near-sail hail with no comma and a doubled "fill away" from the crewed captain
+(pre-existing); an old checkpoint of a smack loads with no fishery; the Breton sardine's
+source (Duhamel du Monceau, Robin) to read.
 
 ### Package 57 as merged (2026-10-17)
 

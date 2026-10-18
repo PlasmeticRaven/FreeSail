@@ -1,0 +1,20 @@
+# Haul the nets (package 56). The fleet hove in by the capstan on the warp, the nets
+# hauled in over the roller and the fish shaken out of the meshes into the hold
+# (Holdsworth 1874 pp. 108 to 111); two hours for sixty nets: judgement.
+#
+# The script (freesail/evolutions/scripts.py, FishingGearScript) holds the gear and not the
+# ship; the order's checks (the gear she carries, the ground she is on, its season, the
+# hour and the wind) are freesail/orders/fishing.py's.
+id: haul_nets
+verb: haul the nets
+applies_to: {class: ship}
+script: fishing_gear
+params: {gear: drift nets, action: haul, ground: null}
+preconditions: []
+timing:
+  haul_s: 7200
+on_start: {log: "All hands to haul the nets; man the capstan."}
+on_complete: {log: "{catch}", kind: fishing.hauled, severity: notable}
+on_fail: {log: "Could not haul the nets: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Holdsworth 1874 pp. 108 to 111 (hauling the nets)"

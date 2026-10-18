@@ -7733,6 +7733,100 @@ class SendBoatScript(Script):
         return max(0.0, left.get(self.phase, 600.0) - self.phase_t)
 
 
+# ---------------------------------------------------------------------------
+# The fishing gear (package 56; spec M7b §21a)
+# ---------------------------------------------------------------------------
+
+
+class FishingGearScript(Script):
+    """The gear shot or hauled (data/evolutions/shoot_*.yaml, haul_*.yaml): one phase of
+    the file's time with the hands at it (`shoot_s` or `haul_s`, stretched by the
+    weather's factor); shot, the gear is in the water fishing (`world.fishing.GearOut`,
+    the World's fishery, which takes the catch a minute at a time by the one catch
+    function); hauled, its take is struck below into the well and the hold. Holds the
+    gear (and the boat, for the seine) and not the ship, so that the helm and the sheets
+    are worked while the hands are at it. The orders' checks are `orders.fishing`'s."""
+
+    holds_subject = False
+
+    def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
+        super().__init__(ship, params, timing)
+        self.kind = str(params.get("gear") or "")
+        self.action = str(params.get("action") or "shoot")
+        self.ground_id = str(params.get("ground") or "")
+        self.catch_words = ""
+        self.phase_t = 0.0
+
+    def holds(self) -> set[str]:
+        return {"the fishing gear", "the boat"} if self.kind == "seine" else {"the fishing gear"}
+
+    def _fishery(self) -> Any:
+        world = _world_of(self.ship)
+        return getattr(world, "fishery", None) if world is not None else None
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        fishery = self._fishery()
+        if fishery is None or fishery.carries(self.kind) is None:
+            return f"she carries no {self.kind}"
+        if self.action == "shoot" and fishery.out is not None:
+            return f"{fishery.out.name} is in the water already"
+        if self.action == "haul" and (fishery.out is None or fishery.out.kind != self.kind):
+            return f"the {self.kind} is not in the water"
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.phase = self.action
+        self.phase_t = 0.0
+        if self.action == "haul":
+            fishery = self._fishery()
+            if fishery is not None and fishery.out is not None:
+                fishery.out.state = "hauling"
+
+    def _duration(self) -> float:
+        return self.timing_value(f"{self.action}_s", 1800.0)
+
+    def tick(self, dt: float, wind: Wind, factor: float) -> None:
+        self.t += dt
+        self.phase_t += dt
+        if self.status != "running":
+            return
+        if self.phase_t < self._duration() * factor:
+            return
+        from freesail.world import fishing
+
+        world = _world_of(self.ship)
+        fishery = self._fishery()
+        if world is None or fishery is None:
+            self.fail("she is in no world to fish in")
+            return
+        if self.action == "shoot":
+            gear = fishery.carries(self.kind)
+            fishery.out = fishing.GearOut(
+                gear.id, self.kind, gear.name, self.ground_id, world.clock.tick
+            )
+            self.catch_words = ""
+            fishing.rig_gear_drag(world, fishery)
+        else:
+            self.catch_words, _ = fishing.haul_into(world, fishery)
+        self.finish()
+
+    def belayed(self) -> None:
+        # a haul belayed leaves the gear in the water, fishing again; a shot belayed is
+        # hauled back aboard empty, as it went
+        fishery = self._fishery()
+        if self.action == "haul" and fishery is not None and fishery.out is not None:
+            fishery.out.state = "fishing"
+
+    def remaining_s(self) -> float:
+        return max(0.0, self._duration() - self.phase_t)
+
+    def words(self) -> dict[str, Any]:
+        fishery = self._fishery()
+        gear = fishery.carries(self.kind) if fishery is not None else None
+        name = gear.name if gear is not None else f"the {self.kind}"
+        return {"gear": name, "Gear": _cap(name), "catch": self.catch_words}
+
+
 SCRIPTS: dict[str, type[Script]] = {
     "tack": TackScript,
     "trim_sheet": TrimSheetScript,
@@ -7769,4 +7863,6 @@ SCRIPTS: dict[str, type[Script]] = {
     "unmoor": UnmoorScript,
     "lay_out_kedge": LayOutKedgeScript,
     "send_boat": SendBoatScript,
+    # the fishing gear (package 56)
+    "fishing_gear": FishingGearScript,
 }

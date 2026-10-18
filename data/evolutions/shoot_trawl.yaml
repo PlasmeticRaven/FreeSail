@@ -1,0 +1,23 @@
+# Shoot the trawl (package 56, spec M7b §21a). The beam trawl put over the side and the
+# warp veered as she goes ahead under easy sail with the tide, the bridles and the dandy
+# bridle made fast; from then she is towing her trawl, half a knot to a knot and a half
+# faster than the stream (Holdsworth 1874 pp. 70 to 71, 77 to 79), and the trawl fishes
+# by the ground's yield a minute at a time (freesail/world/fishing.py) until it is hauled.
+# A quarter of an hour to get the beam over and the warp veered: judgement.
+#
+# The script (freesail/evolutions/scripts.py, FishingGearScript) holds the gear and not the
+# ship; the order's checks (the gear she carries, the ground she is on, its season, the
+# hour and the wind) are freesail/orders/fishing.py's.
+id: shoot_trawl
+verb: shoot the trawl
+applies_to: {class: ship}
+script: fishing_gear
+params: {gear: trawl, action: shoot, ground: null}
+preconditions: []
+timing:
+  shoot_s: 900
+on_start: {log: "Hands to the trawl; over with the beam and veer away the warp."}
+on_complete: {log: "The trawl is down; she is towing it with the tide under easy sail.", kind: fishing.shot, severity: notable}
+on_fail: {log: "Could not shoot the trawl: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 3, rating: ordinary, stations: [forecastle, afterguard]}
+source: "Holdsworth 1874 pp. 70 to 71, 77 to 79 (the trawl towed with the tide under easy sail; the warp and the winch)"

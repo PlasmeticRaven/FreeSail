@@ -1,0 +1,23 @@
+# Shoot the nets (package 56). The drift nets shot at sunset: "the vessel is put before
+# the wind, and shooting the nets over the quarter of the vessel is begun", two hands
+# shooting, one at the corks and one at the netting, the capstan-man at the seizings
+# (Holdsworth 1874 pp. 106 to 107); then she rides to her nets through the night, the
+# fish striking "just after sunset and before sunrise" (pp. 98 to 99). Half an hour for a
+# fleet of sixty nets: judgement.
+#
+# The script (freesail/evolutions/scripts.py, FishingGearScript) holds the gear and not the
+# ship; the order's checks (the gear she carries, the ground she is on, its season, the
+# hour and the wind) are freesail/orders/fishing.py's.
+id: shoot_nets
+verb: shoot the nets
+applies_to: {class: ship}
+script: fishing_gear
+params: {gear: drift nets, action: shoot, ground: null}
+preconditions: []
+timing:
+  shoot_s: 1800
+on_start: {log: "Hands to shoot the nets; put her before the wind."}
+on_complete: {log: "The nets are shot; she rides to them.", kind: fishing.shot, severity: notable}
+on_fail: {log: "Could not shoot the nets: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: 4, rating: ordinary, stations: [forecastle, afterguard]}
+source: "Holdsworth 1874 pp. 98 to 99, 106 to 107 (drift-net fishing; shooting the nets)"

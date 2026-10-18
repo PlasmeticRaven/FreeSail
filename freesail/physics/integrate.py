@@ -115,6 +115,11 @@ def _substep(
     drag_u = _rate(hp.resistance(hull, d.u, d.heel) * st.sea_drag, d.u)
     drag_v = _rate(hp.sway_damping(hull, d.u, d.v), d.v)
     drag_r = _rate(hp.yaw_damping(hull, d.u, d.r), d.r)
+    # the trawl towed astern (package 56, `world.fishing.TRAWL_DRAG`): its drag on her way
+    # ahead, the square of her speed through the water; nothing with no trawl down
+    tow = ship.extra.get("gear_drag") if isinstance(ship.extra, dict) else None
+    if tow:
+        drag_u += _rate(-float(tow) * d.u * abs(d.u), d.u)
 
     # the cable's pull at the hawse (package 34), when an anchor is down
     if st.at_anchor:

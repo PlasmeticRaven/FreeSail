@@ -3227,7 +3227,8 @@ def test_a_named_grant_means_what_it_says_and_several_of_one_order_stand_togethe
     assert e.kind == "order.rejected" and (
         "'set the reckoning' reads as the order 'set', which the officer of the watch may give "
         "already, so it would allow nothing. The longer orders that begin with the same word: "
-        "'you may set the storm staysails', 'you may set the reckoning to'." in e.text
+        "'you may set the storm staysails', 'you may set the reckoning to', 'you may set the "
+        "lines'." in e.text  # package 56: the fishing gear's `set the lines`
     )
     e = world.submit("you may let go")
     assert e.kind == "order.rejected" and "'you may let go the anchor'" in e.text

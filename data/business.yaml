@@ -50,6 +50,9 @@ in_port_hours_drawn: [1, 11]
 # many fathoms, so far from the coast, and a port within reach that sells fish (pilchards,
 # fish, cod) to be her home; a trip of so many hours on the ground (Holdsworth 1874 pp. 137
 # to 139: a shot of the lines and the hauling, a tide or two; the trawl smacks out for days).
+# Package 56: the grounds' tables of data/fishing/ name each ground's season, fish and
+# yield, and the fish quays' prices are data/fishing/fish.yaml's; a ground the tables do
+# not name keeps the default there.
 fishing:
   depth_fathoms: [10, 80]
   off_the_coast_nm: 2

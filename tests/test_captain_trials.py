@@ -70,8 +70,8 @@ TRIAL_STATION_STRANGER_STATES = [
     (18060, "keeping station"),  # package 57 (18960 at 43, 10440 at 45c, 24660 at 45)
 ]
 TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [10423] at 45c; never at 45
-TRIAL_STATION_STRANGER_LINES = 754  # package 57 (714 at package 43, 889 at 45c)
-TRIAL_STATION_STRANGER_DIGEST = "1e9fbcf3ce7497bc"  # package 57 (8dc4b6b51d3bfa8f at 44)
+TRIAL_STATION_STRANGER_LINES = 756  # package 56, the glass (754 at 57)
+TRIAL_STATION_STRANGER_DIGEST = "9c24b2e01bb801e7"  # package 56, the glass (1e9fbcf3ce7497bc at 57)
 
 
 @pytest.fixture(scope="module")
@@ -260,11 +260,11 @@ TRIAL_TRADE_STRANGER_STATES = [
     (57360, "in port"),  # 56520 at 43b, 55440 at 43 (35640 at package 45c, 35340 at 45)
 ]
 TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [57324]  # package 57 ([56498] at 43b, [55413] at 43)
-TRIAL_TRADE_STRANGER_LINES = 1521  # package 57 (1624 at 43b, 1556 at 43, 1176 at 45c)
+TRIAL_TRADE_STRANGER_LINES = 1534  # package 56, the glass (1521 at 57)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
-TRIAL_TRADE_STRANGER_DIGEST = "e73870448a788eac"  # package 57 (6b8c9c7406821465 at 43b)
+TRIAL_TRADE_STRANGER_DIGEST = "7b8012b076ebea42"  # package 56, the glass (e73870448a788eac at 57)
 
 
 @pytest.fixture(scope="module")
@@ -305,11 +305,11 @@ TRIAL_TRADE_THICK_STATES = [
     (14820, "in port"),
 ]
 TRIAL_TRADE_THICK_ANCHORED_TICK = 14775  # package 45 (17688 at package 37p)
-TRIAL_TRADE_THICK_LINES = 482  # package 45 (553 at package 37p)
+TRIAL_TRADE_THICK_LINES = 489  # package 56, the glass (482 at 45)
 # decision 45, the pilot's news: 50901cf162ea95aa before; package 37p (10fee882c789666e before)
 # package 45c: every tick and the lines as they were; a line's words moved (the pilot's
 # conn and the weather's sky, both this package's)
-TRIAL_TRADE_THICK_DIGEST = "7915dc59337bd31d"  # 44, a line's words (f39f5c6f393dd75d at 45c)
+TRIAL_TRADE_THICK_DIGEST = "ce964d9f346034de"  # package 56, the glass (7915dc59337bd31d at 44)
 
 
 @pytest.fixture(scope="module")

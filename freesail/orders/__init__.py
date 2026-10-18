@@ -210,6 +210,16 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import needs
 
         return needs.execute(ship, order)
+    if vocab.verbs[order.verb].object == "fishing":
+        # the fishing gear, the catch and the fish quay (spec M7b §21a; package 56)
+        from freesail.orders import fishing
+
+        return fishing.execute(ship, order)
+    if vocab.verbs[order.verb].object == "glass":
+        # the glass on a near ship (spec M7b §21b; package 56)
+        from freesail.orders import glass
+
+        return glass.execute(ship, order)
     if order.verb == "set" and ("reefs" in order.modifiers or "close" in order.modifiers):
         return _set_reefed(ship, order, vocab)
     return verbs.execute(ship, order, vocab)

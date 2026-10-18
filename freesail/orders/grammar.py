@@ -155,7 +155,17 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
             verb_phrase=verb_phrase,
             object=said or None,
         )
-    if spec.object in ("navigation", "reading", "anchor", "person", "port", "needs", "allowance"):
+    if spec.object in (
+        "navigation",
+        "reading",
+        "anchor",
+        "person",
+        "port",
+        "needs",
+        "allowance",
+        "fishing",
+        "glass",
+    ):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by
         # `orders.navigation` as they were said (the original text, not the lower-cased

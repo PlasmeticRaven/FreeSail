@@ -467,6 +467,18 @@ def _sail_check(
         return template.format(name=name[4:], **{"class": sail.cls, "verb": verb}).rstrip(".")
     if verb == "set" and sail.state is SailState.SET:
         return f"{name} is already set"
+    if verb == "set":
+        # the fishing gear's allowance (package 56): a sail beyond it is refused while the
+        # gear is in the water; nothing on a ship with no fishery
+        from freesail.orders.prompt import world_of
+
+        fishery = getattr(world_of(ship), "fishery", None)
+        if fishery is not None and fishery.out is not None:
+            from freesail.world.fishing import sail_allowed
+
+            why = sail_allowed(fishery, ship, sail.id)
+            if why:
+                return why
     if verb == "take in":
         unsuited = _take_in_word_check(ship, sail, order.verb_phrase, vocab)
         if unsuited:

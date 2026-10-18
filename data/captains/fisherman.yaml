@@ -1,14 +1,22 @@
-# FreeSail: the doctrine of a fishing master (spec M6 §19; package 43b). The form is
-# merchant.yaml's (see its head). The smack and the lugger of the world's business, at far
-# detail only (`freesail/world/crews.py` never crews a fisherman: the spec puts them at
-# far detail in the business and at full detail in the regatta): a trip to a ground drawn
-# from the coast's features, the ground worked as a station of a mile or two for the
-# trip's hours (Holdsworth 1874 pp. 137 to 139: the lines shot under easy sail with the
-# wind free, the smack hove to while the tide runs, the lines hauled by short tacks), and
-# home to the port she sailed from, where she goes in and is gone from the sea. She runs
-# from an enemy made out near her, heaves to in a gale with sea room and claws off a lee
-# shore, as a merchantman does. Her books are empty: the far body works each state by its
-# plan (`freesail/world/brains.py`, `resolve_state`), and she is never crewed.
+# FreeSail: the doctrine of a fishing master (spec M6 §19; package 43b; package 56). The
+# form is merchant.yaml's (see its head). The smack and the lugger of the world's business:
+# a trip to a ground drawn from the coast's features or named in the grounds' tables
+# (data/fishing/), the ground worked for the trip's hours (Holdsworth 1874 pp. 137 to 139:
+# the lines shot under easy sail with the wind free, the smack hove to while the tide
+# runs, the lines hauled by short tacks), and home to the port she sailed from, where her
+# catch is landed at the fish quay and she is gone from the sea. She runs from an enemy
+# made out near her, heaves to in a gale with sea room and claws off a lee shore, as a
+# merchantman does. Her books are empty: the far body works each state by its plan
+# (`freesail/world/brains.py`, `resolve_state`) and her gear by the same evolutions' times
+# and the same catch function as the player's (`world.fishing.far_work`). Since package
+# 56 she is crewed like any other ship near the player (spec M7b §21a: 43b's "never
+# crewed" lifted), and at full detail her captain works the gear by the same evolutions
+# through the orders, in Python and not in a book (`world.fishing.captain_work`, called
+# from `Captain._station`): the gear the ground wants shot when it fishes at the hour, the
+# ship hove to riding to the nets, the lines or the seine (the trawl towed under the sail
+# she has, its drag on her way), hauled when the shot is full or the hour no longer
+# serves, and home when the hours are done. What the doctrine needed: nothing in its
+# tables; the gear's rule is the fishing module's, one rule for both bodies.
 
 role: fisherman
 name: a fishing master

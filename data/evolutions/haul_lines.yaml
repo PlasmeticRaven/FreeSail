@@ -1,0 +1,21 @@
+# Haul the lines (package 56). "The foresail of the smack is lowered, and the end buoy
+# being taken on board, the vessel makes short tacks along the course of the line", the
+# fish taken off the hooks, the cod put alive into the well (Holdsworth 1874 pp. 138 to
+# 139). Three hours for the string: judgement.
+#
+# The script (freesail/evolutions/scripts.py, FishingGearScript) holds the gear and not the
+# ship; the order's checks (the gear she carries, the ground she is on, its season, the
+# hour and the wind) are freesail/orders/fishing.py's.
+id: haul_lines
+verb: haul the lines
+applies_to: {class: ship}
+script: fishing_gear
+params: {gear: lines, action: haul, ground: null}
+preconditions: []
+timing:
+  haul_s: 10800
+on_start: {log: "Take the end buoy aboard; haul the lines."}
+on_complete: {log: "{catch}", kind: fishing.hauled, severity: notable}
+on_fail: {log: "Could not haul the lines: {reason}.", kind: evolution.failed, severity: notable}
+crew: {hands: all, rating: ordinary, stations: [all hands]}
+source: "Holdsworth 1874 pp. 138 to 139 (hauling the longlines)"

@@ -1,0 +1,38 @@
+# FreeSail: the fishing grounds of the north of the Bay of Biscay (package 56, spec M7b
+# §21a), the chart's region `biscay-north`: the Breton sardine off Glenan and Belle Isle.
+# The form is data/fishing/channel-west.yaml's. The sardine was the chief fishery of the
+# south Breton coast, taken in drift nets by day with salted cod's roe ('rogue') thrown to
+# raise the shoal, from undecked boats (the Musée de la Pêche, Concarneau, read
+# 2026-10-17 at artsandculture.google.com: in the eighteenth century "50% of the entire
+# French production volume", the sardine "first fished using roe (salted cod eggs) with
+# different types of nets"); the season of summer and autumn and every yield judgement,
+# no period page reached for them (Duhamel du Monceau's Traité des pêches and Robin's
+# Pêcheurs bretons sous l'Ancien régime are the sources to read next).
+
+region: biscay-north
+grounds:
+  - id: south-of-glenan
+    name: the soundings south of Glenan
+    feature: soundings-south-of-glenan
+    radius_nm: 4.0
+    source: "the chart's feature; the Concarneau and Port Louis sardine boats' ground, judgement on the place"
+    fish:
+      - {fish: sardines, gear: drift nets, months: [6, 7, 8, 9, 10], when: day, tons_per_hour: 0.15, source: "judgement, as the Iroise (data/fishing/channel-west.yaml)"}
+      - {fish: ling and conger, gear: lines, months: all, when: any, tons_per_hour: 0.03, source: "judgement"}
+  - id: off-belle-isle
+    name: the soundings off Belle Isle
+    feature: soundings-off-belle-isle
+    radius_nm: 4.0
+    source: "the chart's feature; Le Palais's sardine (its market file's 'island's sardines'), judgement on the place"
+    fish:
+      - {fish: sardines, gear: drift nets, months: [6, 7, 8, 9, 10], when: day, tons_per_hour: 0.15, source: "judgement"}
+      - {fish: ling and conger, gear: lines, months: all, when: any, tons_per_hour: 0.03, source: "judgement"}
+  - id: belle-isle-to-yeu
+    name: the soundings between Belle Isle and Yeu
+    feature: soundings-belle-isle-to-yeu
+    radius_nm: 5.0
+    source: "the chart's feature"
+    fish:
+      - {fish: sardines, gear: drift nets, months: [6, 7, 8, 9, 10], when: day, tons_per_hour: 0.12, source: "judgement: farther from the presses"}
+      - {fish: soles and turbot, gear: trawl, months: all, when: any, tons_per_hour: 0.015, source: "judgement: the sandy soundings of the bay"}
+      - {fish: plaice and hake, gear: trawl, months: all, when: any, tons_per_hour: 0.05, source: "judgement"}

@@ -662,6 +662,12 @@ class World:
             float(getattr(stores_spec, "provisions_days", 0.0) or 0.0),
         )
         self.ports = Ports(self)
+        # the fishery (spec M7b §21a; package 56): the gear her file carries, the gear in
+        # the water and the catch aboard; None for a ship that carries no fishing gear,
+        # whose world is as it was
+        from freesail.world.fishing import Fishery
+
+        self.fishery = Fishery.of_spec(getattr(self.ship, "spec", None))
         # the needs (spec M7b §19, §20; package 54): the people's hunger, thirst and
         # fatigue, by hand at a station held and by the routine elsewhere, told to the
         # person stationed alone (`world.needs`); the stores' fall at the meals is
@@ -1795,6 +1801,12 @@ class World:
             # writes nothing unless one runs out, and the people's needs, told to the
             # person stationed and never to the log
             self._tick_needs()
+            # the fishery once a minute (package 56): the gear in the water fishing, the
+            # catch's spoilage and its day line; nothing on a ship with no gear
+            fishery = getattr(self, "fishery", None)
+            if fishery is not None:
+                for severity, kind, text, data in fishery.tick(self):
+                    self.record(severity, kind, text, data=data)
         bells = self.clock.bells()
         if bells is not None:
             self.record(

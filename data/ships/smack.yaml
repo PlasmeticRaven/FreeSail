@@ -596,3 +596,22 @@ boats:
   oars: 2
   crew: 3
   tons: 0.1
+# The fishing gear (package 56, spec M7b §21a): what she carries and no other, each with its source; the evolutions that work it are data/evolutions/shoot_*.yaml and haul_*.yaml, its fishing the grounds' of data/fishing/; see tools/gen_ships.py.
+gear:
+# A beam trawl of 36 ft, the smallest of the deep-sea trawls and the Yarmouth men's (Holdsworth 1874 pp. 47, 59), towed with the tide under easy sail at half a knot to a knot and a half faster than the stream, five or six hours a haul, and hove up by the winch in three quarters of an hour (pp. 70 to 71, 77 to 79); the warp 120 fathoms, judgement.
+- id: trawl
+  kind: trawl
+  name: the trawl
+  beam_ft: 36.0
+  length_fathoms: 120
+# Longlines, 90 lines of 40 fathoms and 2,340 hooks baited with whelks: half of the 68-ton cod smack's string (Holdsworth 1874 pp. 137 to 139), judgement on her size; the cod put alive into the well.
+- id: lines
+  kind: lines
+  name: the lines
+  length_fathoms: 3600
+  hooks: 2340
+# A tuck-sean of 80 fathoms, eight deep at the sleeves and ten at the bunt, shot round a shoal from the boat in a bay by day and tucked into the boat at once (Holdsworth 1874 p. 158: 'where only one net is used for the whole process ... the net is called ... either a stop-sean or a tuck-sean'). The pilchard seans of St Ives and the south coast were the seine companies' with their own boats (pp. 188 to 195); a smack's own small sean worked by her boat is judgement, for the spec's truth 105.
+- id: seine
+  kind: seine
+  name: the seine
+  length_fathoms: 80

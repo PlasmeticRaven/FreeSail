@@ -1445,6 +1445,11 @@ def _work_in_hand(world: Any, _: str | None) -> dict[str, Any]:
             belayed.append(words)
         else:
             doing.append(words)
+    fishery = getattr(world, "fishery", None)
+    if fishery is not None and fishery.out is not None and fishery.out.state == "fishing":
+        # a ship fishing is at her gear (package 56): "riding to her nets", words that change
+        # only when the gear goes out or comes in, as the rest of the work in hand
+        doing.append(fishery.out.doing_words())
     parts = []
     if doing:
         parts.append("doing: " + ", ".join(doing))
@@ -2048,12 +2053,27 @@ def _manifest(world: Any, _: str | None) -> dict[str, Any] | None:
     hold = getattr(world, "hold", None)
     if hold is None or hold.capacity_tons <= 0:
         return None
-    return {
+    out = {
         "words": hold.words(),
         "capacity_tons": hold.capacity_tons,
         "stowed_tons": round(hold.stowed_tons, 2),
         "room_tons": round(hold.room_tons, 2),
         "goods": dict(hold.goods),
+    }
+    return out | _catch_of(world, out)
+
+
+def _catch_of(world: Any, out: dict[str, Any]) -> dict[str, Any]:
+    """The catch aboard in a reading's words (package 56): the fish in the well and the
+    hold and how long each keeps, where she carries any; nothing on a ship with none."""
+    fishery = getattr(world, "fishery", None)
+    if fishery is None or not fishery.catch.lots:
+        return {}
+    words = fishery.catch.words(world.clock.tick)
+    return {
+        "words": f"{out['words']}; the catch: {words}",
+        "catch": words,
+        "catch_tons": round(fishery.catch.tons(), 3),
     }
 
 
@@ -2089,7 +2109,7 @@ def _stores(world: Any, _: str | None) -> dict[str, Any] | None:
         out["water_days"] = round(water_days, 1) if water_days is not None else None
         out["provisions_days_left"] = round(left, 1) if left is not None else None
         out["allowance"] = float(getattr(stores, "allowance", 1.0))
-    return out
+    return out | _catch_of(world, out)
 
 
 def _epitome(world: Any, _: str | None) -> dict[str, Any] | None:
@@ -2102,7 +2122,7 @@ def _epitome(world: Any, _: str | None) -> dict[str, Any] | None:
 
 def _sail_in_sight(world: Any, _: str | None) -> dict[str, Any] | None:
     lookout = _lookout_of(world)
-    return lookout.sail(float(world.ship.heading)) if lookout is not None else None
+    return lookout.sail(float(world.ship.heading), world) if lookout is not None else None
 
 
 def _strangers(world: Any, _: str | None) -> dict[str, Any] | None:

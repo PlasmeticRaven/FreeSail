@@ -881,6 +881,49 @@ that the glass on her shows the work truly and the promotion's rule has no excep
 confuse (43b's "never crewed" is lifted; the cap's order unchanged). The smack and the lugger
 carry the gear their files say.
 
+**As built (package 56; `freesail/world/fishing.py` new, `freesail/orders/fishing.py` new,
+`data/fishing/fish.yaml`, `channel-west.yaml` and `biscay-north.yaml` new, eight gear
+evolutions under `data/evolutions/` with `scripts.FishingGearScript`, the gear in the ship
+files through `tools/gen_ships.py` and `ship/schema.py` `GearSpec`).** The grounds are
+tables keyed to the chart's features (the business's Eddystone, Poll Bank, Iroise, Ushant
+and Glenan grounds) or pricked at a position with their source (the seine grounds of Gerrans
+Bay and St Ives Bay, the drift ground of Mount's Bay, the trawling ground off Berry Head),
+each fish with its gear, months, hour (night, day, any) and yield in tons an hour of the
+gear fishing; a bottom or a bank the tables do not name keeps a default. The seasons and the
+gear's forms and hours are Holdsworth 1874's (the OCR in `docs/references/holdsworth/`) and
+the Britannica of 1810's (CLUPEA, after Pennant and Borlase), the Breton sardine's the Musée
+de la Pêche's; every yield, keeping time and fish-quay price is judgement with its
+reasoning (`docs/dev/TuningNotes.md`, package 56). **One catch function** (`fishing.take`),
+called a minute at a time by the player's and a crewed fisherman's World (`Fishery.tick`)
+and by the far body (`fishing.far_work`, the same evolutions' shoot and haul times), with
+the hour's factor (the night's fish half as much again at the change of light), the wind's
+(full to six tenths of the gear's most, half at the most, nothing beyond) and, for the
+trawl, the way's (one to four knots). The smack carries a 36-ft beam trawl, longlines and a
+small tuck-sean for her boat; the lugger a fleet of sixty drift nets and lines; no other
+ship any. The orders: `shoot`/`haul the trawl`, `the nets`, `the seine`, `set`/`haul the
+lines`, `shoot`/`haul the gear`, `sell the catch`, `the catch`, `the fishing grounds`
+(object `fishing`); a shot is refused in words for gear she lacks, off every ground, out of
+season, at the wrong hour or in too much wind; the hauls are all hands. While the gear is
+out the work in hand says "towing her trawl", "riding to her nets", and a sail beyond the
+gear's allowance is refused in `orders.verbs._sail_check`; **the trawl drags** (a drag on
+her way in `physics/integrate.py`, `ship.extra["gear_drag"]`, set only while a trawl is
+down: the smack tows at two and a quarter knots in fourteen of wind under plain sail).
+The catch goes into the well first (a ton to three cubic metres, three tons in the
+Culloden's), alive for the fish that live there and cool for a day for those that do not,
+then the hold, salted while the salt lasts, else spoiling in hours by the season; a lot
+that turns is a notable line, and the catch's line is said each morning at eight. The fish
+quays are `fish.yaml`'s twelve ports with a factor on each fish's price, fresh or salted,
+apart from the ports' cargo markets (which deal in the cured hogshead and were left
+untouched so that no price list moves). The business's fisherman shoots the gear her
+ground wants, fishes and hauls by the same times and the same function, hauls on her
+trip's end and lands her catch at home's quay (`Drawn.landed`); she is crewed like any
+other ship near the player (`crews.FAR_ONLY_ROLES` empty), her World and her far body
+sharing one `Fishery`, her captain working the gear in Python from `Captain._station`
+(`fishing.captain_work`: shoot when it fishes at the hour, heave to riding to it, haul
+when full or when the hour no longer serves, home when the hours are done), the doctrine's
+tables unchanged. A fishing trip's mark is the ground itself, not a station a league off
+(which put a bay's station on the land). Truths 7b-105 and 7b-106.
+
 ### 21b. The glass on a near ship (`freesail/world/lookout.py`, `ships.py`, `crews.py`)
 
 What the glass shows of a near ship beyond her rig and her colours: her manoeuvre and her
@@ -895,6 +938,26 @@ topsail aback"). A crewed ship gives the true evolution's name; a far-detail ves
 words her plan's leg and her sail state give; at night and in thick weather only what the
 visibility allows. Asked through `the glass on <ship>` or given by the lookout when a ship
 is made out and when her work changes.
+
+**As built (package 56; `freesail/world/lookout.py` `glass_tier`, `glass_state`,
+`glass_words`, `Lookout.glass_on` and `_glass_line`; `freesail/orders/glass.py` new).** The
+tiers at two miles, eight cables and four, each bounded by the visibility, a tier less at
+the twilight, and by night within a mile only a light (a fishing vessel at her gear hangs a
+lantern; others show none). A crewed ship's words are her own World's: the manoeuvre in
+hand, the heave-to's record (her tack and the sail aback, "main topsail aback"), the work
+in hand's gerunds, her gear; a far ship's her plan's leg (lying to, at anchor), her sail
+state, her tack and point of sailing from her heading and the wind, and her far gear's
+phase. The lookout says "The glass on the brig on the starboard bow: ..." unasked when a
+sail comes within the tiers and when her state, her work, her light or a nearer tier
+changes the words (her point of sailing alone is not a change, and a ship running before
+it is read on neither tack), not oftener than five minutes, and never of a boat under oars;
+**it moves the recorded passages' pins** wherever a sail comes within two miles by day (the
+pilot cutters, the strangers of the trials: `docs/dev/TuningNotes.md`, package 56); `the glass
+on <ship>` is a reading every station may ask (`agents.agent.Domain.why_not`). **The
+sighting says her heading**: every `lookout.made_out` line now gives her relative bearing,
+her compass bearing and the course she stands ("The sail on the larboard bow, bearing SW by
+S, is a brig, standing to the eastward (E by N), under plain sail."), and `a sail in sight`
+adds the course once her rig is made out, which is what a sample carries. Truth 7b-107.
 
 ### 21c. Truths for 7b-vi
 

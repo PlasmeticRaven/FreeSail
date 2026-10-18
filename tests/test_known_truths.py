@@ -2968,9 +2968,9 @@ GATE_5B_BROUGHT_UP_TICK = 59603  # brought up, the sails furled (package 57; 596
 GATE_5B_SAIL_SIGHTED_TICK = 55620  # "Sail ho! A sail right ahead" (package 57; 55500)
 GATE_5B_PILOT_HAIL_TICK = 57240  # the cutter hails within four cables (package 57; 57120)
 GATE_5B_PILOT_ABOARD_TICK = 57300  # the pilot aboard, a minute after (package 57; 57180)
-GATE_5B_LINES = 729  # package 57 (733 at package 45, 732 at package 37p)
+GATE_5B_LINES = 733  # package 56, the glass (729 at package 57)
 # decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
-GATE_5B_DIGEST = "5f682b9f676a2db4"  # package 57 (271d03594a160224 at package 45)
+GATE_5B_DIGEST = "c8c81b7617e4e0fd"  # package 56, the glass (5f682b9f676a2db4 at 57)
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
 # bearing; the outer road 56502 → 56517; the anchor off the town 57615 → 58210 in six
@@ -3020,9 +3020,9 @@ GATE_5B_SCHOONER_PILOT_HAIL_AGAIN_TICK = 56460  # her second, to heave to (37h; 
 GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # aboard off the outer road (37h; 56580 before)
 GATE_5B_SCHOONER_ANCHORED_TICK = 57257  # off the town, the best bower let go (57255 before 37p)
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p)
-GATE_5B_SCHOONER_LINES = 763  # package 45 (762 at package 37p; every tick as it was)
+GATE_5B_SCHOONER_LINES = 768  # package 56, the glass (763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
-GATE_5B_SCHOONER_DIGEST = "c01e6e0ff56503c8"  # 44, a line's words (edea58e34efd05c4 at 45c)
+GATE_5B_SCHOONER_DIGEST = "b7c16adc612bd01a"  # package 56, the glass (c01e6e0ff56503c8 at 44)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4092,11 +4092,11 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # re-measured at 37j's merge, the tuning notes saying both.)
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
-GATE_5C_CRUISE_LINES = 2225  # package 57 (2287 at package 45c, 1930 at package 45)
+GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
-GATE_5C_CRUISE_DIGEST = "087fdfacfc6381f1"  # package 57 (a46aa710b77a9d6a at 44)
+GATE_5C_CRUISE_DIGEST = "728522e26dd25a49"  # package 56, the glass (087fdfacfc6381f1 at 57)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4200,9 +4200,9 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 # full and by ("'keep her full and by' must wait till she weighs", the refusal of 126000,
 # not said again) where it was refused as a tack; 2999 → 2998 lines
 # (docs/dev/TuningNotes.md, package 37m).
-GATE_5C_MERCHANT_LINES = 3080  # package 57 (3079 at package 45c, 3092 at package 45)
+GATE_5C_MERCHANT_LINES = 3098  # package 56, the glass (3080 at package 57)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
-GATE_5C_MERCHANT_DIGEST = "06b14a75a5eaae8b"  # package 57 (efdd3ae1bb9711be at 44)
+GATE_5C_MERCHANT_DIGEST = "05f0f4aba2eddbc0"  # package 56, the glass (06b14a75a5eaae8b at 57)
 
 
 def _people(world) -> list[dict]:
@@ -4618,11 +4618,11 @@ GATE_6A_INTENT_ANCHORED_TICKS = [57, 104295]  # Carrick Road; Bertheaume (the Ba
 GATE_6A_INTENT_BROUGHT_UP_TICK = 105260  # package 43b (112302 at 45c, 112069 at 45)
 GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 105360  # the boat for the prices (112380 at 45c)
 GATE_6A_INTENT_SOLD_TICK = 124320  # 47 tons at £270 (119820 at 45c, 118980 at 45)
-GATE_6A_INTENT_LINES = 1684  # package 43b (2357 at 45c: the Goulet's conn, 2114 at 45)
+GATE_6A_INTENT_LINES = 1698  # package 56, the glass (1684 at package 43b)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
-GATE_6A_INTENT_DIGEST = "93981cc47f5524e6"  # package 57 (c5060beaa8b991cd at 43b)
+GATE_6A_INTENT_DIGEST = "90061f779b7db484"  # package 56, the glass (93981cc47f5524e6 at 57)
 
 
 @pytest.fixture(scope="module")
@@ -4786,7 +4786,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # quarterdeck carries its place and its hearers (none) in its data, as every say does now
 # (the owner's ruling of 2026-10-10); aa42746f61de91d1 at 37p, a2cd045b9bcc93f8 before it
 # decision 45, the pilot's news: b00ac08c3f63e84c before
-GATE_6A_FAKE_CAPTAIN_DIGEST = "0e089f1279e03928"  # package 57 (c266f45bb9e7fe6f at 44)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "f996530d5a041abc"  # package 56, the glass (0e089f1279e03928 at 57)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -6157,3 +6157,187 @@ def test_truth_7b_112_the_frigate_lies_to_under_her_main_staysail_by_the_heavy_w
     assert all(ship.sails[s].is_set for s in ship.groups["storm staysails"])
     assert not ship.sails["main.staysail"].is_set
     assert ship.sails["main.staysail"].state.value != "blown_out"
+
+
+# Package 56: fishing, and the glass on a near ship (spec M7b §21a to §21c). Truths 7b-105
+# to 7b-107. 105 and 106 on the Culloden smack and the business's smack on the seine
+# ground in Gerrans Bay at seed 7, an August forenoon, the wind ten knots from the west;
+# 107 on the frigate with the Palinure lying to at a mile, at four cables and by night. No
+# recorded passage's pin moves by the fishing: the business is off in every one, and a
+# ship that carries no gear has no fishery (the digests the tests keep).
+# ---------------------------------------------------------------------------
+
+
+def _gerrans_world(ship="data/ships/smack.yaml", lat=50.195, lon=-4.945, hour=9):
+    sc = Scenario(
+        start_time=datetime(1805, 8, 14, hour, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=10.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        region="channel-west",
+        ports=["falmouth", "plymouth"],
+        nation="britain",
+    )
+    return make_world(7, ship, sc)
+
+
+def _one_shot_of_the_seine(world):
+    """The seine shot, an hour fished, hauled: the player's evolutions through the orders."""
+    world.submit("shoot the seine")
+    while world.fishery.out is None:
+        world.run(60)
+    while world.fishery.out.fished_s < 3600:
+        world.run(60)
+    world.submit("haul the seine")
+    while world.fishery.out is not None:
+        world.run(60)
+    caught: dict[str, float] = {}
+    for lot in world.fishery.catch.lots:
+        caught[lot.fish] = caught.get(lot.fish, 0.0) + lot.tons
+    return caught
+
+
+@pytest.fixture(scope="module")
+def gerrans_seine():
+    world = _gerrans_world()
+    caught = _one_shot_of_the_seine(world)
+    return world, caught
+
+
+def test_truth_7b_105_the_smacks_seine_fills_her_well_the_catch_sells_at_falmouth_and_spoils_kept(
+    gerrans_seine,
+):
+    """Spec M7b §21c, truth 105: "The smack on a pilchard ground in season, the seine
+    shot and hauled, fills her well by the ground's yield; the fish sold at Falmouth at
+    the market's price; a well kept too long spoils its catch." Gerrans Bay in August by
+    day: an hour of the seine takes the ground's three tons of pilchards an hour and its
+    ton of mackerel (data/fishing/channel-west.yaml) at ten knots of wind, by the one
+    catch function; the well's three tons are filled and the rest goes into the hold; the
+    same catch landed at Falmouth's quay sells at the quay's price; kept a day in the
+    well, the pilchards there spoil and are said to."""
+    import copy
+
+    from freesail.world import fishing as F
+
+    world, caught = gerrans_seine
+    ground = F.find_ground(world, "gerrans-bay")
+    hour = F.take(ground, "seine", datetime(1805, 8, 14, 10), "day", 10.0, 3600.0)
+    assert caught == pytest.approx(hour, rel=1e-6)
+    catch = world.fishery.catch
+    assert catch.in_well() == pytest.approx(catch.well_tons) == pytest.approx(3.0)
+    hauled = [e for e in world.log if e.kind == "fishing.hauled"]
+    assert len(hauled) == 1 and "Struck down" in hauled[0].text
+    assert "in the well" in hauled[0].text
+    # the catch carried into Carrick Road and sold on the quay
+    quay = _gerrans_world(lat=50.163, lon=-5.0345)
+    quay.submit("let go the best bower")
+    quay.run(600)
+    quay.fishery.catch = copy.deepcopy(catch)
+    for lot in quay.fishery.catch.lots:
+        lot.caught_tick = quay.clock.tick
+        lot.spoils_tick = None if lot.spoils_tick is None else quay.clock.tick + 3600
+    worth = sum(F.price_of(f, False) * t for f, t in caught.items())
+    before = quay.purse.pounds
+    sold = quay.submit("sell the catch")
+    assert sold.kind == "fishing.sold" and "Falmouth" in sold.text
+    assert quay.purse.pounds - before == pytest.approx(worth)
+    # kept a day: the well's pilchards spoil (a pilchard keeps 24 hours in its water)
+    world.run(25 * 3600)
+    turned = [e for e in world.log if e.kind == "fishing.spoiled"]
+    assert any("in the well" in e.text and "pilchards" in e.text for e in turned)
+    assert all(lot.spoiled for lot in world.fishery.catch.lots if lot.fish == "pilchards")
+
+
+def test_truth_7b_106_the_business_fisherman_on_the_same_ground_brings_home_the_same_catch(
+    gerrans_seine,
+):
+    """Spec M7b §21c, truth 106: "The business's fisherman on the same ground brings home
+    the same catch at far detail." A smack of the business on the Gerrans seine ground for
+    two hours from Falmouth, the player's frigate twenty miles off (beyond the crewed
+    range): her far body shoots the seine by the evolution's own time, fishes an hour by
+    the one catch function and hauls, and the catch is the player's to the ounce; she runs
+    home, and her catch is landed at Falmouth's quay (the sale in her record)."""
+    from freesail.world.ships import vessel_from_spec
+
+    _world, caught = gerrans_seine
+    far = _gerrans_world(ship="data/ships/frigate-36.yaml", lat=49.85, lon=-5.2)
+    far.vessels.serial += 1
+    v = vessel_from_spec(
+        far,
+        {
+            "description": "smack",
+            "name": "Brothers",
+            "nation": "britain",
+            "position": {"lat_deg": 50.195, "lon_deg": -4.945},
+            "goal": "bound for Falmouth",
+            "intent": "fish on the seine ground in Gerrans Bay for 2 hours from Falmouth",
+        },
+        far.vessels.serial,
+    )
+    far.vessels.add(v)
+    while v.brain.intent.kind == "fish":
+        far.run(60)
+    assert v.crew is None and v.fishing is not None
+    took: dict[str, float] = {}
+    for lot in v.fishing.catch.lots:
+        took[lot.fish] = took.get(lot.fish, 0.0) + lot.tons
+    assert took == pytest.approx(caught, rel=1e-9)
+    for _ in range(24 * 60):
+        if v.done:
+            break
+        far.run(60)
+    landed = v.fishing.catch.landed
+    assert v.done and landed and landed[0]["port"] == "falmouth"
+    home = dict(landed[0]["sold"])
+    for fish, tons in landed[0]["spoiled"].items():
+        home[fish] = home.get(fish, 0.0) + tons
+    assert sum(home.values()) == pytest.approx(sum(caught.values()), rel=1e-3)
+
+
+def _palinure_at(distance_nm: float, hour: int = 11):
+    from freesail.world.geo import destination
+    from freesail.world.ships import vessel_from_spec
+
+    world = _gerrans_world(ship="data/ships/frigate-36.yaml", lat=49.80, lon=-5.0, hour=hour)
+    where = destination(world.position, 90.0, distance_nm * 1852.0)
+    world.vessels.serial += 1
+    v = vessel_from_spec(
+        world,
+        {
+            "id": "palinure",
+            "description": "brig-sloop",
+            "name": "Palinure",
+            "nation": "france",
+            "position": where.to_dict(),
+            "goal": "bound for 49 48 N 4 30 W",
+        },
+        world.vessels.serial,
+    )
+    v.plan = [("lie_to", math.inf)]
+    world.vessels.add(v)
+    world.run(120)
+    return world
+
+
+def test_truth_7b_107_the_glass_on_the_palinure_hove_to_by_tiers_and_by_night():
+    """Spec M7b §21c, truth 107: "The glass on the Palinure hove to at a mile says she is
+    hove to and on which tack; at four cables the main topsail aback; at night, only her
+    light if any." The French brig-sloop lying to east of the frigate, the wind from the
+    west: at a mile the glass says she is hove to on the larboard tack and nothing of her
+    sails; within four cables the evolution's words, her main topsail aback; by night no
+    light shows and nothing of her work is made out. The lookout says the glass unasked
+    when she comes within its tiers."""
+    world = _palinure_at(1.0)
+    e = world.submit("the glass on the brig")
+    assert e.kind == "lookout.glass" and "hove to on the larboard tack" in e.text, e.text
+    assert "aback" not in e.text
+    said = [x for x in world.log if x.kind == "lookout.glass"]
+    assert said and "hove to on the larboard tack" in said[0].text
+    near = _palinure_at(0.35)
+    e = near.submit("the glass on the brig")
+    assert "hove to on the larboard tack, main topsail aback" in e.text, e.text
+    night = _palinure_at(0.35, hour=23)
+    e = night.submit("the glass on the brig")
+    assert "no light shows" in e.text and "aback" not in e.text, e.text
