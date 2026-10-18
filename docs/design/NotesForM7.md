@@ -322,3 +322,22 @@ spray freezing on the rigging in a gale below the sea's freezing, the water cask
 the watch on deck tiring faster in the cold. Place: the reading and the fog mechanism in
 M7b's last package or 58; the cold's hazards with M7.
 
+## Sight across land (the owner, 2026-10-18)
+
+A vessel behind, or across, a piece of land that should block her should not be seen by
+another; the game simulates no terrain height today, so reasonable ways are wanted before a
+full terrain chart is made (which stays an option). **The lead's reading:** the tiles may
+already carry the heights: they are cut from grids that hold land and sea in one (GEBCO;
+EMODnet in part) and `Chart.elevation_at` answers a height above the datum for the shore and
+a drying rock, so where the land was not clipped at the cut the terrain is there at the
+tile's resolution, and where it was, re-cutting with the land kept is a data step. Then the
+test is a profile along the sight line: the elevation sampled every cell or so between the
+lookout's eye and the target's masthead, the ship hidden where the ground rises above the
+straight line between them (the earth's curvature in the horizon formula as now): a
+frigate's trucks show over a low spit, a lugger's lugs do not; a few dozen lookups per
+sighting per minute; symmetric, so the far ships' sightings honour it too (a cutter behind
+a headland hidden from the cruiser). **Fallback** where the heights are unusable: any land
+on the line blocks the sight, conservative and wrong for mastheads over low ground, still
+better than seeing through a cliff. Place: with the glass and the lookout in M7; it bears
+on the chase and the privateer's trade.
+
