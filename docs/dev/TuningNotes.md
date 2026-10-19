@@ -7298,3 +7298,25 @@ the recorded passages seat no model, so the line, the stand-by's end and the wak
 in them; the line is the sample's and the hearers are the result's, never the log's; aboard
 the hearing of a `say` and of a person's words is as it was; the hold's event is absent
 unless named.
+
+### The suite, as run
+
+On the build machine (four cores), 53b building beside it (the load seven to eight through
+the fast and slow tiers); the code as committed in `7ec7cb9`, the records in `0143886`.
+
+- `ruff check .` and `ruff format .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,477 passed, none
+  failed, 329 slow left out. (A first run was stopped at three quarters by the session's
+  limit on a background command, none failed by then, and run again whole.)
+- **The slow tier of the files touched** (`test_agent_api`, `test_agents`, `test_people`,
+  `test_director`, `test_world_orders`, `test_known_truths`, `--slow`): every test passed
+  but the expected failures and truth 51's five pace measurements, which were run in it by
+  mistake beside 53b's workers (246 ticks a second against the floor of 500) and belong to
+  the pace run alone (below).
+- **The slow tier once whole** (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m
+  "not pace"`): 3,789 passed, 11 expected failures (the same eleven as at 62), none failed
+  and no error; every pinned digest among them. A first whole run was stopped by hand at a
+  twentieth to be started again detached, the session's limit on a background command being
+  shorter than the run under the load.
+- **The pace tests alone** (`python3 -m pytest --slow -m pace -q -p no:cacheprovider`, the
+  load 0.9 at their start and 1.2 at the end): 6 passed.
