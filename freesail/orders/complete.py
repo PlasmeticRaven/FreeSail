@@ -258,6 +258,15 @@ def suggestions(ship: Any, text: str, limit: int = 12) -> list[str]:
         if typed == p or typed.startswith(p + " "):
             matched = phrase
             break
+    if (
+        matched is not None
+        and vocab.verbs[vocab.phrase_to_verb[normalise(matched)]].object == "free"
+        and any(len(p) > len(matched) and _starts(p, typed) for p in vocab.verb_phrases)
+    ):
+        # a free line's verb (package 53b: take, show, read, put, give) that a longer verb
+        # begins with ('take a fix', 'read the standing orders from'): the longer verbs
+        # are offered as before, each with the space for its words
+        matched = None
     if matched is None:
         for phrase in vocab.verb_phrases:
             offer(
