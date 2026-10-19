@@ -1547,11 +1547,12 @@ class World:
         if (
             captain is not None
             and actor == "captain"
-            and not kind.startswith(("agent.", "seat.", "query."))
+            and not kind.startswith(("agent.", "seat.", "query.", "free."))
         ):
             # the player's hand on an intent scenario (decision 41; package 40c): an order
             # of the ship's at the prompt, not a station's sentence nor a reading, and the
-            # rules-based captain stands aside until 'captain: carry on'
+            # rules-based captain stands aside until 'captain: carry on'; a free line
+            # (package 53b) is a person's own and no order of the ship's
             captain.player_hand(text)
         if kind == "evolution.started" and not data.get("failed"):
             # the evolution runner writes its own "started" line; avoid saying it twice
