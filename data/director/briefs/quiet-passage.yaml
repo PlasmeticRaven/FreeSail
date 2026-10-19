@@ -22,7 +22,7 @@ limits:
 cadence: glass
 budget:
   samples_a_day: 48
-  acts_a_day: 4
+  acts_a_day: 48   # no fewer than the samples: the owner's word of 2026-10-19, the budget a tuning point, not a constraint for the first testing
 # The player's examples (package 62), read to the director as examples and never as a
 # rule: the director's hand on a trader it has put on the sea, so that she may be spoken.
 examples:

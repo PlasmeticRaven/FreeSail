@@ -38,6 +38,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 62 | Opus | The director's hand: an order of a ship's own grammar given to her captain's station by the director as his own, far and crewed, refused where a model or the player holds him (spec §3; the owner's proposal of 2026-10-18); the director seated in a ship as a later item | briefed, approved and launched 2026-10-18 beside 59; **built the same day** (spec §3 as built; the Harness's §19; the primer's chapter 20; the tuning notes, "Package 62"; truth 7b-113); the director seated in a ship not built |
 | 63 | Opus | The boat (spec §21k; the owner, 2026-10-18): towing by the boat by an oar force on the hull, the boat as a vessel the player can pull or sail (the seat on another vessel), the kedge's false denial mended; kedging itself needs no package, the pull being in the anchor physics already | brief to write; after 51 |
 | 64 | Fable | The harbour's second pass (spec §21d, "The owner's first use"; the owner, 2026-10-18): the page made clear to a newcomer, the flags explained where they are set, several models and stations configured without several settings files, the maker given the papers (the chronometer first) and the people aboard by name with a short brief each per scenario | noted, not immediate; the owner's word of 2026-10-18: a Fable package after Thursday's usage reset, a proper design run so that starting a game is streamlined with every option kept (the framework functions; it wants a finer touch) |
+| 65 | Fable | The place's knowledge (spec §14, "Brought back and forward"; the owner, 2026-10-19): what a person perceives from where he stands, aboard and ashore (the readings, the log and the sightings by place; the ship reaching him ashore by report, boat or letter), the books and papers kept in places, the always-present line of his own place and state in every sample, and the drill extended to going below, eating, drinking, reading a book and coming on deck | provisional; the deferred locational knowledge of decision 47 brought back and forward at the owner's word after the dispatches test; brief after the owner's testing round |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
 
 ## The testing round after 59 (the owner, 2026-10-18)
@@ -112,7 +113,19 @@ bearings (fixed the same day), the lookout no person for `say as`, no gun or sig
 ashore (53), Plymouth's market without tin against the scenario's own intent and no mate
 in its people (the scenario), the director's stand-by unbreakable by his own word and the
 truth not a meanwhile read (50), the pilot leaving at six knots (ports), the budget of ten
-acts spent before a boarding (the brief). **The captain's debrief** (Opus 5.5, relayed by the owner; `captain-debrief.md` beside the
+acts spent before a boarding (the brief). **The owner's rulings on the test (2026-10-19):** the lookout's hail could have been said as
+the master, a person aboard nobody held, or by a person made for it; the lead did not think
+of the master and spared the acts, so **the budget of acts a day is raised to no fewer than
+the samples a day** in every starter brief and the default (the constraint is a tuning point,
+not a rule for the first testing). **Locational knowledge, dropped by decision 47, is
+brought back and forward as package 65**, provisional: a place must at least carry what can
+reasonably be perceived from it, by action and by what is there (books in their places),
+and the drill is to include going below, eating, drinking, reading a book from the library
+and coming on deck. **The status line:** the owner's thought is the `how am I` reading
+printed in every sample, with a little more for the sense of place; the lead's answer is in
+spec §14 under package 65.
+
+**The captain's debrief** (Opus 5.5, relayed by the owner; `captain-debrief.md` beside the
 notes) adds twelve more, routed in the notes: a word on deck waking a station out of
 earshot with an empty sample and orders dropped during a stand-by (50, the harness); the
 deck's rule in the sample's state line; the master's courses across the land (61); the

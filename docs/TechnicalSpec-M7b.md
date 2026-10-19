@@ -666,6 +666,44 @@ what they were (the lead's reading had them in `the port`, whose words a pinned 
 asks for in port: truth 78's). At the console `go` alone still runs the clock; with words
 after it, it is an order.
 
+**Brought back and forward: the place's knowledge (package 65, provisional; the owner,
+2026-10-19, on the dispatches test).** Decision 47 dropped locational knowledge as an
+overcomplication; the first director's test brought it back by the captain's own account:
+everything reached him in the sample wherever he stood, so moving bought nothing and cost
+an order, and the station felt like a fixed seat with a view; ashore in Plymouth market he
+had the ship's heading, leeway, sails and the frigate's bearing from three miles off. The
+owner's ruling: a place is to carry at least what can reasonably be perceived from it, by
+action and by what is there. Provisionally, then, and for the brief to settle:
+
+- **What a place gives.** The quarterdeck: the deck's readings, the log as it is spoken,
+  the lookout's hails, the conversation of the deck. The masthead: the lookout's horizon
+  and his glass, the deck by hail. The cabin: the chart, the papers and the quiet to work a
+  course, the deck by report (the officer's word, the messenger) and by what is felt (the
+  heel, the motion, the sounds of sail work and all hands). The gunroom: the master's day's
+  work and his slate. Below, asleep: nothing until called or woken. Ashore: the port's
+  places as §14 has them, and the ship by report, by boat or by letter only; the readings
+  of the ship come to nobody ashore. The harness keeps the rule, not the model: a sample
+  carries the readings the place allows, and a reading asked for elsewhere is answered
+  with where it is to be had ("the chart is in the cabin").
+- **Books and papers in their places.** The library's chart, epitome, almanac and papers
+  are in the cabin; the master's slate in the gunroom or on deck with him; the book of
+  standing orders on deck and in the cabin; the primer and the catalogue anywhere (they
+  are the player's reference, not the ship's). A book read where it is not is a walk first.
+- **The always-present line.** Every sample of a seated person opens with one line of his
+  own: who he is, where he is and since when, the deck (his, another's, nobody's), and his
+  state in the needs' words ("You: the captain, ashore at Plymouth, at the market, since
+  15:43; the deck the officer's; on your feet since 05:02, hungry"). The owner's thought
+  was the `how am I` reading printed each sample; this is that reading with the place and
+  the deck added, one line, never more, and the needs' cautions when they come as §20 has
+  them. It is the sample's first line so that a model never has to remember where it is.
+- **The drill.** Before the station brief, after the three calls of today, a short walk: go
+  below, eat, drink, read a book from the library where it is kept, come on deck; each
+  answered, so that the model has seen the places and its own line change before the game.
+- **What is not done yet.** Hearing by place is in (§14's earshot); the readings by place,
+  the papers' places, the line and the drill are 65's. Decision 47's other dropped item,
+  the papers kept in a place, comes with this one as far as the library is concerned and no
+  further.
+
 ### 15. What is heard where: dropped
 
 Locational knowledge (a station's log carrying only what its person could hear from where

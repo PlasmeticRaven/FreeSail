@@ -118,7 +118,9 @@ BRIEFS_DIR = ROOT / "data" / "director" / "briefs"
 # day and the night is forty-eight; four acts a day keeps a quiet passage quiet; the brief
 # raises either).
 DEFAULT_SAMPLES_A_DAY = 48
-DEFAULT_ACTS_A_DAY = 4
+# The acts no fewer than the samples (the owner, 2026-10-19): the budget is a tuning point,
+# not a constraint for the first testing; the dispatches test spent ten before a boarding.
+DEFAULT_ACTS_A_DAY = 48
 
 # The top of each Beaufort force in knots (the Admiralty's scale as the readings describe
 # the wind, `units.describe_wind_strength`): a brief's `gale_max_force` in words is this in
