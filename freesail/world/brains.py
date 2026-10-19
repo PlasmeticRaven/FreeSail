@@ -287,7 +287,10 @@ class FarCaptain(Judgement):
         if held is not None:
             # an order given over his head by the director's hand (package 62): he holds by
             # it until the director's next order to her or a glass, then his plan again
-            if tick < int(held["until"]):
+            event = str(held.get("event") or "")
+            if tick < int(held["until"]) and not (
+                event and _hold_event_came(world, self.vessel, event)
+            ):
                 return
             self.take_up_again()
         crew = getattr(self.vessel, "crew", None)
@@ -583,7 +586,11 @@ class FarCaptain(Judgement):
     over_head: dict[str, Any] | None = None
 
     def over_his_head(
-        self, order: str, until: int, stash: tuple[list[Any], list[Any] | None, str]
+        self,
+        order: str,
+        until: int,
+        stash: tuple[list[Any], list[Any] | None, str],
+        event: str = "",
     ) -> None:
         """An order of the far shape's given to her as his own by the director's hand: he
         is told it came over his head, so that he holds by it until `until` (or the
@@ -600,8 +607,14 @@ class FarCaptain(Judgement):
                 "saved": None if saved is None else list(saved),
                 "sail_order": sail_order,
             }
+            if event:
+                self.over_head["event"] = event  # the hold named (package 66)
         else:
             held["order"], held["until"] = order, int(until)
+            if event:
+                held["event"] = event
+            else:
+                held.pop("event", None)
 
     def take_up_again(self) -> None:
         """The glass out (or `carry on`): his plan as it stood before the director's order
@@ -656,6 +669,7 @@ class FarCaptain(Judgement):
             left = int(held["until"]) - int(self.world.clock.tick)
             captain.over_head_until = int(captain.world.clock.tick) + left
             captain.over_head_order = str(held.get("order") or "")
+            captain.over_head_event = str(held.get("event") or "")
             plan = self.vessel.plan
             if plan and plan[0][0] == "lie_to":
                 # the far body lay to by his order: the near body heaves to by it, his words
@@ -705,7 +719,18 @@ class FarCaptain(Judgement):
             manoeuvre = str(readings.value("manoeuvre_in_hand") or "") if readings else ""
             if manoeuvre in ("hove to", "heaving to"):
                 v.plan = [("lie_to", math.inf)]
-            self.over_his_head(str(getattr(captain, "over_head_order", "") or ""), until, stash)
+            self.over_his_head(
+                str(getattr(captain, "over_head_order", "") or ""),
+                until,
+                stash,
+                event=str(getattr(captain, "over_head_event", "") or ""),
+            )
+
+
+def _hold_event_came(world: Any, vessel: Any, event: str) -> bool:
+    from freesail.world.crews import hold_event_came
+
+    return hold_event_came(world, vessel, event)
 
 
 # Within hail, in metres (`ships.HAIL_NM`, four cables), the distance a chase or an

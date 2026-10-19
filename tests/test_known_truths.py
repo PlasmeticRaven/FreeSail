@@ -6675,3 +6675,172 @@ def test_truth_7b_113_the_hand_brings_a_far_trader_to_heaves_a_crewed_cruiser_to
     assert "is held by a model" in said and "write to him instead" in said
     assert D.log_of(world).entries[-1].kind == "director.refused"
     assert len([e for e in crew.log if e.text == "By the captain: heaving to."]) == 1
+
+
+# Package 66: the station's line and the stand-by (the dispatches test, 2026-10-18, and the
+# captain's debrief). Truths 7b-117 to 7b-119, numbered after 53b's 7b-114 to 7b-116: the
+# line that opens every sample, the stand-by ended by the model's own order and not woken
+# by a word out of its hearing, and the hand's hold named until an event.
+# ---------------------------------------------------------------------------
+
+
+def _captain_ashore_world():
+    """The schooner at anchor in Carrick Road (`test_orders_places.in_falmouth`), a clerk
+    made ashore at Falmouth's counting house, and a captain's station held by a door that
+    answers late (its replies delivered here, as a remote door's are)."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents.agent import captain
+    from freesail.agents.fake import Transcript
+    from tests.test_orders_places import in_falmouth
+
+    world = in_falmouth()
+    world.world_order('person: make "Mr Veale", a clerk, ashore at Falmouth', "the truth")
+    h = Harness(
+        world,
+        captain(SamplingPolicy.in_lockstep(600, "notable", "urgent"), world=world),
+        Transcript([]),
+        save=lambda w, why: None,
+    )
+    h.model_name, h.door = "a late door", "mcp"
+    h.start()
+    world.run(1)
+    return world, h
+
+
+def _until(world, test, step=60, most=240):
+    for _ in range(most):
+        if test():
+            return
+        world.run(step)
+    raise AssertionError("never came")
+
+
+def test_truth_7b_117_the_first_line_of_a_captains_sample_names_his_place_the_deck_and_his_state():
+    """Spec M7b §14 ("The always-present line") and package 66's truth 117: "the first line
+    of a captain's sample names his place, the deck and his state, ashore and aboard, and
+    changes when he moves." The captain's first sample opens with the line on the
+    quarterdeck; he goes ashore, and the sample after the landing says him ashore at
+    Falmouth on the quay since he landed; he comes aboard, and it says him aboard again;
+    his `how am I` answers with the same line."""
+    from freesail.agents.fake import call, reply
+
+    world, h = _captain_ashore_world()
+    cap = world.people.captain
+
+    def line():
+        sample = h.open_sample
+        assert sample is not None and sample.to_dict()["you"] == sample.you
+        assert list(sample.to_dict())[0] == "you"
+        return sample.you
+
+    assert line() == (
+        "You: the captain, on the quarterdeck, since 10:00; the deck yours; on your feet "
+        "since 10:00."
+    )
+    h.deliver(reply("", call("submit_order", text="go ashore")))
+    h.deliver(reply("", call("stand_by", until="a glass")))
+    _until(world, lambda: not h.agent.standing_by)
+    assert cap.where == "shore"
+    landed = next(e for e in world.log if e.kind == "person.ashore")
+    at = landed.ship_time.strftime("%H:%M")
+    assert line() == (
+        f"You: the captain, ashore at Falmouth, on the quay, since {at}; the deck yours; on "
+        "your feet since 10:00."
+    )
+    _until(world, lambda: not world.ports.boat.away)  # the boat home, to be sent for him
+    h.deliver(reply("", call("submit_order", text="come aboard")))
+    h.deliver(reply("", call("stand_by", until="a glass")))
+    _until(world, lambda: not h.agent.standing_by)
+    assert line().startswith("You: the captain, in the boat, since ")  # pulling off to her
+    _until(world, lambda: cap.aboard)
+    h.deliver(reply("", call("stand_by", until="a glass")))
+    _until(world, lambda: not h.agent.standing_by)
+    assert line().startswith("You: the captain, on the quarterdeck, since ")
+    h.deliver(reply("", call("submit_order", text="how am I")))
+    said = h.turns[-1].content["tool_results"][-1]["result"]
+    assert said.startswith("You: the captain, on the quarterdeck, since ") and "\nYou are " in said
+
+
+def test_truth_7b_118_an_order_ends_its_own_stand_by_and_a_word_out_of_earshot_wakes_nobody():
+    """Package 66's truth 118: "an order given while standing by ends the stand-by and runs,
+    and a word said out of a station's earshot does not wake it." The captain ashore stands
+    by; his order to go to the counting house, sent while he stands by (a remote door's
+    reply out of turn), ends the stand-by at his own word, logged so, and runs; the clerk's
+    words there are heard by him and the result says so; at the market, standing by for a
+    word on deck or a notable event, the clerk's words at the counting house (the empty
+    wake of 15:44) do not wake him, and the director's result says nobody heard them and
+    where the captain is. The save replays to the same log."""
+    import json
+
+    from freesail.agents.fake import call, reply
+    from freesail.agents.remote import Desk
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+
+    world, h = _captain_ashore_world()
+    cap = world.people.captain
+    h.deliver(reply("", call("submit_order", text="go ashore")))
+    h.deliver(reply("", call("stand_by", until="a glass")))
+    _until(world, lambda: cap.where == "shore" and not h.agent.standing_by)
+    h.deliver(reply("", call("stand_by", until="a glass")))
+    world.run(60)
+    assert h.agent.standing_by
+    out = Desk._own_act(h, reply("", call("submit_order", text="go to the counting house")))
+    assert out["words"].startswith("Your stand-by (until a glass) ended at your own order")
+    assert not h.agent.standing_by and h.open_sample is not None
+    ended = [e for e in world.log if e.kind == "agent.resumed"][-1]
+    assert ended.text.endswith(
+        "ends its stand-by (until a glass) at its own word; it is sampled again."
+    )
+    assert cap.ashore_at == "counting_house"
+    h.deliver(reply("", call("submit_order", text="say Mr Veale? A packet for your hand, sir.")))
+    result = h.turns[-1].content["tool_results"][-1]["result"]
+    assert result.endswith("Heard by Mr Veale, ashore at Falmouth, at the counting house.")
+    h.deliver(reply("", call("stand_by", until="a word on deck")))
+    said = world.world_order('say as Mr Veale: "Give it me, sir."', "the truth")
+    assert "heard by the captain, ashore at Falmouth, at the counting house" in said.text
+    world.run(2)
+    assert not h.agent.standing_by  # heard: his word on deck
+    h.deliver(reply("", call("submit_order", text="go to the market")))
+    h.deliver(reply("", call("stand_by", until="a word on deck or a notable event")))
+    said = world.world_order('say as Mr Veale: "And the tin, sir?"', "the truth")
+    assert said.text.endswith("heard by nobody: the captain is ashore at Falmouth, at the market.")
+    spoke = [e for e in world.log if e.kind == "person.spoke"][-1]
+    assert spoke.data["heard_by"] == []
+    world.run(120)
+    assert h.agent.standing_by  # out of his earshot: no wake, and no empty sample
+    copy = replay.replay(json.loads(json.dumps(world.save())), ship_factory)
+    assert copy.log.digest() == world.log.digest()
+
+
+def test_truth_7b_119_the_hand_held_until_a_sail_within_hail_holds_past_the_glass_and_ends_at_it():
+    """Spec M7b §3 and package 66's truth 119: "the hand held `until a sail within hail`
+    holds past the glass and ends at the hail." A King's brig-sloop at far detail some
+    twenty miles off, told by the director's hand to heave to until a sail within hail:
+    she lies to past the glass and past two; a brig coming within two cables of her ends
+    the hold, and her captain takes up his plan again, her story saying so."""
+    from tests.test_brains import put
+    from tests.test_world_orders import world_for
+
+    world = world_for(ports=["falmouth"])
+    world.submit("heave to")
+    v = put(
+        world,
+        "brig-sloop",
+        "britain",
+        "49 30 N 5 50 W",
+        "bound for Falmouth",
+        "keep the station off the Lizard within 10 miles",
+        name="Hazard",
+    )
+    world.run(60)
+    e = world.world_order('ship "Hazard": order heave to until a sail within hail', "the truth")
+    assert e.data["result"] == "done" and "until a sail within hail comes to her" in e.text
+    world.run(2 * 1800 + 60)
+    assert v.detail == "far" and v.plan[0][0] == "lie_to" and v.sail_state == "lying to"
+    assert v.brain.over_head is not None and v.brain.over_head["event"] == "hail"
+    brig = put(world, "merchant brig", "britain", "49 30 N 5 50 W", "bound for Falmouth", name="B")
+    brig.position = v.position.advanced(0.0, 0.2 * units.NAUTICAL_MILE)
+    world.run(180)
+    assert v.brain.over_head is None and v.plan[0][0] != "lie_to"
+    assert v.story[-1][1].startswith("The captain takes up his plan again")

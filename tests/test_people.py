@@ -445,7 +445,8 @@ def test_eat_and_drink_are_the_persons_own_answered_to_him_and_never_logged():
     w.submit("short allowance")
     assert "half meal" in w.submit("eat").text
     assert cap.needs.ate == w.clock.tick - 8 * 3600
-    assert w.submit("how am i").text.startswith("You are ")
+    said = w.submit("how am i").text  # the station's line first (package 66), then the needs
+    assert said.startswith("You: the captain, ") and "\nYou are " in said
 
 
 def test_sleep_turns_the_player_in_below_and_his_next_order_or_his_rest_wakes_him():

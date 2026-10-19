@@ -735,7 +735,35 @@ class NeedsKeeper:
         tail += "."
         if n.asleep:
             tail += " You are asleep."
-        return head + tail
+        line = self.line(p, holder)
+        return f"{line}\n{head}{tail}" if line else f"{head}{tail}"
+
+    def line(self, p: Any, holder: Any) -> str:
+        """The station's line for `how am I` (package 66): the same line a station's sample
+        opens with, for the station that holds him or the captain at the prompt."""
+        from freesail.api.readings import station_line
+
+        station = getattr(getattr(holder, "station", None), "name", None)
+        held = getattr(holder, "_place_since", None)
+        since = held[1] if held else None
+        if since is None:
+            # the captain at the prompt: the last line that moved him, or the start
+            from freesail.agents.harness import PLACE_KINDS
+
+            name = str(getattr(p, "name", "") or "")
+            log = self.world.log
+            since = next(
+                (
+                    int(log[i].tick)
+                    for i in range(len(log) - 1, -1, -1)
+                    if log[i].kind in PLACE_KINDS and name and name in log[i].text
+                ),
+                0,
+            )
+        try:
+            return station_line(self.world, station, p, since)
+        except Exception:  # noqa: BLE001  (never an answer lost to the line)
+            return ""
 
 
 def _captain(people: Any) -> Any:

@@ -511,8 +511,11 @@ DIRECTOR_BRIEF = (
     "a person nobody holds, heard where he is and journaled as his ('say as the cook: "
     '"Pease and pork, sir."\'; \'say as Mr Fox: "I knew your father, sir."\'), an order of '
     "another ship's own grammar given to her captain as his own, her log saying it as his "
-    "and he holding by it a glass or until your next order to her, then his intent again "
-    "('ship \"Harpy\": order heave to', 'ship \"Harpy\": order give chase', 'ship "
+    "and he holding by it a glass, or as long as you name it ('... for a watch', '... for "
+    "two glasses', '... until a sail within hail', a landfall, hove to, at anchor), or "
+    "until your next order to her, then his intent again "
+    '(\'ship "Harpy": order heave to\', \'ship "Harpy": order give chase until a sail '
+    "within hail', 'ship "
     '"Harpy": order carry on\' to give her back sooner; at far detail she carries what the '
     "far shape carries, a course shaped or steered, heaving to and filling away, the chase "
     "or hauling off, sail made or shortened, an anchor and weighing, the station kept, and "
@@ -565,8 +568,12 @@ DIRECTOR_BRIEF = (
     "When you stand by, say until what: 'the next glass', 'a watch', an event's words ('a "
     "sail sighted', 'the glass falling fast', 'a wind shift'), or several joined with 'or'. "
     "A director who stands by for a watch lets the player run at his compression; an urgent "
-    "line wakes you. Your budget is the brief's, in samples a day and acts a day of the "
-    "ship's time; spent, you stand by until the next day, and the log says so.\n\n"
+    "line wakes you. While you stand by you may read the truth, the chart, the log, the "
+    "readings, the library and your journal, and the stand-by goes on; a world order or "
+    "words of your own sent meanwhile end it at once and are run. Every sample opens with "
+    "your line: the day's budget as it stands and whose turn the clock waits on. Your "
+    "budget is the brief's, in samples a day and acts a day of the ship's time; spent, you "
+    "stand by until the next day, and the log says so.\n\n"
     "What the harness counts at this station, judged by the game and not by your prose: "
     "the same world order three times with no change in the world; three empty replies in "
     "a row when an urgent line was before you; and no reply at all for a watch of the "

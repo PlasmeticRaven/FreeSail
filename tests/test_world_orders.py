@@ -674,3 +674,84 @@ def test_the_hold_crosses_the_promotion_both_ways():
     K.demote(w, v)
     assert v.crew is None and v.plan[0][0] == "lie_to"
     assert v.brain.over_head is not None and v.brain.over_head["order"] == "heave to"
+
+
+# ---------------------------------------------------------------------------
+# Package 66: the hand's hold named, `say as` by station or trade, who heard
+# ---------------------------------------------------------------------------
+
+
+def test_the_hands_hold_is_named_for_a_time_or_until_her_own_event():
+    """`... for a watch`, `... for two glasses`, `... until a sail within hail`: the hold so
+    named in place of the glass, the default still a glass; an event she is held until ends
+    it when it comes to her (a day at most), and an event she cannot be held until is
+    refused in words naming those she can."""
+    from freesail import units
+    from freesail.world import crews as K
+    from tests.test_brains import put
+
+    assert K.hold_of("heave to for a watch") == ("heave to", 4 * 3600, "")
+    assert K.hold_of("give chase for two glasses") == ("give chase", 3600, "")
+    assert K.hold_of("heave to for an hour") == ("heave to", 3600, "")
+    assert K.hold_of("shape a course for Falmouth") == ("shape a course for Falmouth", None, "")
+    assert K.hold_of("give chase until a sail within hail") == ("give chase", None, "hail")
+    assert K.hold_of("heave to until a landfall")[2] == "land"
+    w = world_for(ports=["falmouth"])
+    w.submit("heave to")
+    v = put(
+        w,
+        "brig-sloop",
+        "britain",
+        "49 30 N 5 50 W",
+        "bound for Falmouth",
+        "keep the station off the Lizard within 10 miles",
+        name="Hazard",
+    )
+    w.run(60)
+    e = w.world_order('ship "Hazard": order heave to for two glasses', "the test")
+    assert e.data["result"] == "done" and "holds by it until 11:01" in e.text, e.text
+    assert v.brain.over_head["until"] == w.clock.tick + 3600
+    e = w.world_order('ship "Hazard": order heave to until a mermaid', "the test")
+    assert e.data["result"] == "refused" and "a sail within hail" in e.text
+    e = w.world_order('ship "Hazard": order heave to until a sail within hail', "the test")
+    assert e.data["result"] == "done", e.text
+    assert "until a sail within hail comes to her (a day at most, 10:01 tomorrow)" in e.text
+    assert v.brain.over_head["event"] == "hail"
+    w.run(2 * 1800)  # past the glass, and past two
+    assert v.brain.over_head is not None and v.plan[0][0] == "lie_to"
+    nancy = put(w, "merchant brig", "britain", "49 30 N 5 50 W", "bound for Falmouth", name="N")
+    nancy.position = v.position.advanced(0.0, 0.25 * units.NAUTICAL_MILE)
+    w.run(180)
+    assert v.brain.over_head is None and v.plan[0][0] != "lie_to"
+    assert v.story[-1][1].startswith("The captain takes up his plan again")
+
+
+def test_say_as_the_lookout_the_hands_and_a_station_and_who_heard_in_the_result():
+    """`say as the lookout`: the ship's own lookout at the masthead, his hail heard on deck;
+    `say as the hands`: the hands on deck; `say as the officer of the watch`: the station's
+    person; the result names who heard it. The rule of reach holds: a held lookout is
+    refused as any held station."""
+    from freesail.agents.seat import seat_player
+
+    w = world_for(position=OFF_FALMOUTH, ports=["falmouth"])
+    officer_h = _fake_officer(w)
+    w.run(1)
+    e = w.world_order('say as the lookout: "Sail ho! Two points on the lee bow!"', "the test")
+    assert e.data["result"] == "done", e.text
+    hail = events(w, "person.spoke")[-1]
+    assert hail.text == "The lookout, from the masthead: Sail ho! Two points on the lee bow!"
+    assert hail.data["heard_by"] == ["officer of the watch"] and hail.data["place"] == "masthead"
+    assert officer_h.agent.heard[-1] == hail.text
+    assert "heard by Mr Pearce, the captain" in e.text
+    e = w.world_order('say as the hands: "Huzzah!"', "the test")
+    assert events(w, "person.spoke")[-1].text == "The hands, on the deck: Huzzah!"
+    e = w.world_order('say as the second officer: "My watch, sir."', "the test")
+    assert events(w, "person.spoke")[-1].text.startswith("Mr Pascoe, the second lieutenant")
+    e = w.world_order('say as the purser: "The slops are short."', "the test")
+    assert e.text.endswith("Mr Gardner spoke in the gunroom, heard by Mr Bailey, in the gunroom.")
+    w.world_order('person: supercargo "Mr Pentreath" aboard in the hold', "the test")
+    e = w.world_order('say as Mr Pentreath: "Dry as a bone."', "the test")
+    assert e.text.endswith("heard by nobody: the captain is on the quarterdeck."), e.text
+    seat_player(w, "lookout")
+    e = w.world_order('say as the lookout: "Deck there!"', "the test")
+    assert e.data["result"] == "refused" and "held by" in e.text

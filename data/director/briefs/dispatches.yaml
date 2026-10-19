@@ -36,5 +36,6 @@ budget:
 examples:
   - 'ship: a frigate "Medusa" of Britain at 49 55 N 4 35 W, bound for Plymouth, intent: keep the station off the Deadman within 8 miles'
   - 'ship "Medusa": order give chase'
+  - 'ship "Medusa": order give chase until a sail within hail'   # the hold named (package 66)
   - 'ship "Medusa": order heave to'
   - 'ship "Medusa": order fill away'

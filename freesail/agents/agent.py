@@ -1373,8 +1373,45 @@ def officer_rank(world: Any) -> tuple[str, str]:
     `standing.rules.RANKS`): bound by the wardroom file's data since package 40
     (`People.holder`: `station: first lieutenant`), which is the first lieutenant on a
     frigate, the lieutenant on a brig-sloop, the mate on a schooner or a cutter; the first
-    lieutenant by name alone where the world keeps no people (a point world)."""
-    return station_holder(world, OFFICER, ("the first lieutenant", "first lieutenant"))
+    lieutenant by name alone where the world keeps no people (a point world). Bound to
+    nobody on a ship that is no King's ship (package 66; `merchant_ship`), he is the mate:
+    the dispatches test's cutter, whose scenario's people held a master only, called the
+    owner at the officer's station 'the first lieutenant', and the captain 'Mr
+    Lieutenant'."""
+    default = (
+        MERCHANT_OFFICER if merchant_ship(world) else ("the first lieutenant", "first lieutenant")
+    )
+    return station_holder(world, OFFICER, default)
+
+
+# The officer of the watch bound to nobody on a ship of the merchant's, the fisherman's or
+# the packet's service (package 66): the mate, as the cutter's and the schooner's wardroom
+# files bind him, never the first lieutenant.
+MERCHANT_OFFICER = ("the mate", "mate")
+
+
+def merchant_ship(world: Any) -> bool:
+    """Whether the ship is no King's ship (package 66): her wardroom file binds the
+    captain's station to a master (a merchantman, a hired cutter, a schooner, a smack),
+    or, with no file, her rules-based captain sails her by the merchant's, the packet's or
+    the fisherman's doctrine. A point world with neither keeps the King's words, as it
+    always did."""
+    if world is None:
+        return False
+    from freesail.world.people import load_wardroom
+
+    spec = getattr(getattr(world, "ship", None), "spec", None)
+    source = getattr(spec, "source", None)
+    if source:
+        try:
+            wardroom = load_wardroom(str(source))
+        except ValueError:
+            wardroom = None
+        role = wardroom.role_of("captain") if wardroom is not None else None
+        if role is not None:
+            return role not in ("captain", "commander")
+    cap = getattr(world, "captain", None)
+    return str(getattr(cap, "role", "") or "") in ("merchant", "packet", "fisherman")
 
 
 def station_holder(world: Any, station: str, default: tuple[str, str]) -> tuple[str, str]:
@@ -1428,7 +1465,11 @@ def officer(
     if name == OFFICER:
         person, rank = officer_rank(world)
     else:
-        person, role = station_holder(world, name, ("the lieutenant", "lieutenant"))
+        person, role = station_holder(
+            world,
+            name,
+            MERCHANT_OFFICER if merchant_ship(world) else ("the lieutenant", "lieutenant"),
+        )
         rank = officer_rank_of(role)
     brief = OFFICER_BRIEF.format(person=person)
     several = officers_words(world, name)

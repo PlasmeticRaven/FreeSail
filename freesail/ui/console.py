@@ -616,6 +616,14 @@ class Console:
                 # an answer for the one who asked and not a line of the log (package 40b:
                 # the master's slate), printed here as a station reads it in its reply
                 self._print(e.line())
+            elif e is not None:
+                # who heard a word said, or until when a question waits (package 66): the
+                # order's result, printed for the player and never a line of the log
+                from freesail.world.hearing import said_tail
+
+                tail = said_tail(self.world, e)
+                if tail:
+                    self._print(f"  ({tail})")
         return True
 
     @staticmethod

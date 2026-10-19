@@ -1035,3 +1035,76 @@ def test_the_fake_director_uses_the_hand_doubted_reentered_attempted_and_replaye
         assert copy.log.digest() == w.log.digest(), road
         assert log_texts(copy) == texts, road
         assert copy.vessels.find("Nancy").story == v.story, road
+
+
+# ---------------------------------------------------------------------------
+# Package 66: the station's line and the stand-by (the dispatches test's findings 9, 17,
+# 18, 19 and 25)
+# ---------------------------------------------------------------------------
+
+
+def test_the_line_opens_every_sample_with_the_place_the_deck_and_the_state():
+    """Every sample of a seated person opens with one line of his own, before the log: who
+    he is, where he is and since when, whose the deck is, his state; it changes when he
+    moves. The director's says the day's budget and whose turn the clock waits on. The
+    console's `how am I` answers with the same line."""
+    w = world_at(49.5, -5.5)
+    h = seat_captain(w, ["go below"])
+    w.run(1)
+    first = next(t.content for t in h.turns if t.role == "data")
+    assert list(first)[0] == "you"
+    assert first["you"].startswith("You: the captain, on the quarterdeck, since 10:00; the deck ")
+    assert first["you"].endswith("on your feet since 10:00.")
+    w.run(2 * EVERY)
+    lines = [t.content["you"] for t in h.turns if t.role == "data" and "you" in t.content]
+    assert any(ln.startswith("You: the captain, in the cabin, since 10:") for ln in lines), lines
+    d = directed()
+    dh = seat_director(d, director_above_the_game([]))
+    d.run(1)
+    said = next(t.content["you"] for t in dh.turns if t.role == "data" and "you" in t.content)
+    assert said.startswith("You: the director, above the game; the day's budget 1 of ")
+    assert said.endswith("acts used; the clock waits on you.")
+    o = world_at(49.5, -5.5)
+    oh = seat_officer(o, [call("stand_by", until="a glass")])
+    o.run(1)
+    assert oh.line().startswith("You: Mr Pearce, the officer of the watch, on the quarterdeck")
+    assert "; the deck the captain's; " in oh.line()
+    o.submit("Mr Pearce, you have the deck")
+    assert "; the deck yours; " in oh.line()
+    said = o.submit("how am i").text
+    assert said.startswith(
+        "You: the captain, on the quarterdeck, since 10:00; the deck Mr Pearce's"
+    )
+
+
+def test_the_truth_and_the_chart_are_the_directors_meanwhile_reads():
+    """The director standing by reads the truth (and the chart, a picture tool) out of turn,
+    and the stand-by goes on (the dispatches test's finding 9)."""
+    from freesail.agents.remote import ASIDE_TOOLS, READ_ONLY_TOOLS
+
+    assert "truth" in READ_ONLY_TOOLS and "chart" in READ_ONLY_TOOLS
+    assert "read_journal" in ASIDE_TOOLS
+    w = directed()
+    h = seat_director(w, [call("stand_by", until="a watch")])
+    w.run(60)
+    assert h.agent.standing_by
+    told = h.aside(call("truth"))
+    assert isinstance(told, dict) and "ships" in told and h.agent.standing_by
+
+
+def test_an_officer_bound_to_nobody_on_a_merchantman_is_the_mate():
+    """Where the ship is no King's ship, the officer of the watch bound to nobody is the mate
+    in the harness's default words, never the first lieutenant (the dispatches scenario's
+    people held a master only); a King's ship keeps the lieutenant."""
+    from freesail.agents.agent import merchant_ship, officer, officer_rank
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    sc = load_scenario(str(ROOT / "data" / "scenarios" / "dispatches-falmouth.yaml"))
+    cutter = make_scenario_world(sc, seed=7)
+    assert cutter.stations.holder("officer of the watch") is None  # its people: a master
+    assert merchant_ship(cutter) and officer_rank(cutter) == ("the mate", "mate")
+    st = officer(world=cutter)
+    assert st.person == "the mate" and st.rank == "mate"
+    assert "first lieutenant" not in st.brief and "in the place of the mate" in st.brief
+    frigate = world_at(49.5, -5.5)
+    assert not merchant_ship(frigate) and officer_rank(frigate)[1] == "first lieutenant"

@@ -1220,7 +1220,13 @@ def _say_as_parts(world: Any, body: str, draw: bool) -> tuple[Any, str]:
         raise WorldOrderError("Say what as him? Put his words after the colon.")
     who = " ".join(m.group("who").split()).strip(_QUOTES)
     people = getattr(world, "people", None)
-    person = people.of_the_company(who, draw=draw) if people is not None else None
+    # one of the people by role or name first, as before; then a station's person or one
+    # of the ship's own voices (package 66); then a man of the muster by his trade
+    person = people.find(who) if people is not None else None
+    if person is None:
+        person = _by_station_or_voice(world, who)
+    if person is None:
+        person = people.of_the_company(who, draw=draw) if people is not None else None
     if person is None:
         raise WorldOrderError(
             f"nobody answering to '{who}' is among the people or the ship's company; a person "
@@ -1228,6 +1234,68 @@ def _say_as_parts(world: Any, body: str, draw: bool) -> tuple[Any, str]:
             "<where>')"
         )
     return person, words
+
+
+@dataclass
+class Voice:
+    """A speaker of the ship's who is no person of the people (package 66; the dispatches
+    test's finding 2): the lookout at the masthead, whose hail reaches the deck, and the
+    hands on deck. He speaks where he is, is journaled by his name, and is never drawn
+    into the people."""
+
+    name: str  # "the lookout", "the hands"
+    role: str
+    place: str  # "masthead", "deck"
+    station: str = ""  # the station whose holder's words would be his ('lookout')
+    aboard: bool = True
+    port: str | None = None
+
+    @property
+    def where(self) -> str:
+        return self.place
+
+
+# The words that name the ship's own voices, by their key (`_words`-like, lower case).
+VOICE_WORDS: dict[str, tuple[str, str, str, str]] = {
+    "lookout": ("the lookout", "lookout", "masthead", "lookout"),
+    "the lookout": ("the lookout", "lookout", "masthead", "lookout"),
+    "the lookout at the masthead": ("the lookout", "lookout", "masthead", "lookout"),
+    "the masthead": ("the lookout", "lookout", "masthead", "lookout"),
+    "the masthead lookout": ("the lookout", "lookout", "masthead", "lookout"),
+    "the hands": ("the hands", "hands", "deck", ""),
+    "hands": ("the hands", "hands", "deck", ""),
+    "the people": ("the hands", "hands", "deck", ""),
+    "the men": ("the hands", "hands", "deck", ""),
+    "the watch": ("the hands", "hands", "deck", ""),
+    "the watch on deck": ("the hands", "hands", "deck", ""),
+}
+
+
+def _by_station_or_voice(world: Any, who: str) -> Any:
+    """`say as` by station or trade (package 66): the person a station of the ship is
+    bound to ('the officer of the watch', 'the second officer', 'the lookout' where the
+    wardroom file binds one), or one of the ship's own voices (`VOICE_WORDS`: the lookout
+    at the masthead, the hands on deck); None for anything else, which is found among the
+    people and the muster as before."""
+    key = " ".join(str(who).lower().replace("’", "'").split()).strip(".")
+    stations = getattr(world, "stations", None)
+    name = key.removeprefix("the ")
+    if stations is not None:
+        try:
+            names = list(stations.names())
+        except Exception:  # noqa: BLE001  (a world whose stations cannot be read)
+            names = []
+        if name in names:
+            try:
+                bound = stations.holder(name)
+            except Exception:  # noqa: BLE001
+                bound = None
+            if bound is not None:
+                return bound
+    voice = VOICE_WORDS.get(key)
+    if voice is None:
+        return None
+    return Voice(*voice)
 
 
 def say_as_person(world: Any, body: str) -> Any:
@@ -1266,7 +1334,17 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 
     person, words = _say_as_parts(world, body, draw=True)
     people = world.people
-    if person.aboard:
+    voice = isinstance(person, Voice)
+    if voice and person.place == "masthead":
+        # the lookout's hail from the masthead reaches the deck (package 66)
+        place, where = "masthead", "from the masthead"
+        heard = _hearers(world, "quarterdeck")
+        heard += [h for h in _hearers(world, "masthead") if h not in heard]
+    elif voice:
+        place = person.place
+        where = place_words(place)
+        heard = _hearers(world, place)
+    elif person.aboard:
         place = people.effective_place(person)
         where = place_words(place)
         heard = _hearers(world, place)
@@ -1281,12 +1359,17 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
                 f"a letter carries his words ('message: at <port> from {person.name}: "
                 '"..."\'), or he comes aboard'
             )
-        place, where, heard = "shore", f"ashore at {port.name}", []
+        place, where = "shore", f"ashore at {port.name}"
+        # package 66: heard by the stations held at the same place of the same port (the
+        # captain at the counting house hears the clerk there; at the market he does not)
+        heard = _hearers_ashore(world, person)
     role = person.role
     tail = f", the {role}" if role and role not in ("captain", "commander") else ""
     if role and role.lower() in person.name.lower():
         tail = ""
     line = f"{person.name}{tail}, {where}: {words}"
+    if voice:
+        line = line[:1].upper() + line[1:]  # 'The lookout, from the masthead: ...'
     for h in heard:
         h.hear(line)
     names = [h.station.name for h in heard]
@@ -1307,11 +1390,41 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     from freesail.agents.director import answer_questions
 
     answered = answer_questions(world, person, words, where)
-    heard_words = f", heard by the {', the '.join(names)}" if names else ""
+    # who heard it (package 66): the people within hearing by name, the stations held
+    # among them, or nobody and where the stations held are
+    from freesail.world.hearing import heard_words, spot_of
+
+    spot = ("aboard", "quarterdeck") if place == "masthead" else spot_of(world, person)
+    said = heard_words(world, spot, person, names, absent=_wanted(world))
     data: dict[str, Any] = {"person": person.name, "heard_by": names}
     if answered:
         data["answered"] = answered
-    return f"{person.name} spoke {where}{heard_words}", data
+    return f"{person.name} spoke {where}, {said}", data
+
+
+def _hearers_ashore(world: Any, person: Any) -> list[Any]:
+    """The stations held whose person is at the same place ashore as `person` (package
+    66; the director's has no place)."""
+    from freesail.agents.agent import DIRECTOR
+    from freesail.agents.harness import _stations_held
+    from freesail.world.hearing import spot_of, station_spot, within_hearing
+
+    here = spot_of(world, person)
+    return [
+        h
+        for h in _stations_held(world)
+        if h.station.name != DIRECTOR and within_hearing(here, station_spot(world, h.station.name))
+    ]
+
+
+def _wanted(world: Any) -> Any:
+    """The person a word put in a mouth is most likely for, named where nobody heard it:
+    the captain's (the station held by a model or the player at the prompt)."""
+    people = getattr(world, "people", None)
+    try:
+        return people.captain if people is not None else None
+    except Exception:  # noqa: BLE001  (a world with no muster)
+        return None
 
 
 def held_stations(world: Any) -> list[tuple[str, str, str]]:
@@ -1373,6 +1486,12 @@ def reach(world: Any, order: WorldOrder) -> str | None:
     stations_held = {station: who for station, _person, who in held_stations(world)}
     if order.channel == "say":
         person = say_as_person(world, order.text)
+        if isinstance(person, Voice) and person.station in stations_held:
+            # the lookout's station held (package 66): his hail is his holder's own
+            return (
+                f"the {person.station}'s station is held by {stations_held[person.station]}: "
+                "his words are his holder's own, and nobody speaks as a held station"
+            )
         if person is not None and person.name in held:
             station, who = held[person.name]
             return (
