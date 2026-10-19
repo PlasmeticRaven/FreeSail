@@ -94,7 +94,26 @@ A person at a station held eats, drinks and sleeps by his own hand (package 54; 
 - `sleep` (`turn in`): below to your cot (the captain's in the cabin, an officer's off the gunroom), asleep until your next order, an urgent line, or you wake rested (eight hours of waking made up an hour below; a night's sleep makes up two days). Refused with the deck below the captain's, and within the hour of your last sleep. Called, you go back where you turned in from.
 - `how am I`: how you are, and when you last ate, drank and slept.
 
-A model's station turns in with a stand-by of its own, `stand by, asleep below until called` (the master's suggestion): a word or a question to it, an urgent line, or its rest wakes it, its log line saying it turned in. A man who goes past the last step falls asleep where he stood: you, until your next order; a model's station standing by, asleep, until called, with nothing in the log. The ends (death, collapse, the surgeon) are a later milestone's, with health. A person who is also a hand (a master's mate, a midshipman) has the crew's fatigue, which the watch bill rests; nobody at the prompt but the owner while a model holds the captain's station, and the owner has no needs.
+A model's station turns in with a stand-by of its own, `stand by, asleep below until called` (the master's suggestion): a word or a question to it, an urgent line, its own order, or its rest wakes it, its log line saying it turned in. A man who goes past the last step falls asleep where he stood: you, until your next order; a model's station standing by, asleep, until called, with nothing in the log. The ends (death, collapse, the surgeon) are a later milestone's, with health. A person who is also a hand (a master's mate, a midshipman) has the crew's fatigue, which the watch bill rests; nobody at the prompt but the owner while a model holds the captain's station, and the owner has no needs.
+
+## The station's line, and the stand-by's end
+
+Since package 66 (the dispatches test, where the captain at Plymouth market lost track of where he stood and lost three orders to his own stand-by) **every sample opens with one line of the station's own**, before the log: who he is, where he is and since when, whose the deck is, and his state in the needs' words when they have any:
+
+```
+You: the captain, ashore at Falmouth, at the market, since 10:38; the deck yours; on your feet since 10:00.
+You: Mr Pearce, the officer of the watch, on the quarterdeck, since 10:00; the deck the captain's; on your feet since 10:00, quite thirsty.
+```
+
+The deck reads *yours*, another's by name (*the deck Mr Pearce's*), *the captain's*, *the captain's book's* (a model at the captain's station without it, his book keeping her) or *nobody's*. `how am I`, yours at the prompt or a station's, answers with the same line and then the hours since you ate, drank and slept. The needs' cautions still come as notices when a step is reached.
+
+**A model's own order ends its stand-by.** An order, an answer or words of its own sent while it stands by (a door that keeps its own conversation sends a reply out of turn) end the stand-by at once, logged *The captain ends its stand-by (until a glass) at its own word*, open its turn, and are run in it; only the reads (the log, the readings, the state, the library, the journal and, at the director's, the truth and the chart), a journal note and shelving a book leave the stand-by as it was. Nothing it sends is dropped with *Nothing was run* any more.
+
+**A wake carries a line.** A stand-by's event wakes a station only when the line reaches it: a word (a `say`, a person's words, a word told or asked) when it was said within its hearing, as the earshot above has it, or ashore at the same place of the same port; the ship's own lines from her log, wherever its person is; the director everything. A clerk speaking at the counting house does not wake a captain standing by at the market, and no sample comes with nothing in it for him.
+
+**Who heard.** The result of a `say` names who heard it: *Heard by Mr Veale, ashore at Falmouth, at the counting house.*, or *heard by nobody, in the gunroom*. At the prompt it is printed under the order; for a model it ends the order's result; the log's own line is as it was. A question put to a person nobody holds while a director is seated says in its result until when it waits for his answer (*his answer is awaited until 11:08, when the glass is out*).
+
+**Merchant words.** On a ship that is no King's ship (her wardroom file binds the captain's station to a master: the cutter, the schooner, the smack, the lugger), an officer of the watch bound to nobody is *the mate* in the harness's words, never the first lieutenant.
 
 ## The forms, in a table
 
