@@ -377,6 +377,17 @@ def test_a_cargo_freighted_comes_off_by_the_lighter_at_no_price_with_its_cause_i
         f"aboard: {room + 5:.0f} tons of tin freighted by Mr Veale at the quay", "the test"
     )
     assert e.data["result"] == "refused" and "will not stow" in e.text
+    # the room is the room left after what is bought and coming off (found on the way in
+    # the dispatches: the master's cargo in the boat, the freight engaged beside it)
+    w.submit("send the boat ashore")
+    for _ in range(120):
+        if not w.ports.boat.away:
+            break
+        w.run(60)
+    w.submit(f"buy {w.hold.room_tons - 2:.0f} tons of copper ore")
+    assert w.ports.boat.away
+    e = w.world_order("aboard: five tons of wool freighted by Mr Veale at the quay", "the test")
+    assert e.data["result"] == "refused" and "tons bought are coming off" in e.text
 
 
 def test_the_channel_doubts_money_from_nobody_a_far_payer_and_a_sum_beyond_the_ports_means():

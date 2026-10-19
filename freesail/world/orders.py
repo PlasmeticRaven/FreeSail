@@ -1675,13 +1675,16 @@ def _freight(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     hold = getattr(world, "hold", None)
     if hold is None or hold.capacity_tons <= 0:
         raise WorldOrderError("she has no hold for a cargo")
-    if tons > hold.room_tons + 1e-9:
+    ports = getattr(world, "ports", None)
+    coming = _tons_coming(ports)
+    room = max(0.0, hold.room_tons - coming)
+    if tons > room + 1e-9:
+        bought = f" ({coming:g} tons bought are coming off)" if coming > 0 else ""
         raise WorldOrderError(
-            f"there is room in the hold for {hold.room_tons:g} tons and no more; {tons:g} tons "
+            f"there is room in the hold for {room:g} tons and no more{bought}; {tons:g} tons "
             f"of {good} will not stow"
         )
     who, party = _party(world, m.group("who") or "")
-    ports = getattr(world, "ports", None)
     port = ports.in_port() if (ports is not None and ports.ports) else None
     at = " ".join((m.group("at") or "").split())
     dest = " ".join((m.group("dest") or "").split())
@@ -1721,6 +1724,23 @@ def _freight(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
         said = f"{words}; struck down into the hold"
     world.record(Severity.NOTABLE, "hold.freighted", text, data=data)
     return said, data
+
+
+def _tons_coming(ports: Any) -> float:
+    """The tons bought or freighted and not yet in the hold: in the boat on her errand of a
+    purchase, or in the port's lighter (the hold's room is the room left after them)."""
+    if ports is None:
+        return 0.0
+    tons = 0.0
+    boat = getattr(ports, "boat", None)
+    if boat is not None and getattr(boat, "away", False):
+        for item in getattr(boat, "carrying", None) or []:
+            if item.get("kind") == "purchase":
+                tons += float(item.get("tons") or 0.0)
+    for job in getattr(ports, "jobs", None) or []:
+        if job.kind == "lighter":
+            tons += sum(float(i.get("tons") or 0.0) for i in job.payload.get("items") or [])
+    return tons
 
 
 def _aboard_reach(world: Any, body: str) -> str | None:
