@@ -7167,3 +7167,168 @@ On the build machine (four cores), 59 building beside it; the code and data as c
   A first whole run was cut off by the container's restart and run again from the start.
 - **The pace tests alone** (`python3 -m pytest --slow -m pace -p no:cacheprovider`, the
   load 1.0 at their start and at the end): 6 passed.
+
+## Package 53b: things, free lines and transactions (2026-10-19)
+
+Spec M7b §17a (the owner's question of 2026-10-19 after the dispatches test and the lead's
+answer, approved "as written"); decisions 46 and 50. Built in the worktree off `53bc80a`.
+Two new modules, `freesail/world/things.py` (the thing, its where in words, its reach, made
+from words) and `freesail/orders/free.py` (the free lines); the rest is the `aboard:`
+channel's thing and transaction forms in `freesail/world/orders.py`, the ledgers on
+`Purse` and `Hold`, the scenario's `things:`, the readings, the director's brief.
+
+### What was built, and the readings taken
+
+- **Item 1, a thing.** The lead's reading kept: a `Thing` in a small `things.py`, the
+  `People` registry holding the things beside the people (`People.things`), the keeping
+  read from the keeper wherever he is, so that the people's machinery moves a thing with no
+  code of its own (the boat, the landing, `go to the counting house`, the pilot put off).
+  The rule of reach for a held person's keeping is applied as the person's rule is, for
+  every source of the order (the owner's too); the scenario's `things:` are its own word
+  and are not checked by it.
+- **Item 2, the free lines.** Nine verbs of the vocabulary's object `free`, the class named
+  in a `free_lines` list with `hand`, `eat` and `drink`. Every station's, with the deck or
+  without; the director's refused (no hands aboard). Reach for a thing and a person is the
+  place's (`things.same_place`: his place aboard or §14's earshot, his place of the port).
+  The past tense of the verb leads the line ("gave", "took", "threw") and the words after
+  it are kept as said, case and all.
+- **Item 3, transactions.** Four forms, each a line of the purse's or the hold's own
+  ledger, a notable line of the play log in the purser's or the manifest's words, and the
+  director's act; doubted by the table in spec §17a's as-built; a payment below nothing
+  and a freight beyond the hold's room refused.
+- **Item 4.** The dispatches scenario carries `things: [a sealed packet, in the captain's
+  keeping, from the Custom House]`; its brief's examples gain `aboard: twenty guineas paid
+  into the purse by Mr Veale`, `aboard: ten tons of wool freighted by Mr Veale at the quay
+  for Falmouth` and a letter left on the cabin table. `data/people/` untouched.
+- **Item 5.** Truths 7b-114 to 7b-116 (`tests/test_known_truths.py`) and the tests in
+  `test_people.py`, `test_world_orders.py`, `test_business.py`, `test_director.py`.
+
+**Taken another way** (spec §17a's as-built says each with its reason): a freight the hold
+cannot stow is refused, not doubted (the hold's tons are the game's; no reason makes room);
+"a sum beyond a port's means by the business's figures" is made of the figures the
+business has, there being no figure of a port's money (below); the class `free` is the
+verbs' object beside a `free_lines` list, since `hand` is the sail's word already and the
+needs keep their object; `show`, `open` and `read` are "as said" whatever they name; a
+hidden thing carries no flag, and every station reads what lies in a place until package 65
+decides who perceives what.
+
+### The figures (judgement)
+
+- **A port's means** (`business.port_means_pounds`): the business's largest cargo
+  (`cargo_tons`' upper figure, 120 tons) at the dearest price of the port's market as of
+  the day, a whole trader's lading bought outright: Falmouth £36,000 on 12 June 1805 at seed
+  7. A sum beyond it in one payment is doubted. A port whose market deals in nothing bounds
+  no sum. The price is read without settling the market (a doubt changes nothing).
+- **The guinea** at twenty-one shillings (£1 1s); a crown five shillings. The sum's words:
+  "£30", "£6 10s", "£6 10s 6d", a number in figures or words before pounds, guineas,
+  crowns, shillings or pence ("thirty pounds ten shillings").
+- **A freight** comes off by the market's lighter job at the market's own times (an hour
+  ashore, three minutes a ton, the pull to the ship), at no price; struck down at once where
+  the freighter is aboard. Doubted with no lighter (she lies in no port and the freighter is
+  not aboard).
+- **Reach**: the payer, payee or freighter aboard, in the boat, or ashore at a port within
+  `BOAT_REACH_NM` (six miles) of where she lies, 52's figure for a man brought off.
+
+### What the dispatches scenario shows, the packet as a thing
+
+A short scripted run at seed 7 on the scenario as committed (its mate and its copper ore
+included; the player at the prompt as her master, the lead at the director's door as the
+seat gives its orders; the script and its output in the lead's report, not in the
+repository): the people's words open "Mr Bowen, master: in command, on the quarterdeck, a
+sealed packet in his keeping. Mr Pearce, mate: on the quarterdeck. ...", the mate holding
+the officer of the watch's station. The cutter anchors in Carrick Road and her rules captain
+buys forty-two tons of copper ore by the boat, the whole of her hold. The director makes Mr
+Veale, a clerk of the Custom House, ashore at Falmouth (at the counting house by his role),
+and a letter for the port admiral on the cabin table (the places' reading: "In the cabin: a
+letter for the port admiral on the table."); `aboard: a letter for Mr Veale, in the
+captain's keeping` is refused by the rule of reach (the master held by the player at the
+prompt); `aboard: ten tons of wool freighted by Mr Veale at the quay for Plymouth` is
+answered "there is room in the hold for 0 tons and no more (42 tons bought are coming off)"
+(with an empty hold, in the run before the intent was changed, it was freighted, written up
+in the manifest with its cause, and came off by the lighter in two hours). From the
+quarterdeck `give the packet to Mr Veale` is "as said; nothing of the ship's changed (Mr
+Veale is ashore at Falmouth, at the counting house, out of your reach)"; landed by the boat
+and at the counting house it moves, "By the captain, ashore at Falmouth, at the counting
+house: gave the packet to Mr Veale; the sealed packet is in Mr Veale's keeping.", and the
+people's words say it of him; `give the guineas to the boatman` is "as said"; `aboard:
+twenty guineas paid into the purse by Mr Veale` is undoubted at his port, "Paid into the
+purse by Mr Veale, twenty guineas (£21); the purse £43." in the play log and the purse's
+ledger, the act in the director's log. The packet the test found handed over in words is now
+handed over, and the guineas are in the purse.
+
+### Found on the way
+
+- **The dispatches had no company** (fixed, it blocked item 4): a scenario whose director
+  brief binds the station in the World's making (`set_brief` in `World.__init__`) read the
+  stations, which read the wardroom, which built the people **before the crew was mustered**;
+  so they were built as a ship with no company's, the captain and the master alone, and
+  stayed so. The dispatches' cutter had no mate, no boatswain, no boy, and her officer of the
+  watch's station was bound to nobody: the test's finding 8 ("the officer of the watch is
+  bound to nobody in this scenario") is this, not the scenario's people. `People.wardroom`
+  now reads the file without building the people while the company is not yet mustered;
+  built afterwards they are the muster's (Mr Pearce the mate holds the officer's station).
+  An old save of a director's scenario replays with the company now, so its log is not the
+  log it was; no pinned passage has a director.
+- **A person's own needs were refused without the deck** (fixed with the free lines, which
+  needed the same exemption): `eat`, `drink`, `sleep` and `how am I`, every station's by its
+  domain since 54, were refused at a station with a domain that has not the deck ("The
+  officer of the watch has not the deck ..."). `tools.own_order` exempts them and the free
+  lines from the deck's check. `the glass on <ship>` (56) is refused so too and is left (it
+  did not block; the lead's).
+- **A free line at the prompt made the rules captain stand aside** (fixed): the player's
+  hand on an intent scenario (40c) took any order of his but a station's sentence or a
+  reading; a free line is no order of the ship's and is left out of it.
+- **The rules captain sailed with his master ashore** (not fixed; the lead's): in the
+  dispatches run the master's `go ashore` came in the minute the rules captain's `in port`
+  book began to get her under way; he stood aside at the order, but the weighing evolution
+  went on, and the cutter weighed and stood out with her master landed at the quay. The
+  stand-aside should belay what his book had in hand, or the master who commands should not
+  be landed while his ship is getting under way.
+- **A freight's room** (mine, fixed): the first build checked the hold's room alone, and
+  in the dispatches run the wool was freighted beside the master's whole lading of copper
+  ore still in the boat, which then came off to lie on deck. The room is now what is left
+  after the purchases in the boat and the lighter (`orders._tons_coming`). The market's own
+  `buy` checks the hold's room alone too; a second bargain is refused while the boat is
+  away, but a purchase in person at the market beside one in the boat is not (the lead's).
+- **The coordinator's two additions to the dispatches scenario** (2026-10-19, made with
+  the packet so that the file is edited once): a mate in its `people:` and the intent
+  `trade copper ore from Falmouth to Plymouth` (Plymouth's market has no tin, the test's
+  finding 7). With the wardroom fix above the muster's mate was already there and bound;
+  the line names him in the file and gives him the coordinator's skill.
+- **The director's "Done:" answer** still runs its two sentences together ("... ashore at
+  Falmouth The play log will carry ..."), as 62 recorded; left.
+
+### Pins
+
+**No pin moves.** No `_DIGEST` or `_LINES` in `tests/` changed (`git diff 53bc80a --
+tests` touches none), and every pinned passage of the slow tier passes against its figure
+(below): no recorded passage has a thing, a free line or a payment by the channel, and
+every new path is gated on one: the people's words, the places', the purse's and the truth's
+new keys are there only when a thing or a transaction is; the scenario's `things` is absent
+from its dict when empty; a verb of the free class was no verb before (an order beginning
+`give`, `take`, `put`, `show`, `stow`, `hide`, `open`, `read` or `throw` that is not a longer
+verb was refused as unknown, and is now a free line: none in a recorded passage).
+
+### The suite, as run
+
+On the build machine (four cores, shared: the load four to eight through the runs), the code
+and data as committed in `9fdd2d7` (the records after it, this section last).
+
+- `python3 -m ruff check .` and `python3 -m ruff format --check .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,506 passed, none
+  failed, 329 slow left out. (A first run, with the source edited under it, failed the
+  fingerprint test, the tree having changed between its two readings, and four completion
+  tests, which the completion's fix put right: `take a fix`, `read the standing orders
+  from`, `show the watcher's journal` had lost the space for their words to the free verbs
+  that begin them.)
+- **The slow tier of the files touched** (`python3 -m pytest --slow -n 4 -q -p
+  no:cacheprovider tests/test_people.py tests/test_world_orders.py tests/test_director.py
+  tests/test_business.py tests/test_known_truths.py`): 210 passed, 7 expected failures, and
+  the four pace tests of `test_known_truths.py` failed on the floor (242 to 380 ticks a
+  second against 500) under the load of four workers: they are the pace marker's, run alone
+  below, where they pass.
+- **The slow tier once whole** (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m
+  "not pace"`): 3,812 passed, 11 expected failures (the ten of 50 and 52, and 57's gale
+  trial), none failed and no error; every pinned digest among them.
+- **The pace tests alone** (`python3 -m pytest --slow -m pace -q -p no:cacheprovider`, the
+  load five at their start and at the end, other worktrees building beside): 6 passed.

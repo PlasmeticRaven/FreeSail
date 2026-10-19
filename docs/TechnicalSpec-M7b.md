@@ -949,8 +949,9 @@ truths 7b-114 to 7b-116).**
   no money. A freight is the market's own form at no price: off by the port's lighter where
   she lies in port (the market's `lighter` job, its line "came off by the lighter ... and
   were struck down into the hold"), struck down at once where the freighter is aboard, the
-  manifest written with its cause. The `purse` reading carries `ledger` and `debts` only
-  once there are any. **The doubt** (`_doubt_aboard_new`): money or goods from nobody, or
+  manifest written with its cause; the hold's room for it is what is left after the
+  purchases in the boat and the lighter (`_tons_coming`). The `purse` reading carries
+  `ledger` and `debts` only once there are any. **The doubt** (`_doubt_aboard_new`): money or goods from nobody, or
   from a person the world does not know; a payer, payee or freighter neither aboard nor at a
   port she lies within `BOAT_REACH_NM` of; a sum beyond the port's means
   (`business.port_means_pounds`: the business's largest cargo, 120 tons, at the dearest
