@@ -508,8 +508,23 @@ def _say(ship: Any, verb: str, text: str) -> tuple[str, str, dict[str, Any]]:
         where = "from the masthead" if place == "masthead" else f"a hail, {where}"
     heard_at = {"quarterdeck", "deck"} if is_hail else {place}
     hearers = []
+    ashore = None
+    if place == "shore":
+        # ashore (package 66): heard at the same place of the same port, not anywhere
+        # ashore (the captain at the market does not hear the counting house)
+        from freesail.world.hearing import spot_words, station_spot
+
+        ashore = station_spot(world, station)
+        where = spot_words(world, ashore)  # 'ashore at Plymouth, at the counting house'
     for other in _stations_held(world):
         if other.station.name == station:
+            continue
+        if ashore is not None:
+            from freesail.world.hearing import station_spot, within_hearing
+
+            if within_hearing(ashore, station_spot(world, other.station.name)):
+                other.hear(f"{who[:1].upper()}{who[1:]}, {where}: {words}")
+                hearers.append(other.station.name)
             continue
         if place_of(world, other.station.name) in heard_at:
             other.hear(f"{who[:1].upper()}{who[1:]}, {where}: {words}")

@@ -7332,3 +7332,156 @@ and data as committed in `9fdd2d7` (the records after it, this section last).
   trial), none failed and no error; every pinned digest among them.
 - **The pace tests alone** (`python3 -m pytest --slow -m pace -q -p no:cacheprovider`, the
   load five at their start and at the end, other worktrees building beside): 6 passed.
+
+## Package 66: the station's line and the stand-by (2026-10-19)
+
+The harness after the dispatches test (`docs/playtests/2026-10-18-dispatches-director-test/`,
+findings 2, 4, 9, 17, 18, 19, 22 and 25, and the captain's debrief); spec M7b §3, §5 and §14
+"as built (package 66)"; truths 7b-117 to 7b-119. Built in a worktree off `6f272b9`, beside
+53b. One new module, `freesail/world/hearing.py` (who heard a word, and where), kept apart
+from the people's registry, which 53b is building on.
+
+### Each item against its intent
+
+1. **The line: built.** `readings.station_line` (one function, as the lead read it) from
+   `People.effective_place` and the port's place ashore, the stations held (where the deck
+   is kept) and the needs (`NeedsKeeper.showing`, `hours`); `Sample.you`, first in the
+   sample's data; the director's `director_line` (the budget and every station whose open
+   sample holds the clock). `how am I` answers with the same line, then its hours. *Taken
+   another way, in part*: the "since" is the harness's (`Harness._place_since`), kept when the
+   person's place changes, looked at after every order, once a minute and at each sample,
+   and read back from the log's last line that moved him: a person has no "since" of his
+   own, and adding one to `Person` would have been 53b's registry. The deck reads *yours*,
+   *Mr Pearce's*, *the captain's*, *the captain's book's* or *nobody's*.
+2. **A model's own order ends its stand-by: built** (`remote.Desk._own_act`): a reply out
+   of turn that acts ends the stand-by at its own word (the log's line as 52 had it for
+   words), opens the turn, and is taken in it; recorded as the model's own word (`door_act`
+   "speak", by "its own order") and the reply after it, so that the replay is the same
+   (truth 7b-118 replays to the same digest). *Wider than asked*: it holds for the wait for
+   the turn as well as for a stand-by, as words of its own did already. The director's
+   `truth` (and `read_journal`, which the meanwhile words named and the door did not run)
+   join the meanwhile reads; the chart was one already as a picture tool.
+3. **A wake carries a line: built** (`Harness._reaches`), in the stand-by's event and
+   severity matches, the urgent line and (*wider than asked*) the cadence's notable lines,
+   so that a word out of hearing neither wakes nor samples a station. The 15:44 case is
+   truth 7b-118's second half.
+4. **Who heard, and until when: built**, in the result and never the log's line (so that no
+   recorded passage moves; the brief's alternative of keeping the pinned line's words and
+   adding the hearers after them would still have moved the digest): `hearing.said_tail`
+   for a `say` and a hail at `submit_order`, the console (printed under the order) and the
+   browser (an unlogged line); `heard_words` in the director's `say as` result; the question
+   to a person nobody holds says until when it waits.
+5. **The hand's hold named: built** (`crews.hold_of`, `hold_event_came`): `for a watch`,
+   `for two glasses`, `for an hour`, `until a sail within hail`, `a sail in sight`, `a
+   landfall`, `hove to`, `at anchor`; the event read from her truth as her far captain
+   perceives it, whichever body moves her; a day at most (judgement); across promotion and
+   demotion. The dispatches brief's examples gain `give chase until a sail within hail`.
+6. **`say as` by station or trade: built** (`orders.Voice`, `_by_station_or_voice`): the
+   people first as before, then a station's person, then the lookout at the masthead (his
+   hail heard on the open deck and aloft) and the hands, then the muster's trades. The rule
+   of reach refuses a held lookout. The cutter has no carpenter in her muster and says so.
+7. **Merchant words: built** (`agent.merchant_ship`, `MERCHANT_OFFICER`): the wardroom
+   file's binding of the captain's station to a master is the test (a point world with no
+   file keeps the lieutenant, as every recorded passage of it did).
+8. **Truths and records: built**: truths 7b-117 to 7b-119; spec §3, §5 and §14 as built; the
+   Harness's §19 and a §21a; the primer's chapter 20. *Taken another way*: chapter 6 does not
+   tell the stand-by (it is the watch and the log); a model's stand-by is told in chapter 19
+   (the wardroom), so the line, the stand-by's end, the wake, who heard and the mate went
+   there, in a section of their own.
+
+### What moved
+
+- The REPL's and the MCP bridge's text of a sample (`repl.render_turn`) prints the line
+  under the sample's head, and now prints `heard` and `needs` too (found on the way, below).
+- `test_agent_api`'s out-of-turn test: an order out of turn is now run in the turn it opens
+  (it asserted "Nothing was run."); `test_agents`' sample keys gain `you`, and its REPL text
+  the line between the head and the first notice; `test_people`'s `how am I` begins with
+  the line. No assertion was loosened beyond the new words.
+- The stand-by tool's description says what wakes and what ends a stand-by; the director's
+  brief says its meanwhile reads, the line and the hold named.
+
+### Found on the way
+
+- **The text doors never showed `heard` or `needs`**: `repl.render_turn`, which the MCP
+  bridge uses, printed the notices, the question, the word, the stand-by's digest, the log
+  and the readings, and not the deck's conversation heard nor the needs. A model through
+  Claude Desktop never read what was said near it or that it was thirsty (part of finding
+  25's "the needs never showed"). Fixed, since the line is printed by the same function.
+- **A person's words ashore were heard by no station**, and a station's `say` ashore by
+  every station ashore at any port (`heard_at = {"shore"}`): fixed as item 4's ground
+  (`hearing.spot_of`).
+- **`read_journal` out of turn was "Nothing was run"**, though the meanwhile words named it:
+  fixed (item 2).
+- **The captain's station keeps the deck ashore**: `movement.go_ashore` refuses a station
+  with the deck except the captain's, so a model captain ashore has the deck, and the line
+  says so ("the deck yours" at the market). Not changed: whether the deck should pass to the
+  officer (or the book) when the captain lands is the lead's.
+- **`People.effective_place` has a side effect** (`_asleep` spends a watch-keeper's call,
+  `p.up = False`, when it reads him outside his watch below at night). The line reads it once
+  a sample, as `place_of` does at every word said; the harness's tracker reads the person's
+  raw place instead. Not changed; for the people's next package.
+
+### Decisions for the lead and the owner
+
+- The hold until an event is bounded at a day; a forgotten order otherwise keeps her for
+  ever. Judgement.
+- Who heard names every named person in earshot (the stations held first, four at most and
+  the rest counted); on a frigate's quarterdeck that is a crowd. Stations only would be
+  shorter and say less.
+- An order out of turn opens the turn whether the model stood by or only waited for its turn.
+- The player at the prompt has no sample; his line is `how am I`. A status line in the
+  browser is not built.
+
+### A scripted run (the late door, the schooner in Carrick Road at seed 7)
+
+```
+10:06  sample: You: the captain, on the quarterdeck, since 10:00; the deck yours; on your feet since 10:00.
+10:06  > submit_order('go ashore'): By the captain: going ashore.
+10:36  sample: You: the captain, ashore at Falmouth, on the quay, since 10:33; the deck yours; on your feet since 10:00.
+10:38  > submit_order('go to the counting house') while standing by until a glass:
+        the door: Your stand-by (until a glass) ended at your own order, and your turn opened with it: what you sent was run in it.
+        the log: [captain] The captain ends its stand-by (until a glass) at its own word; it is sampled again.
+        the result: Mr Travers went to the counting house at Falmouth: ...
+10:38  > say: The captain (Mr Travers), ashore at Falmouth, at the counting house: Mr Veale? A packet for your hand, sir. Heard by Mr Veale, ashore at Falmouth, at the counting house.
+10:38  > stand_by('a word on deck'); the director's say as: Mr Veale spoke ashore at Falmouth, heard by the captain, ashore at Falmouth, at the counting house.
+10:38  woken: [captain] A word on deck; the captain is sampled again.
+10:38  > go to the market; stand_by('a word on deck or a notable event'); the director's say as: Mr Veale spoke ashore at Falmouth, heard by nobody: the captain is ashore at Falmouth, at the market.
+10:40  the captain still standing by: True
+11:07  > submit_order('come aboard') while standing by: By the captain: coming aboard.
+12:08  sample: You: the captain, in the boat, since 11:34; the deck yours; on your feet since 10:00.
+12:08  > how am I: You: the captain, on the quarterdeck, since 12:07; the deck yours; on your feet since 10:00.
+12:09  hand: Hazard's captain gave it as his own, at far detail (By the captain: heaving to): ...; her captain holds by it until a sail within hail comes to her (a day at most, 12:09 tomorrow) or the next order to her, then sails by his intent again.
+12:49  forty minutes on: lying to, held until hail
+12:52  the Nancy two cables off: the hold ended; her story: The captain takes up his plan again (keep the station off the Lizard within 10 miles).
+```
+
+### Pins
+
+**No pin moves.** No `_DIGEST` or `_LINES` in `tests/` changed (`git diff 6f272b9 -- tests`
+touches none), and every pinned passage of the slow tier passes against its figure (below):
+the recorded passages seat no model, so the line, the stand-by's end and the wake never run
+in them; the line is the sample's and the hearers are the result's, never the log's; aboard
+the hearing of a `say` and of a person's words is as it was; the hold's event is absent
+unless named.
+
+### The suite, as run
+
+On the build machine (four cores), 53b building beside it (the load seven to eight through
+the fast and slow tiers); the code as committed in `7ec7cb9`, the records in `0143886`.
+
+- `ruff check .` and `ruff format .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,477 passed, none
+  failed, 329 slow left out. (A first run was stopped at three quarters by the session's
+  limit on a background command, none failed by then, and run again whole.)
+- **The slow tier of the files touched** (`test_agent_api`, `test_agents`, `test_people`,
+  `test_director`, `test_world_orders`, `test_known_truths`, `--slow`): every test passed
+  but the expected failures and truth 51's five pace measurements, which were run in it by
+  mistake beside 53b's workers (246 ticks a second against the floor of 500) and belong to
+  the pace run alone (below).
+- **The slow tier once whole** (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m
+  "not pace"`): 3,789 passed, 11 expected failures (the same eleven as at 62), none failed
+  and no error; every pinned digest among them. A first whole run was stopped by hand at a
+  twentieth to be started again detached, the session's limit on a background command being
+  shorter than the run under the load.
+- **The pace tests alone** (`python3 -m pytest --slow -m pace -q -p no:cacheprovider`, the
+  load 0.9 at their start and 1.2 at the end): 6 passed.

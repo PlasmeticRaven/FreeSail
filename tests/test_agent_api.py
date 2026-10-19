@@ -514,8 +514,17 @@ def test_a_reply_out_of_turn_reads_leaves_or_is_refused_in_words(tmp_path):
         "Noted in the journal; the game still has the floor until your next turn."
     )
     assert g.harness.transcript[-1]["door"] == "journal"
+    # an order sent while the game has the floor opens the turn at the model's own word and
+    # is run in it (package 66; "Nothing was run." before), recorded so that a replay opens
+    # and runs it at the same point
     a = g.reply("", ("submit_order", {"text": "set the royals"}))
-    assert "Nothing was run." in a["words"]
+    assert a["own_act"] and not a.get("out_of_turn") and a["floor"] == "model"
+    assert a["words"] == "Your turn opened at your own order: what you sent was run in it."
+    assert g.harness.transcript[-2]["door"] == "speak"
+    assert g.harness.transcript[-2]["by"] == "its own order"
+    assert g.harness.transcript[-1]["reply"]["calls"][0]["name"] == "submit_order"
+    g.reply("")  # the floor goes back to the game
+    a = g.reply("", ("readings", {}))
     assert a["interim"] == {
         "since": "Morning watch, 8 bells (04:00)",
         "until": None,

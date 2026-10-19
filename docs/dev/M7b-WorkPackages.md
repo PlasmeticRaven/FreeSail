@@ -40,7 +40,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 64 | Fable | The harbour's second pass (spec §21d, "The owner's first use"; the owner, 2026-10-18): the page made clear to a newcomer, the flags explained where they are set, several models and stations configured without several settings files, the maker given the papers (the chronometer first) and the people aboard by name with a short brief each per scenario, and the director's grant (the scenario's `director:` block: models, seats, budget) shown on the game tab and in the maker, with the director's doors in the doors tab (spec §2a; the owner, 2026-10-19) | noted, not immediate; the owner's word of 2026-10-18: a Fable package after Thursday's usage reset, a proper design run so that starting a game is streamlined with every option kept (the framework functions; it wants a finer touch) |
 | 65 | Fable | The place's knowledge (spec §14, "Brought back and forward"; the owner, 2026-10-19): what a person perceives from where he stands, aboard and ashore (the readings, the log and the sightings by place; the ship reaching him ashore by report, boat or letter), the books and papers kept in places, the always-present line of his own place and state in every sample, and the drill extended to going below, eating, drinking, reading a book and coming on deck; and each kind of work done in its own place (the sailmaker's sail room, the master's gunroom, the captain's cabin), the same for the rules' person and for a model or the player at the station doing the same work (the owner, 2026-10-19) | provisional; the deferred locational knowledge of decision 47 brought back and forward at the owner's word after the dispatches test; brief after the owner's testing round |
 | 53b | Opus | Things, free lines and transactions (spec §17a; the owner's question of 2026-10-19 after the dispatches test): a thing made, moved and kept as people are, with a place and a keeper and nothing more; a short list of verbs taking free words and logging them as used, moving a thing where the words name one and saying "as said" where they do not; a sum or a cargo paid, freighted or owed as a transaction with its cause in the ledger, never a variable set; the refinement pass on 53 the owner is looking at | briefed, approved ("as written") and launched 2026-10-19; **built 2026-10-19** (spec §17a as built, with five readings taken another way, and §18's truths; the Harness's §19 and §21; the primer's chapters 14 and 20; the tuning notes, "Package 53b"; truths 7b-114 to 7b-116) |
-| 66 | Opus | The station's line and the stand-by (the harness after the dispatches test, 2026-10-19): one line of the holder's own first in every sample; a model's own order or word ends its stand-by and runs; a wake carries a line or does not wake; a word said tells who heard it and a question put says until when it waits; the truth a meanwhile read for the director; the hand's hold named (`for a watch`, `until <event>`); `say as` the lookout, the master and the muster's persons; merchant words for an unbound officer | briefed, approved and launched 2026-10-19 beside 53b |
+| 66 | Opus | The station's line and the stand-by (the harness after the dispatches test, 2026-10-19): one line of the holder's own first in every sample; a model's own order or word ends its stand-by and runs; a wake carries a line or does not wake; a word said tells who heard it and a question put says until when it waits; the truth a meanwhile read for the director; the hand's hold named (`for a watch`, `until <event>`); `say as` the lookout, the master and the muster's persons; merchant words for an unbound officer | briefed, approved and launched 2026-10-19 beside 53b; **built 2026-10-19** (spec §3, §5 and §14 as built; the Harness's §19 and §21a; the primer's chapters 19 and 20; the tuning notes, "Package 66"; truths 7b-117 to 7b-119) |
 | 67 | Opus | The director's seat made real (spec §2a; the owner, 2026-10-19): the desk reads a held seat, the game starts the API door itself on `seat:` as the harbour starts one, under the grant's budget on the owner's key, the pane in the harbour's doors tab, stopped by `unseat:` or the spent budget; the form widened to a station of a ship; the brief says what a seat costs | provisional; brief after 53b and 66 come back |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
 
@@ -294,6 +294,47 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
    its session kind, as 42b told the captain's station (its leftover).
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
+
+### Package 66 as merged (2026-10-19)
+
+Merged `--no-ff` from the builder's worktree (three commits on `6f272b9`; 30 files, ~1,650
+lines) over 53b, with seven conflicts of the appended kind (the Harness, the tuning notes,
+three test files, the waves table, and `harness.py`'s word kinds, where 53b's `free.line`
+is kept among the words between people and 66's `WORD_KINDS` built on them, the free
+line's hearers being named in its data as 66's reach wants), ruff clean, the touched tests
+and the fast tier on the merged tree by the lead; the builder's fast tier (3,477 passed),
+whole slow tier (3,789 passed, the same 11 expected failures) and pace tests (6 passed)
+all passed on its tree; **the one whole slow tier on the merged pair, at the owner's word,
+is recorded below.** Built as briefed: the line (`readings.station_line`, `director_line`;
+`Sample.you`, first in every sample; `how am I` answering with it), the "since" kept by the
+harness from the log (a person has no since of his own; adding one would have touched
+53b's registry); a model's own acting reply out of turn ends its stand-by, opens the turn
+and runs in it, recorded so that the replay agrees, **wider than asked: while merely
+waiting for its turn too**; the truth and `read_journal` among the director's meanwhile
+reads (the chart was); a wake carries a line or does not wake (`Harness._reaches`), **wider
+than asked: urgent lines and the cadence's notable sampling under the same rule**; who
+heard and until when (`freesail/world/hearing.py`, a new module to keep clear of 53b),
+**the hearers in the order's result and never in the log's line** (the pins); hearing
+ashore the same place of the same port; the hand's hold named (`for a watch`, `for two
+glasses`, `for an hour`, `until` one of five events, a day at most, the builder's
+judgement) across promotion both ways, the dispatches brief's example `give chase until a
+sail within hail`; `say as` by station or trade, the lookout at the masthead heard on deck,
+a held lookout refused; the mate's words where the wardroom file binds the captain's
+station to a master; truths 7b-117 to 7b-119. **Taken another way, accepted:** the
+stand-by's primer section in chapter 19 (chapter 6 does not tell the stand-by).
+
+**Found and fixed on the way:** the text doors (`repl.render_turn`, the MCP bridge's) never
+printed a sample's `heard` or `needs`: a model through the desktop client never saw words
+said near it nor that it was thirsty (part of the test's finding 25); a person's words
+ashore were heard by no station and a station's `say` ashore at every port; `read_journal`
+out of turn answered "Nothing was run". **Not fixed, carried:** the captain's station keeps
+the deck when he goes ashore, so his line ashore says "the deck yours"; `People.
+effective_place` can spend a watch-keeper's call as a side effect. **Decisions for the
+owner:** a day as the bound of a hold until an event; "heard by" naming the people within
+hearing as well as the stations (four named at most, the rest counted) or the stations
+only; an order out of turn opening the turn while merely waiting; the deck passing to
+someone when the captain lands; a status line in the browser for the player at the prompt,
+whose line is `how am I` and who has no sample.
 
 ### Package 53b as merged (2026-10-19)
 

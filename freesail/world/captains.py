@@ -1937,8 +1937,9 @@ class Captain(Judgement):
     # that a checkpoint from before loads with none)
     over_head_until: int | None = None
     over_head_order: str = ""
+    over_head_event: str = ""  # the event the hold was named until (package 66)
 
-    def over_his_head(self, text: str, until: int) -> None:
+    def over_his_head(self, text: str, until: int, event: str = "") -> None:
         """An order of her own grammar given to her as his by the director's hand: he is
         told it came over his head, so that his book is struck as at the player's hand (no
         rule of his fights it) and his judgements are held until `until`, the director's
@@ -1950,6 +1951,7 @@ class Captain(Judgement):
             self.state = None
         self.over_head_until = int(until)
         self.over_head_order = " ".join(str(text).split())
+        self.over_head_event = str(event or "")
 
     def take_up_again(self) -> None:
         """The glass out (or the director's `carry on`): he commands again from where she
@@ -1958,9 +1960,24 @@ class Captain(Judgement):
             return
         self.over_head_until = None
         self.over_head_order = ""
+        self.over_head_event = ""
         self.legs, self.leg_i, self.leg_shaped_tick = [], 0, None
         self._business = {}
         self.last_judged = -1
+
+    def _hold_event_came(self) -> bool:
+        """The event the hold was named until come to her (package 66), read once a minute
+        from her truth: a crewed World's own vessel in her parent's sea."""
+        event = str(getattr(self, "over_head_event", "") or "")
+        world = self.world
+        if not event or world.clock.tick % 60:
+            return False
+        parent, vessel = getattr(world, "parent", None), getattr(world, "vessel", None)
+        if parent is None or vessel is None:
+            return False
+        from freesail.world.crews import hold_event_came
+
+        return hold_event_came(parent, vessel, event)
 
     # -- the tick ---------------------------------------------------------------------
 
@@ -1969,7 +1986,7 @@ class Captain(Judgement):
         transitions, and work the state."""
         world = self.world
         until = getattr(self, "over_head_until", None)
-        if until is not None and world.clock.tick >= until:
+        if until is not None and (world.clock.tick >= until or self._hold_event_came()):
             self.take_up_again()
         if not self.commands:
             self._seen_log = len(world.log)

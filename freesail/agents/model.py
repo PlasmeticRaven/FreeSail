@@ -153,9 +153,15 @@ class Sample:
     # the station's person's needs at a step that is said (package 54: 'quite thirsty and
     # feeling a bit drowsy'); absent while none is
     needs: str | None = None
+    # the station's line (package 66; spec M7b §14): one line of the holder's own, who he
+    # is, where and since when, whose the deck is, his state; first in the sample, before
+    # the log ("You: the captain, on the quarterdeck, since 10:00; the deck yours; ...")
+    you: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
+        if not d.get("you"):
+            d.pop("you", None)
         if d.get("stood_by") is None:
             d.pop("stood_by", None)
         if d.get("word") is None:
@@ -164,11 +170,13 @@ class Sample:
             d.pop("heard", None)
         if not d.get("needs"):
             d.pop("needs", None)
-        # the harness's notices first after the stamp and the reason (the first of them,
+        # the station's line first of all (package 66), then the harness's notices after
+        # the stamp and the reason (the first of them,
         # after a stand-by, says that the model stood by: package 28c), then the question
         # and the stand-by's digest, then the log and the readings; a door that sends the
         # sample as JSON sends it in this order
         first = (
+            "you",
             "tick",
             "stamp",
             "reason",

@@ -43,6 +43,7 @@ within the range a crewed one first, the cap and its order unchanged.
 from __future__ import annotations
 
 import math
+import re
 import zlib
 from dataclasses import replace
 from typing import Any
@@ -920,6 +921,125 @@ HAND_HOLD_S = 1800
 # on`'s word, said of another ship).
 CARRY_ON_WORDS = ("carry on", "carry on with your intent", "as you were")
 
+# The hold named (package 66; the dispatches test's finding 4: steering a frigate across
+# eight miles of sea took two orders and still failed, a glass being three miles and a half
+# at seven knots): `... for a watch`, `... for two glasses`, `... for an hour`, or `...
+# until <an event>`, the hold so named in place of the glass. An event she is held until
+# ends it when it comes to her, or a day at most (judgement: a forgotten order does not
+# keep her lying to for ever; a day is longer than any chase or passage the hand is for).
+HOLD_UNTIL_MAX_S = 24 * 3600
+HOLD_SPANS_S = {"glass": 1800, "hour": 3600, "watch": 4 * 3600, "day": 24 * 3600}
+_COUNTS = {
+    "a": 1,
+    "an": 1,
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+}
+# The events a hold may be named until, by their words (`hold_event_came`): her own, read
+# from her truth as her captain perceives it (`brains.perceive_vessel`).
+HOLD_EVENTS: dict[str, str] = {
+    "a sail within hail": "hail",
+    "a sail in hail": "hail",
+    "within hail": "hail",
+    "a sail sighted": "sail",
+    "a sail in sight": "sail",
+    "a landfall": "land",
+    "landfall": "land",
+    "land in sight": "land",
+    "the land in sight": "land",
+    "hove to": "hove to",
+    "she is hove to": "hove to",
+    "at anchor": "anchor",
+    "anchored": "anchor",
+}
+# The events in the words a refusal names them by, one for each.
+HOLD_EVENT_NAMES = ("a sail within hail", "a sail in sight", "a landfall", "hove to", "at anchor")
+_HOLD_TAIL = re.compile(
+    r"^(?P<order>.+?)\s+(?:for\s+(?P<n>a|an|one|two|three|four|five|six|seven|eight|\d+)\s+"
+    r"(?P<unit>glass(?:es)?|hours?|watch(?:es)?|days?)|until\s+(?P<until>.+?))\s*$",
+    re.I,
+)
+
+
+def hold_of(text: str) -> tuple[str, int | None, str]:
+    """(the order, the hold in seconds or None for the default, the event's key or "")
+    from the hand's words: 'give chase for a watch' -> ('give chase', 14400, ''); 'heave
+    to until a sail within hail' -> ('heave to', None, 'hail'). Raises ValueError in words
+    for an event a hold cannot be named until."""
+    m = _HOLD_TAIL.match(" ".join(str(text).split()))
+    if m is None:
+        return text, None, ""
+    order = m.group("order").strip()
+    if m.group("until") is not None:
+        said = " ".join(m.group("until").lower().split()).rstrip(".")
+        key = HOLD_EVENTS.get(said) or HOLD_EVENTS.get(said.removeprefix("the "))
+        if key is None:
+            raise ValueError(
+                f"a hold is named until one of her own events ({', '.join(HOLD_EVENT_NAMES)}), "
+                "or for a time ('for a watch', 'for two glasses', 'for an hour')"
+            )
+        return order, None, key
+    n_word = m.group("n").lower()
+    n = int(n_word) if n_word.isdigit() else _COUNTS[n_word]
+    unit = m.group("unit").lower().rstrip("s")
+    unit = "glass" if unit.startswith("glas") else ("watch" if unit.startswith("watch") else unit)
+    return order, n * HOLD_SPANS_S[unit], ""
+
+
+def hold_event_came(parent: World, vessel: Any, event: str) -> bool:
+    """Whether the event a hold was named until has come to her (package 66): a sail within
+    hail (four cables) or in sight from her masthead, the land in sight, she hove to, she
+    at anchor; read from her truth as her far captain perceives it, whichever body moves
+    her (the crewed body is mirrored into the far record every tick)."""
+    if not event:
+        return False
+    from freesail.world.brains import HAIL_REACH_M, perceive_vessel
+
+    if event == "hove to":
+        crew = getattr(vessel, "crew", None)
+        if crew is not None and crew.shape == "full":
+            readings = getattr(crew, "readings", None)
+            try:
+                said = str(readings.value("manoeuvre_in_hand") or "") if readings else ""
+            except Exception:  # noqa: BLE001
+                said = ""
+            return said == "hove to"
+        plan = getattr(vessel, "plan", None) or []
+        return bool(plan) and plan[0][0] == "lie_to"
+    try:
+        p = perceive_vessel(parent, vessel)
+    except Exception:  # noqa: BLE001  (a body that cannot be perceived: nothing came)
+        return False
+    if event == "hail":
+        return any(float(s.get("estimate_m", math.inf)) <= HAIL_REACH_M for s in p.strangers)
+    if event == "sail":
+        return bool(p.strangers)
+    if event == "land":
+        return bool(p.land_in_sight)
+    if event == "anchor":
+        return bool(p.anchor_down) or bool(
+            getattr(getattr(vessel, "crew", None), "at_anchor", False)
+        )
+    return False
+
+
+def hold_words(parent: World, until: int, event: str) -> str:
+    """'until 14:30', 'until a sail within hail comes to her (a day at most, 10:01
+    tomorrow)'."""
+    when = _until_words(parent, until)
+    if int(until) - int(parent.clock.tick) >= 24 * 3600 - 60:
+        when += " tomorrow"
+    if not event:
+        return f"until {when}"
+    said = next(k for k, v in HOLD_EVENTS.items() if v == event)
+    return f"until {said} comes to her (a day at most, {when})"
+
 
 class _FarBody:
     """The far body as `far_order` reads it, for a vessel with no World of her own: her
@@ -1006,20 +1126,26 @@ def hand(parent: World, vessel: Any, text: str) -> str:
         )
     if text.lower() in CARRY_ON_WORDS:
         return _carry_on(vessel)
-    until = int(parent.clock.tick) + HAND_HOLD_S
+    # the hold named (package 66): 'for a watch', 'until a sail within hail'
+    text, span, event = hold_of(text)
+    if text.lower() in CARRY_ON_WORDS:
+        return _carry_on(vessel)
+    if event:
+        span = HOLD_UNTIL_MAX_S
+    until = int(parent.clock.tick) + (HAND_HOLD_S if span is None else span)
     crew = vessel.crew
     full = crew is not None and crew.shape == "full"
     if full:
-        words = _hand_crewed(vessel, crew, text, until)
+        words = _hand_crewed(vessel, crew, text, until, event)
     else:
-        words = _hand_far(parent, vessel, text, until)
+        words = _hand_far(parent, vessel, text, until, event)
     if vessel.brain is None and not full:
         return (
             f"{words}; she has no captain of her own beyond her goal, and the order stands "
             "until the next ('fill away', 'shape a course for <a place>')"
         )
     return (
-        f"{words}; her captain holds by it until {_until_words(parent, until)} or the next "
+        f"{words}; her captain holds by it {hold_words(parent, until, event)} or the next "
         "order to her, then sails by his intent again"
     )
 
@@ -1030,7 +1156,7 @@ _READING_WORDS = (
 )
 
 
-def _hand_crewed(vessel: Any, crew: CrewedWorld, text: str, until: int) -> str:
+def _hand_crewed(vessel: Any, crew: CrewedWorld, text: str, until: int, event: str = "") -> str:
     from freesail.world.captains import actor_for
 
     if _is_a_reading(crew, text):
@@ -1042,11 +1168,13 @@ def _hand_crewed(vessel: Any, crew: CrewedWorld, text: str, until: int) -> str:
         why = str((e.data or {}).get("reason") or e.text).rstrip(".")
         raise ValueError(f"{vessel.name}'s captain could not give it as said: {why}")
     # her own clock: a crewed World counts its ticks from her promotion
-    cap.over_his_head(text, int(crew.clock.tick) + (until - int(crew.parent.clock.tick)))
+    cap.over_his_head(
+        text, int(crew.clock.tick) + (until - int(crew.parent.clock.tick)), event=event
+    )
     return f"{vessel.name}'s captain gave it as his own, at full detail ({said})"
 
 
-def _hand_far(parent: World, vessel: Any, text: str, until: int) -> str:
+def _hand_far(parent: World, vessel: Any, text: str, until: int, event: str = "") -> str:
     from freesail.orders.errors import OrderError
     from freesail.world.captains import actor_for
 
@@ -1081,7 +1209,7 @@ def _hand_far(parent: World, vessel: Any, text: str, until: int) -> str:
         words = found[1].rstrip(".")
         her_log(parent, vessel, f"{said}.")
     if brain is not None:
-        brain.over_his_head(text, until, stash)
+        brain.over_his_head(text, until, stash, event=event)
     return f"{vessel.name}'s captain gave it as his own, at far detail ({said}): {words}"
 
 

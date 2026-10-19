@@ -146,6 +146,10 @@ TURNS_WAIT_MAX_S = 120.0
 # look is a few list lengths).
 POLL_RECHECK_S = 0.25
 
+# How a turn opened by the model's own order out of turn is recorded (`door_act` "speak",
+# its `by`; package 66): the stand-by ended at its own word, by an order.
+OWN_ORDER = "its own order"
+
 # The tools that run out of turn: they read and change nothing in the game (`tools.py`).
 READ_ONLY_TOOLS: tuple[str, ...] = (
     "read_log",
@@ -153,6 +157,10 @@ READ_ONLY_TOOLS: tuple[str, ...] = (
     "state",
     "library",
     *tools.PICTURE_TOOLS,  # the chart and the ship's view as pictures (package 42)
+    # the journal read back, and the director's truth (package 66; the dispatches test's
+    # finding 9: the director standing by could not read the truth, nor anyone his journal)
+    "read_journal",
+    "truth",
 )
 
 # ...and with them, out of turn, `shelve`, which changes only what the model is shown, and
@@ -873,6 +881,10 @@ class Desk:
         stood = self._stand_by_out_of_turn(h, reply)
         if stood is not None:
             return stood
+        if not a.paused and any(c.name not in (*ASIDE_TOOLS, "stand_by") for c in reply.calls):
+            acted = self._own_act(h, reply)
+            if acted is not None:
+                return acted
         lost = " Your words were not logged." if reply.text.strip() else ""
         ran = " Nothing was run." if reply.calls else ""
         return {"out_of_turn": True, "words": f"{self.no_floor_words(seat)}{lost}{ran}"}
@@ -888,6 +900,32 @@ class Desk:
             return {"out_of_turn": True, "words": self.no_floor_words(seat)}
         h.door_act("cut_off", words, DOORS[seat.door][1])
         return {}
+
+    @staticmethod
+    def _own_act(h: Harness, reply: Reply) -> dict[str, Any] | None:
+        """**A model's own order or word ends its stand-by** (package 66; the dispatches
+        test's findings 9 and 18: three of the captain's orders and the director's world
+        orders were dropped with "Nothing was run"): a reply that acts (an order, a world
+        order, an answer, any call but the meanwhile reads), sent while the game has the
+        floor, ends the stand-by or the wait at the model's own word, logged as such, and
+        opens its turn; the reply is then taken in that turn, every call run as in any
+        turn. The opening is recorded as the model's own word (`door_act` "speak", by "its
+        own order") and the reply as a reply, so that a replay opens and runs it at the
+        same point. None when no turn could be opened (the station not yet started)."""
+        a = h.agent
+        was = a.stand_by.words if a.standing_by and a.stand_by is not None else None
+        h.door_act("speak", "", OWN_ORDER)
+        if h.open_sample is None:
+            return None
+        h.deliver(reply)
+        if was is not None:
+            words = (
+                f"Your stand-by (until {was}) ended at your own order, and your turn opened "
+                "with it: what you sent was run in it."
+            )
+        else:
+            words = "Your turn opened at your own order: what you sent was run in it."
+        return {"own_act": True, "words": words}
 
     def _stand_by_out_of_turn(self, h: Harness, reply: Reply) -> dict[str, Any] | None:
         """A stand-by asked for while the game has the floor and the model is waiting for
@@ -920,10 +958,12 @@ class Desk:
     @staticmethod
     def no_floor_words_of(h: Harness) -> str:
         a = h.agent
+        reads = "read_log, readings, state, library, read_journal"
+        if h.station.name == "director":
+            reads += ", truth, chart"  # the director's own reads (package 66)
         meanwhile = (
-            "You may read (read_log, readings, state, library, read_journal), write in your "
-            "journal and shelve a book meanwhile; hand_over, stand_down and opt_out are "
-            "taken at once."
+            f"You may read ({reads}), write in your journal and shelve a book meanwhile; "
+            "hand_over, stand_down and opt_out are taken at once."
         )
         if a.paused:
             return (
@@ -935,13 +975,15 @@ class Desk:
         if a.standing_by and a.stand_by is not None:
             return (
                 f"You are standing by until {a.stand_by.words}; your turn comes then, at an "
-                "urgent line, or when the captain asks you something. Words of your own end "
-                f"the stand-by now. {meanwhile}"
+                "urgent line, or when the captain asks you something. Words of your own, or an "
+                "order, a world order or an answer, end the stand-by now and run in the turn "
+                f"they open. {meanwhile}"
             )
         return (
             "It is not your turn: the game has the floor until your next turn (the glass, a "
             "notable event, the end of a stand-by, or a question from the captain). Words of "
-            f"your own open it now; stand_by(until) stands by from now. {meanwhile}"
+            "your own, or an order, a world order or an answer, open it now and run in it; "
+            f"stand_by(until) stands by from now. {meanwhile}"
         )
 
     def released_words(self, seat: Seat) -> str:

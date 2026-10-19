@@ -3130,6 +3130,152 @@ def tendency_in_words(value: dict[str, Any]) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Package 66 (spec M7b §14, "The always-present line"; the dispatches test's finding 25):
+# the station's line, one line of the holder's own that opens every sample, before the
+# log: who he is, where he is and since when, whose the deck is, and his state in the
+# needs' words. Not a row of the registry (a row is the ship's; this is a person's), and
+# read from the people, the stations and the needs as they stand: it changes nothing.
+# ---------------------------------------------------------------------------
+
+LINE_HEAD = "You: "
+
+
+def deck_words_for(world: Any, station: str | None) -> str:
+    """Whose the deck is, as the station's line says it: 'the deck yours', 'the deck Mr
+    Pearce's', 'the deck the captain's', 'the deck the captain's book's', or 'the deck
+    nobody's' (the captain ashore and no station with it). Read from the stations held
+    (the harnesses and the player's seat, where the deck is kept) and the captain."""
+    from freesail.agents.harness import _stations_held
+
+    held = _stations_held(world)
+    for h in held:
+        if getattr(h.agent, "deck", False) and getattr(h.station.domain, "deck", True):
+            if station is not None and h.station.name == station:
+                return "the deck yours"
+            person = str(getattr(h.station, "person", "") or "")
+            if person and not person.startswith(("the ", "a ")):
+                return f"the deck {person}'s"
+            return f"the deck the {h.station.name}'s"
+    names = {h.station.name for h in held}
+    if "captain" in names:
+        # a model (or the player's seat) at the captain's station without the deck: his
+        # book keeps her meanwhile (the captain's reading's 'the deck his book's')
+        return "the deck your book's" if station == "captain" else "the deck the captain's book's"
+    people = getattr(world, "people", None)
+    try:
+        cap = people.captain if people is not None else None
+    except Exception:  # noqa: BLE001  (a world with no muster)
+        cap = None
+    if cap is not None and not getattr(cap, "aboard", True):
+        return "the deck nobody's"
+    if station == "captain":
+        return "the deck yours"
+    return "the deck the captain's"
+
+
+def _line_who(world: Any, station: str | None, person: Any) -> str:
+    if station in (None, "captain"):
+        return "the captain"
+    name = str(getattr(person, "name", "") or "")
+    return f"{name}, the {station}" if name else f"the {station}"
+
+
+def _line_where(world: Any, person: Any) -> str:
+    """'on the quarterdeck', 'in the boat', 'ashore at Plymouth, at the market'."""
+    from freesail.world.movement import ashore_words
+    from freesail.world.places import place_words
+
+    if person is None:
+        return ""
+    if not getattr(person, "aboard", True) and person.where == "shore":
+        return ashore_words(world, person)
+    people = getattr(world, "people", None)
+    try:
+        place = people.effective_place(person) if people is not None else person.where
+    except Exception:  # noqa: BLE001  (a world whose people cannot be read)
+        place = getattr(person, "where", "")
+    return place_words(place) if place else ""
+
+
+def _line_state(world: Any, person: Any) -> str:
+    """'on your feet since 05:02, hungry', 'asleep below': the person's own state in the
+    needs' words when they have any (the steps that are said; spec M7b §20), with when he
+    last woke; '' for a person whose needs nobody keeps."""
+    keeper = getattr(world, "needs", None)
+    if keeper is None or person is None:
+        return ""
+    from freesail.world.needs import FATIGUE, needs_of
+
+    n = needs_of(person)
+    try:
+        said = keeper.showing(person) if n.by_hand else ""
+        awake_h = float(keeper.hours(person).get(FATIGUE, 0.0))
+    except Exception:  # noqa: BLE001  (a world whose needs cannot be read)
+        return ""
+    if n.asleep:
+        return said or "asleep"
+    from datetime import timedelta
+
+    clock = world.clock
+    woke = clock.ship_time - timedelta(hours=max(0.0, awake_h))
+    stamp = woke.strftime("%H:%M")
+    if woke.date() != clock.ship_time.date():
+        stamp += f" on {woke.day} {woke:%B}"
+    return f"on your feet since {stamp}" + (f", {said}" if said else "")
+
+
+def station_line(
+    world: Any, station: str | None, person: Any = None, since_tick: int | None = None
+) -> str:
+    """**The station's line** (package 66; spec M7b §14): one line of the holder's own,
+    'You: the captain, ashore at Plymouth, at the market, since 15:43; the deck the
+    officer's; on your feet since 05:02, hungry.' `station` is the station's name (None for
+    the captain at the prompt), `person` the person bound to it, `since_tick` when he came
+    to where he is (the harness keeps it; None leaves the 'since' out). The director's
+    line says the director's: the day's budget and whose turn the clock waits on
+    (`director_line`)."""
+    if station == "director":
+        return director_line(world)
+    parts = [_line_who(world, station, person)]
+    where = _line_where(world, person)
+    if where:
+        if since_tick is not None:
+            from datetime import timedelta
+
+            clock = world.clock
+            when = clock.ship_time - timedelta(seconds=max(0, clock.tick - int(since_tick)))
+            stamp = when.strftime("%H:%M")
+            if when.date() != clock.ship_time.date():
+                stamp += f" on {when.day} {when:%B}"
+            where += f", since {stamp}"
+        parts.append(where)
+    head = ", ".join(parts)
+    tail = [deck_words_for(world, station or "captain")]
+    state = _line_state(world, person)
+    if state:
+        tail.append(state)
+    return f"{LINE_HEAD}{head}; {'; '.join(tail)}."
+
+
+def director_line(world: Any) -> str:
+    """The director's line: who it is, the day's budget as it stands, and whose turn the
+    clock waits on (the pace rule: 1x while any station's sample is open)."""
+    from freesail.agents import director as director_mod
+    from freesail.agents.harness import open_samples
+
+    b = director_mod.budget_of(world)
+    brief = director_mod.brief_of(world)
+    s = brief.samples_a_day if brief is not None else director_mod.DEFAULT_SAMPLES_A_DAY
+    a = brief.acts_a_day if brief is not None else director_mod.DEFAULT_ACTS_A_DAY
+    others = [o["station"] for o in open_samples(world) if o["station"] != "director"]
+    waits = "you" + (f" and the {', the '.join(others)}" if others else "")
+    return (
+        f"{LINE_HEAD}the director, above the game; the day's budget {b.samples} of {s} "
+        f"samples and {b.acts} of {a} acts used; the clock waits on {waits}."
+    )
+
+
+# ---------------------------------------------------------------------------
 # Package 50 (spec M7b §2): the truth, the director's reading surface. Not a row of the
 # registry (a row is the ship's, read at the prompt and by every station alike: truth 81
 # gives the captain no road to the truth), but a surface of its own that the `truth` tool

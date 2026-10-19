@@ -161,12 +161,20 @@ def render_turn(turn: Turn) -> str:
             out.append(f"{res['name']}: {text}")
         return "\n".join(out)
     out = [f"== Sample at {d.get('stamp')} (data from the game; reason: {d.get('reason')}) =="]
+    if d.get("you"):
+        out.append(str(d["you"]))  # the station's line, first (package 66)
     for n in d.get("notices") or []:
         out.append(f"Notice from the harness: {n}")
     if d.get("question"):
         out.append(f"The captain asks: {d['question']}?")
     if d.get("word"):
         out.append(f"The captain tells you: {d['word']}")
+    # what was said within hearing, and the person's needs (packages 41 and 54): carried by
+    # the sample's data and, until package 66, left out of the text a door renders
+    for said in d.get("heard") or []:
+        out.append(f"Heard: {said}")
+    if d.get("needs"):
+        out.append(f"You are {d['needs']}.")
     sb = d.get("stood_by")
     if sb:
         # the stand-by's digest (package 28c): the notable lines while it lasted

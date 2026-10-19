@@ -193,6 +193,7 @@ from freesail.agents.agent import (
     domain_of,
     door_words,
     number_words,
+    officer_rank,
     ordinal_words,
     place_of,
     voyage_words,
@@ -434,6 +435,11 @@ NO_PERSON_ANSWER_WORDS = (
 # station within earshot of the speaker, each counts as "a word on deck" for its stand-by.
 # A free line (package 53b, `free.line`) is heard so too, by the stations it names.
 WORDS_BETWEEN_PEOPLE = ("agent.told", "agent.asked", "agent.said", "person.spoke", "free.line")
+# The lines that are words said in a place (package 66): a word wakes or samples a station
+# only when it reached it (said within its hearing, or to it); the ship's own lines reach
+# every station from her log, and the director hears everything. `agent.note` is a
+# station's words when its data says where they were said (`say_aboard`).
+WORD_KINDS = (*WORDS_BETWEEN_PEOPLE, "agent.spoke", "agent.note")
 WORD_ON_DECK = "a word on deck"  # the event's words (`readings.EVENTS`)
 
 # The nudge (spec §11), in the consent brief's voice: what was seen, what may be done.
@@ -1040,7 +1046,7 @@ class Harness:
 
         st = self.station
         if st.name == OFFICER and st.domain is not None:
-            brief = OFFICER_BRIEF.format(person=st.person or "the first lieutenant")
+            brief = OFFICER_BRIEF.format(person=st.person or officer_rank(self.world)[0])
         elif st.name == CAPTAIN and st.domain is not None:
             brief = CAPTAIN_BRIEF.format(person=st.person or "the captain")
         elif st.name == MASTER and st.domain is not None:
@@ -1196,6 +1202,8 @@ class Harness:
         if not self.started or self.agent.released:
             return
         self._tick_asked()
+        if world.clock.tick % 60 == 0:
+            self._track_place()  # the line's 'since' (package 66), once a minute
         # the lines since the last look, less any a sample has carried already (a question
         # sampled on the order, after the lines of its tick: package 31c, a standing
         # order's `ask`, whose firing line is notable, sampled once and not twice)
@@ -1279,7 +1287,10 @@ class Harness:
             self._stand_down_requested = None
             self.stand_down(reason, by=by)
             return
-        if not self.started or self.agent.released or self._sampling:
+        if not self.started or self.agent.released:
+            return
+        self._track_place()  # the line's 'since' (package 66): a move is an order's
+        if self._sampling:
             return
         a = self.agent
         if self._open is not None:
@@ -1303,7 +1314,11 @@ class Harness:
                 return "the glass" if p.every_s == R.INTERVALS["a glass"] else "the interval"
         if p.events:
             for e in new:
-                if e.actor != self.actor and p.samples_severity(e.severity):
+                if (
+                    e.actor != self.actor
+                    and p.samples_severity(e.severity)
+                    and self._reaches(e)  # a word out of hearing samples nobody (66)
+                ):
                     return f"a {e.severity.value} event: {e.text}"
         if p.kinds:
             # the station's own kinds (package 41: the masthead's lines, the reckoning's)
@@ -1360,10 +1375,37 @@ class Harness:
 
     def _urgent_in(self, lines: list[Event]) -> Event | None:
         """An urgent line by anyone but the agent: it wakes a stand-by whatever it was for,
-        and is named (package 28c)."""
+        and is named (package 28c); a word only where it reached the station (66)."""
         return next(
-            (e for e in lines if e.actor != self.actor and e.severity is Severity.URGENT), None
+            (
+                e
+                for e in lines
+                if e.actor != self.actor and e.severity is Severity.URGENT and self._reaches(e)
+            ),
+            None,
         )
+
+    def _reaches(self, e: Event) -> bool:
+        """**A wake carries a line or does not wake** (package 66; the dispatches test's
+        finding 17: Mr Veale's words at the counting house woke the captain at the market
+        with nothing for him): whether a line reaches this station. A word said in a place
+        reaches it only when it was said within its hearing (named among the line's
+        hearers, or within earshot of where it is) or to it; the ship's own lines reach it
+        from her log; the director hears everything."""
+        if self._is_directors or e.kind not in WORD_KINDS:
+            return True
+        data = e.data or {}
+        if e.kind == "agent.note" and "heard_by" not in data:
+            return True  # a station's line that is no word said in a place
+        name = self.station.name
+        if name in (data.get("heard_by") or ()):
+            return True
+        addressee = str(data.get("to") if e.kind == "agent.said" else data.get("station") or "")
+        if e.kind in WORDS_BETWEEN_PEOPLE and addressee == name:
+            return True
+        if "heard_by" in data:
+            return False  # its hearers are named, and this station is not among them
+        return self._heard_between(e)
 
     def _danger_in(self, lines: list[Event]) -> Event | None:
         """A notable line by anyone but the agent that speaks of danger (`readings.
@@ -1383,7 +1425,7 @@ class Harness:
         if sb.event is not None:
             spec = R.EVENTS[sb.event]
             for e in lines:
-                if R.event_matches(spec, e.kind, e.data):
+                if R.event_matches(spec, e.kind, e.data) and self._reaches(e):
                     return sb.words, e
             if sb.event == WORD_ON_DECK:
                 for e in lines:
@@ -1392,7 +1434,7 @@ class Harness:
         if sb.severity is not None:
             floor = Severity(sb.severity).rank
             for e in lines:
-                if e.actor != self.actor and e.severity.rank >= floor:
+                if e.actor != self.actor and e.severity.rank >= floor and self._reaches(e):
                     return f"a {e.severity.value} event: {e.text}", e
         return None
 
@@ -1619,6 +1661,7 @@ class Harness:
             word=a.word,
             heard=list(getattr(a, "heard", None) or []) or None,
             needs=self._needs_showing(),
+            you=self.line(),
         )
         a.notices = []
         a.word = None  # carried once; no answer is owed (package 29, `tell`)
@@ -1652,6 +1695,83 @@ class Harness:
         return out
 
     _shape_told: str | None = None  # the shape of another ship last told (package 43)
+    # where the station's person is and since which tick (package 66, the line's 'since'):
+    # (the place's key, the tick he came there); None until first looked at
+    _place_since: tuple[tuple[Any, ...], int] | None = None
+
+    # -- the station's line (package 66; spec M7b §14) ----------------------------------
+
+    def _line_person(self) -> Any:
+        """The person the station is bound to (None for the director's, a conversation's,
+        or a station bound to nobody)."""
+        if self.conversation or self._is_directors:
+            return None
+        stations = getattr(self.world, "stations", None)
+        if stations is None:
+            return None
+        try:
+            return stations.holder(self.station.name)
+        except Exception:  # noqa: BLE001  (a people's build that cannot run binds nobody)
+            return None
+
+    @staticmethod
+    def _place_key(person: Any) -> tuple[Any, ...]:
+        """Where he is, read without a side effect (the bill's sleepers are the people's
+        to judge): aboard and his place, or ashore at his port's place."""
+        return (
+            bool(getattr(person, "aboard", True)),
+            str(getattr(person, "where", "") or ""),
+            str(getattr(person, "ashore_at", "") or ""),
+            str(getattr(person, "port", "") or ""),
+        )
+
+    def _track_place(self) -> None:
+        """Keep when the station's person came to where he is (the line's 'since'): looked
+        at after every order, once a minute and at each sample; the first look reads the
+        log back for the last line that moved him (the start of the game when none did)."""
+        person = self._line_person()
+        if person is None:
+            return
+        key = self._place_key(person)
+        held = self._place_since
+        if held is not None and held[0] == key:
+            return
+        if held is None:
+            self._place_since = (key, self._moved_at(person, 0))
+        else:
+            # the line that moved him since the last look, else now
+            moved = self._moved_at(person, held[1])
+            self._place_since = (key, moved if moved > held[1] else int(self.world.clock.tick))
+
+    def _moved_at(self, person: Any, after: int) -> int:
+        """The tick of the last line that moved him (`PLACE_KINDS`, naming him), read back
+        no further than `after`; `after` when there is none."""
+        name = str(getattr(person, "name", "") or "")
+        log = self.world.log
+        for i in range(len(log) - 1, -1, -1):
+            e = log[i]
+            if int(e.tick) < after:
+                break
+            if e.kind in PLACE_KINDS and name and name in e.text:
+                return int(e.tick)
+        return after
+
+    def line(self) -> str | None:
+        """**The station's line** (package 66; spec M7b §14): one line of the holder's own
+        that opens every sample, before the log (`readings.station_line`); the director's
+        says the day's budget and whose turn the clock waits on. None in a conversation."""
+        if self.conversation:
+            return None
+        if self._is_directors:
+            return R.director_line(self.world)
+        person = self._line_person()
+        self._track_place()
+        since = self._place_since[1] if self._place_since is not None else None
+        try:
+            return R.station_line(self.world, self.station.name, person, since)
+        except Exception as e:  # noqa: BLE001  (never a sample lost to the line)
+            return f"{R.LINE_HEAD}the {self.station.name} (the line could not be read: {e})."
+
     # who commands, as last told to a station below the captain's (package 52): None while
     # its session kind says it as it was told at the seating
     _session_told: str | None = None
@@ -3780,6 +3900,11 @@ class Harness:
         a.last_heard_tick = world.clock.tick
         digest = None
         if a.standing_by and a.stand_by is not None:
+            if a.stand_by.words in (ASLEEP_BELOW, ASLEEP_WHERE):
+                # package 66: his own order or word wakes him, as a call does (package 54)
+                person, keeper = self._person_and_needs()
+                if person is not None and keeper is not None:
+                    keeper.wake(person, self, "")
             digest = self._stood_by_digest("your own word")
             until = a.stand_by.words
             a.state = STATIONED
@@ -4236,6 +4361,20 @@ EIGHT_BELLS = "eight bells"
 
 # What ends a stand-by asleep when he has slept enough (package 54).
 WOKE_RESTED = "you woke, rested"
+
+# The log's kinds that move a person (package 53's places; the captain below and on deck):
+# the line's 'since' is read back from the last of them that names him (package 66).
+PLACE_KINDS = frozenset(
+    {
+        "person.moved",
+        "person.ashore",
+        "person.came",
+        "person.aboard",
+        "person.sent_for",
+        "captain.below",
+        "captain.on_deck",
+    }
+)
 
 
 def place_words_of(world: Any, person: Any) -> str:

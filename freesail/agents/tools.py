@@ -592,7 +592,10 @@ def submit_order(world: World, station: str, text: str, danger: str = "") -> str
         )
     if danger and how and how != DANGER:
         return f"{e.text} (The order was yours to give already; the danger's word was not needed.)"
-    return e.text
+    from freesail.world.hearing import said_tail
+
+    tail = said_tail(world, e)  # who heard it, or until when a question waits (package 66)
+    return f"{e.text} {tail}" if tail else e.text
 
 
 def orders_mod_recognises_world(text: str) -> bool:
@@ -1402,7 +1405,11 @@ TOOLS: dict[str, Tool] = {
             "the reason; the notable lines logged while you stood by come with the sample "
             "that wakes you, counted and listed. 'asleep below until called' turns your "
             "person in below to sleep: a word or a question to you, an urgent line, or your "
-            "rest wakes you (refused with the deck below the captain's).",
+            "rest wakes you (refused with the deck below the captain's). A line wakes you "
+            "only when it reaches you: a word when it is said within your hearing, the "
+            "ship's own lines from her log. An order, an answer or words of your own sent "
+            "while you stand by end the stand-by at once and are run; the reads, a journal "
+            "note and shelving a book do not end it.",
             {
                 "until": "string: the event, the interval, 'a notable event', 'an urgent "
                 "event', or 'asleep below until called'"

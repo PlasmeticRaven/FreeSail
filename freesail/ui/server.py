@@ -103,6 +103,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import dataclasses
 import math
 import sys
 import threading
@@ -476,6 +477,17 @@ class Driver:
                 # an answer for the player who asked and not a line of the log (package
                 # 40b: the master's slate): sent to the pages as a line is, kept nowhere
                 self._emit({"type": "event", "event": event_dict(e)})
+            elif e is not None:
+                # who heard a word said, or until when a question waits (package 66): sent
+                # to the pages as the order's result, kept nowhere
+                from freesail.world.hearing import said_tail
+
+                tail = said_tail(self.world, e)
+                if tail:
+                    told = dataclasses.replace(
+                        e, kind="order.heard", text=tail, severity=Severity.ROUTINE, data={}
+                    )
+                    self._emit({"type": "event", "event": event_dict(told)})
             # a question put to a station is answered on the order (spec M4 §12)
             if not self._ease_for_station():
                 self.emit_snapshot()

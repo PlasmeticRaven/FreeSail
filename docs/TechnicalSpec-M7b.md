@@ -290,6 +290,22 @@ among the examples with its refusal, and a brief may carry the player's own `exa
 director as examples, not a rule. **The director seated in a ship** (the paragraph above) is
 not built.
 
+**As built (package 66, 2026-10-19; `crews.hold_of`, `hold_event_came`, `HOLD_EVENTS`;
+truth 7b-119).** The hold is named (the dispatches test's finding 4: a glass is three miles
+and a half at seven knots, and steering the frigate across eight miles took two orders and
+still failed): `ship "X": order <order> for a watch` (`for two glasses`, `for an hour`, `for
+a day`) holds her captain that long; `... until <an event>` until one of her own events
+comes to her, read from her truth as her far captain perceives it whichever body moves her
+(`brains.perceive_vessel`): `a sail within hail` (four cables, `HAIL_REACH_M`), `a sail in
+sight`, `a landfall` (the land in sight from her), `hove to`, `at anchor`; an event so named
+holds a day at most (`HOLD_UNTIL_MAX_S`, judgement), and one she cannot be held until is
+refused in words naming those she can. The default is still the glass; `carry on` still
+gives her back sooner; the event is kept beside the tick on both captains
+(`Captain.over_head_event`, the far captain's `over_head["event"]`) and crosses the
+promotion both ways. The crewed captain looks for it once a minute, the far captain at his
+judgement's cadence. The dispatches brief's examples gain `ship "Medusa": order give chase
+until a sail within hail`.
+
 ### 4. The brief and its guardrails (`data/director/briefs/*.yaml`; `freesail/agents/director.py`)
 
 The player writes the brief: the tone of the voyage (a quiet passage, a hard-luck cruise, a
@@ -347,6 +363,44 @@ of the act that spent it: no sample opens meanwhile, whatever the policy, a stan
 urgent line would do; the day turned, the next sample says the budget is renewed. Every
 sample carries the budget as it stands in a notice. The save holds the brief and the day's
 counts (`"director"`); a replay by the acts re-counts the acts and takes the save's samples.
+
+**As built (package 66, 2026-10-19; `harness.Harness.line`, `readings.station_line`,
+`director_line`; `remote.Desk._own_act`; `harness.Harness._reaches`; truths 7b-117 and
+7b-118).** After the dispatches test (findings 9, 17, 18, 19, 22 and 25, and the captain's
+debrief):
+
+- **The line.** Every sample of a seated person opens with one line of his own
+  (`Sample.you`, first in the sample's data, and printed first under a text door's head):
+  who he is, where he is and since when, the deck (his, another's by name, the captain's
+  book's or nobody's), and his state in the needs' words ("You: the captain, ashore at
+  Falmouth, at the market, since 10:38; the deck yours; on your feet since 10:00."). One
+  line, never more; the needs' notices come as §20 has them. Built in one function in
+  `readings.py` (`station_line`) from the people's place (`People.effective_place`, the
+  port's place ashore), the stations held (where the deck is kept) and the needs
+  (`NeedsKeeper.showing`, `hours`); the "since" is the harness's, kept when the person's
+  place changes (looked at after every order, once a minute and at the sample, and read
+  back from the log's last line that moved him). `how am I` answers with the same line.
+  The director's line says the day's budget and whose turn the clock waits on (every
+  station with an open sample). The line is the sample's, never the log's: no pin moves.
+- **A model's own order ends its stand-by.** A reply sent while the game has the floor that
+  acts (any call but the meanwhile reads, a journal note, shelving, or a lone `stand_by`)
+  ends the stand-by, or the wait for the turn, at the model's own word, logged as such
+  ("The captain ends its stand-by (until a glass) at its own word; it is sampled again."),
+  opens the turn and is run in it; recorded as the model's own word (`door_act` "speak",
+  by "its own order") and the reply after it, so that a replay opens and runs it at the
+  same point. The door's answer says so. Nothing is dropped with "Nothing was run" but
+  while the station is paused. The meanwhile reads are unchanged and never end it; the
+  director's **truth** (and `read_journal`) join them (`remote.READ_ONLY_TOOLS`); its chart
+  was among them already as a picture tool.
+- **A wake carries a line.** A stand-by's event, an urgent line and a notable line that
+  samples a station by its cadence wake or sample it only when the line reaches it
+  (`Harness._reaches`): a word said in a place (`agent.spoke`, a station's `agent.note`
+  with where it was said, `person.spoke`, a word told or asked, an answer) when its hearers
+  name the station, it was said within its earshot, or to it; the ship's own lines reach
+  every station; the director hears everything. The empty wake of 15:44 is the test (truth
+  7b-118).
+- **Not taken**: the sample's deltas and the repeated history (58), the readings by place
+  (65).
 
 ### 6. The director's log, hidden and revealed (`freesail/agents/journal.py`; `core/replay.py`; `ui/`)
 
@@ -759,6 +813,42 @@ action and by what is there. Provisionally, then, and for the brief to settle:
   the papers' places, the line and the drill are 65's. Decision 47's other dropped item,
   the papers kept in a place, comes with this one as far as the library is concerned and no
   further.
+
+**As built (package 66, 2026-10-19; `freesail/world/hearing.py` new; `orders._say_as`,
+`orders/stations.py` `_say`; `agents/tools.py` `submit_order`; the console and the
+server).** Who heard a word, and where:
+
+- **Ashore** a word is heard at the same place of the same port (`hearing.spot_of`:
+  ("ashore", the port, the place ashore)): the captain at the counting house hears the
+  clerk there, and at the market he does not; before, a person's words ashore were heard
+  by no station at all, and a station's `say` ashore by every station ashore anywhere. A
+  station's `say` ashore says where in its line ("The captain (Mr Travers), ashore at
+  Falmouth, at the counting house: ..."), where it said "ashore" alone. Aboard nothing
+  changes (the exact place for a `say`, the earshot for a person's words).
+- **Who heard** is said in the result of the order that said the words, never in the
+  log's line (`hearing.said_tail`, `heard_words`): the stations held that heard it first,
+  by their person's name, then the people within hearing by name, four at most and the
+  rest counted ("Heard by Mr Veale, ashore at Falmouth, at the counting house."); with
+  nobody, "heard by nobody, in the gunroom", and for the director's `say as` where the
+  captain is ("heard by nobody: the captain is ashore at Falmouth, at the market"). A
+  model reads it at the end of `submit_order`'s result; the player under the order at the
+  console and as an unlogged line in the browser.
+- **A question to a person nobody holds** says in the asker's result until when it waits
+  ("his answer is awaited until 11:08, when the glass is out, and you will be told if none
+  comes"); the director's sample carried it already. The thread form ("say to <person>",
+  "<person> answers") stays 52's.
+- **`say as` by station or trade** (`orders.Voice`, `VOICE_WORDS`, `_by_station_or_voice`):
+  one of the people by role or name first as before, then the person a station is bound
+  to (`say as the officer of the watch`, `the second officer`), then the ship's own voices,
+  which are no persons: `say as the lookout` (his hail from the masthead, heard on the
+  open deck and aloft: "The lookout, from the masthead: Sail ho!") and `say as the hands`
+  (on the deck); then a man of the muster by his trade. The rule of reach holds: the
+  lookout's station held is refused as any held station.
+- **Merchant words** (`agent.merchant_ship`, `MERCHANT_OFFICER`): where her wardroom file
+  binds the captain's station to a master (or, with no file, her rules-based captain sails
+  by the merchant's, the packet's or the fisherman's doctrine), the officer of the watch
+  bound to nobody is "the mate" in his brief and the harness's default words; a King's
+  ship, and a point world with neither, keep the lieutenant.
 
 ### 15. What is heard where: dropped
 

@@ -241,6 +241,7 @@ def test_nothing_real_passes_through_the_harness():
         else:
             # a sample after the first says its readings are the changes (package 31c)
             assert set(d) - {"readings_are"} == {
+                "you",  # the station's line (package 66)
                 "tick",
                 "stamp",
                 "reason",
@@ -1699,8 +1700,10 @@ def test_the_repl_model_prints_the_brief_once_and_each_sample_and_reads_replies(
     assert text.count("== Sample at") >= 3
     # the stand-by ended its turn with no result; the sample that ends it says so first
     assert "== Tool results (data) ==" not in text
+    # the station's line first (package 66), then the notice that it stood by
+    assert "(data from the game; reason: a glass) ==\nYou: the watcher" in text
     assert (
-        "(data from the game; reason: a glass) ==\nNotice from the harness: You stood by "
+        "\nNotice from the harness: You stood by "
         "until a glass at Morning watch (04:10); it is now Morning watch (04:40): "
         "a glass." in text
     )
