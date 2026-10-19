@@ -104,6 +104,47 @@ back with `shelve`. The lead's `readings.director` is this function; the parity 
 the two tools as by design (`TOOL_COUNTERPARTS`) and the console's three requests
 (`the director's log`, `two stories`, `director:`) as the player's own.
 
+### 2a. The director's seat made real (package 67, provisional; the owner, 2026-10-19)
+
+**As it stands.** `seat: <the model's exact name> as captain of <ship> for <n> samples|hours`
+(43's form) checks the consent record, the owner's grant (the scenario's `director:` block:
+`models`, `seats` at once, `seats_in_voyage`) and the budget, and writes a seat on the
+World; the budget is enforced (`crews.enforce_budgets` stands the holder down when it is
+spent). But no door is started by it, and the desk admits a door for another ship's
+captain by the ordinary station rules without reading the seat: the seat is a record of
+intent and a budget, and its result's words ("a door that comes for her under that name is
+admitted") overstate it. The owner's ruling: **the director seats through the API door,
+bounded by the grant's budget.**
+
+**The design, for the brief:**
+
+- **The desk reads the seat.** A door for a model and a ship with a held seat is admitted
+  under its budget; a door without one is admitted as now; a seat held for a model that
+  never comes is stood down with the voyage's end or by `unseat:`.
+- **The director's door.** On `seat:`, the game starts the API door itself as a subprocess
+  of the server, as the harbour of package 59 starts one from its page (`ui/harbour.py`'s
+  `Door` and `door_argv`: the module's own flags, the key from the credential store, the
+  model's name and dialect from the settings or the seat's words, the station the
+  captain's, `--ship` the seated ship), the pane shown in the harbour's doors tab beside
+  the owner's own, stopped by `unseat:` or the spent budget; where the server has no
+  harbour (the console) the seat stays a record and says so. The grant's models are the
+  models the settings know how to call; a model the settings cannot call is refused in
+  words at the seat.
+- **What a seat costs, said.** The brief tells the director that a seat runs a model on the
+  owner's key for its budget, in samples or hours, and that the grant is the owner's
+  spending; the harness counts the seat's samples as it counts the director's.
+- **Other stations.** The form widens to `seat: <model> as <station> of <ship>` for the
+  stations a ship has (an officer of the watch, a lookout on the player's own ship under
+  the owner's grant), the player's own ship included where the grant allows it; the
+  captain stays the default.
+- **The harbour.** The grant is not exposed anywhere a player would find it: it lives in
+  the scenario's `director:` block, which the maker does not show, and the per-seat budget
+  only in the seat order's words. Package 64 (the harbour's second pass) shows the grant on
+  the game tab and in the maker's brief section, with the models the settings can call,
+  and the doors tab shows the director's doors as it shows the owner's.
+
+Package 67, Opus, after 53b and 66; the brief at the lead's hand on the owner's word.
+
 ### 3. The world orders (`freesail/world/orders.py`)
 
 The channel as M5 and M6 built it, with the orders the director needs added and the
