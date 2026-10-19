@@ -298,3 +298,130 @@ def test_the_boat_ashore_brings_the_rumours_off_only_where_the_business_is_on():
     assert seen[None] == []
     (line,) = seen["on"]
     assert line.text.endswith("Rumour, no more.") and line.severity.name == "ROUTINE"
+
+
+# ---------------------------------------------------------------------------
+# Package 53b: transactions, not variables (spec M7b §17a)
+# ---------------------------------------------------------------------------
+
+
+def test_a_sum_paid_in_or_out_is_a_transaction_with_its_cause_and_never_below_nothing():
+    """`aboard: twenty guineas paid into the purse by Mr Veale` credits the purse with the
+    ledger's line and its cause, a notable line of the purser's books in the play log; a
+    sum paid out is the same, refused below nothing; a debt is entered and moves no money.
+    Nothing of the channel sets the purse: each line is a sum with its payer or payee."""
+    from freesail.core.events import for_the_record
+    from freesail.world.orders import read_sum
+    from tests.test_orders_places import in_falmouth
+
+    assert [read_sum(x) for x in ("twenty guineas", "£30", "£6 10s", "a guinea")] == [
+        21.0,
+        30.0,
+        6.5,
+        1.05,
+    ]
+    assert read_sum("thirty pounds ten shillings") == 30.5 and read_sum("a packet") is None
+    w = in_falmouth()
+    w.world_order('person: make "Mr Veale", a clerk, ashore at Falmouth', "the test")
+    was = w.purse.pounds
+    assert "ledger" not in w.readings.value("purse")
+    e = w.world_order("aboard: twenty guineas paid into the purse by Mr Veale", "the test")
+    assert e.data["result"] == "done" and w.purse.pounds == pytest.approx(was + 21.0)
+    paid = [x for x in w.log.all() if x.kind == "purse.received"]
+    assert len(paid) == 1 and not for_the_record(paid[0]) and paid[0].severity.value == "notable"
+    assert paid[0].text == (
+        f"Paid into the purse by Mr Veale, twenty guineas (£21); the purse {w.purse.words()}."
+    )
+    assert w.purse.entries[-1] == (w.clock.tick, 21.0, "paid by Mr Veale, twenty guineas (£21)")
+    assert w.readings.value("purse")["ledger"] == [
+        f"Paid by Mr Veale, twenty guineas (£21); the purse {w.purse.words()}."
+    ]
+    e = w.world_order("aboard: £6 paid from the purse to Mr Veale for his trouble", "the test")
+    assert e.data["result"] == "done" and w.purse.pounds == pytest.approx(was + 15.0)
+    left = w.purse.pounds
+    e = w.world_order(f"aboard: £{left + 1:.0f} paid from the purse to Mr Veale", "the test")
+    assert e.data["result"] == "refused" and "nothing is paid below nothing" in e.text
+    assert w.purse.pounds == left
+    e = w.world_order("aboard: a debt of £30 owed to the chandler at Plymouth", "the test")
+    assert e.data["result"] == "done" and w.purse.pounds == left
+    assert w.readings.value("purse")["debts"] == "owed to the chandler at Plymouth, £30"
+    e = w.world_order("aboard: a sum paid into the purse by Mr Veale", "the test")
+    assert e.data["result"] == "refused" and "no sum the purse reads" in e.text
+
+
+def test_a_cargo_freighted_comes_off_by_the_lighter_at_no_price_with_its_cause_in_the_manifest():
+    """`aboard: ten tons of wool freighted by Mr Veale at the quay for Plymouth`: the
+    market's own form at no price, the freight in the hold's ledger and the manifest with
+    its cause, the goods off by the port's lighter; refused in words where the hold has no
+    room, the hold's tons being the game's."""
+    from tests.test_orders_places import in_falmouth
+
+    w = in_falmouth()
+    w.world_order('person: make "Mr Veale", a clerk, ashore at Falmouth', "the test")
+    purse = w.purse.pounds
+    e = w.world_order(
+        "aboard: ten tons of wool freighted by Mr Veale at the quay for Plymouth", "the test"
+    )
+    assert e.data["result"] == "done" and w.purse.pounds == purse
+    assert w.hold.goods.get("wool") is None  # not yet: the lighter brings it off
+    assert w.hold.lines()[-1] == "10 tons of wool freighted by Mr Veale at Falmouth for Plymouth."
+    for _ in range(180):
+        if w.hold.goods.get("wool"):
+            break
+        w.run(60)
+    assert w.hold.goods["wool"] == 10.0
+    came = [x for x in w.log.all() if x.kind == "market.bought" and x.data.get("good") == "wool"]
+    assert came and came[0].text.startswith("10 tons of wool came off by the lighter from Falmouth")
+    room = w.hold.room_tons
+    e = w.world_order(
+        f"aboard: {room + 5:.0f} tons of tin freighted by Mr Veale at the quay", "the test"
+    )
+    assert e.data["result"] == "refused" and "will not stow" in e.text
+
+
+def test_the_channel_doubts_money_from_nobody_a_far_payer_and_a_sum_beyond_the_ports_means():
+    """The doubt of a transaction (decision 50): money from nobody, from a person the world
+    does not know, from a payer neither aboard nor at a port she lies within a boat's reach
+    of, a sum beyond a port's means by the business's figures (a full lading of its dearest
+    good), a freight to a ship at sea; a debt is never doubted. A held person's money is
+    his holder's own word, refused by the rule of reach."""
+    from freesail.world import orders as WO
+    from tests.test_orders_places import in_falmouth
+
+    w = in_falmouth()
+    w.world_order('person: make "Mr Veale", a clerk, ashore at Falmouth', "the test")
+    w.world_order('person: make "Mr Gill", a merchant, ashore at Brest', "the test")
+    falmouth = w.ports.ports["falmouth"]
+    means = B.port_means_pounds(w, falmouth)
+    assert means == pytest.approx(
+        max(
+            falmouth.market.price(g, w.clock.ship_time, w.nations, falmouth.nation)
+            for g in falmouth.market.goods
+        )
+        * B.load_business()["cargo_tons"][-1]
+    )
+
+    def doubt(text):
+        return WO.doubt(w, WO.parse(text))
+
+    assert doubt("aboard: twenty guineas paid into the purse by Mr Veale") is None
+    assert "from nobody" in doubt("aboard: twenty guineas paid into the purse")
+    assert "nobody answering to 'the owners'" in doubt(
+        "aboard: £100 paid into the purse by the owners"
+    )
+    assert "neither aboard nor at a port" in doubt("aboard: £5 paid into the purse by Mr Gill")
+    assert "beyond Falmouth's means" in doubt(
+        f"aboard: £{means + 100:.0f} paid into the purse by Mr Veale"
+    )
+    assert doubt("aboard: a debt of £30 owed to the chandler at Plymouth") is None
+    assert "neither aboard nor at a port" in doubt("aboard: ten tons of wool freighted by Mr Gill")
+    at_sea = world_with()
+    at_sea.world_order('person: make "Mr Veale", a clerk, aboard in the cabin', "the test")
+    assert WO.doubt(at_sea, WO.parse("aboard: £5 paid into the purse by Mr Veale")) is None
+    # a freighter aboard a ship at sea: no lighter, his goods struck down at once
+    assert WO.doubt(at_sea, WO.parse("aboard: ten tons of wool freighted by Mr Veale")) is None
+    at_sea.world_order("aboard: ten tons of wool freighted by Mr Veale", "the test")
+    assert at_sea.hold.goods["wool"] == 10.0
+    # the captain is held by the player at the prompt: his money is his own word
+    e = w.world_order(f"aboard: £5 paid into the purse by {w.people.captain.name}", "the test")
+    assert e.data["result"] == "refused" and "nobody gives it for him" in e.text

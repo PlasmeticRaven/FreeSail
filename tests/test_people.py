@@ -540,3 +540,205 @@ def test_at_the_prompt_the_owner_has_no_needs_while_a_model_holds_the_captain():
     h.start()
     e = w.submit("eat")
     assert e.kind == "order.rejected" and "you are the owner, not the captain" in e.text
+
+
+# ---------------------------------------------------------------------------
+# Things and free lines (spec M7b §17a; package 53b). Truths 7b-114 and 7b-115 are in
+# `tests/test_known_truths.py`.
+# ---------------------------------------------------------------------------
+
+
+def _packet(w, where="on the cabin table"):
+    from freesail.world import things as TH
+
+    e = w.world_order(f"aboard: a sealed packet, {where}, from the Custom House", "the test")
+    assert e.data["result"] == "done", e.text
+    return TH.things_of(w)[-1]
+
+
+def test_a_thing_is_made_from_words_with_a_place_and_nothing_more_and_shows_where_it_lies():
+    """A thing is the people's sibling: a name, a description and where it is, nothing
+    more; it lies in its place, the places' reading saying it there, the people's words
+    saying nothing of it until somebody keeps it, the truth saying where it is."""
+    from freesail.api import readings as R
+    from freesail.core.events import for_the_record
+    from freesail.world import things as TH
+
+    w = world_for()
+    before = w.readings.words("places")
+    people_before = w.readings.words("people")
+    assert TH.things_of(w) == [] and "things" not in w.readings.value("people")
+    packet = _packet(w)
+    assert (packet.name, packet.description, packet.place, packet.spot, packet.keeper) == (
+        "a sealed packet",
+        "from the Custom House",
+        "cabin",
+        "on the table",
+        "",
+    )
+    assert set(packet.to_dict()) == {"id", "name", "description", "place", "spot"}
+    assert w.readings.words("places") == before + ". In the cabin: a sealed packet on the table."
+    assert w.readings.words("people") == people_before
+    assert w.readings.value("people")["things"] == ["a sealed packet, on the table in the cabin"]
+    truth = R.director_readings(w)
+    assert truth["things"] == ["a sealed packet, on the table in the cabin"]
+    assert "the things: a sealed packet, on the table in the cabin" in truth["words"]
+    # nothing of the order in the play log: the thing is met where it lies
+    assert not [e for e in w.log.all() if "packet" in e.text and not for_the_record(e)]
+    # the forms of where: a keeping, a place with its spot
+    for words, want in (
+        ("in the hold", ("hold", "")),
+        ("under the cabin table", ("cabin", "under the table")),
+        ("on the table in the gunroom", ("gunroom", "on the table")),
+        ("in the captain's cabin", ("cabin", "")),
+    ):
+        assert TH._place_in(words) == want, words
+    assert TH.read_where(w, "in the captain's keeping") == {"keeper": w.people.captain.id}
+    with pytest.raises(TH.ThingWordsError, match="nobody answering to 'Mr Nobody'"):
+        TH.read_where(w, "in the keeping of Mr Nobody")
+    e = w.world_order("aboard: a rat, gnawing the bread", "the test")
+    assert e.data["result"] == "refused" and "say where the rat is" in e.text
+
+
+def test_free_lines_move_a_thing_within_reach_and_say_as_said_where_they_do_not():
+    """`take`, `put`, `stow`, `hide`, `give`, `throw ... overboard` move a thing the words
+    name within the giver's reach; the rest, and every line that names nothing known or a
+    thing out of reach, is logged 'as said; nothing of the ship's changed' and moves
+    nothing. Each is a notable line in the words as used, journaled as the order it is."""
+    w = world_for()
+    cap = w.people.captain
+    packet = _packet(w)
+    e = w.submit("take the packet")
+    assert e.kind == "free.line" and e.severity.value == "notable"
+    assert e.text == (
+        "By the captain, on the quarterdeck: took the packet, as said; nothing of the ship's "
+        "changed (the sealed packet is on the table in the cabin)."
+    )
+    assert packet.place == "cabin" and not packet.keeper
+    e = w.submit("give the letter to the pilot")
+    assert e.text == (
+        "By the captain, on the quarterdeck: gave the letter to the pilot, as said; nothing of "
+        "the ship's changed."
+    )
+    w.submit("go below")
+    e = w.submit("Take the packet.")
+    assert e.text == (
+        "By the captain, in the cabin: took the packet; the sealed packet is in the captain's "
+        "keeping."
+    )
+    assert packet.keeper == cap.id and e.data["moved"] and e.data["thing"] == packet.id
+    assert w.readings.words("people").startswith(
+        f"{cap.name}: in the cabin, a sealed packet in his keeping. "
+    )
+    e = w.submit("hide the packet in the bread locker")
+    assert e.text.endswith("the sealed packet is in the bread locker in the cabin.")
+    assert (packet.keeper, packet.place, packet.spot) == ("", "cabin", "in the bread locker")
+    assert "In the cabin: a sealed packet in the bread locker." in w.readings.words("places")
+    w.submit("pick up the packet")
+    assert packet.keeper == cap.id
+    e = w.submit("stow the packet in the hold")
+    assert "as said; nothing of the ship's changed (the hold is not where you are" in e.text
+    for words in ("open the packet", "read the packet", "show the packet to the master"):
+        e = w.submit(words)
+        assert e.kind == "free.line" and e.text.endswith("as said; nothing of the ship's changed.")
+        assert packet.keeper == cap.id
+    w.submit("come on deck")
+    assert packet.keeper == cap.id  # his, and where he goes
+    e = w.submit("throw the packet overboard")
+    assert e.text.endswith("threw the packet overboard; the sealed packet went over the side.")
+    assert packet.place == "overboard" and not packet.keeper
+    assert w.submit("take the packet").text.endswith("nothing of the ship's changed.")
+    # journaled as orders, so that a replay says them again
+    said = [t for _, a, t in w.journal if a == "captain"]
+    assert "Take the packet." in said and "throw the packet overboard" in said
+    # the sail's 'hand' is the sail's still, and 'hand ... to ...' a giving
+    assert w.submit("hand the fore topsail").kind != "free.line"
+    e = w.submit("hand the chart to the master")
+    assert e.kind == "free.line" and "handed the chart to the master, as said" in e.text
+
+
+def test_a_thing_given_goes_where_its_keeper_goes_and_a_held_person_takes_it_by_his_own_hand():
+    """Given to a person within reach the thing is his and goes where he goes; given to a
+    person a model or the player holds, it lies before him for his own hand, and his own
+    'take' makes it his. A free line is heard where it is said: by the station held within
+    earshot, never by one out of it."""
+    from freesail.agents import tools
+    from freesail.world import things as TH
+    from tests.test_orders_places import OFFICER, seat
+
+    w = world_for()
+    h = seat(w, OFFICER)
+    officer = w.stations.holder(OFFICER)
+    master = w.people.find("the master")
+    packet = _packet(w, "on the quarterdeck")
+    e = w.submit("take the packet")
+    assert e.data["moved"] and e.data["heard_by"] == [OFFICER]
+    assert h.agent.heard[-1] == e.text
+    e = w.submit("give the packet to the master")
+    assert e.text.endswith(f"the sealed packet is in {master.name}'s keeping.")
+    assert packet.keeper == master.id
+    assert TH.where_words(w, packet) == (
+        f"in {master.name}'s keeping, {w.people.state_words(master)}"
+    )
+    assert "a sealed packet in his keeping" in w.people.where_is("the master")["words"]
+    # in another's keeping it is not the captain's to take
+    e = w.submit("take the packet")
+    assert not e.data["moved"] and f"in {master.name}'s keeping" in e.text
+    # handed to the held officer: it lies before him, and his own word takes it
+    TH.put(packet, {"keeper": w.people.captain.id})
+    e = w.submit(f"give the packet to {officer.name}")
+    assert e.text.endswith(
+        f"the sealed packet lies before {officer.name}, for his own hand to take ('take "
+        "sealed packet')."
+    )
+    assert (packet.keeper, packet.spot) == ("", f"before {officer.name}")
+    said = tools.call(w, OFFICER, "submit_order", {"text": "take the packet"})
+    assert said.endswith(f"the sealed packet is in {officer.name}'s keeping.")
+    assert packet.keeper == officer.id
+    # out of earshot: the officer below hears nothing of the captain's line on deck
+    tools.call(w, OFFICER, "submit_order", {"text": "go below"})
+    heard = len(h.agent.heard)
+    e = w.submit("read the orders")
+    assert e.data["heard_by"] == [] and len(h.agent.heard) == heard
+
+
+def test_eat_and_drink_take_any_words_after_them_and_answer_as_before():
+    """The needs' orders are free lines of the same class and unchanged: the words after the
+    verb taken and kept in the record, the answer the person's alone, never a log line."""
+    from freesail.orders.vocabulary import load_vocabulary
+
+    assert load_vocabulary().free_lines[-2:] == ("eat", "drink")
+    w = world_for()
+    lines = len(w.log)
+    e = w.submit("eat a fine meal of roast beef")
+    assert e.kind == "needs.answer"
+    assert w.submit("drink three cups of wine").kind == "needs.answer"
+    assert len(w.log) == lines
+    said = [x.get("order") for x in w.inputs]
+    assert "eat a fine meal of roast beef" in said and "drink three cups of wine" in said
+
+
+def test_the_scenarios_things_are_made_with_the_people_and_the_director_has_no_hands():
+    """A scenario's `things:` are made with the people from the words an `aboard:` order
+    takes; a where that names nobody is the scenario's error in words. The director gives
+    no free line: he has no hands aboard."""
+    from freesail.world import things as TH
+
+    w = world_for(things=["a sealed packet, in the captain's keeping, from the Custom House"])
+    packet = TH.things_of(w)[0]
+    assert packet.keeper == w.people.captain.id and packet.description == "from the Custom House"
+    assert w.readings.words("people").startswith(
+        f"{w.people.captain.name}: on the quarterdeck, a sealed packet in his keeping."
+    )
+    assert w.scenario.to_dict()["things"] == [
+        "a sealed packet, in the captain's keeping, from the Custom House"
+    ]
+    assert "things" not in world_for().scenario.to_dict()  # a save without them as it was
+    bad = world_for(things=[{"name": "a cask", "where": "in the keeping of Mr Nobody"}])
+    with pytest.raises(ValueError, match="the scenario's things, 1"):
+        _ = bad.people.all
+    from tests.test_director import directed
+
+    d = directed()
+    e = d.submit("take the packet", actor="the director")
+    assert e.kind == "order.rejected" and "no hands aboard" in e.text

@@ -640,7 +640,21 @@ class People:
 
     @property
     def wardroom(self) -> Wardroom | None:
-        """The ship's wardroom file as read (package 40); None for a ship without one."""
+        """The ship's wardroom file as read (package 40); None for a ship without one.
+        Asked before her company is mustered (a scenario's director bound in the World's
+        making reads the stations), the file is read and the people are not built: built
+        then, they were the captain and the master of a ship with no company, and stayed so
+        (package 53b, found on the way)."""
+        ship = self.world.ship
+        if (
+            not self._built
+            and (getattr(ship, "extra", None) or {}).get("crew") is None
+            and getattr(getattr(ship, "spec", None), "crew", None) is not None
+        ):
+            try:
+                return load_wardroom(self._ship_file())
+            except ValueError:
+                return None
         self._build()
         return getattr(self, "_wardroom", None)
 

@@ -817,6 +817,26 @@ def _book_judged(world: World, station: str, text: str, verb: str, vocab: Any) -
     return ""
 
 
+def own_order(world: World, text: str) -> bool:
+    """Whether an order is a person's own, given with the deck or without (package 53b):
+    a free line (`give`, `take`, `put` ..., and `hand ... to ...`) or a need of his own
+    (`eat`, `drink`, `sleep`, `how am i`; package 54, which every station's domain allowed
+    and the deck's check refused to a station without the deck, found on the way)."""
+    from freesail.orders import free
+
+    if free.hand_line(text):
+        return True
+    try:
+        from freesail.orders import grammar as imperative
+
+        vocab = load_vocabulary()
+        order = imperative.parse(world.ship, text, vocab)
+    except Exception:  # noqa: BLE001  (words the grammar refuses, or a point ship)
+        return False
+    spec = vocab.verbs.get(order.verb)
+    return spec is not None and spec.object in ("free", "needs")
+
+
 def reach_order(world: World, text: str) -> bool:
     """Whether an order is of the equal reach (spec M7b §17; package 53), given with the
     deck or without: a move of the giver's own (`go below`, `go to the gunroom`, `go
@@ -1635,6 +1655,7 @@ def call(world: World, station: str, name: str, args: dict[str, Any] | None = No
             own_reckoning_order(world, str(args.get("text", "")))
             or conversation_order(world, str(args.get("text", "")))
             or reach_order(world, str(args.get("text", "")))
+            or own_order(world, str(args.get("text", "")))
         )
     )
     if (

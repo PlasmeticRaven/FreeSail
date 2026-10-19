@@ -166,6 +166,8 @@ def things_of(world: Any) -> list[Thing]:
     people = getattr(world, "people", None)
     if people is None:
         return []
+    if not getattr(people, "_built", True) and getattr(world.scenario, "things", None):
+        _ = people.all  # the scenario's things are made with the people, at their muster
     things = getattr(people, "things", None)
     if things is None:
         things = []

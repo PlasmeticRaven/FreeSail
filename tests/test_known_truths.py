@@ -6675,3 +6675,195 @@ def test_truth_7b_113_the_hand_brings_a_far_trader_to_heaves_a_crewed_cruiser_to
     assert "is held by a model" in said and "write to him instead" in said
     assert D.log_of(world).entries[-1].kind == "director.refused"
     assert len([e for e in crew.log if e.text == "By the captain: heaving to."]) == 1
+
+
+# Package 53b: things, free lines and transactions (spec M7b §17a; the owner's question of
+# 2026-10-19 after the dispatches test). Truths 7b-114 to 7b-116. The schooner at seed 7 at
+# anchor in Carrick Road (`tests/test_orders_places.in_falmouth`), the player at the prompt
+# as her master who commands, the director's orders given at his door as the player's
+# seat gives them (an input of its own, replayed through the door). No recorded passage's
+# pin moves: none has a thing, a free line or a payment by the channel.
+# ---------------------------------------------------------------------------
+
+
+def _veale_at_falmouth(port: str = "Falmouth"):
+    from freesail.agents import director as D
+    from tests.test_orders_places import in_falmouth
+
+    world = in_falmouth()
+    said = D.direct(
+        world, f'person: make "Mr Veale", a clerk, ashore at {port}', by="the truth", road=D.INPUT
+    )
+    assert said.startswith("Done:"), said
+    return world
+
+
+def test_truth_7b_114_a_thing_made_in_the_cabin_is_given_ashore_by_a_free_line_and_kept(
+    tmp_path,
+):
+    """Spec M7b §17a and package 53b's truth: "a thing made by the director in the cabin is
+    given by the captain to a person ashore by a free line when he is there, is in that
+    person's keeping in the people's reading and the truth, and stays there through a save
+    and a replay." The director makes the packet on the cabin table and Mr Veale at the
+    counting house; the master who commands goes below, takes it, goes ashore by the boat
+    with it in his keeping, walks to the counting house and gives it to Mr Veale; the
+    people's reading and the truth say it is his; the save replays to the same log and
+    the same things, and a checkpoint holds them."""
+    from freesail.agents import director as D
+    from freesail.api.readings import director_readings
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+    from freesail.world import things as TH
+    from tests.test_orders_places import until
+
+    world = _veale_at_falmouth()
+    said = D.direct(
+        world,
+        "aboard: a sealed packet, on the cabin table, from the Custom House",
+        by="the truth",
+        road=D.INPUT,
+    )
+    assert said.startswith("Done: a sealed packet (from the Custom House) made, on the table")
+    (packet,) = TH.things_of(world)
+    master = world.people.captain
+    veale = world.people.find("Mr Veale")
+    # from the deck the packet is out of his reach: said, and nothing moves
+    e = world.submit("give the packet to Mr Veale")
+    assert e.kind == "free.line" and "as said; nothing of the ship's changed" in e.text
+    assert packet.place == "cabin" and not packet.keeper
+    world.submit("go below")
+    assert world.submit("take the packet").data["moved"]
+    world.submit("come on deck")
+    world.submit("go ashore")
+    until(world, lambda: master.where == "shore" and not world.ports.boat.away)
+    assert packet.keeper == master.id and TH.place_of(world, packet)[0] == "shore"
+    world.submit("go to the counting house")
+    e = world.submit("give the packet to Mr Veale")
+    assert e.kind == "free.line" and e.data["moved"] and e.data["to"] == "Mr Veale"
+    assert e.text == (
+        "By the captain, ashore at Falmouth, at the counting house: gave the packet to Mr "
+        "Veale; the sealed packet is in Mr Veale's keeping."
+    )
+    assert packet.keeper == veale.id
+    keeping = (
+        "Mr Veale, clerk: ashore at Falmouth, at the counting house, a sealed packet in his "
+        "keeping."
+    )
+    assert keeping in world.people.describe() and keeping in world.readings.words("people")
+    truth = director_readings(world)
+    assert keeping in truth["people"][world.ship.name]
+    assert truth["things"] == [
+        "a sealed packet, in Mr Veale's keeping, ashore at Falmouth, at the counting house"
+    ]
+    world.run(600)
+    # the save and the replay: the same log, the same things where they were
+    back = replay.replay_world(world, ship_factory)
+    assert back.log.digest() == world.log.digest()
+    assert [t.to_dict() for t in TH.things_of(back)] == [t.to_dict() for t in TH.things_of(world)]
+    assert keeping in back.people.describe()
+    path = replay.write_checkpoint(world, tmp_path / "packet.ckpt")
+    _, held = replay.read_checkpoint(path)
+    assert [t.to_dict() for t in TH.things_of(held)] == [t.to_dict() for t in TH.things_of(world)]
+
+
+def test_truth_7b_115_a_free_line_naming_nothing_known_is_as_said_and_eat_and_drink_as_before():
+    """Package 53b's truth: "a free line that names nothing known is logged 'as said;
+    nothing of the ship's changed' and moves nothing, and `eat` and `drink` log as before."
+    Each of the free verbs said of nothing the world knows is a notable line in the words
+    as used ending in those words, journaled, the ship's state the same after them; `eat a
+    fine meal` and `drink three cups of wine` are answered to him alone and are no line of
+    the log, the words kept in the record."""
+    from freesail.world import things as TH
+
+    world = _veale_at_falmouth()
+    world.world_order("aboard: a cask of brandy, in the hold", "the truth")
+    before = (
+        [t.to_dict() for t in TH.things_of(world)],
+        world.purse.pounds,
+        dict(world.hold.goods),
+        world.people.describe(),
+    )
+    lines = (
+        "give the letter to the pilot",
+        "hand the dispatches to Mr Veale",
+        "show the chart to Mr Veale",
+        "take the cutlass",
+        "stow the spyglass in the hold",
+        "hide the letter in the bread locker",
+        "put the purse on the table",
+        "open the sea chest",
+        "read the letter",
+        "throw the empty bottle overboard",
+    )
+    for words in lines:
+        e = world.submit(words)
+        assert e.kind == "free.line" and e.severity.value == "notable", words
+        assert e.text.endswith("as said; nothing of the ship's changed."), e.text
+        assert not e.data["moved"]
+    assert e.text == (
+        "By the captain, on the quarterdeck: threw the empty bottle overboard, as said; "
+        "nothing of the ship's changed."
+    )
+    after = (
+        [t.to_dict() for t in TH.things_of(world)],
+        world.purse.pounds,
+        dict(world.hold.goods),
+        world.people.describe(),
+    )
+    assert after == before
+    assert [t for _, a, t in world.journal if a == "captain"][-len(lines) :] == list(lines)
+    n = len(world.log)
+    assert world.submit("eat a fine meal").kind == "needs.answer"
+    assert world.submit("drink three cups of wine").kind == "needs.answer"
+    assert len(world.log) == n
+    said = [x.get("order") for x in world.inputs]
+    assert "eat a fine meal" in said and "drink three cups of wine" in said
+
+
+def test_truth_7b_116_a_sum_paid_by_mr_veale_is_credited_doubted_far_off_refused_below_nothing():
+    """Package 53b's truth: "`aboard: twenty guineas paid into the purse by Mr Veale` with
+    Mr Veale ashore at the ship's port credits the purse with the ledger's line, is doubted
+    with him thirty miles off, and a payment below nothing is refused." At Falmouth the
+    director's order is not doubted, the purse gains £21 and its ledger says by whom with
+    the purse after; in the same water with Mr Veale made at Plymouth instead, thirty miles
+    off, the same order is doubted and nothing is paid; a sum paid from the purse beyond
+    what it holds is refused and the purse is what it was."""
+    from freesail.agents import director as D
+    from freesail.core.events import for_the_record
+    from freesail.world.places import pounds_words
+
+    world = _veale_at_falmouth()
+    purse = world.purse.pounds
+    order = "aboard: twenty guineas paid into the purse by Mr Veale"
+    said = D.direct(world, order, by="the truth", road=D.INPUT)
+    assert said.startswith("Done: twenty guineas (£21) paid into the purse by Mr Veale")
+    assert world.purse.pounds == pytest.approx(purse + 21.0)
+    now = pounds_words(world.purse.pounds)
+    assert world.purse.ledger_lines() == [
+        f"Paid by Mr Veale, twenty guineas (£21); the purse {now}."
+    ]
+    seen = [e for e in world.log.all() if e.kind == "purse.received"]
+    assert [e.text for e in seen] == [
+        f"Paid into the purse by Mr Veale, twenty guineas (£21); the purse {now}."
+    ]
+    assert not for_the_record(seen[0])
+    assert D.log_of(world).entries[-1].kind == "director.order"
+    # thirty miles off: Mr Veale at Plymouth, the schooner in Carrick Road
+    far = _veale_at_falmouth("Plymouth")
+    miles = far.ports.ports["plymouth"].nearest_spot(far.position)[1]
+    assert 25.0 < miles < 40.0
+    was = far.purse.pounds
+    said = D.direct(far, order, by="the truth", road=D.INPUT)
+    assert said.startswith("Doubted, not performed: Mr Veale is ashore at Plymouth")
+    assert f"{miles:.0f} miles off" in said and "neither aboard nor at a port" in said
+    assert far.purse.pounds == was and far.purse.ledger_lines() == []
+    assert D.log_of(far).entries[-1].kind == "director.doubted"
+    # below nothing: refused, the purse what it was
+    held = world.purse.pounds
+    e = world.world_order(f"aboard: £{held + 1:.0f} paid from the purse to Mr Veale", "the truth")
+    assert e.data["result"] == "refused"
+    assert e.text.endswith(
+        f"the purse holds {pounds_words(held)}, not {pounds_words(float(f'{held + 1:.0f}'))}: "
+        "nothing is paid below nothing."
+    )
+    assert world.purse.pounds == held and len(world.purse.ledger_lines()) == 1

@@ -1035,3 +1035,94 @@ def test_the_fake_director_uses_the_hand_doubted_reentered_attempted_and_replaye
         assert copy.log.digest() == w.log.digest(), road
         assert log_texts(copy) == texts, road
         assert copy.vessels.find("Nancy").story == v.story, road
+
+
+# ---------------------------------------------------------------------------
+# Things and transactions (spec M7b §17a; package 53b)
+# ---------------------------------------------------------------------------
+
+
+def test_the_brief_says_his_words_move_no_money_and_gives_things_and_sums_as_examples():
+    """The station brief names a thing made or moved and the transactions among the
+    examples, says that the director's words move no money and no thing and that nothing
+    is set, keeps the rule of reach for a held person's keeping, and leaves the free lines
+    to the people; the dispatches brief offers the sum paid and the freight."""
+    brief = D.DIRECTOR_BRIEF
+    for said in (
+        "'aboard: a sealed packet, on the cabin table, from the Custom House'",
+        "'aboard: twenty guineas paid into the purse by Mr Veale'",
+        "'aboard: £6 paid from the purse to the pilot'",
+        "'aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth'",
+        "'aboard: a debt of £30 owed to the chandler at Plymouth'",
+        "Your words move no money and no thing",
+        "there is no setting of the purse or of anything else",
+        "leave it where he can take it",
+        "you give none, and you read them in your sample",
+    ):
+        assert said in brief, said
+    b = D.resolve_brief("dispatches")
+    assert "aboard: twenty guineas paid into the purse by Mr Veale" in b.examples
+    assert "aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth" in b.examples
+
+
+def test_the_director_pays_by_a_transaction_doubted_far_off_and_makes_a_thing_by_the_reach():
+    """The director's door keeps the channel's doubt for a sum (a payer forty miles off is
+    doubted, performed when entered again with a reason, the act and the doubt and the
+    reason in his log), the purse's own line in the play log and never the order; a payment
+    below nothing is answered honestly and performs nothing; a thing is made where the
+    holder can take it, and refused into the keeping of a held person by the rule of
+    reach."""
+    from freesail.world import things as TH
+
+    w = directed()
+    assert D.direct(w, 'person: make "Mr Veale", a clerk, ashore at Plymouth', by="t").startswith(
+        "Done:"
+    )
+    purse = w.purse.pounds
+    sum_order = "aboard: twenty guineas paid into the purse by Mr Veale"
+    said = D.direct(w, sum_order, by="the test")
+    assert said.startswith("Doubted, not performed: Mr Veale is ashore at Plymouth")
+    assert "neither aboard nor at a port" in said and w.purse.pounds == purse
+    said = D.direct(w, f"{sum_order} [reason: he sent it by the pilot cutter]", by="the test")
+    assert said.startswith("Done: twenty guineas (£21) paid into the purse by Mr Veale")
+    assert w.purse.pounds == pytest.approx(purse + 21.0)
+    assert log_kinds(w)[-1] == "director.reentered"
+    assert "he sent it by the pilot cutter" in log_texts(w)[-1]
+    play = [e for e in w.log.all() if not for_the_record(e)]
+    assert [e.kind for e in play if "Veale" in e.text] == ["purse.received"]
+    assert not [e for e in play if "aboard:" in e.text]
+    said = D.direct(w, "aboard: £99999 paid from the purse to Mr Veale [reason: x]", by="t")
+    assert said.startswith("Logged as attempted, not performed") and "below nothing" in said
+    assert w.purse.pounds == pytest.approx(purse + 21.0)
+    said = D.direct(w, "aboard: a letter for the port admiral, in the captain's keeping", by="t")
+    assert said.startswith("Refused, by the rule of reach:") and "leave it where he" in said
+    said = D.direct(w, "aboard: a letter for the port admiral, on the cabin table", by="t")
+    assert said.startswith("Done: a letter for the port admiral made, on the table in the cabin")
+    assert [t.name for t in TH.things_of(w)] == ["a letter for the port admiral"]
+    # the director has no hands: a free line at his station is refused
+    e = w.submit("take the letter", actor="the director")
+    assert e.kind == "order.rejected" and "no hands aboard" in e.text
+
+
+def test_the_dispatches_scenario_carries_the_packet_in_the_captains_keeping():
+    """The owner's scenario gains the packet as a thing (package 53b, item 4): in the
+    cutter's captain's keeping from the start, from the Custom House, and in the people's
+    words and the truth."""
+    from freesail.world import things as TH
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(ROOT / "data/scenarios/dispatches-falmouth.yaml")
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    (packet,) = TH.things_of(w)
+    cap = w.people.captain
+    assert (packet.name, packet.keeper, packet.description) == (
+        "a sealed packet",
+        cap.id,
+        "from the Custom House",
+    )
+    assert f"{cap.name}, master: " in w.readings.words("people")
+    assert "a sealed packet in his keeping" in w.readings.words("people")
+    assert R.director_readings(w)["things"][0].startswith(
+        f"a sealed packet, in {cap.name}'s keeping"
+    )
