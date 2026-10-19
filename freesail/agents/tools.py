@@ -2135,6 +2135,18 @@ def _grammar_topic() -> Topic:
         "belays that work, named as the log names it ('belay reefing the mainsail'), as it "
         "was ordered, by its kind ('belay the reef') or by its sail ('belay the mainsail')."
     )
+    order.append(
+        "Free lines (a person's own, at any station): "
+        + ", ".join(vocab.free_lines)
+        + ". The words after the verb are taken as said: 'give the packet to Mr Veale', 'take "
+        "the packet', 'put the packet on the table', 'hide the letter in the bread locker', "
+        "'throw the packet overboard', 'eat a fine meal'. Where they name a thing known and a "
+        "person or a place within your reach (your place or its earshot aboard, your place "
+        "of the port ashore), the thing moves and the log says where it is; where they do "
+        "not, or the verb moves nothing (show, open, read), the log says \"as said; nothing "
+        "of the ship's changed\". A thing handed to a person a model or the player holds "
+        "lies before him for his own hand."
+    )
     dialect = standing_dialect_lines(vocab)
     station = [
         "The station sentences the captain uses: 'ask the watcher <question>', 'tell the "

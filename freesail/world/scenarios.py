@@ -54,6 +54,8 @@ ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
                                      # company's names list when not said
     people:                          # people beyond the muster's posts (§22; package 35)
       - {role: supercargo, name: Mr Pentreath, place: cabin}
+    things:                          # things aboard or ashore (M7b §17a; package 53b), each
+      - a sealed packet, in the captain's keeping, from the Custom House   # as `aboard:` says
     papers: {price_lists: [falmouth]}   # the price lists she starts with (§22)
     cargo: {purse_pounds: 500, goods: {tin: 20}}   # the purse and the hold (§23)
     ports:                           # the ports' state (§23, §27): a list of ids, or each
@@ -226,6 +228,13 @@ class ScenarioFile:
                 f"The purse holds £{cargo.get('purse_pounds', 0):g}"
                 + (f"; the hold {goods}." if goods else ".")
             )
+        for t in getattr(sc, "things", None) or []:
+            said = (
+                t
+                if isinstance(t, str)
+                else ", ".join(str(t[k]) for k in ("name", "where", "description") if t.get(k))
+            )
+            out.append(f"A thing: {said}.")
         if sc.ports is not None:
             names = list(sc.ports) if not isinstance(sc.ports, dict) else list(sc.ports)
             out.append(f"The ports: {', '.join(names) if names else 'none'}.")
@@ -424,6 +433,21 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         if s.get("position") is None or not str(s.get("goal") or "").strip():
             raise ScenarioError(f"{where}, ships {i + 1}: a ship needs a position and a goal.")
     sc.ships = [{str(k): v for k, v in s.items()} for s in ships_raw]
+    # the things (spec M7b §17a; package 53b): each the words an `aboard:` order makes a
+    # thing from, or {name, where, description}; read whole when the people are made
+    things_raw = raw.get("things") or []
+    if not isinstance(things_raw, list):
+        raise ScenarioError(f"{where}, things: a list, each 'a thing, where it is'.")
+    for i, t in enumerate(things_raw):
+        if isinstance(t, dict):
+            if not str(t.get("name") or "").strip() or not str(t.get("where") or "").strip():
+                raise ScenarioError(f"{where}, things {i + 1}: a thing wants a name and a where.")
+        elif "," not in str(t):
+            raise ScenarioError(
+                f"{where}, things {i + 1}: say what it is and where, '<a thing>, <where>' "
+                "('a sealed packet, in the captain's keeping')."
+            )
+    sc.things = [dict(t) if isinstance(t, dict) else " ".join(str(t).split()) for t in things_raw]
     # the crewed promotion's budget (the lead, 2026-10-17): `crewed: {cap: N, range_nm: X}`
     if raw.get("crewed") is not None:
         from freesail.world.crews import crewed_settings_of
@@ -696,6 +720,7 @@ FIELD_ORDER: tuple[str, ...] = (
     "wind",
     "intent",
     "people",
+    "things",
     "papers",
     "cargo",
     "ports",
@@ -718,6 +743,7 @@ SECTION_COMMENTS: dict[str, str] = {
     "intent": "The captain's intent (spec M6 §4): the rules captain sails by it when nobody "
     "holds the station; a model captain reads it as his night orders.",
     "people": "People beyond the muster's posts.",
+    "things": "Things aboard or ashore: what each is and where (a place, or a person's keeping).",
     "papers": "The ship's papers: the chart's year, the epitome, the almanac, the price lists.",
     "cargo": "The purse and the hold.",
     "ports": "The ports in play, and their state at the start.",

@@ -2440,7 +2440,13 @@ class Ports:
         for p in people.people if getattr(people, "_built", True) else []:
             if not p.aboard and p.where == "shore" and p.port == port.id:
                 there.setdefault(ashore_at(self.world, p), []).append(p.name)
-        return port_place_lines(port, there)
+        # the things lying there (package 53b), in nobody's keeping
+        from freesail.world.things import lying_ashore, lying_words
+
+        lying = {
+            k: [lying_words(t) for t in v] for k, v in lying_ashore(self.world, port.id).items()
+        }
+        return port_place_lines(port, there, lying)
 
     def pilot_reading(self) -> dict[str, Any] | None:
         if self.pilot is None or self.pilot_port is None:

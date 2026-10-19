@@ -31,6 +31,12 @@ intent: trade tin from Falmouth to Plymouth
 people:
   - {role: master, skill: 0.9}
 
+# The packet as a thing (spec M7b §17a; package 53b): in the captain's keeping from the
+# start, where it goes with him, is given by a free line ('give the packet to Mr Veale') to
+# a person within his reach, and is found where it lies by anyone who looks.
+things:
+  - a sealed packet, in the captain's keeping, from the Custom House
+
 papers:
   chart: {year: 1804}
   epitome: moore

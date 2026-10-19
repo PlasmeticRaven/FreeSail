@@ -38,3 +38,9 @@ examples:
   - 'ship "Medusa": order give chase'
   - 'ship "Medusa": order heave to'
   - 'ship "Medusa": order fill away'
+  # package 53b: the packet's man at Plymouth pays for it by a transaction with its cause
+  # (his words alone move no money), and a freight for the morning tide by the market's own
+  # form at no price; a thing left where the captain can take it
+  - 'aboard: twenty guineas paid into the purse by Mr Veale'
+  - 'aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth'
+  - 'aboard: a letter for the port admiral, on the cabin table'

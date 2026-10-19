@@ -1952,11 +1952,25 @@ def _people(world: Any, _: str | None) -> dict[str, Any] | None:
     people = getattr(world, "people", None)
     if people is None:
         return None
-    return {
+    out = {
         "words": " ".join(people.describe()),
         "count": len(people.all),
         "people": [p.to_dict() | {"state": people.state_words(p)} for p in people.all],
     }
+    things = _things_words(world)
+    if things:
+        # package 53b: the things and where each is, only where there are any
+        out["things"] = things
+    return out
+
+
+def _things_words(world: Any) -> list[str]:
+    """Each thing and where it is, in words (spec M7b §17a; package 53b): 'a sealed
+    packet, in Mr Veale's keeping, ashore at Plymouth, at the counting house'. None for a
+    world with no thing in it."""
+    from freesail.world import things as TH
+
+    return [f"{t.name}, {TH.where_words(world, t)}" for t in TH.things_of(world)]
 
 
 def _no_people_words(world: Any) -> str | None:
@@ -1985,16 +1999,30 @@ def _where_is(world: Any, param: str | None) -> dict[str, Any] | None:
 def _places(world: Any, _: str | None) -> dict[str, Any] | None:
     """`the places`: the names in the words (every sample carries them, so the static
     descriptions ride in `items`, where the prompt's answer and the pane find them)."""
+    from freesail.world import things as TH
     from freesail.world.places import PLACES
 
     places = getattr(world, "places", None)
     if places is None:
         return None
-    return {
+    out = {
         "words": ", ".join(p.name for p in PLACES.values()),
         "items": {p.id: {"name": p.name, "description": p.description} for p in PLACES.values()},
         "described": places.describe(),
     }
+    lying = TH.lying_aboard(world)
+    if lying:
+        # package 53b: the things lying in a place, said with it ("In the cabin: a sealed
+        # packet on the table."), only where there are any, so that every sample of a world
+        # with none is as it was
+        said = []
+        for pid, things in lying.items():
+            said.append(
+                f"In {PLACES[pid].name}: " + ", ".join(TH.lying_words(t) for t in things) + "."
+            )
+            out["items"][pid]["things"] = [TH.lying_words(t) for t in things]
+        out["words"] += ". " + " ".join(said)
+    return out
 
 
 def _ports_of(world: Any) -> Any:
@@ -2085,7 +2113,17 @@ def _purse(world: Any, _: str | None) -> dict[str, Any] | None:
     purse = getattr(world, "purse", None)
     if purse is None:
         return None
-    return {"words": purse.words(), "pounds": round(purse.pounds, 2)}
+    out = {"words": purse.words(), "pounds": round(purse.pounds, 2)}
+    ledger = getattr(purse, "ledger", None)
+    if ledger:
+        # package 53b: the channel's transactions with their causes, and the debts standing,
+        # only where there are any
+        out["ledger"] = purse.ledger_lines()
+        debts = purse.debts_words()
+        if debts:
+            out["debts"] = debts
+            out["words"] += f"; debts: {debts}"
+    return out
 
 
 def _stores(world: Any, _: str | None) -> dict[str, Any] | None:
@@ -3193,6 +3231,13 @@ def director_readings(world: Any) -> dict[str, Any]:
             except Exception:  # noqa: BLE001
                 pass
     out["people"] = people
+    # the things and where each is (package 53b), only where there are any
+    things = _things_words(world)
+    if things:
+        out["things"] = things
+    ledger = getattr(purse, "ledger", None) if purse is not None else None
+    if ledger:
+        own["ledger"] = purse.ledger_lines()
     ports = getattr(world, "ports", None)
     markets: dict[str, dict[str, float]] = {}
     news: list[str] = []
@@ -3302,6 +3347,8 @@ def _truth_words(d: dict[str, Any]) -> str:
     parts.append(weather)
     if d.get("tide"):
         parts.append(f"the tide: {d['tide']['words']}")
+    if d.get("things"):
+        parts.append(f"the things: {'; '.join(d['things'])}")
     if d.get("stations_held"):
         parts.append(f"the stations held (the rule of reach): {d['stations_held']}")
     return ". ".join(parts) + "."

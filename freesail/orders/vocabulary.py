@@ -89,6 +89,10 @@ class Vocabulary:
     # words the ship does not take, each with its sentence (package 37l): "hoist our
     # colours" is milestone 7's, "as you were" says what to say instead
     refused_phrases: dict[str, str] = field(default_factory=dict)
+    # the free lines' class (spec M7b §17a; package 53b): the verbs that take any words
+    # after them and do what the game can with them, `hand` among them (the sail's word
+    # alone, `give` with 'to'), `eat` and `drink` the needs' own
+    free_lines: tuple[str, ...] = ()
 
     def refused(self, text: str) -> str | None:
         """The sentence for a line that begins with one of `refused_phrases`, longest
@@ -280,6 +284,10 @@ def load_vocabulary(path: str | Path | None = None) -> Vocabulary:
     vocab.refused_phrases = {
         key(phrase): str(words) for phrase, words in (data.get("refused_phrases") or {}).items()
     }
+    vocab.free_lines = _tuple(data.get("free_lines"))
+    for verb in vocab.free_lines:
+        if verb not in phrase_to_verb:
+            raise ValueError(f"{p}: free_lines names '{verb}', which is no verb or synonym.")
     return vocab
 
 
