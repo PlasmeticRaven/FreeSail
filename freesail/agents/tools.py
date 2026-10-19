@@ -2164,7 +2164,7 @@ def _grammar_topic() -> Topic:
         "'throw the packet overboard', 'eat a fine meal'. Where they name a thing known and a "
         "person or a place within your reach (your place or its earshot aboard, your place "
         "of the port ashore), the thing moves and the log says where it is; where they do "
-        "not, or the verb moves nothing (show, open, read), the log says \"as said; nothing "
+        'not, or the verb moves nothing (show, open, read), the log says "as said; nothing '
         "of the ship's changed\". A thing handed to a person a model or the player holds "
         "lies before him for his own hand."
     )
