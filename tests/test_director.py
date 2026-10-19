@@ -1126,3 +1126,12 @@ def test_the_dispatches_scenario_carries_the_packet_in_the_captains_keeping():
     assert R.director_readings(w)["things"][0].startswith(
         f"a sealed packet, in {cap.name}'s keeping"
     )
+    # the cutter's company mustered (found on the way: the brief bound in the World's making
+    # had built the people before the muster, the captain and the master alone)
+    assert w.stations.holder("officer of the watch").role == "mate"
+    # a free line at the prompt is no order of the ship's: the rules captain sails on
+    w.run(60)
+    commands = w.captain.commands
+    e = w.submit("give the packet to Mr Veale")
+    assert e.kind == "free.line" and w.captain.commands == commands
+    assert not [x for x in w.log.all() if x.kind == "captain.aside"]
