@@ -423,6 +423,10 @@ class People:
         self.people: list[Person] = []
         self._built = False
         self.messages: list[tuple[Message, int]] = []  # letters in the messenger's hand (due tick)
+        # the things (spec M7b §17a; package 53b; `freesail.world.things`): the people's
+        # sibling, kept here beside them and moved by the same hands (a checkpoint from
+        # before has none, `things.things_of`)
+        self.things: list[Any] = []
 
     # -- building -------------------------------------------------------------------
 
@@ -507,6 +511,7 @@ class People:
                 p.where = "deck"
         self._attach_wardroom()
         self._scenario_people()
+        self._scenario_things()
 
     def _ship_file(self) -> str | None:
         """The ship file she was made from (`ShipSpec.source`), which names her wardroom
@@ -584,6 +589,29 @@ class People:
                 )
             )
 
+    def _scenario_things(self) -> None:
+        """The scenario's `things:` (spec M7b §17a; package 53b): each made from its words
+        as the `aboard:` order makes one ('a sealed packet, in the captain's keeping, from
+        the Custom House'), or from a mapping of {name, where, description}. A thing's
+        where that cannot be read is the scenario's error, in words."""
+        from freesail.world import things as TH
+
+        for i, spec in enumerate(getattr(self.world.scenario, "things", None) or []):
+            if isinstance(spec, dict):
+                words = ", ".join(
+                    str(x)
+                    for x in (spec.get("name"), spec.get("where"), spec.get("description"))
+                    if x
+                )
+            else:
+                words = str(spec)
+            try:
+                thing, where, _moved = TH.make(self.world, words)
+            except TH.ThingWordsError as e:
+                raise ValueError(f"the scenario's things, {i + 1} ('{words}'): {e}.") from None
+            TH.put(thing, where)
+            self.things.append(thing)
+
     def _rename(self, p: Person, name: str) -> None:
         """A person named by the scenario (package 40): the log's form of address from
         the name given (`Captain Bowen` from `Bowen` or `Captain Bowen`), the muster's
@@ -612,7 +640,21 @@ class People:
 
     @property
     def wardroom(self) -> Wardroom | None:
-        """The ship's wardroom file as read (package 40); None for a ship without one."""
+        """The ship's wardroom file as read (package 40); None for a ship without one.
+        Asked before her company is mustered (a scenario's director bound in the World's
+        making reads the stations), the file is read and the people are not built: built
+        then, they were the captain and the master of a ship with no company, and stayed so
+        (package 53b, found on the way)."""
+        ship = self.world.ship
+        if (
+            not self._built
+            and (getattr(ship, "extra", None) or {}).get("crew") is None
+            and getattr(getattr(ship, "spec", None), "crew", None) is not None
+        ):
+            try:
+                return load_wardroom(self._ship_file())
+            except ValueError:
+                return None
         self._build()
         return getattr(self, "_wardroom", None)
 
@@ -742,7 +784,17 @@ class People:
         return person
 
     def remove(self, person: Person) -> None:
+        """A person gone from the world's people (the pilot put off to his cutter): what
+        is in his keeping goes with him, ashore at his port where he has one, else it is
+        left where he was (package 53b)."""
         self._build()
+        for t in getattr(self, "things", None) or []:
+            if t.keeper == person.id:
+                t.keeper = ""
+                if person.port:
+                    t.place, t.port, t.ashore_at, t.spot = "shore", person.port, "quay", ""
+                else:
+                    t.place, t.spot = person.where, ""
         self.people = [p for p in self.people if p is not person]
 
     # -- states -----------------------------------------------------------------------
@@ -895,8 +947,18 @@ class People:
                     p.port
                 )
                 role += f" of {port.name}" if port is not None else ""
-            out.append(f"{p.name}{role}: {self.state_words(p)}.")
+            out.append(f"{p.name}{role}: {self.state_words(p)}{self.keeping_words(p)}.")
         return out
+
+    def keeping_words(self, p: Person) -> str:
+        """', a sealed packet in his keeping' (package 53b): the things a person keeps, as
+        the people's words end with them; nothing for a person who keeps none, so that a
+        world with no thing in it reads as it did."""
+        kept = [t.name for t in getattr(self, "things", None) or [] if t.keeper == p.id]
+        if not kept:
+            return ""
+        names = kept[0] if len(kept) == 1 else f"{', '.join(kept[:-1])} and {kept[-1]}"
+        return f", {names} in his keeping"
 
     def where_is(self, words: str) -> dict[str, Any] | None:
         p = self.find(words)
@@ -904,7 +966,7 @@ class People:
             return None
         return p.to_dict() | {
             "place": self.effective_place(p),
-            "words": f"{p.name}, {self.state_words(p)}",
+            "words": f"{p.name}, {self.state_words(p)}{self.keeping_words(p)}",
             "state": self.state_words(p),
             "outline": p.outline_words(),
         }

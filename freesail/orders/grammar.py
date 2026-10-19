@@ -165,6 +165,7 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         "allowance",
         "fishing",
         "glass",
+        "free",
     ):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by

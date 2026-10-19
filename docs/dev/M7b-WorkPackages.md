@@ -39,7 +39,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 63 | Opus | The boat (spec §21k; the owner, 2026-10-18): towing by the boat by an oar force on the hull, the boat as a vessel the player can pull or sail (the seat on another vessel), the kedge's false denial mended; kedging itself needs no package, the pull being in the anchor physics already | brief to write; after 51 |
 | 64 | Fable | The harbour's second pass (spec §21d, "The owner's first use"; the owner, 2026-10-18): the page made clear to a newcomer, the flags explained where they are set, several models and stations configured without several settings files, the maker given the papers (the chronometer first) and the people aboard by name with a short brief each per scenario, and the director's grant (the scenario's `director:` block: models, seats, budget) shown on the game tab and in the maker, with the director's doors in the doors tab (spec §2a; the owner, 2026-10-19) | noted, not immediate; the owner's word of 2026-10-18: a Fable package after Thursday's usage reset, a proper design run so that starting a game is streamlined with every option kept (the framework functions; it wants a finer touch) |
 | 65 | Fable | The place's knowledge (spec §14, "Brought back and forward"; the owner, 2026-10-19): what a person perceives from where he stands, aboard and ashore (the readings, the log and the sightings by place; the ship reaching him ashore by report, boat or letter), the books and papers kept in places, the always-present line of his own place and state in every sample, and the drill extended to going below, eating, drinking, reading a book and coming on deck; and each kind of work done in its own place (the sailmaker's sail room, the master's gunroom, the captain's cabin), the same for the rules' person and for a model or the player at the station doing the same work (the owner, 2026-10-19) | provisional; the deferred locational knowledge of decision 47 brought back and forward at the owner's word after the dispatches test; brief after the owner's testing round |
-| 53b | Opus | Things, free lines and transactions (spec §17a; the owner's question of 2026-10-19 after the dispatches test): a thing made, moved and kept as people are, with a place and a keeper and nothing more; a short list of verbs taking free words and logging them as used, moving a thing where the words name one and saying "as said" where they do not; a sum or a cargo paid, freighted or owed as a transaction with its cause in the ledger, never a variable set; the refinement pass on 53 the owner is looking at | briefed, approved ("as written") and launched 2026-10-19 |
+| 53b | Opus | Things, free lines and transactions (spec §17a; the owner's question of 2026-10-19 after the dispatches test): a thing made, moved and kept as people are, with a place and a keeper and nothing more; a short list of verbs taking free words and logging them as used, moving a thing where the words name one and saying "as said" where they do not; a sum or a cargo paid, freighted or owed as a transaction with its cause in the ledger, never a variable set; the refinement pass on 53 the owner is looking at | briefed, approved ("as written") and launched 2026-10-19; **built 2026-10-19** (spec §17a as built, with five readings taken another way, and §18's truths; the Harness's §19 and §21; the primer's chapters 14 and 20; the tuning notes, "Package 53b"; truths 7b-114 to 7b-116) |
 | 66 | Opus | The station's line and the stand-by (the harness after the dispatches test, 2026-10-19): one line of the holder's own first in every sample; a model's own order or word ends its stand-by and runs; a wake carries a line or does not wake; a word said tells who heard it and a question put says until when it waits; the truth a meanwhile read for the director; the hand's hold named (`for a watch`, `until <event>`); `say as` the lookout, the master and the muster's persons; merchant words for an unbound officer | briefed, approved and launched 2026-10-19 beside 53b |
 | 67 | Opus | The director's seat made real (spec §2a; the owner, 2026-10-19): the desk reads a held seat, the game starts the API door itself on `seat:` as the harbour starts one, under the grant's budget on the owner's key, the pane in the harbour's doors tab, stopped by `unseat:` or the spent budget; the form widened to a station of a ship; the brief says what a seat costs | provisional; brief after 53b and 66 come back |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
@@ -294,6 +294,53 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
    its session kind, as 42b told the captain's station (its leftover).
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
+
+### Package 53b as merged (2026-10-19)
+
+Merged `--no-ff` from the builder's worktree (nine commits on `53bc80a`; 32 files, ~2,800
+lines) with one conflict (the waves table, both sides kept), ruff clean, the fast tier on
+the merged tree by the lead; the builder's fast tier (3,506 passed), whole slow tier (3,812
+passed, the same 11 expected failures) and pace tests (6 passed) all passed on its final
+tree; **the one whole slow tier on the merged pair (53b with 66) is the lead's, at the
+owner's word, and recorded under 66.** Built as briefed: a thing (`freesail/world/things.py`,
+held by the `People` registry) with a name, a description and where it is (a person's
+keeping, a place aboard with its spot, a place ashore, or over the side), made by the
+scenario's `things:` or `aboard: <a thing>, <where>`, shown in the people's words, `the
+places`, `the places ashore` and the truth only when one exists, saved and replayed, never
+doubted when made, doubted when moved beyond a boat's reach, and kept out of a held person's
+keeping by the rule of reach (it lies before him until his own `take`); the free lines
+(`freesail/orders/free.py`: give, hand ... to, show, take or pick up, stow, hide, put, open,
+read, throw ... overboard, with eat and drink in the same `free_lines` list unchanged),
+moving a known thing within reach and otherwise logging "..., as said; nothing of the
+ship's changed" with the reason in brackets, each a notable line heard within reach and
+journaled, every station's with or without the deck, the director's refused (he has no
+hands aboard); the transactions (`aboard:` paid into the purse by, paid from the purse to,
+a cargo freighted at no price off by the lighter, a debt owed), each in the purse's or the
+hold's ledger with its cause and a notable play-log line, doubted for money from nobody, a
+payer neither aboard nor within six miles, a sum beyond the port's means or a freight to a
+ship at sea, refused below nothing or beyond the hold's room; the dispatches scenario with
+the packet as a thing, a mate in its people and `trade copper ore from Falmouth to Plymouth`
+(the lead's two additions); the brief's examples; truths 7b-114 to 7b-116. **Taken another
+way, accepted:** a freight the hold cannot stow refused, not doubted (no reason makes
+room); "a port's means" given a figure the business lacked (its largest cargo at the port's
+dearest price; the owner to say whether the business keeps a real one); the free verbs
+their own vocabulary object, `hand` a giving only before "to" (it was the sail's word);
+`show`, `open` and `read` always "as said"; no hidden flag until 65 decides who perceives
+what.
+
+**Found and fixed on the way, the first of weight:** the dispatches scenario had no company
+because binding the director's brief in the World's making read the wardroom before the
+crew was mustered, so the ship had the captain and the master only and the officer's
+station was bound to nobody: **the test's finding 8 was this, not the scenario's people**
+(the mate stays in the scenario all the same); `eat`, `drink`, `sleep` and `how am I` were
+refused at a station without the deck; a free line at the prompt made the rules captain
+stand aside; the completion lost a trailing space on three orders. **Not fixed, carried:**
+`the glass on <ship>` refused without the deck; the market's `buy` checks the hold's room
+without goods still in the boat; the director's "Done:" reply; the rules captain's
+stand-aside not belaying work his book has in hand (the master's `go ashore` in the minute
+his book began weighing: she stood out with him on the quay). **Decisions for the owner:**
+the port's-means figure; a hidden thing seen only by one who looks (65); the director
+moving a thing between places ashore; the stand-aside belaying work in hand.
 
 ### Package 62 as merged (2026-10-18)
 

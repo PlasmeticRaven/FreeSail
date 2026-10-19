@@ -217,6 +217,10 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
     if order.channel == "unseat":
         return _unseat(world, body)
     if order.channel == "aboard":
+        held = reach(world, order)
+        if held:
+            # the rule of reach for a thing and a held person's money (package 53b)
+            raise WorldOrderError(f"{held}; the stations held now: {held_words(world)}")
         return _aboard(world, body)
     held = reach(world, order)
     if held:
@@ -1367,6 +1371,9 @@ def reach(world: Any, order: WorldOrder) -> str | None:
         if m is None or _HAND_TAIL.match(m.group("goal")) is None:
             return None
         return _hand_reach(world, m.group("name"))
+    if order.channel == "aboard":
+        # package 53b: a thing into or out of a held person's keeping, and his money
+        return _aboard_reach(world, order.text)
     if order.channel not in ("say", "person"):
         return None
     held = {person: (station, who) for station, person, who in held_stations(world) if person}
@@ -1465,7 +1472,439 @@ def _aboard_match(world: Any, body: str) -> tuple[dict[str, Any], str | None] | 
     return None
 
 
+# ---------------------------------------------------------------------------
+# aboard (spec M7b §17a; package 53b): a thing made or moved, and the transactions
+# ---------------------------------------------------------------------------
+
+# A sum paid into the purse by someone, or from it to someone; a cargo freighted; a debt
+# owed to someone or by someone. Each changes the purse or the hold by a transaction with
+# its cause in the ledger, never a figure set (the owner's question and the lead's answer
+# of 2026-10-19).
+_PAID_IN = re.compile(
+    r"^(?P<sum>.+?)\s+paid\s+(?:into|in\s+to|to)\s+the\s+purse(?:\s+by\s+(?P<who>.+?))?"
+    r"(?:\s+for\s+(?P<for>.+))?$",
+    re.I,
+)
+_PAID_OUT = re.compile(
+    r"^(?P<sum>.+?)\s+paid\s+(?:from|out\s+of)\s+the\s+purse(?:\s+to\s+(?P<who>.+?))?"
+    r"(?:\s+for\s+(?P<for>.+))?$",
+    re.I,
+)
+_FREIGHT = re.compile(
+    r"^(?P<tons>.+?)\s+tons?\s+of\s+(?P<good>.+?)\s+freighted(?:\s+by\s+(?P<who>.+?))?"
+    r"(?:\s+at\s+(?P<at>.+?))?(?:\s+for\s+(?P<dest>.+))?$",
+    re.I,
+)
+_DEBT = re.compile(
+    r"^a\s+debt\s+of\s+(?P<sum>.+?)\s+owed\s+(?P<dir>to|by)\s+(?P<who>.+?)"
+    r"(?:\s+for\s+(?P<for>.+))?$",
+    re.I,
+)
+# The money's units in pounds (a guinea twenty-one shillings; a crown five shillings).
+MONEY_UNITS: dict[str, float] = {
+    "pound": 1.0,
+    "pounds": 1.0,
+    "guinea": 1.05,
+    "guineas": 1.05,
+    "crown": 0.25,
+    "crowns": 0.25,
+    "shilling": 0.05,
+    "shillings": 0.05,
+    "penny": 1.0 / 240.0,
+    "pence": 1.0 / 240.0,
+}
+# A sum in the clerk's figures: '£30', '£6 10s', '£6 10s 6d'.
+_STERLING = re.compile(
+    r"^£\s*(?P<l>\d+(?:\.\d+)?)(?:\s+(?P<s>\d+)\s*s\.?)?(?:\s+(?P<d>\d+)\s*d\.?)?"
+)
+# The forms the channel's thing and transaction orders take, for its answer in words.
+ABOARD_FORMS = (
+    "a thing made or moved ('aboard: a sealed packet, on the cabin table'; 'aboard: a cask "
+    "of brandy, in the hold'; 'aboard: the packet, in the keeping of Mr Veale'), a sum "
+    "('aboard: twenty guineas paid into the purse by Mr Veale'; 'aboard: £6 paid from the "
+    "purse to the pilot'), a freight ('aboard: ten tons of wool freighted by Mr Veale at the "
+    "quay for Falmouth') or a debt ('aboard: a debt of £30 owed to the chandler at Plymouth')"
+)
+
+
+def read_sum(words: str) -> float | None:
+    """A sum of money in pounds from the words ('twenty guineas', '£30', '£6 10s', 'thirty
+    pounds ten shillings', 'a guinea'), or None when the words are no sum."""
+    from freesail.orders.numbers import read
+
+    text = " ".join(str(words).lower().replace(",", " ").split())
+    total = 0.0
+    said = False
+    m = _STERLING.match(text)
+    if m is not None:
+        shillings, pence = int(m.group("s") or 0), int(m.group("d") or 0)
+        total += float(m.group("l")) + shillings / 20.0 + pence / 240.0
+        text, said = text[m.end() :].strip(), True
+    tokens = [t for t in text.replace("-", " ").split() if t not in ("and", "sterling")]
+    i = 0
+    while i < len(tokens):
+        got = read(tokens, i)
+        if got is None or i + got[1] >= len(tokens):
+            return None
+        unit = MONEY_UNITS.get(tokens[i + got[1]])
+        if unit is None:
+            return None
+        total += got[0] * unit
+        i += got[1] + 1
+        said = True
+    return round(total, 4) if said and total > 0 else None
+
+
+def _party(world: Any, words: str) -> tuple[Any, str]:
+    """(the person the words name, or None; the party in words: his name, else the words
+    as said)."""
+    words = " ".join(str(words or "").split()).strip(" .")
+    people = getattr(world, "people", None)
+    p = people.find(words) if (people is not None and words) else None
+    return p, (p.name if p is not None else words)
+
+
+def _transaction(body: str) -> tuple[str, re.Match[str]] | None:
+    """(the kind, the match) of a transaction's words, or None."""
+    said = " ".join(re.sub(r"^aboard\s*:", "", body, flags=re.I).split()).rstrip(".")
+    for kind, rx in (
+        ("received", _PAID_IN),
+        ("paid", _PAID_OUT),
+        ("freight", _FREIGHT),
+        ("debt", _DEBT),
+    ):
+        m = rx.match(said)
+        if m is not None:
+            return kind, m
+    return None
+
+
+def _thing_words(body: str) -> str:
+    return " ".join(re.sub(r"^aboard\s*:", "", body, flags=re.I).split()).rstrip(".")
+
+
+def _aboard_thing(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`aboard: <a thing>, <where>[, <more of it>]`: a thing made, or a thing known moved
+    (spec M7b §17a): never a line of the play log, which carries the thing where it is met
+    (the people's reading, the places', the truth)."""
+    from freesail.world import things as TH
+
+    try:
+        thing, where, moved = TH.make(world, _thing_words(body))
+    except TH.ThingWordsError as e:
+        raise WorldOrderError(str(e)) from None
+    was = TH.where_words(world, thing, keeper_where=False) if moved else ""
+    TH.put(thing, where)
+    if not moved:
+        TH.things_of(world).append(thing)
+    now = TH.where_words(world, thing, keeper_where=False)
+    data: dict[str, Any] = {"thing": thing.id, "name": thing.name, **thing.to_dict()}
+    if moved:
+        data["moved"] = True
+        return f"{thing.the} moved: it was {was}, and is {now}", data
+    desc = f" ({thing.description})" if thing.description else ""
+    return f"{thing.name}{desc} made, {now}", data
+
+
+def _aboard_transaction(world: Any, kind: str, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
+    """A transaction of the purse or the hold (spec M7b §17a): written in its own ledger
+    with its cause, a notable line of the play log saying it as the purser's books do (the
+    effect, never the order), the director's log keeping the act."""
+    from freesail.world.places import pounds_words
+
+    purse = getattr(world, "purse", None)
+    now = world.clock.tick
+    if kind == "freight":
+        return _freight(world, m)
+    pounds = read_sum(m.group("sum"))
+    said = " ".join(m.group("sum").split())
+    if pounds is None:
+        raise WorldOrderError(
+            f"'{said}' is no sum the purse reads: say '£30', '£6 10s', 'twenty guineas', "
+            "'thirty pounds'"
+        )
+    if purse is None:
+        raise WorldOrderError("she keeps no purse")
+    who, party = _party(world, m.group("who") or "")
+    why = f" for {m.group('for').strip()}" if m.groupdict().get("for") else ""
+    sum_words = said if said.startswith("£") else f"{said} ({pounds_words(pounds)})"
+    data: dict[str, Any] = {"kind": kind, "pounds": round(pounds, 2), "party": party}
+    if kind == "received":
+        if not party:
+            raise WorldOrderError(
+                "say who paid it: 'aboard: twenty guineas paid into the purse by Mr Veale'"
+            )
+        line = purse.receive(pounds, party, f"{sum_words}{why}", now)
+        text = f"Paid into the purse by {party}, {sum_words}{why}; the purse {purse.words()}."
+        world.record(Severity.NOTABLE, "purse.received", text, data=data | {"ledger": line})
+        return f"{sum_words} paid into the purse by {party}; the purse {purse.words()}", data
+    if kind == "paid":
+        if not party:
+            raise WorldOrderError(
+                "say to whom it is paid: 'aboard: £6 paid from the purse to the pilot'"
+            )
+        if pounds > purse.pounds + 1e-9:
+            raise WorldOrderError(
+                f"the purse holds {purse.words()}, not {pounds_words(pounds)}: nothing is paid "
+                "below nothing"
+            )
+        line = purse.pay_to(pounds, party, f"{sum_words}{why}", now)
+        text = f"Paid from the purse to {party}, {sum_words}{why}; the purse {purse.words()}."
+        world.record(Severity.NOTABLE, "purse.paid", text, data=data | {"ledger": line})
+        return f"{sum_words} paid from the purse to {party}; the purse {purse.words()}", data
+    to_us = m.group("dir").lower() == "by"
+    line = purse.owe(pounds, party, f"{sum_words}{why}", now, to_us=to_us)
+    text = f"{line[:1].upper()}{line[1:]}, entered in the purser's books."
+    world.record(Severity.NOTABLE, "purse.owed", text, data=data | {"to_us": to_us})
+    return line, data | {"to_us": to_us}
+
+
+def _freight(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
+    """`aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth`: the
+    market's own form at no price (spec M7b §17a): the freight entered in the hold's ledger
+    and the manifest with its cause, the goods off by the port's lighter where she lies in
+    port, struck down at once where the freighter is aboard; refused in words where the hold
+    has no room (the hold's tons are the game's, and no reason stows more)."""
+    from freesail.orders.numbers import read_all
+    from freesail.world.ports import BOAT_ASHORE_S, BOAT_PACE_KN, LIGHTER_S_PER_TON, Job
+
+    tons = read_all(" ".join(m.group("tons").lower().replace("-", " ").split()))
+    if tons is None or tons <= 0:
+        raise WorldOrderError(f"'{m.group('tons')}' is no number of tons")
+    good = " ".join(m.group("good").lower().split())
+    hold = getattr(world, "hold", None)
+    if hold is None or hold.capacity_tons <= 0:
+        raise WorldOrderError("she has no hold for a cargo")
+    ports = getattr(world, "ports", None)
+    coming = _tons_coming(ports)
+    room = max(0.0, hold.room_tons - coming)
+    if tons > room + 1e-9:
+        bought = f" ({coming:g} tons bought are coming off)" if coming > 0 else ""
+        raise WorldOrderError(
+            f"there is room in the hold for {room:g} tons and no more{bought}; {tons:g} tons "
+            f"of {good} will not stow"
+        )
+    who, party = _party(world, m.group("who") or "")
+    port = ports.in_port() if (ports is not None and ports.ports) else None
+    at = " ".join((m.group("at") or "").split())
+    dest = " ".join((m.group("dest") or "").split())
+    words = f"{tons:g} tons of {good} freighted" + (f" by {party}" if party else "")
+    if port is not None:
+        words += f" at {port.name}"
+    elif at:
+        words += f" at {at}"
+    if dest:
+        words += f" for {dest}"
+    now = world.clock.tick
+    hold.freight(tons, good, words, now)
+    papers = getattr(world, "papers", None)
+    if papers is not None:
+        world.record(
+            Severity.ROUTINE,
+            "paper.written",
+            papers.write("the manifest", words),
+            data={"paper": "the manifest"},
+        )
+    data: dict[str, Any] = {"kind": "freight", "tons": tons, "good": good, "party": party}
+    if port is not None and (who is None or not who.aboard):
+        pull_s = ports.to_shore_m(port) / (BOAT_PACE_KN * units.KNOT)
+        due = now + int(BOAT_ASHORE_S["purchase"] + tons * LIGHTER_S_PER_TON + pull_s)
+        ports.jobs.append(
+            Job(due, "lighter", port.id, {"items": [{"good": good, "tons": tons, "freight": 1}]})
+        )
+        text = f"{words[:1].upper()}{words[1:]}; the lighter brings it off."
+        data |= {"port": port.id, "due_tick": due}
+        said = f"{words}; off by the lighter"
+    else:
+        hold.stow(good, tons)
+        text = (
+            f"{words[:1].upper()}{words[1:]}, struck down into the hold; the manifest "
+            f"{hold.words()}."
+        )
+        said = f"{words}; struck down into the hold"
+    world.record(Severity.NOTABLE, "hold.freighted", text, data=data)
+    return said, data
+
+
+def _tons_coming(ports: Any) -> float:
+    """The tons bought or freighted and not yet in the hold: in the boat on her errand of a
+    purchase, or in the port's lighter (the hold's room is the room left after them)."""
+    if ports is None:
+        return 0.0
+    tons = 0.0
+    boat = getattr(ports, "boat", None)
+    if boat is not None and getattr(boat, "away", False):
+        for item in getattr(boat, "carrying", None) or []:
+            if item.get("kind") == "purchase":
+                tons += float(item.get("tons") or 0.0)
+    for job in getattr(ports, "jobs", None) or []:
+        if job.kind == "lighter":
+            tons += sum(float(i.get("tons") or 0.0) for i in job.payload.get("items") or [])
+    return tons
+
+
+def _aboard_reach(world: Any, body: str) -> str | None:
+    """The rule of reach for the `aboard:` channel (package 53b): no thing put into or
+    taken out of the keeping of a person a model or the player holds but by his own act,
+    and no sum paid, freight sent or debt owed by him but by his own word."""
+    from freesail.world import things as TH
+
+    tx = _transaction(body)
+    if tx is not None:
+        kind, m = tx
+        if kind in ("received", "freight") or (kind == "debt" and m.group("dir").lower() == "by"):
+            who, _party_words = _party(world, m.group("who") or "")
+            held = TH.held_by(world, who)
+            if who is not None and held:
+                return (
+                    f"{who.name} is held by {held}: a sum, a freight or a debt of his is his "
+                    "holder's own word, and nobody gives it for him"
+                )
+        return None
+    try:
+        thing, where, moved = TH.make(world, _thing_words(body))
+    except TH.ThingWordsError:
+        return None
+    if moved and thing.keeper:
+        owner = TH.keeper_of(world, thing)
+        held = TH.held_by(world, owner)
+        if owner is not None and held:
+            return (
+                f"{thing.the} is in {owner.name}'s keeping, and he is held by {held}: nothing "
+                "is taken out of a held person's keeping but by his own act"
+            )
+    if where.get("keeper"):
+        people = getattr(world, "people", None)
+        to = next((p for p in people.all if p.id == where["keeper"]), None) if people else None
+        held = TH.held_by(world, to)
+        if to is not None and held:
+            return (
+                f"{to.name} is held by {held}: nothing is put into a held person's keeping but "
+                "by his own act; leave it where he can take it ('on the cabin table') and say so"
+            )
+    return None
+
+
+def _doubt_aboard_new(world: Any, body: str) -> str | None:
+    """The doubt of a transaction (package 53b): a sum from nobody, or from a person the
+    world does not know; a payer, a payee or a freighter neither aboard nor at a port she
+    lies within a boat's reach of; a sum beyond a port's means by the business's figures; a
+    freight with no lighter to bring it (she lies in no port and the freighter is not
+    aboard). A thing moved from one port to another, or between the ship and a port beyond
+    a boat's reach, by no hand that could carry it. A thing made is never doubted."""
+    from freesail.world import things as TH
+    from freesail.world.places import pounds_words
+
+    tx = _transaction(body)
+    if tx is None:
+        try:
+            thing, where, moved = TH.make(world, _thing_words(body))
+        except TH.ThingWordsError:
+            return None
+        if not moved:
+            return None
+        return _doubt_thing_moved(world, thing, where)
+    kind, m = tx
+    if kind == "debt":
+        return None
+    who, party = _party(world, m.group("who") or "")
+    if kind in ("received", "freight") and not party:
+        return "money or goods from nobody: no payer is named, and nothing comes aboard of itself"
+    if who is None and party:
+        return (
+            f"nobody answering to '{party}' is among the people: money or goods from nobody "
+            "the world knows ('person: make ...' first, or give a reason)"
+        )
+    ports = getattr(world, "ports", None)
+    port = None
+    if who is not None and not who.aboard and who.where != "boat":
+        port = ports.ports.get(who.port) if (ports is not None and who.port) else None
+        miles = _port_miles(world, port)
+        if port is None or miles is None or miles > BOAT_REACH_NM:
+            off = f" at {port.name}, {miles:.0f} miles off" if (port and miles is not None) else ""
+            return (
+                f"{who.name} is {world.people.state_words(who)}{off}: neither aboard nor at a "
+                f"port she lies within a boat's reach of ({BOAT_REACH_NM:g} miles), so no hand "
+                "carries it"
+            )
+    if kind == "freight":
+        in_port = ports.in_port() if (ports is not None and ports.ports) else None
+        if in_port is None and (who is None or not who.aboard):
+            return "she lies in no port: no lighter brings a freight off to her at sea"
+        return None
+    pounds = read_sum(m.group("sum"))
+    if pounds is None:
+        return None
+    if port is None and ports is not None and ports.ports:
+        port = ports.in_port()
+        if port is None:
+            near = ports.nearest()
+            port = near[0] if near is not None else None
+    from freesail.world.business import port_means_pounds
+
+    means = port_means_pounds(world, port) if port is not None else None
+    if means is not None and pounds > means:
+        return (
+            f"{pounds_words(pounds)} in one sum is beyond {port.name}'s means by the business's "
+            f"figures (a full lading of its dearest good, {pounds_words(means)})"
+        )
+    return None
+
+
+def _doubt_thing_moved(world: Any, thing: Any, where: dict[str, Any]) -> str | None:
+    from freesail.world import things as TH
+
+    here_place, here_port, _ = TH.place_of(world, thing)
+    if where.get("keeper"):
+        people = getattr(world, "people", None)
+        to = next((p for p in people.all if p.id == where["keeper"]), None)
+        if to is None:
+            return None
+        if to.aboard or to.where in ("boat", "cutter"):
+            there_place, there_port = "aboard", None
+        else:
+            there_place, there_port = "shore", to.port
+    else:
+        there_place, there_port = str(where.get("place") or ""), where.get("port")
+    here_ashore = here_place == "shore"
+    there_ashore = there_place == "shore"
+    if here_ashore and there_ashore and here_port != there_port:
+        return (
+            f"{thing.the} would go from one port to another in a word, by no hand that carries it"
+        )
+    if here_ashore != there_ashore:
+        ports = getattr(world, "ports", None)
+        pid = here_port if here_ashore else there_port
+        port = ports.ports.get(pid) if (ports is not None and pid) else None
+        miles = _port_miles(world, port)
+        if port is not None and miles is not None and miles > BOAT_REACH_NM:
+            return (
+                f"{thing.the} would cross between the ship and {port.name}, {miles:.0f} miles "
+                f"off: no boat carries it so far ({BOAT_REACH_NM:g} miles at the most)"
+            )
+    return None
+
+
 def _aboard(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`aboard: <a thing found aboard>`, the table's (package 50); else a transaction of
+    the purse or the hold, or a thing made or moved (package 53b); else refused in words
+    naming the forms."""
+    if _aboard_match(world, body) is None:
+        tx = _transaction(body)
+        if tx is not None:
+            return _aboard_transaction(world, *tx)
+        if "," in _thing_words(body):
+            return _aboard_thing(world, body)
+        forms = "; ".join(
+            str(t["words"][0]).replace("{spar}", "the <spar>") for t in aboard_table()
+        )
+        raise WorldOrderError(
+            f"An aboard order is one of the table's things ({forms}), or {ABOARD_FORMS}."
+        )
+    return _aboard_found(world, body)
+
+
+def _aboard_found(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     """`aboard: <a thing found aboard>`: the thing's effect in the part graph or the
     stores, and its people's report as a notable line of the play log (the order itself
     is for the record only, decision 46)."""
@@ -1566,6 +2005,8 @@ def doubt(world: Any, order: WorldOrder) -> str | None:
         if order.channel == "port":
             return _doubt_port(world, body)
         if order.channel == "aboard":
+            if _aboard_match(world, body) is None:
+                return _doubt_aboard_new(world, body)  # a thing or a transaction (53b)
             return _doubt_aboard(world, body)
         if order.channel == "person":
             return _doubt_person(world, body)

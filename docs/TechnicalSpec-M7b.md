@@ -849,7 +849,7 @@ orders, the grants, the last handover note), with one notable `watch.deck_passed
 first lieutenant keeps no watch and keeps it until the captain takes it, and an officer whose
 relief nobody holds keeps it.
 
-### 17a. Things, free lines and transactions (package 53b, provisional; the owner and the lead, 2026-10-19)
+### 17a. Things, free lines and transactions (package 53b; the owner and the lead, 2026-10-19; built the same day)
 
 The owner's question after the dispatches test, where the packet was handed over in words
 and the twenty guineas never reached the purse: the director makes people with rigour, so
@@ -904,6 +904,126 @@ market (a thing sold is a transaction with a price the director names); a thing 
 for by a person's action rather than found where it lies; locks, seals and keys beyond the
 words. Each waits for a system that needs it.
 
+**As built (package 53b, 2026-10-19; `freesail/world/things.py` and `freesail/orders/free.py`
+new; `world/people.py`, `orders.py`, `places.py`, `ports.py`, `business.py`, `scenarios.py`;
+`core/world.py`; `orders/__init__.py`, `grammar.py`, `vocabulary.py`; `agents/agent.py`,
+`tools.py`, `harness.py`, `director.py`; `api/readings.py`; `data/vocabulary.yaml`;
+`data/scenarios/dispatches-falmouth.yaml`, `data/director/briefs/dispatches.yaml`;
+`tests/test_people.py`, `test_world_orders.py`, `test_business.py`, `test_director.py`;
+truths 7b-114 to 7b-116).**
+
+- **A thing** (`things.Thing`) is an id, its name as said ("a sealed packet"), a
+  description (the rest of the words that made it) and where it is: a person's keeping
+  (`keeper`, his id: it is where he is, aboard, in the boat or ashore at his place of the
+  port), a place aboard of §14's with its spot in words (`place`, `spot`: "on the table" in
+  the cabin), a place ashore (`place` "shore" with `port` and `ashore_at`), or over the side
+  (`OVERBOARD`). Nothing more. The registry is the World's `People` (`People.things`), so a
+  checkpoint holds them whole and a replay makes them again from the orders and the
+  scenario that made them and the free lines that moved them. Made **by the scenario**
+  (`things:`, each the words of the `aboard:` form or `{name, where, description}`, made
+  with the people at their muster: `People._scenario_things`; a where that names nobody is
+  the scenario's error in words; `Scenario.things` absent from the save's dict when empty)
+  and **by the channel**: `aboard: <a thing>, <where>[, <more of it>]` makes one, `aboard:
+  the <thing>, <where>` moves one known (`orders._aboard_thing`). The where's forms
+  (`things.read_where`): `in the captain's keeping`, `in the keeping of Mr Veale`, `kept by
+  ...`; `in the hold`, `on the cabin table`, `on the table in the gunroom`, `under the cabin
+  table` (the place found among the words, the spot the rest); `ashore at Plymouth[, at the
+  counting house]`, `at the counting house at Plymouth`. Any other phrase is the thing's
+  description; no where said is refused in words naming the forms, so that the table's
+  things (`aboard: a cask found stove`) and the free words of 50's honest answer (`aboard:
+  the cook reports the beef cask found rotten`) are what they were. The play log says
+  nothing of a thing made (decision 46): it is met where it is. **The readings** say it
+  where there is one and only then, so that a world with no thing reads as it did: the
+  people's words end a person's line with what he keeps (`People.keeping_words`: "Mr Veale,
+  clerk: ashore at Plymouth, at the counting house, a sealed packet in his keeping."; the
+  same in `where is`), and `people` carries a `things` list; `the places` adds what lies in
+  each place aboard ("In the cabin: a sealed packet on the table.", and `items[place].things`);
+  `the places ashore` adds "lying there" at each place of the port; the truth carries
+  `things` and says them in its words. **Reach** (`things.reach_why`, `same_place`): a thing
+  in his keeping, or lying in his place, or within earshot of it on the open deck (§14's
+  `earshot`), or at the same place of the same port ashore; a person likewise. **The rule
+  of reach** (`orders._aboard_reach`, through `reach` for every source as the person's
+  rule is): nothing put into the keeping of a person a model or the player holds, nor taken
+  out of it, refused in words that say to leave it where he can take it ("on the cabin
+  table") and say so. **The doubt**: a thing made never; a thing moved from one port to
+  another, or between the ship and a port beyond `BOAT_REACH_NM`, by no hand that could
+  carry it. A person leaving the world (the pilot put off) takes what he keeps ashore at his
+  port.
+- **The free lines** (`orders/free.py`): `give` (and `hand ... to ...`, the sail's bare
+  `hand` being `take in` still), `show`, `take` (`pick up`), `stow`, `hide` (`conceal`),
+  `put`, `open` (`unseal`, `break the seal of`), `read`, `throw` (`toss`), each a verb of
+  the vocabulary's object `free`, listed with `eat` and `drink` in its `free_lines` (the
+  class; the needs' orders unchanged). The giver is the order's person
+  (`movement.person_of_actor`); a rule, a standing order's firing and the director are
+  refused in words (no hands aboard). The words after the verb are read for a thing known
+  (`things.find`: its name whole, its noun, either side of "of") and a person (`People.find`)
+  or a place: `give <thing> to <person>` or `give <person> <thing>`; `stow|hide|put <thing>
+  in|on|under ... <where>` (a place aboard within his reach, or a spot in his own place,
+  or, ashore, his place of the port); `throw <thing> overboard|over the side`. Where they
+  name a thing within reach, and a person within reach for a giving, the thing moves and
+  the line says where it is now ("By the captain, ashore at Plymouth, at the counting house:
+  gave the packet to Mr Veale; the sealed packet is in Mr Veale's keeping."); where they do
+  not, or the verb moves nothing (`show`, `open`, `read`), the line is "..., as said;
+  nothing of the ship's changed" with the reason in brackets when a thing or a person was
+  named. A thing given to a person a model or the player holds lies before him (`spot`
+  "before Mr Pearce"), and his own `take` makes it his. The line is the order's kind
+  `free.line`, notable, in the words as used with the verb put in the past, heard by the
+  stations held within the giver's reach (`Harness.hear`; `free.line` among
+  `WORDS_BETWEEN_PEOPLE`, its hearers named, so that `stand_by('a word on deck')` wakes
+  there and nowhere else), read by the director in his sample as the deck's conversation,
+  and journaled as the order it is. Every station's, with the deck or without
+  (`Domain.why_not` allows the object `free` as it does `needs` and `glass`; `tools.
+  own_order` exempts it from the deck's check, with the needs).
+- **Transactions** (`orders._aboard_transaction`, `_freight`; `places.Purse.receive`,
+  `pay_to`, `owe`, `ledger`; `places.Hold.freight`, `freights`): `aboard: <a sum> paid into
+  the purse by <payer>[ for <cause>]`, `... paid from the purse to <payee>[ for ...]`, `a
+  debt of <a sum> owed to|by <party>`, and `<n> tons of <good> freighted by <freighter>[ at
+  <place>][ for <port>]`. The sum is read in the clerk's figures or words (`read_sum`:
+  "£30", "£6 10s", "twenty guineas" at twenty-one shillings, "thirty pounds ten
+  shillings"). Each is written in the purse's or the hold's own ledger with its cause (the
+  purse's `entries` as every sum's, "paid by Mr Veale, twenty guineas (£21)", and its
+  `ledger` of the channel's kinds `received`, `paid`, `owed`, `owing` with the party and the
+  purse after) and as a notable line of the purser's books or the manifest in the play log
+  (`purse.received`: "Paid into the purse by Mr Veale, twenty guineas (£21); the purse
+  £55."; `purse.paid`; `purse.owed`; `hold.freighted`), the director's log keeping the act.
+  A sum paid out beyond the purse is refused ("nothing is paid below nothing"); a debt moves
+  no money. A freight is the market's own form at no price: off by the port's lighter where
+  she lies in port (the market's `lighter` job, its line "came off by the lighter ... and
+  were struck down into the hold"), struck down at once where the freighter is aboard, the
+  manifest written with its cause; the hold's room for it is what is left after the
+  purchases in the boat and the lighter (`_tons_coming`). The `purse` reading carries
+  `ledger` and `debts` only once there are any. **The doubt** (`_doubt_aboard_new`): money or goods from nobody, or
+  from a person the world does not know; a payer, payee or freighter neither aboard nor at a
+  port she lies within `BOAT_REACH_NM` of; a sum beyond the port's means
+  (`business.port_means_pounds`: the business's largest cargo, 120 tons, at the dearest
+  price of the port's market as of the day; judgement); a freight to a ship in no port by a
+  freighter not aboard. **The reach**: a held person's own payment, freight or debt owed by
+  him is refused (his holder's word).
+- **The director's brief** (`DIRECTOR_BRIEF`) gives a thing made or moved and the four
+  transactions among the examples and says that his words move no money and no thing,
+  that a sum changes only by a transaction with its cause, that nothing is set, the reach
+  for a held person's keeping, and that the free lines are the people's, read in his
+  sample. The dispatches brief's examples gain the sum paid, the freight and a letter left
+  on the cabin table; the dispatches scenario carries the packet as a thing in the
+  captain's keeping, from the Custom House.
+
+**Taken another way.** (1) *The lead's reading had a freight the hold cannot stow doubted*:
+it is refused in words, as a payment below nothing is. The hold's tons are the game's (the
+cargo stays the hold's, item 1), so no reason makes room; entered again with a reason it is
+logged as attempted, the honest road for an order the game cannot perform. (2) *A sum
+beyond a port's means "by the business's figures"*: the business keeps no figure of a
+port's money, so the bound is made of the figures it has (its largest cargo at the port's
+dearest price), judgement in the tuning notes. (3) *The lead's reading had the free verbs
+"one list in the vocabulary with the verb's class `free`"*: they are verbs of the object
+`free` beside a `free_lines` list naming the class with `eat` and `drink`, since `hand` is
+the sail's word already and `eat` and `drink` keep their object `needs` unchanged; `hand`
+is a giving only with "to" and no sail after it. (4) *Show, open and read*: the game keeps
+nothing of a thing's being seen, opened or read (locks, seals and a thing's contents are
+kept out), so each is "as said" whatever the words name. (5) The places' reading carries
+the things lying there; a hidden thing is no different from one put down (no flag kept),
+and every station reads it until the place's knowledge (package 65) decides who sees what
+in a place.
+
 ### 18. Truths for 7b-iv
 
 - 100. A person who goes below is below in the muster and the state; an order of the
@@ -927,6 +1047,38 @@ orders posted, in the book in the master's rank and firing; both books in the li
 mark from the officer's station; the save replayed to the same digest and the same books. No
 recorded passage's pin moved: none moves a person, goes ashore or drafts a book, and the
 place's checks muster nobody.
+
+Package 53b's (§17a):
+
+- 114. A thing made by the director in the cabin is given by the captain to a person ashore
+  by a free line when he is there, is in that person's keeping in the people's reading and
+  the truth, and stays there through a save and a replay.
+- 115. A free line that names nothing known is logged "as said; nothing of the ship's
+  changed" and moves nothing, and `eat` and `drink` log as before.
+- 116. `aboard: twenty guineas paid into the purse by Mr Veale` with Mr Veale ashore at the
+  ship's port credits the purse with the ledger's line, is doubted with him thirty miles
+  off, and a payment below nothing is refused.
+
+**As built (package 53b; `tests/test_known_truths.py`, truths 7b-114 to 7b-116).** The
+schooner at seed 7 at anchor in Carrick Road, her master who commands the player at the
+prompt, the director's orders given at his door as the player's seat gives them (inputs,
+replayed through the door). 7b-114: Mr Veale made a clerk ashore at Falmouth (at the
+counting house by his role) and the packet on the cabin table; from the quarterdeck `give
+the packet to Mr Veale` is "as said" (the packet in the cabin); below, `take the packet`;
+ashore by the boat with it in his keeping, at the counting house, `give the packet to Mr
+Veale` moves it, and the people's words, the reading and the truth say it is Mr Veale's;
+the save replayed to the same digest and the same things, and a checkpoint holds them.
+7b-115: ten free lines of the verbs, each naming nothing the world knows, each a notable
+line ending "as said; nothing of the ship's changed", journaled, the things, the purse, the
+hold and the people as they were; `eat a fine meal` and `drink three cups of wine` answered
+to him alone, no line of the log, the words in the record. 7b-116: the twenty guineas paid
+by Mr Veale at Falmouth undoubted, the purse £21 the richer, its ledger "Paid by Mr Veale,
+twenty guineas (£21); the purse ..." and the purser's notable line, the director's log
+"director.order"; in the same water with Mr Veale made at Plymouth instead, thirty-four
+miles off, the same order doubted (neither aboard nor at a port she lies within a boat's
+reach of) and nothing paid; a sum from the purse a pound beyond it refused "nothing is paid
+below nothing", the purse as it was. No recorded passage's pin moved: none has a thing, a free line or a payment by the
+channel, and every reading's new key is there only when one is.
 
 ## Part 7b-v: Needs
 

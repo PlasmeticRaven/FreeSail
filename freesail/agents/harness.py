@@ -432,7 +432,8 @@ NO_PERSON_ANSWER_WORDS = (
 # The lines of words said between people (package 52; spec M7b §15, the owner's note 15 of
 # gate m6a-2): a word told, a question put, an answer, a person's words. Heard by a
 # station within earshot of the speaker, each counts as "a word on deck" for its stand-by.
-WORDS_BETWEEN_PEOPLE = ("agent.told", "agent.asked", "agent.said", "person.spoke")
+# A free line (package 53b, `free.line`) is heard so too, by the stations it names.
+WORDS_BETWEEN_PEOPLE = ("agent.told", "agent.asked", "agent.said", "person.spoke", "free.line")
 WORD_ON_DECK = "a word on deck"  # the event's words (`readings.EVENTS`)
 
 # The nudge (spec §11), in the consent brief's voice: what was seen, what may be done.
@@ -1406,7 +1407,7 @@ class Harness:
         data = e.data or {}
         if name in (data.get("heard_by") or ()):
             return True
-        if e.kind == "person.spoke":
+        if e.kind in ("person.spoke", "free.line"):
             return False  # its hearers are named
         speaker = str(
             data.get("speaker") or (data.get("station") if e.kind == "agent.said" else "")

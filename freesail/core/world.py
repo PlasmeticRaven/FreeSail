@@ -232,6 +232,12 @@ class Scenario:
     # machine's defaults (`freesail.world.crews`); the drivers' flags override it. Left out
     # of the dict when None.
     crewed: dict[str, Any] | None = None
+    # Package 53b (spec M7b §17a): the things aboard or ashore at the start, each the words
+    # an `aboard:` order makes one from ("a sealed packet, in the captain's keeping, from the
+    # Custom House") or {name, where, description}; made with the people
+    # (`People._scenario_things`). Left out of the dict when there are none, so that a save
+    # of a game without them reads as it did.
+    things: list[Any] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -249,6 +255,8 @@ class Scenario:
             d.pop("business", None)
         if not d.get("crewed"):
             d.pop("crewed", None)
+        if not d.get("things"):
+            d.pop("things", None)
         return d
 
     @classmethod
@@ -1539,11 +1547,12 @@ class World:
         if (
             captain is not None
             and actor == "captain"
-            and not kind.startswith(("agent.", "seat.", "query."))
+            and not kind.startswith(("agent.", "seat.", "query.", "free."))
         ):
             # the player's hand on an intent scenario (decision 41; package 40c): an order
             # of the ship's at the prompt, not a station's sentence nor a reading, and the
-            # rules-based captain stands aside until 'captain: carry on'
+            # rules-based captain stands aside until 'captain: carry on'; a free line
+            # (package 53b) is a person's own and no order of the ship's
             captain.player_hand(text)
         if kind == "evolution.started" and not data.get("failed"):
             # the evolution runner writes its own "started" line; avoid saying it twice

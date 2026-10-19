@@ -278,6 +278,42 @@ the standing orders
 # rejected: draft a book "worse": buy tin
 ```
 
+**Things, and the free lines** (package 53b; spec M7b §17a). A thing is a sealed packet, a cask of brandy, a letter: a name, a few words of what it is, and where it is, nothing more. It lies in a place aboard at the spot the words say ("on the table" in the cabin), or at a place ashore, or it is in somebody's keeping, and then it goes where he goes: into the boat with him, ashore to the counting house, back aboard. The scenario puts things aboard at the start (`things:` in its file; the dispatches give the captain the Custom House's packet), and the director, or you as the owner, makes them (chapter 20). You meet a thing where it is: `the people` ends a man's words with what he keeps (*Mr Veale, clerk: ashore at Plymouth, at the counting house, a sealed packet in his keeping.*), `the places` says what lies in each place aboard (*In the cabin: a sealed packet on the table.*), `the places ashore` what lies at each place of the port.
+
+What you do with a thing you say in your own words, after one of a short list of verbs: `give <a thing> to <a person>` (or `hand ... to ...`, or `give Mr Veale the packet`), `show ... to ...`, `take <a thing>` (or `pick up`), `stow <a thing> in <a place>`, `hide ...`, `put <a thing> on the table`, `open ...`, `read ...`, `throw <a thing> overboard`; `eat` and `drink` are of the same kind and work as they always did. The words after the verb are taken as said. **Where they name a thing the world knows within your reach** (in your keeping, or lying where you are: your place aboard, or within earshot of it on the open deck; ashore, your place of the port) and, for a giving, a person within the same reach, the thing moves and the log says where it is now. **Where they do not**, the log takes the line as said and moves nothing, saying so: *as said; nothing of the ship's changed*, with the reason when you named a thing or a person (it is in the cabin and you are on deck; he is ashore and you are aboard). Showing, opening and reading move nothing, ever. A thing handed to a person a model or another player holds lies before him until his own hand takes it. Each line is a notable line of the log in your words, heard by whoever stands within earshot.
+
+```
+By the captain, on the quarterdeck: gave the packet to Mr Veale, as said; nothing of
+the ship's changed (Mr Veale is ashore at Plymouth, at the counting house, out of your
+reach).
+The captain went below to his cabin; the deck is the officer of the watch's.
+By the captain, in the cabin: took the packet; the sealed packet is in the captain's
+keeping.
+Mr Bowen landed at the quay at Plymouth.
+Mr Bowen went to the counting house at Plymouth: the merchants' business: freights,
+bills and cargoes for another port.
+By the captain, ashore at Plymouth, at the counting house: gave the packet to Mr Veale;
+the sealed packet is in Mr Veale's keeping.
+```
+
+**Money is paid, not said.** Mr Veale may say he pays twenty guineas; the purse is what it was until the sum is paid, and the purser's books then say who paid it and what the purse holds after (*Paid into the purse by Mr Veale, twenty guineas (£21); the purse £55.*). A freight comes off by the port's lighter at no price and is written in the manifest with whose it is and where it goes; a debt is entered in the purser's books and moves no money. These are the director's to give (chapter 20), never a figure set: `the purse` reads the pounds, and the sums and debts with their causes once there are any.
+
+```orders frigate plain-sail
+give the packet to Mr Veale
+hand the letter to the master
+take the packet
+put the packet on the table
+hide the letter in the bread locker
+stow the cask in the hold
+show the chart to the master
+open the packet
+read the letter
+throw the empty bottle overboard
+eat a fine meal
+drink three cups of wine
+# rejected: give
+```
+
 ## Getting under way, with the tide
 
 Chapter 13's `weigh` is the anchor and nothing else: heave short, break out, cat and fish, and she lies with the anchor at the bows and no sail set, which is what the word meant. `get under way` is Luce's whole sequence (ch. XXI): all hands up anchor, the messenger passed and the bars shipped; heave short; the sail-loosers aloft and the topsails let fall, sheeted home and hoisted; the after yards braced for the tack she is to cast on and the head yards abox; heave round until the cable is up and down and the anchor is aweigh; the jib hoisted and the helm a-lee for the stern-board; and when she has paid off seven points, the head yards braced round and the spanker set, the anchor catted and fished as she gathers way. From the outer road a frigate is twenty-five minutes about it and comes out under topsails and jib at four knots.
@@ -380,10 +416,15 @@ The market is the trade the port lived by, brandy, geneva, rum, tea and tobacco 
 | `give the book "<title>" to the boat` | | a manifest's bargains struck together, the boat sent once |
 | `the books` | | the books drafted, with their marks |
 | `show the book "<title>"` | `read the book "<title>"` | one book's page |
+| `give the packet to Mr Veale` | `hand the packet to Mr Veale`, `give Mr Veale the packet` | a thing within your reach into his keeping, he within it; else "as said; nothing of the ship's changed" |
+| `take the packet` | `pick up the packet` | a thing lying where you are into your keeping |
+| `put the packet on the table` | `stow the cask in the hold`, `hide the letter in the bread locker` | a thing within your reach put down where you are, or in a place within earshot |
+| `throw the packet overboard` | `toss the bottle over the side` | a thing within your reach over the side |
+| `show the chart to the master` | `open the packet`, `read the letter` | said; nothing moves |
 | `ask the pilot about the channel` | `ask the pilot for the marks`, `ask the pilot about the anchorage`, `ask the pilot when the tide serves`, `ask the pilot for the news` | the port file's words, and the world's high water at the port |
 | `the places` | | the places aboard, each a name and a description |
 | `the manifest` | `the cargo`, `the hold` | the cargo by tons and the room left |
-| `the purse` | `the money` | the pounds in hand |
+| `the purse` | `the money` | the pounds in hand, and the sums paid in and out and the debts with their causes |
 | `the stores` | | the water by the ton and the provisions by the day, and for how long at the allowance she is at |
 | `short allowance` | `put the people to short allowance`, `half allowance` | the company at half the whole, every man alike; the stores last twice as long and the hands tire the faster |
 | `whole allowance` | `full allowance`, `back to full allowance` | the company back at the whole allowance |

@@ -674,3 +674,69 @@ def test_the_hold_crosses_the_promotion_both_ways():
     K.demote(w, v)
     assert v.crew is None and v.plan[0][0] == "lie_to"
     assert v.brain.over_head is not None and v.brain.over_head["order"] == "heave to"
+
+
+# ---------------------------------------------------------------------------
+# Package 53b: things made and moved by the aboard channel (spec M7b §17a)
+# ---------------------------------------------------------------------------
+
+
+def test_the_aboard_channel_makes_and_moves_a_thing_never_doubted_made_and_keeps_the_reach():
+    """`aboard: <a thing>, <where>` makes a thing (a thing made wants no cause of the
+    sea's, and is never doubted), and `aboard: the <thing>, <where>` moves one known; no
+    thing is put into or taken out of the keeping of a person the player or a model holds
+    (the player at the prompt holds the captain), the refusal saying to leave it where he
+    can take it; the table's things and the old refusal's forms stand."""
+    from freesail.world import things as TH
+
+    w = world_for()
+    for text in (
+        "aboard: a sealed packet, on the cabin table, from the Custom House",
+        "aboard: a cask of brandy, in the hold",
+    ):
+        o = WO.parse(text)
+        assert WO.doubt(w, o) is None and WO.reach(w, o) is None
+        assert w.world_order(text, "the test").data["result"] == "done"
+    packet, cask = TH.things_of(w)
+    assert (cask.name, cask.place) == ("a cask of brandy", "hold")
+    master = w.people.find("the master")
+    e = w.world_order("aboard: the packet, in the keeping of the master", "the test")
+    assert e.data["result"] == "done" and packet.keeper == master.id
+    assert e.text.endswith(f"it was on the table in the cabin, and is in {master.name}'s keeping.")
+    e = w.world_order("aboard: the cask, in the captain's keeping", "the test")
+    assert e.data["result"] == "refused" and "leave it where he can take it" in e.text
+    assert "the stations held now: the captain" in e.text and not cask.keeper
+    TH.put(packet, {"keeper": w.people.captain.id})
+    e = w.world_order("aboard: the packet, in the hold", "the test")
+    assert e.data["result"] == "refused" and "nothing is taken out of a held person's" in e.text
+    # the scenario and the table's things as they were
+    assert (
+        w.world_order("aboard: a cask found stove [reason: x]", "the test").data["result"] == "done"
+    )
+    e = w.world_order("aboard: the cook reports the beef cask found rotten", "the test")
+    assert e.data["result"] == "refused" and "a thing made or moved" in e.text
+
+
+def test_a_thing_moved_by_no_hand_that_could_carry_it_is_doubted_and_a_replay_keeps_it():
+    """A thing moved between the ship and a port beyond a boat's reach, or from one port to
+    another, is doubted; a thing made is not. Made and moved by orders, the things are
+    the same after a replay and a checkpoint, as the people are."""
+    from freesail.core.events import for_the_record
+    from freesail.world import things as TH
+
+    w = world_for(ports=["falmouth", "brest"])
+    w.world_order('person: make "Mr Veale", a clerk, ashore at Falmouth', "the test")
+    w.world_order("aboard: a sealed packet, on the cabin table", "the test")
+    o = WO.parse("aboard: the packet, in the keeping of Mr Veale")
+    assert "no boat carries it so far" in WO.doubt(w, o)
+    o = WO.parse("aboard: a sealed letter, ashore at Brest")
+    assert WO.doubt(w, o) is None  # made, never doubted
+    w.world_order("aboard: the packet, ashore at Falmouth", "the test")
+    o = WO.parse("aboard: the packet, ashore at Brest, at the market")
+    assert "from one port to another" in WO.doubt(w, o)
+    w.world_order("aboard: a cask of brandy, in the hold", "the test")
+    w.run(120)
+    back = replay.replay_world(w, ship_factory)
+    assert [t.to_dict() for t in TH.things_of(back)] == [t.to_dict() for t in TH.things_of(w)]
+    assert back.log.digest() == w.log.digest()
+    assert not [e for e in w.log.all() if "brandy" in e.text and not for_the_record(e)]

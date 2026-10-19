@@ -52,7 +52,7 @@ from freesail.world.captains import plain_position
 from freesail.world.geo import Position, bearing_and_distance
 from freesail.world.ships import land_crossing
 
-__all__ = ["BUSINESS_PATH", "Business", "business_density", "load_business"]
+__all__ = ["BUSINESS_PATH", "Business", "business_density", "load_business", "port_means_pounds"]
 
 BUSINESS_PATH = Path(__file__).resolve().parents[2] / "data" / "business.yaml"
 # The draw's cadence: once an hour of ship's time (judgement: the roll-up's hours).
@@ -98,6 +98,30 @@ def business_density(value: Any) -> float:
     if density < 0.0:
         raise ValueError(f"business: {density:g} is less than nothing")
     return density
+
+
+def port_means_pounds(world: Any, port: Any) -> float | None:
+    """The most a hand at a port pays in one sum, by the business's figures (package 53b;
+    spec M7b §17a, the doubt of a sum beyond a port's means): the largest cargo the
+    business carries (`cargo_tons`' upper figure) at the dearest price of the port's market
+    as of the day, a whole trader's lading bought outright. None for a port whose market
+    deals in nothing, which bounds no sum. Judgement: the business keeps no figure of a
+    port's money, and a merchant's sum beyond a full cargo of the port's dearest good is
+    beyond what the period's counting house paid across a table."""
+    goods = getattr(getattr(port, "market", None), "goods", None) or {}
+    if not goods:
+        return None
+    tons = float((load_business().get("cargo_tons") or [30, 120])[-1])
+    prices = []
+    for name, good in goods.items():
+        try:
+            # the price as of the day, read and nothing settled (a doubt changes nothing)
+            prices.append(
+                float(port.market.price(name, world.clock.ship_time, world.nations, port.nation))
+            )
+        except Exception:  # noqa: BLE001  (a port read outside its world: the table's price)
+            prices.append(float(good.price))
+    return max(prices) * tons if prices else None
 
 
 @dataclass

@@ -25,11 +25,19 @@ wind:
   variability: 0.3
 
 # The captain's intent (spec M6 §4): the rules captain sails by it when nobody holds the
-# station; a model captain reads it as his night orders.
-intent: trade tin from Falmouth to Plymouth
+# station; a model captain reads it as his night orders. Copper ore, which Falmouth sells
+# and Plymouth buys (Plymouth's market has no tin: the dispatches test's finding 7).
+intent: trade copper ore from Falmouth to Plymouth
 
 people:
   - {role: master, skill: 0.9}
+  - {role: mate, skill: 0.7}   # the officer of the watch's person by the wardroom file (finding 8)
+
+# The packet as a thing (spec M7b §17a; package 53b): in the captain's keeping from the
+# start, where it goes with him, is given by a free line ('give the packet to Mr Veale') to
+# a person within his reach, and is found where it lies by anyone who looks.
+things:
+  - a sealed packet, in the captain's keeping, from the Custom House
 
 papers:
   chart: {year: 1804}

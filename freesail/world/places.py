@@ -315,14 +315,21 @@ def ashore_place_of(port: Any, role: str) -> str:
     return DEFAULT_ASHORE
 
 
-def port_place_lines(port: Any, people_there: dict[str, list[str]] | None = None) -> list[str]:
+def port_place_lines(
+    port: Any,
+    people_there: dict[str, list[str]] | None = None,
+    things_there: dict[str, list[str]] | None = None,
+) -> list[str]:
     """`the port`'s places in words, one a line: each with what is done there and who is
-    found there, the people of the world ashore there by name after them."""
+    found there, the people of the world ashore there by name after them, and the things
+    lying there after them (package 53b)."""
     out = []
     for p in port_places(port).values():
         names = (people_there or {}).get(p.id) or []
         found = p.found + (f"; and {', '.join(names)}" if names else "")
-        out.append(f"{p.name[:1].upper()}{p.name[1:]}: {p.done}; found there, {found}.")
+        things = (things_there or {}).get(p.id) or []
+        lying = f"; lying there, {', '.join(things)}" if things else ""
+        out.append(f"{p.name[:1].upper()}{p.name[1:]}: {p.done}; found there, {found}{lying}.")
     return out
 
 
@@ -343,6 +350,9 @@ class Hold:
 
     capacity_tons: float
     goods: dict[str, float] = field(default_factory=dict)
+    # the freights engaged (package 53b; `freight`): (tick, tons, good, the words with the
+    # cause); none for a hold the channel has not touched, or of a checkpoint from before
+    freights: list[tuple[int, float, str, str]] = field(default_factory=list)
 
     @property
     def stowed_tons(self) -> float:
@@ -367,17 +377,29 @@ class Hold:
         else:
             self.goods[good] = left
 
+    def freight(self, tons: float, good: str, words: str, tick: int) -> None:
+        """A cargo freighted (spec M7b §17a; package 53b): the hold's ledger line with its
+        cause ('10 tons of wool freighted by Mr Veale at Plymouth for Falmouth'), written
+        when the freight is engaged; the goods are stowed when they come off."""
+        if getattr(self, "freights", None) is None:
+            self.freights = []  # a checkpoint from before
+        self.freights.append((tick, float(tons), str(good), str(words)))
+
     def lines(self) -> list[str]:
-        """The manifest's lines: the room and the cargo by tons."""
+        """The manifest's lines: the room and the cargo by tons, and the freights engaged
+        with their causes where there are any."""
         if self.capacity_tons <= 0:
             return ["No room for a cargo: the hold is her own stores and ballast."]
         head = (
             f"The hold stows {_tons(self.capacity_tons)} of cargo; "
             f"{_tons(self.stowed_tons)} in it and room for {_tons(self.room_tons)}."
         )
+        freights = [
+            f"{w[:1].upper()}{w[1:]}." for _t, _n, _g, w in getattr(self, "freights", None) or []
+        ]
         if not self.goods:
-            return [head, "No cargo aboard."]
-        return [head, *(f"{_tons(t)} of {g}." for g, t in self.goods.items())]
+            return [head, "No cargo aboard.", *freights]
+        return [head, *(f"{_tons(t)} of {g}." for g, t in self.goods.items()), *freights]
 
     def words(self) -> str:
         if not self.goods:
@@ -396,6 +418,61 @@ class Purse:
 
     pounds: float = 0.0
     entries: list[tuple[int, float, str]] = field(default_factory=list)  # (tick, change, why)
+    # the transactions of the world-order channel (spec M7b §17a; package 53b): each line
+    # (tick, kind, pounds, the payer or the payee, the words), the kinds `received` (paid
+    # into the purse by someone), `paid` (paid from it to someone), `owed` (a debt the ship
+    # owes) and `owing` (a debt owed to her); the money's own lines are in `entries` as
+    # every sum's are. Empty for a purse the channel has not touched, and for a checkpoint
+    # from before (`ledger_of`), so that a world without them reads as it did.
+    ledger: list[tuple[int, str, float, str, str]] = field(default_factory=list)
+
+    def receive(self, pounds: float, by: str, words: str, tick: int) -> str:
+        """A sum paid into the purse by someone: the purse's line and the ledger's, with
+        its cause. Returns the ledger's words ('paid by Mr Veale, twenty guineas; the purse
+        £55')."""
+        self.take(pounds, f"paid by {by}, {words}", tick)
+        line = f"paid by {by}, {words}; the purse {self.words()}"
+        self._ledger().append((tick, "received", float(pounds), by, line))
+        return line
+
+    def pay_to(self, pounds: float, to: str, words: str, tick: int) -> str:
+        """A sum paid from the purse to someone; ValueError in words below nothing (a
+        payment is refused, never a purse below nothing)."""
+        self.pay(pounds, f"paid to {to}, {words}", tick)
+        line = f"paid to {to}, {words}; the purse {self.words()}"
+        self._ledger().append((tick, "paid", float(pounds), to, line))
+        return line
+
+    def owe(self, pounds: float, party: str, words: str, tick: int, to_us: bool = False) -> str:
+        """A debt entered, owed by the ship to the party or (`to_us`) by the party to her:
+        no money moves, the ledger keeps it."""
+        line = (
+            f"a debt of {words} owed by {party} to the ship"
+            if to_us
+            else f"a debt of {words} owed to {party}"
+        )
+        self._ledger().append((tick, "owing" if to_us else "owed", float(pounds), party, line))
+        return line
+
+    def _ledger(self) -> list[tuple[int, str, float, str, str]]:
+        if getattr(self, "ledger", None) is None:
+            self.ledger = []  # a checkpoint from before
+        return self.ledger
+
+    def ledger_lines(self, last: int = 6) -> list[str]:
+        """The channel's transactions in words, the last `last` of them: what a reader of
+        the purser's books sees beside the sum."""
+        return [line[:1].upper() + line[1:] + "." for *_x, line in self._ledger()[-last:]]
+
+    def debts_words(self) -> str:
+        """The debts standing in words ('owed to the chandler at Plymouth, £30'), or ""."""
+        out = []
+        for _t, kind, pounds, party, _w in self._ledger():
+            if kind == "owed":
+                out.append(f"owed to {party}, {pounds_words(pounds)}")
+            elif kind == "owing":
+                out.append(f"owed by {party}, {pounds_words(pounds)}")
+        return "; ".join(out)
 
     def pay(self, pounds: float, why: str, tick: int) -> None:
         if pounds > self.pounds + 1e-9:

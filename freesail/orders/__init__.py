@@ -109,8 +109,20 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
         # verb's words with no sail in them, the port's business (package 35)
         stores = _stores_order(text)
         if stores is None:
+            from freesail.orders import free
+
+            if free.hand_line(text):
+                # 'hand the packet to Mr Veale' (package 53b): the sail's word with no sail
+                # after it and a person to hand to, a free line's giving
+                return free.execute(ship, text, "give", "hand")
             raise
         order = stores
+    if vocab.verbs.get(order.verb) is not None and vocab.verbs[order.verb].object == "free":
+        # a free line (spec M7b §17a; package 53b): the words as used, the thing moved where
+        # they name one and "as said" where they do not; given from wherever he is
+        from freesail.orders import free
+
+        return free.execute(ship, text, order.verb, order.verb_phrase)
     if order.verb in vocab.readings:
         # a reading asked at the prompt (package 33c): a query, in the registry's words
         return prompt.answer(ship, order, text, vocab)

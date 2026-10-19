@@ -18,6 +18,8 @@
 #   query     nothing: a question answered in the log and never journaled
 #   needs     a person's own: eat, drink, sleep (package 54), answered to him alone
 #   allowance the people's allowance of provisions, the captain's (package 54)
+#   free      a free line: any words after the verb, a thing moved where they name one
+#             and "as said" where they do not (package 53b; `free_lines` below)
 # `level` is the control ladder level of docs/DesignProposal.md §2.2.
 # ---------------------------------------------------------------------------
 verbs:
@@ -1299,6 +1301,49 @@ verbs:
     synonyms: [glass on, put the glass on, train the glass on, the glass to]
     object: glass
     level: reading
+  # The free lines (spec M7b §17a; package 53b; `freesail/orders/free.py`): a person's own,
+  # at whatever station he holds (object `free`, every station's but the director's, who
+  # has no hands aboard). The words after the verb are taken as said: where they name a
+  # thing known and a person or a place within reach, the thing moves; where they do not,
+  # the line is logged "as said; nothing of the ship's changed". `hand ... to ...` is the
+  # same as `give` (a bare `hand` is the sail's, `take in`). Each is said in the log as a
+  # word heard where it is said.
+  give:
+    synonyms: []
+    object: free
+    level: 1
+  show:
+    synonyms: []
+    object: free
+    level: 1
+  take:
+    synonyms: [pick up]
+    object: free
+    level: 1
+  stow:
+    synonyms: []
+    object: free
+    level: 1
+  hide:
+    synonyms: [conceal]
+    object: free
+    level: 1
+  put:
+    synonyms: []
+    object: free
+    level: 1
+  open:
+    synonyms: [unseal, break the seal of]
+    object: free
+    level: 1
+  read:
+    synonyms: []
+    object: free
+    level: 1
+  throw:
+    synonyms: [toss]
+    object: free
+    level: 1
   # Console and client control. If one of these reaches the ship, the
   # captain typed it at the wrong prompt; say so.
   hold:
@@ -1313,6 +1358,13 @@ verbs:
     synonyms: [tick, speed up, slow down]
     object: driver
     level: driver
+
+# The free lines' verbs (spec M7b §17a; package 53b): the class of orders that take any words
+# after the verb and do what the game can with them, no more. `give` to `throw` are object
+# `free` (`freesail/orders/free.py`); `eat` and `drink` are the needs' (object `needs`,
+# package 54), of the same class and unchanged: the words after them are taken and kept in
+# the record, the answer the person's alone.
+free_lines: [give, hand, show, take, stow, hide, put, open, read, throw, eat, drink]
 
 # ---------------------------------------------------------------------------
 # Which evolution a level 1 sail verb starts, by sail class (spec §8.4).
