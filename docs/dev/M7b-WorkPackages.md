@@ -39,7 +39,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 63 | Opus | The boat (spec §21k; the owner, 2026-10-18): towing by the boat by an oar force on the hull, the boat as a vessel the player can pull or sail (the seat on another vessel), the kedge's false denial mended; kedging itself needs no package, the pull being in the anchor physics already | brief to write; after 51 |
 | 64 | Fable | The harbour's second pass (spec §21d, "The owner's first use"; the owner, 2026-10-18): the page made clear to a newcomer, the flags explained where they are set, several models and stations configured without several settings files, the maker given the papers (the chronometer first) and the people aboard by name with a short brief each per scenario | noted, not immediate; the owner's word of 2026-10-18: a Fable package after Thursday's usage reset, a proper design run so that starting a game is streamlined with every option kept (the framework functions; it wants a finer touch) |
 | 65 | Fable | The place's knowledge (spec §14, "Brought back and forward"; the owner, 2026-10-19): what a person perceives from where he stands, aboard and ashore (the readings, the log and the sightings by place; the ship reaching him ashore by report, boat or letter), the books and papers kept in places, the always-present line of his own place and state in every sample, and the drill extended to going below, eating, drinking, reading a book and coming on deck; and each kind of work done in its own place (the sailmaker's sail room, the master's gunroom, the captain's cabin), the same for the rules' person and for a model or the player at the station doing the same work (the owner, 2026-10-19) | provisional; the deferred locational knowledge of decision 47 brought back and forward at the owner's word after the dispatches test; brief after the owner's testing round |
-| 53b | Opus | Things, free lines and transactions (spec §17a; the owner's question of 2026-10-19 after the dispatches test): a thing made, moved and kept as people are, with a place and a keeper and nothing more; a short list of verbs taking free words and logging them as used, moving a thing where the words name one and saying "as said" where they do not; a sum or a cargo paid, freighted or owed as a transaction with its cause in the ledger, never a variable set; the refinement pass on 53 the owner is looking at | provisional; brief after the owner's testing round |
+| 53b | Opus | Things, free lines and transactions (spec §17a; the owner's question of 2026-10-19 after the dispatches test): a thing made, moved and kept as people are, with a place and a keeper and nothing more; a short list of verbs taking free words and logging them as used, moving a thing where the words name one and saying "as said" where they do not; a sum or a cargo paid, freighted or owed as a transaction with its cause in the ledger, never a variable set; the refinement pass on 53 the owner is looking at | briefed, approved ("as written") and launched 2026-10-19 |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
 
 ## The testing round after 59 (the owner, 2026-10-18)
@@ -858,6 +858,90 @@ console stays as it is. Each item an intent with the lead's reading; the intent 
    `time` a console command, from the lead's wave-2 playtest); the README's start line
    (`py -m freesail`); the primer's first chapter; §21d, §21e as built; the tuning notes
    (found on the way, the Windows pieces tested by path, pins unmoved by digest, the suite).
+
+## Package 53b: things, free lines and transactions (`freesail/world/people.py` or `things.py` new beside it for a thing made, kept and moved; `freesail/world/orders.py` the `aboard:` forms for a thing made and a sum or cargo paid, freighted or owed; `freesail/orders/` and `data/vocabulary.yaml` the free verbs; `freesail/world/places.py` a thing in a place; `freesail/world/business.py` or where the purse's ledger lives, the transaction's line; `freesail/api/readings.py` a thing in the people's and the place's readings and the truth; `freesail/agents/director.py` the brief's examples; `docs/agents/Harness.md`; the primer's chapter 14 and the director's; `docs/TechnicalSpec-M7b.md` §17a as built; `docs/dev/TuningNotes.md`; `tests/test_people.py`, `test_world_orders.py`, `test_director.py`, `test_business.py`, `test_known_truths.py` truths 114 to 116)
+
+Opus; a day's package on the people's machinery, after the dispatches test (`docs/playtests/
+2026-10-18-dispatches-director-test/`, where the packet was handed over in words and the
+twenty guineas never reached the purse). Spec M7b §17a (the owner's question and the
+lead's answer of 2026-10-19, approved "as written"); decisions 46 and 50; §14's places and
+§8's people made from words. The ground: a person is made from words (`person: make`), kept
+in a place aboard or ashore (`People`, `places.py`, `movement.py`), moved by the player's
+and the director's orders, and heard where he is; the needs' orders `eat` and `drink`
+take any words after the verb and log them; the purse has a ledger of bought, sold and
+paid. Each item an intent with the lead's reading; the intent binds. **No variable is set
+by any order of this package**: a sum changes by a transaction with its cause, or not at
+all.
+
+1. **A thing is the people's sibling.** Made from words by the director (`aboard: a sealed
+   packet, in the captain's keeping`; `aboard: a cask of brandy, in the hold`; `person:
+   make` stays people's) and, where the scenario wants one, by the scenario file (a `things:`
+   list), with a name, a description, and where it is: a place of §14 aboard or ashore, or
+   a person's keeping; **nothing more** (no weight, size or value until a system needs
+   them, and the cargo's tons stay the hold's). It is kept and moved by the people's
+   machinery less their needs and their mouths: given to a person it is his and goes
+   where he goes, stowed it is in the place, left ashore it stays, carried in the boat it
+   is in the boat. It shows in the people's reading ("Mr Veale, clerk, at the counting
+   house, a sealed packet in his keeping"), the place's (`the cabin`: "a sealed packet on
+   the table"), the truth, and the save and the replay. *The lead's reading:* a `Thing`
+   dataclass in `people.py` or a small `things.py`, the `People` registry holding both, the
+   movement code reading "keeper or place" the same for either; the `aboard:` form's
+   doubt is the channel's as for a person made (never doubted: a thing made wants no
+   cause of the sea's), and the rule of reach is the person's: a thing is not put into the
+   keeping of a person a model or the player holds without that holder's own act, so the
+   director leaves it where the holder can take it ("on the cabin table") and says so.
+2. **Free lines.** A short list of verbs takes any words after it and does what the game can
+   with them, no more, and says so in the log in the words as used: `give <thing> to
+   <person>`, `hand ... to ...`, `show ... to ...`, `take <thing>`, `stow <thing> in
+   <place>`, `hide <thing> in <place>`, `put ... in/on ...`, `open <thing>`, `read <thing>`,
+   `throw <thing> overboard`, beside `eat` and `drink` as they are. Where the words name a
+   known thing and a known person or place (within reach: the same place, or the person
+   in earshot of §14), the thing moves and the log says so ("By the captain: gave the
+   packet to Mr Veale; it is in his keeping"); where they do not, the line is accepted as
+   said and nothing moves, the log saying **"as said; nothing of the ship's changed"** in
+   those words, so that the record and the replay stay honest and no model learns that
+   the ship did what it only said. A free line is a notable line heard where it is said
+   (a word on deck), so that the director reads it in his sample as he reads the deck's
+   conversation and answers in the story. *The lead's reading:* one list in the
+   vocabulary with the verb's class `free`, one handler in `freesail/orders/` that
+   resolves the names it can and logs the rest, the needs' `eat`/`drink` brought under the
+   same class without a change to what they do; the officer's and the captain's domains
+   both have the free verbs (they are the person's own, like eating), the lookout's and
+   the master's too for their own things; a free line never costs the day's acts for the
+   director, who gives none: his road to a thing is item 1 and his words.
+3. **Transactions, not variables.** `aboard: twenty guineas paid into the purse by Mr Veale`;
+   `aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth`; `aboard: a
+   debt of £30 owed to the chandler at Plymouth`: world orders of the `aboard:` channel,
+   each written in the purse's or the hold's own ledger with its cause ("paid by Mr Veale,
+   twenty guineas; the purse £55") and in the director's log as the act, replayed through
+   the inputs as every act is; **doubted** where implausible (a sum from nobody, a payer
+   not at the ship's port or aboard, a sum beyond a port's means by the business's
+   figures, a freight the hold cannot stow) and performed when entered again with a
+   reason. A sum paid *out* of the purse the same (`aboard: £6 paid from the purse to the
+   pilot`), refused below nothing. *The lead's reading:* the purse's existing ledger line
+   kinds gain `paid` and `received` with a payer or payee; the hold's cargo form is the
+   market's own (a cargo freighted is bought at no price, with a freight line); the
+   director's brief says that his words move no money and that a sum changes by this
+   form only, and gives the example.
+4. **The dispatches scenario and brief** gain the packet as a thing (`things:` in the
+   scenario: "a sealed packet, in the captain's keeping, from the Custom House"), and the
+   brief's examples the sum paid and the freight; `data/people/` is not touched.
+5. **Truths and the records.** Truth 114: a thing made by the director in the cabin is
+   given by the captain to a person ashore by a free line when he is there, is in that
+   person's keeping in the people's reading and the truth, and stays there through a save
+   and a replay; truth 115: a free line that names nothing known is logged "as said;
+   nothing of the ship's changed" and moves nothing, and `eat` and `drink` log as before;
+   truth 116: `aboard: twenty guineas paid into the purse by Mr Veale` with Mr Veale
+   ashore at the ship's port credits the purse with the ledger's line, is doubted with him
+   thirty miles off, and a payment below nothing is refused. §17a as built; the Harness
+   (the free verbs at each station, a thing in the readings); the primer's chapter 14 and
+   the director's chapter; the tuning notes (what moved, found on the way; pins unmoved by
+   digest: no recorded passage has a thing or a payment by the channel).
+
+**Kept out:** a thing's weight in the boat or the hold; its value at a market; a search by
+a person's action (a thing is found where it lies by anyone who looks); locks, seals and
+keys beyond the words; a developer's setter (the owner's prompt may have one later, the
+director's brief never).
 
 ## Package 62: the director's hand (`freesail/world/orders.py` the `ship "<name>": order ...` form, its doubt and its apply; `freesail/world/crews.py` `far_order` and `submit_far` for a far ship, her World's `submit` for a crewed one; `freesail/agents/director.py` the log's kinds and the brief's examples; `freesail/world/captains.py` only if a far captain's state must be told of an order given over his head; `data/director/briefs/*.yaml` the examples; `docs/agents/Harness.md` the director's section; the primer's director chapter; `docs/TechnicalSpec-M7b.md` §3 as built; `docs/dev/TuningNotes.md`; `tests/test_world_orders.py`, `test_director.py`, `test_known_truths.py` one truth after 7b-112)
 
