@@ -304,8 +304,7 @@ is kept among the words between people and 66's `WORD_KINDS` built on them, the 
 line's hearers being named in its data as 66's reach wants), ruff clean, the touched tests
 and the fast tier on the merged tree by the lead; the builder's fast tier (3,477 passed),
 whole slow tier (3,789 passed, the same 11 expected failures) and pace tests (6 passed)
-all passed on its tree; **the one whole slow tier on the merged pair, at the owner's word,
-is recorded below.** Built as briefed: the line (`readings.station_line`, `director_line`;
+all passed on its tree; **the one whole suite on the merged pair, at the owner's word: run once on `07538f6` with `--slow -m "not pace"`, every test passed with the same 11 expected failures and none failed, and the pace tests alone (load under 1) 6 passed.** Built as briefed: the line (`readings.station_line`, `director_line`;
 `Sample.you`, first in every sample; `how am I` answering with it), the "since" kept by the
 harness from the log (a person has no since of his own; adding one would have touched
 53b's registry); a model's own acting reply out of turn ends its stand-by, opens the turn
