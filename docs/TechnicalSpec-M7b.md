@@ -699,6 +699,21 @@ action and by what is there. Provisionally, then, and for the brief to settle:
 - **The drill.** Before the station brief, after the three calls of today, a short walk: go
   below, eat, drink, read a book from the library where it is kept, come on deck; each
   answered, so that the model has seen the places and its own line change before the game.
+- **Work in its place (the owner, 2026-10-19).** Each kind of work is done where it is
+  done: the sailmaker's in the sail room, the master's day's work and his sights' working
+  in the gunroom, the captain's writing (his book, a letter) in the cabin, the carpenter's
+  below at the damage, the purser's at the hold. Today the rules' people are occupied with
+  a place that is only "on deck" or "below" (`People.occupy`, the reckoning's master and
+  the mirrored persons), the muster's trades go to their trade's place when sent
+  (`TRADE_PLACES`, `movement.py`), and a station holder's own work moves him nowhere but
+  the master's, whose sights and day's work occupy him on deck and below through the same
+  reckoning whoever holds the station. 65 makes the work's place the room itself, the same
+  for the rules' person and for a model or the player at the station doing the same work
+  (the model master working the day's work goes to the gunroom and is occupied there, as
+  the rules' master is; the captain writing his standing orders is in the cabin), so that
+  the place's knowledge follows the work: the master below at his slate hears the deck by
+  report. Where a station holder's work and the rules' person's differ today, the brief
+  lists them and makes them one.
 - **What is not done yet.** Hearing by place is in (§14's earshot); the readings by place,
   the papers' places, the line and the drill are 65's. Decision 47's other dropped item,
   the papers kept in a place, comes with this one as far as the library is concerned and no
