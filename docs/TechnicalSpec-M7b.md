@@ -808,6 +808,61 @@ orders, the grants, the last handover note), with one notable `watch.deck_passed
 first lieutenant keeps no watch and keeps it until the captain takes it, and an officer whose
 relief nobody holds keeps it.
 
+### 17a. Things, free lines and transactions (package 53b, provisional; the owner and the lead, 2026-10-19)
+
+The owner's question after the dispatches test, where the packet was handed over in words
+and the twenty guineas never reached the purse: the director makes people with rigour, so
+he could make things the same way, but that invites a large design; eating and drinking
+already take any words after the verb and log them; so may a free order be accepted and
+logged for the story, and may the director change the purse, or any variable, outright?
+The lead's answer, which the owner may overrule, in three parts, none of them a new
+simulation:
+
+**Things are the people's sibling.** A thing is made from words as a person is (`aboard: a
+sealed packet, in the captain's keeping` or `person: make` for people), with a name, a
+description, where it is (a place aboard or ashore by §14's places, or a person's keeping)
+and nothing else until a system needs more; weight and size are not kept until the hold or
+the boat counts them, and cargo stays the hold's. It moves by hands and places, the game
+guaranteeing only its place and its keeper: given to a person it is his, stowed it is in
+the place, left ashore it stays there, and it is found where it is by anyone who looks (a
+boarding officer's search is the director's story, but the packet's place is the game's).
+It appears in the readings of the place and the person, in the people's words ("Mr Veale,
+clerk, at the counting house, a sealed packet in his keeping") and in the truth. Made,
+moved and kept by the same machinery as people, less their needs and their mouths.
+
+**Free lines.** A short list of verbs takes any words after it and does what the game can
+with them, no more, and says so in the log in the words as used: `give <thing> to
+<person>`, `hand`, `show`, `take`, `stow <thing> in <place>`, `hide`, `open`, `read`, `put`,
+`throw <thing> overboard`, beside `eat` and `drink`, which already work so. Where the words
+name a known thing and a known person or place, the thing moves; where they do not, the
+line is accepted as said and nothing moves, the log saying "as said; nothing of the ship's
+changed" so that the record and the replay stay honest and a model does not learn that the
+ship did what it only said. The director reads the free lines in his sample as he reads
+the deck's conversation, and answers them in the story. The rule generalises the needs'
+orders of package 54 (`eat a fine meal`, `drink three cups of wine`, the verb taken and
+the words kept) and costs one list and one logging form.
+
+**Transactions, not variables.** The purse is not to be set; it is to be paid. `aboard:
+twenty guineas paid into the purse by Mr Veale` is a world order like any other, doubted
+where implausible (money from nobody, a sum beyond a port's means), logged with its cause,
+written in the purse's own ledger as "paid by Mr Veale, twenty guineas; the purse £55",
+and replayed through the inputs as every act is. The same for a cargo given or taken
+(`aboard: ten tons of wool freighted by Mr Veale`), a debt, a bill. The lead's reason for
+holding the line against a raw setter: the director's channel exists to produce *data by
+which the sets of reasonable acts are refined* (decision 50), and a variable set by hand is
+an act with no cause in the record, so it refines nothing; the ledgers and the recorded
+passages pin their digests on causes; and a model given a setter uses it where a cause was
+available, so that the story loses the texture that made Mr Veale's words good. What the
+director cannot do by a form he may already attempt, and the attempt is logged: the purse
+was never tried in the test. The owner's prompt, as the owner and not the director, may
+keep a developer's setter outside the brief if testing wants one; the director's brief
+does not.
+
+**Not done in this part:** a thing's weight in the boat or the hold; a thing's value at a
+market (a thing sold is a transaction with a price the director names); a thing searched
+for by a person's action rather than found where it lies; locks, seals and keys beyond the
+words. Each waits for a system that needs it.
+
 ### 18. Truths for 7b-iv
 
 - 100. A person who goes below is below in the muster and the state; an order of the
