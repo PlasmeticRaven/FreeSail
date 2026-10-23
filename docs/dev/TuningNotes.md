@@ -7946,3 +7946,9 @@ restarted twice during the runs, and each tier is written here as it finished.
 - `ruff check .` and `ruff format .`: clean.
 - **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,554 passed, none
   failed, 327 slow left out (03:27 to 03:51, finished before the second restart).
+- **The slow tier of the files touched** (`test_aboard_found`, `test_agent_api`,
+  `test_captain_trials`, `test_director`, `test_ground`, `test_known_truths`,
+  `test_map_view`, `test_mcp_server`, `test_officer`, `test_orders_places`, `test_people`,
+  `test_scenarios`, `test_settings`, `test_ship_loader`, `test_world_orders`; `--slow -m
+  "not pace"`): 470 passed, 8 expected failures, none failed (04:14 to 04:41), every
+  re-pinned passage among them against its new figure.
