@@ -820,3 +820,95 @@ def test_say_as_the_lookout_the_hands_and_a_station_and_who_heard_in_the_result(
     seat_player(w, "lookout")
     e = w.world_order('say as the lookout: "Deck there!"', "the test")
     assert e.data["result"] == "refused" and "held by" in e.text
+
+
+# ---------------------------------------------------------------------------
+# Package 68: the ship: form read clause by clause (the cold review of 2026-10-22, R-43,
+# R-41 and 61's simple half)
+# ---------------------------------------------------------------------------
+
+
+def test_the_ship_form_reads_its_words_as_the_directors_wrote_them():
+    """R-43: 24 of a small model's 29 `ship:` orders refused. A description after its
+    adjectives ('a French lugger', 'a small fishing lugger'), any colours clause ('British
+    colours', 'colours shown', 'no colours'), an intent with commas in it and a port in the
+    `of` slot (her nation the port's) are read; the refusal names the clause at fault."""
+    w = world_for(ports=["falmouth", "brest", "roscoff"])
+    cases = [
+        (
+            'ship: a French lugger "Sainte-Barbe" of France at 48 50 N 5 50 W, bound for Brest, '
+            "colours shown",
+            "lugger",
+            True,
+            "",
+        ),
+        (
+            'ship: a small fishing lugger "Petit Jean" of France at 48 51 N 5 51 W, bound for '
+            "Brest, French colours",
+            "lugger",
+            True,
+            "",
+        ),
+        (
+            'ship: a merchant brig "Providence" of Falmouth at 49 40 N 5 40 W, bound for Brest, '
+            "British colours",
+            "merchant brig",
+            True,
+            "",
+        ),
+        (
+            'ship: a deep laden merchant brig "Hope" of Britain at 49 41 N 5 41 W, bound for '
+            "Brest, no colours, intent: run home to Falmouth, keeping the land aboard",
+            "merchant brig",
+            False,
+            "run home to Falmouth, keeping the land aboard",
+        ),
+    ]
+    for text, desc, colours, intent in cases:
+        spec = WO.new_ship_spec(w, text)
+        assert spec["colours"] == ("shown" if colours else "none"), (text, spec)
+        assert spec.get("intent", "") == intent, (text, spec)
+        from freesail.world.ships import description_key
+
+        assert description_key(spec["description"]) == desc
+    assert WO.new_ship_spec(w, cases[2][0])["nation"] == "britain"  # Falmouth's
+    e = w.world_order(cases[0][0], "the test")
+    assert e.data["result"] == "done", e.text
+    for text, clause in (
+        (
+            'ship: a whaler "Ann" of Britain at 49 00 N 6 00 W, bound for Falmouth',
+            "the description 'a whaler'",
+        ),
+        (
+            'ship: a cutter "Ann" of Narnia at 49 00 N 6 00 W, bound for Falmouth',
+            "the nation 'Narnia'",
+        ),
+        ('ship: a cutter "Ann" of Britain at the Moon, bound for Falmouth', "the place 'the Moon'"),
+        (
+            'ship: a cutter "Ann" of Britain at 49 00 N 6 00 W, bound for Atlantis, British colours',
+            "the goal 'bound for Atlantis'",
+        ),
+    ):
+        e = w.world_order(text, "the test")
+        assert e.data["result"] == "refused" and clause in e.text, e.text
+
+
+def test_a_ship_on_the_land_is_refused_with_the_nearest_water_and_one_in_harbour_goes_out_by_the_track():
+    """61's simple half (R-43 "crosses the land", the E2 F15 hull put on the land on a
+    reason): a place on the land is refused in words with the nearest water a ship floats
+    in named, whatever reason is given; a ship made in a port's harbour goes out by the
+    port's track (Falmouth's: the outer road, a point off the Manacles' meridian) before
+    her goal's legs, not across the land."""
+    w = world_for(ports=["falmouth", "plymouth"])
+    e = w.world_order(
+        'ship: a cutter "Salt Cat" of Britain at 50 09 N 5 04 W, bound for Plymouth', "t"
+    )
+    assert e.data["result"] == "refused" and "is on the land by the chart" in e.text, e.text
+    assert "the nearest water she floats in is" in e.text and " cables off, at " in e.text
+    e = w.world_order(
+        'ship: a merchant brig "Hope" of Britain at Falmouth, bound for Plymouth', "t"
+    )
+    assert e.data["result"] == "done", e.text
+    hope = w.vessels.find("Hope")
+    marks = [leg[2] for leg in hope.plan]
+    assert marks[0] != "Plymouth" and marks[-1] == "Plymouth", marks

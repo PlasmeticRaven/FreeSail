@@ -672,8 +672,8 @@ def new_ship_spec(world: Any, body: str) -> dict[str, Any]:
         from freesail.world.ships import DESCRIPTIONS
 
         raise WorldOrderError(
-            f"the description '{desc}' names no kind of ship a far-detail ship takes; say one "
-            f"of {', '.join(DESCRIPTIONS)} (with any words before it: 'a French lugger')"
+            f"the description '{desc}' is no description a far-detail ship takes; say one of "
+            f"{', '.join(DESCRIPTIONS)} (with any words before it: 'a French lugger')"
         )
     said_nation = " ".join(m.group("nation").split())
     nation = world.nations.find(said_nation)

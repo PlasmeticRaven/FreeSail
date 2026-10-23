@@ -270,7 +270,8 @@ def test_what_the_channel_doubts_and_what_it_lets_be():
     cases = {
         FAR_BRIG: None,  # thirty miles off: over the horizon
         NEAR_CUTTER: "inside the lookout's horizon",
-        'ship: a cutter "Ashore" of Britain at 50 05 N 5 15 W, bound for Falmouth': "on the land",
+        # on the land: the form's refusal since package 68, never a doubt a reason answers
+        'ship: a cutter "Ashore" of Britain at 50 05 N 5 15 W, bound for Falmouth': None,
         "mark: a cask adrift at 49 28 N 5 40 W": "inside the lookout's horizon",
         "mark: a wreck, her masts showing at 49 00 N 6 20 W": None,
         'weather: low "the deep" radius 450 km at 1805-06-12T10:00 -600 600 940': "season's floor",
@@ -293,6 +294,10 @@ def test_what_the_channel_doubts_and_what_it_lets_be():
             assert found is None, (text, found)
         else:
             assert found is not None and expected in found, (text, found)
+    ashore = 'ship: a cutter "Ashore" of Britain at 50 05 N 5 15 W, bound for Falmouth'
+    said = D.direct(w, f"{ashore} [reason: the story wants her there]", by="the test")
+    assert said.startswith("Logged as attempted") and "is on the land by the chart" in said
+    assert "the nearest water she floats in is" in said and w.vessels.find("Ashore") is None
     # a mind changed wants no cause
     put(w, "merchant brig", "britain", "49 00 N 6 20 W", "bound for Falmouth", "bound for Falmouth")
     assert WO.doubt(w, WO.parse('ship "X": intent run home to Brest')) is None
@@ -346,6 +351,9 @@ def test_the_aboard_orders_do_what_the_table_knows_and_reach_the_play_log_as_a_r
         ("aboard: a seam found working [reason: the test]", "seam_working", lambda: True),
         ("aboard: the water found foul [reason: the test]", "water_foul", lambda: w.stores.foul),
     ):
+        # the doubt seen first, then entered again with the reason (package 68: a reason on
+        # the first entry answers no doubt the director has seen)
+        D.direct(w, text.split(" [reason")[0], by="the test")
         said = D.direct(w, text, by="the test")
         assert said.startswith("Done: found aboard"), (text, said)
         assert check(), text
@@ -1247,6 +1255,7 @@ def test_the_director_pays_by_a_transaction_doubted_far_off_and_makes_a_thing_by
     play = [e for e in w.log.all() if not for_the_record(e)]
     assert [e.kind for e in play if "Veale" in e.text] == ["purse.received"]
     assert not [e for e in play if "aboard:" in e.text]
+    D.direct(w, "aboard: £99999 paid from the purse to Mr Veale", by="t")  # the doubt seen
     said = D.direct(w, "aboard: £99999 paid from the purse to Mr Veale [reason: x]", by="t")
     assert said.startswith("Logged as attempted, not performed") and "below nothing" in said
     assert w.purse.pounds == pytest.approx(purse + 21.0)
@@ -1369,3 +1378,26 @@ def test_an_officer_bound_to_nobody_on_a_merchantman_is_the_mate():
     assert "first lieutenant" not in st.brief and "in the place of the mate" in st.brief
     frigate = world_at(49.5, -5.5)
     assert not merchant_ship(frigate) and officer_rank(frigate)[1] == "first lieutenant"
+
+
+def test_the_form_is_checked_before_the_doubt_and_a_first_reason_answers_no_doubt_unseen():
+    """Package 68 (the cold review of 2026-10-22, R-41): the doubt was judged before the
+    form, so a malformed order came back only "doubted" and a small model took it for a
+    working template; and a reason given on the first entry overrode a doubt the director
+    never saw (a man carried nine miles ashore in a minute). The form is checked first and
+    answered in words; a reason on the first entry is held to the doubt, which is shown,
+    and the order entered again with its reason is performed."""
+    w = directed(systems=[], climatology=True)
+    w.run(60)
+    bad = (
+        'ship: a cutter "Lark" of Brixham-on-Sea at 49 32 N 5 32 W, bound from Torbay for '
+        "Falmouth, British colours"
+    )
+    said = D.direct(w, bad, by="the test")
+    assert said.startswith("The game has no way to do this as said: the nation"), said
+    assert "Doubted" not in said
+    said = D.direct(w, f"{NEAR_CUTTER} [reason: the story wants her near]", by="the test")
+    assert said.startswith("Doubted, not performed: a sail put on the sea"), said
+    assert w.vessels.find("Lark") is None and log_kinds(w)[-1] == "director.doubted"
+    said = D.direct(w, f"{NEAR_CUTTER} [reason: the story wants her near]", by="the test")
+    assert said.startswith("Done:") and log_kinds(w)[-1] == "director.reentered"
