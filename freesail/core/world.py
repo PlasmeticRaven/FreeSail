@@ -331,6 +331,16 @@ AGENT_LOG_KINDS: tuple[str, ...] = (
 # and work belayed at his word, with how it was left (package 29c).
 NOTABLE_ORDER_KINDS = frozenset({"agent.told", "work.belayed", "agent.deck"})
 
+# The recurring lines (package 58a; the cold review of 2026-10-22, R-31, E1-09, D7-12,
+# LO2-09): a line of these kinds whose words have not changed since the last line of its
+# kind is routine, not notable: it tells nobody anything new, and notable it woke every
+# station standing by for a notable event and filled the director's lists (a standing
+# order's trim waiting with "not hands enough" every glass, the lead's cast at anchor
+# every ten minutes in the same water, the carpenter's report of the well pumped out each
+# glass). The first of them, and any whose words changed, keeps its severity; an urgent
+# line is never made routine; the events by kind (`a sounding`) still come.
+RECURRING_KINDS = frozenset({"evolution.waiting", "sounding", "aboard.found", "well.sounded"})
+
 
 # The key under which the ship holds the actor of the order being carried out (package
 # 37g): there while `World.submit` runs the order's handler, and at no other time.
@@ -370,8 +380,18 @@ class World:
     # The event `a wind shift` keeps the same floor (`api.readings`): it does not come
     # while `wind_settled` is false. Class defaults, for a checkpoint saved before the
     # package.
+    # Package 58a (the cold review of 2026-10-22, R-31: in light airs "Light and variable
+    # airs." and "The wind has settled at W" alternated every ten to forty minutes, each
+    # notable, waking the stations and filling the director's lists): a hysteresis of a
+    # point and two knots held ten minutes. The airs fall light when the mean has stood
+    # under the floor `WIND_LIGHT_HOLD_S` (it was a minute); and they settle when the mean
+    # has stood `WIND_SETTLE_BAND_KN` above the floor, its direction within a point of
+    # where the settling began, `WIND_SETTLE_S` (it was five minutes at the floor itself,
+    # whatever its direction did).
     WIND_SHIFT_FLOOR_KN = 4.0
-    WIND_SETTLE_S = 300
+    WIND_LIGHT_HOLD_S = 600
+    WIND_SETTLE_BAND_KN = 2.0
+    WIND_SETTLE_S = 600
     WIND_SWING_S = 3600
     WIND_STEADY_S = 1800
     wind_settled = True
@@ -379,6 +399,11 @@ class World:
     _wind_settling_s = 0
     _wind_unsettled_why = ""  # "light" or "swing" while `wind_settled` is false
     _wind_swing_ref: float | None = None  # where an unsteady wind's mean last stood
+    _wind_settle_ref: float | None = None  # where a light air's settling began (58a)
+    # Package 58a (R-31): the last words of each recurring kind of line (`RECURRING_KINDS`),
+    # so that one whose words have not changed since its last logging is routine; a class
+    # default, for a checkpoint from before
+    _recurring_said: dict[str, str] | None = None
     _wind_shifts_said: tuple[tuple[int, int], ...] = ()  # the last shifts logged: tick, sense
     # The builds this game has been played under, oldest first (package 37d): this build's
     # stamp at the start, and each later build's added when it takes the game up from a
@@ -791,6 +816,13 @@ class World:
         data: dict[str, Any] | None = None,
     ) -> Event:
         sev = severity if isinstance(severity, Severity) else Severity(severity)
+        if kind in RECURRING_KINDS:
+            said = self._recurring_said
+            if said is None:
+                said = self._recurring_said = {}
+            if sev is Severity.NOTABLE and said.get(kind) == text:
+                sev = Severity.ROUTINE  # the same words again: no news (package 58a)
+            said[kind] = text
         e = self.log.append(
             Event(
                 tick=self.clock.tick,
@@ -1658,7 +1690,7 @@ class World:
             if light:
                 self._wind_shift_held_s = 0
                 self._wind_unsettled_s += 1
-                if self._wind_unsettled_s >= self.WIND_SHIFT_HOLD_S:
+                if self._wind_unsettled_s >= self.WIND_LIGHT_HOLD_S:
                     self.wind_settled = False
                     self._wind_unsettled_why = "light"
                     self._wind_unsettled_s = self._wind_settling_s = 0
@@ -1686,13 +1718,22 @@ class World:
             if self._wind_settling_s < self.WIND_STEADY_S:
                 return False
         else:
-            # light airs: settled when the mean has stood a light breeze `WIND_SETTLE_S`
-            if light:
+            # light airs: settled when the mean has stood two knots above the floor, its
+            # direction within a point of where the settling began, `WIND_SETTLE_S`
+            # (package 58a: the hysteresis; a puff across the floor is not the wind back)
+            band = self.WIND_SHIFT_FLOOR_KN + self.WIND_SETTLE_BAND_KN
+            if units.ms_to_knots(mean_speed) < band:
                 self._wind_settling_s = 0
+                self._wind_settle_ref = None
                 return False
+            ref = self._wind_settle_ref
+            if ref is None or abs(units.wrap_pi(mean_from - ref)) >= units.POINT:
+                self._wind_settle_ref = mean_from
+                self._wind_settling_s = 0
             self._wind_settling_s += 1
             if self._wind_settling_s < self.WIND_SETTLE_S:
                 return False
+        self._wind_settle_ref = None
         self.wind_settled = True
         self._wind_unsettled_why = ""
         self._wind_swing_ref = None

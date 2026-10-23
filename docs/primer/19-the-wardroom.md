@@ -115,6 +115,20 @@ The deck reads *yours*, another's by name (*the deck Mr Pearce's*), *the captain
 
 **Merchant words.** On a ship that is no King's ship (her wardroom file binds the captain's station to a master: the cutter, the schooner, the smack, the lugger), an officer of the watch bound to nobody is *the mate* in the harness's words, never the first lieutenant.
 
+## What a sample carries, and the stand-by's instruments
+
+Since package 58a (the owner's playtests of October: one director's waits and samples came to a million characters and more in four hours, and the lugger's officer trimmed before she had settled, "making the right orders at the wrong time"):
+
+**A sample after the first carries what changed**, and nothing the model has read already: the log lines since; the readings that changed; the sails in one line only when a sail's state changed; the sail in sight only when one came, went or was made out further, not each time her bearing moved; the captain's word in the sample's `word`, and not again in its log. The notable lines logged while it stood by are counted and found in the log below, not listed twice. It closes with one line of what stands as before, so that nothing still so is forgotten because the deltas no longer say it:
+
+```
+As before: the sails, two sail in sight, the book; the other readings as last told (readings gives every row).
+```
+
+The first sample of a seating, and the first after a handover fold, are whole; `readings` gives every row on request. At the MCP door a wait that comes back with no turn lists only **the notable lines since its last call**, the earlier counted. **The station's line closes with the cost of thinking**: *...; 30 minutes of the ship's time since your last reply.*
+
+**The ship's own state, to stand by for.** Beside the events, the bells and the intervals, a stand-by may wait for her state as her readings judge it: *her way settled* (her speed steady within a quarter of a knot and her head within a quarter of a point for two minutes, measured afresh after every order: the officer's "steer, settle, trim", the owner's lesson to the lugger's), *depth under 8 fathoms*, *speed under 2 knots*, *speed over 6 knots*, *the wind over 25 knots*, *a point of interest within 3 miles*; alone or joined to others with *or*, the wake saying what it found (*A point of interest within 3 miles: Rill Point, 3 miles by account*). And the readings have `ahead` (chapter 6): what lies on her course within the next glass at her speed, by her account.
+
 ## The forms, in a table
 
 | Form | Also taken | What it does |

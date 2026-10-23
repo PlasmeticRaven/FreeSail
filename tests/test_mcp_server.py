@@ -1074,6 +1074,23 @@ def test_the_command_line_needs_the_model_name(capsys):
     assert "--model-name" in capsys.readouterr().err
 
 
+def test_still_waiting_lists_only_the_lines_since_the_last_call_of_the_same_wait():
+    """Package 58a (the cold review of 2026-10-22, R-26, D2-02, D8-03, LD-06: every 55-second
+    renewal re-listed the whole wait, 58 lines and 12,000 characters): a result lists the
+    notable lines its earlier results of the same wait did not, the rest counted; a count
+    out of reach (a new wait) lists them all."""
+    lines = [{"stamp": f"Forenoon watch (10:0{i})", "text": f"Line {i}."} for i in range(4)]
+    interim = {"since": "Forenoon watch (10:00)", "until": "a watch", "standing_by": True}
+    first = M.still_waiting(interim | {"lines": lines[:2], "notable": 2}, 50.0)
+    assert "Notable lines logged since then (2):" in first and "Line 1." in first
+    later = M.still_waiting(interim | {"lines": lines, "notable": 4}, 50.0, listed=2)
+    assert "since your last call (2; 2 lines before them, in your earlier results)" in later
+    assert "Line 0." not in later and "Line 3." in later
+    none = M.still_waiting(interim | {"lines": lines, "notable": 4}, 50.0, listed=4)
+    assert "No notable lines since your last call (4 lines since then" in none
+    assert "Line 0." in M.still_waiting(interim | {"lines": lines}, 50.0, listed=9)
+
+
 def test_the_held_call_waits_under_the_desktop_clients_cut_and_wait_overrides_it(capsys):
     """Playtest 11's finding 2 (package 31c): Claude Desktop cut a tool call at four real
     minutes, so the bridge held one for 200 seconds; the desktop and Claude Code clients of

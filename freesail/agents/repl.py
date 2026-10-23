@@ -180,9 +180,11 @@ def render_turn(turn: Turn) -> str:
         # the stand-by's digest (package 28c): the notable lines while it lasted
         n = int(sb.get("notable") or 0)
         lines = "no notable lines" if n == 0 else f"{n} notable line{'s' if n != 1 else ''}"
+        listed = bool(n and sb.get("lines"))
+        where = f", in {sb['lines_in']}" if n and sb.get("lines_in") else ""
         out.append(
             f"While you stood by (since {sb.get('since')}, until {sb.get('until')}): {lines} "
-            "logged" + (":" if n else ".")
+            f"logged{where}" + (":" if listed else ".")
         )
         out += [f"  * {ln['stamp']}  {ln['text']}" for ln in sb.get("lines") or []]
     log = d.get("log") or []
@@ -210,6 +212,8 @@ def render_turn(turn: Turn) -> str:
             out.append(f"  {k}: " + "; ".join(f"{a} {b}" for a, b in v.items()))
         else:
             out.append(f"  {k}: {v}")
+    if d.get("as_before"):
+        out.append(str(d["as_before"]))  # what stands unchanged (package 58a, the deltas)
     return "\n".join(out)
 
 

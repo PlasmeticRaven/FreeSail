@@ -435,7 +435,14 @@ def read_checkpoint(path: str | Path) -> tuple[dict[str, Any], World]:
     return header, world
 
 
-def _rebind(world: World) -> None:
+def _rebind(world: World, _seen: set[int] | None = None) -> None:
+    # each World once (found on the way by package 58a: a crewed vessel's World lists the
+    # parent's other vessels, so with two crewed at once each rebound the other's World
+    # without end, and a checkpoint with two ships crewed could not be read)
+    seen = set() if _seen is None else _seen
+    if id(world) in seen:
+        return
+    seen.add(id(world))
     # the builds the game has been played under (package 37d): this one joins them when it
     # takes the game up; a checkpoint from before the stamp has none, and begins with None
     if getattr(world, "station_acts", None) is None:
@@ -466,7 +473,7 @@ def _rebind(world: World) -> None:
     for v in getattr(getattr(world, "vessels", None), "vessels", None) or []:
         # a crewed vessel's own World (package 43): rebound as the parent is
         if getattr(v, "crew", None) is not None:
-            _rebind(v.crew)
+            _rebind(v.crew, seen)
     if world.agents:
         # a station loaded from its checkpoint has played its transcript already: it gets
         # a spent `Playback`, as a replayed one has once its replies are given, so that the

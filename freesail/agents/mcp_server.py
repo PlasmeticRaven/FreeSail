@@ -259,7 +259,8 @@ def door_note(wait: float) -> str:
         f"held open until your next turn and returns it, for up to {_seconds_words(wait)}; "
         "the first line of each result says whose turn it is. If no turn has opened by "
         "then, the result says since when you have waited and lists the notable lines "
-        "logged since; call stand_by again to continue the same wait, or say(text) to end "
+        "logged since your last call (the earlier ones counted, not listed again); call "
+        "stand_by again to continue the same wait, or say(text) to end "
         "it at your own word and open your turn. Never end your reply in the chat while you "
         "are seated: the game is heard only while a call is open, so call stand_by again "
         "rather than stop (the owner does not watch the chat to call you back). Your client "
@@ -275,11 +276,17 @@ def door_note(wait: float) -> str:
     )
 
 
-def still_waiting(interim: dict[str, Any] | None, waited: float) -> str:
+def still_waiting(interim: dict[str, Any] | None, waited: float, listed: int = 0) -> str:
     """The result of a wait that ended with no turn: how long this call waited, since
     when the model has waited and until what, and the notable lines logged since, in
     the log's own words (package 28c; the owner's ruling: a stand-by is a decision not
-    to be sampled, not a decision to be blind). Never empty."""
+    to be sampled, not a decision to be blind). Never empty.
+
+    **Only the lines since the last poll** (package 58a; the cold review of 2026-10-22,
+    R-26, D2-02, D8-03, LD-06: every 55-second renewal re-listed the whole wait, 58 lines
+    and 12,000 characters, 1.3 million characters in four hours for one director):
+    `listed` is how many of the wait's notable lines earlier results of the same wait
+    gave already (`Bridge._listed`); they are counted, and only the new ones listed."""
     head = f"{STILL_WAITING}: this call waited {_seconds_words(waited)} and no turn opened."
     if interim is None:
         return f"{head} Calling stand_by again continues the same wait."
@@ -301,13 +308,30 @@ def still_waiting(interim: dict[str, Any] | None, waited: float) -> str:
             "at your own word."
         )
     lines = list(interim.get("lines") or [])
+    listed = listed if 0 <= listed <= len(lines) else 0
+    new = lines[listed:]
     if not lines:
         tail = " No notable lines have been logged since then."
+    elif not new:
+        tail = (
+            f" No notable lines since your last call ({_count_words(listed)} since then, "
+            "in your earlier results)."
+        )
+    elif listed:
+        tail = (
+            f"\n\nNotable lines logged since your last call ({len(new)}; "
+            f"{_count_words(listed)} before them, in your earlier results):\n"
+            + "\n".join(f"  * {ln.get('stamp')}  {ln.get('text')}" for ln in new)
+        )
     else:
         tail = f"\n\nNotable lines logged since then ({len(lines)}):\n" + "\n".join(
             f"  * {ln.get('stamp')}  {ln.get('text')}" for ln in lines
         )
     return head + where + tail
+
+
+def _count_words(n: int) -> str:
+    return "one line" if n == 1 else f"{n} lines"
 
 
 def _progress_words(interim: dict[str, Any] | None, waited: float) -> str:
@@ -490,6 +514,9 @@ class Bridge:
         # when the client cut it off): a sample or a fold past it is one the model has not
         # read, and it goes into the next result before anything is run blind
         self._shown = 0
+        # the present wait (its start and until what) and how many of its notable lines a
+        # "still waiting" result has listed (package 58a): the next lists only the new
+        self._listed: tuple[tuple[str, str], int] = (("", ""), 0)
         self.stopped_words = ""
         # the calls in flight and the results the client never received
         self._book = threading.Lock()
@@ -1032,7 +1059,15 @@ class Bridge:
             shown = self._render(got)
             return f"{did}\n\n{shown}\n\n{a.get('words') or ''}".strip(), True
         floor = "The game has the floor; the next sample follows when your turn opens."
-        return f"{floor}\n{did}\n\n{still_waiting(a.get('interim'), waited)}", bool(past)
+        interim = a.get("interim")
+        # the wait's notable lines already given by an earlier result of the same wait
+        # (package 58a, R-26): only the new ones are listed
+        wait_key = (str(interim.get("since")), str(interim.get("until"))) if interim else ("", "")
+        listed = self._listed[1] if self._listed[0] == wait_key else 0
+        text = still_waiting(interim, waited, listed)
+        if interim:
+            self._listed = (wait_key, len(interim.get("lines") or []))
+        return f"{floor}\n{did}\n\n{text}", bool(past)
 
     @staticmethod
     def _continued(a: dict[str, Any], args: dict[str, Any]) -> str:

@@ -3028,7 +3028,9 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # with the two "sound the well" lines at tick 0 the whole difference)
 GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
-GATE_5B_SCHOONER_DIGEST = "b9acdeac6354f3bf"  # the well (b7c16adc612bd01a at 56, c01e6e0f at 44)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_5B_SCHOONER_DIGEST = "2b68e8b1f60e8496"  # 58a (b9acdeac6354f3bf, the well; b7c16adc at 56)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4104,7 +4106,9 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
-GATE_5C_CRUISE_DIGEST = "728522e26dd25a49"  # package 56, the glass (087fdfacfc6381f1 at 57)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_5C_CRUISE_DIGEST = "5a62f6fca122c6ad"  # 58a (728522e26dd25a49 at 56, the glass)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4217,7 +4221,9 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 GATE_5C_MERCHANT_LINES = 3099  # package 68, riding (3098 at package 56, 3080 at 57)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
-GATE_5C_MERCHANT_DIGEST = "902be35aeeac7b54"  # package 68, riding (05f0f4aba2eddbc0 before)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_5C_MERCHANT_DIGEST = "36c17b76e1735975"  # 58a (902be35aeeac7b54 at 68, riding)
 
 
 def _people(world) -> list[dict]:
@@ -4653,7 +4659,9 @@ GATE_6A_INTENT_LINES = 2160  # package 68, riding (1698 at 56, 1684 at package 4
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
 # package 56, the glass: 90061f779b7db484 (93981cc47f5524e6 at 57)
-GATE_6A_INTENT_DIGEST = "8eead2f4521f2a61"  # package 68, riding (90061f779b7db484 before)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_6A_INTENT_DIGEST = "6292d5af25a6b326"  # 58a (8eead2f4521f2a61 at 68, riding)
 
 
 @pytest.fixture(scope="module")
@@ -4827,7 +4835,9 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # decision 45, the pilot's news: b00ac08c3f63e84c before
 # package 56, the glass: f996530d5a041abc (0e089f1279e03928 at 57); package 68, riding:
 # the merchant passage's one line more and its account at 300 (3111 lines before)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "1f8de8b49c7d5b5a"  # package 68, riding (f996530d5a041abc)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "073a636b6d76cc16"  # 58a (1f8de8b49c7d5b5a at 68, riding)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -6976,9 +6986,11 @@ def test_truth_7b_117_the_first_line_of_a_captains_sample_names_his_place_the_de
     assert cap.where == "shore"
     landed = next(e for e in world.log if e.kind == "person.ashore")
     at = landed.ship_time.strftime("%H:%M")
+    # package 58a: the line closes with the ship's time since his last reply, a glass's
+    # stand-by being thirty minutes ("...; on your feet since 10:00." before)
     assert line() == (
         f"You: the captain, ashore at Falmouth, on the quay, since {at}; the deck yours; on "
-        "your feet since 10:00."
+        "your feet since 10:00; 30 minutes of the ship's time since your last reply."
     )
     _until(world, lambda: not world.ports.boat.away)  # the boat home, to be sent for him
     h.deliver(reply("", call("submit_order", text="come aboard")))
@@ -7257,3 +7269,189 @@ def test_truth_7b_123_no_enemy_heavier_than_a_brig_refuses_a_frigate_and_lets_a_
         'ship: a frigate "Fowey" of Britain at 49 02 N 6 22 W, bound for Plymouth',
     ):
         assert not D.direct(w, text, by="the test").startswith("Refused"), text
+
+
+# ---------------------------------------------------------------------------
+# Package 58a: the sample's deltas and the stand-by's instruments (the cold review of
+# 2026-10-22, R-26, R-31, R-04, R-42; the lugger officer's and the directors' own
+# accounts). Truths 7b-124 to 7b-126, numbered after 68's 7b-120 to 7b-123.
+# ---------------------------------------------------------------------------
+
+
+def _captain_standing_by_a_glass(stranger_at: str, destination: str):
+    """The frigate lying in a light westerly off the Lizard with one merchant brig put on the
+    sea, and a scripted captain at his station who stands by a glass, turn after turn."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents.agent import captain
+    from freesail.agents.fake import Fake, call
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=180.0,
+        ship_speed_kn=0.0,
+        position={"lat_deg": 49.80, "lon_deg": -5.60},
+        region="channel-west",
+    )
+    w = make_world(7, "data/ships/frigate-36.yaml", sc)
+    order = f'ship: a merchant brig "Two Brothers" of Britain at {stranger_at}, {destination}'
+    assert w.world_order(order, "the truth").data["result"] == "done"
+    w.run(120)
+    st = captain(SamplingPolicy.in_lockstep(None, "urgent"), 24 * 3600, world=w)
+    fake = Fake([call("stand_by", until="a glass")], loop=True)
+    h = Harness(w, st, fake, save=lambda _w, _why: None)
+    h.start()
+    return w, h
+
+
+def _samples(h) -> list[dict]:
+    from freesail.agents.model import DATA
+
+    return [t.content for t in h.turns if t.role == DATA and "tool_results" not in t.content]
+
+
+def test_truth_7b_124_a_second_sample_carries_what_changed_and_still_waiting_what_is_new():
+    """Package 58a's truth 124 (R-26; LO2-20; the owner's "delta" of 2026-10-17): a
+    captain's second sample carries no sail line when no sail changed, and the strangers'
+    list only when a sail came, went or was made out further, closing with one line of
+    what stands as before; the stand-by's notable lines are counted, found in the sample's
+    log, and not listed twice; and "still waiting" carries only the lines since the last
+    poll (1.3 million characters in four hours for one director, the whole wait re-listed
+    every 55 seconds)."""
+    from freesail.agents import mcp_server as M
+
+    # a sail six miles off that is made out no further: the first sample whole, the next
+    # with no sail line and no strangers' list, and the line of what stands as before
+    w, h = _captain_standing_by_a_glass("49 48 N 5 28 W", "bound from Falmouth for Penzance")
+    w.run(2 * 1800 + 5)
+    first, second, third = _samples(h)[:3]
+    assert {"sails", "strangers", "sail_in_sight"} <= set(first["readings"])
+    for later in (second, third):
+        assert not {"sails", "strangers", "sail_in_sight", "stranger_in_sight"} & set(
+            later["readings"]
+        )
+        assert later["as_before"].startswith("As before: the sails, one sail in sight, the book;")
+        assert "30 minutes of the ship's time since your last reply" in later["you"]
+    assert "since your last reply" not in first["you"]
+    # a sail that closes: her list comes again each time she is made out further
+    w2, h2 = _captain_standing_by_a_glass("49 47 N 5 45 W", "bound for the Lizard")
+    w2.run(3 * 1800 + 5)
+    told = [s["readings"].get("strangers") for s in _samples(h2)[1:4]]
+    assert all(told) and told[0].startswith("a brig") and "British colours" in told[1]
+    # the wait's lines: counted in the waking sample, in its log; "still waiting" lists
+    # only what is new since the last poll
+    h.stand_by("a watch")
+    w.record(Severity.NOTABLE, "test.first", "A boat pulling for the shore.")
+    w.run(60)
+    first_poll = M.still_waiting(h.interim(), 50.0)
+    assert "A boat pulling for the shore." in first_poll
+    w.record(Severity.NOTABLE, "test.second", "The boat has landed her people.")
+    w.run(60)
+    second_poll = M.still_waiting(h.interim(), 50.0, listed=1)
+    assert "The boat has landed her people." in second_poll
+    assert "A boat pulling for the shore." not in second_poll
+    assert "(1; one line before them, in your earlier results)" in second_poll
+    w.record(Severity.URGENT, "test.urgent", "The brig is standing into danger.")
+    w.run(2)
+    woke = _samples(h)[-1]
+    assert woke["stood_by"]["notable"] == 2 and "lines" not in woke["stood_by"]
+    texts = [ln["text"] for ln in woke["log"]]
+    assert "A boat pulling for the shore." in texts and "The boat has landed her people." in texts
+
+
+def test_truth_7b_126_a_dry_run_of_a_doubted_order_returns_the_doubt_and_spends_nothing():
+    """Package 58a's truth 126 (R-42; the lugger director's ask that would make "the most
+    difference"): `world_order(text, dry_run=true)` of a doubted order returns the doubt
+    and what the order would do, performs nothing (the log, the inputs, the world's marks
+    and the director's own log as they were, the log's digest the same) and spends no act;
+    entered, the order is doubted on the record, and entered again with its reason it is
+    performed and counted."""
+    from freesail.agents import director as D
+    from freesail.agents import tools
+    from freesail.agents.fake import call
+    from tests.test_director import directed, seat_director
+
+    w = directed("hard-cruise")
+    seat_director(w, [call("stand_by", until="a watch")])
+    w.run(60)
+    mark = "mark: a wreck, her masts showing at 49 30 N 5 31 W"  # six cables off, by day
+    before = (
+        w.log.digest(),
+        len(w.inputs),
+        len(w.marks_of_interest),
+        len(D.log_of(w).entries),
+        D.budget_of(w).acts,
+    )
+    said = tools.call(w, "director", "world_order", {"text": mark, "dry_run": True})
+    assert said.startswith("Dry run, nothing performed and no act spent: it would be doubted: ")
+    assert "inside the lookout's horizon" in said
+    assert "it would do this: a mark put in the world, a wreck, her masts showing" in said
+    after = (
+        w.log.digest(),
+        len(w.inputs),
+        len(w.marks_of_interest),
+        len(D.log_of(w).entries),
+        D.budget_of(w).acts,
+    )
+    assert after == before
+    # entered, doubted on the record; entered again with its reason, performed and counted
+    assert D.direct(w, mark, by="the test").startswith("Doubted, not performed")
+    done = D.direct(w, f"{mark} [reason: the wreck of the Swan, long reported]", by="the test")
+    assert done.startswith("Done: a mark put in the world")
+    assert len(w.marks_of_interest) == 1 and D.budget_of(w).acts == before[4] + 1
+
+
+# The Western Islands run's anchored night at Horta (the filed save, `docs/playtests/
+# 2026-10-18-to-22-owner-playtests-and-review/saves/2026-10-20-western-islands-run-H-
+# final.json`, 2 July): the cutter rode at 38 32 N 28 37 W, on the western edge (28 36.6
+# W) of the channel between Fayal and Pico, and sheered across it; the log said "she
+# swings to the flood" and "to the ebb" sixty-six times in an hour and a half.
+HORTA_BERTH = {"lat_deg": 38.5333, "lon_deg": -28.612}
+HORTA_NIGHT = datetime(1805, 7, 2, 18, 0)
+
+
+def test_truth_7b_125_the_horta_nights_swing_logs_once_per_turn():
+    """Package 58a's truth 125 (R-04; D7-02): the swing at the turn of the tide is said once
+    per turn. The cause, mended and not masked: outside every stream area the stream is
+    nought, and its direction fell back to the area's axis and read as the flood, so that a
+    ship sheering across an area's edge read the flood outside it and the ebb inside, a
+    swing each time. Now `flood` is None where no stream runs, and the swing is said at the
+    turns of the channel's own stream alone. The save's night (its ship and chart, the
+    berth it rode at, the evening of 2 July, the wind of its log at NW by W), six hours at
+    anchor across the edge: 110 swing lines under the old cause, one now."""
+    from freesail.world.geo import Position
+    from freesail.world.sights import greenwich_time
+
+    sc = Scenario(
+        start_time=HORTA_NIGHT,
+        wind_from_deg=292.0,
+        wind_speed_kn=14.0,
+        gustiness=0.3,
+        variability=0.3,
+        ship_heading_deg=290.0,
+        ship_speed_kn=0.0,
+        position=HORTA_BERTH,
+        chart="atlantic-east",
+    )
+    w = make_world(7, "data/ships/cutter.yaml", sc)
+    assert w.submit("let go the best bower").kind == "order.accepted"
+    inside = Position(38.52, -28.58)  # the channel's own water, where she does not ride
+    areas: set[str] = set()
+    turns, was = 0, None
+    for _ in range(6 * 60):
+        w.run(60)
+        areas.add(w.tide_state.area_id)
+        state = w.tide.at(inside, greenwich_time(w))
+        if not state.slack:
+            turns += int(was is not None and state.flood != was)
+            was = state.flood
+    assert areas == {"fayal-channel", "open-sea"}  # she sheered across the edge all night
+    swung = [e for e in w.log if e.kind == "ship.swung"]
+    assert swung and len(swung) <= turns, [e.text for e in swung]
+    assert all(e.data.get("area") == "fayal-channel" for e in swung)
+    if w.tide_state.flood is None:
+        # where no stream runs she rides head to wind, and the reading says so
+        assert "head to wind" in w.readings.words("anchor")

@@ -541,6 +541,15 @@ FOLDED_WORDS = (
 # line (`tools.sail_line`) when any has changed. Nothing is withheld, only not repeated:
 # the readings tool gives every row.
 READINGS_ARE = "the changes since your last sample; the rest as they were"
+# Package 58a (the deltas; the cold review of 2026-10-22, R-26 and LO2-20): the rows that
+# name the other sail, carried only when a sail came, went or was made out further, not
+# each time her bearing moved; the stand-by's notable lines, which the waking sample's log
+# carries, counted and not listed twice; and the line that closes a sample of deltas with
+# what stands as before, so that a model reading the deltas alone has a cheap cure for
+# forgetting (the owner's caution of 2026-10-23, the lead's reading).
+SAIL_ROWS = ("strangers", "sail_in_sight", "stranger_in_sight")
+IN_THE_LOG = "the log below"
+AS_BEFORE_TAIL = "the other readings as last told (readings gives every row)."
 
 # What a stand-by says when the event it was taken for fell while the model's call was on
 # its way (package 31c; playtest 11's finding 6: "eight bells" asked at 03:58 woke it at
@@ -962,6 +971,7 @@ class Harness:
             if b.state == OPEN:
                 b.state = LEFT_BEHIND  # a door's conversation begins at the brief
         self._told = None  # ...so its first sample carries every reading (package 31c)
+        self._told_keys = None  # and every sail in sight (package 58a)
         world = self.world
         lines = [
             f"{d['stamp']}  {d['text']}"
@@ -1369,7 +1379,9 @@ class Harness:
                 # dialect's words (package 41), watched once a tick
                 cond, memory = watches[i]
                 if cond.holds(self.world.readings, memory):
-                    woke = part.words
+                    # a tripwire says what it found (package 58a: the point of interest
+                    # named, the speed she settled at)
+                    woke = part.words + str(memory.get("said") or "")
             else:
                 found = self._matched_in(part, new)
                 if found is not None:
@@ -1514,10 +1526,18 @@ class Harness:
                 continue
             if part.condition is not None:
                 # a reading's condition in the dialect's words (package 41): read as the
-                # book's `when` is, from this moment; one that holds now wakes at once
+                # book's `when` is, from this moment; one that holds now wakes at once; a
+                # tripwire of the ship's own state the same (package 58a)
+                from freesail.agents.tripwires import tripwire_of
                 from freesail.standing.grammar import parse_condition
 
-                cond = parse_condition(part.condition, world.ship)
+                try:
+                    cond = parse_condition(part.condition, world.ship)
+                except OrderError:
+                    trip = tripwire_of(part.condition)
+                    if trip is None:
+                        raise
+                    cond = trip
                 memory: dict[str, Any] = {}
                 holds = cond.holds(world.readings, memory)
                 kept[i] = (cond, memory)
@@ -1565,7 +1585,9 @@ class Harness:
         return [
             tools.log_line(world.log[i])
             for i in range(start, len(world.log))
-            if world.log[i].actor != self.actor and world.log[i].severity is Severity.NOTABLE
+            if world.log[i].actor != self.actor
+            and world.log[i].severity is Severity.NOTABLE
+            and not for_the_record(world.log[i])  # decision 46, as the sample's log has it
         ]
 
     def _stood_by_digest(self, reason: str = "") -> dict[str, Any] | None:
@@ -1697,9 +1719,22 @@ class Harness:
         if full is None or self.conversation:
             return content
         told, self._told = self._told, full
+        keys = self._delta_keys(full)
+        told_keys, self._told_keys = self._told_keys, keys
         if told is None:
             return content
-        changed = {k: v for k, v in full.items() if k != "sails" and told.get(k) != v}
+        # **the deltas** (package 58a; the cold review of 2026-10-22, R-26, LO2-20): a row
+        # keyed by what it says rather than its words (the sails in sight by who they are and
+        # how far made out, not by their bearing this minute; the lookout by who is at the
+        # masthead and his last hail, the sights being `in_sight`'s; the officer by all but
+        # the captain's words to him, which the sample's `word` carries) is carried when its
+        # key changed; every other row when its words did
+        told_keys = told_keys or {}
+        changed = {
+            k: v
+            for k, v in full.items()
+            if k != "sails" and ((keys[k] != told_keys.get(k)) if k in keys else told.get(k) != v)
+        }
         sails = full.get("sails")
         if sails and sails != told.get("sails"):
             changed["sails"] = tools.sail_line(self.world, sails)
@@ -1708,8 +1743,91 @@ class Harness:
             if k == "readings":
                 out["readings_are"] = READINGS_ARE
                 v = changed
+            elif k == "stood_by" and isinstance(v, dict) and v.get("lines"):
+                # the stand-by's notable lines are in this sample's log: counted, not
+                # listed twice (R-26: the waking sample repeated the whole wait)
+                v = {kk: vv for kk, vv in v.items() if kk != "lines"} | {"lines_in": IN_THE_LOG}
+            elif k == "log" and isinstance(v, list):
+                v = self._without_the_word(v, content)
             out[k] = v
+        before = self._as_before(full, changed)
+        if before:
+            out["as_before"] = before
         return out
+
+    # the deltas' keys as last told (package 58a); None until a conversation's first sample
+    _told_keys: dict[str, Any] | None = None
+
+    def _delta_keys(self, full: dict[str, Any]) -> dict[str, Any]:
+        """The rows the deltas compare by what they say (`_as_told`): the sails in sight
+        (`SAIL_ROWS`) by each sail and how far she is made out, the lookout by who holds
+        the masthead and his last hail, the officer of the watch by everything but what the
+        captain told him."""
+        view = self.world.readings
+        out: dict[str, Any] = {}
+
+        def value(row: str) -> Any:
+            try:
+                return view.value(row)
+            except Exception:  # noqa: BLE001  (a row that cannot be read is compared by words)
+                return None
+
+        if any(r in full for r in SAIL_ROWS):
+            strangers = value("strangers")
+            if isinstance(strangers, dict):
+                sails = tuple(
+                    sorted(
+                        (str(i.get("id")), int(i.get("made_out") or 0), str(i.get("nation")))
+                        for i in strangers.get("items") or []
+                    )
+                )
+                out.update({r: sails for r in SAIL_ROWS if r in full})
+        lookout = value("lookout") if "lookout" in full else None
+        if isinstance(lookout, dict):
+            out["lookout"] = (lookout.get("who"), lookout.get("held"), lookout.get("last_hail"))
+        officer = value("officer_of_the_watch") if "officer_of_the_watch" in full else None
+        if isinstance(officer, dict):
+            out["officer_of_the_watch"] = tuple(
+                (k, str(v)) for k, v in sorted(officer.items()) if k not in ("words", "told")
+            )
+        return out
+
+    def _without_the_word(self, log: list[dict[str, Any]], content: dict[str, Any]) -> list:
+        """The sample's log without the captain's word or question to this station, which
+        the sample's `word` and `question` carry already (package 58a: no repetition of
+        what was said to the station)."""
+        said = [str(content.get(k) or "").strip() for k in ("word", "question")]
+        said = [s.rstrip("?.") for s in said if s]
+        if not said:
+            return log
+        return [
+            ln
+            for ln in log
+            if not (
+                ln.get("kind") in ("agent.told", "agent.asked")
+                and any(str(ln.get("text") or "").rstrip("?.").endswith(s) for s in said)
+            )
+        ]
+
+    def _as_before(self, full: dict[str, Any], changed: dict[str, Any]) -> str | None:
+        """The deltas' closing line (package 58a; the lead's reading for the owner's
+        caution, that a model may forget a thing is still so when the deltas no longer say
+        it): one short line of what stands unchanged, the sails, the sail in sight and the
+        book among it, and that `readings` gives every row."""
+        parts: list[str] = []
+        if full.get("sails") and "sails" not in changed:
+            parts.append("the sails")
+        if any(r in full for r in SAIL_ROWS) and not any(r in changed for r in SAIL_ROWS):
+            keys = self._told_keys or {}
+            n = len(next((keys[r] for r in SAIL_ROWS if r in keys), ()))
+            parts.append(f"{number_words(n)} sail in sight" if n else "no sail in sight")
+        if "captain" in full and "captain" not in changed:
+            parts.append("the book")
+        left = len([k for k in full if k not in changed])
+        if not left:
+            return None
+        head = f"As before: {', '.join(parts)}; " if parts else "As before: "
+        return f"{head}{AS_BEFORE_TAIL}"
 
     _shape_told: str | None = None  # the shape of another ship last told (package 43)
     # where the station's person is and since which tick (package 66, the line's 'since'):
@@ -1780,14 +1898,29 @@ class Harness:
         if self.conversation:
             return None
         if self._is_directors:
-            return R.director_line(self.world)
+            return self._with_the_cost(R.director_line(self.world))
         person = self._line_person()
         self._track_place()
         since = self._place_since[1] if self._place_since is not None else None
         try:
-            return R.station_line(self.world, self.station.name, person, since)
+            return self._with_the_cost(R.station_line(self.world, self.station.name, person, since))
         except Exception as e:  # noqa: BLE001  (never a sample lost to the line)
             return f"{R.LINE_HEAD}the {self.station.name} (the line could not be read: {e})."
+
+    # the tick of the model's last reply (package 58a, the cost of thinking); None before
+    # its first, and in a checkpoint from before
+    _replied_tick: int | None = None
+
+    def _with_the_cost(self, line: str) -> str:
+        """**The cost of thinking** (package 58a; the owner's observation of 2026-10-17 and
+        the lugger officer's account of time, the cold review's §7.2): the line closes
+        with the ship's time since the model's last reply, so that it knows what its
+        thinking and its waiting cost ("12 minutes of the ship's time since your last
+        reply"). Nothing before its first reply."""
+        at = self._replied_tick
+        if at is None:
+            return line
+        return f"{line.rstrip('.')}; {cost_words(int(self.world.clock.tick) - at)}."
 
     # who commands, as last told to a station below the captain's (package 52): None while
     # its session kind says it as it was told at the seating
@@ -1991,6 +2124,7 @@ class Harness:
             entry["shown"] = [dict(n) for n in played["shown"]]  # the record's own note (42)
         self.transcript.append(entry)
         self.turns.append(Turn(MODEL, reply))
+        self._replied_tick = int(world.clock.tick)  # the cost of thinking (package 58a)
         # 1. the token, before anything else reads the reply
         for piece in reply.pieces():
             if OPT_OUT_TOKEN in piece:
@@ -2110,7 +2244,7 @@ class Harness:
         if c.name in BUDGET_FREE_TOOLS or c.name in ALWAYS_RUN_TOOLS:
             return None
         still = self._always_run_words()
-        if c.name in ORDER_TOOLS:
+        if c.name in ORDER_TOOLS and not tools.is_dry_run(c.name, c.args):  # a dry run reads
             if self._calls_this_sample < self.orders_per_turn:
                 self._calls_this_sample += 1
                 return None
@@ -2174,9 +2308,10 @@ class Harness:
                 result = f"{result}\n\n{NUDGE_WITH_RESULT}{self._nudge_for_result}"
             self._nudge_for_result = None
             return result
-        if c.name == "world_order":
+        if c.name == "world_order" and not tools.is_dry_run(c.name, c.args):
             # the director's hand (package 50): the same order three times with no change
-            # in the world is the repeat detector's, as the ship's orders are
+            # in the world is the repeat detector's, as the ship's orders are; a dry run
+            # (package 58a) is a read, and none of it
             self._note_submission(str(c.args.get("text", "")))
         result = tools.call(self.world, self.station.name, c.name, c.args)
         if c.name == "world_order" and self._is_directors and len(self.world.log) > before:
@@ -3403,6 +3538,10 @@ class Harness:
             else:
                 b.at -= shift
         self.revision += 1
+        # the first sample after the fold is whole (package 58a, the deltas): what the
+        # model had been told before it is folded away
+        self._told = None
+        self._told_keys = None
         # asked again only once the folded conversation has grown by the fraction
         self._handover_asked_at = self._conversation_size()
 
@@ -3553,18 +3692,27 @@ class Harness:
         if seconds is not None:
             words = f"{words} {'has' if seconds <= 60 else 'have'} passed"
             return StandBy(words, until_tick=world.clock.tick + seconds)
-        # a reading's condition, as the book reads one (package 41)
+        # a reading's condition, as the book reads one (package 41); the dialect's own
+        # words first, so that 'the true wind exceeds 20 knots' stays the dialect's and is
+        # not taken for a tripwire's
+        from freesail.agents.tripwires import TRIPWIRE_WORDS, tripwire_of
         from freesail.standing.grammar import parse_condition
 
         try:
             cond = parse_condition(words, world.ship)
         except OrderError as e:
+            # a tripwire of the ship's own state (package 58a: her way settled, the depth,
+            # the speed, the wind, a point of interest near), judged by the readings
+            trip = tripwire_of(words)
+            if trip is not None:
+                return StandBy(trip.text, condition=trip.text)
             events = ", ".join(w for w, s in R.EVENTS.items() if not s.absent)
             return (
                 f"'{piece}' is not an event or an interval to stand by for, nor a reading's "
                 f"condition the standing dialect reads ({e}). The events: {events}; or 'a "
                 "notable event', 'an urgent event'. The intervals: a glass, an hour, a "
-                "watch, or minutes ('5 minutes', 'ten minutes'). A reading's condition in "
+                "watch, or minutes ('5 minutes', 'ten minutes'). The ship's own state: "
+                f"{', '.join(repr(t) for t in TRIPWIRE_WORDS)}. A reading's condition in "
                 "the standing dialect's words: 'the true wind exceeds 30 knots', 'the land "
                 "is in sight'. Several may be joined with 'or', any of which wakes you."
             )
@@ -4824,6 +4972,23 @@ def _duration(words: str) -> int | None:
         return parse_duration(normalise(words).split())
     except OrderError:
         return None
+
+
+def cost_words(seconds: int) -> str:
+    """The ship's time since the model's last reply, in the line's words (package 58a):
+    "under a minute of the ship's time since your last reply", "12 minutes ...", "an hour
+    and 5 minutes ...", "3 hours ..."."""
+    minutes = max(0, int(seconds)) // 60
+    tail = "of the ship's time since your last reply"
+    if minutes < 1:
+        return f"under a minute {tail}"
+    hours, rest = divmod(minutes, 60)
+    parts = []
+    if hours:
+        parts.append("an hour" if hours == 1 else f"{hours} hours")
+    if rest:
+        parts.append("a minute" if rest == 1 else f"{rest} minutes")
+    return f"{' and '.join(parts)} {tail}"
 
 
 def _span_words(seconds: int) -> str:

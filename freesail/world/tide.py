@@ -261,8 +261,21 @@ class TideState:
         return math.degrees(math.atan2(self.stream_east_ms, self.stream_north_ms)) % 360.0
 
     @property
-    def flood(self) -> bool:
-        """Whether the stream runs along its axis (the flood) rather than against it."""
+    def streaming(self) -> bool:
+        """Whether there is a tidal stream here at all: beyond every tabulated area
+        (`NO_STREAM`) and in an area whose rates are nought there is none, and so neither
+        a flood nor an ebb (package 58a)."""
+        return self.rate_kn > 0.0
+
+    @property
+    def flood(self) -> bool | None:
+        """Whether the stream runs along its axis (the flood) rather than against it; None
+        where there is no stream (package 58a; the cold review of 2026-10-22, R-04: outside
+        every area `NO_STREAM`'s nought of stream fell back to its axis and read as the
+        flood, so a ship sheering across an area's edge at anchor in the ebb read the flood
+        outside and the ebb inside, and the log said her swing minute by minute at Horta)."""
+        if not self.streaming:
+            return None
         d = (self.stream_toward_deg - self.axis_deg + 180.0) % 360.0 - 180.0
         return abs(d) < 90.0
 

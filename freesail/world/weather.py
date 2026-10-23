@@ -159,6 +159,10 @@ COLD_FRONT_TURN_DEG_PER_H = 6.0
 # at twice its radius).
 BOX_HALF_KM = 250.0
 SYSTEM_REACH_KM = 900.0
+# A system or a waypoint appended in play grows in over this at the least (package 58a;
+# the brief's hour: the cold review's R-39, a director's change stepped in at once and the
+# glass jumped nine hundredths in the hour, 5 to 18 knots of wind in a minute).
+APPEND_RAMP_S = 3600
 # The boxes of the climatology beyond the Channel (package 38; spec M6 §26). When she
 # crosses from one box into another the background pressure and the mean gradient move
 # from the one box's to the other's over this many hours (judgement: a hectopascal or two
@@ -630,6 +634,21 @@ class System:
     track_times: list[datetime] = field(default_factory=list)  # the track's times, for bisect
     scripted: bool = False
     gone: bool = False
+    # Package 58a (R-39): a system appended in play grows in from nothing at the order's
+    # tick (`ramp_from`) to its track's anomaly at `ramp_until`, never at a step; None for
+    # a system of the scenario's own and in a checkpoint from before
+    ramp_from: datetime | None = None
+    ramp_until: datetime | None = None
+
+    def ramp_share(self, when: datetime) -> float:
+        """The share of its track's anomaly an appended system has grown to at `when`:
+        from nought at the order's tick to the whole at `ramp_until`; 1 for every other."""
+        if self.ramp_from is None or self.ramp_until is None:
+            return 1.0
+        span = (self.ramp_until - self.ramp_from).total_seconds()
+        if span <= 0.0:
+            return 1.0
+        return min(1.0, max(0.0, (when - self.ramp_from).total_seconds() / span))
 
     # -- the fronts ---------------------------------------------------------
 
@@ -1017,15 +1036,27 @@ class Weather:
         if self.find(str(d.get("name") or "")) is not None:
             raise WeatherError(f"The weather has a system named {d.get('name')!r} already.")
         system = _system_from_dict(d, self.now)
+        # it grows in from nothing at the order's tick (package 58a; the cold review of
+        # 2026-10-22, R-39, D3-08, D4-06, D5-12: a one-point track was held at full
+        # strength from the moment it was appended, the heat low at 1008 hPa nineteen
+        # hours early, and the glass stepped): over `APPEND_RAMP_S` at the least, or until
+        # its first point's time when that is later
+        system.ramp_from = self.now
+        system.ramp_until = max(self.now + timedelta(seconds=APPEND_RAMP_S), system.track[0].at)
         self.systems.append(system)
         x, y, hpa = _track_at(system.track, system.track_times, self.now)
-        system.x_km, system.y_km, system.anomaly_hpa = x, y, hpa - self._background
+        system.x_km, system.y_km = x, y
+        system.anomaly_hpa = (hpa - self._background) * system.ramp_share(self.now)
         return system
 
     def append_waypoint(
         self, name: str, at: datetime, x_km: float, y_km: float, hpa: float
-    ) -> None:
-        """A waypoint appended to a scripted system's track, after its last."""
+    ) -> datetime:
+        """A waypoint appended to a scripted system's track, after its last; the time it is
+        reached, returned. A track that has ended already (its last point before now) is
+        taken up from where the system stands now (package 58a, R-39: the interpolation ran
+        from the old end, and most of the change came at once), the waypoint reached
+        `APPEND_RAMP_S` after the order at the soonest."""
         system = self.find(name)
         if system is None:
             known = ", ".join(s.name for s in self.systems if not s.gone) or "none"
@@ -1039,8 +1070,19 @@ class Weather:
                 f"{system.name}'s track ends at {system.track[-1].at.isoformat()}; a waypoint "
                 f"appended comes after it."
             )
+        if system.track and system.track[-1].at < self.now:
+            # the track had ended: from where it stands now, at the pressure it has now
+            here = TrackPoint(
+                self.now, system.x_km, system.y_km, self._background + system.anomaly_hpa
+            )
+            system.track.append(here)
+            system.track_times.append(self.now)
+            if system.ramp_from is not None:
+                system.ramp_until = min(system.ramp_until or self.now, self.now)
+            at = max(at, self.now + timedelta(seconds=APPEND_RAMP_S))
         system.track.append(TrackPoint(at, float(x_km), float(y_km), float(hpa)))
         system.track_times.append(at)
+        return at
 
     def describe(self) -> list[str]:
         """The systems in words, for the driver's load line (the author's view: names,
@@ -1194,7 +1236,7 @@ class Weather:
             if s.scripted:
                 x, y, hpa = _track_at(s.track, s.track_times, when)
                 s.x_km, s.y_km = x, y
-                s.anomaly_hpa = hpa - self._background
+                s.anomaly_hpa = (hpa - self._background) * s.ramp_share(when)
                 continue
         if self.scripted or self.climatology is None:
             return

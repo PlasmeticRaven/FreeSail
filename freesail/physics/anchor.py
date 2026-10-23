@@ -350,7 +350,8 @@ def riding_words(ship: Ship, tide_state: Any, wind_from_rad: float) -> str:
     tackle = ship.extra.get("ground_tackle")
     riding = tackle.riding_by() if isinstance(tackle, GroundTackle) else None
     by = f" by {riding.name}" if riding is not None else ""
-    if tide_state is None or tide_state.slack:
+    if tide_state is None or tide_state.slack or tide_state.flood is None:
+        # at the turn, or where no stream runs (package 58a): she lies head to wind
         return f"Riding{by}, head to wind."
     stream = math.radians(tide_state.stream_toward_deg)
     # the tide "from" is the opposite of the way it runs; the wind "from" is given

@@ -8074,3 +8074,317 @@ restarted twice during the runs, and each tier is written here as it finished.
   failed, 327 slow left out (07:25 to 07:47). **The slow tier of the files touched** (the
   fifteen above and `test_ports`): 514 passed, 10 expected failures (the eight before and
   the Goulet's two), none failed (07:47 to 08:19).
+
+## Package 58a: the sample's deltas and the stand-by's instruments (2026-10-23)
+
+The cold review of 2026-10-22 (R-26, R-31, R-04, R-39 in part, R-42; the directors' and the
+lugger officer's own accounts in its §7.1 and §7.2), the owner's "delta" of 2026-10-17 and
+his rulings on the brief (the dry run the director's; `ahead` every station's that has the
+deck's readings, the director's by the truth; the deltas watched for forgetting, the lead's
+"as before" line). Built in a worktree off `872aa61`, beside 58b and 67; spec M7b §3, §5 and
+§12 "as built (package 58a)"; the Harness's §21b; the primer's chapters 6, 19 and 20; truths
+7b-124 to 7b-126. Nothing of 58b's (the captain's sea sense, `captains.py`, `brains.py`,
+`ports.py`, the evolutions) or 67's (the desk's seat, `harbour.py`, the `seat:` form, the
+channel) is touched but where named below; `remote.py` has one line (a dry run is a read
+at the desk), `core/replay.py` one guard (found on the way).
+
+### Each item against its intent
+
+1. **Deltas: built.** A sample after the first carries what changed since the model's last
+   reply. The readings were deltas since 31c; what repeated was the rows whose words move
+   with every bearing and the history around them. The sail rows (`strangers`,
+   `sail_in_sight`, `stranger_in_sight`) are compared by each sail and how far she is made
+   out (`Harness._delta_keys`), so the list comes when a sail came, went or was made out
+   further, not each time her bearing moved; the lookout's row by who holds the masthead and
+   his last hail (its sightings are `in_sight`'s); the officer's row by everything but the
+   captain's words to him; the captain's word and question to the station are not given
+   again in the log beside the sample's `word` (`_without_the_word`); the stand-by's notable
+   lines are counted and found in the waking sample's log (`lines_in`), no longer listed
+   twice. Each sample of deltas closes with `as_before` ("As before: the sails, two sail in
+   sight, the book; the other readings as last told (readings gives every row).") for the
+   owner's caution. The first sample of a seating (the brief resent clears it, as 31c's) and
+   the first after a handover fold are whole. **"Still waiting"** lists only the lines since
+   the last call of the same wait (`still_waiting(..., listed)`, the bridge's `_listed`).
+   *Taken another way, in part*: the brief's reading was a per-station cursor for each part;
+   the deltas compare each part's own key with the last told, which is the same thing and
+   keeps nothing new in the save; and the "still waiting" cursor is the MCP bridge's, not
+   the game's, since a door's poll is no act (a cursor in the game would make the samples
+   depend on the polls, and a replay by the transcript does not poll). The standing orders
+   reach a sample only through the `captain` row, which 31c's deltas already carry only when
+   the book changes.
+2. **The notable-noise rules: built.** *The swing at the turn* has its cause mended, not
+   masked: `TideState.flood` is None where no stream runs (`streaming`, the area's rate
+   nought: `NO_STREAM` beyond every area), and the riding words there are "head to wind";
+   the World's turn of the tide (`_tick_tide`) passes over a None as it passes over slack, so
+   a ship sheering across an area's edge says her swing at the channel's own turns. The
+   Horta night, from the filed save's own scenario, ship, berth and evening: **110 swing
+   lines in six hours under the old cause, one now** (truth 7b-125). *A recurring line* of
+   `RECURRING_KINDS` (`evolution.waiting`, `sounding`, `aboard.found`, `well.sounded`)
+   whose words equal the last of its kind is routine (`World.record`; urgent never); the
+   first, and any whose words changed, keep their severity. *Light airs* take the hysteresis
+   of a point and two knots held ten minutes: they fall light when the mean has stood under
+   the floor (four knots) `WIND_LIGHT_HOLD_S`, ten minutes (it was a minute), and settle when
+   it has stood `WIND_SETTLE_BAND_KN` (two knots) above the floor, its direction within a
+   point of where the settling began, `WIND_SETTLE_S`, ten minutes (it was five minutes at
+   the floor, whatever the direction did). A breeze going between three and five knots every
+   twenty minutes for four hours now says "Light and variable airs." once, where it said it
+   six times with five settlings between (`test_log_lines`).
+3. **Tripwires: built** (`freesail/agents/tripwires.py`). `her way settled` (her speed
+   within a quarter of a knot and her head within a quarter of a point for two minutes,
+   measured afresh at every order given: after "steer N" from a southerly course the frigate
+   settled eight minutes on, at 7.3 knots); `depth under <n> fathoms` (the chart at her
+   account, or the lead's cast); `speed under <n> knots`, `speed over <n> knots`; `the wind
+   over <n> knots` (the true wind); `a point of interest within <n> miles` (the chart's
+   places, marks, lights, dangers and anchorages, and the world's `mark:`s, new within the
+   miles of her account; the wake names it). The dialect's conditions underneath are the
+   book's (`parse_condition`), the two of her own way are the module's; each joins the others
+   with *or*, and the refusal of a stand-by it cannot read lists them.
+4. **`ahead` and the cost of thinking: built.** `ahead` is a row of the registry
+   (`readings.ahead_words`), every station's that has the deck's readings: the land, a
+   charted danger within two cables of her track with too little water for her draught, the
+   depth by the chart where it shoals under ten fathoms or changes by a third, a sail within
+   two points of her head; from her account, her head and the log's speed; nothing at
+   anchor, aground or with no way on. A millisecond to read. The director's is the truth's
+   (the player's ship's entry in `truth`, "by the truth"). The station's line and the
+   director's close with "<n> minutes of the ship's time since your last reply"
+   (`Harness._replied_tick`, a class default for checkpoints).
+5. **The forms reference, the dry run and the lookups: built.** `director.WORLD_ORDER_FORMS`
+   is one table of every form, its words, what it does and examples; the library's grammar
+   topic's fourth part, "the world orders", is written from it, and so are the station
+   brief's examples (`_q`) and the starter briefs' (a test holds each starter's examples to
+   the table). Every example is dry-run on the sea it is meant for (a fresh one, one with her
+   ship far off, one with her ships and people near) and is performed or doubted with what
+   it would do, but eight the test's seas cannot do as they stand, each with the game's
+   honest word about the situation (the seat's consent, the starters' own ships not on the
+   test's sea, "carry on" with no order standing, "fill away" when she is not hove to, "haul
+   off" with no sail in sight of her, a payment from an empty purse). **The dry run**
+   (`world_order(text, dry_run=true)`, `director.dry_run`) answers in the channel's order
+   (the budget read without renewing it, the rule of reach, the brief, the form, the doubt)
+   and reads what the order would do by performing it on a copy of the world (the
+   checkpoint's own pickling), let go; it writes nothing anywhere and spends no act, it is
+   counted among the reads, and at the desk it is a meanwhile read through which a stand-by
+   goes on. *Taken another way*: the doubt a dry run shows is not "shown" for 68's rule of
+   the first reason (that reads the director's log, and a dry run writes nothing, so that
+   it replays alike by the transcript and by the acts): the dry run says to enter the order
+   once and then with its reason. **The lookups**: `truth(ports=)`, `truth(grounds=)`,
+   `truth(systems=true)`, `truth(at=)`, each a small read. **The page** "the world" (the
+   library's, `director.world_page`): the systems (they add; they grow in), ships put on the
+   sea and their companies, what each order logs and to whom, the doubt's figures, every
+   figure formatted from the constant the code uses and a test checking each.
+6. **Weather, the small part: built.** An appended system grows in from nothing at the
+   order's tick to its anomaly over `APPEND_RAMP_S` (an hour) at the least, or until its
+   first point's time when that is later (`System.ramp_from`, `ramp_until`, class defaults);
+   a waypoint appended to a track that had ended runs from where the system stands at the
+   order's tick, reached an hour on at the soonest, the result saying so, and its speed is
+   doubted from there; a high is doubted like a low, above the season's ceiling (the month's
+   background with its strongest high and `HIGH_CEILING_MARGIN_HPA`, four hPa, over;
+   judgement) or `LOW_DEEP_HPA` strong within `LOW_NEAR_KM` out of a glass not rising. A
+   990 hPa low appended over the ship for three hours on now takes the glass down two hPa a
+   quarter hour (1012.6 at the order, 1010.4 a quarter hour on), where it stepped 27 hPa at
+   the order (1012.6 to 985.6, measured on `872aa61`). Kept out, as briefed: the summed
+   field's bound and the climatology's drift onto Iberia.
+7. **Truths and records: built.** Truth 124 (the second sample with no sail line and the
+   strangers' list only when a sail was made out further, "still waiting" with only the new
+   lines, the waking sample's lines counted in its log); 125 (the Horta night's swing once a
+   turn); 126 (a dry run of a doubted order returns the doubt and what it would do, the
+   log's digest, the inputs, the marks and the director's log the same, no act spent; then
+   entered, doubted on the record, entered again with its reason, performed and counted).
+
+### What moved
+
+- **The samples' words** (no log, so no pin): the waking sample's `stood_by` carries
+  `lines_in` for its `lines`; a sample of deltas carries `as_before`; the line closes with the
+  cost of thinking; the sail rows, the lookout's and the officer's are carried by their keys.
+  `test_agents`' two assertions of the old shapes follow, the old words kept in comments.
+- **The readings** gain `ahead` (every sample's first, and its deltas when it changed); the
+  grammar topic its fourth part; the library its page "the world"; the `world_order` tool
+  `dry_run` and the `truth` tool its four lookups; the stand-by tool's and the officer's
+  brief's words the tripwires; the director's station brief its examples from the table
+  (the same orders, but the weather's three now concrete, and the dry run, the lookups and
+  the page named).
+- **The log's severities and lines** (the pins, below): the recurring lines routine; the
+  light airs' lines later and fewer; the swing at the turn said once a turn, and "head to
+  wind" where no stream runs. `test_log_lines`' two figures of the light airs follow (the
+  calm's line at 600 seconds, 60 before; the settled wind "a gentle breeze", "a light
+  breeze" before).
+
+### Found on the way
+
+- **A checkpoint with two ships crewed could not be read** (`core.replay._rebind`): a crewed
+  vessel's World lists the parent's other vessels, so with two crewed at once each rebound
+  the other's World without end (`RecursionError`), and a save of such a game fell to its
+  replay. It blocked the dry run's copy of the world; mended by a guard of one line (each
+  World rebound once). Not otherwise tested by this package beyond the forms' test, which
+  copies a world with two crewed.
+- **The standing dialect reads "the depth of water is less than 8 fathoms" as the lead's
+  `the depth`**, though "the depth of water" is the chart's row's own alias (the longest
+  name is not taken); "the depth by the chart is less than" reads the chart. The tripwire
+  uses the latter. Not changed (the dialect's), carried for the lead: a book's `when the
+  depth of water is under 10 fathoms` reads the lead.
+- **A crewed ship's captain does not know "haul off"**: the hand's `ship "Harpy": order haul
+  off` (the hard cruise's own starter example) is carried at far detail ("No sail in sight
+  to haul off from" when there is none) and refused crewed ("There is no such part as the
+  off in this ship"). Not changed (62's hand and 43's grammar); carried.
+- **The truth's "tide" says "the flood" while the height rises** (LD-16), and with `flood`
+  None outside every area the riding words now say "head to wind" there; the truth's tide
+  words still name the stream area's axis. Not changed.
+- **Two tabulated stream areas meeting with different phases** could still say a swing at
+  their edge as a ship sheers across it; not seen in the filed saves, and not masked: noted.
+- **The scratch directory is shared by the builders working at once** (the tree, the scripts
+  and the logs of 58b and 67 sat beside this package's, one of its scripts overwritten by
+  another's of the same name); this package's scratch was moved under `p58a/`.
+
+### Decisions for the lead and the owner
+
+- The figures, all judgement: her way settled at two minutes, a quarter knot and a quarter
+  point; `ahead`'s two cables abeam, ten fathoms, a third of the depth and two points on the
+  head; the high's ceiling four hPa over the season's strongest; an appended system's growth
+  over an hour at the least **or until its first point's time** (the brief said an hour; a
+  system whose first point is a day off would otherwise sit at full strength at that point
+  from the order); the recurring kinds (four: the trim waiting for hands, the cast, the
+  carpenter's report, the well sounded).
+- The dry run's doubt is not a doubt on the record (the director enters the order once and
+  then with its reason): the replay's evenness over a call saved.
+- "The world orders" (the grammar's fourth part) and the page "the world" are in every
+  station's library, as the primer's chapter 20 has always been; neither names a seated
+  director. Served to the director alone would want the station in `_topic`.
+- `ahead` changes in most samples under way (its distances), some 200 characters; the owner
+  wanted it in every sample's view.
+
+### The size of a day's samples, before and after (measured on a filed save)
+
+The lugger's day (`docs/playtests/2026-10-18-to-22-owner-playtests-and-review/saves/
+2026-10-22-lugger-fishing-G.json`, its first ship's day, 10 June 05:00 to 11 June 05:00),
+replayed by its transcript (each station's recorded replies played back where they were
+taken) on this package's tree, so that both tellings are of **the same samples at the same
+points**: each data turn as this package tells it, beside the same turn as 31c told it (the
+readings by their words, the stand-by's lines listed, no line of what stands as before, the
+captain's word in the log as well); and "still waiting" as a door would print it with every
+line of the wait, against only the lines since its last call, one poll each minute of the
+ship's time (a model's fifty seconds at the owner's 1.2x; at five minutes a poll, 6x, the
+figures follow them). Characters, as sent:
+
+| Station | Samples and folds (45 / 95 turns) | "Still waiting" (1,063 / 403 polls) | The day |
+|---|---|---|---|
+| The officer of the watch | 190,992 to 166,285 (-13%) | 556,745 to 403,910 (-27%) | 747,737 to 570,195 (-24%) |
+| The director | 324,658 to 293,002 (-10%) | 299,452 to 175,675 (-41%) | 624,110 to 468,677 (-25%) |
+| Both | 515,650 to 459,287 (-11%) | 856,197 to 579,585 (-32%) | **1,371,847 to 1,038,872 (-24%)** |
+
+At a poll each five minutes of the ship's time the polls fall 109,792 to 81,887 (the
+officer) and 60,029 to 41,210 (the director). What is left in a poll is its head (the wait,
+the time and the clock, some 350 characters); what is left in a sample is its log, which
+the deltas do not touch, `in_sight` and `nearest_land` (the shore's bearings, which change
+with every swing at anchor and which the brief did not name) and `ahead`. This day's waits
+were short (the stations sampled each glass or sooner), so the
+re-listing R-26 measured (58 lines and 12,000 characters a poll, a stand-by of hours) grew
+no long list here; the saving on a long wait is the whole list at each poll but the first.
+
+*Measured another way than first planned*: a replay of the save on the tree before
+(`872aa61`) and on this one gives other samples at other points (the director's appended
+highs grow in now; 78 samples of the officer's before, 45 after), so the two tellings were
+taken of one replay instead (`p58a/measure2.py` in the build's scratch directory). The
+replay before, for the record: the officer's samples 240,163 characters in 78 turns and the
+director's 315,262 in 89.
+
+### Pins
+
+Seven digests moved in eight tests, every one by item 2's recurring lines and nothing else;
+every tick, line and state stands, only the digest moves (the digest reads each line's
+severity). The proof is by bisection: the package's tree with `RECURRING_KINDS` emptied (the
+tide's flood and the light airs left as built) gives every old figure, the eight tests
+passing against their old pins (`p58a/tree-norecur`, both runs passed, 14:15); the tree as
+built gives the new. So neither the tide's mending nor the light airs' hysteresis moves a
+recorded passage. The lines the rule says routine, counted on the tree as built (a line of a
+recurring kind, notable, in the same words as the last of its kind):
+
+| Passage | Old digest | New digest | Lines made routine |
+|---|---|---|---|
+| The schooner's passage (5b) | `b9acdeac6354f3bf` | `2b68e8b1f60e8496` | 3 trims waiting for hands (from 9750), 1 cast of the lead (60109) |
+| The merchant passage (5c), and truth 77 | `902be35aeeac7b54` | `36c17b76e1735975` | 5 trims waiting (from 20824), 15 casts of the lead (from 102102) |
+| The naval cruise (5c), and truth 77 | `728522e26dd25a49` | `5a62f6fca122c6ad` | 1 trim waiting (144622) |
+| The intent schooner (6a) | `8eead2f4521f2a61` | `6292d5af25a6b326` | 9 trims waiting (from 49713) |
+| The fake captain (truth 78) | `1f8de8b49c7d5b5a` | `073a636b6d76cc16` | the merchant passage's |
+| Trial station, lee shore | `e60617edd7ebbc73` | `4720693ca65bc67b` | 1 trim waiting (56941) |
+| Trial trade, stranger | `7b8012b076ebea42` | `9eb41044fc6e9907` | 3 trims waiting (from 13903) |
+
+The lines' counts (766, 3099, 2242, 2160, 3112, 1669, 1534) do not move. The trials'
+other three pins (the station's stranger, the gale, which is an expected failure, and the
+trade in thick weather) stand against their figures; truth 7b-117's line on the quay closes
+now with the cost of thinking ("...; on your feet since 10:00; 30 minutes of the ship's time
+since your last reply.", the old words beside it in the test). Every old figure is kept
+beside the new in the tests' comments.
+
+*To the lead*: `tests/test_captain_trials.py`'s two re-pinned digests lie in a file 58b
+also works its captain's passages in; if 58b moves the same passages, the merged tree's
+figure is neither branch's, and is measured there.
+
+### A scripted run
+
+On the package's tree, three scenes built by the tests' own helpers (the build's scratch
+`scripted_run.py`), as printed:
+
+1. *The deltas*: the captain standing by a glass off the Lizard, bound from Falmouth for
+   Penzance, a sail six miles off. The first sample of his seating (10:02) is whole, 73
+   rows, the sails and the strangers among them. The second (10:32) carries fourteen:
+   `ahead`, the wind's angle, the course and the course made good, the depth by the chart,
+   the heading, the heel, the helm, `in_sight`, the leeway, the reckoning, the run since
+   noon, the speed, the time; no sails (none changed) and no strangers (none came, went or
+   was made out further). His line: "You: the captain, on the quarterdeck, since 10:00; the
+   deck yours; on your feet since 10:00; 30 minutes of the ship's time since your last
+   reply." The closing line: "As before: the sails, one sail in sight, the book; the other
+   readings as last told (readings gives every row)."
+2. *A tripwire*: `steer N`, then `stand_by(until="her way settled")`:
+
+   ```
+   10:10  [captain] The captain stands by until her way settled; the standing orders hold the deck.
+   10:18  [captain] Her way settled, at 7.3 knots; the captain is sampled again.
+   10:18  [captain] The captain stands by until a point of interest within 3 miles; the standing orders hold the deck.
+   10:27  [captain] A point of interest within 3 miles: Rill Point, 3 miles by account; the captain is sampled again.
+   ```
+3. *A dry run* of a mark put 0.6 miles off her: "Dry run, nothing performed and no act
+   spent: it would be doubted: a mark put 0.6 miles off is inside the lookout's horizon (24
+   miles in this visibility, by day): it would have been in sight already. Entered, it is
+   doubted on the record; entered again as 'mark: a wreck, her masts showing at 49 30 N 5 31
+   W [reason: ...]' it is performed, and then it would do this: a mark put in the world, a
+   wreck, her masts showing, at 49 30 N 5 31 W." The director's acts before and after: 0
+   and 0; the log the same; no mark on the sea.
+
+### The suite, as run
+
+On the build machine (four cores) carrying the three packages' suites at once (the load
+between 15 and 26 all afternoon). **On the lead's word the whole slow tier was not run,
+nor the pace tests**: the whole slow run begun in the morning was stopped by its pid at
+11:12, and the lead runs one whole suite on the merged tree. The logs are in the build's
+scratch directory (`p58a/`).
+
+- `ruff check .` and `ruff format .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`, the tree of
+  `edf26bc`, 10:41 to 13:07, `p58a/fast-1.log`): 3,568 passed, **4 failed**, 330 slow left
+  out. Three were the package's and are mended: the library's contents counting the
+  grammar's four parts (`fb269b9`); truth 7b-117's line on the quay, which closes now with
+  the cost of thinking (`67303b2`); and a wardroom door's stand-by on `the true wind exceeds
+  20 knots`, which the tripwires had taken for their own `the wind over 20 knots` (the
+  dialect is read first now, the tripwires only where it refuses, `67303b2`). The fourth is
+  not the package's: truth 88's pace (`test_crews.py`), 44 ticks a second against the floor
+  of 60 under `-n 4` at the load of 20; measured alone in turn on the tree before and this
+  one, three rounds each, it gives 143 to 197 ticks a second by the wall and 207 to 255 by
+  the process's own time for both alike (`p58a/pace_ab.log`).
+- **After the mends** (`67303b2`): the four tests above and the files of the stand-by's
+  words, fast tier (`test_agents`, `test_known_truths`, `test_local_runner`, `test_officer`,
+  `test_python_api`, `test_readings`, `test_standing`, `test_wardroom_doors`,
+  `test_harness_instruments`): all passed, none failed (`p58a/fix-1.log`,
+  `p58a/fast-after.log`).
+- **The slow tier of the files touched** (`test_agents`, `test_director`,
+  `test_known_truths`, `test_log_lines`, `test_tide`, `test_mcp_server`,
+  `test_harness_instruments`; `--slow -n 4 -m "slow and not pace"`, 11:12 to 13:31,
+  `p58a/slow-touched.log`): 115 passed, 7 expected failures, **6 failed**, every one a
+  moved pin above; and the captain trials' five pinned passages (`p58a/trials.log`): 2
+  passed, 1 expected failure, 2 failed, the two moved pins above. The eight re-pinned,
+  run again on the tree as committed (`p58a/repinned.log`, 14:17 to 14:46): 8 passed.
+- **Not run**: the whole slow tier; the pace tests (`-m pace`).
+
+*Found on the way, not mended*: truth 88's pace test is marked `pace` by hand
+(`@pytest.mark.pace` in `tests/test_crews.py`) but `tests/conftest.py`'s `_is_pace` knows
+the pace tests by their names alone, so it is never marked slow and runs in the fast tier
+under `-n`, where it reads the load (its docstring says "any marked `pace` by name or by
+hand belongs here"). It did not block the package; it is the lead's.

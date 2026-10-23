@@ -359,6 +359,22 @@ with its reason is performed. Not taken: a reason that does not answer the doubt
 overrides it (R-41's second case), the hard half of 61 (a route laid clear of the land),
 "whaler" and the forms the directors asked for (R-42).
 
+**As built (package 58a; R-42's reference and dry run, R-39's small part).** The forms are
+one table (`director.WORLD_ORDER_FORMS`: each form's words, what it does, and examples a
+test performs by dry run on the world it is meant for), the library's grammar topic's fourth
+part ("the world orders") and the source of the station brief's and the starter briefs'
+examples. `world_order(text, dry_run=true)` answers in the channel's own order (§12's as
+built). A system appended in play grows in from nothing at the order's tick (`System.
+ramp_from`, `ramp_until`: over `APPEND_RAMP_S`, an hour, at the least, or until its first
+point's time), a waypoint appended to a track that had ended runs from where the system
+stands at the order's tick, reached an hour on at the soonest (and is doubted for its speed
+from there), and **a high is doubted like a low**: above the season's ceiling (the month's
+background with its strongest high's anomaly and `HIGH_CEILING_MARGIN_HPA` over), or one
+`LOW_DEEP_HPA` strong within `LOW_NEAR_KM` of her out of a glass that has not been rising.
+Kept out, as briefed: the summed field's seasonal bound and the climatology's drift onto
+Iberia (M7's weather). The scenario's own world orders take the same rules; no recorded
+passage appends a system, and its waypoints all extend tracks still running.
+
 ### 4. The brief and its guardrails (`data/director/briefs/*.yaml`; `freesail/agents/director.py`)
 
 The player writes the brief: the tone of the voyage (a quiet passage, a hard-luck cruise, a
@@ -488,6 +504,46 @@ again goes on (`remote.Desk._stand_by_out_of_turn`, compared by the stand-by's o
 thing found aboard, a ship put on the sea) are spans of the log its harness passes over
 for its policy, its stand-by and its folds (`Harness._own_lines`); every other station meets
 them as before.
+
+**As built (package 58a; the cold review of 2026-10-22, R-26, R-31, R-04, R-39, R-42 and
+§7's accounts; `harness.Harness._as_told`, `_delta_keys`, `_as_before`; `mcp_server.
+still_waiting`, `Bridge._listed`; `agents/tripwires.py`; `readings.ahead_words`; `World.
+record`'s `RECURRING_KINDS`; truths 7b-124 to 7b-126).**
+
+- **The deltas.** A sample after the first carries what changed since the model's last
+  reply: the log lines since, the readings changed (31c), the sails in one line only when a
+  sail's state changed, the sail rows (`SAIL_ROWS`: the strangers, a sail in sight, a
+  stranger in sight) compared by each sail and how far she is made out, not by her bearing;
+  the lookout's row by who holds the masthead and his last hail, the officer's by all but
+  the captain's words to him; the captain's word or question to the station not again in
+  the log beside the sample's `word`; the stand-by's notable lines counted (`lines_in`, the
+  log below) and not listed twice. A sample of deltas closes with `as_before` ("As before:
+  the sails, two sail in sight, the book; the other readings as last told (readings gives
+  every row).") for the owner's caution that a model may forget a thing is still so. The
+  first sample of a seating and the first after a handover fold are whole; `readings` gives
+  everything. The standing orders reach a sample only by the `captain` row, which the deltas
+  carry when the book changes. *Taken another way*: a cursor per part was not kept beside the
+  log's (the brief's reading); the deltas compare the parts' own keys with the last told,
+  which is the same and keeps nothing more in the save.
+- **Still waiting**: the MCP bridge lists only the notable lines since its last result of
+  the same wait (`still_waiting(..., listed)`), the earlier ones counted. The bridge keeps
+  the count, not the game: a door's poll is not an act, and nothing of the replay moves.
+- **The cost of thinking**: the station's line and the director's close with "<n> minutes
+  of the ship's time since your last reply" (`Harness._replied_tick`, `cost_words`).
+- **Tripwires** (`agents/tripwires.py`): `her way settled` (speed within a quarter knot and
+  head within a quarter point for two minutes, begun again at every order), `depth under
+  <n> fathoms` (the chart at the account, or the lead), `speed under/over <n> knots`, `the
+  wind over <n> knots`, `a point of interest within <n> miles` (the chart's places, marks,
+  lights and dangers and the world's `mark:`s, new within the miles of the account); each a
+  condition watched once a tick as the dialect's are, its wake naming what it found.
+- **The notable-noise rules** (`core/world.py`): a line of `RECURRING_KINDS`
+  (`evolution.waiting`, `sounding`, `aboard.found`, `well.sounded`) whose words equal the
+  last of its kind is routine; light airs fall light under the floor held
+  `WIND_LIGHT_HOLD_S` (ten minutes) and settle `WIND_SETTLE_BAND_KN` (two knots) above it,
+  within a point, held `WIND_SETTLE_S` (ten minutes); the swing at the turn is said once a
+  turn, its cause mended: `TideState.flood` is None where no stream runs (`NO_STREAM`), and
+  the riding words there are "head to wind" (§12a's world orders and M5 §16 unchanged
+  otherwise).
 
 ### 6. The director's log, hidden and revealed (`freesail/agents/journal.py`; `core/replay.py`; `ui/`)
 
@@ -726,6 +782,29 @@ and measures what moved (nothing pinned should).
 ship the player is aboard, the player seated under the same contract as a model there; and
 a save with a station on another ship replays that station's acts as it replays the
 player's (43's checkpoint carries the other ship whole; the acts are keyed by ship).
+
+**As built (package 58a; the observed world as a station reads it ahead, and the
+director's lookups).** **`ahead`** is a row of the registry (`readings.ahead_words`): what
+lies on her course within the next glass at her speed, from the deck's own knowledge (her
+position by account, her head, the log's speed, the chart, the lookout's sail), in one line,
+nearest first: the land, a charted danger within two cables of her track with too little
+water for her, the depth by the chart where it shoals under ten fathoms or changes by a
+third, a sail in sight within two points of her head; at anchor, aground or with no way on,
+nothing. Every station that has the deck's readings has it; the director's is the truth's,
+the player's ship's entry in `truth` carrying `ahead` from her true place, head and speed
+(the owner's ruling of 2026-10-23). **The truth's lookups** (`truth(ports=, grounds=,
+systems=, at=)`; `readings.truth_ports`, `truth_grounds`, `truth_systems`, `truth_at`): a
+port's places, people and prices; the fishing grounds; every weather system with its
+centre, pressure and track, and the field at the ship (that systems add); a point at sea or
+on the land with its depth by the chart and its stream. Each is a small read in place of the
+whole truth (R-35's seven to twelve thousand tokens). **The dry run** (`director.dry_run`;
+spec §3's channel): what a world order would do, read by performing it on a copy of the
+world made by the checkpoint's own pickling and let go, the world itself untouched, so a
+replay is the same with it or without. *Taken another way*: the doubt a dry run shows is not
+a doubt on the record (68's rule that a reason answers only a doubt the director has seen
+reads the director's log, and a dry run writes nothing anywhere, so as to replay alike by
+the transcript and by the acts); the dry run's words say to enter the order once, then with
+its reason.
 
 ### 12a. The director's chart (`freesail/agents/pictures.py`, `tools.py`; `client/map.js` or a painter of the server's own)
 

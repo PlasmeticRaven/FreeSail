@@ -478,6 +478,11 @@ def test_the_stream_areas_belong_to_a_chart_and_beyond_them_there_is_no_stream(t
     state = tide.at(Position(37.0, -14.0), datetime(1805, 6, 12, 12, 0))
     assert state.stream_kn == 0.0 and state.area_id == "open-sea"
     assert state.height_m > 0.0  # the height is still the nearest gauge's tide
+    # package 58a (the cold review's R-04): where no stream runs there is neither flood nor
+    # ebb; nought of stream fell back to the axis and read as the flood before
+    assert not state.streaming and state.flood is None
+    inside = tide.at(Position(38.6, -9.4), datetime(1805, 6, 12, 12, 0))
+    assert inside.streaming and inside.flood in (True, False)
 
 
 def test_far_from_every_place_of_his_table_the_master_says_his_tide_may_be_hours_out():
