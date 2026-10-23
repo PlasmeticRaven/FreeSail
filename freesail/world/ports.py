@@ -75,6 +75,7 @@ from __future__ import annotations
 
 import math
 import random
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -528,6 +529,27 @@ def _beyond_the_leg(a: Position, b: Position, p: Position) -> bool:
     if bearing_and_distance(a, b)[1] < units.CABLE:
         return False
     return _off_the_leg(a, b, p)[1] >= 1.0
+
+
+def _wind_from_over_the_water(world: Any, wind: Any) -> float:
+    """Where the wind comes from over the water at her (radians true): the true wind less
+    the stream's set, the wind her sails feel and her close-hauled angle is counted from
+    (package 68, item 19: in the Goulet's flood of four knots toward the east, the wind at
+    NW over the ground is a point and more nearer north over the water, and the pilot's
+    "as near as she will lie" laid by the wind over the ground had her sails lifting and
+    the flood setting her onto the Mingan). The wind over the ground itself where there is
+    no stream."""
+    from freesail.physics.integrate import water_velocity
+
+    ship = getattr(world, "ship", None)
+    wx, wy = water_velocity(ship) if ship is not None else (0.0, 0.0)
+    if wx == 0.0 and wy == 0.0:
+        return float(wind.direction_from)
+    vx, vy = wind.vector_at_height(10.0)
+    ax, ay = vx - wx, vy - wy
+    if math.hypot(ax, ay) < 1e-9:
+        return float(wind.direction_from)
+    return units.wind_direction_from(ax, ay)
 
 
 def _off_the_leg(a: Position, b: Position, p: Position) -> tuple[float, float]:
@@ -2031,7 +2053,7 @@ class Ports:
         from freesail.physics.integrate import water_velocity
 
         wanted = self._for_the_stream(line)
-        wind_from = float(wind.direction_from)
+        wind_from = _wind_from_over_the_water(self.world, wind)
         closest = close_hauled_true_angle(ship) + PILOT_LIE_MARGIN_RAD + PILOT_SET_WIND_MARGIN_RAD
         x = units.wrap_pi(wanted - wind_from)
         if abs(x) >= closest:
@@ -2088,13 +2110,14 @@ class Ports:
         """The course nearest `wanted` she will lie, full and by on the tack she is on,
         when `wanted` is nearer the wind than that (package 45c): a pilot does not con a
         ship into the wind's eye (the frigate in the Goulet's mouth, the wind at WNW, was
-        given NW by turns and taken aback onto the Fillettes); None when she lies it."""
+        given NW by turns and taken aback onto the Fillettes); None when she lies it. The
+        wind is the one she sails in, over the water (item 19 of package 68)."""
         from freesail.evolutions.scripts import close_hauled_true_angle
 
         wind = getattr(self.world, "wind", None)
         if wind is None:
             return None
-        wind_from = float(wind.direction_from)
+        wind_from = _wind_from_over_the_water(self.world, wind)
         closest = close_hauled_true_angle(self.world.ship) + PILOT_LIE_MARGIN_RAD
         x = units.wrap_pi(wanted - wind_from)
         if abs(x) >= closest:
@@ -2878,6 +2901,28 @@ class Ports:
         port = self.ports.get(job.port_id)
         if port is None:
             return
+        if job.kind == "waterman":
+            # the waterman's pull done (package 68): landed at the quay, or aboard
+            p = world.people.find(str(job.payload.get("person") or ""))
+            if p is None or p.where != "boat":
+                return
+            if job.payload.get("to") == "shore":
+                p.aboard, p.where, p.port, p.ashore_at = False, "shore", port.id, "quay"
+                self._record(
+                    Severity.NOTABLE,
+                    "person.ashore",
+                    f"{p.name} landed at {port.shore.name} from a waterman's boat.",
+                    {"person": p.name, "port": port.id},
+                )
+            else:
+                p.aboard, p.where = True, "quarterdeck"
+                self._record(
+                    Severity.NOTABLE,
+                    "person.aboard",
+                    f"{p.name} came aboard from a waterman's boat.",
+                    {"person": p.name, "port": port.id},
+                )
+            return
         if job.kind == "yard":
             item, qty, words = job.payload["item"], float(job.payload["qty"]), job.payload["words"]
             ship = world.ship
@@ -3069,22 +3114,58 @@ class Ports:
         if "letter" in low or "message" in low or "dispatch" in low or "despatch" in low:
             errand = "message"
             carrying.append({"kind": "letter_out", "text": words})
-        m_with = _after(low, ("with the ", "with ", "carrying the ", "carrying "))
-        if m_with:
-            person = world.people.find(m_with)
-            if person is not None and person.role not in ("captain",):
-                if not person.aboard:
-                    raise OrderError(f"{person.name} is {world.people.state_words(person)}.")
-                if person.occupied:
-                    raise OrderError(f"{person.name} is at the {person.task}.")
-                people.append(person.id)
-                person.aboard = False
-                person.where = "boat"
-                errand = "person" if errand == "prices" and person.role != "purser" else errand
+        for person in self._passengers(words):
+            if not person.aboard:
+                raise OrderError(f"{person.name} is {world.people.state_words(person)}.")
+            if person.occupied:
+                raise OrderError(f"{person.name} is at the {person.task}.")
+        for person in self._passengers(words):
+            people.append(person.id)
+            person.aboard = False
+            person.where = "boat"
+            errand = "person" if errand == "prices" and person.role != "purser" else errand
         if any(w in low for w in ("water", "provisions", "yard", "recruits", "hands")):
             errand = "yard"
         text = self._send_boat(port, errand, carrying, people)
         return text, {"port": port.id, "errand": errand, "people": people}
+
+    def _passengers(self, words: str) -> list[Any]:
+        """The people named after 'with' in `send the boat ashore with ...` (package 68;
+        the cold review of 2026-10-22, R-62: "with the captain and Mr Pearce" dropped both
+        and the errand fell back to "for the prices"): each name found among the people, or
+        the order refused in words, the boat not sent. The captain goes ashore by his own
+        word. Words of the errand ('a letter', 'water') name nobody and are passed over."""
+        from freesail.orders.errors import OrderError
+
+        low = " " + " ".join(str(words).lower().split())
+        i = low.find(" with ")
+        if i < 0:
+            return []
+        rest = low[i + len(" with ") :]
+        for stop in (" for ", " to "):
+            j = rest.find(stop)
+            if j > 0:
+                rest = rest[:j]
+        found: list[Any] = []
+        for name in re.split(r"\s*,\s*|\s+and\s+(?:with\s+)?|\s+with\s+", rest.strip(" .")):
+            name = name.strip()
+            if not name or any(w in name for w in _ERRAND_WORDS):
+                continue
+            person = self.world.people.find(name)
+            if person is None:
+                raise OrderError(
+                    f"Nobody aboard answers to '{name}'; the boat is not sent. The people: "
+                    f"{', '.join(p.name for p in self.world.people.all if p.aboard)}."
+                )
+            if person is self.world.people.captain:
+                raise OrderError(
+                    "The captain goes ashore by his own word, 'go ashore' in the boat or 'hire "
+                    "a waterman'; the others go by 'send the boat ashore with <name>'; the "
+                    "boat is not sent."
+                )
+            if person not in found:
+                found.append(person)
+        return found
 
     def _people_back(self, people: list[str]) -> None:
         for pid in people:
@@ -3359,6 +3440,69 @@ class Ports:
             {"port": port.id, "errand": "landing", "people": [person.id], "subjects": ["the boat"]},
         )
 
+    def waterman(self, person: Any) -> tuple[str, str, dict[str, Any]]:
+        """`hire a waterman` (package 68; the cold review of 2026-10-22, R-62): a shore
+        boat from the quay of the port she lies in, whether her own boat is away or not,
+        takes the person ashore from the ship, or off to her from the quay where he
+        stands, for a shilling a head from the purse; he is in the waterman's boat for the
+        pull and lands, or comes aboard, when it is done (a job of the port's, `_apply_job`).
+        Refused in words where she lies at no port, the port is hostile, or he is busy."""
+        from freesail.orders.errors import OrderError
+        from freesail.world.geo import bearing_and_distance
+
+        world = self.world
+        port = self.in_port()
+        if port is None:
+            raise OrderError(
+                "She lies at no port: there is no waterman to hire, only her own boat at a "
+                "port's reach."
+            )
+        if self.stance(port) == "hostile":
+            raise OrderError(f"{port.name} is hostile to her; no waterman will come off.")
+        if person.occupied:
+            raise OrderError(f"You are at the {person.task}.")
+        if person.aboard:
+            to = "shore"
+        elif person.where == "shore" and person.port == port.id:
+            to = "ship"
+        else:
+            raise OrderError(
+                f"You are {world.people.state_words(person)}; a waterman takes a person "
+                "between the ship and the quay of the port she lies at."
+            )
+        purse = getattr(world, "purse", None)
+        now = world.clock.tick
+        if purse is not None:
+            try:
+                purse.pay(WATERMAN_FARE_POUNDS, f"a waterman's fare, {port.name}", now)
+            except ValueError as e:
+                raise OrderError(f"No waterman's fare: {e}.") from None
+        here = getattr(world, "position", None)
+        metres = bearing_and_distance(here, port.shore.position)[1] if here is not None else 0.0
+        pull_s = int(metres / units.knots_to_ms(WATERMAN_KN)) + WATERMAN_TURN_S
+        due = now + pull_s
+        was = person.where
+        person.aboard, person.where = False, "boat"
+        if to == "ship":
+            person.ashore_at = ""
+        self.jobs.append(Job(due, "waterman", port.id, {"person": person.id, "to": to, "was": was}))
+        minutes = max(1, round(pull_s / 60))
+        if to == "shore":
+            text = (
+                f"A waterman hired from {port.shore.name}: {person.name} goes down into his "
+                f"boat, the fare a shilling; landed in some {minutes} minutes."
+            )
+        else:
+            text = (
+                f"A waterman hired at {port.shore.name}: {person.name} goes off to the ship in "
+                f"his boat, the fare a shilling; aboard in some {minutes} minutes."
+            )
+        return (
+            "person.waterman",
+            text,
+            {"port": port.id, "person": person.name, "to": to, "due_tick": due},
+        )
+
     def fetch_person(self, person: Any) -> tuple[str, str, dict[str, Any]]:
         """`come aboard`: the boat sent from the ship lying at his port to take him off the
         quay (`BoatState.fetching`); refused in words when she does not lie there or the
@@ -3386,9 +3530,24 @@ class Ports:
 
     def _land_and_take_off(self, port: Port) -> list[tuple[Severity, str, str, dict[str, Any]]]:
         """At the quay: the people she landed to stay go ashore, and the people waiting to
-        come off step into her (package 53)."""
+        come off step into her (package 53); a thing lying in the boat is landed on the
+        quay (package 68; the cold review's D8: a thing put in the boat stayed aboard)."""
         world = self.world
         lines: list[tuple[Severity, str, str, dict[str, Any]]] = []
+        from freesail.world import things as things_mod
+
+        for t in things_mod.things_of(world):
+            if t.keeper or t.place != things_mod.IN_THE_BOAT:
+                continue
+            t.place, t.port, t.ashore_at, t.spot = "shore", port.id, "quay", ""
+            lines.append(
+                (
+                    Severity.ROUTINE,
+                    "thing.landed",
+                    f"{t.the[:1].upper()}{t.the[1:]} landed from the boat at {port.shore.name}.",
+                    {"thing": t.id, "port": port.id},
+                )
+            )
         for pid in getattr(self.boat, "landing", ()) or ():
             p = world.people.find(pid)
             if p is None:
@@ -3597,6 +3756,36 @@ def _possessive(name: str) -> str:
     """'Falmouth's', and 'St Mary's' as it stands (package 35b: a port named for a saint
     is a possessive already, and 'St Mary's's market' is no clerk's English)."""
     return name if name.endswith(("'s", "’s")) else f"{name}'s"
+
+
+# The words of a boat's errand after 'with', which name no passenger (package 68).
+_ERRAND_WORDS = (
+    "letter",
+    "message",
+    "dispatch",
+    "despatch",
+    "water",
+    "provisions",
+    "cask",
+    "prices",
+    "news",
+    "yard",
+    "recruits",
+    "hands",
+    "goods",
+    "money",
+    "purse",
+    "list",
+)
+
+# A waterman's boat from the quay (package 68; the cold review of 2026-10-22, R-62: one
+# boat for all the port's business, and the captain waited an hour and forty minutes for
+# her): his pull is reckoned at this speed between the ship and the quay, and five minutes
+# to shove off and to come alongside (judgement), and his fare is a shilling a head
+# (judgement on the period's watermen's fares; no port's data gives its own yet).
+WATERMAN_KN = 2.5
+WATERMAN_TURN_S = 300
+WATERMAN_FARE_POUNDS = 0.05
 
 
 def _after(text: str, leads: tuple[str, ...]) -> str:

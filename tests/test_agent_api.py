@@ -526,6 +526,9 @@ def test_a_reply_out_of_turn_reads_leaves_or_is_refused_in_words(tmp_path):
     g.reply("")  # the floor goes back to the game
     a = g.reply("", ("readings", {}))
     assert a["interim"] == {
+        # the ship's time now and the owner's clock (package 68, R-27)
+        "now": "Morning watch, 8 bells (04:00)",
+        "clock": 1.0,
         "since": "Morning watch, 8 bells (04:00)",
         "until": None,
         "standing_by": False,

@@ -250,8 +250,19 @@ def give_director_brief(world: World, words: str, source: str) -> list[str]:
                 + "."
             ]
         return brief.body().splitlines()
+    if words.lower().startswith("budget"):
+        # `director: budget <n> samples, <m> acts` (package 68, R-61): the budget in play
+        try:
+            brief = director_mod.set_budget(world, words[len("budget") :], source=source)
+        except ValueError as e:
+            return [f"The budget was not taken: {e}"]
+        return [
+            f"The director's budget is set ({brief.source}): {brief.samples_a_day} samples "
+            f"and {brief.acts_a_day} acts a day; the brief is otherwise as it was.",
+            director_mod.budget_words(world),
+        ]
     try:
-        brief = director_mod.set_brief(world, words, source=source)
+        brief = director_mod.brief_in_words(world, words, source=source)
     except (ValueError, OSError) as e:
         return [f"The brief was not taken: {e}"]
     return [

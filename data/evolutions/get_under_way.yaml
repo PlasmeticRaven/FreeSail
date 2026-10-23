@@ -85,7 +85,9 @@ timing:
   cast_enough_points: 4     # at the timeout: paid off this far on the tack wanted she has cast; as far on the other she has cast the wrong way, and is got under way on that tack
   cast_give_up_s: 900       # hanging nearer the wind than that, she is given till this, and the evolution then fails in words, the anchor aweigh
   cat_and_fish_s: 300       # as weigh_anchor's: judgement
-on_start: {log: "All hands up anchor! Pass the messenger, ship the bars; send the ready-men aloft to get the sails ready for loosing."}
+# the first line by her rig (package 68): a ship's "Pass the messenger, ship the bars; send
+# the ready-men aloft", a lugger's windlass and no hand aloft (scripts.under_way_start_words)
+on_start: {log: "{start_words}"}
 on_complete: {log: "Under way on the {tack} tack, {sail_words}; {anchor} catted and fished; {course_words}.", kind: ship.under_way, severity: notable}
 on_fail: {log: "Could not get under way: {reason}.", kind: evolution.failed, severity: notable}
 # crew: all hands ("All hands up anchor!"); a manoeuvre (Luce's whole sequence has the

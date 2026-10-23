@@ -4,7 +4,7 @@ stdio, on the Python MCP SDK's server class (`MCPServer`, which is what the SDK 
 `FastMCP` before its version 2). It is a client of the running game and owns no World.
 
     python -m freesail.agents.mcp_server --game http://localhost:8000 --model-name "<identity>"
-        [--station watcher] [--wait 200] [--session play|test] [--ask-again]
+        [--station watcher] [--wait 50] [--session play|test] [--ask-again]
 
 The owner starts the game first, in the browser (`freesail.ui.server`) or the console
 with `--agents-port`, and plays it there; this bridge carries the model's tool calls to
@@ -37,16 +37,18 @@ saying whose turn it is ("Your turn is open: sample at ..."). While a call is he
 bridge sends MCP progress notifications every `PROGRESS_EVERY_S` (standard clients
 reset their request timeout on progress), each saying how long it has waited and what
 the game has logged of note, and it gives up at the ceiling (`--wait`, `MCP_WAIT_S`,
-two hundred seconds by default, under the four minutes after which Claude Desktop cuts a
-call whatever the progress: package 31c, playtest 11's finding 2): the result then says
-so ("Still waiting ..."), with since when the model has waited, until what, and the
+fifty seconds by default since package 68, under the sixty after which the desktop and
+Claude Code clients cut a call whatever the progress; two hundred before, under the four
+minutes package 31c measured): the result then says so ("Still waiting ...", with the
+ship's time now and the owner's clock), with since when the model has waited, until what, and the
 notable lines logged since, in the log's own words, so a stand-by is a decision not to be
 sampled and not a decision to be blind; calling `stand_by` again continues the same
 wait, and `say(text)` ends it at the model's own word and opens its turn. A `stand_by`
 while the game has the floor and the model is not standing by is taken from then (so the
-bell it names, falling before the next turn, wakes it); one while it is standing by
-continues that wait. For a client that cuts shorter calls, `--wait 50` waits in
-fifty-second calls, each with that digest (`docs/agents/Harness.md`). The game runs on its own clock
+bell it names, falling before the next turn, wakes it); one while it is standing by for
+another replaces that stand-by (package 68), and one for the same continues that wait.
+A client that holds calls longer may be given more (`--wait 200`; `docs/agents/
+Harness.md`). The game runs on its own clock
 meanwhile: what happens while the model holds the floor is added to its open turn (the
 harness's fold), and the next call that reads it gets everything since its last reply.
 
@@ -171,17 +173,17 @@ __all__ = [
 DEFAULT_GAME = "http://localhost:8000"
 
 # How long `say` and `stand_by` hold the call open for the next turn, in real seconds:
-# the ceiling, not the usual wait, since the call returns as soon as the turn opens. Two
-# hundred seconds (package 31c, playtest 11's finding 2): the Claude Desktop client cuts a
-# tool call at four real minutes whatever the progress notifications say (the watcher of
-# playtest 11, at 1x, its `stand_by` by a glass or an urgent event cut again and again; the
-# study of the owner's sessions), and a call cut off costs the model a result it must be
-# given again (`_lost_first`). Under the cut with forty seconds to spare, the call comes
-# back of itself with the honest digest of package 28c ("Still waiting ...": since when,
-# until what, the notable lines since), and the model calls `stand_by` again to go on
-# with the same wait. The package 28c ceiling of an hour was set before the cut was seen.
-# `--wait` overrides it (50 for a client that cuts at a minute, the SDKs' request timeout).
-MCP_WAIT_S = 200.0
+# the ceiling, not the usual wait, since the call returns as soon as the turn opens. Fifty
+# seconds (package 68; the cold review of 2026-10-22, R-25): the desktop and Claude Code
+# clients of the Western Islands run cut a tool call at sixty seconds whatever the progress
+# notifications say, and each cut cost the model the whole station brief again; under the
+# cut with ten seconds to spare, the call comes back of itself with the honest digest of
+# package 28c ("Still waiting ...": the ship's time now and the clock, since when, until
+# what, the notable lines since), and the model calls `stand_by` again to go on with the
+# same wait. Two hundred seconds before (package 31c, playtest 11's finding 2: Claude
+# Desktop then cut at four real minutes); an hour before that (package 28c). `--wait`
+# overrides it (200 for a client that holds calls four minutes).
+MCP_WAIT_S = 50.0
 DEFAULT_WAIT_S = MCP_WAIT_S
 
 # The longest ceiling the bridge takes (judgement: a watch at 1x, four real hours, the
@@ -209,6 +211,14 @@ WAIT_FLOOR_S = 15.0
 
 # The first words of the result of a wait that ended with no turn (`still_waiting`).
 STILL_WAITING = "Still waiting"
+
+# The words before the first result after the game took a reconnection for a cut call
+# (package 68, R-25; `remote.RECONNECT_S`).
+RECONNECTED_WORDS = (
+    "Your client cut your last call and started this door again; you are back at your "
+    "station, and the brief you hold is not sent again (it is the prompt 'brief' and the "
+    "resource freesail://brief, should your conversation have lost it)."
+)
 
 SAY_DESCRIPTION = (
     "Say something into the ship's log under your mark, or nothing (leave text out), and "
@@ -250,7 +260,10 @@ def door_note(wait: float) -> str:
         "the first line of each result says whose turn it is. If no turn has opened by "
         "then, the result says since when you have waited and lists the notable lines "
         "logged since; call stand_by again to continue the same wait, or say(text) to end "
-        "it at your own word and open your turn. Your client keeps this conversation, not "
+        "it at your own word and open your turn. Never end your reply in the chat while you "
+        "are seated: the game is heard only while a call is open, so call stand_by again "
+        "rather than stop (the owner does not watch the chat to call you back). Your client "
+        "keeps this conversation, not "
         "the game: shelve notes a book as put back and the game will not show its pages "
         "again, but it cannot take them out of the chat, so the journal is the place for "
         "what you keep from a page, and read_journal reads it back. The token is looked "
@@ -270,6 +283,9 @@ def still_waiting(interim: dict[str, Any] | None, waited: float) -> str:
     head = f"{STILL_WAITING}: this call waited {_seconds_words(waited)} and no turn opened."
     if interim is None:
         return f"{head} Calling stand_by again continues the same wait."
+    if interim.get("now"):
+        # the ship's time and the owner's clock (package 68, R-27)
+        head += f" It is now {interim['now']}, the clock at {float(interim.get('clock') or 1):g}x."
     since = interim.get("since") or "your last reply"
     if interim.get("standing_by"):
         where = (
@@ -486,6 +502,9 @@ class Bridge:
         # shortened when the client cut one of them short (package 37g): None until then
         self._waiting: set[int] = set()
         self.adapted_from: float | None = None
+        # the words put before the first result after a reconnection the game took for a
+        # cut call (package 68, R-25): the brief is not sent again
+        self._reconnected = ""
 
     # -- the calls in flight ------------------------------------------------------------
 
@@ -589,7 +608,17 @@ class Bridge:
         self.ask_again = False
         self.phase = str(a.get("phase"))
         self._take(a)
-        if a.get("attached"):
+        if a.get("reconnected") and self.phase == STATION:
+            # the same model's door back soon after its last call (package 68, R-25: a
+            # client that cuts a held call at sixty seconds starts the bridge afresh): a
+            # cut call, so the brief it holds already is not sent again, and the turn is
+            self.briefed = True
+            self._reconnected = RECONNECTED_WORDS
+            self.tell_owner(
+                f"FreeSail: {self.identity} back at the {self.game.name}'s station after a "
+                "cut call; the brief is not sent again."
+            )
+        elif a.get("attached"):
             self.tell_owner(f"FreeSail: attached to the {self.game.name} as {self.identity}.")
         else:
             self.tell_owner(f"FreeSail: {a.get('words') or 'stationed.'}")
@@ -727,6 +756,18 @@ class Bridge:
         words = self.contact(client)
         if words:
             return words, True
+        text, brought = self._call_seated(name, args, call_id, progress)
+        if self._reconnected:
+            text, self._reconnected = f"{self._reconnected}\n\n{text}", ""
+        return text, brought
+
+    def _call_seated(
+        self,
+        name: str,
+        args: dict[str, Any],
+        call_id: int | None,
+        progress: Progress | None,
+    ) -> tuple[str, bool]:
         args = {k: v for k, v in (args or {}).items() if v is not None}
         raw = json.dumps({"tool": name, "arguments": args}, ensure_ascii=False, sort_keys=True)
         token = OPT_OUT_TOKEN in raw
@@ -996,8 +1037,9 @@ class Bridge:
     @staticmethod
     def _continued(a: dict[str, Any], args: dict[str, Any]) -> str:
         """A `stand_by` while the game has the floor: taken from now when the model was not
-        standing by (package 31c: the bell it names is not skipped), or the same wait goes
-        on."""
+        standing by (package 31c: the bell it names is not skipped), in place of the one it
+        stands by for when it asks another (package 68, R-28; the game's result says so), or
+        the same wait goes on."""
         results = a.get("results") or []
         if results and a.get("stood_by"):
             return f"{results[-1].get('result')} Taken while the game had the floor."
@@ -1008,12 +1050,7 @@ class Bridge:
             return str(a.get("words") or "")
         if interim.get("standing_by"):
             until = str(interim.get("until"))
-            asked = " ".join(str(args.get("until") or "").lower().split())
-            same = asked in ("", until) or until.endswith(asked)
-            words = f"You are standing by already, until {until}; this call continues that wait."
-            if not same:
-                words += f" A stand-by until {asked} is taken in your turn."
-            return words
+            return f"You are standing by already, until {until}; this call continues that wait."
         return "Your turn has not come yet; this call continues the wait for it."
 
     def _turn_open(self, opened: list[Turn], did: str) -> str:
@@ -1347,8 +1384,8 @@ def main(argv: list[str] | None = None) -> int:
         default=DEFAULT_WAIT_S,
         help=(
             "the most real seconds say and stand_by hold a call open for the next turn "
-            f"(default {DEFAULT_WAIT_S:g}, under Claude Desktop's four-minute cut; at most "
-            f"{WAIT_CEILING_MAX_S:g}; 50 for a client that cuts calls at a minute)"
+            f"(default {DEFAULT_WAIT_S:g}, under the desktop clients' sixty-second cut; at "
+            f"most {WAIT_CEILING_MAX_S:g}; 200 for a client that holds a call four minutes)"
         ),
     )
     ap.add_argument("--session", choices=("play", "test"), default="play")

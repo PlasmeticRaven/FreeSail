@@ -7732,3 +7732,345 @@ lead by the owner's word:
   guide a boat in); "send a letter to ..." (but "send the boat with a letter" is taken);
   "pawl the capstan"; "send the larboard watch below";
   the "storm trysail" asked by a name the rig does not carry.
+
+## Package 68: the review's mending (2026-10-23)
+
+The cold review of 2026-10-22 (`docs/playtests/2026-10-18-to-22-owner-playtests-and-review/
+FreeSail-M7b-Playtest-and-Hotfix-Review.md`, the register R-01 to R-63 and the fold-in's §3.3),
+eighteen items, each one finding's mending; the finding's evidence bound where it and the
+brief differed. Built in a worktree off `809620b`. Nothing of 58's or 67's is built; the
+consent records were not touched. Spec M5 §12 and M7b §2 to §9, §14 and §17 "as built
+(package 68)"; truths 7b-120 to 7b-123.
+
+### Each item against its intent
+
+1. **Riding means riding (R-01): built, the measure taken another way.** `lookout.riding`,
+   one predicate for the master's account (`reckoning._riding`) and the lookout's land-ahead:
+   aground, or an anchor down and holding (none dragging) and either brought up by it
+   (`Anchor.brought_up`, said in the log) or her *headway* over the ground under
+   `RIDING_WAY_KN`, half a knot. The brief's word was her speed over the ground; measured, a
+   frigate riding to the tide in Carrick Road sheers at up to two knots over the ground at
+   the turn and goes nowhere (so the brought-up anchor is the test once the log has said it),
+   and a ship falling astern on her cable as it is veered is not under way (so the measure
+   before she is brought up is her way along her head: the speed alone moved the gate 5b
+   passage and the naval cruise for a ship falling astern, and the headway moves neither).
+   Truth 7b-120: the cutter let go at seven knots a mile off the beach drags her bower, the
+   account runs, the lookout says the land ahead at eight cables (notable) and three cables
+   (urgent) before she strikes; the old rule said neither.
+2. **Words to the captain (R-13, R-14): built.** The player at the prompt holds the
+   captain's station for every word said to him (`stations._player_captain`, the harness's
+   `held_stations`); the line is the speaker's own ("The officer of the watch (Mr Pearce), on
+   the quarterdeck, to the captain: ..."), and a word kept for an empty station is kept under
+   the speaker's mark; the addressee is counted and cut on one tokenisation
+   (`_after_words`) and the longest naming taken (a person's name over a station's word), so
+   the word after "Mr Bowen," is kept. Truth 7b-121.
+3. **A person made aboard another ship (R-15): built, the refusal's half.** `person: make
+   ..., aboard <another ship>` (and "on the quarterdeck of the <ship>", "the <ship>'s
+   gunroom") is refused in words ("names another ship: a person is made aboard the Amazon or
+   ashore, and the people of other ships are not kept ...; nothing is made"); her own name
+   said with a place is taken at the place said. *Taken another way*: the other ships are far
+   detail with no people of their own (the World keeps one ship's company), so there is no
+   crewed World to bind him to; the brief's "or is refused in words" is the half built.
+4. **The MCP door (R-25, R-27, R-30): built.** `MCP_WAIT_S` and the desktop entries'
+   `--wait` fifty seconds (under the client's sixty); a reconnect within `RECONNECT_S` of a
+   held call is a cut call: the held result is delivered with "reconnected", never the brief
+   again; "still waiting" says "It is now <stamp>, the clock at N×"; the officer's brief and
+   the `stand_by` tool name the compound "x or y" stand-by; the door's note says never to end
+   a reply in the chat while seated; Harness.md's "four minutes" is fifty seconds.
+5. **The brig limit (R-38): built.** The brief's enemy limit ranks by `captains.size_rank_of`,
+   as the tops rank a sail, so a frigate is refused under "no enemy heavier than a brig" and a
+   brig let through; a test per starter brief's limit. Truth 7b-123.
+6. **The lugger gets under way as a lugger (R-45): built.** `GetUnderWayScript`'s lug branch:
+   the windlass, no hand aloft, the lugs got ready on deck with their tacks to the casting
+   tack's lee side, the fore lug hoisted at the aweigh and the main lug and the mizen when she
+   has cast (dipped if she casts the other way); the evolution's first line in the rig's words.
+   Truth 7b-122: the Éclair weighs and makes six and a half knots full and by, never aback.
+7. **The chart's fathoms (R-05): built.** `FATHOM` in `client/units.js`, the sounding's
+   figure by one function (`formatFathoms`), finite or "no bottom"; a test that every `U.`
+   name the client reads is one the units module gives.
+8. **The director hidden (R-20): built.** The eased clock's line for the director, and every
+   line of the director's, reach no station's sample and no play log line (the server's
+   `_on_event` asks `for_the_record` first; `_samples_now` leaves the director out); the
+   officer's refusals no longer list the director as tellable, and a word to the director is
+   answered "the director is above the game; a standing order may tell or ask ...".
+9. **A stand-by replaced (R-28): built.** A `stand_by` sent while another runs replaces it
+   and says so (", in place of the stand-by until ..."); the same-wait check reads the
+   new one.
+10. **The director's echoes and the budget (R-61): built.** The director's own `say as`,
+    `aboard` and world-order lines are spans it made (`Harness._own_lines`, a class default
+    `()`) and do not wake it; `director: budget <n> samples, <m> acts` sets the day's budget
+    in play; `director: brief <words>` keeps the limits it does not name (`brief_in_words`);
+    a new brief lifts the hold.
+11. **The truth (R-35): built.** An own-state line (aground and where, at anchor, under
+    way); the intent ships' placeholder goal left out for their intent; `truth(within=<miles>)`.
+12. **The `ship:` form and the doubt (R-43, R-41): built, R-41's second case not taken.** The
+    form read clause by clause (description words after their adjectives, "a French lugger",
+    "small fishing lugger"; any colours clause; an intent with commas; a port in the `of`
+    slot gives its nation), the clause at fault named; the form checked before the doubt; a
+    `[reason]` on first entry is held to a doubt the director has not seen (the doubt shown,
+    the reason entered again). *Not taken*: R-41's second case, a reason that does not answer
+    the doubt, asks the game to judge a reason's sense; its example (a ship "on the land by
+    the chart") is now the form's refusal (item 13) and no reason passes it.
+13. **61's simple half: built.** A ship put on the land is refused in the form with the
+    nearest water named; a ship made in a harbour (within a mile and a half
+    of a port) on a goal leaves by the port's track to sea before her plan. *Taken another
+    way, in part*: a ship on an intent or a cycle is not given the track (her captain's
+    plan has its own departure).
+14. **The boat's small items (R-62): built.** `send the boat ashore with <persons>` carries
+    them or refuses in words, never dropping them to "for the prices"; `hire a waterman` at
+    the quay or aboard, a shore boat at two and a half knots (her own boat away or not);
+    a thing put in the boat goes ashore with it and is landed on the quay. *Taken another
+    way*: the fare is one shilling flat (`WATERMAN_FARE_POUNDS`), the ports' data having no
+    watermen's rates.
+15. **The fold-in's leftovers (§3.3): built.** A `Ground` built with `__new__` (the pre-hotfix
+    checkpoint) ticked aground with a taut cable (CR2-05); the kedge let go with scope no less
+    than the hawser's run to the depth at the kedge (`math.hypot(out_m, depth)`) and "comes
+    home" said only while a heave on it is in hand (CR2-01); the cut pin-history comments
+    restored (CR2-06).
+16. **A merchant brig of her own (R-63): built.** `data/ships/merchant-brig.yaml` through
+    `tools/gen_ships.py` (`merchant_brig`: the Harpy's hull and rig, a master's and mates'
+    company of sixteen, no marines, a merchant's hold and boats); her people file; "A merchant
+    brig, free" sails her. *Taken another way*: her ration is the Navy table's (no period
+    merchant scale in the references), and the evolutions' hands are the frigate's figures
+    (R-46, found on the way), so she works short-handed.
+17. **`.gitattributes`: built.** `* text=auto eol=lf` first, the old rules after it, and the
+    filed records (`docs/agents/consent/**`, `docs/playtests/**`, the brainstorm) excepted
+    as `-text` so that nothing filed is renormalised; a missing ship file named with forward
+    slashes however it was said (`path.as_posix()`, R-58).
+18. **Truths and records: built.** Truths 7b-120 to 7b-123; spec M5 §12, M7b §2 to §9, §14
+    and §17 as built; Harness.md; the primer's chapters 10, 13, 14, 19 and 20; these notes;
+    the waves row.
+
+### What moved
+
+- **The riding rule (item 1)** moved four recorded passages (below) and nothing else; every
+  other pinned passage of the slow tier passes against its figure.
+- **The first reason** (item 12): tests that entered a world order with a `[reason:]` on its
+  first entry now enter it bare, see the doubt, and enter it again with the reason; the
+  land's doubt is now the form's refusal (the tests of it read the refusal).
+- `interim`'s data gains `now` and `clock`; the stand-by's line says what it replaced; the
+  brief's and the tool's words (item 4).
+
+### The rule for checkpointed classes
+
+**Every attribute of a class that is checkpointed (pickled or saved with the World) gets a
+class default**, so that an object of the earlier build, unpickled or made with `__new__`,
+reads the new attribute as its default and never raises. The hotfix's checkpoint crash was a
+`Ground` of the earlier build with no `_kedge` attribute; this package's new attributes keep
+the rule (`Harness._own_lines = ()`, `GetUnderWayScript.lugger = False`), and the
+regression test builds a `Ground` with `__new__` and ticks it aground with a taut cable.
+
+### Found on the way
+
+- **The schooner's pin was missed at the fold-in.** The well's order gone from the starter
+  book (2026-10-21) removes its two held lines at tick 0 from the gate 5b schooner passage as
+  from the three re-pinned with it: 768 lines to 766, `b7c16adc612bd01a` to
+  `b9acdeac6354f3bf`. The tree before this package (`809620b`) gives the new figures and the
+  tree before the fold-in (`953caab`) the old, the two "sound the well" lines the whole
+  difference. Re-pinned here, not item 1's.
+- **The evolutions' hands are the frigate's** (R-46): the merchant brig, sixteen men, works
+  short-handed through every evolution. Not changed (the hands' figures per rig are R-46's).
+- **The intent schooner drags in the Bay of Brest** after item 1 moved her (below): the best
+  bower let go on the pilot's berth with way on drags twenty fathoms before it holds. Not
+  changed; the anchoring script's manners are R-02's, kept out.
+- **The pilot's berth writes its depth in figures** ("let go in 13 fathoms and a half"),
+  where the anchoring's own line writes words ("in nine fathoms and a half"). Not changed.
+- **The pilot judges how near she will lie by the wind over the ground; her sails feel the
+  wind over the water.** In the Goulet's flood (3.9 knots toward 080°) with the wind at 325°
+  and ten knots, the wind over the water is from 350° and eight and a half: the pilot's
+  "steer NE by N, as near as she will lie" (`Ports._as_she_will_lie`, `_made_good_on`, from
+  `world.wind`) is 69° off the wind he reckons and 44° off the wind she sails in; her sails
+  lift, she loses her way to under two knots, and the flood sets her onto the Mingan (the
+  replayed wardroom save from 113000, after item 1 moved its history: the one failure of
+  the slow tier, above). The old path cleared the Mingan by three cables, the lookout's
+  urgent cry said on both. Mended on the lead's word as item 19 (below), which moved no pin
+  and left the Goulet's cases failing for the pilot's conn.
+
+### Pins
+
+Four passages moved, all item 1's; one more (the schooner, above) was the fold-in's. The
+proof is by bisection: the tree as committed with `lookout.riding` restored to the old rule
+(any anchor down, `tackle.at_anchor()`) brings back every old figure, every tick the same;
+the tree with the new rule gives the new. The cause is the same in each: a ship coming to
+her anchor ranges ahead on her cable at half a knot or more before she is brought up, and the
+master's account now runs the while (it did not, an anchor being down).
+
+| Passage | Old | New | Why |
+|---|---|---|---|
+| Merchant passage (5c), lines | 3098 | 3099 | the account run 153 to 302 while she came to in Carrick Road; the master's tide said at 15600 when she has weighed |
+| Merchant passage, digest (and truth 77) | `05f0f4aba2eddbc0` | `902be35aeeac7b54` | the same, and the lead in pilot water's distance at 300 (111 miles by account to 110) |
+| The fake captain (truth 78), lines | 3111 | 3112 | the merchant passage's line |
+| The fake captain, digest | `f996530d5a041abc` | `1f8de8b49c7d5b5a` | the merchant passage's |
+| Trial trade thick, digest | `ce964d9f346034de` | `3c2b220e06496db5` | every tick and line the same; the noon's longitude by account in its data, -5.03015 to -5.03016 (she came to her anchor at 14775) |
+| The intent schooner (6a), lines | 1698 | 2160 | below |
+| The intent schooner, digest | `90061f779b7db484` | `8eead2f4521f2a61` | below |
+
+The intent schooner: the account run while she came to in Carrick Road gives the master's
+tide at 17100, the fixes off St Anthony and the Manacles read differently, the allowance she
+steers by moves, and from 21756 the passage is another. She lays the course again at 28080
+(27960), takes Le Floch at 101820 (101580), comes to the Iroise with the flood serving and is
+conned through the Goulet (not anchored in the road of Bertheaume for the tide, as from 43b to
+56), lets go in the Bay of Brest at 110872 in thirteen fathoms and a half (as at 45c), drags
+from 110962 and holds again having come home twenty fathoms, is brought up at 111710
+(105260), sends the boat for the prices at 111780 (105360), Le Floch leaves at 114900, and she
+sells at 119400 (124320); her states lose "at anchor" and come in port at 110880. Her test's
+words follow: the Bay and thirteen and a half, and the one dragging held again (no dragging
+was the assertion before; no grounding still is). Every old figure is kept beside the new.
+
+The brief's word, the speed over the ground, moved two more (the gate 5b passage and the
+naval cruise, a ship falling astern on her veered cable counted as under way); the headway
+moves neither, measured against the same bisection. No other item moves a pin: the recorded
+passages seat no model and make no world order, no person, no lugger and no merchant brig;
+items 6 and 15's script changes run only for a lugger and a kedge, which no recorded passage
+has; the slow tier's every other pin passes against its figure (below).
+
+### A scripted run
+
+Item 1 (the cutter at seven knots a mile off the beach west of Falmouth, the wind W, `let go the best bower`):
+
+```
+697   urgent   The best bower is dragging: veer more cable, or let go the small bower.
+1140  notable  Land ahead, fine on the larboard bow, eight cables: she is standing into it.
+1620  urgent   Land close ahead, fine on the larboard bow, three cables! She will be on it in three minutes.
+1848  urgent   She has taken the ground forward, on good ground: one fathom and a half of water by the chart ...
+(the old rule: the dragging and the grounding, no land-ahead line)
+```
+
+Item 2 (a model officer, the player at the prompt as captain):
+
+```
+The officer of the watch (Mr Pearce), on the quarterdeck, to the captain: no land in sight yet
+The officer of the watch (Mr Pearce), on the quarterdeck, to the captain: land ho, sir
+The officer of the watch (Mr Pearce), on the quarterdeck, asks the captain: whether we shorten sail?
+```
+
+Item 3 (the Amazon, the director's `person: make`):
+
+```
+not carried out: 'aboard the Two Brothers' names another ship: a person is made aboard the Amazon or ashore, ...; nothing is made.
+Mr Furtado, pilot; made from words, on the quarterdeck.
+Mr Hale, passenger; made from words, in the gunroom.
+```
+
+Item 6 (the Éclair at anchor, `get under way`):
+
+```
+1201  All hands up anchor! Man the windlass, ship the handspikes; the lugs to be got ready for hoisting on deck, no hand aloft.
+1776  Pawl the windlass; stopper the cable. Cast off the gaskets of the lugs, their tacks to larboard for the starboard tack; ...
+2177  The best bower is aweigh. Hoist away the foresail, to larboard! Let go the downhauls, hoist away the jib ...
+2193  She has paid off; right the helm, draw the jib, hoist away the mainsail to larboard, set the mizen.
+2591  Under way on the starboard tack, under the foresail, the mainsail, the mizen and the jib; ... full and by.
+(6.66 knots; no line of her taken aback)
+```
+
+### Decisions for the lead and the owner
+
+- **The intent schooner's new passage** (item 1): she now sails the Goulet with the flood and
+  anchors in the Bay, dragging twenty fathoms first, where from 43b she waited in the road of
+  Bertheaume. It is item 1's by bisection and re-pinned. **R-02** (the anchoring's manners,
+  the Bay's dragging first) is carried for the owner.
+- **The Goulet's failing case**: the lead's word was to mend the pilot's wind (item 19,
+  below); it is mended, and the case still fails, now with its sister case: both are
+  expected failures, strict, the pilot's conn in a strong flood booked as 58b's item 6.
+- Taken another way, each standing on the lead's word: **the riding measure** (brought up,
+  or headway under half a knot, where the brief said speed); **a person aboard another
+  ship** refused, not bound (there is no other crewed World); **the waterman's fare** a
+  shilling flat (ports' rates would be data); **the merchant brig's ration** the Navy's
+  table for want of a merchant scale.
+
+### Item 19: the pilot's wind (found on the way, the lead's word of 2026-10-23)
+
+`Ports._as_she_will_lie` and `_made_good_on` count how near she lies, and her course made
+good, from `_wind_from_over_the_water`: the true wind less the stream's set at her, the wind
+her sails feel; the wind over the ground itself where there is no stream (so that no water
+without a stream moves). A test of the helper beside the Goulet's
+(`test_the_pilot_reckons_how_near_she_lies_by_the_wind_over_the_water`): ten knots from NW
+over the ground in a four-knot flood toward 080° is a wind from 338° over the water.
+
+**No pin moves.** The whole slow tier on the code with the fix (the tree at `1cd9a23` with
+`ports.py` of `465ad80`; 06:04 to 07:05): 3,863 passed, 11 expected failures, every pinned
+passage against its figure, the merchant passage and the intent schooner through the Goulet
+among them (the pilot's "as near as she will lie" never binds in them: their wind is free
+of his legs). Two failed, the Goulet's two cases from the wardroom save, and there the work
+stopped, on the lead's word ("if it still fails after the fix, say exactly where she goes
+and stop there"):
+
+- **From 113000** (the replay's history moved by item 1): the pilot cons her NE and NE by N
+  for his first mark (48° 19.53' N, 4° 37.8' W), passes it at 114480 (land ahead, nine
+  cables, to larboard), takes up the leg for 48° 19.92' N, 4° 36.36' W at NE by E to E by N,
+  is warned of the Mingan a mile on the starboard bow at 115020 ("leave it to starboard"),
+  and for his next aim (48° 20.27' N, 4° 35.76' W) steers NE by E and then ENE "as near as
+  she will lie" in the wind over the water; she keeps her way now (4.4 knots, no sails
+  lifting, where the wind over the ground had her at 1.8), but the flood of 3.9 knots toward
+  080° sets her bodily east, the lookout cries the Mingan four cables ahead at 115320, and
+  she strikes it at 115561 at four knots and a half.
+- **From 114000** (passed before the fix): his first order is NNE, five points to port, as
+  near as she will lie, and the yards still trimmed for the wind on the quarter: she is
+  taken aback at 114049 and lies in irons for twenty minutes; the flood sets her east of his
+  first mark; at 115800 he gives W for the mark, now astern of her, and she is put about to
+  beat back to it against the flood; she works to and fro off Petit Minou for the rest of
+  the 110 minutes, and at 120600 the Mingan is four cables ahead again; no berth said, no
+  grounding (the test's failure: no `port.pilot_berth`). With the old pilot's wind restored
+  (`c062f89`) this case passes, so its failure is the fix's.
+
+What is left is the pilot's conn and not his wind: with the wind over the water he finds,
+rightly, that the NE legs inside Bertheaume will not be laid on this flood under this wind,
+and he has no answer but to steer as near as she will lie (from 113000) or to go back for a
+mark set astern (from 114000). A pilot's answers would be to wait for the slack in the road,
+to work the north shore's eddy, or to anchor; and his first turn should trim before it puts
+her five points nearer the wind.
+
+**A debt, not a fix.** On the lead's word (2026-10-23) the wind over the water is kept, and
+the pilot's conn in a strong flood is booked as package 58b's item 6, the captain's sea
+sense, beside the rules captain's. The two cases
+(`test_ports.py::test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood`,
+113000 and 114000) are marked expected failures, strict, as 57's gale trial is marked,
+with the account above in the marker and the comment over it: the pilot lays legs the
+flood will not let her make and has no answer but to pinch (113000: onto the Mingan at
+115561) or go back (114000: aback at 114049, beating back for a mark astern, no berth in
+the 110 minutes). Strict, so that the suite says so the day 58b's conn brings her in, and
+the marker is lifted then. The logs: the whole slow tier with the fix,
+`slow19-new.log`; the courses, `g-fix.txt` (113000) and `g-fix114.txt` (114000), in the
+build's scratch directory.
+
+
+### The suite, as run
+
+On the build machine (four cores), the code as committed in `c062f89`; the container was
+restarted twice during the runs, and each tier is written here as it finished.
+
+- `ruff check .` and `ruff format .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3,554 passed, none
+  failed, 327 slow left out (03:27 to 03:51, finished before the second restart).
+- **The slow tier of the files touched** (`test_aboard_found`, `test_agent_api`,
+  `test_captain_trials`, `test_director`, `test_ground`, `test_known_truths`,
+  `test_map_view`, `test_mcp_server`, `test_officer`, `test_orders_places`, `test_people`,
+  `test_scenarios`, `test_settings`, `test_ship_loader`, `test_world_orders`; `--slow -m
+  "not pace"`): 470 passed, 8 expected failures, none failed (04:14 to 04:41), every
+  re-pinned passage among them against its new figure.
+- **The slow tier once whole** (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m
+  "not pace"`, 04:42 to 05:39, the tree at `a36cd27`): 3,863 passed, 11 expected failures
+  (the same eleven), **one failed**: `test_ports.py::test_the_pilot_allows_for_the_set_before_
+  his_turn_in_the_goulet_on_the_flood[113000]`, she takes the ground on the Mingan at 115561.
+  It is item 1's by bisection (the tree with the old rule passes it, as does `809620b`), and
+  not a pin: the test replays the owner's wardroom save to 113000 and gives the pilot the
+  conn there, and under the new rule the replay's account ran while she came to her first
+  anchor, so that by 113000 she is a quarter of a mile west of where the owner was (forty
+  metres of water, not twenty-nine) and the pilot's leg to the Mingan is another. The cause
+  of the grounding is the pilot's (found on the way, below), and the test is left failing,
+  not skipped and not moved to another tick, for the lead's word. The case at 114000 passes.
+- **The pace tests alone** (`python3 -m pytest --slow -m pace -q -p no:cacheprovider`, the
+  load 0.8 at their start and 1.0 at the end, 05:54 to 05:57): 6 passed.
+- **After item 19** (the code of `465ad80`): the whole slow tier, which runs the fast tier's
+  tests with the slow, 3,863 passed, 11 expected failures, 2 failed (the Goulet's two cases,
+  item 19's section above); `ruff check .` and `ruff format .` clean. The work stopped there
+  on the lead's word, so the fast tier and the touched files were not run again one by one.
+  **The pace tests alone** on `465ad80`, three times: 5 passed and the gate's day with the
+  region loaded at 473 and then 468 ticks a second against the floor of 500, then all 6
+  passed (07:10 to 07:24). Not the fix's: the same measure taken four times in turn on the
+  fix's tree, the old pilot's wind and `809620b` gave 467 to 564 for all three alike (the
+  container restarted twice that morning; the floor is at the machine's noise today).
+- **After the Goulet's cases were marked** (`292b277`): **the fast tier** 3,555 passed, none
+  failed, 327 slow left out (07:25 to 07:47). **The slow tier of the files touched** (the
+  fifteen above and `test_ports`): 514 passed, 10 expected failures (the eight before and
+  the Goulet's two), none failed (07:47 to 08:19).

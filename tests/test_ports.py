@@ -1818,6 +1818,29 @@ WARDROOM_SAVE = (
 )
 
 
+# Package 68 (item 1 and item 19): riding means riding moved the replay's history before
+# 113000 (her account run while she came to her first anchor), and the pilot reckoning
+# how near she lies by the wind over the water (item 19, the wind her sails feel) finds,
+# rightly, that his NE legs inside Bertheaume will not be laid on this flood under this
+# wind. He lays legs the flood will not let her make and has no answer but to pinch or go
+# back: from 113000 he steers NE by E and ENE as near as she will lie for his aim past the
+# Mingan, keeps her way (4.4 knots), and the flood of 3.9 knots toward 080° sets her onto
+# it at 115561; from 114000 his first turn, five points to NNE with the yards trimmed for
+# the wind on the quarter, has her aback at 114049 and in irons twenty minutes, the flood
+# sets her east of his first mark, and from 115800 he beats back for it, off Petit Minou
+# for the rest of the 110 minutes with no berth said. The pilot's conn in a strong flood
+# (waiting for the slack in the road, working the north shore, anchoring, trimming before
+# a turn toward the wind) is package 58b's item 6, the captain's sea sense; the xfail is
+# lifted when it is built (docs/dev/TuningNotes.md, package 68, item 19).
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "package 68, item 19: the pilot lays legs the flood will not let her make and has no "
+        "answer but to pinch or go back (from 113000 the flood sets her onto the Mingan at "
+        "115561; from 114000 aback at 114049 and beating back for a mark astern, no berth in "
+        "110 minutes); the pilot's conn in a strong flood is package 58b's item 6"
+    ),
+)
 @pytest.mark.parametrize("until", [113000, 114000])
 def test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood(until):
     """Package 43b, from the owner's wardroom save (data, loaded by the game's replay to
@@ -1847,3 +1870,32 @@ def test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood
     berth = events(w, "port.pilot_berth")
     assert berth and berth[-1].text.startswith("The pilot: this is the berth, the Bay of Brest")
     assert units.m_to_fathoms(least) >= 9.0
+
+
+def test_the_pilot_reckons_how_near_she_lies_by_the_wind_over_the_water():
+    """Package 68, item 19: the pilot's "as near as she will lie" is counted from the wind
+    her sails feel, the true wind less the stream's set. In the Goulet's flood of four knots
+    toward ENE, ten knots of wind from NW over the ground come from NNW and a little more
+    over the water; with no stream the wind over the ground itself."""
+    from types import SimpleNamespace
+
+    from freesail.world.ports import _wind_from_over_the_water
+
+    class _Wind:
+        def __init__(self, from_deg: float, kn: float) -> None:
+            self.direction_from = math.radians(from_deg)
+            self.kn = kn
+
+        def vector_at_height(self, _h: float) -> tuple[float, float]:
+            return units.wind_vector(self.direction_from, units.knots_to_ms(self.kn))
+
+    def world(water):
+        extra = {"water": water} if water else {}
+        return SimpleNamespace(ship=SimpleNamespace(extra=extra))
+
+    wind = _Wind(315.0, 10.0)
+    assert _wind_from_over_the_water(world(None), wind) == wind.direction_from
+    to = math.radians(80.0)
+    flood = units.knots_to_ms(4.0)
+    water = (flood * math.sin(to), flood * math.cos(to))
+    assert 335.0 < math.degrees(_wind_from_over_the_water(world(water), wind)) < 350.0

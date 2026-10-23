@@ -361,6 +361,21 @@ again when five looks together find nothing ahead within a quarter of an hour. I
 lookout's one urgent word, it reads her true motion as an eye does, and in fog it is
 silent: the lead is the guard there.
 
+**As built (package 68; the cold review of 2026-10-22, R-01).** "Not at anchor" reads *not
+riding*: an anchor down and holding (none dragging) and either brought up by it or her
+headway over the ground under half a knot (`lookout.riding`, `RIDING_WAY_KN`; her way
+along her head, so that a ship falling astern on her cable as it is veered is riding and
+one ranging ahead on it is not; her speed over the ground, the brief's word, moved two
+passages for a ship falling astern, and was taken another way). The letter of
+the old wording was built, and it was wrong for a ship that lets go with way on: the
+Sherbourne let go at seven knots off Horta, sailed her bower a mile onto the Praia, and
+the lookout said nothing urgent while any anchor was down. A ship dragging or sailing her
+anchor home is not riding; the land-ahead stays armed for her, and the master's account
+(§13, §18's "the account stays") runs for her as for a ship under way. A ship riding to
+her cable is riding however she sheers about it: the brought-up anchor is the test once
+the log has said it (a frigate riding to the tide in Carrick Road sheers at up to two
+knots over the ground at the turn, measured, and goes nowhere).
+
 ### 13. Two positions (`freesail/world/reckoning.py`)
 
 Kept apart from the first line. **The truth** is the physics' position in the frame of §9.

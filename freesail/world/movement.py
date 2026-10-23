@@ -539,6 +539,15 @@ def go_ashore(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
     return ports.land_person(person)
 
 
+def by_waterman(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
+    """`hire a waterman` (package 68, R-62): a shore boat between the ship and the
+    quay of the port she lies at, her own boat away or not (`Ports.waterman`)."""
+    ports = getattr(world, "ports", None)
+    if ports is None or not ports.ports:
+        raise OrderError("There is no port, and no waterman to hire.")
+    return ports.waterman(person)
+
+
 def come_aboard(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
     """`come aboard`: the boat sent for him from the ship lying at his port."""
     ports = getattr(world, "ports", None)

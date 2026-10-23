@@ -1,3 +1,10 @@
+# Every text file checked out and committed with LF endings, whatever the platform
+# (package 68; the cold review of 2026-10-22, its 2.3 and R-58: the hotfix's files came back
+# CR LF from scripts that wrote them on Windows, and a checkout with core.autocrlf writes CR
+# LF too). Git takes the binary files (the chart tiles) by its own test of their content.
+# The lines after this one stand over it for their files.
+* text=auto eol=lf
+
 # Files whose bytes are digested or read whole, kept as committed on every platform: a
 # checkout that turned their line endings would move the consent brief's digest (the
 # records in docs/agents/consent/ carry it, and the re-ask rule compares it), the
@@ -11,3 +18,11 @@ tests/fixtures/ConsentBrief-before-42a.md -text
 tests/fixtures/ConsentBrief-before-42b.md -text
 tests/fixtures/saves/*.checkpoint binary
 tests/fixtures/saves/*.json -text
+
+# The records kept as they were filed, their bytes as committed (package 68): the consent
+# records (never touched but by the package the specification names), the playtests' saves,
+# notes and evidence (some filed with CR LF from the owner's machine), and the first
+# brainstorm.
+docs/agents/consent/** -text
+docs/playtests/** -text
+docs/InitialDesignBrainstorm.txt -text

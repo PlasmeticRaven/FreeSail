@@ -309,7 +309,11 @@ TRIAL_TRADE_THICK_LINES = 489  # package 56, the glass (482 at 45)
 # decision 45, the pilot's news: 50901cf162ea95aa before; package 37p (10fee882c789666e before)
 # package 45c: every tick and the lines as they were; a line's words moved (the pilot's
 # conn and the weather's sky, both this package's)
-TRIAL_TRADE_THICK_DIGEST = "ce964d9f346034de"  # package 56, the glass (7915dc59337bd31d at 44)
+# package 56, the glass: ce964d9f346034de (7915dc59337bd31d at 44); package 68 (item 1,
+# riding): every tick and line the same, the account run while she came to her anchor at
+# 14775 and was not yet brought up: the noon's longitude by account in its data moves in
+# the fifth decimal (-5.03015 to -5.03016); the old rule restored gives the old digest
+TRIAL_TRADE_THICK_DIGEST = "3c2b220e06496db5"  # package 68, riding (ce964d9f346034de)
 
 
 @pytest.fixture(scope="module")

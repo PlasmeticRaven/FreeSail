@@ -368,3 +368,60 @@ def test_a_seat_is_taken_by_the_officers_number_or_his_person(words):
     seat = seat_player(w, words)
     assert seat.station.name == "second officer"
     assert seat.station.person == "Mr Pascoe"
+
+
+# ---------------------------------------------------------------------------
+# Package 68: the boat's passengers, the waterman, a thing in the boat (the cold review
+# of 2026-10-22, R-62 and the D8 note)
+# ---------------------------------------------------------------------------
+
+
+def test_the_boats_passengers_are_carried_or_refused_in_words_never_dropped():
+    """R-62: "send the launch ashore with the captain and Mr Pearce" dropped both and the
+    errand fell back to "for the prices". Each name is carried, or the order is refused
+    in words and the boat stays: a name nobody answers to, and the captain, who goes
+    ashore by his own word."""
+    w = in_falmouth()
+    mate, boatswain = w.people.find("the mate"), w.people.find("the boatswain")
+    e = w.submit(f"send the boat ashore with the captain and {mate.name}")
+    assert e.kind == "order.rejected" and "The captain goes ashore by his own word" in e.text
+    assert "the boat is not sent" in e.text and not w.ports.boat.away and mate.aboard
+    e = w.submit("send the boat ashore with Mr Nobody")
+    assert e.kind == "order.rejected" and "Nobody aboard answers to 'mr nobody'" in e.text
+    assert not w.ports.boat.away
+    e = w.submit(f"send the boat ashore with {mate.name} and {boatswain.name}")
+    assert e.kind == "order.accepted", e.text
+    assert w.ports.boat.away and w.ports.boat.errand == "person"
+    assert {mate.id, boatswain.id} <= set(w.ports.boat.people)
+
+
+def test_a_waterman_takes_the_captain_ashore_while_the_boat_is_away_and_brings_him_off():
+    """R-62: one boat for all the port's business, and the captain waited an hour and forty
+    minutes for her. `hire a waterman` takes him ashore from the ship while her own boat is
+    away, for a shilling, and off to her again from the quay; and a thing lying in the boat
+    is landed on the quay when she goes ashore (the D8 note: it stayed aboard)."""
+    w = in_falmouth()
+    made = w.world_order("aboard: a sealed packet, in the boat", "the test")
+    assert made.data["result"] == "done" and made.text.endswith("in the boat."), made.text
+    e = w.submit("send the boat ashore for the prices")
+    assert e.kind == "order.accepted" and w.ports.boat.away
+    purse = w.purse.pounds
+    e = w.submit("hire a waterman")
+    assert e.kind == "person.waterman" and "the fare a shilling" in e.text, e.text
+    assert w.purse.pounds == pytest.approx(purse - 0.05)
+    cap = w.people.captain
+    until(w, lambda: cap.where == "shore", minutes=90)
+    assert cap.port == "falmouth" and not cap.aboard
+    landed = events(w, "person.ashore")[-1]
+    assert landed.text.endswith("from a waterman's boat.")
+    until(w, lambda: events(w, "thing.landed"), minutes=120)
+    from freesail.world.things import things_of
+
+    packet = [t for t in things_of(w) if t.name == "a sealed packet"][0]
+    assert packet.place == "shore" and packet.port == "falmouth"
+    e = w.submit("hire a waterman")
+    assert e.kind == "person.waterman" and "goes off to the ship" in e.text, e.text
+    until(w, lambda: cap.aboard, minutes=90)
+    assert events(w, "person.aboard")[-1].text.endswith("came aboard from a waterman's boat.")
+    e = w.submit("hire a waterman to Narnia")
+    assert e.kind == "order.rejected"

@@ -537,6 +537,19 @@ _SHIP_GOAL = re.compile(r"^ship\s+\"(?P<name>[^\"]+)\"\s*:\s*(?P<goal>.+?)\s*$",
 # `ship "X": intent <words>`, a brain given to a ship on the sea or her intent changed.
 _SHIP_TAIL = re.compile(r",\s*(?P<tail>no\s+colours|intent:?\s+[^,]+?)\s*$", re.I)
 _INTENT_TAIL = re.compile(r"^intent:?\s+(?P<words>.+?)\s*$", re.I)
+# Package 68 (the cold review of 2026-10-22, R-43): the intent is everything after its
+# word, commas and all; and any clause of her colours ("British colours", "colours shown",
+# "flying French colours", "no colours") is read as one, never as her goal.
+_INTENT_AT = re.compile(r",\s*intent:?\s+", re.I)
+_COLOURS_TAIL = re.compile(r",\s*(?P<tail>[^,]*\bcolou?rs\b[^,]*)\s*$", re.I)
+_NO_COLOURS = re.compile(r"^\s*(?:no|without|showing\s+no|hiding\s+her)\b", re.I)
+# A ship put on the sea within this many miles of a port's roads or anchorage is made in
+# its harbour and goes out by the port's track (package 68, spec M7b §21i's simple half;
+# judgement: the roads of the period's ports lie within a mile or so of the anchorage).
+HARBOUR_NM = 1.5
+# The least depth of water a ship put on the sea is found in, for the nearest water named
+# in the refusal of a place on the land (package 68; judgement: a small vessel's draught).
+SHIP_WATER_M = 3.0
 # The director's hand (spec M7b §3; package 62): `ship "X": order <an order of her own
 # grammar>`, given to her captain's station as his own; and `ship "X": crewed`, a far ship
 # within the promotion's range asked for at full detail first.
@@ -546,19 +559,22 @@ _CREWED_TAIL = re.compile(r"^(?:crewed|at\s+full\s+detail)\.?$", re.I)
 
 def _peel_tails(goal: str) -> tuple[str, bool, str]:
     """(the goal, no colours, the intent's words) from a new ship's words after her
-    place, the tails peeled from the end in either order."""
+    place, the tails peeled from the end in either order. The intent is everything after
+    its word, commas and all, but a colours clause at its end; a colours clause is any
+    clause that names her colours, shown ("British colours", "colours shown") or not ("no
+    colours"), so that it is never read as her goal (package 68, R-43)."""
     no_colours, intent = False, ""
-    while True:
-        m = _SHIP_TAIL.search(goal)
-        if m is None:
-            return goal.strip(), no_colours, intent
-        tail = m.group("tail")
-        im = _INTENT_TAIL.match(tail)
-        if im:
-            intent = im.group("words").strip()
-        else:
-            no_colours = True
-        goal = goal[: m.start()]
+    m = _INTENT_AT.search(goal)
+    if m is not None:
+        goal, intent = goal[: m.start()], goal[m.end() :]
+        while (c := _COLOURS_TAIL.search(intent)) is not None:
+            no_colours = no_colours or bool(_NO_COLOURS.match(c.group("tail")))
+            intent = intent[: c.start()]
+        intent = intent.strip()
+    while (c := _COLOURS_TAIL.search(goal)) is not None:
+        no_colours = no_colours or bool(_NO_COLOURS.match(c.group("tail")))
+        goal = goal[: c.start()]
+    return goal.strip(), no_colours, intent
 
 
 _LETTER = re.compile(
@@ -615,42 +631,14 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         vessel.plan, vessel.cycle, vessel.goal, vessel.tack = plan, cycle, goal, 0.0
         vessel.done = False
         return f"the goal of {vessel.name} changed: {goal}", {"id": vessel.id, "goal": goal}
-    m = _SHIP_NEW.match(body)
-    if m is None:
-        raise WorldOrderError(
-            "A ship order is 'ship: a <description> \"<name>\" of <nation> at <place>, <goal>' "
-            "(then ', no colours' and ', intent: <the intent>' as wanted) or 'ship \"<name>\": "
-            "<goal>' or 'ship \"<name>\": intent <the intent>'."
-        )
-    nation = world.nations.find(m.group("nation"))
-    if nation is None:
-        raise WorldOrderError(f"'{m.group('nation')}' is no nation of the table.")
-    goal, no_colours, intent = _peel_tails(m.group("goal"))
-    letter: dict[str, Any] | None = None
-    lm = _LETTER.match(goal)
-    if lm:
-        goal = lm.group("goal")
-        letter = {"text": lm.group("text"), "origin": (lm.group("origin") or "").strip()}
-    spec: dict[str, Any] = {
-        "description": m.group("desc"),
-        "name": m.group("name"),
-        "nation": nation.id,
-        "position": m.group("where"),
-        "goal": goal,
-        "colours": "none" if no_colours else "shown",
-    }
-    if intent:
-        spec["intent"] = intent
-    if letter is not None:
-        spec["letter"] = {
-            "text": letter["text"],
-            "origin": letter["origin"] or m.group("name"),
-        }
+    spec = new_ship_spec(world, body)
     world.vessels.serial += 1
     try:
         vessel = vessel_from_spec(world, spec, world.vessels.serial)
     except (ValueError, KeyError) as e:
-        raise WorldOrderError(str(e)) from None
+        said = f"the intent '{spec['intent']}': " if spec.get("intent") else ""
+        raise WorldOrderError(f"{said}{e}") from None
+    nation = world.nations.get(spec["nation"])
     world.vessels.add(vessel)
     brain = f", her captain's intent {vessel.intent_words}" if vessel.brain is not None else ""
     guard = f" ({vessel.warning})" if vessel.warning else ""
@@ -659,6 +647,158 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if vessel.intent_words:
         data["intent"] = vessel.intent_words  # on a ship with a brain only: the old pins stand
     return words + brain + guard, data
+
+
+def new_ship_spec(world: Any, body: str) -> dict[str, Any]:
+    """A new ship's spec from `ship: a <description> "<name>" of <nation> at <place>,
+    <goal>[, colours][, intent: <words>]`, each clause read and checked in turn, the
+    refusal naming the clause at fault (package 68; the cold review of 2026-10-22, R-43:
+    24 of a small model's 29 `ship:` orders refused, the errors blaming the wrong clause).
+    Nothing is put on the sea: the director's channel checks the form with it before the
+    doubt (R-41). A port in the `of` slot is her home port, and her nation its; a place on
+    the land is refused with the nearest water named (61's simple half); a ship made in a
+    port's harbour goes out by the port's track."""
+    from freesail.world.ships import _goal_plan, description_key, place_position
+
+    m = _SHIP_NEW.match(body)
+    if m is None:
+        raise WorldOrderError(
+            "A ship order is 'ship: a <description> \"<name>\" of <nation> at <place>, <goal>' "
+            "(then ', no colours' and ', intent: <the intent>' as wanted) or 'ship \"<name>\": "
+            "<goal>' or 'ship \"<name>\": intent <the intent>'."
+        )
+    desc = " ".join(m.group("desc").split())
+    if description_key(desc) is None:
+        from freesail.world.ships import DESCRIPTIONS
+
+        raise WorldOrderError(
+            f"the description '{desc}' is no description a far-detail ship takes; say one of "
+            f"{', '.join(DESCRIPTIONS)} (with any words before it: 'a French lugger')"
+        )
+    said_nation = " ".join(m.group("nation").split())
+    nation = world.nations.find(said_nation)
+    home = None
+    if nation is None:
+        ports = getattr(world, "ports", None)
+        home = ports.find(said_nation) if ports is not None and ports.ports else None
+        if home is not None:
+            nation = world.nations.find(str(getattr(home, "nation", "") or ""))
+    if nation is None:
+        raise WorldOrderError(
+            f"the nation '{said_nation}' is no nation of the table and no port of the world"
+        )
+    where = " ".join(m.group("where").split())
+    found = place_position(world, where)
+    if found is None:
+        raise WorldOrderError(
+            f"the place '{where}' is no position and no place of the chart (say '49 30 N 5 "
+            "50 W', a port or a named feature)"
+        )
+    on_land = _on_the_land(world, found[0])
+    if on_land:
+        raise WorldOrderError(f"the place '{where}' {on_land}")
+    goal, no_colours, intent = _peel_tails(m.group("goal"))
+    letter: dict[str, Any] | None = None
+    lm = _LETTER.match(goal)
+    if lm:
+        goal = lm.group("goal")
+        letter = {"text": lm.group("text"), "origin": (lm.group("origin") or "").strip()}
+    try:
+        _goal_plan(world, goal or "bound for Falmouth", found[0])
+    except ValueError as e:
+        raise WorldOrderError(f"the goal '{goal}': {e}") from None
+    spec: dict[str, Any] = {
+        "description": desc,
+        "name": m.group("name"),
+        "nation": nation.id,
+        "position": where,
+        "goal": goal,
+        "colours": "none" if no_colours else "shown",
+    }
+    harbour = _harbour_of(world, found[0])
+    if harbour is not None:
+        # made in a port's harbour, she goes out by its track (the pilot's way out), not
+        # across the land
+        spec["departing"] = harbour.id
+    if intent:
+        spec["intent"] = intent
+    if letter is not None:
+        spec["letter"] = {
+            "text": letter["text"],
+            "origin": letter["origin"] or m.group("name"),
+        }
+    return spec
+
+
+def _on_the_land(world: Any, pos: Any) -> str:
+    """Why a place is no place to put a ship (package 68; the cold review of 2026-10-22,
+    R-43 and E2 F15: a hull put "on the land by the chart" on a reason that did not answer
+    it): on the land by the chart, with the nearest water a ship floats in named; "" for a
+    place in the water or off the chart."""
+    from freesail.world.geo import Position, bearing_and_distance, format_position
+
+    chart = getattr(world, "chart", None)
+    if chart is None or not chart.contains(pos):
+        return ""
+    depth = chart.depth_at(pos)
+    if depth is None or depth > 0.0:
+        return ""
+    water = None
+    step = units.CABLE / 2
+    for k in range(1, 101):  # out to five miles, by half cables
+        r = k * step
+        for i in range(32):
+            a = math.radians(i * 11.25)
+            p = pos.advanced(r * math.sin(a), r * math.cos(a))
+            if chart.contains(p):
+                d = chart.depth_at(p)
+                if d is not None and d >= SHIP_WATER_M:
+                    water = p
+                    break
+        if water is not None:
+            break
+    if water is None:
+        return "is on the land by the chart, and no water a ship floats in lies within five miles"
+    bearing, metres = bearing_and_distance(pos, water)
+    near = format_position(Position(water.lat_deg, water.lon_deg))
+    return (
+        f"is on the land by the chart, and no ship is put there; the nearest water she floats "
+        f"in is {units.format_heading(units.deg_to_rad(bearing)).split(' ')[0]} of it, "
+        f"{metres / units.CABLE:.0f} cables off, at {near}"
+    )
+
+
+def _harbour_of(world: Any, pos: Any) -> Any:
+    """The port in whose harbour the place lies (its roads or its anchorage within
+    `HARBOUR_NM`), or None (package 68)."""
+    ports = getattr(world, "ports", None)
+    if ports is None or not getattr(ports, "ports", None):
+        return None
+    best = None
+    for port in ports.ports.values():
+        try:
+            _spot, nm = port.nearest_spot(pos)
+        except Exception:  # noqa: BLE001  (a port with no spots)
+            continue
+        if nm <= HARBOUR_NM and (best is None or nm < best[1]):
+            best = (port, nm)
+    return best[0] if best is not None else None
+
+
+def form_error(world: Any, order: WorldOrder) -> str | None:
+    """Why an order's form cannot be performed, in words, or None (package 68; the cold
+    review of 2026-10-22, R-41: the doubt was judged before the form, so a malformed
+    order came back only "doubted", and a small model took it for a working template):
+    checked before the doubt, so that a doubted order is one that can be performed. The
+    new ship's form (`new_ship_spec`) today; every other form is checked as it is
+    performed, as before."""
+    if order.channel != "ship" or _SHIP_GOAL.match(order.text) is not None:
+        return None
+    try:
+        new_ship_spec(world, order.text)
+    except WorldOrderError as e:
+        return str(e)
+    return None
 
 
 def is_hand(order: WorldOrder) -> bool:
@@ -875,7 +1015,20 @@ _ROLE_AGE = re.compile(
     r"^(?P<head>.+?)\s+of\s+(?P<n>[\w -]+?)(?:\s+years?(?:\s+of\s+age)?)?$", re.I
 )
 _ABOARD_AT = re.compile(r"^(?:aboard|on\s+board)(?:\s+(?:in|on)\s+(?P<place>.+))?$", re.I)
-_IN_PLACE = re.compile(r"^(?:in|on)\s+(?P<place>.+)$", re.I)
+_IN_PLACE = re.compile(r"^(?:in|on|onto|into)\s+(?P<place>.+)$", re.I)
+# A ship named in a made person's words (package 68; the cold review of 2026-10-22, R-15:
+# "aboard the Two Brothers" fell into his history and "on the quarterdeck" made him the
+# player's, three foreign captains on the Sherbourne's quarterdeck): "aboard the Lydia",
+# "on board the Lydia", "onto the Sherbourne's quarterdeck", "on the quarterdeck of
+# Cudlip's Boat". The player's own ship by her name is aboard, at the place said; another
+# is refused in words, the people of other ships being no people of this world's.
+_ABOARD_SHIP = re.compile(r"^(?:aboard|on\s+board(?:\s+of)?)\s+(?P<ship>.+)$", re.I)
+_SHIPS_PLACE = re.compile(
+    r"^(?:in|on|onto|into)\s+(?:the\s+)?(?P<ship>.+?)['\u2019]s?\s+(?P<place>[\w ]+)$", re.I
+)
+_PLACE_OF_SHIP = re.compile(
+    r"^(?:in|on|onto|into|aboard)\s+(?:the\s+)?(?P<place>[\w ]+?)\s+of\s+(?P<ship>.+)$", re.I
+)
 _ASHORE_AT = re.compile(r"^ashore(?:\s+(?:at|in)\s+(?P<port>.+))?$", re.I)
 _AT_PORT = re.compile(r"^(?:at|of)\s+(?P<port>.+)$", re.I)
 # A person put ashore or taken aboard by a boat within this many miles of the port's roads
@@ -923,6 +1076,62 @@ def _port_miles(world: Any, port: Any) -> float | None:
     return float(port.nearest_spot(pos)[1])
 
 
+def _ship_said(world: Any, phrase: str, places: Any) -> tuple[bool, str] | None:
+    """A ship named in a made person's words (package 68, R-15): (whether she is the
+    player's own, the place aboard said with her, or ""), None where the phrase names no
+    ship. 'aboard <words>' names a ship whatever the words, unless they are the places'
+    form ('aboard, in the cabin'); "<ship>'s <place>" and "<place> of <ship>" only where
+    the ship is a vessel of the world or the player's own, or the place one aboard."""
+    own = " ".join(str(getattr(getattr(world, "ship", None), "name", "") or "").split())
+    vessels = getattr(world, "vessels", None)
+
+    def _is_own(words: str) -> bool:
+        key = " ".join(words.lower().split()).removeprefix("the ")
+        if key in ("her", "us", "here", "ship", "this ship", "our ship"):
+            return True
+        name = own.lower().removeprefix("the ")
+        return bool(name) and (key == name or key.startswith(name + " "))
+
+    def _vessel(words: str) -> Any:
+        if vessels is None:
+            return None
+        parts = words.split()
+        for n in range(len(parts), 0, -1):
+            found = vessels.find(" ".join(parts[:n]))
+            if found is not None:
+                return found
+        return None
+
+    m = _ABOARD_SHIP.match(phrase)
+    if m is not None and _ABOARD_AT.match(phrase) is None:
+        return _is_own(m.group("ship")), ""
+    m = _PLACE_OF_SHIP.match(phrase)
+    if m is not None:
+        found = places.find(m.group("place"))
+        ship = m.group("ship")
+        if (found is not None and found.aboard) or _is_own(ship) or _vessel(ship) is not None:
+            return _is_own(ship), (found.id if found is not None and found.aboard else "")
+    m = _SHIPS_PLACE.match(phrase)
+    if m is not None:
+        ship = m.group("ship")
+        found = places.find(m.group("place"))
+        aboard_place = found is not None and found.aboard
+        if _is_own(ship) or _vessel(ship) is not None or (aboard_place and not _a_person(ship)):
+            return _is_own(ship), (found.id if aboard_place else "")
+    return None
+
+
+def _a_person(words: str) -> bool:
+    """Whether the words before a "'s" name a person or a role ('the master's cabin',
+    'the captain's', "Mr Fox's"), not a ship (package 68)."""
+    from freesail.world.people import ROLE_WORDS
+
+    key = " ".join(str(words).lower().split()).removeprefix("the ")
+    if key in ROLE_WORDS or key in ("captain", "his", "her", "my", "our", "your"):
+        return True
+    return key.startswith(("mr ", "mrs ", "captain ", "capitaine ", "monsieur ", "senhor "))
+
+
 def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]:
     """`person: make "<name>", <the words>`: a person with an outline from the words, among
     the world's people from now on (spec M7b §8; package 52)."""
@@ -947,6 +1156,19 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
         am = _AGE.match(low)
         if am is not None and _age_of(am.group("a") or am.group("b") or am.group("c") or ""):
             age = _age_of(am.group("a") or am.group("b") or am.group("c") or "")
+            continue
+        said = _ship_said(world, phrase, places)
+        if said is not None:
+            own, at = said
+            if not own:
+                ship_name = getattr(getattr(world, "ship", None), "name", "") or "this ship"
+                raise WorldOrderError(
+                    f"'{phrase}' names another ship: a person is made aboard the {ship_name} "
+                    "or ashore, and the people of other ships are not kept (her master and "
+                    "people are her own, and no form puts a person aboard her); nothing is "
+                    "made."
+                )
+            aboard, place = True, (at or place)
             continue
         m = _ABOARD_AT.match(phrase)
         if m is not None:
@@ -1234,8 +1456,8 @@ def _say_as_parts(world: Any, body: str, draw: bool) -> tuple[Any, str]:
     if person is None:
         raise WorldOrderError(
             f"nobody answering to '{who}' is among the people or the ship's company; a person "
-            'ashore or a stranger is made first (\'person: make "<name>", <who he is>, '
-            "<where>')"
+            'ashore or a stranger aboard is made first (\'person: make "<name>", <who he is>, '
+            "<where>'); the people of another ship are not kept, and none is made aboard her"
         )
     return person, words
 
@@ -2519,14 +2741,8 @@ def _doubt_ship(world: Any, body: str) -> str | None:
     if found is None:
         return None
     pos = found[0]
-    chart = getattr(world, "chart", None)
-    if chart is not None and chart.contains(pos):
-        depth = chart.depth_at(pos)
-        if depth is not None and depth <= 0.0:
-            return (
-                f"the place {found[1]} is on the land by the chart: a ship put there would be "
-                "aground, and no ship sails from dry land"
-            )
+    # a place on the land is refused with the form, the nearest water named (package 68):
+    # no reason puts a hull ashore (the cold review's E2 F15)
     reach, clear = _horizon(world)
     here = getattr(world, "position", None)
     if reach is None or here is None or not clear:

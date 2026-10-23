@@ -150,6 +150,7 @@ def test_the_chronometer_found_stopped_is_dead_by_its_cause_and_set_going_by_the
     assert c.going and not c.stopped
     # a ship with none: the game has no way to do it as said, and the director is told so
     bare = world_at(49.5, -5.5)
+    D.direct(bare, "aboard: the chronometer found stopped", by="t")  # the doubt seen (68)
     said = D.direct(bare, "aboard: the chronometer found stopped [reason: the test]", by="t")
     assert said.startswith("Logged as attempted") and "she carries no chronometer" in said
 

@@ -235,7 +235,20 @@ def description_key(words: str) -> str | None:
     key = " ".join(str(words).lower().replace("_", " ").split())
     if key in DESCRIPTIONS:
         return key
-    return _DESCRIPTION_WORDS.get(key)
+    found = _DESCRIPTION_WORDS.get(key)
+    if found is not None:
+        return found
+    # the description's own words after what qualifies them (package 68; the cold review
+    # of 2026-10-22, R-43: "a French lugger" and "a small fishing lugger" were no
+    # descriptions): the longest tail of the words that names one
+    parts = key.removeprefix("a ").removeprefix("an ").removeprefix("the ").split()
+    for n in range(len(parts) - 1, 0, -1):
+        tail = " ".join(parts[-n:])
+        if tail in DESCRIPTIONS:
+            return tail
+        if tail in _DESCRIPTION_WORDS:
+            return _DESCRIPTION_WORDS[tail]
+    return None
 
 
 @functools.lru_cache(maxsize=8)
@@ -1010,6 +1023,18 @@ def _goal_plan(world: Any, goal: str, start: Position) -> tuple[list[tuple[Any, 
     )
 
 
+def _out_of_port(world: Any, port_id: str) -> list[tuple[Any, ...]]:
+    """The marks of a port's track to sea (`Planner._port_track`), as a far body's plan."""
+    ports = getattr(world, "ports", None)
+    port = (getattr(ports, "ports", None) or {}).get(port_id) if ports is not None else None
+    if port is None:
+        return []
+    from freesail.world.brains import _plan_of_legs
+    from freesail.world.captains import Planner
+
+    return _plan_of_legs(Planner(world)._port_track(port, "to_sea"))
+
+
 def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
     """A vessel from a scenario's `ships:` entry or a world order's words: her
     description (one of `DESCRIPTIONS`), her name, her nation, her position and her goal;
@@ -1036,6 +1061,12 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         position = found[0]
     name = str(spec.get("name") or f"{key} {serial}")
     plan, cycle, goal = _goal_plan(world, str(spec.get("goal") or "bound for Falmouth"), position)
+    departing = str(spec.get("departing") or "")
+    if departing and not cycle and not spec.get("intent"):
+        # made in a port's harbour (package 68, spec M7b §21i's simple half): out by the
+        # port's track to sea, the pilot's way, before her goal's legs, and not across the
+        # land (an intent's captain lays it so himself, `brains.FarCaptain`)
+        plan = _out_of_port(world, departing) + plan
     if spec.get("sailing_factor") is not None:
         # drawn by the caller from its own stream (the world's business, package 43b, so
         # that its ships move no draw of the scenario's)

@@ -99,6 +99,7 @@ __all__ = [
     "read_intent",
     "role_for",
     "size_of_words",
+    "size_rank_of",
     "state_of_actor",
 ]
 
@@ -201,6 +202,22 @@ def size_of_words(known: str) -> int:
         if word in head:
             return rank
     return 0
+
+
+def size_rank_of(words: str) -> int | None:
+    """The class of a hull by any words that name her ('brig', 'a French frigate', 'a
+    brig-sloop of war'), ranked as the tops rank a sail (`_SIZE_WORDS`); None where the
+    words name no class (package 68; the cold review's R-38: the brief's limit "brig" was
+    looked up by the `SIZE_RANK` keys inside it, none of which "brig" holds, so a French
+    frigate passed a brief of no enemy heavier than a brig)."""
+    said = " ".join(str(words or "").lower().replace("\u2019", "'").split())
+    if not said:
+        return None
+    padded = f"a {said.removeprefix('a ').removeprefix('an ').removeprefix('the ')}"
+    for word, rank in _SIZE_WORDS:
+        if word in padded:
+            return rank
+    return None
 
 
 def size_of_file(ship_file: Any) -> int:

@@ -832,6 +832,14 @@ verbs:
                go off to the ship, take me off, come back aboard]
     object: person
     level: 1
+  # A waterman's boat from the quay (package 68; the cold review of 2026-10-22, R-62): the
+  # giver goes ashore in it from the ship, or off to her from the quay, her own boat away
+  # or not, for a shilling a head (`Ports.waterman`).
+  hire a waterman:
+    synonyms: [take a waterman, call a waterman, hail a waterman, hire a shore boat,
+               take a shore boat, go ashore by a waterman, go off by a waterman]
+    object: person
+    level: 1
   # The port's places, what is done in each and who is found there (package 53): asked in
   # port or ashore, answered in words and never journaled, as a reading is; not a reading
   # of the registry, so that no sample and no pinned passage's `the port` carries it.

@@ -20,11 +20,13 @@ def load_spec(path: str | Path) -> ShipSpec:
     try:
         text = path.read_text(encoding="utf-8")
     except FileNotFoundError:
-        raise ShipFileError(f"{path}: no such ship file.") from None
+        # said with forward slashes on every platform (package 68; the cold review's R-58:
+        # the scenario maker's refusal read `data\\ships\\nope.yaml` on Windows)
+        raise ShipFileError(f"{path.as_posix()}: no such ship file.") from None
     try:
         data = yaml.safe_load(text)
     except yaml.YAMLError as e:
-        raise ShipFileError(f"{path}: the file is not valid YAML ({e}).") from None
+        raise ShipFileError(f"{path.as_posix()}: the file is not valid YAML ({e}).") from None
     return parse_ship(data, source=path.as_posix())
 
 

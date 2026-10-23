@@ -418,3 +418,31 @@ def test_reference_ships_carry_their_rake():
     schooner = load_ship("data/ships/topsail-schooner.yaml")
     assert schooner.spars["fore.mast"].rake == pytest.approx(schooner.spars["main.mast"].rake)
     assert schooner.spars["main.mast"].rake > frigate.spars["mizzen.mast"].rake
+
+
+def test_a_missing_ship_file_is_named_with_forward_slashes_however_it_was_said():
+    """Package 68 (the cold review of 2026-10-22, R-58): on Windows the scenario maker's
+    refusal named `data\\ships\\nope.yaml`; the path is said with forward slashes on every
+    platform, as a save keeps it."""
+    for said in ("data/ships/nope.yaml", "data\\ships\\nope.yaml"):
+        with pytest.raises(ShipFileError) as e:
+            load_ship(said)
+        assert str(e.value) == "data/ships/nope.yaml: no such ship file."
+
+
+def test_every_text_file_is_kept_with_lf_endings_by_the_attributes():
+    """Package 68 (R-58 and the review's 2.3): `.gitattributes` keeps every text file LF on
+    every platform (`* text=auto eol=lf`), the records filed as they were excepted; and no
+    file of the code, the data or the tests carries a CR."""
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    rules = (root / ".gitattributes").read_text(encoding="utf-8").splitlines()
+    assert "* text=auto eol=lf" in rules
+    assert "docs/agents/consent/** -text" in rules
+    for top in ("freesail", "tests", "data", "client", "tools"):
+        for p in (root / top).rglob("*"):
+            if p.suffix in (".py", ".yaml", ".yml", ".js", ".html", ".css", ".md", ".orders"):
+                if "fixtures" in p.parts:
+                    continue
+                assert b"\r\n" not in p.read_bytes(), p

@@ -5333,6 +5333,20 @@ def _tackle(ship: Ship) -> Any:
     return ground_tackle(ship)
 
 
+def _kedge_depth(ship: Ship, x_m: float, y_m: float) -> float | None:
+    """The depth of water at a point of the ship's plane, by the chart and the tide now
+    (package 68): where a kedge is let go, as the World reads an anchor's depth."""
+    world = _world_of(ship)
+    chart = getattr(world, "chart", None) if world is not None else None
+    if world is None or chart is None:
+        return None
+    at = world.place_of_plane(x_m, y_m)
+    d = chart.depth_at(at) if at is not None else None
+    if d is None:
+        return None
+    return max(0.0, float(d) + float(getattr(world, "tide_height_m", 0.0)))
+
+
 def _water_depth(ship: Ship) -> float | None:
     depth = ship.extra.get("water_depth_m")
     return None if depth is None else float(depth)
@@ -6783,6 +6797,46 @@ def _set_fore_and_aft(ship: Ship, sails: list[Sail], tack: str) -> None:
         draw_sheets(ship, drawing, lee)
 
 
+def _lugs_all(ship: Ship) -> list[Sail]:
+    """A lugger's dipping lugs, set or not (the fore lug and the main lug), foremost
+    first (package 68)."""
+    lugs = [sl for sl in ship.sails.values() if sl.cls == "lug" and sl.dipping and not sl.wrecked]
+    return sorted(lugs, key=lambda sl: -sl.x_m)
+
+
+def _standing_lugs_all(ship: Ship) -> list[Sail]:
+    """A lugger's mizen, set or not: the standing lug on the aftermost mast, sheeted to its
+    outrigger (not the taille-vent, unbent in fair weather, nor the lug topsails)."""
+    lugs = [
+        sl
+        for sl in ship.sails.values()
+        if sl.cls == "lug"
+        and not sl.dipping
+        and not sl.wrecked
+        and sl.state is not SailState.UNBENT
+        and "topsail" not in sl.id
+    ]
+    return sorted(lugs, key=lambda sl: sl.x_m)[:1]
+
+
+# The first words of getting under way (`data/evolutions/get_under_way.yaml`'s on_start):
+# a ship's, and a lugger's, who has a windlass and no sail-loosers to send aloft (package
+# 68; the cold review of 2026-10-22, R-45).
+UNDER_WAY_START_WORDS = (
+    "All hands up anchor! Pass the messenger, ship the bars; send the ready-men aloft to "
+    "get the sails ready for loosing."
+)
+UNDER_WAY_START_WORDS_LUGGER = (
+    "All hands up anchor! Man the windlass, ship the handspikes; the lugs to be got ready "
+    "for hoisting on deck, no hand aloft."
+)
+
+
+def under_way_start_words(ship: Ship) -> str:
+    """The order's first line, by her rig (package 68)."""
+    return UNDER_WAY_START_WORDS_LUGGER if _lugs_all(ship) else UNDER_WAY_START_WORDS
+
+
 class GetUnderWayScript(_AnchorScript):
     """Get under way as Luce has it (data/evolutions/get_under_way.yaml): heave short,
     loose and sheet home the topsails, weigh, cast her on the tack wanted; the anchor
@@ -6794,10 +6848,23 @@ class GetUnderWayScript(_AnchorScript):
     while she drops astern, up when she has headway); and "paid off" is never said on a
     timeout: at cast_timeout_s she is taken as she lies, on the tack wanted, on the
     other (which the line says, and she is got under way on it), or hanging head to
-    wind, when she is given till cast_give_up_s and the evolution then fails in words."""
+    wind, when she is given till cast_give_up_s and the evolution then fails in words.
+
+    Package 68 (the cold review of 2026-10-22, R-45: the Éclair was got under way with a
+    square-rigger's words, no lug set, and stood under the jib alone a cable off
+    Pergueridre, twice): a lugger is got under way as a lugger. Her cable is hove at the
+    windlass; no sail-loosers go aloft and no topsail is set; her lugs are made ready on
+    deck while she heaves short, the tacks to the lee side of the tack she casts on. At
+    the aweigh her fore lug is hoisted on that side with the jib, its sheet to windward,
+    and the helm a-lee; when she has paid off the jib is drawn, the main lug hoisted on
+    the same side and the mizen set (Forfait 1788, p. 53: "les focs & le tapecul ...
+    favorisent & accélèrent efficacement le mouvement giratoire"; the main lug held till
+    she has cast, as a schooner's mainsail is eased, so that it does not bring her head
+    back to the wind). Cast the other way, her lugs are dipped round to the new lee side."""
 
     fore_and_aft = False  # a class default, for a checkpoint from an earlier build
     main_eased = False  # the same: her main sheet eased off as she pays off
+    lugger = False  # the same (package 68): her dipping lugs got under way as a lugger's
 
     def __init__(self, ship: Ship, params: dict[str, Any], timing: dict[str, float]):
         super().__init__(ship, params, timing)
@@ -6855,6 +6922,9 @@ class GetUnderWayScript(_AnchorScript):
         self.phase_t = 0.0
         self.anchor.heaving = True
         self.fore_and_aft = len(_masts_with_yards(self.ship)) < 2
+        self.lugger = bool(_lugs_all(self.ship))
+        if self.lugger:
+            self.fore_and_aft = True  # her helm tended and her jib aback, as a cutter's
         if self.phase == "loose":
             self._begin_loose()
 
@@ -6890,6 +6960,18 @@ class GetUnderWayScript(_AnchorScript):
         ship = self.ship
         self.phase = "loose"
         self.phase_t = 0.0
+        if self.lugger:
+            # a lugger's lugs made ready on deck, the tacks to the lee side of the tack
+            # she is to cast on; nothing loosed aloft (package 68)
+            lugs = _lugs_all(ship) + _standing_lugs_all(ship)
+            names = names_of_sails(ship, lugs).replace(" and the ", ", the ")
+            self.sails_words = f"under {names} and the jib"
+            self.note(
+                "Pawl the windlass; stopper the cable. Cast off the gaskets of the lugs, "
+                f"their tacks to {_lee_name(self.sign)} for the {self.tack} tack; the "
+                "halliards manned on deck."
+            )
+            return
         tops = _topsails(ship)
         mains = _boom_mainsails(ship)
         for sl in tops:
@@ -6930,11 +7012,22 @@ class GetUnderWayScript(_AnchorScript):
             if self.phase_t >= self.timing_value("rig_capstan_s", 180.0) * factor:
                 self.phase = "heave_short"
                 self.phase_t = 0.0
-                self.note("The messenger passed, the bars shipped and swiftered; heave round!")
+                self.note(
+                    "The windlass manned, the handspikes shipped; heave round!"
+                    if self.lugger
+                    else "The messenger passed, the bars shipped and swiftered; heave round!"
+                )
             return
         if self.phase == "heave_short":
             if self._heave(dt, factor, self.short_m, "heave_fathoms_per_s"):
                 self._begin_loose()
+            return
+        if self.phase == "loose" and self.lugger:
+            if self.phase_t >= self.timing_value("loose_s", 240.0) * factor:
+                _belay_held_work(ship)
+                self.phase = "heave"
+                self.phase_t = 0.0
+                self.note("The lugs ready for hoisting. Man the windlass; heave round!")
             return
         if self.phase == "loose":
             if self.phase_t >= self.timing_value("loose_s", 240.0) * factor:
@@ -6990,7 +7083,11 @@ class GetUnderWayScript(_AnchorScript):
             if self._heave(dt, factor, up_and_down, "heave_fathoms_per_s"):
                 self.phase = "break_out"
                 self.phase_t = 0.0
-                self.note("The cable is up and down. Man the jib halliards!")
+                self.note(
+                    "The cable is up and down. Man the fore lug halliard and the jib halliards!"
+                    if self.lugger
+                    else "The cable is up and down. Man the jib halliards!"
+                )
             return
         if self.phase == "break_out":
             if self.phase_t >= self.timing_value("break_out_s", 60.0) * factor:
@@ -7015,7 +7112,10 @@ class GetUnderWayScript(_AnchorScript):
                 )
                 # the jib hoisted and the helm a-lee for the stern-board (Luce)
                 _set_fore_and_aft(ship, _jib(ship), self.tack)
-                self.fore_and_aft = len(_masts_with_yards(ship)) < 2
+                self.fore_and_aft = self.lugger or len(_masts_with_yards(ship)) < 2
+                if self.lugger:
+                    # her fore lug hoisted on the lee side of the tack she casts on (68)
+                    _set_fore_and_aft(ship, _lugs_all(ship)[:1], self.tack)
                 if self.fore_and_aft:
                     # a fore-and-after casts by her jib: its sheet held to windward of the
                     # tack she is to cast on, aback, which pays her head off (Luce 1884,
@@ -7034,6 +7134,15 @@ class GetUnderWayScript(_AnchorScript):
                 dyn.steady = False
                 self.phase = "cast"
                 self.phase_t = 0.0
+                if self.lugger:
+                    from freesail.evolutions.runner import part_name
+
+                    self.note(
+                        f"Hoist away the {part_name(ship, _lugs_all(ship)[0].id)}, to "
+                        f"{_lee_name(self.sign)}! Let go the downhauls, hoist away the jib, its "
+                        "sheet to windward! Helm a-lee for the stern-board."
+                    )
+                    return
                 self.note(
                     "Let go the downhauls, hoist away the jib, its sheet to windward! The "
                     "topsail yard abox. Helm a-lee for the stern-board."
@@ -7050,8 +7159,8 @@ class GetUnderWayScript(_AnchorScript):
                 self.anchor_phase = "cat_and_fish"
                 self.anchor_t = 0.0
                 self.note(
-                    f"{_cap(self.anchor.name)} up to the bows; avast heaving, pawl the capstan. "
-                    f"Hook the cat."
+                    f"{_cap(self.anchor.name)} up to the bows; avast heaving, pawl the "
+                    f"{'windlass' if self.lugger else 'capstan'}. Hook the cat."
                 )
             elif (
                 self.anchor_phase == "cat_and_fish"
@@ -7113,6 +7222,23 @@ class GetUnderWayScript(_AnchorScript):
                             "by hand with the jib sheet to windward and the helm"
                         )
                         return
+                if cast and self.lugger:
+                    # the jib drawn, the main lug hoisted on the lee side and the mizen
+                    # set; her lugs dipped round when she cast the other way (package 68)
+                    self.cast_done = True
+                    lugs = _lugs_all(ship)
+                    _set_fore_and_aft(ship, lugs + _standing_lugs_all(ship), self.tack)
+                    draw_sheets(ship, [sl for sl in _jib(ship) if sl.is_set], _lee_name(self.sign))
+                    self._steer_out(wind)
+                    self.phase = "under_way"
+                    self.phase_t = 0.0
+                    lee = _lee_name(self.sign)
+                    rest = names_of_sails(ship, lugs[1:]) if len(lugs) > 1 else ""
+                    hoist = f", hoist away {rest} to {lee}" if rest else ""
+                    if how.startswith("She would not cast") and lugs:
+                        hoist = f", dip {names_of_sails(ship, lugs[:1])} to {lee}{hoist}"
+                    self.note(f"{how}; right the helm, draw the jib{hoist}, set the mizen.")
+                    return
                 if cast:
                     self.cast_done = True
                     head, after = head_and_after_yards(ship)
@@ -7129,22 +7255,7 @@ class GetUnderWayScript(_AnchorScript):
                         self.timing_value("brace_s", 60.0),
                     )
                     _set_fore_and_aft(ship, after_gaff_sails_all(ship), self.tack)
-                    # the course steered once she has cast: the pilot's, unless it lies
-                    # closer to the wind than she will sail, when she is kept full and by
-                    # (a helm held to a course she cannot lie pinches her into irons)
-                    closest = close_hauled_true_angle(ship) + 0.5 * POINT
-                    if self.course is not None and (
-                        abs(units.wrap_pi(self.course - float(wind.direction_from))) >= closest
-                    ):
-                        dyn.helm_mode = HelmMode.HEADING
-                        dyn.target_heading = units.wrap_2pi(self.course)
-                    else:
-                        dyn.helm_mode = HelmMode.FULL_AND_BY
-                        if self.course is not None:
-                            self.course_not_laid = self.course
-                            self.pilot_course = False
-                            self.course = None
-                    dyn.steady = False
+                    self._steer_out(wind)
                     self.phase = "under_way"
                     self.phase_t = 0.0
                     self.note(
@@ -7156,6 +7267,25 @@ class GetUnderWayScript(_AnchorScript):
                 return
             if self.anchor_phase == "done" and (self.swing is None or self.swing.done):
                 self.finish()
+
+    def _steer_out(self, wind: Wind) -> None:
+        """The course steered once she has cast: the pilot's, unless it lies closer to the
+        wind than she will sail, when she is kept full and by (a helm held to a course she
+        cannot lie pinches her into irons)."""
+        dyn = self.ship.dyn
+        closest = close_hauled_true_angle(self.ship) + 0.5 * POINT
+        if self.course is not None and (
+            abs(units.wrap_pi(self.course - float(wind.direction_from))) >= closest
+        ):
+            dyn.helm_mode = HelmMode.HEADING
+            dyn.target_heading = units.wrap_2pi(self.course)
+        else:
+            dyn.helm_mode = HelmMode.FULL_AND_BY
+            if self.course is not None:
+                self.course_not_laid = self.course
+                self.pilot_course = False
+                self.course = None
+        dyn.steady = False
 
     # what the work was at, for a belay's line (package 37k)
     _DOING = {
@@ -7579,8 +7709,15 @@ class LayOutKedgeScript(_AnchorScript):
                     hx + ex * self.out_m,
                     hy + ey * self.out_m,
                 )
+                # the depth where the kedge lies, not under the ship, and the hawser paid
+                # out to reach it there, slack along the ground till it is hove taut
+                # (package 68; the cold review's CR2-01: the scope was the boat's
+                # horizontal run, the first depth refresh over-stretched it, and the kedge
+                # "came home" a minute after it was let go, before anyone hove)
+                there = _kedge_depth(ship, self.anchor.ground_x, self.anchor.ground_y)
+                depth = depth if there is None else there
                 self.anchor.depth_m = depth
-                self.anchor.scope_m = self.out_m
+                self.anchor.scope_m = math.hypot(self.out_m, depth)
                 self.anchor.bottom = str(ship.extra.get("bottom", "") or "")
                 self.anchor.taut = False
                 self.anchor.dragging = False

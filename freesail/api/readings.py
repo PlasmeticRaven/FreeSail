@@ -3324,13 +3324,50 @@ def director_line(world: Any) -> str:
 TRUTH_AHEAD_S = 4 * 3600
 
 
-def director_readings(world: Any) -> dict[str, Any]:
+def _own_state_truth(world: Any) -> str:
+    """The player's ship's state in the truth (package 68, R-35): aground, where and on
+    what ground since when; at anchor, riding or dragging; or under way."""
+    extra = getattr(world.ship, "extra", None) or {}
+    aground = extra.get("aground")
+    if aground:
+        words = f"aground, {aground.get('where') or 'the ground under her'}"
+        if aground.get("bottom"):
+            words += f" on {aground['bottom']}"
+        tick = aground.get("tick")
+        if isinstance(tick, int):
+            from datetime import timedelta
+
+            when = world.clock.ship_time - timedelta(seconds=world.clock.tick - tick)
+            words += f", since {when.strftime('%H:%M')}"
+        ts = getattr(world, "tide_state", None)
+        if ts is not None:
+            words += f"; the tide {'rising' if ts.rising else 'falling'}"
+        return words
+    tackle = extra.get("ground_tackle")
+    down = tackle.down() if tackle else []
+    if down:
+        if any(a.dragging for a in down):
+            return "at anchor, dragging"
+        from freesail.world.lookout import riding
+
+        return "at anchor, riding" if riding(world.ship) else "at anchor, with way on"
+    return "under way"
+
+
+def director_readings(world: Any, within_nm: float | None = None) -> dict[str, Any]:
     """The truth as the director reads it: every ship's true position, heading, speed,
     sail and state (the player's first, by her name, then every vessel on the sea with her
     captain's intent and her brain's state where she has one); the weather as it is at
     the player's ship and as the systems will make it a watch on, with the systems by
     name; the tide; the people aboard every crewed ship and their states; the markets'
-    prices; the news (the wars, and each port's). In words and as data."""
+    prices; the news (the wars, and each port's). In words and as data.
+
+    Package 68 (the cold review of 2026-10-22, R-35): the player's ship says her state
+    (aground, where and on what; at anchor, riding or dragging; under way), which the
+    director once read wrong from her speed alone; a ship sailing by her captain's intent
+    shows the intent and not the placeholder goal every business ship was made with
+    ("bound for Falmouth"); and `within_nm` keeps only the ships within so many miles of
+    the player's, and their people, the rest counted."""
     from freesail.world.geo import bearing_and_distance, format_position
 
     out: dict[str, Any] = {"stamp": world.clock.stamp()}
@@ -3347,6 +3384,7 @@ def director_readings(world: Any) -> dict[str, Any]:
         from freesail.api.queries import sail_set_line
 
         own["sail"] = sail_set_line(ship).removeprefix("Sail set: ")
+    own["state"] = _own_state_truth(world)
     cap = getattr(world, "captain", None)
     if cap is not None:
         own["captain"] = cap.words() if hasattr(cap, "words") else str(cap.state)
@@ -3360,6 +3398,17 @@ def director_readings(world: Any) -> dict[str, Any]:
         own["cargo"] = hold.words()
     ships.append(own)
     vessels = getattr(getattr(world, "vessels", None), "vessels", None) or []
+    beyond = 0
+    if within_nm is not None and here is not None:
+        near = []
+        for v in vessels:
+            if v.done:
+                continue
+            if bearing_and_distance(here, v.position)[1] / units.NAUTICAL_MILE <= within_nm:
+                near.append(v)
+            else:
+                beyond += 1
+        vessels = near
     for v in vessels:
         if v.done:
             continue
@@ -3373,8 +3422,9 @@ def director_readings(world: Any) -> dict[str, Any]:
             "speed": f"{v.speed_kn:.1f} knots",
             "sail": v.sail_state,
             "detail": v.detail,
-            "goal": v.goal,
         }
+        if v.brain is None or not v.intent_words:
+            d["goal"] = v.goal  # a ship sailing by her intent shows the intent (68)
         if here is not None:
             bearing, distance = bearing_and_distance(here, v.position)  # degrees true
             d["from_the_ship"] = (
@@ -3388,6 +3438,11 @@ def director_readings(world: Any) -> dict[str, Any]:
             d["letter"] = f"from {getattr(v.letter, 'origin', '')}"
         ships.append(d)
     out["ships"] = ships
+    if within_nm is not None:
+        out["within"] = (
+            f"the ships within {within_nm:g} miles of the {own['name']}; "
+            f"{beyond} more beyond, not shown"
+        )
     out["weather"] = _truth_weather(world)
     ts = getattr(world, "tide_state", None)
     if ts is not None:

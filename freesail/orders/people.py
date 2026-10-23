@@ -18,6 +18,8 @@ order goes, the captain at the prompt or a station's person at his station.
     go aloft                        into the tops
     go ashore                       by the boat, at a port's reach, landed at the quay
     come aboard                     the boat sent for him from the ship at his port
+    hire a waterman                 a shore boat between the ship and the quay, her own
+                                    boat away or not, a shilling a head (package 68)
 
 Each is a verb of `data/vocabulary.yaml` with the object `person`: the grammar takes the
 words after the verb as they are, and this module reads a role or a name from them. The
@@ -44,6 +46,7 @@ MOVE_VERBS: tuple[str, ...] = (
     "go aloft",
     "go ashore",
     "come aboard",
+    "hire a waterman",
 )
 # The verbs of the equal reach (spec M7b §17): every station's, whatever its domain, with
 # the deck or without: its own moves, and the port's places asked.
@@ -126,9 +129,11 @@ def _move(ship: Any, world: Any, people: Any, order: Order, verb: str, rest: str
         raise OrderError(f"You are {movement.where_words(world, person)} already.")
     if verb == "go to" and not rest:
         raise OrderError("Go where? Say 'go to the gunroom', 'go below', 'come on deck'.")
-    if verb in ("go ashore", "come aboard") and rest:
+    if verb in ("go ashore", "come aboard", "hire a waterman") and rest:
         raise OrderError(f"'{verb}' takes nothing after it; '{rest}' was not understood.")
-    if verb == "go ashore":
+    if verb == "hire a waterman":
+        kind, text, data = movement.by_waterman(world, person)
+    elif verb == "go ashore":
         kind, text, data = movement.go_ashore(world, person)
     elif verb == "come aboard":
         kind, text, data = movement.come_aboard(world, person)
@@ -162,7 +167,9 @@ def check(ship: Any, order: Order) -> None:
         if world.people.find(who) is None and _words(who) not in ROLE_WORDS:
             names = ", ".join(x.name for x in world.people.all)
             raise OrderError(f"Nobody aboard answers to '{who}'; the people are {names}.")
-    elif verb in ("go below", "come on deck", "go ashore", "come aboard") and rest:
+    elif (
+        verb in ("go below", "come on deck", "go ashore", "come aboard", "hire a waterman") and rest
+    ):
         raise OrderError(f"'{verb}' takes nothing after it; '{rest}' was not understood.")
     elif verb == "go to" and not rest:
         raise OrderError("Go where? Say 'go to the gunroom', 'go below', 'come on deck'.")
