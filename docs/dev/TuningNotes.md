@@ -8240,3 +8240,13 @@ below re-ran every pinned passage against its figure.
 
 ### The suite, as run
 
+On the build machine (four cores) carrying three other builders' suites beside this one,
+the load between 15 and 25 throughout; each tier written here as it finished.
+
+- `ruff check .` and `ruff format .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`, the code of
+  `388df80`, ending at 12:02 after some three and a half hours): 3,567 passed, **one failed**, 327 slow left out. The one is
+  `test_crews.py::test_truth_88_with_the_cap_full_the_pace_holds`, a floor of ticks a
+  second (32 against 60 under a load of twenty); run alone at once after, the load still
+  seventeen, it passed. Not this package's: it runs no seat, and the only per-tick code
+  added is a test of `director_seats` once a minute.
