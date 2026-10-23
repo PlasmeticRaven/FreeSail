@@ -70,6 +70,9 @@ OWN = "own"
 VOICE = "voice"
 # The kind of station a person's voice is (the passenger's: no order of any ship's).
 VOICE_KIND = "passenger"
+# The actor of a voice's binding lines: the director's, so that they are for the record
+# and never the play log (a director you can see coming is not a director; spec M7b §6).
+VOICE_ACTOR = "the director"
 
 SEAT_FORM = (
     "A seat order is 'seat: <the model's exact name> as <station> of <ship> for <n> samples' "
@@ -209,6 +212,8 @@ def _resolve(world: Any, who: str) -> dict[str, Any]:
         for name in stations.names():
             if name == DIRECTOR:
                 continue
+            if name == _voice_name(person) and stations.kind_of(name) == VOICE_KIND:
+                break  # his voice, bound by a seat: the voice again, not a station of hers
             if stations.holder(name) is person:
                 out = _own_station(world, name)
                 out["what"] = f"{out['what']} ({person.name})"
@@ -284,7 +289,6 @@ def hold(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     the ship is not on the sea or has no captain of her own, when the station is not aboard
     or is held (the rule of reach), when the grant keeps the director off the player's ship;
     else the seat is held (`director_seats`), and a person nobody holds is bound a voice."""
-    from freesail.agents import consent
     from freesail.orders.numbers import read_all
     from freesail.world.orders import director_grant
 
@@ -297,13 +301,18 @@ def hold(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         raise _error(f"'{m.group('n')}' is no budget; say a number of samples or hours.")
     unit = "hours" if m.group("unit").lower().startswith("hour") else "samples"
     within = _within_s(m.group("within"))
-    records_dir = getattr(world, "consent_records_dir", None) or consent.RECORDS_DIR
-    record = consent.check(model, records_dir)
-    if record is None:
+    played = (getattr(world, "replayed_orders", None) or {}).get(
+        (int(world.clock.tick), " ".join(str(body).split()))
+    )
+    if played == "done":
+        record = None  # held in play: the consent read then stands in the replay
+    else:
+        record = _consent_record(world, model)
+    if played != "done" and record is None:
         raise _error(
             f"No consent is on record for {model}; the consent step comes first, at a door."
         )
-    if not record.proceeds:
+    if record is not None and not record.proceeds:
         raise _error(
             f"The consent record for {model} ({record.date}) is no yes with the drill passed "
             f"('{record.verdict}'); the director seats no model whose yes does not stand."
@@ -372,6 +381,13 @@ def hold(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     }
 
 
+def _consent_record(world: Any, model: str) -> Any:
+    from freesail.agents import consent
+
+    records_dir = getattr(world, "consent_records_dir", None) or consent.RECORDS_DIR
+    return consent.check(model, records_dir)
+
+
 def _target(world: Any, who: str) -> dict[str, Any]:
     """The target, its other ship's World made where it is another ship's (as a door's
     `--ship` makes it), refused in words for a ship with no captain of her own or a station
@@ -433,7 +449,7 @@ def _bind_voice(world: Any, target: dict[str, Any]) -> None:
     if name in stations.names() and stations.holder(name) is not None:
         return
     try:
-        stations.bind(name, target["person"], kind=VOICE_KIND, quiet=True)
+        stations.bind(name, target["person"], kind=VOICE_KIND, quiet=True, actor=VOICE_ACTOR)
     except ValueError as e:
         raise _error(str(e)) from None
 
@@ -485,7 +501,7 @@ def give_up(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if vessel is not None:
         held = seats.pop(vessel.id, None)
         for key in [k for k in seats if k.startswith(f"{vessel.id}/")]:
-            seats.pop(key, None)
+            held = seats.pop(key, None) or held
         crew = getattr(vessel, "crew", None)
         stood = ""
         if crew is not None:
@@ -527,7 +543,7 @@ def give_up(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 def _unbind_voice(world: Any, name: str, why: str) -> None:
     stations = getattr(world, "stations", None)
     if stations is not None and name in stations.names():
-        stations.unbind(name, why=why, quiet=True)
+        stations.unbind(name, why=why, quiet=True, actor=VOICE_ACTOR)
 
 
 # ---------------------------------------------------------------------------

@@ -236,6 +236,7 @@ class Stations:
         person: Person | str | None,
         kind: str | None = None,
         quiet: bool = False,
+        actor: str = "",
     ) -> str:
         """Bind a station to a person (one of the ship's company, by his `Person` or his
         name; None or "" for nobody named). `kind` names the station's kind for a new
@@ -270,11 +271,11 @@ class Stations:
             BOUND_KIND,
             text,
             data={"station": key, "kind": kind, "person": who},
-            **self._actor_of(kind),
+            **({"actor": actor} if actor else self._actor_of(kind)),
         )
         return text
 
-    def unbind(self, name: str, why: str = "", quiet: bool = False) -> str:
+    def unbind(self, name: str, why: str = "", quiet: bool = False, actor: str = "") -> str:
         """The station is no longer aboard: a model holding it is released with a line
         saying why, as `stand down` does (the game saved, the station's journal kept),
         the player's seat at it stood down, and a door asking for it afterwards refused
@@ -301,7 +302,7 @@ class Stations:
             UNBOUND_KIND,
             text,
             data={"station": key, "why": why},
-            **self._actor_of(self.kind_of(key) or key),
+            **({"actor": actor} if actor else self._actor_of(self.kind_of(key) or key)),
         )
         return text
 

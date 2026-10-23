@@ -153,6 +153,15 @@ def replay(
     true (package 44: the regatta judges a human replay's course as it is sailed)."""
     road = road_of(data, road)
     world = build_world(data, ship_factory, road)
+    # the world orders' outcomes in play, which a seat's consent is read from in a replay
+    # rather than from the records on this machine (package 67: a seat held under records
+    # kept elsewhere, `--consent-records`, was refused in the replay and the log diverged)
+    world.replayed_orders = {
+        (int(o.get("tick") or 0), " ".join(str(o.get("order") or "").split())): str(
+            o.get("result") or ""
+        )
+        for o in data.get("world_orders") or []
+    }
     end = data["end_tick"] if until_tick is None else min(until_tick, data["end_tick"])
     inputs = data.get("inputs")
     if inputs is None:

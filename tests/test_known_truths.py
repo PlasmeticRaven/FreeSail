@@ -7257,3 +7257,259 @@ def test_truth_7b_123_no_enemy_heavier_than_a_brig_refuses_a_frigate_and_lets_a_
         'ship: a frigate "Fowey" of Britain at 49 02 N 6 22 W, bound for Plymouth',
     ):
         assert not D.direct(w, text, by="the test").startswith("Refused"), text
+
+
+# Package 67: the director's seat made real, and the channel between the player and the
+# director (spec M7b §2a and §6; the cold review's R-21, R-24 and R-34). Truths 7b-130 to
+# 7b-132, numbered after 58a's 124 to 126 and 58b's 127 to 129. The model's name is made
+# up, the API a local server speaking the Messages API's shape (`tests/messages_api.py`),
+# the settings, the records and the saves in a temporary folder, the key the test's own.
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7b_130_a_seat_starts_the_api_door_admits_it_under_its_budget_and_stands_it_down(
+    tmp_path, monkeypatch
+):
+    """Package 67's truth 130: "a `seat:` under the grant for a model the settings can call
+    starts the API door (a fake Messages API in the test), the door is admitted under the
+    seat's budget and stood down when it is spent, and a seat for a model the settings
+    cannot call is refused in words." On a live server with its harbour, the director seats
+    a model as the officer of the watch of the player's own ship for two samples: the game
+    starts the API door as the server's subprocess, marked the director's; it is admitted
+    under the seat; after its second sample the game stands it down with the reason, the
+    door ends of itself, and the director's log says each step; a seat for another model
+    the grant names but the settings cannot call is refused, the settings' model named to
+    the director alone; the play log says nothing of the seats."""
+    pytest.importorskip("fastapi")
+    pytest.importorskip("anthropic")
+    import httpx
+    from messages_api import MODEL, MessagesServer
+
+    from freesail.agents import consent
+    from freesail.agents import director as D
+    from freesail.world.orders import director_seats
+    from tests.test_harbour import Live, Port, _until
+
+    other = "another-made-up-model-8"
+    key = "a-test-key-of-no-account-0123456789"
+    stand_by = {
+        "content": [{"type": "tool_use", "name": "stand_by", "input": {"until": "ten minutes"}}]
+    }
+    with MessagesServer(key, [stand_by] * 6) as api:
+        port = Port(
+            tmp_path, {"doors": {"api": {"model": MODEL, "flags": ["--base-url", api.url]}}}
+        )
+        for name in (MODEL, other):
+            consent.Record(
+                name, "a test runtime", "2026-10-23", consent.YES, answer="Yes.", drill="passed"
+            ).write(port.records)
+        monkeypatch.setenv("FREESAIL_API_KEY", key)
+        monkeypatch.setenv("PYTHON_KEYRING_BACKEND", "keyring.backends.null.Keyring")
+        live = Live(port)
+        try:
+            with httpx.Client(base_url=live.url, timeout=60) as c:
+                c.post(
+                    "/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"}
+                )
+                d = port.driver
+                with d.lock:
+                    w = d.world
+                    w.scenario.director = {
+                        "models": [MODEL, other],
+                        "seats": 2,
+                        "seats_in_voyage": 3,
+                    }
+                    refused = D.direct(w, f"seat: {other} as master for 2 samples", by="the test")
+                    held = D.direct(w, f"seat: {MODEL} as officer for 2 samples", by="the test")
+                assert refused == (
+                    "Refused: the settings call no model by that name; the API door's model is "
+                    f"{MODEL}."
+                )
+                assert held.startswith("Done: the director's seat held for") and "2 samples" in held
+                c.post("/api/driver", json={"action": "speed", "value": 600})
+                c.post("/api/driver", json={"action": "go"})
+
+                def door() -> dict:
+                    doors = c.get("/api/harbour/state").json()["doors"]
+                    return doors[0] if doors else {}
+
+                started = _until(door, 30)
+                assert started["by"] == "the director"
+                assert started["words"].startswith(
+                    "The director's seat's API door at the officer of the watch"
+                )
+
+                def admitted() -> bool:
+                    with d.lock:
+                        seat = director_seats(d.world).get("own/officer of the watch")
+                        stood = d.world.agents.get("officer of the watch")
+                        return bool(
+                            (seat and seat.get("admitted") is not None)
+                            or (stood is not None and stood.agent.released)
+                        )
+
+                try:
+                    _until(admitted, 90)
+                except AssertionError:
+                    out = c.get(f"/api/harbour/doors/{started['id']}").json()["output"]
+                    raise AssertionError("\n".join(out)) from None
+                ended = _until(
+                    lambda: (
+                        (r := c.get(f"/api/harbour/doors/{started['id']}").json())["state"]
+                        == "ended"
+                        and r
+                    ),
+                    120,
+                )
+                c.post("/api/driver", json={"action": "hold"})
+                with d.lock:
+                    h = d.world.agents["officer of the watch"]
+                    assert h.model_name == MODEL and h.agent.released
+                    assert "the director's budget of 2 samples is spent" in h.agent.released_reason
+                    assert director_seats(d.world) == {}
+                    kinds = [(e.kind, e.text) for e in D.log_of(d.world).entries]
+                    play = [e.text for e in d.world.log if e.kind == "world.order"]
+                assert ended["code"] == 3  # the door's EXIT_RELEASED
+                assert ended["output"][-1].endswith("its station was released. ==")
+                seats = [t for k, t in kinds if k == "director.seat"]
+                assert seats[0].startswith(f"The seat held: {MODEL} as the officer of the watch")
+                assert any(t.startswith("The seat's door admitted") for t in seats)
+                assert seats[-1].startswith("The seat stood down") and "is spent" in seats[-1]
+                refusal = [t for k, t in kinds if k == "director.refused"]
+                assert refusal and MODEL not in refusal[0]
+                # the seat's own order is for the record, the refused one never reached it
+                assert len(play) == 1 and other not in play[0]
+        finally:
+            live.close()
+
+
+def test_truth_7b_131_the_players_word_reaches_the_director_and_its_answer_him_and_no_play_log():
+    """Package 67's truth 131 (R-21, R-24): "`director: <words>` at the prompt reaches the
+    director's next sample and its answer reaches the player's driver line, and neither is
+    in the play log or its replay's play side." At the console, a scripted director stands
+    by for a watch; the player's word wakes it and is in its sample as the player's word
+    apart from the game; it answers with `answer the player: ...`, which the console prints
+    as its own line; both are in the director's log and `two stories` shows both beside
+    the play log; the play log, and the play log of the save's replay, hold neither."""
+    import io
+
+    from freesail.agents import Fake, call, reply
+    from freesail.agents import director as D
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+    from freesail.ui.console import Console
+    from tests.test_director import directed, seat_director
+
+    w = directed("quiet-passage")
+    script = [
+        reply("", call("stand_by", until="a watch")),
+        reply(
+            "",
+            call("world_order", text="answer the player: Aye, a quiet passage it is."),
+            call("stand_by", until="a watch"),
+        ),
+        reply("", call("stand_by", until="a watch")),
+    ]
+    h = seat_director(w, Fake(script))
+    out = io.StringIO()
+    console = Console(w, out=out)
+    w.run(120)
+    assert h.agent.standing_by
+    word = "Keep it quiet tonight, if you would."
+    console.handle_line(f"director: {word}")
+    w.run(120)
+    asked = [t for t in h.turns if t.role == "data" and word in json.dumps(t.content)]
+    assert asked and "The player, apart from the game: " + word in json.dumps(asked[0].content)
+    printed = out.getvalue()
+    assert "The director, apart from the game: Aye, a quiet passage it is." in printed
+    assert "Your word is with the director" in printed
+    kinds = [e.kind for e in D.log_of(w).entries]
+    assert "director.player" in kinds and "director.answered" in kinds
+    stories = "\n".join(D.two_stories(w))
+    assert word in stories and "Aye, a quiet passage it is." in stories
+    for e in w.log:
+        assert word not in e.text and "a quiet passage it is" not in e.text
+    copy = replay.replay(json.loads(json.dumps(w.save())), ship_factory)
+    assert copy.log.digest() == w.log.digest()
+    played = [e.line() for e in copy.log.all()]
+    assert not any(word in x or "a quiet passage it is" in x for x in played)
+    assert any(e.kind == "director.player" for e in D.log_of(copy).entries)
+
+
+def test_truth_7b_132_a_seated_api_doors_fold_fires_at_the_default_budget_on_a_long_seat(
+    tmp_path, monkeypatch
+):
+    """Package 67's truth 132 (R-34: with `budget_tokens` at the door's whole context the
+    handover fold never fired, and two seats ran to sixteen million prompt tokens in two
+    hours): "a seated API door's handover fold fires at the default `budget_tokens` on a
+    long seat." The API door, its model reporting 200,000 tokens of context, seated by the
+    director as the officer of the watch: its fold is counted from two fifths of it; the
+    conversation the server counts grows by 15,000 tokens a request; the handover note is
+    asked at 56,000 and written, the conversation folded, and the door says its size at
+    the fold. The same door unseated is counted from the whole context, as before."""
+    pytest.importorskip("fastapi")
+    pytest.importorskip("anthropic")
+    from messages_api import CONTEXT, MODEL, Game, MessagesServer, fake_store, finished, run_door
+
+    from freesail.agents import consent
+    from freesail.agents.agent import A_GLASS_S
+
+    fake_store(monkeypatch)
+    key = "sk" + "-ant-" + "api03-" + "Tq7xLmPz" * 6
+    game = Game(tmp_path, station="officer of the watch")
+    consent.Record(MODEL, "t", "2026-10-23", consent.YES, answer="Yes.", drill="passed").write(
+        game.records
+    )
+    game.world.scenario.director = {"models": [MODEL], "seats": 1, "seats_in_voyage": 1}
+    e = game.world.world_order(f"seat: {MODEL} as officer for 40 samples")
+    assert e.data["result"] == "done"
+    count = {"n": 0}
+
+    def answer(body: dict) -> dict:
+        count["n"] += 1
+        usage = {"input_tokens": 15000 * count["n"], "output_tokens": 20}
+        if "Write the watch's handover note" in json.dumps(body["messages"][-1]):
+            note = {"note": "All quiet; the land not yet raised."}
+            call = {"type": "tool_use", "name": "handover_note", "input": note}
+        else:
+            call = {"type": "tool_use", "name": "stand_by", "input": {"until": "a glass"}}
+        return {"content": [call], "usage": usage}
+
+    argv = ["--model", MODEL, "--station", "officer", "--session", "test"]
+    with MessagesServer(key, [answer] * 12) as srv:
+        got = run_door(game, [*argv, "--base-url", srv.url], {"FREESAIL_API_KEY": key})
+        game.wait_for(lambda: game.harness is not None and game.harness.agent.samples >= 1, 30)
+        h = game.harness
+        assert h.budget_tokens == int(0.4 * CONTEXT)  # 80,000 of the 200,000
+        for _ in range(6):
+            game.wait_for(lambda: h.open_sample is None, 30)
+            game.driver.tick(A_GLASS_S)
+        game.wait_for(lambda: h.open_sample is None, 30)
+        with game.driver.lock:
+            folded = [
+                t
+                for t in h.turns
+                if t.role == "data" and isinstance(t.content, dict) and t.content.get("folded")
+            ]
+            notes = [x for x in game.world.log if x.kind == "agent.handover"]
+            game.world.world_order("unseat: officer, the watch is over")
+        assert finished(got) == 3
+    out = got["out"].getvalue()
+    assert folded and folded[0].content["handover"] == "All quiet; the land not yet raised."
+    assert notes and "Admitted under the director's seat: 40 samples" in out
+    assert "the handover fold at 80,000 tokens" in out
+    said = [ln for ln in out.splitlines() if ln.startswith("The conversation was folded at")]
+    assert said and "90,000 tokens at the last request (the server's count)" in said[0]
+    # the same door with no seat: counted from the whole context, as before
+    game2 = Game(tmp_path / "unseated", station="officer of the watch")
+    consent.Record(MODEL, "t", "2026-10-23", consent.YES, answer="Yes.", drill="passed").write(
+        game2.records
+    )
+    count["n"] = 0
+    with MessagesServer(key, [answer] * 3) as srv:
+        got = run_door(game2, [*argv, "--base-url", srv.url], {"FREESAIL_API_KEY": key})
+        game2.wait_for(lambda: game2.harness is not None and game2.harness.agent.samples >= 1, 30)
+        assert game2.harness.budget_tokens == CONTEXT
+        with game2.driver.lock:
+            game2.world.submit("stand down the officer of the watch")
+        assert finished(got) == 3

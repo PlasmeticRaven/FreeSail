@@ -89,6 +89,10 @@ STATIONS = ("captain", "officer", "master", "lookout", "director", "watcher", "p
 DOOR_KINDS = ("api", "local")
 DOOR_LINES_KEPT = 4000
 STOP_WAIT_S = 6.0
+# A seat's door whose station the game released is given this long to end of itself before
+# it is stopped (package 67; judgement: the door's poll returns within its wait, half a
+# second in the doors' loop, and its last words take a moment more).
+SEAT_DOOR_GRACE_S = 20.0
 COAST_STEP_DEG = 0.01  # the harbour's chart keeps a point about every half mile
 
 
@@ -874,7 +878,22 @@ class Harbour:
         for ident in stale:
             door = self.doors.get(ident or "")
             if door is not None and door.running:
-                threading.Thread(target=door.stop, daemon=True).start()
+                threading.Thread(target=self._stop_seat_door, args=(door,), daemon=True).start()
+
+    def _stop_seat_door(self, door: Door) -> None:
+        """A seat's door whose seat is gone: one whose station the game has released ends
+        of itself (the door says its station was released) and is given the time to; one
+        still waiting (no admission yet, a consent conversation) is stopped."""
+        from freesail.agents.remote import seat_key
+
+        desk = self.driver.desk
+        with self.driver.lock:
+            seat = desk.seats.get(seat_key(door.station, door.ship)) if desk is not None else None
+            released = bool(seat is not None and seat.released)
+        if released:
+            with contextlib.suppress(subprocess.TimeoutExpired):
+                door.proc.wait(timeout=SEAT_DOOR_GRACE_S)
+        door.stop()
 
     @staticmethod
     def _seat_station(world: Any, key: str, seat: dict[str, Any]) -> tuple[str, str]:

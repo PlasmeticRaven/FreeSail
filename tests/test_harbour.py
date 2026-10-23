@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 import os
 import socket
+import sys
 import threading
 import time
 from pathlib import Path
@@ -550,3 +551,152 @@ def test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip(brow
     )
     assert "schooner" in pg.inner_text("#ship-name")
     assert errors == []
+
+
+# ---------------------------------------------------------------------------
+# Package 67: the director's seats' doors
+# ---------------------------------------------------------------------------
+
+
+def test_the_settings_say_the_models_they_can_call_and_the_seated_doors_fold():
+    s = S.check_settings(
+        {
+            "doors": {
+                "api": {
+                    "model": PLACEHOLDER,
+                    "models": [
+                        "placeholder-two",
+                        {"name": "placeholder-three", "dialect": "openrouter"},
+                    ],
+                    "seat_budget_tokens": "2/5",
+                }
+            }
+        }
+    )
+    assert S.callable_models(s) == {
+        PLACEHOLDER: "anthropic",
+        "placeholder-two": "anthropic",
+        "placeholder-three": "openrouter",
+    }
+    assert S.seat_budget_tokens("2/5", 200_000) == 80_000
+    assert S.seat_budget_tokens("40%", 200_000) == 80_000
+    assert S.seat_budget_tokens("0.4", 200_000) == 80_000
+    assert S.seat_budget_tokens("60000", 200_000) == 60_000
+    assert S.seat_budget_tokens("", 200_000) is None
+    with pytest.raises(ValueError):
+        S.seat_budget_tokens("most of it", 200_000)
+    with pytest.raises(S.SettingsError):
+        S.check_settings({"doors": {"api": {"models": [{"name": "x", "dialect": "a fax"}]}}})
+    with pytest.raises(S.SettingsError):
+        S.check_settings({"doors": {"api": {"seat_budget_tokens": "lots"}}})
+
+
+def test_the_harbour_starts_a_seats_door_as_the_directors_and_stops_it_when_the_seat_goes(
+    tmp_path, monkeypatch
+):
+    """Package 67, item 2 (without a subprocess: the door's start recorded): a seat held on
+    the World in play has the API door started for it, its model the seat's, its dialect
+    the settings', `--budget-tokens` the settings' figure, marked the director's and told
+    to the director; a seat for a model the settings cannot call is refused at the
+    director's door and at the owner's `world:`, the settings' model named to the director
+    alone; a seat gone has its door stopped."""
+    from freesail.agents import consent
+    from freesail.agents import director as D
+    from freesail.world.orders import director_seats
+
+    port = Port(
+        tmp_path,
+        {
+            "doors": {
+                "api": {
+                    "model": PLACEHOLDER,
+                    "models": [{"name": "placeholder-two", "dialect": "openrouter"}],
+                    "seat_budget_tokens": "0.25",
+                }
+            }
+        },
+    )
+    started: list[dict[str, Any]] = []
+    stopped: list[str] = []
+
+    class FakeDoor:
+        def __init__(self, ident: str, argv: list[str]):
+            self.id, self.argv, self.running = ident, argv, True
+            self.station, self.ship = "officer of the watch", ""
+
+        def stop(self) -> None:
+            stopped.append(self.id)
+            self.running = False
+
+    def start_door(kind, station, ship="", *, seat="", seat_model="", by=""):
+        argv = port.harbour.door_argv(kind, station, ship, seat_model=seat_model)
+        ident = f"d{len(started) + 1}"
+        started.append({"station": station, "ship": ship, "seat": seat, "by": by, "argv": argv})
+        port.harbour.doors[ident] = FakeDoor(ident, argv)
+        return {"id": ident}
+
+    monkeypatch.setattr(port.harbour, "start_door", start_door)
+    monkeypatch.setattr(port.harbour, "_stop_seat_door", lambda door: door.stop())
+    with TestClient(port.app) as c:
+        c.post("/api/harbour/start", json={"scenario": "data/scenarios/lesson-falmouth.yaml"})
+        w = port.driver.world
+        for name in (PLACEHOLDER, "placeholder-two", "placeholder-four"):
+            consent.Record(
+                name, "a test runtime", "2026-10-23", consent.YES, answer="Yes.", drill="passed"
+            ).write(port.records)
+        w.consent_records_dir = port.records
+        w.scenario.director = {
+            "models": [PLACEHOLDER, "placeholder-two", "placeholder-four"],
+            "seats": 3,
+            "seats_in_voyage": 5,
+        }
+        D.set_brief(w, "quiet-passage", source="the test")
+        refused = D.direct(w, "seat: placeholder-four as officer for 4 samples", by="the test")
+        assert refused == (
+            "Refused: the settings call no model by that name; the API door's model is "
+            f"{PLACEHOLDER}."
+        )
+        r = c.post(
+            "/api/order", json={"text": "world: seat: placeholder-four as master for 4 samples"}
+        )
+        assert "The seat was not held: the settings call no model by that name" in r.text
+        assert director_seats(w) == {}
+        said = D.direct(w, "seat: placeholder-two as officer for 4 samples", by="the test")
+        assert said.startswith("Done:"), said
+        port.harbour.tend_seats()
+        port.harbour.tend_seats()  # once a seat, however often it is tended
+        assert len(started) == 1
+        door = started[0]
+        assert door["by"] == "the director" and door["seat"] == "own/officer of the watch"
+        argv = door["argv"]
+        assert argv[argv.index("--model") + 1] == "placeholder-two"
+        assert argv[argv.index("--dialect") + 1] == "openrouter"
+        assert argv[argv.index("--station") + 1] == "officer of the watch"
+        assert argv[argv.index("--budget-tokens") + 1] == "0.25"
+        assert "--ship" not in argv
+        assert D.direct(w, "unseat: officer, the passage is quiet", by="the test").startswith(
+            "Done"
+        )
+        port.harbour.tend_seats()
+        assert stopped == ["d1"]
+        # a door of the owner's own, from the page, carries no seat's flags and no mark
+        assert "--budget-tokens" not in port.harbour.door_argv("api", "watcher")
+
+
+def test_the_doors_of_the_directors_seats_are_marked_in_the_pane(tmp_path):
+    from freesail.ui.harbour import Door
+
+    door = Door(
+        "d9",
+        "api",
+        "officer of the watch",
+        [sys.executable, "-c", "print('a door')"],
+        by="the director",
+        seat="own/officer of the watch",
+    )
+    door.proc.wait(timeout=30)
+    door._reader.join(timeout=30)
+    state = door.state()
+    assert state["by"] == "the director"
+    assert state["words"].startswith("The director's seat's API door at the officer of the watch")
+    assert Door("d10", "api", "watcher", [sys.executable, "-c", "pass"]).state()["by"] == ""

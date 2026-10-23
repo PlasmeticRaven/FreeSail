@@ -422,6 +422,9 @@ class World:
     business: Any = None
     director_seats_made: int = 0
     consent_records_dir: Any = None
+    # package 67: in a replay, the world orders' outcomes in play by (tick, order), which a
+    # seat's consent is read from (`world.seats.hold`); None in play
+    replayed_orders: dict[tuple[int, str], str] | None = None
 
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
         # the build's stamp, worked once at the start (package 37d)
