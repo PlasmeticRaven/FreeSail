@@ -33,7 +33,7 @@ on these packages; that is the owner's choice.
 
 | # | Who | Package | Status |
 |---|---|---|---|
-| 70 | Fable | The combat core: the quarter bill and work in action, guns as parts, the gunnery's cycle, the hit model with heel, roll and the sea, damage as state, morale and the strike, the fighting book; the first armament and truths; the figures' sources (spec §7 to §10, §8a) | briefed 2026-10-23 (below), for the owner's approval; launched on his word, after the one whole suite on the merged tree of 68, 58a, 67 and 58b |
+| 70 | Fable | The combat core: the quarter bill and work in action, guns as parts, the gunnery's cycle, the hit model with heel, roll and the sea, damage as state, morale and the strike, the fighting book; the first armament and truths; the figures' sources (spec §7 to §10, §8a) | approved and launched 2026-10-23 (Fable, in a worktree off `b4f91ef`), after the one whole suite on the merged tree of 68, 58a, 67 and 58b |
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | after 70, or beside it if the owner's usage allows |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | after 71 |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | after 70 |
@@ -98,8 +98,10 @@ other item hangs from it.
    the gunner and the purser count (powder in cartridges by calibre, shot by kind); the
    gunner, the quarter gunners and the gun crews from the muster's posts and item 1's bill.
    **Through the generator with the source beside each figure, never by hand**: the cutter
-   first (her file names six 3-pounders and eight swivels in words; §12's "carronades" is
-   the specification's slip and the file's armament with its source binds) and the frigate
+   first, **with two fits the scenario chooses between (the owner, 2026-10-23)**: the
+   12-pounder carronades the Admiralty gave its cutters from the 1790s, the default of 1805,
+   and the long 3-pounders with eight swivels her file names in words, the hired and
+   revenue cutters' fit; each with its source; and the frigate
    (the Amazon class's 18-pounders, her carronades and her chasers by Winfield and the
    Establishments); the brig, the schooner, the lugger, the merchant brig and the smack as
    the builder reaches them or left to 75 with their shape settled. A gun dismounted is a

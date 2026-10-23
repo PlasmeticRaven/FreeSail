@@ -440,11 +440,12 @@ the way:** the station gale's pin was stale before this package (the non-strict 
 it); the Roscoff plan's first leg crosses the land about the Isle Verte (61's route; truth
 7b-127 starts from the channel's eastern end instead); the get-under-way line says "full
 and by" while the helm steers a held course; the pilot's waiting line says "wait" twice.
-**Decision for the owner:** the intent schooner now ends her 36 hours in Brest road with the
-tin unsold, the pilot having brought her up to wait for the slack and the captain's boat
-for the prices refusing his weigh. Should the captain's business wait for the pilot, or the
-pilot's wait defer to the boat? And the pilot's answer to open water to his mark that will
-not be fetched (the pinching rule withdrawn) stands open with it.
+**Decision taken (the owner, 2026-10-23):** the intent schooner now ends her 36 hours in
+Brest road with the tin unsold, the pilot having brought her up to wait for the slack and
+the captain's boat for the prices refusing his weigh; the owner rules that the boat may go
+before or after the pilot and no rule is added: the new ending stands as the passage's
+outcome. The pilot's answer to open water to his mark that will not be fetched (the
+pinching rule withdrawn) stays open.
 
 ### Package 67 as merged (2026-10-23)
 
