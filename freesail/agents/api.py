@@ -106,9 +106,10 @@ from typing import Any
 from freesail.agents import local
 from freesail.agents.agent import CADENCES, TURN_ENDS_WORDS, station_name
 from freesail.agents.harness import conversation_text
-from freesail.agents.model import MODEL, OPERATOR, Reply, ToolCall, Turn
+from freesail.agents.model import DATA, MODEL, OPERATOR, Reply, ToolCall, Turn
 from freesail.agents.remote import GameClient, GameError
 from freesail.agents.tools import TOOLS, description_of, parameters_schema, tool_names
+from freesail.agents.tools import tokens as tools_tokens
 
 __all__ = [
     "DOOR_WORDS",
@@ -507,6 +508,8 @@ class ApiModel:
         self.identity_name = ""  # the model's name as the server reports it
         self.context: int | None = None  # the context the server gives it, when it says
         self.usage = Usage()
+        self.last_prompt = 0  # the server's count of the last request (package 67)
+        self._folds_seen: set[tuple[Any, str]] = set()  # the folds said (package 67)
         self.exchanges: list[dict[str, Any]] = []  # bodies, never headers
         self._sent: dict[str, list[dict[str, Any]]] = {}  # a reply's content as the API gave it
         if client is None:
@@ -750,9 +753,36 @@ class ApiModel:
             with open(self.exchanges_file, "a", encoding="utf-8") as f:
                 f.write(line + "\n")
 
+    def _say_folds(self, turns: Sequence[Turn]) -> None:
+        """The conversation's size said at this terminal at each fold the game made (package
+        67; the cold review's R-34): the server's count of the last request before it, and
+        the conversation's size after it at the harness's rule (four characters a token)."""
+        start = max((i for i, t in enumerate(turns) if t.role == OPERATOR), default=0)
+        for t in turns[start:]:
+            c = t.content
+            if t.role != DATA or not isinstance(c, dict) or "folded" not in c:
+                continue
+            key = (c.get("tick"), str(c.get("handover") or "")[:200])
+            if key in self._folds_seen:
+                continue
+            self._folds_seen.add(key)
+            now = sum(
+                tools_tokens(json.dumps(x.to_dict(), ensure_ascii=False)) for x in turns[start:]
+            )
+            before = (
+                f"{self.last_prompt:,} tokens at the last request (the server's count)"
+                if self.last_prompt
+                else "of a size the server had not yet counted"
+            )
+            self._tell(
+                f"The conversation was folded at {c.get('stamp') or 'the handover'}: it was "
+                f"{before}, and is about {now:,} now."
+            )
+
     def reply(self, turns: Sequence[Turn]) -> Reply | None:
         if self.failed is not None:
             return None
+        self._say_folds(turns)
         anthropic = _sdk()
         self.cut_off = None
         notice = ""
@@ -818,6 +848,7 @@ class ApiModel:
                 "prompt": counted["uncached"] + counted["cache_read"] + counted["cache_written"],
                 "reply": counted["out"],
             }
+            self.last_prompt = int(served["prompt"])
             why = self._no_reply(reply)
             if why is None:
                 blocks = [b for b in (_block_param(x) for x in message.content) if b]
@@ -1010,6 +1041,14 @@ def main(
     ap.add_argument("--ask-again", action="store_true")
     ap.add_argument("--handover-reserve", type=local.reserve_form, action="append")
     ap.add_argument(
+        "--budget-tokens",
+        default="",
+        metavar="N|SHARE",
+        help="where the handover fold is counted from, in tokens or as a share of the model's "
+        "context (0.4, 40%%, 2/5): the game's own default is the whole context, and two fifths "
+        "of it for a door under a director's seat (package 67)",
+    )
+    ap.add_argument(
         "--exchanges",
         default=None,
         metavar="FILE",
@@ -1107,8 +1146,20 @@ def main(
         return local.EXIT_UNREACHABLE
     context = model.context_size()
     reserve = local.handover_reserve_tokens(args.handover_reserve, context)
+    from freesail.settings import seat_budget_tokens
+
+    try:
+        budget = seat_budget_tokens(args.budget_tokens, context)
+    except ValueError as e:
+        show(f"The API door does not start: {e}")
+        return local.EXIT_UNREACHABLE
     if context and station_name(args.station) not in ("watcher",):
-        show(local.handover_words(args.handover_reserve, context, reserve))
+        show(local.handover_words(args.handover_reserve, budget or context, reserve))
+    if budget:
+        show(
+            f"The handover fold is counted from {budget:,} tokens of the model's "
+            f"{context or 0:,} (--budget-tokens)."
+        )
     try:
         first = game.station(
             identity,
@@ -1120,6 +1171,7 @@ def main(
             context_tokens=context,
             handover_reserve=reserve,
             cadence=args.cadence or "",
+            budget_tokens=budget,
         )
     except GameError as e:
         show(e.words)

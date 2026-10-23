@@ -318,7 +318,8 @@
       readPane(d.id);
     }
     pane.querySelector(".door-words").textContent = d.words;
-    pane.className = "door-pane door-" + d.state;
+    // the director's seats' doors marked as such beside the owner's own (package 67)
+    pane.className = "door-pane door-" + d.state + (d.by ? " door-director" : "");
     pane.querySelector(".door-stop").disabled = d.state !== "running";
   }
 

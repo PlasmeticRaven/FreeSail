@@ -65,6 +65,8 @@ from __future__ import annotations
 import dataclasses
 import functools
 import re
+import weakref
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -170,6 +172,12 @@ KINDS: dict[str, str] = {
         "a question or a word put to a person nobody holds, for the director to answer as him "
         "(package 52)"
     ),
+    "director.seat": (
+        "a seat held, its door admitted, stood down at its spent budget, ended or lapsed "
+        "(package 67)"
+    ),
+    "director.player": "the player's word to the director, apart from the game (package 67)",
+    "director.answered": "the director's answer to the player, apart from the game (package 67)",
     "note": "a thought the director wrote (the journal tool, or its free text)",
 }
 
@@ -1044,6 +1052,35 @@ DIRECTOR_BRIEF = (
 )
 
 
+# The brief's words on a seat's cost and on the channel with the player (package 67; spec
+# M7b §2a; the cold review's R-34, R-21 and R-24), after the fixed part and before the
+# player's brief: kept apart from the forms reference above.
+SEAT_AND_CHANNEL_BRIEF = (
+    "A seat costs the owner money. A seat runs a model on the owner's key for its budget: "
+    "each of its samples is a request to the model's maker carrying the conversation so "
+    "far, paid for by the owner, for the samples or the hours the seat names, counted from "
+    "the admission of its door; the grant (the models, the seats at once and in the voyage) "
+    "is the owner's spending, not a store to use up. The form is 'seat: <the model's exact "
+    "name> as <station> of <ship> for <n> samples' (or hours): the captain, an officer of "
+    "the watch, the master, the lookout or a passenger of another ship, or of the player's "
+    "own ship (no 'of', the grant allowing), never a station the player or a model holds; "
+    "'as <a person's name>' for the voice of a person nobody holds, aboard or ashore, "
+    "speaking where he is; ', within an hour' at the end for the time its door has to "
+    "come; and 'unseat: <the same words>' gives it up. Where the game has a harbour it "
+    "starts the API door for a seat itself, for a model its settings can call, and a seat "
+    "for a model they cannot call is refused; your budget line says the seats held and "
+    "their spending. Seat a model when the voyage wants a mind of its own at a station, and "
+    "for as little as the story needs.\n\n"
+    "The player may speak to you apart from the game: 'The player, apart from the game: "
+    "...' in your sample is his word to you, not a line of the play log, and nobody aboard "
+    "heard it. Answer him with world_order('answer the player: <your words>') (or open your "
+    "reply or an answer with 'answer the player:'), which goes to him at his prompt apart "
+    "from the play log, into your log, and costs none of the day's acts. Your plans and "
+    "the truth stay in your journal: a question to him is phrased without world detail, "
+    "and an answer tells him nothing his ship could not know."
+)
+
+
 def director(
     policy: SamplingPolicy | None = None, patience_s: int = DIRECTOR_PATIENCE_S, world: Any = None
 ) -> Station:
@@ -1060,7 +1097,7 @@ def director(
         Authority.DIRECTOR,
         policy or default,
         patience_s,
-        f"{DIRECTOR_BRIEF}\n\nThe player's brief:\n{body}",
+        f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\nThe player's brief:\n{body}",
         domain=DIRECTOR_DOMAIN,
         person="",
         rank="",
@@ -1074,7 +1111,7 @@ def station_brief_text(world: Any) -> str:
     station taken again or loaded from a save (`Harness._refresh_station`)."""
     brief = brief_of(world)
     body = brief.body() if brief is not None else NO_BRIEF_WORDS
-    return f"{DIRECTOR_BRIEF}\n\nThe player's brief:\n{body}"
+    return f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\nThe player's brief:\n{body}"
 
 
 # ---------------------------------------------------------------------------
@@ -1199,7 +1236,13 @@ def budget_words(world: Any) -> str:
     brief = brief_of(world)
     s = brief.samples_a_day if brief is not None else DEFAULT_SAMPLES_A_DAY
     a = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
-    return f"The day's budget ({b.day}): {b.samples} of {s} samples, {b.acts} of {a} acts used."
+    words = f"The day's budget ({b.day}): {b.samples} of {s} samples, {b.acts} of {a} acts used."
+    # the seats held and their spending beside it (package 67; R-34): a seat's samples are
+    # the owner's money as the director's are
+    from freesail.world.seats import spending_words
+
+    seats = spending_words(world)
+    return f"{words} {seats}" if seats else words
 
 
 # ---------------------------------------------------------------------------
@@ -1274,6 +1317,189 @@ def two_stories(world: Any, count: int | None = None) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
+# The channel between the player and the director (package 67; spec M7b §2a; R-21, R-24)
+# ---------------------------------------------------------------------------
+
+PLAYER_WORD_KIND = "director.player"
+ANSWERED_KIND = "director.answered"
+PLAYER_WORD_HEAD = "The player, apart from the game:"
+ANSWER_HEAD = "The director, apart from the game:"
+# The director's answer to the player: `answer the player: <words>` (the world_order tool,
+# or a reply or an answer that opens with it), `to the player: <words>` the same.
+_TO_THE_PLAYER = re.compile(
+    r"^\s*(?:answer|to)\s+the\s+player\s*:\s*(?P<words>.+?)\s*$", re.I | re.S
+)
+
+# The drivers' listeners for the channel's lines (the console prints them; the browser's
+# server sends them to the page's pane), beside the World and never on it, so that no save
+# or checkpoint holds them.
+_LISTENERS: weakref.WeakKeyDictionary[Any, list[Callable[[dict[str, Any]], None]]] = (
+    weakref.WeakKeyDictionary()
+)
+
+
+def listen(world: Any, fn: Callable[[dict[str, Any]], None]) -> None:
+    """A driver hears the channel's lines of this World (`{"from", "text", "stamp",
+    "tick"}`), the player's words and the director's answers, apart from the play log."""
+    found = _LISTENERS.setdefault(world, [])
+    if fn not in found:
+        found.append(fn)
+
+
+def unlisten(world: Any, fn: Callable[[dict[str, Any]], None]) -> None:
+    found = _LISTENERS.get(world)
+    if found and fn in found:
+        found.remove(fn)
+
+
+def _channel_line(world: Any, who: str, words: str) -> dict[str, Any]:
+    line = {"from": who, "text": words, "stamp": world.clock.stamp(), "tick": world.clock.tick}
+    for fn in list(_LISTENERS.get(world) or []):
+        fn(dict(line))
+    return line
+
+
+def channel_lines(world: Any) -> list[dict[str, Any]]:
+    """The channel as it stands, from the director's log: the player's words and the
+    director's answers, for a page that opens its pane late."""
+    out = []
+    for e in log_of(world).entries:
+        if e.kind == PLAYER_WORD_KIND:
+            out.append({"from": "the player", "text": e.text.removeprefix(PLAYER_WORD_HEAD)})
+        elif e.kind == ANSWERED_KIND:
+            out.append(
+                {
+                    "from": "the director",
+                    "text": e.text.removeprefix("To the player, apart from the game:"),
+                }
+            )
+        else:
+            continue
+        out[-1].update({"text": out[-1]["text"].strip(), "stamp": e.stamp, "tick": e.tick})
+    return out
+
+
+def player_word(world: Any, words: str, by: str = "the player", quiet: bool = False) -> str:
+    """`director: <words>` at the player's prompt (any seat, or none): an input (replayed,
+    `quiet` then), the director's log's entry, the director told in its next sample as the
+    player's word apart from the game (a word, which wakes a stand-by), and the driver's
+    listeners; never a line of the play log. Returns the words for the player."""
+    words = " ".join(str(words).split())
+    if not words:
+        raise ValueError("Say the words after 'director:'.")
+    if not quiet:
+        inputs = getattr(world, "inputs", None)
+        if inputs is not None:
+            inputs.append({"tick": world.clock.tick, "player_word": words, "by": by})
+    log_of(world).append(world, f"{PLAYER_WORD_HEAD} {words}", kind=PLAYER_WORD_KIND, by=by)
+    held_now = seated(world)
+    if held_now is not None:
+        _tell_director(
+            world,
+            f"{PLAYER_WORD_HEAD} {words} (His word to you, heard by nobody aboard; answer him "
+            "with world_order('answer the player: <your words>') if you will, which costs no "
+            "act.)",
+        )
+    if not quiet:
+        _channel_line(world, "the player", words)
+    if held_now is None:
+        return (
+            "Your word is in the director's log, apart from the game (the play log says "
+            "nothing of it); no director is seated now to read it."
+        )
+    return (
+        "Your word is with the director, apart from the game: in its log, and in its next "
+        "sample; the play log says nothing of it."
+    )
+
+
+def to_the_player(text: str) -> str | None:
+    """The words of the director's answer to the player in a reply, an answer or a world
+    order (`answer the player: <words>`), or None."""
+    m = _TO_THE_PLAYER.match(str(text or ""))
+    return " ".join(m.group("words").split()) if m else None
+
+
+def answer_player(world: Any, words: str, by: str = "the director") -> str:
+    """The director's answer to the player, apart from the game: the director's log's
+    entry and the drivers' listeners (the player's driver line, the browser's pane), never
+    the play log; no act counted. Returns the words for the director."""
+    words = " ".join(str(words).split())
+    if not words:
+        return "An answer to the player wants some words after 'answer the player:'."
+    log_of(world).append(
+        world, f"To the player, apart from the game: {words}", kind=ANSWERED_KIND, by=by
+    )
+    _channel_line(world, "the director", words)
+    return (
+        "Said to the player, apart from the game: at his prompt, never in the play log, and "
+        "in your log. It costs no act."
+    )
+
+
+def thought(world: Any, text: str, note: Callable[[str], None]) -> str | None:
+    """The director's free words (a reply's text, an answer): to the player when they open
+    with 'answer the player:', returning the words for the director; else None, and the
+    caller keeps them as a thought (`note`) as before."""
+    words = to_the_player(text)
+    if words is None:
+        note(text)
+        return None
+    return answer_player(world, words)
+
+
+# ---------------------------------------------------------------------------
+# The seat's door (package 67; spec M7b §2a): the models the settings can call
+# ---------------------------------------------------------------------------
+
+# The harbour of the game's server (`ui.harbour.Harbour`), beside the World and never on
+# it: what the settings can call (`callable_models()`, by name to its dialect) and the API
+# door's own model (`api_model()`). A World with none (the console, a replay) checks
+# nothing, and the seat is a record for a door started by hand.
+_SEAT_DOORS: weakref.WeakKeyDictionary[Any, Any] = weakref.WeakKeyDictionary()
+_SEAT_MODEL = re.compile(r"^seat:\s*(?P<model>.+?)\s+as\s+", re.I)
+
+
+def set_seat_doors(world: Any, doors: Any) -> None:
+    """The harbour that starts the seats' doors for this World (None takes it away)."""
+    if doors is None:
+        _SEAT_DOORS.pop(world, None)
+    else:
+        _SEAT_DOORS[world] = doors
+
+
+def seat_doors_of(world: Any) -> Any:
+    return _SEAT_DOORS.get(world)
+
+
+def uncallable_seat(world: Any, text: str) -> str | None:
+    """Why a `seat:` cannot be served by the harbour's API door (a model the settings
+    cannot call), in words for the one who gave it; None where it can, where the order is
+    no seat, or where no harbour is beside the World. Checked before the order reaches the
+    World, so that the play log, the save and a replay never depend on the settings, and
+    the settings' model's name reaches no log."""
+    doors = _SEAT_DOORS.get(world)
+    m = _SEAT_MODEL.match(" ".join(str(text).split()))
+    if doors is None or m is None:
+        return None
+    model = m.group("model").strip().strip('"')
+    try:
+        known = doors.callable_models()
+    except Exception:  # noqa: BLE001  (settings that cannot be read call nothing)
+        known = {}
+    if model in known:
+        return None
+    api = ""
+    try:
+        api = str(doors.api_model() or "")
+    except Exception:  # noqa: BLE001
+        api = ""
+    return "the settings call no model by that name; " + (
+        f"the API door's model is {api}" if api else "they name no API door's model"
+    )
+
+
+# ---------------------------------------------------------------------------
 # The channel's door: direct
 # ---------------------------------------------------------------------------
 
@@ -1337,6 +1563,11 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         inputs = getattr(world, "inputs", None)
         if inputs is not None:
             inputs.append({"tick": world.clock.tick, "director_order": text, "by": by})
+    to_player = to_the_player(text)
+    if to_player is not None:
+        # the director's answer to the player, apart from the game (package 67): no world
+        # order, no act, nothing in the play log
+        return answer_player(world, to_player, by=by or SOURCE)
     log = log_of(world)
     renew(world)
     b = budget_of(world)
@@ -1353,6 +1584,20 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
     free = order.channel == "say" and pending_for(
         world, getattr(world_orders.say_as_person(world, order.text), "name", "")
     )
+    uncallable = uncallable_seat(world, order.text) if order.channel == "seat" else None
+    if uncallable:
+        # a seat for a model the harbour's settings cannot call (package 67): refused in
+        # words before the World, the settings' model named to the director alone
+        log.append(
+            world,
+            f"Refused (the settings call no model by that name): {order.text}",
+            kind="director.refused",
+            by=by,
+        )
+        inputs = getattr(world, "inputs", None)
+        if road == INPUT and inputs and inputs[-1].get("director_order") == text:
+            inputs.pop()  # nothing given: a replay, with no harbour beside it, gives nothing
+        return f"Refused: {uncallable}."
     if b.acts >= acts_allowed and not free:
         words = (
             f"The day's budget of {acts_allowed} acts is spent: nothing more is performed "

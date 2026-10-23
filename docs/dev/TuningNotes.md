@@ -8388,3 +8388,188 @@ scratch directory (`p58a/`).
 the pace tests by their names alone, so it is never marked slow and runs in the fast tier
 under `-n`, where it reads the load (its docstring says "any marked `pace` by name or by
 hand belongs here"). It did not block the package; it is the lead's.
+
+## Package 67: the director's seat made real, and the channel between the player and the director (2026-10-23)
+
+Built on `872aa61` (after 68's merge) beside 58a and 58b, on the brief as the owner approved
+it: the desk reads a held seat; the game starts the director's API door; the seat's cost
+said and counted; the form widened to every station of a ship, the player's own on by
+default, and to a person's voice; the channel at the prompt and in a small browser pane;
+the seated door's fold at two fifths of the context. A new module keeps the seats
+(`freesail/world/seats.py`), so that `orders.py`, where 58a works on the dry run, carries
+only `_seat` and `_unseat` as doors into it.
+
+### Each item against its intent
+
+1. **The desk reads the seat.** Built. `Desk.station` asks `seats.match` for a seat held at
+   that station (on that ship, or the player's own) for that model; a door that has one is
+   admitted under its budget, the admission an input (`seat_admitted`) after the seating
+   so that a replay counts from the same point, the samples counted from the station's
+   samples at the admission (a station held before does not bring its old samples), the
+   hours from the admission's tick; the door note, the first answer and the director's log
+   say so. Any other door is admitted as before (a seat held for one model does not keep
+   the station from another, as the brief says). The seat kept once a minute by the World
+   itself (`World.tick` calls `crews.enforce_budgets`, now `seats.enforce`, whenever seats
+   are held: 43's call came only while a ship with a captain of her own was about): spent,
+   stood down with the reason; its station released after the admission, the seat ends
+   with it; no door within its `within`, it lapses; each in the director's log
+   (`director.seat`). The voyage's end ends it with the game (nothing outlives the World).
+2. **The game starts the director's door.** Built, the lead's reading taken as written:
+   `Harbour.start_door(..., seat=, seat_model=, by="the director")`, called by
+   `Harbour.tend_seats`, which the driver's clock calls every tenth of a second
+   (`Driver.on_tend`), running or not. The door's command line is `door_argv`'s with the
+   seat's model, its dialect from the settings, the station, `--ship` and `--budget-tokens`
+   where the settings name one; the key is read by the door's process, never the game's;
+   the pane is in the doors tab beside the owner's, marked *The director's seat's API
+   door* (`Door.by`, a class on the pane). A seat gone (unseat, spent, lapsed, a new game)
+   stops its door if it was never admitted; one stood down lets the door end of itself
+   (*its station was released*), stopped only after a grace of twenty seconds (the first
+   build stopped it at once and raced the door's own exit: *stopped from the harbour* and a
+   KeyboardInterrupt in the pane). **The models the settings can call** are
+   `settings.callable_models`: the API door's model and `doors.api.models` (names, or
+   `{name, dialect}`). A seat for another is refused **before the World**, at the
+   director's door (`director.direct`) and at the owner's `world:` in the browser
+   (`Driver.submit`), *Refused: the settings call no model by that name; the API door's
+   model is <x>*: refused in the World it would have put the settings in the log (truth
+   7b-110) and made the replay depend on the settings. The director's log keeps the
+   refusal without the name. Without a harbour (the console), the seat is a record, and
+   its result says how its door is started by hand; its words are the same either way, so
+   that a replay writes the same line.
+3. **The seat's cost said, and counted.** Built. The brief's paragraph
+   (`director.SEAT_AND_CHANNEL_BRIEF`, kept apart from the forms reference 58a works on,
+   after the fixed part and before the player's brief); `seat:`'s result repeats the
+   budget and the cost's shape; the day's budget line (`director.budget_words`, the
+   director's notice every sample) names the seats held and their spending. R-34's list:
+   the seated door's fold at two fifths of the context (`remote.SEAT_BUDGET_SHARE`), the
+   settings' `seat_budget_tokens` naming another figure (tokens, or a share: `0.4`, `40%`,
+   `2/5`), sent by the door as `--budget-tokens`, which every API door now takes; a fold
+   after a double cut-off (the desk folds on the door's words, `CUT_FOLD_NOTE`, at every
+   door whose words say *was cut off again*, the local runner's too); the conversation's
+   size said at the API door's terminal at each fold; the reseat line naming the captain's
+   grants that lapsed with the leaving (`Harness._lapsed`, said only where there were
+   some).
+4. **The form widened.** Built, both halves; the person's seat as the honest smaller
+   version the lead's reading names, well inside the day. Every station of a ship
+   (captain, officer of the watch, master, lookout, passenger; a station a wardroom names
+   otherwise too), the player's own by no `of` or her name, on by default, the grant's
+   `seats_on_the_players_ship: false` keeping the seats off her (a person aboard her
+   among them); the rule of reach through `orders.held_stations`. A person bound to a
+   station is seated at it; a person nobody holds, aboard or ashore, is **his voice**: a
+   station of the passenger's kind bound to him under his name (the binding quiet, the
+   order being the input; its lines carry the director's actor and are for the record),
+   his own brief (`seats.VOICE_BRIEF`, built by `voice_station` since the passenger's
+   factory reads the passenger's binding, not the name it is made under), heard where he
+   stands, `say as` him refused while held. **Taken another way: a person aboard another
+   ship** is refused in words; no other ship has a World of people (68 refuses one made
+   there), so there is nobody to bind. Booked onward with what was learned: the seat at a
+   person on another ship wants 68's person aboard another ship first; and a voice
+   station is listed among `the stations` while it is bound (*the mr veale, a passenger's
+   (Mr Veale)*), which a dedicated kind would hide.
+5. **The channel.** Built. `director: <words>` (any line after `director:` but `brief`,
+   `budget` and nothing, `console.director_word`) is `director.player_word`: an input
+   (`player_word`), the director's log (`director.player`), a word in its next sample
+   (*The player, apart from the game: ...*, which wakes a stand-by), the drivers'
+   listeners (`director.listen`, beside the World in a weak map, never on it). The answer,
+   `answer the player: <words>`, through `world_order` (before any world order is read, no
+   act counted), or opening a reply's text or an `answer` (`director.thought`, two lines in
+   `Harness._say` and `answer`); to the director's log (`director.answered`) and the
+   listeners: the console prints it as its own line, the browser's server sends it to a
+   small pane in the corner (`#channel-panel`), and `GET /api/director/channel` reads it.
+   The play log, and its replay's, carry neither; `two stories` shows both. R-21's words:
+   the desk and the MCP bridge answer the director's own words as its log's. `tell the
+   director` stays refused, its words naming the channel.
+6. **Truths and records.** Truths 7b-130 to 7b-132 as briefed; §2a and §6 as built; the
+   Harness's §19b (with §17, §19 and §22 pointing to it); the primer's chapters 6 and 20.
+
+### The seat's cost on the fake Messages API
+
+The API door in a thread against the game (`tests/messages_api.py`'s server reporting
+200,000 tokens of context and, as its usage, each request's own body at four characters a
+token), the officer of the watch's station, every reply a word and `stand_by` until a
+glass, and the handover note written when it is asked:
+
+| The door | samples | requests | the fold counted from | folds | prompt tokens sent | the largest request | the last |
+|---|---|---|---|---|---|---|---|
+| seated (the default) | 48 | 48 | 80,000 | 0 | 958,466 | 28,088 | 28,088 |
+| not seated | 48 | 48 | 200,000 | 0 | 956,402 | 28,045 | 28,045 |
+| seated (the default) | 132 | 133 | 80,000 | 1 | 4,112,334 | 56,792 | 18,490 |
+| not seated | 132 | 132 | 200,000 | 0 | 4,702,405 | 61,958 | 61,958 |
+
+A quiet seat grows about 380 tokens a sample (a glass's sample and a short reply): a day of
+glasses stays under the fold, and the first fold came at the 56,000 the default asks
+(80,000 less its reserve), after two and a half days, the conversation going back to about
+18,000. By the 132nd sample the seated door sent 13 per cent fewer tokens and its requests
+were a third the size; the difference grows with the square of the seat's length, and far
+faster with a seat whose samples are big (R-34's two seats sent sixteen million tokens in
+two hours, a sample's readings and log many times these). These are the requests' sizes,
+not their price: the door caches the brief and the conversation, so most of each request is
+read from the cache. (The 160 samples asked of the script gave 132: the loop's wait under
+three other builders' suites let some glasses pass in one tick; both runs alike.)
+
+### Found on the way
+
+- **Mended, since it blocked the admission's replay:** a seat held under consent records
+  kept elsewhere (`--consent-records`, as the lead's playtests keep them) was refused in the
+  replay, which reads the repository's records, and the log diverged from the order on.
+  A replay now reads a seat's consent from the world orders' outcomes in play
+  (`replay.replay` sets `World.replayed_orders`; `seats.hold` takes "done" as the consent
+  then read). A seat refused in play for a consent the replaying machine has would still
+  be held in the replay; not mended (the reason is not kept).
+- **Not mended:** a reply a door delivers at the tick another station is seated, after its
+  seating, is replayed before it (two lines of the same tick change places); seen with two
+  doors stationed at tick 0 and a reply between, without any seat. The test seats them a
+  minute apart.
+- **Not mended:** the rule of reach's refusal for a voice reads *Mr Pentreath is the mr
+  pentreath's, held by a model* (the station's name is the person's); the words are
+  `orders.reach`'s.
+
+### Pins
+
+No pin moved, and none is expected to: every new path is entered only where a seat is
+held, the channel is used or a station is taken again after the captain's grants lapsed,
+and no recorded passage seats a model, speaks to the director or reseats a station with
+grants. `World.tick` calls the seats' keeping only while `director_seats` holds one; the
+brief's new paragraph is in no log; the director's free text is a thought as before unless
+it opens with `answer the player:`; `budget_words` is as before with no seat. The slow tier
+below re-ran every pinned passage against its figure.
+
+### Decisions for the lead and the owner
+
+- **The seat at a person on another ship**: booked, after 68's person aboard another ship.
+- **A voice listed among the stations** while bound: keep, or a kind of its own hidden
+  from `the stations`?
+- **A seat whose station is released ends with it** (the model's own stand-down, the
+  owner's word, the door stopped): the director seats again if it wants the station held;
+  the alternative, the seat waiting for another door, risked the harbour starting doors in
+  a loop.
+- **The seated door's terminal** says the fold at the whole context in its first line (the
+  door cannot know it will be seated) and the true figure in the game's answer after it.
+- **The settings' "account"** is read as the dialect; the game does not read the
+  credential store to see that a key is there (the key is the door's process's alone), so
+  a missing key is said in the door's pane when it starts.
+- **A harbour with no API model in its settings** refuses every director's seat on that
+  server (the brief's "the models the settings can call"); a seat for a door the owner
+  means to start by hand through the desktop client is then given at the console or with
+  the settings naming the model.
+
+### The suite, as run
+
+On the build machine (four cores) carrying three other builders' suites beside this one,
+the load between 15 and 25 throughout; each tier written here as it finished.
+
+- `ruff check .` and `ruff format .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`, the code of
+  `388df80`, ending at 12:02 after some three and a half hours): 3,567 passed, **one failed**, 327 slow left out. The one is
+  `test_crews.py::test_truth_88_with_the_cap_full_the_pace_holds`, a floor of ticks a
+  second (32 against 60 under a load of twenty); run alone at once after, the load still
+  seventeen, it passed. Not this package's: it runs no seat, and the only per-tick code
+  added is a test of `director_seats` once a minute.
+- **The slow tier of the files touched** (`test_agent_api`, `test_api_door`, `test_console`,
+  `test_crews`, `test_director`, `test_harbour`, `test_known_truths`, `test_mcp_server`,
+  `test_replay`, `test_seat_hook`, `test_server`, `test_settings`, `test_wardroom_doors`,
+  `test_world_orders`; `--slow -m "not pace"`, the code of `0f963b1`, 12:05 to 14:54): 420
+  passed, 7 expected failures (57's gale trials and the like, marked before), none failed;
+  every recorded passage in `test_known_truths` against its pinned figure, none moved.
+- **The whole slow tier and the pace tests were not run**, on the lead's word of the
+  afternoon (four whole suites at once on the machine, the load at twenty-five): the lead
+  runs one whole suite on the merged tree of 58a, 58b and 67.

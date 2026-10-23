@@ -153,6 +153,15 @@ def replay(
     true (package 44: the regatta judges a human replay's course as it is sailed)."""
     road = road_of(data, road)
     world = build_world(data, ship_factory, road)
+    # the world orders' outcomes in play, which a seat's consent is read from in a replay
+    # rather than from the records on this machine (package 67: a seat held under records
+    # kept elsewhere, `--consent-records`, was refused in the replay and the log diverged)
+    world.replayed_orders = {
+        (int(o.get("tick") or 0), " ".join(str(o.get("order") or "").split())): str(
+            o.get("result") or ""
+        )
+        for o in data.get("world_orders") or []
+    }
     end = data["end_tick"] if until_tick is None else min(until_tick, data["end_tick"])
     inputs = data.get("inputs")
     if inputs is None:
@@ -254,6 +263,22 @@ def _give(world: World, entry: dict[str, Any]) -> None:
 
         world.inputs.append(dict(entry))
         set_brief(world, entry["director_brief"], source=str(entry.get("source", "")), quiet=True)
+        return
+    if "seat_admitted" in entry:
+        # a door admitted under a director's seat (package 67): its budget counted from the
+        # same point again
+        from freesail.world.seats import admitted_again
+
+        world.inputs.append(dict(entry))
+        admitted_again(world, entry["seat_admitted"])
+        return
+    if "player_word" in entry:
+        # the player's word to the director, apart from the game (package 67): the
+        # director's log and its next sample again, never the play log
+        from freesail.agents.director import player_word
+
+        world.inputs.append(dict(entry))
+        player_word(world, str(entry["player_word"]), by=str(entry.get("by") or ""), quiet=True)
         return
     if "binding" in entry:
         # a station bound or unbound (package 41), an input since package 42; kept in the

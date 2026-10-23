@@ -133,7 +133,10 @@
         onSnapshot(data.snapshot);
       } else if (data.type === "event") {
         if (data.event.kind === "query.director_log") openDirectorLog(data.event);
+        else if (data.event.kind === "query.director_word") channelSaid(data.event);
         else log.add(data.event);
+      } else if (data.type === "channel") {
+        addChannelLine(data.line);
       } else if (data.type === "rollup") {
         log.addRollup(data.rollup);
       } else if (data.type === "snapshot") {
@@ -363,6 +366,34 @@
     $("director-panel").hidden = true;
     document.body.classList.remove("director-open");
     drawShip();
+    $("command").focus();
+  }
+
+  // -- the channel between the player and the director (package 67) ---------------------
+  // 'director: <words>' at the order line goes to the director's log and its next sample;
+  // its answer comes here. Neither is a line of the play log.
+
+  function addChannelLine(line) {
+    if (!line || !line.text) return;
+    var row = document.createElement("div");
+    row.className = "channel-line " + (line.from === "the director" ? "from-director" : "from-player");
+    var who = line.from === "the director" ? "The director" : "You";
+    row.textContent = (line.stamp ? line.stamp + "  " : "") + who + ": " + line.text;
+    $("channel-lines").appendChild(row);
+    $("channel-lines").scrollTop = $("channel-lines").scrollHeight;
+    $("channel-panel").hidden = false;
+  }
+
+  function channelSaid(e) {
+    var row = document.createElement("div");
+    row.className = "channel-line channel-note";
+    row.textContent = String(e.text || "");
+    $("channel-lines").appendChild(row);
+    $("channel-panel").hidden = false;
+  }
+
+  function closeChannel() {
+    $("channel-panel").hidden = true;
     $("command").focus();
   }
 
@@ -624,6 +655,7 @@
       else openLibrary("");
     });
     $("btn-director-close").addEventListener("click", closeDirectorLog);
+    $("btn-channel-close").addEventListener("click", closeChannel);
     var ease = $("opt-ease-on-station");
     if (ease) {
       ease.addEventListener("change", function () {

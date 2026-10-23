@@ -447,6 +447,9 @@ class World:
     business: Any = None
     director_seats_made: int = 0
     consent_records_dir: Any = None
+    # package 67: in a replay, the world orders' outcomes in play by (tick, order), which a
+    # seat's consent is read from (`world.seats.hold`); None in play
+    replayed_orders: dict[tuple[int, str], str] | None = None
 
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
         # the build's stamp, worked once at the start (package 37d)
@@ -1857,6 +1860,12 @@ class World:
             if fishery is not None:
                 for severity, kind, text, data in fishery.tick(self):
                     self.record(severity, kind, text, data=data)
+            if self.director_seats:
+                # the director's seats kept once a minute whatever sail is about (package
+                # 67: a seat on her own stations or a person's voice, with no other ship)
+                from freesail.world.crews import enforce_budgets
+
+                enforce_budgets(self)
         bells = self.clock.bells()
         if bells is not None:
             self.record(

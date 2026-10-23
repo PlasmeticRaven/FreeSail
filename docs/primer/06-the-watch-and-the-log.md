@@ -155,6 +155,8 @@ The console reads a line and decides whether it is for the clock or for the ship
 
 Anything else goes to the ship. Type `hold` or `go` at the ship's prompt in the browser and she answers "'hold' is a console command, not an order to the ship".
 
+Two prefixes are not the ship's either: `world: <order>` is yours to the world as its owner (chapter 15), and `director: <words>` is a word to the director above the game, apart from it (chapter 20): it goes to the director's log and its next sample, never to the play log, and its answer comes back to you as a line of the console's own (in the browser, a small pane in the corner), never the log's. `director: brief ...` and `director: budget ...` give the director's brief and its budget, as chapter 20 has them.
+
 ```orders frigate
 state
 muster

@@ -89,6 +89,10 @@ STATIONS = ("captain", "officer", "master", "lookout", "director", "watcher", "p
 DOOR_KINDS = ("api", "local")
 DOOR_LINES_KEPT = 4000
 STOP_WAIT_S = 6.0
+# A seat's door whose station the game released is given this long to end of itself before
+# it is stopped (package 67; judgement: the door's poll returns within its wait, half a
+# second in the doors' loop, and its last words take a moment more).
+SEAT_DOOR_GRACE_S = 20.0
 COAST_STEP_DEG = 0.01  # the harbour's chart keeps a point about every half mile
 
 
@@ -144,11 +148,17 @@ class Door:
         ship: str = "",
         env: dict[str, str] | None = None,
         cwd: Path = ROOT,
+        by: str = "",
+        seat: str = "",
     ):
         self.id = ident
         self.kind = kind
         self.station = station
         self.ship = ship
+        # whose door: "" the owner's, started from the page; "the director" for a seat's
+        # (package 67), with the seat's key on the World
+        self.by = by
+        self.seat = seat
         self.argv = list(argv)
         self.lines: collections.deque[str] = collections.deque(maxlen=DOOR_LINES_KEPT)
         self.count = 0  # lines ever written, so that a pane asks from where it left off
@@ -199,7 +209,8 @@ class Door:
     def words(self) -> str:
         door = "API door" if self.kind == "api" else "local runner"
         aboard = f" of {self.ship}" if self.ship else ""
-        return f"{door} at the {self.station}{aboard}"
+        whose = "director's seat's " if self.by else ""
+        return f"{whose}{door} at the {self.station}{aboard}"
 
     def output(self, since: int = 0) -> tuple[list[str], int]:
         """The lines from the `since`-th on (those still kept), and the count now."""
@@ -249,6 +260,7 @@ class Door:
             + ("" if self.code is None else f" (exit code {self.code})")
             + ".",
             "lines": self.count,
+            "by": self.by,
         }
         return out
 
@@ -286,6 +298,27 @@ class Harbour:
         self._ports: list[dict[str, Any]] | None = None
         self._charts: dict[str, dict[str, Any]] = {}
         self._lock = threading.RLock()
+        # the director's seats' doors (package 67): the seat's key to its door's id (None
+        # where no door could be started: the settings call no such model), for the World
+        # they were started in
+        self.seat_doors: dict[str, str | None] = {}
+        self._seat_world: Any = None
+        from freesail.agents import director as director_mod
+
+        director_mod.set_seat_doors(driver.world, self)
+        on_replace = getattr(driver, "on_replace", None)
+        if callable(on_replace):
+            on_replace(self._taken_up)
+        on_tend = getattr(driver, "on_tend", None)
+        if callable(on_tend):
+            on_tend(self.tend_seats)
+
+    def _taken_up(self, old: Any, new: Any) -> None:
+        """A new game in place: the seats' doors are the new World's to ask for."""
+        from freesail.agents import director as director_mod
+
+        director_mod.set_seat_doors(old, None)
+        director_mod.set_seat_doors(new, self)
 
     # -- settings ------------------------------------------------------------------
 
@@ -307,6 +340,19 @@ class Harbour:
     def scenarios_place(self) -> Path:
         s, _ = self.settings_or_defaults()
         return settings_mod.place(s, "scenarios", self.path)
+
+    def callable_models(self) -> dict[str, str]:
+        """The models the settings can call through the API door, by name to the dialect
+        (package 67: the director's seats are for these); none where the settings cannot
+        be read."""
+        try:
+            return settings_mod.callable_models(self.settings())
+        except SettingsError:
+            return {}
+
+    def api_model(self) -> str:
+        s, _ = self.settings_or_defaults()
+        return str(((s.get("doors") or {}).get("api") or {}).get("model") or "")
 
     # -- what there is -------------------------------------------------------------
 
@@ -683,8 +729,11 @@ class Harbour:
             out["written"] = True
         return out
 
-    def door_argv(self, kind: str, station: str, ship: str = "") -> list[str]:
-        """A door's command line from the settings: the module's own flags, nothing more."""
+    def door_argv(self, kind: str, station: str, ship: str = "", seat_model: str = "") -> list[str]:
+        """A door's command line from the settings: the module's own flags, nothing more.
+        `seat_model` is a director's seat's model (package 67): one of the models the
+        settings can call, with its dialect, and the seated door's fold where the settings
+        name one (`--budget-tokens`)."""
         s, error = self.settings_or_defaults()
         if error:
             raise HarbourError(error)
@@ -694,17 +743,29 @@ class Harbour:
             raise HarbourError("Name the station the door asks for.")
         if kind == "api":
             d = doors.get("api") or {}
-            if not d.get("model"):
+            if seat_model:
+                known = settings_mod.callable_models(s)
+                if seat_model not in known:
+                    raise HarbourError(
+                        "The settings call no model by that name (the API door's model and "
+                        "the models beside it, doors.api.models)."
+                    )
+                model, dialect = seat_model, known[seat_model]
+            else:
+                model, dialect = str(d.get("model") or ""), str(d.get("dialect") or "")
+            if not model:
                 raise HarbourError(
                     "Name the API door's model in the settings (doors, the API door's model), "
                     "exactly as the API knows it: it has no default."
                 )
             argv = [sys.executable, "-m", "freesail.agents.api", "--game", self.game_url]
-            argv += ["--model", str(d["model"]), "--station", station]
-            if d.get("dialect"):
-                argv += ["--dialect", str(d["dialect"])]
+            argv += ["--model", model, "--station", station]
+            if dialect:
+                argv += ["--dialect", dialect]
             if d.get("effort"):
                 argv += ["--effort", str(d["effort"])]
+            if seat_model and d.get("seat_budget_tokens") not in (None, ""):
+                argv += ["--budget-tokens", str(d["seat_budget_tokens"])]
         elif kind == "local":
             d = doors.get("local") or {}
             argv = [sys.executable, "-m", "freesail.agents.local", "--game", self.game_url]
@@ -718,8 +779,20 @@ class Harbour:
             argv += ["--ship", ship]
         return argv + [str(f) for f in d.get("flags") or []]
 
-    def start_door(self, kind: str, station: str, ship: str = "") -> dict[str, Any]:
-        argv = self.door_argv(kind, station, ship)
+    def start_door(
+        self,
+        kind: str,
+        station: str,
+        ship: str = "",
+        *,
+        seat: str = "",
+        seat_model: str = "",
+        by: str = "",
+    ) -> dict[str, Any]:
+        """A door started as the server's subprocess: the owner's from the page, or a
+        director's seat's (package 67: `seat` its key, `seat_model` its model, `by` "the
+        director"), shown in the doors tab beside the owner's and marked so."""
+        argv = self.door_argv(kind, station, ship, seat_model=seat_model)
         if not self.started:
             raise HarbourError("Start a game first: a door is a client of the game in play.")
         env = dict(os.environ)
@@ -730,11 +803,120 @@ class Harbour:
         )
         ident = f"d{next(self._ids)}"
         try:
-            door = Door(ident, kind, " ".join(station.lower().split()), argv, ship=ship, env=env)
+            door = Door(
+                ident,
+                kind,
+                " ".join(station.lower().split()),
+                argv,
+                ship=ship,
+                env=env,
+                by=by,
+                seat=seat,
+            )
         except OSError as e:
             raise HarbourError(f"The door could not be started: {e}") from None
         self.doors[ident] = door
         return door.state()
+
+    # -- the director's seats' doors (package 67; spec M7b §2a) ---------------------------
+
+    def tend_seats(self) -> None:
+        """The game starts the director's door (package 67): every seat held on the World
+        in play and not yet served has the API door started for it as the harbour starts
+        one from its page (its model one the settings can call, its key from the credential
+        store in the door's own process, never the game's), marked the director's; a door
+        whose seat is gone (unseat:, the spent budget, a lapse, a new game) is stopped if it
+        still runs. Called by the driver's clock every tenth of a second, running or not;
+        the stops are made off the clock's thread, since a stopping door asks the game to
+        release its station."""
+        if not self.started:
+            return
+        from freesail.world.orders import director_seats
+
+        d = self.driver
+        with d.lock:
+            world = d.world
+            if world is not self._seat_world:
+                stale = [i for i in self.seat_doors.values() if i]
+                self.seat_doors, self._seat_world = {}, world
+            else:
+                stale = []
+            seats = {k: dict(v) for k, v in director_seats(world).items()}
+            for key in [k for k in self.seat_doors if k not in seats]:
+                ident = self.seat_doors.pop(key)
+                if ident:
+                    stale.append(ident)
+            for key, seat in seats.items():
+                if key in self.seat_doors:
+                    continue
+                station, ship = self._seat_station(world, key, seat)
+                try:
+                    started = self.start_door(
+                        "api",
+                        station,
+                        ship,
+                        seat=key,
+                        seat_model=str(seat.get("model") or ""),
+                        by="the director",
+                    )
+                except HarbourError as e:
+                    self.seat_doors[key] = None
+                    self._tell_director(
+                        world,
+                        f"No door was started for your seat ({seat.get('model')} at {station}"
+                        f"{' of ' + ship if ship else ''}): {e.words} The seat is held as a "
+                        "record; a door started by hand for it is admitted under its budget.",
+                    )
+                    continue
+                self.seat_doors[key] = started["id"]
+                self._tell_director(
+                    world,
+                    f"The harbour has started the API door for your seat ({seat.get('model')} "
+                    f"at {station}{' of ' + ship if ship else ''}); it is admitted under the "
+                    "seat's budget when it comes.",
+                )
+        for ident in stale:
+            door = self.doors.get(ident or "")
+            if door is not None and door.running:
+                threading.Thread(target=self._stop_seat_door, args=(door,), daemon=True).start()
+
+    def _stop_seat_door(self, door: Door) -> None:
+        """A seat's door whose seat is gone: one whose station the game has released ends
+        of itself (the door says its station was released) and is given the time to; one
+        still waiting (no admission yet, a consent conversation) is stopped."""
+        from freesail.agents.remote import seat_key
+
+        desk = self.driver.desk
+        with self.driver.lock:
+            seat = desk.seats.get(seat_key(door.station, door.ship)) if desk is not None else None
+            released = bool(seat is not None and seat.released)
+        if released:
+            with contextlib.suppress(subprocess.TimeoutExpired):
+                door.proc.wait(timeout=SEAT_DOOR_GRACE_S)
+        door.stop()
+
+    @staticmethod
+    def _seat_station(world: Any, key: str, seat: dict[str, Any]) -> tuple[str, str]:
+        """The station and the ship (her name; "" for the player's own) a seat's door asks
+        for."""
+        from freesail.agents.agent import CAPTAIN
+
+        ship_id = str(seat.get("ship") or "") if "station" in seat else key
+        station = str(seat.get("station") or CAPTAIN)
+        if not ship_id:
+            return station, ""
+        vessel = world.vessels.find(ship_id)
+        return station, (vessel.name if vessel is not None else ship_id)
+
+    @staticmethod
+    def _tell_director(world: Any, text: str) -> None:
+        """A notice for the director's next sample (never a line of any log)."""
+        from freesail.agents import director as director_mod
+
+        held = director_mod.seated(world)
+        notices = getattr(getattr(held, "agent", None), "notices", None)
+        if isinstance(notices, list):
+            notices.append(text)
 
     def door(self, ident: str) -> Door:
         door = self.doors.get(ident)

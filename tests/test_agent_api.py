@@ -773,3 +773,200 @@ def test_a_stand_down_is_taken_out_of_turn_and_while_paused_and_replays(tmp_path
     a = g2.reply("", ("stand_down", {}))
     assert g2.harness.agent.released and g2.harness.agent.left_by == "stood down"
     assert a["results"][0]["result"].startswith("You have stood down (a stand-down: ")
+
+
+# ---------------------------------------------------------------------------
+# Package 67: the desk reads the director's seat; the voice of a person; the director's
+# words out of turn; a fold after a double cut-off
+# ---------------------------------------------------------------------------
+
+
+def _granted(g: Game, *models: str, seats: int = 2) -> None:
+    for m in models:
+        consent.Record(
+            m, "a test runtime", "2026-10-23", consent.YES, answer="Yes.", drill="passed"
+        ).write(g.records)
+    g.world.consent_records_dir = g.records
+    g.world.scenario.director = {"models": list(models), "seats": seats, "seats_in_voyage": 4}
+
+
+def _door(g: Game, station: str, model: str, **body: Any) -> dict[str, Any]:
+    r = g.http.post(f"/api/agents/{station}", json={"model_name": model, "door": "mcp"} | body)
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
+def _reply(g: Game, station: str, key: str, text: str = "", *calls, **extra) -> dict:
+    body = {"text": text, "calls": [{"name": n, "args": a} for n, a in calls], "key": key}
+    r = g.http.post(f"/api/agents/{station}/reply", json=body | extra)
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
+def test_a_door_under_a_directors_seat_is_admitted_under_its_budget_and_others_as_before(
+    tmp_path,
+):
+    """Package 67, item 1: a door for the model and the station a seat is held for is
+    admitted under the seat's budget, counted from the admission (an input, so that a
+    replay counts the same), its handover fold at two fifths of its context; a door for
+    another station is admitted as before; the station is stood down when the budget is
+    spent, the seat ends, the director's log says each, and the save replays."""
+    from freesail.agents import director as D
+    from freesail.world.orders import director_seats
+
+    g = Game(tmp_path)
+    other = "another-made-up-model, for the seat"
+    _granted(g, WEIGHTS, other)
+    e = g.world.world_order(f"seat: {WEIGHTS} as officer for 2 samples")
+    assert e.data["result"] == "done", e.text
+    a = _door(g, "officer", WEIGHTS, context_tokens=100_000)
+    assert "Admitted under the director's seat: 2 samples on the owner's key" in a["words"]
+    assert "the handover fold at 40,000 tokens" in a["words"]
+    officer = g.world.agents["officer of the watch"]
+    assert officer.budget_tokens == 40_000
+    brief = next(t["content"] for t in a["turns"] if t["role"] == "operator")
+    assert "The director seats you here under the owner's grant, for 2 samples" in brief
+    seat = director_seats(g.world)["own/officer of the watch"]
+    assert seat["admitted"] == g.world.clock.tick and seat["samples_at"] == 0
+    assert g.world.inputs[-1]["seat_admitted"] == {
+        "seat": "own/officer of the watch",
+        "samples_at": 0,
+    }
+    # the officer's two samples: the first at the seating, the second ten minutes on
+    _reply(g, "officer", a["key"], "", ("stand_by", {"until": "ten minutes"}))
+    g.driver.tick(60)
+    # another model at a station with no seat: as before, at its whole context
+    b = _door(g, "lookout", other, context_tokens=100_000)
+    assert "director's seat" not in b["words"]
+    assert g.world.agents["lookout"].budget_tokens == 100_000
+    g.driver.tick(600)
+    assert officer.agent.released
+    assert "the director's budget of 2 samples is spent" in officer.agent.released_reason
+    assert director_seats(g.world) == {}
+    seats = [x.text for x in D.log_of(g.world).entries if x.kind == "director.seat"]
+    assert [s.split(":")[0] for s in seats] == [
+        "The seat held",
+        "The seat's door admitted",
+        "The seat stood down",
+    ]
+    copy = replay.replay(json.loads(json.dumps(g.world.save())), ship_factory)
+    assert copy.log.digest() == g.world.log.digest()
+
+
+def test_a_seat_held_for_a_released_station_counts_from_the_admission_and_ends_with_it(tmp_path):
+    """A station held before (its samples counted already) and taken under a seat: the
+    seat's samples are counted from the admission, not from the station's first seating;
+    a seat whose station is released after its admission (stood down by the owner) ends
+    with it, and the director's log says so."""
+    from freesail.agents import director as D
+    from freesail.world.orders import director_seats
+
+    g = Game(tmp_path)
+    _granted(g, WEIGHTS)
+    a = _door(g, "officer", WEIGHTS)
+    for _ in range(3):
+        _reply(g, "officer", a["key"], "", ("stand_by", {"until": "ten minutes"}))
+        g.driver.tick(600)
+    officer = g.world.agents["officer of the watch"]
+    before = officer.agent.samples
+    assert before >= 3
+    g.order("stand down the officer of the watch")
+    assert g.world.world_order(f"seat: {WEIGHTS} as officer for 2 samples").data["result"] == "done"
+    a = _door(g, "officer", WEIGHTS)
+    seat = director_seats(g.world)["own/officer of the watch"]
+    assert seat["samples_at"] == before
+    g.driver.tick(120)
+    assert not officer.agent.released  # one sample of the two, the seating's
+    g.order("stand down the officer of the watch")
+    g.driver.tick(60)
+    assert director_seats(g.world) == {}
+    assert D.log_of(g.world).entries[-1].text.endswith("its station was released.")
+
+
+def test_the_voice_of_a_person_nobody_holds_speaks_where_he_is_and_say_as_him_is_refused(
+    tmp_path,
+):
+    """Package 67, item 4's second half, the honest smaller version: `seat: <model> as Mr
+    Pentreath` seats the voice of a person nobody holds, bound to him as a passenger's
+    station under his name; the door asks for him by his name; his brief is his voice's;
+    his words are heard where he stands (the cabin) as his; while the model holds him the
+    director's `say as` for him is refused by the rule of reach; the seat given up undoes
+    the binding."""
+    from freesail.agents import director as D
+
+    g = Game(tmp_path)
+    _granted(g, WEIGHTS)
+    made = g.world.world_order('person: supercargo "Mr Pentreath" aboard in the cabin')
+    assert made.data["result"] == "done", made.text
+    e = g.world.world_order(f"seat: {WEIGHTS} as Mr Pentreath for 4 samples")
+    assert e.data["result"] == "done" and "as the voice of Mr Pentreath" in e.text
+    assert "mr pentreath" in g.world.stations.names()
+    a = _door(g, "Mr Pentreath", WEIGHTS)
+    brief = next(t["content"] for t in a["turns"] if t["role"] == "operator")
+    assert "You are the voice of Mr Pentreath, aboard" in brief
+    h = g.world.agents["mr pentreath"]
+    assert h.station.person == "Mr Pentreath"
+    _reply(g, "Mr Pentreath", a["key"], "The wool is landed dry, I trust.")
+    said = [x for x in g.world.log if x.text == "[mr pentreath] The wool is landed dry, I trust."]
+    assert said and said[0].data["place"] == "cabin"
+    refused = D.direct(g.world, 'say as Mr Pentreath: "Nothing at all."', by="the test")
+    assert refused.startswith("Refused, by the rule of reach") and "mr pentreath" in refused
+    order = g.http.post(
+        "/api/agents/Mr Pentreath/reply",
+        json={
+            "text": "",
+            "calls": [{"name": "submit_order", "args": {"text": "set the topsails"}}],
+            "key": a["key"],
+        },
+    ).json()
+    assert "a passenger gives no order of the ship" in json.dumps(order)
+    out = g.world.world_order("unseat: Mr Pentreath, the supercargo has said enough")
+    assert out.data["result"] == "done" and h.agent.released
+    assert "mr pentreath" not in g.world.stations.names()
+
+
+def test_the_directors_words_out_of_turn_are_its_logs_and_a_double_cut_off_folds(tmp_path):
+    """The cold review's R-21: the director's own words sent while the game has the floor
+    were answered "Your words are in the log under your mark"; they are its log's, and the
+    answer says so. R-34: a reply cut off at its limit twice ends the turn with nothing
+    done, and the conversation is folded after it, as a handover note folds it."""
+    from freesail.agents import director as D
+    from freesail.agents.remote import CUT_FOLD_NOTE
+
+    g = Game(tmp_path)
+    D.set_brief(g.world, "quiet-passage", source="the test")
+    consent.Record(WEIGHTS, "t", "2026-10-23", consent.YES, answer="Yes.", drill="passed").write(
+        g.records
+    )
+    a = _door(g, "director", WEIGHTS)
+    _reply(g, "director", a["key"], "", ("stand_by", {"until": "a watch"}))
+    out = _reply(g, "director", a["key"], "The passage wants a squall before dusk.")
+    assert out["words"].startswith("Your words are in the director's log")
+    assert "under your mark" not in out["words"]
+    # a watcher's conversation long enough to fold, then a turn cut off twice
+    yes_on_record(g.records)
+    g.took(g.station())
+    for _ in range(5):
+        g.reply("", ("readings", {}))  # each a reply and its results in the open turn
+    h = g.harness
+    assert h.open_sample is not None
+    rev = h.revision
+    g.took(
+        g.http.post(
+            "/api/agents/watcher/reply",
+            json={
+                "text": "",
+                "calls": [],
+                "key": g.key,
+                "since": g.cursor,
+                "cut_off": "The model's reply was cut off at the reply limit, and was cut off "
+                "again when asked once more; the turn ended with nothing done",
+            },
+        )
+    )
+    folded = [
+        t
+        for t in h.turns
+        if t.role == "data" and isinstance(t.content, dict) and t.content.get("folded")
+    ]
+    assert folded and folded[0].content["handover"] == CUT_FOLD_NOTE and h.revision > rev

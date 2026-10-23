@@ -104,7 +104,7 @@ back with `shelve`. The lead's `readings.director` is this function; the parity 
 the two tools as by design (`TOOL_COUNTERPARTS`) and the console's three requests
 (`the director's log`, `two stories`, `director:`) as the player's own.
 
-### 2a. The director's seat made real (package 67, provisional; the owner, 2026-10-19)
+### 2a. The director's seat made real (package 67; the owner, 2026-10-19; built 2026-10-23)
 
 **As it stands.** `seat: <the model's exact name> as captain of <ship> for <n> samples|hours`
 (43's form) checks the consent record, the owner's grant (the scenario's `director:` block:
@@ -162,6 +162,85 @@ player's and their people, the rest counted ("the ships within 20 miles of the A
 more beyond, not shown"), a cheaper read. The director is hidden from every station as
 §6 has it: with `--ease-on-station` its samples ease nothing and write no driver's line
 (R-20; `ui/server.Driver._samples_now`).
+
+**As built (package 67, 2026-10-23; `freesail/world/seats.py` new, `orders._seat` and
+`_unseat` its doors; `agents/remote.py`, `ui/harbour.py`, `ui/server.py`, `agents/api.py`,
+`agents/director.py`, `settings.py`; `tests/test_director.py`, `test_agent_api.py`,
+`test_harbour.py`; truths 7b-130 to 7b-132).**
+
+- **The form widened** (`seats.hold`): `seat: <model> as <station> [of <ship>] for <n>
+  samples|hours[, within <time>]`, for the captain, an officer of the watch, the master, the
+  lookout and a passenger of another ship or of the player's own (no `of`, or her name),
+  the player's own allowed unless the grant says `seats_on_the_players_ship: false`; the
+  rule of reach (`orders.held_stations`) refuses a station the player or a model holds,
+  the captain while the player is at the prompt among them. A person by his name is
+  seated at the station he is bound to, and one nobody holds **as his voice**, the
+  honest smaller version of the brief's: a station of the passenger's kind bound to him
+  under his name (`VOICE_KIND`, the binding quiet, the world order being the input, and
+  its lines for the record), his brief (`VOICE_BRIEF`: no order of any ship's, `say`,
+  `ask`, `tell`, the journal, the readings, the stand-by), heard where he stands, and the
+  director's `say as` for him refused by the rule of reach while a model holds him. A
+  person aboard another ship is refused in words (no other ship has a World of people to
+  bind him in; package 68's refusal of one made there). The seats' keys are the ship's id
+  for her captain (43's, so that a save from before reads), `<id>/<station>`, `own/
+  <station>` and `voice/<station>`; `unseat:` takes the same words, or a ship's name for
+  every seat on her as before.
+- **The desk reads the seat** (`Desk.station`, `seats.match`, `seats.admit`): a door for
+  the seat's model at its station is admitted under the seat's budget, its samples or
+  hours counted from the admission (an input, `seat_admitted`, replayed), its door note and
+  its first answer saying so; any other door is admitted as before. Kept once a minute by
+  the World whatever sail is about (`crews.enforce_budgets`, now `seats.enforce`): spent,
+  the station is stood down with the reason; a seat whose station is released after its
+  admission ends with it; one whose door never came lapses after its `within`; the
+  director's log says each (`director.seat`). A seat held when the voyage ends ends with
+  the game.
+- **The director's door** (`Harbour.tend_seats`, called by the driver's clock every tenth
+  of a second): for each seat held the harbour starts the API door with the module's own
+  command line (`door_argv`'s `seat_model`: the seat's model, its dialect from the settings,
+  `--station`, `--ship`, `--budget-tokens` where the settings name one), the key read by the
+  door's own process, the pane in the doors tab marked the director's seat's
+  (`Door.by`); a seat gone before its door was admitted has its door stopped, one stood
+  down lets its door end of itself (*its station was released*). **The models the
+  settings can call** (`settings.callable_models`: the API door's model and
+  `doors.api.models`, each a name or `{name, dialect}`): a `seat:` for another is refused
+  before the World (`director.uncallable_seat`, at the director's door and at the
+  owner's `world:` in the browser), in words naming the API door's model to the director
+  alone; checked before the World so that no log, save or replay depends on the settings
+  and the settings' model's name reaches no log (truth 7b-110). Without a harbour (the
+  console) the seat is a record; its result says the door to start by hand, the same
+  words either way so that a replay writes the same line.
+- **The cost** (R-34): the brief's paragraph on a seat's cost and the channel
+  (`director.SEAT_AND_CHANNEL_BRIEF`, after the fixed part and before the player's brief,
+  apart from the forms reference); `seat:`'s result repeats the budget and the cost's shape;
+  the director's budget line names the seats held and their spending
+  (`seats.spending_words` in `director.budget_words`). A door under a seat has its handover
+  fold counted from **two fifths of its model's context** (`remote.SEAT_BUDGET_SHARE`; the
+  owner's review), or the figure the door asks (`--budget-tokens`, which any API door takes;
+  the settings' `doors.api.seat_budget_tokens` for a seat's door, in tokens or a share); a
+  reply cut off at its limit twice folds the conversation (`remote.CUT_FOLD_NOTE`); the API
+  door says the conversation's size at each fold; and a station taken again says which of
+  the captain's grants lapsed with its leaving (`Harness._lapsed`).
+- **The channel** (R-21, R-24): `director: <words>` at the prompt (`console.director_word`;
+  `director: brief`, `budget` and the bare prefix the brief's as before) is
+  `director.player_word`: an input (`player_word`, replayed), the director's log
+  (`director.player`), the director's next sample as *The player, apart from the game:
+  ...* (a word, which wakes a stand-by), and the drivers' listeners; the director's answer
+  is `answer the player: <words>` (`director.direct` before any world order, or a reply's
+  text or an `answer` opening with it, `director.thought`), no act counted, to the
+  director's log (`director.answered`) and the listeners: the console prints it as its own
+  line, the browser's server sends it to a small pane (`#channel-panel`; `GET
+  /api/director/channel`). The play log carries neither. The director's own words out of
+  turn are answered as its log's, never "in the log under your mark", at the desk and the
+  MCP bridge.
+- **Taken another way**: the person aboard another ship (refused, above); the settings'
+  "account" read as the dialect, the credential store not read by the game to check a key
+  is there (the door says so in its pane when it has none: the key is read by the door's
+  own process alone); the fold after a double cut-off made by the desk on the door's
+  words (`Harness._fold_handover` with a note of its own) rather than by the harness.
+- **Found on the way and mended**: a seat held under consent records kept elsewhere
+  (`--consent-records`) was refused in the replay, the records not being the replay's, and
+  the log diverged; a replay now reads a seat's consent from the world orders' outcomes in
+  play (`World.replayed_orders`, set by `replay.replay`).
 
 ### 3. The world orders (`freesail/world/orders.py`)
 
@@ -586,6 +665,19 @@ leaves its note in its log, and its line says only that it left a note there.
 `--ease-on-station` and write no driver's line, and its own lines, being for the record, ease
 nothing; a standing order's refusal names the stations aboard and never the director ("the
 director is above the game; a standing order may tell or ask the ...").
+
+**As built (package 67; §2a's channel).** The director's log gains three kinds: `director.seat`
+(a seat held, its door admitted, stood down at its spent budget, ended with its station, or
+lapsed), `director.player` (the player's word apart from the game, *The player, apart
+from the game: ...*) and `director.answered` (the director's answer to him, *To the player,
+apart from the game: ...*). Both channel kinds are in `two stories` beside the play log
+as every entry is, and neither is a line of the play log, its replay's or a station's
+sample but the director's own; the player's word is an input (`player_word`), so that a
+replay makes its entry and its notice again. The browser's pane for the channel
+(`#channel-panel`) is apart from the director's log's pane: it shows the player's words
+and the director's answers as they come, shut until a line comes, and reading it
+(`GET /api/director/channel`) is no reveal of the log. A voice's binding and unbinding
+(§2a) carry the director's actor and are for the record.
 
 ### 7. Truths for 7b-i (behavioural)
 

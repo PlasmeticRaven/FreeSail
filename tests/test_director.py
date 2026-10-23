@@ -1624,3 +1624,168 @@ def test_an_appended_system_grows_in_and_a_waypoint_after_an_ended_track_runs_fr
     assert "above the season's ceiling" in str(WO.doubt(w2, high))
     fair = WO.parse('weather: high "the ridge" radius 900 km at 1805-06-13T04:00 900 -900 1022')
     assert WO.doubt(w2, fair) is None
+
+
+# Package 67: the seat's form widened, its cost said, and the channel with the player
+# ---------------------------------------------------------------------------
+
+SEATED = "made-up-seated-model-3"
+
+
+def granted(w: World, tmp_path: Path, **grant: Any) -> World:
+    records = tmp_path / "consent"
+    records.mkdir(exist_ok=True)
+    consent.Record(
+        SEATED, "a test runtime", "2026-10-23", consent.YES, answer="Yes.", drill="passed"
+    ).write(records)
+    w.consent_records_dir = records
+    w.scenario.director = {"models": [SEATED], "seats": 4, "seats_in_voyage": 8} | grant
+    return w
+
+
+def test_the_seat_is_held_at_every_station_of_a_ship_and_for_a_persons_voice(tmp_path):
+    """Package 67, item 4: `seat: <model> as <station> [of <ship>]` for every station a ship
+    has, the player's own ship allowed by default; a person bound to a station is seated
+    at it, one nobody holds as his voice; the rule of reach refuses a held station; the
+    grant may keep the seats off the player's ship; a time for the door to come lapses the
+    seat and the director's log says so; and `unseat:` takes the same words."""
+    w = granted(directed(), tmp_path)
+    put(w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth")
+    own = w.ship.name
+    cases = [
+        (f"seat: {SEATED} as officer for 3 samples", "own/officer of the watch"),
+        (
+            f"seat: {SEATED} as officer of the watch of X for 3 samples",
+            "ship-1/officer of the watch",
+        ),
+        (f"seat: {SEATED} as lookout of {own} for 1 hours, within 20 minutes", "own/lookout"),
+    ]
+    for text, key in cases:
+        e = w.world_order(text)
+        assert e.data["result"] == "done", e.text
+        assert key in WO.director_seats(w)
+    held = WO.director_seats(w)["own/officer of the watch"]
+    assert held["what"] == f"the officer of the watch of {own}" and held["ship"] == ""
+    e = w.world_order(f"seat: {SEATED} as captain for 3 samples")
+    assert e.data["result"] == "refused" and "held by the player at the prompt" in e.text
+    e = w.world_order(f"seat: {SEATED} as officer of the watch of Nowhere for 3 samples")
+    assert e.data["result"] == "refused" and "No ship named 'Nowhere'" in e.text
+    e = w.world_order(f"seat: {SEATED} as officer for 3 samples")
+    assert e.data["result"] == "refused" and "already" in e.text
+    # the master by his name: the station he holds
+    e = w.world_order(f"seat: {SEATED} as {w.stations.holder('master').name} for 2 samples")
+    assert e.data["result"] == "done" and "the master of" in e.text
+    # the seat's result says its cost's shape and how its door comes
+    assert "a model run on the owner's key" in e.text and "counted from its door's" in e.text
+    assert "where the game has a harbour (py -m freesail)" in e.text and "--station" in e.text
+    # the lookout's door never came within twenty minutes: the seat lapses
+    w.run(21 * 60)
+    assert "own/lookout" not in WO.director_seats(w)
+    assert any(t.startswith("The seat lapsed") for t in log_texts(w))
+    # the grant keeps the seats off her: refused on her, another ship's as before
+    for key in list(WO.director_seats(w)):
+        WO.director_seats(w).pop(key)
+    w.scenario.director["seats_on_the_players_ship"] = False
+    e = w.world_order(f"seat: {SEATED} as lookout for 2 samples")
+    assert e.data["result"] == "refused" and "seats_on_the_players_ship: false" in e.text
+    e = w.world_order(f"seat: {SEATED} as captain of X for 2 samples")
+    assert e.data["result"] == "done", e.text
+    assert w.world_order("unseat: X, the brig is home").data["result"] == "done"
+    # a person nobody holds: his voice, ashore where he is
+    w.scenario.director["seats_on_the_players_ship"] = True
+    made = w.world_order('person: make "Mr Veale", a merchant of fifty, ashore at Falmouth')
+    assert made.data["result"] == "done", made.text
+    e = w.world_order(f"seat: {SEATED} as Mr Veale for 5 samples")
+    assert e.data["result"] == "done" and "as the voice of Mr Veale" in e.text
+    assert w.stations.kind_of("mr veale") == "passenger"
+    assert w.stations.holder("mr veale").name == "Mr Veale"
+    e = w.world_order(f"seat: {SEATED} as Mr Nobody for 5 samples")
+    assert e.data["result"] == "refused" and "Nobody answers to 'Mr Nobody'" in e.text
+    e = w.world_order("unseat: Mr Veale, enough of him")
+    assert e.data["result"] == "done" and "mr veale" not in w.stations.names()
+    # nothing of the seats in the play log: the orders are for the record
+    assert not [x for x in w.log if not for_the_record(x) and "seat" in x.text.lower()]
+
+
+def test_the_seats_spending_is_in_the_directors_budget_line_and_its_brief_says_the_cost(
+    tmp_path,
+):
+    """Package 67, item 3: the director's brief says what a seat costs and the channel with
+    the player; the day's budget line names the seats held and their spending."""
+    w = granted(directed(), tmp_path)
+    brief = D.station_brief_text(w)
+    assert "A seat costs the owner money." in brief and "paid for by the owner" in brief
+    assert "answer the player:" in brief and "phrased without world detail" in brief
+    assert brief.index("A seat costs") < brief.index("The player's brief:")
+    assert "The seats held" not in D.budget_words(w)
+    w.world_order(f"seat: {SEATED} as officer for 20 samples")
+    assert D.budget_words(w).endswith(
+        f"The seats held, on the owner's key: {SEATED} as the officer of the watch of "
+        f"{w.ship.name}, held for 20 samples, no door yet."
+    )
+
+
+def test_the_players_word_and_the_directors_answer_by_every_road_and_none_in_the_play_log():
+    """Package 67, item 5: `director: <words>` at the browser's order box goes to the
+    director's log, its next sample (a word, which wakes a stand-by) and the pane, with no
+    director seated said so; the brief's words are still the brief's; the director answers
+    by a world order, by a reply that opens with 'answer the player:' or by the answer
+    tool, each to the driver's listeners and its log and none to the play log, no act
+    counted; the save replays."""
+    from freesail.ui.console import director_brief_words, director_word
+    from freesail.ui.server import Driver
+
+    assert director_word("director: is the wind to stay west?") == "is the wind to stay west?"
+    assert director_word("director: brief a quiet passage") is None
+    assert director_word("director: budget 60 samples") is None
+    assert director_word("director:") is None
+    assert director_brief_words("director: is the wind to stay west?") is None
+    assert director_brief_words("director: brief quiet-passage") == "quiet-passage"
+    w = directed()
+    driver = Driver(w, compression=1.0)
+    sent: list[dict[str, Any]] = []
+    driver.add_listener(sent.append)
+    e = driver.submit("director: is the wind to stay west?")
+    assert e.kind == "query.director_word" and "no director is seated now" in e.text
+    assert [m["line"]["text"] for m in sent if m["type"] == "channel"] == [
+        "is the wind to stay west?"
+    ]
+    script = [
+        reply("", call("stand_by", until="a watch")),
+        reply("answer the player: It may back south by night.", call("stand_by", until="a watch")),
+        reply(
+            "",
+            call("answer", text="answer the player: The glass will tell you first."),
+            call("stand_by", until="a watch"),
+        ),
+        reply("", call("stand_by", until="a watch")),
+    ]
+    h = seat_director(w, Fake(script))
+    w.run(60)
+    acts = D.budget_of(w).acts
+    driver.submit("director: and the fog?")
+    w.run(60)
+    assert h.agent.standing_by
+    driver.submit("director: thank you")
+    w.run(60)
+    answers = [m["line"]["text"] for m in sent if m["type"] == "channel"]
+    assert answers == [
+        "is the wind to stay west?",
+        "and the fog?",
+        "It may back south by night.",
+        "thank you",
+        "The glass will tell you first.",
+    ]
+    assert D.budget_of(w).acts == acts  # an answer is no act
+    assert [x["from"] for x in D.channel_lines(w)] == [
+        "the player",
+        "the player",
+        "the director",
+        "the player",
+        "the director",
+    ]
+    for line in answers:
+        assert not [x for x in w.log if line in x.text]
+    copy = replay.replay(json.loads(json.dumps(w.save())), ship_factory)
+    assert copy.log.digest() == w.log.digest()
+    assert [x["text"] for x in D.channel_lines(copy)][:2] == answers[:2]

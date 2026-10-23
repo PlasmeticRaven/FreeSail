@@ -60,7 +60,18 @@ DEFAULTS: dict[str, Any] = {
     },
     "doors": {
         "desktop": {"model_name": "", "command": "", "wait": None},
-        "api": {"model": "", "dialect": "anthropic", "effort": "", "flags": []},
+        "api": {
+            "model": "",
+            "dialect": "anthropic",
+            "effort": "",
+            "flags": [],
+            # package 67: the other models the API door can call for a director's seat,
+            # each a name or {name, dialect} (the door's own dialect by default); and the
+            # seated door's handover fold, in tokens or as a share of the model's context
+            # ('' two fifths of it, the game's default)
+            "models": [],
+            "seat_budget_tokens": "",
+        },
         "local": {"endpoint": "http://127.0.0.1:8080", "model": "", "flags": []},
     },
 }
@@ -342,6 +353,21 @@ def check_settings(data: Mapping[str, Any], keys: list[str] | None = None) -> di
             raise SettingsError(f"The {door} door's flags are a list of words.")
         if "flags" in out["doors"][door]:
             out["doors"][door]["flags"] = [str(f) for f in flags]
+    api = out["doors"].get("api") or {}
+    try:
+        callable_models(out)
+    except SettingsError:
+        raise
+    except (TypeError, ValueError, AttributeError):
+        raise SettingsError(
+            "The API door's models are a list of names, or of {name, dialect}."
+        ) from None
+    budget = api.get("seat_budget_tokens")
+    if budget not in (None, ""):
+        try:
+            seat_budget_tokens(budget, 1_000_000)
+        except ValueError as e:
+            raise SettingsError(str(e)) from None
     for name in ("saves", "scenarios"):
         place = str(out["places"].get(name) or "")
         if place and inside_repository(place):
@@ -350,6 +376,69 @@ def check_settings(data: Mapping[str, Any], keys: list[str] | None = None) -> di
                 "where the repository never holds what you make."
             )
     return out
+
+
+API_DIALECTS = ("anthropic", "openrouter")
+
+
+def callable_models(settings: Mapping[str, Any]) -> dict[str, str]:
+    """The models the settings can call through the API door (package 67; spec M7b §2a: the
+    grant's models are the models the settings can call), by name to the dialect it is
+    called in: the API door's own model and the `models` beside it. A model's name lives
+    here and in the door's command line, never in the repository, a save or a log."""
+    api = ((settings.get("doors") or {}).get("api")) or {}
+    dialect = str(api.get("dialect") or "anthropic")
+    out: dict[str, str] = {}
+    if api.get("model"):
+        out[str(api["model"])] = dialect
+    for entry in api.get("models") or []:
+        if isinstance(entry, Mapping):
+            name, said = str(entry.get("name") or ""), str(entry.get("dialect") or dialect)
+        else:
+            name, said = str(entry), dialect
+        if not name.strip():
+            continue
+        if said not in API_DIALECTS:
+            raise SettingsError(
+                f"The API door speaks {', '.join(API_DIALECTS)}, not '{said}' (for {name})."
+            )
+        out[name.strip()] = said
+    return out
+
+
+# The seated door's handover fold where the settings name none: two fifths of the model's
+# context (the owner's review of package 67's brief, 2026-10-23).
+SEAT_BUDGET_SHARE = 0.4
+
+
+def seat_budget_tokens(value: Any, context: int | None) -> int | None:
+    """The settings' `seat_budget_tokens` in tokens: a whole number of tokens, or a share
+    of the model's context between 0 and 1 ('0.4', '40%', '2/5'); None where it is '' (the
+    game's default then) or a share with no context known. Refused in words otherwise."""
+    if value in (None, ""):
+        return None
+    t = str(value).strip().replace(",", "").replace("_", "")
+    share: float | None = None
+    try:
+        if t.endswith("%"):
+            share = float(t[:-1]) / 100.0
+        elif "/" in t:
+            a, b = t.split("/", 1)
+            share = float(a) / float(b)
+        else:
+            v = float(t)
+            if 0.0 < v < 1.0:
+                share = v
+            elif v >= 1.0 and v == int(v):
+                return int(v)
+    except (ValueError, ZeroDivisionError):
+        share = None
+    if share is not None and 0.0 < share < 1.0:
+        return int(share * context) if context else None
+    raise ValueError(
+        f"The seated door's fold ({value!r}) is a number of tokens (80000) or a share of the "
+        "model's context between 0 and 1 (0.4, 40% or 2/5)."
+    )
 
 
 def load_settings(path: str | Path | None = None) -> dict[str, Any]:

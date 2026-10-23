@@ -585,7 +585,8 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             raise OrderError(
                 "The director is above the game: nobody asks or tells it on deck, and its "
                 "log is read by name, 'the director's log', at the prompt (the player's "
-                "brief is given with 'director: brief ...')."
+                "brief is given with 'director: brief ...', and his word to it apart from "
+                "the game with 'director: <words>')."
             )
     if verb in ("say", "hail"):
         return _say(ship, verb, text)

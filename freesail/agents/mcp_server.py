@@ -1013,12 +1013,20 @@ class Bridge:
             if a.get("released"):
                 return str(a.get("words") or ""), True
             if a.get("spoke"):
-                did = f"Said, under your mark, while the game had the floor. {a.get('words')}"
+                mark_words = "" if self.game.name == "director" else ", under your mark,"
+                did = f"Said{mark_words} while the game had the floor. {a.get('words')}"
             elif a.get("out_of_turn"):
                 did = (
                     "Nothing said. "
                     + (str(a.get("words") or "") if a.get("interim") is None else "")
                 ).strip()
+            elif self.game.name == "director":
+                # the director's words are its log's, never the play log's (package 67, R-21)
+                did = (
+                    "Written in the director's log, which no station and not the player reads."
+                    if text
+                    else "Nothing said."
+                )
             else:
                 did = "Said, under your mark." if text else "Nothing said."
         else:

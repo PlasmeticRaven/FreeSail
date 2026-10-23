@@ -233,6 +233,15 @@ main {
 .instruments label.option input { vertical-align: -2px; margin: 0 4px 0 0; }
 #i-clock.eased { color: var(--accent); }
 
+/* package 67: the channel between the player and the director, a small pane over the
+   corner, shut until a line comes; never the play log */
+#channel-panel { position: fixed; right: 12px; bottom: 12px; width: min(380px, calc(100vw - 24px)); max-height: 40vh; z-index: 30; display: flex; flex-direction: column; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35); }
+#channel-panel[hidden] { display: none; }
+.channel-lines { flex: 1; min-height: 0; overflow: auto; padding: 6px 10px; font-size: 12.5px; line-height: 1.45; }
+.channel-line { white-space: pre-wrap; margin: 2px 0; }
+.channel-line.from-director { font-style: italic; }
+.channel-line.channel-note { opacity: 0.7; font-size: 11.5px; }
+
 /* package 50: the director's log, in the ship view's place while open, beside the play log */
 #director-panel { grid-column: 2 / span 2; grid-row: 1; }
 #director-panel[hidden] { display: none; }
@@ -336,3 +345,4 @@ p.note { margin: 6px 12px; font-size: 12.5px; color: var(--ink-soft); }
 .door-pane.door-ended .door-words, .door-pane.door-stopped .door-words { color: var(--urgent); }
 .door-pane .door-out { margin: 0; padding: 6px 8px; height: 16em; overflow-y: auto; white-space: pre-wrap; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
 .door-pane .door-say { flex: 1; }
+.door-pane.door-director { border-left: 3px solid var(--notable, #8a6d3b); } /* package 67: the director's seat's door */
