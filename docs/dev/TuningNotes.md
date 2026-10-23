@@ -7643,7 +7643,34 @@ an untouched `953caab` and on the session's pristine copy, on the owner's Window
 and pass on the lead's Linux machine and the release workflow's runner. They are a
 cross-platform question (determinism or drift), not a regression of any change here;
 the whole suite is to be dispatched on both CI runners to settle it (R-58), and no re-pin
-session goes after those four files.* On the owner's machine also `test_harbour.py`'s
+session goes after those four files.*
+
+*The whole suite on both CI runners, dispatched by the lead at the fold-in (run 228 on
+`a67c965`, 2026-10-23), answers R-58.* **Linux (ubuntu-latest): 3,833 passed, 2 failed.**
+One is the hotfix's own miss: the schooner's octant passage (gate 5b) lost the same two
+"held" lines as the three passages the hotfix re-pinned, 768 to 766, its digest
+`b7c16adc612bd01a` to `b9acdeac6354f3bf`; re-pinned by the lead with the old figures beside
+(the signature is the starter book's held well order, the same as the other three; the
+lead did not repeat the bisection). The other is truth 7b-108, the harbour's banner not
+found in the launcher's captured output on either runner (on the lead's machine it is): a
+test of the capture, not of the harbour, to mend in 55's gate work or sooner. **Windows
+(windows-latest): 3,821 passed, 14 failed.** Of the fourteen: the two above; four pace
+floors under the runner's load (no finding); the maker's refusal with a backslash path
+(68's item 17 mends it); `test_a_windows_written_file_keeps_its_line_endings`, where a
+scenario written back on Windows doubles its carriage returns (`\r\r\n`: the writer opens
+with `newline=` and the text already carries `\r\n`; a real Windows bug of the maker, for
+68 or 58a's builder to take as found); and **five recorded passages whose digests or counts
+differ on Windows and not on Linux**: the merchant passage's constants (96480 for 96540),
+the schooner on an intent alone (its digest), truths 77, 78 and 79 (the fake captain's
+passage: two moments for three), the Ushant captain trial's digest, and the schooner's
+octant passage at 767 lines on Windows for 766 on Linux. Those five are **cross-platform
+determinism, not drift**: the same code gives another passage on Windows. The owner's
+machine showed the same set. Booked as an item of its own (a package before the gate, or
+55's: find the floating-point or ordering source, most likely in the reckoning's or the
+business's iteration order or a `math` function's platform result, and pin the passages to
+one answer on both). Until then the Linux runner is the reference for every pin.
+
+On the owner's machine also `test_harbour.py`'s
 maker (a Windows path separator in the refusal, to fix) and truth 7b-108 (the harbour's
 banner not captured).
 `test_standing.py`'s `test_the_well_is_sounded_every_glass_and_read_and_replays` replaces

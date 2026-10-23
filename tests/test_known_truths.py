@@ -3020,9 +3020,9 @@ GATE_5B_SCHOONER_PILOT_HAIL_AGAIN_TICK = 56460  # her second, to heave to (37h; 
 GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # aboard off the outer road (37h; 56580 before)
 GATE_5B_SCHOONER_ANCHORED_TICK = 57257  # off the town, the best bower let go (57255 before 37p)
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p)
-GATE_5B_SCHOONER_LINES = 768  # package 56, the glass (763 at package 45)
+GATE_5B_SCHOONER_LINES = 766  # the starter book's held well order removed, two held lines fewer (768 at package 56, the glass; 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
-GATE_5B_SCHOONER_DIGEST = "b7c16adc612bd01a"  # package 56, the glass (c01e6e0ff56503c8 at 44)
+GATE_5B_SCHOONER_DIGEST = "b9acdeac6354f3bf"  # the held well order removed (b7c16adc612bd01a at package 56, the glass; c01e6e0ff56503c8 at 44)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
