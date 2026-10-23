@@ -75,7 +75,9 @@ def test_a_calm_that_boxes_the_compass_logs_no_shift():
     w.run(4 * 3600)
     assert wind_lines(w) == ["Light and variable airs."]
     (line,) = [e for e in w.log if e.kind == "wind.variable"]
-    assert line.severity is Severity.NOTABLE and line.tick == pytest.approx(60, abs=2)
+    # package 58a: held ten minutes under the floor, the light airs' hysteresis (a minute
+    # before it, the line at tick 60)
+    assert line.severity is Severity.NOTABLE and line.tick == pytest.approx(600, abs=2)
     assert not w.wind_settled
 
 
@@ -91,7 +93,9 @@ def test_the_wind_falling_light_is_said_once_and_the_next_settled_wind_once():
     said = [(e.kind, e.text) for e in w.log if e.kind in ("wind.shift", "wind.variable")]
     assert said == [
         ("wind.variable", "Light and variable airs."),
-        ("wind.shift", "The wind has settled at NE, a light breeze."),
+        # package 58a: settled two knots above the floor, held ten minutes, by when the
+        # mean is a gentle breeze (at the floor, held five minutes, "a light breeze")
+        ("wind.shift", "The wind has settled at NE, a gentle breeze."),
         ("wind.shift", "Wind veered to ENE, a gentle breeze."),
         ("wind.shift", "Wind veered to E, a gentle breeze."),
     ]
@@ -572,3 +576,55 @@ def test_the_shipped_books_enter_whole():
             assert "is not a place on the chart" not in e.text, (path.name, line, e.text)
             if e.kind == "standing.given":
                 w.submit(f'strike standing order "{e.data["name"]}"')
+
+
+# ---------------------------------------------------------------------------
+# Package 58a: the notable-noise rules (the cold review of 2026-10-22, R-31)
+# ---------------------------------------------------------------------------
+
+
+def test_light_airs_about_the_floor_are_said_once_and_settle_only_two_knots_above_it():
+    """D3-06, D4-05, CO2-14: in light airs "Light and variable airs." and "The wind has
+    settled at W" alternated every ten to forty minutes, each notable, waking the stations
+    standing by. The hysteresis: the airs fall light when the mean has stood under four
+    knots ten minutes, and settle when it has stood two knots above that, within a point,
+    ten minutes. A breeze that goes between three and five knots every twenty minutes for
+    four hours falls light once and never settles; at seven knots it settles once."""
+    points = [(0.0, 270.0, 8.0), (0.5, 270.0, 3.0)]
+    for k in range(12):
+        points.append((1.0 + k / 3.0, 270.0, 5.0 if k % 2 else 3.0))
+    w = point_world(script(*points, (5.0, 270.0, 3.0), (5.5, 270.0, 7.0), (7.0, 270.0, 7.0)))
+    w.run(5 * 3600)
+    assert wind_lines(w) == ["Light and variable airs."]
+    assert World.WIND_LIGHT_HOLD_S == 600 and World.WIND_SETTLE_S == 600
+    assert World.WIND_SETTLE_BAND_KN == 2.0
+    w.run(2 * 3600)
+    assert wind_lines(w) == [
+        "Light and variable airs.",
+        "The wind has settled at W, a light breeze.",
+    ]
+
+
+def test_a_recurring_line_with_the_same_words_is_routine():
+    """R-31, E1-09, D7-12, LO2-09: a standing order's trim waiting for hands every glass,
+    the lead's cast at anchor in the same water, the carpenter's report of the well pumped
+    out: the first is notable, the same words again routine, other words notable again;
+    another kind is untouched, and an urgent line stays urgent."""
+    from freesail.core.world import RECURRING_KINDS
+
+    assert {"evolution.waiting", "sounding", "aboard.found"} <= RECURRING_KINDS
+    w = point_world(script((0, 270, 10)))
+    trim = "Not hands enough on deck to trim the mizen; the watch is reefing the main lug."
+    sev = [w.record(Severity.NOTABLE, "evolution.waiting", trim).severity for _ in range(3)]
+    assert sev == [Severity.NOTABLE, Severity.ROUTINE, Severity.ROUTINE]
+    other = w.record(Severity.NOTABLE, "evolution.waiting", "Not hands enough to trim the jib.")
+    assert other.severity is Severity.NOTABLE
+    again = w.record(Severity.NOTABLE, "evolution.waiting", trim)
+    assert again.severity is Severity.NOTABLE  # the words changed since its last logging
+    cast = "By the mark seven, sand and shells."
+    assert w.record(Severity.NOTABLE, "sounding", cast).severity is Severity.NOTABLE
+    assert w.record(Severity.NOTABLE, "sounding", cast).severity is Severity.ROUTINE
+    assert w.record(Severity.URGENT, "sounding", cast).severity is Severity.URGENT
+    land = "Land ahead, fine on the larboard bow, eight cables."
+    said = [w.record(Severity.NOTABLE, "lookout.land_ahead", land).severity for _ in "ab"]
+    assert said == [Severity.NOTABLE, Severity.NOTABLE]
