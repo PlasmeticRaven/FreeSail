@@ -1141,7 +1141,17 @@ stand-by replaced, the director's echoes) and does not redo it.
    lifted. *The lead's reading:* this is the one item of 58 that is judgement rather than
    mending, and the brief binds the intent (she lies to or runs, by the book, and is not
    taken aback every minute) and not the figures.
-6. **Truths and records.** Truth 127: the Éclair's leg re-laid at the turn of the tide in
+6. **The pilot's conn in a stream (68's debt, found by its item 19).** The pilot lays his
+   legs in the wind over the water since 68, and in a four-knot flood through the Goulet his
+   NE legs cannot be made: he has no answer but to pinch or to go back for a mark now
+   astern, and the ship strikes the Mingan or works to and fro off Petit Minou for the
+   hours. A pilot of the period waits for slack water in the road, works the north shore's
+   eddy, or anchors and tells the captain so; and he trims the yards before he orders a
+   five-point turn toward the wind. `Ports` gains those answers as the rules captain's
+   doctrine has them (the stream read from the tide, the leg judged makable before it is
+   ordered, the wait and the anchorage said in his words), and the two Goulet cases of
+   `tests/test_ports.py` marked expected failures by 68 (113000 and 114000) are lifted.
+7. **Truths and records.** Truth 127: the Éclair's leg re-laid at the turn of the tide in
    the Bas channel; 128: a `steer` through the stern dips the lugs (the picture's test from
    the wave-2 notes); 129: the gale trial's frigate lies to under the book without being
    taken aback. The tuning notes with the pins moved and why; the primer's chapters 7 and
