@@ -58,6 +58,10 @@ __all__ = [
 # A thing thrown over the side: gone from the ship and the shore, kept in the registry so
 # that the truth and a replay know what became of it.
 OVERBOARD = "overboard"
+# A thing lying in the ship's boat (package 68; the cold review's D8): aboard while she is
+# at the booms, landed on the quay when she goes ashore (`ports._land_and_take_off`).
+IN_THE_BOAT = "boat"
+_IN_THE_BOAT = re.compile(r"^(?:in|into)\s+(?:the\s+)?(?:ship's\s+)?boat$", re.I)
 
 # The words a thing's name may open with, which `the_words` turns to 'the'.
 _ARTICLES = ("a ", "an ", "some ", "one ", "the ")
@@ -268,6 +272,8 @@ def where_words(world: Any, thing: Thing, keeper_where: bool = True) -> str:
         return f"in {p.name}'s keeping, {world.people.state_words(p)}"
     if thing.place == OVERBOARD:
         return "thrown over the side"
+    if thing.place == IN_THE_BOAT:
+        return "in the boat"
     if thing.place == "shore":
         return _ashore_words(world, thing.port, thing.ashore_at, thing.spot)
     where = place_words(thing.place) if thing.place else "aboard"
@@ -412,6 +418,8 @@ def read_where(world: Any, phrase: str) -> dict[str, Any] | None:
             return {"keeper": p.id}
     if low in ("aboard", "on board"):
         return {}
+    if _IN_THE_BOAT.match(low):
+        return {"place": IN_THE_BOAT, "spot": ""}
     m = _ASHORE.match(text)
     if m is not None:
         ports = getattr(world, "ports", None)
