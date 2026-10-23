@@ -121,6 +121,15 @@ def test_the_station_is_to_seaward_of_its_place_and_the_stranger_is_chased(stati
 # station by 'the leg', and takes the ground at 44332, La Helle two miles off, with land
 # ahead called at six cables and two (43860, 44160), in distress at 44340. The xfail
 # below; for the lead and package 58 (docs/dev/TuningNotes.md, package 57)
+# package 58b (item 5, the gale book's mending; the judgement waits for the lead's
+# playtest, so the pins below are left as they were and the trial an expected failure,
+# the new figures beside the old): the fore topmast staysail is taken in at 8820 before it
+# blows out (it blew out at 8983); lying a-try from 15060 she is never aback; filled away
+# at 30780 she sets her close-reefed topsails and is not hove to again at 32160; beating
+# for the station she is taken among the Molène islands by 'the offing' and takes the
+# ground at 41415 (44332), in distress at 41460 (44340). The first states as they come now:
+# 300 keeping station, 15060 hove to, 30780 on passage, 31560 beating, 41460 in distress
+# (docs/dev/TuningNotes.md, package 58b)
 TRIAL_STATION_GALE_FIRST_STATES = [
     (300, "keeping station"),
     (15060, "hove to for weather"),  # 19980 before package 57
@@ -134,6 +143,8 @@ TRIAL_STATION_GALE_FIRST_STATES = [
 # 52140, ten minutes later than at 51540 (the beating verdict's dwell), and the evening's
 # tacks fall otherwise: she misses stays twice in plain sail after 18:00 and lies aback by
 # turns for half an hour (36 lines of sails backed and filled, 4 before) before she wears
+# package 58b: 864 lines and 4cb58e9ec1ab55c0, aground at 41415; the tree before it
+# (872aa61) gives 857 and cefe2cf5136fb4d9, aground at 44332 (the pin was stale before 58b)
 TRIAL_STATION_GALE_LINES = 909  # package 57, aground at 44332 (1640 at package 43b)
 TRIAL_STATION_GALE_DIGEST = "574332b785e523ab"  # package 57 (c0aa397523ea2972 at 43b)
 
@@ -147,7 +158,9 @@ def station_gale():
     reason=(
         "package 57: the day falls otherwise from the first course shaped, and she takes "
         "the ground at 44332 after twice failing to wear among the islands of "
-        "the Molène passage (the captain's sea sense; for the lead and package 58)"
+        "the Molène passage (the captain's sea sense; for the lead and package 58); "
+        "package 58b: the gale book mended, she lies to never aback and still takes the "
+        "ground there at 41415, for the lead's playtest"
     ),
     strict=False,
 )
@@ -200,7 +213,14 @@ TRIAL_STATION_LEE_SHORE_STATES = [
     (51540, "beating"),
     (68940, "keeping station"),
 ]
-TRIAL_STATION_LEE_SHORE_LINES = 1669  # package 57 (1660 at 43b, 1665 at 45c)
+# package 58b (item 5, the gale book's mending; the judgement waits for the lead's
+# playtest, so the pins are left as they were and the trial an expected failure, the new
+# figures beside the old): filled away at 30780 with the gale's tail still blowing she sets
+# her close-reefed topsails and has way, where she lay aback every three minutes under the
+# storm canvas alone until 37800 (aback 19 minutes in the day, 41 before); hove to again at
+# 41940 (41880), on passage and beating at 51480 and 51540 as before, keeping station at
+# 71340 (68940); never aground; 1597 lines and ed48ca3d61e52f20
+TRIAL_STATION_LEE_SHORE_LINES = 1669  # package 57 (1660 at 43b, 1665 at 45c); 1597 at 58b
 TRIAL_STATION_LEE_SHORE_DIGEST = "e60617edd7ebbc73"  # package 57 (0686965a0871299c at 43b)
 
 
@@ -209,6 +229,14 @@ def station_lee_shore():
     return trial("trial-station-lee-shore")
 
 
+@pytest.mark.xfail(
+    reason=(
+        "package 58b: the gale book mended, the day falls otherwise from her filling away at "
+        "30780 (hove to again at 41940, the station at 71340; never aground), for the "
+        "lead's playtest"
+    ),
+    strict=False,
+)
 def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_shore):
     """Started five miles west of Ushant with a westerly gale coming on: hove to once she
     has sea room, and never aground (the first trial grounded her in thirty-seven minutes

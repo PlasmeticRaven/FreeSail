@@ -505,11 +505,15 @@ next leg judged from where it leaves her. When one will not serve he brings her 
 she is in no more than `PILOT_WAIT_MOST_FATHOMS` (`port.pilot_waits`, the hour he looks for
 the stream to serve, or the wind), looks again every `PILOT_WAIT_LOOK_S` once she rides,
 weighs when the legs will serve by the time she is under way, takes up his track again
-from where she lies, and judges it for that hour until it has come; in deeper water he
-says he cannot bring her up and cons her on as before. A turn of two points and more
-toward the wind has the yards trimmed for it first and the helm put over a minute later
-(`PILOT_TRIM_FIRST_S`). The two Goulet cases from the owner's wardroom save are no longer
-expected failures. Truths 7b-127 to 7b-129.
+from where she lies, and judges it for that hour until it has come, and for three quarters
+of an hour from the weigh (`PILOT_COMMITTED_S`) does not bring her up again; in deeper
+water he says he cannot bring her up and cons her on as before. He gives no course over a
+tack or a wear in hand. His own turn of two points and more onto a course within eight
+points of the wind and a point and more nearer it has the yards trimmed for it first and
+the helm put over a minute later (`PILOT_TRIM_FIRST_S`); a correction of the course he
+is on is trimmed after, as before. While the pilot has the conn, by the captain's word or
+the officer's, the captain's book is written without "the leg". The two Goulet cases from
+the owner's wardroom save are no longer expected failures. Truths 7b-127 to 7b-129.
 
 ### 5. The officer's own reckoning (`freesail/world/reckoning.py`; `freesail/agents/tools.py`)
 
