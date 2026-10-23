@@ -151,9 +151,11 @@ from freesail.ui.console import (
     check_agents_unattended,
     clamp_compression,
     director_brief_words,
+    director_word,
     directors_log_asked,
     eased_words,
     give_director_brief,
+    give_director_word,
     live_world_order,
     loaded_words,
     read_standing_orders,
@@ -233,7 +235,15 @@ class Driver:
         self._thread: threading.Thread | None = None
         self._ticks_since_snapshot = 0
         self._replace_hooks: list[Callable[[World, World], None]] = []  # `replace_world`
+        # called by the clock every period, running or not (package 67: the harbour starts
+        # and stops the director's seats' doors)
+        self._tenders: list[Callable[[], None]] = []
         self.world.log.subscribe(self._on_event)
+        # the channel between the player and the director (package 67): its lines to the
+        # pages' pane, never the play log
+        from freesail.agents import director as director_mod
+
+        director_mod.listen(self.world, self._on_channel)
         # the player's own needs (package 54): sent to the pages as a line, kept nowhere
         needs = getattr(self.world, "needs", None)
         if needs is not None:
@@ -270,6 +280,22 @@ class Driver:
             self._heard = (e.actor.removeprefix("the "), "speaks")  # `--ease-on-station`
         for x in self._view.feed(e, self.compression):
             self._emit_shown(x)
+
+    def _on_channel(self, line: dict[str, Any]) -> None:
+        """A line of the channel between the player and the director (package 67): the
+        player's word or the director's answer, to the pages' pane, never the play log."""
+        self._emit({"type": "channel", "line": dict(line)})
+
+    def on_tend(self, fn: Callable[[], None]) -> None:
+        """Call `fn()` every period of the clock, running or not (the harbour's seats)."""
+        self._tenders.append(fn)
+
+    def _tend(self) -> None:
+        for fn in list(self._tenders):
+            try:
+                fn()
+            except Exception as e:  # noqa: BLE001  (the clock goes on whatever a tender does)
+                say_to_terminal(f"FreeSail: the director's seats could not be tended ({e}).")
 
     def _on_need(self, e: Event) -> None:
         """A line of the player's own needs (package 54): to the pages as an event the
@@ -470,6 +496,23 @@ class Driver:
                 return self._save(path)
             live = live_world_order(text)
             if live is not None:
+                from freesail.agents import director as director_mod
+
+                why = director_mod.uncallable_seat(self.world, live)
+                if why:
+                    # a seat for a model the harbour's settings cannot call (package 67):
+                    # refused before the World, so that no log or save depends on them
+                    told = Event(
+                        tick=self.world.clock.tick,
+                        ship_time=self.world.clock.ship_time,
+                        severity=Severity.ROUTINE,
+                        kind="query.seat_refused",
+                        text=f"The seat was not held: {why}.",
+                        actor="driver",
+                        data={},
+                    )
+                    self._emit({"type": "event", "event": event_dict(told)})
+                    return told
                 # the live world order (package 43; spec M6 §23): the owner's, as at the console
                 e = self.world.world_order(live, source=LIVE_WORLD_ORDER_SOURCE)
                 if not self._ease_for_station():
@@ -542,6 +585,13 @@ class Driver:
             words = said.removeprefix("two stories").strip()
             n = int(words) if words.isdigit() else None
             lines, kind = list(director_mod.two_stories(world, n)), "query.two_stories"
+        elif director_word(text) is not None:
+            # the player's word to the director, apart from the game (package 67): its log
+            # and its next sample, the pane, never the play log
+            lines, kind = (
+                give_director_word(world, director_word(text) or ""),
+                "query.director_word",
+            )
         elif director_brief_words(text) is not None:
             lines = give_director_brief(world, director_brief_words(text) or "", "the player")
             kind = "query.director_brief"
@@ -648,6 +698,7 @@ class Driver:
             # ten real minutes of a pause unanswered, however fast the ship's clock runs
             # (package 31c; before, the check ran only on a period that ran ticks)
             check_agents_unattended(self.world)
+        self._tend()  # the director's seats' doors (package 67), off the World's lock
         return owed
 
     def _clock_thread(self) -> None:
@@ -691,6 +742,10 @@ class Driver:
             old_needs = getattr(old, "needs", None)
             if old_needs is not None:
                 old_needs.unlisten(self._on_need)
+            from freesail.agents import director as director_mod
+
+            director_mod.unlisten(old, self._on_channel)
+            director_mod.listen(world, self._on_channel)
             self.world = world
             self.lockstep = pace == PACE_LOCKSTEP
             self.pace = Pace(world, pace)
@@ -1337,6 +1392,15 @@ def create_app(
             lines = director_mod.reveal(driver.world, "the player")
             entries = [e.to_dict() for e in director_mod.log_of(driver.world).entries]
         return JSONResponse({"lines": lines, "entries": entries})
+
+    @app.get("/api/director/channel")
+    def api_director_channel() -> JSONResponse:
+        """The channel between the player and the director as it stands (package 67): his
+        words and its answers, for the pane; reading it is no reveal of the log."""
+        from freesail.agents import director as director_mod
+
+        with driver.lock:
+            return JSONResponse({"lines": director_mod.channel_lines(driver.world)})
 
     @app.get("/api/save")
     def api_save() -> JSONResponse:

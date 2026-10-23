@@ -60,6 +60,14 @@
     <pre id="director-log" class="director-log"></pre>
   </section>
 
+  <!-- the channel between the player and the director (package 67): 'director: <words>'
+       at the order line, and the director's answers, apart from the play log; shut until
+       a line comes -->
+  <section id="channel-panel" class="panel" hidden aria-live="polite">
+    <div class="panel-head"><span>The director, apart from the game</span><span class="hint"><button id="btn-channel-close" type="button" title="shut the pane">close</button></span></div>
+    <div id="channel-lines" class="channel-lines"></div>
+  </section>
+
   <section id="ship-panel" class="panel">
     <div class="panel-head"><span>Ship</span><span class="hint">[ and ] turn the view; \ returns to leeward</span></div>
     <svg id="ship-view" class="ship-view" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="the ship, drawn from her part graph"></svg>

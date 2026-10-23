@@ -1816,6 +1816,12 @@ class World:
             if fishery is not None:
                 for severity, kind, text, data in fishery.tick(self):
                     self.record(severity, kind, text, data=data)
+            if self.director_seats:
+                # the director's seats kept once a minute whatever sail is about (package
+                # 67: a seat on her own stations or a person's voice, with no other ship)
+                from freesail.world.crews import enforce_budgets
+
+                enforce_budgets(self)
         bells = self.clock.bells()
         if bells is not None:
             self.record(

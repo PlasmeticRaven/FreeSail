@@ -1712,6 +1712,8 @@ class Harness:
         return out
 
     _shape_told: str | None = None  # the shape of another ship last told (package 43)
+    # the captain's grants that lapsed with the last leaving, for the reseat's line (67)
+    _lapsed: tuple[str, ...] = ()
     # where the station's person is and since which tick (package 66, the line's 'since'):
     # (the place's key, the tick he came there); None until first looked at
     _place_since: tuple[tuple[Any, ...], int] | None = None
@@ -2095,8 +2097,11 @@ class Harness:
             data["own_word"] = True
         if self._is_directors:
             # the director's words are a thought in its log (spec M7b §6; package 50),
-            # never a line of the play log: no station and not the player hears them
-            self.note(text, kind="note")
+            # never a line of the play log: no station and not the player hears them; or,
+            # opening with 'answer the player:', its answer to him apart from the game (67)
+            from freesail.agents import director as director_mod
+
+            director_mod.thought(self.world, text, lambda t: self.note(t, kind="note"))
             return
         say_aboard(self.world, self.station.name, self.who_words, text, data, self.actor)
 
@@ -3493,11 +3498,18 @@ class Harness:
             at = f" (through {through})" if by else ""
         before = was or "the holder before it"
         relieving = f", relieving {before}" if relieved else ""
+        lapsed, self._lapsed = self._lapsed, ()
+        # the grants that lapsed with the leaving, said (package 67; R-34)
+        gone = (
+            f" What the captain's word allowed lapsed with it: {'; '.join(lapsed)}."
+            if lapsed
+            else ""
+        )
         world.record(
             Severity.NOTABLE,
             "agent.stationed",
             f"The {self.station.name} takes the station again{at}{relieving}: the "
-            f"{ordinal_words(a.seatings)} seating; it had {full_stop(left)}",
+            f"{ordinal_words(a.seatings)} seating; it had {full_stop(left)}{gone}",
             actor=self.actor,
             data={
                 "station": self.station.name,
@@ -3505,7 +3517,8 @@ class Harness:
                 "left": left,
                 "identity": identity,
                 "relieved": a.relieved,
-            },
+            }
+            | ({"lapsed": list(lapsed)} if lapsed else {}),
         )
         whose = f"the station, held by {before}, had" if relieved else "I had"
         self.note(
@@ -3825,9 +3838,12 @@ class Harness:
         if not text:
             return "An answer needs some words."
         if self._is_directors:
-            # nobody asks the director (package 50): the words go to its log as a thought
-            self.note(text, kind="note")
-            return "Written in the director's log; nobody asked, and no station hears it."
+            # nobody asks the director (package 50): the words go to its log as a thought;
+            # an answer to the player's word opens with 'answer the player:' (package 67)
+            from freesail.agents import director as director_mod
+
+            said = director_mod.thought(self.world, text, lambda t: self.note(t, kind="note"))
+            return said or "Written in the director's log; nobody asked, and no station hears it."
         a = self.agent
         question = a.question
         asker = a.question_by
@@ -4186,6 +4202,12 @@ class Harness:
         # leaves)
         a.deck = False
         a.deck_lost, self._deck_was = "", None
+        # which lapsed, for the reseat's line to say (package 67; R-34: a forced reseat
+        # lapsed the captain's grants without telling the player)
+        general = f"the general authority ({a.general_words})" if a.general_words else ""
+        self._lapsed = tuple(g.said() for g in getattr(a, "grants", ()) or ()) + (
+            (general or "the general authority",) if getattr(a, "general", False) else ()
+        )
         a.grants, a.allowances = (), {}
         a.general, a.general_words = False, ""
         self._sync_captain()  # the captain's station released: the rules hold her (40)

@@ -154,6 +154,23 @@ POLL_RECHECK_S = 0.25
 # seldom begun so soon), and is told so, so that it does not send the brief again.
 RECONNECT_S = 300.0
 
+# The handover fold's budget for a door admitted under a director's seat, as a share of its
+# model's context (package 67; the owner's review of the brief, 2026-10-23: two fifths by
+# default, the settings able to name a figure, which the door sends as `budget_tokens`):
+# at the whole context the fold never fired, and a long API seat resent its whole history
+# with every call (the cold review's R-34).
+SEAT_BUDGET_SHARE = 0.4
+
+# A door's words when no reply was to be had because the model's reply was cut off at its
+# limit twice (`api.ApiModel.reply`'s): the conversation is folded after it (package 67;
+# R-34: journals drifted into copied templates after reply-limit cut-offs with no fold).
+CUT_TWICE_WORDS = "was cut off again"
+CUT_FOLD_NOTE = (
+    "(No note: the conversation was folded after two replies were cut off at the reply "
+    "limit, so that the next is not cut off the same way. What you wrote in your journal "
+    "is kept; read_journal reads it.)"
+)
+
 # How a turn opened by the model's own order out of turn is recorded (`door_act` "speak",
 # its `by`; package 66): the stand-by ended at its own word, by an order.
 OWN_ORDER = "its own order"
@@ -300,6 +317,12 @@ class Seat:
     # the real time the door last held a call open for the next turn (package 68,
     # `RECONNECT_S`): a door that comes back soon after is a cut call, not a new chat
     held_at: float = 0.0
+    # the director's seat the door is admitted under (package 67; `world.seats.match`),
+    # its key on the parent World, and the World it is held on; "" for none
+    director_seat: str = ""
+    parent: Any = None
+    # the handover fold's budget the door asked for (`--budget-tokens`), when it did (67)
+    budget_tokens: int | None = None
 
     def bump(self) -> None:
         with self.cond:
@@ -414,16 +437,18 @@ class Desk:
         asked_kind = str(body.get("session_kind") or "play").lower()
         ship = " ".join(str(body.get("ship") or "").split())
         with self.lock:
-            world = self.world()
+            world = parent = self.world()
+            vessel_id = ""
             if ship:
                 # a station on another ship (package 43; spec M6 §20): her own World,
                 # promoted or in the far shape, found by her id or her name
                 from freesail.world.crews import station_world
 
                 try:
-                    _vessel, world = station_world(world, ship)
+                    vessel, world = station_world(world, ship)
                 except ValueError as e:
                     raise DeskError(404, str(e)) from None
+                vessel_id = str(vessel.id)
             name, make = station_factory(world, name)
             if make is None:
                 # the ship has no such station: the binding on the World decides (41)
@@ -432,6 +457,12 @@ class Desk:
                     f"There is no station '{name}' aboard; the stations: "
                     f"{', '.join(stations_aboard(world))}.",
                 )
+            # the desk reads the seat (package 67; spec M7b §2a): a door for a model at a
+            # station the director holds a seat at for that model is admitted under the
+            # seat's budget; any other is admitted as before
+            from freesail.world import seats as seats_mod
+
+            director_seat = seats_mod.match(parent, vessel_id, name, model_name) or ""
             # the kind of session the station is told, from what is true of it (package
             # 42b): a race at the regatta; a captain, of this ship or another, has no human
             # captain at its prompt
@@ -482,6 +513,7 @@ class Desk:
                 raise DeskError(409, decided.why)
             context = body.get("context_tokens")
             reserve = body.get("handover_reserve")
+            budget = body.get("budget_tokens")
             seat = Seat(
                 name,
                 model_name,
@@ -496,6 +528,9 @@ class Desk:
                 cadence=cadence,
                 ship=ship,
                 pictures=bool(body.get("pictures")),
+                director_seat=director_seat,
+                parent=parent,
+                budget_tokens=int(budget) if budget else None,
             )
             ask_again = bool(body.get("ask_again"))
             opted_out = decided.ask_again and not ask_again
@@ -608,17 +643,45 @@ class Desk:
         note = f"{seat.door_note} Consent for these weights is on record ({where}, {record.date})."
         return note.strip()
 
+    def _seat_note(self, seat: Seat) -> str:
+        """The door's note for a station taken under a director's seat (package 67): whose
+        seat, its budget on the owner's key, and that the game stands it down when spent."""
+        from freesail.world.orders import director_seats
+
+        held = director_seats(seat.parent).get(seat.director_seat) if seat.parent else None
+        if not held:
+            return ""
+        return (
+            f" The director seats you here under the owner's grant, for {held['budget']:g} "
+            f"{held['unit']} counted from now, run on the owner's key; when they are spent the "
+            "game stands you down with the reason."
+        )
+
+    def _budget_tokens(self, seat: Seat) -> int | None:
+        """Where the handover fold is counted from: the door's own `--budget-tokens`; for a
+        door under a director's seat, `SEAT_BUDGET_SHARE` of its model's context (package
+        67; the cold review's R-34: at the whole context the fold never fired); else the
+        context, as before."""
+        if seat.budget_tokens:
+            return int(seat.budget_tokens)
+        if seat.director_seat and seat.context_tokens:
+            return int(SEAT_BUDGET_SHARE * seat.context_tokens)
+        return seat.context_tokens
+
     def _take_station(self, seat: Seat, record: consent.Record) -> None:
         world = seat.world
-        note = self._note(seat, record)
+        note = (self._note(seat, record) + self._seat_note(seat)).strip()
         model = RemoteModel(seat.bump)
         existing = world.agents.get(seat.station)
+        samples_at = 0
+        budget = self._budget_tokens(seat)
         if existing is not None and existing.agent.released:
             # a released station taken again (package 37; 37g: by the same identity or by
             # another, a relief): the brief sent again as it stands, the journal kept, the
             # log saying who relieved whom
             seat.base = len(existing.turns)
-            existing.budget_tokens = seat.context_tokens
+            samples_at = int(existing.agent.samples or 0)
+            existing.budget_tokens = budget
             existing.reserve_tokens = seat.reserve_tokens
             existing.reseat(
                 model,
@@ -633,6 +696,7 @@ class Desk:
             # brief sent again as it stands now, and the log says that the door behind
             # it changed
             seat.base = len(existing.turns)
+            samples_at = int(existing.agent.samples or 0)
             existing.model_name = seat.model_name
             existing.door_act("door", seat.model_name, seat.door)
             existing.take_over(model, save=self._saver(seat), door_note=note)
@@ -651,9 +715,17 @@ class Desk:
                 every, events = A_GLASS_S, frozenset({"notable", "urgent"})
                 policy = SamplingPolicy(every, events, lockstep=self.lockstep)
                 policy = cadence_policy("glass", kind, self.lockstep, world=world) or policy
+            if seat.director_seat.startswith("voice/"):
+                # the voice of a person nobody holds (package 67): the passenger's station
+                # bound to him, with his brief
+                from freesail.world.seats import voice_station
+
+                station = voice_station(world, seat.station, policy)
+            else:
+                station = make_station(world, seat.station, policy)
             h = Harness(
                 world,
-                make_station(world, seat.station, policy),
+                station,
                 model,
                 session_kind=seat.session_kind,
                 save=self._saver(seat),
@@ -663,8 +735,8 @@ class Desk:
         h.model_name = seat.model_name
         h.door = seat.door
         h.pictures = seat.pictures
-        if seat.context_tokens:
-            h.budget_tokens = seat.context_tokens
+        if budget:
+            h.budget_tokens = budget
         if seat.reserve_tokens:
             h.reserve_tokens = seat.reserve_tokens
         seat.harness = h
@@ -672,6 +744,19 @@ class Desk:
         seat.phase = STATION
         if not h.started:
             h.start()
+        if seat.director_seat and seat.parent is not None:
+            # admitted under the seat (package 67): its budget counted from here, an input
+            # after the seating so that a replay counts from the same point
+            from freesail.world.seats import admit
+
+            held = admit(seat.parent, seat.director_seat, samples_at)
+            if held is not None:
+                seat.words = (
+                    f"{seat.words} Admitted under the director's seat: "
+                    f"{held['budget']:g} {held['unit']} on the owner's key"
+                    + (f", the handover fold at {budget:,} tokens" if budget else "")
+                    + "."
+                ).strip()
         self.say(f"FreeSail: the {seat.station} is {seat.who}. {seat.words}".strip())
 
     def _attach(self, seat: Seat, door: str, body: dict[str, Any]) -> dict[str, Any]:
@@ -691,6 +776,10 @@ class Desk:
                 h.budget_tokens = seat.context_tokens = int(body["context_tokens"])
             if body.get("handover_reserve"):
                 h.reserve_tokens = seat.reserve_tokens = int(body["handover_reserve"])
+            if body.get("budget_tokens"):
+                seat.budget_tokens = int(body["budget_tokens"])
+            if body.get("context_tokens") or body.get("budget_tokens"):
+                h.budget_tokens = self._budget_tokens(seat)
             h.pictures = seat.pictures = bool(body.get("pictures"))
             h.door_act("door", seat.model_name, door)
             since = len(seat.archive) + len(h.turns) - seat.base
@@ -889,6 +978,13 @@ class Desk:
             was = a.stand_by.words if a.standing_by and a.stand_by is not None else None
             h.door_act("speak", reply.text, "its own word")
             words = "Your words are in the log under your mark"
+            if h.station.name == "director":
+                # the director's words are its log's, never the play log's (package 67;
+                # R-21: "in the log under your mark" sent a note for the captain nowhere)
+                words = (
+                    "Your words are in the director's log, which no station and not the "
+                    "player reads (to the player: 'answer the player: <words>')"
+                )
             if was is not None:
                 words += f", and your stand-by (until {was}) ended at your own word"
             return {"out_of_turn": True, "spoke": True, "words": f"{words}; your turn is open."}
@@ -918,6 +1014,11 @@ class Desk:
         if h.open_sample is None:
             return {"out_of_turn": True, "words": self.no_floor_words(seat)}
         h.door_act("cut_off", words, DOORS[seat.door][1])
+        if CUT_TWICE_WORDS in words and not h.agent.released:
+            # cut off at the reply limit twice (package 67; R-34): the older exchanges
+            # folded away, as the handover note folds them, so that the next reply has room
+            # (the World is untouched: the conversation is the door's and the harness's)
+            h._fold_handover(CUT_FOLD_NOTE)
         return {}
 
     @staticmethod
@@ -1453,6 +1554,7 @@ class GameClient:
         handover_reserve: int | None = None,
         cadence: str = "",
         pictures: bool = False,
+        budget_tokens: int | None = None,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
             "model_name": model_name,
@@ -1472,6 +1574,8 @@ class GameClient:
             body["handover_reserve"] = int(handover_reserve)  # its reserve in tokens (37g)
         if pictures:
             body["pictures"] = True  # the door's model reads an image (package 45c)
+        if budget_tokens:
+            body["budget_tokens"] = int(budget_tokens)  # where the fold is counted (67)
         # the answer carries the turns from where this door starts reading (the start, or
         # the brief sent again when it attaches) and the index to read on from
         self.key = ""

@@ -261,33 +261,27 @@ def _captain(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 
 
 # ---------------------------------------------------------------------------
-# seat and unseat (spec M6 §23; package 43): the director's seat hook
+# seat and unseat (spec M6 §23; packages 43 and 67): the director's seats
 # ---------------------------------------------------------------------------
 
-_SEAT = re.compile(
-    r"^seat:\s*(?P<model>.+?)\s+as\s+captain\s+of\s+(?P<ship>.+?)\s+for\s+"
-    r"(?P<n>[\w-]+)\s+(?P<unit>samples?|hours?)\s*$",
-    re.I,
-)
-_UNSEAT = re.compile(r"^unseat:\s*(?P<ship>[^,:]+?)\s*(?:[,:]\s*(?P<note>.+?))?\s*$", re.I)
-_SEAT_FORM = (
-    "A seat order is 'seat: <the model's exact name> as captain of <ship> for <n> samples' (or "
-    "'<n> hours'); 'unseat: <ship>' stands the seat down, a note after a comma."
-)
+# The form and its reading are `freesail.world.seats`' (package 67 widened it to every
+# station of a ship, the player's own among them, and to the voice of a person).
 
 
 def director_grant(world: Any) -> dict[str, Any]:
     """The owner's grant to the director (spec M6 §23: how many model seats the director
-    may hold at once and in a voyage, and which models), the scenario's `director:` block:
-    {models: [names], seats: n, seats_in_voyage: m}; empty where the owner gave none."""
+    may hold at once and in a voyage, and which models; package 67: whether on the player's
+    own ship, `seats_on_the_players_ship`, true unless he says otherwise), the scenario's
+    `director:` block: {models: [names], seats: n, seats_in_voyage: m}; empty where the
+    owner gave none."""
     sc = getattr(world, "scenario", None)
     grant = getattr(sc, "director", None) or {}
     return dict(grant) if isinstance(grant, dict) else {}
 
 
 def director_seats(world: Any) -> dict[str, dict[str, Any]]:
-    """The seats the director holds now, by the ship's id (kept on the World; a class
-    default for a checkpoint from before)."""
+    """The seats the director holds now, by the seat's key (`seats.seat_key`: the ship's id
+    for her captain; kept on the World; a class default for a checkpoint from before)."""
     seats = getattr(world, "director_seats", None)
     if seats is None:
         seats = {}
@@ -299,106 +293,21 @@ def director_seats(world: Any) -> dict[str, dict[str, Any]]:
 
 
 def _seat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
-    """`seat: <model> as captain of <ship> for <budget>`: refused when no consent record
-    holds a yes for that model (the game's own records), when the owner's grant does not
-    name it or there is none, when the seats at once or in the voyage are spent, when the
-    ship is not on the sea or has no captain of her own; else the seat is held for the
-    director's door (M7b writes the agent): a door that comes for that model and that
-    ship is admitted under the budget, which the game counts and stands down when spent."""
-    from freesail.agents import consent
-    from freesail.orders.numbers import read_all
+    """`seat: <model> as <station or person> [of <ship>] for <budget>[, within <time>]`
+    (`seats.hold`): refused in words without a consent record's yes, the owner's grant or
+    its budget, at a station held or not aboard; else the seat is held, and a door that
+    comes for it under that name is admitted under its budget (`seats.match`)."""
+    from freesail.world import seats
 
-    m = _SEAT.match(body)
-    if m is None:
-        raise WorldOrderError(_SEAT_FORM)
-    model = m.group("model").strip().strip('"')
-    n = read_all(m.group("n"))
-    if n is None or n <= 0:
-        raise WorldOrderError(f"'{m.group('n')}' is no budget; say a number of samples or hours.")
-    unit = "hours" if m.group("unit").lower().startswith("hour") else "samples"
-    records_dir = getattr(world, "consent_records_dir", None) or consent.RECORDS_DIR
-    record = consent.check(model, records_dir)
-    if record is None:
-        raise WorldOrderError(
-            f"No consent is on record for {model}; the consent step comes first, at a door."
-        )
-    if not record.proceeds:
-        raise WorldOrderError(
-            f"The consent record for {model} ({record.date}) is no yes with the drill passed "
-            f"('{record.verdict}'); the director seats no model whose yes does not stand."
-        )
-    grant = director_grant(world)
-    if not grant:
-        raise WorldOrderError(
-            "The owner has granted the director no seats (the scenario's 'director:' block: "
-            "models, seats, seats_in_voyage)."
-        )
-    models = [str(x) for x in (grant.get("models") or [])]
-    if model not in models:
-        raise WorldOrderError(
-            f"The owner's grant does not name {model}; it names "
-            f"{', '.join(models) if models else 'no model'}."
-        )
-    seats = director_seats(world)
-    at_once = int(grant.get("seats", 1) or 0)
-    in_voyage = int(grant.get("seats_in_voyage", at_once) or 0)
-    made = int(getattr(world, "director_seats_made", 0) or 0)
-    if len(seats) >= at_once:
-        raise WorldOrderError(
-            f"The director's seats at once are spent ({at_once}): unseat one first."
-        )
-    if made >= in_voyage:
-        raise WorldOrderError(f"The director's seats in this voyage are spent ({in_voyage}).")
-    from freesail.world.crews import station_world
-
-    try:
-        vessel, _crew = station_world(world, m.group("ship").strip())
-    except ValueError as e:
-        raise WorldOrderError(str(e)) from None
-    if vessel.id in seats:
-        raise WorldOrderError(
-            f"{vessel.name} has a director's seat already ({seats[vessel.id]['model']})."
-        )
-    seats[vessel.id] = {
-        "model": model,
-        "budget": int(n),
-        "unit": unit,
-        "tick": world.clock.tick,
-    }
-    world.director_seats_made = made + 1
-    return (
-        f"the director's seat held for {model} as captain of {vessel.name} for {int(n):g} "
-        f"{unit}; a door that comes for her under that name is admitted, and the game stands "
-        "the seat down when the budget is spent (the director's own door is milestone 7b's)",
-        {"ship": vessel.id, "model": model, "budget": int(n), "unit": unit},
-    )
+    return seats.hold(world, body)
 
 
 def _unseat(world: Any, body: str) -> tuple[str, dict[str, Any]]:
-    """`unseat: <ship>[, <note>]`: the director's seat on her stood down, with his note,
-    the station released and the seat given back to the budget."""
-    m = _UNSEAT.match(body)
-    if m is None:
-        raise WorldOrderError(_SEAT_FORM)
-    vessel = world.vessels.find(m.group("ship").strip())
-    if vessel is None:
-        raise WorldOrderError(f"No ship named {m.group('ship').strip()!r} is on the sea.")
-    seats = director_seats(world)
-    note = " ".join(str(m.group("note") or "").split()) or "the director's word"
-    held = seats.pop(vessel.id, None)
-    crew = getattr(vessel, "crew", None)
-    stood = ""
-    if crew is not None:
-        for h in list(crew.agents.values()):
-            if not h.agent.released:
-                h.stand_down(note, by="the director")
-                stood = f"; {h.model_name or 'the station'} stood down"
-    if held is None and not stood:
-        raise WorldOrderError(f"The director holds no seat on {vessel.name}.")
-    return f"the director's seat on {vessel.name} given up ({note}){stood}", {
-        "ship": vessel.id,
-        "note": note,
-    }
+    """`unseat: <ship>[, <note>]`, or the station or the person as the seat named it
+    (`seats.give_up`): the seat given up, the station released with the director's note."""
+    from freesail.world import seats
+
+    return seats.give_up(world, body)
 
 
 # ---------------------------------------------------------------------------

@@ -61,6 +61,7 @@ from __future__ import annotations
 
 import argparse
 import queue
+import re
 import sys
 import threading
 import time
@@ -224,16 +225,44 @@ def directors_log_asked(line: str) -> bool:
     return " ".join(str(line).lower().split()).rstrip(".?!") in DIRECTORS_LOG_WORDS
 
 
-def director_brief_words(line: str) -> str | None:
-    """The words after `director: brief` (or `director:` alone), or None for any other
-    line; "" for the brief asked for as it stands."""
+_BRIEF_OR_BUDGET = re.compile(r"^(?:brief|budget)\b", re.I)
+
+
+def director_word(line: str) -> str | None:
+    """The player's word to the director, apart from the game (package 67; the cold
+    review's R-21 and R-24): the words after `director:` that are not the brief's (`brief
+    ...`, `budget ...`, or nothing), or None for any other line."""
     text = " ".join(str(line).split())
     if not text.lower().startswith(DIRECTOR_BRIEF_PREFIX):
+        return None
+    rest = text[len(DIRECTOR_BRIEF_PREFIX) :].strip()
+    if not rest or _BRIEF_OR_BUDGET.match(rest):
+        return None
+    return rest
+
+
+def director_brief_words(line: str) -> str | None:
+    """The words after `director: brief` (or `director: budget ...`, or `director:` alone),
+    or None for any other line, the player's word to the director among them
+    (`director_word`); "" for the brief asked for as it stands."""
+    text = " ".join(str(line).split())
+    if not text.lower().startswith(DIRECTOR_BRIEF_PREFIX) or director_word(text) is not None:
         return None
     rest = text[len(DIRECTOR_BRIEF_PREFIX) :].strip()
     if rest.lower().startswith("brief"):
         rest = rest[len("brief") :].strip(" :,")
     return rest
+
+
+def give_director_word(world: World, words: str, by: str = "the player") -> list[str]:
+    """`director: <words>`: the player's word to the director, apart from the game (its log
+    and its next sample, never the play log), and the words for the player."""
+    from freesail.agents import director as director_mod
+
+    try:
+        return [director_mod.player_word(world, words, by=by)]
+    except ValueError as e:
+        return [str(e)]
 
 
 def give_director_brief(world: World, words: str, source: str) -> list[str]:
@@ -442,12 +471,29 @@ class Console:
         needs = getattr(self.world, "needs", None)
         if needs is not None:
             needs.listen(self._on_need)
+        # the channel between the player and the director (package 67): the director's
+        # answer printed as a line of the driver's, never the play log's
+        from freesail.agents import director as director_mod
+
+        director_mod.listen(self.world, self._on_channel)
 
     def _detach(self) -> None:
         self.world.log.unsubscribe(self._on_event)
         needs = getattr(self.world, "needs", None)
         if needs is not None:
             needs.unlisten(self._on_need)
+        from freesail.agents import director as director_mod
+
+        director_mod.unlisten(self.world, self._on_channel)
+
+    def _on_channel(self, line: dict[str, Any]) -> None:
+        """The director's answer to the player, apart from the game (package 67): printed
+        at the prompt as the driver's line, kept in the director's log, never the play
+        log. The player's own word is not printed back."""
+        if line.get("from") == "the director":
+            self._print(
+                f"  {line.get('stamp', '')}  The director, apart from the game: {line['text']}"
+            )
 
     def _on_need(self, e: Event) -> None:
         """A line of the player's own needs (package 54): printed as a line of the log
@@ -591,6 +637,10 @@ class Console:
 
             n = int(args[1]) if len(args) > 1 else None
             for s in director_mod.two_stories(self.world, n):
+                self._print(s)
+        elif director_word(line) is not None:
+            # the player's word to the director, apart from the game (package 67)
+            for s in give_director_word(self.world, director_word(line) or ""):
                 self._print(s)
         elif director_brief_words(line) is not None:
             for s in give_director_brief(self.world, director_brief_words(line), "the player"):

@@ -526,29 +526,15 @@ def _dealing(world: World, vessel: Any) -> bool:
 
 
 def enforce_budgets(world: World) -> None:
-    """The director's seats' budgets (spec M6 §23; `orders._seat`): a station held on a
-    ship under a director's seat is stood down, with the reason, when its samples or its
-    hours are spent, and the seat given back; once a minute."""
-    seats = getattr(world, "director_seats", None) or {}
-    if not seats:
+    """The director's seats' budgets (spec M6 §23; `orders._seat`): a station held under a
+    director's seat is stood down, with the reason, when its samples or its hours are
+    spent, and the seat given back; once a minute. Package 67 widened the seats to every
+    station and to a person's voice, and keeps them in `world.seats.enforce`."""
+    if not (getattr(world, "director_seats", None) or {}):
         return
-    for vessel in list(world.vessels.vessels):
-        seat = seats.get(vessel.id)
-        crew = vessel.crew
-        if seat is None or crew is None:
-            continue
-        for h in list(crew.agents.values()):
-            if h.agent.released or h.model_name != seat.get("model"):
-                continue
-            spent = False
-            if seat.get("unit") == "hours":
-                spent = world.clock.tick - int(seat.get("tick", 0)) >= float(seat["budget"]) * 3600
-            else:
-                spent = int(getattr(h.agent, "samples", 0) or 0) >= int(seat["budget"])
-            if spent:
-                why = f"the director's budget of {seat['budget']:g} {seat['unit']} is spent"
-                h.stand_down(why, by="the director")
-                seats.pop(vessel.id, None)
+    from freesail.world.seats import enforce
+
+    enforce(world)
 
 
 def crewed_settings_of(raw: Any, where: str = "the scenario") -> dict[str, Any]:

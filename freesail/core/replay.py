@@ -255,6 +255,22 @@ def _give(world: World, entry: dict[str, Any]) -> None:
         world.inputs.append(dict(entry))
         set_brief(world, entry["director_brief"], source=str(entry.get("source", "")), quiet=True)
         return
+    if "seat_admitted" in entry:
+        # a door admitted under a director's seat (package 67): its budget counted from the
+        # same point again
+        from freesail.world.seats import admitted_again
+
+        world.inputs.append(dict(entry))
+        admitted_again(world, entry["seat_admitted"])
+        return
+    if "player_word" in entry:
+        # the player's word to the director, apart from the game (package 67): the
+        # director's log and its next sample again, never the play log
+        from freesail.agents.director import player_word
+
+        world.inputs.append(dict(entry))
+        player_word(world, str(entry["player_word"]), by=str(entry.get("by") or ""), quiet=True)
+        return
     if "binding" in entry:
         # a station bound or unbound (package 41), an input since package 42; kept in the
         # replayed world's inputs (package 50: a quiet binding appended none, and a station
