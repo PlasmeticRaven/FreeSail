@@ -434,10 +434,13 @@ def world_order(world: World, station: str, text: str) -> str:
     return director_mod.direct(world, text, by=harness.model_name)
 
 
-def truth(world: World, station: str) -> dict[str, Any]:
+def truth(world: World, station: str, within: Any = None) -> dict[str, Any]:
     """The truth (spec M7b §2; package 50): every ship's true position, heading, sail and
     state, the weather as it is and as the systems will make it, the tide, the people and
-    their states, the markets and the news; the director's alone."""
+    their states, the markets and the news; the director's alone. `within` (package 68;
+    the cold review of 2026-10-22, R-35: seven to twelve thousand tokens a read, most of
+    them far ships): only the ships, and their people, within so many miles of the
+    player's ship, the rest counted."""
     from freesail.agents.agent import DIRECTOR
 
     harness = world.agents.get(station)
@@ -446,7 +449,15 @@ def truth(world: World, station: str) -> dict[str, Any]:
             "refused": f"The {station} does not see the truth: the truth is the director's "
             "(spec M7b §2); a station on a ship reads her readings and her log."
         }
-    return R.director_readings(world)
+    miles: float | None = None
+    if within not in (None, ""):
+        try:
+            miles = float(within)
+        except (TypeError, ValueError):
+            return {"refused": f"within is a number of miles, not {within!r}."}
+        if miles <= 0:
+            return {"refused": "within is a number of miles over nought."}
+    return R.director_readings(world, within_nm=miles)
 
 
 LIBRARY_TOPICS = (
@@ -1396,7 +1407,10 @@ TOOLS: dict[str, Tool] = {
             "once. `until` is an event's words as "
             f"the standing dialect knows them ({STAND_BY_EVENTS}), an interval ('a glass', "
             "'an hour', 'a watch', '5 minutes', 'ten minutes'), 'a notable event' or 'an "
-            "urgent event'. An event the log says is matched on the kind of its line, not "
+            "urgent event', or several of these joined with 'or' ('tacked, or ten minutes, "
+            "or a sail sighted'), any one of which wakes you, the sample naming which. A "
+            "stand_by sent while you stand by for something else replaces that stand-by, and "
+            "its result says so. An event the log says is matched on the kind of its line, not "
             "its words: 'a strain warning' wakes you on every strain line whatever its prose "
             "('working under the press of sail', 'bending like a whip', 'straining at the "
             f"bolt-ropes', 'bar-taut and surging on the pin'). {WEATHER_EVENT_WORDS} What "
@@ -1412,7 +1426,7 @@ TOOLS: dict[str, Tool] = {
             "note and shelving a book do not end it.",
             {
                 "until": "string: the event, the interval, 'a notable event', 'an urgent "
-                "event', or 'asleep below until called'"
+                "event', several joined with 'or', or 'asleep below until called'"
             },
             stand_by,
         ),
@@ -1551,8 +1565,10 @@ TOOLS: dict[str, Tool] = {
             "heading, speed, sail and state with her captain's intent, the weather as it is "
             "at the player's ship and as the systems will make it for the next watch, the "
             "tide, the people aboard every crewed ship and their states, the markets' "
-            "prices and the news. A book: large, and put back with shelve.",
-            {},
+            "prices and the news. A book: large, and put back with shelve. within: only "
+            "the ships within so many miles of the player's ship, and their people (the "
+            "rest counted), a cheaper read.",
+            {"within": "number, optional: the miles from the player's ship"},
             truth,
             needs_authority=True,
             director_only=True,
@@ -1784,6 +1800,9 @@ def book_of(name: str, args: dict[str, Any], result: Any) -> tuple[str, str] | N
         )
     if name == "truth" and isinstance(result, dict) and "refused" not in result:
         # the truth is a book (package 50): the whole world at a moment, put back when read
+        if args.get("within") not in (None, ""):
+            again = f"truth(within={args['within']})"
+            return f"the truth within {args['within']} miles at {result.get('stamp', '')}", again
         return f"the truth at {result.get('stamp', '')}".rstrip(), "truth()"
     if name == "read_journal" and isinstance(result, dict) and "entries" in result:
         # a long read of the journal is a book too (package 37g): the two long games'

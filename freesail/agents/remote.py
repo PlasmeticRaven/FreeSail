@@ -121,6 +121,7 @@ if TYPE_CHECKING:
 __all__ = [
     "DOORS",
     "POLL_RECHECK_S",
+    "RECONNECT_S",
     "ASIDE_TOOLS",
     "READ_ONLY_TOOLS",
     "TURNS_WAIT_MAX_S",
@@ -145,6 +146,13 @@ TURNS_WAIT_MAX_S = 120.0
 # order or the ten real minutes reaches the door within a quarter of a second, and the
 # look is a few list lengths).
 POLL_RECHECK_S = 0.25
+
+# A door that asks again for the station its model held, within this many real seconds of
+# its last call or of its release by the door, is the same conversation come back after a
+# cut call (package 68, R-25; judgement: five minutes, the time a model takes to call
+# again after its client cut the last call and started the bridge afresh; a new chat is
+# seldom begun so soon), and is told so, so that it does not send the brief again.
+RECONNECT_S = 300.0
 
 # How a turn opened by the model's own order out of turn is recorded (`door_act` "speak",
 # its `by`; package 66): the stand-by ended at its own word, by an order.
@@ -289,6 +297,9 @@ class Seat:
     saves: list[str] = field(default_factory=list)
     version: int = 0
     cond: threading.Condition = field(default_factory=threading.Condition)
+    # the real time the door last held a call open for the next turn (package 68,
+    # `RECONNECT_S`): a door that comes back soon after is a cut call, not a new chat
+    held_at: float = 0.0
 
     def bump(self) -> None:
         with self.cond:
@@ -431,6 +442,7 @@ class Desk:
             seat = self.seats.get(key_name)
             if seat is not None and seat.world is not None and seat.world is not world:
                 seat = None  # the game was replaced (the console's replay): a new seat
+            reconnected = _reconnected(seat, model_name)
             if seat is not None and not seat.released:
                 if seat.model_name != model_name:
                     raise DeskError(
@@ -440,7 +452,9 @@ class Desk:
                         f"down the {name}' in the game), and then the same model or another "
                         "may take it.",
                     )
-                return self._attach(seat, door, body)
+                return self._attach(seat, door, body) | (
+                    {"reconnected": True} if reconnected else {}
+                )
             existing = world.agents.get(name)
             if existing is not None and not existing.agent.released:
                 if not isinstance(existing.model, Playback):
@@ -531,7 +545,10 @@ class Desk:
                 self._take_station(seat, record)
             self.seats[key_name] = seat
             self.changed()
-            return self._answer(seat, 0) | {"since": 0, "key": seat.key}
+            answer = self._answer(seat, 0) | {"since": 0, "key": seat.key}
+            if reconnected and seat.phase == STATION:
+                answer["reconnected"] = True
+            return answer
 
     def runtime(self, seat: Seat) -> str:
         """The runtime line of a consent record: the game, the door and its client."""
@@ -723,6 +740,8 @@ class Desk:
         while True:
             with self.lock:
                 seat = self._seat(name, key, ship)
+                if wait > 0:
+                    seat.held_at = time.monotonic()  # a call held open (package 68)
                 stream = seat.stream()
                 n = max(0, min(int(since or 0), len(stream)))
                 now = time.monotonic()
@@ -933,15 +952,23 @@ class Desk:
         now, as a decision from outside the loop recorded for the replay, so that the bell
         or the event it names, falling before the next turn, wakes it and is not skipped
         (package 31c; playtest 11's finding 6: "eight bells" asked at 03:58 woke it at
-        08:00). None when the reply is not that one call, or the model is standing by
-        already (its wait goes on) or paused."""
+        08:00). A stand-by asked while the model stands by for another replaces it, and its
+        result says so (package 68; the cold review of 2026-10-22, R-28: it was "taken in
+        your turn" and dropped, and a plan to tack at two bells ran on to eight). None when
+        the reply is not that one call, the model is paused, or it asks the stand-by it is
+        in already (its wait goes on)."""
         a = h.agent
-        if len(reply.calls) != 1 or reply.text.strip() or a.paused or a.standing_by:
+        if len(reply.calls) != 1 or reply.text.strip() or a.paused:
             return None
         c = reply.calls[0]
         if c.name != "stand_by" or set(c.args) != {"until"}:
             return None
-        result = h.door_act("stand_by", str(c.args.get("until") or ""), "out of turn")
+        until = str(c.args.get("until") or "")
+        if a.standing_by and a.stand_by is not None:
+            read = h._read_stand_by(until)
+            if not isinstance(read, str) and read.words == a.stand_by.words:
+                return None  # the same wait, which goes on
+        result = h.door_act("stand_by", until, "out of turn")
         return {
             "out_of_turn": True,
             "stood_by": a.standing_by,
@@ -1265,6 +1292,21 @@ def not_on_record_words(model_name: str, why: str) -> str:
         f"{model_name} is not seated: {why}. The consent question is put in a game, at the "
         "game's own consent step (docs/agents/Harness.md); then the regatta may run it."
     )
+
+
+def _reconnected(seat: Seat | None, model_name: str) -> bool:
+    """Whether a door asking for a station is the same model's door come back soon after
+    it last held a call open for the next turn (package 68; the cold review of 2026-10-22, R-25: the
+    desktop client cut a held call at sixty seconds and started the bridge again, and each
+    time the model was sent its whole station brief, 32 to 41 thousand characters, in
+    place of the result): within `RECONNECT_S` of real time it is the same conversation,
+    a cut call, and the door is told so (`reconnected`), so that it delivers the turn and
+    not the brief again."""
+    if seat is None or seat.model_name != model_name or seat.phase not in (STATION, STOPPED):
+        return False
+    if seat.harness is None:
+        return False
+    return seat.held_at > 0 and time.monotonic() - seat.held_at <= RECONNECT_S
 
 
 def _new_key() -> str:

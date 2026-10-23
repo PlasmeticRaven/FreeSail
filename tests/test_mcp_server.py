@@ -308,9 +308,11 @@ def test_the_instructions_and_the_door_note_say_what_this_door_is():
     assert "every argument of every tool call" in note and "opt_out" in note
     assert "does not wait for you" in note
     assert "held open until your next turn and returns it, for up to 50 seconds" in note
-    # under the Claude Desktop client's four-minute cut (package 31c, playtest 11)
-    assert M.DEFAULT_WAIT_S == M.MCP_WAIT_S == 200 < 240
-    assert "for up to 200 seconds" in M.door_note(M.DEFAULT_WAIT_S)
+    # under the desktop clients' sixty-second cut (package 68, R-25; 200 under Claude
+    # Desktop's four-minute cut at package 31c, playtest 11)
+    assert M.DEFAULT_WAIT_S == M.MCP_WAIT_S == 50 < 60
+    assert "for up to 50 seconds" in M.door_note(M.DEFAULT_WAIT_S)
+    assert "Never end your reply in the chat while you are seated" in note
     # the ceiling: at most a watch, whatever --wait says
     assert M.WAIT_CEILING_MAX_S == 14400
     assert M.PROGRESS_EVERY_S == 15 and M.WAIT_SLICE_S == 2
@@ -445,6 +447,8 @@ def test_a_say_that_waits_in_vain_returns_the_sentence_and_never_hangs(tmp_path)
     assert lines[1] == "Said, under your mark."
     assert lines[3].startswith("Still waiting: this call waited 0 seconds and no turn opened.")
     assert "The game has had the floor since Morning watch, 8 bells (04:00)" in said
+    # the ship's time now and the owner's clock (package 68, R-27)
+    assert "no turn opened. It is now Morning watch, 8 bells (04:00), the clock at 1x." in said
     assert said.endswith("No notable lines have been logged since then.")
     assert waited < 5
     # stand_by when the floor is the game's and the model is not standing by is a stand-by
@@ -556,6 +560,40 @@ def test_a_bridge_restarted_for_the_same_model_attaches_to_its_station(tmp_path)
     other = session(g.bridge(identity="another-made-up-model"), look)
     assert other.startswith("No station is offered in this session")
     assert "is held by made-up-chat-model" in other and "taken by nobody else" in other
+
+
+def test_a_quick_reconnect_after_a_held_call_is_a_cut_call_and_the_brief_is_not_sent_again(
+    tmp_path,
+):
+    """Package 68 (the cold review of 2026-10-22, R-25): the desktop client cut a held call
+    at sixty seconds and started the bridge afresh; the old bridge released the station on
+    the disconnect, the new one was seated again, and the model was sent its whole station
+    brief in place of the turn. Now a door of the same model that asks again soon after its
+    door held a call open is a cut call: seated again, the brief not sent again (it stays
+    the prompt and the resource), and the turn delivered with the words that say so."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    first = g.bridge(wait=0.3, slice_s=0.1)
+
+    async def stand(c):
+        await c.call_tool("state", {})  # the brief first
+        return text(await c.call_tool("stand_by", {"until": "a glass"}))  # held, in vain
+
+    stood = session(first, stand)
+    assert "Still waiting" in stood
+    first.close()  # the client went away, and the old bridge released the station
+    assert g.harness.agent.released
+    again = g.bridge(wait=0.3, slice_s=0.1)
+
+    async def look(c):
+        return text(await c.call_tool("readings", {}))
+
+    back = session(again, look)
+    assert back.startswith(M.RECONNECTED_WORDS)
+    assert "This is a message from the harness of FreeSail" not in back  # no brief again
+    assert "Your turn is open" in back
+    assert "FreeSail" in again.brief_resource()  # the brief is still the resource
+    assert not g.harness.agent.released
 
 
 def test_a_game_with_an_mcp_watcher_replays_from_its_save_to_the_same_log(tmp_path):
@@ -779,7 +817,8 @@ def test_a_continued_stand_by_shows_since_when_and_the_notable_lines_and_a_say_e
     assert first.startswith(
         "The game has the floor; the next sample follows when your turn opens.\n"
         "Standing by until a glass; you will be sampled then.\n\nStill waiting: this call "
-        "waited 0 seconds and no turn opened. You have been standing by since Morning watch, "
+        "waited 0 seconds and no turn opened. It is now Morning watch, 8 bells (04:00), the "
+        "clock at 1x. You have been standing by since Morning watch, "
         "8 bells (04:00), until a glass"
     )
     assert first.endswith("No notable lines have been logged since then.")
@@ -798,6 +837,43 @@ def test_a_continued_stand_by_shows_since_when_and_the_notable_lines_and_a_say_e
     assert back.startswith("The game has the floor;")
     h = g.harness
     assert h.journal.entries[-1].text == "Ended the stand-by until a glass at my own word."
+    b.close()
+    copy = replay.replay(json.loads(json.dumps(g.world.save())), ship_factory)
+    assert copy.log.digest() == g.world.log.digest()
+
+
+def test_a_stand_by_asked_while_standing_by_for_another_replaces_it_and_says_so(tmp_path):
+    """Package 68 (the cold review of 2026-10-22, R-28: "a stand-by until two bells is
+    taken in your turn", and the old wait ran on to eight bells): a `stand_by` for another
+    thing, sent while the model stands by, replaces the wait and says so in its result and
+    the log; the same wait asked again goes on, read by the new one; the new one wakes it;
+    the game replays to the same log."""
+    g = Game(tmp_path)
+    yes_on_record(tmp_path / "consent")
+    b = g.bridge(wait=0.3, slice_s=0.1)
+
+    async def script(c):
+        await c.call_tool("state", {})
+        out = [text(await c.call_tool("stand_by", {"until": "eight bells"}))]
+        out.append(text(await c.call_tool("stand_by", {"until": "two bells"})))
+        out.append(text(await c.call_tool("stand_by", {"until": "two bells"})))
+        return out
+
+    first, replaced, again = session(b, script)
+    assert "Standing by until eight bells; you will be sampled then." in first
+    assert (
+        "Standing by until two bells, in place of the stand-by until eight bells; you will be "
+        "sampled then. Taken while the game had the floor."
+    ) in replaced
+    assert "taken in your turn" not in replaced
+    assert "You are standing by already, until two bells; this call continues that wait." in again
+    h = g.harness
+    assert h.agent.standing_by and h.agent.stand_by.words == "two bells"
+    assert "[watcher] Standing by until two bells, in place of the stand-by until eight bells." in (
+        g.lines("agent.stood_by")
+    )
+    g.driver.tick(3600)  # two bells of the morning watch come before eight
+    assert not h.agent.standing_by
     b.close()
     copy = replay.replay(json.loads(json.dumps(g.world.save())), ship_factory)
     assert copy.log.digest() == g.world.log.digest()
@@ -999,17 +1075,19 @@ def test_the_command_line_needs_the_model_name(capsys):
 
 
 def test_the_held_call_waits_under_the_desktop_clients_cut_and_wait_overrides_it(capsys):
-    """Playtest 11's finding 2 (package 31c): Claude Desktop cuts a tool call at four real
-    minutes, so the bridge holds one for 200 seconds by default and comes back with the
-    honest digest before the cut; `--wait` still sets it, up to the ceiling."""
+    """Playtest 11's finding 2 (package 31c): Claude Desktop cut a tool call at four real
+    minutes, so the bridge held one for 200 seconds; the desktop and Claude Code clients of
+    the Western Islands run cut at sixty (package 68, R-25), so it holds one for 50 by
+    default and comes back with the honest digest before the cut; `--wait` still sets it,
+    up to the ceiling."""
     game = GameClient("http://testserver")
-    assert M.Bridge(game, WEIGHTS).wait == M.MCP_WAIT_S == 200.0 < 4 * 60
-    assert M.Bridge(game, WEIGHTS, wait=50).wait == 50
+    assert M.Bridge(game, WEIGHTS).wait == M.MCP_WAIT_S == 50.0 < 60
+    assert M.Bridge(game, WEIGHTS, wait=200).wait == 200
     assert M.Bridge(game, WEIGHTS, wait=10**6).wait == M.WAIT_CEILING_MAX_S
     with pytest.raises(SystemExit):
         M.main(["--help"])
     usage = " ".join(capsys.readouterr().out.split())
-    assert "(default 200, under Claude Desktop's four-minute cut;" in usage
+    assert "(default 50, under the desktop clients' sixty-second cut;" in usage
     assert M.still_waiting(None, 200.0).startswith(
         "Still waiting: this call waited 200 seconds and no turn opened."
     )

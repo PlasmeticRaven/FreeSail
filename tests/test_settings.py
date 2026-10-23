@@ -178,7 +178,13 @@ def test_one_entry_per_station_in_the_mcp_json_form():
     e = S.desktop_entry("captain", s, "http://localhost:8001", ship="Palinure", platform="linux")
     assert e["command"] == "python3"
     assert e["args"][e["args"].index("--ship") + 1] == "Palinure"
-    assert e["args"][-1] == PLACEHOLDER
+    assert e["args"][e["args"].index("--model-name") + 1] == PLACEHOLDER
+    # the bridge's wait in every entry, under the desktop clients' sixty-second cut
+    # (package 68, R-25), or the settings' own
+    assert e["args"][-2:] == ["--wait", "50"]
+    s["doors"]["desktop"]["wait"] = 200
+    e = S.desktop_entry("captain", s, "http://localhost:8001", platform="linux")
+    assert e["args"][-2:] == ["--wait", "200"]
 
 
 def test_the_entries_go_into_the_clients_file_beside_its_other_servers(tmp_path):

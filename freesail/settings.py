@@ -395,6 +395,9 @@ def place(settings: Mapping[str, Any], name: str, path: Path | None = None) -> P
 # ---------------------------------------------------------------------------
 
 ENTRY_PREFIX = "freesail-"
+# The bridge's wait in a desktop entry, seconds (`mcp_server.MCP_WAIT_S`, kept here so that
+# the settings need not load the MCP SDK): under the clients' sixty (package 68).
+DESKTOP_WAIT_S = 50.0
 MODEL_NAME_PLACEHOLDER = "SET THE MODEL'S EXACT NAME HERE"
 
 
@@ -423,8 +426,9 @@ def desktop_entry(
     if ship:
         args += ["--ship", ship]
     args += ["--model-name", str(door.get("model_name") or MODEL_NAME_PLACEHOLDER)]
-    if door.get("wait"):
-        args += ["--wait", f"{float(door['wait']):g}"]
+    # the bridge's wait written into every entry, the settings' own or fifty seconds, under
+    # the sixty after which the desktop clients cut a call (package 68, R-25)
+    args += ["--wait", f"{float(door.get('wait') or DESKTOP_WAIT_S):g}"]
     return {
         "command": str(door.get("command") or python_command(platform)),
         "args": args,

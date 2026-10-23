@@ -200,6 +200,42 @@ def test_the_truth_is_the_directors_alone_and_the_other_stations_do_not_see_it_o
     assert "gives no world order" in T.call(w, CAPTAIN, "world_order", {"text": FAR_BRIG})
 
 
+def test_the_truth_says_her_state_shows_the_intent_not_the_placeholder_and_reads_within():
+    """Package 68 (the cold review of 2026-10-22, R-35): the director read "she is NOT
+    aground" from her speed alone, every business ship's goal read "bound for Falmouth",
+    and a read cost seven to twelve thousand tokens, most of them far ships. The player's
+    ship says her state; a ship by her intent shows the intent and no goal; `within` keeps
+    the near ships and their people, and counts the rest."""
+    from tests.test_ground import on_the_falmouth_bank
+
+    w = on_the_falmouth_bank()
+    D.set_brief(w, "quiet-passage", source="the test")
+    put(w, "merchant brig", "britain", "50 05 N 5 00 W", "bound for Falmouth", "", name="Near")
+    put(
+        w,
+        "brig-sloop",
+        "france",
+        "48 00 N 6 00 W",
+        "bound for Falmouth",
+        "keep the station off Ushant within 15 miles",
+        name="Far",
+    )
+    seat_director(w, [Reply()])
+    truth = T.call(w, DIRECTOR, "truth", {})
+    own = truth["ships"][0]
+    assert own["state"].startswith("aground, ") and "; the tide " in own["state"], own["state"]
+    by = {s["name"]: s for s in truth["ships"][1:]}
+    assert "goal" not in by["Far"] and by["Far"]["intent"].startswith("keep the station off")
+    near = T.call(w, DIRECTOR, "truth", {"within": 20})
+    names = [s["name"] for s in near["ships"]]
+    assert names[0] == own["name"] and "Near" in names and "Far" not in names
+    assert near["within"].endswith("; 1 more beyond, not shown")
+    assert "refused" in T.call(w, DIRECTOR, "truth", {"within": "far"})
+    w2 = directed()
+    seat_director(w2, [Reply()])
+    assert T.call(w2, DIRECTOR, "truth", {})["ships"][0]["state"] == "under way"
+
+
 # ---------------------------------------------------------------------------
 # §3: the world orders, doubted not refused; the forms as examples
 # ---------------------------------------------------------------------------
@@ -394,6 +430,41 @@ def test_the_briefs_limits_refuse_outright_with_the_reason_and_the_refusal_is_lo
     assert D.direct(w3, f"{gale} [reason: the test]", by="the test").startswith("Done")
 
 
+# Each starter brief's enemy limit against an enemy of each class (package 68; the cold
+# review of 2026-10-22, R-38: "brig" held none of the ranking's keys, and a French frigate
+# passed four briefs of no enemy heavier than a brig; only "cutter" was tested).
+_CLASSES = {"cutter": 1, "lugger": 1, "brig-sloop": 2, "merchant brig": 2, "frigate": 3}
+
+
+@pytest.mark.parametrize(
+    "brief,heaviest",
+    [
+        ("quiet-passage", 1),
+        ("chase", 2),
+        ("interesting-passage", 2),
+        ("dispatches", 2),
+        ("hard-cruise", 3),
+    ],
+)
+def test_each_starter_briefs_enemy_limit_refuses_a_heavier_enemy_and_passes_its_own(
+    brief: str, heaviest: int
+):
+    from freesail.world.captains import size_rank_of
+
+    limit = D.resolve_brief(brief).limits["enemy_heaviest"]
+    assert size_rank_of(limit) == heaviest
+    for desc, rank in _CLASSES.items():
+        w = directed(brief, systems=[], climatology=True)
+        order = f'ship: a {desc} "Harpy" of France at 49 00 N 6 20 W, running home to Brest'
+        said = D.direct(w, order, by="the test")
+        if rank > heaviest:
+            assert said.startswith("Refused, outside the brief"), (desc, said)
+            assert f"no enemy heavier than a {limit}" in said
+            assert w.vessels.find("Harpy") is None
+        else:
+            assert not said.startswith("Refused"), (desc, said)
+
+
 # ---------------------------------------------------------------------------
 # §5: sampling, the budget and the clock
 # ---------------------------------------------------------------------------
@@ -452,6 +523,66 @@ def test_the_budget_of_samples_holds_the_director_and_the_cadence_is_the_briefs(
 
     assert cadence_policy("glass", DIRECTOR, world=w2).every_s == 4 * 3600
     assert cadence_policy("glass", DIRECTOR, world=w).every_s == 1800
+
+
+def test_the_directors_own_lines_wake_it_not_and_every_other_station_meets_them():
+    """Package 68 (the cold review of 2026-10-22, R-61: 42% of a day's samples were the
+    director's own `say as` and `aboard` lines echoing back): the lines its own world order
+    writes open no sample of the director's, nor are they folded into its turn; the
+    captain meets them as before."""
+    w = directed()
+    ch = seat_captain(w)
+    script = [
+        reply("", call("world_order", text='say as the boatswain: "A cask stove, sir."')),
+        Reply(),
+        reply("", call("world_order", text='say as the cook: "The cask is stove, sir."')),
+        Reply(),
+    ]
+    dh = seat_director(w, Fake(script, loop=True))
+    w.run(3 * EVERY)
+    # each sample's say as echoed back and opened the next, every tick, before
+    assert len([e for e in w.log if e.kind == "person.spoke"]) < 20
+    reasons = json.dumps([t.content.get("reason") for t in dh.turns if t.role == "data"])
+    folds = json.dumps(
+        [t.content for t in dh.turns if t.role == "data" and t.content.get("folded")]
+    )
+    assert "cask" not in reasons and "cask" not in folds, reasons
+    seen = json.dumps([t.content for t in ch.turns if t.role == "data"])
+    assert "cask" in seen  # the captain met the effects
+
+
+def test_the_budget_is_set_in_play_a_new_brief_lifts_the_hold_and_words_keep_the_limits():
+    """Package 68 (R-61): `director: budget <n> samples, <m> acts` sets the day's budget in
+    play, an input replayed; a brief whose budget the day's counts are within lifts a hold
+    the old one made; `director: brief <words>` changes the tone and keeps the limits, the
+    cadence and the budget it does not name; a starter's name is a brief whole."""
+    from freesail.ui.console import director_brief_words, give_director_brief
+
+    w = directed({"name": "few samples", "budget": {"samples_a_day": 2, "acts_a_day": 9}})
+    h = seat_director(w, [Reply()])
+    w.run(4 * EVERY)
+    assert h.agent.samples == 2 and D.budget_of(w).held_until is not None
+    said = give_director_brief(w, director_brief_words("director: budget 60 samples, 10 acts"), "p")
+    assert said[0].startswith("The director's budget is set (p): 60 samples and 10 acts a day")
+    assert D.brief_of(w).name == "few samples" and D.budget_of(w).held_until is None
+    assert any("The hold is lifted by the new brief: 2 of 60 samples" in t for t in log_texts(w))
+    w.run(EVERY)
+    assert h.agent.samples == 3  # sampled again the same day
+    bad = give_director_brief(w, director_brief_words("director: budget plenty"), "p")
+    assert bad[0].startswith("The budget was not taken: A budget says its samples or its acts")
+    # words keep the limits; a starter is whole
+    w2 = directed("quiet-passage", systems=[], climatology=True)
+    give_director_brief(w2, "a quieter passage still, the fog the only foe", "p")
+    b = D.brief_of(w2)
+    assert b.tone.startswith("a quieter passage still") and b.limits["enemy_heaviest"] == "cutter"
+    assert (
+        b.limits.get("nobody_dies")
+        and b.samples_a_day == D.resolve_brief("quiet-passage").samples_a_day
+    )
+    give_director_brief(w2, "chase", "p")
+    assert D.brief_of(w2).limits["enemy_heaviest"] == "brig"
+    copy = replay.replay(json.loads(json.dumps(w2.save())), ship_factory)
+    assert D.brief_of(copy).to_dict() == D.brief_of(w2).to_dict()
 
 
 # ---------------------------------------------------------------------------
@@ -662,6 +793,29 @@ def test_the_browser_answers_the_same_requests_and_its_log_carries_nothing_of_th
         assert 'id="director-panel"' in page and "director's log" in page
         js = http.get("/client/app.js").text
         assert "query.director_log" in js and "openDirectorLog" in js
+
+
+def test_ease_on_station_never_eases_for_the_director_and_no_refusal_names_it():
+    """Package 68 (the cold review of 2026-10-22, R-20; spec M7b §6): with
+    `--ease-on-station`, "Compression eased to 1x: the director is sampled" reached the
+    officer's samples six times, and the standing order's refusal listed the director among
+    the stations a standing order may tell. The director's samples ease nothing and write
+    no line; the refusal names the stations aboard and never the director."""
+    pytest.importorskip("fastapi")
+    from freesail.ui.server import Driver
+
+    w = directed()
+    h = seat_director(w, ["Nothing yet."])
+    driver = Driver(w, compression=60.0, ease_on_station=True)
+    driver.running = True
+    driver._run_ticks(2 * EVERY + 10)
+    assert h.agent.samples >= 2
+    assert driver.compression == 60.0
+    assert not [e for e in w.log.all() if e.kind == "driver.eased"]
+    assert not [e for e in w.log.all() if "director" in e.text and not for_the_record(e)]
+    e = w.submit("standing order 'sea': when the glass is falling fast then tell the director so")
+    assert e.kind == "order.rejected" and "the director is above the game" in e.text, e.text
+    assert "the director" not in e.text.split("; a standing order may tell or ask ", 1)[1]
 
 
 def test_a_door_seats_a_model_as_the_director_with_the_directors_brief_and_tools(tmp_path):

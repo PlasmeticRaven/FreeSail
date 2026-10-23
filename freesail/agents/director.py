@@ -62,7 +62,9 @@ rules answer as they did.
 
 from __future__ import annotations
 
+import dataclasses
 import functools
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -370,8 +372,10 @@ def _peak_wind_kn(world: Any, body: str) -> float | None:
 
 
 def _enemy_heavier(world: Any, body: str, heaviest: str) -> str | None:
-    """Why a `ship:` order puts an enemy heavier than the brief allows, or None."""
-    from freesail.world.captains import SIZE_RANK
+    """Why a `ship:` order puts an enemy heavier than the brief allows, or None. The
+    description and the limit are ranked by the same words (`captains.size_rank_of`,
+    the tops' ranking of a sail; package 68, R-38)."""
+    from freesail.world.captains import size_rank_of
 
     m = world_orders._SHIP_NEW.match(body)
     if m is None:
@@ -383,15 +387,12 @@ def _enemy_heavier(world: Any, body: str, heaviest: str) -> str | None:
         return None
     desc = " ".join(m.group("desc").lower().split())
     desc = desc.removeprefix("a ").removeprefix("an ").removeprefix("the ")
-    key = next((k for k in SIZE_RANK if k in desc), None)
-    if key is None:
+    rank, limit = size_rank_of(desc), size_rank_of(heaviest)
+    if rank is None or limit is None:
         return None
-    limit = next((k for k in SIZE_RANK if k in heaviest.lower()), None)
-    if limit is None:
-        return None
-    if SIZE_RANK[key] > SIZE_RANK[limit]:
+    if rank > limit:
         return (
-            f"the brief allows no enemy heavier than a {heaviest}, and a {key} of "
+            f"the brief allows no enemy heavier than a {heaviest}, and a {desc} of "
             f"{nation.name} is heavier"
         )
     return None
@@ -466,7 +467,70 @@ def set_brief(
             f"The player's brief was given anew by {source}: {resolved.name}. Its limits: "
             f"{resolved.limits_words()}. The station brief says it whole at your next brief."
         )
+    _lift_hold(world, resolved)
     return resolved
+
+
+def _lift_hold(world: Any, brief: DirectorBrief) -> None:
+    """A hold for a spent budget judged again against a new brief's budget (package 68;
+    the cold review of 2026-10-22, R-61: the owner's brief of 9999 samples left the
+    director held until midnight, the hold judged only when the day turned): lifted when
+    the day's counts are within the new budget, and the log says so."""
+    b = budget_of(world)
+    if b.held_until is None:
+        return
+    if b.samples < brief.samples_a_day and b.acts < brief.acts_a_day:
+        b.held_until, b.held_why = None, ""
+        log_of(world).append(
+            world,
+            f"The hold is lifted by the new brief: {b.samples} of {brief.samples_a_day} "
+            f"samples and {b.acts} of {brief.acts_a_day} acts used today.",
+            kind="director.budget",
+        )
+
+
+# `director: budget <n> samples, <m> acts` (package 68, R-61): the day's budget changed in
+# play, the brief's limits and tone kept.
+_BUDGET_SAMPLES = re.compile(r"(\d+)\s*samples?\b", re.I)
+_BUDGET_ACTS = re.compile(r"(\d+)\s*acts?\b", re.I)
+
+
+def set_budget(world: Any, words: str, source: str = "the player") -> DirectorBrief:
+    """`director: budget 60 samples, 10 acts` (package 68; the cold review of 2026-10-22,
+    R-61: there was no way to change the budget in play, and `director: brief <words>`
+    dropped the limits): the brief as it stands with its budget changed, given as a brief
+    (an input, replayed), so that a hold the old budget made is judged again. Either
+    figure may be said alone; ValueError in words for neither."""
+    s = _BUDGET_SAMPLES.search(str(words))
+    a = _BUDGET_ACTS.search(str(words))
+    if s is None and a is None:
+        raise ValueError(
+            "A budget says its samples or its acts a day: 'director: budget 60 samples, 10 acts'."
+        )
+    brief = brief_of(world)
+    d = brief.to_dict() if brief is not None else DirectorBrief(name="the owner's").to_dict()
+    budget = dict(d.get("budget") or {})
+    if s is not None:
+        budget["samples_a_day"] = max(1, int(s.group(1)))
+    if a is not None:
+        budget["acts_a_day"] = max(0, int(a.group(1)))
+    d["budget"] = budget
+    d["source"] = source
+    return set_brief(world, d, source=source)
+
+
+def brief_in_words(world: Any, words: str, source: str = "the player") -> DirectorBrief:
+    """`director: brief <words>` (package 68, R-61): words that name no starter and no
+    file change the brief's tone and name and keep what the words do not name, its limits
+    (nobody dies, the enemy's weight, the war as it is), its cadence, its budget and its
+    examples; a starter's name or a file is a brief whole, as before."""
+    resolved = resolve_brief(words, source=source)
+    brief = brief_of(world)
+    if brief is None or resolved.limits or resolved.tone != " ".join(str(words).split()):
+        return set_brief(world, resolved, source=source)
+    d = brief.to_dict()
+    d.update(name=resolved.name, tone=resolved.tone, challenge="", source=source)
+    return set_brief(world, d, source=source)
 
 
 # ---------------------------------------------------------------------------
@@ -962,7 +1026,18 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
                 by=by,
             )
             return f"Refused, outside the brief: {why}. The limits are the player's own."
+    # the form checked before the doubt (package 68; the cold review of 2026-10-22, R-41):
+    # a malformed order is answered honestly in words, never "doubted" alone, so that a
+    # doubted order is one that can be performed when entered again
+    malformed = world_orders.form_error(world, order)
+    if malformed:
+        return _no_way(world, order.text, order.reason, malformed, by)
     doubted = world_orders.doubt(world, order)
+    if doubted and order.reason and not _doubt_shown(world, order.text):
+        # a reason given on the first entry answers no doubt the director has seen (R-41: a
+        # man carried nine miles ashore in a minute): the doubt is shown, and the order is
+        # entered again with its reason once it is read
+        order = dataclasses.replace(order, reason="")
     if doubted and not order.reason:
         log.append(
             world,
@@ -1004,6 +1079,15 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         f"Done: {done} The play log will carry its effects as they are met, never the "
         f"order. ({cost}{left} {'act' if left == 1 else 'acts'} of the day's {acts_allowed} "
         f"left.){tail}"
+    )
+
+
+def _doubt_shown(world: Any, text: str) -> bool:
+    """Whether this order, as said, was doubted to the director before (its log's
+    `director.doubted` entry): the doubt shown, the reason may answer it (package 68)."""
+    head = f"Doubted: {text} ("
+    return any(
+        e.kind == "director.doubted" and e.text.startswith(head) for e in log_of(world).entries
     )
 
 

@@ -638,6 +638,9 @@ class Harness:
     _nudge_text: str | None = None
     _nudge_unread = False
     _danger_orders: tuple[tuple[int, str], ...] = ()
+    # The spans of the log (from, to) the director's own world orders wrote, which wake it
+    # not (package 68, R-61); a class default, as every attribute of a checkpointed class
+    _own_lines: tuple[tuple[int, int], ...] = ()
     # The deck of a paused or silent officer (item 7): the stamp and the tick he had it
     # since, kept so that `resume` gives it back as it was held.
     _deck_was: tuple[int | None, str] | None = None
@@ -1211,8 +1214,11 @@ class Harness:
             world.log[i]
             for i in range(max(self._seen_log, self._sample_seen), len(world.log))
             if not for_the_record(world.log[i])  # decision 46: a world order is not seen
+            and not self._own_echo(i)  # nor the director's own act echoing back (68)
         ]
         self._seen_log = len(world.log)
+        if self._own_lines:
+            self._own_lines = tuple(s for s in self._own_lines if s[1] > self._seen_log)
         if self._open is not None:
             # the floor is the model's: a sampling point folds into the open sample
             self._while_open(new)
@@ -1240,6 +1246,11 @@ class Harness:
         reason = self._policy_due(new)
         if reason is not None:
             self._sample(reason)
+
+    def _own_echo(self, i: int) -> bool:
+        """Whether the log's line at `i` was written by this director's own world order
+        (`_own_lines`, package 68)."""
+        return any(start <= i < end for start, end in self._own_lines)
 
     def _while_open(self, new: list[Event]) -> None:
         """A tick while the floor is the model's (a door that answers late): a sampling
@@ -1590,7 +1601,13 @@ class Harness:
             return None
         start, stamp = self._wait_from
         lines = self._notable_since(start)
+        world = self.world
         return {
+            # the ship's time now and the owner's clock (package 68; the cold review of
+            # 2026-10-22, R-27: under compression a model could not tell how stale its
+            # picture was, nor a stopped clock from a quiet one)
+            "now": world.clock.stamp(),
+            "clock": float(getattr(world, "compression", 1.0) or 1.0),
             "since": stamp,
             "until": a.stand_by.words if a.standing_by and a.stand_by is not None else None,
             "standing_by": a.standing_by,
@@ -2162,6 +2179,11 @@ class Harness:
             # in the world is the repeat detector's, as the ship's orders are
             self._note_submission(str(c.args.get("text", "")))
         result = tools.call(self.world, self.station.name, c.name, c.args)
+        if c.name == "world_order" and self._is_directors and len(self.world.log) > before:
+            # the lines its own act wrote (a `say as`, a thing found aboard, a ship put on
+            # the sea) wake it not (package 68, R-61: 42% of a day's budget was spent on
+            # its own lines echoing back); every station else meets them as before
+            self._own_lines = (*self._own_lines, (before, len(self.world.log)))
         if (
             c.name in tools.PICTURE_TOOLS
             and isinstance(result, dict)
@@ -3618,16 +3640,19 @@ class Harness:
             if all(p.event != EIGHT_BELLS for p in sb.parts):
                 sb = dataclasses.replace(sb, bound=EIGHT_BELLS)
         # taken while the game has the floor (a door's call out of turn, package 31c): the
-        # wait the model is in goes on as a stand-by, its digest from the wait's start
+        # wait the model is in goes on as a stand-by, its digest from the wait's start; a
+        # stand-by it is in already is replaced, and the line says which (package 68, R-28)
         out_of_turn = self._open is None
+        was = a.stand_by.words if a.standing_by and a.stand_by is not None else None
+        replaced = f", in place of the stand-by until {was}" if was and was != words else ""
         a.state = STANDING_BY
         a.stand_by = sb
         a.last_heard_tick = world.clock.tick
-        line = f"{self.mark} Standing by until {words}."
+        line = f"{self.mark} Standing by until {words}{replaced}."
         if a.has_deck:
             line = (
-                f"{self.mark} The {self.station.name} stands by until {words}; the standing "
-                "orders hold the deck."
+                f"{self.mark} The {self.station.name} stands by until {words}{replaced}; the "
+                "standing orders hold the deck."
             )
         world.record(Severity.ROUTINE, "agent.stood_by", line, actor=self.actor, data=sb.to_dict())
         if not out_of_turn:
@@ -3651,7 +3676,7 @@ class Harness:
         # then it is delivered at once, at the next tick, not skipped to the next of it
         self._stand_by_watch = None
         self._stand_by_due = self._in_flight(sb, out_of_turn)
-        return f"Standing by until {words}; you will be sampled then."
+        return f"Standing by until {words}{replaced}; you will be sampled then."
 
     # -- the needs (package 54; spec M7b §20) -------------------------------------------
 
