@@ -54,6 +54,17 @@ standing order "shorten sail for weather": when the true wind exceeds 30 knots f
 # apparent she is pinching, and a point off brings her back to a good full.
 standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
 
+# Getting under way: the course is given when she gathers way, not when the anchor breaks
+# out (package 58b, from the lead's playtest of the second wave: the Éclair's standing
+# order `at the anchor aweigh then steer E` put her helm over the moment the anchor was
+# aweigh, before the jib and the helm had cast her, and her head fell off to the south with
+# the land a cable on the bow). The ship holds a course given after weighing while she
+# casts and until she has a knot of way through the water with her sails drawing, and
+# steers it then, saying so ("She has gathered way, ... knots, her sails drawing: E is
+# steered"), so that `at the anchor aweigh then steer E` and `get under way on the
+# starboard tack and steer E` both give it at the right time. Where she is bound is the
+# captain's word, so this book gives no course of its own.
+
 # Trimming on a shift. The yards are trimmed to the wind as it shifts: Luce's table of the
 # best angle of the yard with the keel is given point by point of the wind (Luce 1866,
 # ch. XXIV, 'To Trim Yards'), so a point is the shift a trim answers. The order stands

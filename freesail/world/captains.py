@@ -279,6 +279,30 @@ LEE_RAY_NM = 12.0
 # depth given, two fathoms over it.
 ANCHORAGE_FATHOMS = 12
 
+# A leg re-laid as the stream changes (package 58b, item 1; the Éclair's first cruise: the
+# leg laid on the flood was held through the ebb into the eastern narrows of the channel of
+# Bas, and off Fréhel the way laid with the flood allowed at a knot and a half to the
+# north-east was held while it eased to half a knot, which "would have closed Fréhel in the
+# middle watch"). A course shaped allows the stream the master allows at that hour and no
+# other (`Navigation.shape_for`: "worked once, when the course is shaped"), so the captain
+# lays the leg again when the master's tide turns or she passes by his account into other
+# waters (his `reckoning.tide` line), and when the stream he allows now would carry her off
+# the line by more than `RELAY_OFF_LINE_NM` in the next glass beyond what the course laid
+# allowed for; on passage and running for shelter (beating, his book shapes every glass),
+# never twice within `RELAY_LEAST_S`. Judgement: a cable, the berth a pilot water's mark
+# is passed within; a glass, his book's own interval.
+RELAY_OFF_LINE_NM = 0.1
+RELAY_GLASS_H = 0.5
+RELAY_LEAST_S = 1800  # a glass between layings for the stream's change
+RELAY_TURN_LEAST_S = 600  # ten minutes for the tide's turn (a course shaped at the turn holds)
+
+# The book's close-hauled band under reefs (package 58b, item 5; `Captain._good_full`): a
+# ship kept full and by in a blow is steered this many points freer than her close-hauled
+# angle by compass. Judgement: half a point, the margin the pilot keeps her full and by with
+# (`ports.PILOT_LIE_MARGIN_RAD`); at it the gale trial's frigate made four knots where the
+# helm's mark held her at forty degrees of apparent wind with a knot or two.
+GOOD_FULL_POINTS = 0.5
+
 
 def actor_for(state: str) -> str:
     return f"{ACTOR_PREFIX}'{state}'"
@@ -1260,6 +1284,12 @@ class Perception:
     # package 43: her own class and each stranger's (`SIZE_RANK`), for a cruiser's judgement
     # of a superior force; the port she lies off, for a far-detail body
     own_size: int = 0
+    # package 58b: the tide the master allows in the reckoning now (`the reckoning`'s own
+    # words and figures: whose, the knots, where it sets, the flood or the ebb, the water)
+    tide_allowed: dict[str, Any] = field(default_factory=dict)
+    # package 58b: the depth of water by the chart at the account, in fathoms (None off the
+    # chart or on the land)
+    chart_fathoms: float | None = None
 
     @classmethod
     def read(cls, world: Any) -> Perception:
@@ -1342,6 +1372,12 @@ class Perception:
         pilot = view.value("pilot")
         p.pilot_aboard = isinstance(pilot, dict) and bool(pilot.get("name"))
         p.pilot_conn = isinstance(pilot, dict) and bool(pilot.get("conn"))
+        reckoning = view.value("reckoning")
+        if isinstance(reckoning, dict) and isinstance(reckoning.get("tide"), dict):
+            p.tide_allowed = dict(reckoning["tide"])
+        charted = view.value("depth_of_water")
+        if charted is not None:
+            p.chart_fathoms = units.m_to_fathoms(float(charted))
         # the sails by the readings (package 45): the head sails set, blown out or bent
         # and furled, the topsails' reefs, the storm staysails
         ship = world.ship
@@ -2275,8 +2311,27 @@ class Captain(Judgement):
             # storm staysail"), where heaving to with the main topsail aback took the
             # frigate astern at five knots and failed in the trials
             self.give("shorten sail")
+            if self._lugger_storm_lug():
+                # package 58b (item 5): a lugger has no topsail to lie a-try under; she lies
+                # to under her own storm canvas, the taille-vent in the main lug's place
+                # (Forfait 1788 p. 52: tacked at the foot of the mast, "safe aback"), the
+                # fore lug lowered, the mizen flat aft and the jib to windward
+                self.give("shift the mainsail for the taille-vent", why="to lie to in a gale")
+                self.give("heave to", why="under the taille-vent and the mizen")
+                return
             self.give("lie a-try")
             return
+        sailing_states = ("on passage", "beating", "running for shelter")
+        if old == "hove to for weather" and state in sailing_states:
+            # package 58b (item 5; 57's gale trial): filled away from lying to with the wind
+            # still over his shorten-sail line (the gale over by the glass, or the land under
+            # her lee) she was left under the storm canvas alone, had no way, lay aback every
+            # three minutes and drove onto the islands; she makes sail to go through the
+            # water, the topsails set as they stand close-reefed ("Keep her a good full!",
+            # Luce 1884, ch. XXIV, p. 414; ch. XXIX), before the sail after the gale by steps
+            why = self._sail_to_fill_away()
+            if why:
+                self.give("set the topsails", why=why)
         lying_to = False
         if old == "at anchor" and state in ("on passage", "beating", "running for shelter"):
             # the at-anchor book's "at under way then set plain sail" is unloaded here,
@@ -2337,7 +2392,13 @@ class Captain(Judgement):
             if self.legs and self.leg_i < len(self.legs) and self.legs[self.leg_i].kind != "out":
                 self._shape_leg(why="filled away")
         self._weather_work(p, kinds)
+        if state not in ("at anchor", "in port", "in distress"):
+            self._head_sails_straining(p, events)
+        if state in ("on passage", "beating", "running for shelter", "keeping station"):
+            self._good_full(p, events)
         if state in ("on passage", "beating", "running for shelter"):
+            if self._casts(p, kinds):
+                return  # brought to for the deep-sea lead: the leg waits for the cast
             self._passage(p, events, kinds)
         elif state == "in port":
             self._in_port(p)
@@ -2351,10 +2412,190 @@ class Captain(Judgement):
         elif state == "at anchor":
             if "ship.under_way" in kinds or "ship.weighed" in kinds:
                 self._waiting_at_road = False
+        if "sail.across_the_stern" in kinds and state not in ("hove to for weather", "in distress"):
+            self._across_the_stern(events)
         if "ship.brought_up" in kinds:
             self._business["brought_up"] = True
         if "ship.under_way" in kinds or "ship.aweigh" in kinds:
             self._business.pop("brought_up", None)
+
+    def _lugger_storm_lug(self) -> bool:
+        """A lugger with her storm lug in the sail room or bent (package 58b, item 5): no
+        topsail to lie a-try under, and the taille-vent for a blow."""
+        ship = self.world.ship
+        sails = getattr(ship, "sails", {}) or {}
+        try:
+            from freesail.evolutions.scripts import _lugs_all
+        except ImportError:  # pragma: no cover
+            return False
+        return bool(_lugs_all(ship)) and "taille_vent" in sails
+
+    def _sail_to_fill_away(self) -> str:
+        """Why she makes sail as she fills away from lying to (package 58b, item 5), or "":
+        the wind still over `shorten_sail_kn` and a topsail not set, she would have no way
+        under the storm canvas alone; the land under her lee says it is to claw off."""
+        p = Perception.read(self.world)
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        if p.wind_kn < float(th("shorten_sail_kn", 30)) or p.topsails_all_set:
+            return ""
+        if self._stimulus("lee shore", p):
+            return "to claw off the land under her lee"
+        return "to give her way, the wind still strong"
+
+    def _good_full(self, p: Perception, events: list[Any]) -> None:
+        """The book's close-hauled band widened under reefs (package 58b, item 5; 57's gale
+        trial): kept full and by under close-reefed topsails in a gale, the helm's mark held
+        her at forty degrees of apparent wind with a knot or two of way, aback every three
+        minutes, and neither stays nor wears would bring her round; steered at sixty she
+        made four knots. So in a wind over `shorten_sail_kn`, or with two reefs and more in
+        the topsails, a ship left full and by on a course not laid (by his shaping, his
+        book's, a tack's or a wear's end) is steered `GOOD_FULL_POINTS` freer than her
+        close-hauled angle on the tack she is on, by compass: "Keep her a good full!" (Luce
+        1884, ch. XXIV, p. 414). Not while a manoeuvre is in hand."""
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        heavy = p.wind_kn >= float(th("shorten_sail_kn", 30)) or p.topsail_reefs >= 2
+        if not heavy or p.wind_from_deg is None or p.heading_deg is None:
+            return
+        if p.manoeuvre and p.manoeuvre != "none":
+            return
+        full = False
+        for e in events:
+            data = e.data or {}
+            if e.kind == "helm.set":
+                full = bool(data.get("course_not_laid"))
+            elif e.kind == "helm.order" and data.get("helm_mode"):
+                full = data.get("helm_mode") == "full_and_by"
+            elif e.kind in ("ship.wore", "ship.tacked", "ship.filled_away"):
+                full = "full and by" in e.text
+        if not full:
+            return
+        from freesail.evolutions.scripts import close_hauled_true_angle
+
+        closest = units.rad_to_deg(close_hauled_true_angle(self.world.ship))
+        off = (p.heading_deg - p.wind_from_deg + 180.0) % 360.0 - 180.0
+        sign = 1.0 if off >= 0.0 else -1.0
+        course = (p.wind_from_deg + sign * (closest + GOOD_FULL_POINTS * 11.25)) % 360.0
+        self.give(f"steer {course:.0f}", why="a good full, her canvas reefed in a blow")
+
+    def _head_sails_straining(self, p: Perception, events: list[Any]) -> None:
+        """A head sail straining at its bolt-ropes in a wind over `shorten_sail_kn` is taken
+        in before it blows out (package 58b, item 5; 57's gale trial: the fore topmast
+        staysail strained at 08:16 and at 08:26 and split at 08:29, the jib hauled down and
+        it left standing). The storm staysails are the book's storm canvas, and stand."""
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        if p.wind_kn < float(th("shorten_sail_kn", 30)):
+            return
+        ship = self.world.ship
+        try:
+            from freesail.evolutions.scripts import head_sails
+        except ImportError:  # pragma: no cover
+            return
+        groups = getattr(ship, "groups", {}) or {}
+        storm = set(groups.get("storm staysails", [])) | set(groups.get("storm canvas", []))
+        heads = {sl.id for sl in head_sails(ship)} - storm
+        done = self._business.setdefault("head_sails_in", {})
+        for e in events:
+            sid = getattr(e, "subject", None)
+            if e.kind != "strain.warning" or sid not in heads or "bolt-ropes" not in e.text:
+                continue
+            if p.tick - int(done.get(sid, -(10**9))) < 600:
+                continue
+            done[sid] = p.tick
+            self.give(f"take in the {self._sail_name(sid)}", why="straining at the bolt-ropes")
+
+    def _casts(self, p: Perception, kinds: set[str]) -> bool:
+        """The lead on a long leg (package 58b, item 2): the hand lead every glass where the
+        chart has under `cast_glass_fathoms` at the account, the deep-sea lead every hour in
+        deeper water within `cast_hour_fathoms`; for the deep-sea lead she is brought to
+        when her way is over the four knots it wants (Falconer 1780, 'Sounding': "it is
+        usual previously to bring-to the ship"), only in a wind under `shorten_sail_kn`, and
+        filled away when the cast is had. Not in pilot water (its own lead goes), with the
+        pilot aboard, at anchor or lying to. True while she is brought to for a cast, so
+        that the leg is not shaped against the heave-to."""
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        b = self._business
+        brought = b.get("cast_brought_to")
+        if brought is not None:
+            if "sounding" in kinds or p.tick - int(brought) >= 900:
+                # the cast had (or a quarter of an hour gone without one): filled away
+                b.pop("cast_brought_to", None)
+                b.pop("cast_given", None)
+                if p.manoeuvre in ("hove to", "heaving to"):
+                    self.give("fill away", why="the cast had")
+                return False
+            if p.manoeuvre == "hove to" and p.speed_kn < 3.0 and not b.get("cast_given"):
+                b["cast_given"] = True
+                self.give("heave the deep-sea lead", why="brought to for a cast")
+            return True
+        if p.chart_fathoms is None or self._inner_leg() or p.pilot_aboard:
+            return False
+        if p.anchor_down or p.aground or p.manoeuvre in ("hove to", "heaving to"):
+            return False
+        last = int(b.get("cast_tick", -(10**9)))
+        if p.chart_fathoms < float(th("cast_glass_fathoms", 20)):
+            if p.tick - last >= 1800:
+                b["cast_tick"] = p.tick
+                self.give("heave the lead", why="in soundings on the leg")
+            return False
+        if p.chart_fathoms >= float(th("cast_hour_fathoms", 100)) or p.tick - last < 3600:
+            return False
+        # inshore: the land in sight, or the coast by his account within `cast_inshore_nm`
+        # (taken another way: brought to every hour across the open Channel, the schooner
+        # on her intent lost a quarter of her time to it and never made Brest in 36 hours)
+        coast = p.coast_by_account_nm
+        if p.land_in_sight and p.nearest_land_nm is not None:
+            coast = p.nearest_land_nm
+        if coast is None or coast > float(th("cast_inshore_nm", 15)):
+            return False
+        b["cast_tick"] = p.tick
+        if p.speed_kn <= 4.0:
+            self.give("heave the deep-sea lead", why="inside the hundred-fathom line")
+            return False
+        # brought to for it only once a watch (`cast_bring_to_hours`), and not in a blow:
+        # brought to every hour, the schooner on her intent lost an hour in four along the
+        # coast of Léon (taken another way, package 58b)
+        # (nor beating, nor with the land under her lee within her sea room: hove to for a cast
+        # off the Léon coast after the gale, the frigate drove toward it and took the ground)
+        last_brought = int(b.get("cast_brought_tick", -(10**9)))
+        if (
+            self.state == "beating"
+            or p.wind_kn >= float(th("shorten_sail_kn", 30))
+            or (p.lee_land_nm is not None and p.lee_land_nm <= float(th("sea_room_nm", 10)))
+            or p.tick - last_brought < 3600.0 * float(th("cast_bring_to_hours", 4))
+        ):
+            return False
+        e = self.give("heave to", why="to bring her to for a cast of the deep-sea lead")
+        if e.kind != "order.rejected":
+            b["cast_brought_to"] = p.tick
+            b["cast_brought_tick"] = p.tick
+            return True
+        return False
+
+    def _across_the_stern(self, events: list[Any]) -> None:
+        """The sail work after the wind has come across the stern (package 58b, item 3; the
+        owner's ruling of 2026-10-23: nothing is ordered by the helm, and the sail work is
+        the captain's judgement): his next orders are the lugs left against their masts
+        dipped, the yards left by the lee braced round, and a boom that came over by itself
+        sheeted for its new side, each by its own order. The deck's line said what was
+        left (`navigation.watch_the_stern`); a lug since dipped is refused as done."""
+        crossed = [e for e in events if e.kind == "sail.across_the_stern"]
+        if not crossed:
+            return
+        data = crossed[-1].data or {}
+        sails = getattr(self.world.ship, "sails", {}) or {}
+        why = "the wind across the stern"
+        for sid in data.get("lugs") or []:
+            sl = sails.get(sid)
+            if sl is not None and sl.is_set:
+                self.give(f"dip the {self._sail_name(sid)}", why=why)
+        if data.get("yards"):
+            self.give("trim sails", why=why)
+        elif data.get("booms"):
+            self.give("trim the sheets", why=why)
 
     def _sail_if_none(self) -> None:
         """Plain sail made when she is under way with none set (package 43b), the topsails
@@ -2528,6 +2769,15 @@ class Captain(Judgement):
             return
         leg = self.legs[self.leg_i]
         for e in events:
+            if e.kind == "helm.set" and (e.data or {}).get("verb") == "shape a course for":
+                # the leg as laid, the stream allowed then (package 58b, item 1), by his
+                # rule or his book's hourly "the leg"
+                shaped = e.data or {}
+                self._business["laid"] = {
+                    "tick": e.tick,
+                    "line_deg": shaped.get("line_deg"),
+                    "allowing": dict(shaped.get("allowing") or {}),
+                }
             if e.kind == "helm.set" and state_of_actor(str(e.actor or "")) is not None:
                 data = e.data or {}
                 self._business["course_not_laid"] = bool(data.get("course_not_laid"))
@@ -2542,6 +2792,17 @@ class Captain(Judgement):
                     self._business["course_closest_deg"] = units.rad_to_deg(
                         close_hauled_true_angle(self.world.ship)
                     )
+                if (data.get("helm") or {}).get("held_for") == "way":
+                    # shaped before she had way (package 58b, item 4): held by the helm, and
+                    # shaped again when she has it, the stream then allowed for
+                    self._business["held_for_way"] = True
+        gathered = any(
+            e.kind == "helm.course_given" and (e.data or {}).get("held_for") == "way"
+            for e in events
+        )
+        if gathered and self._business.pop("held_for_way", False) and leg.kind != "out":
+            self._shape_leg(why="she has gathered way")
+            return
         if "ship.filled_away" in kinds and p.manoeuvre not in ("hove to", "heaving to"):
             if leg.kind != "out":
                 self._shape_leg()
@@ -2588,6 +2849,72 @@ class Captain(Judgement):
             return
         if "lookout.land_ahead" in kinds and leg.kind != "out":
             self._shape_leg(why="land ahead")
+            return
+        relay = self._stream_changed(p, events, leg)
+        if relay:
+            self._shape_leg(why=relay)
+
+    def _stream_changed(self, p: Perception, events: list[Any], leg: Leg) -> str:
+        """Why the leg is to be laid again for the stream (package 58b, item 1), or "": the
+        master's tide turned since it was laid (his `reckoning.tide` line), or the stream he
+        allows now differs from the one the course was laid for by enough across the line to
+        carry her `RELAY_OFF_LINE_NM` off it in the next glass. On passage or running for
+        shelter, on a leg he shapes (not the pilot's water nor the road's way out), not lying
+        to, and not within `RELAY_LEAST_S` of the last laying; never for the captain's own
+        set ordered, which the master holds whatever the tide."""
+        if self.state not in ("on passage", "running for shelter") or leg.kind == "out":
+            return ""
+        if self._inner_leg() or p.pilot_conn or p.manoeuvre in ("hove to", "heaving to"):
+            return ""
+        laid = self._business.get("laid")
+        if not isinstance(laid, dict) or laid.get("line_deg") is None:
+            return ""
+        since = p.tick - int(laid.get("tick") or p.tick)
+        now = p.tide_allowed or {}
+        turned = [e for e in events if e.kind == "reckoning.tide" and (e.data or {}).get("turn")]
+        if turned:
+            # the master's turn, kept until the leg is laid again (it may come within
+            # minutes of a laying, and is answered when the ten minutes are out)
+            flood = bool((turned[-1].data or {}).get("flood"))
+            self._business["tide_turned"] = ("flood" if flood else "ebb", turned[-1].tick)
+        pending = self._business.get("tide_turned")
+        if pending and int(laid.get("tick") or 0) > int(pending[1]):
+            self._business.pop("tide_turned", None)  # laid again since the turn
+            pending = None
+        if now.get("by") == "captain" or since < RELAY_TURN_LEAST_S:
+            return ""
+        from freesail.world.reckoning import rate_words, ward_words
+
+        if pending:
+            self._business.pop("tide_turned", None)
+            return f"the tide has turned, the {pending[0]} making"
+        if since < RELAY_LEAST_S:
+            return ""
+
+        def vector(tide: dict[str, Any]) -> tuple[float, float]:
+            if "toward_deg" not in tide:
+                return 0.0, 0.0
+            knots = float(tide.get("knots") or 0.0)
+            toward = math.radians(float(tide["toward_deg"]))
+            return knots * math.sin(toward), knots * math.cos(toward)
+
+        allowed = dict(laid.get("allowing") or {})
+        line = math.radians(float(laid["line_deg"]))
+        steer = math.radians(float(allowed.get("steer_deg", laid["line_deg"])))
+        if not allowed.get("made_good", True) and abs(units.wrap_pi(steer - line)) < 0.01:
+            allowed = {}  # no way on to work an allowance by: nothing was allowed
+        e0, n0 = vector(allowed)
+        e1, n1 = vector(now if now.get("by") == "book" else {})
+        de, dn = e1 - e0, n1 - n0
+        across = de * math.cos(line) - dn * math.sin(line)
+        if abs(across) * RELAY_GLASS_H <= RELAY_OFF_LINE_NM:
+            return ""
+        if "toward_deg" in now and float(now.get("knots") or 0.0) > 0.0:
+            toward = math.radians(float(now["toward_deg"]))
+            stream = f"{rate_words(float(now['knots']))} {ward_words(toward)}"
+        else:
+            stream = "none"
+        return f"the stream changed since the leg was laid: {stream} now"
 
     def _leg_serves(self, leg: Leg, p: Perception) -> bool:
         """Whether a leg of the inner track lies no nearer the wind than `ENTRY_POINTS`
@@ -2816,7 +3143,16 @@ class Captain(Judgement):
                 if e.kind != "order.rejected":
                     self._reload_leg_book()
                     return
-        self.give(f"shape a course for {leg.words}", why=why)
+        e = self.give(f"shape a course for {leg.words}", why=why)
+        shaped = getattr(e, "data", None) or {}
+        if shaped.get("line_deg") is not None:
+            # the leg as laid now (package 58b, item 1), so that a second laying in the
+            # same minute is not asked for against the one before it
+            self._business["laid"] = {
+                "tick": self.world.clock.tick,
+                "line_deg": shaped.get("line_deg"),
+                "allowing": dict(shaped.get("allowing") or {}),
+            }
 
     def _distance_by_account(self, leg: Leg) -> float | None:
         found = self.world.readings.value("distance_to", leg.words)
