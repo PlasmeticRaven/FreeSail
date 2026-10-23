@@ -8251,4 +8251,39 @@ at the desk), `core/replay.py` one guard (found on the way).
 - `ahead` changes in most samples under way (its distances), some 200 characters; the owner
   wanted it in every sample's view.
 
-PLACEHOLDER-58A-MEASURES
+### The size of a day's samples, before and after (measured on a filed save)
+
+The lugger's day (`docs/playtests/2026-10-18-to-22-owner-playtests-and-review/saves/
+2026-10-22-lugger-fishing-G.json`, its first ship's day, 10 June 05:00 to 11 June 05:00),
+replayed by its transcript (each station's recorded replies played back where they were
+taken) on this package's tree, so that both tellings are of **the same samples at the same
+points**: each data turn as this package tells it, beside the same turn as 31c told it (the
+readings by their words, the stand-by's lines listed, no line of what stands as before, the
+captain's word in the log as well); and "still waiting" as a door would print it with every
+line of the wait, against only the lines since its last call, one poll each minute of the
+ship's time (a model's fifty seconds at the owner's 1.2x; at five minutes a poll, 6x, the
+figures follow them). Characters, as sent:
+
+| Station | Samples and folds (45 / 95 turns) | "Still waiting" (1,063 / 403 polls) | The day |
+|---|---|---|---|
+| The officer of the watch | 190,992 to 166,285 (-13%) | 556,745 to 403,910 (-27%) | 747,737 to 570,195 (-24%) |
+| The director | 324,658 to 293,002 (-10%) | 299,452 to 175,675 (-41%) | 624,110 to 468,677 (-25%) |
+| Both | 515,650 to 459,287 (-11%) | 856,197 to 579,585 (-32%) | **1,371,847 to 1,038,872 (-24%)** |
+
+At a poll each five minutes of the ship's time the polls fall 109,792 to 81,887 (the
+officer) and 60,029 to 41,210 (the director). What is left in a poll is its head (the wait,
+the time and the clock, some 350 characters); what is left in a sample is its log, which
+the deltas do not touch, `in_sight` and `nearest_land` (the shore's bearings, which change
+with every swing at anchor and which the brief did not name) and `ahead`. This day's waits
+were short (the stations sampled each glass or sooner), so the
+re-listing R-26 measured (58 lines and 12,000 characters a poll, a stand-by of hours) grew
+no long list here; the saving on a long wait is the whole list at each poll but the first.
+
+*Measured another way than first planned*: a replay of the save on the tree before
+(`872aa61`) and on this one gives other samples at other points (the director's appended
+highs grow in now; 78 samples of the officer's before, 45 after), so the two tellings were
+taken of one replay instead (`p58a/measure2.py` in the build's scratch directory). The
+replay before, for the record: the officer's samples 240,163 characters in 78 turns and the
+director's 315,262 in 89.
+
+PLACEHOLDER-58A-PINS
