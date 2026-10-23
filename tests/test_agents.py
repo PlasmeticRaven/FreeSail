@@ -1845,7 +1845,8 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     three = (ROOT / "docs/primer/03-making-and-shortening-sail.md").read_text(encoding="utf-8")
     assert tools.size_words(tools.tokens(three)) == "about 11,370 tokens"
     grammar = lib(world, topic="grammar", section="all").split("\n\n", 1)[1]
-    assert f"{tools.size_words(tools.tokens(grammar))} whole, in 3 parts" in contents
+    # package 58a: a fourth part, the world orders (3 parts before)
+    assert f"{tools.size_words(tools.tokens(grammar))} whole, in 4 parts" in contents
     ship = lib(world, topic="the ship", section="all").split("\n\n", 1)[1]
     assert f"{tools.size_words(tools.tokens(ship))} whole, in 5 parts" in contents
     tool_page = lib(world, topic="tools")
