@@ -396,8 +396,15 @@ fake captain `0949c109116fc4a1` to `1c9a985bfd5dce0f`, the trade trial with the 
 `5bbca78fdc6b5093` to `48b205b4f587256c`, the intent schooner `b498761052da0862` to
 `585c52675f10e590`; every line count and state figure 58b's own; the old figures beside the
 new with the merge's comment), ruff clean, the re-pinned passages run clean by the lead;
-**the one whole suite on the merged tree of 68, 58a, 67 and 58b follows this record** (the
-owner's word: one suite for the three, no playtest without telling him first). The builder
+**the one whole suite on the merged tree of 68, 58a, 67 and 58b** (the owner's word: one
+suite for the three), run by the lead on a quiet machine after the merge: **3,914 passed,
+12 expected failures, 2 skipped, one failed, truth 90**, the regatta's first course, the
+rules-based captain brought up to wait for the tide 1.2 miles from the road's centre (in
+port by the game's reach of a mile and a half, not finished by the course's mile); by
+bisection either of 58b's items 1 and 2 alone brings her to the pilot with way on and hove
+to for him, and the anchoring where she lies is right, so the course's radius was made the
+game's own reach (1.5; she finishes at 56711, was 53076; the tuning notes, "the lead at the
+merge"); the regatta's twelve tests and the pace tests alone (6) pass after it. The builder
 ran the fast tier under a load of 17 to 25 (3,565 passed, two failed: truth 7b-113, its own
 and mended, and truth 88's pace test in the fast tier, mended by the conftest since) and
 measured the moved passages alone; the whole slow tier was stopped at the lead's
@@ -444,7 +451,8 @@ not be fetched (the pinching rule withdrawn) stands open with it.
 Merged `--no-ff` from the builder's worktree (seven commits on `872aa61`; 32 files, ~2,800
 lines) over 58a with three conflicts of the appended kind (the tuning notes, two test
 files, both kept), ruff clean, the two packages' shared test files run clean by the lead;
-**the whole suite on the merged tree waits for 58b.** The builder ran the fast tier (3,567
+**the whole suite on the merged tree ran after 58b's merge: 3,914 passed, one failed (truth
+90, the regatta's finish radius, 58b's; mended, see 58b's record).** The builder ran the fast tier (3,567
 passed, one failed: truth 88's pace floor under a load of twenty-five, passing alone) and
 the slow tier of its fourteen touched files (420 passed, 7 expected failures, none failed).
 Built as briefed: the seats in a new `freesail/world/seats.py` (`_seat` and `_unseat` doors
@@ -486,9 +494,10 @@ settings name no API model refusing every director's seat.
 ### Package 58a as merged (2026-10-23)
 
 Merged `--no-ff` from the builder's worktree (eleven commits on `872aa61`; 31 files, ~2,800
-lines) with no conflict, ruff clean; **the whole suite on the merged tree waits for 58b and
-67, one run for the three at the lead's and the owner's word** (the machine carried four
-suites at once at a load of twenty-five, so the builders stood theirs down); the builder
+lines) with no conflict, ruff clean; **the whole suite on the merged tree ran once for the three
+after 58b's merge, at the lead's and the owner's word** (the machine had carried four suites
+at once at a load of twenty-five, so the builders stood theirs down): 3,914 passed, one
+failed, 58b's regatta finish (mended; 58b's record); the builder
 ran the fast tier (3,568 passed, four failed: three its own and fixed, one truth 88's pace
 test under load, which it showed is marked `pace` by hand and not recognised by the
 conftest's name rule, for the lead), the slow tier of its touched files (clean but for the

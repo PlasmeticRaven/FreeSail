@@ -8898,6 +8898,50 @@ never aground, the least water fifteen fathoms and a quarter; from 113000 the sa
   fetched.
 - **The gale trials**: the book is mended and lies her to without being taken aback; the
   grounding among the Molène islands is the offing's tack, for the lead's playtest.
+
+### The lead at the merge (2026-10-23): the one whole suite, and the regatta's finish
+
+Merged over 58a and 67 (the last of the three); the four passages that both 58a's recurring
+rule and this package move were re-measured on the merged tree (the merchant passage
+`6abbbff4d7fa1a57`, the fake captain `1c9a985bfd5dce0f`, the trade trial with the stranger
+`48b205b4f587256c`, the intent schooner `585c52675f10e590`; every line count and state
+figure as above). **The one whole suite on the merged tree of 68, 58a, 67 and 58b**
+(`--slow -n 4 -m "not pace"`, the lead's machine, nothing else running, 68 minutes): 3,914
+passed, 12 expected failures (the eleven known and the lee-shore trial, above), 2 skipped,
+**one failed: truth 90, the regatta's first course**, the rules-based captain not finished
+in thirty hours. The pace tests alone, after it: 6 passed.
+
+**The regatta's miss, and whose it is.** The course's finish is "within the radius of the
+outer road", a mile (package 44's judgement). Before this package the frigate from off
+Ushant raised the Falmouth cutter at 51960 making under eight knots, the pilot came aboard
+at once, and she stood on to anchor at 52800 within the mile (finished at 53076, 14 h 44 m).
+Now she comes to the pilot at eight knots (55920), the cutter cannot put him aboard and asks
+her to heave to (the rule is 44's, not this package's), she heaves to at 56521 and takes him
+at 56580, and at 56760 the captain, with the tide not serving to enter and the road's leg
+reached (a mile and a half, `Planner._port_track`), brings her up where she lies: the best
+bower in ten fathoms and a half at 57142, **1.2 miles from the road's centre, in port by
+the game's rule (the port's reach, 45) and not finished by the course's.** By bisection on
+this package's tree alone (`_casts` and `_stream_changed` each turned off, then both): both
+off gives the old finish at 53076 to the tick; either alone gives the miss (the casts off:
+the pilot's fix at 52800, hove to for him at 52932, anchored 53705, 1.3 miles off; the
+layings off: hove to for casts at 4173 and 38181, the pilot's fix at 55980, anchored 56833,
+1.3 miles off). So it is not one item's but the approach's: either item brings her to the
+pilot with way on, and a captain hove to for his pilot with the tide foul anchors in the
+road where he is, which is right. The builder did not see it because the whole slow tier
+was stood down on the lead's word (above).
+
+**Taken: the course's radius is the game's own reach for a road.** `data/regatta/
+ushant-to-falmouth.yaml` `radius_nm` 1.0 to 1.5, the reason in the file; the captain's
+road leg has been reached at a mile and a half since 45 and the course's mile was a
+judgement made before it. With it she finishes at **56711 (15 h 45 m; was 53076, 14 h
+44 m), no grounding, no damage**, the replay to the same digest; the twelve regatta tests
+pass. Not taken: a captain who stands on to the road's centre after taking his pilot (he
+would be sailing a mile into a tide he has just said does not serve), or a course that
+counts "in port" (the regatta judges by the truth). For the owner: the frigate of the
+regatta now heaves to for a cast of the deep-sea lead a quarter of an hour into her passage
+and loses most of that quarter; a captain bound for Falmouth, not racing, would; whether
+the rules captain should cast on a leg he has just laid from a known departure is item 2's
+figure (`cast_hour_fathoms`, the first cast an hour into the leg) and his to tune.
 - **The fraction**: kept at two thirds; a stronger penalty on a wind is a physics change.
 - Taken another way: **the deep-sea lead's bring-to** once a watch and only off a lee
   shore and not beating; **the band under the reefs** withdrawn; the stern's line said

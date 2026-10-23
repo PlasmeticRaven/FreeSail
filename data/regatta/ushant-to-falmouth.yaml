@@ -15,14 +15,19 @@
 # The finish is a line about a place: she is in when her true position is within the
 # radius of the outer road (the pilot's ground off Pendennis, data/ports/falmouth.yaml),
 # every mark rounded first (none on this course). Ninety-six miles; the passage's book
-# brought her up there in fourteen hours, so thirty is the limit.
+# brought her up there in fourteen hours, so thirty is the limit. The radius is the
+# captain's own reach for a road (freesail/world/captains.py, the 'road' leg reached at a
+# mile and a half): it was a mile until package 58b, when the rules-based captain, come to
+# the pilot at eight knots and hove to for him, brought her up where she lay to wait for
+# the tide, 1.2 miles from the road's centre, in port by the game's rule and not finished
+# by the course's (docs/dev/TuningNotes.md, 58b's section, the lead at the merge).
 
 name: Ushant to Falmouth
 scenario: data/scenarios/gate-5b-passage.yaml
 seed: 7
 start_orders: [set plain sail]
 standing_orders: []
-finish: {at: falmouth-outer-road, radius_nm: 1.0}
+finish: {at: falmouth-outer-road, radius_nm: 1.5}
 time_limit_hours: 30
 marks: []
 intent: bound for Falmouth          # the rules-based captain's, and nobody else's
