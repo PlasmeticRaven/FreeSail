@@ -15,7 +15,9 @@ here, the figures are tuned in play, and the parts grow as the current packages 
 67, 55) teach us; the owner's frame is single-ship actions first, the framework open to
 more ships, the command system and the signals to make more ships sane, six on six as the
 ideal and never rushed. The draft is written with room left on purpose: each part names what
-it waits on and what it does not yet decide.
+it waits on and what it does not yet decide. **Revised the same day on the owner's eleven
+notes of the first read** (his `M7_spec_notes` of 2026-10-23), each taken into its section
+and the allocation of §31 redrawn to front-load the design to Fable.
 
 *Proves: combat is the same system. A fight is evolutions competing for hands, damage is
 state in the part graph, and the ships speak to one another by the means the period had.*
@@ -43,6 +45,15 @@ causes):
    range is crewed under the cap's order; a fight at far detail is resolved at coarse steps
    by the same tables, the fighting shape of the brainstorm kept as a measured fallback
    and not a plan (the owner's 95 ticks a second with twelve crewed ships is the baseline).
+6. **Realism, not pacing (the owner, 2026-10-23).** Nothing is made deadlier or quicker for
+   the game's sake. An action of hours is a real and legitimate outcome, and so is one of a
+   quarter of an hour that ends after a single broadside and the colours struck; the
+   physics, the muster and the morale decide which, never a clock of the design's.
+7. **Nothing pre-defines a battle's timing.** The work of an action is continuous and
+   concurrent by the quarter bill (§8a), not a queue of evolutions with fixed durations; a
+   ship with hands to spare fights better because every order in hand gets done, a
+   short-handed one suffers by the same, and the player gives his orders without wondering
+   how they will queue.
 
 ---
 
@@ -102,6 +113,13 @@ As the notes have them, by their own names:
   enemy in sight, anchor).
 - **The French**: du Pavillon's tables and the numerary system that followed; a research
   item before 7-i is briefed, the French book smaller and marked where made.
+- **Any nation (the owner, 2026-10-23).** The British and the French are the well-built
+  books; beneath them a **basic system every nation has** from the foundation (a numerary
+  book of a few dozen entries in the period's common form, a private table made under the
+  seed, the night and fog signals, the convoy's), so that any nation of the table may be a
+  combatant in a fictional scenario (the Spanish, the Dutch, the Danes, the Americans of
+  1812), and a nation's book is built out progressively from that foundation as its sources
+  are found, the data shape the same for all (`data/signals/<nation>/`).
 
 **A signal is a thing hoisted**: the book, the number, by whom, where and when, answered or
 not, with the hands at the halyards and a minute a hoist (an evolution). **It is read by the
@@ -173,8 +191,13 @@ lugger's swivels, the merchant brig's few), with the sources named (the Establis
 `clear for action` (the bulkheads down, the galley fire out, the boats towed or stowed, the
 hands to quarters; a frigate's quarter of an hour, a cutter's five minutes), `beat to
 quarters`, `cast loose the guns`, `load with round shot` (or chain, grape, double), `run out`,
-`fire` (by broadside, by division, as they bear, a rolling broadside), `cease firing`,
-`secure the guns`; the boarders called, the small arms served out. Each with hands, ratings
+`fire` (by broadside at the word, by division, **as they bear** (the period's independent
+fire: the first broadside together at the word and then each gun as it is loaded and bears,
+which is what the owner's "fire at will" was in 1805), a rolling broadside), **a single gun by
+its number or place** (`fire the bow chaser`, `fire No. 3 gun`, `fire a shot across her
+bows`: the ranging shot, the gun to leeward or to windward, the signal gun, the one shot of
+a roleplay), `cease firing`, `secure the guns`; the boarders called, the small arms served
+out. Each with hands, ratings
 and time from the bill as sail work has them, so that a tack while the guns are being run
 out is the slower for the same hands (the proposal's own example). **Rates of fire fall out
 of the muster**: a full and drilled crew's broadside every minute and a half to two minutes
@@ -182,6 +205,25 @@ at the start of an action, falling with fatigue and casualties; a merchantman's 
 served by few and untrained hands at a fraction. The figures are judgements with Douglas
 (*A Treatise on Naval Gunnery*, 1820) and the period's captains' logs as the sources, pinned
 by the truths and tuned in play.
+
+### 8a. The quarter bill, and work in action (the owner's note 4; `freesail/crew/bill.py` a quarter bill beside the watch bill)
+
+At quarters every man has a station and the work is **continuous, not a queue**: the quarter
+bill (data per ship file, as the watch bill is) divides the company into the gun divisions,
+the sail trimmers (the afterguard and the topmen who leave the guns for a brace or a sail),
+the marines, the boarders, the carpenter's crew at the wings and the pumps, the surgeon's
+in the cockpit, the powder boys. A gun's service is a cycle that runs by itself while hands
+and powder last; `engage her to starboard`, `fire as they bear`, `aim at her rigging` are
+**standing intentions the divisions keep**, logged when they change something; the one-shot
+orders (a broadside at the word, a single gun, cease firing, boarders away) ride over them.
+Sail orders in action draw first on the sail trimmers and then on the guns by the fighting
+book's priority (`sail before guns` or the reverse), so that a tack with the guns served is
+slower by exactly the hands it takes and the player never queues a thing: he gives the
+order and the bill finds the hands, saying from where. **The design of this is 70's first
+item**, since the evolution system as M3 built it (an evolution with hands, a duration and
+steps) serves the gun's cycle and the carpenter's plug but not the whole of an action; the
+reading is that the standing-intention form the helm's `full and by` already has is the
+shape, with the bill as the scheduler and the evolutions as its leaves.
 
 ### 9. Shot and the hit model (`freesail/combat/` new: `shot.py`, `hits.py`)
 
@@ -196,7 +238,13 @@ part out of the bill), a shot hole at or below the waterline (a leak of Part 7-i
 stove, the wheel or the tiller ropes shot away (the helm lost until repaired), men killed
 and wounded (Part 7-iv) by the men at the part struck. Grape and musketry at close range
 work on the men; chain on the rigging; the double-shotted broadside at pistol shot on
-everything. The sequence is deterministic under the seed as everything is.
+everything. **Heel and the sea (the owner's note 6):** the lee battery fires lower and
+shorter and the weather battery higher and longer by the heel, the gun's elevation able to
+answer only so far; a lee port whose sill is within a foot of the water is shut and its gun
+silent (the frigate's lower sills and the 74's lower deck in a breeze: the famous reason the
+weather gage and the lee gage differ); the roll's timing is the gunner's doctrine (fire on
+the up-roll for the rigging, on the down-roll for the hull) and the sea state scatters the
+shot by its height. The sequence is deterministic under the seed as everything is.
 
 ### 10. The fighting instructions, the captain's engaging, and morale (`data/captains/*.yaml`; `freesail/world/captains.py`, `brains.py`; `data/standing_orders/fighting.orders`)
 
@@ -214,12 +262,28 @@ temper, which gives **striking by rule** (decision 7: the colours struck when mo
 said in the log with its reason) and the boarders' odds. A model captain reads his book as
 the night orders and fights as he judges; the player fights his own.
 
-### 11. Boarding, and the fight at far detail (`freesail/evolutions/`; `crews.py`)
+### 11. The marines, the small arms and the fight on deck (the owner's note 3; `freesail/crew/`; `data/ships/*.yaml` the detachment; `evolutions/`)
+
+The marines are a division of the muster with their own officer and sergeant, **their kit by
+nation and period as data** (the musket and bayonet, the sergeant's halberd or pike, the
+officer's sword; the French with more soldiers and sharpshooters in the tops as their habit
+was; not intensely detailed, the weapon's kind at least), their duties in the day (the
+sentries at the cabin door, the spirit room and the gangway; the guard; the drill) and at
+quarters (the poop and the gangways, the tops as marksmen by the captain's book, the
+boarders' backbone, the guard on the prisoners). Within musket shot (a hundred yards) they
+**fire at the men on a near deck** by volley or at will, the hits on the men at the parts
+exposed (the quarterdeck's officers and helmsmen first, which is history's lesson), and
+are fired at in turn; the ship's company's small arms (cutlasses, pikes, pistols,
+tomahawks) are served out to the boarders by the bill. **The fight on deck** (a boarding
+won or repulsed, a deck contested) is resolved in a few steps with cover, numbers, arms and
+temper on each side and the losses written to the muster, the marines' volleys and the
+guns' grape counted into it.
+
+### 11a. Boarding, and the fight at far detail (`freesail/evolutions/`; `crews.py`)
 
 Boarding as an evolution: the ships brought together (the helm, the grapnels, the yards
-locked), the boarders over by the odds of numbers, arms and temper, resolved in a few steps
-with losses on both sides and the deck won or the boarders repulsed; cutting out by the
-boats in a harbour the same with the boats (63). **At far detail**, two far ships that meet
+locked), the boarders over by §11's fight on deck, the deck won or the boarders repulsed;
+cutting out by the boats in a harbour the same with the boats (63). **At far detail**, two far ships that meet
 in anger resolve their action by the same tables at coarse steps (a round of broadsides a
 few minutes long, the damage summed into her far state, the striking by morale), so that
 a privateer and a merchantman off the horizon come to the outcome the near fight would;
@@ -288,6 +352,23 @@ M7b meet their ends here (hunger and thirst to sickness and death, fatigue to co
 morning report. Disease as a thing of its own (the fever of a station, the scurvy of a long
 passage) is **M8's**, the hooks left.
 
+### 16a. A station holder hurt (the owner's note 7; the harness)
+
+A person at a station is a valid participant: he is hit as the men at his part are (the
+quarterdeck is the most exposed place in a frigate action), and his hurt comes to the
+station as an urgent line of his own ("You are hit: a splinter in the thigh; you can keep
+the deck, the surgeon can see you below"). **What the holder may do is the same for a model
+and a human**, at parity: keep the deck (his words still carry, his orders still go, the
+line in every sample saying his state), give the deck and go below to the surgeon (the
+officer or the next in the bill takes it as the handover has it), or carry on hurt until
+he collapses by the needs' rule for fatigue. A holder killed ends his person's station as a
+death does: the harness tells the model in words, writes it in the journal and stands the
+station down with the reason (no model is moved to another person by the game; a seat at
+the next person is the owner's or the director's), the player at the prompt likewise loses
+his person and the scenario continues by Part 7-v's roads or ends; the deck passes by the
+bill. The fairness is the rules': the same hit model, the same exposure, the same choices,
+whoever holds the station.
+
 ### 17. Truths for 7-iv (outline)
 
 A broadside's casualties are men of the muster, named where they were named, and the gun's
@@ -351,6 +432,14 @@ flagship"; the night and fog signals; the order of sailing by the wind); a model
 the flagship is the orchestrator the owner saw in play, his signals the command; the
 subordinate captains rules captains obeying the book and their doctrine; the `squadron:`
 and `convoy:` relations beside the nations' stances, which decide whose signals command.
+**A genuine set (the owner's note 8):** a squadron is a set of ships and nothing more
+fixed; ships join it and leave it freely by the director's order (`squadron "Channel":
+detach the Medusa`, `... join the Harpy`), by the scenario file, by the world (a ship
+separated in a gale sails alone until she rejoins by signal; a prize joins her captor's
+company; a convoy's straggler is lost to it), and by the commander's own signal (a division
+detached in chase and recalled); a squadron may split into divisions with their own leaders
+and merge again; a ship alone is a squadron of one for the brain's purposes and no object
+at all for the player's. The far brain re-forms the offsets whenever the set changes.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 
@@ -410,18 +499,34 @@ last package or 58 as the notes say. **Deferred within M7** until a scenario wan
 
 ### 27. The ships of the milestone (`data/ships/`; `tools/gen_ships.py`)
 
-The *Indefatigable* (the razee frigate, 44, Pellew's) and a privateer schooner (the *Prince
-de Neufchatel* or the *Grecian*, the one with the better sources) through the generator with
-their armament; the merchant brig of 68 given her few guns; every existing file given its
-armament and quarter bill. Each with its sources named as the files have always named them.
+The *Indefatigable* (the razee frigate, 44, Pellew's) and the *Prince de Neufchatel* (the
+privateer schooner: the owner's choice, the sources enough and the rig the more novel)
+through the generator with their armament; the merchant brig of 68 given her few guns;
+every existing file given its armament, its quarter bill and its marines. **And a rated
+ship of the line (the owner's note 9: "dream a little big").** The lead's reading of what
+the game can make and use: the part graph, the bill and the generator do not care how big
+she is (the hands are numbers, the guns parts, the sails the same classes more and larger),
+and the lookout's and the crewed cost grow with the number of ships, not their size; the
+cost is the data and the sources. The candidate with the best sources by far is a **74 of
+Slade's design**, the *Bellona* (1760; Lavery's *Anatomy of the Ship* volume gives every
+deck, spar and fitting) or her near sister the *Bellerophon* as the name of 1805: the
+workhorse of every fleet of the period, six hundred men, two gun decks, which is the first
+true test of the lee ports and the heel of §9 and of a company large enough to fight and
+sail at once (§8a). A first rate (the *Victory*, whose sources are immense) is content
+rather than design once a 74 runs, and M8's unless a scenario wants her sooner. The 74 is
+7-viii's third ship, built after the frigate action has proved the systems at the
+frigate's scale.
 
 ### 28. The chart's next goal, and the signals' sources
 
 The owner's question of 2026-10-17 stands open: the Mediterranean, the Great Lakes and North
-America for 1812, or the Caribbean for the West Indies station; the lead's opinion in that
-conversation (the Mediterranean first for the French and the Spanish and the privateers of
-every flag, the Caribbean for the convoys and the fever, the Lakes a milestone of their own
-for the water's kind). **Decided with the gate's scenarios, not before 7-i.** The signals'
+America for 1812, or the Caribbean for the West Indies station; **decided by the owner's note 10
+of 2026-10-23: the Mediterranean first** (the French and the Spanish and the privateers of
+every flag), **then the Caribbean** with the Bermuda sloops and rigs (the famous
+three-masted Bermuda-rigged vessel of the Royal Navy's West Indies station among the
+ships), **then the full east coast of America and the Great Lakes** with their own few
+vessels for 1812. The Mediterranean's block is cut when 7-i's scenarios want it, by the
+chart's own tools as the Channel's and the Bay's were. The signals'
 sources (the 1799 book, Popham 1803, the convoy instructions, du Pavillon) are a research
 item before 7-i is briefed, each book marked verified or made.
 
@@ -455,35 +560,35 @@ edits no consent file; the revision is the package's.
 - The sub-gates may pass separately (decision 49: iterative); a sub-gate's report is the
   gate document's chapter.
 
-## 31. Packages (outline; the allocation, numbered after M7b's)
+## 31. Packages (outline; the allocation, numbered after M7b's; redrawn on the owner's note 11)
 
-The heavy design to Fable and the data and the standard work to Opus, as the head rules
-have it; the numbers from 70 and provisional until each is briefed.
+**The design to Fable first and front-loaded: five Fable packages, each setting a clear
+groundwork and the first of its data, and Opus building out behind each from that baseline
+and never before it.** The gate's measure and document (the six on six, the fighting shape
+if wanted) are the lead's own work and no package. The numbers from 70 and provisional until
+each is briefed.
 
 | # | Who | Package | Part |
 |---|---|---|---|
-| 70 | Fable | The combat core design: guns as parts, the hit model, damage as state, morale and the strike; the figures' sources; the fighting shape measured | 7-ii |
-| 71 | Opus | The ships' armament through the generator; the *Indefatigable* and the privateer schooner | 7-viii |
-| 72 | Opus | Colours, the private signal, the hail between ships, the lights and the bell | 7-i |
-| 73 | Opus | The signal books as data with their sources; the hoist as an evolution; reading by the lookout; the convoy's and the squadron's signals acted by doctrine | 7-i |
-| 74 | Opus | Sight across land | 7-i |
-| 75 | Opus | The gunnery evolutions and the bill; the fighting book; the captain's engaging by doctrine | 7-ii |
-| 76 | Opus | Taking on water: leaks, the pumps, foundering; damage control and jury work; the hotfix's stopgaps retired | 7-iii |
-| 77 | Opus | Health and the surgeon; the needs' ends | 7-iv |
-| 78 | Opus | Boarding; the fight at far detail | 7-ii |
-| 79 | Opus | The prize, the prisoners, the prize court; a captured book | 7-v |
-| 80 | Fable | The captive's channel and the continuation; the court martial as the director's proceeding; with 67's seat at a person | 7-v |
-| 81 | Fable | The squadron brain and the formations; station keeping as a standing-order kind | 7-vi |
-| 82 | Opus | The regimes and the nations' knobs; the business following the player's ship | 7-vi |
-| 83 | Opus | Fine control of the sails; the gybe as an evolution; collision | 7-vii |
-| 84 | Opus | The consent revision for adversarial seats (or with 55) | 29 |
-| 85 | Fable | Six on six: the measure, the tuning, the fighting shape if wanted; the gate document | 30 |
+| 70 | Fable | **The combat core:** the quarter bill and work in action (§8a), guns as parts, the gunnery's cycle, the hit model with heel, roll and the sea, damage as state, morale and the strike, the fighting book; the first armament through the generator (the cutter and the frigate) and the first truths; the figures' sources | 7-ii |
+| 71 | Fable | **Signals and the voice between ships:** colours, the private signal, the hail with its three bodies, the lights and the bell, the signal as a thing hoisted and read; the books' data shape for any nation and the first books of Britain and France (the numerary entries the convoy and the squadron need, the telegraph, night and fog, the convoy's), each mapped to the intent it means | 7-i |
+| 72 | Fable | **The naval system:** the squadron as a genuine set with one brain at far detail, the formations and station keeping, the squadron's book and its signals as the command, the regimes and the nations' knobs, the business following the player's ship | 7-vi |
+| 73 | Fable | **Water, damage control, health and the fight on deck:** leaks and the pumps, the carpenter's and the surgeon's work, the muster's states, the marines and the small arms, the fight on deck, a station holder hurt at parity | 7-iii, 7-iv, §11 |
+| 74 | Fable | **Prizes, the strike and what follows, and the far fight:** the prize crew and the prize court, prisoners and parole, the captive's channel and the continuation, the court martial as the director's, the action at far detail by the same tables; the consent revision for adversarial seats drafted with it (or with 55) | 7-v, §11a, §29 |
+| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape | 7-viii |
+| 76 | Opus | The signal books built out from 71's baseline: the full numerary books, the private tables by month, the French book from its sources, the basic books of the other nations | 7-i |
+| 77 | Opus | The gunnery's and the fight's evolutions filled out from 70 and 73: clearing for action by ship, the boarders, the small-arms drill, the damage-control catalogue (plugs, fothering, jury masts, cutting away) | 7-ii, 7-iii |
+| 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | 7-i, 7-vii |
+| 79 | Opus | The regimes filled out from 72: the blockade, the convoy and its escort, ordinary and commissioning, the nations' doctrines as data; the chart's Mediterranean block | 7-vi, 7-viii |
+| 80 | Opus | Prizes and the continuation filled out from 74: the prize court's eighths, the cartel, retaking, the captive's places and words; the consent revision's package if 55 has closed | 7-v, §29 |
 
-Order: 70 and 72 first (the design and the voice between ships, which M7b's play wants
-now), 71 and 73 beside them, then 75, 76, 77 as the fight's three systems, 78 and 79, 80,
-then 81 and 82, 83 where the sailing wants it, 84 before any model is seated as an enemy,
-85 last. The weather's stacking and seasonal bound (R-39) and the land-avoiding planner
-(M7b's 61) are carried in and placed when 81 shows where the squadrons want them.
+Order: 70 and 71 first and together (the combat core and the voice between ships, which
+M7b's play wants now), 72 and 73 behind them, 74 when 70 has shown the strike; 75 as soon
+as 70's shape of a gun is settled, 76 behind 71, 77 behind 70 and 73, 78 where the sailing
+wants it, 79 behind 72, 80 behind 74. The sub-gates of §30 fall out of that order: 7a after
+70, 73, 75 and 77; 7b after 71, 76 and 72's first half; 7c after 79; 7d the lead's measure.
+The weather's stacking and seasonal bound (R-39) and the land-avoiding planner (M7b's 61)
+are carried in and placed when 72 shows where the squadrons want them.
 
 ## 32. What this milestone does not do
 
@@ -511,5 +616,5 @@ morale is a ship's figure or each division's; whether the far fight is a table o
 model at coarse steps (70 measures both); the signal books' extent in the first version;
 how a model at the flagship gives a signal (a tool, or `make the signal` as an order:
 the order, by the equal-reach rule, unless play says otherwise); how prisoners are counted
-(people or numbers: numbers but for the named); the chart's next block; and everything the
+(people or numbers: numbers but for the named); the chart's next block; the marines' kit tables by nation (73 names the shape, 75 the data); and everything the
 current packages teach before 70 is briefed.
