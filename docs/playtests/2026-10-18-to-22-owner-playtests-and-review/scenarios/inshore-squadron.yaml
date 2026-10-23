@@ -1,0 +1,106 @@
+# FreeSail: the inshore squadron (drafted with the owner, 2026-10-19). The frigate Amazon
+# on the inshore station off Brest in June 1805, a few miles west of the Black Rocks with
+# the Goulet under her lee: the watch on the French fleet that the Navy kept for years,
+# which was seamanship more than battle. Every station of the frigate may be held at once
+# (the captain, three lieutenants keeping their watches by the bill, the master, the
+# masthead), so that the deck passes at the change of the watch, the officers go below to
+# sleep and eat, the night orders are drafted and posted, and the director works the
+# coast against them: the weather off Ushant, the luggers slipping along inside the rocks,
+# a frigate looking out of the Goulet, the victualler from Plymouth with beef and letters.
+# No guns are modelled yet: a stranger chased is a stranger closed, and the drama is the
+# lee shore. Given to either driver with --scenario.
+
+name: The inshore squadron off Brest
+seed: 7
+start: 1805-06-14T04:00
+position: {lat_deg: 48.3300, lon_deg: -5.0800}   # some seven miles west of the Black Rocks
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 0
+  speed_kn: 4
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+# The rules-based captain's station, should the captain's seat fall silent.
+intent: keep the station off the Black Rocks within 8 miles
+
+people:
+  - {role: master, skill: 0.9}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie
+  almanac: 1805
+
+things:
+  - the Admiral's orders, in the captain's keeping, to watch the Goulet and report every sail that comes out
+  - the signal book, in the cabin, weighted with lead for the side
+
+ports: [plymouth, falmouth, torbay, brest]
+business: on                     # the cruisers of both sides are drawn on their stations
+crewed: {cap: 4, range_nm: 5}
+
+weather:
+  climatology: true
+
+orders:
+  - set plain sail
+  - take a fix
+
+# The player commands; models may stand every watch, work the reckoning and keep the
+# masthead; a model directs.
+stations:
+  captain: player
+  officer of the watch: model
+  second officer: model
+  third officer: model
+  master: model
+  lookout: model
+  director: model
+
+director:
+  brief:
+    name: The inshore squadron
+    tone: >-
+      A week on the most exacting station of the war, told as the officers who kept it
+      told it afterwards: the Black Rocks and the Parquette under the lee, Ushant's tides,
+      the glass watched every hour, the fog that comes down at dawn, the long nights of
+      standing off and on. Little happens and everything matters: a lugger seen inside
+      the rocks at first light, a frigate's topsails over the land at the Goulet's mouth,
+      a westerly that freshens until the captain must decide whether to claw off or hold
+      his ground, the victualler from Plymouth with beef, water and a bag of letters. The
+      ship's company is large and has its own life: the officers' watches and their
+      tempers, the carpenter's reports, the purser and the cook.
+    challenge: >-
+      Station-keeping and command over days: holding the inshore station without losing
+      the ship, knowing what came out of Brest and when, managing three lieutenants and a
+      master as people as well as watches, and a lee shore in thick weather at least once.
+      Keep the French honest: they come out when the wind and the blockade allow, small
+      craft creep along the coast under the batteries, nothing heavier than a frigate
+      shows, and nothing is fought (the guns are not modelled): a chase ends within hail,
+      and what she sees is what she reports. Let the weather do the hardest work, within
+      what the season's systems can make. Speak as the unheld people (the carpenter, the
+      purser, the cook, the boatswain, the victualler's master) to give the ship a life.
+    limits:
+      wind_max_kn: 47           # a strong gale at most: force 9
+      enemy_heaviest: frigate-36
+      nobody_dies: true
+      the_war_as_it_is: true
+      the_chart_as_it_is: true
+    cadence: glass
+    budget: {samples_a_day: 9999, acts_a_day: 9999}   # effectively unlimited for playtesting (the owner, 2026-10-19)
+    examples:
+      - 'ship: a lugger "Vigilant" of France at 48 21 N 4 47 W, bound for 48 28 N 4 50 W, no colours'
+      - 'ship "Vigilant": order heave to'
+      - 'ship: a frigate "Hortense" of France at 48 18 N 4 40 W, bound for 48 18 N 4 52 W'
+      - 'ship: a merchant brig "Commerce" of Britain at 48 45 N 5 20 W, bound for 48 30 N 5 05 W'
+      - 'weather: low "the Atlantic low" radius 500 km at 1805-06-15T18:00 -500 300 996'
+      - 'aboard: the main topgallant mast found sprung'
+      - 'aboard: the fore topsail found chafed'
+      - 'say as the carpenter: "The main topgallant mast is sprung in the cap, sir; I would fish it before we carry sail on it again."'
+      - 'aboard: a bag of letters from Plymouth, in the keeping of the purser'

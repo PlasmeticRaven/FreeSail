@@ -101,6 +101,79 @@ His points, each set beside what the build has, so that the brief starts from fa
 Recorded here and in spec §21d so that the refinement is briefed after the owner's testing
 round, with what the round adds.
 
+## The close-out of M7b: the lead's proposal (2026-10-23)
+
+After the owner's week of play (the Western Islands run of 27 ship's days, the lugger at
+Roscoff, the merchant brig in Torbay, the dispatches; five models at the stations) and the
+cold review of the 22nd (`docs/playtests/2026-10-18-to-22-owner-playtests-and-review/`,
+63 findings ranked), with the hotfix folded in at `a67c965` and the whole suite dispatched
+on both CI runners for R-58. The owner's frame: close M7b efficiently, Fable's usage kept
+for M7 (combat and signalling, which the play made him want most), packages merged where
+that serves. The lead's proposal, for the owner's rulings:
+
+**Definitely, before the gate (Opus, briefs by the lead, each a day or two):**
+
+- **68, the review's mending.** The P0 list and the small P1s that hit every model: riding
+  means riding and the lookout's land-ahead keyed on speed over the ground (R-01, with a
+  truth); words to a player-held captain and the dropped word after the name (R-13, R-14);
+  a person made aboard another ship (R-15); the MCP door's wait, the cut call, the time in
+  "still waiting", the compound stand-bys in the officer's brief (R-25, R-27, R-30); the
+  brig limit enforced (R-38); the lugger's own getting under way (R-45); the chart's
+  fathoms (R-05); the director's leaks into the play log (R-20); a stand-by replaced while
+  it runs (R-28); the director not woken by its own lines and a budget command (R-61); the
+  truth's aground state and placeholder goal (R-35); the regression test for the checkpoint
+  crash, the early kedge-home line and the cut pin-history comments (the review's §3.3);
+  the ship-file for a merchant brig (R-63); a `.gitattributes` with `* text=auto eol=lf`.
+- **58, the sample's deltas and the cost of thinking**, the most-asked change at every
+  station: only what changed, no repeated history in "still waiting", the notable-noise
+  rules with hysteresis (R-26, R-31, R-04), the trim-timing tripwires the lugger officer
+  proposed, and `ahead` from the Éclair's cruise. Briefed next after 68.
+- **67, the director's seat made real** (spec §2a): small, and it is what makes the grant
+  and the budget mean spending; the bridge's cut-call fix of 68 belongs beside it.
+- **55, last: the solo director, the consent revision and the gate document.** The consent
+  items of the review go in (R-50: the token quoted in praise, a superseded mark for a
+  false positive, records that travel, the identity correction kept; R-51 "to come"), the
+  18 to 22 October records committed at the owner's word, and the gate run as spec §23
+  has it less what is dropped below. The owner runs the local-model directed passage.
+
+**Merged into those, not packages of their own:** 61's simple first version (a ship put on
+the sea is refused on the land and a harbour departure leaves by the port's fairway; R-43's
+"crosses the land") into 68; 63's small items (the boat's passengers dropped, one boat for
+port business, a waterman to hire; R-62) into 68, the towing and the boat as a vessel
+deferred; the director's grammar help the lugger director asked for (a verified forms
+reference, read-only lookups, a dry run) into 58's brief as the director's half; the
+`ship:` form's parse failures and the doubt-before-form ordering (R-43, R-41) into 68.
+
+**Deferred past the gate, kept on the books:** **51** (the observed world's focus and ships'
+logs; the truth serves the director for now); **60** (a ship bought; the purse's story wants
+more trade play first); **61**'s planner proper and **63**'s towing and boat (both serve M7's
+manoeuvre and cutting-out, and belong with it); **64** (the harbour's second pass, the
+Fable design run: the owner's, after M7's first wave rather than before it, with a 64-lite
+by Opus now if he wants the grant exposed and the flags explained: the lead's advice is to
+wait); **65** (the place's knowledge: 66 gave the line; the readings by place and the drill's
+walk wait for M7's hail between ships, which is the same question of who perceives what).
+
+**Dropped from the gate, for the owner's word:** the regatta's course with a director above
+it (spec §23's last item: the regatta exists and a director adds nothing it proves); the
+orders system's cold review as a separate Fable item (spec §25), its most-hit friction
+taken into 68 and 58 and the rest left to play. The hotfix's repair forms stay as labelled
+stopgaps until M7's taking on water, as the review advises.
+
+**The owner's decisions outstanding** (the review's §8.4 and the lead's): which consent
+records of 18 to 22 October go in (the lead commits none; the owner's word names them);
+the no-budget brief (keep in `data/` with its comments and name mended, or in his own
+scenarios place); the budget's future once R-61's fixes land (9999/9999 stands meanwhile);
+an out-of-character channel between the player and the director (R-21, R-24, R-53: the
+lead's advice is a `director:` word at the prompt that goes to the director's log only,
+and the brief's rule that plans and truth stay in the journal); whether a director may bend
+the weather after the fact so its person's forecast holds (the lead's advice: no, and the
+brief should say so); the viewer notes of 18 October (filed; M8's ship view unless the
+owner wants them with 57's painter sooner).
+
+**Fable's part in this:** the four briefs above and the merges and records, nothing more;
+the design runs (64, 65, the combat and signalling of M7) wait for the new week's budget
+as the owner intends.
+
 ## The dispatches: the director's test, shape two (2026-10-18)
 
 Run the same day 59 and 62 merged: Opus 5.5 captain, the owner at the officer's seat, the

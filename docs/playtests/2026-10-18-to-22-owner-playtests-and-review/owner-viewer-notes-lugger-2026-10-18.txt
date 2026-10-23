@@ -1,0 +1,5 @@
+1. Viewer detail pass note: Hoisted yards, gaffs, booms, etc. should move progressively in the viewer. A yard or lug sail being hoisted should show it's movement over ticks in the viewer, not just a hard change between states.
+2. Small note for the lugger: at certain viewing angles, the sail currently shows passing through the mast due to the angle between the head and foot of the sail, the foot needs to be moved forward a bit, at least in certain cases, and properly be shaped in front of the mast. Also, there is a visible vertical seam in the lug sail, not sure where it came from or if it's on purpose, but I haven't seen it in any other sail type.
+3. The topsails are much better, but their tacks run to the mast, rather than to the end of the lower lug's yard, is that intended and correct?
+4. Reefing the lugs does not visually change the lugs, seemingly.
+5. The jib is a bit too close to the fore lug and clips most of the time, nitpicky, but something to note.

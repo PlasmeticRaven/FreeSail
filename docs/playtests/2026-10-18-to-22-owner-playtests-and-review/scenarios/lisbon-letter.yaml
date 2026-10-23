@@ -1,0 +1,106 @@
+# FreeSail: Lisbon, then wherever the letter says (drafted with the owner, 2026-10-19). The
+# brig-sloop Harpy out of Falmouth in June 1805 with dispatches for the Minister at Lisbon,
+# some eight hundred miles south across the Bay and down the coast of Spain, which is at war
+# with Britain: Ferrol and Corunna are the enemy's, the Portuguese ports neutral. The
+# captain carries his own chronometer, rated at Plymouth in April, whose rate has drifted
+# and which the master forgets to wind one morning in the Bay; the longitude is his and his
+# lunars' to keep. A letter waits at Lisbon that sends her on. Given to either driver with
+# --scenario.
+
+name: Lisbon, then wherever the letter says
+seed: 7
+start: 1805-06-09T06:00
+position: {lat_deg: 50.1631, lon_deg: -5.0345}   # Carrick Road
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/brig.yaml
+  heading_deg: 190
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.85}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie
+  almanac: 1805
+  chronometer:
+    maker: Arnold
+    where: Plymouth
+    rated: 1805-04-20
+    rate_s_per_day: 2.1
+    drift: seeded                 # the true rate departs from the certificate's
+    forgotten: [1805-06-12]       # the morning the master forgets to wind it
+
+things:
+  - the dispatches for His Majesty's Minister at Lisbon, in the captain's keeping, in a weighted bag for the side
+
+ports:
+  falmouth: {}
+  plymouth: {}
+  corunna: {}
+  ferrol: {}
+  vigo: {}
+  oporto: {}
+  lisbon:
+    letters:
+      - text: "From the Admiralty's agent at Lisbon, to the commander of the Harpy: on delivering your dispatches, you are to take in water and proceed with all dispatch to Gibraltar, where the enclosed is to be put into the Governor's own hands. You are to speak no vessel on the passage that you can avoid."
+        origin: the Admiralty's agent at Lisbon
+  lagos: {}
+  cadiz: {}
+  gibraltar: {}
+  tangier: {}
+business: on
+crewed: {cap: 4, range_nm: 5}
+
+weather:
+  climatology: true
+
+orders:
+  - let go the best bower
+  - take a fix
+
+# The player commands; a model keeps the master's reckoning; a model directs.
+stations: {captain: player, master: model, officer of the watch: model, director: model}
+
+director:
+  brief:
+    name: Lisbon, then wherever the letter says
+    tone: >-
+      A King's sloop on a dispatch run, quick and anxious: across the mouth of the Bay with
+      the swell coming in from the westward, down the coast of an enemy past Ferrol and
+      Finisterre, into the Tagus with a pilot and the Minister's man waiting at the quay,
+      then the letter that sends her on south past Cape St Vincent to the Strait. The
+      longitude is the theme: a chronometer that is not what its certificate says, a
+      morning it was not wound, the lunars taken and argued over, the land raised early or
+      late.
+    challenge: >-
+      Navigation and judgement under orders: keeping the reckoning honest and knowing how
+      far to trust it, making Finisterre and the Rock of Lisbon where they are and not where
+      the account says, avoiding what the orders say to avoid. The enemy is real: a Spanish
+      or French cruiser out of Ferrol or Vigo is possible and should be seen before she is
+      near; nothing heavier than a frigate. Fog off Finisterre, a northerly that blows down
+      the coast, a calm off the Rock, each when it tells. Never fight (the guns are not
+      modelled): a chase ends within hail. Make Lisbon a port with people in it (the pilot,
+      the Minister's man, a merchant with news) and let the letter's errand be the second
+      half of the story.
+    limits:
+      wind_max_kn: 40
+      enemy_heaviest: frigate-36
+      nobody_dies: true
+      the_war_as_it_is: true
+      the_chart_as_it_is: true
+    cadence: glass
+    budget: {samples_a_day: 9999, acts_a_day: 9999}   # effectively unlimited for playtesting (the owner, 2026-10-19)
+    examples:
+      - 'ship: a frigate "Santa Brígida" of Spain at 43 40 N 9 00 W, bound for 43 30 N 9 40 W'
+      - 'ship "Santa Brígida": order give chase'
+      - 'weather: low "the Biscay low" radius 450 km at 1805-06-11T06:00 100 -300 1000'
+      - 'aboard: the chronometer found stopped'
+      - 'person: make "Mr Wright", the Minister''s secretary, ashore at Lisbon, at the quay, who has been waiting a week'
+      - 'say as the master: "By the chronometer we are twenty miles west of the account, sir, but I would not swear to it."'

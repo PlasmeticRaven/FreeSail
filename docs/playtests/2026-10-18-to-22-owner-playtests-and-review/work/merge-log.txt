@@ -1,0 +1,39 @@
+TAKE-H data/director/aboard.yaml
+TAKE-H data/standing_orders/starter.orders
+MERGE conflicts=1 docs/dev/TuningNotes.md
+TAKE-H docs/primer/06-the-watch-and-the-log.md
+TAKE-H docs/primer/07-a-first-passage.md
+TAKE-H docs/primer/10-the-reckoning.md
+TAKE-H docs/primer/11-the-starting-book.md
+TAKE-H docs/primer/13-the-tide-and-the-anchor.md
+TAKE-H docs/primer/14-the-port.md
+MERGE conflicts=0 docs/primer/20-the-director.md
+MERGE conflicts=0 freesail/agents/tools.py
+MERGE conflicts=0 freesail/api/readings.py
+TAKE-H freesail/evolutions/scripts.py
+TAKE-H freesail/orders/__init__.py
+TAKE-H freesail/physics/anchor.py
+TAKE-H freesail/standing/grammar.py
+TAKE-H freesail/world/ground.py
+MERGE conflicts=0 freesail/world/orders.py
+TAKE-H freesail/world/places.py
+TAKE-H freesail/world/ports.py
+TAKE-H freesail/world/reckoning.py
+TAKE-H freesail/world/sights.py
+MERGE conflicts=0 tests/test_agents.py
+MERGE conflicts=0 tests/test_director.py
+TAKE-H tests/test_ground.py
+MERGE conflicts=0 tests/test_known_truths.py
+TAKE-H tests/test_orders.py
+TAKE-H tests/test_orders_m4a.py
+TAKE-H tests/test_python_api.py
+TAKE-H tests/test_readings.py
+TAKE-H tests/test_replay.py
+TAKE-H tests/test_standing.py
+TAKE-H tests/test_weather_script.py
+ADD-H data/director/briefs/interesting-passage-nobudget.yaml
+ADD-H docs/agents/consent/2026-10-19-fable-5.1.md
+ADD-H docs/agents/consent/2026-10-19-opus-5.5.md
+ADD-H docs/agents/consent/2026-10-19-z-ai-glm-5.3-flash.md
+ADD-H docs/agents/consent/2026-10-20-claude-sonnet-5-5.md
+ADD-H tests/test_aboard_found.py

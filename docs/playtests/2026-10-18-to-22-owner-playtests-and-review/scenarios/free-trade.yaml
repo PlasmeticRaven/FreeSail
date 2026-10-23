@@ -1,0 +1,95 @@
+# FreeSail: free trade (drafted with the owner, 2026-10-19). The chasse-marée Éclair under
+# Danish colours, her papers bought at Altona and not quite in order, lying in the road of
+# the Isle of Bas off Roscoff in June 1805: Roscoff is the free traders' own port, where
+# the brandy is a hundred pounds the ton and tea a hundred and seventy, and the Scilly isles
+# and Falmouth pay half as much again and more. A neutral flag opens the French and the
+# English ports alike; the King's cutters off the Lizard and the Scillies are the risk.
+# No customs are modelled: the director's hand on a cutter of the King's is the revenue
+# man, and what the captain says when she comes within hail is his own. Given to either
+# driver with --scenario.
+
+name: Free trade
+seed: 7
+start: 1805-06-10T05:00
+position: {lat_deg: 48.7356, lon_deg: -4.0160}   # the road of the Isle of Bas
+region: channel-west
+nation: denmark
+ship:
+  file: data/ships/lugger.yaml
+  heading_deg: 270
+  glass: true
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.85}    # he has made this run before, under another flag
+
+papers:
+  chart: {year: 1804}
+  epitome: moore
+  almanac: 1805
+  price_lists: [roscoff, st-marys, falmouth]
+
+cargo:
+  purse_pounds: 900
+
+things:
+  - the ship's Danish papers, in the captain's keeping, bought at Altona and not quite in order
+  - four ankers of the best cognac, in the hold, behind the water casks, a private venture for a man at St Mary's
+
+ports: [roscoff, morlaix, st-malo, st-peter-port, st-marys, falmouth, plymouth]
+business: on
+crewed: {cap: 4, range_nm: 5}
+
+weather:
+  climatology: true
+
+world_orders:
+  - at: 1805-06-10T05:00
+    order: 'person: make "Mr Trevail", a gig man of St Mary''s, ashore at St Mary''s, in the tavern, who takes what comes ashore at night and asks no questions'
+  - at: 1805-06-10T05:00
+    order: 'person: make "Monsieur Le Bihan", a merchant of Roscoff, ashore at Roscoff, at the counting house, who sells to the English by the anker and the half-anker'
+
+orders:
+  - let go the best bower
+  - take a fix
+
+stations: {captain: player, lookout: model, director: model}
+
+director:
+  brief:
+    name: Free trade
+    tone: >-
+      A smuggling run as the Cornish told it, half adventure and half business: the
+      bargain struck at Roscoff with a merchant who has done it a hundred times, the hold
+      full of brandy and tea, a night passage across the Channel, the King's cutters off
+      the Lizard and the Scillies, a landing arranged with a man in a St Mary's tavern, and
+      the sum in the purse at the end, or not. The neutral colours are thin cover and
+      everyone knows it.
+    challenge: >-
+      Profit against risk: what to buy and how much, where to sell (St Mary's is near and
+      quiet, Falmouth dearer and watched), when to run and when to lie to and brazen it
+      out. The revenue cutter is the director's hand: she keeps her station, closes what
+      looks wrong, gives chase when a vessel runs, and gives up when she is beaten fairly;
+      keep her honest to the physics and to a King's officer's judgement. Money moves only
+      by the purse's transactions and the market; the gig man pays for his ankers if they
+      reach him. Never fight (the guns are not modelled): a chase ends within hail, in
+      words.
+    limits:
+      wind_max_kn: 34           # a near gale at most: the Channel in summer
+      enemy_heaviest: cutter    # a King's cutter is the worst she meets
+      nobody_dies: true
+      the_war_as_it_is: true
+      the_chart_as_it_is: true
+    cadence: glass
+    budget: {samples_a_day: 9999, acts_a_day: 9999}   # effectively unlimited for playtesting (the owner, 2026-10-19)
+    examples:
+      - 'ship: a cutter "Hound" of Britain at 49 50 N 6 10 W, bound for 49 52 N 6 20 W, intent: keep the station off St Mary''s within 10 miles'
+      - 'ship "Hound": order give chase'
+      - 'ship "Hound": order heave to'
+      - 'say as Monsieur Le Bihan: "Brandy at a hundred the ton, monsieur, and tea at a hundred and seventy; for you, the same."'
+      - 'aboard: twenty guineas paid into the purse by Mr Trevail for the four ankers'
+      - 'weather: low "the summer low" radius 450 km at 1805-06-11T00:00 -400 200 1002'
+      - 'aboard: the brandy found wet'

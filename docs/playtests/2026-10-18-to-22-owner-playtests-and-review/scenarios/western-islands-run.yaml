@@ -1,0 +1,111 @@
+# FreeSail: the Western Islands run (drafted with the owner, 2026-10-19). The cutter
+# Sherbourne, a Falmouth merchant's, out of Carrick Road in the second week of June 1805
+# for Fayal in the Azores, some twelve hundred miles to the south-west, with a sealed
+# letter for a wine house at Horta, a part cargo of sailcloth to sell there, and her
+# owners' hope of a hold full of Pico wine to bring home. A long passage for the needs:
+# the cutter is victualled for thirty days and watered for about thirty-four, so that the
+# run out, a week at Fayal and the run home are close to the edge of what she carries
+# unless she victuals and waters at Horta; the sea beyond the Channel is empty of the
+# business (it is drawn in the region she sails from), so the ocean's other ships are the
+# director's to put there. No chronometer: the longitude is by account and by lunar, and
+# the landfall is the master's. Given to either driver with --scenario.
+
+name: The Western Islands run
+seed: 7
+start: 1805-06-08T05:00
+position: {lat_deg: 50.1631, lon_deg: -5.0345}   # Carrick Road, the usual anchorage
+chart: atlantic-east                              # the whole chart: the Channel to the Azores
+nation: britain
+ship:
+  file: data/ships/cutter.yaml
+  heading_deg: 190
+  glass: true
+  instrument: sextant                             # a sextant for the lunars
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.8}    # a fair navigator, not a great one: the landfall will tell
+  - {role: mate, skill: 0.75}
+
+papers:
+  chart: {year: 1804}
+  epitome: moore
+  almanac: 1805
+  price_lists: [falmouth]
+
+cargo:
+  purse_pounds: 180
+  goods: {canvas: 12}             # Bridport sailcloth, to sell at Fayal
+
+# The things aboard at the start (package 53b): the letter is the voyage's errand.
+things:
+  - a sealed letter for Senhor Bettencourt of Horta, in the captain's keeping, from the owners
+  - a small case of the owners' Madeira, in the cabin, a present for the house at Horta
+
+ports:
+  [falmouth, plymouth, st-marys, lisbon, horta, angra, ponta-delgada, funchal, porto-santo]
+
+business: on
+crewed: {cap: 4, range_nm: 5}
+
+weather:
+  climatology: true
+
+# The world's own people at the far end, made at the start so that the director finds
+# them there (spec M7b §8): the wine house the letter is for, and its clerk.
+world_orders:
+  - at: 1805-06-08T05:00
+    order: 'person: make "Senhor Bettencourt", a wine merchant of Horta, aged sixty, ashore at Horta, at the counting house, whose house ships the Pico wine to Falmouth'
+  - at: 1805-06-08T05:00
+    order: 'person: make "Mr Ruiz", a clerk, ashore at Horta, at the quay, who keeps the Bettencourt books and speaks English'
+
+orders:
+  - let go the best bower
+  - take a fix
+
+# The player captains; a model may stand the mate's watch; a model directs.
+stations: {captain: player, officer of the watch: model, director: model}
+
+director:
+  brief:
+    name: The Western Islands run
+    tone: >-
+      A long ocean passage in a small vessel, told as the old hands told it: the Channel
+      left behind, a week of open sea with nothing in it but the weather and the reckoning,
+      the long swell of the Atlantic, the landfall of Fayal under Pico's peak, a strange
+      island port with its own people and customs, and the run home with the hold full.
+      The cutter is small and her stores are what she can carry: the passage should be felt
+      in the purser's book as much as in the log. Fayal should feel like a place: the
+      boatmen, the wine house, the clerk on the quay, the news from Lisbon, a stranger who
+      wants a passage.
+    challenge: >-
+      Endurance and judgement over weeks, not hours: the stores watched and the people fed,
+      the water kept sweet, when to go on short allowance and when to water; a landfall
+      made by account and lunar with no chronometer; trade done well or badly at Horta; and
+      whatever the islands put in the captain's way. Let the needs bite through plausible
+      causes (a calm, a cask, the bread room, the weather that lengthens the passage),
+      never by fiat. Keep the sea honest: other ships are rare out here and each one should
+      mean something; the war is real, and a French privateer off the islands is possible,
+      a ship of the line is not. Make the people at Horta real through what they say and
+      what they carry, and let money move only by the purse's transactions. Never tell the
+      captain what the letter says.
+    limits:
+      wind_max_kn: 40           # a gale at most: a hard passage, not a hurricane
+      enemy_heaviest: brig      # a privateer brig at the heaviest
+      nobody_dies: true
+      the_war_as_it_is: true
+      the_chart_as_it_is: true
+    cadence: watch              # a long voyage: the director samples by the watch and on notable lines
+    budget: {samples_a_day: 9999, acts_a_day: 9999}   # effectively unlimited for playtesting (the owner, 2026-10-19)
+    examples:
+      - 'weather: high "the Azores high" radius 1400 km at 1805-06-14T12:00 -900 -600 1030'
+      - 'aboard: the bread found damp'
+      - 'aboard: the leaguers found leaking'
+      - 'aboard: the water found foul'
+      - 'ship: a merchant brig "Esperança" of Portugal at 40 00 N 18 00 W, bound for Lisbon'
+      - 'say as Mr Ruiz: "The house has your letter, sir. Senhor Bettencourt will see you at four."'
+      - 'aboard: forty tons of wine freighted by Senhor Bettencourt at the quay for Falmouth'
+      - 'aboard: thirty pounds paid into the purse by Senhor Bettencourt for the freight'
+      - 'person: make "Mr Hale", an American supercargo, ashore at Horta, in the tavern, who wants a passage to Funchal'

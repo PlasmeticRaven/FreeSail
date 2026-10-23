@@ -1,0 +1,144 @@
+# FreeSail: the merchant passage (spec M5 §27, §29; package 36). The topsail schooner
+# Speedwell, American, from Falmouth for Brest with a cargo bought at the quay, no
+# chronometer, a master who can work a lunar. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/merchant-passage.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/merchant-passage.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/merchant-passage.yaml --hours 34 --reckoning
+#
+# The passage as the book beside this file sails it (merchant-passage.orders): she lies
+# at anchor in Carrick Road at five in the morning of 12 June 1805 with the price list of
+# Falmouth aboard; forty tons of tin are bought at the quay and come off by the lighter
+# while the boat is ashore; the ebb serves from five (high water at Falmouth 04:50 by
+# the world's tide) and she gets under way on it when the boat is alongside, out by the
+# eastern channel; a sail is sighted off the Lizard and not made out (a brig bound up
+# Channel, far enough off to be a sail and no more); the night across the Channel; the
+# Iroise in her chart's words at the deep-sea lead's cast on the morning of the 13th;
+# the pilot of Brest comes off in the road of Bertheaume on the ebb (high water at
+# Brest 04:19; the Goulet is not taken against the ebb, which runs four or five knots at
+# springs), and she anchors in the road to wait; at the turn she gets under way and
+# takes the Goulet on the flood by the pass north of the Mingan and the Fillettes
+# (Faden 1793: "range along either shore of the Goulet and fear nothing, but not the
+# middle"), the pilot answering and the lead going; she anchors in the Bay of Brest and
+# the tin is sold at the quay. The tin, bought at £120 and sold at £270 (the war's half
+# on English tin in a French port; truth 69), makes the voyage £6,000.
+#
+# The weather is pinned (a westerly of fourteen knots, a fair wind for Brest, veering
+# north-westerly and falling through the two days, the sky clear over the old high over
+# Biscay) so that the passage is the same on every machine; the sea and the motion are
+# kept. The dozen other
+# sail are the Channel's traffic of a June day: three merchant brigs, a revenue cutter
+# off the Wolf, two of the Channel fleet's cruisers off Ushant, a French brig-sloop and
+# a chasse-marée's schooner in the Iroise, a Dane and a Portuguese bound down, an
+# American schooner for Falmouth, a frigate out of Plymouth and the mail cutter; each a
+# hull from the four ship files at far detail, moved by the same wind and tide
+# (freesail/world/ships.py; truth 67). The world orders by time are a waypoint appended
+# to the high and a letter left at Brest for the pilot to bring off. The numbers of the
+# passage at seed 7 are pinned in tests/test_known_truths.py and measured in
+# docs/dev/TuningNotes.md (package 36). The starter book is not loaded: the passage's
+# own book holds what it needs, and `read the standing orders from
+# data/standing_orders/starter.orders` adds the starter's routines at any time.
+
+name: A merchant brig, free, in Torbay
+seed: 7
+start: 1805-06-12T05:00
+position: {lat_deg: 50.41, lon_deg: -3.495}   # Carrick Road, the usual anchorage (Imray 1874 p. 90)
+region: channel-west
+nation: united-states
+ship:
+  file: data/ships/brig.yaml
+  heading_deg: 190
+  glass: true
+  instrument: octant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.9}    # a master who can work a lunar (spec M5 §27): his skill set
+
+papers:
+  chart: {year: 1804}
+  epitome: moore                  # a merchantman's epitome
+  almanac: 1805
+  price_lists: [falmouth]         # the list the supercargo brought off the day before
+
+cargo:
+  purse_pounds: 1000
+
+ports:
+  - alderney
+  - algeciras
+  - angra
+  - cadiz
+  - ceuta
+  - corunna
+  - dartmouth
+  - ferrol
+  - funchal
+  - gibraltar
+  - horta
+  - lagos
+  - la-rochelle
+  - le-palais
+  - lisbon
+  - lorient
+  - morlaix
+  - oporto
+  - paimboeuf
+  - ponta-delgada
+  - porto-santo
+  - rochefort
+  - royan
+  - santander
+  - setubal
+  - st-helier
+  - st-malo
+  - st-peter-port
+  - tangier
+  - tarifa
+  - torbay
+  - vigo
+  - weymouth
+  - falmouth
+  - plymouth
+  - brest
+  - roscoff
+  - st-marys
+
+# The world's business (spec M6 §19; package 43b, `data/business.yaml`): the region's
+# trade, fishermen and cruisers drawn under the seed beside the sail named below.
+business: on
+
+weather:
+  climatology: true
+
+orders:
+  - let go the best bower
+
+# Who holds the stations: player (your seat), model (a model's door), rules (the game's
+# own).
+stations: {captain: player, officer: model, director: model}
+
+# The director above the game (spec M7b §4): the player's brief, a starter's name, a file or
+# the brief itself, with its limits.
+director:
+  brief:
+    name: An interesting passage
+    tone: >-
+      A passage with things in it. Strangers that must be made out before they are trusted,
+      a front that arrives with the glass falling, a price or a letter that tempts a change
+      of plan, the carpenter with a report. The player should be kept thinking, never kept
+      afraid.
+    challenge: >-
+      Judgement under some pressure: what is that sail, and should she run or stand on; does
+      the glass warrant a reef now; is the letter to be believed. Two notable things a watch
+      at most; the weather fresh, never a gale.
+    limits:
+      wind_max_kn: 45
+      enemy_heaviest: frigate-36
+      nobody_dies: true
+      the_war_as_it_is: true
+      the_chart_as_it_is: true
+    cadence: glass
+    budget: {samples_a_day: 48, acts_a_day: 48}
