@@ -378,6 +378,42 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
 
+### Package 68 as merged (2026-10-23)
+
+Merged `--no-ff` from the builder's worktree (nineteen commits on `809620b` across two
+container restarts; the tree surviving each), with two conflicts of the appended kind (the
+waves table; the gate 5b schooner's pin, which the lead and the builder had re-pinned alike,
+the builder's comment kept), ruff clean; the builder's fast tier (3,555 passed), the slow
+tier of the touched files (514 passed, 10 expected failures) and the whole slow tier on its
+fixed code (3,863 passed, the same 11 expected failures) passed, the pace tests passing
+once in three runs on a machine twice restarted (the floor within its noise, measured the
+same on three trees); **the one whole suite on the merged tree is the lead's, recorded
+below.** Built as briefed, all eighteen items, four taken another way and accepted: riding
+measured by **headway** over the ground under half a knot rather than speed (a riding
+frigate sheers at two knots at the turn of the tide, and a ship falling astern on her
+veered cable is not under way); a person made aboard another ship **refused in words**
+rather than bound (no other ship has a crewed World to bind him in); a flat shilling for
+the waterman (the ports have no fare data); the Navy ration for the merchant brig (no
+merchant scale yet). **The pins item 1 moved**, each proven the riding rule's by bisection
+with the old figures kept: the merchant passage (3098 to 3099 lines, its digest, the
+master's tide at 15600), the fake captain's passage (3111 to 3112), the thick trial's digest
+(the noon's longitude by a hundred-thousandth), and **the intent schooner's whole passage
+from 21756** (1698 to 2160 lines: she sails the Goulet with the flood and anchors in the
+Bay of Brest instead of Bertheaume road, drags once and holds). **Item 19, found on the way
+and blocking the suite:** the pilot laid his legs by the wind over the ground, so in a
+four-knot flood his "as near as she will lie" was forty degrees off the wind her sails
+felt; he reads the wind over the water now (no pin moved by it), and the Goulet's two
+replayed cases fail for the true reason, that his legs on that flood cannot be made and he
+knows neither to wait for slack water, to work the north shore nor to anchor: **marked
+expected failures, strict, as 57's gale trials are, the debt booked as 58b's item 6** (the
+pilot's conn in a stream), the marker to come off when it is built.
+
+**Found on the way, carried:** the anchoring's manners (R-02: the intent schooner now
+drags first in the Bay; the owner's call); the evolutions' hand counts are the frigate's
+figures, so the merchant brig works short-handed (R-46, 58b or the bill); the pilot's berth
+line writes its depth in figures. **Decisions for the owner:** the four "taken another
+way" choices above stand unless he says otherwise.
+
 ### Package 66 as merged (2026-10-19)
 
 Merged `--no-ff` from the builder's worktree (three commits on `6f272b9`; 30 files, ~1,650
