@@ -143,7 +143,14 @@ bounded by the grant's budget.**
   the game tab and in the maker's brief section, with the models the settings can call,
   and the doors tab shows the director's doors as it shows the owner's.
 
-Package 67, Opus, after 53b and 66; the brief at the lead's hand on the owner's word.
+- **An out-of-character channel (the owner, 2026-10-23).** A `director:` word at the
+  player's prompt goes to the director's log only, never the play log, and comes to the
+  director in his next sample as the player's word apart from the game; the director's
+  answer to it goes back the same way, apart from the play log, and the play log says
+  nothing. The brief's rule stands beside it: plans and the truth stay in the journal, and
+  a question to the player is phrased without world detail.
+
+Package 67, Opus, after 68; the brief at the lead's hand on the owner's word.
 
 ### 3. The world orders (`freesail/world/orders.py`)
 

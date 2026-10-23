@@ -41,7 +41,8 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 65 | Fable | The place's knowledge (spec §14, "Brought back and forward"; the owner, 2026-10-19): what a person perceives from where he stands, aboard and ashore (the readings, the log and the sightings by place; the ship reaching him ashore by report, boat or letter), the books and papers kept in places, the always-present line of his own place and state in every sample, and the drill extended to going below, eating, drinking, reading a book and coming on deck; and each kind of work done in its own place (the sailmaker's sail room, the master's gunroom, the captain's cabin), the same for the rules' person and for a model or the player at the station doing the same work (the owner, 2026-10-19) | provisional; the deferred locational knowledge of decision 47 brought back and forward at the owner's word after the dispatches test; brief after the owner's testing round |
 | 53b | Opus | Things, free lines and transactions (spec §17a; the owner's question of 2026-10-19 after the dispatches test): a thing made, moved and kept as people are, with a place and a keeper and nothing more; a short list of verbs taking free words and logging them as used, moving a thing where the words name one and saying "as said" where they do not; a sum or a cargo paid, freighted or owed as a transaction with its cause in the ledger, never a variable set; the refinement pass on 53 the owner is looking at | briefed, approved ("as written") and launched 2026-10-19; **built 2026-10-19** (spec §17a as built, with five readings taken another way, and §18's truths; the Harness's §19 and §21; the primer's chapters 14 and 20; the tuning notes, "Package 53b"; truths 7b-114 to 7b-116) |
 | 66 | Opus | The station's line and the stand-by (the harness after the dispatches test, 2026-10-19): one line of the holder's own first in every sample; a model's own order or word ends its stand-by and runs; a wake carries a line or does not wake; a word said tells who heard it and a question put says until when it waits; the truth a meanwhile read for the director; the hand's hold named (`for a watch`, `until <event>`); `say as` the lookout, the master and the muster's persons; merchant words for an unbound officer | briefed, approved and launched 2026-10-19 beside 53b; **built 2026-10-19** (spec §3, §5 and §14 as built; the Harness's §19 and §21a; the primer's chapters 19 and 20; the tuning notes, "Package 66"; truths 7b-117 to 7b-119) |
-| 67 | Opus | The director's seat made real (spec §2a; the owner, 2026-10-19): the desk reads a held seat, the game starts the API door itself on `seat:` as the harbour starts one, under the grant's budget on the owner's key, the pane in the harbour's doors tab, stopped by `unseat:` or the spent budget; the form widened to a station of a ship; the brief says what a seat costs | provisional; brief after 53b and 66 come back |
+| 67 | Opus | The director's seat made real (spec §2a; the owner, 2026-10-19): the desk reads a held seat, the game starts the API door itself on `seat:` as the harbour starts one, under the grant's budget on the owner's key, the pane in the harbour's doors tab, stopped by `unseat:` or the spent budget; the form widened to a station of a ship; the brief says what a seat costs; and an out-of-character channel between the player and the director (the owner, 2026-10-23: a `director:` word at the prompt that goes to the director's log only, and the director's answer to the player apart from the play log) | provisional; brief after 68 |
+| 68 | Opus | The review's mending (the cold review of 2026-10-22, `docs/playtests/2026-10-18-to-22-owner-playtests-and-review/`): the P0 list and the small P1s that hit every model, the fold-in's three leftovers, 61's simple half and 63's small boat items | briefed, approved and launched 2026-10-23 |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
 
 ## The testing round after 59 (the owner, 2026-10-18)
@@ -169,6 +170,14 @@ and the brief's rule that plans and truth stay in the journal); whether a direct
 the weather after the fact so its person's forecast holds (the lead's advice: no, and the
 brief should say so); the viewer notes of 18 October (filed; M8's ship view unless the
 owner wants them with 57's painter sooner).
+
+**The owner's rulings (2026-10-23):** the consent records of 18 to 22 October and the
+no-budget brief are not committed; the director's budget stays very high for the testing
+and tuning (no reason yet to constrain samples or acts); an out-of-character channel
+between the player and the director is wise and goes to package 67; no word either way on a
+director bending the world after the fact to make its person's words true, since more
+diverse director behaviour is wanted before constraining by example. 68 briefed and
+launched the same day.
 
 **Fable's part in this:** the four briefs above and the merges and records, nothing more;
 the design runs (64, 65, the combat and signalling of M7) wait for the new week's budget
@@ -1020,6 +1029,100 @@ console stays as it is. Each item an intent with the lead's reading; the intent 
    `time` a console command, from the lead's wave-2 playtest); the README's start line
    (`py -m freesail`); the primer's first chapter; §21d, §21e as built; the tuning notes
    (found on the way, the Windows pieces tested by path, pins unmoved by digest, the suite).
+
+## Package 68: the review's mending (`freesail/world/reckoning.py` and `lookout.py` the riding rule; `freesail/agents/harness.py`, `remote.py`, `mcp_server.py`, `tools.py` the door's wait and cut call, the stand-by replaced, the director's own lines, the officer's brief; `freesail/world/orders.py` the person made aboard another ship, the `ship:` form's parse, the doubt after the form, the brig limit, the budget command; `freesail/world/people.py` or `hearing.py` the words to a player-held captain; `freesail/orders/` the dropped word after a name; `freesail/evolutions/scripts.py` the lugger's getting under way, the kedge-home line; `freesail/world/ground.py` the checkpoint regression test; `freesail/api/readings.py` the truth's aground state and goal; `freesail/world/ports.py`, `movement.py` the boat's passengers and the waterman; `client/units.js` the fathom; `data/ships/merchant-brig.yaml` through `tools/gen_ships.py`; `.gitattributes`; `docs/agents/Harness.md`; the primer where touched; `docs/TechnicalSpec-M7b.md` §5, §6, §8 and M5 §12's wording as built; `docs/dev/TuningNotes.md`; tests beside each, `test_known_truths.py` truths 120 to 123)
+
+Opus; two or three days; every item small and most of them one predicate, one slice or one
+word. The ground is the cold review of 2026-10-22 (`docs/playtests/2026-10-18-to-22-owner-
+playtests-and-review/FreeSail-M7b-Playtest-and-Hotfix-Review.md`, §5 the register R-01 to
+R-63, §8.2 the P0 list, §3.3 the fold-in's items; the reviewers' reports under `work/
+reviews/` hold the ticks and the code references for every one). Each item names its
+finding; the finding's evidence binds where it and this brief differ, and the reading is
+advice. **Nothing of 58's** (deltas, the repeated history, the notable-noise rules) **or
+67's** (the seat's door) is built here. The head rules bind: the recorded passages' pins are
+re-measured only where a change moves them, with the old figure beside the new and the
+reason in the tuning notes (item 1 may move anchored passages: say which and why).
+
+1. **Riding means riding (R-01, P0).** In `reckoning._riding()` and `lookout._riding()`,
+   riding is an anchor down *and holding* *and* the speed over the ground under a threshold
+   (the lead's reading: half a knot); otherwise the account runs and the lookout's
+   land-ahead stays armed. Amend M5 §12's wording in the spec's as-built note. Truth 120:
+   let go at seven knots a mile off a beach; the account advances; the lookout cries urgent
+   before she strikes (the Western Islands run's grounding at Horta, D5-29).
+2. **Words to the captain (R-13, R-14, P0).** The player at the prompt counts as holding the
+   captain's station for every word said to him; the speaker is the order's actor, never a
+   hard-coded "The captain"; `_split_ask` counts and slices the addressee on one
+   tokenisation so that the word after "Mr Bowen," is kept. Truth 121: "say to the captain,
+   no land in sight yet" from a model officer with the player at the prompt reaches him
+   whole and is logged as the officer's.
+3. **A person made aboard another ship (R-15, P0).** `person: make "...", aboard <another
+   ship>, ...` either binds him to that ship (where she is crewed, through her World) or is
+   refused in words; never silently into the player's cabin; a place said in the make words
+   is honoured.
+4. **The MCP door (R-25, R-27, R-30, P0).** The harbour's desktop entries and the bridge's
+   default `--wait` under the client's sixty seconds (fifty); a quick reconnect after a held
+   call treated as a cut call (the result delivered, never the brief again); "still
+   waiting" carries "it is now <stamp>, the clock at N×"; the officer's brief and the
+   `stand_by` tool's words gain the compound "x or y" stand-by; the MCP seats' brief gains
+   "never end your reply while seated"; Harness.md's "four minutes" corrected.
+5. **The brig limit (R-38, P0).** `enemy_heaviest` ranks the limit as `captains._SIZE_WORDS`
+   does, so a frigate is refused under "brig"; a test per starter brief's limit.
+6. **The lugger gets under way as a lugger (R-45, P0).** A lug branch of `get under way`:
+   the lugs hoisted on the casting tack, the windlass, no sail-loosers aloft; truth 122: the
+   Éclair weighs and makes way without being taken aback.
+7. **The chart's fathoms (R-05, P0).** `FATHOM` in `client/units.js` and a test that the
+   sounding's label is finite.
+8. **The director hidden (R-20).** "Compression eased to 1x: the director is sampled" and
+   every line of the director's never reach a station's sample or the play log; the
+   officer's refusals do not list "the director" as tellable.
+9. **A stand-by replaced (R-28).** A `stand_by` sent while one runs replaces it, says so,
+   and the same-wait check reads the new one.
+10. **The director's budget not spent on echoes, and a budget command (R-61).** The director
+    is not woken by its own `say as`, `aboard` and world-order lines echoing back; `director:
+    budget <n> samples, <m> acts` at the prompt sets the day's budget in play; `director:
+    brief <words>` keeps the limits it does not name; a new brief clears the hold.
+11. **The truth (R-35).** An `aground` state for the player's ship; the business ships'
+    placeholder goal ("bound for Falmouth") dropped for their real intent; a radius filter
+    (`truth(within=<miles>)`) for the cost.
+12. **The `ship:` form and the doubt (R-43, R-41).** "a French lugger", "small fishing
+    lugger" and the like read by their description words; a colours clause ("British
+    colours", ", colours shown") does not break the parse; intents with commas are peeled;
+    the error names the clause at fault; the form is checked before the doubt, so a
+    malformed order is refused in words and never comes back only "doubted"; a `[reason]`
+    on first entry does not override a doubt the director never saw (the doubt is shown,
+    then the reason entered again).
+13. **61's simple half (R-43 "crosses the land", D2-19).** A ship put on the sea at a point
+    on the land is refused in words with the nearest water named; a ship made in a harbour
+    leaves by the port's fairway (the pilot's directions where the port has them) and not
+    across the land.
+14. **63's small boat items (R-62).** `send the boat ashore with <persons>` carries them or
+    refuses in words, never drops them to "for the prices"; a waterman at the quay takes a
+    person off when the ship's boat is away (`hire a waterman`, at the port's price); the
+    boat put away with a thing in it carries the thing (53b's "in the boat" stayed aboard,
+    D8).
+15. **The fold-in's leftovers (the review's §3.3).** A regression test that builds a
+    `Ground` with `__new__` or unpickles a pre-hotfix one and ticks it aground with a taut
+    cable (the checkpoint crash; every attribute of a checkpointed class gets a class
+    default, written as a rule in the tuning notes); the kedge let go with scope no less
+    than the hawser's run to the depth at the kedge, and "comes home" said only while a
+    heave on it is in hand (CR2-01); the cut pin-history comments restored ("729 at 57",
+    `5f682b…` at 57, "495 at 37p", `e358…` at 45; CR2-06).
+16. **A merchant brig of her own (R-63).** "A merchant brig, free" sails a merchant brig's
+    file through `tools/gen_ships.py` (her company a master's and mates', a merchant's
+    ration and hold, no marines), not H.M. brig-sloop; the scenario and the ship list
+    updated.
+17. **`.gitattributes`** with `* text=auto eol=lf`, and the scenario maker's refusal with a
+    Windows path separator made relative (R-58's second Windows test).
+18. **Truths and records.** Truths 120 to 123 (123: the brig limit, the stand-by replaced,
+    or the director's echo, whichever the builder judges the gate's); the spec's as-built
+    notes where each item touches a section; Harness.md; the primer where its words
+    change; the tuning notes (what moved, pins and why, found on the way).
+
+**Kept out:** everything in 58 (deltas, repeated history, notable-noise hysteresis, the
+tripwires, the director's forms reference and dry run), 67 (the seat's door, the
+out-of-character channel), the weather's stacking (R-39, 58 or later), Horta's tide
+(R-03, a data item for the owner's word), the anchoring script's manners (R-02), names and
+addresses (R-16), the voice between ships (R-17, M7), the API seats' folds (R-34, 67).
 
 ## Package 66: the station's line and the stand-by (`freesail/agents/harness.py` the sample's first line, the stand-by's end and its wake; `freesail/agents/agent.py`, `tools.py` the meanwhile reads and the words of the officer; `freesail/agents/director.py` the truth meanwhile and the brief's words; `freesail/world/orders.py` `say as` by station or trade and the hand's hold words; `freesail/world/crews.py` the hold until a watch or an event; `freesail/world/people.py` only for who heard; `freesail/api/readings.py` the line's pieces; `docs/agents/Harness.md`; the primer's director chapter and chapter 6 where the stand-by is told; `docs/TechnicalSpec-M7b.md` §5 and §14 as built; `docs/dev/TuningNotes.md`; `tests/test_harness.py` or where the stand-by is tested, `test_director.py`, `test_world_orders.py`, `test_known_truths.py` truths 117 to 119)
 
