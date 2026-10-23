@@ -7257,3 +7257,62 @@ def test_truth_7b_123_no_enemy_heavier_than_a_brig_refuses_a_frigate_and_lets_a_
         'ship: a frigate "Fowey" of Britain at 49 02 N 6 22 W, bound for Plymouth',
     ):
         assert not D.direct(w, text, by="the test").startswith("Refused"), text
+
+
+# ---------------------------------------------------------------------------
+# Package 58a: the sample's deltas and the stand-by's instruments (the cold review of
+# 2026-10-22, R-26, R-31, R-04, R-42; the lugger officer's and the directors' own
+# accounts). Truths 7b-124 to 7b-126, numbered after 68's 7b-120 to 7b-123.
+# ---------------------------------------------------------------------------
+
+# The Western Islands run's anchored night at Horta (the filed save, `docs/playtests/
+# 2026-10-18-to-22-owner-playtests-and-review/saves/2026-10-20-western-islands-run-H-
+# final.json`, 2 July): the cutter rode at 38 32 N 28 37 W, on the western edge (28 36.6
+# W) of the channel between Fayal and Pico, and sheered across it; the log said "she
+# swings to the flood" and "to the ebb" sixty-six times in an hour and a half.
+HORTA_BERTH = {"lat_deg": 38.5333, "lon_deg": -28.612}
+HORTA_NIGHT = datetime(1805, 7, 2, 18, 0)
+
+
+def test_truth_7b_125_the_horta_nights_swing_logs_once_per_turn():
+    """Package 58a's truth 125 (R-04; D7-02): the swing at the turn of the tide is said once
+    per turn. The cause, mended and not masked: outside every stream area the stream is
+    nought, and its direction fell back to the area's axis and read as the flood, so that a
+    ship sheering across an area's edge read the flood outside it and the ebb inside, a
+    swing each time. Now `flood` is None where no stream runs, and the swing is said at the
+    turns of the channel's own stream alone. The save's night (its ship and chart, the
+    berth it rode at, the evening of 2 July, the wind of its log at NW by W), six hours at
+    anchor across the edge: 110 swing lines under the old cause, one now."""
+    from freesail.world.geo import Position
+    from freesail.world.sights import greenwich_time
+
+    sc = Scenario(
+        start_time=HORTA_NIGHT,
+        wind_from_deg=292.0,
+        wind_speed_kn=14.0,
+        gustiness=0.3,
+        variability=0.3,
+        ship_heading_deg=290.0,
+        ship_speed_kn=0.0,
+        position=HORTA_BERTH,
+        chart="atlantic-east",
+    )
+    w = make_world(7, "data/ships/cutter.yaml", sc)
+    assert w.submit("let go the best bower").kind == "order.accepted"
+    inside = Position(38.52, -28.58)  # the channel's own water, where she does not ride
+    areas: set[str] = set()
+    turns, was = 0, None
+    for _ in range(6 * 60):
+        w.run(60)
+        areas.add(w.tide_state.area_id)
+        state = w.tide.at(inside, greenwich_time(w))
+        if not state.slack:
+            turns += int(was is not None and state.flood != was)
+            was = state.flood
+    assert areas == {"fayal-channel", "open-sea"}  # she sheered across the edge all night
+    swung = [e for e in w.log if e.kind == "ship.swung"]
+    assert swung and len(swung) <= turns, [e.text for e in swung]
+    assert all(e.data.get("area") == "fayal-channel" for e in swung)
+    if w.tide_state.flood is None:
+        # where no stream runs she rides head to wind, and the reading says so
+        assert "head to wind" in w.readings.words("anchor")
