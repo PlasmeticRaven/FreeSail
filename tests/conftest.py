@@ -360,6 +360,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 56: a day of the catch's spoilage and a shot of the seine checkpointed
         "test_fishing.py::test_the_spoilage_is_said_when_a_lot_turns_and_once_a_day_and_salt_keeps",
         "test_fishing.py::test_a_checkpoint_keeps_the_gear_in_the_water_and_the_catch_and_goes_on_the_same",
+        # package 58b: the frigate's gale lying-to (seven hours) and the Éclair's hour
+        "test_known_truths.py::test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_being_taken_aback",
+        "test_known_truths.py::test_truth_7b_127_the_eclairs_leg_is_laid_again_at_the_turn_of_the_tide_in_the_channel_of_bas",
     }
 )
 

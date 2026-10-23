@@ -472,7 +472,8 @@ lead every glass where the chart has under twenty fathoms, the deep-sea lead eve
 inside the hundred-fathom line with the land in sight or within five leagues by account,
 cast as she goes under four knots and brought to for it over them once a watch at most,
 never beating, in a blow or with the land under her lee within her sea room, filled away
-when it is had; not in pilot water nor with the pilot aboard. *The wind across the stern*
+when it is had; not in pilot water nor with the pilot aboard; the first cast a glass or an
+hour into the leg, not at its laying. *The wind across the stern*
 (`orders.navigation.watch_the_stern`, each tick from the evolutions' runner;
 `STERN_CROSSED_DEG`; the owner's ruling of 2026-10-23, nothing ordered by the helm): the
 sails answer as 43b and 37m built them, unchanged, and when the wind has come a point past
@@ -511,9 +512,12 @@ water he says he cannot bring her up and cons her on as before. He gives no cour
 tack or a wear in hand. His own turn of two points and more onto a course within eight
 points of the wind and a point and more nearer it has the yards trimmed for it first and
 the helm put over a minute later (`PILOT_TRIM_FIRST_S`); a correction of the course he
-is on is trimmed after, as before. While the pilot has the conn, by the captain's word or
-the officer's, the captain's book is written without "the leg". The two Goulet cases from
-the owner's wardroom save are no longer expected failures. Truths 7b-127 to 7b-129.
+is on is trimmed after, as before. A course of his that the helm holds till she has way
+for it is not given again over itself, and a weigh of his that is refused (her boat away)
+is asked again each half hour (`PILOT_WAIT_REFUSED_S`). While the pilot has the conn, by
+the captain's word or the officer's, the captain's book is written without "the leg". The
+two Goulet cases from the owner's wardroom save are no longer expected failures. Truths
+7b-127 to 7b-129.
 
 ### 5. The officer's own reckoning (`freesail/world/reckoning.py`; `freesail/agents/tools.py`)
 

@@ -305,7 +305,7 @@ TRIAL_TRADE_STRANGER_LINES = 1407  # package 58b (1534 at 56, the glass; 1521 at
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
 # package 56, the glass: 7b8012b076ebea42 (e73870448a788eac at 57)
-TRIAL_TRADE_STRANGER_DIGEST = "97e193f20ed64e72"  # package 58b (7b8012b076ebea42 at 56)
+TRIAL_TRADE_STRANGER_DIGEST = "5bbca78fdc6b5093"  # package 58b (7b8012b076ebea42 at 56)
 
 
 @pytest.fixture(scope="module")
@@ -342,14 +342,20 @@ def test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_win
 
 # package 37p: at anchor at 17280 (17220), the bower let go at 17688 (17669)
 # package 45 (item 3): at anchor in the outer road, within Falmouth's reach, she is in port
+# package 58b (items 1 and 2, by bisection: both turned off give every old figure, either
+# alone does not): running for shelter in the fog she is brought to for a cast of the
+# deep-sea lead inside the hundred-fathom line at 3900 and filled away at 4800, her leg laid
+# again for the stream, and comes to the outer road earlier, at anchor at 12540 and the
+# bower let go at 12850 in thirteen fathoms, in port at 12900 (docs/dev/TuningNotes.md,
+# package 58b). The old figures beside each.
 TRIAL_TRADE_THICK_STATES = [
     (300, "on passage"),
     (300, "running for shelter"),
-    (14400, "at anchor"),  # 17280 at package 37p
-    (14820, "in port"),
+    (12540, "at anchor"),  # 14400 at 45 (17280 at package 37p)
+    (12900, "in port"),  # 14820 at 45
 ]
-TRIAL_TRADE_THICK_ANCHORED_TICK = 14775  # package 45 (17688 at package 37p)
-TRIAL_TRADE_THICK_LINES = 489  # package 56, the glass (482 at 45)
+TRIAL_TRADE_THICK_ANCHORED_TICK = 12850  # package 58b (14775 at 45, 17688 at package 37p)
+TRIAL_TRADE_THICK_LINES = 426  # package 58b (489 at 56, the glass; 482 at 45)
 # decision 45, the pilot's news: 50901cf162ea95aa before; package 37p (10fee882c789666e before)
 # package 45c: every tick and the lines as they were; a line's words moved (the pilot's
 # conn and the weather's sky, both this package's)
@@ -357,7 +363,8 @@ TRIAL_TRADE_THICK_LINES = 489  # package 56, the glass (482 at 45)
 # riding): every tick and line the same, the account run while she came to her anchor at
 # 14775 and was not yet brought up: the noon's longitude by account in its data moves in
 # the fifth decimal (-5.03015 to -5.03016); the old rule restored gives the old digest
-TRIAL_TRADE_THICK_DIGEST = "3c2b220e06496db5"  # package 68, riding (ce964d9f346034de)
+# package 68, riding: 3c2b220e06496db5 (ce964d9f346034de)
+TRIAL_TRADE_THICK_DIGEST = "cfa538b19cb0d2fe"  # package 58b (3c2b220e06496db5 at 68)
 
 
 @pytest.fixture(scope="module")
