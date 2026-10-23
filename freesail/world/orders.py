@@ -90,7 +90,7 @@ import functools
 import math
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -486,12 +486,19 @@ def _weather(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         at = _time(m.group("at"))
         name = m.group("name")
         try:
-            systems.append_waypoint(
+            reached = systems.append_waypoint(
                 name, at, float(m.group("x")), float(m.group("y")), float(m.group("hpa"))
             )
         except ValueError as e:
             raise WorldOrderError(str(e)) from None
-        return f"a waypoint appended to {name}", {"system": name, "at": at.isoformat()}
+        words = f"a waypoint appended to {name}"
+        if reached is not None and reached != at:
+            # its track had ended: from where it stands now, an hour on at the soonest
+            # (package 58a, R-39)
+            words += (
+                f", reached at {reached.isoformat(timespec='minutes')} from where it stands now"
+            )
+        return words, {"system": name, "at": (reached or at).isoformat()}
     m = _SYSTEM.match(body)
     if m:
         at = _time(m.group("at"))
@@ -2875,10 +2882,53 @@ def _glass_steady(world: Any) -> bool:
     return not words.startswith("falling")
 
 
+# A high is doubted like a low (package 58a; the cold review of 2026-10-22, R-39: highs had
+# no doubt, and two appended highs on the season's own gave 1041 hPa off Brest in June):
+# above the season's ceiling, the month's background with its strongest high's anomaly
+# and this margin over (judgement: the spread of a season's highs about its table), or a
+# strong one put near her out of a glass that has not been rising.
+HIGH_CEILING_MARGIN_HPA = 4.0
+
+
+def _high_ceiling(table: Any) -> float:
+    return float(table.background_hpa) + float(table.high_anomaly_hpa[1]) + HIGH_CEILING_MARGIN_HPA
+
+
+def _glass_rising(world: Any) -> bool:
+    """Whether the glass has been rising (its tendency's words); False with no glass."""
+    glass = getattr(world, "glass", None)
+    tendency = glass.tendency() if glass is not None else None
+    if not tendency:
+        return False
+    return str(tendency.get("words", "")).lower().startswith("rising")
+
+
+def _doubt_high(world: Any, m: re.Match[str], table: Any, systems: Any) -> str | None:
+    hpa = float(m.group("hpa"))
+    if table is not None and hpa > _high_ceiling(table):
+        return (
+            f"a high of {hpa:g} hPa is above the season's ceiling for these waters "
+            f"({_high_ceiling(table):g} hPa in {table.name})"
+        )
+    if systems is not None:
+        x, y = float(m.group("x")), float(m.group("y"))
+        near = math.hypot(x - world.ship_x_km, y - world.ship_y_km)
+        background = float(systems.background_hpa)
+        if near <= LOW_NEAR_KM and hpa - background >= LOW_DEEP_HPA and not _glass_rising(world):
+            return (
+                f"a high {hpa - background:.0f} hPa strong put {near:.0f} km from the ship "
+                "out of a glass that has not been rising: the glass would have been rising "
+                "for a day before such a centre came so near"
+            )
+    return None
+
+
 def _doubt_weather(world: Any, body: str) -> str | None:
     systems = getattr(world, "systems", None)
     table = _month_table(world)
     m = _SYSTEM.match(body)
+    if m is not None and m.group("kind").lower() == "high":
+        return _doubt_high(world, m, table, systems)
     if m is not None and m.group("kind").lower() == "low":
         hpa = float(m.group("hpa"))
         if table is not None and hpa < table.central_hpa[2]:
@@ -2904,10 +2954,19 @@ def _doubt_weather(world: Any, body: str) -> str | None:
             return None
         last = system.track[-1]
         at = _time(m.group("at"))
-        hours = (at - last.at).total_seconds() / 3600.0
+        from_at, from_x, from_y = last.at, last.x_km, last.y_km
+        now = getattr(systems, "now", None)
+        if now is not None and last.at < now:
+            # a track already ended: the waypoint is reached from where the system stands
+            # now, an hour after the order at the soonest (package 58a)
+            from freesail.world.weather import APPEND_RAMP_S
+
+            from_at, from_x, from_y = now, system.x_km, system.y_km
+            at = max(at, now + timedelta(seconds=APPEND_RAMP_S))
+        hours = (at - from_at).total_seconds() / 3600.0
         if hours <= 0:
             return None
-        km = math.hypot(float(m.group("x")) - last.x_km, float(m.group("y")) - last.y_km)
+        km = math.hypot(float(m.group("x")) - from_x, float(m.group("y")) - from_y)
         fastest = table.speed_kn[1] * 1.852 * 1.5  # the season's fastest low, with a half over
         if km / hours > fastest:
             return (
@@ -2918,6 +2977,11 @@ def _doubt_weather(world: Any, body: str) -> str | None:
             return (
                 f"the waypoint deepens {system.name} to {float(m.group('hpa')):g} hPa, below "
                 f"the season's floor ({table.central_hpa[2]:g} hPa in {table.name})"
+            )
+        if system.kind == "high" and float(m.group("hpa")) > _high_ceiling(table):
+            return (
+                f"the waypoint builds {system.name} to {float(m.group('hpa')):g} hPa, above "
+                f"the season's ceiling ({_high_ceiling(table):g} hPa in {table.name})"
             )
     return None
 

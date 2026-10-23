@@ -1401,3 +1401,225 @@ def test_the_form_is_checked_before_the_doubt_and_a_first_reason_answers_no_doub
     assert w.vessels.find("Lark") is None and log_kinds(w)[-1] == "director.doubted"
     said = D.direct(w, f"{NEAR_CUTTER} [reason: the story wants her near]", by="the test")
     assert said.startswith("Done:") and log_kinds(w)[-1] == "director.reentered"
+
+
+# ---------------------------------------------------------------------------
+# Package 58a: the forms reference, the dry run, the lookups and how the world behaves
+# (the cold review of 2026-10-22, R-42 and §7.1: the lugger director's four asks)
+# ---------------------------------------------------------------------------
+
+# the examples the test's seas cannot perform as they stand, and the game's honest words
+# for why: the seat wants the owner's grant and a consent record; the starter briefs' own
+# ships are not on the test's sea; an order that answers another (carry on, fill away) or
+# wants a sail in sight of her or money in the purse
+UNPERFORMED_HERE = {
+    "seat: <the model's exact name> as captain of <ship> for 20 samples": "No consent",
+    "unseat: <ship>": "No ship named",
+    'ship "Lark": order shape a course for Falmouth': "No ship named 'Lark'",
+    'ship "Nancy": order heave to': "No ship named 'Nancy'",
+    'ship "Harpy": order carry on': "under no order of yours",
+    'ship "Harpy": order haul off': "No sail in sight to haul off from",
+    'ship "Medusa": order fill away': "She is not hove to",
+    "aboard: £6 paid from the purse to the pilot": "the purse holds nothing",
+}
+
+
+def _forms_worlds() -> list[Any]:
+    """The test's three seas for the forms, each made when first wanted: a fresh one; one
+    with the brig-sloop Harpy at far detail, 46 miles off with her captain's intent; and one
+    with Harpy and the frigate Medusa three miles off and crewed, in sight of the frigate,
+    Mr Fox and Mr Veale aboard, a low on the systems and a packet on the cabin table. No
+    brief (no limit), the weather by systems."""
+
+    def fresh() -> World:
+        w = directed(None, systems=[], climatology=True)
+        w.run(60)
+        return w
+
+    def far() -> World:
+        w = fresh()
+        order = D.form_of("ship.new").examples[0]
+        assert w.world_order(order, "the test").data["result"] == "done"
+        w.run(60)
+        return w
+
+    def near() -> World:
+        w = fresh()
+        for order in (
+            'ship: a brig-sloop "Harpy" of France at 49 32 N 5 31 W, running home to Brest, '
+            "intent: run home to Brest",
+            'ship: a frigate "Medusa" of Britain at 49 32 N 5 29 W, bound for Plymouth, intent: '
+            "keep the station off the Deadman within 8 miles",
+            'person: make "Mr Fox", a Guernsey pilot of sixty, aboard in the cabin',
+            'person: make "Mr Veale", a clerk of the Custom House, aboard in the cabin',
+            'weather: low "the low" radius 450 km at 1805-06-13T04:00 -300 500 1000',
+            "aboard: a sealed packet, on the cabin table, from the Custom House",
+        ):
+            assert w.world_order(order, "the test").data["result"] == "done", order
+        w.run(120)
+        return w
+
+    made: dict[str, World] = {}
+
+    def world(name: str, make: Any) -> World:
+        if name not in made:
+            made[name] = make()
+        return made[name]
+
+    return [lambda: world("fresh", fresh), lambda: world("far", far), lambda: world("near", near)]
+
+
+def test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs():
+    """The library's grammar gains 'the world orders', every form with examples a test
+    performs (the lugger director's first ask: "a complete director grammar with verified
+    examples"; 37% of its orders failed, learning the forms by refusal): each example
+    parses to its form's channel, and its dry run on the sea it is meant for (a fresh one,
+    one with her ship far off, one with her ships and people near) says it would be
+    performed, or doubted with what it would then do; the few the test's seas cannot
+    perform are answered in the game's honest words about the situation, never the form."""
+    worlds = _forms_worlds()
+    keys = [f.key for f in D.WORLD_ORDER_FORMS]
+    assert len(keys) == len(set(keys)) and all(f.examples for f in D.WORLD_ORDER_FORMS)
+    channels = set(WO.CHANNELS)
+    for f in D.WORLD_ORDER_FORMS:
+        assert f.channel in channels, f.key
+        for x in f.examples:
+            assert WO.parse(x).channel == f.channel, x
+            said = []
+            for world in worlds:
+                s = D.dry_run(world(), x)
+                said.append(s)
+                if "it would be performed" in s or (
+                    "it would be doubted" in s and "it would do this: " in s
+                ):
+                    break
+            else:
+                assert x in UNPERFORMED_HERE, (x, said)
+                assert any(UNPERFORMED_HERE[x] in s for s in said), (x, said)
+
+
+def test_the_briefs_examples_are_drawn_from_the_forms_never_written_apart():
+    """The station brief's examples are the forms' own, and so are the starter briefs'."""
+    every = set(D.every_example())
+    in_brief = [x for x in every if f"'{x}'" in D.DIRECTOR_BRIEF]
+    assert len(in_brief) >= 30
+    assert '\'weather: low "the low" radius 450 km fronts 140 300 at 1805-06-13T04' in (
+        D.DIRECTOR_BRIEF
+    )
+    for name in D.starter_briefs():
+        for x in D.resolve_brief(name).examples:
+            assert x in every, (name, x)
+    grammar = T.library(world_at(49.5, -5.5), "captain", "grammar", section="the world orders")
+    page = str(grammar)
+    for f in D.WORLD_ORDER_FORMS:
+        assert f.words in page and all(f"e.g. {x}" in page for x in f.examples), f.key
+
+
+def test_a_dry_run_says_a_refusal_and_a_form_at_fault_and_is_a_read_at_the_desk():
+    """The dry run answers in the channel's order: the brief's limit, the form at fault,
+    the rule of reach; and at the door it is a read (it ends no stand-by, and counts
+    among the reads, not the orders)."""
+    w = directed("quiet-passage")
+    w.run(60)
+    frigate = 'ship: a frigate "Vengeance" of France at 49 00 N 6 20 W, running home to Brest'
+    said = D.dry_run(w, frigate)
+    assert said.startswith("Dry run, nothing performed and no act spent: it would be refused")
+    assert "outside the brief" in said and w.vessels.find("Vengeance") is None
+    said = D.dry_run(w, "weather: a gale from the west")
+    assert "the game has no way to do this as said" in said
+    assert T.is_dry_run("world_order", {"text": "x", "dry_run": "true"})
+    assert not T.is_dry_run("world_order", {"text": "x"})
+    from freesail.agents.remote import Desk  # noqa: F401  (the desk's aside, below)
+
+    h = seat_director(w, [call("stand_by", until="a watch")])
+    w.run(60)
+    assert h.agent.standing_by
+    result = h.aside(call("world_order", text=frigate, dry_run=True))
+    assert str(result).startswith("Dry run") and h.agent.standing_by
+
+
+def test_the_truths_lookups_a_port_the_grounds_the_systems_and_a_point():
+    """The lugger director's second ask, read-only lookups: a port's places and prices, the
+    fishing grounds, the systems seeded and appended with their tracks (and that they add),
+    and whether a point is at sea and its depth by the chart; each a small read."""
+    w = directed(None, systems=[], climatology=True)
+    seat_director(w, [call("stand_by", until="a watch")])
+    w.run(60)
+    port = T.call(w, "director", "truth", {"ports": "Falmouth"})["ports"]
+    assert port["ports"][0]["port"] == "Falmouth" and "The quay" in port["words"]
+    assert port["ports"][0]["prices"]
+    grounds = T.call(w, "director", "truth", {"grounds": "all"})["grounds"]
+    assert grounds["grounds"] and "pilchards" in grounds["words"]
+    w.world_order('weather: high "the ridge" radius 900 km at 1805-06-13T04:00 300 -500 1024', "t")
+    systems = T.call(w, "director", "truth", {"systems": True})["systems"]
+    ridge = [s for s in systems["systems"] if s["name"] == "the ridge"]
+    assert ridge and ridge[0]["appended"] and ridge[0]["track"]
+    assert "systems add" in systems["words"]
+    sea = T.call(w, "director", "truth", {"at": "49 55 N 4 35 W"})
+    assert sea["at"]["at_sea"] and "fathoms" in sea["at"]["words"]
+    land = T.call(w, "director", "truth", {"at": "the Lizard"})
+    assert not land["at"]["at_sea"] and "on the land" in land["at"]["words"]
+    refused = T.call(w, "captain", "truth", {"ports": "Falmouth"})
+    assert "refused" in refused or "does not see the truth" in str(refused)
+
+
+def test_how_the_world_behaves_is_written_from_the_code_and_says_its_figures():
+    """The lugger director's fourth ask: a short page of how the world behaves, every
+    figure in it the code's own constant."""
+    from freesail.world import crews
+    from freesail.world import orders as wo
+    from freesail.world import weather as wx
+
+    page = T._world_topic().whole
+    for said in (
+        f"{wx.SYSTEM_REACH_KM:g} km",
+        f"{wx.APPEND_RAMP_S // 60} minutes",
+        f"{wx.GEOSTROPHIC_MS_PER_HPA_PER_100KM:g} m/s",
+        f"{crews.CREWED_NM:g} miles",
+        f"{crews.CREWED_CAP} at once",
+        f"{crews.HAND_HOLD_S // 60} minutes",
+        f"{wo.LETTER_REACH_NM:g} miles",
+        f"{wo.PRICE_SWING:.0%}",
+        f"{wo.BOAT_REACH_NM:g} miles",
+        f"{wo.LOW_DEEP_HPA:g} hPa",
+        f"{wo.HIGH_CEILING_MARGIN_HPA:g} hPa",
+        "Systems add",
+    ):
+        assert said in page, said
+    assert "the world: how the world behaves" in str(T.library(world_at(49.5, -5.5), "captain"))
+
+
+def test_an_appended_system_grows_in_and_a_waypoint_after_an_ended_track_runs_from_now():
+    """R-39's small part: a system appended in play grows in from the order's tick (an
+    hour at the least, else until its first point's time), the glass never stepping; a
+    waypoint appended to a track that had ended runs from where the system stands, reached
+    an hour on at the soonest; a high is doubted like a low."""
+    from freesail.world import weather as wx
+
+    w = directed(None, systems=[], climatology=True)
+    w.run(60)
+
+    def glass() -> float:
+        return float(w.systems.pressure_at(w.ship_x_km, w.ship_y_km))
+
+    before = glass()
+    w.world_order('weather: low "the low" radius 450 km at 1805-06-12T13:00 0 0 990', "t")
+    readings = [glass()]
+    for _ in range(12):
+        w.run(900)
+        readings.append(glass())
+    steps = [a - b for a, b in zip(readings, readings[1:], strict=False)]
+    assert abs(readings[0] - before) < 0.05  # nothing at the order's tick
+    assert max(steps) < 3.0 and readings[-1] < before - 20.0  # down by degrees, all of it
+    # the track ended at 13:00: a waypoint for twenty minutes on is reached an hour on
+    w.run(1800)
+    e = w.world_order('weather: waypoint for "the low" at 1805-06-12T13:50 100 100 1000', "t")
+    assert "reached at" in e.text and "from where it stands now" in e.text
+    low = w.systems.find("the low")
+    assert low.track[-1].at - low.track[-2].at == dt.timedelta(seconds=wx.APPEND_RAMP_S)
+    # a high above the season's ceiling is doubted, as a deep low is
+    w2 = directed(None, systems=[], climatology=True)
+    high = WO.parse('weather: high "the dome" radius 900 km at 1805-06-13T04:00 300 -500 1060')
+    assert "above the season's ceiling" in str(WO.doubt(w2, high))
+    fair = WO.parse('weather: high "the ridge" radius 900 km at 1805-06-13T04:00 900 -900 1022')
+    assert WO.doubt(w2, fair) is None

@@ -28,6 +28,7 @@ data; intervals (`INTERVALS`, for `every`) are seconds of ship's time.
 from __future__ import annotations
 
 import functools
+import math
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
@@ -1787,6 +1788,147 @@ REGISTRY.add(
 
 
 # ---------------------------------------------------------------------------
+# Package 58a: `ahead`, what lies on her course within the next glass (the owner's "delta"
+# of 2026-10-17; the lugger officer's account of time, the cold review's §7.2: a model sees
+# samples and never the curve between them). One line, from what the deck has: her
+# position by account, her head and her speed by the log, the chart, and the sail the
+# lookout has in sight; the director's the same by the truth (`ahead_words` with the true
+# position, course and speed, in the truth's own-ship entry).
+# ---------------------------------------------------------------------------
+
+AHEAD_S = 1800  # the next glass
+AHEAD_ABEAM_M = 2.0 * units.CABLE  # a danger this near her track lies on it
+AHEAD_SAIL_POINTS = 2.0  # a sail within two points of her head lies ahead of her
+AHEAD_SHOAL_FM = 10.0  # the depth whose crossing is said ("shoaling under ten fathoms")
+AHEAD_NO_WAY_KN = 0.5  # under this, no way on her: nothing comes on her course
+
+
+def ahead_words(
+    world: Any, pos: Any, heading_rad: float, speed_ms: float, by: str = "by account"
+) -> dict[str, Any] | None:
+    """What lies on her course within the next glass at her speed (package 58a): the land
+    (the first point of the track the chart has dry), a charted danger within two cables
+    of the track with too little water for her, the depth by the chart where it changes
+    (crossing `AHEAD_SHOAL_FM`, or by a third or more), and a sail in sight within two
+    points of her head; in one line, nearest first. None without a chart or a position."""
+    from freesail.world.chart import fathoms_words
+    from freesail.world.geo import destination, distance_words
+
+    chart = getattr(world, "chart", None)
+    if chart is None or pos is None:
+        return None
+    kn = units.ms_to_knots(max(0.0, float(speed_ms)))
+    head_deg = units.rad_to_deg(float(heading_rad)) % 360.0
+    point = units.point_name(float(heading_rad))
+    if getattr(world, "at_anchor", False):
+        return {"words": "nothing: she lies at anchor", "items": [], "run_m": 0.0}
+    if (getattr(world.ship, "extra", None) or {}).get("aground"):
+        return {"words": "nothing: she is aground", "items": [], "run_m": 0.0}
+    if kn < AHEAD_NO_WAY_KN:
+        return {"words": "nothing: she has no way on her", "items": [], "run_m": 0.0}
+    run_m = units.knots_to_ms(kn) * AHEAD_S
+    items: list[tuple[float, str]] = []
+    step = max(units.CABLE, run_m / 30.0)
+    here_d = chart.depth_at(pos)
+    land_at = None
+    k = 1
+    while k * step <= run_m + 1e-6:
+        p = destination(pos, head_deg, k * step)
+        d = chart.depth_at(p)
+        if d is not None and d <= 0.0:
+            land_at = k * step
+            break
+        k += 1
+    if land_at is not None:
+        items.append((land_at, f"the land in {distance_words(land_at)}"))
+    hull = getattr(world.ship, "hull", None)
+    draught = float(hull.spec.draught_m) if hull is not None else 2.0
+    reach = land_at if land_at is not None else run_m
+    for f, along, off, side in chart.dangers_ahead(
+        pos, head_deg, reach, AHEAD_ABEAM_M, tide_m=0.0, wants_m=draught + 1.0
+    ):
+        lies = (
+            "on her track"
+            if off <= units.CABLE
+            else (
+                f"{distance_words(off)} to {'starboard' if side > 0 else 'larboard'} of her track"
+            )
+        )
+        items.append((along, f"{f.name} {lies}, in {distance_words(max(along, units.CABLE))}"))
+    end = destination(pos, head_deg, reach)
+    end_d = chart.depth_at(end) if land_at is None else None
+    shoal_m = units.fathoms_to_m(AHEAD_SHOAL_FM)
+    if here_d is not None and here_d > shoal_m:
+        found = chart.shoal_ahead(pos, head_deg, reach, shoal_m)
+        if found is not None and (land_at is None or found[0] < land_at):
+            items.append(
+                (
+                    found[0],
+                    f"shoaling under {AHEAD_SHOAL_FM:g} fathoms by the chart in "
+                    f"{distance_words(found[0])}",
+                )
+            )
+        elif end_d is not None and end_d > 0 and abs(end_d - here_d) >= here_d / 3.0:
+            items.append(
+                (
+                    reach,
+                    f"the depth by the chart from {fathoms_words(here_d)} to "
+                    f"{fathoms_words(end_d)}",
+                )
+            )
+    lookout = getattr(world, "lookout", None)
+    if lookout is not None:
+        for s in getattr(lookout, "sightings", ()) or ():
+            if getattr(s, "seen_as", "") != "sail":
+                continue
+            rel = units.wrap_pi(units.deg_to_rad(float(s.bearing_deg)) - float(heading_rad))
+            judged = float(s.judged_m)
+            if units.rad_to_points(abs(rel)) <= AHEAD_SAIL_POINTS and judged <= run_m + 2.0 * (
+                units.NAUTICAL_MILE
+            ):
+                from freesail.world.lookout import ahead_words as on_her_head
+
+                items.append((judged, f"a sail {on_her_head(rel)}, {distance_words(judged)} off"))
+    items.sort(key=lambda t: t[0])
+    head = f"on her course {point} at {kn:.0f} knots, the next glass ({distance_words(run_m)}) {by}"
+    if not items:
+        depth = f", {fathoms_words(here_d)} by the chart" if here_d and here_d > 0 else ""
+        words = f"{head}: open water{depth}"
+    else:
+        words = f"{head}: " + "; ".join(w for _, w in items)
+    return {"words": words, "items": [w for _, w in items], "run_m": round(run_m)}
+
+
+def _ahead(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`ahead`: what lies on her course within the next glass, from her position by
+    account, her head and her speed by the log (`ahead_words`). None without a chart or a
+    reckoning."""
+    nav = _navigation_of(world)
+    if nav is None or getattr(world, "chart", None) is None:
+        return None
+    try:
+        pos = nav.account_now()
+    except Exception:  # noqa: BLE001  (an account not yet kept reads as none)
+        return None
+    return ahead_words(world, pos, float(world.ship.heading), _speed(world, None))
+
+
+REGISTRY.add(
+    Reading(
+        "ahead",
+        ("ahead", "what lies ahead", "what is ahead"),
+        "ground",
+        "",
+        _ahead,
+        description="what lies on her course within the next glass at her speed, from her "
+        "position by account: the land, a charted danger near her track, the depth by the "
+        "chart where it shoals or changes, a sail in sight on her head; one line",
+        none_words=_no_dangers_words,
+    )
+)
+
+
+# ---------------------------------------------------------------------------
 # Package 34: the tide as the captain has it, the anchor and the cable (spec M5 §16, §18)
 # ---------------------------------------------------------------------------
 # No reading gives the world's tide: `the tide by the almanac` is the master's, from the
@@ -3385,6 +3527,16 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
 
         own["sail"] = sail_set_line(ship).removeprefix("Sail set: ")
     own["state"] = _own_state_truth(world)
+    # what lies on her course within the next glass, by the truth (package 58a; the
+    # owner's ruling of 2026-10-23: the director's `ahead` is the truth's)
+    try:
+        dyn = getattr(ship, "dyn", None)
+        speed_ms = float(dyn.speed) if dyn is not None else float(getattr(ship, "speed", 0.0))
+        ahead = ahead_words(world, here, float(ship.heading), speed_ms, by="by the truth")
+    except Exception:  # noqa: BLE001  (never a truth lost to the line ahead)
+        ahead = None
+    if ahead is not None:
+        own["ahead"] = ahead["words"]
     cap = getattr(world, "captain", None)
     if cap is not None:
         own["captain"] = cap.words() if hasattr(cap, "words") else str(cap.state)
@@ -3509,6 +3661,172 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
     return out
 
 
+# ---------------------------------------------------------------------------
+# Package 58a: the truth's lookups (the cold review of 2026-10-22, R-42: the lugger
+# director's "read-only data lookups: the grounds, the port's places, which systems are
+# seeded, and 'is this point at sea'"), each a small read in place of the whole truth.
+# ---------------------------------------------------------------------------
+
+
+def truth_ports(world: Any, which: str) -> dict[str, Any]:
+    """`truth(ports=...)`: a port's places (with the world's people ashore at each), its
+    prices and its stance; 'all' for every port of the world."""
+    ports = getattr(world, "ports", None)
+    if ports is None or not ports.ports:
+        return {"words": "The world keeps no ports."}
+    key = " ".join(str(which).split())
+    if key.lower() in ("all", "true", "yes", "every port"):
+        chosen = list(ports.ports.values())
+    else:
+        port = ports.find(key)
+        if port is None:
+            known = ", ".join(p.name for p in ports.ports.values())
+            return {"words": f"No port named '{key}'; the ports of the world: {known}."}
+        chosen = [port]
+    out = []
+    for port in chosen:
+        places = ports.places_lines(port)
+        prices = {g: round(float(x.price), 1) for g, x in port.market.goods.items()}
+        priced = ", ".join(f"{g} £{p:g} a ton" for g, p in prices.items()) or "no market"
+        stance = f"closed to {', '.join(port.closed_to)}" if port.closed_to else "open"
+        out.append(
+            {
+                "port": port.name,
+                "id": port.id,
+                "nation": port.nation,
+                "stance": stance,
+                "places": places,
+                "prices": prices,
+                "words": f"{port.name} ({port.nation}, {stance}): {' '.join(places)} Prices: "
+                f"{priced}.",
+            }
+        )
+    return {"ports": out, "words": " ".join(p["words"] for p in out)}
+
+
+def truth_grounds(world: Any, which: str) -> dict[str, Any]:
+    """`truth(grounds=...)`: the fishing grounds of the chart's regions (or one by name):
+    where each lies, how far it reaches, its fish by gear and season."""
+    from freesail.world.fishing import grounds
+    from freesail.world.geo import format_position
+
+    found = grounds(world)
+    key = " ".join(str(which).lower().split())
+    if key not in ("all", "true", "yes", ""):
+        found = [g for g in found if key in g.name.lower() or key == g.id]
+    if not found:
+        return {"words": f"No fishing ground named '{which}' on this chart."}
+    out = []
+    for g in found:
+        gear = "; ".join(f"{k}: {g.season_words(k)}" for k in g.gear_kinds()) or "no fish"
+        out.append(
+            {
+                "ground": g.name,
+                "id": g.id,
+                "position": format_position(g.position),
+                "radius_nm": g.radius_nm,
+                "words": f"{g.name}, at {format_position(g.position)} within {g.radius_nm:g} "
+                f"miles: {gear}",
+            }
+        )
+    return {"grounds": out, "words": ". ".join(x["words"] for x in out) + "."}
+
+
+def truth_systems(world: Any) -> dict[str, Any]:
+    """`truth(systems=true)`: every weather system, seeded or appended, with its kind, its
+    centre (km east and north of the voyage's start) and its pressure there, its radius,
+    and its track or its drift; the background, and that the field is their sum."""
+    systems = getattr(world, "systems", None)
+    if systems is None:
+        return {"words": "No weather systems: the scenario pins its wind."}
+    bg = float(systems.background_hpa)
+    out = []
+    for s in systems.systems:
+        if s.gone:
+            continue
+        d: dict[str, Any] = {
+            "name": s.name,
+            "kind": s.kind,
+            "appended": bool(s.scripted),
+            "centre_km": [round(s.x_km), round(s.y_km)],
+            "centre_hpa": round(bg + s.anomaly_hpa, 1),
+            "radius_km": round(s.radius_km),
+        }
+        if s.scripted:
+            d["track"] = [
+                f"{p.at.isoformat(timespec='minutes')} {p.x_km:g} {p.y_km:g} {p.hpa:g}"
+                for p in s.track
+            ]
+            how = "on its track: " + "; ".join(d["track"])
+        else:
+            d["drift_kmh"] = [round(s.vx_kmh, 1), round(s.vy_kmh, 1)]
+            d["life_h"] = round(float(s.life_h or 0.0))
+            how = (
+                f"drifting {math.hypot(s.vx_kmh, s.vy_kmh):.0f} km an hour, its life "
+                f"{d['life_h']} hours"
+            )
+        d["words"] = (
+            f"{s.name}, a {s.kind} {d['centre_hpa']:g} hPa at its centre ({d['centre_km'][0]} km "
+            f"E, {d['centre_km'][1]} km N), radius {d['radius_km']} km, {how}"
+        )
+        out.append(d)
+    at_ship = float(systems.pressure_at(world.ship_x_km, world.ship_y_km))
+    words = (
+        f"The background {bg:.1f} hPa; the field at the ship {at_ship:.1f} hPa, the background "
+        "and the gradient with every system's anomaly added (systems add: two highs together "
+        "make a higher glass than either centre). "
+        + ("; ".join(d["words"] for d in out) or "No systems.")
+    )
+    return {
+        "background_hpa": round(bg, 1),
+        "at_the_ship_hpa": round(at_ship, 1),
+        "systems": out,
+        "words": words,
+    }
+
+
+def truth_at(world: Any, where: str) -> dict[str, Any]:
+    """`truth(at=...)`: a point (a position, or a place the chart or the ports name) at sea
+    or on the land, its depth by the chart at the datum, its stream area, and how far it
+    lies from the player's ship."""
+    from freesail.world.chart import fathoms_words
+    from freesail.world.geo import bearing_and_distance, distance_words, format_position
+    from freesail.world.ships import place_position
+
+    found = place_position(world, where)
+    if found is None:
+        return {"words": f"'{where}' is no position and no place of the chart."}
+    pos, name = found
+    chart = getattr(world, "chart", None)
+    depth = chart.depth_at(pos) if chart is not None else None
+    if chart is None:
+        state = "the world keeps no chart"
+    elif depth is None:
+        state = "beyond the chart's data"
+    elif depth <= 0.0:
+        state = "on the land (or a rock that dries)"
+    else:
+        state = f"at sea, {fathoms_words(depth)} by the chart at the datum"
+    d: dict[str, Any] = {
+        "position": format_position(pos),
+        "name": name,
+        "at_sea": bool(depth is not None and depth > 0.0),
+        "depth_m": None if depth is None else round(float(depth), 1),
+    }
+    words = f"{name} ({format_position(pos)}): {state}"
+    tide = getattr(world, "tide", None)
+    if tide is not None:
+        area = tide.area_at(pos)
+        d["stream_area"] = area.name
+        words += f"; the stream: {area.name}"
+    here = getattr(world, "position", None)
+    if here is not None:
+        miles = bearing_and_distance(here, pos)[1]
+        words += f"; {distance_words(miles)} from the {getattr(world.ship, 'name', 'ship')}"
+    d["words"] = words + "."
+    return d
+
+
 def _knots_of(world: Any) -> float:
     dyn = getattr(world.ship, "dyn", None)
     if dyn is not None:
@@ -3543,7 +3861,8 @@ def _truth_weather(world: Any) -> dict[str, Any]:
         for s in systems.systems:
             if s.scripted and s.track:
                 x, y, hpa = _track_at(s.track, s.track_times, then)
-                s.x_km, s.y_km, s.anomaly_hpa = x, y, hpa - systems.background_hpa
+                share = s.ramp_share(then)  # an appended system grows in (package 58a)
+                s.x_km, s.y_km, s.anomaly_hpa = x, y, (hpa - systems.background_hpa) * share
             else:
                 hours = TRUTH_AHEAD_S / 3600.0
                 s.x_km, s.y_km = s.x_km + s.vx_kmh * hours, s.y_km + s.vy_kmh * hours
@@ -3578,6 +3897,8 @@ def _truth_words(d: dict[str, Any]) -> str:
             bits.append(f"intent {s['intent']} ({s.get('state', '')})")
         elif s.get("goal"):
             bits.append(s["goal"])
+        if s.get("ahead"):
+            bits.append(f"ahead: {s['ahead']}")  # package 58a
         parts.append("; ".join(bits))
     w = d.get("weather") or {}
     weather = f"the wind {w.get('wind_now', '')}"

@@ -892,7 +892,11 @@ class Desk:
             if was is not None:
                 words += f", and your stand-by (until {was}) ended at your own word"
             return {"out_of_turn": True, "spoke": True, "words": f"{words}; your turn is open."}
-        if reply.calls and all(c.name in ASIDE_TOOLS for c in reply.calls):
+        if reply.calls and all(
+            c.name in ASIDE_TOOLS or tools.is_dry_run(c.name, c.args) for c in reply.calls
+        ):
+            # the meanwhile reads, a world order's dry run among them (package 58a: it
+            # performs nothing, and the stand-by goes on through it)
             results = [
                 {"name": c.name, "args": dict(c.args), "result": h.aside(c)} for c in reply.calls
             ]

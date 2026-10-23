@@ -239,8 +239,9 @@ def test_nothing_real_passes_through_the_harness():
         if "tool_results" in d:
             assert set(d) == {"tool_results"}
         else:
-            # a sample after the first says its readings are the changes (package 31c)
-            assert set(d) - {"readings_are"} == {
+            # a sample after the first says its readings are the changes (package 31c),
+            # and closes with what stands as before (package 58a)
+            assert set(d) - {"readings_are", "as_before"} == {
                 "you",  # the station's line (package 66)
                 "tick",
                 "stamp",
@@ -899,14 +900,17 @@ def test_an_urgent_line_wakes_any_stand_by_and_the_notable_ones_come_bundled_and
     assert not h.agent.standing_by and fake.calls == calls + 1
     woke = data_turns(fake)[-1]
     assert woke["reason"] == "an urgent event: The fore topgallant mast carried away."
+    # package 58a (the deltas, R-26): the notable lines are counted and found in the
+    # sample's log, not listed twice (before, `"lines": [the booms]` beside the log)
     assert woke["stood_by"] == {
         "since": "Morning watch, 8 bells (04:00)",
         "until": "eight bells",
         "notable": 1,
-        "lines": [interim["lines"][0]],
+        "lines_in": "the log below",
     }
     texts = [ln["text"] for ln in woke["log"]]
     assert "A routine line." in texts and "The fore topgallant mast carried away." in texts
+    assert interim["lines"][0]["text"] in texts
     assert lines(world, "agent.resumed") == [
         "[watcher] An urgent event: The fore topgallant mast carried away; the watcher is "
         "sampled again."
@@ -914,8 +918,9 @@ def test_an_urgent_line_wakes_any_stand_by_and_the_notable_ones_come_bundled_and
     shown = repl_mod.render_turn(fake.seen[-1][-1])
     assert (
         "While you stood by (since Morning watch, 8 bells (04:00), until eight bells): 1 "
-        "notable line logged:\n  * Morning watch (04:01)  The booms are working" in shown
+        "notable line logged, in the log below." in shown
     )
+    assert "* Morning watch (04:01)  The booms are working" in shown  # the log's own line
     # a stand-by until a notable event ends at the next notable line, named
     world2 = point_world()
     h2, fake2, _ = stationed(world2, [call("stand_by", until="a notable event"), "Up."])

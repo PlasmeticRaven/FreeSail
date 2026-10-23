@@ -360,6 +360,11 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 56: a day of the catch's spoilage and a shot of the seine checkpointed
         "test_fishing.py::test_the_spoilage_is_said_when_a_lot_turns_and_once_a_day_and_salt_keeps",
         "test_fishing.py::test_a_checkpoint_keeps_the_gear_in_the_water_and_the_catch_and_goes_on_the_same",
+        # package 58a: every world order's example dry-run on three seas; the Horta night,
+        # the deltas sailed by the glass
+        "test_director.py::test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs",
+        "test_known_truths.py::test_truth_7b_124_a_second_sample_carries_what_changed_and_still_waiting_what_is_new",
+        "test_known_truths.py::test_truth_7b_125_the_horta_nights_swing_logs_once_per_turn",
     }
 )
 

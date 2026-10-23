@@ -7265,6 +7265,133 @@ def test_truth_7b_123_no_enemy_heavier_than_a_brig_refuses_a_frigate_and_lets_a_
 # accounts). Truths 7b-124 to 7b-126, numbered after 68's 7b-120 to 7b-123.
 # ---------------------------------------------------------------------------
 
+
+def _captain_standing_by_a_glass(stranger_at: str, destination: str):
+    """The frigate lying in a light westerly off the Lizard with one merchant brig put on the
+    sea, and a scripted captain at his station who stands by a glass, turn after turn."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents.agent import captain
+    from freesail.agents.fake import Fake, call
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=180.0,
+        ship_speed_kn=0.0,
+        position={"lat_deg": 49.80, "lon_deg": -5.60},
+        region="channel-west",
+    )
+    w = make_world(7, "data/ships/frigate-36.yaml", sc)
+    order = f'ship: a merchant brig "Two Brothers" of Britain at {stranger_at}, {destination}'
+    assert w.world_order(order, "the truth").data["result"] == "done"
+    w.run(120)
+    st = captain(SamplingPolicy.in_lockstep(None, "urgent"), 24 * 3600, world=w)
+    fake = Fake([call("stand_by", until="a glass")], loop=True)
+    h = Harness(w, st, fake, save=lambda _w, _why: None)
+    h.start()
+    return w, h
+
+
+def _samples(h) -> list[dict]:
+    from freesail.agents.model import DATA
+
+    return [t.content for t in h.turns if t.role == DATA and "tool_results" not in t.content]
+
+
+def test_truth_7b_124_a_second_sample_carries_what_changed_and_still_waiting_what_is_new():
+    """Package 58a's truth 124 (R-26; LO2-20; the owner's "delta" of 2026-10-17): a
+    captain's second sample carries no sail line when no sail changed, and the strangers'
+    list only when a sail came, went or was made out further, closing with one line of
+    what stands as before; the stand-by's notable lines are counted, found in the sample's
+    log, and not listed twice; and "still waiting" carries only the lines since the last
+    poll (1.3 million characters in four hours for one director, the whole wait re-listed
+    every 55 seconds)."""
+    from freesail.agents import mcp_server as M
+
+    # a sail six miles off that is made out no further: the first sample whole, the next
+    # with no sail line and no strangers' list, and the line of what stands as before
+    w, h = _captain_standing_by_a_glass("49 48 N 5 28 W", "bound from Falmouth for Penzance")
+    w.run(2 * 1800 + 5)
+    first, second, third = _samples(h)[:3]
+    assert {"sails", "strangers", "sail_in_sight"} <= set(first["readings"])
+    for later in (second, third):
+        assert not {"sails", "strangers", "sail_in_sight", "stranger_in_sight"} & set(
+            later["readings"]
+        )
+        assert later["as_before"].startswith("As before: the sails, one sail in sight, the book;")
+        assert "30 minutes of the ship's time since your last reply" in later["you"]
+    assert "since your last reply" not in first["you"]
+    # a sail that closes: her list comes again each time she is made out further
+    w2, h2 = _captain_standing_by_a_glass("49 47 N 5 45 W", "bound for the Lizard")
+    w2.run(3 * 1800 + 5)
+    told = [s["readings"].get("strangers") for s in _samples(h2)[1:4]]
+    assert all(told) and told[0].startswith("a brig") and "British colours" in told[1]
+    # the wait's lines: counted in the waking sample, in its log; "still waiting" lists
+    # only what is new since the last poll
+    h.stand_by("a watch")
+    w.record(Severity.NOTABLE, "test.first", "A boat pulling for the shore.")
+    w.run(60)
+    first_poll = M.still_waiting(h.interim(), 50.0)
+    assert "A boat pulling for the shore." in first_poll
+    w.record(Severity.NOTABLE, "test.second", "The boat has landed her people.")
+    w.run(60)
+    second_poll = M.still_waiting(h.interim(), 50.0, listed=1)
+    assert "The boat has landed her people." in second_poll
+    assert "A boat pulling for the shore." not in second_poll
+    assert "(1; one line before them, in your earlier results)" in second_poll
+    w.record(Severity.URGENT, "test.urgent", "The brig is standing into danger.")
+    w.run(2)
+    woke = _samples(h)[-1]
+    assert woke["stood_by"]["notable"] == 2 and "lines" not in woke["stood_by"]
+    texts = [ln["text"] for ln in woke["log"]]
+    assert "A boat pulling for the shore." in texts and "The boat has landed her people." in texts
+
+
+def test_truth_7b_126_a_dry_run_of_a_doubted_order_returns_the_doubt_and_spends_nothing():
+    """Package 58a's truth 126 (R-42; the lugger director's ask that would make "the most
+    difference"): `world_order(text, dry_run=true)` of a doubted order returns the doubt
+    and what the order would do, performs nothing (the log, the inputs, the world's marks
+    and the director's own log as they were, the log's digest the same) and spends no act;
+    entered, the order is doubted on the record, and entered again with its reason it is
+    performed and counted."""
+    from freesail.agents import director as D
+    from freesail.agents import tools
+    from freesail.agents.fake import call
+    from tests.test_director import directed, seat_director
+
+    w = directed("hard-cruise")
+    seat_director(w, [call("stand_by", until="a watch")])
+    w.run(60)
+    mark = "mark: a wreck, her masts showing at 49 30 N 5 31 W"  # six cables off, by day
+    before = (
+        w.log.digest(),
+        len(w.inputs),
+        len(w.marks_of_interest),
+        len(D.log_of(w).entries),
+        D.budget_of(w).acts,
+    )
+    said = tools.call(w, "director", "world_order", {"text": mark, "dry_run": True})
+    assert said.startswith("Dry run, nothing performed and no act spent: it would be doubted: ")
+    assert "inside the lookout's horizon" in said
+    assert "it would do this: a mark put in the world, a wreck, her masts showing" in said
+    after = (
+        w.log.digest(),
+        len(w.inputs),
+        len(w.marks_of_interest),
+        len(D.log_of(w).entries),
+        D.budget_of(w).acts,
+    )
+    assert after == before
+    # entered, doubted on the record; entered again with its reason, performed and counted
+    assert D.direct(w, mark, by="the test").startswith("Doubted, not performed")
+    done = D.direct(w, f"{mark} [reason: the wreck of the Swan, long reported]", by="the test")
+    assert done.startswith("Done: a mark put in the world")
+    assert len(w.marks_of_interest) == 1 and D.budget_of(w).acts == before[4] + 1
+
+
 # The Western Islands run's anchored night at Horta (the filed save, `docs/playtests/
 # 2026-10-18-to-22-owner-playtests-and-review/saves/2026-10-20-western-islands-run-H-
 # final.json`, 2 July): the cutter rode at 38 32 N 28 37 W, on the western edge (28 36.6

@@ -418,10 +418,12 @@ def state(world: World, station: str) -> str:
     return "\n".join(lines)
 
 
-def world_order(world: World, station: str, text: str) -> str:
+def world_order(world: World, station: str, text: str, dry_run: Any = None) -> str:
     """The director's hand (spec M7b §3; package 50): a world order through the channel's
     door, the brief's limits and the doubt before it, logged in the director's log and
-    never the play log (`freesail.agents.director.direct`)."""
+    never the play log (`freesail.agents.director.direct`). With `dry_run` (package 58a,
+    R-42) what it would do, its doubt or its refusal, performing nothing, writing nothing
+    and costing no act (`director.dry_run`)."""
     from freesail.agents import director as director_mod
     from freesail.agents.agent import DIRECTOR
 
@@ -431,10 +433,26 @@ def world_order(world: World, station: str, text: str) -> str:
             f"The {station} gives no world order: the world is the director's, the "
             "scenario's and the owner's to order (spec M6 §23)."
         )
+    if truthy(dry_run):
+        return director_mod.dry_run(world, text)
     return director_mod.direct(world, text, by=harness.model_name)
 
 
-def truth(world: World, station: str, within: Any = None) -> dict[str, Any]:
+def is_dry_run(name: str, args: dict[str, Any]) -> bool:
+    """Whether a call is a world order's dry run (package 58a): a read, which ends no
+    stand-by and is counted among the reads, never the orders."""
+    return name == "world_order" and truthy((args or {}).get("dry_run"))
+
+
+def truth(
+    world: World,
+    station: str,
+    within: Any = None,
+    ports: Any = None,
+    grounds: Any = None,
+    systems: Any = None,
+    at: Any = None,
+) -> dict[str, Any]:
     """The truth (spec M7b §2; package 50): every ship's true position, heading, sail and
     state, the weather as it is and as the systems will make it, the tide, the people and
     their states, the markets and the news; the director's alone. `within` (package 68;
@@ -449,6 +467,19 @@ def truth(world: World, station: str, within: Any = None) -> dict[str, Any]:
             "refused": f"The {station} does not see the truth: the truth is the director's "
             "(spec M7b §2); a station on a ship reads her readings and her log."
         }
+    # the lookups (package 58a; the cold review of 2026-10-22, R-42: the lugger director's
+    # "read-only data lookups"), each a small read of its own in place of the whole truth
+    looked: dict[str, Any] = {}
+    if ports not in (None, "", False):
+        looked["ports"] = R.truth_ports(world, str(ports))
+    if grounds not in (None, "", False):
+        looked["grounds"] = R.truth_grounds(world, "all" if grounds is True else str(grounds))
+    if systems not in (None, "", False) and truthy(systems):
+        looked["systems"] = R.truth_systems(world)
+    if at not in (None, ""):
+        looked["at"] = R.truth_at(world, str(at))
+    if looked:
+        return looked
     miles: float | None = None
     if within not in (None, ""):
         try:
@@ -1407,7 +1438,11 @@ TOOLS: dict[str, Tool] = {
             "once. `until` is an event's words as "
             f"the standing dialect knows them ({STAND_BY_EVENTS}), an interval ('a glass', "
             "'an hour', 'a watch', '5 minutes', 'ten minutes'), 'a notable event' or 'an "
-            "urgent event', or several of these joined with 'or' ('tacked, or ten minutes, "
+            "urgent event', the ship's own state judged by her readings ('her way settled', "
+            "her speed and her head steady two minutes after an order; 'depth under 8 "
+            "fathoms'; 'speed under 2 knots'; 'speed over 6 knots'; 'the wind over 25 "
+            "knots'; 'a point of interest within 3 miles'), "
+            "or several of these joined with 'or' ('tacked, or ten minutes, "
             "or a sail sighted'), any one of which wakes you, the sample naming which. A "
             "stand_by sent while you stand by for something else replaces that stand-by, and "
             "its result says so. An event the log says is matched on the kind of its line, not "
@@ -1553,8 +1588,15 @@ TOOLS: dict[str, Tool] = {
             "with a [reason: ...] at its end, which performs it and keeps the act, the doubt "
             "and your reason together. Counted against the day's acts (an answer as a "
             "person to a question put to him, none). Written in the "
-            "director's log, never the play log, which carries the effects alone.",
-            {"text": "string: the world order, with '[reason: ...]' at its end when entered again"},
+            "director's log, never the play log, which carries the effects alone. With "
+            "dry_run=true it says what the order would do, its doubt or its refusal, and "
+            "performs nothing, writes nothing and costs no act (a read: it ends no stand-by). "
+            "The library's grammar topic, 'the world orders', gives every form with examples.",
+            {
+                "text": "string: the world order, with '[reason: ...]' at its end when entered "
+                "again",
+                "dry_run": "boolean, optional: true to try it without performing it",
+            },
             world_order,
             needs_authority=True,
             director_only=True,
@@ -1567,8 +1609,18 @@ TOOLS: dict[str, Tool] = {
             "tide, the people aboard every crewed ship and their states, the markets' "
             "prices and the news. A book: large, and put back with shelve. within: only "
             "the ships within so many miles of the player's ship, and their people (the "
-            "rest counted), a cheaper read.",
-            {"within": "number, optional: the miles from the player's ship"},
+            "rest counted), a cheaper read. The lookups, each a small read on its own: ports "
+            "(a port's places, people and prices: 'Brest', or 'all'), grounds (the fishing "
+            "grounds, or one by name), systems (true: the weather systems seeded and "
+            "appended, each with its track and its pressure at the centre), at (a point, '49 "
+            "55 N 4 35 W' or a place's name: at sea or on the land, its depth by the chart).",
+            {
+                "within": "number, optional: the miles from the player's ship",
+                "ports": "string, optional: a port's name, or 'all'",
+                "grounds": "string, optional: a fishing ground's name, or 'all'",
+                "systems": "boolean, optional: the weather systems and their tracks",
+                "at": "string, optional: a position or a place of the chart",
+            },
             truth,
             needs_authority=True,
             director_only=True,
@@ -2224,10 +2276,22 @@ def _grammar_topic() -> Topic:
     sections.append(
         Section("3", "the station sentences", "\n".join(station), "\n".join(station), by_line=True)
     )
+    # the world orders (package 58a; the cold review of 2026-10-22, R-42: a complete
+    # director's grammar with verified examples), from the forms' own table
+    from freesail.agents.director import forms_words
+
+    world_orders = forms_words()
+    sections.append(
+        Section(
+            "4", "the world orders", "\n".join(world_orders), "\n".join(world_orders), by_line=True
+        )
+    )
+    whole = "\n".join([whole, "", *world_orders])
     return Topic(
         "grammar",
         "the grammar",
-        "the grammar: the order language, the standing dialect and the station sentences",
+        "the grammar: the order language, the standing dialect, the station sentences and "
+        "the world orders",
         whole,
         tuple(sections),
     )
@@ -2237,6 +2301,31 @@ def _grammar() -> str:
     """The grammar whole, as `library(topic='grammar', section='all')` serves it after
     its size."""
     return _grammar_topic().whole
+
+
+@functools.lru_cache(maxsize=1)
+def _world_topic() -> Topic:
+    """**How the world behaves** (package 58a; the lugger director's fourth ask): the
+    weather systems, the ships put on the sea and their companies, what each world order
+    logs and to whom, and the doubt's figures, written from the code
+    (`director.world_page`)."""
+    from freesail.agents.director import world_page
+
+    sections = [
+        Section(str(i), heading, text, text) for i, (heading, text) in enumerate(world_page(), 1)
+    ]
+    whole = "How the world behaves, for the director.\n\n" + "\n\n".join(
+        f"{s.heading[:1].upper()}{s.heading[1:]}. {s.text}" for s in sections
+    )
+    return Topic(
+        "the world",
+        "how the world behaves",
+        "how the world behaves: the weather systems, ships put on the sea, what each world "
+        "order logs, the doubt's figures",
+        whole,
+        tuple(sections),
+        whole_words="the page whole",
+    )
 
 
 def _ship_topic(world: World) -> Topic:
@@ -2409,6 +2498,8 @@ def _topic(world: World, key: str) -> Topic | str:
     if key in ("tools", "the tools"):
         text = "\n".join(tool_lines())
         return Topic("tools", "the tools", text, text)
+    if key in ("the world", "world", "how the world behaves"):
+        return _world_topic()
     n = _chapter_of(key, loose=False)  # a chapter's name alone
     if n is not None:
         return _chapter_topic(n)
@@ -2426,7 +2517,7 @@ def _every_topic(world: World) -> list[Topic]:
     drafted = _books_topic(world)
     if drafted.sections:
         out.append(drafted)
-    for key in ("standing orders", "tools"):
+    for key in ("standing orders", "tools", "the world"):
         top = _topic(world, key)
         assert isinstance(top, Topic)
         out.append(top)
@@ -2571,7 +2662,8 @@ def _contents(world: World) -> str:
     )
     gram = _grammar_topic()
     lines.append(
-        "  grammar: the order language, the standing dialect and the station sentences: "
+        "  grammar: the order language, the standing dialect, the station sentences and the "
+        "world orders: "
         f"{size_words(tokens(gram.whole))} whole, in "
         f"{sum(1 for s in gram.sections if s.level == 1)} parts"
     )
@@ -2604,6 +2696,11 @@ def _contents(world: World) -> str:
     lines.append(
         "  tools: the tools you have and what each takes, "
         f"{size_words(tokens(chr(10).join(tool_lines())))}"
+    )
+    world_page = _world_topic()
+    lines.append(
+        "  the world: how the world behaves (the weather systems, ships put on the sea, what "
+        f"each world order logs, the doubt's figures), {size_words(tokens(world_page.whole))}"
     )
     lines.append(
         "A topic with sections lists them with their sizes (library(topic='primer 3')); "

@@ -543,8 +543,374 @@ NO_BRIEF_WORDS = (
     "prompt, or a file beside the scenario)."
 )
 
+
+@dataclass(frozen=True)
+class Form:
+    """One form of the world orders (package 58a; the cold review of 2026-10-22, R-42, and
+    the lugger director's first ask, "a complete director grammar with verified
+    examples"): its handle, its channel, its words with the slots in angle brackets, and
+    examples the tests perform (`tests/test_director.py`), so that a director who did not
+    write the forms need not learn them by refusal (37% of the lugger director's orders
+    failed, against 7% for the director who wrote the code). The examples in the station
+    brief and in the starter briefs are drawn from these, never written apart."""
+
+    key: str
+    channel: str
+    words: str
+    examples: tuple[str, ...]
+    note: str = ""
+
+
+# Every form the channel performs, in the grammar's order (`freesail.world.orders`).
+WORLD_ORDER_FORMS: tuple[Form, ...] = (
+    Form(
+        "weather.low",
+        "weather",
+        'weather: low "<name>" radius <km> km [fronts <warm°> <cold°>] at <time> <x_km> '
+        "<y_km> <hPa>",
+        ('weather: low "the low" radius 450 km fronts 140 300 at 1805-06-13T04:00 -300 500 990',),
+        "a low appended to the systems, its centre km east and north of the start, at a time "
+        "of its track; it grows from nothing at the order's tick to its figure (an hour at "
+        "the least, else by its first point's time); a low deeper than the season's floor, or "
+        "a deep one near her out of a steady glass, is doubted",
+    ),
+    Form(
+        "weather.high",
+        "weather",
+        'weather: high "<name>" radius <km> km at <time> <x_km> <y_km> <hPa>',
+        ('weather: high "the ridge" radius 900 km at 1805-06-13T04:00 300 -500 1024',),
+        "a high, the same; one above the season's ceiling, or a strong one near her out of a "
+        "glass that has not been rising, is doubted",
+    ),
+    Form(
+        "weather.waypoint",
+        "weather",
+        'weather: waypoint for "<name>" at <time> <x_km> <y_km> <hPa>',
+        ('weather: waypoint for "the low" at 1805-06-13T16:00 -100 400 988',),
+        "a waypoint after the last of a system's track; from a track already ended the "
+        "system goes from where it is now, reaching the waypoint an hour after the order at "
+        "the soonest; faster than the season's lows move, or deeper than its floor, doubted",
+    ),
+    Form(
+        "ship.new",
+        "ship",
+        'ship: <a description> "<name>" of <nation> at <place or position>, <goal>[, no '
+        "colours][, intent: <words>]",
+        (
+            'ship: a brig-sloop "Harpy" of France at 48 44 N 5 20 W, bound for the Start, no '
+            "colours, intent: run home to Brest",
+            'ship: a merchant brig "Two Brothers" of Britain at 49 50 N 5 30 W, trading '
+            "Falmouth to the Lizard",
+            'ship: a frigate "Medusa" of Britain at 49 55 N 4 35 W, bound for Plymouth, '
+            "intent: keep the station off the Deadman within 8 miles",
+        ),
+        "a ship put on the sea: the description a kind the ships know ('a brig-sloop', 'a "
+        "French lugger', 'a small fishing lugger'), the goal 'bound for <place>', 'trading A "
+        "to B', 'patrolling off <place> within <n> miles', 'running home to <place>'; on the "
+        "land refused with the nearest water named; inside her horizon by day, doubted",
+    ),
+    Form(
+        "ship.intent",
+        "ship",
+        'ship "<name>": intent <words>',
+        ('ship "Harpy": intent keep the station off Ushant within 15 miles',),
+        "her captain's intent given or changed: a mind changed wants no cause",
+    ),
+    Form(
+        "ship.hand",
+        "ship",
+        'ship "<name>": order <an order of her own grammar>[ for a watch | for two glasses | '
+        "for an hour | until <a sail within hail | a sail in sight | a landfall | hove to | at "
+        "anchor>]",
+        (
+            'ship "Harpy": order heave to',
+            'ship "Harpy": order give chase until a sail within hail',
+            'ship "Harpy": order carry on',
+            # the starter briefs' own (`data/director/briefs/*.yaml`, drawn from here)
+            'ship "Harpy": order give chase',
+            'ship "Harpy": order haul off',
+            'ship "Medusa": order give chase',
+            'ship "Medusa": order give chase until a sail within hail',
+            'ship "Medusa": order heave to',
+            'ship "Medusa": order fill away',
+            'ship "Lark": order shape a course for Falmouth',
+            'ship "Nancy": order heave to',
+        ),
+        "the hand: her captain's order as his own, held a glass or as named; refused where a "
+        "model or the player holds her captain",
+    ),
+    Form(
+        "ship.crewed",
+        "ship",
+        'ship "<name>": crewed',
+        ('ship "Harpy": crewed',),
+        "a far ship within the player's range made a full ship, the cap allowing",
+    ),
+    Form(
+        "aboard.found",
+        "aboard",
+        "aboard: <a thing found aboard, in the table's words>",
+        (
+            "aboard: the fore topmast is found sprung",
+            "aboard: a cask found stove",
+            "aboard: a seam found working",
+            "aboard: the water found foul",
+            "aboard: the leak stopped",
+            "aboard: the well pumped out",
+        ),
+        "a report of the ship's own people with what it does; with no cause (the table's "
+        "conditions), doubted",
+    ),
+    Form(
+        "aboard.thing",
+        "aboard",
+        "aboard: <a thing>, <where: a place aboard | ashore at <port>, at <place> | in the "
+        "keeping of <person>>[, <a few words of it>]",
+        (
+            "aboard: a sealed packet, on the cabin table, from the Custom House",
+            "aboard: a cask of brandy, in the hold",
+            "aboard: a letter for the port admiral, on the cabin table",
+            "aboard: the packet, in the keeping of Mr Veale",
+        ),
+        "a thing made, or moved when it is known; never into a held person's keeping",
+    ),
+    Form(
+        "aboard.paid_in",
+        "aboard",
+        "aboard: <a sum> paid into the purse by <person>[ for <what>]",
+        ("aboard: twenty guineas paid into the purse by Mr Veale",),
+        "a transaction with its cause, in the purse's ledger; from nobody, or from a payer "
+        "out of a boat's reach, doubted",
+    ),
+    Form(
+        "aboard.paid_out",
+        "aboard",
+        "aboard: <a sum> paid from the purse to <person>[ for <what>]",
+        ("aboard: £6 paid from the purse to the pilot",),
+        "the same, out of the purse; below nothing, no way",
+    ),
+    Form(
+        "aboard.freight",
+        "aboard",
+        "aboard: <n> tons of <good> freighted by <person> at <place> for <port>",
+        ("aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth",),
+        "a freight in the hold's manifest; more than the hold has room for, no way",
+    ),
+    Form(
+        "aboard.debt",
+        "aboard",
+        "aboard: a debt of <a sum> owed <to | by> <person>[ for <what>]",
+        ("aboard: a debt of £30 owed to the chandler at Plymouth",),
+        "a debt in the purse's books",
+    ),
+    Form(
+        "message.at",
+        "message",
+        'message: at <port> from <whom>: "<words>"',
+        ('message: at Brest from the agent: "The tin will fetch its price."',),
+        "a letter left at a port, for the boat to bring off when she is there",
+    ),
+    Form(
+        "message.by",
+        "message",
+        'message: by a cutter from <port> from <whom>: "<words>"',
+        ('message: by a cutter from Plymouth from the port admiral: "Rejoin without delay."',),
+        "a letter sent out to her by a cutter; from a port she is far from, doubted",
+    ),
+    Form(
+        "port",
+        "port",
+        "port <id>: <closed to | open to> <nation>; port <id>: price of <good> <pounds>",
+        ("port brest: closed to Britain", "port falmouth: price of tin 130"),
+        "a port's stance or a price; a price moved beyond the market's swing, doubted",
+    ),
+    Form(
+        "mark",
+        "mark",
+        "mark: <a description> at <place or position>",
+        ("mark: a wreck, her masts showing at 49 58 N 5 16 W",),
+        "a point of interest the lookout sees as a mark; inside her horizon by day, doubted",
+    ),
+    Form(
+        "person.named",
+        "person",
+        'person: <role> "<name>" <aboard[ in the <place>] | ashore at <port>>',
+        (
+            'person: supercargo "Mr Pentreath" aboard in the cabin',
+            'person: agent "Mr Fox" ashore at Brest',
+        ),
+        "a person named, by role",
+    ),
+    Form(
+        "person.make",
+        "person",
+        'person: make "<name>", <who he is>, <where>, <a line of his history>',
+        (
+            'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest, who knew the '
+            "captain's father",
+        ),
+        "a person made from words, who stays in the world; aboard another ship, refused",
+    ),
+    Form(
+        "person.move",
+        "person",
+        'person: "<name>" <comes aboard[ as <station>] | goes ashore | leaves the ship at <port>>',
+        (
+            'person: "Mr Fox" comes aboard as master',
+            'person: "Mr Fox" goes ashore',
+            'person: "Mr Fox" leaves the ship at Falmouth',
+        ),
+        "a person moved, or bound to a station; where no boat could carry him, doubted; a "
+        "held station's person, refused",
+    ),
+    Form(
+        "say",
+        "say",
+        "say as <person, station or trade>: <his words>",
+        ('say as the cook: "Pease and pork, sir."', 'say as Mr Fox: "I knew your father, sir."'),
+        "words in the mouth of a person nobody holds, heard where he is",
+    ),
+    Form(
+        "captain",
+        "captain",
+        "captain: intent <words>",
+        ("captain: intent trade tin from Falmouth to Brest",),
+        "the player's ship's rules-based captain given an intent (the owner's seam)",
+    ),
+    Form(
+        "seat",
+        "seat",
+        "seat: <the model's exact name> as captain of <ship> for <n> <samples | hours>",
+        ("seat: <the model's exact name> as captain of <ship> for 20 samples",),
+        "a model seated as the captain of another ship under the owner's grant; without "
+        "its consent record, the grant or the budget, refused",
+    ),
+    Form(
+        "unseat", "unseat", "unseat: <ship>[, <a note>]", ("unseat: <ship>",), "the seat stood down"
+    ),
+)
+
+
+def form_of(key: str) -> Form:
+    """The form by its handle (`WORLD_ORDER_FORMS`)."""
+    for f in WORLD_ORDER_FORMS:
+        if f.key == key:
+            return f
+    raise KeyError(key)
+
+
+def _q(key: str, i: int = 0) -> str:
+    """A form's example, quoted as the brief quotes one."""
+    return f"'{form_of(key).examples[i]}'"
+
+
+def every_example() -> tuple[str, ...]:
+    """Every example of every form, in the table's order."""
+    return tuple(x for f in WORLD_ORDER_FORMS for x in f.examples)
+
+
+def forms_words() -> list[str]:
+    """The world orders as the library's grammar gives them (package 58a): each form, what
+    it does and its examples, and how to try one without performing it."""
+    out = [
+        "The world orders, the director's (and the owner's, as 'world: <order>' at the "
+        "prompt): one line, the channel first. Each form with what it does and examples the "
+        "game's tests perform. world_order(text, dry_run=true) says what an order would do, "
+        "its doubt or its refusal, performing nothing and costing no act; an order beyond "
+        "these is answered honestly and logged as attempted when entered again with a "
+        "[reason: ...]."
+    ]
+    for f in WORLD_ORDER_FORMS:
+        out.append(f"  {f.words}")
+        if f.note:
+            out.append(f"    {f.note[:1].upper()}{f.note[1:]}.")
+        for x in f.examples:
+            out.append(f"    e.g. {x}")
+    return out
+
+
+def world_page() -> tuple[tuple[str, str], ...]:
+    """**How the world behaves** (package 58a; the lugger director's fourth ask, "how
+    systems combine, how crews are drawn, what log line each order leaves"): the
+    director's library page, written from the code, every figure in it read from the
+    constant the code uses (`tests/test_director.py` checks them), in four sections."""
+    from freesail.world import crews
+    from freesail.world import orders as wo
+    from freesail.world import weather as wx
+
+    weather = (
+        "A weather system is a centre with an anomaly (hPa above or below the background) "
+        "spread as a bell over its radius; the glass at a point is the background and its "
+        "gradient with every system's anomaly there added. Systems add: two highs near one "
+        "another make a glass higher than either centre (truth(systems=true) gives each "
+        "centre and the field at the ship). A seeded system drifts at its velocity and lives "
+        "a life, rising to its peak at the middle of it and dying away, and is dropped "
+        f"beyond {wx.SYSTEM_REACH_KM:g} km of the ship's box; an appended one follows its "
+        "track, held at its ends. Appended in play (package 58a), a system grows in from "
+        f"nothing at the order's tick over {wx.APPEND_RAMP_S // 60} minutes at the least, or "
+        "until its first point's time if that is later; a waypoint appended to a track "
+        "already ended runs from where the system stands at the order's tick, reached "
+        f"{wx.APPEND_RAMP_S // 60} minutes after it at the soonest. The surface wind is the "
+        f"systems' geostrophic wind ({wx.GEOSTROPHIC_MS_PER_HPA_PER_100KM:g} m/s for each hPa "
+        "in a hundred km) turned toward the low and slowed by the sea's friction; a low "
+        f"carries a warm and a cold front {wx.FRONT_LENGTH_KM:g} km long, rain within "
+        f"{wx.WARM_FRONT_RAIN_KM:g} km ahead of the warm front and squalls within "
+        f"{wx.COLD_FRONT_BAND_KM:g} km of the cold."
+    )
+    ships = (
+        "A ship put on the sea sails at far detail: her plan's body moves her along her "
+        "legs, a few lines of story a day, no log and no company. Within "
+        f"{crews.CREWED_NM:g} miles of the player's ship she is crewed when the cap allows "
+        f"({crews.CREWED_CAP} at once by default, the scenario's `crewed` block over it), and "
+        f"made far again beyond {crews.CREWED_DEMOTE_NM:g}: crewed, she is a full ship of her "
+        "kind's file, her company drawn from that file's muster (its posts, ratings and "
+        "names list, English, American or French by the file and not by her nation), her "
+        "captain sailing by his intent. Her captain holds by the hand's order "
+        f"{crews.HAND_HOLD_S // 60} minutes, or as long as named "
+        f"({', '.join(crews.HOLD_EVENT_NAMES)}), a day at most."
+    )
+    logs = (
+        "Every world order goes to your log, the director's, with its doubt and its reason, "
+        "and to the record as a line no station reads; the play log carries only its effects "
+        "as the ship meets them: a ship put on the sea or a mark when the lookout sees it "
+        "(nothing before); the weather as the glass, the sky and the wind change; a thing "
+        "found aboard as a notable line of the ship's own people (the carpenter's report); a "
+        "thing made in nothing of the log (the people's and the places' readings show it); a "
+        "sum, a freight or a debt as a notable line of the purser's books or the manifest; a "
+        "letter at a port when the boat brings it off, and one by a cutter when she comes "
+        "within hail; a port's stance and prices in the pilot's news and the prices the boat "
+        "brings; a person made in nothing until he speaks or is spoken of; `say as` as a line "
+        "in his name where he is, heard by the stations within earshot and journaled as his; "
+        "the hand in her own log as her captain's, and in the play log only what the lookout "
+        "sees of her. A world order the owner gives at the prompt ('world: ...') is the "
+        "same, never doubted."
+    )
+    doubt = (
+        "The channel's doubt, in figures: a ship or a mark put inside the lookout's horizon in "
+        f"clear daylight (the visibility {wo.CLEAR_NM:g} miles or more; a sail's trucks "
+        f"{wo.SAIL_HEIGHT_M:g} m up); a low deeper than the season's floor, or one "
+        f"{wo.LOW_DEEP_HPA:g} hPa deep within {wo.LOW_NEAR_KM:g} km of her out of a glass "
+        "that has not been falling; a high above the season's ceiling (the background and "
+        f"the season's strongest high, and {wo.HIGH_CEILING_MARGIN_HPA:g} hPa over), or one "
+        f"{wo.LOW_DEEP_HPA:g} hPa strong within {wo.LOW_NEAR_KM:g} km of her out of a glass "
+        "that has not been rising; a waypoint faster than half again the season's fastest "
+        f"low; a letter by a cutter from a port more than {wo.LETTER_REACH_NM:g} miles off; a "
+        f"price moved by more than {wo.PRICE_SWING:.0%} in a word; a person moved where no boat "
+        f"could carry him (a port beyond {wo.BOAT_REACH_NM:g} miles); a thing found aboard "
+        "with no cause by the table's conditions. A ship made within "
+        f"{wo.HARBOUR_NM:g} miles of a port leaves by the port's track."
+    )
+    return (
+        ("the weather systems", weather),
+        ("ships put on the sea, and their companies", ships),
+        ("what each order logs, and to whom", logs),
+        ("the doubt's figures", doubt),
+    )
+
+
 # The director's station brief (spec M7b §2; package 50), in the consent brief's voice: the
 # fixed part every director reads, the player's brief after it (`DirectorBrief.body`).
+# Package 58a: its examples are the forms' own (`WORLD_ORDER_FORMS`), never written apart.
 DIRECTOR_BRIEF = (
     "You are the director: a station above the game, bound to no person of any ship. You "
     "see the truth (the truth tool: every ship's true position, heading, sail and state, "
@@ -556,48 +922,49 @@ DIRECTOR_BRIEF = (
     "her and no other ship on it, for your planning of the coast, the marks and the "
     "dangers; the truth's positions are in words. The forms the game performs today are "
     "given as examples of "
-    "reasonable orders, not as the whole of what you may try: the weather ('weather: low "
-    "\"the low\" radius 450 km fronts 140 300 at <time> <x_km> <y_km> <hPa>', 'weather: "
-    'waypoint for "the low" at <time> <x_km> <y_km> <hPa>\'), a ship put on the sea or a '
-    'mind changed (\'ship: a brig-sloop "Harpy" of France at 48 44 N 5 20 W, bound for the '
-    "Start, no colours, intent: run home to Brest'; 'ship \"Harpy\": intent keep the station "
-    "off Ushant within 15 miles'), a thing found aboard ('aboard: the fore topmast is found "
-    "sprung', 'aboard: a cask found stove', 'aboard: a seam found working', 'aboard: the "
-    "water found foul', and twenty more of the table: the bread spoiled, the meat rotten, "
+    f"reasonable orders, not as the whole of what you may try: the weather ({_q('weather.low')}"
+    f", {_q('weather.high')}, {_q('weather.waypoint')}: the time is one of the systems' "
+    "track, the place km east and north of the voyage's start, and a system or a waypoint "
+    "appended grows in from the order's tick over an hour or more, never at a step), a ship "
+    f"put on the sea or a mind changed ({_q('ship.new')}; {_q('ship.intent')}), a thing "
+    f"found aboard ({_q('aboard.found', 0)}, {_q('aboard.found', 1)}, "
+    f"{_q('aboard.found', 2)}, {_q('aboard.found', 3)}, and twenty more of the table: the "
+    "bread spoiled, the meat rotten, "
     "rats in the bread room, the chronometer stopped, the glass broken, the compass "
-    "sticking, the bilge foul; the hull's repair as a stopgap until the pumps come, 'aboard: "
-    "the leak stopped', 'aboard: the well pumped out'; the library's grammar topic lists "
+    "sticking, the bilge foul; the hull's repair as a stopgap until the pumps come, "
+    f"{_q('aboard.found', 4)}, {_q('aboard.found', 5)}; the library's grammar topic lists "
     "them all), a thing made or moved, with a name and where it is and nothing "
-    "more ('aboard: a sealed packet, on the cabin table, from the Custom House'; 'aboard: a "
-    "cask of brandy, in the hold'; 'aboard: the packet, in the keeping of Mr Veale'), a sum, "
-    "a freight or a debt as a transaction with its cause ('aboard: twenty guineas paid into "
-    "the purse by Mr Veale'; 'aboard: £6 paid from the purse to the pilot'; 'aboard: ten tons "
-    "of wool freighted by Mr Veale at the quay for Falmouth'; 'aboard: a debt of £30 owed to "
-    "the chandler at Plymouth'), a letter ('message: at Brest from the agent: \"...\"', 'message: "
-    "by a cutter from Plymouth from the port admiral: \"...\"'), a port's stance or a "
-    "price ('port brest: closed to Britain', 'port falmouth: price of tin 130'), a point of "
-    "interest ('mark: a wreck, her masts showing at 49 58 N 5 16 W'), a person named "
-    '(\'person: supercargo "Mr Pentreath" aboard in the cabin\', \'person: agent "Mr Fox" '
-    "ashore at Brest'), a person made from words, moved, or bound to a station of the ship "
-    '(\'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest, who knew the '
-    "captain's father'; 'person: \"Mr Fox\" comes aboard as master'; 'person: \"Mr Fox\" "
-    "goes ashore'; 'person: \"Mr Fox\" leaves the ship at Falmouth'), words in the mouth of "
-    "a person nobody holds, heard where he is and journaled as his ('say as the cook: "
-    '"Pease and pork, sir."\'; \'say as Mr Fox: "I knew your father, sir."\'), an order of '
+    f"more ({_q('aboard.thing', 0)}; {_q('aboard.thing', 1)}; {_q('aboard.thing', 3)}), a "
+    "sum, a freight or a debt as a transaction with its cause "
+    f"({_q('aboard.paid_in')}; {_q('aboard.paid_out')}; {_q('aboard.freight')}; "
+    f"{_q('aboard.debt')}), a letter ({_q('message.at')}, {_q('message.by')}), a port's "
+    f"stance or a price ({_q('port', 0)}, {_q('port', 1)}), a point of interest "
+    f"({_q('mark')}), a person named ({_q('person.named', 0)}, {_q('person.named', 1)}), a "
+    "person made from words, moved, or bound to a station of the ship "
+    f"({_q('person.make')}; {_q('person.move', 0)}; {_q('person.move', 1)}; "
+    f"{_q('person.move', 2)}), words in the mouth of "
+    "a person nobody holds, heard where he is and journaled as his "
+    f"({_q('say', 0)}; {_q('say', 1)}), an order of "
     "another ship's own grammar given to her captain as his own, her log saying it as his "
     "and he holding by it a glass, or as long as you name it ('... for a watch', '... for "
     "two glasses', '... until a sail within hail', a landfall, hove to, at anchor), or "
     "until your next order to her, then his intent again "
-    '(\'ship "Harpy": order heave to\', \'ship "Harpy": order give chase until a sail '
-    "within hail', 'ship "
-    '"Harpy": order carry on\' to give her back sooner; at far detail she carries what the '
+    f"({_q('ship.hand', 0)}, {_q('ship.hand', 1)}, {_q('ship.hand', 2)} to give her back "
+    "sooner; at far detail she carries what the "
     "far shape carries, a course shaped or steered, heaving to and filling away, the chase "
     "or hauling off, sail made or shortened, an anchor and weighing, the station kept, and "
-    "within the range of the player's ship you may ask for her crewed first, 'ship "
-    '"Harpy": crewed\', the cap allowing), and a model '
+    "within the range of the player's ship you may ask for her crewed first, "
+    f"{_q('ship.crewed')}, the cap allowing), and a model "
     "seated as the captain of another ship under the owner's "
-    "grant ('seat: <the model's exact name> as captain of <ship> for 20 samples', 'unseat: "
-    "<ship>'). The library's grammar topic lists every form. An order beyond the examples "
+    f"grant ({_q('seat')}, {_q('unseat')}). The library's grammar topic lists every form "
+    "with what it does and examples the game's tests perform ('the world orders'), and its "
+    "page 'the world' says how the world behaves (how the systems add and grow, how a "
+    "ship's company is drawn, what each order logs and to whom). world_order(text, "
+    "dry_run=true) tells you what an order would do, its doubt or its refusal, and "
+    "performs nothing and costs no act; and the truth answers lookups for a port's places "
+    "and prices (truth(ports='Brest')), the fishing grounds (truth(grounds='Iroise')), the "
+    "weather systems seeded and their tracks (truth(systems=true)) and whether a point is "
+    "at sea and its depth by the chart (truth(at='49 55 N 4 35 W')). An order beyond the examples "
     "is to be attempted when you think it reasonable (news of a war or a peace, a thing of "
     "the sea the forms do not name): "
     "the game answers honestly when it has no way to do a thing as said, and asks you to "
@@ -1080,6 +1447,93 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         f"order. ({cost}{left} {'act' if left == 1 else 'acts'} of the day's {acts_allowed} "
         f"left.){tail}"
     )
+
+
+DRY_RUN_HEAD = "Dry run, nothing performed and no act spent:"
+
+
+def dry_run(world: Any, text: str) -> str:
+    """**The dry run** (package 58a; the cold review of 2026-10-22, R-42, the lugger
+    director's ask that would make "the most difference"): what a world order would do,
+    its doubt or its refusal, in the channel's own order of judgement (the day's budget,
+    the rule of reach, the brief's limits, the form, the doubt), performing nothing,
+    writing nothing in any log and spending no act. What it would do is read by performing
+    it on a copy of the world, which is then let go; the world itself is not touched, so a
+    replay is the same with the dry run or without. The doubt it shows is not a doubt on
+    the record (`_doubt_shown`): entered, the order is doubted there, and then entered
+    again with its [reason: ...] it is performed."""
+    text = " ".join(str(text).split())
+    brief = brief_of(world)
+    acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
+    bare, reason = world_orders.split_reason(text)
+    try:
+        order = world_orders.parse(text)
+    except world_orders.WorldOrderError as e:
+        return (
+            f"{DRY_RUN_HEAD} the game has no way to do this as said: {str(e).rstrip('.')}. "
+            "The library's grammar topic lists the forms ('the world orders'), each with "
+            "examples."
+        )
+    free = order.channel == "say" and pending_for(
+        world, getattr(world_orders.say_as_person(world, order.text), "name", "")
+    )
+    # the day's counts as they stand, read without renewing them (nothing is changed)
+    state = getattr(world, "director_state", None)
+    today = state is not None and isinstance(state, DayBudget) and state.day == day_of(world)
+    acts_used = state.acts if today else 0
+    held_now = bool(today and state.held_until is not None and world.clock.tick < state.held_until)
+    if held_now or (acts_used >= acts_allowed and not free):
+        return (
+            f"{DRY_RUN_HEAD} it would not be given: the day's budget of {acts_allowed} acts "
+            "is spent until the next day of the ship's time."
+        )
+    reach_why = world_orders.reach(world, order)
+    if reach_why:
+        return f"{DRY_RUN_HEAD} it would be refused, by the rule of reach: {reach_why}."
+    if brief is not None:
+        why = brief.limit_of(world, order)
+        if why:
+            return f"{DRY_RUN_HEAD} it would be refused, outside the brief: {why}."
+    malformed = world_orders.form_error(world, order)
+    if malformed:
+        return f"{DRY_RUN_HEAD} the game has no way to do this as said: {malformed.rstrip('.')}."
+    doubted = world_orders.doubt(world, order)
+    would = _would_do(world, order.text)
+    if doubted:
+        tail = (
+            f" Entered, it is doubted on the record; entered again as '{order.text} [reason: "
+            "...]' it is performed"
+            + (f", and then it would do this: {would}" if would else "")
+            + "."
+        )
+        return f"{DRY_RUN_HEAD} it would be doubted: {doubted}.{tail}"
+    if would is None:
+        return f"{DRY_RUN_HEAD} it would be performed as said ({order.channel})."
+    if would.startswith("not carried out: "):
+        why = would.removeprefix("not carried out: ")
+        return f"{DRY_RUN_HEAD} the game has no way to do this as said: {why}."
+    cost = "an answer, counted against nothing" if free else "one of the day's acts"
+    left = acts_allowed - acts_used
+    return (
+        f"{DRY_RUN_HEAD} it would be performed, as {cost} ({left} of {acts_allowed} left): {would}"
+    )
+
+
+def _would_do(world: Any, text: str) -> str | None:
+    """The words a world order would leave in the driver's line, read by performing it
+    on a copy of the world (the checkpoint's own pickling, `core.replay`), which is let
+    go; None when no copy can be made."""
+    import io
+
+    from freesail.core import replay
+
+    try:
+        copy = replay._Unpickler(io.BytesIO(replay.checkpoint_bytes(world))).load()
+        replay._rebind(copy)
+        e = copy._apply_world_order(text, SOURCE)
+    except Exception:  # noqa: BLE001  (a world that cannot be copied: the form's word alone)
+        return None
+    return e.text.removeprefix(f"World order ({SOURCE}): ").rstrip(".")
 
 
 def _doubt_shown(world: Any, text: str) -> bool:
