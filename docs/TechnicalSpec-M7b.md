@@ -152,6 +152,17 @@ bounded by the grant's budget.**
 
 Package 67, Opus, after 68; the brief at the lead's hand on the owner's word.
 
+**As built (package 68; the cold review of 2026-10-22, R-35).** The truth says the player's
+ship's own state (`readings._own_state_truth`: aground, where, on what ground and since when,
+the tide rising or falling; at anchor, riding or dragging; under way), which a director once
+read wrong from her speed alone; a ship sailing by her captain's intent shows the intent and
+no goal (every business ship was made with the placeholder "bound for Falmouth", and the
+truth showed it); and `truth(within=<miles>)` keeps the ships within so many miles of the
+player's and their people, the rest counted ("the ships within 20 miles of the Amazon; 3
+more beyond, not shown"), a cheaper read. The director is hidden from every station as
+§6 has it: with `--ease-on-station` its samples ease nothing and write no driver's line
+(R-20; `ui/server.Driver._samples_now`).
+
 ### 3. The world orders (`freesail/world/orders.py`)
 
 The channel as M5 and M6 built it, with the orders the director needs added and the
@@ -325,6 +336,29 @@ promotion both ways. The crewed captain looks for it once a minute, the far capt
 judgement's cadence. The dispatches brief's examples gain `ship "Medusa": order give chase
 until a sail within hail`.
 
+**As built (package 68; the cold review of 2026-10-22, R-43, R-41 and 61's simple half).**
+**The new ship's form read clause by clause** (`orders.new_ship_spec`), each checked in turn
+and the refusal naming the clause at fault ("the description 'a whaler' is no description a
+far-detail ship takes", "the nation 'Narnia' ...", "the place '...' ...", "the goal 'bound
+for Atlantis': ..."): a description after its adjectives ("a French lugger", "a small
+fishing lugger", "a deep laden merchant brig"; `ships.description_key`); any clause of her
+colours, shown or not ("British colours", "colours shown", "flying French colours", "no
+colours"), never read as her goal; an intent with commas in it, everything after its word;
+a port in the `of` slot, her nation the port's. **A place on the land is refused** in words
+with the nearest water a ship floats in named ("is on the land by the chart, and no ship is
+put there; the nearest water she floats in is N of it, 1 cables off, at 50° 09' N, 5° 04'
+W"), whatever reason is given: the land's doubt is the form's refusal now, since no reason
+puts a hull ashore. **A ship made in a port's harbour** (within a mile and a half of its
+roads or anchorage, `HARBOUR_NM`) goes out by the port's track to sea before her goal's
+legs, or her intent's (`departing`, as the world's business ships do). **The form before
+the doubt** (`orders.form_error`, in `director.direct`): a malformed order is answered
+honestly in words, never "doubted" alone, so that a doubted order is one that can be
+performed when entered again. **A reason on the first entry** answers no doubt the director
+has not seen (`director._doubt_shown`): the doubt is shown, and the order entered again
+with its reason is performed. Not taken: a reason that does not answer the doubt still
+overrides it (R-41's second case), the hard half of 61 (a route laid clear of the land),
+"whaler" and the forms the directors asked for (R-42).
+
 ### 4. The brief and its guardrails (`data/director/briefs/*.yaml`; `freesail/agents/director.py`)
 
 The player writes the brief: the tone of the voyage (a quiet passage, a hard-luck cruise, a
@@ -359,6 +393,19 @@ station is refreshed with it when the brief changes or a save is loaded. The fou
 the quiet passage (force 6, a cutter, four acts a day; the gate's), the interesting passage
 (force 7, a brig, six), the hard cruise (force 9, a frigate, eight) and the chase (force 7, a
 brig, six).
+
+**As built (package 68; the cold review of 2026-10-22, R-38 and R-61).** **The enemy's
+weight** is ranked as the tops rank a sail (`captains.size_rank_of`, the words of
+`_SIZE_WORDS`) for the description and for the limit alike: "brig" held none of the
+ranking's keys, and a French frigate passed the dispatches', the chase's and the
+interesting passage's briefs of no enemy heavier than a brig. A test for each starter's
+limit against each class (truth 7b-123). **The brief in play**: `director: budget 60
+samples, 10 acts` (either figure alone) gives the brief as it stands with its budget
+changed, an input replayed (`director.set_budget`); `director: brief <words>` that name no
+starter and no file changes the tone and the name and keeps the limits, the cadence, the
+budget and the examples (`director.brief_in_words`; a starter's name or a file is a brief
+whole, as before); a new brief whose budget the day's counts are within lifts a hold the
+old one made, and the log says so (`director._lift_hold`).
 
 ### 5. Sampling, the budget and the clock (`harness.py`; `core/world.py`)
 
@@ -421,6 +468,27 @@ debrief):
 - **Not taken**: the sample's deltas and the repeated history (58), the readings by place
   (65).
 
+**As built (package 68; the cold review of 2026-10-22, R-25, R-27, R-28, R-30, R-61).**
+**The MCP door**: the bridge's default wait is fifty seconds (`MCP_WAIT_S`), under the sixty
+after which the desktop and Claude Code clients cut a call, and the harbour writes `--wait
+50` into every desktop entry (the settings' own figure where given); a door of the same
+model that asks for its station within five real minutes of its door holding a call open
+for the next turn (`remote.RECONNECT_S`, `Seat.held_at`) is a cut call, not a new chat: it is
+seated again as before, and its first result opens with the words that say so and the turn,
+the brief not sent again (it stays the `brief` prompt and the `freesail://brief`
+resource). "Still waiting" says the ship's time now and the owner's clock ("It is now
+Morning watch, 8 bells (04:00), the clock at 60x", `Harness.interim`'s `now` and `clock`).
+The officer's brief and the `stand_by` tool's words give the compound stand-by ("tacked, or
+ten minutes, or a sail sighted"), and the MCP door's words tell a seated model never to end
+its reply in the chat. **A stand-by replaced**: a `stand_by` for another thing, sent while
+the model stands by, replaces the stand-by, its result and the log's line say which ("Standing
+by until two bells, in place of the stand-by until eight bells"), and the same stand-by asked
+again goes on (`remote.Desk._stand_by_out_of_turn`, compared by the stand-by's own reading).
+**The director's own lines** wake it not: the lines its own world order writes (a `say as`, a
+thing found aboard, a ship put on the sea) are spans of the log its harness passes over
+for its policy, its stand-by and its folds (`Harness._own_lines`); every other station meets
+them as before.
+
 ### 6. The director's log, hidden and revealed (`freesail/agents/journal.py`; `core/replay.py`; `ui/`)
 
 Every act of the director (an order given, an order refused, a thought it chose to write)
@@ -457,6 +525,11 @@ on the answer and is shut until then; `GET /api/director/log` is the same reveal
 in the replay**: `two stories [N]` (`director.two_stories`) prints the play log with the
 director's log inline by tick, each of its entries marked `D`. A director that stands down
 leaves its note in its log, and its line says only that it left a note there.
+
+**As built (package 68; R-20).** The director's samples ease nothing under
+`--ease-on-station` and write no driver's line, and its own lines, being for the record, ease
+nothing; a standing order's refusal names the stations aboard and never the director ("the
+director is above the game; a standing order may tell or ask the ...").
 
 ### 7. Truths for 7b-i (behavioural)
 
@@ -532,6 +605,17 @@ under his own name at his trade's place (`TRADE_PLACES`: the cook in the galley,
 cooper in the hold), one of the people from then on; nothing draws him otherwise, so a
 world in which nobody speaks as him or asks him is as it was. **The galley** is a place
 now (under the forecastle, open to the waist), listed after the hold.
+
+**As built (package 68; the cold review of 2026-10-22, R-15).** A person is made aboard
+the player's ship or ashore, and words that name another ship ("aboard the Two Brothers",
+"on the quarterdeck of Cudlip's Boat", "onto the Lydia's quarterdeck") are refused in words
+and nothing is made: three foreign captains had been put on the Sherbourne's quarterdeck
+and in her people. The player's own ship by her name ("onto the Amazon's quarterdeck",
+"aboard the Amazon, in the gunroom") is aboard, at the place said (`orders._ship_said`); a
+place said is honoured and the cabin is the default only where none is. Binding a person to
+another crewed ship through her World was not taken: her World is made and folded with her
+promotion, and a person kept in it would be lost at the fold. The `say as` refusal that
+advised "make him first" says that the people of another ship are not kept.
 
 ### 9. Speaking as the world (`orders.py` `say as`; `harness.py`)
 
@@ -869,6 +953,20 @@ server).** Who heard a word, and where:
   bound to nobody is "the mate" in his brief and the harness's default words; a King's
   ship, and a point world with neither, keep the lieutenant.
 
+**As built (package 68; the cold review of 2026-10-22, R-62 and the D8 note).** `send
+the boat ashore with <names>` carries each person named (the captain, the mate and the
+boatswain by their roles or names, joined by commas or "and"), or refuses the order in
+words and the boat stays: a name nobody answers to, or the captain, who goes ashore by his
+own word; before, both were dropped and the errand fell back to the prices. **A waterman**:
+`hire a waterman` takes the giver ashore from the ship lying at a port, or off to her from
+the quay where he stands, for a shilling a head from the purse, whether her own boat is
+away or not; he is in the waterman's boat for the pull (two knots and a half, and five
+minutes to shove off and come alongside, judgement) and lands or comes aboard when it is
+done (a job of the port's, `Ports.waterman`). The port's own fare is not data yet: a
+shilling everywhere. **A thing in the boat**: `in the boat` is a place a thing may lie
+(`things.IN_THE_BOAT`), aboard while she is at the booms, and landed on the quay when she
+goes ashore.
+
 ### 15. What is heard where: dropped
 
 Locational knowledge (a station's log carrying only what its person could hear from where
@@ -957,6 +1055,18 @@ whose watch comes on deck, he on the quarterdeck, given it as at the captain's w
 orders, the grants, the last handover note), with one notable `watch.deck_passed` line; the
 first lieutenant keeps no watch and keeps it until the captain takes it, and an officer whose
 relief nobody holds keeps it.
+
+**As built (package 68; the cold review of 2026-10-22, R-13 and R-14).** A word or a
+question from a station to the captain the player holds at the prompt (`held_stations`:
+no model at the captain's station, the player seated nowhere else) reaches him: the line
+itself, notable in the play log under the speaker's own mark and place ("The officer of
+the watch (Mr Pearce), on the quarterdeck, to the captain: no land in sight yet"), nothing
+kept in a journal for nobody (`stations._to_the_player_captain`); every model officer's
+report to a player captain had been logged "The captain to the captain ... (nobody holds
+the station)". A word kept for a station nobody holds is kept under its speaker's mark. The
+addressee's words are counted and cut on one tokenisation (`stations._after_words`), and
+the longest naming wins ("Captain Bowen," is two words, not one): "Mr Bowen, no land in
+sight yet" had lost its "no". Truth 7b-121.
 
 ### 17a. Things, free lines and transactions (package 53b; the owner and the lead, 2026-10-19; built the same day)
 

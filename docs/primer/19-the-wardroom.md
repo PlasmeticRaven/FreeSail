@@ -137,7 +137,7 @@ The deck reads *yours*, another's by name (*the deck Mr Pearce's*), *the captain
 | `--station "officer 2"` | `--station "second officer"`, `--seat "Mr Russell"`, `--seat "officer 3"` | one of several officers of the watch, by number or person |
 | `Mr Russell, you have the deck` | `third officer, you have the deck` | the deck to the officer named; `I have the deck` takes it from whoever has it |
 | `master, you may heave to` | `Mr Harvey, you may heave to`, `master, you may not heave to` | a named thing allowed the master's station by the owner or the captain's station, and taken back |
-| `stand by until noon, or a fix, or the true wind exceeds 30 knots` | a model's `stand_by` | a stand-by on several conditions in the dialect's words, any of which wakes the station, the wake's line naming which |
+| `stand by until noon, or a fix, or the true wind exceeds 30 knots` | a model's `stand_by` | a stand-by on several conditions in the dialect's words, any of which wakes the station, the wake's line naming which; a stand-by for another thing sent while one runs replaces it, and says so |
 | `the master` | | the ship's master, and the master's station when it is held, with the working open for it |
 | `the lookout` | `who is at the masthead` | who holds the lookout's station, what is in sight, his last hail |
 | `the pace` | `the clock's pace` | the compression set, the rule, the samples open and since when |
