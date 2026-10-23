@@ -7327,8 +7327,10 @@ def test_truth_7b_127_the_eclairs_leg_is_laid_again_at_the_turn_of_the_tide_in_t
     was held through the ebb into the narrows of the channel of Bas): the rules captain lays
     his leg allowing the flood the master's book gives, and when the master's tide turns to
     the ebb in the channel he lays it again at once, saying why, the helm given the course
-    worked for the new stream; and she clears the channel without touching."""
-    w = _eclair_under_her_lugs(5, 25)
+    worked for the new stream; and she clears the channel without touching. From the
+    channel's eastern end, east of Roscoff: from the road (48° 44.1' N, 4° W) the planner's
+    first leg crosses the land about the Isle Verte (61's route, found on the way)."""
+    w = _eclair_under_her_lugs(5, 25, at=(48.7356, -3.96))
     w.captain.set_intent("passage to 48 46 N 3 45 W")
     w.run(3600)
     shaped = [e for e in w.log if e.kind == "helm.set" and "Shaped a course for" in e.text]
