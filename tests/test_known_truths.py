@@ -7452,7 +7452,6 @@ def test_truth_7b_132_a_seated_api_doors_fold_fires_at_the_default_budget_on_a_l
     from messages_api import CONTEXT, MODEL, Game, MessagesServer, fake_store, finished, run_door
 
     from freesail.agents import consent
-    from freesail.agents.agent import A_GLASS_S
 
     fake_store(monkeypatch)
     key = "sk" + "-ant-" + "api03-" + "Tq7xLmPz" * 6
@@ -7472,7 +7471,7 @@ def test_truth_7b_132_a_seated_api_doors_fold_fires_at_the_default_budget_on_a_l
             note = {"note": "All quiet; the land not yet raised."}
             call = {"type": "tool_use", "name": "handover_note", "input": note}
         else:
-            call = {"type": "tool_use", "name": "stand_by", "input": {"until": "a glass"}}
+            call = {"type": "tool_use", "name": "stand_by", "input": {"until": "ten minutes"}}
         return {"content": [call], "usage": usage}
 
     argv = ["--model", MODEL, "--station", "officer", "--session", "test"]
@@ -7483,7 +7482,7 @@ def test_truth_7b_132_a_seated_api_doors_fold_fires_at_the_default_budget_on_a_l
         assert h.budget_tokens == int(0.4 * CONTEXT)  # 80,000 of the 200,000
         for _ in range(6):
             game.wait_for(lambda: h.open_sample is None, 30)
-            game.driver.tick(A_GLASS_S)
+            game.driver.tick(600)
         game.wait_for(lambda: h.open_sample is None, 30)
         with game.driver.lock:
             folded = [

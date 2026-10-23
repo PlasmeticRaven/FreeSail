@@ -832,14 +832,14 @@ def test_a_door_under_a_directors_seat_is_admitted_under_its_budget_and_others_a
         "seat": "own/officer of the watch",
         "samples_at": 0,
     }
-    # the officer's two samples: the first at the seating, the second a glass on
-    _reply(g, "officer", a["key"], "", ("stand_by", {"until": "a glass"}))
+    # the officer's two samples: the first at the seating, the second ten minutes on
+    _reply(g, "officer", a["key"], "", ("stand_by", {"until": "ten minutes"}))
     g.driver.tick(60)
     # another model at a station with no seat: as before, at its whole context
     b = _door(g, "lookout", other, context_tokens=100_000)
     assert "director's seat" not in b["words"]
     assert g.world.agents["lookout"].budget_tokens == 100_000
-    g.driver.tick(A_GLASS_S + 60)
+    g.driver.tick(600)
     assert officer.agent.released
     assert "the director's budget of 2 samples is spent" in officer.agent.released_reason
     assert director_seats(g.world) == {}
@@ -865,8 +865,8 @@ def test_a_seat_held_for_a_released_station_counts_from_the_admission_and_ends_w
     _granted(g, WEIGHTS)
     a = _door(g, "officer", WEIGHTS)
     for _ in range(3):
-        _reply(g, "officer", a["key"], "", ("stand_by", {"until": "a glass"}))
-        g.driver.tick(A_GLASS_S)
+        _reply(g, "officer", a["key"], "", ("stand_by", {"until": "ten minutes"}))
+        g.driver.tick(600)
     officer = g.world.agents["officer of the watch"]
     before = officer.agent.samples
     assert before >= 3
@@ -947,9 +947,7 @@ def test_the_directors_words_out_of_turn_are_its_logs_and_a_double_cut_off_folds
     yes_on_record(g.records)
     g.took(g.station())
     for _ in range(5):
-        g.reply("", ("readings", {}))
-        g.reply("")
-        g.driver.tick(A_GLASS_S)
+        g.reply("", ("readings", {}))  # each a reply and its results in the open turn
     h = g.harness
     assert h.open_sample is not None
     rev = h.revision

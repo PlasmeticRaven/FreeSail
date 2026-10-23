@@ -97,6 +97,11 @@ DAY_FIXTURES: dict[str, frozenset[str]] = {
 # on the build machine with three other suites running beside them (2026-10-01).
 SLOW_TESTS: frozenset[str] = frozenset(
     {
+        # package 67: the seat's door as the harbour's subprocess on a live server, a long
+        # seat through the API door, and the seat's forms over a day's minutes
+        "test_known_truths.py::test_truth_7b_130_a_seat_starts_the_api_door_admits_it_under_its_budget_and_stands_it_down",
+        "test_known_truths.py::test_truth_7b_132_a_seated_api_doors_fold_fires_at_the_default_budget_on_a_long_seat",
+        "test_director.py::test_the_seat_is_held_at_every_station_of_a_ship_and_for_a_persons_voice",
         # package 59: the maker's proofs (a World made for each) and the harbour in the browser
         "test_harbour.py::test_the_maker_reads_proves_and_saves_in_the_players_place",
         "test_harbour.py::test_in_the_browser_a_game_is_started_and_the_four_scenarios_round_trip",
