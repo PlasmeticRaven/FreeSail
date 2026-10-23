@@ -354,3 +354,56 @@ def test_the_dangers_cover_and_uncover_with_the_tide():
     length, draught = 40.0, units.feet_to_m(15.0)
     assert chart.danger_under(rose.position, 0.0, length, draught, 0.0) is not None
     assert chart.danger_under(rose.position, 0.0, length, draught, 1.0) is None
+
+
+def test_the_kedge_let_go_lies_slack_and_comes_home_only_under_a_heave():
+    """Package 68 (the cold review's CR2-01): the kedge was let go with the boat's
+    horizontal run for its scope and the depth under the ship, the first depth refresh
+    over-stretched the hawser, and "The kedge comes home" was said a minute after the
+    let-go, before anyone hove. Now it is let go with the hawser's run to the depth where
+    it lies, and lies there until it is hove; the line is said only under a heave."""
+    from freesail.ship.parts import ground_tackle
+
+    w = on_the_falmouth_bank()
+    w.submit("take in the fore topsail")
+    assert w.submit("lay out a kedge to the E").kind == "order.accepted"
+    for _ in range(90):
+        w.run(60)
+        if [x for x in w.log if x.kind == "ship.kedged"]:
+            break
+    kedge = next(a for a in ground_tackle(w.ship).down() if a.kind != "bower")
+    assert kedge.scope_m >= kedge.depth_m and not kedge.heaving
+    where = (kedge.ground_x, kedge.ground_y)
+    w.run(600)  # let go and lying: no heave, no line, not moved
+    assert not [x for x in w.log if x.kind == "ground.kedge_home"]
+    assert (kedge.ground_x, kedge.ground_y) == where
+    assert w.submit("heave in the kedge to 20 fathoms").kind == "order.accepted"
+    w.run(1200)
+    home = [x for x in w.log if x.kind == "ground.kedge_home"]
+    assert len(home) == 1 and "too hard on" in home[0].text
+
+
+def test_a_ground_restored_from_before_the_kedging_ticks_aground_with_a_taut_cable():
+    """The checkpoint crash of 2026-10-22 (the cold review's CR2-05 and D7-01): a `Ground`
+    restored from a checkpoint written before the kedging's memory has neither of its
+    attributes, and the live game's clock thread died at the first tick aground with a
+    taut cable. Built here by `__new__` with only the attributes of the earlier build, it
+    ticks aground with the kedge hove taut, as every attribute of a checkpointed class has
+    a class default (the rule in the tuning notes, package 68)."""
+    w = on_the_falmouth_bank()
+    w.submit("take in the fore topsail")
+    assert w.submit("lay out a kedge to the E").kind == "order.accepted"
+    for _ in range(90):
+        w.run(60)
+        if [x for x in w.log if x.kind == "ship.kedged"]:
+            break
+    assert w.submit("heave in the kedge to 20 fathoms").kind == "order.accepted"
+    w.run(300)
+    old = G.Ground.__new__(G.Ground)
+    for name in ("world", "grounded", "_dangers", "_dangers_tick", "_feet_said"):
+        setattr(old, name, getattr(w.ground, name))
+    old._waterlogged_said = w.ground._waterlogged_said
+    assert "_anchor_dist" not in vars(old) and "_came_home_said" not in vars(old)
+    w.ground = old
+    w.run(600)  # aground, the cable taut: no AttributeError, and the memory written
+    assert w.ship.extra.get("aground") and isinstance(old._anchor_dist, dict)

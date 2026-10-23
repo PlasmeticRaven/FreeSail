@@ -374,10 +374,12 @@ class Ground:
             pull_kn += p
             px += p * dx / dist
             py += p * dy / dist
-            # the anchor nearer her than a tick ago while the ground holds her: it is
-            # coming home (the physics' flag is cleared before this is read)
+            # the anchor nearer her than a tick ago while the ground holds her and a heave
+            # on it is in hand: it is coming home (the physics' flag is cleared before this
+            # is read); not while it lies as it was let go (package 68, CR2-01)
             before = self._anchor_dist.get(a.id)
-            came_home = came_home or (before is not None and dist < before - 0.01)
+            heaving = bool(getattr(a, "heaving", False))
+            came_home = came_home or (heaving and before is not None and dist < before - 0.01)
             self._anchor_dist[a.id] = dist
         if pull_kn <= 0.0:
             return

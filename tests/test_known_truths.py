@@ -2968,9 +2968,11 @@ GATE_5B_BROUGHT_UP_TICK = 59603  # brought up, the sails furled (package 57; 596
 GATE_5B_SAIL_SIGHTED_TICK = 55620  # "Sail ho! A sail right ahead" (package 57; 55500)
 GATE_5B_PILOT_HAIL_TICK = 57240  # the cutter hails within four cables (package 57; 57120)
 GATE_5B_PILOT_ABOARD_TICK = 57300  # the pilot aboard, a minute after (package 57; 57180)
-GATE_5B_LINES = 731  # the well's order gone, its two held lines (2026-10-21; 733 at 56)
+GATE_5B_LINES = 731  # the well's order gone, its two held lines (2026-10-21; 733 at 56, 729 at 57)
 # decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
-GATE_5B_DIGEST = "9a1f2802ba7c6533"  # the well (2026-10-21; c8c81b7617e4e0fd at 56)
+GATE_5B_DIGEST = (
+    "9a1f2802ba7c6533"  # the well (2026-10-21; c8c81b7617e4e0fd at 56, 5f682b9f676a2db4 at 57)
+)
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
 # bearing; the outer road 56502 → 56517; the anchor off the town 57615 → 58210 in six
@@ -3028,8 +3030,10 @@ GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before pa
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
 # Black Head at 56081 gone), 475 → 478 lines (docs/dev/TuningNotes.md, package 37m).
 GATE_5B_THICK_TACKED_TICK = 54115  # put about off Black Head, full and by (54063 before 57)
-GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 at 45)
-GATE_5B_THICK_DIGEST = "6f062dc60419f52c"  # the well (2026-10-21; 155a46cede6c96a3 at 57)
+GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 at 45, 495 at 37p)
+GATE_5B_THICK_DIGEST = (
+    "6f062dc60419f52c"  # the well (2026-10-21; 155a46cede6c96a3 at 57, e358748a1eae5fc6 at 45)
+)
 
 
 def the_landfall(log):

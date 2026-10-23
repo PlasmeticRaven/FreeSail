@@ -1288,6 +1288,12 @@ class Runner:
             ctx["parted"] = self._parted_gear(ship, subject)
         if isinstance(subject, Spar):
             ctx["brace_deg"] = f"{abs(units.rad_to_deg(subject.brace_angle)):.0f}"
+        if inst.evo.id == "get_under_way":
+            # the first line by her rig (package 68): a lugger has a windlass and no
+            # sail-loosers aloft
+            from freesail.evolutions.scripts import under_way_start_words
+
+            ctx["start_words"] = under_way_start_words(ship)
         for key, value in inst.params.items():
             ctx.setdefault(key, value)
         if inst.script is not None:
