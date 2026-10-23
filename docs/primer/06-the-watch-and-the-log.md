@@ -133,6 +133,8 @@ The entries you will see most:
 
 Every entry also carries a machine-readable kind (`order.accepted`, `sail.set`, `ship.tacked`, `wind.gust` and so on) and data in SI units, which the browser client and, later, standing orders read (`docs/TechnicalSpec-M0-M2.md` §5).
 
+**What the log says once** (package 58a; the owner's playtests of October found the notable lines crowded with repeats, each waking whoever stood by for a notable event). A line of the kinds that come again and again (a standing order's trim waiting with *Not hands enough on deck*, the lead's cast, the carpenter's report, the well sounded) is notable the first time and **routine when its words are the same as the last of its kind**: the cast at anchor every ten minutes in the same water is marked once. In light airs the wind is said **falling light** only when the mean has stood under four knots ten minutes, and **settled** only when it has stood at six or more, within a point, ten minutes, so an air that hangs about four knots says *Light and variable airs.* once and not every half hour. And at anchor **the swing at the turn of the tide** (*The cable slack at the turn; she swings to the flood*) is said once a turn: where no tidal stream runs at all she rides head to wind, and a ship sheering across the edge of a stream's water no longer swings in the log every minute.
+
 ## The console commands
 
 The console reads a line and decides whether it is for the clock or for the ship. These are for the clock and are never journaled as ship's orders:
@@ -189,6 +191,12 @@ the well
   Forenoon watch (10:00)  The true wind: 15 knots, from N, at the mean.
   Forenoon watch (10:00)  The fore topsail: set.
   Forenoon watch (10:00)  The well: the well not sounded yet: 'sound the well' has the carpenter sound it.
+```
+
+**What lies ahead** (package 58a). `ahead` is one line of what lies on her course within the next glass at her speed, from her position by account: the land, a charted danger within two cables of her track, the depth by the chart where it shoals or changes, a sail in sight on her head; *open water* when there is none, and nothing at anchor. It is the officer's glance along the course before he lets the deck alone for half an hour, and a model at a station reads it in every sample where it changed:
+
+```
+  Forenoon watch (11:10)  Ahead: on her course N at 7 knots, the next glass (three miles and a half) by account: shoaling under 10 fathoms by the chart in a mile and a half; the land in two miles and a half.
 ```
 
 ## Seeds, saving and replaying
