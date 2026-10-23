@@ -885,7 +885,8 @@ def test_the_ship_form_reads_its_words_as_the_directors_wrote_them():
         ),
         ('ship: a cutter "Ann" of Britain at the Moon, bound for Falmouth', "the place 'the Moon'"),
         (
-            'ship: a cutter "Ann" of Britain at 49 00 N 6 00 W, bound for Atlantis, British colours',
+            'ship: a cutter "Ann" of Britain at 49 00 N 6 00 W, bound for Atlantis, British '
+            "colours",
             "the goal 'bound for Atlantis'",
         ),
     ):
@@ -893,7 +894,7 @@ def test_the_ship_form_reads_its_words_as_the_directors_wrote_them():
         assert e.data["result"] == "refused" and clause in e.text, e.text
 
 
-def test_a_ship_on_the_land_is_refused_with_the_nearest_water_and_one_in_harbour_goes_out_by_the_track():
+def test_a_ship_on_the_land_is_refused_and_one_made_in_harbour_goes_out_by_the_track():
     """61's simple half (R-43 "crosses the land", the E2 F15 hull put on the land on a
     reason): a place on the land is refused in words with the nearest water a ship floats
     in named, whatever reason is given; a ship made in a port's harbour goes out by the
