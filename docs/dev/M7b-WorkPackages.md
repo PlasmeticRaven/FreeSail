@@ -384,6 +384,61 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
 
+### Package 58b as merged (2026-10-23)
+
+Merged `--no-ff` from the builder's worktree (ten commits on `872aa61`; 22 files, ~2,000
+lines) over 58a and 67, the last of the three, with five conflicts: the tuning notes and
+the conftest of the appended kind (both kept); the waves row combined with 58a's and 58b's
+built notes; the two pinned-passage files taken at 58b's side and **re-measured on the
+merged tree**, since 58a's recurring-lines rule reads in these passages too and the digest
+reads severity (the merchant passage `26c859e23ceccd42` to `6abbbff4d7fa1a57`, truth 78's
+fake captain `0949c109116fc4a1` to `1c9a985bfd5dce0f`, the trade trial with the stranger
+`5bbca78fdc6b5093` to `48b205b4f587256c`, the intent schooner `b498761052da0862` to
+`585c52675f10e590`; every line count and state figure 58b's own; the old figures beside the
+new with the merge's comment), ruff clean, the re-pinned passages run clean by the lead;
+**the one whole suite on the merged tree of 68, 58a, 67 and 58b follows this record** (the
+owner's word: one suite for the three, no playtest without telling him first). The builder
+ran the fast tier under a load of 17 to 25 (3,565 passed, two failed: truth 7b-113, its own
+and mended, and truth 88's pace test in the fast tier, mended by the conftest since) and
+measured the moved passages alone; the whole slow tier was stopped at the lead's
+stand-down and not run by the builder. Built as briefed: **a leg laid again as the stream
+changes** (the master's turn of the tide, or a stream that would set her a cable off the
+line in a glass; the reason said in the laying); **casts on a long leg** (the hand lead
+every glass under twenty fathoms, the deep-sea lead every hour inside the hundred-fathom
+line, cast as she goes under four knots); **the wind across the stern ordering nothing**
+(the owner's ruling: a point past dead astern with a lug against its mast or a yard braced
+for the old tack, one line to the player, "dip them when you will", and the rules captain
+dipping or bracing as his next orders; the physics unchanged, no evolution from a helm
+order); **the course given when she gathers way** (held from the anchor aweigh till a knot
+of headway with her sails drawing, then given); **the gale book mended** (a head sail
+straining at its bolt-ropes taken in before it blows out, the close-reefed topsails set to
+fill away in a strong wind, a lugger lying to under her storm lug and storm jib; the
+frigate a-try four hours never aback); **the pilot's conn in a stream** (68's debt: each
+leg of his track judged with the stream as she will meet it, she is brought up in 25
+fathoms or less to wait for the flood to slacken, the time said, weighed when the legs will
+serve, his turn trimmed for before the helm goes over; the two Goulet cases lifted from
+xfail, the wait asserted; and the captain's book leaving "the leg" out whenever the pilot
+has the conn, by whoever's word); truths 7b-127 to 7b-129.
+
+**Taken another way, accepted:** the deep-sea lead's bringing-to once a watch at most,
+never beating, in a blow or with land under her lee (brought to every hour she never
+reached Brest); the band under the reefs built and withdrawn (aback every two minutes and a
+half, worse than the helm's own); a captain holding his boat while the pilot waits tried
+and withdrawn (she pinched for his mark and grounded). **The lug fraction** against the
+mast checked and kept at two thirds (a tenth of her way lost, running or on a wind). **The
+gale trials stay expected failures, non-strict, the new figures beside the old, for the
+lead's playtest of the gale book**: the station gale's frigate still grounds among the
+Molène islands on the offing's tack (57's finding), earlier now, nothing lost. **Found on
+the way:** the station gale's pin was stale before this package (the non-strict xfail hid
+it); the Roscoff plan's first leg crosses the land about the Isle Verte (61's route; truth
+7b-127 starts from the channel's eastern end instead); the get-under-way line says "full
+and by" while the helm steers a held course; the pilot's waiting line says "wait" twice.
+**Decision for the owner:** the intent schooner now ends her 36 hours in Brest road with the
+tin unsold, the pilot having brought her up to wait for the slack and the captain's boat
+for the prices refusing his weigh. Should the captain's business wait for the pilot, or the
+pilot's wait defer to the boat? And the pilot's answer to open water to his mark that will
+not be fetched (the pinching rule withdrawn) stands open with it.
+
 ### Package 67 as merged (2026-10-23)
 
 Merged `--no-ff` from the builder's worktree (seven commits on `872aa61`; 32 files, ~2,800
@@ -462,7 +517,7 @@ the whole 1,371,847 to 1,038,872 (−24%).
 unchanged, the digest reading severity: the recurring-lines rule alone, proven by
 bisection (the rule emptied, the old pins pass), the old figures beside the new. **58b
 runs the same trials and may move two of them again; the merged tree takes its own
-figures.** **Found and fixed on the way:** `replay._rebind` recursed without end with two
+figures.** (Done at 58b's merge: four digests, in 58b's record.) **Found and fixed on the way:** `replay._rebind` recursed without end with two
 crewed ships. **Found, carried:** truth 88's pace test in the fast tier under load (the
 conftest's name rule); "the depth of water ..." parsed as the lead's `depth`; a crewed
 captain not knowing "haul off"; the truth's tide words naming the stream area's axis.
