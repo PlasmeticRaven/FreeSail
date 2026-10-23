@@ -31,7 +31,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 51 | Fable | The observed world: the followed ship in place of the given one, no player's ship, the player on another ship, the replay of a station there; the director's chart, the truth drawn (spec §12a); provisionally the director's focus and the ships' logs by kind and tick range (spec §12b; both the owner's word of 2026-10-17) | brief to write, after 50 |
 | 56 | Opus | Fishing for the player with the fisherman's parity and the fishermen promoted; the glass on a near ship by tiers; a sighting saying her heading | briefed 2026-10-17; approved the same day, held until the second wave landed, launched on its merge; **built 2026-10-18** (spec §21a and §21b as built; the primer's chapter 21, the fisherman, and chapter 15's glass; the tuning notes, "Package 56"; truths 7b-105 to 7b-107); **merged 2026-10-18** (the record below) |
 | 57 | Opus | The frigate's staysails from Steel's list through the generator, the period's shapes; the chasse-marée's rig put right (lug topsails, not square; the lugs slung a third from the fore end and set to leeward of the mast; the trim rule reading a lug as fore-and-aft) and the viewer's draw order by aspect and the brace shown (the owner's notes of the Éclair's first cruise, `docs/playtests/2026-10-17-eclair-first-cruise/owner-notes.md`) | briefed 2026-10-17; approved and launched the same day, the three together; **built the same day** (spec §24's 57 as built; the primer's chapters 1 to 3; the tuning notes, "Package 57"; truths 7b-111 and 7b-112); **merged 2026-10-17** (the record below) |
-| 58 | Opus | The captain's sea sense, third pass (the owner's runs of gate 6c); a leg re-laid as the stream changes; the sample's deltas, the `ahead` reading and the cost of thinking (the owner's observation of 2026-10-17); the lugs dipped or a wear ordered when a helm order carries the wind across the stern, and the course given when she gathers way, not at the aweigh (the lead's wave-2 playtest, `docs/playtests/2026-10-17-wave2-lead-playtest/notes.md`) | brief to write |
+| 58 | Opus | The captain's sea sense, third pass (the owner's runs of gate 6c); a leg re-laid as the stream changes; the sample's deltas, the `ahead` reading and the cost of thinking (the owner's observation of 2026-10-17); the lugs dipped or a wear ordered when a helm order carries the wind across the stern, and the course given when she gathers way, not at the aweigh (the lead's wave-2 playtest, `docs/playtests/2026-10-17-wave2-lead-playtest/notes.md`) | **drafted 2026-10-23 for the owner's review** (58a the harness, 58b the captain) |
 | 59 | Opus | The harbour: a launcher in the browser, the scenario maker, the settings and the doors started from it (the owner, 2026-10-17) | briefed 2026-10-18; approved and launched 2026-10-18 beside 62; **built 2026-10-18** (spec §21d and §21e as built; the Harness's §22, with several stations from several chats; the README's start line; the primer's chapter 1; the tuning notes, "Package 59"; truths 7b-108 to 7b-110); the owner's testing round follows |
 | 60 | Opus | A ship bought (the owner's design goal of 2026-10-17; spec §21g): listings, the hull's valuation, the ship bought and sold through the market orders, the transfer of the people and the hands, the errand ashore | brief to write, after 51 and 53 |
 | 61 | Fable | The land-avoiding route, provisional (spec §21i; the owner, 2026-10-17, brought in from the carried items): the course laid clear of the land and the dangers over the chart's own data for every captain and the player, the legs said as the plan | to plan in full at briefing; beside 51, before 58's tracks |
@@ -1029,6 +1029,124 @@ console stays as it is. Each item an intent with the lead's reading; the intent 
    `time` a console command, from the lead's wave-2 playtest); the README's start line
    (`py -m freesail`); the primer's first chapter; §21d, §21e as built; the tuning notes
    (found on the way, the Windows pieces tested by path, pins unmoved by digest, the suite).
+
+## Package 58: the sample's deltas, the stand-by's instruments and the captain's sea sense (DRAFT for the owner's review, 2026-10-23)
+
+Two halves that share a name and little code, proposed as **two Opus builders in parallel**
+(58a in the harness and the director's tools, 58b in the rules captain and the lugger's
+handling), or one builder in series if the owner prefers one report. The ground: the
+cold review of 2026-10-22 (R-26, R-27 and R-28 as far as 68 leaves them, R-31, R-04, R-39
+in part, R-42's dry run, the lugger officer's account of time in §7.2 and the Western
+Islands director's in §7.1), the lead's wave-2 playtest (`docs/playtests/2026-10-17-wave2-
+lead-playtest/notes.md`), the Éclair's first cruise (`docs/playtests/2026-10-17-eclair-
+first-cruise/`), and 57's gale-trial debt (`docs/dev/TuningNotes.md`, "The gale trial, for
+the lead and package 58"). The head rules bind; the pins of the recorded passages move
+only where 58b's handling moves them, with the old figure beside the new. **68 runs
+first**: 58a builds on 68's door (the wait, the cut call, the time in "still waiting", the
+stand-by replaced, the director's echoes) and does not redo it.
+
+### 58a. The sample's deltas and the stand-by's instruments (`freesail/agents/harness.py`, `agent.py`, `tools.py`, `repl.py`, `mcp_server.py`, `remote.py`; `freesail/api/readings.py` the `ahead` reading and the hysteresis; `freesail/core/world.py` and `world/tide.py` the swing's cause; `freesail/world/orders.py` the dry run; `freesail/agents/director.py` the forms reference and the lookups; `docs/agents/Harness.md`; the primer's chapters 6, 19 and 20; `docs/TechnicalSpec-M7b.md` §5 and §12 as built; `docs/dev/TuningNotes.md`; `tests/test_agents.py`, `test_harness*.py`, `test_director.py`, `test_readings.py`, `test_known_truths.py` truths 124 to 126)
+
+1. **Deltas.** A sample after the first carries what changed since the model's last reply
+   and nothing it has already read: the log lines since (as now), the readings that
+   changed (as now), **the sails in one line only when a sail's state changed**, the
+   strangers' list only when a sail came, went or was made out further, the standing
+   orders only when the book changed, and no repetition of what was said to the officer
+   or the captain (the conversation's history is the model's own context, not the
+   sample's). "Still waiting" carries only the lines since the last poll, never the
+   stand-by's whole history (R-26: 1.3 M characters in four hours for one director). *The
+   lead's reading:* the sample builder keeps a per-station cursor for each part as it
+   keeps one for the log; the first sample of a seating, and the first after a handover
+   fold, are whole; a `readings` or `state` call still gives everything on request.
+2. **The notable-noise rules (R-31, R-04).** A recurring line whose words did not change
+   since its last logging is routine, not notable (a standing-order trim's "not hands
+   enough", the lead's cast at anchor, the carpenter's well); light-air wind lines take a
+   hysteresis (a point and two knots, held ten minutes, before a shift is said again);
+   **the swing at the turn of the tide** has its cause mended, not masked: outside every
+   stream area `NO_STREAM` reads `flood=True`, so a ship sheering across an area's edge
+   logs the swing minute by minute; `flood` is `None` where there is no stream, and the
+   swing is said once per turn. The Western Islands' anchored night at Horta, replayed
+   from the filed save, is the test (66 swing lines in an hour and a half become two).
+3. **Tripwires: stand-by events for the ship's own state.** `stand_by(until=...)` takes
+   "her way settled" (the speed steady within a quarter knot for two minutes after a helm
+   or sail order), "depth under <n> fathoms", "speed under <n> knots" and "speed over <n>
+   knots", "the wind over <n> knots", "a point of interest within <n> miles", beside the
+   events of today; the lugger officer's own proposal ("making the right orders at the
+   wrong time": trimming before she settled). Each is judged by the game's readings, never
+   by prose.
+4. **The `ahead` reading and the cost of thinking.** `ahead`: one line of what lies on her
+   course within the next glass at her speed (the land, a danger, a sail, a change of
+   depth by the chart), the owner's "delta" of 2026-10-17; and every sample's first line
+   (66's) gains "<n> minutes of the ship's time since your last reply" so that a model
+   knows what its thinking cost. The director's line gains the same.
+5. **The director's forms reference and dry run (R-42, the lugger director's asks).** The
+   library's grammar topic gains a section "the world orders", every form with a verified
+   example that a test parses (the examples in the brief and the starter briefs are drawn
+   from it, never written apart); `world_order(text, dry_run=True)` returns what the order
+   would do, its doubt or its refusal, performs nothing and costs no act; read-only
+   lookups through the truth: `truth(ports=...)` a port's places and prices, `truth(
+   grounds=...)` the fishing grounds, `truth(systems=True)` the weather systems seeded and
+   their track, `truth(at="49 55 N 4 35 W")` whether a point is at sea and its depth by
+   the chart; and a short "how the world behaves" page in the director's library (how
+   systems add and step, how a ship's company is drawn, what each order logs and to whom),
+   written from the code and tested where it states a number.
+6. **Weather, the small part (R-39).** An appended system or waypoint ramps in from the
+   order's tick over an hour rather than stepping; a high is doubted like a low. The
+   summed field's seasonal bound and the climatology's drift onto Iberia are **kept out**
+   (M7's weather, or a package of their own).
+7. **Truths and records.** Truth 124: a captain's second sample carries no sail line when
+   no sail changed and the stranger's list only when it changed, and "still waiting"
+   carries only the lines since the poll; 125: the Horta night's swing logs once per turn;
+   126: a dry run of a doubted order returns the doubt, performs nothing and spends no
+   act. §5 and §12 as built; the Harness; the primer; the tuning notes (the size of a
+   day's samples before and after, measured on a filed save).
+
+### 58b. The captain's sea sense, third pass (`freesail/world/captains.py`, `brains.py`; `freesail/evolutions/scripts.py` the dip and the wear; `data/standing_orders/starter.orders` and `data/captains/*.yaml` where a book's words change; `freesail/orders/navigation.py` the course given when she gathers way; `docs/primer/` chapters 7 and 11; `docs/TechnicalSpec-M7b.md` §24's 57 debt and M6's captain sections as built; `docs/dev/TuningNotes.md`; `tests/test_captain.py`, `test_ships.py`, `test_known_truths.py` truths 127 to 129, 57's gale-trial xfail lifted)
+
+1. **A leg re-laid as the stream changes.** The rules captain re-lays his leg at each turn
+   of the tide and when the stream's set would carry her off the line by more than a
+   cable in the next glass (the Éclair's first cruise: the leg laid on the flood, held
+   through the ebb into the Bas channel's eastern narrows).
+2. **Casts on a long leg.** The captain's book heaves the lead at an interval on a leg
+   that runs in soundings (every glass under twenty fathoms by the chart; every hour in
+   deeper water inshore of the hundred-fathom line), not only at the leg's ends.
+3. **The lugs dipped, or a wear ordered, when a helm order carries the wind across the
+   stern.** A helm alteration that takes the apparent wind through the stern is a wear to
+   the sails: the lugs dipped (the lugger), the booms gybed with the sheets (the cutter,
+   the schooner), the yards squared and braced anew (the square rig), by the evolution's
+   own script and not left set against the masts (the wave-2 playtest's finding 1; the
+   owner's note that the running band is a helm alteration to the game and a wear to the
+   sails). The rules captain and the player's `steer` alike.
+4. **The course given when she gathers way, not at the aweigh.** After weighing, the
+   captain's first course waits for way on her (a knot, and the sails drawing), and the
+   starter book's words say so (the wave-2 finding; the primer's chapter 11).
+5. **The gale trial (57's debt).** Under the heavy-weather book the helm's "full and by"
+   under reefed canvas is not allowed to bring her up to forty degrees and aback once a
+   minute: the book's close-hauled band under reefs widens, shortening sail takes in the
+   headsails before they blow out, and a ship with no way in a gale lies to under the
+   book's own storm canvas (the lugger under the taille-vent, the square rig under the
+   main topsail aback or the trysail) rather than drifting at sixty-five degrees of leeway;
+   the two gale trials re-pinned with the old figures beside the new and the `xfail`
+   lifted. *The lead's reading:* this is the one item of 58 that is judgement rather than
+   mending, and the brief binds the intent (she lies to or runs, by the book, and is not
+   taken aback every minute) and not the figures.
+6. **Truths and records.** Truth 127: the Éclair's leg re-laid at the turn of the tide in
+   the Bas channel; 128: a `steer` through the stern dips the lugs (the picture's test from
+   the wave-2 notes); 129: the gale trial's frigate lies to under the book without being
+   taken aback. The tuning notes with the pins moved and why; the primer's chapters 7 and
+   11; M6's captain sections as built.
+
+**Kept out of 58:** 68's door items; the deck's deltas for the browser (the player reads
+the whole log); the "say to <person>" thread (52); the seat's door and the channel (67);
+the readings by place (65); the lay line (43b's open item, 61); the weather's seasonal
+bound and climatology (M7); the API seats' context folds (R-34, 67).
+
+**For the owner's review:** one builder or two; whether the dry run should also be the
+player's at the prompt (`world_order ... , dry run` for the owner directing from the
+console); whether the `ahead` reading is every station's or the deck's only (the lead's
+advice: every station that has the deck's readings, the director's by the truth); and
+whether 58b's gale-trial judgement is the builder's to make or waits for the lead's own
+playtest of the fixed book.
 
 ## Package 68: the review's mending (`freesail/world/reckoning.py` and `lookout.py` the riding rule; `freesail/agents/harness.py`, `remote.py`, `mcp_server.py`, `tools.py` the door's wait and cut call, the stand-by replaced, the director's own lines, the officer's brief; `freesail/world/orders.py` the person made aboard another ship, the `ship:` form's parse, the doubt after the form, the brig limit, the budget command; `freesail/world/people.py` or `hearing.py` the words to a player-held captain; `freesail/orders/` the dropped word after a name; `freesail/evolutions/scripts.py` the lugger's getting under way, the kedge-home line; `freesail/world/ground.py` the checkpoint regression test; `freesail/api/readings.py` the truth's aground state and goal; `freesail/world/ports.py`, `movement.py` the boat's passengers and the waterman; `client/units.js` the fathom; `data/ships/merchant-brig.yaml` through `tools/gen_ships.py`; `.gitattributes`; `docs/agents/Harness.md`; the primer where touched; `docs/TechnicalSpec-M7b.md` §5, §6, §8 and M5 §12's wording as built; `docs/dev/TuningNotes.md`; tests beside each, `test_known_truths.py` truths 120 to 123)
 
