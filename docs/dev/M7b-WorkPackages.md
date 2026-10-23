@@ -41,7 +41,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 65 | Fable | The place's knowledge (spec §14, "Brought back and forward"; the owner, 2026-10-19): what a person perceives from where he stands, aboard and ashore (the readings, the log and the sightings by place; the ship reaching him ashore by report, boat or letter), the books and papers kept in places, the always-present line of his own place and state in every sample, and the drill extended to going below, eating, drinking, reading a book and coming on deck; and each kind of work done in its own place (the sailmaker's sail room, the master's gunroom, the captain's cabin), the same for the rules' person and for a model or the player at the station doing the same work (the owner, 2026-10-19) | provisional; the deferred locational knowledge of decision 47 brought back and forward at the owner's word after the dispatches test; brief after the owner's testing round |
 | 53b | Opus | Things, free lines and transactions (spec §17a; the owner's question of 2026-10-19 after the dispatches test): a thing made, moved and kept as people are, with a place and a keeper and nothing more; a short list of verbs taking free words and logging them as used, moving a thing where the words name one and saying "as said" where they do not; a sum or a cargo paid, freighted or owed as a transaction with its cause in the ledger, never a variable set; the refinement pass on 53 the owner is looking at | briefed, approved ("as written") and launched 2026-10-19; **built 2026-10-19** (spec §17a as built, with five readings taken another way, and §18's truths; the Harness's §19 and §21; the primer's chapters 14 and 20; the tuning notes, "Package 53b"; truths 7b-114 to 7b-116) |
 | 66 | Opus | The station's line and the stand-by (the harness after the dispatches test, 2026-10-19): one line of the holder's own first in every sample; a model's own order or word ends its stand-by and runs; a wake carries a line or does not wake; a word said tells who heard it and a question put says until when it waits; the truth a meanwhile read for the director; the hand's hold named (`for a watch`, `until <event>`); `say as` the lookout, the master and the muster's persons; merchant words for an unbound officer | briefed, approved and launched 2026-10-19 beside 53b; **built 2026-10-19** (spec §3, §5 and §14 as built; the Harness's §19 and §21a; the primer's chapters 19 and 20; the tuning notes, "Package 66"; truths 7b-117 to 7b-119) |
-| 67 | Opus | The director's seat made real (spec §2a; the owner, 2026-10-19): the desk reads a held seat, the game starts the API door itself on `seat:` as the harbour starts one, under the grant's budget on the owner's key, the pane in the harbour's doors tab, stopped by `unseat:` or the spent budget; the form widened to a station of a ship; the brief says what a seat costs; and an out-of-character channel between the player and the director (the owner, 2026-10-23: a `director:` word at the prompt that goes to the director's log only, and the director's answer to the player apart from the play log) | provisional; brief after 68 |
+| 67 | Opus | The director's seat made real (spec §2a; the owner, 2026-10-19): the desk reads a held seat, the game starts the API door itself on `seat:` as the harbour starts one, under the grant's budget on the owner's key, the pane in the harbour's doors tab, stopped by `unseat:` or the spent budget; the form widened to a station of a ship; the brief says what a seat costs; and an out-of-character channel between the player and the director (the owner, 2026-10-23: a `director:` word at the prompt that goes to the director's log only, and the director's answer to the player apart from the play log) | **drafted 2026-10-23 for the owner's review**; launch after 68, beside 58 |
 | 68 | Opus | The review's mending (the cold review of 2026-10-22, `docs/playtests/2026-10-18-to-22-owner-playtests-and-review/`): the P0 list and the small P1s that hit every model, the fold-in's three leftovers, 61's simple half and 63's small boat items | briefed, approved and launched 2026-10-23 |
 | 69 | Opus | The pins on Windows (R-58 answered by CI run 228, 2026-10-23): five recorded passages give another digest or count on Windows than on Linux (the merchant passage's constants, the schooner on an intent alone, truths 77 to 79, the Ushant captain trial, the schooner's octant passage by a line); find the platform-dependent source and pin each to one answer on both runners; the harbour's banner test on CI; the maker's doubled carriage returns on Windows | booked; brief before the gate, or folded into 55 |
 | 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
@@ -1166,6 +1166,93 @@ longer say it: both are to be watched and refined in play. *The lead's reading f
 before: the sails, four strangers, the book"), the first sample of a seating and the first
 after a fold are whole, and `readings` on request gives everything, so that forgetting
 has a cheap cure the model can reach for. **Launch after 68 is merged.**
+
+## Package 67: the director's seat made real, and the channel between the player and the director (DRAFT for the owner's review, 2026-10-23) (`freesail/world/orders.py` the `seat:` form widened and the channel's word; `freesail/agents/remote.py` the desk reading a held seat; `freesail/ui/harbour.py` and `ui/server.py` the director's door started as the harbour's are, its pane; `freesail/agents/harness.py`, `api.py` the seat's samples counted, the API seat's folds; `freesail/agents/director.py` the brief's words on a seat's cost and the channel; `freesail/settings.py` the models the settings can call; `freesail/ui/console.py` the `director:` word at the prompt; `docs/agents/Harness.md`; the primer's director chapter; `docs/TechnicalSpec-M7b.md` §2a and §6 as built; `docs/dev/TuningNotes.md`; `tests/test_director.py`, `test_agent_api.py`, `test_harbour.py`, `test_known_truths.py` truths 130 to 132)
+
+Opus; two days; after 68 and beside 58 (little shared code: 58a is the sample and the
+stand-by, 67 the desk, the door and the channel). Spec M7b §2a (the owner's ruling of
+2026-10-19 that the director seats through the API door, bounded by the grant's budget;
+and of the 23rd that an out-of-character channel is wise); §6 (the director's log); M6 §23
+(the grant); the review's R-34 (the API seats' cost), R-21 and R-24 (the channel). The
+ground: `orders._seat` writes a held seat on the World after the consent record, the
+grant and the budget are checked, and `crews.enforce_budgets` stands the holder down when
+it is spent, but no door is started by it and the desk admits a door for another ship's
+captain without reading the seat (spec §2a, "As it stands"); the harbour starts the API
+door and the local runner as the server's subprocesses with their panes (`harbour.Door`,
+`door_argv`), the key from the credential store and the model from the settings. Each
+item an intent with the lead's reading; the intent binds. **The owner's budget rule
+stands:** the brief constrains nothing by default (9999/9999 in the starters stays), it
+only makes a seat's budget real where one is given.
+
+1. **The desk reads the seat.** A door asking for a station of a ship with a held seat for
+   that model is admitted under the seat's budget (its samples or hours counted from the
+   admission, the stand-down by `enforce_budgets` as now, with the reason); a door for a
+   model or a ship with no seat is admitted as today; a seat held for a model that never
+   comes is stood down by `unseat:`, by the voyage's end, or by a timeout the seat's words
+   may name (`seat: ... for 20 samples, within an hour`), and the director's log says so.
+2. **The game starts the director's door.** On `seat:` where the server has a harbour
+   (`py -m freesail`, or the server with the harbour beside it), the game starts the API
+   door itself as the harbour starts one from its page: the module's own command line
+   (`freesail.agents.api --game <url> --model <name> --station <station> [--ship <ship>]
+   --dialect <from the settings>`), the key from the credential store and never from the
+   game, the pane shown in the harbour's doors tab beside the owner's own and marked the
+   director's, stopped by `unseat:`, the spent budget or the server's end. Where there is
+   no harbour (the console), the seat is held as a record and its result says a door must
+   be started by hand. The grant's models are **the models the settings can call**: a seat
+   for a model the settings have no dialect or account for is refused in words at the
+   seat ("the settings call no model by that name; the API door's model is <x>"). *The
+   lead's reading:* `Harbour.start_door` takes a `seat` argument and a `by="the director"`
+   mark; the desk's admission (item 1) is what makes the started door the seat's and not
+   a stranger's.
+3. **The seat's cost said, and counted.** The director's brief says plainly that a seat runs
+   a model on the owner's key for its budget, in samples or hours, and that the grant is
+   the owner's spending; `seat:`'s result repeats the budget and the cost's shape; the
+   seat's samples are counted where the director's are (the day's budget line names the
+   seats held and their spending); and the API seat's own cost is bounded as R-34 asks:
+   `budget_tokens` for a seated door set well under the model's context by default (the
+   settings may raise it) so that the handover fold fires; a fold after a double reply
+   cut-off; the conversation's size logged at each fold; and the reseat line saying which
+   grants lapsed with the reseat.
+4. **The form widened.** `seat: <model> as <station> of <ship> for <n> samples|hours`, the
+   captain the default, for the stations a ship has (an officer of the watch, a lookout, a
+   master, a passenger on another ship), the player's own ship included **only where the
+   grant names it** (`director: {seats_on_the_players_ship: true}` or a like key in the
+   scenario's grant; the lead's reading: off by default, since a model officer under the
+   player's command is the player's own choice today through his doors); the rule of
+   reach as everywhere: no seat at a station the player or a model holds.
+5. **The channel between the player and the director (R-21, R-24; the owner, 2026-10-23).**
+   `director: <words>` at the player's prompt (any seat, or none) goes to the director's
+   log only and comes to the director in its next sample as the player's word apart from
+   the game ("The player, apart from the game: ..."), waking it as a message does; the
+   director's answer is `answer the player: <words>` or the `answer` tool's own with a
+   mark, which goes back to the player as a line of his driver's, never the play log's,
+   and into the director's log; the play log says nothing of either; the replay shows
+   both beside the play log as it shows the director's log; the browser has a small pane
+   for them as it has the director's log on request. The brief's rule stands beside it:
+   plans and the truth stay in the journal, a question to the player is phrased without
+   world detail, and the director's `say` result no longer claims "your words are in the
+   log under your mark" (R-21).
+6. **Truths and records.** Truth 130: a `seat:` under the grant for a model the settings
+   can call starts the API door (a fake Messages API in the test), the door is admitted
+   under the seat's budget and stood down when it is spent, and a seat for a model the
+   settings cannot call is refused in words; 131: `director: <words>` at the prompt reaches
+   the director's next sample and its answer reaches the player's driver line, and
+   neither is in the play log or its replay's play side; 132: a seated API door's handover
+   fold fires at the default `budget_tokens` on a long seat. §2a and §6 as built; the
+   Harness (the seat's door, the channel); the primer's director chapter; the tuning
+   notes (the seat's cost measured on the fake API: samples, tokens).
+
+**Kept out:** the grant's exposure in the harbour's page (64); the seat's door through the
+desktop client (a human must open a chat; the seat's record says so); the local runner as
+a seat's door (the settings' local model may be named in the grant later; the API door
+first); the "say to <person>" thread (52); 58a's deltas and still-waiting.
+
+**For the owner's review:** whether seats on the player's own ship are allowed by a grant
+key (the lead's advice: yes, off by default); whether the channel's player side is also a
+browser pane now or the prompt only (the lead's advice: both, the pane small); whether the
+default `budget_tokens` for a seated API door should be a figure in the settings or a
+fraction of the model's context (the lead's advice: a fraction, two fifths, the settings
+able to say a figure).
 
 ## Package 68: the review's mending (`freesail/world/reckoning.py` and `lookout.py` the riding rule; `freesail/agents/harness.py`, `remote.py`, `mcp_server.py`, `tools.py` the door's wait and cut call, the stand-by replaced, the director's own lines, the officer's brief; `freesail/world/orders.py` the person made aboard another ship, the `ship:` form's parse, the doubt after the form, the brig limit, the budget command; `freesail/world/people.py` or `hearing.py` the words to a player-held captain; `freesail/orders/` the dropped word after a name; `freesail/evolutions/scripts.py` the lugger's getting under way, the kedge-home line; `freesail/world/ground.py` the checkpoint regression test; `freesail/api/readings.py` the truth's aground state and goal; `freesail/world/ports.py`, `movement.py` the boat's passengers and the waterman; `client/units.js` the fathom; `data/ships/merchant-brig.yaml` through `tools/gen_ships.py`; `.gitattributes`; `docs/agents/Harness.md`; the primer where touched; `docs/TechnicalSpec-M7b.md` §5, §6, §8 and M5 §12's wording as built; `docs/dev/TuningNotes.md`; tests beside each, `test_known_truths.py` truths 120 to 123)
 
