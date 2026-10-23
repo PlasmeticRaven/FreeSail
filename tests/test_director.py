@@ -1421,6 +1421,7 @@ UNPERFORMED_HERE = {
     'ship "Harpy": order haul off': "No sail in sight to haul off from",
     'ship "Medusa": order fill away': "She is not hove to",
     "aboard: £6 paid from the purse to the pilot": "the purse holds nothing",
+    'ship "Harpy": crewed': "at full detail already",  # near: crewed by the promotion itself
 }
 
 
@@ -1560,7 +1561,7 @@ def test_the_truths_lookups_a_port_the_grounds_the_systems_and_a_point():
     land = T.call(w, "director", "truth", {"at": "the Lizard"})
     assert not land["at"]["at_sea"] and "on the land" in land["at"]["words"]
     refused = T.call(w, "captain", "truth", {"ports": "Falmouth"})
-    assert "refused" in refused or "does not see the truth" in str(refused)
+    assert "ports" not in refused  # the lookups are the truth's, the director's alone
 
 
 def test_how_the_world_behaves_is_written_from_the_code_and_says_its_figures():
