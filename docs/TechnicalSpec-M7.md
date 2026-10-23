@@ -19,6 +19,10 @@ it waits on and what it does not yet decide. **Revised the same day on the owner
 notes of the first read** (his `M7_spec_notes` of 2026-10-23), each taken into its section
 and the allocation of §31 redrawn to front-load the design to Fable.
 
+**Decision 51 (the owner, 2026-10-23):** M7b is frozen open and its remaining work wrapped up
+alongside this milestone; the consent re-brief waits until testing begins in earnest; after
+58a, 58b and 67 this specification is finalised and package 70 briefed.
+
 *Proves: combat is the same system. A fight is evolutions competing for hands, damage is
 state in the part graph, and the ships speak to one another by the means the period had.*
 

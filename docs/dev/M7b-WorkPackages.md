@@ -44,7 +44,7 @@ wants a captain is played with the owner over the tunnel, without lockstep.
 | 67 | Opus | The director's seat made real (spec §2a; the owner, 2026-10-19): the desk reads a held seat, the game starts the API door itself on `seat:` as the harbour starts one, under the grant's budget on the owner's key, the pane in the harbour's doors tab, stopped by `unseat:` or the spent budget; the form widened to a station of a ship; the brief says what a seat costs; and an out-of-character channel between the player and the director (the owner, 2026-10-23: a `director:` word at the prompt that goes to the director's log only, and the director's answer to the player apart from the play log) | drafted and **approved 2026-10-23** (seats on the player's ship and at a person, on by default; the channel at the prompt and in a pane; the fold at two fifths of the context); **launched 2026-10-23** after 68's merge, beside 58 |
 | 68 | Opus | The review's mending (the cold review of 2026-10-22, `docs/playtests/2026-10-18-to-22-owner-playtests-and-review/`): the P0 list and the small P1s that hit every model, the fold-in's three leftovers, 61's simple half and 63's small boat items | briefed, approved and launched 2026-10-23; **built 2026-10-23** (M5 §12's riding and spec M7b §2 to §9, §14 and §17 as built; the Harness's §3, §19 and §21a; the primer's chapters 10, 13, 14, 19 and 20; the tuning notes, "Package 68"; truths 7b-120 to 7b-123; items 3, 13 and 14 the honest smaller versions, the rest built) |
 | 69 | Opus | The pins on Windows (R-58 answered by CI run 228, 2026-10-23): five recorded passages give another digest or count on Windows than on Linux (the merchant passage's constants, the schooner on an intent alone, truths 77 to 79, the Ushant captain trial, the schooner's octant passage by a line); find the platform-dependent source and pin each to one answer on both runners; the harbour's banner test on CI; the maker's doubled carriage returns on Windows | booked; brief before the gate, or folded into 55 |
-| 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | brief to write, last |
+| 55 | Opus | The solo director and the gate's scenarios; the consent revision's draft; the gate document | **deferred (the owner, 2026-10-23, decision 51)**: M7b frozen open, the re-brief when testing begins in earnest; the gate run alongside M7 |
 
 ## The testing round after 59 (the owner, 2026-10-18)
 
@@ -179,6 +179,12 @@ between the player and the director is wise and goes to package 67; no word eith
 director bending the world after the fact to make its person's words true, since more
 diverse director behaviour is wanted before constraining by example. 68 briefed and
 launched the same day.
+
+**The owner's ruling of 2026-10-23, later the same day (decision 51):** M7b is **frozen
+open, not closed**: no gate now, 55 (the consent re-brief, the solo director, the gate
+document) deferred until testing is to begin in earnest, and the milestone's remaining
+planned work wrapped up alongside milestone 7 rather than before it. After 58a, 58b and 67
+hand back, the M7 specification is finalised and package 70 (the combat core) briefed.
 
 **Fable's part in this:** the four briefs above and the merges and records, nothing more;
 the design runs (64, 65, the combat and signalling of M7) wait for the new week's budget
