@@ -8286,4 +8286,105 @@ taken of one replay instead (`p58a/measure2.py` in the build's scratch directory
 replay before, for the record: the officer's samples 240,163 characters in 78 turns and the
 director's 315,262 in 89.
 
-PLACEHOLDER-58A-PINS
+### Pins
+
+Seven digests moved in eight tests, every one by item 2's recurring lines and nothing else;
+every tick, line and state stands, only the digest moves (the digest reads each line's
+severity). The proof is by bisection: the package's tree with `RECURRING_KINDS` emptied (the
+tide's flood and the light airs left as built) gives every old figure, the eight tests
+passing against their old pins (`p58a/tree-norecur`, both runs passed, 14:15); the tree as
+built gives the new. So neither the tide's mending nor the light airs' hysteresis moves a
+recorded passage. The lines the rule says routine, counted on the tree as built (a line of a
+recurring kind, notable, in the same words as the last of its kind):
+
+| Passage | Old digest | New digest | Lines made routine |
+|---|---|---|---|
+| The schooner's passage (5b) | `b9acdeac6354f3bf` | `2b68e8b1f60e8496` | 3 trims waiting for hands (from 9750), 1 cast of the lead (60109) |
+| The merchant passage (5c), and truth 77 | `902be35aeeac7b54` | `36c17b76e1735975` | 5 trims waiting (from 20824), 15 casts of the lead (from 102102) |
+| The naval cruise (5c), and truth 77 | `728522e26dd25a49` | `5a62f6fca122c6ad` | 1 trim waiting (144622) |
+| The intent schooner (6a) | `8eead2f4521f2a61` | `6292d5af25a6b326` | 9 trims waiting (from 49713) |
+| The fake captain (truth 78) | `1f8de8b49c7d5b5a` | `073a636b6d76cc16` | the merchant passage's |
+| Trial station, lee shore | `e60617edd7ebbc73` | `4720693ca65bc67b` | 1 trim waiting (56941) |
+| Trial trade, stranger | `7b8012b076ebea42` | `9eb41044fc6e9907` | 3 trims waiting (from 13903) |
+
+The lines' counts (766, 3099, 2242, 2160, 3112, 1669, 1534) do not move. The trials'
+other three pins (the station's stranger, the gale, which is an expected failure, and the
+trade in thick weather) stand against their figures; truth 7b-117's line on the quay closes
+now with the cost of thinking ("...; on your feet since 10:00; 30 minutes of the ship's time
+since your last reply.", the old words beside it in the test). Every old figure is kept
+beside the new in the tests' comments.
+
+*To the lead*: `tests/test_captain_trials.py`'s two re-pinned digests lie in a file 58b
+also works its captain's passages in; if 58b moves the same passages, the merged tree's
+figure is neither branch's, and is measured there.
+
+### A scripted run
+
+On the package's tree, three scenes built by the tests' own helpers (the build's scratch
+`scripted_run.py`), as printed:
+
+1. *The deltas*: the captain standing by a glass off the Lizard, bound from Falmouth for
+   Penzance, a sail six miles off. The first sample of his seating (10:02) is whole, 73
+   rows, the sails and the strangers among them. The second (10:32) carries fourteen:
+   `ahead`, the wind's angle, the course and the course made good, the depth by the chart,
+   the heading, the heel, the helm, `in_sight`, the leeway, the reckoning, the run since
+   noon, the speed, the time; no sails (none changed) and no strangers (none came, went or
+   was made out further). His line: "You: the captain, on the quarterdeck, since 10:00; the
+   deck yours; on your feet since 10:00; 30 minutes of the ship's time since your last
+   reply." The closing line: "As before: the sails, one sail in sight, the book; the other
+   readings as last told (readings gives every row)."
+2. *A tripwire*: `steer N`, then `stand_by(until="her way settled")`:
+
+   ```
+   10:10  [captain] The captain stands by until her way settled; the standing orders hold the deck.
+   10:18  [captain] Her way settled, at 7.3 knots; the captain is sampled again.
+   10:18  [captain] The captain stands by until a point of interest within 3 miles; the standing orders hold the deck.
+   10:27  [captain] A point of interest within 3 miles: Rill Point, 3 miles by account; the captain is sampled again.
+   ```
+3. *A dry run* of a mark put 0.6 miles off her: "Dry run, nothing performed and no act
+   spent: it would be doubted: a mark put 0.6 miles off is inside the lookout's horizon (24
+   miles in this visibility, by day): it would have been in sight already. Entered, it is
+   doubted on the record; entered again as 'mark: a wreck, her masts showing at 49 30 N 5 31
+   W [reason: ...]' it is performed, and then it would do this: a mark put in the world, a
+   wreck, her masts showing, at 49 30 N 5 31 W." The director's acts before and after: 0
+   and 0; the log the same; no mark on the sea.
+
+### The suite, as run
+
+On the build machine (four cores) carrying the three packages' suites at once (the load
+between 15 and 26 all afternoon). **On the lead's word the whole slow tier was not run,
+nor the pace tests**: the whole slow run begun in the morning was stopped by its pid at
+11:12, and the lead runs one whole suite on the merged tree. The logs are in the build's
+scratch directory (`p58a/`).
+
+- `ruff check .` and `ruff format .`: clean.
+- **The fast tier** (`python3 -m pytest -n 4 -q -p no:cacheprovider`, the tree of
+  `edf26bc`, 10:41 to 13:07, `p58a/fast-1.log`): 3,568 passed, **4 failed**, 330 slow left
+  out. Three were the package's and are mended: the library's contents counting the
+  grammar's four parts (`fb269b9`); truth 7b-117's line on the quay, which closes now with
+  the cost of thinking (`67303b2`); and a wardroom door's stand-by on `the true wind exceeds
+  20 knots`, which the tripwires had taken for their own `the wind over 20 knots` (the
+  dialect is read first now, the tripwires only where it refuses, `67303b2`). The fourth is
+  not the package's: truth 88's pace (`test_crews.py`), 44 ticks a second against the floor
+  of 60 under `-n 4` at the load of 20; measured alone in turn on the tree before and this
+  one, three rounds each, it gives 143 to 197 ticks a second by the wall and 207 to 255 by
+  the process's own time for both alike (`p58a/pace_ab.log`).
+- **After the mends** (`67303b2`): the four tests above and the files of the stand-by's
+  words, fast tier (`test_agents`, `test_known_truths`, `test_local_runner`, `test_officer`,
+  `test_python_api`, `test_readings`, `test_standing`, `test_wardroom_doors`,
+  `test_harness_instruments`): all passed, none failed (`p58a/fix-1.log`,
+  `p58a/fast-after.log`).
+- **The slow tier of the files touched** (`test_agents`, `test_director`,
+  `test_known_truths`, `test_log_lines`, `test_tide`, `test_mcp_server`,
+  `test_harness_instruments`; `--slow -n 4 -m "slow and not pace"`, 11:12 to 13:31,
+  `p58a/slow-touched.log`): 115 passed, 7 expected failures, **6 failed**, every one a
+  moved pin above; and the captain trials' five pinned passages (`p58a/trials.log`): 2
+  passed, 1 expected failure, 2 failed, the two moved pins above. The eight re-pinned,
+  run again on the tree as committed (`p58a/repinned.log`, 14:17 to 14:46): 8 passed.
+- **Not run**: the whole slow tier; the pace tests (`-m pace`).
+
+*Found on the way, not mended*: truth 88's pace test is marked `pace` by hand
+(`@pytest.mark.pace` in `tests/test_crews.py`) but `tests/conftest.py`'s `_is_pace` knows
+the pace tests by their names alone, so it is never marked slow and runs in the fast tier
+under `-n`, where it reads the load (its docstring says "any marked `pace` by name or by
+hand belongs here"). It did not block the package; it is the lead's.

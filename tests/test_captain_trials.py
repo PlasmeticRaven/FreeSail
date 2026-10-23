@@ -201,7 +201,9 @@ TRIAL_STATION_LEE_SHORE_STATES = [
     (68940, "keeping station"),
 ]
 TRIAL_STATION_LEE_SHORE_LINES = 1669  # package 57 (1660 at 43b, 1665 at 45c)
-TRIAL_STATION_LEE_SHORE_DIGEST = "e60617edd7ebbc73"  # package 57 (0686965a0871299c at 43b)
+# package 58a, the recurring lines: a trim waiting for hands said again in the same words is
+# routine, not notable; every tick and line the same (TuningNotes, package 58a)
+TRIAL_STATION_LEE_SHORE_DIGEST = "4720693ca65bc67b"  # 58a (e60617edd7ebbc73 at 57)
 
 
 @pytest.fixture(scope="module")
@@ -264,7 +266,9 @@ TRIAL_TRADE_STRANGER_LINES = 1534  # package 56, the glass (1521 at 57)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
-TRIAL_TRADE_STRANGER_DIGEST = "7b8012b076ebea42"  # package 56, the glass (e73870448a788eac at 57)
+# package 58a, the recurring lines: a trim waiting for hands said again in the same words is
+# routine, not notable; every tick and line the same (TuningNotes, package 58a)
+TRIAL_TRADE_STRANGER_DIGEST = "9eb41044fc6e9907"  # 58a (7b8012b076ebea42 at 56, the glass)
 
 
 @pytest.fixture(scope="module")

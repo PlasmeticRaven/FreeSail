@@ -3028,7 +3028,9 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # with the two "sound the well" lines at tick 0 the whole difference)
 GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
-GATE_5B_SCHOONER_DIGEST = "b9acdeac6354f3bf"  # the well (b7c16adc612bd01a at 56, c01e6e0f at 44)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_5B_SCHOONER_DIGEST = "2b68e8b1f60e8496"  # 58a (b9acdeac6354f3bf, the well; b7c16adc at 56)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4104,7 +4106,9 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
-GATE_5C_CRUISE_DIGEST = "728522e26dd25a49"  # package 56, the glass (087fdfacfc6381f1 at 57)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_5C_CRUISE_DIGEST = "5a62f6fca122c6ad"  # 58a (728522e26dd25a49 at 56, the glass)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4217,7 +4221,9 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 GATE_5C_MERCHANT_LINES = 3099  # package 68, riding (3098 at package 56, 3080 at 57)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
-GATE_5C_MERCHANT_DIGEST = "902be35aeeac7b54"  # package 68, riding (05f0f4aba2eddbc0 before)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_5C_MERCHANT_DIGEST = "36c17b76e1735975"  # 58a (902be35aeeac7b54 at 68, riding)
 
 
 def _people(world) -> list[dict]:
@@ -4653,7 +4659,9 @@ GATE_6A_INTENT_LINES = 2160  # package 68, riding (1698 at 56, 1684 at package 4
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
 # package 56, the glass: 90061f779b7db484 (93981cc47f5524e6 at 57)
-GATE_6A_INTENT_DIGEST = "8eead2f4521f2a61"  # package 68, riding (90061f779b7db484 before)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_6A_INTENT_DIGEST = "6292d5af25a6b326"  # 58a (8eead2f4521f2a61 at 68, riding)
 
 
 @pytest.fixture(scope="module")
@@ -4827,7 +4835,9 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # decision 45, the pilot's news: b00ac08c3f63e84c before
 # package 56, the glass: f996530d5a041abc (0e089f1279e03928 at 57); package 68, riding:
 # the merchant passage's one line more and its account at 300 (3111 lines before)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "1f8de8b49c7d5b5a"  # package 68, riding (f996530d5a041abc)
+# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
+# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "073a636b6d76cc16"  # 58a (1f8de8b49c7d5b5a at 68, riding)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
