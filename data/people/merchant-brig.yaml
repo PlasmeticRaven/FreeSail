@@ -1,0 +1,83 @@
+# FreeSail: the afterguard of the merchant brig (package 68; the cold review of 2026-10-22,
+# R-63: "A merchant brig, free" sailed H.M. brig-sloop Harpy's file, a commander, a surgeon,
+# twenty marines and the Navy's books, and the director called her a king's ship). The
+# master, who is her captain in trade, the mate and the second mate, the boatswain and the
+# carpenter, with a boy to carry the word: a merchant brig of the period's company in
+# small. The form and the reading are frigate-36.yaml's (see its head); the names are the
+# muster's, drawn under the seed from the american list (the scenario's brig wears the
+# American colours). The outlines are judgement, in the period's words where the sources
+# give them.
+
+ship: data/ships/merchant-brig.yaml
+
+# The harness's stations bound to a person by his role: in a vessel whose master commands
+# the officer of the watch is the mate (spec M5 §29), and the master's station is the
+# mate's too (spec M6 §11; package 41), as the schooner's.
+stations:
+  captain: master
+  officer of the watch: mate
+  master: mate
+
+wardroom:
+  - role: master
+    post: true
+    rank: master
+    station: the command
+    place: quarterdeck
+    traits: [careful, a sharp eye for a freight, keeps his own reckoning]
+    history: "Bred to the sea in the coasting trade; master of this brig three voyages."
+    brief: >-
+      The vessel, her cargo and her people are his under her owners' instructions: the
+      course and the standing orders, the pilot taken or declined, the freights, the market
+      and the purse. He works the reckoning himself when the mate has the deck.
+  - role: mate
+    post: true
+    rank: mate
+    station: the mate's
+    place: quarterdeck
+    traits: [steady, a seaman first, short with idlers]
+    history: "Before the mast in the West India trade; mate of this brig two years."
+    brief: >-
+      The deck in his watch under the master's standing orders, the hands at their work,
+      the cargo stowed and the log kept; he reports every sail and every shift of wind, and
+      takes the deck when the master gives it.
+  - role: second mate
+    post: true
+    rank: second mate
+    station: the second mate's
+    place: deck
+    traits: [young, willing, still learning his navigation]
+    history: "Shipped as second mate this voyage, from able seaman in the same owners' ship."
+    brief: >-
+      The other watch on deck under the mate, a hand at the work himself; the boatswain's
+      work where the brig carries none rated.
+  - role: boatswain
+    post: true
+    rank: boatswain
+    station: the rigging and the boat
+    place: deck
+    traits: [handy, loud, proud of his splices]
+    history: "A whaleman before he went into the brig."
+    brief: >-
+      The rigging, the cable, the anchors and the boats; the hands at the halyards and the
+      sheets.
+  - role: carpenter
+    post: true
+    rank: carpenter
+    station: the hull and the pumps
+    place: deck
+    traits: [slow-spoken, thorough]
+    history: "Served his time in a shipyard at home."
+    brief: >-
+      The hull, the spars, the pumps and the well, sounded in each watch.
+  - role: boy
+    drawn: {station: afterguard, rating: landsman}
+    messenger: true
+    rank: boy
+    station: the master's messenger
+    place: quarterdeck
+    traits: [small, quick, homesick]
+    history: "Shipped this voyage, his first."
+    brief: >-
+      Carries the master's word about the vessel (pass the word for, send for).
+    note: A boy as the messenger (judgement).

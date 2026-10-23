@@ -126,6 +126,7 @@ ROLE_WORDS: dict[str, str] = {
     "third lieutenant": "third lieutenant",
     "lieutenant": "lieutenant",
     "mate": "mate",
+    "second mate": "second mate",  # the merchant brig's (package 68)
     "surgeon": "surgeon",
     "doctor": "surgeon",
     "purser": "purser",

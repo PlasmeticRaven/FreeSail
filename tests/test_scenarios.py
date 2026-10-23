@@ -234,3 +234,31 @@ def test_a_scenarios_seat_is_the_players_at_either_driver_unless_the_flag_says_o
     args = server_parser().parse_args(["--scenario", str(p), "--seat", "captain"])
     world = prepare_game(args, say=lambda line: None)
     assert getattr(world, "player_seat", None) is None  # the flag wins over the file
+
+
+def test_a_merchant_brig_free_sails_a_merchant_brigs_own_file():
+    """Package 68 (the cold review of 2026-10-22, R-63): "A merchant brig, free" sailed H.M.
+    brig-sloop Harpy's file (121 men with 20 marines, a commander and a surgeon, the Navy's
+    books and a 32-ton hold) under the American colours, and the director called her a
+    king's ship. She sails a merchant brig's own file through tools/gen_ships.py: the
+    Harpy's hull and rig, a master's and mates' company of sixteen, no marines, a
+    merchant's stores and the trader's hold."""
+    import yaml
+
+    sf = load_scenario("data/scenarios/merchant-brig.yaml")
+    assert sf.ship_file == "data/ships/merchant-brig.yaml"
+    with open("data/ships/merchant-brig.yaml", encoding="utf-8") as f:
+        doc = yaml.safe_load(f)
+    crew = doc["crew"]
+    assert crew["complement"] == 16 and "marines" not in crew["stations"]
+    assert crew["names"] == "american" and crew["ration"]["table"] == "navy"
+    assert doc["hold"]["capacity_tons"] > 100
+    with open("data/ships/brig.yaml", encoding="utf-8") as f:
+        harpy = yaml.safe_load(f)
+    assert doc["hull"] == harpy["hull"] and doc["spars"] == harpy["spars"]
+    world = make_scenario_world(sf)
+    begin(world, sf)
+    roles = [p.role for p in world.people.all]
+    assert roles[:5] == ["master", "mate", "second mate", "boatswain", "carpenter"]
+    assert world.people.captain.role == "master"
+    assert not set(roles) & {"commander", "lieutenant", "surgeon", "purser", "gunner"}

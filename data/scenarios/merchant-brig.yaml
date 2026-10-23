@@ -1,43 +1,16 @@
-# FreeSail: the merchant passage (spec M5 §27, §29; package 36). The topsail schooner
-# Speedwell, American, from Falmouth for Brest with a cargo bought at the quay, no
-# chronometer, a master who can work a lunar. Given to either driver with --scenario:
-#     py -m freesail.ui.server --scenario data/scenarios/merchant-passage.yaml
-#     py -m freesail.ui.console --scenario data/scenarios/merchant-passage.yaml
-# and printed whole, with the account against the truth, by
-#     py tools/day_log.py data/scenarios/merchant-passage.yaml --hours 34 --reckoning
+# FreeSail: a merchant brig, free (the owner's free scenario of the merchant brig). The
+# brig Industry, American, at anchor in Carrick Road at five in the morning of 12 June 1805
+# with a thousand pounds in the purse and the price list of Falmouth aboard, her voyage the
+# player's own: no book, no orders beyond letting go, the world's business on and the
+# Channel's sail about her. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/merchant-brig.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/merchant-brig.yaml
 #
-# The passage as the book beside this file sails it (merchant-passage.orders): she lies
-# at anchor in Carrick Road at five in the morning of 12 June 1805 with the price list of
-# Falmouth aboard; forty tons of tin are bought at the quay and come off by the lighter
-# while the boat is ashore; the ebb serves from five (high water at Falmouth 04:50 by
-# the world's tide) and she gets under way on it when the boat is alongside, out by the
-# eastern channel; a sail is sighted off the Lizard and not made out (a brig bound up
-# Channel, far enough off to be a sail and no more); the night across the Channel; the
-# Iroise in her chart's words at the deep-sea lead's cast on the morning of the 13th;
-# the pilot of Brest comes off in the road of Bertheaume on the ebb (high water at
-# Brest 04:19; the Goulet is not taken against the ebb, which runs four or five knots at
-# springs), and she anchors in the road to wait; at the turn she gets under way and
-# takes the Goulet on the flood by the pass north of the Mingan and the Fillettes
-# (Faden 1793: "range along either shore of the Goulet and fear nothing, but not the
-# middle"), the pilot answering and the lead going; she anchors in the Bay of Brest and
-# the tin is sold at the quay. The tin, bought at £120 and sold at £270 (the war's half
-# on English tin in a French port; truth 69), makes the voyage £6,000.
-#
-# The weather is pinned (a westerly of fourteen knots, a fair wind for Brest, veering
-# north-westerly and falling through the two days, the sky clear over the old high over
-# Biscay) so that the passage is the same on every machine; the sea and the motion are
-# kept. The dozen other
-# sail are the Channel's traffic of a June day: three merchant brigs, a revenue cutter
-# off the Wolf, two of the Channel fleet's cruisers off Ushant, a French brig-sloop and
-# a chasse-marée's schooner in the Iroise, a Dane and a Portuguese bound down, an
-# American schooner for Falmouth, a frigate out of Plymouth and the mail cutter; each a
-# hull from the four ship files at far detail, moved by the same wind and tide
-# (freesail/world/ships.py; truth 67). The world orders by time are a waypoint appended
-# to the high and a letter left at Brest for the pilot to bring off. The numbers of the
-# passage at seed 7 are pinned in tests/test_known_truths.py and measured in
-# docs/dev/TuningNotes.md (package 36). The starter book is not loaded: the passage's
-# own book holds what it needs, and `read the standing orders from
-# data/standing_orders/starter.orders` adds the starter's routines at any time.
+# Package 68 (the cold review of 2026-10-22, R-63 and R-60): she sails a merchant brig's own
+# file, data/ships/merchant-brig.yaml (tools/gen_ships.py: the Harpy's hull and rig, a
+# master's and mates' company of sixteen, no marines, a merchant's stores and the trader's
+# hold), where before she sailed H.M. brig-sloop Harpy's under the American colours, and
+# this head was the merchant passage's, copied.
 
 name: A merchant brig, free
 seed: 7
@@ -46,7 +19,7 @@ position: {lat_deg: 50.1631, lon_deg: -5.0345}   # Carrick Road, the usual ancho
 region: channel-west
 nation: united-states
 ship:
-  file: data/ships/brig.yaml
+  file: data/ships/merchant-brig.yaml   # her own file (package 68; H.M. brig-sloop Harpy's before)
   heading_deg: 190
   glass: true
   instrument: octant
