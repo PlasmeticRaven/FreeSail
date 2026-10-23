@@ -457,6 +457,8 @@ def _is_pace(item: pytest.Item) -> bool:
     days and read the load, not the tick: the release workflow runs the suite without them
     and then them alone (`-m "not pace"`, then `--slow -m pace`), and so should anyone who
     wants the figure. Any marked `pace` by name or by hand belongs here."""
+    if item.get_closest_marker("pace") is not None:
+        return True  # marked by hand (truth 88 in test_crews.py; 58a's finding)
     name = item.name
     return name.endswith(("holds_truth_51s_floor", "ticks_at_the_build_machines_floor"))
 
