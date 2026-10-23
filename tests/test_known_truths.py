@@ -7040,3 +7040,183 @@ def test_truth_7b_119_the_hand_held_until_a_sail_within_hail_holds_past_the_glas
     world.run(180)
     assert v.brain.over_head is None and v.plan[0][0] != "lie_to"
     assert v.story[-1][1].startswith("The captain takes up his plan again")
+
+
+# Package 68: the review's mending (the cold review of 2026-10-22, `docs/playtests/
+# 2026-10-18-to-22-owner-playtests-and-review/`). Truths 7b-120 to 7b-123, numbered after
+# 66's 7b-117 to 7b-119: riding means riding (R-01), the officer's word to a player captain
+# (R-13, R-14), the lugger weighing as a lugger (R-45), and the brief's enemy limit
+# enforced by the channel (R-38; the gate's: spec M7b §4's "enforced by the channel, not
+# trusted to the model").
+# ---------------------------------------------------------------------------
+
+
+def test_truth_7b_120_let_go_at_seven_knots_off_a_beach_the_account_runs_and_the_lookout_cries():
+    """Package 68's truth 120 (R-01; the grounding at Horta, D5-29): "let go at seven knots
+    a mile off a beach; the account advances; the lookout cries urgent before she strikes."
+    The cutter under plain sail at seven knots, standing north for the shore west of
+    Pendennis, lets go her best bower a mile off: the anchor drags, she sails it home, and
+    she is not riding. The master's account runs with her (before, it froze at the
+    let-go), and the lookout's land ahead cries urgent before she takes the ground (before,
+    muted by any anchor down)."""
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.lookout import riding
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=18.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=0.0,
+        ship_speed_kn=7.0,
+        position={"lat_deg": 50.10, "lon_deg": -5.065},
+        region="channel-west",
+    )
+    w = make_world(7, "data/ships/cutter.yaml", sc)
+    w.submit("set plain sail")
+    w.run(600)
+    assert units.ms_to_knots(w.ship.dyn.speed) > 6.5
+    let_go_at = w.position
+    account_then = w.navigation.account_now()
+    e = w.submit("let go the best bower")
+    assert e.kind == "order.accepted", e.text
+    let_go_tick = w.clock.tick
+    w.run(180)
+    assert w.at_anchor and not riding(w.ship)  # an anchor down, and not holding her
+    for _ in range(40 * 60):
+        w.run(1)
+        if w.ship.extra.get("aground"):
+            break
+    strike = [x for x in w.log if x.kind == "ship.aground"]
+    assert strike and w.ship.extra.get("aground")
+    run_nm = bearing_and_distance(let_go_at, w.position)[1] / units.NAUTICAL_MILE
+    assert 1.0 < run_nm < 2.5  # sailed her anchor home a mile and more
+    account_nm = bearing_and_distance(account_then, w.navigation.account_now())[1]
+    assert account_nm / units.NAUTICAL_MILE > 0.5 * run_nm  # the account ran with her
+    ahead = [
+        x for x in w.log if x.kind == "lookout.land_ahead" and let_go_tick < x.tick < strike[0].tick
+    ]
+    assert [x.severity for x in ahead][-1] is Severity.URGENT, [x.text for x in ahead]
+    assert ahead[-1].text.startswith("Land close ahead")
+
+
+def test_truth_7b_121_the_officers_word_to_the_player_captain_reaches_him_whole_as_the_officers():
+    """Package 68's truth 121 (R-13, R-14): "'say to the captain, no land in sight yet' from
+    a model officer with the player at the prompt reaches him whole and is logged as the
+    officer's." The frigate's officer of the watch, a scripted model with the deck, says
+    it, and says "land ho" to the captain by his name: each a notable line of the play log
+    under the officer's mark and place, every word kept; nothing kept in a journal for
+    nobody; and the game replays to the same log."""
+    from freesail.agents import Fake, Harness, SamplingPolicy, call, reply
+    from freesail.agents.agent import officer
+    from freesail.agents.journal import WORD_KEPT_KIND
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+    from freesail.world.orders import held_stations
+
+    w = make_world(
+        7,
+        "data/ships/frigate-36.yaml",
+        Scenario(wind_from_deg=0.0, ship_heading_deg=180.0, gustiness=0.0, variability=0.0),
+    )
+    cap = w.people.captain
+    script = [
+        reply("", call("submit_order", text="say to the captain, no land in sight yet")),
+        "",
+        reply("", call("submit_order", text=f"Say to Mr {cap.surname}, land ho, sir")),
+        "",
+    ]
+    h = Harness(
+        w, officer(SamplingPolicy.in_lockstep(600), world=w), Fake(script), save=lambda *a: None
+    )
+    assert w.submit("you have the deck").kind == "agent.deck"
+    h.start()
+    w.run(1800)
+    held = [st for st, _p, who in held_stations(w) if who == "the player at the prompt"]
+    assert held == ["captain"]
+    told = [e for e in w.log if e.kind == "agent.told" and e.actor == "the officer of the watch"]
+    person = w.stations.holder("officer of the watch").name
+    assert [e.text for e in told] == [
+        f"The officer of the watch ({person}), on the quarterdeck, to the captain: no land in "
+        "sight yet",
+        f"The officer of the watch ({person}), on the quarterdeck, to the captain: land ho, sir",
+    ]
+    assert all(e.severity is Severity.NOTABLE for e in told)
+    assert not any("The captain to the captain" in e.text for e in w.log)
+    kept = (w.agent_journals or {}).get("captain")
+    assert kept is None or not [x for x in kept.entries if x.kind == WORD_KEPT_KIND]
+    copy = replay.replay(json.loads(json.dumps(w.save())), ship_factory)
+    assert copy.log.digest() == w.log.digest()
+
+
+def test_truth_7b_122_the_eclair_weighs_and_makes_way_under_her_lugs_without_being_taken_aback():
+    """Package 68's truth 122 (R-45: the Éclair got under way with a square-rigger's words,
+    no lug set, under the jib alone a cable off Pergueridre, twice): "the Éclair weighs and
+    makes way without being taken aback." At anchor in nine fathoms off Falmouth, the wind
+    ahead at twelve knots, `get under way`: the windlass and no hand aloft; the fore lug
+    hoisted at the aweigh on the casting tack's lee side with the jib aback; the main lug
+    and the mizen when she has cast; under way under her lugs and making five knots and
+    more, and no line in the whole of it says she is aback."""
+    sc = Scenario(
+        start_time=datetime(1805, 6, 10, 10, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=225.0,
+        ship_speed_kn=0.0,
+        position={"lat_deg": 50.133, "lon_deg": -5.035},
+        region="channel-west",
+    )
+    w = make_world(7, "data/ships/lugger.yaml", sc)
+    assert w.ship.name == "Éclair"
+    assert w.submit("let go the best bower").kind == "order.accepted"
+    w.run(20 * 60)
+    assert w.at_anchor
+    start = len(w.log)
+    e = w.submit("get under way")
+    assert e.kind == "order.accepted", e.text
+    w.run(40 * 60)
+    lines = list(w.log)[start:]
+    said = " ".join(x.text for x in lines)
+    assert (
+        "Man the windlass" in said
+        and "sail-loosers" not in said
+        and "aloft" not in said.replace("no hand aloft", "")
+    )
+    hoist = [x for x in lines if x.text.startswith("Hoist away the foresail, to larboard!")]
+    aweigh = [x for x in lines if x.kind == "ship.aweigh"]
+    assert hoist and aweigh and hoist[0].tick == aweigh[0].tick
+    under_way = [x for x in lines if x.kind == "ship.under_way"]
+    assert under_way and under_way[0].text.startswith(
+        "Under way on the starboard tack, under the foresail, the mainsail, the mizen and the jib"
+    )
+    set_now = {s.id for s in w.ship.sails.values() if s.is_set}
+    assert {"fore.lug", "main.lug", "mizen.lug", "jib"} <= set_now
+    assert all(w.ship.sails[i].lug_side == "larboard" for i in ("fore.lug", "main.lug"))
+    assert units.ms_to_knots(w.ship.dyn.speed) > 5.0
+    assert not [x for x in lines if "aback" in x.text.lower() or x.kind == "sail.aback"]
+
+
+def test_truth_7b_123_no_enemy_heavier_than_a_brig_refuses_a_frigate_and_lets_a_brig_through():
+    """Package 68's truth 123 (R-38; spec M7b §4: the brief's limits "enforced by the
+    channel, not trusted to the model"): the brief's "no enemy heavier than a brig" refused
+    nothing, no key of the ranking fitting inside "brig", and a French frigate passed the
+    dispatches', the chase's and the interesting passage's briefs. Under the chase's brief
+    a French frigate is refused as outside the brief, with the limit named, and logged so;
+    a French brig-sloop and a lugger pass the limit; a British frigate is no enemy."""
+    from freesail.agents import director as D
+    from tests.test_director import directed, log_kinds
+
+    w = directed("chase", systems=[], climatology=True)
+    frigate = 'ship: a frigate "Vengeance" of France at 49 00 N 6 20 W, running home to Brest'
+    said = D.direct(w, frigate, by="the test")
+    assert said.startswith("Refused, outside the brief") and "no enemy heavier than a brig" in said
+    assert w.vessels.find("Vengeance") is None and log_kinds(w)[-1] == "director.refused"
+    for text in (
+        'ship: a brig-sloop "Harpy" of France at 49 00 N 6 20 W, running home to Brest',
+        'ship: a French lugger "Brave" of France at 49 01 N 6 21 W, running home to Brest',
+        'ship: a frigate "Fowey" of Britain at 49 02 N 6 22 W, bound for Plymouth',
+    ):
+        assert not D.direct(w, text, by="the test").startswith("Refused"), text
