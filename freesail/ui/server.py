@@ -118,6 +118,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from freesail import units
+from freesail.agents.agent import DIRECTOR
 from freesail.api import queries
 from freesail.core import replay as replay_mod
 from freesail.core.events import (
@@ -261,10 +262,12 @@ class Driver:
             and self._alarm is None
         ):
             self._alarm = e  # eased once the tick is over (`_run_ticks`)
+        if for_the_record(e):
+            # decision 46: the play log carries a world order's effects, not the order; and
+            # the director's lines, for the record, ease nothing (package 68, R-20)
+            return
         if e.kind in STATION_SPEAKS and self._heard is None and e.actor.startswith("the "):
             self._heard = (e.actor.removeprefix("the "), "speaks")  # `--ease-on-station`
-        if for_the_record(e):
-            return  # decision 46: the play log carries a world order's effects, not the order
         for x in self._view.feed(e, self.compression):
             self._emit_shown(x)
 
@@ -380,9 +383,15 @@ class Driver:
             self.emit_snapshot()
 
     def _samples_now(self) -> dict[str, int]:
+        """Each station's samples so far, the director's left out: it is above the game and
+        hidden from every station and the player (spec M7b §6), so its samples ease nothing
+        and no driver's line says it was sampled (package 68; the cold review of 2026-10-22,
+        R-20: "Compression eased to 1x: the director is sampled" reached the officer's
+        samples six times). Its own lines are for the record, and never ease it either."""
         return {
             name: int(getattr(getattr(h, "agent", None), "samples", 0) or 0)
             for name, h in self.world.agents.items()
+            if name != DIRECTOR
         }
 
     def _station_heard(self) -> tuple[str, str] | None:

@@ -76,6 +76,8 @@ import re
 from typing import Any
 
 from freesail.agents.agent import (
+    CAPTAIN,
+    DIRECTOR,
     OFFICER,
     STATION_ALIASES,
     STATION_NAMES,
@@ -234,16 +236,18 @@ def _station_in(who: str, ship: Any) -> str | None:
 
 def _alias_words(who: str, ship: Any = None) -> int:
     """How many words of `who` name the station: the station's own name, its alias, or
-    its person's name or role (package 41)."""
+    its person's name or role (package 41); the longest of them (package 68: "captain
+    Bowen, land ho" names the captain in two words, not in one, and the cut kept "Bowen,")."""
     who = " ".join(who.split())
+    found = _person_station(who, ship) if ship is not None else None
+    person = found[1] if found is not None else 0
     for name in sorted(_known(ship) if ship is not None else STATION_NAMES, key=lambda n: -len(n)):
         if who == name or who.startswith(name + " "):
-            return len(name.split())
+            return max(len(name.split()), person)
     for alias in STATION_ALIASES:
         if who == alias or who.startswith(alias + " "):
-            return len(alias.split())
-    found = _person_station(who, ship) if ship is not None else None
-    return found[1] if found is not None else 0
+            return max(len(alias.split()), person)
+    return person
 
 
 def _general(text: str) -> tuple[str, str] | None:
@@ -346,10 +350,11 @@ def _split_ask(text: str, ship: Any, verb: str = "ask") -> tuple[str, str]:
             raise OrderError("Tell whom? Say 'tell the watcher <words>'.")
         raise OrderError("Ask whom? Say 'ask the watcher <question>'.")
     # the question is what follows the station's name (or its alias, or its person's
-    # name) in the text as said
+    # name) in the text as said: counted in the normalised words and cut from the words
+    # as said on the same count (package 68, R-14: "Mr Bowen," is three normalised words
+    # and two said ones, and "no land in sight yet" lost its "no")
     n = _alias_words(normalise(rest), ship) or len(station.split())
-    words = rest.split()
-    question = " ".join(words[n:]).lstrip(",:").strip()
+    question = _after_words(rest, n).lstrip(",:").strip()
     # 'tell the first lieutenant to shorten sail', 'ask the master for a course': the
     # leading 'to' or 'for' is the sentence's, not the words'
     for lead in ("to ", "for "):
@@ -357,6 +362,19 @@ def _split_ask(text: str, ship: Any, verb: str = "ask") -> tuple[str, str]:
             question = question[len(lead) :]
             break
     return station, question
+
+
+def _after_words(said: str, n: int) -> str:
+    """The words as said after the first `n` normalised words (package 68, R-14): each
+    word as said counted by the normalised words it makes (`normalise` makes "Bowen," two,
+    "first-lieutenant" two and a dash none), so that the count and the cut agree."""
+    words = said.split()
+    taken = 0
+    for i, word in enumerate(words):
+        if taken >= n:
+            return " ".join(words[i:])
+        taken += len(normalise(word).split())
+    return ""
 
 
 def _aboard(ship: Any) -> tuple[str, ...]:
@@ -368,9 +386,10 @@ def _aboard(ship: Any) -> tuple[str, ...]:
     # not the captain's station (package 40): a standing order speaks for the captain,
     # whoever holds his station, and never tells or asks him
     bound = list(stations.names()) if stations is not None else list(STATIONS_ABOARD)
-    names = [n for n in bound if n != "captain"]
+    # nor the director's (package 68, R-20): above the game, nobody aboard tells or asks it
+    names = [n for n in bound if n not in ("captain", DIRECTOR)]
     for name in list(extra.get("agents") or {}) + list(extra.get("agent_journals") or {}):
-        if name not in names and name != "captain":
+        if name not in names and name not in ("captain", DIRECTOR):
             names.append(name)
     return tuple(names)
 
@@ -379,6 +398,8 @@ def _not_aboard(who: str, ship: Any) -> str:
     aboard = " or the ".join(_aboard(ship))
     if who == "captain":
         return f"a standing order speaks for the captain; it may tell or ask the {aboard}."
+    if who == DIRECTOR:
+        return f"the director is above the game; a standing order may tell or ask the {aboard}."
     return f"there is no {who} aboard yet; a standing order may tell or ask the {aboard}."
 
 
@@ -588,6 +609,8 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
             return routed
     if verb == "ask":
         station, question = _split_ask(text, ship)
+        if not by and _player_captain(ship, station, agents, seat):
+            return _to_the_player_captain(station, question, speaker, asked=True)
         if not by and _kind_of(ship, station) == "lookout" and _held_now(ship, station) is None:
             # package 45c (the owner's interview of 2026-10-15): the masthead answers from
             # what is in sight when nobody holds the station, as its own hails are made
@@ -603,12 +626,14 @@ def handle(ship: Any, text: str) -> tuple[str, str, dict[str, Any]]:
         )
     if verb == "tell":
         station, words = _split_ask(text, ship, verb="tell")
+        if not by and _player_captain(ship, station, agents, seat):
+            return _to_the_player_captain(station, words, speaker)
         held = _held(agents, station, seat)
         if (held is None or not held.started or held.agent.released) and not by:
             # the captain's own word is kept (a station a replay has yet to seat is held by
             # nobody yet); a standing order's firing to nobody is refused as it always was,
             # or a book would fill the journal every glass
-            kept = _keep_word(ship, station, words)
+            kept = _keep_word(ship, station, words, speaker)
             if _kind_of(ship, station) == "lookout":
                 # package 45c: the ship's own lookout at the masthead answers the word
                 kind, said, data = kept
@@ -753,7 +778,7 @@ def _to_the_director(
         station, words = _split_ask(text, ship, verb=verb)
         if verb == "tell":
             # the word kept for whoever takes the station, as before, and the director told
-            kept = _keep_word(ship, station, words)
+            kept = _keep_word(ship, station, words, speaker)
             director_mod.ask_unheld(world, found[0], words, "tell", speaker, journal=False)
             return kept
     else:
@@ -761,7 +786,7 @@ def _to_the_director(
         if found is None or found[0] is None:
             return None
         n = found[1]
-        words = " ".join(rest.split()[n:]).lstrip(",:").strip()
+        words = _after_words(rest, n).lstrip(",:").strip()
         for lead in ("to ", "for "):
             if words.lower().startswith(lead) and len(words.split()) > 1:
                 words = words[len(lead) :]
@@ -858,10 +883,56 @@ def _the_masthead_answers(
     )
 
 
-def _keep_word(ship: Any, station: str, words: str) -> tuple[str, str, dict[str, Any]]:
+def _player_captain(ship: Any, station: str, agents: dict[str, Any], seat: Any) -> bool:
+    """Whether a word or a question goes to the captain held by the player at the prompt
+    (package 68, R-13): the captain's station named, no harness or seat holding it, and
+    the player at the prompt holding it by the rule of reach (`world.orders.
+    held_stations`: no model at the captain's station and the player seated nowhere
+    else). Every model officer's report to a player captain was kept for "nobody" before."""
+    if station != CAPTAIN or _held(agents, station, seat) is not None:
+        return False
+    from freesail.orders.prompt import world_of
+    from freesail.world.orders import held_stations
+
+    world = world_of(ship)
+    if world is None:
+        return False
+    return any(
+        name == CAPTAIN and who == "the player at the prompt"
+        for name, _person, who in held_stations(world)
+    )
+
+
+def _to_the_player_captain(
+    station: str, words: str, speaker: dict[str, str] | None, asked: bool = False
+) -> tuple[str, str, dict[str, Any]]:
+    """A word or a question to the captain held by the player at the prompt (package 68,
+    R-13): the line itself is what reaches him, notable in the play log under the
+    speaker's own mark and place; nothing is kept in a journal for nobody."""
+    words = " ".join(str(words).split())
+    if not words:
+        what, verb = ("the question", "Ask") if asked else ("the words", "Tell")
+        raise OrderError(f"{verb} the {station} what? Say {what} after the name.")
+    if speaker is None or speaker["station"] == station:
+        raise OrderError(f"The {station} tells himself nothing; tell another station.")
+    who = f"{speaker['words'][:1].upper()}{speaker['words'][1:]}"
+    data: dict[str, Any] = {"station": station, "speaker": speaker["station"], "to_player": True}
+    if asked:
+        question = words.rstrip("?")
+        line = f"{who}, {speaker['place']}, asks the {station}: {question}?"
+        return "agent.told", line, data | {"question": question}
+    line = f"{who}, {speaker['place']}, to the {station}: {words}"
+    return "agent.told", line, data | {"words": words}
+
+
+def _keep_word(
+    ship: Any, station: str, words: str, speaker: dict[str, str] | None = None
+) -> tuple[str, str, dict[str, Any]]:
     """`tell the <station> <words>` to a station nobody holds (package 37l; the review of
     gate 5c's playtests, G17: the words were refused and lost): kept in the station's
-    journal and passed to whoever takes it next, in its first sample; the log says so."""
+    journal and passed to whoever takes it next, in its first sample; the log says so,
+    under the speaker's own mark (package 68, R-13: "The captain to the captain" was
+    printed whoever spoke)."""
     from freesail.agents.journal import WORD_KEPT_KIND, journal_of
     from freesail.orders.prompt import world_of
 
@@ -873,6 +944,21 @@ def _keep_word(ship: Any, station: str, words: str) -> tuple[str, str, dict[str,
     if world is None or journals is None:
         raise OrderError(f"There is no {station} at the station; nobody has been stationed there.")
     journal = journal_of(world, station)  # the person's (package 45c)
+    if speaker is not None:
+        if speaker["station"] == station:
+            raise OrderError(f"The {station} tells itself nothing; tell another station.")
+        who = f"{speaker['words'][:1].upper()}{speaker['words'][1:]}"
+        journal.append(
+            world,
+            f"A word from {speaker['words']}, kept for whoever takes the station: {words}",
+            WORD_KEPT_KIND,
+        )
+        return (
+            "agent.told",
+            f"{who}, {speaker['place']}, to the {station}: {words} (nobody holds the "
+            "station; the words are kept in its journal for whoever takes it)",
+            {"station": station, "words": words, "kept": True, "speaker": speaker["station"]},
+        )
     journal.append(
         world, f"The captain's word, kept for whoever takes the station: {words}", WORD_KEPT_KIND
     )

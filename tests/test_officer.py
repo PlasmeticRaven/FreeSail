@@ -358,6 +358,44 @@ def test_the_captains_sentences_reach_the_officer_by_either_name():
     assert h.agent.released
 
 
+def test_the_officers_word_to_the_player_captain_reaches_him_whole_under_the_officers_mark():
+    """Package 68 (the cold review of 2026-10-22, R-13 and R-14): every model officer's
+    word to a captain the player holds at the prompt was logged "The captain to the
+    captain ... (nobody holds the station)" and kept in a journal for nobody, and the word
+    after "Mr Bowen," was cut ("no land in sight yet" became "land in sight yet"). The
+    word, by any form that names him, reaches him whole in the play log, notable, under
+    the officer's own mark; a question likewise; nothing is kept in a journal."""
+    world = frigate_world()
+    cap = world.people.captain
+    surname = cap.name.split()[-1]
+    said = [
+        "say to the captain, no land in sight yet",
+        f"Say to Mr {surname}, land ho, sir",
+        f"tell {cap.name}, the fog has come down",
+        "ask the captain whether we shorten sail",
+    ]
+    script = []
+    for text in said:
+        script += [order(text), ""]
+    h, fake, _ = seated(world, script)
+    world.run(EVERY * (len(said) + 1))
+    who = f"The officer of the watch ({world.stations.holder(OFFICER).name}), on the quarterdeck"
+    told = [e for e in world.log if e.kind == "agent.told" and e.actor == f"the {OFFICER}"]
+    assert [e.text for e in told] == [
+        f"{who}, to the captain: no land in sight yet",
+        f"{who}, to the captain: land ho, sir",
+        f"{who}, to the captain: the fog has come down",
+        f"{who}, asks the captain: whether we shorten sail?",
+    ]
+    assert all(e.severity is Severity.NOTABLE and e.data["to_player"] for e in told)
+    assert not [e for e in world.log if e.kind == "agent.word_kept"]
+    assert "nobody holds the station" not in " ".join(e.text for e in world.log)
+    # a word to a station nobody holds is kept under the officer's own mark
+    world.submit("I have the deck")
+    e = world.submit("tell the master, no bottom at forty")
+    assert e.text.startswith("The captain to the master: no bottom at forty (nobody holds")
+
+
 # ---------------------------------------------------------------------------
 # Authority per order: the domain (the cold review's first item)
 # ---------------------------------------------------------------------------

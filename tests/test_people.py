@@ -327,6 +327,39 @@ def test_a_person_made_from_words_has_his_outline_from_them():
         assert e.data["result"] == "refused" and words in e.text, e.text
 
 
+def test_a_person_made_aboard_another_ship_is_refused_in_words_and_her_own_name_is_aboard():
+    """Package 68 (the cold review of 2026-10-22, R-15): "aboard the Two Brothers, on the
+    quarterdeck" fell into the made man's history, and "on the quarterdeck" put three
+    foreign captains on the Sherbourne's quarterdeck and in her people. Words naming
+    another ship are refused in words and nothing is made; the player's own ship by her
+    name is aboard, at the place said ("onto the Amazon's quarterdeck"), and a place said
+    in the words is honoured, never the cabin by default."""
+    from tests.test_brains import put
+
+    w = world_for(ports=["falmouth"])
+    put(w, "merchant brig", "britain", "49 30 N 5 50 W", "bound for Falmouth", name="Two Brothers")
+    own = w.ship.name
+    before = w.people.describe()
+    for text in (
+        'person: make "Captain Tregarthen", her master, aboard the Two Brothers, on the '
+        "quarterdeck",
+        'person: make "Mr Dunn", a waterman, on the quarterdeck of Cudlip\'s Boat',
+        'person: make "Capitaine Etcheverry", a privateer, aboard the Sainte-Barbe',
+        'person: make "Mr Coffin", master, onto the Lydia\'s quarterdeck',
+    ):
+        e = w.world_order(text, "the test")
+        assert e.data["result"] == "refused", e.text
+        assert "names another ship" in e.text and "nothing is made" in e.text, e.text
+    assert w.people.describe() == before
+    e = w.world_order(f'person: make "Mr Furtado", a pilot, onto the {own}\'s quarterdeck', "t")
+    assert e.data["result"] == "done", e.text
+    assert w.people.find("Mr Furtado").where == "quarterdeck"
+    e = w.world_order(f'person: make "Mr Hale", a passenger, aboard the {own}, in the gunroom', "t")
+    assert e.data["result"] == "done" and w.people.find("Mr Hale").where == "gunroom", e.text
+    e = w.world_order('person: make "Mr Kitto", a passenger, on the quarterdeck', "t")
+    assert w.people.find("Mr Kitto").where == "quarterdeck", e.text
+
+
 def test_a_man_of_the_muster_by_his_trade_is_drawn_only_when_the_voice_reaches_him():
     """The cook is an idler of the muster, not one of the named few: nobody finds him and
     `the people` does not list him until the director's voice reaches for him
