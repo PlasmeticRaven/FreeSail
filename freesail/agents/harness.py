@@ -1531,7 +1531,13 @@ class Harness:
                 from freesail.agents.tripwires import tripwire_of
                 from freesail.standing.grammar import parse_condition
 
-                cond = tripwire_of(part.condition) or parse_condition(part.condition, world.ship)
+                try:
+                    cond = parse_condition(part.condition, world.ship)
+                except OrderError:
+                    trip = tripwire_of(part.condition)
+                    if trip is None:
+                        raise
+                    cond = trip
                 memory: dict[str, Any] = {}
                 holds = cond.holds(world.readings, memory)
                 kept[i] = (cond, memory)
@@ -3686,19 +3692,20 @@ class Harness:
         if seconds is not None:
             words = f"{words} {'has' if seconds <= 60 else 'have'} passed"
             return StandBy(words, until_tick=world.clock.tick + seconds)
-        # a tripwire of the ship's own state (package 58a: her way settled, the depth, the
-        # speed, the wind, a point of interest near), judged by the readings
+        # a reading's condition, as the book reads one (package 41); the dialect's own
+        # words first, so that 'the true wind exceeds 20 knots' stays the dialect's and is
+        # not taken for a tripwire's
         from freesail.agents.tripwires import TRIPWIRE_WORDS, tripwire_of
-
-        trip = tripwire_of(words)
-        if trip is not None:
-            return StandBy(trip.text, condition=trip.text)
-        # a reading's condition, as the book reads one (package 41)
         from freesail.standing.grammar import parse_condition
 
         try:
             cond = parse_condition(words, world.ship)
         except OrderError as e:
+            # a tripwire of the ship's own state (package 58a: her way settled, the depth,
+            # the speed, the wind, a point of interest near), judged by the readings
+            trip = tripwire_of(words)
+            if trip is not None:
+                return StandBy(trip.text, condition=trip.text)
             events = ", ".join(w for w, s in R.EVENTS.items() if not s.absent)
             return (
                 f"'{piece}' is not an event or an interval to stand by for, nor a reading's "

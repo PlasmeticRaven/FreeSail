@@ -6976,9 +6976,11 @@ def test_truth_7b_117_the_first_line_of_a_captains_sample_names_his_place_the_de
     assert cap.where == "shore"
     landed = next(e for e in world.log if e.kind == "person.ashore")
     at = landed.ship_time.strftime("%H:%M")
+    # package 58a: the line closes with the ship's time since his last reply, a glass's
+    # stand-by being thirty minutes ("...; on your feet since 10:00." before)
     assert line() == (
         f"You: the captain, ashore at Falmouth, on the quay, since {at}; the deck yours; on "
-        "your feet since 10:00."
+        "your feet since 10:00; 30 minutes of the ship's time since your last reply."
     )
     _until(world, lambda: not world.ports.boat.away)  # the boat home, to be sent for him
     h.deliver(reply("", call("submit_order", text="come aboard")))
