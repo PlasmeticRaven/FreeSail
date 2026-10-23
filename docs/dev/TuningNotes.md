@@ -8074,3 +8074,360 @@ restarted twice during the runs, and each tier is written here as it finished.
   failed, 327 slow left out (07:25 to 07:47). **The slow tier of the files touched** (the
   fifteen above and `test_ports`): 514 passed, 10 expected failures (the eight before and
   the Goulet's two), none failed (07:47 to 08:19).
+
+## Package 58b: the captain's sea sense, third pass (2026-10-23)
+
+The rules captain's and the pilot's half of package 58 (58a, the deltas and the stand-by, is
+its own builder's). Built in a worktree off `872aa61`. The physics of the wind across the
+stern is not changed (the owner's ruling of 2026-10-23); nothing of 58a's or 67's files is
+touched; the consent records were not touched. Spec M6 §4 and M7b §24 "as built (package
+58b)"; the primer's chapters 7 and 11; truths 7b-127 to 7b-129.
+
+### Each item against its intent
+
+1. **A leg laid again as the stream changes: built.** `Captain._stream_changed`, on passage
+   and running for shelter: the master's tide turns (his `reckoning.tide` line with `turn`,
+   kept till answered and answered ten minutes after a laying at the soonest,
+   `RELAY_TURN_LEAST_S`), or the stream the master allows now, against the one the course
+   was laid allowing, would carry her more than a cable (`RELAY_OFF_LINE_NM`) off the line
+   in the next glass (`RELAY_GLASS_H`), a glass between such layings (`RELAY_LEAST_S`). The
+   laying is the captain's "shape a course for" with the reason said ("the tide has turned,
+   the ebb making"; "the stream changed since the leg was laid: a knot and a quarter SW
+   now"). The leg as laid is read off every `helm.set` of "shape a course for", his own or
+   his book's hourly "the leg". The perception carries the master's tide
+   (`Perception.tide_allowed`). Truth 7b-127: the Éclair's leg laid at 05:30 allowing the
+   flood in the channel of Bas is laid again at the master's turn to the ebb, within ten
+   minutes of it, and she clears the channel.
+2. **Casts on a long leg: built, the bringing-to taken another way.** `Captain._casts`; the
+   five doctrines' thresholds `cast_glass_fathoms` 20, `cast_hour_fathoms` 100,
+   `cast_inshore_nm` 15 and `cast_bring_to_hours` 4. The hand lead every glass where the
+   chart has under twenty fathoms at the account (`Perception.chart_fathoms`); the deep-sea
+   lead every hour inside the hundred-fathom line inshore (the land in sight, or the coast
+   within five leagues by his account). Under four knots she casts as she goes. *Taken
+   another way*: over four knots the deep-sea lead wants her brought to, and brought to
+   every hour she never reached Brest in the intent scenario (eight bring-tos in the
+   Channel's approaches, the stream setting her back at each), and brought to near the land
+   in the lee-shore trial she was set onto it; so she is brought to for it once a watch at
+   most, only on passage or running for shelter (never beating), never in a blow (the wind
+   at the shorten-sail line), never with land under her lee within her sea room, and filled
+   away at the sounding or after a quarter of an hour; the other hours the cast waits. Not
+   in pilot water nor with the pilot aboard (the book's own lead has that). The first cast
+   comes a glass or an hour into the leg, not at its laying: cast at once, the deep-sea
+   lead held the hands of the King's brig-sloop from the director's heave-to for her
+   station (truth 7b-113 failed on the fast tier; mended, item 2's by bisection).
+3. **The wind across the stern: built as the ruling has it.** The physics unchanged; no
+   evolution ordered by a helm order. `orders.navigation.watch_the_stern`, called each tick
+   by the evolutions' runner beside `keep_course_pending` (the runner is outside the files
+   listed; it is the one place every ship's tick passes with her evolutions known): when
+   the wind has come a point (`STERN_CROSSED_DEG`, 11.25°) past dead astern onto the other
+   quarter, with a dipping lug set against its mast or a square yard braced for the old
+   tack, one notable line, `sail.across_the_stern`:
+   "The wind has come across the stern to the larboard quarter: the foresail and the
+   mainsail are against their masts; dip them when you will." (and "; and the yards are
+   braced for the starboard tack, by the lee; brace them round when you will"), once a
+   crossing, nothing done. A manoeuvre's own crossing (wearing, gybing, heaving to) is its
+   own and says nothing (as is a crossing aground). The line's data name the boom sails,
+   which gybe as 37m built them. The rules captain answers it as his next orders
+   (`Captain._across_the_stern`: "dip the foresail", "dip the mainsail"; `trim sails` for
+   the yards; `trim the sheets` where only booms crossed), not hove to nor in distress.
+   Truth 7b-128.
+4. **The course given when she gathers way: built.** `orders.navigation.gathering_way`
+   (`GATHERED_WAY_KN`, a knot): from the anchor aweigh (the weighing evolutions'
+   `WEIGHING_PHASES`) until she has a knot of headway with no sail aback and a sail set,
+   a course given her is held (`Judgement("pending", ..., crossing="way")`): "SE is held
+   till she has gathered way: the anchor is aweigh and she has not a knot of way on her
+   yet; it is given when she has, her sails drawing", and steered then by
+   `keep_course_pending` ("She has gathered way, 1.1 knots, her sails drawing: ...",
+   `helm.course_given`, data `held_for: way`). The rules captain shapes his leg again at that
+   line ("she has gathered way"), so its allowance is worked with way on. The starter book
+   says so in a comment and the primer's chapter 11 has the lugger's two lines.
+5. **The gale book's mending (57's debt): built, the judgement waiting for the lead's
+   playtest.** A head sail straining at its bolt-ropes (`strain.warning` with "bolt-ropes")
+   in a wind over the shorten-sail line is taken in before it blows out
+   (`_head_sails_straining`, storm canvas excepted, once in ten minutes); filling away from
+   lying to with the wind still over that line the close-reefed topsails are set "to claw
+   off the land under her lee" or "to give her way, the wind still strong"
+   (`_sail_to_fill_away`); a lugger lies to under her own storm canvas: "shift the mainsail
+   for the storm lug" (the taille-vent), "shift the jib for the storm jib", "set the storm
+   jib", and "heave to" when it is set (`_lugger_storm_lug`; probe: hove to at 3420 under
+   them, never aback, 2.2 knots). *Taken another way*: **the band under the reefs**, a
+   good full by compass a point free of the helm's full and by, was built and withdrawn:
+   under it the frigate was aback every two minutes and a half in both trials, worse than
+   the helm's own band (`hull.full_for_way`), which is kept. Truth 7b-129: the station
+   gale's frigate lies a-try four hours under the book (243 minutes in the probe), never
+   aback, nothing lost, under two knots on the mean.
+6. **The pilot's conn in a stream (68's debt): built.** `world/ports.py`: each leg of his
+   track ahead judged before he stands into it (`_leg_made`, `_foul_leg`, `_legs_judged`)
+   with the stream at the time she comes to it (`world.tide.at`) and the wind over that
+   water, at `PILOT_JUDGE_WAY_KN`; a leg she lies, or sags off by under a point, serves; one
+   that sags more serves only if her sagged track has water under her keel and passes no
+   danger (`chart.dangers_ahead` within a cable abeam), the next leg judged from where it
+   leaves her. One that will not serve: he brings her up where she is in
+   `PILOT_WAIT_MOST_FATHOMS` (25) or less, saying so and when he looks for the stream to
+   serve; looks again every five minutes once she rides (not dragging, not anchoring);
+   weighs when the legs will serve by the time she is under way (`PILOT_WEIGH_AHEAD_S`);
+   takes up his track again from where she lies (`_joined_track`) on the tack toward his
+   mark (`_as_she_will_lie` takes the other tack when her own lies more than eight points
+   from it); and, weighed, does not bring her up again for three quarters of an hour
+   (`PILOT_COMMITTED_S`). Deeper than 25 fathoms he says he cannot bring her up and cons
+   her on as near as she will lie. He gives no course over a tack or wear in hand (cast the
+   wrong way from her anchor she was given a new course each minute of the wear and worn
+   by turns). His own turn of two points and more onto a course within eight points of the
+   wind and a point nearer it is trimmed for first ("The pilot: trim for close hauled,
+   before I put her head to NNE") and the helm put over a minute later
+   (`PILOT_TRIM_FIRST_S`). The two Goulet cases (113000, 114000) are lifted, the wait
+   asserted. **Found on the way and mended** (the captain's half): with the conn given by
+   the officer (`let the pilot take her in`), the captain's 'on passage' book written again
+   at the weigh after the wait carried "the leg", which shaped her back out of the Goulet
+   for the outer mark under the pilot's feet and set her onto the Fillettes; the book now
+   leaves "the leg" out whenever the pilot has the conn, by whoever's word
+   (`Captain._pilot_has_conn`). Two more from the intent schooner's passage: a course of
+   his held by the helm till she has way for it is not given again over itself (given each
+   minute, it was held again each minute and she never came round), and a weigh of his
+   refused (her boat away for the prices) is asked again each half hour, not at every look
+   (`PILOT_WAIT_REFUSED_S`). *Tried and withdrawn*: a rule bringing her up when she had
+   been "as near as she will lie" for his mark in hand ten minutes without closing it, and
+   judging that leg before weighing again. It brought the intent schooner up in the
+   Goulet's mouth before she was set ashore, but from 114000 it brought the merchantman up
+   three times after weighing where she would have fetched (she berths at 126960 without
+   it) and the case failed; withdrawn, and the intent schooner pinned as below. The open
+   water to his mark in hand is hers to work as she can, as before.
+7. **Truths and records: built.** Truths 7b-127, 7b-128, 7b-129; the records as listed
+   above.
+
+### The pilot's new words
+
+- "The pilot: she will not lie up for 48 20.46 N 4 35.22 W with the flood running three
+  knots and a half and the wind at NW by W; we bring her up here in 17 fathoms and wait for
+  the flood to slacken, about a quarter to two in the afternoon, sir." (the order's line)
+- `port.pilot_waits`: "Mr Tanguy brings her up to wait: wait for the flood to slacken,
+  about a quarter to two in the afternoon." (or "wait for the wind to serve")
+- `port.pilot_waits`, deep water: "The pilot: ...; there is too much water here to bring
+  her up, and I take her on as near as she will lie."
+- "The pilot: the stream will serve for 48 20.46 N 4 35.22 W by the time she has weighed;
+  we weigh and take her in." (the weigh's line); `port.pilot_conn`: "The pilot has her under
+  way again on his track."
+- "The pilot: trim for close hauled, before I put her head to NNE." ("trim for the wind
+  abeam", "trim for the wind large")
+
+### 43b's against-the-mast fraction, checked
+
+`LUG_AGAINST_MAST_AREA` is two thirds (`physics/sails.py`, 43b). Measured on the Éclair of
+the lugger-roscoff scenario, wind 12.3 knots, the mean speed through the water over minutes
+3 to 13 after the turn, lugs left against the masts against the same turn with them dipped,
+the same seed (`fraction.py` in the scratch directory):
+
+| Course | Apparent wind | Against the masts | Dipped | Ratio |
+|---|---|---|---|---|
+| NE, running (through the stern) | ~142° | 3.87 kn | 4.28 kn | 0.90 |
+| NNW, on a wind | ~64° | 4.23 kn | 4.59 kn | 0.92 |
+
+**The old figure is kept** (2/3; no new figure): a lug against its mast costs her a tenth of
+her way, which the line now says and the captain answers. For the lead: the period's
+complaint of a lug left against the mast is worst on a wind (the sail bellied round the
+mast, the luff hard to set), and a stronger penalty on a wind than off it would say so; that
+is a physics change, which this package was told not to make.
+
+### The gale trials, for the lead's playtest
+
+Both trials stay expected failures (`strict=False`), their old figures beside the new in
+the test file. Measured by the trials' own probe (`gale.py`, the trial's scenario and seed,
+the whole day):
+
+| Trial | Figure | Before (`872aa61`) | Now |
+|---|---|---|---|
+| Station gale | states | 300 station, 15060 hove to, 30780 passage, 31560 beating, 32160 hove to, 37680 passage, 37740 beating, 44340 in distress | 300 station, 15060 hove to, 30780 passage, 31560 beating, 41460 in distress |
+| | aground | 44332 | 41415 |
+| | sail lost | fore topmast staysail blown out, 8983 | none (taken in at 8820) |
+| | minutes aback, longest | 7, 1 | 5, 1 |
+| | lying to: minutes, mean knots | 346, 1.81 | 253, 2.01 |
+| | lines, digest | 857, `cefe2cf5136fb4d9` (pinned 909, `574332b785e523ab`) | 864, `4cb58e9ec1ab55c0` |
+| Lee shore | states | ... 41880 hove to, 51480 passage, 51540 beating, 68940 station | ... 41940 hove to, 51480 passage, 51540 beating, 71340 station |
+| | aground | never | never |
+| | minutes aback, longest | 41, 3 | 19, 2 |
+| | lying to: minutes, mean knots | 459, 1.97 | 458, 1.88 |
+| | lines, digest | 1669, `e60617edd7ebbc73` | 1597, `ed48ca3d61e52f20` |
+
+What the lead will see: in the station gale the fore topmast staysail is taken in before it
+blows out; she lies a-try under the book from 15060 for four hours never aback; filled away
+at 30780 for the station with the gale's tail still blowing she sets her close-reefed
+topsails and has way (aback five times in the next three quarters of an hour, where she
+was aback nine times before and hove to again at 32160); then, beating for the station,
+she is taken among the islands of the Molène passage by "the offing"'s tack and takes the ground at 41415,
+La Helle two miles off, as 57's trial did at 44332. The grounding is the offing's (57's
+finding, the captain's tack among islands in the dark with no way to wear) and not the
+book's; the variants tried (without the topsails set to fill away: aground 42668, aback 17
+minutes; the gale line over the shorten-sail line: aground 43152) all ground there. In the
+lee-shore trial the filled-away hours of 30780 to 37800, aback every three minutes under the
+storm canvas alone (41 minutes in the day), are gone (19 minutes), she lies to again a
+minute later at 41940, and the day's tail falls otherwise (the station at 71340).
+
+### What moved
+
+- **Item 3 (the stern's line)** moved the merchant passage (5c) and the fake captain on it
+  (truth 78) by one line each: at 75681, running ESE for the Iroise, the wind comes a point
+  past dead astern with the yards braced for the old tack, and the deck says so; the book's
+  trim braces them at 75791 as before. Every tick the same.
+- **Items 1 and 2** moved the trade trial with the stranger: the French brig's own captain
+  lays his chasing leg again for the stream (in her own World's log, not the schooner's),
+  so that the schooner's hauling-off marks fall a tenth of a minute otherwise from 15660,
+  and her own leg is laid again for the stream from 19680; she is brought to for a cast of
+  the deep-sea lead off the Lizard at 40740 and comes to Falmouth's outer road at 53040.
+- **Items 1, 2 and 6** moved the intent schooner: her legs laid again for the stream and
+  the tide's turns, and the deep-sea lead brought to for once a watch inshore, bring her
+  to the Iroise later; the pilot of Brest, given the conn off Bertheaume at 109980 with the
+  flood running two knots into the Goulet and the wind at NW, brings her up in the road to
+  wait for it to slacken; the captain, in port from the road (45's rule, as from 43b to
+  56), sends the boat for the prices, and the pilot's weigh at 113940 is refused while it
+  is away. She ends the 36 hours in the road, the tin unsold. **With item 6 turned off the
+  same moved passage strikes the Mingan at 113341** under the old pilot (four knots and a
+  half, in distress at 113400).
+- **The gale trials** (item 5): above; expected failures, the new figures beside the old.
+- **The naval cruise** and every other pinned passage of the files touched: against their
+  figures (below). The Goulet's two cases from the wardroom save pass, the wait said.
+- Not a pin, a count: the trade trial's anchoring in Falmouth's outer road now says "the
+  wind does not serve to enter Falmouth" (the test counted none since 45): she comes to the
+  road beating at 53040 with the wind foul, where she came at 57000 with the tide foul, and
+  is in port from the road as at 45. The count is one, the old beside it.
+
+### Found on the way
+
+- **The station gale's pin was stale before this package.** On `872aa61` the trial gives
+  857 lines and `cefe2cf5136fb4d9`, aground 44332; the pin (57's) is 909 and
+  `574332b785e523ab`. The expected failure (`strict=False`) hid the move. Not mine; the new
+  figures are recorded beside both.
+- **The plan from Roscoff crosses the land** (61's route): the Éclair's first leg from the
+  road of Roscoff "crosses the land about the Isle Verte" by the shaped course's own words,
+  and she strikes there seven minutes after it is laid. Truth 7b-127 passed from there only
+  while the first cast took the hands at the laying; it starts from the channel's eastern
+  end now. Not changed.
+- **The get-under-way line says "full and by"** ("Under way on the larboard tack ...; full
+  and by (W lying too near the wind to be laid)") while the helm steers the held course
+  given at the line before. Words only; not changed.
+- **The pilot's waiting line says "wait" twice** ("brings her up to wait: wait for the flood
+  to slacken"): the line is the record's form over the reason's words; the test reads it.
+  Left for the lead.
+
+### Pins
+
+The proof is by bisection on the passages themselves (`probe_fix.py`, `run_off.sh` and the
+plugin `plug/nop58b.py` in the build's scratch directory): each item turned off by a
+monkeypatch of its own functions (1: `_stream_changed`; 2: `_casts`; 3: `watch_the_stern`
+and `_across_the_stern`; 4: `gathering_way`; 5: the three gale functions), item 6 by the
+tree with `ports.py` of `872aa61` and `_pilot_has_conn` off. All six off gives every old
+figure on all three moved passages, every line the same; then each item off alone:
+
+| Passage | Old | New | Each item off alone | Whose |
+|---|---|---|---|---|
+| Merchant passage (5c), lines | 3099 | 3100 | 3: 3099 and the old digest; 1, 2, 4, 5, 6: the new | item 3 |
+| Merchant passage, digest (and truth 77) | `902be35aeeac7b54` | `26c859e23ceccd42` | as above | item 3 |
+| The fake captain (truth 78), lines | 3112 | 3113 | 3: 3112 | item 3 |
+| The fake captain, digest | `1f8de8b49c7d5b5a` | `0949c109116fc4a1` | 3: the old | item 3 |
+| Trade trial (stranger), lines | 1534 | 1407 | 1: 1378; 2: 1423; 3, 4, 5, 6: 1407; 1 and 2 together: 1534 and the old digest | items 1 and 2 |
+| Trade trial, digest | `7b8012b076ebea42` | `97e193f20ed64e72` | as above | items 1 and 2 |
+| Trade trial, states | ... 31680 beating, 38460 passage, 44940 beating, 57000 at anchor, 57360 in port | ... 20400 beating, 22980 passage, 31620 beating, 37560 passage, 46140 beating, 53040 at anchor, 53700 in port | | items 1 and 2 |
+| Trade trial, anchored | 57324 | 53669 | | items 1 and 2 |
+| Intent schooner (6a), lines | 2160 | 2078 | 1: 1871; 2: 2496; 6: 2323, on the Mingan; 3, 4, 5: no change | items 1, 2 and 6 |
+| Intent schooner, digest | `8eead2f4521f2a61` | `b498761052da0862` | all six off: the old | items 1, 2 and 6 |
+| Intent schooner, the rest | on passage 28080; Le Floch aboard 101820, left 114900; anchored 110872 in the Bay in 13½, dragged 110962; brought up 111710; prices 111780; sold 119400 | on passage 28020; Le Floch aboard 108480, not left; anchored 110305 in the road in ten; no drag; brought up 111238; prices 111300; unsold; the pilot's wait at 109980 | | items 1, 2 and 6 |
+| Station gale (expected failure) | 909, `574332b785e523ab` (stale; 857 `cefe2cf5136fb4d9` on `872aa61`) | 864, `4cb58e9ec1ab55c0` | | item 5; recorded beside, not asserted |
+| Lee shore (now an expected failure) | 1669, `e60617edd7ebbc73` | 1597, `ed48ca3d61e52f20` | | item 5; recorded beside, not asserted |
+
+The single-item figures on the intent schooner were measured before the pilot's last two
+mendings (the held course, the refused weigh), which move only the end of that passage;
+the all-off run and the item-6-off run are the proof. The kept runs were checked against
+the tests themselves by loading them as the fixtures (`plug/fxload.py`): the merchant
+passage's test, truth 77, the trade trial and both intent tests pass on them.
+
+### A scripted run
+
+**The Éclair's leg laid again at the turn** (truth 7b-127, from the channel of Bas's eastern
+end, 05:25 on 12 June, wind W by S twelve knots, `passage to 48 46 N 3 45 W`):
+
+```
+300   05:30  By the captain, on passage: shaping a course for 48 45.7 n 3 50.4 w.
+300   05:30  Shaped a course for 48° 46' N, 3° 50' W: ENE by account, 5 miles. Allowing the flood, half a knot to the NE, steer ENE to make it good ...
+1680  05:53  By the master's tide the ebb makes: allowing a knot and a half to the SW.
+1680  05:53  By the captain, on passage: shaping a course for 48 45.7 n 3 50.4 w (the tide has turned, the ebb making).
+1680  05:53  Shaped a course for 48° 46' N, 3° 50' W: ENE by account, 3 miles. Helm ordered: steer ENE (68°).
+```
+
+**A steer through the stern** (truth 7b-128, the Éclair off the Sept-Îles running E under
+her lugs, the wind W by S). The player's `steer NE`:
+
+```
+256  sail.across_the_stern  The wind has come across the stern to the larboard quarter: the foresail and the mainsail are against their masts; dip them when you will.
+```
+
+and nothing more; the lugs stay on the larboard side, against the masts. The rules
+captain's own course through the stern, the same water:
+
+```
+300  By the captain, on passage: shaping a course for 49 20.0 n 3 20.0 w.
+314  The wind has come across the stern to the larboard quarter: the foresail and the mainsail are against their masts; dip them when you will.
+360  By the captain, on passage: dipping the foresail (the wind across the stern).
+360  By the captain, on passage: dipping the mainsail (the wind across the stern).
+538  Dipped the foresail; it stands to leeward of the mast.
+567  Dipped the mainsail; it stands to leeward of the mast.
+```
+
+**The pilot through the Goulet on the flood** (the owner's wardroom save replayed to
+114000, `let the pilot take her in`):
+
+```
+114000  The pilot: she will not lie up for 48 20.46 N 4 35.22 W with the flood running three knots and a half and the wind at NW by W; we bring her up here in 17 fathoms and wait for the flood to slacken, about a quarter to two in the afternoon, sir.
+114000  Mr Tanguy brings her up to wait: wait for the flood to slacken, about a quarter to two in the afternoon.
+119220  The pilot: the stream will serve for 48 20.46 N 4 35.22 W by the time she has weighed; we weigh and take her in.
+120660  The pilot has her under way again on his track.
+126960  The pilot: this is the berth, the Bay of Brest; let go when you please. ...
+```
+
+never aground, the least water fifteen fathoms and a quarter; from 113000 the same wait
+("about three o'clock in the afternoon"), weighed at 118740, the berth at 129060.
+
+### Decisions for the lead and the owner
+
+- **The intent schooner unsold** (items 1, 2 and 6): her passage moved by the leg's layings
+  and the casts brings her to the Iroise as the flood runs hard into the Goulet against a
+  north-westerly, and the pilot brings her up in the road to wait where the old pilot put
+  her on the Mingan; the captain's boat for the prices (45's rule, in port from the road)
+  then keeps her from weighing at the slack. A captain who held his boat while the pilot
+  waits was tried (her pilot then weighed at 113940, was set onto the north shore of the
+  Goulet's mouth pinching for his mark, and she took the ground at 126044), and withdrawn
+  with the pinching rule above. For the lead: whether the captain's business waits for the
+  pilot, and the pilot's answer to the open water to his mark in hand when it will not be
+  fetched.
+- **The gale trials**: the book is mended and lies her to without being taken aback; the
+  grounding among the Molène islands is the offing's tack, for the lead's playtest.
+- **The fraction**: kept at two thirds; a stronger penalty on a wind is a physics change.
+- Taken another way: **the deep-sea lead's bring-to** once a watch and only off a lee
+  shore and not beating; **the band under the reefs** withdrawn; the stern's line said
+  from the evolutions' runner (outside the files listed, one call).
+
+### The suite, as run
+
+On the build machine (four cores), shared with two other builders' suites for most of the
+day (the load between 16 and 25 until 15:00); on the lead's word of that afternoon the
+whole slow tier was **not run** (started at 10:16, stopped at 11:07 by its pid), the pace
+tests were not run, and the moved passages were measured alone, as above. The logs are in
+the build's scratch directory, `p58/`.
+
+- `ruff check .` and `ruff format .`: clean (228 files).
+- **The fast tier, first** (`-n 4`, 10:38 to 13:03 under a load of 17 to 25, `fast-1.log`):
+  3,565 passed, 2 failed: truth 7b-113 (the cruiser's heave-to held by the deep-sea lead
+  cast at the leg's laying: item 2's, mended in `66bd2bf`, the truth passes) and truth 88's
+  pace (33 ticks a second against 60, a pace measure run in that tier under a load of 20;
+  not this package's, the pace tests not run alone as the lead said).
+- **The slow tier of the files touched** (`test_captain_trials`, `test_known_truths`,
+  `test_ports`, `test_ships`, `test_captains`; `-m "slow and not pace"`), on `683ae1a`
+  (15:09 to 15:35, `slow-touched-3.log`): 104 passed, 9 expected failures (the seven of
+  the files before and the two gale trials), 2 failed: the two trade trials, re-pinned
+  after on their bisection (`dd2488d`) and run again alone on the final code with truth
+  7b-127 (moved to the channel's eastern end in `2a56ad0`): 3 passed (`rerun-3.log`). The
+  Goulet's two cases pass in it, as do the merchant passage, truth 77, truth 78 and the
+  intent schooner's two tests on their new figures.
+- **The fast tier, on the final code** (`-n 4 -m "not pace"`, 15:41 to 16:04, the load
+  about 4, `fast-2.log`): 3,564 passed, none failed, 329 slow left out (truths 7b-127 and
+  7b-129 moved into the slow tier by `SLOW_TESTS`: nine seconds and a minute alone).
+- **Not run**: the whole slow tier once (stopped on the lead's word; the lead runs one
+  whole suite on the merged tree) and the pace tests alone.
