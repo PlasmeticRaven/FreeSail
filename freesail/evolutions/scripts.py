@@ -7497,8 +7497,8 @@ class LayOutKedgeScript(_AnchorScript):
             return "she carries no kedge"
         if self.anchor.state not in (AnchorState.STOWED, AnchorState.READY):
             return f"the kedge is {self.anchor.state.value}"
-        if self.ship.extra.get("aground"):
-            return "she is aground"
+        # aground is the kedge's own work: carried out to deep water and hove taut, its
+        # strain heaves her off as the ground's grip lessens (`world.ground`)
         world = _world_of(self.ship)
         self.ports = getattr(world, "ports", None)
         boat = self.ports.boat_spec() if self.ports is not None else None

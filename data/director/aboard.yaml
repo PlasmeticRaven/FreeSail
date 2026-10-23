@@ -3,21 +3,55 @@
 # purser's) with what it does in the part graph or the stores, and the condition under which
 # the simulation could have produced it on its own. An `aboard:` order whose condition does
 # not hold is doubted, not refused (decision 50): the channel says why, and the director may
-# enter it again with a `[reason: ...]`.
+# enter it again with a `[reason: ...]`. The table is what the game can do, never the list of
+# what the director may say: words it does not know are answered honestly and logged.
 #
-# Fields: `words` are the forms the order takes after `aboard:` (`{spar}` stands for a spar
-# of the ship by her own name for it: "the fore topmast"); `report` is the notable line the
-# play log carries, said by the ship's people and never naming the order; `effect` is what
-# changes (`spar_condition`: the spar's condition set to the figure, so that it carries away
-# the sooner under a press of sail, as a sprung spar does; `water_tons`: taken from the
-# stores; `water_foul`: the stores' water marked foul, which the purser's page says and
-# which the needs of package 54 read; `report_only`: nothing modelled yet, said so);
-# `plausible_when` names the condition (`strained`: the spar has borne a strain above the
-# figure of its rating in the last watch, or the mean wind has been fresh; `sea_above`: the
-# sea's words beyond the ones named, so that she has been working; `days_out`: the ship's
-# time since the voyage began); `harm` is `none`, `hurt` or `deadly`, and a brief with
-# `nobody_dies` refuses the deadly.
+# Fields:
+#   `words`: the forms the order takes after `aboard:`, matched whole. A form may name one
+#     slot, filled by the ship's own name for it: `{spar}` ("the fore topmast"), `{sail}`
+#     ("the fore topsail"), `{line}` ("the starboard main brace", or "the main brace" for
+#     the first of the pair), `{anchor}` ("the best bower") or `{good}` ("tin", a good in
+#     the hold). Keep commas out of the forms: an `aboard:` order with a comma that is no
+#     form of the table is read as a thing made or moved (package 53b).
+#   `report`: the notable line the play log carries, said by the ship's people and never
+#     naming the order; the slot is filled there too.
+#   `effect`: what changes, one key or several, each done in turn:
+#     `spar_condition`, `sail_condition`, `line_condition`: the slot's part cut to the
+#       figure (0 to 100), so that it carries away, or a sail bears, the less;
+#     `cable_condition`: the `{anchor}`'s cable cut to the figure (it parts at nought);
+#     `water_tons`: tons of water lost; `water_share`: that share of what is in the tier;
+#     `water_foul`: the water marked foul (the needs read it; watering clears it);
+#     `provisions_share`: that share of the provisions lost; `provisions_days`: so many days;
+#     `cargo_tons`, `cargo_share`: tons, or a share, of the `{good}` struck off the manifest
+#       with the thing's `cause` in the hold's ledger;
+#     `spare_sails_condition`: the sail room's spare canvas worn to the figure;
+#     `cordage_share`: that share of the boatswain's spare cordage lost;
+#     `chronometer_stopped`: the chronometer stopped, its reading saying the words given
+#       (the master winds it and sets it going by the account);
+#     `glass_broken`: the glass gone, its readings saying it is broken;
+#     `leak_stopped`: the grounding's leak stopped, so the well gains no more (a hotfix
+#       until milestone 7's pumps and repair (taking on water));
+#     `well_pumped`: the water in the well pumped out, and the carpenter's feet counted
+#       afresh;
+#     `report_only` (or no effect): nothing modelled yet, said so in the `unmodelled` words.
+#     An effect that wants what she lacks (no chronometer, no glass, no spare canvas) is
+#     answered "no way as said", and nothing changes.
+#   `state`: the word for a part's condition in the director's answer ("sprung", "rotten").
+#   `plausible_when`: every condition named must hold, else the `doubt` words:
+#     `strained`: the part has borne a strain above the figure of its rating in the last
+#       watch, or the mean wind has been fresh (twenty knots);
+#     `sea_above`: the sea's words beyond the ones named (smooth, moderate, short, heavy,
+#       very heavy), so that she has been working;
+#     `days_out`: days of the ship's time since the voyage began;
+#     `days_since_watered`: days since she last took in water (the voyage's start until then);
+#     `wind_above`: the mean wind at or above so many knots;
+#     `at_anchor`: true, she lies at an anchor; false, she does not;
+#     `leaking`: true, she is making water from a grounding; false, she is not;
+#     `well_above`: more than so many metres of water in the well.
+#   `harm`: `none`, `hurt` or `deadly`, and a brief with `nobody_dies` refuses the deadly.
+#   `source`: where the thing is found in the period's books, or "judgement".
 things:
+  # -- the spars, the sails and the rigging ---------------------------------------------
   - id: spar_sprung
     words: ["{spar} is found sprung", "{spar} found sprung", "{spar} sprung"]
     source: Falconer 1780, SPRUNG ("the state of a mast or yard when it is cracked or split by the violence of the wind")
@@ -26,6 +60,65 @@ things:
     plausible_when: {strained: 0.6}
     doubt: "nothing has strained {spar}: she has carried no press of sail in the last watch, and a spar does not spring of itself in a steady breeze"
     harm: none
+  - id: spar_rotten
+    words: ["{spar} is found rotten", "{spar} found rotten", "{spar} found decayed"]
+    source: Falconer 1780, ROTTEN; the carpenter's survey of the masts and yards (Steel 1794, the carpenter's duty); judgement for the figure
+    report: "The carpenter reports {spar} rotten under the paint: sound to the eye, soft to his knife a foot deep. He would have it eased of a press of sail until a new one can be got."
+    effect: {spar_condition: 50}
+    state: rotten
+    doubt: "a spar's rot is the carpenter's finding at any survey"
+    harm: none
+  - id: sail_mildewed
+    words: ["{sail} is found mildewed", "{sail} found mildewed", "{sail} found rotten with mildew"]
+    source: Falconer 1780, MILDEW; canvas furled wet in warm weather (Kipping 1847, the care of sails); judgement for the figure
+    report: "The sailmaker reports {sail} mildewed in the folds where it was furled wet: the cloth is tender, and he would not trust it in a fresh breeze."
+    effect: {sail_condition: 45}
+    state: mildewed
+    plausible_when: {days_out: 7}
+    doubt: "she sailed within the week: canvas does not mildew so soon"
+    harm: none
+  - id: sail_chafed
+    words: ["{sail} is found chafed", "{sail} found chafed", "{sail} chafed through"]
+    source: Falconer 1780, CHAFE; the sail against the stays and the tops in a sea
+    report: "The sailmaker reports {sail} chafed nearly through where it works against the rigging: it wants a patch, and will not bear much until it has one."
+    effect: {sail_condition: 40}
+    state: chafed
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
+    doubt: "she lies easy on a smooth sea: canvas chafes when she rolls and works"
+    harm: none
+  - id: line_chafed
+    words: ["{line} is found chafed", "{line} found chafed", "{line} found stranded"]
+    source: Falconer 1780, STRANDED ("the state of a rope when one of its strands is broken"); CHAFE
+    report: "The boatswain reports {line} chafed and a strand gone: it will hold for now, but not a heavy strain, and he asks leave to reeve a new one."
+    effect: {line_condition: 35}
+    state: chafed
+    plausible_when: {strained: 0.6}
+    doubt: "nothing has strained {line}: she has carried no press of sail in the last watch, and a rope does not strand at its ease"
+    harm: none
+  - id: cable_chafed
+    words: ["{anchor} cable is found chafed", "{anchor} cable found chafed", "{anchor} cable found chafed in the hawse", "{anchor} cable chafed in the hawse"]
+    source: Falconer 1780, CHAFE and SERVICE (the cable served in the hawse against it); a rocky road
+    report: "The boatswain reports {anchor}'s cable chafed in the hawse and on the ground: the service is gone through and the strands are showing. It may not hold her in a blow."
+    effect: {cable_condition: 40}
+    state: chafed
+    plausible_when: {at_anchor: true}
+    doubt: "she rides at no anchor: a cable stowed in the tier does not chafe"
+    harm: none
+  - id: spare_canvas_mildewed
+    words: ["the spare canvas is found mildewed", "the spare canvas found mildewed", "mildew found in the sail room", "the sail room found damp"]
+    source: Falconer 1780, MILDEW; the sail room's stowage (Steel 1794); judgement for the figure
+    report: "The sailmaker reports mildew in the sail room: the spare canvas was stowed damp, and the worst of it is tender."
+    effect: {spare_sails_condition: 60}
+    plausible_when: {days_out: 10}
+    doubt: "she sailed within ten days, the spare canvas aired and dry: mildew wants longer"
+    harm: none
+  - id: cordage_spoiled
+    words: ["rats found at the cordage", "the spare cordage found rotten", "the spare rope found rotten"]
+    source: the boatswain's store; judgement for the share
+    report: "The boatswain reports the spare cordage in his store gnawed and rotten in the coils: a quarter of it will not serve."
+    effect: {cordage_share: 0.25}
+    harm: none
+  # -- the water and the provisions -------------------------------------------------------
   - id: cask_stove
     words: ["a cask found stove", "a cask is found stove", "a water cask stove", "a cask stove"]
     source: Falconer 1780, STOWAGE; the ground tier of the hold
@@ -34,19 +127,123 @@ things:
     plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
     doubt: "she lies easy on a smooth sea: nothing has started a cask in the tier"
     harm: none
-  - id: seam_working
-    words: ["a seam found working", "a seam is found working", "a seam working", "she is found making water"]
-    source: Falconer 1780, LEAK; the well sounded each watch
-    report: "The carpenter reports a seam working below the wale on the weather side; the well is to be sounded every glass."
-    effect: {report_only: true}
+  - id: casks_leaking
+    words: ["the leaguers found leaking", "the water casks found leaking", "the casks found leaking", "the ground tier found leaking"]
+    source: Falconer 1780, LEAGUER (the largest cask, stowed in the ground tier); the cooper's duty; judgement for the share
+    report: "The cooper reports the leaguers in the ground tier leaking at the chimes where she has worked them: a good part of the water is in the well."
+    effect: {water_share: 0.15}
     plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
-    doubt: "she has not been working in a sea: a seam opens under a labouring ship, not at her ease"
+    doubt: "she lies easy on a smooth sea: the casks have not been worked"
     harm: none
   - id: water_foul
     words: ["the water is found foul", "the water found foul", "the water foul"]
     source: the purser's casks; Regulations and Instructions 1806, the Purser
     report: "The purser reports the water in the ground tier foul: the hands turn from it, and he asks that she water at the first port."
     effect: {water_foul: true}
-    plausible_when: {days_out: 5}
+    plausible_when: {days_since_watered: 5}
     doubt: "she watered within the week: casks do not foul in five days"
+    harm: none
+  - id: water_brackish
+    words: ["the water is found brackish", "the water found brackish"]
+    source: watering from a stream near its mouth, where the tide reaches (Falconer 1780, WATERING-PLACE); judgement
+    report: "The purser reports the last water brackish, taken too near the stream's mouth: the hands drink it and are the worse for it."
+    effect: {water_foul: true}
+    doubt: "brackish water is the watering-place's, found at the first taste"
+    harm: none
+  - id: bread_spoiled
+    words: ["the bread is found damp", "the bread found damp", "the bread found mouldy", "the biscuit found mouldy", "the bread room found damp"]
+    source: the bread room, lined against the damp (Steel 1794); Regulations and Instructions 1806, the Purser (the survey of provisions); judgement for the share
+    report: "The purser reports the bread room damp and a part of the biscuit mouldy: what is spoiled goes over the side, and he asks for a survey."
+    effect: {provisions_share: 0.08}
+    plausible_when: {days_out: 7}
+    doubt: "she was victualled within the week: the biscuit does not mould so soon"
+    harm: none
+  - id: meat_rotten
+    words: ["a cask of beef found rotten", "a cask of pork found rotten", "a cask of meat found rotten", "the beef found rotten", "the pork found rotten"]
+    source: Regulations and Instructions 1806, the Purser (provisions condemned by survey); judgement for the share
+    report: "The cook reports a cask of the salt meat rotten when it was broached: it stinks, and the purser has it condemned and over the side."
+    effect: {provisions_share: 0.04}
+    plausible_when: {days_out: 10}
+    doubt: "she was victualled within ten days: the casks were sound when they came aboard"
+    harm: none
+  - id: rats_in_the_bread_room
+    words: ["rats found in the bread room", "rats in the bread room", "rats found at the bread"]
+    source: the period's every ship; judgement for the share
+    report: "The purser reports the rats got into the bread room: bags gnawed and a good deal of the bread fouled."
+    effect: {provisions_share: 0.03}
+    harm: none
+  - id: weevils
+    words: ["weevils found in the biscuit", "the biscuit found full of weevils", "the bread found full of weevils"]
+    source: the period's every ship
+    report: "The cook reports the biscuit full of weevils: the hands knock it on the table before they eat it, as they always have."
+    effect: {report_only: true}
+    unmodelled: "the biscuit is eaten as it is; nothing of the people's temper is modelled yet"
+    harm: none
+  # -- the cargo -------------------------------------------------------------------------
+  - id: cargo_wet
+    words: ["the {good} is found wet", "the {good} found wet", "the {good} found damaged by the bilge water", "{good} found spoiled"]
+    source: Falconer 1780, BILGE-WATER; the merchant's damage by sea water (judgement for the share)
+    report: "The mate reports bilge water got up into the {good} where she has been working: a part of it is spoiled past selling."
+    effect: {cargo_share: 0.1}
+    cause: "found damaged by the bilge water"
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
+    doubt: "she lies easy on a smooth sea: the bilge has not been up into the hold"
+    harm: none
+  # -- the instruments --------------------------------------------------------------------
+  - id: chronometer_stopped
+    words: ["the chronometer is found stopped", "the chronometer found stopped", "the chronometer stopped"]
+    source: the marine chronometer's sensitivity to a shock (`docs/design/Navigation1805.md`); judgement
+    report: "The master reports the chronometer stopped in its box: a heavy sea has jarred it. He has it wound and will set it going by the account, which is no Greenwich time."
+    effect: {chronometer_stopped: "stopped by a jar in a heavy sea"}
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm", "moderate", "a moderate sea"]}
+    doubt: "she lies easy in no more than a moderate sea: nothing has jarred the chronometer in its box"
+    harm: none
+  - id: glass_broken
+    words: ["the glass is found broken", "the glass found broken", "the barometer found broken"]
+    source: the marine barometer's tube, hung in gimbals (`docs/design/WeatherSystems.md`); judgement
+    report: "The master reports the glass broken: the tube cracked in its gimbals and the mercury run out. There is no glass aboard now."
+    effect: {glass_broken: true}
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm", "moderate", "a moderate sea"]}
+    doubt: "she lies easy in no more than a moderate sea: nothing has thrown the glass in its gimbals"
+    harm: none
+  - id: compass_sticking
+    words: ["the compass found sticking", "the compass is found sticking", "the binnacle compass found sticking"]
+    source: Falconer 1780, COMPASS (the card hung on its pin); judgement
+    report: "The master reports the binnacle compass card sticking on its pin: it lags when she comes round, and he has the spare compass got up."
+    effect: {report_only: true}
+    unmodelled: "nothing of the compass's error is modelled yet"
+    harm: none
+  # -- the hull ---------------------------------------------------------------------------
+  - id: seam_working
+    words: ["a seam found working", "a seam is found working", "a seam working", "she is found making water"]
+    source: Falconer 1780, LEAK; the well sounded each watch
+    report: "The carpenter reports a seam working below the wale on the weather side; the well is to be sounded every glass."
+    effect: {report_only: true}
+    unmodelled: "nothing of the hull is modelled yet"
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
+    doubt: "she has not been working in a sea: a seam opens under a labouring ship, not at her ease"
+    harm: none
+  - id: bilge_foul
+    words: ["the bilge found foul", "the bilge water found stinking", "the well found foul"]
+    source: Falconer 1780, BILGE-WATER; the ship sweetened by pumping in fresh water (judgement)
+    report: "The carpenter reports the bilge foul: the well stinks to the berth deck, and he asks that she be pumped out and sweetened."
+    effect: {report_only: true}
+    unmodelled: "nothing of the bilge or the people's health is modelled yet"
+    harm: none
+  # -- the hull's repair: a hotfix until milestone 7's pumps and carpenter's work (taking on water) ----------
+  - id: leak_stopped
+    words: ["the leak found and stopped", "the leak stopped", "the leak fothered", "her strained seams caulked"]
+    source: Falconer 1780, LEAK and FOTHERING; the carpenter's crew at the seams (Steel 1794, the carpenter's duty)
+    report: "The carpenter reports the leak found and stopped: the seams she strained on the ground are payed and caulked, and the well gains no more."
+    effect: {leak_stopped: true}
+    plausible_when: {leaking: true}
+    doubt: "she is making no water: there is no leak to stop"
+    harm: none
+  - id: well_pumped
+    words: ["the well pumped out", "the well pumped dry", "she is pumped out", "the ship pumped out"]
+    source: Falconer 1780, PUMP; the hands at the chain pump until she sucks
+    report: "The carpenter reports her pumped out: the hands were at the pumps until they sucked, and the well is dry."
+    effect: {well_pumped: true}
+    plausible_when: {well_above: 0}
+    doubt: "the well is dry already: there is nothing to pump"
     harm: none

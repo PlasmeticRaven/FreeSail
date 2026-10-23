@@ -1551,43 +1551,156 @@ def aboard_table(path: str = str(ABOARD_PATH)) -> list[dict[str, Any]]:
     for d in raw.get("things") or []:
         if not isinstance(d, dict) or not d.get("id") or not d.get("words"):
             raise ValueError(f"{path}: each thing wants an id and its words.")
+        # a key the game does not know is the table's mistake, said at the load rather than
+        # passed over in play
+        for field_name, known in (
+            ("effect", ABOARD_EFFECT_KEYS),
+            ("plausible_when", ABOARD_PLAUSIBLE_KEYS),
+        ):
+            unknown = sorted(set(d.get(field_name) or {}) - known)
+            if unknown:
+                raise ValueError(
+                    f"{path}: {d['id']}: {field_name} has no key {', '.join(unknown)}; "
+                    f"the keys are {', '.join(sorted(known))}."
+                )
+        slots = {m.group(1) for form in d["words"] for m in _SLOT.finditer(str(form))}
+        if len(slots) > 1 or any(len(_SLOT.findall(str(form))) > 1 for form in d["words"]):
+            raise ValueError(f"{path}: {d['id']}: a thing names one slot in its words, once.")
+        for key in d.get("effect") or {}:
+            want = ABOARD_EFFECT_SLOTS.get(key)
+            if want is not None and (
+                slots != {want} or not all(f"{{{want}}}" in str(form) for form in d["words"])
+            ):
+                raise ValueError(
+                    f"{path}: {d['id']}: the effect {key} wants every form to name the "
+                    f"{{{want}}} it falls on."
+                )
         out.append(dict(d))
     return out
 
 
-def _spar_by_name(ship: Any, words: str) -> str | None:
-    """A spar of the ship by her own name for it ('the fore topmast'), or None."""
-    from freesail.orders.resolve import display_name
+def _key(words: str) -> str:
+    return " ".join(str(words).lower().split()).removeprefix("the ").strip()
 
-    key = " ".join(str(words).lower().split()).removeprefix("the ").strip()
-    for sid in getattr(ship, "spars", None) or ():
-        if display_name(ship, sid).lower().removeprefix("the ").strip() == key:
-            return sid
+
+def _part_by_name(ship: Any, words: str, of: str) -> str | None:
+    """A part of the ship by her own name for it, among her `of` (`spars`, `sails`,
+    `lines`): 'the fore topmast', 'the fore topsail', 'the starboard main brace'; a line
+    or a sail by its name without the side ('the main brace') where the full name finds
+    none, the first of the pair. None when nothing of hers is called so."""
+    from freesail.orders.resolve import display_name, family_name
+
+    key = _key(words)
+    ids = list(getattr(ship, of, None) or ())
+    for pid in ids:
+        if _key(display_name(ship, pid)) == key:
+            return pid
+    for pid in ids:
+        if _key(family_name(ship, pid)) == key:
+            return pid
     return None
 
 
+def _spar_by_name(ship: Any, words: str) -> str | None:
+    """A spar of the ship by her own name for it ('the fore topmast'), or None."""
+    return _part_by_name(ship, words, "spars")
+
+
+def _anchor_by_name(ship: Any, words: str) -> str | None:
+    """An anchor of the ship by its name ('the best bower', 'the small bower'), or None."""
+    from freesail.ship.parts import ground_tackle
+
+    tackle = ground_tackle(ship) if ship is not None else None
+    key = _key(words)
+    for a in getattr(tackle, "anchors", None) or ():
+        if _key(a.name) in (key, f"{key} anchor") or _key(a.name).removesuffix(" anchor") == key:
+            return a.id
+    return None
+
+
+def _good_by_name(world: Any, words: str) -> str | None:
+    """A good in the hold by its name ('tin', 'the brandy'), or None."""
+    hold = getattr(world, "hold", None)
+    key = _key(words)
+    for good, tons in (getattr(hold, "goods", None) or {}).items():
+        if tons > 1e-9 and _key(good) == key:
+            return good
+    return None
+
+
+# The table's slots for a part of the ship or a thing of hers, each named by her own name
+# for it in the words ('the {spar} is found sprung': 'the fore topmast is found sprung'),
+# and how it is found from the words.
+SLOTS: dict[str, Any] = {
+    "spar": lambda world, words: _part_by_name(getattr(world, "ship", None), words, "spars"),
+    "sail": lambda world, words: _part_by_name(getattr(world, "ship", None), words, "sails"),
+    "line": lambda world, words: _part_by_name(getattr(world, "ship", None), words, "lines"),
+    "anchor": lambda world, words: _anchor_by_name(getattr(world, "ship", None), words),
+    "good": _good_by_name,
+}
+_SLOT = re.compile(r"\{(" + "|".join(SLOTS) + r")\}")
+
+
+def _slot_of(thing: dict[str, Any]) -> str | None:
+    """The slot the table's thing names in its words (`spar`, `sail`, ...), or None."""
+    for form in thing.get("words") or ():
+        m = _SLOT.search(str(form))
+        if m is not None:
+            return m.group(1)
+    return None
+
+
+def _target_words(world: Any, thing: dict[str, Any], target: str | None) -> str:
+    """The target in the report's words: 'the fore topmast', 'the best bower', 'tin'."""
+    from freesail.orders.resolve import display_name
+
+    if target is None:
+        return ""
+    slot = _slot_of(thing)
+    ship = getattr(world, "ship", None)
+    if slot in ("spar", "sail", "line"):
+        return f"the {display_name(ship, target)}"
+    if slot == "anchor":
+        from freesail.ship.parts import ground_tackle
+
+        tackle = ground_tackle(ship)
+        a = next((a for a in tackle.anchors if a.id == target), None) if tackle else None
+        return a.name if a is not None else target
+    return str(target)
+
+
+def _fill(words: str, thing: dict[str, Any], name: str) -> str:
+    """The table's words with its slot filled by the target's name."""
+    return _SLOT.sub(name, str(words))
+
+
+def _form_words(thing: dict[str, Any]) -> str:
+    """The thing's first form for the channel's answer, its slot as '<spar>' and so on."""
+    return _SLOT.sub(lambda m: f"the <{m.group(1)}>", str(thing["words"][0]))
+
+
 def _aboard_match(world: Any, body: str) -> tuple[dict[str, Any], str | None] | None:
-    """The table's thing the words name and, for a spar's, the spar's id: None when no
+    """The table's thing the words name and, for one with a slot, the target the slot
+    names (a spar's, a sail's or a line's id, an anchor's id, a good's name): None when no
     thing's words fit."""
     said = " ".join(re.sub(r"^aboard\s*:", "", body, flags=re.I).split()).lower().rstrip(".")
-    ship = getattr(world, "ship", None)
     for thing in aboard_table():
         for form in thing["words"]:
             form = " ".join(str(form).lower().split())
-            if "{spar}" not in form:
+            m = _SLOT.search(form)
+            if m is None:
                 if said == form:
                     return thing, None
                 continue
-            head, _, tail = form.partition("{spar}")
-            head, tail = head.strip(), tail.strip()
+            head, tail = form[: m.start()].strip(), form[m.end() :].strip()
             if not (said.startswith(head) and said.endswith(tail)):
                 continue
             inner = said[len(head) : len(said) - len(tail)].strip()
             if not inner:
                 continue
-            sid = _spar_by_name(ship, inner)
-            if sid is not None:
-                return thing, sid
+            target = SLOTS[m.group(1)](world, inner)
+            if target is not None:
+                return thing, target
     return None
 
 
@@ -2014,9 +2127,7 @@ def _aboard(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             return _aboard_transaction(world, *tx)
         if "," in _thing_words(body):
             return _aboard_thing(world, body)
-        forms = "; ".join(
-            str(t["words"][0]).replace("{spar}", "the <spar>") for t in aboard_table()
-        )
+        forms = "; ".join(_form_words(t) for t in aboard_table())
         raise WorldOrderError(
             f"An aboard order is one of the table's things ({forms}), or {ABOARD_FORMS}."
         )
@@ -2026,47 +2137,287 @@ def _aboard(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 def _aboard_found(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     """`aboard: <a thing found aboard>`: the thing's effect in the part graph or the
     stores, and its people's report as a notable line of the play log (the order itself
-    is for the record only, decision 46)."""
-    from freesail.orders.resolve import display_name
-
+    is for the record only, decision 46). A thing's effect that wants what she lacks (a
+    chronometer, a glass, spare canvas) changes nothing and is refused in words."""
     found = _aboard_match(world, body)
     if found is None:
-        forms = "; ".join(
-            str(t["words"][0]).replace("{spar}", "the <spar>") for t in aboard_table()
-        )
+        forms = "; ".join(_form_words(t) for t in aboard_table())
         raise WorldOrderError(f"An aboard order is one of the table's things: {forms}.")
-    thing, sid = found
-    ship = world.ship
+    thing, target = found
     effect = dict(thing.get("effect") or {})
-    name = f"the {display_name(ship, sid)}" if sid is not None else ""
+    name = _target_words(world, thing, target)
+    for key in effect:
+        lacking = _ABOARD_LACKS.get(key)
+        why = lacking(world) if lacking is not None else None
+        if why:
+            # the game has no way to do it as said: nothing changed, and the words say why
+            raise WorldOrderError(why)
     data: dict[str, Any] = {"thing": thing["id"]}
-    if "spar_condition" in effect:
-        spar = ship.parts[sid]
-        was = float(getattr(spar, "condition", 100.0))
-        spar.condition = min(was, float(effect.get("spar_condition") or SPRUNG_CONDITION))
-        data.update({"spar": sid, "condition": spar.condition, "was": was})
-        what = f"{name} sprung (its condition {spar.condition:g})"
-    elif "water_tons" in effect:
-        stores = getattr(world, "stores", None)
-        lost = float(effect["water_tons"])
-        if stores is not None:
-            taken = min(lost, max(0.0, float(stores.water_tons)))
-            stores.water_tons = max(0.0, float(stores.water_tons) - lost)
-            data.update({"water_tons_lost": taken, "water_tons": stores.water_tons})
-        what = f"a cask stove, {lost:g} ton of water lost"
-    elif effect.get("water_foul"):
-        stores = getattr(world, "stores", None)
-        if stores is not None:
-            stores.foul = True
-        data["water_foul"] = True
-        what = "the water found foul"
-    else:
-        what = f"{thing['id'].replace('_', ' ')} reported (nothing of the hull is modelled yet)"
+    whats = [
+        _ABOARD_EFFECTS[key](world, thing, target, name, value, data)
+        for key, value in effect.items()
+        if key in _ABOARD_EFFECTS
+    ]
+    if not whats:
+        unmodelled = str(thing.get("unmodelled") or "nothing of it is modelled yet")
+        whats = [f"{thing['id'].replace('_', ' ')} reported ({unmodelled})"]
         data["report_only"] = True
-    report = str(thing.get("report") or "").replace("{spar}", name)
+    report = _fill(str(thing.get("report") or ""), thing, name)
     report = report[:1].upper() + report[1:]
     world.record(Severity.NOTABLE, "aboard.found", report, data=data)
-    return f"found aboard: {what}", data
+    return f"found aboard: {'; '.join(whats)}", data
+
+
+# The effects a thing found aboard may have (`data/director/aboard.yaml`, `effect:`), each
+# a change to what the ship models, by the table's key: `(world, thing, target, the
+# target's name, the table's value, the line's data) -> the change in words`. Several keys
+# in one thing are each done, in the table's order. `report_only` (or no key) changes
+# nothing and says so.
+
+
+def _cut_condition(world: Any, target: str, value: Any, data: dict[str, Any], key: str) -> float:
+    part = world.ship.parts[target]
+    was = float(getattr(part, "condition", 100.0))
+    part.condition = min(was, float(value if value is not None else SPRUNG_CONDITION))
+    data.update({key: target, "condition": part.condition, "was": was})
+    return part.condition
+
+
+def _fx_spar(world, thing, target, name, value, data) -> str:
+    c = _cut_condition(world, target, value or SPRUNG_CONDITION, data, "spar")
+    return f"{name} {thing.get('state') or 'sprung'} (its condition {c:g})"
+
+
+def _fx_part(world, thing, target, name, value, data) -> str:
+    c = _cut_condition(world, target, value, data, "part")
+    return f"{name} {thing.get('state') or 'worn'} (its condition {c:g})"
+
+
+def _fx_cable(world, thing, target, name, value, data) -> str:
+    from freesail.ship.parts import ground_tackle
+
+    anchor = next(a for a in ground_tackle(world.ship).anchors if a.id == target)
+    was = float(anchor.cable_condition)
+    anchor.cable_condition = min(was, float(value))
+    data.update({"anchor": target, "cable_condition": anchor.cable_condition, "was": was})
+    return f"{name}'s cable chafed (its condition {anchor.cable_condition:g})"
+
+
+def _fx_water_tons(world, thing, target, name, value, data) -> str:
+    stores = getattr(world, "stores", None)
+    lost = float(value)
+    if stores is not None:
+        taken = min(lost, max(0.0, float(stores.water_tons)))
+        stores.water_tons = max(0.0, float(stores.water_tons) - lost)
+        data.update({"water_tons_lost": taken, "water_tons": stores.water_tons})
+    return f"{lost:g} ton{'' if lost == 1 else 's'} of water lost"
+
+
+def _fx_water_share(world, thing, target, name, value, data) -> str:
+    stores = world.stores
+    lost = max(0.0, float(stores.water_tons)) * min(max(float(value), 0.0), 1.0)
+    stores.water_tons = max(0.0, float(stores.water_tons) - lost)
+    data.update({"water_tons_lost": round(lost, 3), "water_tons": stores.water_tons})
+    return f"{lost:.1f} tons of water lost, {float(value):.0%} of what was in the tier"
+
+
+def _fx_water_foul(world, thing, target, name, value, data) -> str:
+    stores = getattr(world, "stores", None)
+    if stores is not None:
+        stores.foul = True
+    data["water_foul"] = True
+    return "the water found foul"
+
+
+def _fx_provisions_share(world, thing, target, name, value, data) -> str:
+    stores = world.stores
+    lost = max(0.0, float(stores.provisions_days)) * min(max(float(value), 0.0), 1.0)
+    stores.provisions_days = max(0.0, float(stores.provisions_days) - lost)
+    data.update({"provisions_days_lost": round(lost, 3), "provisions_days": stores.provisions_days})
+    return f"{lost:.1f} days of provisions lost, {float(value):.0%} of what was in store"
+
+
+def _fx_provisions_days(world, thing, target, name, value, data) -> str:
+    stores = world.stores
+    lost = min(float(value), max(0.0, float(stores.provisions_days)))
+    stores.provisions_days = max(0.0, float(stores.provisions_days) - lost)
+    data.update({"provisions_days_lost": round(lost, 3), "provisions_days": stores.provisions_days})
+    return f"{lost:.1f} days of provisions lost"
+
+
+def _fx_cargo(world, thing, target, name, value, data, share: bool = False) -> str:
+    from freesail.world.places import _tons
+
+    hold = world.hold
+    have = hold.goods.get(target, 0.0)
+    tons = have * min(max(float(value), 0.0), 1.0) if share else float(value)
+    cause = str(thing.get("cause") or "found spoiled")
+    tons = min(tons, have)
+    words = f"{_tons(tons)} of {target} struck off the manifest, {cause}"
+    lost = hold.lose(target, tons, words, world.clock.tick)
+    data.update({"good": target, "tons_lost": round(lost, 3), "tons": hold.goods.get(target, 0.0)})
+    return f"{_tons(lost)} of {target} struck off, {cause}"
+
+
+def _fx_cargo_share(world, thing, target, name, value, data) -> str:
+    return _fx_cargo(world, thing, target, name, value, data, share=True)
+
+
+def _fx_spare_sails(world, thing, target, name, value, data) -> str:
+    from freesail.ship.parts import sail_room
+
+    room = sail_room(world.ship)
+    bar = float(value)
+    hit = 0
+    for spare in room.sails:
+        if spare.condition > bar:
+            spare.condition = bar
+            hit += 1
+    data.update({"spare_sails_worn": hit, "spare_sails_condition": bar})
+    return f"{hit} spare sail{'' if hit == 1 else 's'} in the sail room worn to {bar:g}"
+
+
+def _fx_cordage_share(world, thing, target, name, value, data) -> str:
+    from freesail.ship.parts import cordage
+
+    store = cordage(world.ship)
+    lost = max(0.0, float(store.fathoms)) * min(max(float(value), 0.0), 1.0)
+    store.take(lost)
+    data.update({"cordage_fathoms_lost": round(lost, 1), "cordage_fathoms": store.fathoms})
+    return f"{lost:.0f} fathoms of spare cordage lost"
+
+
+def _fx_chronometer(world, thing, target, name, value, data) -> str:
+    c = world.navigation.chronometer
+    c.going = False
+    c.stopped = str(value) if isinstance(value, str) else "stopped of itself in its box"
+    data.update({"chronometer_stopped": True})
+    return f"{c.name} stopped"
+
+
+def _fx_glass(world, thing, target, name, value, data) -> str:
+    world.glass = None
+    world.ship.extra["glass_broken"] = True
+    data["glass_broken"] = True
+    return "the glass broken"
+
+
+def _fx_leak_stopped(world, thing, target, name, value, data) -> str:
+    # the grounding's leak (`world.ground`) stopped: the well gains no more, aground or not
+    extra = world.ship.extra
+    was = float(extra.get("leak_m_per_h", 0.0) or 0.0)
+    extra["leak_m_per_h"] = 0.0
+    data.update({"leak_stopped": True, "leak_m_per_h_was": round(was, 3)})
+    return "the leak stopped"
+
+
+def _fx_well_pumped(world, thing, target, name, value, data) -> str:
+    hull = world.ship.hull
+    was = float(hull.water_in_well_m)
+    hull.water_in_well_m = 0.0
+    ground = getattr(world, "ground", None)
+    if ground is not None:
+        # the carpenter's reports count the feet afresh from a dry well
+        ground._feet_said = 0
+        ground._waterlogged_said = False
+    data.update({"well_pumped": True, "well_m_was": round(was, 2)})
+    return f"the well pumped dry ({was:.2f} m of water pumped out)"
+
+
+_ABOARD_EFFECTS: dict[str, Any] = {
+    "spar_condition": _fx_spar,
+    "sail_condition": _fx_part,
+    "line_condition": _fx_part,
+    "cable_condition": _fx_cable,
+    "water_tons": _fx_water_tons,
+    "water_share": _fx_water_share,
+    "water_foul": _fx_water_foul,
+    "provisions_share": _fx_provisions_share,
+    "provisions_days": _fx_provisions_days,
+    "cargo_tons": _fx_cargo,
+    "cargo_share": _fx_cargo_share,
+    "spare_sails_condition": _fx_spare_sails,
+    "cordage_share": _fx_cordage_share,
+    "chronometer_stopped": _fx_chronometer,
+    "glass_broken": _fx_glass,
+    "leak_stopped": _fx_leak_stopped,
+    "well_pumped": _fx_well_pumped,
+}
+
+
+def _lacks_stores(world: Any) -> str | None:
+    return None if getattr(world, "stores", None) is not None else "she keeps no stores"
+
+
+def _lacks_chronometer(world: Any) -> str | None:
+    nav = getattr(world, "navigation", None)
+    c = getattr(nav, "chronometer", None)
+    if c is None:
+        return "she carries no chronometer"
+    if not c.going:
+        return f"{c.name} is stopped already"
+    return None
+
+
+def _lacks_glass(world: Any) -> str | None:
+    if getattr(world, "glass", None) is not None:
+        return None
+    extra = getattr(getattr(world, "ship", None), "extra", None) or {}
+    return "the glass is broken already" if extra.get("glass_broken") else "she carries no glass"
+
+
+def _lacks_sail_room(world: Any) -> str | None:
+    from freesail.ship.parts import sail_room
+
+    return None if len(sail_room(world.ship)) else "there is no spare canvas in the sail room"
+
+
+def _lacks_cordage(world: Any) -> str | None:
+    from freesail.ship.parts import cordage
+
+    return None if cordage(world.ship).fathoms > 0 else "there is no spare cordage in the store"
+
+
+def _lacks_hull(world: Any) -> str | None:
+    return None if getattr(world.ship, "hull", None) is not None else "she has no hull modelled"
+
+
+# What a thing's effect wants of the ship before it is done (else the game has no way to
+# do it as said, and nothing changes): by the effect's key, the reason she lacks it or None.
+_ABOARD_LACKS: dict[str, Any] = {
+    "water_share": _lacks_stores,
+    "provisions_share": _lacks_stores,
+    "provisions_days": _lacks_stores,
+    "spare_sails_condition": _lacks_sail_room,
+    "cordage_share": _lacks_cordage,
+    "chronometer_stopped": _lacks_chronometer,
+    "glass_broken": _lacks_glass,
+    "well_pumped": _lacks_hull,
+}
+# The keys the table's things may use: the effects and `report_only`.
+ABOARD_EFFECT_KEYS = frozenset(_ABOARD_EFFECTS) | {"report_only"}
+# The effects that fall on the target a slot names, by the slot every form must name.
+ABOARD_EFFECT_SLOTS: dict[str, str] = {
+    "spar_condition": "spar",
+    "sail_condition": "sail",
+    "line_condition": "line",
+    "cable_condition": "anchor",
+    "cargo_tons": "good",
+    "cargo_share": "good",
+}
+# The keys the table's `plausible_when` may use (`_doubt_aboard`).
+ABOARD_PLAUSIBLE_KEYS = frozenset(
+    {
+        "strained",
+        "sea_above",
+        "days_out",
+        "days_since_watered",
+        "wind_above",
+        "at_anchor",
+        "leaking",
+        "well_above",
+    }
+)
 
 
 # ---------------------------------------------------------------------------
@@ -2443,47 +2794,105 @@ def _doubt_person(world: Any, body: str) -> str | None:
 
 
 def _doubt_aboard(world: Any, body: str) -> str | None:
-    from freesail.orders.resolve import display_name
-
+    """The doubt of a thing found aboard (the table's `plausible_when`): every condition it
+    names must hold, else the thing's own `doubt` words."""
     found = _aboard_match(world, body)
     if found is None:
         return None
-    thing, sid = found
+    thing, target = found
     when = dict(thing.get("plausible_when") or {})
-    ship = world.ship
-    name = f"the {display_name(ship, sid)}" if sid is not None else ""
-    why = str(thing.get("doubt") or "the thing has no cause in the ship's state").replace(
-        "{spar}", name
+    why = _fill(
+        str(thing.get("doubt") or "the thing has no cause in the ship's state"),
+        thing,
+        _target_words(world, thing, target),
     )
-    if "strained" in when:
-        bar = float(when["strained"])
-        # a strain line of the spar's in the last watch, or a fresh mean wind
-        since = world.clock.tick - STRAINED_LOOKBACK_S
-        for e in reversed(world.log.all()):
-            if e.tick < since:
-                break
-            if e.kind.startswith("strain.") and (
-                e.data.get("part") == sid or float(e.data.get("ratio", 0.0) or 0.0) >= bar
-            ):
-                return None
-        record = getattr(world, "wind_record", None)
-        mean = record.mean_speed() if record is not None else None
-        if mean is not None and units.ms_to_knots(mean) >= STRAINED_WIND_KN:
-            return None
-        spar = ship.parts.get(sid) if sid is not None else None
-        if spar is not None and float(getattr(spar, "strain_ratio", 0.0)) >= bar:
-            return None
-        return why
-    if "sea_above" in when:
-        sea = getattr(world, "sea", None)
-        words = str(getattr(sea, "words", "") or "").lower() if sea is not None else ""
-        calm = [str(w).lower() for w in (when["sea_above"] or [])]
-        if sea is None or any(words == c or words.startswith(c) for c in calm):
+    for key, value in when.items():
+        if not _PLAUSIBLE[key](world, target, value):
             return why
-        return None
-    if "days_out" in when:
-        days = world.clock.tick / 86400.0
-        if days < float(when["days_out"]):
-            return why
-        return None
     return None
+
+
+def _mean_wind_kn(world: Any) -> float | None:
+    record = getattr(world, "wind_record", None)
+    mean = record.mean_speed() if record is not None else None
+    return units.ms_to_knots(mean) if mean is not None else None
+
+
+def _plausible_strained(world: Any, target: str | None, value: Any) -> bool:
+    """A strain line of the part's (or any above the figure) in the last watch, a fresh
+    mean wind, or the part above the figure now."""
+    bar = float(value)
+    since = world.clock.tick - STRAINED_LOOKBACK_S
+    for e in reversed(world.log.all()):
+        if e.tick < since:
+            break
+        if e.kind.startswith("strain.") and (
+            e.data.get("part") == target or float(e.data.get("ratio", 0.0) or 0.0) >= bar
+        ):
+            return True
+    mean = _mean_wind_kn(world)
+    if mean is not None and mean >= STRAINED_WIND_KN:
+        return True
+    parts = getattr(getattr(world, "ship", None), "parts", None) or {}
+    part = parts.get(target) if target is not None else None
+    return part is not None and float(getattr(part, "strain_ratio", 0.0)) >= bar
+
+
+def _plausible_sea_above(world: Any, target: str | None, value: Any) -> bool:
+    """The sea beyond the words named: she has been working."""
+    sea = getattr(world, "sea", None)
+    words = str(getattr(sea, "words", "") or "").lower() if sea is not None else ""
+    calm = [str(w).lower() for w in (value or [])]
+    return sea is not None and not any(words == c or words.startswith(c) for c in calm)
+
+
+def _plausible_days_out(world: Any, target: str | None, value: Any) -> bool:
+    """So many days of the ship's time since the voyage began."""
+    return world.clock.tick / 86400.0 >= float(value)
+
+
+def _plausible_days_since_watered(world: Any, target: str | None, value: Any) -> bool:
+    """So many days since she last took in water (the voyage's start, if she has not)."""
+    watered = int(getattr(getattr(world, "stores", None), "watered_tick", 0) or 0)
+    return (world.clock.tick - watered) / 86400.0 >= float(value)
+
+
+def _plausible_wind_above(world: Any, target: str | None, value: Any) -> bool:
+    """The mean wind at or above so many knots."""
+    mean = _mean_wind_kn(world)
+    return mean is not None and mean >= float(value)
+
+
+def _plausible_at_anchor(world: Any, target: str | None, value: Any) -> bool:
+    """She lies at anchor (an anchor down), or with `false` she does not."""
+    from freesail.ship.parts import ground_tackle
+
+    tackle = ground_tackle(getattr(world, "ship", None))
+    down = any(a.down for a in getattr(tackle, "anchors", None) or ())
+    return down == bool(value)
+
+
+def _plausible_leaking(world: Any, target: str | None, value: Any) -> bool:
+    """She is making water from a grounding (`world.ground`'s leak), or with `false` she
+    is not."""
+    extra = getattr(getattr(world, "ship", None), "extra", None) or {}
+    leaking = float(extra.get("leak_m_per_h", 0.0) or 0.0) > 0.0
+    return leaking == bool(value)
+
+
+def _plausible_well_above(world: Any, target: str | None, value: Any) -> bool:
+    """More than so many metres of water in the well."""
+    hull = getattr(getattr(world, "ship", None), "hull", None)
+    return hull is not None and float(hull.water_in_well_m) > float(value)
+
+
+_PLAUSIBLE: dict[str, Any] = {
+    "strained": _plausible_strained,
+    "sea_above": _plausible_sea_above,
+    "days_out": _plausible_days_out,
+    "days_since_watered": _plausible_days_since_watered,
+    "wind_above": _plausible_wind_above,
+    "at_anchor": _plausible_at_anchor,
+    "leaking": _plausible_leaking,
+    "well_above": _plausible_well_above,
+}

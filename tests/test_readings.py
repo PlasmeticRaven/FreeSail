@@ -82,10 +82,16 @@ def test_every_row_of_the_spec_is_registered():
 
 
 def test_absent_readings_carry_their_sentences():
-    for id, word in (("well", "well"),):
-        row = R.REGISTRY.get(id)
-        assert row.is_absent and row.getter is None
-        assert word in row.absent and "yet" in row.absent
+    # every row still absent says what it is and that it is not yet the ship's
+    for row in R.REGISTRY:
+        if row.is_absent:
+            assert row.getter is None and "yet" in row.absent, row.id
+    # the well arrived on 2026-10-21 (absent from package 33c): the carpenter's last
+    # sounding, None before one, in words that say how to have it sounded
+    row = R.REGISTRY.get("well")
+    assert not row.is_absent and row.kind == "well"
+    assert World(seed=1).readings["well"] is None
+    assert "sound the well" in World(seed=1).readings.words("well")
     # a sail in sight arrived with package 35 (spec M5 §25): the lookout's, the pilot
     # cutter the first sail; None without a chart, in the chart's words
     row = R.REGISTRY.get("sail_in_sight")

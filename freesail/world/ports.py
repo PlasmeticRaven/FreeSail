@@ -2886,6 +2886,12 @@ class Ports:
             if item == "water":
                 world.stores.water_tons += qty
                 done = f"{words} came off from the quay and was started into the ground tier"
+                # watered: the foul casks started and filled sweet, and the days since she
+                # watered counted afresh (the director's `aboard:` table reads them)
+                if getattr(world.stores, "foul", False):
+                    world.stores.foul = False
+                    done += ", the foul water started overboard and the casks filled sweet"
+                world.stores.watered_tick = world.clock.tick
                 paper = "the purser's books"
             elif item == "provisions":
                 world.stores.provisions_days += qty

@@ -7485,3 +7485,223 @@ the fast and slow tiers); the code as committed in `7ec7cb9`, the records in `01
   shorter than the run under the load.
 - **The pace tests alone** (`python3 -m pytest --slow -m pace -q -p no:cacheprovider`, the
   load 0.9 at their start and 1.2 at the end): 6 passed.
+
+## The things found aboard, widened (2026-10-19; the owner's ask, between packages)
+
+The owner's ask after reading the table (`data/director/aboard.yaml`): more things a director
+may find aboard. The table had four, and their effects were four branches of
+`orders._aboard_found`, one effect a thing, one condition of `plausible_when` read (the
+first), and a slot for a spar alone. Widened, without a package of its own:
+
+- **Slots** (`orders.SLOTS`): `{spar}`, `{sail}`, `{line}` (a rope by its full name, or by
+  its name without the side for the first of the pair), `{anchor}` (`the best bower`, `the
+  sheet anchor`) and `{good}` (a good in the hold); one slot a thing, every form naming it
+  where an effect falls on it, said at the table's load.
+- **Effects** (`orders._ABOARD_EFFECTS`), several to a thing, each done in turn:
+  `sail_condition`, `line_condition` and `cable_condition` beside `spar_condition` (only ever
+  cut); `water_share`, `provisions_share` and `provisions_days` beside `water_tons`;
+  `cargo_tons`/`cargo_share` (struck off the manifest with the thing's `cause` in the
+  hold's new `losses` ledger, `Hold.lose`); `spare_sails_condition`; `cordage_share`;
+  `chronometer_stopped` (the chronometer's new `stopped` words in its reading, cleared by
+  `wind the chronometer`); `glass_broken` (`world.glass` none, the readings' new
+  `GLASS_BROKEN_WORDS`). An effect wanting what she lacks (`orders._ABOARD_LACKS`: no
+  chronometer, no glass, no spare canvas or cordage, no stores) is the game's "no way as
+  said", nothing changed. A `report_only` thing says its own `unmodelled` words (the seam's
+  are the hull's still; the default no longer claims the hull for weevils).
+- **Conditions** (`orders._PLAUSIBLE`), every one named held together: `days_since_watered`
+  (the stores' new `watered_tick`, set at the yard's water; the water found foul now reads
+  it in place of `days_out`), `wind_above` (the mean wind) and `at_anchor` beside the three.
+- **Found and fixed:** the water found foul stayed foul for the voyage, since taking in water
+  never cleared it; the yard's water now starts the foul casks and fills them sweet, said in
+  its line ("..., the foul water started overboard and the casks filled sweet").
+- **Unknown keys refuse the table at its load**, in words naming the key and the keys known.
+
+Eighteen things added, twenty-two in all; each figure and share is judgement, its source or
+"judgement" in the table. **Pins:** none moved; no recorded passage gives an `aboard:` order
+or waters with her water foul, and a world with neither reads as it did (the new fields are
+class defaults and the yard's line is unchanged where the water is sweet).
+`tests/test_aboard_found.py` (ten tests) and `tests/test_director.py`'s count of the table.
+
+## The hull's repair, a hotfix (2026-10-21; the owner's ask, between packages)
+
+The cutter grounded off Horta in the Western Islands run (soft sand, struck at five knots:
+a leak of about 0.08 m an hour while she lay aground, the carpenter's "strained on the
+ground and making water"), and nothing in the game could stop the leak or empty the well:
+the pumps and the carpenter's work are milestone 7's (taking on water). Two things are added to the
+director's table (`data/director/aboard.yaml`, under "the hull's repair") until then:
+
+- `leak_stopped` (`the leak stopped`, `the leak found and stopped`, `the leak fothered`,
+  `her strained seams caulked`): the effect `leak_stopped` sets `ship.extra["leak_m_per_h"]`
+  to nought, so `world.ground`'s well gains no more, aground or afloat; doubted by the new
+  condition `leaking` when she is making no water.
+- `well_pumped` (`the well pumped out`, `the well pumped dry`, `she is pumped out`,
+  `the ship pumped out`): the effect `well_pumped` empties `hull.water_in_well_m` and has
+  the carpenter count the feet afresh (`Ground._feet_said`, `_waterlogged_said`); doubted by
+  the new condition `well_above` (metres) when the well is dry.
+
+What the code shows of the grounding as it stands, for the milestone: the leak runs only
+while she is aground (`Ground.tick` calls `_leak` only then), so a ship floated off makes no
+more water and keeps what is in the well; and the well's water is read by nothing but the
+carpenter's lines (no displacement, trim or handling), so the hotfix is the story's beat and
+the well's word, not the ship's behaviour. At five knots the blow of the strike (a ratio of
+0.69) is under the strain's decay ratio and the masts are untouched.
+
+Twenty-four things in all. **Pins:** none moved; no recorded passage gives either order.
+`tests/test_ground.py`'s
+`test_the_director_stops_the_leak_and_pumps_her_out_and_the_well_stays_dry` (the frigate on
+the Manacles: doubted before the strike, done after, the well held then emptied, the same
+after a replay), and the table's counts in `tests/test_aboard_found.py` and
+`tests/test_director.py`.
+
+## The kedging off (2026-10-21; the owner's ask, between packages)
+
+The same grounding off Horta: the captain ordered `lay out a kedge` aground and it was
+refused, "she is aground". That was the guard `LayOutKedgeScript.check` kept with the
+anchor work's others, though carrying out a kedge is the remedy for a ship on the ground.
+Behind the refusal, a kedge could not have helped: aground, `physics/integrate.py` holds
+her position and swing whatever the cable pulls, and only the tide's foot under her keel
+(`AFLOAT_MARGIN_M`) floated her. The owner's ruling: the honest and conservative way, as
+an option, not a quick way off.
+
+- **The kedge laid out aground**: the guard is gone; the boat, the depth and the hawse
+  checks stand as they were.
+- **The capstan's pull on a ship the ground holds** (`physics/anchor.py`): a cable hove in
+  aground no longer has the heaving's exemption from dragging, so past what its anchor
+  holds the anchor comes home along the ground, as an anchor's does when she rides by it.
+  Without this the scope came in on a ship that could not move and the tension rose
+  without limit.
+- **The ground's grip and the heave off** (`world/ground.py`, `Ground._heave_off`): each
+  tick she is held, the pull of her taut cables (each no more than `min(tension, what its
+  anchor holds)`, their directions summed) against `grip_kn`: friction
+  (`GRIP_FRICTION_SOFT` 0.4 on sand, mud or shell; `GRIP_FRICTION_ROCK` 0.8 on a rock) times
+  the weight the bottom bears, the sea's weight over her waterplane
+  (`WATERPLANE_COEFFICIENT` 0.75 of length by beam) to the depth of water she lacks under
+  her keel at her own draught, capped at her displacement's weight. Within the afloat
+  margin she lacks none, and any strain heaves her off. When the pull is the greater and
+  the water `HEAVE_OFF_STEP_FRACTION` (a quarter) of her length along it is deep enough for
+  her draught (the tiles and the charted dangers), she is moved there and afloat: "She is
+  hove off by the kedge, and afloat again[ on the flood]." (`ship.afloat`, data
+  `kedged: true`). Else she lies as she is; the kedge coming home (its distance from her
+  lessening while she is held) is said once a grounding, `ground.kedge_home`.
+
+All judgement. **What it does** on Falmouth bank (the frigate, two fathoms and a half,
+taken on the ebb, her 300 kg kedge laid out to the east and hove in to twenty fathoms): at
+low water the kedge holds 8.6 kN against a grip of 617 kN and comes home; on the flood she
+is hove off at tick 28020, 21 minutes before the tide alone floats her at 29280. A ship
+riding by a taut bower to seaward when she grounds is helped the same way, as she would
+be. Lightening her (starting the water, the guns overboard) is not modelled.
+
+**Pins:** none moved. `test_director.py`'s starter-brief test asked for the briefs folder
+to hold exactly the five starters, and failed on the owner's own
+`interesting-passage-nobudget.yaml` (2026-10-19) before its useful checks ran; it now
+asks that the five be among them, and checks every brief the same. `tests/test_ground.py`'s
+`test_a_kedge_laid_out_aground_and_hove_taut_heaves_her_off_before_the_flood_alone`.
+
+## The well, sounded (2026-10-21; the owner's ask, between packages)
+
+`sound the well` was refused at every asking with "The ship has no well to sound yet;
+that reading comes with the world": package 33c registered `the well` absent, and the row
+stayed absent when package 34 gave the hull its water (`hull.water_in_well_m`, the
+grounding's leak). The owner found it after the grounding off Horta.
+
+- **The reading** `the well` (`api/readings.py`, kind `well`): the carpenter's last
+  sounding, kept in `ship.extra["well_sounded"]` (tick, metres, words), in feet and inches
+  ("a foot and an inch of water in the well", "the well dry"); before one, "the well not
+  sounded yet: 'sound the well' has the carpenter sound it".
+- **The order** `sound the well` (also `sound the pump well`, `sound the pumps`): routed
+  away from the lead in `orders._carry_out` to `world.ground.sound_well`, which sounds to
+  the inch and says against the last sounding whether she gains, holds or is less
+  ("The carpenter sounds the well: a foot and an inch of water, and gaining."; event
+  `well.sounded`). It needs no chart: every ship has a well.
+- **In a condition** the well is refused in its own words (`grammar.WELL_NOT_COMPARED`):
+  it is read, not compared, until milestone 7's pumps (taking on water) give it a rule.
+- **The starter book** loses its `sound the well` order, held there since 33c: live, it
+  would sound a dry well every glass in every log. Its comment says how to enter it. The
+  agents' tool page no longer marks it refused.
+
+Cosmetic still: the water moves nothing of her trim or handling. **Pins:** the reading
+moved none; the starter book's order going took its two held lines ("entered ... Held
+until ...") out of every passage that reads the book: gate 5a's day under systems alone
+(623 lines, `1680cb1391720dd8`; 625 and `bff57a00218b7ec5` before), gate 5b's passage
+(731, `9a1f2802ba7c6533`; 733, `c8c81b7617e4e0fd`) and its thick passage (469,
+`6f062dc60419f52c`; 471, `155a46cede6c96a3`); truth 49 no longer finds the well's order
+among the saved inputs. The starter book's count is seven where the tests counted it
+(`test_agents.py`, `test_orders_m4a.py`, `test_weather_script.py`; `test_replay.py`'s
+eight with "trim"), and the held well's rows in `test_orders.py`'s playtest refusals and
+`test_python_api.py` read it entered. Each re-pin was proven the starter's by restoring
+the absent row and the held order together (the old pins came back).
+
+**Failing before this work, not moved by it** (the full suite with the slow tier on
+2026-10-21; each fails the same with the old well, the old anchor rule and the heave-off
+all restored): the merchant passage's pilot aboard (96480 for 96540), the schooner's
+octant passage, the schooner on an intent alone, truths 77, 78 and 79, and the Ushant
+captain trial's digest. *Corrected by the lead at the fold-in (2026-10-23, from the cold
+review of the 22nd): the cause first written here, "the 2026-10-19 evening changes to
+`world/ports.py`, `reckoning.py`, `places.py` and `sights.py`", was the hotfix session's own
+first batch of 20 October read with local file times as UTC; those seven fail the same on
+an untouched `953caab` and on the session's pristine copy, on the owner's Windows machine,
+and pass on the lead's Linux machine and the release workflow's runner. They are a
+cross-platform question (determinism or drift), not a regression of any change here;
+the whole suite is to be dispatched on both CI runners to settle it (R-58), and no re-pin
+session goes after those four files.* On the owner's machine also `test_harbour.py`'s
+maker (a Windows path separator in the refusal, to fix) and truth 7b-108 (the harbour's
+banner not captured).
+`test_standing.py`'s `test_the_well_is_sounded_every_glass_and_read_and_replays` replaces
+`test_the_well_is_held_in_the_book_and_never_fires`, and the absent sentences' test reads
+every absent row (none is left).
+
+## Open, for the lead: found in the Western Islands run (2026-10-21; not fixed)
+
+Found while directing the owner's run off Horta, after the work above, and left for the
+lead by the owner's word:
+
+- **The swing at the turn of the tide logs over and over.** `core/world.py` `_tick_tide`
+  records `ship.swung` ("The cable slack at the turn; she swings to the flood/ebb.")
+  whenever `TideState.flood` differs from `_tide_was_flood`. `flood` is `None` only when
+  the stream is under a tenth of the rate (`world/tide.py`, `slack`); just above that, and
+  where a constant `current_kn` is added, the stream's direction wobbles about the axis's
+  perpendicular and the flag flips minute to minute, so a ship at anchor at the turn
+  logs the swing to flood and to ebb a dozen times. It is not only the turn: at Horta it
+  ran from 21:18 through the middle watch, every minute at first and then a pair (ebb,
+  then flood a minute later) every five or six minutes for hours, so look too at whether
+  the stream is read at her position as she sheers about 240 fathoms of cable, and the
+  position moves across a place where the stream's direction changes. A fix: hold the new flood or ebb some
+  minutes (ten, say) before the line and before `_tide_was_flood` moves, the counter a
+  class-level default so a checkpoint-restored world does not crash (as `Ground` needed
+  for `_anchor_dist`). It will move the pins of any anchored passage that spans a turn.
+- **Weighing a kedge aground is refused** (`WeighAnchorScript` still checks `aground`;
+  `LayOutKedgeScript` no longer does).
+- **"Man the pumps" is refused in stale words**, now that the well is a reading.
+- **Sail's thrust aground is not modelled**: only the cable heaves her off.
+- **"Brought up" is logged while she is aground.**
+- **The officer of the watch's words are labelled "The captain to the captain"** in the
+  log (02:27 and 02:29 at Horta, with the captain back aboard), and "(nobody holds the
+  station ...)" is added, though the officer answered him.
+- **A thing cannot pass from an unheld person to a held one.** Mr Pearce's `take a sealed
+  letter for Falmouth` from Senhor Bettencourt logged "took ..., as said; nothing of the
+  ship's changed" and left it in Bettencourt's keeping, and the director may not put it
+  in a held person's keeping either (`_aboard_reach`). The way round was to lay it on the
+  desk ashore for him to pick up. Wanted: an unheld person's `give` by the director, or a
+  held person's `take` from someone within earshot who offers it.
+- **A name said in full is refused in the wrong words.** Ashore, Mr Pearce's "Say to Mr
+  Josiah Hale ..." was refused twice with "The officer of the watch has not the deck";
+  "Say to Mr Hale ..." went through. The full name should match, or the refusal say the
+  name was not known.
+- **The director cannot put stores aboard.** The `aboard:` table only takes water and
+  provisions away (`water_tons`, `provisions_days`, the shares); a merchant who sends
+  provisions or water out with his lighters has no order for it. The captain's own `send
+  for provisions for 8 days` (the yard's, `ports.py`) does it at the yard's price. Wanted:
+  an `aboard:` form for stores received, and no form to walk an unheld person ashore from
+  one place to another (`person: "<name>" goes to the quay` is refused).
+- **The director's stand-by events misfire at weighing.** Standing by "under way" woke at
+  23:13 when the small bower was catted, the best bower still down; standing by "the
+  anchor weighed" did not wake at 00:23 when "Under way ..., the best bower catted and
+  fished" was logged. And a stand-by can't be changed while it runs without `say` putting
+  words in the log.
+- **A thing put in the boat stays aboard.** The captain put the Madeira case in the boat;
+  the boat went in with Mr Pearce and came back, and the case was still "in the boat on
+  the quarterdeck".
+- **Not understood or refused:** "ring the bell" and "strike the bell" (a fog signal, or to
+  guide a boat in); "send a letter to ..." (but "send the boat with a letter" is taken);
+  "pawl the capstan"; "send the larboard watch below";
+  the "storm trysail" asked by a name the rig does not carry.

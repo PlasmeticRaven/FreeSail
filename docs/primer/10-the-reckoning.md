@@ -243,7 +243,7 @@ Every reading may be asked at the prompt: type its words, alone or after `what i
   Afternoon watch (12:32)  The bearing of the Lizard: not in sight.
 ```
 
-A question is never journaled and changes nothing aboard; a reading the ship has not got answers so ("The ship has no well to sound yet; that reading comes with the world.").
+A question is never journaled and changes nothing aboard; a reading with nothing in it yet says so in its own words (the well before the carpenter has sounded it: "the well not sounded yet: 'sound the well' has the carpenter sound it").
 
 ## Every form, in a table
 

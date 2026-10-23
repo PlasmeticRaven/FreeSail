@@ -112,10 +112,10 @@ def standing_voyage() -> World:
     w.run(300)
     w.submit("set the studdingsails, both sides")
     for text in read_orders_file(STARTER):
-        # the well's line was refused at load (spec §6) until package 33c, which holds it
-        # in the book instead; the voyage loads the others, as it always has.
-        if "sound the well" not in text:
-            w.submit(text)
+        # the well's line was refused at load (spec §6) until package 33c, which held it in
+        # the book instead; it has left the book (2026-10-21), and the voyage loads the
+        # rest, as it always has.
+        w.submit(text)
     w.submit('standing order "trim": every 10 minutes then trim sails')
     w.run(1500)
     w.submit('belay standing order "keep her full"')

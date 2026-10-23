@@ -379,6 +379,14 @@ _DISTANCE_HEADS = ("the distance to", "distance to", "the distance of", "distanc
 # the words that may follow a sail's or a part's name in a condition (package 32b)
 _AFTER_PART = frozenset({"is", "are", "isn't", "aren't", "exceeds", "exceed"}) | _STOP
 
+# The well's refusal in a condition (2026-10-21): it is a reading of the carpenter's last
+# sounding, and nothing is compared with it until the pumps (milestone 7, taking on
+# water) give it a rule.
+WELL_NOT_COMPARED = (
+    "The well is read, not yet compared in a standing order: 'sound the well' has the "
+    "carpenter sound it, and 'the well' says what he found."
+)
+
 # What each kind is compared with, for the refusal that names the word.
 _HOW = {
     "speed": ("a speed", "in knots"),
@@ -410,6 +418,7 @@ _HOW = {
     "distance": ("a distance", "in miles: 'exceeds 20 miles'"),
     "ground": ("the ground", "by what the lead brings up: 'is sand', 'is not rock'"),
     "person": ("a person", "by his place: 'is on deck', 'is below'"),
+    "well": ("the well", "by nothing yet: it is read ('sound the well'), not compared"),
     "tendency": (
         "the glass",
         "by its tendency: is steady, is rising, is falling, is falling fast, is rising fast, "
@@ -685,6 +694,9 @@ def _parse_comparison(
     if all(c.is_absent for c in cands):
         raise OrderError(cands[0].absent or f"The ship has no reading '{match.phrase}' yet.")
     cands = [c for c in cands if not c.is_absent]
+    if all(c.kind == "well" for c in cands):
+        # the well is read, not compared, until milestone 7's pumps (taking on water) give it a rule
+        raise OrderError(WELL_NOT_COMPARED)
     stop = next((k for k in range(i, len(tokens)) if tokens[k] in _STOP), len(tokens))
     tail = tokens[i:stop]
     tail_words = " ".join(tail)

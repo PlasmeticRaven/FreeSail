@@ -311,8 +311,9 @@ def test_refusals_are_the_dialects_and_come_at_registration(unbound):
     def sound():
         order("sound the well")
 
-    # package 33c: held in the book until the well is a reading, as the dialect's twin is
-    assert sound.rule.held is not None and "no well to sound" in sound.rule.held
+    # entered and live, as the dialect's twin is: the well is a reading (2026-10-21; it was
+    # held in the book from package 33c)
+    assert sound.rule.held is None
 
     with pytest.raises(OrderError, match="only be called inside"):
         order("set the royals")

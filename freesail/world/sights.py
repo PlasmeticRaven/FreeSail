@@ -351,6 +351,10 @@ class Chronometer:
     forgotten: tuple[date, ...] = ()  # the days the master forgets to wind it (scenario)
     wound_days: list[date] = field(default_factory=list)
     where: str = ""  # where it was rated: "Plymouth"
+    # why it stopped, when it stopped of something other than its winding (the director's
+    # `aboard:` table: "found stopped"): the words its reading gives, cleared when it is
+    # wound and set going again; a class default, so that a checkpoint from before loads
+    stopped: str = ""
 
     @classmethod
     def from_scenario(
@@ -437,7 +441,8 @@ class Chronometer:
         now = world.clock.ship_time
         days = int(self.days_since_rated(now))
         if not self.going:
-            return f"{self.name} is dead, not having been wound; {days} days from its rating"
+            why = getattr(self, "stopped", "") or "not having been wound"
+            return f"{self.name} is dead, {why}; {days} days from its rating"
         gmt = self.masters_gmt(greenwich_time(world), now)
         since = (now - self.wound_at).total_seconds()
         if self.wound_at.date() == now.date():

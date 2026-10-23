@@ -188,7 +188,7 @@ the well
 ```
   Forenoon watch (10:00)  The true wind: 15 knots, from N, at the mean.
   Forenoon watch (10:00)  The fore topsail: set.
-  Forenoon watch (10:00)  The well: the ship has no well to sound yet; that reading comes with the world.
+  Forenoon watch (10:00)  The well: the well not sounded yet: 'sound the well' has the carpenter sound it.
 ```
 
 ## Seeds, saving and replaying

@@ -182,7 +182,7 @@ Moored with the best bower to the WNW and the small bower to the NNE, sixty fath
 each; the hawse open to the SW.
 ```
 
-`lay out a kedge to the NE` hoists out the boat with the kedge slung over her stern and a hawser coiled in her; she pulls out at four knots paying it out, lets the kedge go three-quarters of the hawser off on the bearing given, and comes back; the hawser is taken to the capstan. Twenty minutes, and the kedge is down on the ground tackle's list. Warping her up to it is not yet modelled: the kedge holds, as any anchor down does, and `weigh` takes it up again. The game keeps the two cables of a moor as two anchors down and does not yet foul the hawse.
+`lay out a kedge to the NE` hoists out the boat with the kedge slung over her stern and a hawser coiled in her; she pulls out at four knots paying it out, lets the kedge go three-quarters of the hawser off on the bearing given, and comes back; the hawser is taken to the capstan. Twenty minutes, and the kedge is down on the ground tackle's list. Warping her up to it is not yet modelled: the kedge holds, as any anchor down does, and `weigh` takes it up again. Aground it is laid out the same, and hove taut it heaves her off as the tide makes (chapter 13, taking the ground). The game keeps the two cables of a moor as two anchors down and does not yet foul the hawse.
 
 ```orders frigate plain-sail
 # rejected: lay out a kedge to the moon

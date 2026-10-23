@@ -317,7 +317,6 @@ standing order "shorten sail for weather": when the true wind exceeds 30 knots f
 standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
 standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
 standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; shift the fore topmast staysail for the fore storm staysail
-standing order "sound the well": every glass then sound the well
 standing orders
 show standing order "keep her full"
 belay standing order "keep her full"

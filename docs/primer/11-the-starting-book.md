@@ -56,7 +56,7 @@ standing order "tend the sheets": every glass, if the manoeuvre in hand is not h
 standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails
 ```
 
-**The well.** Sounding the well every glass is the pump routine of Luce's day. The ship has no well yet, so the order is entered in the book and held, the line that enters it saying why, and it never fires until the well is a reading; it is kept so that the book is complete when the well arrives.
+**The well.** Sounding the well every glass is the pump routine of Luce's day, and the book kept it, held and silent, while the ship had no well. The well is a reading now, the carpenter's last sounding, and the order has left the starter book: there it would sound a dry well every glass in every log. The water in the well is a grounding's leak's and nothing else's yet, and moves nothing of her handling (the pumps are a later milestone's). A captain who has taken the ground enters it himself, and the carpenter says each glass whether she gains:
 
 ```orders frigate
 standing order "sound the well": every glass then sound the well

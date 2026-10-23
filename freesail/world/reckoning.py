@@ -5053,6 +5053,7 @@ class Navigation:
 
         self.bring_up()
         c.going = True
+        c.stopped = ""
         c.wind(t)
         # the master sets it from the local time by the sun and his longitude by account
         c.set_error_s = (world.position.lon_deg - self.reckoning.lon_deg) * _SECONDS_PER_DEG

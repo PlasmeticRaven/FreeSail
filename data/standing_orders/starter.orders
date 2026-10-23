@@ -120,10 +120,9 @@ standing order "heavy weather": when the true wind exceeds 40 knots for 5 minute
 
 # Sounding the well every glass is the pump routine of Luce's day ("Pump the ship out",
 # Luce 1866, ch. XXXII, daily routine at sea, morning watch art. III and dog watch art.
-# III). The ship has no well yet (spec M4 §24 item 4; milestone 5 brought the glass and
-# the chart, not the well), so this order is entered in the
-# book and held, saying "The ship has no well to sound yet", and it never fires until the
-# well is a reading (package 33c; before, it was refused at every start, a line of noise
-# in every log since milestone 4a); it is kept here so that the book is complete when the
-# well arrives.
-standing order "sound the well": every glass then sound the well
+# III). The book held it from package 33c, silent, while the ship had no well (spec M4 §24
+# item 4; milestone 5 brought the glass and the chart, not the well). The well is a reading
+# now (2026-10-21: the carpenter's sounding, the water the grounding's leak puts in it),
+# and the order has left this book: entered here it would sound a dry well every glass in
+# every log. A captain who has taken the ground enters it himself, as a standing order
+# named "sound the well": every glass then sound the well.

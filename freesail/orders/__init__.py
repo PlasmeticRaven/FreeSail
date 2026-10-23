@@ -195,8 +195,17 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import navigation
 
         if order.object and order.verb in LEAD_VERBS:
-            # "sound the well" (package 33c): the well is a reading the ship has not got
-            # yet, and the registry says so; the lead is not hove for it
+            if _names_the_well(order.object):
+                # "sound the well": the carpenter's sounding, never the lead (package 33c
+                # refused it while the well was an absent reading; 2026-10-21)
+                from freesail.world.ground import sound_well
+
+                world = prompt.world_of(ship)
+                if world is None:
+                    raise OrderError("She has no well to sound: the ship sails alone.")
+                text, data = sound_well(world)
+                return "well.sounded", text, {"verb": "sound the well", "level": 1} | data
+            # a reading the ship has not got yet, named after the lead's verb
             absent = prompt.absent_named(order.object)
             if absent is not None:
                 raise OrderError(absent)
@@ -258,6 +267,12 @@ def _stores_order(text: str) -> Order | None:
 
 # The navigation verbs that heave a lead (`data/vocabulary.yaml`).
 LEAD_VERBS: tuple[str, ...] = ("heave the lead", "heave the deep sea lead")
+
+
+def _names_the_well(words: str) -> bool:
+    """'the well', 'the pump well', 'well': the object of `sound` is the well's."""
+    norm = " ".join(str(words).lower().replace("-", " ").split())
+    return norm in ("well", "the well", "the pump well", "pump well", "the pumps", "the pump")
 
 
 def _set_reefed(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, dict[str, Any]]:

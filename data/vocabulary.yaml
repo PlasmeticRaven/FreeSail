@@ -1920,7 +1920,7 @@ refused_phrases:
   make a signal: *colours
   make the signal: *colours
   hoist a signal: *colours
-  man the pumps: &pumps "The pumps are not worked in this game yet: she makes no water through her seams or a shot hole, and the well is not sounded (the hull's damage is a later milestone's). 'Sound the well' says so."
+  man the pumps: &pumps "The pumps are not worked in this game yet: the well is sounded and read ('sound the well', 'the well'), but pumping, leaks and shot holes come with milestone 7's taking on water; until then the director's hand may have the well pumped out ('aboard: the well pumped out'). 'Sound the well' reads it."
   rig the pumps: *pumps
   work the pumps: *pumps
   pump ship: *pumps

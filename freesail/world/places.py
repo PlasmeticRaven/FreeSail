@@ -353,6 +353,9 @@ class Hold:
     # the freights engaged (package 53b; `freight`): (tick, tons, good, the words with the
     # cause); none for a hold the channel has not touched, or of a checkpoint from before
     freights: list[tuple[int, float, str, str]] = field(default_factory=list)
+    # the cargo found spoiled and struck off (the director's `aboard:` table, `lose`):
+    # (tick, tons, good, the words with the cause); as `freights`
+    losses: list[tuple[int, float, str, str]] = field(default_factory=list)
 
     @property
     def stowed_tons(self) -> float:
@@ -385,9 +388,22 @@ class Hold:
             self.freights = []  # a checkpoint from before
         self.freights.append((tick, float(tons), str(good), str(words)))
 
+    def lose(self, good: str, tons: float, words: str, tick: int) -> float:
+        """Cargo found spoiled and struck off the manifest (the director's `aboard:` table):
+        no more than the hold has of the good, broken out with the ledger's line and its
+        cause. Returns the tons struck off."""
+        tons = min(float(tons), self.goods.get(good, 0.0))
+        if tons <= 1e-9:
+            return 0.0
+        self.break_out(good, tons)
+        if getattr(self, "losses", None) is None:
+            self.losses = []  # a checkpoint from before
+        self.losses.append((tick, tons, str(good), str(words)))
+        return tons
+
     def lines(self) -> list[str]:
         """The manifest's lines: the room and the cargo by tons, and the freights engaged
-        with their causes where there are any."""
+        and the cargo struck off with their causes where there are any."""
         if self.capacity_tons <= 0:
             return ["No room for a cargo: the hold is her own stores and ballast."]
         head = (
@@ -396,7 +412,7 @@ class Hold:
         )
         freights = [
             f"{w[:1].upper()}{w[1:]}." for _t, _n, _g, w in getattr(self, "freights", None) or []
-        ]
+        ] + [f"{w[:1].upper()}{w[1:]}." for _t, _n, _g, w in getattr(self, "losses", None) or []]
         if not self.goods:
             return [head, "No cargo aboard.", *freights]
         return [head, *(f"{_tons(t)} of {g}." for g, t in self.goods.items()), *freights]
@@ -509,6 +525,10 @@ class Stores:
     allowance: float = 1.0
     expended_days: float = 0.0
     expended_tons: float = 0.0
+    # the tick she last took in water (the director's `aboard:` table reads the days since
+    # for a thing found foul, `days_since_watered`): 0, the voyage's start, until she
+    # waters; a class default, as `foul`
+    watered_tick: int = 0
 
     def lines(
         self, complement: int, water_days: float | None = None, day_words: str = ""

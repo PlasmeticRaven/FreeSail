@@ -434,12 +434,12 @@ def test_the_grammar_page_holds_the_standing_dialect_in_full():
     )
     lines = read_orders_file(ROOT / "data/standing_orders/starter.orders")
     # the sheets tended every glass (package 32e); the storm staysail's companion order
-    # folded into heavy weather (package 37p)
-    assert len(lines) == 8
+    # folded into heavy weather (package 37p); the well's order gone (2026-10-21)
+    assert len(lines) == 7
     for line in lines:
         assert f"  {line}" in dialect
         e = world.submit(line)
-        assert e.kind == "standing.given", e.text  # the well's held (package 33c)
+        assert e.kind == "standing.given", e.text
     # the standing sentences are listed once, with the dialect, not among the verbs above it
     assert page.count("strike standing order") == 1
 

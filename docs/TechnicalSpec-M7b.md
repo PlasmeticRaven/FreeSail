@@ -162,6 +162,18 @@ guardrail enforced on every one:
 - **Aboard:** `aboard: the fore topmast is found sprung`, `aboard: a cask found stove`, the
   carpenter's and the purser's reports, from a table of things that can be found aboard
   (`data/director/aboard.yaml`), each with what it does in the part graph or the stores.
+  **As built, widened by the owner's hotfix of 20 October 2026** (reviewed and folded in on
+  the 23rd): twenty-four things, each with a plausibility rule and its doubt, a `harm`
+  level under the brief's "nobody dies", a report in a period voice and an effect on a
+  modelled quantity where one exists ("nothing modelled yet" said where none does): spars
+  sprung and rotten, sails and lines chafed, canvas mildewed, cordage spoiled, casks stove
+  and leaking, the water foul (cleared by watering) and brackish, the bread spoiled, the
+  meat rotten, rats and weevils, the cargo wet, the chronometer stopped, the glass broken,
+  the compass sticking, a seam working, the bilge foul; and two forms of the hull's
+  repair, `aboard: the leak stopped` and `aboard: the well pumped out`, labelled stopgaps
+  that set two quantities at once with no time or hands, until milestone 7's taking on
+  water brings the pumps and the carpenter's work (the well is sounded and read since the
+  same hotfix: `sound the well`, `the well`).
 - **The news and the letters:** `news:` (a war declared, a peace made, a price heard) and
   `letter:` as they stand.
 - **The mark:** 45c's `mark:` point of interest.

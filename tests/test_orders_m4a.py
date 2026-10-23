@@ -312,28 +312,25 @@ STARTER_NAMES = [
     "trim on a shift",
     "tend the sheets",  # package 32e: the sheets tended every glass
     "heavy weather",  # package 37p: it sets the storm staysails, the companion order gone
-    "sound the well",  # package 33c: held in the book until the well is a reading
 ]
 
 
-def test_the_starter_file_loads_in_the_console_with_the_well_held_and_the_rest_entered():
+def test_the_starter_file_loads_in_the_console_and_every_order_is_entered():
     out = io.StringIO()
     con = Console(close_hauled_frigate(), out=out)
     assert con.handle_line(f"read the standing orders from {STARTER}")
     text = out.getvalue()
     # 32e: tending the sheets; 37p: the storm staysail's companion order folded into heavy
     # weather
-    assert f"Read 8 standing orders from {STARTER}." in text
+    assert f"Read 7 standing orders from {STARTER}." in text
     assert con.world.standing.book.names == STARTER_NAMES
     assert not [e for e in con.world.log if e.kind == "order.rejected"]
-    # package 33c: the well's order is entered and held, saying why, and journaled with
-    # the seven others (32e: the sheets; 37p: the storm staysail's order gone)
-    held = [e for e in con.world.log if e.kind == "standing.given" and "Held until" in e.text]
-    assert len(held) == 1 and "The ship has no well to sound yet" in held[0].text
+    # none held: the well's order, held from package 33c, has left the book (2026-10-21)
+    assert not [e for e in con.world.log if e.kind == "standing.given" and "Held until" in e.text]
     journaled = [t for _, _, t in con.world.journal if t.startswith("standing order")]
-    assert len(journaled) == 8
+    assert len(journaled) == 7
     con.handle_line("standing orders")
-    assert "Standing orders (8):" in out.getvalue()
+    assert "Standing orders (7):" in out.getvalue()
 
 
 def test_the_starter_file_loads_on_the_server_driver():
@@ -347,7 +344,8 @@ def test_the_starter_file_names_a_source_for_every_order():
     from pathlib import Path
 
     text = Path(STARTER).read_text(encoding="utf-8")
-    assert text.count('standing order "') == 8  # 32e: "tend the sheets"; 37p: storm staysail gone
+    # 32e: "tend the sheets"; 37p: storm staysail gone; 2026-10-21: the well's order gone
+    assert text.count('standing order "') == 7
     for word in ("Luce 1866", "truth 9", "truth 28", "milestone 5", "judgement"):
         assert word in text, word
     assert "\r" not in text

@@ -324,7 +324,7 @@ def test_the_aboard_orders_do_what_the_table_knows_and_reach_the_play_log_as_a_r
     assert all(e.severity.value == "notable" and not for_the_record(e) for e in reports)
     assert "found foul" in "\n".join(w.stores.lines(100))
     # the table is what the game can do, not what the director may say
-    assert len(WO.aboard_table()) == 4
+    assert len(WO.aboard_table()) == 24
     assert "aboard" in WO.CHANNELS and WO.recognises("aboard: a cask found stove")
 
 
@@ -335,13 +335,15 @@ def test_the_aboard_orders_do_what_the_table_knows_and_reach_the_play_log_as_a_r
 
 def test_the_starter_briefs_load_and_the_console_brief_is_words_alone():
     names = D.starter_briefs()
-    assert names == [
+    # the starters the code and the primer name are there; the owner's own briefs beside
+    # them (interesting-passage-nobudget, 2026-10-19) are welcome and checked the same
+    assert {
         "chase",
         "dispatches",  # the owner's story brief for the director's test (2026-10-18)
         "hard-cruise",
         "interesting-passage",
         "quiet-passage",
-    ]
+    } <= set(names)
     for name in names:
         b = D.resolve_brief(name)
         assert b.tone and b.challenge and b.limits.get("nobody_dies") and b.acts_a_day > 0

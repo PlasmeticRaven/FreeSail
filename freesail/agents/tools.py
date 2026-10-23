@@ -2654,14 +2654,17 @@ def standing_dialect_lines(vocab: Any = None) -> list[str]:
         *readings,
         "    'the <sail>' is any sail by the ship's own name ('the fore royal is shaking'); "
         "'the <part>' any spar or line ('the fore royal yard is straining')",
-        f"  Not yet in the ship, named so a condition can be refused in words: {absent}.",
+        *(
+            [f"  Not yet in the ship, named so a condition can be refused in words: {absent}."]
+            if absent
+            else []
+        ),
         "Durations, after 'for': a number of minutes or seconds ('for 2 minutes', 'for "
         "30 seconds', 'for five minutes'), a glass, a bell, half an hour, an hour, a watch.",
         "Examples, the starter routines (data/standing_orders/starter.orders):",
     ]
     for line in read_orders_file(STARTER_ORDERS):
-        note = "   (refused until the ship has a well to sound)" if "sound the well" in line else ""
-        out.append(f"  {line}{note}")
+        out.append(f"  {line}")
     book = []
     for name, spec in vocab.verbs.items():
         if spec.object != "standing" or name == "standing order":

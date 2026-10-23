@@ -127,6 +127,7 @@ KINDS: dict[str, str] = {
     "distance": "a distance in miles: exceeds, is over, is under, is below 20 miles",
     "ground": "the ground the lead brings up: is sand, is mud, is not rock",
     "person": "a person's place: is on deck, is below",
+    "well": "the water in the well by the last sounding: read, not yet compared",
     "absent": "not a reading the ship has yet",
 }
 
@@ -171,6 +172,8 @@ DAYLIGHT_WORDS: tuple[str, ...] = ("day", "twilight", "night")
 # own, and a small vessel may have none; the scenario says); the tendency wants an hour's
 # record; a scenario without weather systems keeps no sky. Lower-case, as NO_WAY_WORDS.
 NO_GLASS_WORDS = "the ship carries no glass"
+# A glass found broken (the director's `aboard:` table): the ship had one and has none now.
+GLASS_BROKEN_WORDS = "the glass is broken: its tube was found cracked and the mercury run out"
 GLASS_UNWATCHED_WORDS = "the glass has not been watched an hour yet"
 NO_WEATHER_WORDS = "no weather is kept in this scenario; the sky comes with its systems"
 # The sea and the motion (spec M5 §4) are kept when the wind has a cause, or when the
@@ -491,6 +494,9 @@ def _tendency(world: Any, _: str | None) -> dict[str, Any] | None:
 def _no_glass_words(world: Any) -> str | None:
     glass = _glass_of(world)
     if glass is None:
+        ship = getattr(world, "ship", None)
+        if (getattr(ship, "extra", None) or {}).get("glass_broken"):
+            return GLASS_BROKEN_WORDS
         return NO_GLASS_WORDS
     return GLASS_UNWATCHED_WORDS
 
@@ -1092,10 +1098,42 @@ REGISTRY.add(
 )
 REGISTRY.add(Reading("hands_on_deck", ("the hands on deck",), "hands", "", _hands_on_deck))
 REGISTRY.add(Reading("watch_below", ("the watch below",), "hands", "", _watch_below))
-REGISTRY.add_absent(
-    "well",
-    ("the well",),
-    "The ship has no well to sound yet; that reading comes with the world.",
+
+
+def _well(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the well`: the water in the well by the carpenter's last sounding (`sound the
+    well`, `world.ground.sound_well`), with its age; None before a sounding. The water is
+    the grounding's leak's and nothing else's yet (the pumps are milestone 7's, with taking
+    on water), and it moves nothing of her handling: a reading of the carpenter's, not of the ship's
+    trim."""
+    extra = getattr(getattr(world, "ship", None), "extra", None) or {}
+    said = extra.get("well_sounded")
+    if said is None:
+        return None
+    tick, metres, words = said
+    clock = getattr(world, "clock", None)
+    age_s = (clock.tick - tick) if clock is not None else 0
+    return {"metres": metres, "words": words, "age_s": age_s}
+
+
+def _no_sounding_words(world: Any) -> str | None:
+    return "the well not sounded yet: 'sound the well' has the carpenter sound it"
+
+
+# The well (package 33c registered it absent, "The ship has no well to sound yet"; the
+# grounding's leak gave the hull its water in package 34 and the row stayed absent until
+# the owner found it, 2026-10-21): the carpenter's last sounding.
+REGISTRY.add(
+    Reading(
+        "well",
+        ("the well", "the water in the well"),
+        "well",
+        "",
+        _well,
+        description="the water in the well by the carpenter's last sounding, in feet and "
+        "inches ('sound the well' has him sound it)",
+        none_words=_no_sounding_words,
+    )
 )
 # The weather's readings (spec M5 §5, package 30). `the glass` is two rows behind one
 # phrase, as the true wind is: its height in inches and its tendency in words; a ship
@@ -3098,7 +3136,7 @@ def describe_value(reading: Reading, value: Any) -> str:
         from freesail.world.chart import fathoms_words
 
         return fathoms_words(value)
-    if kind in ("position", "distance", "person"):
+    if kind in ("position", "distance", "person", "well"):
         return str(value["words"])
     if kind == "ground":
         return str(value.get("said") or value["words"])

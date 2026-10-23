@@ -174,6 +174,46 @@ def test_a_rock_at_speed_shocks_the_masts_and_stoves_her_and_the_well_rises():
     assert [e for e in w.log if e.kind == "ship.waterlogged"]
 
 
+def test_the_director_stops_the_leak_and_pumps_her_out_and_the_well_stays_dry():
+    """The repair's hotfix until milestone 8 (the director's `aboard:` table): on the rock
+    the leak stopped holds the well where it is, the well pumped out empties it and the
+    carpenter counts the feet afresh; each is doubted when there is nothing to stop or
+    pump; a replay comes back to the same ship."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay
+    from freesail.world import orders as WO
+
+    start = datetime(1805, 6, 12, 12, 0)
+    w = thick_world(FRIGATE, Position(50.025, -5.015), 315.0, start, from_deg=180.0, knots=22.0)
+    # nothing to stop or pump before she strikes
+    assert "no leak to stop" in WO.doubt(w, WO.parse("aboard: the leak stopped"))
+    assert "dry already" in WO.doubt(w, WO.parse("aboard: the well pumped out"))
+    w.submit("set plain sail")
+    w.submit("steer NW")
+    assert run_until_aground(w, 1.5)
+    w.run(3600)
+    hull = w.ship.hull
+    assert hull.water_in_well_m > G.FOOT_M and w.ship.extra["leak_m_per_h"] > 0.0
+    assert WO.doubt(w, WO.parse("aboard: the leak stopped")) is None
+    e = w.world_order("aboard: the leak stopped", "the test")
+    assert e.data["result"] == "done" and "the leak stopped" in e.text
+    assert w.ship.extra["leak_m_per_h"] == 0.0
+    said = [x for x in w.log if x.kind == "aboard.found"][-1]
+    assert said.text.startswith("The carpenter reports the leak found and stopped")
+    held = hull.water_in_well_m
+    w.run(3600)
+    assert hull.water_in_well_m == held  # aground still, and gaining no more
+    assert "no leak to stop" in WO.doubt(w, WO.parse("aboard: the leak stopped"))
+    e = w.world_order("aboard: the well pumped out", "the test")
+    assert e.data["result"] == "done" and "the well pumped dry" in e.text
+    assert hull.water_in_well_m == 0.0 and w.ground._feet_said == 0
+    assert "dry already" in WO.doubt(w, WO.parse("aboard: the well pumped out"))
+    back = replay.replay_world(w, ship_factory)
+    assert back.ship.hull.water_in_well_m == 0.0
+    assert back.ship.extra["leak_m_per_h"] == 0.0
+    assert back.log.digest() == w.log.digest()
+
+
 def test_the_blow_of_the_strike_shakes_the_topmasts_and_carries_them_away_at_speed():
     """`strain.shock_spars`: the strike at six knots is one strain of the rating on the
     topmasts and above (half on the lower masts), which wears them and warns; at nine
@@ -195,6 +235,69 @@ def test_the_blow_of_the_strike_shakes_the_topmasts_and_carries_them_away_at_spe
     w.run(1)
     assert any(s.wrecked for s in topmasts)
     assert [e for e in w.log if e.kind == "spar.carried_away"]
+
+
+def on_the_falmouth_bank():
+    """The frigate on Falmouth bank off Pendennis, two fathoms and a half, taken slowly on
+    the ebb of the forenoon from the east."""
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 7, 0),
+        wind_from_deg=90.0,
+        wind_speed_kn=8.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=270.0,
+        ship_speed_kn=2.0,
+        position={"lat_deg": 50.152, "lon_deg": -5.030},
+        region=REGION,
+    )
+    w = make_world(7, FRIGATE, sc)
+    w.submit("set the fore topsail")
+    assert run_until_aground(w, 1.0)
+    return w
+
+
+def afloat_after(w, hours: float):
+    for _ in range(int(hours * 60)):
+        w.run(60)
+        if not w.ship.extra.get("aground"):
+            return [e for e in w.log if e.kind == "ship.afloat"][-1]
+    return None
+
+
+def test_a_kedge_laid_out_aground_and_hove_taut_heaves_her_off_before_the_flood_alone():
+    """The kedging off (2026-10-21): the kedge laid out aground by the boat to the deep
+    water astern and hove taut. Hard on at low water it comes home and says so, and she
+    lies as she was; as the flood makes, the grip of the ground lessens until the kedge's
+    strain heaves her off, before the tide alone would float her (the same bank, the same
+    seed, no kedge). Conservative: a kedge holds some four times its weight."""
+    plain = on_the_falmouth_bank()
+    plain.submit("take in the fore topsail")
+    alone = afloat_after(plain, 12.0)
+    assert alone is not None and "kedge" not in alone.text
+
+    w = on_the_falmouth_bank()
+    w.submit("take in the fore topsail")
+    e = w.submit("lay out a kedge to the E")
+    assert e.kind == "order.accepted", e.text
+    for _ in range(90):
+        w.run(60)
+        if [x for x in w.log if x.kind == "ship.kedged"]:
+            break
+    assert [x for x in w.log if x.kind == "ship.kedged"]
+    assert w.ship.extra.get("aground")
+    e = w.submit("heave in the kedge to 20 fathoms")
+    assert e.kind == "order.accepted", e.text
+    w.run(1200)
+    assert w.ship.extra.get("aground")  # hard on at low water: the kedge cannot do it
+    home = [x for x in w.log if x.kind == "ground.kedge_home"]
+    assert len(home) == 1 and "too hard on" in home[0].text
+    assert home[0].data["pull_kn"] < home[0].data["grip_kn"]
+    off = afloat_after(w, 12.0)
+    assert off is not None and off.data.get("kedged")
+    assert off.text.startswith("She is hove off by the kedge, and afloat again")
+    assert off.tick < alone.tick  # sooner than the flood alone
+    assert alone.tick - off.tick < 2 * 3600  # but not much: a kedge holds little
 
 
 def test_soft_ground_on_the_ebb_holds_her_till_the_flood_floats_her():

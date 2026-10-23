@@ -213,10 +213,12 @@ def cable_forces(ship: Ship, water: tuple[float, float], h: float) -> tuple[floa
         pull = tension * math.cos(theta)
         holds = holding_n(anchor, theta)
         anchor.holding_kn = holds / 1000.0
-        if anchor.heaving:
+        if anchor.heaving and not ship.extra.get("aground"):
             # the capstan heaves the ship up to her anchor: the cable's pull brings her
             # ahead, and the anchor is not said to drag (it is broken out when the cable
-            # is up and down, the weigh script's word)
+            # is up and down, the weigh script's word). Aground the ship does not come:
+            # the capstan's pull on a ship the ground holds brings the anchor home past
+            # what it holds, as below (the kedging off, `world.ground`)
             pass
         elif pull > holds:
             # it drags: the anchor comes toward the ship along the cable's line until the

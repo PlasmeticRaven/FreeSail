@@ -609,7 +609,7 @@ TABLE: list[tuple[str, str, ok | no]] = [
     (
         F,
         'standing order "x": when the well is over three feet then heave to',
-        no(["The ship has no well to sound yet; that reading comes with the world."]),
+        no(["The well is read, not yet compared in a standing order"]),
     ),
     # the lead's cast (package 33a): `the depth` is the last cast's, in fathoms
     (
@@ -1852,34 +1852,39 @@ def test_a_standing_order_is_found_case_blind_and_by_a_distinct_part_of_its_name
     assert e.kind != "standing.belayed", e.text
 
 
-def test_the_well_is_held_in_the_book_and_never_fires():
-    """Spec M4 §24 item 4: the starter's `sound the well` was refused at every start, a
-    line of noise in every log; now it is entered, held, and silent until the well is a
-    reading, and it is journaled and replays like any order."""
+def test_the_well_is_sounded_every_glass_and_read_and_replays():
+    """The well (2026-10-21; spec M4 §24 item 4, held in the book from package 33c while it
+    was an absent reading): `sound the well` is the carpenter's sounding, never the lead;
+    `the well` reads his last; every glass the book sounds it, and whether she gains is
+    said against the last sounding; the book's order replays like any order."""
     from freesail.core import replay as replay_mod
 
     w = frigate()
+    assert w.readings.words("well").startswith("the well not sounded yet")
+    e = w.submit("sound the well")
+    assert e.kind == "well.sounded" and e.text == "The carpenter sounds the well: she is dry."
+    assert w.readings.words("well") == "the well dry"
+    assert not [x for x in w.log if x.kind == "sounding"]  # the lead is not hove for it
     e = w.submit(WELL)
-    assert e.kind == "standing.given"
-    assert e.text == (
-        "Standing order 'sound the well' entered in the book: every glass then sound the well. "
-        "Held until the ship can carry it out: The ship has no well to sound yet; that "
-        "reading comes with the world."
-    )
+    assert e.kind == "standing.given" and "Held until" not in e.text
     rule = w.standing.book.get("sound the well")
-    assert rule.held is not None and rule.state_words() == (
-        "held: the ship has no well to sound yet; that reading comes with the world"
+    assert rule.held is None
+    w.run(1800)
+    assert rule.fired == 1
+    assert [x for x in w.log if x.kind == "well.sounded"][-1].text.endswith(
+        "she is dry, the same as at the last sounding."
     )
-    w.run(2 * 3600)
-    assert rule.fired == 0 and not [e for e in w.log if "sound the well" in e.actor]
-    assert [t for _, _, t in w.journal] == [WELL]
     copy = replay_mod.replay(w.save(), ship_factory)
     assert copy.log.digest() == w.log.digest()
-    # an order on the well at the prompt is refused in the registry's words
-    e = w.submit("sound the well")
-    assert e.kind == "order.rejected" and e.text.endswith(
-        "The ship has no well to sound yet; that reading comes with the world."
+    # water in the well (set here by hand, as a leak would put it there: a replay cannot
+    # make this part, which is the grounding's in play)
+    w.ship.hull.water_in_well_m = 0.33  # a foot and an inch
+    w.run(1800)
+    assert rule.fired == 2
+    assert [x for x in w.log if x.kind == "well.sounded"][-1].text == (
+        "The carpenter sounds the well: a foot and an inch of water, and gaining."
     )
+    assert w.readings.words("well") == "a foot and an inch of water in the well"
 
 
 def test_a_failing_if_is_said_the_first_time_and_then_once_a_watch(synthetic):

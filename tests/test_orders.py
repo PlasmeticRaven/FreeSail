@@ -1958,7 +1958,6 @@ SOUTH_OF_IT = (50.06, -5.00)
 OFF_USHANT = (48.53, -4.98)
 TRIM_FAIR = ("evolution.started", "order.accepted", "sail.trimmed")
 QUERY = ("query.reading",)
-HELD = ("Held until the ship can carry it out", "no well to sound yet")
 SCANDALISE = "cannot be scandalised: the physics has no state for a gaff sail with its peak"
 MANACLES = (
     "The Manacles are not in sight (a danger of the chart); Manacle Point, in sight, is "
@@ -1978,7 +1977,7 @@ PLAYTEST_REFUSALS: list[tuple[str, str, tuple[float, float], str, Any, took | st
         OFFING,
         'standing order "sound the well": every glass then sound the well',
         None,
-        took(("standing.given",), HELD),
+        took(("standing.given",)),  # entered, the well a reading (2026-10-21; held from 33c)
     ),
     ("frigate", "08:01", OFFING, "Trim the spanker sheet", _set("mizzen.spanker"), took(TRIM_FAIR)),
     ("frigate", "08:02", OFFING, "Tend the spanker sheet", _set("mizzen.spanker"), took(TRIM_FAIR)),
