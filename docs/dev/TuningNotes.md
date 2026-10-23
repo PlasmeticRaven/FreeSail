@@ -7848,6 +7848,17 @@ regression test builds a `Ground` with `__new__` and ticks it aground with a tau
   changed; the anchoring script's manners are R-02's, kept out.
 - **The pilot's berth writes its depth in figures** ("let go in 13 fathoms and a half"),
   where the anchoring's own line writes words ("in nine fathoms and a half"). Not changed.
+- **The pilot judges how near she will lie by the wind over the ground; her sails feel the
+  wind over the water.** In the Goulet's flood (3.9 knots toward 080°) with the wind at 325°
+  and ten knots, the wind over the water is from 350° and eight and a half: the pilot's
+  "steer NE by N, as near as she will lie" (`Ports._as_she_will_lie`, `_made_good_on`, from
+  `world.wind`) is 69° off the wind he reckons and 44° off the wind she sails in; her sails
+  lift, she loses her way to under two knots, and the flood sets her onto the Mingan (the
+  replayed wardroom save from 113000, after item 1 moved its history: the one failure of
+  the slow tier, above). The old path cleared the Mingan by three cables, the lookout's
+  urgent cry said on both. Not changed: the pilot's wind is packages 43b, 45 and 45c's, and
+  the fix would move the passages that sail the Goulet (the merchant passage, the intent
+  schooner) for a reason not this package's. For the lead.
 
 ### Pins
 
@@ -7932,6 +7943,9 @@ Item 6 (the Éclair at anchor, `get under way`):
   anchors in the Bay, dragging twenty fathoms first, where from 43b she waited in the road of
   Bertheaume. It is item 1's by bisection and re-pinned; whether the Bay's dragging wants the
   anchoring's manners (R-02) is the owner's.
+- **The Goulet's failing case** (the wardroom save from 113000): mend the pilot's wind (the
+  wind over the water) and re-pin what it moves, or let the case start where the replay now
+  finds the owner's moment; the test is left failing for that word.
 - **The riding measure**: brought up, or headway under half a knot, where the brief said
   speed; half a knot is the lead's reading.
 - **A person aboard another ship** is refused, not bound (there is no other crewed World).
@@ -7952,3 +7966,14 @@ restarted twice during the runs, and each tier is written here as it finished.
   `test_scenarios`, `test_settings`, `test_ship_loader`, `test_world_orders`; `--slow -m
   "not pace"`): 470 passed, 8 expected failures, none failed (04:14 to 04:41), every
   re-pinned passage among them against its new figure.
+- **The slow tier once whole** (`python3 -m pytest --slow -n 4 -q -p no:cacheprovider -m
+  "not pace"`, 04:42 to 05:39, the tree at `a36cd27`): 3,863 passed, 11 expected failures
+  (the same eleven), **one failed**: `test_ports.py::test_the_pilot_allows_for_the_set_before_
+  his_turn_in_the_goulet_on_the_flood[113000]`, she takes the ground on the Mingan at 115561.
+  It is item 1's by bisection (the tree with the old rule passes it, as does `809620b`), and
+  not a pin: the test replays the owner's wardroom save to 113000 and gives the pilot the
+  conn there, and under the new rule the replay's account ran while she came to her first
+  anchor, so that by 113000 she is a quarter of a mile west of where the owner was (forty
+  metres of water, not twenty-nine) and the pilot's leg to the Mingan is another. The cause
+  of the grounding is the pilot's (found on the way, below), and the test is left failing,
+  not skipped and not moved to another tick, for the lead's word. The case at 114000 passes.
