@@ -7856,9 +7856,8 @@ regression test builds a `Ground` with `__new__` and ticks it aground with a tau
   lift, she loses her way to under two knots, and the flood sets her onto the Mingan (the
   replayed wardroom save from 113000, after item 1 moved its history: the one failure of
   the slow tier, above). The old path cleared the Mingan by three cables, the lookout's
-  urgent cry said on both. Not changed: the pilot's wind is packages 43b, 45 and 45c's, and
-  the fix would move the passages that sail the Goulet (the merchant passage, the intent
-  schooner) for a reason not this package's. For the lead.
+  urgent cry said on both. Mended on the lead's word as item 19 (below), which moved no pin
+  and left the Goulet's cases failing for the pilot's conn.
 
 ### Pins
 
@@ -7941,16 +7940,58 @@ Item 6 (the Éclair at anchor, `get under way`):
 
 - **The intent schooner's new passage** (item 1): she now sails the Goulet with the flood and
   anchors in the Bay, dragging twenty fathoms first, where from 43b she waited in the road of
-  Bertheaume. It is item 1's by bisection and re-pinned; whether the Bay's dragging wants the
-  anchoring's manners (R-02) is the owner's.
-- **The Goulet's failing case** (the wardroom save from 113000): mend the pilot's wind (the
-  wind over the water) and re-pin what it moves, or let the case start where the replay now
-  finds the owner's moment; the test is left failing for that word.
-- **The riding measure**: brought up, or headway under half a knot, where the brief said
-  speed; half a knot is the lead's reading.
-- **A person aboard another ship** is refused, not bound (there is no other crewed World).
-- **The waterman's fare** is a shilling flat; ports' rates would be data.
-- **The merchant brig's ration** is the Navy's table for want of a merchant scale.
+  Bertheaume. It is item 1's by bisection and re-pinned. **R-02** (the anchoring's manners,
+  the Bay's dragging first) is carried for the owner.
+- **The Goulet's failing case**: the lead's word was to mend the pilot's wind (item 19,
+  below); it is mended, and the case still fails, now with its sister case (below).
+- Taken another way, each standing on the lead's word: **the riding measure** (brought up,
+  or headway under half a knot, where the brief said speed); **a person aboard another
+  ship** refused, not bound (there is no other crewed World); **the waterman's fare** a
+  shilling flat (ports' rates would be data); **the merchant brig's ration** the Navy's
+  table for want of a merchant scale.
+
+### Item 19: the pilot's wind (found on the way, the lead's word of 2026-10-23)
+
+`Ports._as_she_will_lie` and `_made_good_on` count how near she lies, and her course made
+good, from `_wind_from_over_the_water`: the true wind less the stream's set at her, the wind
+her sails feel; the wind over the ground itself where there is no stream (so that no water
+without a stream moves). A test of the helper beside the Goulet's
+(`test_the_pilot_reckons_how_near_she_lies_by_the_wind_over_the_water`): ten knots from NW
+over the ground in a four-knot flood toward 080° is a wind from 338° over the water.
+
+**No pin moves.** The whole slow tier on the code with the fix (the tree at `1cd9a23` with
+`ports.py` of `465ad80`; 06:04 to 07:05): 3,863 passed, 11 expected failures, every pinned
+passage against its figure, the merchant passage and the intent schooner through the Goulet
+among them (the pilot's "as near as she will lie" never binds in them: their wind is free
+of his legs). Two failed, the Goulet's two cases from the wardroom save, and there the work
+stopped, on the lead's word ("if it still fails after the fix, say exactly where she goes
+and stop there"):
+
+- **From 113000** (the replay's history moved by item 1): the pilot cons her NE and NE by N
+  for his first mark (48° 19.53' N, 4° 37.8' W), passes it at 114480 (land ahead, nine
+  cables, to larboard), takes up the leg for 48° 19.92' N, 4° 36.36' W at NE by E to E by N,
+  is warned of the Mingan a mile on the starboard bow at 115020 ("leave it to starboard"),
+  and for his next aim (48° 20.27' N, 4° 35.76' W) steers NE by E and then ENE "as near as
+  she will lie" in the wind over the water; she keeps her way now (4.4 knots, no sails
+  lifting, where the wind over the ground had her at 1.8), but the flood of 3.9 knots toward
+  080° sets her bodily east, the lookout cries the Mingan four cables ahead at 115320, and
+  she strikes it at 115561 at four knots and a half.
+- **From 114000** (passed before the fix): his first order is NNE, five points to port, as
+  near as she will lie, and the yards still trimmed for the wind on the quarter: she is
+  taken aback at 114049 and lies in irons for twenty minutes; the flood sets her east of his
+  first mark; at 115800 he gives W for the mark, now astern of her, and she is put about to
+  beat back to it against the flood; she works to and fro off Petit Minou for the rest of
+  the 110 minutes, and at 120600 the Mingan is four cables ahead again; no berth said, no
+  grounding (the test's failure: no `port.pilot_berth`). With the old pilot's wind restored
+  (`c062f89`) this case passes, so its failure is the fix's.
+
+What is left is the pilot's conn and not his wind: with the wind over the water he finds,
+rightly, that the NE legs inside Bertheaume will not be laid on this flood under this wind,
+and he has no answer but to steer as near as she will lie (from 113000) or to go back for a
+mark set astern (from 114000). A pilot's answers would be to wait for the slack in the road,
+to work the north shore's eddy, or to anchor; and his first turn should trim before it puts
+her five points nearer the wind. Not built: for the lead.
+
 
 ### The suite, as run
 
@@ -7979,3 +8020,12 @@ restarted twice during the runs, and each tier is written here as it finished.
   not skipped and not moved to another tick, for the lead's word. The case at 114000 passes.
 - **The pace tests alone** (`python3 -m pytest --slow -m pace -q -p no:cacheprovider`, the
   load 0.8 at their start and 1.0 at the end, 05:54 to 05:57): 6 passed.
+- **After item 19** (the code of `465ad80`): the whole slow tier, which runs the fast tier's
+  tests with the slow, 3,863 passed, 11 expected failures, 2 failed (the Goulet's two cases,
+  item 19's section above); `ruff check .` and `ruff format .` clean. The work stopped there
+  on the lead's word, so the fast tier and the touched files were not run again one by one.
+  **The pace tests alone** on `465ad80`, three times: 5 passed and the gate's day with the
+  region loaded at 473 and then 468 ticks a second against the floor of 500, then all 6
+  passed (07:10 to 07:24). Not the fix's: the same measure taken four times in turn on the
+  fix's tree, the old pilot's wind and `809620b` gave 467 to 564 for all three alike (the
+  container restarted twice that morning; the floor is at the machine's noise today).
