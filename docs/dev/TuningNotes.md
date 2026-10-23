@@ -8250,3 +8250,12 @@ the load between 15 and 25 throughout; each tier written here as it finished.
   second (32 against 60 under a load of twenty); run alone at once after, the load still
   seventeen, it passed. Not this package's: it runs no seat, and the only per-tick code
   added is a test of `director_seats` once a minute.
+- **The slow tier of the files touched** (`test_agent_api`, `test_api_door`, `test_console`,
+  `test_crews`, `test_director`, `test_harbour`, `test_known_truths`, `test_mcp_server`,
+  `test_replay`, `test_seat_hook`, `test_server`, `test_settings`, `test_wardroom_doors`,
+  `test_world_orders`; `--slow -m "not pace"`, the code of `0f963b1`, 12:05 to 14:54): 420
+  passed, 7 expected failures (57's gale trials and the like, marked before), none failed;
+  every recorded passage in `test_known_truths` against its pinned figure, none moved.
+- **The whole slow tier and the pace tests were not run**, on the lead's word of the
+  afternoon (four whole suites at once on the machine, the load at twenty-five): the lead
+  runs one whole suite on the merged tree of 58a, 58b and 67.
