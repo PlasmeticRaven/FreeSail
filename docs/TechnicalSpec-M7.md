@@ -1,7 +1,9 @@
 # FreeSail: Technical Specification, Milestone 7 (Powder)
 
-**Initial draft of 2026-10-23 for the owner's review.** Companion to `docs/TechnicalSpec-M0-M2.md`
-through `-M7b.md`, whose conventions hold. Its sources: the proposal's M7 (`docs/
+**Initial specification of 2026-10-23.** Drafted for the owner's review, revised the same
+day on his eleven notes, and **finalised by the lead for package 70's briefing after 58a,
+58b and 67 merged (decision 51)**; what those packages and 68 taught is §33a. Companion to
+`docs/TechnicalSpec-M0-M2.md` through `-M7b.md`, whose conventions hold. Its sources: the proposal's M7 (`docs/
 DesignProposal.md` §5.3 combat, §3.4 water, §9 the obscure kit, §11 the roadmap; decisions
 7, 27, 40, 47 and 49), the owner's notes for this milestone (`docs/design/NotesForM7.md`:
 fine control, taking on water, signalling and the period's signals, collision, the captain
@@ -320,7 +322,8 @@ on the leak or losing; **foundering** when the water wins (the hands to the boat
 lost, the scenario's end or the director's continuation). `batten down the hatches` and the
 hands kept below in a gale as the owner's note asks. The hotfix's `aboard: the leak
 stopped` and `the well pumped out` are superseded by the carpenter's work and the pumps and
-kept only as the director's causes with a doubt.
+kept only as the director's causes with a doubt; 68's refusal line for the pumps ("not
+worked in this game yet") is retired here.
 
 ### 14. Damage control and jury work (`freesail/evolutions/`; `ship/parts.py` the spares)
 
@@ -549,7 +552,10 @@ fires into a human's ship or takes him prisoner. **Before a model is seated as a
 captain**, the brief is revised to say so and the question put again to every model it
 would seat (the brief's own promise); 55's revision carries the M7b items (R-50, R-51) and
 this one together, or M7's first package carries this alone if 55 has closed. The lead
-edits no consent file; the revision is the package's.
+edits no consent file; the revision is the package's. 67's seat (the API door started by
+the game under the seat's budget, the consent read from the record, a person nobody holds
+seated as his voice) is the mechanism every adversarial seat uses; the revision changes
+what the brief says and whom the game will seat, not the door.
 
 ## 30. Gate 7 (outline), in the brainstorm's order
 
@@ -592,8 +598,9 @@ each is briefed.
 | 79 | Opus | The regimes filled out from 72: the blockade, the convoy and its escort, ordinary and commissioning, the nations' doctrines as data; the chart's Mediterranean block | 7-vi, 7-viii |
 | 80 | Opus | Prizes and the continuation filled out from 74: the prize court's eighths, the cartel, retaking, the captive's places and words; the consent revision's package if 55 has closed | 7-v, §29 |
 
-Order: 70 and 71 first and together (the combat core and the voice between ships, which
-M7b's play wants now), 72 and 73 behind them, 74 when 70 has shown the strike; 75 as soon
+Order: 70 first and 71 after it (**one Fable package at a time**, the owner's rule of
+2026-10-23, so that he can meter the week's usage; the combat core and then the voice
+between ships, which M7b's play wants now), 72 and 73 behind them, 74 when 70 has shown the strike; 75 as soon
 as 70's shape of a gun is settled, 76 behind 71, 77 behind 70 and 73, 78 where the sailing
 wants it, 79 behind 72, 80 behind 74. The sub-gates of §30 fall out of that order: 7a after
 70, 73, 75 and 77; 7b after 71, 76 and 72's first half; 7c after 79; 7d the lead's measure.
@@ -613,11 +620,44 @@ first).
 
 R-17 and R-54 (7-i); the pumps, the carpenter and the capstan's purchases (7-iii); sail's
 thrust aground and the kedge's heave-taut (7-iii with 63); R-39 the weather's stacking and
-the climatology's drift (placed with 81); the land-avoiding planner (61, placed with 81 or
-82); the boat as a vessel and towing (63, before 78's cutting out); the place's knowledge
+the climatology's drift (placed with 72); the land-avoiding planner (61, placed with 72 or
+78); the boat as a vessel and towing (63, before 77's cutting out); the place's knowledge
 (65, with the hail: who perceives what); the harbour's second pass (64, the owner's Fable
-run, when he likes); the cold (26); the thermometer's first layer (58 or M7b's last); the
-lay line (43b, with 82's convoys beating); the Windows pins (69, before the gate).
+run, when he likes); the cold (26); the thermometer's first layer (deferred with §26); the
+lay line (43b, with 79's convoys beating); the Windows pins (69, before the gate); the
+lead's playtest of 58b's gale book and the owner's decisions listed in 58a's, 58b's and
+67's as-merged records (`docs/dev/M7b-WorkPackages.md`).
+
+### 33a. What the last packages of M7b taught (2026-10-23)
+
+Read before 70 was briefed, as §34 asked. **58a** (the deltas, the tripwires, the dry run):
+a station's sample carries a part only when it changed, so an action's state (the guns,
+the damage, the casualties) comes to a station as one line when it changes and not as a
+table every sample; `stand_by(until=...)`'s tripwires, judged by the readings and never by
+prose, are the form for the action's events (she opens fire, a shot strikes, her colours
+come down, a sail within so many cables); the "n minutes since your last reply" line is
+what a model fights against, and an action's samples must stay small enough that a
+model's thinking does not cost it a broadside; the director's `WORLD_ORDER_FORMS`, every
+example performed by a test, is the shape for the director's forms in action. **58b**
+(the captain's sea sense): the rules captain's books are written again at each
+transition and must leave out what another hand holds (the leg under the pilot's conn),
+which is the rule for the engaging book too (the sailing's book yields what the fighting
+book takes: the helm to the engaging's side and range, the sails to the bill's priority);
+the gale book lies her to without being taken aback, so a ship beaten in a blow and a ship
+beaten in action are different states and not one; a physics figure is not changed by a
+package that was told to leave it (the lug's two thirds kept), and the hit model reads
+the heel, the roll and the sea from the physics as they are. **67** (the seats): a model is
+seated through the API door under the seat's budget and folded at two fifths of its
+context, so an action's samples are the fold's enemy; a person nobody holds can be seated
+as his voice, which is how an enemy captain speaks under a model when §29's revision
+allows it; the `director:` channel is where the owner steers an action out of character.
+**68** (the review's mending): the director's hand reaches the ship's state only by the
+table's plausible causes (`aboard: the fore topmast is found sprung`), and a hit of §9 is
+the same state change by another cause; the pumps' refusal line ("not worked in this game
+yet") is retired by 73, the director's `aboard: the well pumped out` kept as his cause;
+the deck's wait and cut call bound how long a station may think, which an action makes
+sharper; riding and the helm's held courses are the ship's own rules and an engaged ship
+keeps them.
 
 ## 34. What this draft does not yet decide
 
@@ -626,5 +666,5 @@ morale is a ship's figure or each division's; whether the far fight is a table o
 model at coarse steps (70 measures both); the signal books' extent in the first version;
 how a model at the flagship gives a signal (a tool, or `make the signal` as an order:
 the order, by the equal-reach rule, unless play says otherwise); how prisoners are counted
-(people or numbers: numbers but for the named); the chart's next block; the marines' kit tables by nation (73 names the shape, 75 the data); and everything the
-current packages teach before 70 is briefed.
+(people or numbers: numbers but for the named); the chart's next block; the marines' kit tables by nation (73 names the shape, 75 the data); and what the later
+packages teach (58a's, 58b's, 67's and 68's lessons are §33a's).
