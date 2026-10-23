@@ -7977,3 +7977,5 @@ restarted twice during the runs, and each tier is written here as it finished.
   metres of water, not twenty-nine) and the pilot's leg to the Mingan is another. The cause
   of the grounding is the pilot's (found on the way, below), and the test is left failing,
   not skipped and not moved to another tick, for the lead's word. The case at 114000 passes.
+- **The pace tests alone** (`python3 -m pytest --slow -m pace -q -p no:cacheprovider`, the
+  load 0.8 at their start and 1.0 at the end, 05:54 to 05:57): 6 passed.
