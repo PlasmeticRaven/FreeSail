@@ -97,6 +97,7 @@ from freesail.world.geo import (
     off_the_line_m,
 )
 from freesail.world.lookout import DISTANCE_BY_ESTIMATION_FRACTION as _LOOKOUT_ESTIMATE_FRACTION
+from freesail.world.lookout import riding as _lookout_riding
 
 __all__ = [
     "BEARING_LINE_FORM_FRACTION",
@@ -2320,13 +2321,11 @@ class Navigation:
         return turned >= units.points_to_rad(BOARD_ALTERATION_POINTS)
 
     def _riding(self) -> bool:
-        """At anchor or aground (package 34): the ship goes nowhere by the master's
-        account, whatever the stream does past her."""
-        extra = getattr(self.world.ship, "extra", None) or {}
-        if extra.get("aground"):
-            return True
-        tackle = extra.get("ground_tackle")
-        return bool(tackle) and tackle.at_anchor()
+        """Riding at anchor or aground (package 34): the ship goes nowhere by the master's
+        account, whatever the stream does past her. Riding is an anchor down and holding
+        and no way over the ground (package 68, R-01: `lookout.riding`); a ship let go
+        with way on, or dragging, is pegged as under way, and the account runs."""
+        return _lookout_riding(self.world.ship)
 
     def _close_hauled_now(self) -> bool:
         world = self.world
