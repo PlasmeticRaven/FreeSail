@@ -1847,3 +1847,32 @@ def test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood
     berth = events(w, "port.pilot_berth")
     assert berth and berth[-1].text.startswith("The pilot: this is the berth, the Bay of Brest")
     assert units.m_to_fathoms(least) >= 9.0
+
+
+def test_the_pilot_reckons_how_near_she_lies_by_the_wind_over_the_water():
+    """Package 68, item 19: the pilot's "as near as she will lie" is counted from the wind
+    her sails feel, the true wind less the stream's set. In the Goulet's flood of four knots
+    toward ENE, ten knots of wind from NW over the ground come from NNW and a little more
+    over the water; with no stream the wind over the ground itself."""
+    from types import SimpleNamespace
+
+    from freesail.world.ports import _wind_from_over_the_water
+
+    class _Wind:
+        def __init__(self, from_deg: float, kn: float) -> None:
+            self.direction_from = math.radians(from_deg)
+            self.kn = kn
+
+        def vector_at_height(self, _h: float) -> tuple[float, float]:
+            return units.wind_vector(self.direction_from, units.knots_to_ms(self.kn))
+
+    def world(water):
+        extra = {"water": water} if water else {}
+        return SimpleNamespace(ship=SimpleNamespace(extra=extra))
+
+    wind = _Wind(315.0, 10.0)
+    assert _wind_from_over_the_water(world(None), wind) == wind.direction_from
+    to = math.radians(80.0)
+    flood = units.knots_to_ms(4.0)
+    water = (flood * math.sin(to), flood * math.cos(to))
+    assert 335.0 < math.degrees(_wind_from_over_the_water(world(water), wind)) < 350.0

@@ -531,6 +531,27 @@ def _beyond_the_leg(a: Position, b: Position, p: Position) -> bool:
     return _off_the_leg(a, b, p)[1] >= 1.0
 
 
+def _wind_from_over_the_water(world: Any, wind: Any) -> float:
+    """Where the wind comes from over the water at her (radians true): the true wind less
+    the stream's set, the wind her sails feel and her close-hauled angle is counted from
+    (package 68, item 19: in the Goulet's flood of four knots toward the east, the wind at
+    NW over the ground is a point and more nearer north over the water, and the pilot's
+    "as near as she will lie" laid by the wind over the ground had her sails lifting and
+    the flood setting her onto the Mingan). The wind over the ground itself where there is
+    no stream."""
+    from freesail.physics.integrate import water_velocity
+
+    ship = getattr(world, "ship", None)
+    wx, wy = water_velocity(ship) if ship is not None else (0.0, 0.0)
+    if wx == 0.0 and wy == 0.0:
+        return float(wind.direction_from)
+    vx, vy = wind.vector_at_height(10.0)
+    ax, ay = vx - wx, vy - wy
+    if math.hypot(ax, ay) < 1e-9:
+        return float(wind.direction_from)
+    return units.wind_direction_from(ax, ay)
+
+
 def _off_the_leg(a: Position, b: Position, p: Position) -> tuple[float, float]:
     """How far `p` lies off the leg from `a` to `b` (metres, on the flat at its latitude)
     and how far along it, as a share of the leg (0 at `a`, 1 at `b`)."""
@@ -2032,7 +2053,7 @@ class Ports:
         from freesail.physics.integrate import water_velocity
 
         wanted = self._for_the_stream(line)
-        wind_from = float(wind.direction_from)
+        wind_from = _wind_from_over_the_water(self.world, wind)
         closest = close_hauled_true_angle(ship) + PILOT_LIE_MARGIN_RAD + PILOT_SET_WIND_MARGIN_RAD
         x = units.wrap_pi(wanted - wind_from)
         if abs(x) >= closest:
@@ -2089,13 +2110,14 @@ class Ports:
         """The course nearest `wanted` she will lie, full and by on the tack she is on,
         when `wanted` is nearer the wind than that (package 45c): a pilot does not con a
         ship into the wind's eye (the frigate in the Goulet's mouth, the wind at WNW, was
-        given NW by turns and taken aback onto the Fillettes); None when she lies it."""
+        given NW by turns and taken aback onto the Fillettes); None when she lies it. The
+        wind is the one she sails in, over the water (item 19 of package 68)."""
         from freesail.evolutions.scripts import close_hauled_true_angle
 
         wind = getattr(self.world, "wind", None)
         if wind is None:
             return None
-        wind_from = float(wind.direction_from)
+        wind_from = _wind_from_over_the_water(self.world, wind)
         closest = close_hauled_true_angle(self.world.ship) + PILOT_LIE_MARGIN_RAD
         x = units.wrap_pi(wanted - wind_from)
         if abs(x) >= closest:
