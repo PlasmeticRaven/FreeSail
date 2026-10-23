@@ -8044,4 +8044,6 @@ restarted twice during the runs, and each tier is written here as it finished.
   fix's tree, the old pilot's wind and `809620b` gave 467 to 564 for all three alike (the
   container restarted twice that morning; the floor is at the machine's noise today).
 - **After the Goulet's cases were marked** (`292b277`): **the fast tier** 3,555 passed, none
-  failed, 327 slow left out (07:25 to 07:47).
+  failed, 327 slow left out (07:25 to 07:47). **The slow tier of the files touched** (the
+  fifteen above and `test_ports`): 514 passed, 10 expected failures (the eight before and
+  the Goulet's two), none failed (07:47 to 08:19).
