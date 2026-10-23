@@ -3022,9 +3022,13 @@ GATE_5B_SCHOONER_PILOT_HAIL_AGAIN_TICK = 56460  # her second, to heave to (37h; 
 GATE_5B_SCHOONER_PILOT_ABOARD_TICK = 56940  # aboard off the outer road (37h; 56580 before)
 GATE_5B_SCHOONER_ANCHORED_TICK = 57257  # off the town, the best bower let go (57255 before 37p)
 GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p)
-GATE_5B_SCHOONER_LINES = 768  # package 56, the glass (763 at package 45)
+# The well's order gone from the starter book (2026-10-21), its two held lines, as the three
+# passages above it; missed at the fold-in, re-pinned at package 68 (found on the way: the
+# tree before 68 gives these figures, and the tree before the fold-in, 953caab, the old
+# with the two "sound the well" lines at tick 0 the whole difference)
+GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
-GATE_5B_SCHOONER_DIGEST = "b7c16adc612bd01a"  # package 56, the glass (c01e6e0ff56503c8 at 44)
+GATE_5B_SCHOONER_DIGEST = "b9acdeac6354f3bf"  # the well (b7c16adc612bd01a at 56, c01e6e0f at 44)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
@@ -4204,9 +4208,16 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 # full and by ("'keep her full and by' must wait till she weighs", the refusal of 126000,
 # not said again) where it was refused as a tack; 2999 → 2998 lines
 # (docs/dev/TuningNotes.md, package 37m).
-GATE_5C_MERCHANT_LINES = 3098  # package 56, the glass (3080 at package 57)
+# package 68 (item 1, riding means riding): she ranges ahead on her cable at half a knot
+# from 153 to 302 while she comes to in Carrick Road, not yet brought up, and the account
+# runs the while (a hundred and fifty seconds; it did not, the anchor being down): the
+# lead in pilot water's distance at 300 reads 110 miles (111), and the master's tide is
+# said at 15600 when she has weighed (one line more); the old rule restored gives the old
+# figures, every tick the same (docs/dev/TuningNotes.md, package 68)
+GATE_5C_MERCHANT_LINES = 3099  # package 68, riding (3098 at package 56, 3080 at 57)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
-GATE_5C_MERCHANT_DIGEST = "05f0f4aba2eddbc0"  # package 56, the glass (06b14a75a5eaae8b at 57)
+# package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
+GATE_5C_MERCHANT_DIGEST = "902be35aeeac7b54"  # package 68, riding (05f0f4aba2eddbc0 before)
 
 
 def _people(world) -> list[dict]:
@@ -4603,30 +4614,46 @@ GATE_6A_INTENT_AWEIGH_TICK = 17037
 # is done from the road by the boat; the pilot of Brest stays aboard to take her in, and the
 # Goulet is not sailed in the 36 hours (before: conned through it by the pilot from 104220
 # and anchored in the Bay of Brest at 111370)
+# package 68 (item 1, riding means riding): she ranges ahead on her cable while she comes
+# to in Carrick Road, not yet brought up, and the account runs the while (it did not, the
+# anchor being down); the master's tide is said at 17100 when she has weighed, the fixes
+# off St Anthony and the Manacles read differently, the allowance she steers by moves, and
+# from 21756 the passage is another: she lays the course again at 28080, takes Le Floch
+# at 101820, comes to the Iroise with the flood serving, is conned through the Goulet and
+# lets go in the Bay of Brest at 110872 in thirteen fathoms and a half (as at 45c), drags
+# from 110962 and holds again having come home twenty fathoms, brought up at 111710; she
+# sells at 119400. Every figure before it is package 43b's and 56's, kept beside the new;
+# the old rule restored gives the old figures (docs/dev/TuningNotes.md, package 68).
 GATE_6A_INTENT_STATES = [  # (tick, state): the books loaded and unloaded by name
     (300, "in port"),
     (17040, "on passage"),
     (23340, "beating"),  # the course for the Lizard's offing not laid (22740 at 45c)
-    (27960, "on passage"),  # laid again (27480 at 45c, 27720 at package 37p)
-    (103980, "at anchor"),  # package 43b: in the road of Bertheaume for the tide
-    (104340, "in port"),  # from the road (in the Bay of Brest at 111420 at 45c)
+    (28080, "on passage"),  # laid again (27960 at 56, 27480 at 45c, 27720 at 37p)
+    # package 43b to 56: (103980, "at anchor") in the road of Bertheaume for the tide and
+    # (104340, "in port") from the road; package 68: in the Bay (111420 at 45c)
+    (110880, "in port"),
 ]
-GATE_6A_INTENT_PILOT_ABOARD_TICKS = [17700, 101580]  # Tregenza out; Le Floch in (101100 at 45c)
+# Tregenza out; Le Floch in (101580 at 56, 101100 at 45c)
+GATE_6A_INTENT_PILOT_ABOARD_TICKS = [17700, 101820]
 # package 45c: the pilot of Brest given the conn at 104220 cons her by his track from his
 # station, Bertheaume, leg by leg through the Goulet (two hours, the book's bearings every
 # five minutes the while: two hundred and forty lines more), the berth said at 111120 on the
 # Bay's road moved onto its twelve fathoms; his cutter comes for him at 120660
-GATE_6A_INTENT_PILOT_LEFT_TICKS = [19920]  # 43b, Le Floch aboard ([19920, 121020] at 45c)
+# package 68: Le Floch put off at the anchor in the Bay ([19920] at 43b to 56, Le Floch
+# aboard; [19920, 121020] at 45c)
+GATE_6A_INTENT_PILOT_LEFT_TICKS = [19920, 114900]
 GATE_6A_INTENT_NOON_TICKS = [25200, 111660]
-GATE_6A_INTENT_ANCHORED_TICKS = [57, 104295]  # Carrick Road; Bertheaume (the Bay 111370)
-GATE_6A_INTENT_BROUGHT_UP_TICK = 105260  # package 43b (112302 at 45c, 112069 at 45)
-GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 105360  # the boat for the prices (112380 at 45c)
-GATE_6A_INTENT_SOLD_TICK = 124320  # 47 tons at £270 (119820 at 45c, 118980 at 45)
-GATE_6A_INTENT_LINES = 1698  # package 56, the glass (1684 at package 43b)
+# Carrick Road; the Bay of Brest (Bertheaume 104295 at 43b to 56; the Bay 111370 at 45c)
+GATE_6A_INTENT_ANCHORED_TICKS = [57, 110872]
+GATE_6A_INTENT_BROUGHT_UP_TICK = 111710  # package 68 (105260 at 43b, 112302 at 45c)
+GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 111780  # the boat for the prices (105360 at 43b)
+GATE_6A_INTENT_SOLD_TICK = 119400  # 47 tons at £270 (124320 at 43b, 119820 at 45c)
+GATE_6A_INTENT_LINES = 2160  # package 68, riding (1698 at 56, 1684 at package 43b)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
-GATE_6A_INTENT_DIGEST = "90061f779b7db484"  # package 56, the glass (93981cc47f5524e6 at 57)
+# package 56, the glass: 90061f779b7db484 (93981cc47f5524e6 at 57)
+GATE_6A_INTENT_DIGEST = "8eead2f4521f2a61"  # package 68, riding (90061f779b7db484 before)
 
 
 @pytest.fixture(scope="module")
@@ -4666,10 +4693,11 @@ def test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants(gate_6a
     for what the purse allows, sails on the ebb when the boat is alongside, takes the
     pilot out, beats off the Lizard when the westerly will not lay the course and lays
     it again, crosses on the soundings' track, takes the pilot of Brest in the Iroise,
-    anchors in the road of Bertheaume for the tide in eight fathoms and a half (package
-    43b; in the Bay in thirteen and a half before), sends the boat for the prices once
-    brought up, and sells at £270. Every doing is an order under his rule's actor, not
-    journaled; the states are books loaded and unloaded by name."""
+    is conned through the Goulet and anchors in the Bay of Brest in thirteen fathoms and
+    a half (package 68; in the road of Bertheaume for the tide in eight and a half from
+    43b to 56, in the Bay in thirteen and a half before), sends the boat for the prices
+    once brought up, and sells at £270. Every doing is an order under his rule's actor,
+    not journaled; the states are books loaded and unloaded by name."""
     world, _moments, _saved = gate_6a_intent
     log = world.log
     cap = world.captain
@@ -4695,12 +4723,19 @@ def test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants(gate_6a
     # package 45: twelve fathoms where the pilot conned her to (13 at 37p)
     # package 45c: the Bay's road on its twelve fathoms, let go in thirteen and a half
     # package 43b: in the road of Bertheaume for the tide, in eight and a half
-    assert "in eight fathoms and a half" in [e for e in log if e.kind == "ship.anchored"][1].text
+    # package 68: in the Bay again, let go in thirteen and a half (the figure as the
+    # pilot's berth writes it)
+    assert "in 13 fathoms and a half" in [e for e in log if e.kind == "ship.anchored"][1].text
     brought = [e.tick for e in log if e.kind == "ship.brought_up"]
     assert brought[-1] == GATE_6A_INTENT_BROUGHT_UP_TICK
     prices = [e for e in _by_rule(log) if "for the prices" in e.text]
     assert prices and prices[0].tick == GATE_6A_INTENT_BOAT_FOR_PRICES_TICK
-    assert not [e for e in log if e.kind in ("ship.aground", "anchor.dragging")]
+    assert not [e for e in log if e.kind == "ship.aground"]
+    # package 68: the best bower let go in the Bay drags from 110962 and holds again,
+    # having come home twenty fathoms, before she is brought up (no dragging before 68)
+    drags = [e.tick for e in log if e.kind == "anchor.dragging"]
+    holds = [e.tick for e in log if e.kind == "anchor.holding"]
+    assert drags == [110962] and holds and holds[0] > drags[0]
     # every doing of his is an order under his actor (its line and its results carry it)
     # and never journaled
     assert any(e.kind == "order.accepted" for e in _by_rule(log))
@@ -4790,7 +4825,9 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # quarterdeck carries its place and its hearers (none) in its data, as every say does now
 # (the owner's ruling of 2026-10-10); aa42746f61de91d1 at 37p, a2cd045b9bcc93f8 before it
 # decision 45, the pilot's news: b00ac08c3f63e84c before
-GATE_6A_FAKE_CAPTAIN_DIGEST = "f996530d5a041abc"  # package 56, the glass (0e089f1279e03928 at 57)
+# package 56, the glass: f996530d5a041abc (0e089f1279e03928 at 57); package 68, riding:
+# the merchant passage's one line more and its account at 300 (3111 lines before)
+GATE_6A_FAKE_CAPTAIN_DIGEST = "1f8de8b49c7d5b5a"  # package 68, riding (f996530d5a041abc)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):

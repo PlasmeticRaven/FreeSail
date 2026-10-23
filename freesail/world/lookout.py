@@ -178,9 +178,9 @@ LAND_AHEAD_WAY_KN = 0.5
 # Riding (package 68; the cold review of 2026-10-22, R-01: any anchor down counted as
 # riding, so the Sherbourne let go at seven knots off Horta froze the master's account and
 # muted the lookout while she sailed a mile onto the Praia): an anchor down and holding
-# (none dragging) and her speed over the ground under this, half a knot (the lead's
-# reading; a ship riding to her cable in a fresh breeze swings at a fifth of a knot and
-# less, measured, and one dragging or sailing her anchor home goes at knots).
+# (none dragging) and brought up by it or her headway over the ground under this, half a
+# knot (the lead's reading; a ship riding to her cable in a fresh breeze swings at a fifth
+# of a knot and less, measured, and one dragging or sailing her anchor home goes at knots).
 RIDING_WAY_KN = 0.5
 # The cast along each line steps by the shore's own distance while that is more than this
 # margin off (the field is in whole cells and within two per cent), and by this step when
@@ -1289,13 +1289,17 @@ def _ward(edges: list[str]) -> str:
 def riding(ship: Any) -> bool:
     """Riding (package 68, R-01): aground, or an anchor down (or two, moored) and holding,
     none of them dragging, and either brought up by it (`Anchor.brought_up`: the cable
-    taut and her way over the ground gone, said in the log) or her speed over the ground
+    taut and her way over the ground gone, said in the log) or her headway over the ground
     under `RIDING_WAY_KN`. A ship that has let go with way on and sails her anchor home,
     or drags it, is not riding: the master's account runs for her (`reckoning`) and the
     lookout's land-ahead stays armed. Spec M5 §12's "not at anchor", as built since
-    package 68. The speed alone is not the measure once she is brought up: a frigate
-    riding to the tide in Carrick Road swings at the turn and sheers at up to two knots
-    over the ground about her anchor, measured, and goes nowhere."""
+    package 68. The speed alone is not the measure: a frigate riding to the tide in
+    Carrick Road swings at the turn and sheers at up to two knots over the ground about
+    her anchor, measured, and goes nowhere (the brought-up anchor is the test once the
+    log has said it); and a ship dropping astern to her cable as it is veered, before she
+    is brought up, goes astern and not ahead (her headway, the test before she is brought
+    up; her speed over the ground alone, measured, counted a ship falling astern on her
+    cable as under way and moved the gate 5b passage and the naval cruise for it)."""
     extra = getattr(ship, "extra", None) or {}
     if extra.get("aground"):
         return True
@@ -1307,12 +1311,13 @@ def riding(ship: Any) -> bool:
         return False
     if any(getattr(a, "brought_up", False) for a in down):
         return True
-    return _speed_over_ground(ship) < units.knots_to_ms(RIDING_WAY_KN)
+    return _headway_over_ground(ship) < units.knots_to_ms(RIDING_WAY_KN)
 
 
-def _speed_over_ground(ship: Any) -> float:
-    """Her speed over the ground, metres a second: her way through the water and the
-    water's own (the stream given to the physics)."""
+def _headway_over_ground(ship: Any) -> float:
+    """Her way along her head over the ground, metres a second (negative astern): her way
+    through the water and the water's own (the stream given to the physics) along her
+    head."""
     dyn = getattr(ship, "dyn", None)
     if dyn is None:
         return float(getattr(ship, "speed", 0.0))
@@ -1320,8 +1325,7 @@ def _speed_over_ground(ship: Any) -> float:
 
     wx, wy = water_velocity(ship)
     ex, ey = units.heading_vector(float(dyn.heading))
-    u, v = float(dyn.u), float(dyn.v)
-    return math.hypot(u * ex + v * ey + wx, u * ey - v * ex + wy)
+    return float(dyn.u) + wx * ex + wy * ey
 
 
 def _plural(name: str) -> bool:

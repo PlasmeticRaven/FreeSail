@@ -363,7 +363,10 @@ silent: the lead is the guard there.
 
 **As built (package 68; the cold review of 2026-10-22, R-01).** "Not at anchor" reads *not
 riding*: an anchor down and holding (none dragging) and either brought up by it or her
-way over the ground under half a knot (`lookout.riding`, `RIDING_WAY_KN`). The letter of
+headway over the ground under half a knot (`lookout.riding`, `RIDING_WAY_KN`; her way
+along her head, so that a ship falling astern on her cable as it is veered is riding and
+one ranging ahead on it is not; her speed over the ground, the brief's word, moved two
+passages for a ship falling astern, and was taken another way). The letter of
 the old wording was built, and it was wrong for a ship that lets go with way on: the
 Sherbourne let go at seven knots off Horta, sailed her bower a mile onto the Praia, and
 the lookout said nothing urgent while any anchor was down. A ship dragging or sailing her
