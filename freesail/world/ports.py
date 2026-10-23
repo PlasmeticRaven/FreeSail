@@ -299,6 +299,7 @@ PILOT_JUDGE_WAY_KN = 4.0  # her way through the water as he reckons a leg (judge
 PILOT_WEIGH_AHEAD_S = 1800  # he judges the stream for her under way in half an hour (judgement)
 PILOT_COMMITTED_S = 2700  # weighed for the slack, he does not bring her up again so soon
 PILOT_WAIT_WEIGH_S = 2700  # a weighing not come in three quarters of an hour is given up
+PILOT_WAIT_REFUSED_S = 1800  # his weigh refused, he asks again in half an hour
 
 IN_PORT_NM = 2.0
 # -- the boat (judgement) --
@@ -2092,6 +2093,18 @@ class Ports:
                 # none over it (package 58b: cast the wrong way from her anchor, she was
                 # given a new course each minute of the wear and worn by turns)
                 return
+            from freesail.orders.navigation import COURSE_PENDING
+
+            held = (getattr(ship, "extra", None) or {}).get(COURSE_PENDING)
+            if (
+                isinstance(held, dict)
+                and self.conn_bearing is not None
+                and abs(units.wrap_pi(wanted - self.conn_bearing)) < PILOT_CONN_TURN_RAD
+            ):
+                # his course held by the helm till she has way for it (through the eye or
+                # by the stern): given again each minute it was held again each minute,
+                # and she never came round (package 58b, the intent scenario in the Goulet)
+                return
             fresh = self.conn_bearing is None or dyn.helm_mode is not HelmMode.HEADING
             # the course given again when the mark's bearing has drawn half a point from
             # the bearing it was last given for, so that a bearing on a point's edge does
@@ -2496,6 +2509,10 @@ class Ports:
         if e.kind != "order.rejected":
             wait["weighing"] = True
             wait["weighing_tick"] = now
+        else:
+            # refused (her boat away, say): the refusal is the line, and he looks again in
+            # half an hour, not at every look
+            wait["look"] = now + PILOT_WAIT_REFUSED_S - PILOT_WAIT_LOOK_S
 
     def _along_the_leg(self, a: Position, b: Position, pos: Position, to_mark: float) -> float:
         """The bearing the pilot steers for along the leg from `a` to `b`: a point on the

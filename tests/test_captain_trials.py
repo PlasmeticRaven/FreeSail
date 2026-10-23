@@ -277,22 +277,35 @@ def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_s
 # the beats fall a minute or two otherwise (31680 to 38460 and 44940 on, against 31740 to
 # 38340 and 44880 to 56340) and she comes to an anchor in Carrick Road at 57324, 19:55,
 # at anchor at 57000 and in port at 57360 (in port at 56520 from her way into the road)
+# package 58b (items 1 and 2, by bisection: the tree with both turned off gives every old
+# figure): the brig's own captain lays his chasing leg again for the stream (her course in
+# her own World's log), so the schooner's hauling-off marks fall a tenth of a minute
+# otherwise from 15660; on passage she lays her leg again for the stream at 19680 and
+# beats from 20400, on passage 22980, beating 31620, on passage 37560, is brought to for a
+# cast of the deep-sea lead off the Lizard at 40740, beats from 46140, and comes to the
+# outer road of Falmouth at 53040 with the wind foul to go in, lets go at 53669 in
+# eighteen fathoms and a half and is in port from the road at 53700 (docs/dev/TuningNotes.md,
+# package 58b). The old figures beside each.
 TRIAL_TRADE_STRANGER_STATES = [
     (300, "on passage"),
     (3660, "evading"),
     (17880, "on passage"),  # 8100 at package 45c
-    (31680, "beating"),  # 31740 at 43b, 18000 at package 43
-    (38460, "on passage"),  # 38340 at 43b; 18120, beating 18240, passage 39060 at 43
-    (44940, "beating"),  # 44880 at 43b, 44220 at package 43
-    (57000, "at anchor"),  # on passage at 56340 at 43b (51720 at package 43)
-    (57360, "in port"),  # 56520 at 43b, 55440 at 43 (35640 at package 45c, 35340 at 45)
+    (20400, "beating"),  # 31680 at 57, 31740 at 43b, 18000 at package 43
+    (22980, "on passage"),  # 38460 at 57, 38340 at 43b; 18120, beating 18240 at 43
+    (31620, "beating"),  # 44940 at 57, 44880 at 43b, 44220 at package 43
+    (37560, "on passage"),  # package 58b
+    (46140, "beating"),  # package 58b
+    (53040, "at anchor"),  # 57000 at 57; on passage at 56340 at 43b (51720 at package 43)
+    (53700, "in port"),  # 57360 at 57, 56520 at 43b, 55440 at 43 (35640 at 45c, 35340 at 45)
 ]
-TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [57324]  # package 57 ([56498] at 43b, [55413] at 43)
-TRIAL_TRADE_STRANGER_LINES = 1534  # package 56, the glass (1521 at 57)
+# package 58b ([57324] at 57, [56498] at 43b, [55413] at 43)
+TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [53669]
+TRIAL_TRADE_STRANGER_LINES = 1407  # package 58b (1534 at 56, the glass; 1521 at 57)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
-TRIAL_TRADE_STRANGER_DIGEST = "7b8012b076ebea42"  # package 56, the glass (e73870448a788eac at 57)
+# package 56, the glass: 7b8012b076ebea42 (e73870448a788eac at 57)
+TRIAL_TRADE_STRANGER_DIGEST = "97e193f20ed64e72"  # package 58b (7b8012b076ebea42 at 56)
 
 
 @pytest.fixture(scope="module")
@@ -317,7 +330,10 @@ def test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_win
     anchored = [e.tick for e in w.log if e.kind == "ship.anchored"]
     assert anchored == TRIAL_TRADE_STRANGER_ANCHORED_TICKS
     waits = [e for e in w.log if "the wind does not serve to enter Falmouth" in e.text]
-    assert len(waits) == 0  # package 45: in port from the road, no wait to go in (2 before)
+    # package 45: in port from the road, no wait to go in (2 before); package 58b: she comes
+    # to the outer road beating with the wind foul to go in and anchors there for it (the
+    # tide's words at 57000 before), in port from the road as at 45
+    assert len(waits) == 1
     assert cap.state == "in port" and cap.intent is not None  # at anchor before package 45
     assert len(w.log) == TRIAL_TRADE_STRANGER_LINES
     assert w.log.digest()[:16] == TRIAL_TRADE_STRANGER_DIGEST
