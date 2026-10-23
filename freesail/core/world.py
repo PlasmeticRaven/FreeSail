@@ -238,6 +238,10 @@ class Scenario:
     # (`People._scenario_things`). Left out of the dict when there are none, so that a save
     # of a game without them reads as it did.
     things: list[Any] = field(default_factory=list)
+    # The fit of guns the ship carries (spec M7 §7; package 70): a name of her file's
+    # `armament.fits`, or None for the file's default. Left out of the dict when None, so
+    # that a save from before reads as it did.
+    fit: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -257,6 +261,8 @@ class Scenario:
             d.pop("crewed", None)
         if not d.get("things"):
             d.pop("things", None)
+        if not d.get("fit"):
+            d.pop("fit", None)
         return d
 
     @classmethod

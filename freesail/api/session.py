@@ -46,7 +46,9 @@ def rebind_hooks(ship: Ship) -> Ship:
 
 
 def make_ship(path: str | Path, scenario: Scenario | None = None) -> Ship:
-    ship = attach_systems(load_ship(path))
+    # the fit of guns the scenario chose (package 70), else the file's default
+    fit = getattr(scenario, "fit", None) if scenario is not None else None
+    ship = attach_systems(load_ship(path, fit=fit))
     if scenario is not None:
         ship.dyn.x = scenario.ship_x
         ship.dyn.y = scenario.ship_y

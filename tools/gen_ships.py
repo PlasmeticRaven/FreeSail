@@ -757,6 +757,50 @@ class Builder:
             if text:
                 self.crew_notes[("people", role)] = text
 
+    def armament(self, note, default, fits):
+        """The `armament:` section (spec M7 §7; package 70) from fits, each
+        (name, source, guns, cartridges, shot, note): `guns` a list of (mapping, note) in
+        the file's order, `cartridges` {pounder: n}, `shot` {pounder: {kind: n}}; the note
+        above the section, each fit's above its name, a gun's above its line."""
+        self.doc["armament"] = {
+            "default": default,
+            "fits": {
+                name: {
+                    "source": source,
+                    "guns": [g for g, _ in guns],
+                    "cartridges": cartridges,
+                    "shot": shot,
+                }
+                for name, source, guns, cartridges, shot, _ in fits
+            },
+        }
+        self.armament_notes = {("section",): note}
+        for name, _, guns, _, _, text in fits:
+            if text:
+                self.armament_notes[("fit", name)] = text
+            for g, gnote in guns:
+                if gnote:
+                    self.armament_notes[("gun", name, g["id"])] = gnote
+
+    def quarter_bill(self, note, trimmers, helm, powder, priority, notes):
+        """The crew's `quarter_bill:` block (spec M7 §8a; package 70): the trimmers by
+        station as (station, n, note) entries, the hands at the helm, the powder beyond the
+        idlers, and the fighting book's priority; `notes` the words above helm, powder and
+        priority."""
+        crew = self.doc["crew"]
+        crew["quarter_bill"] = {
+            "trimmers": {st: n for st, n, _ in trimmers},
+            "helm": helm,
+            "powder": powder,
+            "priority": priority,
+        }
+        self.crew_notes[("quarter_bill",)] = note
+        for st, _, text in trimmers:
+            if text:
+                self.crew_notes[("trimmers", st)] = text
+        for key, text in notes.items():
+            self.crew_notes[("quarter_bill", key)] = text
+
     def rate_spars(self):
         """Second pass: rate every spar from what the engine's graph hangs on it.
 
@@ -875,7 +919,10 @@ class Builder:
         in_tackle = False
         in_boats = False
         in_gear = False
+        in_armament = False
+        fit_name = ""
         gear_notes = getattr(self, "gear_notes", {})
+        armament_notes = getattr(self, "armament_notes", {})
         for line in text.splitlines():
             if line.startswith("hull:"):
                 in_hull = True
@@ -885,6 +932,24 @@ class Builder:
                 in_crew = True
             elif in_crew and not line.startswith("  "):
                 in_crew = False
+            # the armament (package 70), noted as the ground tackle is: the section, each
+            # fit above its name, a gun above its line
+            if line.startswith("armament:"):
+                in_armament = True
+                note = armament_notes.get(("section",))
+                if note:
+                    out.append("# " + note)
+            elif in_armament and not line.startswith("  "):
+                in_armament = False
+            if in_armament:
+                note = None
+                if m := re.match(r"^    ([^ :][^:]*):$", line):
+                    fit_name = m.group(1).strip("'\"")
+                    note = armament_notes.get(("fit", fit_name))
+                elif m := re.match(r"^      - id: (\S+)$", line):
+                    note = armament_notes.get(("gun", fit_name, m.group(1)))
+                if note:
+                    out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
             if line.startswith("ground_tackle:"):
                 in_tackle = True
                 note = self.tackle_notes.get(("section",))
@@ -936,6 +1001,8 @@ class Builder:
                     note = self.crew_notes.get((crew_key,))
                 elif store_key == "spare_spars" and (m := re.match(r"^      (\w+): \d+$", line)):
                     note = self.crew_notes.get(("spare_spars", m.group(1)))
+                elif store_key == "trimmers" and (m := re.match(r"^      (\w+): \d+$", line)):
+                    note = self.crew_notes.get(("trimmers", m.group(1)))  # package 70
                 elif m := re.match(r"^    (\w[^:]*):", line):
                     store_key = m.group(1)
                     note = self.crew_notes.get((crew_key, m.group(1)))
@@ -2299,6 +2366,7 @@ def frigate(out_dir="data/ships"):
         b.alias(f"{name} top bowline", f"{name} topsail bowlines")
     ground_tackle_for(b, 933.0, beam_ft, draught_ft)
     frigate_crew(b)
+    frigate_armament(b, deck_height)
     hold_for(b, 933.0, True, "a ship of war's hold is her own stores and ballast: judgement")
     b.boats(
         BOATS_NOTE,
@@ -3323,6 +3391,556 @@ def ration_entries(whose):
     ]
 
 
+# ---------------------------------------------------------------------------
+# The armament and the quarter bill (spec M7 §7, §8a; package 70)
+# ---------------------------------------------------------------------------
+#
+# A gun is a part of the graph by its position (freesail/ship/parts.py `Gun`), carried in a
+# **fit** the scenario chooses between (`ship: {fit: ...}`), each fit with its magazine. The
+# figures below are remembered from Lavery, *The Arming and Fitting of English Ships of War
+# 1600-1815* (the Establishments' guns, the carronade's adoption from 1779 and its
+# establishment of 1794 to 1795, the allowance of powder and shot), Winfield, *British
+# Warships in the Age of Sail 1793-1817* (each class's armament), Douglas, *A Treatise on
+# Naval Gunnery* (1820: the exercise, the crews, the ranges), and Falconer 1780 (CANNON,
+# SWIVEL); none of these is in docs/references/ as a page, so every figure is FROM MEMORY
+# and marked UNVERIFIED where the text says so, as data/nations.yaml marks its dates. A
+# figure the sources do not give is a judgement and says so.
+
+# The guns' weights, in hundredweight (112 lb), by kind and the weight of their shot
+# (UNVERIFIED, from memory): the long guns of Blomefield's pattern as the 1790s cast them
+# (the 18-pounder of 9 ft, 42 cwt; the 12-pounder of 9 ft, 34; the 9-pounder of 7 ft 6 in,
+# 26; the 6-pounder of 7 ft, 20; the 4-pounder of 6 ft, 12 1/2; the 3-pounder of 4 ft 6 in,
+# 7), the Carron Company's carronades (the 32-pounder, 17 cwt; the 24-pounder, 13; the
+# 18-pounder, 10; the 12-pounder, 6), and the half-pounder swivel on its yoke (about half a
+# hundredweight: judgement).
+LONG_GUN_CWT = {18: 42.0, 12: 34.0, 9: 26.0, 6: 20.0, 4: 12.5, 3: 7.0}
+CARRONADE_CWT = {32: 17.0, 24: 13.0, 18: 10.0, 12: 6.0}
+SWIVEL_CWT = 0.5
+
+# The crew of a gun by the quarter bill, for the pair of one number (the starboard and the
+# larboard gun of a number share a crew, which fights whichever side is engaged and is
+# divided when both are: Lavery, the quarter bill; the Regulations, the men quartered at the
+# guns): a man to about five hundredweight of a long gun and two for the captain and the
+# sponger (Douglas 1820, the exercise: an 18-pounder's crew of eight to ten with the boy;
+# the rule a judgement reading of his crews), a carronade's lighter (three and a man to
+# every eight hundredweight: a 32-pounder carronade worked by five, a 12-pounder by four;
+# judgement after Lavery), a swivel one man, who comes from whoever is spare.
+
+
+def gun_crew(kind, cwt):
+    if kind == "long":
+        return 2 + int(round(cwt / 5.0))
+    if kind == "carronade":
+        return 3 + int(round(cwt / 8.0))
+    return 1
+
+
+# The allowance of shot a gun, by the ship's service: a King's ship's sixty round, with
+# grape and double-headed (chain) shot a tenth of it between them (Lavery on the Ordnance's
+# allowance of the 1790s, about sixty to seventy rounds a gun for a cruise; the shares
+# judgement); a hired cutter's forty (her magazine smaller; judgement); a merchantman's
+# twenty round and a little grape for her own defence (judgement); a swivel's forty
+# half-pound balls. Cartridges one a round and a tenth over for the blank charges (the
+# signal gun, the gun to leeward; judgement).
+KINGS_ROUNDS = {"round": 60, "grape": 6, "chain": 6}
+HIRED_ROUNDS = {"round": 40, "grape": 6, "chain": 4}
+MERCHANT_ROUNDS = {"round": 20, "grape": 4}
+SWIVEL_ROUNDS = {"round": 40}
+BLANK_SHARE = 0.1
+
+# The port sill above the deck, for a gun's muzzle height above the water upright: about two
+# feet on a gun deck (Lavery, the ports; judgement for the figure), the rail's height for a
+# swivel the same.
+PORT_SILL_M = 0.6
+
+
+def fit_magazine(guns, rounds_by_kind):
+    """{pounder: cartridges} and {pounder: {kind: shot}} for a fit's guns, each gun with the
+    allowance of its kind (`rounds_by_kind`: {"long"|"carronade"|"swivel": {kind: n}})."""
+    cartridges: dict = {}
+    shot: dict = {}
+    for g, _ in guns:
+        p = g["pounder"]
+        allowance = rounds_by_kind[g["kind"]]
+        total = sum(allowance.values())
+        cartridges[p] = cartridges.get(p, 0) + int(round(total * (1.0 + BLANK_SHARE)))
+        by = shot.setdefault(p, {})
+        for kind, n in allowance.items():
+            by[kind] = by.get(kind, 0) + n
+    return cartridges, shot
+
+
+def broadside_pair(number, kind, pounder, cwt, x_m, height_m, note=None):
+    """The two guns of one number, starboard then larboard, as (mapping, note) entries;
+    the note on the starboard gun alone."""
+    out = []
+    for i, side in enumerate(SIDES):
+        g = {
+            "id": f"gun.{number}.{side}",
+            "kind": kind,
+            "pounder": pounder,
+            "place": "broadside",
+            "number": number,
+            "side": side,
+            "x_m": round(x_m, 1),
+            "height_m": round(height_m, 1),
+            "crew": gun_crew(kind, cwt),
+            "weight_cwt": cwt,
+        }
+        out.append((g, note if i == 0 else None))
+    return out
+
+
+def chasers(place, kind, pounder, cwt, x_m, height_m, note=None):
+    """A pair of chase guns at the bow or the stern, one a side."""
+    out = []
+    for i, side in enumerate(SIDES):
+        g = {
+            "id": f"chaser.{place}.{side}",
+            "kind": kind,
+            "pounder": pounder,
+            "place": place,
+            "side": side,
+            "x_m": round(x_m, 1),
+            "height_m": round(height_m, 1),
+            "crew": gun_crew(kind, cwt),
+            "weight_cwt": cwt,
+        }
+        out.append((g, note if i == 0 else None))
+    return out
+
+
+def swivels(count, xs_m, height_m, note=None):
+    """So many half-pounder swivels on the rail, numbered a side from forward."""
+    out = []
+    n = 0
+    for x in xs_m:
+        for side in SIDES:
+            n += 1
+            if n > count:
+                break
+            g = {
+                "id": f"swivel.{(n + 1) // 2}.{side}",
+                "kind": "swivel",
+                "pounder": 0.5,
+                "place": "rail",
+                "number": (n + 1) // 2,
+                "side": side,
+                "x_m": round(x, 1),
+                "height_m": round(height_m, 1),
+                "crew": 1,
+                "weight_cwt": SWIVEL_CWT,
+            }
+            out.append((g, note if n == 1 else None))
+    return out
+
+
+def spaced(fore_m, aft_m, n):
+    """n positions from `fore_m` to `aft_m` along the hull, forward positive."""
+    if n == 1:
+        return [(fore_m + aft_m) / 2.0]
+    step = (fore_m - aft_m) / (n - 1)
+    return [fore_m - i * step for i in range(n)]
+
+
+QUARTER_BILL_NOTE = (
+    "The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/"
+    "Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the "
+    "fit's (each gun's crew above), the sail trimmers here by station (the men who leave the "
+    "guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the "
+    "hands at the helm, the powder beyond the idlers, and the fighting book's priority when "
+    "sail work wants more hands than the trimmers give; the marines, the carpenter's crew "
+    "and the surgeon's mates have their stations by their trades. The counts are judgement "
+    "against the stations above."
+)
+PRIORITY_NOTE = (
+    "The fighting book's priority when sail work wants more hands than the trimmers give "
+    "(spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the "
+    "log says from where; 'guns before sail' makes the sail work wait short-handed. The "
+    "player's book and the doctrine may say otherwise."
+)
+
+
+def frigate_armament(b, deck_height):
+    """The Amazon class's armament of 1795 (Winfield, UNVERIFIED from memory: on the upper
+    deck twenty-six 18-pounders; on the quarterdeck eight 32-pounder carronades and two
+    9-pounders; on the forecastle two 9-pounders and two 32-pounder carronades), one fit.
+    The ports along the gun deck spaced about nine feet (Lavery, the ports of an
+    18-pounder frigate; judgement for the figure), the sills about two feet above the
+    deck; the quarterdeck and forecastle a deck higher (about seven feet, judgement). The
+    forecastle 9-pounders are the bow chasers; the quarterdeck pair a broadside pair."""
+    gun_deck = deck_height + PORT_SILL_M
+    upper = deck_height + 2.1 + PORT_SILL_M
+    guns = []
+    xs = spaced(16.5, -16.5, 13)
+    for i, x in enumerate(xs, start=1):
+        guns += broadside_pair(
+            i,
+            "long",
+            18,
+            LONG_GUN_CWT[18],
+            x,
+            gun_deck,
+            (
+                "The upper deck's twenty-six long 18-pounders, thirteen a side (Winfield, the "
+                "Amazon class's establishment; UNVERIFIED from memory): the 9 ft gun of 42 cwt "
+                "(Blomefield's pattern, from memory), the ports about nine feet apart from 54 ft "
+                "before midships to 54 ft abaft (judgement), the muzzle about eight feet above "
+                "the water upright; a crew of ten to the pair, who fight whichever gun bears "
+                "(Douglas 1820, the exercise; the rule in tools/gen_ships.py gun_crew)."
+                if i == 1
+                else None
+            ),
+        )
+    for j, x in enumerate(spaced(-7.0, -17.5, 4), start=14):
+        guns += broadside_pair(
+            j,
+            "carronade",
+            32,
+            CARRONADE_CWT[32],
+            x,
+            upper,
+            (
+                "The quarterdeck's eight 32-pounder carronades, four a side (Winfield; the "
+                "carronade establishment of 1794 to 1795, Lavery): 17 cwt each (the Carron "
+                "Company's, from memory), on the quarterdeck a deck above the guns; five men to "
+                "the pair, the marines among them."
+                if j == 14
+                else None
+            ),
+        )
+    guns += broadside_pair(
+        18,
+        "carronade",
+        32,
+        CARRONADE_CWT[32],
+        14.0,
+        upper,
+        "The forecastle's two 32-pounder carronades, one a side (Winfield).",
+    )
+    guns += broadside_pair(
+        19,
+        "long",
+        9,
+        LONG_GUN_CWT[9],
+        -4.5,
+        upper,
+        "The quarterdeck's two long 9-pounders, one a side, the foremost quarterdeck ports "
+        "(Winfield): the 7 ft 6 in gun of 26 cwt (from memory); seven to the pair.",
+    )
+    guns += chasers(
+        "bow",
+        "long",
+        9,
+        LONG_GUN_CWT[9],
+        17.5,
+        upper,
+        "The forecastle's two long 9-pounders as the bow chasers (Winfield gives the "
+        "forecastle its pair; that they served as chase guns is the frigate's practice, "
+        "judgement): 26 cwt, seven men each.",
+    )
+    cartridges, shot = fit_magazine(
+        guns, {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS, "swivel": SWIVEL_ROUNDS}
+    )
+    b.armament(
+        "The armament (spec M7 7; package 70): the guns as parts of the graph by their place, "
+        "in the one fit the class carried in 1805; each with its crew by the quarter bill and "
+        "the magazine's allowance by calibre. Every figure's source is in tools/gen_ships.py; "
+        "the weights and the establishment are from memory and UNVERIFIED against a printed "
+        "page.",
+        "amazon class 1795",
+        [
+            (
+                "amazon class 1795",
+                "Winfield, British Warships in the Age of Sail 1793-1817, the Amazon class "
+                "(UNVERIFIED from memory); Lavery, Arming and Fitting, the carronade "
+                "establishment of 1794-5 and the Ordnance's allowance; Douglas 1820, the crews",
+                guns,
+                cartridges,
+                shot,
+                "The class's armament of 1795: 26 x 18-pounders, 10 x 32-pounder carronades, "
+                "4 x 9-pounders (Winfield).",
+            )
+        ],
+    )
+    b.quarter_bill(
+        QUARTER_BILL_NOTE,
+        [
+            (
+                "forecastle",
+                8,
+                "The trimmers: of the forecastlemen, for the head sails and the fore braces "
+                "(Luce 1884 ch. XX: the forecastlemen 'the best older seamen'); the five "
+                "counts make the 44 hands the 264 leave when every gun of a side, the chasers "
+                "and the wheel are manned (judgement).",
+            ),
+            ("fore_top", 10, "Of the fore topmen, for the fore braces and the topsails aloft."),
+            ("main_top", 12, "Of the main topmen, the largest top, for the main braces."),
+            ("mizzen_top", 6, "Of the mizzen topmen, for the crossjack braces and the spanker."),
+            (
+                "afterguard",
+                8,
+                "Of the afterguard, at the main sheet and the after braces; the rest of the "
+                "afterguard to the quarterdeck carronades.",
+            ),
+        ],
+        2,
+        0,
+        "sail before guns",
+        {
+            "helm": "Two quartermasters at the wheel (Luce 1884 ch. XX, the quartermasters).",
+            "powder": (
+                "The powder beyond the idlers: none; a frigate's cooks, stewards, servants, "
+                "the clerk, the cooper, the armourer and the sailmaker's crew pass the "
+                "cartridges (judgement after Luce 1884 ch. XX, the powder division)."
+            ),
+            "priority": PRIORITY_NOTE,
+        },
+    )
+
+
+def cutter_armament(b, deck_height):
+    """The cutter's two fits (the owner, 2026-10-23): the Admiralty's 12-pounder carronades
+    that its cutters carried from the 1790s, the default of 1805 (Winfield, the hired and
+    the Admiralty's cutters of 1793-1817: ten 12-pounder carronades in a cutter of 150 to
+    200 tons, six to eight in the smaller; six for 85 tons, judgement; UNVERIFIED from
+    memory), and the long 3-pounders with eight swivels her file names in words, the
+    revenue and the hired cutters' fit of the 1760s on (Sherbourne's as built, the kit's
+    manual; the swivels Falconer 1780, SWIVEL)."""
+    deck = deck_height + PORT_SILL_M
+    rail = deck_height + 0.8  # the rail about two feet eight above the deck (judgement)
+    xs = spaced(2.5, -3.5, 3)
+    carronades = []
+    for i, x in enumerate(xs, start=1):
+        carronades += broadside_pair(
+            i,
+            "carronade",
+            12,
+            CARRONADE_CWT[12],
+            x,
+            deck,
+            (
+                "Six 12-pounder carronades, three a side, abaft the mast where a cutter's "
+                "ports lie (judgement): the Carron Company's 12-pounder of about 6 cwt (from "
+                "memory), four men to the pair."
+                if i == 1
+                else None
+            ),
+        )
+    long_guns = []
+    for i, x in enumerate(xs, start=1):
+        long_guns += broadside_pair(
+            i,
+            "long",
+            3,
+            LONG_GUN_CWT[3],
+            x,
+            deck,
+            (
+                "Six long 3-pounders, three a side (the kit's manual: Sherbourne's six "
+                "3-pounders): the 4 ft 6 in gun of 7 cwt (from memory), three men to the pair."
+                if i == 1
+                else None
+            ),
+        )
+    long_guns += swivels(
+        8,
+        [5.0, 1.0, -2.0, -5.0],
+        rail,
+        "Eight half-pounder swivels on the rail, four a side (the kit's manual; Falconer "
+        "1780, SWIVEL: 'a small piece of artillery ... fixed on a socket'), a man each when "
+        "a man is spare.",
+    )
+    carr_cart, carr_shot = fit_magazine(carronades, {"carronade": HIRED_ROUNDS})
+    long_cart, long_shot = fit_magazine(long_guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS})
+    b.armament(
+        "The armament (spec M7 7; package 70): two fits the scenario chooses between (ship: "
+        "{fit: ...}; the owner, 2026-10-23): the 12-pounder carronades the Admiralty gave its "
+        "cutters from the 1790s, the default of 1805, and the long 3-pounders with eight "
+        "swivels of the revenue and hired cutters. Every figure's source is in "
+        "tools/gen_ships.py; the weights are from memory and UNVERIFIED against a page.",
+        "carronades",
+        [
+            (
+                "carronades",
+                "Winfield, British Warships in the Age of Sail 1793-1817, the Admiralty's and "
+                "the hired armed cutters (UNVERIFIED from memory; the count for 85 tons "
+                "judgement); Lavery, Arming and Fitting, the carronade",
+                carronades,
+                carr_cart,
+                carr_shot,
+                "The Admiralty's fit of 1805: six 12-pounder carronades.",
+            ),
+            (
+                "long guns",
+                "The kit's manual (Sherbourne as built, 1763: six 3-pounders and eight "
+                "swivels); Falconer 1780, SWIVEL; the weights from memory",
+                long_guns,
+                long_cart,
+                long_shot,
+                "The revenue and hired cutters' fit: six long 3-pounders and eight swivels.",
+            ),
+        ],
+    )
+    b.quarter_bill(
+        QUARTER_BILL_NOTE,
+        [
+            (
+                "forecastle",
+                4,
+                "The trimmers: four of the forecastlemen for the head sails and the running "
+                "bowsprit (judgement).",
+            ),
+            ("afterguard", 4, "Four of the afterguard at the main sheet and the boom."),
+        ],
+        1,
+        2,
+        "sail before guns",
+        {
+            "helm": "One man at the tiller (a cutter steers with a tiller; judgement).",
+            "powder": "Two of the waisters to pass the cartridges (judgement).",
+            "priority": PRIORITY_NOTE,
+        },
+    )
+
+
+def brig_armament(b, deck_height):
+    """H.M. brig-sloop Harpy's: sixteen 32-pounder carronades and two long 6-pounder chase
+    guns (the kit's manual; Winfield's Diligence class, UNVERIFIED from memory), one fit; the
+    carronades eight a side along the flush deck, the 6-pounders at the bow ports."""
+    deck = deck_height + PORT_SILL_M
+    guns = []
+    for i, x in enumerate(spaced(9.1, -9.1, 8), start=1):
+        guns += broadside_pair(
+            i,
+            "carronade",
+            32,
+            CARRONADE_CWT[32],
+            x,
+            deck,
+            (
+                "Sixteen 32-pounder carronades, eight a side (the kit's manual; Winfield, the "
+                "Diligence class, UNVERIFIED from memory): 17 cwt each (from memory), the "
+                "ports about eight feet and a half apart (judgement), five men to the pair."
+                if i == 1
+                else None
+            ),
+        )
+    guns += chasers(
+        "bow",
+        "long",
+        6,
+        LONG_GUN_CWT[6],
+        12.0,
+        deck,
+        "Two long 6-pounders at the bow ports as the chase guns (the kit's manual): the 7 ft "
+        "gun of 20 cwt (from memory), six men each.",
+    )
+    cartridges, shot = fit_magazine(guns, {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS})
+    b.armament(
+        "The armament (spec M7 7; package 70): the guns as parts of the graph by their place, "
+        "the class's one fit; each with its crew by the quarter bill and the magazine's "
+        "allowance by calibre. Every figure's source is in tools/gen_ships.py; the weights and "
+        "the establishment are from memory and UNVERIFIED against a printed page.",
+        "diligence class 1796",
+        [
+            (
+                "diligence class 1796",
+                "The kit's manual (docs/design/VesselCandidates.md); Winfield, British Warships "
+                "in the Age of Sail 1793-1817, the Diligence class (UNVERIFIED from memory); "
+                "Lavery, Arming and Fitting; Douglas 1820, the crews",
+                guns,
+                cartridges,
+                shot,
+                "The class's armament: 16 x 32-pounder carronades, 2 x 6-pounder chase guns.",
+            )
+        ],
+    )
+    b.quarter_bill(
+        QUARTER_BILL_NOTE,
+        [
+            ("forecastle", 6, "The trimmers: six of the forecastlemen for the head sails."),
+            ("fore_top", 6, "Six of the fore topmen for the fore braces."),
+            ("main_top", 7, "Seven of the main topmen for the main braces."),
+            ("afterguard", 8, "Eight of the afterguard at the main sheet and the after braces."),
+        ],
+        2,
+        0,
+        "sail before guns",
+        {
+            "helm": "Two quartermasters at the wheel (Luce 1884 ch. XX).",
+            "powder": (
+                "The powder beyond the idlers: none; the cooks, stewards and servants pass the "
+                "cartridges (judgement)."
+            ),
+            "priority": PRIORITY_NOTE,
+        },
+    )
+
+
+def merchant_brig_armament(b):
+    """The merchant brig's few guns (spec M7 §7: 'the merchant brig's few'): four long
+    6-pounders, two a side, for her own defence against a privateer's boats (the period's
+    merchantmen of three hundred tons carried a few 4- or 6-pounders or none; judgement),
+    with a merchant's scant magazine; her hull and deck the Harpy's."""
+    deck = 1.5 + PORT_SILL_M
+    guns = []
+    for i, x in enumerate((4.0, -4.0), start=1):
+        guns += broadside_pair(
+            i,
+            "long",
+            6,
+            LONG_GUN_CWT[6],
+            x,
+            deck,
+            (
+                "Four long 6-pounders, two a side (judgement: a merchant brig's defence against "
+                "a privateer's boats), the 7 ft gun of 20 cwt (from memory); the merchant's "
+                "bill gives four men to the pair where the King's would give six, so her guns "
+                "are served short and slow (spec M7 8)."
+                if i == 1
+                else None
+            ),
+        )
+    for g, _ in guns:
+        g["crew"] = 4  # the merchant's own quarter bill, short of Douglas's figure (judgement)
+    cartridges, shot = fit_magazine(guns, {"long": MERCHANT_ROUNDS})
+    b.armament(
+        "The armament (spec M7 7; package 70): the merchant brig's few guns, one fit, her "
+        "magazine a trader's (twenty round and a little grape a gun: judgement). Every "
+        "figure's source is in tools/gen_ships.py; the weights are from memory.",
+        "merchant",
+        [
+            (
+                "merchant",
+                "Judgement on the period's trade (a brig of three hundred tons carried a few "
+                "4- or 6-pounders for her own defence, or none); the gun's weight from memory",
+                guns,
+                cartridges,
+                shot,
+                "A trader's fit: four 6-pounders, two a side.",
+            )
+        ],
+    )
+    b.quarter_bill(
+        QUARTER_BILL_NOTE,
+        [
+            ("fore_top", 1, "The trimmers: a topman of each top for the braces (judgement)."),
+            ("main_top", 1, None),
+        ],
+        1,
+        0,
+        "sail before guns",
+        {
+            "helm": "One man at the wheel (judgement).",
+            "powder": "The powder beyond the idlers: none; the cook and the boy (judgement).",
+            "priority": (
+                "A merchantman's weapon is her heels: the sails before the guns (judgement)."
+            ),
+        },
+    )
+
+
 def frigate_crew(b):
     posts_note = (
         "Station holders by post (spec M3 2.3): the commissioned officers, then the standing "
@@ -3808,7 +4426,8 @@ def cutter(out_dir="data/ships"):
         "H.M. armed cutter Sherbourne (Slade's design, built at Woolwich, launched 1763): "
         "85 tons burthen, 54 ft 6 in on deck, 19 ft beam; the Channel's revenue cutter, of "
         "the type the pilot cutters and the hired armed cutters of the war shared; six "
-        "3-pounders and eight swivels (guns are not parts until milestone 7). Hull from the "
+        "3-pounders and eight swivels (her two fits, the Admiralty's 12-pounder carronades of "
+        "1805 the default: armament below, package 70). Hull from the "
         "kit's manual (Winfield and the Greenwich draught not reached); spars by Fincham "
         "1843's table of proportions for revenue cruisers (p. 67) and his rules for cutters' "
         "sails (arts. 86, 87); sails by Steel 1794; see tools/gen_ships.py for every rule.",
@@ -4443,6 +5062,7 @@ def cutter(out_dir="data/ships"):
     b.alias("main mast", "main.mast")
     ground_tackle_for(b, burthen, beam_ft, draught_ft)
     cutter_crew(b)
+    cutter_armament(b, deck_height)
     hold_for(b, burthen, False, "a revenue cutter's hold less her own stores: judgement")
     b.boats(
         BOATS_NOTE,
@@ -4695,7 +5315,7 @@ def brig(out_dir="data/ships", merchant=False):
         "H.M. brig-sloop Harpy of the Diligence class (launched 1796, sold 1817): 316 tons "
         "burthen, 95 ft on the gun deck, 75 ft 1 5/8 in on the keel, 28 ft 1 1/2 in beam, "
         "12 ft 0 1/2 in in the hold; sixteen 32-pounder carronades and two 6-pounder chase "
-        "guns (guns are not parts until milestone 7). The Navy's brig; the merchant brig is "
+        "guns (the armament below, package 70). The Navy's brig; the merchant brig is "
         "her second description at far detail (package 36). Hull from the kit's manual "
         "(Winfield and the Greenwich draught not reached); spars by Fincham 1843's table of "
         "proportions for brigs of war (p. 88) checked against Luce 1866 ch. VII; sails by "
@@ -5436,6 +6056,7 @@ def brig(out_dir="data/ships", merchant=False):
         merchant_brig(b, out_dir, burthen, gundeck_ft)
         return
     brig_crew(b)
+    brig_armament(b, deck_height)
     hold_for(b, burthen, True, "a brig-sloop's hold is her own stores: judgement")
     b.boats(
         BOATS_NOTE,
@@ -5517,13 +6138,15 @@ def merchant_brig(b, out_dir, burthen, gundeck_ft):
     b.doc["ship"]["name"] = "Industry"
     b.doc["ship"]["era_notes"] = (
         "The merchant brig Industry (package 68): the trade's brig of the Harpy's lines and "
-        "rig, about 316 tons burthen, her ports painted and no guns; a master's and mates' "
+        "rig, about 316 tons burthen, her ports painted and four 6-pounders for her own defence "
+        "(package 70); a master's and mates' "
         "company of sixteen and no marines, a merchant's stores and the trader's hold and "
         "boats. The hull and the rig are the brig-sloop's (Falconer 1780, BRIG: 'a merchant-"
         "ship with two masts'; the trade's brig of the period of the same size, judgement), "
         "every rule as the Harpy's; see tools/gen_ships.py."
     )
     merchant_brig_crew(b)
+    merchant_brig_armament(b)
     hold_for(b, burthen, False, "a merchant brig's hold, her trade: judgement")
     b.boats(
         BOATS_NOTE,

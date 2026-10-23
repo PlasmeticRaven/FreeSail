@@ -145,6 +145,14 @@ class Sailor:
     # Called on deck out of his watch: by a call for his watch or for all hands while the
     # hands come up (the routine, package 18, sets and clears it). The bill reads it.
     turned_up: bool = False
+    # Package 70 (spec M7 §8a, §9; `docs/design/Design-WorkInAction.md`): his station by
+    # the quarter bill while she is at quarters ("gun:3", "trimmers", "helm", "powder",
+    # "marines", "carpenter", "surgeon"), "" under the watch bill; and the hurt a shot did
+    # him ("killed", "wounded", "hurt"), with the tick, which takes him off the bill
+    # (`fit` false). The surgeon's work and a man's return are 73's.
+    quarters: str = ""
+    hurt: str = ""
+    hurt_tick: int | None = None
 
 
 def fatigue_words(fatigue: float) -> str:

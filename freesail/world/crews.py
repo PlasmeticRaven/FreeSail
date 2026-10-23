@@ -334,6 +334,7 @@ def _crew_scenario(parent: World, vessel: Any) -> Scenario:
         world_orders=[],
         intent=str(vessel.intent_words or ""),
         books=[],
+        fit=(getattr(vessel, "fit", "") or None),  # her own fit of guns, not the player's
     )
     sc.latitude_deg = vessel.position.lat_deg
     return sc

@@ -34,8 +34,8 @@ def spec_from_dict(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
     return parse_ship(data, source=source)
 
 
-def load_ship(path: str | Path) -> Ship:
-    return Ship(load_spec(path))
+def load_ship(path: str | Path, fit: str | None = None) -> Ship:
+    return Ship(load_spec(path), fit=fit)
 
 
 def ship_from_dict(data: dict[str, Any], source: str = "<memory>") -> Ship:

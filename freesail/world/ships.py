@@ -500,6 +500,13 @@ class Vessel:
     # her captain's orders given by the director's hand say in her log while she has no
     # World of her own, as (tick, words); empty in a checkpoint from before
     story: tuple[tuple[int, str], ...] = ()
+    # the fit of guns she carries (spec M7 §7; package 70): a name of her file's fits, ""
+    # for the file's default; her crewed World's ship is made with it, and the far fight
+    # reads it. Her colours as a state the lookout reads (rule 3, 71's hook): "shown" or
+    # "struck"; and the far body's damage summed (74's ground, package 70's measure).
+    fit: str = ""
+    struck: bool = False
+    damage: dict[str, Any] = field(default_factory=dict)
 
     @property
     def height_m(self) -> float:
@@ -911,6 +918,10 @@ class Vessel:
             d["crewed"] = self.crew is not None
         if self.warning:
             d["warning"] = self.warning
+        if getattr(self, "fit", ""):
+            d["fit"] = self.fit  # package 70
+        if getattr(self, "struck", False):
+            d["struck"] = True
         story = getattr(self, "story", ()) or ()
         if story:
             # her captain's orders by the director's hand (package 62): only where there
@@ -1092,6 +1103,7 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         plan=plan,
         cycle=cycle,
         sailing_factor=round(factor, 3),
+        fit=" ".join(str(spec.get("fit") or "").split()),
     )
     if spec.get("letter") is not None:
         from freesail.world.people import Message
