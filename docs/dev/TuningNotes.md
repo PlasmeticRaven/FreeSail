@@ -8043,3 +8043,5 @@ restarted twice during the runs, and each tier is written here as it finished.
   passed (07:10 to 07:24). Not the fix's: the same measure taken four times in turn on the
   fix's tree, the old pilot's wind and `809620b` gave 467 to 564 for all three alike (the
   container restarted twice that morning; the floor is at the machine's noise today).
+- **After the Goulet's cases were marked** (`292b277`): **the fast tier** 3,555 passed, none
+  failed, 327 slow left out (07:25 to 07:47).
