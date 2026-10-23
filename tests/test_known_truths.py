@@ -7257,3 +7257,139 @@ def test_truth_7b_123_no_enemy_heavier_than_a_brig_refuses_a_frigate_and_lets_a_
         'ship: a frigate "Fowey" of Britain at 49 02 N 6 22 W, bound for Plymouth',
     ):
         assert not D.direct(w, text, by="the test").startswith("Refused"), text
+
+
+# Package 58b: the captain's sea sense, third pass (the Éclair's first cruise, the lead's
+# wave-2 playtest and 57's gale trial). Truths 7b-127 to 7b-129, numbered after 58a's
+# 7b-124 to 7b-126: a leg laid again at the turn of the tide, the wind across the stern
+# leaving the lugs against their masts and the captain dipping them, and the frigate lying
+# to under the book in the gale trial without being taken aback.
+# ---------------------------------------------------------------------------
+
+OFF_THE_SEPT_ILES = (49.0, -3.6)  # open water, forty fathoms, the land four leagues south
+
+
+def _eclair_under_her_lugs(
+    hh: int, mm: int, at: tuple[float, float] = (48.7356, -4.000), heading: float = 95.0
+) -> World:
+    """The Éclair under her lugs, the wind W by S, on the morning of the wave-2 playtest
+    (12 June 1805): by default in the channel of Bas east of the road."""
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, hh, mm),
+        wind_from_deg=260.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=heading,
+        ship_speed_kn=4.0,
+        position={"lat_deg": at[0], "lon_deg": at[1]},
+        region="channel-west",
+        ports=["roscoff", "morlaix", "st-malo"],
+        nation="france",
+    )
+    w = make_world(SEED, "data/ships/lugger.yaml", sc)
+    assert w.submit("set plain sail").kind == "order.accepted"
+    return w
+
+
+def test_truth_7b_127_the_eclairs_leg_is_laid_again_at_the_turn_of_the_tide_in_the_channel_of_bas():
+    """Package 58b's truth 127 (item 1; the Éclair's first cruise: the leg laid on the flood
+    was held through the ebb into the narrows of the channel of Bas): the rules captain lays
+    his leg allowing the flood the master's book gives, and when the master's tide turns to
+    the ebb in the channel he lays it again at once, saying why, the helm given the course
+    worked for the new stream; and she clears the channel without touching."""
+    w = _eclair_under_her_lugs(5, 25)
+    w.captain.set_intent("passage to 48 46 N 3 45 W")
+    w.run(3600)
+    shaped = [e for e in w.log if e.kind == "helm.set" and "Shaped a course for" in e.text]
+    assert shaped and "Allowing the flood" in shaped[0].text
+    turned = [e for e in w.log if e.kind == "reckoning.tide" and e.data.get("turn")]
+    assert turned and turned[0].data["flood"] is False, [e.text for e in turned]
+    relaid = [
+        e
+        for e in w.log
+        if e.kind == "order.accepted" and "(the tide has turned, the ebb making)" in e.text
+    ]
+    assert relaid, [e.text for e in w.log if e.kind == "order.accepted"]
+    assert relaid[0].text.startswith("By the captain, on passage: shaping a course for")
+    assert 0 <= relaid[0].tick - turned[0].tick <= 11 * 60
+    assert [e for e in w.log if e.kind == "helm.set" and e.tick == relaid[0].tick]
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+
+
+def test_truth_7b_128_a_steer_through_the_stern_leaves_the_lugs_against_the_masts_and_he_dips():
+    """Package 58b's truth 128 (item 3; the lead's wave-2 playtest, finding 1, and the
+    owner's ruling of 2026-10-23 that nothing is ordered by the helm): the Éclair running
+    under her lugs is steered NE through the stern by the player; the lugs are left against
+    their masts, said once ("dip them when you will"), and nothing is done, the picture
+    drawing them on the weather side; the same turn made by the rules captain's own course
+    has the lugs dipped as his next orders, and the picture draws them to leeward. Off the
+    Sept-Îles, in open water."""
+    from freesail.api.queries import snapshot
+
+    def lug_sides(world: World) -> dict[str, str | None]:
+        return {
+            s["id"]: s["lug_side"]
+            for s in snapshot(world)["sails"]
+            if s["id"] in ("fore.lug", "main.lug")
+        }
+
+    w = _eclair_under_her_lugs(10, 0, at=OFF_THE_SEPT_ILES, heading=90.0)
+    w.run(240)
+    assert lug_sides(w) == {"fore.lug": "larboard", "main.lug": "larboard"}
+    start = len(w.log)
+    w.submit("steer NE")
+    w.run(600)
+    lines = list(w.log)[start:]
+    said = [e for e in lines if e.kind == "sail.across_the_stern"]
+    assert [e.text for e in said] == [
+        "The wind has come across the stern to the larboard quarter: the foresail and the "
+        "mainsail are against their masts; dip them when you will."
+    ]
+    assert not [e for e in lines if e.text.startswith(("Dip the", "By the captain"))]
+    assert lug_sides(w) == {"fore.lug": "larboard", "main.lug": "larboard"}  # the weather side
+    w = _eclair_under_her_lugs(10, 0, at=OFF_THE_SEPT_ILES, heading=90.0)
+    w.run(240)
+    w.captain.set_intent("passage to 49 20 N 3 20 W")
+    w.run(900)
+    said = [e for e in w.log if e.kind == "sail.across_the_stern"]
+    dips = [e for e in w.log if e.kind == "order.accepted" and "dipping the" in e.text]
+    assert len(said) == 1 and len(dips) == 2, [e.text for e in w.log]
+    assert all(e.tick > said[0].tick and e.text.startswith("By the captain") for e in dips)
+    assert lug_sides(w) == {"fore.lug": "starboard", "main.lug": "starboard"}  # to leeward
+
+
+def test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_being_taken_aback():
+    """Package 58b's truth 129 (item 5; 57's gale trial, for the lead's playtest of the
+    fixed book): the frigate on her station off Ushant as the westerly rises to a gale.
+    The head sail straining at its bolt-ropes is taken in by the captain before it blows
+    out (the trial lost its fore topmast staysail at 08:29 before); she is hove to for
+    weather and lies a-try under the close-reefed main topsail and the staysails, as the
+    book has it, and in the four hours and more she lies so she is never taken aback, no
+    sail is lost, and she drifts at under two knots on the mean. What she does when she
+    fills away for the station in the gale's tail is the trial's own pin, an expected
+    failure until the lead has played it (`tests/test_captain_trials.py`)."""
+    from freesail.physics.hull import hull_state
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario("data/scenarios/trials/trial-station-gale.yaml")
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    lying = aback = 0
+    knots = []
+    for _ in range(520):
+        w.run(60)
+        if str(w.readings.value("manoeuvre_in_hand") or "") == "hove to":
+            lying += 1
+            knots.append(units.ms_to_knots(w.ship.dyn.speed))
+            aback += hull_state(w.ship).seconds_aback > 0.0
+    states = [(e.tick, e.data["state"]) for e in w.log if e.kind == "captain.state"]
+    assert "hove to for weather" in {s for _t, s in states}, states
+    lay = [e for e in w.log if e.kind == "ship.hove_to"]
+    assert lay and lay[0].text.startswith("Lying a-try under the main topsail and the staysails")
+    taken = [e for e in w.log if e.text.endswith("(straining at the bolt-ropes).")]
+    assert taken and "taking in the fore topmast staysail" in taken[0].text
+    assert not [e for e in w.log if e.kind in ("sail.blown_out", "sail.split")]
+    assert lying >= 4 * 60 and aback == 0
+    assert sum(knots) / len(knots) < 2.0
+    assert not [e for e in w.log if e.kind == "ship.aground"]

@@ -539,7 +539,7 @@ def test_the_lead_goes_every_glass_in_soundings_and_every_hour_inshore_brought_t
     assert not cap._casts(near, {"sounding"})
     assert given[-1] == ("fill away", "the cast had")
     given.clear()
-    near.manoeuvre, near.tick = "none", 18000  # an hour on, within the watch: cast not had
+    near.manoeuvre, near.tick, near.speed_kn = "none", 18000, 6.0  # within the watch
     assert not cap._casts(near, set()) and not given
     lee = C.Perception(tick=40000, chart_fathoms=45.0, speed_kn=6.0, wind_kn=14.0)
     lee.coast_by_account_nm, lee.lee_land_nm = 9.0, 7.0
@@ -579,12 +579,11 @@ def test_a_lug_left_against_its_mast_is_dipped_as_the_captains_next_order():
     assert all(w.ship.sails[i].lug_side == "starboard" for i in ("fore.lug", "main.lug"))
 
 
-def test_the_gale_books_mending_the_head_sails_in_a_good_full_and_the_luggers_storm_lug():
+def test_the_gale_books_mending_the_head_sails_in_and_the_luggers_storm_lug():
     """Package 58b, item 5 (57's gale trial): a head sail straining at its bolt-ropes in a
     wind over the shorten-sail line is taken in (the fore topmast staysail split in the
-    trial with the jib in); a ship left full and by on a course not laid in a blow is
-    steered half a point freer than her close-hauled angle by compass; a lugger heaves to
-    for weather under her taille-vent, having no topsail to lie a-try under."""
+    trial with the jib in); a lugger heaves to for weather under her taille-vent, having no
+    topsail to lie a-try under."""
     from types import SimpleNamespace
 
     w = world_at(49.5, -5.5, ship=FRIGATE)
@@ -601,22 +600,13 @@ def test_the_gale_books_mending_the_head_sails_in_a_good_full_and_the_luggers_st
     assert len(given) == 1  # not again within ten minutes
     cap._head_sails_straining(C.Perception(tick=2000, wind_kn=20.0), [strain])
     assert len(given) == 1  # under the line, left standing
-    given.clear()
-    shaped = SimpleNamespace(kind="helm.set", text="", data={"course_not_laid": True})
-    blow = C.Perception(tick=3000, wind_kn=35.0, wind_from_deg=265.0, heading_deg=320.0)
-    cap._good_full(blow, [shaped])
-    assert given == [("steer 338", "a good full, her canvas reefed in a blow")]
-    given.clear()
-    cap._good_full(
-        C.Perception(tick=3000, wind_kn=18.0, wind_from_deg=265.0, heading_deg=320.0), [shaped]
-    )
-    assert not given
     lugger = world_at(49.5, -5.5, ship="data/ships/lugger.yaml")
     lcap, lgiven = _on_a_leg(lugger)
     assert lcap._lugger_storm_lug() and not cap._lugger_storm_lug()
     lcap._on_enter("hove to for weather", "on passage")
     assert [t for t, _ in lgiven] == [
         "shorten sail",
-        "shift the mainsail for the taille-vent",
-        "heave to",
+        "shift the mainsail for the storm lug",
+        "shift the jib for the storm jib",
     ]
+    assert lcap._business.get("lie_to_storm_lug")  # hove to when the storm jib is set

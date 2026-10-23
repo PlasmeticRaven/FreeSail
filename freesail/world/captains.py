@@ -296,13 +296,6 @@ RELAY_GLASS_H = 0.5
 RELAY_LEAST_S = 1800  # a glass between layings for the stream's change
 RELAY_TURN_LEAST_S = 600  # ten minutes for the tide's turn (a course shaped at the turn holds)
 
-# The book's close-hauled band under reefs (package 58b, item 5; `Captain._good_full`): a
-# ship kept full and by in a blow is steered this many points freer than her close-hauled
-# angle by compass. Judgement: half a point, the margin the pilot keeps her full and by with
-# (`ports.PILOT_LIE_MARGIN_RAD`); at it the gale trial's frigate made four knots where the
-# helm's mark held her at forty degrees of apparent wind with a knot or two.
-GOOD_FULL_POINTS = 0.5
-
 
 def actor_for(state: str) -> str:
     return f"{ACTOR_PREFIX}'{state}'"
@@ -2314,10 +2307,12 @@ class Captain(Judgement):
             if self._lugger_storm_lug():
                 # package 58b (item 5): a lugger has no topsail to lie a-try under; she lies
                 # to under her own storm canvas, the taille-vent in the main lug's place
-                # (Forfait 1788 p. 52: tacked at the foot of the mast, "safe aback"), the
-                # fore lug lowered, the mizen flat aft and the jib to windward
-                self.give("shift the mainsail for the taille-vent", why="to lie to in a gale")
-                self.give("heave to", why="under the taille-vent and the mizen")
+                # (Forfait 1788 p. 52: tacked at the foot of the mast, "safe aback") and the
+                # storm jib in the jib's, hove to when it is set (the heave-to lowers the fore
+                # lug, hauls the mizen flat aft and the storm jib to windward)
+                self.give("shift the mainsail for the storm lug", why="to lie to in a gale")
+                self.give("shift the jib for the storm jib", why="to lie to in a gale")
+                self._business["lie_to_storm_lug"] = True  # hove to when the storm jib is set
                 return
             self.give("lie a-try")
             return
@@ -2394,8 +2389,23 @@ class Captain(Judgement):
         self._weather_work(p, kinds)
         if state not in ("at anchor", "in port", "in distress"):
             self._head_sails_straining(p, events)
-        if state in ("on passage", "beating", "running for shelter", "keeping station"):
-            self._good_full(p, events)
+        if state == "hove to for weather" and self._business.get("lie_to_storm_lug"):
+            # the lugger's storm jib set: she is hove to under it and the taille-vent
+            from freesail.ship.parts import SailState
+
+            ship_sails = getattr(self.world.ship, "sails", {}) or {}
+            jib = ship_sails.get("storm_jib")
+            if jib is not None and jib.is_set and p.manoeuvre not in ("hove to", "heaving to"):
+                self._business.pop("lie_to_storm_lug", None)
+                self.give("heave to", why="under the taille-vent and the storm jib")
+            elif (
+                jib is not None
+                and jib.state is SailState.FURLED
+                and not self._business.get("storm_jib_set")
+            ):
+                # shifted for the jib already hauled down, it is bent and furled: set it
+                self._business["storm_jib_set"] = True
+                self.give("set the storm jib", why="to lie to under it")
         if state in ("on passage", "beating", "running for shelter"):
             if self._casts(p, kinds):
                 return  # brought to for the deep-sea lead: the leg waits for the cast
@@ -2442,42 +2452,6 @@ class Captain(Judgement):
         if self._stimulus("lee shore", p):
             return "to claw off the land under her lee"
         return "to give her way, the wind still strong"
-
-    def _good_full(self, p: Perception, events: list[Any]) -> None:
-        """The book's close-hauled band widened under reefs (package 58b, item 5; 57's gale
-        trial): kept full and by under close-reefed topsails in a gale, the helm's mark held
-        her at forty degrees of apparent wind with a knot or two of way, aback every three
-        minutes, and neither stays nor wears would bring her round; steered at sixty she
-        made four knots. So in a wind over `shorten_sail_kn`, or with two reefs and more in
-        the topsails, a ship left full and by on a course not laid (by his shaping, his
-        book's, a tack's or a wear's end) is steered `GOOD_FULL_POINTS` freer than her
-        close-hauled angle on the tack she is on, by compass: "Keep her a good full!" (Luce
-        1884, ch. XXIV, p. 414). Not while a manoeuvre is in hand."""
-        d = self.doctrine
-        th = d.threshold if d is not None else (lambda k, v=None: v)
-        heavy = p.wind_kn >= float(th("shorten_sail_kn", 30)) or p.topsail_reefs >= 2
-        if not heavy or p.wind_from_deg is None or p.heading_deg is None:
-            return
-        if p.manoeuvre and p.manoeuvre != "none":
-            return
-        full = False
-        for e in events:
-            data = e.data or {}
-            if e.kind == "helm.set":
-                full = bool(data.get("course_not_laid"))
-            elif e.kind == "helm.order" and data.get("helm_mode"):
-                full = data.get("helm_mode") == "full_and_by"
-            elif e.kind in ("ship.wore", "ship.tacked", "ship.filled_away"):
-                full = "full and by" in e.text
-        if not full:
-            return
-        from freesail.evolutions.scripts import close_hauled_true_angle
-
-        closest = units.rad_to_deg(close_hauled_true_angle(self.world.ship))
-        off = (p.heading_deg - p.wind_from_deg + 180.0) % 360.0 - 180.0
-        sign = 1.0 if off >= 0.0 else -1.0
-        course = (p.wind_from_deg + sign * (closest + GOOD_FULL_POINTS * 11.25)) % 360.0
-        self.give(f"steer {course:.0f}", why="a good full, her canvas reefed in a blow")
 
     def _head_sails_straining(self, p: Perception, events: list[Any]) -> None:
         """A head sail straining at its bolt-ropes in a wind over `shorten_sail_kn` is taken
@@ -2869,7 +2843,7 @@ class Captain(Judgement):
         laid = self._business.get("laid")
         if not isinstance(laid, dict) or laid.get("line_deg") is None:
             return ""
-        since = p.tick - int(laid.get("tick") or p.tick)
+        since = p.tick - int(laid.get("tick", p.tick))
         now = p.tide_allowed or {}
         turned = [e for e in events if e.kind == "reckoning.tide" and (e.data or {}).get("turn")]
         if turned:

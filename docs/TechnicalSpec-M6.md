@@ -455,6 +455,62 @@ without; `captains.resolve_state` still answers through a lazy hook. The crewed 
 (§19) changes the body only: the brain's state is folded into the near captain
 (`FarCaptain.fold_in`: `_enter` loads the state's book) and back (`fold_back`).
 
+**As built (package 58b, 2026-10-23): the captain's sea sense, third pass.** *A leg laid
+again as the stream changes* (`Captain._stream_changed`; `RELAY_OFF_LINE_NM`,
+`RELAY_GLASS_H`, `RELAY_LEAST_S`, `RELAY_TURN_LEAST_S`): a course shaped allows the stream
+the master allows at that hour and no other, so on passage and running for shelter the
+captain lays the leg again when the master's tide turns or she passes by his account into
+other waters (his `reckoning.tide` line, answered ten minutes after a laying at the
+soonest and kept till then), and when the stream the master allows now, against the one
+the course allowed, would carry her more than a cable off the line in the next glass
+(a glass between such layings); the perception carries the master's tide
+(`Perception.tide_allowed`, from `the reckoning`), and a course shaped before she had way
+is shaped again when she has it. *Casts on a long leg* (`Captain._casts`; the doctrines'
+`cast_glass_fathoms`, `cast_hour_fathoms`, `cast_inshore_nm`, `cast_bring_to_hours`;
+`Perception.chart_fathoms`, the depth of water by the chart at the account): the hand
+lead every glass where the chart has under twenty fathoms, the deep-sea lead every hour
+inside the hundred-fathom line with the land in sight or within five leagues by account,
+cast as she goes under four knots and brought to for it over them once a watch at most,
+never beating, in a blow or with the land under her lee within her sea room, filled away
+when it is had; not in pilot water nor with the pilot aboard. *The wind across the stern*
+(`orders.navigation.watch_the_stern`, each tick from the evolutions' runner;
+`STERN_CROSSED_DEG`; the owner's ruling of 2026-10-23, nothing ordered by the helm): the
+sails answer as 43b and 37m built them, unchanged, and when the wind has come a point past
+dead astern onto the other quarter with a dipping lug left against its mast or a square
+yard braced for the old tack, one notable line says so (`sail.across_the_stern`: "the
+foresail and the mainsail are against their masts; dip them when you will"; "the yards
+are braced for the starboard tack, by the lee; brace them round when you will"), once a
+crossing, nothing done, a manoeuvre's own crossing its own; the rules captain's next
+orders are the sail work (`Captain._across_the_stern`: each lug dipped, `trim sails` for
+the yards, `trim the sheets` for a boom that came over by itself). *The course given when
+she gathers way* (`orders.navigation.gathering_way`, `GATHERED_WAY_KN`; a `pending` course
+held `for way`): after the anchor is aweigh a course given her (a helm order, a course
+shaped, a chase's, a standing order's) is held while she casts and until she has a knot
+of headway with her sails drawing, said at the aweigh and steered then (`helm.course_given`,
+"She has gathered way, ... knots, her sails drawing"); the starter book's words say so.
+*The gale book's mending* (57's debt): a head sail straining at its bolt-ropes in a wind
+over the shorten-sail line is taken in by the captain before it blows out
+(`_head_sails_straining`); filling away from lying to with the wind still over that line
+the topsails are set as they stand close-reefed, to go through the water, "to claw off the
+land under her lee" where it is (`_sail_to_fill_away`); a lugger, having no topsail to lie
+a-try under, lies to under her own storm canvas, the storm lug (the taille-vent) in the
+main lug's place and the storm jib in the jib's, hove to when it is set. The two gale
+trials' pins wait for the lead's playtest of the book (the tuning notes, "Package 58b").
+*The pilot's conn in a stream* (`world/ports.py`, package 68's debt): he judges each leg
+of his track ahead before he stands into it (`_leg_made`, `_foul_leg`), with the stream
+his water will have on it when she comes to it and the wind over that water, at a way of
+`PILOT_JUDGE_WAY_KN`: a leg she lies, or sags off by less than a point, serves; one that
+sags more serves only if her sagging track has water under her and passes no danger, the
+next leg judged from where it leaves her. When one will not serve he brings her up where
+she is in no more than `PILOT_WAIT_MOST_FATHOMS` (`port.pilot_waits`, the hour he looks for
+the stream to serve, or the wind), looks again every `PILOT_WAIT_LOOK_S` once she rides,
+weighs when the legs will serve by the time she is under way, takes up his track again
+from where she lies, and judges it for that hour until it has come; in deeper water he
+says he cannot bring her up and cons her on as before. A turn of two points and more
+toward the wind has the yards trimmed for it first and the helm put over a minute later
+(`PILOT_TRIM_FIRST_S`). The two Goulet cases from the owner's wardroom save are no longer
+expected failures. Truths 7b-127 to 7b-129.
+
 ### 5. The officer's own reckoning (`freesail/world/reckoning.py`; `freesail/agents/tools.py`)
 
 G19's small step, true to the period: an officer may keep a reckoning of his own from the

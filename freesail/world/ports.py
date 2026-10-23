@@ -286,16 +286,17 @@ PILOT_JOIN_BERTH_NM = 0.1
 # the helm put over `PILOT_TRIM_FIRST_S` later (from 114000, his five-point turn to NNE
 # with the yards for the wind on the quarter laid her aback in a minute). Judgement
 # throughout: a point's sag is the most a turning mark taken high covers in his short legs;
-# twenty fathoms, a bower's five scopes within a cable and its tier; five minutes, his
+# five and twenty fathoms, as the Éclair rode in two and twenty off Fréhel; five minutes, his
 # look at the water; ten minutes, the steps of his reckoning of the tide; seven hours, past
 # the next slack.
 PILOT_SAG_LEAST_RAD = units.POINT
-PILOT_WAIT_MOST_FATHOMS = 20.0
+PILOT_WAIT_MOST_FATHOMS = 25.0
 PILOT_WAIT_LOOK_S = 300
 PILOT_WAIT_AHEAD_S = 600
 PILOT_WAIT_HORIZON_H = 7.0
 PILOT_TRIM_FIRST_S = 60
 PILOT_JUDGE_WAY_KN = 4.0  # her way through the water as he reckons a leg (judgement)
+PILOT_WEIGH_AHEAD_S = 1800  # he judges the stream for her under way in half an hour (judgement)
 PILOT_WAIT_WEIGH_S = 2700  # a weighing not come in three quarters of an hour is given up
 
 IN_PORT_NM = 2.0
@@ -833,6 +834,7 @@ class Ports:
     conn_wait: dict | None = None
     conn_trim_first: int | None = None
     conn_judged: tuple | None = None  # (the mark's index, the tick) he last judged his legs at
+    conn_wait_for: dict | None = None  # the hour he weighed for, his legs judged for it till then
     hail_answer: str = ""
     hail_count: int = 0
     hail_tick: int | None = None
@@ -1820,6 +1822,7 @@ class Ports:
         self.conn_wait = None
         self.conn_judged = None
         self.conn_trim_first = None
+        self.conn_wait_for = None
         self.conn = True
         way = "in" if inward else "out"
         words = (
@@ -1937,6 +1940,7 @@ class Ports:
         self.conn_wait = None
         self.conn_judged = None
         self.conn_trim_first = None
+        self.conn_wait_for = None
         if said and self.pilot is not None:
             self._record(
                 Severity.NOTABLE,
@@ -2004,8 +2008,19 @@ class Ports:
             if gathering_way(ship):
                 return
             self.conn_wait = None
-            self.conn_leg_from = pos
             self.conn_bearing = None
+            # his track joined again from where she lies: the stream may have set her past
+            # a mark while she came to and rode, and a mark astern is not conned for
+            joined = self._joined_track(port, pos) if self.conn_inward else None
+            if isinstance(joined, list) and joined:
+                self.conn_track, self.conn_i, self.conn_aims = joined, 0, {}
+            self.conn_leg_from = pos
+            # committed for the slack he weighed for: his legs judged for half an hour on
+            # while she gathers way and stands for his first mark
+            from freesail.world.sights import greenwich_time
+
+            ahead = greenwich_time(world) + timedelta(seconds=PILOT_WEIGH_AHEAD_S)
+            self.conn_wait_for = {"at": ahead.isoformat()}
             self._record(
                 Severity.NOTABLE,
                 "port.pilot_conn",
@@ -2193,7 +2208,14 @@ class Ports:
             return None
         own = units.wrap_pi(float(self.world.ship.dyn.heading) - wind_from)
         sign = 1.0 if (own if abs(own) > 1e-6 else x) >= 0.0 else -1.0
-        return units.wrap_2pi(wind_from + sign * closest)
+        lie = units.wrap_2pi(wind_from + sign * closest)
+        other = units.wrap_2pi(wind_from - sign * closest)
+        # the tack she is on, unless its lie is more than eight points from the course he
+        # wants and the other tack's is not (package 58b: cast the wrong way from her anchor,
+        # she was given the lie of her own tack, away from his mark, and worn by turns)
+        if abs(units.wrap_pi(lie - wanted)) > math.pi / 2.0 >= abs(units.wrap_pi(other - wanted)):
+            return other
+        return lie
 
     # -- the conn in a stream (package 58b, item 6) -------------------------------------
 
@@ -2211,11 +2233,12 @@ class Ports:
         stream his water has on the leg at `when_ut`, and where she is when she has run it
         (package 58b, item 6). She lies the course that allows for the stream, or sags off
         the leg by less than `PILOT_SAG_LEAST_RAD`: made, at `b`. Nearer the wind than she
-        lies and sagging more: made only if her sagging track over the leg's length ends no
-        farther off the leg than `PILOT_TURN_HIGH_MOST_M`, has water a fathom beneath her
-        keel all along it and passes no danger within `PILOT_WARN_ABEAM_M` with less water
-        over it than she draws; then she is where the track ends, off the mark, and the next
-        leg is judged from there. Her way is reckoned at `PILOT_JUDGE_WAY_KN`."""
+        lies and sagging more: made only if her sagging track over the leg's length has water
+        a fathom beneath her keel all along it and passes no danger within
+        `PILOT_WARN_ABEAM_M` with less water over it than she draws; then she is where the
+        track ends, off the mark, and the next leg is judged from there (so that a sag that
+        leaves her above a danger is found on the leg after). Her way is reckoned at
+        `PILOT_JUDGE_WAY_KN`."""
         from freesail.evolutions.scripts import close_hauled_true_angle
 
         world = self.world
@@ -2250,8 +2273,6 @@ class Ports:
             return True, b
         if abs(sag) >= math.pi / 3.0 or chart is None:
             return False, b
-        if length * abs(math.tan(sag)) > PILOT_TURN_HIGH_MOST_M:
-            return False, b
         run = length / math.cos(sag)
         made_deg = math.degrees(made) % 360.0
         end = destination(a, made_deg, run)
@@ -2268,14 +2289,25 @@ class Ports:
         return water, end
 
     def _foul_leg(self, pos: Position, when_ut: datetime) -> int | None:
-        """The index in his track of the first mark whose leg will not be made good at
-        `when_ut`, judged from where she is to the mark in hand and then on from where each
-        leg leaves her (`_leg_made`), or None when every leg serves."""
-        start = pos
-        for i in range(self.conn_i, len(self.conn_track)):
-            made, start = self._leg_made(start, self.conn_track[i][1], when_ut)
+        """The index in his track of the first mark whose leg will not be made good, judged
+        from the mark in hand on, each leg from where the one before leaves her (`_leg_made`)
+        and for the time she comes to it from `when_ut` at `PILOT_JUDGE_WAY_KN`; None when
+        every leg serves."""
+        way = units.knots_to_ms(PILOT_JUDGE_WAY_KN)
+        if self.conn_i >= len(self.conn_track):
+            return None
+        # the open water to his mark in hand is hers to work as she can (he cons her for it
+        # as near as she will lie); his legs from mark to mark are judged, from where each
+        # leaves her, for the time she comes to it at her way over the ground
+        start = self.conn_track[self.conn_i][1]
+        when = when_ut + timedelta(seconds=bearing_and_distance(pos, start)[1] / way)
+        for i in range(self.conn_i + 1, len(self.conn_track)):
+            mark = self.conn_track[i][1]
+            made, end = self._leg_made(start, mark, when)
             if not made:
                 return i
+            when = when + timedelta(seconds=bearing_and_distance(start, mark)[1] / way)
+            start = end
         return None
 
     def _legs_judged(self, port: Port, pos: Position, now: int) -> bool:
@@ -2294,6 +2326,15 @@ class Ports:
         from freesail.world.sights import greenwich_time
 
         now_ut = greenwich_time(self.world)
+        # judged for the hour he weighed for while it is still to come, so that a leg he
+        # weighed to take at the slack is not judged foul on the way to it
+        target = (self.conn_wait_for or {}).get("at")
+        if target:
+            at = datetime.fromisoformat(str(target))
+            if at > now_ut:
+                now_ut = at
+            else:
+                self.conn_wait_for = None
         foul = self._foul_leg(pos, now_ut)
         if foul is None:
             return False
@@ -2383,6 +2424,14 @@ class Ports:
         )
         return True
 
+    def _anchoring(self) -> bool:
+        """Coming to her anchor still (the evolution in hand or waiting for hands)."""
+        extra = getattr(self.world.ship, "extra", None) or {}
+        runner = extra.get("evolutions") if isinstance(extra, dict) else None
+        work = runner.work() if runner is not None and hasattr(runner, "work") else []
+        ids = {str(getattr(getattr(i, "evo", None), "id", "")) for i in work}
+        return bool(ids & {"come_to_anchor", "let_go_anchor"})
+
     def _wait_at_anchor(self, port: Port, now: int) -> None:
         """At anchor waiting (package 58b, item 6): every `PILOT_WAIT_LOOK_S` he looks at the
         water; when his legs serve he has her got under way on the tack the first leg
@@ -2397,7 +2446,13 @@ class Ports:
             return
         tackle = (getattr(world.ship, "extra", None) or {}).get("ground_tackle")
         riding = tackle.riding_by() if tackle is not None else None
-        if riding is None or not riding.brought_up or riding.dragging:
+        if (
+            riding is None
+            or not riding.brought_up
+            or riding.dragging
+            or self._ground_speed_kn() > 0.5
+            or self._anchoring()
+        ):
             return  # not yet brought up: he looks when she rides
         wait["look"] = now
         from freesail.world.sights import greenwich_time
@@ -2405,7 +2460,11 @@ class Ports:
         pos = world.position
         if pos is None or self.conn_i >= len(self.conn_track):
             return
-        if self._foul_leg(pos, greenwich_time(world)) is not None:
+        # the legs judged for when she will be under way and in them, not for now: the
+        # weighing takes half an hour and more (from 114000 he weighed at "the stream serves
+        # now", and the ebb had made against his first leg by the time she had cast)
+        under_way_at = greenwich_time(world) + timedelta(seconds=PILOT_WEIGH_AHEAD_S)
+        if self._foul_leg(pos, under_way_at) is not None:
             return
         wind = getattr(world, "wind", None)
         brg, _ = bearing_and_distance(pos, self.conn_track[self.conn_i][1])
@@ -2417,8 +2476,8 @@ class Ports:
         e = world.submit(
             f"get under way on the {tack} tack and steer {point}",
             actor=PILOT_ACTOR,
-            said=f"The pilot: the stream serves now for {wait.get('mark', 'my track')}; "
-            "we weigh and take her in",
+            said=f"The pilot: the stream will serve for {wait.get('mark', 'my track')} by the "
+            "time she has weighed; we weigh and take her in",
         )
         if e.kind != "order.rejected":
             wait["weighing"] = True
