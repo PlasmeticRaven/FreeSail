@@ -36,6 +36,13 @@ standing order "shorten sail for weather": when the true wind exceeds 30 knots f
 standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
 ```
 
+**Getting under way: the course when she gathers way.** The book gives no course of its own, since where she is bound is the captain's word, but it says when a course is given after weighing: when she gathers way, and not when the anchor breaks out. In the lead's playtest of the second wave the Éclair's standing order `at the anchor aweigh then steer E` put her helm over the moment the anchor was aweigh, before the jib and the helm had cast her, and her head fell off to the south with the land a cable on the bow. Since package 58b the ship holds a course given after weighing (a helm order, a course shaped, a standing order's) while she casts and until she has a knot of way through the water with her sails drawing, says so at the aweigh ("E is held till she has gathered way"), and steers it then ("She has gathered way, 1.1 knots, her sails drawing: E is steered"). So either of these gives it at the right time; the second says the tack she casts on as well:
+
+```orders lugger
+standing order "out": at the anchor aweigh then steer E
+standing order "out on the starboard tack": at the turn to the ebb then get under way on the starboard tack and steer E
+```
+
 **Trimming on a shift.** The yards are trimmed to the wind as it shifts, a point at a time, as Luce's table of the yard's best angle is given point by point. It is measured afresh from each firing, so a wind veering steadily through a night has the yards trimmed to it point by point. Not while she is hove to: her yards are then set against each other on purpose, and in two playtests this rule braced a hove-to ship's backed yard round and filled her. The guard is the dialect's own, `and the manoeuvre in hand is not hove to`; with it the rule sleeps while she lies to and wakes when she has filled away. (`trim sails` given by hand to a ship hove to is refused in words; chapter 5.) Put the same guard on any trimming rule of your own.
 
 ```orders frigate

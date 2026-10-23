@@ -443,3 +443,174 @@ def test_a_captain_under_way_with_no_sail_set_makes_plain_sail():
     assert made, [e.text for e in w.log if e.kind == "order.accepted"]
     w.run(1200)
     assert any(s.is_set for s in w.ship.sails.values())
+
+
+# -- package 58b: the captain's sea sense, third pass ------------------------------------
+
+
+def _on_a_leg(w, state: str = "on passage"):
+    """The captain of `w` on a leg to the westward under his intent, his orders recorded
+    and not given (the judgement's own unit, as the rules' tests read a rule)."""
+    cap = w.captain
+    cap.set_intent("bound for Plymouth")
+    cap.state = state
+    cap.legs = [C.Leg("49 00 N 6 00 W", Position(49.0, -6.0), "to", 2.0)]
+    cap.leg_i = 0
+    given: list[tuple[str, str]] = []
+
+    def give(text: str, why: str = ""):
+        given.append((text, why))
+        return type("E", (), {"kind": "order.accepted", "data": {}})()
+
+    cap.give = give
+    return cap, given
+
+
+def test_the_leg_is_laid_again_when_the_tide_turns_and_when_the_stream_sets_her_off_it():
+    """Package 58b, item 1 (the Éclair's first cruise: the leg laid on the flood was held
+    through the ebb into the narrows of the channel of Bas): the master's tide turned since
+    the leg was laid has it laid again, ten minutes after the laying at the soonest; a
+    stream he allows now that would carry her more than a cable off the line in the next
+    glass, beyond what the course allowed, has it laid again a glass after; a stream as it
+    was, or the captain's own set ordered, does not."""
+    from types import SimpleNamespace
+
+    w = world_at(49.5, -5.5)
+    cap, _given = _on_a_leg(w)
+    leg = cap.legs[0]
+    allowing = {"by": "book", "knots": 1.0, "toward_deg": 45.0, "made_good": True}
+    cap._business["laid"] = {"tick": 0, "line_deg": 270.0, "allowing": allowing}
+    p = C.Perception(tick=700, tide_allowed=dict(allowing))
+    assert cap._stream_changed(p, [], leg) == ""
+    turn = SimpleNamespace(kind="reckoning.tide", tick=650, data={"turn": True, "flood": False})
+    assert cap._stream_changed(p, [turn], leg) == "the tide has turned, the ebb making"
+    assert cap._stream_changed(p, [], leg) == ""  # answered once
+    p = C.Perception(tick=300, tide_allowed=dict(allowing))
+    assert cap._stream_changed(p, [turn], leg) == ""  # within ten minutes of the laying
+    p = C.Perception(tick=700, tide_allowed=dict(allowing))
+    assert cap._stream_changed(p, [], leg) == "the tide has turned, the ebb making"  # kept
+    ebb = {"by": "book", "knots": 1.0, "toward_deg": 225.0}
+    assert cap._stream_changed(C.Perception(tick=1000, tide_allowed=ebb), [], leg) == ""
+    said = cap._stream_changed(C.Perception(tick=1900, tide_allowed=ebb), [], leg)
+    assert said == "the stream changed since the leg was laid: a knot to the south-westward now"
+    along = {"by": "book", "knots": 1.0, "toward_deg": 270.0}  # along the line: no matter
+    cap._business["laid"]["allowing"] = {"by": "book", "knots": 1.0, "toward_deg": 90.0}
+    assert cap._stream_changed(C.Perception(tick=1900, tide_allowed=along), [], leg) == ""
+    own = {"by": "captain", "knots": 2.0, "toward_deg": 0.0}
+    assert cap._stream_changed(C.Perception(tick=1900, tide_allowed=own), [], leg) == ""
+    cap.state = "beating"
+    assert cap._stream_changed(C.Perception(tick=1900, tide_allowed=ebb), [], leg) == ""
+
+
+def test_the_lead_goes_every_glass_in_soundings_and_every_hour_inshore_brought_to_once_a_watch():
+    """Package 58b, item 2 (the Éclair's first cruise: twenty miles in sixteen fathoms with
+    no cast put her on the Héaux de Bréhat): on a leg in under twenty fathoms by the chart
+    the hand lead every glass; inshore within the hundred-fathom line the deep-sea lead every
+    hour, cast as she goes under four knots, brought to for it over them once a watch,
+    filled away when it is had; offshore, beating, or with the land under her lee, no
+    bringing to."""
+    w = world_at(49.5, -5.5)
+    cap, given = _on_a_leg(w)
+    p = C.Perception(tick=1000, chart_fathoms=16.0, speed_kn=6.0, wind_kn=14.0)
+    assert not cap._casts(p, set())
+    assert given == []  # the first cast a glass into the leg, not at its laying
+    p.tick = 2800
+    assert not cap._casts(p, set())
+    assert given == [("heave the lead", "in soundings on the leg")]
+    p.tick = 3700
+    cap._casts(p, set())
+    p.tick = 4600
+    cap._casts(p, set())
+    assert len(given) == 2  # a glass after
+    given.clear()
+    cap._business.clear()
+    cap._business["cast_tick"] = 0  # the last cast long since
+    off = C.Perception(tick=10000, chart_fathoms=45.0, speed_kn=6.0, wind_kn=14.0)
+    off.coast_by_account_nm = 40.0
+    assert not cap._casts(off, set()) and not given  # offshore: no cast brought to for
+    near = C.Perception(tick=10000, chart_fathoms=45.0, speed_kn=3.5, wind_kn=14.0)
+    near.coast_by_account_nm = 9.0
+    cap._casts(near, set())
+    assert given == [("heave the deep-sea lead", "inside the hundred-fathom line")]
+    given.clear()
+    near.tick, near.speed_kn = 14000, 6.0
+    assert cap._casts(near, set())
+    assert given == [("heave to", "to bring her to for a cast of the deep-sea lead")]
+    near.tick, near.manoeuvre, near.speed_kn = 14200, "hove to", 2.0
+    assert cap._casts(near, set())
+    assert given[-1] == ("heave the deep-sea lead", "brought to for a cast")
+    near.tick = 14400
+    assert not cap._casts(near, {"sounding"})
+    assert given[-1] == ("fill away", "the cast had")
+    given.clear()
+    near.manoeuvre, near.tick, near.speed_kn = "none", 18000, 6.0  # within the watch
+    assert not cap._casts(near, set()) and not given
+    lee = C.Perception(tick=40000, chart_fathoms=45.0, speed_kn=6.0, wind_kn=14.0)
+    lee.coast_by_account_nm, lee.lee_land_nm = 9.0, 7.0
+    assert not cap._casts(lee, set()) and not given
+
+
+def test_a_lug_left_against_its_mast_is_dipped_as_the_captains_next_order():
+    """Package 58b, item 3 (the owner's ruling of 2026-10-23): the rules captain's own course
+    carried the wind across the Éclair's stern; nothing was ordered by the helm, the deck
+    said the lugs were against their masts, and his next orders dip them."""
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=260.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=90.0,
+        ship_speed_kn=5.0,
+        position={"lat_deg": 49.6, "lon_deg": -4.4},
+        region="channel-west",
+    )
+    w = make_world(7, "data/ships/lugger.yaml", sc)
+    w.submit("set plain sail")
+    w.run(240)
+    assert w.ship.sails["fore.lug"].lug_side == "larboard"
+    w.captain.set_intent("passage to 49 50 N 3 50 W")
+    w.run(15 * 60)
+    crossed = [e for e in w.log if e.kind == "sail.across_the_stern"]
+    dips = [e for e in w.log if e.kind == "order.accepted" and e.text.startswith("By the captain")]
+    dips = [e for e in dips if "dipping" in e.text]
+    assert len(crossed) == 1 and len(dips) == 2, [e.text for e in w.log]
+    assert dips[0].tick > crossed[0].tick
+    assert [e.text for e in dips] == [
+        "By the captain, on passage: dipping the foresail (the wind across the stern).",
+        "By the captain, on passage: dipping the mainsail (the wind across the stern).",
+    ]
+    assert all(w.ship.sails[i].lug_side == "starboard" for i in ("fore.lug", "main.lug"))
+
+
+def test_the_gale_books_mending_the_head_sails_in_and_the_luggers_storm_lug():
+    """Package 58b, item 5 (57's gale trial): a head sail straining at its bolt-ropes in a
+    wind over the shorten-sail line is taken in (the fore topmast staysail split in the
+    trial with the jib in); a lugger heaves to for weather under her taille-vent, having no
+    topsail to lie a-try under."""
+    from types import SimpleNamespace
+
+    w = world_at(49.5, -5.5, ship=FRIGATE)
+    cap, given = _on_a_leg(w, "beating")
+    w.submit("set the jib")
+    w.run(120)
+    strain = SimpleNamespace(
+        kind="strain.warning", subject="jib", text="Jib straining at the bolt-ropes.", data={}
+    )
+    p = C.Perception(tick=1000, wind_kn=33.0)
+    cap._head_sails_straining(p, [strain])
+    assert given == [("take in the jib", "straining at the bolt-ropes")]
+    cap._head_sails_straining(C.Perception(tick=1100, wind_kn=33.0), [strain])
+    assert len(given) == 1  # not again within ten minutes
+    cap._head_sails_straining(C.Perception(tick=2000, wind_kn=20.0), [strain])
+    assert len(given) == 1  # under the line, left standing
+    lugger = world_at(49.5, -5.5, ship="data/ships/lugger.yaml")
+    lcap, lgiven = _on_a_leg(lugger)
+    assert lcap._lugger_storm_lug() and not cap._lugger_storm_lug()
+    lcap._on_enter("hove to for weather", "on passage")
+    assert [t for t, _ in lgiven] == [
+        "shorten sail",
+        "shift the mainsail for the storm lug",
+        "shift the jib for the storm jib",
+    ]
+    assert lcap._business.get("lie_to_storm_lug")  # hove to when the storm jib is set

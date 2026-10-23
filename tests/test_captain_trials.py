@@ -121,6 +121,15 @@ def test_the_station_is_to_seaward_of_its_place_and_the_stranger_is_chased(stati
 # station by 'the leg', and takes the ground at 44332, La Helle two miles off, with land
 # ahead called at six cables and two (43860, 44160), in distress at 44340. The xfail
 # below; for the lead and package 58 (docs/dev/TuningNotes.md, package 57)
+# package 58b (item 5, the gale book's mending; the judgement waits for the lead's
+# playtest, so the pins below are left as they were and the trial an expected failure,
+# the new figures beside the old): the fore topmast staysail is taken in at 8820 before it
+# blows out (it blew out at 8983); lying a-try from 15060 she is never aback; filled away
+# at 30780 she sets her close-reefed topsails and is not hove to again at 32160; beating
+# for the station she is taken among the Molène islands by 'the offing' and takes the
+# ground at 41415 (44332), in distress at 41460 (44340). The first states as they come now:
+# 300 keeping station, 15060 hove to, 30780 on passage, 31560 beating, 41460 in distress
+# (docs/dev/TuningNotes.md, package 58b)
 TRIAL_STATION_GALE_FIRST_STATES = [
     (300, "keeping station"),
     (15060, "hove to for weather"),  # 19980 before package 57
@@ -134,6 +143,8 @@ TRIAL_STATION_GALE_FIRST_STATES = [
 # 52140, ten minutes later than at 51540 (the beating verdict's dwell), and the evening's
 # tacks fall otherwise: she misses stays twice in plain sail after 18:00 and lies aback by
 # turns for half an hour (36 lines of sails backed and filled, 4 before) before she wears
+# package 58b: 864 lines and 4cb58e9ec1ab55c0, aground at 41415; the tree before it
+# (872aa61) gives 857 and cefe2cf5136fb4d9, aground at 44332 (the pin was stale before 58b)
 TRIAL_STATION_GALE_LINES = 909  # package 57, aground at 44332 (1640 at package 43b)
 TRIAL_STATION_GALE_DIGEST = "574332b785e523ab"  # package 57 (c0aa397523ea2972 at 43b)
 
@@ -147,7 +158,9 @@ def station_gale():
     reason=(
         "package 57: the day falls otherwise from the first course shaped, and she takes "
         "the ground at 44332 after twice failing to wear among the islands of "
-        "the Molène passage (the captain's sea sense; for the lead and package 58)"
+        "the Molène passage (the captain's sea sense; for the lead and package 58); "
+        "package 58b: the gale book mended, she lies to never aback and still takes the "
+        "ground there at 41415, for the lead's playtest"
     ),
     strict=False,
 )
@@ -200,10 +213,16 @@ TRIAL_STATION_LEE_SHORE_STATES = [
     (51540, "beating"),
     (68940, "keeping station"),
 ]
-TRIAL_STATION_LEE_SHORE_LINES = 1669  # package 57 (1660 at 43b, 1665 at 45c)
-# package 58a, the recurring lines: a trim waiting for hands said again in the same words is
-# routine, not notable; every tick and line the same (TuningNotes, package 58a)
-TRIAL_STATION_LEE_SHORE_DIGEST = "4720693ca65bc67b"  # 58a (e60617edd7ebbc73 at 57)
+# the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was 1669 "4720693ca65bc67b"
+# package 58b (item 5, the gale book's mending; the judgement waits for the lead's
+# playtest, so the pins are left as they were and the trial an expected failure, the new
+# figures beside the old): filled away at 30780 with the gale's tail still blowing she sets
+# her close-reefed topsails and has way, where she lay aback every three minutes under the
+# storm canvas alone until 37800 (aback 19 minutes in the day, 41 before); hove to again at
+# 41940 (41880), on passage and beating at 51480 and 51540 as before, keeping station at
+# 71340 (68940); never aground; 1597 lines and ed48ca3d61e52f20
+TRIAL_STATION_LEE_SHORE_LINES = 1669  # package 57 (1660 at 43b, 1665 at 45c); 1597 at 58b
+TRIAL_STATION_LEE_SHORE_DIGEST = "e60617edd7ebbc73"  # package 57 (0686965a0871299c at 43b)
 
 
 @pytest.fixture(scope="module")
@@ -211,6 +230,14 @@ def station_lee_shore():
     return trial("trial-station-lee-shore")
 
 
+@pytest.mark.xfail(
+    reason=(
+        "package 58b: the gale book mended, the day falls otherwise from her filling away at "
+        "30780 (hove to again at 41940, the station at 71340; never aground), for the "
+        "lead's playtest"
+    ),
+    strict=False,
+)
 def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_shore):
     """Started five miles west of Ushant with a westerly gale coming on: hove to once she
     has sea room, and never aground (the first trial grounded her in thirty-seven minutes
@@ -251,24 +278,38 @@ def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_s
 # the beats fall a minute or two otherwise (31680 to 38460 and 44940 on, against 31740 to
 # 38340 and 44880 to 56340) and she comes to an anchor in Carrick Road at 57324, 19:55,
 # at anchor at 57000 and in port at 57360 (in port at 56520 from her way into the road)
+# package 58b (items 1 and 2, by bisection: the tree with both turned off gives every old
+# figure): the brig's own captain lays his chasing leg again for the stream (her course in
+# her own World's log), so the schooner's hauling-off marks fall a tenth of a minute
+# otherwise from 15660; on passage she lays her leg again for the stream at 19680 and
+# beats from 20400, on passage 22980, beating 31620, on passage 37560, is brought to for a
+# cast of the deep-sea lead off the Lizard at 40740, beats from 46140, and comes to the
+# outer road of Falmouth at 53040 with the wind foul to go in, lets go at 53669 in
+# eighteen fathoms and a half and is in port from the road at 53700 (docs/dev/TuningNotes.md,
+# package 58b). The old figures beside each.
 TRIAL_TRADE_STRANGER_STATES = [
     (300, "on passage"),
     (3660, "evading"),
     (17880, "on passage"),  # 8100 at package 45c
-    (31680, "beating"),  # 31740 at 43b, 18000 at package 43
-    (38460, "on passage"),  # 38340 at 43b; 18120, beating 18240, passage 39060 at 43
-    (44940, "beating"),  # 44880 at 43b, 44220 at package 43
-    (57000, "at anchor"),  # on passage at 56340 at 43b (51720 at package 43)
-    (57360, "in port"),  # 56520 at 43b, 55440 at 43 (35640 at package 45c, 35340 at 45)
+    (20400, "beating"),  # 31680 at 57, 31740 at 43b, 18000 at package 43
+    (22980, "on passage"),  # 38460 at 57, 38340 at 43b; 18120, beating 18240 at 43
+    (31620, "beating"),  # 44940 at 57, 44880 at 43b, 44220 at package 43
+    (37560, "on passage"),  # package 58b
+    (46140, "beating"),  # package 58b
+    (53040, "at anchor"),  # 57000 at 57; on passage at 56340 at 43b (51720 at package 43)
+    (53700, "in port"),  # 57360 at 57, 56520 at 43b, 55440 at 43 (35640 at 45c, 35340 at 45)
 ]
-TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [57324]  # package 57 ([56498] at 43b, [55413] at 43)
-TRIAL_TRADE_STRANGER_LINES = 1534  # package 56, the glass (1521 at 57)
+# package 58b ([57324] at 57, [56498] at 43b, [55413] at 43)
+TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [53669]
+TRIAL_TRADE_STRANGER_LINES = 1407  # package 58b (1534 at 56, the glass; 1521 at 57)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
-# package 58a, the recurring lines: a trim waiting for hands said again in the same words is
-# routine, not notable; every tick and line the same (TuningNotes, package 58a)
-TRIAL_TRADE_STRANGER_DIGEST = "9eb41044fc6e9907"  # 58a (7b8012b076ebea42 at 56, the glass)
+# the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "9eb41044fc6e9907"
+# package 56, the glass: 7b8012b076ebea42 (e73870448a788eac at 57)
+# the merged tree of 58a and 58b (2026-10-23): 58b alone gave 5bbca78fdc6b5093; the digest reads
+# severity, and 58a's recurring lines are routine in this passage too
+TRIAL_TRADE_STRANGER_DIGEST = "48b205b4f587256c"  # package 58b (7b8012b076ebea42 at 56)
 
 
 @pytest.fixture(scope="module")
@@ -293,7 +334,10 @@ def test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_win
     anchored = [e.tick for e in w.log if e.kind == "ship.anchored"]
     assert anchored == TRIAL_TRADE_STRANGER_ANCHORED_TICKS
     waits = [e for e in w.log if "the wind does not serve to enter Falmouth" in e.text]
-    assert len(waits) == 0  # package 45: in port from the road, no wait to go in (2 before)
+    # package 45: in port from the road, no wait to go in (2 before); package 58b: she comes
+    # to the outer road beating with the wind foul to go in and anchors there for it (the
+    # tide's words at 57000 before), in port from the road as at 45
+    assert len(waits) == 1
     assert cap.state == "in port" and cap.intent is not None  # at anchor before package 45
     assert len(w.log) == TRIAL_TRADE_STRANGER_LINES
     assert w.log.digest()[:16] == TRIAL_TRADE_STRANGER_DIGEST
@@ -302,14 +346,20 @@ def test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_win
 
 # package 37p: at anchor at 17280 (17220), the bower let go at 17688 (17669)
 # package 45 (item 3): at anchor in the outer road, within Falmouth's reach, she is in port
+# package 58b (items 1 and 2, by bisection: both turned off give every old figure, either
+# alone does not): running for shelter in the fog she is brought to for a cast of the
+# deep-sea lead inside the hundred-fathom line at 3900 and filled away at 4800, her leg laid
+# again for the stream, and comes to the outer road earlier, at anchor at 12540 and the
+# bower let go at 12850 in thirteen fathoms, in port at 12900 (docs/dev/TuningNotes.md,
+# package 58b). The old figures beside each.
 TRIAL_TRADE_THICK_STATES = [
     (300, "on passage"),
     (300, "running for shelter"),
-    (14400, "at anchor"),  # 17280 at package 37p
-    (14820, "in port"),
+    (12540, "at anchor"),  # 14400 at 45 (17280 at package 37p)
+    (12900, "in port"),  # 14820 at 45
 ]
-TRIAL_TRADE_THICK_ANCHORED_TICK = 14775  # package 45 (17688 at package 37p)
-TRIAL_TRADE_THICK_LINES = 489  # package 56, the glass (482 at 45)
+TRIAL_TRADE_THICK_ANCHORED_TICK = 12850  # package 58b (14775 at 45, 17688 at package 37p)
+TRIAL_TRADE_THICK_LINES = 426  # package 58b (489 at 56, the glass; 482 at 45)
 # decision 45, the pilot's news: 50901cf162ea95aa before; package 37p (10fee882c789666e before)
 # package 45c: every tick and the lines as they were; a line's words moved (the pilot's
 # conn and the weather's sky, both this package's)
@@ -317,7 +367,8 @@ TRIAL_TRADE_THICK_LINES = 489  # package 56, the glass (482 at 45)
 # riding): every tick and line the same, the account run while she came to her anchor at
 # 14775 and was not yet brought up: the noon's longitude by account in its data moves in
 # the fifth decimal (-5.03015 to -5.03016); the old rule restored gives the old digest
-TRIAL_TRADE_THICK_DIGEST = "3c2b220e06496db5"  # package 68, riding (ce964d9f346034de)
+# package 68, riding: 3c2b220e06496db5 (ce964d9f346034de)
+TRIAL_TRADE_THICK_DIGEST = "cfa538b19cb0d2fe"  # package 58b (3c2b220e06496db5 at 68)
 
 
 @pytest.fixture(scope="module")

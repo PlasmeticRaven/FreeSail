@@ -332,6 +332,54 @@ WAKE_HELM_POINTS = 8.0
 # Under this she has no steerage way: the course is steered as given, as it always was,
 # for there is no turn to judge (a ship gathering way from rest, a ship drifting).
 STEERAGE_WAY_MS = 0.1
+# The course given when she gathers way, not at the aweigh (package 58b, item 4; the lead's
+# wave-2 playtest, finding 4: the standing order `at the anchor aweigh then steer E` put
+# the Éclair's helm for E the moment the anchor broke out, before she had cast or had way,
+# and her head fell off to the south with the land a cable on the bow, as in the owner's
+# first cruise). After weighing, a course given her (a helm order, a course shaped, a
+# chase's) is held while she casts and until she has this much way through the water with
+# her sails drawing, and given then (`keep_course_pending`); the cast and the course the
+# get-under-way ends on are the evolution's own. Judgement: a knot, the way at which a
+# ship answers her helm, the period's "she gathers way".
+GATHERED_WAY_KN = 1.0
+# The weighing evolutions and their phases once the anchor is aweigh: casting and under
+# way for `get under way`, the anchor hove up and catted for `weigh` alone.
+WEIGHING_PHASES: dict[str, tuple[str, ...]] = {
+    "get_under_way": ("cast", "under_way"),
+    "weigh_anchor": ("hoist", "cat_and_fish"),
+}
+
+
+def _has_way(ship: Any) -> bool:
+    """A knot of headway through the water (`GATHERED_WAY_KN`), a sail set and none of
+    hers aback: she has gathered way."""
+    from freesail.physics.hull import hull_state
+
+    dyn = getattr(ship, "dyn", None)
+    if dyn is None or float(dyn.u) < units.knots_to_ms(GATHERED_WAY_KN):
+        return False
+    if hull_state(ship).seconds_aback > 0.0:
+        return False
+    return any(sl.is_set for sl in ship.sails.values())
+
+
+def gathering_way(ship: Any) -> bool:
+    """Whether she has weighed and not yet gathered way (package 58b, item 4): a weighing
+    in hand with the anchor aweigh, still casting, or cast (or hove up alone) and without
+    a knot of way and her sails drawing (`_has_way`)."""
+    runner = (getattr(ship, "extra", None) or {}).get("evolutions")
+    for inst in getattr(runner, "instances", None) or []:
+        phases = WEIGHING_PHASES.get(inst.evo.id)
+        script = getattr(inst, "script", None)
+        if phases is None or script is None or inst.waiting or script.status != "running":
+            continue
+        if getattr(script, "phase", "") not in phases:
+            continue
+        if script.phase == "cast":
+            return True
+        return not _has_way(ship)
+    return False
+
 
 # The manoeuvres a course is handed to while they are in hand (`give_course`).
 COURSE_MANOEUVRES = ("tack", "wear")
@@ -345,7 +393,8 @@ class Judgement:
     (steered round by the stern, a fore-and-after's boom coming over), or 'in_hand' (a
     tack or a wear in hand takes the course as she comes round), or 'pending' (across the
     wind with too little way: kept full and by and the course held till she has way,
-    `keep_course_pending`). `course` is the heading
+    `keep_course_pending`; since package 58b also a course given after weighing before she
+    has gathered way, `gathering_way`). `course` is the heading
     she is to have at the end (radians true): the course, or the close-hauled course on
     the tack she is kept full and by on; `words` the clause the line says."""
 
@@ -354,7 +403,9 @@ class Judgement:
     words: str = ""
     full_and_by: bool = False
     tack: str = ""
-    crossing: str = ""  # 'eye' or 'wake', for a course held till she has way ('pending')
+    # 'eye' or 'wake', for a course held till she has way ('pending'); 'way' for one held
+    # since the aweigh till she has gathered way (package 58b)
+    crossing: str = ""
     helm_order: bool = False
 
 
@@ -464,6 +515,15 @@ def judge_course(
             by_the_wind = units.wrap_2pi(wind_from + sign * closest)
             return Judgement("in_hand", by_the_wind, words, full_and_by=True, tack=going_to)
 
+    if gathering_way(ship):
+        # weighed and not yet under way (package 58b, item 4): the course is held while she
+        # casts and given when she has gathered way, as `keep_course_pending` gives a course
+        # held for way across the wind
+        words = (
+            f"{shown} is held till she has gathered way: the anchor is aweigh and she has not "
+            f"a knot of way on her yet; it is given when she has, her sails drawing"
+        )
+        return Judgement("pending", course, words, helm_order=helm_order, crossing="way")
     if helm_order and off <= EYE_POINTS * units.POINT + EYE_ALLOWANCE:
         # the owner's ruling: a course given directly into the wind's eye is steered
         aback = f"{shown} lies in the wind's eye from her head; she will be taken aback"
@@ -555,6 +615,16 @@ def carry_out(ship: Any, judged: Judgement) -> tuple[str, dict[str, Any]]:
     if judged.branch == "full_and_by":
         _, text, data = handle(ship, "keep her full and by")
         return text, data
+    if judged.branch == "pending" and judged.crossing == "way":
+        # weighed and casting (package 58b, item 4): the helm is the evolution's while she
+        # casts, and the course is held for her, nothing ordered now
+        ship.extra[COURSE_PENDING] = {
+            "course_deg": round(units.rad_to_deg(judged.course), 3),
+            "helm_order": judged.helm_order,
+            "crossing": "way",
+            "waited_s": 0.0,
+        }
+        return "", {"course_pending": ship.extra[COURSE_PENDING]["course_deg"], "held_for": "way"}
     if judged.branch == "pending":
         # kept full and by on her tack, the course held till she has way (the helm's order
         # clears any intention held before it, and this one is held after it)
@@ -610,7 +680,11 @@ def keep_course_pending(ship: Any, dt: float) -> None:
         extra.pop(COURSE_PENDING, None)
         return
     speed = float(ship.dyn.speed)
-    if pending["crossing"] == "eye":
+    held_for_way = pending.get("crossing") == "way"
+    if held_for_way:
+        # held since the aweigh (package 58b, item 4): given when she has gathered way
+        ready = not gathering_way(ship)
+    elif pending["crossing"] == "eye":
         if speed > WEAR_FOR_IT_MIN_MS:
             pending["waited_s"] = float(pending.get("waited_s", 0.0)) + dt
         ready = speed >= units.knots_to_ms(PENDING_STAY_KN) or (
@@ -641,12 +715,121 @@ def keep_course_pending(ship: Any, dt: float) -> None:
         )
         return
     said = judged.words or f"{units.format_heading(course)} is steered"
+    head = "She has way on her now"
+    if held_for_way:
+        knots = units.ms_to_knots(float(ship.dyn.u))
+        head = f"She has gathered way, {knots:.1f} knots, her sails drawing"
     ship.note(
         "notable",
         "helm.course_given",
-        f"She has way on her now: {said}. {text}".rstrip(),
+        f"{head}: {said}. {text}".rstrip(),
         ship.name,
-        {"judged": judged.branch, "course_deg": pending["course_deg"], "helm": data},
+        # the held-for key only for a course held for way, so that the eye's and the
+        # wake's lines are as they were
+        {"judged": judged.branch, "course_deg": pending["course_deg"], "helm": data}
+        | ({"held_for": "way"} if held_for_way else {}),
+    )
+
+
+# The wind across the stern (package 58b, item 3; the owner's ruling of 2026-10-23: nothing
+# is ordered by the helm). A turn by the stern of `WAKE_HELM_POINTS` or less is the helm's,
+# and a fore-and-after's long one a gybe by the helm; the sails answer it as 43b and 37m
+# built them, and that is not changed: a boom comes over by itself (its strain line), a
+# dipping lug left on the old side is pressed against its mast and draws at
+# `physics.sails.LUG_AGAINST_MAST_AREA` until it is dipped, square yards left braced for the
+# old tack are by the lee. What the deck adds is one line when the wind has come across
+# the stern and left a lug against its mast or the yards by the lee ("dip them when you
+# will"), once a crossing, and nothing done: the sail work is the captain's next order (the
+# rules captain gives it, `captains.Captain._across_the_stern`). The crossing is counted
+# when the wind is this far past dead astern on the new quarter, so that a ship running
+# with the wind yawing about her stern is not told of it at every yaw (judgement: a point,
+# more than a helmsman's yaw before it).
+STERN_CROSSED_DEG = 11.25
+STERN_WATCH = "stern_watch"  # `ship.extra`: the side the wind was last on, a plain dict
+
+
+def _whole_ship_work(ship: Any) -> bool:
+    """A whole-ship evolution in hand (a tack, a wear, heaving to, getting under way, coming
+    to an anchor) or her lying to: the manoeuvre does its own sail work."""
+    extra = getattr(ship, "extra", None) or {}
+    if "hove_to" in extra:
+        return True
+    runner = extra.get("evolutions")
+    for inst in getattr(runner, "instances", None) or []:
+        if getattr(inst, "subject_id", None) not in ("ship", getattr(ship, "name", None)):
+            continue
+        script = getattr(inst, "script", None)
+        if inst.evo.id == "get_under_way" and getattr(script, "cast_done", False):
+            continue  # cast and under way, the anchor at the cathead: her sails are set
+        return True
+    return False
+
+
+def watch_the_stern(ship: Any) -> None:
+    """Each tick (`evolutions.runner.Runner.step`): when the wind has come across her stern
+    (abaft the beam on both sides, past dead astern by `STERN_CROSSED_DEG`) and a dipping
+    lug lies against its mast or a square yard is braced for the old tack, one line says so,
+    once for the crossing (package 58b, item 3). Nothing is ordered; a crossing in a
+    manoeuvre is the manoeuvre's."""
+    dyn = getattr(ship, "dyn", None)
+    extra = getattr(ship, "extra", None)
+    if dyn is None or not isinstance(extra, dict):
+        return
+    awa = float(dyn.apparent_wind_angle)
+    side = "starboard" if awa >= 0.0 else "larboard"  # the side the wind is on
+    watch = extra.get(STERN_WATCH)
+    if not isinstance(watch, dict):
+        extra[STERN_WATCH] = {"side": side}
+        return
+    if side == watch.get("side"):
+        return
+    if abs(awa) < math.pi / 2.0:
+        # through the eye or before the beam: a tack's, or the wind's shift ahead
+        watch["side"] = side
+        return
+    if math.pi - abs(awa) < math.radians(STERN_CROSSED_DEG):
+        return  # not yet a point past dead astern on the new quarter
+    old = watch.get("side")
+    watch["side"] = side
+    if _whole_ship_work(ship) or extra.get("aground"):
+        return
+    from freesail.evolutions.scripts import (
+        _yards_aback_for,
+        boom_sails,
+        dipping_lugs,
+        names_of_sails,
+    )
+
+    lee = "larboard" if side == "starboard" else "starboard"
+    lugs = [sl for sl in dipping_lugs(ship) if sl.lug_side is not None and sl.lug_side != lee]
+    sign = 1.0 if side == "starboard" else -1.0
+    yards = _yards_aback_for(ship, sign)
+    if not lugs and not yards:
+        return
+    said = []
+    if lugs:
+        one = len(lugs) == 1
+        names = names_of_sails(ship, lugs)
+        said.append(
+            f"{names} {'is' if one else 'are'} against {'its mast' if one else 'their masts'}; "
+            f"dip {'it' if one else 'them'} when you will"
+        )
+    if yards:
+        said.append(
+            f"the yards are braced for the {old} tack, by the lee; brace them round when you will"
+        )
+    booms = [sl.id for sl in boom_sails(ship)]
+    ship.note(
+        "notable",
+        "sail.across_the_stern",
+        f"The wind has come across the stern to the {side} quarter: " + "; and ".join(said) + ".",
+        ship.name,
+        {
+            "side": side,
+            "lugs": [sl.id for sl in lugs],
+            "yards": [y.id for y in yards],
+            "booms": booms,
+        },
     )
 
 

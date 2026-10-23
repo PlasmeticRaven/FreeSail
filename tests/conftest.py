@@ -370,6 +370,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_director.py::test_every_world_order_form_has_examples_that_parse_and_that_the_game_performs",
         "test_known_truths.py::test_truth_7b_124_a_second_sample_carries_what_changed_and_still_waiting_what_is_new",
         "test_known_truths.py::test_truth_7b_125_the_horta_nights_swing_logs_once_per_turn",
+        # package 58b: the frigate's gale lying-to (seven hours) and the Éclair's hour
+        "test_known_truths.py::test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_being_taken_aback",
+        "test_known_truths.py::test_truth_7b_127_the_eclairs_leg_is_laid_again_at_the_turn_of_the_tide_in_the_channel_of_bas",
     }
 )
 

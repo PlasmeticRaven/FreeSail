@@ -4218,12 +4218,19 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 123272  # the boat alongside from the quay (125
 # lead in pilot water's distance at 300 reads 110 miles (111), and the master's tide is
 # said at 15600 when she has weighed (one line more); the old rule restored gives the old
 # figures, every tick the same (docs/dev/TuningNotes.md, package 68)
-GATE_5C_MERCHANT_LINES = 3099  # package 68, riding (3098 at package 56, 3080 at 57)
+# package 58b (item 3, the wind across the stern; by bisection, the item turned off gives
+# every old figure): at 75681, the schooner running ESE for the Iroise, the wind comes a
+# point past dead astern to the larboard quarter with her yards braced for the starboard
+# tack, and the deck says so once ("brace them round when you will"), the book's trim
+# bracing them at 75791 as before: one line more, every tick the same
+GATE_5C_MERCHANT_LINES = 3100  # package 58b (3099 at 68, riding; 3098 at 56, 3080 at 57)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
-# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
-# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
-GATE_5C_MERCHANT_DIGEST = "36c17b76e1735975"  # 58a (902be35aeeac7b54 at 68, riding)
+# the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
+# package 68, riding: 902be35aeeac7b54
+# the merged tree of 58a and 58b (2026-10-23): 58b alone gave 26c859e23ceccd42; the digest reads
+# severity, and 58a's recurring lines are routine in this passage too
+GATE_5C_MERCHANT_DIGEST = "6abbbff4d7fa1a57"  # package 58b, the stern (902be35aeeac7b54)
 
 
 def _people(world) -> list[dict]:
@@ -4630,38 +4637,58 @@ GATE_6A_INTENT_AWEIGH_TICK = 17037
 # from 110962 and holds again having come home twenty fathoms, brought up at 111710; she
 # sells at 119400. Every figure before it is package 43b's and 56's, kept beside the new;
 # the old rule restored gives the old figures (docs/dev/TuningNotes.md, package 68).
+# package 58b (items 1, 2 and 6, by bisection: the tree with the three turned off gives every
+# old figure, and items 3, 4 and 5 turned off alone change nothing): the leg is laid again
+# for the stream from 29820 and at the turns of the master's tide, and she is brought to
+# for the deep-sea lead once a watch inshore (30720, 64860, 83340, 97740), so that she comes
+# to the Iroise later; Le Floch boards at 108480 off Bertheaume and is given the conn at
+# 109980 with the flood running two knots into the Goulet and the wind at NW, and he judges
+# that she will not lie up for its mouth and brings her up in the road in ten fathoms to
+# wait for the flood to slacken (said); the captain is in port from the road (package 45's
+# rule, as from 43b to 56) and sends the boat for the prices, so that the pilot's weigh at
+# 113940 is refused while the boat is away, asked again each half hour, and she is in the
+# road at the end, the tin unsold. With item 6 turned off the old pilot cons her on and she
+# strikes the Mingan at 113341 (docs/dev/TuningNotes.md, package 58b). The old figures
+# beside each.
 GATE_6A_INTENT_STATES = [  # (tick, state): the books loaded and unloaded by name
     (300, "in port"),
     (17040, "on passage"),
     (23340, "beating"),  # the course for the Lizard's offing not laid (22740 at 45c)
-    (28080, "on passage"),  # laid again (27960 at 56, 27480 at 45c, 27720 at 37p)
+    (28020, "on passage"),  # 28080 at 68 (27960 at 56, 27480 at 45c, 27720 at 37p)
     # package 43b to 56: (103980, "at anchor") in the road of Bertheaume for the tide and
-    # (104340, "in port") from the road; package 68: in the Bay (111420 at 45c)
-    (110880, "in port"),
+    # (104340, "in port") from the road; package 68: in the Bay at 110880 (111420 at 45c)
+    (110340, "in port"),  # package 58b: in the road of Bertheaume, the pilot waiting
 ]
 # Tregenza out; Le Floch in (101580 at 56, 101100 at 45c)
-GATE_6A_INTENT_PILOT_ABOARD_TICKS = [17700, 101820]
+GATE_6A_INTENT_PILOT_ABOARD_TICKS = [17700, 108480]  # 101820 at 68
 # package 45c: the pilot of Brest given the conn at 104220 cons her by his track from his
 # station, Bertheaume, leg by leg through the Goulet (two hours, the book's bearings every
 # five minutes the while: two hundred and forty lines more), the berth said at 111120 on the
 # Bay's road moved onto its twelve fathoms; his cutter comes for him at 120660
 # package 68: Le Floch put off at the anchor in the Bay ([19920] at 43b to 56, Le Floch
 # aboard; [19920, 121020] at 45c)
-GATE_6A_INTENT_PILOT_LEFT_TICKS = [19920, 114900]
+# package 58b: Le Floch aboard at the end, waiting to take her in ([19920, 114900] at 68)
+GATE_6A_INTENT_PILOT_LEFT_TICKS = [19920]
 GATE_6A_INTENT_NOON_TICKS = [25200, 111660]
 # Carrick Road; the Bay of Brest (Bertheaume 104295 at 43b to 56; the Bay 111370 at 45c)
-GATE_6A_INTENT_ANCHORED_TICKS = [57, 110872]
-GATE_6A_INTENT_BROUGHT_UP_TICK = 111710  # package 68 (105260 at 43b, 112302 at 45c)
-GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 111780  # the boat for the prices (105360 at 43b)
-GATE_6A_INTENT_SOLD_TICK = 119400  # 47 tons at £270 (124320 at 43b, 119820 at 45c)
-GATE_6A_INTENT_LINES = 2160  # package 68, riding (1698 at 56, 1684 at package 43b)
+# package 58b: the road of Bertheaume, brought up by the pilot to wait ([57, 110872] at 68)
+GATE_6A_INTENT_ANCHORED_TICKS = [57, 110305]
+# package 58b (111710 at 68, 105260 at 43b, 112302 at 45c)
+GATE_6A_INTENT_BROUGHT_UP_TICK = 111238
+# the boat for the prices (111780 at 68, 105360 at 43b)
+GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 111300
+# package 58b: not sold in the 36 hours (119400 at 68, 124320 at 43b, 119820 at 45c)
+GATE_6A_INTENT_SOLD_TICK = None
+GATE_6A_INTENT_LINES = 2078  # package 58b (2160 at 68, riding; 1698 at 56, 1684 at 43b)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
 # package 56, the glass: 90061f779b7db484 (93981cc47f5524e6 at 57)
-# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
-# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
-GATE_6A_INTENT_DIGEST = "6292d5af25a6b326"  # 58a (8eead2f4521f2a61 at 68, riding)
+# the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "6292d5af25a6b326"
+# package 68, riding: 8eead2f4521f2a61 (90061f779b7db484 before)
+# the merged tree of 58a and 58b (2026-10-23): 58b alone gave b498761052da0862; the digest reads
+# severity, and 58a's recurring lines are routine in this passage too
+GATE_6A_INTENT_DIGEST = "585c52675f10e590"  # package 58b
 
 
 @pytest.fixture(scope="module")
@@ -4714,9 +4741,10 @@ def test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants(gate_6a
     states = [(e.tick, e.data["state"]) for e in log if e.kind == "captain.state"]
     assert states == GATE_6A_INTENT_STATES
     bargains = [e for e in log if e.kind == "market.bargain"]
-    assert [e.tick for e in bargains] == [GATE_6A_INTENT_BOUGHT_TICK, GATE_6A_INTENT_SOLD_TICK]
+    # package 58b: the tin unsold in the 36 hours, the pilot waiting in the road
+    assert [e.tick for e in bargains] == [GATE_6A_INTENT_BOUGHT_TICK]
+    assert GATE_6A_INTENT_SOLD_TICK is None
     assert f"Bought {GATE_6A_INTENT_TONS} tons of tin at Falmouth at £120" in bargains[0].text
-    assert f"Sold {GATE_6A_INTENT_TONS} tons of tin at Brest at £270" in bargains[1].text
     assert [e.tick for e in log if e.kind == "market.bought"] == [GATE_6A_INTENT_TIN_ABOARD_TICK]
     under_way = [e for e in _by_rule(log) if "getting under way" in e.text]
     assert under_way and under_way[0].tick == GATE_6A_INTENT_UNDER_WAY_ORDER_TICK
@@ -4733,7 +4761,11 @@ def test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants(gate_6a
     # package 43b: in the road of Bertheaume for the tide, in eight and a half
     # package 68: in the Bay again, let go in thirteen and a half (the figure as the
     # pilot's berth writes it)
-    assert "in 13 fathoms and a half" in [e for e in log if e.kind == "ship.anchored"][1].text
+    # package 58b: in the road of Bertheaume, brought up by the pilot to wait, in ten
+    assert "in ten fathoms" in [e for e in log if e.kind == "ship.anchored"][1].text
+    waits = [e for e in log if e.kind == "port.pilot_waits"]
+    assert [e.tick for e in waits] == [109980]
+    assert "wait for the flood to slacken" in waits[0].text
     brought = [e.tick for e in log if e.kind == "ship.brought_up"]
     assert brought[-1] == GATE_6A_INTENT_BROUGHT_UP_TICK
     prices = [e for e in _by_rule(log) if "for the prices" in e.text]
@@ -4741,9 +4773,8 @@ def test_the_schooner_on_an_intent_alone_at_seed_7_has_its_own_constants(gate_6a
     assert not [e for e in log if e.kind == "ship.aground"]
     # package 68: the best bower let go in the Bay drags from 110962 and holds again,
     # having come home twenty fathoms, before she is brought up (no dragging before 68)
-    drags = [e.tick for e in log if e.kind == "anchor.dragging"]
-    holds = [e.tick for e in log if e.kind == "anchor.holding"]
-    assert drags == [110962] and holds and holds[0] > drags[0]
+    # package 58b: in the road of Bertheaume she does not drag
+    assert not [e.tick for e in log if e.kind == "anchor.dragging"]
     # every doing of his is an order under his actor (its line and its results carry it)
     # and never journaled
     assert any(e.kind == "order.accepted" for e in _by_rule(log))
@@ -4835,9 +4866,11 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 13  # his 7, the harness's
 # decision 45, the pilot's news: b00ac08c3f63e84c before
 # package 56, the glass: f996530d5a041abc (0e089f1279e03928 at 57); package 68, riding:
 # the merchant passage's one line more and its account at 300 (3111 lines before)
-# package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
-# the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "073a636b6d76cc16"  # 58a (1f8de8b49c7d5b5a at 68, riding)
+# the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "073a636b6d76cc16"
+# package 58b: the merchant passage's stern line (3112 lines before; item 3's by bisection)
+# the merged tree of 58a and 58b (2026-10-23): 58b alone gave 0949c109116fc4a1; the digest reads
+# severity, and 58a's recurring lines are routine in this passage too
+GATE_6A_FAKE_CAPTAIN_DIGEST = "1c9a985bfd5dce0f"  # package 58b (1f8de8b49c7d5b5a at 68)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -7710,3 +7743,141 @@ def test_truth_7b_132_a_seated_api_doors_fold_fires_at_the_default_budget_on_a_l
         with game2.driver.lock:
             game2.world.submit("stand down the officer of the watch")
         assert finished(got) == 3
+
+
+# Package 58b: the captain's sea sense, third pass (the Éclair's first cruise, the lead's
+# wave-2 playtest and 57's gale trial). Truths 7b-127 to 7b-129, numbered after 58a's
+# 7b-124 to 7b-126: a leg laid again at the turn of the tide, the wind across the stern
+# leaving the lugs against their masts and the captain dipping them, and the frigate lying
+# to under the book in the gale trial without being taken aback.
+# ---------------------------------------------------------------------------
+
+OFF_THE_SEPT_ILES = (49.0, -3.6)  # open water, forty fathoms, the land four leagues south
+
+
+def _eclair_under_her_lugs(
+    hh: int, mm: int, at: tuple[float, float] = (48.7356, -4.000), heading: float = 95.0
+) -> World:
+    """The Éclair under her lugs, the wind W by S, on the morning of the wave-2 playtest
+    (12 June 1805): by default in the channel of Bas east of the road."""
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, hh, mm),
+        wind_from_deg=260.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=heading,
+        ship_speed_kn=4.0,
+        position={"lat_deg": at[0], "lon_deg": at[1]},
+        region="channel-west",
+        ports=["roscoff", "morlaix", "st-malo"],
+        nation="france",
+    )
+    w = make_world(SEED, "data/ships/lugger.yaml", sc)
+    assert w.submit("set plain sail").kind == "order.accepted"
+    return w
+
+
+def test_truth_7b_127_the_eclairs_leg_is_laid_again_at_the_turn_of_the_tide_in_the_channel_of_bas():
+    """Package 58b's truth 127 (item 1; the Éclair's first cruise: the leg laid on the flood
+    was held through the ebb into the narrows of the channel of Bas): the rules captain lays
+    his leg allowing the flood the master's book gives, and when the master's tide turns to
+    the ebb in the channel he lays it again at once, saying why, the helm given the course
+    worked for the new stream; and she clears the channel without touching. From the
+    channel's eastern end, east of Roscoff: from the road (48° 44.1' N, 4° W) the planner's
+    first leg crosses the land about the Isle Verte (61's route, found on the way)."""
+    w = _eclair_under_her_lugs(5, 25, at=(48.7356, -3.96))
+    w.captain.set_intent("passage to 48 46 N 3 45 W")
+    w.run(3600)
+    shaped = [e for e in w.log if e.kind == "helm.set" and "Shaped a course for" in e.text]
+    assert shaped and "Allowing the flood" in shaped[0].text
+    turned = [e for e in w.log if e.kind == "reckoning.tide" and e.data.get("turn")]
+    assert turned and turned[0].data["flood"] is False, [e.text for e in turned]
+    relaid = [
+        e
+        for e in w.log
+        if e.kind == "order.accepted" and "(the tide has turned, the ebb making)" in e.text
+    ]
+    assert relaid, [e.text for e in w.log if e.kind == "order.accepted"]
+    assert relaid[0].text.startswith("By the captain, on passage: shaping a course for")
+    assert 0 <= relaid[0].tick - turned[0].tick <= 11 * 60
+    assert [e for e in w.log if e.kind == "helm.set" and e.tick == relaid[0].tick]
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+
+
+def test_truth_7b_128_a_steer_through_the_stern_leaves_the_lugs_against_the_masts_and_he_dips():
+    """Package 58b's truth 128 (item 3; the lead's wave-2 playtest, finding 1, and the
+    owner's ruling of 2026-10-23 that nothing is ordered by the helm): the Éclair running
+    under her lugs is steered NE through the stern by the player; the lugs are left against
+    their masts, said once ("dip them when you will"), and nothing is done, the picture
+    drawing them on the weather side; the same turn made by the rules captain's own course
+    has the lugs dipped as his next orders, and the picture draws them to leeward. Off the
+    Sept-Îles, in open water."""
+    from freesail.api.queries import snapshot
+
+    def lug_sides(world: World) -> dict[str, str | None]:
+        return {
+            s["id"]: s["lug_side"]
+            for s in snapshot(world)["sails"]
+            if s["id"] in ("fore.lug", "main.lug")
+        }
+
+    w = _eclair_under_her_lugs(10, 0, at=OFF_THE_SEPT_ILES, heading=90.0)
+    w.run(240)
+    assert lug_sides(w) == {"fore.lug": "larboard", "main.lug": "larboard"}
+    start = len(w.log)
+    w.submit("steer NE")
+    w.run(600)
+    lines = list(w.log)[start:]
+    said = [e for e in lines if e.kind == "sail.across_the_stern"]
+    assert [e.text for e in said] == [
+        "The wind has come across the stern to the larboard quarter: the foresail and the "
+        "mainsail are against their masts; dip them when you will."
+    ]
+    assert not [e for e in lines if e.text.startswith(("Dip the", "By the captain"))]
+    assert lug_sides(w) == {"fore.lug": "larboard", "main.lug": "larboard"}  # the weather side
+    w = _eclair_under_her_lugs(10, 0, at=OFF_THE_SEPT_ILES, heading=90.0)
+    w.run(240)
+    w.captain.set_intent("passage to 49 20 N 3 20 W")
+    w.run(900)
+    said = [e for e in w.log if e.kind == "sail.across_the_stern"]
+    dips = [e for e in w.log if e.kind == "order.accepted" and "dipping the" in e.text]
+    assert len(said) == 1 and len(dips) == 2, [e.text for e in w.log]
+    assert all(e.tick > said[0].tick and e.text.startswith("By the captain") for e in dips)
+    assert lug_sides(w) == {"fore.lug": "starboard", "main.lug": "starboard"}  # to leeward
+
+
+def test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_being_taken_aback():
+    """Package 58b's truth 129 (item 5; 57's gale trial, for the lead's playtest of the
+    fixed book): the frigate on her station off Ushant as the westerly rises to a gale.
+    The head sail straining at its bolt-ropes is taken in by the captain before it blows
+    out (the trial lost its fore topmast staysail at 08:29 before); she is hove to for
+    weather and lies a-try under the close-reefed main topsail and the staysails, as the
+    book has it, and in the four hours and more she lies so she is never taken aback, no
+    sail is lost, and she drifts at under two knots on the mean. What she does when she
+    fills away for the station in the gale's tail is the trial's own pin, an expected
+    failure until the lead has played it (`tests/test_captain_trials.py`)."""
+    from freesail.physics.hull import hull_state
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario("data/scenarios/trials/trial-station-gale.yaml")
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    lying = aback = 0
+    knots = []
+    for _ in range(520):
+        w.run(60)
+        if str(w.readings.value("manoeuvre_in_hand") or "") == "hove to":
+            lying += 1
+            knots.append(units.ms_to_knots(w.ship.dyn.speed))
+            aback += hull_state(w.ship).seconds_aback > 0.0
+    states = [(e.tick, e.data["state"]) for e in w.log if e.kind == "captain.state"]
+    assert "hove to for weather" in {s for _t, s in states}, states
+    lay = [e for e in w.log if e.kind == "ship.hove_to"]
+    assert lay and lay[0].text.startswith("Lying a-try under the main topsail and the staysails")
+    taken = [e for e in w.log if e.text.endswith("(straining at the bolt-ropes).")]
+    assert taken and "taking in the fore topmast staysail" in taken[0].text
+    assert not [e for e in w.log if e.kind in ("sail.blown_out", "sail.split")]
+    assert lying >= 4 * 60 and aback == 0
+    assert sum(knots) / len(knots) < 2.0
+    assert not [e for e in w.log if e.kind == "ship.aground"]

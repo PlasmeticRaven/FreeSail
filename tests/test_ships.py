@@ -708,3 +708,109 @@ def test_a_course_held_for_want_of_way_is_given_up_for_another_order():
     w.submit("steer 245")
     w.submit("keep her full")
     assert "course_pending" not in w.ship.extra
+
+
+# -- package 58b: the course given when she gathers way; the wind across the stern -------
+
+LUGGER = "data/ships/lugger.yaml"
+
+
+def test_a_course_given_at_the_aweigh_is_held_till_she_has_gathered_way():
+    """Package 58b, item 4 (the lead's wave-2 playtest, finding 4: `at the anchor aweigh
+    then steer E` put the Éclair's helm over the moment the anchor broke out, and her head
+    fell off with the land a cable on the bow): a course given after weighing is held
+    while she casts and until she has a knot of way with her sails drawing, said so at the
+    aweigh, and steered then with a line of its own; the cast is the evolution's."""
+    sc = Scenario(
+        start_time=datetime(1805, 6, 10, 10, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=225.0,
+        ship_speed_kn=0.0,
+        position={"lat_deg": 50.133, "lon_deg": -5.035},
+        region="channel-west",
+    )
+    w = make_world(7, LUGGER, sc)
+    assert w.submit("let go the best bower").kind == "order.accepted"
+    w.run(20 * 60)
+    assert w.at_anchor
+    given = w.submit('standing order "out": at the anchor aweigh then steer SE')
+    assert given.kind == "standing.given", given.text
+    start = len(w.log)
+    assert w.submit("get under way").kind == "order.accepted"
+    w.run(40 * 60)
+    lines = list(w.log)[start:]
+    aweigh = [x for x in lines if x.kind == "ship.aweigh"]
+    held = [x for x in lines if "is held till she has gathered way" in x.text]
+    cast = [x for x in lines if x.kind == "evolution.step" and "paid off" in x.text]
+    gathered = [x for x in lines if x.kind == "helm.course_given"]
+    assert aweigh and held and cast and gathered, [x.text for x in lines]
+    assert held[0].tick == aweigh[0].tick  # said at the aweigh, nothing steered
+    assert gathered[0].tick >= cast[0].tick  # given when she has cast and has way
+    assert gathered[0].text.startswith("She has gathered way, ")
+    assert gathered[0].data["held_for"] == "way"
+    assert "course_pending" not in w.ship.extra
+    assert _on(w, 135.0, 10.0)
+
+
+def test_a_course_given_under_way_is_not_held():
+    """A course given to a ship under way with way on her is steered as it always was:
+    the hold is the aweigh's alone."""
+    w = _under_way(180.0)
+    e = w.submit("steer 200")
+    assert "held till she has gathered way" not in e.text
+    assert "course_pending" not in w.ship.extra
+
+
+def test_a_steer_through_the_stern_leaves_the_lugs_against_the_masts_with_one_line():
+    """Package 58b, item 3 (the owner's ruling of 2026-10-23; the lead's wave-2 playtest,
+    finding 1): a helm order that carries the wind across the stern orders nothing; the
+    lugs are left against their masts and draw so until dipped, and the deck says it once
+    for the crossing ("dip them when you will"). Steered back the lugs are to leeward
+    again, and nothing is said; across a second time, said again."""
+    w = _under_way(180.0, ship=LUGGER)
+    lugs = ("fore.lug", "main.lug")
+    assert all(w.ship.sails[i].lug_side == "larboard" for i in lugs)
+    start = len(w.log)
+    w.submit("steer E")
+    w.run(6 * 60)
+    lines = list(w.log)[start:]
+    said = [x for x in lines if x.kind == "sail.across_the_stern"]
+    assert len(said) == 1, [x.text for x in lines]
+    assert said[0].text == (
+        "The wind has come across the stern to the larboard quarter: the foresail and the "
+        "mainsail are against their masts; dip them when you will."
+    )
+    assert said[0].severity.value == "notable"
+    assert set(said[0].data["lugs"]) == set(lugs)
+    assert all(w.ship.sails[i].lug_side == "larboard" for i in lugs)  # nothing done
+    assert not [x for x in lines if x.text.startswith("Dip the")]
+    start = len(w.log)
+    w.submit("steer S")
+    w.run(6 * 60)
+    assert not [x for x in list(w.log)[start:] if x.kind == "sail.across_the_stern"]
+    w.submit("steer E")
+    w.run(6 * 60)
+    assert len([x for x in list(w.log)[start:] if x.kind == "sail.across_the_stern"]) == 1
+
+
+def test_a_steer_through_the_stern_leaves_the_yards_by_the_lee_with_one_line():
+    """The square-rigged half (package 58b, item 3): the frigate with the wind on her
+    quarter, her yards trimmed for it, steered six points by the stern (the helm's, as
+    37m ruled): the yards are by the lee, said once, and left as they stand."""
+    w = _under_way(180.0)
+    yards = {y.id: y.brace_angle for y in w.ship.spars.values() if y.cls == "yard"}
+    start = len(w.log)
+    w.submit("steer ESE")
+    w.run(4 * 60)
+    lines = list(w.log)[start:]
+    said = [x for x in lines if x.kind == "sail.across_the_stern"]
+    assert len(said) == 1, [x.text for x in lines]
+    assert "the yards are braced for the starboard tack, by the lee; brace them round" in (
+        said[0].text
+    )
+    assert said[0].data["yards"] and not said[0].data["lugs"]
+    assert not [x for x in lines if x.kind in ("ship.wore", "yard.braced")]
+    assert {y.id: y.brace_angle for y in w.ship.spars.values() if y.cls == "yard"} == yards

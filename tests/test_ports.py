@@ -1819,37 +1819,28 @@ WARDROOM_SAVE = (
 
 
 # Package 68 (item 1 and item 19): riding means riding moved the replay's history before
-# 113000 (her account run while she came to her first anchor), and the pilot reckoning
-# how near she lies by the wind over the water (item 19, the wind her sails feel) finds,
-# rightly, that his NE legs inside Bertheaume will not be laid on this flood under this
-# wind. He lays legs the flood will not let her make and has no answer but to pinch or go
-# back: from 113000 he steers NE by E and ENE as near as she will lie for his aim past the
-# Mingan, keeps her way (4.4 knots), and the flood of 3.9 knots toward 080° sets her onto
-# it at 115561; from 114000 his first turn, five points to NNE with the yards trimmed for
-# the wind on the quarter, has her aback at 114049 and in irons twenty minutes, the flood
-# sets her east of his first mark, and from 115800 he beats back for it, off Petit Minou
-# for the rest of the 110 minutes with no berth said. The pilot's conn in a strong flood
-# (waiting for the slack in the road, working the north shore, anchoring, trimming before
-# a turn toward the wind) is package 58b's item 6, the captain's sea sense; the xfail is
-# lifted when it is built (docs/dev/TuningNotes.md, package 68, item 19).
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "package 68, item 19: the pilot lays legs the flood will not let her make and has no "
-        "answer but to pinch or go back (from 113000 the flood sets her onto the Mingan at "
-        "115561; from 114000 aback at 114049 and beating back for a mark astern, no berth in "
-        "110 minutes); the pilot's conn in a strong flood is package 58b's item 6"
-    ),
-)
+# 113000, and the pilot reckoning how near she lies by the wind over the water found, rightly,
+# that his NE legs inside Bertheaume will not be laid on this flood under this wind: from
+# 113000 he pinched onto the Mingan at 115561, from 114000 he was aback at 114049 and beat back
+# for a mark astern (expected failures, strict, from package 68 to 58b). Package 58b (item 6,
+# the pilot's conn in a stream): he judges his legs ahead with the stream his water will have
+# on each when she comes to it, and finding the leg past the Mingan will not be made on the
+# flood he brings her up where she is and waits for the slack, saying so and the hour; he
+# weighs when his legs will serve by the time she is under way, takes up his track from where
+# she lies, and cons her in at the top of the tide; and he trims the yards before a turn of
+# two points and more toward the wind. The xfail is lifted; the run is eight hours, the wait
+# inside it (110 minutes before, when she was taken in on the flood or not at all).
 @pytest.mark.parametrize("until", [113000, 114000])
 def test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood(until):
     """Package 43b, from the owner's wardroom save (data, loaded by the game's replay to
     the tick): the pilot given the conn off Bertheaume on the flood with the wind at
     north-west put her on the Mingan at a minute past one, his turn into the Goulet laid
     from where she was with nothing for the flood setting her up onto the rocks. He
-    allows for the set before his turn now (`Ports._turn_high`: his aim held up to
-    windward of his mark by what the stream will set her on the leg, in clear water),
-    and she comes to his berth in the Bay of Brest with water under her."""
+    allows for the set before his turn (`Ports._turn_high`), and since package 58b judges
+    his legs before he stands into them: the flood setting her across his leg past the
+    Mingan, he brings her up and waits for the slack, says so, and takes her in at the top
+    of the tide; she comes to his berth in the Bay of Brest with water under her, never
+    aground."""
     from freesail.api.session import ship_factory
     from freesail.core import replay
 
@@ -1859,7 +1850,7 @@ def test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood
     assert w.clock.tick == until
     assert w.submit("let the pilot take her in").kind == "port.conn"
     least = math.inf
-    for _ in range(110):
+    for _ in range(8 * 60):
         w.run(60)
         assert not w.ship.extra.get("aground"), w.clock.ship_time
         depth = w.ship.extra.get("water_depth_m")
@@ -1867,8 +1858,13 @@ def test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood
             least = min(least, depth)
         if events(w, "port.pilot_berth"):
             break
+    waits = [e for e in events(w, "port.pilot_waits") if e.data.get("waits")]
+    assert waits and "brings her up to wait: wait for the flood to slacken, about" in waits[0].text
+    said = [e for e in w.log if e.text.startswith("The pilot: she will not lie up for")]
+    assert said and "with the flood running" in said[0].text
     berth = events(w, "port.pilot_berth")
     assert berth and berth[-1].text.startswith("The pilot: this is the berth, the Bay of Brest")
+    assert berth[-1].tick > waits[0].tick
     assert units.m_to_fathoms(least) >= 9.0
 
 

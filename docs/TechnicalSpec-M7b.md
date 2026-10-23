@@ -2091,6 +2091,21 @@ In waves, written for the owner's approval in turn, each launched on his word:
   first course under the new rig and takes the ground among the Molène islands after two
   failed wears: an expected failure, for package 58. The tuning notes, "Package 57", have
   the figures and the pins.
+  **As built (package 58b, 2026-10-23): 57's debt, the gale book's mending.** The book's
+  mending is built and the judgement of it waits for the lead's playtest: a head sail
+  straining at its bolt-ropes in a wind over the shorten-sail line is taken in before it
+  blows out (the fore topmast staysail, blown out at 8983 in the station gale before, is
+  taken in at 8820 and nothing is lost); filling away from lying to with the wind still
+  strong the close-reefed topsails are set to go through the water; a lugger lies to under
+  her own storm canvas, the storm lug (the taille-vent) and the storm jib, hove to when it
+  is set (the Éclair in a gale, never aback). The band under the reefs, a good full by
+  compass a point free of the helm's full and by, was tried and withdrawn (aback every two
+  minutes and a half in the trials); the helm's own band is kept. The station gale lies
+  a-try four hours under the book never aback (truth 7b-129) and still takes the ground
+  among the Molène islands later in the day, at 41415 (44332 before), aback five minutes
+  in the day (seven); the lee-shore trial keeps her off Ushant, never aground, the day
+  falling otherwise from her second lying-to. Both trials are expected failures with their
+  new figures beside the old, for the lead (the tuning notes, "Package 58b").
 - **58 (Opus): the captain's sea sense, third pass**, from the owner's runs of gate 6c
   (`docs/dev/M6-WorkPackages.md`, "The notes of 2026-10-17, read"): the offing by the
   account not its doubt, the guard against land ahead within the visibility, the book

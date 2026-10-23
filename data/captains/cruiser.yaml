@@ -25,6 +25,18 @@ thresholds:
   beating_band_points: {value: 0.5, source: "package 43b: the course laid again only half a point freer than the shaping's edge, so that a course on the edge of the wind is one verdict and not two by turns; judgement"}
   gale_over_minutes: {value: 10, source: "as the King's ship's"}
   shorten_sail_kn: {value: 30, source: "the starter book's thirty knots"}
+  # Package 58b (item 2): casts on a long leg, the captain's own (freesail/world/captains.py
+  # `_casts`), not only at the leg's ends: the hand lead every glass where the chart has
+  # under `cast_glass_fathoms` at the account, the deep-sea lead every hour in deeper water
+  # within `cast_hour_fathoms` inshore (`cast_inshore_nm`), brought to for it when her way
+  # is over the four knots the lead wants and the wind under `shorten_sail_kn` (the Eclair's
+  # first cruise: a leg of
+  # twenty miles in sixteen fathoms with no cast put her on the Heaux de Brehat, the flood
+  # having set her four miles)
+  cast_glass_fathoms: {value: 20, source: "the hand lead's twenty fathoms (freesail/world/reckoning.py HAND_LEAD_FATHOMS); the Master, art. XXVI, 'always sounding to inform' (as data/scenarios/gate-5b-passage.orders has it); the glass judgement"}
+  cast_hour_fathoms: {value: 100, source: "the hundred-fathom line, the edge of soundings; Falconer 1780, 'Sounding', 'it is usual previously to bring-to the ship' for the deep-sea lead; the hour judgement"}
+  cast_inshore_nm: {value: 15, source: "the deep-sea lead brought to for every hour only with the land in sight or the coast by account within five leagues, making the land (taken another way, package 58b: brought to every hour across the open Channel the schooner on her intent lost a quarter of her time and never made Brest in 36 hours); judgement"}
+  cast_bring_to_hours: {value: 4, source: "brought to for the deep-sea lead once a watch at most when her way is over the four knots it wants; the hourly cast taken without bringing to only when her way allows (taken another way, package 58b: brought to every hour within five leagues of the land the schooner on her intent lost an hour in four along the coast of Leon); judgement"}
   sea_room_nm: {value: 10, source: "as the merchant's; judgement"}
   lee_shore_nm: {value: 6, source: "two leagues, spec M6 §4"}
   shelter_land_nm: {value: 0, source: "a cruiser keeps the sea in thick weather, as a King's ship does; nought turns the stimulus off"}

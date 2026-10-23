@@ -384,6 +384,11 @@ class Runner:
             from freesail.orders.navigation import keep_course_pending
 
             keep_course_pending(ship, dt)
+        # the wind across the stern, a lug left against its mast or the yards by the lee:
+        # said once a crossing, nothing ordered (package 58b, item 3)
+        from freesail.orders.navigation import watch_the_stern
+
+        watch_the_stern(ship)
 
     def new_log_group(self) -> str:
         """A key for the evolutions of one order that log as one line (a trim's braces)."""
