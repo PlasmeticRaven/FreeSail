@@ -524,7 +524,13 @@ America for 1812, or the Caribbean for the West Indies station; **decided by the
 of 2026-10-23: the Mediterranean first** (the French and the Spanish and the privateers of
 every flag), **then the Caribbean** with the Bermuda sloops and rigs (the famous
 three-masted Bermuda-rigged vessel of the Royal Navy's West Indies station among the
-ships), **then the full east coast of America and the Great Lakes** with their own few
+ships: the owner's picture of 2026-10-23, a painting of a three-masted Bermuda sloop under
+the white ensign standing out of a West Indies anchorage, each mast tall and raked with a
+leg-of-mutton sail laced to it on a boom, no gaff and no topsail, a jib on a long bowsprit,
+a low rakish hull; a new sail class for the generator and nothing else new, so she may come
+sooner than her sea, the Royal Navy having bought the island's sloops and schooners for the
+Channel's advice work too; the image to `docs/references/images/` with its source when the
+owner places it), **then the full east coast of America and the Great Lakes** with their own few
 vessels for 1812. The Mediterranean's block is cut when 7-i's scenarios want it, by the
 chart's own tools as the Channel's and the Bay's were. The signals'
 sources (the 1799 book, Popham 1803, the convoy instructions, du Pavillon) are a research
