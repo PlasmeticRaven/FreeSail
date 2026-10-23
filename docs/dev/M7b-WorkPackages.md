@@ -384,6 +384,48 @@ starting, or the lead launches you after it). Spec M7b §8, §9 and §15; decisi
 5. **Truths 95 to 97** and the records: §8, §9 and §15 as built; the Harness section; the
    primer; the tuning notes.
 
+### Package 58a as merged (2026-10-23)
+
+Merged `--no-ff` from the builder's worktree (eleven commits on `872aa61`; 31 files, ~2,800
+lines) with no conflict, ruff clean; **the whole suite on the merged tree waits for 58b and
+67, one run for the three at the lead's and the owner's word** (the machine carried four
+suites at once at a load of twenty-five, so the builders stood theirs down); the builder
+ran the fast tier (3,568 passed, four failed: three its own and fixed, one truth 88's pace
+test under load, which it showed is marked `pace` by hand and not recognised by the
+conftest's name rule, for the lead), the slow tier of its touched files (clean but for the
+pins it moved) and the eight moved passages re-pinned. Built as briefed: a later sample
+carries only the rows that changed, the sails in one line only when a sail changed, the
+strangers only when one came or went, "still waiting" only the lines since the last poll,
+and an "As before: ..." line closing each sample (the first of a seating and the first
+after a fold whole, `readings` giving every row); four recurring kinds routine when their
+words have not changed (a trim waiting for hands, the lead's cast, the carpenter's report,
+the well sounded), the light airs' hysteresis a point and two knots held ten minutes, and
+**the tide swing's cause mended** (`flood` None where no stream runs, she rides head to
+wind there: the Horta night from 110 swing lines in six hours to one); the tripwires (her
+way settled, depth under n, speed under or over n, the wind over n, a point of interest
+within n miles), taken by the standing dialect first and the tripwires where it refuses;
+the `ahead` reading, the director's by the truth, and the line's "n minutes of the ship's
+time since your last reply"; the director's forms reference (`WORLD_ORDER_FORMS`, every
+example performed by a test, in section 4 of the grammar and every station's library), the
+dry run (on a copy of the world, no act spent, its doubt not put on the record) and the
+truth's lookups (ports, grounds, systems, at), with a page "the world"; appended weather
+ramping in over an hour and a high over the season's ceiling doubted like a low; truths
+7b-124 to 7b-126. **Measured on the lugger's filed save, one day:** the samples 515,650 to
+459,287 characters (−11%), "still waiting" at a poll a minute 856,197 to 579,585 (−32%),
+the whole 1,371,847 to 1,038,872 (−24%).
+
+**The pins:** seven digests across eight tests moved, every tick, line and state figure
+unchanged, the digest reading severity: the recurring-lines rule alone, proven by
+bisection (the rule emptied, the old pins pass), the old figures beside the new. **58b
+runs the same trials and may move two of them again; the merged tree takes its own
+figures.** **Found and fixed on the way:** `replay._rebind` recursed without end with two
+crewed ships. **Found, carried:** truth 88's pace test in the fast tier under load (the
+conftest's name rule); "the depth of water ..." parsed as the lead's `depth`; a crewed
+captain not knowing "haul off"; the truth's tide words naming the stream area's axis.
+**The owner's watch, as he foresaw:** the deltas and the cost-of-thinking line change the
+shape of what a model reads; to be watched in play for forgetting, the "As before" line
+the cheap cure.
+
 ### Package 68 as merged (2026-10-23)
 
 Merged `--no-ff` from the builder's worktree (nineteen commits on `809620b` across two
