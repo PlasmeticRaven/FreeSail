@@ -724,12 +724,10 @@ def keep_course_pending(ship: Any, dt: float) -> None:
         "helm.course_given",
         f"{head}: {said}. {text}".rstrip(),
         ship.name,
-        {
-            "judged": judged.branch,
-            "course_deg": pending["course_deg"],
-            "helm": data,
-            "held_for": "way" if held_for_way else pending.get("crossing", ""),
-        },
+        # the held-for key only for a course held for way, so that the eye's and the
+        # wake's lines are as they were
+        {"judged": judged.branch, "course_deg": pending["course_deg"], "helm": data}
+        | ({"held_for": "way"} if held_for_way else {}),
     )
 
 
