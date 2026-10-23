@@ -7943,7 +7943,8 @@ Item 6 (the Éclair at anchor, `get under way`):
   Bertheaume. It is item 1's by bisection and re-pinned. **R-02** (the anchoring's manners,
   the Bay's dragging first) is carried for the owner.
 - **The Goulet's failing case**: the lead's word was to mend the pilot's wind (item 19,
-  below); it is mended, and the case still fails, now with its sister case (below).
+  below); it is mended, and the case still fails, now with its sister case: both are
+  expected failures, strict, the pilot's conn in a strong flood booked as 58b's item 6.
 - Taken another way, each standing on the lead's word: **the riding measure** (brought up,
   or headway under half a knot, where the brief said speed); **a person aboard another
   ship** refused, not bound (there is no other crewed World); **the waterman's fare** a
@@ -7990,7 +7991,20 @@ rightly, that the NE legs inside Bertheaume will not be laid on this flood under
 and he has no answer but to steer as near as she will lie (from 113000) or to go back for a
 mark set astern (from 114000). A pilot's answers would be to wait for the slack in the road,
 to work the north shore's eddy, or to anchor; and his first turn should trim before it puts
-her five points nearer the wind. Not built: for the lead.
+her five points nearer the wind.
+
+**A debt, not a fix.** On the lead's word (2026-10-23) the wind over the water is kept, and
+the pilot's conn in a strong flood is booked as package 58b's item 6, the captain's sea
+sense, beside the rules captain's. The two cases
+(`test_ports.py::test_the_pilot_allows_for_the_set_before_his_turn_in_the_goulet_on_the_flood`,
+113000 and 114000) are marked expected failures, strict, as 57's gale trial is marked,
+with the account above in the marker and the comment over it: the pilot lays legs the
+flood will not let her make and has no answer but to pinch (113000: onto the Mingan at
+115561) or go back (114000: aback at 114049, beating back for a mark astern, no berth in
+the 110 minutes). Strict, so that the suite says so the day 58b's conn brings her in, and
+the marker is lifted then. The logs: the whole slow tier with the fix,
+`slow19-new.log`; the courses, `g-fix.txt` (113000) and `g-fix114.txt` (114000), in the
+build's scratch directory.
 
 
 ### The suite, as run
