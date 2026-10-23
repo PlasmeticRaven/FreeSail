@@ -246,6 +246,40 @@ def test_the_charts_tools_read_bearings_and_distances(tmp_path):
     assert (out["variation"], out["none"]) == (24.5, None)
 
 
+UNITS = ROOT / "client" / "units.js"
+
+
+@needs_node
+def test_a_soundings_label_is_finite_fathoms_and_every_unit_the_client_reads_is_defined(tmp_path):
+    """Package 68 (the cold review of 2026-10-22, R-05): `client/units.js` had no `FATHOM`,
+    so every sounding on the chart printed "NaN fm". A depth in metres reads as whole
+    fathoms, a depth that is not a finite number as no bottom; and every `U.<name>` the
+    client's scripts read is one the units module gives."""
+    out = run_js(
+        tmp_path,
+        UNITS,
+        {},
+        """
+        return {
+          fathom: M.FATHOM,
+          ten: M.formatFathoms(18.288), deep: M.formatFathoms(91.44),
+          none: [M.formatFathoms(Infinity), M.formatFathoms(NaN), M.formatFathoms(null),
+                 M.formatFathoms(undefined)],
+          names: Object.keys(M),
+        };
+        """,
+    )
+    assert out["fathom"] == pytest.approx(1.8288)
+    assert (out["ten"], out["deep"]) == ("10 fm", "50 fm")
+    assert out["none"] == ["no bottom"] * 4
+    import re
+
+    for script in (ROOT / "client").glob("*.js"):
+        read = set(re.findall(r"\bU\.([A-Za-z_][A-Za-z_0-9]*)", script.read_text(encoding="utf-8")))
+        missing = read - set(out["names"])
+        assert not missing, (script.name, sorted(missing))
+
+
 def test_the_library_pane_renders_the_models_markdown(tmp_path):
     """The pane's renderer: a primer chapter's headings, tables and code from the very
     text the tool serves, nothing of the page let through as markup, and a

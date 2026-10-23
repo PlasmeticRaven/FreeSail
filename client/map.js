@@ -1025,7 +1025,7 @@
       ctx.fillStyle = inkColour;
       // a depth that is not a finite number is drawn as no bottom, never as "NaN fm" (the
       // owner's note of 2026-10-09; the source is looked for in the soundings' record)
-      var fm = !Number.isFinite(s.depth_m) ? "no bottom" : Math.round(s.depth_m / U.FATHOM) + " fm";
+      var fm = U.formatFathoms(s.depth_m);
       ctx.fillText(fm + (s.ground ? " " + s.ground : ""), q[0] + 4, q[1] - 6);
       ctx.beginPath();
       ctx.arc(q[0], q[1], 2, 0, 2 * Math.PI);

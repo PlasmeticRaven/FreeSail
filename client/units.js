@@ -8,6 +8,9 @@
   var KNOT = 0.514444;
   var NAUTICAL_MILE = 1852.0;
   var CABLE = 185.2;
+  // a fathom of six feet (freesail/units.py FATHOM); missing, every sounding on the
+  // chart printed "NaN fm" (package 68; the cold review of 2026-10-22, R-05)
+  var FATHOM = 1.8288;
   var POINT = Math.PI / 16;
   var TWO_PI = 2 * Math.PI;
   var POINTS = [
@@ -74,6 +77,12 @@
     if (kn < 64) return "a storm";
     return "a hurricane";
   }
+  // a sounding's figure as a chart prints it: whole fathoms, or no bottom where the
+  // depth is not a finite number (never "NaN fm")
+  function formatFathoms(depthM) {
+    if (typeof depthM !== "number" || !Number.isFinite(depthM)) return "no bottom";
+    return Math.round(depthM / FATHOM) + " fm";
+  }
   function partName(id) {
     return id.replace(/\./g, " ").replace(/_/g, " ");
   }
@@ -82,6 +91,7 @@
     KNOT: KNOT,
     NAUTICAL_MILE: NAUTICAL_MILE,
     CABLE: CABLE,
+    FATHOM: FATHOM,
     POINT: POINT,
     POINTS: POINTS,
     wrap2pi: wrap2pi,
@@ -97,6 +107,7 @@
     formatBells: formatBells,
     clockOf: clockOf,
     windStrength: windStrength,
+    formatFathoms: formatFathoms,
     partName: partName,
   };
 });
