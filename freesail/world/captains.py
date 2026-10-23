@@ -2177,8 +2177,11 @@ class Captain(Judgement):
         fills = self._fills()
         out = []
         # while the pilot has the conn (package 45) the book's course lines are left out,
-        # or the hourly "the leg" would take her back from him at the hour
-        conn = bool(self._business.get("conn_given"))
+        # or the hourly "the leg" would take her back from him at the hour; and so when the
+        # conn was the officer's to give (package 58b: the pilot brought her up to wait for
+        # the flood to slacken, and the book written again at the weigh carried "the leg",
+        # which shaped her back out of the Goulet for the outer mark under the pilot's feet)
+        conn = bool(self._business.get("conn_given")) or self._pilot_has_conn()
         for line in self.doctrine.book(state):
             if conn and 'standing order "the leg"' in line:
                 continue
@@ -2187,6 +2190,11 @@ class Captain(Judgement):
             except (KeyError, IndexError, ValueError):
                 continue
         return out
+
+    def _pilot_has_conn(self) -> bool:
+        view = getattr(self.world, "readings", None)
+        pilot = view.value("pilot") if view is not None else None
+        return isinstance(pilot, dict) and bool(pilot.get("conn"))
 
     def _fills(self) -> dict[str, Any]:
         d = self.doctrine

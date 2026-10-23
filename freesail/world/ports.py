@@ -297,6 +297,7 @@ PILOT_WAIT_HORIZON_H = 7.0
 PILOT_TRIM_FIRST_S = 60
 PILOT_JUDGE_WAY_KN = 4.0  # her way through the water as he reckons a leg (judgement)
 PILOT_WEIGH_AHEAD_S = 1800  # he judges the stream for her under way in half an hour (judgement)
+PILOT_COMMITTED_S = 2700  # weighed for the slack, he does not bring her up again so soon
 PILOT_WAIT_WEIGH_S = 2700  # a weighing not come in three quarters of an hour is given up
 
 IN_PORT_NM = 2.0
@@ -2020,7 +2021,10 @@ class Ports:
             from freesail.world.sights import greenwich_time
 
             ahead = greenwich_time(world) + timedelta(seconds=PILOT_WEIGH_AHEAD_S)
-            self.conn_wait_for = {"at": ahead.isoformat()}
+            self.conn_wait_for = {
+                "at": ahead.isoformat(),
+                "until_tick": now + PILOT_COMMITTED_S,
+            }
             self._record(
                 Severity.NOTABLE,
                 "port.pilot_conn",
@@ -2081,6 +2085,13 @@ class Ports:
             lies = self._as_she_will_lie(wanted)
             if lies is not None:
                 wanted, words = lies, f"{words}, as near as she will lie"
+            from freesail.orders.navigation import manoeuvre_in_hand
+
+            if manoeuvre_in_hand(ship) is not None:
+                # going about or wearing for his course: the manoeuvre has it, and he gives
+                # none over it (package 58b: cast the wrong way from her anchor, she was
+                # given a new course each minute of the wear and worn by turns)
+                return
             fresh = self.conn_bearing is None or dyn.helm_mode is not HelmMode.HEADING
             # the course given again when the mark's bearing has drawn half a point from
             # the bearing it was last given for, so that a bearing on a point's edge does
@@ -2317,6 +2328,9 @@ class Ports:
         last = self.conn_judged
         if last is not None and last[0] == self.conn_i and now - int(last[1]) < PILOT_WAIT_LOOK_S:
             return False
+        committed = (self.conn_wait_for or {}).get("until_tick")
+        if committed is not None and now < int(committed):
+            return False  # weighed for the slack: he takes her in on it
         said = (
             bool(last[2])
             if last is not None and len(last) > 2 and last[0] == self.conn_i
@@ -2573,7 +2587,14 @@ class Ports:
             wind_from = _wind_from_over_the_water(world, wind)
             off_new = abs(units.wrap_pi(wanted - wind_from))
             off_now = abs(units.wrap_pi(float(dyn.heading) - wind_from))
-            if off_new < off_now - units.POINT:
+            # his own turn toward the wind, onto a course by the wind (within eight points
+            # of it): not a sheer of hers to be met at once, nor a reach
+            own_turn = (
+                self.conn_bearing is None
+                or abs(units.wrap_pi(float(dyn.heading) - self.conn_bearing))
+                < PILOT_TRIM_POINTS * units.POINT
+            )
+            if own_turn and off_new <= 8.0 * units.POINT and off_new < off_now - units.POINT:
                 if self.conn_trim_first is None:
                     self.conn_trim_first = now
                     off_pts = off_new / units.POINT
