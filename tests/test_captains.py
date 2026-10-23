@@ -513,14 +513,18 @@ def test_the_lead_goes_every_glass_in_soundings_and_every_hour_inshore_brought_t
     cap, given = _on_a_leg(w)
     p = C.Perception(tick=1000, chart_fathoms=16.0, speed_kn=6.0, wind_kn=14.0)
     assert not cap._casts(p, set())
+    assert given == []  # the first cast a glass into the leg, not at its laying
+    p.tick = 2800
+    assert not cap._casts(p, set())
     assert given == [("heave the lead", "in soundings on the leg")]
-    p.tick = 2000
+    p.tick = 3700
     cap._casts(p, set())
-    p.tick = 2900
+    p.tick = 4600
     cap._casts(p, set())
     assert len(given) == 2  # a glass after
     given.clear()
     cap._business.clear()
+    cap._business["cast_tick"] = 0  # the last cast long since
     off = C.Perception(tick=10000, chart_fathoms=45.0, speed_kn=6.0, wind_kn=14.0)
     off.coast_by_account_nm = 40.0
     assert not cap._casts(off, set()) and not given  # offshore: no cast brought to for

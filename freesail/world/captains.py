@@ -2517,7 +2517,13 @@ class Captain(Judgement):
             return False
         if p.anchor_down or p.aground or p.manoeuvre in ("hove to", "heaving to"):
             return False
-        last = int(b.get("cast_tick", -(10**9)))
+        if "cast_tick" not in b:
+            # the first cast a glass or an hour into the leg, not at its laying: cast at
+            # once, the deep-sea lead held the hands from a cruiser's heave-to for her
+            # station (truth 7b-113) and the book's own lead goes in pilot water
+            b["cast_tick"] = p.tick
+            return False
+        last = int(b["cast_tick"])
         if p.chart_fathoms < float(th("cast_glass_fathoms", 20)):
             if p.tick - last >= 1800:
                 b["cast_tick"] = p.tick
