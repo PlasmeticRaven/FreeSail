@@ -35,7 +35,7 @@ on these packages; that is the owner's choice.
 |---|---|---|---|
 | 70 | Fable | The combat core: the quarter bill and work in action, guns as parts, the gunnery's cycle, the hit model with heel, roll and the sea, damage as state, morale and the strike, the fighting book; the first armament and truths; the figures' sources (spec §7 to §10, §8a) | **merged 2026-10-24** (`80f64f7`); the record below |
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
-| 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | briefed 2026-10-24 (below), for the owner's approval |
+| 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | approved and launched 2026-10-24 (Fable, in a worktree off the head of that day) |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | after 70 |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | after 70 and 73 |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | behind 70 |
@@ -177,12 +177,15 @@ than a point on the other side of the eye is now gone about for, under a switch,
 lead accepts for every chase). **Found, carried:** the planner lays no way into Plymouth
 from the south-west (61); the frigate close-hauled makes four knots to the cutter's seven in
 fourteen knots of wind (the hull's); a commodore stopped leaves `_keep_company` to 72.
-**Decisions for the owner:** whether a stranger of any rig that will not answer the private
-signal should be closed and hailed by doctrine; whether the bell is rung at anchor in every
-fog whatever is about (moves the trade-thick trial's pins); `through_the_eye` is `shift` for
-every role, a cutter's `tack` and a frigate's `wear` a word in the role's file when wanted;
-the succession's three minutes become the wake with 72; the French and basic books' numbers
-are all made, for 76 to correct.
+**Decisions (the owner, 2026-10-24):** whether a stranger of any rig that will not answer the
+private signal should be closed and hailed by doctrine **stays open**, the owner weighing
+the investigation of every stranger against the time it costs and its edge cases (as built:
+only a man-of-war's rig makes the silence a tell); the fog signals **only while a sail has
+been about**, as built, "that keeps it interesting"; `through_the_eye` `shift` for every role
+and the chase's new tack rule for every chase **stand as built**, the owner seeing no
+problem and asking their implications be shown in play; the succession's three minutes
+become the wake with 72; the French and basic books' numbers are all made, for 76 to
+correct.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
