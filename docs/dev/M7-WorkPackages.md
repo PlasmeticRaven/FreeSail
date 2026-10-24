@@ -35,7 +35,7 @@ on these packages; that is the owner's choice.
 |---|---|---|---|
 | 70 | Fable | The combat core: the quarter bill and work in action, guns as parts, the gunnery's cycle, the hit model with heel, roll and the sea, damage as state, morale and the strike, the fighting book; the first armament and truths; the figures' sources (spec §7 to §10, §8a) | **merged 2026-10-24** (`80f64f7`); the record below |
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
-| 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | approved and launched 2026-10-24 (Fable, in a worktree off the head of that day) |
+| 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | briefed 2026-10-24 (below), for the owner's approval; runs after 72 |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | after 70 and 73 |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | behind 70 |
@@ -186,6 +186,75 @@ and the chase's new tack rule for every chase **stand as built**, the owner seei
 problem and asking their implications be shown in play; the succession's three minutes
 become the wake with 72; the French and basic books' numbers are all made, for 76 to
 correct.
+
+### Package 72 as merged (2026-10-24)
+
+Merged `--no-ff` from the builder's worktree (ten commits on `356e7ba`, the design note
+first; 53 files, ~6,800 lines) with no conflict; ruff clean; the lead's sweeps clean (no
+consent file, no ship file, no physics file touched; no model identifier). The builder ran
+the fast tier whole (3,631 passed, two failed in the pictures' API-door test under four
+workers, passing alone, not its own), the whole slow tier (3,964 passed, 11 expected
+failures, three failed, all its own and mended after it, their three files rerun, 88
+passed) and the pace tests alone (10 passed after truth 7-159 was put in truth 51's form);
+**since three mends followed its whole slow tier, the lead ran the whole slow tier and the
+pace tests on the merged tree after the merge: its figures follow in the next commit**. Built as briefed,
+generously: **the squadron's shape designed and written first** (`docs/design/
+Design-Squadrons.md`); **the set** (`freesail/world/squadrons.py`: a commander, the members
+in their order of sailing, a kind, a formation and interval, divisions, stragglers, a
+rendezvous, a book, a regime; joined and left by the scenario's `squadrons:`, the director's
+forms, the commander's signals and the world; writing 71's `under_orders_of` on every
+member so that every reader 71 built works unchanged); **one brain at far detail** (each
+member's far body on a station leg laid each minute in the commander's frame at the set's
+pace, the slowest member's; a promoted member's captain `in company`, a state of the
+machine with its doctrine in every role's file, keeping station by the near order; the line
+kept through promotion); **station keeping** a held order of the navigation
+(`freesail/orders/station.py`: `keep station two cables astern of the flagship` and its
+kin, the flag's course and a lead point three cables ahead, shortened a step a glass) and
+**succession by the wake** inside a set (71's three minutes kept outside one); **the
+books** (`data/squadrons/convoy.yaml`, `squadron.yaml`, `blockade.yaml`: rules of signal,
+order, formation, goal and rearm, run once a minute on whichever rules captain holds the
+commodore's station and silent under a model, who commands by `make the signal`; the
+escort's cover and the far cut-out at hailing distance; the commodore's chase and recall);
+**the regimes in data** (`data/regimes.yaml`, eight regimes with knobs and sources; a
+`naval:` block for every nation; `freesail/world/regimes.py`: in ordinary, commissioned
+with a delay, the sortie when no enemy man-of-war has been in the offing for an hour and
+the wind is under a fresh breeze; the intent `blockade <port>` keeping the port's new
+`blockade_station`); **the business** drawing convoys, blockades and ships in ordinary by
+the knobs and **following the player's ship across the regions' edge**, carrying a set over
+whole; **the weather's seasonal bound** (R-39) built under a switch and off (`weather_bound:
+seasonal` on the scenario; no recorded scenario sets it, truth 7-158); readings, events,
+channels and the director's forms (`squadron:`, `squadron "X": ...`, `convoy:`, `ship "X":
+in ordinary at`, `commissioned for`); three scenarios (the convoy of six with a privateer
+schooner, the Brest blockade blown off to Torbay by a scripted gale and a French frigate
+slipping out an hour after the wind fell, the Channel squadron promoting in line); **the
+pace measured** (the convoy of six at far detail alone 544 to 551 ticks a second, under the
+default cap 318 to 328; truth 7-159 at 581 against the build machine's floor of 500, truth
+7-160 at 318 against the crewed floor of 60; the owner's baseline untouched); truths 7-152
+to 7-160; spec §21 to §23 as built, Harness §21e, primer chapter 24, the tuning notes.
+
+**Taken another way, accepted:** the far cut-out stops at hailing distance, not pistol shot
+(74's far fight takes it on); the land-avoiding planner (61) left to 78 with the reason
+(the convoys and the blockade work in open water; Plymouth's track to sea moved off the
+land as data, by Cawsand Bay and the Rame, a frigate from the west having gone through the
+Four onto the Plâtresses in 28 minutes under `blockade Brest` on the outer road: a test
+case for 61); the bound taken only as far as the squadrons' gale wanted (a scripted low
+wants no bound), Iberia's drift left to 79. **Pins:** none moved, no bisection needed (the
+bound off, the planner's graph not built, Plymouth's track read by no recorded passage,
+truth 7-145's 180 seconds kept). **Found on the way, fixed:** the near `keep station`
+order's first form swung her across the line and crept without turning her; a promoted
+ship's world rebuilt the scenario's sets for want of the ships; `blockade Brest` on the
+outer road led through the Four (the chart has two Black Rocks); YAML reads a bare `on:`
+as true; the business's hourly draw counted the sets against `most_ships` and stopped
+drawing; a brainless member's row had no business; the director's `commissioned for`
+example wanted the forms test's list. **Found, carried:** the rules captain on a station
+under the land stands off forty miles in a rising onshore wind (his offing); the
+gradient-wind rule flattens a scripted low's surface wind far from its centre; a brainless
+member is never promoted under any cap (give her an intent to promote her); the pictures'
+API-door test times out beside four workers running long truths (passes alone; not this
+package's). **Decisions for the owner:** the seasonal bound stays under its switch until
+judged on a passage of days; the regimes' knobs are judgement (a sortie when the offing is
+clear fifteen miles or the blockade station, the wind under 22 knots, a commission in two
+to five days); merchantmen stay brainless and far under every cap.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
