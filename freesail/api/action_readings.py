@@ -38,7 +38,47 @@ from freesail import units
 from freesail.api import readings as R
 from freesail.crew.model import number_words
 
-__all__ = ["CABLE_M", "register"]
+__all__ = ["ACTION_ROWS", "CABLE_M", "idle_rows", "register"]
+
+# The action's rows a sample carries only while something is afoot (the brief's item 8: the
+# samples kept small enough that a model's thinking does not cost it a broadside): at
+# quarters, or damaged, or with men hurt, or a mark engaged, or the colours struck, the row
+# rides; idle, it is left out, and its first appearance is itself the delta.
+ACTION_ROWS: tuple[str, ...] = (
+    "damage",
+    "bill",
+    "magazine",
+    "enemy",
+    "range",
+    "colours",
+    "quarter_bill",
+)
+
+
+def idle_rows(world: Any) -> set[str]:
+    """The action's rows to leave out of a sample now: all of them while she is not at
+    quarters, undamaged, nobody hurt, no mark engaged and the colours flying; `guns` always
+    rides (one line)."""
+    ship = getattr(world, "ship", None)
+    if ship is None:
+        return set(ACTION_ROWS)
+    extra = getattr(ship, "extra", None) or {}
+    q = extra.get("quarters")
+    if q is not None and getattr(q, "at_quarters", False):
+        return set()
+    if extra.get("struck"):
+        return set()
+    battery = extra.get("battery")
+    if battery is not None and getattr(battery, "target", None):
+        return set()
+    keeper = extra.get("damage")
+    if keeper is not None and (keeper.hits or keeper.holes):
+        return set()
+    crew = extra.get("crew")
+    if crew is not None and any(s.hurt for s in crew.sailors):
+        return set()
+    return set(ACTION_ROWS)
+
 
 CABLE_M = units.NAUTICAL_MILE / 10.0  # the cable of a tenth of a mile (608 feet)
 

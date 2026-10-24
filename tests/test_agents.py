@@ -1409,7 +1409,8 @@ def test_each_sample_carries_the_lines_since_the_last_one_and_the_readings():
     # on the point ship in a steady wind, the clock's
     assert first["readings"] == data_turns(fake)[0]["readings"] and "readings_are" not in first
     assert second["readings_are"] == harness_mod.READINGS_ARE
-    now = tools.readings_words(world)
+    # the sample's rows are the tool's less the action's idle rows (package 70)
+    now = harness_mod.Harness._sample_readings(world)
     assert second["readings"] == {k: v for k, v in now.items() if first["readings"][k] != v}
     assert set(second["readings"]) <= {"time", "watch", "daylight"}
     assert second["question"] is None and second["notices"] == []
@@ -1858,7 +1859,7 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # box_off.yaml), and the lug's six (package 43b: set, take in, reef, shake out, dip and
     # trim its sheet), and the fishing gear's eight (package 56: the trawl, the nets, the
     # seine and the lines, each shot and hauled)
-    assert "83 evolutions; the list about" in contents  # package 57: set_flying, take_in_flying
+    assert "86 evolutions; the list about" in contents  # package 70: the quarters' three
     # the ship's papers are a topic beside the ship (package 35), listed with their handles
     assert "  papers: the ship's papers, 8 aboard" in contents and "the manifest" in contents
 
