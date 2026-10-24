@@ -19,6 +19,22 @@ name: the commander of a cruiser
 source: "spec M6 §4 and §19; kings-ship.yaml for the station and the chase; the sloops' orders of the period from memory (to make out every sail, to avoid a superior force); judgement on the figures"
 
 thresholds:
+  # Package 70 (spec M7 §10): the engaging doctrine. `engage_nm` the distance within which
+  # an enemy is engaged (nought turns it off); `engage_range_cables` the range the fire is
+  # opened at (the nation's habit may double it: freesail/world/captains.py NATION_HABITS);
+  # `break_off_nm` and `break_off_minutes` the distance and the minutes with no enemy
+  # within it that end the action; `engage_side` the gage (weather or lee); `charge` and
+  # `aim` what the guns load and are laid for; `morale_start` and `strike_below` the
+  # company's figure and the line the colours come down at (freesail/combat/morale.py).
+  engage_nm: {value: 1.0, source: "as the King's ship's"}
+  engage_range_cables: {value: 2, source: "as the King's ship's"}
+  break_off_nm: {value: 3, source: "the enemy beyond this for the minutes below and the action is over; judgement"}
+  break_off_minutes: {value: 10, source: "as gale_over_minutes: ten minutes, not a lull in the firing; judgement"}
+  engage_side: {value: weather, source: "as the King's ship's"}
+  charge: {value: round, source: "round shot the ordinary charge (Douglas 1820); chain for the rigging where the aim is the rigging and the charge says so"}
+  aim: {value: hull, source: "spec M7 §9: the hull the British habit, the rigging the French; the nation's habit stands where the file leaves this empty"}
+  morale_start: {value: 0.85, source: "a cruiser's company at the start of an action (spec M7 §10, decision 7); judgement"}
+  strike_below: {value: 0.15, source: "a brig-sloop or a cutter of the Navy strikes a little sooner than a frigate: her company smaller, a loss of a quarter of them the end of her fight (James, the sloops' actions); judgement"}
   gale_kn: {value: 38, source: "between the merchantman's force 8 and the King's ship's force 9: a brig-sloop lies to sooner than a frigate; judgement on Beaufort's scale"}
   gale_over_kn: {value: 30, source: "judgement, between the two"}
   beating_dwell_minutes: {value: 10, source: "package 43b: the beating book taken up and given up on a verdict that has stood ten minutes, not on one course's word (the trade trial traded the deck every two minutes as an evasion ended); judgement, as gale_over_minutes"}
@@ -141,7 +157,16 @@ books:
     - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
     - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
   in distress: []
-  engaging: []
+  engaging:
+    # package 70 (spec M7 §10): the fighting book. The drum, the guns cast loose, loaded
+    # and laid, and the mark engaged on the side she bears are the captain's own on entering
+    # (freesail/world/captains.py `_engage_now`); the course that keeps her on the engaged
+    # beam at the doctrine's range his each minute (`_engaging`); the fire is the book's.
+    - 'standing order "open fire": when the range is under {engage_range_cables} cables then fire as they bear'
+    - 'standing order "long shot": when the range exceeds {break_off_nm} miles then hold your fire'
+    - 'standing order "return her fire": at she opens fire then fire as they bear'
+    - 'standing order "she strikes": at the enemy strikes then cease firing'
+    - 'standing order "the colours": at the colours struck then cease firing'
   struck: []  # package 70: the colours down, lying to for her captor
 
 transitions:
@@ -185,3 +210,14 @@ transitions:
   - {from: at anchor, on: under way, to: on passage}
   - {from: at anchor, on: anchored in port, to: in port}
   - {from: in distress, on: afloat, to: on passage}
+  # package 70 (spec M7 §10): into the action and out of it
+  - {from: on passage, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: beating, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: keeping station, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: investigating a stranger, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: chasing, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: evading, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: engaging, on: aground, to: in distress}
+  - {from: engaging, on: enemy struck, to: on passage}
+  - {from: engaging, on: enemy out of range, to: on passage}
+  - {from: engaging, on: overmatched, to: evading}

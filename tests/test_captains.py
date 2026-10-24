@@ -81,8 +81,9 @@ def test_an_intent_is_read_from_words_against_the_chart_and_the_ports_and_refuse
 
 def test_every_doctrine_loads_with_sources_states_and_stimuli_the_captain_knows():
     """Each role's file gives thresholds with a source beside each figure, books for
-    every state of the machine (engaging present and empty), and transitions whose
-    states and stimuli the captain judges."""
+    every state of the machine (engaging filled by package 70: the fighting book of spec
+    M7 §10, four lines in every role's file, the fisherman's never loaded since her
+    engage_nm is nought), and transitions whose states and stimuli the captain judges."""
     for role in C.ROLES:
         d = C.load_doctrine(role)
         assert d.role == role and d.thresholds and d.transitions
@@ -91,14 +92,20 @@ def test_every_doctrine_loads_with_sources_states_and_stimuli_the_captain_knows(
             assert isinstance(value, (int, float, str))
         for state in C.STATES:
             assert state in d.books, f"{role}: no book for {state}"
-        assert d.books["engaging"] == ()
+        assert len(d.books["engaging"]) >= 4, f"{role}: the fighting book"
+        assert d.books["struck"] == ()  # the colours down: nothing to order but lying to
+        for key in ("engage_nm", "engage_range_cables", "morale_start", "strike_below"):
+            assert key in d.thresholds, f"{role}: {key}"
         for t in d.transitions:
             assert t.frm in C.STATES and t.to in C.STATES
             assert t.on in C.STIMULI, f"{role}: {t.on}"
             assert not t.unless or t.unless in C.STIMULI
-    # the fisherman is package 43b's (the world's business); a role with no file is refused
-    with pytest.raises(ValueError, match="no doctrine for the role 'privateer'"):
-        C.load_doctrine("privateer")
+    # the fisherman is package 43b's (the world's business), the privateer package 70's
+    # (truth changed: her file exists now, a letter of marque cruising for prizes); a role
+    # with no file is refused
+    assert C.load_doctrine("privateer").role == "privateer"
+    with pytest.raises(ValueError, match="no doctrine for the role 'pirate'"):
+        C.load_doctrine("pirate")
 
 
 def test_every_book_line_of_every_doctrine_parses_in_the_dialect_on_every_ship():

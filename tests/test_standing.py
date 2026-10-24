@@ -657,11 +657,11 @@ TABLE: list[tuple[str, str, ok | no]] = [
         no(["'at dawn' names no event", "sunrise"]),
     ),
     # the lookout's sighting is an event since package 33a named it (the line is package
-    # 32's); `clear for action` is still no order of the ship's
+    # 32's); `clear for action` is the ship's since package 70 (the quarters' evolution)
     (
         F,
         'standing order "x": at a sighting then clear for action',
-        no(["'clear for action' is refused"]),
+        ok("at", event="a sighting"),
     ),
     (F, 'standing order "x": at a landfall then heave the lead', ok("at", event="a landfall")),
     (F, 'standing order "x": at noon then work up the reckoning', ok("at", event="noon")),

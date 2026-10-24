@@ -19,6 +19,22 @@ name: a merchant master
 source: "spec M6 §4; the merchant passage's book (data/scenarios/merchant-passage.orders) for the routines; Beaufort's scale for the gale; Faden 1793 for the common tracks"
 
 thresholds:
+  # Package 70 (spec M7 §10): the engaging doctrine. `engage_nm` the distance within which
+  # an enemy is engaged (nought turns it off); `engage_range_cables` the range the fire is
+  # opened at (the nation's habit may double it: freesail/world/captains.py NATION_HABITS);
+  # `break_off_nm` and `break_off_minutes` the distance and the minutes with no enemy
+  # within it that end the action; `engage_side` the gage (weather or lee); `charge` and
+  # `aim` what the guns load and are laid for; `morale_start` and `strike_below` the
+  # company's figure and the line the colours come down at (freesail/combat/morale.py).
+  engage_nm: {value: 0.3, source: "she fights only when caught, within three cables; beyond, she runs (`hostile stranger`, `evading`)"}
+  engage_range_cables: {value: 2, source: "her few guns fired at two cables to discourage a boarding, not to fight (judgement)"}
+  break_off_nm: {value: 1.5, source: "the enemy beyond this for the minutes below and the action is over; judgement"}
+  break_off_minutes: {value: 10, source: "as gale_over_minutes: ten minutes, not a lull in the firing; judgement"}
+  engage_side: {value: lee, source: "the lee gage to escape: she runs, and fights only when caught"}
+  charge: {value: round, source: "round shot the ordinary charge (Douglas 1820); chain for the rigging where the aim is the rigging and the charge says so"}
+  aim: {value: rigging, source: "spec M7 §9: the hull the British habit, the rigging the French; the nation's habit stands where the file leaves this empty"}
+  morale_start: {value: 0.5, source: "a merchant master's company at the start of an action (spec M7 §10, decision 7); judgement"}
+  strike_below: {value: 0.4, source: "a merchantman strikes to a privateer's first broadside into her: her few guns and her small crew (the prize courts' records of the Channel trade; judgement on the figure)"}
   gale_kn: {value: 34, source: "Beaufort's force 8, a fresh gale, 34 to 40 knots, in which a merchantman of 1805 shortened to close-reefed topsails and lay to with sea room (judgement on the scale)"}
   gale_over_kn: {value: 28, source: "she fills away when the wind has eased under force 7, a moderate gale (judgement)"}
   beating_dwell_minutes: {value: 10, source: "package 43b: the beating book taken up and given up on a verdict that has stood ten minutes, not on one course's word (the trade trial traded the deck every two minutes as an evasion ended); judgement, as gale_over_minutes"}
@@ -146,7 +162,16 @@ books:
     - 'standing order "make all sail to haul off": at steady on the course, if the true wind is under {shorten_sail_kn} knots then make all sail'
   keeping station: []
   in distress: []
-  engaging: []
+  engaging:
+    # package 70 (spec M7 §10): the fighting book. The drum, the guns cast loose, loaded
+    # and laid, and the mark engaged on the side she bears are the captain's own on entering
+    # (freesail/world/captains.py `_engage_now`); the course that keeps her on the engaged
+    # beam at the doctrine's range his each minute (`_engaging`); the fire is the book's.
+    - 'standing order "open fire": when the range is under {engage_range_cables} cables then fire as they bear'
+    - 'standing order "long shot": when the range exceeds {break_off_nm} miles then hold your fire'
+    - 'standing order "return her fire": at she opens fire then fire as they bear'
+    - 'standing order "she strikes": at the enemy strikes then cease firing'
+    - 'standing order "the colours": at the colours struck then cease firing'
   struck: []  # package 70: the colours down, lying to for her captor
 
 transitions:
@@ -183,3 +208,10 @@ transitions:
   # port whose anchorage is beyond the reach (the road of Bertheaume, eight miles from Brest)
   - {from: at anchor, on: anchored in port, to: in port}
   - {from: in distress, on: afloat, to: on passage}
+  # package 70 (spec M7 §10): into the action and out of it
+  - {from: on passage, on: enemy in range, to: engaging}
+  - {from: beating, on: enemy in range, to: engaging}
+  - {from: evading, on: enemy in range, to: engaging}
+  - {from: engaging, on: aground, to: in distress}
+  - {from: engaging, on: enemy struck, to: on passage}
+  - {from: engaging, on: enemy out of range, to: on passage}
