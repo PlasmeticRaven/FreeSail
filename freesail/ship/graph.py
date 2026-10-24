@@ -14,8 +14,8 @@ from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING, Any
 
 from freesail import units
-from freesail.ship.parts import Dynamics, Hull, Line, Part, Sail, Spar
-from freesail.ship.schema import ShipSpec
+from freesail.ship.parts import Dynamics, Gun, Hull, Line, Part, Sail, Spar
+from freesail.ship.schema import FitSpec, ShipSpec
 from freesail.ship.stub import OrderError
 
 if TYPE_CHECKING:
@@ -27,14 +27,23 @@ OrderHandler = Callable[["Ship", str], tuple[str, str, dict[str, Any]]]
 
 
 class Ship:
-    def __init__(self, spec: ShipSpec):
+    def __init__(self, spec: ShipSpec, fit: str | None = None):
         self.spec = spec
         self.name = spec.name
         self.hull = Hull(spec.hull)
         self.spars: dict[str, Spar] = {s.id: Spar.from_spec(s) for s in spec.spars}
         self.sails: dict[str, Sail] = {s.id: Sail.from_spec(s) for s in spec.sails}
         self.lines: dict[str, Line] = {ln.id: Line.from_spec(ln) for ln in spec.lines}
-        self.parts: dict[str, Part] = {**self.spars, **self.sails, **self.lines}
+        # the guns (spec M7 §7; package 70): the fit the scenario chose, or the file's
+        # default; a ship whose file lists no armament carries none
+        self.fit_spec: FitSpec | None = (
+            spec.armament.fit(fit) if spec.armament is not None else None
+        )
+        self.fit: str = self.fit_spec.name if self.fit_spec is not None else ""
+        self.guns: dict[str, Gun] = (
+            {g.id: Gun.from_spec(g) for g in self.fit_spec.guns} if self.fit_spec else {}
+        )
+        self.parts: dict[str, Part] = {**self.spars, **self.sails, **self.lines, **self.guns}
         self.groups: dict[str, list[str]] = {g: list(m) for g, m in spec.groups.items()}
         self.aliases: dict[str, str] = dict(spec.aliases)
         self.dyn = Dynamics()
@@ -277,6 +286,21 @@ class Ship:
                     "strain_ratio": ln.strain_ratio,
                 }
                 for ln in self.lines.values()
+            ],
+            # the guns (package 70): their load state, for the view and the tests
+            "guns": [
+                {
+                    "id": g.id,
+                    "kind": g.kind,
+                    "pounder": g.pounder,
+                    "place": g.place,
+                    "number": g.number,
+                    "side": g.side,
+                    "state": g.state_words,
+                    "dismounted": g.dismounted,
+                    "fired": g.fired,
+                }
+                for g in self.guns.values()
             ],
         }
 

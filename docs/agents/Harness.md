@@ -627,6 +627,61 @@ The first sample of a seating, and the first after a handover fold, are whole; `
 
 **Weather, the small part.** A system appended in play grows in from nothing at the order's tick, over an hour at the least or until its first point's time; a waypoint appended to a track that had ended runs from where the system stands, reached an hour on at the soonest; and a high is doubted as a low is (above the season's ceiling, or a strong one near her out of a glass that has not been rising). The summed field's seasonal bound and the climatology's drift onto Iberia are not mended here.
 
+## 21c. The stations in action (package 70)
+
+Spec M7 §8a and §12 "as built (package 70)"; the primer's chapter 22. What a station
+reads of an action, and what it may do in one.
+
+**The readings.** Every sample carries the action's rows beside the rest, and the deltas
+carry them when they change by what they say: `guns` (cast loose or secured; loaded, run
+out and primed; the side engaged and at whom; the charge, the aim, the firing's doctrine;
+the guns dismounted), `damage` (spars carried away, lines parted, sails holed, shot holes
+and where against the waterline, the helm), `bill` (the killed and wounded of the
+complement, and the hands' temper), `magazine`, `enemy` (the mark in the lookout's words,
+her range in cables by his estimate, 'struck'), `range`, `colours`, `quarter_bill`. The
+`enemy` row is keyed by who she is and whether she has struck, the `range` by the whole
+cable, so her bearing this minute does not re-send the row. The fall of shot and the hits
+are notable lines (`action.fired`, `action.hit`), the casualties urgent ones with the named
+people's own lines (`person.hurt`), and the bill's word when hands are robbed for sail work
+(`quarters.robbed`: "Tacking ship at quarters: 84 hands taken from the guns, half of each
+crew; the guns go on short-handed").
+
+**The tripwires and the events.** A stand-by may wait for `a sail within <n> cables`
+(judged by the lookout's estimate, never the truth) beside the earlier instruments, and for
+the action's events by their words: `she opens fire`, `a warning shot`, `a shot strikes`,
+`a man killed`, `a gun dismounted`, `a spar shot away`, `her colours come down`, `the enemy
+strikes`, `the colours struck`, `at quarters`, `cleared for action`, `the guns cast loose`,
+`the magazine empty`; the same words serve a standing order's `at`.
+
+**The cost of thinking against the cycle.** The station's line closes with the ship's time
+since the model's last reply (package 58a). Against the cycle's figures (truth 7-135: a
+frigate's 18-pounder every 104 s with her full company, a cutter's carronade every minute
+or so) a reply that costs a minute of the ship's time costs a broadside; a station in action
+should stand by on the action's events and keep its replies short, since the samples' deltas
+carry only the rows that changed. The measure: a frigate's broadside is 104 s of the ship's
+time; at the owner's pace of sixty the model has under two seconds of its own clock between
+broadsides, and a stand-by on `a shot strikes` or `her colours come down` costs it nothing.
+
+**The orders.** The captain's station has the gun deck (object `gunnery`): the standing
+intentions (`engage her to starboard`, `load with chain`, `aim at her rigging`, `fire as
+they bear`, `fire by divisions`, `hold your fire`, `fire on the up roll`, `run out the
+guns`, `guns before sail`) and the one-shot orders (`fire`, `fire the larboard broadside`,
+`fire No. 3 gun`, `fire the bow chaser`, `fire a shot across her bows`, `cease firing`,
+`strike the colours`, never refused), and the quarters' (`beat to quarters`, `clear for
+action`, `cast loose the guns`, `secure the guns`). The officer of the watch reads them all
+and gives none: the guns are the captain's to give, and his refusal says so. The boarders
+are refused in words as 73's.
+
+**The director.** His truth shows every ship's guns, damage and butcher's bill and a sail's
+colours struck. His hand reaches the action's state by the table's plausible causes
+(`data/director/aboard.yaml`): `aboard: No. 3 starboard gun found dismounted` (plausible
+under fire within ten minutes, else doubted) and `aboard: the cartridges found damp` (a
+quarter struck off the gunner's count; plausible with water in the well); `ship "Renard":
+order fire the starboard broadside` gives a crewed captain any order of the gun deck as
+his own; `say as the gunner` and `say as the captain of No. 3 gun` speak for the gunner
+and for the senior hand the quarter bill has at the gun. A station holder hurt is 73's;
+this package writes the hit to his person's line and nothing more.
+
 ## 22. The harbour and the settings (package 59)
 
 The terminals, the flags, the desktop client's configuration and the scenarios by hand are now one page: **the harbour**, a page of the game's own server (spec M7b §21d, §21e). In the game folder:

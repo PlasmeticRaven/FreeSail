@@ -1,0 +1,69 @@
+# FreeSail: the first action (spec M7 §12; package 70; the striking-colours study's shape:
+# two ships that can make each other out, one that will fight and one that may strike).
+# The King's cutter Sherbourne, twelve-pounder carronades, cruising off the Lizard on a
+# June forenoon of 1805; a French privateer cutter, the Renard, long three-pounders and
+# eight swivels, cruising for prizes on the same ground a mile and a half to the
+# south-east. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/first-action.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/first-action.yaml
+#
+# Played by the rules captains with no model seated: Mr Bowen (the cutter's commander, a
+# King's ship's doctrine) makes the stranger out, chases and engages an enemy within a
+# mile, beats to quarters, opens at two cables for her hull and returns her fire when she
+# opens it; the Renard's captain (a privateer's doctrine, the French habit over it) engages
+# from long shot at the rigging with chain, keeps her range by the beam, and her company,
+# fighting for the prize money, strikes when the losses or the odds pass her line; or she
+# runs from the King's cutter when the odds show, or the two part at the breaking-off
+# distance with the action over and nobody struck. Nothing pre-defines which (rule 7): an
+# action of a quarter of an hour and one of hours are both outcomes of the seed. Played by
+# the player at the captain's station, the fighting book is his (data/standing_orders/
+# fighting.orders, loaded here beside the starter's) and the orders of the gun deck
+# (`beat to quarters`, `cast loose the guns`, `engage her to starboard`, `fire as they
+# bear`, `fire`, `cease firing`, `strike the colours`); the readings `the guns`, `the
+# damage`, `the bill`, `the enemy`, `the range`.
+#
+# The weather is pinned (a westerly of twelve knots, a moderate breeze, the sky clear),
+# so that the action at seed 7 is the same on every machine; its figures are measured in
+# tests/test_known_truths.py (truths 7-133 onward) and recorded in docs/dev/TuningNotes.md
+# (package 70). The French cutter's fit is the hired cutters' (long guns and swivels), the
+# King's the Admiralty's carronades of the 1790s (data/ships/cutter.yaml, both fits).
+
+name: The first action
+seed: 7
+start: 1805-06-12T10:00
+position: {lat_deg: 49.80, lon_deg: -5.30}   # four leagues south of the Lizard
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/cutter.yaml
+  heading_deg: 180
+  speed_kn: 5
+  fit: carronades
+  glass: true
+intent: cruise off the Lizard within 10 miles
+wind:
+  from_deg: 270
+  knots: 12
+  gustiness: 0.0
+  variability: 0.0
+
+papers:
+  chart: {year: 1804}
+  almanac: 1805
+
+ports: [falmouth, plymouth, brest]
+
+standing_orders:
+  - data/standing_orders/starter.orders
+  - data/standing_orders/fighting.orders
+
+# The other sail: the privateer, a mile and a half to the south-east, cruising for prizes
+# (the intent that makes her captain a privateer's: data/captains/privateer.yaml), her
+# colours shown (71's true and false colours are not yet here), the long guns' fit.
+ships:
+  - {id: renard, description: cutter, name: Renard, nation: france, fit: long guns,
+     position: 49 46.9 N 5 16.4 W, goal: "cruising off the Lizard within 10 miles",
+     intent: "cruise for prizes off the Lizard within 10 miles", colours: shown}
+
+orders:
+  - set plain sail

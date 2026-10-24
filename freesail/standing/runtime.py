@@ -113,6 +113,26 @@ class Firing:
     started: list[Any] = field(default_factory=list)
 
 
+# The gun deck's intentions by the thing each sets (package 70): the conflict rule reads
+# two orders on one thing as contrary, and these as not.
+GUNNERY_PARTS: dict[str, str] = {
+    "engage": "the mark",
+    "load": "the charge",
+    "run out the guns": "the ports",
+    "run in the guns": "the ports",
+    "aim at": "the aim",
+    "fire as they bear": "the firing",
+    "fire by divisions": "the firing",
+    "hold your fire": "the firing",
+    "cease firing": "the firing",
+    "fire": "the word",
+    "fire on the roll": "the roll",
+    "strike the colours": "the colours",
+    "guns before sail": "the priority",
+    "sail before guns": "the priority",
+}
+
+
 def action_parts(ship: Any, text: str) -> ActionParts:
     """Read an order for the parts it touches. An order that cannot be read (a side the
     ship has not got now) touches nothing, and the conflict rule lets it by."""
@@ -149,8 +169,13 @@ def action_parts(ship: Any, text: str) -> ActionParts:
         except OrderError:
             return ActionParts(text, order.verb, frozenset(), manner)
         return ActionParts(text, order.verb, frozenset(res.ids), manner)
-    if order.verb in ("call all hands", "pipe down", "relieve the watch"):
+    if order.verb in ("call all hands", "pipe down", "relieve the watch", "beat to quarters"):
         return ActionParts(text, order.verb, frozenset({CREW}), manner)
+    if spec.object == "gunnery":
+        # the gun deck's intentions (package 70): each its own thing, so that an aim and a
+        # firing's doctrine are not contrary; two aims are
+        part = GUNNERY_PARTS.get(order.verb, SHIP)
+        return ActionParts(text, order.verb, frozenset({part}), manner)
     return ActionParts(text, order.verb, frozenset({SHIP}), manner)
 
 

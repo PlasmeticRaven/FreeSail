@@ -138,6 +138,13 @@ def pipe_down(ship: Ship, order: Order) -> Result:
     busy = all_hands_work(ship)
     if busy:
         raise OrderError(busy)
+    # at quarters (package 70): the company back under the watch bill first; the guns stay
+    # as they are (cast loose and loaded) until secured
+    quarters = ship.extra.get("quarters")
+    stood_down = False
+    if quarters is not None and getattr(quarters, "at_quarters", False):
+        quarters.stand_down()
+        stood_down = True
     note = routine.pipe_down()
     ship.extra.pop(WATCH_CALLS, None)  # a watch still coming up goes below with the rest
     data: dict[str, Any] = {"verb": order.verb, "level": 1}
@@ -150,6 +157,9 @@ def pipe_down(ship: Ship, order: Order) -> Result:
         )
     _severity, kind, text, _subject, note_data = note
     data.update(note_data)
+    if stood_down:
+        text = "The hands piped down from quarters; the guns as they stand until secured. " + text
+        data["from_quarters"] = True
     return kind, text, data
 
 
@@ -203,7 +213,36 @@ def call_watch(ship: Ship, order: Order) -> Result:
     )
 
 
+def beat_to_quarters(ship: Ship, order: Order) -> Result:
+    """`beat to quarters` (spec M7 §8a; package 70): the drum, and every man to his station
+    by the quarter bill (`crew.quarters`). A crew order as `call all hands` is, not an
+    evolution, for the same reason: the drum must not queue behind the tack or the heave-to
+    in hand. The hands are turned up by the routine (staged, as the watch below always
+    comes up) and the bill is assigned at once; a hand at work in hand goes to his gun as
+    the work is done, and sail work from now draws on the trimmers and then on the guns by
+    the fighting book's priority."""
+    from freesail.crew.quarters import quarters_of
+    from freesail.orders.prompt import world_of
+
+    quarters = quarters_of(ship)
+    if quarters is None:
+        raise OrderError("She has no quarter bill: her file carries no guns.")
+    if quarters.at_quarters:
+        raise OrderError("The hands are at quarters already.")
+    routine = _routine(ship, order.verb)
+    note = routine.call_all_hands("to beat to quarters", by_order=True)
+    if note is not None:
+        severity, kind, text, subject, note_data = note
+        ship.note(str(getattr(severity, "value", severity)), kind, text, subject, note_data)
+    world = world_of(ship)
+    tick = int(world.clock.tick) if world is not None else 0
+    lines = quarters.beat(tick)
+    data: dict[str, Any] = {"verb": order.verb, "level": 1, "quarters": quarters.describe()}
+    return "crew.quarters", "Beat to quarters! " + " ".join(lines), data
+
+
 CREW_VERBS: dict[str, Callable[[Ship, Order], Result]] = {
+    "beat to quarters": beat_to_quarters,
     "call all hands": call_all_hands,
     "call the watch": call_watch,
     "pipe down": pipe_down,

@@ -45,7 +45,7 @@ def test_every_thing_of_the_table_is_read_and_each_form_finds_its_own_thing():
     """The table loads with known keys only; each form, its slot filled by a name the
     frigate has, finds its own thing and no other."""
     table = WO.aboard_table()
-    assert len(table) == 24
+    assert len(table) == 26  # package 70: a gun dismounted and the cartridges damp
     assert set(WO._PLAUSIBLE) == WO.ABOARD_PLAUSIBLE_KEYS
     w = world_at(49.5, -5.5)
     w.hold.stow("tin", 10.0)
@@ -55,6 +55,7 @@ def test_every_thing_of_the_table_is_read_and_each_form_finds_its_own_thing():
         "line": "the starboard main brace",
         "anchor": "the best bower",
         "good": "tin",
+        "gun": "No. 3 starboard gun",  # package 70: a gun by the gun deck's words
     }
     for thing in table:
         for form in thing["words"]:

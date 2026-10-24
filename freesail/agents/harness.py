@@ -1694,7 +1694,7 @@ class Harness:
             reason=reason,
             log=lines,
             log_omitted=omitted,
-            readings=tools.readings_words(world),
+            readings=self._sample_readings(world),
             question=a.question,
             notices=list(a.notices),
             word=a.word,
@@ -1708,6 +1708,18 @@ class Harness:
         if not self.conversation:
             self._latest = (self._sample_seen, self._watches())
         return sample
+
+    @staticmethod
+    def _sample_readings(world: Any) -> dict[str, Any]:
+        """The sample's readings: every row the `readings` tool gives, less the action's
+        rows while nothing is afoot (package 70: not at quarters, undamaged, nobody hurt,
+        no mark engaged, the colours flying), so the samples do not grow for a fight that
+        is not happening; a row's first appearance is itself the delta."""
+        from freesail.api.action_readings import idle_rows
+
+        full = tools.readings_words(world)
+        idle = idle_rows(world)
+        return {k: v for k, v in full.items() if k not in idle}
 
     def _as_told(self, content: dict[str, Any]) -> dict[str, Any]:
         """A sample's data turn as the model is sent it (package 31c): the first of a
@@ -1785,6 +1797,14 @@ class Harness:
         lookout = value("lookout") if "lookout" in full else None
         if isinstance(lookout, dict):
             out["lookout"] = (lookout.get("who"), lookout.get("held"), lookout.get("last_hail"))
+        # the action's rows (package 70): the mark by who she is and whether she has struck,
+        # not by her bearing this minute; the range by the whole cable
+        enemy = value("enemy") if "enemy" in full else None
+        if isinstance(enemy, dict):
+            out["enemy"] = (enemy.get("id"), bool(enemy.get("struck")))
+        rng = value("range") if "range" in full else None
+        if isinstance(rng, dict) and rng.get("metres") is not None:
+            out["range"] = round(float(rng["metres"]) / 185.2)
         officer = value("officer_of_the_watch") if "officer_of_the_watch" in full else None
         if isinstance(officer, dict):
             out["officer_of_the_watch"] = tuple(

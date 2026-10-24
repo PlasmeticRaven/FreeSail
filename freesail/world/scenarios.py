@@ -315,6 +315,10 @@ def load_scenario(path: str | Path) -> ScenarioFile:
     ship = raw.get("ship") or {}
     wind = raw.get("wind") or {}
     sc.glass = bool(ship.get("glass", raw.get("glass", False)))
+    # the fit of guns she carries (spec M7 §7; package 70): a name of her file's fits, or
+    # the file's default when the scenario says none
+    if ship.get("fit") is not None:
+        sc.fit = " ".join(str(ship["fit"]).split()) or None
     # the papers whole (spec M5 §27; package 36): the epitome and the chronometer may be
     # given under `papers:` beside the chart's year and the almanac; the ship's line wins
     papers_raw = raw.get("papers") or {}

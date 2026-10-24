@@ -1,0 +1,22 @@
+# Secure the guns (spec M7 §8; package 70; scripted, SecureGunsScript in
+# evolutions/action_scripts.py). The guns run in and housed, the breechings and the
+# tackles frapped, the tompions in; a loaded gun keeps its charge (a ship of war at sea
+# kept her guns shotted). At the end the company goes back under the watch bill (the
+# quarters stood down) and the runner pipes the hands down as after any all-hands work:
+# `secure the guns` is the way out of quarters, `pipe down` the other.
+id: secure_guns
+verb: secure_guns
+applies_to: {class: ship}
+script: secure_guns
+preconditions: []
+timing:
+  secure_s: 120      # run in, housed and frapped (Douglas 1820, part II, 'Secure your guns'; judgement for the two minutes)
+on_start: {log: "Secure the guns!"}
+on_complete: {log: "The guns are secured ({loaded} of them loaded); the hands under the watch bill again.", kind: guns.secured, severity: notable}
+on_fail: {log: "Could not secure the guns: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the gun crews at their guns by the quarter bill, not the runner's pool (a
+# frigate's company is minutes coming up the hatchways, and the crews at the guns do not
+# wait on it): the evolution asks one hand, the gunner's mate, and the script takes its
+# time from the share of the crews at their guns (freesail/evolutions/action_scripts.py)
+crew: {hands: 1, rating: ordinary, stations: [afterguard, waisters, forecastle, quarterdeck]}
+source: "Douglas 1820, part II, the words of command ('Secure your guns'); Luce 1884, ch. XX 'General Quarters' ('Secure')"

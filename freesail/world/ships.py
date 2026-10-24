@@ -266,6 +266,11 @@ def file_descriptions(ship_file: str) -> dict[str, dict[str, str]]:
     return {str(k): {kk: str(vv) for kk, vv in (v or {}).items()} for k, v in found.items()}
 
 
+# The player's ship files that no far description sails, by the description their words
+# are taken from for her shadow in another ship's lookout (package 70).
+SHADOW_FILES: dict[str, str] = {"merchant-brig.yaml": "merchant brig"}
+
+
 def description(key: str) -> dict[str, str]:
     """A description by its key: the index's entry with the ship file's own words for
     her rig and what she is where the file gives them."""
@@ -500,6 +505,13 @@ class Vessel:
     # her captain's orders given by the director's hand say in her log while she has no
     # World of her own, as (tick, words); empty in a checkpoint from before
     story: tuple[tuple[int, str], ...] = ()
+    # the fit of guns she carries (spec M7 §7; package 70): a name of her file's fits, ""
+    # for the file's default; her crewed World's ship is made with it, and the far fight
+    # reads it. Her colours as a state the lookout reads (rule 3, 71's hook): "shown" or
+    # "struck"; and the far body's damage summed (74's ground, package 70's measure).
+    fit: str = ""
+    struck: bool = False
+    damage: dict[str, Any] = field(default_factory=dict)
 
     @property
     def height_m(self) -> float:
@@ -911,6 +923,10 @@ class Vessel:
             d["crewed"] = self.crew is not None
         if self.warning:
             d["warning"] = self.warning
+        if getattr(self, "fit", ""):
+            d["fit"] = self.fit  # package 70
+        if getattr(self, "struck", False):
+            d["struck"] = True
         story = getattr(self, "story", ()) or ()
         if story:
             # her captain's orders by the director's hand (package 62): only where there
@@ -1092,6 +1108,7 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         plan=plan,
         cycle=cycle,
         sailing_factor=round(factor, 3),
+        fit=" ".join(str(spec.get("fit") or "").split()),
     )
     if spec.get("letter") is not None:
         from freesail.world.people import Message
@@ -1312,6 +1329,11 @@ class Vessels:
                         break
             if key in ("merchant brig", "brig-sloop"):
                 key = "brig-sloop" if _is_kings_ship(world) else "merchant brig"
+            if not key:
+                # a player's file no far description sails (the merchant brig's own, package
+                # 70): her words by the file's name, so that another ship's lookout does not
+                # read a trader as 'a ship' of the line's class
+                key = SHADOW_FILES.get(source.replace("\\", "/").split("/")[-1], "")
             d = description(key) if key else {"file": source, "rig": "a ship", "what": "a ship"}
             ports = getattr(world, "ports", None)
             nation_id = str(getattr(ports, "ship_nation", "") or "britain")
@@ -1334,6 +1356,7 @@ class Vessels:
             )
             self._shadow = s
         s.position = pos
+        s.struck = bool((getattr(ship, "extra", None) or {}).get("struck"))  # package 70
         s.heading_deg = units.rad_to_deg(float(ship.heading)) % 360.0
         s.speed_kn = units.ms_to_knots(_ship_speed_ms(ship))
         manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")

@@ -14,11 +14,11 @@ ship:
   rig: brig
   era_notes: 'H.M. brig-sloop Harpy of the Diligence class (launched 1796, sold 1817): 316 tons burthen,
     95 ft on the gun deck, 75 ft 1 5/8 in on the keel, 28 ft 1 1/2 in beam, 12 ft 0 1/2 in in the hold;
-    sixteen 32-pounder carronades and two 6-pounder chase guns (guns are not parts until milestone 7).
-    The Navy''s brig; the merchant brig is her second description at far detail (package 36). Hull from
-    the kit''s manual (Winfield and the Greenwich draught not reached); spars by Fincham 1843''s table
-    of proportions for brigs of war (p. 88) checked against Luce 1866 ch. VII; sails by Steel 1794; see
-    tools/gen_ships.py for every rule.'
+    sixteen 32-pounder carronades and two 6-pounder chase guns (the armament below, package 70). The Navy''s
+    brig; the merchant brig is her second description at far detail (package 36). Hull from the kit''s
+    manual (Winfield and the Greenwich draught not reached); spars by Fincham 1843''s table of proportions
+    for brigs of war (p. 88) checked against Luce 1866 ch. VII; sails by Steel 1794; see tools/gen_ships.py
+    for every rule.'
   descriptions:
     brig-sloop:
       rig: a brig
@@ -1948,6 +1948,225 @@ crew:
     station: afterguard
     rating: landsman
     messenger: true
+  # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
+  quarter_bill:
+    trimmers:
+      # The trimmers: six of the forecastlemen for the head sails.
+      forecastle: 6
+      # Six of the fore topmen for the fore braces.
+      fore_top: 6
+      # Seven of the main topmen for the main braces.
+      main_top: 7
+      # Eight of the afterguard at the main sheet and the after braces.
+      afterguard: 8
+    # Two quartermasters at the wheel (Luce 1884 ch. XX).
+    helm: 2
+    # The powder beyond the idlers: none; the cooks, stewards and servants pass the cartridges (judgement).
+    powder: 0
+    # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
+    priority: sail before guns
+# The armament (spec M7 7; package 70): the guns as parts of the graph by their place, the class's one fit; each with its crew by the quarter bill and the magazine's allowance by calibre. Every figure's source is in tools/gen_ships.py; the weights and the establishment are from memory and UNVERIFIED against a printed page.
+armament:
+  default: diligence class 1796
+  fits:
+    # The class's armament: 16 x 32-pounder carronades, 2 x 6-pounder chase guns.
+    diligence class 1796:
+      source: The kit's manual (docs/design/VesselCandidates.md); Winfield, British Warships in the Age
+        of Sail 1793-1817, the Diligence class (UNVERIFIED from memory); Lavery, Arming and Fitting; Douglas
+        1820, the crews
+      guns:
+      # Sixteen 32-pounder carronades, eight a side (the kit's manual; Winfield, the Diligence class, UNVERIFIED from memory): 17 cwt each (from memory), the ports about eight feet and a half apart (judgement), five men to the pair.
+      - id: gun.1.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 1
+        side: starboard
+        x_m: 9.1
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.1.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 1
+        side: larboard
+        x_m: 9.1
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.2.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 2
+        side: starboard
+        x_m: 6.5
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.2.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 2
+        side: larboard
+        x_m: 6.5
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.3.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 3
+        side: starboard
+        x_m: 3.9
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.3.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 3
+        side: larboard
+        x_m: 3.9
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.4.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 4
+        side: starboard
+        x_m: 1.3
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.4.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 4
+        side: larboard
+        x_m: 1.3
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.5.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 5
+        side: starboard
+        x_m: -1.3
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.5.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 5
+        side: larboard
+        x_m: -1.3
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.6.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 6
+        side: starboard
+        x_m: -3.9
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.6.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 6
+        side: larboard
+        x_m: -3.9
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.7.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 7
+        side: starboard
+        x_m: -6.5
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.7.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 7
+        side: larboard
+        x_m: -6.5
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.8.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 8
+        side: starboard
+        x_m: -9.1
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.8.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 8
+        side: larboard
+        x_m: -9.1
+        height_m: 2.1
+        crew: 5
+        weight_cwt: 17.0
+      # Two long 6-pounders at the bow ports as the chase guns (the kit's manual): the 7 ft gun of 20 cwt (from memory), six men each.
+      - id: chaser.bow.starboard
+        kind: long
+        pounder: 6
+        place: bow
+        side: starboard
+        x_m: 12.0
+        height_m: 2.1
+        crew: 6
+        weight_cwt: 20.0
+      - id: chaser.bow.larboard
+        kind: long
+        pounder: 6
+        place: bow
+        side: larboard
+        x_m: 12.0
+        height_m: 2.1
+        crew: 6
+        weight_cwt: 20.0
+      cartridges:
+        32: 1264
+        6: 158
+      shot:
+        32:
+          round: 960
+          grape: 96
+          chain: 96
+        6:
+          round: 120
+          grape: 12
+          chain: 12
 # The hold (package 35, spec M5 §23): room for 32 tons of cargo beyond her own stores, 0.1 of the 316.133 tons burthen (a brig-sloop's hold is her own stores: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 32

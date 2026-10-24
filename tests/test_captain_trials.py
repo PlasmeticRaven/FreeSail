@@ -288,20 +288,24 @@ def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_s
 # eighteen fathoms and a half and is in port from the road at 53700 (docs/dev/TuningNotes.md,
 # package 58b). The old figures beside each.
 TRIAL_TRADE_STRANGER_STATES = [
+    # package 70 (the combat core): the brig-sloop, crewed while she chases, engages the
+    # schooner within a mile by the cruiser's doctrine and chases her down in action (a
+    # weaker mark is closed, never kept at the beam), opens at seven cables at 17362 and
+    # puts two shot through her side before the schooner runs clear at 18300; the passage
+    # after is the same seamanship on an earlier tide, straight into the road. The old
+    # figures beside each, as before.
     (300, "on passage"),
     (3660, "evading"),
-    (17880, "on passage"),  # 8100 at package 45c
-    (20400, "beating"),  # 31680 at 57, 31740 at 43b, 18000 at package 43
-    (22980, "on passage"),  # 38460 at 57, 38340 at 43b; 18120, beating 18240 at 43
-    (31620, "beating"),  # 44940 at 57, 44880 at 43b, 44220 at package 43
-    (37560, "on passage"),  # package 58b
-    (46140, "beating"),  # package 58b
-    (53040, "at anchor"),  # 57000 at 57; on passage at 56340 at 43b (51720 at package 43)
-    (53700, "in port"),  # 57360 at 57, 56520 at 43b, 55440 at 43 (35640 at 45c, 35340 at 45)
+    (18300, "on passage"),  # 17880 at 58b; 8100 at package 45c
+    (19020, "beating"),  # 20400 at 58b; 31680 at 57, 31740 at 43b, 18000 at package 43
+    (37380, "on passage"),  # 22980, 31620, 37560 at 58b (the earlier beats)
+    (45600, "beating"),  # 46140 at 58b
+    (51240, "at anchor"),  # 53040 at 58b; 57000 at 57; on passage at 56340 at 43b
+    (51900, "in port"),  # 53700 at 58b; 57360 at 57, 56520 at 43b, 55440 at 43
 ]
 # package 58b ([57324] at 57, [56498] at 43b, [55413] at 43)
-TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [53669]
-TRIAL_TRADE_STRANGER_LINES = 1407  # package 58b (1534 at 56, the glass; 1521 at 57)
+TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [51849]  # package 70 (53669 at 58b)
+TRIAL_TRADE_STRANGER_LINES = 1248  # package 70 (1407 at 58b; 1534 at 56, the glass; 1521 at 57)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
@@ -309,7 +313,7 @@ TRIAL_TRADE_STRANGER_LINES = 1407  # package 58b (1534 at 56, the glass; 1521 at
 # package 56, the glass: 7b8012b076ebea42 (e73870448a788eac at 57)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 5bbca78fdc6b5093; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-TRIAL_TRADE_STRANGER_DIGEST = "48b205b4f587256c"  # package 58b (7b8012b076ebea42 at 56)
+TRIAL_TRADE_STRANGER_DIGEST = "0a480f7a4b7f321a"  # package 70 (48b205b4f587256c at 58b)
 
 
 @pytest.fixture(scope="module")
@@ -336,8 +340,11 @@ def test_the_merchant_hauls_off_from_a_privateer_and_waits_in_the_road_for_a_win
     waits = [e for e in w.log if "the wind does not serve to enter Falmouth" in e.text]
     # package 45: in port from the road, no wait to go in (2 before); package 58b: she comes
     # to the outer road beating with the wind foul to go in and anchors there for it (the
-    # tide's words at 57000 before), in port from the road as at 45
+    # tide's words at 57000 before), in port from the road as at 45; package 70: fired into
+    # and run clear, she comes to the road an hour earlier, the wind foul to go in, and waits
+    # for it as at 58b
     assert len(waits) == 1
+    assert [e for e in w.log if e.kind == "action.fired_at"]  # package 70: the brig's fire
     assert cap.state == "in port" and cap.intent is not None  # at anchor before package 45
     assert len(w.log) == TRIAL_TRADE_STRANGER_LINES
     assert w.log.digest()[:16] == TRIAL_TRADE_STRANGER_DIGEST

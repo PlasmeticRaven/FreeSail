@@ -43,7 +43,7 @@ from itertools import product
 from freesail.orders import errors
 from freesail.orders.vocabulary import Vocabulary, key, load_vocabulary, strip_article
 from freesail.ship.graph import Ship
-from freesail.ship.parts import Line, Part, Sail, Spar
+from freesail.ship.parts import Gun, Line, Part, Sail, Spar
 
 SIDE_WORDS = ("starboard", "larboard")
 
@@ -288,6 +288,8 @@ def build_noun_table(ship: Ship, vocab: Vocabulary | None = None) -> NounTable:
 
     # 1. Part ids, generated full names, families, shorthands.
     for part_id, part in ship.parts.items():
+        if isinstance(part, Gun):
+            continue  # the guns have their own grammar (package 70, `orders.gunnery`)
         side = part_side(ship, part_id)
         fam = " ".join(_family_words(ship, part_id, vocab))
         table.add(

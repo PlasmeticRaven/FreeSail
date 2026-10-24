@@ -1,0 +1,23 @@
+# Cast loose the guns (spec M7 §8; package 70; scripted, CastLooseScript in
+# evolutions/action_scripts.py). The crews cast off the tackles and the breechings'
+# lashings, take out the tompions and provide the guns (the powder horns, the match,
+# the rammers and sponges; Douglas 1820, part II, "Cast loose your guns"); from then the
+# guns are served by the battery's cycle (`freesail/combat/guns.py`): loaded, run out and
+# primed as the standing intentions have it, and fired as they bear or at the word.
+# Wanted at quarters; refused in words before the beat.
+id: cast_loose_guns
+verb: cast_loose_guns
+applies_to: {class: ship}
+script: cast_loose_guns
+preconditions: []
+timing:
+  cast_loose_s: 60   # the tackles cast off and the guns provided (Douglas 1820, part II; judgement for the minute)
+on_start: {log: "Cast loose the guns!"}
+on_complete: {log: "The guns are cast loose and provided ({count} of them).", kind: guns.cast_loose, severity: notable}
+on_fail: {log: "Could not cast loose the guns: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the gun crews at their guns by the quarter bill, not the runner's pool (a
+# frigate's company is minutes coming up the hatchways, and the crews at the guns do not
+# wait on it): the evolution asks one hand, the gunner's mate, and the script takes its
+# time from the share of the crews at their guns (freesail/evolutions/action_scripts.py)
+crew: {hands: 1, rating: ordinary, stations: [afterguard, waisters, forecastle, quarterdeck]}
+source: "Douglas 1820, part II, the words of command ('Cast loose your guns'; 'Take out your tompions'); Luce 1884, ch. XX 'General Quarters'"

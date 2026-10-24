@@ -12,6 +12,22 @@ name: the commodore of a convoy
 source: "spec M6 §4; the convoy instructions of the period, from memory (the escort not to leave the convoy to chase); the naval cruise's book for the station; Beaufort's scale"
 
 thresholds:
+  # Package 70 (spec M7 §10): the engaging doctrine. `engage_nm` the distance within which
+  # an enemy is engaged (nought turns it off); `engage_range_cables` the range the fire is
+  # opened at (the nation's habit may double it: freesail/world/captains.py NATION_HABITS);
+  # `break_off_nm` and `break_off_minutes` the distance and the minutes with no enemy
+  # within it that end the action; `engage_side` the gage (weather or lee); `charge` and
+  # `aim` what the guns load and are laid for; `morale_start` and `strike_below` the
+  # company's figure and the line the colours come down at (freesail/combat/morale.py).
+  engage_nm: {value: 0.8, source: "an enemy within four fifths of a mile of the escort is engaged; farther, the convoy is kept (judgement)"}
+  engage_range_cables: {value: 2, source: "as the King's ship's"}
+  break_off_nm: {value: 2.5, source: "the enemy beyond this for the minutes below and the action is over; judgement"}
+  break_off_minutes: {value: 10, source: "as gale_over_minutes: ten minutes, not a lull in the firing; judgement"}
+  engage_side: {value: lee, source: "the lee gage: between the enemy and his convoy, which lies to leeward of the escort (the convoy instructions; judgement)"}
+  charge: {value: round, source: "round shot the ordinary charge (Douglas 1820); chain for the rigging where the aim is the rigging and the charge says so"}
+  aim: {value: hull, source: "spec M7 §9: the hull the British habit, the rigging the French; the nation's habit stands where the file leaves this empty"}
+  morale_start: {value: 0.85, source: "a convoy's commodore's company at the start of an action (spec M7 §10, decision 7); judgement"}
+  strike_below: {value: 0.15, source: "as the cruiser's"}
   gale_kn: {value: 36, source: "a convoy's escort heaves to with the convoy at a fresh gale; judgement on Beaufort's scale"}
   gale_over_kn: {value: 28, source: "judgement"}
   beating_dwell_minutes: {value: 10, source: "package 43b: the beating book taken up and given up on a verdict that has stood ten minutes, not on one course's word (the trade trial traded the deck every two minutes as an evasion ended); judgement, as gale_over_minutes"}
@@ -143,7 +159,17 @@ books:
     # under the close-reefed main topsail alone, aback by turns
     # package 45c: sail after the gale is the captain's own, by steps (thresholds above)
   in distress: []
-  engaging: []
+  engaging:
+    # package 70 (spec M7 §10): the fighting book. The drum, the guns cast loose, loaded
+    # and laid, and the mark engaged on the side she bears are the captain's own on entering
+    # (freesail/world/captains.py `_engage_now`); the course that keeps her on the engaged
+    # beam at the doctrine's range his each minute (`_engaging`); the fire is the book's.
+    - 'standing order "open fire": when the range is under {engage_range_cables} cables then fire as they bear'
+    - 'standing order "long shot": when the range exceeds {break_off_nm} miles then hold your fire'
+    - 'standing order "return her fire": at she opens fire then fire as they bear'
+    - 'standing order "she strikes": at the enemy strikes then cease firing'
+    - 'standing order "the colours": at the colours struck then cease firing'
+  struck: []  # package 70: the colours down, lying to for her captor
 
 transitions:
   # aground from any state at sea is distress (package 40c, the captain's trials: the
@@ -175,3 +201,14 @@ transitions:
   # port whose anchorage is beyond the reach (the road of Bertheaume, eight miles from Brest)
   - {from: at anchor, on: anchored in port, to: in port}
   - {from: in distress, on: afloat, to: on passage}
+  # package 70 (spec M7 §10): into the action and out of it
+  - {from: on passage, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: beating, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: keeping station, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: investigating a stranger, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: chasing, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: evading, on: enemy in range, to: engaging, unless: overmatched}
+  - {from: engaging, on: aground, to: in distress}
+  - {from: engaging, on: enemy struck, to: on passage}
+  - {from: engaging, on: enemy out of range, to: on passage}
+  - {from: engaging, on: overmatched, to: evading}

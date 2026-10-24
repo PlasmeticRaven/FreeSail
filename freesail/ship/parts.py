@@ -27,7 +27,15 @@ from enum import StrEnum
 from typing import Any
 
 from freesail import units
-from freesail.ship.schema import GroundTackleSpec, HullSpec, LineSpec, SailSpec, SparSpec
+from freesail.ship.schema import (
+    FitSpec,
+    GroundTackleSpec,
+    GunSpec,
+    HullSpec,
+    LineSpec,
+    SailSpec,
+    SparSpec,
+)
 
 # ---------------------------------------------------------------------------
 # Canvas (spec 3b §6.1 and §6.2)
@@ -263,6 +271,10 @@ class Sail(Part):
     flying: bool = False
     sheeted_to: str | None = None
     corners_m: list[tuple[float, float]] | None = None  # the cut, for the drawing (package 57)
+    # Package 70 (spec M7 §9): the area shot out of the sail, square metres, which the
+    # physics takes off its drawing area and the strain off what the cloth bears; nothing
+    # mends it until a new sail is bent (the sailmaker's patch is 73's).
+    holed_m2: float = 0.0
     state: SailState = SailState.FURLED
     reefs: int = 0
     # A fore-and-aft sail's angle from the centreline, radians: since package 32e (spec M5
@@ -309,7 +321,15 @@ class Sail(Part):
     def effective_cloth_rating_kn(self) -> float:
         """What the cloth bears now (spec 3b §6.2): its rating times the share a sail of
         its condition keeps, from 0.4 worn out to all of it new."""
-        return self.rating_kn * worn_cloth_fraction(self.condition)
+        whole = max(0.0, 1.0 - self.holed_share)
+        return self.rating_kn * worn_cloth_fraction(self.condition) * whole
+
+    @property
+    def holed_share(self) -> float:
+        """The share of the sail shot out of it (package 70), 0 to 1."""
+        if self.area_m2 <= 0.0:
+            return 0.0
+        return min(1.0, max(0.0, self.holed_m2 / self.area_m2))
 
     @property
     def strain_ratio(self) -> float:
@@ -329,6 +349,7 @@ class Sail(Part):
         if canvas_no is not None:
             self.canvas_no = canvas_no
         self.condition = min(max(condition, 0.0), 100.0)
+        self.holed_m2 = 0.0  # a new sail bent is whole (package 70)
 
     @property
     def is_set(self) -> bool:
@@ -401,6 +422,205 @@ class Line(Part):
         return (
             self.cls == "bowline" and self.state is LineState.BELAYED and self.hauled >= 1.0 - 1e-9
         )
+
+
+# ---------------------------------------------------------------------------
+# The guns (spec M7 §7; package 70)
+# ---------------------------------------------------------------------------
+
+
+class Charge(StrEnum):
+    """What a gun is loaded with. `double` is two round shot on one cartridge (the
+    double-shotted broadside at pistol shot); `blank` a cartridge and a wad alone, the
+    signal gun and the gun to leeward (Falconer 1780, GUN; the Regulations, the gun to
+    leeward as the signal of distress)."""
+
+    ROUND = "round"
+    CHAIN = "chain"
+    GRAPE = "grape"
+    DOUBLE = "double"
+    BLANK = "blank"
+
+
+# The words of a gun's kind, for the log and the readings.
+GUN_KIND_WORDS = {"long": "long gun", "carronade": "carronade", "swivel": "swivel"}
+
+
+@dataclass
+class Gun(Part):
+    """A gun as a part of the graph (spec M7 §7): its kind, calibre and place, its load
+    state (empty; loaded with round, chain, grape or double; run in or out; primed), its
+    elevation and train, and whether it is dismounted (a part out of the bill, as a sprung
+    spar is out of the sail plan). `condition` is the carriage's, the tackles' and the
+    breeching's together (a shot that strikes the gun wears it before it dismounts it).
+    The crew at it is the quarter bill's (`crew/quarters.py`); the cycle that serves it is
+    `combat/guns.py`'s; the shot it throws `combat/shot.py`'s."""
+
+    kind: str = "long"
+    pounder: float = 0.0
+    place: str = "broadside"
+    number: int | None = None
+    side: str | None = None
+    x_m: float = 0.0
+    height_m: float = 0.0
+    crew_n: int = 1  # the men who serve it by the bill
+    weight_cwt: float = 0.0
+    cast_loose: bool = False  # the breechings cast off and the tackles manned
+    loaded: Charge | None = None  # None: empty
+    run_out: bool = False
+    primed: bool = False
+    elevation_deg: float = 0.0  # the quoin: positive is the muzzle raised
+    train_deg: float = 0.0  # from abeam (a broadside gun) or from the bow or stern line
+    dismounted: bool = False
+    fired: int = 0  # rounds fired, for the log and the gunner's count
+
+    @classmethod
+    def from_spec(cls, g: GunSpec) -> Gun:
+        return cls(
+            id=g.id,
+            cls=g.kind,
+            rating_kn=0.0,
+            kind=g.kind,
+            pounder=float(g.pounder),
+            place=g.place,
+            number=g.number,
+            side=g.side,
+            x_m=float(g.x_m),
+            height_m=float(g.height_m),
+            crew_n=int(g.crew),
+            weight_cwt=float(g.weight_cwt),
+        )
+
+    @property
+    def kind_words(self) -> str:
+        """'12-pounder carronade', 'long 18-pounder', 'half-pounder swivel'."""
+        calibre = _pounder_words(self.pounder)
+        if self.kind == "long":
+            return f"long {calibre}-pounder"
+        return f"{calibre}-pounder {GUN_KIND_WORDS[self.kind]}"
+
+    @property
+    def name(self) -> str:
+        """The gun's name as the deck says it: 'No. 3 starboard gun', 'the starboard bow
+        chaser', 'the stern chaser', 'the No. 2 larboard swivel'."""
+        side = f"{self.side} " if self.side else ""
+        if self.place == "broadside":
+            return f"No. {self.number} {side}gun"
+        if self.place in ("bow", "stern"):
+            return f"the {side}{self.place} chaser"
+        n = f"No. {self.number} " if self.number is not None else ""
+        return f"the {n}{side}swivel"
+
+    @property
+    def serves(self) -> bool:
+        """Whether it can be served at all: mounted and whole."""
+        return not self.dismounted and not self.wrecked
+
+    @property
+    def state_words(self) -> str:
+        if self.dismounted:
+            return "dismounted"
+        if not self.cast_loose:
+            return "secured"
+        parts = []
+        parts.append(f"loaded with {self.loaded.value}" if self.loaded else "empty")
+        parts.append("run out" if self.run_out else "run in")
+        if self.primed:
+            parts.append("primed")
+        return ", ".join(parts)
+
+    @property
+    def pair_key(self) -> str:
+        """The key of the gun crew that serves it: the broadside pair by number, else the
+        gun itself (a chaser or a swivel has its own small crew)."""
+        if self.place == "broadside":
+            return f"gun:{self.number}"
+        return f"gun:{self.id}"
+
+
+def _pounder_words(pounder: float) -> str:
+    if pounder == 0.5:
+        return "half"
+    return f"{pounder:g}"
+
+
+@dataclass
+class Magazine:
+    """The magazine and the shot lockers (spec M7 §7): cartridges by calibre and shot by
+    calibre and kind, counted by the gunner and the purser. Each round fired takes one
+    cartridge and one shot (two shot for double). Made from the fit's figures at the first
+    call (`magazine(ship)`), a function of the ship file, the fit and the rounds fired, so
+    a replay has it again."""
+
+    cartridges: dict[float, int] = field(default_factory=dict)
+    shot: dict[float, dict[str, int]] = field(default_factory=dict)
+    fired: dict[float, int] = field(default_factory=dict)  # rounds fired by calibre
+
+    def has(self, pounder: float, charge: Charge) -> bool:
+        if self.cartridges.get(pounder, 0) <= 0:
+            return False
+        if charge is Charge.BLANK:
+            return True
+        kind = "round" if charge is Charge.DOUBLE else charge.value
+        need = 2 if charge is Charge.DOUBLE else 1
+        return self.shot.get(pounder, {}).get(kind, 0) >= need
+
+    def take(self, pounder: float, charge: Charge) -> None:
+        if not self.has(pounder, charge):
+            raise ValueError(f"the magazine has no {charge.value} for a {pounder:g}-pounder")
+        self.cartridges[pounder] -= 1
+        if charge is not Charge.BLANK:
+            kind = "round" if charge is Charge.DOUBLE else charge.value
+            self.shot[pounder][kind] -= 2 if charge is Charge.DOUBLE else 1
+        self.fired[pounder] = self.fired.get(pounder, 0) + 1
+
+    def spoil(self, share: float) -> int:
+        """Cartridges found damp (package 70; the director's hand): that share of every
+        calibre's cartridges struck off, rounded down; the number struck off."""
+        lost = 0
+        for pounder, n in list(self.cartridges.items()):
+            gone = int(n * max(0.0, min(1.0, share)))
+            self.cartridges[pounder] = n - gone
+            lost += gone
+        return lost
+
+    def describe(self) -> list[str]:
+        """The `the magazine` reading's lines: the gunner's count."""
+        if not self.cartridges:
+            return ["The magazine is empty: she carries no powder."]
+        out = []
+        for p in sorted(self.cartridges):
+            kinds = ", ".join(
+                f"{n} {k}" for k, n in (self.shot.get(p) or {}).items() if n or k == "round"
+            )
+            fired = self.fired.get(p, 0)
+            head = f"{_pounder_words(p)}-pounder: {self.cartridges[p]} cartridges"
+            out.append(
+                f"{head}; shot {kinds or 'none'}"
+                + (f"; {fired} round{'s' if fired != 1 else ''} fired" if fired else "")
+                + "."
+            )
+        return out
+
+
+def magazine(ship: Any) -> Magazine:
+    """The ship's magazine, kept in `ship.extra["magazine"]`, from her fit's figures."""
+    extra = getattr(ship, "extra", None)
+    if extra is None:
+        return Magazine()
+    store = extra.get("magazine")
+    if isinstance(store, Magazine):
+        return store
+    fit: FitSpec | None = getattr(ship, "fit_spec", None)
+    if fit is None:
+        store = Magazine()
+    else:
+        store = Magazine(
+            cartridges={float(k): int(v) for k, v in fit.cartridges.items()},
+            shot={float(k): dict(v) for k, v in fit.shot.items()},
+        )
+    extra["magazine"] = store
+    return store
 
 
 # ---------------------------------------------------------------------------

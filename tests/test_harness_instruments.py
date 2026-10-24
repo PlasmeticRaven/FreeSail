@@ -108,6 +108,7 @@ def test_the_tripwires_are_read_in_their_words_and_others_refused_with_them_name
         "speed over 8 knots",
         "the wind over 8 knots",
         "a point of interest within 8 miles",
+        "a sail within 8 cables",  # package 70
     ]
     assert tripwire_of("the depth below ten fathoms").text == "depth under 10 fathoms"
     assert tripwire_of("she has settled").text == "her way settled"

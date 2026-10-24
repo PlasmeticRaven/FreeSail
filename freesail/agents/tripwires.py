@@ -84,6 +84,7 @@ TRIPWIRE_WORDS = (
     "speed over <n> knots",
     "the wind over <n> knots",
     "a point of interest within <n> miles",
+    "a sail within <n> cables",
 )
 
 _NUMBERS = {
@@ -133,6 +134,14 @@ _PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
             r"(?:miles?|nautical\s+miles?)$"
         ),
     ),
+    # package 70: a sail within so many cables (the gun's range is cables, not miles)
+    (
+        "sail",
+        re.compile(
+            rf"^(?:a\s+)?(?:sail|stranger|enemy|ship|the\s+enemy)\s+within\s+{_N}\s+"
+            r"(?:cables?|cables?\s+length)$"
+        ),
+    ),
 )
 
 
@@ -165,6 +174,7 @@ def tripwire_of(words: str) -> Tripwire | None:
             "speed_over": f"speed over {_figure(n)} knots",
             "wind": f"the wind over {_figure(n)} knots",
             "point": f"a point of interest within {_figure(n)} miles",
+            "sail": f"a sail within {_figure(n)} cables",
         }[kind]
         return Tripwire(said, kind, n)
     return None
@@ -205,6 +215,8 @@ class Tripwire:
             return self._settled(view, world, memory)
         if self.kind == "point":
             return self._point(world, memory)
+        if self.kind == "sail":
+            return self._sail(world, memory)
         conds = memory.get("dialect")
         if conds is None:
             conds = memory["dialect"] = self._dialect(world.ship)
@@ -259,6 +271,29 @@ class Tripwire:
         for key, words, nm in near:
             if key not in known:
                 memory["said"] = f": {words}, {miles_words(nm)} by account"
+                return True
+        return False
+
+    def _sail(self, world: Any, memory: dict[str, Any]) -> bool:
+        """A sail within the cables by the lookout's estimate that was not within them at
+        the first look (package 70): the gun's range is judged by eye, never by the truth."""
+        lookout = getattr(world, "lookout", None)
+        if lookout is None:
+            return False
+        items = lookout.strangers(world, float(world.ship.heading)).get("items") or []
+        cable = units.NAUTICAL_MILE / 10.0
+        near = {
+            str(i.get("id")): (str(i.get("known") or "a sail"), float(i["estimate_m"]) / cable)
+            for i in items
+            if i.get("estimate_m") is not None and float(i["estimate_m"]) <= self.n * cable
+        }
+        known = memory.get("known")
+        if known is None:
+            memory["known"] = set(near)
+            return False
+        for key, (words, cables) in near.items():
+            if key not in known:
+                memory["said"] = f": {words}, {cables:.1f} cables by estimation"
                 return True
         return False
 

@@ -159,6 +159,8 @@ def role_of_vessel(vessel: Any, intent: Intent | None) -> str:
         return "fisherman"  # package 43b: the smack and the lugger on a ground
     if kind == "letter":
         return "packet"
+    if kind == "station" and intent is not None and getattr(intent, "prizes", False):
+        return "privateer"  # package 70: a letter of marque cruising for prizes
     if key == "frigate":
         return "kings-ship"
     if key == "brig-sloop":
@@ -232,6 +234,7 @@ class FarCaptain(Judgement):
         self._stranger: str | None = None
         self.spoken_ids: set[str] = set()
         self.given_up: set[str] = set()
+        self.fired_on: set[str] = set()  # the ships that fired on her (package 70)
         self._business: dict[str, Any] = {}
         self._waiting_at_road = False
         self.last_judged = -1
@@ -382,11 +385,37 @@ class FarCaptain(Judgement):
     # -- the hooks the stimuli ask -----------------------------------------------------
 
     def _is_enemy(self, s: dict[str, Any]) -> bool:
+        if str(s.get("id") or "") in (self.fired_on or ()):
+            return True  # she fired on us (package 70, rule 3)
         nation = s.get("nation")
         if not nation:
             return False
         nations = getattr(self.world, "nations", None)
         return bool(nations is not None and nations.at_war(str(nation), self.vessel.nation))
+
+    def _enemy_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
+        # the far body never takes the engaging transition (package 70): the far fight is
+        # 74's, and a far ship that lay to in "engaging" with no battery would neither fight
+        # nor close to hail; she chases and speaks as M6 had her (`combat/far.py` is the
+        # measure of the far fight, run apart)
+        return None
+
+    def _stranger_struck(self, s: dict[str, Any]) -> bool:
+        v = self.world.vessels.get(str(s.get("id") or ""))
+        return bool(v is not None and getattr(v, "struck", False))
+
+    def _enemy_struck(self, p: Perception) -> bool:
+        # the far body has no battery: the nearest enemy within the breaking-off distance
+        # struck is the mark struck (the far fight is 74's; `combat/far.py` the measure)
+        th = self.doctrine.threshold if self.doctrine is not None else (lambda k, v=None: v)
+        for s in p.strangers:
+            if not self._is_enemy(s) or s.get("estimate_m") is None:
+                continue
+            if float(s["estimate_m"]) / units.NAUTICAL_MILE > float(th("break_off_nm", 2.0)):
+                continue
+            if self._stranger_struck(s):
+                return True
+        return False
 
     def _nearest_enemy(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
         enemies = [
@@ -802,7 +831,7 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
     elif state in ("at anchor", "in port"):
         if not vessel.plan or vessel.plan[0][0] != "anchor":
             vessel.plan = [("anchor", "")]
-    elif state in ("in distress", "engaging"):
+    elif state in ("in distress", "engaging", "struck"):
         vessel.plan = [("lie_to", math.inf)]
     vessel.tack = 0.0
     vessel.state = state

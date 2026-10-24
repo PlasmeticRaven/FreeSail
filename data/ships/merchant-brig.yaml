@@ -9,10 +9,11 @@ ship:
   name: Industry
   rig: brig
   era_notes: 'The merchant brig Industry (package 68): the trade''s brig of the Harpy''s lines and rig,
-    about 316 tons burthen, her ports painted and no guns; a master''s and mates'' company of sixteen
-    and no marines, a merchant''s stores and the trader''s hold and boats. The hull and the rig are the
-    brig-sloop''s (Falconer 1780, BRIG: ''a merchant-ship with two masts''; the trade''s brig of the period
-    of the same size, judgement), every rule as the Harpy''s; see tools/gen_ships.py.'
+    about 316 tons burthen, her ports painted and four 6-pounders for her own defence (package 70); a
+    master''s and mates'' company of sixteen and no marines, a merchant''s stores and the trader''s hold
+    and boats. The hull and the rig are the brig-sloop''s (Falconer 1780, BRIG: ''a merchant-ship with
+    two masts''; the trade''s brig of the period of the same size, judgement), every rule as the Harpy''s;
+    see tools/gen_ships.py.'
   descriptions:
     merchant brig:
       rig: a brig
@@ -1895,6 +1896,74 @@ crew:
     station: afterguard
     rating: landsman
     messenger: true
+  # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
+  quarter_bill:
+    trimmers:
+      # The trimmers: a topman of each top for the braces (judgement).
+      fore_top: 1
+      main_top: 1
+    # One man at the wheel (judgement).
+    helm: 1
+    # The powder beyond the idlers: none; the cook and the boy (judgement).
+    powder: 0
+    # A merchantman's weapon is her heels: the sails before the guns (judgement).
+    priority: sail before guns
+# The armament (spec M7 7; package 70): the merchant brig's few guns, one fit, her magazine a trader's (twenty round and a little grape a gun: judgement). Every figure's source is in tools/gen_ships.py; the weights are from memory.
+armament:
+  default: merchant
+  fits:
+    # A trader's fit: four 6-pounders, two a side.
+    merchant:
+      source: Judgement on the period's trade (a brig of three hundred tons carried a few 4- or 6-pounders
+        for her own defence, or none); the gun's weight from memory
+      guns:
+      # Four long 6-pounders, two a side (judgement: a merchant brig's defence against a privateer's boats), the 7 ft gun of 20 cwt (from memory); the merchant's bill gives four men to the pair where the King's would give six, so her guns are served short and slow (spec M7 8).
+      - id: gun.1.starboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 1
+        side: starboard
+        x_m: 4.0
+        height_m: 2.1
+        crew: 4
+        weight_cwt: 20.0
+      - id: gun.1.larboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 1
+        side: larboard
+        x_m: 4.0
+        height_m: 2.1
+        crew: 4
+        weight_cwt: 20.0
+      - id: gun.2.starboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 2
+        side: starboard
+        x_m: -4.0
+        height_m: 2.1
+        crew: 4
+        weight_cwt: 20.0
+      - id: gun.2.larboard
+        kind: long
+        pounder: 6
+        place: broadside
+        number: 2
+        side: larboard
+        x_m: -4.0
+        height_m: 2.1
+        crew: 4
+        weight_cwt: 20.0
+      cartridges:
+        6: 104
+      shot:
+        6:
+          round: 80
+          grape: 16
 # The hold (package 35, spec M5 §23): room for 158 tons of cargo beyond her own stores, 0.5 of the 316.133 tons burthen (a merchant brig's hold, her trade: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 158

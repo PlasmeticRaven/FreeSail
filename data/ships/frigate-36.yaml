@@ -2535,6 +2535,455 @@ crew:
     station: afterguard
     rating: landsman
     messenger: true
+  # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
+  quarter_bill:
+    trimmers:
+      # The trimmers: of the forecastlemen, for the head sails and the fore braces (Luce 1884 ch. XX: the forecastlemen 'the best older seamen'); the five counts make the 44 hands the 264 leave when every gun of a side, the chasers and the wheel are manned (judgement).
+      forecastle: 8
+      # Of the fore topmen, for the fore braces and the topsails aloft.
+      fore_top: 10
+      # Of the main topmen, the largest top, for the main braces.
+      main_top: 12
+      # Of the mizzen topmen, for the crossjack braces and the spanker.
+      mizzen_top: 6
+      # Of the afterguard, at the main sheet and the after braces; the rest of the afterguard to the quarterdeck carronades.
+      afterguard: 8
+    # Two quartermasters at the wheel (Luce 1884 ch. XX, the quartermasters).
+    helm: 2
+    # The powder beyond the idlers: none; a frigate's cooks, stewards, servants, the clerk, the cooper, the armourer and the sailmaker's crew pass the cartridges (judgement after Luce 1884 ch. XX, the powder division).
+    powder: 0
+    # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
+    priority: sail before guns
+# The armament (spec M7 7; package 70): the guns as parts of the graph by their place, in the one fit the class carried in 1805; each with its crew by the quarter bill and the magazine's allowance by calibre. Every figure's source is in tools/gen_ships.py; the weights and the establishment are from memory and UNVERIFIED against a printed page.
+armament:
+  default: amazon class 1795
+  fits:
+    # The class's armament of 1795: 26 x 18-pounders, 10 x 32-pounder carronades, 4 x 9-pounders (Winfield).
+    amazon class 1795:
+      source: Winfield, British Warships in the Age of Sail 1793-1817, the Amazon class (UNVERIFIED from
+        memory); Lavery, Arming and Fitting, the carronade establishment of 1794-5 and the Ordnance's
+        allowance; Douglas 1820, the crews
+      guns:
+      # The upper deck's twenty-six long 18-pounders, thirteen a side (Winfield, the Amazon class's establishment; UNVERIFIED from memory): the 9 ft gun of 42 cwt (Blomefield's pattern, from memory), the ports about nine feet apart from 54 ft before midships to 54 ft abaft (judgement), the muzzle about eight feet above the water upright; a crew of ten to the pair, who fight whichever gun bears (Douglas 1820, the exercise; the rule in tools/gen_ships.py gun_crew).
+      - id: gun.1.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 1
+        side: starboard
+        x_m: 16.5
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.1.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 1
+        side: larboard
+        x_m: 16.5
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.2.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 2
+        side: starboard
+        x_m: 13.8
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.2.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 2
+        side: larboard
+        x_m: 13.8
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.3.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 3
+        side: starboard
+        x_m: 11.0
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.3.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 3
+        side: larboard
+        x_m: 11.0
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.4.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 4
+        side: starboard
+        x_m: 8.2
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.4.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 4
+        side: larboard
+        x_m: 8.2
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.5.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 5
+        side: starboard
+        x_m: 5.5
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.5.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 5
+        side: larboard
+        x_m: 5.5
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.6.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 6
+        side: starboard
+        x_m: 2.8
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.6.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 6
+        side: larboard
+        x_m: 2.8
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.7.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 7
+        side: starboard
+        x_m: 0.0
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.7.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 7
+        side: larboard
+        x_m: 0.0
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.8.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 8
+        side: starboard
+        x_m: -2.8
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.8.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 8
+        side: larboard
+        x_m: -2.8
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.9.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 9
+        side: starboard
+        x_m: -5.5
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.9.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 9
+        side: larboard
+        x_m: -5.5
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.10.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 10
+        side: starboard
+        x_m: -8.2
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.10.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 10
+        side: larboard
+        x_m: -8.2
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.11.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 11
+        side: starboard
+        x_m: -11.0
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.11.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 11
+        side: larboard
+        x_m: -11.0
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.12.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 12
+        side: starboard
+        x_m: -13.8
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.12.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 12
+        side: larboard
+        x_m: -13.8
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.13.starboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 13
+        side: starboard
+        x_m: -16.5
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      - id: gun.13.larboard
+        kind: long
+        pounder: 18
+        place: broadside
+        number: 13
+        side: larboard
+        x_m: -16.5
+        height_m: 2.4
+        crew: 10
+        weight_cwt: 42.0
+      # The quarterdeck's eight 32-pounder carronades, four a side (Winfield; the carronade establishment of 1794 to 1795, Lavery): 17 cwt each (the Carron Company's, from memory), on the quarterdeck a deck above the guns; five men to the pair, the marines among them.
+      - id: gun.14.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 14
+        side: starboard
+        x_m: -7.0
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.14.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 14
+        side: larboard
+        x_m: -7.0
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.15.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 15
+        side: starboard
+        x_m: -10.5
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.15.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 15
+        side: larboard
+        x_m: -10.5
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.16.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 16
+        side: starboard
+        x_m: -14.0
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.16.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 16
+        side: larboard
+        x_m: -14.0
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.17.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 17
+        side: starboard
+        x_m: -17.5
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.17.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 17
+        side: larboard
+        x_m: -17.5
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      # The forecastle's two 32-pounder carronades, one a side (Winfield).
+      - id: gun.18.starboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 18
+        side: starboard
+        x_m: 14.0
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      - id: gun.18.larboard
+        kind: carronade
+        pounder: 32
+        place: broadside
+        number: 18
+        side: larboard
+        x_m: 14.0
+        height_m: 4.5
+        crew: 5
+        weight_cwt: 17.0
+      # The quarterdeck's two long 9-pounders, one a side, the foremost quarterdeck ports (Winfield): the 7 ft 6 in gun of 26 cwt (from memory); seven to the pair.
+      - id: gun.19.starboard
+        kind: long
+        pounder: 9
+        place: broadside
+        number: 19
+        side: starboard
+        x_m: -4.5
+        height_m: 4.5
+        crew: 7
+        weight_cwt: 26.0
+      - id: gun.19.larboard
+        kind: long
+        pounder: 9
+        place: broadside
+        number: 19
+        side: larboard
+        x_m: -4.5
+        height_m: 4.5
+        crew: 7
+        weight_cwt: 26.0
+      # The forecastle's two long 9-pounders as the bow chasers (Winfield gives the forecastle its pair; that they served as chase guns is the frigate's practice, judgement): 26 cwt, seven men each.
+      - id: chaser.bow.starboard
+        kind: long
+        pounder: 9
+        place: bow
+        side: starboard
+        x_m: 17.5
+        height_m: 4.5
+        crew: 7
+        weight_cwt: 26.0
+      - id: chaser.bow.larboard
+        kind: long
+        pounder: 9
+        place: bow
+        side: larboard
+        x_m: 17.5
+        height_m: 4.5
+        crew: 7
+        weight_cwt: 26.0
+      cartridges:
+        18: 2054
+        32: 790
+        9: 316
+      shot:
+        18:
+          round: 1560
+          grape: 156
+          chain: 156
+        32:
+          round: 600
+          grape: 60
+          chain: 60
+        9:
+          round: 240
+          grape: 24
+          chain: 24
 # The hold (package 35, spec M5 §23): room for 93 tons of cargo beyond her own stores, 0.1 of the 933 tons burthen (a ship of war's hold is her own stores and ballast: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 93

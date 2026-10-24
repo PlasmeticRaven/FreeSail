@@ -14,10 +14,11 @@ ship:
   rig: cutter
   era_notes: 'H.M. armed cutter Sherbourne (Slade''s design, built at Woolwich, launched 1763): 85 tons
     burthen, 54 ft 6 in on deck, 19 ft beam; the Channel''s revenue cutter, of the type the pilot cutters
-    and the hired armed cutters of the war shared; six 3-pounders and eight swivels (guns are not parts
-    until milestone 7). Hull from the kit''s manual (Winfield and the Greenwich draught not reached);
-    spars by Fincham 1843''s table of proportions for revenue cruisers (p. 67) and his rules for cutters''
-    sails (arts. 86, 87); sails by Steel 1794; see tools/gen_ships.py for every rule.'
+    and the hired armed cutters of the war shared; six 3-pounders and eight swivels (her two fits, the
+    Admiralty''s 12-pounder carronades of 1805 the default: armament below, package 70). Hull from the
+    kit''s manual (Winfield and the Greenwich draught not reached); spars by Fincham 1843''s table of
+    proportions for revenue cruisers (p. 67) and his rules for cutters'' sails (arts. 86, 87); sails by
+    Steel 1794; see tools/gen_ships.py for every rule.'
 hull:
   # 50 ft: judgement between the 44 ft keel for tonnage (85 tons on 19 ft by the Navy's rule) and the 54.5 ft on deck (the kit's manual), a plumb stem and a raking post.
   length_waterline_m: 15.2
@@ -735,6 +736,254 @@ crew:
     station: afterguard
     rating: landsman
     messenger: true
+  # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
+  quarter_bill:
+    trimmers:
+      # The trimmers: four of the forecastlemen for the head sails and the running bowsprit (judgement).
+      forecastle: 4
+      # Four of the afterguard at the main sheet and the boom.
+      afterguard: 4
+    # One man at the tiller (a cutter steers with a tiller; judgement).
+    helm: 1
+    # Two of the waisters to pass the cartridges (judgement).
+    powder: 2
+    # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
+    priority: sail before guns
+# The armament (spec M7 7; package 70): two fits the scenario chooses between (ship: {fit: ...}; the owner, 2026-10-23): the 12-pounder carronades the Admiralty gave its cutters from the 1790s, the default of 1805, and the long 3-pounders with eight swivels of the revenue and hired cutters. Every figure's source is in tools/gen_ships.py; the weights are from memory and UNVERIFIED against a page.
+armament:
+  default: carronades
+  fits:
+    # The Admiralty's fit of 1805: six 12-pounder carronades.
+    carronades:
+      source: Winfield, British Warships in the Age of Sail 1793-1817, the Admiralty's and the hired armed
+        cutters (UNVERIFIED from memory; the count for 85 tons judgement); Lavery, Arming and Fitting,
+        the carronade
+      guns:
+      # Six 12-pounder carronades, three a side, abaft the mast where a cutter's ports lie (judgement): the Carron Company's 12-pounder of about 6 cwt (from memory), four men to the pair.
+      - id: gun.1.starboard
+        kind: carronade
+        pounder: 12
+        place: broadside
+        number: 1
+        side: starboard
+        x_m: 2.5
+        height_m: 1.5
+        crew: 4
+        weight_cwt: 6.0
+      - id: gun.1.larboard
+        kind: carronade
+        pounder: 12
+        place: broadside
+        number: 1
+        side: larboard
+        x_m: 2.5
+        height_m: 1.5
+        crew: 4
+        weight_cwt: 6.0
+      - id: gun.2.starboard
+        kind: carronade
+        pounder: 12
+        place: broadside
+        number: 2
+        side: starboard
+        x_m: -0.5
+        height_m: 1.5
+        crew: 4
+        weight_cwt: 6.0
+      - id: gun.2.larboard
+        kind: carronade
+        pounder: 12
+        place: broadside
+        number: 2
+        side: larboard
+        x_m: -0.5
+        height_m: 1.5
+        crew: 4
+        weight_cwt: 6.0
+      - id: gun.3.starboard
+        kind: carronade
+        pounder: 12
+        place: broadside
+        number: 3
+        side: starboard
+        x_m: -3.5
+        height_m: 1.5
+        crew: 4
+        weight_cwt: 6.0
+      - id: gun.3.larboard
+        kind: carronade
+        pounder: 12
+        place: broadside
+        number: 3
+        side: larboard
+        x_m: -3.5
+        height_m: 1.5
+        crew: 4
+        weight_cwt: 6.0
+      cartridges:
+        12: 330
+      shot:
+        12:
+          round: 240
+          grape: 36
+          chain: 24
+    # The revenue and hired cutters' fit: six long 3-pounders and eight swivels.
+    long guns:
+      source: 'The kit''s manual (Sherbourne as built, 1763: six 3-pounders and eight swivels); Falconer
+        1780, SWIVEL; the weights from memory'
+      guns:
+      # Six long 3-pounders, three a side (the kit's manual: Sherbourne's six 3-pounders): the 4 ft 6 in gun of 7 cwt (from memory), three men to the pair.
+      - id: gun.1.starboard
+        kind: long
+        pounder: 3
+        place: broadside
+        number: 1
+        side: starboard
+        x_m: 2.5
+        height_m: 1.5
+        crew: 3
+        weight_cwt: 7.0
+      - id: gun.1.larboard
+        kind: long
+        pounder: 3
+        place: broadside
+        number: 1
+        side: larboard
+        x_m: 2.5
+        height_m: 1.5
+        crew: 3
+        weight_cwt: 7.0
+      - id: gun.2.starboard
+        kind: long
+        pounder: 3
+        place: broadside
+        number: 2
+        side: starboard
+        x_m: -0.5
+        height_m: 1.5
+        crew: 3
+        weight_cwt: 7.0
+      - id: gun.2.larboard
+        kind: long
+        pounder: 3
+        place: broadside
+        number: 2
+        side: larboard
+        x_m: -0.5
+        height_m: 1.5
+        crew: 3
+        weight_cwt: 7.0
+      - id: gun.3.starboard
+        kind: long
+        pounder: 3
+        place: broadside
+        number: 3
+        side: starboard
+        x_m: -3.5
+        height_m: 1.5
+        crew: 3
+        weight_cwt: 7.0
+      - id: gun.3.larboard
+        kind: long
+        pounder: 3
+        place: broadside
+        number: 3
+        side: larboard
+        x_m: -3.5
+        height_m: 1.5
+        crew: 3
+        weight_cwt: 7.0
+      # Eight half-pounder swivels on the rail, four a side (the kit's manual; Falconer 1780, SWIVEL: 'a small piece of artillery ... fixed on a socket'), a man each when a man is spare.
+      - id: swivel.1.starboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 1
+        side: starboard
+        x_m: 5.0
+        height_m: 1.7
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.1.larboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 1
+        side: larboard
+        x_m: 5.0
+        height_m: 1.7
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.2.starboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 2
+        side: starboard
+        x_m: 1.0
+        height_m: 1.7
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.2.larboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 2
+        side: larboard
+        x_m: 1.0
+        height_m: 1.7
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.3.starboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 3
+        side: starboard
+        x_m: -2.0
+        height_m: 1.7
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.3.larboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 3
+        side: larboard
+        x_m: -2.0
+        height_m: 1.7
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.4.starboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 4
+        side: starboard
+        x_m: -5.0
+        height_m: 1.7
+        crew: 1
+        weight_cwt: 0.5
+      - id: swivel.4.larboard
+        kind: swivel
+        pounder: 0.5
+        place: rail
+        number: 4
+        side: larboard
+        x_m: -5.0
+        height_m: 1.7
+        crew: 1
+        weight_cwt: 0.5
+      cartridges:
+        3: 330
+        0.5: 352
+      shot:
+        3:
+          round: 240
+          grape: 36
+          chain: 24
+        0.5:
+          round: 320
 # The hold (package 35, spec M5 §23): room for 42 tons of cargo beyond her own stores, 0.5 of the 85 tons burthen (a revenue cutter's hold less her own stores: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 42

@@ -1,0 +1,16 @@
+# FreeSail: the fighting book (spec M7 §10; package 70). The standing orders of an action
+# in the dialect, as a King's ship's captain keeps them: the fire opened at two cables and
+# held at long shot, ceased when she strikes or when our own colours come down, and the
+# guns laid for her hull. Load it with `read the standing orders from
+# data/standing_orders/fighting.orders`; the rules captain loads his role's own on
+# entering `engaging` (data/captains/*.yaml, the `engaging` book) and gives the drum, the
+# guns cast loose and loaded, the aim and the mark on the side she bears himself. Rewrite
+# the figures and the aim as you will: `aim at her rigging`, `load with chain shot` and
+# `fire by divisions` are the dialect's, and a line given by hand stands over the book's.
+standing order "open fire": when the range is under 2 cables then fire as they bear
+standing order "long shot": when the range exceeds 20 cables then hold your fire
+standing order "return her fire": at she opens fire then fire as they bear
+standing order "she strikes": at the enemy strikes then cease firing
+standing order "the colours": at the colours struck then cease firing
+standing order "the aim": at quarters then aim at her hull
+standing order "the charge": at quarters then load with round shot

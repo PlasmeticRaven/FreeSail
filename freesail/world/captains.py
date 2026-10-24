@@ -120,13 +120,22 @@ STATES: tuple[str, ...] = (
     "keeping station",
     "in distress",
     "engaging",
+    "struck",  # package 70: the colours down, lying to for her captor (what follows is 74's)
 )
 
 # The roles the doctrine files give; the cruiser (package 43) is the small man-of-war on
 # passage, a brig-sloop or a cutter of the Navy, who makes out a stranger, chases what she
 # can fight and hauls off from what she cannot; the fisherman (package 43b) works a
 # fishing ground for a trip and goes home, at far detail only.
-ROLES: tuple[str, ...] = ("kings-ship", "merchant", "packet", "commodore", "cruiser", "fisherman")
+ROLES: tuple[str, ...] = (
+    "kings-ship",
+    "merchant",
+    "packet",
+    "commodore",
+    "cruiser",
+    "fisherman",
+    "privateer",  # package 70: a letter of marque cruising for prizes
+)
 
 # The kinds of intent the captain reads (package 43b: `fish`, a trip to a fishing ground
 # and home again, the world's business).
@@ -173,6 +182,36 @@ FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather")
 # The class of a hull by what the tops make out of her, for the cruiser's judgement of a
 # superior force (`overmatched`): a frigate over a brig over a schooner or a cutter
 # (judgement on the catalogue's hierarchy of size, spec M5 §25; the guns are M7's).
+# The lookout's words that mark a man of war (package 70: the privateer's fear of one, and
+# the merchant's); judgement on the words `world/ships.py` gives a sail made out.
+MAN_OF_WAR_WORDS: tuple[str, ...] = (
+    "of war",
+    "frigate",
+    "sloop",
+    "revenue",
+    "king's",
+    "man of war",
+    "ship of the line",
+)
+
+# The nation's habit in action over the role's figures (spec M7 §9, §10: "the British
+# close, the French at long shot"; the aim at the hull or the rigging; the roll fired on).
+# A judgement from the period's commonplaces (Douglas 1820, part I, on the French practice
+# of firing high and at long range; the British of closing to pistol shot and firing low);
+# applied by `Captain._habit`: the engaging range multiplied, the aim and the roll taken
+# where the role's file names none.
+NATION_HABITS: dict[str, dict[str, Any]] = {
+    "britain": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
+    "france": {"range_factor": 2.0, "aim": "rigging", "roll": "up"},
+    "spain": {"range_factor": 1.5, "aim": "rigging", "roll": "up"},
+    "netherlands": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
+    "united-states": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
+}
+
+# The range a weaker mark is closed to in action (pistol shot, a third of a cable;
+# judgement after the chases' record: the chaser ranges alongside).
+CLOSE_RANGE_M = 60.0
+
 SIZE_RANK: dict[str, int] = {
     "frigate": 3,
     "brig-sloop": 2,
@@ -332,19 +371,25 @@ class Intent:
     via: tuple[str, ...] = ()  # the marks sailed by on the way, in order (package 45)
     # package 43b: a fishing trip's hours on the ground; `origin` is then her home port
     hours: float | None = None
+    # package 70: a station cruised for prizes (a letter of marque's), the privateer's role
+    prizes: bool = False
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "kind": self.kind,
-            "words": self.words,
-            "cargo": self.cargo,
-            "tons": self.tons,
-            "origin": self.origin,
-            "destination": self.destination,
-            "radius_nm": self.radius_nm,
-            "done": self.done,
-            "via": list(self.via),
-        } | ({"hours": self.hours} if self.hours is not None else {})
+        return (
+            {
+                "kind": self.kind,
+                "words": self.words,
+                "cargo": self.cargo,
+                "tons": self.tons,
+                "origin": self.origin,
+                "destination": self.destination,
+                "radius_nm": self.radius_nm,
+                "done": self.done,
+                "via": list(self.via),
+            }
+            | ({"hours": self.hours} if self.hours is not None else {})
+            | ({"prizes": True} if self.prizes else {})
+        )
 
 
 # `via` in an intent or a course (package 45): `trade tin from Falmouth to Lisbon via
@@ -502,7 +547,9 @@ _TRADE = re.compile(
     r"(?:to|for)\s+(?P<b>.+)$"
 )
 _STATION = re.compile(
-    r"^(?:keep (?:the )?station|cruise|patrol)\s+off\s+(?P<place>.+?)"
+    r"^(?:keep (?:the )?station|cruise|patrol)"
+    r"(?P<prizes>\s+for\s+prizes|\s+against\s+(?:the\s+)?(?:enemy'?s?\s+)?trade)?"
+    r"\s+off\s+(?P<place>.+?)"
     r"(?:\s+within\s+(?P<radius>[\d.]+)\s+miles?)?(?:\s+between\s+(?P<between>.+))?$"
 )
 _LETTER = re.compile(
@@ -561,7 +608,12 @@ def read_intent(world: Any, words: str) -> Intent:
         place = _place_id(world, group(m, "place"))
         radius = float(m.group("radius") or 5.0)
         return Intent(
-            "station", said, destination=place, radius_nm=radius, between=group(m, "between")
+            "station",
+            said,
+            destination=place,
+            radius_nm=radius,
+            between=group(m, "between"),
+            prizes=bool(m.group("prizes")),
         )
     m = _LETTER.match(text)
     if m:
@@ -712,7 +764,7 @@ def role_for(world: Any, intent: Intent | None) -> str:
     or bound for one is `kings-ship`; a letter carried is the packet's; a convoy's
     commodore is named by the intent; the rest trade."""
     if intent is not None and intent.kind == "station":
-        return "kings-ship"
+        return "privateer" if intent.prizes else "kings-ship"
     if intent is not None and intent.kind == "letter":
         return "packet"
     if intent is not None and intent.kind in ("home", "passage") and _is_kings_ship(world):
@@ -1489,6 +1541,13 @@ STIMULI: tuple[str, ...] = (
     "overmatched",
     "stranger near",
     "chase stale",
+    # package 70 (the engaging doctrine): an enemy within the doctrine's engaging distance;
+    # none within its breaking-off distance for its minutes; the mark engaged has struck;
+    # a man of war of the enemy's within the hostile distance (the privateer's fear)
+    "enemy in range",
+    "enemy out of range",
+    "enemy struck",
+    "man of war near",
 )
 
 
@@ -1514,6 +1573,9 @@ class Judgement:
     # the strangers this captain has done with (package 43): a chase given up as stale is
     # not taken up again while she is in sight, as a sail spoken is a stranger no more
     given_up: set[str] = frozenset()  # type: ignore[assignment]
+    # the ships that have fired on her (package 70, rule 3): an enemy from then on whatever
+    # her colours (a checkpoint from before loads with none)
+    fired_on: set[str] = frozenset()  # type: ignore[assignment]
 
     def _inner_leg(self) -> bool:
         return False
@@ -1624,6 +1686,8 @@ class Judgement:
             and s.get("estimate_m") is not None
             and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
             and int(s.get("size") or 0) > int(p.own_size or 0)
+            # package 70: a merchantman of a bigger hull is a prize, not a superior force
+            and "merchant" not in str(s.get("known") or "").lower()
         ]
         if not enemies:
             return None
@@ -1690,6 +1754,22 @@ class Judgement:
             )
         if name == "chase stale":
             return self._chase_stale(float(th("chase_stale_hours", 3)))
+        # package 70: the engaging doctrine's stimuli
+        if name == "enemy in range":
+            within = float(th("engage_nm", 0.0))
+            return within > 0.0 and self._enemy_within(p, within) is not None
+        if name == "enemy out of range":
+            within = float(th("break_off_nm", 2.0))
+            if self._enemy_within(p, within) is not None:
+                self._business.pop("out_of_range_since", None)
+                return False
+            since = self._business.setdefault("out_of_range_since", p.tick)
+            return p.tick - since >= float(th("break_off_minutes", 10)) * 60.0
+        if name == "enemy struck":
+            return self._enemy_struck(p)
+        if name == "man of war near":
+            within = float(th("stranger_hostile_nm", 6))
+            return self._man_of_war_within(p, within) is not None
         if name == "stranger lost":
             if self._stranger is None:
                 return not p.strangers
@@ -1798,6 +1878,45 @@ class Judgement:
     def _ready_for_sea(self, p: Perception) -> bool:
         return False
 
+    # -- the action's (package 70) ----------------------------------------------------
+
+    def _enemy_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
+        """The nearest enemy within the miles, spoken or not (a ship that has fired on
+        her is an enemy whatever was said): the engaging doctrine's mark."""
+        enemies = [
+            s
+            for s in p.strangers
+            if self._is_enemy(s)
+            and s.get("estimate_m") is not None
+            and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
+            and not self._stranger_struck(s)
+        ]
+        if not enemies:
+            return None
+        return min(enemies, key=lambda s: float(s["estimate_m"]))
+
+    def _man_of_war_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
+        """An enemy's man of war within the miles, by the lookout's words of her ('a
+        brig-sloop of war', 'a frigate', 'a cutter of the revenue'); a stranger under no
+        colours of a man of war's rig counts, a privateer taking no chances."""
+        for s in p.strangers:
+            if s.get("estimate_m") is None:
+                continue
+            if float(s["estimate_m"]) / units.NAUTICAL_MILE > within_nm:
+                continue
+            words = str(s.get("known") or "").lower()
+            if not any(w in words for w in MAN_OF_WAR_WORDS):
+                continue
+            if self._is_enemy(s) or s.get("nation") is None:
+                return s
+        return None
+
+    def _stranger_struck(self, s: dict[str, Any]) -> bool:
+        return False
+
+    def _enemy_struck(self, p: Perception) -> bool:
+        return False
+
 
 class Captain(Judgement):
     """The rules-based captain of the player's ship: named after the person who commands
@@ -1838,6 +1957,7 @@ class Captain(Judgement):
         self._stranger: str | None = None
         self._departing = ""  # the port she sails from, for the plan's first legs
         self.given_up: set[str] = set()  # the chases given up (package 43)
+        self.fired_on: set[str] = set()  # the ships that fired on her (package 70)
         self.error = ""
         if self.intent_words:
             try:
@@ -1976,6 +2096,18 @@ class Captain(Judgement):
         self.last_judged = -1
         return f"{self.name} carries on: {self.intent.words if self.intent else ''}"
 
+    def strike_state(self) -> None:
+        """The colours struck (package 70; `combat.action.strike`): the machine enters
+        `struck`, whose book is empty and whose work is to lie to for her captor."""
+        if self.state == "struck":
+            return
+        if not isinstance(self.fired_on, set):
+            self.fired_on = set()
+        if self.active and self.commands:
+            self._enter("struck")
+        else:
+            self.state = "struck"
+
     # -- an order over his head (spec M7b §3; package 62) ------------------------------
 
     # the director's hand: the tick until which he holds by an order given over his head as
@@ -2051,7 +2183,8 @@ class Captain(Judgement):
             self._enter(self._first_state(p))
         self._transitions(p)
         self._work(p, events)
-        self._rule_of_the_road(p)
+        if self.state not in ("engaging", "struck"):
+            self._rule_of_the_road(p)  # no giving way to an enemy in action (package 70)
         self._deck_by_rule()
 
     # -- the deck to a seated officer (package 41; spec M6 §11) --------------------------
@@ -2199,6 +2332,19 @@ class Captain(Judgement):
     def _fills(self) -> dict[str, Any]:
         d = self.doctrine
         fills: dict[str, Any] = {k: v for k, v in (d.thresholds if d else {}).items()}
+        # package 70: the fighting book's words from the doctrine and the nation's habit
+        habit = self._habit()
+        fills["aim"] = {"hull": "her hull", "rigging": "her rigging"}.get(
+            str(habit["aim"]), "between wind and water"
+        )
+        fills["charge"] = {
+            "round": "round shot",
+            "chain": "chain shot",
+            "grape": "grape",
+            "double": "double shot",
+        }.get(str(habit["charge"]), "round shot")
+        fills["engage_range_cables"] = f"{habit['engage_range_cables']:g}"
+        fills["break_off_cables"] = f"{habit['break_off_cables']:g}"
         leg = self.legs[self.leg_i] if self.legs and self.leg_i < len(self.legs) else None
         if leg is not None:
             fills["mark"] = leg.words
@@ -2304,6 +2450,13 @@ class Captain(Judgement):
     def _on_enter(self, state: str, old: str | None = None) -> None:
         """What is ordered on entering a state, beyond the book."""
         world = self.world
+        if old == "engaging" and state != "struck":
+            # the action over (the mark struck, lost or out of range): the guns silent and
+            # secured, the hands back under the watch bill (package 70)
+            self.give("cease firing", why="the action over")
+            self.give("secure the guns", why="the action over")
+            self._business.pop("engaged_side", None)
+            self._business.pop("steered_for", None)
         if state == "hove to for weather":
             # package 37p: shortened, the jibs in by their ratings and the storm staysails
             # over the storm line (`orders.storm`), and lying to under the close-reefed
@@ -2369,6 +2522,17 @@ class Captain(Judgement):
                 self.give(f"shape a course for {station[0]}")
         elif state == "evading":
             self._haul_off(Perception.read(world))
+        elif state == "engaging":
+            self._engage_now(Perception.read(world))
+        elif state == "struck":
+            # the colours down: she lies to for her captor (package 70; what follows is 74's)
+            manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")
+            lying = manoeuvre in ("hove to", "heaving to") or bool(
+                (getattr(world.ship, "extra", None) or {}).get("hove_to")
+            )
+            if not lying and not self._business.get("struck_lying_to"):
+                self._business["struck_lying_to"] = True
+                self.give("heave to", why="the colours struck")
 
     # -- the doctrine's transitions: `Judgement` (the mixin shared with the far body) --
 
@@ -2427,6 +2591,8 @@ class Captain(Judgement):
         elif state == "evading":
             if p.tick - (self._business.get("hauled_off", -(10**9))) >= 600:
                 self._haul_off(p)
+        elif state == "engaging":
+            self._engaging(p)
         elif state == "at anchor":
             if "ship.under_way" in kinds or "ship.weighed" in kinds:
                 self._waiting_at_road = False
@@ -3284,6 +3450,149 @@ class Captain(Judgement):
             near = self._nearest_stranger(p)
             self._stranger = near.get("id") if near else None
 
+    # -- the action (package 70; spec M7 §10) ------------------------------------------
+
+    def _habit(self) -> dict[str, Any]:
+        """The figures he fights by: the role's file's, the nation's habit over them
+        (`NATION_HABITS`) where the file names none."""
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        ports = getattr(self.world, "ports", None)
+        nation = str(getattr(ports, "ship_nation", "") or "")
+        habit = NATION_HABITS.get(nation, NATION_HABITS["britain"])
+        factor = float(habit["range_factor"])
+        aim = th("aim", "") or habit["aim"]
+        roll = th("roll", "") or habit["roll"]
+        return {
+            "aim": aim,
+            "roll": roll,
+            "charge": th("charge", "round") or "round",
+            "side": th("engage_side", "weather") or "weather",
+            "engage_range_cables": float(th("engage_range_cables", 2.0)) * factor,
+            "break_off_cables": float(th("break_off_nm", 2.0)) * 10.0,
+            "fire_mode": th("fire_mode", "as they bear") or "as they bear",
+        }
+
+    def _mark(self, p: Perception) -> dict[str, Any] | None:
+        """The enemy engaged: the battery's mark if she is in sight, else the nearest
+        enemy within the breaking-off distance."""
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        battery = (getattr(self.world.ship, "extra", None) or {}).get("battery")
+        target = getattr(battery, "target", None) if battery is not None else None
+        if target is not None:
+            for s in p.strangers:
+                if s.get("id") == target and s.get("estimate_m") is not None:
+                    return s
+        return self._enemy_within(p, float(th("break_off_nm", 2.0)))
+
+    def _side_of_mark(self, p: Perception, s: dict[str, Any]) -> str:
+        """The side she bears on now: the battery engaged."""
+        bearing = float(s.get("bearing_deg") or 0.0)
+        heading = float(p.heading_deg or 0.0)
+        rel = (bearing - heading + 180.0) % 360.0 - 180.0
+        return "starboard" if rel >= 0.0 else "larboard"
+
+    def _engage_now(self, p: Perception) -> None:
+        """Entering `engaging`: the drum, the guns cast loose, loaded and laid by the
+        doctrine, the mark engaged on the side she bears, the fire held until the book's
+        range (the book opens it)."""
+        habit = self._habit()
+        mark = self._mark(p)
+        quarters = (getattr(self.world.ship, "extra", None) or {}).get("quarters")
+        if quarters is None or not getattr(quarters, "at_quarters", False):
+            self.give("beat to quarters", why="an enemy in range")
+        self.give("cast loose the guns", why="an enemy in range")
+        self.give(f"load with {self._fills()['charge']}")
+        self.give(f"aim at {self._fills()['aim']}")
+        if habit["roll"] in ("up", "down"):
+            self.give(f"fire on the {habit['roll']} roll")
+        if mark is not None:
+            side = self._side_of_mark(p, mark)
+            self._business["engaged_side"] = side
+            self.give(f"engage her to {side}", why="the enemy in range")
+            self.give("hold your fire", why="until she is within the book's range")
+        self._engaging(p)
+
+    def _engaging(self, p: Perception) -> None:
+        """Each minute of the action: the mark kept on the engaged beam at the doctrine's
+        range (closed when beyond it, opened when under half of it), the battery shifted
+        when she crosses the bow or the stern; the fire the book's."""
+        mark = self._mark(p)
+        if mark is None or p.heading_deg is None:
+            return
+        side = self._side_of_mark(p, mark)
+        if side != self._business.get("engaged_side"):
+            self._business["engaged_side"] = side
+            self.give(f"engage her to {side}", why="she bears on the other side")
+        habit = self._habit()
+        wanted = habit["engage_range_cables"] * units.NAUTICAL_MILE / 10.0
+        rng = float(mark.get("estimate_m") or wanted)
+        last_tick = int(self._business.get("steered_tick", -(10**9)))
+        if self._weaker(p, mark):
+            # a weaker mark (a smaller class, or a merchantman) is chased and closed to
+            # pistol shot: the chaser runs alongside, and the range-keeping law is for an
+            # equal (the trade-stranger trial: the beam law steered the brig across the
+            # chase and the schooner ran clear)
+            wanted = CLOSE_RANGE_M
+            if rng > CLOSE_RANGE_M * 3.0:
+                # the chase renewed every three minutes (the chasing book's 'keep her
+                # bearing' is not loaded in this state; a chase given once is one course)
+                if self._business.get("steered_for") != "chase" or p.tick - last_tick >= 180:
+                    self._business["steered_for"] = "chase"
+                    self._business["steered_tick"] = p.tick
+                    self.give("give chase", why="to close her")
+                return
+        bearing = float(mark.get("bearing_deg") or 0.0)
+        sign = 1.0 if side == "starboard" else -1.0
+        # the angle she is kept on, before the beam to close and abaft it to open, a
+        # straight law of the range over the wanted (at the range abeam; at twice it four
+        # points before the beam; at half, three points abaft), so the course does not
+        # jump at a band's edge
+        ratio = rng / max(wanted, 1.0)
+        off = max(35.0, min(125.0, 90.0 + 55.0 * (1.0 - ratio)))
+        course = (bearing - sign * off) % 360.0
+        last = self._business.get("steered_for")
+        if last == "chase":
+            last = None
+        turn = abs((course - float(last) + 180.0) % 360.0 - 180.0) if last is not None else 999.0
+        if turn >= 10.0 and p.tick - last_tick >= 120:
+            self._business["steered_for"] = course
+            self._business["steered_tick"] = p.tick
+            self.give(f"steer {course:.0f}", why="to keep the enemy on the engaged beam")
+
+    def _enemy_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
+        if not getattr(self.world.ship, "guns", None):
+            return None  # no guns: she never engages; she runs by the merchant's rows
+        return super()._enemy_within(p, within_nm)
+
+    def _weaker(self, p: Perception, mark: dict[str, Any]) -> bool:
+        """A mark of a smaller class than her own, or a merchantman of any class."""
+        if "merchant" in str(mark.get("known") or "").lower():
+            return True
+        return int(mark.get("size") or 0) < int(p.own_size or 0)
+
+    def _stranger_struck(self, s: dict[str, Any]) -> bool:
+        v = self._vessel_of(str(s.get("id") or ""))
+        return bool(v is not None and getattr(v, "struck", False))
+
+    def _enemy_struck(self, p: Perception) -> bool:
+        battery = (getattr(self.world.ship, "extra", None) or {}).get("battery")
+        target = getattr(battery, "target", None) if battery is not None else None
+        if target is None:
+            return False
+        v = self._vessel_of(str(target))
+        return bool(v is not None and getattr(v, "struck", False))
+
+    def _vessel_of(self, vid: str) -> Any:
+        world = self.world
+        sea = getattr(world, "vessels", None)
+        v = sea.get(vid) if sea is not None else None
+        if v is None and vid == "the ship":
+            parent = getattr(world, "parent", None)
+            v = parent.vessels.player_shadow(parent) if parent is not None else None
+        return v
+
     def _nearest_stranger(self, p: Perception) -> dict[str, Any] | None:
         items = self._unspoken(p)
         if not items:
@@ -3291,6 +3600,8 @@ class Captain(Judgement):
         return min(items, key=lambda s: s.get("estimate_m") or math.inf)
 
     def _is_enemy(self, s: dict[str, Any]) -> bool:
+        if str(s.get("id") or "") in (self.fired_on or ()):
+            return True  # she fired on us (package 70, rule 3)
         nation = s.get("nation")
         if not nation:
             return False

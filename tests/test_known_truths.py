@@ -7881,3 +7881,501 @@ def test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_bei
     assert lying >= 4 * 60 and aback == 0
     assert sum(knots) / len(knots) < 2.0
     assert not [e for e in w.log if e.kind == "ship.aground"]
+
+
+# ---------------------------------------------------------------------------
+# Milestone 7: the combat core (package 70; spec M7 §12), truths 7-133 onward. Two
+# crewed cutters off the Lizard at seed 7, the frigate's gun crews, a merchant brig under
+# a privateer's fire, the far fight's measure and the pace; the figures measured on the
+# build machine are in each docstring and in docs/dev/TuningNotes.md (package 70).
+# Nothing here pre-defines a battle's timing (rule 7): the bands are wide, the seed's
+# figure is quoted.
+# ---------------------------------------------------------------------------
+
+CUTTER = "data/ships/cutter.yaml"
+MERCHANT_BRIG = "data/ships/merchant-brig.yaml"
+FIRST_ACTION = "data/scenarios/first-action.yaml"
+
+
+def _action_scenario(wind_kn=12.0, ship=CUTTER, heading=180.0, speed=0.0, intent=None):
+    return Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=wind_kn,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.8, "lon_deg": -5.3},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest"],
+        nation="britain",
+        ship_heading_deg=heading,
+        ship_speed_kn=speed,
+        **({"intent": intent} if intent else {}),
+    )
+
+
+def _a_cutter_crewed(world, bearing_deg, distance_m, nation="france", fit="carronades"):
+    """A cutter of the nation made so far off on the bearing, lying to, and crewed at
+    once; her captain's state `engaging` (the empty book: she lies to and fights)."""
+    from freesail.world import crews
+    from freesail.world.geo import destination
+    from freesail.world.ships import vessel_from_spec
+
+    there = destination(world.position, bearing_deg, distance_m)
+    world.vessels.serial += 1
+    v = vessel_from_spec(
+        world,
+        {
+            "description": "cutter",
+            "name": "Renard",
+            "nation": nation,
+            "position": there,
+            "goal": "bound for 48 30 N 5 18 W",
+            "intent": "bound for 48 30 N 5 18 W",
+            "fit": fit,
+        },
+        world.vessels.serial,
+    )
+    v.plan = [("lie_to", math.inf)]
+    v.sail_state = "lying to"
+    world.vessels.add(v)
+    enemy = crews.promote(world, v)
+    enemy.captain.state = "engaging"
+    return v, enemy
+
+
+def _guns_ready(world) -> None:
+    """The drum, the guns cast loose and loaded, run out and primed on both sides."""
+    world.submit("beat to quarters")
+    world.run(5)
+    world.submit("cast loose the guns")
+    world.run(200)
+
+
+def _two_cutters_at_pistol_shot():
+    """The player's cutter with her guns ready, and the French cutter made a third of a
+    cable off her starboard beam and crewed; the lookout given his minute; the mark
+    engaged to starboard with the fire held."""
+    from freesail.combat.guns import battery_of
+
+    w = make_world(SEED, CUTTER, _action_scenario())
+    _guns_ready(w)
+    heading = float(w.ship.heading)
+    v, enemy = _a_cutter_crewed(w, math.degrees(heading) + 90.0, 60.0)
+    enemy.ship.dyn.heading = heading
+    w.submit("hold your fire")
+    w.run(65)
+    w.submit("engage her to starboard")
+    w.run(1)
+    return w, v, enemy, battery_of(w.ship)
+
+
+def test_truth_7_134_two_cutters_at_pistol_shot_one_broadside_strikes_and_the_damage_is_state():
+    """Spec M7 §12: "two cutters with six carronades each, one broadside at pistol shot,
+    the hits allotted by the doctrine and the damage in the part graph". The King's
+    cutter's starboard carronades at the word, the mark a third of a cable off the beam:
+    of the three, at seed 7 one struck her (a shot through the side to larboard, the hole
+    kept with its place against the waterline, one killed and one wounded in her
+    muster); the mark's own log says what her people saw; nothing is a second model of the
+    ship (rule 1)."""
+    w, v, enemy, battery = _two_cutters_at_pistol_shot()
+    assert battery.target == v.id and battery.engaged == "starboard"
+    said = w.submit("fire")
+    assert said.kind == "guns.fire", said.text
+    w.run(70)
+    fired = [e for e in w.log if e.kind == "action.fired"]
+    assert fired and fired[0].data["fired"] >= 2, [e.text for e in fired]
+    struck = sum(e.data["struck"] for e in fired)
+    assert struck >= 1, [e.text for e in fired]
+    hits = [e for e in enemy.log if e.kind == "action.hit"]
+    assert hits and hits[0].text.startswith("Shot from a cutter:")
+    keeper = enemy.ship.extra["damage"]
+    assert keeper.hits == struck
+    crew = enemy.ship.extra["crew"]
+    hurt = [s for s in crew.sailors if s.hurt]
+    graph = (
+        keeper.holes
+        or [ln for ln in enemy.ship.lines.values() if ln.state.value == "parted"]
+        or [s for s in enemy.ship.spars.values() if s.wrecked]
+        or [s for s in enemy.ship.sails.values() if s.holed_m2 > 0.0]
+        or hurt
+    )
+    assert graph, "a hit that changed nothing"
+    for hole in keeper.holes:
+        assert set(hole) >= {"side", "x_m", "z_m", "diameter_m", "pounder"}
+    assert enemy.readings.words("damage") != "none" or hurt
+    for s in hurt:
+        assert not s.fit and s.hurt in ("killed", "wounded")
+    bill = enemy.readings.value("bill")
+    assert bill["killed"] + bill["wounded"] == len(hurt)
+
+
+def test_truth_7_140_an_action_at_a_cable_ends_in_minutes_and_one_at_long_shot_in_hours():
+    """Rule 7 (nothing pre-defines a battle's timing): the same tables give an action of
+    minutes and one of hours by the range the captains keep. At a cable, two cutters
+    hove to and engaging as they bear, the French cutter under the defaults strikes within
+    a quarter of an hour (at seed 7 three minutes after the first shot: a shot between wind
+    and water and her losses); at long shot the first action's privateer fights an hour
+    and fifty-three minutes (truth 7-133). The log says why she struck."""
+    from freesail.combat.guns import Aim, FireMode, battery_of
+    from freesail.crew.quarters import quarters_of
+    from freesail.ship.parts import Charge
+
+    w = make_world(SEED, CUTTER, _action_scenario(wind_kn=14.0, speed=5.0))
+    w.submit("heave to")
+    v, enemy = _a_cutter_crewed(w, 90.0, 150.0, fit="long guns")
+    enemy.submit("heave to")
+    w.run(90)
+    for world, target in ((w, v.id), (enemy, "the ship")):
+        q = quarters_of(world.ship)
+        q.beat(world.clock.tick)
+        for g in world.ship.guns.values():
+            g.cast_loose = True
+        b = battery_of(world.ship)
+        b.target = target
+        b.engaged = "larboard" if world is w else "starboard"
+        b.mode = FireMode.AS_THEY_BEAR
+        b.aim = Aim.HULL if world is w else Aim.RIGGING
+        b.charge = Charge.ROUND
+    first = None
+    struck_at = None
+    for _ in range(900):
+        w.run(1)
+        if first is None and any(e.kind == "action.fired_at" for e in enemy.log):
+            first = w.clock.tick
+        if v.struck:
+            struck_at = w.clock.tick
+            break
+    assert first is not None and struck_at is not None, "no strike within the quarter hour"
+    assert struck_at - first <= 900
+    line = [e for e in enemy.log if e.kind == "action.struck"][0]
+    assert line.text.startswith("The colours are struck:") and "hurt" in line.text
+    assert line.data["by_rule"] and line.data["morale"] < line.data["strike_below"]
+    assert enemy.captain.state == "struck"
+    assert any(e.kind == "action.enemy_struck" for e in w.log)
+    assert battery_of(enemy.ship).mode is FireMode.HOLD
+
+
+def test_truth_7_133_the_first_action_ends_with_the_privateer_struck_and_the_damage_as_state():
+    """Spec M7 §12 and the brief's item 9: the first action (data/scenarios/
+    first-action.yaml) played by the rules captains with no model seated. At seed 7 the
+    privateer engages at 10:06 and opens at long shot at 10:13; the King's cutter closes,
+    returns her fire and the colours come down at 12:06 (an hour and fifty-three minutes
+    after the first shot) with five of thirty hurt and eight shot holes, the strike line
+    giving the reasons in figures; the King's cutter has her main topgallant mast and two
+    yards carried away and eight lines shot away in the part graph, nobody hurt. The band
+    is wide (an hour to three) because the timing is the seed's, never the rule's."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(FIRST_ACTION)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    v = w.vessels.find("Renard")
+    assert w.captain.role == "kings-ship" and v.brain.role == "privateer"
+    first = None
+    struck_tick = None
+    for _ in range(3 * 60):
+        w.run(60)
+        if first is None:
+            fired_at = [e for e in w.log if e.kind == "action.fired_at"]
+            if fired_at:
+                first = fired_at[0].tick
+        if v.struck or w.ship.extra.get("struck"):
+            struck_tick = w.clock.tick
+            break
+    assert first is not None, "nobody opened fire"
+    assert v.struck and not w.ship.extra.get("struck"), "the privateer strikes at this seed"
+    assert 3600 <= struck_tick - first <= 3 * 3600, f"{(struck_tick - first) / 60:.0f} min"
+    enemy = v.crew
+    line = [e for e in enemy.log if e.kind == "action.struck"][0]
+    assert "against a broadside of" in line.text and "hurt" in line.text
+    assert enemy.captain.state == "struck" and w.captain.state != "engaging"
+    keeper = enemy.ship.extra["damage"]
+    assert keeper.holes and keeper.hits >= len(keeper.holes)
+    hurt = [s for s in enemy.ship.extra["crew"].sailors if s.hurt]
+    assert hurt and all(not s.fit for s in hurt)
+    # the King's cutter's damage is the part graph's own state (rule 1)
+    ship = w.ship
+    wrecked = [s.id for s in ship.spars.values() if s.wrecked]
+    parted = [ln.id for ln in ship.lines.values() if ln.state.value == "parted"]
+    assert wrecked or parted, "an action at long shot at the rigging and nothing cut"
+    assert w.readings.words("damage") != "none"
+    # the victor's book ceased fire and secured the guns when she struck
+    assert any(e.kind == "action.enemy_struck" for e in w.log)
+    assert w.readings.value("guns")["mode"] == "hold"
+
+
+def _frigate_interval(hurt_share: float) -> float:
+    """The mean seconds between a starboard 18-pounder's discharges over twenty minutes
+    of the battery's own cycle at a mark abeam, the company full or a share of each gun
+    crew struck down at their guns after the beat."""
+    from freesail.combat.action import _firer
+    from freesail.combat.guns import FireMode, Target, battery_of
+    from freesail.crew.quarters import quarters_of
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5, FRIGATE)
+    w.run(60)
+    _guns_ready(w)
+    w.run(40)
+    ship = w.ship
+    q = quarters_of(ship)
+    if hurt_share:
+        for gc in q.crews.values():
+            n = int(round(len(gc.members) * hurt_share))
+            for s in gc.members[:n]:
+                s.fit = False
+                s.hurt = "wounded"
+                s.at = None
+    b = battery_of(ship)
+    b.engaged = "starboard"
+    b.mode = FireMode.AS_THEY_BEAR
+    b.target = "mark"
+    b.target_words = "a brig"
+    mark = Target(
+        id="mark",
+        words="a brig",
+        bearing_rad=units.wrap_2pi(float(ship.heading) + math.pi / 2.0),
+        range_m=200.0,
+        heading_rad=float(ship.heading),
+        length_m=30.0,
+        heel_deg=0.0,
+        nation="france",
+        body=None,
+        world=None,
+    )
+    rng = w.rng.stream("truth-7-135")
+    firings: dict[str, list[int]] = {}
+    for tick in range(20 * 60):
+        before = {g.id: g.fired for g in ship.guns.values()}
+        b.tick(1.0, q, _firer(w, ship), mark, rng, tick, lambda *a, **k: [])
+        for g in ship.guns.values():
+            if g.fired > before[g.id]:
+                firings.setdefault(g.id, []).append(tick)
+    gaps = []
+    for gid, ticks in firings.items():
+        g = ship.guns[gid]
+        if g.kind == "long" and g.pounder == 18 and g.side == "starboard" and len(ticks) > 2:
+            gaps += [t2 - t1 for t1, t2 in zip(ticks[1:], ticks[2:], strict=False)]
+    assert gaps, "no 18-pounder fired twice"
+    return sum(gaps) / len(gaps)
+
+
+def test_truth_7_135_the_frigates_broadside_every_minute_and_three_quarters_and_slower_short():
+    """Spec M7 §8 and §12: "the frigate's broadside at the start of an action in a minute
+    and three quarters with her full company, in three with a quarter of them casualties".
+    The rate falls out of the muster (rule 2): the long gun's phases (85 s nominal) under
+    the crews' numbers, rating, fatigue and the weather's factor give 104 s between an
+    18-pounder's discharges with the full company at seed 7; a quarter of each gun's crew
+    struck down at their guns (two or three men in ten, the rounding under a true quarter)
+    gives 159 s by the square law of the numbers (`guns.NUMBERS_POWER`). The bands hold
+    the spec's figures with the seed's measured inside them."""
+    full = _frigate_interval(0.0)
+    assert 90.0 <= full <= 125.0, f"{full:.0f} s"
+    short = _frigate_interval(0.25)
+    assert 140.0 <= short <= 210.0, f"{short:.0f} s"
+    assert short >= full * 1.3
+
+
+def test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_it_takes():
+    """Spec M7 §8 and §8a: "a tack with the guns run out takes longer than the same tack
+    cleared", by the fighting book's priority (the design of item 1). The frigate close
+    hauled on the starboard tack (truth 10's world): cleared, she tacks in 447 s at seed
+    7; at quarters with the guns run out under `sail before guns` the bill lends the tack
+    half of every gun's crew (84 hands, said from where) and she tacks in 436 s with the
+    guns gone short; under `guns before sail` the trimmers alone have her, and she tacks
+    in 642 s. The player never queues a thing: the order is given and the bill finds the
+    hands."""
+
+    def tack(at_quarters: bool, priority: str = "sail before guns"):
+        w = close_hauled_on_starboard(FRIGATE, heading=292.5)
+        if at_quarters:
+            _guns_ready(w)
+            w.run(40)
+            w.submit("run out the guns")
+            said = w.submit(priority)
+            assert said.kind == "guns.priority", said.text
+            w.run(120)
+        t0 = w.clock.tick
+        w.submit("tack ship")
+        done, seconds = until(w, ("ship.tacked", "ship.missed_stays"), 1200)
+        assert done and done[0].kind == "ship.tacked", (priority, [e.text for e in done])
+        robbed = [e for e in w.log if e.tick > t0 and e.kind == "quarters.robbed"]
+        return seconds, robbed
+
+    cleared, none_robbed = tack(False)
+    assert not none_robbed and 285 <= cleared <= 600
+    sail_first, robbed = tack(True)
+    assert robbed and robbed[0].data["hands"] >= 40, [r.text for r in robbed]
+    assert "taken from the guns" in robbed[0].text
+    assert sail_first <= cleared * 1.15, f"{sail_first} s against {cleared} s cleared"
+    guns_first, robbed2 = tack(True, "guns before sail")
+    assert not robbed2
+    assert guns_first >= cleared * 1.25, f"{guns_first} s against {cleared} s cleared"
+
+
+def test_truth_7_137_a_merchant_brig_fired_into_strikes_by_morale_and_the_log_says_why():
+    """Spec M7 §12: "a merchant brig fired into by a privateer strikes by morale when her
+    odds fall below the doctrine's figure, the log saying why". The brig bound for
+    Falmouth, the French privateer cutter cruising for prizes a thousand yards to the
+    south-east: at seed 7 the privateer engages at 10:06, chases her down (a weaker mark
+    is closed to pistol shot) and opens at a cable at 10:14, the brig beats to quarters,
+    and at the first shot that tells (10:15) her colours come down by the odds (her figure
+    0.37 under the merchant's line of 0.4: 'against a broadside of 36 pounds to our 12'),
+    nobody hurt. A company does not strike to shot that missed: the rule wants a hit as
+    well as fire."""
+    from freesail.world.geo import destination
+    from freesail.world.ships import vessel_from_spec
+
+    w = make_world(SEED, MERCHANT_BRIG, _action_scenario(speed=4.0, intent="bound for Falmouth"))
+    w.submit("set plain sail")
+    there = destination(w.position, 135.0, 1200.0)
+    w.vessels.serial += 1
+    v = vessel_from_spec(
+        w,
+        {
+            "description": "cutter",
+            "name": "Renard",
+            "nation": "france",
+            "position": there,
+            "goal": "cruising off the Lizard within 10 miles",
+            "intent": "cruise for prizes off the Lizard within 10 miles",
+            "fit": "carronades",
+        },
+        w.vessels.serial,
+    )
+    w.vessels.add(v)
+    assert w.captain.role == "merchant" and v.brain.role == "privateer"
+    struck = None
+    for _ in range(90):
+        w.run(60)
+        if w.ship.extra.get("struck"):
+            struck = w.clock.tick
+            break
+    assert struck is not None, "the brig did not strike within the hour and a half"
+    line = [e for e in w.log if e.kind == "action.struck"][0]
+    assert line.data["by_rule"] and "against a broadside of" in line.text
+    assert line.data["morale"] < line.data["strike_below"] == 0.4
+    fired_at = [e for e in w.log if e.kind == "action.fired_at"]
+    hits = [e for e in w.log if e.kind == "action.hit"]
+    assert fired_at and hits and fired_at[0].tick <= hits[0].tick <= line.tick
+    assert w.captain.state == "struck" and w.readings.words("colours") == "struck"
+    w.run(61)  # the privateer's captain judges once a minute: the mark struck, the action over
+    assert v.crew is not None and v.crew.captain.state != "engaging"
+    assert any(e.kind == "action.enemy_struck" for e in v.crew.log)
+
+
+def test_truth_7_139_the_far_fight_measured_once_ends_within_the_near_fights_hour_and_repeats():
+    """The brief's item 9: the far fight measured once against the same tables at coarse
+    steps (`combat/far.py`), recorded for 74 and not built beyond the measure. Two cutters
+    at two cables, the King's with carronades at the hull and the privateer's long guns at
+    the rigging: at seed 7 the long-gun cutter strikes after seven rounds of three minutes
+    (twenty-one minutes) with four hurt and three shot holes, against the near fight at a
+    cable in three minutes (truth 7-140) and at long shot in near two hours (7-133); the
+    far fight's range is the far brain's choice, which is 74's. The same seed gives the
+    same record."""
+    from freesail.combat import far
+    from freesail.core.rng import Rng
+
+    def once():
+        rng = Rng(SEED).stream("far")
+        a = far.far_ship(
+            CUTTER, "britain", "carronades", aim="hull", morale_start=0.9, strike_below=0.1
+        )
+        b = far.far_ship(
+            CUTTER, "france", "long guns", aim="rigging", morale_start=0.7, strike_below=0.35
+        )
+        rounds = far.fight(a, b, 400.0, rng, minutes=180)
+        return a, b, rounds
+
+    a, b, rounds = once()
+    assert a.broadside_lb == 36.0 and b.broadside_lb == 13.0
+    assert b.struck_at_s is not None and a.struck_at_s is None
+    assert b.struck_at_s <= 3600.0 and len(rounds) == b.struck_at_s / 180.0
+    assert b.hurt >= 1 and b.holes >= 1 and b.rounds_fired > 0 and a.rounds_fired > 0
+    a2, b2, rounds2 = once()
+    record = [(r.fired, r.struck, r.hurt) for r in rounds]
+    assert record == [(r.fired, r.struck, r.hurt) for r in rounds2]
+
+
+@pytest.mark.pace
+def test_truth_7_138_the_pace_with_two_crewed_cutters_in_action_holds_the_crewed_floor():
+    """The brief's item 9: the pace measured with two crewed ships in action against the
+    baseline (the owner's 95 ticks a second with twelve crewed ships; the conftest's
+    floors not lowered). The first action a quarter of an hour in, both at quarters and
+    the privateer firing: 538 ticks a second on the build machine (best of three
+    thousands), against `crews.CREWED_FLOOR_TICKS_S`."""
+    import time
+
+    from freesail.world import crews as K
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(FIRST_ACTION)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    w.run(900)
+    v = w.vessels.find("Renard")
+    assert v.crew is not None and v.crew.captain.state == "engaging"
+    best = 0.0
+    for _ in range(3):
+        t0 = time.perf_counter()
+        w.run(1000)
+        best = max(best, 1000 / (time.perf_counter() - t0))
+    assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second"
+
+
+def test_truth_7_141_firing_on_a_sail_not_made_out_as_an_enemy_is_told_not_refused():
+    """Rule 3, the least of it (the brief's item 7): a ship that fires on a sail not at war
+    with her is not refused; the consequence is told once (`action.unrecognised`) and her
+    state carries it (`ship.extra["outlaw"]`) for the ports' stance to read; 71's colours,
+    private signal and hail plug in where the lookout's nation is read."""
+    from freesail.combat.guns import battery_of
+
+    w = make_world(SEED, CUTTER, _action_scenario())
+    _guns_ready(w)
+    heading = float(w.ship.heading)
+    v, enemy = _a_cutter_crewed(w, math.degrees(heading) + 90.0, 60.0, nation="united-states")
+    enemy.ship.dyn.heading = heading
+    w.submit("hold your fire")
+    w.run(65)
+    said = w.submit("engage her to starboard")
+    assert said.kind == "guns.engage"
+    w.submit("fire")
+    w.run(70)
+    told = [e for e in w.log if e.kind == "action.unrecognised"]
+    assert len(told) == 1 and "no enemy of ours" in told[0].text
+    assert "fired into" in str(w.ship.extra.get("outlaw"))
+    assert any(e.kind == "action.fired_at" for e in enemy.log)
+    assert battery_of(w.ship).target == v.id  # the order stood: told, not refused
+
+
+def test_truth_7_142_the_players_strike_is_never_refused_and_the_quarter_bill_reads():
+    """Decision 7 and the brief's item 6: `strike the colours` is never refused, its
+    consequence told (the guns silent, she lies to, `the colours` struck, the captain's
+    machine in `struck`); and the quarter bill reads after the beat, 'not at quarters'
+    before it; `secure the guns` and `pipe down` put the hands back under the watch bill."""
+    from freesail.combat.guns import FireMode, battery_of
+
+    w = make_world(SEED, CUTTER, _action_scenario())
+    assert w.readings.words("quarter_bill") == "not at quarters"
+    for text in ("engage her to starboard", "fire as they bear"):
+        said = w.submit(text)
+        assert said.kind == "order.rejected" and "not at quarters" in said.text
+    said = w.submit("beat to quarters")
+    assert said.kind == "crew.quarters" and "gun crews manned" in said.text
+    bill = w.readings.value("quarter_bill")
+    assert bill["at_quarters"] and "Nos. 1 guns" in bill["words"]
+    w.run(5)
+    w.submit("cast loose the guns")
+    w.run(200)  # the crews' minute, stretched while the company is still coming up
+    assert w.readings.value("guns")["cast_loose"]
+    said = w.submit("strike the colours")
+    assert said.kind == "action.struck" and "The colours are struck" in said.text
+    assert w.readings.words("colours") == "struck" and w.ship.extra["struck"]
+    assert battery_of(w.ship).mode is FireMode.HOLD
+    assert w.captain.state == "struck"
+    said = w.submit("secure the guns")
+    assert said.kind == "order.accepted"
+    w.run(200)
+    assert w.readings.words("quarter_bill") == "not at quarters"
+    assert not w.readings.value("guns")["cast_loose"]

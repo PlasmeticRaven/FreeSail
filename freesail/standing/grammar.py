@@ -417,6 +417,7 @@ _HOW = {
     ),
     "distance": ("a distance", "in miles: 'exceeds 20 miles'"),
     "ground": ("the ground", "by what the lead brings up: 'is sand', 'is not rock'"),
+    "state": ("a state", "by its words: 'is struck', 'is cast loose', 'is not engaged'"),
     "person": ("a person", "by his place: 'is on deck', 'is below'"),
     "well": ("the well", "by nothing yet: it is read ('sound the well'), not compared"),
     "tendency": (
@@ -617,7 +618,7 @@ _ANGLE_UNITS = ("degrees", "degree")
 _COUNT_UNITS = ("hands", "men", "hand", "man")
 _GLASS_UNITS = ("inches", "inch")
 _DEPTH_UNITS = ("fathoms", "fathom", "fm")
-_DISTANCE_UNITS = ("miles", "mile", "leagues", "league")
+_DISTANCE_UNITS = ("miles", "mile", "leagues", "league", "cables", "cable")
 
 
 def _lat_or_lon(
@@ -754,14 +755,16 @@ def _parse_comparison(
                 value, said, used = parsed
                 return row, Comparison(op, value, f"{phrase[3:]} {said}"), n + used
         raise refuse()
-    row = _pick(cands, ("ground",))
+    row = _pick(cands, ("ground", "state"))
     if row is not None:
-        for phrase, op in (("is not", "is_not"), ("is", "is")):
+        heads = (("is not", "is_not"), ("are not", "is_not"), ("is", "is"), ("are", "is"))
+        for phrase, op in heads:
             n = _starts(tokens, i, phrase)
             if n:
                 words = tokens[i + n : stop]
                 if not words:
-                    raise OrderError(f"'{match.phrase} {phrase}' what ground? Say sand, mud, rock.")
+                    what = "ground? Say sand, mud, rock" if row.kind == "ground" else "words?"
+                    raise OrderError(f"'{match.phrase} {phrase}' what {what}.")
                 ground = " ".join(words)
                 said = f"{'not ' if op == 'is_not' else ''}{ground}"
                 return row, Comparison(op, ground, said), n + len(words)
@@ -1093,7 +1096,9 @@ def _parse_comparison(
             row = _pick(cands, ("distance",))
             if row is None:
                 raise OrderError(f"'{match.phrase}' is compared in {_unit_of(cands)}, not miles.")
-            miles = float(value) * (3.0 if unit.startswith("league") else 1.0)
+            miles = float(value) * (
+                3.0 if unit.startswith("league") else 0.1 if unit.startswith("cable") else 1.0
+            )
             return (
                 row,
                 Comparison(op, miles, f"{phrase.split()[-1]} {value:g} {unit}"),

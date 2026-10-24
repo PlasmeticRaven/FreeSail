@@ -177,6 +177,10 @@ def read_whole(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         from freesail.orders import port
 
         port.check(ship, order)
+    elif kind == "gunnery":
+        from freesail.orders import gunnery
+
+        gunnery.check(ship, order)
     elif kind in ("sail", "yards", "line", "wreck") and order.object:
         try:
             resolve_noun(ship, order.object, order.side_word, order.verb)
@@ -241,6 +245,11 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import glass
 
         return glass.execute(ship, order)
+    if vocab.verbs[order.verb].object == "gunnery":
+        # the orders of the gun deck (spec M7 §8, §8a; package 70)
+        from freesail.orders import gunnery
+
+        return gunnery.execute(ship, order)
     if order.verb == "set" and ("reefs" in order.modifiers or "close" in order.modifiers):
         return _set_reefed(ship, order, vocab)
     return verbs.execute(ship, order, vocab)

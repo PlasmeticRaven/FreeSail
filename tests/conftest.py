@@ -178,6 +178,13 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_the_pace_on_the_day_under_systems_holds_truth_51s_floor",
         "test_known_truths.py::test_the_pace_on_the_gates_day_with_the_region_loaded_holds_truth_51s_floor",
         "test_known_truths.py::test_the_passage_in_thick_weather_makes_its_landfall_wrong_on_the_reckoning",
+        # package 70: the first action played to the colours (near two hours of two crewed
+        # cutters), the frigate's gun crews over twenty minutes twice, three tacks of the
+        # frigate at quarters, the merchant brig under a privateer's fire
+        "test_known_truths.py::test_truth_7_133_the_first_action_ends_with_the_privateer_struck_and_the_damage_as_state",
+        "test_known_truths.py::test_truth_7_135_the_frigates_broadside_every_minute_and_three_quarters_and_slower_short",
+        "test_known_truths.py::test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_it_takes",
+        "test_known_truths.py::test_truth_7_137_a_merchant_brig_fired_into_strikes_by_morale_and_the_log_says_why",
         "test_known_truths.py::test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_hours",
         "test_known_truths.py::test_truth_10_she_misses_stays_when_put_about_under_three_knots",
         "test_known_truths.py::test_truth_10_the_frigate_tacks_in_five_to_ten_minutes_and_gains_to_windward",

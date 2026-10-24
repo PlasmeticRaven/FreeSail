@@ -98,7 +98,7 @@ DECK_PLACES: frozenset[str] = frozenset({"quarterdeck", "deck"})
 # yards, the lines, the helm and the course, the evolutions said with nothing after them
 # (tack, wear, heave to, all hands), the wreck, the hands' work and the ground tackle.
 DECK_OBJECTS: frozenset[str] = frozenset(
-    {"sail", "yards", "line", "heading", "points", "none", "wreck", "work", "anchor"}
+    {"sail", "yards", "line", "heading", "points", "none", "wreck", "work", "anchor", "gunnery"}
 )
 # The master's verbs that are the helm's: the course shaped, the chase given, the ship put
 # about. The rest of his (the log and the lead, the sights, the reckoning worked below)
