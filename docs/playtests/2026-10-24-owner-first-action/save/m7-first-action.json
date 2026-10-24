@@ -1,0 +1,841 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6c",
+    "rules": "20b5f53136824d11"
+  },
+  "builds": [
+    {
+      "name": "m6c",
+      "rules": "20b5f53136824d11"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "The first action",
+    "start_time": "1805-06-12T10:00:00",
+    "wind_from_deg": 270.0,
+    "wind_speed_kn": 12.0,
+    "gustiness": 0.0,
+    "variability": 0.0,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 180.0,
+    "ship_speed_kn": 5.0,
+    "latitude_deg": 49.8,
+    "position": {
+      "lat_deg": 49.8,
+      "lon_deg": -5.3
+    },
+    "region": "channel-west",
+    "chart": null,
+    "weather": [],
+    "systems": [],
+    "climatology": false,
+    "background": {},
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": null,
+    "instrument": "octant",
+    "current": null,
+    "sky": null,
+    "chronometer": null,
+    "epitome": null,
+    "nation": "britain",
+    "people": [],
+    "papers": {
+      "chart": {
+        "year": 1804
+      },
+      "almanac": 1805
+    },
+    "cargo": {
+      "purse_pounds": 0.0,
+      "goods": {}
+    },
+    "ports": [
+      "falmouth",
+      "plymouth",
+      "brest"
+    ],
+    "ships": [
+      {
+        "id": "renard",
+        "description": "cutter",
+        "name": "Renard",
+        "nation": "france",
+        "fit": "long guns",
+        "position": "49 46.9 N 5 16.4 W",
+        "goal": "cruising off the Lizard within 10 miles",
+        "intent": "cruise for prizes off the Lizard within 10 miles",
+        "colours": "shown"
+      }
+    ],
+    "world_orders": [],
+    "intent": "cruise off the Lizard within 10 miles",
+    "books": [
+      "data/standing_orders/starter.orders",
+      "data/standing_orders/fighting.orders"
+    ],
+    "director": {},
+    "fit": "carronades"
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/cutter.yaml"
+  },
+  "end_tick": 12653,
+  "journal": [
+    [
+      0,
+      "captain",
+      "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"tend the sheets\": every glass, if the manoeuvre in hand is not hove to then trim the sheets"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"open fire\": when the range is under 2 cables then fire as they bear"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"long shot\": when the range exceeds 20 cables then hold your fire"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"return her fire\": at she opens fire then fire as they bear"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"she strikes\": at the enemy strikes then cease firing"
+    ],
+    [
+      0,
+      "captain",
+      "standing order \"the colours\": at the colours struck then cease firing"
+    ],
+    [
+      0,
+      "captain",
+      "set plain sail"
+    ],
+    [
+      7581,
+      "captain",
+      "the glass on her"
+    ],
+    [
+      7652,
+      "captain",
+      "Reeve the jib sheets"
+    ],
+    [
+      7666,
+      "captain",
+      "Reeve the staysail halyard"
+    ],
+    [
+      7701,
+      "captain",
+      "Send down the topgallant yard"
+    ],
+    [
+      8206,
+      "captain",
+      "set the jib"
+    ],
+    [
+      8515,
+      "captain",
+      "Cut away the wreck of the main topgallant mast"
+    ],
+    [
+      8524,
+      "captain",
+      "Send down the square sail yard"
+    ],
+    [
+      9967,
+      "captain",
+      "Shift the square sail yard"
+    ],
+    [
+      10758,
+      "captain",
+      "Trim the square sail yard"
+    ],
+    [
+      10855,
+      "captain",
+      "Reeve the starboard topsail sheet"
+    ],
+    [
+      11052,
+      "captain",
+      "take a fix"
+    ],
+    [
+      11265,
+      "captain",
+      "Set the topsail"
+    ],
+    [
+      11644,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      11707,
+      "captain",
+      "Set the staysail"
+    ],
+    [
+      11837,
+      "captain",
+      "Reeve the storm trysail outhaul"
+    ],
+    [
+      12276,
+      "captain",
+      "Steer east"
+    ],
+    [
+      12280,
+      "captain",
+      "Trim for a run"
+    ],
+    [
+      12394,
+      "captain",
+      "Pipe down"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"night routine\": at sunset then take in the studdingsails; take in the royals"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"morning sail\": at sunrise, if the true wind is under 20 knots then set the royals"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"shorten sail for weather\": when the true wind exceeds 30 knots for 2 minutes then take in the studdingsails; take in the royals; take in the topgallants; reef the topsails, one reef"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"tend the sheets\": every glass, if the manoeuvre in hand is not hove to then trim the sheets"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"open fire\": when the range is under 2 cables then fire as they bear"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"long shot\": when the range exceeds 20 cables then hold your fire"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"return her fire\": at she opens fire then fire as they bear"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"she strikes\": at the enemy strikes then cease firing"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"the colours\": at the colours struck then cease firing"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"the aim\": at quarters then aim at her hull"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "standing order \"the charge\": at quarters then load with round shot"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "set plain sail"
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book holds 9 standing orders; 'standing orders' lists them.",
+        "data": {}
+      }
+    },
+    {
+      "tick": 193,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Taken aback: the sails pressed against the masts and she lost her way.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 193,
+          "kind": "ship.aback"
+        }
+      }
+    },
+    {
+      "tick": 781,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: A cutter opens fire on us at 5 cables.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 781,
+          "kind": "action.fired_at"
+        }
+      }
+    },
+    {
+      "tick": 1904,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Starboard topsail sheet shot away; the topsail flogging itself to ribbons.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 1904,
+          "kind": "line.parted"
+        }
+      }
+    },
+    {
+      "tick": 4187,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Square sail yard shot away in the slings.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 4187,
+          "kind": "spar.carried_away"
+        }
+      }
+    },
+    {
+      "tick": 4200,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Shot from a cutter: the square sail yard shot away.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 4200,
+          "kind": "action.hit"
+        }
+      }
+    },
+    {
+      "tick": 4678,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Main topgallant mast shot away; the topgallant yard hanging to leeward.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 4678,
+          "kind": "spar.carried_away"
+        }
+      }
+    },
+    {
+      "tick": 4902,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Larboard main shrouds shot away.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 4902,
+          "kind": "line.parted"
+        }
+      }
+    },
+    {
+      "tick": 5238,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Fore staysail halyard shot away; the foresail came down in a heap.",
+        "data": {
+          "from": 10.0,
+          "to": 1.0,
+          "tick": 5238,
+          "kind": "line.parted"
+        }
+      }
+    },
+    {
+      "tick": 5910,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Larboard jib sheet shot away; the jib flogging itself to ribbons.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 5910,
+          "kind": "line.parted"
+        }
+      }
+    },
+    {
+      "tick": 6049,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Starboard jib sheet shot away.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 6049,
+          "kind": "line.parted"
+        }
+      }
+    },
+    {
+      "tick": 6163,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Starboard main topmast backstay shot away.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 6163,
+          "kind": "line.parted"
+        }
+      }
+    },
+    {
+      "tick": 7153,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: Storm trysail outhaul shot away.",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 7153,
+          "kind": "line.parted"
+        }
+      }
+    },
+    {
+      "tick": 7560,
+      "line": {
+        "severity": "notable",
+        "kind": "driver.eased",
+        "text": "Compression eased to 1x: A cutter has struck her colours!",
+        "data": {
+          "from": 60.0,
+          "to": 1.0,
+          "tick": 7560,
+          "kind": "action.enemy_struck"
+        }
+      }
+    },
+    {
+      "tick": 7581,
+      "actor": "captain",
+      "order": "the glass on her"
+    },
+    {
+      "tick": 7589,
+      "actor": "captain",
+      "order": "the damage report"
+    },
+    {
+      "tick": 7640,
+      "actor": "captain",
+      "order": "Reeve new lines"
+    },
+    {
+      "tick": 7652,
+      "actor": "captain",
+      "order": "Reeve the jib sheets"
+    },
+    {
+      "tick": 7666,
+      "actor": "captain",
+      "order": "Reeve the staysail halyard"
+    },
+    {
+      "tick": 7678,
+      "actor": "captain",
+      "order": "The lines"
+    },
+    {
+      "tick": 7681,
+      "actor": "captain",
+      "order": "The parted lines"
+    },
+    {
+      "tick": 7683,
+      "actor": "captain",
+      "order": "The damage"
+    },
+    {
+      "tick": 7701,
+      "actor": "captain",
+      "order": "Send down the topgallant yard"
+    },
+    {
+      "tick": 8206,
+      "actor": "captain",
+      "order": "set the jib"
+    },
+    {
+      "tick": 8210,
+      "actor": "captain",
+      "order": "the damage report"
+    },
+    {
+      "tick": 8499,
+      "actor": "captain",
+      "order": "Damage report"
+    },
+    {
+      "tick": 8515,
+      "actor": "captain",
+      "order": "Cut away the wreck of the main topgallant mast"
+    },
+    {
+      "tick": 8524,
+      "actor": "captain",
+      "order": "Send down the square sail yard"
+    },
+    {
+      "tick": 9807,
+      "actor": "captain",
+      "order": "Shift the main topgallant mast"
+    },
+    {
+      "tick": 9810,
+      "actor": "captain",
+      "order": "The yards"
+    },
+    {
+      "tick": 9835,
+      "actor": "captain",
+      "order": "Shift the topgallant yard"
+    },
+    {
+      "tick": 9844,
+      "actor": "captain",
+      "order": "Damage report"
+    },
+    {
+      "tick": 9864,
+      "actor": "captain",
+      "order": "Reeve a new line"
+    },
+    {
+      "tick": 9874,
+      "actor": "captain",
+      "order": "Reeve new lines"
+    },
+    {
+      "tick": 9916,
+      "actor": "captain",
+      "order": "Reeve new larboard shrouds"
+    },
+    {
+      "tick": 9926,
+      "actor": "captain",
+      "order": "The shrouds"
+    },
+    {
+      "tick": 9932,
+      "actor": "captain",
+      "order": "The halyards"
+    },
+    {
+      "tick": 9936,
+      "actor": "captain",
+      "order": "The sheets"
+    },
+    {
+      "tick": 9947,
+      "actor": "captain",
+      "order": "The braces"
+    },
+    {
+      "tick": 9954,
+      "actor": "captain",
+      "order": "Reeve new square sail braces"
+    },
+    {
+      "tick": 9967,
+      "actor": "captain",
+      "order": "Shift the square sail yard"
+    },
+    {
+      "tick": 10751,
+      "actor": "captain",
+      "order": "Trim the square sail"
+    },
+    {
+      "tick": 10758,
+      "actor": "captain",
+      "order": "Trim the square sail yard"
+    },
+    {
+      "tick": 10824,
+      "actor": "captain",
+      "order": "damage report"
+    },
+    {
+      "tick": 10841,
+      "actor": "captain",
+      "order": "Raise the topsail yard"
+    },
+    {
+      "tick": 10845,
+      "actor": "captain",
+      "order": "Raise the topsail"
+    },
+    {
+      "tick": 10847,
+      "actor": "captain",
+      "order": "Set the topsail"
+    },
+    {
+      "tick": 10855,
+      "actor": "captain",
+      "order": "Reeve the starboard topsail sheet"
+    },
+    {
+      "tick": 11052,
+      "actor": "captain",
+      "order": "take a fix"
+    },
+    {
+      "tick": 11265,
+      "actor": "captain",
+      "order": "Set the topsail"
+    },
+    {
+      "tick": 11644,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 11707,
+      "actor": "captain",
+      "order": "Set the staysail"
+    },
+    {
+      "tick": 11837,
+      "actor": "captain",
+      "order": "Reeve the storm trysail outhaul"
+    },
+    {
+      "tick": 11967,
+      "actor": "captain",
+      "order": "reeve the starboard main topmast backstay"
+    },
+    {
+      "tick": 11982,
+      "actor": "captain",
+      "order": "reeve the larboard topgallant yard brace"
+    },
+    {
+      "tick": 12258,
+      "actor": "captain",
+      "order": "captain: carry on"
+    },
+    {
+      "tick": 12276,
+      "actor": "captain",
+      "order": "Steer east"
+    },
+    {
+      "tick": 12280,
+      "actor": "captain",
+      "order": "Trim for a run"
+    },
+    {
+      "tick": 12394,
+      "actor": "captain",
+      "order": "Pipe down"
+    },
+    {
+      "tick": 12396,
+      "actor": "captain",
+      "order": "The surgeon"
+    },
+    {
+      "tick": 12398,
+      "actor": "captain",
+      "order": "Where is the surgeon"
+    },
+    {
+      "tick": 12618,
+      "actor": "captain",
+      "order": "Gybe the mainsail"
+    }
+  ],
+  "standing_orders": [
+    {
+      "name": "keep her full",
+      "text": "standing order \"keep her full\": when the apparent wind is forward of 55 degrees then bear away one point",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 3,
+      "last_fired_tick": 9067,
+      "given_tick": 0
+    },
+    {
+      "name": "trim on a shift",
+      "text": "standing order \"trim on a shift\": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "tend the sheets",
+      "text": "standing order \"tend the sheets\": every glass, if the manoeuvre in hand is not hove to then trim the sheets",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 7,
+      "last_fired_tick": 12600,
+      "given_tick": 0
+    },
+    {
+      "name": "heavy weather",
+      "text": "standing order \"heavy weather\": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "open fire",
+      "text": "standing order \"open fire\": when the range is under 2 cables then fire as they bear",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    },
+    {
+      "name": "long shot",
+      "text": "standing order \"long shot\": when the range exceeds 20 cables then hold your fire",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 9660,
+      "given_tick": 0
+    },
+    {
+      "name": "return her fire",
+      "text": "standing order \"return her fire\": at she opens fire then fire as they bear",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 781,
+      "given_tick": 0
+    },
+    {
+      "name": "she strikes",
+      "text": "standing order \"she strikes\": at the enemy strikes then cease firing",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 1,
+      "last_fired_tick": 7560,
+      "given_tick": 0
+    },
+    {
+      "name": "the colours",
+      "text": "standing order \"the colours\": at the colours struck then cease firing",
+      "given_by": "captain",
+      "source": "dialect",
+      "belayed": false,
+      "fired": 0,
+      "last_fired_tick": null,
+      "given_tick": 0
+    }
+  ],
+  "agents": [],
+  "agent_journals": {},
+  "world_orders": [],
+  "chart_marks": [],
+  "station_acts": [],
+  "stations": {
+    "bound": [],
+    "unbound": []
+  },
+  "director": {}
+}

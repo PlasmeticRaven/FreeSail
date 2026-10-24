@@ -26,7 +26,7 @@ The events, for `at` and a stand-by: `she opens fire` (`action.fired_at`), `a wa
 shot` (`action.warning_shot`), `a shot strikes` (`action.hit`), `a man killed`, `a hand
 hurt`, `a gun dismounted`, `a spar shot away` (the hit's kinds), `her colours come down`
 and `the enemy strikes` (`action.enemy_struck`), `the colours struck` (`action.struck`),
-`at quarters` (`crew.quarters`), `cleared for action` (`ship.cleared`), `the guns cast
+`quarters` (the beat, `crew.quarters`), `cleared for action` (`ship.cleared`), `the guns cast
 loose`, `the guns secured`, `the magazine empty`, `a broadside fired` (`action.fired`).
 """
 
@@ -527,7 +527,11 @@ def register() -> None:
         ev("the enemy strikes", "action.enemy_struck"),
         ev("she strikes", "action.enemy_struck"),
         ev("the colours struck", "action.struck"),
-        ev("at quarters", "crew.quarters"),
+        # the words after `at`: "at quarters" in the book (the key held the "at" itself
+        # until the owner's first action, when the fighting book's two orders on it were
+        # refused at the load; the lead, 2026-10-24)
+        ev("quarters", "crew.quarters"),
+        ev("the beat to quarters", "crew.quarters"),
         ev("cleared for action", "ship.cleared"),
         ev("the guns cast loose", "guns.cast_loose"),
         ev("the guns secured", "guns.secured"),

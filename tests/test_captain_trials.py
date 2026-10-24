@@ -160,7 +160,10 @@ def station_gale():
         "the ground at 44332 after twice failing to wear among the islands of "
         "the Molène passage (the captain's sea sense; for the lead and package 58); "
         "package 58b: the gale book mended, she lies to never aback and still takes the "
-        "ground there at 41415, for the lead's playtest"
+        "ground there at 41415 on 58b's tree; on the merged tree of 58a, 67, 68 and 58b "
+        "(the lead, 2026-10-24: 998 lines, 809ab25ae0c6dea8, aground 42394, the same "
+        "before and after 70) the grounding is the offing's tack among the islands still, "
+        "for the next captain's pass; the book itself judged right from the trials' logs"
     ),
     strict=False,
 )
@@ -208,10 +211,13 @@ TRIAL_STATION_LEE_SHORE_STATES = [
     # package 43b: beating and keeping station in the one minute at 27300 before, the
     # beating rule's two verdicts by turns; the verdict's dwell leaves the station alone
     (30840, "keeping station"),  # 27300 at 43b
-    (41880, "hove to for weather"),
+    # the lead's judgement of 58b's gale book (2026-10-24), read from the trials' logs and not
+    # played live (the owner's ruling): hove to again at 41940 (41880 at 57), the station at
+    # 71340 (68940); the book lies her to never aback, and the expected failure is lifted
+    (41940, "hove to for weather"),
     (51480, "on passage"),
     (51540, "beating"),
-    (68940, "keeping station"),
+    (71340, "keeping station"),
 ]
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was 1669 "4720693ca65bc67b"
 # package 58b (item 5, the gale book's mending; the judgement waits for the lead's
@@ -221,8 +227,8 @@ TRIAL_STATION_LEE_SHORE_STATES = [
 # storm canvas alone until 37800 (aback 19 minutes in the day, 41 before); hove to again at
 # 41940 (41880), on passage and beating at 51480 and 51540 as before, keeping station at
 # 71340 (68940); never aground; 1597 lines and ed48ca3d61e52f20
-TRIAL_STATION_LEE_SHORE_LINES = 1669  # package 57 (1660 at 43b, 1665 at 45c); 1597 at 58b
-TRIAL_STATION_LEE_SHORE_DIGEST = "e60617edd7ebbc73"  # package 57 (0686965a0871299c at 43b)
+TRIAL_STATION_LEE_SHORE_LINES = 1597  # 58b, judged 2026-10-24 (57: 1669; 43b: 1660; 45c: 1665)
+TRIAL_STATION_LEE_SHORE_DIGEST = "ed48ca3d61e52f20"  # 58b, judged (e60617edd7ebbc73 at 57)
 
 
 @pytest.fixture(scope="module")
@@ -230,14 +236,6 @@ def station_lee_shore():
     return trial("trial-station-lee-shore")
 
 
-@pytest.mark.xfail(
-    reason=(
-        "package 58b: the gale book mended, the day falls otherwise from her filling away at "
-        "30780 (hove to again at 41940, the station at 71340; never aground), for the "
-        "lead's playtest"
-    ),
-    strict=False,
-)
 def test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it(station_lee_shore):
     """Started five miles west of Ushant with a westerly gale coming on: hove to once she
     has sea room, and never aground (the first trial grounded her in thirty-seven minutes

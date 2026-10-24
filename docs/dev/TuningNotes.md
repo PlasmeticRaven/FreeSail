@@ -8899,6 +8899,37 @@ never aground, the least water fifteen fathoms and a quarter; from 113000 the sa
 - **The gale trials**: the book is mended and lies her to without being taken aback; the
   grounding among the Molène islands is the offing's tack, for the lead's playtest.
 
+### The gale book judged (the lead, 2026-10-24), from the trials' logs and no live play
+
+The owner ruled that a live play at a station was not needed to judge the book, since
+the judgement is of the ship's behaviour and the trials' logs hold it; the two trials were
+run on the merged tree with 70 (`trial()` of the test file, twenty hours each) and read.
+
+**The lee shore** (Ushant five miles under her lee, a westerly gale coming on): 58b's
+figures exactly, 1597 lines and `ed48ca3d61e52f20`; hove to for weather at 9720, 15060
+and 41940, on passage and beating from 51480, the station at 71340; **never aground**; 29
+minutes aback in the twenty hours (the first hours' spells before she lies to, and the
+filled-away hour from 39817, where 57's book lay aback every three minutes under the storm
+canvas alone). The book does what 58b said: she lies to under the close-reefed main
+topsail and the storm staysails without being taken aback, fills away with the
+close-reefed topsails set and has way. **Judged right; the expected failure lifted and the
+pins set to these figures** (the test's states list, lines and digest; the old beside the
+new in the test).
+
+**The station gale** (the frigate keeping her station off Ushant): on the merged tree 998
+lines, `809ab25ae0c6dea8`, hove to at 16164, in distress at 42420 and **aground at 42394**
+among the islands of the Molène passage, beating for her station in the dark, as 57's
+trial did at 44332 and 58b's own tree at 41415. The same figures on the tree before 70
+(`5fb193e`, run in a worktree), so 70 moved nothing here; the move from 58b's 864 lines
+and `4cb58e9ec1ab55c0` came with 58b's merge over 58a, 67 and 68 (the recurring-lines
+rule and the riding rule touch this passage; not bisected, the trial being an expected
+failure whose cause is known). The book's part is right (hove to once, never aback lying
+to, the staysail taken in before it blows out); the grounding is the offing's tack among
+islands with no way to wear (57's finding), the captain's and not the book's. **Stays an
+expected failure, its reason naming the merged tree's figures and the true cause, for the
+next captain's pass** (booked with 71's brief as the captain's helm in action, item 8,
+and the offing's tack beside it).
+
 ### The lead at the merge (2026-10-23): the one whole suite, and the regatta's finish
 
 Merged over 58a and 67 (the last of the three); the four passages that both 58a's recurring

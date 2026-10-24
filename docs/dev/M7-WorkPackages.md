@@ -34,16 +34,17 @@ on these packages; that is the owner's choice.
 | # | Who | Package | Status |
 |---|---|---|---|
 | 70 | Fable | The combat core: the quarter bill and work in action, guns as parts, the gunnery's cycle, the hit model with heel, roll and the sea, damage as state, morale and the strike, the fighting book; the first armament and truths; the figures' sources (spec §7 to §10, §8a) | **merged 2026-10-24** (`80f64f7`); the record below |
-| 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | next: the brief for the owner's approval, after 70's short play |
+| 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | briefed 2026-10-24 (below), for the owner's approval |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | after 71 |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | after 70 |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | after 70 and 73 |
-| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape | behind 70 |
+| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | behind 70 |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
 | 79 | Opus | The regimes from 72; the chart's Mediterranean block | behind 72 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
+| 81 | Opus | The viewer's action: the gun ports and the guns drawn with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -110,11 +111,16 @@ cables; proven by the transition alone turned off; the old figures beside the ne
 overmatch; a ship with no guns never engages; the gunnery stream opened every tick on any
 armed ship. **Found, carried:** the lookout calls a King's cutter and a trader both "a
 cutter" (71 gives more); a crewed captain stays a minute in engaging after his mark strikes;
-`say as` addresses a gun captain as "Mr". **Decisions for the owner:** the nations' habits
-(French at twice the range, the rigging, the up-roll; British close, the hull, the
-down-roll) are a judgement kept in code and could live in the nations' files; the
-merchant's morale means one telling broadside brings her colours down by the odds (an
-armed Indiaman wants a role of her own, 75's); the far fight waits for 74.
+`say as` addresses a gun captain as "Mr". **Decisions (the owner, 2026-10-24):** the nations' gunnery
+habits (French at twice the range, the rigging, the up-roll; British close, the hull, the
+down-roll), a judgement kept in code, **move to the nations' data file** (71's, which is in
+that file for the colours); the merchant's morale means one telling broadside brings her
+colours down by the odds, and **the ship's sub-types** (the armed Indiaman and the rest,
+selected and customised in the scenario editor) are 75's; the far fight waits for 74. **The
+owner's first play** (`docs/playtests/2026-10-24-owner-first-action/`): the action holds,
+the damage comes to the rigging, both sides hit and miss; the rules captain's engaging
+helm turns a full circle through the wind's eye (for the next captain's pass, with 71);
+two of the fighting book's orders were refused at the load (fixed by the lead the same day: the `at quarters` event registered by its words; the playtest's notes).
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -289,3 +295,134 @@ quarantined; **realism, not pacing** (rule 6: nothing made deadlier or quicker f
 game's sake); **nothing pre-defines a battle's timing** (rule 7). The physics of the hull,
 the sails and the sea is read by the hit model and not changed by it.
 
+## Package 71: signals and the voice between ships (`freesail/world/signals.py` new; `data/signals/<nation>/` new; `freesail/world/ships.py`, `nations.py`, `data/nations.yaml` the colours and the nations' habits; `freesail/world/lookout.py` the colours and the flags made out, the lights; `freesail/world/hearing.py`, `orders.py`, `crews.py` the hail's three bodies; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the challenge, the false colours, the chase by doctrine and the helm in action; `freesail/combat/action.py` the recognition completed and the habits read from data; `freesail/evolutions/` the hoist; `freesail/orders/`, `data/vocabulary.yaml` the orders; `freesail/api/readings.py` the colours and the signals as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations and the director's forms; the papers (`data/papers/`); `data/scenarios/` an encounter and a convoy; `docs/TechnicalSpec-M7.md` §1 to §6 as built; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-143 onward)
+
+Fable; the second package of the milestone, run alone after 70 by the owner's rule. Spec M7
+Part 7-i (§1 to §6) whole, with rule 3 (recognition before fire) and rule 4 (rules first,
+models welcome); the owner's note 1 (any nation a combatant, the books built out
+progressively from one foundation); M7b's play (R-17 the voice between ships, R-54 a chase
+with no good options); the striking-colours study; §33a. **Generously scoped as 70 was:**
+the brief binds the intent and names the ground, the builder designs, takes an item another
+way with its reason, grows a part where the work shows it should, and says what it left and
+why; no day count. **The data shape of the signals is this package's first design, written
+down before it is built** (a design note under `docs/design/`), because 76 builds the books
+out from it and every nation's book must fit it. Each item an intent with the lead's
+reading; the intent binds.
+
+1. **Colours as state (§1).** A ship's colours are shown (which ensign), none, false
+   (another nation's, the ruse the law allowed until the first shot), struck, or the
+   signals of distress; the orders `hoist the colours`, `hoist French colours`, `haul down
+   the colours`, `strike the colours` (70's, kept), `fire a gun to leeward`; the lookout
+   makes colours out at the glass's range by their size and the light; a privateer of the
+   business sails under false colours by her doctrine and shows her own at the range the
+   doctrine says; **firing under false colours is not refused but logged, and every
+   nation's stance turns** (the business's stances, R-54's bluff made real); the
+   vocabulary's `hoist our colours` refusal goes. 70 left the hooks (`extra["colours"]`,
+   the lookout's `shows_colours`, `action._recognition`): this item completes rule 3, so
+   that a ship fires on what her people have made out by colours, by the private signal
+   or by the hail, and 70's `action.unrecognised` becomes the exception it was meant to be.
+2. **The private signal (§2).** The challenge and its reply as a small table per nation
+   per month, made under the seed in the period's form (flags by day, lights or false
+   fires by night), carried as a paper of the ship's library (`papers: private_signals`);
+   `show the private signal`, `answer the private signal`; the rules captain of a King's
+   ship challenges a stranger within the glass's range and reads the answer, right, wrong
+   or none, **the wrong or missing answer the tell that makes her a stranger and starts the
+   chase by his doctrine**; a privateer or a merchant has no table; a captured table is a
+   paper 74's prize carries, good until the month turns.
+3. **The signal books (§3): the shape for any nation, and the first books.** The data
+   shape (`data/signals/<nation>/`) the same for every nation of the table: a numerary book
+   (number to meaning, each entry mapped to an intent or an order the rules captain
+   understands, with its qualifiers: the compass, numbers, a ship by her pennants), the
+   telegraphic dictionary, the night and fog signals, the convoy's instructions, the
+   private tables' form. **The British books first** (Howe's 1790 and the Admiralty's 1799
+   numerary, some two hundred entries chosen for what a squadron, a chase and a convoy
+   need; Popham's telegraphic of 1803 for the free sentence; the night and fog book; the
+   *Signals and Instructions for Ships under Convoy*), **the French book smaller and marked
+   where made** (du Pavillon's tables and the numerary that followed), and **the basic
+   system every nation has from the foundation** (a numerary of a few dozen entries in the
+   period's common form, a private table under the seed, night and fog, the convoy's), so
+   that the Spanish, the Dutch, the Danes or the Americans may be combatants in a
+   fictional scenario; the sources named in each file, and the hoists that are the
+   builder's own invention marked so. 76 builds the books out from this shape and never
+   before it.
+4. **A signal is a thing hoisted and read.** The hoist an evolution (the hands at the
+   halyards, a minute a hoist, the substitute and the preparative, a telegraphic sentence
+   as many hoists as it needs and daylight only); the signal read by the lookout at the
+   range the flags' size and the light allow ("she makes a signal we cannot read" without
+   the book, a minute to look it up, the answering pennant), and in the dark or in fog the
+   night book's lights, false fires, rockets and guns; the orders by meaning (`make the
+   signal to chase`, `make the signal: enemy in sight bearing NW`, `make the telegraphic
+   signal: ...`, `answer the signal`, `repeat it`, `haul it down`), the number in the log
+   beside the meaning. The receiving rules captain acts by doctrine when the sender
+   commands him and logs it otherwise: **the least relation** (a scenario names whose
+   signals a ship obeys, `under the orders of`, enough for a convoy of four to tack in
+   succession on one hoist with no model seated) is this package's; **the squadron as a
+   genuine set, the formations and station keeping are 72's** and not built here. A model
+   at a flagship gives a signal by the order, by the equal-reach rule (§34), unless the
+   work shows a better way.
+5. **The hail, and the voice between ships (§4; R-17).** Within hail a ship is spoken by the
+   speaking trumpet (`hail her`, `say to the <description or name>: <words>`) and the
+   answer comes as a line heard on deck, by the three bodies: the rules captain by table
+   (what ship, whence, whither, cargo, the news, by his nation and his stance; a privateer
+   under false colours lying; a King's ship demanding to know who she is and bidding her
+   heave to), a model at the other captain's station given the words in his sample and
+   answering freely, the player typing the hail and hearing the answer; between two rules
+   captains the standard exchange written to both logs once and the stances read ("spoken",
+   as the lookout keeps it); **the hail as the first order of a search** ("heave to, I am
+   sending a boat", the boat as 63 and 53b have it, the search itself a scene of the
+   director's or the doctrine's, not built here beyond the heave-to demanded and
+   answered); the director's `say as` across the water and 67's seat at a person as they
+   stand. 65's reading of who perceives what (the place's knowledge, on the books) is read
+   and not built: a hail is heard by the deck.
+6. **The lights and the bell (§5).** A stern lantern, top lights for ships in company, the
+   fishing boat's lantern on her nets, merchantmen often none, by order and by the standing
+   orders (`hoist the lights`, `show no lights`); the bell at anchor in fog and the gun or
+   the drum under way as the Regulations and the custom have them; the lookout sees a
+   light at night as it sees a sail by day, at the range a light carries, and hears the
+   bell and the gun in fog. **Sight across land is 78's**, not here.
+7. **The nations' habits to data (the owner, 2026-10-24).** 70's `NATION_HABITS` (the range
+   a nation engages at, its aim, its roll) move from code into `data/nations.yaml` beside
+   each nation's colours, read by 70's doctrine; the same entry names the nation's signals
+   root (`data/signals/<nation>/`) and whether it is a well-built book or the basic
+   system, so that a nation is built out in one place.
+8. **The captain's helm in action (carried from the owner's first action, 2026-10-24).**
+   70's engaging law steered by the enemy's bearing alone and turned the King's cutter a
+   full circle through the wind's eye, aback with the carronades silent for half an hour
+   (`docs/playtests/2026-10-24-owner-first-action/notes.md`). The engaging captain never
+   orders a course within the close-hauled angle; when the enemy passes through the eye he
+   shifts the engaged battery or tacks or wears by his doctrine; he keeps or takes the gage
+   the doctrine names; the chase by doctrine (item 2's tell, 70's `give chase` renewed)
+   works the same law; and 57's offing's tack among islands with no room to wear (the
+   station gale's grounding, the trial an expected failure with its reason) is the same sea
+   sense, taken with it or left with its reason. 70's first-action truths may move by it,
+   with the reasons and the bisection the head rules ask.
+9. **The stations, the director and the readings.** `the colours`, `the signals` (the
+   hoists seen and made, with their meanings where the book is ours), `the private signal`
+   as readings; the events and tripwires (`she hoists her colours`, `a signal made`, `the
+   private signal answered`, `hailed`); the director's forms after `WORLD_ORDER_FORMS`
+   (`ship "X": hoist false colours`, `ship "X": make the signal ...`, his truth showing
+   every ship's true colours and her signals), and the director's brief saying whether his
+   ships may fight under false colours; the harness's samples carrying a hail and a signal
+   as words a model answers.
+10. **Truths and records.** §6's truths but sight across land (a cutter under false colours
+    spoken by a King's frigate answers the hail by the table and is made out at the right
+    range; the private signal answered wrong makes her a stranger and the frigate gives
+    chase by doctrine; a convoy of four under a commodore tacks in succession on one hoist
+    with no model seated; a telegraphic sentence takes the hoists and the minutes the book
+    says; a signal made in fog is a gun and not a flag; and item 8's: the King's cutter
+    engaging to leeward of a privateer never puts her head in the wind), numbered 7-143
+    onward; a scenario or two under `data/scenarios/` (the encounter of the study's shape;
+    the convoy of four); spec §1 to §6 "as built"; the Harness; a chapter of the primer
+    (colours, the private signal, a hail, a signal made and read); the director's library;
+    the tuning notes (the data shape's design, the books' sources and what was made, the
+    hail's tables, the habits moved, what moved and its proof, found on the way, decisions,
+    the suite as run with its counts); the fast tier, the slow tier of the touched files,
+    the whole slow tier when the machine is quiet, the pace tests alone and last.
+
+**Not built here:** sight across land (78); the squadron as a set, formations and station
+keeping (72); the full books (76); the search's scene and the boat's work (the director's,
+63); prizes and the captured papers' use (74); marines (73). **The head rules bind** as 70's
+brief has them: no model identifier; nothing under `docs/agents/consent/` touched; a world
+order never shown as sent; the pins re-measured only where a change moves them, old beside
+new, proven by bisection; never a test skipped, disabled or quarantined; realism, not
+pacing; the physics read and not changed.

@@ -291,8 +291,9 @@ class Runtime:
                 world.record(
                     Severity.ROUTINE,
                     "order.rejected",
-                    f"The book '{name}' has a standing order '{rule.name}', and the book "
-                    f"holds one of that name already ({same.officer}'s); the book's is kept.",
+                    f"The book '{name}' has a standing order '{rule.name}', and one of that "
+                    f"name is held already ({same.officer}'s), which stands; the book's is "
+                    f"not loaded.",
                     actor=actor,
                     data={"order": text, "book": name},
                 )
