@@ -516,7 +516,9 @@ def _carry_away(ship: Ship, st: StrainState, part: Part, ratio: float) -> None:
         _blow_out(ship, st, part, ratio)
 
 
-def _part_line(ship: Ship, st: StrainState, line: Line, ratio: float) -> None:
+def _part_line(ship: Ship, st: StrainState, line: Line, ratio: float, how: str = "parted") -> None:
+    """A line parted, by the strain or by a shot (`how`: "parted", "shot away"; package
+    70, rule 1: the same state by another cause)."""
     line.state = LineState.PARTED
     line.load_kn = 0.0
     st.parted.append(line.id)
@@ -540,20 +542,20 @@ def _part_line(ship: Ship, st: StrainState, line: Line, ratio: float) -> None:
             what = f"the yard came down on the cap and the {sail_names} hangs in the gear"
         else:
             what = f"the {sail_names} came down in a heap"
-        text = f"{name} parted; {what}." if affected else f"{name} parted."
+        text = f"{name} {how}; {what}." if affected else f"{name} {how}."
     elif line.cls == "sheet" and isinstance(target, Sail):
         if target.state is SailState.SET:
             target.state = SailState.LOOSED
             st.flogging.add(target.id)
             affected.append(target.id)
-            text = f"{name} parted; the {_name(ship, target.id, False)} flogging itself to ribbons."
+            text = f"{name} {how}; the {_name(ship, target.id, False)} flogging itself to ribbons."
         else:
-            text = f"{name} parted."
+            text = f"{name} {how}."
     elif line.cls == "brace" and isinstance(target, Spar):
         st.swung.add(target.id)
         affected.append(target.id)
         _swing_yard(ship, target)
-        text = f"{name} parted; the {_name(ship, target.id, False)} swung round to the wind."
+        text = f"{name} {how}; the {_name(ship, target.id, False)} swung round to the wind."
     elif line.cls == "stay":
         sails = [s for s in ship.sails.values() if s.roles.get("stay") == line.id]
         for sail in sails:
@@ -562,16 +564,18 @@ def _part_line(ship: Ship, st: StrainState, line: Line, ratio: float) -> None:
                 st.flogging.discard(sail.id)
                 affected.append(sail.id)
         text = (
-            f"{name} parted; the {_names(ship, affected)} came down with it."
+            f"{name} {how}; the {_names(ship, affected)} came down with it."
             if affected
-            else f"{name} parted."
+            else f"{name} {how}."
         )
     elif line.cls == "bowline" and isinstance(target, Sail):
         # it holds nothing now (parts.Line.bowline_hauled): the leech lifts (spec 3b §4)
-        text = f"{name} parted; the {_name(ship, target.id, False)} lifting at the weather leech."
+        text = f"{name} {how}; the {_name(ship, target.id, False)} lifting at the weather leech."
     else:
-        text = f"{name} parted."
+        text = f"{name} {how}."
     data["affected"] = affected
+    if how != "parted":
+        data["how"] = how
     ship.note("urgent", "line.parted", text, subject=line.id, data=data)
 
 
@@ -592,7 +596,11 @@ def _sails_hoisted_by(ship: Ship, halyard: Line) -> list[Sail]:
     return []
 
 
-def _wreck_spar(ship: Ship, st: StrainState, spar: Spar, ratio: float) -> None:
+def _wreck_spar(
+    ship: Ship, st: StrainState, spar: Spar, ratio: float, how: str = "carried away"
+) -> None:
+    """A spar carried away, by the strain or by a shot (`how`: "carried away", "shot
+    away"; package 70, rule 1)."""
     dependents = ship.dependents(spar)
     spar.wrecked = True
     spar.load_kn = 0.0
@@ -613,9 +621,11 @@ def _wreck_spar(ship: Ship, st: StrainState, spar: Spar, ratio: float) -> None:
         what = f"the {_names(ship, sails or spars)}"
     else:
         what = ""
-    text = f"{name} carried away{where}{'; ' + what + ' hanging to leeward' if what else ''}."
+    text = f"{name} {how}{where}{'; ' + what + ' hanging to leeward' if what else ''}."
     data = _data(spar, ratio)
     data["wrecked"] = [d.id for d in dependents]
+    if how != "carried away":
+        data["how"] = how
     ship.note("urgent", "spar.carried_away", text, subject=spar.id, data=data)
 
 

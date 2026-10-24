@@ -271,6 +271,10 @@ class Sail(Part):
     flying: bool = False
     sheeted_to: str | None = None
     corners_m: list[tuple[float, float]] | None = None  # the cut, for the drawing (package 57)
+    # Package 70 (spec M7 §9): the area shot out of the sail, square metres, which the
+    # physics takes off its drawing area and the strain off what the cloth bears; nothing
+    # mends it until a new sail is bent (the sailmaker's patch is 73's).
+    holed_m2: float = 0.0
     state: SailState = SailState.FURLED
     reefs: int = 0
     # A fore-and-aft sail's angle from the centreline, radians: since package 32e (spec M5
@@ -317,7 +321,15 @@ class Sail(Part):
     def effective_cloth_rating_kn(self) -> float:
         """What the cloth bears now (spec 3b §6.2): its rating times the share a sail of
         its condition keeps, from 0.4 worn out to all of it new."""
-        return self.rating_kn * worn_cloth_fraction(self.condition)
+        whole = max(0.0, 1.0 - self.holed_share)
+        return self.rating_kn * worn_cloth_fraction(self.condition) * whole
+
+    @property
+    def holed_share(self) -> float:
+        """The share of the sail shot out of it (package 70), 0 to 1."""
+        if self.area_m2 <= 0.0:
+            return 0.0
+        return min(1.0, max(0.0, self.holed_m2 / self.area_m2))
 
     @property
     def strain_ratio(self) -> float:
@@ -337,6 +349,7 @@ class Sail(Part):
         if canvas_no is not None:
             self.canvas_no = canvas_no
         self.condition = min(max(condition, 0.0), 100.0)
+        self.holed_m2 = 0.0  # a new sail bent is whole (package 70)
 
     @property
     def is_set(self) -> bool:

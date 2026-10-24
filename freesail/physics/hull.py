@@ -545,6 +545,10 @@ def steer(ship: Ship, dt: float) -> float:
     st = hull_state(ship)
     spec = ship.hull.spec.rudder
     max_angle = units.deg_to_rad(spec.max_angle_deg)
+    if ship.extra.get("helm_lost"):
+        # the wheel or the tiller ropes shot away (package 70, spec M7 §9): the rudder
+        # stays where it was until the relieving tackles are rove (73's repair)
+        return d.rudder
     if d.helm_mode is HelmMode.RUDDER:
         wanted = max(-max_angle, min(max_angle, d.target_rudder))
     else:

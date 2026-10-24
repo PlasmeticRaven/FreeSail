@@ -595,6 +595,8 @@ def _read_rig(ship: Ship) -> _Rig:
             held, flogging = reading.held_to_windward, reading.free
             working = reading.working.id if reading.working is not None else None
         area = sail.area_m2 * max(1.0 - cls.reef_factor * reefs, 0.0)
+        # the area shot out of it draws nothing (package 70, spec M7 §9)
+        area *= max(0.0, 1.0 - getattr(sail, "holed_share", 0.0))
         host = yard_trim.sheet_host(ship, sail)
         if against_the_mast(sail, side_sign) or (
             host is not None and against_the_mast(host, side_sign)
