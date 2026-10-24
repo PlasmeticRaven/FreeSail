@@ -133,6 +133,20 @@ class ClearForActionScript(_QuartersScript):
         return {"quarters": " ".join(q.describe()[:2]) if q is not None else ""}
 
 
+def _crews_present_share(ship: Ship) -> float:
+    """The share of the gun crews' hands at their guns now (the men still coming up, or
+    at sail work, are not): the time the crews' work takes stretches by its inverse, a
+    quarter of them at the least."""
+    q = _quarters(ship)
+    if q is None or not q.at_quarters:
+        return 1.0
+    wanted = sum(gc.wanted for gc in q.crews.values())
+    at = sum(len(gc.hands) for gc in q.crews.values())
+    if wanted <= 0:
+        return 1.0
+    return max(0.25, min(1.0, at / wanted))
+
+
 class CastLooseScript(_QuartersScript):
     """Cast loose the guns: the crews cast off the tackles and the breechings' lashings,
     take out the tompions and provide the guns (Douglas 1820, part II); one phase,
@@ -147,6 +161,9 @@ class CastLooseScript(_QuartersScript):
         if all(g.cast_loose or not g.serves for g in self._guns()):
             return "the guns are cast loose already"
         return None
+
+    def phase_s(self, name: str) -> float:
+        return super().phase_s(name) / _crews_present_share(self.ship)
 
     def begin(self, words: dict[str, Any]) -> None:
         self.start_phases(["cast_loose"])
@@ -176,6 +193,9 @@ class SecureGunsScript(_QuartersScript):
         if not at_quarters and all(not g.cast_loose for g in self._guns()):
             return "the guns are secured already and the hands under the watch bill"
         return None
+
+    def phase_s(self, name: str) -> float:
+        return super().phase_s(name) / _crews_present_share(self.ship)
 
     def begin(self, words: dict[str, Any]) -> None:
         self.start_phases(["secure"])

@@ -77,10 +77,15 @@ GRAPE_FACTOR = 3.0
 REFERENCE_POUNDER = 18.0
 # Of the men hurt, the share killed outright (judgement on the bills: one to two or three).
 KILLED_SHARE = 0.3
-# A gun struck: dismounted with this chance at a shot weight equal to half the gun's weight
-# in hundredweight (a 12-pound ball against a 6-cwt carronade dismounts it; an 18 against a
-# 42-cwt gun seldom), else the carriage is wounded by this much condition (judgement).
-DISMOUNT_AT_HALF_WEIGHT = 0.5
+# A gun struck: dismounted with this chance at a shot weight (pounds) equal to the gun's
+# weight in hundredweight (a 12-pound ball against a 6-cwt carronade dismounts it four
+# times in five; a 3-pound ball against the same once in four; an 18 against a 42-cwt
+# long gun once in five: Douglas 1820, part I, on dismounting by heavy shot and seldom by
+# light), else the carriage is wounded by this much condition (judgement). Of the shot that
+# come across the deck, this share strike a carriage at all (judgement: the guns and their
+# carriages take a third of the deck's length at the side).
+DISMOUNT_AT_WEIGHT = 0.5
+DECK_HIT_ON_A_GUN = 0.35
 GUN_WOUND = 30.0
 # A spar struck: carried away with a chance by the shot's weight against the spar's rating
 # (a stout lower mast of hundreds of kN against a topgallant mast of thirty; judgement),
@@ -226,10 +231,10 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
         )
         keeper.minute.append(("boat", f"{boat.name} stove"))
         return seen
-    if guns and rng.random() < 0.6:
+    if guns and rng.random() < DECK_HIT_ON_A_GUN:
         g = min(guns, key=lambda g: abs(g.x_m - x_m))
-        half = max(g.weight_cwt / 2.0, 0.5)
-        p = min(0.85, max(0.03, DISMOUNT_AT_HALF_WEIGHT * gun.pounder / half))
+        weight = max(g.weight_cwt, 0.5)
+        p = min(0.85, max(0.03, DISMOUNT_AT_WEIGHT * gun.pounder / weight))
         if rng.random() < p:
             g.dismounted = True
             g.loaded = None

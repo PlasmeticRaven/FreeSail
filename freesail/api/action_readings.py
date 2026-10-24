@@ -151,13 +151,19 @@ def _damage(world: Any, _: str | None) -> dict[str, Any] | None:
 
     keeper = damage_of(ship)
     items: list[str] = []
-    spars = [s for s in ship.spars.values() if s.wrecked]
+    # a point ship (the readings' tests) has no part graph: undamaged
+    spars = [s for s in (getattr(ship, "spars", None) or {}).values() if s.wrecked]
     if spars:
         items.append(f"{_and([_part_name(ship, s.id) for s in spars])} carried away")
-    lines = [ln for ln in ship.lines.values() if getattr(ln.state, "value", ln.state) == "parted"]
+    lines = [
+        ln
+        for ln in (getattr(ship, "lines", None) or {}).values()
+        if getattr(ln.state, "value", ln.state) == "parted"
+    ]
     if lines:
         items.append(f"{number_words(len(lines))} line{'s' if len(lines) != 1 else ''} parted")
-    holed = [s for s in ship.sails.values() if getattr(s, "holed_m2", 0.0) > 0.0]
+    sails = (getattr(ship, "sails", None) or {}).values()
+    holed = [s for s in sails if getattr(s, "holed_m2", 0.0) > 0.0]
     if holed:
         items.append(f"{_and([_part_name(ship, s.id) for s in holed])} holed")
     holes = list(keeper.holes) if keeper is not None else []
@@ -170,9 +176,10 @@ def _damage(world: Any, _: str | None) -> dict[str, Any] | None:
     dismounted = [g for g in getattr(ship, "guns", {}).values() if g.dismounted]
     if dismounted:
         items.append(f"{_and([g.name for g in dismounted])} dismounted")
-    if ship.extra.get("helm_lost"):
+    extra = getattr(ship, "extra", None) or {}
+    if extra.get("helm_lost"):
         items.append("the helm shot away")
-    if ship.extra.get("boats_stove"):
+    if extra.get("boats_stove"):
         items.append("a boat stove")
     words = "; ".join(items) if items else "none"
     return {
@@ -183,7 +190,7 @@ def _damage(world: Any, _: str | None) -> dict[str, Any] | None:
         "sails_holed": [s.id for s in holed],
         "holes": holes,
         "dismounted": [g.id for g in dismounted],
-        "helm_lost": bool(ship.extra.get("helm_lost")),
+        "helm_lost": bool(extra.get("helm_lost")),
         "hits": keeper.hits if keeper is not None else 0,
     }
 
@@ -336,7 +343,7 @@ def _colours(world: Any, _: str | None) -> dict[str, Any] | None:
     ship = getattr(world, "ship", None)
     if ship is None:
         return None
-    struck = bool(ship.extra.get("struck"))
+    struck = bool((getattr(ship, "extra", None) or {}).get("struck"))
     return {"words": "struck" if struck else "flying", "struck": struck}
 
 

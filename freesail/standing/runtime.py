@@ -118,8 +118,8 @@ class Firing:
 GUNNERY_PARTS: dict[str, str] = {
     "engage": "the mark",
     "load": "the charge",
-    "run out": "the ports",
-    "run in": "the ports",
+    "run out the guns": "the ports",
+    "run in the guns": "the ports",
     "aim at": "the aim",
     "fire as they bear": "the firing",
     "fire by divisions": "the firing",
@@ -128,6 +128,8 @@ GUNNERY_PARTS: dict[str, str] = {
     "fire": "the word",
     "fire on the roll": "the roll",
     "strike the colours": "the colours",
+    "guns before sail": "the priority",
+    "sail before guns": "the priority",
 }
 
 

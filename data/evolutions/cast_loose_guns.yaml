@@ -15,7 +15,9 @@ timing:
 on_start: {log: "Cast loose the guns!"}
 on_complete: {log: "The guns are cast loose and provided ({count} of them).", kind: guns.cast_loose, severity: notable}
 on_fail: {log: "Could not cast loose the guns: {reason}.", kind: evolution.failed, severity: notable}
-# crew: the gun crews at their guns; the quarter bill's hands, not the watch's, so the
-# runner takes all hands (they are called already) and the crews do the work
-crew: {hands: all, rating: ordinary, stations: [all hands]}
+# crew: the gun crews at their guns by the quarter bill, not the runner's pool (a
+# frigate's company is minutes coming up the hatchways, and the crews at the guns do not
+# wait on it): the evolution asks one hand, the gunner's mate, and the script takes its
+# time from the share of the crews at their guns (freesail/evolutions/action_scripts.py)
+crew: {hands: 1, rating: ordinary, stations: [afterguard, waisters, forecastle, quarterdeck]}
 source: "Douglas 1820, part II, the words of command ('Cast loose your guns'; 'Take out your tompions'); Luce 1884, ch. XX 'General Quarters'"

@@ -266,6 +266,11 @@ def file_descriptions(ship_file: str) -> dict[str, dict[str, str]]:
     return {str(k): {kk: str(vv) for kk, vv in (v or {}).items()} for k, v in found.items()}
 
 
+# The player's ship files that no far description sails, by the description their words
+# are taken from for her shadow in another ship's lookout (package 70).
+SHADOW_FILES: dict[str, str] = {"merchant-brig.yaml": "merchant brig"}
+
+
 def description(key: str) -> dict[str, str]:
     """A description by its key: the index's entry with the ship file's own words for
     her rig and what she is where the file gives them."""
@@ -1324,6 +1329,11 @@ class Vessels:
                         break
             if key in ("merchant brig", "brig-sloop"):
                 key = "brig-sloop" if _is_kings_ship(world) else "merchant brig"
+            if not key:
+                # a player's file no far description sails (the merchant brig's own, package
+                # 70): her words by the file's name, so that another ship's lookout does not
+                # read a trader as 'a ship' of the line's class
+                key = SHADOW_FILES.get(source.replace("\\", "/").split("/")[-1], "")
             d = description(key) if key else {"file": source, "rig": "a ship", "what": "a ship"}
             ports = getattr(world, "ports", None)
             nation_id = str(getattr(ports, "ship_nation", "") or "britain")

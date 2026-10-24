@@ -67,18 +67,19 @@ class Aim(StrEnum):
 
 # The phases of the exercise and their nominal seconds with a full and fresh crew (Douglas
 # 1820, part II, the words of command; the seconds judgement, set so that a long 18-pounder
-# fires every minute and a half or so and a carronade every minute, which is what the logs
-# of 1805 report of a drilled ship at the start of an action; a 3-pounder and a swivel are
-# light work).
+# fires every minute and three quarters or so with the frigate's crews and the weather's
+# factor on them (truth 7-135: 85 s nominal measured 105 s at seed 7) and a carronade
+# every minute, which is what the logs of 1805 report of a drilled ship at the start of
+# an action; a 3-pounder and a swivel are light work).
 PHASES: dict[str, tuple[tuple[str, float], ...]] = {
     "long": (
-        ("sponge", 15.0),
-        ("cartridge", 10.0),
-        ("shot", 15.0),
-        ("ram", 10.0),
-        ("run out", 20.0),
-        ("prime", 10.0),
-        ("point", 15.0),
+        ("sponge", 13.0),
+        ("cartridge", 9.0),
+        ("shot", 13.0),
+        ("ram", 9.0),
+        ("run out", 18.0),
+        ("prime", 9.0),
+        ("point", 14.0),
     ),
     "carronade": (
         ("sponge", 10.0),
@@ -96,6 +97,8 @@ PHASES: dict[str, tuple[tuple[str, float], ...]] = {
 # (judgement: a 3-pounder of 7 cwt is handled by three men in two thirds of the time).
 LIGHT_GUN_SHARE_FLOOR = 0.65
 REFERENCE_CWT = 42.0
+# The short crew's power (see `Battery._factor`): judgement, pinned by truth 7-135.
+NUMBERS_POWER = 2.0
 
 # The arc a gun bears through: a broadside gun thirty-five degrees either side of abeam,
 # trained with handspikes and the quoin (Douglas; the period's ports allowed about that,
@@ -292,7 +295,11 @@ class Battery:
         (`LIGHT_GUN_SHARE_FLOOR`)."""
         if not hands:
             return 1.0e9
-        numbers = max(1.0, wanted / max(got, 0.5))
+        # a short crew slows the gun more than in proportion: the heavy work (running out,
+        # the handspikes at the point) wants its full numbers (Douglas 1820, part II, on the
+        # exercise with reduced crews; the square judgement: a crew of three quarters serves
+        # the gun in a minute and three quarters' place three minutes, truth 7-135)
+        numbers = max(1.0, wanted / max(got, 0.5)) ** NUMBERS_POWER
         reference = H.rating_skill(H.DEFAULT_RATING, False)
         ratios = [reference / max(H.rating_skill(s.rating, False), H.SKILL_FLOOR) for s in hands]
         skill = sum(ratios) / len(ratios)

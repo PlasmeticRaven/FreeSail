@@ -220,6 +220,7 @@ transitions:
   - {from: chasing, on: chase stale, to: on passage}
   - {from: investigating a stranger, on: chase stale, to: on passage}
   # package 70 (spec M7 §10): into the action and out of it
+  - {from: keeping station, on: overmatched, to: evading}
   - {from: on passage, on: man of war near, to: evading}
   - {from: beating, on: man of war near, to: evading}
   - {from: keeping station, on: man of war near, to: evading}

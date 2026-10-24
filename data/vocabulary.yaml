@@ -1382,12 +1382,13 @@ verbs:
     synonyms: [load the guns with, load the guns, load with, load the carronades with, double shot the guns, load double]
     object: gunnery
     level: 1
-  run out:
-    synonyms: [run out the guns, run the guns out, out guns, run out the carronades]
+  run out the guns:
+    # the bare 'run out' and 'run in' are the running bowsprit's (rig out, reef)
+    synonyms: [run the guns out, out guns, run out the carronades, run out your guns, run out the battery]
     object: gunnery
     level: 1
-  run in:
-    synonyms: [run in the guns, run the guns in, in guns, run in the carronades]
+  run in the guns:
+    synonyms: [run the guns in, in guns, run in the carronades, run in your guns, house the battery]
     object: gunnery
     level: 1
   aim at:
@@ -1420,6 +1421,14 @@ verbs:
     level: 1
   strike the colours:
     synonyms: [strike our colours, haul down the colours, haul down our colours, strike the ensign, haul down the ensign, strike to her, surrender, we strike]
+    object: gunnery
+    level: 1
+  guns before sail:
+    synonyms: [the guns before the sails, the guns first, guns first, serve the guns before the sails]
+    object: gunnery
+    level: 1
+  sail before guns:
+    synonyms: [the sails before the guns, the sails first, sails first, work the ship before the guns]
     object: gunnery
     level: 1
   # Console and client control. If one of these reaches the ship, the

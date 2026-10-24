@@ -55,8 +55,8 @@ Result = tuple[str, str, dict[str, Any]]
 GUNNERY_VERBS: tuple[str, ...] = (
     "engage",
     "load",
-    "run out",
-    "run in",
+    "run out the guns",
+    "run in the guns",
     "aim at",
     "fire as they bear",
     "fire by divisions",
@@ -65,6 +65,8 @@ GUNNERY_VERBS: tuple[str, ...] = (
     "fire",
     "cease firing",
     "strike the colours",
+    "guns before sail",
+    "sail before guns",
 )
 
 _SIDES = {
@@ -176,9 +178,9 @@ def execute(ship: Any, order: Order) -> Result:
         return _engage(ship, battery, said)
     if verb == "load":
         return _load(ship, battery, said)
-    if verb == "run out":
+    if verb == "run out the guns":
         return _run_out(ship, battery, True)
-    if verb == "run in":
+    if verb == "run in the guns":
         return _run_out(ship, battery, False)
     if verb == "aim at":
         return _aim(ship, battery, said)
@@ -192,6 +194,8 @@ def execute(ship: Any, order: Order) -> Result:
         return _roll(ship, battery, order.verb_phrase)
     if verb == "fire":
         return _fire(ship, battery, said)
+    if verb in ("guns before sail", "sail before guns"):
+        return _priority(ship, quarters, verb)
     raise OrderError(f"'{verb}' is in the vocabulary but has no meaning at the guns yet.")
 
 
@@ -370,7 +374,7 @@ def _run_out(ship: Any, battery: Battery, out: bool) -> Result:
         return (
             "guns.run_out",
             f"The guns are {state} already.",
-            {"verb": "run out" if out else "run in", "level": 1},
+            {"verb": "run out the guns" if out else "run in the guns", "level": 1},
         )
     battery.run_out_wanted = out
     if out:
@@ -383,7 +387,8 @@ def _run_out(ship: Any, battery: Battery, out: bool) -> Result:
         for g in ship.guns.values():
             if g.kind != "swivel":
                 g.run_out = False
-    return "guns.run_out", text, {"verb": "run out" if out else "run in", "level": 1}
+    verb = "run out the guns" if out else "run in the guns"
+    return "guns.run_out", text, {"verb": verb, "level": 1}
 
 
 def _aim_of(said: str) -> Aim:
@@ -621,6 +626,29 @@ def _a_gun_for_a_signal(ship: Any, battery: Battery, lee: bool, windward: bool) 
     pool = on_side or guns
     loaded = [g for g in pool if battery.ready(g)]
     return (loaded or pool)[0]
+
+
+def _priority(ship: Any, quarters: Any, verb: str) -> Result:
+    """The fighting book's priority (spec M7 §8a): under `sail before guns` sail work short
+    of hands takes them from the guns by the bill; under `guns before sail` nothing is lent
+    and the sail work waits or goes short with the trimmers alone."""
+    if quarters.priority == verb:
+        return (
+            "guns.priority",
+            f"The bill stands at {verb} already.",
+            {"verb": verb, "level": 1, "priority": verb},
+        )
+    quarters.priority = verb
+    words = (
+        "the sail work takes its hands from the guns as it needs them, and the guns go short"
+        if verb == "sail before guns"
+        else "the guns keep their crews, and sail work has the trimmers alone"
+    )
+    return (
+        "guns.priority",
+        f"{verb.capitalize()}: {words}.",
+        {"verb": verb, "level": 1, "priority": verb},
+    )
 
 
 def _cease(ship: Any, battery: Battery) -> Result:

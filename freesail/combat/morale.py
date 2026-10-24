@@ -19,7 +19,8 @@ she fights to a wreck, which is the period's record; a merchantman's high enough
 privateer's first broadside into her brings her colours down, which is also the record.
 
 **Striking by rule**: when the figure falls under the doctrine's line while she is under
-fire (struck within `UNDER_FIRE_S`), the colours are struck, said in the log with the
+fire (fired on within `UNDER_FIRE_S`) and a shot has told (a company does not haul down to
+shot that missed, whatever the odds), the colours are struck, said in the log with the
 reasons in figures; the battery holds, the state `struck` is written for the captain's
 machine (he lies to) and the colours as a state the lookout reads (71's hook). The
 player's own `strike the colours` is never refused: the same state, its consequence told.

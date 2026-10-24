@@ -322,7 +322,9 @@ def _judge_morale(world: Any, ship: Any, battery: Battery, tick: int) -> None:
     enemy_lb = _enemy_weight(world, keeper, tick)
     complement = int(getattr(getattr(ship.spec, "crew", None), "complement", 0) or 0)
     m.judge(ship, complement, enemy_lb, under_fire=bool(recent))
-    if recent and m.value < m.strike_below:
+    # the colours come down under fire that has told: a company does not haul down to shot
+    # that missed, whatever the odds (judgement; the merchant brig's truth, 7-137)
+    if recent and keeper.hits > 0 and m.value < m.strike_below:
         strike(world, by_rule=True)
 
 

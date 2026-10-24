@@ -1682,6 +1682,8 @@ class Judgement:
             and s.get("estimate_m") is not None
             and float(s["estimate_m"]) / units.NAUTICAL_MILE <= within_nm
             and int(s.get("size") or 0) > int(p.own_size or 0)
+            # package 70: a merchantman of a bigger hull is a prize, not a superior force
+            and "merchant" not in str(s.get("known") or "").lower()
         ]
         if not enemies:
             return None
