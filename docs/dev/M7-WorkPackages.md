@@ -36,7 +36,7 @@ on these packages; that is the owner's choice.
 | 70 | Fable | The combat core: the quarter bill and work in action, guns as parts, the gunnery's cycle, the hit model with heel, roll and the sea, damage as state, morale and the strike, the fighting book; the first armament and truths; the figures' sources (spec §7 to §10, §8a) | **merged 2026-10-24** (`80f64f7`); the record below |
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | approved and launched 2026-10-24 (Fable, in a worktree off the head of that day) |
-| 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | after 70 |
+| 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | briefed 2026-10-24 (below), for the owner's approval; runs after 72 |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | after 70 and 73 |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | behind 70 |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
@@ -593,3 +593,137 @@ sight across land (78); the full signal books (76). **The head rules bind** as 7
 world order never shown as sent; the pins re-measured only where a change moves them, old
 beside new, proven by bisection; never a test skipped, disabled or quarantined; realism,
 not pacing; the physics read and not changed; the ship files through the generator.
+
+## Package 73: water, damage control, health and the fight on deck (`freesail/world/hull.py` or `ground.py` the water in the ship, `physics/hull.py` read for the free surface; `freesail/evolutions/` and `data/evolutions/` the pumps, the plugs, the fothering, the jury work, the small arms and the boarding's fight; `freesail/ship/schema.py`, `parts.py` the pumps, the spares and the stores, `tools/gen_ships.py` and `data/ships/*.yaml`; `freesail/crew/model.py`, `muster.py`, `quarters.py`, `hands.py` the muster's states, the surgeon's and the carpenter's posts, the marines' division and kit; `freesail/world/needs.py` the needs' ends; `freesail/combat/hits.py`, `action.py` the shot hole's water, the musketry and the grape on the men, the fight on deck; `freesail/world/captains.py`, `data/captains/*.yaml` the doctrine of boarding and of the pumps; `freesail/orders/`, `data/vocabulary.yaml` the orders and the pumps' refusal retired; `freesail/api/readings.py` the well, the damage report, the sick list, the butcher's bill; `freesail/agents/harness.py`, `director.py`, `data/director/` a station holder hurt and the director's causes; `data/scenarios/`; `docs/TechnicalSpec-M7.md` §11, §13 to §17 as built; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths from the number after 72's)
+
+Fable; the fourth package of the milestone, run alone after 72 by the owner's rule. Spec M7
+§11 (the marines, the small arms and the fight on deck), Part 7-iii (§13 to §15) and Part
+7-iv (§16, §16a, §17) whole, with rule 1 (damage is just state), rule 2 (served by the bill),
+rule 6 (realism, not pacing) and rule 7; the owner's notes 3 (the marines, their kit by
+nation and period, firing from the deck and the tops, their duties) and 7 (a station holder
+hurt at parity); 70's as-merged record and tuning notes (what 70 left you: the shot hole
+written as state with its place against the waterline and no water flowing, men killed and
+wounded off the bill with no surgeon, `boarders away` refused in words, the marines in the
+quarter bill with no fire); the owner's first action (`docs/playtests/2026-10-24-owner-
+first-action/notes.md`: the repairs he tried and what was refused, the damage report that
+should name the parted lines, `reeve new lines`, the standing rigging that cannot be set up,
+`the surgeon`); the hotfix's stopgaps of M7b (`aboard: the leak stopped`, `the well pumped
+out`, the Horta grounding) and 68's pumps refusal, retired here. **Generously scoped as 70,
+71 and 72 were:** the brief binds the intent and names the ground, the builder designs,
+takes an item another way with its reason, grows a part where the work shows it should,
+and says what it left and why; no day count. **The water in the ship and the muster's
+states are designed first and written down before they are built** (a design note under
+`docs/design/`), because 74's strike and 77's catalogue build on them. Each item an intent
+with the lead's reading; the intent binds.
+
+1. **Water in the ship (§13).** Leaks from shot holes (70's state, now flowing by the
+   hole's size, its place against the waterline and the heel), from the ground (the Horta
+   grounding's stopgap replaced), from working seams in a seaway, from heavy seas shipped
+   and rain with the hatches open; the water in the well a quantity the carpenter sounds
+   (the hotfix's reading kept) and a stability penalty as the free surface grows (the
+   physics read, not changed); **the pumps** an evolution with hands and a rate by the pump
+   and the men (`man the pumps`, `spell the pumps`, the chain pump and the hand pumps by
+   the ship's file through the generator with sources), gaining on the leak or losing;
+   **foundering** when the water wins (the hands to the boats, the ship lost, the
+   scenario's end or the director's continuation); `batten down the hatches` and the hands
+   kept below in a gale. 68's refusal line for the pumps retired; the director's `aboard:
+   the well pumped out` and `the leak stopped` kept as his causes with a doubt.
+2. **Damage control and jury work (§14).** Plugging a shot hole (the carpenter and his
+   crew, shot plugs and oakum, the time by the hole's place), fothering a sail over a leak,
+   fishing a sprung spar (in the kit since M3b, taken up), preventer braces and backstays
+   and chain slings before an action, cutting away a mast over the side, a jury mast from
+   the spare spars, **knotting and splicing the running rigging and setting up the standing
+   rigging shot away** (the owner's `reeve new lines` as an evolution that roves every
+   parted running line in turn, the shrouds and backstays set up again with deadeyes and
+   lanyards in the time the bill says); each an evolution competing for hands with the
+   guns and the sails by the fighting book's priority, which is where the fight's
+   decisions live; **the spares as the boatswain's and the carpenter's stores, counted**,
+   through the generator with sources (the cutter with no spare topgallant mast stays so);
+   **the damage report naming every parted line, sprung spar, holed sail, dismounted gun
+   and shot hole**, so that a player finds what to mend. The first of each; 77 fills the
+   catalogue out.
+3. **The muster's states, the surgeon and the needs' ends (§16).** Beyond fresh and tired:
+   hurt (fit for light duty), wounded (below, the surgeon's), sick (the sick list, by the
+   needs' ends and the ship's condition: foul water, short allowance, cold and wet), dead
+   (struck from the muster, buried at sea with a line of the log); the surgeon and his
+   mates as posts with a place (the cockpit at quarters, the sick berth), their work an
+   evolution on each man by his hurt, the lightly hurt back on the bill in days and the
+   badly not; **the needs of M7b meet their ends** (hunger and thirst to sickness and
+   death, fatigue to collapse) as M7b's §20 left them; the butcher's bill in the log after
+   an action, the sick list in the morning report; `the surgeon`, `the sick list`, `the
+   wounded` as readings and `where is the surgeon` answered. Disease as a thing of its own
+   is M8's, the hooks left.
+4. **A station holder hurt, at parity (§16a; the owner's note 7).** A person at a station
+   is hit as the men at his part are (the quarterdeck the most exposed place); his hurt
+   comes to the station as an urgent line of his own; what he may do is the same for a
+   model and a human: keep the deck (his words carry, his orders go, every sample saying
+   his state), give the deck and go below to the surgeon (the officer or the next in the
+   bill taking it as the handover has it), or carry on hurt until he collapses by the
+   needs' rule; a holder killed ends his person's station as a death does (the harness
+   tells the model in words, writes it in the journal and stands the station down with the
+   reason; no model moved to another person by the game; the player at the prompt likewise
+   loses his person and the scenario continues by 74's roads or ends; the deck passes by
+   the bill). 67's seats and 58a's deltas as they stand; the fairness is the rules'.
+5. **The marines and the small arms (§11; the owner's note 3).** The marines a division of
+   the muster with their own officer and sergeant, **their kit by nation and period as
+   data** (the musket and bayonet, the sergeant's halberd or pike, the officer's sword; the
+   French with more soldiers and sharpshooters in the tops; the weapon's kind at least, not
+   intensely detailed; in `data/nations.yaml` beside 71's habits or a file of their own,
+   the ship files naming the detachment through the generator), their duties in the day
+   (the sentries at the cabin door, the spirit room and the gangway; the guard; the drill)
+   and at quarters by 70's bill (the poop and the gangways, the tops as marksmen by the
+   captain's book, the boarders' backbone, the guard on the prisoners); within musket shot
+   they **fire at the men on a near deck** by volley or at will, the hits on the men at
+   the parts exposed (the quarterdeck's officers and helmsmen first), and are fired at in
+   turn; the ship's company's small arms (cutlasses, pikes, pistols, tomahawks) served out
+   to the boarders by the bill; the orders in the dialect (`marines to the tops`, `marines,
+   fire by volley`, `serve out the small arms`).
+6. **The fight on deck (§11).** A boarding won or repulsed, a deck contested, resolved in a
+   few steps with cover, numbers, arms and temper on each side, the marines' volleys and
+   the guns' grape counted into it, the losses written to the muster; `boarders away`
+   (refused by 70) and `repel boarders` as the orders; the ships brought together (the
+   helm, the grapnels, the yards locked) as §11a's evolution so that the fight has a
+   ground, **the capture that follows a deck won left to 74** (the state `struck` by the
+   boarders' hand, as a strike by morale, is this package's; the prize crew and the
+   prisoners are 74's); 70's morale read and written by the fight.
+7. **The doctrine of it, in data.** The rules captain's boarding (when he boards and when
+   he repels, by the odds and his role), his pumps (when he mans and spells them, when he
+   lightens the ship, when he gives her up), his damage control's priority (the leak
+   before the rigging, the rigging before the guns, by his state); the captain's books
+   written again at the transitions as 58b's rule has it.
+8. **The stations, the director and the readings.** `the well`, `the damage report`, `the
+   pumps`, `the sick list`, `the butcher's bill`, `the marines` as readings; the events and
+   tripwires (`the well rising`, `the pumps gaining`, `a man killed`, `boarders`); the
+   director's forms after `WORLD_ORDER_FORMS` (a leak found, a man taken ill, the marines'
+   officer down) with their doubts; the harness's samples at a hurt holder's station; the
+   truth showing every ship's water and her muster.
+9. **Truths and records.** §15's and §17's truths (a shot hole below the waterline fills
+   the well at the rate the hole and the heel give and the pumps hold it with so many hands
+   and not with fewer; the carpenter plugs it in the time the bill says; a ship that
+   founders does so with the log saying when the pumps lost; the Horta grounding replayed
+   with the pumps and the carpenter instead of the stopgap gives the same tide and a repair
+   that takes hands and hours; a broadside's casualties are men of the muster, named where
+   named, and the gun's crew short by them works the gun slower; the surgeon returns the
+   lightly hurt in days and not the badly; a hand dead of thirst with the water foul and no
+   port, the log explaining it from the needs' lines; a marine's volley at pistol shot
+   fells men on the quarterdeck; a boarding against the odds repulsed and one with the odds
+   carried, the losses in both musters; a holder hit at the captain's station told so and
+   keeping the deck or going below at parity, by the test's two roads), numbered from the
+   first after 72's; the first action replayed with the marines and the surgeon in it and
+   what changes said; a scenario of a leak and the pumps; spec §11, §13 to §17 "as built";
+   the Harness (a holder hurt); a chapter of the primer (the well, the pumps, the carpenter,
+   the surgeon, the marines); the director's library; the tuning notes (the design or its
+   pointer, each item, the figures and sources, what moved and its proof, the pins old
+   beside new, found on the way, decisions, the suite as run); the fast tier, the slow tier
+   of the touched files, the whole slow tier when the machine is quiet, the pace tests
+   alone and last.
+
+**Not built here:** the prize, the prisoners and the captive (74); the far fight (74); the
+damage-control catalogue filled out and the boarders' drill (77); disease as its own system
+(M8); the cold (§26, deferred). **The head rules bind** as the briefs before have them: no
+model identifier; nothing under `docs/agents/consent/` touched; a world order never shown as
+sent; the ship files through the generator with sources; the pins re-measured only where a
+change moves them, old beside new, proven by bisection (the Horta grounding's replay and
+the gale trials may move by the water's rule: say which and why); never a test skipped,
+disabled or quarantined; realism, not pacing (a man's wound and a ship's leak take the time
+they took); the physics read and not changed.
