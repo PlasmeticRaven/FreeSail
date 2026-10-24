@@ -667,9 +667,10 @@ class Locker:
         return down
 
     def tidy(self, tick: int, flies_s: int) -> None:
-        """A numerary signal left flying a glass comes down of itself; a telegraphic
-        word's hoist and an answer after their minute; a private signal after five; a
-        hoist bent on and never run up (the hands never had) after a glass."""
+        """A numerary signal left flying a glass comes down of itself; an answer after
+        five minutes; a telegraphic sentence two minutes after its last hoist is up (its
+        words were hauled down one by one as they were made); a private signal after ten;
+        a hoist bent on and never run up (the hands never had) after a glass."""
         for h in self.flying:
             if h.down is not None:
                 continue
@@ -678,13 +679,14 @@ class Locker:
                     h.down = tick
                 continue
             life = flies_s
+            since = h.breaks_out
             if h.book in ("answer", "reply"):
                 life = 300
             elif h.book == "telegraphic":
-                life = 120
+                life, since = 120, h.done_at  # NOT_YET while the hoists are going up
             elif h.book == "private":
                 life = 600
-            if tick - h.breaks_out >= life:
+            if since < NOT_YET and tick - since >= life:
                 h.down = tick
         self.flying = [h for h in self.flying if h.down is None]
 

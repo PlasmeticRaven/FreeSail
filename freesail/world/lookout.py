@@ -300,6 +300,11 @@ _RIG_WORDS = {
     "frigate": "frigate",
     "schooner": "schooner",
     "merchantman": "merchant",
+    # package 71: 'the cutter' was a sail word (35's pilot cutter, the one sail in sight)
+    # and named the nearest sail of any rig; with two in sight it is her rig
+    "cutter": "cutter",
+    "lugger": "lugger",
+    "sloop": "sloop",
 }
 
 
@@ -1301,7 +1306,11 @@ class Lookout:
                     if rig in _key(s.feature.name)
                     or rig in _key(self._sail_known.get(s.feature.id, ""))
                 ]
-                return min(named, key=lambda s: s.distance_m) if named else None
+                if named:
+                    return min(named, key=lambda s: s.distance_m)
+                if key not in _SAIL_WORDS and f"the {key}" not in _SAIL_WORDS:
+                    return None
+                # 'the cutter' with no cutter made out: the nearest sail, as at 35
             return min(sails, key=lambda s: s.distance_m) if sails else None
         for s in self.sightings:
             f = s.feature

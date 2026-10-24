@@ -225,10 +225,11 @@ class SecureGunsScript(_QuartersScript):
 class MakeSignalScript(PhasedScript):
     """Make a signal (spec M7 §3; package 71): the flags bent on and run up, a phase a
     hoist of `hoist_s` (a telegraphic sentence a phase a word), the hoist breaking out on
-    the ship's body at the end of its first minute and complete at the end of its last
-    (`signals.Hoist.breaks_out`, `complete_at`, set when the work begins and not when it
-    was ordered, so a hoist queued behind other work waits its hands). Fails with the
-    hoist hauled down when the hands cannot be had."""
+    the ship's body when the hands have the first hoist up and complete when they have the
+    last (`signals.Hoist.breaks_out`, `complete_at`, set at the phases' ends and not when
+    it was ordered, so a hoist queued behind other work waits its hands, and one the watch
+    is slow at is seen when it is up and not by the book's minute). Fails with the hoist
+    hauled down when the hands cannot be had."""
 
     DEFAULTS = {"hoist": 60.0}
 
@@ -259,19 +260,20 @@ class MakeSignalScript(PhasedScript):
 
     def begin(self, words: dict[str, Any]) -> None:
         n = max(1, int(self.params.get("hoists") or 1))
-        h = self._hoist()
-        tick = self._tick()
-        hoist_s = int(self.phase_s("hoist"))
-        if h is not None:
-            h.breaks_out = tick + hoist_s
-            h.complete_at = tick + hoist_s * n if n > 1 else None
         self.start_phases([f"hoist_{i + 1}" for i in range(n)])
 
     def end_phase(self, name: str) -> None:
         h = self._hoist()
-        if h is None or h.book != "telegraphic":
+        if h is None:
             return
         i = int(name.rsplit("_", 1)[-1]) - 1
+        tick = self._tick()
+        if i == 0:
+            h.breaks_out = tick  # the first hoist up: seen from here
+        if i == len(self.plan) - 1 and h.complete_at is not None:
+            h.complete_at = tick  # the last: read from here
+        if h.book != "telegraphic":
+            return
         if 0 <= i < len(h.words_made):
             self.note(
                 f"The telegraph: hoist {i + 1} of {len(h.words_made)}, '{h.words_made[i]}' "

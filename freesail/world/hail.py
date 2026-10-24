@@ -409,9 +409,10 @@ def answer_by_table(world: Any, vessel: Any, said: str, other_world: Any = None)
         if not template:
             continue
         try:
-            out.append(template.format(**fills))
+            words = template.format(**fills)
         except (KeyError, IndexError):
-            out.append(template)
+            words = template
+        out.append(words[:1].upper() + words[1:])  # each answer a sentence of its own
     return " ".join(out) if out else fills.get("name", "a ship")
 
 
@@ -476,13 +477,9 @@ def _voyage_words(
         r"(?:cruis\w+|patrol\w+|fish\w+|keep the station)\s+off\s+(.+?)(?:\s+within.*)?$", low
     )
     if m:
-        return (
-            f"from {home}, cruising off {_cap(m.group(1))}"
-            if not lying
-            else f"from {home} for Falmouth",
-            f"For {home}",
-            home,
-        )
+        if lying:  # a cruiser's errand is no merchantman's: a passage between two ports
+            return f"from {home} for Falmouth", "For Falmouth", home
+        return f"from {home}, cruising off {_cap(m.group(1))}", f"For {home}", home
     return f"from {home}", f"For {home}", home
 
 

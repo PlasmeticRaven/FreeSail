@@ -8450,15 +8450,15 @@ def test_truth_7_143_a_cutter_under_false_colours_is_made_out_as_british_and_lie
     says otherwise; beyond four cables the hail is refused with the distance."""
     from freesail.world import hail as H
 
-    w, v = _frigate_and_a_cutter_under_false_colours(cables=25.0)
+    w, v = _frigate_and_a_cutter_under_false_colours(cables=18.0)
     w.run(120)
     item = next(i for i in w.readings.value("strangers")["items"] if i["id"] == v.id)
-    assert item["made_out"] >= 2 and item["nation"] == "britain"  # 2.5 miles: by the glass
+    assert item["made_out"] >= 2 and item["nation"] == "britain"  # 1.8 miles: the colours' range
     assert "British colours, the red ensign" in item["known"]
     said = w.submit("hail her")
     assert said.kind == "order.rejected" and "beyond hail" in said.text
-    w2, v2 = _frigate_and_a_cutter_under_false_colours(cables=3.0)
-    w2.run(120)
+    w2, v2 = _frigate_and_a_cutter_under_false_colours(cables=2.0)
+    w2.run(60)  # she draws off a cable a minute: three cables when spoken
     said = w2.submit("hail her")
     assert said.kind == "hail.answered", said.text
     answer = said.data["answer"]
@@ -8468,18 +8468,22 @@ def test_truth_7_143_a_cutter_under_false_colours_is_made_out_as_british_and_lie
     assert v2.spoken and any(e.kind == "hail.answered" for e in w2.log)
     # the standard questions, each answered in the period's form
     said = w2.submit("say to the cutter: whence come you, and whither bound? what cargo?")
-    assert said.kind == "hail.answered" and " for " in said.data["answer"]
+    assert said.kind == "hail.answered" and "For Falmouth." in said.data["answer"]
 
 
 def test_truth_7_144_the_private_signal_answered_wrong_makes_her_a_stranger_and_he_chases():
     """Spec M7 §6's second truth: the encounter (data/scenarios/encounter.yaml) played by the
     rules captains with no model seated. At seed 7 the frigate's captain, on his station,
     closes the cutter under British colours and makes her the private signal at 10:05
-    (the hoist queued behind a wear, up at 10:12); the privateer bluffs a guessed reply,
-    read wrong at 10:15 ("a stranger under false colours, an enemy"), and he gives chase by
-    his doctrine at 10:16; the merchant brig challenged later makes no answer and is left
-    'a merchantman, who has none; a stranger to be spoken'. The bands are a quarter of an
-    hour wide: the timing is the seed's."""
+    (the hoist queued behind a wear, up at 10:11); the privateer bluffs a guessed reply,
+    read wrong at 10:16 ("a stranger under false colours, an enemy"), and he gives chase by
+    his doctrine at 10:17, going about for her (the chase names his stranger and tacks
+    for a chase on the other side of the wind's eye, both mended in the package: before,
+    the bare order chased the merchant brig and held the tack that opened the cutter); a
+    merchant brig challenged alone makes no answer and is left 'a merchantman, who has
+    none; a stranger to be spoken'. The bands are a quarter of an hour wide: the timing
+    is the seed's (up 10:12, wrong 10:15, chase 10:16 while the hoist flew from the
+    book's minute and not from the hands' finishing, mended in the package)."""
     from freesail.world.scenarios import begin, load_scenario, make_scenario_world
 
     sf = load_scenario(ENCOUNTER)
@@ -8510,12 +8514,37 @@ def test_truth_7_144_the_private_signal_answered_wrong_makes_her_a_stranger_and_
     # the privateer's own log: her bluff
     assert renard.crew is not None
     assert any("a guess" in e.text for e in renard.crew.log)
-    # the brig, challenged too, is a merchantman who has none: a stranger to be spoken
-    for _ in range(30):
-        w.run(60)
-    brig = [
-        e for e in w.log if e.kind == "signal.private_judged" and e.data["id"] == "two-brothers"
-    ]
+    # the chase goes after HIS stranger, about for her: south-west, not after the brig
+    chased = [e for e in w.log if e.kind == "helm.set" and e.text.startswith("Gave chase")]
+    assert chased and "Gave chase to a cutter" in chased[0].text, chased[0].text
+    assert "on the other tack" in chased[0].text
+    # a merchant brig challenged alone (the frigate off the Lizard, the brig a mile and a
+    # half off) makes no answer in the table's five minutes: a merchantman who has none, a
+    # stranger to be spoken, no enemy
+    from tests.test_brains import put, world_at
+
+    w2 = world_at(49.5, -5.5, intent="keep the station off the Lizard within 10 miles")
+    w2.run(60)  # his captain has the deck: the challenge is his, not the player's
+    from freesail.world.geo import destination
+
+    off = destination(w2.position, 180.0, 1.5 * units.NAUTICAL_MILE)
+    brig_v = put(
+        w2,
+        "merchant brig",
+        "britain",
+        {"lat_deg": off.lat_deg, "lon_deg": off.lon_deg},
+        "bound for Falmouth",
+        intent="bound for Falmouth",
+        name="Two Brothers",
+    )
+    brig: list = []
+    for _ in range(40):
+        w2.run(60)
+        brig = [
+            e for e in w2.log if e.kind == "signal.private_judged" and e.data["id"] == brig_v.id
+        ]
+        if brig:
+            break
     assert brig and brig[0].data["verdict"] == "none" and brig[0].data["enemy"] is None
     assert "a merchantman, who has none" in brig[0].text
 
@@ -8526,8 +8555,10 @@ def test_truth_7_145_a_convoy_of_four_under_a_commodore_tacks_in_succession_on_o
     player's one hoist of the convoy book's No. 5 is read a minute after it is up by each
     master, answered with the pendant, and performed in succession: the leader at the
     reading and each of the rest three minutes after the one ahead of her, in the order of
-    their making. At seed 7 the hoist is up at 798 and the four are about at 840, 1020,
-    1200 and 1380."""
+    their making. At seed 7 the hoist is up at 798 (the hands slow at it: ordered at 600
+    behind a wear), seen at 840, read at 900, and the four are about at 900, 1080, 1260
+    and 1440 (840, 1020, 1200, 1380 while the hoist flew from the book's minute and not
+    from the hands' finishing, mended in the package)."""
     from freesail.world.scenarios import begin, load_scenario, make_scenario_world
 
     sf = load_scenario(CONVOY)
@@ -8558,7 +8589,7 @@ def test_truth_7_145_a_convoy_of_four_under_a_commodore_tacks_in_succession_on_o
     assert up + 60 <= ticks[0] <= up + 120
     answered = [e for e in w.log if e.kind == "signal.answered"]
     assert len(answered) == 4
-    assert 780 <= up <= 840 and ticks == [840, 1020, 1200, 1380], (up, ticks)
+    assert 780 <= up <= 840 and ticks == [900, 1080, 1260, 1440], (up, ticks)
 
 
 def test_truth_7_146_a_telegraphic_sentence_takes_the_hoists_and_the_minutes_the_book_says():
@@ -8576,15 +8607,18 @@ def test_truth_7_146_a_telegraphic_sentence_takes_the_hoists_and_the_minutes_the
     locker = w.ship.extra["signals"]
     h = next(x for x in locker.flying if x.book == "telegraphic")
     assert h.numbers == (253, 269, 863, 261, 471, 958, 220, 370, 4, 21, 19, 24)
-    w.run(30)  # the hands at the halyards: the first hoist's minute begins when they start
-    assert h.breaks_out < 10**12 and h.complete_at == h.breaks_out + 11 * 60
-    began = h.breaks_out - 60
+    ordered = int(w.clock.tick)
+    assert h.breaks_out >= 10**12 and h.complete_at >= 10**12  # nothing up until the hands
+    w.run(150)  # the hands at the halyards: the first hoist breaks out when they have it up
+    assert ordered + 60 <= h.breaks_out <= ordered + 150, h.breaks_out
+    assert h.complete_at >= 10**12  # the last hoist not yet up: not to be read before it is
     for _ in range(40):
         w.run(60)
         if any(e.kind == "signal.made" and "telegraphic" in e.text for e in w.log):
             break
     up = next(e for e in w.log if e.kind == "signal.made" and "telegraphic" in e.text)
-    minutes = (up.tick - began) / 60.0
+    assert h.complete_at == up.tick  # read a minute after this
+    minutes = (up.tick - ordered) / 60.0
     assert 12.0 <= minutes <= 16.0, minutes  # twelve nominal, stretched by the hands' pace
     hoists = [e for e in w.log if e.kind == "signal.hoist"]
     assert len(hoists) == 12 and "'expects' (269)" in hoists[1].text
@@ -8715,11 +8749,11 @@ def test_truth_7_149_a_shot_under_false_colours_is_a_pirates_act_told_once_and_w
     heading = float(w.ship.heading)
     v, enemy = _a_cutter_crewed(w, math.degrees(heading) + 90.0, 60.0, nation="france")
     enemy.ship.dyn.heading = heading
-    witness = put(
+    witness = put(  # five and a half miles off to the north-west: in sight, a far body
         w,
         "merchant brig",
         "britain",
-        "49 56 N 5 26 W",
+        "49 52 N 5 24 W",
         "bound for Falmouth",
         intent="bound for Falmouth",
         name="Two Brothers",

@@ -140,8 +140,8 @@ and leaves a trader's rig a stranger to be spoken (a merchantman never had the t
 answer under a neutral's colours a stranger still. A privateer whose doctrine bluffs hoists
 a guessed reply. The verdict is `signal.private_judged`, urgent when it makes an enemy, and
 the stranger is recognised so (`captain.recognised`), which the doctrine's `enemy made out`
-reads: the encounter's frigate challenges at 10:05, her flags up at 10:12, reads the
-privateer's guess wrong at 10:15 and gives chase at 10:16 (truth 7-144). A captured table is
+reads: the encounter's frigate challenges at 10:05, her flags up at 10:11, reads the
+privateer's guess wrong at 10:16 and gives chase at 10:17 (truth 7-144). A captured table is
 74's prize's by the same function for the captor.
 
 ### 3. The signal books (`data/signals/*.yaml`; `signals.py`; `freesail/evolutions/` the hoist)

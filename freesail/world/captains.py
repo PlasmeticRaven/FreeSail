@@ -2638,7 +2638,7 @@ class Captain(Judgement):
         elif state == "investigating a stranger":
             self.give("make her out")
         elif state == "chasing":
-            self.give("give chase")
+            self.give(self._chase_order(Perception.read(world)))
         elif state == "keeping station":
             station = self._station_mark()
             if station is not None:
@@ -3675,7 +3675,7 @@ class Captain(Judgement):
                 if self._business.get("steered_for") != "chase" or p.tick - last_tick >= 180:
                     self._business["steered_for"] = "chase"
                     self._business["steered_tick"] = p.tick
-                    self.give("give chase", why="to close her")
+                    self.give(self._chase_order(p), why="to close her")
                 return
         bearing = float(mark.get("bearing_deg") or 0.0)
         # the angle she is kept on, before the beam to close and abaft it to open, a
@@ -3708,6 +3708,26 @@ class Captain(Judgement):
             self._business["steered_tick"] = p.tick
             why = "to keep the enemy on the engaged beam" + (f", {word}" if word else "")
             self.give(f"steer {course:.0f}", why=why)
+
+    def _chase_order(self, p: Perception) -> str:
+        """'chase the cutter': the chase named by HIS stranger's rig when the lookout has
+        it, so the helm goes after the sail he judged and not the order's own choice (the
+        nearest stranger of the lookout's, who counts a sail under our own colours no
+        stranger: the encounter's frigate, package 71, gave chase to the merchant brig two
+        miles off while the privateer under British colours ran); 'give chase' when her
+        rig is not yet made out or the lookout has no word for it."""
+        sid = self._stranger
+        lookout = getattr(self.world, "lookout", None)
+        if sid is None or lookout is None:
+            return "give chase"
+        for s in p.strangers:
+            if str(s.get("id") or "") != str(sid):
+                continue
+            words = str(s.get("known") or "").split(",")[0].split(";")[0].strip()
+            rig = words.removeprefix("a ").removeprefix("an ").strip()
+            if rig and rig != "sail" and lookout.find(f"the {rig}") is not None:
+                return f"chase the {rig}"
+        return "give chase"
 
     def _through_the_eye(self, p: Perception, mark: dict[str, Any], side: str) -> None:
         """The mark passes through the wind's eye (package 71, item 8): by the doctrine's
