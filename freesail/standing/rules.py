@@ -277,7 +277,7 @@ class Clause:
             if lon is None:
                 return False
             return lon > v if op == "east_of" else lon < v
-        if kind == "ground":
+        if kind in ("ground", "state"):
             holds = v in str(value["words"])
             return holds if op == "is" else not holds
         if kind == "person":

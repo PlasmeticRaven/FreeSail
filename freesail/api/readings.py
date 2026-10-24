@@ -3278,7 +3278,7 @@ def describe_value(reading: Reading, value: Any) -> str:
         from freesail.world.chart import fathoms_words
 
         return fathoms_words(value)
-    if kind in ("position", "distance", "person", "well"):
+    if kind in ("position", "distance", "person", "well", "state"):
         return str(value["words"])
     if kind == "ground":
         return str(value.get("said") or value["words"])
@@ -3912,3 +3912,10 @@ def _truth_words(d: dict[str, Any]) -> str:
     if d.get("stations_held"):
         parts.append(f"the stations held (the rule of reach): {d['stations_held']}")
     return ". ".join(parts) + "."
+
+
+# The action's readings and events (package 70), registered from their own module so that
+# this file does not grow by them; imported here last, after every row they stand beside.
+from freesail.api import action_readings as _action_readings  # noqa: E402
+
+_action_readings.register()
