@@ -573,6 +573,7 @@ class World:
                 systems=self.scenario.systems,
                 climatology=climatology,
                 box=box,
+                bound=bool(getattr(self.scenario, "weather_bound", False)),  # package 72
                 background_hpa=self.scenario.background.get("hpa"),
                 gradient=(
                     (
@@ -760,6 +761,11 @@ class World:
             for spec in self.scenario.ships:
                 self.vessels.serial += 1
                 self.vessels.add(vessel_from_spec(self, dict(spec), self.vessels.serial))
+        # the squadrons' registry (package 72; spec M7 §21), before the business, whose
+        # convoys and blockades are sets; the scenario's own sets are read after the readings
+        from freesail.world.squadrons import Squadrons
+
+        self.squadrons = Squadrons(self)
         # the world's business (package 43b; spec M6 §19): the region's trade, fishermen and
         # cruisers drawn under the seed on top of the scenario's own ships, when it says so
         self.business = None
@@ -784,9 +790,8 @@ class World:
         # names (`squadrons:`, or a ship's `squadron:` key), each a commander, the members
         # in their order of sailing, a goal and a formation (`freesail.world.squadrons`);
         # after the readings, which the player's shadow as a commander reads
-        from freesail.world.squadrons import Squadrons, sets_from_scenario
+        from freesail.world.squadrons import sets_from_scenario
 
-        self.squadrons = Squadrons(self)
         sets_from_scenario(self)
         # The agents at their stations (spec M4 §11), by station name, in the order they
         # were stationed: each is a `freesail.agents.harness.Harness`, called after the

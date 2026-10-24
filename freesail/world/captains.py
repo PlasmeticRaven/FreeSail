@@ -447,6 +447,8 @@ class Intent:
     # package 71: a passage made as a convoy's escort (`convoy the trade from A to B`), the
     # commodore's role; the merchantmen under his orders are the scenario's
     convoy: bool = False
+    # package 72: a station that is a blockade of the port named (`blockade Brest`)
+    blockade: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return (
@@ -463,6 +465,7 @@ class Intent:
             }
             | ({"hours": self.hours} if self.hours is not None else {})
             | ({"prizes": True} if self.prizes else {})
+            | ({"blockade": self.blockade} if self.blockade else {})
         )
 
 
@@ -642,6 +645,11 @@ _CONVOY = re.compile(
     r"^(?:convoy|escort)\s+(?:the\s+)?(?:trade|convoy|merchantmen|ships|fleet)?\s*"
     r"(?:from\s+(?P<a>.+?)\s+)?(?:for|to)\s+(?P<b>.+)$"
 )
+# package 72 (spec M7 §22): the blockade's station, off the port's outer road ('blockade
+# Brest', 'blockade Brest within 6 miles'): a station intent whose place is the road's feature
+_BLOCKADE = re.compile(
+    r"^blockade\s+(?:the\s+port\s+of\s+)?(?P<port>.+?)(?:\s+within\s+(?P<radius>[\d.]+)\s+miles?)?$"
+)
 
 
 def read_intent(world: Any, words: str) -> Intent:
@@ -722,6 +730,22 @@ def read_intent(world: Any, words: str) -> Intent:
         a = _place_id(world, group(m, "a")) if m.group("a") else ""
         b, via = to_and_via(group(m, "b"))
         return Intent("passage", said, origin=a, destination=b, via=via, convoy=True)
+    m = _BLOCKADE.match(text)
+    if m:
+        ports = getattr(world, "ports", None)
+        port = ports.find(group(m, "port")) if ports is not None and ports.ports else None
+        if port is None:
+            raise ValueError(f"'{group(m, 'port')}' is no port of the chart to blockade.")
+        feature = str(getattr(port.outer_road, "feature_id", "") or "")
+        chart = getattr(world, "chart", None)
+        if not feature or chart is None or chart.feature(feature) is None:
+            raise ValueError(f"the port of {port.name} has no outer road on the chart to blockade.")
+        from freesail.world.regimes import regime_knob
+
+        radius = float(m.group("radius") or regime_knob("on blockade", "inshore_nm", 6.0))
+        intent = Intent("station", said, destination=feature, radius_nm=radius, between=port.id)
+        intent.blockade = port.id
+        return intent
     m = _PASSAGE.match(text)
     if m:
         a = _place_id(world, group(m, "a")) if m.group("a") else ""

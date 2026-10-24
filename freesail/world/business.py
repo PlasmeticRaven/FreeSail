@@ -49,7 +49,7 @@ import yaml
 
 from freesail import units
 from freesail.world.captains import plain_position
-from freesail.world.geo import Position, bearing_and_distance
+from freesail.world.geo import Position, bearing_and_distance, destination
 from freesail.world.ships import land_crossing
 
 __all__ = ["BUSINESS_PATH", "Business", "business_density", "load_business", "port_means_pounds"]
@@ -141,6 +141,7 @@ class Drawn:
     ended: str = ""
     ended_tick: int | None = None
     landed: str = ""  # a fisherman's catch sold at her home (package 56)
+    squadron: str = ""  # package 72: the set a drawn ship belongs to (a convoy, a blockade)
 
     def to_dict(self) -> dict[str, Any]:
         return {k: v for k, v in self.__dict__.items() if v not in ("", None)}
@@ -162,6 +163,9 @@ class Business:
     # tracks to sea it refuses: not drawn again (the draw's cost is the planning)
     refused: set[tuple[str, str]] = field(default_factory=set)
     _leaves: dict[str, bool] = field(default_factory=dict)
+    # package 72 (the owner's requirement of 2026-10-17): the regions the player's ship has
+    # entered, each peopled once when he enters it; the business follows the centre
+    regions_entered: list[str] = field(default_factory=list)
 
     # -- the stream and the data ---------------------------------------------------------
 
@@ -194,6 +198,14 @@ class Business:
         else:
             self.bounds = tuple(chart.bounds)  # type: ignore[assignment]
         self.last_draw = world.clock.tick
+        if region is not None:
+            self.regions_entered.append(region)
+        self._people_the_region()
+
+    def _people_the_region(self) -> None:
+        """The region's population drawn: the traders in port and at sea, the fishermen, the
+        cruisers of the nations at war, and (package 72, spec M7 §22) the convoys, the
+        blockades and the ships in ordinary the nations' knobs give."""
         for _ in range(self._n("traders_in_port")):
             self._trader(in_port=True)
         for _ in range(self._n("traders_at_sea")):
@@ -201,6 +213,55 @@ class Business:
         for _ in range(self._n("fishermen")):
             self._fisherman(at_start=True)
         self._cruisers()
+        for _ in range(self._n("convoys")):
+            self._convoy()
+        self._blockades()
+        self._in_ordinary()
+
+    # -- the region followed (package 72; the owner, 2026-10-17) -------------------------
+
+    def _follow(self) -> None:
+        """The region in play is wherever the centre is: when the player's ship (the one
+        the game follows) crosses into another region of the chart, the business's region
+        and bounds move with her, and the new region is peopled once."""
+        world = self.world
+        chart = getattr(world, "chart", None)
+        pos = world.position
+        if chart is None or pos is None:
+            return
+        region = chart.region_at(pos)
+        if region is None or region == self.region:
+            return
+        self.region = region
+        self.bounds = tuple(chart.region_bounds[region])  # type: ignore[assignment]
+        self._leaves = {}
+        if region not in self.regions_entered:
+            self.regions_entered.append(region)
+            self._people_the_region()
+
+    def _carried_over(self, v: Any) -> bool:
+        """A ship beyond the region's edge is kept in the world while she is within the
+        carry-over distance of the centre, or a member of a set any of whose members is:
+        a convoy sailing up Channel with the player crosses the edge whole, with its state
+        and its set (package 72)."""
+        world = self.world
+        pos = world.position
+        if pos is None:
+            return False
+        carry = float(self.data.get("carry_over_nm", 30.0)) * units.NAUTICAL_MILE
+        if bearing_and_distance(pos, v.position)[1] <= carry:
+            return True
+        sets = getattr(world, "squadrons", None)
+        sq = sets.of(v.id) if sets is not None else None
+        if sq is None:
+            return False
+        for m in sq.members:
+            body = world.vessels.get(m) if m != "the ship" else None
+            if m == "the ship":
+                return True
+            if body is not None and bearing_and_distance(pos, body.position)[1] <= carry:
+                return True
+        return False
 
     def inside(self, pos: Position, margin_nm: float = 0.0) -> bool:
         s, n, w, e = self.bounds
@@ -226,6 +287,7 @@ class Business:
         the business's ended in the record, and the draw once an hour."""
         world = self.world
         now = world.clock.tick
+        self._follow()
         live = {v.id: v for v in world.vessels.vessels}
         for d in self.drawn:
             if d.ended:
@@ -234,7 +296,11 @@ class Business:
             if v is None or v.done:
                 d.ended, d.ended_tick = "gone in at her port", now
                 continue
-            if not self.inside(v.position, GONE_BEYOND_NM) and self._bound_away(v):
+            if (
+                not self.inside(v.position, GONE_BEYOND_NM)
+                and self._bound_away(v)
+                and not self._carried_over(v)
+            ):
                 v.done = True
                 d.ended, d.ended_tick = "left at the edge", now
         if now - self.last_draw < DRAW_EVERY_S:
@@ -251,8 +317,16 @@ class Business:
 
     def _bound_away(self, v: Any) -> bool:
         """Whether a ship's business takes her beyond the region: her plan's last mark
-        is outside it, or she has none."""
+        is outside it, or she has none (a member on her station leg goes where her
+        commander goes: his plan is read)."""
         plan = getattr(v, "plan", None) or []
+        if plan and plan[0][0] == "station":
+            sets = getattr(self.world, "squadrons", None)
+            sq = sets.of(v.id) if sets is not None else None
+            boss = self.world.vessels.get(sq.commander) if sq is not None else None
+            if boss is None:
+                return False
+            plan = getattr(boss, "plan", None) or []
         marks = [leg[1] for leg in plan if len(leg) > 1 and isinstance(leg[1], Position)]
         return not marks or not self.inside(marks[-1])
 
@@ -614,6 +688,299 @@ class Business:
                     colours=entry.get("colours", "shown"),
                 )
 
+    # -- the convoys, the blockades and the ships in ordinary (package 72; spec M7 §22) ----
+
+    def _naval(self, nation: str) -> dict[str, Any]:
+        from freesail.world.regimes import naval_of
+
+        return naval_of(self.world, nation)
+
+    def _convoy(self) -> Any:
+        """A convoy of a nation that convoys and is at war: so many merchantmen under an
+        escort of the nation's kind, formed in the order of sailing under the convoy book,
+        on a route of the trade's between the region's ports, five miles outside the port
+        of departure bound for the other (the port's departure is 79's) or at an edge
+        bound in. Returns the set, or None when no route or no nation serves."""
+        from freesail.world.regimes import regime_knob
+
+        nations = self.world.nations
+        candidates = [
+            n
+            for n in sorted(nations.nations)
+            if self._naval(n).get("convoys") and any(nations.at_war(n, o) for o in nations.nations)
+        ]
+        if not candidates:
+            return None
+        rng = self._rng()
+        nation = candidates[int(rng.random() * len(candidates)) % len(candidates)]
+        lo, hi = regime_knob("in convoy", "size", [4, 8])
+        n = int(lo + (hi - lo + 1) * rng.random())
+        routes = [
+            r
+            for r in self.routes()
+            if (r[1].id, r[2].id) not in self.refused
+            and r[1].nation == nation
+            and r[2].nation == nation
+            and self._arrives_clear(r[2])
+        ]
+        if not routes:
+            # the trade's routes want a price worth the voyage; a convoy sails between the
+            # nation's ports whatever the prices (the coasting trade under convoy by the acts)
+            ports = [p for p in self.ports() if p.nation == nation]
+            pairs = [
+                (1.0, a, b, next((g for g in a.market.goods if g in b.market.goods), "sundries"))
+                for a in ports
+                for b in ports
+                if a is not b and (a.id, b.id) not in self.refused and self._arrives_clear(b)
+            ]
+            routes = pairs
+        if not routes:
+            return None
+        chosen = routes[int(rng.random() * len(routes)) % len(routes)]
+        _ratio, a, b, good = chosen
+        in_port = rng.random() < 0.5
+        return self._convoy_of(n, nation, a, b, good, in_port=in_port)
+
+    def _convoy_of(
+        self,
+        n: int,
+        nation: str,
+        a: Any,
+        b: Any,
+        good: str,
+        in_port: bool,
+        escort_description: str = "",
+        escort_name: str = "",
+    ) -> Any:
+        from freesail.world.ships import land_crossing
+        from freesail.world.squadrons import Squadron
+
+        rng = self._rng()
+        escort = escort_description or str(self._naval(nation).get("convoy_escort") or "brig-sloop")
+        intent = f"convoy the trade from {a.name} to {b.name}"
+        if in_port:
+            first = self._approach(b)[0][1]
+            # five miles outside the port of departure, on the way to the destination
+            road = a.outer_road.position
+            bearing = bearing_and_distance(road, first)[0]
+            where = destination(road, bearing, 5.0 * units.NAUTICAL_MILE)
+            if not self._at_sea(where) or land_crossing(
+                self.world, where, [("to", first, "the approach")]
+            ):
+                return None
+            said = f"outside {a.name}, the convoy got under way this morning"
+        else:
+            first = self._approach(b)[0][1]
+            edges = [
+                p
+                for p in self._edge_points(first)
+                if not land_crossing(self.world, p, [("to", first, "the approach")])
+            ]
+            if not edges:
+                return None
+            where = edges[0]
+            said = f"at the edge, {where}, the convoy bound in"
+        commodore = self._put(
+            "escort",
+            escort,
+            nation,
+            escort_name or self._cruiser_name(nation),
+            where,
+            intent,
+            "",
+            said,
+        )
+        if commodore is None:
+            return None
+        members = [commodore.id]
+        lo, hi = self.data.get("cargo_tons", [30, 120])
+        for i in range(n):
+            tons = int(lo + (hi - lo) * rng.random())
+            spot = destination(
+                where, (180.0 + 25.0 * i) % 360.0, (0.3 + 0.15 * i) * units.NAUTICAL_MILE
+            )
+            v = self._put(
+                "convoy",
+                self._pick("trader_kinds", nation),
+                nation,
+                self._name(nation),
+                spot,
+                "",
+                f"{tons} tons of {good}, under convoy",
+                said,
+                goal=f"bound for {b.name}",
+            )
+            if v is not None:
+                members.append(v.id)
+        if len(members) < 2:
+            return None
+        sets = self.world.squadrons
+        sq = Squadron(
+            id=f"convoy-{self.serial}",
+            name=f"the {a.name} convoy",
+            kind="convoy",
+            nation=nation,
+            commander=commodore.id,
+            members=members,
+            goal=intent,
+            formation="order of sailing",
+            columns=2,
+            regime="in convoy",
+        )
+        sets.add(sq, self.world)
+        for d in self.drawn:
+            if d.id in members:
+                d.squadron = sq.id
+        return sq
+
+    def draw_convoy(self, n: int, escort_words: str, from_port: str, to_port: str) -> Any:
+        """The director's `convoy: <n> merchantmen under <ship | a brig-sloop> from <A> for
+        <B>`: a convoy drawn now outside the first port bound for the second."""
+        from freesail.world.ships import description_key
+
+        ports = self.world.ports
+        a = ports.find(from_port) if ports is not None and ports.ports else None
+        b = ports.find(to_port) if ports is not None and ports.ports else None
+        if a is None or b is None:
+            raise ValueError(
+                f"the chart knows no port named {(from_port if a is None else to_port)!r} in play"
+            )
+        if a is b:
+            raise ValueError("a convoy sails from one port for another")
+        nation = str(a.nation)
+        words = " ".join(escort_words.split()).removeprefix("a ").removeprefix("an ")
+        escort_name = ""
+        desc = description_key(words)
+        if desc is None:
+            v = self.world.vessels.find(words.removeprefix("the "))
+            if v is None:
+                raise ValueError(
+                    f"'{escort_words}' is no ship on the sea and no description of one; say "
+                    "'under a brig-sloop' or a ship's name"
+                )
+            desc, escort_name, nation = str(v.description), "", str(v.nation)
+        good = next((g for g in a.market.goods if g in b.market.goods), "sundries")
+        sq = self._convoy_of(
+            int(n),
+            nation,
+            a,
+            b,
+            good,
+            in_port=True,
+            escort_description=desc,
+            escort_name=escort_name,
+        )
+        if sq is None:
+            raise ValueError(
+                f"no convoy could be formed outside {a.name} for {b.name} (the way crosses "
+                "the land)"
+            )
+        return sq
+
+    def _blockades(self) -> None:
+        """A blockading squadron of each nation that blockades a port of the region (the
+        nations' knobs): the main body on the offshore station under a frigate, the inshore
+        division on the port's approach under a brig-sloop, the set under the blockade book."""
+        from freesail.world.captains import station_off
+        from freesail.world.squadrons import Squadron, load_book
+
+        nations = self.world.nations
+        chart = self.world.chart
+        ports = self.world.ports
+        book = load_book("blockade")
+        for nation in sorted(nations.nations):
+            for pid in self._naval(nation).get("blockades") or []:
+                port = ports.ports.get(str(pid)) if ports is not None else None
+                if port is None or not self.inside(port.outer_road.position):
+                    continue
+                if not nations.at_war(nation, str(port.nation)):
+                    continue
+                off = book.get("offshore") or {}
+                f = chart.find_feature(str(off.get("place") or "Ushant"))
+                if f is None:
+                    continue
+                within = float(off.get("within_nm", 15))
+                where = station_off(self.world, f.position, within)
+                flag = self._put(
+                    "blockade",
+                    str(off.get("kind") or "frigate"),
+                    nation,
+                    self._cruiser_name(nation),
+                    where,
+                    f"keep the station off {f.name} within {within:g} miles",
+                    "",
+                    f"on the blockade of {port.name}, the offshore station off {f.name}",
+                )
+                if flag is None:
+                    continue
+                members = [flag.id]
+                inshore = book.get("inshore") or {}
+                radius = float(inshore.get("within_nm", 6))
+                road = chart.feature(str(port.outer_road.feature_id))
+                where_in = (
+                    station_off(self.world, road.position, radius) if road is not None else where
+                )
+                brig = self._put(
+                    "blockade",
+                    str(inshore.get("kind") or "brig-sloop"),
+                    nation,
+                    self._cruiser_name(nation),
+                    where_in,
+                    f"blockade {port.name} within {radius:g} miles",
+                    "",
+                    f"on the blockade of {port.name}, the inshore station",
+                )
+                if brig is not None:
+                    members.append(brig.id)
+                sq = Squadron(
+                    id=f"blockade-{port.id}",
+                    name=f"the blockade of {port.name}",
+                    kind="squadron",
+                    nation=nation,
+                    commander=flag.id,
+                    members=members,
+                    goal=f"blockade {port.name}",
+                    formation="line ahead",
+                    book="blockade",
+                    regime="on blockade",
+                )
+                self.world.squadrons.add(sq, self.world)
+                if brig is not None:
+                    sq.detach(self.world, "inshore", brig.id, [])
+                for d in self.drawn:
+                    if d.id in members:
+                        d.squadron = sq.id
+
+    def _in_ordinary(self) -> None:
+        """Each nation's ships in ordinary (the knobs' `in_ordinary`) at the region's ports:
+        a hull at the anchorage with her sortie, commissioned when the offing is clear."""
+        from freesail.world.regimes import put_in_ordinary
+
+        nations = self.world.nations
+        ports = self.world.ports
+        for nation in sorted(nations.nations):
+            for entry in self._naval(nation).get("in_ordinary") or []:
+                port = ports.ports.get(str(entry.get("port") or "")) if ports is not None else None
+                if port is None or not self.inside(port.outer_road.position):
+                    continue
+                vessel = self._put(
+                    "ordinary",
+                    str(entry.get("description") or "frigate"),
+                    nation,
+                    self._cruiser_name(nation),
+                    port.anchorage.position,
+                    "",
+                    "",
+                    f"in ordinary at {port.name}",
+                    goal=f"bound for {port.name}",
+                )
+                if vessel is None:
+                    continue
+                put_in_ordinary(self.world, vessel, port, str(entry.get("sortie") or ""))
+                for d in self.drawn:
+                    if d.id == vessel.id:
+                        d.intent = f"in ordinary at {port.name}; the sortie {vessel.sortie}"
+
     # -- putting a ship on the sea -----------------------------------------------------
 
     def _put(
@@ -628,6 +995,7 @@ class Business:
         said: str,
         colours: str = "shown",
         departing: str = "",
+        goal: str = "",
     ) -> Any:
         from freesail.world.ships import vessel_from_spec
 
@@ -641,7 +1009,7 @@ class Business:
             "name": name,
             "nation": nation,
             "position": where.to_dict(),
-            "goal": "bound for Falmouth",  # replaced by the intent's plan
+            "goal": goal or "bound for Falmouth",  # replaced by the intent's plan
             "intent": intent,
             "colours": colours,
         }
@@ -671,7 +1039,12 @@ class Business:
         if not names:
             return f"the {nation} cruiser"
         rng = self._rng()
-        return str(names[int(rng.random() * len(names)) % len(names)])
+        used = {v.name for v in self.world.vessels.vessels}
+        for _ in range(8):
+            name = str(names[int(rng.random() * len(names)) % len(names)])
+            if name not in used:
+                return name  # package 72: two men of war of one name in one sea (found)
+        return f"{names[0]} {self.serial}"
 
     def _anchored_in(self, vessel: Any, port: Any) -> None:
         """A ship drawn lying in a port: at anchor at its anchorage, her business there

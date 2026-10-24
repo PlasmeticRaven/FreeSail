@@ -104,12 +104,18 @@ def test_the_draw_peoples_the_region_with_trade_fishing_and_the_cruisers_at_war(
     b = busy.business
     assert b is not None and b.region == "channel-west"
     kinds = {d.kind for d in b.drawn}
-    assert kinds == {"trade", "fishing", "cruiser"}
+    # package 72: the convoys, the blockades and the ships in ordinary beside them
+    assert kinds == {"trade", "fishing", "cruiser", "convoy", "escort", "blockade", "ordinary"}
     ids = {v.id for v in busy.vessels.vessels}
     for d in b.drawn:
         assert d.id in ids and d.intent and d.where
         v = busy.vessels.get(d.id)
-        assert v.brain is not None and v.brain.intent is not None
+        if d.kind in ("convoy", "ordinary"):
+            # package 72: a convoy's merchantman keeps her station with no brain; a hull in
+            # ordinary has none until commissioned
+            assert v.brain is None
+        else:
+            assert v.brain is not None and v.brain.intent is not None
         assert b.inside(v.position)
     # nothing of the draw is a line of the player's log
     assert not [e for e in busy.log if "business" in e.kind]

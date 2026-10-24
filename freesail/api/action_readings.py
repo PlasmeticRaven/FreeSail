@@ -81,6 +81,9 @@ def idle_rows(world: Any) -> set[str]:
     locker = extra.get("signals")
     if locker is not None and locker.colours.state != "shown":
         idle.discard("colours")  # package 71: false or no colours are worth a row
+    from freesail.api.squadron_readings import idle_squadron_rows
+
+    idle |= idle_squadron_rows(world)  # package 72: nothing of a set for a ship in none
     return idle
 
 

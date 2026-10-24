@@ -61,6 +61,10 @@ class Nation:
     habits: dict[str, Any] = field(default_factory=dict)
     signals_root: str = "basic"
     signals_system: str = "basic"
+    # package 72 (spec M7 §22): the nation's naval knobs (`naval:`: who keeps the sea, who
+    # keeps port and slips out when the blockade is blown off, who convoys and under what,
+    # whose privateers chase what pays), read by the business and the regimes
+    naval: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -227,6 +231,7 @@ def load_nations(path: str | Path = NATIONS_PATH) -> Nations:
             habits=dict(d.get("habits") or {}),
             signals_root=str((d.get("signals") or {}).get("root") or "basic"),
             signals_system=str((d.get("signals") or {}).get("system") or "basic"),
+            naval=dict(d.get("naval") or {}),
         )
     wars = []
     for w in doc.get("wars") or []:

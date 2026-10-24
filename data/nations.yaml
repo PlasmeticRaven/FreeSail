@@ -42,6 +42,18 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: britain, system: well-built}
+    # package 72 (spec M7 §22; docs/design/Design-Squadrons.md): the nation's naval knobs,
+    # read by the world's business and the regimes (data/regimes.yaml): the British keep
+    # the sea, engage, blockade Brest, and convoy their trade under a brig-sloop
+    naval:
+      keeps_the_sea: true
+      keeps_port: false
+      engages: true
+      blockades: [brest]
+      convoys: true
+      convoy_escort: brig-sloop
+      privateers: "chase what pays"
+      source: "the British practice of 1803 to 1805: the close blockade of Brest under Cornwallis, the convoy acts, the single-ship actions sought (Mahan, James, from memory); judgement"
   france:
     name: France
     adjective: French
@@ -62,6 +74,20 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: france, system: well-built}
+    # package 72 (spec M7 §22): the French keep port under the blockade and slip out when
+    # it is blown off; a frigate in ordinary at Brest with her sortie; the corsairs chase
+    # what pays
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      slips_out_when_blown_off: true
+      in_ordinary:
+        - {port: brest, description: frigate, sortie: "cruise off the Lizard within 20 miles"}
+      privateers: "chase what pays"
+      source: "the Brest fleet and frigates keeping port under the blockade and sailing when the blockaders were blown off (Mahan, from memory); the corsairs of St Malo and Dunkirk; judgement"
   spain:
     name: Spain
     adjective: Spanish
@@ -82,6 +108,16 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 72 (spec M7 §22): the Spanish keep port with the French
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      slips_out_when_blown_off: true
+      privateers: "chase what pays"
+      source: "Ferrol and Cadiz under blockade in 1805 (from memory); judgement"
   batavian-republic:
     name: the Batavian Republic
     adjective: Dutch
@@ -102,6 +138,15 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 72 (spec M7 §22): the Dutch keep port in the Texel
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: true
+      blockades: []
+      convoys: false
+      privateers: "chase what pays"
+      source: "the Texel squadron under blockade (from memory); judgement"
   united-states:
     name: the United States
     adjective: American
@@ -122,6 +167,17 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 72 (spec M7 §22): the Americans of 1812 keep the sea in single ships and
+    # fight single actions; at peace in 1805, so nothing of it is drawn
+    naval:
+      keeps_the_sea: true
+      keeps_port: false
+      engages: true
+      single_actions: true
+      blockades: []
+      convoys: false
+      privateers: "chase what pays"
+      source: "the frigate actions of 1812 (James, from memory); judgement"
   portugal:
     name: Portugal
     adjective: Portuguese
@@ -142,6 +198,15 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 72 (spec M7 §22): no navy of her own at sea in 1805 to speak of
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "judgement"
   denmark:
     name: Denmark
     adjective: Danish
@@ -162,6 +227,15 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 72 (spec M7 §22): at peace, her navy in Copenhagen
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: true
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "judgement"
   # package 39f, the Strait: Morocco, for Tangier and the African shore. The Emperor
   # Muley Soliman (Mawlay Sulayman, from 1792) at peace with every nation in June 1805:
   # no war in the table below, so a Moorish port is neutral to all and open to its own.
@@ -187,6 +261,15 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 72 (spec M7 §22): the Emperor's few cruisers, at peace with all
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "judgement"
     relations:
       britain: "peace; the Emperor apparently prefers the English to any other European power and allows Gibraltar its cattle from Tangier, a grant of Muley Ismael (Purdy 1826, p. 5, quoting Jackson); the fleets water at Tetuan (p. 8)"
       spain: "peace since Muley Yazid's war of 1790 and 1791 on Ceuta (Lempriere 1800, pp. 318 and 326, the war's beginning); the peace of 1799 FROM MEMORY"

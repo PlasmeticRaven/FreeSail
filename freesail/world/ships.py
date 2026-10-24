@@ -524,6 +524,12 @@ class Vessel:
     # pace); None in a checkpoint from before and on every ship that commands no set
     squadron: str = ""
     pace_cap_kn: float | None = None
+    # package 72 (spec M7 §22): her regime where it is more than her state ("in ordinary":
+    # a hull at a port's anchorage with no company and no intent), the sortie she sails
+    # for when commissioned, and the tick a commission falls due (-1 for none)
+    regime: str = ""
+    sortie: str = ""
+    commission_tick: int = -1
 
     @property
     def height_m(self) -> float:
@@ -1185,6 +1191,22 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         vessel.under_orders_of = " ".join(str(boss).split())
     if spec.get("lights"):
         locker.lights = str(spec["lights"])
+    if str(spec.get("regime") or "").lower().strip() == "in ordinary":
+        # package 72 (spec M7 §22): a hull laid up at a port's anchorage, commissioned later
+        from freesail.world.regimes import put_in_ordinary
+
+        ports = getattr(world, "ports", None)
+        port = None
+        best = None
+        for p in (getattr(ports, "ports", None) or {}).values():
+            _, d = bearing_and_distance(position, p.anchorage.position)
+            if best is None or d < best:
+                port, best = p, d
+        if port is None or best is None or best > 3.0 * units.NAUTICAL_MILE:
+            raise ValueError(f"'{name}' in ordinary lies at no port's anchorage")
+        vessel.position = port.anchorage.position
+        put_in_ordinary(world, vessel, port, str(spec.get("sortie") or ""))
+        return vessel
     if spec.get("letter") is not None:
         from freesail.world.people import Message
 
@@ -1346,6 +1368,11 @@ class Vessels:
             # the commanders' frames, the stragglers counted, the commanders' books read;
             # and the far captures, a rule of the sea whether a set is on it or not
             lines.extend(sets.tick(world))
+        if any(getattr(v, "regime", "") == "in ordinary" for v in self.vessels):
+            # the regimes' minute (package 72; spec M7 §22): the commissions due, the sorties
+            from freesail.world.regimes import minute as regimes_minute
+
+            lines.extend(regimes_minute(world))
         if any(v.under_orders_of and v.brain is None and not v.done for v in self.vessels):
             # a vessel under another's orders with no brain (a convoy's merchantman given
             # only her company to keep) reads and obeys the signals by the least captain

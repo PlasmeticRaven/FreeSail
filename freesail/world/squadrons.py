@@ -413,7 +413,11 @@ class Squadron:
         frame: along the course (negative astern), across positive to leeward. The
         members of a detached division are left out (their slots are on their leader,
         `_division_slots`)."""
-        detached = {m for d in self.divisions.values() if d.detached for m in d.members}
+        # a detached division's leader sails her own intent and has no slot; her members
+        # keep their stations on her (`stations`)
+        detached = {
+            m for d in self.divisions.values() if d.detached for m in (d.leader, *d.members)
+        }
         order = [m for m in self.members if m not in detached]
         interval = float(self.interval_m)
         out: dict[str, tuple[float, float]] = {}

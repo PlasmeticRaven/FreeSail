@@ -471,3 +471,225 @@ def test_the_convoy_tacks_in_succession_by_the_wake_each_at_the_ship_aheads_turn
     for a, b in zip(others, others[1:], strict=False):
         _, d = bearing_and_distance(where[a], where[b])
         assert d <= 1.5 * units.CABLE, (a, b, d)
+
+
+# -- the regimes and the business (spec M7 §22) ----------------------------------------------
+
+
+def test_the_business_draws_a_convoy_a_blockade_and_a_ship_in_ordinary_by_the_nations_knobs():
+    """With the business on in the Channel: a British convoy of four to eight merchantmen
+    under an escort as one set in the order of sailing (the merchantmen with no brain, on
+    the station leg), the blockade of Brest under a frigate on the offshore station with
+    a brig-sloop detached inshore ('blockade Brest within 6 miles', the station off the
+    road of Bertheaume), and the French frigate in ordinary at Brest with her sortie; each
+    in the record with its kind."""
+    from tests.test_business import world_with
+
+    w = world_with("on")
+    b = w.business
+    kinds = {d.kind for d in b.drawn}
+    assert {"convoy", "escort", "blockade", "ordinary"} <= kinds
+    convoy = next(s for s in w.squadrons.sets if s.kind == "convoy")
+    assert 4 <= len(convoy.others()) <= 8 and convoy.formation == "order of sailing"
+    assert convoy.goal.startswith("convoy the trade from")
+    cdr = w.vessels.get(convoy.commander)
+    assert cdr.brain is not None and cdr.brain.role == "commodore"
+    for m in convoy.others():
+        v = w.vessels.get(m)
+        assert v.brain is None and v.plan[0] == ("station", convoy.id)
+        assert v.under_orders_of == convoy.commander and v.squadron == convoy.id
+    blockade = w.squadrons.find("the blockade of Brest")
+    assert blockade is not None and blockade.book == "blockade" and blockade.regime == "on blockade"
+    flag = w.vessels.get(blockade.commander)
+    assert flag.description == "frigate" and "off Ushant" in flag.intent_words
+    d = blockade.divisions["inshore"]
+    brig = w.vessels.get(d.leader)
+    assert brig.description == "brig-sloop" and brig.intent_words.startswith("blockade Brest")
+    assert brig.brain.intent.kind == "station" and brig.brain.intent.blockade == "brest"
+    assert brig.under_orders_of == flag.id
+    ordinary = [v for v in w.vessels.vessels if v.regime == "in ordinary"]
+    assert len(ordinary) == 1
+    hulk = ordinary[0]
+    assert hulk.nation == "france" and hulk.brain is None and hulk.plan[0][0] == "anchor"
+    assert hulk.sortie == "cruise off the Lizard within 20 miles"
+    names = [v.name for v in w.vessels.vessels]
+    assert len(names) == len(set(names)), names  # found on the way: two cruisers of one name
+    w.run(1800)
+    assert all(v.brain is None for v in ordinary) and hulk.position == hulk.position
+
+
+def test_the_frigate_in_ordinary_slips_out_when_the_blockaders_are_gone_from_the_offing():
+    """The French regime: a ship in ordinary with a sortie, of a nation that slips out when
+    the blockade is blown off, sails when no enemy man of war has been within the regime's
+    ten miles of the port's outer road for an hour; while the blockaders keep their station
+    she stays."""
+    from tests.test_business import world_with
+
+    w = world_with("on")
+    hulk = next(v for v in w.vessels.vessels if v.regime == "in ordinary")
+    blockade = w.squadrons.find("the blockade of Brest")
+    w.run(4200)
+    assert hulk.regime == "in ordinary" and hulk.brain is None
+    # the blockaders blown off to Torbay (the gale's rule), here by the director's word
+    for vid in list(blockade.members):
+        v = w.vessels.get(vid)
+        v.done = True
+    for _ in range(80):
+        w.run(60)
+        if hulk.brain is not None:
+            break
+    assert hulk.brain is not None and hulk.regime == ""
+    assert hulk.brain.intent_words == "cruise off the Lizard within 20 miles"
+    assert any("slipped out" in words for _, words in hulk.story)
+    assert any(e.kind == "regime.sortie" for e in w.log)
+
+
+def test_a_ship_is_laid_up_in_ordinary_and_commissioned_by_the_directors_forms():
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5, intent=STATION_INTENT)
+    w.run(60)
+    e = w.world_order(
+        'ship: a brig-sloop "Harpy" of Britain at 50 05 N 5 00 W, bound for Falmouth, intent: '
+        "bound for Falmouth",
+        "the test",
+    )
+    assert e.data["result"] == "done", e.text
+    e = w.world_order('ship "Harpy": in ordinary at Falmouth', "the test")
+    assert e.data["result"] == "done", e.text
+    v = w.vessels.find("Harpy")
+    assert v.regime == "in ordinary" and v.brain is None and v.plan[0][0] == "anchor"
+    assert w.vessels.find("Harpy").position == w.ports.ports["falmouth"].anchorage.position
+    e = w.world_order('ship "Harpy": commissioned for sail for Brest in 1 hour', "the test")
+    assert e.data["result"] == "done", e.text
+    assert v.commission_tick > 0 and v.sortie
+    w.run(3700)
+    assert v.brain is not None and v.regime == "" and v.brain.intent.destination == "brest"
+    e = w.world_order('ship "Harpy": commissioned for bound for Plymouth', "the test")
+    assert e.data["result"] != "done" and "not in ordinary" in e.text
+
+
+def test_the_business_follows_the_players_ship_across_the_regions_edge_and_carries_a_set():
+    """The owner's requirement of 2026-10-17: the player's schooner six miles west of the
+    Channel's two regions' edge (3° W) runs east-south-east before a westerly with the
+    business on; when she crosses (two hours), the business's region becomes the
+    mid-Channel, that region is peopled once, and a drawn convoy sailing beside her is
+    carried over whole (a member of a set any of whose members is within the carry-over
+    distance is never put out of the world), while a ship bound away and far from her
+    goes as before."""
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+    from freesail.world.geo import Position
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.6, "lon_deg": -3.2},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest", "dartmouth", "weymouth", "st-malo"],
+        nation="britain",
+        business="on",
+        ship_heading_deg=110.0,
+        ship_speed_kn=5.0,
+    )
+    w = make_world(7, "data/ships/topsail-schooner.yaml", sc)
+    b = w.business
+    assert b.region == "channel-west" and b.regions_entered == ["channel-west"]
+    before = len(b.drawn)
+    w.submit("set plain sail")
+    w.submit("steer east-south-east")
+    convoy = next(s for s in w.squadrons.sets if s.kind == "convoy")
+    # the convoy put beside the player, a mile to the south, bound east with her
+    cdr = w.vessels.get(convoy.commander)
+    here = destination(w.position, 180.0, 1.0 * units.NAUTICAL_MILE)
+    shift = (here.lat_deg - cdr.position.lat_deg, here.lon_deg - cdr.position.lon_deg)
+    for m in convoy.members:
+        v = w.vessels.get(m)
+        v.position = Position(v.position.lat_deg + shift[0], v.position.lon_deg + shift[1])
+    for _ in range(18):
+        w.run(600)
+        if b.region == "channel-mid":
+            break
+    assert b.region == "channel-mid", (b.region, w.position)
+    assert b.regions_entered == ["channel-west", "channel-mid"]
+    assert len(b.drawn) > before  # the mid-Channel peopled once on entering it
+    for m in convoy.members:
+        v = w.vessels.get(m)
+        assert v is not None and not v.done, m
+    assert b._carried_over(cdr)
+    # a drawn ship far from the player beyond the western edge is put out as before
+    far = next(d for d in b.drawn if d.kind == "trade" and d.ended == "")
+    v = w.vessels.get(far.id)
+    v.position = Position(48.5, -7.5)
+    v.plan = [("to", Position(48.5, -8.0), "beyond")]
+    assert not b._carried_over(v) and b._bound_away(v)
+
+
+# -- the weather's seasonal bound (R-39; item 7) ---------------------------------------------
+
+
+def test_the_seasonal_bound_holds_the_glass_under_the_ceiling_and_the_wind_with_it_under_a_switch():
+    """R-39: two highs added over the ship take the glass past the season's ceiling (1041
+    off Brest in June); under the scenario's `weather_bound: seasonal` the summed anomaly
+    is scaled to the ceiling and the systems' wind with it (the field and the wind agree);
+    off (every recorded passage) the field is as it was."""
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+    from freesail.world import weather as Wx
+
+    def world(bound: bool):
+        sc = Scenario(
+            start_time=datetime(1805, 6, 12, 10, 0),
+            wind_from_deg=270.0,
+            wind_speed_kn=14.0,
+            gustiness=0.0,
+            variability=0.0,
+            position={"lat_deg": 48.6, "lon_deg": -5.5},
+            region="channel-west",
+            ports=["falmouth", "plymouth", "brest"],
+            nation="britain",
+            climatology=True,
+            systems=[],
+            weather_bound=bound,
+        )
+        w = make_world(7, "data/ships/brig.yaml", sc)
+        for name in ("one", "two"):
+            w.systems.append_system(
+                {
+                    "name": f"high {name}",
+                    "kind": "high",
+                    "radius_km": 600,
+                    "track": [
+                        {"at": "1805-06-12T10:00", "x_km": 0, "y_km": 0, "hpa": 1040},
+                        {"at": "1805-06-14T10:00", "x_km": 0, "y_km": 0, "hpa": 1040},
+                    ],
+                }
+            )
+        w.systems.advance(datetime(1805, 6, 12, 14, 0))
+        return w
+
+    off, on = world(False), world(True)
+    t = on.systems._table(on.systems.now)
+    ceiling = float(t.background_hpa) + float(t.high_anomaly_hpa[1]) + Wx.HIGH_CEILING_MARGIN_HPA
+    p_off = off.systems.pressure_at(0.0, 0.0)
+    p_on = on.systems.pressure_at(0.0, 0.0)
+    assert p_off > ceiling + 2.0, (p_off, ceiling)
+    assert abs(p_on - ceiling) < 0.01, (p_on, ceiling)
+    k = on.systems.bound_at(0.0, 0.0)
+    assert 0.0 < k < 1.0
+    # the wind scaled with the field, a little off the centre where the gradient is not nought
+    vx0, vy0 = off.systems.geostrophic_at(200.0, 100.0)
+    vx1, vy1 = on.systems.geostrophic_at(200.0, 100.0)
+    assert (vx1**2 + vy1**2) < (vx0**2 + vy0**2)
+    # far from the highs the bound does not bite and the two fields are one
+    assert abs(off.systems.pressure_at(2500.0, 0.0) - on.systems.pressure_at(2500.0, 0.0)) < 0.01
+    assert not off.systems.bound and on.systems.bound
+    # the switch is the scenario's word and leaves the dict alone when off
+    assert "weather_bound" not in off.scenario.to_dict() and on.scenario.to_dict()["weather_bound"]

@@ -1425,6 +1425,12 @@ UNPERFORMED_HERE = {
     # package 71: no signal to answer and no sail within hail in the test's seas
     'ship "Medusa": order answer the signal': "No signal has been seen to answer",
     'ship "Medusa": order hail her': "beyond hail",
+    # package 72: the Harpy is French (a ship of another nation joins only as a prize), no
+    # division is detached on the test's sea (the dry run keeps nothing), and the business
+    # is off in it
+    'squadron "the Channel squadron": join the Harpy': "only as a prize",
+    'squadron "the Channel squadron": recall the inshore division': "has no division named",
+    "convoy: four merchantmen under a brig-sloop from Falmouth for Plymouth": "business is off",
 }
 
 
@@ -1458,6 +1464,12 @@ def _forms_worlds() -> list[Any]:
             'person: make "Mr Veale", a clerk of the Custom House, aboard in the cabin',
             'weather: low "the low" radius 450 km at 1805-06-13T04:00 -300 500 1000',
             "aboard: a sealed packet, on the cabin table, from the Custom House",
+            # package 72: a British cutter beside the Medusa, and the two a set, for the
+            # squadron's forms
+            'ship: a cutter "Nimble" of Britain at 49 31 N 5 29 W, bound for Falmouth, intent: '
+            "bound for Falmouth",
+            'squadron: "the Channel squadron" of Britain under the Medusa with the Nimble, keep '
+            "the station off the Deadman within 8 miles",
         ):
             assert w.world_order(order, "the test").data["result"] == "done", order
         w.run(120)

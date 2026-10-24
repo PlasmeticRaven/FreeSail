@@ -815,6 +815,61 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "and obeys that ship's signals and no other's",
     ),
     Form(
+        "ship.regime",
+        "ship",
+        'ship "<name>": in ordinary at <port>; ship "<name>": commissioned for <intent> [at '
+        "once | in <n> days]",
+        (
+            'ship "Harpy": in ordinary at Falmouth',
+            'ship "Harpy": commissioned for cruise off the Lizard within 10 miles in 2 days',
+        ),
+        "the regimes (package 72, spec M7 §22): a hull laid up at a port's anchorage with no "
+        "company and no intent, and a ship in ordinary commissioned for an intent, at once or "
+        "after the regime's delay (two to five days when none is said); the business "
+        "commissions a nation's ships in ordinary by its knobs when the blockade is off",
+    ),
+    Form(
+        "squadron.new",
+        "squadron",
+        'squadron: "<name>" of <nation> under <ship | the ship> [with <ship>, <ship>], <goal>',
+        (
+            'squadron: "the inshore squadron" of Britain under the Medusa with the Nimble, keep '
+            "the station off the Deadman within 8 miles",
+        ),
+        "a set made of ships on the sea (package 72, spec M7 §21): the commander, the members "
+        "in their order of sailing, the goal his intent; a convoy when the members are "
+        "merchantmen; the members keep their stations on him at far detail and by their "
+        "books when crewed, and read his signals",
+    ),
+    Form(
+        "squadron.act",
+        "squadron",
+        'squadron "<name>": <join <ship> | detach <ship> | detach <ship>, <ship> as the <name> '
+        "division [under <ship>] | recall the <name> division | form the line ahead | form the "
+        "line abreast | form the order of sailing [in N columns] | form close order | goal "
+        "<words> | commander <ship> | rendezvous <place> | dissolve>",
+        (
+            'squadron "the Channel squadron": join the Harpy',
+            'squadron "the Channel squadron": form the line abreast',
+            'squadron "the Channel squadron": detach the Nimble as the inshore division',
+            'squadron "the Channel squadron": recall the inshore division',
+            'squadron "the Channel squadron": detach the Nimble',
+            'squadron "the Channel squadron": goal keep the station off Ushant within 12 miles',
+            'squadron "the Channel squadron": rendezvous the Lizard',
+        ),
+        "the set changed by the world: a ship joined or detached (she sails on her own), a "
+        "division detached under a leader and recalled, the formation, the goal (every "
+        "leader's intent), the commander, the rendezvous; dissolved, every ship her own",
+    ),
+    Form(
+        "convoy",
+        "convoy",
+        "convoy: <n> merchantmen under <ship | a brig-sloop> from <port> for <port>",
+        ("convoy: four merchantmen under a brig-sloop from Falmouth for Plymouth",),
+        "a convoy the world's business draws now, lying in the first port bound for the second "
+        "under an escort of the nation's kind; refused where the business is off",
+    ),
+    Form(
         "say",
         "say",
         "say as <person, station or trade>: <his words>",
