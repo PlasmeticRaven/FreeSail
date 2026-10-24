@@ -198,7 +198,7 @@ workers, passing alone, not its own), the whole slow tier (3,964 passed, 11 expe
 failures, three failed, all its own and mended after it, their three files rerun, 88
 passed) and the pace tests alone (10 passed after truth 7-159 was put in truth 51's form);
 **since three mends followed its whole slow tier, the lead ran the whole slow tier and the
-pace tests on the merged tree after the merge: its figures follow in the next commit**. Built as briefed,
+pace tests on the merged tree after the merge: 3,973 passed, 11 expected failures, 2 skipped, none failed; the pace tests 10 passed**. Built as briefed,
 generously: **the squadron's shape designed and written first** (`docs/design/
 Design-Squadrons.md`); **the set** (`freesail/world/squadrons.py`: a commander, the members
 in their order of sailing, a kind, a formation and interval, divisions, stragglers, a
