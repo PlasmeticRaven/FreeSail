@@ -48,7 +48,7 @@ from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
 from freesail.ship.parts import Charge, Gun
 
-__all__ = ["GUNNERY_VERBS", "check", "execute"]
+__all__ = ["GUNNERY_VERBS", "check", "execute", "guns_named"]
 
 Result = tuple[str, str, dict[str, Any]]
 
@@ -500,6 +500,16 @@ def _fire_words(ship: Any, said: str, dry: bool = False) -> dict[str, Any]:
         f"'fire No. 3 gun', 'fire the bow chaser', 'fire a shot across her bows' or 'fire a "
         f"gun to leeward'; '{said}' names no gun of hers."
     )
+
+
+def guns_named(ship: Any, words: str) -> list[str]:
+    """The guns the words name ('No. 3 starboard gun', 'the bow chaser', 'the swivels'),
+    by id; empty when none (the director's `aboard:` slot and `say as` read it too)."""
+    w = " ".join(str(words).lower().split())
+    for lead in ("the ", "a "):
+        if w.startswith(lead):
+            w = w[len(lead) :]
+    return _guns_named(ship, w)
 
 
 def _guns_named(ship: Any, w: str) -> list[str]:

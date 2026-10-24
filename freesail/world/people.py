@@ -779,6 +779,27 @@ class People:
             self.add(person)
         return person
 
+    def draw_sailor(self, sailor: Any, role: str, draw: bool = True) -> Person:
+        """A man of the muster drawn as a person under a role's words (package 70: the
+        captain of a gun), as `of_the_company` draws a man of a trade; the person already
+        drawn for this sailor is returned instead of a second."""
+        self._build()
+        for p in self.people:
+            if p.sailor_id == sailor.id:
+                return p
+        pid = role.replace(" ", "_").replace("'", "").replace(".", "")
+        person = Person(
+            pid,
+            _address(role, sailor.name),
+            role,
+            float(sailor.skill_deck),
+            place="deck",
+            sailor_id=sailor.id,
+        )
+        if draw:
+            self.add(person)
+        return person
+
     def add(self, person: Person) -> Person:
         self._build()
         self.people.append(person)

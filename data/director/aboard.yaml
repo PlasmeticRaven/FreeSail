@@ -51,6 +51,23 @@
 #   `harm`: `none`, `hurt` or `deadly`, and a brief with `nobody_dies` refuses the deadly.
 #   `source`: where the thing is found in the period's books, or "judgement".
 things:
+  # -- the guns (package 70; spec M7 §8, §9) ---------------------------------------------
+  - id: gun_dismounted
+    words: ["{gun} is found dismounted", "{gun} found dismounted", "{gun} dismounted"]
+    source: Douglas 1820, part I (a gun dismounted by shot, or by its own recoil when the breeching parts); judgement
+    report: "The gunner reports {gun} dismounted: the carriage broken under it, the gun on the deck; it is out of the bill until the carpenter can get it up again."
+    effect: {gun_dismounted: true}
+    plausible_when: {under_fire: true}
+    doubt: "nothing has struck {gun}: no shot has come aboard in the last ten minutes, and a gun does not leave its carriage of itself"
+    harm: none
+  - id: cartridges_damp
+    words: ["the cartridges found damp", "the cartridges are found damp", "a quarter of the cartridges found damp", "the powder found damp"]
+    source: the gunner's survey of the magazine (Steel 1794, the gunner's duty); the logs' "found the powder damp" after a leak or a shot hole by the magazine; judgement for the share
+    report: "The gunner reports a quarter of the cartridges damp in the magazine, the powder caked; he has struck them off and will dry what he can when the galley fire is lit again."
+    effect: {cartridges_damp: 0.25}
+    doubt: "the magazine is dry: no water in the well above a foot and no shot hole by it; damp cartridges want one or the other (enter it again with a reason, and it is done)"
+    plausible_when: {well_above: 0.3}
+    harm: none
   # -- the spars, the sails and the rigging ---------------------------------------------
   - id: spar_sprung
     words: ["{spar} is found sprung", "{spar} found sprung", "{spar} sprung"]

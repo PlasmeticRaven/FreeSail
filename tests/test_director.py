@@ -368,7 +368,7 @@ def test_the_aboard_orders_do_what_the_table_knows_and_reach_the_play_log_as_a_r
     assert all(e.severity.value == "notable" and not for_the_record(e) for e in reports)
     assert "found foul" in "\n".join(w.stores.lines(100))
     # the table is what the game can do, not what the director may say
-    assert len(WO.aboard_table()) == 24
+    assert len(WO.aboard_table()) == 26  # package 70: the guns' two things
     assert "aboard" in WO.CHANNELS and WO.recognises("aboard: a cask found stove")
 
 

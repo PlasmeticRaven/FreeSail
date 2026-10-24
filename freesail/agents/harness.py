@@ -1785,6 +1785,14 @@ class Harness:
         lookout = value("lookout") if "lookout" in full else None
         if isinstance(lookout, dict):
             out["lookout"] = (lookout.get("who"), lookout.get("held"), lookout.get("last_hail"))
+        # the action's rows (package 70): the mark by who she is and whether she has struck,
+        # not by her bearing this minute; the range by the whole cable
+        enemy = value("enemy") if "enemy" in full else None
+        if isinstance(enemy, dict):
+            out["enemy"] = (enemy.get("id"), bool(enemy.get("struck")))
+        rng = value("range") if "range" in full else None
+        if isinstance(rng, dict) and rng.get("metres") is not None:
+            out["range"] = round(float(rng["metres"]) / 185.2)
         officer = value("officer_of_the_watch") if "officer_of_the_watch" in full else None
         if isinstance(officer, dict):
             out["officer_of_the_watch"] = tuple(

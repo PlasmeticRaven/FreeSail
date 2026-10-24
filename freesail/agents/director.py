@@ -665,6 +665,8 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             "aboard: the water found foul",
             "aboard: the leak stopped",
             "aboard: the well pumped out",
+            "aboard: No. 3 starboard gun found dismounted",
+            "aboard: the cartridges found damp",
         ),
         "a report of the ship's own people with what it does; with no cause (the table's "
         "conditions), doubted",

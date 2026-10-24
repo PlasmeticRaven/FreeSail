@@ -1349,6 +1349,36 @@ PERSON_SPOKE_KIND = "person.spoke"
 _QUOTES = "\"'\u201c\u201d\u2018\u2019"
 
 
+def _gun_captain(world: Any, people: Any, who: str, draw: bool) -> Any:
+    """The captain of a gun by the gun's name (package 70: 'the captain of No. 3 gun',
+    'No. 3 gun's captain', 'the gun captain of the bow chaser'): the senior hand of its
+    crew by the quarter bill, drawn from the muster under his own name as a man of a
+    trade is (`People.of_the_company`); None when she is not at quarters or no gun answers."""
+    import re
+
+    ship = getattr(world, "ship", None)
+    if ship is None or not getattr(ship, "guns", None):
+        return None
+    w = " ".join(str(who).lower().split())
+    m = re.match(r"^(?:the\s+)?(?:gun\s+)?captain\s+of\s+(.+)$", w) or re.match(
+        r"^(.+?)'?s?\s+(?:gun\s+)?captain$", w
+    )
+    if m is None:
+        return None
+    from freesail.orders.gunnery import guns_named
+
+    ids = guns_named(ship, m.group(1).strip())
+    quarters = (getattr(ship, "extra", None) or {}).get("quarters")
+    if not ids or quarters is None or not getattr(quarters, "at_quarters", False):
+        return None
+    gc = quarters.crew_of(ship.guns[ids[0]])
+    members = [s for s in (gc.members if gc is not None else []) if s.fit]
+    if not members:
+        return None
+    sailor = max(members, key=lambda s: (float(s.skill_deck), s.name))
+    return people.draw_sailor(sailor, f"captain of {ship.guns[ids[0]].name}", draw=draw)
+
+
 def _say_as_parts(world: Any, body: str, draw: bool) -> tuple[Any, str]:
     """(the person, his words) of a `say as` order; the man of the muster by his trade
     drawn into the people only when `draw` (`People.of_the_company`)."""
@@ -1369,6 +1399,8 @@ def _say_as_parts(world: Any, body: str, draw: bool) -> tuple[Any, str]:
         person = _by_station_or_voice(world, who)
     if person is None:
         person = people.of_the_company(who, draw=draw) if people is not None else None
+    if person is None and people is not None:
+        person = _gun_captain(world, people, who, draw)  # package 70
     if person is None:
         raise WorldOrderError(
             f"nobody answering to '{who}' is among the people or the ship's company; a person "
@@ -1775,6 +1807,7 @@ SLOTS: dict[str, Any] = {
     "line": lambda world, words: _part_by_name(getattr(world, "ship", None), words, "lines"),
     "anchor": lambda world, words: _anchor_by_name(getattr(world, "ship", None), words),
     "good": _good_by_name,
+    "gun": lambda world, words: _gun_by_name(getattr(world, "ship", None), words),
 }
 _SLOT = re.compile(r"\{(" + "|".join(SLOTS) + r")\}")
 
@@ -1786,6 +1819,17 @@ def _slot_of(thing: dict[str, Any]) -> str | None:
         if m is not None:
             return m.group(1)
     return None
+
+
+def _gun_by_name(ship: Any, words: str) -> str | None:
+    """A gun by the gun deck's words ('No. 3 starboard gun', 'the bow chaser'; package 70),
+    the first of a pair when no side is said."""
+    if ship is None or not getattr(ship, "guns", None):
+        return None
+    from freesail.orders.gunnery import guns_named
+
+    ids = guns_named(ship, words)
+    return ids[0] if ids else None
 
 
 def _target_words(world: Any, thing: dict[str, Any], target: str | None) -> str:
@@ -1804,6 +1848,9 @@ def _target_words(world: Any, thing: dict[str, Any], target: str | None) -> str:
         tackle = ground_tackle(ship)
         a = next((a for a in tackle.anchors if a.id == target), None) if tackle else None
         return a.name if a is not None else target
+    if slot == "gun":
+        gun = (getattr(ship, "guns", None) or {}).get(target)
+        return gun.name if gun is not None else str(target)
     return str(target)
 
 
@@ -2462,7 +2509,36 @@ def _fx_well_pumped(world, thing, target, name, value, data) -> str:
     return f"the well pumped dry ({was:.2f} m of water pumped out)"
 
 
+def _fx_gun_dismounted(world, thing, target, name, value, data) -> str:
+    """A gun found dismounted (package 70): the same state a shot leaves (`combat.hits`),
+    the gun out of the bill until 73's carpenter remounts it."""
+    gun = world.ship.guns[target]
+    was = gun.dismounted
+    gun.dismounted = True
+    battery = (getattr(world.ship, "extra", None) or {}).get("battery")
+    if battery is not None and hasattr(battery, "services"):
+        svc = battery.services.get(gun.id)
+        if svc is not None:
+            svc.phase = -1
+    data.update({"gun": target, "was_dismounted": was})
+    return f"{name} dismounted (out of the bill)"
+
+
+def _fx_cartridges_damp(world, thing, target, name, value, data) -> str:
+    """Cartridges found damp (package 70): that share of every calibre's cartridges
+    struck off the gunner's count, as a shot hole at the magazine or a leak would."""
+    from freesail.ship.parts import magazine
+
+    mag = magazine(world.ship)
+    share = float(value if value is not None else 0.25)
+    lost = mag.spoil(share)
+    data.update({"share": share, "cartridges_lost": lost})
+    return f"{lost} cartridges damp and struck off the gunner's count"
+
+
 _ABOARD_EFFECTS: dict[str, Any] = {
+    "gun_dismounted": _fx_gun_dismounted,
+    "cartridges_damp": _fx_cartridges_damp,
     "spar_condition": _fx_spar,
     "sail_condition": _fx_part,
     "line_condition": _fx_part,
@@ -2536,6 +2612,7 @@ _ABOARD_LACKS: dict[str, Any] = {
 ABOARD_EFFECT_KEYS = frozenset(_ABOARD_EFFECTS) | {"report_only"}
 # The effects that fall on the target a slot names, by the slot every form must name.
 ABOARD_EFFECT_SLOTS: dict[str, str] = {
+    "gun_dismounted": "gun",  # package 70
     "spar_condition": "spar",
     "sail_condition": "sail",
     "line_condition": "line",
@@ -2546,6 +2623,8 @@ ABOARD_EFFECT_SLOTS: dict[str, str] = {
 # The keys the table's `plausible_when` may use (`_doubt_aboard`).
 ABOARD_PLAUSIBLE_KEYS = frozenset(
     {
+        "under_fire",  # package 70: a shot has struck her within the last ten minutes
+        "at_quarters",  # package 70: the hands at quarters, or not
         "strained",
         "sea_above",
         "days_out",
@@ -3075,7 +3154,26 @@ def _plausible_well_above(world: Any, target: str | None, value: Any) -> bool:
     return hull is not None and float(hull.water_in_well_m) > float(value)
 
 
+def _plausible_under_fire(world: Any, target: str | None, value: Any) -> bool:
+    """She has been fired on within the last ten minutes (`combat.hits.Damage`)."""
+    from freesail.combat.hits import damage_of
+    from freesail.combat.morale import UNDER_FIRE_S
+
+    keeper = damage_of(world.ship)
+    tick = int(world.clock.tick)
+    recent = keeper is not None and any(tick - t <= UNDER_FIRE_S for t in keeper.struck_by.values())
+    return recent == bool(value)
+
+
+def _plausible_at_quarters(world: Any, target: str | None, value: Any) -> bool:
+    quarters = (getattr(world.ship, "extra", None) or {}).get("quarters")
+    at = bool(quarters is not None and getattr(quarters, "at_quarters", False))
+    return at == bool(value)
+
+
 _PLAUSIBLE: dict[str, Any] = {
+    "under_fire": _plausible_under_fire,
+    "at_quarters": _plausible_at_quarters,
     "strained": _plausible_strained,
     "sea_above": _plausible_sea_above,
     "days_out": _plausible_days_out,

@@ -3548,6 +3548,7 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
     hold = getattr(world, "hold", None)
     if hold is not None:
         own["cargo"] = hold.words()
+    own.update(_truth_action(world))  # package 70: her guns and her damage
     ships.append(own)
     vessels = getattr(getattr(world, "vessels", None), "vessels", None) or []
     beyond = 0
@@ -3588,6 +3589,11 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
             d["state"] = getattr(v.brain, "state", v.state)
         if v.letter is not None:
             d["letter"] = f"from {getattr(v.letter, 'origin', '')}"
+        if getattr(v, "struck", False):
+            d["colours"] = "struck"
+        crew = getattr(v, "crew", None)
+        if crew is not None and getattr(crew, "shape", "full") == "full":
+            d.update(_truth_action(crew))  # package 70: a crewed ship's guns and damage
         ships.append(d)
     out["ships"] = ships
     if within_nm is not None:
@@ -3879,6 +3885,27 @@ def _truth_weather(world: Any) -> dict[str, Any]:
     return out
 
 
+def _truth_action(world: Any) -> dict[str, Any]:
+    """A ship's guns, damage and bill for the director's truth (package 70), in the
+    readings' own words; nothing for a ship without guns and undamaged."""
+    out: dict[str, Any] = {}
+    view = getattr(world, "readings", None)
+    if view is None:
+        return out
+    for row in ("guns", "damage", "bill"):
+        try:
+            value = view.value(row)
+        except Exception:  # noqa: BLE001  (never a truth lost to a row)
+            value = None
+        if isinstance(value, dict) and value.get("words"):
+            if row == "damage" and value["words"] == "none":
+                continue
+            if row == "bill" and not (value.get("killed") or value.get("wounded")):
+                continue
+            out[row] = value["words"]
+    return out
+
+
 def _truth_words(d: dict[str, Any]) -> str:
     parts = []
     for s in d.get("ships") or []:
@@ -3899,6 +3926,11 @@ def _truth_words(d: dict[str, Any]) -> str:
             bits.append(s["goal"])
         if s.get("ahead"):
             bits.append(f"ahead: {s['ahead']}")  # package 58a
+        for row in ("guns", "damage", "bill"):  # package 70
+            if s.get(row):
+                bits.append(f"{row}: {s[row]}")
+        if s.get("colours") == "struck":
+            bits.append("colours struck")
         parts.append("; ".join(bits))
     w = d.get("weather") or {}
     weather = f"the wind {w.get('wind_now', '')}"

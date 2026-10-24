@@ -574,6 +574,16 @@ class Magazine:
             self.shot[pounder][kind] -= 2 if charge is Charge.DOUBLE else 1
         self.fired[pounder] = self.fired.get(pounder, 0) + 1
 
+    def spoil(self, share: float) -> int:
+        """Cartridges found damp (package 70; the director's hand): that share of every
+        calibre's cartridges struck off, rounded down; the number struck off."""
+        lost = 0
+        for pounder, n in list(self.cartridges.items()):
+            gone = int(n * max(0.0, min(1.0, share)))
+            self.cartridges[pounder] = n - gone
+            lost += gone
+        return lost
+
     def describe(self) -> list[str]:
         """The `the magazine` reading's lines: the gunner's count."""
         if not self.cartridges:
