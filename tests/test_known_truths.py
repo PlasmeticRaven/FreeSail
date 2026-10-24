@@ -6743,7 +6743,9 @@ def test_truth_7b_113_the_hand_brings_a_far_trader_to_heaves_a_crewed_cruiser_to
     play = [e for e in world.log.all() if not for_the_record(e)]
     assert not [e for e in play if "By the captain" in e.text or trader.name in e.text]
     seen = [e for e in play if "brig" in e.text.lower() and e.tick > 61]
-    assert seen and all(e.kind.startswith("lookout.") for e in seen)
+    # package 71: the King's cruiser makes the private signal to us, which the lookout
+    # reports under the signal kinds (`signal.private`): his observation, no order of hers
+    assert seen and all(e.kind.startswith(("lookout.", "signal.")) for e in seen)
     assert any("hove to" in e.text or "heaving to" in e.text for e in seen)
     # a fake captain at her captain's station: the same order refused in words
     held = Harness(
