@@ -383,7 +383,9 @@ def _succession(cap: Any, locker: S.Locker, tick: int, near: bool) -> None:
     own = _own_id(cap)
     for key, item in list(pending.items()):
         h = item["hoist"]
-        rank, prev = S.succession_rank(list(root.vessels.vessels), own, str(item["sender"]))
+        rank, prev = S.succession_rank(
+            list(root.vessels.vessels), own, str(item["sender"]), getattr(root, "squadrons", None)
+        )
         if S.predecessor_done(prev, key, tick):
             del pending[key]
             _obey(cap, locker, h, str(item["sender"]), tick, near)

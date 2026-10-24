@@ -121,6 +121,9 @@ STATES: tuple[str, ...] = (
     "in distress",
     "engaging",
     "struck",  # package 70: the colours down, lying to for her captor (what follows is 74's)
+    # package 72 (spec M7 §21): a member of a squadron or a convoy at her station in the
+    # set; the rows out of it are each role file's (docs/design/Design-Squadrons.md)
+    "in company",
 )
 
 # The roles the doctrine files give; the cruiser (package 43) is the small man-of-war on
@@ -177,7 +180,7 @@ CAPTAIN_ON_DECK_STATES: frozenset[str] = frozenset(
 # (`brains.FarCaptain`, package 43) resolves every state of the machine
 # (`brains.resolve_state`); the brain lives in `freesail.world.brains`, apart from this
 # module, which reads no truth (see `tests/test_captains.py`).
-FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather")
+FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather", "in company")
 
 # The class of a hull by what the tops make out of her, for the cruiser's judgement of a
 # superior force (`overmatched`): a frigate over a brig over a schooner or a cutter

@@ -1088,10 +1088,19 @@ def order_of(h: Hoist) -> str | None:
     return text
 
 
-def succession_rank(sea_vessels: list[Any], reader_id: str, sender_id: str) -> tuple[int, Any]:
-    """The reader's place among the ships under the sender's orders (the scenario's and
-    the director's order of their making: the leader first), and the ship before her."""
+def succession_rank(
+    sea_vessels: list[Any], reader_id: str, sender_id: str, squadrons: Any = None
+) -> tuple[int, Any]:
+    """The reader's place among the ships under the sender's orders (her set's order of
+    sailing when she is in one, package 72; else the scenario's and the director's order of
+    their making: the leader first), and the ship before her."""
     under = [v for v in sea_vessels if str(getattr(v, "under_orders_of", "") or "") == sender_id]
+    sq = squadrons.of(reader_id) if squadrons is not None else None
+    if sq is not None:
+        by_id = {str(v.id): v for v in sea_vessels}
+        ordered = [by_id[m] for m in sq.under(sender_id) if m in by_id]
+        if any(str(v.id) == reader_id for v in ordered):
+            under = ordered
     ids = [str(v.id) for v in under]
     if reader_id not in ids:
         return 0, None

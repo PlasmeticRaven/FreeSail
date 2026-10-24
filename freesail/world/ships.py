@@ -518,6 +518,12 @@ class Vessel:
     # the least relation under 72's squadron); None and '' in a checkpoint from before
     signals: Any = None
     under_orders_of: str = ""
+    # package 72 (spec M7 §21): the set she is a member of (`squadrons.Squadron.id`, written
+    # by the set alone; "" for a ship in none), and, on a set's commander, the set's pace as
+    # a cap on his far body (the slowest member's best: the convoy at the slowest ship's
+    # pace); None in a checkpoint from before and on every ship that commands no set
+    squadron: str = ""
+    pace_cap_kn: float | None = None
 
     @property
     def height_m(self) -> float:
@@ -606,6 +612,9 @@ class Vessel:
         kn = self.polar.speed_kn(off, wind_kn) * self.sailing_factor
         if self.sail_state == "under reefed topsails":
             kn *= REEFED_FACTOR
+        cap = getattr(self, "pace_cap_kn", None)
+        if cap is not None:
+            kn = min(kn, float(cap))  # package 72: the set's pace, the slowest member's
         return max(VESSEL_MIN_SPEED_KN, kn) if off >= self.polar.closest_deg else kn
 
     def _intercept(self, world: Any, target: Position) -> Position:
@@ -731,6 +740,12 @@ class Vessel:
             return
         if kind == "company":
             self._keep_company(world, float(leg[1]), dt, wind_from, wind_kn)
+            return
+        if kind == "station":
+            # package 72 (spec M7 §21): her station in her set's formation, by the set
+            from freesail.world.squadrons import keep_station
+
+            keep_station(self, world, dt, wind_from, wind_kn)
             return
         if kind == "to_ship":
             target = world.position
@@ -947,6 +962,8 @@ class Vessel:
             d["colours"] = locker.colours.to_dict()  # package 71: only off the plain state
         if getattr(self, "under_orders_of", ""):
             d["under_orders_of"] = self.under_orders_of
+        if getattr(self, "squadron", ""):
+            d["squadron"] = self.squadron  # package 72: only on a member
         story = getattr(self, "story", ()) or ()
         if story:
             # her captain's orders by the director's hand (package 62): only where there
@@ -1323,6 +1340,11 @@ class Vessels:
             if v.done or v.brain is None or (v.crew is not None and v.crew.shape == "full"):
                 continue
             v.brain.tick()
+        sets = getattr(world, "squadrons", None)
+        if sets is not None and sets.sets:
+            # the squadrons' minute (package 72; spec M7 §21): the stations computed from
+            # the commanders' frames, the stragglers counted, the commanders' books read
+            lines.extend(sets.tick(world))
         if any(v.under_orders_of and v.brain is None and not v.done for v in self.vessels):
             # a vessel under another's orders with no brain (a convoy's merchantman given
             # only her company to keep) reads and obeys the signals by the least captain

@@ -219,3 +219,12 @@ transitions:
   - {from: engaging, on: aground, to: in distress}
   - {from: engaging, on: enemy struck, to: on passage}
   - {from: engaging, on: enemy out of range, to: on passage}
+  # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): in company, a merchantman
+  # of a convoy at her station: the ground, the gale, the port and an enemy within three
+  # cables (she fights when caught) as alone; NO `hostile stranger` row, by the convoy
+  # instructions (the ships to keep their stations and not to separate on a stranger's
+  # appearance; the escort answers her; from memory), where the merchant alone hauls off
+  - {from: in company, on: aground, to: in distress}
+  - {from: in company, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: in company, on: anchored in port, to: in port}
+  - {from: in company, on: enemy in range, to: engaging}

@@ -198,3 +198,9 @@ transitions:
   - {from: engaging, on: aground, to: in distress}
   - {from: engaging, on: enemy struck, to: on passage}
   - {from: engaging, on: enemy out of range, to: on passage}
+  # package 72 (spec M7 §21): in company (a packet sailing with a convoy for her safety):
+  # the merchant's rows, the stranger left to the escort
+  - {from: in company, on: aground, to: in distress}
+  - {from: in company, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: in company, on: anchored in port, to: in port}
+  - {from: in company, on: enemy in range, to: engaging}

@@ -457,6 +457,42 @@ def load_scenario(path: str | Path) -> ScenarioFile:
         from freesail.world.crews import crewed_settings_of
 
         sc.crewed = crewed_settings_of(raw["crewed"], where)
+    # the squadrons and the convoys (package 72; spec M7 §21): each a mapping with its
+    # commander and its members by id or name, checked whole when the World is made
+    sets_raw = raw.get("squadrons") or []
+    if not isinstance(sets_raw, list):
+        raise ScenarioError(
+            f"{where}, squadrons: a list of {{id, name, kind, commander, members, formation}}."
+        )
+    for i, s in enumerate(sets_raw):
+        if not isinstance(s, dict):
+            raise ScenarioError(f"{where}, squadrons {i + 1}: a squadron is a mapping.")
+        if not (s.get("id") or s.get("name")):
+            raise ScenarioError(f"{where}, squadrons {i + 1}: a squadron wants an id or a name.")
+        from freesail.world.squadrons import FORMATIONS, KINDS
+
+        if s.get("kind") is not None and str(s["kind"]).lower() not in KINDS:
+            raise ScenarioError(
+                f"{where}, squadrons {i + 1}: '{s['kind']}' is no kind; say {' or '.join(KINDS)}."
+            )
+        if (
+            s.get("formation") is not None
+            and " ".join(str(s["formation"]).lower().split()) not in FORMATIONS
+        ):
+            raise ScenarioError(
+                f"{where}, squadrons {i + 1}: '{s['formation']}' is no formation; say one of "
+                f"{', '.join(FORMATIONS)}."
+            )
+    sc.squadrons = [{str(k): v for k, v in s.items()} for s in sets_raw]
+    # the weather's seasonal bound (R-39; package 72): `weather_bound: seasonal`, off when
+    # not said (the recorded passages), its own key beside the weather's list form
+    if raw.get("weather_bound") is not None:
+        bound = str(raw["weather_bound"]).lower().strip()
+        if bound not in ("seasonal", "on", "off", "none", "true", "false"):
+            raise ScenarioError(
+                f"{where}, weather_bound: 'seasonal' or 'off', not {raw['weather_bound']!r}."
+            )
+        sc.weather_bound = bound in ("seasonal", "on", "true")
     # the world's business (package 43b; spec M6 §19): on, off or a density; off when not said
     if raw.get("business") is not None:
         from freesail.world.business import business_density

@@ -225,3 +225,11 @@ transitions:
   - {from: engaging, on: enemy struck, to: on passage}
   - {from: engaging, on: enemy out of range, to: on passage}
   - {from: engaging, on: overmatched, to: evading}
+  # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): in company, a cruiser at
+  # her station in a squadron: the ground, the gale, a superior force and an enemy within
+  # her engaging distance as on her station; no stranger row (the flag's signal frees her)
+  - {from: in company, on: aground, to: in distress}
+  - {from: in company, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: in company, on: anchored in port, to: in port}
+  - {from: in company, on: overmatched, to: evading}
+  - {from: in company, on: enemy in range, to: engaging, unless: overmatched}
