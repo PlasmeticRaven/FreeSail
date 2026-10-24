@@ -343,6 +343,8 @@ def _crew_scenario(parent: World, vessel: Any) -> Scenario:
         fit=(getattr(vessel, "fit", "") or None),  # her own fit of guns, not the player's
     )
     sc.latitude_deg = vessel.position.lat_deg
+    # package 72: the sets are the parent's; her own World has none (its ships are not in it)
+    sc.squadrons = []
     return sc
 
 

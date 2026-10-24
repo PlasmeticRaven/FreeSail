@@ -51,6 +51,15 @@ STATION_TOLERANCE_M = 0.5 * units.CABLE
 SAIL_STEP_M = 1.0 * units.CABLE
 # A new course is said and the helm put again when it differs from the last by a point.
 RELAY_DEG = 11.25
+# Out of station she steers for a point this far ahead of her station along the flag's
+# course (judgement: three cables, so that a ship a cable off her station closes it at
+# some twenty degrees to the line and not by chasing the point across it).
+LEAD_M = 3.0 * units.CABLE
+# Ahead of her station she shortens sail a step at a time, this often, up to so many steps
+# (judgement: a glass between steps for the hands to finish the last; four steps take her
+# from all plain sail to reefed topsails).
+SHORT_STEPS = 4
+SHORT_EVERY_S = 120
 
 _BEARING_WORDS = {
     "astern": "astern",
@@ -147,11 +156,16 @@ def _sighting_of(world: Any, flag: str) -> Any:
 
 
 def _flag_course_deg(world: Any, flag: str, sighting: Any) -> float | None:
-    """The flag's course as the tops have made it out (her heading to the nearest point
-    once her rig is made out), else None."""
+    """The flag's course: the squadron's own, which the officer of the watch knows (the
+    course the flag signalled, the order of sailing), when the flag is the leader of her
+    set; else as the tops have made it out (her heading to the nearest point once her rig
+    is made out), else None (her own heading is taken, and the station laid along it, which
+    is the loop that swung her across the line until the set's course was read)."""
     lookout = world.lookout
+    sq = _set_of(world)
+    in_set = sq is not None and (flag == sq.commander or flag == sq.leader_of(_own_id(world)))
     level = int((getattr(lookout, "_sail_said", None) or {}).get(sighting.feature.id, 0))
-    if level < 1:
+    if level < 1 and not in_set:
         return None
     root = _root(world)
     body = root.vessels.get(flag) if flag != "the ship" else root.vessels.player_shadow(root)
@@ -264,7 +278,9 @@ def _work(world: Any, spec: dict[str, Any], by_order: bool) -> Result:
     sx, sy = fx + ox, fy + oy
     distance = math.hypot(sx, sy)
     bearing = math.degrees(math.atan2(sx, sy)) % 360.0
-    rel = units.rad_to_deg(units.wrap_pi(math.radians(bearing - flag_course)))
+    c = math.radians(flag_course)
+    ux, uy = math.sin(c), math.cos(c)
+    along = sx * ux + sy * uy  # the station ahead of her (+) or astern (-) by the flag's course
     tolerance = STATION_TOLERANCE_M
     straggle_m = (sq.straggler_nm if sq is not None else 1.0) * units.NAUTICAL_MILE
     out = distance > straggle_m
@@ -278,20 +294,32 @@ def _work(world: Any, spec: dict[str, Any], by_order: bool) -> Result:
         "bearing_deg": round(bearing, 1),
         "in_station": distance <= tolerance,
     }
-    # the helm
+    # the helm: in station the flag's course; out of it the bearing of a point LEAD_M ahead
+    # of the station along the flag's course, which near the station is the flag's course
+    # with a small correction and far astern of it the station's own bearing (steering
+    # for the station point itself chases a point moving at the flag's speed and swings
+    # her across the line); ahead of her station the same aim, with sail shortened below
     if distance <= tolerance:
         course, clamp = flag_course, ""
         why = "in station, her course"
-    elif abs(rel) <= 100.0:
-        course, clamp = _course_clamped(world, bearing)
-        why = "for the station"
     else:
-        course, clamp = flag_course, ""
-        why = "ahead of her station, dropping back on the flag's course"
-    last_course = held.get("course")
+        # ahead of her station the lead grows by how far ahead, so that she edges back onto
+        # the line while her sail drops her back and never crosses the flag's bows
+        lead = LEAD_M + max(0.0, -along)
+        ax, ay = sx + lead * ux, sy + lead * uy
+        aim = math.degrees(math.atan2(ax, ay)) % 360.0
+        course, clamp = _course_clamped(world, aim)
+        why = "for the station" if along >= -SAIL_STEP_M else "ahead of her station, dropping back"
+    # the helm is put again when the course differs by a point from the one last ORDERED
+    # (not the one last computed, which creeps a few degrees a glass and would never turn
+    # her), or when her head has strayed two points from it (an evolution or another
+    # order has moved the helm)
+    ordered = held.get("ordered")
+    strayed = abs(units.rad_to_deg(units.wrap_pi(math.radians(course - own_heading))))
     turned = (
-        last_course is None
-        or abs(units.rad_to_deg(units.wrap_pi(math.radians(course - last_course)))) >= RELAY_DEG
+        ordered is None
+        or abs(units.rad_to_deg(units.wrap_pi(math.radians(course - ordered)))) >= RELAY_DEG
+        or strayed >= 2.0 * RELAY_DEG
     )
     helm_words = ""
     if turned:
@@ -303,26 +331,31 @@ def _work(world: Any, spec: dict[str, Any], by_order: bool) -> Result:
         else:
             helm_words, _ = carry_out(ship, judged)
             helm_words += f" ({judged.words})"
-    # the sail
+    # the sail: ahead of her station she shortens a step at a time, a step a glass while she
+    # is still ahead (the topgallants, then the courses, then the reefs: the sail order's
+    # own ladder), up to SHORT_STEPS; back within half a step she sets plain sail again
     sail_words = ""
-    short = bool(held.get("short"))
-    if abs(rel) > 100.0 and distance > SAIL_STEP_M and not short:
+    short = int(held.get("short") or 0)
+    last_sail = int(held.get("sail_tick", -(10**9)))
+    if along < -SAIL_STEP_M and short < SHORT_STEPS and tick - last_sail >= SHORT_EVERY_S:
         from freesail.orders import handle
 
         try:
             _, sail_words, _ = handle(ship, "shorten sail")
-            short = True
+            short += 1
+            last_sail = tick
         except OrderError:
             pass
-    elif short and (distance <= tolerance or abs(rel) <= 100.0):
+    elif short and along >= -SAIL_STEP_M / 2.0:
         from freesail.orders import handle
 
         try:
             _, sail_words, _ = handle(ship, "set plain sail")
-            short = False
+            short = 0
+            last_sail = tick
         except OrderError:
             pass
-    elif abs(rel) <= 100.0 and distance > 3.0 * SAIL_STEP_M and not held.get("pressed"):
+    elif along > 3.0 * SAIL_STEP_M and not held.get("pressed"):
         from freesail.orders import handle
 
         try:
@@ -336,7 +369,9 @@ def _work(world: Any, spec: dict[str, Any], by_order: bool) -> Result:
         flag=flag,
         since=held.get("since", tick),
         course=course,
+        ordered=course if turned else ordered,
         short=short,
+        sail_tick=last_sail,
         pressed=pressed,
         out=out,
         said="kept",
@@ -351,7 +386,7 @@ def _work(world: Any, spec: dict[str, Any], by_order: bool) -> Result:
     place = (
         "in station"
         if distance <= tolerance
-        else f"{_cables(distance)} {'astern of' if abs(rel) <= 100.0 else 'ahead of'} her station"
+        else f"{_cables(distance)} {'astern of' if along >= 0.0 else 'ahead of'} her station"
     )
     head = f"Keeping {station_words}: {flag_name} bears {units.point_name(b)} {_cables(est)}" + (
         f", steering {units.point_name(math.radians(flag_course))}" if course_known else ""

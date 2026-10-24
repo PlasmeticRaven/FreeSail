@@ -158,11 +158,34 @@ _MAN_OF_WAR_ROLES = frozenset({"kings-ship", "cruiser", "commodore"})
 _MAN_OF_WAR_DESCRIPTIONS = frozenset({"frigate", "brig-sloop"})
 
 
+def _blockade_station_of(world: Any, port: Any) -> tuple[Any, float] | None:
+    """The port's blockade station as (position, radius m), from its file's
+    `blockade_station` (the feature and its miles), None for a port with none."""
+    station = dict(getattr(port, "blockade_station", None) or {})
+    chart = getattr(world, "chart", None)
+    feature = chart.feature(str(station.get("feature") or "")) if chart is not None else None
+    if feature is None:
+        return None
+    from freesail.world.geo import Position
+
+    pos = Position(float(feature.lat_deg), float(feature.lon_deg))
+    return pos, float(station.get("within_nm") or 6.0) * units.NAUTICAL_MILE
+
+
+def _in_the_offing(world: Any, port: Any, pos: Any, within_nm: float) -> bool:
+    """Within the regime's miles of the port's outer road, or on the port's blockade
+    station (within its miles of its feature): either is the offing the port's look-outs
+    see a blockader in."""
+    if bearing_and_distance(port.outer_road.position, pos)[1] <= within_nm * units.NAUTICAL_MILE:
+        return True
+    station = _blockade_station_of(world, port)
+    return station is not None and bearing_and_distance(station[0], pos)[1] <= station[1]
+
+
 def _enemy_men_of_war_near(world: Any, port: Any, nation: str, within_nm: float) -> bool:
     nations = getattr(world, "nations", None)
     if nations is None:
         return False
-    here = port.outer_road.position
     for o in world.vessels.vessels:
         if getattr(o, "done", False) or not nations.at_war(str(o.nation), nation):
             continue
@@ -173,7 +196,7 @@ def _enemy_men_of_war_near(world: Any, port: Any, nation: str, within_nm: float)
             and str(getattr(o, "description", "")) not in _MAN_OF_WAR_DESCRIPTIONS
         ):
             continue
-        if bearing_and_distance(here, o.position)[1] <= within_nm * units.NAUTICAL_MILE:
+        if _in_the_offing(world, port, o.position, within_nm):
             return True
     # the player's own ship, a King's ship of a nation at war with hers
     pos = getattr(world, "position", None)
@@ -182,12 +205,25 @@ def _enemy_men_of_war_near(world: Any, port: Any, nation: str, within_nm: float)
     if pos is not None and own and nations.at_war(own, nation):
         from freesail.world.captains import _is_kings_ship
 
-        if (
-            _is_kings_ship(world)
-            and bearing_and_distance(here, pos)[1] <= within_nm * units.NAUTICAL_MILE
-        ):
+        if _is_kings_ship(world) and _in_the_offing(world, port, pos, within_nm):
             return True
     return False
+
+
+def _wind_kn_at(world: Any, pos: Any) -> float:
+    """The wind's speed in knots at a place: the systems' surface wind where the world has
+    the field, else the one wind of the pinned scenario."""
+    systems = getattr(world, "systems", None)
+    if systems is not None and getattr(world, "weather", None) is None:
+        plane = world.plane_of(pos) if hasattr(world, "plane_of") else None
+        if plane is not None:
+            try:
+                _, ms = systems.surface_wind_at(plane[0] / 1000.0, plane[1] / 1000.0)
+                return float(ms) / units.KNOT
+            except Exception:  # noqa: BLE001
+                pass
+    wind = getattr(world, "wind", None)
+    return float(getattr(wind, "speed", 0.0) or 0.0) / units.KNOT if wind is not None else 0.0
 
 
 def minute(world: Any) -> list[tuple[Any, ...]]:
@@ -222,8 +258,14 @@ def minute(world: Any) -> list[tuple[Any, ...]]:
             continue
         within = float(regime_knob("in ordinary", "slip_out_clear_nm", 10.0))
         clear_s = float(regime_knob("in ordinary", "slip_out_clear_minutes", 60)) * 60.0
+        wind_max = float(regime_knob("in ordinary", "slip_out_wind_max_kn", 27.0))
         memo = v.__dict__.setdefault("_sortie_memo", {})
         if _enemy_men_of_war_near(world, port, str(v.nation), within):
+            memo["clear_since"] = None
+            continue
+        if _wind_kn_at(world, port.outer_road.position) > wind_max:
+            # the gale that blew the blockade off keeps her in too: she waits for it to
+            # moderate, and the hour of the offing clear is counted from then
             memo["clear_since"] = None
             continue
         since = memo.get("clear_since")

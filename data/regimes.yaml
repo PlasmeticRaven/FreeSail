@@ -22,8 +22,9 @@ regimes:
   in ordinary:
     rule: "a hull in port with no company and no intent (`regime: in ordinary` on her entry, or the director's `ship \"X\": in ordinary at <port>`): she lies at the anchorage and sails for nothing until commissioned by the business (a nation that slips out when the blockade is blown off, with her `sortie`) or the director (`ship \"X\": commissioned for <intent>`), after the delay below"
     commission_delay_h: {value: [48, 120], source: "two to five days: a ship in ordinary wanted her company raised and her stores got in; the Regulations 1806 and the dockyards' practice (from memory); judgement, the weeks of the record cut for play"}
-    slip_out_clear_nm: {value: 10, source: "no enemy man of war within ten miles of the port's outer road for the minutes below, and she slips out (the French frigates and squadrons sailing from Brest when the blockade was off its station; Mahan, from memory); judgement"}
+    slip_out_clear_nm: {value: 15, source: "no enemy man of war within fifteen miles of the port's outer road for the minutes below, or on the port's blockade station (data/ports, `blockade_station`), and she slips out: the look-out posts on the points saw the inshore squadron off the Black Rocks, nine miles from the road of Bertheaume, and the main body's topsails toward Ushant (the French frigates and squadrons sailing from Brest when the blockade was off its station; Mahan, from memory); judgement"}
     slip_out_clear_minutes: {value: 60, source: "an hour of the offing clear, not a glance; judgement"}
+    slip_out_wind_max_kn: {value: 22, source: "no sortie in more than a fresh breeze (the top of Beaufort's force 5): a frigate warped out of the Penfeld and through the Goulet on the ebb wanted moderate weather, and the gale that blows the blockade off keeps her in too; she slips out when it moderates, the French sailing from Brest on the blockaders' being blown off with the wind serving (Mahan, from memory); judgement"}
     source: "the Regulations 1806; Mahan on the blockade of Brest (from memory)"
   on station:
     intent: "keep the station off {place} within {nm} miles"

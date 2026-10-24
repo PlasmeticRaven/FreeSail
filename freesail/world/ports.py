@@ -528,6 +528,12 @@ class Port:
     # `places.port_places`): `places:` in the file, each {id, name, done, found, roles}. A
     # plain class default, so that a checkpoint from before loads.
     places: tuple[dict[str, Any], ...] = ()
+    # The port's blockade station (package 72; spec M7 §22): `blockade_station:` in the file,
+    # {feature, within_nm, source}, the inshore squadron's station off the port's approach
+    # that the intent `blockade <port>` reads (the road itself lies behind the land from
+    # seaward: Bertheaume behind Saint-Mathieu). None: the outer road. A plain class
+    # default, so that a checkpoint from before loads.
+    blockade_station: dict[str, Any] | None = None
 
     @property
     def blockaded_by(self) -> str | None:
@@ -724,6 +730,9 @@ def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None 
         state=port_state,
         blockade=blockade,
         places=tuple(dict(x) for x in (doc.get("places") or []) if isinstance(x, dict)),
+        blockade_station=(
+            dict(doc["blockade_station"]) if isinstance(doc.get("blockade_station"), dict) else None
+        ),
     )
 
 

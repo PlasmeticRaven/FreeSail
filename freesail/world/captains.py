@@ -736,13 +736,22 @@ def read_intent(world: Any, words: str) -> Intent:
         port = ports.find(group(m, "port")) if ports is not None and ports.ports else None
         if port is None:
             raise ValueError(f"'{group(m, 'port')}' is no port of the chart to blockade.")
-        feature = str(getattr(port.outer_road, "feature_id", "") or "")
+        # the port's own blockade station (data/ports/<port>.yaml `blockade_station`, off
+        # the approach: Brest's off the Black Rocks), else its outer road
+        station = dict(getattr(port, "blockade_station", None) or {})
+        feature = str(station.get("feature") or getattr(port.outer_road, "feature_id", "") or "")
         chart = getattr(world, "chart", None)
         if not feature or chart is None or chart.feature(feature) is None:
-            raise ValueError(f"the port of {port.name} has no outer road on the chart to blockade.")
+            raise ValueError(
+                f"the port of {port.name} has no blockade station or outer road on the chart."
+            )
         from freesail.world.regimes import regime_knob
 
-        radius = float(m.group("radius") or regime_knob("on blockade", "inshore_nm", 6.0))
+        radius = float(
+            m.group("radius")
+            or station.get("within_nm")
+            or regime_knob("on blockade", "inshore_nm", 6.0)
+        )
         intent = Intent("station", said, destination=feature, radius_nm=radius, between=port.id)
         intent.blockade = port.id
         return intent
