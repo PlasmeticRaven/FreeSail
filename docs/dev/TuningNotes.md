@@ -9701,10 +9701,20 @@ three thousands after the scenario's first ten minutes:
 | under the default cap (the privateer promoted; the merchantmen brainless and far) | 328 |
 | under a cap of twelve | 311 |
 
-Against the floors: `BUILD_MACHINE_FLOOR` 500 for far detail (truth 7-159), the crewed floor
-60 under the cap (7-160); the owner's baseline of 95 ticks a second with twelve crewed ships
-is not touched by this package (the merchantmen without brains are never promoted, so a
-convoy's cap is spent on the escort and the enemy). The early figure during the build, a
+The far-detail figure of the scenario is the player's brig's: her physics and her crew's
+sail-handling while her rules captain beats up Channel are four fifths of the tick (a
+profile of a thousand ticks: the set's own minute is not in the first forty entries, and
+the far side, six station legs with their tide, is a fifth), and it ran 483 to 551 on quiet
+runs by the day's load; inside the pace set it gave 483 and failed the floor once. Truth
+7-159 therefore measures the convoy at far detail in truth 51's own form, beside the
+brains' frigate as the frigate with the dozen is measured (a far commodore with his brain
+and the convoy's book, six brainless merchant brigs on the station leg, the set's minute,
+a privateer with her brain): **581 ticks a second** (load 0.7) against `BUILD_MACHINE_FLOOR`
+500; truth 7-160 keeps the scenario itself under the default cap and a cap of twelve
+against the crewed floor 60 (318 to 328). The owner's baseline of 95 ticks a second with
+twelve crewed ships is not touched by this package (the merchantmen without brains are
+never promoted, so a convoy's cap is spent on the escort and the enemy). The tool keeps
+the scenario's own figure for the owner's play. The early figure during the build, a
 frigate with the dozen far ships of the merchant passage, was 491 before the set's minute
 was tightened (the stations cached per tick, the slots computed once a minute). The set's
 minute costs one `stations()` per set per minute and one perception per commander per
@@ -9717,7 +9727,9 @@ No recorded passage's pin moved: the weather's bound is off in every recorded sc
 captain bound into or out of Plymouth (no recorded passage is), and the physics is
 untouched. The slow tier ran whole after the package (the counts below) with no truth
 re-pinned. 71's convoy (truth 7-145, four ships under orders outside a set) keeps its three
-minutes.
+minutes. Three mends followed the whole slow tier (below) and the three files they touch
+were run again under `--slow`; nothing else changed after it but truth 7-159's form and
+these notes.
 
 ### Found on the way
 
@@ -9758,3 +9770,24 @@ minutes.
 - The planner's graph (61) is 78's; the owner's framing of 61 wanted the captains' present
   behaviour tested first, and this package's finding (a frigate steering for a road behind a
   point) is one such test.
+
+### The suite, as run
+
+- `ruff check .` and `ruff format --check .` clean (253 files).
+- The fast tier whole (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3631 passed, 2
+  failed, 355 slow left out. The two are `tests/test_pictures.py`'s API-door picture test
+  ("the door did not get there in time", its ninety-second thread beside four workers
+  running this package's long truths) and its knock-on (the watcher's station left held);
+  both pass alone (2 passed).
+- The whole slow tier (`--slow -n 4 -q -p no:cacheprovider -m "not pace"`, the machine at
+  load 0.6 when launched): 3964 passed, 3 failed, 11 xfailed (the trials' expected failures,
+  the station-gale trial among them, left as they are). The three were this package's:
+  the business's hourly draw counting the sets and the blockaders against the region's most,
+  a brainless convoy member's record without a business, and the director's `commissioned
+  for` example absent from the forms test's unperformed list. Mended; `tests/test_business.py`,
+  `tests/test_director.py` and `tests/test_squadrons.py` run again under `--slow -m "not
+  pace"`: 88 passed.
+- The pace tests alone (`--slow -q -p no:cacheprovider -m pace`): the first run 9 passed, 1
+  failed (truth 7-159 at 483 against 500, the scenario's own figure); 7-159 rewritten to
+  truth 51's form (581); the second run 10 passed.
+- Truths 7-152 to 7-160 at seed 7 as written; truth 7-145's figures unchanged.

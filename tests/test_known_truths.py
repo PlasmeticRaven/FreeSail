@@ -9100,15 +9100,34 @@ def test_truth_7_158_the_weathers_seasonal_bound_is_off_in_every_recorded_scenar
 
 
 def test_truth_7_159_the_pace_with_the_convoy_of_six_at_far_detail_holds_truth_51s_floor():
-    """The brief's item 2 and 10: the convoy of six and the privateer at far detail (the cap
-    nought: the player's brig crewed, seven far bodies, one with a brain and the privateer
-    with hers, the set's minute and the commodore's book), the best of three thousands of
-    ticks after the first ten minutes, at least BUILD_MACHINE_FLOOR. Measured on the build
-    machine by `py tools/pace.py squadrons` (docs/dev/TuningNotes.md, package 72)."""
+    """The brief's item 2 and 10: the convoy of six at far detail in truth 51's own form (the
+    frigate of the brains' sea with the far ships beside her, as the frigate with the dozen
+    is measured): a far brig-sloop commodore with his brain and the convoy's book, six
+    merchant brigs without brains on the station leg, the set's minute, and a privateer
+    schooner with her brain five miles to windward; the cap nought; the best of three
+    thousands of ticks after the first ten minutes, at least BUILD_MACHINE_FLOOR. The
+    scenario's own figure (the player's brig beating up Channel with her rules captain
+    working her sails) is the tool's, `py tools/pace.py squadrons`, 483 to 551 on the build
+    machine by the day's load (docs/dev/TuningNotes.md, package 72); the brig's sail-handling
+    is the near crew model's cost and not the set's, which this truth measures apart."""
     import time
 
-    w = _scenario_world(CONVOY_SIX)
-    w.crewed_settings = {"cap": 0}
+    from freesail.world.geo import destination
+    from tests.test_brains import put
+    from tests.test_squadrons import convoy_world
+
+    w, sq, harpy = convoy_world(brains=(False, False, False, False, False, False), cap=0)
+    p = destination(harpy.position, 45.0, 5.0 * units.NAUTICAL_MILE)
+    put(
+        w,
+        "schooner",
+        "france",
+        {"lat_deg": p.lat_deg, "lon_deg": p.lon_deg},
+        "patrolling off the Lizard within 20 miles",
+        intent="cruise for prizes off the Lizard within 20 miles",
+        name="Vengeur",
+    )
+    assert len(sq.members) == 7 and all(w.vessels.get(m).crew is None for m in sq.members)
     w.run(600)
     best = 0.0
     for _ in range(3):
