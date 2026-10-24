@@ -1241,7 +1241,7 @@ def test_live_sampling_folds_what_happens_while_the_model_has_the_floor():
     o = h.open_sample
     assert o.reason.startswith("the start; then ") and o.reason.endswith("; then a question")
     assert "the interval" in o.reason or "the glass" in o.reason
-    assert o.tick == EVERY and o.readings == tools.readings_words(world)
+    assert o.tick == EVERY and o.readings == sample_rows(world)
     assert o.question == "how she goes"
     # every notable line since the start is in the merged turn (the routine ones are
     # capped, the most recent kept, as in any sample)
@@ -1393,6 +1393,13 @@ def test_on_events_sampling_names_the_event_and_a_station_may_combine_the_two():
     assert both.describe() == "every 10 minutes and on notable and urgent events"
 
 
+def sample_rows(world) -> dict:
+    """The rows a sample carries: the readings tool's less the action's idle rows (package
+    70: `the damage`, `the bill`, `the enemy` and their kin ride only while something is
+    afoot; the tool itself gives every row)."""
+    return harness_mod.Harness._sample_readings(world)
+
+
 def test_each_sample_carries_the_lines_since_the_last_one_and_the_readings():
     world = point_world()
     h, fake, _ = stationed(world, ["Aye."], loop=True)
@@ -1409,8 +1416,7 @@ def test_each_sample_carries_the_lines_since_the_last_one_and_the_readings():
     # on the point ship in a steady wind, the clock's
     assert first["readings"] == data_turns(fake)[0]["readings"] and "readings_are" not in first
     assert second["readings_are"] == harness_mod.READINGS_ARE
-    # the sample's rows are the tool's less the action's idle rows (package 70)
-    now = harness_mod.Harness._sample_readings(world)
+    now = sample_rows(world)
     assert second["readings"] == {k: v for k, v in now.items() if first["readings"][k] != v}
     assert set(second["readings"]) <= {"time", "watch", "daylight"}
     assert second["question"] is None and second["notices"] == []
@@ -2503,7 +2509,7 @@ def test_a_sample_after_the_first_carries_only_what_changed_and_the_sails_in_one
 
     def look(last, turns):
         if "readings" in last:
-            at_call.append(tools.readings_words(world))
+            at_call.append(sample_rows(world))
         return Reply()
 
     h, fake, _ = stationed(world, [look], loop=True)
@@ -2564,7 +2570,7 @@ def test_what_the_captain_has_the_model_can_get_from_its_samples():
 
     def look(last, turns):
         if "readings" in last:
-            assert the_models_picture(world, turns) == tools.readings_words(world)
+            assert the_models_picture(world, turns) == sample_rows(world)
             checked.append(world.clock.tick)
         return Reply()
 
@@ -2601,8 +2607,8 @@ def test_samples_bundled_into_an_open_turn_share_one_copy_of_what_is_common():
             assert all(before.get(k) != v for k, v in t.content["readings"].items()), (
                 "a fold repeats nothing"
             )
-    assert h.open_sample.readings == tools.readings_words(world)
-    assert the_models_picture(world, h.turns) == tools.readings_words(world)
+    assert h.open_sample.readings == sample_rows(world)
+    assert the_models_picture(world, h.turns) == sample_rows(world)
 
 
 def test_a_door_that_leaves_out_old_turns_sends_the_first_kept_with_every_reading():
@@ -2639,7 +2645,7 @@ def test_a_door_that_leaves_out_old_turns_sends_the_first_kept_with_every_readin
     for s in samples[: k + 1]:
         picture.update(s["readings"])
     assert first["readings"] == picture
-    assert set(picture) == set(tools.readings_words(world))
+    assert set(picture) == set(sample_rows(world))
 
 
 def test_the_brief_and_the_tools_say_what_a_sample_carries_and_the_weathers_events():

@@ -208,6 +208,10 @@ NATION_HABITS: dict[str, dict[str, Any]] = {
     "united-states": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
 }
 
+# The range a weaker mark is closed to in action (pistol shot, a third of a cable;
+# judgement after the chases' record: the chaser ranges alongside).
+CLOSE_RANGE_M = 60.0
+
 SIZE_RANK: dict[str, int] = {
     "frigate": 3,
     "brig-sloop": 2,
@@ -3524,6 +3528,19 @@ class Captain(Judgement):
         habit = self._habit()
         wanted = habit["engage_range_cables"] * units.NAUTICAL_MILE / 10.0
         rng = float(mark.get("estimate_m") or wanted)
+        last_tick = int(self._business.get("steered_tick", -(10**9)))
+        if self._weaker(p, mark):
+            # a weaker mark (a smaller class, or a merchantman) is chased and closed to
+            # pistol shot: the chaser runs alongside, and the range-keeping law is for an
+            # equal (the trade-stranger trial: the beam law steered the brig across the
+            # chase and the schooner ran clear)
+            wanted = CLOSE_RANGE_M
+            if rng > CLOSE_RANGE_M * 3.0:
+                if self._business.get("steered_for") != "chase" and p.tick - last_tick >= 120:
+                    self._business["steered_for"] = "chase"
+                    self._business["steered_tick"] = p.tick
+                    self.give("give chase", why="to close her")
+                return
         bearing = float(mark.get("bearing_deg") or 0.0)
         sign = 1.0 if side == "starboard" else -1.0
         # the angle she is kept on, before the beam to close and abaft it to open, a
@@ -3534,12 +3551,24 @@ class Captain(Judgement):
         off = max(35.0, min(125.0, 90.0 + 55.0 * (1.0 - ratio)))
         course = (bearing - sign * off) % 360.0
         last = self._business.get("steered_for")
-        last_tick = int(self._business.get("steered_tick", -(10**9)))
+        if last == "chase":
+            last = None
         turn = abs((course - float(last) + 180.0) % 360.0 - 180.0) if last is not None else 999.0
         if turn >= 10.0 and p.tick - last_tick >= 120:
             self._business["steered_for"] = course
             self._business["steered_tick"] = p.tick
             self.give(f"steer {course:.0f}", why="to keep the enemy on the engaged beam")
+
+    def _enemy_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
+        if not getattr(self.world.ship, "guns", None):
+            return None  # no guns: she never engages; she runs by the merchant's rows
+        return super()._enemy_within(p, within_nm)
+
+    def _weaker(self, p: Perception, mark: dict[str, Any]) -> bool:
+        """A mark of a smaller class than her own, or a merchantman of any class."""
+        if "merchant" in str(mark.get("known") or "").lower():
+            return True
+        return int(mark.get("size") or 0) < int(p.own_size or 0)
 
     def _stranger_struck(self, s: dict[str, Any]) -> bool:
         v = self._vessel_of(str(s.get("id") or ""))

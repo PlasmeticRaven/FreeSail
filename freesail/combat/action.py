@@ -47,6 +47,21 @@ GUNNERY_STREAM = "gunnery"
 PLAYER_ID = "the ship"
 
 
+class _LazyStream:
+    """The gunnery's random stream, opened at the first draw: a ship with guns that never
+    fires opens no stream, and the sailing's list of streams is as it was (the strain's
+    determinism test pins it)."""
+
+    def __init__(self, world: Any) -> None:
+        self._world = world
+        self._stream: Any = None
+
+    def random(self) -> float:
+        if self._stream is None:
+            self._stream = self._world.rng.stream(GUNNERY_STREAM)
+        return self._stream.random()
+
+
 def tick_action(world: Any) -> None:
     """One tick of the action for this World's ship."""
     ship = world.ship
@@ -65,7 +80,7 @@ def tick_action(world: Any) -> None:
     battery.target_relative_rad = (
         units.wrap_pi(target.bearing_rad - firer.heading_rad) if target is not None else None
     )
-    rng = world.rng.stream(GUNNERY_STREAM)
+    rng = _LazyStream(world)  # the gunnery's stream opened at the first shot, not before
     fired_before = battery.rounds_fired
     opened_before = dict(battery.opened_fire_at)
     battery.tick(1.0, quarters, firer, target, rng, tick, HITS.resolve_shot)
