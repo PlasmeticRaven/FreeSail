@@ -492,3 +492,46 @@ left with the finding; item 9 the readings, the events, the forms and the harnes
 the scenarios, the truths from 7-152 and the records. 79 builds the regimes out from
 `data/regimes.yaml` and the nations' knobs; 74 gives the prize to her captor's set and the
 far fight to the straggler; 76 corrects the books' numbers the squadron's signals use.
+
+## As built (the postscript, 2026-10-24)
+
+The shape held. Where the build moved from the note:
+
+- **The cut-out's distance** is hailing distance (`CUT_OUT_M`, four cables), not pistol shot:
+  the far chase of package 70 brings a privateer to within hail of her prey and stops there,
+  and the capture rule reads that range; 74's far fight will put the shot in between.
+- **The weather's bound** is the scenario's top-level key `weather_bound: seasonal | off`, not
+  a key under `weather:` (the loader's `weather:` mapping is the M5 form of the wind, the
+  systems and the climatology, and a switch that moves passages is better seen at the top).
+  It is a soft scale on the systems' summed anomaly and on their wind with it
+  (`Weather.bound_at`), never on the mean gradient.
+- **The near station law** was written twice. The first read the flag's course from the tops
+  alone and, when they had not made it out, from the ship's own heading, so that the station
+  "astern of the flag" turned with every helm she put: a loop that swung her across the
+  line. As built the flag's course is the set's own (the signalled course, which every officer
+  of the watch knows) when the flag leads her set, and the tops' when she keeps station on a
+  ship named; she steers for a point three cables ahead of her station along that course,
+  with the lead grown by how far ahead of it she is; she shortens sail a step a glass while
+  ahead of it, up to four steps; and the helm is put again against the course last ordered,
+  not the one last computed, which crept a few degrees a glass and never turned her.
+- **The port's blockade station** (`data/ports/<port>.yaml`, `blockade_station`) is where
+  the intent `blockade <port>` keeps station, not the outer road: the road of Bertheaume lies
+  behind Saint-Mathieu from seaward, and a captain steering for it from the west takes the
+  Four and the Plâtresses. The regime's offing counts a man of war on that station as well as
+  one within fifteen miles of the road (ten in the note: the inshore squadron off the Black
+  Rocks works nine miles from the road and more), and no sortie is made above a fresh breeze
+  (22 knots): the gale that blows the blockade off keeps the French in too, and they slip out
+  when it moderates, which is the order of the owner's scenario.
+- **A promoted ship's own World** carries no sets (`_crew_scenario` clears `squadrons`): the
+  sets are the parent's, and her World's ships are not in it.
+- **The chart's two Black Rocks**: the features file has Brest's (`pierres-noires`, "the Black
+  Rocks") and Falmouth's drying rock ("the Black Rock"); the intents read the plural to
+  Brest's, as the cruiser's doctrine already did.
+- **The squadron scenario's members** carry an intent each (the station intent of their
+  commodore): a brainless member is never promoted (the crews' switch promotes ships with
+  brains), so a line that is to be kept through the promotion is a line of ships with brains;
+  a convoy's merchantmen stay brainless and far, as the note had them.
+- **The planner across the land** was not needed by the convoys after all, but Plymouth's
+  track to sea was moved off the land (`data/ports/plymouth.yaml`: by Cawsand Bay and the
+  Rame to the open Channel), which lets the planner into and out of Plymouth; 61's graph
+  stays with 78.
