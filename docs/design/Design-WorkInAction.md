@@ -209,3 +209,7 @@ item 5 is where a shot lands in the part graph and the muster; item 6 gives the 
 captain his engaging book over these intentions and the morale that strikes; item 8 gives
 the stations the readings in one line when they change; item 9 measures two crewed ships
 served by this bill against the baseline.
+
+### As built (the end of the package)
+
+The shape held, with two of its transitions taken another way once they were run. `beat to quarters` is a crew order beside `call all hands` (`orders/crew.py`), not an evolution: an all-hands evolution queues behind the tack or the heave-to in hand (the first smoke had a crewed cutter wait ten minutes for her drum while her heave-to failed), and the drum must not; the hands are turned up by the routine and the bill assigned at once, a hand at work going to his gun as it is done. `cast loose the guns` and `secure the guns` are evolutions for their time but take it from the crews at their guns, asking the runner for one hand (a frigate's company is minutes coming up the hatchways, and the first measure had her guns never come loose waiting on the pool). `clear for action` stays the all-hands evolution it was. The guns' cycle, the standing intentions, the robbing by priority and the one figure of morale are as written above; every figure is in `docs/dev/TuningNotes.md` (package 70).
