@@ -1527,6 +1527,12 @@ def execute(ship: Any, order: Order) -> Result:
         which = rest or _sail_named(order.verb_phrase)
         text, data = world.lookout.make_out(world, which)
         return "lookout.made_out", text, {"verb": verb, "level": 1} | data
+    if verb == "keep station":
+        # package 72 (spec M7 §21): her station in her set, or on a ship named, by the
+        # lookout's bearing and distance of the flag (`orders/station.py`)
+        from freesail.orders import station
+
+        return station.execute(ship, order)
     if verb == "give chase":
         world = _world_with_lookout(ship)
         which = rest or _sail_named(order.verb_phrase)

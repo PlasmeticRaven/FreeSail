@@ -9601,3 +9601,193 @@ a time, long runs detached to a log and polled.
   3,953 run (the fast tier within it), 3,941 passed, 11 expected failures (the station-gale trial among them), 1 failed: the director's every-form examples test, which the package's own forms and examples broke (above, "the director's library"); mended, and the four files it touches (`test_director`, `test_crews`, `test_orders`, `test_signals`) re-run whole under `--slow`: 800 passed.
 - **The pace tests** (`--slow -m pace`, alone and last): 8 passed, 7-151 (the convoy of four under orders) within them.
 - `ruff check .` and `ruff format .` clean at every commit.
+
+## Package 72: the naval system (2026-10-24)
+
+The third package of milestone 7, built in a worktree off `356e7ba`. Spec M7 Part 7-vi
+(§21 to §23) "as built (package 72)" and the §3 and §6 lines for the succession and the
+least relation; `docs/design/Design-Squadrons.md` (the design, written first, with its "As
+built" postscript); `docs/agents/Harness.md` §21e; the primer's chapter 24; truths 7-152 to
+7-160; the three scenarios `convoy-six.yaml`, `blockade.yaml`, `squadron.yaml`. The physics
+of the hull, the sails and the sea is read and not changed; no ship file was touched; the
+consent records were not touched; no model identifier anywhere.
+
+### The set's design, in a paragraph
+
+A squadron is a genuine set (`Squadron` in `freesail/world/squadrons.py`, the registry on
+the World): members in the order of sailing, a commander, a kind, a formation whose slots
+are laid in the commander's frame with the leeward side by the wind, an interval, a book.
+The set writes 71's least relation on every member and clears it when she leaves, so one
+hoist still works the whole; it moves as one brain at far detail, every other member on the
+plan leg `("station", set)` laid every minute at the set's pace, which is the slowest
+member's and a cap on the commander's far body; it is ticked once a minute after the brains
+and before the bodies, and that minute is the stragglers, the pace, the commander's reading
+of the signals flying and his book. A promoted member's captain is `in company` and keeps
+station by the near order; the commander's book runs on whichever rules captain holds the
+commodore's station and falls silent under a model. The regimes are data; the business
+draws by them and follows the player's ship.
+
+### Each item against its intent
+
+1. **The set: built.** `Squadron`, `Squadrons`, `sets_from_scenario`; join, leave, set the
+   commander, detach and recall a division, split; the readings and the director's forms.
+2. **One brain at far detail and the promotion in station: built, measured.** The station
+   leg, the pace cap, `in company` for the promoted captain, the far brain's `resolve_state`
+   laying the leg; the promotion keeps the line (7-155). The pace figures below.
+3. **Formations and station keeping as a standing-order kind; the wake: built.** The four
+   formations; `keep station` as a held order of the navigation (`freesail/orders/station.py`)
+   given by the `in company` book every two minutes and by the player; the succession by the
+   wake within a set, 71's three minutes outside one (`signalling._succession`).
+4. **The book, the commodore's and escort's doctrine, the model at the flagship: built.**
+   `data/squadrons/*.yaml` with sources; the commodore's chasing rows and `chase_stale_hours`;
+   the escort's cover (`COVER_NM`) and the cut-out withheld within it; the model commands by
+   `make the signal` and the book says nothing under him.
+5. **Regimes in data with the nations' knobs: built the shape and the first of each**
+   (`data/regimes.yaml`, `naval:` in `data/nations.yaml`, `regimes.py` for in ordinary and the
+   sortie, the intent `blockade <port>`); 79 builds them out.
+6. **The business's convoys and squadrons, and the player followed: built.** `_convoy`,
+   `_blockades`, `_in_ordinary`, `_follow`, `_carried_over`; `population.convoys: 1`,
+   `carry_over_nm: 30` (judgement: a convoy half an hour's sail from the edge is still the
+   player's weather).
+7. **The weather's seasonal bound (R-39): built under a switch, off.** `Weather.bound`, a
+   soft scale on the systems' summed anomaly and their wind (`bound_at`), on by the
+   scenario's `weather_bound: seasonal`; the unit test holds the glass to June's ceiling
+   (1046 hPa: the background with the strongest high and the four-hectopascal margin) where
+   two highs would give 1057; truth 7-158 keeps it off in every recorded scenario. Taken only
+   this far: the blockade's gale is a scripted low and wants no bound; the recorded passages
+   are not re-measured because nothing moves with the switch off. Iberia's drift (the cold
+   review's finding) is 79's.
+8. **The planner across the land (61): left to 78, with the reason.** The convoys sail the
+   Channel's open water and the Brest blockade works from seaward; what the convoys did want
+   was Plymouth's track to sea moved off the land (`data/ports/plymouth.yaml`: by Cawsand Bay
+   and the Rame), which was data and is done; 61's graph is not.
+9. **Readings, events, forms, truth, harness: built.** `the squadron`, `the convoy`, `the
+   order of sailing`, `the station`; the events listed in Harness §21e; the forms
+   `squadron.new`, `squadron.act`, `convoy`, `ship.regime` after `WORLD_ORDER_FORMS`; the
+   channels `squadron` and `convoy`; the director's truth with every ship's set and regime.
+10. **Scenarios, truths, records: built.** Below.
+
+### The three days at seed 7
+
+- **The convoy of six and the privateer** (`convoy-six.yaml`): the Friendship a mile astern
+  (a dull sailer, `sailing_factor: 0.85`) is a straggler by the book's ten minutes; No. 20
+  ordered at 2760, up at 2866 (the hands slow at it behind a wear), answered at 3000; back in
+  her station at 5280; every ship within 165 m of her station from 7200 on (the far leg holds
+  at the tolerance's edge, half a cable, and the commodore's own turns add the rest). The
+  privateer schooner investigates from 600 and evades at 3600 at two miles from the
+  commodore (`man_of_war_nm: 2.5`), twenty miles off by 10800. The owner's cut-out needs
+  an uncovered straggler: the escort in company covers the six, and the unit test has the
+  cut-out with a merchantman alone.
+- **The blockade of Brest blown off** (`blockade.yaml`): the scripted low (978 hPa passing
+  490 km north of the start, the gale day's radius) gives 34 knots from 226° at T+3h, 38 at
+  the height, under 28 by T+10h, under 22 by T+11h; the inshore squadron's far commodore
+  stands off the land in the rising southerly (his station book's offing) and is blown off
+  by the book at 11400; the goal restored at 37920; the lights at 38640; the Hortense out at
+  43200, an hour after the wind fell under the fresh breeze. The player's frigate on the
+  Ushant station is hove to from T+3h to T+8h30 and keeping her station after, by her book.
+- **The squadron promoting in station** (`squadron.yaml`): at far detail the two members
+  within a cable of their stations at 3600 (about 40 m while the commodore steers steady);
+  under the default cap all three crewed by 600 and within a cable and a half at 7200,
+  their captains in company. The first build of the near order lost the line (below).
+
+### The pace
+
+`py tools/pace.py squadrons` on the build machine, quiet (load 0.3 to 0.7), each the best of
+three thousands after the scenario's first ten minutes:
+
+| The convoy of six and the privateer | ticks a second |
+|---|---|
+| at far detail alone (the player's brig crewed; seven far bodies, two with brains) | 551 |
+| under the default cap (the privateer promoted; the merchantmen brainless and far) | 328 |
+| under a cap of twelve | 311 |
+
+The far-detail figure of the scenario is the player's brig's: her physics and her crew's
+sail-handling while her rules captain beats up Channel are four fifths of the tick (a
+profile of a thousand ticks: the set's own minute is not in the first forty entries, and
+the far side, six station legs with their tide, is a fifth), and it ran 483 to 551 on quiet
+runs by the day's load; inside the pace set it gave 483 and failed the floor once. Truth
+7-159 therefore measures the convoy at far detail in truth 51's own form, beside the
+brains' frigate as the frigate with the dozen is measured (a far commodore with his brain
+and the convoy's book, six brainless merchant brigs on the station leg, the set's minute,
+a privateer with her brain): **581 ticks a second** (load 0.7) against `BUILD_MACHINE_FLOOR`
+500; truth 7-160 keeps the scenario itself under the default cap and a cap of twelve
+against the crewed floor 60 (318 to 328). The owner's baseline of 95 ticks a second with
+twelve crewed ships is not touched by this package (the merchantmen without brains are
+never promoted, so a convoy's cap is spent on the escort and the enemy). The tool keeps
+the scenario's own figure for the owner's play. The early figure during the build, a
+frigate with the dozen far ships of the merchant passage, was 491 before the set's minute
+was tightened (the stations cached per tick, the slots computed once a minute). The set's
+minute costs one `stations()` per set per minute and one perception per commander per
+minute; a brainless member on the station leg costs a far body's tick and nothing more.
+
+### What moved, and the pins
+
+No recorded passage's pin moved: the weather's bound is off in every recorded scenario
+(truth 7-158), the planner's graph is not built, Plymouth's track to sea is read only by a
+captain bound into or out of Plymouth (no recorded passage is), and the physics is
+untouched. The slow tier ran whole after the package (the counts below) with no truth
+re-pinned. 71's convoy (truth 7-145, four ships under orders outside a set) keeps its three
+minutes. Three mends followed the whole slow tier (below) and the three files they touch
+were run again under `--slow`; nothing else changed after it but truth 7-159's form and
+these notes.
+
+### Found on the way
+
+- **The near station order's two faults** (both mended in this package): the flag's course
+  taken from her own heading when the tops had not made it out, which turned the station with
+  every helm she put; and the helm put again only against the course last computed, which
+  crept a few degrees a glass and never turned her. With the set's course and the ordered
+  course she keeps station to a cable and a half through two hours under the default cap.
+- **A promoted ship's World built the sets again** from the scenario's `squadrons:` and failed
+  for want of the ships; her World carries none now.
+- **The chart has two Black Rocks**: Brest's (`pierres-noires`, the plural) and Falmouth's
+  drying rock (the singular); the intents read them apart.
+- **`blockade Brest` on the road itself** took a frigate from the west through the Four and
+  onto the Plâtresses in twenty-eight minutes; the port's blockade station is the mend.
+- **The gradient-wind rule** makes a scripted low's surface wind nearly flat in strength
+  across hours (24 knots for eleven hours in the first draft of the blockade's low at 400 km,
+  18 at 250 km): the gale comes from the low passing at about the radius, as the gale day's
+  does. Noted for whoever scripts the next gale.
+- **The rules captain on a station under the land** stands off forty miles in a rising
+  onshore wind (his book's offing), which emptied Brest's offing and let the sortie out
+  before the gale in the first draft; the regime's wind ceiling is the mend. His keeping
+  station in a gale is the known expected failure of the trials and not touched.
+- **A brainless member is never promoted** (the crews' switch promotes ships with brains);
+  the squadron scenario's members carry intents for that reason.
+- **YAML reads a bare `on:` key as `True`**; the books' loader normalises it.
+
+### Decisions for the lead and the owner
+
+- The weather's bound stays under its switch until the owner has judged it on a passage of
+  days; the switch is `weather_bound: seasonal` in a scenario.
+- `CUT_OUT_M` is hailing distance (four cables), the far chase's own stop; 74's far fight
+  should put the shot in and the strike after it.
+- The regime's offing (fifteen miles of the road or the port's blockade station) and the
+  fresh-breeze ceiling for a sortie are judgement figures in `data/regimes.yaml` for the
+  owner's hand.
+- The convoy's merchantmen stay brainless and far under every cap; if the owner wants a
+  merchantman promoted (to speak her, to board her), give her an intent in the scenario.
+- The planner's graph (61) is 78's; the owner's framing of 61 wanted the captains' present
+  behaviour tested first, and this package's finding (a frigate steering for a road behind a
+  point) is one such test.
+
+### The suite, as run
+
+- `ruff check .` and `ruff format --check .` clean (253 files).
+- The fast tier whole (`python3 -m pytest -n 4 -q -p no:cacheprovider`): 3631 passed, 2
+  failed, 355 slow left out. The two are `tests/test_pictures.py`'s API-door picture test
+  ("the door did not get there in time", its ninety-second thread beside four workers
+  running this package's long truths) and its knock-on (the watcher's station left held);
+  both pass alone (2 passed).
+- The whole slow tier (`--slow -n 4 -q -p no:cacheprovider -m "not pace"`, the machine at
+  load 0.6 when launched): 3964 passed, 3 failed, 11 xfailed (the trials' expected failures,
+  the station-gale trial among them, left as they are). The three were this package's:
+  the business's hourly draw counting the sets and the blockaders against the region's most,
+  a brainless convoy member's record without a business, and the director's `commissioned
+  for` example absent from the forms test's unperformed list. Mended; `tests/test_business.py`,
+  `tests/test_director.py` and `tests/test_squadrons.py` run again under `--slow -m "not
+  pace"`: 88 passed.
+- The pace tests alone (`--slow -q -p no:cacheprovider -m pace`): the first run 9 passed, 1
+  failed (truth 7-159 at 483 against 500, the scenario's own figure); 7-159 rewritten to
+  truth 51's form (581); the second run 10 passed.
+- Truths 7-152 to 7-160 at seed 7 as written; truth 7-145's figures unchanged.

@@ -10,6 +10,7 @@ with the machine's load beside. Run it on a quiet machine:
     py tools/pace.py far             # with the dozen at far detail
     py tools/pace.py crewed --ships 3 6   # with so many crewed ships
     py tools/pace.py crewed --profile     # and a profile of three crewed ships' ticks
+    py tools/pace.py squadrons       # the convoy of six at far detail, the default cap, a cap of 12
 
 Sixty ticks a second is the owner's play at 60x; the crewed cap (`freesail/world/crews.py`,
 `CREWED_CAP`) was chosen from these figures on the build machine (TuningNotes, package 43).
@@ -96,6 +97,23 @@ def main(which: str = "all", ships: list[int] | None = None, profile: bool = Fal
             far.vessels.serial += 1
             far.vessels.add(vessel_from_spec(far, dict(spec), far.vessels.serial))
         measure([far], "the frigate with the dozen ships at far detail")
+    if which in ("all", "squadrons"):
+        # package 72: the convoy of six and the privateer (data/scenarios/convoy-six.yaml),
+        # the set at far detail alone (cap nought), under the default cap and under a cap
+        # of twelve (every member crewed); each after the scenario's first ten minutes
+        for cap in (0, None, 12):
+            sf3 = load_scenario("data/scenarios/convoy-six.yaml")
+            sq = make_scenario_world(sf3)
+            begin(sq, sf3)
+            if cap is not None:
+                sq.crewed_settings = {"cap": cap}
+            sq.run(600)
+            label = (
+                "far detail alone"
+                if cap == 0
+                else ("the default cap" if cap is None else f"a cap of {cap}")
+            )
+            measure([sq], f"the convoy of six and the privateer, {label}")
     if which in ("all", "crewed"):
         ns = ships or [1, 3, 6, 12]
         crews = [crewed(sf, i, *s) for i, s in enumerate(SHIPS)]
@@ -118,7 +136,8 @@ if __name__ == "__main__":
     import argparse
 
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("which", nargs="?", default="all", choices=["all", "alone", "far", "crewed"])
+    choices = ["all", "alone", "far", "crewed", "squadrons"]
+    ap.add_argument("which", nargs="?", default="all", choices=choices)
     ap.add_argument("--ships", type=int, nargs="+", help="how many crewed ships, each a measure")
     ap.add_argument("--profile", action="store_true", help="profile three crewed ships' ticks")
     args = ap.parse_args()

@@ -25,6 +25,15 @@ population:
   traders_at_sea: 3       # merchantmen at the edges, coming in for a port of the region
   fishermen: 4            # smacks and luggers on the grounds or bound for them
   cruisers_per_side: 1    # a cruiser of each nation at war on a station of her own
+  # package 72 (spec M7 §22; data/regimes.yaml): the convoys of the nations that convoy
+  # (four to eight sail under an escort, the Channel's coasting convoys; judgement), and
+  # the blockades the nations' knobs name are drawn whole (`naval.blockades`), each once
+  convoys: 1
+# package 72 (the owner's requirement of 2026-10-17): the business follows the player's
+# ship across the regions, and a ship beyond the region's edge is put out of the world
+# only when she is bound away AND farther than this from the player's ship (or a set of
+# hers is): beyond the horizon and a watch's sailing (judgement)
+carry_over_nm: 30
 # A ship arrives at an edge, bound in, or sails from a port, bound away, by the draw once
 # an hour with these chances at density 1 (judgement: about six traders and two fishermen
 # a day across the region), so long as the region holds fewer than `most_ships`.

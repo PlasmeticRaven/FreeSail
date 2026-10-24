@@ -159,6 +159,9 @@ COLD_FRONT_TURN_DEG_PER_H = 6.0
 # at twice its radius).
 BOX_HALF_KM = 250.0
 SYSTEM_REACH_KM = 900.0
+# The season's ceiling for a high (package 58a's doubt, and package 72's bound): the
+# month's background with its strongest high's anomaly and this margin over (judgement).
+HIGH_CEILING_MARGIN_HPA = 4.0
 # A system or a waypoint appended in play grows in over this at the least (package 58a;
 # the brief's hour: the cold review's R-39, a director's change stepped in at once and the
 # glass jumped nine hundredths in the hour, 5 to 18 knots of wind in a minute).
@@ -923,12 +926,14 @@ class Weather:
         background_hpa: float | None = None,
         gradient: tuple[float, float] | None = None,
         box: Box | str | None = None,
+        bound: bool = False,
     ):
         self.start = start
         self.now = start
         self.seed = int(seed)
         self._stream = stream
         self.climatology = climatology
+        self.bound = bool(bound)  # the summed field's seasonal bound (package 72)
         # the box she starts in (package 38): the climatology's default when none is said
         if isinstance(box, str):
             if climatology is None or box not in climatology.boxes:
@@ -1293,23 +1298,58 @@ class Weather:
 
     # -- the field ----------------------------------------------------------
 
+    # The summed field's seasonal bound (R-39; package 72, spec M7 §22's blockade at sea
+    # for days): off by default (the recorded passages), on by the scenario's
+    # `weather_bound: seasonal`. A soft clamp: where the systems' summed anomaly would take
+    # the glass under the month's floor (the deepest low the table allows) or over its
+    # ceiling (the background with the strongest high's anomaly and the margin), the
+    # anomaly is scaled by the one factor that brings it to the bound, and every system's
+    # gradient by the same, so that the wind and the glass agree (a hard clamp would give a
+    # flat field and no wind where the bound bites). A class default so that a checkpoint
+    # from before loads with it off.
+    bound: bool = False
+
+    def _bound_factor(self, p0: float, anomaly: float) -> float:
+        if not self.bound or anomaly == 0.0 or self.climatology is None:
+            return 1.0
+        t = self._table(self.now)
+        floor = float(t.central_hpa[2])
+        ceiling = float(t.background_hpa) + float(t.high_anomaly_hpa[1]) + HIGH_CEILING_MARGIN_HPA
+        p = p0 + anomaly
+        if p < floor and anomaly < 0.0:
+            return max(0.0, min(1.0, (floor - p0) / anomaly))
+        if p > ceiling and anomaly > 0.0:
+            return max(0.0, min(1.0, (ceiling - p0) / anomaly))
+        return 1.0
+
+    def bound_at(self, x_km: float, y_km: float) -> float:
+        """The bound's factor at a point: one where the field is within the season's
+        bounds (or the bound is off), less where the summed systems are held to them."""
+        p0 = self._background + self._gradient[0] * x_km + self._gradient[1] * y_km
+        anomaly = sum(s.anomaly_and_gradient(x_km, y_km)[0] for s in self.systems)
+        return self._bound_factor(p0, anomaly)
+
     def pressure_at(self, x_km: float, y_km: float) -> float:
-        p = self._background + self._gradient[0] * x_km + self._gradient[1] * y_km
+        p0 = self._background + self._gradient[0] * x_km + self._gradient[1] * y_km
+        anomaly = 0.0
         for s in self.systems:
-            p += s.anomaly_and_gradient(x_km, y_km)[0]
-        return p
+            anomaly += s.anomaly_and_gradient(x_km, y_km)[0]
+        return p0 + self._bound_factor(p0, anomaly) * anomaly
 
     def geostrophic_at(self, x_km: float, y_km: float) -> tuple[float, float]:
         """The geostrophic wind's velocity (m/s east, north): each system's gradient turned
         ninety degrees with low pressure on the left, capped in strong curvature by the
         gradient-wind rule (Holton, *An Introduction to Dynamic Meteorology*, the gradient
         wind: cyclonic flow is subgeostrophic, anticyclonic flow cannot exceed f r / 4 in
-        its geostrophic value)."""
+        its geostrophic value); the systems' part scaled by the season's bound where it
+        bites (package 72), the mean gradient's never."""
         gx, gy = self._gradient
         vx = -GEOSTROPHIC_MS_PER_HPA_PER_100KM * 100.0 * gy
         vy = GEOSTROPHIC_MS_PER_HPA_PER_100KM * 100.0 * gx
+        k = self.bound_at(x_km, y_km) if self.bound else 1.0
         for s in self.systems:
             _, gx, gy, u = s.anomaly_and_gradient(x_km, y_km)
+            gx, gy = gx * k, gy * k
             g = math.hypot(gx, gy)  # hPa/km
             if g == 0.0:
                 continue

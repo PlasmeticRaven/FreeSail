@@ -736,6 +736,64 @@ is under; a brief's `limits: {false_colours: false}` refuses his ships the ruse,
 brief's limits. `say as the captain of the Nancy: ...` within hail speaks for an unheld
 captain as 52 has it.
 
+## 21e. The squadron, the convoy and the station (package 72)
+
+Spec M7 §21 to §23 "as built (package 72)"; `docs/design/Design-Squadrons.md`; the primer's
+chapter 24. What a station reads of the set its ship commands or belongs to, and what it may
+do with it. The set is a genuine object of the world (`world.squadrons`): its members in
+their order, its formation and interval, its pace the slowest ship's, its commander's book;
+the station never sees another set as an object, only its ships and signals, as a captain did.
+
+**The readings.** `squadron` (the set: its name and kind, the commander, the members in
+their order with each one's state and whether she straggles, the formation, the pace, the
+goal, the prizes, the divisions detached), `convoy` (the same words for a convoy), `order_of_sailing`
+(the formation's slots by name: the columns and the intervals), `station` (each ship
+against her station with the distance in cables and whether she is in it; for a member, her
+own station under the flag with the flag's bearing and distance as the lookout gives it). A
+ship in no set reads "The ship is in no squadron" and nothing more. The rows ride in a
+sample while something is afoot (a straggler, a ship out of station, an enemy closing the
+convoy), as the action's rows ride.
+
+**The lines.** `squadron.straggler` ("The Friendship is a straggler: a mile and a half out
+of her station in the Falmouth trade"), `sail.out_of_station` and `sail.in_station` (the near
+body's own, routine for the far), `squadron.in_station` (a straggler regaining it),
+`squadron.lost` (a ship lost to the convoy beyond the set's distance), `squadron.cut_out` (a
+merchantman taken from under the convoy, urgent), `squadron.parted` (a ship parting
+company), the commodore's signal (his book's or his own, `signal.made` on his locker and `signal.read`
+at every station that holds the book, marked as the commander's), `squadron.detached` and
+`squadron.recalled` (a division in chase and back), `regime.sortie` (a ship in ordinary
+slipping out). The events for `at` and a stand-by: `a straggler`, `in station`, `out of
+station`, `a ship lost to the convoy`, `a ship cut out`, `a ship parts company`, `the
+commodore makes a signal`, `a division detached`, `a division recalled`.
+
+**The orders** (object `navigation`, held): `keep station` / `keep your station` (the station
+the set gives her), `keep station two cables astern of the Harpy` / `on the larboard beam of
+the flagship` / `a cable to windward of the Harpy` (a station of her own naming), worked
+every two minutes by the `in company` book of every role and by the player's own word; the
+order reads the lookout's bearing and distance of the flag and the set's course, steers for
+a point ahead of her station along the flag's course, makes sail astern of it and shortens a
+step a glass ahead of it (`freesail/orders/station.py`). The set itself is commanded by the
+signals of §21d (`make the signal: the convoy to close round the commodore`, `make the
+signal to tack in succession`, `... to chase`, `... discontinue the chase`), which the set
+performs: in succession by the wake (each ship at the point where the ship ahead put about;
+71's three minutes stand outside a set). A model at the flagship commands so, and the
+commander's book (`data/squadrons/*.yaml`) says nothing while his seat is live; with no model
+seated the rules captain reads the book. The intent `blockade <port>` keeps the port's
+blockade station (`data/ports/<port>.yaml`, `blockade_station`) under the blockade's book.
+
+**The director.** `squadron: "the inshore squadron" of Britain under the Medusa with the
+Nimble, keep the station off the Deadman within 8 miles` (a set made whole, its commander's
+intent the goal), `squadron "the Channel squadron": join the Harpy` / `detach the Nimble and
+the Sparrow in chase` / `recall the division` / `form line abreast` / `the interval three
+cables` / `the signal <words>` (the set's own changes and its signals through the commander's
+hand), `convoy: six merchant brigs of Britain from Falmouth to the Start under a brig-sloop`
+(a convoy drawn whole by the business's tables), `ship "X": in ordinary at Brest` and `ship
+"X": commissioned for <intent>` (the regime's two states, the commission after the regime's
+delay); the scenario's `squadrons:` and a ship's `squadron:` key the same forms at rest. His
+truth shows every ship's set and her regime (`squadron`, `regime` on the row) and the sets
+whole (`squadrons`). A world order is never shown as sent to a station. The channels
+`squadron` and `convoy` carry the lines to the stations that read them.
+
 ## 22. The harbour and the settings (package 59)
 
 The terminals, the flags, the desktop client's configuration and the scenarios by hand are now one page: **the harbour**, a page of the game's own server (spec M7b §21d, §21e). In the game folder:

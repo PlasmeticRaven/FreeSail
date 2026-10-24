@@ -220,7 +220,11 @@ book" when it does not, the answering pendant and the private signal by their fo
 **acted on by a rules captain under the sender's orders** (`signalling`: answered with the
 pendant; obeyed by `does` through `Captain.give` on a crewed ship and `signals.far_perform`
 on a far body; `in_succession` performed each when the ship before her has, three minutes
-apart; `release` lets her go). The least relation is `Vessel.under_orders_of` (the
+apart; `release` lets her go; **as built (package 72):** within a set the succession is by
+the wake, each ship putting about where the ship ahead of her did, the interval over
+the pace, and the three minutes stand only outside a set). The least relation is
+`Vessel.under_orders_of` (**as built (package 72):** written by the set on every member
+and cleared when she leaves; the
 scenario's `under_the_orders_of`, the director's `ship "X": under the orders of <ship |
 the ship | nobody>`) with the goal `in company with the ship` for a merchantman's keeping
 company (the `company` leg), and a brainless vessel under orders reads by the least
@@ -314,7 +318,7 @@ answers the King's frigate's hail by the table with a lie (7-143); the private s
 answered wrong makes her a stranger under false colours and the frigate gives chase by
 doctrine, the encounter's figures (7-144); a convoy of four under a commodore tacks in
 succession on one hoist with no model seated, each three minutes after the one ahead
-(7-145); Nelson's sentence takes twelve hoists and twelve minutes (7-146); a signal made in
+(7-145; within a set the wake replaces the three minutes, truth 7-156 of package 72); Nelson's sentence takes twelve hoists and twelve minutes (7-146); a signal made in
 fog is a gun, heard at three miles and read by the book (7-147); the King's cutter engaging
 a privateer never puts her head within the close-hauled angle, and the first action ends an
 hour after the first shot (7-148, with 7-133 re-pinned); a shot under false colours is a
@@ -696,6 +700,33 @@ detached in chase and recalled); a squadron may split into divisions with their 
 and merge again; a ship alone is a squadron of one for the brain's purposes and no object
 at all for the player's. The far brain re-forms the offsets whenever the set changes.
 
+**As built (package 72).** `freesail/world/squadrons.py`: `Squadron` (id, name, kind
+`squadron | convoy`, nation, commander, members in the order of sailing, goal, formation
+`line ahead | line abreast | order of sailing | close order`, interval, columns, divisions,
+stragglers, rendezvous, book, regime, prizes) and the registry `Squadrons` on the World
+(`world.squadrons`), ticked once a minute after the brains and before the bodies; the set
+writes 71's `under_orders_of` on every member and clears it when she leaves; the formation's
+slots are laid in the commander's frame (across positive to leeward, so the line turns with
+the wind), and a member at far detail keeps her slot by the plan leg `("station", set)` at
+the set's pace, which is the slowest member's polar under the convoy's factor and a cap
+on the commander's far body (`Vessel.pace_cap_kn`); the guide dead-reckons when the
+commander is on a detour. The state `in company` (every role's book; `keep your station`
+every two minutes) is what a promoted member's captain is in, and the far brain's
+`resolve_state` lays the station leg for it, so that the promotion under the cap keeps the
+line (truth 7-155). Stragglers by the book's distance and minutes, lost beyond its
+distance, separated in a gale to the rendezvous; divisions detached in chase by the signal
+and recalled, their leaders' signals read by their divisions. The scenario's `squadrons:`
+and a ship's `squadron:` key, the director's `squadron:` and `squadron "X": ...` forms. The
+commander's book (`data/squadrons/convoy.yaml`, `squadron.yaml`, `blockade.yaml`; rules
+with `on`, `signal`, `order`, `goal`, `formation`, `rearm`, `on_rearm`, `near_only`,
+`repeat_minutes`) is read once a minute by the rules captain at the commodore's station,
+near, crewed or far, and says nothing while a model holds the seat: the model commands by
+`make the signal`. A merchantman brought to by an armed enemy with no man of war of hers
+within the cover distance strikes and joins his company (`far_captures`; 74 puts the far
+fight in). What is not built: the line of battle's own book (76's numbers), the squadron
+shown to the player as an object of the world (the brief), the night and fog signals as a
+set's standing order (the books' `lights` rule stands in).
+
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 
 A ship of a nation is **in port, in ordinary, on station, on passage, in convoy or escorting,
@@ -709,6 +740,24 @@ actions). The business draws them under the seed as it draws traders and fisherm
 §19), **and the business follows the player's ship across regions** (the owner's requirement
 of 2026-10-17), the convoys and the long chases crossing the chart's blocks.
 
+**As built (package 72).** `data/regimes.yaml` the eight regimes, each a rule in words with
+its knobs and sources; `data/nations.yaml` `naval:` for every nation (keeps the sea, slips out
+when blown off, convoys, the escort, the blockades, the ships in ordinary with their sorties,
+the privateers' prey); `freesail/world/regimes.py` the two that are the far body's own
+minute: a ship in ordinary (`Vessel.regime`, a hull at a port's anchorage with no brain,
+commissioned after the regime's delay by the director's `ship "X": commissioned for
+<intent>` or at once) and the sortie (her written `sortie` sailed when no enemy man of war
+has been in the offing, fifteen miles of the road or the port's blockade station, for an
+hour with the wind under a fresh breeze). The intent `blockade <port>` keeps the port's
+blockade station (`data/ports/<port>.yaml` `blockade_station`: Brest's off the Black Rocks)
+under the blockade's book, which bears the squadron up for its rendezvous in a westerly
+gale and restores the station when it moderates. The business (`business.py`) draws by the
+knobs: the convoys (`population.convoys`), the blockades (inshore and offshore), the ships
+in ordinary; and **follows the player's ship across the regions' edge**, re-peopling a region
+once on entry and carrying over a set whole while any member is within the carry-over
+distance (`carry_over_nm`). Not built, left to 79: the nations' fighting habits (fire high,
+single actions) as regime rules; the commission's delay drawn by the business.
+
 ### 23. Truths for 7-vi (outline)
 
 A convoy of six under a brig-sloop meets a privateer schooner: the escort makes the signal
@@ -716,6 +765,21 @@ to close round the commodore, the convoy obeys with no model seated, the private
 out the straggler by doctrine or is driven off by the odds; a blockading squadron off Brest
 is blown off by a gale and the business's frigate slips out on it; the squadron keeps its
 line at far detail and promotes member by member as the player closes, each in her station.
+
+**As built (package 72):** truths 7-152 to 7-160 in `tests/test_known_truths.py` at seed 7,
+each from a recorded scenario: the convoy of six keeps its order and the book signals the
+straggler (7-152: the signal at 2760, up at 2866, answered at 3000, the Friendship back in
+station at 5280, every ship within a cable after two hours); the privateer investigates and
+evades the escort at two miles, no ship cut out since none is uncovered (7-153; the cut-out
+itself is the unit test in `tests/test_squadrons.py` with a merchantman alone); the blockade
+blown off Brest at 11400 and the station restored at 37920, the Hortense out at 43200
+(7-154); the squadron's line within a cable at far detail and within a cable and a half
+through the promotion of all three (7-155); the succession by the wake (7-156); the business
+following the ship over 3° W with the convoy carried whole (7-157); the weather's bound off
+in every recorded scenario (7-158); the pace at far detail against the build machine's floor
+and under the cap against the crewed floor (7-159, 7-160). The owner's privateer cuts out
+the straggler only when the escort is beyond the cover distance: with the King's brig in
+company the convoy of six is covered, and that is the doctrine's own answer.
 
 ---
 

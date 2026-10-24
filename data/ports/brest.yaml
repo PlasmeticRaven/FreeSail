@@ -127,3 +127,12 @@ places:
     done: "a ship of war's orders and her business with the arsenal are seen to"
     found: "the maritime prefect's officers and clerks"
     roles: [prefect, commissary]
+
+# The blockade station (package 72; spec M7 §22): the inshore squadron's station off the
+# Black Rocks (the Pierres Noires), a league west of Saint-Mathieu, whence the Goulet is
+# watched; the road of Bertheaume itself lies behind the point from seaward, and a ship
+# steering for it from the west goes through the Four. The intent `blockade Brest` keeps
+# this station. Source: the blockade of 1803 to 1805, the inshore squadron off the Black
+# Rocks (Mahan, *The Influence of Sea Power upon the French Revolution and Empire*, ch.
+# XV, from memory); the miles judgement.
+blockade_station: {feature: pierres-noires, within_nm: 6, source: "the inshore squadron off the Black Rocks (Mahan, from memory); the miles judgement"}

@@ -1,0 +1,53 @@
+# FreeSail: a squadron's book (spec M7 §21; package 72; docs/design/Design-Squadrons.md). Read
+# by freesail/world/squadrons.py: the standing orders of a squadron of men of war cruising
+# or on passage in company, as a book like the captain's: the line ahead at two cables, the
+# night and fog signals, a few rules that make the commodore's signals when a rules captain
+# commands. Every figure is JUDGEMENT after the sources named, from memory; the owner tunes
+# this file with a text editor.
+#
+# Sources: the Admiralty's *Signal Book for the Ships of War* 1799 (the order of sailing,
+# the line of battle, the general chase, the recall; the numbers as data/signals/britain
+# has them) and Howe's instructions of 1790; the *Regulations and Instructions* of 1806
+# on ships in company (the lights at night, the station kept on the admiral); Falconer
+# 1780, LINE and SQUADRON.
+
+kind: squadron
+name: a squadron's book
+source: "the Signal Book for the Ships of War 1799 and the Regulations 1806, from memory; every figure judgement"
+
+formation: line ahead
+interval_cables: {value: 2, source: "the close order of the line: two cables (Howe 1790's instructions, from memory); judgement"}
+pace_factor: {value: 0.95, source: "a squadron keeps the sea under the dullest sailer's best; judgement"}
+straggler_nm: {value: 1.0, source: "a mile out of her station in the line; judgement"}
+straggler_minutes: {value: 10, source: "judgement, as the captains' dwell"}
+lost_nm: {value: 8.0, source: "eight miles: beyond a frigate's flags with the glass; judgement"}
+separated_nm: {value: 12.0, source: "twelve miles, out of sight of the hulls; a separated ship makes for the rendezvous; judgement"}
+convoy_close_nm: {value: 6.0, source: "an enemy made out within two leagues is the squadron's news; judgement"}
+cover_nm: {value: 2.0, source: "as the convoy's"}
+night: {lights: top lights, source: "the Regulations 1806: ships in company to carry the lights the admiral orders; the top lights for a squadron; judgement"}
+
+rules:
+  - key: enemy
+    on: enemy in sight
+    signal: enemy in sight
+    rearm: enemy lost
+    source: "the 1799 book, No. 1: the enemy in sight (the news made to the squadron)"
+  - key: lights
+    on: night
+    signal: hoist the lights
+    order: hoist the top lights
+    rearm: day
+    source: "the Regulations 1806 on the lights of ships in company"
+  - key: pace
+    on: member astern
+    order: shorten sail
+    near_only: true
+    repeat_minutes: 20
+    rearm: all in station
+    source: "the 1799 book, No. 50: the ships ahead to shorten sail; the flag keeps the line closed up; judgement"
+  - key: pace_on
+    on: all in station
+    order: set plain sail
+    near_only: true
+    rearm: member astern
+    source: "judgement"

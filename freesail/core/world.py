@@ -242,6 +242,15 @@ class Scenario:
     # `armament.fits`, or None for the file's default. Left out of the dict when None, so
     # that a save from before reads as it did.
     fit: str | None = None
+    # The squadrons and the convoys (spec M7 §21; package 72): `squadrons:` in the scenario
+    # file, each {id, name, kind, commander, members, goal, formation, interval_cables,
+    # columns, rendezvous, book} (`freesail.world.squadrons.Squadron.from_spec`). Left out
+    # of the dict when there are none, so that a save of a game without them reads as it did.
+    squadrons: list[dict[str, Any]] = field(default_factory=list)
+    # The weather's seasonal bound (R-39; package 72): `weather: {bound: seasonal}` in the
+    # scenario file turns the summed field's soft clamp on; off when not said, so that no
+    # recorded passage moves until the owner has judged it. Left out of the dict when off.
+    weather_bound: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         # a Scenario unpickled from a checkpoint of an earlier build lacks the fields
@@ -259,6 +268,10 @@ class Scenario:
             d.pop("business", None)
         if not d.get("crewed"):
             d.pop("crewed", None)
+        if not d.get("squadrons"):
+            d.pop("squadrons", None)
+        if not d.get("weather_bound"):
+            d.pop("weather_bound", None)
         if not d.get("things"):
             d.pop("things", None)
         if not d.get("fit"):
@@ -451,6 +464,9 @@ class World:
     director_seats: dict[str, dict[str, Any]] | None = None
     # package 43b: the world's business (`freesail.world.business.Business`), None when off
     business: Any = None
+    # package 72: the squadrons and the convoys (`freesail.world.squadrons.Squadrons`); None
+    # in a checkpoint from before
+    squadrons: Any = None
     director_seats_made: int = 0
     consent_records_dir: Any = None
     # package 67: in a replay, the world orders' outcomes in play by (tick, order), which a
@@ -557,6 +573,7 @@ class World:
                 systems=self.scenario.systems,
                 climatology=climatology,
                 box=box,
+                bound=bool(getattr(self.scenario, "weather_bound", False)),  # package 72
                 background_hpa=self.scenario.background.get("hpa"),
                 gradient=(
                     (
@@ -744,6 +761,11 @@ class World:
             for spec in self.scenario.ships:
                 self.vessels.serial += 1
                 self.vessels.add(vessel_from_spec(self, dict(spec), self.vessels.serial))
+        # the squadrons' registry (package 72; spec M7 §21), before the business, whose
+        # convoys and blockades are sets; the scenario's own sets are read after the readings
+        from freesail.world.squadrons import Squadrons
+
+        self.squadrons = Squadrons(self)
         # the world's business (package 43b; spec M6 §19): the region's trade, fishermen and
         # cruisers drawn under the seed on top of the scenario's own ships, when it says so
         self.business = None
@@ -764,6 +786,13 @@ class World:
         self.standing = Runtime(self)
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["standing"] = self.standing
+        # the squadrons and the convoys (package 72; spec M7 §21): the sets the scenario
+        # names (`squadrons:`, or a ship's `squadron:` key), each a commander, the members
+        # in their order of sailing, a goal and a formation (`freesail.world.squadrons`);
+        # after the readings, which the player's shadow as a commander reads
+        from freesail.world.squadrons import sets_from_scenario
+
+        sets_from_scenario(self)
         # The agents at their stations (spec M4 §11), by station name, in the order they
         # were stationed: each is a `freesail.agents.harness.Harness`, called after the
         # standing orders on every tick (`on_tick`) and after every order (`on_order`, for

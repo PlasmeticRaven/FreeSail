@@ -3619,11 +3619,34 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
         if getattr(v, "struck", False):
             d["colours"] = "struck"
         d.update(_truth_signals(v, str(v.nation), world))  # package 71: her true colours
+        if getattr(v, "squadron", ""):
+            d["squadron"] = v.squadron  # package 72: the set she is a member of
+        if getattr(v, "regime", ""):
+            d["regime"] = v.regime  # package 72: in ordinary, and the rest
         crew = getattr(v, "crew", None)
         if crew is not None and getattr(crew, "shape", "full") == "full":
             d.update(_truth_action(crew))  # package 70: a crewed ship's guns and damage
         ships.append(d)
     out["ships"] = ships
+    sets = getattr(world, "squadrons", None)
+    if sets is not None and sets.sets:
+        # package 72 (spec M7 §21): every set with its commander, its members in their order
+        # of sailing and their stations (the director's truth; the player reads his own)
+        rows = []
+        for sq in sets.sets:
+            row = sq.to_dict()
+            row["commander"] = (
+                own["name"] if sq.commander == "the ship" else sq._name_of(world, sq.commander)
+            )
+            row["members"] = [sq._name_of(world, m) for m in sq.members]
+            if sq.off_station_m:
+                row["off_station_m"] = {
+                    sq._name_of(world, m): round(off) for m, off in sq.off_station_m.items()
+                }
+            if sq.stragglers:
+                row["stragglers"] = [sq._name_of(world, m) for m in sq.stragglers]
+            rows.append(row)
+        out["squadrons"] = rows
     if within_nm is not None:
         out["within"] = (
             f"the ships within {within_nm:g} miles of the {own['name']}; "
@@ -3985,3 +4008,8 @@ _action_readings.register()
 from freesail.api import signal_readings as _signal_readings  # noqa: E402
 
 _signal_readings.register()
+
+# The squadron's, the station's and the convoy's (package 72), after the signals'.
+from freesail.api import squadron_readings as _squadron_readings  # noqa: E402
+
+_squadron_readings.register()

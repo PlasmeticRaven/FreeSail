@@ -1,0 +1,97 @@
+# FreeSail: a convoy of six and a privateer (spec M7 §21 to §23; package 72; the owner's
+# scenario of the brief). The King's brig-sloop, commodore of six merchant brigs out of
+# Falmouth bound up Channel for the Start, a June forenoon of 1805 six leagues south of the
+# Lizard with a north-easterly; the six are a genuine set (`squadrons:` below) in the
+# order of sailing in two columns at two cables, under the player's orders, keeping their
+# stations at far detail at the slowest ship's pace and promoted to full crews in station
+# as they come within the cap; and a French privateer schooner to windward, cruising for
+# prizes, who makes out the convoy and works down on its rear for a straggler. Given to
+# either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/convoy-six.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/convoy-six.yaml
+#
+# Played by the player at the commodore's station: `the convoy`, `the order of sailing`,
+# `the station` (each ship's station and how far off it she lies); `make the signal: the
+# convoy to close round the commodore`, `make the signal: enemy in sight bearing NE`,
+# `make the signal to make more sail`, the chase and the recall; a straggler is covered by
+# standing within the cover distance of her, and a merchantman brought to by the
+# privateer with no cover strikes and is cut out (`the squadron` says so). Played by the
+# rules captain with no model seated: the commodore's book (data/squadrons/convoy.yaml)
+# runs on his perception, signals a straggler to make more sail, closes the convoy when an
+# enemy is made out, covers the ship the enemy closes, and he chases nobody.
+#
+# The weather is pinned (a north-easterly of twelve knots, the sky clear), so that the
+# convoy at seed 7 is the same on every machine; its figures are measured in
+# tests/test_known_truths.py (truths 7-152 onward) and recorded in docs/dev/TuningNotes.md
+# (package 72).
+
+name: A convoy of six and a privateer
+seed: 7
+start: 1805-06-12T10:00
+position: {lat_deg: 49.75, lon_deg: -5.20}   # six leagues south of the Lizard
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/brig.yaml
+  heading_deg: 115
+  speed_kn: 5
+  glass: true
+intent: convoy the trade from Falmouth to the Start
+wind:
+  from_deg: 45
+  knots: 12
+  gustiness: 0.0
+  variability: 0.0
+
+papers:
+  chart: {year: 1804}
+  almanac: 1805
+
+ports: [falmouth, plymouth, brest]
+
+standing_orders:
+  - data/standing_orders/starter.orders
+
+# the six merchantmen, in the convoy's order of sailing (the leaders of the two columns
+# first, the rear last; the succession is this order): each a member of the set `trade`
+# below, which lays her station astern of the commodore and writes 71's relation (under
+# the orders of the player's ship); a stern lantern each by night. The slowest of them, the
+# deep-laden Friendship, sets the convoy's pace.
+ships:
+  - {id: nancy, description: merchant brig, name: Nancy, nation: britain,
+     position: 49 44.5 N 5 11.7 W, goal: "bound for the Start", colours: shown,
+     lights: stern lantern, squadron: trade}
+  - {id: two-brothers, description: merchant brig, name: Two Brothers, nation: britain,
+     position: 49 44.3 N 5 12.4 W, goal: "bound for the Start", colours: shown,
+     lights: stern lantern, squadron: trade}
+  - {id: providence, description: merchant brig, name: Providence, nation: britain,
+     position: 49 44.2 N 5 11.9 W, goal: "bound for the Start", colours: shown,
+     lights: stern lantern, squadron: trade}
+  - {id: hope, description: merchant brig, name: Hope, nation: britain,
+     position: 49 44.0 N 5 12.6 W, goal: "bound for the Start", colours: shown,
+     lights: stern lantern, squadron: trade}
+  - {id: mary-ann, description: merchant brig, name: Mary Ann, nation: britain,
+     position: 49 43.9 N 5 12.1 W, goal: "bound for the Start", colours: shown,
+     lights: stern lantern, squadron: trade}
+  - {id: friendship, description: merchant brig, name: Friendship, nation: britain,
+     position: 49 43.7 N 5 12.8 W, goal: "bound for the Start", colours: shown,
+     lights: stern lantern, squadron: trade, sailing_factor: 0.85}
+  # the privateer: a French schooner five miles to windward under her own colours, cruising
+  # for prizes; her doctrine (data/captains/privateer.yaml) takes a merchantman and keeps
+  # clear of a man of war
+  - {id: vengeur, description: schooner, name: Vengeur, nation: france,
+     position: 49 48.6 N 5 06.5 W, goal: "patrolling off the Lizard within 20 miles",
+     intent: "cruise for prizes off the Lizard within 20 miles", colours: shown}
+
+squadrons:
+  - id: trade
+    name: the Falmouth trade
+    kind: convoy
+    commander: the ship
+    members: [nancy, two-brothers, providence, hope, mary-ann, friendship]
+    formation: order of sailing
+    columns: 2
+    interval_cables: 2
+
+orders:
+  - set plain sail

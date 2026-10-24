@@ -30,6 +30,9 @@ thresholds:
   aim: {value: rigging, source: "spec M7 §9: the hull the British habit, the rigging the French; the nation's habit stands where the file leaves this empty"}
   morale_start: {value: 0.6, source: "a packet's commander's company at the start of an action (spec M7 §10, decision 7); judgement"}
   strike_below: {value: 0.3, source: "the Falmouth packets fought their guns to save the mails and struck when the mails were sunk (the Post Office packets' actions of 1793 to 1815); the figure judgement"}
+  # package 72 (rule 5's least): a packet brought to by a privateer alongside at far detail
+  # does not strike by rule: she fought her guns for the mails (74 gives her the far fight)
+  yields_when_caught: {value: false, source: "the Post Office packets' standing orders to fight for the mails (from memory); judgement"}
   gale_kn: {value: 38, source: "a packet carries on; she heaves to at a strong gale, force 8's upper half; judgement on Beaufort's scale"}
   gale_over_kn: {value: 30, source: "judgement"}
   beating_dwell_minutes: {value: 10, source: "package 43b: the beating book taken up and given up on a verdict that has stood ten minutes, not on one course's word (the trade trial traded the deck every two minutes as an evasion ended); judgement, as gale_over_minutes"}
@@ -148,6 +151,18 @@ books:
     - 'standing order "make all sail to haul off": at steady on the course, if the true wind is under {shorten_sail_kn} knots then make all sail'
   keeping station: []
   in distress: []
+  in company:
+    # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): her station in the set,
+    # kept by `keep your station` every two minutes (freesail/orders/station.py: the held
+    # order of the navigation, judged by the lookout's bearing and distance of the flag,
+    # the helm's law and the sail to hold it); the trims and the land as on her station
+    - 'standing order "the station": every 2 minutes, if the manoeuvre in hand is not hove to then keep your station'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
+    - 'standing order "land ahead": at land ahead then put her about'
+    - 'standing order "land close ahead": at land close ahead then put her about'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
   engaging:
     # package 70 (spec M7 §10): the fighting book. The drum, the guns cast loose, loaded
     # and laid, and the mark engaged on the side she bears are the captain's own on entering
@@ -198,3 +213,9 @@ transitions:
   - {from: engaging, on: aground, to: in distress}
   - {from: engaging, on: enemy struck, to: on passage}
   - {from: engaging, on: enemy out of range, to: on passage}
+  # package 72 (spec M7 §21): in company (a packet sailing with a convoy for her safety):
+  # the merchant's rows, the stranger left to the escort
+  - {from: in company, on: aground, to: in distress}
+  - {from: in company, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: in company, on: anchored in port, to: in port}
+  - {from: in company, on: enemy in range, to: engaging}

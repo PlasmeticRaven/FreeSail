@@ -518,6 +518,18 @@ class Vessel:
     # the least relation under 72's squadron); None and '' in a checkpoint from before
     signals: Any = None
     under_orders_of: str = ""
+    # package 72 (spec M7 §21): the set she is a member of (`squadrons.Squadron.id`, written
+    # by the set alone; "" for a ship in none), and, on a set's commander, the set's pace as
+    # a cap on his far body (the slowest member's best: the convoy at the slowest ship's
+    # pace); None in a checkpoint from before and on every ship that commands no set
+    squadron: str = ""
+    pace_cap_kn: float | None = None
+    # package 72 (spec M7 §22): her regime where it is more than her state ("in ordinary":
+    # a hull at a port's anchorage with no company and no intent), the sortie she sails
+    # for when commissioned, and the tick a commission falls due (-1 for none)
+    regime: str = ""
+    sortie: str = ""
+    commission_tick: int = -1
 
     @property
     def height_m(self) -> float:
@@ -606,6 +618,9 @@ class Vessel:
         kn = self.polar.speed_kn(off, wind_kn) * self.sailing_factor
         if self.sail_state == "under reefed topsails":
             kn *= REEFED_FACTOR
+        cap = getattr(self, "pace_cap_kn", None)
+        if cap is not None:
+            kn = min(kn, float(cap))  # package 72: the set's pace, the slowest member's
         return max(VESSEL_MIN_SPEED_KN, kn) if off >= self.polar.closest_deg else kn
 
     def _intercept(self, world: Any, target: Position) -> Position:
@@ -731,6 +746,12 @@ class Vessel:
             return
         if kind == "company":
             self._keep_company(world, float(leg[1]), dt, wind_from, wind_kn)
+            return
+        if kind == "station":
+            # package 72 (spec M7 §21): her station in her set's formation, by the set
+            from freesail.world.squadrons import keep_station
+
+            keep_station(self, world, dt, wind_from, wind_kn)
             return
         if kind == "to_ship":
             target = world.position
@@ -947,6 +968,8 @@ class Vessel:
             d["colours"] = locker.colours.to_dict()  # package 71: only off the plain state
         if getattr(self, "under_orders_of", ""):
             d["under_orders_of"] = self.under_orders_of
+        if getattr(self, "squadron", ""):
+            d["squadron"] = self.squadron  # package 72: only on a member
         story = getattr(self, "story", ()) or ()
         if story:
             # her captain's orders by the director's hand (package 62): only where there
@@ -1168,6 +1191,22 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         vessel.under_orders_of = " ".join(str(boss).split())
     if spec.get("lights"):
         locker.lights = str(spec["lights"])
+    if str(spec.get("regime") or "").lower().strip() == "in ordinary":
+        # package 72 (spec M7 §22): a hull laid up at a port's anchorage, commissioned later
+        from freesail.world.regimes import put_in_ordinary
+
+        ports = getattr(world, "ports", None)
+        port = None
+        best = None
+        for p in (getattr(ports, "ports", None) or {}).values():
+            _, d = bearing_and_distance(position, p.anchorage.position)
+            if best is None or d < best:
+                port, best = p, d
+        if port is None or best is None or best > 3.0 * units.NAUTICAL_MILE:
+            raise ValueError(f"'{name}' in ordinary lies at no port's anchorage")
+        vessel.position = port.anchorage.position
+        put_in_ordinary(world, vessel, port, str(spec.get("sortie") or ""))
+        return vessel
     if spec.get("letter") is not None:
         from freesail.world.people import Message
 
@@ -1323,6 +1362,17 @@ class Vessels:
             if v.done or v.brain is None or (v.crew is not None and v.crew.shape == "full"):
                 continue
             v.brain.tick()
+        sets = getattr(world, "squadrons", None)
+        if sets is not None:
+            # the squadrons' minute (package 72; spec M7 §21): the stations computed from
+            # the commanders' frames, the stragglers counted, the commanders' books read;
+            # and the far captures, a rule of the sea whether a set is on it or not
+            lines.extend(sets.tick(world))
+        if any(getattr(v, "regime", "") == "in ordinary" for v in self.vessels):
+            # the regimes' minute (package 72; spec M7 §22): the commissions due, the sorties
+            from freesail.world.regimes import minute as regimes_minute
+
+            lines.extend(regimes_minute(world))
         if any(v.under_orders_of and v.brain is None and not v.done for v in self.vessels):
             # a vessel under another's orders with no brain (a convoy's merchantman given
             # only her company to keep) reads and obeys the signals by the least captain

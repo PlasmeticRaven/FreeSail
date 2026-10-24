@@ -76,7 +76,7 @@ AT_ANCHOR_LEAST_S = 3600
 PLAYER_ID = "the ship"
 # The states the far-detail body resolves without a brain (spec M6 §4; package 40): on
 # passage is her plan, hove to is no way. A vessel with a brain resolves every state.
-FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather")
+FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather", "in company")
 
 
 def perceive_vessel(world: Any, vessel: Any, brain: Any = None) -> Perception:
@@ -161,6 +161,11 @@ def role_of_vessel(vessel: Any, intent: Intent | None) -> str:
         return "packet"
     if kind == "station" and intent is not None and getattr(intent, "prizes", False):
         return "privateer"  # package 70: a letter of marque cruising for prizes
+    if intent is not None and getattr(intent, "convoy", False):
+        # package 72 (found on the way): a far escort given `convoy the trade from A to B`
+        # sailed by the cruiser's doctrine (`role_for` had the row, this function had not),
+        # and left her convoy to investigate every stranger
+        return "commodore"
     if key == "frigate":
         return "kings-ship"
     if key == "brig-sloop":
@@ -185,7 +190,7 @@ _DETOUR_STATES = frozenset(
         "in distress",
     }
 )
-_PLAN_STATES = frozenset({"on passage", "beating", "keeping station"})
+_PLAN_STATES = frozenset({"on passage", "beating", "keeping station", "in company"})
 
 
 def _plan_of_legs(legs: list[Leg]) -> list[tuple[Any, ...]]:
@@ -323,20 +328,35 @@ class FarCaptain(Judgement):
             return "in port"
         if p.anchor_down:
             return "at anchor"
+        if self._in_a_set():
+            return "in company"  # package 72: a member of a set starts at her station
         if self._stationed() and self._on_station():
             return "keeping station"
         return "on passage"
+
+    def _in_a_set(self) -> bool:
+        """A member of a squadron or a convoy who is not its commander nor a detached
+        division's leader (package 72): her station is the set's and her plan the station
+        leg, not her intent's legs."""
+        from freesail.world.squadrons import plan_state_of
+
+        return plan_state_of(self.world, str(self.vessel.id), "on passage") == "in company"
 
     def _stationed(self) -> bool:
         """A station's intent, or a fishing trip's ground worked as one (package 43b)."""
         return self.intent is not None and self.intent.kind in ("station", "fish")
 
     def _enter(self, state: str) -> None:
+        from freesail.world.squadrons import plan_state_of
+
+        # package 72: a member of a set enters `in company` where her doctrine would enter
+        # a plan state (her station is the set's); the commander and a ship alone as before
+        state = plan_state_of(self.world, str(self.vessel.id), state)
         old = self.state
         self.state = state
         self._state_entered = self.world.clock.tick
         self.history.append((self.world.clock.tick, state))
-        if state in _PLAN_STATES and not self.planned:
+        if state in _PLAN_STATES and state != "in company" and not self.planned:
             self._plan()
         resolve_state(self.vessel, state, self)
         if state == "keeping station":
@@ -825,7 +845,11 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
     if brain is None:
         if state not in FAR_DETAIL_STATES:
             return False
-        if state == "hove to for weather":
+        if state == "in company":
+            # package 72: a member with no brain keeps her station in her set; the station
+            # leg is the set's to lay (`squadrons._lay_station_leg`), and is kept here
+            vessel.lying_to_s = 0.0
+        elif state == "hove to for weather":
             if vessel.state != state:
                 vessel.saved_plan = list(vessel.plan)
                 vessel.plan = [("lie_to", math.inf)]
@@ -847,7 +871,16 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
             vessel.plan = list(vessel.saved_plan)
             vessel.saved_plan = None
             vessel.lying_to_s = 0.0
-        if state == "keeping station":
+        if state == "in company":
+            # package 72 (spec M7 §21): her station in her set, the station leg; her own
+            # intent's legs are the commander's business
+            sets = getattr(brain.world, "squadrons", None)
+            sq = sets.of(vessel.id) if sets is not None else None
+            vessel.plan = [("station", sq.id)] if sq is not None else list(vessel.plan)
+            vessel.cycle = False
+            vessel.saved_plan = None
+            vessel.lying_to_s = 0.0
+        elif state == "keeping station":
             mark = brain._station_mark()
             if mark is not None and brain.intent is not None:
                 vessel.plan = _station_square(mark, brain.intent.radius_nm)

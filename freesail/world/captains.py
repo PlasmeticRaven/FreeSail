@@ -121,6 +121,9 @@ STATES: tuple[str, ...] = (
     "in distress",
     "engaging",
     "struck",  # package 70: the colours down, lying to for her captor (what follows is 74's)
+    # package 72 (spec M7 §21): a member of a squadron or a convoy at her station in the
+    # set; the rows out of it are each role file's (docs/design/Design-Squadrons.md)
+    "in company",
 )
 
 # The roles the doctrine files give; the cruiser (package 43) is the small man-of-war on
@@ -177,7 +180,7 @@ CAPTAIN_ON_DECK_STATES: frozenset[str] = frozenset(
 # (`brains.FarCaptain`, package 43) resolves every state of the machine
 # (`brains.resolve_state`); the brain lives in `freesail.world.brains`, apart from this
 # module, which reads no truth (see `tests/test_captains.py`).
-FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather")
+FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather", "in company")
 
 # The class of a hull by what the tops make out of her, for the cruiser's judgement of a
 # superior force (`overmatched`): a frigate over a brig over a schooner or a cutter
@@ -444,6 +447,8 @@ class Intent:
     # package 71: a passage made as a convoy's escort (`convoy the trade from A to B`), the
     # commodore's role; the merchantmen under his orders are the scenario's
     convoy: bool = False
+    # package 72: a station that is a blockade of the port named (`blockade Brest`)
+    blockade: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return (
@@ -460,6 +465,7 @@ class Intent:
             }
             | ({"hours": self.hours} if self.hours is not None else {})
             | ({"prizes": True} if self.prizes else {})
+            | ({"blockade": self.blockade} if self.blockade else {})
         )
 
 
@@ -639,6 +645,11 @@ _CONVOY = re.compile(
     r"^(?:convoy|escort)\s+(?:the\s+)?(?:trade|convoy|merchantmen|ships|fleet)?\s*"
     r"(?:from\s+(?P<a>.+?)\s+)?(?:for|to)\s+(?P<b>.+)$"
 )
+# package 72 (spec M7 §22): the blockade's station, off the port's outer road ('blockade
+# Brest', 'blockade Brest within 6 miles'): a station intent whose place is the road's feature
+_BLOCKADE = re.compile(
+    r"^blockade\s+(?:the\s+port\s+of\s+)?(?P<port>.+?)(?:\s+within\s+(?P<radius>[\d.]+)\s+miles?)?$"
+)
 
 
 def read_intent(world: Any, words: str) -> Intent:
@@ -719,6 +730,31 @@ def read_intent(world: Any, words: str) -> Intent:
         a = _place_id(world, group(m, "a")) if m.group("a") else ""
         b, via = to_and_via(group(m, "b"))
         return Intent("passage", said, origin=a, destination=b, via=via, convoy=True)
+    m = _BLOCKADE.match(text)
+    if m:
+        ports = getattr(world, "ports", None)
+        port = ports.find(group(m, "port")) if ports is not None and ports.ports else None
+        if port is None:
+            raise ValueError(f"'{group(m, 'port')}' is no port of the chart to blockade.")
+        # the port's own blockade station (data/ports/<port>.yaml `blockade_station`, off
+        # the approach: Brest's off the Black Rocks), else its outer road
+        station = dict(getattr(port, "blockade_station", None) or {})
+        feature = str(station.get("feature") or getattr(port.outer_road, "feature_id", "") or "")
+        chart = getattr(world, "chart", None)
+        if not feature or chart is None or chart.feature(feature) is None:
+            raise ValueError(
+                f"the port of {port.name} has no blockade station or outer road on the chart."
+            )
+        from freesail.world.regimes import regime_knob
+
+        radius = float(
+            m.group("radius")
+            or station.get("within_nm")
+            or regime_knob("on blockade", "inshore_nm", 6.0)
+        )
+        intent = Intent("station", said, destination=feature, radius_nm=radius, between=port.id)
+        intent.blockade = port.id
+        return intent
     m = _PASSAGE.match(text)
     if m:
         a = _place_id(world, group(m, "a")) if m.group("a") else ""
@@ -1852,7 +1888,10 @@ class Judgement:
         if name == "enemy struck":
             return self._enemy_struck(p)
         if name == "man of war near":
-            within = float(th("stranger_hostile_nm", 6))
+            # package 72: a privateer's own distance for a man of war (`man_of_war_nm`),
+            # apart from the two leagues a superior force is hauled off from, so that she
+            # hovers on a convoy and runs when the escort bears down
+            within = float(th("man_of_war_nm", th("stranger_hostile_nm", 6)))
             return self._man_of_war_within(p, within) is not None
         if name == "stranger lost":
             if self._stranger is None:
@@ -2392,10 +2431,18 @@ class Captain(Judgement):
             return "at anchor"
         if self.intent is not None and self.intent.kind == "station" and self._on_station(p):
             return "keeping station"
-        return "on passage"
+        return "on passage"  # a member of a set: `_enter` makes it `in company` (package 72)
 
     def _enter(self, state: str) -> None:
         world = self.world
+        # package 72 (spec M7 §21): a member of a set enters `in company` where her
+        # doctrine would enter a plan state; the set is the parent World's, and the
+        # player's own ship may be a member of one
+        from freesail.world.squadrons import plan_state_of
+
+        root = getattr(world, "parent", None) or world
+        own = str(getattr(getattr(world, "vessel", None), "id", "") or "the ship")
+        state = plan_state_of(root, own, state)
         old = self.state
         if old is not None:
             self._leave(old)
@@ -2643,6 +2690,12 @@ class Captain(Judgement):
             station = self._station_mark()
             if station is not None:
                 self.give(f"shape a course for {station[0]}")
+        elif state == "in company":
+            # package 72: her station in her set taken up at once; the book keeps it
+            try:
+                self.give("keep your station", why="her station in the set")
+            except Exception:  # noqa: BLE001 - the flag not in sight: the book tries again
+                pass
         elif state == "evading":
             self._haul_off(Perception.read(world))
         elif state == "engaging":

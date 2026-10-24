@@ -161,6 +161,18 @@ books:
     - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
     - 'standing order "sail after the gale": when the true wind is under 25 knots for 30 minutes, if the {storm_topsail} is reefed then sway up the topgallant masts; shake out the reefs in the topsails; set plain sail'
   in distress: []
+  in company:
+    # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): her station in the set,
+    # kept by `keep your station` every two minutes (freesail/orders/station.py: the held
+    # order of the navigation, judged by the lookout's bearing and distance of the flag,
+    # the helm's law and the sail to hold it); the trims and the land as on her station
+    - 'standing order "the station": every 2 minutes, if the manoeuvre in hand is not hove to then keep your station'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
+    - 'standing order "land ahead": at land ahead then put her about'
+    - 'standing order "land close ahead": at land close ahead then put her about'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
   engaging:
     # package 70 (spec M7 §10): the fighting book. The drum, the guns cast loose, loaded
     # and laid, and the mark engaged on the side she bears are the captain's own on entering
@@ -225,3 +237,11 @@ transitions:
   - {from: engaging, on: enemy struck, to: on passage}
   - {from: engaging, on: enemy out of range, to: on passage}
   - {from: engaging, on: overmatched, to: evading}
+  # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): in company, a cruiser at
+  # her station in a squadron: the ground, the gale, a superior force and an enemy within
+  # her engaging distance as on her station; no stranger row (the flag's signal frees her)
+  - {from: in company, on: aground, to: in distress}
+  - {from: in company, on: gale, to: hove to for weather, unless: no sea room}
+  - {from: in company, on: anchored in port, to: in port}
+  - {from: in company, on: overmatched, to: evading}
+  - {from: in company, on: enemy in range, to: engaging, unless: overmatched}

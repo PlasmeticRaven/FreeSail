@@ -101,9 +101,14 @@ closed_to: []
 # a mile to the westward of the Eddystone, the cruise's own mark
 # (data/scenarios/naval-cruise.orders: "passing a mile to the westward of the Eddystone");
 # `from_sea` the reverse; `in` from Cawsand Bay to the anchorage in the Sound.
+# Package 72 (found on the way by 71 and 72: the planner laid no way into Plymouth from
+# the south-west that the land guard accepted, the leg from the sea mark straight into
+# Cawsand Bay cutting Rame Head): the track rounds Penlee Point first, a mark a mile and a
+# half east-south-east of it, as the approach has it (Rame Head given a berth, Penlee Point
+# rounded to open Cawsand Bay; the Channel Pilot's words from memory, the mark judgement).
 tracks:
-  to_sea: [cawsand-bay, 50 11 N 4 18 W]
-  from_sea: [50 11 N 4 18 W, cawsand-bay]
+  to_sea: [cawsand-bay, 50 18.3 N 4 08.0 W, 50 11 N 4 18 W]
+  from_sea: [50 11 N 4 18 W, 50 18.3 N 4 08.0 W, cawsand-bay]
   in: [plymouth-sound-anchorage]
 
 # The port's own places ashore (package 53; spec M7b §14), beside every port's

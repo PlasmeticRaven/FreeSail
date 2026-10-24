@@ -1,0 +1,57 @@
+# FreeSail: the regimes of a nation's ships (spec M7 §22; package 72;
+# docs/design/Design-Squadrons.md). Read by freesail/world/regimes.py and the world's
+# business (freesail/world/business.py): a ship of a nation is in port, in ordinary, on
+# station, on passage, in convoy or escorting, on blockade, in chase, each a few rules in
+# data. This package writes the shape and the first of each; 79 fills them out. The
+# nations' knobs (who keeps the sea, who keeps port and slips out when the blockade is blown
+# off, who convoys, whose privateers chase what pays) are each nation's `naval:` entry in
+# data/nations.yaml. Every figure here is JUDGEMENT after the sources named, from memory.
+#
+# Sources: Mahan, *The Influence of Sea Power upon the French Revolution and Empire*
+# (the blockade of Brest, the French keeping port and slipping out when the blockaders
+# were blown off, the convoy system); James, *The Naval History of Great Britain* (the
+# single-ship actions; the American frigates of 1812); the convoy acts of 1798 and 1803;
+# the *Regulations and Instructions* of 1806 on ships in ordinary and commissioning (a hull
+# in ordinary under the master attendant, commissioned by a captain's appointment, her
+# company raised over weeks); Falconer 1780, ORDINARY and STATION.
+
+regimes:
+  in port:
+    rule: "at anchor within the port's reach, her business the brains' wait (freesail/world/brains.py IN_PORT_WAIT_S); she sails when ready for sea"
+    source: "spec M6 §4; package 43"
+  in ordinary:
+    rule: "a hull in port with no company and no intent (`regime: in ordinary` on her entry, or the director's `ship \"X\": in ordinary at <port>`): she lies at the anchorage and sails for nothing until commissioned by the business (a nation that slips out when the blockade is blown off, with her `sortie`) or the director (`ship \"X\": commissioned for <intent>`), after the delay below"
+    commission_delay_h: {value: [48, 120], source: "two to five days: a ship in ordinary wanted her company raised and her stores got in; the Regulations 1806 and the dockyards' practice (from memory); judgement, the weeks of the record cut for play"}
+    slip_out_clear_nm: {value: 15, source: "no enemy man of war within fifteen miles of the port's outer road for the minutes below, or on the port's blockade station (data/ports, `blockade_station`), and she slips out: the look-out posts on the points saw the inshore squadron off the Black Rocks, nine miles from the road of Bertheaume, and the main body's topsails toward Ushant (the French frigates and squadrons sailing from Brest when the blockade was off its station; Mahan, from memory); judgement"}
+    slip_out_clear_minutes: {value: 60, source: "an hour of the offing clear, not a glance; judgement"}
+    slip_out_wind_max_kn: {value: 22, source: "no sortie in more than a fresh breeze (the top of Beaufort's force 5): a frigate warped out of the Penfeld and through the Goulet on the ebb wanted moderate weather, and the gale that blows the blockade off keeps her in too; she slips out when it moderates, the French sailing from Brest on the blockaders' being blown off with the wind serving (Mahan, from memory); judgement"}
+    source: "the Regulations 1806; Mahan on the blockade of Brest (from memory)"
+  on station:
+    intent: "keep the station off {place} within {nm} miles"
+    book: squadron
+    rule: "a cruiser or a King's ship on a station of her doctrine's (data/captains/cruiser.yaml `stations:`); a squadron on station a set under the squadron's book"
+    source: "spec M6 §4; package 43b"
+  on passage:
+    intent: "bound for {place}"
+    rule: "a ship on her way between ports alone, or a squadron on passage in line ahead"
+    source: "spec M6 §4"
+  in convoy:
+    book: convoy
+    formation: order of sailing
+    size: {value: [4, 8], source: "the Channel's coasting convoys of a handful to a dozen sail; the ocean convoys of hundreds are beyond the cap (the convoy acts of 1798 and 1803, from memory); judgement"}
+    rule: "merchantmen of a nation that convoys sail as a set under an escort, in the order of sailing at the slowest ship's pace, reading the convoy book; the business draws them in port bound out or at an edge bound in"
+    source: "the convoy acts of 1798 and 1803; the Signals and Instructions for Ships under Convoy (from memory)"
+  escorting:
+    intent: "convoy the trade from {a} to {b}"
+    role: commodore
+    escort: {value: brig-sloop, source: "a brig-sloop or a frigate the ordinary escort of a coasting convoy; judgement"}
+    rule: "the escort is the set's commander with the commodore's doctrine: he does not leave the convoy to chase, covers a straggler, closes the convoy round him when an enemy is in sight (data/squadrons/convoy.yaml)"
+    source: "the Regulations 1806; the convoy instructions (from memory)"
+  on blockade:
+    intent: "blockade {port}"
+    book: blockade
+    rule: "a squadron off an enemy's port, the inshore division on the port's approach and the main body in the offing (data/squadrons/blockade.yaml `inshore`, `offshore`), blown off to its lee rendezvous by a westerly gale and back when it moderates; the blockaded nation's ship in ordinary slips out when the offing is clear"
+    source: "the blockade of Brest, 1803 to 1805 (Mahan, James, from memory)"
+  in chase:
+    rule: "the state `chasing` by doctrine; a division detached in chase by the commander's signal (the ships pointed out to chase) and recalled (discontinue the chase), the set's divisions"
+    source: "the 1799 book's signals for the chase and the recall (from memory)"

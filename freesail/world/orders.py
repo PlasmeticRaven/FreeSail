@@ -133,6 +133,9 @@ CHANNELS = (
     "unseat",
     "aboard",
     "say",
+    # package 72 (spec M7 §21): the squadrons and the convoys as sets
+    "squadron",
+    "convoy",
 )
 
 # The captain's grammar refuses a world order in these words (truth 71).
@@ -146,8 +149,8 @@ REFUSAL = (
 # `say as <person>: <words>` (package 52) is the `say` channel's; a bare `say <words>` is the
 # deck's conversation and no world order.
 _HEAD = re.compile(
-    r"^\s*(?:(weather|ship|message|port|person|captain|mark|seat|unseat|aboard)\b"
-    r"\s*(\"[^\"]*\"|[\w-]+)?\s*:|(say)\s+as\s+[^:]+:)",
+    r"^\s*(?:(weather|ship|message|port|person|captain|mark|seat|unseat|aboard|squadron|convoy)"
+    r"\b\s*(\"[^\"]*\"|[\w-]+)?\s*:|(say)\s+as\s+[^:]+:)",
     re.I,
 )
 # The director's reason at the end of an order entered again after a doubt (decision 50):
@@ -191,7 +194,7 @@ def parse(text: str) -> WorldOrder:
     if m is None:
         raise WorldOrderError(
             f"'{text}' is no world order: say weather:, ship:, message:, port <id>:, person:, "
-            "captain:, mark:, aboard:, seat:, unseat: or say as <person>:."
+            "captain:, mark:, aboard:, seat:, unseat:, squadron:, convoy: or say as <person>:."
         )
     return WorldOrder((m.group(1) or m.group(3)).lower(), text, reason)
 
@@ -216,6 +219,10 @@ def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
         return _seat(world, body)
     if order.channel == "unseat":
         return _unseat(world, body)
+    if order.channel == "squadron":
+        return _squadron(world, body)
+    if order.channel == "convoy":
+        return _convoy(world, body)
     if order.channel == "aboard":
         held = reach(world, order)
         if held:
@@ -541,6 +548,12 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         om = _ORDERS_OF_TAIL.match(m.group("goal"))
         if om:
             return _orders_of(world, vessel, om.group("boss"))
+        rm = _IN_ORDINARY_TAIL.match(m.group("goal"))
+        if rm:
+            return _in_ordinary(world, vessel, rm.group("port"))
+        cm = _COMMISSION_TAIL.match(m.group("goal"))
+        if cm:
+            return _commissioned(world, vessel, cm.group("words"), cm.group("when"))
         from freesail.world.ships import _goal_plan
 
         try:
@@ -569,6 +582,93 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
 
 
 _ORDERS_OF_TAIL = re.compile(r"^under\s+the\s+orders\s+of\s+(?P<boss>.+)$", re.I)
+# package 72 (spec M7 §22): the regimes' two forms on a ship: laid up in ordinary at a port
+# (a hull with no company and no intent) and commissioned for an intent, at once or after
+# the regime's delay ('commissioned for bound for Lorient in three days')
+_IN_ORDINARY_TAIL = re.compile(
+    r"^(?:laid\s+up\s+)?in\s+ordinary(?:\s+at\s+(?P<port>.+?))?\.?$", re.I
+)
+_COMMISSION_TAIL = re.compile(
+    r"^commissioned\s+(?:for\s+)?(?P<words>.+?)(?:\s+(?P<when>at\s+once|now|in\s+[\w\s]+?(?:hours?|days?)))?\.?$",
+    re.I,
+)
+
+
+def _in_ordinary(world: Any, vessel: Any, port_words: str | None) -> tuple[str, dict[str, Any]]:
+    """`ship "X": in ordinary at <port>`: she is laid up at the port's anchorage (the port
+    she lies in when none is named), her brain and intent gone, her sortie none until a
+    commission; the business commissions a nation's ships in ordinary by its knobs."""
+    from freesail.world.regimes import put_in_ordinary
+
+    ports = getattr(world, "ports", None)
+    port = None
+    if port_words:
+        port = ports.find(port_words.strip()) if ports is not None and ports.ports else None
+        if port is None:
+            raise WorldOrderError(f"The chart knows no port named {port_words!r} in play.")
+    else:
+        from freesail.world.regimes import _port_of
+
+        port = _port_of(world, vessel)
+        if port is None:
+            raise WorldOrderError(
+                f"{vessel.name} lies at no port's anchorage; say 'in ordinary at <port>'."
+            )
+    sets = getattr(world, "squadrons", None)
+    sq = sets.of(vessel.id) if sets is not None else None
+    if sq is not None:
+        sq.leave(world, vessel.id, "laid up in ordinary")
+    crew = getattr(vessel, "crew", None)
+    if crew is not None and getattr(crew, "shape", "full") == "full":
+        from freesail.world.crews import demote
+
+        demote(world, vessel)
+    vessel.position = port.anchorage.position
+    put_in_ordinary(world, vessel, port)
+    return (
+        f"{vessel.name} laid up in ordinary at {port.name}: a hull at the anchorage, no "
+        "company and no intent",
+        {
+            "id": vessel.id,
+            "regime": "in ordinary",
+            "port": port.id,
+        },
+    )
+
+
+def _commissioned(
+    world: Any, vessel: Any, words: str, when: str | None
+) -> tuple[str, dict[str, Any]]:
+    """`ship "X": commissioned for <intent> [at once | in <n> hours | in <n> days]`: a ship
+    in ordinary given her company and an intent, sailing at once or when the delay is up
+    (the regime's two to five days when none is said)."""
+    from freesail.orders.numbers import read_all
+    from freesail.world.regimes import commission, regime_knob
+
+    if getattr(vessel, "regime", "") != "in ordinary":
+        raise WorldOrderError(
+            f"{vessel.name} is not in ordinary (she is {vessel.state}); a ship on the sea is "
+            "given an intent with 'ship \"X\": intent <words>'."
+        )
+    delay_s = 0
+    low = (when or "").lower().strip()
+    if not low:
+        lo, hi = regime_knob("in ordinary", "commission_delay_h", [48, 120])
+        rng = world.rng.stream("business")
+        delay_s = int((float(lo) + (float(hi) - float(lo)) * rng.random()) * 3600.0)
+    elif low not in ("at once", "now"):
+        m = re.match(r"^in\s+(?P<n>[\w\s]+?)\s+(?P<unit>hours?|days?)$", low)
+        n = read_all(m.group("n")) if m else None
+        if m is None or n is None:
+            raise WorldOrderError(
+                f"'{when}' is no delay; say 'at once', 'in 3 days' or 'in 12 hours'."
+            )
+        delay_s = int(float(n) * (86400.0 if m.group("unit").startswith("day") else 3600.0))
+    try:
+        said = commission(world, vessel, words, delay_s=delay_s)
+    except ValueError as e:
+        raise WorldOrderError(f"the intent '{words}': {e}") from None
+    return f"{vessel.name} {said}", {"id": vessel.id, "intent": words, "delay_s": delay_s}
 
 
 def _orders_of(world: Any, vessel: Any, boss: str) -> tuple[str, dict[str, Any]]:
@@ -606,6 +706,307 @@ def _orders_of(world: Any, vessel: Any, boss: str) -> tuple[str, dict[str, Any]]
         f"{vessel.name} under the orders of {boss_words}: she answers {boss_words}'s signals "
         "with the pendant and performs them, and nobody else's",
         {"id": vessel.id, "under_orders_of": boss_id},
+    )
+
+
+# ---------------------------------------------------------------------------
+# squadron and convoy (package 72; spec M7 §21): the sets
+# ---------------------------------------------------------------------------
+
+_SQUADRON_ACT = re.compile(r"^squadron\s+\"(?P<name>[^\"]+)\"\s*:\s*(?P<act>.+?)\s*$", re.I)
+_SQUADRON_NEW = re.compile(
+    r"^squadron:\s*\"(?P<name>[^\"]+)\"\s+of\s+(?P<nation>[\w' -]+?)\s+under\s+(?P<cdr>.+?)"
+    r"(?:\s+with\s+(?P<with>.+?))?\s*,\s*(?P<goal>.+?)\s*$",
+    re.I,
+)
+_CONVOY_NEW = re.compile(
+    r"^convoy:\s*(?P<n>\w+)\s+(?:merchantmen|merchant\s+brigs|ships|sail)\s+under\s+"
+    r"(?P<escort>.+?)\s+from\s+(?P<a>.+?)\s+(?:for|to)\s+(?P<b>.+?)\s*$",
+    re.I,
+)
+_DIVISION = re.compile(
+    r"^detach\s+(?P<ships>.+?)\s+as\s+the\s+(?P<div>[\w' -]+?)\s+division"
+    r"(?:\s+under\s+(?P<lead>.+?))?$",
+    re.I,
+)
+_FORM = re.compile(
+    r"^form\s+(?:the\s+)?(?P<formation>line\s+ahead|line\s+abreast|order\s+of\s+sailing|"
+    r"close\s+order)(?:\s+in\s+(?P<cols>\w+)\s+columns?)?$",
+    re.I,
+)
+_RECALL = re.compile(r"^recall\s+(?:the\s+)?(?P<div>[\w' -]+?)(?:\s+division)?$", re.I)
+_SQUADRON_FORMS_WORDS = (
+    "join <ship>; detach <ship>; detach <ship>, <ship> as the <name> division [under <ship>]; "
+    "recall the <name> division; form the line ahead | the line abreast | the order of sailing "
+    "[in N columns] | close order; goal <words>; commander <ship>; rendezvous <place>; dissolve"
+)
+
+
+def _ship_named(world: Any, words: str, what: str) -> Any:
+    who = " ".join(str(words).split()).strip(" .'\"")
+    low = who.lower()
+    if low in ("the ship", "us", "me", "the player", "the player's ship", "our ship"):
+        return "the ship"
+    v = world.vessels.find(who.removeprefix("the ").removeprefix("The "))
+    if v is None:
+        raise WorldOrderError(f"No ship named {who!r} is on the sea to {what}.")
+    return v
+
+
+def _ids_named(world: Any, words: str, what: str) -> list[str]:
+    parts = [p for p in re.split(r"\s*,\s*|\s+and\s+", words) if p.strip()]
+    out = []
+    for part in parts:
+        v = _ship_named(world, part, what)
+        out.append("the ship" if v == "the ship" else str(v.id))
+    return out
+
+
+def _same_nation_or_refuse(world: Any, nation_id: str, vid: str, set_name: str) -> None:
+    """A set is one nation's: a ship of another joins it only as a prize (74's), and the
+    player's ship is her scenario's nation."""
+    if vid == "the ship":
+        ports = getattr(world, "ports", None)
+        own = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
+    else:
+        own = str(getattr(world.vessels.get(vid), "nation", "") or "")
+    if nation_id and own and own != nation_id:
+        n = world.nations.get(own)
+        raise WorldOrderError(
+            f"{'The ship' if vid == 'the ship' else world.vessels.get(vid).name} is "
+            f"{n.adjective}, and {set_name} is {world.nations.get(nation_id).adjective}: a ship "
+            "of another nation sails in a set only as a prize."
+        )
+
+
+def _set_named(world: Any, name: str) -> Any:
+    sets = getattr(world, "squadrons", None)
+    sq = sets.find(name) if sets is not None else None
+    if sq is None:
+        known = ", ".join(s.name for s in (sets.sets if sets is not None else [])) or "none"
+        raise WorldOrderError(
+            f"No squadron named {name!r} is on the sea (the squadrons: {known}); make one with "
+            "'squadron: \"<name>\" of <nation> under <ship> with <ship>, <ship>, <goal>'."
+        )
+    return sq
+
+
+def _squadron(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`squadron "<name>": <act>` on a set, and `squadron: "<name>" of <nation> under <ship>
+    [with <ship>, <ship>], <goal>` making one of ships on the sea."""
+    from freesail.world.squadrons import FORMATIONS, Squadron
+
+    m = _SQUADRON_ACT.match(body)
+    if m:
+        sq = _set_named(world, m.group("name"))
+        act = " ".join(m.group("act").split()).rstrip(".")
+        low = act.lower()
+        data: dict[str, Any] = {"squadron": sq.id}
+        dm = _DIVISION.match(act)
+        if dm:
+            ids = _ids_named(world, dm.group("ships"), "be detached")
+            lead = ids[0]
+            if dm.group("lead"):
+                v = _ship_named(world, dm.group("lead"), "lead the division")
+                lead = "the ship" if v == "the ship" else str(v.id)
+            for vid in ids:
+                if vid not in sq.members:
+                    raise WorldOrderError(
+                        f"{sq._name_of(world, vid)} is no member of {sq.name}; the members: "
+                        + ", ".join(sq._name_of(world, x) for x in sq.members)
+                    )
+            d = sq.detach(world, dm.group("div").strip(), lead, ids)
+            world.record(
+                Severity.NOTABLE,
+                "squadron.detached",
+                f"The {d.name} division detached from {sq.name} under {sq._name_of(world, lead)}.",
+                data={"squadron": sq.id, "division": d.name, "leader": lead},
+            )
+            return (
+                f"the {d.name} division of {sq.name} detached under {sq._name_of(world, lead)}: "
+                + ", ".join(sq._name_of(world, x) for x in [lead, *d.members]),
+                data | {"division": d.name, "leader": lead, "members": list(d.members)},
+            )
+        if low.startswith("join "):
+            v = _ship_named(world, act[5:], "join the squadron")
+            vid = "the ship" if v == "the ship" else str(v.id)
+            _same_nation_or_refuse(world, sq.nation, vid, sq.name)
+            other = world.squadrons.of(vid)
+            if other is not None and other is not sq:
+                other.leave(world, vid, f"to join {sq.name}")
+            sq.join(world, vid)
+            return f"{sq._name_of(world, vid)} joins {sq.name}", data | {"id": vid}
+        if low.startswith("detach "):
+            v = _ship_named(world, act[7:], "be detached")
+            vid = "the ship" if v == "the ship" else str(v.id)
+            if vid not in sq.members:
+                raise WorldOrderError(f"{sq._name_of(world, vid)} is no member of {sq.name}.")
+            if vid == sq.commander:
+                raise WorldOrderError(
+                    f"{sq._name_of(world, vid)} commands {sq.name}; name another commander "
+                    f"first ('squadron \"{sq.name}\": commander <ship>')."
+                )
+            sq.leave(world, vid, "detached by order")
+            brain = getattr(v, "brain", None) if v != "the ship" else None
+            if brain is not None:
+                brain.planned = False
+                brain.state = None
+            return f"{sq._name_of(world, vid)} detached from {sq.name}, on her own", data | {
+                "id": vid
+            }
+        rm = _RECALL.match(act)
+        if rm:
+            name = rm.group("div").strip()
+            d = sq.recall(world, name)
+            if d is None:
+                raise WorldOrderError(
+                    f"{sq.name} has no division named {name!r} detached"
+                    + (f"; detached: {', '.join(sq.divisions)}" if sq.divisions else "")
+                    + "."
+                )
+            world.record(
+                Severity.NOTABLE,
+                "squadron.recalled",
+                f"The {d.name} division recalled to {sq.name}.",
+                data={"squadron": sq.id, "division": d.name},
+            )
+            return f"the {d.name} division recalled to {sq.name}", data | {"division": d.name}
+        fm = _FORM.match(act)
+        if fm:
+            formation = " ".join(fm.group("formation").lower().split())
+            if formation not in FORMATIONS:
+                raise WorldOrderError(
+                    f"'{formation}' is no formation; say one of {', '.join(FORMATIONS)}."
+                )
+            sq.formation = formation
+            if fm.group("cols"):
+                from freesail.orders.numbers import read_all
+
+                cols = read_all(fm.group("cols"))
+                if cols:
+                    sq.columns = max(1, int(cols))
+            sq._stations_tick = -1
+            sq._note(world, f"{formation} by order")
+            return f"{sq.name} forms the {formation}", data | {"formation": formation}
+        if low.startswith("goal "):
+            words = act[5:].strip()
+            sq._set_goal(world, words)
+            sq.goal = words
+            sq.made.pop("__goals__", None)  # a goal given is the set's own, not to be restored
+            return f"the goal of {sq.name}: {words}", data | {"goal": words}
+        if low.startswith("commander "):
+            v = _ship_named(world, act[10:], "command the squadron")
+            vid = "the ship" if v == "the ship" else str(v.id)
+            sq.set_commander(world, vid)
+            return f"{sq._name_of(world, vid)} commands {sq.name}", data | {"commander": vid}
+        if low.startswith("rendezvous "):
+            from freesail.world.ships import place_position
+
+            place = act[11:].strip()
+            found = place_position(world, place)
+            if found is None:
+                raise WorldOrderError(f"The chart knows no place named {place!r} for a rendezvous.")
+            sq.rendezvous = found[1]
+            return f"the rendezvous of {sq.name}: {found[1]}", data | {"rendezvous": found[1]}
+        if low in ("dissolve", "dissolved", "disperse", "part company"):
+            world.squadrons.remove(sq, world)
+            return f"{sq.name} dissolved: every ship on her own", data
+        raise WorldOrderError(f"'{act}' is nothing a squadron does; say {_SQUADRON_FORMS_WORDS}.")
+    m = _SQUADRON_NEW.match(body)
+    if m is None:
+        raise WorldOrderError(
+            "Say 'squadron \"<name>\": <act>' (the acts: "
+            + _SQUADRON_FORMS_WORDS
+            + ") or 'squadron: \"<name>\" of <nation> under <ship> with <ship>, <ship>, <goal>'."
+        )
+    nation = world.nations.find(m.group("nation").strip())
+    if nation is None:
+        raise WorldOrderError(f"'{m.group('nation')}' is no nation of the table.")
+    cdr = _ship_named(world, m.group("cdr"), "command the squadron")
+    cdr_id = "the ship" if cdr == "the ship" else str(cdr.id)
+    members = [cdr_id]
+    if m.group("with"):
+        members += [
+            x for x in _ids_named(world, m.group("with"), "join the squadron") if x != cdr_id
+        ]
+    for x in members:
+        _same_nation_or_refuse(world, nation.id, x, m.group("name"))
+    goal = m.group("goal").strip()
+    merchant = sum(
+        1
+        for x in members
+        if x != "the ship" and "merchant" in str(getattr(world.vessels.get(x), "description", ""))
+    )
+    kind = "convoy" if merchant >= max(1, len(members) // 2) else "squadron"
+    sets = world.squadrons
+    for x in members:
+        other = sets.of(x)
+        if other is not None:
+            other.leave(world, x, f"to join {m.group('name')}")
+    try:
+        sq = Squadron.from_spec(
+            world,
+            {
+                "name": m.group("name"),
+                "kind": kind,
+                "nation": nation.id,
+                "commander": cdr_id,
+                "members": members,
+                "goal": goal,
+            },
+        )
+        sets.add(sq, world)
+    except ValueError as e:
+        raise WorldOrderError(str(e)) from None
+    if cdr_id != "the ship":
+        brain = getattr(cdr, "brain", None)
+        if brain is not None:
+            try:
+                brain.set_intent(goal)
+                brain._plan()
+            except ValueError as e:
+                sets.remove(sq, world)
+                raise WorldOrderError(f"the goal '{goal}': {e}") from None
+            cdr.intent_words = brain.intent_words
+    return (
+        f"{sq.name} formed, a {kind} of {nation.name} under {sq._name_of(world, cdr_id)}: "
+        + ", ".join(sq._name_of(world, x) for x in sq.members)
+        + f"; the goal {goal}",
+        {"squadron": sq.id, "kind": kind, "members": list(sq.members), "goal": goal},
+    )
+
+
+def _convoy(world: Any, body: str) -> tuple[str, dict[str, Any]]:
+    """`convoy: <n> merchantmen under <ship> from <port> for <port>`: a convoy the world's
+    business draws now, in port at the first port bound for the second, under an escort of
+    the nation's kind (or the ship named, when she is on the sea)."""
+    m = _CONVOY_NEW.match(body)
+    if m is None:
+        raise WorldOrderError(
+            "Say 'convoy: <n> merchantmen under <ship or a brig-sloop> from <port> for <port>'."
+        )
+    business = getattr(world, "business", None)
+    if business is None:
+        raise WorldOrderError(
+            "The world's business is off in this scenario (`business: on`), and the convoys "
+            "are its; put the ships on the sea with 'ship:' and form them with 'squadron:' "
+            "instead."
+        )
+    from freesail.orders.numbers import read_all
+
+    n = read_all(m.group("n"))
+    if not n or int(n) < 1:
+        raise WorldOrderError(f"'{m.group('n')}' is no number of merchantmen.")
+    try:
+        sq = business.draw_convoy(
+            int(n), m.group("escort").strip(), m.group("a").strip(), m.group("b").strip()
+        )
+    except ValueError as e:
+        raise WorldOrderError(str(e)) from None
+    return (
+        f"{sq.name} drawn: {len(sq.members) - 1} merchantmen under "
+        f"{sq._name_of(world, sq.commander)}, {sq.goal}",
+        {"squadron": sq.id, "members": list(sq.members), "goal": sq.goal},
     )
 
 
@@ -2918,8 +3319,9 @@ def _glass_steady(world: Any) -> bool:
 # no doubt, and two appended highs on the season's own gave 1041 hPa off Brest in June):
 # above the season's ceiling, the month's background with its strongest high's anomaly
 # and this margin over (judgement: the spread of a season's highs about its table), or a
-# strong one put near her out of a glass that has not been rising.
-HIGH_CEILING_MARGIN_HPA = 4.0
+# strong one put near her out of a glass that has not been rising. The margin lives with
+# the weather since package 72's seasonal bound uses the same ceiling.
+from freesail.world.weather import HIGH_CEILING_MARGIN_HPA  # noqa: E402
 
 
 def _high_ceiling(table: Any) -> float:

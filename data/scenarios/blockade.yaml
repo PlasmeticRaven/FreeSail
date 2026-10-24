@@ -1,0 +1,105 @@
+# FreeSail: the blockade of Brest blown off (spec M7 §22; package 72; the owner's scenario
+# of the brief). A June forenoon of 1805 off Brest: the inshore squadron, the frigate Naiad
+# with the brig-sloop Nimble in her wake, blockading Brest under a far commodore (the
+# regime's intent `blockade Brest`: the port's blockade station off the Black Rocks within
+# six miles, data/ports/brest.yaml); the King's frigate (the player's) the main body off
+# Ushant on her own station; and the French frigate Hortense in ordinary in the Bay of
+# Brest with her sortie written (France keeps port and slips out when the blockade is
+# blown off: data/nations.yaml `naval:`). A low passes north of Ushant through the day:
+# the wind goes south-west and rises to a gale by the early afternoon, and the blockade's
+# book (data/squadrons/blockade.yaml, `blown_off`) bears the inshore squadron up for its
+# rendezvous in Torbay; the gale moderates in the evening and the book restores the
+# station; and when the offing has been clear of the enemy's men of war for the regime's
+# hour with the gale over, the Hortense slips out and is away to cruise off the Lizard.
+# Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/blockade.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/blockade.yaml
+#
+# Played by the player on the Ushant station: `the glass` (falling through the forenoon),
+# `the squadron` when the inshore squadron is in sight, `strangers`; a gale on a lee shore
+# is the day's lesson, and the French frigate standing out of the Iroise in the evening
+# her reward for keeping the sea or her escape. Played by the rules captain with no model
+# seated: he keeps his station by his book and heaves to or claws off as it says. The
+# Hortense's sortie is the regime's (freesail/world/regimes.py), not a scripted event: a
+# man of war of the King's within fifteen miles of the road of Bertheaume keeps her in,
+# and so does the gale.
+#
+# The weather is the scripted low alone (no climatology), so that the day at seed 7 is the
+# same on every machine; its figures are measured in tests/test_known_truths.py (truths
+# 7-152 onward) and recorded in docs/dev/TuningNotes.md (package 72).
+
+name: The blockade of Brest blown off
+seed: 7
+start: 1805-06-12T10:00
+position: {lat_deg: 48.45, lon_deg: -5.25}   # the Ushant station, the Stiff ten miles north-west
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 20
+  speed_kn: 5
+  glass: true
+intent: keep the station off Ushant within 15 miles
+wind:
+  from_deg: 210
+  knots: 15
+  gustiness: 0.0
+  variability: 0.0
+
+papers:
+  chart: {year: 1804}
+  almanac: 1805
+
+ports: [brest, falmouth, plymouth, torbay]
+
+standing_orders:
+  - data/standing_orders/starter.orders
+
+# the low: deepening as it crosses north of Ushant through the day, filling as it goes up
+# Channel; the wind at the squadron south-westerly rising to a gale by the early afternoon,
+# veering west and north-west and moderating in the evening (positions km east and north of
+# the start)
+weather:
+  background: {hpa: 1016, gradient_hpa_per_100km: 0.3, high_toward_deg: 200}
+  systems:
+    - name: the low
+      kind: low
+      radius_km: 420
+      fronts: {warm_deg: 160, cold_deg: 250}
+      track:
+        - {at: 1805-06-12T04:00, x_km: -1300, y_km: 560, hpa: 1000}
+        - {at: 1805-06-12T10:00, x_km: -700, y_km: 520, hpa: 988}
+        - {at: 1805-06-12T14:00, x_km: -200, y_km: 490, hpa: 978}
+        - {at: 1805-06-12T18:00, x_km: 300, y_km: 490, hpa: 980}
+        - {at: 1805-06-13T00:00, x_km: 900, y_km: 540, hpa: 996}
+        - {at: 1805-06-13T10:00, x_km: 1600, y_km: 650, hpa: 1006}
+  sky: {sky: overcast, weather: rain, visibility: the horizon}
+  sea: true
+
+ships:
+  # the inshore squadron: the Naiad, commodore, on the blockade station, the Nimble in her
+  # wake at two cables (the set below; the blockade's book)
+  - {id: naiad, description: frigate, name: Naiad, nation: britain,
+     position: 48 19.6 N 5 00.8 W, goal: "patrolling off the Black Rocks within 6 miles",
+     intent: "blockade Brest", colours: shown, heading_deg: 20, squadron: inshore}
+  - {id: nimble, description: brig-sloop, name: Nimble, nation: britain,
+     position: 48 19.4 N 5 01.0 W, goal: "patrolling off the Black Rocks within 6 miles",
+     colours: shown, heading_deg: 20, squadron: inshore}
+  # the French frigate in ordinary in the Bay of Brest, her sortie written
+  - {id: hortense, description: frigate, name: Hortense, nation: france,
+     position: 48 20 N 4 29 W, goal: "running home to Brest", regime: in ordinary,
+     sortie: "cruise off the Lizard within 20 miles", colours: shown}
+
+squadrons:
+  - id: inshore
+    name: the inshore squadron
+    kind: squadron
+    commander: naiad
+    members: [naiad, nimble]
+    formation: line ahead
+    interval_cables: 2
+    book: blockade
+    rendezvous: Torbay
+
+orders:
+  - set plain sail

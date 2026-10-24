@@ -8830,3 +8830,329 @@ def test_truth_7_151_the_pace_with_a_convoy_of_four_under_orders_holds_the_floor
         w.run(1000)
         best = max(best, 1000 / (time.perf_counter() - t0))
     assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second"
+
+
+# ---------------------------------------------------------------------------
+# Package 72: the naval system (spec M7 §21 to §23; truths 7-152 onward)
+# ---------------------------------------------------------------------------
+
+CONVOY_SIX = "data/scenarios/convoy-six.yaml"
+BLOCKADE = "data/scenarios/blockade.yaml"
+SQUADRON = "data/scenarios/squadron.yaml"
+
+
+def _scenario_world(path: str):
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(path)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    return w
+
+
+def _off_station_m(w, sq) -> dict[str, float]:
+    from freesail.world.geo import bearing_and_distance
+
+    st = sq.stations(w)
+    return {
+        m: bearing_and_distance(w.vessels.get(m).position, st[m])[1]
+        for m in sq.others()
+        if m in st and w.vessels.get(m) is not None
+    }
+
+
+def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_straggler():
+    """Spec M7 §21 and §23's first truth (the owner's scenario, data/scenarios/convoy-six.yaml):
+    six merchant brigs under the King's brig-sloop are one set in the order of sailing, two
+    columns at two cables, each on the station leg at far detail and under the orders of
+    the player's ship; the slowest of them (the deep-laden Friendship, a dull sailer) sets
+    the pace and starts a mile astern. The commodore's book (data/squadrons/convoy.yaml),
+    read by the rules captain with no model seated, signals her a straggler (No. 20, the
+    ships astern to make more sail) when she has been out of her station ten minutes, and
+    she regains it; after two hours every ship is within a cable of her station and holds
+    it. At seed 7: the signal ordered at 2760, up at 2866, answered at 3000; the Friendship
+    back in her station at 5280 (`squadron.in_station`); at 7200 and after, every ship
+    within 165 m of her station (the far station leg holds at the tolerance's edge, half a
+    cable, and the lookout's rounding adds the rest)."""
+    w = _scenario_world(CONVOY_SIX)
+    sq = w.squadrons.find("the Falmouth trade")
+    assert sq is not None and sq.kind == "convoy" and sq.commander == "the ship"
+    assert sq.members == [
+        "the ship",
+        "nancy",
+        "two-brothers",
+        "providence",
+        "hope",
+        "mary-ann",
+        "friendship",
+    ]
+    for m in sq.others():
+        v = w.vessels.get(m)
+        assert v.under_orders_of == "the ship" and v.plan[0] == ("station", "trade"), m
+    w.run(7200)
+    ordered = [e for e in w.log if e.kind == "signal.ordered" and "No. 20" in e.text]
+    made = [e for e in w.log if e.kind == "signal.made" and "No. 20" in e.text]
+    answered = [e for e in w.log if e.kind == "signal.answered"]
+    back = [e for e in w.log if e.kind == "squadron.in_station" and "Friendship" in e.text]
+    assert ordered and made and answered and back, (ordered, made, answered, back)
+    when = (ordered[0].tick, made[0].tick, answered[0].tick, back[0].tick)
+    assert when == (2760, 2866, 3000, 5280), when
+    worst = 0.0
+    for _ in range(6):
+        w.run(600)
+        worst = max(worst, max(_off_station_m(w, sq).values()))
+    assert worst <= 165.0, worst
+    assert not sq.stragglers and not sq.prizes
+
+
+def test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort_at_two_miles():
+    """Spec M7 §22's privateer doctrine in the owner's scenario: the French schooner five
+    miles to windward of the convoy makes it out, works down to investigate, and finding a
+    man of war of the King's within her doctrine's distance (data/captains/privateer.yaml,
+    `man_of_war_nm`) she evades and stands away; no merchantman is cut out, since none is
+    uncovered. At seed 7 she is investigating at 600, evading by 3600 at two miles from the
+    commodore, and twenty miles off by 10800."""
+    w = _scenario_world(CONVOY_SIX)
+    from freesail.world.geo import bearing_and_distance
+
+    pv = w.vessels.find("Vengeur")
+    assert pv is not None and pv.nation == "france" and pv.brain is not None
+    w.run(600)
+    assert pv.brain.state == "investigating a stranger", pv.brain.state
+    w.run(3000)
+    d_at_1h = bearing_and_distance(w.position, pv.position)[1] / units.NAUTICAL_MILE
+    assert pv.brain.state == "evading" and 1.5 <= d_at_1h <= 3.0, (pv.brain.state, d_at_1h)
+    w.run(7200)
+    d_at_3h = bearing_and_distance(w.position, pv.position)[1] / units.NAUTICAL_MILE
+    assert d_at_3h >= 15.0, d_at_3h
+    sq = w.squadrons.find("the Falmouth trade")
+    assert not sq.prizes and all(not w.vessels.get(m).struck for m in sq.others())
+
+
+def test_truth_7_154_the_blockade_is_blown_off_brest_and_the_hortense_slips_out_after_the_gale():
+    """Spec M7 §22's blockade (the owner's scenario, data/scenarios/blockade.yaml): the inshore
+    squadron under a far commodore on the port's blockade station (`blockade Brest`: off
+    the Black Rocks within six miles, data/ports/brest.yaml) with the Nimble in her wake;
+    a scripted low brings a south-westerly gale; the blockade's book bears the squadron up
+    for Torbay when the wind is a gale from the west, and restores the station when it is
+    over; the French frigate in ordinary slips out when the offing (fifteen miles of the
+    road, or the blockade station) has been clear of the King's men of war for an hour
+    with the wind under a fresh breeze (data/regimes.yaml). At seed 7: blown off at 11400
+    (the wind 34 knots from 226), the goal restored at 37920 (under 28 knots), the night
+    lights at 38640, the Hortense out at 43200; the far Nimble within a cable of her
+    station at the end of the gale and at the end of the day; the player's frigate on the
+    Ushant station hove to through the gale and keeping her station after it."""
+    w = _scenario_world(BLOCKADE)
+    sq = w.squadrons.find("the inshore squadron")
+    naiad, nimble, hortense = (w.vessels.find(n) for n in ("Naiad", "Nimble", "Hortense"))
+    assert sq.book == "blockade" and sq.rendezvous == "Torbay" and sq.commander == naiad.id
+    assert naiad.brain.intent_words == "blockade Brest"
+    assert hortense.regime == "in ordinary" and hortense.brain is None
+    w.run(28800)
+    assert any(t == 11400 and "bound for Torbay" in words for t, words in sq.history), sq.history
+    assert naiad.brain.intent_words == "bound for Torbay"
+    assert hortense.regime == "in ordinary"
+    assert w.captain.state == "hove to for weather"
+    assert max(_off_station_m(w, sq).values()) <= units.CABLE
+    w.run(21600)
+    assert any(t == 37920 and "restored" in words for t, words in sq.history), sq.history
+    assert naiad.brain.intent_words == "blockade Brest"
+    sortie = [e for e in w.log if e.kind == "regime.sortie"]
+    assert [e.tick for e in sortie] == [43200], sortie
+    assert hortense.regime == "" and hortense.brain is not None
+    assert hortense.intent_words == "cruise off the Lizard within 20 miles"
+    assert w.captain.state == "keeping station"
+    assert max(_off_station_m(w, sq).values()) <= units.CABLE
+
+
+def test_truth_7_155_the_squadron_keeps_its_line_at_far_detail_and_through_the_promotion():
+    """Spec M7 §21's second truth (the owner's scenario, data/scenarios/squadron.yaml): the
+    Channel squadron, a frigate with a brig-sloop and a cutter in line ahead at two
+    cables under a far commodore, keeps its line at far detail (one brain, two station
+    legs) within half a cable; within the crewed distance of the player's frigate its
+    three are promoted to full crews under the cap, and each promoted captain keeps her
+    station by his book (`in company`: `keep your station` every two minutes), so that the
+    line is kept through the promotion. At seed 7 with the cap at nought: every ship
+    within a cable of her station at 3600 (the far leg holds at the tolerance's edge, half a
+    cable, and the guide's turns add the rest). Under the default cap: all three crewed by 600,
+    and at 7200 every ship within a cable and a half of her station, their captains in
+    company."""
+    from freesail.world import crews as K
+
+    far = _scenario_world(SQUADRON)
+    far.crewed_settings = {"cap": 0}
+    sq = far.squadrons.find("the Channel squadron")
+    assert sq.formation == "line ahead" and sq.members == ["medusa", "nimble", "sparrow"]
+    far.run(3600)
+    assert all(far.vessels.get(m).crew is None for m in sq.members)
+    assert max(_off_station_m(far, sq).values()) <= units.CABLE, _off_station_m(far, sq)
+    w = _scenario_world(SQUADRON)
+    sq = w.squadrons.find("the Channel squadron")
+    w.run(600)
+    crewed = [m for m in sq.members if w.vessels.get(m).crew is not None]
+    assert crewed == sq.members and K.CREWED_CAP >= 3, crewed
+    w.run(6600)
+    for m in sq.others():
+        v = w.vessels.get(m)
+        assert v.crew is not None and v.crew.captain.state == "in company", (m, v.crew)
+    assert max(_off_station_m(w, sq).values()) <= 1.5 * units.CABLE, _off_station_m(w, sq)
+
+
+def test_truth_7_156_the_succession_is_by_the_wake_each_ship_putting_about_at_the_turning_point():
+    """Spec M7 §21 (the brief's item 3): a signal performed in succession is performed by
+    each ship when she reaches the point where the ship ahead of her put about (the wake),
+    which replaces package 71's three minutes between ships: a convoy at four cables and
+    four knots and a half tacks in succession at the interval over the speed, five minutes
+    or so, each gap the same within a minute; outside a set 71's gap stands."""
+    from freesail.world import signals as S
+    from tests.test_squadrons import convoy_world
+
+    w, sq, harpy = convoy_world(brains=(False, False, False), formation="line ahead")
+    sq.interval_m = 4.0 * units.CABLE
+    w.run(7200)
+    books = S.books_for_nation(w.nations, "britain")
+    entry, q = books.find("tack in succession", "convoy")
+    S.make_hoist(S.vessel_locker(harpy), books, entry, q, harpy.id, int(w.clock.tick))
+    about: dict[str, int] = {}
+    for _ in range(40):
+        w.run(60)
+        for m in sq.others():
+            v = w.vessels.get(m)
+            if m not in about and any("went about" in words for _, words in (v.story or ())):
+                about[m] = next(t for t, words in v.story if "went about" in words)
+    assert set(about) == set(sq.others()), about
+    ticks = [about[m] for m in sq.others()]
+    gaps = [b - a for a, b in zip(ticks, ticks[1:], strict=False)]
+    assert ticks == sorted(ticks) and all(300 <= g <= 420 for g in gaps), gaps
+    assert all(g != 180 for g in gaps), gaps
+
+
+def test_truth_7_157_the_business_follows_the_ship_across_the_regions_edge_and_carries_the_convoy():
+    """Spec M7 §22 (the owner's requirement of 2026-10-17): the business's region is
+    wherever the player's ship is; crossing the Channel's edge at 3° W her business
+    becomes the mid-Channel's, that region is peopled once, and a convoy sailing beside
+    her is carried over whole. At seed 7 the schooner from six miles west of the edge
+    crosses within two hours before a westerly, and the business's regions entered read
+    the west then the mid-Channel."""
+    from freesail.world.geo import Position, destination
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.6, "lon_deg": -3.2},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest", "dartmouth", "weymouth", "st-malo"],
+        nation="britain",
+        business="on",
+        ship_heading_deg=110.0,
+        ship_speed_kn=5.0,
+    )
+    w = make_world(SEED, "data/ships/topsail-schooner.yaml", sc)
+    b = w.business
+    assert b.region == "channel-west" and b.regions_entered == ["channel-west"]
+    before = len(b.drawn)
+    w.submit("set plain sail")
+    w.submit("steer east-south-east")
+    convoy = next(s for s in w.squadrons.sets if s.kind == "convoy")
+    cdr = w.vessels.get(convoy.commander)
+    here = destination(w.position, 180.0, 1.0 * units.NAUTICAL_MILE)
+    shift = (here.lat_deg - cdr.position.lat_deg, here.lon_deg - cdr.position.lon_deg)
+    for m in convoy.members:
+        v = w.vessels.get(m)
+        v.position = Position(v.position.lat_deg + shift[0], v.position.lon_deg + shift[1])
+    crossed = None
+    for _ in range(12):
+        w.run(600)
+        if b.region == "channel-mid":
+            crossed = w.clock.tick
+            break
+    assert crossed is not None and crossed <= 7200, (b.region, w.position)
+    assert b.regions_entered == ["channel-west", "channel-mid"]
+    assert len(b.drawn) > before
+    assert all(not w.vessels.get(m).done for m in convoy.members)
+
+
+def test_truth_7_158_the_weathers_seasonal_bound_is_off_in_every_recorded_scenario():
+    """R-39 as taken in package 72: the summed field's seasonal bound is built under the
+    scenario's `weather_bound: seasonal` and off by default, so that no recorded passage
+    moves; no scenario in data/scenarios says it, and a World made from any of them has
+    the bound off. Under the switch the glass is held to the month's ceiling (the unit test
+    in tests/test_squadrons.py)."""
+    from pathlib import Path
+
+    import yaml
+
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    said = []
+    for path in sorted(Path("data/scenarios").rglob("*.yaml")):
+        raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        if isinstance(raw, dict) and raw.get("weather_bound") is not None:
+            said.append(str(path))
+    assert said == [], said
+    sf = load_scenario("data/scenarios/gate-5a-day.yaml")
+    w = make_scenario_world(sf)
+    assert w.systems is not None and w.systems.bound is False
+    assert "weather_bound" not in sf.scenario.to_dict()
+
+
+def test_truth_7_159_the_pace_with_the_convoy_of_six_at_far_detail_holds_truth_51s_floor():
+    """The brief's item 2 and 10: the convoy of six at far detail in truth 51's own form (the
+    frigate of the brains' sea with the far ships beside her, as the frigate with the dozen
+    is measured): a far brig-sloop commodore with his brain and the convoy's book, six
+    merchant brigs without brains on the station leg, the set's minute, and a privateer
+    schooner with her brain five miles to windward; the cap nought; the best of three
+    thousands of ticks after the first ten minutes, at least BUILD_MACHINE_FLOOR. The
+    scenario's own figure (the player's brig beating up Channel with her rules captain
+    working her sails) is the tool's, `py tools/pace.py squadrons`, 483 to 551 on the build
+    machine by the day's load (docs/dev/TuningNotes.md, package 72); the brig's sail-handling
+    is the near crew model's cost and not the set's, which this truth measures apart."""
+    import time
+
+    from freesail.world.geo import destination
+    from tests.test_brains import put
+    from tests.test_squadrons import convoy_world
+
+    w, sq, harpy = convoy_world(brains=(False, False, False, False, False, False), cap=0)
+    p = destination(harpy.position, 45.0, 5.0 * units.NAUTICAL_MILE)
+    put(
+        w,
+        "schooner",
+        "france",
+        {"lat_deg": p.lat_deg, "lon_deg": p.lon_deg},
+        "patrolling off the Lizard within 20 miles",
+        intent="cruise for prizes off the Lizard within 20 miles",
+        name="Vengeur",
+    )
+    assert len(sq.members) == 7 and all(w.vessels.get(m).crew is None for m in sq.members)
+    w.run(600)
+    best = 0.0
+    for _ in range(3):
+        t0 = time.perf_counter()
+        w.run(1000)
+        best = max(best, 1000 / (time.perf_counter() - t0))
+    assert best >= BUILD_MACHINE_FLOOR, f"{best:.0f} ticks a second"
+
+
+def test_truth_7_160_the_pace_with_the_convoy_of_six_under_the_cap_holds_truth_51s_floor():
+    """The brief's item 2: the same convoy under the default cap (the merchantmen without
+    brains stay far; the privateer and the player's ship crewed) and under a cap of
+    twelve, at least the crewed floor; the conftest's floors are not lowered."""
+    import time
+
+    from freesail.world import crews as K
+
+    for cap in (None, 12):
+        w = _scenario_world(CONVOY_SIX)
+        if cap is not None:
+            w.crewed_settings = {"cap": cap}
+        w.run(600)
+        best = 0.0
+        for _ in range(3):
+            t0 = time.perf_counter()
+            w.run(1000)
+            best = max(best, 1000 / (time.perf_counter() - t0))
+        assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second under a cap of {cap}"
