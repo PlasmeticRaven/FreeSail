@@ -34,8 +34,8 @@ on these packages; that is the owner's choice.
 | # | Who | Package | Status |
 |---|---|---|---|
 | 70 | Fable | The combat core: the quarter bill and work in action, guns as parts, the gunnery's cycle, the hit model with heel, roll and the sea, damage as state, morale and the strike, the fighting book; the first armament and truths; the figures' sources (spec §7 to §10, §8a) | **merged 2026-10-24** (`80f64f7`); the record below |
-| 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | approved and launched 2026-10-24 (Fable, in a worktree off `9488329`) |
-| 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | after 71 |
+| 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
+| 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | briefed 2026-10-24 (below), for the owner's approval |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | after 70 |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | after 70 and 73 |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | behind 70 |
@@ -121,6 +121,68 @@ owner's first play** (`docs/playtests/2026-10-24-owner-first-action/`): the acti
 the damage comes to the rigging, both sides hit and miss; the rules captain's engaging
 helm turns a full circle through the wind's eye (for the next captain's pass, with 71);
 two of the fighting book's orders were refused at the load (fixed by the lead the same day: the `at quarters` event registered by its words; the playtest's notes).
+
+### Package 71 as merged (2026-10-24)
+
+Merged `--no-ff` from the builder's worktree (ten commits on `bca885c`, the design note
+first; 74 files, ~8,500 lines) with no conflict, the merge's tree byte-identical to the
+builder's head; ruff clean; the lead's sweeps clean (no consent file, no ship file, no
+physics file touched; no model identifier). The builder ran the fast tier whole on its
+final tree (3,614 passed), the whole slow tier one mend earlier (3,941 passed, 11 expected
+failures, one failed: its own forms test, mended and its four files rerun, 800 passed) and
+the pace tests alone (8 passed); **the lead ran the whole slow tier and the pace tests on
+the merged tree after the merge; its figures follow in the next commit**. Built as briefed, generously: **the
+signals' data shape designed and written first** (`docs/design/Design-Signals.md`: six files
+under `data/signals/<root>/` in one shape for every nation, the declaration, the numerary
+mapped to what a commanded captain does, the telegraphic dictionary, night and fog, the
+convoy's, the private table's form; Britain's and France's books and the basic system every
+other nation stands on, named from `data/nations.yaml`); **colours a state of both bodies**
+(shown, none, false, struck, distress; a lookout gives the nation shown and never the true
+one; the privateer closes under the enemy's colours and shows her own at four cables; a
+shot under false or no colours told once as a pirate's act, the ports' stance turned and
+every captain whose people saw it holding her a pirate; rule 3 completed); **the private
+signal** made under the seed in the period's form, a paper of the King's ships, the King's
+captain challenging every strange sail within the flags' range, the wrong answer the tell
+and the chase by doctrine; **a signal hoisted** by three hands a phase a hoist, flying when
+the hands have it up, read at the flags' range a minute later by whoever has the book, the
+answering pendant; **the least relation** (`under the orders of`, by the scenario or the
+director) with a commanded captain performing the entry's `does` and a brainless vessel
+obeying by the least captain, the convoy of four tacking in succession on one hoist with no
+model; **the hail in three bodies** by a table in `data/captains/hail.yaml`; **the lights,
+the bell and the fog gun**; **the nations' habits in data** (70's `netherlands` key that
+never matched found and fixed); **the captain's helm in action** (never within the
+close-hauled angle plus half a point, never across the eye, the gage kept, `through_the_eye`
+in every role file, the chase under the same law; the first action at seed 7 no longer
+turns through the wind's eye and ends at 11:12 after 59 minutes of fire, 146 rounds); the
+readings, events and director's forms; truths 7-143 to 7-151; two scenarios (the encounter
+off the Lizard, the convoy of four); spec §1 to §6 as built, Harness §21d, primer chapter
+23, the tuning notes.
+
+**Taken another way, accepted:** a trader's rig that makes no answer to the private signal
+is a stranger to be spoken, not an enemy (only a man-of-war's rig makes the silence a
+tell); a single ship keeps fog signals only while a sail has been about within the hour
+(so the thick-weather passages did not move); the offing's tack among the Molène islands
+read against item 8 and left as the beating book's sea-room judgement, the station gale an
+expected failure still. **Pins:** truths 7-133, 7-144 and 7-145 by the builder's own
+mendings (the hoist flying when the hands have it up, the helm's law), the old beside the
+new; two captain's trials moved as findings (the station stranger, the King's brig's private
+signal to the Palinure, 756 to 787 lines; the trade stranger, the French brig's signal and
+her going about for the schooner, 1248 to 1246), each proven by its switch alone; no
+sailing passage with no other ship in it moved. **Found on the way, fixed:** the hoist flew
+from the book's minute before the hands had it up; a telegraphic sentence was hauled down
+before it could be read; `give chase` went after the wrong sail (the captain now names his
+stranger's rig, a judged enemy is a stranger to the order, and `cutter`, `lugger` and
+`sloop` are rig words); the chase held the tack that opened her (45c's law: a chase more
+than a point on the other side of the eye is now gone about for, under a switch, which the
+lead accepts for every chase). **Found, carried:** the planner lays no way into Plymouth
+from the south-west (61); the frigate close-hauled makes four knots to the cutter's seven in
+fourteen knots of wind (the hull's); a commodore stopped leaves `_keep_company` to 72.
+**Decisions for the owner:** whether a stranger of any rig that will not answer the private
+signal should be closed and hailed by doctrine; whether the bell is rung at anchor in every
+fog whatever is about (moves the trade-thick trial's pins); `through_the_eye` is `shift` for
+every role, a cutter's `tack` and a frigate's `wear` a word in the role's file when wanted;
+the succession's three minutes become the wake with 72; the French and basic books' numbers
+are all made, for 76 to correct.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -426,3 +488,105 @@ brief has them: no model identifier; nothing under `docs/agents/consent/` touche
 order never shown as sent; the pins re-measured only where a change moves them, old beside
 new, proven by bisection; never a test skipped, disabled or quarantined; realism, not
 pacing; the physics read and not changed.
+
+## Package 72: the naval system (`freesail/world/squadrons.py` new; `freesail/world/crews.py`, `brains.py`, `ships.py` the set, the offsets and the promotion; `freesail/world/signals.py` the least relation given to the set; `freesail/world/captains.py`, `data/captains/*.yaml` station keeping, the escort's and the commodore's doctrine; `freesail/standing/` station keeping as a standing-order kind; `freesail/world/business.py`, `data/business.yaml`, `data/nations.yaml` the regimes and the nations' knobs, the business following the player's ship; `freesail/world/weather.py` R-39's bound; `freesail/world/orders.py`, `freesail/agents/director.py`, `data/director/` the squadron's forms; `freesail/api/readings.py`; `freesail/agents/harness.py` the commodore's station; `data/scenarios/` the convoy of six, the blockade; `docs/TechnicalSpec-M7.md` §21 to §23 as built; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-152 onward)
+
+Fable; the third package of the milestone, run alone after 71 by the owner's rule. Spec M7
+Part 7-vi (§21 to §23) whole, with rule 4 (rules first, models welcome) and rule 5 (the far
+ships fight as the near do, coarsely); the owner's note 8 (a genuine set, split and joined
+freely); the owner's frame (the command system and the signals to make more ships sane, six
+on six the ideal and never rushed); the owner's requirement that the business follows the
+player's ship across regions; 71's as-merged record (the least relation, the convoy of four,
+the succession's three minutes to become the wake) and its design note; §33 for what is
+carried in. **Generously scoped as 70 and 71 were:** the brief binds the intent and names
+the ground, the builder designs, takes an item another way with its reason, grows a part
+where the work shows it should, and says what it left and why; no day count. **The
+squadron's shape is designed first and written down before it is built** (a design note
+under `docs/design/`), because 79 builds the regimes out from it and the gate's six on six
+is measured on it. Each item an intent with the lead's reading; the intent binds.
+
+1. **The squadron as a genuine set (§21).** One new object: a set of vessels with one
+   commander and one goal, and nothing more fixed. Ships join it and leave it freely: by
+   the scenario file, by the director (`squadron "Channel": detach the Medusa`, `... join
+   the Harpy`), by the world (a ship separated in a gale sails alone until she rejoins by
+   signal; a prize joins her captor's company, 74's; a straggler is lost to the convoy),
+   and by the commander's own signal (a division detached in chase and recalled); a
+   squadron splits into divisions with their own leaders and merges again; a ship alone is
+   a squadron of one for the brain and no object at all for the player. 71's `under the
+   orders of` becomes what the set reads, kept as the field for a ship under orders
+   outside any set.
+2. **One brain at far detail, and the promotion in station.** The set is moved as one
+   brain at far detail with the members at formation offsets (the line ahead, the line
+   abreast, the order of sailing, the convoy's columns), re-formed whenever the set
+   changes, so that a convoy, a blockading squadron and a line of battle are one cheap
+   thing until the player is near; under the cap the members promote one by one, each in
+   her station, and a promoted member keeps her station by her own captain's book. **The
+   pace is a figure of this item**: the owner's baseline is 95 ticks a second with twelve
+   crewed ships; six on six at far detail must be cheap and measured, and the conftest's
+   floors are not lowered.
+3. **Formations and station keeping.** Station keeping as a standing-order kind the
+   captain's and the squadron's books use (`keep station two cables astern of the
+   flagship`, `keep your station in the line`), the helm's law and the sails' trim serving
+   it (71's `helm_in_action` and the sea sense of 58b as they are); in succession by the
+   wake, the leader's going about the mark (71's three minutes replaced); the order of
+   sailing by the wind; a straggler, a ship out of her station and the signal that calls
+   her in.
+4. **The squadron's book, the commodore and the escort.** The commander's standing orders
+   as a book like the captain's (the signals of the day, the night and fog signals, the
+   order of sailing, the rendezvous), his signals the command by 71's books; the
+   subordinate rules captains obeying the book and their doctrine; **a model at the
+   flagship as the orchestrator** the owner saw in play, given the squadron's state in his
+   sample and commanding by `make the signal`; the escort's doctrine (a stranger answered
+   by doctrine, the convoy closed round the commodore, a straggler covered, a privateer
+   driven off by the odds or the straggler cut out by hers), the commodore's (the
+   rendezvous kept, a division detached and recalled).
+5. **The regimes (§22).** A ship of a nation in port, in ordinary, on station, on passage,
+   in convoy or escorting, on blockade, in chase, each a doctrine of a few rules in data:
+   the blockade's inshore and offshore squadrons blown off by a westerly gale; the convoy
+   at the slowest ship's pace; a ship in ordinary a hull in port commissioned with a delay
+   by the business or the director; the nations' knobs in `data/nations.yaml` beside 71's
+   habits (the British keep the sea and engage, the French keep port, the privateers of any
+   flag chase what pays, the Americans of 1812 fight single actions). The shape and the
+   first of each regime are this package's; 79 fills them out.
+6. **The business draws them, and follows the player's ship.** The business draws
+   convoys, escorts and squadrons under the seed as it draws traders and fishermen (M6
+   §19), and **follows the player's ship across regions** (the owner's requirement of
+   2026-10-17): the convoys and the long chases crossing the chart's blocks, a ship under
+   way at a block's edge carried over with her state and her set.
+7. **The weather's bound (R-39, carried in).** The summed field's seasonal bound and the
+   climatology's drift onto Iberia, kept out by 58a and placed here because a squadron at
+   sea for days and a blockade blown off by a gale want honest weather over a week; the
+   small part (an appended system's ramp, a high doubted) is 58a's and stands. Taken only as
+   far as the squadrons want it, with the reason written.
+8. **The planner across the land (61, carried in).** A convoy's route and a blockade's
+   station want a plan that does not cross the land (71 found the planner lays no way into
+   Plymouth from the south-west; 58b found the Roscoff plan crossing the Isle Verte). Built
+   here if the convoys want it, else left to 78 with the reason.
+9. **The stations, the director and the readings.** `the squadron`, `the station`, `the
+   convoy`, `the order of sailing` as readings; the events and tripwires (`a ship out of
+   her station`, `the commodore makes a signal`, `a straggler`); the director's forms after
+   `WORLD_ORDER_FORMS` (the set joined and detached, a squadron's goal, a convoy drawn),
+   his truth showing every set and its stations; the harness's samples at a commodore's or
+   a subordinate's station; a squadron never shown as a thing to the player but by its
+   ships and its signals.
+10. **Truths and records.** §23's truths (a convoy of six under a brig-sloop meets a
+    privateer schooner, the escort makes the signal to close round the commodore, the
+    convoy obeys with no model seated, the privateer cuts out the straggler by doctrine or
+    is driven off by the odds; a blockading squadron off Brest blown off by a gale and the
+    business's frigate slipping out on it; the squadron keeping its line at far detail and
+    promoting member by member as the player closes, each in her station; the pace of six
+    on six at far detail and under the cap), numbered 7-152 onward; the scenarios under
+    `data/scenarios/`; spec §21 to §23 "as built"; the Harness; a chapter of the primer (in
+    company: the convoy, the station, the commodore's signals); the director's library;
+    the tuning notes (the set's design, each item, the pace measured, what moved and its
+    proof, the pins old beside new, found on the way, decisions, the suite as run with its
+    counts); the fast tier, the slow tier of the touched files, the whole slow tier when
+    the machine is quiet, the pace tests alone and last.
+
+**Not built here:** fleet actions beyond six on six (§32); prizes joining a company beyond
+the hook (74); the marines (73); the regimes filled out and the Mediterranean block (79);
+sight across land (78); the full signal books (76). **The head rules bind** as 70's and
+71's briefs have them: no model identifier; nothing under `docs/agents/consent/` touched; a
+world order never shown as sent; the pins re-measured only where a change moves them, old
+beside new, proven by bisection; never a test skipped, disabled or quarantined; realism,
+not pacing; the physics read and not changed; the ship files through the generator.
