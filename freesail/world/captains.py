@@ -3536,7 +3536,9 @@ class Captain(Judgement):
             # chase and the schooner ran clear)
             wanted = CLOSE_RANGE_M
             if rng > CLOSE_RANGE_M * 3.0:
-                if self._business.get("steered_for") != "chase" and p.tick - last_tick >= 120:
+                # the chase renewed every three minutes (the chasing book's 'keep her
+                # bearing' is not loaded in this state; a chase given once is one course)
+                if self._business.get("steered_for") != "chase" or p.tick - last_tick >= 180:
                     self._business["steered_for"] = "chase"
                     self._business["steered_tick"] = p.tick
                     self.give("give chase", why="to close her")

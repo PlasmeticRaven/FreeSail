@@ -337,7 +337,8 @@ role, the privateer (`cruise for prizes off <place>`), who engages what pays fro
 at the rigging and runs from a man of war; the nation's habit over the role's figures
 (`NATION_HABITS`: the French at twice the range and at the rigging on the up-roll). The
 captain's own on entering (the drum, the guns cast loose, loaded and laid, the mark on the
-side she bears) and each minute (the mark kept on the engaged beam at his range). The
+side she bears) and each minute (an equal kept on the engaged beam at his range; a weaker
+mark, a smaller class or a merchantman, chased and closed to pistol shot). The
 player's fighting book `data/standing_orders/fighting.orders`. **Morale is the ship's one
 figure** (the division's temper has nothing to act on until 73's fight on deck), from the
 doctrine's start, the losses, the guns dismounted, the masts gone and the odds under fire;

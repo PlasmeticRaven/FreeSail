@@ -9108,7 +9108,7 @@ hatchways, and the first measure had her guns never come loose).
 | Two cutters at pistol shot, three carronades at the word (7-134) | one struck: a shot hole through the side, one killed, one wounded |
 | Two cutters at a cable, as they bear (7-140) | the French cutter struck three minutes after the first shot |
 | The first action at long shot (7-133) | opened 10:13, struck 12:06; five of thirty hurt, eight shot holes; the King's cutter a topgallant mast and two yards gone, eight lines shot away, nobody hurt |
-| The merchant brig under a privateer's fire (7-137) | engaged 10:06, fired on 10:19, struck 10:23 at the first shot that told, by the odds (0.37 under 0.4) |
+| The merchant brig under a privateer's fire (7-137) | engaged 10:06, chased down and fired on at a cable 10:14, struck 10:15 at the first shot that told, by the odds (0.37 under 0.4) |
 | The far fight at two cables (7-139) | seven rounds of three minutes; the long-gun cutter struck with four hurt and three holes |
 | The pace, two crewed cutters in action (7-138) | 538 ticks a second (best of three thousands), against the crewed floor of 60 and the owner's 95 with twelve crewed ships |
 
@@ -9121,12 +9121,25 @@ law (the doctrine's `engage_range_cables` under the nation's habit) and resolve 
 
 ### What moved, and the pins
 
-No sailing passage moved. The changes to shared code are read-only to the sailing: the
+No sailing passage moved: the changes to shared code are read-only to the sailing (the
 runner's quarters tick and the robbing act only `at_quarters`; the captain's new states and
-stimuli fire only with an enemy in sight; the readings' new rows read state that is empty
-on a ship with no guns; the hull's steer reads `helm_lost` only when set. The fast tier
-and the slow tier of the touched files ran green (below); the pins were not re-measured
-since nothing moved them (the proof the suite's own: the pinned passages' tests pass).
+stimuli fire only with an enemy in sight; the readings' new rows read state that is empty on
+a ship with no guns; the hull's steer reads `helm_lost` only when set; the action's random
+stream opens at the first shot, so the strain's list of streams is as it was). **One
+captain's trial moved, and it is a finding, not a sailing passage:** the trade-stranger
+trial (`tests/test_captain_trials.py`, a British schooner chased by a French brig-sloop),
+because the brig, crewed while she chases, now takes the cruiser's `chasing → engaging`
+within a mile and chases on in action; the first form of the engaging work kept her at the
+beam and she steered across the chase (the schooner ran clear thirty minutes sooner and,
+on the earlier tide, took the ground going into Falmouth), so a weaker mark (a smaller
+class, or a merchantman) is chased by the navigation's own `give chase` and closed to pistol
+shot, the beam law kept for an equal. Proof by bisection: the engaging transition alone
+turned off gives every old figure; with it on, the brig runs her down, opens at seven
+cables at 17362 and puts two shot through her side, the schooner runs clear at 18300 (17880
+at 58b), beats from 19020 and from 45600, anchors at 51240 (the bower at 51849; 53669 at
+58b) and is in port at 51900 (53700), waiting in the road for the wind as at 58b; 1248
+lines (1407) and the digest 0a480f7a4b7f321a
+(48b205b4f587256c). The old figures stand beside the new in the test.
 
 ### Found on the way
 
@@ -9149,6 +9162,15 @@ since nothing moved them (the proof the suite's own: the pinned passages' tests 
   thing for whoever next touches the people's forms.
 - Renard's crewed captain stays a minute in `engaging` after his mark has struck: his
   judgement is once a minute (truth 7-137 waits for it).
+- A ship with no guns took the merchant's `evading → engaging` row when caught within
+  three cables (the trial's schooner): a ship with no guns never engages now; she runs.
+- The gunnery's random stream was opened every tick on any ship with guns, firing or not,
+  and the strain's determinism test pins the sailing's list of streams: it opens at the
+  first shot now.
+- The samples: the eight action rows in every sample grew a frigate's officer's first
+  sample past his handover's fold by thirty tokens; the rows ride only while something is
+  afoot (at quarters, damaged, hurt, a mark engaged, the colours struck), the readings tool
+  still gives every row, and a row's first appearance is itself the delta.
 
 ### Decisions for the lead and the owner
 

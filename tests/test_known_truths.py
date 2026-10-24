@@ -8218,11 +8218,12 @@ def test_truth_7_137_a_merchant_brig_fired_into_strikes_by_morale_and_the_log_sa
     """Spec M7 §12: "a merchant brig fired into by a privateer strikes by morale when her
     odds fall below the doctrine's figure, the log saying why". The brig bound for
     Falmouth, the French privateer cutter cruising for prizes a thousand yards to the
-    south-east: at seed 7 the privateer engages at 10:06 and opens at four cables at
-    10:19, the brig beats to quarters and returns her fire, and at the first shot that
-    tells (10:23) her colours come down by the odds (her figure 0.37 under the merchant's
-    line of 0.4: 'against a broadside of 36 pounds to our 12'), nobody hurt. A company
-    does not strike to shot that missed: the rule wants a hit as well as fire."""
+    south-east: at seed 7 the privateer engages at 10:06, chases her down (a weaker mark
+    is closed to pistol shot) and opens at a cable at 10:14, the brig beats to quarters,
+    and at the first shot that tells (10:15) her colours come down by the odds (her figure
+    0.37 under the merchant's line of 0.4: 'against a broadside of 36 pounds to our 12'),
+    nobody hurt. A company does not strike to shot that missed: the rule wants a hit as
+    well as fire."""
     from freesail.world.geo import destination
     from freesail.world.ships import vessel_from_spec
 
