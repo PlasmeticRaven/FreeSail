@@ -8974,3 +8974,195 @@ the build's scratch directory, `p58/`.
   7b-129 moved into the slow tier by `SLOW_TESTS`: nine seconds and a minute alone).
 - **Not run**: the whole slow tier once (stopped on the lead's word; the lead runs one
   whole suite on the merged tree) and the pace tests alone.
+
+
+## Package 70: the combat core (2026-10-24)
+
+The first package of milestone 7, built in a worktree off `5fb193e`. Spec M7 Part 7-ii (§7
+to §12) "as built (package 70)"; `docs/agents/Harness.md` §21c; the primer's chapter 22;
+truths 7-133 to 7-142; the first action's scenario. The physics of the hull, the sails and
+the sea is read by the hit model and not changed; no ship file was touched by hand (every
+figure through `tools/gen_ships.py` with its source beside it); the consent records were not
+touched; no recorded passage moved (the sailing truths and the pinned passages ran green
+with the package in: an action package should move no sailing passage, and this one did not,
+which the whole fast tier and the slow tier of the touched files say below).
+
+### Item 1's design, as built
+
+`docs/design/Design-WorkInAction.md`, written before anything else. The reading that held:
+the quarter bill is a second assignment of the same men (`Sailor.quarters`; `Sailor.at` the
+gun's key while he is at it), beaten by `crew/quarters.py` and stood down by `secure the
+guns` or `pipe down`; a gun's service is a cycle the battery steps each tick while hands and
+powder last (`combat/guns.py`, not an evolution: every phase an evolution would have queued
+the player's orders behind it); `engage her to starboard`, `load with chain`, `aim at her
+rigging`, `fire as they bear` are standing intentions kept until changed, and the broadside
+at the word, a gun by name, `cease firing` and the strike ride over them; sail work at
+quarters takes the trimmers and then the guns by the bill's priority (`Runner._rob_the_guns`
+after `hands.request`), the line saying from where, and the hands go back to their guns
+each tick (`Quarters.tick` from `Runner.step`). Morale is the ship's one figure (the
+reason in `combat/morale.py`'s head). Taken another way from the lead's reading: the beat to
+quarters is a crew order beside `call all hands` and not an evolution, because an all-hands
+evolution queues behind the tack or the heave-to in hand and the drum must not (the first
+smoke had a crewed cutter wait ten minutes for her drum while her heave-to failed); and
+casting loose and securing, though evolutions for their time, take their hands from the
+crews at the guns and not the runner's pool (a frigate's company is minutes coming up the
+hatchways, and the first measure had her guns never come loose).
+
+### Each item against its intent
+
+1. **The quarter bill and work in action: built**, as above. Found on the way: the beat and
+   the cast loose as the design first had them (all-hands evolutions) queued and starved;
+   both changed with the reason written in their files.
+2. **Guns as parts: built**, the cutter's two fits, the frigate, the brig, the merchant
+   brig; the schooner, the lugger and the smack left to 75 with their shape settled (the
+   generator's `armament`/`quarter_bill` builders take any ship). `GunSpec`, `FitSpec`,
+   `ArmamentSpec`, `QuarterBillSpec` in the schema; `Gun(Part)` with its load state;
+   `Magazine` as a store from the fit's figures. A dismounted gun is out of the bill.
+3. **The gunnery's cycle: built**, the four evolutions and the gun deck's orders
+   (`orders/gunnery.py`, object `gunnery`); the rates fall out of the muster (below).
+4. **Shot and the hit model: built** (`combat/shot.py`): point blank 250 yd for a long gun
+   and 230 for a carronade, random shot 1,200 and 800 (the 3-pounder and the 12-pounder
+   carronade; by the log of the calibre), the bands 0.9 at a quarter of point blank, 0.5
+   at point blank, 0.2 at twice; heel and the lee port, the roll and the sea's scatter.
+5. **Damage as state: built** (`combat/hits.py`): a line shot away by the strain model's
+   own parting (`how="shot away"`), a spar by its wrecking, a sail's area cut
+   (`Sail.holed_m2`), a gun dismounted, a boat stove, the helm lost (`extra["helm_lost"]`:
+   the rudder held where it is), the shot hole written with its place against the
+   waterline for 73's well (no water flows: the first water was not cheap, since the well
+   is 73's own reading), the men at the part struck killed and wounded in the muster.
+6. **The fighting instructions, the engaging and morale: built**: the doctrine as data in
+   every role's file, the privateer's new file, the fighting book, the strike by rule.
+   *Morale is the ship's one figure*, decided so because the colours are one decision for
+   the whole company and a division's temper has nothing to act on until 73's fight on
+   deck. The strike wants a shot that told as well as fire (found on the way: the merchant
+   brig struck to shot that missed).
+7. **Recognition before fire: the least of it, built**: a shot at a sail not made out as an
+   enemy is told once (`action.unrecognised`) and the ship carries `extra["outlaw"]` for
+   the ports' stance; 71 will find the hook at `combat.action._recognition` (the lookout's
+   nation and `shows_colours`) and the colours as a state (`extra["colours"]`, the shadow's
+   `struck`).
+8. **The stations in action: built**: the readings in every sample and their deltas, the
+   events and the tripwire, the director's two things and `say as` a gun captain, the truth's
+   guns and damage. The cost of thinking against the cycle: a frigate's broadside comes
+   every 104 s, a cutter's carronade every 60 or so; a model whose reply takes a minute of
+   the ship's time at the usual pace misses a broadside, which the station's line says in
+   its minutes-since clause; nothing in the sample grew for the action but the rows that
+   changed.
+9. **The first action, the pace and the far fight: built** and measured (below).
+10. **The records: this section**, the spec, the Harness, the primer, the director's
+    library (the forms' examples are the library's), the suite as run.
+
+### The figures and their sources
+
+- The guns (`tools/gen_ships.py`): the cutter's 12-pounder carronades of 6 cwt (the
+  Admiralty's fit of the 1790s), her long 3-pounders of 7 cwt with eight half-pounder
+  swivels (the hired and revenue cutters' fit; the Establishments and Lavery, *Arming and
+  Fitting*, from memory and marked UNVERIFIED in the file); the frigate's 26 long
+  18-pounders of 42 cwt, 8 and 2 32-pounder carronades of 17 cwt, 2 long 9-pounder chasers
+  (Winfield's *Amazon* class, from memory, UNVERIFIED); the brig's 16 32-pounder carronades
+  and 2 long 6-pounders; the merchant brig's 4 6-pounders. Gun crews by weight (a long gun
+  2 + cwt/5, a carronade 3 + cwt/8; Douglas 1820 and the quarter bills' usage). The rounds
+  per gun: 60 round, 6 grape, 6 chain for a King's ship (the Ordnance's allowance; UNVERIFIED
+  figure), 40 for a hired cutter, 20 for a merchantman.
+- The exercise (`combat/guns.py` `PHASES`): a long gun's seven phases 85 s nominal, a
+  carronade's 60 s, a swivel's 35 s (Douglas 1820, part II, the words of command; the
+  seconds judgement, pinned by truth 7-135); a light long gun worked faster with its
+  weight to a floor of 0.65; the crew factor the numbers (squared, `NUMBERS_POWER`), the
+  rating against the ordinary seaman's, the fatigue, the seaway and the weather's factor.
+- The ballistics (`combat/shot.py`): point blank and random by the log of the calibre;
+  elevation 10° and depression 4° for a long gun, 11° and 5° for a carronade; the heel
+  added to or taken from the quoin by the side; a port shut within a foot (`PORT_SHUT_M`).
+- The hit's allotment (`combat/hits.py`): at the hull 55/25/20 hull/deck/rigging, at the
+  rigging 12/13/75, between wind and water 65/20/15 (judgement after Douglas on where
+  shot fired low and high tell); shot holes below the waterline 12 per cent, 25 more at
+  fifteen degrees of heel with the bottom presented, 30 more under "between wind and
+  water"; men hurt per hit 1.5 at the hull, 1.0 on deck, 0.15 aloft for an 18-pound shot
+  at close range, scaled by the calibre, halved when spent, trebled by grape toward the
+  men (the butcher's bills of 1805, judgement); killed three in ten of the hurt.
+- Dismounting: the chance half the shot's weight over the gun's weight in hundredweight,
+  capped at 0.85 and floored at 0.03, on a third of the deck's hits (Douglas on heavy shot
+  dismounting and light seldom); the first figures (half the gun's weight, three fifths of
+  the deck's hits) dismounted two carronades by 3-pounder shot in ten minutes.
+- Morale (`combat/morale.py`): the losses' weight 2.0 (a fifth hurt takes two fifths), the
+  guns dismounted 0.25, a lower mast gone 0.3, the odds up to 0.25 by the log of the
+  broadside weights while under fire; the start and the line by role (a King's ship 0.9 and
+  0.1, a cruiser 0.85 and 0.15, a privateer 0.7 and 0.35, a packet 0.6 and 0.3, a merchant
+  0.5 and 0.4, a fisherman 0.4 and 0.4), each with its source in the role's file.
+- The doctrine's distances: engaged within a mile (a King's ship), a mile and a half (a
+  privateer), three cables (a merchant: she fights when caught), nought (a fisherman);
+  the fire opened at two cables (the British close) or three (the privateer), the French
+  habit doubling it (`NATION_HABITS`); broken off at two to three miles for ten minutes.
+- The clearing: a frigate's quarter of an hour and a cutter's five minutes by her length
+  between the two (spec M7 §8), the drum a minute and a half, the cast loose a minute
+  with the crews at the guns, the securing two.
+
+### The rates measured (the build machine, seed 7)
+
+| Measure | Figure |
+|---|---|
+| A frigate's 18-pounder, full company (truth 7-135) | every 104 s (the spec's minute and three quarters) |
+| The same, a quarter of each gun's crew down | every 159 s (two or three men in ten; a true quarter gives 185) |
+| A frigate's tack close hauled, cleared (truth 7-136) | 447 s |
+| The same at quarters, `sail before guns` | 436 s, 84 hands lent from the guns |
+| The same at quarters, `guns before sail` | 642 s, the trimmers alone |
+| Two cutters at pistol shot, three carronades at the word (7-134) | one struck: a shot hole through the side, one killed, one wounded |
+| Two cutters at a cable, as they bear (7-140) | the French cutter struck three minutes after the first shot |
+| The first action at long shot (7-133) | opened 10:13, struck 12:06; five of thirty hurt, eight shot holes; the King's cutter a topgallant mast and two yards gone, eight lines shot away, nobody hurt |
+| The merchant brig under a privateer's fire (7-137) | engaged 10:06, fired on 10:19, struck 10:23 at the first shot that told, by the odds (0.37 under 0.4) |
+| The far fight at two cables (7-139) | seven rounds of three minutes; the long-gun cutter struck with four hurt and three holes |
+| The pace, two crewed cutters in action (7-138) | 538 ticks a second (best of three thousands), against the crewed floor of 60 and the owner's 95 with twelve crewed ships |
+
+The far fight against the near: at two cables the far tables end the two cutters' fight in
+twenty-one minutes; the near fight ends in three at a cable and in near two hours at long
+shot, so the far fight's range is the figure that decides it, and that is the far brain's
+choice, which is 74's. 74 should give the far brains the engaging transition with a range
+law (the doctrine's `engage_range_cables` under the nation's habit) and resolve rounds by
+`combat.far.fight` with the damage summed into `Vessel.damage`.
+
+### What moved, and the pins
+
+No sailing passage moved. The changes to shared code are read-only to the sailing: the
+runner's quarters tick and the robbing act only `at_quarters`; the captain's new states and
+stimuli fire only with an enemy in sight; the readings' new rows read state that is empty
+on a ship with no guns; the hull's steer reads `helm_lost` only when set. The fast tier
+and the slow tier of the touched files ran green (below); the pins were not re-measured
+since nothing moved them (the proof the suite's own: the pinned passages' tests pass).
+
+### Found on the way
+
+- A promoted ship took her file's name, so two cutters in one log were both "Sherbourne";
+  she takes her vessel's name now (`crews.py`).
+- The lookout calls a King's cutter and a trader both "a cutter": a privateer cannot tell
+  one from the other by sight, which is honest (the record has privateers mistaking revenue
+  cutters), and `man of war near` reads only what the words give ("of war", "frigate",
+  "sloop", "revenue").
+- The size ranks called a merchant brig (hull class 2) a bigger class than a cutter: a
+  merchantman is never an overmatch now; and the player's merchant brig's shadow read as
+  "a ship" (class 3) in another ship's lookout, since no far description sails her file;
+  `SHADOW_FILES` gives her a trader's words.
+- The standing book's conflict rule read `aim at her rigging` and `fire as they bear` as
+  contrary orders on the ship; each gun-deck intention is its own thing to it now.
+- The bare verbs `run out` and `run in` are the running bowsprit's; the guns' are `run out
+  the guns` and `run in the guns`.
+- `say as` draws a gun captain by his gun under "Mr", as it addresses any role it does not
+  know; a petty officer would be addressed by his plain name (`people._address`), a small
+  thing for whoever next touches the people's forms.
+- Renard's crewed captain stays a minute in `engaging` after his mark has struck: his
+  judgement is once a minute (truth 7-137 waits for it).
+
+### Decisions for the lead and the owner
+
+- The nation's habit over the role's figures (`NATION_HABITS`) is a judgement from the
+  period's commonplaces; the owner may prefer it in the nations' files.
+- The privateer's fear of a man of war reads the lookout's words; 71's colours and the
+  hail will give it more to read.
+- The far fight is measured and not wired; 74 builds it from `combat/far.py`.
+- The merchant's `strike_below` of 0.4 under a start of 0.5 means one broadside that tells
+  brings her colours down by the odds alone; the record supports it for a privateer's
+  prize, the owner may want it softer for an armed Indiaman (a role of her own, 75's).
+
+### The suite, as run
+
+See the report; the fast tier whole (two slices, the fingerprint test re-run alone on a
+quiet tree), the slow tier of the touched files, the whole slow tier once, the pace tests
+alone and last.

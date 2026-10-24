@@ -192,6 +192,19 @@ frigate's 18-pounders and carronades, the cutter's carronades, the schooner's lo
 lugger's swivels, the merchant brig's few), with the sources named (the Establishments; the
 *Indefatigable*'s and the privateer schooner's from their own records: Part 7-viii).
 
+**As built (package 70).** `Gun(Part)` by place, number and side with its load state,
+elevation and train (`freesail/ship/parts.py`); `GunSpec`, `FitSpec`, `ArmamentSpec` and
+`QuarterBillSpec` in the schema, a ship file carrying one or several fits the scenario
+chooses between (`fit:`); the magazine and the shot lockers a `Magazine` store from the
+fit's figures, counted by the gunner (`the magazine`). Through the generator with the
+source beside each figure: the cutter's two fits (the Admiralty's 12-pounder carronades of
+1805, the hired cutters' long 3-pounders with eight swivels), the frigate (the *Amazon*
+class's 18-pounders, 32-pounder carronades and 9-pounder chasers), the brig-sloop and the
+merchant brig; the schooner, the lugger and the smack left to 75 with the builders in
+place. The carriage, the tackles and the breeching are the gun's own state (cast loose,
+run out), not parts of the graph; the figures from memory are marked UNVERIFIED in the
+generator for 75's sources.
+
 ### 8. The gunnery as evolutions (`freesail/evolutions/`; `freesail/crew/bill.py`)
 
 `clear for action` (the bulkheads down, the galley fire out, the boats towed or stowed, the
@@ -212,6 +225,21 @@ served by few and untrained hands at a fraction. The figures are judgements with
 (*A Treatise on Naval Gunnery*, 1820) and the period's captains' logs as the sources, pinned
 by the truths and tuned in play.
 
+**As built (package 70).** The orders of the gun deck are the dialect's (`orders/gunnery.py`,
+object `gunnery`): `clear for action` (a frigate's quarter of an hour, a cutter's five
+minutes, by her length), `beat to quarters` (a crew order beside `call all hands`, at once,
+never queued behind the work in hand), `cast loose the guns` and `secure the guns` (the gun
+crews' own work, their time from the crews at their guns), `load with ...`, `run out the
+guns`, `run in the guns`, `fire as they bear`, `fire by divisions`, `hold your fire`, `fire
+on the up roll`, `fire` and a side's broadside at the word, a gun by number or place, a
+shot across her bows, a gun to leeward, `cease firing`; the boarders and the small arms
+73's. The cycle is the battery's own and not an evolution (`combat/guns.py`: seven phases
+for a long gun, 85 s nominal; a carronade's 60; a swivel's 35; the crew factor the numbers
+squared, the rating, the fatigue, the seaway and the weather), so **the rates fall out of
+the muster**: a frigate's 18-pounder every 104 s with her full company and every 159 s
+with a quarter of each gun's crew down (truth 7-135). A gun captain fires at nothing beyond
+his gun's throw. The rules captain gives them by his doctrine (§10).
+
 ### 8a. The quarter bill, and work in action (the owner's note 4; `freesail/crew/bill.py` a quarter bill beside the watch bill)
 
 At quarters every man has a station and the work is **continuous, not a queue**: the quarter
@@ -230,6 +258,21 @@ item**, since the evolution system as M3 built it (an evolution with hands, a du
 steps) serves the gun's cycle and the carpenter's plug but not the whole of an action; the
 reading is that the standing-intention form the helm's `full and by` already has is the
 shape, with the bill as the scheduler and the evolutions as its leaves.
+
+**As built (package 70).** `docs/design/Design-WorkInAction.md` and `crew/quarters.py`: the
+quarter bill in the ship's file beside the watch bill (through the generator with its
+sources), beaten by `beat to quarters` into the gun crews (one to each pair of guns), the
+trimmers, the helm, the powder, the marines, the carpenter and the surgeon; every man's
+`quarters` a second assignment beside his watch, his `at` the gun's key while he is at it.
+The standing intentions are the battery's (`engage her to starboard`, `load`, `aim at`,
+the firing's doctrine, the roll, the ports, the priority), kept until changed and logged
+when they change something; the one-shot orders ride over them. Sail work at quarters
+draws on the trimmers and then on the guns by the fighting book's priority
+(`Runner._rob_the_guns`): under `sail before guns` the frigate's tack takes half of every
+gun's crew and keeps its pace (436 s against 447 cleared) while the guns go short; under
+`guns before sail` the trimmers alone have her (642 s); the line says from where, and the
+hands go back to their guns as the work is done (truth 7-136). The lead's reading held
+but for the beat and the cast loose, taken another way with the reason in the tuning notes.
 
 ### 9. Shot and the hit model (`freesail/combat/` new: `shot.py`, `hits.py`)
 
@@ -252,6 +295,21 @@ weather gage and the lee gage differ); the roll's timing is the gunner's doctrin
 the up-roll for the rigging, on the down-roll for the hull) and the sea state scatters the
 shot by its height. The sequence is deterministic under the seed as everything is.
 
+**As built (package 70).** `combat/shot.py` and `combat/hits.py`: the ballistics by the
+log of the calibre (point blank 250 yd for a long gun, 230 for a carronade; random shot
+1,200 and 800 for the 3-pounder and the 12-pounder carronade), the hit chance by band (nine
+in ten at a quarter of point blank, one in two at point blank, a fifth at twice), the
+mark's size and aspect, the crew's aim and the platform's scatter; the heel added to or
+taken from the quoin by the side, the lee port shut within a foot of the water, the roll
+by the gunner's doctrine, the sea's height; deterministic under the seed. A hit allotted
+by the aim's shares to the hull (a shot hole with its place against the waterline, the men
+between decks), the deck (the men, a gun dismounted by the shot's weight against the gun's,
+the wheel, a boat) or the rigging (a line shot away by the strain model's own parting, a
+spar carried away, a sail holed and drawing the less), and the men killed and wounded in
+the muster off the bill. The fired-at ship's log says what her people saw once a minute;
+the firer's her own fall of shot; the truth both. The figures are in the tuning notes with
+their sources; no water flows from the hole until 73.
+
 ### 10. The fighting instructions, the captain's engaging, and morale (`data/captains/*.yaml`; `freesail/world/captains.py`, `brains.py`; `data/standing_orders/fighting.orders`)
 
 The rules captain's **engaging state** (present since M6, empty until now) is filled by
@@ -267,6 +325,27 @@ from the captain's doctrine, the losses, the odds, the nation's habit and the ha
 temper, which gives **striking by rule** (decision 7: the colours struck when morale fails,
 said in the log with its reason) and the boarders' odds. A model captain reads his book as
 the night orders and fights as he judges; the player fights his own.
+
+**As built (package 70).** The engaging state filled by doctrine as data in every role's
+file (`engage_nm`, `engage_range_cables`, `break_off_nm`, the gage, the charge, the aim,
+`morale_start`, `strike_below`, each with its source), an `engaging` book in the dialect
+(open fire within the range, hold at long shot, return her fire when she opens it, cease
+firing when she strikes and when our own colours come down), the transitions into the
+action (an enemy in range unless overmatched) and out of it (the mark struck, or none
+within the breaking-off distance for its minutes; a superior force hauled off from); a new
+role, the privateer (`cruise for prizes off <place>`), who engages what pays from long shot
+at the rigging and runs from a man of war; the nation's habit over the role's figures
+(`NATION_HABITS`: the French at twice the range and at the rigging on the up-roll). The
+captain's own on entering (the drum, the guns cast loose, loaded and laid, the mark on the
+side she bears) and each minute (the mark kept on the engaged beam at his range). The
+player's fighting book `data/standing_orders/fighting.orders`. **Morale is the ship's one
+figure** (the division's temper has nothing to act on until 73's fight on deck), from the
+doctrine's start, the losses, the guns dismounted, the masts gone and the odds under fire;
+the colours come down by rule when it passes the line while under fire and a shot has told,
+the log saying the reasons in figures, the battery held, the state `struck` (she lies to),
+the colours a state the lookout reads; the player's `strike the colours` never refused.
+What follows is 74's. The far body never takes the engaging transition (the far fight 74's;
+`combat/far.py` the measure).
 
 ### 11. The marines, the small arms and the fight on deck (the owner's note 3; `freesail/crew/`; `data/ships/*.yaml` the detachment; `evolutions/`)
 
@@ -296,6 +375,10 @@ a privateer and a merchantman off the horizon come to the outcome the near fight
 within the promotion's range the engaged ships are crewed under the cap's order, an
 engagement first among the cap's reasons.
 
+**Not built here (package 70).** §11 and §11a are 73's and 74's. The far fight is
+measured once (`combat/far.py`: the same tables at coarse steps, two cutters at two cables
+struck in twenty-one minutes; truth 7-139) and not wired to the far brains.
+
 ### 12. Truths for 7-ii (outline)
 
 Two cutters with six carronades each, one broadside at pistol shot, the hits allotted by the
@@ -306,6 +389,19 @@ run out takes longer than the same tack cleared; a merchant brig fired into by a
 strikes by morale when her odds fall below the doctrine's figure, the log saying why; the
 same action at far detail ends the same way within a round; nothing fires under false
 colours without the log saying so and every stance turning.
+
+**As built (package 70).** Truths 7-133 to 7-142 in `tests/test_known_truths.py`, measured
+at seed 7 and pinned with wide bands (rule 7): two cutters at pistol shot, one broadside at
+the word and one struck (a shot hole through the side, one killed and one wounded; 7-134);
+the frigate's 18-pounder every 104 s with her full company and 159 s with a quarter of each
+crew down (7-135); the tack cleared 447 s, at quarters 436 s with 84 hands lent under
+`sail before guns` and 642 s under `guns before sail` (7-136); the merchant brig fired into
+by a privateer strikes by morale at the first shot that tells, the log saying why (7-137);
+the first action at long shot from 10:13 to the colours at 12:06 (7-133) and the same two
+cutters at a cable settled in three minutes (7-140); the far fight measured once and
+repeatable (7-139); the pace with two crewed cutters in action 538 ticks a second (7-138);
+firing on a sail not made out told and not refused (7-141); the player's strike never
+refused (7-142). "Nothing fires under false colours without the log saying so" is 71's.
 
 ---
 
