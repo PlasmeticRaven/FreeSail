@@ -131,7 +131,7 @@ physics file touched; no model identifier). The builder ran the fast tier whole 
 final tree (3,614 passed), the whole slow tier one mend earlier (3,941 passed, 11 expected
 failures, one failed: its own forms test, mended and its four files rerun, 800 passed) and
 the pace tests alone (8 passed); **the lead ran the whole slow tier and the pace tests on
-the merged tree after the merge; its figures follow in the next commit**. Built as briefed, generously: **the
+the merged tree after the merge: 3,948 passed, 11 expected failures, 2 skipped, none failed; the pace tests 8 passed**. Built as briefed, generously: **the
 signals' data shape designed and written first** (`docs/design/Design-Signals.md`: six files
 under `data/signals/<root>/` in one shape for every nation, the declaration, the numerary
 mapped to what a commanded captain does, the telegraphic dictionary, night and fog, the
