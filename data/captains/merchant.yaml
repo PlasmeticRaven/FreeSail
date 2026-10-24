@@ -147,6 +147,7 @@ books:
   keeping station: []
   in distress: []
   engaging: []
+  struck: []  # package 70: the colours down, lying to for her captor
 
 transitions:
   # aground from any state at sea is distress (package 40c, the captain's trials: the

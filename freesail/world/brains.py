@@ -232,6 +232,7 @@ class FarCaptain(Judgement):
         self._stranger: str | None = None
         self.spoken_ids: set[str] = set()
         self.given_up: set[str] = set()
+        self.fired_on: set[str] = set()  # the ships that fired on her (package 70)
         self._business: dict[str, Any] = {}
         self._waiting_at_road = False
         self.last_judged = -1
@@ -382,6 +383,8 @@ class FarCaptain(Judgement):
     # -- the hooks the stimuli ask -----------------------------------------------------
 
     def _is_enemy(self, s: dict[str, Any]) -> bool:
+        if str(s.get("id") or "") in (self.fired_on or ()):
+            return True  # she fired on us (package 70, rule 3)
         nation = s.get("nation")
         if not nation:
             return False
@@ -802,7 +805,7 @@ def resolve_state(vessel: Any, state: str, brain: FarCaptain | None = None) -> b
     elif state in ("at anchor", "in port"):
         if not vessel.plan or vessel.plan[0][0] != "anchor":
             vessel.plan = [("anchor", "")]
-    elif state in ("in distress", "engaging"):
+    elif state in ("in distress", "engaging", "struck"):
         vessel.plan = [("lie_to", math.inf)]
     vessel.tack = 0.0
     vessel.state = state

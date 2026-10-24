@@ -120,6 +120,7 @@ STATES: tuple[str, ...] = (
     "keeping station",
     "in distress",
     "engaging",
+    "struck",  # package 70: the colours down, lying to for her captor (what follows is 74's)
 )
 
 # The roles the doctrine files give; the cruiser (package 43) is the small man-of-war on
@@ -1514,6 +1515,9 @@ class Judgement:
     # the strangers this captain has done with (package 43): a chase given up as stale is
     # not taken up again while she is in sight, as a sail spoken is a stranger no more
     given_up: set[str] = frozenset()  # type: ignore[assignment]
+    # the ships that have fired on her (package 70, rule 3): an enemy from then on whatever
+    # her colours (a checkpoint from before loads with none)
+    fired_on: set[str] = frozenset()  # type: ignore[assignment]
 
     def _inner_leg(self) -> bool:
         return False
@@ -1838,6 +1842,7 @@ class Captain(Judgement):
         self._stranger: str | None = None
         self._departing = ""  # the port she sails from, for the plan's first legs
         self.given_up: set[str] = set()  # the chases given up (package 43)
+        self.fired_on: set[str] = set()  # the ships that fired on her (package 70)
         self.error = ""
         if self.intent_words:
             try:
@@ -1975,6 +1980,18 @@ class Captain(Judgement):
         self._business = {}
         self.last_judged = -1
         return f"{self.name} carries on: {self.intent.words if self.intent else ''}"
+
+    def strike_state(self) -> None:
+        """The colours struck (package 70; `combat.action.strike`): the machine enters
+        `struck`, whose book is empty and whose work is to lie to for her captor."""
+        if self.state == "struck":
+            return
+        if not isinstance(self.fired_on, set):
+            self.fired_on = set()
+        if self.active and self.commands:
+            self._enter("struck")
+        else:
+            self.state = "struck"
 
     # -- an order over his head (spec M7b §3; package 62) ------------------------------
 
@@ -2369,6 +2386,15 @@ class Captain(Judgement):
                 self.give(f"shape a course for {station[0]}")
         elif state == "evading":
             self._haul_off(Perception.read(world))
+        elif state == "struck":
+            # the colours down: she lies to for her captor (package 70; what follows is 74's)
+            manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")
+            lying = manoeuvre in ("hove to", "heaving to") or bool(
+                (getattr(world.ship, "extra", None) or {}).get("hove_to")
+            )
+            if not lying and not self._business.get("struck_lying_to"):
+                self._business["struck_lying_to"] = True
+                self.give("heave to", why="the colours struck")
 
     # -- the doctrine's transitions: `Judgement` (the mixin shared with the far body) --
 
@@ -3291,6 +3317,8 @@ class Captain(Judgement):
         return min(items, key=lambda s: s.get("estimate_m") or math.inf)
 
     def _is_enemy(self, s: dict[str, Any]) -> bool:
+        if str(s.get("id") or "") in (self.fired_on or ()):
+            return True  # she fired on us (package 70, rule 3)
         nation = s.get("nation")
         if not nation:
             return False

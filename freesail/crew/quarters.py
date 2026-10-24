@@ -279,11 +279,7 @@ class Quarters:
                     freed.append(s)
                 if n:
                     from_guns.append(gc.key)
-            words = (
-                f"{_share_words(share)} of each gun's crew, {number_words(len(freed))}"
-                if freed
-                else ""
-            )
+            words = f"from the guns, {_share_words(share)} of each crew" if freed else ""
             return freed, words
         order = sorted(self.crews.values(), key=lambda gc: _rob_order(gc, bearing_fwd))
         for gc in order:
@@ -332,9 +328,12 @@ class Quarters:
     # -- words ----------------------------------------------------------------------
 
     def _beat_lines(self) -> list[str]:
-        manned = sum(1 for gc in self.crews.values() if len(gc.hands) * 2 >= gc.wanted)
-        short = [gc for gc in self.crews.values() if gc.wanted and len(gc.hands) * 2 < gc.wanted]
+        manned = sum(1 for gc in self.crews.values() if len(gc.members) * 2 >= gc.wanted)
+        short = [gc for gc in self.crews.values() if gc.wanted and len(gc.members) * 2 < gc.wanted]
         marines = self.divisions.get(MARINES, [])
+        at_work = sum(
+            1 for gc in self.crews.values() for m in gc.members if m.at and m.at != gc.key
+        )
         lines = [
             f"Quarters: {number_words(manned)} gun crew{'s' if manned != 1 else ''} manned, "
             f"the trimmers {len(self.divisions.get(TRIMMERS, []))}, the helm "
@@ -346,6 +345,11 @@ class Quarters:
         if short:
             names = self._guns_words([gc.key for gc in short])
             lines.append(f"Not hands enough for every gun: {names} stand unmanned.")
+        if at_work:
+            lines.append(
+                f"{number_words(at_work).capitalize()} of the guns' hands at the work in hand, "
+                "to go to their guns as it is done."
+            )
         return lines
 
     def describe(self) -> list[str]:

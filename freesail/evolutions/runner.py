@@ -389,6 +389,11 @@ class Runner:
         from freesail.orders.navigation import watch_the_stern
 
         watch_the_stern(ship)
+        # at quarters a hand whose work is done goes back to his gun (package 70, spec M7
+        # §8a; `crew/quarters.py`)
+        quarters = ship.extra.get("quarters")
+        if quarters is not None and getattr(quarters, "at_quarters", False):
+            quarters.tick()
 
     def new_log_group(self) -> str:
         """A key for the evolutions of one order that log as one line (a trim's braces)."""
@@ -1077,6 +1082,7 @@ class Runner:
             self._subject_mast(ship, inst),
             aloft=self._aloft(inst),
         )
+        got = self._rob_the_guns(ship, inst, crew, want, got)
         if got.outcome == hands.TOO_FEW:
             inst.waiting = True
             inst.waiting_for = WAITING_FOR_HANDS
@@ -1101,6 +1107,59 @@ class Runner:
         if got.outcome == hands.SHORT:
             self._note_short(ship, inst, got)
         return True
+
+    def _rob_the_guns(
+        self, ship: Ship, inst: Instance, crew: Crew, want: hands.CrewRequest, got: hands.Assignment
+    ) -> hands.Assignment:
+        """At quarters, sail work short of hands takes them from the guns by the fighting
+        book's priority (package 70, spec M7 §8a; `crew/quarters.py`, `lend`): a numbered
+        request the crews from the end that bears least, whole crews first; an all-hands
+        manoeuvre the share of each crew told off for the sails. The hands freed are taken
+        by a second request, and the line says from where. Under `guns before sail` nothing
+        is lent and the work waits or goes short, as the design has it."""
+        quarters = ship.extra.get("quarters")
+        if quarters is None or not getattr(quarters, "at_quarters", False):
+            return got
+        if got.outcome == hands.ENOUGH and not want.all_hands:
+            return got
+        aloft = self._aloft(inst)
+        battery = ship.extra.get("battery")
+        bearing_fwd = None
+        relative = getattr(battery, "target_relative_rad", None) if battery is not None else None
+        if relative is not None:
+            bearing_fwd = abs(relative) < 1.5707963
+        if want.all_hands:
+            from freesail.crew.quarters import TOLD_OFF_SHARE
+
+            freed, where = quarters.lend(
+                len(crew.sailors), aloft, bearing_fwd, share=TOLD_OFF_SHARE
+            )
+        else:
+            need = max(0, got.wanted - (got.got if got.outcome != hands.TOO_FEW else 0))
+            freed, where = quarters.lend(need, aloft, bearing_fwd)
+        if not freed:
+            return got
+        if got.outcome != hands.TOO_FEW:
+            hands.release(crew, inst.inst_id)
+        again = hands.request(
+            crew,
+            self._pool(crew, inst),
+            inst.inst_id,
+            want,
+            self._subject_mast(ship, inst),
+            aloft=aloft,
+        )
+        if again.outcome != hands.TOO_FEW and where:
+            n = len(freed)
+            ship.note(
+                "notable",
+                "quarters.robbed",
+                f"{self._doing(inst).capitalize()} at quarters: {number_words(n)} "
+                f"hand{'s' if n != 1 else ''} taken {where}; the guns go on short-handed.",
+                inst.subject_id,
+                {"evolution": inst.evo.id, "hands": n, "from": where},
+            )
+        return again
 
     def _note_short(self, ship: Ship, inst: Instance, got: hands.Assignment) -> None:
         if inst.short_logged:

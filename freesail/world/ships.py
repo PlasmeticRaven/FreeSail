@@ -1346,6 +1346,7 @@ class Vessels:
             )
             self._shadow = s
         s.position = pos
+        s.struck = bool((getattr(ship, "extra", None) or {}).get("struck"))  # package 70
         s.heading_deg = units.rad_to_deg(float(ship.heading)) % 360.0
         s.speed_kn = units.ms_to_knots(_ship_speed_ms(ship))
         manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")

@@ -1833,6 +1833,12 @@ class World:
         self._tick_geo()
         # the other sail move before the lookout looks (packages 35 and 36)
         self._tick_vessels()
+        # the action (spec M7 Part 7-ii; package 70): the guns served and fired, the shot
+        # resolved on the mark's body, the strike; nothing on a ship without guns
+        if getattr(self.ship, "guns", None):
+            from freesail.combat.action import tick_action
+
+            tick_action(self)
         if self.chart is not None:
             self._tick_chart()
         if self.navigation is not None:

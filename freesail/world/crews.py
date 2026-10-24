@@ -180,6 +180,7 @@ class CrewedWorld(World):
         sc = _crew_scenario(parent, vessel)
         seed = (int(parent.seed) * 1009 + zlib.crc32(str(vessel.id).encode("utf-8"))) % (2**31)
         ship = make_ship(vessel.ship_file, sc)
+        ship.name = vessel.name  # her own name over her file's (package 70: two cutters in a log)
         super().__init__(seed=seed, scenario=sc, ship=ship)
         attach_crew(self)
         self.vessels = CrewView(self)
@@ -465,6 +466,7 @@ def _to_full(vessel: Any) -> None:
 
     sc = _crew_scenario(crew.parent, vessel)
     ship = make_ship(vessel.ship_file, sc)
+    ship.name = vessel.name  # package 70
     old_extra = getattr(crew.ship, "extra", None) or {}
     crew.ship = ship
     crew.ship.extra["rng"] = crew.rng

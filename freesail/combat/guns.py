@@ -214,6 +214,8 @@ class Battery:
         self.opened_fire_at: dict[str, int] = {}  # target id -> tick the first shot went
         self.last_fired_tick: int | None = None
         self.rounds_fired: int = 0
+        # the mark's relative bearing this tick, for the runner's robbing of the guns
+        self.target_relative_rad: float | None = None
         self._said_no_powder: set[float] = set()
         self._warned: set[str] = set()
 
@@ -413,10 +415,15 @@ class Battery:
         if target is None or relative is None:
             self.word = None
             return
+        # a gun captain fires at what his gun can throw to: a mark beyond its random range
+        # is not fired at (Douglas 1820 on the waste of powder at long shot; judgement)
         ready = [
             g
             for g in ship.guns.values()
-            if self.ready(g) and self.bears(g, relative) and self._side_fires(g)
+            if self.ready(g)
+            and self.bears(g, relative)
+            and self._side_fires(g)
+            and target.range_m <= S.ballistics_of(g.kind, g.pounder).random_m
         ]
         if not ready:
             return
