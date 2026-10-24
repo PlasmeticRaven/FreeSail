@@ -9543,6 +9543,15 @@ digest again.
   `tests/test_officer.py`); truth 7b-113 takes the lookout's `signal.private` line on the
   cruiser as his observation (the King's cruiser makes the private signal to us); the
   contents-cost and fingerprint tests pass re-run alone, as they have since 68.
+- **The director's library, by the slow tier**: two examples of `ship.order` named the
+  encounter's Renard, who is on none of the forms test's three seas (Harpy now); the
+  crewed hand took `hail her` for a reading (the stations' grammar reads `hail <post>`
+  first, and the deck's conversation answers any unparsed words), so a director's
+  `order hail her` to a near ship was refused as "a reading or a word on her deck": the
+  signal orders and the hail are asked first now (`crews._is_a_reading`); and the form
+  `ship "<name>": under the orders of <the ship | <ship> | nobody>` had its grammar and
+  examples and no performer (the scenario's `under_the_orders_of` was the only way), which
+  `world/orders._orders_of` gives it, the release by `nobody`.
 
 ### Decisions for the lead and the owner
 
@@ -9582,13 +9591,13 @@ a time, long runs detached to a log and polled.
 - **The fast tier whole** (`python3 -m pytest -q -p no:cacheprovider -n 3`): 3,607 run,
   3,601 passed, 6 failed at the first run, every one an expectation of the package's own
   making or a re-run-alone case (above, "the fast tier's expectations"); the six mended
-  and the tier re-run whole at the end: __FAST2__.
+  and the tier re-run whole at the end: 3,614 run, 3,614 passed, none failed (14:43, load under two).
 - **The package's truths** 7-143 to 7-150 (`-k "7_14"`, the slow ones under `--slow`):
-  eight passed after the mends above; 7-151 (the pace) alone and last: __PACE__.
+  eight passed after the mends above; 7-151 (the pace) alone and last: passed, among the eight pace tests below.
 - **The captain's trials** (`--slow tests/test_captain_trials.py`): six passed, one
   expected failure (the station-gale), after the two stranger trials' re-pin above; and
   again within the slow tier whole.
 - **The slow tier whole** (`--slow -n 4 -m "not pace"`, the touched files within it):
-  __SLOW__.
-- **The pace tests** (`--slow -m pace`, alone and last): __PACE2__.
+  3,953 run (the fast tier within it), 3,941 passed, 11 expected failures (the station-gale trial among them), 1 failed: the director's every-form examples test, which the package's own forms and examples broke (above, "the director's library"); mended, and the four files it touches (`test_director`, `test_crews`, `test_orders`, `test_signals`) re-run whole under `--slow`: 800 passed.
+- **The pace tests** (`--slow -m pace`, alone and last): 8 passed, 7-151 (the convoy of four under orders) within them.
 - `ruff check .` and `ruff format .` clean at every commit.

@@ -835,6 +835,12 @@ def _is_a_reading(crew: CrewedWorld, text: str) -> bool:
     from freesail.standing import grammar as standing
 
     ship = crew.ship
+    from freesail.orders import signals as signal_orders
+
+    if signal_orders.recognises(text, ship) is not None:
+        # package 71: the colours, a signal or the hail of a sail are orders of hers (the
+        # stations' grammar would take 'hail her' for a hail of the deck)
+        return False
     if stations.recognises(text, ship) is not None:
         return True
     if standing.recognises(text) in ("standing orders", "show standing order"):

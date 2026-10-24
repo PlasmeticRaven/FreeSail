@@ -665,8 +665,8 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             'ship "Lark": order shape a course for Falmouth',
             'ship "Nancy": order heave to',
             # package 71: the colours, the signals and the hail by her own grammar
-            'ship "Renard": order hoist false colours',
-            'ship "Renard": order hoist the colours',
+            'ship "Harpy": order hoist false colours',
+            'ship "Harpy": order hoist the colours',
             'ship "Medusa": order make the signal to tack in succession',
             'ship "Medusa": order make the signal enemy in sight bearing SW',
             'ship "Medusa": order answer the signal',

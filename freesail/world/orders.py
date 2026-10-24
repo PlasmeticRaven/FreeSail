@@ -538,6 +538,9 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
                 "id": vessel.id,
                 "intent": vessel.brain.intent.words,
             }
+        om = _ORDERS_OF_TAIL.match(m.group("goal"))
+        if om:
+            return _orders_of(world, vessel, om.group("boss"))
         from freesail.world.ships import _goal_plan
 
         try:
@@ -563,6 +566,47 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if vessel.intent_words:
         data["intent"] = vessel.intent_words  # on a ship with a brain only: the old pins stand
     return words + brain + guard, data
+
+
+_ORDERS_OF_TAIL = re.compile(r"^under\s+the\s+orders\s+of\s+(?P<boss>.+)$", re.I)
+
+
+def _orders_of(world: Any, vessel: Any, boss: str) -> tuple[str, dict[str, Any]]:
+    """`ship "<name>": under the orders of <the ship | <ship> | nobody>` (package 71, spec
+    M7 §3: the least relation). She reads and performs the signals of the ship named from
+    now on, as the scenario's `under_the_orders_of` sets it; `nobody` releases her."""
+    who = " ".join(str(boss).split()).strip(" .'\"")
+    low = who.lower()
+    if low in ("nobody", "no one", "none", "herself", "her own captain"):
+        vessel.under_orders_of = ""
+        crew = getattr(vessel, "crew", None)
+        if crew is not None:
+            crew.under_orders_of = ""
+        return f"{vessel.name} released: under nobody's orders, she sails by her own captain", {
+            "id": vessel.id,
+            "under_orders_of": "",
+        }
+    if low in ("the ship", "us", "me", "the player", "the player's ship", "our ship"):
+        boss_id, boss_words = "the ship", "the ship"
+    else:
+        other = world.vessels.find(who.removeprefix("the ").removeprefix("The "))
+        if other is None:
+            raise WorldOrderError(
+                f"No ship named {who!r} is on the sea to be under the orders of; say 'the "
+                "ship' for the player's, a ship's name, or 'nobody'."
+            )
+        if other is vessel:
+            raise WorldOrderError(f"{vessel.name} cannot be under her own orders; say 'nobody'.")
+        boss_id, boss_words = str(other.id), other.name
+    vessel.under_orders_of = boss_id
+    crew = getattr(vessel, "crew", None)
+    if crew is not None:
+        crew.under_orders_of = boss_id
+    return (
+        f"{vessel.name} under the orders of {boss_words}: she answers {boss_words}'s signals "
+        "with the pendant and performs them, and nobody else's",
+        {"id": vessel.id, "under_orders_of": boss_id},
+    )
 
 
 def new_ship_spec(world: Any, body: str) -> dict[str, Any]:
