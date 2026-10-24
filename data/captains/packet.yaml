@@ -12,7 +12,7 @@ source: "spec M6 §4; the Post Office packets' standing orders of the period, fr
 thresholds:
   # Package 70 (spec M7 §10): the engaging doctrine. `engage_nm` the distance within which
   # an enemy is engaged (nought turns it off); `engage_range_cables` the range the fire is
-  # opened at (the nation's habit may double it: freesail/world/captains.py NATION_HABITS);
+  # opened at (the nation's habit may double it: data/nations.yaml `habits:`, package 71);
   # `break_off_nm` and `break_off_minutes` the distance and the minutes with no enemy
   # within it that end the action; `engage_side` the gage (weather or lee); `charge` and
   # `aim` what the guns load and are laid for; `morale_start` and `strike_below` the

@@ -27,7 +27,7 @@ from typing import Any
 
 import yaml
 
-__all__ = ["NATIONS_PATH", "STANCES", "Nation", "Nations", "load_nations"]
+__all__ = ["DEFAULT_HABITS", "NATIONS_PATH", "STANCES", "Nation", "Nations", "load_nations"]
 
 NATIONS_PATH = Path(__file__).resolve().parents[2] / "data" / "nations.yaml"
 
@@ -37,6 +37,11 @@ STANCES = ("open", "neutral", "closed", "hostile")
 # The names lists of data/crew/names.yaml and the nation a ship whose company is drawn
 # from each belongs to by default (the scenario may say otherwise).
 NAMES_TO_NATION = {"english": "britain", "american": "united-states", "french": "france"}
+
+
+# The habit of a nation the table does not know (a scenario's nation is always the
+# table's, so this is the floor): the common one.
+DEFAULT_HABITS: dict[str, Any] = {"range_factor": 1.0, "aim": "hull", "roll": "down"}
 
 
 @dataclass(frozen=True)
@@ -50,6 +55,12 @@ class Nation:
     letters_of_marque: bool
     closed_to: tuple[str, ...] = ()
     flag: str = ""  # the flag's short word for the lookout: "the red ensign" (package 36)
+    # package 71 (the owner, 2026-10-24): the nation's habit in action over the role's
+    # figures (`range_factor`, `aim`, `roll`, `source`), read by `Captain._habit`; and her
+    # signal books' root under data/signals/ with its system (`well-built` or `basic`)
+    habits: dict[str, Any] = field(default_factory=dict)
+    signals_root: str = "basic"
+    signals_system: str = "basic"
 
 
 @dataclass
@@ -124,6 +135,16 @@ class Nations:
         if ship_nation in closed:
             return "closed"
         return "neutral"
+
+    def habits_of(self, nation_id: str) -> dict[str, Any]:
+        """The nation's habit in action (package 71): the table's figures over the
+        common ones where the entry leaves one out."""
+        key = _key(nation_id)
+        found = self.nations.get(key)
+        out = dict(DEFAULT_HABITS)
+        if found is not None:
+            out.update({k: v for k, v in found.habits.items() if k != "source"})
+        return out
 
     def nation_of_names(self, names_list: str) -> str:
         """The nation a ship belongs to by the names list her company is drawn from."""
@@ -203,6 +224,9 @@ def load_nations(path: str | Path = NATIONS_PATH) -> Nations:
             letters_of_marque=bool(d.get("letters_of_marque", False)),
             closed_to=tuple(str(x) for x in (d.get("closed_to") or [])),
             flag=str(d.get("flag") or ""),
+            habits=dict(d.get("habits") or {}),
+            signals_root=str((d.get("signals") or {}).get("root") or "basic"),
+            signals_system=str((d.get("signals") or {}).get("system") or "basic"),
         )
     wars = []
     for w in doc.get("wars") or []:

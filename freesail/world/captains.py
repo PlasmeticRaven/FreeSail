@@ -195,18 +195,10 @@ MAN_OF_WAR_WORDS: tuple[str, ...] = (
 )
 
 # The nation's habit in action over the role's figures (spec M7 §9, §10: "the British
-# close, the French at long shot"; the aim at the hull or the rigging; the roll fired on).
-# A judgement from the period's commonplaces (Douglas 1820, part I, on the French practice
-# of firing high and at long range; the British of closing to pistol shot and firing low);
-# applied by `Captain._habit`: the engaging range multiplied, the aim and the roll taken
-# where the role's file names none.
-NATION_HABITS: dict[str, dict[str, Any]] = {
-    "britain": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
-    "france": {"range_factor": 2.0, "aim": "rigging", "roll": "up"},
-    "spain": {"range_factor": 1.5, "aim": "rigging", "roll": "up"},
-    "netherlands": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
-    "united-states": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
-}
+# close, the French at long shot"; the aim at the hull or the rigging; the roll fired on)
+# is each nation's `habits:` entry in data/nations.yaml (package 71, the owner's word of
+# 2026-10-24: 70's table in this module moved to the nations' data file, read through
+# `world.nations.habits_of` by `Captain._habit`).
 
 # The range a weaker mark is closed to in action (pistol shot, a third of a cable;
 # judgement after the chases' record: the chaser ranges alongside).
@@ -3454,13 +3446,16 @@ class Captain(Judgement):
 
     def _habit(self) -> dict[str, Any]:
         """The figures he fights by: the role's file's, the nation's habit over them
-        (`NATION_HABITS`) where the file names none."""
+        (data/nations.yaml `habits:`, package 71) where the file names none."""
+        from freesail.world.nations import DEFAULT_HABITS
+
         d = self.doctrine
         th = d.threshold if d is not None else (lambda k, v=None: v)
         ports = getattr(self.world, "ports", None)
         nation = str(getattr(ports, "ship_nation", "") or "")
-        habit = NATION_HABITS.get(nation, NATION_HABITS["britain"])
-        factor = float(habit["range_factor"])
+        nations = getattr(self.world, "nations", None)
+        habit = nations.habits_of(nation) if nations is not None else dict(DEFAULT_HABITS)
+        factor = float(habit.get("range_factor", 1.0))
         aim = th("aim", "") or habit["aim"]
         roll = th("roll", "") or habit["roll"]
         return {

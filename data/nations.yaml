@@ -31,6 +31,17 @@ nations:
     flag: "the red ensign"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: true      # issued by the Admiralty against France, Spain and the Batavian Republic (from memory)
     closed_to: []
+    # package 71 (the owner, 2026-10-24): the nation's habit in action over the role's figures
+    # (spec M7 §9, §10; freesail/world/captains.py `Captain._habit`): the engaging range
+    # multiplied, the aim and the roll taken where the role's file names none
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "the British habit of closing and firing low into the hull on the down-roll (Douglas 1820, part I; the single-ship actions of 1793 to 1815 in James); 70's judgement, moved here by the owner's word of 2026-10-24"
+    # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
+    signals: {root: britain, system: well-built}
   france:
     name: France
     adjective: French
@@ -40,6 +51,17 @@ nations:
     flag: "the tricolour"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: true      # the corsairs of St Malo, Dunkirk and Bordeaux (from memory)
     closed_to: []
+    # package 71 (the owner, 2026-10-24): the nation's habit in action over the role's figures
+    # (spec M7 §9, §10; freesail/world/captains.py `Captain._habit`): the engaging range
+    # multiplied, the aim and the roll taken where the role's file names none
+    habits:
+      range_factor: 2.0
+      aim: rigging
+      roll: up
+      source: "the French habit of engaging at long range and firing high at the rigging on the up-roll, to cripple and escape (Douglas 1820, part I; the commonplaces of the period); 70's judgement, moved here"
+    # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
+    signals: {root: france, system: well-built}
   spain:
     name: Spain
     adjective: Spanish
@@ -49,6 +71,17 @@ nations:
     flag: "the red and yellow"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: true
     closed_to: []
+    # package 71 (the owner, 2026-10-24): the nation's habit in action over the role's figures
+    # (spec M7 §9, §10; freesail/world/captains.py `Captain._habit`): the engaging range
+    # multiplied, the aim and the roll taken where the role's file names none
+    habits:
+      range_factor: 1.5
+      aim: rigging
+      roll: up
+      source: "between the French and the British: the Spanish fleet drilled with the French and fired high (Trafalgar's accounts, from memory); 70's judgement, moved here"
+    # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
+    signals: {root: basic, system: basic}
   batavian-republic:
     name: the Batavian Republic
     adjective: Dutch
@@ -58,6 +91,17 @@ nations:
     flag: "the Batavian tricolour"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: true
     closed_to: []
+    # package 71 (the owner, 2026-10-24): the nation's habit in action over the role's figures
+    # (spec M7 §9, §10; freesail/world/captains.py `Captain._habit`): the engaging range
+    # multiplied, the aim and the roll taken where the role's file names none
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "the Dutch fought close and hulled, Camperdown's (1797) butcher's bill the evidence (James, from memory); 70's judgement (its table named 'netherlands', which the table never matched: found on the way, package 71), moved here"
+    # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
+    signals: {root: basic, system: basic}
   united-states:
     name: the United States
     adjective: American
@@ -67,6 +111,17 @@ nations:
     flag: "the stars and stripes"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: false     # none issued in 1805; the Barbary war was the Navy's (from memory)
     closed_to: []
+    # package 71 (the owner, 2026-10-24): the nation's habit in action over the role's figures
+    # (spec M7 §9, §10; freesail/world/captains.py `Captain._habit`): the engaging range
+    # multiplied, the aim and the roll taken where the role's file names none
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "the American frigates of 1812 fired low and fast into the hull (the Constitution's and the United States's actions, from memory); 70's judgement, moved here"
+    # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
+    signals: {root: basic, system: basic}
   portugal:
     name: Portugal
     adjective: Portuguese
@@ -76,6 +131,17 @@ nations:
     flag: "the white ensign with the arms"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: false
     closed_to: []
+    # package 71 (the owner, 2026-10-24): the nation's habit in action over the role's figures
+    # (spec M7 §9, §10; freesail/world/captains.py `Captain._habit`): the engaging range
+    # multiplied, the aim and the roll taken where the role's file names none
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "no habit of her own in the period's record read; the British, with whom her navy served (judgement, package 71)"
+    # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
+    signals: {root: basic, system: basic}
   denmark:
     name: Denmark
     adjective: Danish
@@ -85,6 +151,17 @@ nations:
     flag: "the Dannebrog"    # the flag's short word, for the lookout's "shows British colours, the red ensign" (package 36)
     letters_of_marque: false
     closed_to: []
+    # package 71 (the owner, 2026-10-24): the nation's habit in action over the role's figures
+    # (spec M7 §9, §10; freesail/world/captains.py `Captain._habit`): the engaging range
+    # multiplied, the aim and the roll taken where the role's file names none
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "Copenhagen 1801: the Danish blockships hulled the British at close range (from memory); judgement, package 71"
+    # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
+    signals: {root: basic, system: basic}
   # package 39f, the Strait: Morocco, for Tangier and the African shore. The Emperor
   # Muley Soliman (Mawlay Sulayman, from 1792) at peace with every nation in June 1805:
   # no war in the table below, so a Moorish port is neutral to all and open to its own.
@@ -99,6 +176,17 @@ nations:
     flag: "the plain red"    # the flag's short word, for the lookout (package 36)
     letters_of_marque: false     # the Emperor's few cruisers at peace with all; judgement (his father had declared peace with all Europe, Lempriere 1800, p. 39, of Sidi Mahomet)
     closed_to: []
+    # package 71 (the owner, 2026-10-24): the nation's habit in action over the role's figures
+    # (spec M7 §9, §10; freesail/world/captains.py `Captain._habit`): the engaging range
+    # multiplied, the aim and the roll taken where the role's file names none
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "no record read; the common habit (judgement, package 71)"
+    # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
+    # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
+    signals: {root: basic, system: basic}
     relations:
       britain: "peace; the Emperor apparently prefers the English to any other European power and allows Gibraltar its cattle from Tangier, a grant of Muley Ismael (Purdy 1826, p. 5, quoting Jackson); the fleets water at Tetuan (p. 8)"
       spain: "peace since Muley Yazid's war of 1790 and 1791 on Ceuta (Lempriere 1800, pp. 318 and 326, the war's beginning); the peace of 1799 FROM MEMORY"
