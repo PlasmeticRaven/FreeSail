@@ -166,6 +166,7 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         "fishing",
         "glass",
         "free",
+        "gunnery",  # package 70: the mark, the side, the charge, the aim, a gun by its name
     ):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by

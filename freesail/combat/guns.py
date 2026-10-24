@@ -217,6 +217,7 @@ class Battery:
         # the mark's relative bearing this tick, for the runner's robbing of the guns
         self.target_relative_rad: float | None = None
         self._said_no_powder: set[float] = set()
+        self._fell_back: set[tuple[float, str]] = set()  # (pounder, charge) said once
         self._warned: set[str] = set()
 
     # -- the intentions --------------------------------------------------------------
@@ -300,6 +301,31 @@ class Battery:
         seaway = H.seaway_factor(firer.roll_deg, False)
         return numbers * skill * fatigue * seaway * max(1.0, firer.weather_factor)
 
+    def _charge_for(self, gun: Gun, mag: Any) -> Charge | None:
+        """The charge this gun loads under the intention: a swivel takes round or grape
+        and never chain or double (its bore; Falconer 1780, 'Swivel'); a charge the
+        magazine is out of falls back to round shot with the gunner's word once; None
+        when there is no round shot either."""
+        want = self.charge
+        if gun.kind == "swivel" and want in (Charge.CHAIN, Charge.DOUBLE):
+            want = Charge.ROUND
+        if mag.has(gun.pounder, want):
+            return want
+        if want is not Charge.ROUND and mag.has(gun.pounder, Charge.ROUND):
+            key = (gun.pounder, want.value)
+            if key not in self._fell_back:
+                self._fell_back.add(key)
+                self.ship.note(
+                    "notable",
+                    "guns.magazine_empty",
+                    f"The gunner reports no more {_charge_words(want)} for the "
+                    f"{gun.kind_words}s: they load with round shot.",
+                    gun.id,
+                    {"pounder": gun.pounder, "charge": want.value, "instead": "round"},
+                )
+            return Charge.ROUND
+        return None
+
     def _phases(self, gun: Gun) -> tuple[tuple[str, float], ...]:
         phases = PHASES.get(gun.kind, PHASES["long"])
         if gun.kind == "long" and gun.weight_cwt > 0.0:
@@ -328,22 +354,23 @@ class Battery:
             if name == "cartridge" and not gun.loaded and svc.left_s >= phases[svc.phase][1]:
                 # the powder comes up: a cartridge and the shot taken from the magazine as
                 # the loading begins; none, and the gun stays empty
-                if not mag.has(gun.pounder, self.charge):
+                charge = self._charge_for(gun, mag)
+                if charge is None:
                     svc.stalled = "no cartridge"
                     if gun.pounder not in self._said_no_powder:
                         self._said_no_powder.add(gun.pounder)
                         self.ship.note(
                             "notable",
                             "guns.magazine_empty",
-                            f"The gunner reports no more {_charge_words(self.charge)} for the "
+                            f"The gunner reports no more cartridges for the "
                             f"{gun.kind_words}s: the magazine is out.",
                             gun.id,
                             {"pounder": gun.pounder, "charge": self.charge.value},
                         )
                     svc.phase = -1
                     return
-                mag.take(gun.pounder, self.charge)
-                gun.loaded = self.charge
+                mag.take(gun.pounder, charge)
+                gun.loaded = charge
             step = min(left, svc.left_s)
             svc.left_s -= step
             left -= step
@@ -555,6 +582,11 @@ class Battery:
                 fell.append(f"{number_words(over)} over")
             if wide:
                 fell.append(f"{number_words(wide)} wide")
+            across = sum(1 for v in volleys if v.outcome == "across her bows")
+            if across:
+                fell.append(f"{number_words(across)} across her bows")
+            if blank - across:
+                fell.append(f"{number_words(blank - across)} a blank charge")
             text = f"{number_words(n).capitalize()} shot{at}: {_and(fell)}."
             if seen:
                 text += " " + " ".join(seen)

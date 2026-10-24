@@ -262,6 +262,11 @@ class Instance:
 # ---------------------------------------------------------------------------
 
 
+# The evolutions that are the gun crews' own work at quarters (package 70): the bill does
+# not rob the guns for them.
+QUARTERS_OWN = frozenset({"clear_for_action", "cast_loose_guns", "secure_guns"})
+
+
 class Runner:
     """Runs evolutions for one ship. See the module docstring."""
 
@@ -1120,6 +1125,8 @@ class Runner:
         quarters = ship.extra.get("quarters")
         if quarters is None or not getattr(quarters, "at_quarters", False):
             return got
+        if inst.evo.id in QUARTERS_OWN:
+            return got  # the guns' own work (cast loose, secured): the crews do it
         if got.outcome == hands.ENOUGH and not want.all_hands:
             return got
         aloft = self._aloft(inst)

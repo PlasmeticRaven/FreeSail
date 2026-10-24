@@ -186,12 +186,26 @@ def _fired_on(world: Any, battery: Battery, target: Target, tick: int, opened_be
     is told the firer the first time he fires on a sail not made out as an enemy."""
     firer_id = _own_id(world)
     first = target.id not in opened_before
+    # the last shot this tick a signal (across her bows, or a blank): no fire opened
+    last = battery.volleys[-1] if battery.volleys else None
+    signal = last is not None and last.outcome in ("across her bows", "blank")
     if target.world is not None:
         keeper = HITS.damage_of(target.world.ship)
         if keeper is not None:
+            words = _words_in(target.world, firer_id, world.ship.name)
+            if signal:
+                if last.outcome == "across her bows" and firer_id not in keeper.warned_by:
+                    keeper.warned_by.add(firer_id)
+                    target.world.record(
+                        Severity.URGENT,
+                        "action.warning_shot",
+                        f"{_cap(words)} fires a shot across our bows.",
+                        data={"firer": firer_id, "range_m": round(target.range_m)},
+                    )
+                return
             keeper.struck_by[firer_id] = tick  # under fire from her, from now
-            if first:
-                words = _words_in(target.world, firer_id, world.ship.name)
+            if firer_id not in keeper.opened_by:
+                keeper.opened_by.add(firer_id)
                 target.world.record(
                     Severity.URGENT,
                     "action.fired_at",
@@ -202,6 +216,8 @@ def _fired_on(world: Any, battery: Battery, target: Target, tick: int, opened_be
         if captain is not None:
             captain.fired_on.add(firer_id)
     else:
+        if signal:
+            return
         brain = getattr(target.body, "brain", None)
         if brain is not None:
             brain.fired_on.add(firer_id)

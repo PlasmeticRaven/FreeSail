@@ -389,6 +389,8 @@ class Damage:
         self.minute: list[tuple[str, str]] = []
         self.minute_men: list[Sailor] = []
         self.struck_by: dict[str, int] = {}  # firer id -> the last tick her shot came
+        self.opened_by: set[str] = set()  # the firers whose opening fire was said
+        self.warned_by: set[str] = set()  # the firers whose shot across the bows was said
         self.first_struck_tick: int | None = None
 
 

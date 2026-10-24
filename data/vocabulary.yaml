@@ -1352,6 +1352,76 @@ verbs:
     synonyms: [toss]
     object: free
     level: 1
+  # Milestone 7 (package 70; spec M7 §8, §8a): the quarters and the guns. The four
+  # evolutions move the company between the watch bill and the quarter bill (object
+  # `none`, `evolutions` below; the beat is a crew order as `call all hands` is, at once,
+  # `freesail/orders/crew.py`); the rest are the gun deck's orders (object `gunnery`,
+  # `freesail/orders/gunnery.py`): standing intentions the battery keeps, and the one-shot
+  # orders that ride over them. The boarders are 73's (`refused_phrases`).
+  clear for action:
+    synonyms: [clear ship for action, clear the ship for action, clear for battle, clear the decks for action]
+    object: none
+    level: 1
+  beat to quarters:
+    synonyms: [beat quarters, all hands to quarters, hands to quarters, to quarters, general quarters, sound quarters]
+    object: none
+    level: 1
+  cast loose the guns:
+    synonyms: [cast loose, cast loose your guns, cast the guns loose, cast loose the carronades]
+    object: none
+    level: 1
+  secure the guns:
+    synonyms: [secure your guns, house the guns, secure the carronades, secure guns]
+    object: none
+    level: 1
+  engage:
+    synonyms: [engage her, open on, bring her to action, bring the guns to bear on, train the guns on]
+    object: gunnery
+    level: 1
+  load:
+    synonyms: [load the guns with, load the guns, load with, load the carronades with, double shot the guns, load double]
+    object: gunnery
+    level: 1
+  run out:
+    synonyms: [run out the guns, run the guns out, out guns, run out the carronades]
+    object: gunnery
+    level: 1
+  run in:
+    synonyms: [run in the guns, run the guns in, in guns, run in the carronades]
+    object: gunnery
+    level: 1
+  aim at:
+    synonyms: [aim for, lay the guns for, lay for, point the guns at, fire at, fire into, aim high at, aim low at]
+    object: gunnery
+    level: 1
+  fire as they bear:
+    synonyms: [fire at will, independent fire, fire as your guns bear, fire as the guns bear, fire as she bears, fire as they come to bear]
+    object: gunnery
+    level: 1
+  fire by divisions:
+    synonyms: [fire in divisions, fire by division, divisions fire]
+    object: gunnery
+    level: 1
+  hold your fire:
+    synonyms: [hold fire, hold the fire, do not fire, don't fire, hold your fire until she bears, hold your fire until the word, wait for the word]
+    object: gunnery
+    level: 1
+  fire on the roll:
+    synonyms: [fire on the up roll, fire on the down roll, fire on the uproll, fire on the downroll, fire on the upward roll, fire on the downward roll]
+    object: gunnery
+    level: 1
+  fire:
+    synonyms: [open fire, give her a broadside, give her the broadside, let fly, fire away, commence firing, fire the broadside, give fire]
+    object: gunnery
+    level: 1
+  cease firing:
+    synonyms: [cease fire, stop firing, check your fire, check fire, silence the guns, stop the firing]
+    object: gunnery
+    level: 1
+  strike the colours:
+    synonyms: [strike our colours, haul down the colours, haul down our colours, strike the ensign, haul down the ensign, strike to her, surrender, we strike]
+    object: gunnery
+    level: 1
   # Console and client control. If one of these reaches the ship, the
   # captain typed it at the wrong prompt; say so.
   hold:
@@ -1419,6 +1489,10 @@ evolutions:
   wear ship: wear
   heave to: heave_to
   fill away: fill_away
+  # package 70: the quarters' evolutions (spec M7 §8, §8a)
+  clear for action: clear_for_action
+  cast loose the guns: cast_loose_guns
+  secure the guns: secure_guns
   # milestone 3b (spec 3b §6.3 and §6.4): any sail the ship's two rigs carry is bent from
   # and unbent to the sail room, storm canvas and the occasional sails among them
   bend:
@@ -1914,6 +1988,16 @@ irrevocable:
 # standing order's action (`orders.read_whole`).
 # ---------------------------------------------------------------------------
 refused_phrases:
+  # package 70: the boarders and the fight on deck are the milestone's third combat
+  # package (spec M7 §11, §11a); the guns, the quarters and the strike are here
+  boarders away: &boarders "The boarders are not called away in this game yet: the small arms, the marines' fire and the fight on deck come with milestone 7's third combat package. The guns are served ('beat to quarters', 'cast loose the guns', 'engage her to starboard', 'fire as they bear'), and the colours are struck ('strike the colours')."
+  away boarders: *boarders
+  call away the boarders: *boarders
+  man the boarders: *boarders
+  board her: *boarders
+  prepare to board: *boarders
+  stand by to board: *boarders
+  repel boarders: *boarders
   hoist our colours: &colours "Colours and signals are milestone 7's: the ensign, the private signal and the signal book come with the other ships that answer them, and this ship has no flag locker yet."
   hoist the colours: *colours
   hoist colours: *colours

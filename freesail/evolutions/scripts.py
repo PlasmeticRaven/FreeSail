@@ -8003,3 +8003,10 @@ SCRIPTS: dict[str, type[Script]] = {
     # the fishing gear (package 56)
     "fishing_gear": FishingGearScript,
 }
+
+# the quarters' evolutions (package 70): clearing for action, the beat, the guns cast
+# loose and secured, in their own module (it builds on `PhasedScript`, so the import is
+# this late one)
+from freesail.evolutions.action_scripts import ACTION_SCRIPTS  # noqa: E402
+
+SCRIPTS.update(ACTION_SCRIPTS)
