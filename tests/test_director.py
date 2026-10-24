@@ -1422,6 +1422,9 @@ UNPERFORMED_HERE = {
     'ship "Medusa": order fill away': "She is not hove to",
     "aboard: £6 paid from the purse to the pilot": "the purse holds nothing",
     'ship "Harpy": crewed': "at full detail already",  # near: crewed by the promotion itself
+    # package 71: no signal to answer and no sail within hail in the test's seas
+    'ship "Medusa": order answer the signal': "No signal has been seen to answer",
+    'ship "Medusa": order hail her': "beyond hail",
 }
 
 

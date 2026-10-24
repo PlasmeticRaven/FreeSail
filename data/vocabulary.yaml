@@ -1420,7 +1420,7 @@ verbs:
     object: gunnery
     level: 1
   strike the colours:
-    synonyms: [strike our colours, haul down the colours, haul down our colours, strike the ensign, haul down the ensign, strike to her, surrender, we strike]
+    synonyms: [strike our colours, strike the ensign, strike to her, surrender, we strike]
     object: gunnery
     level: 1
   guns before sail:
@@ -1430,6 +1430,70 @@ verbs:
   sail before guns:
     synonyms: [the sails before the guns, the sails first, sails first, work the ship before the guns]
     object: gunnery
+    level: 1
+  # package 71 (spec M7 §1 to §5): the colours, the signals, the private signal, the lights,
+  # the fog signals and the hail (freesail/orders/signals.py), read by their words before
+  # the vocabulary since a signal's meaning and a hail's words are free text; listed here
+  # for the completions and the briefs
+  hoist the colours:
+    synonyms: [hoist our colours, hoist colours, show our colours, show the colours, hoist the ensign, show the ensign, hoist our true colours, hoist the true colours]
+    object: signals
+    level: 1
+  hoist false colours:
+    synonyms: [show false colours, hoist the enemy's colours, hoist French colours, hoist British colours, hoist Spanish colours, hoist Danish colours, hoist American colours]
+    object: signals
+    level: 1
+  haul down the colours:
+    synonyms: [haul down our colours, haul down the ensign, lower the colours]
+    object: signals
+    level: 1
+  hoist the ensign union down:
+    synonyms: [make the signal of distress, hoist the signal of distress]
+    object: signals
+    level: 1
+  show the private signal:
+    synonyms: [make the private signal, hoist the private signal]
+    object: signals
+    level: 1
+  answer the private signal:
+    synonyms: [reply to the private signal]
+    object: signals
+    level: 1
+  make the signal:
+    synonyms: [hoist the signal, make a signal, hoist a signal, make the night signal, make the fog signal]
+    object: signals
+    level: 1
+  make the telegraphic signal:
+    synonyms: [hoist the telegraphic signal]
+    object: signals
+    level: 1
+  answer the signal:
+    synonyms: [hoist the answering pendant, hoist the answering pennant, acknowledge the signal]
+    object: signals
+    level: 1
+  repeat the signal:
+    synonyms: [repeat it]
+    object: signals
+    level: 1
+  haul down the signal:
+    synonyms: [haul it down, haul down the signals]
+    object: signals
+    level: 1
+  hoist the lights:
+    synonyms: [hoist a stern lantern, hoist the stern lantern, hoist the top lights, show the lights, light the lanterns]
+    object: signals
+    level: 1
+  show no lights:
+    synonyms: [douse the lights, douse all lights, darken ship]
+    object: signals
+    level: 1
+  keep the fog signals:
+    synonyms: [make the fog signals, ring the bell, keep the bell going]
+    object: signals
+    level: 1
+  cease the fog signals:
+    synonyms: [stop the bell, belay the fog signals]
+    object: signals
     level: 1
   # Console and client control. If one of these reaches the ship, the
   # captain typed it at the wrong prompt; say so.
@@ -2007,20 +2071,6 @@ refused_phrases:
   prepare to board: *boarders
   stand by to board: *boarders
   repel boarders: *boarders
-  hoist our colours: &colours "Colours and signals are milestone 7's: the ensign, the private signal and the signal book come with the other ships that answer them, and this ship has no flag locker yet."
-  hoist the colours: *colours
-  hoist colours: *colours
-  show our colours: *colours
-  show the colours: *colours
-  show your colours: *colours
-  hoist the ensign: *colours
-  show the ensign: *colours
-  hoist a flag: *colours
-  hoist the flag: *colours
-  make the private signal: *colours
-  make a signal: *colours
-  make the signal: *colours
-  hoist a signal: *colours
   man the pumps: &pumps "The pumps are not worked in this game yet: the well is sounded and read ('sound the well', 'the well'), but pumping, leaks and shot holes come with milestone 7's taking on water; until then the director's hand may have the well pumped out ('aboard: the well pumped out'). 'Sound the well' reads it."
   rig the pumps: *pumps
   work the pumps: *pumps

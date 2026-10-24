@@ -60,3 +60,16 @@ papers:
     place: cabin
     source: prices
     words: the prices at the last port the boat was ashore in, as the purser brought them off
+  # package 71 (spec M7 §2, §3): the private signals under seal in the captain's keeping (the
+  # Regulations and Instructions 1806: issued to the King's ships, weighted to sink, destroyed
+  # on capture), and the signal book of the nation's service
+  - handle: the private signals
+    keeper: captain
+    place: cabin
+    source: private_signals
+    words: this month's recognition signal, the challenge and the reply by day and by night, under seal
+  - handle: the signal book
+    keeper: captain
+    place: cabin
+    source: signal_book
+    words: the nation's signal books, the day signals by number with their meanings, the night and fog signals, the convoy's instructions

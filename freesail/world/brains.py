@@ -235,6 +235,8 @@ class FarCaptain(Judgement):
         self.spoken_ids: set[str] = set()
         self.given_up: set[str] = set()
         self.fired_on: set[str] = set()  # the ships that fired on her (package 70)
+        self.recognised: dict[str, dict[str, Any]] = {}  # package 71: by signal or hail
+        self.pirates: set[str] = set()  # seen to fire under false colours (package 71)
         self._business: dict[str, Any] = {}
         self._waiting_at_road = False
         self.last_judged = -1
@@ -309,6 +311,11 @@ class FarCaptain(Judgement):
             self._enter(self._first_state(p))
         self._transitions(p)
         self._work(p)
+        # the signals (package 71): the flying hoists of the sail in sight read, answered
+        # and obeyed; the private signal; the colours by doctrine
+        from freesail.world import signalling
+
+        signalling.far_minute(self, p)
 
     def _first_state(self, p: Perception) -> str:
         if p.anchor_down and p.in_port:
@@ -385,8 +392,9 @@ class FarCaptain(Judgement):
     # -- the hooks the stimuli ask -----------------------------------------------------
 
     def _is_enemy(self, s: dict[str, Any]) -> bool:
-        if str(s.get("id") or "") in (self.fired_on or ()):
-            return True  # she fired on us (package 70, rule 3)
+        known = self._known_enemy(s)  # package 71: the shot, the private signal, the hail
+        if known is not None:
+            return known
         nation = s.get("nation")
         if not nation:
             return False
@@ -546,6 +554,35 @@ class FarCaptain(Judgement):
         brain = getattr(other, "brain", None) if other is not None else None
         if brain is not None:
             brain.spoken_ids.add(self.vessel.id)
+            # the standard exchange between two rules captains (package 71, spec M7 §4):
+            # each reads the other's nation from his answer (a liar's words believed)
+            from freesail.world import hail as H
+            from freesail.world import signalling
+
+            nations = getattr(self.world, "nations", None)
+            words = H.exchange_words(self.world, self.vessel, other)
+            answers = [w for w in words.split("'") if w.strip()]
+            theirs = answers[1] if len(answers) > 1 else ""
+            mine = answers[3] if len(answers) > 3 else ""
+            n_theirs = H.nation_in_words(nations, theirs)
+            n_mine = H.nation_in_words(nations, mine)
+            if n_theirs and nations is not None:
+                signalling.recognise(
+                    self,
+                    other_id,
+                    n_theirs,
+                    "the hail",
+                    nations.at_war(n_theirs, str(self.vessel.nation)),
+                )
+            if n_mine and nations is not None:
+                signalling.recognise(
+                    brain,
+                    str(self.vessel.id),
+                    n_mine,
+                    "the hail",
+                    nations.at_war(n_mine, str(other.nation)),
+                )
+            self._exchange = words
         if other_id != PLAYER_ID and hasattr(vessels, "spoke"):
             vessels.spoke(self.vessel, other_id)
 
@@ -687,6 +724,8 @@ class FarCaptain(Judgement):
         captain._gale_over_since = self._gale_over_since
         captain._stranger = self._stranger
         captain.spoken_ids = set(self.spoken_ids)
+        captain.recognised = dict(self.recognised)  # package 71
+        captain.pirates = set(self.pirates)
         captain.given_up = set(self.given_up)
         captain.last_judged = -1
         held = getattr(self, "over_head", None)
@@ -723,6 +762,8 @@ class FarCaptain(Judgement):
         self._gale_over_since = captain._gale_over_since
         self._stranger = captain._stranger
         self.spoken_ids |= set(getattr(captain, "spoken_ids", set()))
+        self.recognised.update(getattr(captain, "recognised", {}) or {})  # package 71
+        self.pirates |= set(getattr(captain, "pirates", set()) or set())
         self.given_up |= set(getattr(captain, "given_up", set()) or set())
         state = captain.state or "on passage"
         if state in ("beating", "in distress"):

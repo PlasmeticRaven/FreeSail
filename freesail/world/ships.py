@@ -1005,6 +1005,7 @@ def _goal_plan(world: Any, goal: str, start: Position) -> tuple[list[tuple[Any, 
     running home to <place>         to the place, and in
     carrying the mail to <place>    to the place, and in
     carrying a letter to the ship   to the ship, then home where she came from
+    in company with the ship [within <n> cables]   keeping company with the player's ship (71)
     """
     import re
 
@@ -1052,10 +1053,26 @@ def _goal_plan(world: Any, goal: str, start: Position) -> tuple[list[tuple[Any, 
         return [("home", p[0], p[1])], False, f"carrying the mail to {p[1]}"
     if re.match(r"^(?:carrying|carry)\s+a\s+(?:letter|message|dispatch|despatch)", text):
         return [("to_ship", 2.0 * units.CABLE), ("home", start, "home")], False, goal
+    m = re.match(
+        r"^(?:in|keeping|keep)\s+company\s+with\s+(?:the\s+)?(?:ship|commodore|convoy|flag)"
+        r"(?:\s+within\s+([\d.]+)\s+cables?)?$",
+        text,
+    )
+    if m:
+        # package 71 (spec M7 §3, the least relation): a merchantman of a convoy keeps
+        # company with the player's ship (the pilot's boat's `company` leg, 37h) within so
+        # many cables, two by default; her signals are read by `under_the_orders_of`
+        cables = float(m.group(1) or 2.0)
+        return (
+            [("company", cables * units.CABLE)],
+            False,
+            f"in company with the ship within {cables:g} cables",
+        )
     raise ValueError(
         f"'{goal}' is no goal a captain at far detail knows: say trading <A> to <B>, bound "
         f"from <A> for <B>, patrolling off <place> within <n> miles, running home to <place>, "
-        f"carrying the mail to <place>, or carrying a letter to the ship."
+        f"carrying the mail to <place>, carrying a letter to the ship, or in company with "
+        f"the ship."
     )
 
 
@@ -1306,6 +1323,13 @@ class Vessels:
             if v.done or v.brain is None or (v.crew is not None and v.crew.shape == "full"):
                 continue
             v.brain.tick()
+        if any(v.under_orders_of and v.brain is None and not v.done for v in self.vessels):
+            # a vessel under another's orders with no brain (a convoy's merchantman given
+            # only her company to keep) reads and obeys the signals by the least captain
+            # (package 71; `signalling.brainless_minute`)
+            from freesail.world.signalling import brainless_minute
+
+            brainless_minute(world)
         for v in self.vessels:
             if v.done or v.detail == "near" or (v.crew is not None and v.crew.shape == "full"):
                 continue
@@ -1483,8 +1507,13 @@ class Vessels:
         if not wa or not wb:
             return
         brain = a.brain
+        exchange = str(getattr(brain, "_exchange", "") or "") if brain is not None else ""
         hail = brain.doctrine.threshold("hail", "") if brain is not None and brain.doctrine else ""
-        said = f" {wa} hails her" + (f": {hail!r}" if hail else "") + "."
+        if exchange:
+            # package 71: the standard exchange written once, in the lookout's hearing
+            said = f" {wa} hails her, and the words carry across the water: {exchange}"
+        else:
+            said = f" {wa} hails her" + (f": {hail!r}" if hail else "") + "."
         self._spoke_lines.append(
             (
                 Severity.ROUTINE,
@@ -1543,6 +1572,12 @@ class Vessels:
                     brain.speak(_player_id())
                     said = brain.doctrine.threshold("hail", "") if brain.doctrine else ""
                     hail = f" She hails: {said!r}." if said else ""
+                    if said:
+                        # package 71: the hail heard on deck, for the stations and for the
+                        # player's answer (`say to her: ...`), which her captain reads
+                        from freesail.world.hail import player_hailed
+
+                        player_hailed(world, v, said)
                 if v.letter is not None:
                     v.alongside = True
                     lines.append(
@@ -1594,6 +1629,25 @@ class Vessels:
                 limit = min(limit, NIGHT_LAND_NM)
             if nm <= limit:
                 out.append(Sighting(v.seen_as_feature(distance), bearing, distance, "sail"))
+            elif vis_nm < 1.0 and _sound_of(v, nm):
+                # package 71 (spec M7 §5): in fog her bell at anchor, her gun or her drum under
+                # way, heard beyond the visibility at the range a sound carries
+                out.append(
+                    Sighting(
+                        Feature(
+                            f"sound:{v.id}",
+                            "sound",
+                            _sound_of(v, nm),
+                            v.position.lat_deg,
+                            v.position.lon_deg,
+                            modern=v.id,
+                            height_m=v.height_m,
+                        ),
+                        bearing,
+                        distance,
+                        "sound",
+                    )
+                )
             elif daylight == "night" and nm <= min(vis_nm, LIGHT_SEEN_NM) and _lights_of(v):
                 # package 71 (spec M7 §5): her light seen at night beyond the hull's loom, at
                 # the range a lantern carries, as a sighting of its own
@@ -1624,6 +1678,29 @@ def _player_id() -> str:
     from freesail.world.brains import PLAYER_ID
 
     return PLAYER_ID
+
+
+def _sound_of(v: Vessel, nm: float) -> str:
+    """What is heard of a far vessel in fog at this distance (package 71): 'a bell' at
+    anchor within the mile, 'a gun' under way in company within three, 'a drum' alone
+    within the mile, while she keeps the fog signals; '' otherwise."""
+    from freesail.world.signals import BELL_HEARD_NM, GUN_HEARD_NM
+
+    locker = getattr(v, "signals", None)
+    if locker is None:
+        return ""
+    fog_gun = any(h.book == "fog" and h.down is None for h in locker.flying)
+    if fog_gun and nm <= GUN_HEARD_NM:
+        return "a gun"
+    if not locker.fog_signals:
+        return ""
+    plan = getattr(v, "plan", None) or []
+    at_anchor = bool(plan) and plan[0][0] == "anchor" or v.sail_state == "at anchor"
+    if at_anchor:
+        return "a bell" if nm <= BELL_HEARD_NM else ""
+    if getattr(v, "under_orders_of", ""):
+        return "a gun" if nm <= GUN_HEARD_NM else ""
+    return "a drum" if nm <= BELL_HEARD_NM else ""
 
 
 def _lights_of(v: Vessel) -> str:

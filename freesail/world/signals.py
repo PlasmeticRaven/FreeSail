@@ -85,6 +85,9 @@ BELL_HEARD_NM = 1.0
 # The ships in succession perform the order this long after the one before them has (the
 # time a ship takes to go about; judgement, said in the tuning notes).
 SUCCESSION_GAP_S = 180
+# A hoist bent on but not yet run up (the hands at other work): it breaks out when the
+# evolution begins (`MakeSignalScript.begin`), and never of itself.
+NOT_YET = 10**12
 
 _ROLES_WITH_TABLE = ("kings-ship", "cruiser", "commodore")
 
@@ -665,9 +668,14 @@ class Locker:
 
     def tidy(self, tick: int, flies_s: int) -> None:
         """A numerary signal left flying a glass comes down of itself; a telegraphic
-        word's hoist and an answer after their minute; a private signal after five."""
+        word's hoist and an answer after their minute; a private signal after five; a
+        hoist bent on and never run up (the hands never had) after a glass."""
         for h in self.flying:
             if h.down is not None:
+                continue
+            if h.breaks_out >= NOT_YET:
+                if tick - h.since >= flies_s:
+                    h.down = tick
                 continue
             life = flies_s
             if h.book in ("answer", "reply"):
@@ -1122,9 +1130,15 @@ def far_perform(world: Any, vessel: Any, order: str) -> str:
         new = (2.0 * float(wind_from) - heading) % 360.0
         from freesail.world.geo import destination
 
-        far = destination(vessel.position, new, 30.0 * units.NAUTICAL_MILE)
+        company = [leg for leg in plan if leg[0] == "company"]
+        reach = (1.0 if company else 30.0) * units.NAUTICAL_MILE
+        far = destination(vessel.position, new, reach)
         vessel.saved_plan = vessel.saved_plan or list(plan)
         vessel.plan = [("to", far, f"the other tack ({units.point_name(math.radians(new))})")]
+        if company:
+            # a ship keeping company goes about, stands on a mile on the new tack and closes
+            # her commodore again (the least relation: nothing keeps a formation here, 72's)
+            vessel.plan.append(company[0])
         vessel.tack = 0.0
         return ("went about" if low.startswith(("put", "tack")) else "wore") + (
             f", her head {units.point_name(math.radians(new))}"
@@ -1271,3 +1285,140 @@ def has_glass(world: Any) -> bool:
     if getattr(world, "vessel", None) is not None:
         return True
     return bool(getattr(getattr(world, "scenario", None), "glass", False))
+
+
+def root_seed(world: Any) -> int:
+    """The world's seed for the private table: a crewed World's is her parent's, so that
+    the two ships of one nation in one world hold one table."""
+    parent = getattr(world, "parent", None)
+    return int(getattr(parent if parent is not None else world, "seed", 0) or 0)
+
+
+def table_of(world: Any) -> PrivateTable | None:
+    """The private table this World's ship carries this month: her nation's, when the
+    scenario's papers give it (`papers: {private_signals: true}`; `false` takes it away)
+    or her captain's role is one the table is issued to (the root's `carried_by`: a King's
+    ship, a cruiser, a commodore); None in a merchantman, a packet, a privateer, a
+    fisherman or a prize."""
+    books = books_for(world)
+    nation = own_nation(world)
+    papers = getattr(getattr(world, "scenario", None), "papers", None) or {}
+    given = papers.get("private_signals") if isinstance(papers, dict) else None
+    if given is False:
+        return None
+    carried = bool(given)
+    if not carried:
+        captain = getattr(world, "captain", None)
+        role = str(getattr(captain, "role", "") or "")
+        if not role:
+            vessel = getattr(world, "vessel", None)
+            brain = getattr(vessel, "brain", None)
+            role = str(getattr(brain, "role", "") or "")
+        carried = books.table_carried_by(role)
+    if not carried:
+        return None
+    now = world.clock.ship_time
+    nations = getattr(world, "nations", None)
+    table = private_table(books, nation, now.year, now.month, root_seed(world))
+    try:
+        table.adjective = nations.get(nation).adjective if nations is not None else ""
+    except KeyError:
+        table.adjective = ""
+    return table
+
+
+def vessel_table(world: Any, vessel: Any) -> PrivateTable | None:
+    """A far vessel's table: her nation's when her brain's role is issued one."""
+    brain = getattr(vessel, "brain", None)
+    role = str(getattr(brain, "role", "") or "")
+    books = books_for_nation(getattr(world, "nations", None), str(vessel.nation))
+    if not books.table_carried_by(role):
+        return None
+    now = world.clock.ship_time
+    return private_table(books, str(vessel.nation), now.year, now.month, root_seed(world))
+
+
+def far_order_words(world: Any, vessel: Any, text: str) -> tuple[str, str, dict[str, Any]] | None:
+    """A far body's order of the colours, the lights or the signals, for the director's
+    hand (`crews.far_order`): (kind, the line, data), or None when the words are none of
+    these. A signal is made by its meaning from her nation's book, at once (no hands to
+    count on a far body; the minute to run it up kept)."""
+    import re
+
+    low = " ".join(str(text).lower().split()).rstrip(".")
+    tick = int(world.clock.tick)
+    locker = vessel_locker(vessel)
+    nations = getattr(world, "nations", None)
+    m = re.match(
+        r"^(?:hoist|show)\s+(?:the\s+|a\s+)?(?P<n>false|[a-z-]+)\s+(?:colours|ensign|flag)$", low
+    )
+    if m and m.group("n") not in ("the", "our", "her", "true", "your"):
+        word = m.group("n")
+        if word == "false":
+            enemies = nations.enemies_of(str(vessel.nation)) if nations is not None else []
+            nid = enemies[0] if enemies else None
+        else:
+            found = nations.find(word) if nations is not None else None
+            nid = found.id if found is not None else None
+        if nid is None:
+            from freesail.orders.errors import OrderError
+
+            raise OrderError(f"'{word}' names no nation of the table for her colours.")
+        if nid == str(vessel.nation):
+            set_colours(locker.colours, nations, "shown", nid, tick)
+            return (
+                "colours.changed",
+                f"Her own colours hoisted: {locker.colours.words(nations)}.",
+                {},
+            )
+        set_colours(locker.colours, nations, "false", nid, tick)
+        return "colours.changed", f"False colours hoisted: {locker.colours.words(nations)}.", {}
+    done = far_perform(world, vessel, low)
+    if done and low in (
+        "hoist the colours",
+        "hoist our colours",
+        "hoist your true colours",
+        "show no lights",
+        "hoist the top lights",
+        "hoist a stern lantern",
+        "hoist the lights",
+    ):
+        return "colours.changed" if "colours" in low else "lights.changed", f"{_cap(done)}.", {}
+    if low in ("haul down the colours", "haul down the ensign"):
+        set_colours(locker.colours, nations, "none", "", tick)
+        return "colours.changed", "The colours hauled down: she shows none.", {}
+    m = re.match(r"^(?:make|hoist)\s+(?:the|a)\s+signal(?:\s*[:,]\s*|\s+)(?P<words>.+)$", low)
+    if m:
+        books = books_for_nation(nations, str(vessel.nation))
+        light = light_now(world)
+        book = BOOKS_BY_LIGHT[light]
+        found = books.find(m.group("words"), book)
+        if found is None and book == "numerary":
+            found = books.find(m.group("words"), "convoy")
+        if found is None:
+            from freesail.orders.errors import OrderError
+
+            raise OrderError(f"'{m.group('words')}' is no signal of her {book} book.")
+        entry, qualifiers = found
+        h = make_hoist(locker, books, entry, qualifiers, str(vessel.id), tick)
+        return (
+            "signal.made",
+            f"The signal made: {h.words()} (up in a minute).",
+            {"hoist": h.to_dict()},
+        )
+    if low in ("answer the signal", "hoist the answering pendant", "hoist the answering pennant"):
+        last = next(
+            (e for e in reversed(locker.log) if e.get("kind") in ("signal.read", "signal.seen")),
+            None,
+        )
+        if last is None:
+            from freesail.orders.errors import OrderError
+
+            raise OrderError("No signal has been seen to answer.")
+        books = books_for_nation(nations, str(vessel.nation))
+        make_answer(locker, books, str(vessel.id), tick, str(last["by"]))
+        return "signal.made", "The answering pendant hoisted.", {}
+    if low in ("haul down the signal", "haul it down", "haul down the signals"):
+        down = locker.haul_down(tick)
+        return "signal.down", f"The signal hauled down ({len(down)}).", {}
+    return None

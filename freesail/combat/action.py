@@ -241,30 +241,96 @@ def _fired_on(world: Any, battery: Battery, target: Target, tick: int, opened_be
 
 
 def _recognition(world: Any, target: Target) -> None:
-    """Rule 3, the least of it: the first shot at a mark not made out as an enemy is said
-    with its consequence (`ship.extra["outlaw"]`), not refused."""
+    """Rule 3, completed (package 71): the first shot at a mark is judged twice. Under
+    her own false or no colours the firer's shot is a pirate's act by the law of nations,
+    told once, the ports' stance turned (`ship.extra["outlaw"]`) and every captain whose
+    people had her in sight holding her a pirate from then on (`pirates`). Then the mark:
+    an enemy by the colours she shows and the wars, by the private signal answered wrong
+    or not at all, by the hail, or by her own shot (`captain.recognised`, `fired_on`) is
+    fired on with nothing said; a sail made out by none of these is 70's
+    `action.unrecognised`, now the exception, said with its consequence and not refused."""
+    from freesail.world.signals import player_locker
+
     nations = getattr(world, "nations", None)
     ports = getattr(world, "ports", None)
     own = getattr(ports, "ship_nation", None) if ports is not None else None
+    tick = int(world.clock.tick)
+    colours = player_locker(world).colours
+    if colours.state in ("false", "none") and colours.fired_under_false is None:
+        colours.fired_under_false = tick
+        under = (
+            f"false colours ({colours.words(nations)})"
+            if colours.state == "false"
+            else "no colours"
+        )
+        world.ship.extra["outlaw"] = f"fired into {target.words} under {under}"
+        world.record(
+            Severity.URGENT,
+            "action.false_colours",
+            f"Fired into {target.words} under {under}: a pirate's act by the law of nations; "
+            "every ship that saw it and every port that hears of it will hold us so.",
+            data={"target": target.id, "colours": colours.state, "nation": colours.nation},
+        )
+        _witnessed(world, tick)
+    captain = getattr(world, "captain", None)
+    known = None
+    if captain is not None and hasattr(captain, "_known_enemy"):
+        known = captain._known_enemy({"id": target.id})
+    if known:
+        return
     enemy = bool(
         target.nation and own and nations is not None and nations.at_war(str(target.nation), own)
     )
-    if enemy:
+    if enemy or known is not None:
         return
     if target.nation is None:
-        why = "her colours not made out"
+        why = "her colours not made out, no private signal made to her and no hail"
     else:
         whose = nations.get(target.nation).adjective if nations else target.nation
-        why = f"a {whose} vessel, no enemy of ours"
+        why = f"a {whose} vessel by her colours, no enemy of ours"
     world.ship.extra["outlaw"] = f"fired into {target.words}, {why}"
     world.record(
         Severity.URGENT,
         "action.unrecognised",
         f"Fired into {target.words}, {why}: every port and ship that hears of it will "
-        "hold us pirates (the colours, the private signal and the hail are not yet to be "
-        "had; the stance of the ports is turned).",
+        "hold us pirates (the stance of the ports is turned).",
         data={"target": target.id, "nation": target.nation},
     )
+
+
+def _witnessed(world: Any, tick: int) -> None:
+    """Every captain whose people had the firer in sight at her shot under false or no
+    colours holds her a pirate from then on (the witnesses; the word reaches the ports
+    with the complaint and nobody else)."""
+    from freesail.world.chart import NIGHT_LAND_NM
+
+    root = getattr(world, "parent", None) or world
+    firer = _own_id(world)
+    here = world.position
+    if here is None:
+        return
+    reach = (NIGHT_LAND_NM if str(root.daylight) != "day" else 8.0) * units.NAUTICAL_MILE
+    conditions = getattr(root, "conditions", None)
+    vis = getattr(conditions, "visibility_nm", None) if conditions is not None else None
+    if vis is not None:
+        reach = min(reach, float(vis) * units.NAUTICAL_MILE)
+    for v in list(getattr(root.vessels, "vessels", []) or []):
+        if v.id == firer or getattr(v, "done", False):
+            continue
+        if bearing_and_distance(here, v.position)[1] > reach:
+            continue
+        brain = getattr(v, "brain", None)
+        if brain is not None:
+            brain.pirates.add(firer)
+        crew = getattr(v, "crew", None)
+        cap = getattr(crew, "captain", None) if crew is not None else None
+        if cap is not None and hasattr(cap, "pirates"):
+            cap.pirates.add(firer)
+    if firer != PLAYER_ID and root.position is not None:
+        if bearing_and_distance(here, root.position)[1] <= reach:
+            cap = getattr(root, "captain", None)
+            if cap is not None and hasattr(cap, "pirates"):
+                cap.pirates.add(firer)
 
 
 def _damage_minute(world: Any, ship: Any, tick: int) -> None:
@@ -387,7 +453,9 @@ def strike(world: Any, by_rule: bool, words: str = "") -> str:
     ship = world.ship
     tick = world.clock.tick
     ship.extra["struck"] = tick
-    ship.extra["colours"] = "struck"
+    from freesail.world.signals import locker_of, set_colours
+
+    set_colours(locker_of(ship).colours, getattr(world, "nations", None), "struck", "", tick)
     battery = battery_of(ship)
     if battery is not None:
         battery.mode = FireMode.HOLD

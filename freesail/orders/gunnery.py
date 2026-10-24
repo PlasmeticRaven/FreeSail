@@ -689,7 +689,9 @@ def _strike(ship: Any, battery: Battery, said: str) -> Result:
         strike(world, by_rule=False, words="by the captain's order")
     else:
         ship.extra["struck"] = True
-        ship.extra["colours"] = "struck"
+        from freesail.world.signals import locker_of, set_colours
+
+        set_colours(locker_of(ship).colours, None, "struck", "", 0)
         battery.mode = FireMode.HOLD
     enemy = battery.target_words or "the enemy"
     text = (

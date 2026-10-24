@@ -764,6 +764,48 @@ class Papers:
                 lines.append(f"Prices at {port.name}, {when}, a ton at the quay:")
                 lines.extend(f"  {good}, {pounds_words(price)}." for good, price in listed)
             return lines, keeper
+        if source == "private_signals":
+            from freesail.world.signals import table_of
+
+            table = table_of(world)
+            if table is None:
+                return [
+                    "No private signals aboard: the month's table is issued to the King's "
+                    "ships under seal, and this ship carries none."
+                ], keeper
+            return table.lines(), keeper
+        if source == "signal_book":
+            from freesail.world.signals import books_for
+
+            books = books_for(world)
+            lines = [
+                f"The {books.nation} signal books ({books.system}): the day signals by number, "
+                "the night and fog signals, the convoy's instructions; a signal is made by its "
+                "meaning ('make the signal to tack in succession')."
+            ]
+            lines.extend(
+                f"  No. {e.number}: {e.meaning}" + (f" ({e.original})" if e.original else "")
+                for e in books.numerary
+            )
+            lines.append(
+                "The night signals: "
+                + "; ".join(f"{e.meaning}, {e.show}" for e in books.night)
+                + "."
+            )
+            lines.append(
+                "The fog signals: " + "; ".join(f"{e.meaning}, {e.fire}" for e in books.fog) + "."
+            )
+            lines.append(
+                "The convoy's instructions: "
+                + "; ".join(f"No. {e.number} {e.meaning}" for e in books.convoy)
+                + "."
+            )
+            if books.telegraph:
+                lines.append(
+                    f"The telegraphic dictionary: {len(books.words)} words and the alphabet "
+                    "('make the telegraphic signal: <the words>')."
+                )
+            return lines, keeper
         return [f"The paper's source '{source}' is not one the ship keeps."], keeper
 
 

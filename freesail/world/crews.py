@@ -815,6 +815,14 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
             raise OrderError("She has no station to keep: her intent is not a station's.")
         brain._enter("keeping station")
         return "helm.set", "The station kept again (the plan's square about it).", {}
+    # package 71: the colours, the lights and the signals on a far body (the director's
+    # `ship "X": order hoist false colours`, `... make the signal to tack`), by the signals'
+    # own performer; None when the words are none of theirs
+    from freesail.world.signals import far_order_words
+
+    done = far_order_words(crew.parent, v, text)
+    if done is not None:
+        return done
     return None
 
 

@@ -1,0 +1,67 @@
+# FreeSail: the encounter (spec M7 §1, §2, §4, §6; package 71; the striking-colours study's
+# shape: two ships that can make each other out, and the recognition the encounter turns
+# on). The King's frigate Amazon, thirty-six, on passage down Channel on a June forenoon
+# of 1805, on the Lizard station; two miles to the south-west a cutter under British
+# colours, which is the French privateer Renard closing a Falmouth brig under the ruse the
+# law allowed her until her first shot. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/encounter.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/encounter.yaml
+#
+# Played by the rules captains with no model seated: the frigate's captain, on his
+# station, closes the stranger and makes her out, sees British colours, and makes her the private signal within the flags'
+# range (the King's ships' table for June 1805, drawn under the seed and carried in the
+# cabin: `the private signal`); the privateer has no table and bluffs a reply by her
+# doctrine, which is wrong, and that is the tell: she is a stranger under false colours and
+# the frigate's captain gives chase by his doctrine; the privateer, a man of war near,
+# runs, her own colours hoisted at the doctrine's range. Played by the player at the captain's station: `make
+# her out`, `show the private signal`, `the private signal`, `the colours`, `the signals`,
+# `give chase`, and within four cables `hail her` and `say to the cutter: heave to, I am
+# sending a boat`, which she answers by the table (a lie under the flag she shows, or her
+# own words with a model at her captain's station). The brig Two Brothers, bound for
+# Falmouth, is the privateer's business.
+#
+# The weather is pinned (a westerly of fourteen knots, the sky clear), so that the
+# encounter at seed 7 is the same on every machine; its figures are measured in
+# tests/test_known_truths.py (truths 7-143 onward) and recorded in docs/dev/TuningNotes.md
+# (package 71).
+
+name: The encounter
+seed: 7
+start: 1805-06-12T10:00
+position: {lat_deg: 49.85, lon_deg: -5.20}   # four leagues south-east of the Lizard
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 225
+  speed_kn: 6
+  glass: true
+intent: keep the station off the Lizard within 10 miles
+wind:
+  from_deg: 270
+  knots: 14
+  gustiness: 0.0
+  variability: 0.0
+
+papers:
+  chart: {year: 1804}
+  almanac: 1805
+
+ports: [falmouth, plymouth, brest]
+
+standing_orders:
+  - data/standing_orders/starter.orders
+
+ships:
+  # the privateer under British colours (`colours: British` on a French ship is false
+  # colours), closing the brig; her doctrine shows her own at four cables or before a shot
+  - {id: renard, description: cutter, name: Renard, nation: france, fit: long guns,
+     position: 49 49.5 N 5 14.5 W, goal: "cruising off the Lizard within 10 miles",
+     intent: "cruise for prizes off the Lizard within 10 miles", colours: British}
+  # her business: a brig bound for Falmouth (Plymouth from here crosses the land in the planner: found on the way, package 71)
+  - {id: two-brothers, description: merchant brig, name: Two Brothers, nation: britain,
+     position: 49 48.0 N 5 11.5 W, goal: "bound for Falmouth", intent: "bound for Falmouth",
+     colours: shown}
+
+orders:
+  - set plain sail

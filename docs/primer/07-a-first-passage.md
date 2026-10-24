@@ -392,13 +392,12 @@ bring her up a point
 trim the headsail sheets
 furl the jibs
 # rejected: steer south by west half
-# rejected: hoist our colours
 # rejected: as you were
 # rejected: put the helm over
 # rejected: man the pumps
 ```
 
-Some words are refused with what to say instead, or with the milestone they wait for: *hoist our colours* is milestone 7's, with the other ships that would answer them; *man the pumps* waits on a hull that makes water; *as you were* is answered with `belay that`; *put the helm over*, which says not which way, with `helm a-lee` and `hard a-weather`. At sea with a chart, `where is Ushant` says where a mark of the chart lies, in sight by the lookout's bearing and estimate, or by account from the master's position ("Ushant: not in sight; by account it bears S by E, 88 miles."), and `shape a course for a mile west of Ushant` lays off a point from a place of the chart (chapter 10). A mark's name is taken without its accents or its apostrophes: *lavandiere* is the Lavandière, *st anthonys head* St Anthony's Head. A word to a station nobody holds (`tell the watcher keep a sharp lookout`) is kept in its journal and passed to whoever takes the station, and the log says so.
+Some words are refused with what to say instead, or with the milestone they wait for: *man the pumps* waits on a hull that makes water; *as you were* is answered with `belay that`; *put the helm over*, which says not which way, with `helm a-lee` and `hard a-weather`. At sea with a chart, `where is Ushant` says where a mark of the chart lies, in sight by the lookout's bearing and estimate, or by account from the master's position ("Ushant: not in sight; by account it bears S by E, 88 miles."), and `shape a course for a mile west of Ushant` lays off a point from a place of the chart (chapter 10). A mark's name is taken without its accents or its apostrophes: *lavandiere* is the Lavandière, *st anthonys head* St Anthony's Head. A word to a station nobody holds (`tell the watcher keep a sharp lookout`) is kept in its journal and passed to whoever takes the station, and the log says so.
 
 ## A day of it, and a word with the watcher
 

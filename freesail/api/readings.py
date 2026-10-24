@@ -3496,6 +3496,32 @@ def _own_state_truth(world: Any) -> str:
     return "under way"
 
 
+def _truth_signals(body: Any, true_nation: str, world: Any) -> dict[str, Any]:
+    """The director's truth of a ship's colours and signals (package 71): the colours she
+    shows beside her true nation (the ruse laid bare for him alone), the hoists flying,
+    her lights, and whose signals command her; nothing added while she is plainly under
+    her own colours with nothing flying, so that the pinned forms stand."""
+    locker = getattr(body, "signals", None)
+    if locker is None and hasattr(body, "extra"):
+        locker = (body.extra or {}).get("signals")
+    if locker is None:
+        return {}
+    out: dict[str, Any] = {}
+    c = locker.colours
+    if c.state != "shown" or (c.nation and c.nation != true_nation):
+        out["colours_shown"] = {"state": c.state, "nation": c.nation or None, "true": true_nation}
+    tick = int(world.clock.tick)
+    flying = locker.flying_now(tick)
+    if flying:
+        out["signals"] = [h.words() for h in flying]
+    if locker.lights and locker.lights != "none":
+        out["lights"] = locker.lights
+    boss = getattr(body, "under_orders_of", "")
+    if boss:
+        out["under_orders_of"] = boss
+    return out
+
+
 def director_readings(world: Any, within_nm: float | None = None) -> dict[str, Any]:
     """The truth as the director reads it: every ship's true position, heading, speed,
     sail and state (the player's first, by her name, then every vessel on the sea with her
@@ -3549,6 +3575,7 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
     if hold is not None:
         own["cargo"] = hold.words()
     own.update(_truth_action(world))  # package 70: her guns and her damage
+    own.update(_truth_signals(world.ship, str(own.get("nation") or ""), world))  # package 71
     ships.append(own)
     vessels = getattr(getattr(world, "vessels", None), "vessels", None) or []
     beyond = 0
@@ -3591,6 +3618,7 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
             d["letter"] = f"from {getattr(v.letter, 'origin', '')}"
         if getattr(v, "struck", False):
             d["colours"] = "struck"
+        d.update(_truth_signals(v, str(v.nation), world))  # package 71: her true colours
         crew = getattr(v, "crew", None)
         if crew is not None and getattr(crew, "shape", "full") == "full":
             d.update(_truth_action(crew))  # package 70: a crewed ship's guns and damage
@@ -3951,3 +3979,9 @@ def _truth_words(d: dict[str, Any]) -> str:
 from freesail.api import action_readings as _action_readings  # noqa: E402
 
 _action_readings.register()
+
+# The colours', the signals' and the lights' (package 71), after the action's (whose
+# `colours` row they replace with the fuller one).
+from freesail.api import signal_readings as _signal_readings  # noqa: E402
+
+_signal_readings.register()

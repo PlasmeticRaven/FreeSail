@@ -25,10 +25,22 @@ thresholds:
   break_off_nm: {value: 2.5, source: "the enemy beyond this for the minutes below and the action is over; judgement"}
   break_off_minutes: {value: 10, source: "as gale_over_minutes: ten minutes, not a lull in the firing; judgement"}
   engage_side: {value: weather, source: "the weather gage, to engage or to run as it pays"}
+  # package 71 (item 8): what he does when the enemy passes through the wind's eye and the
+  # engaging helm may not follow her through it: `shift` the engaged battery and keep his
+  # tack (the guns go on), or `tack` or `wear` for her
+  through_the_eye: {value: shift, source: "the battery shifted and the tack kept: the course never put in the wind's eye in action (the owner's first action, 2026-10-24); judgement"}
   charge: {value: chain, source: "round shot the ordinary charge (Douglas 1820); chain for the rigging where the aim is the rigging and the charge says so"}
   aim: {value: rigging, source: "spec M7 §9: the hull the British habit, the rigging the French; the nation's habit stands where the file leaves this empty"}
   morale_start: {value: 0.7, source: "a privateer's company at the start of an action (spec M7 §10, decision 7); judgement"}
   strike_below: {value: 0.35, source: "a privateer's company fights for the prize money and not for the flag: a loss of a sixth of them, or the odds against them, brings the colours down (the privateers' actions in the prize courts' records; judgement)"}
+  # Package 71 (spec M7 §1, §2): the ruse. `false_colours` sails her under the principal
+  # enemy's colours while she closes a stranger, `true_colours_cables` the range she shows
+  # her own at (and before her first shot whatever the range: rule 3), `bluff_private_signal`
+  # a guessed reply to a King's ship's challenge rather than none (the wrong answer is the
+  # tell either way; some tried it).
+  false_colours: {value: true, source: "the Channel privateers' habit of closing under British or neutral colours (the prize courts' records and the trade's complaints, from memory); the law allowed the ruse until the first shot"}
+  true_colours_cables: {value: 4, source: "her own colours shown within hail's distance of the chase, before a shot (judgement after the record: the ensign run up as the gun was fired)"}
+  bluff_private_signal: {value: true, source: "a guessed reply to the private signal rather than silence, which some privateers tried on a King's cruiser (from memory; judgement)"}
   investigate_nm: {value: 10, source: "as the cruiser's: a sail within ten miles is closed and made out"}
   chase_stale_hours: {value: 3, source: "as the cruiser's: a watch of chasing without a mile gained is given up"}
   stranger_chase_nm: {value: 25, source: "as the cruiser's"}
@@ -221,6 +233,10 @@ transitions:
   - {from: investigating a stranger, on: chase stale, to: on passage}
   # package 70 (spec M7 §10): into the action and out of it
   - {from: keeping station, on: overmatched, to: evading}
+  # package 71 (found on the way): on her cruising ground a sail near is closed and made
+  # out, as the cruiser's book has it (70's privateer sat on her station until an enemy
+  # came within her engaging distance)
+  - {from: keeping station, on: stranger near, to: investigating a stranger}
   - {from: on passage, on: man of war near, to: evading}
   - {from: beating, on: man of war near, to: evading}
   - {from: keeping station, on: man of war near, to: evading}

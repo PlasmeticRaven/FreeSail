@@ -31,6 +31,10 @@ thresholds:
   break_off_nm: {value: 3, source: "the enemy beyond this for the minutes below and the action is over; judgement"}
   break_off_minutes: {value: 10, source: "as gale_over_minutes: ten minutes, not a lull in the firing; judgement"}
   engage_side: {value: weather, source: "as the King's ship's"}
+  # package 71 (item 8): what he does when the enemy passes through the wind's eye and the
+  # engaging helm may not follow her through it: `shift` the engaged battery and keep his
+  # tack (the guns go on), or `tack` or `wear` for her
+  through_the_eye: {value: shift, source: "the battery shifted and the tack kept: the course never put in the wind's eye in action (the owner's first action, 2026-10-24); judgement"}
   charge: {value: round, source: "round shot the ordinary charge (Douglas 1820); chain for the rigging where the aim is the rigging and the charge says so"}
   aim: {value: hull, source: "spec M7 §9: the hull the British habit, the rigging the French; the nation's habit stands where the file leaves this empty"}
   morale_start: {value: 0.85, source: "a cruiser's company at the start of an action (spec M7 §10, decision 7); judgement"}

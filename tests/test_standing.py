@@ -2087,7 +2087,8 @@ def channel(ship: str = "frigate") -> World:
         (F, "heave the lead; trim sails; set the topsail", "set the topsail", "say which"),
         (F, "heave the lead; veer umpteen fathoms", "veer umpteen fathoms", "not a number of"),
         (F, "heave the lead; send for the cook's cat", "send for the cook's cat", "Nobody aboard"),
-        (F, "heave the lead; hoist our colours", "hoist our colours", "milestone 7"),
+        # package 71: the colours are an order the ship takes; the pumps still wait
+        (F, "heave the lead; man the pumps", "man the pumps", "milestone 7"),
         (F, "heave the lead; steer south by west half", "steer south by west half", "toward which"),
         (F, "heave the lead; buy umpteen tons of tin", "buy umpteen tons of tin", "How many tons"),
         (

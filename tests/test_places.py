@@ -156,6 +156,8 @@ def test_every_paper_is_a_thing_with_a_keeper_and_a_place_and_the_stores_own_wor
         "the establishment of ground tackle",
         "the epitome's table of the establishments",
         "the price list",
+        "the private signals",  # package 71
+        "the signal book",
     ]
     by = {p.handle: p for p in pages}
     assert by["the sailmaker's account"].keeper == "sailmaker"
@@ -181,8 +183,13 @@ def test_every_paper_is_a_thing_with_a_keeper_and_a_place_and_the_stores_own_wor
     assert line == "The manifest written up by the purser: twenty tons of tin stowed."
     assert w.papers.page("manifest").as_of == "10 June, Forenoon watch (10:01)"
     assert w.papers.page("sailmaker").as_of_tick == 0
-    with pytest.raises(KeyError):
-        w.papers.page("the signal book")
+    # package 71: the private signals (none aboard a frigate with no King's captain in this
+    # scenario) and the nation's signal book, both in the captain's keeping
+    private = w.papers.page("the private signals")
+    assert private.keeper == "captain" and private.lines[0].startswith("No private signals aboard")
+    book = w.papers.page("the signal book")
+    assert book.lines[0].startswith("The britain signal books (well-built)")
+    assert "  No. 16: Engage the enemy more closely" in book.lines
 
 
 def test_the_mate_keeps_the_pursers_papers_in_a_merchantman():
@@ -199,7 +206,7 @@ def test_the_papers_are_served_by_handle_through_the_library_to_every_station_th
     closes here: the watcher, the captain and the browser's pane read one page."""
     w = world_for()
     listing = tools.library(w, "watcher", "papers")
-    assert listing.startswith("the ship's papers: 8 papers aboard, each by handle")
+    assert listing.startswith("the ship's papers: 10 papers aboard, each by handle")
     assert "  2. the manifest, about" in listing
     page = tools.library(w, "watcher", "papers", section="manifest")
     assert page.title == "the ship's papers, the manifest"
@@ -220,7 +227,7 @@ def test_the_papers_are_served_by_handle_through_the_library_to_every_station_th
     assert "[the ship's papers, the epitome" in found
     # listed in the contents beside the ship, with its handles
     contents = tools.library(w, "watcher", "contents")
-    assert "  papers: the ship's papers, 8 aboard" in contents
+    assert "  papers: the ship's papers, 10 aboard" in contents
     # the pane's route serves the same lines (tests/test_server.py has the route itself)
     from freesail.ui.server import ship_papers
 
