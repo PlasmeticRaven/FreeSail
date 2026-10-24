@@ -9219,3 +9219,279 @@ lines (1407) and the digest 0a480f7a4b7f321a
 See the report; the fast tier whole (two slices, the fingerprint test re-run alone on a
 quiet tree), the slow tier of the touched files, the whole slow tier once, the pace tests
 alone and last.
+
+## Package 71: signals and the voice between ships (2026-10-24)
+
+The second package of milestone 7, built in a worktree off `bca885c`. Spec M7 Part 7-i
+(§1 to §6) "as built (package 71)" and the §10 line for the habits moved;
+`docs/design/Design-Signals.md` (the data shape, written first); `docs/agents/Harness.md`
+§21d; the primer's chapter 23; truths 7-143 to 7-151; the encounter and the convoy
+scenarios. The physics is read and not changed; no ship file was touched; the consent
+records were not touched; no model identifier anywhere.
+
+### The data shape's design
+
+`docs/design/Design-Signals.md`, written before anything else: one root a directory under
+`data/signals/`, the same six files in each (`book.yaml` the declaration, `numerary.yaml`
+the day signals mapped to what a commanded captain does, `telegraphic.yaml` the dictionary,
+`night_fog.yaml`, `convoy.yaml`, `private.yaml` the private table's form), a nation naming
+its root and its system in `data/nations.yaml`, `basic` the foundation every nation stands
+on; colours a state of both bodies with the nation shown read by every lookout; a signal a
+thing hoisted by an evolution and read a minute after it is seen by whoever holds the book;
+`under the orders of` the least relation; the hail's three bodies by table. What was
+rejected is in the note (one file a nation; signals by number as the form; the hoist as an
+instantaneous state; every captain obeying every signal; the squadron's work; the true
+nation in the reading; a bell line per far ship per fog; the table in the save; the whole
+dictionary). The shape held through the build; the note's postscript says the two places
+it grew (the least captain for a brainless vessel; the goal `in company with the ship`).
+
+### Each item against its intent
+
+1. **Colours as state: built.** `signals.Colours` (shown, none, false, struck, distress)
+   on the far vessel's and the crewed ship's one `Locker`, the player's shadow his; the
+   nation shown given by every lookout and the `strangers` reading (`Vessel.nation_shown`),
+   the truth the director's; the orders of `orders/signals.py`; the scenario's `colours:
+   British` on a French ship false colours; the lookout's `colours.changed` line; the
+   privateer's doctrine (`false_colours`, `true_colours_cables: 4`,
+   `bluff_private_signal`); every rules captain's true colours before his first shot;
+   the first shot under false or no colours a pirate's act, told once, the ports turned and
+   the witnesses' `pirates` set; the recognition completed in `action._recognition`
+   (the colours against the wars, the private signal, the hail, the shot) with 70's
+   `unrecognised` the exception; the vocabulary's refusal gone. Taken another way: `haul
+   down the colours` under fire is the strike (the custom; the spec's `haul down` and
+   `strike` are one act in action and two out of it).
+2. **The private signal: built.** The table a pure function of the seed, the nation, the
+   year and the month from the root's form (the real tables are lost; the game's made and
+   said so in every `private.yaml`); the paper "the private signals" in the cabin; carried
+   by the roles the root names (a King's ship, a cruiser, a commodore) or by `papers:
+   {private_signals: true}`; `show` and `answer the private signal` hoists; the King's
+   captain's challenge to every strange sail once her colours are made out, one a minute,
+   the verdict counted from the moment his flags are up (found on the way: counted from
+   the order, "no answer" was judged before the hoist was up). Taken another way: a
+   trader's silence is no tell (a merchantman never had the table) and leaves her a
+   stranger to be spoken; only a man of war's rig under his own colours, or a reply and
+   the wrong one, makes an enemy; a neutral's colours a stranger still. The encounter's
+   first run had the frigate take a British merchant brig for an enemy under false colours
+   and engage her, which is what the rule now forbids.
+3. **The books: built** as the shape says: Britain 150 day signals, 330 words of the
+   dictionary, 25 night, 16 fog, 32 convoy; France 70 day signals with the Code's phrases
+   where remembered and no dictionary; basic 46 day signals; the sources at every file's
+   head and the made entries marked. The numbers remembered with confidence are kept (1,
+   13, 16, 63, 72, 76); every other number is the builder's and says so. 76 builds out.
+4. **A signal hoisted and read: built.** `data/evolutions/make_signal.yaml` with
+   `MakeSignalScript` (three hands, a minute a hoist, a sentence a phase a word; the hoist
+   breaks out when the hands run it up, never of itself: found on the way, a hoist queued
+   behind a wear was read by the other ship before it was up); read by the lookout at the
+   flags' range by day, the lights' by night, the gun's in fog, the meaning a minute later
+   with the book; answered with the pendant; obeyed by the captain under the sender's
+   orders (`does`: order, state, news, answer, closer, release; `in_succession` three
+   minutes apart, `SUCCESSION_GAP_S`, the time a merchantman takes to go about: judgement,
+   where the period's succession was by the leader's wake and wants 72's station keeping);
+   the least relation `under_orders_of` by the scenario and the director; the convoy book
+   when merchantmen are under the sender's orders; the goal `in company with the ship`;
+   the least captain for a brainless vessel under orders; a company-keeper's tack a mile
+   on the new tack and her commodore closed again. The telegraphic sentence: twelve hoists,
+   twelve minutes, read a minute after the last is up. A model at a flagship gives a signal
+   by the order (§34's equal-reach rule), as the brief read it.
+5. **The hail: built** (`world/hail.py`, `data/captains/hail.yaml`): within four cables,
+   the questions read in the words, the answers by role and nation in the period's form,
+   the lie under false colours with a name and a port of the nation shown drawn under the
+   seed, the demand to heave to obeyed, declined or run from by stance (the heave-to
+   demanded and answered is the search's first order; the boat and the search not built,
+   63's and the director's); a model's hail heard in his sample and his own `say to` the
+   answer; the player's hail and answer; two rules captains' exchange written once in the
+   lookout's line. The hearing of the words is the deck's (65's reading read, not built).
+6. **The lights and the bell: built.** The lights a state (`hoist the lights`, the top
+   lights, `show no lights`; the scenario's `lights:`; the convoy book's); a far ship's
+   light a sighting at night at three miles (`LIGHT_SEEN_NM`, judgement); in fog the fog
+   signals kept (`keep the fog signals`; the rules captain of himself only while another
+   sail has been in sight within the hour, so that no single ship's recorded passage in
+   thick weather moves: the trade-thick trial stands) and heard beyond the visibility as a
+   sighting by ear (the bell at anchor within the mile, the gun in company within three,
+   the drum alone within the mile; the Regulations' and the custom's figures from memory,
+   marked so); the fog book's signal a gun fired by the battery. Sight across land: 78's.
+7. **The nations' habits to data: built.** 70's `NATION_HABITS` moved into each nation's
+   `habits:` of `data/nations.yaml` with its source (70's judgement, with a word on the
+   period's record for each), read by `Captain._habit` through `Nations.habits_of`; the
+   same entry names the signals' root and system. 70's table had a `netherlands` key the
+   table's `batavian-republic` never matched (the Dutch fought by the default, which was
+   the British habit; now the Dutch habit is their own entry, the same figures).
+8. **The captain's helm in action: built** (`captains.helm_in_action`): the beam law of 70
+   never within the close-hauled angle and half a point (`ENGAGING_WIND_MARGIN_POINTS`, the
+   course-shaping's own margin), the gage the doctrine names kept where the geometry allows
+   (under `weather`, a mark to windward worked up to by the wind on the tack whose head
+   points nearer her), never a course across the eye from the tack she is on: the mark
+   through the eye answered by the doctrine's `through_the_eye` (`shift` the battery and
+   keep the tack, every role's default; `tack` or `wear` by his book). The chase of a weaker
+   mark (70's `give chase` renewed) already clamped to the wind in `_chase_course` and is
+   unchanged. **The first action after it (seed 7):** the King's cutter engages at 10:09,
+   the privateer opens at 10:13 as before, and no minute of the engagement finds her head
+   within the close-hauled angle (two minutes do before it, the tack as the chase begins);
+   she fires 146 rounds against 51 and the Renard strikes at 11:12 with five hurt and seven
+   holes, the cutter's main topgallant mast and two yards gone and three lines shot away,
+   nobody hurt. **57's offing's tack among islands: left** with its reason (below, decisions).
+9. **The stations, the director and the readings: built.** `the colours`, `the signals`,
+   `the private signal`, `the lights`; the events (Harness §21d); the director's examples
+   under `ship "X": order ...` (false colours, the signal, the answer, the hail), the new
+   form `ship "X": under the orders of <ship | the ship | nobody>`, his truth's
+   `colours_shown` beside the true nation, `signals`, `lights`, `under_orders_of`; the
+   brief's `limits: {false_colours: false}`; the harness's `hear` carrying a hail and the
+   captain's brief's sentence on the orders.
+10. **Truths and records: built.** 7-143 to 7-151; the two scenarios; spec §1 to §6 as
+    built; Harness §21d; primer 23; the director's library (the forms' examples are the
+    library's); this section.
+
+### The books' sources and what was made
+
+Howe's signal book of 1790 and the Admiralty's *Signal Book for the Ships of War* of 1799
+(the meanings; the numbers 1, 13, 16, 63, 72 and 76 remembered, the rest made and marked);
+Popham's *Telegraphic Signals or Marine Vocabulary*, 1800 and 1803 (the telegraph flag, the
+alphabet of twenty-five with J wanting and V before U as the hoist of 21 October 1805
+spells 'duty', the eight numbers of that hoist: do 220, England 253, every 261, expects
+269, his 370, man 471, that 863, will 958; every other number made between them in the
+book's alphabetical order); the night and fog signals bound with the 1799 book (the form:
+lights in number and place, false fires, rockets, guns; guns, muskets, the bell and the
+drum in fog; every hoist made); the *Signals and Instructions for Ships under Convoy* (the
+form and the meanings; the numbers made); the *Regulations and Instructions* of 1806 (the
+private signals' custody; the lights of ships in company; the fog signals' intervals from
+memory); du Pavillon's tabular signals of 1776 and the Republic's *Code de signaux* of the
+1790s (the French meanings in their own phrases where remembered: *virer de bord vent devant
+par la contre-marche*, *combattre de plus près*, *branle-bas de combat*; every number made);
+Falconer (HAIL, SIGNAL) and Luce 1884 ch. XX for the hail's custom. All from memory and
+said so in every file; no page of these is in `docs/references/`; 76 builds the books out
+against the printed editions.
+
+### The hail's tables
+
+`data/captains/hail.yaml`: eight question kinds matched in the words (what ship, whence,
+whither, cargo, news, the captain, the days out, heave to); the answers by role (a King's
+ship, a cruiser, a commodore name themselves by the nation's style, "His Majesty's",
+"the French national", "His Catholic Majesty's"; a merchant, a packet, a fisherman, a
+privateer; and `lie`, the merchant's table under false colours); the home ports and the
+lie's names by nation; the cargo by the description's words (deep laden, a cargo; else in
+ballast). The words are the builder's in the period's form and marked made.
+
+### The habits moved
+
+| Nation | range factor | aim | roll | source (70's judgement, the record's word) |
+|---|---|---|---|---|
+| Britain | 1.0 | hull | down | Douglas 1820, part I; James |
+| France | 2.0 | rigging | up | Douglas 1820, part I |
+| Spain | 1.5 | rigging | up | Trafalgar's accounts (from memory) |
+| the Batavian Republic | 1.0 | hull | down | Camperdown (from memory); 70's key never matched |
+| the United States | 1.0 | hull | down | the frigates of 1812 (from memory) |
+| Portugal, Denmark, Morocco | 1.0 | hull | down | the common habit (judgement) |
+
+### The helm's law mended, and the first action after it
+
+The law is in item 8 above. The bisection of the first action at seed 7
+(`HELM_IN_ACTION`, `signalling.CHALLENGES`, `signalling.DOCTRINE_COLOURS`, and the
+privateer's new station row stripped from her loaded doctrine, each in turn):
+
+| Items on | first shot | struck | rounds (the cutter) | her head in the eye, aback | lines | digest |
+|---|---|---|---|---|---|---|
+| none (70's baseline) | 781 | 7560, 12:06 | 147 | 2940, 3060 | 403 | cb832470416c6456 |
+| the helm's law alone | 781 | 4740, 11:19 | 146 | never | 326 | 77200a49d6ec59e0 |
+| the privateer's station row alone | 781 | 4320, 11:12 | 147 | never | 319 | 04889d5dbf5e9208 |
+| the challenge alone | 781 | 6540, 11:49 | 124 | 2940, 3060 | 377 | 1f3aac6b92dd0cbb |
+| the colours by doctrine alone | 781 | 7560, 12:06 | 147 | 2940, 3060 | 403 | cb832470416c6456 |
+| all on | 781 | 4320, 11:12 | 146 | never | 311 | 8bae7694834dd3b5 |
+
+So the helm's law alone takes the half hour aback out of the King's cutter's circle (the
+owner's note) and ends the action three quarters of an hour sooner; the privateer's row
+alone (she closes the cutter instead of waiting on her station for one within her
+engaging distance) changes the geometry so that even 70's law never crosses the eye; the
+challenge alone (the cutter's hands at the halyards for the private signal while she
+closes) stretches the action by delaying her guns; the colours by doctrine change nothing
+here (the Renard shows her own in this scenario). Everything off gives 70's figures and
+digest again.
+
+### What moved, and the pins
+
+- **Truth 7-133** (the first action): the colours at 11:12 (12:06), fifty-nine minutes
+  after the first shot (an hour and fifty-three), five hurt and seven holes (five and
+  eight), three lines shot away in the cutter (eight); the band's floor 2700 s (3600). By
+  the helm's law and the privateer's row, as the table says. The old figures beside the
+  new in the test.
+- **No sailing passage moved**: the lookout's new work reads a sail's locker only when she
+  flies something, a captain challenges only with a table and a stranger within the flags'
+  range, the fog signals are kept only with a sail about, the lights are seen only when a
+  vessel shows them, and the far brain's minute reads nothing on an empty sea; the
+  recorded passages of the fast tier and the slow tier of the touched files ran green
+  (below).
+- **The captain's trials**: the station-stranger, station-lee-shore, trade-stranger and
+  trade-thick trials: see the suite as run below (the trade-stranger trial has a French
+  brig and a British schooner: the brig's cruiser doctrine carries the table and challenges
+  the schooner, so its pins may move; the figures are below once the slow tier of the
+  touched files has run).
+- **The station-gale trial** (the expected failure): left as it is; item 8's law is the
+  engaging helm's and not the offing's tack (below).
+- **`tests/test_places.py`**: the papers' catalogue has ten entries (eight) with the private
+  signals and the signal book; `tests/test_agents.py`: 87 evolutions (86) and ten papers;
+  `tests/test_orders.py` and `tests/test_standing.py`: `hoist our colours` is an order (the
+  refusal gone by the spec), the standing case moved to the pumps' refusal; the primer's
+  chapter 7 no longer shows the colours refused.
+
+### Found on the way
+
+- 70's `NATION_HABITS` keyed `netherlands` where the table says `batavian-republic`: the
+  Dutch fought by the default (fixed by the move to data).
+- The privateer's doctrine had no row from `keeping station` on `stranger near`, so a
+  privateer on her cruising ground sat still until an enemy came within her engaging
+  distance (the cruiser has the row); given it, with the bisection above.
+- A hoist created with its breaking-out minute at the order was read by the other ship
+  before the hands had run it up when the evolution queued behind a wear; the script sets
+  the moment now (`NOT_YET` until then), and a hoist never run up comes down after a glass.
+- The private signal's wait counted from the order; it counts from the flags' breaking out.
+- The frigate's captain took a British merchant brig's silence to the private signal for
+  the tell and engaged her; a trader's rig is a stranger to be spoken.
+- A commodore challenged his own merchantmen; a ship under his orders is no stranger.
+- The planner lays no way into Plymouth from the south-west that the land guard accepts
+  (`bound for Plymouth` from off the Lizard "crosses the land on the leg to Cawsand Bay",
+  via the Eddystone or the Start the same): the encounter's brig is bound for Falmouth and
+  the convoy for the Start. For whoever next touches the port tracks (61's route finding).
+- `_keep_company` follows the commodore's drift when he has no way (the first convoy had
+  a commodore with no valid intent and the brigs' heads swung with his drift): with a
+  sailing commodore it holds; a `company` leg under a stopped ship is 72's to steady.
+- `role_for` never gave the commodore's role: `convoy the trade from <A> to <B>` (and
+  `escort the convoy to <place>`) is a passage intent that does (`Intent.convoy`).
+- The answering pendant of every brig was logged into every other brig's story; only read
+  signals are, now.
+- The far body's `far_order` had no words for the colours or a signal; `signals.far_order_words`
+  gives them for the director's hand.
+- 70's `extra["colours"] = "struck"` string, set in two places and read by none, is the
+  locker's state now.
+
+### Decisions for the lead and the owner
+
+- **The succession's three minutes** (`SUCCESSION_GAP_S`): in succession by the period
+  was each ship putting about in the leader's wake; without station keeping (72's) the
+  game uses the time a merchantman takes to go about. 72 should make it the wake.
+- **A trader's rig and the private signal**: the rule leaves a plain "cutter" or "brig"
+  under his own colours that makes no answer a stranger to be spoken, and only "of war",
+  "frigate", "sloop" or "revenue" in the lookout's words make the silence a tell. The
+  owner may want a stranger of any rig that will not answer closed and hailed by doctrine
+  (the investigating book does so already: she is chased within hail and spoken).
+- **The witnesses of a shot under false colours** are the captains whose people had the
+  firer in sight (eight miles by day, the loom at night); the ports hold her by the
+  `outlaw` flag as 70 had it. News travelling farther (a complaint carried into port and
+  out again) is the business's and 74's.
+- **The fog signals of a single ship** are kept only with a sail about, so that the
+  recorded passages in thick weather do not move; the owner may prefer the bell rung at
+  anchor in every fog whatever is about, which moves the trade-thick trial's pins.
+- **57's offing's tack among islands** (the station-gale trial): read against item 8 and
+  left. The engaging law's clamp is a course never ordered within the close-hauled angle;
+  the offing's fault is the beating book's `put her about` given among the Molène islands
+  where the new tack has no more room than the old, which is a judgement of sea room on
+  both tacks before going about (the lee land along the new course's ray) and belongs to
+  the beating book, not the engaging law; it is a captain's pass of its own, and the
+  trial stays an expected failure with its reason as the lead wrote it.
+- **The French and basic books' numbers** are all made; 76 corrects them against the
+  printed books and may find the British numbers I remembered wrongly.
+- **`through_the_eye`** is `shift` for every role; a cutter's `tack` and a frigate's
+  `wear` are a word in the role's file when the owner wants them, and the first action
+  under `tack` is unmeasured.
+
+### The suite, as run
+
+See the report.

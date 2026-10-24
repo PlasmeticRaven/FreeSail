@@ -550,17 +550,16 @@ def _make(world: Any, locker: Any, tick: int, words: str, book_said: str) -> Res
         # the flags are not to be seen; the hoist is heard when the gun fires
         hoist.breaks_out = tick + 30
         text = f"In the fog the signal is made by gun: {entry.fire}, {_lower(entry.meaning)}."
-        world.record(_sev("NOTABLE"), "signal.made", text, data={"hoist": hoist.to_dict()})
         _fire_signal_gun(world)
         return (
             "signal.made",
             text,
-            {"verb": "make the signal", "level": 1, "hoist": hoist.to_dict()},
+            {"verb": "make the signal", "level": 1, "hoist": hoist.to_dict(), "notable": True},
         )
     line = _start_hoist(world, locker, hoist, 1, hoist.words())
     text = (
-        f"{line} ({hoist.words()}, the {_adjective(world)} {entry.book} book; a minute to "
-        "run it up.)"
+        f"{line.rstrip('.')} ({hoist.words()}, the {_adjective(world)} {entry.book} book; a "
+        "minute to run it up)."
     )
     return "signal.ordered", text, {"verb": "make the signal", "level": 1, "hoist": hoist.to_dict()}
 
@@ -618,14 +617,15 @@ def _telegraphic(world: Any, locker: Any, tick: int, sentence: str) -> Result:
     minutes = len(hoists) * books.hoist_s // 60
     spelt = [w for n, w in hoists if len(w) == 1]
     text = (
-        f"{line} ({len(hoists)} hoists, {minutes} minutes, the telegraph flag over each: "
+        f"{line.rstrip('.')} ({len(hoists)} hoists, {minutes} minutes, the telegraph flag over "
+        "each: "
         + ", ".join(f"{w} {n}" for n, w in hoists)
         + (
             f"; spelt letter by letter where the book has no word: {''.join(spelt)}"
             if spelt
             else ""
         )
-        + ".)"
+        + ")."
     )
     return (
         "signal.ordered",
@@ -653,7 +653,12 @@ def _answer(world: Any, locker: Any, tick: int) -> Result:
     locker.answered.add(last["key"])
     hoist = S.make_answer(locker, books, S.own_id(world), tick, str(last["by"]))
     line = _start_hoist(world, locker, hoist, 1, "the answering pendant")
-    text = f"{line} (to {last['words'].rstrip('.')})"
+    about = (
+        f"the signal read, {_lower(last['hoist'].meaning)}"
+        if last.get("kind") == "signal.read"
+        else "a signal not of our book"
+    )
+    text = f"{line.rstrip('.')} (to {about})."
     return "signal.ordered", text, {"verb": "answer the signal", "level": 1, "to": last["by"]}
 
 
@@ -681,7 +686,11 @@ def _repeat(world: Any, locker: Any, tick: int) -> Result:
     )
     locker.hoist(copy)
     line = _start_hoist(world, locker, copy, 1, copy.words())
-    return "signal.ordered", f"{line} (repeated.)", {"verb": "repeat the signal", "level": 1}
+    return (
+        "signal.ordered",
+        f"{line.rstrip('.')} (repeated).",
+        {"verb": "repeat the signal", "level": 1},
+    )
 
 
 def _private(
@@ -717,7 +726,7 @@ def _private(
     hoist = S.make_private(locker, books, table, light, S.own_id(world), tick, reply=reply, to=to)
     what = "the private signal's reply" if reply else "the private signal"
     line = _start_hoist(world, locker, hoist, 1, what)
-    text = f"{line} ({hoist.shown}; the table for {_month_words(world)}.)"
+    text = f"{line.rstrip('.')} ({hoist.shown}; the table for {_month_words(world)})."
     return (
         "signal.ordered",
         text,

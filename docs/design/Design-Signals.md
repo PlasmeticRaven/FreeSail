@@ -456,3 +456,24 @@ scenarios and the records. 76 builds the books out from the six files and never 
 them; 72 replaces `under_orders_of` with the squadron's set and keeps the entries' `does`;
 74 gives a prize's papers (a captured table, a captured book) to the captor's library by
 the paper's handle.
+
+## As built (the end of the package)
+
+The shape held: the six files a root, the three roots, the `Locker` one object for a ship's
+two bodies, the hoist an evolution read a minute after it is seen, the private table a pure
+function of the seed, the hail's three bodies by table, `under_orders_of` the least
+relation. It grew in two places the convoy showed. **A vessel under orders with no brain**
+(a merchantman given only her company to keep, with no intent and so no `FarCaptain`) reads
+and obeys by the least captain (`signalling._Reader`, ticked once a minute from
+`Vessels.tick`), because the brief's convoy wants no model and no intent in four
+merchantmen beyond keeping company; and **the goal `in company with the ship`** was added
+to the far body's goals (the pilot's boat's `company` leg of 37h), since no intent of the
+captain's machine keeps company and the squadron's set is 72's. Two things were taken
+another way with their reasons in the tuning notes: a trader's silence to the private
+signal is no tell (a merchantman never had the table; only a man of war's rig under his
+own colours, or a reply and the wrong one, makes an enemy), and the fog signals are kept
+by a rules captain only while another sail has been in sight within the hour, so that no
+single ship's recorded passage in thick weather moves. The hoist's breaking-out minute is
+the script's to set when the hands run it up (`NOT_YET` until then), not the order's,
+which the encounter taught when a hoist queued behind a wear was read before it was up.
+Every figure is in `docs/dev/TuningNotes.md` (package 71).

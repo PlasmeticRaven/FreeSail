@@ -184,6 +184,13 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_133_the_first_action_ends_with_the_privateer_struck_and_the_damage_as_state",
         "test_known_truths.py::test_truth_7_135_the_frigates_broadside_every_minute_and_three_quarters_and_slower_short",
         "test_known_truths.py::test_truth_7_136_a_tack_with_the_guns_served_is_slower_by_exactly_the_hands_it_takes",
+        # package 71: the encounter's first half hour with two crewed ships, the convoy's
+        # half hour with three crewed brigs, the first action to the strike again
+        "test_known_truths.py::test_truth_7_144_the_private_signal_answered_wrong_makes_her_a_stranger_and_he_chases",
+        "test_known_truths.py::test_truth_7_145_a_convoy_of_four_under_a_commodore_tacks_in_succession_on_one_hoist",
+        "test_known_truths.py::test_truth_7_148_the_kings_cutter_engaging_to_leeward_never_puts_her_head_in_the_wind",
+        "test_known_truths.py::test_truth_7_143_a_cutter_under_false_colours_is_made_out_as_british_and_lies_to_the_hail",
+        "test_known_truths.py::test_truth_7_149_a_shot_under_false_colours_is_a_pirates_act_told_once_and_witnessed",
         "test_known_truths.py::test_truth_7_137_a_merchant_brig_fired_into_strikes_by_morale_and_the_log_says_why",
         "test_known_truths.py::test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_hours",
         "test_known_truths.py::test_truth_10_she_misses_stays_when_put_about_under_three_knots",

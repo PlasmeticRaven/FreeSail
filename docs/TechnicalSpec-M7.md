@@ -84,6 +84,30 @@ the doctrine says. **Firing under false colours** is not refused: it is logged, 
 treats her as a pirate thereafter (the business's stances), and the director's brief may
 forbid it to the director's ships. The `hoist our colours` refusal of the vocabulary goes.
 
+**As built (package 71; `docs/design/Design-Signals.md`).** Colours are a state of every
+body (`signals.Colours`: `shown`, `none`, `false` with the nation shown, `struck`,
+`distress`), one object for a far vessel and her crewed World (`Vessel.signals`, the
+`Locker`) and the player's shadow's his own, so that every lookout, far and near, gives
+the nation *shown* and never the true one (`Vessel.nation_shown`; the `strangers` reading's
+`nation`): a French privateer under British colours is "British colours, the red ensign" to
+the King's captain reading her, and the truth is the director's alone. The orders of
+`orders/signals.py`: `hoist the colours`, `hoist French colours` / `hoist false colours` (the
+principal enemy's), `haul down the colours` (none; under fire it is the strike, by the
+custom), `hoist the ensign union down` (distress, with 70's `fire a gun to leeward`), 70's
+`strike the colours` kept; the scenario's `colours: British` on a French ship is false
+colours, and the director's `ship "X": order hoist false colours` the same. The lookout
+says when a sail's colours shift (`colours.changed`: hoisted, hauled down, shifted). A
+privateer's doctrine sails her under false colours while she closes a stranger
+(`false_colours`, `true_colours_cables`, `bluff_private_signal` in `privateer.yaml`) and
+every rules captain hoists his true colours before his first shot (`_engage_now`); the
+player is not made to. **Recognition before fire is completed** (`action._recognition`): the
+first shot under false or no colours is a pirate's act, told once (`action.false_colours`),
+the ports' stance turned (`outlaw`) and every captain whose people had her in sight holding
+her a pirate from then on (`pirates`, the witnesses); then the mark is judged by what his
+people have made out: the colours shown against the wars, the private signal answered
+wrong or not at all, the hail's words, or her own shot (`captain.recognised`, `fired_on`),
+and 70's `action.unrecognised` is the exception. The refusal of the vocabulary is gone.
+
 ### 2. The private signal (`data/signals/private/*.yaml`; `freesail/world/signals.py` new; the papers)
 
 The recognition challenge and its reply: a small table per nation per month, issued under
@@ -95,6 +119,30 @@ or a merchant has no table and cannot answer; a captured table is a paper of a p
 7-v) and good until the month turns. The sources: the Admiralty's private signals as the
 period's letters and orders quote them (the form, not the actual tables, which were secret
 and are mostly lost); the game's tables are made, under the seed, in the period's form.
+
+**As built (package 71).** The table is a pure function of the world's seed, the nation,
+the year and the month (`signals.private_table`), drawn from the root's `private.yaml` form
+(a flag at a named place answered by another with the ensign where the table says; by night
+lights and a false fire): two ships of one nation in one world hold one table, a replay has
+it again, and the Spanish draw is not the Dutch. It is a paper of the ship's library ("the
+private signals", the captain's, in the cabin: this month's challenge and reply by day and
+by night), carried by the roles the root names (`carried_by`: a King's ship, a cruiser, a
+commodore) or given by the scenario's `papers: {private_signals: true}`; a merchantman, a
+packet, a fisherman and a privateer have none. `show the private signal` and `answer the
+private signal` are hoists of the `private` and `reply` books by the same hands. The rules
+captain of a King's ship makes it to every strange sail within the flags' range once her
+colours are made out (by day; the lights' range by night; never in fog, never in action,
+never to a ship under his own orders), one a minute, and judges the reply against his table
+from the moment his flags are up (`signalling._judge_challenges`): right makes her one of
+his and a sail spoken; a reply and the wrong one is the tell whatever her colours (she tried
+to pass for one of his); no answer under his own colours is the tell for a man of war's rig
+and leaves a trader's rig a stranger to be spoken (a merchantman never had the table); no
+answer under a neutral's colours a stranger still. A privateer whose doctrine bluffs hoists
+a guessed reply. The verdict is `signal.private_judged`, urgent when it makes an enemy, and
+the stranger is recognised so (`captain.recognised`), which the doctrine's `enemy made out`
+reads: the encounter's frigate challenges at 10:05, her flags up at 10:12, reads the
+privateer's guess wrong at 10:15 and gives chase at 10:16 (truth 7-144). A captured table is
+74's prize's by the same function for the captor.
 
 ### 3. The signal books (`data/signals/*.yaml`; `signals.py`; `freesail/evolutions/` the hoist)
 
@@ -137,6 +185,51 @@ meaning. The receiving rules captain acts by doctrine when the sender commands h
 `squadron:` relation of Part 7-vi) and logs it otherwise; a model is given the meaning in
 words and answers by meaning or by a free sentence.
 
+**As built (package 71; `docs/design/Design-Signals.md`, the shape written first).** One
+root a directory under `data/signals/`, the same six files in each: `book.yaml` (the
+nation, the system, the sources, the flags, a hoist's minute, the reading's minute, the
+flags' range and the glass's factor), `numerary.yaml` (the day signals, each `number`,
+`meaning` and `also`, `does` what a commanded captain performs, `qualifiers`,
+`in_succession`, `source`, `made`), `telegraphic.yaml` (Popham's dictionary and alphabet),
+`night_fog.yaml` (the night book's lights, false fires, rockets and guns, the fog book's
+guns, muskets, bell and drum, and the fog signals a ship keeps of herself), `convoy.yaml`
+(the instructions to merchantmen) and `private.yaml` (the table's form). A nation names
+its root and its system in `data/nations.yaml` (`signals: {root, system}`): **Britain**
+well-built (150 day signals from Howe 1790 and the 1799 book, the numbers remembered kept
+and the rest marked made; Popham's 1803 dictionary in a first version of 330 words numbered
+to the twelve hoists of 21 October 1805, J wanting and V before U, the rest spelt; 25 night
+and 16 fog signals; 32 convoy instructions), **France** well-built and smaller (70 day
+signals with the Code's phrases where remembered, no dictionary, which is history's), and
+**basic** the foundation every other nation stands on (46 day signals in the period's common
+form, no dictionary; every entry marked made). The `does` kinds are `order` (a dialect order
+with `{compass}`, `{place}` or `{number}` filled), `state`, `news`, `answer`, `closer` (the
+engaging range halved: No. 16) and `release`. A signal is made by its meaning (`make the
+signal to tack in succession`, `make the signal: enemy in sight bearing NW`, `make the
+signal No. 16`), the book chosen by the light (the numerary by day, the night book by night,
+in fog the gun fired by the battery), the convoy book when merchantmen are under the
+sender's orders; `make the telegraphic signal: <the words>` is a well-built book's with a
+dictionary and refused in words elsewhere. **The hoist is an evolution**
+(`data/evolutions/make_signal.yaml`, three hands at the halyards, a minute a hoist, a
+sentence a phase a word; it breaks out when the hands run it up and never of itself, so a
+hoist queued behind a wear is not read before it is up) kept flying on the body
+(`signals.Hoist`, a glass at most), **read by every lookout** once a minute at the flags'
+range by day (two miles, three with the glass), the lights' at night, the gun's in fog
+(`signals.read_flying`: "she makes a signal: two flags at the main", the meaning a minute
+later when the ship's library holds the sender's book, "a signal we cannot read: not of our
+book" when it does not, the answering pendant and the private signal by their form), and
+**acted on by a rules captain under the sender's orders** (`signalling`: answered with the
+pendant; obeyed by `does` through `Captain.give` on a crewed ship and `signals.far_perform`
+on a far body; `in_succession` performed each when the ship before her has, three minutes
+apart; `release` lets her go). The least relation is `Vessel.under_orders_of` (the
+scenario's `under_the_orders_of`, the director's `ship "X": under the orders of <ship |
+the ship | nobody>`) with the goal `in company with the ship` for a merchantman's keeping
+company (the `company` leg), and a brainless vessel under orders reads by the least
+captain (`signalling.brainless_minute`); the convoy of four tacks in succession on one hoist
+with no model seated (truth 7-145). The player's ship obeys nobody's signals. Readings:
+`the signals`, `the colours`, `the private signal`, `the lights`; the paper "the signal
+book". 72's squadron replaces the relation and keeps the entries' `does`; 76 builds the
+books out from the six files.
+
 ### 4. The hail, and the voice between ships (`freesail/world/hearing.py`, `orders.py`; `crews.py`; the harness)
 
 Within hail (the four cables the lookout has) a ship is spoken by the speaking trumpet:
@@ -154,6 +247,30 @@ boat as 63 and 53b have it, the search a scene of the director's or the rules' d
 (`say as the captain of the Medusa`), which is 52's rule across the water; 67's seat at a
 person makes a model that captain's voice without a seat at her helm.
 
+**As built (package 71; `world/hail.py`, `data/captains/hail.yaml`).** Within four cables
+`hail her`, `hail the brig: what ship is that?` and `say to the Nancy: heave to, I am
+sending a boat` speak another ship by the trumpet (beyond, refused with the cables): a line
+of the speaker's log (`hail.made`), a line heard on her deck (`hail.heard`, urgent, so a
+station there wakes and hears it under `heard`), and the answer by her body. **The rules
+captain** answers by the table: the half-dozen questions read in the words (what ship,
+whence, whither, cargo, news, the captain, the days out, heave to), each answered from her
+truth by her role and nation in the period's form ("His Majesty's cutter Sherbourne. And what
+ship is that?"; "The Nancy of Guernsey, from Guernsey for Falmouth, a cargo of salt"); a
+privateer under false colours lies by the merchant's table under the flag she shows, with a
+name and a port of that nation drawn under the seed; a demand to heave to is obeyed by a
+merchantman, a packet or a fisherman not at war with a King's ship (her captain heaves to),
+run from by an enemy's and by a privateer (she makes sail), declined by a King's ship. **A
+model** at the hailed ship's captain's station is given the words in his sample and nothing
+answers for him; he answers with his own `say to`. **The player** hears the answer on his
+deck (`hail.answered`); a rules captain's hail of him (43's line) is kept for his `say to
+her: ...`, and the answer's nation is read by the words (`nation_in_words`: "His Majesty's",
+"of Guernsey", "the French national") and recognised to the hailer, a liar's words believed
+(the private signal and the shot are the tells). Between two rules captains the standard
+exchange is written once in the lookout's line (`exchange_words`), both reading the other's
+nation. The hail is the first order of a search in that the heave-to is demanded and
+answered; the boat and the search are the director's scene and 63's. The hailed ship is
+spoken (`spoken`, both brains' `spoken_ids`).
+
 ### 5. The lights and the bell; sight across land (`lookout.py`; the standing orders)
 
 A stern lantern, top lights for a squadron keeping station, the fishing boat's lantern on
@@ -167,6 +284,21 @@ masthead, symmetric for the far ships' sightings; where the heights are unusable
 on the line blocks the sight. It bears on the chase and the privateer's trade, so it is
 7-i's and not later.
 
+**As built (package 71).** The lights are a state of the locker (`none`, `stern lantern`,
+`top lights`; 56's lantern at the nets kept) by `hoist the lights` / `hoist a stern lantern`
+/ `hoist the top lights` / `show no lights`, by the scenario's `lights:` and by the books'
+signals (the convoy's "hoist their lights"); the lookout sees a far ship's light at night as
+a sighting of its own ("A light two points on the bow, bearing SW") at `LIGHT_SEEN_NM`
+(three miles, within the visibility) beyond the hull's loom at the mile. In fog (the
+visibility under a mile) a ship keeping the fog signals (`keep the fog signals`, and the
+rules captain of himself while another sail has been in sight within the hour, so that no
+single ship's recorded passage moves) is heard beyond the visibility as a sighting by ear
+("A bell heard in the fog on the larboard bow, bearing W": the bell at anchor within the
+mile, a gun under way in company within three, the drum alone within the mile; the figures
+the Regulations' and the custom's from memory, in `night_fog.yaml`'s `keeping`), and a
+signal made in fog is the fog book's gun, fired by the battery and read by ear (truth
+7-147). **Sight across land is not built** (78's, by the brief).
+
 ### 6. Truths for 7-i (outline)
 
 A cutter under false colours spoken by a King's frigate answers the hail by the table and
@@ -175,6 +307,21 @@ the frigate's captain, who gives chase by doctrine; a convoy of four under a com
 in succession on one hoist with no model seated; a telegraphic sentence takes the hoists
 and the minutes the book says; a lugger behind a headland is not seen by the cruiser
 outside it; a signal made in fog is a gun and not a flag.
+
+**As built (package 71).** Truths 7-143 to 7-151 in `tests/test_known_truths.py`, measured
+at seed 7: a cutter under false colours is made out as British at the colours' range and
+answers the King's frigate's hail by the table with a lie (7-143); the private signal
+answered wrong makes her a stranger under false colours and the frigate gives chase by
+doctrine, the encounter's figures (7-144); a convoy of four under a commodore tacks in
+succession on one hoist with no model seated, each three minutes after the one ahead
+(7-145); Nelson's sentence takes twelve hoists and twelve minutes (7-146); a signal made in
+fog is a gun, heard at three miles and read by the book (7-147); the King's cutter engaging
+a privateer never puts her head within the close-hauled angle, and the first action ends an
+hour after the first shot (7-148, with 7-133 re-pinned); a shot under false colours is a
+pirate's act, told once, the ports turned and every witness holding her so (7-149); a light
+is seen at night at the range a lantern carries and a bell heard in fog (7-150); the pace
+with a convoy of four under orders and the hoists read each minute holds the floors (7-151).
+The lugger behind a headland is 78's.
 
 ---
 
@@ -334,8 +481,12 @@ firing when she strikes and when our own colours come down), the transitions int
 action (an enemy in range unless overmatched) and out of it (the mark struck, or none
 within the breaking-off distance for its minutes; a superior force hauled off from); a new
 role, the privateer (`cruise for prizes off <place>`), who engages what pays from long shot
-at the rigging and runs from a man of war; the nation's habit over the role's figures
-(`NATION_HABITS`: the French at twice the range and at the rigging on the up-roll). The
+at the rigging and runs from a man of war; the nation's habit over the role's figures (the
+French at twice the range and at the rigging on the up-roll; 70's `NATION_HABITS` in the
+code, moved by package 71 into each nation's `habits:` of `data/nations.yaml` beside her
+colours and her signals' root, on the owner's word of 2026-10-24). The engaging helm's law
+is package 71's `helm_in_action` (item 8: never within the close-hauled angle, the gage
+kept, the mark through the eye answered by the doctrine's `through_the_eye`). The
 captain's own on entering (the drum, the guns cast loose, loaded and laid, the mark on the
 side she bears) and each minute (an equal kept on the engaged beam at his range; a weaker
 mark, a smaller class or a merchantman, chased and closed to pistol shot). The

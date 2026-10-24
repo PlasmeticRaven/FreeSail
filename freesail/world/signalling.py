@@ -23,6 +23,11 @@ from freesail.world import signals as S
 
 __all__ = ["far_minute", "near_minute", "recognise", "verdict_of"]
 
+# The switches for the bisection of what each item moved (the tuning notes, package 71):
+# off, no challenge is made and no colours are shifted by doctrine.
+CHALLENGES = True
+DOCTRINE_COLOURS = True
+
 # The states in which a King's captain challenges a stranger (not in action, not struck).
 CHALLENGE_STATES = frozenset(
     {
@@ -144,6 +149,7 @@ def far_minute(brain: Any, p: Any) -> None:
     reader_id = str(vessel.id)
     if locker.flying and getattr(vessel, "crew", None) is None:
         locker.tidy(tick, books.flies_s)  # the far body has no lookout to tidy for her
+    heard: set[str] = set()
     for s in p.strangers:
         sid = str(s.get("id") or "")
         est = s.get("estimate_m")
@@ -175,15 +181,56 @@ def far_minute(brain: Any, p: Any) -> None:
             reader_id,
         )
         S.note_seen(locker, seen, tick)
+        heard.add(sid)
         for item in seen:
             if item.read and item.kind != "signal.answered":
                 _story(vessel, tick, item.text.rstrip("."))
+    if light == "fog":
+        _hear_fog_guns(brain, locker, books, tick, heard)
     _handle_log(brain, locker, tick, near=False)
     _judge_challenges(brain, locker, p, tick)
     _challenge_strangers(brain, locker, p, tick, near=False)
     _colours_by_doctrine(brain, locker, p, tick, near=False)
     _succession(brain, locker, tick, near=False)
     fog_signals_minute(brain, p, near=False)
+
+
+def _hear_fog_guns(brain: Any, locker: S.Locker, books: S.Books, tick: int, heard: set) -> None:
+    """In a fog the far body hears the fog book's gun from a ship she cannot see, within
+    `GUN_HEARD_NM` (the near body's lookout gives her the same as a sound sighting): the
+    ship she is under the orders of by her title, any other as a ship unseen."""
+    from freesail.world.geo import bearing_and_distance
+
+    vessel = brain.vessel
+    root = _root_world(brain)
+    others = [o for o in root.vessels.vessels if o is not vessel and not o.done]
+    shadow = root.vessels.player_shadow(root)
+    if shadow is not None:
+        others.append(shadow)
+    orders_of = str(getattr(vessel, "under_orders_of", "") or "")
+    for o in others:
+        sid = str(o.id)
+        if sid in heard:
+            continue
+        other = getattr(o, "signals", None)
+        if other is None or not other.flying:
+            continue
+        hoists = [h for h in other.flying_now(tick) if h.book == "fog"]
+        if not hoists:
+            continue
+        _, distance = bearing_and_distance(vessel.position, o.position)
+        if distance / units.NAUTICAL_MILE > S.GUN_HEARD_NM:
+            continue
+        words = (
+            "the commodore unseen in the fog" if sid == orders_of else "a ship unseen in the fog"
+        )
+        seen = S.read_flying(
+            locker, books, sid, words, hoists, float(distance), "fog", False, tick, str(vessel.id)
+        )
+        S.note_seen(locker, seen, tick)
+        for item in seen:
+            if item.read:
+                _story(vessel, tick, item.text.rstrip("."))
 
 
 def _story(vessel: Any, tick: int, words: str) -> None:
@@ -223,8 +270,8 @@ def _handle_log(cap: Any, locker: S.Locker, tick: int, near: bool) -> None:
             continue  # seen and not read: nothing to answer with
         # a signal of the book read: answered with the pendant, and obeyed when he commands us
         if h.key not in locker.answered:
+            _answer(cap, locker, books, sender, tick, near)  # the order marks it answered
             locker.answered.add(h.key)
-            _answer(cap, locker, books, sender, tick, near)
         commanded = S.commanded_by(_body_or_world(cap), sender) or (h.to == own)
         if commanded:
             if h.in_succession:
@@ -413,7 +460,7 @@ def _challenge_strangers(cap: Any, locker: S.Locker, p: Any, tick: int, near: bo
     """A King's captain makes the private signal to every strange sail within the flags'
     range by day and the lights' by night, once each; not in fog, not in action."""
     table = _table(cap)
-    if table is None or getattr(cap, "state", None) not in CHALLENGE_STATES:
+    if not CHALLENGES or table is None or getattr(cap, "state", None) not in CHALLENGE_STATES:
         return
     light = _light(cap)
     if light == "fog":
@@ -590,7 +637,7 @@ def _colours_by_doctrine(cap: Any, locker: S.Locker, p: Any, tick: int, near: bo
     when she has a stranger in hand and shows her own at the doctrine's range; any
     captain in action shows his true colours before his first shot (`_engage_now`)."""
     d = getattr(cap, "doctrine", None)
-    if d is None or not bool(d.threshold("false_colours", False)):
+    if not DOCTRINE_COLOURS or d is None or not bool(d.threshold("false_colours", False)):
         return
     state = getattr(cap, "state", None)
     c = locker.colours

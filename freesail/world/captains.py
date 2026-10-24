@@ -209,6 +209,9 @@ CLOSE_RANGE_M = 60.0
 # course in action is ordered nearer the wind than close-hauled and this, the same half
 # point the course-shaping's own rule keeps (`navigation.COURSE_NOT_LAID_MARGIN_POINTS`).
 ENGAGING_WIND_MARGIN_POINTS = 0.5
+# The law's switch, for the bisection of what it moved (the tuning notes, package 71): off,
+# 70's course by the mark's bearing alone is given again.
+HELM_IN_ACTION = True
 
 
 def helm_in_action(
@@ -3686,9 +3689,14 @@ class Captain(Judgement):
         from freesail.evolutions.scripts import close_hauled_true_angle
 
         closest = units.rad_to_deg(close_hauled_true_angle(self.world.ship))
-        course, word = helm_in_action(
-            p.heading_deg, p.wind_from_deg, closest, bearing, side, ratio, habit["side"]
-        )
+        if HELM_IN_ACTION:
+            course, word = helm_in_action(
+                p.heading_deg, p.wind_from_deg, closest, bearing, side, ratio, habit["side"]
+            )
+        else:  # 70's law, for the bisection alone
+            sign = 1.0 if side == "starboard" else -1.0
+            off = max(35.0, min(125.0, 90.0 + 55.0 * (1.0 - ratio)))
+            course, word = (bearing - sign * off) % 360.0, ""
         if "through the eye" in word:
             self._through_the_eye(p, mark, side)
         last = self._business.get("steered_for")
