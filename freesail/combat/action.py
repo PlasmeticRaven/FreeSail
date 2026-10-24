@@ -399,7 +399,12 @@ def strike(world: Any, by_rule: bool, words: str = "") -> str:
         Severity.URGENT,
         "action.struck",
         text,
-        data={"by_rule": by_rule, "morale": round(m.value, 2) if m is not None else None},
+        data={
+            "by_rule": by_rule,
+            "morale": round(m.value, 2) if m is not None else None,
+            "strike_below": m.strike_below if m is not None else None,
+            "reasons": m.reasons if m is not None else "",
+        },
     )
     captain = getattr(world, "captain", None)
     if captain is not None and hasattr(captain, "strike_state"):
