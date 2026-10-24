@@ -308,7 +308,9 @@ class Business:
         self.last_draw = now
         rates = self.data.get("arrivals_per_hour", {})
         most = int(self.data.get("most_ships", 16) * max(self.density, 1.0))
-        at_sea = sum(1 for d in self.drawn if not d.ended)
+        # the traders and the fishermen against the region's most (package 72: the sets, the
+        # blockaders and the ships in ordinary are the nations' and not counted against it)
+        at_sea = sum(1 for d in self.drawn if not d.ended and d.kind in ("trade", "fishing"))
         rng = self._rng()
         if at_sea < most and rng.random() < float(rates.get("trader", 0.0)) * self.density:
             self._trader(in_port=rng.random() < 0.5)
@@ -1028,7 +1030,18 @@ class Business:
         world.vessels.serial += 1
         world.vessels.add(vessel)
         self.drawn.append(
-            Drawn(vid, world.clock.tick, kind, description, nation, name, intent, said, carries)
+            # a brainless member of a set has her goal for her business (package 72)
+            Drawn(
+                vid,
+                world.clock.tick,
+                kind,
+                description,
+                nation,
+                name,
+                intent or goal,
+                said,
+                carries,
+            )
         )
         return vessel
 

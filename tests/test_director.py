@@ -1431,6 +1431,10 @@ UNPERFORMED_HERE = {
     'squadron "the Channel squadron": join the Harpy': "only as a prize",
     'squadron "the Channel squadron": recall the inshore division': "has no division named",
     "convoy: four merchantmen under a brig-sloop from Falmouth for Plymouth": "business is off",
+    # package 72: the Harpy is at sea, not in ordinary
+    'ship "Harpy": commissioned for cruise off the Lizard within 10 miles in 2 days': (
+        "is not in ordinary"
+    ),
 }
 
 
