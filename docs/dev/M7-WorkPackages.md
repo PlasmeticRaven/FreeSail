@@ -37,13 +37,14 @@ on these packages; that is the owner's choice.
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | approved and launched 2026-10-24 (Fable, in a worktree off `ca305c4`) |
-| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; runs after 73 |
+| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 82** (the owner, 2026-10-24: the boat and the player aboard another ship first) |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | behind 70 |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
 | 79 | Opus | The regimes from 72; the chart's Mediterranean block | behind 72 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
+| 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below), for the owner's approval; runs after 73, before 74 |
 | 81 | Opus | The viewer's action: the gun ports and the guns drawn with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
@@ -906,3 +907,108 @@ shown as sent; the ship files through the generator with sources; the pins re-me
 where a change moves them, old beside new, proven by bisection (the far fight wired can
 move passages with two far ships in anger: say which and why); never a test skipped,
 disabled or quarantined; realism, not pacing; the physics read and not changed.
+
+## Package 82: the boat as a vessel, and the player aboard another ship (`freesail/core/world.py`, `ui/console.py`, `ui/server.py`, the drivers: the followed ship; `freesail/world/crews.py`, `ships.py`, `people.py`, `places.py`, `stations.py`, `seats.py`, `orders.py` a person aboard another ship and the seat that follows him; `freesail/core/replay.py` the station on another ship replayed; `freesail/physics/` an oar force on a hull (new, by the brief's leave); `freesail/evolutions/` the boat's orders and the tow; `data/ships/boat-*.yaml` through `tools/gen_ships.py`; `freesail/world/movement.py`, `ports.py` the boat's errands as they are; `freesail/api/readings.py` the readings following the person; `freesail/agents/harness.py`, `director.py`, `data/director/`; the viewer (`client/`) drawing the boat; `docs/TechnicalSpec-M7b.md` §11, §12, §21k as built; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7b-113, 7b-114 and the M7 numbers after 73's)
+
+Fable; brought forward by the owner on 2026-10-24 to run after 73 and before 74, because
+74's captive is a person aboard another ship and its prize crew goes aboard by boat. Spec
+M7b §11 (a world with no player's ship: the followed ship in place of the given one), §12
+(the player on another ship and the replay of a station there) and §21k (towing by the
+boat, and the boat as a vessel), with their truths 7b-113 and 7b-114; M7b's packages 51 and
+63 on the books (this package takes the heart of 51 and all of 63; 51 keeps the director's
+chart and focus, §12a and §12b, for a later brief); 68's refusal of a person made aboard
+another ship (R-15) and 67's seat (every station of the player's ship seatable, a seat at a
+person as a voice, one aboard another ship refused for want of a World of people); 53's
+places and 66's line; the owner's own tests of the kedge and the boat (M7b spec §21k's
+head). **Generously scoped as the M7 packages are:** the brief binds the intent and names
+the ground, the builder designs, takes an item another way with its reason, grows a part
+where the work shows it should, and says what it left and why; no day count. **The followed
+ship and the person's movement between ships are designed first and written down before
+they are built** (a design note under `docs/design/`), because 74 builds the captive on
+them. Each item an intent with the lead's reading; the intent binds.
+
+1. **The followed ship in place of the given one (§11).** The game's centre (the
+   promotion's, the chart's, the pace rule's, the readings', the lookout's, the reckoning's,
+   the drivers') follows a ship rather than being the one ship given at the start: the
+   player's ship the followed ship by default, so nothing recorded moves; a scenario with
+   no player's ship (`ship: none`, `director: observe`) running its business and its ships
+   under their captains with the centre wherever the observer looks (`follow "Palinure"`,
+   the chart's view), the readings that assume a ship answering "no ship followed" in words,
+   the ship's orders refused in words, the world orders standing, the console and the
+   browser opening at the director's station. *The lead's reading of the cost* stands as the
+   spec has it: the World's construction assumes a ship in several places, and the package
+   measures what moved (nothing pinned should).
+2. **The player on another ship, and the seat that follows the person (§12; 67 and 68).**
+   `--seat captain --ship <id>` for the player, seated under the same contract as a model
+   there, the drivers' centre following the ship he is aboard; **a person aboard another
+   ship made real**: the player and any person may be aboard a ship not the given one, that
+   ship given her World of people as the cap promotes her (68's refusal lifted and 67's
+   "one aboard another ship" seatable), his place and his voice there as 53's places and
+   66's line have them, the readings his ship's while he is in her; **the person moving
+   between ships** by the boat (item 4), by boarding (73's deck won) and by capture (74's
+   captive, the hook left: a person put aboard the captor with his station's seat following
+   him or standing down by the handover's rule); the director's `aboard:` and `ship "X":`
+   forms reaching a person on any ship. The design question is the seat: a station is a
+   person aboard, so a person who changes ships keeps his station and the ship under it
+   changes, or the station ends and a new one begins on the other ship with the same holder;
+   the builder decides and writes why (the replay and the consent's record must both hold).
+3. **The replay of a station on another ship (§12).** A save with a station on another
+   ship replays that station's acts as it replays the player's (the checkpoint carries the
+   other ship whole; the acts keyed by ship), and a person who moved between ships in play
+   moves the same in the replay to the same digest.
+4. **The boat as a vessel (§21k).** Each ship's boat a ship file through the generator (a
+   16-ft boat with four oars and a sprit or lug stepped at will; the frigate's launch and
+   cutter larger; with sources or the word judgement), a vessel of the world when manned
+   and away from the ship (crewed by the promotion's machinery, her own World, small), **an
+   oar force on a hull** as her propulsion by the hands at the oars and their fatigue (the
+   one physics addition this brief allows, with its source) and the sail when stepped; the
+   sweeps' orders (`give way`, `lie on your oars`, `step the mast`, `set the lug`, `pull
+   for <the point>`); **the player aboard her** by `go to the boat` and item 2's seat, her
+   readings his while he is in her and the ship's again when he comes aboard; the errands
+   (ashore, the kedge, the tow, the pilot, the prices) done by her as before when nobody is
+   in her; the viewer drawing her under oars or sail; the account following the boat as a
+   vessel's; the boat lost (stove, swamped, cut adrift) as a state the ship's file knows.
+5. **Towing by the boat, and the kedge's false denial (§21k).** `tow her with the boat [to
+   <the point or bearing>]`: the boat ahead on a tow-line with her oars, the ship's head
+   brought round or the ship moved at the boat's pace against her resistance and the tide
+   (a quarter of a knot to a knot for a cutter or a lugger by the boat's size and hands;
+   little or nothing for the frigate, whose boats towed her head round in a calm and no
+   more: the period's practice, a judgement in the notes), the boat's crew tiring by the
+   hour, `the boat alongside` ending it, refused in a sea the boat cannot work in; the same
+   oar force for the tow and for the boat herself; the kedge's false denial ("the boat was
+   not sent away" while the lay-out went on) mended, kedging itself left to the anchor
+   physics it is in.
+6. **The stations, the director and the readings.** `the boat`, `the boats`, `where am I`
+   answering the ship or the boat the person is in, `the followed ship`; the events and
+   tripwires (`the boat away`, `the boat alongside`, `aboard the <ship>`); the director's
+   forms after `WORLD_ORDER_FORMS` (`follow "X"`, a person put aboard another ship, the
+   boat sent); the harness's samples following the person's ship; the truth showing every
+   boat as a vessel when she is one.
+7. **Truths and records.** Truths 7b-113 (the lugger becalmed with the ebb setting her
+   toward the Lavandière towed clear by her boat at half a knot; the frigate's boats bring
+   her head round in a calm and move her no distance worth the account's notice) and 7b-114
+   (the player in the cutter's boat pulls ashore at Falmouth from Carrick Road under oars,
+   steps the mast and sails her back under her lug, the readings his in the boat and the
+   ship's again aboard; the boat's errands run as before with nobody in her), and M7 truths
+   numbered from the first after 73's (a world with no player's ship runs a day with its
+   business and the centre on the followed ship, nothing pinned moved; the player seated as
+   captain of another ship with the player's ship brainless and far; a person moved from
+   one ship to another by the boat in play and in the replay to the same digest; the
+   director's `follow`); spec M7b §11, §12 and §21k "as built"; the Harness (the seat on
+   another ship, the readings following the person); a chapter of the primer (the boat; going
+   aboard another ship); the director's library; the tuning notes (the design or its
+   pointer, each item, what moved and its proof by bisection, the pins old beside new,
+   found on the way, decisions, the suite as run); the fast tier, the slow tier of the
+   touched files, the whole slow tier when the machine is quiet, the pace tests alone and
+   last.
+
+**Not built here:** the director's chart and focus (§12a, §12b; 51's remainder); the boats
+as fighting vessels and cutting out (77); the captive's channel itself (74, on item 2's
+hook); the prize crew (74). **The head rules bind** as the briefs before have them: no model
+identifier; nothing under `docs/agents/consent/` touched (a seat on another ship is read
+from the consent record as 67 reads it; if the brief's words do not cover it, the seat is
+refused in words and the gap named for 55); a world order never shown as sent; the ship
+files through the generator with sources; the pins re-measured only where a change moves
+them, old beside new, proven by bisection (the followed ship should move nothing pinned:
+if it does, that is a finding); never a test skipped, disabled or quarantined; realism,
+not pacing; the physics read and not changed but for the oar force this brief names.
