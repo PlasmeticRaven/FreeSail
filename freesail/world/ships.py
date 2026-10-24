@@ -1341,9 +1341,10 @@ class Vessels:
                 continue
             v.brain.tick()
         sets = getattr(world, "squadrons", None)
-        if sets is not None and sets.sets:
+        if sets is not None:
             # the squadrons' minute (package 72; spec M7 §21): the stations computed from
-            # the commanders' frames, the stragglers counted, the commanders' books read
+            # the commanders' frames, the stragglers counted, the commanders' books read;
+            # and the far captures, a rule of the sea whether a set is on it or not
             lines.extend(sets.tick(world))
         if any(v.under_orders_of and v.brain is None and not v.done for v in self.vessels):
             # a vessel under another's orders with no brain (a convoy's merchantman given

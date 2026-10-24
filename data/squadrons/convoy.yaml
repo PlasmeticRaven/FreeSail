@@ -1,0 +1,88 @@
+# FreeSail: the convoy's book (spec M7 §21, §22; package 72; docs/design/Design-Squadrons.md).
+# Read by freesail/world/squadrons.py: the commander's standing orders for a convoy, as a
+# book like the captain's. The order of sailing and its intervals, the convoy's pace, what
+# makes a straggler and when she is lost, the night orders, and a few rules in data that make
+# the commodore's signals when a rules captain commands (a model at the flagship or the
+# player gives his own signals, and no rule fires while he holds the station). Every figure
+# is JUDGEMENT after the sources named, from memory; the owner tunes this file with a text
+# editor, as the captains' books.
+#
+# Sources: the Admiralty's *Signals and Instructions for Ships under Convoy* (the
+# instructions to masters: to keep their stations in the order the commodore appoints, in
+# close order, not to separate on a strange sail's appearance, to repeat his signals, to
+# hoist their lights by night; the convoy to sail at the rate of the dullest sailer; from
+# memory); the *Regulations and Instructions* of 1806 on the order of sailing and the
+# escort's duty (not to leave the convoy to chase); the convoy acts of 1798 and 1803 on
+# the trade sailing under convoy (from memory); Falconer 1780, CONVOY and STATION.
+
+kind: convoy
+name: the convoy's book
+source: "the Signals and Instructions for Ships under Convoy and the Regulations 1806, from memory; every figure judgement"
+
+# the order of sailing: the merchantmen in columns to leeward of the escort, two cables apart
+formation: order of sailing
+columns: 2
+interval_cables: {value: 2, source: "the convoy instructions' close order, two cables apart (from memory); judgement"}
+# the convoy sails under the slowest ship's best, so that she keeps her station
+pace_factor: {value: 0.9, source: "the convoy to sail at the rate of the dullest sailer (the instructions, from memory); nine tenths of her best so that she can keep up; judgement"}
+# a member this far from her station for so long is a straggler; this far she is lost to
+# the convoy (beyond the flags' reach with the glass) and proceeds alone for the port
+straggler_nm: {value: 1.0, source: "a mile out of her station: beyond the close order's reach and a signal's quick answer; judgement"}
+straggler_minutes: {value: 10, source: "ten minutes, not a yaw; judgement, as the captains' dwell"}
+lost_nm: {value: 6.0, source: "six miles: beyond the flags' range with the glass (data/signals/britain/book.yaml); judgement"}
+separated_nm: {value: 10.0, source: "ten miles: out of sight of the convoy's hulls from a brig's tops; a separated ship makes for the rendezvous; judgement"}
+# an enemy made out within this of the convoy brings it round the commodore; a straggler
+# with an enemy within the cover distance is covered by the escort
+convoy_close_nm: {value: 4.0, source: "an enemy within four miles is an hour from the convoy at the privateers' pace; judgement"}
+cover_nm: {value: 2.0, source: "an enemy within two miles of a straggler is covered: the escort can be up with her within the hour; judgement"}
+night: {lights: stern lantern, source: "the convoy instructions' night orders: every ship to carry a light; judgement on the kind"}
+
+# the commodore's rules: each fired once when its stimulus holds and armed again by its
+# re-arm; `signal` is made by its meaning from the convoy book (the merchantmen read that
+# book and no other), `order` is given to the commodore's own ship, `do` is the escort's
+# own act (cover a straggler; recall himself), `formation` the set's; `near_only` rules run
+# only when the commodore's body is the physics' (the player's rules captain, or a crewed
+# commodore), since a far body's pace is capped by the set and wants no sail shortened
+rules:
+  - key: close
+    on: enemy in sight
+    signal: close round the commodore
+    formation: close order
+    rearm: enemy lost
+    on_rearm: {formation: order of sailing}
+    source: "the convoy instructions: the signal to close round the commodore on an enemy's appearance (from memory)"
+  - key: straggler
+    on: straggler
+    signal: the ships astern to make more sail
+    to: straggler
+    rearm: in station
+    source: "the convoy instructions: the sternmost ships to make more sail (from memory)"
+  - key: cover
+    on: straggler threatened
+    do: cover
+    rearm: enemy lost
+    on_rearm: {do: recall}
+    source: "the escort's duty to the straggler, the convoy kept together (the Regulations 1806; judgement)"
+  - key: lights
+    on: night
+    signal: hoist the lights
+    order: hoist a stern lantern
+    rearm: day
+    source: "the convoy instructions' night orders (from memory)"
+  - key: pace
+    on: member astern
+    order: shorten sail
+    near_only: true
+    repeat_minutes: 20
+    rearm: all in station
+    source: "the convoy to sail at the rate of the dullest sailer: the commodore shortens sail for a ship astern of her station (the instructions, from memory)"
+  - key: pace_on
+    on: all in station
+    order: set plain sail
+    near_only: true
+    rearm: member astern
+    source: "and makes sail again when his convoy is closed up; judgement"
+  - key: anchor
+    on: commander in port
+    signal: anchor
+    source: "the convoy to anchor with the commodore at the port (the instructions, from memory)"

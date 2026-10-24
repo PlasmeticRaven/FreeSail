@@ -1,0 +1,57 @@
+# FreeSail: the blockade's book (spec M7 §22; package 72; docs/design/Design-Squadrons.md).
+# Read by freesail/world/squadrons.py and the regimes (data/regimes.yaml): a blockading
+# squadron keeps an inshore station off the port's approach and an offshore one in the
+# offing, and is blown off by a westerly gale to its lee rendezvous, where it waits for the
+# wind to come fair and returns. Every figure is JUDGEMENT after the sources named, from
+# memory; 79 builds the regime out; the owner tunes this file with a text editor.
+#
+# Sources: the blockade of Brest of 1803 to 1805 under Cornwallis (the inshore squadron
+# off the Black Rocks under a captain, the main body off Ushant, the whole bearing up for
+# Torbay in a westerly gale and beating back when it moderated; Mahan, *The Influence of
+# Sea Power upon the French Revolution and Empire*, ch. XV and XVI, and James, from
+# memory); the *Regulations and Instructions* of 1806 on ships in company.
+
+kind: squadron
+name: the blockade's book
+source: "the blockade of Brest, 1803 to 1805 (Mahan, James, from memory); every figure judgement"
+
+formation: line ahead
+interval_cables: {value: 3, source: "a cruising line in the offing, a little open: three cables; judgement"}
+pace_factor: {value: 0.95, source: "judgement"}
+straggler_nm: {value: 2.0, source: "two miles on a blockade's station, where the squadron works in a wider order; judgement"}
+straggler_minutes: {value: 15, source: "judgement"}
+lost_nm: {value: 12.0, source: "twelve miles; judgement"}
+separated_nm: {value: 15.0, source: "fifteen miles: a ship separated in a gale makes for the rendezvous; judgement"}
+convoy_close_nm: {value: 8.0, source: "an enemy made out within eight miles of the squadron is its news; judgement"}
+cover_nm: {value: 3.0, source: "judgement"}
+night: {lights: top lights, source: "the Regulations 1806"}
+
+# the two stations of the regime (the inshore division's and the main body's), each the
+# captain's station intent the business or the scenario gives; and the gale that blows the
+# whole off to its lee rendezvous
+inshore: {place: the Black Rocks, within_nm: 6, kind: brig-sloop, source: "the inshore squadron off the Black Rocks (Mahan, from memory); judgement on the miles"}
+offshore: {place: Ushant, within_nm: 15, kind: frigate, source: "the main body off Ushant (Mahan); the Ushant station of package 40c's trials"}
+blown_off:
+  wind_kn: {value: 34, source: "Beaufort's force 8, the gale the captains' books heave to in"}
+  from_deg: [225, 315]
+  rendezvous: Torbay
+  source: "Cornwallis's squadron bearing up for Torbay in a westerly gale and beating back when it moderated (Mahan, James, from memory)"
+
+rules:
+  - key: blown_off
+    on: gale from the west
+    goal: "bound for {rendezvous}"
+    rearm: gale over
+    on_rearm: {goal: restore}
+    source: "the squadron bears up for its rendezvous in a westerly gale and returns to its station when the wind moderates (the blockade of Brest, from memory)"
+  - key: enemy
+    on: enemy in sight
+    signal: enemy in sight
+    rearm: enemy lost
+    source: "the 1799 book, No. 1"
+  - key: lights
+    on: night
+    signal: hoist the lights
+    order: hoist the top lights
+    rearm: day
+    source: "the Regulations 1806"

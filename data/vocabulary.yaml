@@ -873,6 +873,16 @@ verbs:
                chase the brig, chase the cutter, chase the schooner, chase the ship, chase the frigate]
     object: navigation
     level: 1
+  # Station keeping (spec M7 §21; package 72; `freesail/orders/station.py`): a held order
+  # of the navigation, in the family of `keep her full and by`: her station in her set, or
+  # so many cables in a direction of a ship named ('keep station two cables astern of the
+  # Harpy'), kept by the lookout's bearing and distance of the flag; the `in company` book
+  # of every role gives `keep your station` every two minutes.
+  keep station:
+    synonyms: [keep your station, keep her station, take station, take your station,
+               take up your station, keep station in the line, keep your station in the line]
+    object: navigation
+    level: 1
   # The port (spec M5 §23; `freesail/orders/port.py`): the object `port` takes the words
   # after the verb as said (a person for the boat, a number of tons and a good, an item
   # of the yard, a number of hands and a rating).

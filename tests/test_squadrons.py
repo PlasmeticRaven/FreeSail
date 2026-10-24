@@ -255,3 +255,219 @@ squadrons:
     path.write_text(bad, encoding="utf-8")
     with pytest.raises(Exception, match="no kind"):
         load_scenario(path)
+
+
+# -- the commander's book and his minute -------------------------------------------------
+
+
+def test_the_commodores_book_signals_a_straggler_and_she_makes_sail():
+    """A merchantman a mile and a half astern is a straggler after ten minutes; the convoy book's
+    rule makes the signal (No. 20, the ships astern to make more sail) on the far
+    commodore's locker, and she reads and performs it; she regains her station under the
+    capped convoy (at half a knot of closing) within four hours and the rule re-arms."""
+    w, sq, harpy = convoy_world(brains=(False, False, False))
+    p = destination(harpy.position, 235.0, 1.6 * units.NAUTICAL_MILE)
+    nancy = put(
+        w,
+        "merchant brig",
+        "britain",
+        {"lat_deg": p.lat_deg, "lon_deg": p.lon_deg},
+        "bound for the Start",
+        name="Nancy",
+    )
+    sq.join(w, nancy.id)
+    w.run(900)
+    assert nancy.id in sq.stragglers
+    assert "rule:straggler" in sq.made
+    assert any("ships astern to make more sail" in words for _, words in harpy.story)
+    w.run(600)
+    assert any("made sail" in words for _, words in nancy.story), nancy.story
+    w.run(11400)
+    assert nancy.id not in sq.stragglers and "rule:straggler" not in sq.made
+    assert off_station_m(w, sq)[nancy.id] <= Q.STATION_TOLERANCE_M
+
+
+def test_a_crewed_commodore_shortens_sail_by_his_book_when_a_member_falls_astern():
+    """The near body has no pace cap: the commodore promoted within the player's four
+    miles runs away from his convoy at the physics' pace, and the book's near-only rule
+    has him shorten sail (by steps, every twenty minutes while one is astern)."""
+    w, sq, harpy = convoy_world(brains=(True, False, True, False), cap=3)
+    # the player's frigate is six miles off: close the convoy to within the range
+    here = w.position
+    for v in w.vessels.vessels:
+        b, d = bearing_and_distance(here, v.position)
+        v.position = destination(
+            here, b, max(d - 3.5 * units.NAUTICAL_MILE, 0.3 * units.NAUTICAL_MILE)
+        )
+    w.run(1500)
+    assert harpy.crew is not None and harpy.crew.shape == "full"
+    assert "rule:pace" in sq.made
+    said = [e.text for e in harpy.crew.log if "shortening sail (the squadron's book)" in e.text]
+    assert said, [e.text[:80] for e in harpy.crew.log if "captain" in e.kind][-5:]
+
+
+def test_an_enemy_made_out_closes_the_convoy_round_the_commodore_with_no_model_seated():
+    """A French privateer schooner under British colours within two miles of the convoy:
+    the commodore challenges her with the private signal, her bluff is wrong, she is an
+    enemy to him, and his book makes the convoy book's signal to close round the commodore
+    (the set in close order), which the merchantmen read and answer; when she is lost the
+    order of sailing is formed again."""
+    w, sq, harpy = convoy_world(brains=(False, False, False, False))
+    w.run(1200)
+    p = destination(harpy.position, 150.0, 1.8 * units.NAUTICAL_MILE)
+    pv = put(
+        w,
+        "schooner",
+        "france",
+        {"lat_deg": p.lat_deg, "lon_deg": p.lon_deg},
+        "cruising off the Lizard within 20 miles",
+        intent="cruise for prizes off the Lizard within 20 miles",
+        colours="British",
+        name="Vengeur",
+    )
+    pv.sailing_factor = 1.0
+    for _ in range(70):
+        w.run(60)
+        if "rule:close" in sq.made:
+            break
+    assert "rule:close" in sq.made, (harpy.story, harpy.brain.recognised)
+    assert sq.formation == "close order"
+    assert any("close round the commodore" in words for _, words in harpy.story)
+    w.run(600)
+    gap = sq.interval_m * 0.5
+    slots = sq.slots(w)
+    body = [m for m in sq.others()]
+    assert max(abs(slots[m][1]) for m in body) <= gap + 1.0
+    # the merchantmen read it and answered with the pendant
+    read = [
+        m for m in sq.others() if any("close round" in words for _, words in w.vessels.get(m).story)
+    ]
+    assert len(read) >= 2, [w.vessels.get(m).story for m in sq.others()]
+
+
+# -- the straggler cut out at far detail -----------------------------------------------------
+
+
+def test_a_merchantman_brought_to_by_a_privateer_with_no_cover_strikes_and_joins_his_company():
+    """Rule 5's least (74's hook): a merchant brig alone, a French privateer schooner a mile
+    off who chases her and comes up within hail with no man of war of hers within two
+    miles: she strikes by rule, her colours struck, and joins the privateer's company as a
+    prize, keeping station on him as he returns to his cruise."""
+    w = world_at(49.5, -5.5, intent=STATION_INTENT)
+    w.crewed_settings = {"cap": 0}
+    w.run(60)
+    far = destination(w.position, 180.0, 12.0 * units.NAUTICAL_MILE)
+    # a merchantman with her goal and no brain, as a convoy's are (one with a brain of her
+    # own evades at seven knots, and a topsail schooner at seven and a fifth closes her at a
+    # fifth of a knot: a stern chase of hours, which is the physics and honest)
+    prey = put(
+        w,
+        "merchant brig",
+        "britain",
+        {"lat_deg": far.lat_deg, "lon_deg": far.lon_deg},
+        "bound for the Start",
+        name="Nancy",
+    )
+    prey.sailing_factor = 0.85  # a dull sailer, as the record has the stragglers
+    p = destination(far, 270.0, 1.2 * units.NAUTICAL_MILE)  # to windward, within the tops' range
+    pv = put(
+        w,
+        "schooner",
+        "france",
+        {"lat_deg": p.lat_deg, "lon_deg": p.lon_deg},
+        "cruising off the Lizard within 20 miles",
+        intent="cruise for prizes off the Lizard within 20 miles",
+        colours="shown",
+        name="Vengeur",
+    )
+    pv.sailing_factor = 1.0
+    for _ in range(150):
+        w.run(60)
+        if prey.struck:
+            break
+    assert prey.struck and prey.state == "struck"
+    assert prey.signals.colours.state == "struck"
+    company = w.squadrons.commanded_by(pv.id)
+    assert company is not None and prey.id in company.prizes and prey.squadron == company.id
+    assert any("struck" in words for _, words in prey.story)
+    assert any(e.kind == "squadron.cut_out" for e in w.log)
+
+
+def test_the_cut_out_is_withheld_while_a_man_of_war_of_hers_is_within_the_cover_distance():
+    from freesail.world import squadrons as Q2
+
+    w = world_at(49.5, -5.5, intent=STATION_INTENT)
+    w.crewed_settings = {"cap": 0}
+    w.run(60)
+    far = destination(w.position, 180.0, 12.0 * units.NAUTICAL_MILE)
+    prey = put(
+        w,
+        "merchant brig",
+        "britain",
+        {"lat_deg": far.lat_deg, "lon_deg": far.lon_deg},
+        "bound for the Start",
+        name="Nancy",
+    )
+    p = destination(far, 200.0, 0.05 * units.NAUTICAL_MILE)
+    pv = put(
+        w,
+        "schooner",
+        "france",
+        {"lat_deg": p.lat_deg, "lon_deg": p.lon_deg},
+        "cruising off the Lizard within 20 miles",
+        intent="cruise for prizes off the Lizard within 20 miles",
+        name="Vengeur",
+    )
+    pv.brain.state = "chasing"
+    pv.brain._stranger = prey.id
+    q = destination(far, 90.0, 1.0 * units.NAUTICAL_MILE)
+    put(
+        w,
+        "brig-sloop",
+        "britain",
+        {"lat_deg": q.lat_deg, "lon_deg": q.lon_deg},
+        "bound for the Start",
+        intent="bound for the Start",
+        name="Harpy",
+    )
+    assert Q2._armed_enemy_alongside(w, prey) is pv and Q2._covered(w, prey)
+    assert Q2.far_captures(w) == [] and not prey.struck
+
+
+# -- the succession by the wake --------------------------------------------------------------
+
+
+def test_the_convoy_tacks_in_succession_by_the_wake_each_at_the_ship_aheads_turning_point():
+    """In line ahead four cables apart, the far commodore's hoist of the convoy book's No. 5
+    is read by each merchantman and performed in succession by the wake: each puts about
+    when her own run since the ship ahead went about reaches the distance she was astern
+    of her, so the second is four cables of run after the first (five or six minutes at the
+    convoy's pace, the run counted by the minute), not 71's three minutes; at two cables
+    and this pace the two coincide, which is why the test opens the line. The ships under
+    orders outside a set keep the three minutes (truth 7-145)."""
+    from freesail.world import signals as S
+
+    w, sq, harpy = convoy_world(brains=(False, False, False), formation="line ahead")
+    sq.interval_m = 4.0 * units.CABLE
+    w.run(7200)
+    assert all(e <= Q.STATION_TOLERANCE_M for e in off_station_m(w, sq).values())
+    books = S.books_for_nation(w.nations, "britain")
+    entry, q = books.find("tack in succession", "convoy")
+    S.make_hoist(S.vessel_locker(harpy), books, entry, q, harpy.id, int(w.clock.tick))
+    about: dict[str, int] = {}
+    where: dict[str, object] = {}
+    for _ in range(40):
+        w.run(60)
+        for m in sq.others():
+            v = w.vessels.get(m)
+            if m not in about and any("went about" in words for _, words in (v.story or ())):
+                about[m] = next(t for t, words in v.story if "went about" in words)
+                where[m] = v.position
+    assert set(about) == set(sq.others()), about
+    ticks = [about[m] for m in sq.others()]
+    gaps = [b - a for a, b in zip(ticks, ticks[1:], strict=False)]
+    assert ticks == sorted(ticks) and all(300 <= g <= 420 for g in gaps), gaps
+    others = sq.others()
+    for a, b in zip(others, others[1:], strict=False):
+        _, d = bearing_and_distance(where[a], where[b])
+        assert d <= 1.5 * units.CABLE, (a, b, d)

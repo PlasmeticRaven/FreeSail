@@ -39,6 +39,7 @@ from typing import Any
 import yaml
 
 from freesail import units
+from freesail.core.events import Severity
 from freesail.world.geo import Position, bearing_and_distance, distance_words
 
 __all__ = [
@@ -121,6 +122,14 @@ def load_book(name: str) -> dict[str, Any]:
     raw: dict[str, Any] = {}
     if path.is_file():
         raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    rules = []
+    for rule in raw.get("rules") or []:
+        if isinstance(rule, dict):
+            # YAML 1.1 reads a bare `on:` as the boolean key True (as the doctrine loader
+            # notes): the key is given its word again
+            rule = {("on" if k is True else str(k)): v for k, v in rule.items()}
+        rules.append(rule)
+    raw["rules"] = rules
     _BOOKS[key] = raw
     return raw
 
@@ -462,7 +471,7 @@ class Squadron:
         if self._stations_tick == tick and self._stations:
             return self._stations
         out: dict[str, Position] = {}
-        guide = _frame_of(world, self.commander)
+        guide = self._guide_frame(world)
         if guide is not None:
             pos, course, lee_sign = guide
             slots = self.slots(world)
@@ -490,6 +499,53 @@ class Squadron:
 
     def station_of(self, world: Any, vessel_id: str) -> Position | None:
         return self.stations(world).get(str(vessel_id))
+
+    # the guide's dead reckoning while the commander is away: (position, course, tick)
+    _guide_dr: tuple[Position, float, float, int] | None = None
+
+    def _commander_on_detour(self, world: Any) -> bool:
+        """The commander off his plan (chasing, investigating, engaging, evading): the
+        convoy stands on by the guide's reckoning and does not follow him."""
+        if self.commander == PLAYER_ID:
+            cap = getattr(world, "captain", None)
+            state = getattr(cap, "state", None) if cap is not None and cap.commands else None
+        else:
+            body = _body(world, self.commander)
+            crew = getattr(body, "crew", None) if body is not None else None
+            if crew is not None and getattr(crew, "shape", "full") == "full":
+                state = getattr(getattr(crew, "captain", None), "state", None)
+            else:
+                state = getattr(getattr(body, "brain", None), "state", None)
+        return state in ("chasing", "investigating a stranger", "engaging", "evading")
+
+    def _guide_frame(self, world: Any) -> tuple[Position, float, float] | None:
+        """The frame the stations are laid in: the commander's while he keeps his plan;
+        while he is on a detour the guide stands on from where he left it, at the set's
+        pace along his last course (the convoy does not chase with its escort), and he
+        takes it up again where it has got to."""
+        tick = int(world.clock.tick)
+        if not self._commander_on_detour(world):
+            self._guide_dr = None
+            return _frame_of(world, self.commander)
+        if self._guide_dr is None:
+            frame = _frame_of(world, self.commander)
+            if frame is None:
+                return None
+            pos, course, lee = frame
+            body = _body(world, self.commander)
+            kn = float(getattr(body, "speed_kn", 0.0) or 0.0) if body is not None else 0.0
+            if body is not None and getattr(body, "pace_cap_kn", None) is not None:
+                kn = min(kn, float(body.pace_cap_kn)) if kn > 0 else float(body.pace_cap_kn)
+            self._guide_dr = (pos, course, max(kn, 2.0), tick)
+            return pos, course, lee
+        pos, course, kn, since = self._guide_dr
+        step = units.knots_to_ms(kn) * float(tick - since)
+        rad = math.radians(course)
+        here = pos.advanced(step * math.sin(rad), step * math.cos(rad))
+        self._guide_dr = (here, course, kn, tick)
+        wind_from = _wind_from_at(world, here)
+        rel = units.rad_to_deg(units.wrap_pi(math.radians(wind_from - course)))
+        return here, course, (1.0 if rel <= 0.0 else -1.0)
 
     def guide_velocity(self, world: Any, vessel_id: str) -> tuple[float, float]:
         """The way over the ground (m/s east, north) of the ship this member keeps her
@@ -559,7 +615,424 @@ class Squadron:
                     del self.stragglers[m]
                     lines.append(self._regained_line(world, m))
         self._cap_the_pace(world)
+        lines.extend(self._released(world))
+        self._read_commanders_signals(world)
+        lines.extend(self._commanders_minute(world))
         return lines
+
+    # -- the commander's signals, read on the set ---------------------------------------
+
+    def _released(self, world: Any) -> list[tuple[Any, ...]]:
+        """A member whose relation no longer names her leader was released by signal
+        (71's `release`: part company, the convoy to disperse): she leaves the set."""
+        lines: list[tuple[Any, ...]] = []
+        for m in list(self.others()):
+            body = _body(world, m)
+            if body is None:
+                continue
+            if str(getattr(body, "under_orders_of", "") or "") != self.leader_of(m):
+                self.leave(world, m, "released by signal")
+                lines.append(
+                    (
+                        Severity.ROUTINE,
+                        "squadron.parted",
+                        f"{self._name_of(world, m)} has parted company with {self.name}.",
+                        {"id": m, "squadron": self.id},
+                    )
+                )
+        return lines
+
+    def _read_commanders_signals(self, world: Any) -> None:
+        """The commander's own hoists (made by his rule, by the player or by a model) are
+        the command for the set: the formations formed, the ships pointed out to chase
+        detached as a division under the first named, the chase discontinued recalling
+        them. Each hoist read once."""
+        locker = _locker_of(world, self.commander)
+        if locker is None:
+            return
+        for h in list(getattr(locker, "made", ()) or ()):
+            key = h.key
+            if key in self.made:
+                continue
+            low = str(h.meaning or "").lower()
+            if h.book not in ("numerary", "convoy", "night", "fog"):
+                continue
+            self.made[key] = int(world.clock.tick)
+            if "order of sailing" in low:
+                self.formation = "order of sailing"
+                if "two columns" in low:
+                    self.columns = 2
+                self._note(world, "the order of sailing formed by signal")
+            elif "line of battle ahead" in low or "line ahead" in low or "line of bearing" in low:
+                self.formation = "line ahead"
+                self._note(world, "the line ahead formed by signal")
+            elif "abreast" in low:
+                self.formation = "line abreast"
+                self._note(world, "the line abreast formed by signal")
+            elif (
+                "closer order" in low or "close round the commodore" in low or "close order" in low
+            ):
+                self.formation = "close order"
+                self._note(world, "close order by signal")
+            elif "pointed out to chase" in low and h.to and h.to in self.members:
+                if not self.is_division_leader(h.to) and h.to != self.commander:
+                    self.detach(world, "chasing", h.to, [])
+            elif "discontinue the chase" in low or "rejoin" in low:
+                for name in list(self.divisions):
+                    if name == "chasing":
+                        self.recall(world, name)
+            self._stations_tick = -1
+
+    # -- the commander's minute: his book's rules -----------------------------------------
+
+    def _commander(self, world: Any) -> tuple[Any, Any, str] | None:
+        """(the captain-like, his perception, the body: 'far' | 'crewed' | 'player') of a
+        rules commander; None when a model or the player holds the commander's station, or
+        the director's hand holds him (then the signals are theirs)."""
+        if self.commander == PLAYER_ID:
+            cap = getattr(world, "captain", None)
+            if cap is None or not getattr(cap, "commands", False):
+                return None
+            from freesail.world.captains import Perception
+
+            return cap, Perception.read(world), "player"
+        body = _body(world, self.commander)
+        if body is None:
+            return None
+        crew = getattr(body, "crew", None)
+        if crew is not None and getattr(crew, "shape", "full") == "full":
+            cap = getattr(crew, "captain", None)
+            if cap is None or not getattr(cap, "commands", False):
+                return None
+            from freesail.world.captains import Perception
+
+            return cap, Perception.read(crew), "crewed"
+        brain = getattr(body, "brain", None)
+        if brain is None or getattr(brain, "over_head", None) is not None:
+            return None
+        from freesail.world.brains import perceive_vessel
+
+        return brain, perceive_vessel(world, body, brain), "far"
+
+    def _commanders_minute(self, world: Any) -> list[tuple[Any, ...]]:
+        rules = self.book_data().get("rules") or []
+        if not rules:
+            return []
+        found = self._commander(world)
+        if found is None:
+            return []
+        cap, p, kind = found
+        tick = int(world.clock.tick)
+        percept = self._set_perception(world, cap, p)
+        lines: list[tuple[Any, ...]] = []
+        for rule in rules:
+            if not isinstance(rule, dict):
+                continue
+            key = str(rule.get("key") or rule.get("on") or "")
+            if rule.get("near_only") and kind == "far":
+                continue
+            if rule.get("far_only") and kind != "far":
+                continue
+            fired = f"rule:{key}" in self.made
+            if fired:
+                rearm = rule.get("rearm")
+                if rearm and self._stimulus(str(rearm), percept):
+                    del self.made[f"rule:{key}"]
+                    on_rearm = rule.get("on_rearm")
+                    if isinstance(on_rearm, dict):
+                        lines.extend(self._perform(world, on_rearm, cap, kind, percept))
+                    continue
+                repeat = rule.get("repeat_minutes")
+                if (
+                    repeat
+                    and tick - int(self.made[f"rule:{key}"]) >= float(repeat) * 60.0
+                    and self._stimulus(str(rule.get("on") or ""), percept)
+                ):
+                    # by steps while the stimulus holds (the commodore shortening sail
+                    # again for a convoy still astern)
+                    lines.extend(self._perform(world, rule, cap, kind, percept))
+                    self.made[f"rule:{key}"] = tick
+                continue
+            if self._stimulus(str(rule.get("on") or ""), percept):
+                done = self._perform(world, rule, cap, kind, percept)
+                self.made[f"rule:{key}"] = tick
+                lines.extend(done)
+        return lines
+
+    def _set_perception(self, world: Any, cap: Any, p: Any) -> dict[str, Any]:
+        """What the set's rules judge by: the enemies the commander's people have made out
+        (his own `_is_enemy`), the nearest enemy's distance to any member, a straggler
+        threatened (an enemy within the book's cover distance of her), the light, the
+        members astern of their stations, the commander's state."""
+        enemies: list[tuple[str, float]] = []
+        for s in getattr(p, "strangers", []) or []:
+            sid = str(s.get("id") or "")
+            if not sid or s.get("estimate_m") is None:
+                continue
+            try:
+                hostile = bool(cap._is_enemy(s))
+            except Exception:  # noqa: BLE001
+                hostile = False
+            if hostile:
+                enemies.append((sid, float(s["estimate_m"])))
+        close_nm = float(self.knob("convoy_close_nm", 4.0))
+        cover_nm = float(self.knob("cover_nm", 2.0))
+        nearest_nm = min((d for _, d in enemies), default=math.inf) / units.NAUTICAL_MILE
+        threatened: list[tuple[str, str]] = []
+        for sid, _ in enemies:
+            enemy = _body(world, sid)
+            if enemy is None:
+                continue
+            for m in self.stragglers:
+                mb = _body(world, m)
+                if mb is None:
+                    continue
+                _, d = bearing_and_distance(enemy.position, mb.position)
+                if d <= cover_nm * units.NAUTICAL_MILE:
+                    threatened.append((m, sid))
+        tol = STATION_TOLERANCE_M
+        astern = [
+            m for m, off in self.off_station_m.items() if off > 3.0 * tol and self._behind(world, m)
+        ]
+        in_station = all(off <= 2.0 * tol for off in self.off_station_m.values())
+        from freesail.world.signals import light_now
+
+        state = str(getattr(cap, "state", "") or "")
+        return {
+            "enemies": enemies,
+            "nearest_enemy_nm": nearest_nm,
+            "enemy_in_sight": bool(enemies) and nearest_nm <= close_nm,
+            "enemy_lost": not enemies or nearest_nm > close_nm * 1.5,
+            "threatened": threatened,
+            "astern": astern,
+            "in_station": in_station and bool(self.off_station_m),
+            "light": light_now(world),
+            "state": state,
+            "wind_kn": float(getattr(p, "wind_kn", 0.0) or 0.0),
+            "wind_from": float(getattr(p, "wind_from_deg", 0.0) or 0.0),
+            "in_port": bool(getattr(p, "in_port", "")),
+            "stragglers": list(self.stragglers),
+        }
+
+    def _behind(self, world: Any, vid: str) -> bool:
+        body = _body(world, vid)
+        at = self._stations.get(vid)
+        frame = self._guide_frame(world)
+        if body is None or at is None or frame is None:
+            return False
+        bearing, _ = bearing_and_distance(at, body.position)
+        rel = units.rad_to_deg(units.wrap_pi(math.radians(bearing - frame[1])))
+        return abs(rel) > 90.0
+
+    def _stimulus(self, name: str, percept: dict[str, Any]) -> bool:
+        if name == "enemy in sight":
+            return bool(percept["enemy_in_sight"])
+        if name == "enemy lost":
+            return bool(percept["enemy_lost"])
+        if name == "straggler":
+            return bool(percept["stragglers"])
+        if name == "in station":
+            return not percept["stragglers"]
+        if name == "straggler threatened":
+            return bool(percept["threatened"])
+        if name == "member astern":
+            return bool(percept["astern"])
+        if name == "all in station":
+            return bool(percept["in_station"])
+        if name == "night":
+            return percept["light"] == "night"
+        if name == "day":
+            return percept["light"] == "day"
+        if name == "fog":
+            return percept["light"] == "fog"
+        if name == "clear":
+            return percept["light"] != "fog"
+        if name == "commander in port":
+            return percept["state"] == "in port" or percept["in_port"]
+        if name == "gale from the west":
+            blown = self.book_data().get("blown_off") or {}
+            kn = float(_val(blown.get("wind_kn"), 34.0))
+            lo, hi = blown.get("from_deg") or [225.0, 315.0]
+            frm = percept["wind_from"]
+            return percept["wind_kn"] >= kn and float(lo) <= frm <= float(hi)
+        if name == "gale over":
+            blown = self.book_data().get("blown_off") or {}
+            kn = float(_val(blown.get("wind_kn"), 34.0))
+            return percept["wind_kn"] < kn - 6.0
+        return False
+
+    def _perform(
+        self, world: Any, rule: dict[str, Any], cap: Any, kind: str, percept: dict[str, Any]
+    ) -> list[tuple[Any, ...]]:
+        lines: list[tuple[Any, ...]] = []
+        tick = int(world.clock.tick)
+        signal = rule.get("signal")
+        if signal:
+            to = None
+            if rule.get("to") == "straggler" and percept["stragglers"]:
+                to = percept["stragglers"][0]
+            lines.extend(self._make_signal(world, cap, kind, str(signal), to))
+        order = rule.get("order")
+        if order:
+            lines.extend(self._give(world, cap, kind, str(order), str(rule.get("why") or "")))
+        formation = rule.get("formation")
+        if formation in FORMATIONS:
+            self.formation = str(formation)
+            self._stations_tick = -1
+            self._note(world, f"{self.formation} by the book")
+        do = rule.get("do")
+        if do == "cover" and percept["threatened"]:
+            straggler, enemy = percept["threatened"][0]
+            self._cover(world, cap, straggler, enemy)
+        elif do == "recall":
+            if str(getattr(cap, "state", "") or "") == "chasing" and cap._business.get("covering"):
+                cap._business.pop("covering", None)
+                try:
+                    cap._enter("on passage")
+                except Exception:  # noqa: BLE001
+                    pass
+        goal = rule.get("goal")
+        if goal:
+            lines.extend(self._set_goal(world, str(goal)))
+        if rule.get("goal") == "restore" or do == "restore the goal":
+            lines.extend(self._restore_goal(world))
+        self._note(world, f"the book: {rule.get('key') or rule.get('on')} at {tick}")
+        return lines
+
+    def _make_signal(
+        self, world: Any, cap: Any, kind: str, words: str, to: str | None
+    ) -> list[tuple[Any, ...]]:
+        from freesail.world import signals as S
+
+        if kind != "far":
+            try:
+                cap.give(f"make the signal: {words}", why="the squadron's book")
+            except Exception:  # noqa: BLE001 - refused in words (no hands, the book lacks it)
+                pass
+            return []
+        body = _body(world, self.commander)
+        if body is None:
+            return []
+        locker = S.vessel_locker(body)
+        nations = getattr(world, "nations", None)
+        books = S.books_for_nation(nations, str(body.nation))
+        light = S.light_now(world)
+        book = S.BOOKS_BY_LIGHT[light]
+        found = None
+        if self.kind == "convoy" and book == "numerary":
+            found = books.find(words, "convoy")
+        if found is None:
+            found = books.find(words, book)
+        if found is None and book == "numerary":
+            found = books.find(words, "convoy")
+        if found is None:
+            return []
+        entry, qualifiers = found
+        h = S.make_hoist(
+            locker, books, entry, qualifiers, str(body.id), int(world.clock.tick), to=to
+        )
+        _story(body, int(world.clock.tick), f"made the signal: {h.words()} (the book)")
+        return []
+
+    def _give(self, world: Any, cap: Any, kind: str, order: str, why: str) -> list[tuple[Any, ...]]:
+        if kind == "far":
+            from freesail.world.signals import far_perform
+
+            body = _body(world, self.commander)
+            if body is not None:
+                done = far_perform(world, body, order)
+                if done:
+                    _story(body, int(world.clock.tick), f"by the book: {done}")
+            return []
+        try:
+            cap.give(order, why=why or "the squadron's book")
+        except Exception:  # noqa: BLE001
+            pass
+        return []
+
+    def _cover(self, world: Any, cap: Any, straggler: str, enemy: str) -> None:
+        """The escort covers a straggler: he chases the enemy that threatens her, and
+        `covering` in his business brings him back when she is lost (`do: recall`)."""
+        if str(getattr(cap, "state", "") or "") in ("chasing", "engaging"):
+            return
+        cap._stranger = enemy
+        cap._business["covering"] = straggler
+        try:
+            cap._enter("chasing")
+        except Exception:  # noqa: BLE001
+            cap._business.pop("covering", None)
+            return
+        self._note(
+            world,
+            f"covering {self._name_of(world, straggler)} against {self._name_of(world, enemy)}",
+        )
+
+    def _set_goal(self, world: Any, words: str) -> list[tuple[Any, ...]]:
+        """The set's goal changed by the book (the blockade blown off to its rendezvous):
+        every leader's intent set, the old kept to be restored."""
+        words = words.replace("{rendezvous}", self.rendezvous or self.destination_words(world))
+        saved = self.made.setdefault("__goals__", {})  # type: ignore[arg-type]
+        if not isinstance(saved, dict):
+            saved = {}
+            self.made["__goals__"] = saved  # type: ignore[assignment]
+        leaders = [self.commander] + [d.leader for d in self.divisions.values() if d.detached]
+        for lead in leaders:
+            if lead == PLAYER_ID:
+                cap = getattr(world, "captain", None)
+                if cap is not None and getattr(cap, "commands", False):
+                    saved.setdefault(lead, cap.intent_words)
+                    try:
+                        cap.set_intent(words)
+                    except Exception:  # noqa: BLE001
+                        pass
+                continue
+            body = _body(world, lead)
+            brain = getattr(body, "brain", None) if body is not None else None
+            if brain is None:
+                continue
+            saved.setdefault(lead, brain.intent_words)
+            try:
+                crew = getattr(body, "crew", None)
+                if crew is not None and getattr(crew, "captain", None) is not None:
+                    crew.captain.set_intent(words)
+                brain.set_intent(words)
+                brain._plan()
+                brain.state = None
+            except Exception:  # noqa: BLE001
+                continue
+        self._note(world, f"the goal by the book: {words}")
+        return []
+
+    def _restore_goal(self, world: Any) -> list[tuple[Any, ...]]:
+        saved = self.made.pop("__goals__", None)  # type: ignore[arg-type]
+        if not isinstance(saved, dict):
+            return []
+        for lead, words in saved.items():
+            if not words:
+                continue
+            if lead == PLAYER_ID:
+                cap = getattr(world, "captain", None)
+                if cap is not None:
+                    try:
+                        cap.set_intent(words)
+                    except Exception:  # noqa: BLE001
+                        pass
+                continue
+            body = _body(world, lead)
+            brain = getattr(body, "brain", None) if body is not None else None
+            if brain is None:
+                continue
+            try:
+                crew = getattr(body, "crew", None)
+                if crew is not None and getattr(crew, "captain", None) is not None:
+                    crew.captain.set_intent(words)
+                brain.set_intent(words)
+                brain._plan()
+                brain.state = None
+            except Exception:  # noqa: BLE001
+                continue
+        self._note(world, "the goal restored by the book")
+        return []
 
     def _cap_the_pace(self, world: Any) -> None:
         body = _body(world, self.commander)
@@ -845,6 +1318,7 @@ class Squadrons:
             if not s.others():
                 continue
             lines.extend(s.minute(world))
+        lines.extend(far_captures(world))
         return lines
 
     def to_dict(self) -> list[dict[str, Any]]:
@@ -1010,6 +1484,155 @@ def _story(vessel: Any, tick: int, words: str) -> None:
     story = list(getattr(vessel, "story", ()) or ())
     story.append((tick, words))
     vessel.story = tuple(story[-30:])
+
+
+def _val(raw: Any, default: Any) -> Any:
+    if isinstance(raw, dict) and "value" in raw:
+        return raw["value"]
+    return default if raw is None else raw
+
+
+def _locker_of(world: Any, vid: str) -> Any:
+    from freesail.world import signals as S
+
+    if vid == PLAYER_ID:
+        ship = getattr(world, "ship", None)
+        return S.player_locker(world) if ship is not None and hasattr(ship, "extra") else None
+    body = _body(world, vid)
+    return S.vessel_locker(body) if body is not None else None
+
+
+# The straggler cut out at far detail (rule 5's least; docs/design/Design-Squadrons.md):
+# a ship whose doctrine yields when caught, brought to within hail by an armed enemy who
+# has her for his chase (the far chase comes to at hailing distance, where the privateer
+# hailed her to strike), with no friendly man of war within the cover distance, strikes by
+# rule and joins her captor's company. The figures are judgements after the prize courts'
+# Channel record (a merchantman brought to by a privateer alongside struck without a fight
+# more often than not); 74 replaces the rule with `combat/far.py`'s rounds for the ships
+# that fight. The design note said pistol shot; the far chase never comes nearer than hail.
+CUT_OUT_M = 0.4 * units.NAUTICAL_MILE
+COVER_NM = 2.0
+_ARMED_ROLES = frozenset({"privateer", "cruiser", "kings-ship", "commodore"})
+_MAN_OF_WAR_DESCRIPTIONS = frozenset({"frigate", "brig-sloop"})
+
+
+def _yields(body: Any) -> bool:
+    brain = getattr(body, "brain", None)
+    d = getattr(brain, "doctrine", None) if brain is not None else None
+    if d is not None:
+        return bool(d.threshold("yields_when_caught", False))
+    return "merchant" in str(getattr(body, "description", "") or "")
+
+
+def _armed_enemy_alongside(world: Any, prey: Any) -> Any:
+    nations = getattr(world, "nations", None)
+    if nations is None:
+        return None
+    for o in world.vessels.vessels:
+        if o is prey or getattr(o, "done", False) or getattr(o, "struck", False):
+            continue
+        brain = getattr(o, "brain", None)
+        if brain is None or brain.state not in ("chasing", "engaging", "investigating a stranger"):
+            continue
+        if str(getattr(brain, "_stranger", "") or "") != str(prey.id):
+            continue
+        if getattr(brain, "role", "") not in _ARMED_ROLES:
+            continue
+        if not nations.at_war(str(o.nation), str(prey.nation)):
+            continue
+        if getattr(o, "crew", None) is not None and o.crew.shape == "full":
+            continue  # the near fight is 70's
+        _, d = bearing_and_distance(o.position, prey.position)
+        if d <= CUT_OUT_M:
+            return o
+    return None
+
+
+def _covered(world: Any, prey: Any) -> bool:
+    for o in world.vessels.vessels:
+        if o is prey or getattr(o, "done", False) or str(o.nation) != str(prey.nation):
+            continue
+        brain = getattr(o, "brain", None)
+        role = getattr(brain, "role", "") if brain is not None else ""
+        if (
+            role not in _ARMED_ROLES
+            and str(getattr(o, "description", "")) not in _MAN_OF_WAR_DESCRIPTIONS
+        ):
+            continue
+        _, d = bearing_and_distance(o.position, prey.position)
+        if d <= COVER_NM * units.NAUTICAL_MILE:
+            return True
+    shadow_pos = getattr(world, "position", None)
+    ports = getattr(world, "ports", None)
+    own_nation = getattr(ports, "ship_nation", None) if ports is not None else None
+    if shadow_pos is not None and own_nation == str(prey.nation):
+        _, d = bearing_and_distance(shadow_pos, prey.position)
+        from freesail.world.captains import _is_kings_ship
+
+        if d <= COVER_NM * units.NAUTICAL_MILE and _is_kings_ship(world):
+            return True
+    return False
+
+
+def far_captures(world: Any) -> list[tuple[Any, ...]]:
+    """Once a minute: every far ship that yields when caught, brought to by an armed enemy
+    with no cover, strikes and joins her captor's company."""
+    lines: list[tuple[Any, ...]] = []
+    sea = getattr(world, "vessels", None)
+    sets = getattr(world, "squadrons", None)
+    if sea is None or sets is None:
+        return lines
+    tick = int(world.clock.tick)
+    for prey in list(sea.vessels):
+        if getattr(prey, "done", False) or getattr(prey, "struck", False) or not _yields(prey):
+            continue
+        if getattr(prey, "crew", None) is not None and prey.crew.shape == "full":
+            continue
+        captor = _armed_enemy_alongside(world, prey)
+        if captor is None or _covered(world, prey):
+            continue
+        from freesail.world import signals as S
+
+        prey.struck = True
+        S.set_colours(
+            S.vessel_locker(prey).colours, getattr(world, "nations", None), "struck", "", tick
+        )
+        prey.state = "struck"
+        prey.plan = [("lie_to", math.inf)]
+        prey.saved_plan = None
+        brain = getattr(prey, "brain", None)
+        if brain is not None:
+            brain.state = "struck"
+            brain.history.append((tick, "struck"))
+        old = sets.of(prey.id)
+        if old is not None:
+            old.leave(world, prey.id, f"cut out by {captor.name}")
+        company = sets.commanded_by(captor.id)
+        if company is None:
+            company = Squadron(
+                id=f"{captor.id}-company",
+                name=f"{captor.name}'s company",
+                kind="squadron",
+                nation=str(captor.nation),
+                commander=str(captor.id),
+                members=[str(captor.id)],
+                goal=str(getattr(captor, "intent_words", "") or ""),
+                formation="line ahead",
+            )
+            sets.add(company, world)
+        company.join(world, prey.id, as_prize=True)
+        _story(prey, tick, f"brought to by {captor.name} alongside, no help in sight: struck")
+        _story(captor, tick, f"{prey.name} struck to us alongside: a prize, in company")
+        lines.append(
+            (
+                Severity.NOTABLE,
+                "squadron.cut_out",
+                f"{prey.name} is cut out: brought to by {captor.name} with no help near, she "
+                "strikes and is carried off in company.",
+                {"id": prey.id, "captor": captor.id},
+            )
+        )
+    return lines
 
 
 def keep_station(vessel: Any, world: Any, dt: float, wind_from: float, wind_kn: float) -> None:

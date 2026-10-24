@@ -43,6 +43,10 @@ thresholds:
   bluff_private_signal: {value: true, source: "a guessed reply to the private signal rather than silence, which some privateers tried on a King's cruiser (from memory; judgement)"}
   investigate_nm: {value: 10, source: "as the cruiser's: a sail within ten miles is closed and made out"}
   chase_stale_hours: {value: 3, source: "as the cruiser's: a watch of chasing without a mile gained is given up"}
+  # package 72 (spec M7 §22): the distance within which a man of war drives her off, apart
+  # from the two leagues a superior force is hauled off from (`stranger_hostile_nm`), so that
+  # she hovers on a convoy at a league and runs when the escort bears down on her
+  man_of_war_nm: {value: 2.5, source: "a sloop of war that can bring her to action within the hour: two miles and a half at the Channel privateers' edge of speed over a brig-sloop (the privateers hovering on the convoys' flanks and snapping up the stragglers, the prize courts' record, from memory); judgement"}
   stranger_chase_nm: {value: 25, source: "as the cruiser's"}
   gale_kn: {value: 34, source: "Beaufort's force 8, a fresh gale, 34 to 40 knots, in which a merchantman of 1805 shortened to close-reefed topsails and lay to with sea room (judgement on the scale)"}
   gale_over_kn: {value: 28, source: "she fills away when the wind has eased under force 7, a moderate gale (judgement)"}
@@ -67,7 +71,7 @@ thresholds:
   lee_shore_nm: {value: 6, source: "two leagues: spec M6 §4, 'the land closing within two leagues' with the wind onshore"}
   shelter_land_nm: {value: 12, source: "thick weather is run from when the land is within four leagues, where a road may be found in a watch's sail; judgement"}
   shelter_within_nm: {value: 20, source: "the nearest open road run for in thick weather when it is within a watch's sail at five knots; judgement"}
-  stranger_hostile_nm: {value: 6, source: "a stranger of a nation at war made out within two leagues is hauled off from: her colours are made out at two miles, her rig at four (freesail/world/ships.py), so this is the first the merchant can know; judgement"}
+  stranger_hostile_nm: {value: 3, source: "package 72: a superior force within a league is hauled off from (the merchant's two leagues), so that she hovers on a convoy's flank a league from its escort and snaps up a straggler, as the Channel privateers did (the prize courts' record and the trade's complaints, from memory); judgement"}
   offing_nm: {value: 3, source: "a headland given an offing of a league, and the beating book goes about when the nearest land is within it; judgement, after the merchant book's berth of two or three miles for the open sea's marks"}
   leg_reached_nm: {value: 2, source: "the open sea's marks are reached by account within two miles, since the account is a mile or two out by the afternoon (the merchant book's comments)"}
   anchor_within_nm: {value: 0.5, source: "the port's anchorage mark reached within half a mile by account; the merchant book's 'the mark in the Bay'"}
@@ -171,6 +175,18 @@ books:
     - 'standing order "make all sail to haul off": at steady on the course, if the true wind is under {shorten_sail_kn} knots then make all sail'
   keeping station: []
   in distress: []
+  in company:
+    # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): her station in the set,
+    # kept by `keep your station` every two minutes (freesail/orders/station.py: the held
+    # order of the navigation, judged by the lookout's bearing and distance of the flag,
+    # the helm's law and the sail to hold it); the trims and the land as on her station
+    - 'standing order "the station": every 2 minutes, if the manoeuvre in hand is not hove to then keep your station'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
+    - 'standing order "land ahead": at land ahead then put her about'
+    - 'standing order "land close ahead": at land close ahead then put her about'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
   engaging:
     # package 70 (spec M7 §10): the fighting book. The drum, the guns cast loose, loaded
     # and laid, and the mark engaged on the side she bears are the captain's own on entering

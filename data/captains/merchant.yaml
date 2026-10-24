@@ -39,6 +39,11 @@ thresholds:
   aim: {value: rigging, source: "spec M7 §9: the hull the British habit, the rigging the French; the nation's habit stands where the file leaves this empty"}
   morale_start: {value: 0.5, source: "a merchant master's company at the start of an action (spec M7 §10, decision 7); judgement"}
   strike_below: {value: 0.4, source: "a merchantman strikes to a privateer's first broadside into her: her few guns and her small crew (the prize courts' records of the Channel trade; judgement on the figure)"}
+  # package 72 (rule 5's least; freesail/world/squadrons.py `far_captures`): at far detail,
+  # brought to within pistol shot by an armed enemy who has her for his chase with no man
+  # of war of her own nation within the cover distance, she strikes by rule and is carried
+  # off in his company (74 gives the far fight to the ships that fight)
+  yields_when_caught: {value: true, source: "a merchantman brought to by a privateer alongside struck without a fight more often than not: the prize courts' Channel record of 1793 to 1815 (from memory); judgement"}
   gale_kn: {value: 34, source: "Beaufort's force 8, a fresh gale, 34 to 40 knots, in which a merchantman of 1805 shortened to close-reefed topsails and lay to with sea room (judgement on the scale)"}
   gale_over_kn: {value: 28, source: "she fills away when the wind has eased under force 7, a moderate gale (judgement)"}
   beating_dwell_minutes: {value: 10, source: "package 43b: the beating book taken up and given up on a verdict that has stood ten minutes, not on one course's word (the trade trial traded the deck every two minutes as an evasion ended); judgement, as gale_over_minutes"}
@@ -166,6 +171,18 @@ books:
     - 'standing order "make all sail to haul off": at steady on the course, if the true wind is under {shorten_sail_kn} knots then make all sail'
   keeping station: []
   in distress: []
+  in company:
+    # package 72 (spec M7 §21; docs/design/Design-Squadrons.md): her station in the set,
+    # kept by `keep your station` every two minutes (freesail/orders/station.py: the held
+    # order of the navigation, judged by the lookout's bearing and distance of the flag,
+    # the helm's law and the sail to hold it); the trims and the land as on her station
+    - 'standing order "the station": every 2 minutes, if the manoeuvre in hand is not hove to then keep your station'
+    - 'standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails'
+    - 'standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets'
+    - 'standing order "the offing": when the nearest land is under {offing_nm} miles then put her about'
+    - 'standing order "land ahead": at land ahead then put her about'
+    - 'standing order "land close ahead": at land close ahead then put her about'
+    - 'standing order "shorten sail for weather": when the true wind exceeds {shorten_sail_kn} knots for 2 minutes then shorten sail'
   engaging:
     # package 70 (spec M7 §10): the fighting book. The drum, the guns cast loose, loaded
     # and laid, and the mark engaged on the side she bears are the captain's own on entering

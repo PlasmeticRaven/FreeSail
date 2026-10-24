@@ -381,14 +381,69 @@ def _succession(cap: Any, locker: S.Locker, tick: int, near: bool) -> None:
         return
     root = _root_world(cap)
     own = _own_id(cap)
+    sets = getattr(root, "squadrons", None)
+    in_a_set = sets is not None and sets.of(own) is not None
     for key, item in list(pending.items()):
         h = item["hoist"]
-        rank, prev = S.succession_rank(
-            list(root.vessels.vessels), own, str(item["sender"]), getattr(root, "squadrons", None)
-        )
+        rank, prev = S.succession_rank(list(root.vessels.vessels), own, str(item["sender"]), sets)
+        if in_a_set and prev is not None:
+            # package 72 (spec M7 §21): in succession by the wake. When the ship ahead has
+            # performed it, note how far astern of her we were (the far body by the truth's
+            # distance, the near by the lookout's estimate of her), and perform it when our
+            # own run since reaches that: her wake. A ship under orders outside any set
+            # keeps 71's three minutes (`predecessor_done`), having no order of sailing.
+            t_prev = S.vessel_locker(prev).obeyed.get(key)
+            if t_prev is None:
+                continue
+            if item.get("wake_start") is None:
+                item["wake_start"] = tick
+                item["astern_m"] = _astern_of(cap, prev)
+                item["run_m"] = 0.0
+                item["last"] = tick
+            else:
+                item["run_m"] = float(item.get("run_m", 0.0)) + _own_speed_ms(cap) * float(
+                    tick - int(item.get("last", tick))
+                )
+                item["last"] = tick
+            if float(item["run_m"]) >= float(item["astern_m"]):
+                del pending[key]
+                _obey(cap, locker, h, str(item["sender"]), tick, near)
+            continue
         if S.predecessor_done(prev, key, tick):
             del pending[key]
             _obey(cap, locker, h, str(item["sender"]), tick, near)
+
+
+def _astern_of(cap: Any, prev: Any) -> float:
+    """How far astern of the ship ahead this one is when she goes about: the near body by
+    the lookout's estimate of her, the far body by the truth."""
+    from freesail.world.geo import bearing_and_distance
+
+    vessel = getattr(cap, "vessel", None)
+    crew = getattr(vessel, "crew", None) if vessel is not None else None
+    if vessel is None or (crew is not None and getattr(crew, "shape", "") == "full"):
+        try:
+            p = _perceive(cap)
+            for s in p.strangers:
+                if str(s.get("id") or "") == str(prev.id) and s.get("estimate_m") is not None:
+                    return float(s["estimate_m"])
+        except Exception:  # noqa: BLE001
+            pass
+        here = getattr(cap.world, "position", None)
+        if here is not None:
+            return float(bearing_and_distance(here, prev.position)[1])
+        return 0.0
+    return float(bearing_and_distance(vessel.position, prev.position)[1])
+
+
+def _own_speed_ms(cap: Any) -> float:
+    vessel = getattr(cap, "vessel", None)
+    crew = getattr(vessel, "crew", None) if vessel is not None else None
+    if vessel is None or (crew is not None and getattr(crew, "shape", "") == "full"):
+        view = getattr(cap.world, "readings", None)
+        speed = view.value("speed") if view is not None else None
+        return float(speed) if speed is not None else 0.0
+    return units.knots_to_ms(float(getattr(vessel, "speed_kn", 0.0) or 0.0))
 
 
 # ---------------------------------------------------------------------------

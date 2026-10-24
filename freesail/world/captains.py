@@ -1855,7 +1855,10 @@ class Judgement:
         if name == "enemy struck":
             return self._enemy_struck(p)
         if name == "man of war near":
-            within = float(th("stranger_hostile_nm", 6))
+            # package 72: a privateer's own distance for a man of war (`man_of_war_nm`),
+            # apart from the two leagues a superior force is hauled off from, so that she
+            # hovers on a convoy and runs when the escort bears down
+            within = float(th("man_of_war_nm", th("stranger_hostile_nm", 6)))
             return self._man_of_war_within(p, within) is not None
         if name == "stranger lost":
             if self._stranger is None:
@@ -2395,10 +2398,18 @@ class Captain(Judgement):
             return "at anchor"
         if self.intent is not None and self.intent.kind == "station" and self._on_station(p):
             return "keeping station"
-        return "on passage"
+        return "on passage"  # a member of a set: `_enter` makes it `in company` (package 72)
 
     def _enter(self, state: str) -> None:
         world = self.world
+        # package 72 (spec M7 §21): a member of a set enters `in company` where her
+        # doctrine would enter a plan state; the set is the parent World's, and the
+        # player's own ship may be a member of one
+        from freesail.world.squadrons import plan_state_of
+
+        root = getattr(world, "parent", None) or world
+        own = str(getattr(getattr(world, "vessel", None), "id", "") or "the ship")
+        state = plan_state_of(root, own, state)
         old = self.state
         if old is not None:
             self._leave(old)
@@ -2646,6 +2657,12 @@ class Captain(Judgement):
             station = self._station_mark()
             if station is not None:
                 self.give(f"shape a course for {station[0]}")
+        elif state == "in company":
+            # package 72: her station in her set taken up at once; the book keeps it
+            try:
+                self.give("keep your station", why="her station in the set")
+            except Exception:  # noqa: BLE001 - the flag not in sight: the book tries again
+                pass
         elif state == "evading":
             self._haul_off(Perception.read(world))
         elif state == "engaging":

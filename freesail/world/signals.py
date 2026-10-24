@@ -1141,14 +1141,15 @@ def far_perform(world: Any, vessel: Any, order: str) -> str:
         new = (2.0 * float(wind_from) - heading) % 360.0
         from freesail.world.geo import destination
 
-        company = [leg for leg in plan if leg[0] == "company"]
+        company = [leg for leg in plan if leg[0] in ("company", "station")]
         reach = (1.0 if company else 30.0) * units.NAUTICAL_MILE
         far = destination(vessel.position, new, reach)
         vessel.saved_plan = vessel.saved_plan or list(plan)
         vessel.plan = [("to", far, f"the other tack ({units.point_name(math.radians(new))})")]
         if company:
             # a ship keeping company goes about, stands on a mile on the new tack and closes
-            # her commodore again (the least relation: nothing keeps a formation here, 72's)
+            # her commodore again (the least relation); a member of a set takes up her
+            # station leg again after it (package 72: the set's stations turn with him)
             vessel.plan.append(company[0])
         vessel.tack = 0.0
         return ("went about" if low.startswith(("put", "tack")) else "wore") + (
@@ -1209,6 +1210,10 @@ def far_perform(world: Any, vessel: Any, order: str) -> str:
         return f"steered {units.point_name(rad)}"
     if low in ("close the flag", "shape a course for the flag", "close the commodore"):
         boss = str(getattr(vessel, "under_orders_of", "") or "")
+        if getattr(vessel, "squadron", "") and plan and plan[0][0] == "station":
+            # package 72: a member of a set closes by the set's order (close order is the
+            # set's formation, which the commander's signal has set); her station leg stands
+            return "closed on the commodore in her station"
         if boss == "the ship":
             vessel.saved_plan = vessel.saved_plan or list(plan)
             vessel.plan = [("company", 2.0 * units.CABLE)]
