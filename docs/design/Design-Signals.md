@@ -474,6 +474,11 @@ signal is no tell (a merchantman never had the table; only a man of war's rig un
 own colours, or a reply and the wrong one, makes an enemy), and the fog signals are kept
 by a rules captain only while another sail has been in sight within the hour, so that no
 single ship's recorded passage in thick weather moves. The hoist's breaking-out minute is
-the script's to set when the hands run it up (`NOT_YET` until then), not the order's,
-which the encounter taught when a hoist queued behind a wear was read before it was up.
-Every figure is in `docs/dev/TuningNotes.md` (package 71).
+the script's to set when the hands have the first hoist up (`NOT_YET` until then; the
+phase's end at the hands' pace, not the order's minute nor the book's), which the encounter
+taught when a hoist queued behind a wear was read before it was up, and the convoy when a
+short watch's two-minute hoist was read at the book's one. The chase learned two things
+from the encounter that were not in the design: the captain names his stranger's rig to
+the chase order (the order's own choice is the lookout's nearest stranger, who counts a
+sail under our colours none), and a chase on the other side of the wind's eye is gone about
+for. Every figure is in `docs/dev/TuningNotes.md` (package 71).

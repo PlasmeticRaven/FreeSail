@@ -9419,11 +9419,41 @@ digest again.
   vessel shows them, and the far brain's minute reads nothing on an empty sea; the
   recorded passages of the fast tier and the slow tier of the touched files ran green
   (below).
-- **The captain's trials**: the station-stranger, station-lee-shore, trade-stranger and
-  trade-thick trials: see the suite as run below (the trade-stranger trial has a French
-  brig and a British schooner: the brig's cruiser doctrine carries the table and challenges
-  the schooner, so its pins may move; the figures are below once the slow tier of the
-  touched files has run).
+- **Truth 7-145** (the convoy, pinned in the package and moved in it): the hoist ordered
+  at 600 behind a wear, up at 798, seen at 840, read at 900 and the four about at 900,
+  1080, 1260 and 1440 (840, 1020, 1200, 1380 while the hoist flew from the book's minute
+  after the hands began, 738, and not from their finishing, 798: the brig's three hands at
+  the halyards took two minutes to the book's one, and the readers saw flags not yet up;
+  mended, below). **Truth 7-144** (the encounter): the challenge up at 10:11 (10:12), read
+  wrong at 10:16 (10:15), chasing at 10:17 (10:16), the same cause; and the chase goes
+  about for the cutter, south-west (it went after the merchant brig, below), so the brig
+  is no longer challenged within the encounter and her verdict ("a merchantman, who has
+  none") is proved in a second world of the truth's, the frigate on her station and the
+  brig a mile and a half off. **Truth 7-143**: the colours made out at eighteen cables (the
+  colours' range by eye is two miles; twenty-five were pinned by mistake for the glass,
+  which is on the captain's one stranger), the hail at three cables (she draws off a cable
+  a minute from two). **Truth 7-147**: at two miles the brig is a near body (`CREWED_NM`
+  is four), so the fog gun is read by her lookout's sound sighting and obeyed in her own
+  world; the signal is "bring to" (four guns), which a ship running free can perform where
+  "tack" is refused her as not close-hauled.
+- **The captain's trials**: the station-lee-shore, trade-thick and station-gale trials
+  (the last the expected failure) stand to the line. The two stranger trials moved in
+  their lines and digests and in nothing else (every state's tick, the chase, the anchor
+  at 51849), proved by bisection over the package's switches (`bisect_trials` in the
+  scratchpad; each row a five-hour run):
+
+  | trial | variant | lines | digest | what the row says |
+  |---|---|---|---|---|
+  | station-stranger | all on | 787 | `f8f4e544cc34b86e` | the new pin |
+  | station-stranger | challenges off | 756 | `9c24b2e01bb801e7` | 56's pin again: the whole move is the King's brig's private signal to the Palinure (made, up, seen; no answer from a man of war's rig: the tell), thirty-one lines |
+  | station-stranger | tacks, naming, rig words, helm off (each alone) | 787 | `f8f4e544cc34b86e` | none of them touches it |
+  | trade-stranger | all on | 1246 | `e55bc37c58ccb31b` | the new pin |
+  | trade-stranger | challenges off | 1245 | `887fdd486d4a0e33` | the French brig's private signal to the schooner is one line of her lookout's |
+  | trade-stranger | tacks off | 1249 | `63e2674f865d0605` | the brig's crewed chase goes about for the schooner on the other side of the eye: three lines fewer |
+  | trade-stranger | naming, rig words, helm off (each alone) | 1246 | `e55bc37c58ccb31b` | none of them touches it |
+  | trade-stranger | all off | 1248 | `0a480f7a4b7f321a` | 70's pin again |
+
+  The old figures stand beside the new in `tests/test_captain_trials.py`.
 - **The station-gale trial** (the expected failure): left as it is; item 8's law is the
   engaging helm's and not the offing's tack (below).
 - **`tests/test_places.py`**: the papers' catalogue has ten entries (eight) with the private
@@ -9461,6 +9491,58 @@ digest again.
   gives them for the director's hand.
 - 70's `extra["colours"] = "struck"` string, set in two places and read by none, is the
   locker's state now.
+- **The hoist flew from the book's minute, not the hands' finishing**: `MakeSignalScript.begin`
+  set `breaks_out` at the start tick plus the book's `hoist_s`, but the phase runs at the
+  hands' factor (the convoy brig's three hands took two minutes), so the readers saw and
+  read flags not yet up and the "signal is up" line came a minute after they had obeyed
+  it. The script sets `breaks_out` at the first phase's end and `complete_at` at the last
+  (`NOT_YET` until then), and the convoy's and the encounter's pins moved by a minute
+  (above).
+- **A telegraphic sentence could not be read**: `Locker.tidy` gave a telegraphic hoist two
+  minutes of life from its breaking out, while a sentence of n words completes n minutes
+  after it and is read a minute later; every sentence of more than two words was hauled
+  down before any reader could read it. Its life runs from `done_at` now (the completion),
+  `NOT_YET` while the words are going up.
+- **The chase went after the wrong sail**: the captain's bare `give chase` left the sail to
+  the order, whose pool (45c) counts a sail under our own colours no stranger, so the
+  encounter's frigate, having judged the cutter under British colours an enemy by the
+  private signal, gave chase to the merchant brig two miles off while the privateer ran.
+  Three mends: the captain names his stranger's rig when the lookout has it
+  (`Captain._chase_order`, "chase the cutter"); a sail the captain holds an enemy
+  (`recognised[..].enemy`, `pirates`) is a stranger to the bare order whatever she shows
+  (the books' standing orders `keep her bearing` and `more of her` give the bare order
+  every glass); and `the cutter` was a *sail word* of the lookout's (35's pilot cutter, the
+  one sail in sight) that named the nearest sail of any rig, so even the named order chased
+  the brig: `cutter`, `lugger` and `sloop` are rig words now, the nearest-sail reading kept
+  when no sail of the rig is made out.
+- **The chase held the tack that opened her**: 45c's chase course keeps the tack she is on
+  when the chase lies within the close-hauled angle ("a chase dead to windward is not a
+  reason to put her about every glass"), which with the cutter on the larboard quarter, SW
+  by S, held the frigate NNW and opened her at eleven knots relative. A chase more than a
+  point on the other side of the wind's eye is gone about for now (`CHASE_TACKS_FOR_HER`,
+  the bisection's switch; the words say "on the other tack"); dead in the eye the tack is
+  held as 45c had it. At the seed the frigate goes about at 10:17, lies SSW and follows her
+  S at four knots to the cutter's seven (the frigate's close-hauled speed is the hull's,
+  70's and not changed).
+- **The near body answered a signal twice in words**: `_handle_log` marked the hoist
+  answered before giving `answer the signal`, whose handler found it answered already and
+  said so; the key is marked after the order now. The pendant's line named the whole read
+  line ("to The sail fires four guns: bring to"); it names the signal read.
+- **The fog signal's line was told twice** (the handler recorded it and `World.submit`
+  recorded the result): once, `notable`.
+- **The far body heard no gun in a fog**: `far_minute` read the hoists of the sail in
+  sight, and in a fog nothing is; it hears a fog-book gun from any ship within
+  `GUN_HEARD_NM` now (two far bodies of a convoy in a fog; the near body had it from the
+  lookout's sound sightings).
+- **A privateer's lie** said "from Guernsey, for Guernsey": a cruiser's errand is no
+  merchantman's, so the liar's whither is a passage between two ports, and each answer of
+  the hail is a sentence of its own ("In ballast.", not "in ballast.").
+- **The fast tier's expectations**: the library's papers topic lists ten papers
+  (`tests/test_server.py`); the officer's handover budget 18,500 (18,000) for the brief's
+  sentence on the colours, the signals and the hail (10,896 tokens at the seat;
+  `tests/test_officer.py`); truth 7b-113 takes the lookout's `signal.private` line on the
+  cruiser as his observation (the King's cruiser makes the private signal to us); the
+  contents-cost and fingerprint tests pass re-run alone, as they have since 68.
 
 ### Decisions for the lead and the owner
 
@@ -9494,4 +9576,19 @@ digest again.
 
 ### The suite, as run
 
-See the report.
+All at the end of the package, on the lead's shared machine (load under two), one suite at
+a time, long runs detached to a log and polled.
+
+- **The fast tier whole** (`python3 -m pytest -q -p no:cacheprovider -n 3`): 3,607 run,
+  3,601 passed, 6 failed at the first run, every one an expectation of the package's own
+  making or a re-run-alone case (above, "the fast tier's expectations"); the six mended
+  and the tier re-run whole at the end: __FAST2__.
+- **The package's truths** 7-143 to 7-150 (`-k "7_14"`, the slow ones under `--slow`):
+  eight passed after the mends above; 7-151 (the pace) alone and last: __PACE__.
+- **The captain's trials** (`--slow tests/test_captain_trials.py`): six passed, one
+  expected failure (the station-gale), after the two stranger trials' re-pin above; and
+  again within the slow tier whole.
+- **The slow tier whole** (`--slow -n 4 -m "not pace"`, the touched files within it):
+  __SLOW__.
+- **The pace tests** (`--slow -m pace`, alone and last): __PACE2__.
+- `ruff check .` and `ruff format .` clean at every commit.
