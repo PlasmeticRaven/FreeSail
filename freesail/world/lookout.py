@@ -646,6 +646,7 @@ class Lookout:
             glass = self._glass_line(world, v, s, level, relative)
             if glass is not None:
                 out.append(glass)
+            out.extend(self._signals_of(world, v, s, level))
         for fid, where in list(self._sails_seen.items()):
             if fid not in seen:
                 self._sail_said.pop(fid, None)
@@ -660,6 +661,54 @@ class Lookout:
                     )
                 )
         self._sails_seen = seen
+        return out
+
+    def _signals_of(
+        self, world: Any, v: Any, s: Sighting, level: int
+    ) -> list[tuple[Severity, str, str, dict[str, Any]]]:
+        """The signals she flies, as this ship's people see them this minute (package 71,
+        spec M7 §3): 'she makes a signal' at the flags' range, the meaning a minute later
+        when the book is ours, the private signal and the answering pendant by their form;
+        a light's or a gun's by night and in fog. Nothing on a sail whose rig is not yet
+        made out by day (the flags are smaller than she is)."""
+        from freesail.world import signals as S
+
+        locker = getattr(v, "signals", None)
+        if locker is None or not locker.flying:
+            return []
+        tick = int(world.clock.tick)
+        hoists = locker.flying_now(tick)
+        if not hoists:
+            return []
+        reader = S.player_locker(world)
+        books = S.books_for(world)
+        light = S.light_now(world)
+        if light == "day" and level < 1:
+            return []
+        glass = S.has_glass(world)
+        own = S.own_id(world)
+        who = self._sail_word(v, level).removeprefix("the ")
+        who = f"the {who}" if who != "sail" else "the sail"
+        seen = S.read_flying(
+            reader,
+            books,
+            v.id,
+            who,
+            hoists,
+            float(s.distance_m),
+            light,
+            glass,
+            tick,
+            own,
+            S.held_books(world),
+        )
+        S.note_seen(reader, seen, tick)
+        out = []
+        for item in seen:
+            severity = (
+                Severity.NOTABLE if item.read or item.kind != "signal.seen" else Severity.ROUTINE
+            )
+            out.append((severity, item.kind, item.text, item.data))
         return out
 
     def _glass_line(
@@ -759,7 +808,8 @@ class Lookout:
         self, v: Any, s: Sighting, level: int, words: str, relative: str, glass: bool
     ) -> tuple[Severity, str, str, dict[str, Any]]:
         who = self._sail_word(v, level - 1 if level > 1 else 0)
-        colours = level >= 2 and v.shows_colours and bool(v.nation_adjective)
+        shown = v.nation_shown  # package 71: the colours shown, false or true
+        colours = level >= 2 and shown is not None
         # package 56 (the owner's note 5 at gate 6c): every line that reports a sail made
         # out gives her relative bearing, her compass bearing and the course she stands
         point = units.point_name(math.radians(s.bearing_deg))
@@ -780,7 +830,7 @@ class Lookout:
             "id": v.id,
             "level": level,
             "colours": bool(colours),
-            "nation": v.nation if colours else None,
+            "nation": shown if colours else None,
             "words": words,
             "relative": relative,
             "bearing_deg": round(s.bearing_deg, 1),
@@ -856,10 +906,9 @@ class Lookout:
                     "made_out": level,
                     "known": known or "a sail",
                     # her nation once her colours are made out and she shows them; None
-                    # while she is a stranger (too far, or no colours)
-                    "nation": v.nation
-                    if v is not None and level >= 2 and v.shows_colours and v.nation_adjective
-                    else None,
+                    # while she is a stranger (too far, or no colours); the nation SHOWN,
+                    # which under false colours is the ruse's (package 71)
+                    "nation": v.nation_shown if v is not None and level >= 2 else None,
                     "spoken": bool(v is not None and v.spoken),  # within hail at any time
                     "words": f"{head} {relative}, bearing {point}, distant "
                     f"{estimate_words(s.judged_m)}{detail}",

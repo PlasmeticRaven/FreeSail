@@ -1,0 +1,31 @@
+# FreeSail: the French signal books' declaration (spec M7 §3; package 71;
+# docs/design/Design-Signals.md). The same shape as data/signals/britain/book.yaml (its
+# head says the fields). The French book is smaller than the British and marked where made.
+#
+# The sources, from memory and marked so: du Pavillon's *Tactique navale* and his tabular
+# signals of 1776 (a table of a hundred cells read by two flags, the row and the column,
+# which the Royal Navy's numerary system of 1790 improved on); the numerary *Code de
+# signaux* of the Republic's navy of the 1790s (the *Signaux de jour et de nuit*, ten
+# numeral flags after Howe's manner); Villeneuve's signals of 1805 (the fleet's book as
+# the accounts of Trafalgar give a few of them). No telegraphic dictionary: the free
+# sentence by flags was Popham's and the French navy had none in 1805 (a *vocabulaire*
+# came later), which the book says in telegraphic.yaml.
+
+nation: france
+system: well-built           # her own sources, smaller than the British; no dictionary
+sources:
+  - "du Pavillon, Tactique navale, and the tabular signals of 1776 (from memory)"
+  - "the Code de signaux of the Republic's navy, the 1790s (Signaux de jour et de nuit; from memory)"
+  - "Villeneuve's fleet signals of 1805 as the accounts of Trafalgar give them (from memory)"
+flags:
+  numerals: 10               # the numerary of the 1790s: ten numeral flags
+  substitute: true
+  preparative: true          # the 'pavillon preparatif'
+  telegraph: false           # no dictionary in 1805
+  answering_pennant: true    # the 'flamme d'intelligence'
+  annul: true
+hoist_s: 60
+read_s: 60
+read_nm: 2.0
+glass_factor: 1.5
+flies_s: 1800

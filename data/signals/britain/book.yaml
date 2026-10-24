@@ -1,0 +1,44 @@
+# FreeSail: the British signal books' declaration (spec M7 §3; package 71;
+# docs/design/Design-Signals.md). Read by freesail/world/signals.py (`load_books`), which
+# reads the five books beside this file in the one shape every nation's root has. A nation
+# names its root in data/nations.yaml (`signals: {root: britain, system: well-built}`).
+#
+# The sources, from memory and marked so (no page of these is in docs/references/; package
+# 76 builds the books out from them against the printed editions): Lord Howe's signal book
+# of 1790 (the numerary system the fleet adopted); the Admiralty's *Signal Book for the
+# Ships of War* of 1799 (the numerary flags 0 to 9, the substitute, the preparative, the
+# affirmative and the annulling flag; the day signals by number); Sir Home Popham's
+# *Telegraphic Signals or Marine Vocabulary* of 1800 and its 1803 edition (the telegraph
+# flag over the numerals, the dictionary of words and the alphabet); the Admiralty's night
+# and fog signals bound with the 1799 book (lights in their number and place, false fires,
+# rockets and guns; guns, muskets, the bell and the drum in fog); the *Signals and
+# Instructions for Ships under Convoy*; the *Regulations and Instructions relating to His
+# Majesty's Service at Sea* (1806) for the custody of the private signals (under seal,
+# weighted to sink, destroyed on capture) and the lights of ships in company.
+#
+# What is made: every entry below whose `made` is true is the builder's own, in the
+# period's form (its meaning one the books had, its number or its hoist the builder's where
+# the period's was not remembered); the private tables themselves were secret and are lost,
+# so the game's are drawn under the seed from the form in private.yaml (made).
+
+nation: britain
+system: well-built           # a book built from the nation's own sources, with a dictionary
+sources:
+  - "Howe, Signal Book for the Ships of War, 1790 (from memory)"
+  - "the Admiralty's Signal Book for the Ships of War, 1799 (from memory)"
+  - "Popham, Telegraphic Signals or Marine Vocabulary, 1800, and the 1803 edition (from memory; the twelve hoists of 21 October 1805 the one passage known by heart)"
+  - "the Admiralty's night and fog signals bound with the 1799 book (the form from memory)"
+  - "Signals and Instructions for Ships under Convoy (the form from memory)"
+  - "Regulations and Instructions relating to His Majesty's Service at Sea, 1806 (the private signals' custody; the lights of ships in company)"
+flags:
+  numerals: 10               # the numeral flags 0 to 9 (Howe 1790; the 1799 book)
+  substitute: true           # one substitute flag, repeating the flag above it (1799)
+  preparative: true          # the preparative, over a signal to be executed on its being hauled down (1799)
+  telegraph: true            # Popham's telegraph flag over the numerals (1800, 1803)
+  answering_pennant: true    # the answering pendant: the signal seen and understood (1799)
+  annul: true                # the annulling flag (1799)
+hoist_s: 60                  # a hoist bent and run up: a minute (Popham's own reckoning of a minute or more a hoist; judgement for the figure)
+read_s: 60                   # the minute to find it in the book at the other end (judgement)
+read_nm: 2.0                 # the flags made out by eye at the colours' distance (freesail/world/ships.py COLOURS_MADE_OUT_NM; the numeral flags of 1799 the size of an ensign, judgement)
+glass_factor: 1.5            # the glass aloft reaches further by this (ships.GLASS_FACTOR)
+flies_s: 1800                # a numerary signal left flying at most a glass before it is hauled down of itself (judgement)

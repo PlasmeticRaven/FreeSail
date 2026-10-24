@@ -1,0 +1,33 @@
+# FreeSail: the French instructions to merchantmen under convoy (spec M7 §3; package 71;
+# docs/design/Design-Signals.md). The form is data/signals/britain/convoy.yaml's; the French
+# coastal convoys of 1805 (Brest to Lorient, the Channel ports under the batteries) were
+# worked by the escort's signals in the Code's manner (from memory); every number and hoist
+# MADE, the book the dozen meanings a convoy wants.
+
+source: "the French escorts' convoy signals (the form from memory; made)"
+made: true
+
+entries:
+  - {number: 1, meaning: "The convoy to make sail", also: ["make sail", "make more sail", "more sail"], does: {order: "make sail"}, source: "made", made: true}
+  - {number: 2, meaning: "The convoy to make all sail", also: ["make all sail", "all sail", "crowd sail"], does: {order: "make all sail"}, source: "made", made: true}
+  - {number: 3, meaning: "The convoy to shorten sail", also: ["shorten sail", "take in sail", "less sail"], does: {order: "shorten sail"}, source: "made", made: true}
+  - {number: 4, meaning: "The convoy to tack together", also: ["tack", "tack together", "put about", "go about"], does: {order: "put her about"}, source: "made", made: true}
+  - {number: 5, meaning: "The convoy to tack in succession", also: ["tack in succession", "put about in succession", "go about in succession"], does: {order: "put her about"}, in_succession: true, source: "made", made: true}
+  - {number: 6, meaning: "The convoy to wear together", also: ["wear", "wear together", "wear ship"], does: {order: "wear ship"}, source: "made", made: true}
+  - {number: 7, meaning: "The convoy to wear in succession", also: ["wear in succession", "wear ship in succession"], does: {order: "wear ship"}, in_succession: true, source: "made", made: true}
+  - {number: 8, meaning: "The convoy to close round the commodore", also: ["close round the commodore", "close", "close up", "keep closer order", "close order"], does: {order: "close the flag"}, source: "made", made: true}
+  - {number: 9, meaning: "Enemy in sight", also: ["the enemy in sight", "an enemy in sight", "enemy's cruisers in sight", "a privateer in sight"], does: {news: true}, qualifiers: [compass], source: "made", made: true}
+  - {number: 10, meaning: "A strange sail in sight", also: ["strange sail", "a sail in sight", "a stranger in sight"], does: {news: true}, qualifiers: [compass], source: "made", made: true}
+  - {number: 11, meaning: "The convoy to anchor", also: ["anchor", "come to an anchor", "let go the anchor"], does: {order: "come to an anchor"}, source: "made", made: true}
+  - {number: 12, meaning: "The convoy to weigh", also: ["weigh", "weigh anchor", "get under way", "up anchor"], does: {order: "weigh anchor"}, source: "made", made: true}
+  - {number: 13, meaning: "The convoy to bring to", also: ["bring to", "heave to", "lie to"], does: {order: "heave to"}, source: "made", made: true}
+  - {number: 14, meaning: "The convoy to fill and make sail", also: ["fill", "fill away", "make sail again"], does: {order: "fill away"}, source: "made", made: true}
+  - {number: 15, meaning: "The convoy to steer the course indicated", also: ["steer", "steer the course", "alter course to", "course"], does: {order: "steer {compass}"}, qualifiers: [compass], source: "made", made: true}
+  - {number: 16, meaning: "The convoy to disperse", also: ["disperse", "every ship to shift for herself", "the convoy to disperse", "part company", "proceed independently"], does: {release: true}, source: "made", made: true}
+  - {number: 17, meaning: "The ship pointed out to come within hail of the commodore", also: ["come within hail", "within hail of the commodore", "close the commodore"], does: {order: "close the flag"}, qualifiers: [ship], source: "made", made: true}
+  - {number: 18, meaning: "The convoy to hoist their lights", also: ["hoist the lights", "lights", "show the lights", "hoist a stern lantern"], does: {order: "hoist a stern lantern"}, source: "made", made: true}
+  - {number: 19, meaning: "The convoy to show no lights", also: ["show no lights", "no lights", "douse the lights"], does: {order: "show no lights"}, source: "made", made: true}
+  - {number: 20, meaning: "Hoist your colours", also: ["show your colours", "hoist your colours", "colours"], does: {order: "hoist the colours"}, qualifiers: [ship], source: "made", made: true}
+  - {number: 21, meaning: "Affirmative", also: ["yes", "affirmative", "the signal is seen and understood"], does: {answer: "affirmative"}, source: "made", made: true}
+  - {number: 22, meaning: "Negative", also: ["no", "negative", "cannot comply"], does: {answer: "negative"}, source: "made", made: true}
+  - {number: 23, meaning: "Annul the last signal", also: ["annul", "annul the signal", "annul the last signal"], does: {answer: "annulled"}, source: "made", made: true}

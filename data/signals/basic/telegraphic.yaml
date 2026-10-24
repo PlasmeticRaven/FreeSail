@@ -1,0 +1,10 @@
+# FreeSail: the basic system's telegraphic dictionary (spec M7 §3; package 71;
+# docs/design/Design-Signals.md). There is none: the free sentence by flags was Popham's
+# and Britain's; a ship of a basic-system nation ordered `make the telegraphic signal: ...`
+# is refused in words. The file is kept so that every root has the same six.
+
+source: "no telegraphic dictionary in the basic system"
+made: false
+telegraph_flag: false
+alphabet: {}
+words: {}

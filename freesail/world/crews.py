@@ -183,6 +183,11 @@ class CrewedWorld(World):
         ship.name = vessel.name  # her own name over her file's (package 70: two cutters in a log)
         super().__init__(seed=seed, scenario=sc, ship=ship)
         attach_crew(self)
+        # package 71: her signal locker is her far body's (one object: the colours she
+        # shows, the hoists flying, her lights), so that nothing is mirrored
+        from freesail.world.signals import vessel_locker
+
+        self.ship.extra["signals"] = vessel_locker(vessel)
         self.vessels = CrewView(self)
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["vessels_view"] = True

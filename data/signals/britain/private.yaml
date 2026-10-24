@@ -1,0 +1,35 @@
+# FreeSail: the form of the British private signals (spec M7 §2; package 71;
+# docs/design/Design-Signals.md). The recognition challenge and its reply, issued under
+# seal, changed by the month and sunk weighted on capture (the Regulations and Instructions
+# of 1806; the period's letters and orders quote the form: "the private signal for the day
+# ... a blue flag at the main topmast head, answered by a red at the fore"; by night lights
+# and false fires). The actual tables were secret and are lost: the game's are MADE under
+# the seed in this form (`freesail/world/signals.py` `private_table`: the world's seed, the
+# nation, the year and the month seed the draw, so that two ships of one nation in one world
+# hold the same table and a replay has it again). A captured table (74's prize) is the same
+# draw for the captor, good until the month turns.
+#
+# Each `{slot}` is drawn from the pool of that name; `changes` says when the table turns.
+
+source: "the form of the Admiralty's private signals as the period's orders quote them (from memory); the tables made under the seed"
+made: true
+changes: monthly
+day:
+  challenge: "a {flag} at the {place}"
+  reply: "a {flag} at the {place}, with the ensign at the {ensign_place}"
+  pools:
+    flag: ["blue flag", "red flag", "white flag", "yellow flag", "blue and yellow flag", "red and white flag", "blue pendant", "red pendant", "white pendant", "Dutch jack", "union jack", "chequered flag"]
+    place: ["main topmast head", "fore topmast head", "mizen peak", "fore yardarm", "main yardarm", "ensign staff", "mizen topmast head"]
+    ensign_place: ["mizen peak", "ensign staff", "main topmast head"]
+night:
+  challenge: "{n} lights {arrangement} at the {place}"
+  reply: "{n} lights {arrangement} at the {place}, and a false fire"
+  pools:
+    n: ["one", "two", "three"]
+    arrangement: ["horizontal", "one over the other", "in a triangle"]
+    place: ["mizen peak", "ensign staff", "main topmast head", "fore topmast head"]
+# the ships that carry the table (judgement on the Regulations' custody: the King's ships
+# and the hired armed vessels in the Navy's service; a merchantman, a packet, a privateer
+# and a fisherman never had it)
+carried_by: [kings-ship, cruiser, commodore]
+answer_wait_s: 300   # the challenger waits five minutes for the reply before he reads none (judgement)

@@ -1,0 +1,53 @@
+# FreeSail: the French night and fog signals (spec M7 §3, §5; package 71;
+# docs/design/Design-Signals.md). The form of the Code's *Signaux de nuit* and *Signaux de
+# brume* (lanterns, 'feux de Bengale' for the British false fire, rockets and guns; guns and
+# muskets in fog), from memory; every hoist MADE in that form, the meanings the dozen a
+# night and a fog want. The form is data/signals/britain/night_fog.yaml's.
+
+source: "the Code de signaux's Signaux de nuit et de brume (the form from memory; every hoist made)"
+made: true
+
+night:
+  - {meaning: "Enemy in sight", also: ["the enemy in sight", "an enemy in sight"], show: "two lights horizontal at the mizen peak, and a Bengal light", does: {news: true}, source: "made", made: true}
+  - {meaning: "A strange sail in sight", also: ["strange sail", "a sail in sight"], show: "two lights, one over the other, at the ensign staff", does: {news: true}, source: "made", made: true}
+  - {meaning: "Tack together", also: ["tack", "put about together"], show: "one light at the mizen peak, and two guns", does: {order: "put her about"}, source: "made", made: true}
+  - {meaning: "Tack in succession", also: ["tack in succession"], show: "one light at the mizen peak, one gun, and a Bengal light", does: {order: "put her about"}, in_succession: true, source: "made", made: true}
+  - {meaning: "Wear together", also: ["wear", "wear ship together"], show: "two lights horizontal at the main topmast head, and three guns", does: {order: "wear ship"}, source: "made", made: true}
+  - {meaning: "Wear in succession", also: ["wear in succession"], show: "two lights horizontal at the main topmast head, one gun, and a Bengal light", does: {order: "wear ship"}, in_succession: true, source: "made", made: true}
+  - {meaning: "Make more sail", also: ["make sail", "more sail"], show: "one light at the fore topmast head, and a rocket", does: {order: "make sail"}, source: "made", made: true}
+  - {meaning: "Shorten sail", also: ["shorten sail", "take in sail"], show: "one light at the fore topmast head, and two rockets", does: {order: "shorten sail"}, source: "made", made: true}
+  - {meaning: "Bring to", also: ["heave to", "lie to", "bring to"], show: "three lights in a triangle at the mizen peak, and one gun", does: {order: "heave to"}, source: "made", made: true}
+  - {meaning: "Fill and make sail", also: ["fill", "fill away", "make sail again"], show: "three lights in a triangle at the mizen peak, and two guns", does: {order: "fill away"}, source: "made", made: true}
+  - {meaning: "Anchor", also: ["come to an anchor", "anchor"], show: "four lights in a square at the ensign staff, and one gun", does: {order: "come to an anchor"}, source: "made", made: true}
+  - {meaning: "Weigh", also: ["weigh anchor", "get under way"], show: "four lights in a square at the ensign staff, and two guns", does: {order: "weigh anchor"}, source: "made", made: true}
+  - {meaning: "Chase", also: ["general chase", "to chase", "chase in the direction"], show: "two rockets and a Bengal light", does: {state: chasing}, source: "made", made: true}
+  - {meaning: "Discontinue the chase", also: ["recall", "the recall", "give up the chase"], show: "three Bengal lights, one after another", does: {state: "on passage"}, source: "made", made: true}
+  - {meaning: "Engage the enemy", also: ["engage", "engage the enemy"], show: "a rocket and two guns", does: {state: engaging}, source: "made", made: true}
+  - {meaning: "Discontinue the action", also: ["break off the action", "haul off"], show: "two lights, one over the other, at the main topmast head, and three guns", does: {state: "on passage"}, source: "made", made: true}
+  - {meaning: "Keep closer order", also: ["close order", "close up", "close round the commodore"], show: "one light at the ensign staff, and a Bengal light", does: {order: "close the flag"}, source: "made", made: true}
+  - {meaning: "Danger: rocks or shoals", also: ["danger", "breakers", "shoal water", "land in sight"], show: "lights at every masthead, guns and muskets at intervals", does: {news: true}, source: "made", made: true}
+  - {meaning: "I am in want of assistance", also: ["want assistance", "in distress", "distress"], show: "a light at the masthead and guns at intervals", does: {news: true}, source: "made", made: true}
+  - {meaning: "Show your colours", also: ["show the private signal", "the private signal"], show: "the private signal's lights", does: {order: "show the private signal"}, source: "made", made: true}
+  - {meaning: "Affirmative", also: ["yes", "affirmative", "answer", "the signal is seen and understood"], show: "one Bengal light", does: {answer: "affirmative"}, source: "made", made: true}
+  - {meaning: "Negative", also: ["no", "negative", "cannot comply"], show: "two Bengal lights", does: {answer: "negative"}, source: "made", made: true}
+
+fog:
+  - {meaning: "Tack together", also: ["tack", "put about together"], fire: "two guns", does: {order: "put her about"}, source: "made", made: true}
+  - {meaning: "Tack in succession", also: ["tack in succession"], fire: "two guns and a volley of musketry", does: {order: "put her about"}, in_succession: true, source: "made", made: true}
+  - {meaning: "Wear together", also: ["wear", "wear ship together"], fire: "three guns", does: {order: "wear ship"}, source: "made", made: true}
+  - {meaning: "Wear in succession", also: ["wear in succession"], fire: "three guns and a volley of musketry", does: {order: "wear ship"}, in_succession: true, source: "made", made: true}
+  - {meaning: "Make more sail", also: ["make sail", "more sail"], fire: "one gun and the drum beaten", does: {order: "make sail"}, source: "made", made: true}
+  - {meaning: "Shorten sail", also: ["shorten sail", "take in sail"], fire: "one gun and the bell rung", does: {order: "shorten sail"}, source: "made", made: true}
+  - {meaning: "Bring to", also: ["heave to", "lie to", "bring to"], fire: "four guns", does: {order: "heave to"}, source: "made", made: true}
+  - {meaning: "Fill and make sail", also: ["fill", "fill away"], fire: "five guns", does: {order: "fill away"}, source: "made", made: true}
+  - {meaning: "Anchor", also: ["come to an anchor", "anchor"], fire: "six guns", does: {order: "come to an anchor"}, source: "made", made: true}
+  - {meaning: "Weigh", also: ["weigh anchor", "get under way"], fire: "seven guns", does: {order: "weigh anchor"}, source: "made", made: true}
+  - {meaning: "Enemy in sight", also: ["the enemy in sight", "a strange sail in sight", "strange sail"], fire: "a gun and the drum, repeated", does: {news: true}, source: "made", made: true}
+  - {meaning: "Danger: rocks or shoals", also: ["danger", "breakers", "shoal water"], fire: "guns and muskets at intervals, the bell rung", does: {news: true}, source: "made", made: true}
+  - {meaning: "Keep company", also: ["keep company", "keep closer order", "close order"], fire: "a gun every half hour, the ships answering with muskets", does: {order: "close the flag"}, source: "made", made: true}
+  - {meaning: "Affirmative", also: ["yes", "affirmative", "answer"], fire: "a volley of musketry", does: {answer: "affirmative"}, source: "made", made: true}
+
+keeping:
+  at_anchor: {do: "ring the bell", every_s: 120, source: "the custom at anchor in a fog (judgement; as the British)"}
+  under_way: {do: "fire a gun", every_s: 1800, source: "the fleet's gun every half hour in a fog (from memory; judgement)"}
+  under_way_alone: {do: "beat the drum", every_s: 300, source: "the custom (judgement)"}

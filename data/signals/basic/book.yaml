@@ -1,0 +1,32 @@
+# FreeSail: the basic signal system every nation has from the foundation (spec M7 §3, the
+# owner's note of 2026-10-23; package 71; docs/design/Design-Signals.md). The same shape as
+# data/signals/britain/book.yaml (its head says the fields). A nation whose entry in
+# data/nations.yaml names `signals: {root: basic}` (or names none) reads this root: the
+# Spanish, the Dutch, the Danes, the Americans, the Portuguese and the Moors in 1805, each
+# built out into a root of her own by package 76 as her sources are found.
+#
+# What it is: a numerary book of a few dozen entries in the common form of the period's
+# national books (every navy of 1805 had numeral flags after Howe's manner, or a table
+# after du Pavillon's, and the same general signals in it: the chase and the recall, the
+# line, tacking and wearing together and in succession, more and less sail, anchoring,
+# the enemy and the land in sight, distress, the affirmative and the negative); no
+# telegraphic dictionary (the free sentence was Popham's); the night and fog signals and
+# the convoy's in the common form; the private table's form. Every entry MADE: the meanings
+# are the period's, the numbers and hoists the builder's.
+
+nation: basic
+system: basic
+sources:
+  - "the common form of the period's national signal books (every meaning one each had; every number and hoist made)"
+flags:
+  numerals: 10
+  substitute: true
+  preparative: true
+  telegraph: false
+  answering_pennant: true
+  annul: true
+hoist_s: 60
+read_s: 60
+read_nm: 2.0
+glass_factor: 1.5
+flies_s: 1800

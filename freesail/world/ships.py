@@ -512,6 +512,12 @@ class Vessel:
     fit: str = ""
     struck: bool = False
     damage: dict[str, Any] = field(default_factory=dict)
+    # package 71 (spec M7 §1 to §4): her signal locker (`signals.Locker`: her colours as a
+    # state, the hoists flying, her lights; one object with her crewed World's), and whose
+    # signals command her (`under the orders of`: a ship's id, 'the ship' for the player's;
+    # the least relation under 72's squadron); None and '' in a checkpoint from before
+    signals: Any = None
+    under_orders_of: str = ""
 
     @property
     def height_m(self) -> float:
@@ -858,10 +864,19 @@ class Vessel:
         return f"standing to the {_ward(self.heading_deg)} ({point}), {self.sail_state}"
 
     def colours_words(self) -> str:
-        if not self.shows_colours or not self.nation_adjective:
-            return "a stranger, her colours not made out"
-        flag = f", {self.flag}" if self.flag else ""
-        return f"{self.nation_adjective} colours{flag}"
+        """Her colours as a lookout reads them (package 71): the nation SHOWN, which under
+        false colours is not her own; 'a stranger, her colours not made out' when none."""
+        from freesail.world.signals import vessel_locker
+
+        return vessel_locker(self).colours.words(None)
+
+    @property
+    def nation_shown(self) -> str | None:
+        """The nation a lookout makes out from her colours, None when none show."""
+        from freesail.world.signals import colours_seen
+
+        shows, nation, _adj, _flag = colours_seen(self)
+        return nation if shows else None
 
     def words_at(self, level: int) -> str:
         """What is known of her at a level made out (the reading `the strangers`)."""
@@ -927,6 +942,11 @@ class Vessel:
             d["fit"] = self.fit  # package 70
         if getattr(self, "struck", False):
             d["struck"] = True
+        locker = getattr(self, "signals", None)
+        if locker is not None and locker.colours.state != "shown":
+            d["colours"] = locker.colours.to_dict()  # package 71: only off the plain state
+        if getattr(self, "under_orders_of", ""):
+            d["under_orders_of"] = self.under_orders_of
         story = getattr(self, "story", ()) or ()
         if story:
             # her captain's orders by the director's hand (package 62): only where there
@@ -1090,7 +1110,8 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
     else:
         stream = world.rng.stream("ships")
         factor = SAILING_FACTOR_MIN + (1.0 - SAILING_FACTOR_MIN) * stream.random()
-    shows = str(spec.get("colours", "shown")).lower() not in ("none", "no", "false", "hidden")
+    colours_word = str(spec.get("colours", "shown")).lower().strip()
+    shows = colours_word not in ("none", "no", "false", "hidden")
     vessel = Vessel(
         id=str(spec.get("id") or f"ship-{serial}"),
         name=name,
@@ -1110,6 +1131,26 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         sailing_factor=round(factor, 3),
         fit=" ".join(str(spec.get("fit") or "").split()),
     )
+    # package 71: `colours: <another nation>` is false colours of that nation ('colours:
+    # British' on a French privateer); `under_the_orders_of:` whose signals command her;
+    # `lights:` what she shows by night
+    from freesail.world.signals import set_colours, vessel_locker
+
+    locker = vessel_locker(vessel)
+    if shows and colours_word not in ("shown", "yes", "true", ""):
+        other = world.nations.find(colours_word)
+        if other is None:
+            raise ValueError(
+                f"'{spec.get('colours')}' is no colours a ship shows: 'shown', 'none', or a "
+                "nation of the table for false colours"
+            )
+        if other.id != nation.id:
+            set_colours(locker.colours, world.nations, "false", other.id, 0)
+    boss = spec.get("under_the_orders_of", spec.get("under_orders_of"))
+    if boss:
+        vessel.under_orders_of = " ".join(str(boss).split())
+    if spec.get("lights"):
+        locker.lights = str(spec["lights"])
     if spec.get("letter") is not None:
         from freesail.world.people import Message
 
@@ -1355,6 +1396,11 @@ class Vessels:
                 what=d["what"],
             )
             self._shadow = s
+        # package 71: the player's locker is the shadow's (her colours as she shows them,
+        # her signals flying), one object
+        from freesail.world.signals import player_locker
+
+        s.signals = player_locker(world)
         s.position = pos
         s.struck = bool((getattr(ship, "extra", None) or {}).get("struck"))  # package 70
         s.heading_deg = units.rad_to_deg(float(ship.heading)) % 360.0
@@ -1402,7 +1448,8 @@ class Vessels:
             if nm > limit:
                 continue
             level, _ = o.made_out(distance, glass=(o.id == glass_for))
-            colours = level >= 2 and o.shows_colours and bool(o.nation_adjective)
+            shown = o.nation_shown  # package 71: the colours SHOWN, false or true
+            colours = level >= 2 and shown is not None
             items.append(
                 {
                     "id": o.id,
@@ -1412,7 +1459,7 @@ class Vessels:
                     "estimate_m": round(distance),
                     "made_out": level,
                     "known": o.words_at(level),
-                    "nation": o.nation if colours else None,
+                    "nation": shown if colours else None,
                     "spoken": o.id in spoken,
                     "size": _size_of(o),
                 }
@@ -1531,6 +1578,7 @@ class Vessels:
         and the eye give (truth 67), within the weather's visibility, by day; at night a
         sail is seen only close aboard, as the land is (`chart.NIGHT_LAND_NM`)."""
         from freesail.world.chart import NIGHT_LAND_NM
+        from freesail.world.signals import LIGHT_SEEN_NM
 
         vis_nm = math.inf if visibility_nm is None else float(visibility_nm)
         out: list[Sighting] = []
@@ -1546,6 +1594,25 @@ class Vessels:
                 limit = min(limit, NIGHT_LAND_NM)
             if nm <= limit:
                 out.append(Sighting(v.seen_as_feature(distance), bearing, distance, "sail"))
+            elif daylight == "night" and nm <= min(vis_nm, LIGHT_SEEN_NM) and _lights_of(v):
+                # package 71 (spec M7 §5): her light seen at night beyond the hull's loom, at
+                # the range a lantern carries, as a sighting of its own
+                out.append(
+                    Sighting(
+                        Feature(
+                            f"light:{v.id}",
+                            "light",
+                            "a light",
+                            v.position.lat_deg,
+                            v.position.lon_deg,
+                            modern=v.id,
+                            height_m=v.height_m,
+                        ),
+                        bearing,
+                        distance,
+                        "light",
+                    )
+                )
         out.sort(key=lambda s: s.distance_m)
         return out
 
@@ -1557,6 +1624,18 @@ def _player_id() -> str:
     from freesail.world.brains import PLAYER_ID
 
     return PLAYER_ID
+
+
+def _lights_of(v: Vessel) -> str:
+    """The lights a far vessel shows by night (package 71): her locker's, or a fishing
+    vessel's lantern at her gear (56's)."""
+    locker = getattr(v, "signals", None)
+    lights = str(getattr(locker, "lights", "") or "none") if locker is not None else "none"
+    if lights != "none":
+        return lights
+    fishing = getattr(v, "fishing", None)
+    out = getattr(fishing, "out", None) if fishing is not None else None
+    return "a lantern at her nets" if out is not None and out.state == "fishing" else ""
 
 
 def _size_of(v: Vessel) -> int:

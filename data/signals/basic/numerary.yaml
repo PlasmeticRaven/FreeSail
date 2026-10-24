@@ -1,0 +1,53 @@
+# FreeSail: the basic numerary signal book, the day signals (spec M7 §3; package 71;
+# docs/design/Design-Signals.md). The form is data/signals/britain/numerary.yaml's (its
+# head says the fields). A few dozen entries in the common form of the period's national
+# books; every number MADE, every meaning one the books had. Package 76 builds each nation's
+# own root out from this.
+
+entries:
+  - {number: 1, meaning: "Enemy in sight", also: ["the enemy in sight", "an enemy in sight"], does: {news: true}, qualifiers: [compass], source: "the common form (made)", made: true}
+  - {number: 2, meaning: "A strange sail in sight", also: ["strange sail", "a sail in sight"], does: {news: true}, qualifiers: [compass, number], source: "the common form (made)", made: true}
+  - {number: 3, meaning: "The strange sail is an enemy", also: ["the stranger is an enemy", "she is an enemy"], does: {news: true}, source: "the common form (made)", made: true}
+  - {number: 4, meaning: "The strange sail is a friend", also: ["the stranger is a friend", "she is a friend"], does: {news: true}, source: "the common form (made)", made: true}
+  - {number: 5, meaning: "The enemy is superior in force", also: ["the enemy is superior", "a superior force"], does: {news: true}, source: "the common form (made)", made: true}
+  - {number: 6, meaning: "Land in sight", also: ["the land in sight", "land seen"], does: {news: true}, qualifiers: [compass], source: "the common form (made)", made: true}
+  - {number: 7, meaning: "Danger: rocks or shoals", also: ["danger", "breakers", "shoal water"], does: {news: true}, qualifiers: [compass], source: "the common form (made)", made: true}
+  - {number: 8, meaning: "General chase", also: ["chase", "to chase", "a general chase", "chase in the direction"], does: {state: chasing}, qualifiers: [compass], source: "the common form (made)", made: true}
+  - {number: 9, meaning: "Discontinue the chase", also: ["give up the chase", "the recall", "recall the chasers"], does: {state: "on passage"}, source: "the common form (made)", made: true}
+  - {number: 10, meaning: "Rejoin the admiral", also: ["rejoin", "rejoin the flag", "close the admiral", "rally"], does: {order: "shape a course for the flag"}, source: "the common form (made)", made: true}
+  - {number: 11, meaning: "Prepare for battle", also: ["prepare for battle", "prepare for action", "clear for action"], does: {order: "clear for action"}, source: "the common form (made)", made: true}
+  - {number: 12, meaning: "Engage the enemy", also: ["engage", "engage the enemy", "to engage"], does: {state: engaging}, source: "the common form (made)", made: true}
+  - {number: 13, meaning: "Engage the enemy more closely", also: ["engage more closely", "engage closer", "closer"], does: {closer: true}, source: "the common form (made)", made: true}
+  - {number: 14, meaning: "Discontinue the action", also: ["break off the action", "cease the action", "haul off", "leave off action"], does: {state: "on passage"}, source: "the common form (made)", made: true}
+  - {number: 15, meaning: "Form the line of battle", also: ["form the line", "form the line of battle", "the line of battle", "form line ahead"], does: {news: true}, qualifiers: [compass], source: "the common form (made; 72's)", made: true}
+  - {number: 16, meaning: "Form the order of sailing", also: ["form the order of sailing", "the order of sailing"], does: {news: true}, source: "the common form (made; 72's)", made: true}
+  - {number: 17, meaning: "Keep closer order", also: ["close order", "closer order", "close up", "keep closer order"], does: {order: "close the flag"}, source: "the common form (made)", made: true}
+  - {number: 18, meaning: "Tack together", also: ["tack", "tack together", "put about together", "go about together"], does: {order: "put her about"}, source: "the common form (made)", made: true}
+  - {number: 19, meaning: "Tack in succession", also: ["tack in succession", "put about in succession", "go about in succession"], does: {order: "put her about"}, in_succession: true, source: "the common form (made)", made: true}
+  - {number: 20, meaning: "Wear together", also: ["wear", "wear together", "wear ship together"], does: {order: "wear ship"}, source: "the common form (made)", made: true}
+  - {number: 21, meaning: "Wear in succession", also: ["wear in succession", "wear ship in succession"], does: {order: "wear ship"}, in_succession: true, source: "the common form (made)", made: true}
+  - {number: 22, meaning: "Make more sail", also: ["make sail", "make more sail", "more sail", "make all sail", "all sail"], does: {order: "make sail"}, source: "the common form (made)", made: true}
+  - {number: 23, meaning: "Shorten sail", also: ["shorten sail", "take in sail", "less sail"], does: {order: "shorten sail"}, source: "the common form (made)", made: true}
+  - {number: 24, meaning: "Bring to", also: ["bring to", "heave to", "lie to", "lay to"], does: {order: "heave to"}, source: "the common form (made)", made: true}
+  - {number: 25, meaning: "Fill and make sail", also: ["fill", "fill away", "make sail again", "get under way"], does: {order: "fill away"}, source: "the common form (made)", made: true}
+  - {number: 26, meaning: "Steer the course indicated", also: ["steer", "steer the course", "alter course to", "course", "bear up"], does: {order: "steer {compass}"}, qualifiers: [compass], source: "the common form (made)", made: true}
+  - {number: 27, meaning: "Haul your wind", also: ["haul your wind", "close hauled", "by the wind", "keep the wind"], does: {order: "keep her full and by"}, source: "the common form (made)", made: true}
+  - {number: 28, meaning: "Anchor", also: ["anchor", "come to an anchor", "let go the anchor"], does: {order: "come to an anchor"}, source: "the common form (made)", made: true}
+  - {number: 29, meaning: "Weigh", also: ["weigh", "weigh anchor", "up anchor", "get under way"], does: {order: "weigh anchor"}, source: "the common form (made)", made: true}
+  - {number: 30, meaning: "Show your colours", also: ["show your colours", "hoist your colours", "colours"], does: {order: "hoist the colours"}, qualifiers: [ship], source: "the common form (made)", made: true}
+  - {number: 31, meaning: "Show the private signal", also: ["make the private signal", "the private signal"], does: {order: "show the private signal"}, qualifiers: [ship], source: "the common form (made)", made: true}
+  - {number: 32, meaning: "Hoist your true colours", also: ["true colours", "hoist your true colours"], does: {order: "hoist the colours"}, source: "the common form (made)", made: true}
+  - {number: 33, meaning: "I am in want of assistance", also: ["want assistance", "in distress", "distress", "assistance"], does: {news: true}, source: "the common form (made)", made: true}
+  - {number: 34, meaning: "I am disabled: masts or rigging", also: ["disabled", "dismasted", "my rigging is cut up", "sprung a leak", "a leak"], does: {news: true}, source: "the common form (made)", made: true}
+  - {number: 35, meaning: "Part company", also: ["you may part company", "proceed on your voyage", "proceed", "proceed independently", "disperse", "the convoy to disperse"], does: {release: true}, qualifiers: [ship], source: "the common form (made)", made: true}
+  - {number: 36, meaning: "Hoist the lights", also: ["hoist the lights", "top lights", "hoist the top lights", "lights"], does: {order: "hoist the top lights"}, source: "the common form (made)", made: true}
+  - {number: 37, meaning: "Show no lights", also: ["show no lights", "no lights", "douse the lights"], does: {order: "show no lights"}, source: "the common form (made)", made: true}
+  - {number: 38, meaning: "Send a boat to the admiral", also: ["send a boat", "a boat to the flag", "repair on board"], does: {news: true}, qualifiers: [ship], source: "the common form (made)", made: true}
+  - {number: 39, meaning: "The signal is not understood", also: ["not understood", "signal not understood"], does: {answer: "not understood"}, source: "the common form (made)", made: true}
+  - {number: 40, meaning: "I cannot comply", also: ["cannot comply", "unable to comply"], does: {answer: "cannot comply"}, source: "the common form (made)", made: true}
+  - {number: 41, meaning: "Affirmative", also: ["yes", "affirmative", "the affirmative"], does: {answer: "affirmative"}, source: "the common form (made)", made: true}
+  - {number: 42, meaning: "Negative", also: ["no", "negative", "the negative"], does: {answer: "negative"}, source: "the common form (made)", made: true}
+  - {number: 43, meaning: "Annul the last signal", also: ["annul", "annul the signal", "annul the last signal"], does: {answer: "annulled"}, source: "the common form (made)", made: true}
+  - {number: 44, meaning: "Steer for the place indicated", also: ["make for", "steer for", "proceed to"], does: {order: "shape a course for {place}"}, qualifiers: [place], source: "the common form (made)", made: true}
+  - {number: 45, meaning: "Beat to quarters", also: ["beat to quarters", "quarters", "to quarters"], does: {order: "beat to quarters"}, source: "the common form (made)", made: true}
+  - {number: 46, meaning: "Fire a gun to leeward", also: ["fire a gun to leeward", "a gun to leeward"], does: {order: "fire a gun to leeward"}, source: "the common form (made)", made: true}

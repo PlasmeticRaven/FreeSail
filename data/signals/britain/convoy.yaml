@@ -1,0 +1,47 @@
+# FreeSail: the British instructions to merchantmen under convoy (spec M7 §3; package 71;
+# docs/design/Design-Signals.md). The Admiralty's *Signals and Instructions for Ships under
+# Convoy*, a short book of its own given to the masters, who never saw the fleet's book:
+# the meanings from memory of its form (make sail, shorten sail, tack, wear, close round the
+# commodore, the enemy in sight, anchor, the convoy to disperse, a ship to come within hail,
+# the lights by night), the numbers and hoists MADE. A merchantman under a commodore's orders
+# reads this book and no other; the commodore's ship reads both. Package 76 builds it out.
+#
+# The form is the numerary's (number, meaning, also, does, in_succession, qualifiers,
+# source, made); the hoists are flags over a pendant by the convoy book's custom.
+
+source: "Signals and Instructions for Ships under Convoy (the Admiralty's; the form from memory, the numbers and hoists made)"
+made: true
+
+entries:
+  - {number: 1, meaning: "The convoy to make sail", also: ["make sail", "make more sail", "more sail"], does: {order: "make sail"}, source: "the convoy instructions (made)", made: true}
+  - {number: 2, meaning: "The convoy to make all sail", also: ["make all sail", "all sail", "crowd sail"], does: {order: "make all sail"}, source: "the convoy instructions (made)", made: true}
+  - {number: 3, meaning: "The convoy to shorten sail", also: ["shorten sail", "take in sail", "less sail"], does: {order: "shorten sail"}, source: "the convoy instructions (made)", made: true}
+  - {number: 4, meaning: "The convoy to tack together", also: ["tack", "tack together", "put about", "go about"], does: {order: "put her about"}, source: "the convoy instructions (made)", made: true}
+  - {number: 5, meaning: "The convoy to tack in succession", also: ["tack in succession", "put about in succession", "go about in succession"], does: {order: "put her about"}, in_succession: true, source: "the convoy instructions (made)", made: true}
+  - {number: 6, meaning: "The convoy to wear together", also: ["wear", "wear together", "wear ship"], does: {order: "wear ship"}, source: "the convoy instructions (made)", made: true}
+  - {number: 7, meaning: "The convoy to wear in succession", also: ["wear in succession", "wear ship in succession"], does: {order: "wear ship"}, in_succession: true, source: "the convoy instructions (made)", made: true}
+  - {number: 8, meaning: "The convoy to close round the commodore", also: ["close round the commodore", "close", "close up", "keep closer order", "close order"], does: {order: "close the flag"}, source: "the convoy instructions (made)", made: true}
+  - {number: 9, meaning: "Enemy in sight", also: ["the enemy in sight", "an enemy in sight", "enemy's cruisers in sight", "a privateer in sight"], does: {news: true}, qualifiers: [compass], source: "the convoy instructions (made)", made: true}
+  - {number: 10, meaning: "A strange sail in sight", also: ["strange sail", "a sail in sight", "a stranger in sight"], does: {news: true}, qualifiers: [compass], source: "the convoy instructions (made)", made: true}
+  - {number: 11, meaning: "The convoy to anchor", also: ["anchor", "come to an anchor", "let go the anchor"], does: {order: "come to an anchor"}, source: "the convoy instructions (made)", made: true}
+  - {number: 12, meaning: "The convoy to weigh", also: ["weigh", "weigh anchor", "get under way", "up anchor"], does: {order: "weigh anchor"}, source: "the convoy instructions (made)", made: true}
+  - {number: 13, meaning: "The convoy to bring to", also: ["bring to", "heave to", "lie to"], does: {order: "heave to"}, source: "the convoy instructions (made)", made: true}
+  - {number: 14, meaning: "The convoy to fill and make sail", also: ["fill", "fill away", "make sail again"], does: {order: "fill away"}, source: "the convoy instructions (made)", made: true}
+  - {number: 15, meaning: "The convoy to steer the course indicated", also: ["steer", "steer the course", "alter course to", "course"], does: {order: "steer {compass}"}, qualifiers: [compass], source: "the convoy instructions (made)", made: true}
+  - {number: 16, meaning: "The convoy to keep the wind on the starboard tack", also: ["keep the wind on the starboard tack", "by the wind on the starboard tack", "close hauled on the starboard tack"], does: {order: "keep her full and by on the starboard tack"}, source: "the convoy instructions (made)", made: true}
+  - {number: 17, meaning: "The convoy to keep the wind on the larboard tack", also: ["keep the wind on the larboard tack", "by the wind on the larboard tack", "close hauled on the larboard tack"], does: {order: "keep her full and by on the larboard tack"}, source: "the convoy instructions (made)", made: true}
+  - {number: 18, meaning: "The convoy to disperse", also: ["disperse", "every ship to shift for herself", "the convoy to disperse", "part company", "proceed independently"], does: {release: true}, source: "the convoy instructions (made)", made: true}
+  - {number: 19, meaning: "The ship pointed out to come within hail of the commodore", also: ["come within hail", "within hail of the commodore", "close the commodore"], does: {order: "close the flag"}, qualifiers: [ship], source: "the convoy instructions (made)", made: true}
+  - {number: 20, meaning: "The ships astern to make more sail", also: ["ships astern make more sail", "the sternmost ships to make sail", "the sternmost ships"], does: {order: "make all sail"}, source: "the convoy instructions (made)", made: true}
+  - {number: 21, meaning: "The ships ahead to shorten sail", also: ["ships ahead shorten sail", "the headmost ships to shorten sail", "the headmost ships"], does: {order: "shorten sail"}, source: "the convoy instructions (made)", made: true}
+  - {number: 22, meaning: "The convoy to hoist their lights", also: ["hoist the lights", "lights", "show the lights", "hoist a stern lantern"], does: {order: "hoist a stern lantern"}, source: "the convoy instructions' night orders (made)", made: true}
+  - {number: 23, meaning: "The convoy to show no lights", also: ["show no lights", "no lights", "douse the lights"], does: {order: "show no lights"}, source: "the convoy instructions' night orders (made)", made: true}
+  - {number: 24, meaning: "Hoist your colours", also: ["show your colours", "hoist your colours", "colours"], does: {order: "hoist the colours"}, qualifiers: [ship], source: "the convoy instructions (made)", made: true}
+  - {number: 25, meaning: "I am in want of assistance", also: ["want assistance", "in distress", "assistance"], does: {news: true}, source: "the convoy instructions (made)", made: true}
+  - {number: 26, meaning: "The convoy to take in a reef in the topsails", also: ["take in a reef", "reef the topsails", "reef topsails"], does: {order: "take in a reef in the topsails"}, source: "the convoy instructions (made)", made: true}
+  - {number: 27, meaning: "The convoy to shake out the reefs", also: ["shake out the reefs", "out reefs"], does: {order: "shake out the reefs"}, source: "the convoy instructions (made)", made: true}
+  - {number: 28, meaning: "The convoy to prepare to anchor", also: ["prepare to anchor"], does: {news: true}, source: "the convoy instructions (made)", made: true}
+  - {number: 29, meaning: "Keep your station", also: ["keep station", "keep your station"], does: {news: true}, qualifiers: [ship], source: "the convoy instructions (made; station keeping 72's)", made: true}
+  - {number: 30, meaning: "Affirmative", also: ["yes", "affirmative", "the signal is seen and understood"], does: {answer: "affirmative"}, source: "the convoy instructions (made)", made: true}
+  - {number: 31, meaning: "Negative", also: ["no", "negative", "cannot comply"], does: {answer: "negative"}, source: "the convoy instructions (made)", made: true}
+  - {number: 32, meaning: "Annul the last signal", also: ["annul", "annul the signal", "annul the last signal"], does: {answer: "annulled"}, source: "the convoy instructions (made)", made: true}
