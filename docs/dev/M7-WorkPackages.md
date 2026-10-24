@@ -37,7 +37,7 @@ on these packages; that is the owner's choice.
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | approved and launched 2026-10-24 (Fable, in a worktree off `ca305c4`) |
-| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | after 70 and 73 |
+| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; runs after 73 |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | behind 70 |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue | behind 70 and 73 |
@@ -796,3 +796,113 @@ change moves them, old beside new, proven by bisection (the Horta grounding's re
 the gale trials may move by the water's rule: say which and why); never a test skipped,
 disabled or quarantined; realism, not pacing (a man's wound and a ship's leak take the time
 they took); the physics read and not changed.
+
+## Package 74: prizes, the strike and what follows, and the far fight (`freesail/world/prizes.py` new; `freesail/world/crews.py`, `ships.py`, `brains.py` the prize as a vessel with a new nation and goal, the far fight wired; `freesail/combat/far.py`, `action.py`, `morale.py`; `freesail/world/business.py`, `ports.py`, `data/business.yaml`, `data/ports/*.yaml` the prize court and the head money; `freesail/world/people.py`, `places.py`, `hearing.py`, `stations.py`, `seats.py` the captive's place and voice; `freesail/world/captains.py`, `data/captains/*.yaml` the captor's and the prize master's doctrine, the parole; `freesail/agents/harness.py`, `director.py`, `data/director/` the captive's channel, the court martial as the director's proceeding, a new command; `freesail/world/scenarios.py`, `data/scenarios/`; `freesail/api/readings.py`; `docs/design/` the consent revision's draft; `docs/TechnicalSpec-M7.md` §11a, §18 to §20, §29 as built; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths from the number after 73's)
+
+Fable; the fifth and last of the front-loaded Fable packages, run alone after 73 by the
+owner's rule. Spec M7 §11a (the far fight), Part 7-v (§18 to §20) and §29 whole, with rule
+4 (rules first, models welcome) and rule 5 (the far ships fight as the near do, coarsely);
+decision 7 (the colours struck by rule, the captain's own word too); the striking-colours
+study whole (its gaps 1 and 6 are this package's); the owner's note on the court martial
+and the continuation (`docs/design/NotesForM7.md`); 70's far fight measured and not wired
+(`combat/far.py`, truth 7-139), 72's cut-out stopping at hailing distance and its prize hook
+on the set, 73's fight on deck ending at `struck` by the boarders' hand, 71's captured
+private table as a paper, 53b's things and transactions, 66's line and 67's seat at a
+person (the shape of the captive's voice). **Generously scoped as the four before it:** the
+brief binds the intent and names the ground, the builder designs, takes an item another
+way with its reason, grows a part where the work shows it should, and says what it left
+and why; no day count. **The prize and the captive are designed first and written down
+before they are built** (a design note under `docs/design/`), because 80 fills them out and
+M8's career remembers what they record. Each item an intent with the lead's reading; the
+intent binds.
+
+1. **The prize (§18).** A ship struck is possessed: her colours the captor's; a prize crew
+   out of the captor's muster put aboard with a prize master (a person bound to her
+   captain's station under the rules, or a model's seat by 67's door); her people prisoners
+   confined below or divided between the ships, counted as numbers but for the named; a
+   goal that is a friendly port, the two sailing in company (72's set: a prize joins her
+   captor's company) or parting; a prize retaken by her prisoners rising when the prize crew
+   is thin and tired, or by a cruiser coming up (the retaking by boats waits for 63's boat
+   and 77's cutting out); a captured signal book or private table a paper of the prize
+   (71's); burning or scuttling a prize not worth manning; the far body carrying a prize as
+   a vessel with a new nation and goal. The doctrine of it in the captor's role file (what
+   he mans, what he burns, how he divides his people).
+2. **The prize court and the money.** The prize condemned and paid at the port by the
+   business's purse: the hull's valuation (60's mechanics from the other side: 60 is not
+   built, so the least valuation from the ship file's tonnage, age and fit with its source,
+   left in a shape 60 takes up for buying and selling), the cargo at the market (53b's
+   transactions), the head money for a privateer or a man-of-war, the agent's commission,
+   shared by the period's eighths (the 1808 proclamation's shares, or the 1805 ones, named)
+   between the captain, the officers and the people, the purse's line saying so; a prize
+   lost on the way home nothing; a neutral taken wrongly the court's refusal and the costs.
+3. **The player struck: the captive's channel (§19; the study's gap 1).** The player who
+   strikes has not lost the game: he is a person aboard the captor with the place and the
+   voice M7b gave every person (where he is: the great cabin, the gunroom, the hold; what he
+   can see from there; what he can say and to whom, `say to the captain: ...`; his journal
+   kept); the parole given or refused by the period's custom (an officer's parole, a
+   passenger's, a seaman confined); the captor's captain a rules captain by doctrine (the
+   sword returned, the parole accepted, the course for his port, the prisoners landed or
+   exchanged by cartel) or a model's seat or the director's voice; the director shaping
+   what follows through plausible causes as always (a gale that night, a cartel in the
+   offing, a friendly cruiser at dawn); a holder at the captor's stations seeing him as a
+   person aboard. The same channel serves a prisoner of the player's own prize, by parity.
+4. **The court martial and a new command (§19; the owner's note).** The court martial as
+   the director's proceeding: its questions in-world through the director's channel (67's)
+   and the captive's, the verdict a world order journaled (acquitted with honour, reprimanded,
+   dismissed the ship, dismissed the service), nothing shown as sent; a new command as a
+   scenario's start that carries what the records keep (his name, his people who followed
+   him, the verdict); **a career that remembers is M8's**, the hooks named in the records.
+5. **The far fight, wired (§11a; rule 5).** 70's `combat/far.py` (the same tables at
+   three-minute rounds) given to the far brains: two far ships that meet in anger resolve
+   their action at coarse steps by their doctrine (the engaging transition for the far
+   bodies with the doctrine's range under the nation's habit), the damage summed into the
+   far state (`Vessel.damage`), the striking by morale, the prize as item 1 has it at far
+   detail; 72's cut-out carried from hailing distance to its end by the same rounds; within
+   the promotion's range the engaged ships crewed under the cap's order, **an engagement
+   first among the cap's reasons**, the far state carried into the near body and back; the
+   near action and the far one measured to agree within a round (70's truth 7-139 extended);
+   the pace measured with the far fights running (the floors not lowered).
+6. **The consent revision for adversarial seats (§29; the study's gap 6), drafted and not
+   applied.** No model is seated as the captain of a ship that fires into a human's ship or
+   takes him prisoner until the consent brief has been revised and the question put again;
+   package 55 (deferred by the owner until testing begins in earnest) carries the revision
+   and the re-brief. This package **drafts the revision's text** under `docs/design/` (what
+   the brief would say: the roles of an enemy captain, a prize master over prisoners, a
+   captor's captain to a human captive; what an instance would see and do; the leaving
+   words), **edits no file under `docs/agents/consent/` or `docs/agents/ConsentBrief.md`**,
+   and makes the game refuse such a seat in words until the revised brief is in force (a
+   flag the revision's package turns), the refusal saying why; the rules captain and the
+   director's voice serve every adversarial role meanwhile (rule 4).
+7. **The stations, the director and the readings.** `the prize`, `the prisoners`, `the
+   prize crew`, `the parole` as readings; the events and tripwires (`she is taken`, `the
+   prisoners rising`, `a cartel`); the director's forms after `WORLD_ORDER_FORMS` (a prize
+   condemned or restored, a cartel sent, the court's verdict, a new command) with their
+   doubts; the harness's samples at the captive's channel and at a prize master's station;
+   the truth showing every prize, her crew and her prisoners.
+8. **Truths and records.** §20's truths (a merchant brig taken by a privateer schooner sails
+   for Bayonne under a prize crew of eight with her master a prisoner in the cabin and is
+   retaken by a cruiser coming up when the prize crew is thin and tired, the boats' retaking
+   left to 63 and 77 with the truth's words amended and the reason; the prize money paid at
+   Falmouth by the eighths, the purse's line saying so; the player struck to a model's ship
+   asked for his parole in the model's words and answering in his own, the exchange in both
+   logs and nowhere in the operator's voice, by the test's fake door; the far fight of a
+   privateer and a merchantman off the horizon ending as the near fight would within a
+   round, and the prize carried; a court martial's verdict journaled as a world order and a
+   new command started from it), numbered from the first after 73's; scenarios (the prize's
+   passage home; the captive aboard the captor); spec §11a, §18 to §20 and §29 "as built";
+   the Harness (the captive's channel, a prize master's station); a chapter of the primer
+   (a prize taken, a prize crew, the court; striking and what follows); the director's
+   library; the tuning notes (the design or its pointer, each item, the figures and sources,
+   the far fight's agreement, what moved and its proof, the pins old beside new, found on
+   the way, decisions, the suite as run); the fast tier, the slow tier of the touched files,
+   the whole slow tier when the machine is quiet, the pace tests alone and last.
+
+**Not built here:** the career (M8); a ship bought and sold (60) beyond the valuation's
+shape; the boats' cutting out and retaking (63, 77); the cartel's and the captive's places
+and words filled out (80); the consent revision applied (55). **The head rules bind** as the
+briefs before have them: no model identifier; **nothing under `docs/agents/consent/` or in
+`docs/agents/ConsentBrief.md` touched, this package's item 6 included**; a world order never
+shown as sent; the ship files through the generator with sources; the pins re-measured only
+where a change moves them, old beside new, proven by bisection (the far fight wired can
+move passages with two far ships in anger: say which and why); never a test skipped,
+disabled or quarantined; realism, not pacing; the physics read and not changed.
