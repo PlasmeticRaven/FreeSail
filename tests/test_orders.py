@@ -2698,9 +2698,11 @@ def test_two_bargains_in_one_order_are_two():
         ("schooner", "furl the water sail", ok(evo="take_in_studding")),
         ("schooner", "clew up the water sail", no(["not clewed up", "'take in the water sail'"])),
         ("frigate", "take in the water sail", no(["There is no such part as the water sail"])),
-        # the words refused with what to say, or the milestone
-        ("frigate", "hoist our colours", no(["milestone 7"])),
-        ("frigate", "show your colours", no(["milestone 7"])),
+        # the words refused with what to say, or the milestone; the colours are the ship's
+        # since package 71 (spec M7 §1), and on a ship with no world and no other sail to
+        # see a flag the order says so
+        ("frigate", "hoist our colours", no(["no other sail to see a flag"])),
+        ("frigate", "show your colours", no(["no other sail to see a flag"])),
         ("frigate", "man the pumps", no(["not worked in this game yet", "Sound the well"])),
         ("frigate", "as you were", no(["'belay that'"])),
         (

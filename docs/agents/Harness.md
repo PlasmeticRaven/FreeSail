@@ -682,6 +682,60 @@ his own; `say as the gunner` and `say as the captain of No. 3 gun` speak for the
 and for the senior hand the quarter bill has at the gun. A station holder hurt is 73's;
 this package writes the hit to his person's line and nothing more.
 
+## 21d. Colours, signals and the hail at the stations (package 71)
+
+Spec M7 §1 to §6 "as built (package 71)"; `docs/design/Design-Signals.md`; the primer's
+chapter 23. What a station reads of the colours, the signals and the hail, and what it may
+do with them.
+
+**The readings.** `colours` (the ship's own: "British colours, the red ensign"; "false:
+French colours, the tricolour"; "none"; "struck"; the ensign union down), `signals` (the
+hoists flying with who answered them, and the signals seen and read this glass with their
+meanings where the book is ours), `private_signal` (this month's challenge and reply, or
+"none aboard", and the last stranger's answer), `lights`. The `colours` row rides in a
+sample while it is not plainly the ship's own, as the action's rows ride while something is
+afoot. The papers "the private signals" and "the signal book" are in the library by handle
+(`library(topic='papers', section='the signal book')`: every day signal by number with its
+meaning, the night and fog signals, the convoy's instructions).
+
+**The lines.** A sail's colours made out and shifted (`lookout.made_out`, `colours.changed`:
+"The brig hoists her colours: French colours, the tricolour"); a signal seen and read
+(`signal.seen` routine, `signal.read` notable: "The brig-sloop of war's signal is No. 54,
+tack in succession"; "a signal we cannot read: not of our book"); the private signal made,
+answered and judged (`signal.private`, `signal.private_reply`, `signal.private_judged`,
+urgent when it makes an enemy: "The cutter answers the private signal wrong: a stranger
+under false colours, an enemy"); a hail heard (`hail.heard`, urgent: "The frigate, within
+hail, hails us: 'What ship is that?'", carried under `heard` in the station's next sample as
+the deck's conversation is) and answered (`hail.answered`); a light seen at night and a bell
+or a gun heard in fog (`lookout.sighting`); a shot under false colours (`action.false_colours`,
+urgent). The events for `at` and a stand-by: `her colours change`, `she hoists her colours`,
+`she hauls down her colours`, `a signal made`, `a signal seen`, `a signal read`, `a signal
+answered`, `the private signal made`, `the private signal answered`, `the private signal
+right`, `the private signal wrong`, `hailed`, `a hail answered`, `a light seen`, `a gun
+heard`.
+
+**The orders** (object `signals`, by their words): `hoist the colours`, `hoist French
+colours` / `hoist false colours`, `haul down the colours`, `hoist the ensign union down`,
+`show the private signal`, `answer the private signal`, `make the signal to chase` /
+`make the signal: enemy in sight bearing NW` / `make the signal No. 16`, `make the
+telegraphic signal: <the words>`, `answer the signal`, `repeat the signal`, `haul down the
+signal`, `hoist the lights` / `hoist the top lights` / `show no lights`, `keep the fog
+signals` / `cease the fog signals`, `hail her` / `hail the brig: <words>` / `say to the
+Nancy: <words>`. They are the captain's; the officer of the watch reads them and gives
+none but by his grant. A model at a flagship gives a signal by the order (§34's
+equal-reach rule), and reads the answers in `signals`; a model at the hailed ship's
+captain answers a hail with `say to the frigate: ...`, and nothing answers for him by table
+while his seat is live.
+
+**The director.** `ship "Harpy": order hoist false colours`, `... order make the signal to
+tack in succession`, `... order hail her` are her own grammar through his hand on a far or
+a crewed body; `ship "Nancy": under the orders of the ship` (or another ship, or nobody)
+names whose signals command her; his truth shows every ship's colours as shown beside her
+true nation (`colours_shown`), her hoists flying (`signals`), her lights and whose orders she
+is under; a brief's `limits: {false_colours: false}` refuses his ships the ruse, said in the
+brief's limits. `say as the captain of the Nancy: ...` within hail speaks for an unheld
+captain as 52 has it.
+
 ## 22. The harbour and the settings (package 59)
 
 The terminals, the flags, the desktop client's configuration and the scenarios by hand are now one page: **the harbour**, a page of the game's own server (spec M7b §21d, §21e). In the game folder:

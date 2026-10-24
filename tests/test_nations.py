@@ -116,6 +116,27 @@ def test_letters_of_marque_colours_and_names_lists(table):
     assert table.find("Ruritania") is None
 
 
+def test_every_nation_has_its_habit_in_action_and_its_signals_root(table):
+    """Package 71 (the owner, 2026-10-24): 70's nations' habits moved from the code into
+    the table beside each nation's colours, with the source; the same entry names the
+    nation's signal books' root under data/signals/ and whether it is a well-built book or
+    the basic system, so that a nation is built out in one place."""
+    from freesail.world.nations import DEFAULT_HABITS
+
+    for n in table.nations.values():
+        assert n.habits.get("source"), n.id
+        assert n.habits["aim"] in ("hull", "rigging") and n.habits["roll"] in ("up", "down")
+        assert n.signals_root and n.signals_system in ("well-built", "basic"), n.id
+    french = table.habits_of("france")
+    assert french == {"range_factor": 2.0, "aim": "rigging", "roll": "up"}
+    assert table.habits_of("britain") == {"range_factor": 1.0, "aim": "hull", "roll": "down"}
+    assert table.habits_of("the Dutch") == {"range_factor": 1.0, "aim": "hull", "roll": "down"}
+    assert table.habits_of("ruritania") == DEFAULT_HABITS
+    assert table.get("britain").signals_root == "britain"
+    assert table.get("france").signals_system == "well-built"
+    assert table.get("spain").signals_root == "basic"
+
+
 def test_the_stance_of_a_port_toward_a_ship(table, chart):
     # open to its own, hostile to its enemy, neutral to the rest, closed by a port's order
     assert table.stance("britain", "britain") == "open"

@@ -70,8 +70,12 @@ TRIAL_STATION_STRANGER_STATES = [
     (18060, "keeping station"),  # package 57 (18960 at 43, 10440 at 45c, 24660 at 45)
 ]
 TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [10423] at 45c; never at 45
-TRIAL_STATION_STRANGER_LINES = 756  # package 56, the glass (754 at 57)
-TRIAL_STATION_STRANGER_DIGEST = "9c24b2e01bb801e7"  # package 56, the glass (1e9fbcf3ce7497bc at 57)
+# package 71: the King's brig makes the private signal to the Palinure once her colours are
+# made out and reads no answer (a man of war's rig: the tell), thirty-one lines of the
+# challenge and its reading; the states and the chase as before, proved by bisection
+# (`signalling.CHALLENGES` off gives 756 and 9c24b2e01bb801e7 again)
+TRIAL_STATION_STRANGER_LINES = 787  # package 71 (756 at package 56, the glass; 754 at 57)
+TRIAL_STATION_STRANGER_DIGEST = "f8f4e544cc34b86e"  # package 71 (9c24b2e01bb801e7 at 56)
 
 
 @pytest.fixture(scope="module")
@@ -303,7 +307,12 @@ TRIAL_TRADE_STRANGER_STATES = [
 ]
 # package 58b ([57324] at 57, [56498] at 43b, [55413] at 43)
 TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [51849]  # package 70 (53669 at 58b)
-TRIAL_TRADE_STRANGER_LINES = 1248  # package 70 (1407 at 58b; 1534 at 56, the glass; 1521 at 57)
+# package 71: the French brig's cruiser doctrine makes the private signal to the schooner
+# (one line, her lookout's), and the brig's chase goes about for a chase on the other side
+# of the wind's eye (`navigation.CHASE_TACKS_FOR_HER`, three lines fewer); every state and
+# the anchor at 51849 as at 70, proved by bisection (the switches off give 1248 and
+# 0a480f7a4b7f321a again)
+TRIAL_TRADE_STRANGER_LINES = 1246  # package 71 (1248 at 70; 1407 at 58b; 1534 at 56; 1521 at 57)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
@@ -311,7 +320,7 @@ TRIAL_TRADE_STRANGER_LINES = 1248  # package 70 (1407 at 58b; 1534 at 56, the gl
 # package 56, the glass: 7b8012b076ebea42 (e73870448a788eac at 57)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 5bbca78fdc6b5093; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-TRIAL_TRADE_STRANGER_DIGEST = "0a480f7a4b7f321a"  # package 70 (48b205b4f587256c at 58b)
+TRIAL_TRADE_STRANGER_DIGEST = "e55bc37c58ccb31b"  # package 71 (0a480f7a4b7f321a at 70)
 
 
 @pytest.fixture(scope="module")

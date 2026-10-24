@@ -288,6 +288,8 @@ class DirectorBrief:
             out.append("the war as it is: no port closed to or opened to the ship's own nation")
         if lim.get("the_chart_as_it_is"):
             out.append("the chart as it is (a point of interest is not the chart)")
+        if lim.get("false_colours") is False:
+            out.append("no false colours: your ships fight under their own (package 71)")
         return "; ".join(out) if out else "none beyond the channel's doubt"
 
     def body(self) -> str:
@@ -336,6 +338,10 @@ class DirectorBrief:
             found = world_orders._aboard_match(world, body)
             if found is not None and str(found[0].get("harm", "none")).lower() == "deadly":
                 return "the brief says nobody dies, and that is a thing that kills"
+        if order.channel == "ship" and lim.get("false_colours") is False:
+            low = " ".join(body.lower().split())
+            if "false colours" in low or _names_false_colours(world, low):
+                return "the brief forbids your ships the ruse: no false colours (package 71)"
         if order.channel == "port" and lim.get("the_war_as_it_is"):
             m = world_orders._PORT.match(body)
             ports = getattr(world, "ports", None)
@@ -348,6 +354,21 @@ class DirectorBrief:
                         "ship's own nation is the war changed"
                     )
         return None
+
+
+def _names_false_colours(world: Any, low: str) -> bool:
+    """Whether a ship order hoists another nation's colours ('order hoist Danish colours'
+    on a French ship, 'no colours' at her making is not the ruse)."""
+    import re
+
+    m = re.search(r"(?:hoist|show)\s+(?:the\s+)?([a-z-]+)\s+colours", low)
+    if m is None:
+        return False
+    word = m.group(1)
+    if word in ("the", "our", "her", "your", "true"):
+        return False
+    nations = getattr(world, "nations", None)
+    return nations is not None and nations.find(word) is not None
 
 
 def _peak_wind_kn(world: Any, body: str) -> float | None:
@@ -643,6 +664,13 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             'ship "Medusa": order fill away',
             'ship "Lark": order shape a course for Falmouth',
             'ship "Nancy": order heave to',
+            # package 71: the colours, the signals and the hail by her own grammar
+            'ship "Harpy": order hoist false colours',
+            'ship "Harpy": order hoist the colours',
+            'ship "Medusa": order make the signal to tack in succession',
+            'ship "Medusa": order make the signal enemy in sight bearing SW',
+            'ship "Medusa": order answer the signal',
+            'ship "Medusa": order hail her',
         ),
         "the hand: her captain's order as his own, held a glass or as named; refused where a "
         "model or the player holds her captain",
@@ -772,6 +800,19 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         ),
         "a person moved, or bound to a station; where no boat could carry him, doubted; a "
         "held station's person, refused",
+    ),
+    Form(
+        "ship.orders_of",
+        "ship",
+        'ship "<name>": under the orders of <ship | the ship | nobody>',
+        (
+            'ship "Harpy": under the orders of the ship',
+            'ship "Harpy": under the orders of the Medusa',
+            'ship "Harpy": under the orders of nobody',
+        ),
+        "whose signals command her (package 71, the least relation under 72's squadron): "
+        "the player's ship, another by her name, or nobody; a ship under orders answers "
+        "and obeys that ship's signals and no other's",
     ),
     Form(
         "say",

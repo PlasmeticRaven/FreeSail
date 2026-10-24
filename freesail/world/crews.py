@@ -183,6 +183,11 @@ class CrewedWorld(World):
         ship.name = vessel.name  # her own name over her file's (package 70: two cutters in a log)
         super().__init__(seed=seed, scenario=sc, ship=ship)
         attach_crew(self)
+        # package 71: her signal locker is her far body's (one object: the colours she
+        # shows, the hoists flying, her lights), so that nothing is mirrored
+        from freesail.world.signals import vessel_locker
+
+        self.ship.extra["signals"] = vessel_locker(vessel)
         self.vessels = CrewView(self)
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["vessels_view"] = True
@@ -810,6 +815,14 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
             raise OrderError("She has no station to keep: her intent is not a station's.")
         brain._enter("keeping station")
         return "helm.set", "The station kept again (the plan's square about it).", {}
+    # package 71: the colours, the lights and the signals on a far body (the director's
+    # `ship "X": order hoist false colours`, `... make the signal to tack`), by the signals'
+    # own performer; None when the words are none of theirs
+    from freesail.world.signals import far_order_words
+
+    done = far_order_words(crew.parent, v, text)
+    if done is not None:
+        return done
     return None
 
 
@@ -822,6 +835,12 @@ def _is_a_reading(crew: CrewedWorld, text: str) -> bool:
     from freesail.standing import grammar as standing
 
     ship = crew.ship
+    from freesail.orders import signals as signal_orders
+
+    if signal_orders.recognises(text, ship) is not None:
+        # package 71: the colours, a signal or the hail of a sail are orders of hers (the
+        # stations' grammar would take 'hail her' for a hail of the deck)
+        return False
     if stations.recognises(text, ship) is not None:
         return True
     if standing.recognises(text) in ("standing orders", "show standing order"):

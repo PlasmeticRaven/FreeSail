@@ -1,0 +1,182 @@
+# FreeSail: the British numerary signal book, the day signals (spec M7 §3; package 71;
+# docs/design/Design-Signals.md). Howe's 1790 book and the Admiralty's Signal Book for the
+# Ships of War of 1799, from memory: the meanings are the books' (the orders by which the
+# squadrons and convoys of 1805 were worked); the numbers are the 1799 book's where the
+# builder remembers them with confidence (1, 13, 16, 63, 72, 76: Trafalgar's own signals)
+# and the builder's own where not, each such entry marked `made: true`. Package 76 builds
+# the book out against the printed edition and corrects the numbers.
+#
+# Each entry: `number` the hoist; `meaning` the words the log writes beside it and the
+# words `make the signal <meaning>` matches (`also` more words for the same); `does` what a
+# rules captain under the sender's orders does on reading it (docs/design/Design-Signals.md:
+# `{order: <an order of the dialect>}` with `{compass}`, `{number}` or `{place}` filled from
+# the qualifiers, `{state: <a state of his machine>}`, `{news: true}` logged and raised as
+# an event, `{answer: <word>}` an answer to a signal, `{closer: true}` the engaging range
+# halved, `{release: true}` the ship let go from the sender's orders); `in_succession:
+# true` the ships under orders performing it one after another, the leader first;
+# `qualifiers` what the hoist takes after it (compass, number, ship, place); `source`.
+
+entries:
+  # -- the enemy, strangers and the land (news) ------------------------------------------
+  - {number: 1, meaning: "Enemy in sight", also: ["the enemy in sight", "an enemy in sight"], does: {news: true}, qualifiers: [compass], source: "the 1799 book, No. 1 (the number from memory, uncertain)"}
+  - {number: 2, meaning: "A strange sail in sight", also: ["strange sail in sight", "a sail in sight", "strange sail"], does: {news: true}, qualifiers: [compass, number], source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 3, meaning: "The strange sail is an enemy", also: ["the stranger is an enemy", "she is an enemy"], does: {news: true}, source: "Howe 1790 (the number made)", made: true}
+  - {number: 4, meaning: "The strange sail is a friend", also: ["the stranger is a friend", "she is a friend"], does: {news: true}, source: "Howe 1790 (the number made)", made: true}
+  - {number: 6, meaning: "The enemy is a fleet", also: ["the enemy is a fleet", "a fleet in sight"], does: {news: true}, qualifiers: [compass], source: "the 1799 book (the number made)", made: true}
+  - {number: 7, meaning: "The enemy is superior in force", also: ["the enemy is superior", "a superior force"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 8, meaning: "The enemy is inferior in force", also: ["the enemy is inferior"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 9, meaning: "The enemy's ships are men of war", also: ["men of war", "the enemy are men of war"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 10, meaning: "The enemy's ships are merchantmen", also: ["merchantmen", "the enemy are merchantmen", "a convoy in sight"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 11, meaning: "Land in sight", also: ["the land in sight", "land seen", "the land seen"], does: {news: true}, qualifiers: [compass], source: "the 1799 book (the number made)", made: true}
+  - {number: 12, meaning: "Danger: rocks or shoals", also: ["danger", "a danger", "rocks or shoals", "breakers"], does: {news: true}, qualifiers: [compass], source: "the 1799 book (the number made)", made: true}
+  - {number: 14, meaning: "I have soundings", also: ["soundings", "in soundings"], does: {news: true}, qualifiers: [number], source: "the 1799 book (the number made)", made: true}
+  - {number: 15, meaning: "The enemy is standing toward us", also: ["the enemy standing toward us", "the enemy bears down"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 17, meaning: "The enemy is standing away from us", also: ["the enemy standing away", "the enemy makes off"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+
+  # -- the chase ----------------------------------------------------------------------------
+  - {number: 5, meaning: "General chase", also: ["chase", "to chase", "a general chase"], does: {state: chasing}, qualifiers: [compass], source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 18, meaning: "Chase in the direction indicated", also: ["chase to the", "chase in the direction"], does: {state: chasing}, qualifiers: [compass], source: "the 1799 book (the number made)", made: true}
+  - {number: 19, meaning: "Chase to windward", also: ["chase to windward"], does: {state: chasing}, source: "the 1799 book (the number made)", made: true}
+  - {number: 20, meaning: "Chase to leeward", also: ["chase to leeward"], does: {state: chasing}, source: "the 1799 book (the number made)", made: true}
+  - {number: 21, meaning: "The ships pointed out to chase", also: ["ships to chase", "to chase the stranger"], does: {state: chasing}, qualifiers: [ship, compass], source: "the 1799 book (the number made)", made: true}
+  - {number: 22, meaning: "Discontinue the chase", also: ["give up the chase", "leave off chase", "recall the chasers", "the recall"], does: {state: "on passage"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 23, meaning: "Rejoin the admiral", also: ["rejoin", "rejoin me", "close the admiral", "rejoin the flag"], does: {order: "shape a course for the flag"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 24, meaning: "Come within hail of the admiral", also: ["come within hail", "within hail of the admiral"], does: {order: "close the flag"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 25, meaning: "Reconnoitre the enemy", also: ["reconnoitre", "reconnoitre the stranger", "look into"], does: {state: "investigating a stranger"}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+  - {number: 26, meaning: "Keep sight of the enemy during the night", also: ["keep sight of the enemy", "keep the enemy in sight"], does: {state: "investigating a stranger"}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+
+  # -- battle -------------------------------------------------------------------------------
+  - {number: 13, meaning: "Prepare for battle", also: ["prepare for battle", "prepare for action", "clear for action"], does: {order: "clear for action"}, source: "the 1799 book, No. 13 (Trafalgar, 6:13 of 21 October 1805; the number from memory)"}
+  - {number: 16, meaning: "Engage the enemy more closely", also: ["engage more closely", "engage the enemy closer", "closer", "engage closer"], does: {closer: true}, source: "the 1799 book, No. 16 (Nelson's last signal; the number certain)"}
+  - {number: 27, meaning: "Engage the enemy", also: ["engage", "engage the enemy", "to engage"], does: {state: engaging}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 28, meaning: "Engage the enemy's van", also: ["engage the van", "the van"], does: {state: engaging}, source: "the 1799 book (the number made)", made: true}
+  - {number: 29, meaning: "Engage the enemy's centre", also: ["engage the centre", "the centre"], does: {state: engaging}, source: "the 1799 book (the number made)", made: true}
+  - {number: 30, meaning: "Engage the enemy's rear", also: ["engage the rear", "the rear"], does: {state: engaging}, source: "the 1799 book (the number made)", made: true}
+  - {number: 31, meaning: "Attack from to windward", also: ["attack from windward", "engage from to windward", "the weather gage"], does: {order: "engage from to windward"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 32, meaning: "Attack from to leeward", also: ["attack from leeward", "engage from to leeward", "the lee gage"], does: {order: "engage from to leeward"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 33, meaning: "Break through the enemy's line", also: ["break the line", "break through the line", "cut the line"], does: {state: engaging}, source: "Howe 1790 (the Glorious First of June); the 1799 book (the number made)", made: true}
+  - {number: 34, meaning: "Bear down on the enemy", also: ["bear down on the enemy", "bear down"], does: {state: engaging}, source: "the 1799 book (the number made)", made: true}
+  - {number: 35, meaning: "Engage as you come up", also: ["engage as you come up", "each ship to engage as she comes up"], does: {state: engaging}, source: "the 1799 book (the number made)", made: true}
+  - {number: 36, meaning: "Discontinue the action", also: ["discontinue the action", "break off the action", "cease the action", "haul off", "leave off action"], does: {state: "on passage"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 37, meaning: "Prepare to board the enemy", also: ["prepare to board", "board the enemy"], does: {news: true}, source: "the 1799 book (the number made; the boarders 73's)", made: true}
+  - {number: 38, meaning: "Take possession of the ships that have struck", also: ["take possession", "take possession of the prize"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made; the prize 74's)", made: true}
+  - {number: 39, meaning: "Assist the ships engaged", also: ["assist the ships engaged", "support the ships engaged", "support"], does: {state: engaging}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+  - {number: 40, meaning: "The enemy has struck", also: ["the enemy has struck", "she has struck"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+
+  # -- the line and the order of sailing ------------------------------------------------------
+  - {number: 41, meaning: "Form the line of battle ahead", also: ["form the line", "form the line of battle", "form line ahead", "the line of battle"], does: {news: true}, qualifiers: [compass], source: "Howe 1790; the 1799 book (the number made; the formations 72's)", made: true}
+  - {number: 42, meaning: "Form the line of battle abreast", also: ["form line abreast", "the line abreast"], does: {news: true}, qualifiers: [compass], source: "the 1799 book (the number made; 72's)", made: true}
+  - {number: 43, meaning: "Form the line of bearing", also: ["the line of bearing", "form the line of bearing"], does: {news: true}, qualifiers: [compass], source: "the 1799 book (the number made; 72's)", made: true}
+  - {number: 72, meaning: "Form the order of sailing in two columns", also: ["form the order of sailing in two columns", "two columns", "the order of sailing in two columns"], does: {news: true}, source: "the 1799 book, No. 72 (Trafalgar, 6:10 of 21 October 1805; the number from memory; 72's formations)"}
+  - {number: 44, meaning: "Form the order of sailing", also: ["form the order of sailing", "the order of sailing"], does: {news: true}, source: "the 1799 book (the number made; 72's)", made: true}
+  - {number: 45, meaning: "Form the order of battle", also: ["form the order of battle", "the order of battle"], does: {news: true}, source: "the 1799 book (the number made; 72's)", made: true}
+  - {number: 46, meaning: "Keep closer order", also: ["keep closer order", "close order", "closer order", "close up"], does: {order: "close the flag"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 47, meaning: "Open the order", also: ["open order", "open the order"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 48, meaning: "Keep your station", also: ["keep station", "keep your station", "keep the station"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made; station keeping 72's)", made: true}
+  - {number: 49, meaning: "The ships astern to make more sail", also: ["ships astern make more sail", "the sternmost ships to make sail"], does: {order: "make all sail"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 50, meaning: "The ships ahead to shorten sail", also: ["ships ahead shorten sail", "the headmost ships to shorten sail"], does: {order: "shorten sail"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 51, meaning: "Lead the fleet on the course indicated", also: ["lead the fleet", "lead"], does: {order: "steer {compass}"}, qualifiers: [ship, compass], source: "the 1799 book (the number made)", made: true}
+  - {number: 52, meaning: "Invert the line", also: ["invert the line", "the rear to lead"], does: {news: true}, source: "the 1799 book (the number made; 72's)", made: true}
+
+  # -- sail and the helm, together and in succession -------------------------------------------
+  - {number: 53, meaning: "Tack together", also: ["tack", "tack together", "put about together", "go about together", "all tack"], does: {order: "put her about"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 54, meaning: "Tack in succession", also: ["tack in succession", "put about in succession", "go about in succession"], does: {order: "put her about"}, in_succession: true, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 55, meaning: "Wear together", also: ["wear", "wear together", "wear ship together", "all wear"], does: {order: "wear ship"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 56, meaning: "Wear in succession", also: ["wear in succession", "wear ship in succession"], does: {order: "wear ship"}, in_succession: true, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 57, meaning: "Make more sail", also: ["make more sail", "more sail", "make sail"], does: {order: "make sail"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 58, meaning: "Make all sail", also: ["make all sail", "all sail", "crowd sail", "make all possible sail"], does: {order: "make all sail"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 59, meaning: "Shorten sail", also: ["shorten sail", "take in sail", "less sail"], does: {order: "shorten sail"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 60, meaning: "Take in a reef in the topsails", also: ["take in a reef", "reef the topsails", "a reef in the topsails", "reef topsails"], does: {order: "take in a reef in the topsails"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 61, meaning: "Close reef the topsails", also: ["close reef the topsails", "close reef", "close reefed topsails"], does: {order: "close reef the topsails"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 62, meaning: "Shake out the reefs", also: ["shake out the reefs", "let out the reefs", "out reefs"], does: {order: "shake out the reefs"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 64, meaning: "Bring to", also: ["bring to", "heave to", "lie to", "lay to", "heave to on the starboard tack"], does: {order: "heave to"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 65, meaning: "Bring to on the larboard tack", also: ["heave to on the larboard tack", "bring to on the larboard tack"], does: {order: "heave to"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 66, meaning: "Fill and make sail", also: ["fill", "fill away", "fill and make sail", "make sail again", "get under way"], does: {order: "fill away"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 67, meaning: "Alter course to starboard", also: ["alter course to starboard", "haul to starboard"], does: {order: "steer two points to starboard"}, qualifiers: [number], source: "the 1799 book (the number made)", made: true}
+  - {number: 68, meaning: "Alter course to larboard", also: ["alter course to larboard", "alter course to port", "haul to larboard"], does: {order: "steer two points to larboard"}, qualifiers: [number], source: "the 1799 book (the number made)", made: true}
+  - {number: 69, meaning: "Steer the course indicated", also: ["steer", "steer the course", "alter course to", "course"], does: {order: "steer {compass}"}, qualifiers: [compass], source: "the 1799 book (the number made)", made: true}
+  - {number: 70, meaning: "Keep the wind on the starboard tack", also: ["keep the wind on the starboard tack", "close hauled on the starboard tack", "by the wind on the starboard tack", "haul your wind on the starboard tack"], does: {order: "keep her full and by on the starboard tack"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 71, meaning: "Keep the wind on the larboard tack", also: ["keep the wind on the larboard tack", "close hauled on the larboard tack", "by the wind on the larboard tack", "haul your wind on the larboard tack"], does: {order: "keep her full and by on the larboard tack"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 73, meaning: "Haul your wind", also: ["haul your wind", "haul the wind", "close hauled", "by the wind", "keep the wind"], does: {order: "keep her full and by"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 76, meaning: "Bear up and sail large on the course indicated", also: ["bear up and sail large", "bear up", "sail large", "bear away"], does: {order: "steer {compass}"}, qualifiers: [compass], source: "the 1799 book, No. 76 (Trafalgar, 6:22 of 21 October 1805, the course ENE; the number from memory)"}
+  - {number: 74, meaning: "Lie by under easy sail", also: ["lie by", "easy sail", "under easy sail"], does: {order: "shorten sail"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 75, meaning: "Scud before the wind", also: ["scud", "scud before the wind", "run before it"], does: {order: "scud"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 77, meaning: "Set studding sails", also: ["set studding sails", "studding sails", "set the studding sails"], does: {order: "set the studding sails"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 78, meaning: "Take in studding sails", also: ["take in studding sails", "in studding sails", "take in the studding sails"], does: {order: "take in the studding sails"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 79, meaning: "Send down topgallant yards", also: ["send down topgallant yards", "down topgallant yards", "strike topgallant yards"], does: {order: "send down the topgallant yards"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 80, meaning: "Send down topgallant masts", also: ["send down topgallant masts", "strike topgallant masts", "down topgallant masts"], does: {order: "send down the topgallant masts"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 81, meaning: "Sway up topgallant masts and yards", also: ["sway up topgallant masts", "up topgallant masts", "cross topgallant yards"], does: {order: "sway up the topgallant masts"}, source: "the 1799 book (the number made)", made: true}
+
+  # -- anchoring --------------------------------------------------------------------------------
+  - {number: 63, meaning: "Prepare to anchor", also: ["prepare to anchor", "anchor at the close of day", "prepare to anchor at the close of day"], does: {news: true}, source: "the 1799 book, No. 63 (Nelson's intended signal before Trafalgar, from memory)"}
+  - {number: 82, meaning: "Anchor", also: ["anchor", "come to an anchor", "let go the anchor", "to anchor"], does: {order: "come to an anchor"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 83, meaning: "Anchor as convenient", also: ["anchor as convenient", "anchor as most convenient"], does: {order: "come to an anchor"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 84, meaning: "Weigh", also: ["weigh", "weigh anchor", "up anchor", "get under way"], does: {order: "weigh anchor"}, source: "Howe 1790; the 1799 book (the number made)", made: true}
+  - {number: 85, meaning: "Prepare to weigh", also: ["prepare to weigh", "heave short"], does: {order: "heave short"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 86, meaning: "Moor", also: ["moor", "moor ship"], does: {order: "moor"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 87, meaning: "Unmoor", also: ["unmoor", "unmoor ship"], does: {order: "unmoor"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 88, meaning: "Veer more cable", also: ["veer cable", "veer more cable", "veer away"], does: {order: "veer cable"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 89, meaning: "The fleet will weigh at daylight", also: ["weigh at daylight", "the fleet will weigh at daylight", "under way at daylight"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+
+  # -- the ship's company and the service ---------------------------------------------------------
+  - {number: 90, meaning: "Send a boat to the admiral", also: ["send a boat", "send a boat to the admiral", "a boat to the flag"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made; the boat 63's)", made: true}
+  - {number: 91, meaning: "The captain to repair on board the admiral", also: ["captain to repair on board", "repair on board", "the captain to come aboard the flag"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+  - {number: 92, meaning: "Send a lieutenant to the admiral", also: ["send a lieutenant", "a lieutenant to the flag"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+  - {number: 93, meaning: "Repeat the signals of the admiral", also: ["repeat signals", "repeat the admiral's signals", "repeat the signals"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made; the repeating frigate 72's)", made: true}
+  - {number: 94, meaning: "Show your colours", also: ["show your colours", "hoist your colours", "show colours", "colours"], does: {order: "hoist the colours"}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+  - {number: 95, meaning: "Show the private signal", also: ["make the private signal", "show the private signal", "the private signal"], does: {order: "show the private signal"}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+  - {number: 96, meaning: "Hoist the colours of the nation indicated", also: ["hoist false colours", "show false colours", "false colours"], does: {order: "hoist false colours"}, qualifiers: [number], source: "the 1799 book had the ruse by signal to the fleet (from memory; the number made)", made: true}
+  - {number: 97, meaning: "Man overboard", also: ["man overboard", "a man overboard"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 98, meaning: "I am in want of assistance", also: ["want assistance", "in want of assistance", "in distress", "assistance"], does: {news: true}, source: "the 1799 book (the number made; the ensign union down and a gun to leeward the signal of distress at sea)", made: true}
+  - {number: 99, meaning: "I am in want of a surgeon", also: ["want a surgeon", "a surgeon", "in want of a surgeon"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 100, meaning: "I am in want of water", also: ["want water", "in want of water", "short of water"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 101, meaning: "I am in want of provisions", also: ["want provisions", "in want of provisions", "short of provisions"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 102, meaning: "I am in want of a pilot", also: ["want a pilot", "a pilot", "in want of a pilot"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 103, meaning: "I have sprung a leak", also: ["sprung a leak", "a leak", "making water", "the leak"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 104, meaning: "I am disabled: masts or rigging", also: ["disabled", "dismasted", "disabled in the rigging", "my rigging is cut up"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 105, meaning: "I cannot keep up with the fleet", also: ["cannot keep up", "unable to keep up", "I cannot keep up"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 106, meaning: "Permission to part company", also: ["part company", "permission to part company", "leave to part company"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+  - {number: 107, meaning: "Part company", also: ["you may part company", "proceed on your voyage", "proceed", "proceed independently"], does: {release: true}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+  - {number: 108, meaning: "I have dispatches for the admiral", also: ["dispatches", "I have dispatches", "dispatches for the admiral"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 109, meaning: "I have intelligence to communicate", also: ["intelligence", "I have intelligence", "news to communicate"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 110, meaning: "Send the boats to tow", also: ["boats to tow", "send boats to tow", "tow"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made; the boats 63's)", made: true}
+  - {number: 111, meaning: "Hoist the top lights", also: ["hoist the top lights", "top lights", "show the top lights"], does: {order: "hoist the top lights"}, source: "the 1799 book's night orders (the number made)", made: true}
+  - {number: 112, meaning: "Show no lights", also: ["show no lights", "no lights", "douse the lights"], does: {order: "show no lights"}, source: "the 1799 book's night orders (the number made)", made: true}
+  - {number: 113, meaning: "Beat to quarters", also: ["beat to quarters", "quarters", "to quarters"], does: {order: "beat to quarters"}, source: "the 1799 book (the number made; `prepare for battle` the fleet's word)", made: true}
+  - {number: 114, meaning: "Exercise the great guns", also: ["exercise the great guns", "exercise the guns", "great guns"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 115, meaning: "Fire a gun to leeward", also: ["fire a gun to leeward", "a gun to leeward"], does: {order: "fire a gun to leeward"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 116, meaning: "The signal is not understood", also: ["not understood", "signal not understood", "I do not understand"], does: {answer: "not understood"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 117, meaning: "I cannot comply", also: ["cannot comply", "unable to comply", "I cannot comply"], does: {answer: "cannot comply"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 118, meaning: "Affirmative", also: ["yes", "the affirmative", "affirmative"], does: {answer: "affirmative"}, source: "the 1799 book's affirmative flag (the number made)", made: true}
+  - {number: 119, meaning: "Negative", also: ["no", "the negative", "negative"], does: {answer: "negative"}, source: "the 1799 book's negative (the number made)", made: true}
+  - {number: 120, meaning: "Annul the last signal", also: ["annul", "annul the signal", "annul the last signal", "belay the signal"], does: {answer: "annulled"}, source: "the 1799 book's annulling flag (the number made)", made: true}
+  - {number: 121, meaning: "Denotes the signal is for the ship pointed out", also: ["to the ship pointed out"], does: {news: true}, qualifiers: [ship], source: "the 1799 book's pendants (the number made)", made: true}
+  - {number: 122, meaning: "The convoy to make sail", also: ["convoy make sail", "the convoy to make sail", "convoy to make more sail"], does: {order: "make sail"}, source: "the 1799 book; the convoy instructions (the number made)", made: true}
+  - {number: 123, meaning: "The convoy to shorten sail", also: ["convoy shorten sail", "the convoy to shorten sail"], does: {order: "shorten sail"}, source: "the 1799 book; the convoy instructions (the number made)", made: true}
+  - {number: 124, meaning: "The convoy to close round the commodore", also: ["close round the commodore", "convoy close", "the convoy to close"], does: {order: "close the flag"}, source: "the convoy instructions (the number made)", made: true}
+  - {number: 125, meaning: "The convoy to disperse", also: ["disperse", "the convoy to disperse", "convoy disperse", "every ship to shift for herself"], does: {release: true}, source: "the convoy instructions (the number made)", made: true}
+  - {number: 126, meaning: "Enemy's cruisers in sight", also: ["enemy cruisers", "an enemy's cruiser", "a privateer in sight", "privateers in sight"], does: {news: true}, qualifiers: [compass], source: "the convoy instructions (the number made)", made: true}
+  - {number: 127, meaning: "Hoist the signal of distress", also: ["distress", "the signal of distress"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 128, meaning: "Send the sick to the hospital ship", also: ["send the sick", "the sick to the hospital ship"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 129, meaning: "Water and provisions at the place indicated", also: ["water at", "water and provisions at"], does: {news: true}, qualifiers: [place], source: "the 1799 book (the number made)", made: true}
+  - {number: 130, meaning: "Rendezvous at the place indicated", also: ["rendezvous", "the rendezvous", "rendezvous at"], does: {news: true}, qualifiers: [place], source: "the 1799 book (the number made)", made: true}
+  - {number: 131, meaning: "Steer for the place indicated", also: ["make for", "steer for", "proceed to"], does: {order: "shape a course for {place}"}, qualifiers: [place], source: "the 1799 book (the number made)", made: true}
+  - {number: 132, meaning: "Heave the lead", also: ["heave the lead", "sound", "take soundings"], does: {order: "heave the lead"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 133, meaning: "Keep the land aboard", also: ["keep the land aboard", "keep in with the land"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 134, meaning: "Keep an offing", also: ["keep an offing", "stand off the land", "keep off the land"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 135, meaning: "Hoist the colours of the enemy", also: ["hoist the enemy's colours", "the enemy's colours"], does: {order: "hoist false colours"}, source: "the ruse by signal (from memory; the number made)", made: true}
+  - {number: 136, meaning: "Hoist your true colours", also: ["true colours", "hoist your true colours", "show your true colours"], does: {order: "hoist the colours"}, source: "the 1799 book (the number made)", made: true}
+  - {number: 137, meaning: "The fleet to be prepared to weigh at a moment's notice", also: ["prepare to weigh at a moment's notice", "be ready to weigh"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 138, meaning: "The enemy's fleet is at sea", also: ["the enemy is at sea", "the enemy's fleet at sea", "the enemy at sea"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 139, meaning: "The enemy's fleet is in port", also: ["the enemy is in port", "the enemy in port"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 140, meaning: "Take station astern of the admiral", also: ["station astern", "take station astern", "astern of the admiral"], does: {order: "close the flag"}, qualifiers: [ship], source: "the 1799 book (the number made; station keeping 72's)", made: true}
+  - {number: 141, meaning: "Take station ahead of the admiral", also: ["station ahead", "take station ahead", "ahead of the admiral"], does: {order: "close the flag"}, qualifiers: [ship], source: "the 1799 book (the number made; 72's)", made: true}
+  - {number: 142, meaning: "Take station to windward of the admiral", also: ["station to windward", "to windward of the admiral"], does: {order: "close the flag"}, qualifiers: [ship], source: "the 1799 book (the number made; 72's)", made: true}
+  - {number: 143, meaning: "Take station to leeward of the admiral", also: ["station to leeward", "to leeward of the admiral"], does: {order: "close the flag"}, qualifiers: [ship], source: "the 1799 book (the number made; 72's)", made: true}
+  - {number: 144, meaning: "Cruise on the station indicated", also: ["cruise", "cruise off", "take your station off"], does: {news: true}, qualifiers: [place, number], source: "the 1799 book (the number made)", made: true}
+  - {number: 145, meaning: "Return to port", also: ["return to port", "return into port", "go into port"], does: {news: true}, qualifiers: [place], source: "the 1799 book (the number made)", made: true}
+  - {number: 146, meaning: "Prepare for sea", also: ["prepare for sea", "ready for sea"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 147, meaning: "The admiral is going to shift his flag", also: ["shift the flag", "the admiral shifts his flag"], does: {news: true}, qualifiers: [ship], source: "the 1799 book (the number made)", made: true}
+  - {number: 148, meaning: "Strike the enemy's colours and hoist your own over them", also: ["hoist your colours over the enemy's", "the prize's colours"], does: {news: true}, source: "the custom (from memory; the number made; 74's)", made: true}
+  - {number: 149, meaning: "Secure the masts", also: ["secure the masts", "get up preventer stays"], does: {news: true}, source: "the 1799 book (the number made)", made: true}
+  - {number: 150, meaning: "Prepare to receive the enemy at anchor", also: ["receive the enemy at anchor", "spring on the cable"], does: {news: true}, source: "the 1799 book (the number made; the Nile's lesson)", made: true}

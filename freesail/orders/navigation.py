@@ -216,6 +216,9 @@ CHASE_LEAD_MAX_DEG = 70.0
 CHASE_CROSSED_DEG = 45.0
 CHASE_STEADY_DEG = 0.5  # a drift below this is 'the bearing steady'
 CHASE_MIN_INTERVAL_S = 60.0  # two orders within a minute read no drift
+# package 71: a chase within the close-hauled angle on the other side of the wind's eye
+# is gone about for (False: 45c's law, the tack she is on held; the bisection's switch)
+CHASE_TACKS_FOR_HER = True
 
 
 def _chase_course(world: Any, sighting: Any) -> tuple[float, str]:
@@ -280,8 +283,15 @@ def _chase_course(world: Any, sighting: Any) -> tuple[float, str]:
     off = units.rad_to_deg(units.wrap_pi(math.radians(course - wind_from)))
     if abs(off) < closest:
         # on the tack she is on: her head's side of the wind's eye (a chase dead to
-        # windward is not a reason to put her about every glass)
+        # windward is not a reason to put her about every glass); package 71: a chase
+        # that lies plainly on the other side of the eye (more than a point off it) is
+        # gone about for, since holding the tack she is on opens her (the encounter's
+        # frigate held NNW with the privateer on her larboard quarter, SW by S)
         side = 1.0 if units.wrap_pi(math.radians(heading_deg - wind_from)) >= 0 else -1.0
+        her_side = 1.0 if off >= 0 else -1.0
+        if CHASE_TACKS_FOR_HER and her_side != side and abs(off) > EYE_POINTS * 11.25:
+            side = her_side
+            words += ", on the other tack"
         course = (wind_from + side * closest) % 360.0
         words += ", as near the wind as she will lie"
     return course, words
@@ -1539,7 +1549,17 @@ def execute(ship: Any, order: Order) -> Result:
             own = ports.ship_nation if ports is not None else None
             known = lookout.stranger(world, float(world.ship.heading), own)
             ids = {i["id"] for i in known["items"]}
-            strangers = [s for s in sails if s.feature.modern in ids]
+            # package 71: a sail the captain holds an enemy (the private signal answered
+            # wrong, a shot under false colours) is a stranger whatever colours she shows;
+            # the lookout counts her none under our own, and the encounter's frigate
+            # chased the merchant brig while the privateer under British colours ran
+            cap = getattr(world, "captain", None)
+            held = {
+                str(sid)
+                for sid, r in (getattr(cap, "recognised", None) or {}).items()
+                if isinstance(r, dict) and r.get("enemy")
+            } | {str(x) for x in (getattr(cap, "pirates", None) or ())}
+            strangers = [s for s in sails if s.feature.modern in ids or s.feature.modern in held]
             pool = strangers or sails
             in_hand = [s for s in pool if s.feature.id in chases]
             sighting = min(in_hand or pool, key=lambda s: s.distance_m)

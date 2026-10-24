@@ -6743,7 +6743,9 @@ def test_truth_7b_113_the_hand_brings_a_far_trader_to_heaves_a_crewed_cruiser_to
     play = [e for e in world.log.all() if not for_the_record(e)]
     assert not [e for e in play if "By the captain" in e.text or trader.name in e.text]
     seen = [e for e in play if "brig" in e.text.lower() and e.tick > 61]
-    assert seen and all(e.kind.startswith("lookout.") for e in seen)
+    # package 71: the King's cruiser makes the private signal to us, which the lookout
+    # reports under the signal kinds (`signal.private`): his observation, no order of hers
+    assert seen and all(e.kind.startswith(("lookout.", "signal.")) for e in seen)
     assert any("hove to" in e.text or "heaving to" in e.text for e in seen)
     # a fake captain at her captain's station: the same order refused in words
     held = Harness(
@@ -8060,11 +8062,18 @@ def test_truth_7_133_the_first_action_ends_with_the_privateer_struck_and_the_dam
     """Spec M7 §12 and the brief's item 9: the first action (data/scenarios/
     first-action.yaml) played by the rules captains with no model seated. At seed 7 the
     privateer engages at 10:06 and opens at long shot at 10:13; the King's cutter closes,
-    returns her fire and the colours come down at 12:06 (an hour and fifty-three minutes
-    after the first shot) with five of thirty hurt and eight shot holes, the strike line
-    giving the reasons in figures; the King's cutter has her main topgallant mast and two
-    yards carried away and eight lines shot away in the part graph, nobody hurt. The band
-    is wide (an hour to three) because the timing is the seed's, never the rule's."""
+    returns her fire and the colours come down at 11:12 (fifty-nine minutes after the first
+    shot) with five of thirty hurt and seven shot holes, the strike line giving the reasons
+    in figures; the King's cutter has her main topgallant mast and two yards carried away
+    and three lines shot away in the part graph, nobody hurt. The band is wide (three
+    quarters of an hour to three) because the timing is the seed's, never the rule's.
+    Package 70 pinned 12:06 (an hour and fifty-three minutes, the band an hour to three):
+    package 71 moved it by two items, proved by bisection (docs/dev/TuningNotes.md, package
+    71): the engaging helm's law (item 8), which alone takes the half hour aback out of the
+    King's cutter's circle and ends the action at 11:19, and the privateer's new row on her
+    station (she closes a sail near her instead of waiting for one within her engaging
+    distance; found on the way), which alone ends it at 11:12; every item off gives 70's
+    12:06 and digest again."""
     from freesail.world.scenarios import begin, load_scenario, make_scenario_world
 
     sf = load_scenario(FIRST_ACTION)
@@ -8085,7 +8094,8 @@ def test_truth_7_133_the_first_action_ends_with_the_privateer_struck_and_the_dam
             break
     assert first is not None, "nobody opened fire"
     assert v.struck and not w.ship.extra.get("struck"), "the privateer strikes at this seed"
-    assert 3600 <= struck_tick - first <= 3 * 3600, f"{(struck_tick - first) / 60:.0f} min"
+    # 3600 <= ... at package 70 (12:06, 6779 s); 3539 s at package 71 (11:12), by the bisection
+    assert 2700 <= struck_tick - first <= 3 * 3600, f"{(struck_tick - first) / 60:.0f} min"
     enemy = v.crew
     line = [e for e in enemy.log if e.kind == "action.struck"][0]
     assert "against a broadside of" in line.text and "hurt" in line.text
@@ -8379,3 +8389,444 @@ def test_truth_7_142_the_players_strike_is_never_refused_and_the_quarter_bill_re
     w.run(200)
     assert w.readings.words("quarter_bill") == "not at quarters"
     assert not w.readings.value("guns")["cast_loose"]
+
+
+# ---------------------------------------------------------------------------
+# Package 71: signals and the voice between ships (spec M7 §1 to §6; truths 7-143 onward)
+# ---------------------------------------------------------------------------
+
+ENCOUNTER = "data/scenarios/encounter.yaml"
+CONVOY = "data/scenarios/convoy.yaml"
+
+
+def _sea_at(lat: float, lon: float, ship: str, when: datetime, **kw):
+    """A world at sea off the Lizard at seed 7 at a given hour (the brains' `world_at`,
+    which fixes the forenoon, with the time free)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        region="channel-west",
+        ports=["falmouth", "plymouth", "brest"],
+        nation="britain",
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def _frigate_and_a_cutter_under_false_colours(cables: float):
+    """The King's frigate with a French privateer cutter under British colours so many
+    cables off her beam, both at sea south of the Lizard at seed 7."""
+    from tests.test_brains import put, world_at
+
+    w = world_at(49.5, -5.5)
+    w.run(60)
+    from freesail.world.geo import destination
+
+    here = w.position
+    off = destination(here, 180.0, cables * units.CABLE)
+    v = put(
+        w,
+        "cutter",
+        "france",
+        {"lat_deg": off.lat_deg, "lon_deg": off.lon_deg},
+        "cruising off the Lizard within 10 miles",
+        intent="cruise for prizes off the Lizard within 10 miles",
+        colours="British",
+        name="Renard",
+    )
+    return w, v
+
+
+def test_truth_7_143_a_cutter_under_false_colours_is_made_out_as_british_and_lies_to_the_hail():
+    """Spec M7 §6's first truth and the brief's item 10: a French privateer cutter under
+    British colours is made out by the King's frigate's lookout as British at the colours'
+    range (the nation SHOWN, never the true one), and spoken within four cables she answers
+    the hail by the table with a lie under the flag she shows (a name and a port of that
+    nation), which the frigate's captain believes until the private signal or the shot
+    says otherwise; beyond four cables the hail is refused with the distance."""
+    from freesail.world import hail as H
+
+    w, v = _frigate_and_a_cutter_under_false_colours(cables=18.0)
+    w.run(120)
+    item = next(i for i in w.readings.value("strangers")["items"] if i["id"] == v.id)
+    assert item["made_out"] >= 2 and item["nation"] == "britain"  # 1.8 miles: the colours' range
+    assert "British colours, the red ensign" in item["known"]
+    said = w.submit("hail her")
+    assert said.kind == "order.rejected" and "beyond hail" in said.text
+    w2, v2 = _frigate_and_a_cutter_under_false_colours(cables=2.0)
+    w2.run(60)  # she draws off a cable a minute: three cables when spoken
+    said = w2.submit("hail her")
+    assert said.kind == "hail.answered", said.text
+    answer = said.data["answer"]
+    assert "Renard" not in answer and " of " in answer
+    assert H.nation_in_words(w2.nations, answer) == "britain"
+    assert w2.captain.recognised[v2.id]["nation"] == "britain"
+    assert v2.spoken and any(e.kind == "hail.answered" for e in w2.log)
+    # the standard questions, each answered in the period's form
+    said = w2.submit("say to the cutter: whence come you, and whither bound? what cargo?")
+    assert said.kind == "hail.answered" and "For Falmouth." in said.data["answer"]
+
+
+def test_truth_7_144_the_private_signal_answered_wrong_makes_her_a_stranger_and_he_chases():
+    """Spec M7 §6's second truth: the encounter (data/scenarios/encounter.yaml) played by the
+    rules captains with no model seated. At seed 7 the frigate's captain, on his station,
+    closes the cutter under British colours and makes her the private signal at 10:05
+    (the hoist queued behind a wear, up at 10:11); the privateer bluffs a guessed reply,
+    read wrong at 10:16 ("a stranger under false colours, an enemy"), and he gives chase by
+    his doctrine at 10:17, going about for her (the chase names his stranger and tacks
+    for a chase on the other side of the wind's eye, both mended in the package: before,
+    the bare order chased the merchant brig and held the tack that opened the cutter); a
+    merchant brig challenged alone makes no answer and is left 'a merchantman, who has
+    none; a stranger to be spoken'. The bands are a quarter of an hour wide: the timing
+    is the seed's (up 10:12, wrong 10:15, chase 10:16 while the hoist flew from the
+    book's minute and not from the hands' finishing, mended in the package)."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(ENCOUNTER)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    renard = w.vessels.find("Renard")
+    assert renard.nation == "france" and renard.nation_shown == "britain"
+    states = []
+    for _ in range(45):
+        w.run(60)
+        st = w.captain.state
+        if not states or states[-1][1] != st:
+            states.append((w.clock.tick, st))
+        if st == "chasing":
+            break
+    judged = [e for e in w.log if e.kind == "signal.private_judged"]
+    assert judged and judged[0].data["id"] == renard.id and judged[0].data["verdict"] == "wrong"
+    assert "a stranger under false colours, an enemy" in judged[0].text
+    made = [e for e in w.log if e.kind == "signal.made" and "private signal" in e.text]
+    assert made and 600 <= made[0].tick <= judged[0].tick <= 1500
+    assert w.captain.recognised[renard.id]["enemy"] is True
+    assert [s for _, s in states][:3] == ["investigating a stranger", "chasing"][:2] or (
+        "chasing" in [s for _, s in states]
+    )
+    chase = next(t for t, s in states if s == "chasing")
+    assert judged[0].tick < chase <= judged[0].tick + 120
+    assert w.readings.value("private_signal")["verdicts"][renard.id] == "wrong"
+    # the privateer's own log: her bluff
+    assert renard.crew is not None
+    assert any("a guess" in e.text for e in renard.crew.log)
+    # the chase goes after HIS stranger, about for her: south-west, not after the brig
+    chased = [e for e in w.log if e.kind == "helm.set" and e.text.startswith("Gave chase")]
+    assert chased and "Gave chase to a cutter" in chased[0].text, chased[0].text
+    assert "on the other tack" in chased[0].text
+    # a merchant brig challenged alone (the frigate off the Lizard, the brig a mile and a
+    # half off) makes no answer in the table's five minutes: a merchantman who has none, a
+    # stranger to be spoken, no enemy
+    from tests.test_brains import put, world_at
+
+    w2 = world_at(49.5, -5.5, intent="keep the station off the Lizard within 10 miles")
+    w2.run(60)  # his captain has the deck: the challenge is his, not the player's
+    from freesail.world.geo import destination
+
+    off = destination(w2.position, 180.0, 1.5 * units.NAUTICAL_MILE)
+    brig_v = put(
+        w2,
+        "merchant brig",
+        "britain",
+        {"lat_deg": off.lat_deg, "lon_deg": off.lon_deg},
+        "bound for Falmouth",
+        intent="bound for Falmouth",
+        name="Two Brothers",
+    )
+    brig: list = []
+    for _ in range(40):
+        w2.run(60)
+        brig = [
+            e for e in w2.log if e.kind == "signal.private_judged" and e.data["id"] == brig_v.id
+        ]
+        if brig:
+            break
+    assert brig and brig[0].data["verdict"] == "none" and brig[0].data["enemy"] is None
+    assert "a merchantman, who has none" in brig[0].text
+
+
+def test_truth_7_145_a_convoy_of_four_under_a_commodore_tacks_in_succession_on_one_hoist():
+    """Spec M7 §6's third truth: the convoy (data/scenarios/convoy.yaml), four merchant
+    brigs keeping company with the King's brig and under her orders, no model seated; the
+    player's one hoist of the convoy book's No. 5 is read a minute after it is up by each
+    master, answered with the pendant, and performed in succession: the leader at the
+    reading and each of the rest three minutes after the one ahead of her, in the order of
+    their making. At seed 7 the hoist is up at 798 (the hands slow at it: ordered at 600
+    behind a wear), seen at 840, read at 900, and the four are about at 900, 1080, 1260
+    and 1440 (840, 1020, 1200, 1380 while the hoist flew from the book's minute and not
+    from the hands' finishing, mended in the package)."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(CONVOY)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    names = ["Nancy", "Two Brothers", "Providence", "Friendship"]
+    for n in names:
+        v = w.vessels.find(n)
+        assert v.under_orders_of == "the ship" and v.brain is None
+    w.run(600)
+    said = w.submit("make the signal to tack in succession")
+    assert said.kind == "signal.ordered" and "No. 5, the convoy to tack in succession" in said.text
+    about: dict[str, int] = {}
+    up = None
+    for _ in range(30):
+        w.run(60)
+        if up is None:
+            made = [e for e in w.log if e.kind == "signal.made"]
+            up = made[0].tick if made else None
+        for n in names:
+            v = w.vessels.find(n)
+            if n not in about and any("went about" in words for _, words in (v.story or ())):
+                about[n] = next(t for t, words in v.story if "went about" in words)
+    assert up is not None and set(about) == set(names), about
+    ticks = [about[n] for n in names]
+    gaps = [b - a for a, b in zip(ticks, ticks[1:], strict=False)]
+    assert ticks == sorted(ticks) and gaps == [180, 180, 180], gaps
+    assert up + 60 <= ticks[0] <= up + 120
+    answered = [e for e in w.log if e.kind == "signal.answered"]
+    assert len(answered) == 4
+    assert 780 <= up <= 840 and ticks == [900, 1080, 1260, 1440], (up, ticks)
+
+
+def test_truth_7_146_a_telegraphic_sentence_takes_the_hoists_and_the_minutes_the_book_says():
+    """Spec M7 §6's fourth truth: Nelson's sentence by Popham's 1803 book is twelve hoists
+    (eight words of the dictionary and 'duty' spelt), a minute a hoist, read at the other
+    end a minute after the last is up; the French and the basic books have no dictionary
+    and the order is refused in words."""
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5)
+    w.run(120)
+    said = w.submit("make the telegraphic signal: England expects that every man will do his duty")
+    assert said.kind == "signal.ordered" and "12 hoists, 12 minutes" in said.text
+    assert "D 4, U 21, T 19, Y 24" in said.text
+    locker = w.ship.extra["signals"]
+    h = next(x for x in locker.flying if x.book == "telegraphic")
+    assert h.numbers == (253, 269, 863, 261, 471, 958, 220, 370, 4, 21, 19, 24)
+    ordered = int(w.clock.tick)
+    assert h.breaks_out >= 10**12 and h.complete_at >= 10**12  # nothing up until the hands
+    w.run(150)  # the hands at the halyards: the first hoist breaks out when they have it up
+    assert ordered + 60 <= h.breaks_out <= ordered + 150, h.breaks_out
+    assert h.complete_at >= 10**12  # the last hoist not yet up: not to be read before it is
+    for _ in range(40):
+        w.run(60)
+        if any(e.kind == "signal.made" and "telegraphic" in e.text for e in w.log):
+            break
+    up = next(e for e in w.log if e.kind == "signal.made" and "telegraphic" in e.text)
+    assert h.complete_at == up.tick  # read a minute after this
+    minutes = (up.tick - ordered) / 60.0
+    assert 12.0 <= minutes <= 16.0, minutes  # twelve nominal, stretched by the hands' pace
+    hoists = [e for e in w.log if e.kind == "signal.hoist"]
+    assert len(hoists) == 12 and "'expects' (269)" in hoists[1].text
+    # a French ship has no dictionary: by meaning from the numerary, or not at all
+    from freesail.world import signals as S
+
+    with pytest.raises(S.BookFileError):
+        S.load_books("france").encode("England expects")
+
+
+def test_truth_7_147_a_signal_made_in_fog_is_a_gun_and_not_a_flag():
+    """Spec M7 §6's last truth: in fog (the visibility under a mile) the same order makes
+    the fog book's signal, a gun fired by the battery, heard and read by ear by a ship two
+    miles off beyond the visibility (a near body at that distance, her lookout's sound
+    sighting), answered and obeyed when she is under our orders; a bell at anchor is
+    heard within the mile."""
+    from tests.test_brains import put
+
+    w = _sea_at(
+        49.5,
+        -5.5,
+        CUTTER,
+        datetime(1805, 6, 12, 10, 0),
+        climatology=True,
+        sky={"weather": "fog", "visibility": "a cable"},
+    )
+    w.run(60)
+    assert w.conditions.visibility_nm < 1.0
+    from freesail.world.geo import destination
+
+    off = destination(w.position, 90.0, 2.0 * units.NAUTICAL_MILE)
+    v = put(
+        w,
+        "brig-sloop",
+        "britain",
+        {"lat_deg": off.lat_deg, "lon_deg": off.lon_deg},
+        "bound for Falmouth",
+        intent="bound for Falmouth",
+        name="Harpy",
+    )
+    v.under_orders_of = "the ship"
+    w.run(60)
+    _guns_ready(w)
+    w.run(10)
+    said = w.submit("make the signal to heave to")
+    assert said.kind == "signal.made" and "by gun: four guns, bring to" in said.text
+    assert [e for e in w.log if e.kind == "signal.made"].__len__() == 1  # told once
+    for _ in range(8):
+        w.run(60)
+    near = v.crew
+    assert near is not None, "a sail two miles off is a near body (CREWED_NM)"
+    kinds = [(e.kind, e.text) for e in near.log]
+    heard = [t for k, t in kinds if k == "signal.read"]
+    assert heard and "fires four guns: bring to" in heard[0], kinds[-12:]
+    assert any(k == "signal.ordered" and "answering pendant" in t for k, t in kinds), kinds[-12:]
+    assert any("heaving to (the signal from the ship: Bring to)" in t for _, t in kinds), kinds[
+        -12:
+    ]
+    assert any(k == "ship.hove_to" for k, _ in kinds), kinds[-12:]
+    # a bell at anchor in the fog is heard within the mile by the player's lookout
+    from freesail.world.signals import vessel_locker
+
+    close = destination(w.position, 270.0, 0.7 * units.NAUTICAL_MILE)
+    rider = put(
+        w,
+        "merchant brig",
+        "britain",
+        {"lat_deg": close.lat_deg, "lon_deg": close.lon_deg},
+        "bound for Falmouth",
+        name="Nancy",
+    )
+    rider.plan = [("anchor", "")]
+    rider.sail_state = "at anchor"
+    vessel_locker(rider).fog_signals = True
+    w.run(180)
+    bells = [e for e in w.log if e.kind == "lookout.sighting" and "bell heard in the fog" in e.text]
+    assert bells, [e.text for e in w.log if e.kind == "lookout.sighting"][-4:]
+
+
+def test_truth_7_148_the_kings_cutter_engaging_to_leeward_never_puts_her_head_in_the_wind():
+    """The brief's item 8 (the owner's first action, 2026-10-24): 70's engaging helm steered
+    by the mark's bearing alone and turned the King's cutter through the wind's eye, aback
+    with her carronades silent for half an hour. The law is `captains.helm_in_action`: no
+    course in action within the close-hauled angle and half a point of the eye, the gage
+    kept, the mark through the eye answered by the doctrine. At seed 7 no minute of the
+    engagement finds her head within the close-hauled angle, no helm order says she will be
+    taken aback, and the action ends at 11:12 with the privateer struck, fifty-nine minutes
+    after the first shot (12:06 under 70's law: the tuning notes' bisection)."""
+    from freesail.evolutions.scripts import close_hauled_true_angle
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(FIRST_ACTION)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    v = w.vessels.find("Renard")
+    closest = units.rad_to_deg(close_hauled_true_angle(w.ship))
+    in_eye = []
+    struck = None
+    for _ in range(3 * 60):
+        w.run(60)
+        if w.captain.state == "engaging":
+            heading = units.rad_to_deg(float(w.ship.heading)) % 360.0
+            wind = units.rad_to_deg(float(w.wind.direction_from)) % 360.0
+            off = abs((heading - wind + 180.0) % 360.0 - 180.0)
+            if off < closest - 2.0:
+                in_eye.append((w.clock.tick, round(heading), round(off)))
+        if v.struck or w.ship.extra.get("struck"):
+            struck = w.clock.tick
+            break
+    assert not in_eye, in_eye
+    assert not [e for e in w.log if "taken aback" in e.text and "wind's eye" in e.text]
+    assert v.struck and struck is not None and 3600 <= struck <= 5400, struck
+    battery = w.ship.extra["battery"]
+    assert battery.rounds_fired >= 100  # 146 at seed 7; 51 under 70's law
+
+
+def test_truth_7_149_a_shot_under_false_colours_is_a_pirates_act_told_once_and_witnessed():
+    """Spec M7 §1 and §12's last truth: nothing fires under false colours without the log
+    saying so and every stance turning. The King's cutter under French colours fires on a
+    French privateer within sight of a British merchant brig: the first shot is told once
+    (`action.false_colours`), the ship is an outlaw to the ports, and every captain whose
+    people had her in sight holds her a pirate from then on, whatever colours she hoists."""
+    from freesail.combat.guns import battery_of
+    from tests.test_brains import put
+
+    w = make_world(SEED, CUTTER, _action_scenario())
+    _guns_ready(w)
+    heading = float(w.ship.heading)
+    v, enemy = _a_cutter_crewed(w, math.degrees(heading) + 90.0, 60.0, nation="france")
+    enemy.ship.dyn.heading = heading
+    witness = put(  # five and a half miles off to the north-west: in sight, a far body
+        w,
+        "merchant brig",
+        "britain",
+        "49 52 N 5 24 W",
+        "bound for Falmouth",
+        intent="bound for Falmouth",
+        name="Two Brothers",
+    )
+    w.submit("hold your fire")
+    w.submit("hoist French colours")
+    assert w.readings.words("colours").startswith("false: French colours")
+    w.run(65)
+    w.submit("engage her to starboard")
+    w.submit("fire")
+    w.run(70)
+    told = [e for e in w.log if e.kind == "action.false_colours"]
+    assert len(told) == 1 and "a pirate's act" in told[0].text
+    assert "under false colours" in str(w.ship.extra.get("outlaw"))
+    assert not [e for e in w.log if e.kind == "action.unrecognised"]  # an enemy by her colours
+    assert "the ship" in witness.brain.pirates and "the ship" in enemy.captain.pirates
+    assert battery_of(w.ship).target == v.id
+    w.submit("fire")
+    w.run(70)
+    assert len([e for e in w.log if e.kind == "action.false_colours"]) == 1  # told once
+    w.submit("hoist the colours")
+    assert "the ship" in witness.brain.pirates  # the witness holds her so whatever she hoists
+
+
+def test_truth_7_150_a_light_is_seen_at_night_at_the_range_a_lantern_carries():
+    """Spec M7 §5: by night a far ship showing a stern lantern is seen as a light at three
+    miles, beyond the hull's loom at the mile, as a sighting of its own; darkened she is
+    not; and `hoist the lights` is the ship's own order."""
+    from tests.test_brains import put
+
+    w = _sea_at(49.5, -5.5, CUTTER, datetime(1805, 6, 12, 23, 30))
+    assert w.daylight == "night"
+    w.run(60)
+    from freesail.world.geo import destination
+
+    off = destination(w.position, 45.0, 2.5 * units.NAUTICAL_MILE)
+    where = {"lat_deg": off.lat_deg, "lon_deg": off.lon_deg}
+    v = put(w, "merchant brig", "britain", where, "bound for Falmouth", name="Nancy")
+    w.run(120)
+    assert not [e for e in w.log if e.kind == "lookout.sighting" and "light" in e.text.lower()]
+    from freesail.world.signals import vessel_locker
+
+    vessel_locker(v).lights = "stern lantern"
+    w.run(120)
+    lights = [e for e in w.log if e.kind == "lookout.sighting" and e.text.startswith("A light")]
+    assert lights, [e.text for e in w.log if e.kind == "lookout.sighting"][-3:]
+    said = w.submit("hoist a stern lantern")
+    assert said.kind == "lights.changed" and w.readings.words("lights") == "a stern lantern"
+    said = w.submit("show no lights")
+    assert said.kind == "lights.changed" and w.readings.words("lights") == "none"
+
+
+@pytest.mark.pace
+def test_truth_7_151_the_pace_with_a_convoy_of_four_under_orders_holds_the_floor():
+    """The brief's item 10: a pace check for the work that runs for every far ship under
+    orders (the least captain reading the flying hoists once a minute) and the lookout's
+    reading of the flags: the convoy of four with a hoist flying, against the crewed floor
+    (the brigs nearest the commodore are crewed under the cap); the conftest's floors are
+    not lowered."""
+    import time
+
+    from freesail.world import crews as K
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(CONVOY)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    w.run(600)
+    w.submit("make the signal to make more sail")
+    w.run(200)
+    best = 0.0
+    for _ in range(3):
+        t0 = time.perf_counter()
+        w.run(1000)
+        best = max(best, 1000 / (time.perf_counter() - t0))
+    assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second"

@@ -1,0 +1,71 @@
+# FreeSail: the British night and fog signals (spec M7 §3, §5; package 71;
+# docs/design/Design-Signals.md). The night signals bound with the Admiralty's 1799 book:
+# lanterns in their number and place (horizontal, vertical, in a triangle; at the mizen
+# peak, the ensign staff, the main topmast head), false fires (the blue light burnt on
+# deck), rockets and guns; the fog signals: guns at intervals, muskets, the bell and the
+# drum. The FORM is the book's, from memory; every hoist below is MADE in that form (the
+# actual arrangements are not remembered and the meanings' numbers are the day book's
+# where one serves). The meanings are the few dozen a night and a fog want (the spec: "a
+# few dozen meanings, not a vocabulary"). Package 76 builds them out against the printed
+# book.
+#
+# `show` is what is shown or burnt by night, `fire` what is fired in fog; `does` as the
+# numerary's; `signal_s` how long it is shown (a lantern hoisted and kept a glass; a false
+# fire burns a minute; a gun is an instant and is heard, not seen).
+
+source: "the night and fog signals bound with the Admiralty's Signal Book for the Ships of War, 1799 (the form from memory; every hoist made); the Regulations and Instructions 1806 for the bell at anchor and the lights of ships in company (from memory)"
+made: true
+
+night:
+  - {meaning: "Enemy in sight", also: ["the enemy in sight", "an enemy in sight"], show: "three lights in a triangle at the mizen peak, and a false fire", does: {news: true}, source: "the 1799 night signals (the form; made)", made: true}
+  - {meaning: "A strange sail in sight", also: ["strange sail", "a sail in sight"], show: "two lights, one over the other, at the mizen peak", does: {news: true}, source: "made", made: true}
+  - {meaning: "Tack together", also: ["tack", "put about together"], show: "two lights horizontal at the mizen peak, and two guns", does: {order: "put her about"}, source: "made", made: true}
+  - {meaning: "Tack in succession", also: ["tack in succession"], show: "two lights horizontal at the mizen peak, one gun, and a false fire", does: {order: "put her about"}, in_succession: true, source: "made", made: true}
+  - {meaning: "Wear together", also: ["wear", "wear ship together"], show: "three lights horizontal at the mizen peak, and three guns", does: {order: "wear ship"}, source: "made", made: true}
+  - {meaning: "Wear in succession", also: ["wear in succession"], show: "three lights horizontal at the mizen peak, one gun, and a false fire", does: {order: "wear ship"}, in_succession: true, source: "made", made: true}
+  - {meaning: "Make more sail", also: ["make sail", "more sail"], show: "one light at the main topmast head, and a false fire", does: {order: "make sail"}, source: "made", made: true}
+  - {meaning: "Shorten sail", also: ["shorten sail", "take in sail"], show: "one light at the main topmast head, and two false fires", does: {order: "shorten sail"}, source: "made", made: true}
+  - {meaning: "Bring to", also: ["heave to", "lie to", "bring to"], show: "two lights, one over the other, at the ensign staff, and one gun", does: {order: "heave to"}, source: "made", made: true}
+  - {meaning: "Fill and make sail", also: ["fill", "fill away", "make sail again"], show: "one light at the ensign staff, and two guns", does: {order: "fill away"}, source: "made", made: true}
+  - {meaning: "Alter course to starboard", also: ["haul to starboard"], show: "one light at the mizen peak, and a rocket", does: {order: "steer two points to starboard"}, source: "made", made: true}
+  - {meaning: "Alter course to larboard", also: ["haul to larboard", "alter course to port"], show: "one light at the mizen peak, and two rockets", does: {order: "steer two points to larboard"}, source: "made", made: true}
+  - {meaning: "Anchor", also: ["come to an anchor", "anchor"], show: "four lights in a square at the mizen peak, and one gun", does: {order: "come to an anchor"}, source: "made", made: true}
+  - {meaning: "Weigh", also: ["weigh anchor", "get under way"], show: "four lights in a square at the mizen peak, and three guns", does: {order: "weigh anchor"}, source: "made", made: true}
+  - {meaning: "Chase", also: ["general chase", "to chase", "chase in the direction"], show: "a rocket and a false fire, repeated", does: {state: chasing}, source: "made", made: true}
+  - {meaning: "Discontinue the chase", also: ["recall", "the recall", "give up the chase"], show: "three false fires, one after another", does: {state: "on passage"}, source: "made", made: true}
+  - {meaning: "Engage the enemy", also: ["engage", "engage the enemy"], show: "two rockets and a gun", does: {state: engaging}, source: "made", made: true}
+  - {meaning: "Discontinue the action", also: ["break off the action", "haul off"], show: "three lights in a triangle at the ensign staff, and three guns", does: {state: "on passage"}, source: "made", made: true}
+  - {meaning: "Keep closer order", also: ["close order", "close up", "close round the commodore"], show: "one light at the fore topmast head, and a false fire", does: {order: "close the flag"}, source: "made", made: true}
+  - {meaning: "Land in sight", also: ["the land in sight", "land seen"], show: "one light at the ensign staff, and three false fires", does: {news: true}, source: "made", made: true}
+  - {meaning: "Danger: rocks or shoals", also: ["danger", "breakers", "shoal water"], show: "lights at every masthead, guns and muskets at intervals", does: {news: true}, source: "the 1799 night signals' form for a ship in danger (from memory; made)", made: true}
+  - {meaning: "I am in want of assistance", also: ["want assistance", "in distress", "distress"], show: "a light at the masthead and guns at intervals", does: {news: true}, source: "the custom of a ship in distress by night (Falconer, SIGNAL; made)", made: true}
+  - {meaning: "Show your colours", also: ["show the private signal", "the private signal"], show: "the private signal's lights", does: {order: "show the private signal"}, source: "made", made: true}
+  - {meaning: "Affirmative", also: ["yes", "affirmative", "the signal is seen and understood", "answer"], show: "one false fire", does: {answer: "affirmative"}, source: "the 1799 night signals' answer (from memory; made)", made: true}
+  - {meaning: "Negative", also: ["no", "negative", "cannot comply"], show: "two false fires", does: {answer: "negative"}, source: "made", made: true}
+
+fog:
+  - {meaning: "Tack together", also: ["tack", "put about together"], fire: "two guns", does: {order: "put her about"}, source: "the 1799 fog signals' form (from memory; made)", made: true}
+  - {meaning: "Tack in succession", also: ["tack in succession"], fire: "two guns and a volley of musketry", does: {order: "put her about"}, in_succession: true, source: "made", made: true}
+  - {meaning: "Wear together", also: ["wear", "wear ship together"], fire: "three guns", does: {order: "wear ship"}, source: "made", made: true}
+  - {meaning: "Wear in succession", also: ["wear in succession"], fire: "three guns and a volley of musketry", does: {order: "wear ship"}, in_succession: true, source: "made", made: true}
+  - {meaning: "Make more sail", also: ["make sail", "more sail"], fire: "one gun and the drum beaten", does: {order: "make sail"}, source: "made", made: true}
+  - {meaning: "Shorten sail", also: ["shorten sail", "take in sail"], fire: "one gun and the bell rung", does: {order: "shorten sail"}, source: "made", made: true}
+  - {meaning: "Bring to", also: ["heave to", "lie to", "bring to"], fire: "four guns", does: {order: "heave to"}, source: "made", made: true}
+  - {meaning: "Fill and make sail", also: ["fill", "fill away"], fire: "five guns", does: {order: "fill away"}, source: "made", made: true}
+  - {meaning: "Anchor", also: ["come to an anchor", "anchor"], fire: "six guns", does: {order: "come to an anchor"}, source: "made", made: true}
+  - {meaning: "Weigh", also: ["weigh anchor", "get under way"], fire: "seven guns", does: {order: "weigh anchor"}, source: "made", made: true}
+  - {meaning: "Alter course to starboard", also: ["haul to starboard"], fire: "one gun and a volley of musketry", does: {order: "steer two points to starboard"}, source: "made", made: true}
+  - {meaning: "Alter course to larboard", also: ["haul to larboard", "alter course to port"], fire: "one gun and two volleys of musketry", does: {order: "steer two points to larboard"}, source: "made", made: true}
+  - {meaning: "Enemy in sight", also: ["the enemy in sight", "a strange sail in sight", "strange sail"], fire: "a gun and the drum, repeated", does: {news: true}, source: "made", made: true}
+  - {meaning: "Danger: rocks or shoals", also: ["danger", "breakers", "shoal water"], fire: "guns and muskets at intervals, the bell rung", does: {news: true}, source: "the fog signals' form for a ship in danger (from memory; made)", made: true}
+  - {meaning: "Keep company", also: ["keep company", "the fleet to keep company", "keep closer order", "close order"], fire: "a gun every half hour, the ships answering with muskets", does: {order: "close the flag"}, source: "the Regulations' and the custom's fog signal of a fleet keeping company (from memory; made)", made: true}
+  - {meaning: "Affirmative", also: ["yes", "affirmative", "answer"], fire: "a volley of musketry", does: {answer: "affirmative"}, source: "made", made: true}
+
+# the fog signals a ship keeps of herself, by the custom and the Regulations (from memory;
+# the figures judgement): at anchor the bell rung at intervals, under way a gun at intervals
+# when in company, else muskets or the drum; `keep the fog signals` begins them, the lookout
+# of another ship hears them within the mile (the bell) or three (the gun)
+keeping:
+  at_anchor: {do: "ring the bell", every_s: 120, source: "the custom at anchor in a fog (Falconer, Luce 1884 ch. XXXII on fog signals under the older usage; the two minutes judgement)"}
+  under_way: {do: "fire a gun", every_s: 1800, source: "the Regulations' gun every half hour for a fleet in a fog (from memory; judgement)"}
+  under_way_alone: {do: "beat the drum", every_s: 300, source: "a ship alone beats the drum or fires muskets rather than powder by the gun (the custom; judgement)"}

@@ -1,0 +1,28 @@
+# Make a signal (spec M7 §3; package 71; docs/design/Design-Signals.md; scripted,
+# MakeSignalScript in evolutions/action_scripts.py). The flags bent on and run up to the
+# masthead by the yeoman of the signals and two hands at the halyards, a minute a hoist
+# (Popham's own reckoning of a minute or more a hoist, the signal officer reading the book;
+# judgement for the figure); a telegraphic sentence as many hoists as it has words and
+# spelt letters, each a phase, the next bent as the last is hauled down. The hoist breaks
+# out on the sender's body when the hands have the first hoist up (the phase's end, not
+# the book's minute: a short watch is slower), where every lookout near enough with
+# light enough sees it (`freesail/world/signals.py` `read_flying`). By night the lanterns
+# and the false fires take the same minute to show; in fog the gun is the signal and takes
+# the gun's own time (the gunnery's), so the fog book's signals are made by the battery and
+# not by these hands. Fails in words when the hands cannot be had, and the hoist comes down.
+id: make_signal
+verb: make_signal
+applies_to: {class: ship}
+script: make_signal
+params: {hoists: 1, hoist_key: "", words: ""}
+preconditions: []
+timing:
+  hoist_s: 60   # a hoist bent and run up (Popham 1803, from memory; judgement)
+on_start: {log: "Bend on the signal: {words}."}
+on_complete: {log: "The signal is up: {words}.", kind: signal.made, severity: notable}
+on_fail: {log: "Could not make the signal: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the yeoman of the signals and two hands at the halyards (the signal midshipman is
+# an officer and no hand of the bill; Luce 1884 ch. XX on the signal quartermaster); at
+# quarters they are the trimmers' (the quarter bill's rule for any sail work)
+crew: {hands: 3, rating: ordinary, stations: [afterguard, quarterdeck]}
+source: "Popham, Telegraphic Signals, 1803 (a minute or more a hoist, from memory); the 1799 book's substitute and preparative; Luce 1884 ch. XX (the signal quartermaster)"

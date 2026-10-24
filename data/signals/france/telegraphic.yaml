@@ -1,0 +1,13 @@
+# FreeSail: the French telegraphic dictionary (spec M7 §3; package 71;
+# docs/design/Design-Signals.md). There is none: the free sentence by flags was Popham's
+# (1800, 1803) and the French navy had no dictionary of the kind in 1805 (a vocabulaire
+# came later; from memory). A French ship ordered `make the telegraphic signal: ...` is
+# refused in words ("the French book has no telegraphic dictionary; a signal is made by its
+# meaning from the numerary"). The file is kept so that every root has the same six and 76
+# fills it if a source is found.
+
+source: "no French telegraphic dictionary in 1805 (from memory)"
+made: false
+telegraph_flag: false
+alphabet: {}
+words: {}

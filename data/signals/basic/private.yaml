@@ -1,0 +1,27 @@
+# FreeSail: the form of the basic system's private signals (spec M7 §2; package 71;
+# docs/design/Design-Signals.md). The form is data/signals/britain/private.yaml's (its head
+# says the fields and the draw): a flag at a named place answered by another, with the
+# ensign where the table says; by night lights and a false fire. Every nation of the basic
+# system draws her own table from this form, because the nation is in the draw's seed
+# (`freesail/world/signals.py` `private_table`), so a Spanish table is not a Dutch one.
+# MADE.
+
+source: "the common form of the period's recognition signals (made); the tables made under the seed"
+made: true
+changes: monthly
+day:
+  challenge: "a {flag} at the {place}"
+  reply: "a {flag} at the {place}, with the ensign at the {ensign_place}"
+  pools:
+    flag: ["blue flag", "red flag", "white flag", "yellow flag", "blue and yellow flag", "red and white flag", "blue pendant", "red pendant", "white pendant", "chequered flag"]
+    place: ["main topmast head", "fore topmast head", "mizen peak", "fore yardarm", "main yardarm", "ensign staff"]
+    ensign_place: ["mizen peak", "ensign staff", "main topmast head"]
+night:
+  challenge: "{n} lights {arrangement} at the {place}"
+  reply: "{n} lights {arrangement} at the {place}, and a false fire"
+  pools:
+    n: ["one", "two", "three"]
+    arrangement: ["horizontal", "one over the other", "in a triangle"]
+    place: ["mizen peak", "ensign staff", "main topmast head", "fore topmast head"]
+carried_by: [kings-ship, cruiser, commodore]
+answer_wait_s: 300

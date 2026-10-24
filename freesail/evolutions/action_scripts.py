@@ -28,6 +28,7 @@ __all__ = [
     "ACTION_SCRIPTS",
     "CastLooseScript",
     "ClearForActionScript",
+    "MakeSignalScript",
     "SecureGunsScript",
 ]
 
@@ -221,8 +222,78 @@ class SecureGunsScript(_QuartersScript):
         return {"loaded": loaded}
 
 
+class MakeSignalScript(PhasedScript):
+    """Make a signal (spec M7 §3; package 71): the flags bent on and run up, a phase a
+    hoist of `hoist_s` (a telegraphic sentence a phase a word), the hoist breaking out on
+    the ship's body when the hands have the first hoist up and complete when they have the
+    last (`signals.Hoist.breaks_out`, `complete_at`, set at the phases' ends and not when
+    it was ordered, so a hoist queued behind other work waits its hands, and one the watch
+    is slow at is seen when it is up and not by the book's minute). Fails with the hoist
+    hauled down when the hands cannot be had."""
+
+    DEFAULTS = {"hoist": 60.0}
+
+    def holds(self) -> set[str]:
+        return set()  # the halyards are nobody's hold: a signal is made through any work
+
+    def _tick(self) -> int:
+        from freesail.orders.prompt import world_of
+
+        world = world_of(self.ship)
+        return int(world.clock.tick) if world is not None else 0
+
+    def _hoist(self) -> Any:
+        from freesail.world.signals import locker_of
+
+        key = str(self.params.get("hoist_key") or "")
+        locker = locker_of(self.ship)
+        for h in [*locker.flying, *reversed(locker.made)]:
+            if h.key == key:
+                return h
+        return None
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        return None if self._hoist() is not None else "no signal is bent on"
+
+    def phase_s(self, name: str) -> float:
+        return self.timing_value("hoist_s", 60.0)
+
+    def begin(self, words: dict[str, Any]) -> None:
+        n = max(1, int(self.params.get("hoists") or 1))
+        self.start_phases([f"hoist_{i + 1}" for i in range(n)])
+
+    def end_phase(self, name: str) -> None:
+        h = self._hoist()
+        if h is None:
+            return
+        i = int(name.rsplit("_", 1)[-1]) - 1
+        tick = self._tick()
+        if i == 0:
+            h.breaks_out = tick  # the first hoist up: seen from here
+        if i == len(self.plan) - 1 and h.complete_at is not None:
+            h.complete_at = tick  # the last: read from here
+        if h.book != "telegraphic":
+            return
+        if 0 <= i < len(h.words_made):
+            self.note(
+                f"The telegraph: hoist {i + 1} of {len(h.words_made)}, '{h.words_made[i]}' "
+                f"({h.numbers[i]}).",
+                kind="signal.hoist",
+            )
+
+    def fail(self, reason: str) -> None:
+        super().fail(reason)
+        h = self._hoist()
+        if h is not None and h.down is None:
+            h.down = self._tick()
+
+    def words(self) -> dict[str, Any]:
+        return {"words": str(self.params.get("words") or "the signal")}
+
+
 ACTION_SCRIPTS: dict[str, type[PhasedScript]] = {
     "clear_for_action": ClearForActionScript,
     "cast_loose_guns": CastLooseScript,
     "secure_guns": SecureGunsScript,
+    "make_signal": MakeSignalScript,
 }

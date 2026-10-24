@@ -1,0 +1,163 @@
+# FreeSail: the hail's tables (spec M7 §4; package 71; docs/design/Design-Signals.md). What a
+# rules captain says when he is spoken within hail, by his role, his nation and the colours
+# he shows, in the period's words (the logs of 1805 and the sea novels' usage: "What ship is
+# that?", "His Majesty's ship ...", "The Nancy of Guernsey, from Guernsey for Falmouth, in
+# ballast"; Luce 1884 ch. XX on the custom of the hail; Falconer, HAIL). Read by
+# freesail/world/hail.py. The words are the builder's in the period's form, MADE from the
+# usage and marked so; the questions are the half-dozen of the standard exchange.
+#
+# `questions`: the words of a hail matched to a question kind (what ship, whence, whither,
+# cargo, news, the captain, how many days out, heave to); a hail with none of them is "what
+# ship" (the hail itself). `answers`: templates by role, filled from her truth (or her lie:
+# a privateer under false colours answers under the flag she shows, with a name and a port of
+# that nation drawn under the seed). `navy`: the words of a King's ship by nation. `ports`:
+# the home ports a lie or a nameless merchant draws from, by nation. `lies`: the names a
+# privateer under false colours gives, by the nation shown.
+
+source: "the standard hail of the period from the logs and the usage (from memory; the words made in its form); Luce 1884 ch. XX; Falconer, HAIL"
+made: true
+
+standard_hail:
+  kings-ship: "What ship is that?"
+  cruiser: "What ship is that?"
+  commodore: "What ship is that?"
+  merchant: "What ship is that, and whither bound?"
+  packet: "What ship is that?"
+  privateer: "What ship is that?"
+  fisherman: "What ship is that?"
+
+questions:
+  what ship: ["what ship", "who are you", "what vessel", "your name", "what is she", "what ship is that", "ahoy"]
+  whence: ["whence", "where from", "where are you from", "from what port", "where do you come from", "where have you come from"]
+  whither: ["whither", "where bound", "bound", "where are you bound", "for what port", "where are you going"]
+  cargo: ["cargo", "what have you aboard", "lading", "laden", "what do you carry", "freight"]
+  news: ["news", "what news", "any news", "the war", "the fleet", "intelligence"]
+  captain: ["who commands", "your captain", "who is your captain", "commander", "what captain"]
+  days out: ["how many days", "days out", "how long out", "when did you sail"]
+  heave to: ["heave to", "bring to", "lie to", "sending a boat", "send a boat", "stand by to be boarded", "back your topsail", "back your main topsail", "shorten sail and heave to"]
+
+navy:
+  britain: "His Majesty's {kind} {name}"
+  france: "the French national {kind} {name}"
+  spain: "His Catholic Majesty's {kind} {name}"
+  batavian-republic: "the Batavian Republic's {kind} {name}"
+  united-states: "the United States {kind} {name}"
+  portugal: "Her Most Faithful Majesty's {kind} {name}"
+  denmark: "His Danish Majesty's {kind} {name}"
+  morocco: "the Emperor of Morocco's {kind} {name}"
+
+answers:
+  kings-ship:
+    what ship: "{navy}. And what ship is that?"
+    whence: "From {port}, on the King's service."
+    whither: "On the King's service; that is my business."
+    cargo: "No cargo: she is a King's ship."
+    news: "{news}."
+    captain: "{captain} commands her."
+    days out: "{days} days from {port}."
+    heave to: "A King's ship heaves to for nobody: stand on."
+  cruiser:
+    what ship: "{navy}. And what ship is that?"
+    whence: "From {port}, on the King's service."
+    whither: "On the King's service."
+    cargo: "No cargo: she is a King's ship."
+    news: "{news}."
+    captain: "{captain} commands her."
+    days out: "{days} days from {port}."
+    heave to: "A King's ship heaves to for nobody: stand on."
+  commodore:
+    what ship: "{navy}, with a convoy under my orders. And what ship is that?"
+    whence: "From {port} with the convoy."
+    whither: "With the convoy, on the King's service."
+    cargo: "No cargo: she is a King's ship."
+    news: "{news}."
+    captain: "{captain} commands her."
+    days out: "{days} days from {port}."
+    heave to: "A King's ship heaves to for nobody: stand on."
+  merchant:
+    what ship: "The {name} of {port}, {voyage}, {cargo}."
+    whence: "From {port}, {days} days."
+    whither: "{voyage_short}."
+    cargo: "{cargo}."
+    news: "{news}."
+    captain: "{captain}, master."
+    days out: "{days} days from {port}."
+    heave to: "{heave_to}"
+  packet:
+    what ship: "His Majesty's packet {name}, with the mails, {voyage}."
+    whence: "From {port} with the mails, {days} days."
+    whither: "{voyage_short}, with the mails."
+    cargo: "The mails, and nothing else."
+    news: "{news}."
+    captain: "{captain} commands her."
+    days out: "{days} days from {port}."
+    heave to: "{heave_to}"
+  fisherman:
+    what ship: "The {name} of {port}, fishing."
+    whence: "Out of {port}."
+    whither: "Fishing, and home to {port}."
+    cargo: "Fish, when we have them."
+    news: "{news}."
+    captain: "{captain}, skipper."
+    days out: "{days} days out."
+    heave to: "{heave_to}"
+  privateer:
+    what ship: "The privateer {name} of {port}, cruising. And what ship is that?"
+    whence: "From {port}."
+    whither: "Cruising."
+    cargo: "No cargo."
+    news: "{news}."
+    captain: "{captain} commands her."
+    days out: "{days} days from {port}."
+    heave to: "{heave_to}"
+  # under false colours a privateer lies by the merchant's table (`lie: merchant`), with a
+  # name and a port of the nation she shows
+  lie:
+    what ship: "The {name} of {port}, {voyage}, {cargo}."
+    whence: "From {port}, {days} days."
+    whither: "{voyage_short}."
+    cargo: "{cargo}."
+    news: "{news}."
+    captain: "{captain}, master."
+    days out: "{days} days from {port}."
+    heave to: "{heave_to}"
+
+# the demand to heave to, answered by stance: a King's ship of a nation she is not at war
+# with is obeyed by a merchantman, a packet and a fisherman; an enemy's is run from; a
+# privateer makes sail from any; a King's ship declines
+heave_to:
+  obeys: "Aye aye: heaving to."
+  runs: "She makes no answer but sail."
+  declines: "A King's ship heaves to for nobody: stand on."
+  privateer: "She makes no answer but sail."
+
+# a nameless far vessel's home port, and a lie's, by the nation shown (the ports of the
+# period's trade; a privateer under British colours is 'of Guernsey' as often as not,
+# which the record has)
+ports:
+  britain: [Falmouth, Plymouth, Guernsey, Bristol, London, Dartmouth, Jersey, Liverpool]
+  france: [St Malo, Brest, Morlaix, Nantes, Bordeaux, Dunkirk, Lorient]
+  spain: [Cadiz, Corunna, Ferrol, Bilbao, Vigo]
+  batavian-republic: [Amsterdam, Rotterdam, Flushing]
+  united-states: [Boston, New York, Salem, Baltimore, Philadelphia]
+  portugal: [Lisbon, Oporto]
+  denmark: [Copenhagen, Altona, Bergen]
+  morocco: [Tangier, Sale]
+
+# the names a lie takes, by the nation shown (merchantmen's names of the period's registers,
+# from memory; made)
+lies:
+  britain: [Nancy, Two Brothers, Providence, Betsey, Friendship, Hope, Industry, Mary Ann, Active, Union]
+  france: [Marie, Deux Amis, Bonne Mère, Espérance, Aimable Victoire, Jeune Henri, Confiance]
+  spain: [Nuestra Señora del Carmen, San José, Santa Ana, La Esperanza]
+  batavian-republic: [Vrouw Maria, Jonge Jan, Goede Hoop, Twee Gebroeders]
+  united-states: [Eliza, Sally, Polly, Hannah, Enterprise, Minerva]
+  portugal: [Bom Jesus, Nossa Senhora da Conceição, São João]
+  denmark: [Anna Maria, Haabet, Enigheden, Fortuna]
+  morocco: [Meshouda, Mirboha]
+
+# the cargo a far merchantman answers for by her description's words (no hold at far
+# detail): deep laden, a cargo; light, in ballast
+cargo:
+  deep: ["a cargo of wine and brandy", "a cargo of salt", "a cargo of tin and copper", "a cargo of pilchards", "a general cargo", "a cargo of wheat", "a cargo of coals"]
+  light: ["in ballast"]

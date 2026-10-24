@@ -272,7 +272,7 @@ def lead_words(words: str) -> str:
     return words
 
 
-_ORDER = {"danger": 0, "sail": 1, "light": 2, "land": 3, "mark": 4}
+_ORDER = {"danger": 0, "sail": 1, "sound": 1, "light": 2, "land": 3, "mark": 4}
 
 # The ids of the points of interest a world order puts in the world (`mark:`, package 45c;
 # `freesail.world.orders._mark`).
@@ -300,6 +300,11 @@ _RIG_WORDS = {
     "frigate": "frigate",
     "schooner": "schooner",
     "merchantman": "merchant",
+    # package 71: 'the cutter' was a sail word (35's pilot cutter, the one sail in sight)
+    # and named the nearest sail of any rig; with two in sight it is her rig
+    "cutter": "cutter",
+    "lugger": "lugger",
+    "sloop": "sloop",
 }
 
 
@@ -483,6 +488,7 @@ class Lookout:
             )
         lines.extend(self._closing(found, heading, minute))
         lines.extend(self._land_ahead(world, pos, found, heading))
+        self._tidy_signals(world)
         lines.extend(self._sails(world, found, fresh_ids, heading))
         if self._had_land and not land_now and self._looked:
             lines.append(
@@ -625,6 +631,12 @@ class Lookout:
         out: list[tuple[Severity, str, str, dict[str, Any]]] = []
         seen: dict[str, str] = {}
         for s in found:
+            if s.seen_as == "sound":
+                # a sail heard and not seen (package 71): her fog signals read by ear
+                v = self._vessel(world, s)
+                if v is not None:
+                    out.extend(self._signals_of(world, v, s, 0))
+                continue
             if s.seen_as != "sail":
                 continue
             v = self._vessel(world, s)
@@ -646,10 +658,13 @@ class Lookout:
             glass = self._glass_line(world, v, s, level, relative)
             if glass is not None:
                 out.append(glass)
+            out.extend(self._colours_changed(v, fid, level))
+            out.extend(self._signals_of(world, v, s, level))
         for fid, where in list(self._sails_seen.items()):
             if fid not in seen:
                 self._sail_said.pop(fid, None)
                 self._sail_known.pop(fid, None)
+                getattr(self, "_colours_said", {}).pop(fid, None)
                 getattr(self, "_glass_said", {}).pop(fid, None)
                 out.append(
                     (
@@ -660,6 +675,97 @@ class Lookout:
                     )
                 )
         self._sails_seen = seen
+        return out
+
+    def _tidy_signals(self, world: Any) -> None:
+        """The ship's own hoists that have flown their time come down of themselves
+        (package 71), once a minute with the look; nothing on a ship with no locker."""
+        extra = getattr(world.ship, "extra", None)
+        locker = extra.get("signals") if extra is not None else None
+        if locker is None or not locker.flying:
+            return
+        from freesail.world import signals as S
+
+        locker.tidy(int(world.clock.tick), S.books_for(world).flies_s)
+
+    def _colours_changed(
+        self, v: Any, fid: str, level: int
+    ) -> list[tuple[Severity, str, str, dict[str, Any]]]:
+        """Her colours shifted while they are to be made out (package 71, spec M7 §1):
+        hoisted, hauled down, or changed for another nation's; one line a change."""
+        said = getattr(self, "_colours_said", None)
+        if said is None:
+            said = self._colours_said = {}
+        if level < 2:
+            return []
+        shown = v.nation_shown
+        locker = getattr(v, "signals", None)
+        state = locker.colours.state if locker is not None else "shown"
+        now = (shown, state)
+        before = said.get(fid)
+        said[fid] = now
+        if before is None or before == now:
+            return []
+        who = _head(self._sail_word(v, level))
+        if state == "struck":
+            return []  # the strike is the action's own line (`action.enemy_struck`)
+        if shown is None:
+            text = f"{who} hauls down her colours."
+        elif before[0] is None:
+            text = f"{who} hoists her colours: {v.colours_words()}."
+        else:
+            text = f"{who} shifts her colours: {v.colours_words()}."
+        if state == "distress":
+            text = f"{who} hoists the ensign union down: the signal of distress."
+        data = {"id": v.id, "state": state, "nation": shown, "own": False}
+        return [(Severity.NOTABLE, "colours.changed", text, data)]
+
+    def _signals_of(
+        self, world: Any, v: Any, s: Sighting, level: int
+    ) -> list[tuple[Severity, str, str, dict[str, Any]]]:
+        """The signals she flies, as this ship's people see them this minute (package 71,
+        spec M7 §3): 'she makes a signal' at the flags' range, the meaning a minute later
+        when the book is ours, the private signal and the answering pendant by their form;
+        a light's or a gun's by night and in fog. Nothing on a sail whose rig is not yet
+        made out by day (the flags are smaller than she is)."""
+        from freesail.world import signals as S
+
+        locker = getattr(v, "signals", None)
+        if locker is None or not locker.flying:
+            return []
+        tick = int(world.clock.tick)
+        hoists = locker.flying_now(tick)
+        if not hoists:
+            return []
+        reader = S.player_locker(world)
+        books = S.books_for(world)
+        light = S.light_now(world)
+        if light == "day" and level < 1 and s.seen_as != "sound":
+            return []
+        glass = S.has_glass(world)
+        own = S.own_id(world)
+        who = self._sail_word(v, level).removeprefix("the ")
+        who = f"the {who}" if who != "sail" else "the sail"
+        seen = S.read_flying(
+            reader,
+            books,
+            v.id,
+            who,
+            hoists,
+            float(s.distance_m),
+            light,
+            glass,
+            tick,
+            own,
+            S.held_books(world),
+        )
+        S.note_seen(reader, seen, tick)
+        out = []
+        for item in seen:
+            severity = (
+                Severity.NOTABLE if item.read or item.kind != "signal.seen" else Severity.ROUTINE
+            )
+            out.append((severity, item.kind, item.text, item.data))
         return out
 
     def _glass_line(
@@ -759,7 +865,8 @@ class Lookout:
         self, v: Any, s: Sighting, level: int, words: str, relative: str, glass: bool
     ) -> tuple[Severity, str, str, dict[str, Any]]:
         who = self._sail_word(v, level - 1 if level > 1 else 0)
-        colours = level >= 2 and v.shows_colours and bool(v.nation_adjective)
+        shown = v.nation_shown  # package 71: the colours shown, false or true
+        colours = level >= 2 and shown is not None
         # package 56 (the owner's note 5 at gate 6c): every line that reports a sail made
         # out gives her relative bearing, her compass bearing and the course she stands
         point = units.point_name(math.radians(s.bearing_deg))
@@ -780,7 +887,7 @@ class Lookout:
             "id": v.id,
             "level": level,
             "colours": bool(colours),
-            "nation": v.nation if colours else None,
+            "nation": shown if colours else None,
             "words": words,
             "relative": relative,
             "bearing_deg": round(s.bearing_deg, 1),
@@ -856,10 +963,9 @@ class Lookout:
                     "made_out": level,
                     "known": known or "a sail",
                     # her nation once her colours are made out and she shows them; None
-                    # while she is a stranger (too far, or no colours)
-                    "nation": v.nation
-                    if v is not None and level >= 2 and v.shows_colours and v.nation_adjective
-                    else None,
+                    # while she is a stranger (too far, or no colours); the nation SHOWN,
+                    # which under false colours is the ruse's (package 71)
+                    "nation": v.nation_shown if v is not None and level >= 2 else None,
                     "spoken": bool(v is not None and v.spoken),  # within hail at any time
                     "words": f"{head} {relative}, bearing {point}, distant "
                     f"{estimate_words(s.judged_m)}{detail}",
@@ -1141,6 +1247,9 @@ class Lookout:
         distance = estimate_words(s.judged_m)
         if s.seen_as == "light":
             return f"A light {relative}, bearing {point}."
+        if s.seen_as == "sound":
+            # package 71 (spec M7 §5): a bell, a gun or a drum heard in the fog
+            return f"{_head(s.feature.name)} heard in the fog {relative}, bearing {point}."
         head = _head(s.feature.name)
         if s.seen_as == "sail":
             # the hail for other sail (spec M5 §25, truth 67's form; package 35): a bearing
@@ -1197,7 +1306,11 @@ class Lookout:
                     if rig in _key(s.feature.name)
                     or rig in _key(self._sail_known.get(s.feature.id, ""))
                 ]
-                return min(named, key=lambda s: s.distance_m) if named else None
+                if named:
+                    return min(named, key=lambda s: s.distance_m)
+                if key not in _SAIL_WORDS and f"the {key}" not in _SAIL_WORDS:
+                    return None
+                # 'the cutter' with no cutter made out: the nearest sail, as at 35
             return min(sails, key=lambda s: s.distance_m) if sails else None
         for s in self.sightings:
             f = s.feature

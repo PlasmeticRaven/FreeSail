@@ -1,0 +1,73 @@
+# FreeSail: the convoy (spec M7 §3, §4, §6; package 71; the least relation under 72's
+# squadron). The King's brig-sloop Harpy, commodore of four merchant brigs out of Falmouth
+# bound up Channel, a June forenoon of 1805 south of the Lizard with a north-easterly: the
+# four keep company with her at far detail (the `company` leg) and are `under the orders
+# of` the player's ship, so that one hoist of the convoy's instructions works them all
+# ("the convoy to tack in succession", No. 5 of the convoy book: each puts about when the
+# ship ahead of her has, the leader first). Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/convoy.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/convoy.yaml
+#
+# Played by the player at the captain's station: `make the signal to tack in succession`
+# (the convoy book's, since merchantmen are under his orders; a minute to run it up, a
+# minute for each master to find it in his book, the answering pendants as they read it,
+# and the brigs about one after another), `make the signal to make more sail`, `make the
+# signal: the convoy to close round the commodore`, `make the signal: enemy in sight
+# bearing SW`, `the signals`; by night `hoist the lights` and the night book; in fog the
+# gun. Played by the rules captain with no model seated: the commodore keeps his station
+# with the convoy and chases nobody (data/captains/commodore.yaml), and the convoy is
+# worked by the player's signals or the director's (`ship "Harpy": order make the signal
+# to tack in succession` is the player's own grammar; the director gives it as any order).
+#
+# The weather is pinned (a north-easterly of twelve knots, the sky clear, the convoy beating
+# up for the Start), so that the convoy at
+# seed 7 is the same on every machine; its figures are measured in
+# tests/test_known_truths.py (truths 7-143 onward) and recorded in docs/dev/TuningNotes.md
+# (package 71).
+
+name: The convoy
+seed: 7
+start: 1805-06-12T10:00
+position: {lat_deg: 49.75, lon_deg: -5.20}   # six leagues south of the Lizard
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/brig.yaml
+  heading_deg: 115
+  speed_kn: 5
+  glass: true
+intent: convoy the trade from Falmouth to the Start
+wind:
+  from_deg: 45
+  knots: 12
+  gustiness: 0.0
+  variability: 0.0
+
+papers:
+  chart: {year: 1804}
+  almanac: 1805
+
+ports: [falmouth, plymouth, brest]
+
+standing_orders:
+  - data/standing_orders/starter.orders
+
+# the four merchantmen, in the convoy's order (the leader first; the succession is this
+# order): each keeps company with the commodore (the goal "in company with the ship") and
+# is under the orders of the player's ship; a stern lantern each by night
+ships:
+  - {id: nancy, description: merchant brig, name: Nancy, nation: britain,
+     position: 49 44.4 N 5 11.4 W, goal: "in company with the ship", colours: shown,
+     under_the_orders_of: the ship, lights: stern lantern}
+  - {id: two-brothers, description: merchant brig, name: Two Brothers, nation: britain,
+     position: 49 44.2 N 5 12.6 W, goal: "in company with the ship", colours: shown,
+     under_the_orders_of: the ship, lights: stern lantern}
+  - {id: providence, description: merchant brig, name: Providence, nation: britain,
+     position: 49 43.8 N 5 11.0 W, goal: "in company with the ship", colours: shown,
+     under_the_orders_of: the ship, lights: stern lantern}
+  - {id: friendship, description: merchant brig, name: Friendship, nation: britain,
+     position: 49 43.6 N 5 12.2 W, goal: "in company with the ship", colours: shown,
+     under_the_orders_of: the ship, lights: stern lantern}
+
+orders:
+  - set plain sail

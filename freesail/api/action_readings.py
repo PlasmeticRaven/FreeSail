@@ -77,7 +77,11 @@ def idle_rows(world: Any) -> set[str]:
     crew = extra.get("crew")
     if crew is not None and any(s.hurt for s in crew.sailors):
         return set()
-    return set(ACTION_ROWS)
+    idle = set(ACTION_ROWS)
+    locker = extra.get("signals")
+    if locker is not None and locker.colours.state != "shown":
+        idle.discard("colours")  # package 71: false or no colours are worth a row
+    return idle
 
 
 CABLE_M = units.NAUTICAL_MILE / 10.0  # the cable of a tenth of a mile (608 feet)

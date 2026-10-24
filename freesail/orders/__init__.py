@@ -80,6 +80,13 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
         # `belay "blind lead"`: a standing order by its name, without the words
         # 'standing order' (package 33c)
         return standing.handle(ship, book)
+    from freesail.orders import signals as signal_orders
+
+    if signal_orders.recognises(text, ship):
+        # the colours, the signals, the private signal, the lights and a hail of another
+        # ship (spec M7 §1 to §5; package 71): read by their words before the stations,
+        # since `hail the brig` is a hail across the water and `hail <words>` the lookout's
+        return signal_orders.handle(ship, text)
     if stations.recognises(text, ship):
         # a sentence to an agent's station (spec M4 §12): `ask the watcher ...`, `stand
         # down the watcher`, `resume the watcher`, `show the watcher's journal`
@@ -157,6 +164,10 @@ def read_whole(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     refused = vocab.refused(text)
     if refused is not None:
         raise OrderError(refused)
+    from freesail.orders import signals as signal_orders
+
+    if signal_orders.recognises(text, ship):
+        return signal_orders.read(ship, text)  # package 71: the words read, nothing made
     order = parse(ship, text, vocab)
     if order.verb in vocab.group_evolutions or order.verb in vocab.readings:
         return order
@@ -250,6 +261,11 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import gunnery
 
         return gunnery.execute(ship, order)
+    if vocab.verbs[order.verb].object == "signals":
+        # the colours and the signals (spec M7 §1 to §5; package 71): by their words
+        from freesail.orders import signals as signal_orders
+
+        return signal_orders.handle(ship, order.text)
     if order.verb == "set" and ("reefs" in order.modifiers or "close" in order.modifiers):
         return _set_reefed(ship, order, vocab)
     return verbs.execute(ship, order, vocab)

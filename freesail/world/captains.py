@@ -195,22 +195,90 @@ MAN_OF_WAR_WORDS: tuple[str, ...] = (
 )
 
 # The nation's habit in action over the role's figures (spec M7 §9, §10: "the British
-# close, the French at long shot"; the aim at the hull or the rigging; the roll fired on).
-# A judgement from the period's commonplaces (Douglas 1820, part I, on the French practice
-# of firing high and at long range; the British of closing to pistol shot and firing low);
-# applied by `Captain._habit`: the engaging range multiplied, the aim and the roll taken
-# where the role's file names none.
-NATION_HABITS: dict[str, dict[str, Any]] = {
-    "britain": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
-    "france": {"range_factor": 2.0, "aim": "rigging", "roll": "up"},
-    "spain": {"range_factor": 1.5, "aim": "rigging", "roll": "up"},
-    "netherlands": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
-    "united-states": {"range_factor": 1.0, "aim": "hull", "roll": "down"},
-}
+# close, the French at long shot"; the aim at the hull or the rigging; the roll fired on)
+# is each nation's `habits:` entry in data/nations.yaml (package 71, the owner's word of
+# 2026-10-24: 70's table in this module moved to the nations' data file, read through
+# `world.nations.habits_of` by `Captain._habit`).
 
 # The range a weaker mark is closed to in action (pistol shot, a third of a cable;
 # judgement after the chases' record: the chaser ranges alongside).
 CLOSE_RANGE_M = 60.0
+# The engaging helm's margin off the close-hauled angle (package 71, item 8: the owner's
+# first action, where 70's law steered by the mark's bearing alone and turned the King's
+# cutter through the wind's eye, aback with her carronades silent for half an hour): no
+# course in action is ordered nearer the wind than close-hauled and this, the same half
+# point the course-shaping's own rule keeps (`navigation.COURSE_NOT_LAID_MARGIN_POINTS`).
+ENGAGING_WIND_MARGIN_POINTS = 0.5
+# The law's switch, for the bisection of what it moved (the tuning notes, package 71): off,
+# 70's course by the mark's bearing alone is given again.
+HELM_IN_ACTION = True
+
+
+def helm_in_action(
+    heading_deg: float,
+    wind_from_deg: float,
+    closest_deg: float,
+    bearing_deg: float,
+    side: str,
+    ratio: float,
+    gage: str = "weather",
+) -> tuple[float, str]:
+    """The engaging helm's course (package 71, item 8; spec M7 §10): the beam law of
+    70 (the mark kept on the engaged beam, before it to close and abaft it to open, a
+    straight law of the range over the wanted), **never within the ship's close-hauled
+    angle and half a point of the wind's eye** (the course clamped to the close-hauled
+    course on the tack her head is on, as `navigation._chase_course` clamps a chase), and
+    the gage the doctrine names kept where the geometry allows: under `weather`, a mark to
+    windward is worked up to by the wind on the tack that points nearer her rather than
+    by the beam law that falls off to leeward; under `lee`, a mark to leeward the same
+    the other way. Returns (the course true, degrees; the word for the log: '' for the
+    beam law, 'as near the wind as she will lie' for the clamp, 'to keep the weather
+    gage' or 'to take it'), and never a course across the eye: when the beam law wants
+    the other tack the course is the close-hauled course on this one and the word says
+    'the mark through the eye', for the doctrine's `through_the_eye` to answer."""
+    sign = 1.0 if side == "starboard" else -1.0
+    off = max(35.0, min(125.0, 90.0 + 55.0 * (1.0 - ratio)))
+    course = (bearing_deg - sign * off) % 360.0
+    word = ""
+    point = units.rad_to_deg(units.POINT)
+    edge = float(closest_deg) + ENGAGING_WIND_MARGIN_POINTS * point
+    head_side = 1.0 if _signed_off(heading_deg, wind_from_deg) >= 0.0 else -1.0
+    mark_off = _signed_off(bearing_deg, wind_from_deg)  # the mark's bearing from the eye
+    windward = abs(mark_off) < 90.0
+    if gage == "weather" and windward and ratio > 1.0:
+        # she lies to windward of us and we have ground to make: by the wind on the tack
+        # whose head points nearer her, which is the course that gains it
+        toward = 1.0 if mark_off >= 0.0 else -1.0
+        if toward == head_side:
+            course = (wind_from_deg + toward * edge) % 360.0
+            word = "by the wind, to take the weather gage"
+    elif gage == "lee" and not windward and ratio > 1.0:
+        toward = 1.0 if mark_off >= 0.0 else -1.0
+        course = (bearing_deg - sign * min(off, 70.0)) % 360.0
+        word = "to keep the lee gage"
+    course_off = _signed_off(course, wind_from_deg)
+    if abs(course_off) < edge:
+        # within the close-hauled angle: the close-hauled course on her own tack
+        course_side = 1.0 if course_off >= 0.0 else -1.0
+        course = (wind_from_deg + head_side * edge) % 360.0
+        word = (
+            "as near the wind as she will lie; the mark through the eye"
+            if course_side != head_side
+            else "as near the wind as she will lie"
+        )
+    elif (1.0 if course_off >= 0.0 else -1.0) != head_side and abs(course_off) < 90.0:
+        # the beam law wants the other tack by the wind's eye: never a course across it
+        # from here; the close-hauled course on this tack, and the doctrine answers
+        course = (wind_from_deg + head_side * edge) % 360.0
+        word = "as near the wind as she will lie; the mark through the eye"
+    return course, word
+
+
+def _signed_off(course_deg: float, wind_from_deg: float) -> float:
+    """The course's angle from the wind's eye, degrees, positive with the wind on her
+    larboard side (her head to starboard of the eye)."""
+    return units.rad_to_deg(units.wrap_pi(math.radians(course_deg - wind_from_deg)))
+
 
 SIZE_RANK: dict[str, int] = {
     "frigate": 3,
@@ -373,6 +441,9 @@ class Intent:
     hours: float | None = None
     # package 70: a station cruised for prizes (a letter of marque's), the privateer's role
     prizes: bool = False
+    # package 71: a passage made as a convoy's escort (`convoy the trade from A to B`), the
+    # commodore's role; the merchantmen under his orders are the scenario's
+    convoy: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return (
@@ -562,6 +633,12 @@ _FISH = re.compile(
     r"\s+for\s+(?P<hours>[\d.]+)\s+hours?\s+(?:from|out\s+of)\s+(?P<home>.+)$"
 )
 _PASSAGE = re.compile(r"^(?:bound|passage|sail)\s+(?:from\s+(?P<a>.+?)\s+)?(?:for|to)\s+(?P<b>.+)$")
+# package 71: the convoy's commodore ('convoy the trade from Falmouth to the Start', 'escort
+# the convoy to Plymouth'): a passage with the commodore's doctrine
+_CONVOY = re.compile(
+    r"^(?:convoy|escort)\s+(?:the\s+)?(?:trade|convoy|merchantmen|ships|fleet)?\s*"
+    r"(?:from\s+(?P<a>.+?)\s+)?(?:for|to)\s+(?P<b>.+)$"
+)
 
 
 def read_intent(world: Any, words: str) -> Intent:
@@ -637,6 +714,11 @@ def read_intent(world: Any, words: str) -> Intent:
             radius_nm=float(m.group("radius") or 1.5),
             hours=float(m.group("hours")),
         )
+    m = _CONVOY.match(text)
+    if m:
+        a = _place_id(world, group(m, "a")) if m.group("a") else ""
+        b, via = to_and_via(group(m, "b"))
+        return Intent("passage", said, origin=a, destination=b, via=via, convoy=True)
     m = _PASSAGE.match(text)
     if m:
         a = _place_id(world, group(m, "a")) if m.group("a") else ""
@@ -645,7 +727,7 @@ def read_intent(world: Any, words: str) -> Intent:
     raise ValueError(
         f"'{words}' is no intent a captain knows: say 'trade <cargo> from <A> to <B>', 'keep "
         "the station off <place> within <n> miles', 'carry this letter to <place>', 'run "
-        "home to <place>' or 'bound for <place>'."
+        "home to <place>', 'bound for <place>' or 'convoy the trade from <A> to <B>'."
     )
 
 
@@ -767,6 +849,8 @@ def role_for(world: Any, intent: Intent | None) -> str:
         return "privateer" if intent.prizes else "kings-ship"
     if intent is not None and intent.kind == "letter":
         return "packet"
+    if intent is not None and intent.convoy:
+        return "commodore"  # package 71: the convoy's escort, by the intent's words
     if intent is not None and intent.kind in ("home", "passage") and _is_kings_ship(world):
         return "kings-ship"
     return "merchant"
@@ -1788,8 +1872,14 @@ class Judgement:
                 for s in p.strangers
             )
         if name == "friend made out":
+            # package 71: a King's captain with the private signal aboard takes a stranger
+            # under his own colours for a friend only when she has answered it (or the
+            # hail) rightly; a neutral's colours are a friend's by themselves
             return any(
-                s.get("id") == self._stranger and s.get("nation") and not self._is_enemy(s)
+                s.get("id") == self._stranger
+                and s.get("nation")
+                and not self._is_enemy(s)
+                and self._friend_sure(s)
                 for s in p.strangers
             )
         if name == "course not laid":
@@ -1871,6 +1961,28 @@ class Judgement:
 
     def _is_enemy(self, s: dict[str, Any]) -> bool:
         return False
+
+    def _known_enemy(self, s: dict[str, Any]) -> bool | None:
+        """What he knows of her beyond her colours (package 71, rule 3): True when she
+        fired on him or he saw her fire under false colours, or the private signal or the
+        hail made her an enemy; False when they made her a friend; None when neither."""
+        sid = str(s.get("id") or "")
+        if sid in (self.fired_on or ()) or sid in (getattr(self, "pirates", None) or ()):
+            return True
+        known = (getattr(self, "recognised", None) or {}).get(sid)
+        if known is not None and known.get("enemy") is not None:
+            return bool(known["enemy"])
+        return None
+
+    def _friend_sure(self, s: dict[str, Any]) -> bool:
+        from freesail.world import signalling
+
+        known = self._known_enemy(s)
+        if known is not None:
+            return not known
+        if str(s.get("nation") or "") != signalling._own_nation(self):
+            return True
+        return signalling._table(self) is None
 
     def _nearest_enemy(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
         return None
@@ -1958,6 +2070,12 @@ class Captain(Judgement):
         self._departing = ""  # the port she sails from, for the plan's first legs
         self.given_up: set[str] = set()  # the chases given up (package 43)
         self.fired_on: set[str] = set()  # the ships that fired on her (package 70)
+        # package 71 (rule 3): what he knows of each sail by the private signal or the hail
+        # (`signalling.recognise`), the pirates he saw fire under false colours, the sail
+        # spoken (the far brain's set, folded in and back)
+        self.recognised: dict[str, dict[str, Any]] = {}
+        self.pirates: set[str] = set()
+        self.spoken_ids: set[str] = set()
         self.error = ""
         if self.intent_words:
             try:
@@ -2185,6 +2303,11 @@ class Captain(Judgement):
         self._work(p, events)
         if self.state not in ("engaging", "struck"):
             self._rule_of_the_road(p)  # no giving way to an enemy in action (package 70)
+        # the signals (package 71): what his people read this minute answered and obeyed,
+        # the private signal made and judged, the colours by his doctrine
+        from freesail.world import signalling
+
+        signalling.near_minute(self, p)
         self._deck_by_rule()
 
     # -- the deck to a seated officer (package 41; spec M6 §11) --------------------------
@@ -2515,7 +2638,7 @@ class Captain(Judgement):
         elif state == "investigating a stranger":
             self.give("make her out")
         elif state == "chasing":
-            self.give("give chase")
+            self.give(self._chase_order(Perception.read(world)))
         elif state == "keeping station":
             station = self._station_mark()
             if station is not None:
@@ -3454,21 +3577,25 @@ class Captain(Judgement):
 
     def _habit(self) -> dict[str, Any]:
         """The figures he fights by: the role's file's, the nation's habit over them
-        (`NATION_HABITS`) where the file names none."""
+        (data/nations.yaml `habits:`, package 71) where the file names none."""
+        from freesail.world.nations import DEFAULT_HABITS
+
         d = self.doctrine
         th = d.threshold if d is not None else (lambda k, v=None: v)
         ports = getattr(self.world, "ports", None)
         nation = str(getattr(ports, "ship_nation", "") or "")
-        habit = NATION_HABITS.get(nation, NATION_HABITS["britain"])
-        factor = float(habit["range_factor"])
+        nations = getattr(self.world, "nations", None)
+        habit = nations.habits_of(nation) if nations is not None else dict(DEFAULT_HABITS)
+        factor = float(habit.get("range_factor", 1.0))
         aim = th("aim", "") or habit["aim"]
         roll = th("roll", "") or habit["roll"]
+        closer = 0.5 if self._business.get("closer") else 1.0  # 'engage more closely' (71)
         return {
             "aim": aim,
             "roll": roll,
             "charge": th("charge", "round") or "round",
             "side": th("engage_side", "weather") or "weather",
-            "engage_range_cables": float(th("engage_range_cables", 2.0)) * factor,
+            "engage_range_cables": float(th("engage_range_cables", 2.0)) * factor * closer,
             "break_off_cables": float(th("break_off_nm", 2.0)) * 10.0,
             "fire_mode": th("fire_mode", "as they bear") or "as they bear",
         }
@@ -3499,6 +3626,13 @@ class Captain(Judgement):
         range (the book opens it)."""
         habit = self._habit()
         mark = self._mark(p)
+        # rule 3 (package 71): her true colours before the first shot; the ruse was the
+        # law's until then and no further
+        from freesail.world.signals import player_locker
+
+        colours = player_locker(self.world).colours
+        if colours.state in ("false", "none"):
+            self.give("hoist the colours", why="her true colours before the first shot")
         quarters = (getattr(self.world.ship, "extra", None) or {}).get("quarters")
         if quarters is None or not getattr(quarters, "at_quarters", False):
             self.give("beat to quarters", why="an enemy in range")
@@ -3541,17 +3675,30 @@ class Captain(Judgement):
                 if self._business.get("steered_for") != "chase" or p.tick - last_tick >= 180:
                     self._business["steered_for"] = "chase"
                     self._business["steered_tick"] = p.tick
-                    self.give("give chase", why="to close her")
+                    self.give(self._chase_order(p), why="to close her")
                 return
         bearing = float(mark.get("bearing_deg") or 0.0)
-        sign = 1.0 if side == "starboard" else -1.0
         # the angle she is kept on, before the beam to close and abaft it to open, a
         # straight law of the range over the wanted (at the range abeam; at twice it four
         # points before the beam; at half, three points abaft), so the course does not
-        # jump at a band's edge
+        # jump at a band's edge; never within the close-hauled angle, the gage kept
+        # (`helm_in_action`, package 71's item 8)
         ratio = rng / max(wanted, 1.0)
-        off = max(35.0, min(125.0, 90.0 + 55.0 * (1.0 - ratio)))
-        course = (bearing - sign * off) % 360.0
+        if p.wind_from_deg is None:
+            return
+        from freesail.evolutions.scripts import close_hauled_true_angle
+
+        closest = units.rad_to_deg(close_hauled_true_angle(self.world.ship))
+        if HELM_IN_ACTION:
+            course, word = helm_in_action(
+                p.heading_deg, p.wind_from_deg, closest, bearing, side, ratio, habit["side"]
+            )
+        else:  # 70's law, for the bisection alone
+            sign = 1.0 if side == "starboard" else -1.0
+            off = max(35.0, min(125.0, 90.0 + 55.0 * (1.0 - ratio)))
+            course, word = (bearing - sign * off) % 360.0, ""
+        if "through the eye" in word:
+            self._through_the_eye(p, mark, side)
         last = self._business.get("steered_for")
         if last == "chase":
             last = None
@@ -3559,7 +3706,46 @@ class Captain(Judgement):
         if turn >= 10.0 and p.tick - last_tick >= 120:
             self._business["steered_for"] = course
             self._business["steered_tick"] = p.tick
-            self.give(f"steer {course:.0f}", why="to keep the enemy on the engaged beam")
+            why = "to keep the enemy on the engaged beam" + (f", {word}" if word else "")
+            self.give(f"steer {course:.0f}", why=why)
+
+    def _chase_order(self, p: Perception) -> str:
+        """'chase the cutter': the chase named by HIS stranger's rig when the lookout has
+        it, so the helm goes after the sail he judged and not the order's own choice (the
+        nearest stranger of the lookout's, who counts a sail under our own colours no
+        stranger: the encounter's frigate, package 71, gave chase to the merchant brig two
+        miles off while the privateer under British colours ran); 'give chase' when her
+        rig is not yet made out or the lookout has no word for it."""
+        sid = self._stranger
+        lookout = getattr(self.world, "lookout", None)
+        if sid is None or lookout is None:
+            return "give chase"
+        for s in p.strangers:
+            if str(s.get("id") or "") != str(sid):
+                continue
+            words = str(s.get("known") or "").split(",")[0].split(";")[0].strip()
+            rig = words.removeprefix("a ").removeprefix("an ").strip()
+            if rig and rig != "sail" and lookout.find(f"the {rig}") is not None:
+                return f"chase the {rig}"
+        return "give chase"
+
+    def _through_the_eye(self, p: Perception, mark: dict[str, Any], side: str) -> None:
+        """The mark passes through the wind's eye (package 71, item 8): by the doctrine's
+        `through_the_eye` he shifts the engaged battery and stays on his tack (the default:
+        his guns go on, the beam law finding her on the other side next minute), or puts
+        about or wears for her (a handy cutter may tack, a frigate wears), once a crossing
+        and not again within five minutes."""
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        what = str(th("through_the_eye", "shift") or "shift")
+        last = int(self._business.get("through_the_eye_tick", -(10**9)))
+        if what not in ("tack", "wear") or p.tick - last < 300:
+            return
+        self._business["through_the_eye_tick"] = p.tick
+        self._business["steered_tick"] = p.tick
+        self._business["steered_for"] = None
+        order = "put her about" if what == "tack" else "wear ship"
+        self.give(order, why="the enemy passes through the wind's eye")
 
     def _enemy_within(self, p: Perception, within_nm: float) -> dict[str, Any] | None:
         if not getattr(self.world.ship, "guns", None):
@@ -3600,8 +3786,9 @@ class Captain(Judgement):
         return min(items, key=lambda s: s.get("estimate_m") or math.inf)
 
     def _is_enemy(self, s: dict[str, Any]) -> bool:
-        if str(s.get("id") or "") in (self.fired_on or ()):
-            return True  # she fired on us (package 70, rule 3)
+        known = self._known_enemy(s)  # package 71: the shot, the private signal, the hail
+        if known is not None:
+            return known
         nation = s.get("nation")
         if not nation:
             return False

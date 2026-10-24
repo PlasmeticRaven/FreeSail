@@ -16,7 +16,7 @@ source: "spec M6 §4; the naval cruise's book for the station and the chase (Luc
 thresholds:
   # Package 70 (spec M7 §10): the engaging doctrine. `engage_nm` the distance within which
   # an enemy is engaged (nought turns it off); `engage_range_cables` the range the fire is
-  # opened at (the nation's habit may double it: freesail/world/captains.py NATION_HABITS);
+  # opened at (the nation's habit may double it: data/nations.yaml `habits:`, package 71);
   # `break_off_nm` and `break_off_minutes` the distance and the minutes with no enemy
   # within it that end the action; `engage_side` the gage (weather or lee); `charge` and
   # `aim` what the guns load and are laid for; `morale_start` and `strike_below` the
@@ -26,6 +26,10 @@ thresholds:
   break_off_nm: {value: 3, source: "the enemy beyond this for the minutes below and the action is over; judgement"}
   break_off_minutes: {value: 10, source: "as gale_over_minutes: ten minutes, not a lull in the firing; judgement"}
   engage_side: {value: weather, source: "the weather gage to engage, the Fighting Instructions' and Clerk of Eldin's (1790) rule: from windward she chooses the range and the moment"}
+  # package 71 (item 8): what he does when the enemy passes through the wind's eye and the
+  # engaging helm may not follow her through it: `shift` the engaged battery and keep his
+  # tack (the guns go on), or `tack` or `wear` for her
+  through_the_eye: {value: shift, source: "the battery shifted and the tack kept: the course never put in the wind's eye in action (the owner's first action, 2026-10-24); judgement"}
   charge: {value: round, source: "round shot the ordinary charge (Douglas 1820); chain for the rigging where the aim is the rigging and the charge says so"}
   aim: {value: hull, source: "spec M7 §9: the hull the British habit, the rigging the French; the nation's habit stands where the file leaves this empty"}
   morale_start: {value: 0.9, source: "a King's ship's company at the start of an action (spec M7 §10, decision 7); judgement"}
