@@ -23,5 +23,5 @@ on_fail: {log: "Could not fother the leak: {reason}.", kind: evolution.failed, s
 # crew: all hands, the sailmaker's party and the watch to thrum and to haul the sail
 # under, a party of twenty at the most (judgement; a cutter's company is fewer, and the
 # work goes at the pace of what she has)
-crew: {hands: all, party: 20, rating: ordinary, stations: [forecastle, waisters, afterguard, idlers]}
+crew: {hands: all, party: 20, rating: ordinary, stations: [forecastle, waisters, afterguard, idlers, all hands]}
 source: "Falconer 1780, FOTHERING; Cook's Endeavour on the Great Barrier Reef, June 1770 (the fothering by Monkhouse); the hours judgement"

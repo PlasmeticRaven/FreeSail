@@ -27,5 +27,5 @@ on_fail: {log: "Could not rig a jury {mast}: {reason}.", kind: evolution.failed,
 # crew: all hands, the carpenter's crew at the sheers and the watch at the tackles, a
 # party of thirty at the most (judgement; a cutter's whole company is fewer, and the work
 # goes at the pace of what she has)
-crew: {hands: all, party: 30, rating: ordinary, stations: [forecastle, waisters, afterguard, topmen, idlers]}
+crew: {hands: all, party: 30, rating: ordinary, stations: [forecastle, waisters, afterguard, topmen, idlers, all hands]}
 source: "Falconer 1780, JURY-MAST; Luce 1884, ch. XXXI 'Jury Masts' (a spare topmast stepped in the stump); the hours judgement"

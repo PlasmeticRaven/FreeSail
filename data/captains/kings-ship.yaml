@@ -30,7 +30,7 @@ thresholds:
   pumps_at_m: {value: 0.3, source: "a foot of water in the well mans the pumps beyond the watch's routine spell (Falconer 1780, PUMP: the well sounded each watch and the pumps worked when she makes water); judgement"}
   spell_minutes: {value: 30, source: "a spell at the brakes half an hour (freesail/world/water.py SPELL_S; Falconer 1780, SPELL); judgement"}
   give_up_at_share: {value: 0.4, source: "with the water at two fifths of what founders her and the pumps losing, an enemy at hand, the colours come down rather than the ship go down with her people (the sinking actions, James; judgement)"}
-  damage_priority: {value: [the leak, the rigging, the guns], source: "the leak first (she must float), then the rigging that keeps her sailing, then a dismounted gun (77's remount); the carpenter's and the boatswain's order of work, judgement"}
+  damage_priority: {value: "the leak, the rigging, the guns", source: "the leak first (she must float), then the rigging that keeps her sailing, then a dismounted gun (77's remount); the carpenter's and the boatswain's order of work, judgement"}
   # Package 70 (spec M7 §10): the engaging doctrine. `engage_nm` the distance within which
   # an enemy is engaged (nought turns it off); `engage_range_cables` the range the fire is
   # opened at (the nation's habit may double it: data/nations.yaml `habits:`, package 71);

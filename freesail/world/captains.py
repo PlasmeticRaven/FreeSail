@@ -3950,7 +3950,8 @@ class Captain(Judgement):
             for h in (getattr(keeper, "holes", []) or [])
             if not h.get("plugged") and float(h.get("z_m", 1.0)) < 0.3
         ]
-        order = list(self._th("damage_priority", ["the leak", "the rigging", "the guns"]) or [])
+        said = self._th("damage_priority", "the leak, the rigging, the guns")
+        order = [x.strip() for x in str(said).split(",") if x.strip()]
         in_action = self.state == "engaging"
         wanted: list[tuple[str, str]] = []
         for what in order:
