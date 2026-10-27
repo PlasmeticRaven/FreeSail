@@ -24,7 +24,10 @@ list. The Opus packages that build out behind a Fable baseline run as a wave whe
 baseline is in, as **sibling cloud sessions** rather than subagents of the lead's machine
 (each in its own container, so the suites do not share one machine's load; each pushing its
 own branch named for its package, `claude/pkg-<n>`, with the owner's permission given at
-that wave; the lead fetching, reviewing and merging as now, and running one whole suite on
+that wave (**and granted for every builder, Fable or Opus, on 2026-10-27**, after package
+73's first run was lost with the machine's rebuild: a builder pushes its worktree branch to
+`claude/pkg-<n>` after each commit as a safety net, never force-pushed, nothing merging from
+it without the lead's review); the lead fetching, reviewing and merging as now, and running one whole suite on
 the merged tree). The lead's own work (the six-on-six measure, the gate document, the
 merges, the records, the short plays) is no package. The usage may run to the week's limit
 on these packages; that is the owner's choice.
