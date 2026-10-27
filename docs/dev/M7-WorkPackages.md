@@ -1139,7 +1139,16 @@ intent binds.
    every shot, with the owner's "the flow of the game through the log" as the measure, and
    the same read for the human's log; the two signal books in the papers made one (the
    ship's own; the generic page says whose it is not).
-5. **Found on the way, and the records.** Everything else the reading shows (the hail
+5. **The ship herself, said plainly (the owner, 2026-10-27).** Models at a station have
+   almost never been told what ship they are on, and sometimes not her name; they reason it
+   out or guess, usually right, and learn it over time. Every station's brief says, at the
+   seating and after a fold, her name, her rig and class (a 36-gun frigate, a cutter, a
+   topsail schooner), her service (a King's ship, a merchantman, a privateer, a packet, a
+   fisherman) and nation, her fit of guns, her port and her people's number, and who
+   commands; and a reading `the ship` (or `what ship`, `my ship`) answers the same at any
+   time, from the ship's own papers and muster, so that no model has to deduce where it
+   stands.
+6. **Found on the way, and the records.** Everything else the reading shows (the hail
    resolving to a far lugger over the wreck in sight, the `captain: carry on` collision with
    the director's form, `gybe the mainsail`'s answer); the record of redactions; the tuning
    notes; the Harness; the suite as run (the fast tier, the slow tier of the touched files,
