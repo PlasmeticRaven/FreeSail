@@ -537,7 +537,7 @@ checkpoint of the one World, a log per hull kept in the save.
 **`freesail/core/world.py`: `World`, the shared.** Keeps: `clock`, `rng`, `chart`, `tide`,
 `systems`, `nations`, `ports` (the world's half of today's `Ports`, 2.4), `people` (the
 one registry of persons and things, 2.3), `vessels` (every ship's far body, the player's
-included, 2.2 below), `squadrons`, `business`, `world_orders`, `marks_of_interest`, the
+included, the `ships.py` paragraph below), `squadrons`, `business`, `world_orders`, `marks_of_interest`, the
 director (`director_brief`, `director_state`, `director_seats`, the director's journal),
 `offices` (2.10), `hulls` (`dict[id, Hull]`), `followed` (the hull the drivers and the cap
 centre on), `journal`, `inputs`, `station_acts`, `played_under`, `chart_marks`,
