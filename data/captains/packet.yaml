@@ -10,6 +10,23 @@ name: the commander of a packet
 source: "spec M6 §4; the Post Office packets' standing orders of the period, from memory (to avoid every sail, to run from what she cannot fight); the merchant's doctrine for the rest"
 
 thresholds:
+  # package 73 (spec M7 §11, §11a, §13, §14): the fight on deck and the damage. `board_odds`
+  # his boarders so many times her fit company before he boards (nought: never),
+  # `board_when` 'her guns silent' (no shot of hers has struck for five minutes) or 'at any
+  # time'; `musketry_cables` the range the marines open by volley within; `marines_tops`
+  # whether the book sends the marksmen aloft on entering the action (`kit`: the nation's
+  # share aloft decides, data/marines.yaml); `pumps_at_m` the well's depth he mans the pumps
+  # at, `spell_minutes` the spell at the brakes (the keeper's), `give_up_at_share` the share
+  # of the foundering water at which, the pumps losing and an enemy at hand, he strikes;
+  # `damage_priority` the order of his repairs (freesail/world/captains.py `_damage_work`)
+  board_odds: {value: 0.0, source: "a packet or a trader never boards: nought turns it off"}
+  board_when: {value: her guns silent, source: "as board_odds"}
+  musketry_cables: {value: 1.0, source: "the marines open within a cable, musket shot being a hundred yards (spec M7 §11): a cable is the outside of it; judgement"}
+  marines_tops: {value: false, source: "the French put sharpshooters in the tops, the British kept theirs on the poop (Nelson's objection; Trafalgar's accounts, from memory): the nation's kit decides"}
+  pumps_at_m: {value: 0.3, source: "a foot of water in the well mans the pumps beyond the watch's routine spell (Falconer 1780, PUMP: the well sounded each watch and the pumps worked when she makes water); judgement"}
+  spell_minutes: {value: 30, source: "a spell at the brakes half an hour (freesail/world/water.py SPELL_S; Falconer 1780, SPELL); judgement"}
+  give_up_at_share: {value: 0.4, source: "with the water at two fifths of what founders her and the pumps losing, an enemy at hand, the colours come down rather than the ship go down with her people (the sinking actions, James; judgement)"}
+  damage_priority: {value: [the leak, the rigging, the guns], source: "the leak first (she must float), then the rigging that keeps her sailing, then a dismounted gun (77's remount); the carpenter's and the boatswain's order of work, judgement"}
   # Package 70 (spec M7 §10): the engaging doctrine. `engage_nm` the distance within which
   # an enemy is engaged (nought turns it off); `engage_range_cables` the range the fire is
   # opened at (the nation's habit may double it: data/nations.yaml `habits:`, package 71);

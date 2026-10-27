@@ -1950,6 +1950,10 @@ crew:
     station: afterguard
     rating: landsman
     messenger: true
+  # The sergeant of marines, commanding a brig-sloop's party, drawn from the twenty.
+  - role: sergeant of marines
+    station: marines
+    rating: marine
   # The quarter bill beyond the gun crews (spec M7 8a; package 70; docs/design/Design-WorkInAction.md): at quarters every man has a station by it, the gun crews the fit's (each gun's crew above), the sail trimmers here by station (the men who leave the guns for a brace or a sail: Luce 1884 ch. XX, 'Watch, Quarter and Station Bills'), the hands at the helm, the powder beyond the idlers, and the fighting book's priority when sail work wants more hands than the trimmers give; the marines, the carpenter's crew and the surgeon's mates have their stations by their trades. The counts are judgement against the stations above.
   quarter_bill:
     trimmers:
@@ -1967,6 +1971,10 @@ crew:
     powder: 0
     # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
     priority: sail before guns
+    # Eight of the brig's seamen with the stand of arms' muskets (judgement).
+    small_arms: 8
+    # Thirty boarders from the guns' crews with the twenty marines (judgement).
+    boarders: 30
 # The armament (spec M7 7; package 70): the guns as parts of the graph by their place, the class's one fit; each with its crew by the quarter bill and the magazine's allowance by calibre. Every figure's source is in tools/gen_ships.py; the weights and the establishment are from memory and UNVERIFIED against a printed page.
 armament:
   default: diligence class 1796

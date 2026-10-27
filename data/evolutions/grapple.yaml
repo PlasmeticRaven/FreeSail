@@ -1,0 +1,22 @@
+# Grapple the enemy (spec M7 §11a; package 73; scripted, GrappleScript in
+# evolutions/fight_scripts.py). "GRAPPLING, a sort of small anchor, fitted with four or
+# five flukes or claws ... GRAPPLINGS are also used to fasten ships together in battle,
+# being thrown into the enemy's rigging or chains" (Falconer 1780, GRAPPLING). Refused
+# beyond thirty metres (a grapnel's throw on its chain; judgement); at the end both ships
+# are grappled (`extra["grappled_to"]` on each: `combat/boarding.py`), the integrator holds
+# both as the ground holds a ship, and the boarders may be called away. One phase,
+# `grapnels`.
+id: grapple
+verb: grapple
+applies_to: {class: ship}
+script: grapple
+params: {target: null}
+preconditions: []
+timing:
+  grapnels_s: 120   # the grapnels got up on their chains, carried to the chains and the gangway and thrown as she closes (judgement: two minutes)
+on_start: {log: "{begin}"}
+on_complete: {log: "{done}", kind: ship.grappled, severity: urgent}
+on_fail: {log: "Could not {verb_word} her: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the boatswain's party with the grapnels, eight hands (judgement)
+crew: {hands: 8, rating: able, stations: [forecastle, afterguard, waisters]}
+source: "Falconer 1780, GRAPPLING ('to fasten ships together in battle, being thrown into the enemy's rigging or chains'); the time and the hands judgement"

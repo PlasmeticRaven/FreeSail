@@ -213,7 +213,89 @@ def _surgeon(world: Any, _: str | None) -> dict[str, Any] | None:
     }
 
 
+# -- the fight's rows (spec M7 §11, §11a; package 73) ------------------------------------------
+
+
+def _marines(world: Any, _: str | None) -> dict[str, Any] | None:
+    ship = getattr(world, "ship", None)
+    if ship is None or _crew(world) is None:
+        return None
+    from freesail.combat.small_arms import describe
+
+    return describe(world, ship)
+
+
+def _small_arms(world: Any, _: str | None) -> dict[str, Any] | None:
+    ship = getattr(world, "ship", None)
+    if ship is None or _crew(world) is None:
+        return None
+    from freesail.combat.small_arms import musketry_of, small_arms_count, small_arms_of
+
+    m = musketry_of(ship)
+    arms = small_arms_of(world)
+    n = small_arms_count(ship)
+    what = str(arms.get("words") or "cutlasses, pikes, pistols and tomahawks")
+    if m.served:
+        fire = {"at will": "firing at will", "hold": "the muskets held"}[m.small_arms_mode]
+        words = (
+            f"served out ({what}); {number_words(n)} small-arms men with the stand of arms' "
+            f"muskets, {fire}"
+        )
+    else:
+        words = (
+            f"in the arms chests ({what}; 'serve out the small arms'); {number_words(n)} "
+            "small-arms men by the bill"
+        )
+    return {"words": words, "served": m.served, "mode": m.small_arms_mode, "men": n}
+
+
+def _boarders(world: Any, _: str | None) -> dict[str, Any] | None:
+    ship = getattr(world, "ship", None)
+    if ship is None or _crew(world) is None:
+        return None
+    from freesail.combat.boarding import describe
+
+    return describe(world, ship)
+
+
 def register() -> None:
+    R.REGISTRY.add(
+        R.Reading(
+            "marines",
+            ("the marines", "the detachment", "the marines' station"),
+            "state",
+            "",
+            _marines,
+            description="the marines: the detachment fit of its number, its officer and its "
+            "kit, where it stands (the sentries and the drill; at quarters the poop and the "
+            "gangways, the tops) and its fire (held, by volley, at will)",
+            none_words=_no_muster_words,
+        )
+    )
+    R.REGISTRY.add(
+        R.Reading(
+            "small_arms",
+            ("the small arms", "the stand of arms", "the arms"),
+            "state",
+            "",
+            _small_arms,
+            description="the small arms: in the chests or served out, the small-arms men by "
+            "the bill and their fire",
+            none_words=_no_muster_words,
+        )
+    )
+    R.REGISTRY.add(
+        R.Reading(
+            "boarders",
+            ("the boarders", "the fight on deck", "the boarding", "the grapnels"),
+            "state",
+            "",
+            _boarders,
+            description="the boarders by the bill with their arms, whom she is grappled to, "
+            "the fight on deck by rounds and losses, the gun crews up to repel boarders",
+            none_words=_no_muster_words,
+        )
+    )
     R.REGISTRY.add(
         R.Reading(
             "sick_list",
@@ -321,5 +403,17 @@ def register() -> None:
         ev("a man collapsed", "person.collapsed"),
         ev("an officer killed", "person.killed"),
         ev("the command passes", "ship.command_passes"),
+        # the fight's (package 73)
+        ev("musketry", "action.musketry"),
+        ev("the marines' fire", "action.musketry"),
+        ev("grappled", "ship.grappled"),
+        ev("the grapnels cast off", "ship.cast_off"),
+        ev("the boarders away", "action.boarders"),
+        ev("boarded", "action.boarded"),
+        ev("the fight on deck", "action.boarding"),
+        ev("a round of the fight", "action.boarding"),
+        ev("the deck carried", "action.carried"),
+        ev("the boarders repulsed", "action.repulsed"),
+        ev("repel boarders", "action.repel"),
     ):
         R.EVENTS[spec.words] = spec

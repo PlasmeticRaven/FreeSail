@@ -208,7 +208,7 @@ ARMAMENT_KEYS = ("default", "fits")
 # The quarter bill beyond the gun crews (spec M7 §8a; `docs/design/Design-WorkInAction.md`):
 # the sail trimmers by station, the hands at the helm, the powder, and the fighting book's
 # priority between the sails and the guns when hands are short.
-QUARTER_BILL_KEYS = ("trimmers", "helm", "powder", "priority")
+QUARTER_BILL_KEYS = ("trimmers", "helm", "powder", "priority", "small_arms", "boarders")
 PRIORITIES = ("sail before guns", "guns before sail")
 
 # Default load ratings (kN) by class, used with a warning when a file omits one.
@@ -271,6 +271,9 @@ SEAMAN_STATIONS = CREW_STATIONS[:6]
 
 # The ratings a ship file may share its seamen among, best first.
 SEAMAN_RATINGS = ("able", "ordinary", "landsman")
+# The ratings a named role may be drawn by (package 73): the seamen's, and the marines'
+# for the detachment's officer and sergeant (`crew.model.Rating`).
+PERSON_RATINGS = SEAMAN_RATINGS + ("marine", "petty officer", "idler", "officer")
 RATINGS_SUM_TOLERANCE = 1e-6  # the shares must add up to one within this
 
 # The idlers' trades (spec §2.1): what the `idlers_by_trade` mapping may name.
@@ -482,6 +485,10 @@ class QuarterBillSpec:
     helm: int = 2
     powder: int = 0
     priority: str = "sail before guns"
+    # package 73 (spec M7 §11): the small-arms men with the stand of arms' muskets, and
+    # the boarders told off from the guns' crews (Luce 1884 ch. XX), beside the marines
+    small_arms: int = 0
+    boarders: int = 0
 
 
 @dataclass
@@ -925,6 +932,8 @@ def _parse_quarter_bill(raw: Any, source: str) -> QuarterBillSpec:
         helm=_count(raw.get("helm", 2), "the hands at the helm", source),
         powder=_count(raw.get("powder", 0), "the powder's hands", source),
         priority=priority,
+        small_arms=_count(raw.get("small_arms", 0), "the small-arms men", source),
+        boarders=_count(raw.get("boarders", 0), "the boarders", source),
     )
 
 
@@ -1759,7 +1768,8 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
         station = _known(p.get("station", "afterguard"), CREW_STATIONS, "the station", source)
         rating = p.get("rating")
         if rating is not None:
-            rating = _known(rating, SEAMAN_RATINGS, "the rating", source)
+            # package 73: the marines' officer and sergeant are drawn by the rating `marine`
+            rating = _known(rating, PERSON_RATINGS, "the rating", source)
         messenger = p.get("messenger", False)
         if not isinstance(messenger, bool):
             raise ShipFileError(

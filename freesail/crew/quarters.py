@@ -112,6 +112,44 @@ class Quarters:
         self.priority = str(getattr(bill, "priority", "sail before guns") or "sail before guns")
         self._robbed_lines: list[str] = []
 
+    # -- the marines between the carronades and their muskets (package 73, spec M7 §11) ----
+
+    def marines_to_arms(self) -> int:
+        """The marines leave the guns for their muskets (the quarterdeck carronades they
+        serve at the beat, Luce 1884 ch. XX, go short by them): every fit marine at a gun
+        into the marines' division. Returns how many moved."""
+        from freesail.crew.model import Station
+
+        moved = 0
+        division = self.divisions.setdefault(MARINES, [])
+        for gc in self.crews.values():
+            keep = []
+            for s in gc.members:
+                if s.station is Station.MARINES and s.fit:
+                    s.quarters = MARINES
+                    division.append(s)
+                    moved += 1
+                else:
+                    keep.append(s)
+            gc.members = keep
+        return moved
+
+    def marines_to_guns(self) -> int:
+        """The marines back to the carronades from their muskets: each short crew made up
+        from the division, the carronades first. Returns how many moved."""
+        division = self.divisions.get(MARINES, [])
+        if not division:
+            return 0
+        moved = 0
+        crews = sorted(self.crews.values(), key=lambda gc: (gc.kind != "carronade", gc.key))
+        for gc in crews:
+            while len(gc.members) < gc.wanted and division:
+                s = division.pop(0)
+                s.quarters = gc.key
+                gc.members.append(s)
+                moved += 1
+        return moved
+
     # -- the beat to quarters and the pipe down ------------------------------------------
 
     def beat(self, tick: int) -> list[str]:

@@ -751,6 +751,10 @@ crew:
     powder: 2
     # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
     priority: sail before guns
+    # Six of the cutter's best shots with the stand of arms' muskets (judgement); she bears no marines.
+    small_arms: 6
+    # Twenty of the cutter's seamen with cutlass and pistol (judgement: a cutter's company boards almost whole).
+    boarders: 20
 # The armament (spec M7 7; package 70): two fits the scenario chooses between (ship: {fit: ...}; the owner, 2026-10-23): the 12-pounder carronades the Admiralty gave its cutters from the 1790s, the default of 1805, and the long 3-pounders with eight swivels of the revenue and hired cutters. Every figure's source is in tools/gen_ships.py; the weights are from memory and UNVERIFIED against a page.
 armament:
   default: carronades

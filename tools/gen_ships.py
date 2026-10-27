@@ -794,17 +794,32 @@ class Builder:
                 if gnote:
                     self.armament_notes[("gun", name, g["id"])] = gnote
 
-    def quarter_bill(self, note, trimmers, helm, powder, priority, notes):
+    def quarter_bill(
+        self,
+        note,
+        trimmers,
+        helm,
+        powder,
+        priority,
+        notes,
+        small_arms=0,
+        boarders=0,
+        small_arms_note="",
+        boarders_note="",
+    ):
         """The crew's `quarter_bill:` block (spec M7 §8a; package 70): the trimmers by
         station as (station, n, note) entries, the hands at the helm, the powder beyond the
         idlers, and the fighting book's priority; `notes` the words above helm, powder and
-        priority."""
+        priority. Package 73 (spec M7 §11): the small-arms men and the boarders told off
+        from the guns' crews, each with its note."""
         crew = self.doc["crew"]
         crew["quarter_bill"] = {
             "trimmers": {st: n for st, n, _ in trimmers},
             "helm": helm,
             "powder": powder,
             "priority": priority,
+            "small_arms": small_arms,
+            "boarders": boarders,
         }
         self.crew_notes[("quarter_bill",)] = note
         for st, _, text in trimmers:
@@ -812,6 +827,8 @@ class Builder:
                 self.crew_notes[("trimmers", st)] = text
         for key, text in notes.items():
             self.crew_notes[("quarter_bill", key)] = text
+        self.crew_notes[("quarter_bill", "small_arms")] = small_arms_note or SMALL_ARMS_NOTE
+        self.crew_notes[("quarter_bill", "boarders")] = boarders_note or BOARDERS_NOTE
 
     def rate_spars(self):
         """Second pass: rate every spar from what the engine's graph hangs on it.
@@ -3370,6 +3387,18 @@ CHAIN_PUMP_T_PER_H = 80.0
 CHAIN_PUMP_HANDS = 4
 HAND_PUMP_T_PER_H = 15.0
 HAND_PUMP_HANDS = 2
+# package 73 (spec M7 §11): the quarter bill's small-arms men and boarders
+SMALL_ARMS_NOTE = (
+    "The small-arms men beyond the marines: seamen with the muskets of the stand of arms, "
+    "firing at will within musket shot when the arms are served out (Luce 1884 ch. XX: the "
+    "station bill's small-arms men; the count judgement against the company)."
+)
+BOARDERS_NOTE = (
+    "The boarders told off from the guns' crews (Luce 1884 ch. XX: 'boarders and sail "
+    "trimmers are told off from the guns' crews'; the first and second boarders of the "
+    "station bill), beside the marines who board with the bayonet; the count judgement at "
+    "about a quarter of the seamen."
+)
 PUMPS_NOTE = (
     "The pumps (package 73, spec M7 §13): the chain pump of Cole and Bentinck, a ton in 43 "
     "seconds and a half with four men (Falconer 1780, PUMP), and the common brake pump with "
@@ -3807,6 +3836,16 @@ def frigate_armament(b, deck_height):
             ),
             "priority": PRIORITY_NOTE,
         },
+        small_arms=20,
+        boarders=60,
+        small_arms_note=(
+            "Twenty topmen and forecastlemen with the muskets of the stand of arms (judgement "
+            "for a 36-gun frigate of 264)."
+        ),
+        boarders_note=(
+            "Sixty boarders by the bill: the first and second boarders told off from the guns' "
+            "crews, with the forty marines (judgement: a frigate's boarding party of a hundred)."
+        ),
     )
 
 
@@ -3912,6 +3951,16 @@ def cutter_armament(b, deck_height):
             "powder": "Two of the waisters to pass the cartridges (judgement).",
             "priority": PRIORITY_NOTE,
         },
+        small_arms=6,
+        boarders=20,
+        small_arms_note=(
+            "Six of the cutter's best shots with the stand of arms' muskets (judgement); she "
+            "bears no marines."
+        ),
+        boarders_note=(
+            "Twenty of the cutter's seamen with cutlass and pistol (judgement: a cutter's "
+            "company boards almost whole)."
+        ),
     )
 
 
@@ -3986,6 +4035,10 @@ def brig_armament(b, deck_height):
             ),
             "priority": PRIORITY_NOTE,
         },
+        small_arms=8,
+        boarders=30,
+        small_arms_note="Eight of the brig's seamen with the stand of arms' muskets (judgement).",
+        boarders_note="Thirty boarders from the guns' crews with the twenty marines (judgement).",
     )
 
 
@@ -4049,6 +4102,13 @@ def merchant_brig_armament(b):
                 "A merchantman's weapon is her heels: the sails before the guns (judgement)."
             ),
         },
+        small_arms=2,
+        boarders=6,
+        small_arms_note=(
+            "Two men with the master's muskets from the cabin (judgement: a merchant brig's "
+            "chest of arms)."
+        ),
+        boarders_note="Six of the merchant brig's hands: a trader does not board (judgement).",
     )
 
 

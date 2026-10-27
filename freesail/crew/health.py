@@ -290,6 +290,10 @@ class Health:
         sailor.hurt_tick = tick
         sailor.dressed = False
         sailor.at = None
+        # the wound's draws on the health's own stream, so that the gunnery's stream (the
+        # hit model's `rng`) runs exactly as it ran before the wounds had words: the first
+        # action at seed 7 keeps 71's minute
+        rng = self.stream()
         if killed:
             sailor.hurt = "killed"
             sailor.wound = ""
@@ -761,6 +765,35 @@ class Health:
         stationed, holder = keeper.holder_of(person)
         if stationed:
             keeper._tell(person, holder, text, Severity.NOTABLE, [])
+
+    # -- the director's hand (package 73, item 8) -------------------------------------------------
+
+    def make_sick(self, sailors: list[Sailor], how: str, tick: int) -> list[Sailor]:
+        """So many men taken ill by a cause (the director's `aboard:` forms): on the sick
+        list for the flux's days, their persons sick; nothing said (the report is the
+        form's)."""
+        rng = self.stream()
+        taken = []
+        for s in sailors:
+            if s.hurt:
+                continue
+            s.fit = False
+            s.hurt = "sick"
+            s.hurt_how = how
+            s.hurt_tick = tick
+            lo, hi = SICK_DAYS
+            s.hurt_until = tick + int((lo + rng.random() * (hi - lo)) * 86400)
+            s.at = None
+            taken.append(s)
+            person = self.person_of_sailor(s)
+            if person is not None:
+                person.sick = True
+                self._tell_person(
+                    person,
+                    f"You are taken ill ({how}) and on the sick list; the deck is not yours "
+                    "until you are off it.",
+                )
+        return taken
 
     # -- the butcher's bill ----------------------------------------------------------------------
 

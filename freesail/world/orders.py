@@ -2253,6 +2253,8 @@ SLOTS: dict[str, Any] = {
     "anchor": lambda world, words: _anchor_by_name(getattr(world, "ship", None), words),
     "good": _good_by_name,
     "gun": lambda world, words: _gun_by_name(getattr(world, "ship", None), words),
+    # package 73: a person by his role or his name ('the first lieutenant', 'Mr Pearce')
+    "person": lambda world, words: _person_by_name(world, words),
 }
 _SLOT = re.compile(r"\{(" + "|".join(SLOTS) + r")\}")
 
@@ -2264,6 +2266,18 @@ def _slot_of(thing: dict[str, Any]) -> str | None:
         if m is not None:
             return m.group(1)
     return None
+
+
+def _person_by_name(world: Any, words: str) -> str | None:
+    """A person of the ship's company by his role or his name (package 73): his id."""
+    people = getattr(world, "people", None)
+    if people is None:
+        return None
+    try:
+        p = people.find(words)
+    except Exception:  # noqa: BLE001
+        return None
+    return p.id if p is not None and getattr(p, "aboard", True) else None
 
 
 def _gun_by_name(ship: Any, words: str) -> str | None:
@@ -2296,6 +2310,10 @@ def _target_words(world: Any, thing: dict[str, Any], target: str | None) -> str:
     if slot == "gun":
         gun = (getattr(ship, "guns", None) or {}).get(target)
         return gun.name if gun is not None else str(target)
+    if slot == "person":
+        people = getattr(world, "people", None)
+        p = next((x for x in getattr(people, "people", []) if x.id == target), None)
+        return p.name if p is not None else str(target)
     return str(target)
 
 
@@ -2958,6 +2976,77 @@ def _fx_leak_started(world, thing, target, name, value, data) -> str:
     return f"a seam started, making {float(value):g} tons an hour"
 
 
+def _fit_men(world: Any) -> list[Any]:
+    crew = (getattr(world.ship, "extra", None) or {}).get("crew")
+    if crew is None:
+        return []
+    from freesail.crew.model import Station
+
+    return [
+        s for s in crew.sailors if s.fit and not s.hurt and s.station is not Station.QUARTERDECK
+    ]
+
+
+def _fx_sick_men(world, thing, target, name, value, data) -> str:
+    """So many men taken ill (package 73): on the sick list by the health keeper, with the
+    thing's `cause` words."""
+    from freesail.crew.model import number_words
+
+    n = max(1, int(value or 1))
+    rng = world.rng.stream("health")
+    pool = _fit_men(world)
+    taken = []
+    while pool and len(taken) < n:
+        taken.append(pool.pop(int(rng.random() * len(pool)) % len(pool)))
+    how = str(thing.get("cause") or "a fever")
+    sick = world.health.make_sick(taken, how, int(world.clock.tick))
+    data.update({"sick": [s.id for s in sick], "names": [s.name for s in sick], "how": how})
+    return f"{number_words(len(sick))} on the sick list ({how})"
+
+
+def _fx_sick_share(world, thing, target, name, value, data) -> str:
+    """That share of the fit men taken ill (package 73): the fever in the ship."""
+    pool = _fit_men(world)
+    n = max(1, int(round(float(value or 0.1) * len(pool))))
+    return _fx_sick_men(world, thing, target, name, n, data)
+
+
+def _fx_person_hurt(world, thing, target, name, value, data) -> str:
+    """A person of the company hurt by the director's hand (package 73): the health
+    keeper's wound, light or grave as the thing says, his station told its roads as the
+    shot's hit tells them."""
+    people = world.people
+    p = next((x for x in people.people if x.id == target), None)
+    crew = (getattr(world.ship, "extra", None) or {}).get("crew")
+    sailor = (
+        crew.by_id.get(getattr(p, "sailor_id", None))
+        if crew is not None and p is not None
+        else None
+    )
+    if sailor is None:
+        raise WorldOrderError(f"{name} is no man of the muster to be hurt")
+    if sailor.hurt:
+        raise WorldOrderError(f"{name} is {sailor.hurt} already")
+    grave = str(value or "light").lower() == "grave"
+    how = str(thing.get("cause") or "a fall")
+    rng = world.rng.stream("health")
+    world.health.hit(sailor, False, rng, int(world.clock.tick), how=how)
+    sailor.wound = "grave" if grave else "light"
+    data.update({"person": p.id, "sailor": sailor.id, "wound": sailor.wound, "how": how})
+    return f"{name} wounded ({how}, {'dangerously' if grave else 'lightly'})"
+
+
+def _fx_surgeon_sick(world, thing, target, name, value, data) -> str:
+    """The surgeon taken ill (package 73): off his work, the wounded to their messmates
+    and his mates until he is up."""
+    surgeon = world.health.surgeon()
+    sick = world.health.make_sick(
+        [surgeon], str(thing.get("cause") or "a fever"), int(world.clock.tick)
+    )
+    data.update({"sick": [s.id for s in sick], "names": [s.name for s in sick]})
+    return f"the surgeon, {surgeon.name}, on his own sick list"
+
+
 def _fx_gun_dismounted(world, thing, target, name, value, data) -> str:
     """A gun found dismounted (package 70): the same state a shot leaves (`combat.hits`),
     the gun out of the bill until 73's carpenter remounts it."""
@@ -3006,6 +3095,11 @@ _ABOARD_EFFECTS: dict[str, Any] = {
     "leak_stopped": _fx_leak_stopped,
     "well_pumped": _fx_well_pumped,
     "leak_tons_per_h": _fx_leak_started,
+    # package 73 (item 8): the people's health by the director's hand
+    "sick_men": _fx_sick_men,
+    "sick_share": _fx_sick_share,
+    "person_hurt": _fx_person_hurt,
+    "surgeon_sick": _fx_surgeon_sick,
 }
 
 
@@ -3048,7 +3142,27 @@ def _lacks_hull(world: Any) -> str | None:
 
 # What a thing's effect wants of the ship before it is done (else the game has no way to
 # do it as said, and nothing changes): by the effect's key, the reason she lacks it or None.
+def _lacks_muster(world: Any) -> str | None:
+    crew = (getattr(getattr(world, "ship", None), "extra", None) or {}).get("crew")
+    if crew is None or getattr(world, "health", None) is None:
+        return "she keeps no muster"
+    return None
+
+
+def _lacks_surgeon(world: Any) -> str | None:
+    why = _lacks_muster(world)
+    if why:
+        return why
+    if world.health.surgeon() is None:
+        return "she bears no surgeon, or he is ill already"
+    return None
+
+
 _ABOARD_LACKS: dict[str, Any] = {
+    "sick_men": _lacks_muster,
+    "sick_share": _lacks_muster,
+    "person_hurt": _lacks_muster,
+    "surgeon_sick": _lacks_surgeon,
     "water_share": _lacks_stores,
     "provisions_share": _lacks_stores,
     "provisions_days": _lacks_stores,

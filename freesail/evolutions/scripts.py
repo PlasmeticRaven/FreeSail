@@ -8013,3 +8013,6 @@ SCRIPTS.update(ACTION_SCRIPTS)
 from freesail.evolutions.repair_scripts import REPAIR_SCRIPTS  # noqa: E402
 
 SCRIPTS.update(REPAIR_SCRIPTS)  # package 73: the damage control's evolutions
+from freesail.evolutions.fight_scripts import FIGHT_SCRIPTS  # noqa: E402
+
+SCRIPTS.update(FIGHT_SCRIPTS)  # package 73: the grapple and the small arms served

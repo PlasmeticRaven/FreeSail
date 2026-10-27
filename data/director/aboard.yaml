@@ -10,9 +10,10 @@
 #   `words`: the forms the order takes after `aboard:`, matched whole. A form may name one
 #     slot, filled by the ship's own name for it: `{spar}` ("the fore topmast"), `{sail}`
 #     ("the fore topsail"), `{line}` ("the starboard main brace", or "the main brace" for
-#     the first of the pair), `{anchor}` ("the best bower") or `{good}` ("tin", a good in
-#     the hold). Keep commas out of the forms: an `aboard:` order with a comma that is no
-#     form of the table is read as a thing made or moved (package 53b).
+#     the first of the pair), `{anchor}` ("the best bower"), `{good}` ("tin", a good in
+#     the hold) or `{person}` ("the first lieutenant", "Mr Pearce"; package 73). Keep
+#     commas out of the forms: an `aboard:` order with a comma that is no form of the
+#     table is read as a thing made or moved (package 53b).
 #   `report`: the notable line the play log carries, said by the ship's people and never
 #     naming the order; the slot is filled there too.
 #   `effect`: what changes, one key or several, each done in turn:
@@ -35,6 +36,11 @@
 #       afresh (doubted while the ship's own pumps and hands could do it);
 #     `leak_tons_per_h`: a seam started, making so many tons an hour until the carpenter
 #       caulks it (`stop the leak`; package 73);
+#     `sick_men`: so many men taken ill, on the sick list for the flux's days with the
+#       thing's `cause` words (package 73, spec M7 §16); `sick_share`: that share of the fit
+#       men; `person_hurt`: the `{person}` wounded, `light` or `grave`, his station told its
+#       roads as a hit tells them (§16a); `surgeon_sick`: the surgeon on his own list, the
+#       wounded to his mates and their messmates until he is up;
 #     `report_only` (or no effect): nothing modelled yet, said so in the `unmodelled` words.
 #     An effect that wants what she lacks (no chronometer, no glass, no spare canvas) is
 #     answered "no way as said", and nothing changes.
@@ -244,6 +250,52 @@ things:
     plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
     doubt: "she has not been working in a sea: a seam opens under a labouring ship, not at her ease"
     harm: none
+  # -- the people's health (package 73, spec M7 §16, §16a; item 8) ------------------------
+  - id: man_taken_ill
+    words: ["a man taken ill", "a man is taken ill", "a man fallen ill", "a man on the sick list", "a man down with the flux", "a man down with a fever"]
+    source: "the sick lists of the period's ships (Trotter, Medicina Nautica; Blane): the flux and the fevers the sea's own; judgement"
+    report: "The surgeon reports a man taken ill and put on the sick list: a fever, with the flux; he is in the sick berth and off the bill until it passes."
+    effect: {sick_men: 1}
+    cause: "a fever, with the flux"
+    plausible_when: {days_out: 2}
+    doubt: "she is not two days out: the fevers and the flux come with the days at sea and the water in the casks"
+    harm: hurt
+  - id: fever_in_the_ship
+    words: ["the fever in the ship", "a fever in the ship", "the flux in the ship", "fever broken out", "the fever broken out", "the flux broken out", "the ship's fever"]
+    source: "the fevers that went through a ship's company (Trotter, Medicina Nautica; the Mediterranean and West India stations' returns): a tenth down in a week; judgement"
+    report: "The surgeon reports a fever broken out in the ship: a tenth of the people down with it in the sick berth, and he fears more; he asks for the sick berth to be aired and the decks washed with vinegar."
+    effect: {sick_share: 0.1}
+    cause: "the fever in the ship"
+    plausible_when: {days_out: 7}
+    doubt: "she is not a week out: a fever goes through a ship's company after weeks at sea, not days"
+    harm: hurt
+  - id: person_hurt
+    words: ["{person} is hurt", "{person} hurt", "{person} is wounded", "{person} fallen down the hatchway", "{person} is down"]
+    source: "the accidents of the sea (a fall down a hatchway, a block from aloft, a man thrown against a gun in a seaway; the surgeons' journals, from memory); judgement"
+    report: "{person} is hurt: a fall down the hatchway in the seaway; he is bruised and cut about the head, and the surgeon has him."
+    effect: {person_hurt: light}
+    cause: "a fall down the hatchway"
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
+    doubt: "a smooth sea and nothing working: a man is hurt by a fall in a seaway, by a block in a blow, or by the enemy's shot"
+    harm: hurt
+  - id: person_badly_hurt
+    words: ["{person} is badly hurt", "{person} badly hurt", "{person} is dangerously hurt", "{person} is badly wounded"]
+    source: "as person_hurt: the fall that breaks a man (judgement)"
+    report: "{person} is badly hurt: a fall from the gangway to the deck below in the seaway, and the surgeon has him in the cockpit; it is a dangerous hurt."
+    effect: {person_hurt: grave}
+    cause: "a fall from the gangway"
+    plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
+    doubt: "a smooth sea and nothing working: a man is broken by a fall in a seaway, not at his ease"
+    harm: hurt
+  - id: surgeon_taken_ill
+    words: ["the surgeon taken ill", "the surgeon is taken ill", "the surgeon fallen ill", "the surgeon is ill", "the surgeon down with a fever", "the doctor taken ill"]
+    source: "the surgeons who took the fevers of their own sick berths (Trotter; the West India station's losses of surgeons, from memory); judgement"
+    report: "The surgeon is taken ill with a fever and has put himself on his own list: his mates and the men's messmates dress the wounded until he is up."
+    effect: {surgeon_sick: true}
+    cause: "a fever"
+    plausible_when: {days_out: 2}
+    doubt: "she is not two days out: a surgeon takes the fever from his sick berth, which has had nobody in it"
+    harm: hurt
   - id: bilge_foul
     words: ["the bilge found foul", "the bilge water found stinking", "the well found foul"]
     source: Falconer 1780, BILGE-WATER; the ship sweetened by pumping in fresh water (judgement)

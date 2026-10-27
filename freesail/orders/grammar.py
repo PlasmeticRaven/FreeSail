@@ -115,6 +115,17 @@ class Order:
 # ---------------------------------------------------------------------------
 
 
+# The divisions hailed before an order of the fight (package 73): the comma after them is
+# the drill's ("Marines, fire by volley!") and is read away before the verb is matched.
+DIVISION_HAILS: tuple[str, ...] = (
+    "marines",
+    "small arms men",
+    "small-arms men",
+    "small arms",
+    "boarders",
+)
+
+
 def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     """Parse one order against this ship's vocabulary. Raises OrderError."""
     vocab = vocab or load_vocabulary()
@@ -126,6 +137,13 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     norm = " ".join(tokens)
     if not norm or norm == ",":
         raise OrderError("No order given.")
+    # package 73 (spec M7 §11): the hail to a division before its order ("marines, fire by
+    # volley", "small arms, hold your fire", "boarders, repel") is one phrase, the comma
+    # the drill's and not the grammar's side comma
+    for lead in DIVISION_HAILS:
+        if norm.startswith(lead + " , "):
+            norm = lead + " " + norm[len(lead) + 3 :]
+            break
     segments = [seg.split() for seg in norm.split(" , ")]
     segments = [seg for seg in segments if seg]
     if not segments:

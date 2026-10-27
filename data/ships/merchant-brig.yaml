@@ -1910,6 +1910,10 @@ crew:
     powder: 0
     # A merchantman's weapon is her heels: the sails before the guns (judgement).
     priority: sail before guns
+    # Two men with the master's muskets from the cabin (judgement: a merchant brig's chest of arms).
+    small_arms: 2
+    # Six of the merchant brig's hands: a trader does not board (judgement).
+    boarders: 6
 # The armament (spec M7 7; package 70): the merchant brig's few guns, one fit, her magazine a trader's (twenty round and a little grape a gun: judgement). Every figure's source is in tools/gen_ships.py; the weights are from memory.
 armament:
   default: merchant

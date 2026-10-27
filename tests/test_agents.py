@@ -1865,7 +1865,10 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # box_off.yaml), and the lug's six (package 43b: set, take in, reef, shake out, dip and
     # trim its sheet), and the fishing gear's eight (package 56: the trawl, the nets, the
     # seine and the lines, each shot and hauled)
-    assert "87 evolutions; the list about" in contents  # package 71: the hoist beside 70's three
+    # ... and package 73's ten (the hatches, the shot holes, the fother, the fish, the
+    # preventers, the rigging set up, the mast cut away, the jury mast, the grapple and the
+    # small arms served) beside 71's hoist and 70's three
+    assert "97 evolutions; the list about" in contents
     # the ship's papers are a topic beside the ship (package 35), listed with their handles
     assert "  papers: the ship's papers, 10 aboard" in contents and "the manifest" in contents
 

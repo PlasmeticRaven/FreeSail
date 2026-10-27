@@ -1374,7 +1374,8 @@ verbs:
   # `none`, `evolutions` below; the beat is a crew order as `call all hands` is, at once,
   # `freesail/orders/crew.py`); the rest are the gun deck's orders (object `gunnery`,
   # `freesail/orders/gunnery.py`): standing intentions the battery keeps, and the one-shot
-  # orders that ride over them. The boarders are 73's (`refused_phrases`).
+  # orders that ride over them. The marines, the small arms and the boarders are
+  # package 73's (object `fight`, below).
   clear for action:
     synonyms: [clear ship for action, clear the ship for action, clear for battle, clear the decks for action]
     object: none
@@ -1533,6 +1534,78 @@ verbs:
                cut away the main mast, cut away the fore mast, cut away the mizzen mast, cut the mast away,
                cut away the masts]
     object: damage
+    level: 1
+  # Package 73 (spec M7 §11, §11a): the marines, the small arms and the fight on deck
+  # (object `fight`, `freesail/orders/fight.py`). The marines' fire is a standing intention
+  # within musket shot of a near deck (`combat/small_arms.py`); the small arms are served
+  # out by an evolution; `lay her aboard` is the chase's helm with the boarding's word,
+  # `grapple her` an evolution within thirty metres, and `boarders away` and `repel
+  # boarders` the fight on deck (`combat/boarding.py`), once refused here as 73's. The
+  # hail before the order ("marines, fire by volley") is read by the grammar
+  # (`orders/grammar.py` DIVISION_HAILS): the comma is the drill's.
+  marines fire by volley:
+    synonyms: [the marines fire by volley, marines fire a volley, marines open fire,
+               marines fire by volleys, the marines open fire, marines fire]
+    object: fight
+    level: 1
+  marines fire at will:
+    synonyms: [the marines fire at will, marines independent fire, marines fire independently]
+    object: fight
+    level: 1
+  marines hold your fire:
+    synonyms: [marines cease firing, the marines hold their fire,
+               marines hold fire, the marines cease firing]
+    object: fight
+    level: 1
+  marines to the tops:
+    synonyms: [send the marines into the tops, marines into the tops, marines aloft, send the marines aloft,
+               marksmen to the tops, send the marines to the tops, the marines to the tops]
+    object: fight
+    level: 1
+  marines to the gangways:
+    synonyms: [marines down from the tops, marines to the poop, marines to the poop and gangways, call the marines down,
+               marines down, the marines down from the tops, marines to the poop and the gangways]
+    object: fight
+    level: 1
+  serve out the small arms:
+    synonyms: [serve out small arms, serve out the arms, serve out cutlasses and pikes, serve out the cutlasses,
+               arm the boarders, issue the small arms, small arms to the boarders, serve out the pistols and cutlasses,
+               serve out pikes and cutlasses]
+    object: fight
+    level: 1
+  small arms fire at will:
+    synonyms: [small arms men fire at will, the small arms fire at will,
+               musketry at will, small-arms men fire at will]
+    object: fight
+    level: 1
+  small arms hold your fire:
+    synonyms: [small arms men hold your fire, small arms cease firing]
+    object: fight
+    level: 1
+  lay her aboard:
+    synonyms: [run her aboard, lay the enemy aboard, lay us aboard of her, board and carry her, lay her alongside,
+               run alongside her, prepare to board, stand by to board, lay him aboard, lay us alongside her]
+    object: fight
+    level: 1
+  grapple her:
+    synonyms: [grapple, throw the grapnels, grapple the enemy, get the grapnels on her, make fast to her,
+               lash her alongside, throw the grapplings, grapple him]
+    object: fight
+    level: 1
+  cast off the grapnels:
+    synonyms: [cast off the grapnel, cut the grapnels, cast her off, cut her adrift, cast off from her,
+               cut away the grapnels, cast off the grapplings, cut the grapplings]
+    object: fight
+    level: 1
+  boarders away:
+    synonyms: [away boarders, call away the boarders, man the boarders, board her, boarders away!, away boarders!,
+               board him, boarders over the side]
+    object: fight
+    level: 1
+  repel boarders:
+    synonyms: [stand by to repel boarders, repel boarders!, boarders repel, all hands to repel boarders,
+               repel the boarders, prepare to repel boarders]
+    object: fight
     level: 1
   bury the dead:
     synonyms: [commit the dead to the deep, read the burial service, bury the killed, commit the bodies to the deep,
@@ -2177,16 +2250,6 @@ irrevocable:
 # standing order's action (`orders.read_whole`).
 # ---------------------------------------------------------------------------
 refused_phrases:
-  # package 70: the boarders and the fight on deck are the milestone's third combat
-  # package (spec M7 §11, §11a); the guns, the quarters and the strike are here
-  boarders away: &boarders "The boarders are not called away in this game yet: the small arms, the marines' fire and the fight on deck come with milestone 7's third combat package. The guns are served ('beat to quarters', 'cast loose the guns', 'engage her to starboard', 'fire as they bear'), and the colours are struck ('strike the colours')."
-  away boarders: *boarders
-  call away the boarders: *boarders
-  man the boarders: *boarders
-  board her: *boarders
-  prepare to board: *boarders
-  stand by to board: *boarders
-  repel boarders: *boarders
   as you were: "'As you were' is not an order the ship keeps: say 'belay that' to stop the last order's work where it stands, 'belay all work' for everything in hand, or give the order that puts her back ('square the yards', 'steer SW by W')."
   lay out the stream anchor: &stream "The boat lays out the kedge and no other anchor in this game: say 'lay out a kedge astern' (or to a point, 'lay out a kedge to the NE'), 'let go the stream anchor' from the ship, or 'back the anchor' with the stream."
   lay out the stream: *stream

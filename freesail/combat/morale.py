@@ -75,6 +75,7 @@ class Morale:
     guns_lost: float = 0.0
     masts_lost: float = 0.0
     odds: float = 0.0
+    repulses: float = 0.0  # package 73: the boarders repulsed, `boarding.REPULSE_COST` each
     reasons: str = ""
 
     def judge(
@@ -113,6 +114,7 @@ class Morale:
             - GUNS_WEIGHT * self.guns_lost
             - MASTS_WEIGHT * self.masts_lost
             - self.odds
+            - self.repulses
         )
         self.value = max(0.0, min(1.0, value))
         self.reasons = self._reasons(hurt, complement, guns, lower, enemy_weight_lb, own)
@@ -126,6 +128,8 @@ class Morale:
         gone = sum(1 for s in lower if s.wrecked)
         if gone:
             parts.append(f"{number_words(gone)} lower mast{'s' if gone != 1 else ''} gone")
+        if self.repulses > 0.0:
+            parts.append("the boarders repulsed")
         if self.odds > 0.0 and own_lb > 0.0:
             parts.append(f"against a broadside of {enemy_lb:g} pounds to our {own_lb:g}")
         elif self.odds > 0.0:

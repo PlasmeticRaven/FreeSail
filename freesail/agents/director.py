@@ -695,6 +695,11 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             "aboard: the well pumped out",
             "aboard: No. 3 starboard gun found dismounted",
             "aboard: the cartridges found damp",
+            # package 73: the people's health
+            "aboard: a man taken ill",
+            "aboard: the fever in the ship",
+            "aboard: the first lieutenant is hurt",
+            "aboard: the surgeon taken ill",
         ),
         "a report of the ship's own people with what it does; with no cause (the table's "
         "conditions), doubted",
