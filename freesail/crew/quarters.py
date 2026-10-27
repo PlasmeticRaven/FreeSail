@@ -248,7 +248,8 @@ class Quarters:
     def casualties(self) -> tuple[int, int]:
         """(killed, wounded) of the whole company, by the muster's hurt."""
         killed = sum(1 for s in self.crew.sailors if s.hurt == "killed")
-        wounded = sum(1 for s in self.crew.sailors if s.hurt and s.hurt != "killed")
+        killed += len(getattr(self.crew, "dead", []) or [])  # buried (package 73)
+        wounded = sum(1 for s in self.crew.sailors if s.hurt in ("wounded", "hurt"))
         return killed, wounded
 
     # -- robbing by the fighting book's priority ----------------------------------------

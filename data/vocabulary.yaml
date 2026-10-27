@@ -795,6 +795,13 @@ verbs:
                call the pilot]
     object: person
     level: 1
+  # package 73 (spec M7 §16a): a holder hurt gives the deck and goes below to the surgeon,
+  # a person's own order at any station (object `needs`, freesail/orders/needs.py)
+  go below to the surgeon:
+    synonyms: [go to the surgeon, go below to the cockpit, go down to the surgeon, see the surgeon,
+               go below to have the wound dressed, go below with the wound, to the surgeon]
+    object: needs
+    level: 1
   go below:
     synonyms: [go below to the cabin, go to the cabin, go to my cabin, retire to the cabin,
                go down to the cabin, below]

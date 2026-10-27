@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import Any
 
 from freesail.api import readings as R
+from freesail.crew.model import number_words
 
 __all__ = ["register"]
 
@@ -116,7 +117,139 @@ def well_tail(world: Any) -> str:
     return ", " + "; ".join(bits) if bits else ""
 
 
+# -- the health's rows (spec M7 §16; package 73) ---------------------------------------------
+
+
+def _crew(world: Any) -> Any:
+    ship = getattr(world, "ship", None)
+    return (getattr(ship, "extra", None) or {}).get("crew") if ship is not None else None
+
+
+def _no_muster_words(world: Any) -> str | None:
+    return "no ship's company is mustered" if _crew(world) is None else None
+
+
+def _sick_list(world: Any, _: str | None) -> dict[str, Any] | None:
+    crew = _crew(world)
+    if crew is None:
+        return None
+    from freesail.crew.health import hurt_words
+
+    listed = [s for s in crew.sailors if s.hurt in ("wounded", "sick")]
+    light = [s for s in crew.sailors if s.hurt == "hurt"]
+    dead = [s for s in crew.sailors if s.hurt == "killed"]
+    if not listed and not light and not dead:
+        return {"words": "none", "count": 0, "names": [], "light_duty": 0}
+    names = [f"{s.name}, {hurt_words(s)}" for s in listed]
+    words = f"{len(listed)} on the list: " + "; ".join(names) if listed else "nobody on the list"
+    if light:
+        words += f"; at light duty: {', '.join(s.name for s in light)}"
+    if dead:
+        words += f"; dead, to be buried: {', '.join(s.name for s in dead)}"
+    return {
+        "words": words,
+        "count": len(listed),
+        "names": [(s.name, s.hurt, getattr(s, "wound", "")) for s in listed],
+        "light_duty": len(light),
+        "dead": len(dead),
+    }
+
+
+def _wounded(world: Any, _: str | None) -> dict[str, Any] | None:
+    crew = _crew(world)
+    if crew is None:
+        return None
+    from freesail.crew.health import hurt_words
+
+    wounded = [s for s in crew.sailors if s.hurt == "wounded"]
+    if not wounded:
+        return {"words": "none", "count": 0, "names": []}
+    waiting = [s for s in wounded if not getattr(s, "dressed", False)]
+    words = f"{len(wounded)}: " + "; ".join(f"{s.name}, {hurt_words(s)}" for s in wounded)
+    if waiting:
+        words += f"; {len(waiting)} not yet dressed"
+    return {
+        "words": words,
+        "count": len(wounded),
+        "waiting": len(waiting),
+        "names": [(s.name, getattr(s, "wound", "")) for s in wounded],
+    }
+
+
+def _surgeon(world: Any, _: str | None) -> dict[str, Any] | None:
+    crew = _crew(world)
+    health = getattr(world, "health", None)
+    if crew is None or health is None:
+        return None
+    surgeon = health.surgeon()
+    mates = health.mates()
+    if surgeon is None and not mates:
+        return {
+            "words": "no surgeon borne: the wounded are dressed by their messmates",
+            "borne": False,
+            "at_work": 0,
+            "waiting": len(health.waiting()),
+        }
+    st = health.state
+    at_work = len(st.at_work) if st is not None else 0
+    waiting = len(health.waiting())
+    where = "the cockpit" if (crew.all_hands_called_by == "quarters") else "the sick berth"
+    name = f"the surgeon, {surgeon.name}" if surgeon is not None else "the surgeon's mate"
+    if at_work:
+        words = f"{name}, in {where}, at work on the wounded"
+        words += f", {number_words(waiting)} waiting" if waiting else ""
+    else:
+        words = f"{name}, in {where}" + (", nobody under his hands" if not waiting else "")
+    if mates:
+        words += f"; {number_words(len(mates))} mate{'s' if len(mates) != 1 else ''}"
+    return {
+        "words": words,
+        "borne": surgeon is not None,
+        "name": surgeon.name if surgeon is not None else "",
+        "mates": len(mates),
+        "at_work": at_work,
+        "waiting": waiting,
+        "where": where,
+    }
+
+
 def register() -> None:
+    R.REGISTRY.add(
+        R.Reading(
+            "sick_list",
+            ("the sick list", "the sick", "the list"),
+            "state",
+            "",
+            _sick_list,
+            description="the sick list by name: the wounded and the sick with each man's "
+            "hurt, the men at light duty, the dead to be buried; 'none'",
+            none_words=_no_muster_words,
+        )
+    )
+    R.REGISTRY.add(
+        R.Reading(
+            "wounded",
+            ("the wounded", "the hurt"),
+            "state",
+            "",
+            _wounded,
+            description="the wounded by name with each wound, light or dangerous, and how "
+            "many wait for the surgeon; 'none'",
+            none_words=_no_muster_words,
+        )
+    )
+    R.REGISTRY.add(
+        R.Reading(
+            "surgeon",
+            ("the surgeon", "the doctor", "the surgeon's work"),
+            "state",
+            "",
+            _surgeon,
+            description="the surgeon: borne or not, where he is, at work on the wounded or "
+            "idle, how many wait, his mates",
+            none_words=_no_muster_words,
+        )
+    )
     R.REGISTRY.add(
         R.Reading(
             "pumps",
@@ -177,5 +310,16 @@ def register() -> None:
         ev("she founders", "ship.foundered"),
         ev("the ship founders", "ship.foundered"),
         ev("the hatches battened", "hatches.battened"),
+        # the health's (package 73)
+        ev("a man taken ill", "health.sick"),
+        ev("a man dead", "health.died"),
+        ev("a death", "health.died"),
+        ev("the burial", "crew.buried"),
+        ev("the morning report", "health.morning_report"),
+        ev("the butcher's bill", "action.bill"),
+        ev("the surgeon's report", "health.sick"),
+        ev("a man collapsed", "person.collapsed"),
+        ev("an officer killed", "person.killed"),
+        ev("the command passes", "ship.command_passes"),
     ):
         R.EVENTS[spec.words] = spec

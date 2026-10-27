@@ -130,6 +130,23 @@ PLACES: dict[str, Place] = {
             "victuals in the cook's charge (judgement: a frigate's of the period, under the "
             "forecastle and open to the waist; a small vessel's is her caboose on deck)",
         ),
+        # package 73 (spec M7 §16): the surgeon's places
+        Place(
+            "cockpit",
+            "the cockpit",
+            "the surgeon's place in action, on the orlop below the waterline, where the "
+            "wounded are brought down to him (Falconer 1780, COCKPIT: 'the place where the "
+            "wounded men are dressed'); the sick berth under the forecastle else",
+            below=True,
+        ),
+        Place(
+            "sick_berth",
+            "the sick berth",
+            "the sick berth under the forecastle, in the surgeon's charge (the frigates' sick "
+            "berth of the 1800s, screened off forward on the upper deck: judgement on the "
+            "Regulations' surgeon)",
+            below=True,
+        ),
         Place(
             "boat",
             "the boat",

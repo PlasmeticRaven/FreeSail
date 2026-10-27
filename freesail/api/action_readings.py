@@ -330,29 +330,44 @@ def _bill(world: Any, _: str | None) -> dict[str, Any] | None:
     crew = getattr(ship, "extra", {}).get("crew") if ship is not None else None
     if crew is None:
         return None
-    killed = [s for s in crew.sailors if s.hurt == "killed"]
-    wounded = [s for s in crew.sailors if s.hurt and s.hurt != "killed"]
-    complement = len(crew.sailors)
+    # package 73 (spec M7 §16): the states beyond 70's two, the buried counted, the names
+    buried = list(getattr(crew, "dead", []) or [])
+    killed = [s for s in crew.sailors if s.hurt == "killed"] + buried
+    wounded = [s for s in crew.sailors if s.hurt == "wounded"]
+    grave = [s for s in wounded if getattr(s, "wound", "") in ("grave", "invalid")]
+    light = [s for s in crew.sailors if s.hurt == "hurt"]
+    sick = [s for s in crew.sailors if s.hurt == "sick"]
+    complement = len(crew.sailors) + len(buried)
     morale = ship.extra.get("morale")
     temper = morale.words if morale is not None else "steady"
-    if not killed and not wounded:
+    if not killed and not wounded and not light:
         words = f"nobody hurt of {complement}; the hands {temper}"
     else:
         said = []
         if killed:
             said.append(f"{number_words(len(killed))} killed")
         if wounded:
-            said.append(f"{number_words(len(wounded))} wounded")
-        words = f"{' and '.join(said)} of {complement}; the hands {temper}"
+            said.append(
+                f"{number_words(len(wounded))} wounded"
+                + (f" ({number_words(len(grave))} dangerously)" if grave else "")
+            )
+        if light:
+            said.append(f"{number_words(len(light))} hurt and at light duty")
+        words = f"{', '.join(said)} of {complement}; the hands {temper}"
+    if sick:
+        words += f"; {number_words(len(sick))} sick"
     return {
         "words": words,
         "killed": len(killed),
-        "wounded": len(wounded),
+        "wounded": len(wounded) + len(light),
+        "grave": len(grave),
+        "light": len(light),
+        "sick": len(sick),
         "complement": complement,
         "fit": sum(1 for s in crew.sailors if s.fit),
         "temper": temper,
         "morale": round(float(morale.value), 2) if morale is not None else None,
-        "names": [(s.name, s.hurt) for s in killed + wounded],
+        "names": [(s.name, s.hurt) for s in killed + wounded + light],
     }
 
 

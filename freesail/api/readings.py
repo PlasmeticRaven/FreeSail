@@ -3380,13 +3380,47 @@ def _line_where(world: Any, person: Any) -> str:
     return place_words(place) if place else ""
 
 
+def health_words_for(world: Any, person: Any) -> str:
+    """The person's hurt in the muster's words (package 73, spec M7 §16a): 'hit: a splinter
+    in the thigh, dangerously, undressed', 'hurt (a cut on the head), at light duty',
+    'dead'; '' for a whole man or a person who is no man of the muster."""
+    if person is None:
+        return ""
+    if getattr(person, "dead", False):
+        return "dead"
+    crew = (getattr(getattr(world, "ship", None), "extra", None) or {}).get("crew")
+    sid = getattr(person, "sailor_id", None)
+    if crew is None or not sid:
+        return ""
+    s = crew.by_id.get(sid)
+    if s is None or not s.hurt:
+        return ""
+    from freesail.crew.health import hurt_words
+
+    words = hurt_words(s)
+    if s.hurt == "wounded":
+        words += ", dressed" if getattr(s, "dressed", False) else ", not yet dressed"
+        if person.where == "cockpit":
+            words += ", below with the surgeon"
+    return words
+
+
 def _line_state(world: Any, person: Any) -> str:
     """'on your feet since 05:02, hungry', 'asleep below': the person's own state in the
     needs' words when they have any (the steps that are said; spec M7b §20), with when he
-    last woke; '' for a person whose needs nobody keeps."""
+    last woke; his hurt (package 73) before them; '' for a person whose needs nobody
+    keeps."""
     keeper = getattr(world, "needs", None)
     if keeper is None or person is None:
         return ""
+    hurt = health_words_for(world, person)
+    if hurt:
+        rest = _line_state_needs(world, person, keeper)
+        return f"{hurt}; {rest}" if rest else hurt
+    return _line_state_needs(world, person, keeper)
+
+
+def _line_state_needs(world: Any, person: Any, keeper: Any) -> str:
     from freesail.world.needs import FATIGUE, needs_of
 
     n = needs_of(person)

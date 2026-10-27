@@ -88,7 +88,14 @@ class Morale:
         import math
 
         crew = ship.extra.get("crew")
-        hurt = sum(1 for s in crew.sailors if s.hurt) if crew is not None else 0
+        # the losses (package 73): the killed, the wounded and the hurt at light duty, and
+        # the dead buried and struck from the books; the sick list is not the action's
+        hurt = (
+            sum(1 for s in crew.sailors if s.hurt in ("killed", "wounded", "hurt"))
+            + len(getattr(crew, "dead", []) or [])
+            if crew is not None
+            else 0
+        )
         self.losses = hurt / max(complement, 1)
         guns = list(getattr(ship, "guns", {}).values())
         self.guns_lost = sum(1 for g in guns if g.dismounted) / len(guns) if guns else 0.0

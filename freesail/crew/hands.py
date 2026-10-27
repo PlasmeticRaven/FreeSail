@@ -233,6 +233,8 @@ def can_work(sailor: Sailor, aloft: bool) -> bool:
     of a rating that goes aloft (never a marine or an idler)."""
     if not sailor.fit or sailor.station in _NOT_HANDS:
         return False
+    if aloft and getattr(sailor, "hurt", "") == "hurt":
+        return False  # at light duty (package 73): on deck, never on the yards
     return rating_skill(sailor.rating, aloft) > 0.0 if aloft else True
 
 

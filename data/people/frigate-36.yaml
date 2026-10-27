@@ -204,3 +204,31 @@ wardroom:
       Carries the captain's word about the ship (pass the word for, send for), keeps a watch
       by the bill and learns the reckoning from the master.
     note: A midshipman as the captain's messenger, one of the boys of the afterguard.
+  # package 73 (spec M7 §11; the owner's note 3): the marines' officer and sergeant, drawn
+  # from the detachment of forty (the establishment of a 36-gun frigate's party: a
+  # lieutenant, a sergeant, a corporal, a drummer and the privates; from memory) so that the
+  # muster's forty stand as they were and no name shifts
+  - role: lieutenant of marines
+    drawn: {station: marines, rating: marine}
+    rank: lieutenant of marines
+    station: the marines
+    place: quarterdeck
+    traits: [upright, exact at the drill, a little apart from the sea officers]
+    history: "Four years in the corps; the Nile in the Zealous."
+    brief: >-
+      Commands the detachment: the sentries at the cabin door, the spirit room and the
+      gangway, the guard, the drill in the forenoon; at quarters the poop and the gangways,
+      the tops when the captain wills it, the fire by volley within musket shot, the
+      boarders' backbone and the guard on the prisoners.
+    note: The lieutenant of marines, drawn from the detachment (one of the forty).
+  - role: sergeant of marines
+    drawn: {station: marines, rating: marine}
+    rank: sergeant of marines
+    station: the marines
+    place: deck
+    traits: [a loud voice, the halberd, twenty years' service]
+    history: "Camperdown as a private; a sergeant since the Peace."
+    brief: >-
+      Posts the sentries, takes the drill and the muster of the detachment, carries the
+      halberd at quarters and leads the file on a boarding.
+    note: The sergeant of marines, drawn from the detachment.

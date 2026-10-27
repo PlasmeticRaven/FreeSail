@@ -57,6 +57,13 @@ def execute(ship: Any, order: Order) -> Result:
     keeper = world.needs
     person, holder = keeper.person_of(actor)
     data["person"] = person.name
+    if verb == "go below to the surgeon":
+        # package 73 (spec M7 §16a): the holder hurt gives the deck and goes below
+        health = getattr(world, "health", None)
+        if health is None:
+            raise OrderError("There is no surgeon's cockpit in this ship.")
+        text = health.go_below_to_the_surgeon(person, holder)
+        return "needs.answer", text, data | {"place": person.where}
     if verb == "eat":
         text = keeper.eat(person, holder)
     elif verb == "drink":

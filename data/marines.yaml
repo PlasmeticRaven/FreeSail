@@ -1,0 +1,84 @@
+# FreeSail: the marines' kit by nation and period, and the ship's company's small arms
+# (spec M7 §11; the owner's note 3; package 73; docs/design/Design-WaterAndHealth.md).
+# Read by freesail/world/nations.py (`Nations.marines_kit_of`: each nation's entry in
+# data/nations.yaml names its kit under `marines: {kit: ...}`, the basic kit standing where
+# one names none) and by freesail/combat/small_arms.py (the fire within musket shot) and
+# freesail/combat/boarding.py (the fight on deck). The weapon's kind at least, not
+# intensely detailed, as the owner's note asks. Every figure is judgement with its source;
+# the detachment itself is the ship file's (`crew.stations.marines`, with its sergeant and
+# its officer drawn from it: data/people/<ship>.yaml), never this file's.
+#
+# Fields of a kit:
+#   name           the corps in words
+#   musket         the musket and its bayonet, in words
+#   sergeant       the sergeant's arm (the British sergeant's halberd, the French sergeant's musket)
+#   officer        the officer's arm
+#   volley_s       the seconds a drilled detachment takes between volleys (the British drill's
+#                  three rounds a minute: Hughes, Firepower, on the platoon exercise; the
+#                  French soldiers embarked slower, judgement)
+#   hit_at_50_yd   the chance a shot tells on a man on a near deck at fifty yards (judgement
+#                  from the period's musketry trials: a volley at a hundred yards put one ball
+#                  in five into a target the size of a line of men (Hughes), a man on a deck
+#                  behind a bulwark and a hammock netting a quarter of that); falling with the
+#                  square of the range to nought at musket shot, a hundred yards (spec M7 §11)
+#   tops_share     the share of the detachment the captain's book sends into the tops as
+#                  marksmen (the French habit: Nelson's objection to musketry from the tops
+#                  and the French Marins de la Garde and soldiers aloft at Trafalgar; the
+#                  British kept theirs on the poop and the gangways)
+#   tops_factor    the marksman's edge from the tops (the French sharpshooters: judgement)
+#   soldiers       whether the detachment is soldiers of the line embarked (the French ships
+#                  carried troops beside their few marines), which the fight on deck reads
+#                  as a temper of their own
+#   boarding       their strength on a deck a man against a seaman with a cutlass (the
+#                  bayonet and the drill; judgement)
+#   source         where it comes from
+
+kits:
+  british:
+    name: the Royal Marines
+    musket: "the Sea Service musket of .75 bore (the India pattern Brown Bess of 1797) with its bayonet"
+    sergeant: "the halberd (the sergeant's pike, carried in the Marines to 1805 and after)"
+    officer: "the sword"
+    volley_s: 20
+    hit_at_50_yd: 0.05
+    tops_share: 0.2
+    tops_factor: 1.0
+    soldiers: false
+    boarding: 1.3
+    source: "the Sea Service musket and the sergeant's halberd: the Royal Marines' establishment of 1802 to 1805 (from memory; UNVERIFIED against a page); the drill's three rounds a minute: Hughes, Firepower, on the platoon exercise; the share aloft judgement (Nelson kept his marines off the tops)"
+  french:
+    name: the troupes de la marine and the soldiers embarked
+    musket: "the Charleville musket of 1777 (.69 bore, the An IX pattern) with its bayonet"
+    sergeant: "the musket (the French sergeant carried no halberd by 1805)"
+    officer: "the sword"
+    volley_s: 30
+    hit_at_50_yd: 0.05
+    tops_share: 0.4
+    tops_factor: 1.5
+    soldiers: true
+    boarding: 1.2
+    source: "the model 1777 musket and the An IX pattern (from memory; UNVERIFIED against a page); the French habit of soldiers embarked and sharpshooters in the tops (Trafalgar's accounts: the Redoutable's musketry; from memory); the volley's seconds judgement for troops at sea"
+  basic:
+    name: the marines
+    musket: "a musket of the common bore with its bayonet"
+    sergeant: "the pike"
+    officer: "the sword"
+    volley_s: 25
+    hit_at_50_yd: 0.04
+    tops_share: 0.2
+    tops_factor: 1.0
+    soldiers: false
+    boarding: 1.2
+    source: "the common kit of the period's sea soldiers; judgement"
+
+# The ship's company's small arms, served out to the boarders by the bill (spec M7 §11:
+# cutlasses, pikes, pistols, tomahawks; the Ordnance's allowance of small arms to a ship by
+# her rate, from memory). A man with his arms served out fights at the full strength, one
+# without at this share (his fists and a handspike: judgement); the small-arms men of the
+# quarter bill have muskets of the stand of arms.
+small_arms:
+  words: "cutlasses, boarding pikes, pistols and tomahawks from the stand of arms"
+  musket: "the muskets of the stand of arms"
+  served_factor: 1.0
+  unserved_factor: 0.5
+  source: "the Ordnance's small-arms allowance by rate (Lavery, Arming and Fitting, from memory; UNVERIFIED); the factors judgement"

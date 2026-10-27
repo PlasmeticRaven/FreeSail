@@ -742,6 +742,11 @@ class World:
 
         self.water = Water(self)
         self.ship_lost = False
+        # the health (spec M7 §16, §16a; package 73): the wounded, the sick and the dead,
+        # the surgeon's queue, the needs' ends (`freesail.crew.health`), once a minute
+        from freesail.crew.health import Health
+
+        self.health = Health(self)
         # The other sail on the sea at the start and the world orders by time (spec M5 §25
         # to §27; package 36; `freesail.world.ships`, `freesail.world.orders`): the ships
         # are the scenario's state, as the people are; the orders are applied at their
@@ -1974,6 +1979,12 @@ class World:
 
             needs = self.needs = NeedsKeeper(self)
         needs.tick()
+        health = getattr(self, "health", None)
+        if health is None:
+            from freesail.crew.health import Health
+
+            health = self.health = Health(self)
+        health.tick()
 
     # -- queries -------------------------------------------------------------
 
