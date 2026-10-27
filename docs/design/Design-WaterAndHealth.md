@@ -523,4 +523,44 @@ sick list's shape for its fevers.
 
 ## As built (the postscript)
 
-Filled at the end of the package.
+Written at the end of the package (2026-10-27). The truths are numbered **7-172 to 7-184**
+(the owner's local practice-and-resupply package took 7-161 to 7-171 while this one was
+built), not "the first after 72's" as the design said above.
+
+**Built as designed.** The water keeper of every World with its five sources, the well's
+depth by the bilge's floor, the routine pumping, the free surface through `Hull.gm_m` read by
+the heel and the motion (the physics untouched), the pumps as a standing work with Falconer's
+rates and the men's power of 1.5, the spells and the suck, the foundering at half the
+displacement with the settling line before it and the integrator holding her; the eight
+repairs as evolutions with their stores counted, the preventer that holds a parting line, the
+damage report naming everything; the muster's states and the surgeon's queue, the courses,
+the day at eight, the bill, the needs' ends; the holder's roads at parity through the needs
+keeper's line and the harness's carried-below stand-by; the kit by nation, the musketry by
+volley and at will within musket shot with the quarterdeck's share, the grapple and the fight's
+rounds with the carried, repulsed and contested ends; the doctrine's knobs in six files; the
+director's five forms; the readings and events; the scenario `leak.yaml`.
+
+**Taken another way.** (1) The marines at quarters stand at 70's quarterdeck carronades, so
+`marines, fire by volley` / `at will` and `marines to the tops` take them to their muskets (the
+carronades short by them) and `hold your fire` sends them back; the design had them on the poop
+from the beat. (2) The grapnels hold from the throw (the evolution's two minutes are the hauling
+together), not at its end: two ships lying to drift apart at a foot a second and the throw at
+thirty metres would never have held at the end of two minutes. (3) The doctrine's standing
+orders ("the small arms", "repel") were not written into the engaging books: the captain's own
+minute does the same (`_musketry`, `_boarding`, `_damage_work`), so no new event words were
+needed in the standing grammar. (4) The hail before a fight order ("marines, fire by volley")
+is read away by the grammar (`DIVISION_HAILS`), not matched as a synonym with a comma, since the
+grammar splits at the comma for a side. (5) The wound's draws (light or grave, the words) are
+the health stream's and not the gunnery's, so that the gunnery's stream runs as 71 left it; the
+first action's minute moved all the same, by the small arms served out and fired (TuningNotes).
+(6) A holder's light wound kept on deck is dressed where he stands after an hour (the design
+left him undressed); a grave one dressed below keeps him under the surgeon's hands until the
+judgement, and the station ends with the judgement (dead or invalided), which the design did
+not say. (7) The person slot `{person}` for the director's forms. (8) `lay her aboard` is the
+chase's helm on the engaged mark with the boarding's word, not a helm law of its own.
+
+**Left.** The hands to the boats at the end (75's); the far vessel's people under musketry and
+boarding (74's: she must be crewed); cutting out by the boats; the run for the land when the
+water gains (the distress book's); 77's remount of a dismounted gun; the pace truth (the
+fight's cost measured in the notes, not pinned). Every place that assumes the player's ship is
+the only crewed one is named in the package's report for package 84's one-world refactor.

@@ -57,6 +57,8 @@ def _world(ship: Any, verb: str) -> Any:
     world = world_of(ship)
     if world is None or getattr(world, "clock", None) is None:
         raise OrderError(f"'{verb}' wants a ship in a world; this one sails alone.")
+    if ship.extra.get("foundered"):
+        raise OrderError("She is foundered: the water has her, and there is no fight left in her.")
     return world
 
 

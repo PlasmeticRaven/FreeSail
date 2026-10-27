@@ -68,7 +68,17 @@ def _world(ship: Any, verb: str) -> Any:
     world = world_of(ship)
     if world is None or getattr(world, "water", None) is None:
         raise OrderError(f"'{verb}' wants a ship in a world; this one sails alone.")
+    _afloat(ship)
     return world
+
+
+def _afloat(ship: Any) -> None:
+    """A foundered ship has no work left but the boats' (75's)."""
+    if (getattr(ship, "extra", None) or {}).get("foundered"):
+        raise OrderError(
+            "She is foundered: the water has her, and there is no work left aboard but the "
+            "boats' (not yet in the game)."
+        )
 
 
 def _runner(ship: Any, verb: str) -> Any:
@@ -81,6 +91,7 @@ def _runner(ship: Any, verb: str) -> Any:
 def _start(ship: Any, evo_id: str, subject: str, params: dict[str, Any], verb: str) -> Result:
     if registry.get(evo_id) is None:
         raise OrderError(f"There is no such evolution as '{evo_id}'.")
+    _afloat(ship)
     runner = _runner(ship, verb)
     text = runner.start(ship, evo_id, subject, params)
     # the runner writes its own started line; work that waits its turn behind other work

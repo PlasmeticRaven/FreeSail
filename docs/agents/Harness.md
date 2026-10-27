@@ -794,6 +794,88 @@ truth shows every ship's set and her regime (`squadron`, `regime` on the row) an
 whole (`squadrons`). A world order is never shown as sent to a station. The channels
 `squadron` and `convoy` carry the lines to the stations that read them.
 
+## 21f. Water, damage, the wounded and the fight on deck at the stations (package 73)
+
+Spec M7 §11, §11a, §13 to §17 "as built (package 73)"; `docs/design/Design-WaterAndHealth.md`;
+the primer's chapter 25. What a station reads and may do of the water in the ship, the damage
+control, the surgeon's work and the fight on deck; and what happens to the person a station
+holds when he is hit.
+
+**The readings.** `the well` (the carpenter's feet with the tail: rising, the pumps gaining or
+losing), `the water` (the tons, the sources by name and their rates), `the leaks`, `the pumps`
+(manned or not, by whom, the rate, when spelled), `the hatches`; `the damage` now names
+everything (the lines parted, running and standing, with the order that mends each; the sprung
+spars; the jury masts; the holed sails; the shot holes by place and plugged; the well), and
+`the parted lines`; `the sick list` (by name with each man's hurt, the men at light duty, the
+dead to be buried), `the wounded` (each wound, light or dangerous, how many wait), `the
+surgeon` (borne or not, in the cockpit or the sick berth, at work or idle, his mates), `the
+bill` (the states: killed, wounded with the dangerous apart, hurt and at light duty, sick);
+`the marines` (the detachment fit of its number, its officer and kit, where it stands and its
+fire), `the small arms` (in the chests or served out, the small-arms men), `the boarders` (the
+bill's count with their arms, whom she is grappled to, the fight by rounds and losses, the gun
+crews up to repel). The needs' line of a sample carries the person's own state first: `wounded
+(a splinter in the hand)`, `hurt and at light duty`, `below with the surgeon`, `dead`.
+
+**The lines and the events.** `well.rising` ("The carpenter reports a foot of water in the
+well, and gaining"), `pumps.manned`, `pumps.spelled`, `pumps.gaining`, `pumps.losing`,
+`pumps.sucked`, `pumps.secured`, `ship.settling`, `ship.foundered` (urgent; a crewed vessel
+sunk is `action.enemy_sunk` in the parent), `hatches.battened`, `leak.stopped`, `hole.plugged`;
+`health.sick` (the surgeon's report at eight), `health.died`, `health.invalided`,
+`health.returned`, `crew.buried`, `health.morning_report` (routine), `action.bill` (the
+butcher's bill ten minutes after the last shot), `person.hurt`, `person.collapsed`,
+`person.killed`, `ship.command_passes`; `action.musketry` (the firer's minute), `ship.grappled`,
+`ship.cast_off`, `action.boarders`, `action.boarded`, `action.boarding` (a round), `action.carried`,
+`action.repulsed`, `action.repel`. The events for `at` and a stand-by: `the well rising`, `the
+pumps gaining`, `the pumps losing`, `the pumps suck`, `the leak stopped`, `a hole plugged`,
+`settling`, `she founders`, `the hatches battened`, `a man taken ill`, `a man dead`, `the
+burial`, `the morning report`, `the butcher's bill`, `a man collapsed`, `an officer killed`,
+`the command passes`, `musketry`, `grappled`, `the boarders away`, `the fight on deck`, `the
+deck carried`, `the boarders repulsed`.
+
+**The orders** (object `damage`, the deck's): `man the pumps`, `spell the pumps`, `secure the
+pumps`, `batten down the hatches`, `open the hatches`, `plug the shot holes`, `stop the leak`,
+`fother a sail`, `rig preventer braces`, `rig preventer backstays`, `sling the yards`, `set up
+the rigging` (or `set up the larboard main shrouds`), `reeve new lines`, `fish the fore
+topmast`, `rig a jury mast`, `cut away the mainmast`, `bury the dead`; (object `fight`):
+`marines, fire by volley` / `fire at will` / `hold your fire`, `marines to the tops` / `to the
+gangways`, `serve out the small arms`, `small arms, fire at will` / `hold your fire`, `lay her
+aboard`, `grapple her`, `cast off the grapnels`, `boarders away`, `repel boarders` (the hail's
+comma is the drill's); (object `needs`, the person's own): `go below to the surgeon`. Every
+repair is an evolution of the runner's (hands and time, the fighting book's priority); the
+pumps a standing work of the hands' pool; the marines' fire a standing intention within
+musket shot of a near deck; the grapple an evolution within thirty metres.
+
+**The holder hit (§16a, at parity).** The person a station holds is hit as the men at his part
+are. The station is told in an urgent line of its own with the roads: a light wound, "You are
+hit: a splinter in the hand. You can keep the deck (your orders go and your words carry, and you
+tire the faster), or go below to the surgeon to have it dressed ('go below to the surgeon') and
+come on deck again"; a grave one, "... you will collapse within the half hour if the wound is
+not dressed". On deck he is not in the surgeon's queue; a light wound is dressed where he
+stands after an hour (a mate sent up where one is borne). `go below to the surgeon` gives the
+deck (the rules captain carries on by the bill, the officer's deck returns to the captain) and
+puts him in the cockpit and the queue; dressed, he is told and may `go on deck`. A grave
+wound kept on deck collapses him at the half hour: the harness's **carried-below stand-by**
+(`StandBy("carried below to the surgeon, until your wound is dressed")`), which no event, bell
+or urgent line ends until the surgeon has dressed him; dressed, a grave wound keeps him under
+the surgeon's hands until the judgement at a day, and the station ends with that judgement:
+dead, `agent.stopped` "stood down by the world: killed: ..."; an invalid, "stood down by the
+world: invalided: ...". A holder killed outright is stood down the same way, the model told
+"You are killed: a round shot. Your person is dead and the station ends with him; the deck
+passes by the bill", the journal written, the station released and saved. The player at the
+prompt as the captain is told the same words through the needs' listeners and loses his
+person; the command passes by the wardroom's order (`ship.command_passes`, the people's
+captain thereafter), and the scenario goes on under whoever commands. The needs' ends are the
+same keeper's: thirst collapses a stationed person at three days (carried below, water and
+food bring him round) and kills at four; hunger at a week and three.
+
+**The director.** `aboard: a man taken ill`, `aboard: the fever in the ship`, `aboard: the
+first lieutenant is hurt` (or `Mr Pearce is hurt`, `... is badly hurt`), `aboard: the surgeon
+taken ill`, each doubted without its cause (two days out for the fevers, a week for the fever in
+the ship, a seaway for a fall) and performed with one; `aboard: a seam found working` is a leak
+of two tons an hour the keeper runs; `the leak stopped` and `the well pumped out` act through
+the keeper and are doubted while the ship's own carpenter and pumps could do it. His truth shows
+every ship's well, pumps and muster states. A world order is never shown as sent to a station.
+
 ## 22. The harbour and the settings (package 59)
 
 The terminals, the flags, the desktop client's configuration and the scenarios by hand are now one page: **the harbour**, a page of the game's own server (spec M7b §21d, §21e). In the game folder:
