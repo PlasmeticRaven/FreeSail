@@ -541,16 +541,20 @@ included, 2.2 below), `squadrons`, `business`, `world_orders`, `marks_of_interes
 director (`director_brief`, `director_state`, `director_seats`, the director's journal),
 `offices` (2.10), `hulls` (`dict[id, Hull]`), `followed` (the hull the drivers and the cap
 centre on), `journal`, `inputs`, `station_acts`, `played_under`, `chart_marks`,
-`compression`. Its `tick` runs: the clock, the world orders due, the weather's minute (the
-systems advanced once, not per hull), **every awake hull's tick in a fixed order** (the
-followed hull first, then by hull id: her wind, sea, motion, conditions, tide, physics, run
-on the sphere, action, grounding and lookout, reckoning, dealings, people, routine, needs,
-fishery, water, bells, sun, standing, captain, watches, agents, as `World.tick` has them
-today), the far bodies' minute (the business, the brains of the sleeping and hull-less
-ships, the sets, the regimes, the moves, the hails, **the switch**), the sleeping hulls'
-minute (their people, needs, water and dealings coarsely), the ports' jobs, the offices'
-day. The order is chosen so that the followed hull's lines fall where they fall today;
-part 3 says which pins that keeps.
+`compression`. Its `tick` runs **in two phases, in the order today's tick has them**:
+the clock, the world orders due, the weather's minute (the systems advanced once, not per
+hull); then *the bodies move*: every awake hull's wind, sea, motion, conditions, tide,
+physics and run on the sphere, the followed hull first and the rest by hull id; then *the
+world sees and acts*: the other awake hulls' action, grounding and lookout, reckoning,
+dealings, people, routine, needs, fishery, water, bells, sun, standing, captain, watches
+and agents (as a crewed World's whole tick runs today between the player's run on the
+sphere and his lookout), the far bodies' minute (the business, the brains of the sleeping
+and hull-less ships, the sets, the regimes, the moves, the hails, **the switch**), the
+sleeping hulls' minute (their people, needs, water and dealings coarsely), the ports'
+jobs, the offices' day, and **the followed hull's own seeing and acting last**, as the
+player's run after `_tick_vessels` today. The order is chosen so that every line of the
+followed hull's log and of a crewed ship's falls at the tick it falls at today; part 3
+says which pins that keeps and the one step that proves it.
 
 **`freesail/world/hulls.py` (new): `Hull`, the ship.** Owns every per-ship field 1.1
 lists, the methods that work them (`submit`, `record`, `readings`, the `_tick_*` of her
@@ -864,3 +868,250 @@ Each step is a thing the world does; none is a special case of the player's.
 - **A world order for every person's act** (the director moving persons by `person:` as
   the means for a model's `go ashore`). The act is the person's and journaled as his
   station's; the director's form stays the director's.
+
+## 3. The two roads costed, honestly
+
+**Road A, one World with many hulls** (part 2; the lead's instinct). **Road B, many Worlds
+sharing the world's state** (the brief's cheaper reach): `CrewedWorld` kept as the
+promoted ship's container, her World made as today but given the parent's registries by
+reference instead of empty copies (`self.ports = parent.ports`, `self.people` the parent's
+persons for the shore, `self.business`, `self.squadrons`, `self.director_*`,
+`self.world_orders` the parent's), the player's World the parent as now with its shadow,
+two clocks and two logs as now, and the demotion's drop mended by keeping her World asleep
+when she carries something worth keeping.
+
+### 3.1 What moves in the code
+
+Both roads must do the same four splits, because the sharing is impossible without them:
+**the ports' dealings** out of `Ports` (2.4: about 1,200 of its 4,270 lines are the ship's
+pilot, cutter, boat, jobs, price lists and trade; under B each CrewedWorld needs its own
+`Dealings` against the one shared `Ports` exactly as under A); **the persons' registry**
+out of `People` (2.3: the whereabouts, the home, the company as a view; under B the
+crewed World's `People` must read the parent's persons ashore and write its own man ashore
+into them, which is the same registry by a longer road); **hearing and movement by the
+registry** (`hearing.py`, `movement.py`, `things.py`: the spot with the hull in it); and
+**the far brain's port acts** (`brains.FarCaptain._in_port`, `far_order` by the track and
+the guard). These four are about 2,200 lines moved or changed under either road, and
+they are the owner's acceptance test's steps 4 to 6.
+
+Road A then does what B does not: `core/world.py` split into `World` and `hulls.Hull`
+(some 600 lines moved behind properties, 100 of properties); `crews.py` rewritten from
+1,309 lines to the switch (about 500); `ships.py` the player's vessel of the sea and
+`tick_hulls` (150); `squadrons.py`, `combat/action.py`, `signals.py`, `signalling.py`,
+`hail.py`, `brains.py` the sixty-six `PLAYER_ID` cases made one rule (about 150);
+`orders.py` and `director.py` the forms with a hull and the truth over the hulls (350);
+`readings.py` the truth and the station line (150); `harness.py`, `remote.py`, `seats.py`
+the hull in place of the World (150); `replay.py` the hull on the inputs, the `hulls`
+block, the converter (200); `ui/server.py`, `console.py`, `harbour.py` the followed hull
+(100); and the tests beside each. About 4,000 lines touched and 2,000 moved in all, the
+size of package 70. Road B touches about 2,500 (the four splits, the sharing in `crews.py`
+and `_crew_scenario`, the save's `crews` block for the crewed Worlds' inputs and
+transcripts, the asleep World) and leaves the rest.
+
+By the assumptions of 1.7: Road A retires all thirty-eight (the twelve of the World's
+shape and the promotion become the Hull's own; the five of the player's shadow become one
+rule; the four of the far brain become the port's acts; the five of the stations and the
+hearing become the registry's; the three of the save become the hull on the input; the
+three of the drivers become `followed`; the two of the truth become the walk over the
+hulls; the consent brief's words are 55's). Road B retires fourteen (6, 7, 13, 18, 20, 21,
+25, 27, 28, 29, 31, 37, 38 and half of 10) and keeps twenty-four: the one ship at the
+World's centre (1 to 5, 8, 9), the shadow and the special cases (11, 12, 15), the switch's
+centre (19, 36), the second clock and log (9, 17, 22, 23, 24), the drivers (34, 35) and
+the save's shape (32, 33). The twenty-four are the ones 82's followed ship and the
+observed world then have to retire, since a world with no player's ship under B is a
+parent World with no `ship`, which every one of the 223 `world.ship` reads refuses; so B's
+saving is paid again by 82 and, the hulls being then made under 82's time pressure, paid
+worse.
+
+### 3.2 The pace, measured
+
+The method is truth 51's (a thousand ticks to settle, the best of three thousands, in
+ticks a second of wall clock), by `tools/pace.py` on the head `908741f` and by the
+scratchpad's `measure_seam.py` (described in 1.8's manner: its figures are reproducible
+from the script's docstring), on the build machine with package 73's builder running
+beside (the load average is given with each figure; the floors are judged alone). The
+owner's baseline, 95 ticks a second with twelve crewed ships on his machine and 1,111
+alone, is not re-measured here.
+
+| measure (`tools/pace.py`) | this run | package 43's table (the slower machine) |
+|---|---|---|
+| the frigate alone, the station trial | 573 (load 0.7) | 560 |
+| the frigate with the dozen ships at far detail | 516 (0.8) | 718 to 764 on the faster machine |
+| the frigate with one crewed ship | 282 (0.9) | about 280 |
+| with three (the cap) | 181 (0.9) | 100 to 114 |
+| with six | 86 (2.3) | 56 |
+| with twelve | 47 (3.8) | 34 |
+| the convoy of six and the privateer, far detail alone | 520 (4.5) | 551 (72) |
+| the same under the default cap | 298 (4.9) | 328 (72) |
+| the same under a cap of twelve | 335 (5.1) | 311 (72) |
+
+| measure (`measure_seam.py`) | figure |
+|---|---|
+| a promotion (`CrewedWorld` made: her ship from her file, her muster, her stations), best of three | a cutter 465 ms, a brig 634 ms, a frigate 698 ms (load 5.5) |
+| the checkpoint of the first action at tick 60, the privateer far | 460 KB |
+| the same at tick 900, the privateer crewed and fourteen minutes in action | 539 KB: **a crewed World's weight about 80 KB** with her log |
+| a station's World kept in the far shape, `far_tick` a thousand times | 27 ms: **0.03 ms a tick**, a hundredth of a crewed tick |
+| the schooner at anchor in Carrick Road with the dozen far ships, no orders | 1,898 ticks a second (load 5.7); 1,931 with the cap at nought |
+| the frigate under way on the station trial, the same minutes | 539; hove to 515 |
+| of three crewed ships' ticks (cProfile, 600 ticks): the sails' physics | **63 per cent** of `World.tick` |
+| the evolutions' runner (the hands at the sheets and the sails) | 21 per cent |
+| the strain | 3.5; the captain's judgement 2.4; the routine 1.4 |
+| the World's own bookkeeping that a refactor touches (the tide, the weather followed and observed, the ports' tick, the people's tick, the needs, the lookout, the reckoning) | **under 3 per cent together** (0.1, 0.9, 0.1, 0.1, 0.1, 0.0, 0.4, 0.5) |
+
+What the figures say for the roads:
+
+- **A crewed ship's cost is her hull's, not her World's.** Eighty-four per cent of her
+  tick is the physics and the hands, which every road pays for every awake hull alike;
+  the World-level bookkeeping both roads move is under three per cent. **Neither road
+  changes the pace of an awake ship within the measure's noise**, and the owner's 95 with
+  twelve is untouched by either.
+- **A sleeping hull costs nothing a tick.** Road A's hulls kept asleep are not ticked but
+  at the minute (the people's, the needs', the water's and the dealings' minutes, each
+  measured at a thousandth of a tick or less per hull); the far shape's 0.03 ms is the
+  upper bound of what a sleeping hull's mirror costs, and the design mirrors nothing while
+  she sleeps. The memory is 80 KB a hull in the checkpoint; fifty hulls are 4 MB against
+  `test_checkpoint`'s 2 MB bound on one world, so the bound moves with the hulls kept, said
+  in the notes, and the owner's decision in part 5 on which hulls are kept decides it.
+- **A promotion's hitch** (half a second to seven tenths, a frozen frame at 60x) is paid
+  today at every promotion and under road A once per ship; a ship that flaps at the edge
+  costs today's road a hitch each time and road A none.
+- **A hull at anchor costs a quarter to a third of one under way** (1,898 against 539 are
+  different hulls, the schooner's against the frigate's; the frigate hove to at 515 says
+  the physics runs whole while she has sails set, and the anchored hull's saving is the
+  sails furled and the hands idle). So "a ship with a stationed person at full detail at
+  all times" (the owner's note 11) costs, at anchor in port, about a third of a crewed
+  ship, and under way the whole; the cap's order with the stationed hull first (2.6) is the
+  honest bound, and the owner may raise the cap.
+- **The floors.** `BUILD_MACHINE_FLOOR` 500 (truth 51's form) and `CREWED_FLOOR_TICKS_S`
+  60 with the cap full hold under either road by the same margin as today; nothing here
+  lowers them. The crewed figures under load above (86 at six, 47 at twelve) are the
+  machine's and not the code's: 43's table has 56 and 34 for the same on the slower
+  machine, quiet.
+
+### 3.3 The pins
+
+The recorded passages pin the player's log's digest, line count and ticks: the gate 5a
+day, the three gate 5b passages, the merchant passage and the naval cruise, the 6a intent
+and fake-captain days, the five captain's trials, and the M7 truths' inline ticks (the first
+action's strike at 7560, the encounter, the convoy of four's hoist at 2866, the convoy of
+six's signal at 2760, the squadron promoted by 600, 7-155's line within a cable and a half).
+**The aim is none moved**, and the design keeps each by three rules, each a step's proof in
+part 4:
+
+1. **The followed hull's streams keep their names** (`rng.stream("muster")`, `"strain"`,
+   `"wind"`, `"weather"`, `"reckoning"`, `"business"`, `"gunnery"` unprefixed) and the other
+   hulls keep today's seeding (an `Rng` of her own seeded `(seed * 1009 + crc32(id))`,
+   made once at her first waking), so every draw the player's passage makes is the draw it
+   makes today, and a ship woken once in a passage draws what her promotion draws today.
+2. **The tick's two phases keep today's order of lines** (2.2): the bodies move in today's
+   order, the other hulls see and act, the far minute runs, the followed hull sees and acts
+   last; a line's tick cannot move unless the order does.
+3. **The player's vessel of the sea is appended last** to `world.vessels` and left out of
+   every viewer's own sail, so that the brains' nearest-first orders and the lookouts'
+   lists are what the shadow gave.
+
+What can move, and why, each a finding and not a regression: **a ship woken twice in one
+passage** draws her second waking from streams that continued (today she is re-mustered
+fresh), and her hands are tired by what they did: the trade trial's French brig if she is
+demoted and promoted again within it (the trial's as-merged record of 70 says she is
+crewed while chasing; whether she is demoted within the trial is the bisection's to say);
+**a crewed ship's own log** keeps the world's ticks, not ticks from her promotion (nothing
+pinned reads them: `test_crews.py`'s truth 89 reads the lines' kinds and words); **a
+sleeping hull's dealings** run where today a far ship waits twelve hours and vanishes:
+no recorded passage has a business ship reach her port and transact (the business is off
+in every recorded scenario, 43b), and the scenarios' own far ships with `trade` intents
+reach no port within their pinned spans (the Palinure in the cruise is a passage, not a
+trade). Under road B the same three rules apply to the sharing and the same findings
+follow; B has no new risk of its own, and no saving either, since the dangerous moves (the
+registry, the dealings, the far acts) are B's too.
+
+The checkpoint's classes: the three fixture saves (`tests/fixtures/saves/`, m5c, no crewed
+ship in any) load by `World.__setstate__`'s converter (2.2) and the tests
+`test_a_playtest_save_loads_from_its_checkpoint_and_runs_on_a_glass` and `..._watch` are
+the proof; the owner's eleven saves of 70 to 72 have crewed Worlds in them and are the
+converter's second test (the lead's, with the folder).
+
+### 3.4 What the consent brief's words assume
+
+`docs/agents/ConsentBrief.md` is read and not edited; these are its sentences that name
+"the ship" and what each would mean under the design, for package 55:
+
+- "*a captain, who commands a ship, the player's or another in the same world, with every
+  power a human player has at the prompt*": already the design's words; true today only
+  in the promotion's shape, true whole under it.
+- "*the ship's log, her readings, a reference library ... and tools to read those, to
+  give orders where the station allows*": true of a hull; "the ship" is the station's
+  hull, awake or asleep, and asleep the orders are the coarse forms. The brief says
+  nothing of a station whose ship's surface changes under it (43 built it under 40's
+  decision; the brief never said it): **a sentence for 55** that a station's ship may be
+  at full or at coarse detail by the game's budget and that its orders are refused in
+  words where she is coarse.
+- "*The officer of the watch stands in the place of one of the ship's officers*", "*The
+  captain stands in the place of the person who commands the ship*": true for any hull;
+  **the station bound to a person who moves between ships** (82, 74) is not in the brief
+  at all: a sentence for 55 that a station is a person's and follows him aboard another
+  ship or ashore, with the orders that place allows.
+- "*It gives no order to the world outside the ship (the weather, another ship, a port):
+  those are the scenario's and refused in words*": still true; a person's acts ashore (a
+  purchase, a word to a merchant, a thing taken) are his station's acts, not orders to
+  the world, and the brief's "a port" in that list means the port's stance and prices,
+  which stay the director's. Worth a clause for 55 so that "a port" is not read as "go
+  ashore".
+- "*A paused or silent lookout or master has its work done meanwhile by the ship's own
+  people*", "*the deck lent to its own book ... by the game's own rules in the captain's
+  place*": true for any hull; for a sleeping hull the rules in the captain's place are the
+  far brain's, which the brief need not name.
+- "*a passenger, who is aboard with no duty*": true aboard any hull; a person ashore with
+  no duty (the voice of 67, a person made ashore) is not "aboard": a word for 55.
+- "*a director, who sees the whole world, shapes events, and may seat models at the
+  stations of its ships*": under 2.10 an office is a station of the world and of no ship;
+  M8's package and 55's revision say so together, not 84.
+
+Nothing in the brief is made false by road A that road B keeps true; the two sentences 55
+wants (a station's ship coarse or full by the budget; a station following its person) are
+wanted by 82 and 74 under either road.
+
+### 3.5 What 82, 74, 75 and 77 gain or must wait for
+
+- **82 (the boat, the player aboard another ship)** gains most. Under road A its item 1
+  (the followed ship) is `world.followed` and the drivers reading it, a day's work on 84's
+  ground instead of the spec's "the World's construction assumes a ship in several
+  places"; its item 2 (a person aboard another ship, the seat following him) is the
+  registry's whereabouts and the station bound to the person, 84's; its item 3 (the replay
+  of a station on another ship) is the hull on the input, 84's; its items 4 and 5 (the
+  boat as a vessel, the oar force, the tow) are its own and unchanged: the boat is a small
+  hull, a vessel of the sea when away, awake under the cap like any, her file through the
+  generator. 82 after 84 is the boat, the oar force and the seat's words. Under road B, 82
+  pays the twenty-four assumptions of 3.1 itself.
+- **74 (prizes, the captive, the far fight)** gains the prize as a hull with a new nation
+  and the prize crew as persons whose home is the captor and whose whereabouts is the
+  prize (the registry), the captive as a person aboard the captor's hull with his station
+  following him and his voice heard by spot (66's line and hearing, no new channel), and
+  the far fight's damage written into a sleeping hull's parts as state (rule 1) where 70's
+  `Vessel.damage` sums it. 74 waits for 84 and 82 (the owner's order) and is simpler for
+  both; its consent draft (item 6) reads 3.4.
+- **75 (the ships)** waits for nothing: the files are the files; a sub-type's fit is the
+  hull's at her making, as the far record's `fit` is today.
+- **77 (the evolutions and the catalogue)** waits for nothing: the hands are the hull's;
+  the boarders' drill and the cutting out read 82's boat, as before.
+- **73 (building now)** is merged first (the owner's order): its water keeper "of every
+  World" becomes the hull's at 84's first step by a rename, and gains that a demoted
+  ship's water and wounded are no longer forgotten (1.7's 21).
+- **76, 79, 81** wait for nothing. **55** gains the two sentences of 3.4.
+
+### 3.6 The recommendation
+
+**Road A, one World with many crewed hulls, done once and now.** The reason in a
+paragraph: the four splits that make a person's acts possible anywhere (the ports'
+dealings, the persons' registry, hearing by the registry, the far brain's port acts) are
+the same work under either road and are the owner's acceptance test's hard steps; what
+road B saves by keeping two Worlds (the player's at the centre with her shadow, two clocks
+and two logs) is some 1,500 lines of the split and the drivers, and every one of those
+lines is paid again by 82's followed ship, whose first item is a world with no player's
+ship, which a parent World cannot be; the pace is the hull's and not the World's under
+either road (84 per cent the physics and the hands, under 3 per cent the bookkeeping), so
+A costs nothing in ticks and B saves nothing; the pins are kept by the same three rules
+under either; and A ends with the thirty-eight assumptions retired where B ends with
+twenty-four kept and a `CrewedWorld` that is a hull by a worse name. The owner's frame
+("a sweeping refactor on any large scale would be better to do sooner rather than later")
+is the lead's instinct, and the code agrees with both.
