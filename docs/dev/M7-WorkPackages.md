@@ -50,6 +50,7 @@ on these packages; that is the owner's choice.
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | briefed and launched 2026-10-27 (below), beside 73 |
 | 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | after 83 and the owner's reading; 73 and the owner's local work merged first |
+| 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
 | 81 | Opus | The viewer's action: the gun ports and the guns drawn with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
@@ -1087,3 +1088,63 @@ lead's reading; the intent binds; the study may take an item another way with it
 moved. **The head rules bind:** no model identifier in any file; the design note and the
 draft brief are the deliverables, committed on the study's branch and pushed to
 `claude/pkg-83` after each commit (the owner's permission of 2026-10-27).
+
+## Package 85: the orders, the primer and the library for a model reader (`docs/primer/*`, `docs/agents/Harness.md`, the library's topics (`freesail/agents/tools.py`, `data/director/` and the stations' briefs), `data/vocabulary.yaml` and `freesail/orders/` the grammar, `freesail/api/readings.py` the date and the war, `freesail/world/papers` and `data/papers/papers.yaml` the news of the war, `freesail/agents/harness.py` the stand-by's words and the action's severities; a new test over the primer and the library; `docs/dev/` a record of what was redacted and where it went; `docs/dev/TuningNotes.md`; tests beside each)
+
+Fable; a review that mends what it finds, by the owner's word of 2026-10-27, to run after
+83's design is read and beside or after 84 as the usage allows. The evidence: the owner's
+notes 3 to 6 (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/owner-notes-2026-10-27.txt`),
+the model officer's five friction points (`model-officer-review.md` beside it), the
+dispatches test's and the Roscoff station's findings in the tuning notes, and the owner's
+reading of the door logs (a model reasoning the war's state from the primer's pilot example;
+a model taking a primer's pilot's news as its own voyage's; a model calling out the wrong
+flag numbers from a generic signal page). Each item an intent with the lead's reading; the
+intent binds.
+
+1. **The rule, stated once and enforced.** The primer and the library are in-world documents
+   for whoever reads them, human or model, at any station, in any scenario, on any ship.
+   Nothing in them may be true only for one scenario, one signal book, one ship, one voyage
+   or one stage of the build: no particular signal book presented as the reader's (a general
+   page on signals says how a book is read and that the ship's papers hold hers); no pilot's
+   news, price or stranger given as if of the reader's own voyage unless marked as an example
+   and set apart; no reference to milestones, packages, gates, builders, the owner, the lead,
+   a model, an instance, a playtest or the development at all. **Redact aggressively**; what
+   is cut and still worth keeping (the examples from real voyages, the figures' provenance,
+   the history of a page) goes to a record under `docs/dev/` (for instance
+   `docs/dev/PrimerRedactions.md`) with the page it came from. A test over `docs/primer/` and
+   the library's rendered topics guards the rule by a list of forbidden words and patterns
+   (the milestone and package numbers, "the owner", "the lead", "builder", "playtest",
+   "gate", model and vendor names, the scenarios' names where not the primer's own worked
+   example) with an allow-list for the few words that are in-world too, and fails when one
+   returns.
+2. **Categorised, complete, correct.** The primer's chapters and the library's topics read
+   as one book: what a station may do, where to find each thing, the grammar in one place
+   with every order form the game accepts (the dialect's forms generated or checked against
+   the vocabulary by a test, so that no order the game takes is missing from the book and no
+   form the book gives is refused), the readings listed with what each answers, the events
+   and tripwires, the director's forms where the director's library is concerned; the voice
+   in one grammar (`hail the <sail> <words>` with the colon optional, `say to`, the lookout's
+   `hail`), and the briefs and tool descriptions telling a model that it may move about the
+   ship, eat, drink, read, say and say to, go ashore (the owner's note 3).
+3. **The date, and the war, as readings.** The date and the ship's time as a reading in
+   words (`the date`, in every sample's first line or on request; the owner's note 4); the
+   war's state as the ship knows it: the knowledge she sailed with (the nations' table as
+   of the scenario's start, in her papers) and every change the news brought in from a port
+   or a pilot logged in the papers as the prices are, readable as `the war` (note 5), never
+   deduced from a primer's example.
+4. **The stand-by's words, and the action's severities.** A reply that batches orders before
+   a `stand_by` says "not run" only of the calls after it, and names the ones that ran; in
+   action at 1x the discharges and the trim steps carry the severity that lets a stand-by on
+   "a notable event" wake for what matters (a hit, a strike, a change of state) and not for
+   every shot, with the owner's "the flow of the game through the log" as the measure, and
+   the same read for the human's log; the two signal books in the papers made one (the
+   ship's own; the generic page says whose it is not).
+5. **Found on the way, and the records.** Everything else the reading shows (the hail
+   resolving to a far lugger over the wreck in sight, the `captain: carry on` collision with
+   the director's form, `gybe the mainsail`'s answer); the record of redactions; the tuning
+   notes; the Harness; the suite as run (the fast tier, the slow tier of the touched files,
+   the whole slow tier when quiet, the pace tests alone and last).
+
+**Not done here:** the one-world refactor (84), the boat (82); any change to
+`docs/agents/consent/` or `docs/agents/ConsentBrief.md` (if the brief's wording offends the
+rule, say so for 55). **The head rules bind** as the briefs before have them.
