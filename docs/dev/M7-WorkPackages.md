@@ -48,8 +48,8 @@ on these packages; that is the owner's choice.
 | 79 | Opus | The regimes from 72; the chart's Mediterranean block | behind 72 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
-| 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | briefed and launched 2026-10-27 (below), beside 73 |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | after 83 and the owner's reading; 73 and the owner's local work merged first |
+| 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below), for the owner's eight decisions; 73 and the owner's local work merged first |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
 | 81 | Opus | The viewer's action: the gun ports and the guns drawn with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
@@ -1157,3 +1157,120 @@ intent binds.
 **Not done here:** the one-world refactor (84), the boat (82); any change to
 `docs/agents/consent/` or `docs/agents/ConsentBrief.md` (if the brief's wording offends the
 rule, say so for 55). **The head rules bind** as the briefs before have them.
+
+## Package 84: the one-world refactor (`freesail/world/hulls.py` new, the Hull; `freesail/core/world.py` the World split and the two-phase tick; `freesail/world/crews.py` the switch alone, `CrewedWorld` retired; `freesail/world/people.py`, `hearing.py`, `movement.py`, `things.py`, `stations.py` one registry of persons and things with the whereabouts; `freesail/world/ports.py` and `dealings.py` new, the ports' half and the hull's half; `freesail/world/ships.py`, `brains.py`, `squadrons.py`, `signals.py`, `signalling.py`, `hail.py`, `combat/action.py` the player's vessel of the sea and `PLAYER_ID` one rule; `freesail/world/business.py`, `data/business.yaml` the far trader's transaction; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the forms with a hull and the truth over the hulls; `freesail/api/readings.py` the station line and the truth; `freesail/agents/harness.py`, `remote.py`, `tools.py`, `seats.py` the hull in the World's place; `freesail/core/replay.py`, `acts.py` the hull on the inputs, the save's hulls block, the checkpoint's converter; `freesail/ui/server.py`, `console.py`, `harbour.py` the followed hull; `docs/TechnicalSpec-M6.md` §19 and §20, `docs/TechnicalSpec-M7b.md` §11, §12 and §12b "as built" pointers; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` the acceptance test as a truth numbered after 73's)
+
+Fable; the refactor of decision 52 on package 83's design (`docs/design/Design-OneWorld.md`:
+the world as it is in its part 1, the design in its part 2, the roads costed in its part 3,
+the steps in its part 4, the findings and the owner's decisions in its part 5), run after
+73 and the owner's local work are merged and after the owner has read the study and taken
+its part 5's decisions (each item below says which it waits on). The intent: **one World
+that the player is in and so is everyone else**; a ship at full detail a `Hull` of that
+World with her own people, places, bill, log and stations, the player's ship one such
+hull, the ports, the persons ashore, the things, the markets, the business, the weather,
+the sets, the chart and the director's hand the world's once; a hull awake under the
+physics or asleep under the plan with her state kept, the cap deciding which wake and
+nothing dropped at the switch; a person's coarse acts possible anywhere; the leaders'
+offices left room for. **Generously scoped as 70 to 73 were:** the brief binds the intent
+and names the ground, the builder designs within the study's design, takes a step another
+way with its reason (the study's "what was rejected" read first), grows a part where the
+work shows it should, and says what it left and why; no day count. **Each item is a step
+of the study's part 4: a mergeable state with the whole suite passing and the pins
+standing**, one commit on the branch that reverts whole, pushed to `claude/pkg-84` after
+each, so that the lead may merge in parts; the pace truths alone and last at every step,
+`tools/pace.py` at steps 5, 6 and 7 with the figures beside the study's 3.2. The study's
+three rules for the pins (the followed hull's streams unprefixed and the other hulls seeded
+as today, the tick's two phases, the player's vessel last) bind; a pin that moves is proven
+by bisection and restored by the order, never re-pinned for the order's sake; the few that
+may move as findings (a ship woken twice; a crewed log's ticks) are named with why. Each
+item an intent with the lead's reading; the intent binds.
+
+1. **The Hull extracted behind the World's names (step 1).** `hulls.Hull` with every
+   per-ship field and method the study's 1.1 lists; `World` keeping the shared fields and
+   `world.own`, every per-ship attribute of `World` a property to it; the tick's order
+   untouched; `CrewedWorld` untouched; 73's water and muster's states per hull by the
+   rename; the checkpoint's converter (`World.__setstate__`) so that the three fixture
+   saves and the owner's load by the checkpoint road. *The lead's reading:* pure
+   delegation, no pin moves, the proof the slow tier whole; the ground of everything, done
+   alone and first.
+2. **One registry of persons and things, the whereabouts, hearing by spot (step 2).**
+   `People` on the World; `Person.aboard` the hull's id, `Person.home`; the company and the
+   aboard as views; the things on the registry; `hearing.spot_of` with the hull; the moves
+   writing the whereabouts; the crewed World's `people` the parent's registry filtered to
+   her. *Reading:* the acceptance test's step 5 and 6 ground; a world in which nobody
+   moves is as it was (53's rule); `People.find` scoped to the hull then the world.
+   *Parallel with item 3.*
+3. **The ports split: `Ports` the world's, `Dealings` the hull's (step 3).** The port
+   files, markets, stances (`stance(port, nation)`), blockades, tracks, yards, pools and
+   the jobs of every hull in `Ports`; the pilot and his conn, the cutter, the boat and its
+   errands, the price lists, `lay_in`, `trade`, `trade_list`, `enter_hands` in a hull's
+   `Dealings`; the crewed World given the parent's `Ports` and her own `Dealings`, so that
+   the tender goes ashore at full detail. *Reading:* the largest file; the player's dealings
+   the same state in another class; the passages' pilot lines at their ticks the proof.
+   *Parallel with item 2.*
+4. **The coarse acts on a sleeping ship, and the far brain's port acts (step 4).**
+   `submit_far` routing by "needs no physics" (the person's acts, the port's acts, the free
+   lines, the conversation, the signals through the grammar; the plan's words to
+   `far_order`); `far_order`'s course by the port's track and under the land guard; the far
+   brain transacting at her port under `data/business.yaml`'s `transact:` knob (the owner's
+   decision 5); `shape_words` naming the coarse forms. **The owner's acceptance test as a
+   truth here**: a fake captain of the tender ordered from Torbay to Plymouth by signal,
+   by the track, ashore to a person made there, back with a thing, home within hail, the
+   lugger passed and not fought until 74. *Reading:* how far the acts go is the owner's
+   decision 1, recommended whole; the business off in every recorded scenario, so no pin.
+5. **The ship persists: sleep and wake in place of drop and remake (step 5).** The
+   demotion a sleep with the physics off, the promotion a wake without remaking her ship,
+   a hull made once and her `Rng` made once; `Vessel.damage` from the parts at sleep; the
+   checkpoint's bound stated per hull (the owner's decision 2 on which logs are kept).
+   *Reading:* a ship woken twice may move as a finding; truth 88's pace with the sleeping
+   Worlds beside.
+6. **The Hull the container; `CrewedWorld` retired; the two-phase tick (step 6).** One
+   clock; her own log; `World.tick` over `world.hulls` in the study's two phases (the
+   bodies move, the other hulls see and act, the far minute, the followed hull last);
+   `tick_hulls`, `all_agents`, `Harness(hull)`, `hull_for`, `hand` one road, `hull.vessels`;
+   the hull's own sea, motion and conditions at her place (the study's findings 5 and 6).
+   *Reading:* the one step where a pin can move for the order's sake, and the order is
+   the mend; `CrewedWorld` kept as a name for the unpickler alone.
+7. **The player's ship a hull among the hulls; the shadow retired (step 7).**
+   `world.followed`; the player's `Vessel` of the sea appended last; `strangers_of(viewer)`;
+   the sixty-six `PLAYER_ID` cases one rule and `PLAYER_ID` defined once; a hull at anchor
+   or in port awake under the cap's order with the stationed hull first (the owner's
+   decisions 3 and 6). *Reading:* 82's followed ship and 74's captive become simple here;
+   the nearest-first orders by the study's rule 3.
+8. **The save and the replay of many hulls (step 8).** The hull on each input, the save's
+   `hulls` block, `_give` and `acts.give` to the hull, a hull made in play re-made in the
+   replay at its tick, the converter completed for a checkpoint with `CrewedWorld`s (the
+   owner's eleven saves of 70 to 72). *Reading:* 43's left-undone closed (a save with a
+   model captain of another ship replays her orders); parallel with item 7.
+9. **The director's reach and the truth over the hulls (step 9).** The forms with a hull
+   (`aboard the Raven: ...`, the followed when none is named; `person: ... aboard the
+   Raven`; `say as` anywhere by spot; `message: ... to the Raven`); the truth walking the
+   hulls, their people, purses, cargoes, guns, damage and water, and the persons ashore;
+   `read_log ship=` of a hull's log (§12b's ground); the seat at a person aboard any hull;
+   the director's library and `WORLD_ORDER_FORMS` with every example performed. *Reading:*
+   parallel with item 10.
+10. **The drivers follow a hull; the offices' room (step 10).** `state()`, the chart and
+    the prompt reading `world.followed`; `follow "X"` as a driver's line and `followed`
+    None answered "no ship followed" (82's §11 words; the rest of §11 82's); the stations'
+    registry and the harness taking a domain, an office's shape as a stub and no office
+    built (the owner's decision 4: M8's); the world orders' purview hook. *Reading:*
+    parallel with item 9.
+11. **The long tail, the words and the records (step 11).** `shape_words`, `seats.py`'s
+    and `agent.py`'s "the player's ship"; the Harness doc; the primer's chapters on the
+    promotion and the other ship's captain; spec M6 §19 and §20 and M7b §11, §12 and
+    §12b "as built" pointing to the study; `crews.py`'s head; the tuning notes (the design's
+    pointer, each step, the pace figures beside the study's, what moved and its proof by
+    bisection, the pins old beside new, found on the way, decisions, the suite as run);
+    the `world` to `hull` rename only where a step touched a consumer.
+
+**Not built here:** the boat as a vessel, the oar force, the tow and the seat's words for a
+person who moves between ships (82, re-briefed on this ground); the prize, the captive's
+channel and the far fight wired (74); any office of the leaders (M8; the domain, the
+whereabouts and the purview hook are this package's); the business peopling a region
+where a stationed hull goes (the owner's decision 7, a later knob); a vectorised many-hull
+physics (not wanted). **The head rules bind** as the briefs before have them: no model
+identifier; nothing under `docs/agents/consent/` or in `docs/agents/ConsentBrief.md`
+touched (the study's 3.4 is 55's); a world order never shown as sent; the ship files
+untouched; the pins re-measured only where a change moves them, old beside new, proven by
+bisection; never a test skipped, disabled or quarantined; realism, not pacing; the physics
+read and not changed; each step a green mergeable state pushed to `claude/pkg-84`.
