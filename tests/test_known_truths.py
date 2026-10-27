@@ -9577,7 +9577,8 @@ def test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_c
     down between three quarters of an hour and three after the first shot); what changed
     is said: both captains serve out the small arms on entering the action (their
     doctrines' `board_odds` above nought); the privateer's captain has the carpenter plug
-    her shot holes and mans the pumps at the doctrine's foot of water; her bill counts the
+    her shot holes under water and mans the pumps at the doctrine's foot where the well
+    asks it; her bill counts the
     killed and the wounded by their states and the butcher's bill is said ten minutes after
     the last shot; the next morning she buries her dead. The minute itself moved from 71's
     11:12 (docs/dev/TuningNotes.md, package 73: the bisection names which item)."""
@@ -9607,8 +9608,11 @@ def test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_c
         or w.ship.extra["musketry"].served
     )
     assert events(enemy, "small_arms.served")
-    assert any("Plug the shot holes" in e.text for e in enemy.log)
-    # the pumps at the doctrine's foot of water, or the well never there
+    # the carpenter to the holes under water where there are any (at this seed her seven
+    # lie above it), the pumps at the doctrine's foot of water or the well never there
+    under = [h for h in enemy.ship.extra["damage"].holes if float(h.get("z_m", 1.0)) < 0.0]
+    if under:
+        assert any("Plug the shot holes" in e.text for e in enemy.log)
     assert events(enemy, "pumps.manned") or enemy.water.depth_m() < 0.3
     bill = enemy.readings.words("bill")
     assert "killed" in bill or "wounded" in bill

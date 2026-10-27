@@ -9919,8 +9919,9 @@ on entering the action** (`board_odds` above nought in the King's ship's and the
 doctrines): the gunner's party of six leaves the guns for five minutes at the start, and the
 small-arms men fire at will within a cable thereafter, which with 70's cutters of thirty men
 each slows the King's cutter's first broadsides and lengthens the action by half an hour. The
-pumps and the carpenter (her holes plugged at 10:50, her pumps manned at the doctrine's foot)
-move it three minutes more. The pin is re-measured in 7-183 as the band and the new lines, the
+pumps and the carpenter move it three minutes more (in the runs with the small arms off her
+holes were plugged at 10:50 and her pumps manned at 11:04 with the well at 0.31 m; in the
+whole package's run her seven holes lie above the water and neither is wanted). The pin is re-measured in 7-183 as the band and the new lines, the
 old minute beside the new here; the choice to keep the serve-out is realism's (both ships would
 arm before an action) and the owner may turn it off per role by `board_odds: 0`.
 
