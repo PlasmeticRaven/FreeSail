@@ -576,3 +576,23 @@ def test_no_file_of_the_repository_holds_the_shape_of_a_key():
                 found.append(f"{name}: {m.group(0)[:12]}...")
     assert found == []
     assert re.search(api.KEY_SHAPES[0], KEY)  # the shapes find a key of the shape
+
+
+def test_the_terminal_says_a_fold_only_for_the_handover_and_not_for_a_sample_added():
+    """The playtest of 2026-10-27: the door's terminal said "The conversation was folded"
+    at every event that came while the model's turn was open. A sample added to the open
+    turn is marked `folded` too (`Harness._fold`), and folds nothing away; only the
+    handover's fold, which replaces the older exchanges by the note, is said."""
+    said: list[str] = []
+    m = api.ApiModel(MODEL, KEY, say=said.append, client=object())
+    m.last_prompt = 32212
+    added = Turn(DATA, {"tick": 60, "stamp": "Morning watch (05:00)", "folded": "added"})
+    turns = [Turn(OPERATOR, "the brief"), added]
+    m._say_folds(turns)
+    assert said == []
+    handover = Turn(
+        DATA,
+        {"tick": 120, "stamp": "Morning watch (05:01)", "handover": "All quiet.", "folded": "x"},
+    )
+    m._say_folds([*turns, handover])
+    assert len(said) == 1 and said[0].startswith("The conversation was folded at Morning watch")

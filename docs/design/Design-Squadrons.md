@@ -275,7 +275,7 @@ commander promoted keeps his intent as now and the set's minute runs through his
 costs six station legs a minute (arithmetic) and one brain; six on six at far detail is
 measured early against the frigate alone and the dozen far ships, and again at the end,
 and under the cap of three and with the cap raised to twelve (the owner's baseline) by
-`tools/pace.py squadrons`, with the figures in the tuning notes and truths 7-161 and 7-162
+`tools/pace.py squadrons`, with the figures in the tuning notes and truths 7-159 and 7-160
 asserting the conftest's floors (`BUILD_MACHINE_FLOOR` at far detail, `CREWED_FLOOR_TICKS_S`
 under the cap), not lowered.
 

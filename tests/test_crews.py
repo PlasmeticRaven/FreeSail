@@ -381,3 +381,45 @@ def test_the_crewed_budget_is_a_setting_of_the_scenario_or_the_flags():
         K.crewed_settings_of({"range_nm": 0})
     with pytest.raises(ValueError):
         K.crewed_settings_of("three")
+
+
+def test_a_door_on_another_ship_reads_its_turns_again_after_a_book_is_shelved(tmp_path):
+    """The playtest of 2026-10-26: the captain of a cutter beside the player's ship
+    shelved a book over MCP; the shelve moved the stream's revision, the door read its
+    turns again (`GameClient.reread`) without naming the ship, the game answered that it
+    held no captain's station, and the bridge asked for the station again in place of the
+    shelve's result. The read again names the ship as every other call does."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.agents import consent
+    from freesail.agents.model import Reply, ToolCall
+    from freesail.agents.remote import GameClient
+    from freesail.ui.server import Driver, create_app
+
+    w = hove_to_world()
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    assert b.crew is not None and b.crew.shape == "full"
+    records = tmp_path / "consent"
+    records.mkdir()
+    weights = "made-up-crew-model-9b.Q4_K_M.gguf"
+    consent.Record(
+        weights, "a test runtime", "2026-10-16", consent.YES, answer="Yes.", drill="passed"
+    ).write(records)
+    driver = Driver(w, compression=60.0)
+    app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
+    with TestClient(app) as http:
+        game = GameClient("http://testserver", "captain", http=http, ship="X")
+        a = game.station(weights, "mcp")
+        assert a["phase"] == "station" and game.key
+        game.reply(Reply(calls=(ToolCall("library", {"topic": "primer 3", "section": "reefing"}),)))
+        assert not game.stale
+        game.reply(Reply(calls=(ToolCall("shelve", {"book": "book 1"}),)))
+        assert game.stale  # the shelve changed a turn the door had read
+        turns = game.reread()  # named the player's ship's captain before the fix: a 404
+        assert turns and not game.stale
+        assert "captain" not in w.agents and b.crew.agents["captain"].agent.released is False
+        game.release("the test is done")

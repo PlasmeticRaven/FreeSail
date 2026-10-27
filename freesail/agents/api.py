@@ -760,7 +760,12 @@ class ApiModel:
         start = max((i for i, t in enumerate(turns) if t.role == OPERATOR), default=0)
         for t in turns[start:]:
             c = t.content
-            if t.role != DATA or not isinstance(c, dict) or "folded" not in c:
+            # the handover's fold only: a sample added to the open turn is marked `folded`
+            # too (`Harness._fold`), and folds nothing away (the playtest of 2026-10-27: the
+            # terminal said "folded" at every event that came while the turn was open)
+            if t.role != DATA or not isinstance(c, dict) or not c.get("handover"):
+                continue
+            if "folded" not in c:
                 continue
             key = (c.get("tick"), str(c.get("handover") or "")[:200])
             if key in self._folds_seen:

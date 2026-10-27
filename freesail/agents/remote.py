@@ -1539,7 +1539,7 @@ class GameClient:
         (a turn it had read has changed: a book shelved, `revision` moved); the cursor
         does not move, so what lies past it is read on as before. A door replaces its
         copy with these."""
-        params = {"since": self.origin, "wait": 0, "key": self.key}
+        params = {"since": self.origin, "wait": 0, "key": self.key, **self._ship_param()}
         answer = self._request("GET", f"/api/agents/{self.name}/turns", params=params)
         self.revision = int(answer.get("revision") or 0)
         self.stale = False
