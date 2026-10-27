@@ -1115,3 +1115,274 @@ under either; and A ends with the thirty-eight assumptions retired where B ends 
 twenty-four kept and a `CrewedWorld` that is a hull by a worse name. The owner's frame
 ("a sweeping refactor on any large scale would be better to do sooner rather than later")
 is the lead's instinct, and the code agrees with both.
+
+## 4. The migration in steps that keep the suite green
+
+Eleven steps, each a mergeable state with the whole suite passing and the pins standing
+(or the few that may move named with why and proven by bisection), each one commit on
+84's branch that reverts whole, so that the lead may merge 84 in parts and sibling
+builders may take the steps marked parallel. The ground: 73 merged and the owner's local
+work merged first (the owner's order); 73's water keeper and muster's states ride through
+step 1 by a rename. The pace truths (88, 7-138, 7-151, 7-159, 7-160) run alone and last at
+every step; `tools/pace.py` at steps 5, 6 and 7 with the figures in the tuning notes
+beside 3.2's.
+
+**Step 1. The Hull extracted behind the World's names.** `freesail/world/hulls.py` new:
+`Hull` with every per-ship field of 1.1 and the methods that work them (`submit`,
+`record`, `readings`, her `_tick_*`); `World` keeps the shared fields and `world.own`,
+the followed hull, and **every per-ship attribute of `World` becomes a property to
+`own`** (with setters), `World.tick` unchanged in its order and calling the hull's parts;
+`CrewedWorld` untouched (a World, so it gets an `own` too). 73's `water` per hull by the
+rename; `ship.extra` keys as they are. *Files:* `core/world.py`, `world/hulls.py`,
+`core/replay.py` (`_rebind`, `World.__setstate__`'s converter lifting an old checkpoint's
+fields into `own`), `tests/test_core.py`, `test_checkpoint.py`. *Tests:* the whole suite;
+every pin holds (pure delegation; the proof is the slow tier whole). *Risk:* the
+checkpoint's shape (the three fixtures and the owner's saves are the test); a property
+missed. *Rollback:* the one commit. *Parallel:* none; the ground of all that follows.
+
+**Step 2. One registry of persons and things, the whereabouts, hearing by spot.**
+`people.py`: `People` on the World, `Person.aboard` the hull's id, `Person.home`, the
+company and the aboard as views (`hull.company`, `hull.aboard`), `People.build_company(hull)`
+from her muster and wardroom file, the things on the registry; `hearing.spot_of` with the
+hull in the spot; `movement.go_ashore`, `come_aboard`, `by_waterman` writing the
+whereabouts; `stations.holder` by the company view; the CrewedWorld's `people` **the
+parent's registry filtered to her** (the first sharing). *Files:* `world/people.py`,
+`hearing.py`, `movement.py`, `things.py`, `stations.py`, `seats.py`, `orders.py`
+(`_make_person`, `_move_person`, `say_as`), `api/readings.py` (`station_line`),
+`crews.py`; `tests/test_people.py`, `test_orders_places.py`, `test_tell.py`,
+`test_director.py`, `test_crews.py`. *Tests:* a person of the tender's company ashore at
+Falmouth hears the player's Mr Gill at the counting house and takes a thing from him; a
+world in which nobody moves is as it was (53's rule). *Pins:* none (the registry's order
+keeps the player's company first; `People.find` scoped to the hull then the world).
+*Risk:* two ships' men of one name (the names are drawn per ship). *Rollback:* the one
+commit. *Parallel with step 3.*
+
+**Step 3. The ports split: `Ports` the world's, `Dealings` the hull's.** `world/ports.py`
+keeps the port's half (2.4; `stance(port, nation)`); `world/dealings.py` new takes the
+hull's half (`hull.dealings`: the pilot and his conn, the cutter, the boat, the jobs, the
+price lists, `lay_in`, `trade`, `trade_list`, `enter_hands`); `Ports.tick` runs every
+hull's jobs; the CrewedWorld's `ports` **the parent's** with her own `Dealings` (the second
+sharing: **the tender goes ashore at full detail here**). *Files:* `world/ports.py`,
+`world/dealings.py`, `world/books.py`, `orders/port.py`, `world/movement.py`,
+`world/things.py`, `world/business.py` (`port_means_pounds`), `api/readings.py`,
+`crews.py`; `tests/test_ports.py`, `test_business.py`, `test_orders_places.py`, the
+passages. *Tests:* the gate 5b and 5c passages and the trials whole (the pilot's lines at
+their ticks); a crewed stranger in Carrick Road sends her own boat for the prices and the
+player's boat is where it was. *Pins:* none (the player's dealings are the same state in
+another class). *Risk:* the largest file; the conn's class defaults for the checkpoint;
+`declined_until` and the price lists per hull. *Rollback:* the one commit. *Parallel with
+step 2.*
+
+**Step 4. The coarse acts on a sleeping ship, and the far brain's port acts.**
+`crews.submit_far` widened to route by "needs no physics" (the person's acts, the port's
+acts, the free lines, the conversation, the signals through the grammar with the
+`Dealings` and the registry; the plan's words to `far_order`); `far_order`'s `shape a
+course for <port>` by the port's track and under `land_crossing`; `FarCaptain._in_port`
+transacting (a far trader sells and buys at her port by `Dealings.trade`'s code; the
+watering by the needs' rule) under `data/business.yaml`'s `transact:` knob; `shape_words`
+naming the coarse forms. *Files:* `crews.py`, `brains.py`, `business.py`,
+`data/business.yaml`, `data/captains/*.yaml` (when a captain waters), `orders/__init__.py`;
+`tests/test_crews.py`, `test_brains.py`, `test_business.py`. *Tests:* **the owner's
+acceptance test as a truth** (a fake captain of the tender ordered to Plymouth from
+Torbay by signal, by the track, ashore to a person made there, back with a thing, home
+within hail; the lugger passed and not fought until 74); a far trader at her port moves the
+market's supply. *Pins:* none (the business is off in every recorded scenario; the
+scenarios' far traders reach no port in their pinned spans, proven by the slow tier).
+*Risk:* the grammar's routing (a reading taken for an act). *Rollback:* the one commit.
+*Depends on 2 and 3.* **The acceptance test first passes whole here**, in the old
+container, coarse.
+
+**Step 5. The ship persists: sleep and wake in place of drop and remake.** `demote` no
+longer drops the World but puts it to sleep (`far_tick` the sleeping tick, the physics
+off); `promote` of a ship with a World wakes it without remaking her ship (`_to_full` keeps
+the parts, `_set_sail` only where the plan changed her sail state); `make_hull` once per
+ship; `Vessel.damage` written from the parts at sleep; her `Rng` made once at her first
+waking and kept. *Files:* `crews.py`, `ships.py`, `combat/far.py`; `tests/test_crews.py`,
+`test_checkpoint.py` (the bound raised with the sleeping hulls and said). *Tests:* a
+ship demoted with a shot hole and three wounded wakes with them; truth 88's pace with the
+sleeping Worlds beside. *Pins:* **a ship woken twice in a passage may move** (3.3), named
+by the bisection; expected none in the recorded passages. *Risk:* memory (80 KB a hull);
+the rng's continuity. *Rollback:* the one commit. *Depends on 4.*
+
+**Step 6. The Hull is the container; `CrewedWorld` retired.** `make_hull` makes a `Hull`
+of the one World (the shared fields delegating to it: **one clock**, her own seeded `Rng`
+kept, her own `hull.log`); `World.tick` in the two phases (2.2) over `world.hulls`;
+`Vessels.tick_crews` → `tick_hulls`; `all_agents` over `world.hulls`; `Harness(hull)`;
+`Desk.station` → `hull_for`; `hand` one road; `CrewView` → `hull.vessels`; `CrewedWorld`
+kept as a name for the unpickler alone. *Files:* `crews.py`, `hulls.py`, `core/world.py`,
+`ships.py`, `agents/harness.py`, `remote.py`, `tools.py`, `seats.py`, `api/queries.py`,
+`ui/harbour.py`; the tests beside. *Tests:* the whole slow tier for the two-phase order
+(the first action's strike at 7560, the encounter, the trials' digests, 7-155's promotions
+by 600, the convoy of four's hoist). *Pins:* none if the order is kept; **this is the one
+step where a pin can move for the order's sake**, and a moved pin is restored by the
+order, never re-pinned. *Risk:* the order; a harness reading `world.clock` where the hull's
+log's ticks were hers. *Rollback:* the one commit. *Depends on 5.*
+
+**Step 7. The player's ship a hull among the hulls; the shadow retired.** `world.followed`;
+`world.own` → `world.hulls[followed]`; the player's `Vessel` of the sea made at the start
+and **appended last**; `strangers_of(viewer)` leaving the viewer's own out; the sixty-six
+`PLAYER_ID` cases one rule (`vessel.hull`); `squadrons._body`, `action._body_of`,
+`signals.own_id`, `player_locker`, `hail.player_hailed` the hull's; `PLAYER_ID` defined
+once in `ships.py` as the followed hull's vessel id. *Files:* `ships.py`, `squadrons.py`,
+`combat/action.py`, `signals.py`, `signalling.py`, `hail.py`, `brains.py`, `orders.py`,
+`api/squadron_readings.py`, `action_readings.py`; the tests beside. *Tests:* the whole
+slow tier (the nearest-first orders by 3.3's rule 3). *Pins:* none if the player's vessel
+is last. *Risk:* a lookout seeing its own hull; the set with the player as commander.
+*Rollback:* the one commit. *Depends on 6.* **82's followed ship and 74's captive become
+simple here** (the followed hull a pointer; a person aboard any hull with his station).
+
+**Step 8. The save and the replay of many hulls.** The hull on each input, the save's
+`hulls` block (agents, stations, standing orders, log), `_give` to the hull, `acts.give`
+by hull and station, a hull made in play re-made in the replay at its tick, the converter
+completed for a checkpoint with `CrewedWorld`s in it (the owner's saves). *Files:*
+`core/replay.py`, `core/acts.py`, `core/world.py` (`save`), `agents/harness.py`
+(`take_up_after_replay`), `ui/console.py`, `ui/server.py` (the load); `tests/
+test_replay.py`, `test_checkpoint.py`, `test_crews.py`. *Tests:* a save with a fake
+captain of the tender replays her orders to the same digest (43's left-undone closed); the
+owner's `m7-cutter-tender-test` save loads. *Pins:* none. *Risk:* the acts' keying; a
+replay that makes a hull by an act at the right tick. *Rollback:* the one commit. *Depends
+on 6; parallel with 7.* **82's replay of a station on another ship is done here.**
+
+**Step 9. The director's reach and the truth over the hulls.** The forms with a hull
+(`aboard the Raven: ...`, the followed when none is named; `person: ... aboard the Raven`;
+`say as` anywhere by spot; `message: ... to the Raven`), the truth walking the hulls and
+the persons ashore, `read_log ship=` of a hull's log, the seat at a person aboard any hull
+(67's refusal lifted), the harbour's doors as now. *Files:* `orders.py`,
+`agents/director.py`, `data/director/`, `api/readings.py`, `seats.py`, `agents/tools.py`;
+`tests/test_director.py`, `test_world_orders.py`, `test_seat_hook.py`. *Tests:* every form's
+example by dry run; the director reads the Raven's log from Plymouth. *Pins:* none.
+*Rollback:* the one commit. *Depends on 7 and 8; parallel with 10.*
+
+**Step 10. The drivers follow a hull; the offices' room.** `ui/server.state()`, the chart,
+the console's prompt read `world.followed`; `follow "X"` as a driver's line and `followed`
+None answered "no ship followed" (82's §11 words, the rest of §11 82's); the stations'
+registry and the harness take a domain (a hull; an office's shape as a stub, no office
+built); the world orders' purview hook (`by` with a purview the director's passes whole).
+*Files:* `ui/server.py`, `ui/console.py`, `ui/harbour.py`, `world/stations.py`,
+`agents/harness.py`, `agents/agent.py`, `world/orders.py`; `tests/test_server.py`,
+`test_console.py`. *Pins:* none. *Rollback:* the one commit. *Depends on 7; parallel with
+9.*
+
+**Step 11. The long tail and the words.** `shape_words`, `seats.py`'s and `agent.py`'s
+"the player's ship", the Harness doc (`docs/agents/Harness.md` §21's seat on another
+ship), the primer's chapters on the promotion and the other ship's captain, spec M6 §19
+and §20 and M7b §11, §12 and §12b "as built" pointers to this note, `crews.py`'s head,
+the tuning notes; the `world` → `hull` rename in a consumer only where the step touched
+it. *Pins:* none. *Depends on all.*
+
+The suite is run as the briefs have it at each step: the fast tier, the slow tier of the
+touched files, the whole slow tier when the machine is quiet, the pace tests alone and
+last. The budget: steps 1 to 7 are one Fable package in sequence (steps 2 and 3 by two
+siblings if the owner wants the week spent faster), 8 to 10 three siblings, 11 the lead's
+or the package's last day; the whole about the size of package 70 (3.1).
+
+## 5. Found on the way, and the open decisions
+
+### 5.1 Found on the way, not the seam's
+
+For the lead, each wrong today whichever road is taken:
+
+1. **The convoy's stall** (the owner's note 1) is not reproduced here (no code was run but
+   the measures); the place to look is the near `keep station` order
+   (`orders/station.py`) shaping a course for the flag's bearing with the helm's `full
+   and by` under it: a flag dead to windward puts the course inside the close-hauled angle
+   and nothing bears her away to fill when she loses way; the far body's `_course_for`
+   lays a beat for the same case and the near order should read the same law (58b's).
+2. **The colours flickering under fire** (the owner's debrief): `signalling.far_minute`
+   judges the false colours by doctrine every minute, so a privateer that has shown her
+   true colours before an enemy shows the false ones again at the next minute; one rule
+   (her true colours once shown before an enemy are held) in 71's privateer doctrine.
+3. **A seat on a ship at anchor is crewed for a minute and demoted** (`station_world`
+   reads no state; `switch` does), and the model is told she is "beyond the range of the
+   player's ship" at two cables (`shape_words`, `FAR_SHAPE_REFUSAL`): false words. Step
+   4's `shape_words` mends the words; step 5 the flap.
+4. **A far ship's `shape a course for <place>` lays one straight leg with no land guard
+   and no port track** (`crews.far_order`), so a seated captain of a far ship, or the
+   director's hand, sends her across a cape; the business's ships go by `_approach` and
+   `_out_of_port` and the guard. Step 4's.
+5. **A crewed firer has no roll** (`_crew_scenario`'s `sea=False`, so `motion` is None and
+   `action.firer_state` reads `roll_deg` nought): the privateer's gunnery is scattered by
+   nothing where the player's is scattered by the sea (70's hit model, `S.steadiness`).
+   The hull's own sea and motion at her place (2.2) mend it at step 6; until then a
+   finding for 70's tuning notes.
+6. **Every far captain perceives the player's sky and visibility** (`perceive_vessel`
+   reads `world.conditions`): a cruiser off Ushant sees by the fog at the Lizard. Step 6's
+   `conditions_at` per hull mends the hulls; the hull-less far bodies want
+   `systems.conditions_at` at their own plane point once a minute (cheap; 3.2's
+   `_observe_weather` is 0.1 per cent of a tick).
+7. **A far trader reaching her port vanishes** (`FarCaptain._in_port`: `vessel.done`)
+   instead of turning round, so the business's "so many ships going about their business"
+   is a stream of ships coming in and never going out but by the draw: step 4's
+   transaction and a return cargo mend it, under the knob.
+8. **`PLAYER_ID` is defined three times** (`brains.py`, `squadrons.py`,
+   `combat/action.py`) with the same string; one import at step 7.
+9. **A save with a model captain of another ship replays without her orders** (1.5): the
+   owner's tender saves replay by their checkpoints alone; step 8's.
+10. **`vessel.crew` and `ship.crew`** are two things (a World and a muster) under one
+    name, which the count of 1.8 had to tell apart by hand; `Vessel.hull` at step 5.
+11. **The hand's hold converted between two clocks** (`_hand_crewed`, `fold_in`,
+    `fold_back`): correct today, a standing source of off-by-a-tick faults until step 6
+    gives one clock.
+12. **The demotion forgets the wounded** (70's casualties, 73's states, the water): a
+    ship that fought the player, was demoted and came back is whole again. Step 5's.
+13. **A crewed ship holds no captured signal book** (`_crew_scenario`'s `papers={}` and
+    `held_books`): right until 74's prize, when her papers must be hers; step 1's `papers`
+    per hull.
+14. **`tools/pace.py` and truth 7-159's docstring say `py`**, the Windows launcher; on the
+    build machine it is `python3`: the docs' words.
+15. **`test_checkpoint`'s bound** of 2 MB on a checkpoint is one world's; it moves with
+    the hulls kept (3.2) and should be stated per hull.
+16. **The owner's notes 4 and 5** (the date and the war's state as readings) are the first
+    reviewer's and not the seam's; they are easier per hull (the papers and the news are
+    the hull's knowledge) and should be built after step 1.
+
+### 5.2 The decisions only the owner can take
+
+Each with the study's recommendation.
+
+1. **How far a far person's acts go in the first step (step 4).** *Recommend* the whole
+   of 2.5's table at once: going ashore and coming aboard, the waterman, the port's places,
+   the prices by the boat, buying and selling with the lighter, watering and victualling at
+   the yard by its time, the hands entered, speaking and the free lines, a letter sent; the
+   yard's repair of a sleeping hull coarse (by the parts' condition and the yard's time) and
+   the pilot as a job that brings her to the anchorage at the track's time without the
+   conn. Each is a job on a timer or a move in the registry and costs nothing a tick; the
+   owner's note 11 asks for "the important interactions and information" and this is
+   their list.
+2. **Whether a hull's log is kept for every ship or only for ships with a stationed
+   person.** *Recommend* every hull keeps her log while she exists (80 KB a hull with a
+   day's log; the director's `read_log ship=` and `focus` want it; a ship that fought the
+   player should remember it), a ship with no hull keeps her short story, and a hull
+   `done` is dropped with her log unless a station was ever held on her, when the log goes
+   to the save. The save grows to a few megabytes in a long game; the bound of 5.1's 15 is
+   stated per hull.
+3. **The pace bound he accepts.** *Recommend* the cap stays three on the build machine's
+   defaults with the stationed hull first in the cap's order (2.6), the owner's machine
+   taking six at 60x (1,111 alone, 95 with twelve), and "a ship with a stationed person at
+   full detail at all times" as a scenario's choice (`crewed: {stationed: always}`) that
+   the cap's order honours as a hull in dealings is honoured today, so that he may try it
+   in his tender game and see the pace. A sleeping hull costs nothing a tick (3.2).
+4. **Whether the leaders' roles come in M8 or earlier.** *Recommend* M8, with 84 building
+   the domain parameter, the registry's whereabouts and the purview hook (2.10) so that an
+   office is a package of its own that touches no hull; earlier only if the owner wants
+   the port admiral's commissioning in play before the career, which 72's `commissioned
+   for` gives the director already.
+5. **Whether a far ship of the business transacts at the market when she reaches her
+   port** (the supply loop's first turn, 2.4). *Recommend* yes, under `transact:` in
+   `data/business.yaml` on by default (no recorded passage has the business on, so no pin
+   moves), the price moved by what is carried with 43b's `SUPPLY_PER_TON` as the knob,
+   so that the markets the owner sails between begin to breathe.
+6. **Whether a hull at anchor or in port may be awake** (retiring `_NOT_CREWED_STATES`).
+   *Recommend* yes under the cap's order: a hull at anchor costs a third of one under way
+   (3.2); the port's business is the port's; a stationed hull in port at full detail is
+   what the owner's tender test wants; the pilot cutter sent for her steers for her hull
+   (43b's reason for the rule was that a crewed stranger's cutter steered for the player,
+   which the dealings per hull end).
+7. **The business's region.** *Recommend* the followed hull's as now in 84; peopling a
+   region wherever an awake or stationed hull goes is a knob for a later package (the
+   owner's "low-level simulation in every region" of 2026-10-17), since each region's draw
+   costs its ships' minutes and the owner should see the tender's game first.
+8. **Whether two sleeping hulls far from the player wake for a fight between them.**
+   *Recommend* no: 74's far fight resolves it in rounds asleep (rule 5), the damage written
+   into the hulls as state, and a scenario may raise the cap; a stationed hull in a fight
+   is a dealing and takes her place in the cap's order as a dealing ship does today.
