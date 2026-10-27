@@ -160,6 +160,7 @@ class Leak:
     words: str
     t_per_h: float
     where: str = ""
+    hole: Any = None  # the shot hole's dict, for the carpenter's plug
 
 
 @dataclass
@@ -277,7 +278,7 @@ class Water:
                 continue
             if st.fothered:
                 rate *= FOTHER_SHARE
-            out.append(Leak("shot hole", _hole_words(ship, hole), rate, hole.get("side", "")))
+            out.append(Leak("shot hole", _hole_words(ship, hole), rate, hole.get("side", ""), hole))
         # the ground's leak: aground at the hotfix's rate, afloat at the bottom's share
         rate_m = float(extra.get("leak_m_per_h", 0.0) or 0.0)
         if rate_m > 0.0:
@@ -368,6 +369,15 @@ class Water:
         if st.foundered is not None:
             self._hold_foundered()
             return
+        if st.fothered and (knots_of(ship) > FOTHER_HOLDS_UNDER_KN or ship.extra.get("aground")):
+            # the fothered sail goes: torn off by her way through the water, or by the ground
+            st.fothered = False
+            world.record(
+                Severity.NOTABLE,
+                "leak.fother_gone",
+                "The fothered sail has gone from under her, and the leak runs as it did.",
+                data={"tick": tick},
+            )
         gain = self.gain_t_per_h()
         st.last_gain_t_per_h = gain
         pumped = self.pumps.tick(tick)
@@ -638,8 +648,10 @@ class Water:
         }
 
 
-# A fothered sail over the leak lets through this share (Falconer 1780, FOTHERING; judgement).
+# A fothered sail over the leak lets through this share (Falconer 1780, FOTHERING; judgement),
+# and goes when she makes more than this through the water (judgement).
 FOTHER_SHARE = 0.3
+FOTHER_HOLDS_UNDER_KN = 6.0
 
 
 def _hole_words(ship: Any, hole: dict[str, Any]) -> str:

@@ -83,12 +83,48 @@ def _start(ship: Any, evo_id: str, subject: str, params: dict[str, Any], verb: s
         raise OrderError(f"There is no such evolution as '{evo_id}'.")
     runner = _runner(ship, verb)
     text = runner.start(ship, evo_id, subject, params)
-    return "evolution.started", text, {"verb": verb, "level": 1, "evolution": evo_id}
+    # the runner writes its own started line; work that waits its turn behind other work
+    # on the same hold says so in a line of its own (the World leaves the started kind's
+    # text to the runner)
+    kind = "evolution.queued" if "will follow" in text else "evolution.started"
+    return kind, text, {"verb": verb, "level": 1, "evolution": evo_id}
+
+
+_MAST_WORDS = {
+    "mainmast": "main mast",
+    "foremast": "fore mast",
+    "mizzenmast": "mizzen mast",
+    "mizenmast": "mizzen mast",
+    "mizen": "mizzen mast",
+    "mizzen": "mizzen mast",
+}
+
+
+def _mast_words(ship: Any, words: str, order: Order) -> str:
+    """The lower mast an order names: the words after the verb, else the mast in the phrase
+    itself ("cut away the mainmast", "rig a jury foremast"), the compound names opened
+    ("mainmast" is "main mast" to the ship's nouns); nothing named on a ship with one lower
+    mast takes it."""
+    if not words:
+        last = str(order.verb_phrase or "").split()[-1] if order.verb_phrase else ""
+        if last not in ("mast", "masts", "jury", ""):
+            words = last
+    words = " ".join(words.lower().split())
+    for lead in ("the ", "a "):
+        words = words.removeprefix(lead)
+    words = _MAST_WORDS.get(words, words)
+    if not words:
+        masts = [s for s in getattr(ship, "spars", {}).values() if s.cls == "mast"]
+        if len(masts) == 1:
+            words = "mast"
+    return words
 
 
 def execute(ship: Any, order: Order) -> Result:
     verb = order.verb
     words = " ".join(str(order.object or "").split())
+    if verb in ("cut away the mast", "rig a jury mast"):
+        words = _mast_words(ship, words, order)
     data: dict[str, Any] = {"verb": verb, "level": 1}
     # -- the pumps --------------------------------------------------------------------
     if verb == "man the pumps":
@@ -135,11 +171,11 @@ def execute(ship: Any, order: Order) -> Result:
 
         return V.reeve_every_parted_line(ship, order)
     if verb == "fish":
-        from freesail.orders.resolve import resolve_noun
+        from freesail.orders.resolve import resolve as resolve_noun_
 
         if not words:
             raise OrderError("Fish which spar? Name it ('fish the fore topmast').")
-        ids = resolve_noun(ship, words, order.side_word, verb)
+        ids = resolve_noun_(ship, words, order.side_word, verb).ids
         spars = [i for i in ids if i in ship.spars]
         if not spars:
             raise OrderError(f"'{words}' is no spar of this ship to fish.")
@@ -151,11 +187,11 @@ def execute(ship: Any, order: Order) -> Result:
     if verb == "rig a jury mast":
         return _start(ship, "jury_mast", "ship", {"mast_words": words}, verb)
     if verb == "cut away the mast":
-        from freesail.orders.resolve import resolve_noun
+        from freesail.orders.resolve import resolve as resolve_noun_
 
         if not words:
             raise OrderError("Cut away which mast? Name it ('cut away the mainmast').")
-        ids = resolve_noun(ship, words, order.side_word, verb)
+        ids = resolve_noun_(ship, words, order.side_word, verb).ids
         masts = [i for i in ids if i in ship.spars and ship.spars[i].cls == "mast"]
         if not masts:
             raise OrderError(f"'{words}' is no lower mast of this ship to cut away.")

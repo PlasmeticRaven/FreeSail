@@ -2815,6 +2815,79 @@ def _reeve(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     return "evolution.started", text, data
 
 
+def reeve_every_parted_line(ship: Ship, order: Order) -> Result:
+    """'Reeve new lines' (package 73; the owner's first action, 2026-10-24: "reeve new
+    lines" wanted the line named): every parted running line rove afresh in turn, one
+    `reeve_line` evolution a line as `reeve a new <line>` starts it, the lines that went
+    with a spar passed over with the reason; refused in words when nothing is parted."""
+    from freesail.evolutions.repair_scripts import parted_running_lines
+
+    lines = parted_running_lines(ship)
+    gone = [
+        ln
+        for ln in ship.lines.values()
+        if ln.state is LineState.PARTED and ln.wrecked and not ln.is_standing
+    ]
+    standing = [ln for ln in ship.lines.values() if ln.state is LineState.PARTED and ln.is_standing]
+    if not lines:
+        tail = ""
+        if standing:
+            names = errors.join_names([resolve.the(ship, ln.id) for ln in standing], "and")
+            verb_word = "is" if len(standing) == 1 else "are"
+            tail = (
+                f" {names[0].upper()}{names[1:]} {verb_word} standing rigging: "
+                "'set up the rigging'."
+            )
+        if gone:
+            tail += " The lines that went with a spar are rove again when it is shifted."
+        raise OrderError(f"No running line is parted; there is nothing to reeve.{tail}")
+    runner = runner_of(ship)
+    started: list[dict[str, Any]] = []
+    texts: list[str] = []
+    failed: list[str] = []
+    for line in lines:
+        name = resolve.the(ship, line.id)
+        reason = scripts.reeve_refusal(ship, line, False)
+        if reason:
+            failed.append(_lower(reason))
+            continue
+        try:
+            texts.append(
+                runner.start(ship, "reeve_line", line.id, {"line": line.id, "splice": False})
+            )
+        except OrderError as e:
+            failed.append(_refused(name, e))
+            continue
+        started.append({"evolution": "reeve_line", "subject": line.id})
+    if not started:
+        raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
+    n = len(started)
+    text = (
+        f"Reeve new lines: {n} parted line{'s' if n != 1 else ''} to be rove in turn. "
+        + " ".join(t.strip() for t in texts if t)
+    )
+    if failed:
+        text += " Not done: " + errors.sentence_list(f.rstrip(".") for f in failed) + "."
+    if standing:
+        names = errors.join_names([resolve.the(ship, ln.id) for ln in standing], "and")
+        verb_word = "is" if len(standing) == 1 else "are"
+        text += (
+            f" {names[0].upper()}{names[1:]} {verb_word} standing rigging, to be set up "
+            "('set up the rigging')."
+        )
+    return (
+        "evolution.started",
+        text,
+        {
+            "verb": order.verb,
+            "level": 1,
+            "subjects": [s["subject"] for s in started],
+            "evolutions": started,
+            "failed": failed,
+        },
+    )
+
+
 def _clear_wreck(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     """'Cut away the <part>', 'clear away the wreck of the <part>', 'clear the wreck', and
     'send down the <spar>' of a spar carried away: one clear_wreck evolution for each wreck

@@ -203,6 +203,11 @@ class Spar(Part):
     # (Steel 1794 vol. I, p. 167, HORSE); the sheet's geometry reads it (evolutions/trim.py).
     # 0: no horse given; the geometry takes a quarter of the boom's length.
     horse_m: float = 0.0
+    # A jury mast (package 73, spec M7 §14): a lower mast carried away standing again on a
+    # spare topmast stepped in its stump, at a share of its rating (`rating_whole_kn` the
+    # file's figure, kept for the dockyard); dataclass defaults, so older saves load
+    jury: bool = False
+    rating_whole_kn: float = 0.0
 
     @classmethod
     def from_spec(cls, s: SparSpec) -> Spar:
@@ -394,6 +399,11 @@ class Line(Part):
     # lies to leeward, as a sheet lets it. A sail with a sheet each side needs no such
     # flag: it lies on the side whose sheet is hauled.
     held_side: str | None = None
+    # A preventer rove beside it (package 73, spec M7 §14: the preventer braces and
+    # backstays and the chain slings before an action): when the line parts or is shot
+    # away the preventer takes the strain and the line keeps its office, the preventer
+    # consumed (`physics.strain._part_line`); a dataclass default, so older saves load
+    preventer: bool = False
 
     @classmethod
     def from_spec(cls, ln: LineSpec) -> Line:

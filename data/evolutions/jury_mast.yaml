@@ -1,0 +1,31 @@
+# Rig a jury mast (spec M7 §14; package 73; scripted, JuryMastScript in
+# evolutions/repair_scripts.py). "JURY-MAST, a temporary or occasional mast, erected in a
+# ship to supply the place of one which has been carried away by a tempest, battle, &c."
+# (Falconer 1780, JURY-MAST); Luce 1884, ch. XXXI 'Jury Masts': a spare topmast stepped in
+# the stump of the lower mast and stayed with what the wreck left. The lower mast carried
+# away and its wreck cleared (clear_wreck.yaml) stands again as a jury mast: a spare topmast
+# from the booms (`crew.stores.spare_spars`), the mast's rating two fifths and its
+# condition forty (judgement: it will not bear a press of sail, and the strain model takes
+# it at one), the topmast and what stood on it still down; the course of that mast may be
+# bent and set on it. The mast is named (`params.mast_words`), or the first lower mast
+# carried away and cleared. Phases: get_up (on deck: the spare topmast got out of the
+# booms and the stump cleared), step (on deck: swayed up and stepped in the stump), stay
+# (aloft: stayed and the rigging set up).
+id: jury_mast
+verb: jury_mast
+applies_to: {class: ship}
+script: jury_mast
+params: {mast_words: "", aloft: [stay]}
+preconditions: []
+timing:
+  get_up_s: 3600   # the spare topmast got out of the booms, its heel shaped for the stump: an hour (judgement)
+  step_s: 5400     # swayed up and stepped in the stump with sheers and tackles: an hour and a half (judgement; Luce's jury masts a day's work in all)
+  stay_s: 5400     # stayed and the rigging set up: an hour and a half (judgement)
+on_start: {log: "Rig a jury {mast}! The spare topmast out of the booms and the sheers got up."}
+on_complete: {log: "{done}", kind: mast.jury, severity: notable}
+on_fail: {log: "Could not rig a jury {mast}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: all hands, the carpenter's crew at the sheers and the watch at the tackles, a
+# party of thirty at the most (judgement; a cutter's whole company is fewer, and the work
+# goes at the pace of what she has)
+crew: {hands: all, party: 30, rating: ordinary, stations: [forecastle, waisters, afterguard, topmen, idlers]}
+source: "Falconer 1780, JURY-MAST; Luce 1884, ch. XXXI 'Jury Masts' (a spare topmast stepped in the stump); the hours judgement"
