@@ -40,14 +40,16 @@ on these packages; that is the owner's choice.
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | approved and launched 2026-10-24 (Fable, in a worktree off `ca305c4`); **that run lost with the machine's rebuild during the pause of 2026-10-24 to 27 (its worktree and unpushed branch gone); relaunched 2026-10-27 off `7da0c0e`** |
-| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 82** (the owner, 2026-10-24: the boat and the player aboard another ship first) |
+| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52) |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | behind 70 |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
 | 79 | Opus | The regimes from 72; the chart's Mediterranean block | behind 72 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
-| 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below), for the owner's approval; runs after 73, before 74 |
+| 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
+| 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | briefed and launched 2026-10-27 (below), beside 73 |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | after 83 and the owner's reading; 73 and the owner's local work merged first |
 | 81 | Opus | The viewer's action: the gun ports and the guns drawn with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
@@ -1015,3 +1017,73 @@ files through the generator with sources; the pins re-measured only where a chan
 them, old beside new, proven by bisection (the followed ship should move nothing pinned:
 if it does, that is a finding); never a test skipped, disabled or quarantined; realism,
 not pacing; the physics read and not changed but for the oar force this brief names.
+
+## Package 83: the one-world study (`docs/design/Design-OneWorld.md` new; a draft brief for package 84 in this file; throwaway measurements in the scratchpad only; no code in the repository)
+
+Fable; a design study and no code, launched 2026-10-27 beside 73 on the owner's word that
+the usage is to be spent now and the refactor planned smartly before more is built on the
+old seam. Decision 52 (`docs/DesignProposal.md`) is the frame; the owner's debrief
+(`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/debrief.md`) and his twelve notes
+(`owner-notes-2026-10-27.txt` beside it, notes 2, 9, 11 and 12) are the evidence; his
+acceptance test is in the decision. The study reads the world as it is and designs the world
+as it should be, costs the road between, and writes both down. Each item an intent with the
+lead's reading; the intent binds; the study may take an item another way with its reason.
+
+1. **The world as it is: the seam named.** How the game's one World holds the player's ship,
+   her people, places and things, the ports and their people, the business, the weather,
+   the sets, the director; how a far body lives in it (`ships.py`, `brains.py`, 72's sets);
+   what the promotion under the cap builds for a crewed ship today (`crews.py`'s
+   CrewedWorld, `_crew_scenario`, the mirror between the far state and the near body, what
+   is copied and what is cut: no ports, no people ashore, no things, no market, the
+   director's hand only by the forms that name a ship); how a station's harness, the doors
+   and the seats (67) bind to a World; how the replay and the save (`core/replay.py`, the
+   checkpoint keyed by ship) rebuild it; how the pace rule and the cap centre on the player's
+   ship. Written as a map with the files and the objects named, the player-centric
+   assumptions listed one by one (the lead's count of them is the study's first finding).
+2. **The world as it should be: one world, many crewed hulls.** The design: one World that
+   the player is in and so is everyone else; a crewed ship a hull in it with her own
+   people, places aboard, bill, log and stations, the player's ship one such hull; the
+   ports, the people ashore, the things, the markets, the business, the weather, the sets,
+   the chart and the director's hand the world's once; a person a person of the world who
+   may be aboard any hull or ashore, moved between them (82's boat, 73's boarding, 74's
+   capture) with his station following him; **the person's coarse acts possible anywhere**
+   at far detail (go ashore, trade, speak to a person, take a thing, anchor, sail for a
+   port, chase, report) by the far brain's and the business's own means, the full-detail
+   hull only where the cap gives it, nothing coded out (the owner's bound); the station's
+   readings, samples and deltas (58a) per hull; the director's reach the world's (his forms,
+   his truth, his `say as`); the replay and the save of a world with several crewed hulls
+   and persons who moved. The leaders of nations and companies as **abstract stationed
+   roles** (M8's; rules or model, biased and competitive, perhaps never seen as a person)
+   left room for in the design: a role that holds reins of the naval system (72's regimes)
+   and the business, with a station's contract and a sample of its own. Say what a model at
+   another ship's captain's station sees and may do under this design, and what the owner's
+   acceptance test looks like step by step in it.
+3. **The two roads costed, honestly.** One World with many hulls (the lead's instinct)
+   against many Worlds sharing the world's state (the cheaper reach); for each: what moves
+   in the code (files, objects, the count of player-centric assumptions it removes or keeps),
+   what it costs in pace (the baseline 95 ticks a second with twelve crewed ships and the
+   conftest's floors; measure what you can on the present code with throwaway scripts in
+   the scratchpad), what the recorded passages lose (which pins move and why; the aim is
+   none), what the consent brief's words assume (a station on "the ship"; read
+   `docs/agents/ConsentBrief.md` and say where its wording would no longer be true, without
+   editing it: that is 55's), what 82, 74, 75 and 77 gain or must wait for. Recommend one
+   road, with the reason.
+4. **The migration in steps that keep the suite green.** The refactor (84) as an ordered
+   list of steps, each a mergeable state with the whole suite passing and the pins standing
+   (or the few that must move, named with why), so that the work can be built by one Fable
+   package in stages or by sibling builders in parallel where the steps are independent;
+   each step with its files, its tests, its risk and its rollback; the step at which the
+   owner's acceptance test first passes whole; the step at which 82's boat and 74's captive
+   become simple. The steps are the brief of 84, drafted in this file as "## Package 84"
+   for the lead and the owner.
+5. **Found on the way, and the open decisions.** Everything the reading shows that is wrong
+   today and not the seam's (the convoy's stall, the colours flickering, the tender's "no
+   port in the world", whatever else), listed for the lead; the decisions only the owner can
+   take (how far a far person's acts go in the first step; whether a far hull's log is kept
+   for every ship or only for ships with a stationed person; the pace bound he accepts;
+   whether the leaders' roles come in M8 or earlier), each with the study's recommendation.
+
+**Not done here:** no code change in the repository; no edit to the consent files; no pin
+moved. **The head rules bind:** no model identifier in any file; the design note and the
+draft brief are the deliverables, committed on the study's branch and pushed to
+`claude/pkg-83` after each commit (the owner's permission of 2026-10-27).

@@ -655,6 +655,20 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
 50. **The director brought forward; a world order doubted, not refused.** Owner, 2026-10-17 (his birthday, "a bit free"), on his runs of gate 6c at partial completion (`docs/playtests/2026-10-17-gate-m6c-owner-runs/`): packages 50 (the director proper, Fable) and 52 (the director's voice, Opus) of M7b are brought forward to now, so that the director's station is in for testing; gate 6c stands run in part, its untested items deferred to the director's milestone's gate. And a rule for 50: the world-order channel's feasibility check does not refuse outright. It states the reason the act is doubted and says "if you think the action you requested is still reasonable, you may enter it again along with a `[reason: ...]`, and it will be logged and performed"; the act re-entered with its reason is done and recorded with the doubt and the reason, so that the director is not over-constrained and the record gives the data by which the sets of reasonable acts are refined. The brief's hard limits (the player's own: no gale above such a force, nobody dies) stay refusals.
 
 51. **Milestone 7b frozen open, not closed; milestone 7 begins beside it.** Owner, 2026-10-23, after the week's playtests and the cold review. The consent re-brief (55) is deferred until more work is complete and testing is to begin in earnest; the gate 7b is not run now, the milestone is frozen as open and its remaining planned work (58, 67 in hand; 51, 60, 61, 63, 64, 65, 69 on the books) is wrapped up alongside milestone 7 rather than before it. After the three packages in hand (58a, 58b, 67) the initial technical specification of M7 (`docs/TechnicalSpec-M7.md`, revised on the owner's notes the same day) is finalised and package 70, the combat core, is briefed.
+52. **One world, the player one part of it.** Owner, 2026-10-27, after his playtests of
+    packages 70 to 72 (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/debrief.md`):
+    the world is one world that the player is in and so is everyone else; a person seated by
+    a model anywhere in it (another ship's captain, a person ashore) must be able to do at
+    coarse detail whatever the player can do (go ashore, trade, speak, sail for a port,
+    chase, report), the full-detail ship only where the cap gives it and nothing coded out;
+    the director's reach the world's. The present shape (a promoted ship given a World of
+    her own, cut down) is replaced by one world with many crewed hulls, planned as a design
+    study first (package 83) and then the refactor (84), before 82 and 74 build on the old
+    seam; the national and company leaders as abstract stationed roles (rules or model,
+    biased and competitive, perhaps never seen) are a goal the design must leave room for.
+    The owner's acceptance test: his armed tender ordered to the next region, through real
+    weather, into a port, ashore to a person, back with a thing, past a ship the director
+    placed, and home to report it all, the player none the wiser until the report.
 
 ### Still open
 
