@@ -167,6 +167,8 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         "glass",
         "free",
         "gunnery",  # package 70: the mark, the side, the charge, the aim, a gun by its name
+        "damage",  # package 73: the pumps, the hatches, the carpenter's and the boatswain's work
+        "fight",  # package 73: the marines, the small arms and the boarders
     ):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by
@@ -462,7 +464,10 @@ def _match_verb(words: list[str], vocab: Vocabulary) -> tuple[str, str]:
         pw = phrase.split()
         if keyed[: len(pw)] == pw:
             return phrase, vocab.phrase_to_verb[phrase]
-    raise errors.unknown_verb(" ".join(words), vocab.verb_names)
+    # package 73: a synonym nearer in spelling than any verb is hinted first ("man the
+    # boats" is "man the boat", not "man the pumps")
+    synonyms = [s for spec in vocab.verbs.values() for s in spec.synonyms]
+    raise errors.unknown_verb(" ".join(words), vocab.verb_names, synonyms)
 
 
 # ---------------------------------------------------------------------------

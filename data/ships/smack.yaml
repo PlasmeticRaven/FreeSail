@@ -557,6 +557,8 @@ crew:
       yard: 1
     # Spare rope (judgement).
     cordage_fathoms: 40
+    # The carpenter's shot plugs (package 73, spec M7 §14): tapered plugs of soft wood with oakum and tallow, kept ready in action (the Regulations and Instructions 1806, the Carpenter; Falconer 1780, PLUG: 'shot-plugs ... to stop holes made by cannon shot'); the count by her class, judgement. A smack's 2.
+    shot_plugs: 2
     # The sail room (spec 3b §6.3), every sail new; see tools/gen_ships.py.
     sails:
     # A spare jib (judgement).
@@ -586,6 +588,14 @@ crew:
 hold:
   capacity_tons: 18
   well_m3: 9.1
+# The pumps (package 73, spec M7 §13): the chain pump of Cole and Bentinck, a ton in 43 seconds and a half with four men (Falconer 1780, PUMP), and the common brake pump with two; the counts by the ship's class (Lavery, Arming and Fitting; Steel 1794); see tools/gen_ships.py.
+pumps:
+# A brake pump (the common or elm-tree pump): two men, 15 tons an hour fresh (judgement).
+- id: pump.hand.1
+  kind: hand
+  name: the pump
+  tons_per_hour: 15.0
+  hands: 2
 # The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 (BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule for the boat herself; see tools/gen_ships.py.
 boats:
 # The smack's boat, for the lines and the shore (Holdsworth pp. 137 to 139; judgement on the size).

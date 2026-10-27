@@ -2933,25 +2933,29 @@ def _fx_glass(world, thing, target, name, value, data) -> str:
 
 
 def _fx_leak_stopped(world, thing, target, name, value, data) -> str:
-    # the grounding's leak (`world.ground`) stopped: the well gains no more, aground or not
+    # the ground's leak and every started seam stopped (package 73: the keeper's, as the
+    # carpenter's caulking stops them); the shot holes are the carpenter's plugs
     extra = world.ship.extra
     was = float(extra.get("leak_m_per_h", 0.0) or 0.0)
-    extra["leak_m_per_h"] = 0.0
-    data.update({"leak_stopped": True, "leak_m_per_h_was": round(was, 3)})
+    stopped = world.water.stop_leaks(int(world.clock.tick))
+    data.update({"leak_stopped": True, "leak_m_per_h_was": round(was, 3), "stopped": stopped})
     return "the leak stopped"
 
 
 def _fx_well_pumped(world, thing, target, name, value, data) -> str:
     hull = world.ship.hull
     was = float(hull.water_in_well_m)
-    hull.water_in_well_m = 0.0
-    ground = getattr(world, "ground", None)
-    if ground is not None:
-        # the carpenter's reports count the feet afresh from a dry well
-        ground._feet_said = 0
-        ground._waterlogged_said = False
-    data.update({"well_pumped": True, "well_m_was": round(was, 2)})
+    tons = world.water.pump_out()
+    data.update({"well_pumped": True, "well_m_was": round(was, 2), "tons": round(tons, 1)})
     return f"the well pumped dry ({was:.2f} m of water pumped out)"
+
+
+def _fx_leak_started(world, thing, target, name, value, data) -> str:
+    """A seam found working (package 73: modelled now): a leak of so many tons an hour
+    from a started seam, until the carpenter caulks it (`stop the leak`)."""
+    seam = world.water.start_seam(float(value), "a seam started below the wale")
+    data.update({"leak_t_per_h": float(value), "seam_since": seam["since"]})
+    return f"a seam started, making {float(value):g} tons an hour"
 
 
 def _fx_gun_dismounted(world, thing, target, name, value, data) -> str:
@@ -3001,6 +3005,7 @@ _ABOARD_EFFECTS: dict[str, Any] = {
     "glass_broken": _fx_glass,
     "leak_stopped": _fx_leak_stopped,
     "well_pumped": _fx_well_pumped,
+    "leak_tons_per_h": _fx_leak_started,
 }
 
 
@@ -3078,6 +3083,7 @@ ABOARD_PLAUSIBLE_KEYS = frozenset(
         "at_anchor",
         "leaking",
         "well_above",
+        "pumps_cannot",  # package 73: the ship's own pumps could not do it
     }
 )
 
@@ -3587,11 +3593,29 @@ def _plausible_at_anchor(world: Any, target: str | None, value: Any) -> bool:
 
 
 def _plausible_leaking(world: Any, target: str | None, value: Any) -> bool:
-    """She is making water from a grounding (`world.ground`'s leak), or with `false` she
-    is not."""
-    extra = getattr(getattr(world, "ship", None), "extra", None) or {}
-    leaking = float(extra.get("leak_m_per_h", 0.0) or 0.0) > 0.0
+    """She is making water from a grounding or a started seam (the keeper's leaks of the
+    ground's and a seam's kinds, package 73), or with `false` she is not."""
+    water = getattr(world, "water", None)
+    leaking = water is not None and any(lk.kind in ("the ground", "a seam") for lk in water.leaks())
     return leaking == bool(value)
+
+
+def _plausible_pumps_idle(world: Any, target: str | None, value: Any) -> bool:
+    """The ship's own pumps cannot do it (package 73): she has no pumps, or no company to
+    man them, or they are manned and losing; with pumps and hands idle the well pumped out
+    by a cause is doubted (the captain's `man the pumps` does it)."""
+    water = getattr(world, "water", None)
+    ship = getattr(world, "ship", None)
+    if water is None or ship is None:
+        return bool(value)
+    pumps = water.pumps
+    crew = (getattr(ship, "extra", None) or {}).get("crew")
+    if not pumps.specs() or crew is None:
+        return bool(value)
+    if pumps.manned:
+        st = water.state
+        return bool(value) == bool(st is not None and st.gaining is False)
+    return not bool(value)
 
 
 def _plausible_well_above(world: Any, target: str | None, value: Any) -> bool:
@@ -3628,4 +3652,5 @@ _PLAUSIBLE: dict[str, Any] = {
     "at_anchor": _plausible_at_anchor,
     "leaking": _plausible_leaking,
     "well_above": _plausible_well_above,
+    "pumps_cannot": _plausible_pumps_idle,  # package 73
 }

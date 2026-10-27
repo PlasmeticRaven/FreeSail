@@ -153,7 +153,7 @@ def test_truth_66_the_same_passage_with_the_lead_going_hourly_does_not_ground():
 def test_a_rock_at_speed_shocks_the_masts_and_stoves_her_and_the_well_rises():
     """The strike on a charted rock at six knots: the topmasts shaken (a strain warning
     or a spar carried away), the carpenter's report of her stove, the well rising by the
-    foot, and in time waterlogged."""
+    foot, and in time (package 73: the water the keeper's) bilged and filled where she lies."""
     # the frigate run on to the Manacles from the south-east on the flood at six knots
     start = datetime(1805, 6, 12, 12, 0)
     w = thick_world(FRIGATE, Position(50.025, -5.015), 315.0, start, from_deg=180.0, knots=22.0)
@@ -171,14 +171,16 @@ def test_a_rock_at_speed_shocks_the_masts_and_stoves_her_and_the_well_rises():
     rising = [e for e in w.log if e.kind == "well.rising"]
     assert rising and "in the well" in rising[0].text
     w.run(6 * 3600)
-    assert [e for e in w.log if e.kind == "ship.waterlogged"]
+    bilged = [e for e in w.log if e.kind == "ship.foundered"]
+    assert bilged and "bilged on the ground" in bilged[0].text
 
 
 def test_the_director_stops_the_leak_and_pumps_her_out_and_the_well_stays_dry():
-    """The repair's hotfix until milestone 8 (the director's `aboard:` table): on the rock
-    the leak stopped holds the well where it is, the well pumped out empties it and the
-    carpenter counts the feet afresh; each is doubted when there is nothing to stop or
-    pump; a replay comes back to the same ship."""
+    """The hotfix's two forms of the director's `aboard:` table, kept as his causes beside
+    the carpenter and the pumps (package 73): on the rock the leak stopped holds the well
+    but for the seams' trickle, the well pumped out empties it and the carpenter counts
+    the feet afresh; each is doubted when there is nothing to stop or pump; a replay comes
+    back to the same ship."""
     from freesail.api.session import ship_factory
     from freesail.core import replay
     from freesail.world import orders as WO
@@ -202,11 +204,12 @@ def test_the_director_stops_the_leak_and_pumps_her_out_and_the_well_stays_dry():
     assert said.text.startswith("The carpenter reports the leak found and stopped")
     held = hull.water_in_well_m
     w.run(3600)
-    assert hull.water_in_well_m == held  # aground still, and gaining no more
+    # aground still, and gaining no more but the seams she works (package 73: a trickle)
+    assert hull.water_in_well_m < held + 0.05
     assert "no leak to stop" in WO.doubt(w, WO.parse("aboard: the leak stopped"))
-    e = w.world_order("aboard: the well pumped out", "the test")
+    e = w.world_order("aboard: the well pumped out [reason: the test]", "the test")
     assert e.data["result"] == "done" and "the well pumped dry" in e.text
-    assert hull.water_in_well_m == 0.0 and w.ground._feet_said == 0
+    assert hull.water_in_well_m == 0.0 and w.water.state.feet_said == 0
     assert "dry already" in WO.doubt(w, WO.parse("aboard: the well pumped out"))
     back = replay.replay_world(w, ship_factory)
     assert back.ship.hull.water_in_well_m == 0.0
@@ -400,9 +403,8 @@ def test_a_ground_restored_from_before_the_kedging_ticks_aground_with_a_taut_cab
     assert w.submit("heave in the kedge to 20 fathoms").kind == "order.accepted"
     w.run(300)
     old = G.Ground.__new__(G.Ground)
-    for name in ("world", "grounded", "_dangers", "_dangers_tick", "_feet_said"):
+    for name in ("world", "grounded", "_dangers", "_dangers_tick"):
         setattr(old, name, getattr(w.ground, name))
-    old._waterlogged_said = w.ground._waterlogged_said
     assert "_anchor_dist" not in vars(old) and "_came_home_said" not in vars(old)
     w.ground = old
     w.run(600)  # aground, the cable taut: no AttributeError, and the memory written

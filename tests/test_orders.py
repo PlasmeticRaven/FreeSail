@@ -2703,7 +2703,9 @@ def test_two_bargains_in_one_order_are_two():
         # see a flag the order says so
         ("frigate", "hoist our colours", no(["no other sail to see a flag"])),
         ("frigate", "show your colours", no(["no other sail to see a flag"])),
-        ("frigate", "man the pumps", no(["not worked in this game yet", "Sound the well"])),
+        # package 73: the pumps are the ship's own (68's refusal retired); a ship alone,
+        # with no world to keep her water, says so
+        ("frigate", "man the pumps", no(["wants a ship in a world"])),
         ("frigate", "as you were", no(["'belay that'"])),
         (
             "frigate",
@@ -2741,7 +2743,9 @@ def test_the_phrasings_of_g17_on_a_ship(which: str, text: str, expect: ok | no):
     [
         # `hail the pilot` is an order since package 37h, merged after this test was
         # written: its wrong hint ("did you mean 'haul'?") is gone with it
-        ("man the boats", None),
+        # package 73: 'man the pumps' is an order, and the grammar's held-words rule
+        # would hint it for "man the boats"; the synonym nearer in spelling comes first
+        ("man the boats", "'man the boat'"),
         ("as you like it", None),
         ("mr pearce make sail", None),
         ("stear south", "'steer'"),

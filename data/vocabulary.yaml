@@ -1433,6 +1433,105 @@ verbs:
     synonyms: [strike our colours, strike the ensign, strike to her, surrender, we strike]
     object: gunnery
     level: 1
+  # Package 73 (spec M7 §13, §14; docs/design/Design-WaterAndHealth.md): the water, the
+  # pumps and the damage control (object `damage`, freesail/orders/damage.py). The pumps
+  # are a standing work manned from the hands' pool, on until the well sucks or the word;
+  # the hatches, the plugs, the fothered sail, the preventers, the standing rigging set up,
+  # every parted running line rove in turn, the fished spar, the jury mast and the mast
+  # cut away are evolutions with hands and time (data/evolutions/*.yaml).
+  man the pumps:
+    synonyms: [rig the pumps, work the pumps, pump ship, pump her out, pump the ship out, man the chain pumps,
+               man the chain pump, hands to the pumps, turn the hands to the pumps, pump the ship,
+               get the pumps going, set the pumps going]
+    object: damage
+    level: 1
+  spell the pumps:
+    synonyms: [relieve the pumps, fresh hands to the pumps, spell the men at the pumps, relieve the men at the pumps,
+               spell ho]
+    object: damage
+    level: 1
+  secure the pumps:
+    synonyms: [stand down the pumps, the pumps crews stand down, knock off pumping, knock off the pumps,
+               belay the pumps, stop pumping, leave the pumps]
+    object: damage
+    level: 1
+  batten down the hatches:
+    synonyms: [batten down, batten the hatches down, batten down the hatchways, batten the hatches,
+               put the tarpaulins on the hatches, close the hatches]
+    object: damage
+    level: 1
+  open the hatches:
+    synonyms: [take off the hatches, unbatten the hatches, take the tarpaulins off the hatches, open the hatchways,
+               take the battens off]
+    object: damage
+    level: 1
+  plug the shot holes:
+    synonyms: [plug the shot hole, plug the holes, plug the hole, stop the shot holes, stop the shot hole,
+               the carpenter to the shot holes, send the carpenter to the shot holes, plug her,
+               plug the shot holes below the waterline]
+    object: damage
+    level: 1
+  stop the leak:
+    synonyms: [stop the leaks, find the leak, find and stop the leak, caulk the seams, caulk the seam,
+               caulk her seams, stop her leaks, the carpenter to the leak, send the carpenter to the leak]
+    object: damage
+    level: 1
+  fother a sail:
+    synonyms: [fother a sail over the leak, fother the leak, fother a sail under her, fother her,
+               fother a sail over the hole, thrum a sail and fother the leak, fother]
+    object: damage
+    level: 1
+  rig preventer braces:
+    synonyms: [rig the preventer braces, reeve preventer braces, rig preventers, reeve the preventer braces,
+               preventer braces]
+    object: damage
+    level: 1
+  rig preventer backstays:
+    synonyms: [rig the preventer backstays, set up preventer backstays, set up the preventer backstays,
+               preventer backstays, rig preventer stays]
+    object: damage
+    level: 1
+  sling the yards:
+    synonyms: [sling the yards with chains, chain sling the yards, put chain slings on the yards,
+               sling the lower yards, sling the yards in chains]
+    object: damage
+    level: 1
+  set up the rigging:
+    synonyms: [set up the standing rigging, set up the rigging shot away, set up the rigging again,
+               set up the shrouds and backstays, set up the shrouds, set up the backstays, set up the stays,
+               set up every shroud, knot and set up the rigging]
+    object: damage
+    level: 1
+  set up:
+    synonyms: [set up the, set up a new, knot and set up, knot and set up the]
+    object: damage
+    level: 1
+  reeve new lines:
+    synonyms: [reeve a new line, reeve new running rigging, reeve the running rigging, knot and splice the rigging,
+               knot and splice, reeve new lines throughout, reeve the parted lines, reeve every parted line,
+               reeve the lines, splice the rigging, reeve new gear, knot and splice the running rigging]
+    object: damage
+    level: 1
+  fish:
+    synonyms: [fish the, put a fish on, put a fish on the, woold and fish, woold and fish the, fish and woold]
+    object: damage
+    level: 1
+  rig a jury mast:
+    synonyms: [rig a jury, rig jury masts, rig a jury foremast, rig a jury mainmast, rig a jury mizzenmast,
+               rig a jury mizen, step a jury mast, get up a jury mast, rig jury mast]
+    object: damage
+    level: 1
+  cut away the mast:
+    synonyms: [cut away the mainmast, cut away the foremast, cut away the mizzenmast, cut away the mizen,
+               cut away the main mast, cut away the fore mast, cut away the mizzen mast, cut the mast away,
+               cut away the masts]
+    object: damage
+    level: 1
+  bury the dead:
+    synonyms: [commit the dead to the deep, read the burial service, bury the killed, commit the bodies to the deep,
+               bury them]
+    object: damage
+    level: 1
   guns before sail:
     synonyms: [the guns before the sails, the guns first, guns first, serve the guns before the sails]
     object: gunnery
@@ -2081,11 +2180,6 @@ refused_phrases:
   prepare to board: *boarders
   stand by to board: *boarders
   repel boarders: *boarders
-  man the pumps: &pumps "The pumps are not worked in this game yet: the well is sounded and read ('sound the well', 'the well'), but pumping, leaks and shot holes come with milestone 7's taking on water; until then the director's hand may have the well pumped out ('aboard: the well pumped out'). 'Sound the well' reads it."
-  rig the pumps: *pumps
-  work the pumps: *pumps
-  pump ship: *pumps
-  pump her out: *pumps
   as you were: "'As you were' is not an order the ship keeps: say 'belay that' to stop the last order's work where it stands, 'belay all work' for everything in hand, or give the order that puts her back ('square the yards', 'steer SW by W')."
   lay out the stream anchor: &stream "The boat lays out the kedge and no other anchor in this game: say 'lay out a kedge astern' (or to a point, 'lay out a kedge to the NE'), 'let go the stream anchor' from the ship, or 'back the anchor' with the stream."
   lay out the stream: *stream

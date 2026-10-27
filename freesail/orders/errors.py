@@ -101,8 +101,10 @@ def suggest(word: str, known: Iterable[str], article: str = "the ") -> str:
     return "; did you mean " + join_names(f"{article}{h}" for h in hints) + "?"
 
 
-def unknown_verb(text: str, verbs: Iterable[str]) -> UnknownVerbError:
-    """'X is not an order this ship understands; did you mean 'set' or 'steer'?'"""
+def unknown_verb(text: str, verbs: Iterable[str], synonyms: Iterable[str] = ()) -> UnknownVerbError:
+    """'X is not an order this ship understands; did you mean 'set' or 'steer'?' A synonym
+    (package 73) nearer in spelling than any verb hinted is put first, so that the hint
+    points the right way ("man the boats": 'man the boat', not 'man the pumps')."""
     verbs = list(verbs)
     words = text.split()
     # Try the first one or two words: most verbs are one word, some are two.
@@ -123,6 +125,18 @@ def unknown_verb(text: str, verbs: Iterable[str]) -> UnknownVerbError:
                     continue
                 scored[h] = max(scored.get(h, 0.0), ratio)
     hints = sorted(scored, key=lambda h: -scored[h])
+    synonyms = [s for s in synonyms if s not in scored]
+    if hints and synonyms:
+        best = max(scored.values())
+        said = " ".join(words[: max(1, min(3, len(words)))])
+        near = [
+            (difflib.SequenceMatcher(None, said, s).ratio(), s)
+            for s in nearest(said, synonyms, n=2, cutoff=VERB_HINT_CUTOFF)
+        ]
+        near = [(r, s) for r, s in near if r > best]
+        if near:
+            near.sort(key=lambda rs: -rs[0])
+            hints = [near[0][1]] + hints
     hint = ("; did you mean " + join_names(f"'{h}'" for h in hints[:3]) + "?") if hints else "."
     return UnknownVerbError(
         f"'{text}' is not an order this ship understands{hint} "

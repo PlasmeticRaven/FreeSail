@@ -734,6 +734,14 @@ class World:
         from freesail.world.needs import NeedsKeeper
 
         self.needs = NeedsKeeper(self)
+        # the water in the ship (spec M7 §13; package 73): the shot holes, the ground, the
+        # seams and the sea into one quantity, the well, the pumps and foundering
+        # (`freesail.world.water`), ticked every tick after the ship's step; a flag the
+        # keeper raises when the ship is lost
+        from freesail.world.water import Water
+
+        self.water = Water(self)
+        self.ship_lost = False
         # The other sail on the sea at the start and the world orders by time (spec M5 §25
         # to §27; package 36; `freesail.world.ships`, `freesail.world.orders`): the ships
         # are the scenario's state, as the people are; the orders are applied at their
@@ -1870,6 +1878,16 @@ class World:
             tick_action(self)
         if self.chart is not None:
             self._tick_chart()
+        # the water in the ship (spec M7 §13; package 73), after the ground has struck and
+        # the shot has landed: the sources summed, the pumps' lift taken off, the well
+        # written, the lines said; nothing on a ship without a hull
+        water = getattr(self, "water", None)
+        if water is None:
+            # a checkpoint from before package 73: the keeper made now
+            from freesail.world.water import Water
+
+            water = self.water = Water(self)
+        water.tick()
         if self.navigation is not None:
             # the reckoning (spec M5 §13, package 33a): the traverse board, the hourly
             # log, the casts and the noon, after the lookout has looked

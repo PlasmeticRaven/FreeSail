@@ -295,6 +295,7 @@ STORE_KEYS = (
     "spare_spars",
     "cordage_fathoms",
     "sails",  # milestone 3b: the sail room's contents, one entry a sail (spec 3b §6.3)
+    "shot_plugs",  # package 73 (spec M7 §14): the carpenter's shot plugs, counted
 )
 SPARE_SAIL_KEYS = ("kind", "canvas_no", "condition")
 
@@ -441,6 +442,7 @@ class StoresSpec:
     cordage_fathoms: float = 0.0
     sails: list[SpareSailSpec] | None = None  # the sail room, when the file lists it
     spars: dict[str, int] | None = None  # the booms by spar class (package 30b), when given so
+    shot_plugs: float = 0.0  # the carpenter's shot plugs (package 73, spec M7 §14)
 
 
 @dataclass
@@ -619,6 +621,24 @@ class GearSpec:
     hooks: int | None = None
 
 
+@dataclass
+class PumpSpec:
+    """One of the ship's pumps (package 73, spec M7 §13): its kind (the chain pump of Cole
+    and Bentinck, standard in the King's ships by 1805, or the common brake pump), the
+    name the hands use, the tons of water an hour it lifts with its hands fresh at it and
+    the hands it wants (Falconer 1780, PUMP: the chain pump "wrought by four men,
+    discharged a ton of water in 43 seconds and a half"). Read by `freesail/world/water.py`."""
+
+    id: str
+    kind: str
+    name: str
+    tons_per_hour: float
+    hands: int
+
+
+PUMP_KINDS = ("chain", "hand")
+PUMP_KEYS = ("id", "kind", "name", "tons_per_hour", "hands")
+
 GEAR_KINDS = ("trawl", "drift nets", "seine", "lines")
 GEAR_KEYS = ("id", "kind", "name", "beam_ft", "length_fathoms", "nets", "hooks")
 
@@ -646,6 +666,7 @@ class ShipSpec:
     boats: list[BoatSpec] = field(default_factory=list)  # none: no boat to send (package 35)
     gear: list[GearSpec] = field(default_factory=list)  # none: no fishing gear (package 56)
     armament: ArmamentSpec | None = None  # None: no guns, and the gunnery refused in words
+    pumps: list[PumpSpec] = field(default_factory=list)  # none: no pumps (package 73)
 
 
 # ---------------------------------------------------------------------------
@@ -718,9 +739,45 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         armament=(
             _parse_armament(data["armament"], source) if data.get("armament") is not None else None
         ),
+        pumps=_parse_pumps(data["pumps"], source) if data.get("pumps") is not None else [],
     )
     validate(spec)
     return spec
+
+
+def _parse_pumps(raw: Any, source: str) -> list[PumpSpec]:
+    """The `pumps:` list (package 73, spec M7 §13): each a mapping of PUMP_KEYS."""
+    if not isinstance(raw, list):
+        raise ShipFileError(f"{source}: 'pumps' is not a list of pumps.")
+    pumps: list[PumpSpec] = []
+    seen: set[str] = set()
+    for i, p in enumerate(raw):
+        where = f"pump #{i + 1}"
+        if not isinstance(p, dict):
+            raise ShipFileError(f"{source}: {where} is not a mapping.")
+        for key in p:
+            if key not in PUMP_KEYS:
+                raise ShipFileError(
+                    f"{source}: {where} has '{key}', which is no key of a pump; the keys are "
+                    f"{', '.join(PUMP_KEYS)}."
+                )
+        pid = _str(p, "id", where, source)
+        if pid in seen:
+            raise ShipFileError(f"{source}: the pump id '{pid}' is given twice.")
+        seen.add(pid)
+        kind = _str(p, "kind", where, source)
+        if kind not in PUMP_KINDS:
+            raise ShipFileError(
+                f"{source}: {where} is a '{kind}' pump; the kinds are {' or '.join(PUMP_KINDS)}."
+            )
+        tons = _num(p, "tons_per_hour", where, source)
+        hands_n = p.get("hands")
+        if isinstance(hands_n, bool) or not isinstance(hands_n, int) or hands_n < 1:
+            raise ShipFileError(
+                f"{source}: {where} wants {hands_n!r} hands; say a number, one or more."
+            )
+        pumps.append(PumpSpec(pid, kind, _str(p, "name", where, source), float(tons), int(hands_n)))
+    return pumps
 
 
 def _parse_armament(raw: Any, source: str) -> ArmamentSpec:

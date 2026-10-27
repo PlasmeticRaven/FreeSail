@@ -1330,6 +1330,20 @@ def ground_tackle(ship: Any) -> GroundTackle | None:
 class Hull:
     spec: HullSpec
     water_in_well_m: float = 0.0
+    # the free surface's loss of metacentric height (package 73, spec M7 §13; written by
+    # `freesail/world/water.py` from the water in the ship, nought with a dry well); a
+    # dataclass default, so that a checkpoint from before loads with none
+    free_surface_m: float = 0.0
+
+    @property
+    def gm_m(self) -> float:
+        """The metacentric height as she floats now: the file's figure less the free
+        surface's, floored at the motion's own floor. The heel's balance
+        (`physics/hull.py`) and the roll (`physics/motion.py`) read this in place of the
+        file's figure: the one place the water's quantity reaches the stability (the
+        physics itself is not changed)."""
+        fs = float(getattr(self, "free_surface_m", 0.0) or 0.0)
+        return max(0.05, float(self.spec.gm_m) - fs)
 
     @property
     def length(self) -> float:

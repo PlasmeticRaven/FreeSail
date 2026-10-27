@@ -29,10 +29,12 @@
 #     `chronometer_stopped`: the chronometer stopped, its reading saying the words given
 #       (the master winds it and sets it going by the account);
 #     `glass_broken`: the glass gone, its readings saying it is broken;
-#     `leak_stopped`: the grounding's leak stopped, so the well gains no more (a hotfix
-#       until milestone 7's pumps and repair (taking on water));
+#     `leak_stopped`: the ground's leak and every started seam stopped (the carpenter's
+#       caulking by a cause; package 73);
 #     `well_pumped`: the water in the well pumped out, and the carpenter's feet counted
-#       afresh;
+#       afresh (doubted while the ship's own pumps and hands could do it);
+#     `leak_tons_per_h`: a seam started, making so many tons an hour until the carpenter
+#       caulks it (`stop the leak`; package 73);
 #     `report_only` (or no effect): nothing modelled yet, said so in the `unmodelled` words.
 #     An effect that wants what she lacks (no chronometer, no glass, no spare canvas) is
 #     answered "no way as said", and nothing changes.
@@ -46,8 +48,11 @@
 #     `days_since_watered`: days since she last took in water (the voyage's start until then);
 #     `wind_above`: the mean wind at or above so many knots;
 #     `at_anchor`: true, she lies at an anchor; false, she does not;
-#     `leaking`: true, she is making water from a grounding; false, she is not;
-#     `well_above`: more than so many metres of water in the well.
+#     `leaking`: true, she is making water from a grounding or a started seam; false,
+#       she is not;
+#     `well_above`: more than so many metres of water in the well;
+#     `pumps_cannot`: true, the ship's own pumps cannot do it (no pumps, no company, or
+#       the pumps manned and losing); false, they could (package 73).
 #   `harm`: `none`, `hurt` or `deadly`, and a brief with `nobody_dies` refuses the deadly.
 #   `source`: where the thing is found in the period's books, or "judgement".
 things:
@@ -232,11 +237,10 @@ things:
     harm: none
   # -- the hull ---------------------------------------------------------------------------
   - id: seam_working
-    words: ["a seam found working", "a seam is found working", "a seam working", "she is found making water"]
-    source: Falconer 1780, LEAK; the well sounded each watch
-    report: "The carpenter reports a seam working below the wale on the weather side; the well is to be sounded every glass."
-    effect: {report_only: true}
-    unmodelled: "nothing of the hull is modelled yet"
+    words: ["a seam found working", "a seam is found working", "a seam working", "she is found making water", "a leak found", "a leak is found"]
+    source: "Falconer 1780, LEAK; the well sounded each watch; the rate judgement (a started seam a few tons an hour, which two hands at a brake pump hold; package 73, docs/design/Design-WaterAndHealth.md)"
+    report: "The carpenter reports a seam working below the wale on the weather side, making water at some two tons an hour; the well is to be sounded every glass, and he asks for hands to caulk it."
+    effect: {leak_tons_per_h: 2.0}
     plausible_when: {sea_above: ["smooth", "a smooth sea", "calm"]}
     doubt: "she has not been working in a sea: a seam opens under a labouring ship, not at her ease"
     harm: none
@@ -247,20 +251,23 @@ things:
     effect: {report_only: true}
     unmodelled: "nothing of the bilge or the people's health is modelled yet"
     harm: none
-  # -- the hull's repair: a hotfix until milestone 7's pumps and carpenter's work (taking on water) ----------
+  # -- the hull's repair: the hotfix's two forms of 2026-10-21, kept as the director's causes
+  # beside the carpenter's own work and the pumps (package 73, spec M7 §13: `stop the leak`
+  # caulks the ground's leak and a started seam in the carpenter's hours, `plug the shot
+  # holes` plugs them, `man the pumps` pumps her out), each with its doubt ----------
   - id: leak_stopped
     words: ["the leak found and stopped", "the leak stopped", "the leak fothered", "her strained seams caulked"]
     source: Falconer 1780, LEAK and FOTHERING; the carpenter's crew at the seams (Steel 1794, the carpenter's duty)
-    report: "The carpenter reports the leak found and stopped: the seams she strained on the ground are payed and caulked, and the well gains no more."
+    report: "The carpenter reports the leak found and stopped: the seams she strained are payed and caulked, and the well gains no more from them."
     effect: {leak_stopped: true}
     plausible_when: {leaking: true}
-    doubt: "she is making no water: there is no leak to stop"
+    doubt: "she is making no water from the ground or a started seam: there is no leak to stop (a shot hole is the carpenter's plug: 'plug the shot holes')"
     harm: none
   - id: well_pumped
     words: ["the well pumped out", "the well pumped dry", "she is pumped out", "the ship pumped out"]
     source: Falconer 1780, PUMP; the hands at the chain pump until she sucks
     report: "The carpenter reports her pumped out: the hands were at the pumps until they sucked, and the well is dry."
     effect: {well_pumped: true}
-    plausible_when: {well_above: 0}
-    doubt: "the well is dry already: there is nothing to pump"
+    plausible_when: {well_above: 0, pumps_cannot: true}
+    doubt: "the well is dry already, or she has pumps and hands to pump her out herself ('man the pumps' is the captain's order, and the pumps gain or lose by their rates)"
     harm: none

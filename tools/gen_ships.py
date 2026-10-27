@@ -724,6 +724,18 @@ class Builder:
             if text:
                 self.boat_notes[("boats", bid)] = text
 
+    def pumps(self, note, entries):
+        """The `pumps:` list (package 73, spec M7 §13) from (id, kind, name, tons_per_hour,
+        hands, note) entries, the note above each pump's line and `note` above the section."""
+        self.doc["pumps"] = [
+            {"id": pid, "kind": kind, "name": name, "tons_per_hour": tph, "hands": hands}
+            for pid, kind, name, tph, hands, _ in entries
+        ]
+        self.pump_notes = {("section",): note}
+        for pid, _, _, _, _, text in entries:
+            if text:
+                self.pump_notes[("pumps", pid)] = text
+
     def gear(self, note, entries):
         """The `gear:` list (package 56, spec M7b §21a) from (id, kind, name, sizes, note)
         entries, `sizes` a mapping of the period's figures (beam_ft, length_fathoms, nets,
@@ -919,9 +931,11 @@ class Builder:
         in_tackle = False
         in_boats = False
         in_gear = False
+        in_pumps = False
         in_armament = False
         fit_name = ""
         gear_notes = getattr(self, "gear_notes", {})
+        pump_notes = getattr(self, "pump_notes", {})
         armament_notes = getattr(self, "armament_notes", {})
         for line in text.splitlines():
             if line.startswith("hull:"):
@@ -988,6 +1002,20 @@ class Builder:
                 note = gear_notes.get(("gear", m.group(1)))
                 if note:
                     out.append("# " + note)
+            # the pumps (package 73), noted as the boats are
+            if line.startswith("pumps:"):
+                in_boats = False
+                in_gear = False
+                in_pumps = True
+                note = pump_notes.get(("section",))
+                if note:
+                    out.append("# " + note)
+            elif in_pumps and not line.startswith("  ") and not line.startswith("- "):
+                in_pumps = False
+            if in_pumps and (m := re.match(r"^- id: (\S+)$", line)):
+                note = pump_notes.get(("pumps", m.group(1)))
+                if note:
+                    out.append("# " + note)
             if in_crew:
                 note = None
                 if m := re.match(r"^    - kind: (\S+)$", line):
@@ -1009,7 +1037,7 @@ class Builder:
                 if note:
                     out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
             m = re.match(r"^- id: (\S+)$", line)
-            if m and m.group(1) in self.notes and not in_boats and not in_gear:
+            if m and m.group(1) in self.notes and not in_boats and not in_gear and not in_pumps:
                 out.append("# " + self.notes[m.group(1)])
             m = re.match(r"^  (\w+):", line) if in_hull else None
             if m and m.group(1) in self.hull_notes:
@@ -2368,6 +2396,19 @@ def frigate(out_dir="data/ships"):
     frigate_crew(b)
     frigate_armament(b, deck_height)
     hold_for(b, 933.0, True, "a ship of war's hold is her own stores and ballast: judgement")
+    b.pumps(
+        PUMPS_NOTE,
+        pump_entries(
+            2,
+            2,
+            [
+                "the starboard chain pump",
+                "the larboard chain pump",
+                "the starboard hand pump",
+                "the larboard hand pump",
+            ],
+        ),
+    )
     b.boats(
         BOATS_NOTE,
         boat_entries(
@@ -3209,6 +3250,7 @@ def schooner(out_dir="data/ships"):
     ground_tackle_for(b, 224.0, beam_ft, draught_ft)
     schooner_crew(b)
     hold_for(b, 224.0, False, "a sharp Baltimore hull stows about half her tonnage: judgement")
+    b.pumps(PUMPS_NOTE, pump_entries(0, 2, ["the starboard pump", "the larboard pump"]))
     b.boats(
         BOATS_NOTE,
         boat_entries(
@@ -3308,6 +3350,75 @@ def boat_entries(length_ft, ship_of_war, allowance):
         weight_lb = breadth * breadth * length * BOAT_WEIGHT_FACTORS.get(kind, BOAT_WEIGHT_DEFAULT)
         tons = round(max(0.1, weight_lb / LB_PER_TON), 1)
         out.append((bid, kind, name, float(length), oars, oars + 1, tons, text))
+    return out
+
+
+# The pumps (package 73, spec M7 §13; docs/design/Design-WaterAndHealth.md). The chain pump
+# of Cole and Bentinck, in the King's ships from the 1770s and standard by 1805: in the
+# Seaford's trial "the chain pump, wrought by four men, discharged a ton of water in 43
+# seconds and a half" (Falconer 1780, PUMP, the article's close), which is 83 tons an hour
+# at four men fresh, taken as 80; the common pump, the brake or elm-tree pump, two men at
+# the brake, a fraction of it (judgement from its bore: a seven-inch bore, a twelve-inch
+# stroke, thirty strokes a minute is some 13 tons an hour; 15 taken). The King's ships
+# carried two chain pumps at the main mast and two elm-tree pumps (Lavery, Arming and
+# Fitting, the pumps; from memory); a brig-sloop one chain pump and two hand pumps
+# (judgement); the small vessels hand pumps alone (Steel 1794 on the pumps of small craft;
+# judgement for the count). The rates are the pump's with its hands fresh; the men's
+# numbers, their rating and their fatigue, and the roll, make the lift the keeper gives
+# (`freesail/world/water.py`).
+CHAIN_PUMP_T_PER_H = 80.0
+CHAIN_PUMP_HANDS = 4
+HAND_PUMP_T_PER_H = 15.0
+HAND_PUMP_HANDS = 2
+PUMPS_NOTE = (
+    "The pumps (package 73, spec M7 §13): the chain pump of Cole and Bentinck, a ton in 43 "
+    "seconds and a half with four men (Falconer 1780, PUMP), and the common brake pump with "
+    "two; the counts by the ship's class (Lavery, Arming and Fitting; Steel 1794); see "
+    "tools/gen_ships.py."
+)
+SHOT_PLUGS_NOTE = (
+    "The carpenter's shot plugs (package 73, spec M7 §14): tapered plugs of soft wood with "
+    "oakum and tallow, kept ready in action (the Regulations and Instructions 1806, the "
+    "Carpenter; Falconer 1780, PLUG: 'shot-plugs ... to stop holes made by cannon shot'); "
+    "the count by her class, judgement."
+)
+
+
+def pump_entries(chain, hand, names):
+    """The pumps' lines: so many chain pumps and so many hand pumps, the names from
+    `names` in order."""
+    out = []
+    i = 0
+    for n in range(chain):
+        out.append(
+            (
+                f"pump.chain.{n + 1}",
+                "chain",
+                names[i],
+                CHAIN_PUMP_T_PER_H,
+                CHAIN_PUMP_HANDS,
+                "A chain pump at the main mast (Falconer 1780, PUMP): four men, 80 tons an "
+                "hour fresh."
+                if n == 0
+                else None,
+            )
+        )
+        i += 1
+    for n in range(hand):
+        out.append(
+            (
+                f"pump.hand.{n + 1}",
+                "hand",
+                names[i],
+                HAND_PUMP_T_PER_H,
+                HAND_PUMP_HANDS,
+                "A brake pump (the common or elm-tree pump): two men, 15 tons an hour fresh "
+                "(judgement)."
+                if n == 0
+                else None,
+            )
+        )
+        i += 1
     return out
 
 
@@ -4042,6 +4153,11 @@ def frigate_crew(b):
                 600,
                 "Spare rope in the boatswain's store (judgement).",
             ),
+            (
+                ("stores", "shot_plugs"),
+                40,
+                SHOT_PLUGS_NOTE + " A frigate's 40.",
+            ),
             *ration_entries("a King's ship"),
         ]
     )
@@ -4226,6 +4342,11 @@ def schooner_crew(b):
             (("stores", "provisions_days"), 60, "Provisions: two months (judgement)."),
             (("stores", "spare_spars"), {}, None),  # the booms, by class: below
             (("stores", "cordage_fathoms"), 150, "Spare rope (judgement)."),
+            (
+                ("stores", "shot_plugs"),
+                8,
+                SHOT_PLUGS_NOTE + " A schooner's 8.",
+            ),
             *ration_entries("a private ship of war's articles promised the like (judgement)"),
         ]
     )
@@ -5064,6 +5185,7 @@ def cutter(out_dir="data/ships"):
     cutter_crew(b)
     cutter_armament(b, deck_height)
     hold_for(b, burthen, False, "a revenue cutter's hold less her own stores: judgement")
+    b.pumps(PUMPS_NOTE, pump_entries(0, 2, ["the starboard pump", "the larboard pump"]))
     b.boats(
         BOATS_NOTE,
         boat_entries(
@@ -5164,6 +5286,11 @@ def cutter_crew(b):
             (("stores", "provisions_days"), 30, "Provisions: a month (judgement)."),
             (("stores", "spare_spars"), {}, None),  # the booms, by class: below
             (("stores", "cordage_fathoms"), 80, "Spare rope (judgement)."),
+            (
+                ("stores", "shot_plugs"),
+                8,
+                SHOT_PLUGS_NOTE + " A cutter's 8.",
+            ),
             *ration_entries("a revenue cruiser victualled as the King's ships (judgement)"),
         ]
     )
@@ -6058,6 +6185,10 @@ def brig(out_dir="data/ships", merchant=False):
     brig_crew(b)
     brig_armament(b, deck_height)
     hold_for(b, burthen, True, "a brig-sloop's hold is her own stores: judgement")
+    b.pumps(
+        PUMPS_NOTE,
+        pump_entries(1, 2, ["the chain pump", "the starboard hand pump", "the larboard hand pump"]),
+    )
     b.boats(
         BOATS_NOTE,
         boat_entries(
@@ -6148,6 +6279,7 @@ def merchant_brig(b, out_dir, burthen, gundeck_ft):
     merchant_brig_crew(b)
     merchant_brig_armament(b)
     hold_for(b, burthen, False, "a merchant brig's hold, her trade: judgement")
+    b.pumps(PUMPS_NOTE, pump_entries(0, 2, ["the starboard pump", "the larboard pump"]))
     b.boats(
         BOATS_NOTE,
         boat_entries(
@@ -6256,6 +6388,11 @@ def merchant_brig_crew(b):
             (("stores", "provisions_days"), 90, "Provisions: three months (judgement)."),
             (("stores", "spare_spars"), {}, None),  # the booms, by class: below
             (("stores", "cordage_fathoms"), 150, "Spare rope (judgement)."),
+            (
+                ("stores", "shot_plugs"),
+                4,
+                SHOT_PLUGS_NOTE + " A merchantman's 4.",
+            ),
             *ration_entries(
                 "a merchant's articles promised the like (judgement: no scale of the period's "
                 "merchant service is in the references)"
@@ -6375,6 +6512,11 @@ def brig_crew(b):
                 ("stores", "cordage_fathoms"),
                 300,
                 "Spare rope in the boatswain's store (judgement).",
+            ),
+            (
+                ("stores", "shot_plugs"),
+                20,
+                SHOT_PLUGS_NOTE + " A brig-sloop's 20.",
             ),
             *ration_entries("a King's ship"),
         ]
@@ -7054,6 +7196,7 @@ def lugger(out_dir="data/ships"):
     ground_tackle_for(b, burthen, beam_ft, draught_ft)
     lugger_crew(b)
     hold_for(b, burthen, False, "a chasse-marée, a coaster deep in the hold: judgement")
+    b.pumps(PUMPS_NOTE, pump_entries(0, 1, ["the pump"]))
     b.boats(
         BOATS_NOTE,
         boat_entries(
@@ -7174,6 +7317,11 @@ def lugger_crew(b):
             (("stores", "provisions_days"), 30, "Provisions: a month (judgement)."),
             (("stores", "spare_spars"), {}, None),
             (("stores", "cordage_fathoms"), 80, "Spare rope (judgement)."),
+            (
+                ("stores", "shot_plugs"),
+                4,
+                SHOT_PLUGS_NOTE + " A lugger's 4.",
+            ),
             *ration_entries(
                 "the measure for a French vessel too, whose own ration the references do not "
                 "give (judgement)"
@@ -7793,6 +7941,7 @@ def smack(out_dir="data/ships"):
         "water-tight compartment amidships open to the sea through holes in her bottom "
         "(Holdsworth 1874 pp. 139 to 140; Steel 1805, WELL), where the live cod are kept."
     )
+    b.pumps(PUMPS_NOTE, pump_entries(0, 1, ["the pump"]))
     b.boats(
         BOATS_NOTE,
         boat_entries(
@@ -7909,6 +8058,11 @@ def smack_crew(b):
             (("stores", "provisions_days"), 14, "Provisions: a fortnight (judgement)."),
             (("stores", "spare_spars"), {}, None),
             (("stores", "cordage_fathoms"), 40, "Spare rope (judgement)."),
+            (
+                ("stores", "shot_plugs"),
+                2,
+                SHOT_PLUGS_NOTE + " A smack's 2.",
+            ),
             *ration_entries("the measure for a smack's men, found by her owner (judgement)"),
         ]
     )

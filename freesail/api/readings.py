@@ -1104,9 +1104,9 @@ REGISTRY.add(Reading("watch_below", ("the watch below",), "hands", "", _watch_be
 def _well(world: Any, _: str | None) -> dict[str, Any] | None:
     """`the well`: the water in the well by the carpenter's last sounding (`sound the
     well`, `world.ground.sound_well`), with its age; None before a sounding. The water is
-    the grounding's leak's and nothing else's yet (the pumps are milestone 7's, with taking
-    on water), and it moves nothing of her handling: a reading of the carpenter's, not of the ship's
-    trim."""
+    the keeper's (`freesail/world/water.py`, package 73: the shot holes, the ground, the
+    seams and the sea, less the pumps); its free surface reaches the stability through
+    `parts.Hull.gm_m` and nothing else of her handling: a reading of the carpenter's."""
     extra = getattr(getattr(world, "ship", None), "extra", None) or {}
     said = extra.get("well_sounded")
     if said is None:
@@ -1114,7 +1114,10 @@ def _well(world: Any, _: str | None) -> dict[str, Any] | None:
     tick, metres, words = said
     clock = getattr(world, "clock", None)
     age_s = (clock.tick - tick) if clock is not None else 0
-    return {"metres": metres, "words": words, "age_s": age_s}
+    # package 73: the keeper's gain and the pumps' state after the sounding's words
+    from freesail.api.damage_readings import well_tail
+
+    return {"metres": metres, "words": words + well_tail(world), "age_s": age_s}
 
 
 def _no_sounding_words(world: Any) -> str | None:
@@ -4010,6 +4013,8 @@ from freesail.api import signal_readings as _signal_readings  # noqa: E402
 _signal_readings.register()
 
 # The squadron's, the station's and the convoy's (package 72), after the signals'.
+from freesail.api import damage_readings as _damage_readings  # noqa: E402
 from freesail.api import squadron_readings as _squadron_readings  # noqa: E402
 
 _squadron_readings.register()
+_damage_readings.register()  # package 73: the pumps, the leaks, the hatches, the water
