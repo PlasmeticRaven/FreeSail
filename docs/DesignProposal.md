@@ -669,6 +669,19 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     The owner's acceptance test: his armed tender ordered to the next region, through real
     weather, into a port, ashore to a person, back with a thing, past a ship the director
     placed, and home to report it all, the player none the wiser until the report.
+53. **The one-world refactor's eight decisions.** Owner, 2026-10-27, on the study's
+    recommendations (`docs/design/Design-OneWorld.md` §5.2), each taken as proposed: a far
+    person's acts at step 4 the whole table at once (the yard's repair of a sleeping hull
+    coarse, the pilot a job to the anchorage without the conn); a log for every hull while
+    she exists, a finished hull's dropped unless a station was ever held on her (the owner
+    amenable to holding every log if the concern is storage rather than performance, once
+    the storage is measured); the pace bound three awake hulls on the build machine with a
+    stationed hull first in the cap's order and six on the owner's, stationed hulls kept
+    awake as a scenario's option; the leaders' offices M8's, 84 building the room for them;
+    a far trader transacting at her port, on by default; a hull at anchor awake under the
+    cap's order; the business's region the followed hull's; two sleeping hulls fighting far
+    from the player by 74's rounds asleep. 84 launches when 73 and the fold-in of the
+    owner's local work are merged; the owner's usage is to be spent without hurry.
 
 ### Still open
 

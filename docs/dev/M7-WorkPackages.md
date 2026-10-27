@@ -49,8 +49,9 @@ on these packages; that is the owner's choice.
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below), for the owner's eight decisions; 73 and the owner's local work merged first |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); **the eight decisions taken as proposed (decision 53, 2026-10-27)**; launches when 73 and 86 are merged |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
+| 86 | Fable | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | briefed 2026-10-27 (below); launches the moment 73 is merged |
 | 81 | Opus | The viewer's action: the gun ports and the guns drawn with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
@@ -1160,6 +1161,8 @@ rule, say so for 55). **The head rules bind** as the briefs before have them.
 
 ## Package 84: the one-world refactor (`freesail/world/hulls.py` new, the Hull; `freesail/core/world.py` the World split and the two-phase tick; `freesail/world/crews.py` the switch alone, `CrewedWorld` retired; `freesail/world/people.py`, `hearing.py`, `movement.py`, `things.py`, `stations.py` one registry of persons and things with the whereabouts; `freesail/world/ports.py` and `dealings.py` new, the ports' half and the hull's half; `freesail/world/ships.py`, `brains.py`, `squadrons.py`, `signals.py`, `signalling.py`, `hail.py`, `combat/action.py` the player's vessel of the sea and `PLAYER_ID` one rule; `freesail/world/business.py`, `data/business.yaml` the far trader's transaction; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the forms with a hull and the truth over the hulls; `freesail/api/readings.py` the station line and the truth; `freesail/agents/harness.py`, `remote.py`, `tools.py`, `seats.py` the hull in the World's place; `freesail/core/replay.py`, `acts.py` the hull on the inputs, the save's hulls block, the checkpoint's converter; `freesail/ui/server.py`, `console.py`, `harbour.py` the followed hull; `docs/TechnicalSpec-M6.md` §19 and §20, `docs/TechnicalSpec-M7b.md` §11, §12 and §12b "as built" pointers; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` the acceptance test as a truth numbered after 73's)
 
+**The owner's eight decisions were taken as the study proposed on 2026-10-27 (decision 53 in `docs/DesignProposal.md`); where an item below says it waits on one, it no longer does, and the log's holding in decision 2 is to be measured for storage before any hull's log is dropped.**
+
 Fable; the refactor of decision 52 on package 83's design (`docs/design/Design-OneWorld.md`:
 the world as it is in its part 1, the design in its part 2, the roads costed in its part 3,
 the steps in its part 4, the findings and the owner's decisions in its part 5), run after
@@ -1274,3 +1277,53 @@ touched (the study's 3.4 is 55's); a world order never shown as sent; the ship f
 untouched; the pins re-measured only where a change moves them, old beside new, proven by
 bisection; never a test skipped, disabled or quarantined; realism, not pacing; the physics
 read and not changed; each step a green mergeable state pushed to `claude/pkg-84`.
+
+## Package 86: the owner's local work folded in (every file the review's plan names: the ordnance package's new files whole, the shared files hunk by hunk on top of 73, `tools/gen_ships.py` merged by hand and the ship files regenerated; the fixes with their tightening; the records recast into the line's current files; `docs/dev/TuningNotes.md`; the tests)
+
+Fable; launched the moment 73 is merged, the one package between 73 and 84. The ground is
+**the review of the owner's local work**, `docs/playtests/2026-10-25-to-27-owner-playtests-
+70-72/review-of-the-local-work.md`, whose section 3 gives every change and its
+recommendation, section 5 the collisions, and **section 7 the merge plan, which is this
+brief's order of work**; the owner's own weighting in `debrief.md` beside it (the door fixes
+key, already merged as the plan's step 1 at `59c4ca4`; the free intent wanted in substance
+and provisional in form; resupply and practice as stopgaps for 75 and 77 to redesign as
+judged); his tree extracted at `/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-50d6-9285-0413fe7ccd0b/scratchpad/owner-local-2026-10-27/m7localchanges` (read as data; run nothing from inside it) and his unified diff against `2774be3` beside it (`owner-local.diff`). Each item an intent with the lead's reading; the intent binds; the review's reasons are the reading.
+
+1. **The ordnance package on top of 73 (the plan's step 3).** The new files whole; the
+   shared files hunk by hunk over 73's versions of the same files; `tools/gen_ships.py`
+   merged by hand with 73's changes and the ship files regenerated, never taken as text;
+   the review's edits made (the global pivot arc made per gun or named for 75; the fillers
+   noted for 75 or 77 as real posts; the stale docstring and comment; the duplicated word
+   helpers removed; `Papers._merge` reading its own path; the `practice` stream and the
+   `hit_chance` size keyword as they are). The owner's truths keep their numbers 7-161 to
+   7-171 (73's begin at 7-172, so no renumbering: the plan's step 4 is reduced to the unit
+   pins and the counts, each with the old figure beside the new).
+2. **The fixes (the plan's step 2), tightened.** The free intents (the crewed captain
+   short-circuiting a free intent as the far one does, the ship keeping her service role,
+   the warning's words), the hail fix (its `commands` branch limited to the player's ship,
+   the heave-to on a demand only as the spec has it), station keeping by name and by kind
+   limited to sails in sight with the word match tightened; the tests the review asks for
+   each.
+3. **The pins proven.** The whole slow tier and the pace tests on the merged tree; every pin
+   the hail fix or the rest moves bisected (the gating reverted, the old figure back), moved
+   with the old beside the new and the reason, and the convoy and blockade scenarios and
+   truths 7-143 to 7-160 checked in particular. **The convoy's stall reproduced**
+   (`convoy-six.yaml` run with no orders, as the owner played it: stalled early south-east
+   of the Lizard with no way on) and the cause named: the study's reading is the near
+   `keep station` order shaping a course inside the close-hauled angle with no bear-away to
+   fill (58b's law for the far body's `_course_for`); mended if it is that and small, else
+   reported for 72's captain pass.
+4. **The records recast (the plan's step 5).** The owner's design notes whole with their
+   local hashes replaced by the fold-in's commits; his sections of the spec, the Harness,
+   the tuning notes and the primers into the line's current files; the one line that names
+   a model reworded; the "Practice and resupply as merged" record written by hand into the
+   line's `docs/dev/M7-WorkPackages.md` (never his file whole); 74's, 75's, 77's and 82's
+   briefs given the lines the review's section 5 names; the six slow truths' build-machine
+   digests recorded beside the owner's.
+5. **Left out.** The four consent records; the owner's `docs/dev/M7-WorkPackages.md` as a
+   file; nothing of `tests/test_pictures.py` (its two tests fail on this machine's newer
+   Chromium by a hair under the blank threshold, before and after every change: the
+   machine's, noted, not mended here).
+
+**The head rules bind** as the briefs before have them; the builder pushes its branch to
+`claude/pkg-86` after each commit.
