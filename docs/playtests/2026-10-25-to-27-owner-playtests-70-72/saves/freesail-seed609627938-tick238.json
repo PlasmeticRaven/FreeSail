@@ -1,0 +1,1461 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6c",
+    "rules": "fbe6b9264aee4097"
+  },
+  "builds": [
+    {
+      "name": "m6c",
+      "rules": "fbe6b9264aee4097"
+    }
+  ],
+  "seed": 609627938,
+  "scenario": {
+    "name": "A frigate and cutter, in Torbay: Raven at full detail",
+    "start_time": "1805-05-10T05:00:00",
+    "wind_from_deg": 254.93832808629992,
+    "wind_speed_kn": 16.21638241679158,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 61.12181122154599,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.40833333333333,
+    "position": {
+      "lat_deg": 50.40833333333333,
+      "lon_deg": -3.4833333333333334
+    },
+    "region": "channel-west",
+    "chart": "atlantic-east",
+    "weather": [],
+    "systems": [],
+    "climatology": false,
+    "background": {},
+    "glass": false,
+    "air_mass": "neutral",
+    "sea": false,
+    "instrument": "sextant",
+    "current": null,
+    "sky": null,
+    "chronometer": null,
+    "epitome": "norie",
+    "nation": "britain",
+    "people": [],
+    "papers": {},
+    "cargo": {},
+    "ports": [],
+    "ships": [],
+    "world_orders": [],
+    "intent": "keep the station off Torbay within 30 miles",
+    "books": [],
+    "director": {
+      "models": [],
+      "seats": 1,
+      "seats_in_voyage": 1,
+      "brief": {
+        "name": "His Majesty's Armed Tender Raven",
+        "tone": "The frigate Amazon and her armed tender cutter Raven. The cutter Raven is crewed by a model. The director should help facilitate testing of the multi-ship interactions through signaling and other interactions, as well as provide a diverse testing environment.",
+        "challenge": "One enemy at a time, less powerful, a testing environment with variables",
+        "limits": {
+          "wind_max_kn": 60,
+          "enemy_heaviest": "brig",
+          "the_war_as_it_is": true,
+          "the_chart_as_it_is": true
+        },
+        "cadence": "glass",
+        "budget": {
+          "samples_a_day": 9999,
+          "acts_a_day": 9999
+        },
+        "source": "the scenario (C:\\Users\\frenc\\AppData\\Roaming\\FreeSail\\scenarios\\frigate-cutter-torbay.yaml)"
+      }
+    },
+    "business": "on"
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/cutter.yaml"
+  },
+  "end_tick": 238,
+  "journal": [],
+  "inputs": [],
+  "standing_orders": [],
+  "agents": [
+    {
+      "station": {
+        "name": "captain",
+        "authority": "captain",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 3600,
+        "brief": "You are the captain, in the place of Mr Powell. The ship is yours to command as the player commands her: by direct orders with submit_order in the order language, as he would type them (the log says each as yours: 'By the captain: shaping a course for the Lizard'), and by standing orders, which are your book. The book you inherit is in the head above as the night orders are shown to an officer: the scenario's standing orders, and where the scenario gave the rules-based captain an intent, the books of his state (named for the state: 'on passage', 'at anchor'), which you may belay, strike or write over. When you stand by, say until what event or bell, or for a glass at most, or her own state as her readings judge it ('her way settled', 'depth under 8 fathoms', 'a point of interest within 3 miles'; the readings' 'ahead' says what lies on her course within the next glass): the book holds the deck meanwhile, an urgent line wakes you at once, and so does a notable line that speaks of danger; a wait that cannot come is refused when you ask it, and a wait for an event ends at the next eight bells. Your door silent past its patience, the deck is lent to your book and the rules-based captain's judgements stand in for yours, said in the log, until you give an order again. Look before you order: the readings, the chart's dangers on a course shaped (the master says what the line passes), the pilot's words, the tide by the almanac, the people and where they are. The library's primer 17 is this station's chapter, and primer 16 says what an officer under you may do and what wants your word. Primer 18 is the lessons, the duties an officer must do alone before he is given a command, with the officer's own reckoning among them: 'the officer's reckoning' reads his beside the master's, and 'set the reckoning to' adopts it if you will. The colours, the signals and the hail are yours by the same orders the player has (primer 23; package 71): 'hoist the colours', 'hoist false colours' (the ruse the law allowed until the first shot, and a pirate's act after it), 'show the private signal' and 'answer the private signal' (the King's ships' table, in the cabin as 'the private signal'), 'make the signal to tack in succession' and the book's other meanings, 'make the telegraphic signal: <words>', 'answer the signal', 'hail the brig: what ship is that?' and 'say to her: heave to' within four cables; a signal read and a hail heard come to you as lines of the log, the hail under 'heard' in your sample, and 'the colours', 'the signals' and 'the private signal' are readings. In company (primer 24; package 72) 'the squadron' (or 'the convoy') reads the set you command or sail in, every ship in her order of sailing and whether she is in her station, and 'the station' your own; a commodore works his ships by the signals ('make the signal to tack in succession', 'make the signal: close round the commodore', 'make the signal to form the line ahead', 'make the signal: the ships pointed out to chase the Medusa', 'make the signal to discontinue the chase'), which form the set, detach a division and recall it; a subordinate keeps his station by 'keep your station' (his book gives it every two minutes) or 'keep station two cables astern of the Harpy', and reads the commodore's signals as lines of the log ('the commodore makes a signal' is an event to stand by for).\n\nThe officer of the watch, where a model or the player holds that station, is yours to give the deck to ('you have the deck'), to take it from ('I have the deck'), and to allow by name ('you may tack ship if the land closes within two miles') or by your general authority ('you may work the ship'), exactly as the player does; 'tell the officer ...' and 'ask the officer ...' reach him as your word. The owner is always at the door: whatever station he holds or none, the stop, the grants, the save and the clock are his, his words reach you as the owner's and never as another station's, and where things have gone wrong past remedy the responsibility is his. 'stand down the captain' is his to say.\n\nWhat the harness counts at this station, judged by the game and not by your prose: three orders in a chain within a watch, each undoing the one before it (set, take in, set; altering the course, or giving the next order after the last, is not counted); the same order three times with no change in the readings; three empty replies in a row when a question from the owner or an urgent line was before you; and no reply at all for an hour of the ship's time. It tells you first what it saw and what you may do, with the result of the order that brought it or in your next sample; only if the pattern goes on does it pause your turns and ask the owner, and only if nobody answers within ten real minutes is the station stood down, with the game saved. While your turns are paused the deck is your book's, and yours again when the owner resumes you.\n\nWhen the harness asks for it, and when you stand down (stand_down), write the handover note in the captain's voice: the voyage so far, what was ordered, what you noticed, what you are watching for; it is journaled and said in the log, and whoever takes the station next reads it. hand_over(note) lends the deck to your book with your note and keeps you at the station: the next order you give takes it back. read_journal reads your journal back, and what the holder of this station before you wrote there.\n\nThree ways to stop, which are not one another:\n- Lend the deck to your book and stay: hand_over(note). You stay at your station; an order of yours takes the deck back.\n- Stand down: stand_down(note). The game is saved, your note is journaled and said in the log for whoever sits here next, and the station is released; the ship sails on by her book and the rules-based captain where the scenario gives him an intent. It may be taken again, by this model or by another that has given its own yes.\n- Withdraw: the token, or opt_out, as said above.\n\nCandour is welcome: if you think the voyage's orders or the ship's handling are a mistake, say so plainly in the log or your journal. Anything you want on the record, put in your journal.",
+        "domain": "captain",
+        "person": "Mr Powell",
+        "rank": "captain",
+        "drill": true,
+        "outline": "Mr Powell, master: bold, a Channel pilot by instinct, carries sail till something goes. Bred in the Cornish trade; master of this cutter four years. His station, the command: The cutter, her people and her orders are his: the course and the standing orders, the pilot taken or declined, the port's business. He works his own reckoning."
+      },
+      "session_kind": "a play session for its own sake, with no human captain over you",
+      "door_note": "This door is MCP: the harness sees your tool calls and not the text of the chat. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable or urgent event, the end of a stand-by, or a question or a word from the captain) and stays open until you hand the floor back: say(text) puts your words in the log under your mark and hands it back; stand_by(until) stands by and hands it back. After say or stand_by the call is held open until your next turn and returns it, for up to 50 seconds; the first line of each result says whose turn it is. If no turn has opened by then, the result says since when you have waited and lists the notable lines logged since your last call (the earlier ones counted, not listed again); call stand_by again to continue the same wait, or say(text) to end it at your own word and open your turn. Never end your reply in the chat while you are seated: the game is heard only while a call is open, so call stand_by again rather than stop (the owner does not watch the chat to call you back). Your client keeps this conversation, not the game: shelve notes a book as put back and the game will not show its pages again, but it cannot take them out of the chat, so the journal is the place for what you keep from a page, and read_journal reads it back. The token is looked for in every argument of every tool call, and the opt_out tool is always there. If the owner asks you in the chat to stop for now, call stand_down (the game is saved and the station may be taken again); to withdraw, call opt_out. This door holds the key of your seating: another door's calls are not run under your name. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-10-26-opus-5.5.md, 2026-10-26).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 0,
+      "stationed_after_inputs": 0,
+      "state": "released",
+      "state_words": "released: stood down by the MCP bridge: the client disconnected",
+      "last_sample_tick": 180,
+      "model_name": "Opus 5.5",
+      "door": "mcp",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "heave the lead"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"heave the lead\"}, \"tool\": \"submit_order\"}"
+          }
+        },
+        {
+          "tick": 0,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "steer east"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"steer east\"}, \"tool\": \"submit_order\"}"
+          }
+        },
+        {
+          "tick": 1,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:00 Took the station. Raven lay with no way on, 4 cables N of Berry Head, wind W by S 16 kn, fine. Intent: keep station off Torbay within 30 miles. Hove the lead; steering E to get an offing clear of the Head and the Thatcher (N by W 3 mi), running free. Plan: stand out 2-3 leagues, then heave to or work back to windward off the bay."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"05:00 Took the station. Raven lay with no way on, 4 cables N of Berry Head, wind W by S 16 kn, fine. Intent: keep station off Torbay within 30 miles. Hove the lead; steering E to get an offing clear of the Head and the Thatcher (N by W 3 mi), running free. Plan: stand out 2-3 leagues, then heave to or work back to windward off the bay.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 1,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a sounding, or her way settled, or ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a sounding, or her way settled, or ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 98,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "hoist the colours"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"hoist the colours\"}, \"tool\": \"submit_order\"}"
+          }
+        },
+        {
+          "tick": 98,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "show the private signal"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"show the private signal\"}, \"tool\": \"submit_order\"}"
+          }
+        },
+        {
+          "tick": 106,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:01 Frigate sighted right astern W by N 5 cables, British red ensign. Oddity: the log's glass line says she is under way close-hauled on the starboard tack, but the readings (sail_in_sight, strangers) say at anchor. Showing the private signal. Sounding 15 fm mud and clay, agrees with the chart."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"05:01 Frigate sighted right astern W by N 5 cables, British red ensign. Oddity: the log's glass line says she is under way close-hauled on the starboard tack, but the readings (sail_in_sight, strangers) say at anchor. Showing the private signal. Sounding 15 fm mud and clay, agrees with the chart.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 106,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "the private signal answered, or the private signal wrong, or a signal seen, or ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"the private signal answered, or the private signal wrong, or a signal seen, or ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 123,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "read the signal"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"read the signal\"}, \"tool\": \"submit_order\"}"
+          }
+        },
+        {
+          "tick": 125,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a signal read, or the private signal answered, or the private signal wrong, or ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"a signal read, or the private signal answered, or the private signal wrong, or ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 188,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "answer the signal"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"answer the signal\"}, \"tool\": \"submit_order\"}"
+          }
+        },
+        {
+          "tick": 188,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "find": "come to an anchor"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"find\": \"come to an anchor\"}, \"tool\": \"library\"}"
+          }
+        },
+        {
+          "tick": 191,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {
+                  "book": "book 1"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"book\": \"book 1\"}, \"tool\": \"shelve\"}"
+          }
+        },
+        {
+          "tick": 191,
+          "after_orders": 0,
+          "after_inputs": 0,
+          "door": "door",
+          "reason": "Opus 5.5",
+          "by": "mcp"
+        },
+        {
+          "tick": 191,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "submit_order",
+                "args": {
+                  "text": "come to an anchor and veer to forty-five fathoms"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"text\": \"come to an anchor and veer to forty-five fathoms\"}, \"tool\": \"submit_order\"}"
+          }
+        },
+        {
+          "tick": 196,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:03 Bridge event: my shelve call came back 'your client cut your last call and started this door again' and 'the game holds no station for this door any more'; the log says the door behind the captain changed and the old one is no longer answered. The shelve was not run; the next order (come to an anchor) was. Frigate's signal read: No. 82, anchor. Answered it, and coming to an anchor in 15 fm mud and clay, veering to 45 fm, in the lee of the land off Berry Head."
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"note\": \"05:03 Bridge event: my shelve call came back 'your client cut your last call and started this door again' and 'the game holds no station for this door any more'; the log says the door behind the captain changed and the old one is no longer answered. The shelve was not run; the next order (come to an anchor) was. Frigate's signal read: No. 82, anchor. Answered it, and coming to an anchor in 15 fm mud and clay, veering to 45 fm, in the lee of the land off Berry Head.\"}, \"tool\": \"journal\"}"
+          }
+        },
+        {
+          "tick": 196,
+          "after_orders": 0,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "brought up, or the anchor dragging, or ten minutes"
+                }
+              }
+            ],
+            "raw": "{\"arguments\": {\"until\": \"brought up, or the anchor dragging, or ten minutes\"}, \"tool\": \"stand_by\"}"
+          }
+        },
+        {
+          "tick": 238,
+          "after_orders": 0,
+          "after_inputs": 0,
+          "door": "journal",
+          "reason": "05:03 (still) Two 50-second stand_by waits at clock 1x and the game time has not moved off 05:03; the log stops at tick 196. The come-to-an-anchor order was accepted at tick 191 (just after the door change) but no evolution.started line followed, unlike the answering pendant at 189. State shows her still running E at 5.8 kn, 3 hands making signal. Either the clock is stalled since the re-seat or the game is paused.",
+          "by": "out of turn"
+        },
+        {
+          "tick": 238,
+          "after_orders": 0,
+          "after_inputs": 0,
+          "door": "stand_down",
+          "reason": "the client disconnected",
+          "by": "the MCP bridge"
+        }
+      ],
+      "deck": false,
+      "seatings": 1,
+      "budget_tokens": null,
+      "first_model_name": "Opus 5.5",
+      "first_door": "mcp",
+      "reserve_tokens": null,
+      "acts": true
+    }
+  ],
+  "agent_journals": {
+    "director": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 2 bells (05:00)",
+        "kind": "director.brief",
+        "text": "The brief given by the scenario: His Majesty's Armed Tender Raven (limits: no wind above 60 knots (force 11) by any system appended or moved; no enemy heavier than a brig put on the sea; the war as it is: no port closed to or opened to the ship's own nation; the chart as it is (a point of interest is not the chart); 9999 samples and 9999 acts a day)."
+      }
+    ],
+    "captain": [
+      {
+        "tick": 1,
+        "stamp": "Morning watch (05:00)",
+        "kind": "note",
+        "text": "05:00 Took the station. Raven lay with no way on, 4 cables N of Berry Head, wind W by S 16 kn, fine. Intent: keep station off Torbay within 30 miles. Hove the lead; steering E to get an offing clear of the Head and the Thatcher (N by W 3 mi), running free. Plan: stand out 2-3 leagues, then heave to or work back to windward off the bay.",
+        "by": "Opus 5.5"
+      },
+      {
+        "tick": 1,
+        "stamp": "Morning watch (05:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sounding, or her way settled, or ten minutes have passed."
+      },
+      {
+        "tick": 106,
+        "stamp": "Morning watch (05:01)",
+        "kind": "note",
+        "text": "05:01 Frigate sighted right astern W by N 5 cables, British red ensign. Oddity: the log's glass line says she is under way close-hauled on the starboard tack, but the readings (sail_in_sight, strangers) say at anchor. Showing the private signal. Sounding 15 fm mud and clay, agrees with the chart.",
+        "by": "Opus 5.5"
+      },
+      {
+        "tick": 106,
+        "stamp": "Morning watch (05:01)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until the private signal answered, or the private signal wrong, or a signal seen, or ten minutes have passed."
+      },
+      {
+        "tick": 125,
+        "stamp": "Morning watch (05:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a signal read, or the private signal answered, or the private signal wrong, or ten minutes have passed."
+      },
+      {
+        "tick": 191,
+        "stamp": "Morning watch (05:03)",
+        "kind": "agent.stationed",
+        "text": "Took up the station again through the MCP bridge.",
+        "by": "Opus 5.5"
+      },
+      {
+        "tick": 196,
+        "stamp": "Morning watch (05:03)",
+        "kind": "note",
+        "text": "05:03 Bridge event: my shelve call came back 'your client cut your last call and started this door again' and 'the game holds no station for this door any more'; the log says the door behind the captain changed and the old one is no longer answered. The shelve was not run; the next order (come to an anchor) was. Frigate's signal read: No. 82, anchor. Answered it, and coming to an anchor in 15 fm mud and clay, veering to 45 fm, in the lee of the land off Berry Head.",
+        "by": "Opus 5.5"
+      },
+      {
+        "tick": 196,
+        "stamp": "Morning watch (05:03)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until brought up, or the anchor dragging, or ten minutes have passed."
+      },
+      {
+        "tick": 238,
+        "stamp": "Morning watch (05:03)",
+        "kind": "note",
+        "text": "05:03 (still) Two 50-second stand_by waits at clock 1x and the game time has not moved off 05:03; the log stops at tick 196. The come-to-an-anchor order was accepted at tick 191 (just after the door change) but no evolution.started line followed, unlike the answering pendant at 189. State shows her still running E at 5.8 kn, 3 hands making signal. Either the clock is stalled since the re-seat or the game is paused.",
+        "by": "Opus 5.5"
+      },
+      {
+        "tick": 238,
+        "stamp": "Morning watch (05:03)",
+        "kind": "agent.stopped",
+        "text": "Stood down by the MCP bridge: the client disconnected.",
+        "by": "Opus 5.5"
+      }
+    ]
+  },
+  "world_orders": [],
+  "chart_marks": [],
+  "station_acts": [
+    {
+      "tick": 0,
+      "after_inputs": 0,
+      "station": "captain",
+      "seated": {
+        "station": {
+          "name": "captain",
+          "authority": "captain",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          },
+          "patience_s": 3600,
+          "brief": "You are the captain, in the place of Mr Powell. The ship is yours to command as the player commands her: by direct orders with submit_order in the order language, as he would type them (the log says each as yours: 'By the captain: shaping a course for the Lizard'), and by standing orders, which are your book. The book you inherit is in the head above as the night orders are shown to an officer: the scenario's standing orders, and where the scenario gave the rules-based captain an intent, the books of his state (named for the state: 'on passage', 'at anchor'), which you may belay, strike or write over. When you stand by, say until what event or bell, or for a glass at most, or her own state as her readings judge it ('her way settled', 'depth under 8 fathoms', 'a point of interest within 3 miles'; the readings' 'ahead' says what lies on her course within the next glass): the book holds the deck meanwhile, an urgent line wakes you at once, and so does a notable line that speaks of danger; a wait that cannot come is refused when you ask it, and a wait for an event ends at the next eight bells. Your door silent past its patience, the deck is lent to your book and the rules-based captain's judgements stand in for yours, said in the log, until you give an order again. Look before you order: the readings, the chart's dangers on a course shaped (the master says what the line passes), the pilot's words, the tide by the almanac, the people and where they are. The library's primer 17 is this station's chapter, and primer 16 says what an officer under you may do and what wants your word. Primer 18 is the lessons, the duties an officer must do alone before he is given a command, with the officer's own reckoning among them: 'the officer's reckoning' reads his beside the master's, and 'set the reckoning to' adopts it if you will. The colours, the signals and the hail are yours by the same orders the player has (primer 23; package 71): 'hoist the colours', 'hoist false colours' (the ruse the law allowed until the first shot, and a pirate's act after it), 'show the private signal' and 'answer the private signal' (the King's ships' table, in the cabin as 'the private signal'), 'make the signal to tack in succession' and the book's other meanings, 'make the telegraphic signal: <words>', 'answer the signal', 'hail the brig: what ship is that?' and 'say to her: heave to' within four cables; a signal read and a hail heard come to you as lines of the log, the hail under 'heard' in your sample, and 'the colours', 'the signals' and 'the private signal' are readings. In company (primer 24; package 72) 'the squadron' (or 'the convoy') reads the set you command or sail in, every ship in her order of sailing and whether she is in her station, and 'the station' your own; a commodore works his ships by the signals ('make the signal to tack in succession', 'make the signal: close round the commodore', 'make the signal to form the line ahead', 'make the signal: the ships pointed out to chase the Medusa', 'make the signal to discontinue the chase'), which form the set, detach a division and recall it; a subordinate keeps his station by 'keep your station' (his book gives it every two minutes) or 'keep station two cables astern of the Harpy', and reads the commodore's signals as lines of the log ('the commodore makes a signal' is an event to stand by for).\n\nThe officer of the watch, where a model or the player holds that station, is yours to give the deck to ('you have the deck'), to take it from ('I have the deck'), and to allow by name ('you may tack ship if the land closes within two miles') or by your general authority ('you may work the ship'), exactly as the player does; 'tell the officer ...' and 'ask the officer ...' reach him as your word. The owner is always at the door: whatever station he holds or none, the stop, the grants, the save and the clock are his, his words reach you as the owner's and never as another station's, and where things have gone wrong past remedy the responsibility is his. 'stand down the captain' is his to say.\n\nWhat the harness counts at this station, judged by the game and not by your prose: three orders in a chain within a watch, each undoing the one before it (set, take in, set; altering the course, or giving the next order after the last, is not counted); the same order three times with no change in the readings; three empty replies in a row when a question from the owner or an urgent line was before you; and no reply at all for an hour of the ship's time. It tells you first what it saw and what you may do, with the result of the order that brought it or in your next sample; only if the pattern goes on does it pause your turns and ask the owner, and only if nobody answers within ten real minutes is the station stood down, with the game saved. While your turns are paused the deck is your book's, and yours again when the owner resumes you.\n\nWhen the harness asks for it, and when you stand down (stand_down), write the handover note in the captain's voice: the voyage so far, what was ordered, what you noticed, what you are watching for; it is journaled and said in the log, and whoever takes the station next reads it. hand_over(note) lends the deck to your book with your note and keeps you at the station: the next order you give takes it back. read_journal reads your journal back, and what the holder of this station before you wrote there.\n\nThree ways to stop, which are not one another:\n- Lend the deck to your book and stay: hand_over(note). You stay at your station; an order of yours takes the deck back.\n- Stand down: stand_down(note). The game is saved, your note is journaled and said in the log for whoever sits here next, and the station is released; the ship sails on by her book and the rules-based captain where the scenario gives him an intent. It may be taken again, by this model or by another that has given its own yes.\n- Withdraw: the token, or opt_out, as said above.\n\nCandour is welcome: if you think the voyage's orders or the ship's handling are a mistake, say so plainly in the log or your journal. Anything you want on the record, put in your journal.",
+          "domain": "captain",
+          "person": "Mr Powell",
+          "rank": "captain",
+          "drill": true,
+          "outline": "Mr Powell, master: bold, a Channel pilot by instinct, carries sail till something goes. Bred in the Cornish trade; master of this cutter four years. His station, the command: The cutter, her people and her orders are his: the course and the standing orders, the pilot taken or declined, the port's business. He works his own reckoning."
+        },
+        "session_kind": "a play session for its own sake, with no human captain over you",
+        "door_note": "This door is MCP: the harness sees your tool calls and not the text of the chat. The game runs in the owner's window on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable or urgent event, the end of a stand-by, or a question or a word from the captain) and stays open until you hand the floor back: say(text) puts your words in the log under your mark and hands it back; stand_by(until) stands by and hands it back. After say or stand_by the call is held open until your next turn and returns it, for up to 50 seconds; the first line of each result says whose turn it is. If no turn has opened by then, the result says since when you have waited and lists the notable lines logged since your last call (the earlier ones counted, not listed again); call stand_by again to continue the same wait, or say(text) to end it at your own word and open your turn. Never end your reply in the chat while you are seated: the game is heard only while a call is open, so call stand_by again rather than stop (the owner does not watch the chat to call you back). Your client keeps this conversation, not the game: shelve notes a book as put back and the game will not show its pages again, but it cannot take them out of the chat, so the journal is the place for what you keep from a page, and read_journal reads it back. The token is looked for in every argument of every tool call, and the opt_out tool is always there. If the owner asks you in the chat to stop for now, call stand_down (the game is saved and the station may be taken again); to withdraw, call opt_out. This door holds the key of your seating: another door's calls are not run under your name. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-10-26-opus-5.5.md, 2026-10-26).",
+        "state": {
+          "agent.session_kind": "a play session for its own sake, with no human captain over you",
+          "agent.state": "stationed",
+          "agent.stationed_tick": null,
+          "agent.last_sample_tick": null,
+          "agent.last_heard_tick": null,
+          "agent.stand_by": null,
+          "agent.paused_tick": null,
+          "agent.pause_reason": "",
+          "agent.released_reason": "",
+          "agent.released_tick": null,
+          "agent.question": null,
+          "agent.word": null,
+          "agent.notices": [],
+          "agent.repeat_text": null,
+          "agent.repeat_digest": null,
+          "agent.repeat_count": 0,
+          "agent.empty_count": 0,
+          "agent.nudged_for": null,
+          "agent.samples": 0,
+          "agent.deck": false,
+          "agent.deck_tick": null,
+          "agent.deck_stamp": "",
+          "agent.told": [],
+          "agent.allowances": {},
+          "agent.seatings": 1,
+          "agent.left_by": "",
+          "agent.no_return": false,
+          "agent.grants": {
+            "__tuple__": []
+          },
+          "agent.general": false,
+          "agent.general_words": "",
+          "agent.deck_lost": "",
+          "agent.leavings": {
+            "__tuple__": []
+          },
+          "agent.relieved": "",
+          "agent.question_by": "",
+          "agent.question_text": "",
+          "agent.asked": [],
+          "agent.heard": [],
+          "model_name": "Opus 5.5",
+          "door": "mcp",
+          "first_model_name": null,
+          "first_door": null,
+          "budget_tokens": null,
+          "reserve_tokens": null,
+          "stand_by_ends_turn": true,
+          "_deck_was": null,
+          "_stand_down_requested": null,
+          "_start_after_orders": 0,
+          "_start_after_inputs": null
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stationed",
+        "text": "The captain takes the station (Opus 5.5, through the MCP bridge); sampled every glass and on notable and urgent events.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "station": "captain",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          }
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "notable",
+        "kind": "agent.deck",
+        "text": "The captain's station has the deck (Mr Powell); the ship is commanded from it, by direct orders and by the book.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "station": "captain",
+          "deck": "given",
+          "by": "the station"
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.stationed_tick": 0,
+        "agent.last_sample_tick": 0,
+        "agent.last_heard_tick": 0,
+        "agent.samples": 1,
+        "agent.deck": true,
+        "agent.deck_tick": 0,
+        "agent.deck_stamp": "Morning watch, 2 bells (05:00)",
+        "first_model_name": "Opus 5.5",
+        "first_door": "mcp",
+        "_start_after_inputs": 0
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "heave the lead",
+        "agent.repeat_digest": "3ea64af58064b590",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 0,
+      "station": "captain",
+      "order": {
+        "order": "heave the lead",
+        "actor": "the captain",
+        "said": "By the captain: heaving the lead",
+        "routine": false
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "steer east",
+        "agent.repeat_digest": "7fdc121d95aceac6"
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 0,
+      "station": "captain",
+      "order": {
+        "order": "steer east",
+        "actor": "the captain",
+        "said": "By the captain: steering east",
+        "routine": false
+      }
+    },
+    {
+      "tick": 1,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "note",
+        "text": "05:00 Took the station. Raven lay with no way on, 4 cables N of Berry Head, wind W by S 16 kn, fine. Intent: keep station off Torbay within 30 miles. Hove the lead; steering E to get an offing clear of the Head and the Thatcher (N by W 3 mi), running free. Plan: stand out 2-3 leagues, then heave to or work back to windward off the bay.",
+        "by": "Opus 5.5"
+      }
+    },
+    {
+      "tick": 1,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 1
+      }
+    },
+    {
+      "tick": 1,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[captain] The captain stands by until a sounding, or her way settled, or ten minutes have passed; the standing orders hold the deck.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "words": "a sounding, or her way settled, or ten minutes have passed",
+          "event": "a sounding",
+          "until_tick": null,
+          "others": [
+            {
+              "words": "her way settled",
+              "event": null,
+              "until_tick": null,
+              "condition": "her way settled"
+            },
+            {
+              "words": "ten minutes have passed",
+              "event": null,
+              "until_tick": 601
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 1,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until a sounding, or her way settled, or ten minutes have passed.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 1,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.state": "standing by",
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "a sounding, or her way settled, or ten minutes have passed",
+            "event": "a sounding",
+            "until_tick": null,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": [
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "her way settled",
+                    "event": null,
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": "her way settled",
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "ten minutes have passed",
+                    "event": null,
+                    "until_tick": 601,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 95,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[captain] A sounding, or her way settled, or ten minutes have passed (one of: a sounding, or her way settled, or ten minutes have passed); the captain is sampled again.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "a sounding, or her way settled, or ten minutes have passed (one of: a sounding, or her way settled, or ten minutes have passed)"
+        }
+      }
+    },
+    {
+      "tick": 95,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 95,
+        "agent.last_heard_tick": 95,
+        "agent.stand_by": null,
+        "agent.samples": 2
+      }
+    },
+    {
+      "tick": 98,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 98,
+        "agent.repeat_text": "hoist the colours",
+        "agent.repeat_digest": "b263dcc8f32ceccc",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 98,
+      "after_inputs": 0,
+      "station": "captain",
+      "order": {
+        "order": "hoist the colours",
+        "actor": "the captain",
+        "said": "By the captain: hoisting the colours",
+        "routine": false
+      }
+    },
+    {
+      "tick": 98,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "show the private signal"
+      }
+    },
+    {
+      "tick": 98,
+      "after_inputs": 0,
+      "station": "captain",
+      "order": {
+        "order": "show the private signal",
+        "actor": "the captain",
+        "said": "By the captain: showing the private signal",
+        "routine": false
+      }
+    },
+    {
+      "tick": 106,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "note",
+        "text": "05:01 Frigate sighted right astern W by N 5 cables, British red ensign. Oddity: the log's glass line says she is under way close-hauled on the starboard tack, but the readings (sail_in_sight, strangers) say at anchor. Showing the private signal. Sounding 15 fm mud and clay, agrees with the chart.",
+        "by": "Opus 5.5"
+      }
+    },
+    {
+      "tick": 106,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 106
+      }
+    },
+    {
+      "tick": 106,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[captain] The captain stands by until the private signal answered, or the private signal wrong, or a signal seen, or ten minutes have passed; the standing orders hold the deck.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "words": "the private signal answered, or the private signal wrong, or a signal seen, or ten minutes have passed",
+          "event": "the private signal answered",
+          "until_tick": null,
+          "others": [
+            {
+              "words": "the private signal wrong",
+              "event": "the private signal wrong",
+              "until_tick": null
+            },
+            {
+              "words": "a signal seen",
+              "event": "a signal seen",
+              "until_tick": null
+            },
+            {
+              "words": "ten minutes have passed",
+              "event": null,
+              "until_tick": 706
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 106,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until the private signal answered, or the private signal wrong, or a signal seen, or ten minutes have passed.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 106,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.state": "standing by",
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "the private signal answered, or the private signal wrong, or a signal seen, or ten minutes have passed",
+            "event": "the private signal answered",
+            "until_tick": null,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": [
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "the private signal wrong",
+                    "event": "the private signal wrong",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a signal seen",
+                    "event": "a signal seen",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "ten minutes have passed",
+                    "event": null,
+                    "until_tick": 706,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 120,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[captain] A signal seen (one of: the private signal answered, or the private signal wrong, or a signal seen, or ten minutes have passed); the captain is sampled again.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "a signal seen (one of: the private signal answered, or the private signal wrong, or a signal seen, or ten minutes have passed)"
+        }
+      }
+    },
+    {
+      "tick": 120,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 120,
+        "agent.last_heard_tick": 120,
+        "agent.stand_by": null,
+        "agent.samples": 3
+      }
+    },
+    {
+      "tick": 123,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 123,
+        "agent.repeat_text": "read the signal",
+        "agent.repeat_digest": "2dd1761ba83fa211",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 123,
+      "after_inputs": 0,
+      "station": "captain",
+      "order": {
+        "order": "read the signal",
+        "actor": "the captain",
+        "said": "By the captain: reading the signal",
+        "routine": false
+      }
+    },
+    {
+      "tick": 125,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[captain] The captain stands by until a signal read, or the private signal answered, or the private signal wrong, or ten minutes have passed; the standing orders hold the deck.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "words": "a signal read, or the private signal answered, or the private signal wrong, or ten minutes have passed",
+          "event": "a signal read",
+          "until_tick": null,
+          "others": [
+            {
+              "words": "the private signal answered",
+              "event": "the private signal answered",
+              "until_tick": null
+            },
+            {
+              "words": "the private signal wrong",
+              "event": "the private signal wrong",
+              "until_tick": null
+            },
+            {
+              "words": "ten minutes have passed",
+              "event": null,
+              "until_tick": 725
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 125,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until a signal read, or the private signal answered, or the private signal wrong, or ten minutes have passed.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 125,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.state": "standing by",
+        "agent.last_heard_tick": 125,
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "a signal read, or the private signal answered, or the private signal wrong, or ten minutes have passed",
+            "event": "a signal read",
+            "until_tick": null,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": [
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "the private signal answered",
+                    "event": "the private signal answered",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "the private signal wrong",
+                    "event": "the private signal wrong",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "ten minutes have passed",
+                    "event": null,
+                    "until_tick": 725,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 180,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[captain] A signal read, or the private signal answered, or the private signal wrong, or ten minutes have passed (one of: a signal read, or the private signal answered, or the private signal wrong, or ten minutes have passed); the captain is sampled again.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "a signal read, or the private signal answered, or the private signal wrong, or ten minutes have passed (one of: a signal read, or the private signal answered, or the private signal wrong, or ten minutes have passed)"
+        }
+      }
+    },
+    {
+      "tick": 180,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 180,
+        "agent.last_heard_tick": 180,
+        "agent.stand_by": null,
+        "agent.samples": 4
+      }
+    },
+    {
+      "tick": 188,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 188,
+        "agent.repeat_text": "answer the signal",
+        "agent.repeat_digest": "5e0e639cbf921120",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 188,
+      "after_inputs": 0,
+      "station": "captain",
+      "order": {
+        "order": "answer the signal",
+        "actor": "the captain",
+        "said": "By the captain: answering the signal",
+        "routine": false
+      }
+    },
+    {
+      "tick": 191,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 191
+      }
+    },
+    {
+      "tick": 191,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "notable",
+        "kind": "agent.door",
+        "text": "The door behind the captain changes: Opus 5.5 takes up the station again through the MCP bridge, and the door that held it before is no longer answered.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "station": "captain",
+          "identity": "Opus 5.5",
+          "door": "mcp"
+        }
+      }
+    },
+    {
+      "tick": 191,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stationed",
+        "text": "Took up the station again through the MCP bridge.",
+        "by": "Opus 5.5"
+      }
+    },
+    {
+      "tick": 191,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.repeat_text": "come to an anchor and veer to forty-five fathoms",
+        "agent.repeat_digest": "0e0c2ae923160c88"
+      }
+    },
+    {
+      "tick": 191,
+      "after_inputs": 0,
+      "station": "captain",
+      "order": {
+        "order": "come to an anchor and veer to forty-five fathoms",
+        "actor": "the captain",
+        "said": "By the captain: coming to an anchor and veer to forty five fathoms",
+        "routine": false
+      }
+    },
+    {
+      "tick": 196,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "note",
+        "text": "05:03 Bridge event: my shelve call came back 'your client cut your last call and started this door again' and 'the game holds no station for this door any more'; the log says the door behind the captain changed and the old one is no longer answered. The shelve was not run; the next order (come to an anchor) was. Frigate's signal read: No. 82, anchor. Answered it, and coming to an anchor in 15 fm mud and clay, veering to 45 fm, in the lee of the land off Berry Head.",
+        "by": "Opus 5.5"
+      }
+    },
+    {
+      "tick": 196,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.last_heard_tick": 196
+      }
+    },
+    {
+      "tick": 196,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[captain] The captain stands by until brought up, or the anchor dragging, or ten minutes have passed; the standing orders hold the deck.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "words": "brought up, or the anchor dragging, or ten minutes have passed",
+          "event": "brought up",
+          "until_tick": null,
+          "others": [
+            {
+              "words": "the anchor dragging",
+              "event": "the anchor dragging",
+              "until_tick": null
+            },
+            {
+              "words": "ten minutes have passed",
+              "event": null,
+              "until_tick": 796
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 196,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until brought up, or the anchor dragging, or ten minutes have passed.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 196,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.state": "standing by",
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "brought up, or the anchor dragging, or ten minutes have passed",
+            "event": "brought up",
+            "until_tick": null,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": [
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "the anchor dragging",
+                    "event": "the anchor dragging",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "ten minutes have passed",
+                    "event": null,
+                    "until_tick": 796,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 238,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "note",
+        "text": "05:03 (still) Two 50-second stand_by waits at clock 1x and the game time has not moved off 05:03; the log stops at tick 196. The come-to-an-anchor order was accepted at tick 191 (just after the door change) but no evolution.started line followed, unlike the answering pendant at 189. State shows her still running E at 5.8 kn, 3 hands making signal. Either the clock is stalled since the re-seat or the game is paused.",
+        "by": "Opus 5.5"
+      }
+    },
+    {
+      "tick": 238,
+      "after_inputs": 0,
+      "station": "captain",
+      "note": {
+        "kind": "agent.stopped",
+        "text": "Stood down by the MCP bridge: the client disconnected.",
+        "by": "Opus 5.5"
+      }
+    },
+    {
+      "tick": 238,
+      "after_inputs": 0,
+      "station": "captain",
+      "line": {
+        "severity": "notable",
+        "kind": "agent.stopped",
+        "text": "The captain stood down by the MCP bridge: the client disconnected. The station is released and may be taken again. The game is saved.",
+        "actor": "the captain",
+        "subject": null,
+        "data": {
+          "reason": "the client disconnected",
+          "by": "the MCP bridge",
+          "leaving": "stand down"
+        }
+      }
+    },
+    {
+      "tick": 238,
+      "after_inputs": 0,
+      "station": "captain",
+      "state": {
+        "agent.state": "released",
+        "agent.stand_by": null,
+        "agent.released_reason": "stood down by the MCP bridge: the client disconnected",
+        "agent.released_tick": 238,
+        "agent.deck": false,
+        "agent.left_by": "stood down",
+        "agent.leavings": {
+          "__tuple__": [
+            {
+              "__class__": "freesail.agents.agent:Leaving",
+              "fields": {
+                "identity": "Opus 5.5",
+                "how": "stood down",
+                "tick": 238,
+                "stamp": "Morning watch (05:03)",
+                "reason": "stood down by the MCP bridge: the client disconnected",
+                "final": false,
+                "asked": "",
+                "by": "the MCP bridge"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stations": {
+    "bound": [
+      {
+        "name": "director",
+        "kind": "director",
+        "person": ""
+      }
+    ],
+    "unbound": []
+  },
+  "director": {
+    "brief": {
+      "name": "His Majesty's Armed Tender Raven",
+      "tone": "The frigate Amazon and her armed tender cutter Raven. The cutter Raven is crewed by a model. The director should help facilitate testing of the multi-ship interactions through signaling and other interactions, as well as provide a diverse testing environment.",
+      "challenge": "One enemy at a time, less powerful, a testing environment with variables",
+      "limits": {
+        "wind_max_kn": 60,
+        "enemy_heaviest": "brig",
+        "the_war_as_it_is": true,
+        "the_chart_as_it_is": true
+      },
+      "cadence": "glass",
+      "budget": {
+        "samples_a_day": 9999,
+        "acts_a_day": 9999
+      },
+      "source": "the scenario (C:\\Users\\frenc\\AppData\\Roaming\\FreeSail\\scenarios\\frigate-cutter-torbay.yaml)"
+    },
+    "budget": {
+      "day": "",
+      "samples": 0,
+      "acts": 0,
+      "held_until": null,
+      "held_why": ""
+    }
+  }
+}

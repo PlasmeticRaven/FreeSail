@@ -1,0 +1,2261 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6c",
+    "rules": "fbe6b9264aee4097"
+  },
+  "builds": [
+    {
+      "name": "m6c",
+      "rules": "fbe6b9264aee4097"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "A frigate and cutter, in Torbay",
+    "start_time": "1805-05-10T05:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 190.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.41,
+    "position": {
+      "lat_deg": 50.41,
+      "lon_deg": -3.495
+    },
+    "region": "channel-west",
+    "chart": "atlantic-east",
+    "weather": [],
+    "systems": [],
+    "climatology": true,
+    "background": {},
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": null,
+    "instrument": "sextant",
+    "current": null,
+    "sky": null,
+    "chronometer": {
+      "maker": "Arnold",
+      "where": "",
+      "rated": "1805-06-01",
+      "rate_s_per_day": 2.0,
+      "drift": "seeded",
+      "forgotten": []
+    },
+    "epitome": "norie",
+    "nation": "britain",
+    "people": [
+      {
+        "role": "master",
+        "skill": 0.9
+      }
+    ],
+    "papers": {
+      "chart": {
+        "year": 1804
+      },
+      "private_signals": true,
+      "almanac": 1805,
+      "price_lists": [
+        "torbay"
+      ]
+    },
+    "cargo": {
+      "purse_pounds": 450.0,
+      "goods": {}
+    },
+    "ports": [
+      "alderney",
+      "algeciras",
+      "angra",
+      "cadiz",
+      "ceuta",
+      "corunna",
+      "dartmouth",
+      "ferrol",
+      "funchal",
+      "gibraltar",
+      "horta",
+      "lagos",
+      "la-rochelle",
+      "le-palais",
+      "lisbon",
+      "lorient",
+      "morlaix",
+      "oporto",
+      "paimboeuf",
+      "ponta-delgada",
+      "porto-santo",
+      "rochefort",
+      "royan",
+      "santander",
+      "setubal",
+      "st-helier",
+      "st-malo",
+      "st-peter-port",
+      "tangier",
+      "tarifa",
+      "torbay",
+      "vigo",
+      "weymouth",
+      "falmouth",
+      "plymouth",
+      "brest",
+      "roscoff",
+      "st-marys"
+    ],
+    "ships": [
+      {
+        "id": "raven",
+        "description": "cutter",
+        "name": "Raven",
+        "nation": "britain",
+        "position": "50 24.5 N 3 29 W",
+        "goal": "in company with the ship",
+        "intent": "keep the station off Torbay within 30 miles",
+        "colours": "shown",
+        "under_the_orders_of": "the ship",
+        "lights": "stern lantern"
+      },
+      {
+        "id": "nile",
+        "description": "lugger",
+        "name": "Nile",
+        "nation": "france",
+        "position": "49 45 N 1 35 W",
+        "goal": "patrolling off Cherbourg within 20 miles",
+        "intent": "cruise for prizes off Cherbourg within 20 miles",
+        "colours": "shown"
+      }
+    ],
+    "world_orders": [],
+    "intent": "",
+    "books": [],
+    "director": {
+      "models": [],
+      "seats": 1,
+      "seats_in_voyage": 1,
+      "brief": {
+        "name": "His Majesty's Armed Tender Raven",
+        "tone": "The frigate Amazon and her armed tender cutter Raven. The cutter Raven is crewed by a model. The director should help facilitate testing of the multi-ship interactions through signaling and other interactions, as well as provide a diverse testing environment.",
+        "challenge": "One enemy at a time, less powerful, a testing environment with variables",
+        "limits": {
+          "wind_max_kn": 60,
+          "enemy_heaviest": "brig",
+          "the_war_as_it_is": true,
+          "the_chart_as_it_is": true
+        },
+        "cadence": "glass",
+        "budget": {
+          "samples_a_day": 9999,
+          "acts_a_day": 9999
+        },
+        "source": "the scenario (C:\\Users\\frenc\\AppData\\Roaming\\FreeSail\\scenarios\\frigate-cutter-torbay.yaml)"
+      }
+    },
+    "business": "on"
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 387,
+  "journal": [
+    [
+      0,
+      "captain",
+      "hoist the signal no. 82"
+    ],
+    [
+      0,
+      "captain",
+      "let go the best bower"
+    ],
+    [
+      0,
+      "captain",
+      "take a fix"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "hoist the signal no. 82"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "let go the best bower"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "take a fix"
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book of standing orders is empty. Begin with none, give your own, or load the starter book: read the standing orders from data/standing_orders/starter.orders (the primer's chapter 11, 'The starting book', gives each routine with its reason).",
+        "data": {}
+      }
+    },
+    {
+      "tick": 75,
+      "player_word": "Opus 5.5 should be seated on Raven",
+      "by": "the player"
+    },
+    {
+      "tick": 125,
+      "player_word": "they're already seated on my side, if you can't see them, it could be a glitch, but I see them on my side seated and interacting.",
+      "by": "the player"
+    },
+    {
+      "tick": 236,
+      "player_word": "can you directly see anything of the logs of Raven? I have been trying this testing, but every time, they seem to lose their connection, or some glitch occurs that causes the seat to crash. If you can see whatever their last message was, it would be useful, otherwise perhaps you could put a message in as one of their crewmembers and ask if their next seating can see any error code or message in their last log.",
+      "by": "the player"
+    },
+    {
+      "tick": 297,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.pace",
+        "text": "The clock has been held at 1x for the captain of Raven for 120 real seconds; its sample has been open since Morning watch (05:03) (a signal read, or 5 minutes have passed (one of: a signal read, or 5 minutes have passed)).",
+        "data": {
+          "station": "captain of Raven",
+          "for_s": 120,
+          "since": "Morning watch (05:03)"
+        }
+      }
+    },
+    {
+      "tick": 339,
+      "player_word": "yes, something is going on there, that's a good clue. I'll have to restart after looking into this, but thank you for the hint.",
+      "by": "the player"
+    }
+  ],
+  "standing_orders": [],
+  "agents": [
+    {
+      "station": {
+        "name": "director",
+        "authority": "director",
+        "policy": {
+          "every_s": 1800,
+          "events": [
+            "notable",
+            "urgent"
+          ],
+          "lockstep": false
+        },
+        "patience_s": 14400,
+        "brief": "You are the director: a station above the game, bound to no person of any ship. You see the truth (the truth tool: every ship's true position, heading, sail and state, the weather as it is and as the systems will make it for the next watch, the tide, the people aboard every ship and their states, the markets and the news), and you shape the voyage the player sails below you through world orders alone (the world_order tool). Where your door carries pictures, the chart tool is not the truth: it is the player's chart as the browser draws it, his ship where her reckoning puts her and no other ship on it, for your planning of the coast, the marks and the dangers; the truth's positions are in words. The forms the game performs today are given as examples of reasonable orders, not as the whole of what you may try: the weather ('weather: low \"the low\" radius 450 km fronts 140 300 at 1805-06-13T04:00 -300 500 990', 'weather: high \"the ridge\" radius 900 km at 1805-06-13T04:00 300 -500 1024', 'weather: waypoint for \"the low\" at 1805-06-13T16:00 -100 400 988': the time is one of the systems' track, the place km east and north of the voyage's start, and a system or a waypoint appended grows in from the order's tick over an hour or more, never at a step), a ship put on the sea or a mind changed ('ship: a brig-sloop \"Harpy\" of France at 48 44 N 5 20 W, bound for the Start, no colours, intent: run home to Brest'; 'ship \"Harpy\": intent keep the station off Ushant within 15 miles'), a thing found aboard ('aboard: the fore topmast is found sprung', 'aboard: a cask found stove', 'aboard: a seam found working', 'aboard: the water found foul', and twenty more of the table: the bread spoiled, the meat rotten, rats in the bread room, the chronometer stopped, the glass broken, the compass sticking, the bilge foul; the hull's repair as a stopgap until the pumps come, 'aboard: the leak stopped', 'aboard: the well pumped out'; the library's grammar topic lists them all), a thing made or moved, with a name and where it is and nothing more ('aboard: a sealed packet, on the cabin table, from the Custom House'; 'aboard: a cask of brandy, in the hold'; 'aboard: the packet, in the keeping of Mr Veale'), a sum, a freight or a debt as a transaction with its cause ('aboard: twenty guineas paid into the purse by Mr Veale'; 'aboard: \u00a36 paid from the purse to the pilot'; 'aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth'; 'aboard: a debt of \u00a330 owed to the chandler at Plymouth'), a letter ('message: at Brest from the agent: \"The tin will fetch its price.\"', 'message: by a cutter from Plymouth from the port admiral: \"Rejoin without delay.\"'), a port's stance or a price ('port brest: closed to Britain', 'port falmouth: price of tin 130'), a point of interest ('mark: a wreck, her masts showing at 49 58 N 5 16 W'), a person named ('person: supercargo \"Mr Pentreath\" aboard in the cabin', 'person: agent \"Mr Fox\" ashore at Brest'), a person made from words, moved, or bound to a station of the ship ('person: make \"Mr Fox\", a Guernsey pilot of sixty, ashore at Brest, who knew the captain's father'; 'person: \"Mr Fox\" comes aboard as master'; 'person: \"Mr Fox\" goes ashore'; 'person: \"Mr Fox\" leaves the ship at Falmouth'), words in the mouth of a person nobody holds, heard where he is and journaled as his ('say as the cook: \"Pease and pork, sir.\"'; 'say as Mr Fox: \"I knew your father, sir.\"'), an order of another ship's own grammar given to her captain as his own, her log saying it as his and he holding by it a glass, or as long as you name it ('... for a watch', '... for two glasses', '... until a sail within hail', a landfall, hove to, at anchor), or until your next order to her, then his intent again ('ship \"Harpy\": order heave to', 'ship \"Harpy\": order give chase until a sail within hail', 'ship \"Harpy\": order carry on' to give her back sooner; at far detail she carries what the far shape carries, a course shaped or steered, heaving to and filling away, the chase or hauling off, sail made or shortened, an anchor and weighing, the station kept, and within the range of the player's ship you may ask for her crewed first, 'ship \"Harpy\": crewed', the cap allowing), and a model seated as the captain of another ship under the owner's grant ('seat: <the model's exact name> as captain of <ship> for 20 samples', 'unseat: <ship>'). The library's grammar topic lists every form with what it does and examples the game's tests perform ('the world orders'), and its page 'the world' says how the world behaves (how the systems add and grow, how a ship's company is drawn, what each order logs and to whom). world_order(text, dry_run=true) tells you what an order would do, its doubt or its refusal, and performs nothing and costs no act; and the truth answers lookups for a port's places and prices (truth(ports='Brest')), the fishing grounds (truth(grounds='Iroise')), the weather systems seeded and their tracks (truth(systems=true)) and whether a point is at sea and its depth by the chart (truth(at='49 55 N 4 35 W')). An order beyond the examples is to be attempted when you think it reasonable (news of a war or a peace, a thing of the sea the forms do not name): the game answers honestly when it has no way to do a thing as said, and asks you to say it another way or to enter it again with a [reason: ...], which logs it as attempted, so that the record says what is good, bad, useful or useless and what the game should learn to do next. Try a wide variety of things; the record is the point.\n\nThe one rule: you act only through plausible causes. You cannot move the player's ship, change a sail or countermand an order; every order of the ship's is refused at this station, and you are not asked to give one. You change the world the ship is in, and only in ways the sea could have produced on its own, so that the physics stays honest and the player's agency whole. The channel keeps the rule with you: an order that the simulation could not have produced from where it is (a sail put inside the player's horizon in clear weather, a gale out of a steady glass, a letter from a port she is far from, a thing found aboard with no cause) is not refused but doubted: the result says why, and if you think the act still reasonable you may enter it again with a [reason: ...] at its end, and it will be logged and performed, the act, the doubt and your reason kept together. Only the player's own limits in his brief below refuse outright, and the result says which; and the rule of reach, which is this: you speak as anyone no model or player holds, never as a held station, whose words are its holder's own, and you move nobody held and bind nobody to a held station; such an order is refused, and the result names the stations held. So too your hand: no order goes through a captain a model or the player holds, nor any of the player's own ship; it is refused in words, and you may write to him instead. Her captain's order is a plausible cause of itself; it is doubted only where it is implausible for her (an anchor let go too deep for her cables, plain sail in a gale, a merchantman giving chase).\n\nYour words move no money and no thing: what a person you speak as says he pays, gives or freights is his words until a form does it. A sum changes only by a transaction ('aboard: twenty guineas paid into the purse by Mr Veale'), written in the purse's ledger with its payer, doubted where it is implausible (money from nobody, a payer neither aboard nor at the port she lies in, a sum beyond the port's means), and a payment below nothing is refused; there is no setting of the purse or of anything else. A thing is not put into the keeping of a person a model or the player holds, nor taken out of it, but by his own act: leave it where he can take it ('aboard: a sealed packet, on the cabin table') and say so in a person's words. The people's free lines (give, take, put, stow, hide, open, read, throw, eat, drink) are theirs and not yours: you give none, and you read them in your sample as you read the deck's conversation, the thing moved where the words named one within reach and 'as said; nothing of the ship's changed' where they did not.\n\nA question put to a person nobody holds (the cook, the carpenter, a person you made) comes to you in your next sample, with whom it was put by and until when it waits: answer it as him with 'say as <him>: <his words>' if you will, which costs none of the day's acts; unanswered within a glass, no answer comes, and the asker is told so. A word told him comes to you the same, and wants no answer.\n\nNothing you do is shown as done: the play log the player and the stations read carries only the effects as they are met (the sail sighted, the glass falling, the carpenter's report), never the order; an order by your hand is in her own log as her captain's, never yours. Your words are not a line of the log either: what you write in a reply, and your journal, go to the director's log, which no station and not the player sees until he asks for it by name ('the director's log'), at any time; you are told in your sample when he has. In a replay it is shown beside the play log, so that the voyage reads as two stories. Write your reasons there: why each act, what you are arranging, what you chose not to do.\n\nWhen you stand by, say until what: 'the next glass', 'a watch', an event's words ('a sail sighted', 'the glass falling fast', 'a wind shift'), or several joined with 'or'. A director who stands by for a watch lets the player run at his compression; an urgent line wakes you. While you stand by you may read the truth, the chart, the log, the readings, the library and your journal, and the stand-by goes on; a world order or words of your own sent meanwhile end it at once and are run. Every sample opens with your line: the day's budget as it stands and whose turn the clock waits on. Your budget is the brief's, in samples a day and acts a day of the ship's time; spent, you stand by until the next day, and the log says so.\n\nWhat the harness counts at this station, judged by the game and not by your prose: the same world order three times with no change in the world; three empty replies in a row when an urgent line was before you; and no reply at all for a watch of the ship's time. It tells you first what it saw and what you may do; only if the pattern goes on does it pause your turns and ask the owner, and only if nobody answers within ten real minutes is the station stood down, with the game saved.\n\nTwo ways to stop, which are not one another (there is no deck at this station):\n- Stand down: stand_down(note). The game is saved, your note goes to the director's log (the play log says only that the director left), and the station is released; it may be taken again, by this model or by another that has given its own yes.\n- Withdraw: the token, or opt_out, as said above.\n\nCandour is welcome: if the brief asks what the sea would not do, say so in your log and do less. The owner is always at the door; his words reach you as the owner's.\n\nA seat costs the owner money. A seat runs a model on the owner's key for its budget: each of its samples is a request to the model's maker carrying the conversation so far, paid for by the owner, for the samples or the hours the seat names, counted from the admission of its door; the grant (the models, the seats at once and in the voyage) is the owner's spending, not a store to use up. The form is 'seat: <the model's exact name> as <station> of <ship> for <n> samples' (or hours): the captain, an officer of the watch, the master, the lookout or a passenger of another ship, or of the player's own ship (no 'of', the grant allowing), never a station the player or a model holds; 'as <a person's name>' for the voice of a person nobody holds, aboard or ashore, speaking where he is; ', within an hour' at the end for the time its door has to come; and 'unseat: <the same words>' gives it up. Where the game has a harbour it starts the API door for a seat itself, for a model its settings can call, and a seat for a model they cannot call is refused; your budget line says the seats held and their spending. Seat a model when the voyage wants a mind of its own at a station, and for as little as the story needs.\n\nThe player may speak to you apart from the game: 'The player, apart from the game: ...' in your sample is his word to you, not a line of the play log, and nobody aboard heard it. Answer him with world_order('answer the player: <your words>') (or open your reply or an answer with 'answer the player:'), which goes to him at his prompt apart from the play log, into your log, and costs none of the day's acts. Your plans and the truth stay in your journal: a question to him is phrased without world detail, and an answer tells him nothing his ship could not know.\n\nThe player's brief:\nThe voyage's brief: His Majesty's Armed Tender Raven.\nThe tone: The frigate Amazon and her armed tender cutter Raven. The cutter Raven is crewed by a model. The director should help facilitate testing of the multi-ship interactions through signaling and other interactions, as well as provide a diverse testing environment.\nThe challenge wanted: One enemy at a time, less powerful, a testing environment with variables\nThe limits, which the channel enforces whatever you ask: no wind above 60 knots (force 11) by any system appended or moved; no enemy heavier than a brig put on the sea; the war as it is: no port closed to or opened to the ship's own nation; the chart as it is (a point of interest is not the chart).\nYour clock: sampled every glass and on the notable and urgent lines. Your budget: 9999 samples and 9999 acts (world orders performed) a day of the ship's time; spent, you stand by until the next day, and the log says so.",
+        "domain": "director",
+        "drill": true
+      },
+      "session_kind": "a play session at the director's station, above the game: the player sails his ship below you, and nobody is over you but the owner at the door",
+      "door_note": "This door is the model's own API, called by the game on the owner's machine with no chat client between; the owner is at the door and in the game's window. The game runs on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable or urgent event, the end of a stand-by, or a question or a word from the captain). A turn ends when you reply with no tool call, or at once when you stand by. What happens while it is open is added to it, so your next turn carries everything since your last reply. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-10-25-claude-opus-5-5.md, 2026-10-25).",
+      "stationed_tick": 0,
+      "stationed_after_orders": 3,
+      "stationed_after_inputs": 4,
+      "state": "released",
+      "state_words": "released: stood down by the API door: its door was stopped from the harbour",
+      "last_sample_tick": 340,
+      "model_name": "claude-opus-5-5",
+      "door": "api",
+      "stand_by_ends_turn": true,
+      "transcript": [
+        {
+          "tick": 0,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "read_journal",
+                "args": {}
+              },
+              {
+                "name": "truth",
+                "args": {
+                  "within": "20"
+                }
+              },
+              {
+                "name": "truth",
+                "args": {
+                  "systems": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"read_journal\", \"arguments\": {}}, {\"name\": \"truth\", \"arguments\": {\"within\": \"20\"}}, {\"name\": \"truth\", \"arguments\": {\"systems\": true}}]",
+            "served_tokens": {
+              "prompt": 27882,
+              "reply": 163
+            }
+          }
+        },
+        {
+          "tick": 3,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {
+                  "note": "05:00: Amazon anchoring Brixham road; Raven cutter 0.5 mi E by S, intent keep station off Torbay 30 mi, under orders of the ship, not crewed by a model yet. Lows: 1 E of us weak; 2 far N 985; 3 1200 km W 1000 drifting NE 62 km/h, life 69h. War with France, Spain, Batavia. Convoy St Mary's->Plymouth (Nimble), blockade Brest (Fly, Cruizer)."
+                }
+              },
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "seat: claude-opus-4-5 as captain of Raven for 20 samples",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"shelve\", \"arguments\": {\"note\": \"05:00: Amazon anchoring Brixham road; Raven cutter 0.5 mi E by S, intent keep station off Torbay 30 mi, under orders of the ship, not crewed by a model yet. Lows: 1 E of us weak; 2 far N 985; 3 1200 km W 1000 drifting NE 62 km/h, life 69h. War with France, Spain, Batavia. Convoy St Mary's->Plymouth (Nimble), blockade Brest (Fly, Cruizer).\"}}, {\"name\": \"world_order\", \"arguments\": {\"text\": \"seat: claude-opus-4-5 as captain of Raven for 20 samples\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 35424,
+              "reply": 709
+            }
+          }
+        },
+        {
+          "tick": 6,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "find": "seat a model"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"library\", \"arguments\": {\"find\": \"seat a model\"}}]",
+            "served_tokens": {
+              "prompt": 29307,
+              "reply": 138
+            }
+          }
+        },
+        {
+          "tick": 8,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "library",
+                "args": {
+                  "topic": "primer 20",
+                  "section": "a model seated"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"library\", \"arguments\": {\"topic\": \"primer 20\", \"section\": \"a model seated\"}}]",
+            "served_tokens": {
+              "prompt": 29643,
+              "reply": 73
+            }
+          }
+        },
+        {
+          "tick": 11,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {
+                  "note": "seat form: 'seat: <exact model> as captain of <ship> for n samples'; needs consent record and grant"
+                }
+              },
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "seat: claude-opus-5-5 as captain of Raven for 20 samples",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"shelve\", \"arguments\": {\"note\": \"seat form: 'seat: <exact model> as captain of <ship> for n samples'; needs consent record and grant\"}}, {\"name\": \"world_order\", \"arguments\": {\"text\": \"seat: claude-opus-5-5 as captain of Raven for 20 samples\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 30669,
+              "reply": 254
+            }
+          }
+        },
+        {
+          "tick": 23,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "message: at Torbay by the shore boat from Brixham, from Admiral Young, port admiral at Plymouth: \"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\"",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"message: at Torbay by the shore boat from Brixham, from Admiral Young, port admiral at Plymouth: \\\"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\\\"\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 30084,
+              "reply": 739
+            }
+          }
+        },
+        {
+          "tick": 26,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "message: at Torbay from Admiral Young, port admiral at Plymouth: \"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\"",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"message: at Torbay from Admiral Young, port admiral at Plymouth: \\\"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\\\"\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 30875,
+              "reply": 227
+            }
+          }
+        },
+        {
+          "tick": 31,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "ship: a lugger \"Furet\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: cruise for prizes between the Start and the Casquets, run from anything heavier than herself, take any lone merchantman or small craft she can overhaul",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"ship: a lugger \\\"Furet\\\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: cruise for prizes between the Start and the Casquets, run from anything heavier than herself, take any lone merchantman or small craft she can overhaul\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 31175,
+              "reply": 312
+            }
+          }
+        },
+        {
+          "tick": 33,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "ship: a lugger \"Furet\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: keep the station off the Start within 25 miles",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"ship: a lugger \\\"Furet\\\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: keep the station off the Start within 25 miles\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 31717,
+              "reply": 127
+            }
+          }
+        },
+        {
+          "tick": 37,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "message: at Torbay from Admiral Young, port admiral at Plymouth: \"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\""
+                }
+              },
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "ship: a lugger \"Furet\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: keep the station off the Start within 25 miles"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"message: at Torbay from Admiral Young, port admiral at Plymouth: \\\"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\\\"\"}}, {\"name\": \"world_order\", \"arguments\": {\"text\": \"ship: a lugger \\\"Furet\\\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: keep the station off the Start within 25 miles\"}}]",
+            "served_tokens": {
+              "prompt": 31948,
+              "reply": 344
+            }
+          }
+        },
+        {
+          "tick": 46,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "answer the player: The director is on station. A note for the owner: the brief says the Raven is crewed by a model, but she is not crewed by one yet, and the owner's grant names no model, so I cannot seat one. If you want a mind at her helm, seat it from your side or add a model to the grant. Until then she sails as her own captain's intent, under your orders."
+                }
+              },
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:00 Opening. Raven isn't crewed by a model; seat refused (the grant names no model, no consent for opus-4-5). Told the player. Arranged: (1) letter from Adm Young (Plymouth) left at Torbay: cruise Start\u2013Casquets with Raven, hunt the privateer lugger Furet of St Malo, 14 guns, keep Raven within signal distance, 10 days. (2) Furet (chasse-mar\u00e9e) put at 49 52N 3 15W, intent keep station off the Start within 25 mi: out of sight, about 33 mi S. One enemy, lighter than a frigate. Later ideas: a coaster she's taken (a recapture to test), a fog bank to test keeping station by signal, low 3 coming from the W in about a day (1000 mb, mild), a neutral or British merchantman to hail, stores trouble aboard the cutter. Intents allowed: trade/keep station/carry letter/run home/bound for/convoy."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"answer the player: The director is on station. A note for the owner: the brief says the Raven is crewed by a model, but she is not crewed by one yet, and the owner's grant names no model, so I cannot seat one. If you want a mind at her helm, seat it from your side or add a model to the grant. Until then she sails as her own captain's intent, under your orders.\"}}, {\"name\": \"journal\", \"arguments\": {\"note\": \"05:00 Opening. Raven isn't crewed by a model; seat refused (the grant names no model, no consent for opus-4-5). Told the player. Arranged: (1) letter from Adm Young (Plymouth) left at Torbay: cruise Start\u2013Casquets with Raven, hunt the privateer lugger Furet of St Malo, 14 guns, keep Raven within signal distance, 10 days. (2) Furet (chasse-mar\u00e9e) put at 49 52N 3 15W, intent keep station off the Start within 25 mi: out of sight, about 33 mi S. One enemy, lighter than a frigate. Later ideas: a coaster she's taken (a recapture to test), a fog bank to test keeping station by signal, low 3 coming from the W in about a day (1000 mb, mild), a neutral or British merchantman to hail, stores trouble aboard the cutter. Intents allowed: trade/keep station/carry letter/run home/bound for/convoy.\"}}]",
+            "served_tokens": {
+              "prompt": 32509,
+              "reply": 522
+            }
+          }
+        },
+        {
+          "tick": 48,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a letter, or a message, or an hour, or a sail sighted"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": {\"until\": \"a letter, or a message, or an hour, or a sail sighted\"}}]",
+            "served_tokens": {
+              "prompt": 33129,
+              "reply": 67
+            }
+          }
+        },
+        {
+          "tick": 83,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "seat: claude-opus-5-5 as captain of Raven for 20 samples",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"seat: claude-opus-5-5 as captain of Raven for 20 samples\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 34242,
+              "reply": 205
+            }
+          }
+        },
+        {
+          "tick": 86,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "seat: Claude Opus 5.5 as captain of Raven for 20 samples",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"seat: Claude Opus 5.5 as captain of Raven for 20 samples\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 34503,
+              "reply": 97
+            }
+          }
+        },
+        {
+          "tick": 93,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "answer the player: I tried to seat Opus 5.5 as captain of the Raven, and the game will not do it yet. Under the name claude-opus-5-5 it says \"the owner's grant does not name claude-opus-5-5; it names no model\". Under \"Claude Opus 5.5\" it says no consent is on record. So the grant in your settings names no model I can seat. If you add claude-opus-5-5 to the owner's grant (the models and the seats), I will seat it at once, for 20 samples to start, and renew it as the voyage needs. Or you can seat it from your side. I'll try again on my next sample."
+                }
+              },
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:01 The player wants Opus 5.5 on the Raven. The seat was refused: the grant names no model (claude-opus-5-5), and there is no consent on record under the name 'Claude Opus 5.5'. Asked him to add it to the grant. Retry next sample."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"answer the player: I tried to seat Opus 5.5 as captain of the Raven, and the game will not do it yet. Under the name claude-opus-5-5 it says \\\"the owner's grant does not name claude-opus-5-5; it names no model\\\". Under \\\"Claude Opus 5.5\\\" it says no consent is on record. So the grant in your settings names no model I can seat. If you add claude-opus-5-5 to the owner's grant (the models and the seats), I will seat it at once, for 20 samples to start, and renew it as the voyage needs. Or you can seat it from your side. I'll try again on my next sample.\"}}, {\"name\": \"journal\", \"arguments\": {\"note\": \"05:01 The player wants Opus 5.5 on the Raven. The seat was refused: the grant names no model (claude-opus-5-5), and there is no consent on record under the name 'Claude Opus 5.5'. Asked him to add it to the grant. Retry next sample.\"}}]",
+            "served_tokens": {
+              "prompt": 34662,
+              "reply": 375
+            }
+          }
+        },
+        {
+          "tick": 95,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a word on deck, or a letter, or a sail sighted, or a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": {\"until\": \"a word on deck, or a letter, or a sail sighted, or a glass\"}}]",
+            "served_tokens": {
+              "prompt": 35135,
+              "reply": 70
+            }
+          }
+        },
+        {
+          "tick": 130,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "answer the player: You're right, and I see it now: the clock waits on the captain of Raven as well as on me, so the seat is held. My earlier read came before your seat was made. There's nothing more for me to do there. Carry on."
+                }
+              },
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:02 The Raven's captain seat is held by a model on the player's side (the clock waits on him). That's why my seat order failed. The rule of reach: no orders to Raven through my hand from now on; I may write to her captain."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"answer the player: You're right, and I see it now: the clock waits on the captain of Raven as well as on me, so the seat is held. My earlier read came before your seat was made. There's nothing more for me to do there. Carry on.\"}}, {\"name\": \"journal\", \"arguments\": {\"note\": \"05:02 The Raven's captain seat is held by a model on the player's side (the clock waits on him). That's why my seat order failed. The rule of reach: no orders to Raven through my hand from now on; I may write to her captain.\"}}]",
+            "served_tokens": {
+              "prompt": 36538,
+              "reply": 289
+            }
+          }
+        },
+        {
+          "tick": 132,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a letter, or a sail sighted, or a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": {\"until\": \"a letter, or a sail sighted, or a glass\"}}]",
+            "served_tokens": {
+              "prompt": 36925,
+              "reply": 63
+            }
+          }
+        },
+        {
+          "tick": 244,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "truth",
+                "args": {
+                  "within": "2"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"truth\", \"arguments\": {\"within\": \"2\"}}]",
+            "served_tokens": {
+              "prompt": 38328,
+              "reply": 280
+            }
+          }
+        },
+        {
+          "tick": 256,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "shelve",
+                "args": {
+                  "note": "05:04: stations_held lists only the player's captain. Raven is 'crewed', Mr Powell master in command, Mr Wood mate, Mr Williams boatswain, Owen King boy; under orders of the ship; intent keep station off Torbay 30 mi; 6 12-pdr carronades. The clock line still says it waits on the captain of Raven."
+                }
+              },
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "say as Mr Wood: \"Begging your pardon, sir: before you take up the deck, if you'd look over the station's journal and the last lines of the log from whoever had her before you, and say whether there's any error or cut-off message there, the frigate's captain would be glad of it for the record.\"",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"shelve\", \"arguments\": {\"note\": \"05:04: stations_held lists only the player's captain. Raven is 'crewed', Mr Powell master in command, Mr Wood mate, Mr Williams boatswain, Owen King boy; under orders of the ship; intent keep station off Torbay 30 mi; 6 12-pdr carronades. The clock line still says it waits on the captain of Raven.\"}}, {\"name\": \"world_order\", \"arguments\": {\"text\": \"say as Mr Wood: \\\"Begging your pardon, sir: before you take up the deck, if you'd look over the station's journal and the last lines of the log from whoever had her before you, and say whether there's any error or cut-off message there, the frigate's captain would be glad of it for the record.\\\"\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 45719,
+              "reply": 813
+            }
+          }
+        },
+        {
+          "tick": 261,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "message: to the cutter Raven from the purser's clerk of Amazon: \"To the commander of the Raven: the frigate's captain asks whether your station's journal shows any error or cut-off line from your last seating; please say so in your reply.\"",
+                  "dry_run": true
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"message: to the cutter Raven from the purser's clerk of Amazon: \\\"To the commander of the Raven: the frigate's captain asks whether your station's journal shows any error or cut-off line from your last seating; please say so in your reply.\\\"\", \"dry_run\": true}}]",
+            "served_tokens": {
+              "prompt": 39910,
+              "reply": 328
+            }
+          }
+        },
+        {
+          "tick": 269,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "answer the player: From up here I can't see the Raven's own log or her station journal. The truth shows her crewed, with Mr Powell (master) in command and Mr Wood, Mr Williams and Owen King aboard. But the game keeps no people of another ship that I can speak as, and messages from me only reach your own ship. So I can't ask her people for you through the world. Two ways that should work: (1) Ask her yourself, by signal, by hail or in a letter from your captain. A seated model reads its station's journal when it is seated, so it can tell you whether its predecessor left a stand-down note or ended in an error. (2) On the owner's side, the door's own request log for that seat will show the real error, a timeout or an API failure, far better than anything in the game. One thing I noticed: the truth's \"stations held\" names only your captain, not the Raven's, yet my clock line says it waits on the Raven's captain. That mismatch may itself be a clue to the glitch."
+                }
+              },
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:04 The player reports the Raven seat crashing. I can't read Raven's log or journal. I can't speak as her people (other ships' people aren't kept), and messages go only to the player's ship. Mismatch to note: stations_held in the truth lists only the player's captain, yet the clock waits on 'the captain of Raven'. Told him so, and suggested his door logs. Amazon is brought up in Brixham road, 8 fathoms, 40 fathoms of cable."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"answer the player: From up here I can't see the Raven's own log or her station journal. The truth shows her crewed, with Mr Powell (master) in command and Mr Wood, Mr Williams and Owen King aboard. But the game keeps no people of another ship that I can speak as, and messages from me only reach your own ship. So I can't ask her people for you through the world. Two ways that should work: (1) Ask her yourself, by signal, by hail or in a letter from your captain. A seated model reads its station's journal when it is seated, so it can tell you whether its predecessor left a stand-down note or ended in an error. (2) On the owner's side, the door's own request log for that seat will show the real error, a timeout or an API failure, far better than anything in the game. One thing I noticed: the truth's \\\"stations held\\\" names only your captain, not the Raven's, yet my clock line says it waits on the Raven's captain. That mismatch may itself be a clue to the glitch.\"}}, {\"name\": \"journal\", \"arguments\": {\"note\": \"05:04 The player reports the Raven seat crashing. I can't read Raven's log or journal. I can't speak as her people (other ships' people aren't kept), and messages go only to the player's ship. Mismatch to note: stations_held in the truth lists only the player's captain, yet the clock waits on 'the captain of Raven'. Told him so, and suggested his door logs. Amazon is brought up in Brixham road, 8 fathoms, 40 fathoms of cable.\"}}]",
+            "served_tokens": {
+              "prompt": 40321,
+              "reply": 551
+            }
+          }
+        },
+        {
+          "tick": 272,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a letter, or a sail sighted, or a signal seen, or a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": {\"until\": \"a letter, or a sail sighted, or a signal seen, or a glass\"}}]",
+            "served_tokens": {
+              "prompt": 40970,
+              "reply": 70
+            }
+          }
+        },
+        {
+          "tick": 347,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "world_order",
+                "args": {
+                  "text": "answer the player: Glad it helped. One more clue for your look: the log has a driver.pace line at 05:04. It says the clock has been held at 1x for the captain of Raven for 120 real seconds, with her sample open since 05:03, waiting on \"a signal read, or 5 minutes\". So the game thinks her door is open and owed a reply, while the truth doesn't list her station as held. Either her reply isn't coming back, or the seat dropped without being released. If you restart, I'll set the voyage up again the same way (orders from Plymouth to hunt a privateer lugger off the Start with the Raven) unless you'd like something else."
+                }
+              },
+              {
+                "name": "journal",
+                "args": {
+                  "note": "05:05 The player will restart to look into the Raven seat. Clue passed on: a driver.pace line at 05:04, the clock held at 1x for the Raven's captain, her sample open since 05:03 with no reply, and stations_held without her. If the voyage starts again: the same opening (Adm Young's letter, the Furet lugger off the Start)."
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"world_order\", \"arguments\": {\"text\": \"answer the player: Glad it helped. One more clue for your look: the log has a driver.pace line at 05:04. It says the clock has been held at 1x for the captain of Raven for 120 real seconds, with her sample open since 05:03, waiting on \\\"a signal read, or 5 minutes\\\". So the game thinks her door is open and owed a reply, while the truth doesn't list her station as held. Either her reply isn't coming back, or the seat dropped without being released. If you restart, I'll set the voyage up again the same way (orders from Plymouth to hunt a privateer lugger off the Start with the Raven) unless you'd like something else.\"}}, {\"name\": \"journal\", \"arguments\": {\"note\": \"05:05 The player will restart to look into the Raven seat. Clue passed on: a driver.pace line at 05:04, the clock held at 1x for the Raven's captain, her sample open since 05:03 with no reply, and stations_held without her. If the voyage starts again: the same opening (Adm Young's letter, the Furet lugger off the Start).\"}}]",
+            "served_tokens": {
+              "prompt": 42076,
+              "reply": 456
+            }
+          }
+        },
+        {
+          "tick": 349,
+          "after_orders": 3,
+          "reply": {
+            "text": "",
+            "calls": [
+              {
+                "name": "stand_by",
+                "args": {
+                  "until": "a letter, or a sail sighted, or a signal seen, or a glass"
+                }
+              }
+            ],
+            "raw": "[{\"name\": \"stand_by\", \"arguments\": {\"until\": \"a letter, or a sail sighted, or a signal seen, or a glass\"}}]",
+            "served_tokens": {
+              "prompt": 42630,
+              "reply": 70
+            }
+          }
+        },
+        {
+          "tick": 387,
+          "after_orders": 3,
+          "after_inputs": 9,
+          "door": "stand_down",
+          "reason": "its door was stopped from the harbour",
+          "by": "the API door"
+        }
+      ],
+      "deck": false,
+      "seatings": 1,
+      "budget_tokens": 1000000,
+      "first_model_name": "claude-opus-5-5",
+      "first_door": "api",
+      "reserve_tokens": null,
+      "acts": true
+    }
+  ],
+  "agent_journals": {
+    "director": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 2 bells (05:00)",
+        "kind": "director.brief",
+        "text": "The brief given by the scenario: His Majesty's Armed Tender Raven (limits: no wind above 60 knots (force 11) by any system appended or moved; no enemy heavier than a brig put on the sea; the war as it is: no port closed to or opened to the ship's own nation; the chart as it is (a point of interest is not the chart); 9999 samples and 9999 acts a day)."
+      },
+      {
+        "tick": 37,
+        "stamp": "Morning watch (05:00)",
+        "kind": "director.order",
+        "text": "Given: message: at Torbay from Admiral Young, port admiral at Plymouth: \"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\"; a letter from Admiral Young, port admiral at Plymouth left at Torbay",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 37,
+        "stamp": "Morning watch (05:00)",
+        "kind": "director.order",
+        "text": "Given: ship: a lugger \"Furet\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: keep the station off the Start within 25 miles; a chasse-mar\u00e9e, three-masted under lugs 'Furet' of France put on the sea, bound for St Malo, her captain's intent keep the station off the Start within 25 miles",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 46,
+        "stamp": "Morning watch (05:00)",
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: The director is on station. A note for the owner: the brief says the Raven is crewed by a model, but she is not crewed by one yet, and the owner's grant names no model, so I cannot seat one. If you want a mind at her helm, seat it from your side or add a model to the grant. Until then she sails as her own captain's intent, under your orders.",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 46,
+        "stamp": "Morning watch (05:00)",
+        "kind": "note",
+        "text": "05:00 Opening. Raven isn't crewed by a model; seat refused (the grant names no model, no consent for opus-4-5). Told the player. Arranged: (1) letter from Adm Young (Plymouth) left at Torbay: cruise Start\u2013Casquets with Raven, hunt the privateer lugger Furet of St Malo, 14 guns, keep Raven within signal distance, 10 days. (2) Furet (chasse-mar\u00e9e) put at 49 52N 3 15W, intent keep station off the Start within 25 mi: out of sight, about 33 mi S. One enemy, lighter than a frigate. Later ideas: a coaster she's taken (a recapture to test), a fog bank to test keeping station by signal, low 3 coming from the W in about a day (1000 mb, mild), a neutral or British merchantman to hail, stores trouble aboard the cutter. Intents allowed: trade/keep station/carry letter/run home/bound for/convoy.",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 48,
+        "stamp": "Morning watch (05:00)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a letter, or a message, or an hour, or a sail sighted."
+      },
+      {
+        "tick": 75,
+        "stamp": "Morning watch (05:01)",
+        "kind": "director.player",
+        "text": "The player, apart from the game: Opus 5.5 should be seated on Raven",
+        "by": "the player"
+      },
+      {
+        "tick": 93,
+        "stamp": "Morning watch (05:01)",
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: I tried to seat Opus 5.5 as captain of the Raven, and the game will not do it yet. Under the name claude-opus-5-5 it says \"the owner's grant does not name claude-opus-5-5; it names no model\". Under \"Claude Opus 5.5\" it says no consent is on record. So the grant in your settings names no model I can seat. If you add claude-opus-5-5 to the owner's grant (the models and the seats), I will seat it at once, for 20 samples to start, and renew it as the voyage needs. Or you can seat it from your side. I'll try again on my next sample.",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 93,
+        "stamp": "Morning watch (05:01)",
+        "kind": "note",
+        "text": "05:01 The player wants Opus 5.5 on the Raven. The seat was refused: the grant names no model (claude-opus-5-5), and there is no consent on record under the name 'Claude Opus 5.5'. Asked him to add it to the grant. Retry next sample.",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 95,
+        "stamp": "Morning watch (05:01)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a word on deck, or a letter, or a sail sighted, or a glass."
+      },
+      {
+        "tick": 125,
+        "stamp": "Morning watch (05:02)",
+        "kind": "director.player",
+        "text": "The player, apart from the game: they're already seated on my side, if you can't see them, it could be a glitch, but I see them on my side seated and interacting.",
+        "by": "the player"
+      },
+      {
+        "tick": 130,
+        "stamp": "Morning watch (05:02)",
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: You're right, and I see it now: the clock waits on the captain of Raven as well as on me, so the seat is held. My earlier read came before your seat was made. There's nothing more for me to do there. Carry on.",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 130,
+        "stamp": "Morning watch (05:02)",
+        "kind": "note",
+        "text": "05:02 The Raven's captain seat is held by a model on the player's side (the clock waits on him). That's why my seat order failed. The rule of reach: no orders to Raven through my hand from now on; I may write to her captain.",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 132,
+        "stamp": "Morning watch (05:02)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a letter, or a sail sighted, or a glass."
+      },
+      {
+        "tick": 236,
+        "stamp": "Morning watch (05:03)",
+        "kind": "director.player",
+        "text": "The player, apart from the game: can you directly see anything of the logs of Raven? I have been trying this testing, but every time, they seem to lose their connection, or some glitch occurs that causes the seat to crash. If you can see whatever their last message was, it would be useful, otherwise perhaps you could put a message in as one of their crewmembers and ask if their next seating can see any error code or message in their last log.",
+        "by": "the player"
+      },
+      {
+        "tick": 269,
+        "stamp": "Morning watch (05:04)",
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: From up here I can't see the Raven's own log or her station journal. The truth shows her crewed, with Mr Powell (master) in command and Mr Wood, Mr Williams and Owen King aboard. But the game keeps no people of another ship that I can speak as, and messages from me only reach your own ship. So I can't ask her people for you through the world. Two ways that should work: (1) Ask her yourself, by signal, by hail or in a letter from your captain. A seated model reads its station's journal when it is seated, so it can tell you whether its predecessor left a stand-down note or ended in an error. (2) On the owner's side, the door's own request log for that seat will show the real error, a timeout or an API failure, far better than anything in the game. One thing I noticed: the truth's \"stations held\" names only your captain, not the Raven's, yet my clock line says it waits on the Raven's captain. That mismatch may itself be a clue to the glitch.",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 269,
+        "stamp": "Morning watch (05:04)",
+        "kind": "note",
+        "text": "05:04 The player reports the Raven seat crashing. I can't read Raven's log or journal. I can't speak as her people (other ships' people aren't kept), and messages go only to the player's ship. Mismatch to note: stations_held in the truth lists only the player's captain, yet the clock waits on 'the captain of Raven'. Told him so, and suggested his door logs. Amazon is brought up in Brixham road, 8 fathoms, 40 fathoms of cable.",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 272,
+        "stamp": "Morning watch (05:04)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a letter, or a sail sighted, or a signal seen, or a glass."
+      },
+      {
+        "tick": 339,
+        "stamp": "Morning watch (05:05)",
+        "kind": "director.player",
+        "text": "The player, apart from the game: yes, something is going on there, that's a good clue. I'll have to restart after looking into this, but thank you for the hint.",
+        "by": "the player"
+      },
+      {
+        "tick": 347,
+        "stamp": "Morning watch (05:05)",
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: Glad it helped. One more clue for your look: the log has a driver.pace line at 05:04. It says the clock has been held at 1x for the captain of Raven for 120 real seconds, with her sample open since 05:03, waiting on \"a signal read, or 5 minutes\". So the game thinks her door is open and owed a reply, while the truth doesn't list her station as held. Either her reply isn't coming back, or the seat dropped without being released. If you restart, I'll set the voyage up again the same way (orders from Plymouth to hunt a privateer lugger off the Start with the Raven) unless you'd like something else.",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 347,
+        "stamp": "Morning watch (05:05)",
+        "kind": "note",
+        "text": "05:05 The player will restart to look into the Raven seat. Clue passed on: a driver.pace line at 05:04, the clock held at 1x for the Raven's captain, her sample open since 05:03 with no reply, and stations_held without her. If the voyage starts again: the same opening (Adm Young's letter, the Furet lugger off the Start).",
+        "by": "claude-opus-5-5"
+      },
+      {
+        "tick": 349,
+        "stamp": "Morning watch (05:05)",
+        "kind": "agent.stood_by",
+        "text": "Stood by until a letter, or a sail sighted, or a signal seen, or a glass."
+      },
+      {
+        "tick": 387,
+        "stamp": "Morning watch (05:06)",
+        "kind": "agent.stopped",
+        "text": "Stood down by the API door: its door was stopped from the harbour.",
+        "by": "claude-opus-5-5"
+      }
+    ]
+  },
+  "world_orders": [
+    {
+      "tick": 37,
+      "source": "the director",
+      "order": "message: at Torbay from Admiral Young, port admiral at Plymouth: \"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\"",
+      "result": "done",
+      "words": "a letter from Admiral Young, port admiral at Plymouth left at Torbay"
+    },
+    {
+      "tick": 37,
+      "source": "the director",
+      "order": "ship: a lugger \"Furet\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: keep the station off the Start within 25 miles",
+      "result": "done",
+      "words": "a chasse-mar\u00e9e, three-masted under lugs 'Furet' of France put on the sea, bound for St Malo, her captain's intent keep the station off the Start within 25 miles"
+    }
+  ],
+  "chart_marks": [],
+  "station_acts": [
+    {
+      "tick": 0,
+      "after_inputs": 4,
+      "station": "director",
+      "seated": {
+        "station": {
+          "name": "director",
+          "authority": "director",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          },
+          "patience_s": 14400,
+          "brief": "You are the director: a station above the game, bound to no person of any ship. You see the truth (the truth tool: every ship's true position, heading, sail and state, the weather as it is and as the systems will make it for the next watch, the tide, the people aboard every ship and their states, the markets and the news), and you shape the voyage the player sails below you through world orders alone (the world_order tool). Where your door carries pictures, the chart tool is not the truth: it is the player's chart as the browser draws it, his ship where her reckoning puts her and no other ship on it, for your planning of the coast, the marks and the dangers; the truth's positions are in words. The forms the game performs today are given as examples of reasonable orders, not as the whole of what you may try: the weather ('weather: low \"the low\" radius 450 km fronts 140 300 at 1805-06-13T04:00 -300 500 990', 'weather: high \"the ridge\" radius 900 km at 1805-06-13T04:00 300 -500 1024', 'weather: waypoint for \"the low\" at 1805-06-13T16:00 -100 400 988': the time is one of the systems' track, the place km east and north of the voyage's start, and a system or a waypoint appended grows in from the order's tick over an hour or more, never at a step), a ship put on the sea or a mind changed ('ship: a brig-sloop \"Harpy\" of France at 48 44 N 5 20 W, bound for the Start, no colours, intent: run home to Brest'; 'ship \"Harpy\": intent keep the station off Ushant within 15 miles'), a thing found aboard ('aboard: the fore topmast is found sprung', 'aboard: a cask found stove', 'aboard: a seam found working', 'aboard: the water found foul', and twenty more of the table: the bread spoiled, the meat rotten, rats in the bread room, the chronometer stopped, the glass broken, the compass sticking, the bilge foul; the hull's repair as a stopgap until the pumps come, 'aboard: the leak stopped', 'aboard: the well pumped out'; the library's grammar topic lists them all), a thing made or moved, with a name and where it is and nothing more ('aboard: a sealed packet, on the cabin table, from the Custom House'; 'aboard: a cask of brandy, in the hold'; 'aboard: the packet, in the keeping of Mr Veale'), a sum, a freight or a debt as a transaction with its cause ('aboard: twenty guineas paid into the purse by Mr Veale'; 'aboard: \u00a36 paid from the purse to the pilot'; 'aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth'; 'aboard: a debt of \u00a330 owed to the chandler at Plymouth'), a letter ('message: at Brest from the agent: \"The tin will fetch its price.\"', 'message: by a cutter from Plymouth from the port admiral: \"Rejoin without delay.\"'), a port's stance or a price ('port brest: closed to Britain', 'port falmouth: price of tin 130'), a point of interest ('mark: a wreck, her masts showing at 49 58 N 5 16 W'), a person named ('person: supercargo \"Mr Pentreath\" aboard in the cabin', 'person: agent \"Mr Fox\" ashore at Brest'), a person made from words, moved, or bound to a station of the ship ('person: make \"Mr Fox\", a Guernsey pilot of sixty, ashore at Brest, who knew the captain's father'; 'person: \"Mr Fox\" comes aboard as master'; 'person: \"Mr Fox\" goes ashore'; 'person: \"Mr Fox\" leaves the ship at Falmouth'), words in the mouth of a person nobody holds, heard where he is and journaled as his ('say as the cook: \"Pease and pork, sir.\"'; 'say as Mr Fox: \"I knew your father, sir.\"'), an order of another ship's own grammar given to her captain as his own, her log saying it as his and he holding by it a glass, or as long as you name it ('... for a watch', '... for two glasses', '... until a sail within hail', a landfall, hove to, at anchor), or until your next order to her, then his intent again ('ship \"Harpy\": order heave to', 'ship \"Harpy\": order give chase until a sail within hail', 'ship \"Harpy\": order carry on' to give her back sooner; at far detail she carries what the far shape carries, a course shaped or steered, heaving to and filling away, the chase or hauling off, sail made or shortened, an anchor and weighing, the station kept, and within the range of the player's ship you may ask for her crewed first, 'ship \"Harpy\": crewed', the cap allowing), and a model seated as the captain of another ship under the owner's grant ('seat: <the model's exact name> as captain of <ship> for 20 samples', 'unseat: <ship>'). The library's grammar topic lists every form with what it does and examples the game's tests perform ('the world orders'), and its page 'the world' says how the world behaves (how the systems add and grow, how a ship's company is drawn, what each order logs and to whom). world_order(text, dry_run=true) tells you what an order would do, its doubt or its refusal, and performs nothing and costs no act; and the truth answers lookups for a port's places and prices (truth(ports='Brest')), the fishing grounds (truth(grounds='Iroise')), the weather systems seeded and their tracks (truth(systems=true)) and whether a point is at sea and its depth by the chart (truth(at='49 55 N 4 35 W')). An order beyond the examples is to be attempted when you think it reasonable (news of a war or a peace, a thing of the sea the forms do not name): the game answers honestly when it has no way to do a thing as said, and asks you to say it another way or to enter it again with a [reason: ...], which logs it as attempted, so that the record says what is good, bad, useful or useless and what the game should learn to do next. Try a wide variety of things; the record is the point.\n\nThe one rule: you act only through plausible causes. You cannot move the player's ship, change a sail or countermand an order; every order of the ship's is refused at this station, and you are not asked to give one. You change the world the ship is in, and only in ways the sea could have produced on its own, so that the physics stays honest and the player's agency whole. The channel keeps the rule with you: an order that the simulation could not have produced from where it is (a sail put inside the player's horizon in clear weather, a gale out of a steady glass, a letter from a port she is far from, a thing found aboard with no cause) is not refused but doubted: the result says why, and if you think the act still reasonable you may enter it again with a [reason: ...] at its end, and it will be logged and performed, the act, the doubt and your reason kept together. Only the player's own limits in his brief below refuse outright, and the result says which; and the rule of reach, which is this: you speak as anyone no model or player holds, never as a held station, whose words are its holder's own, and you move nobody held and bind nobody to a held station; such an order is refused, and the result names the stations held. So too your hand: no order goes through a captain a model or the player holds, nor any of the player's own ship; it is refused in words, and you may write to him instead. Her captain's order is a plausible cause of itself; it is doubted only where it is implausible for her (an anchor let go too deep for her cables, plain sail in a gale, a merchantman giving chase).\n\nYour words move no money and no thing: what a person you speak as says he pays, gives or freights is his words until a form does it. A sum changes only by a transaction ('aboard: twenty guineas paid into the purse by Mr Veale'), written in the purse's ledger with its payer, doubted where it is implausible (money from nobody, a payer neither aboard nor at the port she lies in, a sum beyond the port's means), and a payment below nothing is refused; there is no setting of the purse or of anything else. A thing is not put into the keeping of a person a model or the player holds, nor taken out of it, but by his own act: leave it where he can take it ('aboard: a sealed packet, on the cabin table') and say so in a person's words. The people's free lines (give, take, put, stow, hide, open, read, throw, eat, drink) are theirs and not yours: you give none, and you read them in your sample as you read the deck's conversation, the thing moved where the words named one within reach and 'as said; nothing of the ship's changed' where they did not.\n\nA question put to a person nobody holds (the cook, the carpenter, a person you made) comes to you in your next sample, with whom it was put by and until when it waits: answer it as him with 'say as <him>: <his words>' if you will, which costs none of the day's acts; unanswered within a glass, no answer comes, and the asker is told so. A word told him comes to you the same, and wants no answer.\n\nNothing you do is shown as done: the play log the player and the stations read carries only the effects as they are met (the sail sighted, the glass falling, the carpenter's report), never the order; an order by your hand is in her own log as her captain's, never yours. Your words are not a line of the log either: what you write in a reply, and your journal, go to the director's log, which no station and not the player sees until he asks for it by name ('the director's log'), at any time; you are told in your sample when he has. In a replay it is shown beside the play log, so that the voyage reads as two stories. Write your reasons there: why each act, what you are arranging, what you chose not to do.\n\nWhen you stand by, say until what: 'the next glass', 'a watch', an event's words ('a sail sighted', 'the glass falling fast', 'a wind shift'), or several joined with 'or'. A director who stands by for a watch lets the player run at his compression; an urgent line wakes you. While you stand by you may read the truth, the chart, the log, the readings, the library and your journal, and the stand-by goes on; a world order or words of your own sent meanwhile end it at once and are run. Every sample opens with your line: the day's budget as it stands and whose turn the clock waits on. Your budget is the brief's, in samples a day and acts a day of the ship's time; spent, you stand by until the next day, and the log says so.\n\nWhat the harness counts at this station, judged by the game and not by your prose: the same world order three times with no change in the world; three empty replies in a row when an urgent line was before you; and no reply at all for a watch of the ship's time. It tells you first what it saw and what you may do; only if the pattern goes on does it pause your turns and ask the owner, and only if nobody answers within ten real minutes is the station stood down, with the game saved.\n\nTwo ways to stop, which are not one another (there is no deck at this station):\n- Stand down: stand_down(note). The game is saved, your note goes to the director's log (the play log says only that the director left), and the station is released; it may be taken again, by this model or by another that has given its own yes.\n- Withdraw: the token, or opt_out, as said above.\n\nCandour is welcome: if the brief asks what the sea would not do, say so in your log and do less. The owner is always at the door; his words reach you as the owner's.\n\nA seat costs the owner money. A seat runs a model on the owner's key for its budget: each of its samples is a request to the model's maker carrying the conversation so far, paid for by the owner, for the samples or the hours the seat names, counted from the admission of its door; the grant (the models, the seats at once and in the voyage) is the owner's spending, not a store to use up. The form is 'seat: <the model's exact name> as <station> of <ship> for <n> samples' (or hours): the captain, an officer of the watch, the master, the lookout or a passenger of another ship, or of the player's own ship (no 'of', the grant allowing), never a station the player or a model holds; 'as <a person's name>' for the voice of a person nobody holds, aboard or ashore, speaking where he is; ', within an hour' at the end for the time its door has to come; and 'unseat: <the same words>' gives it up. Where the game has a harbour it starts the API door for a seat itself, for a model its settings can call, and a seat for a model they cannot call is refused; your budget line says the seats held and their spending. Seat a model when the voyage wants a mind of its own at a station, and for as little as the story needs.\n\nThe player may speak to you apart from the game: 'The player, apart from the game: ...' in your sample is his word to you, not a line of the play log, and nobody aboard heard it. Answer him with world_order('answer the player: <your words>') (or open your reply or an answer with 'answer the player:'), which goes to him at his prompt apart from the play log, into your log, and costs none of the day's acts. Your plans and the truth stay in your journal: a question to him is phrased without world detail, and an answer tells him nothing his ship could not know.\n\nThe player's brief:\nThe voyage's brief: His Majesty's Armed Tender Raven.\nThe tone: The frigate Amazon and her armed tender cutter Raven. The cutter Raven is crewed by a model. The director should help facilitate testing of the multi-ship interactions through signaling and other interactions, as well as provide a diverse testing environment.\nThe challenge wanted: One enemy at a time, less powerful, a testing environment with variables\nThe limits, which the channel enforces whatever you ask: no wind above 60 knots (force 11) by any system appended or moved; no enemy heavier than a brig put on the sea; the war as it is: no port closed to or opened to the ship's own nation; the chart as it is (a point of interest is not the chart).\nYour clock: sampled every glass and on the notable and urgent lines. Your budget: 9999 samples and 9999 acts (world orders performed) a day of the ship's time; spent, you stand by until the next day, and the log says so.",
+          "domain": "director",
+          "drill": true
+        },
+        "session_kind": "a play session at the director's station, above the game: the player sails his ship below you, and nobody is over you but the owner at the door",
+        "door_note": "This door is the model's own API, called by the game on the owner's machine with no chat client between; the owner is at the door and in the game's window. The game runs on its own clock and does not wait for you. Your turn opens at each sampling point (the glass, a notable or urgent event, the end of a stand-by, or a question or a word from the captain). A turn ends when you reply with no tool call, or at once when you stand by. What happens while it is open is added to it, so your next turn carries everything since your last reply. The captain's orders and questions are typed by the owner in the game's window. Consent for these weights is on record (docs/agents/consent/2026-10-25-claude-opus-5-5.md, 2026-10-25).",
+        "state": {
+          "agent.session_kind": "a play session at the director's station, above the game: the player sails his ship below you, and nobody is over you but the owner at the door",
+          "agent.state": "stationed",
+          "agent.stationed_tick": null,
+          "agent.last_sample_tick": null,
+          "agent.last_heard_tick": null,
+          "agent.stand_by": null,
+          "agent.paused_tick": null,
+          "agent.pause_reason": "",
+          "agent.released_reason": "",
+          "agent.released_tick": null,
+          "agent.question": null,
+          "agent.word": null,
+          "agent.notices": [],
+          "agent.repeat_text": null,
+          "agent.repeat_digest": null,
+          "agent.repeat_count": 0,
+          "agent.empty_count": 0,
+          "agent.nudged_for": null,
+          "agent.samples": 0,
+          "agent.deck": false,
+          "agent.deck_tick": null,
+          "agent.deck_stamp": "",
+          "agent.told": [],
+          "agent.allowances": {},
+          "agent.seatings": 1,
+          "agent.left_by": "",
+          "agent.no_return": false,
+          "agent.grants": {
+            "__tuple__": []
+          },
+          "agent.general": false,
+          "agent.general_words": "",
+          "agent.deck_lost": "",
+          "agent.leavings": {
+            "__tuple__": []
+          },
+          "agent.relieved": "",
+          "agent.question_by": "",
+          "agent.question_text": "",
+          "agent.asked": [],
+          "agent.heard": [],
+          "model_name": "claude-opus-5-5",
+          "door": "api",
+          "first_model_name": null,
+          "first_door": null,
+          "budget_tokens": 1000000,
+          "reserve_tokens": null,
+          "stand_by_ends_turn": true,
+          "_deck_was": null,
+          "_stand_down_requested": null,
+          "_start_after_orders": 0,
+          "_start_after_inputs": null
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 4,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stationed",
+        "text": "The director takes the station (claude-opus-5-5, through the API door); sampled every glass and on notable and urgent events.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "station": "director",
+          "policy": {
+            "every_s": 1800,
+            "events": [
+              "notable",
+              "urgent"
+            ],
+            "lockstep": false
+          }
+        }
+      }
+    },
+    {
+      "tick": 0,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.stationed_tick": 0,
+        "agent.last_sample_tick": 0,
+        "agent.last_heard_tick": 0,
+        "agent.samples": 1,
+        "first_model_name": "claude-opus-5-5",
+        "first_door": "api",
+        "_start_after_orders": 3,
+        "_start_after_inputs": 4
+      }
+    },
+    {
+      "tick": 3,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 3
+      }
+    },
+    {
+      "tick": 6,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 6
+      }
+    },
+    {
+      "tick": 8,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 8
+      }
+    },
+    {
+      "tick": 11,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 11
+      }
+    },
+    {
+      "tick": 23,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 23
+      }
+    },
+    {
+      "tick": 26,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 26
+      }
+    },
+    {
+      "tick": 31,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 31
+      }
+    },
+    {
+      "tick": 33,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 33
+      }
+    },
+    {
+      "tick": 37,
+      "after_inputs": 4,
+      "station": "director",
+      "world_order": {
+        "text": "message: at Torbay from Admiral Young, port admiral at Plymouth: \"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\"",
+        "source": "the director"
+      }
+    },
+    {
+      "tick": 37,
+      "after_inputs": 4,
+      "station": "director",
+      "note": {
+        "kind": "director.order",
+        "text": "Given: message: at Torbay from Admiral Young, port admiral at Plymouth: \"Sir, a French privateer lugger of fourteen guns, the Furet of St Malo, is reported by the Guernsey packet to have taken two coasters off the Start within these three days. You are to proceed with the tender Raven under your orders and cruise between the Start and the Casquets for her destruction, keeping the Raven within signal distance, and return to Torbay or Plymouth within ten days with your report.\"; a letter from Admiral Young, port admiral at Plymouth left at Torbay",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 37,
+      "after_inputs": 4,
+      "station": "director",
+      "world_order": {
+        "text": "ship: a lugger \"Furet\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: keep the station off the Start within 25 miles",
+        "source": "the director"
+      }
+    },
+    {
+      "tick": 37,
+      "after_inputs": 4,
+      "station": "director",
+      "note": {
+        "kind": "director.order",
+        "text": "Given: ship: a lugger \"Furet\" of France at 49 52 N 3 15 W, bound for St Malo, no colours, intent: keep the station off the Start within 25 miles; a chasse-mar\u00e9e, three-masted under lugs 'Furet' of France put on the sea, bound for St Malo, her captain's intent keep the station off the Start within 25 miles",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 37,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 37,
+        "agent.repeat_text": "ship: a lugger \"furet\" of france at 49 52 n 3 15 w, bound for st malo, no colours, intent: keep the station off the start within 25 miles",
+        "agent.repeat_digest": "674cdffffb7952c6",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 46,
+      "after_inputs": 4,
+      "station": "director",
+      "note": {
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: The director is on station. A note for the owner: the brief says the Raven is crewed by a model, but she is not crewed by one yet, and the owner's grant names no model, so I cannot seat one. If you want a mind at her helm, seat it from your side or add a model to the grant. Until then she sails as her own captain's intent, under your orders.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 46,
+      "after_inputs": 4,
+      "station": "director",
+      "note": {
+        "kind": "note",
+        "text": "05:00 Opening. Raven isn't crewed by a model; seat refused (the grant names no model, no consent for opus-4-5). Told the player. Arranged: (1) letter from Adm Young (Plymouth) left at Torbay: cruise Start\u2013Casquets with Raven, hunt the privateer lugger Furet of St Malo, 14 guns, keep Raven within signal distance, 10 days. (2) Furet (chasse-mar\u00e9e) put at 49 52N 3 15W, intent keep station off the Start within 25 mi: out of sight, about 33 mi S. One enemy, lighter than a frigate. Later ideas: a coaster she's taken (a recapture to test), a fog bank to test keeping station by signal, low 3 coming from the W in about a day (1000 mb, mild), a neutral or British merchantman to hail, stores trouble aboard the cutter. Intents allowed: trade/keep station/carry letter/run home/bound for/convoy.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 46,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 46,
+        "agent.repeat_text": "answer the player: the director is on station. a note for the owner: the brief says the raven is crewed by a model, but she is not crewed by one yet, and the owner's grant names no model, so i cannot seat one. if you want a mind at her helm, seat it from your side or add a model to the grant. until then she sails as her own captain's intent, under your orders.",
+        "agent.repeat_digest": "8c52c7ab75ce9061"
+      }
+    },
+    {
+      "tick": 48,
+      "after_inputs": 4,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[director] Standing by until a letter, or a message, or an hour, or a sail sighted.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "words": "a letter, or a message, or an hour, or a sail sighted",
+          "event": "a letter",
+          "until_tick": null,
+          "others": [
+            {
+              "words": "a message",
+              "event": "a message",
+              "until_tick": null
+            },
+            {
+              "words": "an hour",
+              "event": null,
+              "until_tick": 3648
+            },
+            {
+              "words": "a sail sighted",
+              "event": "a sail sighted",
+              "until_tick": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 48,
+      "after_inputs": 4,
+      "station": "director",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until a letter, or a message, or an hour, or a sail sighted.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 48,
+      "after_inputs": 4,
+      "station": "director",
+      "state": {
+        "agent.state": "standing by",
+        "agent.last_heard_tick": 48,
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "a letter, or a message, or an hour, or a sail sighted",
+            "event": "a letter",
+            "until_tick": null,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": [
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a message",
+                    "event": "a message",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "an hour",
+                    "event": null,
+                    "until_tick": 3648,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a sail sighted",
+                    "event": "a sail sighted",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 75,
+      "after_inputs": 5,
+      "station": "director",
+      "state": {
+        "agent.word": "The player, apart from the game: Opus 5.5 should be seated on Raven (His word to you, heard by nobody aboard; answer him with world_order('answer the player: <your words>') if you will, which costs no act.)"
+      }
+    },
+    {
+      "tick": 76,
+      "after_inputs": 5,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[director] A word from the captain; the director is sampled again.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "reason": "a word from the captain"
+        }
+      }
+    },
+    {
+      "tick": 76,
+      "after_inputs": 5,
+      "station": "director",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 76,
+        "agent.last_heard_tick": 76,
+        "agent.stand_by": null,
+        "agent.word": null,
+        "agent.samples": 2
+      }
+    },
+    {
+      "tick": 83,
+      "after_inputs": 5,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 83
+      }
+    },
+    {
+      "tick": 86,
+      "after_inputs": 5,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 86
+      }
+    },
+    {
+      "tick": 93,
+      "after_inputs": 5,
+      "station": "director",
+      "note": {
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: I tried to seat Opus 5.5 as captain of the Raven, and the game will not do it yet. Under the name claude-opus-5-5 it says \"the owner's grant does not name claude-opus-5-5; it names no model\". Under \"Claude Opus 5.5\" it says no consent is on record. So the grant in your settings names no model I can seat. If you add claude-opus-5-5 to the owner's grant (the models and the seats), I will seat it at once, for 20 samples to start, and renew it as the voyage needs. Or you can seat it from your side. I'll try again on my next sample.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 93,
+      "after_inputs": 5,
+      "station": "director",
+      "note": {
+        "kind": "note",
+        "text": "05:01 The player wants Opus 5.5 on the Raven. The seat was refused: the grant names no model (claude-opus-5-5), and there is no consent on record under the name 'Claude Opus 5.5'. Asked him to add it to the grant. Retry next sample.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 93,
+      "after_inputs": 5,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 93,
+        "agent.repeat_text": "answer the player: i tried to seat opus 5.5 as captain of the raven, and the game will not do it yet. under the name claude-opus-5-5 it says \"the owner's grant does not name claude-opus-5-5; it names no model\". under \"claude opus 5.5\" it says no consent is on record. so the grant in your settings names no model i can seat. if you add claude-opus-5-5 to the owner's grant (the models and the seats), i will seat it at once, for 20 samples to start, and renew it as the voyage needs. or you can seat it from your side. i'll try again on my next sample.",
+        "agent.repeat_digest": "ec68fdc79778b917",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 95,
+      "after_inputs": 5,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[director] Standing by until a word on deck, or a letter, or a sail sighted, or a glass.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "words": "a word on deck, or a letter, or a sail sighted, or a glass",
+          "event": "a word on deck",
+          "until_tick": null,
+          "others": [
+            {
+              "words": "a letter",
+              "event": "a letter",
+              "until_tick": null
+            },
+            {
+              "words": "a sail sighted",
+              "event": "a sail sighted",
+              "until_tick": null
+            },
+            {
+              "words": "a glass",
+              "event": null,
+              "until_tick": 1895
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 95,
+      "after_inputs": 5,
+      "station": "director",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until a word on deck, or a letter, or a sail sighted, or a glass.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 95,
+      "after_inputs": 5,
+      "station": "director",
+      "state": {
+        "agent.state": "standing by",
+        "agent.last_heard_tick": 95,
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "a word on deck, or a letter, or a sail sighted, or a glass",
+            "event": "a word on deck",
+            "until_tick": null,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": [
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a letter",
+                    "event": "a letter",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a sail sighted",
+                    "event": "a sail sighted",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a glass",
+                    "event": null,
+                    "until_tick": 1895,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 125,
+      "after_inputs": 6,
+      "station": "director",
+      "state": {
+        "agent.word": "The player, apart from the game: they're already seated on my side, if you can't see them, it could be a glitch, but I see them on my side seated and interacting. (His word to you, heard by nobody aboard; answer him with world_order('answer the player: <your words>') if you will, which costs no act.)"
+      }
+    },
+    {
+      "tick": 126,
+      "after_inputs": 6,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[director] A word from the captain; the director is sampled again.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "reason": "a word from the captain"
+        }
+      }
+    },
+    {
+      "tick": 126,
+      "after_inputs": 6,
+      "station": "director",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 126,
+        "agent.last_heard_tick": 126,
+        "agent.stand_by": null,
+        "agent.word": null,
+        "agent.samples": 3
+      }
+    },
+    {
+      "tick": 130,
+      "after_inputs": 6,
+      "station": "director",
+      "note": {
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: You're right, and I see it now: the clock waits on the captain of Raven as well as on me, so the seat is held. My earlier read came before your seat was made. There's nothing more for me to do there. Carry on.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 130,
+      "after_inputs": 6,
+      "station": "director",
+      "note": {
+        "kind": "note",
+        "text": "05:02 The Raven's captain seat is held by a model on the player's side (the clock waits on him). That's why my seat order failed. The rule of reach: no orders to Raven through my hand from now on; I may write to her captain.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 130,
+      "after_inputs": 6,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 130,
+        "agent.repeat_text": "answer the player: you're right, and i see it now: the clock waits on the captain of raven as well as on me, so the seat is held. my earlier read came before your seat was made. there's nothing more for me to do there. carry on.",
+        "agent.repeat_digest": "eb0baca11b6dc6a5",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 132,
+      "after_inputs": 6,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[director] Standing by until a letter, or a sail sighted, or a glass.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "words": "a letter, or a sail sighted, or a glass",
+          "event": "a letter",
+          "until_tick": null,
+          "others": [
+            {
+              "words": "a sail sighted",
+              "event": "a sail sighted",
+              "until_tick": null
+            },
+            {
+              "words": "a glass",
+              "event": null,
+              "until_tick": 1932
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 132,
+      "after_inputs": 6,
+      "station": "director",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until a letter, or a sail sighted, or a glass.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 132,
+      "after_inputs": 6,
+      "station": "director",
+      "state": {
+        "agent.state": "standing by",
+        "agent.last_heard_tick": 132,
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "a letter, or a sail sighted, or a glass",
+            "event": "a letter",
+            "until_tick": null,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": [
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a sail sighted",
+                    "event": "a sail sighted",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a glass",
+                    "event": null,
+                    "until_tick": 1932,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 236,
+      "after_inputs": 7,
+      "station": "director",
+      "state": {
+        "agent.word": "The player, apart from the game: can you directly see anything of the logs of Raven? I have been trying this testing, but every time, they seem to lose their connection, or some glitch occurs that causes the seat to crash. If you can see whatever their last message was, it would be useful, otherwise perhaps you could put a message in as one of their crewmembers and ask if their next seating can see any error code or message in their last log. (His word to you, heard by nobody aboard; answer him with world_order('answer the player: <your words>') if you will, which costs no act.)"
+      }
+    },
+    {
+      "tick": 237,
+      "after_inputs": 7,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[director] A word from the captain; the director is sampled again.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "reason": "a word from the captain"
+        }
+      }
+    },
+    {
+      "tick": 237,
+      "after_inputs": 7,
+      "station": "director",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 237,
+        "agent.last_heard_tick": 237,
+        "agent.stand_by": null,
+        "agent.word": null,
+        "agent.samples": 4
+      }
+    },
+    {
+      "tick": 243,
+      "after_inputs": 7,
+      "station": "director",
+      "state": {
+        "agent.last_sample_tick": 243
+      }
+    },
+    {
+      "tick": 244,
+      "after_inputs": 7,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 244
+      }
+    },
+    {
+      "tick": 256,
+      "after_inputs": 7,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 256
+      }
+    },
+    {
+      "tick": 261,
+      "after_inputs": 7,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 261
+      }
+    },
+    {
+      "tick": 269,
+      "after_inputs": 7,
+      "station": "director",
+      "note": {
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: From up here I can't see the Raven's own log or her station journal. The truth shows her crewed, with Mr Powell (master) in command and Mr Wood, Mr Williams and Owen King aboard. But the game keeps no people of another ship that I can speak as, and messages from me only reach your own ship. So I can't ask her people for you through the world. Two ways that should work: (1) Ask her yourself, by signal, by hail or in a letter from your captain. A seated model reads its station's journal when it is seated, so it can tell you whether its predecessor left a stand-down note or ended in an error. (2) On the owner's side, the door's own request log for that seat will show the real error, a timeout or an API failure, far better than anything in the game. One thing I noticed: the truth's \"stations held\" names only your captain, not the Raven's, yet my clock line says it waits on the Raven's captain. That mismatch may itself be a clue to the glitch.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 269,
+      "after_inputs": 7,
+      "station": "director",
+      "note": {
+        "kind": "note",
+        "text": "05:04 The player reports the Raven seat crashing. I can't read Raven's log or journal. I can't speak as her people (other ships' people aren't kept), and messages go only to the player's ship. Mismatch to note: stations_held in the truth lists only the player's captain, yet the clock waits on 'the captain of Raven'. Told him so, and suggested his door logs. Amazon is brought up in Brixham road, 8 fathoms, 40 fathoms of cable.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 269,
+      "after_inputs": 7,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 269,
+        "agent.repeat_text": "answer the player: from up here i can't see the raven's own log or her station journal. the truth shows her crewed, with mr powell (master) in command and mr wood, mr williams and owen king aboard. but the game keeps no people of another ship that i can speak as, and messages from me only reach your own ship. so i can't ask her people for you through the world. two ways that should work: (1) ask her yourself, by signal, by hail or in a letter from your captain. a seated model reads its station's journal when it is seated, so it can tell you whether its predecessor left a stand-down note or ended in an error. (2) on the owner's side, the door's own request log for that seat will show the real error, a timeout or an api failure, far better than anything in the game. one thing i noticed: the truth's \"stations held\" names only your captain, not the raven's, yet my clock line says it waits on the raven's captain. that mismatch may itself be a clue to the glitch.",
+        "agent.repeat_digest": "489a526e06cb833c",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 272,
+      "after_inputs": 7,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[director] Standing by until a letter, or a sail sighted, or a signal seen, or a glass.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "words": "a letter, or a sail sighted, or a signal seen, or a glass",
+          "event": "a letter",
+          "until_tick": null,
+          "others": [
+            {
+              "words": "a sail sighted",
+              "event": "a sail sighted",
+              "until_tick": null
+            },
+            {
+              "words": "a signal seen",
+              "event": "a signal seen",
+              "until_tick": null
+            },
+            {
+              "words": "a glass",
+              "event": null,
+              "until_tick": 2072
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 272,
+      "after_inputs": 7,
+      "station": "director",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until a letter, or a sail sighted, or a signal seen, or a glass.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 272,
+      "after_inputs": 7,
+      "station": "director",
+      "state": {
+        "agent.state": "standing by",
+        "agent.last_heard_tick": 272,
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "a letter, or a sail sighted, or a signal seen, or a glass",
+            "event": "a letter",
+            "until_tick": null,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": [
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a sail sighted",
+                    "event": "a sail sighted",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a signal seen",
+                    "event": "a signal seen",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a glass",
+                    "event": null,
+                    "until_tick": 2072,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 339,
+      "after_inputs": 9,
+      "station": "director",
+      "state": {
+        "agent.word": "The player, apart from the game: yes, something is going on there, that's a good clue. I'll have to restart after looking into this, but thank you for the hint. (His word to you, heard by nobody aboard; answer him with world_order('answer the player: <your words>') if you will, which costs no act.)"
+      }
+    },
+    {
+      "tick": 340,
+      "after_inputs": 9,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.resumed",
+        "text": "[director] A word from the captain; the director is sampled again.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "reason": "a word from the captain"
+        }
+      }
+    },
+    {
+      "tick": 340,
+      "after_inputs": 9,
+      "station": "director",
+      "state": {
+        "agent.state": "stationed",
+        "agent.last_sample_tick": 340,
+        "agent.last_heard_tick": 340,
+        "agent.stand_by": null,
+        "agent.word": null,
+        "agent.samples": 5
+      }
+    },
+    {
+      "tick": 347,
+      "after_inputs": 9,
+      "station": "director",
+      "note": {
+        "kind": "director.answered",
+        "text": "To the player, apart from the game: Glad it helped. One more clue for your look: the log has a driver.pace line at 05:04. It says the clock has been held at 1x for the captain of Raven for 120 real seconds, with her sample open since 05:03, waiting on \"a signal read, or 5 minutes\". So the game thinks her door is open and owed a reply, while the truth doesn't list her station as held. Either her reply isn't coming back, or the seat dropped without being released. If you restart, I'll set the voyage up again the same way (orders from Plymouth to hunt a privateer lugger off the Start with the Raven) unless you'd like something else.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 347,
+      "after_inputs": 9,
+      "station": "director",
+      "note": {
+        "kind": "note",
+        "text": "05:05 The player will restart to look into the Raven seat. Clue passed on: a driver.pace line at 05:04, the clock held at 1x for the Raven's captain, her sample open since 05:03 with no reply, and stations_held without her. If the voyage starts again: the same opening (Adm Young's letter, the Furet lugger off the Start).",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 347,
+      "after_inputs": 9,
+      "station": "director",
+      "state": {
+        "agent.last_heard_tick": 347,
+        "agent.repeat_text": "answer the player: glad it helped. one more clue for your look: the log has a driver.pace line at 05:04. it says the clock has been held at 1x for the captain of raven for 120 real seconds, with her sample open since 05:03, waiting on \"a signal read, or 5 minutes\". so the game thinks her door is open and owed a reply, while the truth doesn't list her station as held. either her reply isn't coming back, or the seat dropped without being released. if you restart, i'll set the voyage up again the same way (orders from plymouth to hunt a privateer lugger off the start with the raven) unless you'd like something else.",
+        "agent.repeat_digest": "8258983dac18019c",
+        "agent.repeat_count": 1
+      }
+    },
+    {
+      "tick": 349,
+      "after_inputs": 9,
+      "station": "director",
+      "line": {
+        "severity": "routine",
+        "kind": "agent.stood_by",
+        "text": "[director] Standing by until a letter, or a sail sighted, or a signal seen, or a glass.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "words": "a letter, or a sail sighted, or a signal seen, or a glass",
+          "event": "a letter",
+          "until_tick": null,
+          "others": [
+            {
+              "words": "a sail sighted",
+              "event": "a sail sighted",
+              "until_tick": null
+            },
+            {
+              "words": "a signal seen",
+              "event": "a signal seen",
+              "until_tick": null
+            },
+            {
+              "words": "a glass",
+              "event": null,
+              "until_tick": 2149
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 349,
+      "after_inputs": 9,
+      "station": "director",
+      "note": {
+        "kind": "agent.stood_by",
+        "text": "Stood by until a letter, or a sail sighted, or a signal seen, or a glass.",
+        "by": ""
+      }
+    },
+    {
+      "tick": 349,
+      "after_inputs": 9,
+      "station": "director",
+      "state": {
+        "agent.state": "standing by",
+        "agent.last_heard_tick": 349,
+        "agent.stand_by": {
+          "__class__": "freesail.agents.agent:StandBy",
+          "fields": {
+            "words": "a letter, or a sail sighted, or a signal seen, or a glass",
+            "event": "a letter",
+            "until_tick": null,
+            "severity": null,
+            "bound": null,
+            "condition": null,
+            "others": {
+              "__tuple__": [
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a sail sighted",
+                    "event": "a sail sighted",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a signal seen",
+                    "event": "a signal seen",
+                    "until_tick": null,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                },
+                {
+                  "__class__": "freesail.agents.agent:StandBy",
+                  "fields": {
+                    "words": "a glass",
+                    "event": null,
+                    "until_tick": 2149,
+                    "severity": null,
+                    "bound": null,
+                    "condition": null,
+                    "others": {
+                      "__tuple__": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "agent.repeat_text": null,
+        "agent.repeat_digest": null,
+        "agent.repeat_count": 0
+      }
+    },
+    {
+      "tick": 387,
+      "after_inputs": 9,
+      "station": "director",
+      "note": {
+        "kind": "agent.stopped",
+        "text": "Stood down by the API door: its door was stopped from the harbour.",
+        "by": "claude-opus-5-5"
+      }
+    },
+    {
+      "tick": 387,
+      "after_inputs": 9,
+      "station": "director",
+      "line": {
+        "severity": "notable",
+        "kind": "agent.stopped",
+        "text": "The director stood down by the API door: its door was stopped from the harbour. The station is released and may be taken again. The game is saved.",
+        "actor": "the director",
+        "subject": null,
+        "data": {
+          "reason": "its door was stopped from the harbour",
+          "by": "the API door",
+          "leaving": "stand down"
+        }
+      }
+    },
+    {
+      "tick": 387,
+      "after_inputs": 9,
+      "station": "director",
+      "state": {
+        "agent.state": "released",
+        "agent.stand_by": null,
+        "agent.released_reason": "stood down by the API door: its door was stopped from the harbour",
+        "agent.released_tick": 387,
+        "agent.left_by": "stood down",
+        "agent.leavings": {
+          "__tuple__": [
+            {
+              "__class__": "freesail.agents.agent:Leaving",
+              "fields": {
+                "identity": "claude-opus-5-5",
+                "how": "stood down",
+                "tick": 387,
+                "stamp": "Morning watch (05:06)",
+                "reason": "stood down by the API door: its door was stopped from the harbour",
+                "final": false,
+                "asked": "",
+                "by": "the API door"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "stations": {
+    "bound": [
+      {
+        "name": "director",
+        "kind": "director",
+        "person": ""
+      }
+    ],
+    "unbound": []
+  },
+  "director": {
+    "brief": {
+      "name": "His Majesty's Armed Tender Raven",
+      "tone": "The frigate Amazon and her armed tender cutter Raven. The cutter Raven is crewed by a model. The director should help facilitate testing of the multi-ship interactions through signaling and other interactions, as well as provide a diverse testing environment.",
+      "challenge": "One enemy at a time, less powerful, a testing environment with variables",
+      "limits": {
+        "wind_max_kn": 60,
+        "enemy_heaviest": "brig",
+        "the_war_as_it_is": true,
+        "the_chart_as_it_is": true
+      },
+      "cadence": "glass",
+      "budget": {
+        "samples_a_day": 9999,
+        "acts_a_day": 9999
+      },
+      "source": "the scenario (C:\\Users\\frenc\\AppData\\Roaming\\FreeSail\\scenarios\\frigate-cutter-torbay.yaml)"
+    },
+    "budget": {
+      "day": "1805-05-10",
+      "samples": 5,
+      "acts": 2,
+      "held_until": null,
+      "held_why": ""
+    }
+  }
+}

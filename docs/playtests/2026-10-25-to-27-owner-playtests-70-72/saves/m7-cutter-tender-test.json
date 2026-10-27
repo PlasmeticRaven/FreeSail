@@ -1,0 +1,1105 @@
+{
+  "format": 1,
+  "engine": "0.0.1",
+  "build": {
+    "name": "m6c",
+    "rules": "0a0c76dfa72752ed"
+  },
+  "builds": [
+    {
+      "name": "m6c",
+      "rules": "0a0c76dfa72752ed"
+    }
+  ],
+  "seed": 7,
+  "scenario": {
+    "name": "A frigate and cutter, in Torbay",
+    "start_time": "1805-05-10T05:00:00",
+    "wind_from_deg": 225.0,
+    "wind_speed_kn": 15.0,
+    "gustiness": 0.3,
+    "variability": 0.3,
+    "ship_x": 0.0,
+    "ship_y": 0.0,
+    "ship_heading_deg": 190.0,
+    "ship_speed_kn": 0.0,
+    "latitude_deg": 50.41,
+    "position": {
+      "lat_deg": 50.41,
+      "lon_deg": -3.495
+    },
+    "region": "channel-west",
+    "chart": "atlantic-east",
+    "weather": [],
+    "systems": [],
+    "climatology": true,
+    "background": {},
+    "glass": true,
+    "air_mass": "neutral",
+    "sea": null,
+    "instrument": "sextant",
+    "current": null,
+    "sky": null,
+    "chronometer": {
+      "maker": "Arnold",
+      "where": "",
+      "rated": "1805-06-01",
+      "rate_s_per_day": 2.0,
+      "drift": "seeded",
+      "forgotten": []
+    },
+    "epitome": "norie",
+    "nation": "britain",
+    "people": [
+      {
+        "role": "master",
+        "skill": 0.9
+      }
+    ],
+    "papers": {
+      "chart": {
+        "year": 1804
+      },
+      "private_signals": true,
+      "almanac": 1805,
+      "price_lists": [
+        "torbay"
+      ]
+    },
+    "cargo": {
+      "purse_pounds": 450.0,
+      "goods": {}
+    },
+    "ports": [
+      "alderney",
+      "algeciras",
+      "angra",
+      "cadiz",
+      "ceuta",
+      "corunna",
+      "dartmouth",
+      "ferrol",
+      "funchal",
+      "gibraltar",
+      "horta",
+      "lagos",
+      "la-rochelle",
+      "le-palais",
+      "lisbon",
+      "lorient",
+      "morlaix",
+      "oporto",
+      "paimboeuf",
+      "ponta-delgada",
+      "porto-santo",
+      "rochefort",
+      "royan",
+      "santander",
+      "setubal",
+      "st-helier",
+      "st-malo",
+      "st-peter-port",
+      "tangier",
+      "tarifa",
+      "torbay",
+      "vigo",
+      "weymouth",
+      "falmouth",
+      "plymouth",
+      "brest",
+      "roscoff",
+      "st-marys"
+    ],
+    "ships": [
+      {
+        "id": "raven",
+        "description": "cutter",
+        "name": "Raven",
+        "nation": "britain",
+        "position": "50 24.5 N 3 29 W",
+        "goal": "in company with the ship",
+        "free_intent": "Armed tender and consort of the frigate Amazon",
+        "colours": "shown",
+        "under_the_orders_of": "the ship",
+        "lights": "stern lantern"
+      },
+      {
+        "id": "nile",
+        "description": "lugger",
+        "name": "Nile",
+        "nation": "france",
+        "position": "49 45 N 1 35 W",
+        "goal": "patrolling off Cherbourg within 20 miles",
+        "intent": "cruise for prizes off Cherbourg within 20 miles",
+        "colours": "shown"
+      }
+    ],
+    "world_orders": [],
+    "intent": "",
+    "books": [],
+    "director": {
+      "models": [],
+      "seats": 1,
+      "seats_in_voyage": 1,
+      "brief": {
+        "name": "His Majesty's Armed Tender Raven",
+        "tone": "The frigate Amazon and her armed tender cutter Raven. The cutter Raven is crewed by a model. The director should help facilitate testing of the multi-ship interactions through signaling and other interactions, as well as provide a diverse testing environment.",
+        "challenge": "One enemy at a time, less powerful, a testing environment with variables",
+        "limits": {
+          "wind_max_kn": 60,
+          "enemy_heaviest": "brig",
+          "the_war_as_it_is": true,
+          "the_chart_as_it_is": true
+        },
+        "cadence": "glass",
+        "budget": {
+          "samples_a_day": 9999,
+          "acts_a_day": 9999
+        },
+        "source": "the scenario (C:\\Users\\frenc\\AppData\\Roaming\\FreeSail\\scenarios\\frigate-cutter-torbay.yaml)"
+      }
+    },
+    "business": "on"
+  },
+  "ship_ref": {
+    "type": "file",
+    "path": "data/ships/frigate-36.yaml"
+  },
+  "end_tick": 38587,
+  "journal": [
+    [
+      0,
+      "captain",
+      "hoist the signal no. 82"
+    ],
+    [
+      0,
+      "captain",
+      "let go the best bower"
+    ],
+    [
+      0,
+      "captain",
+      "take a fix"
+    ],
+    [
+      981,
+      "captain",
+      "hoist the signal come within hail"
+    ],
+    [
+      5962,
+      "captain",
+      "Belay all"
+    ],
+    [
+      5976,
+      "captain",
+      "hail the cutter: Heave to for further words"
+    ],
+    [
+      6054,
+      "captain",
+      "hail the cutter: We are well, are you well and ready to get under way? The captain wonders if you are able to go ashore or not."
+    ],
+    [
+      6067,
+      "captain",
+      "belay all"
+    ],
+    [
+      6226,
+      "captain",
+      "hail the cutter: Understood, the captain would like you to know that this is the first time testing working with a model as captain of another ship, so expect foibles and inconsistencies, and please journal anything you see that doesn't seem right on your end. We will be getting under way under topsails and making east-southeast for you to form up on us, then we shall turn for Cherbourg. Let us establish some things now so that we may coordinate easily while outside hail, we have the full signal book, do you have the full signal book in your ship's papers?"
+    ],
+    [
+      6245,
+      "captain",
+      "belay all"
+    ],
+    [
+      6306,
+      "captain",
+      "hail the cutter: Raven shall keep station two cables astern unless otherwise signalled, signal table is in force, captain requests you attempt to hoist the private signal now to see what happens."
+    ],
+    [
+      6314,
+      "captain",
+      "belay all"
+    ],
+    [
+      6421,
+      "captain",
+      "hail the cutter: We shall establish personal private signal, dip the colours thrice, response is single dip and lantern at the topmast. Please hoist the lights now to confirm we can see your lantern when set."
+    ],
+    [
+      6435,
+      "captain",
+      "belay all"
+    ],
+    [
+      6446,
+      "captain",
+      "the glass on her"
+    ],
+    [
+      6476,
+      "captain",
+      "the glass on her"
+    ],
+    [
+      6521,
+      "captain",
+      "hail the cutter: nay, no light visible, fall back to dipping colours by day, lights hoisted and doused in the same pattern by night (three to one)."
+    ],
+    [
+      6533,
+      "captain",
+      "belay all"
+    ],
+    [
+      6553,
+      "captain",
+      "get under way and steer east southeast"
+    ],
+    [
+      6586,
+      "captain",
+      "make the convoy signal no. 13"
+    ],
+    [
+      6617,
+      "captain",
+      "make the convoy signal no. 12"
+    ],
+    [
+      6633,
+      "captain",
+      "belay all"
+    ],
+    [
+      6637,
+      "captain",
+      "make the convoy signal no. 12"
+    ],
+    [
+      6642,
+      "captain",
+      "get under way and steer east southeast"
+    ],
+    [
+      8056,
+      "captain",
+      "hoist telegraphic signal Try ship name \"the ship\""
+    ],
+    [
+      8198,
+      "captain",
+      "decline the pilot"
+    ],
+    [
+      8291,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      8570,
+      "captain",
+      "take a fix"
+    ],
+    [
+      9045,
+      "captain",
+      "make the convoy signal no. 26"
+    ],
+    [
+      9049,
+      "captain",
+      "reef the topsails, one reef"
+    ],
+    [
+      9196,
+      "captain",
+      "take a fix"
+    ],
+    [
+      9747,
+      "captain",
+      "hoist the telegraphic signal Commodore holds a half 5 knots"
+    ],
+    [
+      9762,
+      "captain",
+      "belay all"
+    ],
+    [
+      9776,
+      "captain",
+      "hoist the telegraphic signal Commodore holds a half five knots"
+    ],
+    [
+      11424,
+      "captain",
+      "set the courses, one reef"
+    ],
+    [
+      11954,
+      "captain",
+      "shake out the topsails"
+    ],
+    [
+      12844,
+      "captain",
+      "hoist the convoy signal no. 27"
+    ],
+    [
+      13233,
+      "captain",
+      "hail the cutter: If you may hear me, welcome to your station! How are you finding Raven?"
+    ],
+    [
+      13246,
+      "captain",
+      "belay all"
+    ],
+    [
+      13299,
+      "captain",
+      "hail the cutter: up to 6 knots now, I think the station order can be trusted but keep a close watch at first to be sure"
+    ],
+    [
+      13308,
+      "captain",
+      "belay all"
+    ],
+    [
+      13986,
+      "captain",
+      "trim the sails"
+    ],
+    [
+      13994,
+      "captain",
+      "Set the main topmast staysail"
+    ],
+    [
+      13997,
+      "captain",
+      "set the mizzen topmast staysail"
+    ],
+    [
+      14488,
+      "captain",
+      "make the convoy signal make more sail"
+    ],
+    [
+      15002,
+      "captain",
+      "Reef the topsails, one reef"
+    ],
+    [
+      15450,
+      "captain",
+      "take in the main topmast staysail"
+    ],
+    [
+      15453,
+      "captain",
+      "take in the mizzen topmast staysail"
+    ],
+    [
+      16007,
+      "captain",
+      "take a bearing of the land"
+    ],
+    [
+      16107,
+      "captain",
+      "shape a course for 49 48 N 1 38 W"
+    ],
+    [
+      16108,
+      "captain",
+      "steer 113"
+    ],
+    [
+      16158,
+      "captain",
+      "shape a course for 49 48 N 1 38 W"
+    ],
+    [
+      16260,
+      "captain",
+      "make the signal no. 68"
+    ],
+    [
+      16269,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      18304,
+      "captain",
+      "haul up the courses"
+    ],
+    [
+      19149,
+      "captain",
+      "shake out the topsails"
+    ],
+    [
+      21752,
+      "captain",
+      "square the yards"
+    ],
+    [
+      25031,
+      "captain",
+      "shape a course for 49 48 N 1 38 W"
+    ],
+    [
+      25558,
+      "captain",
+      "Brace the yards up 2 points"
+    ],
+    [
+      25691,
+      "captain",
+      "Trim the yards"
+    ],
+    [
+      25940,
+      "captain",
+      "hail the cutter: Making 5.3 knots"
+    ],
+    [
+      25949,
+      "captain",
+      "belay all"
+    ],
+    [
+      26476,
+      "captain",
+      "Tend the sheets"
+    ],
+    [
+      26545,
+      "captain",
+      "Reef the topsails, one reef"
+    ],
+    [
+      26919,
+      "captain",
+      "brace the yards in a point"
+    ],
+    [
+      29926,
+      "captain",
+      "Brace the yards up a point"
+    ],
+    [
+      30384,
+      "captain",
+      "trim the sails"
+    ],
+    [
+      31003,
+      "captain",
+      "make the signal no. 48"
+    ],
+    [
+      34714,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      34814,
+      "captain",
+      "Set the fore course"
+    ],
+    [
+      35272,
+      "captain",
+      "shake out the fore course"
+    ],
+    [
+      35803,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      37261,
+      "captain",
+      "Shake out the topsails, one reef"
+    ],
+    [
+      37889,
+      "captain",
+      "Trim the sails"
+    ],
+    [
+      38105,
+      "captain",
+      "Set the main topmast staysail"
+    ],
+    [
+      38108,
+      "captain",
+      "set the mizzen topmast staysail"
+    ]
+  ],
+  "inputs": [
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "hoist the signal no. 82"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "let go the best bower"
+    },
+    {
+      "tick": 0,
+      "actor": "captain",
+      "order": "take a fix"
+    },
+    {
+      "tick": 0,
+      "line": {
+        "severity": "routine",
+        "kind": "driver.book",
+        "text": "The book of standing orders is empty. Begin with none, give your own, or load the starter book: read the standing orders from data/standing_orders/starter.orders (the primer's chapter 11, 'The starting book', gives each routine with its reason).",
+        "data": {}
+      }
+    },
+    {
+      "tick": 968,
+      "actor": "captain",
+      "order": "Hoist the signal come within easy hail"
+    },
+    {
+      "tick": 981,
+      "actor": "captain",
+      "order": "hoist the signal come within hail"
+    },
+    {
+      "tick": 5962,
+      "actor": "captain",
+      "order": "Belay all"
+    },
+    {
+      "tick": 5976,
+      "actor": "captain",
+      "order": "hail the cutter: Heave to for further words"
+    },
+    {
+      "tick": 6054,
+      "actor": "captain",
+      "order": "hail the cutter: We are well, are you well and ready to get under way? The captain wonders if you are able to go ashore or not."
+    },
+    {
+      "tick": 6067,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 6226,
+      "actor": "captain",
+      "order": "hail the cutter: Understood, the captain would like you to know that this is the first time testing working with a model as captain of another ship, so expect foibles and inconsistencies, and please journal anything you see that doesn't seem right on your end. We will be getting under way under topsails and making east-southeast for you to form up on us, then we shall turn for Cherbourg. Let us establish some things now so that we may coordinate easily while outside hail, we have the full signal book, do you have the full signal book in your ship's papers?"
+    },
+    {
+      "tick": 6245,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 6306,
+      "actor": "captain",
+      "order": "hail the cutter: Raven shall keep station two cables astern unless otherwise signalled, signal table is in force, captain requests you attempt to hoist the private signal now to see what happens."
+    },
+    {
+      "tick": 6314,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 6421,
+      "actor": "captain",
+      "order": "hail the cutter: We shall establish personal private signal, dip the colours thrice, response is single dip and lantern at the topmast. Please hoist the lights now to confirm we can see your lantern when set."
+    },
+    {
+      "tick": 6435,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 6446,
+      "actor": "captain",
+      "order": "the glass on her"
+    },
+    {
+      "tick": 6449,
+      "actor": "captain",
+      "order": "the signals"
+    },
+    {
+      "tick": 6455,
+      "actor": "captain",
+      "order": "the lights"
+    },
+    {
+      "tick": 6458,
+      "actor": "captain",
+      "order": "what is in sight"
+    },
+    {
+      "tick": 6476,
+      "actor": "captain",
+      "order": "the glass on her"
+    },
+    {
+      "tick": 6481,
+      "actor": "captain",
+      "order": "the signals"
+    },
+    {
+      "tick": 6521,
+      "actor": "captain",
+      "order": "hail the cutter: nay, no light visible, fall back to dipping colours by day, lights hoisted and doused in the same pattern by night (three to one)."
+    },
+    {
+      "tick": 6533,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 6553,
+      "actor": "captain",
+      "order": "get under way and steer east southeast"
+    },
+    {
+      "tick": 6586,
+      "actor": "captain",
+      "order": "make the convoy signal no. 13"
+    },
+    {
+      "tick": 6596,
+      "actor": "captain",
+      "order": "belay make signal"
+    },
+    {
+      "tick": 6598,
+      "actor": "captain",
+      "order": "belay making signal"
+    },
+    {
+      "tick": 6617,
+      "actor": "captain",
+      "order": "make the convoy signal no. 12"
+    },
+    {
+      "tick": 6633,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 6637,
+      "actor": "captain",
+      "order": "make the convoy signal no. 12"
+    },
+    {
+      "tick": 6642,
+      "actor": "captain",
+      "order": "get under way and steer east southeast"
+    },
+    {
+      "tick": 8056,
+      "actor": "captain",
+      "order": "hoist telegraphic signal Try ship name \"the ship\""
+    },
+    {
+      "tick": 8198,
+      "actor": "captain",
+      "order": "decline the pilot"
+    },
+    {
+      "tick": 8291,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 8570,
+      "actor": "captain",
+      "order": "take a fix"
+    },
+    {
+      "tick": 9045,
+      "actor": "captain",
+      "order": "make the convoy signal no. 26"
+    },
+    {
+      "tick": 9049,
+      "actor": "captain",
+      "order": "reef the topsails, one reef"
+    },
+    {
+      "tick": 9196,
+      "actor": "captain",
+      "order": "take a fix"
+    },
+    {
+      "tick": 9747,
+      "actor": "captain",
+      "order": "hoist the telegraphic signal Commodore holds a half 5 knots"
+    },
+    {
+      "tick": 9762,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 9776,
+      "actor": "captain",
+      "order": "hoist the telegraphic signal Commodore holds a half five knots"
+    },
+    {
+      "tick": 11424,
+      "actor": "captain",
+      "order": "set the courses, one reef"
+    },
+    {
+      "tick": 11954,
+      "actor": "captain",
+      "order": "shake out the topsails"
+    },
+    {
+      "tick": 12844,
+      "actor": "captain",
+      "order": "hoist the convoy signal no. 27"
+    },
+    {
+      "tick": 13233,
+      "actor": "captain",
+      "order": "hail the cutter: If you may hear me, welcome to your station! How are you finding Raven?"
+    },
+    {
+      "tick": 13246,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 13299,
+      "actor": "captain",
+      "order": "hail the cutter: up to 6 knots now, I think the station order can be trusted but keep a close watch at first to be sure"
+    },
+    {
+      "tick": 13308,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 13986,
+      "actor": "captain",
+      "order": "trim the sails"
+    },
+    {
+      "tick": 13994,
+      "actor": "captain",
+      "order": "Set the main topmast staysail"
+    },
+    {
+      "tick": 13997,
+      "actor": "captain",
+      "order": "set the mizzen topmast staysail"
+    },
+    {
+      "tick": 14478,
+      "actor": "captain",
+      "order": "hail the cutter: 7.3 knots!"
+    },
+    {
+      "tick": 14488,
+      "actor": "captain",
+      "order": "make the convoy signal make more sail"
+    },
+    {
+      "tick": 15002,
+      "actor": "captain",
+      "order": "Reef the topsails, one reef"
+    },
+    {
+      "tick": 15450,
+      "actor": "captain",
+      "order": "take in the main topmast staysail"
+    },
+    {
+      "tick": 15453,
+      "actor": "captain",
+      "order": "take in the mizzen topmast staysail"
+    },
+    {
+      "tick": 16007,
+      "actor": "captain",
+      "order": "take a bearing of the land"
+    },
+    {
+      "tick": 16089,
+      "actor": "captain",
+      "order": "the signals"
+    },
+    {
+      "tick": 16107,
+      "actor": "captain",
+      "order": "shape a course for 49 48 N 1 38 W"
+    },
+    {
+      "tick": 16108,
+      "actor": "captain",
+      "order": "steer 113"
+    },
+    {
+      "tick": 16158,
+      "actor": "captain",
+      "order": "shape a course for 49 48 N 1 38 W"
+    },
+    {
+      "tick": 16198,
+      "actor": "captain",
+      "order": "hoist the signal no. 69 108"
+    },
+    {
+      "tick": 16215,
+      "actor": "captain",
+      "order": "make the signal: Steer the course indicated 108"
+    },
+    {
+      "tick": 16231,
+      "actor": "captain",
+      "order": "make the signal: steer the course indicated bearing 108"
+    },
+    {
+      "tick": 16251,
+      "actor": "captain",
+      "order": "make the signal: alter the course to larboard"
+    },
+    {
+      "tick": 16260,
+      "actor": "captain",
+      "order": "make the signal no. 68"
+    },
+    {
+      "tick": 16269,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 18298,
+      "actor": "captain",
+      "order": "reef the courses one reef"
+    },
+    {
+      "tick": 18304,
+      "actor": "captain",
+      "order": "haul up the courses"
+    },
+    {
+      "tick": 19149,
+      "actor": "captain",
+      "order": "shake out the topsails"
+    },
+    {
+      "tick": 21752,
+      "actor": "captain",
+      "order": "square the yards"
+    },
+    {
+      "tick": 25031,
+      "actor": "captain",
+      "order": "shape a course for 49 48 N 1 38 W"
+    },
+    {
+      "tick": 25558,
+      "actor": "captain",
+      "order": "Brace the yards up 2 points"
+    },
+    {
+      "tick": 25691,
+      "actor": "captain",
+      "order": "Trim the yards"
+    },
+    {
+      "tick": 25940,
+      "actor": "captain",
+      "order": "hail the cutter: Making 5.3 knots"
+    },
+    {
+      "tick": 25949,
+      "actor": "captain",
+      "order": "belay all"
+    },
+    {
+      "tick": 26476,
+      "actor": "captain",
+      "order": "Tend the sheets"
+    },
+    {
+      "tick": 26545,
+      "actor": "captain",
+      "order": "Reef the topsails, one reef"
+    },
+    {
+      "tick": 26919,
+      "actor": "captain",
+      "order": "brace the yards in a point"
+    },
+    {
+      "tick": 27033,
+      "actor": "captain",
+      "order": "the sails"
+    },
+    {
+      "tick": 28099,
+      "actor": "captain",
+      "order": "the sails"
+    },
+    {
+      "tick": 28887,
+      "actor": "captain",
+      "order": "the sails"
+    },
+    {
+      "tick": 29920,
+      "actor": "captain",
+      "order": "the sails"
+    },
+    {
+      "tick": 29926,
+      "actor": "captain",
+      "order": "Brace the yards up a point"
+    },
+    {
+      "tick": 30384,
+      "actor": "captain",
+      "order": "trim the sails"
+    },
+    {
+      "tick": 30999,
+      "actor": "captain",
+      "order": "make signal no. 48"
+    },
+    {
+      "tick": 31003,
+      "actor": "captain",
+      "order": "make the signal no. 48"
+    },
+    {
+      "tick": 31774,
+      "actor": "captain",
+      "order": "how am I"
+    },
+    {
+      "tick": 34714,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 34814,
+      "actor": "captain",
+      "order": "Set the fore course"
+    },
+    {
+      "tick": 35272,
+      "actor": "captain",
+      "order": "shake out the fore course"
+    },
+    {
+      "tick": 35803,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 37261,
+      "actor": "captain",
+      "order": "Shake out the topsails, one reef"
+    },
+    {
+      "tick": 37889,
+      "actor": "captain",
+      "order": "Trim the sails"
+    },
+    {
+      "tick": 38105,
+      "actor": "captain",
+      "order": "Set the main topmast staysail"
+    },
+    {
+      "tick": 38108,
+      "actor": "captain",
+      "order": "set the mizzen topmast staysail"
+    }
+  ],
+  "standing_orders": [],
+  "agents": [],
+  "agent_journals": {
+    "director": [
+      {
+        "tick": 0,
+        "stamp": "Morning watch, 2 bells (05:00)",
+        "kind": "director.brief",
+        "text": "The brief given by the scenario: His Majesty's Armed Tender Raven (limits: no wind above 60 knots (force 11) by any system appended or moved; no enemy heavier than a brig put on the sea; the war as it is: no port closed to or opened to the ship's own nation; the chart as it is (a point of interest is not the chart); 9999 samples and 9999 acts a day)."
+      }
+    ]
+  },
+  "world_orders": [],
+  "chart_marks": [
+    {
+      "kind": "ring",
+      "points": [
+        {
+          "lat": 49.792138250093736,
+          "lon": -1.6385216165548107
+        }
+      ],
+      "radius_m": 5497.818051612625,
+      "id": "m1"
+    }
+  ],
+  "station_acts": [],
+  "stations": {
+    "bound": [
+      {
+        "name": "director",
+        "kind": "director",
+        "person": ""
+      }
+    ],
+    "unbound": []
+  },
+  "director": {
+    "brief": {
+      "name": "His Majesty's Armed Tender Raven",
+      "tone": "The frigate Amazon and her armed tender cutter Raven. The cutter Raven is crewed by a model. The director should help facilitate testing of the multi-ship interactions through signaling and other interactions, as well as provide a diverse testing environment.",
+      "challenge": "One enemy at a time, less powerful, a testing environment with variables",
+      "limits": {
+        "wind_max_kn": 60,
+        "enemy_heaviest": "brig",
+        "the_war_as_it_is": true,
+        "the_chart_as_it_is": true
+      },
+      "cadence": "glass",
+      "budget": {
+        "samples_a_day": 9999,
+        "acts_a_day": 9999
+      },
+      "source": "the scenario (C:\\Users\\frenc\\AppData\\Roaming\\FreeSail\\scenarios\\frigate-cutter-torbay.yaml)"
+    },
+    "budget": {
+      "day": "",
+      "samples": 0,
+      "acts": 0,
+      "held_until": null,
+      "held_why": ""
+    }
+  }
+}
