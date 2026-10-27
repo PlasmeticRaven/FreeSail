@@ -486,3 +486,381 @@ save).
 
 Steps 2 to 4 are coarse and partly true; 5 and 6 are false; 7 and 8 are true by accident
 of the far body's limits. The design in part 2 makes each step a thing the world does.
+
+## 2. The world as it should be: one world, many crewed hulls
+
+### 2.1 The design in one paragraph
+
+**One `World` holds the world and the hulls hold the ships.** The World keeps what is one
+of in a game: the clock, the seeded streams, the chart, the tide table, the weather, the
+nations, the ports (their files, markets, stances, blockades, tracks, yards and pools, and
+who is found at each place ashore), **the persons of the world and the things** in one
+registry, the far bodies of every ship **the player's among them**, the sets and the
+regimes, the business, the world orders and the marks, the director and the offices (the
+leaders' roles, 2.10). A ship that is or has been at full detail has a **`Hull`**, kept in
+`world.hulls`: her part graph, her company and her muster, her places aboard, her stations
+and their holders, her hold, purse, stores and papers, her reckoning, her lookout, the
+wind, sea, motion, sky, glass, tide and ground **at her place**, her book of standing
+orders and its runtime, her rules captain, the harnesses at her stations and their
+journals, her log, her needs, her fishery, her water (73), her signal locker, her dealings
+with the ports (her pilot and his conn, her boat and its errands, the price lists she
+holds, her jobs). Everything the World keeps of one ship today becomes the Hull's, and the
+player's ship is one hull like the others, the hull the game **follows** (`world.followed`,
+82's §11). A hull has a **physics switch**: *awake*, her parts stepped by the physics every
+tick, her evolutions run by her hands, her lookout looking, her captain's book judged, as
+a crewed World is ticked today; or *asleep*, her far body moved by the plan at the minute
+as a far ship is moved today, her parts, people, stores, water, damage, purse and log kept
+and untouched, her needs and her people's minute ticked coarsely. The cap's business is
+**which hulls are awake**, by the same rule as now (the nearest to the followed hull first,
+a ship in dealings before a nearer one that is not, a stationed hull before an idle one),
+and nothing is ever dropped at the switch: the promotion is a hull woken, the demotion a
+hull put to sleep. A ship that has never been at full detail has no hull and is a far body
+with a short story, as now, until the cap wakes her, a person is seated on her, or **an act
+of hers needs a hull** (a person goes ashore from her, she trades, a thing is given aboard
+her), when her hull is made from her file at her truth once and kept. **The acts of a
+person are the world's acts, not a World's**: going ashore is the port's job on the person
+by his hull's boat or a waterman, being ashore is a place in the one registry of persons,
+hearing is by spot in that registry, a thing is in it, trading is the market's transaction
+on the hull's purse and hold whether her physics sleeps or wakes, the pilot and the track
+in and out are the port's jobs on the hull; so a person anywhere can go ashore, trade,
+speak, take a thing, anchor, sail for a port, chase and report **at coarse detail from a
+sleeping hull**, and the full surface comes beneath the same station when she wakes. The
+consumers of a World today (the grammar, the readings, the harness, the captain, the
+standing runtime, the ports' dealings, the needs) are given the hull, which answers to the
+same names, so that the orders' 3,600 lines and the readings' 4,000 move not at all and
+the thirty-eight assumptions are retired at the seams where they live. One clock, one rng
+with the hulls' streams named by hull, one journal with the hull named on each input, one
+checkpoint of the one World, a log per hull kept in the save.
+
+### 2.2 The pieces
+
+**`freesail/core/world.py`: `World`, the shared.** Keeps: `clock`, `rng`, `chart`, `tide`,
+`systems`, `nations`, `ports` (the world's half of today's `Ports`, 2.4), `people` (the
+one registry of persons and things, 2.3), `vessels` (every ship's far body, the player's
+included, 2.2 below), `squadrons`, `business`, `world_orders`, `marks_of_interest`, the
+director (`director_brief`, `director_state`, `director_seats`, the director's journal),
+`offices` (2.10), `hulls` (`dict[id, Hull]`), `followed` (the hull the drivers and the cap
+centre on), `journal`, `inputs`, `station_acts`, `played_under`, `chart_marks`,
+`compression`. Its `tick` runs: the clock, the world orders due, the weather's minute (the
+systems advanced once, not per hull), **every awake hull's tick in a fixed order** (the
+followed hull first, then by hull id: her wind, sea, motion, conditions, tide, physics, run
+on the sphere, action, grounding and lookout, reckoning, dealings, people, routine, needs,
+fishery, water, bells, sun, standing, captain, watches, agents, as `World.tick` has them
+today), the far bodies' minute (the business, the brains of the sleeping and hull-less
+ships, the sets, the regimes, the moves, the hails, **the switch**), the sleeping hulls'
+minute (their people, needs, water and dealings coarsely), the ports' jobs, the offices'
+day. The order is chosen so that the followed hull's lines fall where they fall today;
+part 3 says which pins that keeps.
+
+**`freesail/world/hulls.py` (new): `Hull`, the ship.** Owns every per-ship field 1.1
+lists, the methods that work them (`submit`, `record`, `readings`, the `_tick_*` of her
+own systems, `state`, `summary_lines`) and a `world` back-reference, and **exposes the
+World's shared fields as properties** (`hull.clock`, `hull.rng`, `hull.chart`, `hull.tide`,
+`hull.systems`, `hull.nations`, `hull.ports`, `hull.people`, `hull.vessels` (a view like
+today's `CrewView`: every far body but her own, moving nothing), `hull.squadrons`,
+`hull.business`, `hull.world_orders`, `hull.director_*`), so that a consumer written
+against `world.<name>` reads the same name on a hull. This is the façade the whole
+migration stands on: `CrewedWorld` is a World that *copies and empties* the shared things;
+`Hull` is a ship that *delegates* them. `Hull.awake` is the switch; `wake()` sets her
+sail from the far words and folds her brain in (`_set_sail`, `FarCaptain.fold_in` as now);
+`sleep()` mirrors her truth into the far body and folds the brain back (`mirror`,
+`fold_back` as now) and stops her physics; neither makes or drops anything. A hull's
+streams are the World's rng's, named by her id (`rng.stream(f"{id}:muster")`), the
+followed hull's unprefixed so that the player's draws are what they were. Her `log` is her
+own (`hull.log`) and the World's log is the followed hull's for the drivers (`world.log` a
+property) until 82's observed world wants a log of the world's own events; **a hull's log
+is never dropped**, which is §12b's "a crewed ship that demotes keeps her log" and the
+ground of `read_log ship=`.
+
+**`freesail/world/ships.py`: `Vessel` and `Hull` one identity.** `Vessel.crew` becomes
+`Vessel.hull` (None for a ship with none); `Vessel.detail` gains the word `asleep`. **The
+player's ship is a `Vessel` of the sea** made at the World's start from her file's
+description, under the id the save and the signals know (`PLAYER_ID`, kept as the followed
+hull's vessel id for the old saves' sake and defined once, in `ships.py`), in
+`world.vessels` with the rest; `player_shadow` is retired and `strangers_of(viewer)` leaves
+the viewer's own vessel out, as `CrewView` does today. The mirror runs for every awake hull
+(`Vessels.tick_hulls`), so the lookouts, the brains, the sets and the action read one list
+of bodies and the sixty-six special cases of `PLAYER_ID` become one rule: a vessel with a
+hull awake is read from her hull, else from her record. `Vessel.story` stays the log of a
+ship with no hull and becomes her hull's log's first lines when a hull is made.
+
+**`freesail/world/crews.py` becomes the switch and nothing else.** `switch` (the cap's
+rule over `world.hulls` and `world.vessels`, centred on `world.followed`), `wake`,
+`sleep`, `make_hull` (a hull from her file at her truth: today's `CrewedWorld.__init__`
+less the scenario copying), `hand` (the director's hand, now one road: `hull.submit`
+awake, `far_order` on her far body asleep, the hull's log either way), `ask_crewed`
+(`ship "X": crewed` wakes her; the cap's order stands), `station_world` retired for
+`hull_for(world, words)` (make or find her hull, wake her if the cap allows, else leave
+her asleep with the station on her). `_NOT_CREWED_STATES` is retired: a hull at anchor or
+in port may be awake (the port's business is the port's now), and the owner's bound on it
+is an open decision (part 5). `CrewedWorld`, `CrewView`, `far_tick`, `mirror_far`,
+`_crew_scenario` and `_to_full` go; `FAR_SHAPE_WORDS` stays as the sleeping hull's words
+for the plan, widened by the person's and the port's acts (2.5).
+
+**`freesail/core/replay.py`.** One journal: each input carries `"hull": <id>` (absent for
+the followed hull, so every old save reads as it did) and `_give` submits to that hull;
+the save carries `"hulls": {id: {ship_ref, agents, stations, standing_orders, log}}` for
+every hull but the followed one, whose fields stay where they are; `acts.give` takes the
+hull by the act's station key. A replay re-makes a hull where the journal or the switch
+made her (the far record's file and her truth at that tick are deterministic from the
+seed) and gives her inputs again at their ticks. The checkpoint pickles the one World as
+now; `_rebind` walks `world.hulls` once each; `World.__setstate__` converts a checkpoint
+from before the refactor (the per-ship fields lifted into a followed `Hull`, a
+`CrewedWorld` found on a vessel lifted into a hull of the same id), so that the three
+fixture saves and the owner's saves load by the checkpoint road as now.
+
+### 2.3 A person of the world
+
+Today's `People` does two jobs: the company of one ship (built from her muster and her
+wardroom file) and the registry of everyone named (the pilot, a person made ashore, the
+things). The design keeps **one registry on the World** (`world.people`, the class kept)
+and gives every `Person` a whereabouts that is the whole truth of where he is: `aboard`
+the id of the hull he is in (None ashore or in a boat), `port` and `ashore_at` as now when
+ashore, `boat` the hull whose boat he is in, and a **home**: the hull he belongs to by his
+station or his muster (`Person.ship`), so that `come aboard` knows whose boat to send and a
+prize crew's men (74) know whom they left. The hull's company is a view (`hull.company`:
+the persons whose home is her, wherever they are; `hull.aboard`: the persons in her now,
+hers or not), built when her hull is made from her muster as `People._build` builds it
+today, and the muster's counts stay the hull's (`ship.extra["crew"]`). The things stay in
+the registry (`world.people.things`), a thing's `keeper` any person of the world and its
+`place` any hull's place or any port's. Hearing's spot (`hearing.spot_of`) becomes
+`("aboard", hull id, place)`, `("ashore", port, place)` or `("boat", hull id)`, and
+`within_hearing` compares them as it does: two persons at the market at Plymouth hear each
+other whichever hull brought them. The needs (`NeedsKeeper`) are kept per hull over her
+company and tick for a sleeping hull at the minute (a keeper's tick costs nothing the
+measure can see, 3.3). A person seated by a model is a person of the registry at a station
+of some hull (or of an office, 2.10); **a seat at a person aboard any hull** is the same
+`seat:` as today with the hull named, 67's refusal lifted, and a person moving between
+hulls (82's boat, 73's boarding, 74's capture) changes `Person.aboard` and nothing of his
+station, which follows him (the station is bound to the person; the hull under the station
+changes; 82's builder decides the seat's words from this ground).
+
+### 2.4 The ports as the world's, and a hull's dealings
+
+`world/ports.py`'s 4,270 lines are two things in one class, told apart by which fields a
+method reads. **The port's** (`Ports`, the World's): `ports` and `_load`, the port files
+and their state (`Port`, `Market`, `Dockyard`, the pools, `Spot`, the tracks, `PilotSpec`),
+`stance(port, nation)` (the nation an argument, not `ship_nation`), `blockades`,
+`watched_by`, `nearest(pos)`, `in_port(pos)`, `find`, `price_of`, `demand`, `recover`,
+`news_words`, the places ashore and who is found there (`places_lines`), `trade_together`,
+and the jobs of every hull (`jobs`, `_apply_job`, keyed by the hull they are for). **The
+hull's** (`Dealings`, new, one per hull): the pilot and his conn (`pilot`, `pilot_port`,
+`pilot_since`, `conn_*`, `_tick_pilot`, `give_conn`, `take_conn_back`, `answer_pilot`,
+`_hail*`, `_waits*`), the cutter sent for her (`cutter_*`, `_launch_cutter`), her boat
+(`BoatState`, `_send_boat`, `send_boat`, `boat_phase`, `_boat_back`, `boat_reading`,
+`boats_words`, `land_person`, `fetch_person`, `waterman`, `_passengers`, `_people_back`),
+the price lists she holds (`price_lists`, `_write_price_list`, `prices_reading`),
+`lay_in`, `declined_until`, her `trade` and `trade_list` (the market's transaction on
+*her* purse and hold), `enter_hands` and `_muster_recruits` (the pool into *her* muster),
+`craft`. `Ports.tick` runs the jobs for every hull; each awake hull's tick runs her
+`Dealings.tick` (the pilot's minute, the boat kept); a sleeping hull's dealings tick at the
+minute too, since a boat's pull and a lighter's load are jobs with a time and want no
+physics. A trade by a sleeping hull is the same `Dealings.trade` with the lighter's job;
+and a far ship of the business that reaches her port with a `trade` intent **transacts**
+by it instead of vanishing (`FarCaptain._in_port` sells her cargo and buys the return
+cargo at the market's price by the code the player's trade uses, against a hull made for
+her purse and hold, or, the owner's cheaper choice in part 5, against the market alone with
+no hull), which is "the business's own means" the brief names and the first thing that
+gives the markets a supply loop (M8's "prices moved by what the ships carry" becomes a
+knob).
+
+### 2.5 The coarse acts anywhere
+
+A person on a sleeping hull, seated or rules, acts through her `submit`, which routes by
+the act and not by the shape:
+
+| the act | awake | asleep (coarse) | the means |
+|---|---|---|---|
+| the helm, the sails, the guns, the anchor's detail | the grammar | refused in words naming the coarse forms | the physics |
+| shape a course, steer, heave to, fill away, make and shorten sail as a state, anchor, weigh, give chase, haul off, keep the station | the grammar | `far_order` on her far body, **by the port's track in and out and under the land guard** (`_approach`, `_out_of_port`, `land_crossing`, today the business's alone) | the plan |
+| the colours, a signal, the hail, the lights | the grammar | `signals.far_order_words` as now | 71's two bodies |
+| go ashore, come aboard, hire a waterman, go to the market, send the boat ashore for the prices or a purchase | `Dealings` | the same `Dealings`: a job of the port with the boat's time, the person's whereabouts changed when it is done | the port's jobs |
+| buy, sell, water, victual, the yard's repair, enter hands | `Dealings.trade`, the yard, the pool | the same, the lighter's job and the yard's time; the yard's repair of a sleeping hull's parts by the file's condition, coarsely | the market, the yard |
+| say, say to, ask, tell, a word ashore | hearing by spot | the same | the one registry |
+| give, take, show, stow, read, throw; eat, drink | the free lines | the same | the one registry |
+| write a letter, send it by a ship or a cutter, carry a letter | `message:` widened to any hull and any person | the same | the far bodies' carriage |
+| the needs, the sick, the water in her | the keepers | the keepers at the minute | per hull |
+| a far fight | the action | 74's rounds | 70's tables |
+| report | `say` within hail, a signal, a letter, the log read | the same | 71, `read_log ship=` |
+
+The sleeping hull's grammar is `submit` with `hull.awake` false: a reading, the
+conversation, the book's listing, the person's acts, the port's acts, the free lines and
+the signals go through the grammar as they stand (today's `_is_a_reading`, widened to
+"needs no physics"); the plan's words go to `far_order`; the rest is refused naming the
+coarse forms. The far brain (`FarCaptain`) is the rules body of a sleeping hull's captain
+and gains the port's acts in its `_in_port` (the transaction, the watering by the needs'
+rule, the boat for the prices), so that a convoy's merchantman trades and a cruiser waters
+without a model; the same doctrine files (`data/captains/*.yaml`) say when.
+
+### 2.6 The cap, the switch, what sleeps and what wakes
+
+`switch` keeps today's rule with three changes. The centre is `world.followed`. The
+candidates are the hulls and the vessels with brains; a vessel without a hull is given one
+at her waking (`make_hull`, measured 0.5 to 0.7 s on the build machine, once per ship
+rather than once per promotion). The order: a hull in dealings with the followed hull, then
+**a hull with a stationed person** (a model's or the player's seat: the owner's note 11,
+"a ship with a stationed person on it at full detail"), then the nearest; beyond the cap,
+asleep. A sleeping hull costs no tick but her minute (3.3); the memory is the hull's
+(80 KB in the checkpoint for a cutter with her log). A hull `done` (gone in and gone from
+the sea, the business's end) is discarded with her log kept in the save when a station was
+ever held on her, else dropped as a far body is dropped today. The physics switch is the
+only switch: the far shape of a World kept for a seated station is retired, since a
+sleeping hull *is* that shape with her state kept.
+
+### 2.7 The stations, the readings, the samples and the deltas, per hull
+
+`Harness(hull)` samples her readings, her log, her people and her deltas as it does a
+World's today; `all_agents(world)` walks `world.hulls` (and the offices); `open_samples`
+and the pace rule unchanged; the desk's `ship` names the hull and the seat key is
+`<hull>/<station>` as now; `station_line` reads the person's whereabouts from the registry
+("aboard the Raven, at anchor in Plymouth Sound, in the cabin"; "ashore at Plymouth, at the
+market"). `shape_words` becomes the hull's "awake" or "asleep" notice with the coarse forms
+named and no "beyond the range of the player's ship". `readings.ahead_words`, the
+tripwires, the station line and the deltas take the hull. The seat at a person on any
+hull: `seats.hold` with the hull named; the budget, the admission and the harbour's doors
+as now.
+
+### 2.8 The director's reach
+
+The truth (`director_readings`) walks `world.hulls` and `world.vessels`: every ship by
+truth, the hulls' people, purses, cargoes, guns, damage and water, the sleeping hulls
+included, the persons ashore at every port, the things, the sets, the offices;
+`within=` from the followed hull. The forms gain a hull where they had the player's:
+`aboard the Raven: a cask found stove`, `aboard the Raven: twenty guineas paid into the
+purse by ...` (the followed hull when none is named, so every example and every old order
+reads as it did); `person: "Mr Fox" comes aboard the Raven as master`, `person: make ...
+aboard the Raven`; `say as <person>` for any person anywhere, heard by spot; `message: at
+<port> from <whom> to the Raven`; `ship "X": order` as now; `follow "X"` (82's). The
+director's log one, the doubts the same, the rule of reach the same (a held person's acts
+are his holder's). `focus` and `read_log ship=` (§12b) read a hull's log awake or asleep.
+
+### 2.9 The replay and the save of a world with several hulls and persons who moved
+
+One journal with the hull on each input (2.2); the stations' acts keyed by hull and
+station; the save's `hulls` block; a person's moves are the inputs and the jobs that made
+them (the boat's errand, the waterman, 74's capture as a world order), so a replay moves
+him the same; a hull made in play by an act (a far trader's transaction, a person seated)
+is made in the replay at the same tick by the same act. A save from before the refactor
+has no `hulls` block and no `hull` on its inputs and reads whole; its checkpoint converts
+(2.2). The log digest of the followed hull is what the pins read today; part 3 names the
+pins that move and why.
+
+### 2.10 The leaders of nations and companies: room left
+
+An **office** is a station of the world and of no hull: the port admiral at Plymouth, the
+Admiralty, a company's board at Falmouth, the minister of marine at Brest. The design
+leaves it room by three things it does anyway: the stations' registry and the harness take
+a *domain* that answers to the readings' names (a hull does; an office would answer with
+its purview's truth: its nation's ships and their regimes, its ports' stances and markets,
+the news), `world.offices` beside `world.hulls`; a person of the one registry may hold an
+office's station ashore or unseen (`Person.aboard` None, `port` set or not); and the
+office's acts are **world orders restricted to a purview**, through the channel the
+director uses (`commissioned for`, `in ordinary at`, `convoy:`, `blockade <port>`, a price
+regulated, a letter of marque, a court's verdict), doubted the same way, with a rules body
+that is the regimes' book run once a day (72's `data/regimes.yaml` knobs: the sortie, the
+commission's delay, the convoy's sailing) as the rules captain is the captain's. Biased and
+competitive is the brief of each office and the nations' knobs; never seen as a person is
+`Person.aboard` None with no port. Nothing of this is built by 84; 84 builds the domain
+parameter, the registry's whereabouts and the orders' purview hook so that M8's package
+adds an office without touching the hulls.
+
+### 2.11 What a model at another ship's captain's station sees and may do
+
+Seated as the Raven's captain (by the door's `--ship Raven` or the director's `seat:`),
+with the Raven asleep at anchor in Torbay: his line, "You: the captain of the Raven,
+aboard, on the quarterdeck, at anchor in Torbay, since 06:10; the deck yours"; his
+readings: her place by her account, the wind at her, her way, her sail as a state, the sail
+in sight from her masthead (the Amazon among them, by name once made out), her people and
+their states, her stores, water, purse and hold, her colours and signals, the port's places
+and prices when in port and her price list held, the news; her log (her own lines, kept
+from her last waking); the deltas and the stand-by's tripwires as any station's. He may:
+weigh, shape a course for Plymouth (by the track out of Torbay and the land guard), make
+sail, heave to, anchor, give chase; show colours, make and answer a signal, hail and answer
+a hail; go ashore and come aboard, send the boat for the prices, buy and sell, water and
+victual at the yard, hire a waterman; go to the market, speak to a person there, be told
+and asked; give, take, read, stow a thing; write and send a letter; keep his journal; stand
+by. He may not, while she sleeps: name a sail, work the helm's detail, exercise or fire the
+guns, reef, tack by the evolution: each refused in words naming the coarse form. When the
+cap wakes her (near the Amazon, or in dealings, or because he is stationed and the cap has
+room), the whole surface comes beneath the same station with no reseat and the log says so,
+as 43 built it. What he sees of the Amazon is what her lookout sees: a sail, a frigate,
+British colours, a hoist; nothing of the player's log.
+
+### 2.12 The owner's acceptance test under this design
+
+The Amazon in Torbay, the Raven her tender in company, a model seated as the Raven's
+captain; the player at the Amazon's prompt.
+
+1. *The seat.* `seat: <model> as captain of Raven`: her hull made from her file at her
+   truth (once; half a second), awake since she is within four miles and the cap has
+   room and she carries a station; her people, her stores and her purse hers from here
+   on, her log begun. The player's log says nothing.
+2. *The order.* The player signals her by 71's book ("proceed to Plymouth"; or hails her
+   within four cables, or sends a letter by the boat). The model reads the hoist in its
+   sample, answers it, and orders `weigh` and `shape a course for Plymouth`: awake, her
+   own evolutions and her captain's grammar; the Amazon's lookout sees her under way and
+   the player's log says so.
+3. *Through real weather.* Six miles out she is put to sleep by the cap (the Amazon lying
+   still, nothing in dealings): her far body sails the plan by the port's track and the
+   polar in the systems' wind at her place, reefed over thirty knots and lying to over
+   forty-five, the systems' sky and visibility **at her** (one `conditions_at` per hull per
+   minute); the model's sample says she is asleep and what it may do; it may heave to for
+   the night or carry on. Her water, needs and people tick at the minute.
+4. *Into a port.* `shape a course for Plymouth` ends at the road by the track; `come to an
+   anchor` in the Sound; the pilot and the track in are the port's job on her (the
+   `Dealings` of a sleeping hull run the pilot's minute as a job without the conn's
+   physics: she is brought to the anchorage at the track's time; the owner's open decision
+   in part 5 is whether a sleeping hull takes the pilot at all or anchors in the road).
+5. *Ashore to a person.* `go ashore`: her boat's pull by the port's job, the model's person
+   landed at the quay, `go to the counting house`, where Mr Gill (made by the director,
+   `person: make "Mr Gill", a merchant, ashore at Plymouth, at the counting house`) is
+   found in the one registry; `say to Mr Gill: ...` heard by spot; the director answers
+   as Mr Gill by `say as`, or a model seated as his voice does.
+6. *Back with a thing.* `aboard: a sealed packet, in the keeping of Mr Gill` (the
+   director's, anywhere); `give the packet to the captain of the Raven` by the director's
+   `say as` and the free line, or the model's `take the packet` when it lies before him;
+   `come aboard`: the boat fetches him, the packet in his keeping aboard the Raven.
+7. *Past a ship the director placed.* `ship: a French lugger "Renard" of France at <place>,
+   cruising` on the sea; the Raven weighs and sails for Torbay by the track out; the
+   lugger's brain makes her out and chases by doctrine; both asleep, 74's far fight
+   resolves it in rounds, or the Raven's model hauls off and runs; both would wake if
+   within the cap's reach of the Amazon, and the owner's cap decides whether a fight
+   between two stationed or dealing hulls far from the player wakes them (part 5).
+8. *Home to report.* Within four cables of the Amazon the model hails or signals; `say to
+   the captain of the Amazon: ...` heard on both quarterdecks; the player reads it in his
+   log and nowhere before: his log had a sail going and a sail coming and nothing between,
+   and the Raven's log, read by `read_log ship="Raven"` or shown by the director's
+   `two stories`, has the port, the quay, the counting house, Mr Gill, the packet and the
+   lugger, every line the game's own.
+
+Each step is a thing the world does; none is a special case of the player's.
+
+### 2.13 What was rejected, and why
+
+- **Many Worlds sharing the world's state** (the brief's cheaper reach): costed in part 3
+  and rejected there; the short reason is that its sharing shims are half the one-world
+  work, it keeps two clocks, two logs and the drop at demotion, and 82's followed ship then
+  has to make the player's World a CrewedWorld of a headless parent, which is this design
+  by a worse door.
+- **Every ship a hull from the start.** A hull costs half a second to make and 80 KB to
+  keep, and most of the business's ships never meet anyone; a hull made at her first need
+  is the same ship, later and cheaper.
+- **A stationed ship awake at all times** (the owner's thought in note 11). A hull awake
+  costs what the frigate costs (3.3); the cap's order gives a stationed hull priority
+  rather than exemption, so that two stationed hulls and the player's fit the owner's
+  machine and a dozen do not stop it. The owner may raise the cap for a scenario as now.
+- **The far shape of a World kept for a station.** A sleeping hull is that shape with her
+  state kept and no second clock; nothing of it is worth keeping.
+- **A vectorised many-hull physics** (the risk table's hot loop). Nothing here needs it:
+  the awake set is the cap's, as today. It stays the answer if the owner wants every ship
+  in a region awake.
+- **Persons with no home hull.** `come aboard`, the prize crew, the watch bill and the
+  muster all want to know whose man he is; a person of the world keeps a home.
+- **Merging `Vessel` into `Hull`.** The far record stays the cheap thing every ship has;
+  the hull is the costly thing some ships have; one identity, two objects.
+- **Renaming `world` to `hull` through the consumers.** The façade keeps the names so that
+  the migration moves the seams and not the 7,600 lines of the grammar and the readings;
+  the rename is the long tail, done file by file as each is touched, never as a step.
+- **A world order for every person's act** (the director moving persons by `person:` as
+  the means for a model's `go ashore`). The act is the person's and journaled as his
+  station's; the director's form stays the director's.
