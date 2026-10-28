@@ -9161,6 +9161,785 @@ def test_truth_7_160_the_pace_with_the_convoy_of_six_under_the_cap_holds_truth_5
 
 
 # ---------------------------------------------------------------------------
+# Practice and resupply (the owner's, built between packages 72 and 73 and folded in by
+# package 86 after 73; docs/design/Build-PracticeAndResupply.md §8.2; truths 7-161 to
+# 7-171): practice at the great guns (a cask hove over for a mark, a notional mark at the
+# captain's word, dumb show) and powder and shot taken in at a port (the magazine by gun
+# kind, the gunner's filling from the powder below, the Ordnance's issue free to a King's
+# ship, the merchants' sale paid at alongside, the hoy and the galley fire). The digests
+# differ on the owner's Windows machine (docs/dev/TuningNotes.md, package 72): states,
+# kinds, counts and bands are pinned, a digest measured there or on the build machine is
+# quoted in the docstring, and two digests are compared only when both are made in the
+# same run.
+# ---------------------------------------------------------------------------
+
+PRIVATEER = "data/ships/privateer-schooner.yaml"
+EXERCISING = "data/scenarios/exercising-the-great-guns.yaml"
+THE_SOUND = {"lat_deg": 50.345, "lon_deg": -4.150}  # the anchorage in Plymouth Sound
+HAMOAZE = {"lat_deg": 50.3760, "lon_deg": -4.1916}  # the Hamoaze, Plymouth's harbour
+CASCAIS_ROAD = {"lat_deg": 38.6910, "lon_deg": -9.4100}  # Lisbon's outer road
+# The director's world order (data/director/aboard.yaml): a quarter of every kind's filled
+# cartridges struck off the gunner's count, the barrels below left alone; an input, so a
+# replay gives it again.
+DAMP = "aboard: the cartridges found damp"
+MAGAZINE_OUT = (
+    "The gunner reports no more cartridges for the 12-pounder carronades: the magazine is out."
+)
+
+
+def _anchored(
+    where,
+    ship=CUTTER,
+    start=datetime(1805, 6, 10, 10, 0),
+    chart="channel-west",
+    ports=("plymouth", "falmouth"),
+    **kw,
+):
+    """A ship brought up where she is put at seed 7 (tests/test_ordnance.py's world): a
+    south-westerly moderate breeze, the best bower let go by the order in her second minute
+    and five minutes given to bring up; in port at the spot nearest her."""
+    kw.setdefault("nation", "britain")
+    sc = Scenario(
+        start_time=start,
+        wind_from_deg=225.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=180.0,
+        ship_speed_kn=0.0,
+        position=where,
+        chart=chart,
+        ports=list(ports),
+        **kw,
+    )
+    w = make_world(SEED, ship, sc)
+    w.run(60)
+    w.submit("let go the best bower")
+    w.run(300)
+    assert w.at_anchor and w.ports.in_port() is not None
+    return w
+
+
+def _gunners_fills(mag) -> dict:
+    """The cartridges the gunner filled for each kind, read from the gunner's own count: the
+    filled now, less the kind's allowance, and the rounds it took added back."""
+    return {k: mag.filled_of(*k) - n + mag.fired.get(k, 0) for k, n in mag.level.items()}
+
+
+def test_truth_7_161_the_first_action_is_untouched_by_the_magazine_by_kind_filling_and_practice():
+    """The build design's §4 and decision 26: the first action (data/scenarios/
+    first-action.yaml, truth 7-133's) played again by the rules captains with the magazine
+    kept by gun kind, the gunner filling at quarters from the powder below, and practice's
+    marks, readings and stream in the build. At seed 7 the privateer opens at 10:13 (tick
+    781) and strikes at 11:12 (4320), fifty-nine minutes after, as before the work; no line
+    of the filling, of practice or of the supply in either ship's log, and no practice
+    stream; the Renard's 3-pounders fall back from chain shot at 10:20 in package 72's
+    words and data (her own log's time: her crewed World begins a minute after ours, so
+    her tick 1140 is 10:20; the review's finding, this docstring having said 10:19). The
+    King's cutter took 149 of her 330 cartridges and her gunner filled 26 at quarters from
+    the 200 pounds below, so that 207 are filled and 174 pounds below at the strike; the
+    Renard's gunner filled 28 (26 for her long 3-pounders, 2 for her swivels), the filling
+    moving powder from the barrels into cartridges and nothing else.
+    Measured on this machine at the strike: 311 lines and the digest a158a30ce39b345d, on
+    4a12e97 and on the merged tree alike (decision 26: recorded and not pinned, the
+    digests differing here)."""
+    from freesail.ship.parts import magazine
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(FIRST_ACTION)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    v = w.vessels.find("Renard")
+    first = None
+    struck_tick = None
+    for _ in range(3 * 60):
+        w.run(60)
+        if first is None:
+            fired_at = [e for e in w.log if e.kind == "action.fired_at"]
+            if fired_at:
+                first = fired_at[0].tick
+        if v.struck or w.ship.extra.get("struck"):
+            struck_tick = w.clock.tick
+            break
+    assert first is not None and v.struck and not w.ship.extra.get("struck")
+    # truth 7-133's band; 3539 s at seed 7, as before the work
+    assert 2700 <= struck_tick - first <= 3 * 3600, f"{(struck_tick - first) / 60:.0f} min"
+    enemy = v.crew
+    new = ("guns.filling", "guns.filled", "guns.powder_out", "practice.", "ordnance.")
+    for log in (w.log, enemy.log):
+        assert not [e.kind for e in log if e.kind.startswith(new)]
+    assert "practice" not in w.rng.stream_names()
+    fell_back = [e for e in enemy.log if e.kind == "guns.magazine_empty"]
+    assert [e.text for e in fell_back] == [
+        "The gunner reports no more chain shot for the long 3-pounders: they load with round shot."
+    ]
+    assert fell_back[0].data == {"pounder": 3.0, "charge": "chain", "instead": "round"}
+    # said in her own log by her own clock, once her guns are firing (10:20 at seed 7)
+    opened = [e for e in enemy.log if e.kind == "action.fired"]
+    assert opened and opened[0].ship_time <= fell_back[0].ship_time
+    mag = magazine(w.ship)
+    key = ("carronade", 12.0)
+    assert mag.level == {key: 330} and mag.reserve_lb == 200.0 and mag.charge_of(*key) == 1.0
+    assert mag.fired[key] >= 100 and mag.filled_by_gunner > 0  # 149 and 26 at seed 7
+    assert mag.filled_of(*key) == 330 - mag.fired[key] + mag.filled_by_gunner
+    assert mag.powder_lb == 200.0 - mag.filled_by_gunner
+    for ship in (w.ship, enemy.ship):
+        m = magazine(ship)
+        fills = _gunners_fills(m)
+        assert all(n >= 0 for n in fills.values()) and sum(fills.values()) == m.filled_by_gunner
+        spent = sum(n * m.charge_of(*k) for k, n in fills.items())
+        assert m.powder_lb == pytest.approx(m.reserve_lb - spent), ship.name
+
+
+def test_truth_7_162_the_frigate_knocks_a_cask_to_staves_at_two_cables_and_nobody_is_an_outlaw():
+    """The build design's §6: a cask for a mark is no sail. The frigate at quarters with her
+    guns loaded (truth 7-135's world); an empty cask put in the water by the test two cables
+    off her starboard beam, as truth 7-134 puts the cutter, is made out by the masthead and
+    engaged by the order (`engage the cask to starboard`): her starboard guns fire as they
+    bear, the first shot that strikes knocks it to staves, said once, and the mark is
+    cleared and the guns silent after. At seed 7 the first minute's thirteen shot fall five
+    over and eight wide, and the fifteenth round, No. 16 starboard gun's at 393 m, strikes
+    it ("The mark struck by No. 16 starboard gun at two cables and knocked to staves; the
+    guns hold their fire for want of a mark."); over seeds 1 to 20 the strike came at the
+    3rd to the 46th round, 12 on the median (the cask's size term about 0.16, decision 18),
+    so the band is the first sixty. Nothing of an action's follows: no recognition, false
+    colours, outlaw, morale or strike; the rounds are practice (`last_practice_tick`, never
+    `last_fired_tick`), counted against the month's allowance for exercise (six charges,
+    said once beyond it). Each kind's filled cartridges are its allowance (2054 for the
+    long 18-pounders) less the rounds it took and more the gunner's filling for it, and
+    that filling is all the powder that left the barrels below."""
+    from freesail.combat import marks
+    from freesail.combat.guns import battery_of
+    from freesail.ship.parts import magazine
+    from freesail.world.geo import destination
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5, FRIGATE)
+    w.run(60)
+    _guns_ready(w)
+    w.run(40)
+    ship = w.ship
+    there = destination(w.position, math.degrees(float(ship.heading)) + 90.0, 2.0 * units.CABLE)
+    cask = marks.Cask(f"{marks.PRACTICE_PREFIX}cask-1", there, int(w.clock.tick))
+    ship.extra["practice"] = marks.Practice(cask=cask, serial=1)
+    w.run(60)
+    assert marks.cask_in_sight(w, cask)
+    said = w.submit("engage the cask to starboard")
+    assert said.kind == "guns.engage" and said.data["target"] == cask.id, said.text
+    battery = battery_of(ship)
+    before = battery.rounds_fired
+    rounds = None
+    for _ in range(30 * 60):
+        w.run(1)
+        if rounds is None and cask.gone == "struck":
+            rounds = battery.rounds_fired - before
+        if any(e.kind == "practice.mark_struck" for e in w.log):
+            break
+    assert rounds is not None and 1 <= rounds <= 60, rounds  # the fifteenth at seed 7
+    (line,) = [e for e in w.log if e.kind == "practice.mark_struck"]
+    assert line.text.startswith("The mark struck by ") and line.text.endswith(
+        "and knocked to staves; the guns hold their fire for want of a mark."
+    )
+    assert line.data["id"] == cask.id and line.data["range_m"] <= 3.0 * units.CABLE
+    assert battery.target is None and battery.target_words == ""
+    w.run(120)
+    assert not [e for e in w.log if e.kind == "action.fired" and e.tick > line.tick]
+    assert len([e for e in w.log if e.kind == "practice.mark_struck"]) == 1
+    kinds = {e.kind for e in w.log}
+    assert not kinds & {"action.unrecognised", "action.false_colours", "action.enemy_struck"}
+    assert "outlaw" not in ship.extra and "morale" not in ship.extra
+    assert battery.last_fired_tick is None and battery.last_practice_tick is not None
+    assert len([e for e in w.log if e.kind == "practice.beyond_allowance"]) == 1
+    falls = w.readings.value("practice")["falls"]
+    assert set(falls) == {"2"} and falls["2"]["struck"] == 1, falls
+    mag = magazine(ship)
+    assert mag.level[("long", 18.0)] == 2054
+    fills = _gunners_fills(mag)
+    assert all(n >= 0 for n in fills.values()) and sum(fills.values()) == mag.filled_by_gunner
+    assert mag.filled_of("long", 18.0) == 2054 - mag.fired[("long", 18.0)] + fills[("long", 18.0)]
+    spent = sum(n * mag.charge_of(*k) for k, n in fills.items())
+    assert mag.powder_lb == pytest.approx(mag.reserve_lb - spent)
+
+
+def test_truth_7_163_the_shot_at_a_mark_tells_more_often_at_two_cables_than_at_four():
+    """The build design's §6 (the judges' graft: a struck cask ends a run, so the ranges are
+    compared at a notional mark): the frigate at quarters engages, by the order, a mark on
+    her starboard beam twenty minutes at two cables and twenty at four; the minute's line
+    says the shot "on the mark", `the range` is the mark's, and the practice reading keeps
+    the falls by cables. At seed 7: 70 on the mark of 237 rounds at two cables (30 per
+    cent), 27 of 237 at four (11 per cent); the hit chance's own tables, the range alone
+    between them."""
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5, FRIGATE)
+    w.run(60)
+    _guns_ready(w)
+    w.run(40)
+    for cables, figure in (("two", 2), ("four", 4)):
+        said = w.submit(f"engage a mark {cables} cables on the starboard beam")
+        assert said.kind == "guns.engage" and said.data["mark"] == "notional", said.text
+        t0 = w.clock.tick
+        w.run(20 * 60)
+        lines = [e for e in w.log if e.kind == "action.fired" and e.tick > t0 + 60]
+        assert lines and all(e.data.get("mark") == "notional" for e in lines)
+        assert any(" on the mark" in e.text for e in lines), [e.text for e in lines]
+        assert w.readings.words("range") == f"{figure} cables"
+    falls = w.readings.value("practice")["falls"]
+    assert set(falls) == {"2", "4"}, falls
+    fired = {c: sum(row.values()) for c, row in falls.items()}
+    share = {c: falls[c].get("struck", 0) / fired[c] for c in falls}
+    assert min(fired.values()) >= 100, fired  # 237 at each range at seed 7
+    assert share["2"] > share["4"] > 0.0, share  # 70/237 and 27/237 at seed 7
+
+
+def test_truth_7_164_dumb_show_serves_the_guns_at_the_actions_pace_and_spends_nothing():
+    """The build design's §6 and decisions 20 and 21: `exercise the starboard battery` given
+    at quarters before `cast loose the guns`, so that every cycle begins empty; for twenty
+    minutes the starboard crews serve their guns through the phases at the action's pace,
+    and nothing leaves the magazine. At seed 7 the long 18-pounders' sponge to point is
+    105 s on the mean of 131 timed cycles, inside truth 7-135's band (the live interval
+    between discharges 104 s with the full company), the 9-pounder chasers' 56 s; a line
+    `practice.exercise` every minute from 10:04, when the first cycles end, to the last;
+    the magazine as it was, no round fired, no `action.fired`, the gunnery stream never
+    opened. The practice reading says the pace in words (it said 'a minute and 16 seconds'
+    for the carronades until this truth: the teens are now words). Both batteries at once
+    split each gun crew between its two guns, as engaging on both sides does, and the
+    18-pounders then take 406 s (measured, not pinned)."""
+    import copy
+
+    from freesail.ship.parts import magazine
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5, FRIGATE)
+    w.run(60)
+    mag = magazine(w.ship)
+    start = copy.deepcopy(vars(mag))
+    w.submit("beat to quarters")
+    w.run(5)
+    said = w.submit("exercise the starboard battery")
+    assert said.kind == "guns.exercise" and said.data["side"] == "starboard"
+    assert said.text.endswith("The guns are not yet cast loose: say 'cast loose the guns'.")
+    w.submit("cast loose the guns")
+    t0 = w.clock.tick
+    w.run(20 * 60)
+    practice = w.readings.value("practice")
+    assert practice["exercise"] == "starboard" and practice["live"] == 0
+    timed = {
+        gid: d
+        for gid, d in practice["guns"].items()
+        if d["cycles"] and w.ship.guns[gid].kind == "long" and w.ship.guns[gid].pounder == 18.0
+    }
+    assert timed and all(w.ship.guns[gid].side == "starboard" for gid in timed)
+    cycles = sum(d["cycles"] for d in timed.values())
+    mean = sum(d["mean_s"] * d["cycles"] for d in timed.values()) / cycles
+    assert 90.0 <= mean <= 125.0, f"{mean:.0f} s"  # truth 7-135's band; 105 s at seed 7
+    pace = [p for p in practice["words"].split("; ") if "from sponge to point" in p]
+    assert pace and not [p for p in pace if re.search(r"\d+ (?:second|minute)", p)], pace
+    assert vars(mag) == start
+    guns = w.readings.value("guns")
+    assert guns["rounds_fired"] == 0 and guns["loaded"] == 0 and guns["exercise"] == "starboard"
+    assert "gunnery" not in w.rng.stream_names()
+    assert not [e for e in w.log if e.kind == "action.fired"]
+    minutes = sorted({e.tick // 60 for e in w.log if e.kind == "practice.exercise"})
+    assert minutes and minutes[0] <= (t0 + 5 * 60) // 60, minutes  # 10:04 at seed 7
+    assert minutes == list(range(minutes[0], w.clock.tick // 60 + 1)), minutes
+
+
+def test_truth_7_165_a_notional_mark_serves_by_night_and_in_fog():
+    """The build design's §3.3 and decision 27: by night a cask over the side could not be
+    seen from the masthead and the heave is refused; in fog it is seen only within the
+    visibility (`marks.seen_range_nm`), so that a mark at four cables is a notional one; a
+    notional mark serves in both, the captain's word of a mark at a bearing from her head
+    and a range, a cutter's length beam-on, which nobody sees. The frigate at 02:00 on 12
+    June is refused the heave in the order's words; at 02:00 and again in a fog of a cable
+    at 10:00 (truth 7-147's sky) she engages a mark four cables on the starboard beam: her
+    starboard guns fire on it, the minute's line says the shot on the mark, `the range` is
+    the stated four cables exactly (no lookout's estimate in it), and no mark is sighted (no
+    sighting of the cask's kind, no practice stream, the practice reading's mark not in
+    sight). In the fog the heave is not refused, the order's only refusals being no chart
+    and the night (the review's finding: this docstring said a cask could not be seen in
+    fog). At seed 7 in ten minutes: 114 rounds and 11 on the mark by night, 121 and 8 in
+    the fog."""
+    from freesail.combat.guns import battery_of
+
+    fog = {"climatology": True, "sky": {"weather": "fog", "visibility": "a cable"}}
+    for when, kw in ((datetime(1805, 6, 12, 2, 0), {}), (datetime(1805, 6, 12, 10, 0), fog)):
+        w = _sea_at(49.5, -5.5, FRIGATE, when, **kw)
+        w.run(60)
+        if kw:
+            assert w.daylight == "day" and w.conditions.visibility_nm < 1.0
+        else:
+            assert w.daylight == "night"
+            said = w.submit("heave a cask overboard")
+            assert said.kind == "order.rejected" and said.data["reason"] == (
+                "It is dark: a cask over the side would not be seen from the masthead; a "
+                "notional mark serves by night ('engage a mark four cables on the starboard "
+                "beam')."
+            )
+        _guns_ready(w)
+        said = w.submit("engage a mark four cables on the starboard beam")
+        assert said.kind == "guns.engage" and said.data["target"] == "practice:notional"
+        t0 = w.clock.tick
+        w.run(10 * 60)
+        lines = [e for e in w.log if e.kind == "action.fired" and e.tick > t0]
+        assert any(" on the mark" in e.text for e in lines), [e.text for e in lines]
+        assert battery_of(w.ship).rounds_fired > 0
+        reading = w.readings.value("range")
+        assert reading["metres"] / units.CABLE == 4.0 and reading["words"] == "4 cables"
+        mark = w.readings.value("practice")["mark"]
+        assert mark["kind"] == "notional" and mark["range_cables"] == 4.0
+        assert mark["in_sight"] is False
+        assert not [s for s in w.lookout.sightings if s.seen_as == "cask"]
+        assert not [e for e in w.log if e.kind.startswith("practice.mark")]
+        assert "practice" not in w.rng.stream_names()
+        if kw:
+            # in the fog by day the heave is not refused: a cask is seen within the cable
+            assert w.submit("heave a cask overboard").kind == "order.accepted"
+
+
+def test_truth_7_166_a_cask_lost_in_haze_holds_fire_is_told_each_way_and_given_up_at_three_miles():
+    """The build design's §6: the frigate standing north under plain sail on a hazy
+    forenoon (the scenario's sky pinned hazy, the visibility a mile), at quarters, heaves a
+    cask over from the lee quarter and engages it on both sides. At seed 7 she leaves it
+    astern and the masthead loses it in the haze at 10:25, a mile and a sixth off ("The
+    mark is lost to sight in the haze."): while it is unseen the battery keeps it for its
+    mark but has nothing to lay for (`action.target_of` gives none), and no round is fired;
+    she wears for it and it is made out again at 10:35, seven cables ahead, and her bow
+    chasers open on it at once; she holds her fire, passes it and stands on; the masthead
+    loses it again at 11:03, and at 11:31 it is given up three miles astern ("The mark is
+    lost astern, three miles off."), the battery's mark cleared. Each change of the
+    masthead's sight is told once and never twice running: lost, made out again, lost. A
+    cask is never seen beyond a mile, so it is always lost to sight before it is three
+    miles off: the third line is that loss (the design's "once each way" read so)."""
+    from freesail.combat import marks
+    from freesail.combat.action import target_of
+    from freesail.combat.guns import FireMode, battery_of
+
+    w = _sea_at(
+        49.5,
+        -5.5,
+        FRIGATE,
+        datetime(1805, 6, 12, 10, 0),
+        climatology=True,
+        sky={"sky": "hazy", "weather": "fine", "visibility": "a mile"},
+        ship_heading_deg=0.0,
+        ship_speed_kn=6.0,
+    )
+    w.run(60)
+    assert w.readings.words("visibility") == "a mile"
+    w.submit("set plain sail")
+    w.run(120)
+    _guns_ready(w)
+    assert w.submit("heave a cask overboard").kind == "order.accepted"
+    w.run(150)
+    cask = marks.cask_in_water(w.ship)
+    assert cask is not None and marks.cask_in_sight(w, cask)
+    assert w.submit("engage the cask on both sides").kind == "guns.engage"
+    battery = battery_of(w.ship)
+    p = marks.practice_of(w.ship)
+    stage = "standing on"
+    unseen: list[int] = []  # the rounds fired, each minute it is lost before she wears back
+    seen_at = resumed = None
+    for _ in range(150):
+        w.run(60)
+        if cask.gone:
+            break
+        if stage == "standing on" and p.sight == "lost":
+            assert w.submit("wear ship").kind == "order.accepted"
+            stage = "wearing back"
+        elif stage == "wearing back" and p.sight == "seen":
+            stage, seen_at = "in sight again", battery.rounds_fired
+        elif stage == "in sight again" and battery.rounds_fired > seen_at:
+            resumed = battery.rounds_fired - seen_at
+            assert w.submit("hold your fire").kind == "guns.mode"
+            stage = "standing away"
+        if stage == "wearing back" and not marks.cask_in_sight(w, cask):
+            assert battery.target == cask.id and target_of(w, cask.id) is None
+            assert not w.readings.value("practice")["mark"]["in_sight"]
+            unseen.append(battery.rounds_fired)
+    assert stage == "standing away" and cask.gone == "lost", (stage, cask.gone)
+    assert unseen and set(unseen) == {0}, unseen
+    assert resumed, "no round fired on the cask when it was made out again"
+    sight = [e for e in w.log if e.kind == "practice.mark_sight"]
+    assert [e.data["seen"] for e in sight] == [False, True, False], [e.text for e in sight]
+    assert sight[0].text == sight[2].text == "The mark is lost to sight in the haze."
+    assert re.fullmatch(
+        r"The mark is made out again, bearing [NSEW by]+, about \w+ cables\.", sight[1].text
+    )
+    (lost,) = [e for e in w.log if e.kind == "practice.mark_lost"]
+    assert lost.text == "The mark is lost astern, three miles off." and lost.data["gone"] == "lost"
+    assert lost.data["range_m"] >= 3.0 * units.NAUTICAL_MILE
+    assert battery.target is None and battery.mode is FireMode.HOLD
+    assert not [e for e in w.log if e.kind == "practice.mark_struck"]
+
+
+def test_truth_7_167_in_the_sound_the_kings_cutter_completes_her_magazine_from_the_ordnance_free():
+    """The build design's §5 and the owner's ruling (the Ordnance's issue to a King's ship
+    free and vouched; the galley fire out a state the needs read): the King's cutter at
+    anchor in Plymouth Sound with her powder spent (set by the test: the hours of firing
+    that would spend two barrels are not sailed here) and three cartridges filled; at
+    quarters her guns load those three and the gunner reports the magazine out. At seed 7
+    `take in powder and shot` at 07:41 demands five barrels and three round shot of the
+    Ordnance's storekeeper, issued and vouched, the purse untouched throughout; the hoy is
+    alongside at 11:41, four hours on, the galley fire put out (Art. V), the port's and the
+    stores' readings saying so, the captain's meal below cold and the company's dinner at
+    noon served cold; the powder struck down at 12:41, the hour the taking in takes at the
+    least, the fire lit again and the gunner's account written up by the boatswain. The
+    magazine wants nothing from the stowing (the powder below is reckoned with the filled
+    cartridges), and the gunner fills by day alone, out of quarters, from 12:41 to 20:00
+    and from 06:00 on the 11th, until at 11:04 he has the 330 filled ("The gunner has the
+    cartridges filled to the allowance: 330 for the 12-pounder carronades; 1 barrel and 70
+    pounds below."). Spent again (by the test, as before) after her empty guns have loaded,
+    the magazine out is said again: a receipt and a cartridge taken clear the once-said
+    line (decision 7), which before this work was said once a calibre and never again."""
+    from freesail.ship.parts import magazine
+
+    w = _anchored(
+        THE_SOUND,
+        start=datetime(1805, 6, 10, 7, 30),
+        papers={"service": "kings"},
+        cargo={"purse_pounds": 100.0},
+    )
+    assert w.ports.in_port().nearest_spot(w.position)[0].name == "the anchorage in the Sound"
+    mag = magazine(w.ship)
+    key = ("carronade", 12.0)
+    mag.powder_lb = 0.0
+    mag.set_filled(*key, 3)
+    _guns_ready(w)
+    out = [e for e in w.log if e.kind == "guns.magazine_empty"]
+    assert [e.text for e in out] == [MAGAZINE_OUT]
+    assert out[0].data == {"pounder": 12.0, "charge": "round"}  # package 72's
+    w.submit("secure the guns")
+    w.run(150)
+    purse = (w.purse.pounds, list(w.purse.entries))
+    demand = w.submit("take in powder and shot")
+    assert demand.kind == "ordnance.demanded", demand.text
+    assert "of the Ordnance's storekeeper at Plymouth, issued and vouched;" in demand.text
+    assert demand.data["how"] == "issue" and demand.data["cost_pounds"] == 0.0
+    assert demand.data["barrels"] == 5 and demand.data["due_tick"] == demand.tick + 4 * 3600
+    assert w.readings["port"]["hoy"]["stage"] == "coming off"
+    w.run(demand.data["due_tick"] - w.clock.tick + 1)
+    (alongside,) = [e for e in w.log if e.kind == "ordnance.alongside"]
+    assert alongside.tick == demand.tick + 4 * 3600
+    assert w.stores.galley_fire_out == "powder"
+    assert w.readings["stores"]["words"].endswith(
+        ", the galley fire out while the powder comes aboard"
+    )
+    assert w.readings["port"]["hoy"]["stage"] == "alongside"
+    w.submit("go below")
+    said = w.submit("eat")
+    assert said.text.startswith(
+        "A cold meal, biscuit and cheese, the galley fire being out while the powder comes "
+        "aboard; you eat"
+    ), said.text
+    w.submit("go on deck")
+    while not [e for e in w.log if e.kind == "ordnance.stowed"]:
+        w.run(60)
+    (stowed,) = [e for e in w.log if e.kind == "ordnance.stowed"]
+    assert stowed.tick == alongside.tick + 3600  # five barrels and three shot: the least hour
+    assert stowed.text.startswith("Five barrels of powder and 3 round shot of 12 pounds struck")
+    assert "issued by the Ordnance's storekeeper and vouched" in stowed.text
+    assert stowed.text.endswith("the galley fire lit again.")
+    assert w.stores.galley_fire_out == "" and w.stores.cold_meals >= 1  # dinner at noon
+    written = [e for e in w.log if e.kind == "paper.written" and e.tick == stowed.tick]
+    assert written and written[0].data == {"paper": "the gunner's account"}
+    assert written[0].text.startswith("The gunner's account written up by the boatswain:")
+    assert mag.account[-1][1].startswith(
+        "Received of the Ordnance's storekeeper at Plymouth, issued and vouched: 5 barrels"
+    )
+    assert mag.powder_lb == 500.0 and mag.wanting().empty
+    samples = []
+    filled = []
+    while not filled:
+        w.run(600)
+        samples.append((w.clock.ship_time, mag.filled_of(*key)))
+        filled = [e for e in w.log if e.kind == "guns.filled"]
+    night = {n for t, n in samples if t.hour >= 20 or t.hour < 6}
+    assert len(night) == 1 and 0 < night.pop() < 330  # none filled by night
+    (done,) = filled
+    assert done.text == (
+        "The gunner has the cartridges filled to the allowance: 330 for the 12-pounder "
+        "carronades; 1 barrel and 70 pounds below."
+    )
+    at = w.clock.ship_time - timedelta(seconds=w.clock.tick - done.tick)
+    assert at.day == 11 and 6 <= at.hour < 20, at  # 11:04 at seed 7, by day and out of quarters
+    assert mag.filled_of(*key) == 330 and not mag.short and mag.wanting().empty
+    assert mag.powder_lb == 170.0 and mag.filled_by_gunner == 330
+    assert (w.purse.pounds, list(w.purse.entries)) == purse
+    _guns_ready(w)  # her three empty guns load from the filled cartridges
+    mag.set_filled(*key, 0)
+    mag.powder_lb = 0.0
+    assert w.submit("engage a mark three cables on the starboard beam").kind == "guns.engage"
+    w.run(600)
+    out = [e for e in w.log if e.kind == "guns.magazine_empty"]
+    assert [e.text for e in out] == [MAGAZINE_OUT, MAGAZINE_OUT]
+    assert not [e for e in w.log if e.kind in ("guns.filling", "guns.powder_out")]
+
+
+def test_truth_7_168_powder_is_taken_in_at_the_road_not_the_harbour_and_bought_only_of_necessity():
+    """The build design's §3.2 and §5: the Regulations of 1806 (1808 printing), the Gunner,
+    Art. VI, "Plymouth Sound or Cawsand Bay", and the Captain's "absolute necessity" (Art.
+    VII). Each ship made short by the director's damp cartridges (an input), at seed 7: the
+    King's cutter in the Hamoaze is refused in the article's words; at Falmouth, where
+    there is no storekeeper of the Ordnance, she is refused until her captain says it is of
+    necessity, and then buys a barrel of the merchants for £5, the purse paying at
+    alongside three hours on and once only; the merchant brig at Falmouth buys hers for £5
+    with no word of necessity; the privateer is refused the Ordnance's issue at Plymouth,
+    whose town sells none (decision 10); and at Lisbon, a neutral's port, a French
+    privateer is refused once the knob is set on the loaded block (`sells_in_war_to`:
+    Britain alone, decision 11) and served when it is unset."""
+    from freesail.ship.parts import magazine
+
+    harbour = _anchored(HAMOAZE, papers={"service": "kings"}, cargo={"purse_pounds": 100.0})
+    assert harbour.ports.in_port().nearest_spot(harbour.position)[0].name == "the Hamoaze"
+    harbour.world_order(DAMP)
+    assert not magazine(harbour.ship).wanting().empty
+    said = harbour.submit("take in powder and shot")
+    assert said.kind == "order.rejected" and said.data["reason"] == (
+        "Powder is taken in at Plymouth Sound or Cawsand Bay, not in the harbour (the "
+        "Regulations, the Gunner, Art. VI): weigh and bring her to the road first."
+    )
+    assert not harbour.ports.jobs
+    kings = _anchored(CARRICK_ROAD_5C, papers={"service": "kings"}, cargo={"purse_pounds": 100.0})
+    kings.world_order(DAMP)
+    said = kings.submit("take in powder and shot")
+    assert said.kind == "order.rejected" and said.data["reason"] == (
+        "There is no storekeeper of the Ordnance at Falmouth, and a captain is charged not to "
+        "purchase stores without an absolute necessity (the Regulations): say 'buy powder of "
+        "necessity' to buy it of the merchants at £5 a barrel."
+    )
+    brig = _anchored(CARRICK_ROAD_5C, ship=MERCHANT_BRIG, cargo={"purse_pounds": 100.0})
+    brig.world_order(DAMP)
+    for w, order, necessity in (
+        (kings, "buy powder of necessity", True),
+        (brig, "buy powder and shot", False),
+    ):
+        entries = len(w.purse.entries)
+        demand = w.submit(order)
+        assert demand.kind == "ordnance.demanded", demand.text
+        assert demand.data["how"] == "sale" and demand.data["necessity"] is necessity
+        assert demand.data["barrels"] == 1 and demand.data["cost_pounds"] == 5.0
+        assert w.purse.pounds == 100.0  # paid when the hoy comes alongside
+        w.run(demand.data["due_tick"] - w.clock.tick + 1)
+        assert [e.tick for e in w.log if e.kind == "ordnance.alongside"] == [demand.tick + 3 * 3600]
+        assert w.purse.entries[entries:] == [
+            (demand.tick + 3 * 3600, -5.0, "powder and shot of the merchants at Falmouth")
+        ]
+        w.run(2 * 3600)
+        (stowed,) = [e for e in w.log if e.kind == "ordnance.stowed"]
+        assert ("of absolute necessity, on the captain's word" in stowed.text) is necessity
+        assert w.purse.pounds == 95.0 and len(w.purse.entries) == entries + 1  # paid once
+    privateer = _anchored(
+        THE_SOUND, ship=PRIVATEER, papers={"service": "privateer"}, cargo={"purse_pounds": 100.0}
+    )
+    privateer.world_order(DAMP)
+    for order in ("take in powder and shot", "buy powder and shot"):
+        said = privateer.submit(order)
+        assert said.kind == "order.rejected" and said.data["reason"] == (
+            "The Ordnance's storekeeper at Plymouth issues to the King's ships alone, and no "
+            "merchant here sells powder."
+        )
+    french = _anchored(
+        CASCAIS_ROAD,
+        ship=PRIVATEER,
+        chart="atlantic-east",
+        ports=("lisbon",),
+        nation="france",
+        papers={"service": "privateer"},
+        cargo={"purse_pounds": 100.0},
+    )
+    french.world_order(DAMP)
+    block = french.ports.ports["lisbon"].ordnance
+    assert french.ports.stance(french.ports.in_port()) == "neutral"
+    assert block["sells_in_war_to"] is None  # the knob in the file, left unset
+    block["sells_in_war_to"] = ("britain",)
+    said = french.submit("buy powder and shot")
+    assert said.kind == "order.rejected" and said.data["reason"] == (
+        "Lisbon's merchants sell no powder to a French ship while the war lasts."
+    )
+    block["sells_in_war_to"] = None
+    assert french.submit("buy powder and shot").kind == "ordnance.demanded"
+
+
+def test_truth_7_169_the_long_tom_fires_on_when_the_carronades_filled_cartridges_are_spent():
+    """The build design's §4: the privateer schooner (her long 12-pounder on a pivot and four
+    12-pounder carronades) at quarters engages a mark three cables on the starboard beam,
+    her carronades' filled cartridges set to four by the test. At seed 7 the four are
+    spent within three minutes; the guns wait at the cartridge while the gunner fills from
+    the powder below, told once ("No more filled cartridges for the 12-pounder carronades:
+    the gunner is filling, and the guns wait on him."); the long Tom has cartridges of its
+    own kind and never stalls, firing 25 rounds in the forty minutes; the carronades fire
+    again as each cartridge is filled (a man of the powder at 135 man-seconds a cartridge,
+    about one in two minutes and a quarter); and the powder below falls by exactly the 18
+    pounds of the 18 cartridges he filled, a pound apiece."""
+    from freesail.combat.guns import battery_of
+    from freesail.ship.parts import magazine
+    from tests.test_brains import world_at
+
+    w = world_at(49.5, -5.5, PRIVATEER)
+    w.run(60)
+    _guns_ready(w)
+    ship = w.ship
+    battery = battery_of(ship)
+    mag = magazine(ship)
+    mag.set_filled("carronade", 12.0, 4)
+    cartridges, fired = dict(mag.cartridges), dict(mag.fired)
+    powder, by_gunner = mag.powder_lb, mag.filled_by_gunner
+    said = w.submit("engage a mark three cables on the starboard beam")
+    assert said.kind == "guns.engage", said.text
+    pivot = next(g for g in ship.guns.values() if g.place == "pivot")
+    carronades = [g for g in ship.guns.values() if g.kind == "carronade"]
+    stalled = []
+    discharged = []  # the ticks a carronade fired
+    for _ in range(40 * 60):
+        before = sum(g.fired for g in carronades)
+        w.run(1)
+        if battery.services[pivot.id].stalled:
+            stalled.append(w.clock.tick)
+        discharged += [w.clock.tick] * (sum(g.fired for g in carronades) - before)
+    assert not stalled, stalled[:5]
+    assert pivot.fired >= 10  # 25 at seed 7
+    (waiting,) = [e for e in w.log if e.kind == "guns.filling"]
+    assert waiting.text == (
+        "No more filled cartridges for the 12-pounder carronades: the gunner is filling, and "
+        "the guns wait on him."
+    )
+    assert waiting.data["kind"] == "carronade" and waiting.data["held"] is False
+    again = [t for t in discharged if t > waiting.tick]
+    assert len(again) >= 5, discharged  # 17 at seed 7, one each two minutes or so
+    assert not [e for e in w.log if e.kind in ("guns.magazine_empty", "guns.powder_out")]
+    fills = {
+        k: mag.cartridges.get(k, 0) - cartridges.get(k, 0) + mag.fired.get(k, 0) - fired.get(k, 0)
+        for k in mag.level
+    }
+    assert sum(fills.values()) == mag.filled_by_gunner - by_gunner > 0  # 18 at seed 7
+    spent = sum(n * mag.charge_of(*k) for k, n in fills.items())
+    assert powder - mag.powder_lb == pytest.approx(spent)
+
+
+def test_truth_7_170_a_checkpoint_with_the_hoy_alongside_resumes_to_one_digest_and_replays_to_it(
+    tmp_path,
+):
+    """The build design's §3.4 and §9: the hoy is a port job, the galley fire a state of the
+    stores and the filling the magazine's, so a checkpoint holds them whole and a replay
+    makes them again from the inputs. The King's cutter in Plymouth Sound, a quarter of her
+    cartridges found damp (the director's order) at 07:36 and her gunner filling them again
+    from the powder below, all 82 by 10:41; `take in powder and shot` demands a barrel, and
+    the hoy comes alongside at 11:36. Ten minutes later a quarter of them is found damp
+    again, and the gunner may fill none while the powder comes aboard and the galley fire
+    is out: a minute on the checkpoint is taken so, the magazine short (248 of 330), the
+    hoy alongside and the filling held by the fire. The game resumed and the game played on run four
+    hours and a half each, through the stowing at 12:36, the gunner's filling of the 82
+    from the powder taken in and his report at 15:41 ("The gunner has the cartridges filled
+    to the allowance"), to the same log and magazine; the save replayed from its seed and
+    inputs gives them again. (Before the review's finding the filling was done an hour
+    before the checkpoint, and nothing of it crossed it.) Measured on this machine: 44 lines
+    and the digest 073626b2d8d85807 for all three."""
+    from freesail.api.session import ship_factory
+    from freesail.core import replay as replay_mod
+    from freesail.ship.parts import magazine
+
+    w = _anchored(
+        THE_SOUND,
+        start=datetime(1805, 6, 10, 7, 30),
+        papers={"service": "kings"},
+        cargo={"purse_pounds": 100.0},
+    )
+    w.world_order(DAMP)
+    demand = w.submit("take in powder and shot")
+    assert demand.kind == "ordnance.demanded" and demand.data["barrels"] == 1, demand.text
+    w.run(demand.data["due_tick"] - w.clock.tick + 600)
+    (job,) = w.ports.jobs
+    assert job.payload["stage"] == "stowed" and w.stores.galley_fire_out == "powder"
+    mag = magazine(w.ship)
+    assert mag.filled_of("carronade", 12.0) == 330 and not mag.short  # the first filled
+    w.world_order(DAMP)  # damp again with the hoy alongside: the filling held by the fire
+    mag = magazine(w.ship)
+    held = mag.filled_of("carronade", 12.0)
+    assert mag.short and held < 330, held  # 248 at seed 7
+    filled = mag.filled_by_gunner
+    w.run(60)
+    assert mag.filled_of("carronade", 12.0) == held and mag.filled_by_gunner == filled
+    path = replay_mod.write_checkpoint(w, tmp_path / "hoy.checkpoint")
+    _header, resumed = replay_mod.read_checkpoint(path)
+    assert [(j.kind, j.payload, j.due_tick) for j in resumed.ports.jobs] == [
+        (job.kind, job.payload, job.due_tick)
+    ]
+    assert resumed.stores.galley_fire_out == "powder"
+    assert vars(magazine(resumed.ship)) == vars(mag)
+    for world in (w, resumed):
+        world.run(4 * 3600 + 30 * 60)
+    assert [e.tick for e in w.log if e.kind == "ordnance.stowed"] == [job.due_tick]
+    assert resumed.log.digest() == w.log.digest()
+    assert vars(magazine(resumed.ship)) == vars(magazine(w.ship))
+    for world in (w, resumed):
+        m = magazine(world.ship)
+        assert m.filled_of("carronade", 12.0) == 330 and not m.short  # filled to the allowance
+        assert m.filled_by_gunner == filled + 330 - held  # all of it after the checkpoint
+        (said,) = [e for e in world.log if e.kind == "guns.filled"]
+        assert said.tick > job.due_tick  # after the stowing, in the resumed game too
+    again = replay_mod.replay_world(w, ship_factory)
+    assert again.log.digest() == w.log.digest()
+    assert vars(magazine(again.ship)) == vars(magazine(w.ship))
+    assert again.stores.cold_meals == resumed.stores.cold_meals == w.stores.cold_meals
+
+
+def test_truth_7_171_a_practice_forenoon_is_checkpointed_and_replayed(tmp_path):
+    """The build design's §3.4: every order of practice is an input and everything after it
+    is pickled state or drawn from its own stream, so a forenoon of practice resumes from
+    its checkpoint and replays from its save to one log. The owner's scenario
+    (data/scenarios/exercising-the-great-guns.yaml, the rules captains with no model
+    seated), the orders given by the test: at 09:01 `beat to quarters`, `exercise the
+    starboard battery` and `cast loose the guns`; twenty minutes of dumb show and `cease
+    exercising`; a cask hove over from the starboard quarter and engaged to starboard;
+    checkpointed at 09:25 with the cask in the water and in sight; then half an hour, a
+    notional mark four cables on the starboard beam engaged for half an hour, `secure the
+    guns`, and on to noon. The game resumed from the checkpoint and the game played on give
+    one log, and the save replayed gives it again. Measured on this machine: 227 lines and
+    the digest 77cfa4458e18620d for all three (measured again after the review, before its
+    fixes and after them alike; the c06f1fa9bb619847 first written here did not
+    reproduce)."""
+    from freesail.api.session import ship_factory
+    from freesail.combat import marks
+    from freesail.core import replay as replay_mod
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(EXERCISING)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    w.run(60)
+    assert w.submit("beat to quarters").kind == "crew.quarters"
+    w.run(5)
+    assert w.submit("exercise the starboard battery").kind == "guns.exercise"
+    w.submit("cast loose the guns")
+    w.run(20 * 60)
+    assert w.submit("cease exercising").kind == "guns.exercise"
+    w.run(60)
+    assert w.submit("heave a cask overboard from the starboard quarter").kind == "order.accepted"
+    w.run(120)
+    assert w.submit("engage the cask to starboard").kind == "guns.engage"
+    w.run(60)
+    cask = marks.cask_in_water(w.ship)
+    assert cask is not None and marks.cask_in_sight(w, cask)
+    assert any(e.kind == "practice.exercise" for e in w.log)
+    path = replay_mod.write_checkpoint(w, tmp_path / "forenoon.checkpoint")
+    _header, resumed = replay_mod.read_checkpoint(path)
+    assert marks.cask_in_water(resumed.ship) == cask
+    for world in (w, resumed):
+        world.run(30 * 60)
+        assert world.submit("engage a mark four cables on the starboard beam").kind == "guns.engage"
+        world.run(30 * 60)
+        world.submit("secure the guns")
+        world.run(3 * 3600 - world.clock.tick)
+    assert resumed.log.digest() == w.log.digest()
+    assert w.readings.value("practice") == resumed.readings.value("practice")
+    assert any(e.kind == "action.fired" and e.data.get("mark") == "notional" for e in w.log)
+    again = replay_mod.replay_world(w, ship_factory)
+    assert again.log.digest() == w.log.digest()
+    assert again.readings.value("practice") == w.readings.value("practice")
+
+
+# ---------------------------------------------------------------------------
 # Package 73: water, damage control, health and the fight on deck (spec M7 §11, §11a, §13
 # to §17; docs/design/Design-WaterAndHealth.md; truths 7-172 onward, after the owner's
 # practice-and-resupply package's 7-161 to 7-171)

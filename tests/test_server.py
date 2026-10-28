@@ -539,6 +539,7 @@ def test_the_ship_papers_are_the_librarys_papers_topic_and_nothing_waits(client,
         "the price list",
         "the private signals",  # package 71
         "the signal book",
+        "the gunner's account",  # practice and resupply (between packages 72 and 73)
     ]
     assert by["the booms' list"]["lines"] == queries.booms_lines(world)
     assert by["the sailmaker's account"]["lines"] == queries.sail_room_lines(world)

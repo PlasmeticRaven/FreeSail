@@ -296,6 +296,8 @@ class Ship:
                     "place": g.place,
                     "number": g.number,
                     "side": g.side,
+                    # a pivot gun's training, for the view (PROVISIONAL, 2026-10-25)
+                    **({"train_deg": round(g.train_deg, 1)} if g.place == "pivot" else {}),
                     "state": g.state_words,
                     "dismounted": g.dismounted,
                     "fired": g.fired,

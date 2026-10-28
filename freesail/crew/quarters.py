@@ -354,7 +354,12 @@ class Quarters:
             gid = k[len(GUN_PREFIX) :]
             g = self.ship.guns.get(gid)
             if g is not None:
-                kinds.add("the swivels" if g.place == "rail" else f"the {g.place} chasers")
+                if g.place == "rail":
+                    kinds.add("the swivels")
+                elif g.place == "pivot":
+                    kinds.add("the pivot gun")
+                else:
+                    kinds.add(f"the {g.place} chasers")
         parts += sorted(kinds)
         if numbers:
             if len(numbers) == 1:
@@ -425,7 +430,7 @@ def quarters_of(ship: Any) -> Quarters | None:
 
 
 def _gun_order(g: Gun) -> tuple[int, float, str]:
-    place = {"broadside": 0, "bow": 1, "stern": 1, "rail": 2}.get(g.place, 3)
+    place = {"broadside": 0, "pivot": 0, "bow": 1, "stern": 1, "rail": 2}.get(g.place, 3)
     return (place, -g.x_m, g.id)
 
 

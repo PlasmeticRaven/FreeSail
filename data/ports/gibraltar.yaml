@@ -112,6 +112,23 @@ dockyard:
     - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.2, note: "water scarce on the Rock, the tanks and wells; judgement"}
     - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
 
+# Powder and shot (practice and resupply, between packages 72 and 73;
+# docs/design/Build-PracticeAndResupply.md §1.3; read by freesail/world/ordnance.py):
+# the storekeeper of the Ordnance on the Rock issues to the King's ships, free and vouched,
+# anywhere in the bay (the Regulations of 1806, the Gunner, Art. VI lists the home roads
+# alone), and the garrison town's merchants sell to the rest. That the Ordnance kept a
+# storekeeper at Gibraltar is from memory, UNVERIFIED; that its merchants sold powder, and
+# the prices and the hours, judgement, UNVERIFIED.
+ordnance:
+  kind: ordnance                 # the storekeeper of the Ordnance: free and vouched to the King's ships
+  sells: true                    # the town's merchants also sell (judgement, UNVERIFIED)
+  hoy_hours: 3                   # the demand and the hoy's errand (judgement)
+  barrels_an_hour: 20            # the taking in (judgement)
+  shot_tons_an_hour: 2
+  powder_per_barrel_pounds: 6.0  # abroad (judgement, UNVERIFIED)
+  shot_per_ton_pounds: 14.0
+  source: "Regulations 1806 (1808 printing), Gunner, Art. I l.12722-12738, Art. V l.12800-12809; the storekeeper at Gibraltar from memory, UNVERIFIED; the merchants and the prices judgement, UNVERIFIED"
+
 crew_pool:
   # judgement: the garrison town's seamen, Genoese and Minorquins among them
   able: {hands: 6, pounds: 3, delay_h: 12}

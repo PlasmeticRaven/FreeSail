@@ -130,6 +130,13 @@ GUNNERY_PARTS: dict[str, str] = {
     "strike the colours": "the colours",
     "guns before sail": "the priority",
     "sail before guns": "the priority",
+    # practice and resupply (between packages 72 and 73): the cask, the dumb show and the
+    # gunner's filling
+    "heave a cask overboard": "the cask",
+    "exercise the guns": "the exercise",
+    "cease exercising": "the exercise",
+    "fill cartridges": "the filling",
+    "cease filling": "the filling",
 }
 
 

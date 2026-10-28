@@ -171,6 +171,13 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "rig": "a schooner",
         "what": "a topsail schooner",
     },
+    # PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): the letter of marque
+    # of the schooner's draught, her guns her own file's; the tops make out a schooner
+    "privateer schooner": {
+        "file": "data/ships/privateer-schooner.yaml",
+        "rig": "a schooner",
+        "what": "a topsail schooner, pierced for guns",
+    },
     "cutter": {"file": "data/ships/cutter.yaml", "rig": "a cutter", "what": "a cutter"},
     "brig-sloop": {
         "file": "data/ships/brig.yaml",
@@ -203,6 +210,11 @@ _DESCRIPTION_WORDS = {
     "schooner": "schooner",
     "a topsail schooner": "schooner",
     "topsail schooner": "schooner",
+    "a privateer schooner": "privateer schooner",
+    "an armed schooner": "privateer schooner",
+    "armed schooner": "privateer schooner",
+    "a letter of marque": "privateer schooner",
+    "letter of marque": "privateer schooner",
     "a cutter": "cutter",
     "cutter": "cutter",
     "a brig": "merchant brig",

@@ -288,6 +288,7 @@ SIZE_RANK: dict[str, int] = {
     "brig-sloop": 2,
     "merchant brig": 2,
     "schooner": 1,
+    "privateer schooner": 1,  # PROVISIONAL (2026-10-25): the schooner's hull, armed
     "cutter": 1,
     "lugger": 1,  # package 43b: a chasse-marée of a hundred tons, the cutter's class
     "smack": 0,  # a fishing smack of thirty-five tons is nobody's match

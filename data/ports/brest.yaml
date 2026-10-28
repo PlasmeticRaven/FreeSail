@@ -85,6 +85,22 @@ dockyard:
     - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1}
     - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
 
+# Powder and shot (practice and resupply, between packages 72 and 73;
+# docs/design/Build-PracticeAndResupply.md §1.3; read by freesail/world/ordnance.py):
+# Brest's merchants sell powder and shot to any ship the port is open or neutral to, at a
+# price paid when the hoy comes alongside; that they dealt in it is the proposal's list
+# (docs/design/Proposal-MagazineResupply.md), UNVERIFIED; the prices, at home, and the hours
+# judgement. The arsenal's own issue to the French ships is not
+# built (no French ship of war does port business yet): the port's merchants serve them.
+ordnance:
+  kind: merchants                # the town's merchants, at a price
+  hoy_hours: 3                   # the demand and the hoy's errand (judgement)
+  barrels_an_hour: 20            # the taking in (judgement)
+  shot_tons_an_hour: 2
+  powder_per_barrel_pounds: 5.0  # a barrel of a hundred pounds (judgement, UNVERIFIED)
+  shot_per_ton_pounds: 12.0     # a ton of shot (judgement, UNVERIFIED)
+  source: "the merchants' trade in powder: Proposal-MagazineResupply.md's list, UNVERIFIED; the prices and the hours judgement, UNVERIFIED"
+
 crew_pool:
   able: {hands: 6, pounds: 2, delay_h: 24}
   ordinary: {hands: 10, pounds: 1.5, delay_h: 24}

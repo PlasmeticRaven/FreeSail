@@ -1,0 +1,52 @@
+# FreeSail: exercising the great guns (practice and resupply, between packages 72 and 73;
+# docs/design/Build-PracticeAndResupply.md §6). The King's frigate of the Amazon class,
+# her long 18-pounders, her 32-pounder carronades and her 9-pounder chasers, cruising
+# south of the Lizard on a June forenoon of 1805 with a westerly and nobody in sight: a
+# forenoon for the captain "to exercise the Ship's company frequently at the guns"
+# (Regulations 1806, 1808 printing, the Captain, Art. IX, l.8738-8742). Given to either
+# driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/exercising-the-great-guns.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/exercising-the-great-guns.yaml
+#
+# Played by the player at the captain's station: `beat to quarters`, then `exercise the
+# guns` (before `cast loose the guns`, so that the cycle begins empty) for the dumb show,
+# the guns served without powder; or `heave a cask overboard` for a mark and `engage the
+# cask to starboard`, or `engage a mark four cables on the starboard beam` by night or in
+# fog; `cease exercising`, `secure the guns`; `fill cartridges` and `cease filling` for the
+# gunner. The readings `the practice`, `the guns`, `the magazine`, `the range`. Played by
+# the rules captains with no model seated, nothing happens: no captain's book exercises
+# the guns, and she cruises on her station until a sail is sighted.
+#
+# The weather is pinned (a westerly of ten knots, a gentle breeze, the sky clear), so that
+# the forenoon at seed 7 is the same on every machine; nothing else is on the sea.
+
+name: Exercising the great guns
+seed: 7
+start: 1805-06-14T09:00
+position: 49 52 N 5 12 W   # some five miles south of the Lizard
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 180
+  speed_kn: 5
+  glass: true
+intent: cruise off the Lizard within 10 miles
+wind:
+  from_deg: 280
+  knots: 10
+  gustiness: 0.0
+  variability: 0.0
+
+papers:
+  chart: {year: 1804}
+  almanac: 1805
+
+ports: [falmouth, plymouth]
+
+standing_orders:
+  - data/standing_orders/starter.orders
+  - data/standing_orders/fighting.orders
+
+orders:
+  - set plain sail
