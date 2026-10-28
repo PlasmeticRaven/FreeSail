@@ -8,6 +8,38 @@
 - **D10** (her main topgallant): the brief leaves the physics unchanged and has a rig the engine lacks reported to the lead.
 - **The 74**, the sub-types as fits and roles, and the per-gun pivot arc are new in the brief, and are not in this sheet.
 
+## The owner's answers (2026-10-27)
+
+"Unless indicated here, decision as recommended." So every decision below not named here is taken as recommended, subject to the brief where the status note above says the brief reopens it.
+
+| Decision | The owner's answer |
+|---|---|
+| **D3** | **(b).** The settee is kept drawing as a ship's mizen is, to help her through the wind, and dipped last. |
+| **D8** | **(b).** Yards under the bowsprit where the period shows them: the 64's spritsail and sprit-topsail yards, and the bilander's. "Let's live a little; spritsails are a reasonable thing to try for." |
+| **D9** | **(c).** The 64's mizen on its proper lateen yard, the dormant lateen class finished. The 64 should be "rightly sailable and as detailed as any other ship", and the lateen will serve later ships (a tartane), so it is to be properly implemented. |
+| **D12** | **(b).** The lee ports shut within a foot of the water, for every ship. |
+| **D14** | **(c), in this package.** The sourced hull profile goes into every ship file **and is drawn by the viewer**, for every ship. |
+| **D18** | **Open, with the owner's measure:** whichever choice gives the best impression in the viewer and matches the sources. The convention may change, so long as the change is an improvement. |
+| **D35** | **(b), limited.** The fore topgallant studding sail, together with (a)'s studding sails and main topmast staysail. |
+
+**The owner's word on the viewer (2026-10-27).** "Changing the viewer is alright now." The sourced hull profile, and drawing it properly in the viewer, are part of this package and are to be properly implemented.
+
+**What follows from the answers:**
+- **D46 becomes (d) with rule 3 restored,** since D3 is (b). In stays, the ourse is braced to leeward as the helm goes down, and the yard is changed last. Each rule is carried over by judgement from a ship's mizen, and its truth says so.
+- **D10 stays (a):** an opt-in key whose yards the handling ignores. Reported to the lead under the brief's "a rig the engine lacks is reported".
+- **D17 is taken with the brief:** two files. The razee's fits are the brief's "as razeed 1795" (Winfield p. 99's establishment, D17(b)'s fit) and the 1796 fit as carried (26 × 24-pdr, 2 × 12-pdr, 18 × 42-pdr carronades, 330 men: James vol. 1 p. 361). The default is the 1795 fit, as the brief names it. The owner may say otherwise.
+- **D27 and D39 are taken with the brief:** the *Neufchatel* is an American vessel of 1812, with her names American by default. Her scenario's year, and the war's state in the table of nations, are for the design.
+- **D18, the lead's reading for the design:** with D14(c), the viewer draws her true sides, sheer, wales and port sills from the hull profile, and no longer from the one deck line. The deck-height convention can then serve the physics and the spar heights alone. The design proposes against the owner's measure and shows the screenshots.
+
+**Beyond the brief as written, for the lead.** The owner's answers widen package 75 in five places. The brief's own text says otherwise, so the lead should know before stage 0:
+1. **The viewer.** The brief says "the viewer itself stays at the current standard in this package" and, under "Not built here", "the viewer's hull (81's)". The owner's answer to D14 brings the sourced hull's drawing into 75, for every ship. Package 81 keeps the guns, their movement, the flash and the smoke.
+2. **The lateen class** (D9), finished for the 64's mizen: its evolutions, its brace, its curve and its drawing.
+3. **Yards under the bowsprit** (D8): new engine and viewer work. The engine note found that such a yard changes how a ship is classed and handled (Eng §5; §7, risk 2).
+4. **The lee ports wired for every ship** (D12): every existing ship's combat pins move, and are re-measured old beside new.
+5. **The settee's tack as a ship's mizen** (D3), within the settee's design, which goes to the lead under the brief's gate.
+
+Items 2 and 3 extend the engine as the settee does. Their designs come to the lead beside the settee's, under the same gate.
+
 This sheet gathers the questions the four research notes leave for you, merged where they ask the same thing, each with its options and evidence, a recommendation that keeps your rulings, and what depends on it. One question the notes did not ask is added as D48: where the 64 sails. You may accept every recommendation at once, or answer by number (for example "D9: a").
 
 Notes cited, all in `docs/design/`: **Ind** Research-Indefatigable-2026-10; **Neuf** Research-PrinceDeNeufchatel-2026-10; **Bil** Research-Bilander-2026-10; **Eng** Research-ShipsEngine-2026-10. The marks (read, measured, catalogue, secondary, memory, judgement) are the notes'. Where a citation is the lead's own reading and is not in any note, it says so, with the OCR line.
