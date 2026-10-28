@@ -56,7 +56,7 @@ on these packages; that is the owner's choice.
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 and 2 merged 2026-10-28** (`d9dba1f`, from the sibling session's `claude/pkg-84`; nothing pinned moved); **steps 3 onward continue in the sibling from the head after 86 and these** |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 4 merged 2026-10-28** (steps 1 and 2 at `d9dba1f`, steps 3 and 4 from the sibling's `claude/pkg-84` after it; nothing pinned moved; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
 | 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | **merged 2026-10-28** (`cd97ce7`); the record below |
 | 87 | Fable | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief once most of the milestone's orders are in, after 73, 77 and 84 |
@@ -450,6 +450,38 @@ converter reads every older shape. **Found on the way:** `orders._doubt_thing_mo
 unpacking a thing's where into three. The builder's report reached the lead through its
 pushed branch and notes, its scheduled-task message carrying only a preamble: sibling
 sessions report by their branch, which the lead reads, and the message is a courtesy.
+
+### Package 84, steps 3 and 4, as merged (2026-10-28)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` (two commits on the merged head
+`8db8b9a`; 55 files, ~5,500 lines added and ~3,600 removed) with no conflict; ruff clean;
+the lead's sweeps clean; the sibling's fast tier whole on each step (two explained failures:
+the pictures' threshold under load, and the squadrons' succession test whose band was the
+old route's phase and not the rule, recast to the rule it states with the old figure beside
+the new), its touched files' slow tier running as it reported; **the whole suite on the
+merged tree in the cloud (the figures below when it ends).** **Step 3:** the ports split
+into `Ports`, the world's (the files, the markets, the stances, the tracks, who is at each
+place ashore), and `Dealings`, a hull's (her pilot and his conn, her boat and its errands,
+her price lists, her jobs). **Step 4:** the coarse acts on a sleeping hull and the far
+brain's port acts: a station on a ship at far detail works every act that wants no
+physics through her own grammar (the boat's errands as the port's jobs with the boat's
+time, the captain landed at the quay and fetched, the places ashore, a word said and heard
+by spot, the free lines, a signal and a hail); `shape a course for <port>` in the far
+shape the planner's passage by the ports' tracks and the chart's common tracks, ending at
+her anchor; a far body under a held station lying to at her plan's end instead of
+vanishing; the far trader at her port selling, buying a return cargo and sailing again
+(`transact: true`, decision 53's fifth); the director's `say as` for a person ashore heard
+by whoever of any hull is at his place; a kept thing knowing its keeper's home hull.
+**The owner's acceptance test is truth 7-200** on the new `data/scenarios/tender.yaml`: the
+Amazon at anchor in Brixham road, the Raven her tender asleep the whole day with a fake at
+her captain's station, ordered to Plymouth by signal, by the tracks, ashore to a person,
+back with the packet, the lugger passed, home within hail. **Taken another way, with
+reasons in the design note's postscript:** the Raven asleep from the start (the switch is
+steps 5 and 6's), the pilot's track in as the plan's anchor leg (the pilot as a job is
+step 5's). **Data:** a coasting track from Torbay to Plymouth in the Channel's features,
+used only where a straight line is not clear. **Found on the way, fixed:** `station_world`
+ignoring the scenario's crewed cap. **Open for the lead:** the director's lines for a
+person land in the player's log as before (the director's-reach step's).
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
