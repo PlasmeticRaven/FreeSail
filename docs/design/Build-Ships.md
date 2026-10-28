@@ -590,8 +590,8 @@ not a refusal: a hand-written file may carry guns between ports.
 | frigate-36 (*Amazon*) | Steel 1805, the bodies of "the frigate of 36 guns and 877 tons" (OCR `docs/references/steel/steel-1805-naval-architecture-1822-printing-ocr.txt:27071-27170`, garbled); Steel's rules for the top-timber and load lines (`:15178-15187`) | Folio I's 36 (read); Winfield 1793-1817 p. 143's draughts; Steel: the wale's lower edge a few inches above the load line (`:15190-15193`) | **Folio I: 7 ft 8 in above the water at midships, 2.34 m**, at a load draught of 17 ft 4 in / 18 ft 4 in (read, page image) | Steel's bodies table for the 36 from its page image. **Plainly:** Steel's 36, not *Amazon*'s own lines (not reached) |
 | brig, merchant-brig (*Harpy*'s hull) | the *Raven* brig's contract of 1804 (Steel 1805 pp. lix ff., OCR `:44331-44390`): waist, deck ends, height of breadth, moulded breadths; scaled from 100 ft to 95 ft (judgement) | the same; Winfield's draughts | the *Raven*'s sills 16 in above the deck; Steel p. 124, "sloops, cutters, &c." four to five feet above the water (`:8268-8271`): **1.22-1.52 m against the file's 2.1** | the load line the *Raven*'s figures stand on |
 | topsail-schooner, privateer-schooner (*Lynx*'s draught) | Chapelle 1930 fig. 17, the *Musquidobit* draught (held scan, p. 82) | the same | Spider's 3 ft 5 in above the water, 10 in above the deck (Chapelle pp. 166-167; the file's own, `gen_ships.py:4152-4155`) | the plate's sheer and stations, measured |
-| cutter (*Sherbourne*) | Steel 1805, "a cutter, on a new construction, of 278 tons" (OCR `:27779-27841`), scaled (judgement) | Fincham 1843 p. 67 (the file's own); Steel's rule | Steel p. 124's four to five feet; the file's 1.5 m within it | the bodies table's page image |
-| lugger (*Éclair*) | RMG ZAZ6306, the gun lugger taken off afloat, 2 July 1795 (catalogue: `VesselReferences-2026-10.md:85`) | the same | the same; Steel p. 124 failing it | the free 1280-px image, to be fetched and measured |
+| cutter (*Sherbourne*) | Steel 1805, "a cutter, on a new construction, of 273 tons" (the page image; the OCR at `:27779-27841` misreads 278: `ships-design/pages-steel-1805-bodies.md`), scaled (judgement) | Fincham 1843 p. 67 (the file's own); Steel's rule | Steel p. 124's four to five feet; the file's 1.5 m within it | the bodies table's page image |
+| lugger (*Éclair*) | RMG ZAZ6306, the gun lugger taken off afloat, 2 July 1795 (catalogue: `VesselReferences-2026-10.md:85`) | the same | the same; Steel p. 124 failing it | the 1280-px image, measured (`ships-design/pages-zaz6306.md`; Crown copyright, never copied) |
 | smack (*Culloden*) | Chapman 1768 Pl. LIX No. 3; Steel 1805's coasting sloop of 60 tons (OCR `:28504-`), scaled | the same | no guns by default (§9.1) | Chapman's plate |
 
 Where a point is not yet measured it is written as judgement in its note, never left out
@@ -1247,7 +1247,8 @@ Each builder's branch is reviewed as soon as it is done, then fixed (plan Phase 
 **Answered by the owner (2026-10-28; Decisions, "The design's questions").** Item 3: "as carried
 1796". Item 4: the spritsail yard only, out of plain sail. Items 5, 6 and 8: as proposed. Item 7:
 as proposed, except the lifts, now drawn on every yard (§6). Item 10: the six-inch margin. Item
-11: to be fetched. Still open: 1, 2, 9, the weather side of 10, 12 and 13.
+11: fetched and read (below). Item 13: left out (below). Still open: 1, 2, 9, the weather side
+of 10, and 12.
 
 1. **D18:** (a) proposed for every file (§5.5); the razee's gun deck at 1.39 m, or (c) her old
    upper deck at 3.66 m; decided on B5's screenshots.
@@ -1269,14 +1270,22 @@ as proposed, except the lifts, now drawn on every yard (§6). Item 10: the six-i
 9. **The swivel's charge** halves, 4 oz to 2 oz, by the table's half-pounder (§10).
 10. **The weather side's ports** under a roll beyond the heel, and the six-inch reopening margin
     (§7.1).
-11. **Pages to read** (public domain, filed with provenance): Steel 1805's bodies tables for the
-    36-gun frigate, the 278-ton cutter and the 60-ton sloop; ZAZ6306; Chapelle's fig. 17;
-    Chapman's Pl. LIX.
+11. **Pages to read** (filed with provenance): Steel 1805's bodies tables for the 36-gun
+    frigate, the 273-ton cutter and the 60-ton sloop; ZAZ6306; Chapelle's fig. 17; Chapman's
+    Pl. LIX. *Done (2026-10-28):* the four notes `ships-design/pages-*.md`, the images cached
+    outside the repository (`docs/references/README.md`). ZAZ6306 is Crown copyright: read and
+    measured, never copied.
 12. **The revenue cutter's guns** (the hired cutters' long guns stand in) and the *Éclair*'s
     calibre.
 13. **The driver** of the 64 and the 74 (Indf §4.4; Ext §14 item 10): the occasional light-weather
     sail hoisted to the mizen yard's peak on its own small yard, abaft the mizen course. The
-    mizen course itself stays her after sail. Left out unless the owner asks for it.
+    mizen course itself stays her after sail. *Left out (2026-10-28; the owner left the choice to
+    the session):* a light-weather sail, and carrying it would reopen the approved engine design.
+    Lever sets it like a studding sail: its yard hoisted to the peak, the tack to the weather fife
+    rail, the sheet to a pole run out over the taffrail
+    (`docs/references/lever/lever-1827-young-sea-officers-sheet-anchor-ocr.txt:8264-8270`). A
+    later package may add it as a ringtail whose host sail has no boom (`physics/sails.py`
+    `_gaff_host`).
 
 ### 19.2 For the lead
 
