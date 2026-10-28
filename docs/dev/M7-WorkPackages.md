@@ -294,8 +294,10 @@ failed: the pictures test under load, passing alone, and its own stiffness line,
 its file rerun), the slow tier whole on that tree (334 passed, none failed, 11 expected
 failures) and the pace tests alone (9 passed, truth 7-159 at 481 against 500 on this loaded
 machine, as 72's own first run had it; not re-pinned); after them one line of `water.py`
-and the notes changed. **The whole suite on the merged tree is the lead's in the cloud by
-the whole-suite workflow (the figures below when it ends).** Built as briefed, generously:
+and the notes changed. **The whole suite on the merged tree in the cloud (run 2 of the
+whole-suite workflow, 40 minutes): every shard green but truth 7b-108's harbour line unseen
+on the runner (an environment's failure, mended since by a flush), the pace job informative
+with 7-159 at 491 on a shared runner.** Built as briefed, generously:
 **the water in the ship** one quantity the keeper sums each tick (shot holes by the orifice
 law, the ground, the seams working in a roll, the sea shipped unless battened, the
 director's causes), the well's depth and the carpenter's feet, **the pumps** the ship
@@ -404,8 +406,11 @@ station keeping by kind among sails in sight, hyphen-aware); **no recorded passa
 (the hail's gating reverted in a copy and 37 logs compared: identical but for one unasserted
 scene); the records recast into the line's files with the one model-naming line reworded;
 the builder's fast tier 3,891 passed and one failed (the pictures test's threshold on this
-machine), the touched files' slow tier 147 passed, 8 expected failures; **the whole suite
-on the merged tree is the lead's in the cloud (the figures below when it ends).**
+machine), the touched files' slow tier 147 passed, 8 expected failures; **the whole suite on the
+merged tree in the cloud (run 3 of the whole-suite workflow, 41 minutes): every shard green
+but truth 7b-108's harbour line unseen on the runner (mended by the flush at `8db8b9a`),
+the pace job informative with 7-159 and the gate day under the build machine's floor on a
+shared runner, as before.**
 
 **Judgements, the lead's:** the privateer schooner's eight small-arms men and twenty-six
 boarders, scaled from the cutter's and marked provisional, accepted for 75 to source. **The
