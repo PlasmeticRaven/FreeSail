@@ -1,0 +1,63 @@
+# FreeSail: the leak (spec M7 §13, §14; package 73; the design in
+# docs/design/Design-WaterAndHealth.md). The King's cutter Sherbourne, homeward for
+# Falmouth across the mouth of the Channel in a fresh westerly of June 1805, four leagues
+# south of the Lizard; half an hour out the carpenter reports a seam working below the
+# wale (the director's form `aboard: a seam found working`, given here by the scenario's
+# world orders), making some two tons an hour, and two more open in the next hour as she
+# labours; her own seams work in the seaway besides. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/leak.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/leak.yaml
+#
+# Played by the rules captain with no model seated: he mans the pumps when the well shows a
+# foot of water (`pumps_at_m`, data/captains/kings-ship.yaml) and the keeper spells the
+# hands every half hour; the carpenter's caulking is the player's or the doctrine's (`stop
+# the leak`, three hours of the carpenter's crew at the seams). Played by the player at the
+# captain's station: `the well`, `the leaks`, `the pumps` are the readings; `man the
+# pumps`, `spell the pumps`, `secure the pumps`, `stop the leak`, `batten down the hatches`
+# the orders; left alone the well gains some five tons an hour against a cutter's forty to
+# the metre, and the free surface takes her stiffness before the water takes her.
+#
+# The weather is pinned (a westerly of twenty-four knots, a strong breeze, the sea she
+# labours in), so that the leak at seed 7 is the same on every machine; its figures are
+# measured in tests/test_known_truths.py (truth 7-184) and recorded in docs/dev/TuningNotes.md
+# (package 73).
+
+name: The leak
+seed: 7
+start: 1805-06-12T10:00
+position: {lat_deg: 49.80, lon_deg: -5.30}   # four leagues south of the Lizard
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/cutter.yaml
+  heading_deg: 45
+  speed_kn: 6
+  fit: carronades
+  glass: true
+intent: bound for Falmouth
+wind:
+  from_deg: 270
+  knots: 24
+  gustiness: 0.0
+  variability: 0.0
+
+papers:
+  chart: {year: 1804}
+  almanac: 1805
+
+ports: [falmouth, plymouth]
+
+standing_orders:
+  - data/standing_orders/starter.orders
+
+orders:
+  - set plain sail
+
+# The seams found working, by the director's forms (data/director/aboard.yaml,
+# `seam_working`: a leak of two tons an hour from each until the carpenter caulks it), half
+# an hour out and an hour and a half out; the reasons given so that the channel's doubt
+# (a seam opens under a labouring ship) does not hold them back in a quieter sea.
+world_orders:
+  - {at: 1805-06-12T10:30, order: "aboard: a seam found working [reason: the scenario's leak, she has been working in the seaway]"}
+  - {at: 1805-06-12T11:00, order: "aboard: a seam found working [reason: a second seam as she labours]"}
+  - {at: 1805-06-12T11:30, order: "aboard: a seam found working [reason: a third seam as she labours]"}

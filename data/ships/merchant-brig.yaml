@@ -1865,6 +1865,8 @@ crew:
       yard: 1
     # Spare rope (judgement).
     cordage_fathoms: 150
+    # The carpenter's shot plugs (package 73, spec M7 §14): tapered plugs of soft wood with oakum and tallow, kept ready in action (the Regulations and Instructions 1806, the Carpenter; Falconer 1780, PLUG: 'shot-plugs ... to stop holes made by cannon shot'); the count by her class, judgement. A merchantman's 4.
+    shot_plugs: 4
     # The sail room (spec 3b §6.3): a trader's second suit of the sails she wears out; see tools/gen_ships.py.
     sails:
     # A second fore and main topsail and jib (judgement).
@@ -1908,6 +1910,10 @@ crew:
     powder: 0
     # A merchantman's weapon is her heels: the sails before the guns (judgement).
     priority: sail before guns
+    # Two men with the master's muskets from the cabin (judgement: a merchant brig's chest of arms).
+    small_arms: 2
+    # Six of the merchant brig's hands: a trader does not board (judgement).
+    boarders: 6
 # The armament (spec M7 7; package 70): the merchant brig's few guns, one fit, her magazine a trader's (twenty round and a little grape a gun: judgement). Every figure's source is in tools/gen_ships.py; the weights are from memory.
 armament:
   default: merchant
@@ -1967,6 +1973,19 @@ armament:
 # The hold (package 35, spec M5 §23): room for 158 tons of cargo beyond her own stores, 0.5 of the 316.133 tons burthen (a merchant brig's hold, her trade: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 158
+# The pumps (package 73, spec M7 §13): the chain pump of Cole and Bentinck, a ton in 43 seconds and a half with four men (Falconer 1780, PUMP), and the common brake pump with two; the counts by the ship's class (Lavery, Arming and Fitting; Steel 1794); see tools/gen_ships.py.
+pumps:
+# A brake pump (the common or elm-tree pump): two men, 15 tons an hour fresh (judgement).
+- id: pump.hand.1
+  kind: hand
+  name: the starboard pump
+  tons_per_hour: 15.0
+  hands: 2
+- id: pump.hand.2
+  kind: hand
+  name: the larboard pump
+  tons_per_hour: 15.0
+  hands: 2
 # The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 (BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule for the boat herself; see tools/gen_ships.py.
 boats:
 # The long-boat, a merchantman's one great boat, stowed amidships (Luce's rule on a small vessel's scale).

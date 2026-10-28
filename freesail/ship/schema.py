@@ -208,7 +208,7 @@ ARMAMENT_KEYS = ("default", "fits")
 # The quarter bill beyond the gun crews (spec M7 §8a; `docs/design/Design-WorkInAction.md`):
 # the sail trimmers by station, the hands at the helm, the powder, and the fighting book's
 # priority between the sails and the guns when hands are short.
-QUARTER_BILL_KEYS = ("trimmers", "helm", "powder", "priority")
+QUARTER_BILL_KEYS = ("trimmers", "helm", "powder", "priority", "small_arms", "boarders")
 PRIORITIES = ("sail before guns", "guns before sail")
 
 # Default load ratings (kN) by class, used with a warning when a file omits one.
@@ -271,6 +271,9 @@ SEAMAN_STATIONS = CREW_STATIONS[:6]
 
 # The ratings a ship file may share its seamen among, best first.
 SEAMAN_RATINGS = ("able", "ordinary", "landsman")
+# The ratings a named role may be drawn by (package 73): the seamen's, and the marines'
+# for the detachment's officer and sergeant (`crew.model.Rating`).
+PERSON_RATINGS = SEAMAN_RATINGS + ("marine", "petty officer", "idler", "officer")
 RATINGS_SUM_TOLERANCE = 1e-6  # the shares must add up to one within this
 
 # The idlers' trades (spec §2.1): what the `idlers_by_trade` mapping may name.
@@ -295,6 +298,7 @@ STORE_KEYS = (
     "spare_spars",
     "cordage_fathoms",
     "sails",  # milestone 3b: the sail room's contents, one entry a sail (spec 3b §6.3)
+    "shot_plugs",  # package 73 (spec M7 §14): the carpenter's shot plugs, counted
 )
 SPARE_SAIL_KEYS = ("kind", "canvas_no", "condition")
 
@@ -441,6 +445,7 @@ class StoresSpec:
     cordage_fathoms: float = 0.0
     sails: list[SpareSailSpec] | None = None  # the sail room, when the file lists it
     spars: dict[str, int] | None = None  # the booms by spar class (package 30b), when given so
+    shot_plugs: float = 0.0  # the carpenter's shot plugs (package 73, spec M7 §14)
 
 
 @dataclass
@@ -480,6 +485,10 @@ class QuarterBillSpec:
     helm: int = 2
     powder: int = 0
     priority: str = "sail before guns"
+    # package 73 (spec M7 §11): the small-arms men with the stand of arms' muskets, and
+    # the boarders told off from the guns' crews (Luce 1884 ch. XX), beside the marines
+    small_arms: int = 0
+    boarders: int = 0
 
 
 @dataclass
@@ -619,6 +628,24 @@ class GearSpec:
     hooks: int | None = None
 
 
+@dataclass
+class PumpSpec:
+    """One of the ship's pumps (package 73, spec M7 §13): its kind (the chain pump of Cole
+    and Bentinck, standard in the King's ships by 1805, or the common brake pump), the
+    name the hands use, the tons of water an hour it lifts with its hands fresh at it and
+    the hands it wants (Falconer 1780, PUMP: the chain pump "wrought by four men,
+    discharged a ton of water in 43 seconds and a half"). Read by `freesail/world/water.py`."""
+
+    id: str
+    kind: str
+    name: str
+    tons_per_hour: float
+    hands: int
+
+
+PUMP_KINDS = ("chain", "hand")
+PUMP_KEYS = ("id", "kind", "name", "tons_per_hour", "hands")
+
 GEAR_KINDS = ("trawl", "drift nets", "seine", "lines")
 GEAR_KEYS = ("id", "kind", "name", "beam_ft", "length_fathoms", "nets", "hooks")
 
@@ -646,6 +673,7 @@ class ShipSpec:
     boats: list[BoatSpec] = field(default_factory=list)  # none: no boat to send (package 35)
     gear: list[GearSpec] = field(default_factory=list)  # none: no fishing gear (package 56)
     armament: ArmamentSpec | None = None  # None: no guns, and the gunnery refused in words
+    pumps: list[PumpSpec] = field(default_factory=list)  # none: no pumps (package 73)
 
 
 # ---------------------------------------------------------------------------
@@ -718,9 +746,45 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         armament=(
             _parse_armament(data["armament"], source) if data.get("armament") is not None else None
         ),
+        pumps=_parse_pumps(data["pumps"], source) if data.get("pumps") is not None else [],
     )
     validate(spec)
     return spec
+
+
+def _parse_pumps(raw: Any, source: str) -> list[PumpSpec]:
+    """The `pumps:` list (package 73, spec M7 §13): each a mapping of PUMP_KEYS."""
+    if not isinstance(raw, list):
+        raise ShipFileError(f"{source}: 'pumps' is not a list of pumps.")
+    pumps: list[PumpSpec] = []
+    seen: set[str] = set()
+    for i, p in enumerate(raw):
+        where = f"pump #{i + 1}"
+        if not isinstance(p, dict):
+            raise ShipFileError(f"{source}: {where} is not a mapping.")
+        for key in p:
+            if key not in PUMP_KEYS:
+                raise ShipFileError(
+                    f"{source}: {where} has '{key}', which is no key of a pump; the keys are "
+                    f"{', '.join(PUMP_KEYS)}."
+                )
+        pid = _str(p, "id", where, source)
+        if pid in seen:
+            raise ShipFileError(f"{source}: the pump id '{pid}' is given twice.")
+        seen.add(pid)
+        kind = _str(p, "kind", where, source)
+        if kind not in PUMP_KINDS:
+            raise ShipFileError(
+                f"{source}: {where} is a '{kind}' pump; the kinds are {' or '.join(PUMP_KINDS)}."
+            )
+        tons = _num(p, "tons_per_hour", where, source)
+        hands_n = p.get("hands")
+        if isinstance(hands_n, bool) or not isinstance(hands_n, int) or hands_n < 1:
+            raise ShipFileError(
+                f"{source}: {where} wants {hands_n!r} hands; say a number, one or more."
+            )
+        pumps.append(PumpSpec(pid, kind, _str(p, "name", where, source), float(tons), int(hands_n)))
+    return pumps
 
 
 def _parse_armament(raw: Any, source: str) -> ArmamentSpec:
@@ -868,6 +932,8 @@ def _parse_quarter_bill(raw: Any, source: str) -> QuarterBillSpec:
         helm=_count(raw.get("helm", 2), "the hands at the helm", source),
         powder=_count(raw.get("powder", 0), "the powder's hands", source),
         priority=priority,
+        small_arms=_count(raw.get("small_arms", 0), "the small-arms men", source),
+        boarders=_count(raw.get("boarders", 0), "the boarders", source),
     )
 
 
@@ -1702,7 +1768,8 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
         station = _known(p.get("station", "afterguard"), CREW_STATIONS, "the station", source)
         rating = p.get("rating")
         if rating is not None:
-            rating = _known(rating, SEAMAN_RATINGS, "the rating", source)
+            # package 73: the marines' officer and sergeant are drawn by the rating `marine`
+            rating = _known(rating, PERSON_RATINGS, "the rating", source)
         messenger = p.get("messenger", False)
         if not isinstance(messenger, bool):
             raise ShipFileError(

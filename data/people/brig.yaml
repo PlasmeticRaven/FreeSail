@@ -119,3 +119,16 @@ wardroom:
       Carries the commander's word about the brig (pass the word for, send for), keeps a
       watch by the bill and learns the reckoning from the master.
     note: A midshipman as the messenger, one of the boys of the afterguard.
+  # package 73 (spec M7 §11): a brig-sloop's party of marines under its sergeant, no
+  # officer (the sloops' establishment; from memory), drawn from the twenty
+  - role: sergeant of marines
+    drawn: {station: marines, rating: marine}
+    rank: sergeant of marines
+    station: the marines
+    place: deck
+    traits: [a loud voice, the halberd, twenty years' service]
+    history: "The Nile as a corporal."
+    brief: >-
+      Commands the brig's party: the sentries, the drill, the guard; at quarters the
+      gangways and the fire by volley within musket shot, the boarders' backbone.
+    note: The sergeant of marines, commanding a brig-sloop's party, drawn from the twenty.

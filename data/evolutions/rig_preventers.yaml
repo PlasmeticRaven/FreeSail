@@ -1,0 +1,27 @@
+# Rig the preventer braces, the preventer backstays, or sling the yards with chains before
+# an action (spec M7 §14; package 73; scripted, RigPreventersScript in
+# evolutions/repair_scripts.py). Clearing for action, "preventer-braces are rove, the yards
+# slung with chains, the stoppers for the rigging prepared" (Luce 1884, ch. XX 'General
+# Quarters'; the logs' "rove preventer braces and slung the lower yards" before an action).
+# A line with a preventer rove keeps its office when it parts or is shot away: the
+# preventer takes the strain and the line is parted no further (the strain model's
+# `_part_line`, the one place a line parts, consumes it with a note), so the sail does not
+# come down nor the yard swing. `params.what`: `braces` (every yard's braces), `backstays`
+# (every backstay), `slings` (the halyards and ties of the lower and topsail yards, with
+# chains). Each takes its fathoms from the boatswain's store (`crew.stores.cordage_fathoms`;
+# the chains are not counted). One phase, `reeve` (aloft).
+id: rig_preventers
+verb: rig_preventers
+applies_to: {class: ship}
+script: rig_preventers
+params: {what: braces, aloft: [reeve]}
+preconditions: []
+timing:
+  reeve_s: 1200   # the preventers rove and set up, or the chains passed round the yards: twenty minutes (judgement)
+on_start: {log: "{begin}"}
+on_complete: {log: "{done}", kind: preventers.rigged, severity: notable}
+on_fail: {log: "Could not rig the {what_words}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the topmen aloft with the preventers and the afterguard at the falls: twelve hands
+# (judgement)
+crew: {hands: 12, rating: able, stations: [topmen, forecastle, afterguard]}
+source: "Luce 1884, ch. XX 'General Quarters' (preventer braces rove, the yards slung with chains); the minutes judgement"

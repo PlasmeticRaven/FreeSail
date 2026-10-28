@@ -203,6 +203,11 @@ class Spar(Part):
     # (Steel 1794 vol. I, p. 167, HORSE); the sheet's geometry reads it (evolutions/trim.py).
     # 0: no horse given; the geometry takes a quarter of the boom's length.
     horse_m: float = 0.0
+    # A jury mast (package 73, spec M7 §14): a lower mast carried away standing again on a
+    # spare topmast stepped in its stump, at a share of its rating (`rating_whole_kn` the
+    # file's figure, kept for the dockyard); dataclass defaults, so older saves load
+    jury: bool = False
+    rating_whole_kn: float = 0.0
 
     @classmethod
     def from_spec(cls, s: SparSpec) -> Spar:
@@ -394,6 +399,11 @@ class Line(Part):
     # lies to leeward, as a sheet lets it. A sail with a sheet each side needs no such
     # flag: it lies on the side whose sheet is hauled.
     held_side: str | None = None
+    # A preventer rove beside it (package 73, spec M7 §14: the preventer braces and
+    # backstays and the chain slings before an action): when the line parts or is shot
+    # away the preventer takes the strain and the line keeps its office, the preventer
+    # consumed (`physics.strain._part_line`); a dataclass default, so older saves load
+    preventer: bool = False
 
     @classmethod
     def from_spec(cls, ln: LineSpec) -> Line:
@@ -1330,6 +1340,20 @@ def ground_tackle(ship: Any) -> GroundTackle | None:
 class Hull:
     spec: HullSpec
     water_in_well_m: float = 0.0
+    # the free surface's loss of metacentric height (package 73, spec M7 §13; written by
+    # `freesail/world/water.py` from the water in the ship, nought with a dry well); a
+    # dataclass default, so that a checkpoint from before loads with none
+    free_surface_m: float = 0.0
+
+    @property
+    def gm_m(self) -> float:
+        """The metacentric height as she floats now: the file's figure less the free
+        surface's, floored at the motion's own floor. The heel's balance
+        (`physics/hull.py`) and the roll (`physics/motion.py`) read this in place of the
+        file's figure: the one place the water's quantity reaches the stability (the
+        physics itself is not changed)."""
+        fs = float(getattr(self, "free_surface_m", 0.0) or 0.0)
+        return max(0.05, float(self.spec.gm_m) - fs)
 
     @property
     def length(self) -> float:

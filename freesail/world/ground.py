@@ -15,11 +15,13 @@ dozen fathoms deep in the tiles and a mile of ledges in the pilot). When she str
   rule on a blow proportional to the square of her speed (`strain.shock_spars`,
   `SHOCK_SPEED_KN`: judgement, at six knots the topmasts go);
 - **a leak**, by the bottom's kind and her speed: on rock her planks are stove and the
-  well rises fast, on sand or mud it is a trickle (judgement in the rates; the pumps are
-  milestone 8's with the well's reading, so the carpenter reports each foot and at two
-  metres she is waterlogged and nothing more is modelled, which the tuning notes say;
-  until then the director's `aboard: the leak stopped` and `aboard: the well pumped out`
-  stand in for the carpenter's crew and the pumps, a hotfix of 2026-10-21);
+  well rises fast, on sand or mud it is a trickle (judgement in the rates, in metres of
+  the well an hour, kept to the number since the hotfix of 2026-10-21); the rate is
+  written to `ship.extra["leak_m_per_h"]` and the water itself is the keeper's
+  (`freesail/world/water.py`, package 73, spec M7 §13): it flows into the one quantity of
+  water in the ship with the shot holes' and the seams', the carpenter reports each foot,
+  the pumps gain on it or lose, the carpenter caulks it (`stop the leak`) and the
+  director's `aboard: the leak stopped` and `the well pumped out` stay his causes;
 - **the log**: the urgent line with her speed, heel, the tide rising or falling and the
   ground, then the master's word on when she should float, which is *his* tide (the
   epitome's next high water, `tide.Epitome`), never the world's; and the world's own line
@@ -58,7 +60,6 @@ __all__ = [
     "LEAK_SOFT_M_PER_H",
     "LEAK_REFERENCE_KN",
     "SHOCK_SPEED_KN",
-    "WATERLOGGED_M",
     "Ground",
     "Grounded",
 ]
@@ -73,9 +74,6 @@ SHOCK_SPEED_KN = 6.0
 LEAK_ROCK_M_PER_H = 0.6
 LEAK_SOFT_M_PER_H = 0.05
 LEAK_REFERENCE_KN = 4.0
-# Past this in the well she is waterlogged and nothing more is modelled (the pumps and
-# the well's reading are milestone 8's).
-WATERLOGGED_M = 2.0
 FOOT_M = 0.3048
 
 # The dangers about her are read from the chart's index once a minute and tested every
@@ -141,8 +139,6 @@ class Ground:
         self.grounded: Grounded | None = None
         self._dangers: list[Any] = []
         self._dangers_tick = -DANGERS_REFRESH_S
-        self._feet_said = 0
-        self._waterlogged_said = False
         self._came_home_said = False
         self._anchor_dist: dict[str, float] = {}
 
@@ -190,8 +186,6 @@ class Ground:
             self._afloat()
         elif touched is not None and self.grounded is not None:
             self._heave_off(plain)
-        if self.grounded is not None:
-            self._leak()
 
     # -- the strike -----------------------------------------------------------------------
 
@@ -279,37 +273,7 @@ class Ground:
         )
         world.record(Severity.NOTABLE, "ground.master", text, data={"rising": False} | said)
 
-    # -- the leak and floating off ---------------------------------------------------------
-
-    def _leak(self) -> None:
-        world = self.world
-        ship = world.ship
-        extra = getattr(ship, "extra", None)
-        hull = getattr(ship, "hull", None)
-        if extra is None or hull is None:
-            return
-        rate = float(extra.get("leak_m_per_h", 0.0))
-        if rate <= 0.0:
-            return
-        hull.water_in_well_m = min(WATERLOGGED_M, hull.water_in_well_m + rate / 3600.0)
-        feet = int(hull.water_in_well_m / FOOT_M)
-        if feet > self._feet_said:
-            self._feet_said = feet
-            n = "a foot" if feet == 1 else f"{feet} feet"
-            world.record(
-                Severity.NOTABLE,
-                "well.rising",
-                f"The carpenter reports {n} of water in the well, and gaining.",
-                data={"well_m": round(hull.water_in_well_m, 2), "feet": feet},
-            )
-        if hull.water_in_well_m >= WATERLOGGED_M and not self._waterlogged_said:
-            self._waterlogged_said = True
-            world.record(
-                Severity.URGENT,
-                "ship.waterlogged",
-                "She is waterlogged; the water has beaten the carpenter's crew.",
-                data={"well_m": round(hull.water_in_well_m, 2)},
-            )
+    # -- floating off ---------------------------------------------------------------------
 
     def _afloat(self, kedged: bool = False) -> None:
         world = self.world
@@ -420,9 +384,10 @@ def sound_well(world: Any) -> tuple[str, dict[str, Any]]:
     """`sound the well`: the carpenter's rod down the pump well (Falconer 1780, PUMP; the
     carpenter to sound it "twice at least in each watch", spec M3's reading of the
     Regulations), the water in feet and inches, and against his last sounding whether she
-    gains. The water is the grounding's leak's (`Ground._leak`) and nothing yet besides;
-    the sounding is kept in `ship.extra["well_sounded"]` (tick, metres, words) for the
-    reading `the well`, and a replay of the order makes it again."""
+    gains. The water is the keeper's (`freesail/world/water.py`, package 73: the shot holes,
+    the ground, the seams and the sea, less the pumps); the sounding is kept in
+    `ship.extra["well_sounded"]` (tick, metres, words) for the reading `the well`, and a
+    replay of the order makes it again."""
     ship = world.ship
     hull = getattr(ship, "hull", None)
     metres = float(hull.water_in_well_m) if hull is not None else 0.0

@@ -86,6 +86,12 @@ def tick_action(world: Any) -> None:
     battery.tick(1.0, quarters, firer, target, rng, tick, HITS.resolve_shot)
     if target is not None and battery.rounds_fired > fired_before:
         _fired_on(world, battery, target, tick, opened_before)
+    # package 73 (spec M7 §11, §11a): the marines' and the small arms' fire within musket
+    # shot of a near deck, and the fight on deck while grappled
+    from freesail.combat import boarding, small_arms
+
+    small_arms.tick(world, ship, target, firer, tick, rng)
+    boarding.tick(world)
     if minute:
         line = battery.minute_line(tick)
         if line is not None:

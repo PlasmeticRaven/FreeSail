@@ -360,7 +360,10 @@ def equilibrium_heel(hull: Hull, heel_moment_nm: float, side_force_n: float) -> 
     """
     keel = HEEL_KEEL_LEVER_FRACTION * hull.spec.draught_m
     moment = heel_moment_nm + side_force_n * keel
-    righting = hull.spec.displacement_kg * units.G * hull.spec.gm_m
+    # the metacentric height as she floats (package 73: the file's less the free surface's
+    # loss, `parts.Hull.gm_m`; the file's own figure with a dry well)
+    gm = float(getattr(hull, "gm_m", hull.spec.gm_m))
+    righting = hull.spec.displacement_kg * units.G * gm
     if righting <= 0:
         return 0.0
     ratio = max(-1.0, min(1.0, moment / righting))

@@ -312,7 +312,10 @@ TRIAL_TRADE_STRANGER_ANCHORED_TICKS = [51849]  # package 70 (53669 at 58b)
 # of the wind's eye (`navigation.CHASE_TACKS_FOR_HER`, three lines fewer); every state and
 # the anchor at 51849 as at 70, proved by bisection (the switches off give 1248 and
 # 0a480f7a4b7f321a again)
-TRIAL_TRADE_STRANGER_LINES = 1246  # package 71 (1248 at 70; 1407 at 58b; 1534 at 56; 1521 at 57)
+# package 73: the butcher's bill said once after the brig's fire ("nobody hurt"), and the
+# brig-sloop's captain serving out the small arms on entering the action, so that her fire on
+# the schooner falls differently (the same lines, other texts); docs/dev/TuningNotes.md, 73
+TRIAL_TRADE_STRANGER_LINES = 1247  # package 73 (1246 at 71; 1248 at 70; 1407 at 58b; 1534 at 56)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
@@ -320,7 +323,9 @@ TRIAL_TRADE_STRANGER_LINES = 1246  # package 71 (1248 at 70; 1407 at 58b; 1534 a
 # package 56, the glass: 7b8012b076ebea42 (e73870448a788eac at 57)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 5bbca78fdc6b5093; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
-TRIAL_TRADE_STRANGER_DIGEST = "e55bc37c58ccb31b"  # package 71 (0a480f7a4b7f321a at 70)
+TRIAL_TRADE_STRANGER_DIGEST = (
+    "11b8a45bdc8c935a"  # package 73 (e55bc37c58ccb31b at 71; 0a480f7a4b7f321a at 70)
+)
 
 
 @pytest.fixture(scope="module")

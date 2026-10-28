@@ -1343,6 +1343,7 @@ class Runner:
             "id": inst.evo.id,
             "verb": inst.evo.verb,
             "subject": name,
+            "subject_id": inst.subject_id,  # package 73: the repair scripts find their part by it
             "ship": ship.name,
             "sail": name,
             "yard": name,

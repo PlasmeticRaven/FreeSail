@@ -129,6 +129,14 @@ ROLE_WORDS: dict[str, str] = {
     "second mate": "second mate",  # the merchant brig's (package 68)
     "surgeon": "surgeon",
     "doctor": "surgeon",
+    # package 73 (spec M7 §11): the marines' officer and sergeant
+    "lieutenant of marines": "lieutenant of marines",
+    "marine officer": "lieutenant of marines",
+    "officer of marines": "lieutenant of marines",
+    "the marines officer": "lieutenant of marines",
+    "sergeant of marines": "sergeant of marines",
+    "sergeant": "sergeant of marines",
+    "the sergeant": "sergeant of marines",
     "purser": "purser",
     "boatswain": "boatswain",
     "bosun": "boatswain",
@@ -341,6 +349,8 @@ class Person:
     # the place ashore he went to at his port (package 53; spec M7b §14: the quay, the
     # market, ...; `places.port_places`): "" for where his role is found, or the quay
     ashore_at: str = ""
+    # dead (package 73, spec M7 §16a): his station ended, the command passed by the bill
+    dead: bool = False
 
     @property
     def rank(self) -> str:
@@ -684,17 +694,27 @@ class People:
                     return found
         return None
 
+    # the person the command passed to when the man in command was killed (package 73,
+    # spec M7 §16a; `crew/health.py`): a class default, so older saves load
+    command_passed_to: str | None = None
+
     @property
     def captain(self) -> Person:
         self._build()
+        passed = getattr(self, "command_passed_to", None)
+        if passed:
+            for p in self.people:
+                if p.id == passed and not getattr(p, "dead", False):
+                    return p
         for p in self.people:
-            if p.role in ("captain", "commander"):
+            if p.role in ("captain", "commander") and not getattr(p, "dead", False):
                 return p
         # a vessel whose master commands (the schooner, the cutter): the master is the captain
         for p in self.people:
-            if p.role == "master":
+            if p.role == "master" and not getattr(p, "dead", False):
                 return p
-        return self.people[0]
+        alive = [p for p in self.people if not getattr(p, "dead", False)]
+        return alive[0] if alive else self.people[0]
 
     @property
     def messenger(self) -> Person | None:
@@ -823,7 +843,21 @@ class People:
 
     def state_words(self, p: Person) -> str:
         """'on the quarterdeck', 'below, asleep', 'ashore', 'in the boat', 'sick', 'at the
-        lunar, below'."""
+        lunar, below'; a man wounded or hurt says so first (package 73, spec M7 §16)."""
+        words = self._state_words(p)
+        if getattr(p, "dead", False) or p.where == "cockpit":
+            return words
+        crew = (getattr(self.world.ship, "extra", None) or {}).get("crew")
+        s = crew.by_id.get(p.sailor_id) if crew is not None and p.sailor_id else None
+        hurt = getattr(s, "hurt", "") if s is not None else ""
+        if hurt == "wounded":
+            how = getattr(s, "hurt_how", "")
+            return f"wounded ({how}), {words}" if how else f"wounded, {words}"
+        if hurt == "hurt":
+            return f"hurt and at light duty, {words}"
+        return words
+
+    def _state_words(self, p: Person) -> str:
         if not p.aboard and p.where == "shore":
             # ashore at his port, at one of its places (package 53; spec M7b §14)
             from freesail.world.movement import ashore_words
@@ -831,6 +865,10 @@ class People:
             return ashore_words(self.world, p)
         if not p.aboard and p.where in ("boat", "cutter"):
             return place_words(p.where)
+        if getattr(p, "dead", False):
+            return "dead"
+        if p.where == "cockpit":
+            return "below with the surgeon"
         if p.sick:
             return "sick, in the sick berth"
         needs = p.needs
@@ -1198,6 +1236,8 @@ def _address(role: str, name: str) -> str:
         return f"Captain {surname}"
     if role in ("boy", "midshipman"):
         return f"Mr {surname}" if role == "midshipman" else name
+    if role == "sergeant of marines":
+        return f"Sergeant {surname}"  # package 73
     return f"Mr {surname}"
 
 

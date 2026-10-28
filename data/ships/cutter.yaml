@@ -708,6 +708,8 @@ crew:
       yard: 1
     # Spare rope (judgement).
     cordage_fathoms: 80
+    # The carpenter's shot plugs (package 73, spec M7 §14): tapered plugs of soft wood with oakum and tallow, kept ready in action (the Regulations and Instructions 1806, the Carpenter; Falconer 1780, PLUG: 'shot-plugs ... to stop holes made by cannon shot'); the count by her class, judgement. A cutter's 8.
+    shot_plugs: 8
     # The sail room (spec 3b §6.3), every sail new; see tools/gen_ships.py.
     sails:
     # A spare jib and mainsail (spec M5 §23, judgement).
@@ -749,6 +751,10 @@ crew:
     powder: 2
     # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
     priority: sail before guns
+    # Six of the cutter's best shots with the stand of arms' muskets (judgement); she bears no marines.
+    small_arms: 6
+    # Twenty of the cutter's seamen with cutlass and pistol (judgement: a cutter's company boards almost whole).
+    boarders: 20
 # The armament (spec M7 7; package 70): two fits the scenario chooses between (ship: {fit: ...}; the owner, 2026-10-23): the 12-pounder carronades the Admiralty gave its cutters from the 1790s, the default of 1805, and the long 3-pounders with eight swivels of the revenue and hired cutters. Every figure's source is in tools/gen_ships.py; the weights are from memory and UNVERIFIED against a page.
 armament:
   default: carronades
@@ -987,6 +993,19 @@ armament:
 # The hold (package 35, spec M5 §23): room for 42 tons of cargo beyond her own stores, 0.5 of the 85 tons burthen (a revenue cutter's hold less her own stores: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 42
+# The pumps (package 73, spec M7 §13): the chain pump of Cole and Bentinck, a ton in 43 seconds and a half with four men (Falconer 1780, PUMP), and the common brake pump with two; the counts by the ship's class (Lavery, Arming and Fitting; Steel 1794); see tools/gen_ships.py.
+pumps:
+# A brake pump (the common or elm-tree pump): two men, 15 tons an hour fresh (judgement).
+- id: pump.hand.1
+  kind: hand
+  name: the starboard pump
+  tons_per_hour: 15.0
+  hands: 2
+- id: pump.hand.2
+  kind: hand
+  name: the larboard pump
+  tons_per_hour: 15.0
+  hands: 2
 # The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 (BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule for the boat herself; see tools/gen_ships.py.
 boats:
 # The cutter's boat, a yawl of four oars (Falconer, YAWL), on the deck amidships.

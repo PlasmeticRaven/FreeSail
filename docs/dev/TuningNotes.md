@@ -9791,3 +9791,230 @@ these notes.
   failed (truth 7-159 at 483 against 500, the scenario's own figure); 7-159 rewritten to
   truth 51's form (581); the second run 10 passed.
 - Truths 7-152 to 7-160 at seed 7 as written; truth 7-145's figures unchanged.
+
+## Package 73: water, damage control, health and the fight on deck (2026-10-27)
+
+The fourth package of milestone 7, built in a worktree off `7da0c0e` (the branch
+`claude/pkg-73`). Spec M7 §11, §11a, §13 to §17 "as built (package 73)" and the §9 line for
+the men struck; `docs/design/Design-WaterAndHealth.md` (the design, written first, with its
+"As built" postscript); `docs/agents/Harness.md` §21f; the primer's chapter 25; the
+director's library page's fifth section; truths 7-172 to 7-184 (the owner's local package took
+7-161 to 7-171); the scenario `leak.yaml`. The physics of the hull, the sails and the sea is
+read and not changed (the free surface is applied where the stability was already a figure:
+`Hull.gm_m`, read by the equilibrium heel and the motion's particulars); the ship files were
+regenerated through `tools/gen_ships.py` (the pumps, the shot plugs, the quarter bill's
+small-arms men and boarders, the marines' two roles) with the sources beside each figure; the
+consent records were not touched; no model identifier anywhere.
+
+### The design, in a paragraph
+
+The water in a ship is one quantity, the tons the keeper of every World sums each tick from
+its sources (the shot holes by the orifice law, the ground, the seams in a seaway, the sea
+shipped, the director's seams), the well's depth the tons over the bilge's floor, the pumps a
+standing work of the hands' pool at Falconer's rates, the free surface a loss of metacentric
+height the physics reads, foundering at half the displacement. The wounded, the sick and the
+dead are states of the muster with the surgeon's queue and the courses the health keeper
+works once a minute, the needs' ends among them; a station holder is a man of the muster with
+his roads at parity. The marines' kit is data by nation, their fire a standing intention within
+musket shot of a near deck, the fight on deck a round a minute by strengths; every repair an
+evolution competing for hands. Everything is state the readings give and the log says.
+
+### The figures and their sources (judgement marked)
+
+| Figure | Value | Source |
+|---|---|---|
+| orifice coefficient | 0.6 | the sharp-edged orifice's discharge coefficient (hydraulics' commonplace) |
+| chain pump / hand pump | 80 / 15 t/h at 4 / 2 men | Falconer 1780, PUMP (a ton a minute for the chain pump) |
+| the pumps' rate by numbers | numbers^1.5 × skill / (fatigue × seaway) | judgement |
+| spell at the brakes | 30 min | Falconer 1780, SPELL; judgement |
+| suck under | 0.05 m | judgement |
+| well floor | 0.45 L B | judgement (the frigate's metre of water 220 t, the cutter's 40) |
+| seams working | 0.02 t/h per 100 t × ((roll − 6°)/4)², cap 25°; ×3 for 24 h after a grounding | the "sucked the pumps dry at eight bells" of a sound ship; judgement |
+| sea shipped | 2 t/h per m of sea over 3 m × L/20, unless battened | judgement |
+| free surface | l b³/12 ∇, l = 0.6 L, b = B·min(1, 0.15 + depth/(0.5 T)), from 0.1 m | the free-surface correction; the breadth floor judgement |
+| founder / settling | 0.5 / 0.6 of the displacement's water | judgement |
+| shot plugs | frigate 40, brig 20, schooner and cutter 8, merchant brig 4, lugger 4, smack 2 | the carpenter's stores by rate; judgement |
+| plug a hole | 600 s above water, 1200 s within 0.5 m under, 2400 s deeper; caulking 10800 s | Falconer 1780, LEAK; judgement |
+| fother | the hole's rate less 0.3 while under 6 kn | Falconer 1780, FOTHERING; judgement |
+| fish / jury | sprung under 60, fished to 70; a jury mast 0.4 of the rating, condition 40 | Luce 1884 ch. XXXI; judgement |
+| the wound | killed 0.3; light / grave half and half | the actions' returns (James); judgement |
+| the surgeon | light 600 s (a mate), grave 1800 s; messmates 3600 s; first come first served | Turnbull 1806; judgement |
+| the courses | light 7–14 d (×1.5 untreated); grave judged at 24 h: dies 0.3 treated / 0.6 not, else invalid 40 d; sick 3–7 d | the surgeons' journals, from memory; judgement |
+| the sick list | foul water 0.02/day; short allowance 0.01/day past 7 d; water out: sick 0.1/day from day 2, dead 0.05/day from day 4 | Trotter, Medicina Nautica; judgement |
+| the needs' ends | thirst 72 h collapse / 96 h death; hunger 7 d / 21 d | the medical commonplaces; judgement |
+| the bill | 600 s after the last shot | judgement |
+| quarterdeck share | 0.2 of the shot's hits aft, 0.4 of the musketry's | spec M7 §11 (history's lesson); judgement |
+| musket shot | 91.44 m (a hundred yards) | spec M7 §11; Falconer 1780, MUSKET |
+| the kits | british volley 20 s, hit at 50 yd 0.05, tops share 0.2; french 30 s, 0.05, 0.4, tops factor 1.5, soldiers; basic 25 s, 0.04, 0.2 | Hughes, Firepower (three rounds a minute; a volley's fifth at a hundred yards); Trafalgar's accounts; judgement |
+| the hit's fall with range | (1 − r/musket shot)² scaled to the kit's figure at 50 yd | judgement |
+| roll scatter | 1/(1 + roll/10°) | judgement |
+| small arms | served 1.0, unserved 0.5; small-arms men 20/6/8/2; boarders 60/20/30/6 | Luce 1884 ch. XX (the station bill); judgement |
+| the fight | round 60 s; ROUND_LOSS 1.0 (losses ~ strength/10); first round cover 1.3 defence, 0.8 attack; CARRIED_RATIO 0.5; CONTEST_ROUNDS 15; REPULSE_COST 0.1; marines' bayonet by the kit (1.3/1.2) | the period's boardings short and decided (James); judgement |
+| the crossing | the defenders' marines at five times the 50-yd chance; a loaded gun bearing one man each | judgement |
+| the grapnels | within 30 m; two minutes and eight hands; hold from the throw | Falconer 1780, GRAPPLING; judgement |
+| the doctrine | board_odds 1.3 (King's ship, cruiser, commodore), 1.0 privateer, 0 merchant and packet; board_when her guns silent (no shot of hers for five minutes; a mark that never answered boarded after a quarter of an hour's engagement); musketry_cables 1; marines_tops kit; pumps_at_m 0.3; give_up_at_share 0.4; damage_priority the leak, the rigging, the guns | sources in each `data/captains/*.yaml` row |
+
+### What was measured
+
+- **The orifice law.** An 18-pounder's hole half a metre under the frigate's waterline:
+  85 t/h; a 12-pounder's a third of a metre under: 50 t/h (7-172, `test_water`). The frigate's
+  four pumps with twelve hands lift 190 t/h and gain; three men at a hand pump lose.
+- **The carpenter.** The hole half a metre under plugged in twenty minutes, the plug counted,
+  the pumps sucking after (7-173).
+- **Foundering.** The cutter with three 18-pounder holes a metre under (some 300 t/h against
+  her 30) founders in the hour, the lines in order: the well rising, the pumps losing, settling,
+  "She is going down: the water has beaten the pumps; the pumps lost her at 10:00" (7-174).
+- **The Manacles.** The frigate on the rock as the ground tests run her; the pumps gain on the
+  leak and `stop the leak` is three hours, after which the ground's leak is nought (7-175).
+- **The leak scenario** (`leak.yaml`, seed 7): three seams at 2 t/h in a strong westerly; the
+  well shows a foot at 13:00 and the merchant doctrine's captain mans the pumps at 0.3 m
+  ("manning the pumps (the well at 0.29 m)"), dry by 13:30, the hand pumps' 30 t/h kept by
+  spells; with the captain aside, 0.6 m at 15:00 and `Hull.gm_m` 1.10 → 0.77 (7-184).
+- **The surgeon.** Twelve hits on the frigate at seed 7: 20 hurt (4 killed, 16 wounded, 5
+  dangerously); the surgeon and two mates clear the queue in three hours; the bill then "four
+  killed, five wounded (five dangerously), eleven hurt and at light duty of 264"; at 24 h two
+  invalided (7-176, 7-177).
+- **Thirst.** The cutter's water and provisions out at seed 7: the captain at the prompt
+  collapses at 72 h (day 15 10:00) and is dead at 96 h, the command passing to Mr Pearce; six
+  men sick on day 3, two more on day 4, the first hand dead of thirst on day 5, buried the next
+  morning (7-178).
+- **The musketry.** The frigate's forty marines at thirty metres of a French frigate at seed 7:
+  three volleys the first minute, one of her people fallen to a musket ball ("musketry from
+  her deck; one killed" in her log); drifting apart at a foot a second the ships are out of
+  musket shot in three minutes (7-179). Twenty small-arms men at will from thirty metres
+  killed five and wounded seven of a frigate's company in five minutes in a probe (her
+  captain's doctrine).
+- **The fight on deck.** A hundred boarders against a frigate's 264 awake on deck: the
+  crossing's volley costs seven, round one 17 of ours to seven of hers (strengths 50 to 110),
+  repulsed, 24 lost to 7 (7-180). Against the same frigate at quarters, her gun crews at the
+  guns (118 defenders), with the arms served out: six rounds, 26 of ours to 44 of hers, the
+  deck carried, "The colours are struck (carried by boarding)" (7-181).
+- **The pace.** The two frigates grappled and fighting ran at the crewed floor's order (the
+  fight's round is a few list comprehensions a minute; the musketry a Poisson draw a tick
+  within musket shot and nothing beyond); no pace truth was pinned and `K.CREWED_FLOOR_TICKS_S`
+  is unchanged.
+
+### The first action at seed 7: a pin moved, the bisection
+
+Package 71 pinned the privateer's strike at **11:12** (3539 s after the first shot, five of
+thirty hurt, seven holes). With package 73 whole she strikes at **11:43** (5399 s, four hurt,
+seven holes): inside 7-133's band (three quarters of an hour to three) and the same victor,
+the minute moved by thirty-one. The bisection, each item off alone and together (the first
+action replayed three hours each, `FS73_BISECT` toggles removed after):
+
+| Items off | Struck | Minutes after the first shot | Her hurt | Holes |
+|---|---|---|---|---|
+| none (package 73 whole) | 11:43 | 90 | 4 | 7 |
+| the marines' and small arms' fire and the boarding (`_musketry`, `_boarding`) | 11:43 | 90 | 4 | 7 |
+| the pumps, the repairs and the repel (`_damage_work`) | 11:40 | 87 | 4 | 7 |
+| the small arms served out on entering the action (`_fight_ready`) | **11:12** | 59 | 5 | 7 |
+| all three doctrine items | 11:12 | 59 | 5 | 7 |
+| all three, and the wounds' draws on the gunnery stream | 11:03 | 50 | 4 | 7 |
+| the wounds' draws on the gunnery stream alone | 11:11 | 58 | 5 | 9 |
+
+So the water, the health and the damage control alone leave 71's minute exactly (the wounds'
+draws moved to the health stream for that reason: on the gunnery's stream they shift every
+shot after the first wounded man); the mover is **the small arms served out by both captains
+on entering the action** (`board_odds` above nought in the King's ship's and the privateer's
+doctrines): the gunner's party of six leaves the guns for five minutes at the start, and the
+small-arms men fire at will within a cable thereafter, which with 70's cutters of thirty men
+each slows the King's cutter's first broadsides and lengthens the action by half an hour. The
+pumps and the carpenter move it three minutes more (in the runs with the small arms off her
+holes were plugged at 10:50 and her pumps manned at 11:04 with the well at 0.31 m; in the
+whole package's run her seven holes lie above the water and neither is wanted). The pin is re-measured in 7-183 as the band and the new lines, the
+old minute beside the new here; the choice to keep the serve-out is realism's (both ships would
+arm before an action) and the owner may turn it off per role by `board_odds: 0`.
+
+### Found on the way
+
+- `(patient.hurt_tick or tick)` treated a man hit at the world's first tick as hit "now"
+  (`_since` in `crew/health.py`).
+- A dead person marked before the station and the captaincy were looked up vanished from
+  `stationed()` and `people.captain`, so the holder's death was never told nor the command
+  passed; the order is now lookups first.
+- The harness's `_stand_by_ended` wakes any stand-by on an urgent line; the carried-below
+  stand-by had to be deaf to the deck or the collapsed officer was back on his feet at the
+  next urgent event.
+- The grammar's hint for `man the boats` offered `man the pumps` once the pumps existed; a
+  nearer synonym is hinted first (`orders/errors.unknown_verb`).
+- The YAML flow sequence splits a synonym at its comma: the hails ("marines, fire by volley")
+  are the grammar's (`DIVISION_HAILS`), not the vocabulary's.
+- `said_as_done` turned "small arms, fire at will" into "smalling arms"; the fight's orders
+  have their own said forms (`FIGHT_SAID`).
+- The crewed vessel placed alongside drifts apart from the player's ship at a foot a second
+  (her captain's helm, or the two hulls' leeway); the grapnels holding from the throw is the
+  true reading of it, and the tests hold her captain aside (`Captain.aside`).
+- The library's and the aboard table's counted tests (97 evolutions, 31 things) moved by the
+  package's additions, as they are meant to.
+- The slow tier's captain's trials found three things of the doctrine's and the keeper's own
+  (below, "the trials"): a privateer whose `lay her aboard` was refused (the lookout does not
+  find a sail by his own name for her) stood off and never fired, since the boarding pre-empted
+  the helm law; the chase is laid on the chase in hand or the nearest stranger now, and a
+  refused chase leaves the helm law standing. The pumps' crews, kept by spells "while a leak
+  runs", were kept all day in a gale by the weather's own water (her seams, the sea she ships),
+  twelve hands off the sail work: the weather's water keeps nobody at the brakes, the well is
+  pumped again when it shows. The butcher's bill said "nobody hurt" at every lull of a desultory
+  fire: once in an hour now. The rigging is mended when the weather serves: never lying to for
+  weather, in distress, or with the wind at the shortening figure.
+- Gate 5a's day under systems alone at seed 7 moved by 71 s (the standing order "topgallants
+  again" at 104049 for 103978): bisected by keeper, the health keeper off changes nothing and
+  the water keeper off gives the day back. In a blow the frigate took in the weather's water
+  (her seams at the roll, the sea over the hatches, some fourteen tons an hour) faster than a
+  pumping at the watch change cleared it, the well passed the free surface's tenth of a metre
+  and her stiffness and heel moved. A ship in a blow kept her pumps going every half hour; the
+  routine pumps the weather's water every glass now, unasked and unlogged, while nothing of the
+  hull's runs, and the day keeps 71's constants (`_routine_pumping`).
+
+### The trials (the slow tier's captain's trials)
+
+- **The lee shore** (`trial-station-lee-shore`): moved by the keeper's kept pumps (above) and
+  back to its judged pins exactly with the fix (1597 lines, `ed48ca3d61e52f20`, the states as
+  58b judged them). Nothing re-pinned.
+- **The trade stranger** (`trial-trade-stranger`): 1246 lines and `e55bc37c58ccb31b` at 71;
+  with package 73 whole **1247 lines and `11b8a45bdc8c935a`**. Bisected by keeper: the health
+  keeper off gives 1246 lines (the one line is the butcher's bill, "nobody hurt", said once
+  after the brig-sloop's fire); both keepers off still gives another digest (`22933f90d5a797e5`),
+  the same lines with other texts: the brig-sloop's captain serves out the small arms on
+  entering the action (the gunner's party of six off her guns for five minutes), and her shots
+  at the schooner fall otherwise, as the first action's did. Re-pinned, old beside new.
+- **The station gale**: the expected failure, left as it was.
+- **The first action** after the quarterdeck's draw moved to the health stream: 11:43 still
+  (5399 s, four hurt, seven holes); the hit-dependent truths (7-134, 7-176, 7-179, 7-137)
+  and the fight's and the health's tests unchanged.
+
+### The suites
+
+Run at the end of the package on the whole branch (465dcd2), four cores, nothing else of
+the machine running:
+
+- **The fast tier whole** (`-m "not slow and not pace"`): 3690 passed, 1 failed:
+  `tests/test_pictures.py::test_the_mcp_bridge_returns_the_chart_and_the_ships_view_as_images_that_are_not_blank`
+  ("the chart is blank (std 7.9)" against 8.0, with the slow tier running beside it), which
+  passes alone; not the package's. An earlier whole run before the last fixes gave 3677
+  passed and 14 failed, every one accounted for above (four truths of this package since
+  settled, ten tests that counted or refused what the package built, updated as true
+  changes, and the fingerprint test once under load).
+- **The slow tier whole without the pace tests** (`-m "slow and not pace"`): 334 passed, 0
+  failed, 11 expected failures (the station-gale trial among them, left as it was). The
+  earlier run before the mends gave 329 passed and 5 failed (gate 5a's day, the lee shore,
+  the trade stranger, 7-148 and 7-137), each bisected and mended or re-pinned above.
+- **The package's own files**: `test_water` 11, `test_damage_control` 10, `test_health` 12,
+  `test_fight` 12, the truths 7-172 to 7-184: 13; all passing.
+- **The last round, on cd224fc's tree** (the lead's rule of 2026-10-28: no whole tier after
+  it, the whole suite the lead's at the merge): the fast tier 3689 passed, 2 failed (the
+  pictures test above, which passes alone, and `test_water`'s free-surface test: the keeper's
+  new quiet path left the stiffness unrestored when the well was pumped out by hand; mended in
+  c60c361 and `tests/test_water.py` and `tests/test_pictures.py` run again: the water's eleven
+  pass, the pictures test passes alone); the slow tier 334 passed, 0 failed, 11 expected
+  failures.
+- **The pace tests alone, last** (`--slow -m pace`, on c60c361): 9 passed, 1 failed: truth
+  7-159 (the convoy of six at far detail) at 481 ticks a second against the floor of 500, and
+  482 alone again on the quiet machine (486 before the keeper's quiet path, when its full
+  tick cost 0.08 ms of the far tick's two; 484 and 481 since are within this machine's
+  noise: package 72's own first run had it at 483 and a quiet second at 581). The keeper
+  adds nothing to a dry ship's tick now but the quiet test itself; the health keeper is once a
+  minute. The lead's six machines decide it at the merge.
+
+What changed after the whole slow tier's last run: the quiet path's stiffness line (c60c361,
+one line of `water.py`) and this section; the water file and the pictures test were run again
+after it, and the pace tests.

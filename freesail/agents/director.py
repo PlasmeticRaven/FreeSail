@@ -695,6 +695,11 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             "aboard: the well pumped out",
             "aboard: No. 3 starboard gun found dismounted",
             "aboard: the cartridges found damp",
+            # package 73: the people's health
+            "aboard: a man taken ill",
+            "aboard: the fever in the ship",
+            "aboard: the first lieutenant is hurt",
+            "aboard: the surgeon taken ill",
         ),
         "a report of the ship's own people with what it does; with no cause (the table's "
         "conditions), doubted",
@@ -1006,11 +1011,59 @@ def world_page() -> tuple[tuple[str, str], ...]:
         "with no cause by the table's conditions. A ship made within "
         f"{wo.HARBOUR_NM:g} miles of a port leaves by the port's track."
     )
+    from freesail.combat import boarding as bd
+    from freesail.combat import small_arms as sa
+    from freesail.crew import health as hl
+    from freesail.world import water as wt
+
+    bodies = (
+        "Package 73: the water, the wounded and the fight on deck. The water in a ship is one "
+        "quantity in tons (the well's depth the tons over the bilge's floor, "
+        f"{wt.WELL_FLOOR_COEFF:g} of her length by her beam), fed by the shot holes by the orifice "
+        f"law (a coefficient of {wt.ORIFICE_CD:g}), the ground's leak, the seams working in a "
+        f"seaway above {wt.SEAMS_ROLL_FREE_DEG:g} degrees of roll, the sea shipped over "
+        f"{wt.SEA_SHIPS_OVER_M:g} m of sea unless the hatches are battened, and your seams "
+        "(`aboard: a seam found working`, two tons an hour each); the pumps are the ship file's "
+        "(Falconer's chain pump 80 tons an hour at four men, the hand pump 15 at two), "
+        f"spelled every {wt.SPELL_S // 60} minutes, sucking under {wt.SUCK_M:g} m; she settles at "
+        f"{wt.SETTLING_SHARE:g} of the water that founders her and founders at "
+        f"{wt.FOUNDER_SHARE:g} of her displacement, the free surface taking her stiffness from "
+        f"{wt.FREE_SURFACE_FROM_M:g} m of depth. Your `the leak stopped` and `the well pumped "
+        "out` are doubted while her own carpenter and pumps could do it. A man hit is killed "
+        "three in ten, else wounded "
+        "light or grave half and half; the surgeon dresses the grave in "
+        f"{hl.DRESS_GRAVE_S // 60} minutes and his mates the light in {hl.DRESS_LIGHT_S // 60}; "
+        f"the light are at light duty {hl.HEAL_LIGHT_D[0]:g} to {hl.HEAL_LIGHT_D[1]:g} days, the "
+        "grave "
+        f"judged at {hl.JUDGE_GRAVE_S // 3600} hours (dead {hl.DIE_GRAVE_TREATED:.0%} treated, "
+        f"{hl.DIE_GRAVE_UNTREATED:.0%} not, else an invalid {hl.HEAL_GRAVE_D:g} days); the sick "
+        f"list takes {hl.SICK_FOUL_WATER:.0%} a day of the fit with the water foul, "
+        f"{hl.SICK_SHORT_ALLOWANCE:.0%} "
+        f"past {hl.SHORT_ALLOWANCE_DAYS:g} days of short allowance, and with the water expended "
+        f"{hl.WATER_OUT_SICK_SHARE:.0%} a day from day {hl.WATER_OUT_SICK_FROM_D:g} and "
+        f"{hl.WATER_OUT_DEATH_SHARE:.0%} dead a day from day {hl.WATER_OUT_DEATH_FROM_D:g}; a "
+        f"stationed person collapses of thirst at {hl.THIRST_COLLAPSE_H:g} hours and dies at "
+        f"{hl.THIRST_DEATH_H:g}, of hunger at {hl.HUNGER_COLLAPSE_H / 24:g} and "
+        f"{hl.HUNGER_DEATH_H / 24:g} days; the dead are buried at eight the next morning and the "
+        f"butcher's bill said {hl.BILL_AFTER_S // 60} minutes after the last shot. Your forms `a "
+        "man taken ill`, `the fever in the ship` (a tenth of the fit), `<person> is hurt` (or "
+        "`badly "
+        "hurt`), `the surgeon taken ill` act through the same keeper. The marines fire within "
+        f"musket shot ({sa.MUSKET_SHOT_M:.0f} m) of a near deck, the quarterdeck's people taking "
+        f"{sa.QUARTERDECK_SHARE:.0%} of the hits; the grapnels hold within {bd.GRAPPLE_RANGE_M:g} "
+        "m; a boarding is a round a minute, the deck carried when the defenders' strength falls "
+        "under "
+        f"{bd.CARRIED_RATIO:.0%} of the boarders' (or their temper under its line), the boarders "
+        f"repulsed the other way or after {bd.CONTEST_ROUNDS} rounds, a repulse costing the temper "
+        f"{bd.REPULSE_COST:g}. A far vessel's people are not hit by musketry or boarded: the near "
+        "fight wants her crewed."
+    )
     return (
         ("the weather systems", weather),
         ("ships put on the sea, and their companies", ships),
         ("what each order logs, and to whom", logs),
         ("the doubt's figures", doubt),
+        ("the water, the wounded and the fight on deck", bodies),
     )
 
 
@@ -1037,8 +1090,9 @@ DIRECTOR_BRIEF = (
     f"{_q('aboard.found', 2)}, {_q('aboard.found', 3)}, and twenty more of the table: the "
     "bread spoiled, the meat rotten, "
     "rats in the bread room, the chronometer stopped, the glass broken, the compass "
-    "sticking, the bilge foul; the hull's repair as a stopgap until the pumps come, "
-    f"{_q('aboard.found', 4)}, {_q('aboard.found', 5)}; the library's grammar topic lists "
+    "sticking, the bilge foul; the hull's repair as your cause beside the carpenter and the "
+    f"pumps, {_q('aboard.found', 4)}, {_q('aboard.found', 5)}; the people's health, "
+    f"{_q('aboard.found', 8)}, {_q('aboard.found', 10)}; the library's grammar topic lists "
     "them all), a thing made or moved, with a name and where it is and nothing "
     f"more ({_q('aboard.thing', 0)}; {_q('aboard.thing', 1)}; {_q('aboard.thing', 3)}), a "
     "sum, a freight or a debt as a transaction with its cause "

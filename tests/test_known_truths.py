@@ -8730,7 +8730,9 @@ def test_truth_7_148_the_kings_cutter_engaging_to_leeward_never_puts_her_head_in
             break
     assert not in_eye, in_eye
     assert not [e for e in w.log if "taken aback" in e.text and "wind's eye" in e.text]
-    assert v.struck and struck is not None and 3600 <= struck <= 5400, struck
+    # package 73: the small arms served out on entering the action lengthen the first action
+    # by half an hour (11:12 to 11:43; docs/dev/TuningNotes.md, package 73, the bisection)
+    assert v.struck and struck is not None and 3600 <= struck <= 6600, struck
     battery = w.ship.extra["battery"]
     assert battery.rounds_fired >= 100  # 146 at seed 7; 51 under 70's law
 
@@ -9156,3 +9158,501 @@ def test_truth_7_160_the_pace_with_the_convoy_of_six_under_the_cap_holds_truth_5
             w.run(1000)
             best = max(best, 1000 / (time.perf_counter() - t0))
         assert best >= K.CREWED_FLOOR_TICKS_S, f"{best:.0f} ticks a second under a cap of {cap}"
+
+
+# ---------------------------------------------------------------------------
+# Package 73: water, damage control, health and the fight on deck (spec M7 §11, §11a, §13
+# to §17; docs/design/Design-WaterAndHealth.md; truths 7-172 onward, after the owner's
+# practice-and-resupply package's 7-161 to 7-171)
+# ---------------------------------------------------------------------------
+
+
+def _hole_in(world, z_m: float, pounder: float = 18.0, side: str = "starboard") -> dict:
+    """A shot hole written as 70's state, at so much against the upright waterline."""
+    from freesail.combat.hits import damage_of, shot_diameter_m
+
+    keeper = damage_of(world.ship)
+    hole = {
+        "tick": world.clock.tick,
+        "side": side,
+        "x_m": 0.0,
+        "z_m": z_m,
+        "diameter_m": round(shot_diameter_m(pounder), 3),
+        "pounder": pounder,
+    }
+    keeper.holes.append(hole)
+    return hole
+
+
+def test_truth_7_172_a_shot_hole_fills_the_well_by_the_orifice_law_and_the_pumps_hold_it():
+    """Spec M7 §15: "A shot hole below the waterline fills the well at the rate the hole
+    and the heel give and the pumps hold it with so many hands and not with fewer." An
+    18-pounder's hole half a metre under the frigate's waterline takes in some eighty-five
+    tons an hour by the orifice law (`Q = 0.6 A sqrt(2gh)`), the carpenter reports the
+    first foot in the well, the two chain pumps and the two hand pumps (Falconer 1780,
+    PUMP: 80 and 15 tons an hour) with their twelve hands gain on it and three men at one
+    hand pump would lose; heeled so that the hole is buried she takes in more."""
+    from freesail.world import water as W
+
+    w = make_world(SEED, FRIGATE, _action_scenario(wind_kn=0.1))
+    w.run(5)
+    _hole_in(w, -0.5, 18.0)
+    leaks = w.water.leaks()
+    assert len(leaks) == 1 and leaks[0].kind == "shot hole"
+    gain = leaks[0].t_per_h
+    assert 75.0 < gain < 95.0, gain
+    assert gain == pytest.approx(W.orifice_t_per_h(leaks[0].hole["diameter_m"], 0.5), rel=0.05)
+    w.ship.dyn.heel = 0.1  # six degrees to starboard: the hole buried
+    assert w.water.leaks()[0].t_per_h > gain
+    w.ship.dyn.heel = 0.0
+    w.run(3600)
+    rising = events(w, "well.rising")
+    assert rising and "a foot of water in the well" in rising[0].text
+    e = w.submit("man the pumps")
+    assert e.kind == "pumps.manned" and "twelve hands" in e.text.lower()
+    w.run(600)
+    pumps = w.water.pumps
+    full = pumps.rate_t_per_h(pumps.hands())
+    assert full > gain and 150.0 < full < 220.0, (full, gain)
+    assert events(w, "pumps.gaining")
+    assert pumps.rate_t_per_h(pumps.hands()[:3]) < gain
+    assert "pumps" in w.readings.words("pumps") or "lifting" in w.readings.words("pumps")
+
+
+def test_truth_7_173_the_carpenter_plugs_the_hole_in_the_time_the_bill_says_and_the_leak_stops():
+    """Spec M7 §15: "the carpenter plugs it in the time the bill says". A hole half a
+    metre under is reached from between decks with the water about the men: twenty
+    minutes (data/evolutions/plug_shot_hole.yaml); the plug counted from the carpenter's
+    store, the hole `plugged`, the keeper's leaks empty and the pumps sucking after."""
+    from freesail.evolutions.repair_scripts import shot_plugs
+
+    w = make_world(SEED, FRIGATE, _action_scenario(wind_kn=0.1))
+    w.run(5)
+    hole = _hole_in(w, -0.4, 12.0)
+    plugs = shot_plugs(w.ship).count
+    w.submit("man the pumps")
+    e = w.submit("plug the shot holes")
+    assert e.kind in ("order.accepted", "evolution.started", "evolution.queued"), e.text
+    w.run(600)
+    assert not hole.get("plugged")
+    w.run(900)
+    assert hole.get("plugged") and shot_plugs(w.ship).count == plugs - 1
+    assert not [lk for lk in w.water.leaks() if lk.kind == "shot hole"]
+    w.run(1800)
+    assert events(w, "pumps.sucked")
+    assert "plugged" in w.readings.words("damage")
+
+
+def test_truth_7_174_a_ship_that_founders_does_so_with_the_log_saying_when_the_pumps_lost():
+    """Spec M7 §15: "a ship that founders does so with the log saying when the pumps
+    lost". The cutter with three 18-pounder holes a metre under (some three hundred tons
+    an hour against her two hand pumps' thirty) fills in the hour: the well rising by the
+    foot, the pumps losing, the ship settling at three fifths of what founders her and
+    foundered at half her displacement, the colours' lines in order, the world's ship lost
+    and the integrator holding her where she lies."""
+    w = make_world(SEED, CUTTER, _action_scenario(wind_kn=0.1))
+    w.run(5)
+    for side in ("starboard", "larboard", "starboard"):
+        _hole_in(w, -1.0, 18.0, side)
+    w.submit("man the pumps")
+    for _ in range(240):
+        w.run(60)
+        if getattr(w, "ship_lost", False):
+            break
+    assert w.ship_lost and w.ship.extra.get("foundered")
+    kinds = [
+        e.kind
+        for e in w.log
+        if e.kind in ("well.rising", "pumps.losing", "ship.settling", "ship.foundered")
+    ]
+    assert (
+        kinds.index("pumps.losing") < kinds.index("ship.settling") < kinds.index("ship.foundered")
+    )
+    lost = events(w, "pumps.losing")[0]
+    assert "losing" in lost.text and "tons" in lost.text
+    foundered = events(w, "ship.foundered")[0]
+    assert "the pumps lost her at" in foundered.text and "the ship is lost" in foundered.text
+    speed = float(w.ship.dyn.speed or 0.0)
+    w.run(300)
+    assert float(w.ship.dyn.speed or 0.0) <= max(speed, 0.1)
+
+
+def test_truth_7_175_the_grounding_replayed_with_the_pumps_and_the_carpenter_takes_hours():
+    """Spec M7 §15: "the grounding at Horta replayed with the pumps and the carpenter
+    instead of the stopgap gives the same tide and a repair that takes hands and hours".
+    The frigate run on to the Manacles at four knots in a lighter wind than the ground's
+    tests use (at six she is stove at six hundred tons an hour and bilged where she lies,
+    which no carpenter mends: the ground's own test; the orders are refused on a foundered
+    ship): the rock's leak some hundred and forty tons an hour, the pumps manned by order
+    gain on it (the chain pumps' hundred and ninety), and `stop the leak` is the
+    carpenter's three hours at the planks (data/evolutions/plug_shot_hole.yaml, the
+    caulking), after which the ground's leak is nought and the pumps suck; the tide's own
+    times are the ground's and not touched (the ground tests measure them)."""
+    from tests.test_ground import FRIGATE as GF
+    from tests.test_ground import Position, run_until_aground, thick_world
+
+    start = datetime(1805, 6, 12, 12, 0)
+    w = thick_world(GF, Position(50.025, -5.015), 315.0, start, from_deg=180.0, knots=10.0)
+    w.submit("set plain sail")
+    w.submit("steer NW")
+    assert run_until_aground(w, 3.0)
+    w.run(1800)
+    rate = w.ship.extra["leak_m_per_h"]
+    assert rate > 0.0 and any(lk.kind == "the ground" for lk in w.water.leaks())
+    e = w.submit("man the pumps")
+    assert e.kind == "pumps.manned", e.text
+    e = w.submit("stop the leak")
+    assert e.kind in ("order.accepted", "evolution.started", "evolution.queued"), e.text
+    w.run(1800)
+    assert w.ship.extra["leak_m_per_h"] == rate  # the caulking takes its hours
+    w.run(3 * 3600)
+    assert w.ship.extra["leak_m_per_h"] == 0.0
+    assert not [lk for lk in w.water.leaks() if lk.kind == "the ground"]
+    w.run(3600)
+    assert w.water.depth_m() < 0.1 and events(w, "pumps.sucked")
+    assert w.ship.extra.get("aground") and not w.ship.extra.get("foundered")
+
+
+def test_truth_7_176_a_broadsides_casualties_are_men_of_the_muster_named_and_the_bill_counts():
+    """Spec M7 §17: "A broadside's casualties are men of the muster, named where they were
+    named". Twelve hits on the frigate's after deck and hull at quarters hurt twenty of
+    her people (at seed 7): each a man of the muster with his wound in words, the
+    quarterdeck's share among them and the captain himself told his roads in a line of
+    his own; the butcher's bill ten minutes after the last shot names the killed and
+    counts the wounded, the dangerous apart; the morale's figure counts them."""
+    from freesail.combat import hits as HITS
+
+    w = make_world(SEED, FRIGATE, _action_scenario())
+    told: list = []
+    w.needs.listen(told.append)
+    w.submit("beat to quarters")
+    w.run(120)
+    keeper = HITS.damage_of(w.ship)
+    rng = w.rng.stream("gunnery")
+    for _ in range(6):
+        HITS._casualties(w.ship, keeper, 2.0, -15.0, "deck", rng, w.clock.tick)
+        HITS._casualties(w.ship, keeper, 2.0, 0.0, "hull", rng, w.clock.tick)
+    crew = w.ship.extra["crew"]
+    hurt = [s for s in crew.sailors if s.hurt]
+    assert 12 <= len(hurt) <= 30
+    assert all(s.hurt in ("killed", "wounded") and not s.fit for s in hurt)
+    assert all(s.hurt_how for s in hurt if s.hurt == "wounded")
+    assert any(s.station.value == "quarterdeck" for s in hurt)
+    captain = w.people.captain
+    cap = crew.by_id[captain.sailor_id]
+    if cap.hurt:
+        assert any("You are hit" in e.text for e in told)
+    keeper.hits = 12
+    keeper.struck_by = {"enemy": w.clock.tick}
+    w.run(660)
+    bill = events(w, "action.bill")
+    assert len(bill) == 1 and bill[0].text.startswith("The butcher's bill: ")
+    killed = [s for s in hurt if s.hurt == "killed"]
+    if killed:
+        assert killed[0].name in bill[0].text
+    assert "dangerously" in bill[0].text
+    words = w.readings.words("bill")
+    assert "wounded" in words and "of 264" in words
+
+
+def test_truth_7_177_the_surgeon_returns_the_lightly_hurt_in_hours_and_days_and_not_the_badly():
+    """Spec M7 §17: "the surgeon's work returns the lightly hurt to the bill in days and
+    not the badly". After 7-176's hits the surgeon and his two mates work the queue (the
+    grave under his hands half an hour each, the light under a mate's ten minutes): in
+    three hours nobody waits, the lightly wounded are 'hurt' and at light duty for a week
+    or two, the gravely wounded stay below for the surgeon's judgement at a day, when each
+    dies or is invalided for the voyage; the bill and the sick list say so in words."""
+    from freesail.combat import hits as HITS
+
+    w = make_world(SEED, FRIGATE, _action_scenario())
+    w.submit("beat to quarters")
+    w.run(120)
+    keeper = HITS.damage_of(w.ship)
+    rng = w.rng.stream("gunnery")
+    for _ in range(6):
+        HITS._casualties(w.ship, keeper, 2.0, -15.0, "deck", rng, w.clock.tick)
+        HITS._casualties(w.ship, keeper, 2.0, 0.0, "hull", rng, w.clock.tick)
+    crew = w.ship.extra["crew"]
+    wounded = [s for s in crew.sailors if s.hurt == "wounded"]
+    light = [s for s in wounded if s.wound == "light"]
+    grave = [s for s in wounded if s.wound == "grave"]
+    assert light and grave
+    assert w.health.surgeon() is not None and len(w.health.mates()) == 2
+    w.run(600)
+    assert "at work on the wounded" in w.readings.words("surgeon")
+    w.run(5 * 3600)
+    assert "nobody under his hands" in w.readings.words("surgeon")
+    assert all(s.hurt == "hurt" and s.fit for s in light)
+    assert all(7 * 86400 - 3600 <= s.hurt_until - w.clock.tick <= 14 * 86400 for s in light)
+    assert all(s.hurt == "wounded" and s.dressed and not s.fit for s in grave)
+    assert "hurt and at light duty" in w.readings.words("bill")
+    w.submit("secure the guns")
+    w.run(28 * 3600)  # a day after the last of them was dressed
+    judged = [e for e in w.log if e.kind in ("health.died", "health.invalided")]
+    assert len(judged) == len(grave)
+    assert all(s.hurt == "killed" or s.wound == "invalid" for s in grave)
+    assert not any(s.fit for s in grave)
+
+
+def test_truth_7_178_a_hand_dead_of_thirst_is_a_death_the_log_explains_from_the_needs_lines():
+    """Spec M7 §17: "a hand dead of thirst on a passage with the water foul and no port
+    is a death the log explains from the needs' lines before it". The cutter's water and
+    provisions expended: the captain at the prompt is told he is thirsty, then
+    desperately thirsty, collapses at three days and is dead at four, told so in his own
+    line, the command passing by the bill; of the hands, the surgeon's report has men
+    taken ill from the second day and dead from the fourth, each 'died of thirst, the
+    water being expended', buried the next morning; nothing of it is a figure set."""
+    w = make_world(SEED, CUTTER, _action_scenario())
+    told: list = []
+    w.needs.listen(told.append)
+    w.stores.water_tons = 0.0
+    w.stores.provisions_days = 0.0
+    captain = w.people.captain
+    w.run(5 * 24 * 3600)
+    thirsty = [e.text for e in told if "thirsty" in e.text]
+    assert thirsty and any("desperately thirsty" in t for t in thirsty)
+    assert any("collapsed with thirst" in e.text for e in told)
+    assert any("You are dead of thirst" in e.text for e in told)
+    assert captain.dead and w.people.captain is not captain
+    passes = events(w, "ship.command_passes")
+    assert passes and w.people.captain.name in passes[0].text
+    died = events(w, "health.died")
+    assert died and all("thirst" in e.text for e in died)
+    assert any("the water being expended" in e.text for e in died)
+    sick = events(w, "health.sick")
+    assert sick and sick[0].tick < died[0].tick
+    buried = events(w, "crew.buried")
+    assert buried and all(b.tick > died[0].tick for b in buried)
+    dead = [s for s in w.ship.extra["crew"].dead]
+    assert dead and all(s.hurt_how.startswith("of thirst") for s in dead)
+
+
+def test_truth_7_179_a_volley_within_musket_shot_fells_the_near_decks_men_and_the_quarterdecks():
+    """Spec M7 §11: the marines "fire at the men on a near deck by volley or at will, the
+    hits on the men at the parts exposed (the quarterdeck's officers and helmsmen first,
+    which is history's lesson)". The frigate's forty marines at thirty metres of a French
+    frigate fire three volleys a minute (the British drill); at seed 7 her people fall to
+    musket balls within the three minutes, her log saying 'musketry from her deck', and
+    the ball's choice of a man falls on the quarterdeck two times in five: with the draw
+    forced the quarterdeck's man is struck, and a named person among them is told in a
+    line of his own."""
+    from freesail.combat import small_arms as SA
+    from tests.test_fight import _alongside
+
+    w, v, enemy = _alongside(30.0)
+    assert w.submit("marines, fire by volley").kind == "marines.fire"
+    w.run(180)
+    ours = events(w, "action.musketry")
+    assert ours and sum(e.data["volleys"] for e in ours) >= 3  # until she drifts out of shot
+    hurt = [s for s in enemy.ship.extra["crew"].sailors if s.hurt]
+    assert hurt and all("musket ball" in s.hurt_how for s in hurt)
+    assert any("musketry from her deck" in e.text for e in events(enemy, "action.hit"))
+
+    class _Draw:
+        def __init__(self, seq):
+            self.seq = list(seq)
+
+        def random(self):
+            return self.seq.pop(0) if self.seq else 0.5
+
+    quarterdeck, deck = SA.exposed_men(enemy.ship, "larboard")
+    assert quarterdeck and deck
+    before = len(events(enemy, "person.hurt"))
+    struck = SA.strike_a_man(
+        enemy.ship,
+        "larboard",
+        _Draw([0.1, 0.0, 0.9, 0.9, 0.9]),
+        w.clock.tick,
+        "a musket ball in the arm",
+        "the ship",
+    )
+    assert struck is not None and struck.station.value == "quarterdeck"
+    assert struck.hurt == "wounded"
+    enemy.run(60) if hasattr(enemy, "run") else w.run(60)
+    w.run(60)
+    named = [p for p in enemy.people.people if p.sailor_id == struck.id]
+    if named:
+        assert "wounded" in enemy.people.state_words(named[0])
+        assert len(events(enemy, "person.hurt")) > before
+
+
+def test_truth_7_180_the_boarders_are_repulsed_by_a_whole_company_awake_and_the_temper_pays():
+    """Spec M7 §11a: "the boarders over by §11's fight on deck, the deck won or the
+    boarders repulsed". A hundred boarders (the bill's sixty with the forty marines)
+    against a frigate's company all on deck and awake: the crossing's volley tells, the
+    first round goes against them (the defenders' strength near twice theirs behind their
+    nettings) and they are repulsed within three rounds; the grapnels cast off, the losses
+    on both musters, the lines on both logs, the hands' temper the worse by a tenth."""
+    from freesail.combat import boarding as B
+    from freesail.combat.morale import morale_of
+    from tests.test_fight import _alongside
+
+    w, v, enemy = _alongside(10.0)
+    w.submit("grapple her")
+    w.run(65)
+    assert B.grappled_to(w.ship) == v.id
+    assert w.submit("boarders away").kind == "action.boarders"
+    for _ in range(B.CONTEST_ROUNDS + 1):
+        w.run(60)
+        f = B.fight_of(w.ship)
+        if f is not None and f.over:
+            break
+    f = B.fight_of(w.ship)
+    assert f.over == "repulsed" and f.round <= 3
+    rounds = events(w, "action.boarding")
+    assert rounds[0].data["strength_defence"] > rounds[0].data["strength_attack"]
+    assert events(w, "action.repulsed") and events(enemy, "action.repulsed")
+    assert morale_of(w.ship).repulses == pytest.approx(B.REPULSE_COST)
+    assert not B.grappled_to(w.ship)
+    assert f.lost_attack > f.lost_defence > 0
+
+
+def test_truth_7_181_the_boarders_carry_a_deck_held_by_the_marines_and_the_colours_come_down():
+    """Spec M7 §11a: the deck won. Against the same frigate at quarters, her gun crews at
+    their guns and the deck held by her marines, the helm, the trimmers and the
+    quarterdeck, the boarders with their arms served out carry it in a few rounds: her
+    colours come down 'carried by boarding' (the strike's own line, the far body struck),
+    the prize alongside for 74; the losses by name on both bills."""
+    from freesail.combat import boarding as B
+    from freesail.combat import small_arms as SA
+    from tests.test_fight import _alongside
+
+    w, v, enemy = _alongside(10.0, her_quarters=True)
+    w.submit("grapple her")
+    w.submit("serve out the small arms")
+    w.run(400)
+    assert SA.musketry_of(w.ship).served
+    assert w.submit("boarders away").kind == "action.boarders"
+    for _ in range(B.CONTEST_ROUNDS + 1):
+        w.run(60)
+        f = B.fight_of(w.ship)
+        if f is not None and f.over:
+            break
+    f = B.fight_of(w.ship)
+    assert f.over == "carried" and 2 <= f.round <= 12, (f.over, f.round)
+    assert any("carried by boarding" in e.text for e in events(enemy, "action.struck"))
+    assert v.struck and events(w, "action.carried")
+    assert f.lost_defence > f.lost_attack > 0
+    assert "killed" in enemy.readings.words("bill") or "wounded" in enemy.readings.words("bill")
+
+
+def test_truth_7_182_a_station_holder_hit_has_the_two_roads_at_parity_and_killed_is_stood_down():
+    """Spec M7 §16a: the holder hit "may keep the deck ... or give the deck and go below
+    to the surgeon ... a holder killed ends his person's station as a death does". The
+    officer of the watch (a fake model with the deck) hit lightly is told his roads in an
+    urgent line of his own and keeps the deck, his orders going; gone below by the order
+    he is in the cockpit and the surgeon's queue and told when dressed; hit gravely and
+    keeping the deck he collapses at the half hour and is carried below (the stand-by that
+    no event ends); killed, the station is stood down by the world with the reason and
+    the log says so; the captain at the prompt killed, the command passes by the bill."""
+    from freesail.crew import health as H
+    from tests.test_health import _hit, _officer_with_the_deck
+
+    w, oh, person, sailor = _officer_with_the_deck()
+    _hit(w, sailor, "light")
+    notice = [n for n in oh.agent.notices if "You are hit" in n]
+    assert notice and "go below to the surgeon" in notice[0] and oh.agent.deck
+    assert w.health.go_below_to_the_surgeon(person, oh).startswith("You give the deck")
+    assert person.where == "cockpit" and not oh.agent.deck
+    w.run(H.DRESS_LIGHT_S + 120)
+    assert sailor.hurt == "hurt" and any("Your wound is dressed" in n for n in oh.agent.notices)
+    w2, oh2, person2, sailor2 = _officer_with_the_deck()
+    _hit(w2, sailor2, "grave")
+    w2.run(H.COLLAPSE_S + 120)
+    assert oh2.agent.standing_by and person2.where == "cockpit"
+    assert events(w2, "person.collapsed")
+    w3, oh3, person3, sailor3 = _officer_with_the_deck()
+    _hit(w3, sailor3, killed=True, how="a round shot")
+    assert person3.dead and oh3.agent.released
+    assert any(
+        "killed: a round shot" in e.text and "the world" in e.text
+        for e in events(w3, "agent.stopped")
+    )
+    captain = w3.people.captain
+    _hit(w3, w3.ship.extra["crew"].by_id[captain.sailor_id], killed=True, how="a musket ball")
+    assert captain.dead and w3.people.captain is not captain and events(w3, "ship.command_passes")
+
+
+def test_truth_7_183_the_first_action_replayed_with_the_arms_the_pumps_and_the_carpenter():
+    """Spec M7 §12 and the brief's item 9: the first action (data/scenarios/first-action.yaml)
+    replayed at seed 7 with package 73 in it. The band of 7-133 holds (the colours come
+    down between three quarters of an hour and three after the first shot); what changed
+    is said: both captains serve out the small arms on entering the action (their
+    doctrines' `board_odds` above nought); the privateer's captain has the carpenter plug
+    her shot holes under water and mans the pumps at the doctrine's foot where the well
+    asks it; her bill counts the
+    killed and the wounded by their states and the butcher's bill is said ten minutes after
+    the last shot; the next morning she buries her dead. The minute itself moved from 71's
+    11:12 (docs/dev/TuningNotes.md, package 73: the bisection names which item)."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario(FIRST_ACTION)
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    v = w.vessels.find("Renard")
+    first = None
+    struck_tick = None
+    for _ in range(3 * 60):
+        w.run(60)
+        if first is None:
+            fired_at = [e for e in w.log if e.kind == "action.fired_at"]
+            if fired_at:
+                first = fired_at[0].tick
+        if v.struck or w.ship.extra.get("struck"):
+            struck_tick = w.clock.tick
+            break
+    assert first is not None and v.struck and not w.ship.extra.get("struck")
+    assert 2700 <= struck_tick - first <= 3 * 3600, f"{(struck_tick - first) / 60:.0f} min"
+    enemy = v.crew
+    assert any("serving out the small arms" in e.text for e in enemy.log), "the small arms"
+    assert (
+        any("serving out the small arms" in e.text for e in w.log)
+        or w.ship.extra["musketry"].served
+    )
+    assert events(enemy, "small_arms.served")
+    # the carpenter to the holes under water where there are any (at this seed her seven
+    # lie above it), the pumps at the doctrine's foot of water or the well never there
+    under = [h for h in enemy.ship.extra["damage"].holes if float(h.get("z_m", 1.0)) < 0.0]
+    if under:
+        assert any("Plug the shot holes" in e.text for e in enemy.log)
+    assert events(enemy, "pumps.manned") or enemy.water.depth_m() < 0.3
+    bill = enemy.readings.words("bill")
+    assert "killed" in bill or "wounded" in bill
+    w.run(11 * 60)
+    assert events(enemy, "action.bill")
+    w.run(21 * 3600)
+    killed = [s for s in enemy.ship.extra["crew"].dead]
+    if killed:
+        assert events(enemy, "crew.buried")
+
+
+def test_truth_7_184_the_leak_scenario_mans_the_pumps_at_a_foot_and_left_alone_loses_stiffness():
+    """The brief's leak scenario (data/scenarios/leak.yaml): the King's cutter homeward in
+    a strong westerly, three seams found working by the scenario's world orders (two tons
+    an hour each). Under the rules captain the well shows a foot at 13:00 and he mans the
+    pumps at the doctrine's depth (`pumps_at_m` 0.3), the hand pumps' thirty tons an hour
+    gaining on the six and sucking within the half hour, the spells said; with the captain
+    aside the well is two feet at 15:00 and the free surface has taken a third of her
+    metacentric height (1.10 m to 0.77 m, `Hull.gm_m`), nothing else of her changed."""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario("data/scenarios/leak.yaml")
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    gm0 = float(w.ship.hull.gm_m)
+    w.run(3 * 3600 + 900)
+    assert len(events(w, "aboard.found")) == 3 and len(w.water.leaks()) == 3
+    assert w.water.pumps.manned and any("manning the pumps" in e.text for e in w.log)
+    w.run(3600)
+    assert w.water.depth_m() < 0.05 and events(w, "pumps.sucked")
+    w.run(3600)
+    assert events(w, "pumps.spelled")
+    w2 = make_scenario_world(sf)
+    begin(w2, sf)
+    w2.captain.aside = True
+    w2.run(5 * 3600)
+    assert not w2.water.pumps.manned
+    assert 0.5 < w2.water.depth_m() < 0.7, w2.water.depth_m()
+    gm = float(w2.ship.hull.gm_m)
+    assert 0.6 < gm < 0.85 and gm0 == pytest.approx(1.1, abs=0.05), (gm0, gm)
+    assert not w2.ship_lost

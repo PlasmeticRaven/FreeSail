@@ -62,7 +62,11 @@ def step(ship: Ship, dt: float, wind: Wind) -> None:
     st.at_anchor = bool(ship.extra.get("ground_tackle")) and any(
         a.down for a in ship.extra["ground_tackle"].anchors
     )
-    st.aground = bool(ship.extra.get("aground"))
+    # the ground holds her; so does the water that has sunk her and the grapnels that hold
+    # her to another ship (package 73, spec M7 §13 and §11a: the ground's own hook widened)
+    st.aground = bool(
+        ship.extra.get("aground") or ship.extra.get("foundered") or ship.extra.get("grappled_to")
+    )
     # the rig is read once for the four substeps (package 29's profile; `sails._Rig` says
     # why nothing it holds can change between them)
     hold_rig(ship)
@@ -445,7 +449,15 @@ def _log_notes(ship: Ship, st: hp.HullState, dt: float) -> None:
         data = {"thrust_n": st.last_thrust_n, "speed": d.speed, "aws": st.aws}
         lesser = text = ""
         if st.at_anchor or st.aground:
-            where = "at anchor" if st.at_anchor else "aground"
+            where = (
+                "at anchor"
+                if st.at_anchor
+                else "aground"
+                if ship.extra.get("aground")
+                else "grappled"
+                if ship.extra.get("grappled_to")
+                else "awash"
+            )
             lesser, text = "anchor", f"Her sails aback as she lies {where}."
         elif not st.aback_had_way:
             lesser, text = "no_way", "Her sails aback; she had no way on to lose."

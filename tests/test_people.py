@@ -81,7 +81,8 @@ def test_the_named_few_come_from_the_muster_by_post_and_by_the_ship_files_roles(
         assert ws.people.captain.role == "master" and ws.people.messenger.role == "boy"
     brig = world_for(BRIG).people
     assert brig.captain.role == "commander" and brig.messenger.role == "midshipman"
-    assert [p.role for p in brig.all][-2:] == ["master's mate", "midshipman"]
+    # package 73 (spec M7 §11): the brig-sloop's party of marines under its sergeant, drawn last
+    assert [p.role for p in brig.all][-3:] == ["master's mate", "midshipman", "sergeant of marines"]
 
 
 def test_the_people_and_where_is_are_readings_in_the_registry_and_at_the_prompt():

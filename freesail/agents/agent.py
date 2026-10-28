@@ -534,7 +534,9 @@ _DANGER = _COURSE_ORDERS | frozenset({"heave to", "let go the anchor"})
 
 OFFICER_DOMAIN = Domain(
     levels=frozenset({"0", "1", "2"}),
-    objects=frozenset({"sail", "yards", "line", "wreck", "work", "query", "reading"}),
+    objects=frozenset(
+        {"sail", "yards", "line", "wreck", "work", "query", "reading", "damage"}
+    ),  # package 73: the pumps, the hatches and the carpenter's work are the deck's
     verbs=frozenset(
         {
             # the lead and the log, the lookout, the pilot's hail

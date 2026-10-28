@@ -20,6 +20,7 @@ Every date in the file is from memory and the file says so; nothing here is a re
 
 from __future__ import annotations
 
+import functools
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -42,6 +43,9 @@ NAMES_TO_NATION = {"english": "britain", "american": "united-states", "french": 
 # The habit of a nation the table does not know (a scenario's nation is always the
 # table's, so this is the floor): the common one.
 DEFAULT_HABITS: dict[str, Any] = {"range_factor": 1.0, "aim": "hull", "roll": "down"}
+# The marines' kits (package 73, spec M7 §11): `data/marines.yaml`, a kit a nation names
+# under `marines: {kit: ...}`; the basic kit stands where none is named.
+MARINES_PATH = Path(__file__).resolve().parents[2] / "data" / "marines.yaml"
 
 
 @dataclass(frozen=True)
@@ -60,6 +64,8 @@ class Nation:
     # signal books' root under data/signals/ with its system (`well-built` or `basic`)
     habits: dict[str, Any] = field(default_factory=dict)
     signals_root: str = "basic"
+    # package 73 (spec M7 §11): the marines' kit named, a key of data/marines.yaml
+    marines: dict[str, Any] = field(default_factory=dict)
     signals_system: str = "basic"
     # package 72 (spec M7 §22): the nation's naval knobs (`naval:`: who keeps the sea, who
     # keeps port and slips out when the blockade is blown off, who convoys and under what,
@@ -140,6 +146,17 @@ class Nations:
             return "closed"
         return "neutral"
 
+    def marines_kit_of(self, nation_id: str) -> dict[str, Any]:
+        """The nation's marines' kit (package 73): its entry's `marines.kit` in
+        `data/marines.yaml`, the basic kit where it names none or an unknown one."""
+        key = _key(nation_id)
+        found = self.nations.get(key)
+        name = str((getattr(found, "marines", None) or {}).get("kit") or "basic")
+        kits = load_marines().get("kits") or {}
+        kit = dict(kits.get(name) or kits.get("basic") or {})
+        kit["id"] = name if name in kits else "basic"
+        return kit
+
     def habits_of(self, nation_id: str) -> dict[str, Any]:
         """The nation's habit in action (package 71): the table's figures over the
         common ones where the entry leaves one out."""
@@ -214,6 +231,16 @@ class Nations:
         }
 
 
+@functools.lru_cache(maxsize=2)
+def _marines(path: str) -> dict[str, Any]:
+    return yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+
+
+def load_marines(path: str | Path = MARINES_PATH) -> dict[str, Any]:
+    """The marines' kits and the small arms (`data/marines.yaml`; package 73)."""
+    return _marines(str(path))
+
+
 def load_nations(path: str | Path = NATIONS_PATH) -> Nations:
     doc = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
     nations: dict[str, Nation] = {}
@@ -232,6 +259,7 @@ def load_nations(path: str | Path = NATIONS_PATH) -> Nations:
             signals_root=str((d.get("signals") or {}).get("root") or "basic"),
             signals_system=str((d.get("signals") or {}).get("system") or "basic"),
             naval=dict(d.get("naval") or {}),
+            marines=dict(d.get("marines") or {}),
         )
     wars = []
     for w in doc.get("wars") or []:

@@ -155,7 +155,9 @@ class Particulars:
             return cls()
         return cls(
             beam_m=float(spec.beam_m),
-            gm_m=float(spec.gm_m),
+            # the metacentric height as she floats (package 73: `parts.Hull.gm_m`, the
+            # file's less the free surface's; the file's with a dry well)
+            gm_m=float(getattr(hull, "gm_m", spec.gm_m)),
             length_m=float(spec.length_waterline_m),
         )
 

@@ -115,6 +115,17 @@ class Order:
 # ---------------------------------------------------------------------------
 
 
+# The divisions hailed before an order of the fight (package 73): the comma after them is
+# the drill's ("Marines, fire by volley!") and is read away before the verb is matched.
+DIVISION_HAILS: tuple[str, ...] = (
+    "marines",
+    "small arms men",
+    "small-arms men",
+    "small arms",
+    "boarders",
+)
+
+
 def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     """Parse one order against this ship's vocabulary. Raises OrderError."""
     vocab = vocab or load_vocabulary()
@@ -126,6 +137,13 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     norm = " ".join(tokens)
     if not norm or norm == ",":
         raise OrderError("No order given.")
+    # package 73 (spec M7 §11): the hail to a division before its order ("marines, fire by
+    # volley", "small arms, hold your fire", "boarders, repel") is one phrase, the comma
+    # the drill's and not the grammar's side comma
+    for lead in DIVISION_HAILS:
+        if norm.startswith(lead + " , "):
+            norm = lead + " " + norm[len(lead) + 3 :]
+            break
     segments = [seg.split() for seg in norm.split(" , ")]
     segments = [seg for seg in segments if seg]
     if not segments:
@@ -167,6 +185,8 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
         "glass",
         "free",
         "gunnery",  # package 70: the mark, the side, the charge, the aim, a gun by its name
+        "damage",  # package 73: the pumps, the hatches, the carpenter's and the boatswain's work
+        "fight",  # package 73: the marines, the small arms and the boarders
     ):
         # what the captain says to the master (spec M5 §15, package 33a): the words after
         # the verb are a mark, a place, a position or an allowance, read by
@@ -462,7 +482,10 @@ def _match_verb(words: list[str], vocab: Vocabulary) -> tuple[str, str]:
         pw = phrase.split()
         if keyed[: len(pw)] == pw:
             return phrase, vocab.phrase_to_verb[phrase]
-    raise errors.unknown_verb(" ".join(words), vocab.verb_names)
+    # package 73: a synonym nearer in spelling than any verb is hinted first ("man the
+    # boats" is "man the boat", not "man the pumps")
+    synonyms = [s for spec in vocab.verbs.values() for s in spec.synonyms]
+    raise errors.unknown_verb(" ".join(words), vocab.verb_names, synonyms)
 
 
 # ---------------------------------------------------------------------------

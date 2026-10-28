@@ -266,6 +266,16 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
         from freesail.orders import signals as signal_orders
 
         return signal_orders.handle(ship, order.text)
+    if vocab.verbs[order.verb].object == "damage":
+        # the water, the pumps and the damage control (spec M7 §13, §14; package 73)
+        from freesail.orders import damage
+
+        return damage.execute(ship, order)
+    if vocab.verbs[order.verb].object == "fight":
+        # the marines, the small arms and the fight on deck (spec M7 §11; package 73)
+        from freesail.orders import fight
+
+        return fight.execute(ship, order)
     if order.verb == "set" and ("reefs" in order.modifiers or "close" in order.modifiers):
         return _set_reefed(ship, order, vocab)
     return verbs.execute(ship, order, vocab)

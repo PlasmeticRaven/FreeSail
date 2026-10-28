@@ -43,7 +43,9 @@ EVOLUTION_DIR = Path(__file__).resolve().parents[1] / "data" / "evolutions"
 
 # The all-hands sail evolutions, each with a party in its crew line (package 31b): the
 # manoeuvres and the masts take everyone.
-ALL_HANDS_SAIL_WORK = ("reef_square", "furl_all", "loose_sails_to_dry")
+# package 73: a sail fothered over a leak and a jury mast swayed up are all-hands work with
+# a party named, as the sail work is
+ALL_HANDS_SAIL_WORK = ("reef_square", "furl_all", "loose_sails_to_dry", "fother_sail", "jury_mast")
 
 NEW = [
     "send_down_topgallant_masts",
