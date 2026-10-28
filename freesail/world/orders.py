@@ -1851,7 +1851,7 @@ def _say_as_parts(world: Any, body: str, draw: bool) -> tuple[Any, str]:
     people = getattr(world, "people", None)
     # one of the people by role or name first, as before; then a station's person or one
     # of the ship's own voices (package 66); then a man of the muster by his trade
-    person = people.find(who) if people is not None else None
+    person = people.find_anywhere(who) if people is not None else None
     if person is None:
         person = _by_station_or_voice(world, who)
     if person is None:
@@ -2025,7 +2025,11 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     # among them, or nobody and where the stations held are
     from freesail.world.hearing import heard_words, spot_of
 
-    spot = ("aboard", "quarterdeck") if place == "masthead" else spot_of(world, person)
+    spot = (
+        ("aboard", str(world.own.id), "quarterdeck")
+        if place == "masthead"
+        else spot_of(world, person)
+    )
     said = heard_words(world, spot, person, names, absent=_wanted(world))
     data: dict[str, Any] = {"person": person.name, "heard_by": names}
     if answered:
@@ -2037,14 +2041,13 @@ def _hearers_ashore(world: Any, person: Any) -> list[Any]:
     """The stations held whose person is at the same place ashore as `person` (package
     66; the director's has no place)."""
     from freesail.agents.agent import DIRECTOR
-    from freesail.agents.harness import _stations_held
-    from freesail.world.hearing import spot_of, station_spot, within_hearing
+    from freesail.world.hearing import spot_of, station_spot, stations_everywhere, within_hearing
 
     here = spot_of(world, person)
     return [
         h
-        for h in _stations_held(world)
-        if h.station.name != DIRECTOR and within_hearing(here, station_spot(world, h.station.name))
+        for w, h in stations_everywhere(world)
+        if h.station.name != DIRECTOR and within_hearing(here, station_spot(w, h.station.name))
     ]
 
 
@@ -2746,10 +2749,11 @@ def _doubt_aboard_new(world: Any, body: str) -> str | None:
 def _doubt_thing_moved(world: Any, thing: Any, where: dict[str, Any]) -> str | None:
     from freesail.world import things as TH
 
-    here_place, here_port, _ = TH.place_of(world, thing)
+    here_place, here_port, _, _hull = TH.place_of(world, thing)
     if where.get("keeper"):
         people = getattr(world, "people", None)
-        to = next((p for p in people.all if p.id == where["keeper"]), None)
+        everyone = getattr(people, "everyone", None) or people.all  # any hull's (step 2)
+        to = next((p for p in everyone if p.id == where["keeper"]), None)
         if to is None:
             return None
         if to.aboard or to.where in ("boat", "cutter"):

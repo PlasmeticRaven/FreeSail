@@ -10873,3 +10873,141 @@ On the build machine, the rule of 2026-10-28 (the whole suite the lead's in the 
   slow left out; the failure is `tests/test_pictures.py`'s MCP bridge picture "not blank",
   this machine's newer Chromium a hair under the blank threshold, failing before this
   package as after it (the machine's; nothing of it touched here).
+
+## Package 84, steps 1 and 2: the one-world refactor's first two steps (2026-10-28)
+
+The first two of the eleven steps of `docs/design/Design-OneWorld.md` §4, built as a sibling
+session in its own container on `claude/pkg-84` off `e7a3ee8` (73 merged; 86 building beside
+on the same head), each step one commit pushed when green; the design note's postscript "As
+built, steps 1 and 2" says what each step built, took another way and found; this section
+is the record of what moved, the counts, the pace and the suites. The physics are not
+touched; no ship file, no consent file, no model identifier.
+
+### Step 1: the Hull extracted behind the World's names
+
+**What moved: nothing pinned.** The step moves state and not operations: every per-ship
+field of the World lives on `world.own` (a `freesail.world.hulls.Hull`) and is read and
+written under its old name through a property, the World's `tick`, `record`, `submit` and
+`_tick_*` unchanged in text and order. No digest, line count, tick or state of any recorded
+passage can move by it, and none did in the suites run (below). The checkpoint's shape
+changed (the World's dict holds `own` in place of the per-ship fields) and the converter
+`World.__setstate__` reads the old shape: the three kept saves (`tests/fixtures/saves/`, m5c)
+load by the checkpoint road, run on a glass and a watch and save again
+(`test_checkpoint.py`), and `tests/test_hulls.py` writes a checkpoint in the old shape from a
+live world, loads it and runs it on to the live world's digest; a `CrewedWorld` in a
+checkpoint converts the same way (its own Hull under her vessel's id; `test_hulls.py`
+round-trips a world with a promoted brig and both logs' digests hold).
+
+**The count.** `PER_SHIP_FIELDS` names 59 fields (her ship and place 4, the ground and
+anchors 7, the tide 2, the sky and glass 3, the sea and motion 6, the wind 11, the sun 2, the
+reckoning 2, the log 2, the registries and keepers 13, the readings view 2, the book, captain,
+harnesses and seat 5); `SHARED_FIELDS` 21 the Hull reads back. `core/world.py` lost its
+twelve per-ship class defaults (to the Hull) and gained the Hull's making, the converter and
+the properties' installation (some forty lines); `core/replay.py` the Hull's reduction; no
+other file of the game changed.
+
+**The delegation's cost, measured on this container (four cores, the baseline fast tier
+running beside; the ratio is the figure, not the absolute).** A read of `world.ship` through
+the property, 50 ns; of `world.own.ship`, 13 ns; of a plain attribute of the World
+(`world.clock`), 10 ns (a million reads each by `timeit`). A tick of the cutter on the plane
+with no chart makes 47 per-ship reads through the World (counted by wrapping the properties
+over 600 ticks: `ship` 10.4 a tick, `wind` 8, `_position` 4, `wind_record` 4, `log` 3, `sea`
+3, `wind_settled` 2, `motion` 2), so the delegation costs about two microseconds of a tick
+that costs two milliseconds in truth 51's form: a tenth of a per cent, under the noise of any
+measure below.
+
+**The pace, truth 51's form (a thousand ticks to settle, the best of three thousands, the
+frigate alone on the station trial; `tools/pace.py alone`), the base commit `e7a3ee8` and
+step 1's tree measured one after the other on the quiet container:** the base
+tree 578 and 612 ticks a second by `tools/pace.py`, 567, 576 and 593 by the same measure
+run from a script in three pairs alternated with step 1's; step 1's tree 551 and 539 by
+`tools/pace.py`, 607, 653 and 549 in the alternated pairs (the load 0.6 to 0.85 throughout).
+The spread of one tree against itself (539 to 612 for the base, 539 to 653 for step 1) is
+wider than any difference between them: **the delegation costs nothing the measure can see**,
+as the count of reads said it would. (A first pair read 578 against 551 and looked like a
+loss of five per cent; the alternated pairs show it was the machine's noise. A profile of a
+thousand ticks under `cProfile` puts the properties' getter at 84,500 calls and 61 ms of
+5.3 s, which is the profiler's own cost of a call and not the game's.) Truth 51's floor of
+500 stands on this container on both trees; the pace tests proper are run alone at the end
+of the two steps.
+
+### Step 2: one registry of persons and things, the whereabouts, hearing by spot
+
+**What moved: nothing pinned.** The step changes where the persons are kept (one registry
+on the World, each company a view of its list) and what a person and a thing know of where
+they are (`Person.hull`, `Person.home`, `Thing.hull`), and widens hearing and reach to the
+registry; a world in which nobody moves is as it was, line for line, because every list a
+reading walks is the same list in the same order (the company's, the player's first), every
+bool that rides a log line's data is the same bool (`Person.aboard`, now a property over the
+hull), and no act was added to any tick. The readings of a world with one hull are the
+readings they were: `the people`, `where is`, `the places`, `the places ashore`, the free
+lines' lines and the hearing's tails are word for word what the fast tier's tests had of
+them before, and the touched files' tests pass unchanged but for the one that unpacked a
+thing's where into three (`test_world_orders`'s doubt test found the caller in
+`orders._doubt_thing_moved`, mended). The checkpoint's shape changed again (`World.registry`;
+`People` without its lists; `Person` with `hull` and `home` in place of `aboard`; `Thing`
+with `hull`) and the converter reads every older shape: the three kept saves load and run on
+(`test_checkpoint.py`), and `tests/test_hulls.py` writes the pre-84 shape whole, a crewed
+ship with a person ashore and things in both hulls in it, and loads it to the live worlds'
+digests.
+
+**The count.** `people.py` gained `Registry` (some 170 lines) and `People` lost its two
+lists for two properties, `everyone`, `discharge` and `find_anywhere`; `Person` an
+`__init__` of its own (the dataclass's fields as they were, `aboard` a keyword still) and
+the property; `hearing.py` the hull in the spot, `stations_everywhere`, `own_hull` and
+`company_of`; `things.py` the hull on the thing, in the where and in the reach;
+`movement.within_hail` the hulls; `orders.py` three places (the `say as` person found
+anywhere, the masthead's spot, the hearers ashore of every World, the doubt's unpack);
+`orders/free.py` the where's fourth field and the person found anywhere; `ports.py` two
+(who is found ashore, of every hull; the boat's things of this hull); `crews.demote` the
+discharge; `core/world.py` the registry's making and the old people's adoption; `hulls.py`
+the two views. Eleven files of the game; three test files (`test_people.py` three tests,
+`test_hulls.py` one, and the pre-84 shape's writer).
+
+**New tests.** `test_people.py`: the persons of every hull one registry and each company a
+view of it (two hulls' companies, the views, the whereabouts, `aboard` as the bool it was,
+`find` scoped and `find_anywhere` not, her persons gone with her World); a word ashore heard
+by whoever is at that place whichever hull brought him (the brig's master ashore at Falmouth
+at the counting house hears the player's Mr Gill and not his own quarterdeck; the two
+quarterdecks two spots; the port's places naming both; a thing ashore within his reach, taken
+and given to Mr Gill by the free lines of his own ship's grammar; within hail by the hull); a
+thing lies in one hull and the other's places do not show it. `test_hulls.py`: the pre-84
+checkpoint with a crewed ship, a person ashore and a thing in each hull converts whole. The
+acts that put a crewed ship's person ashore (her boat, the port's business for her) are step
+3's, so the whereabouts in these tests are written as the boat will write them; the
+hearing, the reach and the free lines are the real ones.
+
+### The suites, as run (2026-10-28; this container, four cores, nothing else of the
+### machine's but what is said)
+
+By the rule of 2026-10-28: the fast tier whole on each step's final tree, the slow tier of
+the touched files, the pace tests alone and last; the whole suite the lead's in the cloud at
+the merge. Each tier was run from a worktree of the committed tree, so that the next step's
+edits in the main tree could not reach a worker's lazy import.
+
+- **The base `e7a3ee8`, the fast tier whole** (`-n auto -q`, a baseline for the counts):
+  3,690 passed, 3 failed: the two pictures tests (`test_pictures.py`: "the chart is blank
+  (std 8.0)" against the bound of 8.0, with the other three workers and this builder's
+  reading of the code beside it, the failure 73's record knows under load) and the
+  fingerprint test (`test_replay.py`), which this builder caused by editing `core/world.py`
+  while the run was on (the fingerprint is of the code and moved under the test); neither is
+  the tree's.
+- **Step 1 (`2efb12e`), the fast tier whole**: 3,699 passed, 0 failed, 0 skipped (the six
+  new tests of `test_hulls.py`, the pictures tests and the fingerprint test passing on the
+  quieter machine).
+- **Step 2 (`8253924`), the fast tier whole**: 3,703 passed, 0 failed (three new tests in
+  `test_people.py`, one in `test_hulls.py`).
+- **The slow tier of the touched files** (`--slow -m "slow and not pace"`, on step 2's tree,
+  two workers beside its fast tier: `test_hulls`, `test_people`, `test_checkpoint`,
+  `test_core`, `test_crews`, `test_orders_places`, `test_tell`, `test_director`,
+  `test_world_orders`, `test_ports`, `test_places`): 24 passed, 0 failed (the kept saves run
+  on a watch, truth 87's brig, truth 89's fake captain across the switch, the trials'
+  neighbours in those files).
+- **The pace tests alone, last** (`--slow -m pace`, on step 2's tree, the machine quiet, load
+  1.6 falling): 10 passed, 0 failed (truth 51's five, 88 with the cap full, 7-138, 7-151,
+  7-159 and 7-160).
+
+The whole slow tier was not run here (the lead's, by the whole-suite workflow at the merge);
+no pin was re-measured, since nothing a pin reads moved by either step (the proof above and
+the slow tier of the touched files; the whole tier at the merge is the last word). What
+changed after each tree's fast tier: nothing of the code; this section.

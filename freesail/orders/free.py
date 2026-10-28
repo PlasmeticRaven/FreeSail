@@ -172,10 +172,16 @@ def _carry_out(world: Any, person: Any, verb: str, rest: str) -> tuple[bool, str
             return False, "", why, thing, to
         held = TH.held_by(world, to)
         if held:
-            place, port, ashore_at = TH._where_of_person(world, to)
+            place, port, ashore_at, hull = TH._where_of_person(world, to)
             TH.put(
                 thing,
-                {"place": place, "spot": f"before {to.name}", "port": port, "ashore_at": ashore_at},
+                {
+                    "place": place,
+                    "spot": f"before {to.name}",
+                    "port": port,
+                    "ashore_at": ashore_at,
+                    "hull": hull,
+                },
             )
             return (
                 True,
@@ -265,14 +271,14 @@ def _thing_and_person(world: Any, rest: str) -> tuple[Any, Any]:
         if low[i] != "to":
             continue
         t = TH.find(world, " ".join(words[:i]))
-        p = people.find(" ".join(words[i + 1 :]))
+        p = people.find_anywhere(" ".join(words[i + 1 :]))
         if t or p:
             thing = thing or (t[0] if len(t) == 1 else None)
             person = person or p
         if len(t) == 1 and p is not None:
             return t[0], p
     for i in range(1, len(words)):
-        p = people.find(" ".join(words[:i]))
+        p = people.find_anywhere(" ".join(words[:i]))
         t = TH.find(world, " ".join(words[i:]))
         if p is not None and len(t) == 1:
             return t[0], p
@@ -319,10 +325,10 @@ def _destination(world: Any, person: Any, dest: str) -> tuple[dict[str, Any] | N
     found = TH._place_in(dest)
     if found is not None:
         place, spot = found
-        if not TH.same_place(here, (place, None, "")):
+        if not TH.same_place(here, (place, None, "", here[3])):
             return None, f"{PLACES[place].name} is not where you are; go there first"
-        return {"place": place, "spot": spot}, ""
-    return {"place": here[0], "spot": dest}, ""
+        return {"place": place, "spot": spot, "hull": here[3]}, ""
+    return {"place": here[0], "spot": dest, "hull": here[3]}, ""
 
 
 def _hearers(world: Any, person: Any) -> list[Any]:

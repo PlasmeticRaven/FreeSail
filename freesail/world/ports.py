@@ -2925,7 +2925,8 @@ class Ports:
         people = self.world.people
         # the people as they stand, without mustering them for a reading (a world in
         # which nobody has moved is as it was)
-        for p in people.people if getattr(people, "_built", True) else []:
+        everyone = getattr(people, "everyone", None) if getattr(people, "_built", True) else []
+        for p in everyone or []:
             if not p.aboard and p.where == "shore" and p.port == port.id:
                 there.setdefault(ashore_at(self.world, p), []).append(p.name)
         # the things lying there (package 53b), in nobody's keeping
@@ -4005,10 +4006,11 @@ class Ports:
         lines: list[tuple[Severity, str, str, dict[str, Any]]] = []
         from freesail.world import things as things_mod
 
+        own = str(getattr(getattr(world, "own", None), "id", "") or "")
         for t in things_mod.things_of(world):
-            if t.keeper or t.place != things_mod.IN_THE_BOAT:
+            if t.keeper or t.place != things_mod.IN_THE_BOAT or (t.hull and t.hull != own):
                 continue
-            t.place, t.port, t.ashore_at, t.spot = "shore", port.id, "quay", ""
+            t.place, t.port, t.ashore_at, t.spot, t.hull = "shore", port.id, "quay", "", None
             lines.append(
                 (
                     Severity.ROUTINE,

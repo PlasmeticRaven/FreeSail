@@ -803,6 +803,15 @@ what she is made out to be with a hyphened word whole or by its head ('brig' a m
 brig, not a brig-sloop; 'sloop' or 'brig-sloop' the brig-sloop). The name leans on the
 player's shadow and the id 'the ship', which 82 and 84 rework.
 
+**As built (package 84, steps 1 and 2; `docs/design/Design-OneWorld.md`, "As built, steps 1
+and 2").** The container of a promoted member is still her own World (`crews.CrewedWorld`)
+until the refactor's step 6, but what a World keeps of one ship, the player's or a member's,
+is a `Hull` behind the World's names (`freesail/world/hulls.py`, `world.own`), and the
+persons of every ship and of the shore are one registry of the world (`world.registry`,
+`people.Registry`) with each person's whereabouts (`Person.hull`, `Person.home`), a ship's
+company a view of it; hearing is by spot with the hull in it, so a word ashore is heard by
+whoever is at that place of that port, whichever ship brought him.
+
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 
 A ship of a nation is **in port, in ordinary, on station, on passage, in convoy or escorting,

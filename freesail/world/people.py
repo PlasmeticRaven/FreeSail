@@ -315,20 +315,36 @@ def load_wardroom(ship_file: str | Path | None) -> Wardroom | None:
     return _wardroom(str(p)) if p is not None else None
 
 
-@dataclass
+# A person made as aboard before a registry has adopted him (package 84, step 2): he is
+# aboard his home hull, whichever that proves to be when `People.add` or `People._build`
+# adopts him; the sentinel is never a hull's id and never outlives the adoption.
+ABOARD_HOME = "aboard his home hull"
+
+
+@dataclass(init=False)
 class Person:
     """One of the named few. `mirror` is package 33a's `Master` for the master, whose
     place and occupation the reckoning keeps; this person reads and writes through it.
     `outline` is his character outline from the wardroom file (package 40), None for a
     person the file does not know (the pilot, a scenario's supercargo); `station` is the
-    harness's station bound to him by the file ("" for none)."""
+    harness's station bound to him by the file ("" for none).
+
+    **His whereabouts** (package 84, step 2; the design's §2.3): `hull` is the id of the
+    hull he is in now (None ashore or in a boat) and `home` the hull that keeps him (his
+    muster's ship, or the ship whose World made him from words); `aboard` is the view of
+    the first as a bool, read everywhere it was and written as it was (`aboard = True` puts
+    him back in his home hull, `False` takes him out of every hull), so that the thirty
+    places that move a person stand and the bool rides the pinned lines' data as before.
+    `place` is his place aboard, or 'shore', 'boat' or 'cutter'; `port` and `ashore_at` say
+    where ashore."""
 
     id: str
     name: str  # "Mr Harvey", "Captain Bowen", "the pilot, Mr Pascoe of Falmouth"
     role: str
     skill: float
     place: str = "quarterdeck"
-    aboard: bool = True
+    hull: str | None = None
+    home: str = ""
     sick: bool = False
     messenger: bool = False
     watch: str | None = None  # "starboard" or "larboard" for a watch-keeper
@@ -351,6 +367,66 @@ class Person:
     ashore_at: str = ""
     # dead (package 73, spec M7 §16a): his station ended, the command passed by the bill
     dead: bool = False
+
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        role: str,
+        skill: float,
+        place: str = "quarterdeck",
+        aboard: bool = True,
+        sick: bool = False,
+        messenger: bool = False,
+        watch: str | None = None,
+        occupied_until: int | None = None,
+        occupied_with: str = "",
+        pending: tuple[str, int, str] | None = None,
+        mirror: Any = None,
+        sailor_id: str | None = None,
+        port: str | None = None,
+        up: bool = False,
+        outline: Outline | None = None,
+        station: str = "",
+        needs: Any = None,
+        ashore_at: str = "",
+        dead: bool = False,
+        hull: str | None = None,
+        home: str = "",
+    ) -> None:
+        self.id = id
+        self.name = name
+        self.role = role
+        self.skill = skill
+        self.place = place
+        self.home = home
+        # aboard his home hull until the registry adopts him, or the hull said, or ashore
+        self.hull = hull if hull is not None else (ABOARD_HOME if aboard else None)
+        self.sick = sick
+        self.messenger = messenger
+        self.watch = watch
+        self.occupied_until = occupied_until
+        self.occupied_with = occupied_with
+        self.pending = pending
+        self.mirror = mirror
+        self.sailor_id = sailor_id
+        self.port = port
+        self.up = up
+        self.outline = outline
+        self.station = station
+        self.needs = needs
+        self.ashore_at = ashore_at
+        self.dead = dead
+
+    @property
+    def aboard(self) -> bool:
+        """Whether he is in a hull (his own or another's); the bool every reading and every
+        move used before the whereabouts were his (package 84, step 2)."""
+        return self.hull is not None
+
+    @aboard.setter
+    def aboard(self, value: bool) -> None:
+        self.hull = (self.home or ABOARD_HOME) if value else None
 
     @property
     def rank(self) -> str:
@@ -425,19 +501,199 @@ class Message:
     carried_by: str = "the boat"
 
 
+class Registry:
+    """**The persons and the things of the world, one registry** (package 84, step 2; the
+    design's §2.3), kept on the World (`world.registry`) and shared by every World of the
+    game (a crewed ship's World is given its parent's). The persons are kept in one list
+    per home hull (`by_home`, the hulls in the order they registered, the World's own
+    first, so that the player's company comes first as it did), and each hull's company
+    (`People`) is a view of its own list; `persons()` is everyone, `aboard(hull)` whoever is
+    in a hull now, hers or not; the things are one list (`things`), each with the hull it
+    lies in (`Thing.hull`) or its keeper, so that a thing a person carries aboard another
+    ship goes with him. Hearing and reach read the registry (`hearing.people_hearing`,
+    `things.keeper_of`), the company's own orders read the company (`People.find`,
+    `holder`, `send_for`), and `People.find_anywhere` reaches the rest."""
+
+    def __init__(self) -> None:
+        self.hulls: list[str] = []
+        self.by_home: dict[str, list[Person]] = {}
+        self.companies: dict[str, Any] = {}
+        self.things: list[Any] = []
+
+    def register(self, company: People) -> list[Person]:
+        """A hull's company registered: its list of persons, made when first seen."""
+        hid = company.hull_id
+        if hid not in self.by_home:
+            self.by_home[hid] = []
+            self.hulls.append(hid)
+        self.companies[hid] = company
+        return self.by_home[hid]
+
+    def unregister(self, hull_id: str) -> None:
+        """A hull gone (her World dropped at the demotion): her persons out of the registry
+        with the things they keep and the things lying in her."""
+        persons = self.by_home.pop(hull_id, [])
+        self.companies.pop(hull_id, None)
+        if hull_id in self.hulls:
+            self.hulls.remove(hull_id)
+        ids = {p.id for p in persons}
+        self.things = [
+            t
+            for t in self.things
+            if not ((t.keeper and t.keeper in ids) or (not t.keeper and t.hull == hull_id))
+        ]
+
+    def company(self, hull_id: str) -> list[Person]:
+        """The persons a hull keeps (her company, wherever each is now): the list itself."""
+        if hull_id not in self.by_home:
+            self.by_home[hull_id] = []
+            self.hulls.append(hull_id)
+        return self.by_home[hull_id]
+
+    def aboard(self, hull_id: str) -> list[Person]:
+        """The persons in a hull now, hers or another's."""
+        return [p for p in self.persons() if p.hull == hull_id]
+
+    def persons(self) -> list[Person]:
+        """Everyone, the hulls' companies in the order the hulls registered."""
+        out: list[Person] = []
+        for hid in self.hulls:
+            out.extend(self.by_home.get(hid, ()))
+        for hid, persons in self.by_home.items():
+            if hid not in self.hulls:
+                out.extend(persons)
+        return out
+
+    def people_of(self, hull_id: str) -> Any:
+        """The company object (`People`) of a hull, or None."""
+        return self.companies.get(hull_id)
+
+    def adopt(self, person: Person, home: str) -> Person:
+        """A person given his home where he has none, and put aboard it where he was made
+        as aboard (`ABOARD_HOME`)."""
+        if not person.home:
+            person.home = home
+        if person.hull == ABOARD_HOME:
+            person.hull = person.home
+        return person
+
+    def remove(self, person: Person) -> None:
+        for persons in self.by_home.values():
+            for i, p in enumerate(persons):
+                if p is person:
+                    del persons[i]
+                    return
+
+    def rehome(self, person: Person, hull_id: str) -> None:
+        """A person given another home (a prize crew's man, 74): moved between the lists."""
+        self.remove(person)
+        person.home = hull_id
+        self.company(hull_id).append(person)
+
+    def adopt_old(self, company: Any, hull_id: str) -> None:
+        """A `People` from a checkpoint written before the registry (its persons and things
+        on its own dict, each person's `aboard` a bool): taken into this registry under
+        the hull's id, the whereabouts written from the bool."""
+        from freesail.world.places import PLACES
+
+        persons = list(company.__dict__.pop("people", []) or [])
+        things = list(company.__dict__.pop("things", []) or [])
+        company.hull_id = hull_id
+        for p in persons:
+            was_aboard = p.__dict__.pop("aboard", True)
+            if "home" not in p.__dict__ or not p.home:
+                p.home = hull_id
+            if "hull" not in p.__dict__ or p.hull == ABOARD_HOME:
+                p.hull = hull_id if was_aboard else None
+        for t in things:
+            if "hull" not in t.__dict__:
+                place = str(getattr(t, "place", "") or "")
+                aboard = (place in PLACES and PLACES[place].aboard) or place == "boat"
+                t.hull = hull_id if (aboard and not getattr(t, "keeper", "")) else None
+        self.by_home.setdefault(hull_id, []).extend(persons)
+        if hull_id not in self.hulls:
+            self.hulls.append(hull_id)
+        self.companies[hull_id] = company
+        self.things.extend(things)
+
+    def absorb(self, other: Registry, renames: dict[str, str] | None = None) -> None:
+        """Another registry's persons and things taken into this one (a crewed ship's World
+        from a checkpoint written before the registry, whose own was made at its load),
+        the hull ids renamed where `renames` says."""
+        renames = renames or {}
+        for hid, persons in list(other.by_home.items()):
+            new = renames.get(hid, hid)
+            for p in persons:
+                if p.home == hid:
+                    p.home = new
+                if p.hull == hid:
+                    p.hull = new
+            self.by_home.setdefault(new, []).extend(persons)
+            if new not in self.hulls:
+                self.hulls.append(new)
+            company = other.companies.get(hid)
+            if company is not None:
+                company.hull_id = new
+                self.companies[new] = company
+        for t in other.things:
+            if t.hull in renames:
+                t.hull = renames[t.hull]
+        self.things.extend(other.things)
+        other.by_home, other.companies, other.things, other.hulls = {}, {}, [], []
+
+
 class People:
-    """The people of one World, built from the muster at the first call (the composer
-    musters the crew after the World is made, as the master is found: `reckoning`)."""
+    """The company of one hull: the named few, built from her muster at the first call
+    (the composer musters the crew after the World is made, as the master is found:
+    `reckoning`). Since package 84's step 2 the persons live in the World's one registry
+    (`Registry`, `world.registry`), this object a view of the list the registry keeps for
+    her hull (`people`), with her own letters in hand, her wardroom and the command's
+    passing; `everyone` is the registry whole."""
 
     def __init__(self, world: Any) -> None:
         self.world = world
-        self.people: list[Person] = []
+        self.hull_id = str(getattr(getattr(world, "own", None), "id", "") or "")
         self._built = False
         self.messages: list[tuple[Message, int]] = []  # letters in the messenger's hand (due tick)
-        # the things (spec M7b §17a; package 53b; `freesail.world.things`): the people's
-        # sibling, kept here beside them and moved by the same hands (a checkpoint from
-        # before has none, `things.things_of`)
-        self.things: list[Any] = []
+        registry = getattr(world, "registry", None)
+        if registry is None:
+            # a World made without one (a stub of the tests'): a registry of its own
+            registry = world.registry = Registry()
+        registry.register(self)
+
+    @property
+    def registry(self) -> Registry:
+        """The world's one registry of persons and things (`world.registry`)."""
+        return self.world.registry
+
+    @property
+    def people(self) -> list[Person]:
+        """The persons this hull keeps, the registry's own list for her."""
+        return self.registry.company(self.hull_id)
+
+    @people.setter
+    def people(self, value: list[Person]) -> None:
+        self.registry.by_home[self.hull_id] = list(value)
+
+    @property
+    def things(self) -> list[Any]:
+        """The things of the world (spec M7b §17a; package 53b; `freesail.world.things`):
+        the people's sibling, one list on the registry, moved by the same hands."""
+        return self.registry.things
+
+    @things.setter
+    def things(self, value: list[Any]) -> None:
+        self.registry.things = list(value)
+
+    @property
+    def everyone(self) -> list[Person]:
+        """Every person of the world, this company first where it registered first."""
+        self._build()
+        return self.registry.persons()
+
+    def discharge(self) -> None:
+        """This hull's persons and things out of the registry (her World dropped)."""
+        self.registry.unregister(self.hull_id)
 
     # -- building -------------------------------------------------------------------
 
@@ -458,6 +714,8 @@ class People:
                 self.people.append(
                     Person("master", nav.master.name, "master", nav.master.skill, mirror=nav.master)
                 )
+            for p in self.people:
+                self.registry.adopt(p, self.hull_id)
             return
         used: set[str] = set()
         for post, sailor in crew.posts.items():
@@ -522,6 +780,8 @@ class People:
                 p.where = "deck"
         self._attach_wardroom()
         self._scenario_people()
+        for p in self.people:
+            self.registry.adopt(p, self.hull_id)
         self._scenario_things()
 
     def _ship_file(self) -> str | None:
@@ -758,6 +1018,28 @@ class People:
                 return p
         return None
 
+    def find_anywhere(self, words: str) -> Person | None:
+        """A person by the words among this company first (`find`), then among everyone
+        else of the world by his name, his surname or his role (package 84, step 2): the
+        reach of a word said ashore, a thing given or taken, the director's `say as`; never
+        of `send for` or a station's binding, which are the company's own."""
+        found = self.find(words)
+        if found is not None:
+            return found
+        key = _words(words)
+        if not key or key in ("captain", "commander", "me", "myself"):
+            return None
+        bare = key.removeprefix("mr ").removeprefix("mister ")
+        others = [p for p in self.registry.persons() if p.home != self.hull_id]
+        for p in others:
+            if _words(p.surname) == bare or _words(p.name) == bare or _words(p.name) == key:
+                return p
+        role = ROLE_WORDS.get(key, key)
+        for p in others:
+            if p.role and _words(p.role) == role:
+                return p
+        return None
+
     def of_the_company(self, words: str, draw: bool = True) -> Person | None:
         """A person of the ship's company by the words (spec M7b §9; package 52): one of
         the people (`find`), or a man of the muster by his trade whom the named few do not
@@ -821,7 +1103,10 @@ class People:
         return person
 
     def add(self, person: Person) -> Person:
+        """A person added to this hull's company: his home this hull where he has none,
+        aboard it where he was made as aboard."""
         self._build()
+        self.registry.adopt(person, self.hull_id)
         self.people.append(person)
         return person
 
@@ -837,7 +1122,8 @@ class People:
                     t.place, t.port, t.ashore_at, t.spot = "shore", person.port, "quay", ""
                 else:
                     t.place, t.spot = person.where, ""
-        self.people = [p for p in self.people if p is not person]
+                    t.hull = person.hull
+        self.registry.remove(person)
 
     # -- states -----------------------------------------------------------------------
 

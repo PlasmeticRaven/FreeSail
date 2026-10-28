@@ -118,6 +118,9 @@ class Thing:
     spot: str = ""
     port: str | None = None
     ashore_at: str = ""
+    # the hull it lies in, when its place is aboard or in her boat (package 84, step 2; the
+    # world's one registry of things): None in a keeping, ashore or over the side
+    hull: str | None = None
 
     @property
     def the(self) -> str:
@@ -186,7 +189,8 @@ def keeper_of(world: Any, thing: Thing) -> Any:
     people = getattr(world, "people", None)
     if people is None:
         return None
-    return next((p for p in people.all if p.id == thing.keeper), None)
+    everyone = getattr(people, "everyone", None) or people.all  # every hull's (step 2)
+    return next((p for p in everyone if p.id == thing.keeper), None)
 
 
 def kept_by(world: Any, person: Any) -> list[Thing]:
@@ -194,20 +198,17 @@ def kept_by(world: Any, person: Any) -> list[Thing]:
     return [t for t in things_of(world) if t.keeper and t.keeper == person.id]
 
 
-def place_of(world: Any, thing: Thing) -> tuple[str, str | None, str]:
-    """Where the thing is now: (the place, the port, the place ashore). In a person's
-    keeping it is where he is (his place aboard, 'boat' or 'cutter' off the ship,
-    'shore' at his port and his place ashore)."""
+Where = tuple[str, str | None, str, str | None]  # the place, the port, ashore at, the hull
+
+
+def place_of(world: Any, thing: Thing) -> Where:
+    """Where the thing is now: (the place, the port, the place ashore, the hull). In a
+    person's keeping it is where he is (his place aboard his hull, 'boat' or 'cutter' off
+    the ship, 'shore' at his port and his place ashore)."""
     p = keeper_of(world, thing)
     if p is None:
-        return thing.place, thing.port, thing.ashore_at
-    if p.aboard:
-        return world.people.effective_place(p), None, ""
-    if p.where == "shore":
-        from freesail.world.movement import ashore_at
-
-        return "shore", p.port, ashore_at(world, p)
-    return p.where, None, ""
+        return thing.place, thing.port, thing.ashore_at, thing.hull
+    return _where_of_person(world, p)
 
 
 def find(world: Any, words: str) -> list[Thing]:
@@ -281,10 +282,19 @@ def where_words(world: Any, thing: Thing, keeper_where: bool = True) -> str:
 
 
 def lying_aboard(world: Any) -> dict[str, list[Thing]]:
-    """The things lying in each place aboard (in nobody's keeping), by place."""
+    """The things lying in each place aboard this World's own hull (in nobody's keeping),
+    by place."""
+    from freesail.world.hearing import own_hull
+
+    here = own_hull(world)
     out: dict[str, list[Thing]] = {}
     for t in things_of(world):
-        if not t.keeper and t.place in PLACES and PLACES[t.place].aboard:
+        if (
+            not t.keeper
+            and t.place in PLACES
+            and PLACES[t.place].aboard
+            and (t.hull == here or not t.hull)
+        ):
             out.setdefault(t.place, []).append(t)
     return out
 
@@ -325,21 +335,34 @@ def held_by(world: Any, person: Any) -> str | None:
     return None
 
 
-def _where_of_person(world: Any, person: Any) -> tuple[str, str | None, str]:
+def _where_of_person(world: Any, person: Any) -> Where:
+    from freesail.world.hearing import company_of, own_hull
+
     if person.aboard:
-        return world.people.effective_place(person), None, ""
+        people = company_of(world, person)
+        place = people.effective_place(person) if people is not None else person.where
+        hull = getattr(person, "hull", None)
+        return place, None, "", (hull if isinstance(hull, str) and hull else own_hull(world))
     if person.where == "shore":
         from freesail.world.movement import ashore_at
 
-        return "shore", person.port, ashore_at(world, person)
-    return person.where, None, ""
+        return "shore", person.port, ashore_at(world, person), None
+    return person.where, None, "", (getattr(person, "home", "") or own_hull(world))
 
 
-def same_place(a: tuple[str, str | None, str], b: tuple[str, str | None, str]) -> bool:
-    """Whether two places are within reach of each other: aboard, the same place or the
-    open deck's earshot; ashore, the same place of the same port; in the boat, the boat."""
+def _hull_of(where: tuple[Any, ...]) -> str | None:
+    return where[3] if len(where) > 3 else None
+
+
+def same_place(a: tuple[Any, ...], b: tuple[Any, ...]) -> bool:
+    """Whether two places are within reach of each other: aboard, the same hull and the
+    same place or the open deck's earshot; ashore, the same place of the same port; in a
+    boat, the same boat (package 84, step 2: the hull in the where)."""
     if a[0] == "shore" or b[0] == "shore":
         return a[0] == b[0] and a[1] == b[1] and (a[2] or "quay") == (b[2] or "quay")
+    ha, hb = _hull_of(a), _hull_of(b)
+    if ha and hb and ha != hb:
+        return False
     if a[0] in PLACES and PLACES[a[0]].aboard and b[0] in PLACES and PLACES[b[0]].aboard:
         return b[0] in earshot(a[0]) or a[0] == b[0]
     return a[0] == b[0]
@@ -416,10 +439,12 @@ def read_where(world: Any, phrase: str) -> dict[str, Any] | None:
                     "('person: make \"<name>\", <who he is>, <where>')"
                 )
             return {"keeper": p.id}
+    from freesail.world.hearing import own_hull
+
     if low in ("aboard", "on board"):
         return {}
     if _IN_THE_BOAT.match(low):
-        return {"place": IN_THE_BOAT, "spot": ""}
+        return {"place": IN_THE_BOAT, "spot": "", "hull": own_hull(world)}
     m = _ASHORE.match(text)
     if m is not None:
         ports = getattr(world, "ports", None)
@@ -436,7 +461,7 @@ def read_where(world: Any, phrase: str) -> dict[str, Any] | None:
         return {"place": "shore", "port": port.id, "ashore_at": "quay"}
     found = _place_in(text)
     if found is not None:
-        return {"place": found[0], "spot": found[1]}
+        return {"place": found[0], "spot": found[1], "hull": own_hull(world)}
     ports = getattr(world, "ports", None)
     m = _PLACE_AT_PORT.match(text)
     if m is not None and ports is not None:
@@ -506,6 +531,7 @@ def put(thing: Thing, where: dict[str, Any]) -> None:
     thing.spot = "" if thing.keeper else str(where.get("spot") or "")
     thing.port = None if thing.keeper else where.get("port")
     thing.ashore_at = "" if thing.keeper else str(where.get("ashore_at") or "")
+    thing.hull = None if thing.keeper else (where.get("hull") or None)
 
 
 def _new_id(world: Any, name: str) -> str:
