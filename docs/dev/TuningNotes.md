@@ -10018,3 +10018,844 @@ the machine running:
 What changed after the whole slow tier's last run: the quiet path's stiffness line (c60c361,
 one line of `water.py`) and this section; the water file and the pictures test were run again
 after it, and the pace tests.
+## Between packages: the privateer schooner and the pivot gun, provisional (2026-10-25)
+
+At the owner's ask, between packages and ahead of package 75, to test how far package 70's
+armament extends: a new hull given guns through the generator alone, then a new mounting.
+Everything here is marked PROVISIONAL where it lives, for 75 to replace from the type's own
+records. The design and the open items are in `docs/design/Proposal-PivotGun.md`. Two
+proposals written the same day, for the lead to brief or not, are
+`docs/design/Proposal-PracticeFiring.md` (practice at the great guns: a cask, a notional mark
+and dumb show, with every gunnery order unchanged) and
+`docs/design/Proposal-MagazineResupply.md` (powder and shot from the Ordnance and the
+merchants, by the Admiralty's Regulations of 1806 in `docs/references/admiralty/`; no port
+supplies either today).
+
+- **The privateer schooner** (`data/ships/privateer-schooner.yaml`, through
+  `tools/gen_ships.py` `schooner(armed=True)`, `privateer_schooner`, `schooner_armament`):
+  the topsail schooner's hull, rig and company with two fits. `long tom` is the default, the
+  owner's loadout: a long 12-pounder on a pivot amidships at +2.6 m, between the fore mast at
+  +7.8 and the main at -2.6, four 12-pounder carronades two a side clear of its sweep, and
+  four swivels. `letter of marque` is six long 6-pounders and four swivels.
+  `topsail-schooner.yaml` regenerates byte-identical. The description `privateer schooner`
+  (and "an armed schooner", "a letter of marque") is in `world/ships.py`, made out "a
+  schooner" by the tops, and its size rank is in `world/captains.py`. **Why a file of its
+  own:** with the guns on `topsail-schooner.yaml`, the trade trial's merchant schooner went to
+  `engaging` against the privateer instead of hauling off (the states moved, proven against
+  the same trial with the old file), and every passage and trial sailing the unarmed
+  Speedwell would have been armed.
+- **The pivot** (`schema.GUN_PLACES`; `parts.Gun.name`, `train_deg`; `combat/guns.py`
+  `ARC_PIVOT_FROM_DEG` 60, `ARC_PIVOT_TO_DEG` 140, `PIVOT_TRAIN_DEG_S` 3, `PIVOT_ON_DEG` 5,
+  `_train_pivots`, `bears`, `serving`, `_is_lee`; `combat/hits.py` the deck's guns;
+  `crew/quarters.py` the bill's order and words; `orders/gunnery.py` "the pivot gun", "the
+  long Tom"; `ship/graph.py` the export's `train_deg`). No side; trained toward the mark the
+  shorter way at its crew's pace; bears within the arc either side when trained within five
+  degrees. **The arc is the owner's ruling of the day**, 60 to 140 either side, reasoned from
+  the schooner's rig (the fore topmast backstays at about 55 to 60 degrees from the pivot,
+  the main shrouds at about 140 to 150). A first figure of 30 to 150 fired through the fore
+  rigging. Each pivot's arcs from its own ship is proposed, not built. Nothing changes on a
+  ship without a pivot: every branch is the pivot's alone.
+- **Measured** (the first action at seed 7 with the Renard replaced by the privateer
+  schooner, a scratch scenario not committed, both rules captains, three hours; the long
+  Tom's run with the first arc of 30 to 150):
+  - The letter of marque's long 6-pounders kept the range and carried away the King's
+    cutter's main topmast, topgallant mast, gaff and boom in about an hour and a half (133
+    rounds). The range opened and both broke off; nobody struck; two of the cutter's men were
+    killed.
+  - The long Tom trained to the larboard quarter (110 to 128 degrees off the bow) and fired 62
+    rounds, the carronades 157. The King's cutter, whose broadside bore little of the
+    afternoon, fired 37 and 38 in the two runs. The pivot's case in one action. These are
+    tuning, not pins.
+- **Found, carried** (in the proposals for the lead):
+  - A long gun and a carronade of one calibre draw one pool of cartridges. The magazine keys
+    them by the shot's weight, and the long Tom fell silent when the carronades had emptied
+    the 12-pound cartridges.
+  - A captain whose magazine is out stays `engaging`.
+  - `shot.lee_port_shut` is defined and never called.
+  - "The wheel is shot away" is said for a tillered ship.
+  - A new vessel type still touched code in two places (the descriptions' words, the size
+    rank), which could be read from the ship files' own `descriptions`.
+  - Practice with no mark logs a shotted gun's round as "a shot across her bows".
+  - The gunner's "the magazine is out" is said once a calibre and never cleared.
+- **Tests:**
+  - `tests/test_pivot_gun.py` (new: the arc either side and its edges, training and its pace
+    short-handed, serving, the lee side, the orders, the load's refusal of a sided pivot).
+  - `tests/test_ships.py` (both fits; the privateer is the schooner's hull and company).
+  - `tests/test_ship_particulars.py` (the generator writes the new file).
+  - The ship, signal, squadron, director and scenario files under `--slow` passed after the
+    split (209). The captain's trials under `--slow`: three fail on this machine with the old
+    files and the new alike, the same assertions and digests (the trade trial in thick weather
+    `df5f02eb6e6ce68a` for `cfa538b19cb0d2fe`; the Ushant lee shore; the trade stranger's
+    1248 lines for 1246). They are not this work's.
+  - The whole slow tier could not be run to an end here: two suites at once, with an action
+    beside them, crashed workers (a Windows access violation in the physics) and ran out
+    the clock. Run alone at two workers after the arc's ruling: the combat truths 7-133 to
+    7-160 (28 passed), and the pivot, ship, loader, signal, squadron, brains, captains,
+    director, aboard, scenario and orders files under `--slow` (968 passed). Ruff is clean on
+    every file touched. **The lead should run the whole slow tier on the merged tree, as for
+    any fold-in.**
+
+## Between packages 72 and 73: practice at the great guns, and powder and shot taken in (2026-10-25)
+
+Built locally between packages, on `main` of a local repository on its local baseline (the
+M7 folder taken from the line's `2774be3`, with the provisional pivot gun and privateer
+schooner, above), nothing pushed, **for the lead to fold in**. (Package 86's fold-in: the
+owner's local commits this section named are on no branch of the project; the work they
+made is on the line at `5b01fdf`, on top of package 73, and the tree he measured before it
+is called "the local baseline" below.) The owner's two proposals of the day (`docs/design/Proposal-PracticeFiring.md`,
+`docs/design/Proposal-MagazineResupply.md`), approved and built from one design,
+`docs/design/Build-PracticeAndResupply.md` (its decisions table names every
+judgement call, its §8.2 the truths); the working name in the code and here is "practice and
+resupply (between packages 72 and 73)". The lead's stage 0 (the scaffolding, no
+behaviour change), then three builders in three worktrees, each with its own review's
+fixes: Builder 1 the magazine and the gun deck, Builder 2 the supply, Builder 3 practice;
+merged in that order with the merge's own edits, truths 7-161 to 7-171, and the review of
+the merged tree with its fixes: ten local commits, all folded in at `5b01fdf`. Spec M7 §8
+"as built (practice and resupply)"; `docs/agents/Harness.md` §21f; the primer's chapters 14
+("Powder and shot") and 22 ("Practice at the great guns"); the owner's scenario
+`data/scenarios/exercising-the-great-guns.yaml`. The physics is read and not changed; no
+ship file was touched by hand (the five armed files regenerated through
+`tools/gen_ships.py`, the topsail schooner, the lugger and the smack byte-identical); the
+consent records were not touched; no model identifier anywhere; no new random draw on an
+existing path (the one new stream, "practice", opens at a cask's first sighting). **The
+truth numbers 7-161 to 7-171** follow 72's 7-160 and are to be agreed with package 73,
+whose brief takes "the number after 72's".
+
+### The owner's rulings (2026-10-25)
+
+- **Stages A and B both**: the magazine by kind with the gunner's filling, and powder and
+  shot taken in at a port.
+- **The Ordnance's issue to a King's ship is free and vouched**; merchants and privateers
+  pay.
+- **Practice gives no skill**: each gun's drill is counted (`guns.Drill`: the rounds in dumb
+  show and live, the timed cycles and the best, the falls at the mark) and nothing reads it
+  for pace or aim. The drill counts only.
+- **The galley fire out while the powder comes aboard is a state the needs read.**
+- **Ship-to-ship transfer is deferred**, with powder from prizes (74's and 82's).
+
+### What was built, and where
+
+1. **The magazine by kind** (`ship/parts.py`: `Magazine` of layout 2, `charge_lb`,
+   `fill_seconds`, `split_by_kind`, `fit_levels`, `Wanting`, `powder_words`, `gun_words`,
+   `_convert_70`; `ship/schema.py`: `FIT_KEYS` with `charges`, `powder_barrels` and
+   `exercise_charges`, the cartridges and charges by kind and calibre, the calibre-keyed
+   form kept where one kind of the fit has the calibre and refused in words where two do,
+   `QuarterBillSpec.filling`; `tools/gen_ships.py`: `fit_magazine`, `Builder.armament`,
+   `quarter_bill(filling=)`, the notes on the new keys). The cartridges filled by gun kind
+   and calibre against the fit's allowance, the loose powder below in barrels against the
+   barrels' establishment, the shot by calibre and kind as before, `wanting()` what would
+   complete her, the gunner's account a tuple of dated receipts. The long Tom's 55
+   cartridges are its own: the pivot gun's finding above ("A long gun and a carronade of one
+   calibre draw one pool") is mended (truth 7-169).
+2. **The gunner's filling** (`combat/filling.py`, once a minute from
+   `combat/action.tick_action`; the wait at the cartridge phase and the self-clearing
+   once-sets in `combat/guns.py`). A gun with no filled cartridge of its kind waits at the
+   cartridge phase while there is powder below (`guns.filling`, told once an outage); with
+   none below, "the magazine is out" as before, said again once powder has come aboard and
+   a cartridge has been taken (the pivot gun's finding above, "said once a calibre and never
+   cleared", mended: truth 7-167). The magazine's reading says what he fills for, or that he
+   is not filling and why.
+3. **Powder and shot taken in** (`world/ordnance.py`: the block, the demand and its
+   refusals, the hoy's two stages; `orders/ordnance.py`: the words; `world/service.py`:
+   `service_of` and `under_the_regulations`; `world/ports.py`: `Port.ordnance`, the job's
+   branch, the hoy in the port's reading, `left_behind` once a minute; `orders/port.py` and
+   `orders/__init__._stores_order`: the routes in; the eleven ports' `ordnance:` blocks;
+   `world/places.py`: `Stores.galley_fire_out` and `cold_meals`, the paper "the gunner's
+   account" (source `magazine`, kept by the gunner, else the boatswain, the mate, the
+   master) and an old catalogue mended on a miss; `world/needs.py`: the cold meal;
+   `crew/victuals.py`: the meals counted cold; `data/papers/papers.yaml`: the eleventh
+   paper).
+4. **Practice** (`combat/marks.py`: the cask and the notional mark, the cask's drift, loss
+   and sight, the allowance; `combat/guns.py`: the exercise in dumb show, the drill, the
+   shot at a mark, "into the sea"; `combat/shot.py`: `hit_chance(size=)`; `combat/hits.py`:
+   the mark's first branch; `combat/action.py`: the mark's target, `marks.count_live` for a
+   mark in place of `_fired_on`, `marks.tick`, the exercise ended by the strike and when the
+   hands are piped down; `orders/gunnery.py`: the orders; `evolutions/action_scripts.py`:
+   `HeaveMarkScript`, holding nothing, and `secure the guns` ending the exercise and giving
+   up a mark; `data/evolutions/heave_mark.yaml`; `world/lookout.py`: the cask a sighting of
+   its own kind, never hailed; `world/reckoning.py`: the cask's bearing moving no reckoning;
+   `api/practice_readings.py`: the `practice` row and the thirteen events;
+   `api/action_readings.py`: the `magazine` row in port and the `guns` row's dumb show;
+   `standing/runtime.py`: `GUNNERY_PARTS`; `data/vocabulary.yaml`: the port's verb and the
+   gun deck's five, all written in stage 0 and none after).
+5. **The records**: this section, spec M7 §8's "as built", Harness §21f, the work packages'
+   entry, the primer's chapters 14 and 22 (22's stale facts mended against the first action
+   at seed 7: the colours at 11:12, seven shot holes, no lee port shut, point blank by
+   calibre), and the squadrons design's pace floors named as built, truths 7-159 and 7-160.
+
+### The figures and their sources
+
+- **The charges** (`parts.CHARGE_SHARE`, written into each fit as `charges:`): a long gun a
+  third of its shot's weight, a carronade a twelfth, a swivel a half, to the ounce. Falconer
+  1780, CANNON (from l.4037), quoting Robins at l.4826-4831: the present allowance half the
+  ball in the smaller pieces and seven sixteenths in the 32-pounders, a third "or even less"
+  an advantage. **That the service charge of 1805 was a third is from memory, UNVERIFIED;
+  the carronade's twelfth is from memory, UNVERIFIED** (Falconer is before the carronade);
+  the swivel's half is Falconer's smaller pieces (l.4827) applied to a half-pounder,
+  judgement. The Regulations' Table No. 29 (OCR l.27498-27502) has lost its figures in the
+  OCR; package 75 enters them through the generator from the page image.
+
+  | Gun | Charge | To fill one, man-seconds |
+  |---|---|---|
+  | long 18 | 6 lb | 210 |
+  | long 12 | 4 lb | 180 |
+  | long 9 | 3 lb | 165 |
+  | long 6 | 2 lb | 150 |
+  | long 3 | 1 lb | 135 |
+  | carronade 32 | 2 lb 11 oz | 160 |
+  | carronade 12 | 1 lb | 135 |
+  | swivel ½ | 4 oz | 124 |
+
+- **The barrel**: a hundred pounds (`BARREL_LB`): Falconer 1780, the French glossary, *Baril
+  de poudre*, "a powder-cask, containing an hundred pounds of gun-powder" (l.22563-22564).
+  The English barrel's weight is UNVERIFIED.
+- **The filled allowance and the reserve**: the filled counts are package 70's (a round a
+  gun of the allowance and a tenth over for the blank charges, judgement), so that nothing
+  an action did before moves; the powder below at completion is half the filled powder,
+  rounded up to the barrel (`RESERVE_SHARE`, judgement: the period kept most of its powder
+  in the barrels). As committed:
+
+  | Fit | Filled (kind, calibre: n) | Filled powder | `powder_barrels` | `exercise_charges` | The bill's `filling` |
+  |---|---|---|---|---|---|
+  | frigate-36 | long 18: 2054; carronade 32: 790; long 9: 316 | 15,395 lb | 77 | 6 | 10 |
+  | brig | carronade 32: 1264; long 6: 158 | 3,713 lb | 19 | 4 | 4 |
+  | cutter, carronades | carronade 12: 330 | 330 lb | 2 | 1 | 1 |
+  | cutter, long guns | long 3: 330; swivel ½: 352 | 418 lb | 3 | none | 1 |
+  | privateer-schooner, long tom | long 12: 55; carronade 12: 220; swivel ½: 176 | 484 lb | 3 | none | 1 |
+  | privateer-schooner, letter of marque | long 6: 330; swivel ½: 176 | 704 lb | 4 | none | 1 |
+  | merchant-brig | long 6: 104 | 208 lb | 2 | none | 1 |
+
+- **The filling**: 120 man-seconds a cartridge and 15 a pound of its charge (`FILL_S_BASE`,
+  `FILL_S_PER_LB`, judgement), sixty man-seconds a man a minute. The party is the bill's
+  `filling`, one man to every four cannon, the swivels not cannon (Falconer 1780,
+  QUARTER-GUNNER, l.14283-14289; `max(1, cannon // 4)` where a bill does not say it): at
+  quarters the first of them of the powder division, fit and not lent, read and never moved
+  (the Regulations 1806, 1808 printing, the Gunner, Art. XVIII, l.13065-13071: he is to
+  take all opportunities of filling powder during an action); out of quarters while the
+  idlers are up, 06:00 to 20:00, the gunner and his crew in the filling room notionally;
+  never by night out of quarters (Art. VII, l.12843-12850: the magazine not opened until the
+  proper officer is in the light room; the night is judgement), never while the hoy is
+  alongside (Art. V) and never after the colours are struck. The neediest kind is filled
+  first (the lowest share of its level; equal shares in `GUN_KINDS` order, then the larger
+  calibre); each barrel emptied is counted for the Ordnance's shilling. One man fills a
+  12-pounder carronade's cartridge in 135 s, about one in two minutes and a quarter.
+- **The ports and the prices** (the eleven `ordnance:` blocks): the Ordnance's storekeeper
+  at Plymouth, in the Sound or Cawsand Bay only (`roads: [outer_road, anchorage]`, the
+  Hamoaze the mooring; the Gunner, Art. VI, l.12833-12839: "Plymouth Sound or Cawsand Bay,
+  Spithead, ..."), and at Gibraltar, anywhere in port (the storekeeper there from memory,
+  UNVERIFIED); the town's merchants selling at Gibraltar and none at Plymouth (UNVERIFIED;
+  the owner may flip either). The merchants of Falmouth, St Peter Port, Brest, Lorient,
+  Rochefort and St Malo sell at £5 a barrel and £12 a ton of shot, those of Cadiz, Ferrol
+  and Lisbon (and Gibraltar's) at £6 and £14: **every price UNVERIFIED**, the project's texts
+  giving none, and the merchants' trade in powder at those ports the proposal's list,
+  UNVERIFIED. The other 27 port files have no block. A sale is priced to the shilling, a
+  shot of grape or chain weighed as the calibre's round shot (judgement), the ton the long
+  ton of 2,240 lb. The hoy is alongside four hours after the demand at Plymouth and three
+  elsewhere, the taking in at 20 barrels and 2 tons an hour and an hour at the least
+  (judgement). The words: the storekeeper of the Ordnance at the port (Art. I,
+  l.12722-12738), the galley fire put out and no light but in the light room (Art. V,
+  l.12800-12809), the magazine secured and the keys to the captain (l.12815-12827), the
+  empty barrels returned at a shilling apiece, the gunner's own (Art. IX, l.12887-12902),
+  and a King's ship's purchase of the merchants only of absolute necessity (the Captain,
+  Art. VII, l.6220-6252). Lisbon's `sells_in_war_to` is written in its file as a comment and
+  left unset.
+- **The cask** (`combat/marks.py`, `heave_mark.yaml`): an empty cask with a flag on a staff,
+  from memory and UNVERIFIED against a page; hove over by two hands in a minute from the
+  quarter, four points abaft the beam (135° from her head) and six tenths of her length
+  from her centre (judgement); a metre long, its size term in the hit chance √(1/40), about
+  0.16, where every hull under 10 m is given the floor of 0.5 (decision 18); the flag's
+  staff 2 m high; made out from the masthead by day within a mile and the visibility, half
+  that at twilight (`chart.TWILIGHT_FACTOR`), never by night (judgement); set by the tide's
+  stream and blown to leeward at 2 per cent of the wind's base speed, once a minute
+  (judgement); given up when she is three miles from it (judgement). The captain is to
+  exercise the ship's company frequently at the guns (the Captain, Art. IX, l.8738-8742).
+- **The notional mark** (`orders/gunnery.py`): a cutter's length, 20 m, beam-on at any
+  bearing (judgement); four points on the bow (45° from her head), on the beam (90°) or on
+  the quarter (135°), either side (judgement); it keeps its bearing from her head as she
+  turns, and is laid from a cable to the longest random shot of the guns that bear there.
+  The arcs that decide which bear are the battery's, unchanged (`combat/guns.py`): a
+  broadside gun 35° either side of its beam, a chaser 25° of the bow or the stern, a swivel
+  100° of its beam, the pivot 60° to 140° off the bow either side (the owner's ruling,
+  above). So no broadside gun or chaser bears on the bow or the quarter, and the frigate and
+  the King's cutter are refused a notional mark there; the long Tom bears on the beam and
+  the quarter and not the bow. The refusals' suggested mark is four cables on the beam, or
+  the whole cables her longest gun reaches when that is less (the King's cutter's 12-pounder
+  carronades throw 3.95 cables: three).
+- **The allowance for exercise** (`exercise_charges`, King's fits only): a charge and a
+  round shot a month for a fourth of the upper deck's guns in a ship of one deck, for six
+  months after the guns are received (the Gunner, Art. XXI, l.13122-13144; the Captain's
+  chapter, l.8842-8879, gives a third), the first six months' figure, since the game keeps
+  no commissioning date (judgement): the frigate 6 (her 26 main-deck guns, a ship of one
+  deck: judgement), the brig 4, the King's cutter 1; the hired cutter's long guns, the
+  privateer and the merchant brig none. Counted by the month for a King's ship of Britain
+  alone; the first round beyond it said once a month and entered in the gunner's account.
+
+### The decisions, as built
+
+The build design's table, each against what was built.
+
+| # | The design's decision | As built |
+|---|---|---|
+| 1 | Charges a third, a twelfth and a half, UNVERIFIED, written as `charges:` | As designed |
+| 2 | A barrel of 100 lb | As designed |
+| 3 | Today's cartridge counts filled; a reserve of half the filled powder in whole barrels | As designed, rounded up to the barrel |
+| 4 | The gunner fills whenever a kind is below its level: at quarters with the powder division's men not lent, out of quarters by day; never by night out of quarters, with the hoy alongside or struck | As designed. The review: the magazine's reading said "the gunner filling" by night, with the hoy alongside and struck; it now says "the gunner not filling for the ... by night", "while the hoy is alongside", ", the colours struck" or ", no man of the powder to spare", from the gate `fill_tick` keeps (`filling.not_filling`), in the reading, the gunner's account and the supply's refusals alike |
+| 5 | The party the bill's `filling`, one to every four great guns; read, never moved | As designed: the frigate 10, the brig 4, the rest 1 |
+| 6 | A gun with none filled of its kind waits at the cartridge phase while there is powder below; with none, today's path | As designed. Builder 1's review: a gun waits only for a kind the magazine has a level for; a kind with none takes today's path |
+| 7 | The magazine-out and fallback lines clear themselves; `guns.filling` once an outage; an old game may say an old line once more | As designed (below, an old game). Builder 1's review: the report `guns.filled` is said only when a cartridge was filled since it was asked for (`Magazine.report_due`, a plain class default the receipt resets), forgotten when nothing was short to come back, and kept at quarters until she is out of them; `guns.powder_out` is said only when the minute's own filling brings the powder below under the charge of every kind still short, so a store with nothing below to fill from never says it, and with powder left over its words are "The gunner reports the powder below too little to fill another cartridge for the ...: ... below, and N cartridges short of the allowance." (the design's "all the powder filled: no loose powder below" kept for none) |
+| 8 | The Ordnance free and vouched to the King's ships of the port's own nation, the merchants to everyone else; a sale paid at alongside | As designed (an issue where her stance at the port is open, her own nation's port). A sale's money is given back if she weighs before the powder is struck down |
+| 9 | A King's ship buys of the merchants only "of necessity" | As designed for a King's ship of Britain alone (`service.under_the_regulations`; the review: an American frigate was refused at Falmouth under the British Regulations, and her purchase written "for the Admiralty's account"); a man of war of another nation buys as everyone else does. The shipped "A merchant ship, free" says `papers: {service: merchant}` |
+| 10 | Ordnance ports Plymouth and Gibraltar, nine merchant ports, 27 with none; Plymouth's town sells nothing | As designed |
+| 11 | Lisbon's knob documented and left unset | As designed |
+| 12 | £5 and £12 at home, £6 and £14 abroad, UNVERIFIED | As designed; to the shilling, grape and chain weighed as round |
+| 13 | The roads rule at Plymouth only | As designed |
+| 14 | The hoy a port job, its time by quantity, an hour at the least | As designed. Builder 2's review: once a minute (`Ports.tick`, `ordnance.left_behind`) a hoy alongside a ship that has weighed has **its stowed stage at once**, nothing received and the galley fire lit as her anchor comes up, not hours later at sea; a hoy at one port neither refuses a demand at another nor shows in that port's reading. The pending refusal has a second form while the hoy is alongside ("The hoy is alongside with her powder already; it will be struck down in ...") |
+| 15 | The galley fire out a state; the meals cold, no hardship | As designed |
+| 16 | The empty barrels' shilling said in the stowed line | As designed |
+| 17 | The cask a sighting with its own stream, never hailed, said once lost to sight and once found | As designed, each change of the masthead's sight said once: truth 7-166 has lost, made out again and lost, since a cask is never seen beyond a mile and is lost to sight before it is three miles off. The review: the cask sorts beside a sail in `what is in sight` (off the Lizard the land and the chart's marks had cut it from the words) and is filtered out before the hails are cut to six, so every hail is as it was. The merge (local): **the reckoning's cask**, a bearing of the cask moving no reckoning, as a sail's does not (`world/reckoning.py`, found by Builder 3 outside its own files) |
+| 18 | The cask's size term about 0.16 | As designed |
+| 19 | The notional mark a cutter's 20 m beam-on, from a cable to her longest random shot, the refusal naming the gun | Builder 3's review: the reach is the guns' that bear on the mark's bearing, and **a mark where no gun bears is refused** in words; the refusals' suggestion is laid within her reach. Carried: the range refusal names the one pivot gun in the plural |
+| 20 | Dumb show: an empty gun's whole cycle, a loaded gun from the run out to the point; `fire` at the word refused; a gun by name fires | As designed. The review: a gun fired by name (or the gun to leeward) in dumb show from empty never loaded; `Battery.serve_by_name` takes it out of the dumb show and it is served live until it has fired, taking a cartridge |
+| 21 | `exercise the guns` at quarters before the guns are cast loose | As designed. Builder 3's review: **the exercise ends when the hands are piped down** from quarters (`tick_action`), since no order could end it after (`cease exercising` wants the hands at quarters, and `secure the guns` finds the guns secured). The review: narrowing the exercise or moving it to the other side leaves the dropped side's guns as `cease exercising` leaves them, an empty gun run in and unprimed |
+| 22 | "The mark" and "the target" the cask only while one is in the water | As designed |
+| 23 | The allowance a fourth a month: the frigate 6, the brig 4, the cutter 1 | As designed for a King's ship of Britain alone (as 9); the cutter's allowance "one charge", not "one charges" (the review) |
+| 24 | A shotted gun with no mark sends "the shot into the sea"; 7-147's fog gun changes its words | As designed and measured (below) |
+| 25 | The fallback line by calibre when two kinds share it, its once-key `(pounder, charge)` | As designed; the Renard's line byte-identical (below) |
+| 26 | Truth 7-161 pins state and kinds, not a digest | As designed |
+| 27 | The heave refused by night and with no chart | As designed; accepted in fog (truth 7-165) |
+| 28 | A gunnery verb, so that the side can be said | As designed |
+| 29 | Every vocabulary entry written in stage 0 | As designed: no builder touched `data/vocabulary.yaml` |
+| 30 | `api/action_readings.py` Builder 3's after stage 0 | As designed |
+
+Beyond the table:
+
+- **The block read from this build's port file first** (Builder 2's review):
+  `ordnance.block_of` reads a pickled `Port`'s block from this build's file of the port
+  (`ports.PORTS_DIR`), and the pickled `port.path` only when this build has none, since the
+  kept saves' ports all name another checkout whose files have no block (the design's §1.3
+  read `port.path`).
+- **The papers merged on every miss** (Builder 2's review): the catalogue is mended against
+  a per-process cache of the file (`places._file_papers`) and no flag is kept on `Papers`,
+  so a checkpoint is mended by whichever build resumes it (the design's §5 said once).
+- The supply's words (Builder 2's review): a number is read whole before an "and" ("a
+  hundred and fifty round shot", "two and a half barrels", "two barrels and a half of
+  powder"), and "demand a barrel of powder" is one barrel, not all she wants.
+- The review of the merged tree: the practice reading's words (the swivels timed "from
+  cartridge to point", the one pivot gun singular, the notional mark's hits "on the mark",
+  its falls filed under a key ending " notional" with the reading's data unchanged, and a
+  cask's falls at a cable at the least, never "at 0 cables"); the seventh refusal at an
+  Ordnance port whose storekeeper is not hers names him ("The Ordnance's storekeeper at
+  {Port} does not issue to her"; no shipped port is one, and the test writes such a block
+  for Lisbon), the design's words kept at a merchant port; a hoy of shot alone goes back
+  "with the shot"; `fill cartridges` with a few pounds below says "The powder below is too
+  little to fill another cartridge: 3 pounds below; ..."; the order's answer and the
+  supply's example name a single gun singular; truth 7-170 made to hold the magazine short
+  and the filling held by the galley fire across its checkpoint.
+- The truths (local): the practice reading said the teens of its pace in figures ("a
+  minute and 16 seconds" beside "a minute and twenty seconds"); they are words now, and
+  7-164 asserts no figure in the pace.
+
+### What moved, and the pins
+
+- **No known truth moved.** `tests/test_known_truths.py` gained the eleven and changed no
+  line of the others; truths 7-133 to 7-171 ran green under `--slow` after the review's
+  fixes (39 passed); stage 0 measured truths 7-133 to 7-160 giving no "the magazine is out"
+  line and the Renard's chain fallback once (7-133, 7-138, 7-148), as before. The review ran
+  every shipped scenario two hours at seed 7 on the local baseline and on the merged tree, each the
+  same lines and digest; run again for these notes on the tree with the review's fixes
+  (local), the 34 shipped before this work give the same lines, digests, streams and
+  crewed ships' digests as on the local baseline, and the new practice scenario 143 lines and
+  `0abc2785f70d589f`. The sailing gates, the captain's trials and the consent digests are
+  in the whole slow tier (below).
+- **The unit pins that moved**, each with its comment naming this work:
+  - `tests/test_agents.py`: 88 evolutions (87; `heave_mark.yaml`) and 11 papers (10; the
+    gunner's account), the lead's at the merge (local).
+  - `tests/test_officer.py`: the handover budget 19,000 (18,500), the conversation at the
+    seat 11,214 tokens with the thirteen new events' words in the stand-by sentence and the
+    practice row (11,068 on the local baseline; stage 0 found 11,150 against the old budget's
+    11,100), the lead's at the merge.
+  - `tests/test_places.py` and `tests/test_server.py`: eleven papers, the gunner's account
+    the last (Builder 2).
+  - `tests/test_ship_particulars.py`: one more file compared with the generator's,
+    `merchant-brig.yaml`, which reproduced byte for byte on the local baseline before its magazine
+    was regenerated (Builder 1).
+  - `tests/conftest.py`: six of the eleven truths in `SLOW_TESTS` under one comment (7-161,
+    7-166, 7-167, 7-168, 7-170, 7-171; 11 to 56 s at two workers on this machine).
+- **Log text that changed with no assertion** (decision 24): truth 7-147's fog gun, a
+  shotted single gun fired with no target, logs "Fired one gun, the shot into the sea." with
+  `sea: 1` in its data, where the local baseline logged "Fired one gun across her bows, a blank
+  charge." (measured on both trees for these notes; the truth asserts neither). The only new
+  keys in an existing event's data are `sea` and `mark`, each only when used.
+
+### The first action, measured
+
+At seed 7 to the strike, as truth 7-161 runs it, measured on the local baseline (a `git archive` of
+it) and on the merged tree with the review's fixes, again for these notes: the privateer
+opens at 10:13 (tick 781) and strikes at 11:12 (4320), 3,539 s after; **311 lines and
+`a158a30ce39b345d` on both trees**, with the same nine streams; the Renard's "The gunner
+reports no more chain shot for the long 3-pounders: they load with round shot." at her tick
+1140 (10:20 on her own clock), its data keys `pounder`, `charge` and `instead`, the same on
+both. The King's cutter fired 146 rounds and took 149 cartridges (three in her guns at the
+strike); her gunner filled 26 at quarters from the 200 pounds below, so that 207 are filled
+and 174 pounds below at the strike, where the local baseline left 181 and kept no powder below; the
+Renard's gunner filled 28 (26 for her long 3-pounders, 2 for her swivels). No line of the
+filling, of practice or of the supply in either log, and no "practice" stream. The digest is
+recorded and not pinned (decision 26: this machine's digests are not the build machine's,
+the pivot gun's section above).
+
+### An old game
+
+A checkpoint of packages 70 to 72 (the build design's §1.1 step 3 and §9, decision 7):
+
+- **It has no powder reserve.** Its magazine is converted once to layout 2
+  (`parts._convert_70`, logging and drawing nothing): each calibre's filled cartridges and
+  rounds fired split over the fit's gun kinds of that calibre (the long Tom's 275 are 55
+  and 220), no loose powder below, and the barrels' establishment the old fit's
+  `powder_barrels`, which an old pickled `FitSpec` reads as its class default 0. **Until she
+  takes powder in**, her establishment is the filled allowance alone: the reading says
+  "Powder below: none; no barrels established.", `fill cartridges` answers "There is no
+  powder below to fill: the filled cartridges are all she has.", `guns.powder_out` is never
+  said, and a demand wants only what makes up the filled allowance's powder. Measured by the
+  review: the first action's checkpoint written at the local baseline at tick 2437, in action, and
+  resumed on the merged tree (before the review's fixes) converts both magazines with
+  `powder_lb` and `reserve_lb` 0.0, the gunners fill nothing, and the game comes to the
+  strike at 4320 with the same 311 lines and `a158a30ce39b345d` as the uninterrupted game
+  (181 filled in the King's cutter at the strike, against a new game's 207).
+- **It may say a once-said magazine line once more.** The battery's once-set for "the
+  magazine is out" is now `_said_out`, keyed by gun kind and calibre and starting empty; the
+  old float-keyed `_said_no_powder` is left unread (`combat/guns.py`). So "The gunner reports
+  no more cartridges for the ...: the magazine is out." may be said once again in a resumed
+  game for a kind it was said for before the checkpoint.
+- The rest loads as it was: every new attribute on a pickled class is a plain class default
+  (`Magazine`, `FitSpec`, `QuarterBillSpec`, `Battery`, `Service`, `Volley`, `Lookout`,
+  `Stores`, `Port`), a `Port` reads its block from this build's file, and a `Papers` mends
+  its catalogue with the gunner's account at the first miss.
+
+### Measured at seed 7 on this machine (truths 7-161 to 7-171)
+
+Each figure is the truth's docstring's, measured before it was pinned; states, kinds, counts
+and bands are pinned, and the digests are recorded and compared only run against run on one
+machine (decision 26).
+
+- **7-161**, the first action untouched: above.
+- **7-162**, the frigate's cask, put two cables abeam by the test and engaged by the order:
+  the first minute's thirteen shot fall five over and eight wide, and the fifteenth round,
+  No. 16 starboard gun's at 393 m, strikes it, said once; over seeds 1 to 20 the strike came
+  at the 3rd to the 46th round, 12 on the median, so the band is the first sixty. No
+  recognition, outlaw, morale or strike; `last_fired_tick` None; the target cleared and no
+  `action.fired` in the two minutes after. Each kind's filled count is its allowance less
+  what it took and more the gunner's filling for it, and that filling is all the powder that
+  left the barrels (the design's "2054 − fired + `filled_by_gunner`" held only were the
+  18-pounders alone refilled, and the carronades and 9-pounders fire too).
+- **7-163**, a notional mark on the starboard beam twenty minutes at each range: 70 on the
+  mark of 237 rounds at two cables (30 per cent), 27 of 237 at four (11 per cent); the
+  reading's falls hold rows "2" and "4".
+- **7-164**, `exercise the starboard battery` before `cast loose the guns`, twenty minutes:
+  the long 18-pounders 105 s from sponge to point on the mean of 131 timed cycles (truth
+  7-135's band, 90 to 125 s; the best 65 s), the 9-pounder chasers 70 s on the mean and 56 s
+  at the best, the 32-pounder carronades 76 s; a `practice.exercise` line every minute from
+  10:04; the magazine as it was, no round fired, no gunnery stream. Both batteries at once
+  (the bare `exercise the guns`) split each crew between its two guns, as engaging on both
+  sides does: the 18-pounders 406 s on the mean of 54 cycles (measured, not pinned; the
+  truth exercises one side for that reason).
+- **7-165**, ten minutes at a mark four cables on the starboard beam: at 02:00 the heave
+  refused in §3.3's words, 114 rounds and 11 on the mark; in a fog of a cable at 10:00 (truth
+  7-147's sky), 121 and 8, and the heave accepted; `the range` exactly 4.0 cables, no cask
+  sighted, no practice stream.
+- **7-166**, the hazy forenoon (the visibility a mile): the cask lost to sight at 10:25 a
+  mile and a sixth off, no round and no target while it is unseen; made out again at 10:35
+  seven cables ahead, the bow chasers opening on it; she holds her fire and stands on; lost
+  to sight again at 11:03, and given up three miles astern at 11:31, the target cleared.
+- **7-167**, the King's cutter at anchor in Plymouth Sound, her powder set to nothing and
+  three filled by the test: five barrels and three round shot demanded at 07:41, issued and
+  vouched, the purse untouched; the hoy alongside at 11:41, the galley fire out, the
+  captain's meal below cold and the company's dinner at noon served cold; struck down at
+  12:41 (the hour at the least), the fire lit again and the gunner's account written up by
+  the boatswain (the cutter has no gunner); `wanting()` empty at the stowing, the powder
+  below reckoned with the filled cartridges, and after the filling; the gunner filling by
+  day alone (none from 20:00 to 06:00) to the 330 at 11:04 the next day, 170 lb below;
+  spent again by the test, "the magazine is out" said again. Her emptying is placed by
+  hand, twice, beyond what the design names: the hours of firing that would spend two
+  barrels are not sailed.
+- **7-168**, each ship made short by the director's `aboard: the cartridges found damp`:
+  the King's cutter refused in the Hamoaze in Art. VI's words; at Falmouth refused, then
+  `buy powder of necessity` buys a barrel for £5, paid once, at alongside three hours on;
+  the merchant brig buys hers at Falmouth for £5 with no word of necessity; the privateer
+  refused at Plymouth, whose town sells none; a French privateer at Lisbon refused with
+  `sells_in_war_to: [britain]` set on the loaded block, and served when it is unset.
+- **7-169**, the privateer schooner at a notional mark three cables on the starboard beam,
+  her carronades' filled set to four: the four spent within three minutes, `guns.filling`
+  said once, the long Tom never stalling (25 rounds in forty minutes), the carronades firing
+  17 times after the filling begins as each cartridge is filled, and the powder below
+  falling by exactly the 18 lb of the 18 cartridges filled.
+- **7-170**, the King's cutter in the Sound, a quarter of her cartridges found damp at 07:36
+  and filled again by 10:41, a barrel demanded, the hoy alongside at 11:36 and a quarter
+  found damp again ten minutes on, the filling held by the galley fire: checkpointed so (248
+  of 330 filled), then resumed, played on and replayed four hours and a half each, through
+  the stowing at 12:36 and the gunner's report at 15:41, to one log and one magazine: 44
+  lines and `073626b2d8d85807` (37 lines and `9905e45c2884a5a9` in its first form, before
+  the review had the filling cross the checkpoint).
+- **7-171**, the owner's scenario with the orders given by the test (twenty minutes of dumb
+  show, a cask hove over and engaged, checkpointed at 09:25 with the cask in the water and
+  in sight, a notional mark for half an hour, `secure the guns`, on to noon): resumed,
+  played on and replayed to one log, 227 lines and `77cfa4458e18620d`, measured again before
+  the review's fixes and after them alike (the `c06f1fa9bb619847` first written in its
+  docstring did not reproduce).
+
+### Found on the way
+
+- Stage 0: the officer's handover budget, not foreseen by the design (above).
+- Builder 3: the cask's bearing moved the reckoning (`world/reckoning.py`, not its file),
+  left for the lead with a strict xfail and mended at the merge.
+- Builder 2: the kept saves' ports in `tests/fixtures/saves/` all name another checkout's
+  port files, so the design's read of `port.path` gave them no block (hence this build's
+  file first).
+- The truths: four of §8.2's pins could not be written as worded, and each truth pins what
+  the code does with the reason in its docstring: 7-162's identity (kind by kind, above);
+  7-164's side (one battery, above); 7-166's "one line each way" (lost, made out again,
+  lost); 7-167's `wanting()`, empty at the stowing already, and her emptying placed by hand.
+- The review of the merged tree reproduced each finding with the reviewers' scripts before
+  its fix, and each fix's test failed on the old code (fifteen new tests failing and
+  `test_service.py` failing to import, with `freesail/` and `data/` stashed), but for the
+  coverage test of the real magazine end to end and the docstring assertions of 7-161 and
+  7-165, which pass on the old code too.
+
+### What is left out
+
+- The build design's §10, unchanged: ship-to-ship transfer and powder from prizes (74 and
+  82, the owner's ruling); skill from practice (the owner's ruling; the drill counts kept for
+  a later decision); Table No. 29's figures, reduced and increased charges and range by
+  charge (the page image; `shot.py` is shared with `far.py`); the quarter gunners and the
+  gunner as posts (a post shifts the muster's draws and every digest: 75); the fillers'
+  fatigue, and filling by night out of quarters; a national arsenal's issue to French or
+  Spanish men of war (their ports are merchants); Plymouth's town merchants (`sells: false`,
+  UNVERIFIED, for the owner); clear for action's galley fire as state (nothing relights it);
+  the rest of the Regulations' powder rules (the dry magazine, the sentinel, the keys,
+  turning the barrels), words in the lines only; gunfire heard and remarked; the broadside
+  at the word in dumb show, drawing a loaded gun's charge, recovering the cask, and points
+  before or abaft the beam for the notional mark; the second six months' allowance (no
+  commissioning date); an `aboard:` row for the cooper's cask (the table stays at 26);
+  powder's weight in the trim; the hoy as a vessel (82's) and any powder flag.
+- Carried from the pivot gun's section above, still open: arcs and reach for a gun fired by
+  name; `shot.lee_port_shut` never called; a captain whose magazine is out stays
+  `engaging`; "the wheel is shot away" for a tillered ship; a new vessel type's words in
+  code.
+- **Found, carried** (not among the review's confirmed findings): the pending hoy's refusal
+  says "with her powder" for a hoy of shot alone (the design's words for refusal 5); the
+  notional mark's range refusal names the one pivot gun in the plural ("her long
+  12-pounders' random shot"); truth 7-164's docstring gives the chasers' 56 s, which is their
+  best and not their mean (70 s).
+
+### Decisions for the lead and the owner
+
+- The truth numbers 7-161 to 7-171 against package 73's, whichever folds in second
+  renumbering.
+- The port files' judgement figures for the owner's hand: Plymouth's town selling none and
+  Gibraltar's selling, Lisbon's knob unset, the prices, the hoy's hours and the pace of the
+  taking in.
+- The charges stand until Table No. 29 is read from the page image (75); the allowance is
+  the first six months' for every King's ship of Britain until the game keeps a
+  commissioning date.
+
+### The suite, as run
+
+One pytest process at a time, at two workers (this machine: the pivot gun's section above),
+the counts from junitxml where the project's own `-q` hid the summary.
+
+- Stage 0 (local): the fast tier and ruff, one test moved (the officer's budget, above).
+- The truths (local, `--slow`): 7-160 to 7-171, 12 passed; 7-133 to 7-160, 28 passed;
+  the eight feature test files, 156 passed.
+- The review's fixes (local): the ten feature test files, 183 passed; truths 7-133 to
+  7-171 under `--slow`, 39 passed; `test_lookout`, `test_chart`, `test_readings`,
+  `test_places`, `test_scenarios`, `test_business`, `test_context_budget`,
+  `test_orders_places`, `test_ports`, `test_people`, `test_fishing`, `test_longitude`,
+  `test_reckoning` and `test_agents`, 378 passed (57 slow left out); `test_lookout`,
+  `test_scenarios` and `test_business` under `--slow`, 36 passed; `ruff check .` and `ruff
+  format --check .` clean (269 files); every committed file LF.
+- These notes (on the review's fixes and the notes' own local commit): `tests/test_practice.py` whole,
+  whose documents test reads this section's heading and an old game's two caveats, and
+  `test_context_budget`'s Harness test, 26 passed; ruff clean on `tests/test_practice.py`;
+  the first action and truth 7-147's fog gun measured on both trees, truth 7-164's dumb show
+  (one battery and both) on the merged tree, and every shipped scenario two hours (all
+  above).
+- **The whole slow tier,** run by the lead on his local tree with the free intents and
+  before the hail fix (none of the owner's saves ran on it):
+  - **How:** alone on this machine, `--slow -q -p no:cacheprovider -n 2`, the pace tests
+    included; 107 minutes.
+  - **Result:** 4183 tests, 10 failed, 14 skipped.
+  - **None of the ten is this work's.** Run alone on the local baseline, all ten fail
+    with the same assertions and the same figures.
+  - **The three captain's trials,** as recorded in the pivot gun's section above:
+    - the trade trial in thick weather, `df5f02eb6e6ce68a` for `cfa538b19cb0d2fe`;
+    - the Ushant lee shore, `eb06bd7b36cbeff8` for `ed48ca3d61e52f20`;
+    - the trade stranger, 1248 lines for 1246.
+  - **The gate 5c cruise's four:**
+    - the merchant passage's constants, 96480 for 96540;
+    - truth 77's digest, `ea265e4704a06726` for `6abbbff4d7fa1a57`;
+    - truths 78 and 79, `[57, 100918]` for `[57, 100616, 115547]`.
+  - **Gate 6a's schooner on an intent alone:** in port at 110400 for 110340.
+  - **Gate 5b's schooner passage:** 767 lines for 766.
+  - **Truth 7b-108:** the harbour's server printed nothing to the test's pipe here.
+  - **Why:** these long passages and digests differ between this machine and the build
+    machine, as decision 26 says. The build machine's whole slow tier is the one that
+    counts for them.
+
+## Open, for the lead: the frigate's quarterdeck against Winfield (2026-10-25; not fixed)
+
+The owner has given the lead Winfield's entries from their own copy of *British Warships in
+the Age of Sail 1793-1817*. The copy is private reference, kept outside the repository; only
+facts, cited by page, come in. Checking the ship files against those entries found one
+error.
+
+**The error: the frigate-36's quarterdeck.**
+- **What the file has, from memory:** on the quarterdeck, eight 32-pounder carronades and two
+  long 9-pounders; 40 pieces in all (`tools/gen_ships.py` `frigate_armament`).
+- **What Winfield p. 143 gives:** the Amazon class's establishment of 16.3.1795 has eight long
+  9-pounders and six 32-pounder carronades on the quarterdeck; 44 pieces in all.
+- **What agrees:** the upper deck's twenty-six 18-pounders, the forecastle's two 9-pounders
+  and two carronades, the 264 men, and the hull.
+
+**The owner's ruling (2026-10-25): leave it until the new ships are built.** The fit stays as
+it is, marked INCORRECT, pending correction, in its comments and in the fit's `source`
+string. The game reads neither, so nothing moves. No ship build corrects it.
+
+**What correcting it would move:**
+- the quarter bill: fourteen pieces on the quarterdeck, against ten;
+- the magazine's cartridges and shot by kind;
+- the combat truths that fight the frigate (7-133 to 7-160);
+- the practice truths that count her fills by kind (7-162 to 7-164).
+
+The allowance for exercise counts only the upper deck's guns, so it stays at six.
+
+**The other entries checked agree:**
+- the brig against the Diligence class and *Harpy* (pp. 255-256): hull, 121 men, sixteen
+  32-pounder carronades and two 6-pounders;
+- the topsail schooner and the privateer schooner against *Musquidobit* (p. 335): hull
+  figures, though the generator has 223 91/94 tons where Winfield has 92/94.
+
+Their "Winfield not reached" and "from memory" citations can be given pages when the files
+are next touched.
+
+**Winfield's naval fit for *Musquidobit*** (eight 18-pounder carronades and two 6-pounders,
+50 men) could be a third fit for the privateer schooner, if the owner wants one.
+
+## Open, for the lead: found directing the owner's Roscoff station (2026-10-26; not fixed)
+
+The setting: the owner's test of practice and resupply, sailing the frigate-36 with a model
+at the officer of the watch's station, 12-13 June 1805. The lead sat at the director's station. The owner
+corrected the first item.
+
+- **The officer of the watch cannot see how far along a job is.**
+  - **What happened:** at 13:28 the captain ordered clear for action. The job ran
+    short-handed: the quarters kept drawing hands off to brace the yards and trim the
+    sheets. At 14:09 the officer read it as "stalled for forty minutes" and belayed it, with
+    the guns waiting behind it.
+  - **What was really so:** the job was not stalled, only slow. Its base is 900 s at the
+    frigate's length (`evolutions/action_scripts.py` `clear_seconds`), lengthened by the
+    shortage of hands. The owner saw in the browser that it had about three seconds left
+    when it was belayed.
+  - **The cause:** `api/readings.py` `_work_in_hand` gives each job only its words ("doing:
+    clearing for action"), as doing, waiting or belayed. It gives no time left, although
+    the browser shows the countdown. A model therefore cannot reason about what to belay,
+    or when.
+  - **Suggested fix:** give each job the time it has left in words, from the runner's own
+    figure, and why it is slow where it is: for example, "clearing for action, about three
+    minutes to go, short-handed (hands at the braces)".
+    - Change the words in coarse steps only ("about a quarter of an hour", "about five
+      minutes", "a minute or two"). Every sample carries the readings that changed, so a
+      count by the minute would be in every one of them.
+    - Check whether a job lengthened by drawing off its hands should say so when the hands
+      are taken. The 41 minutes against a nominal 15 may be right, but neither the player
+      nor the officer was told it was happening.
+- **A long telegraph signal holds up a tack.** The captain hoisted "SURRENDER", spelt in
+  nine hoists, nine minutes. The tack ordered after it waited its turn behind the signal,
+  until the officer hauled the signal down and the captain belayed all. Signal work at the
+  mizen halyards perhaps should not take the hands a tack wants, or not in action.
+- **Order words refused that the game itself prints:**
+  - "the glass on the sail bearing ESE" was refused ("Nothing in sight answers to 'the sail
+    bearing ese'"), although the strangers are listed in exactly those words.
+  - "give chase to the lugger" was not understood, while a bare "give chase" took the
+    nearest stranger.
+  - "belay making signal", "belay making the private signal" and "avast making signal"
+    were refused, although the work in hand lists "making signal".
+- **A lunar in fog.** At 01:15 Mr Harvey took and cleared a set of distances of Altair and
+  the moon. The log had had fog at a cable's visibility since 00:54, and the readings said
+  "no lunar: the sky is thick with fog" by 01:33.
+- **The coastal fog came in four-hour blocks off Batz, 54 minutes after midnight and again
+  through the forenoon** (`world/weather.py` `coastal_fog`: under a high, within 30 km of
+  the coast, wind under 12 knots). The owner found it trying: "Blasted fog". The figures
+  are [S10]'s June share times the conditional factor, about 24% a block. They may be
+  right for the Breton coast in June. Noted only as a game that turned on it: twice it hid
+  ships within two miles.
+- **For the director (the lead's own use of the station):**
+  - The far ship's grammar wants the intent with no "intent:" before it. The description
+    must end in one of the far kinds ("a French coasting lugger", not "sloop"). The `of`
+    slot takes only ports of the world, so Morlaix and Fowey are refused.
+  - A "patrolling off <port>" goal warns that "her plan crosses the land" when the port is
+    inshore of an island (Roscoff behind Batz). A patrol centred on a position at sea
+    does not.
+  - The director's sample says nothing of a far ship reaching the end of a "bound from A
+    for B" goal at a point at sea. The lead gave Marie-Jeanne a further leg before she
+    reached it, not knowing what she would do there.
+
+## Package 86: the owner's local work folded in (2026-10-28)
+
+The owner's practice and resupply, his pivot gun and privateer schooner, and three of his
+six fixes, folded in on top of package 73 by the review's plan
+(`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`,
+section 7; the door fixes and the squadrons' note were its first step, `59c4ca4`), on the
+package's branch in a worktree off `e7a3ee8`. His tree was read as data: a commit was
+made of it over `2774be3` in a scratch index (never a branch), and its change cherry-picked
+without committing onto the line, so that git merged every shared file hunk by hunk over
+the line's; the conflicts were resolved by hand, the fixes held back for their own commits.
+The three sections above this one ("Between packages: the privateer schooner and the pivot
+gun", "Between packages 72 and 73: practice at the great guns ...", and the two "Open, for
+the lead" notes) are his, merged into this file; his local commit hashes are recast in them
+(his commits are on no branch of the project: "the local baseline" names the tree he
+measured before, `5b01fdf` the fold-in of the work), and the one line that named a model
+now says "a model at the officer of the watch's station".
+
+### The fold-in, item by item
+
+- **The ordnance package (`5b01fdf`).** Taken whole: `combat/filling.py`, `combat/marks.py`,
+  `world/ordnance.py`, `orders/ordnance.py`, `world/service.py`, `api/practice_readings.py`,
+  `data/evolutions/heave_mark.yaml`, the scenario, the ten test files. Merged over 73's
+  versions with a hand at the conflicts: `api/readings.py` (practice's readings registered
+  after 73's damage readings, so no existing row's order moves); `combat/action.py` (a
+  mark's live rounds counted against the allowance, a sail's told as 70 has it, and 73's
+  small arms and fight on deck after both: a cask has no crew, so the musketry returns at
+  once); `ship/schema.py` (the quarter bill's keys 73's `small_arms` and `boarders` and his
+  `filling`); `tools/gen_ships.py` (`quarter_bill` taking both packages' keywords; the
+  privateer schooner built through `schooner(armed=True)` takes 73's pumps and shot plugs
+  with her hull, and her quarter bill **eight small-arms men and twenty-six boarders**, a
+  PROVISIONAL judgement after the King's cutter's six and twenty of thirty, where the merged
+  generator would have written none); `tests/test_known_truths.py` (his 7-161 to 7-171
+  placed before 73's 7-172 onward, by number). The generator was run and its five changed
+  files and the new `privateer-schooner.yaml` committed; against a text three-way merge of
+  his ship files over 73's they agree line for line but for two comment placements the
+  text merge could not settle (the frigate's and the brig's armament headers), which the
+  generator settles.
+- **The review's edits.** The pivot gun's arc per gun: a pivot gun takes `arc_deg: [from,
+  to]` in its ship file (only a pivot, nought to a hundred and eighty, the first the less),
+  carried on `Gun.arc_deg` (a gun pickled before reads None) and read by `guns.pivot_arc`
+  for the battery and the order's bearing; the generator writes the schooner's 60 to 140;
+  `ARC_PIVOT_FROM_DEG` and `ARC_PIVOT_TO_DEG` are only the default for a pivot whose file
+  names none. The stale `schooner_armament` docstring; the stale comment at the filling's
+  call in `action.py`; the fillers' stopgap named in `combat/filling.py`'s head and in 75's
+  and 77's briefs. The duplicated helpers: `guns.count_words` (on `number_words`, the teens
+  and the tens said) and `guns.seconds_words` in place of `guns._cardinal` and the two
+  `_seconds_words` (`practice_readings` imports them), `parts.kind_rank` (public) in place
+  of `gunnery._rank`; `_a`, `_cap`, `_and` in `world/ordnance.py` and `orders/ordnance.py`
+  stay, there being no shared helper of the project's to use instead (each module keeps its
+  own, as `orders/gunnery.py` does since 70), and `schema._gun_words` stays (the schema
+  cannot import `parts`, which imports it). `Papers._merge` mends from the catalogue's own
+  file (`Papers.path`, None for the project's, so that no machine's path is pickled; a
+  `Papers` pickled before it reads the project's). The 7-164 docstring's slip (the chasers'
+  56 s is their best; their mean 70 s).
+- **The unit pins, recomputed on the merged tree.** `tests/test_agents.py` 98 evolutions
+  (97 under 73; his tree had 88 for 87) and 11 papers (10); `tests/test_places.py` 11
+  papers (10); `tests/test_officer.py` the handover budget **20,500 (20,000)**: the officer's
+  conversation at the seat is 12,052 tokens on the merged tree (11,905 under 73 alone, his
+  11,214 before 73), over the fraction (0.6) of 20,000, so five hundred more as the comment
+  chain has it.
+- **The free intent, tightened (`33e852c` as he made it, `35cf088`).** The crewed captain
+  short-circuits a free intent as the far body does: on his passage he heaves her to once
+  each time he comes back to it (`Captain._free`, keyed by the state's entry tick) and lays
+  no plan, where he had tried every judgement and said a plan of no legs each time
+  (measured: a merchant brig given a free intent says nothing more in twenty minutes after
+  her one "heaving to"). The ship keeps her service's role and doctrine under a free intent
+  (`Captain.set_intent`, `FarCaptain.set_intent`; `role_for` gives a King's ship by her
+  wardroom her role where she had none): a patrolling cutter given one stays a cruiser far
+  and crewed. `FREE_WARNING` and the seated captain's brief say she is lain to; the
+  director's form says the free intent. Open as the review left it (the owner's question 5):
+  a misspelt port is taken as a free intent.
+- **The hail, tightened (`d479b4f`).** The `commands` branch of `model_holds_her` is the
+  player's ship's alone (`parent is None`): a crewed ship whose captain holds by the
+  director's hand or stands aside is answered by the table as before (his fix had left her
+  hail pending with nobody to answer). The heave-to on a demand only is his, as spec M7 §4's
+  as-built words have it.
+- **Station keeping by name and kind, tightened (`d479b4f`).** The kind is matched only
+  among the sails her lookout has in sight (`_sighting_of`), and by her description and what
+  she is made out to be with a hyphened word whole or by its head: 'brig' takes a merchant
+  brig and not a brig-sloop ('a brig', the rig both share, is not read for it), 'sloop' and
+  'brig-sloop' the brig-sloop; a kind with no sail in sight is refused in words. His test
+  waits a minute more for the lookout's first sweep after the promotion.
+
+### The pins, and the hail fix bisected
+
+Run on the merged tree (`d479b4f`): the slow tier of every test file this package touched,
+with the captain's trials (`--slow -m "slow and not pace" -n 4`, 22 files): 155 run, 147
+passed, 8 expected failures, none failed; truths 7-143 to 7-158 among them, the convoy's
+(7-152, 7-153, 7-155, 7-156, 7-157) and the blockade's (7-154), and the owner's six slow
+truths. **No recorded-passage pin moved.** The hail fix was bisected all the same, the
+review having expected it to move the far-to-far passages: in a copy of the tree with the
+gating reverted (the table's heave-to worked on every hail again) and on the tree itself,
+truths 7-140 to 7-158 were run with every World's log measured at the test's end (37 logs,
+a pytest plugin in the scratchpad): the same lines and digests on both but one, 7-143's
+third scene, the crewed ship hailed (8 lines with the fix, 12 without: the heave-to's answer
+and its manoeuvre no longer worked on a question), which no assertion reads. The far-to-far
+exchange is between two brains (`FarCaptain.speak`), and no recorded passage has two brains
+meet within hail of each other unasked: the convoy's merchantmen have none.
+
+The pace tests alone (`--slow -m pace`, serially, the touched files): 10 run, 8 passed, 2
+under the build machine's floor of 500 (the gate's day with the region loaded at 463, truth
+7-159 at 438). The two measured three times each, alternately, on `e7a3ee8` (the line before
+86) and on the fold-in, on the quiet machine (load under one): the gate's day 450, 526 and
+514 before, 511, 530 and 472 after; 7-159 494, 469 and 470 before, 488, 512 and 472 after.
+The machine's spread about the floor, the same before and after, and not the fold-in's
+(73's own runs had 7-159 at 481 to 486); not re-pinned.
+
+### The convoy's stall
+
+Reproduced as the owner played it: `convoy-six.yaml` run with no orders by the rules
+captains alone, minute by minute (a probe in the scratchpad), on the merged tree, on
+`e7a3ee8` and on `2774be3` and his own tree: **the same passage on all four**, so the stall
+is the line's since 72 and neither his work's nor 73's. It is not the near `keep station`
+order: the six merchantmen have no brain, so `crews.switch` never promotes them (they keep
+their stations at far detail on the station leg) and no hail between brains touches them.
+It is **the commodore's own ship**, the player's brig-sloop under her rules captain:
+
+- at 10:17 (tick 1020) she enters `beating` and at 10:17:51 (1071) goes about short-handed
+  ("Only 31 hands to tack ship; the rest are reefing the fore topsail and the main topsail
+  and trimming the spanker"), the convoy's book shortening sail to the slowest ship's pace
+  at the same time (1260); she is eight and a half minutes in stays and has lost her way by
+  10:20 (1200, 0.7 knots);
+- she comes out on the larboard tack at 10:26:34 (1594, "heading ESE (112°), full and by")
+  with no way on (0.6 knots), and at 10:30:10 (1810) "Her sails aback; she had no way on to
+  lose", her head some forty degrees off the north-easterly under the full-and-by helm;
+- nothing bears her away to fill: the helm cannot steer her without way; the standing
+  order 'keep her full' (bear away a point when the apparent wind is forward of 55°) is a
+  `when` rule, true since the tack and so not fired again until 10:54; the book's 'the leg'
+  at 10:47 says only 'keep her full and by';
+- the far merchantmen keep station at the set's pace, capped on the commodore's
+  (`Vessel.pace_cap_kn`), so **the whole convoy lies with no way on (0.3 to 0.4 knots),
+  south-east of the Lizard, from about 10:20**;
+- at 10:44 the book's second shortening takes in the mainsail (2566) and the spanker
+  (2671); with her after sail gone her head pays off (10:45 to 10:47 she falls off to
+  200°), she gathers way (2.2 knots at 10:50) and the convoy with her; truth 7-152's
+  straggler signal (2760) comes in that minute.
+
+So at seed 7 by the rules alone she regains way after twenty-five minutes; "never regained"
+is not reproduced (his game ran on the server's clock, where a quarter of an hour aback
+looks final, or something of his session, an order or a hand, kept her aback past the
+second shortening). **The cause** is the near captain's and the helm's, not the station
+order's: no rule of his recovers a ship aback with no way under `full and by` (the far
+body's `_course_for` law of 58b bears away to fill; the near captain has no counterpart),
+and the tack is put in hand short-handed while the book shortens sail. **Not mended here:
+it is not small.** A mend changes this very passage, which truths 7-152 (its pinned ticks
+2760, 2866, 3000, 5280) and 7-153 record, and the captain's rules for every role;
+it is the lead's, for 72's captain pass.
+
+### Primer 22's minute
+
+The owner's primer said the privateer engages at 10:07; truth 7-133's docstring says 10:06.
+Measured on the merged tree at seed 7: her captain enters `engaging` at her own tick 360,
+which is **10:07** by her log (her crewed World begins a minute after ours, as truth 7-161
+found for the chain shot), so the primer's minute stands. With package 73 the colours come
+down at **11:43** with four of thirty hurt and seven shot holes (73's own bisection above),
+so the primer's 11:12 and five hurt, his tree's figures before 73, are now 11:43 and four.
+Truth 7-133's docstring is 70's and was left as it is.
+
+### The suites as run
+
+SUITES

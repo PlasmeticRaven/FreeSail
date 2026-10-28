@@ -35,7 +35,7 @@ SMACK = ROOT / "data" / "ships" / "smack.yaml"  # package 43b
 # PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): the armed schooner
 PRIVATEER_SCHOONER = ROOT / "data" / "ships" / "privateer-schooner.yaml"
 # practice and resupply (between packages 72 and 73): the merchant brig is compared too; it
-# reproduced byte for byte on 4a12e97, before its magazine was regenerated
+# reproduced byte for byte on the owner's local baseline, before its magazine was regenerated
 MERCHANT_BRIG = ROOT / "data" / "ships" / "merchant-brig.yaml"
 
 

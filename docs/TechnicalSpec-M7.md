@@ -275,6 +275,15 @@ nation. The hail is the first order of a search in that the heave-to is demanded
 answered; the boat and the search are the director's scene and 63's. The hailed ship is
 spoken (`spoken`, both brains' `spoken_ids`).
 
+**As fixed (the owner's playtest of 2026-10-27, folded in by package 86).** The table's
+heave-to is worked only when the words demand it ("heave to", "bring to", "sending a boat"
+and the rest of the table's phrases): before, every hail had the hailed ship obey or run,
+and so every first exchange between two far rules captains hove one to or made her sail.
+The player's own ship with no rules captain commanding (`Captain.commands`, a property that
+had been called as a method, so that the table answered for him) hears the hail and keeps
+it for his `say to her`; a crewed ship whose captain stands aside or holds by the
+director's hand is still answered by the table, nobody else being there to answer.
+
 ### 5. The lights and the bell; sight across land (`lookout.py`; the standing orders)
 
 A stern lantern, top lights for a squadron keeping station, the fishing boat's lantern on
@@ -356,6 +365,17 @@ place. The carriage, the tackles and the breeching are the gun's own state (cast
 run out), not parts of the graph; the figures from memory are marked UNVERIFIED in the
 generator for 75's sources.
 
+**The magazine by kind (the owner's practice and resupply, folded in by package 86).** The
+magazine keeps its filled cartridges by gun kind and calibre, not by calibre alone (the
+privateer schooner's long 12 had drawn on the carronades' 12-pounder cartridges), each with
+its charge, and its loose powder below in barrels of a hundred pounds; the charges, the
+barrels and a King's fit's monthly allowance for exercise are the fit's, through the
+generator (the charges' shares UNVERIFIED until Table No. 29 is read; 75's). A store pickled
+before it is converted once at the load, nothing drawn or logged. A gun's place may be
+`pivot` (PROVISIONAL, the owner's ask of 2026-10-25): no side, trained round by its crew,
+and bearing over either side through its own `arc_deg` from the ship file (the privateer
+schooner's 60 to 140 degrees off the bow); §8's as-built note says the rest.
+
 ### 8. The gunnery as evolutions (`freesail/evolutions/`; `freesail/crew/bill.py`)
 
 `clear for action` (the bulkheads down, the galley fire out, the boats towed or stowed, the
@@ -390,6 +410,36 @@ squared, the rating, the fatigue, the seaway and the weather), so **the rates fa
 the muster**: a frigate's 18-pounder every 104 s with her full company and every 159 s
 with a quarter of each gun's crew down (truth 7-135). A gun captain fires at nothing beyond
 his gun's throw. The rules captain gives them by his doctrine (§10).
+
+**As built (practice and resupply, between packages 72 and 73).** Built locally between
+packages from `docs/design/Build-PracticeAndResupply.md` and folded in by package 86 on top
+of 73 (`5b01fdf`), on the
+owner's rulings of 2026-10-25 (stages A and B; the Ordnance's issue to a King's ship free
+and vouched, merchants and privateers paying; practice giving no skill, the drill counted
+only; the galley fire out a state the needs read; ship-to-ship transfer deferred). The
+magazine of §7 keeps its filled cartridges by gun kind and calibre and its loose powder
+below in barrels (`ship/parts.py`; the charges, the barrels and the allowance for exercise
+in the fits through the generator), and the gunner fills them from it at quarters and by
+day (`combat/filling.py`), a gun with none filled of its kind waiting at the cartridge.
+Powder and shot are taken in at eleven ports by the hoy, a port job with the galley fire
+out while it is alongside: issued free and vouched by the Ordnance at Plymouth (in the
+Sound or Cawsand Bay) and Gibraltar to a King's ship of Britain, sold by the merchants to
+the rest (`world/ordnance.py`, `orders/ordnance.py`, `world/service.py`). The guns are
+exercised at a cask hove over the side, at a notional mark by day, by night or in fog, and
+in dumb show at the action's pace with nothing spent (`combat/marks.py`, `combat/guns.py`,
+`orders/gunnery.py`, `api/practice_readings.py`). Truths 7-161 to 7-171, the first action
+untouched among them (311 lines and its digest on both of the owner's trees), keep their
+numbers (73's are 7-172 to 7-184). Said as built at the fold-in: a port pickled before the
+port files carried their `ordnance:` block reads this build's block from its file, once and
+silently (`world/ordnance.block_of`); a rules captain's fighting book opens fire on a cask
+by the range reading as on a sail, by design, and nothing of the mark is an action's
+(recognition, morale, the outlaw); the gunner's filling party is read and never moved, so
+the fillers take no hands from other work (the build's decision 5), a stopgap that 75's or
+77's brief makes real posts; the pivot gun's arc is the gun's own (`arc_deg`), a default
+only where a file names none. The figures and their sources, the decisions as built, the
+pins, an old game and what is left out are in the tuning notes ("Between packages 72 and
+73: practice at the great guns, and powder and shot taken in", and package 86's section);
+the stations' side is Harness §21g.
 
 ### 8a. The quarter bill, and work in action (the owner's note 4; `freesail/crew/bill.py` a quarter bill beside the watch bill)
 
@@ -744,6 +794,14 @@ within the cover distance strikes and joins his company (`far_captures`; 74 puts
 fight in). What is not built: the line of battle's own book (76's numbers), the squadron
 shown to the player as an object of the world (the brief), the night and fog signals as a
 set's standing order (the books' `lights` rule stands in).
+
+**As fixed (the owner's playtest of 2026-10-27, folded in by package 86).** `keep station
+two cables astern of the Amazon` names the player's ship by her own name as well as by `the
+ship`, and `... of the frigate` a sail by her kind: the nearest of the kind among the sails
+her lookout has in sight (never one only the truth knows of), read from her description and
+what she is made out to be with a hyphened word whole or by its head ('brig' a merchant
+brig, not a brig-sloop; 'sloop' or 'brig-sloop' the brig-sloop). The name leans on the
+player's shadow and the id 'the ship', which 82 and 84 rework.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 

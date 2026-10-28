@@ -9230,8 +9230,9 @@ def test_truth_7_161_the_first_action_is_untouched_by_the_magazine_by_kind_filli
     """The build design's §4 and decision 26: the first action (data/scenarios/
     first-action.yaml, truth 7-133's) played again by the rules captains with the magazine
     kept by gun kind, the gunner filling at quarters from the powder below, and practice's
-    marks, readings and stream in the build. At seed 7 the privateer opens at 10:13 (tick
-    781) and strikes at 11:12 (4320), fifty-nine minutes after, as before the work; no line
+    marks, readings and stream in the build. At seed 7 on the owner's tree (before package
+    73) the privateer opens at 10:13 (tick 781) and strikes at 11:12 (4320), fifty-nine
+    minutes after, as before the work; no line
     of the filling, of practice or of the supply in either ship's log, and no practice
     stream; the Renard's 3-pounders fall back from chain shot at 10:20 in package 72's
     words and data (her own log's time: her crewed World begins a minute after ours, so
@@ -9240,9 +9241,16 @@ def test_truth_7_161_the_first_action_is_untouched_by_the_magazine_by_kind_filli
     the 200 pounds below, so that 207 are filled and 174 pounds below at the strike; the
     Renard's gunner filled 28 (26 for her long 3-pounders, 2 for her swivels), the filling
     moving powder from the barrels into cartridges and nothing else.
-    Measured on this machine at the strike: 311 lines and the digest a158a30ce39b345d, on
-    4a12e97 and on the merged tree alike (decision 26: recorded and not pinned, the
-    digests differing here)."""
+    Measured on the owner's machine at the strike: 311 lines and the digest
+    a158a30ce39b345d, on his local baseline and on his merged tree alike (decision 26:
+    recorded and not pinned, the digests differing there). On the build machine at package
+    86's fold-in, on top of package 73 (whose small arms served on entering the action move
+    the minute, its own bisection): she strikes at 11:43 (6180, ninety minutes after the
+    first shot, inside 7-133's band), the chain shot falling back at 10:20 as before; the
+    King's cutter took 211 of her 330 cartridges and her gunner filled 40, so that 159 are
+    filled and 160 pounds below at the strike; the Renard's gunner filled 41 (39 for her
+    long 3-pounders, 2 for her swivels); 390 lines and the digest fde496ab303d4af9, the
+    Renard's own log 264 lines and 94f8df0c29462ed0 (recorded, not pinned)."""
     from freesail.ship.parts import magazine
     from freesail.world.scenarios import begin, load_scenario, make_scenario_world
 
@@ -9262,7 +9270,7 @@ def test_truth_7_161_the_first_action_is_untouched_by_the_magazine_by_kind_filli
             struck_tick = w.clock.tick
             break
     assert first is not None and v.struck and not w.ship.extra.get("struck")
-    # truth 7-133's band; 3539 s at seed 7, as before the work
+    # truth 7-133's band; 3539 s at seed 7 on the owner's tree, 5399 s with package 73
     assert 2700 <= struck_tick - first <= 3 * 3600, f"{(struck_tick - first) / 60:.0f} min"
     enemy = v.crew
     new = ("guns.filling", "guns.filled", "guns.powder_out", "practice.", "ordnance.")
@@ -9398,8 +9406,9 @@ def test_truth_7_164_dumb_show_serves_the_guns_at_the_actions_pace_and_spends_no
     minutes the starboard crews serve their guns through the phases at the action's pace,
     and nothing leaves the magazine. At seed 7 the long 18-pounders' sponge to point is
     105 s on the mean of 131 timed cycles, inside truth 7-135's band (the live interval
-    between discharges 104 s with the full company), the 9-pounder chasers' 56 s; a line
-    `practice.exercise` every minute from 10:04, when the first cycles end, to the last;
+    between discharges 104 s with the full company), the 9-pounder chasers' best 56 s
+    (their mean 70 s; the review of the owner's work found the best written as the mean);
+    a line `practice.exercise` every minute from 10:04, when the first cycles end, to the last;
     the magazine as it was, no round fired, no `action.fired`, the gunnery stream never
     opened. The practice reading says the pace in words (it said 'a minute and 16 seconds'
     for the carronades until this truth: the teens are now words). Both batteries at once
@@ -9510,7 +9519,9 @@ def test_truth_7_166_a_cask_lost_in_haze_holds_fire_is_told_each_way_and_given_u
     lost astern, three miles off."), the battery's mark cleared. Each change of the
     masthead's sight is told once and never twice running: lost, made out again, lost. A
     cask is never seen beyond a mile, so it is always lost to sight before it is three
-    miles off: the third line is that loss (the design's "once each way" read so)."""
+    miles off: the third line is that loss (the design's "once each way" read so). On the
+    build machine at package 86's fold-in: 88 lines and the digest 970914c3a0a4d170 at the
+    test's end (recorded, not pinned; the owner recorded none)."""
     from freesail.combat import marks
     from freesail.combat.action import target_of
     from freesail.combat.guns import FireMode, battery_of
@@ -9591,7 +9602,9 @@ def test_truth_7_167_in_the_sound_the_kings_cutter_completes_her_magazine_from_t
     cartridges filled to the allowance: 330 for the 12-pounder carronades; 1 barrel and 70
     pounds below."). Spent again (by the test, as before) after her empty guns have loaded,
     the magazine out is said again: a receipt and a cartridge taken clear the once-said
-    line (decision 7), which before this work was said once a calibre and never again."""
+    line (decision 7), which before this work was said once a calibre and never again. On
+    the build machine at package 86's fold-in: 128 lines and the digest 1097aab244230e03
+    at the test's end (recorded, not pinned; the owner recorded none)."""
     from freesail.ship.parts import magazine
 
     w = _anchored(
@@ -9687,7 +9700,10 @@ def test_truth_7_168_powder_is_taken_in_at_the_road_not_the_harbour_and_bought_o
     with no word of necessity; the privateer is refused the Ordnance's issue at Plymouth,
     whose town sells none (decision 10); and at Lisbon, a neutral's port, a French
     privateer is refused once the knob is set on the loaded block (`sells_in_war_to`:
-    Britain alone, decision 11) and served when it is unset."""
+    Britain alone, decision 11) and served when it is unset. On the build machine at
+    package 86's fold-in, the five worlds in the test's order: 14 lines (0161fac3dbb5c5c0),
+    33 (82d197d2b2bd54e9), 32 (d3fe2cae0f223882), 15 (091a213c34c1ffb8) and 16
+    (7143cf8a33ad1d9a) (recorded, not pinned; the owner recorded none)."""
     from freesail.ship.parts import magazine
 
     harbour = _anchored(HAMOAZE, papers={"service": "kings"}, cargo={"purse_pounds": 100.0})
@@ -9833,8 +9849,9 @@ def test_truth_7_170_a_checkpoint_with_the_hoy_alongside_resumes_to_one_digest_a
     from the powder taken in and his report at 15:41 ("The gunner has the cartridges filled
     to the allowance"), to the same log and magazine; the save replayed from its seed and
     inputs gives them again. (Before the review's finding the filling was done an hour
-    before the checkpoint, and nothing of it crossed it.) Measured on this machine: 44 lines
-    and the digest 073626b2d8d85807 for all three."""
+    before the checkpoint, and nothing of it crossed it.) Measured on the owner's machine:
+    44 lines and the digest 073626b2d8d85807 for all three; on the build machine at package
+    86's fold-in, on top of 73, the same 44 lines and 073626b2d8d85807."""
     from freesail.api.session import ship_factory
     from freesail.core import replay as replay_mod
     from freesail.ship.parts import magazine
@@ -9895,10 +9912,11 @@ def test_truth_7_171_a_practice_forenoon_is_checkpointed_and_replayed(tmp_path):
     checkpointed at 09:25 with the cask in the water and in sight; then half an hour, a
     notional mark four cables on the starboard beam engaged for half an hour, `secure the
     guns`, and on to noon. The game resumed from the checkpoint and the game played on give
-    one log, and the save replayed gives it again. Measured on this machine: 227 lines and
-    the digest 77cfa4458e18620d for all three (measured again after the review, before its
-    fixes and after them alike; the c06f1fa9bb619847 first written here did not
-    reproduce)."""
+    one log, and the save replayed gives it again. Measured on the owner's machine: 227
+    lines and the digest 77cfa4458e18620d for all three (measured again after the review,
+    before its fixes and after them alike; the c06f1fa9bb619847 first written here did not
+    reproduce); on the build machine at package 86's fold-in, on top of 73, the same 227
+    lines and 77cfa4458e18620d."""
     from freesail.api.session import ship_factory
     from freesail.combat import marks
     from freesail.core import replay as replay_mod

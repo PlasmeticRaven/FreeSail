@@ -602,7 +602,7 @@ def test_the_documents_say_what_practice_and_resupply_built():
     assert "**As built (practice and resupply, between packages 72 and 73).**" in spec
     assert "### Practice and resupply as merged" in read("docs/dev/M7-WorkPackages.md")
     harness = read("docs/agents/Harness.md")
-    start = harness.index("## 21f. Practice at the great guns")
+    start = harness.index("## 21g. Practice at the great guns")  # 21f before 73 (86)
     section = " ".join(harness[start : harness.index("\n## 22.", start)].split())
     assert "`practice`" in section and "`magazine`" in section
     ours = ("guns.filling", "guns.filled", "guns.powder_out", "ordnance.", "practice.")

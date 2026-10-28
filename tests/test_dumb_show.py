@@ -235,8 +235,8 @@ def test_the_drill_keeps_its_best_and_its_mean():
 
 
 def _old_minute_line(volleys: list[Volley], target_words: str, target: str | None):
-    """Today's `Battery.minute_line` (combat/guns.py at 4a12e97), for the minutes with no
-    shot into the sea and none at a mark."""
+    """Today's `Battery.minute_line` (combat/guns.py at the owner's local baseline), for the
+    minutes with no shot into the sea and none at a mark."""
     n = len(volleys)
     struck = sum(1 for v in volleys if v.outcome == "struck")
     short = sum(1 for v in volleys if v.outcome == "short")
@@ -357,7 +357,7 @@ def test_the_minutes_words_at_a_mark_and_into_the_sea():
 
 
 def _old_hit_chance(range_m, b, reach_m, *, target_length_m, aspect_rad, aim, scatter_deg):
-    """Today's `shot.hit_chance` (combat/shot.py at 4a12e97)."""
+    """Today's `shot.hit_chance` (combat/shot.py at the owner's local baseline)."""
     if range_m <= 0.0 or reach_m <= 0.0:
         return 0.0
     if range_m > reach_m * 1.05 or range_m > b.random_m:
