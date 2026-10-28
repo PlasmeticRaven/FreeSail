@@ -10121,3 +10121,38 @@ checkpoint with a crewed ship, a person ashore and a thing in each hull converts
 acts that put a crewed ship's person ashore (her boat, the port's business for her) are step
 3's, so the whereabouts in these tests are written as the boat will write them; the
 hearing, the reach and the free lines are the real ones.
+
+### The suites, as run (2026-10-28; this container, four cores, nothing else of the
+### machine's but what is said)
+
+By the rule of 2026-10-28: the fast tier whole on each step's final tree, the slow tier of
+the touched files, the pace tests alone and last; the whole suite the lead's in the cloud at
+the merge. Each tier was run from a worktree of the committed tree, so that the next step's
+edits in the main tree could not reach a worker's lazy import.
+
+- **The base `e7a3ee8`, the fast tier whole** (`-n auto -q`, a baseline for the counts):
+  3,690 passed, 3 failed: the two pictures tests (`test_pictures.py`: "the chart is blank
+  (std 8.0)" against the bound of 8.0, with the other three workers and this builder's
+  reading of the code beside it, the failure 73's record knows under load) and the
+  fingerprint test (`test_replay.py`), which this builder caused by editing `core/world.py`
+  while the run was on (the fingerprint is of the code and moved under the test); neither is
+  the tree's.
+- **Step 1 (`2efb12e`), the fast tier whole**: 3,699 passed, 0 failed, 0 skipped (the six
+  new tests of `test_hulls.py`, the pictures tests and the fingerprint test passing on the
+  quieter machine).
+- **Step 2 (`8253924`), the fast tier whole**: 3,703 passed, 0 failed (three new tests in
+  `test_people.py`, one in `test_hulls.py`).
+- **The slow tier of the touched files** (`--slow -m "slow and not pace"`, on step 2's tree,
+  two workers beside its fast tier: `test_hulls`, `test_people`, `test_checkpoint`,
+  `test_core`, `test_crews`, `test_orders_places`, `test_tell`, `test_director`,
+  `test_world_orders`, `test_ports`, `test_places`): 24 passed, 0 failed (the kept saves run
+  on a watch, truth 87's brig, truth 89's fake captain across the switch, the trials'
+  neighbours in those files).
+- **The pace tests alone, last** (`--slow -m pace`, on step 2's tree, the machine quiet, load
+  1.6 falling): 10 passed, 0 failed (truth 51's five, 88 with the cap full, 7-138, 7-151,
+  7-159 and 7-160).
+
+The whole slow tier was not run here (the lead's, by the whole-suite workflow at the merge);
+no pin was re-measured, since nothing a pin reads moved by either step (the proof above and
+the slow tier of the touched files; the whole tier at the merge is the last word). What
+changed after each tree's fast tier: nothing of the code; this section.
