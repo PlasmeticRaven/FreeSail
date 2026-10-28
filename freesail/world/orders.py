@@ -520,20 +520,28 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             raise WorldOrderError(f"No ship named {m.group('name')!r} is on the sea.")
         im = _INTENT_TAIL.match(m.group("goal"))
         if im:
-            # a brain given to a ship on the sea, or her intent changed (package 43)
+            # a brain given to a ship on the sea, or her intent changed (package 43); words
+            # no form reads are taken as a free intent, said with the warning and why the
+            # rules-based captain cannot sail by them (the owner's lead, 2026-10-26)
             from freesail.world.brains import FarCaptain
+            from freesail.world.captains import FREE, FREE_WARNING, read_intent
 
+            refused = ""
+            try:
+                read_intent(world, im.group("words"))
+            except ValueError as e:
+                refused = str(e)
             try:
                 vessel.warning = ""  # the guard's word on her goal's legs: her captain plans anew
                 if vessel.brain is None:
-                    vessel.brain = FarCaptain(world, vessel, im.group("words"))
+                    vessel.brain = FarCaptain(world, vessel, im.group("words"), free=True)
                     vessel.intent_words = vessel.brain.intent_words
                     vessel.brain._plan()
                     words = f"the captain of {vessel.name} given an intent"
                 else:
                     if vessel.crew is not None and getattr(vessel.crew, "captain", None):
-                        vessel.crew.captain.set_intent(im.group("words"))
-                    vessel.brain.set_intent(im.group("words"))
+                        vessel.crew.captain.set_intent(im.group("words"), free=True)
+                    vessel.brain.set_intent(im.group("words"), free=True)
                     vessel.intent_words = vessel.brain.intent_words
                     words = f"the intent of {vessel.name}'s captain changed"
             except ValueError as e:
@@ -541,10 +549,14 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             if vessel.warning:
                 raise WorldOrderError(f"{vessel.name} {vessel.warning}")
             vessel.done = False
-            return f"{words}: {vessel.brain.intent.words}", {
-                "id": vessel.id,
-                "intent": vessel.brain.intent.words,
-            }
+            data = {"id": vessel.id, "intent": vessel.brain.intent.words}
+            if vessel.brain.intent.kind == FREE:
+                data["free"] = True
+                return (
+                    f"{words}: {vessel.brain.intent.words} ({FREE_WARNING}; {refused})",
+                    data,
+                )
+            return f"{words}: {vessel.brain.intent.words}", data
         om = _ORDERS_OF_TAIL.match(m.group("goal"))
         if om:
             return _orders_of(world, vessel, om.group("boss"))

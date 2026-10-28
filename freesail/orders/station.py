@@ -139,10 +139,43 @@ def _parse(world: Any, rest: str) -> dict[str, Any]:
         if v is None and key in ("ship", "player's ship", "us"):
             flag = "the ship"
         elif v is None:
-            raise OrderError(f"No ship named {who!r} is on the sea to keep station on.")
+            # the player's ship by her name, or a sail by her kind, the nearest (the playtest
+            # of 2026-10-27: the tender's model said 'the Amazon' and 'the frigate', and only
+            # 'the ship' was taken)
+            v = _named_or_kind(world, root, key)
+            if v is None:
+                raise OrderError(f"No ship named {who!r} is on the sea to keep station on.")
+            flag = str(v.id)
         else:
             flag = str(v.id)
     return {"flag": flag, "where": _BEARING_WORDS[m.group("where")], "cables": cables}
+
+
+def _named_or_kind(world: Any, root: Any, key: str) -> Any:
+    """A sail to keep station on that `Vessels.find` does not name: the player's ship by
+    her own name (her shadow, under the id 'the ship'), else the nearest sail of the kind
+    said ('frigate', 'cutter', 'brig-sloop'), the player's among them; never the ship
+    herself. None when nothing on the sea answers."""
+    from freesail.world.geo import bearing_and_distance
+
+    own = _own_id(world)
+    shadow = root.vessels.player_shadow(root)
+    others = [v for v in root.vessels.active() if str(v.id) != own]
+    if shadow is not None and own != str(shadow.id):
+        if key in (shadow.name.lower(), shadow.name.lower().removeprefix("the ")):
+            return shadow
+        others.append(shadow)
+    word = re.compile(rf"\b{re.escape(key)}\b")
+
+    def of_kind(v: Any) -> bool:
+        words = (str(v.description or ""), str(v.kind or ""), str(v.what or ""))
+        return key == words[0].lower() or any(word.search(w.lower()) for w in words)
+
+    kind = [v for v in others if of_kind(v)]
+    here = getattr(world, "position", None)
+    if not kind or here is None:
+        return None
+    return min(kind, key=lambda v: bearing_and_distance(here, v.position)[1])
 
 
 def _sighting_of(world: Any, flag: str) -> Any:

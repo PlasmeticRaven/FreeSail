@@ -653,11 +653,41 @@ _BLOCKADE = re.compile(
 )
 
 
-def read_intent(world: Any, words: str) -> Intent:
+# A free intent (the owner's lead, 2026-10-26): words no form of `read_intent` reads,
+# taken for a ship on the sea so that a model seated as her captain is told its goal. The
+# rules-based captain lays no plan for it: he keeps her as she is, by his doctrine's weather
+# and strangers, until a model or the player at her captain's station sails her.
+FREE = "free"
+FREE_WARNING = (
+    "a free intent: the rules-based captain will not follow it, and keeps her as she is "
+    "until a model or the player takes her captain's station"
+)
+
+
+def free_intent(words: str) -> Intent:
+    """A free intent from its words whatever they say (a scenario ship's `free_intent:`,
+    2026-10-27): the goal a model at her captain's station is given, which the rules-based
+    captain does not sail by even where its words are a form he knows."""
+    said = " ".join(str(words).split()).rstrip(".")
+    if not said:
+        raise ValueError("a free intent says the ship's goal in words; these are empty.")
+    return Intent(FREE, said)
+
+
+def read_intent(world: Any, words: str, free: bool = False) -> Intent:
     """An intent from its words, the places checked against the chart and the ports
     (raises ValueError in words): `trade tin from Falmouth to Brest`, `trade forty tons
     of tin from Falmouth to Brest`, `keep the station off Ushant within 15 miles`, `carry
-    this letter to Brest`, `run home to Plymouth`, `bound for Brest`."""
+    this letter to Brest`, `run home to Plymouth`, `bound for Brest`. With `free`, words
+    no form reads (and a form whose places the chart has not got) are a free intent."""
+    if free:
+        try:
+            return read_intent(world, words)
+        except ValueError:
+            said = " ".join(str(words).split()).rstrip(".")
+            if not said:
+                raise
+            return Intent(FREE, said)
     from freesail.orders.numbers import read_all
 
     said = " ".join(str(words).split()).rstrip(".")
@@ -2203,10 +2233,12 @@ class Captain(Judgement):
 
     # -- the intent changed (a world order) ----------------------------------------------
 
-    def set_intent(self, words: str) -> str:
+    def set_intent(self, words: str, free: bool = False) -> str:
         """`captain: intent <words>` (the director's seam): the intent read anew, the
-        plan dropped and worked again at the next judgement; the words for the journal."""
-        self.intent = read_intent(self.world, words)
+        plan dropped and worked again at the next judgement; the words for the journal.
+        `free` takes words no form reads as a free intent (another ship's, `ship "X":
+        intent`)."""
+        self.intent = read_intent(self.world, words, free)
         self.intent_words = " ".join(words.split())
         self.role = role_for(self.world, self.intent)
         self.doctrine = load_doctrine(self.role)

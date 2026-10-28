@@ -25,6 +25,7 @@ from typing import Any
 
 from freesail import units
 from freesail.world.captains import (
+    FREE,
     IN_PORT_NM,
     JUDGE_EVERY_S,
     SIZE_RANK,
@@ -225,11 +226,22 @@ class FarCaptain(Judgement):
     of his mind is a line in the player's log. Across the crewed promotion his state is
     folded into the near body's `Captain` and back (`fold_in`, `fold_back`)."""
 
-    def __init__(self, world: Any, vessel: Any, intent: str, role: str = "") -> None:
+    def __init__(
+        self,
+        world: Any,
+        vessel: Any,
+        intent: str,
+        role: str = "",
+        free: bool = False,
+        given: Intent | None = None,
+    ) -> None:
         self.world = world
         self.vessel = vessel
         self.intent_words = " ".join(str(intent).split())
-        self.intent: Intent | None = read_intent(world, self.intent_words)
+        # `given`: the intent read already (a scenario ship's `free_intent:`, always free)
+        self.intent: Intent | None = (
+            given if given is not None else read_intent(world, self.intent_words, free)
+        )
         self.role = role or role_of_vessel(vessel, self.intent)
         self.doctrine: Doctrine | None = load_doctrine(self.role)
         self.state: str | None = None
@@ -270,9 +282,10 @@ class FarCaptain(Judgement):
             "history": [list(h) for h in self.history],
         }
 
-    def set_intent(self, words: str) -> str:
-        """`ship "X": intent <words>`: the intent read anew, the plan laid again."""
-        self.intent = read_intent(self.world, words)
+    def set_intent(self, words: str, free: bool = False) -> str:
+        """`ship "X": intent <words>`: the intent read anew, the plan laid again; `free`
+        takes words no form reads as a free intent, for which no plan is laid."""
+        self.intent = read_intent(self.world, words, free)
         self.intent_words = " ".join(words.split())
         self.role = role_of_vessel(self.vessel, self.intent)
         self.doctrine = load_doctrine(self.role)
@@ -379,6 +392,15 @@ class FarCaptain(Judgement):
         plan; refused in words into the vessel's `warning` when a mark is not the
         chart's."""
         if self.intent is None:
+            return
+        if self.intent.kind == FREE:
+            # a free intent (2026-10-26): no legs to lay, and a plan with none is a voyage
+            # done; she lies to where she is until her captain's station sails her
+            self.vessel.plan = [("lie_to", math.inf)]
+            self.vessel.cycle = False
+            self.vessel.saved_plan = None
+            self.vessel.tack = 0.0
+            self.planned = True
             return
         try:
             legs = Planner(self.world).legs_for(self.intent, self.vessel.position, self._departing)
@@ -737,6 +759,7 @@ class FarCaptain(Judgement):
         stranger in hand, the sails spoken, the trend's memory."""
         captain.intent = self.intent
         captain.intent_words = self.intent_words
+        captain.error = ""  # her World read a free intent's words, and refused them
         captain.role = self.role
         captain.doctrine = self.doctrine
         captain.trend = self.trend

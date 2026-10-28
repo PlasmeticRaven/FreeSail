@@ -330,3 +330,60 @@ def test_a_privateer_under_false_colours_lies_by_the_table_and_a_kings_ship_name
     )
     answer = H.answer_by_table(w, nancy, "What ship, whence and whither?")
     assert answer.startswith("The Nancy of ") and "for Falmouth" in answer
+
+
+def test_a_hail_of_the_players_ship_waits_for_the_player_and_moves_no_sail():
+    """The playtest of 2026-10-27: the frigate with her armed tender, a model at the
+    cutter's captain's station. Every hail the cutter made was answered for the player's
+    ship by table, and her rules-based captain made all sail, "hailed to heave to; she will
+    not", whatever the words: `model_holds_her` called `Captain.commands` (a property) as a
+    method, and the heave-to was worked on every hail, not only on the demand. The player's
+    ship with no rules captain commanding hears the hail and keeps it for his `say to her`;
+    a ship answering by table moves her sail only when she is asked to heave to."""
+    from tests.test_brains import put
+    from tests.test_crews import hove_to_world
+
+    w = hove_to_world()
+    assert not w.captain.commands  # the player commands her: no intent, no rules captain
+    raven = put(
+        w,
+        "cutter",
+        "britain",
+        "49 30.2 N 5 30 W",
+        "in company with the ship",
+        intent="patrol off the Lizard within 5 miles",
+        name="Raven",
+    )
+    w.run(61)
+    crew = raven.crew
+    assert crew is not None and crew.shape == "full"
+    assert H.model_holds_her(w)
+    shadow = w.vessels.player_shadow(w)
+    n = len(w.log)
+    assert H.deliver(crew, shadow, "We are well, how are you?", int(crew.clock.tick)) is None
+    new = list(w.log)[n:]
+    assert [e.kind for e in new] == ["hail.heard"]
+    assert w.ship.extra["hail_pending"]["words"] == "We are well, how are you?"
+    # a ship her rules captain commands answers by table: an enemy merchantman hailed with
+    # a question that is no demand moves no sail; the demand itself she runs from
+    w2 = hove_to_world()
+    nancy = put(
+        w2,
+        "merchant brig",
+        "france",
+        "49 30.2 N 5 30 W",
+        "bound for Brest",
+        intent="bound for Brest",
+        name="Nancy",
+    )
+    w2.run(61)
+    assert nancy.crew is not None and nancy.crew.shape == "full"
+    assert nancy.crew.captain.commands and not H.model_holds_her(nancy.crew)
+
+    def hailed(words: str) -> list[str]:
+        n2 = len(nancy.crew.log)
+        assert H.deliver(w2, nancy, words, int(w2.clock.tick))
+        return [e.text for e in list(nancy.crew.log)[n2:] if "making all sail" in e.text]
+
+    assert hailed("What news?") == []
+    assert hailed("Heave to, I am sending a boat") != []
