@@ -1386,3 +1386,75 @@ Each with the study's recommendation.
    *Recommend* no: 74's far fight resolves it in rounds asleep (rule 5), the damage written
    into the hulls as state, and a scenario may raise the cap; a stationed hull in a fight
    is a dealing and takes her place in the cap's order as a dealing ship does today.
+
+## As built, steps 1 and 2 (package 84; 2026-10-28)
+
+The first two of part 4's eleven steps, built as a sibling session on `claude/pkg-84` off
+`e7a3ee8` (73 merged; 86, the fold-in of the owner's local work, building beside on the same
+head), each a mergeable commit with the fast tier whole on its tree and the slow tier of the
+files it touched; the measurements and the suites as run are in `docs/dev/TuningNotes.md`
+under "Package 84, steps 1 and 2". Step 3 onward is built from the head after 86's merge.
+
+### Step 1: the Hull extracted behind the World's names (`freesail/world/hulls.py`)
+
+**Built.** A `Hull` object holds every per-ship field of §1.1 (`hulls.PER_SHIP_FIELDS`, the
+one list, in the constructor's order: her ship and her place on the sphere; her lookout,
+ground and anchors' dragging; the tide at her; her glass, sky and visibility; her sea and
+motion; the wind at her with the wind-shift bookkeeping; her sun; her reckoning; her log and
+the recurring kinds' words; her places, people, stations, papers, hold, purse, stores, ports,
+fishery, needs, water, health and the lost flag; her readings view; her standing runtime,
+rules captain, harnesses, journals and the player's seat), kept as `world.own`; the World
+keeps the shared fields (`SHARED_FIELDS` names them: the seed and scenario, the clock, the
+streams, the chart, the tide table, the systems and the script, the nations, the vessels, the
+sets, the business, the world orders, the marks, the director's three, the journal and the
+inputs, the acts, the compression). **Every per-ship attribute of `World` is a property to
+`own`**, installed at the end of `core/world.py` from the one list with a getter, a setter
+and a deleter (`hulls.delegated`), so that `world.ship`, `world.log`, `world.people` and
+the rest read and write the Hull's fields under the names the grammar's 3,600 lines and the
+readings' 4,000 use, and `getattr(world, name, None)` and `hasattr` answer as before for a
+field a Hull has not got; the class defaults the World kept for a checkpoint from before
+their package (the wind-shift state, the recurring words, the dragging's lines, the seat, the
+lost flag) are the Hull's class defaults now. The Hull exposes the shared fields back under
+their names (`hull.clock`, `hull.rng`, `hull.chart`, `hull.vessels`, ...) and forwards
+`record`, `submit` and `readings`, and has the small pure reads of her own state
+(`ship_x`, `position`, `at_anchor`, `name`, `heading_deg`): the façade of §2.2, on which a
+consumer given a hull reads what it reads of a World. `World.__init__` makes the Hull first,
+empty, so every assignment it makes lands on her; `CrewedWorld` is untouched and, being a
+World, gets a Hull of its own under **her vessel's id** (`Hull.id`; the World's own hull is
+`brains.PLAYER_ID`, "the ship", read through `hulls.own_id()` until step 7 defines it once).
+Package 73's water and health keepers are the hull's by the list and nothing else. The
+checkpoint: `World.__setstate__` (new; the pickler's `_new, (cls,), state` reduction calls
+it) lifts an old checkpoint's per-ship fields off the World's dict into a Hull
+(`hulls.lift_old_state`), a `CrewedWorld` in one converting the same way, and the pickler
+leaves the Hull's cached readings view out as it left the World's; the three fixture saves
+load by the checkpoint road and run on (`test_checkpoint.py`), and `tests/test_hulls.py`
+loads a checkpoint written in the old shape from a live world and carries it on to the same
+digest. The tick's order is untouched; nothing pinned moves (pure delegation of state can
+move no order of operations; the fast tier whole and the slow tier of the touched files are
+the proof here, the whole suite the lead's at the merge).
+
+**Taken another way, with the reason.** The brief has the Hull own "the methods that work
+them" (`submit`, `record`, `readings`, her `_tick_*`); here the methods stay on the World and
+only the state moves. Three reasons: the state's move alone is what the converter and the
+pins need, and a method moved is a method whose body could change by a slip; the World's text
+stands line for line beside package 86, which is editing the same files on the sibling, so
+the lead's merge of 86 then 84 meets no conflict in `core/world.py`'s eight hundred lines of
+methods; and each of those methods changes anyway at step 6, when it runs once per hull in
+the two-phase tick, which is the step to move it. The Hull's `record`, `submit` and
+`readings` forward to the World until then.
+
+**Measured.** A delegated read costs about 50 ns against 13 for the Hull's own attribute and
+10 for a plain one on the World (a million reads timed on this container); a tick of the
+cutter on the plane makes some 47 per-ship reads through the World (`ship` 10, `wind` 8,
+`_position` 4, `wind_record` 4, `log` 3, `sea` 3), two microseconds of a two-millisecond
+tick, a tenth of a per cent; the frigate's pace alone in truth 51's form is in the tuning
+notes beside the base commit's, measured on this container one after the other.
+
+**Found on the way.** `agent_journals["director"]`, the director's journal, rides the
+player's hull with her stations' journals (the design has it the world's; step 9's, with the
+director's forms). `ports` is the hull's as one object with the port files in it (§1.7's 7)
+until step 3 splits it. `person_journals`, `crewed_settings`, `consent_records_dir`,
+`load_report`, `loaded_from`, `pace_rule` are set on the World by the drivers and the
+doors and stay the World's. `PLAYER_ID` is now read in a fourth place (`hulls.own_id`, a
+function over `brains.PLAYER_ID`, not a fifth copy of the string); step 7's one definition
+retires all of them.

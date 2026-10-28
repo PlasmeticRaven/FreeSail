@@ -331,10 +331,15 @@ class _Pickler(pickle.Pickler):
         if name in ("freesail.core.world.World", "freesail.world.crews.CrewedWorld"):
             state = dict(obj.__dict__)
             state["chart"] = None
-            state["_readings_view"] = None
-            state["_readings_key"] = None
             state.pop("load_report", None)  # how this run was loaded is not the game's state
             state["_acts_frames"] = []  # the stations acting now (package 42), none at rest
+            return _new, (cls,), state
+        if name == "freesail.world.hulls.Hull":
+            # the ship's fields (package 84, step 1): the readings' cached view is this
+            # tick's and not state
+            state = dict(obj.__dict__)
+            state["_readings_view"] = None
+            state["_readings_key"] = None
             return _new, (cls,), state
         if name == "freesail.core.events.Log":
             state = dict(obj.__dict__)

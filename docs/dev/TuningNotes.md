@@ -10018,3 +10018,60 @@ the machine running:
 What changed after the whole slow tier's last run: the quiet path's stiffness line (c60c361,
 one line of `water.py`) and this section; the water file and the pictures test were run again
 after it, and the pace tests.
+
+## Package 84, steps 1 and 2: the one-world refactor's first two steps (2026-10-28)
+
+The first two of the eleven steps of `docs/design/Design-OneWorld.md` §4, built as a sibling
+session in its own container on `claude/pkg-84` off `e7a3ee8` (73 merged; 86 building beside
+on the same head), each step one commit pushed when green; the design note's postscript "As
+built, steps 1 and 2" says what each step built, took another way and found; this section
+is the record of what moved, the counts, the pace and the suites. The physics are not
+touched; no ship file, no consent file, no model identifier.
+
+### Step 1: the Hull extracted behind the World's names
+
+**What moved: nothing pinned.** The step moves state and not operations: every per-ship
+field of the World lives on `world.own` (a `freesail.world.hulls.Hull`) and is read and
+written under its old name through a property, the World's `tick`, `record`, `submit` and
+`_tick_*` unchanged in text and order. No digest, line count, tick or state of any recorded
+passage can move by it, and none did in the suites run (below). The checkpoint's shape
+changed (the World's dict holds `own` in place of the per-ship fields) and the converter
+`World.__setstate__` reads the old shape: the three kept saves (`tests/fixtures/saves/`, m5c)
+load by the checkpoint road, run on a glass and a watch and save again
+(`test_checkpoint.py`), and `tests/test_hulls.py` writes a checkpoint in the old shape from a
+live world, loads it and runs it on to the live world's digest; a `CrewedWorld` in a
+checkpoint converts the same way (its own Hull under her vessel's id; `test_hulls.py`
+round-trips a world with a promoted brig and both logs' digests hold).
+
+**The count.** `PER_SHIP_FIELDS` names 59 fields (her ship and place 4, the ground and
+anchors 7, the tide 2, the sky and glass 3, the sea and motion 6, the wind 11, the sun 2, the
+reckoning 2, the log 2, the registries and keepers 13, the readings view 2, the book, captain,
+harnesses and seat 5); `SHARED_FIELDS` 21 the Hull reads back. `core/world.py` lost its
+twelve per-ship class defaults (to the Hull) and gained the Hull's making, the converter and
+the properties' installation (some forty lines); `core/replay.py` the Hull's reduction; no
+other file of the game changed.
+
+**The delegation's cost, measured on this container (four cores, the baseline fast tier
+running beside; the ratio is the figure, not the absolute).** A read of `world.ship` through
+the property, 50 ns; of `world.own.ship`, 13 ns; of a plain attribute of the World
+(`world.clock`), 10 ns (a million reads each by `timeit`). A tick of the cutter on the plane
+with no chart makes 47 per-ship reads through the World (counted by wrapping the properties
+over 600 ticks: `ship` 10.4 a tick, `wind` 8, `_position` 4, `wind_record` 4, `log` 3, `sea`
+3, `wind_settled` 2, `motion` 2), so the delegation costs about two microseconds of a tick
+that costs two milliseconds in truth 51's form: a tenth of a per cent, under the noise of any
+measure below.
+
+**The pace, truth 51's form (a thousand ticks to settle, the best of three thousands, the
+frigate alone on the station trial; `tools/pace.py alone`), the base commit `e7a3ee8` and
+step 1's tree measured one after the other on the quiet container:** the base
+tree 578 and 612 ticks a second by `tools/pace.py`, 567, 576 and 593 by the same measure
+run from a script in three pairs alternated with step 1's; step 1's tree 551 and 539 by
+`tools/pace.py`, 607, 653 and 549 in the alternated pairs (the load 0.6 to 0.85 throughout).
+The spread of one tree against itself (539 to 612 for the base, 539 to 653 for step 1) is
+wider than any difference between them: **the delegation costs nothing the measure can see**,
+as the count of reads said it would. (A first pair read 578 against 551 and looked like a
+loss of five per cent; the alternated pairs show it was the machine's noise. A profile of a
+thousand ticks under `cProfile` puts the properties' getter at 84,500 calls and 61 ms of
+5.3 s, which is the profiler's own cost of a call and not the game's.) Truth 51's floor of
+500 stands on this container on both trees; the pace tests proper are run alone at the end
+of the two steps.
