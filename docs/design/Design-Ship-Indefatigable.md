@@ -83,7 +83,7 @@ yards under the bowsprit), which wait behind two stubs for the gated engine desi
 | 13 | **The 64's spritsail and sprit-topsail yards** are not written until stage B (`head_yards()` a stub) | A bowsprit yard reclasses her head yards and breaks the stagger today (map-engine §3.2) |
 | 14 | The razee carries no yards under the bowsprit (D8 (b) as answered) | **Plainly:** Steel p. 49 gives the 44 and the 38 both yards; put to the owner (§17) |
 | 15 | The razee's mizen: gaff 40 ft 10 in, boom 65 ft 4 in (D20 (a), Steel p. 40); the sail about 240 m² | As decided; the area by the frigate's spanker rule (measured here) |
-| 16 | Fits: the 64 **"ardent class 1784"** (default) and **"ardent class 1794"**; the razee **"as razeed 1795"** (default, the brief's words) and **"as carried 1796"** | D17 with the brief; Winfield 1793-1817 p. 99; James vol. 1 pp. 361, 454 |
+| 16 | Fits: the 64 **"ardent class 1784"** (default) and **"ardent class 1794"**; the razee **"as razeed 1795"** (the brief's words) and **"as carried 1796"** (default: the owner, 2026-10-28) | D17 with the brief; Winfield 1793-1817 p. 99; James vol. 1 pp. 361, 454 |
 | 17 | Patterns (Adye 1804 pp. 72, 155): 24-pdr 9 ft 6 in 49½ cwt; 18-pdr 9 ft 40 cwt; 12-pdr 9 ft 6 in 34 cwt; 9-pdr 7 ft 6 in 24½ cwt; carronades 42-pdr 22¼, 24-pdr 13, 18-pdr 9 cwt | D31 (a) for the razee; the 74's reading for the 64's 18s and 9s (judgement for hers) |
 | 18 | Crews by Falconer (11, 9, 7, 6 to the 24, 18, 12, 9) and Douglas (4 to any carronade), in both files | D31 (c); Bel §13.1 answer 12 |
 | 19 | Guns numbered on across decks from forward; a `deck` word on each gun when stage 0 lands the key | `(number, side)` unique in a fit (`schema.py`; map §0 item 17); a number is one crew (`parts.py:553-559`) |
@@ -610,6 +610,10 @@ with this sail (§16, risk 6).
   and sprit topsail rows in the 44 and 38 columns (seen here). She kept the 64's spars by the only
   account. "Where the period shows them" may therefore include her: put to the owner. Either way
   she waits for the same gate, so stage A is unchanged.
+  - **Answered (the owner, 2026-10-28):** she crosses the spritsail yard, as an occasional sail,
+    and no sprit-topsail yard (the owner's reading of photographs of a modern model of her,
+    secondary). Her yard is taken from the 64's spar (she kept the 64's spars), with the sprit
+    course as the 64's, out of "plain sail".
 
 ### 4.7 Storm, occasional sails, groups and aliases
 
@@ -635,8 +639,8 @@ with this sail (§16, risk 6).
 
 | File | Fit | Guns, by place and number | Source |
 |---|---|---|---|
-| razee | **"as razeed 1795"** (default) | gun deck 1-13: long 24. Quarterdeck 14-17: long 12 in the four foremost ports a side; 18-19: 42-pdr carronades in the two aftmost. Forecastle 20-21: long 12 in the after two; 22: 42-pdr carronade in the foremost | Winfield 1793-1817 p. 99; ZAZ2371's and ZAZ2398's tables (read); James vol. 1 p. 454. The establishment fills the ports exactly (six and three a side: ZAZ2375, measured). The split within each deck is judgement: a carronade's short recoil where the room is least, by the cabin and wheel aft and the catheads and bitts forward |
-| razee | **"as carried 1796"** | gun deck 1-13: long 24; quarterdeck 14-19 and forecastle 20-22: 42-pdr carronades; `chaser.bow.*`: two long 12s as bow chasers at about x +22.9 m, 4.25 m above the water (judgement: no bow port measured) | James vol. 1 p. 361; Troude vol. 3 p. 31; D30 (a) |
+| razee | **"as razeed 1795"** | gun deck 1-13: long 24. Quarterdeck 14-17: long 12 in the four foremost ports a side; 18-19: 42-pdr carronades in the two aftmost. Forecastle 20-21: long 12 in the after two; 22: 42-pdr carronade in the foremost | Winfield 1793-1817 p. 99; ZAZ2371's and ZAZ2398's tables (read); James vol. 1 p. 454. The establishment fills the ports exactly (six and three a side: ZAZ2375, measured). The split within each deck is judgement: a carronade's short recoil where the room is least, by the cabin and wheel aft and the catheads and bitts forward |
+| razee | **"as carried 1796"** (default) | gun deck 1-13: long 24; quarterdeck 14-19 and forecastle 20-22: 42-pdr carronades; `chaser.bow.*`: two long 12s as bow chasers at about x +22.9 m, 4.25 m above the water (judgement: no bow port measured) | James vol. 1 p. 361; Troude vol. 3 p. 31; D30 (a) |
 | 64 | **"ardent class 1784"** (default) | lower deck 1-13: long 24; upper deck 14-26: long 18; quarterdeck 27-31: long 9 in the five ports a side; forecastle 32: long 9 | ZAZ1407's gun table (read; written for *Stately* on the shared sheet); Winfield 1793-1817 p. 99; D17 (a) |
 | 64 | **"ardent class 1794"** | as 1784, plus forecastle 33: 24-pdr carronades at about +14.6 m; roundhouse 34-36: 18-pdr carronades between −23 and −17 m (the roundhouse unmeasured; judgement) | Winfield 1793-1817 p. 99: the class's from 1794, never hers (Ind §4.1, judgement) |
 
@@ -644,7 +648,10 @@ with this sail (§16, risk 6).
   guns ("The Indefatigable mounted but 28", vol. 1 p. 454) goes in the 1795 fit's note.
   **Plainly:** fidelity argues that the fit she carried in every action read (1796 to 1805)
   should be her default; the brief names "as razeed 1795" and the decision sheet makes it the
-  default, the owner able to say otherwise. Put to the owner (§17); it also settles §11.1.
+  default, the owner able to say otherwise. Put to the owner (§17), who made "as carried 1796"
+  the default (2026-10-28); §11.1's second way holds. What is set against the default fit (the
+  filling party, the quarter bill, `Quarters.beat` at muster) is taken on the 1796 fit, and B1
+  records the figures it gives where this document gives the 1795 fit's.
 - The 1796 fit's note says she carried it in January 1797 (James vol. 2 pp. 16-17) and in 1805
   (vol. 3 p. 313; ADM 1/2408/84, catalogue).
 
@@ -1204,6 +1211,12 @@ after the wiring. Her files' byte identity is the package's generator truth.
 ---
 
 ## 17. Open for the owner or the lead
+
+**Answered by the owner (2026-10-28; Decisions, "The design's questions").** Item 3: the razee's
+default fit is "as carried 1796", so §11.1's second way holds for her. Item 5: the razee crosses
+a spritsail yard, out of plain sail, and no sprit-topsail yard; `head_yards()` writes the
+spritsail yard for both files and the sprit-topsail yard for the 64 alone. Item 6: the spars
+rule. Item 10: as proposed. Steel's driver (§4.4) stays left out unless the owner asks for it.
 
 1. **D18 (owner):** (a) proposed, the razee's gun deck at 1.39 m; (c), her old upper deck at
    3.66 m, one figure away; decided on screenshots of both beside the 64 and the frigate-36 (§2.2).

@@ -54,7 +54,7 @@ All are held privately; the repository cites them by page. *French Warships 1786
 **What follows from the answers:**
 - **D46 becomes (d) with rule 3 restored,** since D3 is (b). In stays, the ourse is braced to leeward as the helm goes down, and the yard is changed last. Each rule is carried over by judgement from a ship's mizen, and its truth says so.
 - **D10 stays (a):** an opt-in key whose yards the handling ignores. Reported to the lead under the brief's "a rig the engine lacks is reported".
-- **D17 is taken with the brief:** two files. The razee's fits are the brief's "as razeed 1795" (Winfield p. 99's establishment, D17(b)'s fit) and the 1796 fit as carried (26 × 24-pdr, 2 × 12-pdr, 18 × 42-pdr carronades, 330 men: James vol. 1 p. 361). The default is the 1795 fit, as the brief names it. The owner may say otherwise.
+- **D17 is taken with the brief:** two files. The razee's fits are the brief's "as razeed 1795" (Winfield p. 99's establishment, D17(b)'s fit) and the 1796 fit as carried (26 × 24-pdr, 2 × 12-pdr, 18 × 42-pdr carronades, 330 men: James vol. 1 p. 361). The default was the 1795 fit, as the brief names it; the owner made it the 1796 fit as carried (2026-10-28, below).
 - **D27 and D39 are taken with the brief:** the *Neufchatel* is an American vessel of 1812, with her names American by default. Her scenario's year, and the war's state in the table of nations, are for the design.
 - **D18, the lead's reading for the design:** with D14(c), the viewer draws her true sides, sheer, wales and port sills from the hull profile, and no longer from the one deck line. The deck-height convention can then serve the physics and the spar heights alone. The design proposes against the owner's measure and shows the screenshots.
 
@@ -74,6 +74,19 @@ All are held privately; the repository cites them by page. *French Warships 1786
 5. **The settee's tack as a ship's mizen** (D3), within the settee's design, which goes to the lead under the brief's gate.
 
 Items 2 and 3 extend the engine as the settee does. Their designs come to the lead beside the settee's, under the same gate.
+
+**The design's questions (the owner, 2026-10-28).** The Phase 3 design (`Build-Ships.md` §19.1) put its questions to the owner, who answered by number:
+- **The razee's default fit is "as carried 1796"** (26 × 24-pdr, 2 × 12-pdr, 18 × 42-pdr carronades). A scenario for her need not name a fit, which settles D48's second way for her.
+- **The razee crosses a spritsail yard**, an occasional sail kept out of plain sail, and no sprit-topsail yard. The owner judged the spritsail reasonable from photographs of a modern model of her (secondary); Steel 1794 p. 49 gives a 44 both yards. D8(b) widens to her spritsail yard.
+- **The 64's topgallants and royals are cut to Steel's spars**, his sail table's figures recorded in her notes.
+- **The brig's sill** follows Steel's band for sloops, 1.22-1.52 m, so her lee ports shut at 12-16° of heel, not 24.7°.
+- **The judgement figures are accepted:**
+  - for the 64: 76 private marines, 18-pdrs of 40 cwt, the split of her 12s and carronades, her small-arms men, an exercise allowance of a third;
+  - for the engine: "furl the mizen" furls the lateen course aloft; the settee is dipped when the head yards' swing ends, with its times and hands; the spritsails are out of plain sail;
+  - for the lee ports: a shut port reopens six inches clear of the water.
+- **The lifts.** The owner asked why only the lateen yard's lifts are drawn. The reason was only that the viewer draws no lifts today, though every square yard's are in the files, and drawing them would change every picture. The hull profile's drawing changes every picture anyway, so the design now proposes drawing every yard's lifts in the same step (B5), the pictures re-measured old beside new.
+- **The 74's driver.** The owner asked whether the *Bellerophon* loses her spanker. She does not: her mizen course on the mizen yard is her after sail, and the engine handles it as the spanker (hauled aft in stays, brailed hove to). The sail left out is the driver of the 1773 establishment: a separate light-weather sail hoisted to the mizen yard's peak on a small yard of its own and spread abaft the course (Steel; Lavery Table 15). The 64's driver is the same sail (Steel 1794). Whether to carry it is open.
+- **The public-domain pages** the design named (Steel 1805's bodies tables, ZAZ6306, Chapelle's fig. 17, Chapman's Pl. LIX) are to be fetched and filed.
 
 This sheet gathers the questions the four research notes leave for you, merged where they ask the same thing, each with its options and evidence, a recommendation that keeps your rulings, and what depends on it. One question the notes did not ask is added as D48: where the 64 sails. You may accept every recommendation at once, or answer by number (for example "D9: a").
 

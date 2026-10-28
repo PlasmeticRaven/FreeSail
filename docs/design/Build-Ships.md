@@ -685,6 +685,11 @@ frigate-36's convention, and both files and the tuning notes would say so.
   on the razee (Indf §12.3).
 - `fullRigFrame` (:1383-1414) already holds the hull's points; nothing else in the rig or the
   physics changes.
+- **The lifts of every yard** (proposed after the owner's question, 2026-10-28; Decisions, "The
+  design's questions"): each `lift` line the files already carry is drawn faint from its yard's
+  arm to the masthead above, at the braces' opacity, in the same step as the profile, since the
+  profile changes every picture anyway. This replaces Ext §6.1's lifts on a lateen yard alone.
+  The pictures' figures are measured with the lifts and without, old beside new.
 
 **The rendering:** `client/shipview.js:58-60` draws each hull figure with the class
 `"hull " + part`; `client/style.css` (:155-158) gains `.hull.wale` and `.hull.band` (an SVG
@@ -1239,6 +1244,11 @@ Each builder's branch is reviewed as soon as it is done, then fixed (plan Phase 
 
 ### 19.1 For the owner
 
+**Answered by the owner (2026-10-28; Decisions, "The design's questions").** Item 3: "as carried
+1796". Item 4: the spritsail yard only, out of plain sail. Items 5, 6 and 8: as proposed. Item 7:
+as proposed, except the lifts, now drawn on every yard (§6). Item 10: the six-inch margin. Item
+11: to be fetched. Still open: 1, 2, 9, the weather side of 10, 12 and 13.
+
 1. **D18:** (a) proposed for every file (§5.5); the razee's gun deck at 1.39 m, or (c) her old
    upper deck at 3.66 m; decided on B5's screenshots.
 2. **D25:** (c), the Lizard of April 1796, proposed (the lead's view and the shared draft; Indf
@@ -1264,6 +1274,9 @@ Each builder's branch is reviewed as soon as it is done, then fixed (plan Phase 
     Chapman's Pl. LIX.
 12. **The revenue cutter's guns** (the hired cutters' long guns stand in) and the *Éclair*'s
     calibre.
+13. **The driver** of the 64 and the 74 (Indf §4.4; Ext §14 item 10): the occasional light-weather
+    sail hoisted to the mizen yard's peak on its own small yard, abaft the mizen course. The
+    mizen course itself stays her after sail. Left out unless the owner asks for it.
 
 ### 19.2 For the lead
 
