@@ -23,7 +23,7 @@ thresholds:
   # of the foundering water at which, the pumps losing and an enemy at hand, he strikes;
   # `damage_priority` the order of his repairs (freesail/world/captains.py `_damage_work`)
   board_odds: {value: 1.0, source: "a privateer boards at once with the odds even, to spare the prize and her own guns (the privateers' way: the Channel privateers' captures by boarding, from memory); judgement"}
-  board_when: {value: at any time, source: "as board_odds"}
+  board_when: {value: her guns silent, source: "a privateer boards a prize that does not answer his fire, after a quarter of an hour's engagement, and a ship whose fire has slackened: the odds even are enough (as board_odds); judgement"}
   musketry_cables: {value: 1.0, source: "the marines open within a cable, musket shot being a hundred yards (spec M7 §11): a cable is the outside of it; judgement"}
   marines_tops: {value: false, source: "the French put sharpshooters in the tops, the British kept theirs on the poop (Nelson's objection; Trafalgar's accounts, from memory): the nation's kit decides"}
   pumps_at_m: {value: 0.3, source: "a foot of water in the well mans the pumps beyond the watch's routine spell (Falconer 1780, PUMP: the well sounded each watch and the pumps worked when she makes water); judgement"}

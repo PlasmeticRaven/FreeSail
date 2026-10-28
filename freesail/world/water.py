@@ -391,22 +391,20 @@ class Water:
         self._lines(st, gain, pumped, before, depth, tick)
 
     def _routine_pumping(self, st: WaterState, gain: float) -> None:
-        """At the change of the watch the watch pumps her dry unasked while the well is
-        shallow and nothing but the seams runs: no line and no hands (the routine's ten
-        minutes at the brakes)."""
+        """Every glass the watch pumps her dry unasked while the well is shallow and nothing
+        but the weather's water runs (her seams working, the sea she ships): no line and no
+        hands (the routine's minutes at the brakes, "the pumps going every half hour" of a
+        ship in a blow). A leak of the hull's, the ground's or a started seam's is the
+        carpenter's and the order's."""
         clock = self.world.clock
-        watch = clock.watch()
-        if st.routine_watch is None:
-            st.routine_watch = watch
+        tick = int(clock.tick)
+        if tick % SPELL_S:
             return
-        if watch == st.routine_watch:
-            return
-        st.routine_watch = watch
         if st.tons <= 0.0 or st.pumps_manned:
             return
         if self.depth_m() >= ROUTINE_PUMP_UNDER_M:
             return
-        if any(lk.kind not in ("the seams",) for lk in self.leaks()):
+        if any(lk.kind not in ("the seams", "the sea") for lk in self.leaks()):
             return
         if not _pump_specs(self.ship):
             return
@@ -822,8 +820,10 @@ class Pumps:
         rate = self.rate_t_per_h(men)
         if water.depth_m() < SUCK_M:
             # the pumps suck: the crews stand down unless a leak runs (then they are kept
-            # at it by spells, pumping each glass, as the period kept a known leak)
-            leaks = [lk for lk in water.leaks() if lk.kind != "the seams"]
+            # at it by spells, pumping each glass, as the period kept a known leak); the
+            # weather's water (her seams working, the sea she ships) keeps nobody at the
+            # brakes: the well is pumped again when it shows (the doctrine's foot)
+            leaks = [lk for lk in water.leaks() if lk.kind not in ("the seams", "the sea")]
             if not leaks:
                 if st.pumps_said_sucked is not True:
                     st.pumps_said_sucked = True

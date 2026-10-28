@@ -812,12 +812,15 @@ class Health:
         last_fired = getattr(battery, "last_fired_tick", None) or 0
         if tick - max(last_struck, last_fired) < BILL_AFTER_S:
             return
-        st.bill_hits = hits
-        st.bill_said_tick = tick
         killed = [s for s in crew.sailors if s.hurt == "killed"] + list(
             getattr(crew, "dead", []) or []
         )
         wounded = [s for s in crew.sailors if s.hurt in ("wounded", "hurt")]
+        said_before = st.bill_said_tick
+        st.bill_hits = hits
+        st.bill_said_tick = tick
+        if not killed and not wounded and said_before is not None and tick - said_before < 3600:
+            return  # "nobody hurt" is said once in an hour's action, not at every lull
         grave = [s for s in wounded if getattr(s, "wound", "") in ("grave", "invalid")]
         parts = []
         if killed:

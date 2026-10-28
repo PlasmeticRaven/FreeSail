@@ -355,9 +355,17 @@ def _casualties(ship, keeper, mean: float, x_m: float, where: str, rng, tick) ->
     quarterdeck = [s for s in crew.by_station[Station.QUARTERDECK] if s.fit] if aft else []
     hurt = 0
     taken: set[str] = set()
+    # the quarterdeck's share is drawn on the health's stream, not the gunnery's, so that
+    # the shot's own sequence runs as 70 and 71 left it (package 73)
+    qd_rng = None
+    if quarterdeck:
+        from freesail.orders.prompt import world_of
+
+        world = world_of(ship)
+        qd_rng = world.rng.stream("health") if world is not None else None
     for _ in range(n):
         pool = candidates
-        if quarterdeck and rng.random() < QUARTERDECK_SHARE:
+        if quarterdeck and qd_rng is not None and qd_rng.random() < QUARTERDECK_SHARE:
             pool = quarterdeck
         s = next((x for x in pool if x.id not in taken and x.fit), None)
         if s is None:

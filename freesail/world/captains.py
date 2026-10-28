@@ -3856,11 +3856,13 @@ class Captain(Judgement):
             return False
         when = str(self._th("board_when", "her guns silent") or "her guns silent")
         if when != "at any time":
+            # her guns silent: no shot of hers has struck for five minutes; a mark that has
+            # never answered the fire is boarded after a quarter of an hour's engagement
             keeper = damage_of(ship)
             last = int(keeper.struck_by.get(mid, -(10**9))) if keeper is not None else -(10**9)
-            if p.tick - last < 300 and last > -(10**8):
+            if last > -(10**8) and p.tick - last < 300:
                 return False
-            if last <= -(10**8) and p.tick - int(self._business.get("engaged_at", p.tick)) < 300:
+            if last <= -(10**8) and p.tick - int(self._business.get("engaged_at", p.tick)) < 900:
                 return False
         tick = p.tick
         if grappled_to(ship) == mid:
@@ -3875,7 +3877,9 @@ class Captain(Judgement):
             return True
         if tick - int(self._business.get("board_tick", -(10**9))) >= 180:
             self._business["board_tick"] = tick
-            self.give("lay her aboard", why=f"to board her: {ours} boarders to her {theirs}")
+            e = self.give("lay her aboard", why=f"to board her: {ours} boarders to her {theirs}")
+            if getattr(e, "kind", "") == "order.rejected":
+                return False  # the helm law stands: the chase could not be laid
         return True
 
     def _damage_work(self, p: Perception) -> None:
@@ -3937,6 +3941,13 @@ class Captain(Judgement):
         ship = world.ship
         tick = p.tick
         if tick - int(self._business.get("repairs_tick", -(10**9))) < 600:
+            return
+        # the rigging is mended when the weather serves (the carpenter's and the boatswain's
+        # reports say as much): never lying to for weather, in distress, or with the wind at
+        # the shortening figure and above
+        if self.state in ("hove to for weather", "in distress"):
+            return
+        if float(p.wind_kn or 0.0) >= float(self._th("shorten_sail_kn", 30.0) or 30.0):
             return
         runner = ship.extra.get("evolutions")
         in_hand = (

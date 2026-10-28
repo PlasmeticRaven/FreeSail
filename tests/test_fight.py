@@ -441,14 +441,11 @@ def test_the_rules_captain_opens_musketry_within_a_cable_and_serves_out_the_arms
     assert all("musket ball" in s.hurt_how for s in ours)
     from freesail.world.captains import load_doctrine
 
-    for role, odds, when in (
-        ("kings-ship", 1.3, "her guns silent"),
-        ("privateer", 1.0, "at any time"),
-        ("merchant", 0.0, "her guns silent"),
-    ):
+    for role, odds in (("kings-ship", 1.3), ("privateer", 1.0), ("merchant", 0.0)):
         d = load_doctrine(role)
-        assert d.threshold("board_odds") == odds and d.threshold("board_when") == when
-        assert d.threshold("pumps_at_m") == 0.3 and d.threshold("damage_priority")[0] == "the leak"
+        assert d.threshold("board_odds") == odds and d.threshold("board_when") == "her guns silent"
+        assert d.threshold("pumps_at_m") == 0.3
+        assert str(d.threshold("damage_priority")).startswith("the leak")
         assert d.sources["board_odds"]
 
 

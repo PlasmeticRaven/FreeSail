@@ -9852,7 +9852,7 @@ evolution competing for hands. Everything is state the readings give and the log
 | the fight | round 60 s; ROUND_LOSS 1.0 (losses ~ strength/10); first round cover 1.3 defence, 0.8 attack; CARRIED_RATIO 0.5; CONTEST_ROUNDS 15; REPULSE_COST 0.1; marines' bayonet by the kit (1.3/1.2) | the period's boardings short and decided (James); judgement |
 | the crossing | the defenders' marines at five times the 50-yd chance; a loaded gun bearing one man each | judgement |
 | the grapnels | within 30 m; two minutes and eight hands; hold from the throw | Falconer 1780, GRAPPLING; judgement |
-| the doctrine | board_odds 1.3 (King's ship, cruiser, commodore), 1.0 privateer, 0 merchant and packet; board_when her guns silent / at any time; musketry_cables 1; marines_tops kit; pumps_at_m 0.3; give_up_at_share 0.4; damage_priority the leak, the rigging, the guns | sources in each `data/captains/*.yaml` row |
+| the doctrine | board_odds 1.3 (King's ship, cruiser, commodore), 1.0 privateer, 0 merchant and packet; board_when her guns silent (no shot of hers for five minutes; a mark that never answered boarded after a quarter of an hour's engagement); musketry_cables 1; marines_tops kit; pumps_at_m 0.3; give_up_at_share 0.4; damage_priority the leak, the rigging, the guns | sources in each `data/captains/*.yaml` row |
 
 ### What was measured
 
@@ -9946,6 +9946,41 @@ arm before an action) and the owner may turn it off per role by `board_odds: 0`.
   true reading of it, and the tests hold her captain aside (`Captain.aside`).
 - The library's and the aboard table's counted tests (97 evolutions, 31 things) moved by the
   package's additions, as they are meant to.
+- The slow tier's captain's trials found three things of the doctrine's and the keeper's own
+  (below, "the trials"): a privateer whose `lay her aboard` was refused (the lookout does not
+  find a sail by his own name for her) stood off and never fired, since the boarding pre-empted
+  the helm law; the chase is laid on the chase in hand or the nearest stranger now, and a
+  refused chase leaves the helm law standing. The pumps' crews, kept by spells "while a leak
+  runs", were kept all day in a gale by the weather's own water (her seams, the sea she ships),
+  twelve hands off the sail work: the weather's water keeps nobody at the brakes, the well is
+  pumped again when it shows. The butcher's bill said "nobody hurt" at every lull of a desultory
+  fire: once in an hour now. The rigging is mended when the weather serves: never lying to for
+  weather, in distress, or with the wind at the shortening figure.
+- Gate 5a's day under systems alone at seed 7 moved by 71 s (the standing order "topgallants
+  again" at 104049 for 103978): bisected by keeper, the health keeper off changes nothing and
+  the water keeper off gives the day back. In a blow the frigate took in the weather's water
+  (her seams at the roll, the sea over the hatches, some fourteen tons an hour) faster than a
+  pumping at the watch change cleared it, the well passed the free surface's tenth of a metre
+  and her stiffness and heel moved. A ship in a blow kept her pumps going every half hour; the
+  routine pumps the weather's water every glass now, unasked and unlogged, while nothing of the
+  hull's runs, and the day keeps 71's constants (`_routine_pumping`).
+
+### The trials (the slow tier's captain's trials)
+
+- **The lee shore** (`trial-station-lee-shore`): moved by the keeper's kept pumps (above) and
+  back to its judged pins exactly with the fix (1597 lines, `ed48ca3d61e52f20`, the states as
+  58b judged them). Nothing re-pinned.
+- **The trade stranger** (`trial-trade-stranger`): 1246 lines and `e55bc37c58ccb31b` at 71;
+  with package 73 whole **1247 lines and `11b8a45bdc8c935a`**. Bisected by keeper: the health
+  keeper off gives 1246 lines (the one line is the butcher's bill, "nobody hurt", said once
+  after the brig-sloop's fire); both keepers off still gives another digest (`22933f90d5a797e5`),
+  the same lines with other texts: the brig-sloop's captain serves out the small arms on
+  entering the action (the gunner's party of six off her guns for five minutes), and her shots
+  at the schooner fall otherwise, as the first action's did. Re-pinned, old beside new.
+- **The station gale**: the expected failure, left as it was.
+- **The first action** after the quarterdeck's draw moved to the health stream: 11:43 still
+  (5399 s, four hurt, seven holes); the hit-dependent truths (7-134, 7-176, 7-179, 7-137)
+  and the fight's and the health's tests unchanged.
 
 ### The suites
 

@@ -8730,7 +8730,9 @@ def test_truth_7_148_the_kings_cutter_engaging_to_leeward_never_puts_her_head_in
             break
     assert not in_eye, in_eye
     assert not [e for e in w.log if "taken aback" in e.text and "wind's eye" in e.text]
-    assert v.struck and struck is not None and 3600 <= struck <= 5400, struck
+    # package 73: the small arms served out on entering the action lengthen the first action
+    # by half an hour (11:12 to 11:43; docs/dev/TuningNotes.md, package 73, the bisection)
+    assert v.struck and struck is not None and 3600 <= struck <= 6600, struck
     battery = w.ship.extra["battery"]
     assert battery.rounds_fired >= 100  # 146 at seed 7; 51 under 70's law
 

@@ -207,20 +207,9 @@ def execute(ship: Any, order: Order) -> Result:
         from freesail.orders import navigation
 
         ship.extra["laying_aboard"] = int(world.clock.tick)
+        # the chase in hand is kept, else the nearest stranger: the mark engaged is she in
+        # an action (the lookout's name for her is no mark of his to find by)
         which = order.object or None
-        if which is None:
-            # the mark engaged, by the lookout's name for her, so the helm goes after her
-            # and not the nearest stranger
-            from freesail.combat.guns import battery_of
-
-            battery = battery_of(ship)
-            tid = getattr(battery, "target", None) if battery is not None else None
-            lookout = getattr(world, "lookout", None)
-            if tid and lookout is not None:
-                try:
-                    which = lookout.sail_name(f"sail:{tid}", "") or None
-                except Exception:  # noqa: BLE001
-                    which = None
         chase = replace(order, verb="give chase", verb_phrase="give chase", object=which)
         kind, text, more = navigation.execute(ship, chase)
         text = (
