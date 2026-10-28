@@ -3299,10 +3299,11 @@ class Navigation:
         said = (
             f"{_head(found.feature.name)} bore {units.point_name(laid)}, {estimate} by estimation"
         )
-        if found.seen_as == "sail":
+        if found.seen_as in ("sail", "cask"):
             # a sail is no mark (package 37d): her bearing in words and data, the account
             # as it was (on the Harpy one bearing of a pilot's boat moved it ten miles);
-            # her place is the truth's and is in no data
+            # her place is the truth's and is in no data; nor is the cask over the side for
+            # a mark (practice and resupply, between packages 72 and 73)
             return f"{said}.", {
                 "tick": world.clock.tick,
                 "id": found.feature.id,

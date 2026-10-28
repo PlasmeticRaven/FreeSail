@@ -13,7 +13,8 @@ The rows, each a state in words the dialect compares by `is <words>` and `is not
                       ('is none', 'is not none')
     the bill          the butcher's bill and the hands' temper: the killed and wounded of
                       the complement, the figure's words ('is steady', 'is wavering')
-    the magazine      the cartridges and shot by calibre, as the gunner counts them
+    the magazine      the filled cartridges by gun, the powder below and the shot, as the
+                      gunner counts them; it rides in port while she wants powder or shot
     the enemy         the mark engaged, in the lookout's words, with her bearing and her
                       colours as made out, and 'struck' when they are down
     the range         the range of the mark by the lookout's estimate, in cables (a
@@ -56,6 +57,15 @@ ACTION_ROWS: tuple[str, ...] = (
 
 
 def idle_rows(world: Any) -> set[str]:
+    """The rows to leave out of a sample now: the action's and the squadron's
+    (`_idle_action_rows`), and the practice's on every path (practice and resupply, between
+    packages 72 and 73: `practice_readings.idle_practice_rows`)."""
+    from freesail.api.practice_readings import idle_practice_rows
+
+    return _idle_action_rows(world) | idle_practice_rows(world)
+
+
+def _idle_action_rows(world: Any) -> set[str]:
     """The action's rows to leave out of a sample now: all of them while she is not at
     quarters, undamaged, nobody hurt, no mark engaged and the colours flying; `guns` always
     rides (one line)."""
@@ -81,10 +91,29 @@ def idle_rows(world: Any) -> set[str]:
     locker = extra.get("signals")
     if locker is not None and locker.colours.state != "shown":
         idle.discard("colours")  # package 71: false or no colours are worth a row
+    if _wants_in_port(world, ship, extra):
+        idle.discard("magazine")  # practice and resupply: the magazine to complete in port
     from freesail.api.squadron_readings import idle_squadron_rows
 
     idle |= idle_squadron_rows(world)  # package 72: nothing of a set for a ship in none
     return idle
+
+
+def _wants_in_port(world: Any, ship: Any, extra: dict[str, Any]) -> bool:
+    """Practice and resupply (between packages 72 and 73): whether she lies in port with her
+    magazine short of its establishment (`Magazine.wanting`), when the magazine's row rides
+    a sample for the powder and the shot to be taken in. A magazine not yet made is her
+    fit's, complete; none is made here (`magazine` is asked only of one she has)."""
+    if not getattr(ship, "guns", None):
+        return False
+    from freesail.ship.parts import Magazine, magazine
+
+    if not isinstance(extra.get("magazine"), Magazine):
+        return False
+    ports = getattr(world, "ports", None)
+    if ports is None or ports.in_port() is None:
+        return False
+    return not magazine(ship).wanting().empty
 
 
 CABLE_M = units.NAUTICAL_MILE / 10.0  # the cable of a tenth of a mile (608 feet)
@@ -147,10 +176,14 @@ def _guns(world: Any, _: str | None) -> dict[str, Any] | None:
         parts.append("holding fire" if mode == "hold" else f"firing {mode}")
         if battery.roll_doctrine:
             parts.append(f"on the {battery.roll_doctrine}-roll")
+    exercise = battery.exercise  # practice and resupply: the dumb show (a class default)
+    if exercise:
+        which = "both batteries" if exercise == "both" else f"the {exercise} battery"
+        parts.append(f"exercising {which} in dumb show")
     if dismounted:
         names = _and([g.name for g in dismounted])
         parts.append(f"{number_words(len(dismounted))} dismounted ({names})")
-    return {
+    value = {
         "words": "; ".join(parts),
         "count": len(serving),
         "cast_loose": cast,
@@ -165,6 +198,9 @@ def _guns(world: Any, _: str | None) -> dict[str, Any] | None:
         "dismounted": [g.id for g in dismounted],
         "rounds_fired": battery.rounds_fired,
     }
+    if exercise:
+        value["exercise"] = exercise  # only while it is set, so the data is as it was
+    return value
 
 
 def _kinds_words(guns: list[Any]) -> str:
@@ -375,10 +411,10 @@ def _magazine(world: Any, _: str | None) -> dict[str, Any] | None:
     ship = getattr(world, "ship", None)
     if ship is None or not getattr(ship, "guns", None):
         return None
+    from freesail.combat.filling import magazine_lines
     from freesail.ship.parts import magazine
 
-    mag = magazine(ship)
-    lines = mag.describe()
+    lines = magazine_lines(world, ship, magazine(ship))
     return {"words": " ".join(lines) if lines else "empty", "lines": lines}
 
 
@@ -566,7 +602,8 @@ def register() -> None:
             "state",
             "",
             _magazine,
-            description="the magazine as the gunner counts it: cartridges and shot by calibre",
+            description="the magazine as the gunner counts it: filled cartridges by gun, the "
+            "powder below and the shot",
             none_words=_no_guns_words,
         )
     )

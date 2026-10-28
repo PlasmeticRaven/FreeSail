@@ -283,7 +283,9 @@ def _carry_out(ship: Ship, order: Order, vocab: Vocabulary) -> tuple[str, str, d
 
 def _stores_order(text: str) -> Order | None:
     """'take in twenty tons of water' as the port's `take in water` with the words after
-    the verb as said, or None when the words are not the stores'."""
+    the verb as said, or None when the words are not the stores'; 'take in forty barrels
+    of powder' as `take in powder and shot` (practice and resupply, between packages 72
+    and 73)."""
     low = " ".join(text.lower().split())
     if not low.startswith("take in "):
         return None
@@ -291,10 +293,14 @@ def _stores_order(text: str) -> Order | None:
     words = rest.split()
     if "water sail" in rest:
         return None  # a sail, not the stores (package 37l)
+    from freesail.orders.ordnance import TAKE_IN, names_powder
+
     if any(w in ("water",) for w in words):
         verb = "take in water"
     elif any(w in ("provisions", "provision") for w in words):
         verb = "take in provisions"
+    elif names_powder(rest):
+        verb = TAKE_IN
     else:
         return None
     return Order(text=low, verb=verb, verb_phrase="take in", object=rest)

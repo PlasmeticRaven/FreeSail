@@ -2562,21 +2562,24 @@ crew:
     helm: 2
     # The powder beyond the idlers: none; a frigate's cooks, stewards, servants, the clerk, the cooper, the armourer and the sailmaker's crew pass the cartridges (judgement after Luce 1884 ch. XX, the powder division).
     powder: 0
+    # The quarter gunners and the gunner's crew in the filling room, one to every four cannon (Falconer 1780, QUARTER-GUNNER, l.14283-14289); the swivels are not cannon (practice and resupply, between packages 72 and 73).
+    filling: 10
     # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
     priority: sail before guns
     # Twenty topmen and forecastlemen with the muskets of the stand of arms (judgement for a 36-gun frigate of 264).
     small_arms: 20
     # Sixty boarders by the bill: the first and second boarders told off from the guns' crews, with the forty marines (judgement: a frigate's boarding party of a hundred).
     boarders: 60
-# The armament (spec M7 7; package 70): the guns as parts of the graph by their place, in the one fit the class carried in 1805; each with its crew by the quarter bill and the magazine's allowance by calibre. Every figure's source is in tools/gen_ships.py; the weights and the establishment are from memory and UNVERIFIED against a printed page.
+# The armament (spec M7 7; package 70): the guns as parts of the graph by their place, in the one fit the class carried in 1805; each with its crew by the quarter bill and the magazine's allowance by kind and calibre. Every figure's source is in tools/gen_ships.py; the weights are from memory and UNVERIFIED against a printed page, and the quarterdeck's guns are INCORRECT against Winfield 1793-1817 p. 143 (eight 9-pounders and six carronades, not two and eight), kept by the owner's ruling pending correction.
 armament:
   default: amazon class 1795
   fits:
-    # The class's armament of 1795: 26 x 18-pounders, 10 x 32-pounder carronades, 4 x 9-pounders (Winfield).
+    # The class's armament of 1795 as this fit has it: 26 x 18-pounders, 10 x 32-pounder carronades, 4 x 9-pounders. INCORRECT on the quarterdeck, pending correction (the owner, 2026-10-25): Winfield 1793-1817 p. 143 gives it 8 x 9-pounders and 6 x 32-pounder carronades, 44 pieces in all.
     amazon class 1795:
-      source: Winfield, British Warships in the Age of Sail 1793-1817, the Amazon class (UNVERIFIED from
-        memory); Lavery, Arming and Fitting, the carronade establishment of 1794-5 and the Ordnance's
-        allowance; Douglas 1820, the crews
+      source: Winfield, British Warships in the Age of Sail 1793-1817, p. 143, the Amazon class (this
+        fit's quarterdeck is from memory and INCORRECT against it, pending correction); Lavery, Arming
+        and Fitting, the carronade establishment of 1794-5 and the Ordnance's allowance; Douglas 1820,
+        the crews
       guns:
       # The upper deck's twenty-six long 18-pounders, thirteen a side (Winfield, the Amazon class's establishment; UNVERIFIED from memory): the 9 ft gun of 42 cwt (Blomefield's pattern, from memory), the ports about nine feet apart from 54 ft before midships to 54 ft abaft (judgement), the muzzle about eight feet above the water upright; a crew of ten to the pair, who fight whichever gun bears (Douglas 1820, the exercise; the rule in tools/gen_ships.py gun_crew).
       - id: gun.1.starboard
@@ -2839,7 +2842,7 @@ armament:
         height_m: 2.4
         crew: 10
         weight_cwt: 42.0
-      # The quarterdeck's eight 32-pounder carronades, four a side (Winfield; the carronade establishment of 1794 to 1795, Lavery): 17 cwt each (the Carron Company's, from memory), on the quarterdeck a deck above the guns; five men to the pair, the marines among them.
+      # The quarterdeck's eight 32-pounder carronades, four a side (from memory; INCORRECT, pending correction: Winfield 1793-1817 p. 143 gives six, with eight long 9-pounders; the carronade establishment of 1794 to 1795, Lavery): 17 cwt each (the Carron Company's, from memory), on the quarterdeck a deck above the guns; five men to the pair, the marines among them.
       - id: gun.14.starboard
         kind: carronade
         pounder: 32
@@ -2920,7 +2923,7 @@ armament:
         height_m: 4.5
         crew: 5
         weight_cwt: 17.0
-      # The forecastle's two 32-pounder carronades, one a side (Winfield).
+      # The forecastle's two 32-pounder carronades, one a side (Winfield 1793-1817 p. 143).
       - id: gun.18.starboard
         kind: carronade
         pounder: 32
@@ -2941,7 +2944,7 @@ armament:
         height_m: 4.5
         crew: 5
         weight_cwt: 17.0
-      # The quarterdeck's two long 9-pounders, one a side, the foremost quarterdeck ports (Winfield): the 7 ft 6 in gun of 26 cwt (from memory); seven to the pair.
+      # The quarterdeck's two long 9-pounders, one a side, the foremost quarterdeck ports (from memory; INCORRECT, pending correction: Winfield 1793-1817 p. 143 gives eight): the 7 ft 6 in gun of 26 cwt (from memory); seven to the pair.
       - id: gun.19.starboard
         kind: long
         pounder: 9
@@ -2981,10 +2984,24 @@ armament:
         height_m: 4.5
         crew: 7
         weight_cwt: 26.0
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
       cartridges:
-        18: 2054
-        32: 790
-        9: 316
+        long:
+          18: 2054
+          9: 316
+        carronade:
+          32: 790
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        long:
+          18: 6.0
+          9: 3.0
+        carronade:
+          32: 2.6875
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 77
+      # The Regulations' allowance for exercise a month: a charge and a round shot for a fourth of the upper deck guns in a ship of one deck, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144; the Captain's chapter, l.8842-8879, gives a third); the first six months' figure, the game keeping no commissioning date (judgement).
+      exercise_charges: 6
       shot:
         18:
           round: 1560

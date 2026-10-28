@@ -32,6 +32,11 @@ CUTTER = ROOT / "data" / "ships" / "cutter.yaml"
 BRIG = ROOT / "data" / "ships" / "brig.yaml"
 LUGGER = ROOT / "data" / "ships" / "lugger.yaml"  # package 43b
 SMACK = ROOT / "data" / "ships" / "smack.yaml"  # package 43b
+# PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): the armed schooner
+PRIVATEER_SCHOONER = ROOT / "data" / "ships" / "privateer-schooner.yaml"
+# practice and resupply (between packages 72 and 73): the merchant brig is compared too; it
+# reproduced byte for byte on the owner's local baseline, before its magazine was regenerated
+MERCHANT_BRIG = ROOT / "data" / "ships" / "merchant-brig.yaml"
 
 
 @pytest.fixture(scope="module")
@@ -555,7 +560,16 @@ def test_generator_reproduces_the_committed_files(tmp_path):
         cwd=ROOT,
         capture_output=True,
     )
-    for committed in (FRIGATE, SCHOONER, CUTTER, BRIG, LUGGER, SMACK):
+    for committed in (
+        FRIGATE,
+        SCHOONER,
+        PRIVATEER_SCHOONER,
+        CUTTER,
+        BRIG,
+        MERCHANT_BRIG,
+        LUGGER,
+        SMACK,
+    ):
         made = out / committed.name
         assert made.exists()
         # Compare as text so that a Windows checkout with CRLF endings

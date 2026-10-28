@@ -4052,3 +4052,10 @@ from freesail.api import squadron_readings as _squadron_readings  # noqa: E402
 
 _squadron_readings.register()
 _damage_readings.register()  # package 73: the pumps, the leaks, the hatches, the water
+
+# Practice and resupply's (the owner's, folded in by package 86 after 73;
+# docs/design/Build-PracticeAndResupply.md §1.7, §8): the practice's row and the events of
+# the filling, the hoy and the marks, after the squadron's and the damage's.
+from freesail.api import practice_readings as _practice_readings  # noqa: E402
+
+_practice_readings.register()

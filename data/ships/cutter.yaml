@@ -749,6 +749,8 @@ crew:
     helm: 1
     # Two of the waisters to pass the cartridges (judgement).
     powder: 2
+    # The quarter gunners and the gunner's crew in the filling room, one to every four cannon (Falconer 1780, QUARTER-GUNNER, l.14283-14289); the swivels are not cannon (practice and resupply, between packages 72 and 73).
+    filling: 1
     # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
     priority: sail before guns
     # Six of the cutter's best shots with the stand of arms' muskets (judgement); she bears no marines.
@@ -826,8 +828,18 @@ armament:
         height_m: 1.5
         crew: 4
         weight_cwt: 6.0
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
       cartridges:
-        12: 330
+        carronade:
+          12: 330
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        carronade:
+          12: 1.0
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 2
+      # The Regulations' allowance for exercise a month: a charge and a round shot for a fourth of the upper deck guns in a ship of one deck, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144; the Captain's chapter, l.8842-8879, gives a third); the first six months' figure, the game keeping no commissioning date (judgement).
+      exercise_charges: 1
       shot:
         12:
           round: 240
@@ -980,9 +992,20 @@ armament:
         height_m: 1.7
         crew: 1
         weight_cwt: 0.5
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
       cartridges:
-        3: 330
-        0.5: 352
+        long:
+          3: 330
+        swivel:
+          0.5: 352
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        long:
+          3: 1.0
+        swivel:
+          0.5: 0.25
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 3
       shot:
         3:
           round: 240

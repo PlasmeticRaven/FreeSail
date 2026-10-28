@@ -929,6 +929,15 @@ verbs:
     synonyms: [enter hands, recruit, ship hands, enter men, raise men, enter seamen]
     object: port
     level: 1
+  # powder and shot taken in (docs/design/Build-PracticeAndResupply.md §5)
+  take in powder and shot:
+    synonyms: [complete the powder and shot, complete her powder and shot, complete powder and shot,
+               demand powder and shot, indent for powder and shot, take in powder, take in shot,
+               take in ammunition, complete the magazine, fill the magazine, complete the powder,
+               complete the shot, demand powder, demand shot, indent for powder, indent for shot,
+               buy powder and shot, buy powder, buy shot, purchase powder, purchase shot]
+    object: port
+    level: 1
   # Package 37h: the pilot's hail answered (the owner's ruling of 5 October 2026, decision
   # 35: "an order accepts or declines the pilotage when the pilot first hails, with a
   # simple form of hailing"). The port's business, so kept back from a general grant.
@@ -1618,6 +1627,32 @@ verbs:
     level: 1
   sail before guns:
     synonyms: [the sails before the guns, the sails first, sails first, work the ship before the guns]
+    object: gunnery
+    level: 1
+  # practice at the great guns, and the gunner's filling (Build-PracticeAndResupply.md §4, §6)
+  heave a cask overboard:
+    synonyms: [heave a cask overboard for a mark, heave over a mark, heave a mark overboard,
+               put a cask over the side, put a mark over the side, drop a cask for a mark,
+               drop a cask, drop a mark]
+    object: gunnery
+    level: 1
+  exercise the guns:
+    synonyms: [exercise the great guns, exercise great guns, exercise at the guns, exercise the battery,
+               exercise both batteries, exercise the starboard battery, exercise the larboard battery,
+               exercise the starboard guns, exercise the larboard guns, exercise in dumb show,
+               exercise the guns in dumb show]
+    object: gunnery
+    level: 1
+  cease exercising:
+    synonyms: [cease the exercise, stop exercising, belay the exercise, end the exercise]
+    object: gunnery
+    level: 1
+  fill cartridges:
+    synonyms: [fill the cartridges, fill powder into cartridges, the gunner to fill cartridges]
+    object: gunnery
+    level: 1
+  cease filling:
+    synonyms: [stop filling, stop filling cartridges, cease filling cartridges, belay the filling]
     object: gunnery
     level: 1
   # package 71 (spec M7 §1 to §5): the colours, the signals, the private signal, the lights,

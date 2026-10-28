@@ -331,12 +331,15 @@ def model_holds_her(other_world: Any) -> bool:
     answers for her: the player's own ship with no rules captain commanding, or a seat at
     her captain's station."""
     captain = getattr(other_world, "captain", None)
-    try:
-        if captain is not None and not captain.commands():
-            return True
-    except Exception:  # noqa: BLE001
-        pass
-    if captain is None and getattr(other_world, "parent", None) is None:
+    player = getattr(other_world, "parent", None) is None
+    # `Captain.commands` is a property (the playtest of 2026-10-27: called as a method, the
+    # TypeError was swallowed, and the player's ship answered every hail by table). The
+    # player's ship alone (package 86's fold-in, the review's finding): a crewed ship whose
+    # captain stands aside or holds by the director's hand is answered by the table as
+    # before, for nobody else would answer her hail
+    if player and captain is not None and not getattr(captain, "commands", True):
+        return True
+    if captain is None and player:
         return True  # the player's ship with no rules captain at all
     stations = getattr(other_world, "stations", None)
     try:
@@ -402,9 +405,14 @@ def answer_by_table(world: Any, vessel: Any, said: str, other_world: Any = None)
     )
     fills = _fills(world, vessel, role, shown if lying else str(vessel.nation), lying, other_world)
     hailer_world = world
-    fills["heave_to"] = _heave_to(world, vessel, role, other_world, hailer_world)
+    questions = questions_in(said)
+    # the demand answered, and obeyed or run from, only when the words make it (2026-10-27:
+    # every hail had her make all sail, "hailed to heave to; she will not")
+    fills["heave_to"] = (
+        _heave_to(world, vessel, role, other_world, hailer_world) if "heave to" in questions else ""
+    )
     out: list[str] = []
-    for q in questions_in(said):
+    for q in questions:
         template = str((answers or {}).get(q) or "")
         if not template:
             continue

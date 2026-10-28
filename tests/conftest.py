@@ -396,6 +396,16 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 58b: the frigate's gale lying-to (seven hours) and the Éclair's hour
         "test_known_truths.py::test_truth_7b_129_the_gale_trials_frigate_lies_to_under_the_book_without_being_taken_aback",
         "test_known_truths.py::test_truth_7b_127_the_eclairs_leg_is_laid_again_at_the_turn_of_the_tide_in_the_channel_of_bas",
+        # practice and resupply (between packages 72 and 73): the first action to the strike
+        # again, the cask lost in the haze over an hour and a half, the King's cutter's day and
+        # a half in the Sound, five ports' demands with their hoys, and the two checkpoints
+        # with their replays (11 to 56 s at two workers on this machine, 2026-10-25)
+        "test_known_truths.py::test_truth_7_161_the_first_action_is_untouched_by_the_magazine_by_kind_filling_and_practice",
+        "test_known_truths.py::test_truth_7_166_a_cask_lost_in_haze_holds_fire_is_told_each_way_and_given_up_at_three_miles",
+        "test_known_truths.py::test_truth_7_167_in_the_sound_the_kings_cutter_completes_her_magazine_from_the_ordnance_free",
+        "test_known_truths.py::test_truth_7_168_powder_is_taken_in_at_the_road_not_the_harbour_and_bought_only_of_necessity",
+        "test_known_truths.py::test_truth_7_170_a_checkpoint_with_the_hoy_alongside_resumes_to_one_digest_and_replays_to_it",
+        "test_known_truths.py::test_truth_7_171_a_practice_forenoon_is_checkpointed_and_replayed",
     }
 )
 

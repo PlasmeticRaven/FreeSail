@@ -32,6 +32,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from freesail.combat import marks
 from freesail.combat.guns import Aim, Battery, Target
 from freesail.crew.model import Sailor, Station
 from freesail.physics import strain as ST
@@ -121,7 +122,11 @@ def resolve_shot(
     """A shot that struck the mark: where it lands by the aim and what it does there,
     written to the mark's state. Returns what the firer's people could see of it (a spar
     coming down, a sail holed), for the battery's minute line; the mark's own log carries
-    the rest through her damage keeper (`action.py`)."""
+    the rest through her damage keeper (`action.py`). A mark for practice is the marks'
+    (practice and resupply, between packages 72 and 73): the cask knocked to staves, and
+    nothing drawn (`marks.struck`)."""
+    if marks.is_mark(target.id):
+        return marks.struck(battery, gun, target, tick)
     body = target.body
     if body is None:
         return []
@@ -202,7 +207,7 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
     guns = [
         g
         for g in getattr(ship, "guns", {}).values()
-        if g.side == side and g.place == "broadside" and not g.dismounted
+        if ((g.side == side and g.place == "broadside") or g.place == "pivot") and not g.dismounted
     ]
     if aft and rng.random() < HELM_SHOT_SHARE and not ship.extra.get("helm_lost"):
         ship.extra["helm_lost"] = "the wheel shot away"

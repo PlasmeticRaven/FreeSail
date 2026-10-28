@@ -138,6 +138,7 @@ def hit_chance(
     aspect_rad: float,
     aim: float,
     scatter_deg: float,
+    size: float | None = None,
 ) -> float:
     """The chance one shot strikes the mark (the module's head). `reach_m` is the range
     the gun's effective elevation gives (`range_at`): a shot that falls short strikes
@@ -145,7 +146,9 @@ def hit_chance(
     over, which `hits.py` reads as a hit on the rigging where it is a hit at all).
     `aspect_rad` is the mark's heading against the line of fire (0 end-on, pi/2 beam-on);
     `aim` the crew's mean deck skill over the ordinary seaman's; `scatter_deg` from
-    `steadiness`."""
+    `steadiness`. `size`, when given, is the mark's size term in place of the hull's (a
+    cask's, below the hull's floor: practice and resupply, between packages 72 and 73;
+    `combat.marks.CASK_SIZE`); None keeps the hull's, and every figure as it was."""
     if range_m <= 0.0 or reach_m <= 0.0:
         return 0.0
     if range_m > reach_m * 1.05 or range_m > b.random_m:
@@ -160,7 +163,8 @@ def hit_chance(
     else:
         rmax = max(b.random_m / b.point_blank_m, 2.5)
         base = max(0.03, 0.2 * (1.0 - (r - 2.0) / (rmax - 2.0)))
-    size = min(1.3, max(0.5, math.sqrt(max(target_length_m, 5.0) / 40.0)))
+    if size is None:
+        size = min(1.3, max(0.5, math.sqrt(max(target_length_m, 5.0) / 40.0)))
     aspect = 0.6 + 0.4 * abs(math.sin(aspect_rad))
     quality = min(1.2, max(0.6, aim))
     steady = 1.0 / (1.0 + 0.05 * max(0.0, scatter_deg) * max(r, 0.5))

@@ -1908,6 +1908,8 @@ crew:
     helm: 1
     # The powder beyond the idlers: none; the cook and the boy (judgement).
     powder: 0
+    # The quarter gunners and the gunner's crew in the filling room, one to every four cannon (Falconer 1780, QUARTER-GUNNER, l.14283-14289); the swivels are not cannon (practice and resupply, between packages 72 and 73).
+    filling: 1
     # A merchantman's weapon is her heels: the sails before the guns (judgement).
     priority: sail before guns
     # Two men with the master's muskets from the cabin (judgement: a merchant brig's chest of arms).
@@ -1964,8 +1966,16 @@ armament:
         height_m: 2.1
         crew: 4
         weight_cwt: 20.0
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
       cartridges:
-        6: 104
+        long:
+          6: 104
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        long:
+          6: 2.0
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 2
       shot:
         6:
           round: 80

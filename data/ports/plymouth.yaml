@@ -86,6 +86,26 @@ dockyard:
     - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0, note: "watered by the launch from the yard's tanks in gang casks (Luce 1866, 'Boats'): ten tons an hour, judgement"}
     - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0, note: "from the victualling office"}
 
+# Powder and shot (practice and resupply, between packages 72 and 73;
+# docs/design/Build-PracticeAndResupply.md §1.3; read by freesail/world/ordnance.py):
+# the storekeeper of the Ordnance issues to the King's ships, free and vouched (the
+# Regulations of 1806, the Gunner, Art. I: the gunner applies "to the Store-keeper of the
+# Ordnance at the Port"), and the powder is taken in at the roads only, Cawsand Bay or the
+# Sound and never the Hamoaze (Art. VI: "Plymouth Sound or Cawsand Bay, Spithead,
+# Blackstakes, Longreach"). Whether the town's merchants sold powder is UNVERIFIED: none
+# here, for the owner to decide. The hours judgement.
+ordnance:
+  kind: ordnance                 # the storekeeper of the Ordnance: free and vouched to the King's ships
+  sells: false                   # the town's merchants sell none (UNVERIFIED; the owner may flip it)
+  roads: [outer_road, anchorage] # Cawsand Bay and the anchorage in the Sound; the Hamoaze is the mooring
+  roads_words: Plymouth Sound or Cawsand Bay
+  hoy_hours: 4                   # the demand and the hoy's errand (judgement)
+  barrels_an_hour: 20            # the taking in (judgement)
+  shot_tons_an_hour: 2
+  powder_per_barrel_pounds: 5.0  # a sale's price, were there one (judgement, UNVERIFIED)
+  shot_per_ton_pounds: 12.0
+  source: "Regulations 1806 (1808 printing), Gunner, Art. I l.12722-12738, Art. V l.12800-12809, Art. VI l.12833-12839"
+
 crew_pool:
   # the press and the receiving ship take the seamen; a few come off for the bounty
   # (judgement: dearer and slower than at Falmouth, but more of them)

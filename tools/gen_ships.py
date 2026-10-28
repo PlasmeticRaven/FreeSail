@@ -771,28 +771,30 @@ class Builder:
 
     def armament(self, note, default, fits):
         """The `armament:` section (spec M7 §7; package 70) from fits, each
-        (name, source, guns, cartridges, shot, note): `guns` a list of (mapping, note) in
-        the file's order, `cartridges` {pounder: n}, `shot` {pounder: {kind: n}}; the note
-        above the section, each fit's above its name, a gun's above its line."""
+        (name, source, guns, magazine, note): `guns` a list of (mapping, note) in the
+        file's order, `magazine` the fit's magazine in the file's order (`fit_magazine`:
+        the filled cartridges and their charges by kind and calibre, the powder barrels,
+        a King's fit's charges for exercise, the shot by calibre and kind; practice and
+        resupply, between packages 72 and 73); the note above the section, each fit's
+        above its name, a gun's above its line, `MAGAZINE_NOTES` above the magazine's
+        keys."""
         self.doc["armament"] = {
             "default": default,
             "fits": {
-                name: {
-                    "source": source,
-                    "guns": [g for g, _ in guns],
-                    "cartridges": cartridges,
-                    "shot": shot,
-                }
-                for name, source, guns, cartridges, shot, _ in fits
+                name: {"source": source, "guns": [g for g, _ in guns], **magazine}
+                for name, source, guns, magazine, _ in fits
             },
         }
         self.armament_notes = {("section",): note}
-        for name, _, guns, _, _, text in fits:
+        for name, _, guns, magazine, text in fits:
             if text:
                 self.armament_notes[("fit", name)] = text
             for g, gnote in guns:
                 if gnote:
                     self.armament_notes[("gun", name, g["id"])] = gnote
+            for key in magazine:
+                if key in MAGAZINE_NOTES:
+                    self.armament_notes[("magazine", name, key)] = MAGAZINE_NOTES[key]
 
     def quarter_bill(
         self,
@@ -806,17 +808,21 @@ class Builder:
         boarders=0,
         small_arms_note="",
         boarders_note="",
+        filling=None,
     ):
         """The crew's `quarter_bill:` block (spec M7 §8a; package 70): the trimmers by
         station as (station, n, note) entries, the hands at the helm, the powder beyond the
-        idlers, and the fighting book's priority; `notes` the words above helm, powder and
-        priority. Package 73 (spec M7 §11): the small-arms men and the boarders told off
-        from the guns' crews, each with its note."""
+        idlers, the men who fill cartridges when given (`filling_party`; the owner's practice
+        and resupply, folded in by package 86, after the powder with `FILLING_NOTE`), and the
+        fighting book's priority; `notes` the words above helm, powder and priority. Package
+        73 (spec M7 §11): the small-arms men and the boarders told off from the guns' crews,
+        each with its note."""
         crew = self.doc["crew"]
         crew["quarter_bill"] = {
             "trimmers": {st: n for st, n, _ in trimmers},
             "helm": helm,
             "powder": powder,
+            **({"filling": filling} if filling is not None else {}),
             "priority": priority,
             "small_arms": small_arms,
             "boarders": boarders,
@@ -825,6 +831,8 @@ class Builder:
         for st, _, text in trimmers:
             if text:
                 self.crew_notes[("trimmers", st)] = text
+        if filling is not None:
+            self.crew_notes[("quarter_bill", "filling")] = FILLING_NOTE
         for key, text in notes.items():
             self.crew_notes[("quarter_bill", key)] = text
         self.crew_notes[("quarter_bill", "small_arms")] = small_arms_note or SMALL_ARMS_NOTE
@@ -979,6 +987,11 @@ class Builder:
                     note = armament_notes.get(("fit", fit_name))
                 elif m := re.match(r"^      - id: (\S+)$", line):
                     note = armament_notes.get(("gun", fit_name, m.group(1)))
+                elif m := re.match(
+                    r"^      (cartridges|charges|powder_barrels|exercise_charges):", line
+                ):
+                    # the magazine's keys (practice and resupply, between packages 72 and 73)
+                    note = armament_notes.get(("magazine", fit_name, m.group(1)))
                 if note:
                     out.append(" " * (len(line) - len(line.lstrip())) + "# " + note)
             if line.startswith("ground_tackle:"):
@@ -2519,7 +2532,10 @@ SPANKER_CENTRE = 9.8
 # ---------------------------------------------------------------------------
 
 
-def schooner(out_dir="data/ships"):
+def schooner(out_dir="data/ships", armed=False):
+    """The topsail schooner Speedwell (`topsail-schooner.yaml`), or with `armed` the
+    letter of marque of her draught (`privateer-schooner.yaml`, PROVISIONAL ahead of
+    package 75): the same hull, rig and company, with a fit of guns and a quarter bill."""
     # Design winds: as the frigate's, plus the gaff-topsail pole at 22 (that sail comes in
     # early)
     dw = dict(DESIGN_WIND_KN, gaff_topsail=22.0)
@@ -3266,6 +3282,8 @@ def schooner(out_dir="data/ships"):
     b.alias("fore top bowline", "fore bowlines")
     ground_tackle_for(b, 224.0, beam_ft, draught_ft)
     schooner_crew(b)
+    if armed:
+        schooner_armament(b)
     hold_for(b, 224.0, False, "a sharp Baltimore hull stows about half her tonnage: judgement")
     b.pumps(PUMPS_NOTE, pump_entries(0, 2, ["the starboard pump", "the larboard pump"]))
     b.boats(
@@ -3286,6 +3304,9 @@ def schooner(out_dir="data/ships"):
             ],
         ),
     )
+    if armed:
+        privateer_schooner(b, out_dir)
+        return
     b.dump(
         os.path.join(out_dir, "topsail-schooner.yaml"),
         "# Reference ship: Speedwell, a Baltimore-built topsail schooner of about 1804, to the\n"
@@ -3594,20 +3615,95 @@ BLANK_SHARE = 0.1
 PORT_SILL_M = 0.6
 
 
-def fit_magazine(guns, rounds_by_kind):
-    """{pounder: cartridges} and {pounder: {kind: shot}} for a fit's guns, each gun with the
-    allowance of its kind (`rounds_by_kind`: {"long"|"carronade"|"swivel": {kind: n}})."""
+def fit_magazine(guns, rounds_by_kind, exercise_charges=0):
+    """A fit's magazine for its guns, each gun with the allowance of its kind
+    (`rounds_by_kind`: {"long"|"carronade"|"swivel": {kind: n}}), as a mapping in the
+    file's order (practice and resupply, between packages 72 and 73; the build design's
+    §1.2): `cartridges`, filled, by the gun's kind and calibre, a round each and a tenth
+    over (`BLANK_SHARE`); `charges`, a cartridge's powder by kind and calibre
+    (`freesail.ship.parts.charge_lb`, the shares UNVERIFIED until package 75 reads the
+    Regulations' Table No. 29); `powder_barrels`, the powder below in barrels of a hundred
+    pounds, `RESERVE_SHARE` of the filled powder rounded up; `exercise_charges`, a King's
+    fit's allowance for exercise a month (`exercise_allowance`), written only when above
+    nought; and `shot` by calibre and kind."""
+    from freesail.ship.parts import BARREL_LB, RESERVE_SHARE, charge_lb
+
     cartridges: dict = {}
+    charges: dict = {}
     shot: dict = {}
     for g, _ in guns:
-        p = g["pounder"]
-        allowance = rounds_by_kind[g["kind"]]
+        p, kind = g["pounder"], g["kind"]
+        allowance = rounds_by_kind[kind]
         total = sum(allowance.values())
-        cartridges[p] = cartridges.get(p, 0) + int(round(total * (1.0 + BLANK_SHARE)))
+        filled = cartridges.setdefault(kind, {})
+        filled[p] = filled.get(p, 0) + int(round(total * (1.0 + BLANK_SHARE)))
+        charges.setdefault(kind, {})[p] = charge_lb(kind, p)
         by = shot.setdefault(p, {})
-        for kind, n in allowance.items():
-            by[kind] = by.get(kind, 0) + n
-    return cartridges, shot
+        for k, n in allowance.items():
+            by[k] = by.get(k, 0) + n
+    filled_lb = sum(n * charges[k][p] for k, ps in cartridges.items() for p, n in ps.items())
+    out = {
+        "cartridges": cartridges,
+        "charges": charges,
+        "powder_barrels": math.ceil(RESERVE_SHARE * filled_lb / BARREL_LB),
+    }
+    if exercise_charges > 0:
+        out["exercise_charges"] = exercise_charges
+    out["shot"] = shot
+    return out
+
+
+def exercise_allowance(upper_deck_guns):
+    """The Regulations' allowance for exercise in a ship of one deck: a charge of powder and
+    a round shot a month for a fourth of the upper deck guns, the figure for the first six
+    months after the guns are received (the Regulations 1806, 1808 printing, the Gunner,
+    Art. XXI, OCR l.13122-13144; a third in ships of two or three decks; the game keeps no
+    commissioning date, so the first six months' figure: judgement). A King's fit only."""
+    return upper_deck_guns // 4
+
+
+def filling_party(guns):
+    """The quarter bill's men filling cartridges: one to every four cannon, the swivels
+    not cannon (Falconer 1780, QUARTER-GUNNER, l.14283-14289: 'one quarter-gunner being
+    allowed to every four cannon'), and one at the least."""
+    return max(1, sum(1 for g, _ in guns if g["kind"] != "swivel") // 4)
+
+
+# The notes above a fit's magazine keys (practice and resupply, between packages 72 and 73;
+# docs/design/Build-PracticeAndResupply.md §1.2, §2).
+MAGAZINE_NOTES = {
+    "cartridges": (
+        "The cartridges filled at the fitting out, by the gun's kind and calibre: a round a "
+        "gun of the allowance below and a tenth over for the blank charges (judgement); the "
+        "gunner fills more from the powder below as they are fired (combat/filling.py)."
+    ),
+    "charges": (
+        "A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's "
+        "weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' "
+        "would be an advantage; the service charge of 1805 a third from memory, "
+        "UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half "
+        "(Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the "
+        "Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost."
+    ),
+    "powder_barrels": (
+        "The powder below in barrels of a hundred pounds (Falconer 1780, the French "
+        "glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight "
+        "UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the "
+        "period kept most of its powder in the barrels)."
+    ),
+    "exercise_charges": (
+        "The Regulations' allowance for exercise a month: a charge and a round shot for a "
+        "fourth of the upper deck guns in a ship of one deck, for six months after the guns "
+        "are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, "
+        "l.13122-13144; the Captain's chapter, l.8842-8879, gives a third); the first six "
+        "months' figure, the game keeping no commissioning date (judgement)."
+    ),
+}
+FILLING_NOTE = (
+    "The quarter gunners and the gunner's crew in the filling room, one to every four cannon "
+    "(Falconer 1780, QUARTER-GUNNER, l.14283-14289); the swivels are not cannon (practice "
+    "and resupply, between packages 72 and 73)."
+)
 
 
 def broadside_pair(number, kind, pounder, cwt, x_m, height_m, note=None):
@@ -3648,6 +3744,25 @@ def chasers(place, kind, pounder, cwt, x_m, height_m, note=None):
         }
         out.append((g, note if i == 0 else None))
     return out
+
+
+def pivot_gun(kind, pounder, cwt, x_m, height_m, arc_deg, note=None):
+    """A gun on a pivot amidships (PROVISIONAL, the owner's ask of 2026-10-25): no side, it
+    trains to either (`combat/guns.py`) through its own arc, (from, to) degrees off the bow
+    over either side (package 86: per gun, each pivot's from its own ship's rig); its own
+    crew by the gun's rule."""
+    g = {
+        "id": "pivot",
+        "kind": kind,
+        "pounder": pounder,
+        "place": "pivot",
+        "arc_deg": [float(arc_deg[0]), float(arc_deg[1])],
+        "x_m": round(x_m, 1),
+        "height_m": round(height_m, 1),
+        "crew": gun_crew(kind, cwt),
+        "weight_cwt": cwt,
+    }
+    return [(g, note)]
 
 
 def swivels(count, xs_m, height_m, note=None):
@@ -3702,13 +3817,19 @@ PRIORITY_NOTE = (
 
 
 def frigate_armament(b, deck_height):
-    """The Amazon class's armament of 1795 (Winfield, UNVERIFIED from memory: on the upper
-    deck twenty-six 18-pounders; on the quarterdeck eight 32-pounder carronades and two
-    9-pounders; on the forecastle two 9-pounders and two 32-pounder carronades), one fit.
-    The ports along the gun deck spaced about nine feet (Lavery, the ports of an
-    18-pounder frigate; judgement for the figure), the sills about two feet above the
-    deck; the quarterdeck and forecastle a deck higher (about seven feet, judgement). The
-    forecastle 9-pounders are the bow chasers; the quarterdeck pair a broadside pair."""
+    """The Amazon class's armament of 1795 as this fit has it, from memory: on the upper deck
+    twenty-six 18-pounders; on the quarterdeck eight 32-pounder carronades and two
+    9-pounders; on the forecastle two 9-pounders and two 32-pounder carronades; one fit.
+    INCORRECT on the quarterdeck, pending correction. Winfield 1793-1817 p. 143 (the owner's
+    copy, read 2026-10-25) gives the class's establishment of 16.3.1795 as 26 x 18-pounders;
+    QD 8 x 9-pounders + 6 x 32-pounder carronades; Fc 2 x 9-pounders + 2 x 32-pounder
+    carronades: 44 pieces where this fit has 40. The upper deck and the forecastle agree.
+    Kept as it is by the owner's ruling of 2026-10-25 while the new ships are built
+    (docs/dev/TuningNotes.md, "Open, for the lead: the frigate's quarterdeck"). The ports
+    along the gun deck spaced about nine feet (Lavery, the ports of an 18-pounder frigate;
+    judgement for the figure), the sills about two feet above the deck; the quarterdeck and
+    forecastle a deck higher (about seven feet, judgement). The forecastle 9-pounders are
+    the bow chasers; the quarterdeck pair a broadside pair."""
     gun_deck = deck_height + PORT_SILL_M
     upper = deck_height + 2.1 + PORT_SILL_M
     guns = []
@@ -3741,10 +3862,11 @@ def frigate_armament(b, deck_height):
             x,
             upper,
             (
-                "The quarterdeck's eight 32-pounder carronades, four a side (Winfield; the "
-                "carronade establishment of 1794 to 1795, Lavery): 17 cwt each (the Carron "
-                "Company's, from memory), on the quarterdeck a deck above the guns; five men to "
-                "the pair, the marines among them."
+                "The quarterdeck's eight 32-pounder carronades, four a side (from memory; "
+                "INCORRECT, pending correction: Winfield 1793-1817 p. 143 gives six, with eight "
+                "long 9-pounders; the carronade establishment of 1794 to 1795, Lavery): 17 cwt "
+                "each (the Carron Company's, from memory), on the quarterdeck a deck above the "
+                "guns; five men to the pair, the marines among them."
                 if j == 14
                 else None
             ),
@@ -3756,7 +3878,7 @@ def frigate_armament(b, deck_height):
         CARRONADE_CWT[32],
         14.0,
         upper,
-        "The forecastle's two 32-pounder carronades, one a side (Winfield).",
+        "The forecastle's two 32-pounder carronades, one a side (Winfield 1793-1817 p. 143).",
     )
     guns += broadside_pair(
         19,
@@ -3766,7 +3888,8 @@ def frigate_armament(b, deck_height):
         -4.5,
         upper,
         "The quarterdeck's two long 9-pounders, one a side, the foremost quarterdeck ports "
-        "(Winfield): the 7 ft 6 in gun of 26 cwt (from memory); seven to the pair.",
+        "(from memory; INCORRECT, pending correction: Winfield 1793-1817 p. 143 gives eight): "
+        "the 7 ft 6 in gun of 26 cwt (from memory); seven to the pair.",
     )
     guns += chasers(
         "bow",
@@ -3779,27 +3902,36 @@ def frigate_armament(b, deck_height):
         "forecastle its pair; that they served as chase guns is the frigate's practice, "
         "judgement): 26 cwt, seven men each.",
     )
-    cartridges, shot = fit_magazine(
-        guns, {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS, "swivel": SWIVEL_ROUNDS}
+    # a King's fit: the allowance for exercise as a ship of one deck, a fourth of the upper
+    # deck's twenty-six 18-pounders, the quarterdeck's and the forecastle's guns not counted
+    # (judgement on the Article's "upper deck guns"; practice and resupply)
+    magazine = fit_magazine(
+        guns,
+        {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS, "swivel": SWIVEL_ROUNDS},
+        exercise_allowance(26),
     )
     b.armament(
         "The armament (spec M7 7; package 70): the guns as parts of the graph by their place, "
         "in the one fit the class carried in 1805; each with its crew by the quarter bill and "
-        "the magazine's allowance by calibre. Every figure's source is in tools/gen_ships.py; "
-        "the weights and the establishment are from memory and UNVERIFIED against a printed "
-        "page.",
+        "the magazine's allowance by kind and calibre. Every figure's source is in "
+        "tools/gen_ships.py; "
+        "the weights are from memory and UNVERIFIED against a printed page, and the "
+        "quarterdeck's guns are INCORRECT against Winfield 1793-1817 p. 143 (eight 9-pounders "
+        "and six carronades, not two and eight), kept by the owner's ruling pending correction.",
         "amazon class 1795",
         [
             (
                 "amazon class 1795",
-                "Winfield, British Warships in the Age of Sail 1793-1817, the Amazon class "
-                "(UNVERIFIED from memory); Lavery, Arming and Fitting, the carronade "
-                "establishment of 1794-5 and the Ordnance's allowance; Douglas 1820, the crews",
+                "Winfield, British Warships in the Age of Sail 1793-1817, p. 143, the Amazon "
+                "class (this fit's quarterdeck is from memory and INCORRECT against it, pending "
+                "correction); Lavery, Arming and Fitting, the carronade establishment of 1794-5 "
+                "and the Ordnance's allowance; Douglas 1820, the crews",
                 guns,
-                cartridges,
-                shot,
-                "The class's armament of 1795: 26 x 18-pounders, 10 x 32-pounder carronades, "
-                "4 x 9-pounders (Winfield).",
+                magazine,
+                "The class's armament of 1795 as this fit has it: 26 x 18-pounders, 10 x "
+                "32-pounder carronades, 4 x 9-pounders. INCORRECT on the quarterdeck, pending "
+                "correction (the owner, 2026-10-25): Winfield 1793-1817 p. 143 gives it 8 x "
+                "9-pounders and 6 x 32-pounder carronades, 44 pieces in all.",
             )
         ],
     )
@@ -3846,6 +3978,7 @@ def frigate_armament(b, deck_height):
             "Sixty boarders by the bill: the first and second boarders told off from the guns' "
             "crews, with the forty marines (judgement: a frigate's boarding party of a hundred)."
         ),
+        filling=filling_party(guns),
     )
 
 
@@ -3901,8 +4034,12 @@ def cutter_armament(b, deck_height):
         "1780, SWIVEL: 'a small piece of artillery ... fixed on a socket'), a man each when "
         "a man is spare.",
     )
-    carr_cart, carr_shot = fit_magazine(carronades, {"carronade": HIRED_ROUNDS})
-    long_cart, long_shot = fit_magazine(long_guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS})
+    # the Admiralty's carronades a King's fit, with the allowance for exercise (practice and
+    # resupply); the revenue's and the hired cutters' long guns none
+    carr_magazine = fit_magazine(
+        carronades, {"carronade": HIRED_ROUNDS}, exercise_allowance(len(carronades))
+    )
+    long_magazine = fit_magazine(long_guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS})
     b.armament(
         "The armament (spec M7 7; package 70): two fits the scenario chooses between (ship: "
         "{fit: ...}; the owner, 2026-10-23): the 12-pounder carronades the Admiralty gave its "
@@ -3917,8 +4054,7 @@ def cutter_armament(b, deck_height):
                 "the hired armed cutters (UNVERIFIED from memory; the count for 85 tons "
                 "judgement); Lavery, Arming and Fitting, the carronade",
                 carronades,
-                carr_cart,
-                carr_shot,
+                carr_magazine,
                 "The Admiralty's fit of 1805: six 12-pounder carronades.",
             ),
             (
@@ -3926,8 +4062,7 @@ def cutter_armament(b, deck_height):
                 "The kit's manual (Sherbourne as built, 1763: six 3-pounders and eight "
                 "swivels); Falconer 1780, SWIVEL; the weights from memory",
                 long_guns,
-                long_cart,
-                long_shot,
+                long_magazine,
                 "The revenue and hired cutters' fit: six long 3-pounders and eight swivels.",
             ),
         ],
@@ -3961,6 +4096,193 @@ def cutter_armament(b, deck_height):
             "Twenty of the cutter's seamen with cutlass and pistol (judgement: a cutter's "
             "company boards almost whole)."
         ),
+        filling=filling_party(carronades),
+    )
+
+
+def privateer_schooner(b, out_dir):
+    """The letter of marque of Speedwell's draught (PROVISIONAL; the owner's ask of
+    2026-10-25, ahead of package 75): the hull, the rig, the company and the boats are the
+    topsail schooner's, built above, with her guns and her quarter bill
+    (`schooner_armament`); a file of her own so that every scenario and trial sailing the
+    unarmed Speedwell is untouched."""
+    b.doc["ship"]["era_notes"] = (
+        "A Baltimore privateer schooner of about 1804 (PROVISIONAL, ahead of package 75): "
+        "Speedwell's draught, Kemp's Lynx of 1812 (Chapelle 1930, pp. 82-83), her hull, rig "
+        "and company of forty the topsail schooner's, armed with a long 12-pounder on a pivot "
+        "amidships and four carronades (the default fit), or a letter of marque's six long "
+        "6-pounders; see tools/gen_ships.py for every rule."
+    )
+    b.descriptions(
+        [
+            (
+                "privateer schooner",
+                "a schooner",
+                "a topsail schooner, pierced for guns",
+                "PROVISIONAL. A Baltimore schooner armed as a letter of marque; her ports are "
+                "what the glass makes out, not her commission (judgement).",
+            ),
+        ]
+    )
+    b.dump(
+        os.path.join(out_dir, "privateer-schooner.yaml"),
+        "# PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): a letter of marque\n"
+        "# of Speedwell's draught, Kemp's Lynx of 1812 (Chapelle, The Baltimore Clipper, 1930,\n"
+        "# pp. 82-83), the hull, rig and company the topsail schooner's (topsail-schooner.yaml\n"
+        "# and its sources), with two fits (a long 12-pounder on a pivot and four carronades,\n"
+        "# the default; a letter of marque's six long 6-pounders) and a quarter bill.\n"
+        "# Generated by tools/gen_ships.py; edit that script and rerun, do not edit this file.\n"
+        "# Units: metres, m2, kg, kN. Comments mark judgements.\n",
+    )
+
+
+def schooner_armament(b):
+    """PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): the topsail
+    schooner's first fit, to test the armament's extensibility to a new hull through the
+    generator alone. A letter of marque's armament of about 1805: six long 6-pounders, three
+    a side, in the 2nd, 4th and 6th of Lynx's seven ports a side (Chapelle 1930, p. 82: seven
+    ports a side on the Admiralty's draught), and four half-pounder swivels on the rail. A
+    Baltimore letter of marque of Lynx's size shipped six or eight guns and about forty men,
+    a privateer twice the guns and three times the men (from memory, UNVERIFIED; the count
+    a judgement for the file's complement of forty). The pivot gun ('long Tom') the type is
+    known for is the default fit built below it (`pivot_gun`, the place `pivot` of
+    `GUN_PLACES`, the owner's loadout of 2026-10-25), with four carronades and the swivels;
+    this six-gun fit is the letter of marque's. Package 75 replaces both fits from the
+    type's own records (spec M7 §7, §27)."""
+    # The port sills 3 ft 5 in above the water (Spider's specification, Chapelle pp.
+    # 166-167), the source's own figure rather than the deck's: a low-sided vessel whose lee
+    # ports shut at about 12 degrees of heel (shot.lee_port_shut's foot above the water).
+    sill = ft(3.0 + 5.0 / 12.0)
+    rail = 0.9 + 0.8  # the rail about two feet eight above the deck (judgement, as the cutter's)
+    guns = []
+    for i, x in enumerate(spaced(8.4, -8.4, 3), start=1):
+        guns += broadside_pair(
+            i,
+            "long",
+            6,
+            LONG_GUN_CWT[6],
+            x,
+            sill,
+            (
+                "PROVISIONAL (ahead of package 75). Six long 6-pounders, three a side, in the "
+                "2nd, 4th and 6th of the seven ports (Chapelle p. 82; the count a judgement): "
+                "the 7 ft gun of 20 cwt (from memory), six men to the pair."
+                if i == 1
+                else None
+            ),
+        )
+    guns += swivels(
+        4,
+        [10.0, -10.0],
+        rail,
+        "PROVISIONAL. Four half-pounder swivels on the rail, two a side at the bow and the "
+        "quarter (judgement; Falconer 1780, SWIVEL), a man each when a man is spare.",
+    )
+    magazine = fit_magazine(guns, {"long": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS})
+    # The long Tom (the owner's loadout, 2026-10-25): one long 12-pounder on a pivot
+    # amidships between the masts (the fore at +7.8 m, the main at -2.6 m), firing over the
+    # rail on either side, and four 12-pounder carronades, two a side, in the ports forward
+    # of the fore mast and abaft the main, clear of the pivot's sweep; the swivels as above.
+    # The Baltimore privateers of 1812 carried a long 12, 18 or 24 on the pivot and a few
+    # carronades or long guns on the broadside (Chapelle 1930, from memory, UNVERIFIED; the
+    # long 12 a judgement for a hull of 224 tons).
+    tom = pivot_gun(
+        "long",
+        12,
+        LONG_GUN_CWT[12],
+        2.6,
+        rail,
+        (60.0, 140.0),
+        "PROVISIONAL (the owner's loadout, 2026-10-25). The long Tom: a long 12-pounder of "
+        "34 cwt (from memory) on a pivot amidships between the masts, firing over the rail to "
+        "either side; nine men by the gun's rule. Its arc from 60 to 140 degrees off the bow "
+        "(the owner's ruling of the day, from her rig: the fore topmast backstays at about 55 "
+        "to 60 degrees from the pivot, the main shrouds at about 140 to 150; "
+        "docs/design/Proposal-PivotGun.md §3).",
+    )
+    for i, x in enumerate((10.5, -7.5), start=1):
+        tom += broadside_pair(
+            i,
+            "carronade",
+            12,
+            CARRONADE_CWT[12],
+            x,
+            sill,
+            (
+                "PROVISIONAL. Four 12-pounder carronades, two a side, forward of the fore mast "
+                "and abaft the main, clear of the pivot's sweep (judgement): the Carron "
+                "Company's 12-pounder of about 6 cwt (from memory), four men to the pair."
+                if i == 1
+                else None
+            ),
+        )
+    tom += swivels(4, [10.0, -10.0], rail, None)
+    tom_magazine = fit_magazine(
+        tom, {"long": HIRED_ROUNDS, "carronade": HIRED_ROUNDS, "swivel": SWIVEL_ROUNDS}
+    )
+    b.armament(
+        "The armament (spec M7 7; package 70's shape): PROVISIONAL, the owner's ask of "
+        "2026-10-25 ahead of package 75, which gives the schooner her fits from the type's own "
+        "records. Two fits the scenario chooses between (ship: {fit: ...}): the long Tom on "
+        "its pivot with four carronades, the default, and a letter of marque's six long "
+        "6-pounders. Every figure's source is in tools/gen_ships.py; the weights are from "
+        "memory and UNVERIFIED against a page.",
+        "long tom",
+        [
+            (
+                "long tom",
+                "Chapelle, The Baltimore Clipper, 1930 (the pivot gun of the Baltimore "
+                "privateers, from memory, UNVERIFIED); the owner's loadout of 2026-10-25; the "
+                "weights from memory",
+                tom,
+                tom_magazine,
+                "PROVISIONAL. A privateer's fit: a long 12-pounder on the pivot, four "
+                "12-pounder carronades and four swivels.",
+            ),
+            (
+                "letter of marque",
+                "Chapelle, The Baltimore Clipper, 1930, p. 82 (Lynx's seven ports a side) and "
+                "pp. 166-167 (Spider's port sills); the count of guns a judgement for a letter "
+                "of marque of forty men (UNVERIFIED from memory); the weights from memory",
+                guns,
+                magazine,
+                "PROVISIONAL. A letter of marque's fit: six long 6-pounders and four swivels.",
+            ),
+        ],
+    )
+    b.quarter_bill(
+        QUARTER_BILL_NOTE,
+        [
+            (
+                "forecastle",
+                4,
+                "PROVISIONAL. The trimmers: four of the forecastlemen for the head sails "
+                "(judgement).",
+            ),
+            ("fore_top", 3, "Three of the fore topmen for the fore braces and the topsail."),
+            ("afterguard", 4, "Four of the afterguard at the main sheet and the gaffs."),
+        ],
+        1,
+        2,
+        "sail before guns",
+        {
+            "helm": "One man at the tiller (a Baltimore schooner steered with a tiller; "
+            "judgement).",
+            "powder": "Two of the waisters to pass the cartridges (judgement).",
+            "priority": PRIORITY_NOTE,
+        },
+        small_arms=8,
+        boarders=26,
+        small_arms_note=(
+            "Eight of her people with the stand of arms' muskets (PROVISIONAL, for package 75: "
+            "judgement after the King's cutter's six of thirty); she bears no marines."
+        ),
+        boarders_note=(
+            "Twenty-six boarders of her forty with cutlass and pistol (PROVISIONAL, for package "
+            "75: judgement after the King's cutter's twenty of thirty; a privateer's company "
+            "boards almost whole)."
+        ),
+        filling=filling_party(tom),
     )
 
 
@@ -3996,11 +4318,16 @@ def brig_armament(b, deck_height):
         "Two long 6-pounders at the bow ports as the chase guns (the kit's manual): the 7 ft "
         "gun of 20 cwt (from memory), six men each.",
     )
-    cartridges, shot = fit_magazine(guns, {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS})
+    # a King's fit: the allowance for exercise a fourth of her guns, all on the flush deck
+    # (practice and resupply)
+    magazine = fit_magazine(
+        guns, {"long": KINGS_ROUNDS, "carronade": KINGS_ROUNDS}, exercise_allowance(len(guns))
+    )
     b.armament(
         "The armament (spec M7 7; package 70): the guns as parts of the graph by their place, "
         "the class's one fit; each with its crew by the quarter bill and the magazine's "
-        "allowance by calibre. Every figure's source is in tools/gen_ships.py; the weights and "
+        "allowance by kind and calibre. Every figure's source is in tools/gen_ships.py; the "
+        "weights and "
         "the establishment are from memory and UNVERIFIED against a printed page.",
         "diligence class 1796",
         [
@@ -4010,8 +4337,7 @@ def brig_armament(b, deck_height):
                 "in the Age of Sail 1793-1817, the Diligence class (UNVERIFIED from memory); "
                 "Lavery, Arming and Fitting; Douglas 1820, the crews",
                 guns,
-                cartridges,
-                shot,
+                magazine,
                 "The class's armament: 16 x 32-pounder carronades, 2 x 6-pounder chase guns.",
             )
         ],
@@ -4039,6 +4365,7 @@ def brig_armament(b, deck_height):
         boarders=30,
         small_arms_note="Eight of the brig's seamen with the stand of arms' muskets (judgement).",
         boarders_note="Thirty boarders from the guns' crews with the twenty marines (judgement).",
+        filling=filling_party(guns),
     )
 
 
@@ -4068,7 +4395,7 @@ def merchant_brig_armament(b):
         )
     for g, _ in guns:
         g["crew"] = 4  # the merchant's own quarter bill, short of Douglas's figure (judgement)
-    cartridges, shot = fit_magazine(guns, {"long": MERCHANT_ROUNDS})
+    magazine = fit_magazine(guns, {"long": MERCHANT_ROUNDS})
     b.armament(
         "The armament (spec M7 7; package 70): the merchant brig's few guns, one fit, her "
         "magazine a trader's (twenty round and a little grape a gun: judgement). Every "
@@ -4080,8 +4407,7 @@ def merchant_brig_armament(b):
                 "Judgement on the period's trade (a brig of three hundred tons carried a few "
                 "4- or 6-pounders for her own defence, or none); the gun's weight from memory",
                 guns,
-                cartridges,
-                shot,
+                magazine,
                 "A trader's fit: four 6-pounders, two a side.",
             )
         ],
@@ -4109,6 +4435,7 @@ def merchant_brig_armament(b):
             "chest of arms)."
         ),
         boarders_note="Six of the merchant brig's hands: a trader does not board (judgement).",
+        filling=filling_party(guns),
     )
 
 
@@ -8154,6 +8481,7 @@ if __name__ == "__main__":
     os.makedirs(out, exist_ok=True)
     frigate(out)
     schooner(out)
+    schooner(out, armed=True)
     cutter(out)
     brig(out)
     brig(out, merchant=True)

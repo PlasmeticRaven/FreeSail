@@ -288,6 +288,7 @@ SIZE_RANK: dict[str, int] = {
     "brig-sloop": 2,
     "merchant brig": 2,
     "schooner": 1,
+    "privateer schooner": 1,  # PROVISIONAL (2026-10-25): the schooner's hull, armed
     "cutter": 1,
     "lugger": 1,  # package 43b: a chasse-marée of a hundred tons, the cutter's class
     "smack": 0,  # a fishing smack of thirty-five tons is nobody's match
@@ -652,11 +653,44 @@ _BLOCKADE = re.compile(
 )
 
 
-def read_intent(world: Any, words: str) -> Intent:
+# A free intent (the owner's lead, 2026-10-26): words no form of `read_intent` reads,
+# taken for a ship on the sea so that a model seated as her captain is told its goal. The
+# rules-based captain lays no plan for it: he lies her to where she is (the far body by her
+# plan's `lie_to`, the crewed captain by one `heave to`; package 86's fold-in), keeping her
+# service's role and doctrine for the weather and strangers, until a model or the player at
+# her captain's station sails her. PROVISIONAL in form (the owner's debrief of 2026-10-27):
+# packages 82 and 84 rework it with the person aboard another ship.
+FREE = "free"
+FREE_WARNING = (
+    "a free intent: the rules-based captain will not follow it, and lies her to where she is "
+    "until a model or the player takes her captain's station"
+)
+
+
+def free_intent(words: str) -> Intent:
+    """A free intent from its words whatever they say (a scenario ship's `free_intent:`,
+    2026-10-27): the goal a model at her captain's station is given, which the rules-based
+    captain does not sail by even where its words are a form he knows."""
+    said = " ".join(str(words).split()).rstrip(".")
+    if not said:
+        raise ValueError("a free intent says the ship's goal in words; these are empty.")
+    return Intent(FREE, said)
+
+
+def read_intent(world: Any, words: str, free: bool = False) -> Intent:
     """An intent from its words, the places checked against the chart and the ports
     (raises ValueError in words): `trade tin from Falmouth to Brest`, `trade forty tons
     of tin from Falmouth to Brest`, `keep the station off Ushant within 15 miles`, `carry
-    this letter to Brest`, `run home to Plymouth`, `bound for Brest`."""
+    this letter to Brest`, `run home to Plymouth`, `bound for Brest`. With `free`, words
+    no form reads (and a form whose places the chart has not got) are a free intent."""
+    if free:
+        try:
+            return read_intent(world, words)
+        except ValueError:
+            said = " ".join(str(words).split()).rstrip(".")
+            if not said:
+                raise
+            return Intent(FREE, said)
     from freesail.orders.numbers import read_all
 
     said = " ".join(str(words).split()).rstrip(".")
@@ -887,8 +921,8 @@ def role_for(world: Any, intent: Intent | None) -> str:
         return "packet"
     if intent is not None and intent.convoy:
         return "commodore"  # package 71: the convoy's escort, by the intent's words
-    if intent is not None and intent.kind in ("home", "passage") and _is_kings_ship(world):
-        return "kings-ship"
+    if intent is not None and intent.kind in ("home", "passage", FREE) and _is_kings_ship(world):
+        return "kings-ship"  # a free intent's too (package 86): her service's role
     return "merchant"
 
 
@@ -2202,12 +2236,17 @@ class Captain(Judgement):
 
     # -- the intent changed (a world order) ----------------------------------------------
 
-    def set_intent(self, words: str) -> str:
+    def set_intent(self, words: str, free: bool = False) -> str:
         """`captain: intent <words>` (the director's seam): the intent read anew, the
-        plan dropped and worked again at the next judgement; the words for the journal."""
-        self.intent = read_intent(self.world, words)
+        plan dropped and worked again at the next judgement; the words for the journal.
+        `free` takes words no form reads as a free intent (another ship's, `ship "X":
+        intent`), under which he keeps the role and the doctrine of her service he had
+        (package 86's fold-in, the review's finding: a King's cutter or tender had fallen to
+        the merchant's doctrine)."""
+        self.intent = read_intent(self.world, words, free)
         self.intent_words = " ".join(words.split())
-        self.role = role_for(self.world, self.intent)
+        if not (self.intent.kind == FREE and self.role):
+            self.role = role_for(self.world, self.intent)
         self.doctrine = load_doctrine(self.role)
         self.legs, self.leg_i, self.leg_shaped_tick = [], 0, None
         self._business = {}
@@ -3089,6 +3128,9 @@ class Captain(Judgement):
             return sid.replace(".", " ").replace("_", " ")
 
     def _passage(self, p: Perception, events: list[Any], kinds: set[str]) -> None:
+        if self.intent is not None and self.intent.kind == FREE:
+            self._free(p)
+            return
         if not self.legs:
             self._plan(p)
             if not self.legs:
@@ -3417,6 +3459,22 @@ class Captain(Judgement):
                 lines = self._book_lines(self.state)
                 if lines:
                     runtime.load_book(self.state, lines, actor_for(self.state), quiet=True)
+
+    def _free(self, p: Perception) -> None:
+        """A free intent (package 86's fold-in, the review's finding): no plan is laid, as
+        the far body lays none (`brains.FarCaptain._plan`), where the crewed captain had
+        tried to plan it every minute and said a plan of no legs each time. He lies her to
+        where she is, once each time he comes back to his passage (as the far body's
+        `lie_to` is taken up again after a detour), and his doctrine of the weather and
+        strangers keeps on; a model or the player at her captain's station sails her."""
+        entered = getattr(self, "_state_entered", None)
+        if "free_lain_to" in self._business and self._business["free_lain_to"] == entered:
+            return
+        self._business["free_lain_to"] = entered
+        self.legs, self.leg_i = [], 0
+        if p.manoeuvre in ("hove to", "heaving to"):
+            return
+        self.give("heave to", why=f"a free intent, {self.intent.words}: no plan to sail by")
 
     def _plan(self, p: Perception) -> None:
         if self.intent is None:

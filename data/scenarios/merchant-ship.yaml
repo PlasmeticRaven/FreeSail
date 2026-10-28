@@ -58,6 +58,7 @@ people:
   - {role: master, skill: 0.9}    # a master who can work a lunar (spec M5 §27): his skill set
 
 papers:
+  service: merchant               # a merchantman on the Amazon's file, not a King's ship
   chart: {year: 1804}
   epitome: moore                  # a merchantman's epitome
   almanac: 1805

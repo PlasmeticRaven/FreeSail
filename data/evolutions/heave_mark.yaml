@@ -1,0 +1,26 @@
+# Heave a cask overboard for a mark (practice and resupply, between packages 72 and 73;
+# docs/design/Build-PracticeAndResupply.md §6; scripted, HeaveMarkScript in
+# evolutions/action_scripts.py). Two hands at the quarter put an empty cask with a flag on
+# a staff over the side, four points abaft the beam, for the guns to be exercised at;
+# from then it floats where it fell, set by the stream and a little to leeward, and the
+# masthead has it in sight by day within a mile (freesail/combat/marks.py). The captain
+# is "to exercise the Ship's company frequently at the guns" and the times are to be
+# entered in the log (Regulations 1808 printing, the Captain, Art. IX, l.8738-8742), and
+# the Gunner is to instruct the men "to point the guns properly" with the powder and
+# round shot allowed him for it each month (Art. XI, l.8842-8879; the Gunner, Art. XXI,
+# l.13122-13144). The cask with its flag as the mark is from memory, UNVERIFIED against
+# a page. The subject is `her`, and the script holds nothing of the ship's, so the two
+# hands at the quarter never hold her against a tack or a wear.
+id: heave_mark
+verb: heave_mark
+applies_to: {class: ship}
+script: heave_mark
+preconditions: []
+timing:
+  heave_s: 60        # the cask got up, the flag's staff lashed and the cask over the side (judgement)
+on_start: {log: "Hands to the quarter: an empty cask over the side for a mark."}
+on_complete: {log: "The mark is over the side from the {side} quarter, an empty cask with a flag on a staff.", kind: practice.mark_over, severity: notable}
+on_fail: {log: "Could not heave a cask over for a mark: {reason}.", kind: evolution.failed, severity: routine}
+# crew: two hands of the afterguard at the quarter, as for the log (heave_log.yaml)
+crew: {hands: 2, rating: ordinary, stations: [afterguard, quarterdeck]}
+source: "Regulations 1806 (1808 printing), the Captain, Art. IX l.8738-8742 (the company exercised at the guns, the times in the log) and Art. XI l.8842-8879 (the men taught to point the guns; the powder and shot a month); the Gunner, Art. XXI l.13122-13144; the cask and its flag from memory, UNVERIFIED"

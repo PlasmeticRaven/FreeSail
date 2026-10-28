@@ -171,6 +171,13 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "rig": "a schooner",
         "what": "a topsail schooner",
     },
+    # PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): the letter of marque
+    # of the schooner's draught, her guns her own file's; the tops make out a schooner
+    "privateer schooner": {
+        "file": "data/ships/privateer-schooner.yaml",
+        "rig": "a schooner",
+        "what": "a topsail schooner, pierced for guns",
+    },
     "cutter": {"file": "data/ships/cutter.yaml", "rig": "a cutter", "what": "a cutter"},
     "brig-sloop": {
         "file": "data/ships/brig.yaml",
@@ -203,6 +210,11 @@ _DESCRIPTION_WORDS = {
     "schooner": "schooner",
     "a topsail schooner": "schooner",
     "topsail schooner": "schooner",
+    "a privateer schooner": "privateer schooner",
+    "an armed schooner": "privateer schooner",
+    "armed schooner": "privateer schooner",
+    "a letter of marque": "privateer schooner",
+    "letter of marque": "privateer schooner",
     "a cutter": "cutter",
     "cutter": "cutter",
     "a brig": "merchant brig",
@@ -1138,7 +1150,7 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
     name = str(spec.get("name") or f"{key} {serial}")
     plan, cycle, goal = _goal_plan(world, str(spec.get("goal") or "bound for Falmouth"), position)
     departing = str(spec.get("departing") or "")
-    if departing and not cycle and not spec.get("intent"):
+    if departing and not cycle and not (spec.get("intent") or spec.get("free_intent")):
         # made in a port's harbour (package 68, spec M7b §21i's simple half): out by the
         # port's track to sea, the pilot's way, before her goal's legs, and not across the
         # land (an intent's captain lays it so himself, `brains.FarCaptain`)
@@ -1228,14 +1240,23 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         else 0.0
     )
     intent = " ".join(str(spec.get("intent") or "").split())
-    if intent:
+    free = " ".join(str(spec.get("free_intent") or "").split())
+    if intent and free:
+        raise ValueError(
+            f"{name} is given both an intent and a free intent; give her one or the other."
+        )
+    if intent or free:
         # the brain on the far body (package 43): her captain, who lays her plan from the
         # intent over the chart at his first judgement; refused in words when the intent
-        # is none a captain knows
+        # is none a captain knows. A free intent (`free_intent:`, 2026-10-27) is taken as
+        # it is said, the goal for a model at her captain's station: he does not sail by it
         from freesail.world.brains import FarCaptain
+        from freesail.world.captains import free_intent
 
-        vessel.intent_words = intent
-        vessel.brain = FarCaptain(world, vessel, intent)
+        words = intent or free
+        vessel.intent_words = words
+        given = free_intent(words) if free else None
+        vessel.brain = FarCaptain(world, vessel, words, given=given)
         if spec.get("departing"):
             # lying in a port (the world's business, package 43b): her plan goes out by
             # the port's track, as a ship's that sails from it does

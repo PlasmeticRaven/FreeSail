@@ -272,7 +272,11 @@ def lead_words(words: str) -> str:
     return words
 
 
-_ORDER = {"danger": 0, "sail": 1, "sound": 1, "light": 2, "land": 3, "mark": 4}
+# The cask for a mark (practice and resupply) beside a sail in `what is in sight`: off a
+# coast the land and the chart's marks filled its eight places and the cask a cable off was
+# cut off from the words (the review's finding, off the Lizard in the owner's practice
+# scenario). It is never hailed (`Lookout.look`).
+_ORDER = {"danger": 0, "sail": 1, "sound": 1, "cask": 1, "light": 2, "land": 3, "mark": 4}
 
 # The ids of the points of interest a world order puts in the world (`mark:`, package 45c;
 # `freesail.world.orders._mark`).
@@ -292,6 +296,9 @@ _SAIL_WORDS = frozenset(
         "the pilot cutter",
     }
 )
+# The words the cask hove over for a mark is asked for by (`find`; practice and resupply,
+# between packages 72 and 73), while one is in sight.
+_CASK_WORDS = frozenset({"mark", "cask", "target", "practice mark"})
 # A sail by her rig as the tops made it out (package 36): the word in the lookout's name
 # for her ("a brig, standing to the eastward").
 _RIG_WORDS = {
@@ -373,6 +380,10 @@ class Lookout:
     # light), so that the lookout says it when she is made out and when her work changes;
     # a plain default, so that a checkpoint from before loads with it
     _glass_said: dict[str, tuple[Any, ...]] = field(default_factory=dict)
+    # practice and resupply (between packages 72 and 73): the cask hove over for a mark is
+    # judged from a stream of its own, opened at its first sighting, so that no draw of an
+    # existing scenario moves; a plain default, so that a checkpoint from before loads
+    _practice_stream: random.Random | None = None
 
     def peg_own_run(self, world: Any) -> tuple[float, float]:
         """Her run through the water to now, pegged by the heading and the way since the
@@ -454,6 +465,18 @@ class Lookout:
             # rig's height and the eye give, within the weather's visibility
             found.extend(vessels.in_sight(pos, self.height_of_eye_m, visibility_nm, daylight))
             found.sort(key=lambda s: s.distance_m)
+        # the cask hove over for a mark (practice and resupply, between packages 72 and 73;
+        # `combat.marks`): a sighting of its own kind, never hailed; sorted in only when
+        # one is in sight, and its stream opened at its first sighting
+        casks = _marks().sightings(world, pos, visibility_nm, daylight)
+        if casks:
+            if self._practice_stream is None:
+                rng = getattr(world, "rng", None)
+                self._practice_stream = (
+                    rng.stream("practice") if rng is not None else random.Random(3)
+                )
+            found.extend(casks)
+            found.sort(key=lambda s: s.distance_m)
         minute = world.clock.tick // 60
         heading = float(world.ship.heading)
         land_now = any(s.seen_as in ("land", "light") for s in found)
@@ -474,7 +497,10 @@ class Lookout:
         fresh_ids = {s.feature.id for s in fresh}
         fresh = [s for s in found if s.feature.id in fresh_ids]
         fresh.sort(key=lambda s: (_ORDER.get(s.seen_as, 9), s.distance_m))
-        for s in fresh[:LOOKOUT_HAIL_MAX]:
+        # the mark is never hailed, nor takes a hail's place: the heave said it
+        # (`combat.marks`)
+        hailed = [s for s in fresh if s.seen_as != "cask"]
+        for s in hailed[:LOOKOUT_HAIL_MAX]:
             text = self.words(s, heading)
             # a danger is notable; so is everything seen in the look that makes the
             # landfall, and a sail ("Sail ho!", package 35)
@@ -527,6 +553,8 @@ class Lookout:
                 stream = self._sail_stream
             elif s.feature.id == SHORE_ID and self._shore_stream:
                 stream = self._shore_stream
+            elif s.seen_as == "cask" and self._practice_stream:
+                stream = self._practice_stream
             factor = max(0.3, 1.0 + stream.gauss(0.0, DISTANCE_BY_ESTIMATION_FRACTION))
             ep = Episode(
                 factor,
@@ -1264,9 +1292,10 @@ class Lookout:
             # a rock that covers and dries is "showing" when it is seen (package 34)
             showing = " showing" if s.feature.kind == "drying" else ""
             return f"{head}{showing} bearing {point}, distant {distance}: a danger."
-        if s.feature.id.startswith(INTEREST_PREFIX):
-            # a point of interest (package 45c): its description, where it lies from her
-            # head, its bearing and its distance, as the shore is said
+        if s.feature.id.startswith(INTEREST_PREFIX) or s.seen_as == "cask":
+            # a point of interest (package 45c), and the cask hove over for a mark
+            # (practice and resupply): where it lies from her head, its bearing and its
+            # distance, as the shore is said
             return f"{head} {relative}, bearing {point}, distant {distance}."
         return f"{head} bearing {point}, distant {distance}."
 
@@ -1280,6 +1309,12 @@ class Lookout:
         key = _key(name)
         if not key:
             return None
+        if key in _CASK_WORDS:
+            # the cask hove over for a mark (practice and resupply), while it is in sight;
+            # else the words keep their meaning
+            cask = next((s for s in self.sightings if s.seen_as == "cask"), None)
+            if cask is not None:
+                return cask
         if key in ("land", "shore", "coast", "headland", "nearest land"):
             # the nearest land; at night, when the land itself is not to be seen, the
             # nearest light or mark that is (the reading `the land` counts them so); the
@@ -1393,6 +1428,14 @@ class Lookout:
 
 def _head(name: str) -> str:
     return name[:1].upper() + name[1:]
+
+
+def _marks() -> Any:
+    """`combat.marks`, imported when the lookout first looks (the combat package builds on
+    the world's, so not at this module's import)."""
+    from freesail.combat import marks
+
+    return marks
 
 
 def _ward(edges: list[str]) -> str:

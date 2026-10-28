@@ -329,8 +329,11 @@ def test_the_ship_world_order_takes_an_intent_and_gives_a_brain_to_a_ship_on_the
     assert e3.data["result"] == "done" and w.vessels.find("Lark").brain is None
     e4 = w.world_order('ship "Lark": intent carry this letter to Plymouth')
     assert e4.data["result"] == "done" and w.vessels.find("Lark").brain.role == "packet"
+    # words no form reads are a free intent (2026-10-26), taken with the warning and why
     e5 = w.world_order('ship "Lark": intent fish the Wolf')
-    assert e5.data["result"] == "refused"
+    assert e5.data["result"] == "done" and "the rules-based captain will not follow it" in e5.text
+    assert "no intent a captain knows" in e5.text
+    assert w.vessels.find("Lark").brain.intent.kind == "free"
     # the save carries the brains' intents, and a replay gives them again
     from freesail.api.session import ship_factory
     from freesail.core import replay as replay_mod

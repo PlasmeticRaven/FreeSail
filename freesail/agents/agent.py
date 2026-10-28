@@ -2019,7 +2019,13 @@ def voyage_words(world: Any) -> str:
     cap = getattr(world, "captain", None)
     parts = [f"The voyage: {sc.name}." if sc is not None else "The voyage."]
     if cap is not None:
-        if cap.intent is not None:
+        if cap.intent is not None and cap.intent.kind == "free":
+            parts.append(
+                f"The intent the scenario gives the ship: {cap.intent.words}. It is a free "
+                "intent, the goal you are given: the rules-based captain will not follow it, "
+                "and lies her to where she is when nobody holds this station."
+            )
+        elif cap.intent is not None:
             parts.append(
                 f"The intent the scenario gives the ship: {cap.intent.words}; the "
                 f"rules-based captain ({cap.role}) sails her by it when nobody holds this "

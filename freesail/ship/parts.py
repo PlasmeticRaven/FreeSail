@@ -22,12 +22,14 @@ has carried away is shifted for a spare of its class from them.
 from __future__ import annotations
 
 import math
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
 from freesail import units
 from freesail.ship.schema import (
+    GUN_KINDS,
     FitSpec,
     GroundTackleSpec,
     GunSpec,
@@ -480,9 +482,15 @@ class Gun(Part):
     run_out: bool = False
     primed: bool = False
     elevation_deg: float = 0.0  # the quoin: positive is the muzzle raised
-    train_deg: float = 0.0  # from abeam (a broadside gun) or from the bow or stern line
+    # from abeam (a broadside gun) or from the bow or stern line; a pivot gun's is the
+    # relative bearing it points, from the bow, starboard positive, nought secured fore
+    # and aft (PROVISIONAL, 2026-10-25)
+    train_deg: float = 0.0
     dismounted: bool = False
     fired: int = 0  # rounds fired, for the log and the gunner's count
+    # a pivot gun's own arc over either side, degrees off the bow (package 86; None, and a
+    # gun pickled before it, the default arc of `combat.guns.pivot_arc`)
+    arc_deg: tuple[float, float] | None = None
 
     @classmethod
     def from_spec(cls, g: GunSpec) -> Gun:
@@ -499,6 +507,7 @@ class Gun(Part):
             height_m=float(g.height_m),
             crew_n=int(g.crew),
             weight_cwt=float(g.weight_cwt),
+            arc_deg=tuple(g.arc_deg) if g.arc_deg is not None else None,
         )
 
     @property
@@ -518,6 +527,8 @@ class Gun(Part):
             return f"No. {self.number} {side}gun"
         if self.place in ("bow", "stern"):
             return f"the {side}{self.place} chaser"
+        if self.place == "pivot":
+            return f"the No. {self.number} pivot gun" if self.number else "the pivot gun"
         n = f"No. {self.number} " if self.number is not None else ""
         return f"the {n}{side}swivel"
 
@@ -554,80 +565,522 @@ def _pounder_words(pounder: float) -> str:
     return f"{pounder:g}"
 
 
+# The powder below and the filled cartridges (practice and resupply, between packages 72
+# and 73; docs/design/Build-PracticeAndResupply.md §1.1, §2).
+
+# A barrel of powder holds a hundred pounds: Falconer 1780, the French glossary, "Baril de
+# poudre, a powder-cask, containing an hundred pounds of gun-powder" (l.22563-22564). The
+# English barrel's weight is UNVERIFIED.
+BARREL_LB = 100.0
+# A cartridge's powder as a share of its shot's weight by the gun's kind, until the
+# Regulations' Table No. 29 (OCR l.27498-27502, its figures lost in the OCR) is read from
+# the page image (package 75). A long gun a third: Falconer 1780, CANNON (from l.4037),
+# quoting Robins at l.4826-4831, the present allowance is half the ball in the smaller
+# pieces and seven sixteenths in the 32-pounders, and a third or even less would be an
+# advantage; that the service charge of 1805 was a third is from memory, UNVERIFIED. A
+# carronade a twelfth, from memory, UNVERIFIED (Falconer 1780 is before the carronade). A
+# swivel a half, Falconer's smaller pieces (l.4827) applied to a half-pounder (judgement).
+CHARGE_SHARE: dict[str, float] = {"long": 1 / 3, "carronade": 1 / 12, "swivel": 1 / 2}
+# The powder below at completion, as a share of the filled powder (judgement: the period
+# kept most of its powder in the barrels).
+RESERVE_SHARE = 0.5
+# The man-seconds to fill one cartridge: a fixed part, and a part by the pound of its
+# charge (judgement).
+FILL_S_BASE = 120.0
+FILL_S_PER_LB = 15.0
+# The magazine's layout: 1, the cartridges and the rounds fired by calibre (packages 70 to
+# 72); 2, the filled cartridges by kind and calibre, with the powder below.
+MAGAZINE_LAYOUT = 2
+
+
+def charge_lb(kind: str, pounder: float) -> float:
+    """A cartridge's powder in pounds for a gun of the kind and calibre, to the ounce."""
+    share = CHARGE_SHARE.get(kind, CHARGE_SHARE["long"])
+    return round(share * float(pounder) * 16.0) / 16.0
+
+
+def fill_seconds(charge: float) -> float:
+    """The man-seconds to fill one cartridge of `charge` pounds."""
+    return FILL_S_BASE + FILL_S_PER_LB * float(charge)
+
+
+def kind_rank(kind: str) -> int:
+    """The gun kinds' order (`GUN_KINDS`: long, carronade, swivel), any other after."""
+    return GUN_KINDS.index(kind) if kind in GUN_KINDS else len(GUN_KINDS)
+
+
+def split_by_kind(
+    by_calibre: Mapping[float, int], guns: Iterable[Any]
+) -> dict[tuple[str, float], int]:
+    """Counts by calibre split over the gun kinds of each calibre in proportion to their
+    number of guns, by the largest remainder with ties in `GUN_KINDS` order: the long Tom's
+    275 cartridges of 12 for one long gun and four carronades are 55 and 220, 100 are 20 and
+    80, 101 are 20 and 81. A calibre no gun has keeps its count under the long gun's kind,
+    so that nothing is lost (the schema refuses such a fit)."""
+    guns_of: dict[float, dict[str, int]] = {}
+    for g in guns:
+        kinds = guns_of.setdefault(float(g.pounder), {})
+        kinds[str(g.kind)] = kinds.get(str(g.kind), 0) + 1
+    out: dict[tuple[str, float], int] = {}
+    for pounder, count in by_calibre.items():
+        p, n = float(pounder), int(count)
+        kinds = guns_of.get(p)
+        if not kinds:
+            out[("long", p)] = out.get(("long", p), 0) + n
+            continue
+        order = sorted(kinds, key=kind_rank)
+        total = sum(kinds.values())
+        quota = {k: divmod(n * kinds[k], total) for k in order}
+        counts = {k: q for k, (q, _) in quota.items()}
+        left = n - sum(counts.values())
+        # the rest by the largest remainder; equal remainders in GUN_KINDS order
+        ranked = sorted((-quota[k][1], i, k) for i, k in enumerate(order))
+        for _, _, k in ranked[:left]:
+            counts[k] += 1
+        for k in order:
+            out[(k, p)] = out.get((k, p), 0) + counts[k]
+    return out
+
+
+def fit_levels(fit: FitSpec | None) -> dict[tuple[str, float], int]:
+    """The fit's filled allowance by kind and calibre, from her `cartridges:` in either key
+    shape: by kind and calibre, or by calibre alone (a fit of packages 70 to 72, or one
+    pickled then), split over her guns by `split_by_kind`."""
+    if fit is None:
+        return {}
+    out: dict[tuple[str, float], int] = {}
+    by_calibre: dict[float, int] = {}
+    for key, n in (getattr(fit, "cartridges", None) or {}).items():
+        if isinstance(key, tuple):
+            k = (str(key[0]), float(key[1]))
+            out[k] = out.get(k, 0) + int(n)
+        else:
+            by_calibre[float(key)] = by_calibre.get(float(key), 0) + int(n)
+    if by_calibre:
+        for k, n in split_by_kind(by_calibre, getattr(fit, "guns", None) or ()).items():
+            out[k] = out.get(k, 0) + n
+    return out
+
+
+@dataclass(frozen=True)
+class Wanting:
+    """What the magazine wants to be complete (`Magazine.wanting`): the powder in pounds,
+    the same to the nearest whole barrel, and the shot by calibre and kind. Never
+    pickled."""
+
+    powder_lb: float
+    barrels: int
+    shot: dict[float, dict[str, int]]
+
+    @property
+    def empty(self) -> bool:
+        """Nothing wanted: no barrel and no shot."""
+        return self.barrels <= 0 and not any(
+            n > 0 for kinds in self.shot.values() for n in kinds.values()
+        )
+
+
+def gun_words(kind: str, pounder: float, n: int = 2) -> str:
+    """Guns of a kind and calibre in the deck's words, without the article: 'long
+    12-pounder' for one, 'long 12-pounders', '12-pounder carronades', 'half-pounder
+    swivels' for more (`Gun.kind_words`, and its plural)."""
+    calibre = _pounder_words(float(pounder))
+    if kind == "long":
+        words = f"long {calibre}-pounder"
+    else:
+        words = f"{calibre}-pounder {GUN_KIND_WORDS.get(kind, kind)}"
+    return words if n == 1 else words + "s"
+
+
+def powder_words(lb: float, none: str = "no powder") -> str:
+    """Powder by the barrel of a hundred pounds and the pound: '2 barrels and 40 pounds',
+    '1 barrel', '31 pounds', 'under a pound'; `none` for none."""
+    lb = max(0.0, float(lb))
+    if lb <= 0.0:
+        return none
+    total = int(round(lb))
+    if total == 0:
+        return "under a pound"
+    barrels, pounds = divmod(total, int(BARREL_LB))
+    parts = []
+    if barrels:
+        parts.append(f"{barrels} barrel{'s' if barrels != 1 else ''}")
+    if pounds:
+        parts.append(f"{pounds} pound{'s' if pounds != 1 else ''}")
+    return " and ".join(parts)
+
+
 @dataclass
 class Magazine:
-    """The magazine and the shot lockers (spec M7 §7): cartridges by calibre and shot by
-    calibre and kind, counted by the gunner and the purser. Each round fired takes one
-    cartridge and one shot (two shot for double). Made from the fit's figures at the first
-    call (`magazine(ship)`), a function of the ship file, the fit and the rounds fired, so
-    a replay has it again."""
+    """The magazine and the shot lockers (spec M7 §7; practice and resupply, between
+    packages 72 and 73, docs/design/Build-PracticeAndResupply.md §1.1): the cartridges
+    filled, by the gun's kind and calibre, against the fit's allowance (`level`); the loose
+    powder below in the barrels, from which the gunner fills them (`fill`, called by
+    `combat.filling.fill_tick`); and the shot by calibre and kind, counted by the gunner and
+    the purser. Each round fired takes one filled cartridge of the gun's kind and one shot
+    of its calibre (two shot for double, none for blank). Made from the fit's figures at
+    the first call (`magazine(ship)`): a function of the ship file, the fit, the rounds
+    fired, the gunner's filling and the ports' issues (`receive`), so a replay has it
+    again. Every field after the first three is a plain class default, so that a magazine
+    pickled by packages 70 to 72 (`layout` 1, the cartridges and the rounds fired by
+    calibre) loads, and `magazine` converts it once (`_convert_70`)."""
 
-    cartridges: dict[float, int] = field(default_factory=dict)
+    # FILLED: {(kind, pounder): n}; layout 1 {pounder: n}
+    cartridges: dict = field(default_factory=dict)
     shot: dict[float, dict[str, int]] = field(default_factory=dict)
-    fired: dict[float, int] = field(default_factory=dict)  # rounds fired by calibre
+    fired: dict = field(default_factory=dict)  # {(kind, pounder): n}; layout 1 {pounder: n}
+    # practice and resupply (between packages 72 and 73; the build design's §1.1): plain
+    # class defaults, so that a magazine pickled before them loads. Layout 2 keys
+    # `cartridges` and `fired` by (kind, pounder).
+    layout: int = 1
+    level: dict | None = None  # {(kind, pounder): n}, the fit's filled allowance
+    charges: dict | None = None  # {(kind, pounder): lb}
+    shot_level: dict | None = None  # the fit's shot, {pounder: {kind: n}}
+    reserve_lb: float = 0.0  # the barrels' establishment
+    powder_lb: float = 0.0  # loose powder below, in the barrels
+    short: bool = False  # some kind below its level (the filling's early out): `recount`
+    fill_s: float = 0.0  # man-seconds in hand toward the next cartridge
+    filled_by_gunner: int = 0
+    barrels_emptied: int = 0  # for the Ordnance's shilling (the Gunner, Art. IX)
+    filling_held: bool = False  # `cease filling`
+    report_filled: bool = False  # say `guns.filled` when back at the level
+    said_powder_out: bool = False
+    account: tuple = ()  # ((when, words), ...): reassigned, never mutated
+    gun_count: dict | None = None  # {(kind, pounder): guns}, for the words; None: plural
+    # a cartridge filled since the report was asked for (`combat.filling`): the report is
+    # said when the last kind is back, and forgotten when nothing was short to come back
+    report_due: bool = False
 
-    def has(self, pounder: float, charge: Charge) -> bool:
-        if self.cartridges.get(pounder, 0) <= 0:
+    def has(self, kind: str, pounder: float, charge: Charge) -> bool:
+        """A filled cartridge for a gun of the kind and calibre, and its shot: two round for
+        double, none for blank."""
+        if self.cartridges.get((kind, float(pounder)), 0) <= 0:
             return False
         if charge is Charge.BLANK:
             return True
-        kind = "round" if charge is Charge.DOUBLE else charge.value
+        shot_kind = "round" if charge is Charge.DOUBLE else charge.value
         need = 2 if charge is Charge.DOUBLE else 1
-        return self.shot.get(pounder, {}).get(kind, 0) >= need
+        return self.shot.get(float(pounder), {}).get(shot_kind, 0) >= need
 
-    def take(self, pounder: float, charge: Charge) -> None:
-        if not self.has(pounder, charge):
+    def take(self, kind: str, pounder: float, charge: Charge) -> None:
+        """The cartridge and the shot taken for one round, and the round counted."""
+        if not self.has(kind, pounder, charge):
             raise ValueError(f"the magazine has no {charge.value} for a {pounder:g}-pounder")
-        self.cartridges[pounder] -= 1
+        key = (kind, float(pounder))
+        self.cartridges[key] -= 1
         if charge is not Charge.BLANK:
-            kind = "round" if charge is Charge.DOUBLE else charge.value
-            self.shot[pounder][kind] -= 2 if charge is Charge.DOUBLE else 1
-        self.fired[pounder] = self.fired.get(pounder, 0) + 1
+            shot_kind = "round" if charge is Charge.DOUBLE else charge.value
+            self.shot[float(pounder)][shot_kind] -= 2 if charge is Charge.DOUBLE else 1
+        self.fired[key] = self.fired.get(key, 0) + 1
+        if self.cartridges[key] < (self.level or {}).get(key, 0):
+            self.short = True
 
     def spoil(self, share: float) -> int:
         """Cartridges found damp (package 70; the director's hand): that share of every
-        calibre's cartridges struck off, rounded down; the number struck off."""
+        kind's filled cartridges struck off, rounded down, the barrels below left alone; the
+        number struck off."""
         lost = 0
-        for pounder, n in list(self.cartridges.items()):
+        for key, n in list(self.cartridges.items()):
             gone = int(n * max(0.0, min(1.0, share)))
-            self.cartridges[pounder] = n - gone
+            self.cartridges[key] = n - gone
             lost += gone
+        self.recount()
         return lost
 
-    def describe(self) -> list[str]:
-        """The `the magazine` reading's lines: the gunner's count."""
-        if not self.cartridges:
+    def recount(self) -> bool:
+        """Whether some kind is below its level, kept in `short` (the filling's early out).
+        Every method that moves a count keeps it; a hand that sets `cartridges` itself (a
+        test, the director) calls this after."""
+        level = self.level or {}
+        self.short = any(self.cartridges.get(k, 0) < n for k, n in level.items())
+        return self.short
+
+    def set_filled(self, kind: str, pounder: float, n: int) -> None:
+        """The filled count of a kind set by hand (a test, the director), `short` kept."""
+        self.cartridges[(kind, float(pounder))] = max(0, int(n))
+        self.recount()
+
+    # -- the filling and the receipts (practice and resupply) -----------------------------
+
+    def filled_of(self, kind: str, pounder: float) -> int:
+        """The filled cartridges for guns of the kind and calibre (layout 1: the
+        calibre's)."""
+        if self.layout >= MAGAZINE_LAYOUT:
+            return int(self.cartridges.get((kind, float(pounder)), 0))
+        return int(self.cartridges.get(float(pounder), 0))
+
+    def charge_of(self, kind: str, pounder: float) -> float:
+        """A cartridge's powder in pounds: the fit's `charges:`, else `charge_lb`."""
+        got = (self.charges or {}).get((kind, float(pounder)))
+        return float(got) if got is not None else charge_lb(kind, pounder)
+
+    def can_fill(self, kind: str, pounder: float) -> bool:
+        """Whether the gunner can fill a cartridge of the kind now: its charge below and the
+        filling not held."""
+        return not self.filling_held and self.powder_lb >= self.charge_of(kind, pounder)
+
+    def neediest(self) -> tuple[str, float] | None:
+        """The kind the gunner fills next: of those below their level that he can fill, the
+        lowest share of its level, equal shares in `GUN_KINDS` order and then the larger
+        calibre; None when there is none."""
+        best: tuple[tuple[float, int, float], tuple[str, float]] | None = None
+        for key, lvl in (self.level or {}).items():
+            n = self.cartridges.get(key, 0)
+            if lvl <= 0 or n >= lvl or not self.can_fill(*key):
+                continue
+            rank = (n / lvl, kind_rank(key[0]), -float(key[1]))
+            if best is None or rank < best[0]:
+                best = (rank, key)
+        return best[1] if best is not None else None
+
+    def fill(self, man_seconds: float) -> list[tuple[str, float]]:
+        """The gunner's man-seconds at the filling: banked in `fill_s`, and a cartridge of
+        the neediest kind filled for each `fill_seconds(charge)` of them, its charge taken
+        from the powder below (a barrel emptied counted for the Ordnance's shilling, the
+        Gunner, Art. IX). The keys filled, in order; it logs nothing and draws nothing. With
+        nothing to fill, the man-seconds in hand go back to nought."""
+        out: list[tuple[str, float]] = []
+        self.fill_s = float(self.fill_s) + max(0.0, float(man_seconds))
+        while True:
+            key = self.neediest()
+            if key is None:
+                self.fill_s = 0.0
+                break
+            charge = self.charge_of(*key)
+            cost = fill_seconds(charge)
+            if self.fill_s + 1e-9 < cost:
+                break
+            self.fill_s -= cost
+            before = _barrels_open(self.powder_lb)
+            self.powder_lb = max(0.0, float(self.powder_lb) - charge)
+            after = _barrels_open(self.powder_lb)
+            if after < before:
+                self.barrels_emptied = int(self.barrels_emptied) + before - after
+            self.cartridges[key] = self.cartridges.get(key, 0) + 1
+            self.filled_by_gunner = int(self.filled_by_gunner) + 1
+            out.append(key)
+        self.recount()
+        return out
+
+    def receive(
+        self,
+        powder_lb: float = 0.0,
+        shot: Mapping[float, Mapping[str, int]] | None = None,
+        *,
+        when: str = "",
+        words: str = "",
+    ) -> None:
+        """Powder and shot taken in, as one transaction: the powder into the barrels below,
+        the shot into the lockers by calibre (a float, whatever the payload's key) and
+        kind, and the receipt entered in the gunner's account when it has words; the
+        gunner then reports the cartridges filled, and the powder's running out may be
+        said again."""
+        self.powder_lb = float(self.powder_lb) + max(0.0, float(powder_lb))
+        for pounder, kinds in (shot or {}).items():
+            locker = self.shot.setdefault(float(pounder), {})
+            for kind, n in kinds.items():
+                locker[str(kind)] = locker.get(str(kind), 0) + max(0, int(n))
+        if words:
+            self.enter(when, words)
+        self.report_filled = True
+        self.report_due = False
+        self.said_powder_out = False
+
+    def wanting(self) -> Wanting:
+        """What she wants to be complete: the establishment (the filled allowance's powder
+        and the barrels') less what is held (the filled cartridges' powder and the powder
+        below), in pounds and to the nearest whole barrel; and the fit's shot less what is
+        in the lockers. Never below nought."""
+        level = self.level or {}
+        established = sum(n * self.charge_of(*k) for k, n in level.items())
+        established += float(self.reserve_lb)
+        held = sum(
+            n * self.charge_of(*k) for k, n in self.cartridges.items() if isinstance(k, tuple)
+        )
+        held += float(self.powder_lb)
+        deficit = max(0.0, established - held)
+        shot: dict[float, dict[str, int]] = {}
+        for p, kinds in (self.shot_level or {}).items():
+            for k, n in kinds.items():
+                want = int(n) - int(self.shot.get(float(p), {}).get(k, 0))
+                if want > 0:
+                    shot.setdefault(float(p), {})[str(k)] = want
+        return Wanting(deficit, int((deficit + BARREL_LB / 2.0) // BARREL_LB), shot)
+
+    def enter(self, when: str, words: str) -> None:
+        """One line of the gunner's account."""
+        self.account = (*self.account, (str(when), str(words)))
+
+    def account_lines(self, last: int = 12) -> list[str]:
+        """The gunner's account's page: its last entries, each with its date where it has
+        one."""
+        if last <= 0:
+            return []
+        return [f"{when}: {words}" if when else words for when, words in self.account[-last:]]
+
+    def return_barrels(self) -> int:
+        """The barrels emptied since the last return, counted from nought again."""
+        n = int(self.barrels_emptied)
+        if n:
+            self.barrels_emptied = 0
+        return n
+
+    def words_of(self, key: tuple[str, float]) -> str:
+        """The guns of a kind as the magazine's lines name them: 'long 12-pounder' for one
+        gun, '12-pounder carronades' for more (more where the count is not known)."""
+        return gun_words(key[0], key[1], int((self.gun_count or {}).get(key, 2)))
+
+    def short_by(self) -> int:
+        """The cartridges short of the allowance, all kinds together."""
+        level = self.level or {}
+        return sum(max(0, n - int(self.cartridges.get(k, 0))) for k, n in level.items())
+
+    def describe(self, stopped: str = "") -> list[str]:
+        """The `the magazine` reading's lines: the gunner's count of the filled cartridges
+        against the allowance (and what he fills for, or why he is not filling for it now:
+        `stopped`, the words of `combat.filling.not_filling`, " by night"; the review's
+        finding: the reading said "the gunner filling" by night, with the hoy alongside and
+        struck, when nothing was filled), the powder below against the barrels'
+        establishment, the shot by calibre, and the rounds fired."""
+        level = self.level or {}
+        keys = list(level) + [k for k in self.cartridges if k not in level]
+        any_shot = any(n for kinds in self.shot.values() for n in kinds.values())
+        if not keys and self.powder_lb <= 0.0 and not any_shot:
             return ["The magazine is empty: she carries no powder."]
-        out = []
-        for p in sorted(self.cartridges):
+        parts = []
+        for k in keys:
+            n = int(self.cartridges.get(k, 0))
+            of = f" of {level[k]}" if k in level else ""
+            parts.append(f"{n}{of} for the {self.words_of(k)}")
+        head = "Filled cartridges: " + (", ".join(parts) if parts else "none")
+        if self.short:
+            needy = self.neediest()
+            if self.filling_held:
+                head += "; the filling stopped by order"
+            elif needy is not None and stopped:
+                head += f"; the gunner not filling for the {self.words_of(needy)}{stopped}"
+            elif needy is not None:
+                head += f"; the gunner filling for the {self.words_of(needy)}"
+            elif self.powder_lb > 1e-9:
+                head += "; too little powder below to fill more"
+            else:
+                head += "; no powder below to fill more"
+        out = [head + "."]
+        established = int(round(float(self.reserve_lb) / BARREL_LB))
+        below = powder_words(self.powder_lb, "none")
+        if established > 0:
+            plural = "s" if established != 1 else ""
+            out.append(f"Powder below: {below}, of {established} barrel{plural} established.")
+        else:
+            out.append(f"Powder below: {below}; no barrels established.")
+        shots = []
+        for p in sorted(self.shot, reverse=True):
             kinds = ", ".join(
                 f"{n} {k}" for k, n in (self.shot.get(p) or {}).items() if n or k == "round"
             )
-            fired = self.fired.get(p, 0)
-            head = f"{_pounder_words(p)}-pounder: {self.cartridges[p]} cartridges"
-            out.append(
-                f"{head}; shot {kinds or 'none'}"
-                + (f"; {fired} round{'s' if fired != 1 else ''} fired" if fired else "")
-                + "."
-            )
+            shots.append(f"{_pounder_words(p)}-pounder {kinds or 'none'}")
+        out.append("Shot: " + ("; ".join(shots) if shots else "none") + ".")
+        fired = sum(int(n) for n in self.fired.values())
+        if fired:
+            out.append(f"{fired} round{'s' if fired != 1 else ''} fired.")
         return out
 
 
+def _barrels_open(lb: float) -> int:
+    """The barrels the powder below is in, the last broached: the ceiling of its hundreds
+    of pounds."""
+    return math.ceil(max(0.0, float(lb)) / BARREL_LB - 1e-9)
+
+
+def _gun_count(fit: Any) -> dict[tuple[str, float], int] | None:
+    if fit is None:
+        return None
+    out: dict[tuple[str, float], int] = {}
+    for g in getattr(fit, "guns", None) or ():
+        key = (str(g.kind), float(g.pounder))
+        out[key] = out.get(key, 0) + 1
+    return out
+
+
+def _charges_of(
+    fit: Any, levels: Mapping[tuple[str, float], int]
+) -> dict[tuple[str, float], float]:
+    """A cartridge's charge for every kind of the fit's allowance: the file's `charges:`,
+    else `charge_lb` (a fit pickled before them, or a hand-written file without)."""
+    given = getattr(fit, "charges", None) or {}
+    out: dict[tuple[str, float], float] = {}
+    for key in levels:
+        got = given.get(key)
+        out[key] = float(got) if got is not None else charge_lb(key[0], key[1])
+    return out
+
+
+def _split_store(counts: Mapping[Any, int], guns: Iterable[Any]) -> dict[tuple[str, float], int]:
+    """A layout-1 store's counts by kind and calibre: the calibre keys split over the fit's
+    guns (`split_by_kind`), a key already by kind kept."""
+    out: dict[tuple[str, float], int] = {}
+    by_calibre: dict[float, int] = {}
+    for key, n in (counts or {}).items():
+        if isinstance(key, tuple):
+            k = (str(key[0]), float(key[1]))
+            out[k] = out.get(k, 0) + int(n)
+        else:
+            by_calibre[float(key)] = by_calibre.get(float(key), 0) + int(n)
+    for k, n in split_by_kind(by_calibre, guns).items():
+        out[k] = out.get(k, 0) + n
+    return out
+
+
+def _convert_70(store: Magazine, fit: FitSpec | None) -> None:
+    """A magazine of packages 70 to 72 (layout 1) brought to layout 2 once, logging and
+    drawing nothing: each calibre's cartridges and rounds fired split over the fit's guns of
+    that calibre by kind (`split_by_kind`); the allowance, the charges and the shot's level
+    from the fit (an old fit's calibre keys split the same way, its charges `charge_lb`'s);
+    no powder below, and the barrels' establishment the fit's (an old fit's nought, so an
+    old game has no reserve until she takes powder in)."""
+    guns = list(getattr(fit, "guns", None) or ()) if fit is not None else []
+    store.cartridges = _split_store(store.cartridges, guns)
+    store.fired = _split_store(store.fired, guns)
+    levels = fit_levels(fit)
+    store.level = dict(levels)
+    store.charges = _charges_of(fit, levels)
+    store.shot_level = {float(k): dict(v) for k, v in fit.shot.items()} if fit is not None else None
+    store.powder_lb = 0.0
+    store.reserve_lb = float(getattr(fit, "powder_barrels", 0) or 0) * BARREL_LB
+    store.gun_count = _gun_count(fit)
+    store.layout = MAGAZINE_LAYOUT
+    store.recount()
+
+
 def magazine(ship: Any) -> Magazine:
-    """The ship's magazine, kept in `ship.extra["magazine"]`, from her fit's figures."""
+    """The ship's magazine, kept in `ship.extra["magazine"]`: a function of the ship file,
+    the fit, the rounds fired, the gunner's filling and the ports' issues. Made at the
+    first call from the fit's figures, the cartridges filled to the allowance and the powder
+    below at the barrels' establishment; a magazine of packages 70 to 72 converted once."""
     extra = getattr(ship, "extra", None)
     if extra is None:
-        return Magazine()
+        return Magazine(layout=MAGAZINE_LAYOUT)
     store = extra.get("magazine")
     if isinstance(store, Magazine):
+        if store.layout < MAGAZINE_LAYOUT:
+            _convert_70(store, getattr(ship, "fit_spec", None))
         return store
     fit: FitSpec | None = getattr(ship, "fit_spec", None)
     if fit is None:
-        store = Magazine()
+        store = Magazine(layout=MAGAZINE_LAYOUT)
     else:
+        levels = fit_levels(fit)
+        reserve = float(getattr(fit, "powder_barrels", 0) or 0) * BARREL_LB
         store = Magazine(
-            cartridges={float(k): int(v) for k, v in fit.cartridges.items()},
+            cartridges=dict(levels),
             shot={float(k): dict(v) for k, v in fit.shot.items()},
+            layout=MAGAZINE_LAYOUT,
+            level=dict(levels),
+            charges=_charges_of(fit, levels),
+            shot_level={float(k): dict(v) for k, v in fit.shot.items()},
+            reserve_lb=reserve,
+            powder_lb=reserve,
+            gun_count=_gun_count(fit),
         )
     extra["magazine"] = store
     return store
