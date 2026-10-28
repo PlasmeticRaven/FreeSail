@@ -490,7 +490,9 @@ def crewed(world: World) -> list[Any]:
 
 
 def promote(world: World, vessel: Any) -> CrewedWorld:
-    """A far-detail vessel made a crewed ship beside the player's (spec M6 §19)."""
+    """A far-detail vessel made a crewed ship beside the player's (spec M6 §19): her World
+    made once, from her file at her truth; woken, not remade, when she has one asleep
+    (package 84, step 5)."""
     if vessel.crew is not None:
         if vessel.crew.shape == "far":
             _to_full(vessel)
@@ -503,35 +505,33 @@ def promote(world: World, vessel: Any) -> CrewedWorld:
 
 
 def _to_full(vessel: Any) -> None:
-    """A station's World kept in the far shape brought back to the full surface (spec M6
-    §20): the body remade from her file at her truth under the same World object, so that
-    the station is not reseated. Said in her log."""
+    """A sleeping World woken to the full surface (package 84, step 5; spec M6 §20 for a
+    station kept across the switch): her ship is the one she had, not remade from her file
+    (the parts, the damage, the company and their fatigue, the stores and the purse as she
+    left them; her `Rng` continuing), her body given the far body's truth it mirrored while
+    asleep, her sail set as the far body's word where the plan changed it; the station, if
+    one is seated, is not reseated. Said in her log."""
     crew = vessel.crew
-    from freesail.api.session import attach_crew, make_ship
-
-    sc = _crew_scenario(crew.parent, vessel)
-    ship = make_ship(vessel.ship_file, sc)
-    ship.name = vessel.name  # package 70
-    old_extra = getattr(crew.ship, "extra", None) or {}
-    crew.ship = ship
-    crew.ship.extra["rng"] = crew.rng
-    attach_crew(crew)
-    for key in ("agents", "agent_journals", "stations", "navigation", "standing", "player_seat"):
-        if key in old_extra:
-            crew.ship.extra[key] = old_extra[key]
     crew._geo_last = (0.0, 0.0)
     crew._position = vessel.position
     crew.shape = "full"
-    _set_sail(crew, vessel.sail_state)
+    crew.mirror_far()
+    if _sail_state_of(crew) != vessel.sail_state:
+        _set_sail(crew, vessel.sail_state)
+    if crew.navigation is not None and crew.position is not None:
+        crew.navigation.reckoning.set_position(
+            crew.position, crew.clock.tick, sigma_nm=PROMOTION_ACCOUNT_SIGMA_NM
+        )
     if getattr(crew, "fishery", None) is not None:
         from freesail.world.fishing import rig_gear_drag
 
-        rig_gear_drag(crew, crew.fishery)  # the trawl down on the new body (package 56)
+        rig_gear_drag(crew, crew.fishery)  # the trawl down on the body again (package 56)
     brain = vessel.brain
     if brain is not None:
         brain.fold_in(crew.captain)
+    seated = any(not h.agent.released for h in crew.agents.values())
     crew.record(
-        Severity.URGENT,
+        Severity.URGENT if seated else Severity.ROUTINE,
         "crew.promoted",
         f"{vessel.name} at full detail again: her company at their stations, the deck "
         "and the sails hers to work by every order.",
@@ -539,22 +539,55 @@ def _to_full(vessel: Any) -> None:
     )
 
 
+def write_damage(vessel: Any, crew: CrewedWorld) -> None:
+    """The near body's damage summed into the far body's record as she goes to sleep
+    (package 84, step 5; 74's ground, `combat/far.py`'s head): the killed and the wounded by
+    the muster's hurt, the guns dismounted, the shot holes and those below the water, the
+    spars wrecked and the sails blown out; the far fight's own counts (`hits`, `weight_lb`)
+    kept. Nothing of it is read yet beyond the record."""
+    from freesail.combat import hits as H
+    from freesail.ship.parts import SailState
+
+    ship = crew.ship
+    d = vessel.damage
+    muster = (getattr(ship, "extra", None) or {}).get("crew")
+    sailors = list(getattr(muster, "sailors", []) or [])
+    d["killed"] = sum(1 for x in sailors if x.hurt == "killed") + len(
+        getattr(muster, "dead", []) or []
+    )
+    d["wounded"] = sum(1 for x in sailors if x.hurt in ("wounded", "hurt"))
+    guns = getattr(ship, "guns", {}) or {}
+    d["dismounted"] = sum(1 for g in guns.values() if getattr(g, "dismounted", False))
+    keeper = H.damage_of(ship)
+    holes = list(getattr(keeper, "holes", []) or []) if keeper is not None else []
+    d["holes"] = len(holes)
+    d["holes_below"] = sum(1 for h in holes if h.get("below"))
+    d["spars_gone"] = sum(1 for sp in ship.spars.values() if getattr(sp, "wrecked", False))
+    d["sails_blown_out"] = sum(1 for sl in ship.sails.values() if sl.state == SailState.BLOWN_OUT)
+    d["slept_at"] = int(crew.parent.clock.tick)
+
+
 def demote(world: World, vessel: Any) -> None:
-    """A crewed ship folded back to far detail: her truth and her captain's state into
-    the far body and the brain; her World dropped, or kept in the far shape while a
-    station is seated on her (spec M6 §20)."""
+    """A crewed ship put to sleep (package 84, step 5): her truth and her captain's state
+    into the far body and the brain, her damage into the far body's record, and her World
+    kept in the far shape with the physics off (`far_tick`), her company, her stores, her
+    purse and her damage hers until she wakes without being remade (`_to_full`); said in
+    her log, urgent where a station is seated on her (spec M6 §20: the station's whole
+    surface changes, and a station standing by is woken to be told its shape). Before this
+    step her World was dropped and remade at the next promotion."""
     crew = vessel.crew
     if crew is None:
         return
     mirror(vessel, crew, minute=True)
     brain = vessel.brain
-    if brain is not None and crew.shape == "full":
-        brain.fold_back(crew.captain)
+    if crew.shape == "full":
+        if brain is not None:
+            brain.fold_back(crew.captain)
+        write_damage(vessel, crew)
     seated = any(not h.agent.released for h in crew.agents.values())
+    crew.shape = "far"
+    crew._far_anchored = bool(vessel.plan) and vessel.plan[0][0] == "anchor"
     if seated:
-        # urgent in her log (package 43): the station's whole surface changes, and a
-        # station standing by is woken to be told its shape
-        crew.shape = "far"
         crew.record(
             Severity.URGENT,
             "crew.demoted",
@@ -564,13 +597,28 @@ def demote(world: World, vessel: Any) -> None:
             data={"id": vessel.id},
         )
     else:
-        # her persons and the things they keep out of the world's one registry with her
-        # World (package 84, step 2); step 5 keeps her instead
+        crew.record(
+            Severity.ROUTINE,
+            "crew.demoted",
+            f"{vessel.name} asleep at far detail: beyond the range of the ship, her body is "
+            "the plan's and her hull keeps as she left it, to wake unchanged when she is near "
+            "again.",
+            data={"id": vessel.id, "asleep": True},
+        )
+    world.vessels.crewed_ids = _crew_ids(world)
+
+
+def release_done(world: World) -> None:
+    """A vessel gone from the sea (`done`) gives up her World (package 84, step 5): her
+    persons and the things they keep out of the one registry, as the drop did before."""
+    for v in world.vessels.vessels:
+        crew = v.crew
+        if crew is None or not v.done:
+            continue
         people = getattr(crew, "people", None)
         if people is not None and hasattr(people, "discharge"):
             people.discharge()
-        vessel.crew = None
-        vessel.detail = "far"
+        v.crew = None
     world.vessels.crewed_ids = _crew_ids(world)
 
 
@@ -633,6 +681,7 @@ def switch(world: World) -> None:
     cap, a ship in dealings with the player before a nearer one that is not, and a
     dealing ship within the range taking the place of the farthest crewed ship that has
     none when the cap is full."""
+    release_done(world)
     centre = world.position
     if centre is None:
         return

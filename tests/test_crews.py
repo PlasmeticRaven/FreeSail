@@ -73,12 +73,13 @@ def test_a_vessel_with_a_brain_within_the_range_is_promoted_and_demoted_beyond_i
     w.world_order('ship "X": intent bound for 49 30 N 6 30 W')
     for _ in range(400):
         w.run(60)
-        if b.crew is None:
+        if b.crew.shape == "far":
             break
     d = nm_between(w.position, b.position)
-    assert b.crew is None and b.detail == "far" and d >= K.CREWED_DEMOTE_NM - 0.2
+    # since package 84, step 5, the demotion is a sleep: her World is kept in the far shape
+    assert b.crew.shape == "far" and b not in K.crewed(w) and d >= K.CREWED_DEMOTE_NM - 0.2
     assert b.brain.state == "on passage" and b.plan and b.plan[0][0] == "to"
-    assert w.vessels.crewed_ids == ()
+    assert w.vessels.crewed_ids == (b.id,)  # her World alive, asleep (step 5)
     assert not w.vessels.to_dict()[0]["crewed"]
 
 
@@ -112,8 +113,8 @@ def test_the_cap_holds_the_nearest_first_and_a_ship_in_dealings_before_a_nearer_
     # of the farthest crewed ship that is not
     ships[3].dealing_tick = w.clock.tick
     w.run(60)
-    assert ships[3].crew is not None and ships[2].crew is None
-    assert len(w.vessels.crewed_ids) == K.CREWED_CAP
+    assert ships[3].crew is not None and ships[2].crew.shape == "far"  # asleep (step 5)
+    assert len(K.crewed(w)) == K.CREWED_CAP  # awake; `crewed_ids` counts the sleepers too
     # a vessel at anchor or in port is not promoted, and a crewed one that anchors is demoted
     from freesail.world import brains as B
 
@@ -122,7 +123,7 @@ def test_the_cap_holds_the_nearest_first_and_a_ship_in_dealings_before_a_nearer_
     B.resolve_state(ships[0], "at anchor", ships[0].brain)
     ships[0].crew.captain._enter("at anchor")
     w.run(60)
-    assert ships[0].crew is None and ships[2].crew is None
+    assert ships[0].crew.shape == "far" and ships[2].crew.shape == "far"
 
 
 def test_a_checkpoint_carries_a_crewed_ship_and_ticks_on_alike(tmp_path):
@@ -179,7 +180,8 @@ def test_truth_87_the_brig_promoted_sails_near_the_track_her_polar_gave_her():
     miles_near = east_near * 60.0 * 0.65
     assert abs(miles_near - miles_far) <= 1.5, (miles_near, miles_far)
     K.demote(w, near)
-    assert near.crew is None and [leg[0] for leg in near.plan] == [leg[0] for leg in plan_before]
+    assert near.crew.shape == "far"  # asleep, not dropped (package 84, step 5)
+    assert [leg[0] for leg in near.plan] == [leg[0] for leg in plan_before]
 
 
 @pytest.mark.pace
@@ -799,3 +801,108 @@ def test_a_word_said_as_a_person_ashore_reaches_another_ships_captain_landed_the
     w.run(3 * 3600)
     assert skipper.aboard and skipper.hull == v.id
     assert TH.place_of(w, packet)[3] == v.id and "keeping" in TH.where_words(w, packet)
+
+
+# ---------------------------------------------------------------------------
+# Package 84, step 5: the ship persists, sleep and wake in place of drop and remake
+# ---------------------------------------------------------------------------
+
+
+def _asleep(w, b) -> None:
+    """Sail her beyond the range by an intent away from the ship until she sleeps."""
+    w.world_order(f'ship "{b.name}": intent bound for 49 30 N 6 30 W')
+    for _ in range(400):
+        w.run(60)
+        if b.crew is not None and b.crew.shape == "far":
+            return
+    raise AssertionError("not demoted")
+
+
+def test_a_ship_demoted_sleeps_with_her_damage_and_wakes_the_same_ship(tmp_path):
+    """Package 84, step 5 (the design's §2.6): the demotion is a sleep, not a drop. A brig
+    promoted beside the frigate, holed below the water with a gun dismounted and three men
+    wounded, sails beyond the range: her World is kept in the far shape with the physics
+    off, her company stays in the one registry, the far body's record has her damage
+    summed (`Vessel.damage`: the wounded, the gun, the hole), and her line says she is
+    asleep; the far body moves her and the kept ship mirrors it. Brought near again she
+    wakes without being remade: the same ship object, the hole, the gun and the wounded as
+    she left them, her line saying she is at full detail again. A checkpoint written while
+    she sleeps carries her World and wakes it alike. A vessel gone from the sea gives up
+    her World and her people."""
+    from freesail.combat import hits as H
+
+    w = hove_to_world()
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    crew = b.crew
+    assert crew is not None and crew.shape == "full"
+    ship = crew.ship
+    hers = [p for p in w.registry.persons() if p.home == b.id]
+    assert len(hers) >= 8
+    muster = ship.extra["crew"]
+    for s in muster.sailors[:3]:
+        s.hurt = "wounded"
+    H.damage_of(ship).holes.append({"side": "larboard", "below": True, "x_m": 3.0})
+    gun = next(iter(ship.guns.values()))
+    gun.dismounted = True
+    _asleep(w, b)
+    assert b.crew is crew and crew.shape == "far" and b.detail == "crewed"
+    assert b.id in w.vessels.crewed_ids and b not in K.crewed(w)
+    assert [p for p in w.registry.persons() if p.home == b.id] == hers
+    assert b.damage["wounded"] == 3 and b.damage["killed"] == 0
+    assert b.damage["dismounted"] == 1 and b.damage["holes"] == 1 and b.damage["holes_below"] == 1
+    said = [e for e in crew.log if e.kind == "crew.demoted"]
+    assert said and "asleep" in said[-1].text and said[-1].data["asleep"]
+    assert said[-1].severity.value == "routine"  # no station to tell
+    p0 = crew.position
+    w.run(600)
+    assert crew.position != p0 and crew.position == b.position
+    assert crew.ship is ship and not any(e.kind == "crew.promoted" for e in list(crew.log)[-20:])
+    # a checkpoint written while she sleeps carries her World, asleep, and wakes it alike
+    path = replay_mod.write_checkpoint(w, tmp_path / "asleep.ckpt")
+    _, c = replay_mod.read_checkpoint(path)
+    cb = c.vessels.get(b.id)
+    assert cb.crew is not None and cb.crew.shape == "far" and cb.damage == b.damage
+    # near again: awake, the same ship, her damage as she left it
+    for world, vessel in ((w, b), (c, cb)):
+        vessel.position = world.position.advanced(0.0, 3.0 * units.NAUTICAL_MILE)
+        world.run(61)
+        assert vessel.crew.shape == "full"
+    assert crew.ship is ship
+    assert sum(1 for s in muster.sailors if s.hurt == "wounded") == 3
+    assert len(H.damage_of(crew.ship).holes) == 1 and gun.dismounted
+    woke = [e for e in crew.log if e.kind == "crew.promoted"]
+    assert len(woke) == 2 and "at full detail again" in woke[-1].text
+    assert cb.crew.ship.extra["crew"] is not muster
+    assert sum(1 for s in cb.crew.ship.extra["crew"].sailors if s.hurt == "wounded") == 3
+    # gone from the sea, she gives up her World and her people
+    b.done = True
+    w.run(60)
+    assert b.crew is None and not [p for p in w.registry.persons() if p.home == b.id]
+    assert b.id not in w.vessels.crewed_ids
+
+
+def test_a_ship_woken_keeps_her_streams_and_her_sail_follows_the_plans_word():
+    """Package 84, step 5: woken, a ship's `Rng` is the one she had (her streams continue,
+    where the remake began them again: the design's §3.3 names what may move by it), and
+    her sail is set as the far body's word only where the plan changed it while she slept
+    (reefed for weather asleep, she wakes under reefed topsails)."""
+    w = hove_to_world()
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    crew = b.crew
+    rng = crew.rng
+    drawn = crew.rng.stream("muster").random()
+    _asleep(w, b)
+    b.sail_state = "under reefed topsails"
+    b.position = w.position.advanced(0.0, 3.0 * units.NAUTICAL_MILE)
+    K.promote(w, b)  # as the switch does at its minute
+    assert crew.shape == "full" and crew.rng is rng
+    assert crew.rng.stream("muster").random() != drawn
+    assert K._sail_state_of(crew) == "under reefed topsails"  # before her captain's judgement
+    w.run(61)
+    assert crew.shape == "full"

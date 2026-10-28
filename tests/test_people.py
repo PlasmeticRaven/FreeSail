@@ -837,12 +837,17 @@ def test_the_persons_of_every_hull_are_one_registry_and_each_company_a_view_of_i
     assert w.people.find(crew.people.captain.name) is None
     assert w.people.find_anywhere(crew.people.captain.name) is crew.people.captain
     assert crew.people.find("the captain") is crew.people.captain
-    # her World dropped at the demotion, her persons leave the registry
+    # her World sleeps at the demotion (package 84, step 5) and her persons stay in the
+    # registry, asleep aboard her; gone from the sea she gives them up
     w.world_order('ship "X": intent bound for 49 30 N 6 30 W')
     for _ in range(400):
         w.run(60)
-        if b.crew is None:
+        if b.crew.shape == "far":
             break
+    assert b.crew.shape == "far" and reg.hulls == [w.own.id, b.id]
+    assert mate in w.people.everyone and mate not in w.people.all
+    b.done = True
+    w.run(60)
     assert b.crew is None and reg.hulls == [w.own.id] and w.people.everyone == w.people.all
 
 

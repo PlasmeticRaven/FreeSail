@@ -11157,3 +11157,52 @@ was withdrawn** rather than three figures re-pinned: the far course takes the ca
 marks instead (`shape a course for Plymouth via the Start`, package 45's `via` on the
 intents' grammar), and the land guard's refusal names the way; nothing recorded moves. The
 fast tier on the mended tree is below.
+
+**The pace tests alone on the mended step 4 tree** (`--slow -m pace`, this container, quiet):
+all passed but truth 7-159 (the convoy of six at far detail) at 493 ticks a second for the
+build machine's floor of 500, which the cloud runner also misses (476 "as before", the
+lead's record of the merge); the step touches nothing of the far bodies' tick, and the
+figure is the container's.
+
+### Step 5: the ship persists, sleep and wake in place of drop and remake
+
+Built on step 4 (the design note's postscript "Step 5" has the shape). **What moved:
+nothing pinned in the fast tier**; the design's §3.3 names what may move by the step (a
+ship woken twice in one passage draws from streams that continued, where the remake began
+them again), and the slow tier of the trials and the known truths is the bisection's ground
+(below). **The count.** `crews.py` alone in the game (`demote` a sleep, `_to_full` a wake
+without `make_ship`, `write_damage`, `release_done`, the switch releasing the done first);
+`tests/test_crews.py` (two tests new; four assertions of a dropped World became assertions
+of a sleeping one, the cap counted by `crewed()`); the records.
+
+**The checkpoint with sleeping Worlds** (`replay.write_checkpoint`, gzipped, this
+container): the frigate hove to with three brigs promoted beside her, 601,556 bytes at two
+minutes; the three sailed beyond the range and asleep, 704,775 bytes at the demotion's
+tick; the same tick with the three Worlds dropped as before the step, 704,756 bytes: the
+three sleeping Worlds add nineteen bytes the gzip can see (their parts, company and log are
+near copies of one another's and of what the log already holds), the growth being the
+log's. The bound in `test_checkpoint.py` (2 MB) stands with room; the per-hull statement the
+brief asks for is this: a sleeping brig's World costs the checkpoint nothing measurable
+beside her log, and a kept save's size is its logs'.
+
+**The pace with sleeping Worlds** (truth 51's form, the best of three thousands, this
+container quiet, load 0.7 to 1.0): the frigate hove to with three brigs awake beside her
+(truth 88's setting) 213 to 256 ticks a second over three runs; the same three sailed
+beyond the range and asleep, their Worlds kept and far-ticked, **459 and 490**; the same
+three demoted on the tree before this step (`e38a3e2`, their Worlds dropped), **530**. A
+sleeping World costs a thirty-seventh of the pace each (the far tick's clock, mirror, wind
+step and lookout minute), an awake one a third; `tools/pace.py crewed --ships 3` on this
+tree 179 ticks a second (the owner's machine ticked twelve awake above sixty). The pace
+tests alone on this tree: all passed but truth 7-159 at 461 for the floor of 500, the
+container's figure as at step 4 (493) and on the cloud runner (476), nothing of the far
+bodies' tick touched by the step. The script's own "dropped" phase on this tree (the
+Worlds set to None by hand, 132 and 142) is not the old road and is not the figure: the old
+road is the measurement on `e38a3e2`.
+
+**The suites on the step 5 tree** (`c8a70cd`'s tree): ruff clean; the fast tier whole,
+three workers: 1 failure, the pictures' blank-image check under load (passes alone); the
+known truths' slow tier whole with the trials, the crews, the checkpoint, the business, the
+brains and the squadrons (`--slow -m "slow and not pace"`, three workers): 1 failure, the
+lee-shore trial's digest, the container's difference recorded at step 3; the pace tests
+alone as above. Nothing pinned moved: no recorded passage wakes a ship twice (the design's
+§3.3 said where to look, and the trials' and the truths' pins stand).
