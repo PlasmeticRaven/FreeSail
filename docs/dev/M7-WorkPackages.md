@@ -41,7 +41,7 @@ on these packages; that is the owner's choice.
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | approved and launched 2026-10-24 (Fable, in a worktree off `ca305c4`); **that run lost with the machine's rebuild during the pause of 2026-10-24 to 27 (its worktree and unpushed branch gone); relaunched 2026-10-27 off `7da0c0e`** |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52) |
-| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | behind 70 |
+| 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
@@ -1160,7 +1160,7 @@ intent binds.
 `docs/agents/consent/` or `docs/agents/ConsentBrief.md` (if the brief's wording offends the
 rule, say so for 55). **The head rules bind** as the briefs before have them.
 
-## Package 84: the one-world refactor (`freesail/world/hulls.py` new, the Hull; `freesail/core/world.py` the World split and the two-phase tick; `freesail/world/crews.py` the switch alone, `CrewedWorld` retired; `freesail/world/people.py`, `hearing.py`, `movement.py`, `things.py`, `stations.py` one registry of persons and things with the whereabouts; `freesail/world/ports.py` and `dealings.py` new, the ports' half and the hull's half; `freesail/world/ships.py`, `brains.py`, `squadrons.py`, `signals.py`, `signalling.py`, `hail.py`, `combat/action.py` the player's vessel of the sea and `PLAYER_ID` one rule; `freesail/world/business.py`, `data/business.yaml` the far trader's transaction; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the forms with a hull and the truth over the hulls; `freesail/api/readings.py` the station line and the truth; `freesail/agents/harness.py`, `remote.py`, `tools.py`, `seats.py` the hull in the World's place; `freesail/core/replay.py`, `acts.py` the hull on the inputs, the save's hulls block, the checkpoint's converter; `freesail/ui/server.py`, `console.py`, `harbour.py` the followed hull; `docs/TechnicalSpec-M6.md` §19 and §20, `docs/TechnicalSpec-M7b.md` §11, §12 and §12b "as built" pointers; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` the acceptance test as a truth numbered after 73's)
+## Package 84: the one-world refactor (`freesail/world/hulls.py` new, the Hull; `freesail/core/world.py` the World split and the two-phase tick; `freesail/world/crews.py` the switch alone, `CrewedWorld` retired; `freesail/world/people.py`, `hearing.py`, `movement.py`, `things.py`, `stations.py` one registry of persons and things with the whereabouts; `freesail/world/ports.py` and `dealings.py` new, the ports' half and the hull's half; `freesail/world/ships.py`, `brains.py`, `squadrons.py`, `signals.py`, `signalling.py`, `hail.py`, `combat/action.py` the player's vessel of the sea and `PLAYER_ID` one rule; `freesail/world/business.py`, `data/business.yaml` the far trader's transaction; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the forms with a hull and the truth over the hulls; `freesail/api/readings.py` the station line and the truth; `freesail/agents/harness.py`, `remote.py`, `tools.py`, `seats.py` the hull in the World's place; `freesail/core/replay.py`, `acts.py` the hull on the inputs, the save's hulls block, the checkpoint's converter; `freesail/ui/server.py`, `console.py`, `harbour.py` the followed hull; `docs/TechnicalSpec-M6.md` §19 and §20, `docs/TechnicalSpec-M7b.md` §11, §12 and §12b "as built" pointers; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` the acceptance test as a truth; **84's truths are numbered 7-200 onward**, 75's 7-185 to 7-199, 85's 7-240 onward, so that packages built apart do not collide)
 
 **The owner's eight decisions were taken as the study proposed on 2026-10-27 (decision 53 in `docs/DesignProposal.md`); where an item below says it waits on one, it no longer does, and the log's holding in decision 2 is to be measured for storage before any hull's log is dropped.**
 
@@ -1328,3 +1328,68 @@ judged); his tree extracted at `/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-
 
 **The head rules bind** as the briefs before have them; the builder pushes its branch to
 `claude/pkg-86` after each commit.
+
+## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
+
+**Built by the owner's own local session** (his word of 2026-10-28), from the head of
+`claude/dreamy-darwin-d77nty` after package 86 is merged (the lead names the commit), on a
+branch `claude/pkg-75` pushed to the origin; the lead reviews and merges, and runs the suite
+on the build machine. The session works in a fresh clone that keeps the remote (never a
+copied folder made into its own repository), commits on `claude/pkg-75` only, pushes that
+branch only, never pushes to or rebases `claude/dreamy-darwin-d77nty`, never force-pushes,
+and does not merge; the owner's machine gives different digests from the build machine's
+(decision 26), so its truths pin states, counts, ticks and bands, never digests. Spec M7 §27
+and §28 (the Bermuda sloop's description for later), §7 as built by 70 and extended by 86
+(the magazine by kind, the fits, the pivot gun with its arc to be made per gun), §8a's
+quarter bill, 73's marines' detachment and kit, 72's naval knobs, 71's colours and signals
+root; the owner's note of 2026-10-24 (the ship's sub-types as fits and roles the scenario
+editor selects and customises in their reasonable degrees) and decision 53's note on 75.
+Each item an intent with the lead's reading; the intent binds; the session designs within
+them and says what it took another way.
+
+1. **The *Indefatigable*** (the razee of 1795, 44 guns, 24-pounders on the gun deck, her
+   carronades, her people some 330): the file through the generator from her draughts and
+   Winfield, the Establishments and Lavery, every figure with its source or marked
+   judgement; her sail plan and spars as the frigate's are drawn, her polar measured and
+   recorded; her quarter bill and her marines' detachment; her fits (as razeed 1795; later
+   armaments as data for the scenario editor); a far description and a vessel type.
+2. **The *Prince de Neufchatel*** (the privateer of 1812, the hermaphrodite brig or
+   schooner rig as the sources have her, her long guns and carronades, her large crew for
+   prizes): the same, with the rig's peculiarities recorded for the physics' reading (the
+   physics is not changed; where her rig needs a sail class the engine lacks, say so for the
+   lead rather than approximate silently); her privateer's fits; an American vessel of
+   1812 under 71's basic signals system.
+3. **A 74** (the *Bellona* or the *Bellerophon*, the lead's two candidates; the session may
+   choose with its reason): the two-decker's file through the generator, her lower deck's
+   32-pounders and their ports' sills against the heel (70's lee ports shut within a foot of
+   the water, the famous reason), her upper deck and quarterdeck, her people some 590, her
+   quarter bill by deck, her marines; her sail plan and spars; her polar; the pace of a
+   74 crewed measured against the floors and recorded (the muster is three times the
+   frigate's); a scenario that puts her on the sea.
+4. **The sub-types as fits and roles.** Each file's fits named and described so that the
+   scenario editor may select and customise them in their reasonable degrees: the armed
+   Indiaman as a role of the merchant ship with her guns and morale (74's and 70's
+   decisions: an Indiaman is not a merchantman who strikes at the first telling broadside),
+   the revenue cutter, the hired armed cutter, the privateer, the packet; the roles'
+   doctrine files where a role is new (`data/captains/`); the generator the one place a
+   fit is written.
+5. **Every file's armament, quarter bill and marines from 70's and 73's shape.** The
+   schooner, the lugger and the smack given their fits and quarter bills (left to 75 by
+   70); the pivot gun's arc made per gun in the generator (86's global constant retired)
+   with the Dolphin's and the schooner's arcs sourced; the fillers as posts where 73 or 86
+   left them as a judgement; the marines' kit by nation from 73's data.
+6. **Truths and records.** Truths 7-185 to 7-199 (each ship's particulars against her
+   sources within the test's bands; the generator byte-identical for every file; the
+   Indefatigable's broadside rate and weight against the frigate's by 70's rule; the 74's
+   lower ports shut at the heel the sources give; the 74's pace; the Prince de Neufchatel's
+   polar's best point); a scenario per ship; spec §27 as built; the primer's ships chapter;
+   the tuning notes (each figure's source, the polars, what was taken another way, found on
+   the way, the suite as run on the owner's machine: the fast tier and the touched files'
+   slow tier; the whole slow tier and the pace tests the lead's on the build machine).
+
+**Not built here:** the physics (read, not changed; a rig the engine lacks is reported);
+the boats as files (82's); the viewer's hull (81's); the Bermuda sloop (the Caribbean's
+block, 79 or later). **The head rules bind** as the briefs before have them: no model
+identifier in any file or commit; nothing under `docs/agents/consent/` touched; the ship
+files never edited by hand; the pins re-measured only where a change moves them, old
+beside new, proven; never a test skipped, disabled or quarantined; realism, not pacing.
