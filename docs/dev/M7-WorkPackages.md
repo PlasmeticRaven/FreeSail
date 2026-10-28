@@ -46,7 +46,7 @@ on these packages; that is the owner's choice.
 | 70 | Fable | The combat core: the quarter bill and work in action, guns as parts, the gunnery's cycle, the hit model with heel, roll and the sea, damage as state, morale and the strike, the fighting book; the first armament and truths; the figures' sources (spec §7 to §10, §8a) | **merged 2026-10-24** (`80f64f7`); the record below |
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
-| 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | approved and launched 2026-10-24 (Fable, in a worktree off `ca305c4`); **that run lost with the machine's rebuild during the pause of 2026-10-24 to 27 (its worktree and unpushed branch gone); relaunched 2026-10-27 off `7da0c0e`** |
+| 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52) |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
@@ -56,9 +56,9 @@ on these packages; that is the owner's choice.
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); **the eight decisions taken as proposed (decision 53, 2026-10-27)**; launches when 73 and 86 are merged |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 and 2 launched 2026-10-28 as a sibling session on `claude/pkg-84` off `ec56664`, beside 86; step 3 onward from the head after 86's merge** |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
-| 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | briefed 2026-10-27 (below); launches the moment 73 is merged |
+| 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | launched 2026-10-28 (Opus, in a worktree off `ec56664`) |
 | 87 | Fable | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief once most of the milestone's orders are in, after 73, 77 and 84 |
 | 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
@@ -271,6 +271,61 @@ package's). **Decisions for the owner:** the seasonal bound stays under its swit
 judged on a passage of days; the regimes' knobs are judgement (a sortie when the offing is
 clear fifteen miles or the blockade station, the wind under 22 knots, a commission in two
 to five days); merchantmen stay brainless and far under every cap.
+
+### Package 73 as merged (2026-10-28)
+
+Merged `--no-ff` from the builder's worktree (twelve commits on `7da0c0e`, the design note
+first, every commit pushed to `claude/pkg-73`; 96 files, ~10,600 lines) with no conflict;
+ruff clean; the lead's sweeps clean (no consent file; the ship files regenerated
+byte-identical; the four physics files touched only by state hooks rule 1 wants: the
+metacentric height read as she floats, the held states of a foundered or grappled hull, a
+preventer taking a parting line's strain). The first run of this package was lost with the
+machine's rebuild of 2026-10-24 to 27; the second rode through a restart on the 27th with
+its disk intact. The builder ran the fast tier whole on its last tree (3,689 passed, two
+failed: the pictures test under load, passing alone, and its own stiffness line, mended and
+its file rerun), the slow tier whole on that tree (334 passed, none failed, 11 expected
+failures) and the pace tests alone (9 passed, truth 7-159 at 481 against 500 on this loaded
+machine, as 72's own first run had it; not re-pinned); after them one line of `water.py`
+and the notes changed. **The whole suite on the merged tree is the lead's in the cloud by
+the whole-suite workflow (the figures below when it ends).** Built as briefed, generously:
+**the water in the ship** one quantity the keeper sums each tick (shot holes by the orifice
+law, the ground, the seams working in a roll, the sea shipped unless battened, the
+director's causes), the well's depth and the carpenter's feet, **the pumps** the ship
+file's through the generator as the hands' work by spells, the weather's water pumped
+every glass unasked, **the free surface** taking the metacentric height, **foundering**;
+**damage control and jury work** as evolutions competing for hands (the plugs by the hole's
+place, fothering, fishing, preventers and slings, the rigging set up, a mast cut away, a
+jury mast, the owner's `reeve new lines`), the damage report naming everything; **the
+muster's states** (hurt, wounded light, grave or invalid, sick, killed), the surgeon and his
+mates as posts with their queue and courses, the sick list at eight, the needs' ends, the
+burial, the morning report and the butcher's bill; **a station holder hurt at parity** (his
+own urgent line, the deck kept or given, the grave wound's collapse into a carried-below
+stand-by, the judgement that ends the station, the command passing by the bill); **the
+marines' kit by nation as data** and their musketry within musket shot of a near deck;
+**the fight on deck** (`lay her aboard`, `grapple her`, `boarders away`, `repel boarders`, a
+round a minute by strengths, carried or repulsed); **the doctrine in data** read by the
+captain's own minute; the readings, events, forms and samples; the leak scenario; truths
+7-172 to 7-184; spec §9, §11, §11a, §13 to §17 as built, Harness §21f, primer chapter 25,
+the tuning notes.
+
+**Taken another way, accepted:** the marines stand at 70's carronades at quarters until
+ordered to their muskets; the grapnels hold from the throw; the doctrine's standing orders
+replaced by the captain's own minute; the wounds' draws on a health stream of their own so
+70's and 71's gunnery runs as it did. **Pins:** the first action's strike 11:12 to 11:43,
+the mover the small arms served out by both captains on entering the action (bisected,
+kept for realism, `board_odds: 0` turns it off per role); the trade-stranger trial one line
+(the butcher's bill's "nobody hurt"); the lee-shore trial and gate 5a's day moved under an
+early keeper and are back to their pins exactly after two mends the trials themselves
+found (the pumps' crews kept all day by the weather's water; a sound ship in a blow passing
+the free surface's tenth). **Found on the way, fixed:** a man hit at tick 0 taken as hit
+now; a person marked dead before the lookups never told and the command never passed;
+`man the boats` hinting `man the pumps`; a foundered ship accepting orders of work; a
+privateer whose boarding was refused standing off and never firing. **Found, carried:**
+the pictures test and the fingerprint test under load; truth 7-159's pace on a loaded
+machine. **For package 84:** the places the work assumes the player's ship the only crewed
+one are listed in the builder's report (the small arms' and boarding's `_own_id`, the
+founder's report to the parent, the keepers one per World), all of the kind step 1's
+delegation handles.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
