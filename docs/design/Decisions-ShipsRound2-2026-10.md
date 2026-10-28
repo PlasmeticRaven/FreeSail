@@ -30,7 +30,7 @@
   - c. 1794-95, with the lateen mizen yard on the lateen class (D9(c)) and the 1793 and 1794 fits;
   - 1801-1815, with the gaff, the 1795-1805 fit (82 pieces) and an 1815 fit.
 - **The hull:** ZAZ1357 as drawn.
-- **The sill:** *Elephant*'s 5.6 ft at the drawn line, as recommended. It is put to the owner again since the *Bellona*'s own report gives 5 ft 2 in (§13.2).
+- **The sill:** first *Elephant*'s 5.6 ft at the drawn line, as recommended. Revised by the owner the same day to the *Bellona*'s own reported 5 ft 2 in at Channel draught (§13.2), so the lee port shuts at 10.6°. The design reconciles the hull profile with it.
 - **The lee-port rule:** heel with the roll's amplitude, the sill and the half-breadth both from the hull profile (for every ship, under D12(b)).
 - **The quarter bill:** by deck, with a deck key on each gun.
 - **The company:** 590, with a rear-admiral's flag as a fit.
