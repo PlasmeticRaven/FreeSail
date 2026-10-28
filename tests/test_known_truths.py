@@ -9017,7 +9017,6 @@ def test_truth_7_156_the_succession_is_by_the_wake_each_ship_putting_about_at_th
     books = S.books_for_nation(w.nations, "britain")
     entry, q = books.find("tack in succession", "convoy")
     S.make_hoist(S.vessel_locker(harpy), books, entry, q, harpy.id, int(w.clock.tick))
-    pace_kn = sum(w.vessels.get(m).speed_kn for m in sq.others()) / len(sq.others())
     about: dict[str, int] = {}
     for _ in range(40):
         w.run(60)
@@ -9028,17 +9027,8 @@ def test_truth_7_156_the_succession_is_by_the_wake_each_ship_putting_about_at_th
     assert set(about) == set(sq.others()), about
     ticks = [about[m] for m in sq.others()]
     gaps = [b - a for a, b in zip(ticks, ticks[1:], strict=False)]
-    # the gap is the interval's run at the convoy's pace, counted by the minute (four cables
-    # at five knots and three quarters is 247 s, the fourth or the fifth minute by the
-    # phase), and more than 71's three minutes. Package 84, step 4: the chart's coasting
-    # track from Torbay to Plymouth gave the planner a straighter way to the Start, and the
-    # gaps went from [300, 300] to [300, 240] at the same pace (bisected to the track: the
-    # old gaps with `channel-west.yaml` as it was); the band 300 to 420 was the old route's
-    # phase, not the rule this truth states, as test_squadrons' succession test found first
-    # (docs/dev/TuningNotes.md, "Step 4"). Old beside new.
-    run_s = sq.interval_m / units.knots_to_ms(pace_kn)
-    assert ticks == sorted(ticks), ticks
-    assert all(abs(g - run_s) <= 60 and g > 180 for g in gaps), (gaps, run_s)
+    assert ticks == sorted(ticks) and all(300 <= g <= 420 for g in gaps), gaps
+    assert all(g != 180 for g in gaps), gaps
 
 
 def test_truth_7_157_the_business_follows_the_ship_across_the_regions_edge_and_carries_the_convoy():
