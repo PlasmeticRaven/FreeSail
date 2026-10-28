@@ -25,7 +25,23 @@
 
 **The owner's word on the viewer (2026-10-27).** "Changing the viewer is alright now." The sourced hull profile, and drawing it properly in the viewer, are part of this package and are to be properly implemented.
 
-**The 74 (2026-10-28).** The owner chose HMS *Bellerophon*, the Arrogant-class 74 of 1786 on the Bellona-class draughts, as this package's 74 (`Research-74-2026-10.md` §1.2). A *Téméraire*-class French 74 is the second ship of the line, a later goal outside this package. The note's other questions (§11, 2-18) are not yet answered.
+**The 74 (2026-10-28).** The owner chose HMS *Bellerophon*, the Arrogant-class 74 of 1786 on the Bellona-class draughts, as this package's 74 (`Research-74-2026-10.md` §1.2). A *Téméraire*-class French 74 is the second ship of the line, a later goal outside this package. The owner answered the note's other questions (§11, 2-18) the same day, by number, in the note's §13.1. In brief:
+- **Two files, one for each rig era:**
+  - c. 1794-95, with the lateen mizen yard on the lateen class (D9(c)) and the 1793 and 1794 fits;
+  - 1801-1815, with the gaff, the 1795-1805 fit (82 pieces) and an 1815 fit.
+- **The hull:** ZAZ1357 as drawn.
+- **The sill:** *Elephant*'s 5.6 ft at the drawn line, as recommended. It is put to the owner again since the *Bellona*'s own report gives 5 ft 2 in (§13.2).
+- **The lee-port rule:** heel with the roll's amplitude, the sill and the half-breadth both from the hull profile (for every ship, under D12(b)).
+- **The quarter bill:** by deck, with a deck key on each gun.
+- **The company:** 590, with a rear-admiral's flag as a fit.
+- **The marines:** as suggested, with leave to use TNA's Trafalgar Ancestors.
+- **The guns and their crews:** by the sources (Falconer and Douglas). This departs from D31(a)'s rule for the razee; whether she follows is open.
+- **Ground tackle and boats:** by Steel's tables, as D33.
+- **The best speed:** about 11 kn.
+- **The scenario:** Basque Roads, July 1815.
+- **D25:** stays open.
+
+The owner's copy of Lavery's *The 74-Gun Ship Bellona* (1985) supplied the *Bellona*'s own sailing reports of 1763 and 1783 (p. 9, Table 2; held privately, cited in the note's §13.2).
 
 **What follows from the answers:**
 - **D46 becomes (d) with rule 3 restored,** since D3 is (b). In stays, the ourse is braced to leeward as the helm goes down, and the yard is changed last. Each rule is carried over by judgement from a ship's mizen, and its truth says so.
