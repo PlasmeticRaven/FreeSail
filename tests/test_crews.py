@@ -554,6 +554,7 @@ def test_a_station_is_kept_on_the_players_ship_by_her_name_or_on_a_sail_by_her_k
     w.run(61)
     crew = raven.crew
     assert crew is not None and crew.shape == "full" and w.ship.name == "Amazon"
+    w.run(60)  # her lookout's first sweep (a kind is taken among the sails in sight: 86)
 
     def flag(words: str) -> str | None:
         crew.ship.extra.pop("station", None)
@@ -568,3 +569,42 @@ def test_a_station_is_kept_on_the_players_ship_by_her_name_or_on_a_sail_by_her_k
     nancy = w.vessels.find("Nancy")
     assert flag("the brig") == nancy.id and flag("the Nancy") == nancy.id
     assert flag("the cutter") is None and flag("the Victory") is None
+
+
+def test_a_station_by_kind_is_kept_only_on_a_sail_in_sight_and_brig_is_no_brig_sloop():
+    """Package 86's fold-in (the review of the owner's local work, section 3): the kind is
+    matched only among the sails her lookout has in sight, where it had searched the whole
+    sea by truth (a frigate nobody aboard could know of was taken); and 'brig' takes a
+    merchant brig, not a brig-sloop, which 'sloop' and 'brig-sloop' take. A lugger
+    thirty-five miles off is refused by her kind, out of sight, and by her name is
+    taken as before (the name is the order's own knowledge)."""
+    w = hove_to_world()
+    raven = put(
+        w,
+        "cutter",
+        "britain",
+        "49 30.2 N 5 30 W",
+        "in company with the ship",
+        "patrol off the Lizard within 5 miles",
+        name="Raven",
+    )
+    harpy = put(w, "brig-sloop", "britain", "49 31 N 5 31 W", "bound for Falmouth", name="Harpy")
+    belle = put(w, "lugger", "france", "48 55 N 5 30 W", "bound for Brest", name="Belle")
+    w.run(121)
+    crew = raven.crew
+    assert crew is not None and crew.shape == "full"
+    seen = {str(s.feature.modern) for s in crew.lookout.sightings if s.seen_as == "sail"}
+    assert harpy.id in seen and belle.id not in seen
+
+    def flag(words: str) -> str | None:
+        crew.ship.extra.pop("station", None)
+        e = crew.submit(f"keep station two cables astern of {words}")
+        if e.kind == "order.rejected":
+            assert "no sail of that kind is in sight" in e.text, e.text
+            return None
+        return (crew.ship.extra.get("station") or {}).get("flag")
+
+    assert flag("the brig") is None  # a brig-sloop is no 'brig' of the order's words
+    assert flag("the sloop") == harpy.id and flag("the brig-sloop") == harpy.id
+    assert flag("the lugger") is None  # beyond her horizon: nobody aboard knows of her
+    assert flag("the Belle") == belle.id  # her name said: `Vessels.find`, as before

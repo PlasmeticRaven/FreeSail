@@ -144,7 +144,10 @@ def _parse(world: Any, rest: str) -> dict[str, Any]:
             # 'the ship' was taken)
             v = _named_or_kind(world, root, key)
             if v is None:
-                raise OrderError(f"No ship named {who!r} is on the sea to keep station on.")
+                raise OrderError(
+                    f"No ship named {who!r} is on the sea to keep station on, and no sail of "
+                    "that kind is in sight."
+                )
             flag = str(v.id)
         else:
             flag = str(v.id)
@@ -153,25 +156,41 @@ def _parse(world: Any, rest: str) -> dict[str, Any]:
 
 def _named_or_kind(world: Any, root: Any, key: str) -> Any:
     """A sail to keep station on that `Vessels.find` does not name: the player's ship by
-    her own name (her shadow, under the id 'the ship'), else the nearest sail of the kind
-    said ('frigate', 'cutter', 'brig-sloop'), the player's among them; never the ship
-    herself. None when nothing on the sea answers."""
+    her own name (her shadow, under the id 'the ship'), else the nearest sail in sight of
+    the kind said ('frigate', 'cutter', 'brig-sloop', 'sloop'), the player's among them;
+    never the ship herself. None when nothing answers.
+
+    Package 86's fold-in (the review of the owner's local work, section 3): the kind is
+    matched only among the sails her lookout has in sight (`_sighting_of`), where it had
+    searched the whole sea by truth and found a frigate nobody aboard could know of; and by
+    her description and what she is made out to be, a hyphened word whole or by its last
+    part, so that 'brig' takes a merchant brig and not a brig-sloop (her rig's word, 'a
+    brig', is left out for it), while 'sloop' and 'brig-sloop' take the brig-sloop."""
     from freesail.world.geo import bearing_and_distance
 
     own = _own_id(world)
     shadow = root.vessels.player_shadow(root)
-    others = [v for v in root.vessels.active() if str(v.id) != own]
+    others = [(v, str(v.id)) for v in root.vessels.active() if str(v.id) != own]
     if shadow is not None and own != str(shadow.id):
         if key in (shadow.name.lower(), shadow.name.lower().removeprefix("the ")):
             return shadow
-        others.append(shadow)
-    word = re.compile(rf"\b{re.escape(key)}\b")
+        others.append((shadow, "the ship"))
+    said = " ".join(key.replace("-", " ").split())  # 'brig-sloop' and 'brig sloop' alike
+    phrase = re.compile(rf"(?<![\w-]){re.escape(said)}(?![\w-])")
 
     def of_kind(v: Any) -> bool:
-        words = (str(v.description or ""), str(v.kind or ""), str(v.what or ""))
-        return key == words[0].lower() or any(word.search(w.lower()) for w in words)
+        for text in (str(v.description or ""), str(v.what or "")):
+            low = text.lower()
+            # a word said alone against the words as written, hyphens kept ('brig' is not
+            # 'brig-sloop'); words said together against them with hyphens as spaces
+            if phrase.search(low if " " not in said else low.replace("-", " ")):
+                return True
+            words = re.findall(r"[\w-]+", low)
+            if " " not in said and any("-" in w and w.rsplit("-", 1)[1] == said for w in words):
+                return True  # the head of a hyphened word: 'sloop' of 'brig-sloop'
+        return False
 
-    kind = [v for v in others if of_kind(v)]
+    kind = [v for v, flag in others if of_kind(v) and _sighting_of(world, flag) is not None]
     here = getattr(world, "position", None)
     if not kind or here is None:
         return None

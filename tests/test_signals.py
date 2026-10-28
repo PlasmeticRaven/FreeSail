@@ -387,3 +387,41 @@ def test_a_hail_of_the_players_ship_waits_for_the_player_and_moves_no_sail():
 
     assert hailed("What news?") == []
     assert hailed("Heave to, I am sending a boat") != []
+
+
+def test_a_crewed_ship_under_the_directors_hand_or_standing_aside_is_still_answered_by_table():
+    """Package 86's fold-in (the review of the owner's local work, section 3): the hail
+    fix's `commands` branch is the player's ship's alone. A crewed ship whose rules captain
+    holds by the director's hand (`over_his_head`) or stands aside commands nothing, and no
+    model holds her: the table answers her hail as it did, where the owner's fix had left it
+    pending with nobody to answer. The player's ship with her captain aside still waits for
+    the player."""
+    from tests.test_brains import put
+    from tests.test_crews import hove_to_world
+
+    w = hove_to_world()
+    nancy = put(
+        w,
+        "merchant brig",
+        "britain",
+        "49 30.2 N 5 30 W",
+        "bound for Falmouth",
+        intent="bound for Falmouth",
+        name="Nancy",
+    )
+    w.run(61)
+    crew = nancy.crew
+    assert crew is not None and crew.shape == "full"
+    cap = crew.captain
+    cap.over_his_head("heave to", until=int(w.clock.tick) + 3600)
+    assert not cap.commands and not H.model_holds_her(crew)
+    answer = H.deliver(w, nancy, "What ship is that?", int(w.clock.tick))
+    assert answer and answer.startswith("The Nancy of ")
+    assert "hail_pending" not in crew.ship.extra
+    cap.take_up_again()
+    cap.aside = True
+    assert not cap.commands and not H.model_holds_her(crew)
+    assert H.deliver(w, nancy, "What ship is that?", int(w.clock.tick)).startswith("The Nancy")
+    # the player's own ship, her rules captain standing aside: the hail waits for him
+    w.captain.aside = True
+    assert H.model_holds_her(w)
