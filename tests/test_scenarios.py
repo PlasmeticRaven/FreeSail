@@ -32,7 +32,7 @@ def test_the_channel_east_is_a_passage_on_the_whole_chart_from_torbay_to_guernse
     start = world.position
     assert chart.level_at(start) == 3  # the dartmouth-torbay harbour patch
     assert 9.0 < chart.depth_at(start) < 16.0  # Brixham road, six fathoms or so
-    assert list(world.ports.ports) == [
+    assert list(world.dealings.ports) == [
         "torbay",
         "dartmouth",
         "weymouth",
@@ -40,7 +40,7 @@ def test_the_channel_east_is_a_passage_on_the_whole_chart_from_torbay_to_guernse
         "st-peter-port",
         "st-helier",
     ]
-    assert {world.ports.stance(p) for p in world.ports.ports.values()} == {"open"}
+    assert {world.dealings.stance(p) for p in world.dealings.ports.values()} == {"open"}
     road = chart.find_feature("the Great Road of Guernsey")
     assert road is not None and road.id == "guernsey-great-road"
     _, run_m = bearing_and_distance(start, road.position)
@@ -78,8 +78,8 @@ def test_the_strait_is_a_passage_on_the_whole_chart_from_off_trafalgar_to_gibral
     start = world.position
     assert chart.region_at(start) == "strait" and start.lat_deg < 36.4
     assert chart.depth_at(start) > 20.0
-    assert list(world.ports.ports) == ["gibraltar", "tarifa", "algeciras", "ceuta", "tangier"]
-    assert world.ports.stance(world.ports.ports["gibraltar"]) == "open"
+    assert list(world.dealings.ports) == ["gibraltar", "tarifa", "algeciras", "ceuta", "tangier"]
+    assert world.dealings.stance(world.dealings.ports["gibraltar"]) == "open"
     road = chart.find_feature("Gibraltar road")
     assert road is not None and road.id == "gibraltar-road"
     _, run_m = bearing_and_distance(start, road.position)
@@ -110,8 +110,8 @@ def test_portugal_is_a_passage_on_the_whole_chart_from_oporto_to_the_road_of_bel
     start = world.position
     assert chart.level_at(start) == 3  # the oporto-douro harbour patch
     assert 10.0 < chart.depth_at(start) < 25.0
-    assert list(world.ports.ports) == ["oporto", "lisbon"]
-    assert {world.ports.stance(p) for p in world.ports.ports.values()} == {"neutral"}
+    assert list(world.dealings.ports) == ["oporto", "lisbon"]
+    assert {world.dealings.stance(p) for p in world.dealings.ports.values()} == {"neutral"}
     road = chart.find_feature("the road of Belém")
     assert road is not None and road.id == "belem-road"
     _, run_m = bearing_and_distance(start, road.position)

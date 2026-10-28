@@ -612,7 +612,7 @@ def _in_ordinary(world: Any, vessel: Any, port_words: str | None) -> tuple[str, 
     commission; the business commissions a nation's ships in ordinary by its knobs."""
     from freesail.world.regimes import put_in_ordinary
 
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     port = None
     if port_words:
         port = ports.find(port_words.strip()) if ports is not None and ports.ports else None
@@ -778,7 +778,7 @@ def _same_nation_or_refuse(world: Any, nation_id: str, vid: str, set_name: str) 
     """A set is one nation's: a ship of another joins it only as a prize (74's), and the
     player's ship is her scenario's nation."""
     if vid == "the ship":
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         own = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
     else:
         own = str(getattr(world.vessels.get(vid), "nation", "") or "")
@@ -1052,7 +1052,7 @@ def new_ship_spec(world: Any, body: str) -> dict[str, Any]:
     nation = world.nations.find(said_nation)
     home = None
     if nation is None:
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         home = ports.find(said_nation) if ports is not None and ports.ports else None
         if home is not None:
             nation = world.nations.find(str(getattr(home, "nation", "") or ""))
@@ -1144,7 +1144,7 @@ def _on_the_land(world: Any, pos: Any) -> str:
 def _harbour_of(world: Any, pos: Any) -> Any:
     """The port in whose harbour the place lies (its roads or its anchorage within
     `HARBOUR_NM`), or None (package 68)."""
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if ports is None or not getattr(ports, "ports", None):
         return None
     best = None
@@ -1262,7 +1262,7 @@ _MESSAGE_BY = re.compile(
 def _message(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     from freesail.world.people import Message
 
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     m = _MESSAGE_AT.match(body)
     if m:
         port = ports.find(m.group("port")) if ports is not None else None
@@ -1316,7 +1316,7 @@ _PORT = re.compile(
 
 
 def _port(world: Any, body: str) -> tuple[str, dict[str, Any]]:
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     m = _PORT.match(body)
     if m is None:
         raise WorldOrderError(
@@ -1518,7 +1518,7 @@ def _make_person(world: Any, name: str, rest: str) -> tuple[str, dict[str, Any]]
         )
     if world.people.find(name) is not None:
         raise WorldOrderError(f"{name} is among the people already.")
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     places = Places()
     role, quals, age, history, rank = "", [], 0, [], ""
     aboard: bool | None = None
@@ -1664,7 +1664,7 @@ def _move_person(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
         )
     move = " ".join(m.group("move").lower().split())
     stations = world.stations
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     data: dict[str, Any] = {"person": person.name}
     if move.startswith("comes aboard"):
         said = []
@@ -1788,7 +1788,7 @@ def _person(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             "role": role,
             "place": place,
         }
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     port = ports.find(m.group("port")) if ports is not None else None
     if port is None:
         raise WorldOrderError(f"'{m.group('port')}' is no port of the world.")
@@ -1980,20 +1980,24 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         where = place_words(place)
         heard = _hearers(world, place)
     else:
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         port = ports.ports.get(person.port) if (ports is not None and person.port) else None
         miles = _port_miles(world, port)
-        if port is None or miles is None or miles > BOAT_REACH_NM:
+        # package 66: heard by the stations held at the same place of the same port (the
+        # captain at the counting house hears the clerk there; at the market he does not);
+        # since package 84 (step 4) the stations of every hull and the persons of the one
+        # registry at his place, so that a word said ashore reaches another ship's captain
+        # landed there with the player's ship a day's sail off
+        heard = _hearers_ashore(world, person) if port is not None else []
+        near = port is not None and miles is not None and miles <= BOAT_REACH_NM
+        if port is None or not (near or heard or _at_his_place(world, person)):
             at = f" at {port.name}, {miles:.0f} miles off" if (port and miles is not None) else ""
             raise WorldOrderError(
-                f"nobody aboard can hear {person.name}: he is {place_words(person.where)}{at}; "
-                f"a letter carries his words ('message: at <port> from {person.name}: "
-                '"..."\'), or he comes aboard'
+                f"nobody can hear {person.name}: he is {place_words(person.where)}{at}, and "
+                "nobody of any ship is at his place; a letter carries his words ('message: at "
+                f'<port> from {person.name}: "..."\'), or he comes aboard'
             )
         place, where = "shore", f"ashore at {port.name}"
-        # package 66: heard by the stations held at the same place of the same port (the
-        # captain at the counting house hears the clerk there; at the market he does not)
-        heard = _hearers_ashore(world, person)
     role = person.role
     tail = f", the {role}" if role and role not in ("captain", "commander") else ""
     if role and role.lower() in person.name.lower():
@@ -2018,6 +2022,15 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         },
     )
     person_journal(world, person).append(world, f"Said, {where}: {words}", kind=SAID_KIND)
+    if not voice:
+        # a free line in his mouth is his own act (package 84, step 4): the thing given,
+        # taken or put by the rule of reach, said in the log as a free line of his
+        from freesail.orders import free
+
+        acted = free.spoken(world, person, words)
+        if acted is not None:
+            kind, line, data = acted
+            world.record(Severity.NOTABLE, kind, line, data=data)
     from freesail.agents.director import answer_questions
 
     answered = answer_questions(world, person, words, where)
@@ -2035,6 +2048,14 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if answered:
         data["answered"] = answered
     return f"{person.name} spoke {where}, {said}", data
+
+
+def _at_his_place(world: Any, person: Any) -> bool:
+    """Whether any named person of the one registry is within hearing of `person` where he
+    stands ashore (package 84, step 4)."""
+    from freesail.world.hearing import people_hearing, spot_of
+
+    return bool(people_hearing(world, spot_of(world, person), exclude=person))
 
 
 def _hearers_ashore(world: Any, person: Any) -> list[Any]:
@@ -2570,7 +2591,7 @@ def _freight(world: Any, m: re.Match[str]) -> tuple[str, dict[str, Any]]:
     hold = getattr(world, "hold", None)
     if hold is None or hold.capacity_tons <= 0:
         raise WorldOrderError("she has no hold for a cargo")
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     coming = _tons_coming(ports)
     room = max(0.0, hold.room_tons - coming)
     if tons > room + 1e-9:
@@ -2710,7 +2731,7 @@ def _doubt_aboard_new(world: Any, body: str) -> str | None:
             f"nobody answering to '{party}' is among the people: money or goods from nobody "
             "the world knows ('person: make ...' first, or give a reason)"
         )
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     port = None
     if who is not None and not who.aboard and who.where != "boat":
         port = ports.ports.get(who.port) if (ports is not None and who.port) else None
@@ -2769,7 +2790,7 @@ def _doubt_thing_moved(world: Any, thing: Any, where: dict[str, Any]) -> str | N
             f"{thing.the} would go from one port to another in a word, by no hand that carries it"
         )
     if here_ashore != there_ashore:
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         pid = here_port if here_ashore else there_port
         port = ports.ports.get(pid) if (ports is not None and pid) else None
         miles = _port_miles(world, port)
@@ -3560,7 +3581,7 @@ def _doubt_message(world: Any, body: str) -> str | None:
     from freesail.world.geo import bearing_and_distance
 
     m = _MESSAGE_BY.match(body)
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     here = getattr(world, "position", None)
     if m is None or ports is None or here is None:
         return None
@@ -3578,7 +3599,7 @@ def _doubt_message(world: Any, body: str) -> str | None:
 
 def _doubt_port(world: Any, body: str) -> str | None:
     m = _PORT.match(body)
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if m is None or ports is None or m.group("what").lower() != "price of":
         return None
     port = ports.find(m.group("port").strip('"'))
@@ -3609,7 +3630,7 @@ def _doubt_person(world: Any, body: str) -> str | None:
         return None
     name = " ".join(str(m.group("name") or m.group("bare") or "").split()).strip('"')
     person = world.people.find(name)
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if person is None or ports is None or getattr(world, "position", None) is None:
         return None
     move = " ".join(m.group("move").lower().split())

@@ -56,7 +56,7 @@ on these packages; that is the owner's choice.
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 and 2 merged 2026-10-28** (`d9dba1f`, from the sibling session's `claude/pkg-84`; nothing pinned moved); **steps 3 onward continue in the sibling from the head after 86 and these** |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 5 merged 2026-10-28** (steps 1 and 2 at `d9dba1f`, steps 3, 4 and 5 from the sibling's `claude/pkg-84` after it; nothing pinned moved; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
 | 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | **merged 2026-10-28** (`cd97ce7`); the record below |
 | 87 | Fable | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief once most of the milestone's orders are in, after 73, 77 and 84 |
@@ -450,6 +450,102 @@ converter reads every older shape. **Found on the way:** `orders._doubt_thing_mo
 unpacking a thing's where into three. The builder's report reached the lead through its
 pushed branch and notes, its scheduled-task message carrying only a preamble: sibling
 sessions report by their branch, which the lead reads, and the message is a courtesy.
+
+### Package 84, steps 3 and 4, as merged (2026-10-28)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` (two commits on the merged head
+`8db8b9a`; 55 files, ~5,500 lines added and ~3,600 removed) with no conflict; ruff clean;
+the lead's sweeps clean; the sibling's fast tier whole on each step (two explained failures:
+the pictures' threshold under load, and the squadrons' succession test whose band was the
+old route's phase and not the rule, recast to the rule it states with the old figure beside
+the new), its touched files' slow tier running as it reported; **the whole suite on the
+merged tree in the cloud (the figures below when it ends).** **Step 3:** the ports split
+into `Ports`, the world's (the files, the markets, the stances, the tracks, who is at each
+place ashore), and `Dealings`, a hull's (her pilot and his conn, her boat and its errands,
+her price lists, her jobs). **Step 4:** the coarse acts on a sleeping hull and the far
+brain's port acts: a station on a ship at far detail works every act that wants no
+physics through her own grammar (the boat's errands as the port's jobs with the boat's
+time, the captain landed at the quay and fetched, the places ashore, a word said and heard
+by spot, the free lines, a signal and a hail); `shape a course for <port>` in the far
+shape the planner's passage by the ports' tracks and the chart's common tracks, ending at
+her anchor; a far body under a held station lying to at her plan's end instead of
+vanishing; the far trader at her port selling, buying a return cargo and sailing again
+(`transact: true`, decision 53's fifth); the director's `say as` for a person ashore heard
+by whoever of any hull is at his place; a kept thing knowing its keeper's home hull.
+**The owner's acceptance test is truth 7-200** on the new `data/scenarios/tender.yaml`: the
+Amazon at anchor in Brixham road, the Raven her tender asleep the whole day with a fake at
+her captain's station, ordered to Plymouth by signal, by the tracks, ashore to a person,
+back with the packet, the lugger passed, home within hail. **Taken another way, with
+reasons in the design note's postscript:** the Raven asleep from the start (the switch is
+steps 5 and 6's), the pilot's track in as the plan's anchor leg (the pilot as a job is
+step 5's). **Data:** a coasting track from Torbay to Plymouth in the Channel's features,
+used only where a straight line is not clear. **Found on the way, fixed:** `station_world`
+ignoring the scenario's crewed cap. **Open for the lead:** the director's lines for a
+person land in the player's log as before (the director's-reach step's).
+
+**The whole suite in the cloud on the merged head `5e3f7b5`** (run 5, 34 minutes): lint
+clean; the slow tier's six shards 4,246 passed, 3 skipped, 11 xfailed and **2 failed**, both
+pinned truths that passed on the previous head `3421829`: 7-154 (the blockade squadron
+blown off for Torbay restored its station at 34200 for the pinned 37920) and 7-156 (the
+convoy's tack-in-succession gaps `[300, 240]` for the band 300 to 420); truth 7b-108's
+harbour line passed with the line buffering; the pace job (informative) missed two floors on
+the runner as before (the gates' day 487, 7-159 476 for 500). **The cause, step 4's
+coasting track**, which the planner took for every route whose ends reached it, bisected by
+the sibling on its own tree the same hour (the known truths' slow tier run after all, on
+the merged head) and by the lead on this one; the lead's recast of 7-156 to the rule it
+states (`bd220cb`) reverted (`ad041ca`) when the sibling's mend came, since a data change
+is no reason to re-pin three figures. **The mend merged `--no-ff` from `claude/pkg-84` at
+`ef7b7fe`:** the track withdrawn, the squadrons' and the captains' tests' original
+assertions restored, and the far course for a port taking the captain's marks (`shape a
+course for Plymouth via the Start`, the intents' `via` of package 45, each headland given
+its offing), the land guard's refusal naming the way by marks ("give the way by marks");
+truth 7-200's fake reads the refusal in its order's result and gives the way (two refusals
+in the day, out and home, each answered). **The lead's judgement:** right as the thing is:
+a captain told that the straight course for Plymouth crosses the Start names the Start, in
+the words the intents already take, and a model captain gets the same refusal naming what
+to say; the record and the acceptance test say so. **The whole suite in the cloud on the
+mended head `e38a3e2`** (run 6, 34 minutes): lint clean; the slow tier's six shards **4,248
+passed, 3 skipped, 11 xfailed, none failed**, truths 7-154, 7-156 and 7-200 among them at
+their pinned figures; the pace tests 10 of 10 on that runner. Steps 3 and 4 stand merged
+green.
+
+### Package 84, step 5, as merged (2026-10-28)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` at `2f81fc1` (one commit over
+the lead's `e38a3e2`, brought in at the step's boundary; 8 files, 305 lines added and 45
+removed); ruff clean; the sibling's fast tier whole (the pictures' threshold under load the
+one failure, passing alone) and the known truths' slow tier with the trials, the crews, the
+checkpoint, the business, the brains and the squadrons (the lee-shore trial's digest the
+container's difference recorded at step 3, the same on the base); the lead's fast tier of
+the touched files; **the whole suite on the merged tree `5949e18` in the cloud (run 7, 45
+minutes, one shard's runner slow): lint clean; the slow tier's six shards 4,250 passed, 3
+skipped, 11 xfailed, none failed; the pace tests 10 of 10.** Step 5 stands merged green.
+**The step:** the ship persists. `demote` is a sleep: her truth and her captain's state into
+the far body and the brain as before, her damage summed into the far body's record
+(`write_damage`: the killed and the wounded by the muster's hurt, the guns dismounted, the
+shot holes and those below the water, the spars wrecked, the sails blown out, the tick she
+slept; the far fight's own counts kept, 74's ground), her World kept in the far shape with
+the physics off, her company in the one registry, her stores, purse, parts and Rng hers.
+`promote` of a ship with a World is a wake (`_to_full` without `make_ship`): the ship she
+had, her body given the far body's mirrored truth, her sail set as the far body's word only
+where the plan changed it asleep, the brain folded in, no reseat; the woken line urgent
+only where a station is seated. A vessel gone from the sea gives up her World and her
+people (`release_done`, first in the switch). `crewed_ids` counts the Worlds alive (the far
+tick's gate), `crews.crewed` the awake against the cap; a vessel's dict says `crewed` for
+awake only and `asleep` apart, so the glass's pinned data reads as before. **Taken another
+way, with reasons in the design note's postscript:** the Rng made with her World and kept;
+a sleeping company's needs not advanced (a knob for the owner: ticking them without the
+routines that serve them would kill her company of thirst); the watch not changed at the
+bells while she sleeps. **Measured** (TuningNotes "Step 5"): three sleeping brigs beside
+the frigate cost the pace about a thirty-seventh each against a third awake (459 and 490
+ticks a second for 530 with their Worlds dropped on the old road); the checkpoint with the
+three asleep 704,775 bytes for 704,756 dropped, the growth the log's; the 2 MB bound stands.
+**The lead's review, one finding for step 6:** a ship asleep keeps `detail == "crewed"`
+(the sibling's tests assert it), so `_promote_and_hail` never gives her the near detail's
+every-second tick when she comes within `NEAR_DETAIL_NM` over the cap; before the step an
+unseated demote set her `far` and the near level served her. A seated ship was already so.
+Nothing pinned shows it; step 6's two-phase tick (the Hull as the container) is where a
+sleeping hull's cadence by distance is settled, and the sibling is told.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -1651,3 +1747,86 @@ onward and 86's 7-161 to 7-171, each with the old figure beside the new. The gun
 filling party is read and never moved (the build's decision 5): the gunner, his crew and
 the quarter gunners as real posts that compete for hands are 77's unless 75 takes them
 first.
+
+### Notes from the lead to the ships session (the written channel: the session fetches this branch before each stage; its reports are its branch and `docs/design/`)
+
+**2026-10-28, on the session's first message.** The channel works from the session to the
+lead and not back (a cloud session's credential does not deliver to another session), so
+these notes are the lead's side of it. The session's reading of the go-ahead is right on
+all three points: Phase 3 approved and then the build one ship at a time, the
+*Indefatigable* first, the generator modules, the hull profiles and the ship files going
+from design to build without a gate; the gate on the engine extensions only, one design
+document read once by the lead before their builders start, and **the mizen course cut at
+the mast** (laced to it, its head on the lateen yard abaft the mast, the owner's choice of
+the 28th for the 74 and the 64) belongs in that same document, between the lateen and the
+gaff; the lead's head merged before stage 0 and the builders reaching `world.ship` and the
+crewed world only through the names the Hull keeps. One addition: after the merge before
+stage 0, bring the lead's branch in again **only at stage boundaries**, so the builders are
+not chasing the one-world refactor mid-stage. When the engine document is ready, name its
+path in a message if the session can, or the lead reads it on the branch.
+
+**2026-10-28, the gate: `Design-ShipsEngineExtensions.md` at bee6e96 on `claude/pkg-75`,
+read with `Build-Ships.md` §19.2 and §20.** The engine extensions are **approved as
+designed**, and the session may lay stage 0 and stage 0E and start its builders.
+
+The gate's two items:
+1. *The mizen course* as class lateen cut at the mast (`cut_at_mast`), reading the gaff's
+   curve through `curve_class`, is right: the physics sees the curve the sail's cut earns and
+   the rig sees a yard, which is what the thing is. The measurements of §3.2 settle it (the
+   frigate's polar within 0.2 kn at every point with the gaff's curve; the yard out of the
+   braced yards; her classing as filed).
+2. *"The physics' equations are not changed"* is met by what §1 lists: a `curve_class` lookup
+   where a class lookup already stood, a membership test that leaves the yards under the
+   bowsprit out of `_square_rigged`, the helm's mark and `_spar_x`, and nothing else in
+   `physics/`. The proof the lead reads at the merge: `_plate_force`, `compute_sail_forces`'s
+   sums, `_lateral_offset`, the load fractions and `data/sail_classes.yaml` byte-identical
+   to the head merged before stage 0 (a diff of those ranges shows nothing), and the row "the
+   spanker as filed" of §3.2 re-measured on the final tree equal to the figures printed there.
+   Nothing pinned on the existing ships moves; where a pin moves it is re-measured where moved,
+   old beside new, with the cause bisected to one change (the standing rule).
+
+Build §19.2, in its order:
+- *2, stage 0E after this approval*, the four `curve_class` lookups in stage 0: as settled.
+- *3, D48 against a named fit*: **the third way.** A command-line ship that lacks the
+  scenario's fit takes her own default, with one line in the log, and a test of it in
+  `tests/test_scenarios_75.py`. B6 builds it, the smallest change in `make_scenario_world`'s
+  reach and nothing else in `world/scenarios.py`; package 84 may touch that file later and the
+  lead resolves the merge.
+- *4, the fillers as posts*: to 77, as proposed.
+- *5, the merchant brig's and the packet's descriptions* moved to their files: yes. The convoy
+  and trade pins it moves are listed in the record with old beside new and the move proved by
+  bisection; a description is a description and no behaviour may move with it.
+- *6, the scenario's `nations:` block*: **ruled in**, laid in stage 0b as §12.1 says, inert
+  while no scenario carries it. The wars' dates land with their citation by page; a row the
+  builder cannot check against James says so in its comment, and the *Neufchatel*'s scenario
+  notes name it open, rather than carrying a date from memory as if checked.
+- *7, D10(a)'s key* for the *Neufchatel*'s main topgallant: yes, built by B3 as its fourth
+  step beside `under_bowsprit` at places 1 and 3 of §4.2, inert until her file uses it.
+- *8, the order and the merges*: the *Indefatigable*, the *Prince de Neufchatel*, the bilander,
+  the 74, as the owner asked and §2.3 has it. **The lead merges after each ship**: the session
+  reports a ship done on its branch, the lead reviews and merges `--no-ff`, runs the whole suite
+  in the cloud, and the session brings the lead's head in at the next stage boundary. The
+  window closes with the merge; nothing waits for the end of the package.
+- *9, the names and the fits*: accepted as written (`sixty-four.yaml`, `razee-44.yaml`,
+  `hermaphrodite-brig.yaml`, `seventy-four.yaml`, `bilander.yaml`; the fits "ardent class
+  1784", "ardent class 1794", "as razeed 1795", "as carried 1796"; the description keys).
+- *10, the workflow's shape*: accepted, the two-way byte test included.
+- *11, the head*: the lead's branch now stands at 5e3f7b5 (package 84's steps 3 and 4
+  merged). Merge the lead's head as it stands when stage 0 begins, then at stage boundaries
+  only; the ancestor check of §2.1 before stage 0.
+- *12, the frigate's draught and the 36's trimmers*: recorded for the frigate's own file, not
+  this package's.
+- `ARC_PIVOT_*` kept for the old pickles, with a comment saying why: yes.
+
+Ext §14, the rest: *3*, the engine's driver rule holds for the settee hove to unless the
+measured figures say otherwise, and then D4(a) with the figures in TuningNotes; *4*, as
+designed, the case that holds pinned and named, and if neither holds D44(c)'s `settee` row is
+accepted in advance (no equation changes; `test_sails.py`'s curve set old beside new); *5*,
+yes, furled aloft; *6* and *7*, the session's judgement, the times and hands recorded in
+TuningNotes with the sources; *8* and *9*, yes; *10*, the 74 without the driver of 1773, the
+want recorded in her design as open, not asked for now; *11*, the truths' numbers as Build §20
+has them within 7-185 to 7-199, the spare block 7-230 to 7-239 for more; *12*, (a), above;
+*13*, a later package; *14*, open.
+
+The suites as the brief has them: the fast tier once on the final tree and the touched files'
+slow tier on the owner's machine; the whole suite is the lead's, in the cloud, at each merge.

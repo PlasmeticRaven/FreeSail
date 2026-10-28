@@ -411,7 +411,7 @@ def books_for(world: Any) -> Books:
 
 
 def own_nation(world: Any) -> str:
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     nation = getattr(ports, "ship_nation", None) if ports is not None else None
     if not nation:
         nation = getattr(getattr(world, "scenario", None), "nation", None)

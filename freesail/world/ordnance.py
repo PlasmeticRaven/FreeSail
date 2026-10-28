@@ -245,7 +245,7 @@ def _refused_in_war(world: Any, block: dict[str, Any]) -> bool:
     listed = block.get("sells_in_war_to")
     if listed is None:
         return False
-    nation = str(world.ports.ship_nation).lower()
+    nation = str(world.dealings.ship_nation).lower()
     if not world.nations.enemies_of(nation):
         return False
     return nation not in listed
@@ -323,7 +323,7 @@ def take_in(world: Any, ask: Ask) -> tuple[str, dict[str, Any]]:
     ship = world.ship
     if not getattr(ship, "guns", None):
         raise OrderError(NO_GUNS_WORDS)
-    ports = world.ports
+    ports = world.dealings
     port = ports.in_port()
     if port is None:
         raise OrderError(NOT_IN_PORT_WORDS)

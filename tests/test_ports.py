@@ -137,8 +137,8 @@ def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
     # package 39b Biscay north's five
     assert list(files) == ALL_PORTS
     w = world_at(OFF_THE_LIZARD)
-    assert list(w.ports.ports) == ALL_PORTS
-    falmouth = w.ports.ports["falmouth"]
+    assert list(w.dealings.ports) == ALL_PORTS
+    falmouth = w.dealings.ports["falmouth"]
     assert falmouth.nation == "britain" and "White 1835" in falmouth.source
     # the roads and the anchorage are the chart's features, not figures of their own
     outer = w.chart.feature("falmouth-outer-road")
@@ -152,7 +152,7 @@ def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
     assert falmouth.mooring_for(units.feet_to_m(16.0)) is falmouth.anchorage
     assert falmouth.mooring_for(units.feet_to_m(9.0)) is falmouth.mooring
     assert falmouth.shore.name == "the quay at Falmouth"
-    for port in w.ports.ports.values():
+    for port in w.dealings.ports.values():
         assert port.pilot.names and 0.0 < port.pilot.skill <= 1.0 and port.pilot.fee_pounds > 0
         assert port.pilot.cast in ("starboard", "larboard")
         assert set(port.pilot.words) >= {"channel", "marks", "anchorage", "tide"}
@@ -164,9 +164,9 @@ def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
         assert set(port.crew_pool) == {"able", "ordinary", "landsman"}
         for good in port.market.goods.values():
             assert good.price > 0 and all(isinstance(m, int) for m in good.season)
-    assert w.ports.ports["plymouth"].dockyard.kind == "yard"
-    assert w.ports.ports["plymouth"].mooring.feature_id == "the-hamoaze"
-    assert w.ports.ports["brest"].nation == "france"
+    assert w.dealings.ports["plymouth"].dockyard.kind == "yard"
+    assert w.dealings.ports["plymouth"].mooring.feature_id == "the-hamoaze"
+    assert w.dealings.ports["brest"].nation == "france"
     # the summary names the port she lies nearest
     assert any(ln.startswith("Port: ") for ln in w.summary_lines())
 
@@ -205,7 +205,7 @@ def test_a_fourth_port_costs_a_file_and_nothing_else(tmp_path):
     bare = World(seed=1)
     assert bare.ports.ports == {}
     assert bare.submit("send the boat ashore").kind == "order.rejected"
-    assert bare.ports.port_words() is None and bare.ports.nearest() is None
+    assert bare.dealings.port_words() is None and bare.dealings.nearest() is None
 
 
 # ---------------------------------------------------------------------------
@@ -274,7 +274,7 @@ def test_the_market_moves_a_price_by_the_season_the_war_and_the_supply_and_no_mo
 
 def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_stance_the_tables():
     frigate = world_at(OFF_THE_LIZARD)
-    assert frigate.ports.ship_nation == "britain"
+    assert frigate.dealings.ship_nation == "britain"
     french_ports = {"brest", "roscoff", "st-malo", "morlaix"}
     # Biscay north's five (package 39b): hostile throughout to a King's ship
     french_ports |= {"la-rochelle", "le-palais", "lorient", "paimboeuf", "rochefort"}
@@ -290,25 +290,25 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # Tangier the Emperor of Morocco's, at peace with all and neutral to her
     french_ports |= {"algeciras", "ceuta", "tarifa"}
     neutral_ports |= {"tangier"}
-    assert {p.id: frigate.ports.stance(p) for p in frigate.ports.ports.values()} == {
+    assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS
     }
     schooner = world_at(OFF_THE_LIZARD, ship=SCHOONER)
-    assert schooner.ports.ship_nation == "united-states"
-    assert {p.id: schooner.ports.stance(p) for p in schooner.ports.ports.values()} == {
+    assert schooner.dealings.ship_nation == "united-states"
+    assert {p.id: schooner.dealings.stance(p) for p in schooner.ports.ports.values()} == {
         pid: "neutral" for pid in ALL_PORTS
     }
     french = world_at(OFF_THE_LIZARD, ship=SCHOONER, nation="france")
-    assert french.ports.ship_nation == "france"
-    assert french.ports.stance(french.ports.ports["brest"]) == "open"
-    assert french.ports.stance(french.ports.ports["roscoff"]) == "open"
-    assert french.ports.stance(french.ports.ports["st-marys"]) == "hostile"
-    assert french.ports.stance(french.ports.ports["falmouth"]) == "hostile"
+    assert french.dealings.ship_nation == "france"
+    assert french.dealings.stance(french.ports.ports["brest"]) == "open"
+    assert french.dealings.stance(french.ports.ports["roscoff"]) == "open"
+    assert french.dealings.stance(french.ports.ports["st-marys"]) == "hostile"
+    assert french.dealings.stance(french.ports.ports["falmouth"]) == "hostile"
     closed = world_at(
         OFF_THE_LIZARD, ship=SCHOONER, ports={"falmouth": {"closed_to": ["united-states"]}}
     )
-    assert closed.ports.stance(closed.ports.ports["falmouth"]) == "closed"
+    assert closed.dealings.stance(closed.ports.ports["falmouth"]) == "closed"
     # the reading at sea: the nearest port and its stance, no pilot within reach
     said = frigate.readings.words("port")
     # package 37j: by the captain's means, the account and its doubt
@@ -346,10 +346,10 @@ def test_the_pilot_comes_off_in_his_cutter_hails_boards_and_is_a_person_aboard()
     assert taken and hail.tick <= taken[0].tick <= hail.tick + 1
     assert taken[0].text == "Answered the cutter: we will take the pilot for Falmouth."
     assert hail.tick - sails[0].tick >= 60 and (aboard.tick - hail.tick) % 60 == 0
-    pilot = w.ports.pilot
+    pilot = w.dealings.pilot
     assert pilot is not None and pilot.role == "pilot" and pilot.port == "falmouth"
     surname = pilot.name.removeprefix("Mr ")
-    assert surname in w.ports.ports["falmouth"].pilot.names
+    assert surname in w.dealings.ports["falmouth"].pilot.names
     assert aboard.text == (
         f"The pilot, {pilot.name} of Falmouth, came aboard from the cutter to pilot her in."
     )
@@ -382,10 +382,10 @@ def test_the_pilot_comes_off_in_his_cutter_hails_boards_and_is_a_person_aboard()
     )
     assert len(events(w, "port.pilot_words")) == 1
     # the cutter lies to a while and goes home once he is aboard; nothing was refused
-    cutter = w.ports._cutter()
+    cutter = w.dealings._cutter()
     assert cutter is not None and not cutter.alongside and cutter.plan[0][0] == "lie_to"
     w.run(2 * 3600)
-    assert w.ports._cutter() is None and not w.vessels.vessels
+    assert w.dealings._cutter() is None and not w.vessels.vessels
     assert not events(w, "port.pilot_refused")
 
 
@@ -399,8 +399,8 @@ def test_no_pilot_comes_off_by_night_to_a_ship_at_anchor_or_to_one_without_way()
     assert not still.vessels.vessels
     riding = at_anchor_in(FALMOUTH_OUTER)
     riding.run(1800)
-    assert not riding.vessels.vessels and riding.ports.pilot is None
-    assert riding.ports.in_port() is riding.ports.ports["falmouth"]
+    assert not riding.vessels.vessels and riding.dealings.pilot is None
+    assert riding.dealings.in_port() is riding.ports.ports["falmouth"]
     assert riding.readings.words("port").startswith("at anchor in Falmouth, the outer road")
 
 
@@ -412,7 +412,11 @@ def test_the_pilot_leaves_outward_bound_in_the_cutter_and_takes_his_fee_from_the
 
     w = at_anchor_in(FALMOUTH_OUTER, cargo={"purse_pounds": 100.0})
     pilot = w.people.add(Person("pilot-falmouth-1", "Mr Pascoe", "pilot", 0.9, port="falmouth"))
-    w.ports.pilot, w.ports.pilot_port, w.ports.pilot_since = pilot, "falmouth", w.clock.tick
+    w.dealings.pilot, w.dealings.pilot_port, w.dealings.pilot_since = (
+        pilot,
+        "falmouth",
+        w.clock.tick,
+    )
     e = w.submit("get under way")
     assert e.kind == "order.accepted"
     under_way = run_until(w, "ship.under_way", 90)
@@ -432,7 +436,7 @@ def test_the_pilot_leaves_outward_bound_in_the_cutter_and_takes_his_fee_from_the
         -5.0,
         "pilotage, Falmouth",
     )
-    assert w.ports.pilot is None and w.people.find("the pilot") is None
+    assert w.dealings.pilot is None and w.people.find("the pilot") is None
     assert w.readings.words("pilot").startswith(
         "no pilot aboard"
     ) or "no pilot" in w.readings.words("pilot")
@@ -586,13 +590,13 @@ def test_a_boat_order_that_comes_to_nothing_leaves_her_at_the_booms_and_one_away
     work of the deck's to belay, so that she cannot vanish from the water."""
     w = at_anchor_in(CARRICK_ROAD)
     e = w.submit("send the boat ashore")
-    assert e.kind == "order.accepted" and w.ports.boat.away
+    assert e.kind == "order.accepted" and w.dealings.boat.away
     w.run(30)
     e = w.submit("belay all work")
     assert e.kind == "work.belayed"
     w.run(60)
     stood = events(w, "boat.stood_down")
-    assert not w.ports.boat.away and len(stood) == 1
+    assert not w.dealings.boat.away and len(stood) == 1
     assert "was not sent away for the prices and what news there is" in stood[0].text
     assert stood[0].text.endswith("she is at the booms. Send her again when you please.")
     e = w.submit("send the boat ashore")
@@ -600,9 +604,9 @@ def test_a_boat_order_that_comes_to_nothing_leaves_her_at_the_booms_and_one_away
     run_until(w, "boat.away", 20)
     e = w.submit("belay all work")
     assert e.kind == "order.rejected" and "The boat is away from the ship on her errand" in e.text
-    assert w.ports.boat.away
+    assert w.dealings.boat.away
     run_until(w, "boat.alongside", 240)
-    assert not w.ports.boat.away and len(events(w, "boat.stood_down")) == 1
+    assert not w.dealings.boat.away and len(events(w, "boat.stood_down")) == 1
 
 
 def test_the_boat_sent_while_all_hands_bring_her_to_waits_for_them_and_goes():
@@ -617,7 +621,7 @@ def test_the_boat_sent_while_all_hands_bring_her_to_waits_for_them_and_goes():
     assert e.kind == "order.accepted"
     run_until(w, "ship.anchored", 20)
     e = w.submit("send the boat ashore")
-    assert e.kind == "order.accepted" and w.ports.boat.away
+    assert e.kind == "order.accepted" and w.dealings.boat.away
     w.run(5)
     waits = [x.text for x in events(w, "evolution.waiting") if "send boat" in x.text]
     assert waits == ["Not hands enough on deck to send boat; the hands are coming to anchor."]
@@ -645,7 +649,7 @@ def test_the_boats_errand_ashore_brings_the_prices_off_and_the_orders_refuse_in_
     e = w.submit("buy ten tons of tin")
     assert e.kind == "order.rejected" and "send the boat ashore first" in e.text
     e = w.submit("send the boat ashore with the mate")
-    assert e.kind == "order.accepted" and w.ports.boat.errand == "person"
+    assert e.kind == "order.accepted" and w.dealings.boat.errand == "person"
     w.run(1)
     assert events(w, "evolution.started")[-1].text == (
         "Away the long-boat's crew! Hoist out the long-boat."
@@ -669,7 +673,7 @@ def test_the_boats_errand_ashore_brings_the_prices_off_and_the_orders_refuse_in_
     run_until(w, "boat.ashore", 60)
     assert mate.where == "shore" and w.people.state_words(mate) == "ashore"
     back = run_until(w, "boat.alongside", 120)
-    pull_m = w.ports.to_shore_m(w.ports.ports["falmouth"])
+    pull_m = w.dealings.to_shore_m(w.dealings.ports["falmouth"])
     pull_s = pull_m / units.knots_to_ms(PT.BOAT_PACE_KN)
     assert back.tick - away.tick == pytest.approx(
         2 * pull_s + PT.BOAT_ASHORE_S["person"] + PT.BOAT_HOIST_IN_S, abs=120
@@ -711,7 +715,7 @@ def test_the_boats_errand_ashore_brings_the_prices_off_and_the_orders_refuse_in_
 
 def test_the_yard_supplies_by_demand_at_plymouth_and_the_chandlers_at_a_price_at_falmouth():
     plymouth = at_anchor_in(THE_SOUND, heading=180.0, cargo={"purse_pounds": 100.0})
-    assert plymouth.ports.in_port() is plymouth.ports.ports["plymouth"]
+    assert plymouth.dealings.in_port() is plymouth.ports.ports["plymouth"]
     before = booms(plymouth.ship).counts.get("topmast", 0)
     e = plymouth.submit("demand a topmast from the yard")
     assert e.kind == "yard.demanded" and e.data["cost_pounds"] == 0 and e.data["hours"] == 8
@@ -764,7 +768,7 @@ def test_hands_enter_from_the_pool_at_a_bounty_and_muster_into_the_crew_by_the_b
     assert e.kind == "crew.entering"
     assert e.data["n"] == 4 and e.data["bounty_pounds"] == 12.0
     assert e.text == "Entered 4 able at Falmouth at £3 bounty each; they come off in 12 hours."
-    assert w.purse.pounds == 88.0 and w.ports.ports["falmouth"].crew_pool["able"]["hands"] == 0
+    assert w.purse.pounds == 88.0 and w.dealings.ports["falmouth"].crew_pool["able"]["hands"] == 0
     e = w.submit("enter two able seamen")
     assert e.kind == "order.rejected" and "No able hands are to be had at Falmouth" in e.text
     e = w.submit("enter ten landsmen")
@@ -813,7 +817,7 @@ def test_the_port_is_a_function_of_the_seed_and_a_checkpoint_mid_errand_resumes_
     assert a.readings["boat"] == b.readings["boat"]
     path = replay.write_checkpoint(a, tmp_path / "port.ckpt")
     _, c = replay.read_checkpoint(path)
-    assert c.readings["boat"] == a.readings["boat"] and c.ports.boat.away
+    assert c.readings["boat"] == a.readings["boat"] and c.dealings.boat.away
     for w in (a, c):
         run_until(w, "boat.alongside", 120)
         w.submit("buy three tons of coal")
@@ -828,7 +832,7 @@ def test_the_port_is_a_function_of_the_seed_and_a_checkpoint_mid_errand_resumes_
         w.submit(TAKE_THE_PILOT)
         w.submit("set plain sail")
         run_until(w, "port.pilot_aboard", 150)
-    assert p1.ports.pilot.name == p2.ports.pilot.name
+    assert p1.dealings.pilot.name == p2.dealings.pilot.name
     assert p1.log.digest() == p2.log.digest()
 
 
@@ -882,7 +886,7 @@ def test_st_marys_is_a_file_on_the_scilly_patch_with_the_isles_produce_and_no_ya
     St Mary's Sound as the outer road; the isles' produce for a market and no spars; the
     gig the file says comes off (which 35's machinery does not read: the fault reported)."""
     w = world_at(OFF_THE_LIZARD)
-    port = w.ports.ports["st-marys"]
+    port = w.dealings.ports["st-marys"]
     assert port.name == "St Mary's" and port.nation == "britain"
     assert "White 1835 pp. 13-17" in port.source and "Imray 1874 pp. 104-108" in port.source
     assert port.anchorage.feature_id == "st-marys-road" and port.anchorage.name == "St Mary's Road"
@@ -922,9 +926,9 @@ def test_the_pilot_boards_from_seaward_and_the_frigate_anchors_in_st_marys_road(
     assert sails and sails[0].tick < hail.tick < aboard.tick < anchored.tick
     assert sails[0].text.startswith("Sail ho!")
     assert hail.text.startswith("The gig hailed: a pilot for St Mary's")
-    pilot = w.ports.pilot
+    pilot = w.dealings.pilot
     assert pilot is not None and pilot.port == "st-marys"
-    assert pilot.name.removeprefix("Mr ") in w.ports.ports["st-marys"].pilot.names
+    assert pilot.name.removeprefix("Mr ") in w.dealings.ports["st-marys"].pilot.names
     # the port's file says a gig, which 36 reads (`pilot.vessel`)
     assert aboard.text == (
         f"The pilot, {pilot.name} of St Mary's, came aboard from the gig to pilot her in."
@@ -935,7 +939,7 @@ def test_the_pilot_boards_from_seaward_and_the_frigate_anchors_in_st_marys_road(
     assert "High water at St Mary's about" in said
     assert anchored.text.startswith("The best bower let go in ")
     w.run(900)
-    assert w.at_anchor and w.ports.in_port() is w.ports.ports["st-marys"]
+    assert w.at_anchor and w.dealings.in_port() is w.dealings.ports["st-marys"]
     assert w.readings.words("port").startswith("at anchor in St Mary's, St Mary's Road")
     assert not events(w, "ship.aground")
 
@@ -949,7 +953,7 @@ def test_the_pilot_boards_a_neutral_off_the_isle_of_bas_and_she_anchors_in_the_r
     w.submit("set plain sail")
     anchored = stand_in(w, BATZ_IN)
     aboard = events(w, "port.pilot_aboard")[0]
-    pilot = w.ports.pilot
+    pilot = w.dealings.pilot
     assert pilot is not None and pilot.port == "roscoff"
     assert aboard.text == (
         f"The pilot, {pilot.name} of Roscoff, came aboard from the boat to pilot her in "
@@ -966,7 +970,7 @@ def test_the_pilot_boards_a_neutral_off_the_isle_of_bas_and_she_anchors_in_the_r
         "the depth."
     )
     w.run(900)
-    assert w.at_anchor and w.ports.in_port() is w.ports.ports["roscoff"]
+    assert w.at_anchor and w.dealings.in_port() is w.dealings.ports["roscoff"]
     assert w.readings.words("port").startswith(
         "at anchor in Roscoff, the road of the Isle of Bas; the port neutral to the Americans"
     )
@@ -980,14 +984,14 @@ def test_roscoff_is_hostile_to_british_colours_and_closed_in_the_pilots_words_by
     the American in the pilot's words. The brief's 'closed to Britain' cannot be had while
     the table says war (a closure never outranks a war: tests/test_nations.py); reported."""
     cutter = world_at({"lat_deg": 48.736, "lon_deg": -4.10}, ship=CUTTER, heading=90.0, speed=4.0)
-    assert cutter.ports.ship_nation == "britain"
-    assert cutter.ports.stance(cutter.ports.ports["roscoff"]) == "hostile"
+    assert cutter.dealings.ship_nation == "britain"
+    assert cutter.dealings.stance(cutter.ports.ports["roscoff"]) == "hostile"
     cutter.submit("set plain sail")
     cutter.run(3600)
     assert not cutter.vessels.vessels and not events(cutter, "port.pilot_hail")
     assert "the port hostile to the English" in cutter.readings.words("port")
     riding = at_anchor_in({"lat_deg": 48.7356, "lon_deg": -4.0170}, ship=CUTTER, heading=250.0)
-    assert riding.ports.in_port() is riding.ports.ports["roscoff"]
+    assert riding.dealings.in_port() is riding.ports.ports["roscoff"]
     for order, words in (
         ("send the boat ashore", "Roscoff is hostile to her; a boat sent in would be taken."),
         ("buy ten tons of brandy", "Roscoff is hostile to her; there is no trading there."),
@@ -1009,7 +1013,7 @@ def test_roscoff_is_hostile_to_british_colours_and_closed_in_the_pilots_words_by
         "The pilot hailed from the boat: Roscoff is closed to the Americans by the port's "
         "order; you will get no pilot here"
     )
-    assert closed.ports.pilot is None and refused.data["stance"] == "closed"
+    assert closed.dealings.pilot is None and refused.data["stance"] == "closed"
 
 
 def test_the_price_lists_are_the_files_and_the_rules_table_moves_them():
@@ -1017,7 +1021,7 @@ def test_the_price_lists_are_the_files_and_the_rules_table_moves_them():
     and Roscoff's English tin by the war, the kelp by the season; the boat brings St Mary's
     list off and the purser's paper says it; the yard has no spar to give there."""
     w = at_anchor_in({"lat_deg": 49.9250, "lon_deg": -6.3300}, cargo={"purse_pounds": 100.0})
-    assert w.ports.in_port() is w.ports.ports["st-marys"]
+    assert w.dealings.in_port() is w.dealings.ports["st-marys"]
     assert w.submit("send the boat ashore").kind == "order.accepted"
     prices = run_until(w, "market.prices", 120)
     assert prices.text.startswith(
@@ -1036,7 +1040,7 @@ def test_the_price_lists_are_the_files_and_the_rules_table_moves_them():
     e = w.submit("buy ten tons of turnips")
     assert e.kind == "order.rejected" and "St Mary's market has no turnips" in e.text
     # Roscoff's trade for the Cornish run, priced by judgement and saying so
-    roscoff = w.ports.ports["roscoff"]
+    roscoff = w.dealings.ports["roscoff"]
     when = datetime(1805, 6, 10)
     for good in ("brandy", "geneva", "rum", "tea", "tobacco"):
         assert "judgement" in roscoff.market.goods[good].note, good
@@ -1133,13 +1137,13 @@ def test_two_bargains_in_one_order_are_struck_together_and_the_boat_goes_once():
     run_until(w, "boat.alongside", 240)
     refused = w.submit("buy 3 tons of coal and 2 tons of tea")
     assert refused.kind == "order.rejected" and "market has no tea" in refused.text
-    assert w.purse.pounds == 500.0 and not w.ports.boat.away
+    assert w.purse.pounds == 500.0 and not w.dealings.boat.away
     e = w.submit("buy 3 tons of coal and 2 tons of pilchards")
     assert e.kind == "market.bargain", e.text
     assert e.text.startswith("Bought at Falmouth: 3 tons of coal at ")
     assert "; 2 tons of pilchards at " in e.text and "paid in all; the boat goes for it" in e.text
     assert [b["good"] for b in e.data["bargains"]] == ["coal", "pilchards"]
-    assert w.ports.boat.away
+    assert w.dealings.boat.away
     run_until(w, "market.bought", 240)
     assert w.hold.goods == {"coal": 3.0, "pilchards": 2.0}
     assert len(events(w, "market.bought")) == 2
@@ -1164,7 +1168,7 @@ def test_belay_get_under_way_belays_the_work_by_the_orders_own_words():
 
 def _hailed(w, minutes=150):
     hail = run_until(w, "port.pilot_hail", minutes)
-    return hail, w.ports._cutter()
+    return hail, w.dealings._cutter()
 
 
 def _cables(w, vessel):
@@ -1190,7 +1194,7 @@ def test_the_pilot_unanswered_keeps_company_hails_once_more_and_bears_away():
     apart = []
     for _ in range(25):
         w.run(60)
-        if w.ports.cutter_errand == "bring":
+        if w.dealings.cutter_errand == "bring":
             apart.append(_cables(w, cutter))
     hails = events(w, "port.pilot_hail")
     gone = events(w, "port.pilot_gone")
@@ -1206,8 +1210,8 @@ def test_the_pilot_unanswered_keeps_company_hails_once_more_and_bears_away():
     )
     # in company until she bore away, once she had closed from her hail at four cables
     assert apart and max(apart[3:]) <= 2.0
-    assert not events(w, "port.pilot_aboard") and w.ports.pilot is None
-    assert w.ports.declined_until["falmouth"] == gone[0].tick + int(PT.PILOT_AGAIN_H * 3600)
+    assert not events(w, "port.pilot_aboard") and w.dealings.pilot is None
+    assert w.dealings.declined_until["falmouth"] == gone[0].tick + int(PT.PILOT_AGAIN_H * 3600)
     assert cutter.plan[0][0] == "home"
 
 
@@ -1242,7 +1246,7 @@ def test_a_fast_ship_is_hailed_to_shorten_sail_and_the_boat_keeps_company_until_
     w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0, wind_kn=22.0)
     w.submit("set plain sail")
     hail, cutter = _hailed(w)
-    assert w.ports._ground_speed_kn() > PT.PILOT_BOARDS_UNDER_KN
+    assert w.dealings._ground_speed_kn() > PT.PILOT_BOARDS_UNDER_KN
     assert hail.text == (
         "The cutter hailed: a pilot for Falmouth; shorten sail and he will come aboard."
     )
@@ -1257,10 +1261,10 @@ def test_a_fast_ship_is_hailed_to_shorten_sail_and_the_boat_keeps_company_until_
     apart, fast = [], []
     for _ in range(60):
         w.run(60)
-        if w.ports.pilot is not None:
+        if w.dealings.pilot is not None:
             break
         apart.append(_cables(w, cutter))
-        fast.append(w.ports._ground_speed_kn())
+        fast.append(w.dealings._ground_speed_kn())
     aboard = events(w, "port.pilot_aboard")
     waits = events(w, "port.pilot_waits")
     assert aboard and waits and waits[0].tick < aboard[0].tick
@@ -1292,7 +1296,7 @@ def _pilot_aboard(w, port="falmouth"):
     from freesail.world.people import Person
 
     pilot = w.people.add(Person(f"pilot-{port}-1", "Mr Pascoe", "pilot", 0.9, port=port))
-    w.ports.pilot, w.ports.pilot_port, w.ports.pilot_since = pilot, port, w.clock.tick
+    w.dealings.pilot, w.dealings.pilot_port, w.dealings.pilot_since = pilot, port, w.clock.tick
     return pilot
 
 
@@ -1384,7 +1388,7 @@ def test_the_pilot_is_put_off_at_the_anchor_and_the_pilotage_paid_once():
     assert w.purse.pounds == 95.0
     paid = [x[1:] for x in w.purse.entries if "pilotage" in str(x[2])]
     assert paid == [(-5.0, "pilotage, Falmouth")]
-    assert w.ports.pilot is None and w.people.find("the pilot") is None
+    assert w.dealings.pilot is None and w.people.find("the pilot") is None
 
 
 def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_the_black_rock():
@@ -1410,7 +1414,7 @@ def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_th
         "The pilot, Mr Pascoe, has the conn to take her in: by 2 marks to Carrick Road; 'I "
         "have the conn', or a helm order, takes her back."
     )
-    assert w.ports.conn and [m[0] for m in w.ports.conn_track] == [
+    assert w.dealings.conn and [m[0] for m in w.dealings.conn_track] == [
         "Falmouth outer road",
         "Carrick Road",
     ]
@@ -1418,7 +1422,7 @@ def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_th
     assert berth.text.startswith(
         "The pilot: this is the berth, Carrick Road; let go when you please. Carrick Road, "
     )
-    assert not w.ports.conn and not events(w, "ship.aground")
+    assert not w.dealings.conn and not events(w, "ship.aground")
     fixes = events(w, "port.pilot_fix")
     assert len(fixes) == 1 and fixes[0].text.startswith("The pilot has her by his marks: ")
     conned = [x for x in events(w, "helm.order") if x.actor == PILOT_ACTOR]
@@ -1445,7 +1449,9 @@ def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_th
     e = w.submit("come to an anchor")
     assert e.kind == "order.accepted"
     w.run(900)
-    assert w.at_anchor and w.ports.in_port() is not None and w.ports.in_port().id == "falmouth"
+    assert (
+        w.at_anchor and w.dealings.in_port() is not None and w.dealings.in_port().id == "falmouth"
+    )
     # the officer takes her back, by the words or by a helm order of his own
     w = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=5.0, wind=225.0)
     _pilot_aboard(w)
@@ -1458,12 +1464,12 @@ def test_the_pilot_given_the_conn_takes_her_in_by_his_marks_and_keeps_her_off_th
     w.run(300)
     e = w.submit("I have the conn")
     assert e.text == "I have the conn; Mr Pascoe stands by and will still warn of his water."
-    assert not w.ports.conn
+    assert not w.dealings.conn
     assert w.submit("let the pilot take her in").kind == "port.conn"
     w.run(300)
     assert w.submit("steer NNW").kind == "helm.order"
     w.run(60)
-    assert not w.ports.conn
+    assert not w.dealings.conn
     assert [x.text for x in events(w, "port.pilot_conn")] == [
         "The pilot gives her up: the conn taken back.",
         "The pilot gives her up: you have her, sir (the helm was given another course).",
@@ -1526,7 +1532,7 @@ def test_the_pilot_joins_his_track_by_a_planned_leg_or_asks_for_the_station_firs
     w = _conn_from(BASQUE_ROAD, "rochefort", "biscay-north", datetime(1805, 9, 27, 6, 0), 120.0)
     e = w.submit("let the pilot take her in")
     assert e.kind == "port.conn" and "to the road of Aix" in e.text
-    track = [m[1] for m in w.ports.conn_track]
+    track = [m[1] for m in w.dealings.conn_track]
     assert len(track) >= 2 and all(p.lat_deg < 46.016 for p in track[1:])  # south of Aix
     for _ in range(90):
         w.run(60)
@@ -1538,7 +1544,7 @@ def test_the_pilot_joins_his_track_by_a_planned_leg_or_asks_for_the_station_firs
     north_of_re = {"lat_deg": 46.25, "lon_deg": -1.40}
     w = _conn_from(north_of_re, "rochefort", "biscay-north", datetime(1805, 9, 27, 6, 0), 90.0)
     e = w.submit("let the pilot take her in")
-    assert e.kind == "order.rejected" and not w.ports.conn
+    assert e.kind == "order.rejected" and not w.dealings.conn
     assert "bring her to the station first, the road of Aix, and I will take her in" in e.text
 
 
@@ -1563,7 +1569,7 @@ def test_a_hail_never_asks_a_ship_at_anchor_to_shorten_sail():
     boat that comes up with her at anchor asks only whether she will take him, and he
     boards her as she lies."""
     w = at_anchor_in(FALMOUTH_OUTER)
-    w.ports._launch_cutter(w.ports.ports["falmouth"], "bring")
+    w.dealings._launch_cutter(w.dealings.ports["falmouth"], "bring")
     hail, _ = _hailed(w, 10)
     assert hail.text == "The cutter hailed: a pilot for Falmouth, if you will take him."
     assert hail.data["wants"] == ""
@@ -1613,10 +1619,10 @@ def test_biscay_norths_ports_stand_on_the_blocks_marks_and_on_their_own_position
     assert lorient.outer_road.feature_id == "groix-road" == lorient.pilot.station
     assert lorient.mooring.deep_draught_ft == 21  # Faden p. 69: Pennemané for 21 feet and less
     assert whole.chart.region_at(lorient.anchorage.position) == "biscay-north"
-    assert whole.ports.nearest()[0].id == "lorient"
-    assert whole.ports.stance(lorient) == "hostile"  # the frigate, British
+    assert whole.dealings.nearest()[0].id == "lorient"
+    assert whole.dealings.stance(lorient) == "hostile"  # the frigate, British
     neutral = world_at(GROIX_ROAD, ship=SCHOONER, chart="atlantic-east")
-    assert all(neutral.ports.stance(neutral.ports.ports[p]) == "neutral" for p in BISCAY_NORTH)
+    assert all(neutral.dealings.stance(neutral.ports.ports[p]) == "neutral" for p in BISCAY_NORTH)
 
 
 # ---------------------------------------------------------------------------
@@ -1648,7 +1654,7 @@ def test_portugals_ports_stand_on_the_blocks_marks_and_on_their_own_positions_wi
                 assert whole.chart.region_at(a.position) == "portugal", (pid, key)
         doc = yaml.safe_load(open(f"data/ports/{pid}.yaml", encoding="utf-8"))
         assert ("Tofiño" in doc["datum"]) if pid == "cadiz" else doc["datum"] == "unverified"
-    assert whole.ports.nearest()[0].id == "cadiz"
+    assert whole.dealings.nearest()[0].id == "cadiz"
     lisbon = whole.ports.ports["lisbon"]
     assert lisbon.outer_road.feature_id == "cascais-road" == lisbon.pilot.station
     assert lisbon.anchorage.feature_id == "belem-road" and lisbon.anchorage.depth_m > 20.0
@@ -1656,7 +1662,7 @@ def test_portugals_ports_stand_on_the_blocks_marks_and_on_their_own_positions_wi
     oporto = whole.ports.ports["oporto"]
     assert oporto.mooring_for(units.feet_to_m(16.0)) is oporto.anchorage
     for pid in ("oporto", "lisbon", "setubal", "lagos"):
-        assert whole.ports.stance(whole.ports.ports[pid]) == "neutral"  # the frigate, British
+        assert whole.dealings.stance(whole.ports.ports[pid]) == "neutral"  # the frigate, British
 
 
 def test_cadiz_is_blockaded_closed_to_the_blockaders_enemies_and_watched_by_their_ships():
@@ -1672,22 +1678,22 @@ def test_cadiz_is_blockaded_closed_to_the_blockaders_enemies_and_watched_by_thei
     assert listed["port"] == "cadiz" and listed["by"] == "britain"
     assert listed["station"] is not None and listed["station"].lat_deg == pytest.approx(36.55)
     assert american.ports.watched_by(cadiz) == "britain"
-    assert american.ports.stance(cadiz) == "neutral"
+    assert american.dealings.stance(cadiz) == "neutral"
     assert "blockaded by the British" in american.readings.words("port")
     frigate = world_at(OFF_CADIZ, chart="atlantic-east")
-    assert frigate.ports.stance(frigate.ports.ports["cadiz"]) == "hostile"
+    assert frigate.dealings.stance(frigate.ports.ports["cadiz"]) == "hostile"
     # a Spanish schooner standing in for the road: the pilot hails his refusal
     spaniard = world_at(
         OFF_CADIZ, ship=SCHOONER, heading=90.0, speed=4.0, chart="atlantic-east", nation="spain"
     )
-    assert spaniard.ports.stance(spaniard.ports.ports["cadiz"]) == "closed"
+    assert spaniard.dealings.stance(spaniard.ports.ports["cadiz"]) == "closed"
     spaniard.submit("set plain sail")
     refused = run_until(spaniard, "port.pilot_refused", 120)
     assert refused.text.startswith(
         "The pilot hailed from the boat: Cadiz is blockaded by the British squadron; no "
         "pilot will take the Spaniards in past their ships."
     )
-    assert spaniard.ports.pilot is None and refused.data["stance"] == "closed"
+    assert spaniard.dealings.pilot is None and refused.data["stance"] == "closed"
     # the scenario lifts the blockade, or lays one on another port
     lifted = world_at(
         OFF_CADIZ,
@@ -1701,8 +1707,10 @@ def test_cadiz_is_blockaded_closed_to_the_blockaders_enemies_and_watched_by_thei
     )
     assert lifted.ports.ports["cadiz"].state == "open"
     assert [b["port"] for b in lifted.ports.blockades()] == ["lisbon"]
-    assert lifted.ports.stance(lifted.ports.ports["cadiz"]) == "open"
-    assert lifted.ports.stance(lifted.ports.ports["lisbon"]) == "neutral"  # Spain is France's ally
+    assert lifted.dealings.stance(lifted.ports.ports["cadiz"]) == "open"
+    assert (
+        lifted.dealings.stance(lifted.ports.ports["lisbon"]) == "neutral"
+    )  # Spain is France's ally
     with pytest.raises(ValueError, match="names its blockaders"):
         world_at(OFF_CADIZ, chart="atlantic-east", ports={"lisbon": {"state": "blockaded"}})
     with pytest.raises(ValueError, match="state 'besieged' is not one of open, blockaded"):
@@ -1748,14 +1756,14 @@ def test_biscay_souths_ports_stand_on_the_blocks_marks_and_on_their_own_position
         doc = yaml.safe_load(open(f"data/ports/{pid}.yaml", encoding="utf-8"))
         assert doc["datum"] == "unverified"
         assert norie.by_name(port.tide["establishment"]) is not None, pid
-        assert whole.ports.stance(port) == "hostile"  # the frigate, British
+        assert whole.dealings.stance(port) == "hostile"  # the frigate, British
     vigo = whole.ports.ports["vigo"]
     assert vigo.outer_road.feature_id == "cies-road" == vigo.pilot.station
-    assert whole.ports.nearest()[0].id == "vigo"
+    assert whole.dealings.nearest()[0].id == "vigo"
     # the road of Vigo in the Derrotero's eight to fourteen brazas, on mud
     assert vigo.anchorage.bottom == "mud" and 14.0 < vigo.anchorage.depth_m < 20.0
     neutral = world_at(VIGO_OUTER_ROAD, ship=SCHOONER, chart="atlantic-east")
-    assert all(neutral.ports.stance(neutral.ports.ports[p]) == "neutral" for p in BISCAY_SOUTH)
+    assert all(neutral.dealings.stance(neutral.ports.ports[p]) == "neutral" for p in BISCAY_SOUTH)
 
 
 # ---------------------------------------------------------------------------
@@ -1795,8 +1803,8 @@ def test_the_straits_ports_stand_on_the_blocks_marks_and_the_stances_of_three_na
             assert doc["datum"] == "unverified"
     gib = whole.ports.ports["gibraltar"]
     assert gib.nation == "britain" and gib.anchorage.feature_id == "gibraltar-road"
-    assert whole.ports.nearest()[0].id == "gibraltar"
-    stances = {pid: whole.ports.stance(whole.ports.ports[pid]) for pid in STRAIT_PORTS}
+    assert whole.dealings.nearest()[0].id == "gibraltar"
+    stances = {pid: whole.dealings.stance(whole.ports.ports[pid]) for pid in STRAIT_PORTS}
     assert stances == {
         "algeciras": "hostile",
         "ceuta": "hostile",
@@ -1805,11 +1813,11 @@ def test_the_straits_ports_stand_on_the_blocks_marks_and_the_stances_of_three_na
         "tarifa": "hostile",
     }
     neutral = world_at(OFF_EUROPA, ship=SCHOONER, chart="atlantic-east")
-    assert {neutral.ports.stance(neutral.ports.ports[p]) for p in STRAIT_PORTS} == {"neutral"}
+    assert {neutral.dealings.stance(neutral.ports.ports[p]) for p in STRAIT_PORTS} == {"neutral"}
     spaniard = world_at(OFF_EUROPA, ship=SCHOONER, chart="atlantic-east", nation="spain")
-    assert spaniard.ports.stance(spaniard.ports.ports["gibraltar"]) == "hostile"
-    assert spaniard.ports.stance(spaniard.ports.ports["ceuta"]) == "open"
-    assert spaniard.ports.stance(spaniard.ports.ports["tangier"]) == "neutral"
+    assert spaniard.dealings.stance(spaniard.ports.ports["gibraltar"]) == "hostile"
+    assert spaniard.dealings.stance(spaniard.ports.ports["ceuta"]) == "open"
+    assert spaniard.dealings.stance(spaniard.ports.ports["tangier"]) == "neutral"
 
 
 WARDROOM_SAVE = (
@@ -1895,3 +1903,105 @@ def test_the_pilot_reckons_how_near_she_lies_by_the_wind_over_the_water():
     flood = units.knots_to_ms(4.0)
     water = (flood * math.sin(to), flood * math.cos(to))
     assert 335.0 < math.degrees(_wind_from_over_the_water(world(water), wind)) < 350.0
+
+
+# ---------------------------------------------------------------------------
+# Package 84, step 3: the ports the world's, the dealings a hull's
+# (`docs/design/Design-OneWorld.md` §2.4 and the migration's third step)
+# ---------------------------------------------------------------------------
+
+
+def test_the_ports_are_the_worlds_and_a_hulls_dealings_are_hers():
+    """`world.ports` is the world's `Ports`: the files, the markets, a stance toward a
+    nation, the nearest port to a place; `world.dealings` is the hull's `Dealings`: her
+    pilot, her boat, her price lists, her jobs, reading the world's half through her under
+    the names the one class had. A dealing read on the world's ports is refused in words
+    naming where it lives; the jobs of every hull are the world's view."""
+    from freesail.world.dealings import Dealings
+    from freesail.world.ports import Ports
+
+    w = at_anchor_in(CARRICK_ROAD, ship=SCHOONER, heading=250.0, cargo={"purse_pounds": 500.0})
+    assert isinstance(w.ports, Ports) and isinstance(w.dealings, Dealings)
+    assert w.ports.world is w and w.dealings.world is w and w.own.dealings is w.dealings
+    assert w.own.ports is w.ports and w.dealings.ports is w.ports.ports
+    falmouth = w.ports.find("Falmouth")
+    assert w.dealings.find("Falmouth") is falmouth
+    assert w.ports.stance(falmouth, w.dealings.ship_nation) == w.dealings.stance(falmouth)
+    assert w.ports.stance(falmouth, "france") == "hostile"
+    assert w.ports.in_port_at(w.position) is falmouth and w.dealings.in_port() is falmouth
+    assert w.ports.nearest_to(w.position)[0] is falmouth and w.dealings.nearest()[0] is falmouth
+    with pytest.raises(AttributeError, match="a hull's dealing: read it on `world.dealings`"):
+        _ = w.ports.boat
+    with pytest.raises(TypeError):
+        w.ports.stance(falmouth)  # the nation is an argument of the world's
+    assert w.ports.jobs == [] and w.dealings.jobs == []
+    e = w.submit("send the boat ashore for the prices")
+    assert e.kind == "order.accepted" and w.dealings.boat.away
+    for _ in range(240):
+        w.run(60)
+        if not w.dealings.boat.away:
+            break
+    assert "falmouth" in w.dealings.price_lists and not w.dealings.boat.away
+    e = w.submit("buy a suit of sails from the chandlers")
+    assert e.kind != "order.rejected", e.text
+    jobs = w.dealings.jobs
+    assert jobs and all(j.hull == w.own.id for j in jobs) and w.ports.jobs == jobs
+
+
+def test_a_crewed_stranger_in_carrick_road_deals_with_the_port_by_her_own_boat():
+    """The design's test for step 3: a crewed stranger in Carrick Road sends her own boat for
+    the prices and the player's boat is where it was; her captain goes ashore at full
+    detail and is found at the quay among the port's people; no pilot cutter is sent after
+    her unasked while her captain is a rules brain (step 4 gives him the port's acts)."""
+    from tests.test_brains import put
+
+    w = at_anchor_in(CARRICK_ROAD, ship=FRIGATE, cargo={"purse_pounds": 500.0})
+    sails_before = len(w.vessels.vessels)
+    b = put(
+        w,
+        "merchant brig",
+        "britain",
+        "50 09.5 N 5 02.5 W",
+        "bound for Falmouth",
+        "bound for Falmouth",
+    )
+    w.run(61)
+    assert b.crew is not None and b.crew.shape == "full", "the brig in the road is crewed"
+    crew = b.crew
+    assert crew.ports is w.ports and crew.dealings is not w.dealings
+    assert crew.dealings.hull_id == b.id and w.dealings.hull_id == w.own.id
+    # her captain anchors her by his own grammar (the rules captain stands aside)
+    e = crew.submit("let go the best bower")
+    assert e.kind == "order.accepted", e.text
+    w.run(300)
+    assert crew.at_anchor and crew.dealings.in_port() is w.ports.find("Falmouth")
+    assert b.crew is crew, "still crewed: her captain's state is not the anchor's"
+    # her boat for the prices, hers alone
+    e = crew.submit("send the boat ashore for the prices")
+    assert e.kind == "order.accepted", e.text
+    assert crew.dealings.boat.away and not w.dealings.boat.away
+    for _ in range(240):  # her boat's pull is hers: from where she lies, some hour and a half
+        w.run(60)
+        if not crew.dealings.boat.away:
+            break
+    assert "falmouth" in crew.dealings.price_lists and "falmouth" not in w.dealings.price_lists
+    assert not crew.dealings.boat.away and not w.dealings.boat.away
+    assert w.readings.words("boat") == "the launch at the booms"
+    # her captain ashore at full detail, found at the quay with the world's people there
+    cap = crew.people.captain
+    e = crew.submit("go ashore")
+    assert e.kind != "order.rejected", e.text
+    for _ in range(240):
+        w.run(60)
+        if not cap.aboard and cap.where == "shore":
+            break
+    assert not cap.aboard and cap.where == "shore" and cap.port == "falmouth"
+    lines = " ".join(w.ports.places_lines(w.ports.find("Falmouth")))
+    assert cap.name in lines and lines == " ".join(
+        crew.dealings.places_lines(crew.dealings.find("Falmouth"))
+    )
+    # no cutter was sent after her unasked, and the player's dealings are untouched
+    assert crew.dealings.pilot is None and crew.dealings.cutter_id is None
+    assert w.dealings.pilot is None and w.dealings.cutter_id is None
+    assert len(w.vessels.vessels) == sails_before + 1
+    assert [j.hull for j in w.ports.jobs] == [b.id] * len(crew.dealings.jobs)

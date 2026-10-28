@@ -1088,7 +1088,7 @@ class Squadron:
         except Exception:  # noqa: BLE001
             return ""
         dest = intent.destination
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         port = (getattr(ports, "ports", None) or {}).get(dest) if ports is not None else None
         if port is not None:
             return str(port.name)
@@ -1227,7 +1227,7 @@ class Squadron:
             body = _body(world, commander)
             nation = str(
                 getattr(body, "nation", "")
-                or getattr(getattr(world, "ports", None), "ship_nation", "")
+                or getattr(getattr(world, "dealings", None), "ship_nation", "")
                 or ""
             )
         goal = str(spec.get("goal") or "")
@@ -1567,7 +1567,7 @@ def _covered(world: Any, prey: Any) -> bool:
         if d <= COVER_NM * units.NAUTICAL_MILE:
             return True
     shadow_pos = getattr(world, "position", None)
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     own_nation = getattr(ports, "ship_nation", None) if ports is not None else None
     if shadow_pos is not None and own_nation == str(prey.nation):
         _, d = bearing_and_distance(shadow_pos, prey.position)

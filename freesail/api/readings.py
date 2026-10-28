@@ -2209,7 +2209,7 @@ def _places(world: Any, _: str | None) -> dict[str, Any] | None:
 
 
 def _ports_of(world: Any) -> Any:
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     return ports if ports is not None and ports.ports else None
 
 
@@ -2241,12 +2241,12 @@ def _no_port_words(world: Any) -> str | None:
 
 
 def _boat(world: Any, _: str | None) -> dict[str, Any] | None:
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     return ports.boat_reading() if ports is not None else None
 
 
 def _boats(world: Any, _: str | None) -> dict[str, Any] | None:
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     return {"words": ports.boats_words()} if ports is not None else None
 
 
@@ -2359,7 +2359,7 @@ def _stranger_in_sight(world: Any, _: str | None) -> dict[str, Any] | None:
     lookout = _lookout_of(world)
     if lookout is None:
         return None
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     own = ports.ship_nation if ports is not None else None
     return lookout.stranger(world, float(world.ship.heading), own)
 
@@ -2815,7 +2815,7 @@ def _needs_aground(world: Any) -> str | None:
 
 
 def _needs_pilot(world: Any) -> str | None:
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if ports is None:
         return None
     if getattr(ports, "pilot", None) is not None:
@@ -3723,7 +3723,7 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
     ledger = getattr(purse, "ledger", None) if purse is not None else None
     if ledger:
         own["ledger"] = purse.ledger_lines()
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     markets: dict[str, dict[str, float]] = {}
     news: list[str] = []
     nations = getattr(world, "nations", None)
@@ -3765,7 +3765,7 @@ def director_readings(world: Any, within_nm: float | None = None) -> dict[str, A
 def truth_ports(world: Any, which: str) -> dict[str, Any]:
     """`truth(ports=...)`: a port's places (with the world's people ashore at each), its
     prices and its stance; 'all' for every port of the world."""
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if ports is None or not ports.ports:
         return {"words": "The world keeps no ports."}
     key = " ".join(str(which).split())

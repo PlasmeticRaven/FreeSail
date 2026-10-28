@@ -721,7 +721,13 @@ class World:
             float(getattr(stores_spec, "water_tons", 0.0) or 0.0),
             float(getattr(stores_spec, "provisions_days", 0.0) or 0.0),
         )
-        self.ports = Ports(self)
+        # the ports of the world (package 84, step 3; `ports.Ports`): one for the game, a
+        # crewed ship's World given its parent's; her dealings with them hers
+        # (`dealings.Dealings`, `world.dealings`)
+        from freesail.world.dealings import Dealings
+
+        self.ports = parent.ports if parent is not None else Ports(self)
+        self.dealings = Dealings(self)
         # the fishery (spec M7b §21a; package 56): the gear her file carries, the gear in
         # the water and the catch aboard; None for a ship that carries no fishing gear,
         # whose world is as it was
@@ -867,6 +873,45 @@ class World:
 
         self.__dict__.update(lift_old_state(self, state))
         self._adopt_old_people()
+        self._adopt_old_ports()
+
+    def _adopt_old_ports(self) -> None:
+        """A checkpoint written before the ports' split (package 84, step 3): the one
+        `Ports` object on the hull, the port files and her dealings together, parted into
+        the world's `Ports` (the files) and her `Dealings` (the rest); a crewed ship's
+        World's (its own `__setstate__` ran first) given the parent's ports."""
+        from freesail.world.dealings import Dealings
+        from freesail.world.ports import Ports
+
+        own = self.own
+        old = None
+        if "dealings" not in own.__dict__:
+            # the one object lifted onto the hull by a step 1 converter that knew `ports`
+            # as hers, or left on the World's dict by this one, which knows it as the world's
+            if "ports" in own.__dict__:
+                old = own.__dict__.pop("ports")
+            elif "boat" in getattr(self.__dict__.get("ports"), "__dict__", {}):
+                old = self.__dict__["ports"]
+        if old is not None:
+            dealings = Dealings.__new__(Dealings)
+            for key, value in list(old.__dict__.items()):
+                if key not in ("world", "ports"):
+                    dealings.__dict__[key] = value
+                    del old.__dict__[key]
+            dealings.world = self
+            own.dealings = dealings
+            ports = Ports.__new__(Ports)
+            ports.world = self
+            ports.ports = old.__dict__.get("ports", {})
+            self.ports = ports
+            for job in dealings.__dict__.get("jobs", ()) or ():
+                if not getattr(job, "hull", ""):
+                    job.hull = own.id
+        for v in getattr(getattr(self, "vessels", None), "vessels", None) or []:
+            crew = getattr(v, "crew", None)
+            if crew is None or crew.__dict__.get("ports") is self.ports:
+                continue
+            crew.ports = self.ports
 
     def _adopt_old_people(self) -> None:
         """The persons and the things of a checkpoint written before the one registry
@@ -1938,7 +1983,9 @@ class World:
         # the ports (spec M5 §23, package 35): the pilot's coming and going once a minute,
         # the yard's and the pool's jobs when due; then the people's tasks done, the moves
         # in hand finished and the letters delivered through the door (§22)
-        self.ports.tick()
+        self.dealings.tick()
+        if self.ports.world is self:
+            self.ports.tick()  # the world's ports, once, by the World that owns them
         for severity, kind, text, data in self.people.tick(self.clock.tick):
             self.record(severity, kind, text, data=data)
         # the watch routine (spec M3 §4): watch changes, all hands, fatigue and rest

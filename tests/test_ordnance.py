@@ -160,7 +160,7 @@ def at_anchor_in(where, ship=CUTTER, **kw):
     w.run(60)
     w.submit("let go the best bower")
     w.run(300)
-    assert w.at_anchor and w.ports.in_port() is not None
+    assert w.at_anchor and w.dealings.in_port() is not None
     return w
 
 
@@ -183,7 +183,7 @@ def refused(w, order):
 def hurry(w):
     """The hoy's job brought due at the next tick (its hours are pinned by its due tick
     before this is called): the fast tier sails no five hours at anchor."""
-    for job in w.ports.jobs:
+    for job in w.dealings.jobs:
         if job.kind == OR.JOB_KIND:
             job.due_tick = w.clock.tick + 1
     w.run(2)
@@ -200,18 +200,18 @@ def test_the_eleven_ports_have_their_blocks_and_the_other_twenty_seven_none():
     the prices at home or abroad; Lisbon's knob written in its file and left unset; every
     other port file with no block, so 'none to be had'."""
     w = world_at(OFF_THE_LIZARD, ports=tuple(PT.port_files()))
-    with_block = {pid for pid, port in w.ports.ports.items() if port.ordnance is not None}
+    with_block = {pid for pid, port in w.dealings.ports.items() if port.ordnance is not None}
     assert with_block == set(BLOCKS)
-    assert len(w.ports.ports) - len(with_block) == 27
+    assert len(w.dealings.ports) - len(with_block) == 27
     for pid, (kind, sells, roads, hours, barrel, ton) in BLOCKS.items():
-        block = w.ports.ports[pid].ordnance
+        block = w.dealings.ports[pid].ordnance
         assert (block["kind"], block["sells"], block["roads"]) == (kind, sells, roads), pid
         assert block["hoy_hours"] == hours, pid
         assert (block["powder_per_barrel_pounds"], block["shot_per_ton_pounds"]) == (barrel, ton)
         assert (block["barrels_an_hour"], block["shot_tons_an_hour"]) == (20.0, 2.0), pid
         assert block["source"] and block["sells_in_war_to"] is None, pid
-        assert OR.block_of(w.ports.ports[pid]) is block
-    plymouth = w.ports.ports["plymouth"].ordnance
+        assert OR.block_of(w.dealings.ports[pid]) is block
+    plymouth = w.dealings.ports["plymouth"].ordnance
     assert plymouth["roads_words"] == "Plymouth Sound or Cawsand Bay"
     assert "Art. VI l.12833-12839" in plymouth["source"]
     text = open("data/ports/lisbon.yaml", encoding="utf-8").read()
@@ -251,7 +251,7 @@ def test_a_port_pickled_before_the_block_reads_it_once_from_its_file(tmp_path):
     saves naming another folder): that file is read only when this build has no file of
     the port, and with neither the port has none."""
     w = world_at(OFF_THE_LIZARD, ports=("plymouth",))
-    port = w.ports.ports["plymouth"]
+    port = w.dealings.ports["plymouth"]
     new = port.ordnance
     del port.__dict__["ordnance"]  # as a port pickled before this build
     text = open("data/ports/plymouth.yaml", encoding="utf-8").read()
@@ -304,7 +304,7 @@ def test_the_kings_cutter_completes_her_magazine_of_the_ordnance_free_in_the_sou
     assert e.data["barrels"] == 1 and e.data["powder_lb"] == 100.0
     assert e.data["shot"] == {"12": {"round": 149}}
     assert e.data["due_tick"] == e.tick + 4 * 3600
-    (job,) = w.ports.jobs
+    (job,) = w.dealings.jobs
     assert (job.kind, job.port_id, job.due_tick) == ("ordnance", "plymouth", e.tick + 4 * 3600)
     assert job.payload == {
         "stage": "alongside",
@@ -331,7 +331,7 @@ def test_the_kings_cutter_completes_her_magazine_of_the_ordnance_free_in_the_sou
     assert alongside.severity.value == "notable"
     assert w.stores.galley_fire_out == "powder"
     assert w.readings["port"]["words"].endswith("; the hoy alongside, the powder coming aboard")
-    (stowing,) = w.ports.jobs
+    (stowing,) = w.dealings.jobs
     assert stowing.payload["stage"] == "stowed"
     assert stowing.due_tick == alongside.tick + 3600  # 1/20 + 0.8 tons/2, at least an hour
     hurry(w)
@@ -341,7 +341,7 @@ def test_the_kings_cutter_completes_her_magazine_of_the_ordnance_free_in_the_sou
         "the Ordnance's storekeeper and vouched; the magazine secured and the keys to the "
         "captain; the galley fire lit again."
     )
-    assert w.stores.galley_fire_out == "" and not w.ports.jobs
+    assert w.stores.galley_fire_out == "" and not w.dealings.jobs
     assert mag.powder_lb == 300.0 and mag.shot[12.0]["round"] == 240
     assert mag.report_filled is True
     (when, words) = mag.account[-1]
@@ -372,15 +372,15 @@ def test_powder_is_taken_in_at_the_road_and_never_in_the_hamoaze():
     outer road) and the anchorage in the Sound pass, the Hamoaze (the mooring) is refused in
     the article's words; the issue is the King's ship's alone."""
     road = kings_cutter(CAWSAND)
-    assert road.ports.in_port().nearest_spot(road.position)[0].name == "Cawsand Bay"
+    assert road.dealings.in_port().nearest_spot(road.position)[0].name == "Cawsand Bay"
     assert road.submit("take in powder").kind == "ordnance.demanded"
     harbour = kings_cutter(HAMOAZE)
-    assert harbour.ports.in_port().nearest_spot(harbour.position)[0].name == "the Hamoaze"
+    assert harbour.dealings.in_port().nearest_spot(harbour.position)[0].name == "the Hamoaze"
     assert refused(harbour, "take in powder and shot") == (
         "Powder is taken in at Plymouth Sound or Cawsand Bay, not in the harbour (the "
         "Regulations, the Gunner, Art. VI): weigh and bring her to the road first."
     )
-    assert not harbour.ports.jobs
+    assert not harbour.dealings.jobs
 
 
 def test_the_hoy_goes_back_when_she_is_gone_from_the_road_and_nothing_is_paid():
@@ -392,20 +392,20 @@ def test_the_hoy_goes_back_when_she_is_gone_from_the_road_and_nothing_is_paid():
     after_the_action(w.ship)
     pay = {"stage": "alongside", "how": "issue", "necessity": False, "powder_lb": 100.0}
     pay |= {"barrels": 1, "shot": {}, "cost": 0.0, "words": "1 barrel of powder"}
-    w.ports.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", dict(pay)))
+    w.dealings.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", dict(pay)))
     w.run(2)
     (missed,) = events(w, "ordnance.missed")
     assert missed.text == (
         "The hoy came off and found her gone from the road; it went back with the powder."
     )
     assert missed.data["why"] == "gone" and missed.severity.value == "notable"
-    assert w.stores.galley_fire_out == "" and not w.ports.jobs
+    assert w.stores.galley_fire_out == "" and not w.dealings.jobs
     assert not events(w, "ordnance.alongside")
     # weighed with the hoy alongside: a sale at Falmouth, paid at alongside, given back
     pay |= {"stage": "stowed", "how": "sale", "cost": 5.0}
     w.stores.galley_fire_out = "powder"
     w.purse.pay(5.0, "powder and shot of the merchants at Falmouth", w.clock.tick)
-    w.ports.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", dict(pay)))
+    w.dealings.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", dict(pay)))
     w.run(2)
     gone = events(w, "ordnance.missed")[-1]
     assert gone.text == (
@@ -425,7 +425,7 @@ def test_a_ship_that_weighs_with_the_hoy_alongside_has_her_galley_fire_lit_as_sh
     w.submit("buy powder and shot of necessity")
     hurry(w)
     assert w.stores.galley_fire_out == "powder" and w.purse.pounds == pytest.approx(85.4)
-    (stowing,) = w.ports.jobs
+    (stowing,) = w.dealings.jobs
     assert w.submit("weigh").kind == "order.accepted"
     up = None
     for _ in range(40):
@@ -442,7 +442,7 @@ def test_a_ship_that_weighs_with_the_hoy_alongside_has_her_galley_fire_lit_as_sh
         "went back with it, the £14 12s paid returned; the galley fire lit again."
     )
     assert gone.data["why"] == "weighed"
-    assert w.stores.galley_fire_out == "" and not w.ports.jobs
+    assert w.stores.galley_fire_out == "" and not w.dealings.jobs
     assert w.purse.pounds == pytest.approx(100.0)
     assert not events(w, "ordnance.stowed")
 
@@ -454,7 +454,7 @@ def test_a_hoy_at_another_port_neither_stops_a_demand_here_nor_shows_in_this_por
     w = kings_cutter(CARRICK_ROAD)
     pay = {"stage": "alongside", "how": "issue", "necessity": False, "powder_lb": 100.0}
     pay |= {"barrels": 1, "shot": {}, "cost": 0.0, "words": "1 barrel of powder"}
-    w.ports.jobs.append(PT.Job(w.clock.tick + 2 * 3600, "ordnance", "plymouth", dict(pay)))
+    w.dealings.jobs.append(PT.Job(w.clock.tick + 2 * 3600, "ordnance", "plymouth", dict(pay)))
     w.run(1)
     reading = w.readings["port"]
     assert reading["port"] == "falmouth" and "hoy" not in reading
@@ -525,7 +525,7 @@ def test_a_hostile_port_and_a_port_with_no_block_refuse_her_in_words():
         "Brest is hostile to her; no powder will be issued or sold her."
     )
     w = kings_cutter(CARRICK_ROAD)
-    w.ports.ports["falmouth"].ordnance = None  # as the twenty-seven
+    w.dealings.ports["falmouth"].ordnance = None  # as the twenty-seven
     assert refused(w, "buy powder of necessity") == (
         "There is no powder or shot to be had at Falmouth: no storekeeper of the Ordnance, "
         "and no merchant who deals in it."
@@ -656,7 +656,7 @@ def test_the_merchant_brig_buys_at_falmouth_and_a_short_purse_sends_the_hoy_back
         "back with the powder."
     )
     assert missed.data["why"] == "purse"
-    assert w.purse.pounds == 10.0 and w.stores.galley_fire_out == "" and not w.ports.jobs
+    assert w.purse.pounds == 10.0 and w.stores.galley_fire_out == "" and not w.dealings.jobs
 
 
 def test_lisbon_sells_to_both_sides_until_its_knob_is_set():
@@ -671,10 +671,10 @@ def test_lisbon_sells_to_both_sides_until_its_knob_is_set():
         cargo={"purse_pounds": 100.0},
     )
     after_the_action(french.ship)
-    assert french.ports.stance(french.ports.in_port()) == "neutral"
+    assert french.dealings.stance(french.dealings.in_port()) == "neutral"
     assert french.nations.enemies_of("france")
     assert french.submit("take in powder").kind == "ordnance.demanded"
-    french.ports.jobs = []
+    french.dealings.jobs = []
     french.ports.ports["lisbon"].ordnance["sells_in_war_to"] = ("britain",)
     assert refused(french, "take in powder") == (
         "Lisbon's merchants sell no powder to a French ship while the war lasts."
@@ -738,7 +738,7 @@ def test_a_man_of_war_of_another_nation_buys_of_the_merchants_as_everyone_else_d
         nation="portugal",
         cargo={"purse_pounds": 500.0},
     )
-    assert pt.ports.stance(pt.ports.in_port()) == "neutral"
+    assert pt.dealings.stance(pt.dealings.in_port()) == "neutral"
     fake_magazine(pt.ship, filled={("long", 18.0): 1900})
     e = pt.submit("take in powder and shot")
     assert e.kind == "ordnance.demanded" and e.data["how"] == "sale", e.text
@@ -758,13 +758,13 @@ def test_the_seventh_refusal_at_an_ordnance_port_names_its_storekeeper():
         cargo={"purse_pounds": 100.0},
     )
     after_the_action(w.ship)
-    assert w.ports.stance(w.ports.in_port()) == "neutral"
+    assert w.dealings.stance(w.dealings.in_port()) == "neutral"
     assert refused(w, "take in powder and shot") == (
         "There is no storekeeper of the Ordnance at Lisbon, and a captain is charged not to "
         "purchase stores without an absolute necessity (the Regulations): say 'buy powder of "
         "necessity' to buy it of the merchants at £6 a barrel."
     )
-    w.ports.ports["lisbon"].ordnance["kind"] = "ordnance"
+    w.dealings.ports["lisbon"].ordnance["kind"] = "ordnance"
     assert refused(w, "take in powder and shot") == (
         "The Ordnance's storekeeper at Lisbon does not issue to her, and a captain is charged "
         "not to purchase stores without an absolute necessity (the Regulations): say 'buy "
@@ -782,7 +782,7 @@ def test_a_hoy_of_shot_alone_goes_back_with_the_shot():
     fake_magazine(w.ship, shot={6.0: {"round": 50}})
     e = w.submit("take in shot")
     assert e.kind == "ordnance.demanded" and e.data["barrels"] == 0, e.text
-    (job,) = w.ports.jobs
+    (job,) = w.dealings.jobs
     shot_only = dict(job.payload)
     w.purse.pounds = 0.0
     hurry(w)
@@ -790,13 +790,13 @@ def test_a_hoy_of_shot_alone_goes_back_with_the_shot():
     assert short.text.startswith("The merchants' hoy came alongside, but the purse holds ")
     assert short.text.endswith("; it went back with the shot.")
     w.purse.pounds = 100.0
-    w.ports.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", dict(shot_only)))
+    w.dealings.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", dict(shot_only)))
     w.run(2)
     assert events(w, "ordnance.missed")[-1].text == (
         "The hoy came off and found her gone from the road; it went back with the shot."
     )
     stowing = shot_only | {"stage": "stowed"}
-    w.ports.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", stowing))
+    w.dealings.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", stowing))
     w.purse.pay(float(shot_only["cost"]), "the shot of the merchants at Falmouth", w.clock.tick)
     w.run(2)
     assert events(w, "ordnance.missed")[-1].text.startswith(
@@ -804,7 +804,7 @@ def test_a_hoy_of_shot_alone_goes_back_with_the_shot():
         "back with it, the "
     )
     with_powder = shot_only | {"barrels": 1, "powder_lb": 100.0}
-    w.ports.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", with_powder))
+    w.dealings.jobs.append(PT.Job(w.clock.tick + 1, "ordnance", "plymouth", with_powder))
     w.run(2)
     assert events(w, "ordnance.missed")[-1].text == (
         "The hoy came off and found her gone from the road; it went back with the powder."

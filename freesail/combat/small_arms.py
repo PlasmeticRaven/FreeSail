@@ -114,7 +114,7 @@ def kit_of(world: Any) -> dict[str, Any]:
     from freesail.world.nations import load_marines
 
     nations = getattr(world, "nations", None)
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     nation = str(getattr(ports, "ship_nation", "") or "")
     if nations is not None and hasattr(nations, "marines_kit_of"):
         return nations.marines_kit_of(nation)

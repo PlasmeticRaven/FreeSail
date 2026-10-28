@@ -23,7 +23,7 @@ crew pool, in port.
 
 Each is a verb of `data/vocabulary.yaml` with the object `port`: the grammar takes the
 words after the verb as they are, and this module reads a number, a good, an item or a
-rating from them and hands the order to the World's ports (`freesail.world.ports.Ports`),
+rating from them and hands the order to the World's ports (`freesail.world.dealings.Dealings`),
 which refuse in words when she is not in port, the prices are not known, the boat is
 away, the hold is full or the purse short.
 """
@@ -102,7 +102,7 @@ def _bargains(rest: str) -> list[str]:
 
 def _ports(ship: Any) -> Any:
     world = world_of(ship)
-    ports = getattr(world, "ports", None) if world is not None else None
+    ports = getattr(world, "dealings", None) if world is not None else None
     if ports is None or not ports.ports:
         raise OrderError(NO_PORTS_WORDS)
     return ports

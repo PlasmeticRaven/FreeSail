@@ -107,6 +107,7 @@ def _old_shape_checkpoint(world: World) -> bytes:
     the game's own pickler for everything else. Every World of the graph is written so,
     the crewed ships' included."""
     from freesail.world.people import People, Person
+    from freesail.world.ports import Ports
     from freesail.world.things import Thing
 
     def world_state(w: World) -> dict:
@@ -114,8 +115,16 @@ def _old_shape_checkpoint(world: World) -> bytes:
         hull = state.pop("own")
         state.pop("registry", None)
         for name in hulls.PER_SHIP_FIELDS:
-            if name in hull.__dict__:
+            if name in hull.__dict__ and name != "dealings":
                 state[name] = hull.__dict__[name]
+        # the one `Ports` of before step 3: the port files and her dealings in one object
+        old_ports = Ports.__new__(Ports)
+        for key, value in hull.dealings.__dict__.items():
+            if key != "world":
+                old_ports.__dict__[key] = value
+        old_ports.world = w
+        old_ports.ports = w.ports.ports
+        state["ports"] = old_ports
         state["chart"] = None
         state["_readings_view"] = None
         state["_readings_key"] = None
@@ -145,10 +154,16 @@ def _old_shape_checkpoint(world: World) -> bytes:
         state.pop("hull", None)
         return state
 
+    def ports_state(ports: Ports) -> dict:
+        # a step 3 `Ports` met on its own (the shared one): written as a bare old one
+        return dict(ports.__dict__)
+
     class OldPickler(replay_mod._Pickler):
         def reducer_override(self, obj):
             if isinstance(obj, World):
                 return replay_mod._new, (type(obj),), world_state(obj)
+            if isinstance(obj, Ports):
+                return replay_mod._new, (Ports,), ports_state(obj)
             if isinstance(obj, People):
                 return replay_mod._new, (People,), people_state(obj)
             if isinstance(obj, Person):
@@ -171,6 +186,10 @@ def test_a_checkpoint_from_before_the_hull_converts_on_load_and_carries_on_alike
     replay_mod._rebind(loaded)
     assert "own" in loaded.__dict__ and isinstance(loaded.own, hulls.Hull)
     assert not any(name in loaded.__dict__ for name in hulls.PER_SHIP_FIELDS)
+    # the ports parted (step 3): the world's files on `ports`, her dealings on the hull
+    assert type(loaded.ports).__name__ == "Ports" and "boat" not in loaded.ports.__dict__
+    assert type(loaded.dealings).__name__ == "Dealings" and loaded.dealings.world is loaded
+    assert loaded.ports.ports is loaded.dealings.ports and loaded.dealings.boat is not None
     assert loaded.own.world is loaded and loaded.own.id == PLAYER_ID
     assert loaded.log.digest() == w.log.digest() and loaded.ship.name == w.ship.name
     assert loaded.wind_settled == w.wind_settled and loaded.people.captain.name

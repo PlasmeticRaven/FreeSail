@@ -99,8 +99,9 @@ PER_SHIP_FIELDS: tuple[str, ...] = (
     "log",
     "_recurring_said",
     # her places aboard, her people, her stations, her papers, her hold, purse and stores,
-    # her ports' dealings (one object with the ports' files until step 3), her fishery, her
-    # needs, her water and her health (spec M5 §22 to §25; M7b §19 to §21a; M7 §13, §16)
+    # her dealings with the ports (step 3; the port files are the world's `ports`), her
+    # fishery, her needs, her water and her health (spec M5 §22 to §25; M7b §19 to §21a;
+    # M7 §13, §16)
     "places",
     "people",
     "stations",
@@ -108,7 +109,7 @@ PER_SHIP_FIELDS: tuple[str, ...] = (
     "hold",
     "purse",
     "stores",
-    "ports",
+    "dealings",
     "fishery",
     "needs",
     "water",
@@ -139,6 +140,7 @@ SHARED_FIELDS: tuple[str, ...] = (
     "weather",
     "nations",
     "registry",
+    "ports",
     "vessels",
     "squadrons",
     "business",

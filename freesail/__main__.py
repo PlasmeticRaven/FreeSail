@@ -36,6 +36,11 @@ PATH_FLAGS = ("ship", "scenario", "load", "standing_orders", "consent_records", 
 
 
 def main(argv: list[str] | None = None) -> int:
+    # the harbour's terminal lines are read by a test through a pipe (truth 7b-108) and by
+    # the owner through a console: line-buffered, so that each line reaches its reader when
+    # it is said and not when the process ends
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(line_buffering=True)
     from freesail.ui import server
 
     ap = server.server_parser("FreeSail: the harbour, the game's launcher (package 59)")

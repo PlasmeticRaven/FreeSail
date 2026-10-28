@@ -77,6 +77,88 @@ def load_business(path: str = str(BUSINESS_PATH)) -> dict[str, Any]:
     return yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
 
 
+def transact(world: Any, brain: Any, port_id: str) -> bool:
+    """A far trader at her port of destination (package 84, step 4; `data/business.yaml`
+    `transact:`, the owner's decision 5): her cargo sold to the port's market at its price
+    of the day, the supply moved by the tons (`Market.sold_to_port`), a return cargo bought
+    where a route worth carrying runs from that port (the business's `routes` rule, with or
+    without the business on), and her captain's intent set for it, so that she sails again;
+    with no route worth it, a passage home to her port of lading, empty; with no home port
+    either, nothing (she is gone from the sea as before). The sale and the purchase are
+    kept on the business's record of her where she is one of its ships (`Drawn.landed`).
+    Returns whether she has a new voyage."""
+    data = load_business()
+    if not bool(data.get("transact", True)):
+        return False
+    intent = getattr(brain, "intent", None)
+    ports = getattr(world, "ports", None)
+    port = (getattr(ports, "ports", None) or {}).get(port_id) if ports is not None else None
+    if intent is None or port is None or intent.kind != "trade":
+        return False
+    when = world.clock.ship_time
+    nations = world.nations
+    tons = float(intent.tons or 0.0)
+    good = str(intent.cargo or "")
+    port.market.recover(world.clock.tick)
+    sold = ""
+    if tons > 0.0 and good:
+        price = 0.0
+        if good in port.market.goods:
+            price = port.market.price(good, when, nations, port.nation)
+        port.market.sold_to_port(good, tons)
+        sold = f"{tons:g} tons of {good} sold at {port.name}" + (
+            f" for £{price * tons:.0f}" if price else ""
+        )
+    # the return cargo: the best route worth carrying from this port, to her port of lading
+    # first (the trade's own round), else to any port of the world
+    least = float(data.get("price_ratio_least", 1.3))
+    best: tuple[float, Any, str] | None = None
+    origin = str(intent.origin or "")
+    for b in ports.ports.values():
+        if b is port:
+            continue
+        for g in port.market.goods:
+            if g not in b.market.goods:
+                continue
+            pa = port.market.price(g, when, nations, port.nation)
+            pb = b.market.price(g, when, nations, b.nation)
+            if pa <= 0 or pb / pa < least:
+                continue
+            key = (1.0 if b.id == origin else 0.0, pb / pa)
+            if best is None or key > (1.0 if best[1].id == origin else 0.0, best[0]):
+                best = (pb / pa, b, g)
+    lines: list[str] = [sold] if sold else []
+    if best is not None:
+        _ratio, b, g = best
+        carry = tons if tons > 0.0 else float(data.get("cargo_tons", [30, 120])[0])
+        port.market.bought_from_port(g, carry)
+        brain.set_intent(f"trade {carry:g} tons of {g} from {port.name} to {b.name}")
+        lines.append(f"{carry:g} tons of {g} bought for {b.name}")
+    elif origin and origin in ports.ports and origin != port.id:
+        brain.set_intent(f"bound for {ports.ports[origin].name}")
+        lines.append(f"sailing home to {ports.ports[origin].name} empty")
+    else:
+        business = getattr(world, "business", None)
+        _note_landed(business, brain.vessel, "; ".join(lines))
+        return False
+    brain._departing = port.id
+    brain.planned = False
+    brain.vessel.saved_plan = None
+    _note_landed(getattr(world, "business", None), brain.vessel, "; ".join(lines))
+    story = list(getattr(brain.vessel, "story", ()) or ())
+    story.append((int(world.clock.tick), "; ".join(lines)))
+    brain.vessel.story = tuple(story[-20:])
+    return True
+
+
+def _note_landed(business: Any, vessel: Any, words: str) -> None:
+    if business is None or not words:
+        return
+    for d in getattr(business, "drawn", ()) or ():
+        if d.id == vessel.id:
+            d.landed = words
+
+
 def business_density(value: Any) -> float:
     """The scenario's `business:` as a density: off (and nothing said) 0, on 1, a number
     itself; refused in words otherwise."""
@@ -492,22 +574,10 @@ class Business:
         return vessel
 
     def _approach(self, port: Any) -> list[tuple[Any, ...]]:
-        """The port's way in from the sea as the far body's plan: its track from the sea,
-        its road, its inner track to the anchorage (`Planner.legs_for`'s, without the sea
-        route to its first mark)."""
-        from freesail.world.brains import _plan_of_legs
-        from freesail.world.captains import Planner
+        """The port's way in from the sea as the far body's plan (`ships.approach_plan`)."""
+        from freesail.world.ships import approach_plan
 
-        planner = Planner(self.world)
-        plan = _plan_of_legs(planner._port_track(port, "from_sea"))
-        road = ("to", port.outer_road.position, port.outer_road.name)
-        if not any(len(leg) > 1 and leg[1] == road[1] for leg in plan):
-            plan.append(road)
-        plan += _plan_of_legs(planner._port_track(port, "in"))
-        anchorage = ("to", port.anchorage.position, port.anchorage.name)
-        if not any(len(leg) > 1 and leg[1] == anchorage[1] for leg in plan):
-            plan.append(anchorage)
-        return plan
+        return approach_plan(self.world, port)
 
     def _arrives_clear(self, port: Any) -> bool:
         """Whether the port's way in from the sea keeps off the land at far detail (the

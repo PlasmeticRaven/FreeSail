@@ -54,6 +54,14 @@ outward_bound_share: 0.34
 # Her wait in port before she sails (package 43's `IN_PORT_WAIT_S`, twelve hours, is the
 # brains'; a ship drawn in port at the start has had part of it): judgement.
 in_port_hours_drawn: [1, 11]
+# Package 84, step 4 (the owner's decision 5, docs/DesignProposal.md decision 53): a trader
+# of the business or of a scenario that reaches her port with a trade intent transacts
+# there instead of vanishing: her cargo sold to the port's market (each ton lowering the
+# price by SUPPLY_PER_TON, freesail/world/ports.py, the market's own rule), a return cargo
+# bought where a route worth carrying runs from that port (`price_ratio_least`), and she
+# sails again with it; with no route worth it she sails home empty, and with no home she is
+# gone from the sea as before. `false` keeps package 43's wait-and-vanish.
+transact: true
 
 # A fishing ground: a feature of the chart of kind `bottom` or `bank` with a sounding of so
 # many fathoms, so far from the coast, and a port within reach that sells fish (pilchards,
