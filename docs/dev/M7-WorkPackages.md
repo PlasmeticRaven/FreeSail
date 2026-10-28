@@ -1830,3 +1830,53 @@ has them within 7-185 to 7-199, the spare block 7-230 to 7-239 for more; *12*, (
 
 The suites as the brief has them: the fast tier once on the final tree and the touched files'
 slow tier on the owner's machine; the whole suite is the lead's, in the cloud, at each merge.
+
+**2026-10-28, later: the owner's answers read** (`9710fad` on `claude/pkg-75`, recorded in
+`Decisions-ShipsRound2-2026-10.md`, `Build-Ships.md` and the *Indefatigable*'s design). They
+sit with the rulings above and change none of them: the razee's default fit "as carried
+1796" serves her without a scenario naming a fit, and **D48's third way stands as ruled** for
+the files with named fits that are not hers (the 74, the 64's two fits) and for a command-line
+ship meeting any scenario's fit; the engine's judgement figures the owner accepted are the
+ones ruled in (the mizen furled aloft, the settee dipped when the head yards' swing ends, the
+spritsails out of plain sail). **The lifts drawn on every yard**, faint at the braces'
+opacity, in the profile's step: accepted; the pictures' figures measured with and without,
+old beside new, and the change kept to the viewer's rig drawing so that package 81's hull
+work, which draws from this package's profiles later, does not meet it in the same lines.
+The 74's driver stays left out unless the owner asks. Nothing further is owed from the lead
+before stage 0's first commits.
+
+**2026-10-28, stage 0 read** (`fd5bb95`, with `c514048` the pages and `b562bae` the driver,
+on `claude/pkg-75`; the session's message of the evening). **Accepted as laid.** Read against
+the gate: nothing under `freesail/physics/` or in `data/sail_classes.yaml` is touched; no
+ship file moves; the `curve_class` lookups are where the ruling put them and return the
+sail's own class; the hooks are inert as said (`combat/ports.update` returns two empty sets,
+`CHARGE_TABLE_LB` is empty, the four ship modules write nothing, the profile is read by
+nothing a file carries). The known word changes are accepted: the director's brief-limit
+refusal naming the ships of the line by their rank, and the two lee-port events registered
+absent so the brief and the stand-by are as before. The checkpoint's forms leave the new
+fields out at their defaults, which is the right way to keep every pin. Four things to carry:
+1. **`charge_lb` now reads the Regulations' table first.** When SW-1 fills
+   `CHARGE_TABLE_LB`, the eight files' magazines (`fit_magazine`) read it too. The rule: the
+   two-way byte test is the gate on that commit; if a figure of the eight would move, the
+   table serves the new ships alone (keyed so, or read only where a file asks), and the
+   eight's charges stay as filed until a package of their own re-measures them old beside
+   new. The design's "no figure of the eight moves" is the rule, not a hope.
+2. **Package 84 and the shared files.** Stage 0 touches `world/ships.py`, `captains.py`,
+   `brains.py` and `squadrons.py`, which 84's step 6 (the Hull as the container, under test
+   now) reworks. So, beside "the lead's head at every stage boundary": **bring the lead's
+   head in again before reporting a ship done**, and resolve what meets on the session's
+   branch, where the ships' changes are small and local and the engine's are to be re-read
+   as they land; the lead merges a branch that already carries the lead's head. The merge
+   cadence stands: after each ship.
+3. **The references** (twenty-seven OCR texts now, 53 MB where there were 15): accepted, all
+   period and public domain, each with its README row and source; the page images stay
+   outside the repository as the README says; nothing further is filed without its row. The
+   size is told to the owner as a fact, not a complaint.
+4. **The lifts on every yard**: confirmed (the entry above). **The driver of the 64 and the
+   74** (Ext §14 item 10 reopened by the owner): proceed to the addendum; the lead reads it
+   with the same lens as the gate, the physics' ranges byte-identical, the sail's curve an
+   existing class's, `_gaff_host`'s new host a membership and not an equation, and the
+   frigate's polar re-measured equal. Stage 0E and B1 do not wait on it.
+The 64's exercise allowance by `decks=2`, Adye's and Falconer's tables in `tools/ships/period.py`
+with their pages, and the pivot's arc required at the load (the old pickles keeping the
+default, as ruled) are all as they should be. Go on to stage 0E.
