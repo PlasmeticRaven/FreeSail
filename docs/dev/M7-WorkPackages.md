@@ -1830,3 +1830,17 @@ has them within 7-185 to 7-199, the spare block 7-230 to 7-239 for more; *12*, (
 
 The suites as the brief has them: the fast tier once on the final tree and the touched files'
 slow tier on the owner's machine; the whole suite is the lead's, in the cloud, at each merge.
+
+**2026-10-28, later: the owner's answers read** (`9710fad` on `claude/pkg-75`, recorded in
+`Decisions-ShipsRound2-2026-10.md`, `Build-Ships.md` and the *Indefatigable*'s design). They
+sit with the rulings above and change none of them: the razee's default fit "as carried
+1796" serves her without a scenario naming a fit, and **D48's third way stands as ruled** for
+the files with named fits that are not hers (the 74, the 64's two fits) and for a command-line
+ship meeting any scenario's fit; the engine's judgement figures the owner accepted are the
+ones ruled in (the mizen furled aloft, the settee dipped when the head yards' swing ends, the
+spritsails out of plain sail). **The lifts drawn on every yard**, faint at the braces'
+opacity, in the profile's step: accepted; the pictures' figures measured with and without,
+old beside new, and the change kept to the viewer's rig drawing so that package 81's hull
+work, which draws from this package's profiles later, does not meet it in the same lines.
+The 74's driver stays left out unless the owner asks. Nothing further is owed from the lead
+before stage 0's first commits.
