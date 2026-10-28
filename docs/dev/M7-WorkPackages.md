@@ -517,7 +517,9 @@ removed); ruff clean; the sibling's fast tier whole (the pictures' threshold und
 one failure, passing alone) and the known truths' slow tier with the trials, the crews, the
 checkpoint, the business, the brains and the squadrons (the lee-shore trial's digest the
 container's difference recorded at step 3, the same on the base); the lead's fast tier of
-the touched files; **the whole suite on the merged tree in the cloud (the figures below).**
+the touched files; **the whole suite on the merged tree `5949e18` in the cloud (run 7, 45
+minutes, one shard's runner slow): lint clean; the slow tier's six shards 4,250 passed, 3
+skipped, 11 xfailed, none failed; the pace tests 10 of 10.** Step 5 stands merged green.
 **The step:** the ship persists. `demote` is a sleep: her truth and her captain's state into
 the far body and the brain as before, her damage summed into the far body's record
 (`write_damage`: the killed and the wounded by the muster's hurt, the guns dismounted, the
