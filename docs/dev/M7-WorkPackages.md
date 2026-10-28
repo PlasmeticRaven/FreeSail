@@ -503,8 +503,11 @@ truth 7-200's fake reads the refusal in its order's result and gives the way (tw
 in the day, out and home, each answered). **The lead's judgement:** right as the thing is:
 a captain told that the straight course for Plymouth crosses the Start names the Start, in
 the words the intents already take, and a model captain gets the same refusal naming what
-to say; the record and the acceptance test say so. The whole suite in the cloud again on
-the mended head (the figures below).
+to say; the record and the acceptance test say so. **The whole suite in the cloud on the
+mended head `e38a3e2`** (run 6, 34 minutes): lint clean; the slow tier's six shards **4,248
+passed, 3 skipped, 11 xfailed, none failed**, truths 7-154, 7-156 and 7-200 among them at
+their pinned figures; the pace tests 10 of 10 on that runner. Steps 3 and 4 stand merged
+green.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
