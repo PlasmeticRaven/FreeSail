@@ -803,8 +803,8 @@ what she is made out to be with a hyphened word whole or by its head ('brig' a m
 brig, not a brig-sloop; 'sloop' or 'brig-sloop' the brig-sloop). The name leans on the
 player's shadow and the id 'the ship', which 82 and 84 rework.
 
-**As built (package 84, steps 1 to 4; `docs/design/Design-OneWorld.md`, "As built, steps 1
-and 2", "Step 3" and "Step 4").** The container of a promoted member is still her own World
+**As built (package 84, steps 1 to 5; `docs/design/Design-OneWorld.md`, "As built, steps 1
+and 2", "Step 3", "Step 4" and "Step 5").** The container of a promoted member is still her own World
 (`crews.CrewedWorld`) until the refactor's step 6, but what a World keeps of one ship, the
 player's or a member's, is a `Hull` behind the World's names (`freesail/world/hulls.py`,
 `world.own`); the persons of every ship and of the shore are one registry of the world
@@ -821,7 +821,10 @@ by the boat's time, her captain landed and fetched, the places ashore, a word sa
 by spot, the free lines, a signal and a hail; `shape a course for <port>` lays the planner's
 passage by the ports' tracks and the chart's coasting tracks, ending at her anchor in the
 port; a far trader reaching her port transacts and sails again (`data/business.yaml`
-`transact:`); the acceptance test of the design is truth 7-200 (`data/scenarios/tender.yaml`).
+`transact:`); the acceptance test of the design is truth 7-200 (`data/scenarios/tender.yaml`). A member
+demoted sleeps rather than being dropped (step 5): her World is kept in the far shape with
+the physics off, her company, stores, purse, parts and damage hers, the damage summed into
+the far body's record, and she wakes without being remade when the cap takes her again.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 

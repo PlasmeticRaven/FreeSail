@@ -1686,3 +1686,45 @@ passage out a dead beat of fifteen hours and a northerly the beat into the Sound
 scenario's day is a north-westerly. The far brain standing aside for a held station does not
 answer a hoist read (its handling is his judgement's minute), so the fake answers it itself.
 A person ashore keeps his `place` as 'shore' and his place of the port in `ashore_at`.
+
+### Step 5: the ship persists, sleep and wake in place of drop and remake
+
+Built on step 4. **Built.** The demotion is a sleep (`crews.demote`): her truth and her
+captain's state folded into the far body and the brain as before, her damage summed into
+the far body's record (`crews.write_damage` into `Vessel.damage`: the killed and the wounded
+by the muster's hurt, the guns dismounted, the shot holes and those below the water, the
+spars wrecked, the sails blown out, the tick she slept; the far fight's own `hits` and
+`weight_lb` kept, 74's ground), and her World kept in the far shape with the physics off
+(`far_tick`, as a station's World was kept since package 43), her company in the one
+registry, her stores, her purse, her parts and her `Rng` hers; said in her log, routine
+("asleep at far detail") unless a station is seated on her (the urgent line of before).
+The promotion of a ship with a World is a wake (`crews._to_full`): the ship she had, not
+remade from her file; her body given the far body's truth it mirrored while asleep
+(`mirror_far`), her sail set as the far body's word only where the plan changed it while
+she slept (`_sail_state_of` against `vessel.sail_state`), her account set at the
+promotion's sigma, the trawl rigged again, the brain folded in, the station (if any) not
+reseated. `promote` makes a World once, from her file at her truth, for a ship that never
+had one. A vessel gone from the sea (`done`) gives up her World and her people
+(`release_done`, at the switch), as the drop did. `Vessels.crewed_ids` counts the Worlds
+alive, awake or asleep (the far tick's gate); `crews.crewed` the awake, against the cap.
+**Nothing pinned moved** in the fast tier; the slow tier's word is in the notes.
+
+**Taken another way, with the reason.** `make_hull` once per ship is the World made once
+(the Hull is the World's `own` since step 1; the container's move is step 6's). The design
+has the ship's `Rng` made at her first waking: it is made with her World, as it was, and
+kept, which is the same thing one step earlier. A sleeping hull's needs do not advance
+(`far_tick` runs her dealings' jobs and her people's moves, not the needs' tick): a company
+asleep for days is neither fed nor starved; the needs by rule for a sleeping hull (her
+stores drawn without the galley's lines) is a knob for the owner, named in the notes, since
+ticking them without the routines that serve them would kill a sleeping company of thirst.
+The watch does not change at the bells while she sleeps (no company tick asleep); she wakes
+with the watch she slept with, which the first bells mend.
+
+**Found on the way.** `test_crews.py`'s assertions that a demoted ship's World is `None`
+became assertions that it sleeps (`shape == "far"`), the cap counted by `crewed()` and not
+`crewed_ids`. A vessel's dict said `crewed` for any World (`Vessel.to_dict`), and the
+lookout's glass line carries that flag in its pinned data, so a sleeping World would have
+moved every digest in which a demoted ship is glassed again: `crewed` is awake at full
+detail, as it read before the step, and `asleep` is said apart. The checkpoint: a World asleep is carried as a seated far World was, and the
+three kept saves and the fixture's checkpoint are untouched; three sleeping brigs beside
+the frigate add nothing the gzip can see beside the log's growth (the notes have the bytes).

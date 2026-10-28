@@ -672,7 +672,7 @@ def test_the_hold_crosses_the_promotion_both_ways():
     w.world_order('ship "Hazard": order heave to', "the test")
     w.run(300)
     K.demote(w, v)
-    assert v.crew is None and v.plan[0][0] == "lie_to"
+    assert v.crew.shape == "far" and v.plan[0][0] == "lie_to"  # asleep (package 84, step 5)
     assert v.brain.over_head is not None and v.brain.over_head["order"] == "heave to"
 
 

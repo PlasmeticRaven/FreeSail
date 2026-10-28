@@ -997,7 +997,12 @@ class Vessel:
             # in the pinned form of a vessel without one
             d["intent"] = self.intent_words
             d["brain"] = self.brain.to_dict()
-            d["crewed"] = self.crew is not None
+            # crewed is awake at full detail; a World kept asleep (package 84, step 5) says
+            # so apart, so that the glass's pinned data reads as before the step
+            awake = self.crew is not None and getattr(self.crew, "shape", "full") == "full"
+            d["crewed"] = awake
+            if self.crew is not None and not awake:
+                d["asleep"] = True
         if self.warning:
             d["warning"] = self.warning
         if getattr(self, "fit", ""):
