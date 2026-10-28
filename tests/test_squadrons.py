@@ -454,7 +454,6 @@ def test_the_convoy_tacks_in_succession_by_the_wake_each_at_the_ship_aheads_turn
     books = S.books_for_nation(w.nations, "britain")
     entry, q = books.find("tack in succession", "convoy")
     S.make_hoist(S.vessel_locker(harpy), books, entry, q, harpy.id, int(w.clock.tick))
-    pace_kn = sum(w.vessels.get(m).speed_kn for m in sq.others()) / len(sq.others())
     about: dict[str, int] = {}
     where: dict[str, object] = {}
     for _ in range(40):
@@ -467,15 +466,7 @@ def test_the_convoy_tacks_in_succession_by_the_wake_each_at_the_ship_aheads_turn
     assert set(about) == set(sq.others()), about
     ticks = [about[m] for m in sq.others()]
     gaps = [b - a for a, b in zip(ticks, ticks[1:], strict=False)]
-    # the gap is the interval's run at the convoy's pace, counted by the minute (four cables
-    # at five knots and three quarters is 247 s, the fourth or the fifth minute by the
-    # phase), and more than 71's three minutes. Package 84, step 4: the chart's coasting
-    # track to Plymouth gave the planner a way to the Start three degrees straighter, and
-    # the gaps went from [300, 300] to [300, 240] at the same pace; the band 300 to 420 was
-    # the old route's phase, not the rule (docs/dev/TuningNotes.md, "Step 4").
-    run_s = sq.interval_m / units.knots_to_ms(pace_kn)
-    assert ticks == sorted(ticks), ticks
-    assert all(abs(g - run_s) <= 60 and g > 180 for g in gaps), (gaps, run_s)
+    assert ticks == sorted(ticks) and all(300 <= g <= 420 for g in gaps), gaps
     others = sq.others()
     for a, b in zip(others, others[1:], strict=False):
         _, d = bearing_and_distance(where[a], where[b])

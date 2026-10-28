@@ -789,15 +789,18 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
     low = " ".join(text.lower().split()).rstrip(".")
     m = re.match(r"^(?:shape|lay) (?:a |the )?course for (?P<place>.+)$", low)
     if m:
+        # the marks as the captain wrote them (their case), the place as the chart finds it
+        said = " ".join(text.split()).rstrip(".")
+        place, _, via = (x.strip() for x in said[-len(m.group("place")) :].partition(" via "))
         ports = getattr(crew.parent, "ports", None)
-        port = ports.find(m.group("place")) if ports is not None else None
+        port = ports.find(place) if ports is not None else None
         if port is not None:
-            # a port: by its tracks and under the land guard (package 84, step 4; the
-            # study's finding 4: one straight leg sent her across a cape)
+            # a port: by its tracks and the marks named, under the land guard (package 84,
+            # step 4; the study's finding 4: one straight leg sent her across a cape)
             from freesail.world.ships import port_course
 
             try:
-                plan = port_course(crew.parent, v, port)
+                plan = port_course(crew.parent, v, port, via)
             except ValueError as e:
                 raise OrderError(f"{str(e)[:1].upper()}{str(e)[1:]}; she keeps her plan.") from None
             v.saved_plan = None
@@ -806,10 +809,11 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
             if brain is not None:
                 brain.planned = True
             marks = ", ".join(str(leg[2]) for leg in plan if len(leg) > 2 and leg[2])
+            way = f" via {via}" if via else ""
             return (
                 "helm.set",
-                f"Shaped a course for {port.name} by the tracks: {marks} (the plan's legs).",
-                {"place": port.name, "port": port.id, "legs": len(plan)},
+                f"Shaped a course for {port.name}{way} by the tracks: {marks} (the plan's legs).",
+                {"place": port.name, "port": port.id, "legs": len(plan), "via": via},
             )
         found = _place_for(crew.parent, m.group("place"))
         if found is None:

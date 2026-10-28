@@ -10497,6 +10497,15 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
     def act(last, turns):
         """The fake at her captain's station: what the sample says decides the next act."""
         if "tool_results" in last:
+            # the order's result read (a refusal is routine, so no sample carries it): the
+            # land guard's word answered with a way by marks (package 45's `via`)
+            said = str(last["tool_results"]).lower()
+            if "give the way by marks" in said and stage["n"] in (2, 6):
+                port = "Plymouth" if stage["n"] == 2 else "Torbay"
+                stage["orders"].append(f"shape a course for {port} via the Start")
+                return Reply(
+                    calls=(call("submit_order", text=f"shape a course for {port} via the Start"),)
+                )
             return Reply()
         log = last.get("log") or []
         kinds = {str(e.get("kind")) for e in log}
@@ -10557,9 +10566,14 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
     w.submit("make the signal: proceed to Plymouth")
     run_until(lambda: stage["n"] >= 2, 1.0, step=60)
     assert "signal.read" in raven_kinds()
+    run_until(lambda: raven.plan and raven.plan[-1] == ("anchor", "plymouth"), 0.5, step=60)
+    refused = [
+        e for e in crew.log if e.kind == "order.rejected" and "give the way by marks" in e.text
+    ]
+    assert len(refused) == 1 and "crosses the land" in refused[0].text  # the land guard's word
     shaped = [e for e in crew.log if e.kind == "helm.set" and "by the tracks" in e.text]
     assert shaped and "the anchorage in the Sound" in shaped[-1].text
-    assert "50 11 N 3 37 W" in shaped[-1].text  # outside the Start, by the coasting track
+    assert "via the Start" in shaped[-1].text and "east-south-east of the Start" in shaped[-1].text
     assert raven.plan[-1] == ("anchor", "plymouth")
     run_until(lambda: any(e.kind == "signal.answered" for e in w.log), 0.5, step=60)
     # 3. at sea: the director makes the person and the thing at Plymouth while she sails
@@ -10601,6 +10615,7 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
     )
     # 8. home to report: within hail of the frigate, heard on her quarterdeck
     run_until(lambda: stage["n"] >= 7, 18.0)
+    assert sum(1 for e in crew.log if e.kind == "order.rejected" and "give the way" in e.text) == 2
     assert crew.dealings.in_port() is not None and crew.dealings.in_port().id == "torbay"
     assert nm_apart() < 1.0
     run_until(lambda: any(e.kind == "hail.heard" for e in w.log), 0.5, step=60)
@@ -10617,9 +10632,12 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
     ).lower()
     for words in ("counting house", "mr gill", "packet", "lugger", "barbican"):
         assert words not in own, words
-    # every order of the fake's was taken; nothing of hers was refused
+    # every order of the fake's was taken but the two the land guard refused, answered by
+    # the way by marks
     refused = [e for e in crew.log if e.kind == "order.rejected" and e.actor == "the captain"]
-    assert not refused, [e.text for e in refused]
+    assert len(refused) == 2 and all("give the way by marks" in e.text for e in refused), [
+        e.text for e in refused
+    ]
     assert stage["orders"][0] == "come to an anchor" and stage["orders"][-1] == "hail the frigate"
     assert fake.calls > 6
     h.release("the test is done") if hasattr(h, "release") else None

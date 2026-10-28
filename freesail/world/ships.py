@@ -1160,13 +1160,15 @@ def approach_plan(world: Any, port: Any) -> list[tuple[Any, ...]]:
     return plan
 
 
-def port_course(world: Any, vessel: Any, port: Any) -> list[tuple[Any, ...]]:
+def port_course(world: Any, vessel: Any, port: Any, via: str = "") -> list[tuple[Any, ...]]:
     """A far body's course for a port by the tracks (package 84, step 4; the design's §2.5
     and its finding 4): the planner's passage for it (`Planner.legs_for`) as the far brain
     lays one, out of the port she lies in by its track to sea, along the common tracks
-    where the straight line is not clear of the shore, in by the port's track from the sea
-    to its road and its anchorage, the whole under the land guard (`land_crossing`); raises
-    ValueError in words when a leg crosses the land."""
+    where the straight line is not clear of the shore, by the marks her captain names
+    (`via`, package 45's words: 'the Start, the Bolt Tail', each given its offing) where the
+    chart has no track, in by the port's track from the sea to its road and its anchorage,
+    the whole under the land guard (`land_crossing`); raises ValueError in words when a leg
+    crosses the land, naming the way by marks."""
     from freesail.world.brains import _plan_of_legs
     from freesail.world.captains import Planner, read_intent
 
@@ -1174,7 +1176,8 @@ def port_course(world: Any, vessel: Any, port: Any) -> list[tuple[Any, ...]]:
     ports = getattr(world, "ports", None)
     lying = ports.in_port_at(here) if ports is not None else None
     departing = lying.id if lying is not None and lying.id != port.id else ""
-    intent = read_intent(world, f"bound for {port.name}")
+    words = f"bound for {port.name}" + (f" via {via}" if via else "")
+    intent = read_intent(world, words)
     legs = Planner(world).legs_for(intent, here, departing)
     # the port she weighs from: its anchorage is where she lies, not a mark to anchor at
     # (Torbay's track to sea begins at Brixham road); and the plan ends at the first anchor
@@ -1187,7 +1190,11 @@ def port_course(world: Any, vessel: Any, port: Any) -> list[tuple[Any, ...]]:
             break
     crossing = land_crossing(world, here, plan)
     if crossing:
-        raise ValueError(f"the course for {port.name} by the tracks {crossing}")
+        way = f" via {via}" if via else ""
+        raise ValueError(
+            f"the course for {port.name}{way} by the tracks {crossing}; give the way by marks "
+            f"('shape a course for {port.name} via <a headland or a position>')"
+        )
     return plan
 
 

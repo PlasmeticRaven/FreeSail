@@ -180,11 +180,7 @@ def test_the_planner_joins_the_ports_tracks_and_the_common_track_by_the_iroise()
     ]
     assert planner.sea_route(off_lizard, soundings) == []
     tracks = C.load_tracks(w)
-    assert [t.id for t in tracks] == [
-        "channel-to-brest",
-        "lizard-to-plymouth",
-        "torbay-to-plymouth",
-    ]
+    assert [t.id for t in tracks] == ["channel-to-brest", "lizard-to-plymouth"]
     # a line that runs across the land is not clear, and a way round it is found: by a
     # track's marks, or a headland given an offing (a plain position to the tenth)
     behind = Position(50.05, -5.02)  # off Falmouth, inside the Manacles' line
