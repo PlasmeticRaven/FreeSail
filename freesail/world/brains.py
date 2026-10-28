@@ -284,10 +284,13 @@ class FarCaptain(Judgement):
 
     def set_intent(self, words: str, free: bool = False) -> str:
         """`ship "X": intent <words>`: the intent read anew, the plan laid again; `free`
-        takes words no form reads as a free intent, for which no plan is laid."""
+        takes words no form reads as a free intent, for which no plan is laid and under
+        which her captain keeps the role and the doctrine of her service he had (package
+        86's fold-in, the review's finding)."""
         self.intent = read_intent(self.world, words, free)
         self.intent_words = " ".join(words.split())
-        self.role = role_of_vessel(self.vessel, self.intent)
+        if not (self.intent.kind == FREE and self.role):
+            self.role = role_of_vessel(self.vessel, self.intent)
         self.doctrine = load_doctrine(self.role)
         self.planned = False
         self.vessel.saved_plan = None

@@ -2023,7 +2023,7 @@ def voyage_words(world: Any) -> str:
             parts.append(
                 f"The intent the scenario gives the ship: {cap.intent.words}. It is a free "
                 "intent, the goal you are given: the rules-based captain will not follow it, "
-                "and keeps her as she is when nobody holds this station."
+                "and lies her to where she is when nobody holds this station."
             )
         elif cap.intent is not None:
             parts.append(

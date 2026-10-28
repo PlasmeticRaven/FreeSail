@@ -643,7 +643,10 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "ship",
         'ship "<name>": intent <words>',
         ('ship "Harpy": intent keep the station off Ushant within 15 miles',),
-        "her captain's intent given or changed: a mind changed wants no cause",
+        "her captain's intent given or changed: a mind changed wants no cause; words no "
+        "intent's form reads are her free intent, the goal told to a model at her captain's "
+        "station, which her rules-based captain does not sail by: he lies her to, her "
+        "service's doctrine kept",
     ),
     Form(
         "ship.hand",

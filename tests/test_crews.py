@@ -455,6 +455,53 @@ def test_a_free_intent_is_taken_for_a_ship_on_the_sea_with_the_warning(tmp_path)
         )
 
 
+def test_under_a_free_intent_the_crewed_captain_lies_her_to_once_and_keeps_her_service():
+    """Package 86's fold-in (the review of the owner's local work, section 3): the crewed
+    captain short-circuits a free intent as the far body does, where he had tried to plan it
+    every judgement and said a plan of no legs each time: on his passage he heaves her to
+    once, says nothing more in twenty minutes, and lays no legs. And she keeps her service's
+    role and doctrine: a cutter patrolling (a cruiser) given a free intent stays a cruiser,
+    far and crewed, where she had fallen to the merchant's doctrine."""
+    from freesail.world.captains import FREE
+
+    w = hove_to_world()
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    crew = b.crew
+    assert crew is not None and crew.captain.state == "on passage"
+    w.world_order('ship "X": intent wait here for the Amazon\'s boat')
+    n = len(list(crew.log))
+    w.run(20 * 60)
+    said = list(crew.log)[n:]
+    assert not [e for e in said if e.kind == "captain.plan"], "a plan said under a free intent"
+    heave = [e for e in said if e.kind == "order.accepted" and "free intent" in e.text]
+    assert len(heave) == 1 and "heaving to" in heave[0].text
+    assert crew.readings.value("manoeuvre_in_hand") == "hove to"
+    assert crew.captain.intent.kind == FREE and not crew.captain.legs
+    raven = put(
+        w,
+        "cutter",
+        "britain",
+        "49 31 N 5 31 W",
+        "patrolling off the Lizard within 5 miles",
+        "patrol off the Lizard within 5 miles",
+        name="Raven",
+    )
+    w.run(61)
+    assert raven.brain.role == "cruiser"
+    assert raven.crew is not None and raven.crew.captain.role == "cruiser"
+    cap = raven.crew.captain
+    w.world_order('ship "Raven": intent wait here for the Amazon\'s boat')
+    assert raven.brain.intent.kind == FREE and raven.brain.role == "cruiser"
+    assert raven.brain.doctrine is not None and raven.brain.doctrine.role == "cruiser"
+    assert cap.intent.kind == FREE and cap.role == "cruiser" and cap.doctrine.role == "cruiser"
+    # a form he knows given after it is read for its own role, as before
+    w.world_order('ship "Raven": intent bound for Falmouth')
+    assert raven.brain.role == "merchant"
+
+
 def test_the_crewed_budget_is_a_setting_of_the_scenario_or_the_flags():
     """The lead, 2026-10-17: the cap and the range are the build machine's constants
     unless the scenario or the drivers' flags say otherwise (`crews.settings`); a cap of one
