@@ -21,9 +21,11 @@
 | **D14** | **(c), in this package.** The sourced hull profile goes into every ship file **and is drawn by the viewer**, for every ship. |
 | **D18** | **Open, with the owner's measure:** whichever choice gives the best impression in the viewer and matches the sources. The convention may change, so long as the change is an improvement. |
 | **D35** | **(b), limited.** The fore topgallant studding sail, together with (a)'s studding sails and main topmast staysail. |
-| **D25** | **Open** until the 74's research reports. A French 74 would make the *Droits de l'Homme* action of January 1797 a third candidate, beside the sheet's (b) and the lead's (c). The research has reported (`Research-74-2026-10.md`): it recommends the British *Bellerophon* for this package and proposes a *Téméraire*-class French 74 as a later ship of its own, which the *Droits de l'Homme* option needs (its owner's question 16). The owner holds D25 open. |
+| **D25** | **Open** until the 74's research reports. A French 74 would make the *Droits de l'Homme* action of January 1797 a third candidate, beside the sheet's (b) and the lead's (c). The research has reported (`Research-74-2026-10.md`): it recommends the British *Bellerophon* for this package and proposes a *Téméraire*-class French 74 as a later ship of its own, which the *Droits de l'Homme* option needs (its owner's question 16). The owner holds D25 open. With the French 74 a later ship (below), that option would wait for her. |
 
 **The owner's word on the viewer (2026-10-27).** "Changing the viewer is alright now." The sourced hull profile, and drawing it properly in the viewer, are part of this package and are to be properly implemented.
+
+**The 74 (2026-10-28).** The owner chose HMS *Bellerophon*, the Arrogant-class 74 of 1786 on the Bellona-class draughts, as this package's 74 (`Research-74-2026-10.md` §1.2). A *Téméraire*-class French 74 is the second ship of the line, a later goal outside this package. The note's other questions (§11, 2-18) are not yet answered.
 
 **What follows from the answers:**
 - **D46 becomes (d) with rule 3 restored,** since D3 is (b). In stays, the ourse is braced to leeward as the helm goes down, and the yard is changed last. Each rule is carried over by judgement from a ship's mizen, and its truth says so.
