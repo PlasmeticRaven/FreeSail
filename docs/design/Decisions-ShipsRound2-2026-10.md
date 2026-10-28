@@ -1,6 +1,6 @@
 # Decisions: the three ships, the owner's second round (2026-10-25)
 
-**Status (2026-10-27): finished, not yet answered, and older than Package 75's brief** (`docs/dev/M7-WorkPackages.md`), which binds. Some decisions are reopened or settled by the brief. They are to be reconciled before the owner answers:
+**Status (2026-10-28): answered by the owner (2026-10-27) and ruled on by the lead (2026-10-28), both recorded below; D18 and D25 stay open.** The sheet was written before Package 75's brief (`docs/dev/M7-WorkPackages.md`), which binds. The brief reopened or settled these decisions, as the answers below take into account:
 - **D12** (the lee ports): the brief has the 74's lower-deck ports shut within a foot of the water as the sources give. A truth pins it.
 - **D14** (the viewer's hull): the brief adds a sourced hull profile to every ship file through the generator. The viewer still stays at today's standard.
 - **D17** (the Indefatigable's fits): the brief wants a fit "as razeed 1795", with later armaments as data for the scenario editor.
@@ -21,7 +21,7 @@
 | **D14** | **(c), in this package.** The sourced hull profile goes into every ship file **and is drawn by the viewer**, for every ship. |
 | **D18** | **Open, with the owner's measure:** whichever choice gives the best impression in the viewer and matches the sources. The convention may change, so long as the change is an improvement. |
 | **D35** | **(b), limited.** The fore topgallant studding sail, together with (a)'s studding sails and main topmast staysail. |
-| **D25** | **Open** until the 74's research reports. A French 74 would make the *Droits de l'Homme* action of January 1797 a third candidate, beside the sheet's (b) and the lead's (c). |
+| **D25** | **Open** until the 74's research reports. A French 74 would make the *Droits de l'Homme* action of January 1797 a third candidate, beside the sheet's (b) and the lead's (c). The research has reported (`Research-74-2026-10.md`): it recommends the British *Bellerophon* for this package and proposes a *Téméraire*-class French 74 as a later ship of its own, which the *Droits de l'Homme* option needs (its owner's question 16). The owner holds D25 open. |
 
 **The owner's word on the viewer (2026-10-27).** "Changing the viewer is alright now." The sourced hull profile, and drawing it properly in the viewer, are part of this package and are to be properly implemented.
 
