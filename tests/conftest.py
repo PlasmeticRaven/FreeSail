@@ -29,6 +29,9 @@ fast tier grows slow.
 
 from __future__ import annotations
 
+import os
+import zlib
+
 import pytest
 
 SLOW_THRESHOLD_S = 5.0  # judgement: the fast tier in a few minutes on four loaded cores
@@ -518,6 +521,31 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
             config.stash[_LEFT_OUT] = len(left_out)
             if hasattr(config, "workerinput"):  # an xdist worker: the controller says it
                 config.workeroutput["freesail_slow_left_out"] = len(left_out)
+    # A shard of the suite for a run spread over several machines (the whole-suite
+    # workflow, `.github/workflows/whole-suite.yml`, 2026-10-28): `FREESAIL_SHARD=i/n`
+    # keeps the items whose group falls in shard i of n, by a stable hash of the xdist
+    # group's name where the item has one (so a module-scoped day or passage stays whole
+    # on one machine, as `--dist loadgroup` keeps it on one worker) and of the node id
+    # otherwise. Unset, nothing is left out; the shards together are the whole run.
+    shard = os.environ.get("FREESAIL_SHARD", "").strip()
+    if shard:
+        try:
+            index, total = (int(x) for x in shard.split("/"))
+        except ValueError as e:
+            raise pytest.UsageError(f"FREESAIL_SHARD wants i/n, not {shard!r}") from e
+        if total < 1 or not 0 <= index < total:
+            raise pytest.UsageError(f"FREESAIL_SHARD {shard!r}: i must be 0 to n-1")
+
+        def shard_key(item: pytest.Item) -> str:
+            group = item.get_closest_marker("xdist_group")
+            if group is not None and group.args:
+                return f"group:{group.args[0]}"
+            return item.nodeid
+
+        others = [i for i in items if zlib.crc32(shard_key(i).encode()) % total != index]
+        if others:
+            items[:] = [i for i in items if i not in set(others)]
+            config.hook.pytest_deselected(items=others)
     _group_by_shared_fixtures(items)
 
 
