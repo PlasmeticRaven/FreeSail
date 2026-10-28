@@ -10111,7 +10111,7 @@ behaviour change), then three builders in three worktrees, each with its own rev
 fixes: Builder 1 the magazine and the gun deck, Builder 2 the supply, Builder 3 practice;
 merged in that order with the merge's own edits, truths 7-161 to 7-171, and the review of
 the merged tree with its fixes: ten local commits, all folded in at `5b01fdf`. Spec M7 §8
-"as built (practice and resupply)"; `docs/agents/Harness.md` §21f; the primer's chapters 14
+"as built (practice and resupply)"; `docs/agents/Harness.md` §21g (§21f on his tree); the primer's chapters 14
 ("Powder and shot") and 22 ("Practice at the great guns"); the owner's scenario
 `data/scenarios/exercising-the-great-guns.yaml`. The physics is read and not changed; no
 ship file was touched by hand (the five armed files regenerated through
@@ -10178,7 +10178,7 @@ whose brief takes "the number after 72's".
    `api/action_readings.py`: the `magazine` row in port and the `guns` row's dumb show;
    `standing/runtime.py`: `GUNNERY_PARTS`; `data/vocabulary.yaml`: the port's verb and the
    gun deck's five, all written in stage 0 and none after).
-5. **The records**: this section, spec M7 §8's "as built", Harness §21f, the work packages'
+5. **The records**: this section, spec M7 §8's "as built", Harness §21g (§21f on his tree), the work packages'
    entry, the primer's chapters 14 and 22 (22's stale facts mended against the first action
    at seed 7: the colours at 11:12, seven shot holes, no lee port shut, point blank by
    calibre), and the squadrons design's pace floors named as built, truths 7-159 and 7-160.
@@ -10858,4 +10858,18 @@ Truth 7-133's docstring is 70's and was left as it is.
 
 ### The suites as run
 
-SUITES
+On the build machine, the rule of 2026-10-28 (the whole suite the lead's in the cloud):
+
+- `ruff check .` and `ruff format --check .` clean (282 files).
+- The slow tier of the touched files and the captain's trials (`--slow -m "slow and not
+  pace" -n 4`, 22 files) on `d479b4f`: 155 run, 147 passed, 8 expected failures, none
+  failed (the longest the directed day's replay, 411 s).
+- The pace tests alone (`--slow -m pace`, serially, the touched files): 10 run, 8 passed,
+  2 under the floor before and after the fold-in alike (above).
+- The hail's bisection (truths 7-140 to 7-158 on the tree and on its copy with the gating
+  reverted, `--slow -m "not pace" -n 4`): 18 passed on each.
+- The owner's six slow truths measured with the logs' figures: 6 passed.
+- The fast tier once on the final tree (`-n 4 -q`): 3,892 run, 3,891 passed, 1 failed, 361
+  slow left out; the failure is `tests/test_pictures.py`'s MCP bridge picture "not blank",
+  this machine's newer Chromium a hair under the blank threshold, failing before this
+  package as after it (the machine's; nothing of it touched here).
