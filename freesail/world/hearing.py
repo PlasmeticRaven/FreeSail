@@ -8,11 +8,13 @@ house is not the market). These functions read the people and the stations as th
 and change nothing. They are kept apart from the people's registry (`people.py`), whose
 movement of persons is another package's, so that each is read alone.
 
-    spot_of(world, person)        where a person hears: ("aboard", place) or ("ashore",
-                                  port, place ashore)
+    spot_of(world, person)        where a person hears: ("aboard", hull, place), ("ashore",
+                                  port, place ashore) or ("boat", hull)
     station_spot(world, station)  the same for a station (its person's, else its place)
     within_hearing(said, other)   whether a word said at one spot is heard at another
-    people_hearing(world, spot)   the named people within hearing of a word said there
+    people_hearing(world, spot)   the named people within hearing of a word said there,
+                                  of every hull (the world's one registry)
+    stations_everywhere(world)    the stations held on every World of the game
     heard_words(...)              'heard by the captain and Mr Veale, at the counting
                                   house' or 'heard by nobody: the captain is at the market'
 """
@@ -23,11 +25,13 @@ from typing import Any
 
 __all__ = [
     "heard_words",
+    "own_hull",
     "people_hearing",
     "said_tail",
     "spot_of",
     "spot_words",
     "station_spot",
+    "stations_everywhere",
     "within_hearing",
 ]
 
@@ -38,22 +42,44 @@ Spot = tuple[str, ...]
 HEARD_NAMED_MAX = 4
 
 
+def own_hull(world: Any) -> str:
+    """The id of a World's own hull (`world.own.id`), "" for a stub without one."""
+    return str(getattr(getattr(world, "own", None), "id", "") or "")
+
+
+def company_of(world: Any, person: Any) -> Any:
+    """The company (`People`) a person is read by: his home hull's, through the world's
+    one registry (package 84, step 2), else the World's own."""
+    registry = getattr(world, "registry", None)
+    home = getattr(person, "home", "")
+    if registry is not None and home:
+        found = registry.people_of(home)
+        if found is not None:
+            return found
+    return getattr(world, "people", None)
+
+
 def spot_of(world: Any, person: Any) -> Spot:
-    """Where a person hears: ("aboard", his place) by the people's own reading of it, or
-    ("ashore", his port's id, his place ashore); ("boat",) in the boat."""
+    """Where a person hears: ("aboard", the hull he is in, his place) by his own company's
+    reading of it, or ("ashore", his port's id, his place ashore); ("boat", his home hull)
+    in his ship's boat, ("cutter", ...) in the pilot's. Two persons at the market at
+    Plymouth hear each other whichever hull brought them (package 84, step 2)."""
     if not getattr(person, "aboard", True):
         where = str(getattr(person, "where", "") or "")
         if where == "shore":
             from freesail.world.movement import ashore_at
 
             return ("ashore", str(getattr(person, "port", "") or ""), ashore_at(world, person))
-        return (where or "boat",)
-    people = getattr(world, "people", None)
+        return (where or "boat", str(getattr(person, "home", "") or own_hull(world)))
+    people = company_of(world, person)
     try:
         place = people.effective_place(person) if people is not None else person.where
     except Exception:  # noqa: BLE001  (a world whose people cannot be read)
         place = getattr(person, "where", "quarterdeck")
-    return ("aboard", "quarterdeck" if place == "deck" else str(place))
+    hull = getattr(person, "hull", None)
+    if not isinstance(hull, str) or not hull:
+        hull = own_hull(world)  # a voice of the ship's, or a person before his adoption
+    return ("aboard", hull, "quarterdeck" if place == "deck" else str(place))
 
 
 def station_spot(world: Any, station: str) -> Spot:
@@ -79,32 +105,54 @@ def station_spot(world: Any, station: str) -> Spot:
     place = place_of(world, station)
     if place == "shore":
         return ("ashore", "", "")
-    return ("aboard", "quarterdeck" if place == "deck" else place)
+    return ("aboard", own_hull(world), "quarterdeck" if place == "deck" else place)
 
 
 def within_hearing(said: Spot, other: Spot) -> bool:
-    """Whether a word said at `said` is heard at `other`: aboard within earshot of the
-    place, ashore at the same place of the same port, in the boat in the same boat."""
+    """Whether a word said at `said` is heard at `other`: aboard the same hull within
+    earshot of the place, ashore at the same place of the same port, in a boat in the
+    same boat."""
     from freesail.world.places import earshot
 
     if not said or not other or said[0] != other[0]:
         return False
     if said[0] == "aboard":
-        return other[1] in earshot(said[1])
+        return (
+            len(said) == 3
+            and len(other) == 3
+            and said[1] == other[1]
+            and (other[2] in earshot(said[2]))
+        )
     return said == other
 
 
 def people_hearing(world: Any, said: Spot, exclude: Any = None) -> list[Any]:
-    """The named people (the people's registry) within hearing of a word said at `said`,
-    the speaker (`exclude`) left out."""
+    """The named people of the world's one registry within hearing of a word said at
+    `said`, the speaker (`exclude`) left out: every hull's, so that a word ashore reaches
+    whoever is at that place of that port (package 84, step 2)."""
     people = getattr(world, "people", None)
     if people is None:
         return []
     try:
-        everyone = list(people.all)
+        everyone = list(getattr(people, "everyone", None) or people.all)
     except Exception:  # noqa: BLE001  (a world with no muster)
         return []
     return [p for p in everyone if p is not exclude and within_hearing(said, spot_of(world, p))]
+
+
+def stations_everywhere(world: Any) -> list[tuple[Any, Any]]:
+    """The stations held now on every World of the game, as (the World, the harness or the
+    player's seat): the parent's and each crewed ship's (package 84, step 2; the one
+    registry's hearing wants the hearers of every hull)."""
+    from freesail.agents.harness import _stations_held
+
+    parent = getattr(world, "parent", None) or world
+    out = [(parent, h) for h in _stations_held(parent)]
+    for v in getattr(getattr(parent, "vessels", None), "vessels", None) or []:
+        crew = getattr(v, "crew", None)
+        if crew is not None and not getattr(v, "done", False):
+            out.extend((crew, h) for h in _stations_held(crew))
+    return out
 
 
 def spot_words(world: Any, spot: Spot) -> str:
@@ -112,7 +160,13 @@ def spot_words(world: Any, spot: Spot) -> str:
     from freesail.world.places import place_words
 
     if spot and spot[0] == "aboard":
-        return place_words(spot[1])
+        words = place_words(spot[2] if len(spot) == 3 else spot[1])
+        if len(spot) == 3 and spot[1] and spot[1] != own_hull(world):
+            registry = getattr(world, "registry", None)
+            company = registry.people_of(spot[1]) if registry is not None else None
+            name = getattr(getattr(company, "world", None), "ship", None)
+            words = f"aboard the {getattr(name, 'name', spot[1]) or spot[1]}, {words}"
+        return words
     if spot and spot[0] == "ashore":
         from freesail.world.movement import ashore_place_words
 
@@ -205,7 +259,7 @@ def said_tail(world: Any, e: Any) -> str:
     if kind in SAID_KINDS:
         station = str(data.get("station") or "captain")
         if data.get("hail") or kind == "agent.hail":
-            spot: Spot = ("aboard", "quarterdeck")
+            spot: Spot = ("aboard", own_hull(world), "quarterdeck")
         else:
             spot = station_spot(world, station)
         reg = getattr(world, "stations", None)

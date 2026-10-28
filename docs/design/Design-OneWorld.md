@@ -1458,3 +1458,78 @@ until step 3 splits it. `person_journals`, `crewed_settings`, `consent_records_d
 doors and stay the World's. `PLAYER_ID` is now read in a fourth place (`hulls.own_id`, a
 function over `brains.PLAYER_ID`, not a fifth copy of the string); step 7's one definition
 retires all of them.
+
+### Step 2: one registry of persons and things, the whereabouts, hearing by spot
+
+**Built.** `people.Registry`, one for the game on `world.registry` (a shared field, so
+`hull.registry` reads it too), made by the World's constructor and **given by a crewed
+ship's World to her company from her parent** (the first sharing: `World.__init__` reads
+`self.parent` where a `CrewedWorld` set it, as it reads `self.vessel` for the hull's id). The
+registry keeps the persons in one list per home hull, the hulls in the order they
+registered, the World's own first, so that `persons()` (everyone) has the player's company
+first as the one list had it; the things are one list on it. **`People` is the company of one
+hull**: a view of the registry's list for her (`People.people` is that list itself, so every
+`append` and every reading of the company stand), with her letters in hand, her wardroom and
+the command's passing as its own, `everyone` the registry whole, `discharge` taking her
+persons and their things out when her World is dropped at the demotion (`crews.demote`;
+step 5 keeps her instead). **The whereabouts**: `Person.hull`, the id of the hull he is in
+(None ashore or in a boat), and `Person.home`, the hull that keeps him (his muster's ship,
+or the ship whose World made him from words: the pilot, a person the director makes, a man
+drawn by his trade), both set when his company adopts him (`Registry.adopt`, at the muster's
+build and at `People.add`); `Person.aboard` is a property over `hull`, read as the bool it
+was and written as it was (True puts him back in his home hull, False takes him out of every
+hull), so that the eleven writers and the hundred readers of the bool stand and `to_dict`'s
+bool rides the pinned lines' data as before. The views the design names are the Hull's:
+`hull.company` (whom she keeps, wherever each is) and `hull.aboard` (who is in her now,
+hers or not). **Things** gain `Thing.hull`, the hull a thing lies in when its place is aboard
+or in her boat (None in a keeping, ashore or over the side), written by `things.put` from a
+where that `read_where` now gives with the hull, and read by `lying_aboard` (this hull's
+things alone), by the reach (`same_place` compares the hull first, and the where-tuple is
+four: the place, the port, the place ashore, the hull) and by the boat's landing
+(`Ports._land_and_take_off`, this hull's boat's things alone); `keeper_of` finds a keeper in
+any hull's company. **Hearing by spot**: `spot_of` is `("aboard", hull, place)`,
+`("ashore", port, place)` or `("boat" | "cutter", home hull)`; `within_hearing` wants the
+same hull aboard; `people_hearing` reads everyone of the registry, so two persons at the
+counting house at Falmouth hear each other whichever hull brought them and two quarterdecks
+are two spots; `station_spot` and the hail's spot carry the World's own hull;
+`stations_everywhere` gives the stations held on every World of the game, which the
+director's `say as` to a person ashore uses for its hearers (`orders._hearers_ashore`);
+`spot_words` says "aboard the Raven, on the quarterdeck" of another hull's spot and nothing
+new of the World's own. `movement.within_hail` compares hulls (a person in a boat hails his
+home hull). **`People.find` stays scoped to the company**, as the design asks (`send for`, a
+station's binding, the people's reading are the company's own), and **`find_anywhere`**
+reaches the rest of the registry by name, surname or role: the free lines' person (`give the
+packet to Mr Gill` from another hull's man at the same place ashore), the director's `say
+as`, the thing's keeper and the doubt of a thing moved use it. `Ports.places_lines` names
+everyone of the world found at a port's places. The checkpoint: `World._adopt_old_people`
+makes the registry for a checkpoint written before it from the World's own `People`
+(`Registry.adopt_old`: the lists lifted off it, each person's bool read into his
+whereabouts, each thing given its hull), and absorbs each crewed ship's World's (her own
+`__setstate__` runs while the parent's dict is still empty, so she makes a registry of her
+own and may take the player's id for her hull; the parent's puts the vessel's id right and
+merges, `Registry.absorb`); `tests/test_hulls.py` writes the pre-84 shape with a crewed
+ship, a person ashore and things in both hulls and loads it whole, and the three kept saves
+load as before.
+
+**Taken another way, with the reason.** The design has `Person.aboard` become the hull's
+id; here the id is `Person.hull` and `aboard` stays a bool, a property over it. The reason
+is the digest: `Person.to_dict` rides every `person.came`, `person.free` and `person.ashore`
+line as data, and a value of "the ship" in place of `True` would move every recorded passage
+that has a person move in it; the property keeps the bool on the wire and the writers as they
+are. The design's `People.build_company(hull)` is `People._build` as it was, the company's
+own `People` object registering its hull: one class, two roles (the company's object and the
+registry's list), rather than a new class for the company and a renamed one for the registry,
+so that the hundred readers of `world.people.<name>` stand.
+
+**Found on the way.** A person made ashore by the director (`person: make ... ashore at
+Plymouth`) is kept by the World's own hull (his `home` is the player's ship's id), because
+the form acts on `world.people` and the people's reading has always listed him; a person of
+the shore with no hull is a bucket the registry has (`home=""`) and no form fills yet: step
+9's, when `person: make` takes a hull or none. `person_journals` are keyed by the person's
+name on the World (step 9's, with the hull on the input). `Ports.places_lines` is the only
+reading that walks everyone; the truth (`director_readings`) still lists the player's
+company and things, which is step 9's walk over the hulls. `Voice` (the lookout's and the
+hands') keeps a bool `aboard` and no hull, and `spot_of` gives it the World's own.
+`_to_full` (a station's World brought back from the far shape) remakes her ship and muster
+and keeps her `People` as it did; the persons' `sailor_id`s then name the old muster, which
+step 5's wake without a remake ends.

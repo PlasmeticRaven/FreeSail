@@ -361,9 +361,15 @@ def within_hail(world: Any, a: Any, b: Any) -> bool:
     both ashore at one port; a person in the boat or the pilot's cutter alongside hails
     the ship as aboard. A person not among the people (None) is taken as aboard."""
 
+    from freesail.world.hearing import own_hull
+
     def side(p: Any) -> str:
-        if p is None or p.aboard or p.where in ("boat", "cutter"):
-            return "aboard"
+        if p is None:
+            return f"aboard:{own_hull(world)}"
+        if p.aboard:
+            return f"aboard:{getattr(p, 'hull', None) or own_hull(world)}"
+        if p.where in ("boat", "cutter"):
+            return f"aboard:{getattr(p, 'home', '') or own_hull(world)}"
         return f"ashore:{getattr(p, 'port', '') or ''}"
 
     return side(a) == side(b)

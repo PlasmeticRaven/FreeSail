@@ -10075,3 +10075,49 @@ thousand ticks under `cProfile` puts the properties' getter at 84,500 calls and 
 5.3 s, which is the profiler's own cost of a call and not the game's.) Truth 51's floor of
 500 stands on this container on both trees; the pace tests proper are run alone at the end
 of the two steps.
+
+### Step 2: one registry of persons and things, the whereabouts, hearing by spot
+
+**What moved: nothing pinned.** The step changes where the persons are kept (one registry
+on the World, each company a view of its list) and what a person and a thing know of where
+they are (`Person.hull`, `Person.home`, `Thing.hull`), and widens hearing and reach to the
+registry; a world in which nobody moves is as it was, line for line, because every list a
+reading walks is the same list in the same order (the company's, the player's first), every
+bool that rides a log line's data is the same bool (`Person.aboard`, now a property over the
+hull), and no act was added to any tick. The readings of a world with one hull are the
+readings they were: `the people`, `where is`, `the places`, `the places ashore`, the free
+lines' lines and the hearing's tails are word for word what the fast tier's tests had of
+them before, and the touched files' tests pass unchanged but for the one that unpacked a
+thing's where into three (`test_world_orders`'s doubt test found the caller in
+`orders._doubt_thing_moved`, mended). The checkpoint's shape changed again (`World.registry`;
+`People` without its lists; `Person` with `hull` and `home` in place of `aboard`; `Thing`
+with `hull`) and the converter reads every older shape: the three kept saves load and run on
+(`test_checkpoint.py`), and `tests/test_hulls.py` writes the pre-84 shape whole, a crewed
+ship with a person ashore and things in both hulls in it, and loads it to the live worlds'
+digests.
+
+**The count.** `people.py` gained `Registry` (some 170 lines) and `People` lost its two
+lists for two properties, `everyone`, `discharge` and `find_anywhere`; `Person` an
+`__init__` of its own (the dataclass's fields as they were, `aboard` a keyword still) and
+the property; `hearing.py` the hull in the spot, `stations_everywhere`, `own_hull` and
+`company_of`; `things.py` the hull on the thing, in the where and in the reach;
+`movement.within_hail` the hulls; `orders.py` three places (the `say as` person found
+anywhere, the masthead's spot, the hearers ashore of every World, the doubt's unpack);
+`orders/free.py` the where's fourth field and the person found anywhere; `ports.py` two
+(who is found ashore, of every hull; the boat's things of this hull); `crews.demote` the
+discharge; `core/world.py` the registry's making and the old people's adoption; `hulls.py`
+the two views. Eleven files of the game; three test files (`test_people.py` three tests,
+`test_hulls.py` one, and the pre-84 shape's writer).
+
+**New tests.** `test_people.py`: the persons of every hull one registry and each company a
+view of it (two hulls' companies, the views, the whereabouts, `aboard` as the bool it was,
+`find` scoped and `find_anywhere` not, her persons gone with her World); a word ashore heard
+by whoever is at that place whichever hull brought him (the brig's master ashore at Falmouth
+at the counting house hears the player's Mr Gill and not his own quarterdeck; the two
+quarterdecks two spots; the port's places naming both; a thing ashore within his reach, taken
+and given to Mr Gill by the free lines of his own ship's grammar; within hail by the hull); a
+thing lies in one hull and the other's places do not show it. `test_hulls.py`: the pre-84
+checkpoint with a crewed ship, a person ashore and a thing in each hull converts whole. The
+acts that put a crewed ship's person ashore (her boat, the port's business for her) are step
+3's, so the whereabouts in these tests are written as the boat will write them; the
+hearing, the reach and the free lines are the real ones.

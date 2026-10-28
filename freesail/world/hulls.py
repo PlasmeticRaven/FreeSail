@@ -138,6 +138,7 @@ SHARED_FIELDS: tuple[str, ...] = (
     "systems",
     "weather",
     "nations",
+    "registry",
     "vessels",
     "squadrons",
     "business",
@@ -265,6 +266,19 @@ class Hull:
     @property
     def heading_deg(self) -> float:
         return units.rad_to_deg(float(self.ship.heading)) % 360.0
+
+    # -- her persons (package 84, step 2; the registry's views) -------------------------
+
+    @property
+    def company(self) -> list[Any]:
+        """The persons she keeps (her muster's named few and whoever her World made),
+        wherever each is now: the registry's list for her."""
+        return self.world.registry.company(self.id)
+
+    @property
+    def aboard(self) -> list[Any]:
+        """The persons in her now, hers or another hull's."""
+        return self.world.registry.aboard(self.id)
 
     # -- the World's, forwarded -------------------------------------------------------
 

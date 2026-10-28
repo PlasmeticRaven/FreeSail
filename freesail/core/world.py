@@ -467,6 +467,14 @@ class World:
 
         vessel = getattr(self, "vessel", None)
         self.own = Hull(self, getattr(vessel, "id", None) or own_id())
+        # The registry of the world's persons and things (package 84, step 2; `people.
+        # Registry`): one for the game, so a crewed ship's World (`CrewedWorld.parent`, set
+        # before this constructor runs) is given its parent's and her company is a view of
+        # it; her `people` registers her hull in it below.
+        from freesail.world.people import Registry
+
+        parent = getattr(self, "parent", None)
+        self.registry = parent.registry if parent is not None else Registry()
         # the build's stamp, worked once at the start (package 37d)
         self.played_under = [build_stamp()]
         self.seed = int(seed)
@@ -858,6 +866,31 @@ class World:
         from freesail.world.hulls import lift_old_state
 
         self.__dict__.update(lift_old_state(self, state))
+        self._adopt_old_people()
+
+    def _adopt_old_people(self) -> None:
+        """The persons and the things of a checkpoint written before the one registry
+        (package 84, step 2) taken into one: this World's own `People` into a registry made
+        here, and each crewed ship's World's (its own `__setstate__` ran first, with the
+        parent's dict still empty, so it made a registry of its own and may have taken the
+        player's id for its hull) absorbed under her vessel's id."""
+        from freesail.world.people import Registry
+
+        if "registry" not in self.__dict__:
+            self.registry = Registry()
+            people = self.own.__dict__.get("people")
+            if people is not None and "hull_id" not in people.__dict__:
+                self.registry.adopt_old(people, self.own.id)
+        for v in getattr(getattr(self, "vessels", None), "vessels", None) or []:
+            crew = getattr(v, "crew", None)
+            if crew is None or crew.__dict__.get("registry") is self.registry:
+                continue
+            was = crew.own.id
+            crew.own.id = str(v.id)
+            theirs = crew.__dict__.get("registry")
+            if theirs is not None:
+                self.registry.absorb(theirs, {was: str(v.id)} if was != v.id else None)
+            crew.registry = self.registry
 
     # -- logging -------------------------------------------------------------
 
