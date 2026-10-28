@@ -1616,12 +1616,14 @@ as a job to the anchorage is step 5's). **Her World's far tick** runs her dealin
 and her people's moves each second, so a captain landed by the boat is at the quay when the
 job falls due, goes to the counting house, is heard there by spot by whoever of any hull is
 at that place, takes what lies before him and is fetched by the boat again. **The course
-for a port** (`shape a course for <port>` in the far shape) is the planner's passage for it
-(`ships.port_course`, `Planner.legs_for` with the port she lies in as the departing port):
-out by its track to sea, along the common tracks where the straight line is not clear of
-the shore, in by the port's track from the sea to its road and its anchorage, where the
-plan's last leg is the anchor; the port she weighs from is no mark to anchor at, the whole
-under the land guard and refused in words where it crosses the land. **A far body under a
+for a port** (`shape a course for <port> [via <marks>]` in the far shape) is the planner's
+passage for it (`ships.port_course`, `Planner.legs_for` with the port she lies in as the
+departing port): out by its track to sea, along the common tracks where the straight line
+is not clear of the shore, by the marks the captain names where the chart has no track
+(package 45's `via`, each headland given its offing), in by the port's track from the sea
+to its road and its anchorage, where the plan's last leg is the anchor; the port she weighs
+from is no mark to anchor at, the whole under the land guard and refused in words where it
+crosses the land, the refusal naming the way by marks. **A far body under a
 held station is that station's to end**, not the sea's (`Vessel.station_held`): at a plan's
 last mark she lies to, said once in her log (`plan.ended`, notable), where a vessel of her
 own was done and gone; brought to an anchor by the plan's own last leg her World says so
@@ -1643,15 +1645,15 @@ acceptance test is truth 7-200** (`data/scenarios/tender.yaml`; `tests/test_know
 the Amazon at anchor in Brixham road, the Raven her tender in company with a free intent, a
 fake at the Raven's captain's station through the harness (the station's samples its eyes:
 the hoist read, the anchor by the track's end, the boat alongside, the word heard), the
-frigate's signal No. 131 read and answered, the course for Plymouth by the tracks, Mr Gill
+frigate's signal No. 131 read and answered, the course for Plymouth refused by the land
+guard and laid via the Start, Mr Gill
 made at the counting house with a sealed packet in his keeping while she is at sea, her
 captain landed by the boat's job and given the packet by the director's `say as`, back
 aboard with it, the lugger the director placed off the Start made out on the way home and
 not fought, the hail within four cables heard on the Amazon's quarterdeck; the Amazon's own
 lines have the signal, the cutter going and coming and the hail and nothing of the port,
 Mr Gill, the packet or the lugger. **Nothing pinned moved**: the business is off in every
-recorded scenario, no recorded scenario seats a station on another ship, and the coasting
-track is a way the planner takes only where the straight line was not clear.
+recorded scenario and no recorded scenario seats a station on another ship.
 
 **Taken another way, with the reason.** The owner's test has the Raven awake at the start
 and put to sleep six miles out; the truth keeps her asleep the whole day (`crewed: {cap:
@@ -1671,11 +1673,15 @@ build machine's constants for the cap and the range and promoted a ship under a 
 whose cap was nought; it reads the budget the scenario or the flags set, as the switch does
 (`settings`). Torbay's track to sea begins at its anchorage, so the planner's departing
 legs carried an anchor at Brixham road; the far course drops the departing port's
-anchorage legs. The chart had no common track along the coast from the Berry Head to the
-Start and the Bolt Head, so the straight line from Torbay's sea mark to Plymouth's crossed
-the Prawle and the planner's headland offing could not clear it; `torbay-to-plymouth` is
-added to `data/charts/features/channel-west.yaml` (Imray 1874 for the coast, the points
-judgement), used only where the straight line is not clear. A westerly made the tender's
+anchorage legs. The chart has no common track along the coast from the Berry Head to the
+Start and the Bolt Head, so the straight line from Torbay's sea mark to Plymouth's crosses
+the Prawle and the planner's headland offing cannot clear it; a coasting track added to
+`channel-west.yaml` cleared it, but the planner took the track for every route whose ends
+reached it (a convoy from off the Lizard bound for the Start, the blockade squadron blown
+off for Torbay), and three tests' figures moved with the routes (`test_squadrons`' and
+truth 7-156's tack-in-succession gap, truth 7-154's restoration tick), so the track was
+withdrawn and the far course takes the captain's marks instead (`via the Start`), as the
+intents' grammar has since package 45; the land guard's refusal says so. A westerly made the tender's
 passage out a dead beat of fifteen hours and a northerly the beat into the Sound five; the
 scenario's day is a north-westerly. The far brain standing aside for a held station does not
 answer a hoist read (its handling is his judgement's minute), so the fake answers it itself.

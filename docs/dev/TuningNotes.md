@@ -11074,10 +11074,9 @@ left for the lead's whole suite in the cloud to judge, not re-pinned here.
 ### Step 4: the coarse acts on a sleeping hull, and the far brain's port acts
 
 Built on step 3 (the design note's postscript "Step 4" has the shape). **What moved: nothing
-pinned.** The business is off in every recorded scenario, no recorded scenario seats a
-station on another ship, and the chart's new coasting track (`torbay-to-plymouth`) is a way
-the planner takes only where a straight line was not clear of the shore, which no recorded
-passage's plan is.
+pinned.** The business is off in every recorded scenario and no recorded scenario seats a
+station on another ship; a coasting track tried on the chart moved three figures and was
+withdrawn (below).
 
 **The count.** `crews.py` (the routing by "needs no physics", `COARSE_OBJECTS`; the far
 tick running her dealings' jobs and her people's moves; the anchor by the track's end and
@@ -11088,10 +11087,9 @@ errand as two jobs with the boat's time, the pilot's minute and the cutter not r
 body lying to at the plan's end under a held station), `brains.py` and `business.py` (the
 far trader's transaction, `data/business.yaml` `transact:`), `world/orders.py` (a word said
 as a person ashore heard by whoever of any hull is at his place; a free line in his mouth
-performed), `orders/free.py` (`spoken`), `things.py` (`Thing.keeper_home`),
-`data/charts/features/channel-west.yaml` (the coasting track), `data/scenarios/tender.yaml`
-(new); tests in `test_crews.py` (five), `test_business.py` (one), `test_captains.py` (the
-tracks' list), `test_world_orders.py` (the refusal's words), and truth 7-200.
+performed), `orders/free.py` (`spoken`), `things.py` (`Thing.keeper_home`), `data/scenarios/tender.yaml`
+(new); tests in `test_crews.py` (five), `test_business.py` (one), `test_world_orders.py` (the
+refusal's words), and truth 7-200.
 
 **The tender's day** (truth 7-200, seed 7, `data/scenarios/tender.yaml`): the Amazon at
 anchor in Brixham road, the Raven a King's cutter beside her at far detail with a fake at
@@ -11099,23 +11097,26 @@ her captain's station through the harness (lockstep every ten minutes and on the
 lines; a word at every sample, since a door silent past its patience loses the deck to the
 rules captain, whose judgements stand in). The walk: anchored by the fake at the start; the
 frigate's No. 131 (steer for the place indicated: Plymouth) seen at a minute and read at two,
-the fake answering it with the pendant, weighing and shaping the course; the course by the
-tracks out of Torbay (50 24 N 3 26 W), by the coasting track outside the Start and the Bolt
-Head (50 23 N 3 24 W, 50 11 N 3 37 W, 50 09 N 3 52 W), to Plymouth's sea mark (50 11 N 4 18
-W) and in by its track to the anchorage in the Sound, where the plan's last leg anchors her.
+the fake answering it with the pendant, weighing and shaping the course; `shape a course
+for Plymouth` refused by the land guard (the straight way from Torbay's sea mark crosses the
+Prawle) with the way by marks named, and `shape a course for Plymouth via the Start` laid:
+out of Torbay (50 24 N 3 26 W), five miles east-south-east of the Start, the planner's
+offing off the Bolt Tail (50 09.9 N 3 47.5 W), Plymouth's sea mark (50 11 N 4 18 W) and in
+by its track to the anchorage in the Sound, where the plan's last leg anchors her.
 The day's figures (seed 7, a north-westerly of fourteen knots falling to twelve): anchored
-at 05:01; the hoist seen at 05:04, read at 05:06, the fake's three orders at 05:07; six
-miles off the Amazon at 06:47; brought to an anchor in the Sound by the track's end at
-18:19 (thirteen hours for some forty-five miles by the tracks, the far body's polar and her
+at 05:01; the hoist seen at 05:04, read at 05:06, the fake's three orders at 05:07, the
+course refused by the land guard in the order's result and laid via the Start in the same
+minute; six miles off the Amazon at 07:17; brought to an anchor in the Sound by the track's
+end at 19:22 (fourteen hours for some fifty miles by the marks, the far body's polar and her
 sailing factor, the last legs into the Sound close-hauled); the boat back from landing her
-captain at 19:25, Mr Gill's packet given at the counting house and the boat back with him
-at 20:37; weighed and shaped for Torbay at once; the lugger made out on the starboard bow
-at 04:14 of the 13th, passing to the westward; brought to an anchor in Brixham road at
-09:57 of the 13th (thirteen hours home, the last leg into the bay a beat against the
-north-westerly) and the hail heard on the Amazon at 10:03. The Raven's log 366 lines, the
-Amazon's 210, the fake called 206 times over 199 samples; 131 s of wall on this container
-for the twenty-nine hours (the frigate at anchor at full detail the whole while). Nothing
-of it is pinned; the truth asserts the walk and the two logs' silences, not the figures.
+captain at 20:28, Mr Gill's packet given at the counting house and the boat back with him at
+21:47; weighed and shaped for Torbay at once, the same refusal and the same way; the lugger
+made out on the way home and passed; brought to an anchor in Brixham road at 11:30 of the
+13th (fourteen hours home, the last leg into the bay a beat against the north-westerly) and
+the hail heard on the Amazon at 11:33. The Raven's log 381 lines, the Amazon's 215, the fake
+called 217 times over 208 samples; 153 s of wall on this container for the thirty hours (the
+frigate at anchor at full detail the whole while, the fast tier running beside). Nothing of
+it is pinned; the truth asserts the walk and the two logs' silences, not the figures.
 
 **Found on the way.** The seat on another ship (`station_world`) read the build machine's
 constants and promoted a ship under a scenario whose cap was nought (mended: it reads
@@ -11137,18 +11138,22 @@ same tree. The hand's refusal of a reading (`_READING_WORDS`) keeps the strict m
 (`_is_a_reading`), the far shape's routing the widened one (`_needs_no_physics`): a port
 order given over her captain's head is his to give or refuse in her words, as before.
 
-**The fast tier on step 4's tree** (`-n auto`, four workers, this container): 2 failures.
-`test_pictures.py`'s blank-image check under load again (passes alone), and
-`test_squadrons.py::test_the_convoy_tacks_in_succession_by_the_wake_...`: the gaps between
-the merchantmen's tacks `[300, 240]` against its band of 300 to 420 s. **Bisected to the
-chart's coasting track** (the test passes with `channel-west.yaml` as it was): the convoy
-bound from off the Lizard for the Start was routed by the planner's headland offing (a mark
-at 50 12.0 N 3 34.6 W) and is now routed by the track's marks (50 09 N 3 52 W, 50 11 N 3 37
-W, the Start), her heading 055 for 058, her pace 5.8 for 5.7 knots. Four cables at that
-pace is 247 s, so the gap counted by the minute is the fourth or the fifth minute by its
-phase: `[300, 300]` before, `[300, 240]` now. The band of five to seven minutes was the old
-route's phase and not the rule the test states (the run of the interval at the pace, not
-71's three minutes); the assertion is the rule now, each gap within a minute of the
-interval's run at the measured pace and more than three minutes, the old figure beside the
-new here. Nothing else of the chart's routing moved in the fast tier; the slow tier of the
-touched files and the known truths is below.
+**The fast tier on step 4's tree as first pushed (628d875)** (`-n auto`, four workers,
+this container): 2 failures. `test_pictures.py`'s blank-image check under load again (passes
+alone), and `test_squadrons.py::test_the_convoy_tacks_in_succession_by_the_wake_...`: the
+gaps between the merchantmen's tacks `[300, 240]` against its band of 300 to 420 s.
+**Bisected to a coasting track** the step had added to the chart (`torbay-to-plymouth` in
+`channel-west.yaml`, so that the tender's course for Plymouth by the tracks cleared the
+Start): the convoy bound from off the Lizard for the Start was routed by the planner's
+headland offing before (a mark at 50 12.0 N 3 34.6 W) and by the track's marks with it, her
+heading 055 for 058 at the same pace, and the gap counted by the minute fell on the fourth
+minute instead of the fifth (four cables at 5.8 knots is 247 s). The slow tier of the
+touched files, the trials and the known truths (`--slow -m "slow and not pace"`, three
+workers): 3 failures, truth 7-156 (the same gap, the same cause), **truth 7-154** (the
+blockade squadron blown off for Torbay restored its station at 34200 for the pinned 37920,
+her route to Torbay by the track's marks) and the lee-shore trial's digest (the container's,
+step 3's record). Both truths pass with the track withdrawn (the bisection). **The track
+was withdrawn** rather than three figures re-pinned: the far course takes the captain's
+marks instead (`shape a course for Plymouth via the Start`, package 45's `via` on the
+intents' grammar), and the land guard's refusal names the way; nothing recorded moves. The
+fast tier on the mended tree is below.
