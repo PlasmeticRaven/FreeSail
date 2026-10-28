@@ -1700,3 +1700,69 @@ crewed world only through the names the Hull keeps. One addition: after the merg
 stage 0, bring the lead's branch in again **only at stage boundaries**, so the builders are
 not chasing the one-world refactor mid-stage. When the engine document is ready, name its
 path in a message if the session can, or the lead reads it on the branch.
+
+**2026-10-28, the gate: `Design-ShipsEngineExtensions.md` at bee6e96 on `claude/pkg-75`,
+read with `Build-Ships.md` §19.2 and §20.** The engine extensions are **approved as
+designed**, and the session may lay stage 0 and stage 0E and start its builders.
+
+The gate's two items:
+1. *The mizen course* as class lateen cut at the mast (`cut_at_mast`), reading the gaff's
+   curve through `curve_class`, is right: the physics sees the curve the sail's cut earns and
+   the rig sees a yard, which is what the thing is. The measurements of §3.2 settle it (the
+   frigate's polar within 0.2 kn at every point with the gaff's curve; the yard out of the
+   braced yards; her classing as filed).
+2. *"The physics' equations are not changed"* is met by what §1 lists: a `curve_class` lookup
+   where a class lookup already stood, a membership test that leaves the yards under the
+   bowsprit out of `_square_rigged`, the helm's mark and `_spar_x`, and nothing else in
+   `physics/`. The proof the lead reads at the merge: `_plate_force`, `compute_sail_forces`'s
+   sums, `_lateral_offset`, the load fractions and `data/sail_classes.yaml` byte-identical
+   to the head merged before stage 0 (a diff of those ranges shows nothing), and the row "the
+   spanker as filed" of §3.2 re-measured on the final tree equal to the figures printed there.
+   Nothing pinned on the existing ships moves; where a pin moves it is re-measured where moved,
+   old beside new, with the cause bisected to one change (the standing rule).
+
+Build §19.2, in its order:
+- *2, stage 0E after this approval*, the four `curve_class` lookups in stage 0: as settled.
+- *3, D48 against a named fit*: **the third way.** A command-line ship that lacks the
+  scenario's fit takes her own default, with one line in the log, and a test of it in
+  `tests/test_scenarios_75.py`. B6 builds it, the smallest change in `make_scenario_world`'s
+  reach and nothing else in `world/scenarios.py`; package 84 may touch that file later and the
+  lead resolves the merge.
+- *4, the fillers as posts*: to 77, as proposed.
+- *5, the merchant brig's and the packet's descriptions* moved to their files: yes. The convoy
+  and trade pins it moves are listed in the record with old beside new and the move proved by
+  bisection; a description is a description and no behaviour may move with it.
+- *6, the scenario's `nations:` block*: **ruled in**, laid in stage 0b as §12.1 says, inert
+  while no scenario carries it. The wars' dates land with their citation by page; a row the
+  builder cannot check against James says so in its comment, and the *Neufchatel*'s scenario
+  notes name it open, rather than carrying a date from memory as if checked.
+- *7, D10(a)'s key* for the *Neufchatel*'s main topgallant: yes, built by B3 as its fourth
+  step beside `under_bowsprit` at places 1 and 3 of §4.2, inert until her file uses it.
+- *8, the order and the merges*: the *Indefatigable*, the *Prince de Neufchatel*, the bilander,
+  the 74, as the owner asked and §2.3 has it. **The lead merges after each ship**: the session
+  reports a ship done on its branch, the lead reviews and merges `--no-ff`, runs the whole suite
+  in the cloud, and the session brings the lead's head in at the next stage boundary. The
+  window closes with the merge; nothing waits for the end of the package.
+- *9, the names and the fits*: accepted as written (`sixty-four.yaml`, `razee-44.yaml`,
+  `hermaphrodite-brig.yaml`, `seventy-four.yaml`, `bilander.yaml`; the fits "ardent class
+  1784", "ardent class 1794", "as razeed 1795", "as carried 1796"; the description keys).
+- *10, the workflow's shape*: accepted, the two-way byte test included.
+- *11, the head*: the lead's branch now stands at 5e3f7b5 (package 84's steps 3 and 4
+  merged). Merge the lead's head as it stands when stage 0 begins, then at stage boundaries
+  only; the ancestor check of §2.1 before stage 0.
+- *12, the frigate's draught and the 36's trimmers*: recorded for the frigate's own file, not
+  this package's.
+- `ARC_PIVOT_*` kept for the old pickles, with a comment saying why: yes.
+
+Ext §14, the rest: *3*, the engine's driver rule holds for the settee hove to unless the
+measured figures say otherwise, and then D4(a) with the figures in TuningNotes; *4*, as
+designed, the case that holds pinned and named, and if neither holds D44(c)'s `settee` row is
+accepted in advance (no equation changes; `test_sails.py`'s curve set old beside new); *5*,
+yes, furled aloft; *6* and *7*, the session's judgement, the times and hands recorded in
+TuningNotes with the sources; *8* and *9*, yes; *10*, the 74 without the driver of 1773, the
+want recorded in her design as open, not asked for now; *11*, the truths' numbers as Build §20
+has them within 7-185 to 7-199, the spare block 7-230 to 7-239 for more; *12*, (a), above;
+*13*, a later package; *14*, open.
+
+The suites as the brief has them: the fast tier once on the final tree and the touched files'
+slow tier on the owner's machine; the whole suite is the lead's, in the cloud, at each merge.
