@@ -32,7 +32,13 @@
 - **D27 and D39 are taken with the brief:** the *Neufchatel* is an American vessel of 1812, with her names American by default. Her scenario's year, and the war's state in the table of nations, are for the design.
 - **D18, the lead's reading for the design:** with D14(c), the viewer draws her true sides, sheer, wales and port sills from the hull profile, and no longer from the one deck line. The deck-height convention can then serve the physics and the spar heights alone. The design proposes against the owner's measure and shows the screenshots.
 
-**Beyond the brief as written, for the lead.** The owner's answers widen package 75 in five places. The brief's own text says otherwise, so the lead should know before stage 0:
+**Ruled on by the lead (2026-10-28, the brief as amended at `3e2c8d8`): all five accepted.**
+- **The hull profile drawn in the viewer for every ship is in this package.** The pictures' tests are kept passing, any threshold that moves is re-pinned with the old figure beside the new, and package 81 starts from the drawn hull.
+- **The lateen class and the yards under the bowsprit go under the lead's gate with the settee.** One design document for the three engine extensions reaches the lead before Phase 4. The physics' equations are not changed.
+- **The lee ports are wired for every ship, with sourced sill heights, "as data honesty".** This is built only after 86's head is in. Every combat pin it moves is shown with the old figure beside the new, the reason, and the proof by bisection.
+- **The settee tacking as a ship's mizen is within the settee's design.**
+
+**Beyond the brief as first written, for the lead.** The owner's answers widened package 75 in five places, which the lead has ruled on as above:
 1. **The viewer.** The brief says "the viewer itself stays at the current standard in this package" and, under "Not built here", "the viewer's hull (81's)". The owner's answer to D14 brings the sourced hull's drawing into 75, for every ship.
    - **The owner's reading (2026-10-27):** package 81 is booked for the gun ports, the guns, the muzzle flash and the smoke. Drawing the hull itself properly is booked to no package, so it comes to 75 without taking anything from 81.
    - The owner is confirming this with the lead.
