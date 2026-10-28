@@ -1335,9 +1335,12 @@ judged); his tree extracted at `/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-
 its plan `Plan-ShipsWorkflow.md` of 2026-10-25, research, the owner's decisions, design,
 a behaviour-free stage 0, builders in worktrees, review by lenses, truths, the comparison
 with the ships built by single agents; the per-ship generator modules under `tools/ships/`
-imported by `tools/gen_ships.py`, the lead's structural decision, agreed), from the head of
-`claude/dreamy-darwin-d77nty` after package 86 is merged (the lead names the commit), on a
-branch `claude/pkg-75` pushed to the origin; the lead reviews and merges, and runs the suite
+imported by `tools/gen_ships.py`, the lead's structural decision, agreed), on a branch
+`claude/pkg-75` pushed to the origin: **the research and the preparation may begin now from
+the head of `claude/dreamy-darwin-d77nty` as it stands (docs and references only); before
+any code or ship file is built, the session brings in the head after package 86 is merged,
+which the lead names, with `git fetch origin && git merge origin/claude/dreamy-darwin-d77nty`
+on `claude/pkg-75`** (a merge into its own branch, never a rebase); the lead reviews and merges, and runs the suite
 on the build machine. The session works in a fresh clone that keeps the remote (never a
 copied folder made into its own repository), commits on `claude/pkg-75` only, pushes that
 branch only, never pushes to or rebases `claude/dreamy-darwin-d77nty`, never force-pushes,
@@ -1376,8 +1379,10 @@ them and says what it took another way.
    this package that extends the engine**, a sail type with its yard, physics, evolutions
    and stations, so the lead's gate applies: the session's design document for the settee
    (its Phase 3) comes to the lead before it is built, and the settee follows the lug's
-   class as 43b built it. **And a 74, optional** (the *Bellona* or the *Bellerophon*; the
-   session may choose with its reason, or leave it for a later wave): the two-decker's file through the generator, her lower deck's
+   class as 43b built it. **And a 74, or a ship of the line of a like class** (the owner,
+   2026-10-28: the session runs its research workflow on the class starting from the
+   *Bellona* or the *Bellerophon*, and may propose a similar class it finds more
+   interesting, with its reason; the owner decides from the research): the two-decker's file through the generator, her lower deck's
    32-pounders and their ports' sills against the heel (70's lee ports shut within a foot of
    the water, the famous reason), her upper deck and quarterdeck, her people some 590, her
    quarter bill by deck, her marines; her sail plan and spars; her polar; the pace of a
