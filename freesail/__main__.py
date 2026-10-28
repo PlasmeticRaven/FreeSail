@@ -114,7 +114,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     host = "localhost" if args.host in ("127.0.0.1", "0.0.0.0") else args.host
     page = f"http://{host}:{args.port}/harbour"
-    print(f"FreeSail harbour. Open {page}")
+    # flushed: under a pipe (truth 7b-108 on a runner, the owner's machine) the line sat in
+    # the buffer until the process was killed, and the test read nothing
+    print(f"FreeSail harbour. Open {page}", flush=True)
     print(f"The settings: {path}" + (f" (not read: {error})" if error else ""))
     print(
         "The clock is held until the driver says go (the game page's button, or 'go' at "
