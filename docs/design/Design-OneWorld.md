@@ -1594,3 +1594,89 @@ attribute name `ports` for the dealings they hold, since a checkpoint mid-errand
 script with it; the rename is the long tail's. `Job.hull` is "" in a checkpoint from
 before and is filled from the list it is found in. The schooner's nation by her company's
 names is not Britain's (`ship_nation`), which the step's first test learned.
+
+### Step 4: the coarse acts on a sleeping hull, and the far brain's port acts
+
+Built on step 3. **Built.** A station on a ship whose hull sleeps (`CrewedWorld.shape ==
+"far"`) works every act that wants no physics through her own grammar, with her dealings
+and the one registry carrying it (`crews._is_a_reading`, widened from the readings and the
+conversation to "needs no physics": the vocabulary's verbs whose object is a person, the
+port, a free line, the needs, a query, a book, an allowance or a station, the standing
+listing, the books' listing and the hail of a sail; the plan's words and the signals stay
+the far body's, `far_order`). **Her dealings know her shape** (`Dealings.coarse`,
+`Dealings.anchored`: the far body's anchor leg or its state where the tackle is asleep):
+`in_port` is by the far body's anchor; the boat's errand is a job of the port with the
+boat's time (`_send_boat_coarse`: hoisted out, the pull to the quay at the boat's pace, the
+business ashore by its errand, the pull back, hoisted in; two `Job(kind="boat")` under her
+hull's id, the first landing the boat and whoever it carries, the second bringing it
+alongside with what it fetched, each doing what the boat's script does at that phase,
+`boat_phase`; the boat's own line carries the time, since a sleeping hull has no runner to
+say an evolution's start); the pilot's minute and the cutter are not run asleep (the pilot
+as a job to the anchorage is step 5's). **Her World's far tick** runs her dealings' jobs
+and her people's moves each second, so a captain landed by the boat is at the quay when the
+job falls due, goes to the counting house, is heard there by spot by whoever of any hull is
+at that place, takes what lies before him and is fetched by the boat again. **The course
+for a port** (`shape a course for <port>` in the far shape) is the planner's passage for it
+(`ships.port_course`, `Planner.legs_for` with the port she lies in as the departing port):
+out by its track to sea, along the common tracks where the straight line is not clear of
+the shore, in by the port's track from the sea to its road and its anchorage, where the
+plan's last leg is the anchor; the port she weighs from is no mark to anchor at, the whole
+under the land guard and refused in words where it crosses the land. **A far body under a
+held station is that station's to end**, not the sea's (`Vessel.station_held`): at a plan's
+last mark she lies to, said once in her log (`plan.ended`, notable), where a vessel of her
+own was done and gone; brought to an anchor by the plan's own last leg her World says so
+(`ship.anchored` by the track's end, notable), so that the station's sample carries it.
+**The far trader transacts** (`business.transact`, under `data/business.yaml` `transact:
+true`, the owner's decision 5): her cargo sold to the port's market at the day's price with
+the supply moved by the tons, the best return cargo a route worth carrying offers bought
+(her port of lading first), her intent set for it and her plan laid from that port, so that
+she sails again where she vanished (the study's finding 7); with no route worth it, home
+empty; with the knob off, done at her port as before. **The director's word in a person's
+mouth** (`say as <person>: ...`) is heard by whoever of any hull is at his place of his port,
+the player's ship a day's sail off (package 66 refused it beyond a boat's reach of the
+player's ship), and a free line in his mouth is his own act by the rule of reach
+(`free.spoken`: `say as Mr Gill: give the packet to Mr Pope` puts the packet in the
+cutter's captain's keeping, heard by him alone). **A kept thing knows its keeper's home
+hull** (`Thing.keeper_home`): a person's id is his company's and two hulls have a master
+each, so the packet given to the cutter's master is hers and not the frigate's. **The
+acceptance test is truth 7-200** (`data/scenarios/tender.yaml`; `tests/test_known_truths.py`):
+the Amazon at anchor in Brixham road, the Raven her tender in company with a free intent, a
+fake at the Raven's captain's station through the harness (the station's samples its eyes:
+the hoist read, the anchor by the track's end, the boat alongside, the word heard), the
+frigate's signal No. 131 read and answered, the course for Plymouth by the tracks, Mr Gill
+made at the counting house with a sealed packet in his keeping while she is at sea, her
+captain landed by the boat's job and given the packet by the director's `say as`, back
+aboard with it, the lugger the director placed off the Start made out on the way home and
+not fought, the hail within four cables heard on the Amazon's quarterdeck; the Amazon's own
+lines have the signal, the cutter going and coming and the hail and nothing of the port,
+Mr Gill, the packet or the lugger. **Nothing pinned moved**: the business is off in every
+recorded scenario, no recorded scenario seats a station on another ship, and the coasting
+track is a way the planner takes only where the straight line was not clear.
+
+**Taken another way, with the reason.** The owner's test has the Raven awake at the start
+and put to sleep six miles out; the truth keeps her asleep the whole day (`crewed: {cap:
+0}`), because the walk is step 4's (the coarse acts) and the switch between the shapes under
+a kept station is truth 89's already; the sleep-and-wake of a hull with her people, stores
+and purse hers is step 5's and 6's, where the truth gains the switch. The design's step 4
+has the pilot's track in as a job of a sleeping hull's dealings; here the course by the
+tracks ends at the anchorage by the port's own track and the plan's anchor leg, which is
+what the pilot would do without his minute, and the pilot as a job is left to step 5 with
+the owner's open decision on whether a sleeping hull takes him at all. The station's hull
+and the one world's logs: the director's world orders (`person: make`, `aboard:`, `say as`)
+are the harness's lines in the player's log, as before this package; the one-world home of
+a word said ashore is the director's-reach step's.
+
+**Found on the way.** `station_world` (the seat on another ship, `--ship <id>`) read the
+build machine's constants for the cap and the range and promoted a ship under a scenario
+whose cap was nought; it reads the budget the scenario or the flags set, as the switch does
+(`settings`). Torbay's track to sea begins at its anchorage, so the planner's departing
+legs carried an anchor at Brixham road; the far course drops the departing port's
+anchorage legs. The chart had no common track along the coast from the Berry Head to the
+Start and the Bolt Head, so the straight line from Torbay's sea mark to Plymouth's crossed
+the Prawle and the planner's headland offing could not clear it; `torbay-to-plymouth` is
+added to `data/charts/features/channel-west.yaml` (Imray 1874 for the coast, the points
+judgement), used only where the straight line is not clear. A westerly made the tender's
+passage out a dead beat of fifteen hours and a northerly the beat into the Sound five; the
+scenario's day is a north-westerly. The far brain standing aside for a held station does not
+answer a hoist read (its handling is his judgement's minute), so the fake answers it itself.
+A person ashore keeps his `place` as 'shore' and his place of the port in `ashore_at`.

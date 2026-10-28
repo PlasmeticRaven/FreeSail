@@ -171,6 +171,10 @@ class CrewedWorld(World):
     §20): then the far body moves her and this World only mirrors it for the station's
     readings (`far_tick`)."""
 
+    # whether the far body rode at anchor at the last far tick (package 84, step 4): the
+    # anchor by the plan's own end said once; a class default, as a checkpoint from before
+    _far_anchored: bool = False
+
     def __init__(self, parent: World, vessel: Any) -> None:
         from freesail.api.session import attach_crew, make_ship
 
@@ -281,6 +285,34 @@ class CrewedWorld(World):
         captain's (the brain has her)."""
         self.clock.advance()
         self.mirror_far()
+        anchored = bool(self.vessel.plan) and self.vessel.plan[0][0] == "anchor"
+        if anchored and not self._far_anchored:
+            # brought to an anchor by the plan's own last leg (a course for a port by the
+            # tracks, step 4), not by an order: said once, so that the station knows
+            port = self.ports.in_port_at(self.vessel.position) if self.ports is not None else None
+            spot = port.nearest_spot(self.vessel.position)[0].name if port is not None else None
+            where = f" in {spot}" if spot else ""
+            self.record(
+                Severity.NOTABLE,
+                "ship.anchored",
+                f"Brought to an anchor{where} by the track's end (the far body rides head to "
+                "wind).",
+                data={"port": port.id if port is not None else "", "far_shape": True},
+            )
+        self._far_anchored = anchored
+        reached = getattr(self.vessel, "mark_reached", "")
+        if reached:
+            # the plan's last mark under a held station (package 84, step 4; `Vessel.
+            # _arrived`): she lies to there, said in her log so that the station's sample
+            # carries it
+            self.vessel.mark_reached = ""
+            self.record(
+                Severity.NOTABLE,
+                "plan.ended",
+                f"The plan's last mark reached, {reached}: she lies to there (the far body) "
+                "until a course is shaped or she is brought to an anchor.",
+                data={"mark": reached},
+            )
         self._follow_weather()
         self.wind.step(1.0, self.wind_record.mean_speed())
         self.wind_record.add(self.wind.effective_speed, self.wind.direction_from)
@@ -293,6 +325,12 @@ class CrewedWorld(World):
             if self.lookout is not None:
                 for severity, kind, text, data in self.lookout.look(self):
                     self.record(severity, kind, text, data=data)
+        # her dealings' jobs due (the boat's errands by the plan's time, the yard's, the
+        # lighter's) and her people's moves (package 84, step 4: the coarse acts of a
+        # sleeping hull), with no physics
+        self.dealings.tick()
+        for severity, kind, text, data in self.people.tick(self.clock.tick):
+            self.record(severity, kind, text, data=data)
         self._tick_sun()
         bells = self.clock.bells()
         if bells is not None:
@@ -660,11 +698,29 @@ FAR_SHAPE_WORDS = (
     "weigh",
     "keep the station",
 )
+# The acts that need no physics (package 84, step 4; the design's §2.5): a person's (going
+# ashore and coming aboard, the waterman, the port's places, a word said), the port's (the
+# boat for the prices or a purchase, buying and selling, the yard, the hands entered), the
+# free lines, the needs, the readings, the books and the conversation, all through the
+# ship's grammar with her dealings and the world's registry, whatever her shape; by the
+# vocabulary's object of the verb.
+COARSE_OBJECTS = frozenset(
+    {"person", "port", "free", "needs", "query", "book", "allowance", "station"}
+)
+COARSE_WORDS = (
+    "go ashore, come aboard and hire a waterman",
+    "go to a place ashore, say, ask and tell, give and take",
+    "send the boat ashore for the prices or a purchase",
+    "buy and sell, demand of the yard, take in water and provisions, enter hands",
+    "the colours, a signal and a hail",
+)
 FAR_SHAPE_REFUSAL = (
-    "She is at far detail, beyond the range of the ship: her body is the plan's, and the "
-    "orders that work it are " + ", ".join(FAR_SHAPE_WORDS) + ". The readings, the "
-    "conversation and the book's listing are answered; the whole surface returns when she "
-    "is near again, with no reseat."
+    "Her hull sleeps (she is at far detail): her body is the plan's, and the orders that "
+    "work it are " + ", ".join(FAR_SHAPE_WORDS) + "; the acts that want no physics are hers "
+    "as at full detail (" + "; ".join(COARSE_WORDS) + "); the readings, the conversation and "
+    "the book's listing are answered. The helm's detail, the sails by name, the guns and the "
+    "evolutions want her awake, and the whole surface returns when the cap wakes her, with "
+    "no reseat."
 )
 
 
@@ -692,7 +748,11 @@ def station_world(parent: World, words: str) -> tuple[Any, CrewedWorld]:
         if centre is not None
         else math.inf
     )
-    full = nm <= CREWED_NM and len(crewed(parent)) < CREWED_CAP
+    # the budget the scenario or the flags set (`settings`; found on the way in package
+    # 84, step 4: the seat read the build machine's constants and promoted a ship under a
+    # scenario whose cap was nought)
+    cap, range_nm, _ = settings(parent)
+    full = nm <= range_nm and len(crewed(parent)) < cap
     crew = CrewedWorld(parent, vessel)
     vessel.crew = crew
     vessel.detail = "crewed"
@@ -729,6 +789,28 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
     low = " ".join(text.lower().split()).rstrip(".")
     m = re.match(r"^(?:shape|lay) (?:a |the )?course for (?P<place>.+)$", low)
     if m:
+        ports = getattr(crew.parent, "ports", None)
+        port = ports.find(m.group("place")) if ports is not None else None
+        if port is not None:
+            # a port: by its tracks and under the land guard (package 84, step 4; the
+            # study's finding 4: one straight leg sent her across a cape)
+            from freesail.world.ships import port_course
+
+            try:
+                plan = port_course(crew.parent, v, port)
+            except ValueError as e:
+                raise OrderError(f"{str(e)[:1].upper()}{str(e)[1:]}; she keeps her plan.") from None
+            v.saved_plan = None
+            v.plan = plan
+            v.tack = 0.0
+            if brain is not None:
+                brain.planned = True
+            marks = ", ".join(str(leg[2]) for leg in plan if len(leg) > 2 and leg[2])
+            return (
+                "helm.set",
+                f"Shaped a course for {port.name} by the tracks: {marks} (the plan's legs).",
+                {"place": port.name, "port": port.id, "legs": len(plan)},
+            )
         found = _place_for(crew.parent, m.group("place"))
         if found is None:
             raise OrderError(f"The chart knows no place named {m.group('place')!r}.")
@@ -804,6 +886,7 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
         if not (v.plan and v.plan[0][0] == "anchor"):
             v.saved_plan = list(v.plan)
         v.plan = [("anchor", "")]
+        crew._far_anchored = True
         return (
             "ship.anchored",
             "Came to an anchor where she is (the far body rides head to wind).",
@@ -834,12 +917,15 @@ def far_order(crew: CrewedWorld, text: str) -> tuple[str, str, dict[str, Any]] |
 
 
 def _is_a_reading(crew: CrewedWorld, text: str) -> bool:
-    """Whether the words ask a reading, a query or the deck's conversation, which the far
-    shape answers through the ship's grammar (nothing of them moves the body)."""
+    """Whether the words ask a reading, a query or the deck's conversation (the standing
+    listing and the book's listing among them), which her captain reads for himself and the
+    director's hand does not give (`_READING_WORDS`); as before package 84's step 4, which
+    widened the far shape's own routing to `_needs_no_physics`."""
     from freesail.orders import prompt, read_whole, stations
     from freesail.orders.errors import OrderError
     from freesail.orders.vocabulary import load_vocabulary
     from freesail.standing import grammar as standing
+    from freesail.world import books
 
     ship = crew.ship
     from freesail.orders import signals as signal_orders
@@ -852,6 +938,8 @@ def _is_a_reading(crew: CrewedWorld, text: str) -> bool:
         return True
     if standing.recognises(text) in ("standing orders", "show standing order"):
         return True
+    if books.recognises(text):
+        return True
     vocab = load_vocabulary()
     try:
         order = read_whole(ship, text, vocab)
@@ -863,13 +951,55 @@ def _is_a_reading(crew: CrewedWorld, text: str) -> bool:
     return order.verb in vocab.readings
 
 
+def _needs_no_physics(crew: CrewedWorld, text: str) -> bool:
+    """Whether the words ask a reading, a query or the deck's conversation, or (package 84,
+    step 4) an act that needs no physics, which the far shape answers through the ship's
+    grammar: nothing of them moves the body, and a sleeping hull's dealings and the world's
+    registry carry them (a person goes ashore by the boat's job, a thing is taken, a word
+    is heard by spot). The plan's words and the signals are the far body's (`far_order`);
+    the hail of a sail is words by the trumpet and goes through the grammar."""
+    from freesail.orders import parse, prompt, stations
+    from freesail.orders.errors import OrderError
+    from freesail.orders.vocabulary import load_vocabulary
+    from freesail.standing import grammar as standing
+    from freesail.world import books
+
+    ship = crew.ship
+    from freesail.orders import signals as signal_orders
+
+    signal = signal_orders.recognises(text, ship)
+    if signal is not None:
+        # package 71: the colours, a signal or the hail of a sail are orders of hers (the
+        # stations' grammar would take 'hail her' for a hail of the deck); the hail alone
+        # wants no hoist and goes through the grammar (step 4)
+        return signal == "hail"
+    if stations.recognises(text, ship) is not None:
+        return True
+    if standing.recognises(text) in ("standing orders", "show standing order"):
+        return True
+    if books.recognises(text):
+        return True
+    vocab = load_vocabulary()
+    try:
+        order = parse(ship, text, vocab)
+    except OrderError:
+        try:
+            return prompt.answer_unparsed(ship, text, vocab) is not None
+        except OrderError:
+            return False
+    if order.verb in vocab.readings:
+        return True
+    spec = vocab.verbs.get(order.verb)
+    return spec is not None and spec.object in COARSE_OBJECTS
+
+
 def submit_far(crew: CrewedWorld, text: str, actor: str, said: str | None, routine: bool) -> Any:
     """`World.submit` in the far shape: a far-shape order on the plan, a reading or the
     conversation through the grammar, anything else refused in words."""
     from freesail.orders.errors import OrderError
 
     text = " ".join(text.split())
-    if _is_a_reading(crew, text):
+    if _needs_no_physics(crew, text):
         return World.submit(crew, text, actor=actor, said=said, routine=routine)
     try:
         found = far_order(crew, text)
@@ -906,12 +1036,14 @@ def shape_words(crew: CrewedWorld) -> str:
     v = crew.vessel
     if crew.shape == "far":
         return (
-            f"{v.name} is at far detail, beyond the range of the player's ship: her body is "
-            "the plan's, moved once a minute by her polar in the wind at her. Your orders "
-            "work it in the plan layer's shape: " + ", ".join(FAR_SHAPE_WORDS) + ". The "
-            "readings are the far body's (her place, the wind, what her lookout sees); the "
-            "sails, the hands and the book are as they stood when she was last at full "
-            "detail. When she is near the ship again the whole surface returns beneath this "
+            f"{v.name}'s hull sleeps (she is at far detail, beyond the cap's reach): her body "
+            "is the plan's, moved once a minute by her polar in the wind at her. Your orders "
+            "work it in the plan layer's shape: " + ", ".join(FAR_SHAPE_WORDS) + ". The acts "
+            "that want no physics are yours as at full detail: " + "; ".join(COARSE_WORDS) + " "
+            "(the boat's errands by the plan's time, the words heard by whoever is at that "
+            "place). The readings are the far body's (her place, the wind, what her lookout "
+            "sees); the sails, the hands and the book are as they stood when she was last "
+            "awake. When the cap wakes her again the whole surface returns beneath this "
             "station, with no reseat, and the log says so."
         )
     return (

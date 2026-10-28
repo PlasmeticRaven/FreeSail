@@ -434,7 +434,7 @@ def test_say_as_puts_words_in_a_mouth_heard_within_earshot_and_journaled_as_his(
     said = events(w, "person.spoke")[-1].text
     assert said == "Mr Fox, the agent, ashore at Falmouth: The packet is in."
     far = w.world_order('say as Mr Roy: "Bonjour."', "t")
-    assert far.data["result"] == "refused" and "nobody aboard can hear Mr Roy" in far.text
+    assert far.data["result"] == "refused" and "nobody can hear Mr Roy" in far.text
     none = w.world_order('say as the harbourmaster: "Welcome."', "t")
     assert none.data["result"] == "refused" and "make" in none.text
     assert w.submit('say as the cook: "Aye."').kind == "order.rejected"  # the captain's prompt

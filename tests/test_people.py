@@ -628,7 +628,10 @@ def test_a_thing_is_made_from_words_with_a_place_and_nothing_more_and_shows_wher
         ("in the captain's cabin", ("cabin", "")),
     ):
         assert TH._place_in(words) == want, words
-    assert TH.read_where(w, "in the captain's keeping") == {"keeper": w.people.captain.id}
+    assert TH.read_where(w, "in the captain's keeping") == {
+        "keeper": w.people.captain.id,
+        "keeper_home": w.own.id,  # the keeper's home hull (package 84, step 4)
+    }
     with pytest.raises(TH.ThingWordsError, match="nobody answering to 'Mr Nobody'"):
         TH.read_where(w, "in the keeping of Mr Nobody")
     e = w.world_order("aboard: a rat, gnawing the bread", "the test")

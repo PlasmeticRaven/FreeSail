@@ -11070,3 +11070,85 @@ this container. Package 73's record has the trial back on its pin exactly after 
 the build machine, so the difference is this container's against that machine's (as truth
 7b-108's harbour line was the runner's), a line's words or data and not a state or a count;
 left for the lead's whole suite in the cloud to judge, not re-pinned here.
+
+### Step 4: the coarse acts on a sleeping hull, and the far brain's port acts
+
+Built on step 3 (the design note's postscript "Step 4" has the shape). **What moved: nothing
+pinned.** The business is off in every recorded scenario, no recorded scenario seats a
+station on another ship, and the chart's new coasting track (`torbay-to-plymouth`) is a way
+the planner takes only where a straight line was not clear of the shore, which no recorded
+passage's plan is.
+
+**The count.** `crews.py` (the routing by "needs no physics", `COARSE_OBJECTS`; the far
+tick running her dealings' jobs and her people's moves; the anchor by the track's end and
+the plan's end said in her log; `far_order`'s course for a port by the tracks; the seat
+reading the scenario's crewed budget), `dealings.py` (`coarse`, `anchored`, the boat's
+errand as two jobs with the boat's time, the pilot's minute and the cutter not run asleep),
+`ships.py` (`port_course`, `approach_plan`, `Vessel.station_held`, `mark_reached`, the far
+body lying to at the plan's end under a held station), `brains.py` and `business.py` (the
+far trader's transaction, `data/business.yaml` `transact:`), `world/orders.py` (a word said
+as a person ashore heard by whoever of any hull is at his place; a free line in his mouth
+performed), `orders/free.py` (`spoken`), `things.py` (`Thing.keeper_home`),
+`data/charts/features/channel-west.yaml` (the coasting track), `data/scenarios/tender.yaml`
+(new); tests in `test_crews.py` (five), `test_business.py` (one), `test_captains.py` (the
+tracks' list), `test_world_orders.py` (the refusal's words), and truth 7-200.
+
+**The tender's day** (truth 7-200, seed 7, `data/scenarios/tender.yaml`): the Amazon at
+anchor in Brixham road, the Raven a King's cutter beside her at far detail with a fake at
+her captain's station through the harness (lockstep every ten minutes and on the notable
+lines; a word at every sample, since a door silent past its patience loses the deck to the
+rules captain, whose judgements stand in). The walk: anchored by the fake at the start; the
+frigate's No. 131 (steer for the place indicated: Plymouth) seen at a minute and read at two,
+the fake answering it with the pendant, weighing and shaping the course; the course by the
+tracks out of Torbay (50 24 N 3 26 W), by the coasting track outside the Start and the Bolt
+Head (50 23 N 3 24 W, 50 11 N 3 37 W, 50 09 N 3 52 W), to Plymouth's sea mark (50 11 N 4 18
+W) and in by its track to the anchorage in the Sound, where the plan's last leg anchors her.
+The day's figures (seed 7, a north-westerly of fourteen knots falling to twelve): anchored
+at 05:01; the hoist seen at 05:04, read at 05:06, the fake's three orders at 05:07; six
+miles off the Amazon at 06:47; brought to an anchor in the Sound by the track's end at
+18:19 (thirteen hours for some forty-five miles by the tracks, the far body's polar and her
+sailing factor, the last legs into the Sound close-hauled); the boat back from landing her
+captain at 19:25, Mr Gill's packet given at the counting house and the boat back with him
+at 20:37; weighed and shaped for Torbay at once; the lugger made out on the starboard bow
+at 04:14 of the 13th, passing to the westward; brought to an anchor in Brixham road at
+09:57 of the 13th (thirteen hours home, the last leg into the bay a beat against the
+north-westerly) and the hail heard on the Amazon at 10:03. The Raven's log 366 lines, the
+Amazon's 210, the fake called 206 times over 199 samples; 131 s of wall on this container
+for the twenty-nine hours (the frigate at anchor at full detail the whole while). Nothing
+of it is pinned; the truth asserts the walk and the two logs' silences, not the figures.
+
+**Found on the way.** The seat on another ship (`station_world`) read the build machine's
+constants and promoted a ship under a scenario whose cap was nought (mended: it reads
+`settings`). The far body's end-of-plan took a crewed hull off the sea with her station
+seated (mended: she lies to under a held station, `plan.ended`). The planner had no track
+along the coast from the Berry Head to the Start and the Bolt Head, and its headland offing
+could not clear the Prawle, so `shape a course for Plymouth` from Torbay was refused by the
+land guard until the coasting track was added; Torbay's track to sea begins at its
+anchorage, which the far course drops as a mark to anchor at. A fake that answered its
+samples with silence lost the deck to the rules captain after its patience (the harness's
+rule for a silent door), whose judgements stood in and laid his own plan; the truth's fake
+says a word at every sample. The director's `say as` for a person ashore was refused beyond
+a boat's reach of the player's ship (package 66's rule), which the one registry makes a
+question of who is at his place; and a thing given to the cutter's master was found in the
+frigate's master's hands by his id (`Thing.keeper_home`). The step 3 fast tier on its
+worktree: 1 failure, `test_pictures.py`'s blank-image check (`std 7.95 > 8.0`) under the
+machine's load beside this step's smokes, as the baseline's run had; it passes alone on the
+same tree. The hand's refusal of a reading (`_READING_WORDS`) keeps the strict meaning
+(`_is_a_reading`), the far shape's routing the widened one (`_needs_no_physics`): a port
+order given over her captain's head is his to give or refuse in her words, as before.
+
+**The fast tier on step 4's tree** (`-n auto`, four workers, this container): 2 failures.
+`test_pictures.py`'s blank-image check under load again (passes alone), and
+`test_squadrons.py::test_the_convoy_tacks_in_succession_by_the_wake_...`: the gaps between
+the merchantmen's tacks `[300, 240]` against its band of 300 to 420 s. **Bisected to the
+chart's coasting track** (the test passes with `channel-west.yaml` as it was): the convoy
+bound from off the Lizard for the Start was routed by the planner's headland offing (a mark
+at 50 12.0 N 3 34.6 W) and is now routed by the track's marks (50 09 N 3 52 W, 50 11 N 3 37
+W, the Start), her heading 055 for 058, her pace 5.8 for 5.7 knots. Four cables at that
+pace is 247 s, so the gap counted by the minute is the fourth or the fifth minute by its
+phase: `[300, 300]` before, `[300, 240]` now. The band of five to seven minutes was the old
+route's phase and not the rule the test states (the run of the interval at the pace, not
+71's three minutes); the assertion is the rule now, each gap within a minute of the
+interval's run at the measured pace and more than three minutes, the old figure beside the
+new here. Nothing else of the chart's routing moved in the fast tier; the slow tier of the
+touched files and the known truths is below.

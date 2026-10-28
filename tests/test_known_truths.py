@@ -10455,3 +10455,171 @@ def test_truth_7_184_the_leak_scenario_mans_the_pumps_at_a_foot_and_left_alone_l
     gm = float(w2.ship.hull.gm_m)
     assert 0.6 < gm < 0.85 and gm0 == pytest.approx(1.1, abs=0.05), (gm0, gm)
     assert not w2.ship_lost
+
+
+@pytest.mark.slow
+def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_and_hails_home():
+    """Package 84, step 4: the owner's acceptance test of the one-world design
+    (docs/design/Design-OneWorld.md §2.12) walked with a fake at the tender's captain's
+    station, her hull asleep the whole day (data/scenarios/tender.yaml, `crewed: {cap: 0}`;
+    the switch between the shapes is truth 89's). The Amazon lies at anchor in Brixham road
+    with the cutter Raven in company; the fake anchors her, reads the frigate's signal No.
+    131 in its sample, answers it, weighs and shapes a course for Plymouth, which the far
+    body sails by the ports' tracks (out of Torbay, outside the Start and the Bolt Head by
+    the coasting track, in by the Sound to the anchorage, where the plan's last leg brings
+    her to an anchor); the director makes Mr Gill at Plymouth's counting house with a sealed
+    packet in his keeping while she is at sea; landed by her boat's job the fake's captain
+    goes to the counting house, is heard there, is given the packet by the director's `say
+    as` (a free line in Mr Gill's mouth, heard by him alone) and comes aboard with it in his
+    keeping; the lugger the director placed off the Start is made out by her lookout on the
+    way home and not fought (74's); within hail of the frigate she hails, heard on the
+    Amazon's quarterdeck. The Amazon's own lines have the signal, the cutter going and
+    coming and the hail, and nothing of the port, Mr Gill, the packet or the lugger (the
+    director's world orders are the harness's lines in the player's log, as before this
+    package: the director's reach is a later step's); the Raven's log has them all, every
+    line the game's own. Nothing is pinned: the business is off, and the walk is the truth."""
+    from freesail.agents import Fake, Harness, SamplingPolicy, call
+    from freesail.agents.agent import captain as captain_station
+    from freesail.agents.model import Reply
+    from freesail.world import things as TH
+    from freesail.world.crews import station_world
+    from freesail.world.geo import bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    sf = load_scenario("data/scenarios/tender.yaml")
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    w.run(60)
+    raven, crew = station_world(w, "Raven")
+    assert crew.shape == "far" and raven.detail == "crewed"
+    stage = {"n": 0, "orders": []}
+
+    def act(last, turns):
+        """The fake at her captain's station: what the sample says decides the next act."""
+        if "tool_results" in last:
+            return Reply()
+        log = last.get("log") or []
+        kinds = {str(e.get("kind")) for e in log}
+        text = " ".join(str(e.get("text", "")) for e in log).lower()
+        heard = " ".join(str(x) for x in (last.get("heard") or [])).lower()
+        s, orders = stage["n"], []
+        if s == 0:
+            orders, s = ["come to an anchor"], 1
+        elif s == 1 and "signal.read" in kinds and "plymouth" in text:
+            orders, s = ["answer the signal", "weigh", "shape a course for Plymouth"], 2
+        elif s == 2 and "ship.anchored" in kinds and "the sound" in text:
+            orders, s = ["go ashore"], 3
+        elif s == 3 and "boat.alongside" in kinds:
+            orders = [
+                "go to the counting house",
+                "say good day to you, Mr Gill; I am come for the packet",
+            ]
+            s = 4
+        elif s == 4 and "keeping" in heard:
+            orders, s = ["say I am obliged to you, Mr Gill", "come aboard"], 5
+        elif s == 5 and "boat.alongside" in kinds:
+            orders, s = ["weigh", "shape a course for Torbay"], 6
+        elif s == 6 and "ship.anchored" in kinds and "brixham" in text:
+            orders, s = ["hail the frigate"], 7
+        stage["n"] = s
+        stage["orders"] += orders
+        if not orders:
+            # a word at every sample: a door silent past its patience loses the deck to
+            # the rules captain, whose judgements would stand in (spec M6 §20)
+            return Reply(text="Nothing to add; carrying on.")
+        return Reply(calls=tuple(call("submit_order", text=o) for o in orders))
+
+    fake = Fake([act], loop=True)
+    policy = SamplingPolicy.in_lockstep(600, "notable", "urgent")
+    h = Harness(crew, captain_station(policy, 3600, world=crew), fake, save=lambda w, why: None)
+    h.model_name, h.door = "the fake", "runner"
+    h.start()
+    assert crew.captain.seated and raven.station_held()
+
+    def nm_apart() -> float:
+        return bearing_and_distance(raven.position, w.position)[1] / units.NAUTICAL_MILE
+
+    def run_until(cond, hours: float, step: int = 300) -> None:
+        for _ in range(int(hours * 3600 / step)):
+            w.run(step)
+            if cond():
+                return
+        raise AssertionError(f"not reached in {hours} h: stage {stage['n']}, {raven.position}")
+
+    def raven_kinds() -> list[str]:
+        return [e.kind for e in crew.log]
+
+    # 1. the seat: she rides at anchor beside the frigate, the player's log silent of it
+    w.run(120)
+    assert stage["n"] == 1 and raven.plan[0][0] == "anchor"
+    assert crew.dealings.in_port() is not None and crew.dealings.in_port().id == "torbay"
+    # 2. the order by signal: read in the sample, answered, the course by the tracks
+    w.submit("make the signal: proceed to Plymouth")
+    run_until(lambda: stage["n"] >= 2, 1.0, step=60)
+    assert "signal.read" in raven_kinds()
+    shaped = [e for e in crew.log if e.kind == "helm.set" and "by the tracks" in e.text]
+    assert shaped and "the anchorage in the Sound" in shaped[-1].text
+    assert "50 11 N 3 37 W" in shaped[-1].text  # outside the Start, by the coasting track
+    assert raven.plan[-1] == ("anchor", "plymouth")
+    run_until(lambda: any(e.kind == "signal.answered" for e in w.log), 0.5, step=60)
+    # 3. at sea: the director makes the person and the thing at Plymouth while she sails
+    run_until(lambda: nm_apart() > 6.0, 4.0)
+    assert any(
+        e.kind == "lookout.glass" and "cutter" in e.text and "under way" in e.text for e in w.log
+    )
+    w.world_order(
+        'person: make "Mr Gill", a merchant of Plymouth, ashore at Plymouth, at the counting house'
+    )
+    w.world_order("aboard: a sealed packet, in the keeping of Mr Gill")
+    packet = next(t for t in w.registry.things if "packet" in t.name)
+    gill = w.people.find("Mr Gill")
+    assert TH.keeper_of(w, packet) is gill and not gill.aboard
+    # 4. into the port: the plan's last leg anchors her in the Sound, said in her log
+    run_until(lambda: stage["n"] >= 3, 16.0)
+    assert crew.dealings.in_port() is not None and crew.dealings.in_port().id == "plymouth"
+    assert any(e.kind == "ship.anchored" and "track's end" in e.text for e in crew.log)
+    # 5. ashore to a person: landed by the boat's job, to the counting house, heard there
+    run_until(lambda: stage["n"] >= 4, 3.0)
+    skipper = next(p for p in crew.people.people if p.station == "captain")
+    assert skipper.where == "shore" and skipper.port == "plymouth" and skipper.hull is None
+    assert skipper.ashore_at == "counting_house"
+    spoke = [e for e in crew.log if e.kind == "agent.spoke"]
+    assert spoke and "ashore at Plymouth, at the counting house" in spoke[-1].text
+    # 6. back with a thing: the director's word in Mr Gill's mouth gives it; the boat fetches him
+    e = w.world_order(f"say as Mr Gill: give the packet to {skipper.name}")
+    assert "heard by" in e.text and skipper.name in e.text
+    given = [x for x in w.log if x.kind == "free.line" and x.data.get("spoken_as")]
+    assert given and given[-1].data["moved"] and TH.keeper_of(w, packet) is skipper
+    assert TH.place_of(w, packet)[:3] == ("shore", "plymouth", "counting_house")
+    run_until(lambda: stage["n"] >= 6, 3.0)
+    assert skipper.aboard and skipper.hull == raven.id
+    assert TH.keeper_of(w, packet) is skipper and TH.place_of(w, packet)[3] == raven.id
+    # 7. past a ship the director placed: made out, not fought
+    w.world_order(
+        'ship: a lugger "Renard" of France at 50 09 N 3 44 W, '
+        "patrolling off 50 08 N 3 42 W within 3 miles, no colours"
+    )
+    # 8. home to report: within hail of the frigate, heard on her quarterdeck
+    run_until(lambda: stage["n"] >= 7, 18.0)
+    assert crew.dealings.in_port() is not None and crew.dealings.in_port().id == "torbay"
+    assert nm_apart() < 1.0
+    run_until(lambda: any(e.kind == "hail.heard" for e in w.log), 0.5, step=60)
+    heard = [e for e in w.log if e.kind == "hail.heard"]
+    assert "cutter" in heard[-1].text and heard[-1].severity.value == "urgent"
+    # the two logs: hers has the port, the quay, the counting house, Mr Gill, the packet and
+    # the lugger; the player's own lines have none of them
+    hers = " ".join(e.text for e in crew.log).lower()
+    for words in ("barbican steps", "counting house", "mr gill", "packet", "lugger"):
+        assert words in hers, words
+    assert any(e.kind == "lookout.made_out" and "lugger" in e.text for e in crew.log)
+    own = " ".join(
+        e.text for e in w.log if e.kind not in ("world.order", "person.spoke", "free.line")
+    ).lower()
+    for words in ("counting house", "mr gill", "packet", "lugger", "barbican"):
+        assert words not in own, words
+    # every order of the fake's was taken; nothing of hers was refused
+    refused = [e for e in crew.log if e.kind == "order.rejected" and e.actor == "the captain"]
+    assert not refused, [e.text for e in refused]
+    assert stage["orders"][0] == "come to an anchor" and stage["orders"][-1] == "hail the frigate"
+    assert fake.calls > 6
+    h.release("the test is done") if hasattr(h, "release") else None

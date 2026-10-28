@@ -497,6 +497,9 @@ class Vessel:
     # crewed promotion. A vessel in a checkpoint from before loads on passage.
     state: str = "on passage"
     saved_plan: list[tuple[Any, ...]] | None = None
+    # the plan's last mark reached under a held station (package 84, step 4): she lies to
+    # there, and her World says so once (`CrewedWorld.far_tick`)
+    mark_reached: str = ""
     # the brain on the far body (package 43; spec M6 §4, §19): a vessel given an `intent:`
     # carries a `captains.FarCaptain`, who judges once a minute from her truth and lays
     # her plan state by state; a vessel without one sails her goal's plan as before. Her
@@ -693,9 +696,14 @@ class Vessel:
 
     def tick(self, world: Any, dt: float) -> None:
         """Move along the plan for `dt` seconds, by the wind at her and the tide."""
-        if self.done or not self.plan:
-            self.done = True
+        if self.done:
             return
+        if not self.plan:
+            if self.station_held():
+                self.plan = [("lie_to", math.inf)]
+            else:
+                self.done = True
+                return
         leg = self.plan[0]
         kind = leg[0]
         wind_from, wind_ms = self._wind_at(world)
@@ -864,7 +872,28 @@ class Vessel:
             self.plan = [("lie_to", math.inf)]
             return
         if kind == "home" or (kind == "to" and not self.plan):
+            if self.station_held():
+                # a crewed hull whose captain's station is held (package 84, step 4; the
+                # design's §2.5): her voyage is that station's to end, not the sea's, so
+                # at the plan's last mark she lies to until a course is shaped or she is
+                # brought to an anchor; her World says so (`CrewedWorld.far_tick`)
+                self.plan = [("lie_to", math.inf)]
+                self.mark_reached = (
+                    str(leg[2]) if len(leg) > 2 and leg[2] else "the plan's last mark"
+                )
+                return
             self.done = True
+
+    def station_held(self) -> bool:
+        """Whether a station is seated at this hull's captain's station and holds her
+        deck (package 84, step 4): the same test the far brain stands aside by."""
+        crew = getattr(self, "crew", None)
+        near = getattr(crew, "captain", None) if crew is not None else None
+        return (
+            near is not None
+            and bool(getattr(near, "seated", False))
+            and not getattr(near, "stand_in", False)
+        )
 
     # -- the level of detail -------------------------------------------------------------
 
@@ -1111,9 +1140,60 @@ def _goal_plan(world: Any, goal: str, start: Position) -> tuple[list[tuple[Any, 
     )
 
 
+def approach_plan(world: Any, port: Any) -> list[tuple[Any, ...]]:
+    """A port's way in from the sea as a far body's plan (package 43b's business, and since
+    package 84 step 4 the far shape's `shape a course for <port>`): its track from the sea,
+    its road, its inner track to the anchorage (`Planner.legs_for`'s, without the sea
+    route to its first mark)."""
+    from freesail.world.brains import _plan_of_legs
+    from freesail.world.captains import Planner
+
+    planner = Planner(world)
+    plan = _plan_of_legs(planner._port_track(port, "from_sea"))
+    road = ("to", port.outer_road.position, port.outer_road.name)
+    if not any(len(leg) > 1 and leg[1] == road[1] for leg in plan):
+        plan.append(road)
+    plan += _plan_of_legs(planner._port_track(port, "in"))
+    anchorage = ("to", port.anchorage.position, port.anchorage.name)
+    if not any(len(leg) > 1 and leg[1] == anchorage[1] for leg in plan):
+        plan.append(anchorage)
+    return plan
+
+
+def port_course(world: Any, vessel: Any, port: Any) -> list[tuple[Any, ...]]:
+    """A far body's course for a port by the tracks (package 84, step 4; the design's §2.5
+    and its finding 4): the planner's passage for it (`Planner.legs_for`) as the far brain
+    lays one, out of the port she lies in by its track to sea, along the common tracks
+    where the straight line is not clear of the shore, in by the port's track from the sea
+    to its road and its anchorage, the whole under the land guard (`land_crossing`); raises
+    ValueError in words when a leg crosses the land."""
+    from freesail.world.brains import _plan_of_legs
+    from freesail.world.captains import Planner, read_intent
+
+    here = vessel.position
+    ports = getattr(world, "ports", None)
+    lying = ports.in_port_at(here) if ports is not None else None
+    departing = lying.id if lying is not None and lying.id != port.id else ""
+    intent = read_intent(world, f"bound for {port.name}")
+    legs = Planner(world).legs_for(intent, here, departing)
+    # the port she weighs from: its anchorage is where she lies, not a mark to anchor at
+    # (Torbay's track to sea begins at Brixham road); and the plan ends at the first anchor
+    # in the port she is bound for (a track whose road follows its anchorage)
+    legs = [leg for leg in legs if not (leg.kind == "anchorage" and leg.port == departing)]
+    plan = _plan_of_legs(legs)
+    for i, leg in enumerate(plan):
+        if leg[0] == "anchor":
+            plan = plan[: i + 1]
+            break
+    crossing = land_crossing(world, here, plan)
+    if crossing:
+        raise ValueError(f"the course for {port.name} by the tracks {crossing}")
+    return plan
+
+
 def _out_of_port(world: Any, port_id: str) -> list[tuple[Any, ...]]:
     """The marks of a port's track to sea (`Planner._port_track`), as a far body's plan."""
-    ports = getattr(world, "dealings", None)
+    ports = getattr(world, "ports", None)
     port = (getattr(ports, "ports", None) or {}).get(port_id) if ports is not None else None
     if port is None:
         return []

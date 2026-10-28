@@ -121,6 +121,10 @@ class Thing:
     # the hull it lies in, when its place is aboard or in her boat (package 84, step 2; the
     # world's one registry of things): None in a keeping, ashore or over the side
     hull: str | None = None
+    # the home hull of the person who keeps it (package 84, step 4): a person's id is his
+    # company's ("master", "s001"), and two hulls have a master each, so the keeper is the
+    # one of that home; "" for a thing kept from before, or by a person of the world's own
+    keeper_home: str = ""
 
     @property
     def the(self) -> str:
@@ -190,12 +194,21 @@ def keeper_of(world: Any, thing: Thing) -> Any:
     if people is None:
         return None
     everyone = getattr(people, "everyone", None) or people.all  # every hull's (step 2)
-    return next((p for p in everyone if p.id == thing.keeper), None)
+    return next((p for p in everyone if _keeps(thing, p)), None)
+
+
+def _keeps(thing: Thing, person: Any) -> bool:
+    """Whether `person` is the thing's keeper: his id, and his home hull where the thing
+    knows it (step 4)."""
+    if not thing.keeper or person.id != thing.keeper:
+        return False
+    home = getattr(thing, "keeper_home", "")
+    return not home or str(getattr(person, "home", "") or "") == home
 
 
 def kept_by(world: Any, person: Any) -> list[Thing]:
     """The things in a person's keeping, in the order made."""
-    return [t for t in things_of(world) if t.keeper and t.keeper == person.id]
+    return [t for t in things_of(world) if _keeps(t, person)]
 
 
 Where = tuple[str, str | None, str, str | None]  # the place, the port, ashore at, the hull
@@ -438,7 +451,7 @@ def read_where(world: Any, phrase: str) -> dict[str, Any] | None:
                     f"nobody answering to '{who}' is among the people; a person is made first "
                     "('person: make \"<name>\", <who he is>, <where>')"
                 )
-            return {"keeper": p.id}
+            return {"keeper": p.id, "keeper_home": str(getattr(p, "home", "") or "")}
     from freesail.world.hearing import own_hull
 
     if low in ("aboard", "on board"):
@@ -527,6 +540,7 @@ def put(thing: Thing, where: dict[str, Any]) -> None:
     """The thing put where the words say: a keeping, a place aboard with its spot, or a
     place ashore."""
     thing.keeper = str(where.get("keeper") or "")
+    thing.keeper_home = str(where.get("keeper_home") or "") if thing.keeper else ""
     thing.place = "" if thing.keeper else str(where.get("place") or "")
     thing.spot = "" if thing.keeper else str(where.get("spot") or "")
     thing.port = None if thing.keeper else where.get("port")

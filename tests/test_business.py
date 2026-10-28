@@ -442,3 +442,81 @@ def test_the_channel_doubts_money_from_nobody_a_far_payer_and_a_sum_beyond_the_p
     # the captain is held by the player at the prompt: his money is his own word
     e = w.world_order(f"aboard: £5 paid into the purse by {w.people.captain.name}", "the test")
     assert e.data["result"] == "refused" and "nobody gives it for him" in e.text
+
+
+def test_a_far_trader_at_her_port_sells_buys_a_return_cargo_and_sails_again_under_the_knob():
+    """Package 84, step 4 (the owner's decision 5; `data/business.yaml` `transact:`): a far
+    trader reaching her port of destination sells her cargo to the market at the day's
+    price, the supply moved by the tons, buys the best return cargo a route worth carrying
+    offers (her port of lading first) and sails again under a new intent from that port,
+    her story saying so; with the knob off she is gone from the sea as before. The business
+    need not be on: the routes rule reads the markets alone."""
+    from types import SimpleNamespace
+
+    w = world_with(None)
+    brest = w.ports.ports["brest"]
+    w.vessels.serial += 1
+    v = vessel_from_spec(
+        w,
+        {
+            "description": "merchant brig",
+            "name": "Two Brothers",
+            "nation": "britain",
+            "position": brest.anchorage.position,
+            "goal": "bound for Brest",
+            "intent": "trade 40 tons of tin from Falmouth to Brest",
+            "departing": "brest",
+        },
+        w.vessels.serial,
+    )
+    w.vessels.add(v)
+    brain = v.brain
+    assert brain.intent.kind == "trade" and brain.intent.tons == 40
+    sold_before = dict(brest.market.net_sold)
+    # the brain's own in-port work: her wait out, the transaction, then under way again
+    brain._state_entered = 0
+    brain.state = "in port"
+    brain._in_port(SimpleNamespace(in_port="brest", tick=10**6))
+    assert brest.market.net_sold.get("tin", 0.0) == sold_before.get("tin", 0.0) + 40.0
+    assert brain._departing == "brest" and brain.planned
+    assert brain.intent.kind in ("trade", "passage")
+    assert brain.intent.words != "trade 40 tons of tin from Falmouth to Brest"
+    told = v.story[-1][1]
+    assert "40 tons of tin sold at Brest" in told and ("bought for" in told or "home to" in told)
+    if brain.intent.kind == "trade":
+        good = brain.intent.cargo
+        assert "bought for" in told and brain.intent.tons == 40
+        assert brest.market.net_sold.get(good, 0.0) == sold_before.get(good, 0.0) - 40.0 + (
+            40.0 if good == "tin" else 0.0
+        )
+    assert not v.done and brain.state == "on passage" and v.plan and v.plan[0][0] == "to"
+    # the knob off: she is done at her port, as before the step
+    w2 = world_with(None)
+    w2.vessels.serial += 1
+    v2 = vessel_from_spec(
+        w2,
+        {
+            "description": "merchant brig",
+            "name": "Nancy",
+            "nation": "britain",
+            "position": w2.ports.ports["brest"].anchorage.position,
+            "goal": "bound for Brest",
+            "intent": "trade 40 tons of tin from Falmouth to Brest",
+            "departing": "brest",
+        },
+        w2.vessels.serial,
+    )
+    w2.vessels.add(v2)
+    knob = dict(B.load_business()) | {"transact": False}
+    B.load_business.cache_clear()
+    original = B.load_business
+    B.load_business = lambda path=None: knob  # type: ignore[assignment]
+    try:
+        assert not B.transact(w2, v2.brain, "brest")
+        v2.brain._state_entered = 0
+        v2.brain.state = "in port"
+        v2.brain._in_port(SimpleNamespace(in_port="brest", tick=10**6))
+        assert v2.done and v2.brain.intent.done
+    finally:
+        B.load_business = original
+    assert B.load_business().get("transact") is True

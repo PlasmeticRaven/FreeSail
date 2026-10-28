@@ -328,7 +328,9 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
         ).json()
         refused = [e for e in crew.log if e.kind == "order.rejected" and "royals" in e.text]
         assert refused and "far detail" in refused[-1].text
-        assert b.plan[0][0] == "to" and b.plan[0][2] == "Falmouth"
+        # since package 84, step 4, a course for a port is by the tracks: its plan ends at
+        # her anchor in the port
+        assert b.plan[0][0] == "to" and b.plan[-1] == ("anchor", "falmouth")
         assert [e for e in crew.log if e.kind == "helm.set" and "Falmouth" in e.text]
         assert r
         told = False
@@ -611,3 +613,189 @@ def test_a_station_by_kind_is_kept_only_on_a_sail_in_sight_and_brig_is_no_brig_s
     assert flag("the sloop") == harpy.id and flag("the brig-sloop") == harpy.id
     assert flag("the lugger") is None  # beyond her horizon: nobody aboard knows of her
     assert flag("the Belle") == belle.id  # her name said: `Vessels.find`, as before
+
+
+# ---------------------------------------------------------------------------
+# Package 84, step 4: the coarse acts on a sleeping hull, the far course by the tracks
+# ---------------------------------------------------------------------------
+
+
+def _held_far_cutter(w, position, name="Raven"):
+    """A King's cutter at far detail with a station held at her captain's (the seat's
+    flag, as a fake through the doors sets it), lying at `position` with a free intent."""
+    v = put(w, "cutter", "britain", position, "bound for Falmouth", name=name)
+    w.world_order(f'ship "{name}": intent wait here for the frigate\'s orders')
+    vessel, crew = K.station_world(w, name)
+    assert crew.shape == "far" and vessel is v
+    crew.captain.seated = True
+    return v, crew
+
+
+def test_the_far_shape_works_the_coarse_acts_on_her_dealings_and_the_one_registry():
+    """Package 84, step 4 (the design's §2.5): a station on a sleeping hull works the acts
+    that want no physics through her own grammar. Brought to an anchor in Carrick Road
+    (the far body's anchor leg) she lies in Falmouth by her dealings; the boat sent ashore
+    for the prices is a job of the port with the boat's time (hoisted out, the pull at the
+    boat's pace, the business ashore, the pull back, hoisted in), two jobs under her hull's
+    id, the price list aboard when the second runs; `go ashore` lands her captain at the
+    quay by the same boat, who goes to the counting house and is heard there by spot, and
+    `come aboard` fetches him by the boat again; an order of the deck is refused in words
+    that name the coarse forms."""
+    w = hove_to_world()
+    falmouth = w.ports.find("Falmouth")
+    v, crew = _held_far_cutter(w, falmouth.anchorage.position)
+    e = crew.submit("come to an anchor", actor="the captain")
+    assert e.kind == "ship.anchored" and v.plan[0][0] == "anchor"
+    assert crew.dealings.coarse and crew.dealings.anchored
+    assert crew.dealings.in_port() is not None and crew.dealings.in_port().id == "falmouth"
+    # the deck's detail wants her awake; the refusal names what she can do
+    e = crew.submit("take in the royals", actor="the captain")
+    assert e.kind == "order.rejected" and "far detail" in e.text
+    assert "go ashore" in e.text and "send the boat" in e.text
+    # the boat for the prices: two jobs at the boat's times, nothing until they run
+    n = len(list(crew.log))
+    crew.submit("send the boat ashore for the prices", actor="the captain")
+    away = [x for x in list(crew.log)[n:] if x.kind == "boat.away"]
+    assert len(away) == 1 and "her hull sleeps" in away[0].text and "minutes" in away[0].text
+    jobs = [j for j in crew.dealings.jobs if j.kind == "boat"]
+    assert len(jobs) == 2 and all(j.hull == v.id for j in jobs)
+    assert jobs[0].payload["stage"] == "ashore" and jobs[1].payload["stage"] == "back"
+    assert crew.dealings.boat.away and "falmouth" not in crew.dealings.price_lists
+    assert [x.kind for x in list(crew.log)[n:] if x.kind.startswith("boat.")] == ["boat.away"]
+    w.run(jobs[0].due_tick - w.clock.tick + 1)
+    assert [x.kind for x in list(crew.log)[n:] if x.kind.startswith("boat.")] == [
+        "boat.away",
+        "boat.ashore",
+    ]
+    w.run(jobs[1].due_tick - w.clock.tick + 1)
+    kinds = [x.kind for x in list(crew.log)[n:]]
+    assert kinds.count("boat.alongside") == 1 and "market.prices" in kinds
+    assert "falmouth" in crew.dealings.price_lists and not crew.dealings.boat.away
+    # the world's ports carry no boat of hers: the jobs were hers alone
+    assert not [j for j in w.dealings.jobs if j.kind == "boat"]
+    # her captain ashore by the boat, to the counting house, heard there, and fetched back
+    n = len(list(crew.log))
+    crew.submit("go ashore", actor="the captain")
+    assert crew.dealings.boat.away and crew.dealings.boat.errand == "landing"
+    assert crew.submit("come aboard", actor="the captain").kind == "order.rejected"
+    w.run(3 * 3600)
+    landed = [x for x in list(crew.log)[n:] if x.kind == "person.ashore"]
+    assert len(landed) == 1 and not crew.dealings.boat.away
+    captain = next(p for p in crew.people.people if p.station == "captain")
+    assert captain.name in landed[0].text and captain.hull is None
+    assert captain.port == "falmouth" and captain.where == "shore"
+    assert captain.home == v.id and not captain.aboard
+    n = len(list(crew.log))
+    crew.submit("go to the counting house", actor="the captain")
+    crew.submit("say good day to you all", actor="the captain")
+    said = {x.kind: x.text for x in list(crew.log)[n:]}
+    assert "counting house" in said["person.moved"]
+    assert "ashore at Falmouth, at the counting house" in said["agent.spoke"]
+    n = len(list(crew.log))
+    crew.submit("come aboard", actor="the captain")
+    assert crew.dealings.boat.away and crew.dealings.boat.errand == "fetch"
+    w.run(3 * 3600)
+    assert [x.kind for x in list(crew.log)[n:] if x.kind == "person.came"]
+    assert captain.hull == v.id and captain.aboard and not crew.dealings.boat.away
+
+
+def test_the_far_course_for_a_port_is_laid_by_the_tracks_and_ends_at_her_anchor():
+    """Package 84, step 4: `shape a course for <port>` on a sleeping hull is the planner's
+    passage for it (the far brain's own way), out of the port she lies in by its track to
+    sea, by the common tracks where the straight line is not clear of the shore, in by the
+    port's track from the sea to its anchorage, where the plan's last leg is the anchor;
+    the line names the marks. The port she weighs from is no mark to anchor at. A place of
+    the chart is one leg as before."""
+    w = hove_to_world()
+    falmouth = w.ports.find("Falmouth")
+    v, crew = _held_far_cutter(w, falmouth.anchorage.position)
+    crew.submit("come to an anchor", actor="the captain")
+    crew.submit("weigh", actor="the captain")
+    e = crew.submit("shape a course for Plymouth", actor="the captain")
+    assert e.kind == "helm.set" and "by the tracks" in e.text and e.data["port"] == "plymouth"
+    assert v.plan[-1] == ("anchor", "plymouth")
+    assert not any(leg[0] == "anchor" for leg in v.plan[:-1])
+    names = [leg[2] for leg in v.plan if len(leg) > 2]
+    assert "Carrick Road" not in names and names[-1] == "the anchorage in the Sound"
+    assert names[0] == falmouth.tracks["to_sea"][0] or len(names) > 3
+    assert "the anchorage in the Sound" in e.text
+    e = crew.submit("shape a course for the Lizard", actor="the captain")
+    assert e.kind == "helm.set" and v.plan == [("to", v.plan[0][1], "the Lizard")]
+
+
+def test_a_held_stations_far_body_lies_to_at_the_plans_end_and_is_not_taken_off_the_sea():
+    """Package 84, step 4: a far body whose captain's station is held is that station's to
+    end, not the sea's: at the plan's last mark she lies to, said once in her log
+    (`plan.ended`, notable), where a vessel of her own was done and gone; with the station
+    released she is taken off the sea at her plan's end as before."""
+    w = hove_to_world()
+    v, crew = _held_far_cutter(w, "49 40 N 5 40 W")
+    mark = v.position.advanced(0.0, 2.0 * units.CABLE)
+    v.plan = [("to", mark, "a mark")]
+    n = len(list(crew.log))
+    w.run(900)
+    assert not v.done and v.plan == [("lie_to", float("inf"))]
+    ended = [x for x in list(crew.log)[n:] if x.kind == "plan.ended"]
+    assert len(ended) == 1 and "a mark" in ended[0].text and ended[0].data["mark"] == "a mark"
+    assert v.station_held()
+    crew.captain.seated = False
+    assert not v.station_held()
+    v.plan = [("to", v.position.advanced(0.0, 2.0 * units.CABLE), "a mark")]
+    w.run(900)
+    assert v.done
+
+
+def test_the_seat_on_another_ship_honours_the_scenarios_crewed_budget():
+    """Package 84, step 4 (found on the way): `station_world` read the build machine's
+    constants and promoted a ship within the range under a scenario whose cap was nought;
+    it reads the budget the scenario or the flags set, as the switch does."""
+    w = hove_to_world()
+    w.crewed_settings = {"cap": 0}
+    b = put(
+        w, "merchant brig", "britain", "49 32 N 5 31 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    assert nm_between(w.position, b.position) < K.CREWED_NM
+    _, crew = K.station_world(w, "X")
+    assert crew.shape == "far" and b.detail == "crewed"
+
+
+def test_a_word_said_as_a_person_ashore_reaches_another_ships_captain_landed_there():
+    """Package 84, step 4 (the design's §2.12, steps 5 and 6): the director's `say as` for a
+    person ashore is heard by whoever of any hull is at his place of his port, the player's
+    ship a day's sail off (package 66 refused it beyond a boat's reach of the player's ship),
+    and a free line in his mouth is his own act by the rule of reach: the packet he keeps
+    given to the cutter's captain at the counting house, in that captain's keeping (the
+    keeper told from the player's own master of the same id by his home hull), and aboard
+    the cutter with him when her boat fetches him; nobody at his place is still refused in
+    words."""
+    from freesail.world import things as TH
+
+    w = hove_to_world()
+    falmouth = w.ports.find("Falmouth")
+    assert nm_between(w.position, falmouth.anchorage.position) > 30
+    v, crew = _held_far_cutter(w, falmouth.anchorage.position)
+    crew.submit("come to an anchor", actor="the captain")
+    w.world_order('person: make "Mr Gill", a merchant, ashore at Falmouth, at the counting house')
+    w.world_order("aboard: a sealed packet, in the keeping of Mr Gill")
+    e = w.world_order('say as Mr Gill: "A fine morning."')
+    assert e.data["result"] == "refused" and "nobody can hear Mr Gill" in e.text
+    crew.submit("go ashore", actor="the captain")
+    w.run(3 * 3600)
+    crew.submit("go to the counting house", actor="the captain")
+    skipper = next(p for p in crew.people.people if p.station == "captain")
+    assert skipper.ashore_at == "counting_house" and skipper.port == "falmouth"
+    e = w.world_order('say as Mr Gill: "A fine morning, Captain."')
+    assert e.data["result"] == "done" and skipper.name in e.text
+    packet = next(t for t in w.registry.things if "packet" in t.name)
+    e = w.world_order(f"say as Mr Gill: give the packet to {skipper.name}")
+    assert e.data["result"] == "done"
+    line = [x for x in w.log if x.kind == "free.line"][-1]
+    assert line.data["spoken_as"] and line.data["moved"] and line.data["to"] == skipper.name
+    assert "gave the packet" in line.text and f"in {skipper.name}'s keeping" in line.text
+    assert packet.keeper == skipper.id == "master" and packet.keeper_home == v.id
+    assert TH.keeper_of(w, packet) is skipper and TH.kept_by(w, skipper) == [packet]
+    assert TH.kept_by(w, w.people.find("master")) == []  # the player's master, the same id
+    crew.submit("come aboard", actor="the captain")
+    w.run(3 * 3600)
+    assert skipper.aboard and skipper.hull == v.id
+    assert TH.place_of(w, packet)[3] == v.id and "keeping" in TH.where_words(w, packet)

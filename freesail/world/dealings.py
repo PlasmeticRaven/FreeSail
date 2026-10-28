@@ -27,6 +27,8 @@ from freesail.world.places import Hold, Purse, pounds_words
 from freesail.world.ports import (
     _ERRAND_WORDS,
     BOAT_ASHORE_S,
+    BOAT_HOIST_IN_S,
+    BOAT_HOIST_OUT_S,
     BOAT_PACE_KN,
     IN_PORT_NM,
     LIGHTER_S_PER_TON,
@@ -184,6 +186,26 @@ class Dealings:
                 self._write_price_list(self.ports[pid], at_start=True)
 
     @property
+    def coarse(self) -> bool:
+        """Whether her hull's physics sleep (package 84, step 4; the design's §2.5): a
+        station's World kept in the far shape, the far body moving her. Then the boat's
+        errand is a job of the port with the boat's time, her anchor the far body's, and the
+        pilot's conn not hers (the pilot as a job to the anchorage is step 5's)."""
+        return getattr(self.world, "shape", "full") == "far"
+
+    @property
+    def anchored(self) -> bool:
+        """Whether she is at anchor: her tackle awake; asleep, the far body's anchor leg or
+        its state."""
+        if self.coarse:
+            v = getattr(self.world, "vessel", None)
+            plan = getattr(v, "plan", None) or []
+            if plan and plan[0][0] == "anchor":
+                return True
+            return str(getattr(v, "state", "") or "") in ("at anchor", "in port")
+        return bool(self.world.at_anchor)
+
+    @property
     def pilot_offered(self) -> bool:
         """Whether the port's pilot comes off for her unasked (package 84, step 3): for a
         ship whose captain can answer his hail, the player's or one a station holds; a
@@ -235,7 +257,7 @@ class Dealings:
     def in_port(self) -> Port | None:
         """The port she lies in: at anchor within the port's reach (`Port.reach_nm`,
         `IN_PORT_NM` by default) of its roads or mooring."""
-        if not self.world.at_anchor:
+        if not self.anchored:
             return None
         return self.world.ports.in_port_at(self.world.position)
 
@@ -275,6 +297,8 @@ class Dealings:
                 self.jobs = [j for j in self.jobs if all(j is not g for g in gone)]
                 for job in gone:
                     self._apply_job(job)
+        if self.coarse:
+            return  # asleep: her jobs alone (the boat's errands by the plan's time; step 4)
         if world.clock.ship_time.second == 0 and self.ports and world.position is not None:
             self._tick_pilot(now)
         if self.boat.away and world.clock.ship_time.second == 0:
@@ -409,7 +433,7 @@ class Dealings:
             _, d_station = bearing_and_distance(world.position, port.outer_road.position)
             if d_station / units.NAUTICAL_MILE > port.pilot.cruising_nm:
                 return
-            if world.at_anchor or self._aground():
+            if self.anchored or self._aground():
                 return
             if self.declined_until.get(port.id, 0) > now:
                 return
@@ -479,7 +503,7 @@ class Dealings:
             return
         if self.pilot is not None and (cutter is None or self.cutter_errand is None):
             port = self.ports[self.pilot_port or ""]
-            if world.at_anchor:
+            if self.anchored:
                 self._put_off_at_anchor(port, now)
                 return
             if self.pilot_boat_asked:
@@ -524,7 +548,7 @@ class Dealings:
     def _note_lay_in(self) -> None:
         """The port she lies in at anchor, kept until she is beyond its pilot's ground:
         a pilot who boards her before then takes her out (package 37h)."""
-        if self.world.at_anchor:
+        if self.anchored:
             port = self.in_port()
             spot = port.nearest_spot(self.world.position)[0] if port is not None else None
             if port is not None and spot is not port.outer_road:
@@ -546,7 +570,6 @@ class Dealings:
         shorten sail when she is too fast for him to board and to heave to at the second
         hail, never either at anchor; or, come off for the pilot aboard, saying so. From
         the hail the boat keeps company with her (`ships.Vessel`'s `company` leg)."""
-        world = self.world
         craft = port.pilot.craft
         if self.cutter_errand == "bring" and self.stance(port) == "closed":
             # a port closed to her nation: the pilot hails his refusal from the boat
@@ -565,7 +588,7 @@ class Dealings:
             )
             return
         wants = ""
-        if not world.at_anchor and self._ground_speed_kn() > PILOT_BOARDS_UNDER_KN:
+        if not self.anchored and self._ground_speed_kn() > PILOT_BOARDS_UNDER_KN:
             wants = "heave to" if again else "shorten sail"
         self.hail_count += 1
         self.hail_tick = now
@@ -692,7 +715,7 @@ class Dealings:
             self.hail_tick = world.clock.tick
         cutter.plan = [("company", PILOT_COMPANY_M)]
         wants = ""
-        if not world.at_anchor and self._ground_speed_kn() > PILOT_BOARDS_UNDER_KN:
+        if not self.anchored and self._ground_speed_kn() > PILOT_BOARDS_UNDER_KN:
             wants = self.hail_wants or "shorten sail"
         already = wants and self._in_hand(wants)
         head = (
@@ -879,7 +902,7 @@ class Dealings:
                     f"being empty"
                 )
         world.people.remove(pilot)
-        if world.at_anchor:
+        if self.anchored:
             spot, _ = port.nearest_spot(world.position)
             where = f"at the anchor in {spot.name}"
         else:
@@ -916,7 +939,7 @@ class Dealings:
         world = self.world
         chart = getattr(world, "chart", None)
         pos = world.position
-        if chart is None or pos is None or world.at_anchor:
+        if chart is None or pos is None or self.anchored:
             return
         _, d_nm = port.nearest_spot(pos)
         if d_nm > port.pilot.cruising_nm:
@@ -1033,7 +1056,7 @@ class Dealings:
         world = self.world
         nav = getattr(world, "navigation", None)
         pos = world.position
-        if nav is None or pos is None or world.at_anchor or self._aground():
+        if nav is None or pos is None or self.anchored or self._aground():
             return
         _, d_nm = port.nearest_spot(pos)
         if d_nm > port.pilot.cruising_nm:
@@ -1284,7 +1307,7 @@ class Dealings:
             # waiting for the stream or the wind (package 58b, item 6): at anchor he looks at
             # the water every few minutes and weighs when his legs serve; coming to her
             # anchor, or weighing until she has way, he gives no course
-            if world.at_anchor:
+            if self.anchored:
                 self._wait_at_anchor(port, now)
                 return
             if not self.conn_wait.get("weighing"):
@@ -1316,7 +1339,7 @@ class Dealings:
                 "The pilot has her under way again on his track.",
                 {"port": port.id, "conn": True, "waited": True},
             )
-        if world.at_anchor:
+        if self.anchored:
             self._conn_off("she is at anchor", said=False)
             return
         if self._legs_judged(port, pos, now):
@@ -2627,6 +2650,17 @@ class Dealings:
                     {"person": p.name, "port": port.id},
                 )
             return
+        if job.kind == "boat":
+            # the sleeping hull's boat at the quay and back (step 4): the script's phases
+            # run by the job's time
+            if not self.boat.away:
+                return
+            stage = str(job.payload.get("stage") or "")
+            phases = ("ashore",) if stage == "ashore" else ("returning", "alongside")
+            for phase in phases:
+                for severity, kind, text, data in self.boat_phase(phase):
+                    self._record(severity, kind, text, data)
+            return
         if job.kind == "yard":
             item, qty, words = job.payload["item"], float(job.payload["qty"]), job.payload["words"]
             ship = world.ship
@@ -2777,6 +2811,8 @@ class Dealings:
         runner = world.ship.extra.get("evolutions")
         if runner is None:
             raise OrderError("There is no one to man the boat: no evolution runner is fitted.")
+        if self.coarse:
+            return self._send_boat_coarse(port, boat, errand, carrying, list(people or []))
         was = self.boat
         self.boat = BoatState(
             away=True,
@@ -2798,6 +2834,48 @@ class Dealings:
             self._people_back(people or [])
             raise
 
+    def _send_boat_coarse(
+        self, port: Port, boat: Any, errand: str, carrying: list[dict[str, Any]], people: list[str]
+    ) -> str:
+        """The boat's errand on a sleeping hull (package 84, step 4; the design's §2.5): a job
+        of the port with the boat's time and no hands, hoisted out, the pull to the quay at the
+        boat's pace, the business ashore by its errand, the pull back and the boat hoisted in,
+        two jobs at their ticks (`_apply_job`, "boat": the boat ashore, and back), each doing
+        what the boat's script does at that phase (`boat_phase`); the log says her away now."""
+        world = self.world
+        now = int(world.clock.tick)
+        pull_s = self.to_shore_m(port) / units.knots_to_ms(BOAT_PACE_KN)
+        ashore_s = float(BOAT_ASHORE_S.get(errand, BOAT_ASHORE_S["message"]))
+        ashore_at = now + BOAT_HOIST_OUT_S + int(pull_s)
+        back_at = ashore_at + int(ashore_s) + int(pull_s) + BOAT_HOIST_IN_S
+        self.boat = BoatState(
+            away=True,
+            boat_id=boat.id,
+            boat_name=boat.name,
+            errand=errand,
+            port_id=port.id,
+            carrying=list(carrying),
+            phase="pulling for the shore",
+            since_tick=now,
+            people=list(people),
+        )
+        self.jobs.append(Job(ashore_at, "boat", port.id, {"stage": "ashore"}, hull=self.hull_id))
+        self.jobs.append(Job(back_at, "boat", port.id, {"stage": "back"}, hull=self.hull_id))
+        minutes = max(1, round((back_at - now) / 60))
+        tail = (
+            f"; back alongside in some {minutes} minutes (the boat's pull by the plan: her "
+            "hull sleeps)."
+        )
+        text = ""
+        for severity, kind, line, data in self.boat_phase("away"):
+            if kind == "boat.away":
+                # the World says an evolution's start by its runner's line, which a sleeping
+                # hull has not got: the boat's own line carries the time instead
+                line = line.rstrip(".") + tail
+                text = line
+            self._record(severity, kind, line, data | {"back_at": back_at})
+        return text
+
     def send_boat(self, words: str) -> tuple[str, dict[str, Any]]:
         """`send the boat ashore [with the purser | with <person> | for the prices | with
         a letter]`: the boat away to the port's quay; what it does there is its errand."""
@@ -2807,7 +2885,7 @@ class Dealings:
         port = self.in_port()
         if port is None:
             found = self.nearest(IN_PORT_NM * 2.5)
-            if found is not None and not world.at_anchor:
+            if found is not None and not self.anchored:
                 raise OrderError(
                     f"She is under way; bring her to an anchor in "
                     f"{_possessive(found[0].name)} roads before the boat goes ashore."
@@ -3119,11 +3197,10 @@ class Dealings:
         is not in port, the port is hostile or the boat is away."""
         from freesail.orders.errors import OrderError
 
-        world = self.world
         port = self.in_port()
         if port is None:
             found = self.nearest(IN_PORT_NM * 2.5)
-            if found is not None and not world.at_anchor:
+            if found is not None and not self.anchored:
                 raise OrderError(
                     f"She is under way; bring her to an anchor in "
                     f"{_possessive(found[0].name)} roads before you go ashore."

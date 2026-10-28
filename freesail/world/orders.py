@@ -1983,17 +1983,21 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         ports = getattr(world, "dealings", None)
         port = ports.ports.get(person.port) if (ports is not None and person.port) else None
         miles = _port_miles(world, port)
-        if port is None or miles is None or miles > BOAT_REACH_NM:
+        # package 66: heard by the stations held at the same place of the same port (the
+        # captain at the counting house hears the clerk there; at the market he does not);
+        # since package 84 (step 4) the stations of every hull and the persons of the one
+        # registry at his place, so that a word said ashore reaches another ship's captain
+        # landed there with the player's ship a day's sail off
+        heard = _hearers_ashore(world, person) if port is not None else []
+        near = port is not None and miles is not None and miles <= BOAT_REACH_NM
+        if port is None or not (near or heard or _at_his_place(world, person)):
             at = f" at {port.name}, {miles:.0f} miles off" if (port and miles is not None) else ""
             raise WorldOrderError(
-                f"nobody aboard can hear {person.name}: he is {place_words(person.where)}{at}; "
-                f"a letter carries his words ('message: at <port> from {person.name}: "
-                '"..."\'), or he comes aboard'
+                f"nobody can hear {person.name}: he is {place_words(person.where)}{at}, and "
+                "nobody of any ship is at his place; a letter carries his words ('message: at "
+                f'<port> from {person.name}: "..."\'), or he comes aboard'
             )
         place, where = "shore", f"ashore at {port.name}"
-        # package 66: heard by the stations held at the same place of the same port (the
-        # captain at the counting house hears the clerk there; at the market he does not)
-        heard = _hearers_ashore(world, person)
     role = person.role
     tail = f", the {role}" if role and role not in ("captain", "commander") else ""
     if role and role.lower() in person.name.lower():
@@ -2018,6 +2022,15 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
         },
     )
     person_journal(world, person).append(world, f"Said, {where}: {words}", kind=SAID_KIND)
+    if not voice:
+        # a free line in his mouth is his own act (package 84, step 4): the thing given,
+        # taken or put by the rule of reach, said in the log as a free line of his
+        from freesail.orders import free
+
+        acted = free.spoken(world, person, words)
+        if acted is not None:
+            kind, line, data = acted
+            world.record(Severity.NOTABLE, kind, line, data=data)
     from freesail.agents.director import answer_questions
 
     answered = answer_questions(world, person, words, where)
@@ -2035,6 +2048,14 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     if answered:
         data["answered"] = answered
     return f"{person.name} spoke {where}, {said}", data
+
+
+def _at_his_place(world: Any, person: Any) -> bool:
+    """Whether any named person of the one registry is within hearing of `person` where he
+    stands ashore (package 84, step 4)."""
+    from freesail.world.hearing import people_hearing, spot_of
+
+    return bool(people_hearing(world, spot_of(world, person), exclude=person))
 
 
 def _hearers_ashore(world: Any, person: Any) -> list[Any]:
