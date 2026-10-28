@@ -29,7 +29,14 @@ that wave (**and granted for every builder, Fable or Opus, on 2026-10-27**, afte
 `claude/pkg-<n>` after each commit as a safety net, never force-pushed, nothing merging from
 it without the lead's review); the lead fetching, reviewing and merging as now, and running one whole suite on
 the merged tree). The lead's own work (the six-on-six measure, the gate document, the
-merges, the records, the short plays) is no package. The usage may run to the week's limit
+merges, the records, the short plays) is no package. **The suites, from 2026-10-28:** a
+builder runs the fast tier once on its final tree and the slow tier of the files it touched,
+and after a mend reruns only the mended test's file (and the pace tests when the mend
+touches a per-tick path), never a whole tier again; **the whole suite on the merged tree is
+the lead's, run in the cloud by the whole-suite workflow** (`.github/workflows/
+whole-suite.yml`: the slow tier in six shards, the pace tests alone after, some twenty
+minutes) at every merge, so that no builder spends seventy minutes of the shared machine
+watching dots (the owner's word). The usage may run to the week's limit
 on these packages; that is the owner's choice.
 
 ## Waves
@@ -1162,6 +1169,8 @@ rule, say so for 55). **The head rules bind** as the briefs before have them.
 
 ## Package 84: the one-world refactor (`freesail/world/hulls.py` new, the Hull; `freesail/core/world.py` the World split and the two-phase tick; `freesail/world/crews.py` the switch alone, `CrewedWorld` retired; `freesail/world/people.py`, `hearing.py`, `movement.py`, `things.py`, `stations.py` one registry of persons and things with the whereabouts; `freesail/world/ports.py` and `dealings.py` new, the ports' half and the hull's half; `freesail/world/ships.py`, `brains.py`, `squadrons.py`, `signals.py`, `signalling.py`, `hail.py`, `combat/action.py` the player's vessel of the sea and `PLAYER_ID` one rule; `freesail/world/business.py`, `data/business.yaml` the far trader's transaction; `freesail/world/orders.py`, `agents/director.py`, `data/director/` the forms with a hull and the truth over the hulls; `freesail/api/readings.py` the station line and the truth; `freesail/agents/harness.py`, `remote.py`, `tools.py`, `seats.py` the hull in the World's place; `freesail/core/replay.py`, `acts.py` the hull on the inputs, the save's hulls block, the checkpoint's converter; `freesail/ui/server.py`, `console.py`, `harbour.py` the followed hull; `docs/TechnicalSpec-M6.md` §19 and §20, `docs/TechnicalSpec-M7b.md` §11, §12 and §12b "as built" pointers; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` the acceptance test as a truth; **84's truths are numbered 7-200 onward**, 75's 7-185 to 7-199, 85's 7-240 onward, so that packages built apart do not collide)
 
+**The suites (2026-10-28):** the fast tier once on the final tree and the slow tier of the touched files; after a mend only the mended test's file; the whole suite is the lead's in the cloud at the merge.
+
 **The owner's eight decisions were taken as the study proposed on 2026-10-27 (decision 53 in `docs/DesignProposal.md`); where an item below says it waits on one, it no longer does, and the log's holding in decision 2 is to be measured for storage before any hull's log is dropped.**
 
 Fable; the refactor of decision 52 on package 83's design (`docs/design/Design-OneWorld.md`:
@@ -1280,6 +1289,8 @@ bisection; never a test skipped, disabled or quarantined; realism, not pacing; t
 read and not changed; each step a green mergeable state pushed to `claude/pkg-84`.
 
 ## Package 86: the owner's local work folded in (every file the review's plan names: the ordnance package's new files whole, the shared files hunk by hunk on top of 73, `tools/gen_ships.py` merged by hand and the ship files regenerated; the fixes with their tightening; the records recast into the line's current files; `docs/dev/TuningNotes.md`; the tests)
+
+**The suites (2026-10-28):** the fast tier once on the final tree and the slow tier of the touched files; after a mend only the mended test's file; the whole suite is the lead's in the cloud at the merge.
 
 Opus (the owner, 2026-10-27: the fold-in is mechanical work under a precise plan; the two judgements, the hail fix's pins proven by bisection and the convoy's stall's cause, are the lead's at the merge); launched the moment 73 is merged, the one package between 73 and 84. The ground is
 **the review of the owner's local work**, `docs/playtests/2026-10-25-to-27-owner-playtests-
