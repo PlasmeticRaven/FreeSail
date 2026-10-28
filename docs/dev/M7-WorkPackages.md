@@ -1331,14 +1331,24 @@ judged); his tree extracted at `/tmp/claude-0/-home-user-FreeSail/e2d459f1-79d4-
 
 ## Package 75: the ships (`tools/gen_ships.py` and `data/ships/*.yaml` through it, new files for the *Indefatigable*, the *Prince de Neufchatel* and a 74; `freesail/world/ships.py` the vessel types and their far descriptions, `captains.py` `SIZE_RANK`; `freesail/ship/schema.py` only where a new figure needs a key; `data/nations.yaml` the marines' detachments by nation if 73 left them there; `data/scenarios/` a scenario for each ship; `docs/TechnicalSpec-M7.md` §27 as built; the primer's chapter on the ships; `docs/dev/TuningNotes.md`; `tests/test_ships.py`, `test_ship_particulars.py`, `test_known_truths.py` truths 7-185 to 7-199)
 
-**Built by the owner's own local session** (his word of 2026-10-28), from the head of
+**Built by the owner's own local session by its workflow method** (his word of 2026-10-28;
+its plan `Plan-ShipsWorkflow.md` of 2026-10-25, research, the owner's decisions, design,
+a behaviour-free stage 0, builders in worktrees, review by lenses, truths, the comparison
+with the ships built by single agents; the per-ship generator modules under `tools/ships/`
+imported by `tools/gen_ships.py`, the lead's structural decision, agreed), from the head of
 `claude/dreamy-darwin-d77nty` after package 86 is merged (the lead names the commit), on a
 branch `claude/pkg-75` pushed to the origin; the lead reviews and merges, and runs the suite
 on the build machine. The session works in a fresh clone that keeps the remote (never a
 copied folder made into its own repository), commits on `claude/pkg-75` only, pushes that
 branch only, never pushes to or rebases `claude/dreamy-darwin-d77nty`, never force-pushes,
-and does not merge; the owner's machine gives different digests from the build machine's
-(decision 26), so its truths pin states, counts, ticks and bands, never digests. Spec M7 §27
+and does not merge; the research notes and the sources filed in the session's earlier
+`ships/research` worktree come over by copying the files into the fresh clone, never by its
+history; the owner's machine gives different digests from the build machine's (decision
+26), so its truths pin states, counts, ticks and bands, never digests. **Each ship file
+gains a hull profile through the generator** (a dozen sourced points for the sheer, the
+stem, the stern, the wales and the port sills, beside the guns' `x_m` and `height_m` of 70),
+the existing seven ships included, so that package 81 draws real ports from data; the
+viewer itself stays at the current standard in this package. Spec M7 §27
 and §28 (the Bermuda sloop's description for later), §7 as built by 70 and extended by 86
 (the magazine by kind, the fits, the pivot gun with its arc to be made per gun), §8a's
 quarter bill, 73's marines' detachment and kit, 72's naval knobs, 71's colours and signals
@@ -1359,8 +1369,15 @@ them and says what it took another way.
    physics is not changed; where her rig needs a sail class the engine lacks, say so for the
    lead rather than approximate silently); her privateer's fits; an American vessel of
    1812 under 71's basic signals system.
-3. **A 74** (the *Bellona* or the *Bellerophon*, the lead's two candidates; the session may
-   choose with its reason): the two-decker's file through the generator, her lower deck's
+3. **The British bilander with a settee main** (the owner's ruling of 2026-10-25 in his
+   session's plan, Gwyn's drawing of c. 1780; unarmed by default with an armed merchant fit;
+   the settee a four-cornered lateen on a long oblique yard built on the lug's yard and
+   dipping machinery of 43b, set and clewed up as Lescallier gives it): **the one piece of
+   this package that extends the engine**, a sail type with its yard, physics, evolutions
+   and stations, so the lead's gate applies: the session's design document for the settee
+   (its Phase 3) comes to the lead before it is built, and the settee follows the lug's
+   class as 43b built it. **And a 74, optional** (the *Bellona* or the *Bellerophon*; the
+   session may choose with its reason, or leave it for a later wave): the two-decker's file through the generator, her lower deck's
    32-pounders and their ports' sills against the heel (70's lee ports shut within a foot of
    the water, the famous reason), her upper deck and quarterdeck, her people some 590, her
    quarter bill by deck, her marines; her sail plan and spars; her polar; the pace of a
