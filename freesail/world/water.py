@@ -393,6 +393,7 @@ class Water:
             st.last_gain_t_per_h = 0.0
             st.last_pumped_t_per_h = 0.0
             hull.water_in_well_m = 0.0
+            self._free_surface(hull, 0.0)  # the well just pumped out gives her stiffness back
             return
         gain = self.gain_t_per_h()
         st.last_gain_t_per_h = gain
