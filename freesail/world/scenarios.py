@@ -63,6 +63,10 @@ ship's motion are kept with it (spec M5 §4; `sea` above overrides either way).
     ships:                           # the other sail on the sea at the start (§25; package 36)
       - {id: two-brothers, description: merchant brig, name: Two Brothers, nation: britain,
          position: 49 50 N 5 30 W, goal: "trading Falmouth to the Lizard", colours: shown}
+                                     # with `intent:` her rules-based captain sails her; with
+                                     # `free_intent:` (any words) a model at her captain's
+                                     # station is told its goal, and the rules-based captain
+                                     # keeps her lying to (2026-10-27)
     world_orders:                    # orders to the world by time (§26; freesail.world.orders)
       - {at: 1805-06-12T14:00, order: 'message: at Brest from the Prefect maritime: "..."'}
     director:                        # the director (spec M6 §23; M7b §4, package 50)
@@ -243,9 +247,15 @@ class ScenarioFile:
         if sc.ships:
             out.append(f"Other sail on the sea at the start: {len(sc.ships)}.")
             for s in sc.ships:
+                free = ""
+                if s.get("free_intent"):
+                    free = (
+                        f" Free intent: {s['free_intent']} "
+                        "(the rules-based captain will not follow it)."
+                    )
                 out.append(
                     f"  {s.get('description')} {s.get('name', '')} of {s.get('nation', 'britain')}"
-                    f" at {s.get('position')}, {s.get('goal')}."
+                    f" at {s.get('position')}, {s.get('goal')}.{free}"
                 )
         if sc.world_orders:
             out.append(f"World orders by time: {len(sc.world_orders)}.")
@@ -436,6 +446,17 @@ def load_scenario(path: str | Path) -> ScenarioFile:
             )
         if s.get("position") is None or not str(s.get("goal") or "").strip():
             raise ScenarioError(f"{where}, ships {i + 1}: a ship needs a position and a goal.")
+        # a free intent (2026-10-27): her goal in any words, for a model at her captain's
+        # station; the rules-based captain does not sail by it
+        if s.get("free_intent") is not None:
+            if not isinstance(s["free_intent"], str) or not s["free_intent"].strip():
+                raise ScenarioError(
+                    f"{where}, ships {i + 1}: free_intent is the ship's goal in words."
+                )
+            if s.get("intent") is not None:
+                raise ScenarioError(
+                    f"{where}, ships {i + 1}: give her an intent or a free_intent, not both."
+                )
     sc.ships = [{str(k): v for k, v in s.items()} for s in ships_raw]
     # the things (spec M7b §17a; package 53b): each the words an `aboard:` order makes a
     # thing from, or {name, where, description}; read whole when the people are made
@@ -793,7 +814,7 @@ SECTION_COMMENTS: dict[str, str] = {
     "once, and within how many miles.",
     "weather": "The weather: the month's climatology, or the wind pinned by the hour (the "
     "primer's forms).",
-    "ships": "The other sail on the sea at the start, each with her intent.",
+    "ships": "The other sail on the sea at the start, each with her intent or her free intent.",
     "world_orders": "The world orders by time.",
     "standing_orders": "The standing orders read at the start.",
     "orders": "The captain's first orders, given at tick 0.",

@@ -85,6 +85,7 @@ import yaml
 
 from freesail import units
 from freesail.core.events import Severity
+from freesail.world import ordnance
 from freesail.world.geo import Position, bearing_and_distance, destination, distance_words
 from freesail.world.people import Message, Person
 from freesail.world.places import Hold, Purse, pounds_words
@@ -534,6 +535,12 @@ class Port:
     # seaward: Bertheaume behind Saint-Mathieu). None: the outer road. A plain class
     # default, so that a checkpoint from before loads.
     blockade_station: dict[str, Any] | None = None
+    # The port's powder and shot (practice and resupply, between packages 72 and 73; the
+    # build design's §1.3): `ordnance:` in the file as `world.ordnance.parse_block` reads it,
+    # the storekeeper of the Ordnance or the merchants; None: none to be had. A plain class
+    # default; a port pickled before it has none of its own, and `ordnance.block_of` reads
+    # its file once.
+    ordnance: dict[str, Any] | None = None
 
     @property
     def blockaded_by(self) -> str | None:
@@ -733,6 +740,7 @@ def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None 
         blockade_station=(
             dict(doc["blockade_station"]) if isinstance(doc.get("blockade_station"), dict) else None
         ),
+        ordnance=ordnance.parse_block(doc.get("ordnance"), where),
     )
 
 
@@ -1001,6 +1009,15 @@ class Ports:
             if due:
                 self.jobs = [j for j in self.jobs if j.due_tick > now]
                 for job in due:
+                    self._apply_job(job)
+        if self.jobs and world.clock.ship_time.second == 0:
+            # practice and resupply (between packages 72 and 73): a hoy alongside a ship that
+            # has weighed goes back at once, and the galley fire is lit as she goes
+            # (`ordnance.left_behind`); nothing when no hoy is alongside
+            gone = ordnance.left_behind(self)
+            if gone:
+                self.jobs = [j for j in self.jobs if all(j is not g for g in gone)]
+                for job in gone:
                     self._apply_job(job)
         if world.clock.ship_time.second == 0 and self.ports and world.position is not None:
             self._tick_pilot(now)
@@ -2876,6 +2893,12 @@ class Ports:
                 doing = "going back"
             bits.append(f"the pilot {port.pilot.craft} {doing}")
         bits.append(self.boat.words())
+        # practice and resupply (between packages 72 and 73): the hoy with her powder, while
+        # its job is in hand at this port, and only then, so that the reading is otherwise
+        # what it was
+        hoy = ordnance.hoy_words(self, port.id)
+        if hoy is not None:
+            bits.append(hoy[0])
         out = {
             "words": "; ".join(bits),
             "port": port.id,
@@ -2889,6 +2912,8 @@ class Ports:
             # package 39d: only a blockaded port's reading carries its state, so an open
             # port's reading is what it was
             out.update({"state": port.state, "blockaded_by": by})
+        if hoy is not None:
+            out["hoy"] = hoy[1]
         return out
 
     def places_lines(self, port: Port) -> list[str]:
@@ -2900,7 +2925,8 @@ class Ports:
         people = self.world.people
         # the people as they stand, without mustering them for a reading (a world in
         # which nobody has moved is as it was)
-        for p in people.people if getattr(people, "_built", True) else []:
+        everyone = getattr(people, "everyone", None) if getattr(people, "_built", True) else []
+        for p in everyone or []:
             if not p.aboard and p.where == "shore" and p.port == port.id:
                 there.setdefault(ashore_at(self.world, p), []).append(p.name)
         # the things lying there (package 53b), in nobody's keeping
@@ -3412,6 +3438,10 @@ class Ports:
                 )
         elif job.kind == "recruits":
             self._muster_recruits(port, int(job.payload["n"]), str(job.payload["rating"]))
+        elif job.kind == "ordnance":
+            # the hoy with the powder and shot, alongside and then stowed (practice and
+            # resupply, between packages 72 and 73; `world.ordnance`)
+            ordnance.apply_job(self, job, port)
         elif job.kind == "lighter":
             # package 53: the goods bought at the market in person, off by the port's lighter
             for item in job.payload.get("items") or []:
@@ -3976,10 +4006,11 @@ class Ports:
         lines: list[tuple[Severity, str, str, dict[str, Any]]] = []
         from freesail.world import things as things_mod
 
+        own = str(getattr(getattr(world, "own", None), "id", "") or "")
         for t in things_mod.things_of(world):
-            if t.keeper or t.place != things_mod.IN_THE_BOAT:
+            if t.keeper or t.place != things_mod.IN_THE_BOAT or (t.hull and t.hull != own):
                 continue
-            t.place, t.port, t.ashore_at, t.spot = "shore", port.id, "quay", ""
+            t.place, t.port, t.ashore_at, t.spot, t.hull = "shore", port.id, "quay", "", None
             lines.append(
                 (
                     Severity.ROUTINE,

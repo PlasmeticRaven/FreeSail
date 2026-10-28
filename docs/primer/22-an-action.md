@@ -59,7 +59,7 @@ A gun captain fires at nothing beyond his gun's throw (a 12-pounder carronade's 
 
 ## The fall of shot
 
-Each shot is laid for the range by its gun captain, the quoin answering only so far: the lee battery fires lower and shorter and the weather battery higher and longer by the heel, a lee port whose sill is within a foot of the water is shut and its gun silent, and the sea scatters the shot by its height and the roll. The hit chance falls with the range from nine in ten at pistol shot to one in two at point blank (250 yards for a long gun, 230 for a carronade) and a fifth at twice it. Your log says what your people can see of your own fire, once a minute; the ship fired at says what hers can see of it:
+Each shot is laid for the range by its gun captain, the quoin answering only so far: the lee battery fires lower and shorter and the weather battery higher and longer by the heel, and the sea scatters the shot by its height and the roll (no lee port is shut by the heel yet: a lee gun is served however far she lies over, and its shot falls short where the quoin cannot answer the heel). The hit chance falls with the range from nine in ten at pistol shot to one in two at point blank (380 yards for a long 18-pounder, 250 for a long 3-pounder, 230 for a 12-pounder carronade) and a fifth at twice it. Your log says what your people can see of your own fire, once a minute; the ship fired at says what hers can see of it:
 
 ```
 * Forenoon watch (10:04)  Three shot at a cutter: one struck her and two wide. A shot struck her between wind and water.
@@ -101,14 +101,62 @@ standing order "she strikes": at the enemy strikes then cease firing
 Morale is the one new quantity: the company's readiness to fight on, from the captain's doctrine (a King's ship's company starts high and fights to a wreck; a merchant crew's starts low and strikes to the first broadside into her), the losses, the guns dismounted, the masts gone and the odds while under fire. When it falls under the doctrine's line while she is under fire and a shot has told, the colours come down by rule and the log says why:
 
 ```
-! Forenoon watch (12:06)  The colours are struck: five of 30 hurt, against a broadside of 36 pounds to our 13; the hands will not stand to the guns. The guns fall silent and she lies to for her captor.
+! Forenoon watch (11:12)  The colours are struck: five of 30 hurt, against a broadside of 36 pounds to our 13; the hands will not stand to the guns. The guns fall silent and she lies to for her captor.
 ```
 
 What follows the colours down (the prize crew, the prisoners, the captive's channel) is a later package's; this one ends at the colours struck and the firing ceased.
 
 ## The first action
 
-`data/scenarios/first-action.yaml`: the King's cutter *Sherbourne* cruising off the Lizard on a June forenoon, the French privateer cutter *Renard* a mile and a half to the south-east. Played by the rules captains alone at seed 7, the privateer engages at 10:06 and opens at long shot at 10:13; the King's cutter closes, returns her fire, and the colours come down at 12:06 with five of thirty hurt and eight shot holes. At a cable the same two cutters settle it in three minutes. Nothing pre-defines which: the range the captains keep decides it, and the seed.
+`data/scenarios/first-action.yaml`: the King's cutter *Sherbourne* cruising off the Lizard on a June forenoon, the French privateer cutter *Renard* a mile and a half to the south-east. Played by the rules captains alone at seed 7, the privateer engages at 10:07 and opens at long shot at 10:13; the King's cutter closes, returns her fire, and the colours come down at 11:43 with four of thirty hurt and seven shot holes. At a cable the same two cutters settle it in three minutes. Nothing pre-defines which: the range the captains keep decides it, and the seed.
+
+## Practice at the great guns
+
+A captain of 1805 was "to exercise the Ship's company frequently at the guns", and to have the times of it written in the log (the Regulations, the Captain, Art. IX); the gunner was to teach the men at their quarters to point the guns (Art. XI), and to issue for it, each month of her first six, a charge of powder and a round shot for a fourth of the upper deck's guns in a ship of one deck (the Gunner, Art. XXI: the frigate's six, the brig-sloop's four, the King's cutter's one). `data/scenarios/exercising-the-great-guns.yaml` is such a forenoon: the frigate south of the Lizard with nobody in sight. Under the rules captains with no model seated nothing happens there; the practice is the player's. It comes in two kinds, and practice improves no skill of the crews': the gun deck keeps each gun's drill and nothing reads it for pace or aim.
+
+**Dumb show.** At quarters, `exercise the guns` (or `exercise the starboard battery`, `exercise both batteries`; with no side said, the engaged side, else both) has the crews serve every phase by its time, the sponge to the point, with no powder taken from the magazine and no shot leaving the ship. Given before `cast loose the guns`, the cycle begins empty; a gun already loaded is run out and pointed only, and keeps its charge. It is refused while a sail is engaged. The broadside at the word is refused while the guns are exercised; a gun fired by name, or the gun to leeward, fires as it would. `cease exercising`, any `engage`, `secure the guns`, the hands piped down from quarters and the colours struck end it.
+
+```
+Exercise the starboard battery in dumb show: the guns served without powder, and no shot leaves the ship. The guns are not yet cast loose: say 'cast loose the guns'.
+The battery is exercising in dumb show: no gun is fired at the word; say 'cease exercising' first.
+```
+
+**A cask for a mark.** `heave a cask overboard` (from the lee quarter unless you name one: `heave a cask overboard from the starboard quarter`) is two hands' work for a minute at the quarter, and holds nothing of the ship's: she may tack while they are at it. A cask already in the water is given up. By night, and in a world with no chart, it is refused, since nobody could see the cask:
+
+```
+Hands to the quarter: an empty cask over the side for a mark.
+The mark is over the side from the larboard quarter, an empty cask with a flag on a staff.
+```
+
+The cask floats where it fell, set by the tide's stream and a little to leeward by the wind. The masthead makes it out by day within a mile and the visibility, at twilight within half that, and never by night; it is never hailed, `what is in sight` names it "the mark", and `the bearing of the mark` reads where it lies. `engage the cask to larboard` lays the battery for it ("the mark" and "the target" mean the cask while one is in the water, and a sail otherwise), and the gun captains lay for it by the truth, as for a ship, and fire as it bears and within their reach: bring it onto the beam. A cask is a small mark, about a sixth of a frigate's hull for the hit chance, and the first shot that strikes it knocks it to staves. It is lost to sight and made out again once each way, and given up when she is three miles from it:
+
+```
+The mark struck by No. 3 starboard gun at two cables and knocked to staves; the guns hold their fire for want of a mark.
+The mark is lost to sight in the haze.
+The mark is made out again, bearing SE by S, about three cables.
+The mark is lost astern, three miles off.
+```
+
+A mark is no sail: nobody is fired into, nobody's colours are judged, no ship or port hears of it, and nobody's temper moves.
+
+**A notional mark.** `engage a mark four cables on the starboard beam` (on the bow, the beam or the quarter, where a gun of hers bears; from a cable to the longest random shot of the guns that bear) lays the battery for a mark that is only the captain's word: a cutter's length, beam-on wherever she heads, by night and in fog alike. The minute's line says the fall of shot "on the mark", and `the range` is the range you laid it at. The mark keeps its bearing from her head as she turns, so it is refused where no gun of hers can bear: a broadside gun bears within about three points of the beam, and a chaser within about two of right ahead or astern, so the frigate's guns bear on neither the bow nor the quarter, while a swivel or a pivot gun may. The guns that do not carry so far are named, and a mark beyond them all is refused:
+
+```
+Engage the mark six cables on the starboard beam: the starboard battery, the guns to fire as they bear; her 32-pounder carronades do not carry six cables.
+No gun of hers carries ten cables: her long 18-pounders' random shot is 9.9 cables.
+No gun of hers bears on the starboard bow, and a notional mark keeps its bearing from her head as she turns: say 'engage a mark four cables on the starboard beam'.
+```
+
+`fire at the mark` is not the way to it ("to fire at the mark, say 'engage the mark to starboard' and 'fire'").
+
+**The reading.** `the practice` (or `the exercise`, `the gun drill`) gives each gun's rounds in dumb show and live, the mean and the best from the sponge to the point, the falls of shot at the mark by cables, the mark with its bearing and range and whether it is in sight, and in a King's ship the month's live rounds against the allowance; "none" when there has been none. The first live round beyond the month's allowance is said once and entered in the gunner's account: "Beyond the allowance for exercise this month (six charges by the Regulations, the Gunner, Art. XXI): the powder past it is spent on the captain's word, and the gunner's account keeps it." `the guns` says "exercising the starboard battery in dumb show" while it lasts.
+
+**The gunner's filling.** The magazine holds filled cartridges by gun and loose powder in the barrels below, and the gunner fills more as the guns use them. `fill cartridges` has him report when they are filled to the allowance again, and `cease filling` shuts the magazine until he is ordered:
+
+```
+The gunner fills cartridges from the powder below: 181 of 330 for the 12-pounder carronades, 2 barrels below; by day, and at quarters with a man of the powder to spare.
+The gunner fills no more cartridges until he is ordered; the magazine shut.
+```
 
 ## Where to read more
 

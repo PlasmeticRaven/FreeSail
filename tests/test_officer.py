@@ -912,15 +912,20 @@ def test_the_handover_note_is_asked_for_at_the_budgets_fraction_and_folds_the_co
     # package 57: her eight new sails in the readings and the brief took it further (9,978
     # tokens at the seat under 57 alone): the budget two thousand more than the door's;
     # package 71: the brief's sentence on the colours, the signals and the hail (10,896 at
-    # the seat): five hundred more
-    h.budget_tokens = 18500
-    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 18500
+    # the seat): five hundred more; package 73: eleven readings of the water, the health
+    # and the fight and the damage report's names (11,905 at the seat): fifteen hundred
+    # more; the owner's practice and resupply, folded in by package 86: the thirteen new
+    # events' words in the stand-by sentence and the practice row (12,052 at the seat on the
+    # merged tree, over the fraction of 20,000; on the owner's tree before 73, 11,214 and
+    # 19,000 for 18,500): five hundred more, 20,500 (20,000 before it)
+    h.budget_tokens = 20500
+    assert h._conversation_size() < harness_mod.HANDOVER_AT_FRACTION * 20500
     while h.revision == 0:
         world.run(EVERY)  # the ask rides a sample; the fake answers it; the fold ends the turn
         assert world.clock.tick < 20 * EVERY, "the ask never came"
     ask = next(n for d in data_turns(fake) for n in d.get("notices") or [] if "handover note" in n)
     assert ask.startswith("Your conversation since the brief has reached about ")
-    assert "of the 18,500 tokens this door gives you" in ask
+    assert "of the 20,500 tokens this door gives you" in ask  # 20,000 before 86
     before = 0
     noted = [e for e in h.journal.entries if e.kind == "agent.handover"]
     assert len(noted) == 1 and noted[0].text == f"Handover note (the watch so far): {NOTE}"

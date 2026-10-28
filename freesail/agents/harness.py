@@ -393,6 +393,9 @@ A_WORD = "a word from the captain"
 # wakes rested; neither is bound by the deck's eight bells.
 ASLEEP_BELOW = "asleep below until called"
 ASLEEP_WHERE = "asleep where you stood until called"
+# package 73 (spec M7 §16a): a holder collapsed with his wound and carried below
+CARRIED_BELOW = "carried below to the surgeon, until your wound is dressed"
+WOUND_DRESSED = "the surgeon has dressed your wound; you may come on deck"
 ASLEEP_WORDS = frozenset(
     {
         ASLEEP_BELOW,
@@ -1352,6 +1355,13 @@ class Harness:
         sb = self.agent.stand_by
         if sb is None:
             return "nothing to stand by for"
+        if sb.words == CARRIED_BELOW:
+            # package 73 (spec M7 §16a): a man carried below to the surgeon hears nothing of
+            # the deck until the surgeon has dressed him; no event and no bell ends it
+            if self._stand_by_due == WOUND_DRESSED:
+                self._stand_by_due = None
+                return WOUND_DRESSED
+            return None
         if self._stand_by_due is not None:
             # the event fell while the model's call was on its way (`stand_by`)
             due, self._stand_by_due = self._stand_by_due, None
@@ -3881,9 +3891,16 @@ class Harness:
         if self.conversation:
             return None
         person, keeper = self._person_and_needs()
-        if person is None or getattr(person, "needs", None) is None:
+        if person is None:
             return None
-        return keeper.showing(person) or None
+        # package 73 (spec M7 §16a): his hurt beside his needs, in the muster's words
+        from freesail.api.readings import health_words_for
+
+        hurt = health_words_for(self.world, person)
+        shown = keeper.showing(person) if getattr(person, "needs", None) is not None else ""
+        if hurt and shown:
+            return f"{hurt}; {shown}"
+        return hurt or shown or None
 
     def _turn_in(self, sb: StandBy) -> str:
         """`stand by, asleep below until called` (the master's suggestion): the person
@@ -3954,6 +3971,35 @@ class Harness:
         self._stand_by_due = None
         self.journal.append(world, "Fell asleep where he stood.", kind="agent.stood_by")
         return True
+
+    def carried_below(self, text: str) -> bool:
+        """He has collapsed and is carried below to the surgeon (spec M7 §16a; package 73,
+        `crew/health.py`): the station stands by as it does for a man asleep where he
+        stood, told so in words, until the surgeon has dressed him (`wound_dressed`).
+        False, and nothing done, while the model has the floor or the station is paused
+        or released."""
+        a = self.agent
+        if not self.started or a.released or a.paused or self._open is not None:
+            a.notices.append(text)
+            return False
+        world = self.world
+        a.state = STANDING_BY
+        a.stand_by = StandBy(CARRIED_BELOW)
+        a.last_heard_tick = world.clock.tick
+        self._wait_from = (len(world.log), world.clock.stamp())
+        self._stood_at = (CARRIED_BELOW, world.clock.stamp())
+        self._stand_by_watch = None
+        self._stand_by_due = None
+        a.notices.append(text)
+        self.journal.append(world, "Collapsed, hurt, and was carried below.", kind="agent.stood_by")
+        return True
+
+    def wound_dressed(self) -> None:
+        """The surgeon has dressed him (`crew/health.py`): a stand-by below ends at the
+        harness's next look, and he may come on deck."""
+        sb = self.agent.stand_by
+        if self.agent.standing_by and sb is not None and sb.words == CARRIED_BELOW:
+            self._stand_by_due = WOUND_DRESSED
 
     def wake_rested(self) -> None:
         """He woke rested (`world.needs`): the stand-by ends at the harness's next look."""

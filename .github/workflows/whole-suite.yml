@@ -8,7 +8,8 @@ name: whole suite
 #   - the slow tier without the pace tests, in N shards (tests/conftest.py's
 #     FREESAIL_SHARD: a stable split by xdist group, so a module-scoped day or passage
 #     stays whole on one machine), each shard on all its runner's cores;
-#   - the pace tests alone and last, on one runner, serial, as the release does;
+#   - the pace tests alone and last, on one runner, serial, as the release does, their
+#     result informative and not gating (the floors are the build machine's);
 #   - the lint once.
 # Linux by default (the recorded passages are pinned on Linux); Windows as well when
 # asked, for the owner's platform (package 69 has the five cross-platform pins).
@@ -66,9 +67,13 @@ jobs:
         run: python -m pytest -n auto --dist loadgroup --slow -m "not pace" -rfE -p no:cacheprovider
 
   pace:
-    name: pace tests, alone (${{ matrix.os }})
+    # informative, not gating: the floors are the build machine's (truth 51), and a shared
+    # cloud runner gives 480 to 520 where the build machine gives 580; the first run here
+    # failed the gate day's floor by three ticks a second
+    name: pace tests, alone, informative (${{ matrix.os }})
     needs: slow
     if: always()
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:

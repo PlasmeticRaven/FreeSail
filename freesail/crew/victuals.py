@@ -234,6 +234,11 @@ def serve(world: Any, meal: str) -> list[Line]:
     stores.water_tons = max(0.0, stores.water_tons - tons)
     stores.expended_days = float(getattr(stores, "expended_days", 0.0)) + take_days
     stores.expended_tons = float(getattr(stores, "expended_tons", 0.0)) + take_tons
+    if getattr(stores, "galley_fire_out", ""):
+        # practice and resupply (between packages 72 and 73): the meal served cold while
+        # the galley fire is out for the powder, counted and never said; the hardship and
+        # the physics are what they were
+        stores.cold_meals = int(getattr(stores, "cold_meals", 0) or 0) + 1
     if had_provisions and stores.provisions_days <= 1e-9:
         stores.provisions_days = 0.0
         lines.append(

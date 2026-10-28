@@ -11,6 +11,10 @@ crew pool, in port.
     take in water [<n> tons]        the water completed from the quay or the yard
     take in provisions [for <n> days]
     enter <n> <rating> seamen       hands from the pool at a bounty, come off after a delay
+    take in powder and shot         the magazine completed, of the Ordnance or the merchants
+                                    (practice and resupply, between packages 72 and 73;
+                                    `orders.ordnance`); `buy` and `demand` whose words name
+                                    powder or shot are the same order's
     take the pilot                  the answer to the pilot boat's hail (package 37h): she
                                     shortens sail or heaves to as the hail asked, and he
                                     boards when the boat can put him aboard
@@ -30,6 +34,7 @@ import re
 from typing import Any
 
 from freesail.orders import numbers
+from freesail.orders import ordnance as ordnance_orders
 from freesail.orders.errors import OrderError
 from freesail.orders.grammar import Order
 from freesail.orders.prompt import world_of
@@ -128,6 +133,13 @@ def execute(ship: Any, order: Order) -> Result:
     """Carry out a port order. The verb is the vocabulary's key."""
     verb = order.verb
     rest = (order.object or "").strip()
+    if verb == ordnance_orders.TAKE_IN or (
+        verb in ("buy", "demand") and ordnance_orders.names_powder(rest)
+    ):
+        # powder and shot (practice and resupply, between packages 72 and 73): the supply's
+        # order, before the yard's and the market's (no market trades powder), and read
+        # before the ports so that a ship with no guns is told so first
+        return ordnance_orders.execute(ship, order)
     ports = _ports(ship)
     if verb in CONN_VERBS:
         # package 45: the pilot conns her in or out along his port's track; `I have the
@@ -249,7 +261,12 @@ def check(ship: Any, order: Order) -> None:
     purse are the order's own business when it fires."""
     verb = order.verb
     rest = (order.object or "").strip()
-    if verb in ("buy", "sell") and not re.search(
+    if verb == ordnance_orders.TAKE_IN or (
+        verb in ("buy", "demand") and ordnance_orders.names_powder(rest)
+    ):
+        # powder and shot (practice and resupply): the quantities and the guns named
+        ordnance_orders.check(ship, order)
+    elif verb in ("buy", "sell") and not re.search(
         r"\b(chandlers|yard|sails?|spars?|topmast|cordage)\b", rest.lower()
     ):
         for words in _bargains(rest):

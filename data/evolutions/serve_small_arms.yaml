@@ -1,0 +1,22 @@
+# Serve out the small arms (spec M7 §11; package 73; scripted, ServeSmallArmsScript in
+# evolutions/fight_scripts.py). The cutlasses, boarding pikes, pistols and tomahawks of
+# the Ordnance's allowance from the arms chests to the boarders by the quarter bill, the
+# muskets of the stand of arms to the small-arms men (Luce 1884 ch. XX, the station bill:
+# the boarders and the pikemen told off; the gunner's charge of the small arms, Steel 1794
+# and the Regulations). At the end the musketry's `served` state: the boarders fight at
+# their whole strength, the small-arms men may fire (`combat/small_arms.py`,
+# `combat/boarding.py`). One phase, `arms`.
+id: serve_small_arms
+verb: serve_small_arms
+applies_to: {class: ship}
+script: serve_small_arms
+params: {}
+preconditions: []
+timing:
+  arms_s: 300   # the chests opened, the arms passed along the deck and the pikes racked (judgement: five minutes)
+on_start: {log: "{begin}"}
+on_complete: {log: "{done}", kind: small_arms.served, severity: notable}
+on_fail: {log: "Could not {verb_word} the small arms: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the gunner's party at the chests, six hands (judgement)
+crew: {hands: 6, rating: ordinary, stations: [waisters, afterguard, idlers]}
+source: "Luce 1884 ch. XX (the boarders and pikemen told off on the station bill); the Ordnance's small-arms allowance by rate (Lavery, Arming and Fitting, from memory; UNVERIFIED); the time judgement"

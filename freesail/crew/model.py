@@ -153,6 +153,17 @@ class Sailor:
     quarters: str = ""
     hurt: str = ""
     hurt_tick: int | None = None
+    # Package 73 (spec M7 §16; `crew/health.py`): the states beyond 70's two. `hurt` is
+    # one word: "" fresh, "hurt" (a light wound dressed: fit for light duty on deck, never
+    # aloft), "wounded" (below, the surgeon's; `wound` light, grave, or invalid once judged),
+    # "sick" (the sick list) or "killed" (on the books until he is buried); `hurt_until`
+    # the tick he is healed or judged, `dressed` whether the surgeon has seen him,
+    # `treated` whether a surgeon did (else his messmates), `hurt_how` the wound in words.
+    wound: str = ""
+    hurt_until: int | None = None
+    dressed: bool = False
+    treated: bool = False
+    hurt_how: str = ""
 
 
 def fatigue_words(fatigue: float) -> str:
@@ -194,6 +205,9 @@ class Crew:
     # "" in a checkpoint from before, which reads as the captain's
     all_hands_called_by: str = ""
     watch_on_deck: Watch | None = None
+    # the dead struck from the books at their burial (package 73, spec M7 §16): counted
+    # still against the company's temper and in the butcher's bill
+    dead: list[Sailor] = field(default_factory=list)
     by_station: dict[Station, list[Sailor]] = field(init=False, repr=False)
     by_watch: dict[Watch, list[Sailor]] = field(init=False, repr=False)
     by_id: dict[str, Sailor] = field(init=False, repr=False)

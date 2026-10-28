@@ -81,7 +81,8 @@ def test_the_named_few_come_from_the_muster_by_post_and_by_the_ship_files_roles(
         assert ws.people.captain.role == "master" and ws.people.messenger.role == "boy"
     brig = world_for(BRIG).people
     assert brig.captain.role == "commander" and brig.messenger.role == "midshipman"
-    assert [p.role for p in brig.all][-2:] == ["master's mate", "midshipman"]
+    # package 73 (spec M7 §11): the brig-sloop's party of marines under its sergeant, drawn last
+    assert [p.role for p in brig.all][-3:] == ["master's mate", "midshipman", "sergeant of marines"]
 
 
 def test_the_people_and_where_is_are_readings_in_the_registry_and_at_the_prompt():
@@ -776,3 +777,162 @@ def test_the_scenarios_things_are_made_with_the_people_and_the_director_has_no_h
     d = directed()
     e = d.submit("take the packet", actor="the director")
     assert e.kind == "order.rejected" and "no hands aboard" in e.text
+
+
+# ---------------------------------------------------------------------------
+# Package 84, step 2: one registry of persons and things, the whereabouts, hearing by spot
+# (`docs/design/Design-OneWorld.md` §2.3 and the migration's second step)
+# ---------------------------------------------------------------------------
+
+
+def _world_with_a_crewed_brig():
+    """The hove-to world of `test_crews` with a merchant brig promoted three miles off:
+    two hulls, two companies, one registry."""
+    from tests.test_crews import hove_to_world, put
+
+    w = hove_to_world()
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    assert b.crew is not None
+    return w, b
+
+
+def test_the_persons_of_every_hull_are_one_registry_and_each_company_a_view_of_it():
+    """The World keeps one registry of persons (`world.registry`); a crewed ship's World
+    shares it and her company is the registry's list for her hull; the player's company
+    comes first, as it did when it was the one list; each person knows the hull he is in
+    and the hull that keeps him, and `aboard` reads and writes as the bool it was; the
+    registry is emptied of her when her World is dropped."""
+    w, b = _world_with_a_crewed_brig()
+    crew = b.crew
+    reg = w.registry
+    assert crew.registry is reg and reg.hulls == [w.own.id, b.id]
+    assert w.people.people is reg.company(w.own.id) and crew.people.people is reg.company(b.id)
+    assert w.people.hull_id == w.own.id and crew.people.hull_id == b.id
+    # the views: the company (whom she keeps) and the aboard (who is in her now)
+    assert w.own.company == w.people.all and crew.own.company == crew.people.all
+    assert w.own.aboard == w.people.all and crew.own.aboard == crew.people.all
+    everyone = w.people.everyone
+    assert everyone == w.people.all + crew.people.all and crew.people.everyone == everyone
+    for p in w.people.all:
+        assert (p.hull, p.home, p.aboard) == (w.own.id, w.own.id, True)
+    for p in crew.people.all:
+        assert (p.hull, p.home, p.aboard) == (b.id, b.id, True)
+    # the player's company reads as it did: `the people` names his own and nobody of hers
+    words = w.readings.words("people")
+    assert w.people.captain.name in words and crew.people.captain.name not in words
+    # `aboard` as the bool it was, the whereabouts under it
+    mate = crew.people.find("the master")
+    mate.aboard = False
+    assert mate.hull is None and not mate.aboard and mate.home == b.id
+    mate.aboard = True
+    assert mate.hull == b.id and mate.aboard
+    assert mate.to_dict()["aboard"] is True and "hull" not in mate.to_dict()
+    # a name is found in his own company first, and in the world after
+    assert w.people.find(crew.people.captain.name) is None
+    assert w.people.find_anywhere(crew.people.captain.name) is crew.people.captain
+    assert crew.people.find("the captain") is crew.people.captain
+    # her World dropped at the demotion, her persons leave the registry
+    w.world_order('ship "X": intent bound for 49 30 N 6 30 W')
+    for _ in range(400):
+        w.run(60)
+        if b.crew is None:
+            break
+    assert b.crew is None and reg.hulls == [w.own.id] and w.people.everyone == w.people.all
+
+
+def test_a_word_ashore_is_heard_by_whoever_is_at_that_place_whichever_hull_brought_him():
+    """Hearing is by spot in the one registry: the brig's master ashore at Falmouth at the
+    counting house hears the player's Mr Gill there and not his own captain aboard the
+    brig; aboard, a word on one hull's quarterdeck is not heard on the other's; a thing
+    lying at the counting house is within his reach, and given to Mr Gill it is Mr Gill's
+    (the acts themselves, going ashore from a crewed hull and a port's business for her,
+    are step 3's: the master's whereabouts are written here as the boat would write them)."""
+    from freesail.world import hearing as H
+    from freesail.world import things as TH
+
+    w, b = _world_with_a_crewed_brig()
+    crew = b.crew
+    e = w.world_order(
+        'person: make "Mr Gill", a merchant, ashore at Falmouth, at the counting house', "the test"
+    )
+    assert e.data["result"] == "done", e.text
+    gill = w.people.find("Mr Gill")
+    assert gill is not None and not gill.aboard and gill.home == w.own.id
+    assert H.spot_of(w, gill) == ("ashore", "falmouth", "counting_house")
+    master = crew.people.find("the master")
+    master.aboard, master.where, master.port, master.ashore_at = (
+        False,
+        "shore",
+        "falmouth",
+        "counting_house",
+    )
+    assert H.spot_of(crew, master) == H.spot_of(w, gill)
+    assert H.within_hearing(H.spot_of(w, gill), H.spot_of(crew, master))
+    heard = H.people_hearing(w, H.spot_of(w, gill), exclude=gill)
+    assert heard == [master]
+    assert H.people_hearing(crew, H.spot_of(crew, master), exclude=master) == [gill]
+    assert "Mr Gill" in H.heard_words(crew, H.spot_of(crew, master), master)
+    # aboard: the two quarterdecks are two spots
+    assert H.spot_of(w, w.people.captain) == ("aboard", w.own.id, "quarterdeck")
+    assert H.spot_of(crew, crew.people.captain) == ("aboard", b.id, "quarterdeck")
+    assert not H.within_hearing(
+        H.spot_of(w, w.people.captain), H.spot_of(crew, crew.people.captain)
+    )
+    assert w.people.captain in H.people_hearing(w, ("aboard", w.own.id, "quarterdeck"))
+    assert crew.people.captain not in H.people_hearing(w, ("aboard", w.own.id, "quarterdeck"))
+    # the port's places name him among those found there, with the player's Mr Gill
+    lines = " ".join(w.ports.places_lines(w.ports.ports["falmouth"]))
+    assert master.name in lines and "Mr Gill" in lines
+    # a thing ashore within his reach, taken, kept, given to Mr Gill by his own hand
+    e = w.world_order("aboard: a sealed packet, ashore at Falmouth, at the counting house", "t")
+    assert e.data["result"] == "done", e.text
+    packet = TH.things_of(w)[-1]
+    assert packet.hull is None and TH.things_of(crew) is TH.things_of(w)
+    assert TH.reach_why(crew, master, packet) is None
+    assert TH.reach_why(w, w.people.captain, packet) is not None
+    assert TH.person_reach_why(crew, master, gill) is None
+    assert TH.person_reach_why(w, w.people.captain, gill) is not None
+    # within hail (spec M7b §17): ashore at one port, yes; the two decks, no
+    from freesail.world.movement import within_hail
+
+    assert within_hail(w, gill, master)
+    assert not within_hail(w, w.people.captain, crew.people.captain)
+    aboard_hers = [p for p in crew.people.all if p.aboard]
+    assert within_hail(crew, aboard_hers[0], aboard_hers[1])
+    # the brig's captain ashore at the same spot works the free lines of his own ship's
+    # grammar (the free lines' person is the order's actor, the captain's at the prompt)
+    cap = crew.people.captain
+    cap.aboard, cap.where, cap.port = False, "shore", "falmouth"
+    cap.ashore_at = "counting_house"
+    e = crew.submit("take the packet")
+    assert e.kind == "free.line" and e.data["moved"], e.text
+    assert packet.keeper == crew.people.captain.id
+    e = crew.submit("give the packet to Mr Gill")
+    assert e.data["moved"] and packet.keeper == gill.id, e.text
+    assert TH.keeper_of(crew, packet) is gill and TH.keeper_of(w, packet) is gill
+    assert "a sealed packet in his keeping" in w.readings.words("people")
+
+
+def test_a_thing_lies_in_one_hull_and_the_places_of_the_other_do_not_show_it():
+    """A thing made aboard lies in the hull that made it (`Thing.hull`); the other hull's
+    places do not list it, and a person aboard the other hull is out of its reach."""
+    from freesail.world import things as TH
+
+    w, b = _world_with_a_crewed_brig()
+    crew = b.crew
+    packet = _packet(w)
+    assert packet.hull == w.own.id
+    assert TH.lying_aboard(w) == {"cabin": [packet]} and TH.lying_aboard(crew) == {}
+    assert "a sealed packet" in w.readings.words("places")
+    assert "a sealed packet" not in crew.readings.words("places")
+    crew.people.captain.where = "cabin"
+    assert TH.reach_why(crew, crew.people.captain, packet) is not None
+    e = crew.world_order("aboard: a letter, on the cabin table", "t")
+    assert e.data["result"] == "done", e.text
+    letter = TH.things_of(w)[-1]
+    assert letter.hull == b.id and TH.lying_aboard(crew) == {"cabin": [letter]}
+    assert TH.lying_aboard(w) == {"cabin": [packet]}
+    assert TH.reach_why(crew, crew.people.captain, letter) is None

@@ -1,0 +1,26 @@
+# Fish a sprung spar (spec M7 §14; package 73; scripted, FishSparScript in
+# evolutions/repair_scripts.py). "FISH, a machine employed to hoist or draw up the flukes of
+# the ship's anchor ... Also a long piece of oak, convex on one side and concave on the
+# other, used to fasten upon the outside of the lower masts, as an additional security, to
+# strengthen them when they are sprung" (Falconer 1780, FISH); "a lower mast sprung may be
+# fished and woolded" (Luce 1884, ch. XXXI 'Lower Mast Carried Away or Sprung': the fishes
+# of capstan bars or spare spars, the wooldings hove taut). A sprung spar (its condition
+# under the mark) fished and woolded stands at a condition of seventy at most: it will not
+# bear a press of sail, and the strain model reads it so. The fishes are not counted (the
+# capstan bars and the makings of the booms). Phases: fishes (on deck: the fishes made and
+# got aloft), woold (aloft: the fishes clapped on and the wooldings hove taut).
+id: fish_spar
+verb: fish
+applies_to: {class: spar}
+script: fish_spar
+params: {aloft: [woold]}
+preconditions: []
+timing:
+  fishes_s: 900   # the fishes made of capstan bars or a spare spar's makings and got up: a quarter of an hour (judgement)
+  woold_s: 1800   # clapped on and woolded: half an hour (judgement; Luce's "woolding" is slow work with a Spanish windlass)
+on_start: {log: "Fish the {spar}! The fishes made and got aloft."}
+on_complete: {log: "{done}", kind: spar.fished, severity: notable}
+on_fail: {log: "Could not fish the {spar}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the carpenter's crew and the topmen of the mast: eight hands aloft (judgement)
+crew: {hands: 8, rating: able, stations: [topmen, idlers, forecastle, afterguard]}
+source: "Falconer 1780, FISH; Luce 1884, ch. XXXI 'Lower Mast Carried Away or Sprung' (fished and woolded); the minutes judgement"

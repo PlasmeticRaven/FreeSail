@@ -288,6 +288,7 @@ SIZE_RANK: dict[str, int] = {
     "brig-sloop": 2,
     "merchant brig": 2,
     "schooner": 1,
+    "privateer schooner": 1,  # PROVISIONAL (2026-10-25): the schooner's hull, armed
     "cutter": 1,
     "lugger": 1,  # package 43b: a chasse-marée of a hundred tons, the cutter's class
     "smack": 0,  # a fishing smack of thirty-five tons is nobody's match
@@ -652,11 +653,44 @@ _BLOCKADE = re.compile(
 )
 
 
-def read_intent(world: Any, words: str) -> Intent:
+# A free intent (the owner's lead, 2026-10-26): words no form of `read_intent` reads,
+# taken for a ship on the sea so that a model seated as her captain is told its goal. The
+# rules-based captain lays no plan for it: he lies her to where she is (the far body by her
+# plan's `lie_to`, the crewed captain by one `heave to`; package 86's fold-in), keeping her
+# service's role and doctrine for the weather and strangers, until a model or the player at
+# her captain's station sails her. PROVISIONAL in form (the owner's debrief of 2026-10-27):
+# packages 82 and 84 rework it with the person aboard another ship.
+FREE = "free"
+FREE_WARNING = (
+    "a free intent: the rules-based captain will not follow it, and lies her to where she is "
+    "until a model or the player takes her captain's station"
+)
+
+
+def free_intent(words: str) -> Intent:
+    """A free intent from its words whatever they say (a scenario ship's `free_intent:`,
+    2026-10-27): the goal a model at her captain's station is given, which the rules-based
+    captain does not sail by even where its words are a form he knows."""
+    said = " ".join(str(words).split()).rstrip(".")
+    if not said:
+        raise ValueError("a free intent says the ship's goal in words; these are empty.")
+    return Intent(FREE, said)
+
+
+def read_intent(world: Any, words: str, free: bool = False) -> Intent:
     """An intent from its words, the places checked against the chart and the ports
     (raises ValueError in words): `trade tin from Falmouth to Brest`, `trade forty tons
     of tin from Falmouth to Brest`, `keep the station off Ushant within 15 miles`, `carry
-    this letter to Brest`, `run home to Plymouth`, `bound for Brest`."""
+    this letter to Brest`, `run home to Plymouth`, `bound for Brest`. With `free`, words
+    no form reads (and a form whose places the chart has not got) are a free intent."""
+    if free:
+        try:
+            return read_intent(world, words)
+        except ValueError:
+            said = " ".join(str(words).split()).rstrip(".")
+            if not said:
+                raise
+            return Intent(FREE, said)
     from freesail.orders.numbers import read_all
 
     said = " ".join(str(words).split()).rstrip(".")
@@ -887,8 +921,8 @@ def role_for(world: Any, intent: Intent | None) -> str:
         return "packet"
     if intent is not None and intent.convoy:
         return "commodore"  # package 71: the convoy's escort, by the intent's words
-    if intent is not None and intent.kind in ("home", "passage") and _is_kings_ship(world):
-        return "kings-ship"
+    if intent is not None and intent.kind in ("home", "passage", FREE) and _is_kings_ship(world):
+        return "kings-ship"  # a free intent's too (package 86): her service's role
     return "merchant"
 
 
@@ -2202,12 +2236,17 @@ class Captain(Judgement):
 
     # -- the intent changed (a world order) ----------------------------------------------
 
-    def set_intent(self, words: str) -> str:
+    def set_intent(self, words: str, free: bool = False) -> str:
         """`captain: intent <words>` (the director's seam): the intent read anew, the
-        plan dropped and worked again at the next judgement; the words for the journal."""
-        self.intent = read_intent(self.world, words)
+        plan dropped and worked again at the next judgement; the words for the journal.
+        `free` takes words no form reads as a free intent (another ship's, `ship "X":
+        intent`), under which he keeps the role and the doctrine of her service he had
+        (package 86's fold-in, the review's finding: a King's cutter or tender had fallen to
+        the merchant's doctrine)."""
+        self.intent = read_intent(self.world, words, free)
         self.intent_words = " ".join(words.split())
-        self.role = role_for(self.world, self.intent)
+        if not (self.intent.kind == FREE and self.role):
+            self.role = role_for(self.world, self.intent)
         self.doctrine = load_doctrine(self.role)
         self.legs, self.leg_i, self.leg_shaped_tick = [], 0, None
         self._business = {}
@@ -2719,6 +2758,7 @@ class Captain(Judgement):
         if state is None:
             return
         kinds = {e.kind for e in events}
+        self._damage_work(p)
         if self._business.get("filling") and p.manoeuvre == "hove to":
             # a sailing state entered while she was still heaving to for the weather
             # (package 40c): the fill away waits for the heave-to to finish, and is given
@@ -3088,6 +3128,9 @@ class Captain(Judgement):
             return sid.replace(".", " ").replace("_", " ")
 
     def _passage(self, p: Perception, events: list[Any], kinds: set[str]) -> None:
+        if self.intent is not None and self.intent.kind == FREE:
+            self._free(p)
+            return
         if not self.legs:
             self._plan(p)
             if not self.legs:
@@ -3417,6 +3460,22 @@ class Captain(Judgement):
                 if lines:
                     runtime.load_book(self.state, lines, actor_for(self.state), quiet=True)
 
+    def _free(self, p: Perception) -> None:
+        """A free intent (package 86's fold-in, the review's finding): no plan is laid, as
+        the far body lays none (`brains.FarCaptain._plan`), where the crewed captain had
+        tried to plan it every minute and said a plan of no legs each time. He lies her to
+        where she is, once each time he comes back to his passage (as the far body's
+        `lie_to` is taken up again after a detour), and his doctrine of the weather and
+        strangers keeps on; a model or the player at her captain's station sails her."""
+        entered = getattr(self, "_state_entered", None)
+        if "free_lain_to" in self._business and self._business["free_lain_to"] == entered:
+            return
+        self._business["free_lain_to"] = entered
+        self.legs, self.leg_i = [], 0
+        if p.manoeuvre in ("hove to", "heaving to"):
+            return
+        self.give("heave to", why=f"a free intent, {self.intent.words}: no plan to sail by")
+
     def _plan(self, p: Perception) -> None:
         if self.intent is None:
             return
@@ -3686,6 +3745,7 @@ class Captain(Judgement):
         colours = player_locker(self.world).colours
         if colours.state in ("false", "none"):
             self.give("hoist the colours", why="her true colours before the first shot")
+        self._business["engaged_at"] = p.tick
         quarters = (getattr(self.world.ship, "extra", None) or {}).get("quarters")
         if quarters is None or not getattr(quarters, "at_quarters", False):
             self.give("beat to quarters", why="an enemy in range")
@@ -3699,6 +3759,7 @@ class Captain(Judgement):
             self._business["engaged_side"] = side
             self.give(f"engage her to {side}", why="the enemy in range")
             self.give("hold your fire", why="until she is within the book's range")
+        self._fight_ready(p)
         self._engaging(p)
 
     def _engaging(self, p: Perception) -> None:
@@ -3716,6 +3777,9 @@ class Captain(Judgement):
         wanted = habit["engage_range_cables"] * units.NAUTICAL_MILE / 10.0
         rng = float(mark.get("estimate_m") or wanted)
         last_tick = int(self._business.get("steered_tick", -(10**9)))
+        self._musketry(p, rng)
+        if self._boarding(p, mark, rng):
+            return
         if self._weaker(p, mark):
             # a weaker mark (a smaller class, or a merchantman) is chased and closed to
             # pistol shot: the chaser runs alongside, and the range-keeping law is for an
@@ -3761,6 +3825,224 @@ class Captain(Judgement):
             self._business["steered_tick"] = p.tick
             why = "to keep the enemy on the engaged beam" + (f", {word}" if word else "")
             self.give(f"steer {course:.0f}", why=why)
+
+    # -- package 73 (spec M7 §11, §11a, §13, §14): the fight on deck and the damage ----------
+
+    def _th(self, key: str, default: Any = None) -> Any:
+        d = self.doctrine
+        return d.threshold(key, default) if d is not None else default
+
+    def _fight_ready(self, p: Perception) -> None:
+        """Entering the action: the marines into the tops where the kit's habit is the
+        tops (`marines_tops`: `kit` reads the nation's share aloft, true or false says it
+        outright), the small arms served out where he may board (`board_odds` above
+        nought)."""
+        from freesail.combat.small_arms import kit_of, marines_of
+
+        ship = self.world.ship
+        if marines_of(ship):
+            tops = self._th("marines_tops", "kit")
+            kit = kit_of(self.world)
+            aloft = tops is True or (tops == "kit" and float(kit.get("tops_share", 0.0)) >= 0.3)
+            if aloft:
+                self.give("marines to the tops", why="the marksmen aloft, the nation's habit")
+        if float(self._th("board_odds", 0.0) or 0.0) > 0.0:
+            self.give("serve out the small arms", why="to be ready to board or be boarded")
+
+    def _musketry(self, p: Perception, range_m: float) -> None:
+        """The marines open by volley within the doctrine's cables of a near deck and hold
+        their fire beyond twice it; the small arms at will with them."""
+        from freesail.combat.small_arms import musketry_of
+
+        ship = self.world.ship
+        quarters = ship.extra.get("quarters")
+        if quarters is None or not getattr(quarters, "at_quarters", False):
+            return
+        m = musketry_of(ship)
+        cables = float(self._th("musketry_cables", 1.0) or 1.0)
+        within = cables * units.NAUTICAL_MILE / 10.0
+        crew = ship.extra.get("crew")
+        from freesail.crew.model import Station
+
+        borne = crew is not None and any(s.fit for s in crew.by_station.get(Station.MARINES, []))
+        if borne:  # at their carronades until the order takes them to their muskets
+            if range_m <= within and m.mode == "hold":
+                self.give("marines, fire by volley", why=f"within {cables:g} cables")
+            elif range_m > 2.0 * within and m.mode != "hold":
+                self.give("marines, hold your fire", why="she is beyond musket shot")
+        if m.served:
+            if range_m <= within and m.small_arms_mode == "hold":
+                self.give("small arms, fire at will", why=f"within {cables:g} cables")
+            elif range_m > 2.0 * within and m.small_arms_mode != "hold":
+                self.give("small arms, hold your fire", why="she is beyond musket shot")
+
+    def _boarding(self, p: Perception, mark: dict[str, Any], range_m: float) -> bool:
+        """Whether he is laying her aboard this minute (the helm law stands aside): by
+        `board_odds` (his boarders so many times her fit company) and `board_when` (`her
+        guns silent`: no shot of hers has struck for five minutes; `at any time`); the
+        chase's helm to close, the grapnels within their throw, the boarders away once
+        grappled; a fight in hand holds the course."""
+        from freesail.combat.boarding import GRAPPLE_RANGE_M, boarders_of, fight_of, grappled_to
+        from freesail.combat.hits import damage_of
+        from freesail.world.brains import PLAYER_ID
+
+        ship = self.world.ship
+        odds = float(self._th("board_odds", 0.0) or 0.0)
+        if odds <= 0.0:
+            return False
+        f = fight_of(ship)
+        if f is not None and not f.over:
+            return True
+        if self._stranger_struck(mark):
+            return False
+        mid = str(mark.get("id") or "")
+        v = self._vessel_of(mid)
+        crew_world = getattr(v, "crew", None) if v is not None else None
+        body = (
+            crew_world.ship
+            if crew_world is not None and getattr(crew_world, "shape", "full") == "full"
+            else None
+        )
+        if body is None and mid == PLAYER_ID:
+            parent = getattr(self.world, "parent", None)
+            body = parent.ship if parent is not None else None
+        if body is None or body.extra.get("crew") is None:
+            return False
+        theirs = sum(1 for s in body.extra["crew"].sailors if s.fit)
+        ours = len(boarders_of(ship, self.world))
+        if ours < odds * max(theirs, 1):
+            return False
+        when = str(self._th("board_when", "her guns silent") or "her guns silent")
+        if when != "at any time":
+            # her guns silent: no shot of hers has struck for five minutes; a mark that has
+            # never answered the fire is boarded after a quarter of an hour's engagement
+            keeper = damage_of(ship)
+            last = int(keeper.struck_by.get(mid, -(10**9))) if keeper is not None else -(10**9)
+            if last > -(10**8) and p.tick - last < 300:
+                return False
+            if last <= -(10**8) and p.tick - int(self._business.get("engaged_at", p.tick)) < 900:
+                return False
+        tick = p.tick
+        if grappled_to(ship) == mid:
+            if tick - int(self._business.get("boarders_tick", -(10**9))) >= 120:
+                self._business["boarders_tick"] = tick
+                self.give("boarders away", why="grappled, the odds his")
+            return True
+        if range_m <= GRAPPLE_RANGE_M:
+            if tick - int(self._business.get("grapple_tick", -(10**9))) >= 180:
+                self._business["grapple_tick"] = tick
+                self.give("grapple her", why="within a grapnel's throw")
+            return True
+        if tick - int(self._business.get("board_tick", -(10**9))) >= 180:
+            self._business["board_tick"] = tick
+            e = self.give("lay her aboard", why=f"to board her: {ours} boarders to her {theirs}")
+            if getattr(e, "kind", "") == "order.rejected":
+                return False  # the helm law stands: the chase could not be laid
+        return True
+
+    def _damage_work(self, p: Perception) -> None:
+        """Each minute in any state: her boarders on his deck repelled; the pumps manned at
+        the doctrine's depth; the colours struck when the water gains past the share with
+        an enemy at hand; the repairs by the doctrine's priority (in action the leak first,
+        then the rigging that keeps him sailing; after it the rigging whole)."""
+        from freesail.combat.boarding import fight_of
+        from freesail.combat.small_arms import musketry_of
+
+        world = self.world
+        ship = world.ship
+        tick = p.tick
+        f = fight_of(ship)
+        if f is not None and not f.over and f.defender is ship and not musketry_of(ship).repelling:
+            self.give("repel boarders", why="her boarders on our deck")
+        water = getattr(world, "water", None)
+        st = water.state if water is not None else None
+        if water is None or st is None:
+            return
+        depth = float(water.depth_m())
+        pumps = water.pumps
+        at = float(self._th("pumps_at_m", 0.3) or 0.3)
+        if (
+            depth >= at
+            and not pumps.manned
+            and tick - int(self._business.get("pumps_tick", -(10**9))) >= 600
+        ):
+            self._business["pumps_tick"] = tick
+            self.give("man the pumps", why=f"the well at {depth:.2f} m")
+        share = float(self._th("give_up_at_share", 0.4) or 0.4)
+        founder = float(water.founder_t())
+        losing = pumps.manned and float(water.gain_t_per_h()) > float(
+            pumps.rate_t_per_h(pumps.hands())
+        )
+        if (
+            share > 0.0
+            and founder > 0.0
+            and float(st.tons) >= share * founder
+            and losing
+            and self.state == "engaging"
+            and not ship.extra.get("struck")
+            and not self._business.get("gave_up")
+        ):
+            self._business["gave_up"] = True
+            self.give(
+                "strike the colours", why="the water gaining on the pumps with an enemy at hand"
+            )
+        self._repairs(p)
+
+    def _repairs(self, p: Perception) -> None:
+        from freesail.evolutions.repair_scripts import (
+            parted_running_lines,
+            parted_standing_lines,
+            sprung_spars,
+        )
+
+        world = self.world
+        ship = world.ship
+        tick = p.tick
+        if tick - int(self._business.get("repairs_tick", -(10**9))) < 600:
+            return
+        # the rigging is mended when the weather serves (the carpenter's and the boatswain's
+        # reports say as much): never lying to for weather, in distress, or with the wind at
+        # the shortening figure and above
+        if self.state in ("hove to for weather", "in distress"):
+            return
+        if float(p.wind_kn or 0.0) >= float(self._th("shorten_sail_kn", 30.0) or 30.0):
+            return
+        runner = ship.extra.get("evolutions")
+        in_hand = (
+            {inst.evo.id for inst in getattr(runner, "instances", [])}
+            if runner is not None
+            else set()
+        )
+        keeper = ship.extra.get("damage")
+        holes = [
+            h
+            for h in (getattr(keeper, "holes", []) or [])
+            if not h.get("plugged") and float(h.get("z_m", 1.0)) < 0.3
+        ]
+        said = self._th("damage_priority", "the leak, the rigging, the guns")
+        order = [x.strip() for x in str(said).split(",") if x.strip()]
+        in_action = self.state == "engaging"
+        wanted: list[tuple[str, str]] = []
+        for what in order:
+            if what == "the leak" and holes and "plug_shot_hole" not in in_hand:
+                wanted.append(("plug the shot holes", "the shot holes under water"))
+            if what == "the rigging":
+                if parted_standing_lines(ship) and "set_up_rigging" not in in_hand:
+                    wanted.append(("set up the rigging", "the standing rigging parted"))
+                if not in_action:
+                    if parted_running_lines(ship) and "reeve_line" not in in_hand:
+                        wanted.append(("reeve new lines", "the running rigging shot away"))
+                    for spar in sprung_spars(ship):
+                        if "fish_spar" not in in_hand:
+                            from freesail.evolutions.repair_scripts import _name
+
+                            wanted.append((f"fish the {_name(ship, spar.id)}", "a sprung spar"))
+                            break
+        if not wanted:
+            return
+        self._business["repairs_tick"] = tick
+        text, why = wanted[0]
+        self.give(text, why=why)
 
     def _chase_order(self, p: Perception) -> str:
         """'chase the cutter': the chase named by HIS stranger's rig when the lookout has

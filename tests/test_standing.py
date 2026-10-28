@@ -1878,13 +1878,14 @@ def test_the_well_is_sounded_every_glass_and_read_and_replays():
     assert copy.log.digest() == w.log.digest()
     # water in the well (set here by hand, as a leak would put it there: a replay cannot
     # make this part, which is the grounding's in play)
-    w.ship.hull.water_in_well_m = 0.33  # a foot and an inch
+    # (package 73: the water is the keeper's tons, the feet read from them)
+    w.water.state.tons = 0.33 * w.water.floor_m2()  # a foot and an inch
     w.run(1800)
     assert rule.fired == 2
-    assert [x for x in w.log if x.kind == "well.sounded"][-1].text == (
-        "The carpenter sounds the well: a foot and an inch of water, and gaining."
+    assert [x for x in w.log if x.kind == "well.sounded"][-1].text.startswith(
+        "The carpenter sounds the well: a foot and an inch of water, and gaining"
     )
-    assert w.readings.words("well") == "a foot and an inch of water in the well"
+    assert w.readings.words("well").startswith("a foot and an inch of water in the well")
 
 
 def test_a_failing_if_is_said_the_first_time_and_then_once_a_watch(synthetic):
@@ -2087,8 +2088,8 @@ def channel(ship: str = "frigate") -> World:
         (F, "heave the lead; trim sails; set the topsail", "set the topsail", "say which"),
         (F, "heave the lead; veer umpteen fathoms", "veer umpteen fathoms", "not a number of"),
         (F, "heave the lead; send for the cook's cat", "send for the cook's cat", "Nobody aboard"),
-        # package 71: the colours are an order the ship takes; the pumps still wait
-        (F, "heave the lead; man the pumps", "man the pumps", "milestone 7"),
+        # package 71: the colours are an order the ship takes; package 73: the pumps too
+        (F, "heave the lead; as you were", "as you were", "belay that"),
         (F, "heave the lead; steer south by west half", "steer south by west half", "toward which"),
         (F, "heave the lead; buy umpteen tons of tin", "buy umpteen tons of tin", "How many tons"),
         (

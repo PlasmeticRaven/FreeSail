@@ -45,7 +45,7 @@ def test_every_thing_of_the_table_is_read_and_each_form_finds_its_own_thing():
     """The table loads with known keys only; each form, its slot filled by a name the
     frigate has, finds its own thing and no other."""
     table = WO.aboard_table()
-    assert len(table) == 26  # package 70: a gun dismounted and the cartridges damp
+    assert len(table) == 31  # package 70: the guns' two; package 73: the people's health, five
     assert set(WO._PLAUSIBLE) == WO.ABOARD_PLAUSIBLE_KEYS
     w = world_at(49.5, -5.5)
     w.hold.stow("tin", 10.0)
@@ -56,6 +56,7 @@ def test_every_thing_of_the_table_is_read_and_each_form_finds_its_own_thing():
         "anchor": "the best bower",
         "good": "tin",
         "gun": "No. 3 starboard gun",  # package 70: a gun by the gun deck's words
+        "person": "the first lieutenant",  # package 73: a person by his role or his name
     }
     for thing in table:
         for form in thing["words"]:
@@ -134,7 +135,8 @@ def test_the_stores_the_cargo_and_the_spare_gear_fall_by_their_share_with_the_ca
 
 def test_a_report_only_thing_says_its_own_words_of_what_is_not_modelled():
     w = world_at(49.5, -5.5)
-    assert "nothing of the hull is modelled yet" in found(w, "a seam found working").text
+    # package 73: a seam found working is a leak the keeper runs; the bilge is the report-only
+    assert "nothing of the bilge" in found(w, "the bilge found foul").text
     e = found(w, "the compass found sticking")
     assert "nothing of the compass's error is modelled yet" in e.text
     assert reports(w)[-1].data["report_only"]

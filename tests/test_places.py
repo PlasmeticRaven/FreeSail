@@ -158,6 +158,7 @@ def test_every_paper_is_a_thing_with_a_keeper_and_a_place_and_the_stores_own_wor
         "the price list",
         "the private signals",  # package 71
         "the signal book",
+        "the gunner's account",  # practice and resupply (between packages 72 and 73)
     ]
     by = {p.handle: p for p in pages}
     assert by["the sailmaker's account"].keeper == "sailmaker"
@@ -206,7 +207,9 @@ def test_the_papers_are_served_by_handle_through_the_library_to_every_station_th
     closes here: the watcher, the captain and the browser's pane read one page."""
     w = world_for()
     listing = tools.library(w, "watcher", "papers")
-    assert listing.startswith("the ship's papers: 10 papers aboard, each by handle")
+    # eleven since practice and resupply (the owner's, folded in by package 86): the
+    # gunner's account (10 before it)
+    assert listing.startswith("the ship's papers: 11 papers aboard, each by handle")
     assert "  2. the manifest, about" in listing
     page = tools.library(w, "watcher", "papers", section="manifest")
     assert page.title == "the ship's papers, the manifest"
@@ -227,7 +230,7 @@ def test_the_papers_are_served_by_handle_through_the_library_to_every_station_th
     assert "[the ship's papers, the epitome" in found
     # listed in the contents beside the ship, with its handles
     contents = tools.library(w, "watcher", "contents")
-    assert "  papers: the ship's papers, 10 aboard" in contents
+    assert "  papers: the ship's papers, 11 aboard" in contents  # 10 before package 86
     # the pane's route serves the same lines (tests/test_server.py has the route itself)
     from freesail.ui.server import ship_papers
 

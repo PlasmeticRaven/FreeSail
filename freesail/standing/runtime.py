@@ -130,6 +130,13 @@ GUNNERY_PARTS: dict[str, str] = {
     "strike the colours": "the colours",
     "guns before sail": "the priority",
     "sail before guns": "the priority",
+    # practice and resupply (between packages 72 and 73): the cask, the dumb show and the
+    # gunner's filling
+    "heave a cask overboard": "the cask",
+    "exercise the guns": "the exercise",
+    "cease exercising": "the exercise",
+    "fill cartridges": "the filling",
+    "cease filling": "the filling",
 }
 
 
@@ -215,6 +222,24 @@ def imperative_helm_verbs() -> tuple[str, ...]:
     return tuple(HELM_VERBS) + ("keep her full",)
 
 
+# The fight's orders said as done (package 73, spec M7 §11): a hail is no verb to turn.
+FIGHT_SAID: dict[str, str] = {
+    "marines fire by volley": "the marines to fire by volley",
+    "marines fire at will": "the marines to fire at will",
+    "marines hold your fire": "the marines to hold their fire",
+    "marines to the tops": "the marines sent into the tops",
+    "marines to the gangways": "the marines brought down to the gangways",
+    "serve out the small arms": "serving out the small arms",
+    "small arms fire at will": "the small-arms men to fire at will",
+    "small arms hold your fire": "the small-arms men to hold their fire",
+    "lay her aboard": "laying her aboard",
+    "grapple her": "grappling her",
+    "cast off the grapnels": "casting off the grapnels",
+    "boarders away": "the boarders away",
+    "repel boarders": "repelling boarders",
+}
+
+
 def said_as_done(ship: Any, text: str) -> str:
     """'take in the studdingsails' -> 'taking in the studdingsails', for the firing line."""
     words = normalise(text).replace(" , ", ", ").split()
@@ -226,6 +251,12 @@ def said_as_done(ship: Any, text: str) -> str:
         phrase_len = len(order.verb_phrase.split())
     except OrderError:
         head, phrase_len = words[0], 1
+    else:
+        # package 73: the fight's orders begin with a hail, not a verb ("marines, fire by
+        # volley"), and are said as done in their own words
+        said = FIGHT_SAID.get(order.verb)
+        if said is not None:
+            return said
     for i in range(min(phrase_len, len(words))):
         if words[i] == head:
             words[i] = gerund(head)

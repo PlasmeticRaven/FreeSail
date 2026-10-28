@@ -1,0 +1,27 @@
+# Fother a sail over the leak (spec M7 §14; package 73; scripted, FotherSailScript in
+# evolutions/repair_scripts.py). "FOTHERING, a peculiar method of endeavouring to stop a
+# leak in the bottom of a ship while she is afloat ... a basket ... oakum, with ... a
+# quantity of chopped rope-yarns, and wool ... and a sail being spread under the ship's
+# bottom" (Falconer 1780, FOTHERING); Cook's Endeavour on the reef, 1770, fothered with a
+# studding sail. A sail from the sail room is thrummed with oakum and hauled under the
+# bottom over the leak: the sea's pressure holds it in, and every leak below the water
+# (the shot holes unplugged, the ground's, a started seam) comes in at three tenths of its
+# rate while the sail holds (`freesail/world/water.py` FOTHER_SHARE; judgement). The sail
+# is used up. It goes when she makes more than six knots or takes the ground again
+# (judgement). Phases: thrum (on deck), haul_under (on deck, the ropes passed under her).
+id: fother_sail
+verb: fother
+applies_to: {class: ship}
+script: fother_sail
+preconditions: []
+timing:
+  thrum_s: 3600       # the sail spread on deck and thrummed with oakum and rope-yarns: an hour (judgement after Falconer)
+  haul_under_s: 1800  # the ropes passed under the bows and the sail hauled under her to the place: half an hour (judgement)
+on_start: {log: "Fother a sail over the leak! A sail got up from the sail room and the oakum and rope-yarns to thrum it."}
+on_complete: {log: "{done}", kind: leak.fothered, severity: notable}
+on_fail: {log: "Could not fother the leak: {reason}.", kind: evolution.failed, severity: notable}
+# crew: all hands, the sailmaker's party and the watch to thrum and to haul the sail
+# under, a party of twenty at the most (judgement; a cutter's company is fewer, and the
+# work goes at the pace of what she has)
+crew: {hands: all, party: 20, rating: ordinary, stations: [forecastle, waisters, afterguard, idlers, all hands]}
+source: "Falconer 1780, FOTHERING; Cook's Endeavour on the Great Barrier Reef, June 1770 (the fothering by Monkhouse); the hours judgement"

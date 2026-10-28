@@ -283,12 +283,13 @@ def test_refusals_are_the_dialects_and_come_at_registration(unbound):
             order("set the royals")
 
     # a sighting is an event since package 33a named it; the order after it is still parsed
-    # (`clear for action` is the ship's since package 70; the boarders are refused in words)
-    with pytest.raises(OrderError, match="boarders are not called away"):
+    # (`clear for action` is the ship's since package 70, the boarders since 73; `as you
+    # were` is refused in words with what to say instead)
+    with pytest.raises(OrderError, match="say 'belay that'"):
 
         @at("a sighting", name="sighting")
         def sighting():
-            order("boarders away")
+            order("as you were")
 
     with pytest.raises(OrderError, match="cannot be 'shaking'"):
 

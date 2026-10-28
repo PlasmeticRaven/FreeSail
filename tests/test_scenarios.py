@@ -196,6 +196,61 @@ def test_a_windows_written_file_keeps_its_line_endings(tmp_path):
     assert out.read_bytes() == src.read_bytes()
 
 
+def test_a_scenario_ship_takes_a_free_intent_which_the_rules_captain_does_not_sail(tmp_path):
+    """2026-10-27: a scenario's ship takes `free_intent:` in any words, the goal a model
+    at her captain's station is told (world orders are the director's, so a scenario is
+    where the player gives it). The rules-based captain does not sail by it, even where
+    its words are a form he knows: she lies to, and is not taken off the sea as a voyage
+    done. The scenario's lines say so. An intent and a free intent together, or an empty
+    one, are refused in words when the scenario is read."""
+    from freesail.world.captains import FREE
+    from freesail.world.scenarios import ScenarioError
+
+    base = CHANNEL_EAST.read_text(encoding="utf-8")
+    goal = "find the smuggler's lugger said to be running brandy into Cawsand"
+    p = tmp_path / "free.yaml"
+    p.write_text(
+        base
+        + "\nships:\n"
+        + "  - {description: cutter, name: Raven, nation: britain, position: 50 25 N 3 27 W,\n"
+        + f'     goal: "bound for Dartmouth", free_intent: "{goal}"}}\n'
+        + "  - {description: cutter, name: Lark, nation: britain, position: 50 24 N 3 26 W,\n"
+        + '     goal: "bound for Dartmouth", free_intent: "bound for Dartmouth"}\n',
+        encoding="utf-8",
+    )
+    sf = load_scenario(p)
+    assert any(
+        f"Free intent: {goal} (the rules-based captain will not follow it)" in ln
+        for ln in sf.lines()
+    )
+    world = make_scenario_world(sf)
+    raven, lark = world.vessels.find("Raven"), world.vessels.find("Lark")
+    assert raven.brain.intent.kind == FREE and raven.brain.intent.words == goal
+    assert raven.intent_words == goal
+    # a form he knows, given as a free intent, is free all the same
+    assert lark.brain.intent.kind == FREE
+    world.run(120)
+    for v in (raven, lark):
+        assert not v.done and v.plan and v.plan[0][0] == "lie_to"
+    for bad, words in (
+        ('intent: "bound for Dartmouth", free_intent: "anything"', "not both"),
+        ('free_intent: "  "', "the ship's goal in words"),
+    ):
+        p.write_text(
+            base
+            + "\nships:\n"
+            + "  - {description: cutter, name: Raven, nation: britain, position: 50 25 N 3 27 W,\n"
+            + f'     goal: "bound for Dartmouth", {bad}}}\n',
+            encoding="utf-8",
+        )
+        try:
+            load_scenario(p)
+        except ScenarioError as e:
+            assert words in str(e), str(e)
+        else:
+            raise AssertionError(bad)
+
+
 def test_the_stations_and_who_holds_them_are_read_and_the_players_seat_given(tmp_path):
     from freesail.world.scenarios import ScenarioError
 

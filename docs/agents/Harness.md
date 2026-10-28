@@ -736,6 +736,13 @@ is under; a brief's `limits: {false_colours: false}` refuses his ships the ruse,
 brief's limits. `say as the captain of the Nancy: ...` within hail speaks for an unheld
 captain as 52 has it.
 
+**The hail as fixed (package 86's fold-in of the owner's fix of 2026-10-27).** A rules
+captain's hail of the player's ship with nobody's rules captain commanding her (the player
+or a model at her captain's station) waits for `say to her`, where the table had answered
+it; a crewed ship whose captain stands aside or holds by the director's hand is answered by
+the table. The table's heave-to is obeyed, run from or declined only when the hail demands
+it (`heave to, I am sending a boat`); a question moves no sail.
+
 ## 21e. The squadron, the convoy and the station (package 72)
 
 Spec M7 §21 to §23 "as built (package 72)"; `docs/design/Design-Squadrons.md`; the primer's
@@ -793,6 +800,196 @@ delay); the scenario's `squadrons:` and a ship's `squadron:` key the same forms 
 truth shows every ship's set and her regime (`squadron`, `regime` on the row) and the sets
 whole (`squadrons`). A world order is never shown as sent to a station. The channels
 `squadron` and `convoy` carry the lines to the stations that read them.
+
+**Package 86's fold-in (the owner's fixes of 2026-10-26 and 27).** A captain seated on
+another ship may `keep station two cables astern of the Amazon` (the player's ship by her
+name) or `... of the frigate` (the nearest sail of that kind in sight, read from what she is
+made out to be: 'brig' a merchant brig, 'sloop' a brig-sloop); a kind with no sail of it in
+sight is refused in words. **A free intent:** the director's `ship "X": intent <words>` takes
+words no form reads as her free intent, said with the warning ("a free intent: the
+rules-based captain will not follow it, and lies her to where she is until a model or the
+player takes her captain's station") and why; a scenario ship's `free_intent:` takes any
+words so. A model seated as her captain is told it as the goal he is given; with nobody at
+her captain's station her rules-based captain lies her to, keeping her service's role and
+doctrine. PROVISIONAL in form: 82 and 84 rework the free intent, the hail's rule and the
+station's name with the person aboard another ship.
+
+## 21f. Water, damage, the wounded and the fight on deck at the stations (package 73)
+
+Spec M7 §11, §11a, §13 to §17 "as built (package 73)"; `docs/design/Design-WaterAndHealth.md`;
+the primer's chapter 25. What a station reads and may do of the water in the ship, the damage
+control, the surgeon's work and the fight on deck; and what happens to the person a station
+holds when he is hit.
+
+**The readings.** `the well` (the carpenter's feet with the tail: rising, the pumps gaining or
+losing), `the water` (the tons, the sources by name and their rates), `the leaks`, `the pumps`
+(manned or not, by whom, the rate, when spelled), `the hatches`; `the damage` now names
+everything (the lines parted, running and standing, with the order that mends each; the sprung
+spars; the jury masts; the holed sails; the shot holes by place and plugged; the well), and
+`the parted lines`; `the sick list` (by name with each man's hurt, the men at light duty, the
+dead to be buried), `the wounded` (each wound, light or dangerous, how many wait), `the
+surgeon` (borne or not, in the cockpit or the sick berth, at work or idle, his mates), `the
+bill` (the states: killed, wounded with the dangerous apart, hurt and at light duty, sick);
+`the marines` (the detachment fit of its number, its officer and kit, where it stands and its
+fire), `the small arms` (in the chests or served out, the small-arms men), `the boarders` (the
+bill's count with their arms, whom she is grappled to, the fight by rounds and losses, the gun
+crews up to repel). The needs' line of a sample carries the person's own state first: `wounded
+(a splinter in the hand)`, `hurt and at light duty`, `below with the surgeon`, `dead`.
+
+**The lines and the events.** `well.rising` ("The carpenter reports a foot of water in the
+well, and gaining"), `pumps.manned`, `pumps.spelled`, `pumps.gaining`, `pumps.losing`,
+`pumps.sucked`, `pumps.secured`, `ship.settling`, `ship.foundered` (urgent; a crewed vessel
+sunk is `action.enemy_sunk` in the parent), `hatches.battened`, `leak.stopped`, `hole.plugged`;
+`health.sick` (the surgeon's report at eight), `health.died`, `health.invalided`,
+`health.returned`, `crew.buried`, `health.morning_report` (routine), `action.bill` (the
+butcher's bill ten minutes after the last shot), `person.hurt`, `person.collapsed`,
+`person.killed`, `ship.command_passes`; `action.musketry` (the firer's minute), `ship.grappled`,
+`ship.cast_off`, `action.boarders`, `action.boarded`, `action.boarding` (a round), `action.carried`,
+`action.repulsed`, `action.repel`. The events for `at` and a stand-by: `the well rising`, `the
+pumps gaining`, `the pumps losing`, `the pumps suck`, `the leak stopped`, `a hole plugged`,
+`settling`, `she founders`, `the hatches battened`, `a man taken ill`, `a man dead`, `the
+burial`, `the morning report`, `the butcher's bill`, `a man collapsed`, `an officer killed`,
+`the command passes`, `musketry`, `grappled`, `the boarders away`, `the fight on deck`, `the
+deck carried`, `the boarders repulsed`.
+
+**The orders** (object `damage`, the deck's): `man the pumps`, `spell the pumps`, `secure the
+pumps`, `batten down the hatches`, `open the hatches`, `plug the shot holes`, `stop the leak`,
+`fother a sail`, `rig preventer braces`, `rig preventer backstays`, `sling the yards`, `set up
+the rigging` (or `set up the larboard main shrouds`), `reeve new lines`, `fish the fore
+topmast`, `rig a jury mast`, `cut away the mainmast`, `bury the dead`; (object `fight`):
+`marines, fire by volley` / `fire at will` / `hold your fire`, `marines to the tops` / `to the
+gangways`, `serve out the small arms`, `small arms, fire at will` / `hold your fire`, `lay her
+aboard`, `grapple her`, `cast off the grapnels`, `boarders away`, `repel boarders` (the hail's
+comma is the drill's); (object `needs`, the person's own): `go below to the surgeon`. Every
+repair is an evolution of the runner's (hands and time, the fighting book's priority); the
+pumps a standing work of the hands' pool; the marines' fire a standing intention within
+musket shot of a near deck; the grapple an evolution within thirty metres.
+
+**The holder hit (§16a, at parity).** The person a station holds is hit as the men at his part
+are. The station is told in an urgent line of its own with the roads: a light wound, "You are
+hit: a splinter in the hand. You can keep the deck (your orders go and your words carry, and you
+tire the faster), or go below to the surgeon to have it dressed ('go below to the surgeon') and
+come on deck again"; a grave one, "... you will collapse within the half hour if the wound is
+not dressed". On deck he is not in the surgeon's queue; a light wound is dressed where he
+stands after an hour (a mate sent up where one is borne). `go below to the surgeon` gives the
+deck (the rules captain carries on by the bill, the officer's deck returns to the captain) and
+puts him in the cockpit and the queue; dressed, he is told and may `go on deck`. A grave
+wound kept on deck collapses him at the half hour: the harness's **carried-below stand-by**
+(`StandBy("carried below to the surgeon, until your wound is dressed")`), which no event, bell
+or urgent line ends until the surgeon has dressed him; dressed, a grave wound keeps him under
+the surgeon's hands until the judgement at a day, and the station ends with that judgement:
+dead, `agent.stopped` "stood down by the world: killed: ..."; an invalid, "stood down by the
+world: invalided: ...". A holder killed outright is stood down the same way, the model told
+"You are killed: a round shot. Your person is dead and the station ends with him; the deck
+passes by the bill", the journal written, the station released and saved. The player at the
+prompt as the captain is told the same words through the needs' listeners and loses his
+person; the command passes by the wardroom's order (`ship.command_passes`, the people's
+captain thereafter), and the scenario goes on under whoever commands. The needs' ends are the
+same keeper's: thirst collapses a stationed person at three days (carried below, water and
+food bring him round) and kills at four; hunger at a week and three.
+
+**The director.** `aboard: a man taken ill`, `aboard: the fever in the ship`, `aboard: the
+first lieutenant is hurt` (or `Mr Pearce is hurt`, `... is badly hurt`), `aboard: the surgeon
+taken ill`, each doubted without its cause (two days out for the fevers, a week for the fever in
+the ship, a seaway for a fall) and performed with one; `aboard: a seam found working` is a leak
+of two tons an hour the keeper runs; `the leak stopped` and `the well pumped out` act through
+the keeper and are doubted while the ship's own carpenter and pumps could do it. His truth shows
+every ship's well, pumps and muster states. A world order is never shown as sent to a station.
+## 21g. Practice at the great guns, and powder and shot taken in (between packages 72 and 73; folded in by package 86)
+
+Spec M7 §8 "as built (practice and resupply)"; `docs/design/Build-PracticeAndResupply.md`;
+the tuning notes' section of the same name; the primer's chapters 14 ("Powder and shot") and
+22 ("Practice at the great guns"). Built locally between packages 72 and 73 and folded in by package 86 after 73.
+What a station reads of the magazine, the gunner's filling, the hoy and practice, and what
+it may do with them.
+
+**The readings.** `practice` ("the practice", "the exercise", "the gun drill"; a state):
+each gun's rounds in dumb show and live and the pace by kind, the mean and the best from
+sponge to point (a swivel's from its cartridge); the falls of shot at the mark by cables,
+"struck" at the cask and "on the mark" at the notional mark; the mark, the cask with its
+bearing and range by the lookout's estimate and whether it is in sight, or the notional
+mark at its stated range; and for a King's ship of Britain the month's live rounds against
+the allowance for exercise; "none" when there has been none. It rides a sample only while
+she is exercising, a mark is engaged or a cask is in the water. `magazine` now gives the
+gunner's count by gun kind ("Filled cartridges: 300 of 330 for the 12-pounder carronades;
+the gunner filling for the 12-pounder carronades."), saying when he is not filling and why
+("the gunner not filling for the 12-pounder carronades by night", "while the hoy is
+alongside", ", the colours struck", ", no man of the powder to spare", "the filling stopped
+by order"), the powder below against the barrels established ("Powder below: 1 barrel and
+70 pounds, of 2 barrels established."), the shot by calibre and the rounds fired; it rides
+in port while she wants powder or shot. `guns` says "exercising the starboard battery in
+dumb show" while she is; `stores` says "the galley fire out while the powder comes aboard"
+while it is out (and the paper "the purser's books" the meals served cold); `port` says the
+hoy coming off, with the hour it will be alongside, and alongside with the powder coming
+aboard; `range` gives a notional mark's stated range exactly. `what is in sight` names the
+cask "the mark" beside a sail; the lookout never hails it. The paper "the gunner's account"
+(`library(topic='papers', section="the gunner's account")`) is the magazine's count with
+the receipts and the practice beyond the allowance, kept by the boatswain where there is no
+gunner.
+
+**The lines.** The gunner's: `guns.filling` (notable, once an outage: "No more filled
+cartridges for the 12-pounder carronades: the gunner is filling, and the guns wait on
+him."), `guns.filled` (routine, out of quarters, after a receipt or `fill cartridges`: "The
+gunner has the cartridges filled to the allowance: 330 for the 12-pounder carronades; 1
+barrel and 70 pounds below."), `guns.powder_out` (notable, when his filling leaves too
+little below: "The gunner reports all the powder filled: no loose powder below, and 40
+cartridges short of the allowance."), and package 70's `guns.magazine_empty`, said again
+once powder has come aboard. The hoy's: `ordnance.alongside` (notable: "The Ordnance's hoy
+is alongside with the powder: the galley fire is put out, no light allowed but in the light
+room, and no man to smoke (the Regulations, the Gunner, Art. V)."), `ordnance.stowed`
+(notable: the powder struck down and stowed, the magazine secured and the keys to the
+captain, the galley fire lit again, and at the Ordnance's the gunner's shilling for each
+empty barrel), `ordnance.missed` (notable: the hoy gone back, finding her gone from the
+road, the purse short, or she weighed before it was struck down), and the gunner's account
+written (`paper.written`). Practice's: `practice.mark_over` (notable: "The mark is over the
+side from the starboard quarter, an empty cask with a flag on a staff."),
+`practice.mark_struck` (notable: "The mark struck by No. 16 starboard gun at two cables and
+knocked to staves; the guns hold their fire for want of a mark."), `practice.mark_lost`
+(routine: "The mark is lost astern, three miles off.", or given up at a new heave),
+`practice.mark_sight` (routine, each change of the masthead's sight once: "The mark is lost
+to sight in the haze."; "The mark is made out again, bearing ..."), `practice.exercise`
+(routine, each minute of the dumb show: "Exercising the starboard battery in dumb show:
+eleven rounds in the minute, the starboard bow chaser the quickest, fifty-six seconds from
+sponge to point."), `practice.beyond_allowance` (notable, once a month). A minute's fall of
+shot at a mark says "struck the mark" or "on the mark", and a shotted gun with no mark
+sends "the shot into the sea". Nothing of practice is an action's: no recognition, no
+outlaw, no morale.
+
+**The events** for `at` and a stand-by: `the gunner filling` (`guns.filling`), `the
+cartridges filled` (`guns.filled`), `the powder all filled` (`guns.powder_out`), `the hoy
+alongside` (`ordnance.alongside`), `the powder stowed` (`ordnance.stowed`), `the hoy turned
+back` (`ordnance.missed`), `the mark over the side` (`practice.mark_over`), `the mark
+struck` (`practice.mark_struck`), `the mark lost` (`practice.mark_lost`), `the mark lost to
+sight` and `the mark in sight again` (`practice.mark_sight`, by its `seen`), `the exercise`
+(`practice.exercise`, the dumb show's line each minute), `beyond the allowance`
+(`practice.beyond_allowance`).
+
+**The orders.** The gun deck's (object `gunnery`, the captain's as the rest of it; `heave a
+cask overboard`, `fill cartridges` and `cease filling` in or out of quarters, the rest at
+quarters): `heave a cask overboard` (from the lee quarter, or `from the starboard quarter`;
+refused by night and with no chart, where a notional mark serves), `engage the cask to
+starboard` (and "the mark", "the target", which mean the cask only while one is in the
+water), `engage a mark four cables on the starboard beam` (a notional mark at the bow, the
+beam or the quarter where a gun of hers bears, from a cable to the longest random shot of
+the guns that bear there; refused in words where none bears, as on the frigate's bow and
+quarter), `exercise the guns` (`the starboard battery`, `both batteries`; dumb show, the
+guns served without powder and nothing fired but a gun by name, which is served live and
+fires; it may be given at quarters before the guns are cast loose, so that every cycle
+starts empty), `cease exercising` (the exercise ends too with an `engage`, `secure the
+guns`, the strike, and when the hands are piped down from quarters), `fill cartridges` (the
+gunner to fill and to report the cartridges filled to the allowance) and `cease filling`.
+`fire` at the word is refused while the battery exercises. The port's: `take in powder and
+shot` (`take in powder`, `take in shot`, `take in two barrels of powder`, `take in 20
+cartridges for the carronades`, `take in 100 round shot for the 12-pounders`, `buy powder`,
+`demand powder and shot`, and the rest of its synonyms), issued free and vouched by the
+Ordnance at Plymouth (in the Sound or Cawsand Bay) and Gibraltar to a King's ship of
+Britain, bought of the merchants elsewhere, paid when the hoy comes alongside and given back
+if she weighs before it is struck down; a King's ship of Britain buys of them only `of
+necessity` (`buy powder of necessity`), the line keeping the captain's word.
+
+**The director.** `aboard: the cartridges found damp` (a quarter of every kind's filled
+cartridges struck off the gunner's count, the barrels below left alone) makes the magazine
+short for the gunner to fill.
 
 ## 22. The harbour and the settings (package 59)
 

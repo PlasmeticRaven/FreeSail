@@ -104,6 +104,59 @@ def test_the_descriptions_name_the_four_files_and_the_brigs_two_come_from_her_fi
     assert S.description("frigate")["rig"] == "a ship"  # three masts, square-rigged, from the tops
 
 
+def test_the_privateer_schooner_is_the_schooner_armed_and_the_schooner_stays_unarmed():
+    """PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): the letter of
+    marque of the schooner's draught is a file of her own, so that every passage and trial
+    sailing the unarmed Speedwell is untouched: the same hull, rig and company, her guns and
+    her quarter bill added; the tops make her out a schooner, the glass her ports."""
+    import yaml
+
+    from freesail.ship.loader import load_spec
+
+    plain_path = "data/ships/topsail-schooner.yaml"
+    armed_path = "data/ships/privateer-schooner.yaml"
+    assert S.description_key("a French privateer schooner") == "privateer schooner"
+    assert S.description_key("an armed schooner") == "privateer schooner"
+    assert S.description_key("a schooner") == "schooner"
+    armed = S.description("privateer schooner")
+    assert armed["file"] == armed_path
+    assert armed["rig"] == S.description("schooner")["rig"] == "a schooner"
+    assert armed["what"] == S.file_descriptions(armed_path)["privateer schooner"]["what"]
+    plain, spec = load_spec(plain_path), load_spec(armed_path)
+    assert plain.armament is None and plain.crew.quarter_bill is None
+    assert spec.armament.default == "long tom"
+    tom = spec.armament.fit()
+    kinds = sorted((g.kind, g.pounder, g.place) for g in tom.guns)
+    assert kinds == (
+        [("carronade", 12, "broadside")] * 4
+        + [("long", 12, "pivot")]
+        + [("swivel", 0.5, "rail")] * 4
+    )
+    marque = spec.armament.fit("letter of marque")
+    kinds = sorted((g.kind, g.pounder) for g in marque.guns)
+    assert kinds == [("long", 6)] * 6 + [("swivel", 0.5)] * 4
+    # each fit's gun crews (one a pair, the pivot its own) and the bill's other stations
+    # fit inside her forty
+    bill = spec.crew.quarter_bill
+    others = sum(bill.trimmers.values()) + bill.helm + bill.powder
+    for fit in (tom, marque):
+        at_guns = sum(
+            g.crew for g in fit.guns if g.kind != "swivel" and g.side in ("starboard", None)
+        )
+        assert at_guns + others <= spec.crew.complement, fit.name
+    # everything but the guns, the bill and her words is the schooner's own
+    docs = []
+    for path in (plain_path, armed_path):
+        with open(path, encoding="utf-8") as f:
+            doc = yaml.safe_load(f)
+        doc.pop("armament", None)
+        doc["crew"].pop("quarter_bill", None)
+        doc["ship"].pop("era_notes")
+        doc["ship"].pop("descriptions", None)
+        docs.append(doc)
+    assert docs[0] == docs[1]
+
+
 # ---------------------------------------------------------------------------
 # Goals and plans
 # ---------------------------------------------------------------------------

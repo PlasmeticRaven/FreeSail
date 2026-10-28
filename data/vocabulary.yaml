@@ -795,6 +795,13 @@ verbs:
                call the pilot]
     object: person
     level: 1
+  # package 73 (spec M7 §16a): a holder hurt gives the deck and goes below to the surgeon,
+  # a person's own order at any station (object `needs`, freesail/orders/needs.py)
+  go below to the surgeon:
+    synonyms: [go to the surgeon, go below to the cockpit, go down to the surgeon, see the surgeon,
+               go below to have the wound dressed, go below with the wound, to the surgeon]
+    object: needs
+    level: 1
   go below:
     synonyms: [go below to the cabin, go to the cabin, go to my cabin, retire to the cabin,
                go down to the cabin, below]
@@ -920,6 +927,15 @@ verbs:
     level: 1
   enter:
     synonyms: [enter hands, recruit, ship hands, enter men, raise men, enter seamen]
+    object: port
+    level: 1
+  # powder and shot taken in (docs/design/Build-PracticeAndResupply.md §5)
+  take in powder and shot:
+    synonyms: [complete the powder and shot, complete her powder and shot, complete powder and shot,
+               demand powder and shot, indent for powder and shot, take in powder, take in shot,
+               take in ammunition, complete the magazine, fill the magazine, complete the powder,
+               complete the shot, demand powder, demand shot, indent for powder, indent for shot,
+               buy powder and shot, buy powder, buy shot, purchase powder, purchase shot]
     object: port
     level: 1
   # Package 37h: the pilot's hail answered (the owner's ruling of 5 October 2026, decision
@@ -1367,7 +1383,8 @@ verbs:
   # `none`, `evolutions` below; the beat is a crew order as `call all hands` is, at once,
   # `freesail/orders/crew.py`); the rest are the gun deck's orders (object `gunnery`,
   # `freesail/orders/gunnery.py`): standing intentions the battery keeps, and the one-shot
-  # orders that ride over them. The boarders are 73's (`refused_phrases`).
+  # orders that ride over them. The marines, the small arms and the boarders are
+  # package 73's (object `fight`, below).
   clear for action:
     synonyms: [clear ship for action, clear the ship for action, clear for battle, clear the decks for action]
     object: none
@@ -1433,12 +1450,209 @@ verbs:
     synonyms: [strike our colours, strike the ensign, strike to her, surrender, we strike]
     object: gunnery
     level: 1
+  # Package 73 (spec M7 §13, §14; docs/design/Design-WaterAndHealth.md): the water, the
+  # pumps and the damage control (object `damage`, freesail/orders/damage.py). The pumps
+  # are a standing work manned from the hands' pool, on until the well sucks or the word;
+  # the hatches, the plugs, the fothered sail, the preventers, the standing rigging set up,
+  # every parted running line rove in turn, the fished spar, the jury mast and the mast
+  # cut away are evolutions with hands and time (data/evolutions/*.yaml).
+  man the pumps:
+    synonyms: [rig the pumps, work the pumps, pump ship, pump her out, pump the ship out, man the chain pumps,
+               man the chain pump, hands to the pumps, turn the hands to the pumps, pump the ship,
+               get the pumps going, set the pumps going]
+    object: damage
+    level: 1
+  spell the pumps:
+    synonyms: [relieve the pumps, fresh hands to the pumps, spell the men at the pumps, relieve the men at the pumps,
+               spell ho]
+    object: damage
+    level: 1
+  secure the pumps:
+    synonyms: [stand down the pumps, the pumps crews stand down, knock off pumping, knock off the pumps,
+               belay the pumps, stop pumping, leave the pumps]
+    object: damage
+    level: 1
+  batten down the hatches:
+    synonyms: [batten down, batten the hatches down, batten down the hatchways, batten the hatches,
+               put the tarpaulins on the hatches, close the hatches]
+    object: damage
+    level: 1
+  open the hatches:
+    synonyms: [take off the hatches, unbatten the hatches, take the tarpaulins off the hatches, open the hatchways,
+               take the battens off]
+    object: damage
+    level: 1
+  plug the shot holes:
+    synonyms: [plug the shot hole, plug the holes, plug the hole, stop the shot holes, stop the shot hole,
+               the carpenter to the shot holes, send the carpenter to the shot holes, plug her,
+               plug the shot holes below the waterline]
+    object: damage
+    level: 1
+  stop the leak:
+    synonyms: [stop the leaks, find the leak, find and stop the leak, caulk the seams, caulk the seam,
+               caulk her seams, stop her leaks, the carpenter to the leak, send the carpenter to the leak]
+    object: damage
+    level: 1
+  fother a sail:
+    synonyms: [fother a sail over the leak, fother the leak, fother a sail under her, fother her,
+               fother a sail over the hole, thrum a sail and fother the leak, fother]
+    object: damage
+    level: 1
+  rig preventer braces:
+    synonyms: [rig the preventer braces, reeve preventer braces, rig preventers, reeve the preventer braces,
+               preventer braces]
+    object: damage
+    level: 1
+  rig preventer backstays:
+    synonyms: [rig the preventer backstays, set up preventer backstays, set up the preventer backstays,
+               preventer backstays, rig preventer stays]
+    object: damage
+    level: 1
+  sling the yards:
+    synonyms: [sling the yards with chains, chain sling the yards, put chain slings on the yards,
+               sling the lower yards, sling the yards in chains]
+    object: damage
+    level: 1
+  set up the rigging:
+    synonyms: [set up the standing rigging, set up the rigging shot away, set up the rigging again,
+               set up the shrouds and backstays, set up the shrouds, set up the backstays, set up the stays,
+               set up every shroud, knot and set up the rigging]
+    object: damage
+    level: 1
+  set up:
+    synonyms: [set up the, set up a new, knot and set up, knot and set up the]
+    object: damage
+    level: 1
+  reeve new lines:
+    synonyms: [reeve a new line, reeve new running rigging, reeve the running rigging, knot and splice the rigging,
+               knot and splice, reeve new lines throughout, reeve the parted lines, reeve every parted line,
+               reeve the lines, splice the rigging, reeve new gear, knot and splice the running rigging]
+    object: damage
+    level: 1
+  fish:
+    synonyms: [fish the, put a fish on, put a fish on the, woold and fish, woold and fish the, fish and woold]
+    object: damage
+    level: 1
+  rig a jury mast:
+    synonyms: [rig a jury, rig jury masts, rig a jury foremast, rig a jury mainmast, rig a jury mizzenmast,
+               rig a jury mizen, step a jury mast, get up a jury mast, rig jury mast]
+    object: damage
+    level: 1
+  cut away the mast:
+    synonyms: [cut away the mainmast, cut away the foremast, cut away the mizzenmast, cut away the mizen,
+               cut away the main mast, cut away the fore mast, cut away the mizzen mast, cut the mast away,
+               cut away the masts]
+    object: damage
+    level: 1
+  # Package 73 (spec M7 §11, §11a): the marines, the small arms and the fight on deck
+  # (object `fight`, `freesail/orders/fight.py`). The marines' fire is a standing intention
+  # within musket shot of a near deck (`combat/small_arms.py`); the small arms are served
+  # out by an evolution; `lay her aboard` is the chase's helm with the boarding's word,
+  # `grapple her` an evolution within thirty metres, and `boarders away` and `repel
+  # boarders` the fight on deck (`combat/boarding.py`), once refused here as 73's. The
+  # hail before the order ("marines, fire by volley") is read by the grammar
+  # (`orders/grammar.py` DIVISION_HAILS): the comma is the drill's.
+  marines fire by volley:
+    synonyms: [the marines fire by volley, marines fire a volley, marines open fire,
+               marines fire by volleys, the marines open fire, marines fire]
+    object: fight
+    level: 1
+  marines fire at will:
+    synonyms: [the marines fire at will, marines independent fire, marines fire independently]
+    object: fight
+    level: 1
+  marines hold your fire:
+    synonyms: [marines cease firing, the marines hold their fire,
+               marines hold fire, the marines cease firing]
+    object: fight
+    level: 1
+  marines to the tops:
+    synonyms: [send the marines into the tops, marines into the tops, marines aloft, send the marines aloft,
+               marksmen to the tops, send the marines to the tops, the marines to the tops]
+    object: fight
+    level: 1
+  marines to the gangways:
+    synonyms: [marines down from the tops, marines to the poop, marines to the poop and gangways, call the marines down,
+               marines down, the marines down from the tops, marines to the poop and the gangways]
+    object: fight
+    level: 1
+  serve out the small arms:
+    synonyms: [serve out small arms, serve out the arms, serve out cutlasses and pikes, serve out the cutlasses,
+               arm the boarders, issue the small arms, small arms to the boarders, serve out the pistols and cutlasses,
+               serve out pikes and cutlasses]
+    object: fight
+    level: 1
+  small arms fire at will:
+    synonyms: [small arms men fire at will, the small arms fire at will,
+               musketry at will, small-arms men fire at will]
+    object: fight
+    level: 1
+  small arms hold your fire:
+    synonyms: [small arms men hold your fire, small arms cease firing]
+    object: fight
+    level: 1
+  lay her aboard:
+    synonyms: [run her aboard, lay the enemy aboard, lay us aboard of her, board and carry her, lay her alongside,
+               run alongside her, prepare to board, stand by to board, lay him aboard, lay us alongside her]
+    object: fight
+    level: 1
+  grapple her:
+    synonyms: [grapple, throw the grapnels, grapple the enemy, get the grapnels on her, make fast to her,
+               lash her alongside, throw the grapplings, grapple him]
+    object: fight
+    level: 1
+  cast off the grapnels:
+    synonyms: [cast off the grapnel, cut the grapnels, cast her off, cut her adrift, cast off from her,
+               cut away the grapnels, cast off the grapplings, cut the grapplings]
+    object: fight
+    level: 1
+  boarders away:
+    synonyms: [away boarders, call away the boarders, man the boarders, board her, boarders away!, away boarders!,
+               board him, boarders over the side]
+    object: fight
+    level: 1
+  repel boarders:
+    synonyms: [stand by to repel boarders, repel boarders!, boarders repel, all hands to repel boarders,
+               repel the boarders, prepare to repel boarders]
+    object: fight
+    level: 1
+  bury the dead:
+    synonyms: [commit the dead to the deep, read the burial service, bury the killed, commit the bodies to the deep,
+               bury them]
+    object: damage
+    level: 1
   guns before sail:
     synonyms: [the guns before the sails, the guns first, guns first, serve the guns before the sails]
     object: gunnery
     level: 1
   sail before guns:
     synonyms: [the sails before the guns, the sails first, sails first, work the ship before the guns]
+    object: gunnery
+    level: 1
+  # practice at the great guns, and the gunner's filling (Build-PracticeAndResupply.md §4, §6)
+  heave a cask overboard:
+    synonyms: [heave a cask overboard for a mark, heave over a mark, heave a mark overboard,
+               put a cask over the side, put a mark over the side, drop a cask for a mark,
+               drop a cask, drop a mark]
+    object: gunnery
+    level: 1
+  exercise the guns:
+    synonyms: [exercise the great guns, exercise great guns, exercise at the guns, exercise the battery,
+               exercise both batteries, exercise the starboard battery, exercise the larboard battery,
+               exercise the starboard guns, exercise the larboard guns, exercise in dumb show,
+               exercise the guns in dumb show]
+    object: gunnery
+    level: 1
+  cease exercising:
+    synonyms: [cease the exercise, stop exercising, belay the exercise, end the exercise]
+    object: gunnery
+    level: 1
+  fill cartridges:
+    synonyms: [fill the cartridges, fill powder into cartridges, the gunner to fill cartridges]
+    object: gunnery
+    level: 1
+  cease filling:
+    synonyms: [stop filling, stop filling cartridges, cease filling cartridges, belay the filling]
     object: gunnery
     level: 1
   # package 71 (spec M7 §1 to §5): the colours, the signals, the private signal, the lights,
@@ -2071,21 +2285,6 @@ irrevocable:
 # standing order's action (`orders.read_whole`).
 # ---------------------------------------------------------------------------
 refused_phrases:
-  # package 70: the boarders and the fight on deck are the milestone's third combat
-  # package (spec M7 §11, §11a); the guns, the quarters and the strike are here
-  boarders away: &boarders "The boarders are not called away in this game yet: the small arms, the marines' fire and the fight on deck come with milestone 7's third combat package. The guns are served ('beat to quarters', 'cast loose the guns', 'engage her to starboard', 'fire as they bear'), and the colours are struck ('strike the colours')."
-  away boarders: *boarders
-  call away the boarders: *boarders
-  man the boarders: *boarders
-  board her: *boarders
-  prepare to board: *boarders
-  stand by to board: *boarders
-  repel boarders: *boarders
-  man the pumps: &pumps "The pumps are not worked in this game yet: the well is sounded and read ('sound the well', 'the well'), but pumping, leaks and shot holes come with milestone 7's taking on water; until then the director's hand may have the well pumped out ('aboard: the well pumped out'). 'Sound the well' reads it."
-  rig the pumps: *pumps
-  work the pumps: *pumps
-  pump ship: *pumps
-  pump her out: *pumps
   as you were: "'As you were' is not an order the ship keeps: say 'belay that' to stop the last order's work where it stands, 'belay all work' for everything in hand, or give the order that puts her back ('square the yards', 'steer SW by W')."
   lay out the stream anchor: &stream "The boat lays out the kedge and no other anchor in this game: say 'lay out a kedge astern' (or to a point, 'lay out a kedge to the NE'), 'let go the stream anchor' from the ship, or 'back the anchor' with the stream."
   lay out the stream: *stream

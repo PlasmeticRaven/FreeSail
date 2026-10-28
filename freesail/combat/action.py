@@ -32,6 +32,7 @@ import math
 from typing import Any
 
 from freesail import units
+from freesail.combat import filling, marks
 from freesail.combat import hits as HITS
 from freesail.combat.guns import Battery, FireMode, Firer, Target, battery_of
 from freesail.combat.morale import UNDER_FIRE_S, morale_of
@@ -69,6 +70,11 @@ def tick_action(world: Any) -> None:
     if battery is None:
         return
     quarters = quarters_of(ship)
+    if battery.exercise and (quarters is None or not quarters.at_quarters):
+        # practice and resupply (between packages 72 and 73): the dumb show is the hands'
+        # work at quarters, and ends when they are piped down from them; no order could end
+        # it after, `cease exercising` wanting the hands at quarters (judgement)
+        battery.end_exercise()
     tick = world.clock.tick
     minute = world.clock.ship_time.second == 0
     target = target_of(world, battery.target) if battery.target else None
@@ -85,7 +91,19 @@ def tick_action(world: Any) -> None:
     opened_before = dict(battery.opened_fire_at)
     battery.tick(1.0, quarters, firer, target, rng, tick, HITS.resolve_shot)
     if target is not None and battery.rounds_fired > fired_before:
-        _fired_on(world, battery, target, tick, opened_before)
+        if marks.is_mark(target.id):
+            # practice and resupply (the owner's, folded in by package 86): a mark is no
+            # sail, and nobody's people see the flash; its live rounds are counted against
+            # the month's allowance instead (`marks.count_live`)
+            marks.count_live(world, battery.rounds_fired - fired_before)
+        else:
+            _fired_on(world, battery, target, tick, opened_before)
+    # package 73 (spec M7 §11, §11a): the marines' and the small arms' fire within musket
+    # shot of a near deck, and the fight on deck while grappled
+    from freesail.combat import boarding, small_arms
+
+    small_arms.tick(world, ship, target, firer, tick, rng)
+    boarding.tick(world)
     if minute:
         line = battery.minute_line(tick)
         if line is not None:
@@ -94,6 +112,16 @@ def tick_action(world: Any) -> None:
         _damage_minute(world, ship, tick)
         _judge_morale(world, ship, battery, tick)
         _watch_struck(world, battery, tick)
+        # practice and resupply (the owner's, folded in by package 86): the dumb show's
+        # minute line (`Battery.exercise_line`), and the gunner's filling of cartridges at
+        # quarters (`filling.fill_tick`, which returns at once while the magazine is full)
+        drill = battery.exercise_line(tick)
+        if drill is not None:
+            world.record(Severity.ROUTINE, "practice.exercise", drill[0], data=drill[1])
+        filling.fill_tick(world, battery, quarters)
+    # the marks' minute after the battery's and its line (practice and resupply): the cask
+    # struck said, set by the stream, lost or lost to sight; nothing with no practice
+    marks.tick(world, battery, tick, minute)
 
 
 # -- the mark ---------------------------------------------------------------------------
@@ -101,7 +129,11 @@ def tick_action(world: Any) -> None:
 
 def target_of(world: Any, target_id: str) -> Target | None:
     """The mark's body and truth for this World's battery: a far vessel (her crewed World's
-    ship when crewed), or the player's ship for a crewed World."""
+    ship when crewed), or the player's ship for a crewed World; a mark for practice
+    (practice and resupply, between packages 72 and 73: the cask or the notional mark,
+    `marks.target_of_mark`), which needs no position of the ship's for the notional."""
+    if marks.is_mark(target_id):
+        return marks.target_of_mark(world, target_id)
     here = getattr(world, "position", None)
     if here is None:
         return None
@@ -461,6 +493,8 @@ def strike(world: Any, by_rule: bool, words: str = "") -> str:
         battery.mode = FireMode.HOLD
         battery.word = None
         battery.single = []
+        if battery.exercise:
+            battery.end_exercise()  # practice and resupply: the dumb show ends with the colours
     vessel = getattr(world, "vessel", None)
     if vessel is not None:
         vessel.struck = True

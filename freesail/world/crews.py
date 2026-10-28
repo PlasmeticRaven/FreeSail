@@ -526,6 +526,11 @@ def demote(world: World, vessel: Any) -> None:
             data={"id": vessel.id},
         )
     else:
+        # her persons and the things they keep out of the world's one registry with her
+        # World (package 84, step 2); step 5 keeps her instead
+        people = getattr(crew, "people", None)
+        if people is not None and hasattr(people, "discharge"):
+            people.discharge()
         vessel.crew = None
         vessel.detail = "far"
     world.vessels.crewed_ids = _crew_ids(world)

@@ -15,6 +15,11 @@ beat and the hands at their stations in a minute and a half; the guns cast loose
 provided in a minute (Douglas 1820, part II: "Cast loose your guns", the tackles cast off
 and the tompions out); the guns secured in two (run in, housed, the breechings and the
 tackles frapped). Every figure is the file's to tune.
+
+Practice at the great guns (practice and resupply, between packages 72 and 73;
+docs/design/Build-PracticeAndResupply.md §6): the cask hove over the side from the quarter
+for a mark (`HeaveMarkScript`), two hands' work for a minute that holds nothing of the
+ship's, so that it never holds her against a tack.
 """
 
 from __future__ import annotations
@@ -28,6 +33,7 @@ __all__ = [
     "ACTION_SCRIPTS",
     "CastLooseScript",
     "ClearForActionScript",
+    "HeaveMarkScript",
     "MakeSignalScript",
     "SecureGunsScript",
 ]
@@ -213,6 +219,15 @@ class SecureGunsScript(_QuartersScript):
             battery.mode = FireMode.HOLD
             battery.word = None
             battery.single = []
+            # practice and resupply: the dumb show ends with the guns secured, and a mark
+            # for practice is given up with them (a sail engaged is kept, as it was)
+            if battery.exercise:
+                battery.end_exercise()
+            from freesail.combat.marks import is_mark
+
+            if is_mark(battery.target):
+                battery.target = None
+                battery.target_words = ""
         q = _quarters(self.ship)
         if q is not None and q.at_quarters:
             q.stand_down()
@@ -291,9 +306,54 @@ class MakeSignalScript(PhasedScript):
         return {"words": str(self.params.get("words") or "the signal")}
 
 
+class HeaveMarkScript(PhasedScript):
+    """Heave a cask overboard for a mark (practice and resupply, between packages 72 and
+    73; `data/evolutions/heave_mark.yaml`): two hands at the quarter, an empty cask with a
+    flag on a staff over the side; one phase, `heave`, at whose end the cask is in the
+    water (`combat.marks.drop_cask`) from the quarter of the `side` param, four points
+    abaft the beam. Holds nothing of the ship's (the boat away's precedent,
+    `SendBoatScript`), so two hands at the quarter never hold her against a tack."""
+
+    DEFAULTS = {"heave": 60.0}
+    holds_subject = False
+
+    def holds(self) -> set[str]:
+        return set()
+
+    def _world(self) -> Any:
+        from freesail.orders.prompt import world_of
+
+        return world_of(self.ship)
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        world = self._world()
+        if world is None or getattr(world, "position", None) is None:
+            return "the ship sails alone, with no chart, and a cask over the side could not be seen"
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.start_phases(["heave"])
+
+    def end_phase(self, name: str) -> None:
+        world = self._world()
+        if world is None or getattr(world, "position", None) is None:
+            self.fail("the ship sails alone, with no chart")
+            return
+        from freesail.combat.marks import drop_cask
+
+        drop_cask(world, self._side())
+
+    def _side(self) -> str:
+        return "starboard" if str(self.params.get("side")) == "starboard" else "larboard"
+
+    def words(self) -> dict[str, Any]:
+        return {"side": self._side()}
+
+
 ACTION_SCRIPTS: dict[str, type[PhasedScript]] = {
     "clear_for_action": ClearForActionScript,
     "cast_loose_guns": CastLooseScript,
     "secure_guns": SecureGunsScript,
     "make_signal": MakeSignalScript,
+    "heave_mark": HeaveMarkScript,
 }

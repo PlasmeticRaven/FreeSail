@@ -708,6 +708,8 @@ crew:
       yard: 1
     # Spare rope (judgement).
     cordage_fathoms: 80
+    # The carpenter's shot plugs (package 73, spec M7 §14): tapered plugs of soft wood with oakum and tallow, kept ready in action (the Regulations and Instructions 1806, the Carpenter; Falconer 1780, PLUG: 'shot-plugs ... to stop holes made by cannon shot'); the count by her class, judgement. A cutter's 8.
+    shot_plugs: 8
     # The sail room (spec 3b §6.3), every sail new; see tools/gen_ships.py.
     sails:
     # A spare jib and mainsail (spec M5 §23, judgement).
@@ -747,8 +749,14 @@ crew:
     helm: 1
     # Two of the waisters to pass the cartridges (judgement).
     powder: 2
+    # The quarter gunners and the gunner's crew in the filling room, one to every four cannon (Falconer 1780, QUARTER-GUNNER, l.14283-14289); the swivels are not cannon (practice and resupply, between packages 72 and 73).
+    filling: 1
     # The fighting book's priority when sail work wants more hands than the trimmers give (spec M7 8a): 'sail before guns' robs the guns (the disengaged battery first) and the log says from where; 'guns before sail' makes the sail work wait short-handed. The player's book and the doctrine may say otherwise.
     priority: sail before guns
+    # Six of the cutter's best shots with the stand of arms' muskets (judgement); she bears no marines.
+    small_arms: 6
+    # Twenty of the cutter's seamen with cutlass and pistol (judgement: a cutter's company boards almost whole).
+    boarders: 20
 # The armament (spec M7 7; package 70): two fits the scenario chooses between (ship: {fit: ...}; the owner, 2026-10-23): the 12-pounder carronades the Admiralty gave its cutters from the 1790s, the default of 1805, and the long 3-pounders with eight swivels of the revenue and hired cutters. Every figure's source is in tools/gen_ships.py; the weights are from memory and UNVERIFIED against a page.
 armament:
   default: carronades
@@ -820,8 +828,18 @@ armament:
         height_m: 1.5
         crew: 4
         weight_cwt: 6.0
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
       cartridges:
-        12: 330
+        carronade:
+          12: 330
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        carronade:
+          12: 1.0
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 2
+      # The Regulations' allowance for exercise a month: a charge and a round shot for a fourth of the upper deck guns in a ship of one deck, for six months after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI, l.13122-13144; the Captain's chapter, l.8842-8879, gives a third); the first six months' figure, the game keeping no commissioning date (judgement).
+      exercise_charges: 1
       shot:
         12:
           round: 240
@@ -974,9 +992,20 @@ armament:
         height_m: 1.7
         crew: 1
         weight_cwt: 0.5
+      # The cartridges filled at the fitting out, by the gun's kind and calibre: a round a gun of the allowance below and a tenth over for the blank charges (judgement); the gunner fills more from the powder below as they are fired (combat/filling.py).
       cartridges:
-        3: 330
-        0.5: 352
+        long:
+          3: 330
+        swivel:
+          0.5: 352
+      # A cartridge's powder in pounds, to the ounce: a long gun a third of its shot's weight (Falconer 1780, CANNON, quoting Robins, l.4826-4831: a third 'or even less' would be an advantage; the service charge of 1805 a third from memory, UNVERIFIED), a carronade a twelfth (from memory, UNVERIFIED), a swivel a half (Falconer's smaller pieces, l.4827: judgement). Package 75 replaces them from the Regulations' Table No. 29 (OCR l.27498-27502), whose figures the OCR lost.
+      charges:
+        long:
+          3: 1.0
+        swivel:
+          0.5: 0.25
+      # The powder below in barrels of a hundred pounds (Falconer 1780, the French glossary, 'Baril de poudre', l.22563-22564; the English barrel's weight UNVERIFIED), half the filled powder rounded up to the barrel (judgement: the period kept most of its powder in the barrels).
+      powder_barrels: 3
       shot:
         3:
           round: 240
@@ -987,6 +1016,19 @@ armament:
 # The hold (package 35, spec M5 §23): room for 42 tons of cargo beyond her own stores, 0.5 of the 85 tons burthen (a revenue cutter's hold less her own stores: judgement; Falconer 1780, HOLD); see tools/gen_ships.py.
 hold:
   capacity_tons: 42
+# The pumps (package 73, spec M7 §13): the chain pump of Cole and Bentinck, a ton in 43 seconds and a half with four men (Falconer 1780, PUMP), and the common brake pump with two; the counts by the ship's class (Lavery, Arming and Fitting; Steel 1794); see tools/gen_ships.py.
+pumps:
+# A brake pump (the common or elm-tree pump): two men, 15 tons an hour fresh (judgement).
+- id: pump.hand.1
+  kind: hand
+  name: the starboard pump
+  tons_per_hour: 15.0
+  hands: 2
+- id: pump.hand.2
+  kind: hand
+  name: the larboard pump
+  tons_per_hour: 15.0
+  hands: 2
 # The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 (BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule for the boat herself; see tools/gen_ships.py.
 boats:
 # The cutter's boat, a yawl of four oars (Falconer, YAWL), on the deck amidships.

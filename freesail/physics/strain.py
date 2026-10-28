@@ -518,7 +518,21 @@ def _carry_away(ship: Ship, st: StrainState, part: Part, ratio: float) -> None:
 
 def _part_line(ship: Ship, st: StrainState, line: Line, ratio: float, how: str = "parted") -> None:
     """A line parted, by the strain or by a shot (`how`: "parted", "shot away"; package
-    70, rule 1: the same state by another cause)."""
+    70, rule 1: the same state by another cause). A line with a preventer rove beside it
+    (package 73, spec M7 §14) keeps its office: the preventer takes the strain and is
+    consumed, said in a line of its own, and nothing else changes."""
+    if getattr(line, "preventer", False):
+        line.preventer = False
+        line.load_kn = 0.0
+        name = _name(ship, line.id)
+        ship.note(
+            "notable",
+            "line.preventer_held",
+            f"{name} {how}; the preventer holds, and the gear stands.",
+            subject=line.id,
+            data=_data(line, ratio) | {"how": how, "preventer": True},
+        )
+        return
     line.state = LineState.PARTED
     line.load_kn = 0.0
     st.parted.append(line.id)

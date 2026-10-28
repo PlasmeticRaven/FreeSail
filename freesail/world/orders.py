@@ -520,20 +520,28 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             raise WorldOrderError(f"No ship named {m.group('name')!r} is on the sea.")
         im = _INTENT_TAIL.match(m.group("goal"))
         if im:
-            # a brain given to a ship on the sea, or her intent changed (package 43)
+            # a brain given to a ship on the sea, or her intent changed (package 43); words
+            # no form reads are taken as a free intent, said with the warning and why the
+            # rules-based captain cannot sail by them (the owner's lead, 2026-10-26)
             from freesail.world.brains import FarCaptain
+            from freesail.world.captains import FREE, FREE_WARNING, read_intent
 
+            refused = ""
+            try:
+                read_intent(world, im.group("words"))
+            except ValueError as e:
+                refused = str(e)
             try:
                 vessel.warning = ""  # the guard's word on her goal's legs: her captain plans anew
                 if vessel.brain is None:
-                    vessel.brain = FarCaptain(world, vessel, im.group("words"))
+                    vessel.brain = FarCaptain(world, vessel, im.group("words"), free=True)
                     vessel.intent_words = vessel.brain.intent_words
                     vessel.brain._plan()
                     words = f"the captain of {vessel.name} given an intent"
                 else:
                     if vessel.crew is not None and getattr(vessel.crew, "captain", None):
-                        vessel.crew.captain.set_intent(im.group("words"))
-                    vessel.brain.set_intent(im.group("words"))
+                        vessel.crew.captain.set_intent(im.group("words"), free=True)
+                    vessel.brain.set_intent(im.group("words"), free=True)
                     vessel.intent_words = vessel.brain.intent_words
                     words = f"the intent of {vessel.name}'s captain changed"
             except ValueError as e:
@@ -541,10 +549,14 @@ def _ship(world: Any, body: str) -> tuple[str, dict[str, Any]]:
             if vessel.warning:
                 raise WorldOrderError(f"{vessel.name} {vessel.warning}")
             vessel.done = False
-            return f"{words}: {vessel.brain.intent.words}", {
-                "id": vessel.id,
-                "intent": vessel.brain.intent.words,
-            }
+            data = {"id": vessel.id, "intent": vessel.brain.intent.words}
+            if vessel.brain.intent.kind == FREE:
+                data["free"] = True
+                return (
+                    f"{words}: {vessel.brain.intent.words} ({FREE_WARNING}; {refused})",
+                    data,
+                )
+            return f"{words}: {vessel.brain.intent.words}", data
         om = _ORDERS_OF_TAIL.match(m.group("goal"))
         if om:
             return _orders_of(world, vessel, om.group("boss"))
@@ -1839,7 +1851,7 @@ def _say_as_parts(world: Any, body: str, draw: bool) -> tuple[Any, str]:
     people = getattr(world, "people", None)
     # one of the people by role or name first, as before; then a station's person or one
     # of the ship's own voices (package 66); then a man of the muster by his trade
-    person = people.find(who) if people is not None else None
+    person = people.find_anywhere(who) if people is not None else None
     if person is None:
         person = _by_station_or_voice(world, who)
     if person is None:
@@ -2013,7 +2025,11 @@ def _say_as(world: Any, body: str) -> tuple[str, dict[str, Any]]:
     # among them, or nobody and where the stations held are
     from freesail.world.hearing import heard_words, spot_of
 
-    spot = ("aboard", "quarterdeck") if place == "masthead" else spot_of(world, person)
+    spot = (
+        ("aboard", str(world.own.id), "quarterdeck")
+        if place == "masthead"
+        else spot_of(world, person)
+    )
     said = heard_words(world, spot, person, names, absent=_wanted(world))
     data: dict[str, Any] = {"person": person.name, "heard_by": names}
     if answered:
@@ -2025,14 +2041,13 @@ def _hearers_ashore(world: Any, person: Any) -> list[Any]:
     """The stations held whose person is at the same place ashore as `person` (package
     66; the director's has no place)."""
     from freesail.agents.agent import DIRECTOR
-    from freesail.agents.harness import _stations_held
-    from freesail.world.hearing import spot_of, station_spot, within_hearing
+    from freesail.world.hearing import spot_of, station_spot, stations_everywhere, within_hearing
 
     here = spot_of(world, person)
     return [
         h
-        for h in _stations_held(world)
-        if h.station.name != DIRECTOR and within_hearing(here, station_spot(world, h.station.name))
+        for w, h in stations_everywhere(world)
+        if h.station.name != DIRECTOR and within_hearing(here, station_spot(w, h.station.name))
     ]
 
 
@@ -2253,6 +2268,8 @@ SLOTS: dict[str, Any] = {
     "anchor": lambda world, words: _anchor_by_name(getattr(world, "ship", None), words),
     "good": _good_by_name,
     "gun": lambda world, words: _gun_by_name(getattr(world, "ship", None), words),
+    # package 73: a person by his role or his name ('the first lieutenant', 'Mr Pearce')
+    "person": lambda world, words: _person_by_name(world, words),
 }
 _SLOT = re.compile(r"\{(" + "|".join(SLOTS) + r")\}")
 
@@ -2264,6 +2281,18 @@ def _slot_of(thing: dict[str, Any]) -> str | None:
         if m is not None:
             return m.group(1)
     return None
+
+
+def _person_by_name(world: Any, words: str) -> str | None:
+    """A person of the ship's company by his role or his name (package 73): his id."""
+    people = getattr(world, "people", None)
+    if people is None:
+        return None
+    try:
+        p = people.find(words)
+    except Exception:  # noqa: BLE001
+        return None
+    return p.id if p is not None and getattr(p, "aboard", True) else None
 
 
 def _gun_by_name(ship: Any, words: str) -> str | None:
@@ -2296,6 +2325,10 @@ def _target_words(world: Any, thing: dict[str, Any], target: str | None) -> str:
     if slot == "gun":
         gun = (getattr(ship, "guns", None) or {}).get(target)
         return gun.name if gun is not None else str(target)
+    if slot == "person":
+        people = getattr(world, "people", None)
+        p = next((x for x in getattr(people, "people", []) if x.id == target), None)
+        return p.name if p is not None else str(target)
     return str(target)
 
 
@@ -2716,10 +2749,11 @@ def _doubt_aboard_new(world: Any, body: str) -> str | None:
 def _doubt_thing_moved(world: Any, thing: Any, where: dict[str, Any]) -> str | None:
     from freesail.world import things as TH
 
-    here_place, here_port, _ = TH.place_of(world, thing)
+    here_place, here_port, _, _hull = TH.place_of(world, thing)
     if where.get("keeper"):
         people = getattr(world, "people", None)
-        to = next((p for p in people.all if p.id == where["keeper"]), None)
+        everyone = getattr(people, "everyone", None) or people.all  # any hull's (step 2)
+        to = next((p for p in everyone if p.id == where["keeper"]), None)
         if to is None:
             return None
         if to.aboard or to.where in ("boat", "cutter"):
@@ -2933,25 +2967,100 @@ def _fx_glass(world, thing, target, name, value, data) -> str:
 
 
 def _fx_leak_stopped(world, thing, target, name, value, data) -> str:
-    # the grounding's leak (`world.ground`) stopped: the well gains no more, aground or not
+    # the ground's leak and every started seam stopped (package 73: the keeper's, as the
+    # carpenter's caulking stops them); the shot holes are the carpenter's plugs
     extra = world.ship.extra
     was = float(extra.get("leak_m_per_h", 0.0) or 0.0)
-    extra["leak_m_per_h"] = 0.0
-    data.update({"leak_stopped": True, "leak_m_per_h_was": round(was, 3)})
+    stopped = world.water.stop_leaks(int(world.clock.tick))
+    data.update({"leak_stopped": True, "leak_m_per_h_was": round(was, 3), "stopped": stopped})
     return "the leak stopped"
 
 
 def _fx_well_pumped(world, thing, target, name, value, data) -> str:
     hull = world.ship.hull
     was = float(hull.water_in_well_m)
-    hull.water_in_well_m = 0.0
-    ground = getattr(world, "ground", None)
-    if ground is not None:
-        # the carpenter's reports count the feet afresh from a dry well
-        ground._feet_said = 0
-        ground._waterlogged_said = False
-    data.update({"well_pumped": True, "well_m_was": round(was, 2)})
+    tons = world.water.pump_out()
+    data.update({"well_pumped": True, "well_m_was": round(was, 2), "tons": round(tons, 1)})
     return f"the well pumped dry ({was:.2f} m of water pumped out)"
+
+
+def _fx_leak_started(world, thing, target, name, value, data) -> str:
+    """A seam found working (package 73: modelled now): a leak of so many tons an hour
+    from a started seam, until the carpenter caulks it (`stop the leak`)."""
+    seam = world.water.start_seam(float(value), "a seam started below the wale")
+    data.update({"leak_t_per_h": float(value), "seam_since": seam["since"]})
+    return f"a seam started, making {float(value):g} tons an hour"
+
+
+def _fit_men(world: Any) -> list[Any]:
+    crew = (getattr(world.ship, "extra", None) or {}).get("crew")
+    if crew is None:
+        return []
+    from freesail.crew.model import Station
+
+    return [
+        s for s in crew.sailors if s.fit and not s.hurt and s.station is not Station.QUARTERDECK
+    ]
+
+
+def _fx_sick_men(world, thing, target, name, value, data) -> str:
+    """So many men taken ill (package 73): on the sick list by the health keeper, with the
+    thing's `cause` words."""
+    from freesail.crew.model import number_words
+
+    n = max(1, int(value or 1))
+    rng = world.rng.stream("health")
+    pool = _fit_men(world)
+    taken = []
+    while pool and len(taken) < n:
+        taken.append(pool.pop(int(rng.random() * len(pool)) % len(pool)))
+    how = str(thing.get("cause") or "a fever")
+    sick = world.health.make_sick(taken, how, int(world.clock.tick))
+    data.update({"sick": [s.id for s in sick], "names": [s.name for s in sick], "how": how})
+    return f"{number_words(len(sick))} on the sick list ({how})"
+
+
+def _fx_sick_share(world, thing, target, name, value, data) -> str:
+    """That share of the fit men taken ill (package 73): the fever in the ship."""
+    pool = _fit_men(world)
+    n = max(1, int(round(float(value or 0.1) * len(pool))))
+    return _fx_sick_men(world, thing, target, name, n, data)
+
+
+def _fx_person_hurt(world, thing, target, name, value, data) -> str:
+    """A person of the company hurt by the director's hand (package 73): the health
+    keeper's wound, light or grave as the thing says, his station told its roads as the
+    shot's hit tells them."""
+    people = world.people
+    p = next((x for x in people.people if x.id == target), None)
+    crew = (getattr(world.ship, "extra", None) or {}).get("crew")
+    sailor = (
+        crew.by_id.get(getattr(p, "sailor_id", None))
+        if crew is not None and p is not None
+        else None
+    )
+    if sailor is None:
+        raise WorldOrderError(f"{name} is no man of the muster to be hurt")
+    if sailor.hurt:
+        raise WorldOrderError(f"{name} is {sailor.hurt} already")
+    grave = str(value or "light").lower() == "grave"
+    how = str(thing.get("cause") or "a fall")
+    rng = world.rng.stream("health")
+    world.health.hit(sailor, False, rng, int(world.clock.tick), how=how)
+    sailor.wound = "grave" if grave else "light"
+    data.update({"person": p.id, "sailor": sailor.id, "wound": sailor.wound, "how": how})
+    return f"{name} wounded ({how}, {'dangerously' if grave else 'lightly'})"
+
+
+def _fx_surgeon_sick(world, thing, target, name, value, data) -> str:
+    """The surgeon taken ill (package 73): off his work, the wounded to their messmates
+    and his mates until he is up."""
+    surgeon = world.health.surgeon()
+    sick = world.health.make_sick(
+        [surgeon], str(thing.get("cause") or "a fever"), int(world.clock.tick)
+    )
+    data.update({"sick": [s.id for s in sick], "names": [s.name for s in sick]})
+    return f"the surgeon, {surgeon.name}, on his own sick list"
 
 
 def _fx_gun_dismounted(world, thing, target, name, value, data) -> str:
@@ -3001,6 +3110,12 @@ _ABOARD_EFFECTS: dict[str, Any] = {
     "glass_broken": _fx_glass,
     "leak_stopped": _fx_leak_stopped,
     "well_pumped": _fx_well_pumped,
+    "leak_tons_per_h": _fx_leak_started,
+    # package 73 (item 8): the people's health by the director's hand
+    "sick_men": _fx_sick_men,
+    "sick_share": _fx_sick_share,
+    "person_hurt": _fx_person_hurt,
+    "surgeon_sick": _fx_surgeon_sick,
 }
 
 
@@ -3043,7 +3158,27 @@ def _lacks_hull(world: Any) -> str | None:
 
 # What a thing's effect wants of the ship before it is done (else the game has no way to
 # do it as said, and nothing changes): by the effect's key, the reason she lacks it or None.
+def _lacks_muster(world: Any) -> str | None:
+    crew = (getattr(getattr(world, "ship", None), "extra", None) or {}).get("crew")
+    if crew is None or getattr(world, "health", None) is None:
+        return "she keeps no muster"
+    return None
+
+
+def _lacks_surgeon(world: Any) -> str | None:
+    why = _lacks_muster(world)
+    if why:
+        return why
+    if world.health.surgeon() is None:
+        return "she bears no surgeon, or he is ill already"
+    return None
+
+
 _ABOARD_LACKS: dict[str, Any] = {
+    "sick_men": _lacks_muster,
+    "sick_share": _lacks_muster,
+    "person_hurt": _lacks_muster,
+    "surgeon_sick": _lacks_surgeon,
     "water_share": _lacks_stores,
     "provisions_share": _lacks_stores,
     "provisions_days": _lacks_stores,
@@ -3078,6 +3213,7 @@ ABOARD_PLAUSIBLE_KEYS = frozenset(
         "at_anchor",
         "leaking",
         "well_above",
+        "pumps_cannot",  # package 73: the ship's own pumps could not do it
     }
 )
 
@@ -3587,11 +3723,29 @@ def _plausible_at_anchor(world: Any, target: str | None, value: Any) -> bool:
 
 
 def _plausible_leaking(world: Any, target: str | None, value: Any) -> bool:
-    """She is making water from a grounding (`world.ground`'s leak), or with `false` she
-    is not."""
-    extra = getattr(getattr(world, "ship", None), "extra", None) or {}
-    leaking = float(extra.get("leak_m_per_h", 0.0) or 0.0) > 0.0
+    """She is making water from a grounding or a started seam (the keeper's leaks of the
+    ground's and a seam's kinds, package 73), or with `false` she is not."""
+    water = getattr(world, "water", None)
+    leaking = water is not None and any(lk.kind in ("the ground", "a seam") for lk in water.leaks())
     return leaking == bool(value)
+
+
+def _plausible_pumps_idle(world: Any, target: str | None, value: Any) -> bool:
+    """The ship's own pumps cannot do it (package 73): she has no pumps, or no company to
+    man them, or they are manned and losing; with pumps and hands idle the well pumped out
+    by a cause is doubted (the captain's `man the pumps` does it)."""
+    water = getattr(world, "water", None)
+    ship = getattr(world, "ship", None)
+    if water is None or ship is None:
+        return bool(value)
+    pumps = water.pumps
+    crew = (getattr(ship, "extra", None) or {}).get("crew")
+    if not pumps.specs() or crew is None:
+        return bool(value)
+    if pumps.manned:
+        st = water.state
+        return bool(value) == bool(st is not None and st.gaining is False)
+    return not bool(value)
 
 
 def _plausible_well_above(world: Any, target: str | None, value: Any) -> bool:
@@ -3628,4 +3782,5 @@ _PLAUSIBLE: dict[str, Any] = {
     "at_anchor": _plausible_at_anchor,
     "leaking": _plausible_leaking,
     "well_above": _plausible_well_above,
+    "pumps_cannot": _plausible_pumps_idle,  # package 73
 }

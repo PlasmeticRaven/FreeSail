@@ -1,0 +1,23 @@
+# Cut away a lower mast (spec M7 §14; package 73; scripted, CutAwayMastScript in
+# evolutions/repair_scripts.py). A standing lower mast cut away by the axes at the
+# partners and the lanyards of its rigging: "the mizen-mast must instantly be cut away"
+# (Falconer 1780, VEERING, a ship that will not wear in a gale); a ship on her beam ends
+# righted by cutting away her masts (Luce 1884, ch. XXIX 'On her Beam Ends'). The mast goes
+# over the side with all it carries, as a mast carried away does (the strain model's own
+# wrecking, `how="cut away"`), and the wreck is cleared with it. Phases: axes (on deck: the
+# lanyards and the mast cut through), clear (on deck: the wreck cut adrift).
+id: cut_away_mast
+verb: cut_away_mast
+applies_to: {class: spar}
+script: cut_away_mast
+preconditions: []
+timing:
+  axes_s: 600    # the lanyards cut and the mast cut through at the partners: ten minutes (judgement)
+  clear_s: 300   # the wreck cut adrift from the chains: five minutes (judgement)
+on_start: {log: "Cut away the {spar}! Axes to the lanyards and the partners."}
+on_complete: {log: "{done}", kind: mast.cut_away, severity: urgent}
+on_fail: {log: "Could not cut away the {spar}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the carpenter's crew with the axes and the afterguard at the lanyards: ten hands
+# (judgement)
+crew: {hands: 10, rating: ordinary, stations: [idlers, afterguard, forecastle, waisters]}
+source: "Falconer 1780, VEERING ('the mizen-mast must instantly be cut away'); Luce 1884, ch. XXIX 'On her Beam Ends'; the minutes judgement"

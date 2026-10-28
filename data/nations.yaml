@@ -42,6 +42,10 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: britain, system: well-built}
+    # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
+    # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
+    # the share aloft); the detachment itself is the ship file's
+    marines: {kit: british}
     # package 72 (spec M7 §22; docs/design/Design-Squadrons.md): the nation's naval knobs,
     # read by the world's business and the regimes (data/regimes.yaml): the British keep
     # the sea, engage, blockade Brest, and convoy their trade under a brig-sloop
@@ -74,6 +78,10 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: france, system: well-built}
+    # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
+    # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
+    # the share aloft); the detachment itself is the ship file's
+    marines: {kit: french}
     # package 72 (spec M7 §22): the French keep port under the blockade and slip out when
     # it is blown off; a frigate in ordinary at Brest with her sortie; the corsairs chase
     # what pays
@@ -108,6 +116,10 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
+    # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
+    # the share aloft); the detachment itself is the ship file's
+    marines: {kit: basic}
     # package 72 (spec M7 §22): the Spanish keep port with the French
     naval:
       keeps_the_sea: false
@@ -138,6 +150,10 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
+    # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
+    # the share aloft); the detachment itself is the ship file's
+    marines: {kit: basic}
     # package 72 (spec M7 §22): the Dutch keep port in the Texel
     naval:
       keeps_the_sea: false
@@ -167,6 +183,10 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
+    # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
+    # the share aloft); the detachment itself is the ship file's
+    marines: {kit: basic}
     # package 72 (spec M7 §22): the Americans of 1812 keep the sea in single ships and
     # fight single actions; at peace in 1805, so nothing of it is drawn
     naval:
@@ -198,6 +218,10 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
+    # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
+    # the share aloft); the detachment itself is the ship file's
+    marines: {kit: basic}
     # package 72 (spec M7 §22): no navy of her own at sea in 1805 to speak of
     naval:
       keeps_the_sea: false
@@ -227,6 +251,10 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
+    # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
+    # the share aloft); the detachment itself is the ship file's
+    marines: {kit: basic}
     # package 72 (spec M7 §22): at peace, her navy in Copenhagen
     naval:
       keeps_the_sea: false
@@ -261,6 +289,10 @@ nations:
     # package 71 (spec M7 §3): her signal books' root under data/signals/ and whether it is a
     # well-built book or the basic system every nation stands on (docs/design/Design-Signals.md)
     signals: {root: basic, system: basic}
+    # package 73 (spec M7 §11; the owner's note 3): the marines' kit by nation, a key of
+    # data/marines.yaml (the musket, the sergeant's and the officer's arms, the volley,
+    # the share aloft); the detachment itself is the ship file's
+    marines: {kit: basic}
     # package 72 (spec M7 §22): the Emperor's few cruisers, at peace with all
     naval:
       keeps_the_sea: false

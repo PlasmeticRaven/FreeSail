@@ -112,6 +112,44 @@ class Quarters:
         self.priority = str(getattr(bill, "priority", "sail before guns") or "sail before guns")
         self._robbed_lines: list[str] = []
 
+    # -- the marines between the carronades and their muskets (package 73, spec M7 §11) ----
+
+    def marines_to_arms(self) -> int:
+        """The marines leave the guns for their muskets (the quarterdeck carronades they
+        serve at the beat, Luce 1884 ch. XX, go short by them): every fit marine at a gun
+        into the marines' division. Returns how many moved."""
+        from freesail.crew.model import Station
+
+        moved = 0
+        division = self.divisions.setdefault(MARINES, [])
+        for gc in self.crews.values():
+            keep = []
+            for s in gc.members:
+                if s.station is Station.MARINES and s.fit:
+                    s.quarters = MARINES
+                    division.append(s)
+                    moved += 1
+                else:
+                    keep.append(s)
+            gc.members = keep
+        return moved
+
+    def marines_to_guns(self) -> int:
+        """The marines back to the carronades from their muskets: each short crew made up
+        from the division, the carronades first. Returns how many moved."""
+        division = self.divisions.get(MARINES, [])
+        if not division:
+            return 0
+        moved = 0
+        crews = sorted(self.crews.values(), key=lambda gc: (gc.kind != "carronade", gc.key))
+        for gc in crews:
+            while len(gc.members) < gc.wanted and division:
+                s = division.pop(0)
+                s.quarters = gc.key
+                gc.members.append(s)
+                moved += 1
+        return moved
+
     # -- the beat to quarters and the pipe down ------------------------------------------
 
     def beat(self, tick: int) -> list[str]:
@@ -248,7 +286,8 @@ class Quarters:
     def casualties(self) -> tuple[int, int]:
         """(killed, wounded) of the whole company, by the muster's hurt."""
         killed = sum(1 for s in self.crew.sailors if s.hurt == "killed")
-        wounded = sum(1 for s in self.crew.sailors if s.hurt and s.hurt != "killed")
+        killed += len(getattr(self.crew, "dead", []) or [])  # buried (package 73)
+        wounded = sum(1 for s in self.crew.sailors if s.hurt in ("wounded", "hurt"))
         return killed, wounded
 
     # -- robbing by the fighting book's priority ----------------------------------------
@@ -315,7 +354,12 @@ class Quarters:
             gid = k[len(GUN_PREFIX) :]
             g = self.ship.guns.get(gid)
             if g is not None:
-                kinds.add("the swivels" if g.place == "rail" else f"the {g.place} chasers")
+                if g.place == "rail":
+                    kinds.add("the swivels")
+                elif g.place == "pivot":
+                    kinds.add("the pivot gun")
+                else:
+                    kinds.add(f"the {g.place} chasers")
         parts += sorted(kinds)
         if numbers:
             if len(numbers) == 1:
@@ -386,7 +430,7 @@ def quarters_of(ship: Any) -> Quarters | None:
 
 
 def _gun_order(g: Gun) -> tuple[int, float, str]:
-    place = {"broadside": 0, "bow": 1, "stern": 1, "rail": 2}.get(g.place, 3)
+    place = {"broadside": 0, "pivot": 0, "bow": 1, "stern": 1, "rail": 2}.get(g.place, 3)
     return (place, -g.x_m, g.id)
 
 

@@ -1,0 +1,24 @@
+# Set up the standing rigging shot away or parted (spec M7 §14; package 73; scripted,
+# SetUpRiggingScript in evolutions/repair_scripts.py). The shrouds, the backstays and the
+# stays are not rove but set up: "the shrouds are set up with lanyards through the
+# dead-eyes" (Lever 1808, 'Setting up the Shrouds'; 'Rigging the Lower Masts'); a shroud
+# shot away is knotted or a new one got over the masthead and set up again with deadeyes
+# and lanyards. Every parted standing line in turn (or the one named, `params.line_words`),
+# a phase a line, its time by its class; each new line takes its fathoms from the
+# boatswain's store (`crew.stores.cordage_fathoms`) and stands sound at the file's rating.
+id: set_up_rigging
+verb: set_up
+applies_to: {class: ship}
+script: set_up_rigging
+params: {line_words: "", aloft: [shroud, backstay, stay]}
+preconditions: []
+timing:
+  shroud_s: 2700    # a shroud got over the masthead, turned in and set up: three quarters of an hour (judgement)
+  backstay_s: 2700  # a backstay the same (judgement)
+  stay_s: 3600      # a stay, the heaviest rope aloft, got over and set up: an hour (judgement)
+on_start: {log: "{begin}"}
+on_complete: {log: "{done}", kind: rigging.set_up, severity: notable}
+on_fail: {log: "Could not set up the rigging: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the boatswain's party aloft and at the lanyards: ten able hands (judgement)
+crew: {hands: 10, rating: able, stations: [topmen, forecastle, afterguard]}
+source: "Lever 1808, 'Rigging the Lower Masts', 'Setting up the Shrouds' (deadeyes and lanyards); Steel 1794 vol. I, the tables of standing rigging; the minutes judgement"

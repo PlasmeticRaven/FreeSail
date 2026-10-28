@@ -1104,9 +1104,9 @@ REGISTRY.add(Reading("watch_below", ("the watch below",), "hands", "", _watch_be
 def _well(world: Any, _: str | None) -> dict[str, Any] | None:
     """`the well`: the water in the well by the carpenter's last sounding (`sound the
     well`, `world.ground.sound_well`), with its age; None before a sounding. The water is
-    the grounding's leak's and nothing else's yet (the pumps are milestone 7's, with taking
-    on water), and it moves nothing of her handling: a reading of the carpenter's, not of the ship's
-    trim."""
+    the keeper's (`freesail/world/water.py`, package 73: the shot holes, the ground, the
+    seams and the sea, less the pumps); its free surface reaches the stability through
+    `parts.Hull.gm_m` and nothing else of her handling: a reading of the carpenter's."""
     extra = getattr(getattr(world, "ship", None), "extra", None) or {}
     said = extra.get("well_sounded")
     if said is None:
@@ -1114,7 +1114,10 @@ def _well(world: Any, _: str | None) -> dict[str, Any] | None:
     tick, metres, words = said
     clock = getattr(world, "clock", None)
     age_s = (clock.tick - tick) if clock is not None else 0
-    return {"metres": metres, "words": words, "age_s": age_s}
+    # package 73: the keeper's gain and the pumps' state after the sounding's words
+    from freesail.api.damage_readings import well_tail
+
+    return {"metres": metres, "words": words + well_tail(world), "age_s": age_s}
 
 
 def _no_sounding_words(world: Any) -> str | None:
@@ -3377,13 +3380,47 @@ def _line_where(world: Any, person: Any) -> str:
     return place_words(place) if place else ""
 
 
+def health_words_for(world: Any, person: Any) -> str:
+    """The person's hurt in the muster's words (package 73, spec M7 §16a): 'hit: a splinter
+    in the thigh, dangerously, undressed', 'hurt (a cut on the head), at light duty',
+    'dead'; '' for a whole man or a person who is no man of the muster."""
+    if person is None:
+        return ""
+    if getattr(person, "dead", False):
+        return "dead"
+    crew = (getattr(getattr(world, "ship", None), "extra", None) or {}).get("crew")
+    sid = getattr(person, "sailor_id", None)
+    if crew is None or not sid:
+        return ""
+    s = crew.by_id.get(sid)
+    if s is None or not s.hurt:
+        return ""
+    from freesail.crew.health import hurt_words
+
+    words = hurt_words(s)
+    if s.hurt == "wounded":
+        words += ", dressed" if getattr(s, "dressed", False) else ", not yet dressed"
+        if person.where == "cockpit":
+            words += ", below with the surgeon"
+    return words
+
+
 def _line_state(world: Any, person: Any) -> str:
     """'on your feet since 05:02, hungry', 'asleep below': the person's own state in the
     needs' words when they have any (the steps that are said; spec M7b §20), with when he
-    last woke; '' for a person whose needs nobody keeps."""
+    last woke; his hurt (package 73) before them; '' for a person whose needs nobody
+    keeps."""
     keeper = getattr(world, "needs", None)
     if keeper is None or person is None:
         return ""
+    hurt = health_words_for(world, person)
+    if hurt:
+        rest = _line_state_needs(world, person, keeper)
+        return f"{hurt}; {rest}" if rest else hurt
+    return _line_state_needs(world, person, keeper)
+
+
+def _line_state_needs(world: Any, person: Any, keeper: Any) -> str:
     from freesail.world.needs import FATIGUE, needs_of
 
     n = needs_of(person)
@@ -4010,6 +4047,15 @@ from freesail.api import signal_readings as _signal_readings  # noqa: E402
 _signal_readings.register()
 
 # The squadron's, the station's and the convoy's (package 72), after the signals'.
+from freesail.api import damage_readings as _damage_readings  # noqa: E402
 from freesail.api import squadron_readings as _squadron_readings  # noqa: E402
 
 _squadron_readings.register()
+_damage_readings.register()  # package 73: the pumps, the leaks, the hatches, the water
+
+# Practice and resupply's (the owner's, folded in by package 86 after 73;
+# docs/design/Build-PracticeAndResupply.md §1.7, §8): the practice's row and the events of
+# the filling, the hoy and the marks, after the squadron's and the damage's.
+from freesail.api import practice_readings as _practice_readings  # noqa: E402
+
+_practice_readings.register()

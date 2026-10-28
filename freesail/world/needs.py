@@ -561,7 +561,15 @@ class NeedsKeeper:
         short = aboard and stores is not None and getattr(stores, "allowance", 1.0) < 1.0
         n.ate = now - int(self.table.short_allowance_hours_left * 3600) if short else now
         n.told[HUNGER] = 0
-        if where in self.table.places_with_food or not aboard:
+        if aboard and where in self.table.places_with_food and _galley_out(stores):
+            # practice and resupply (between packages 72 and 73): the galley fire out while
+            # the powder comes aboard (the Regulations of 1806, the Gunner, Art. V), and the
+            # meal cold; eaten all the same
+            text = (
+                "A cold meal, biscuit and cheese, the galley fire being out while the powder "
+                f"comes aboard; you eat {place_words(where)}"
+            )
+        elif where in self.table.places_with_food or not aboard:
             text = f"You eat {place_words(where)}"
         else:
             text = (
@@ -777,6 +785,12 @@ def _victualled(world: Any) -> bool:
     from freesail.crew.victuals import victualled
 
     return victualled(world)
+
+
+def _galley_out(stores: Any) -> bool:
+    """Whether the galley fire is out for the powder (`Stores.galley_fire_out`; practice and
+    resupply, between packages 72 and 73)."""
+    return bool(getattr(stores, "galley_fire_out", "")) if stores is not None else False
 
 
 def _place(world: Any, p: Any) -> str:

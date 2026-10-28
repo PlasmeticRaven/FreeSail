@@ -253,7 +253,15 @@ guardrail enforced on every one:
   season's record for the box); refused in words beyond it.
 - **Ships:** `ship:` as it stands, with 43's `intent:`; `ship "X": intent ...` to change a
   mind; a ship put on the sea only where she could be (not inside the player's horizon
-  unless the visibility hides her; not aground).
+  unless the visibility hides her; not aground). **A free intent** (the owner's of
+  2026-10-26 and 27, folded in by package 86; PROVISIONAL in form, for 82 and 84 to
+  rework): words no intent's form reads are taken, with the warning and why, as the goal a
+  model at her captain's station is told (the scenario's `free_intent:` takes any words so);
+  her rules-based captain does not sail by it but lies her to where she is (the far body by
+  its plan's `lie_to`, the crewed captain by one `heave to` on his passage), keeping her
+  service's role and doctrine for the weather and strangers. A misspelt port is so taken
+  too; whether an unreadable intent should instead be refused unless a word asks for the
+  free form is the owner's open question.
 - **People:** `person:` as M6 §11 outlined it (`person: "Mr Fox" comes aboard as master`),
   made real here (§8).
 - **Aboard:** `aboard: the fore topmast is found sprung`, `aboard: a cask found stove`, the

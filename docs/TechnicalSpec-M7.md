@@ -275,6 +275,15 @@ nation. The hail is the first order of a search in that the heave-to is demanded
 answered; the boat and the search are the director's scene and 63's. The hailed ship is
 spoken (`spoken`, both brains' `spoken_ids`).
 
+**As fixed (the owner's playtest of 2026-10-27, folded in by package 86).** The table's
+heave-to is worked only when the words demand it ("heave to", "bring to", "sending a boat"
+and the rest of the table's phrases): before, every hail had the hailed ship obey or run,
+and so every first exchange between two far rules captains hove one to or made her sail.
+The player's own ship with no rules captain commanding (`Captain.commands`, a property that
+had been called as a method, so that the table answered for him) hears the hail and keeps
+it for his `say to her`; a crewed ship whose captain stands aside or holds by the
+director's hand is still answered by the table, nobody else being there to answer.
+
 ### 5. The lights and the bell; sight across land (`lookout.py`; the standing orders)
 
 A stern lantern, top lights for a squadron keeping station, the fishing boat's lantern on
@@ -356,6 +365,17 @@ place. The carriage, the tackles and the breeching are the gun's own state (cast
 run out), not parts of the graph; the figures from memory are marked UNVERIFIED in the
 generator for 75's sources.
 
+**The magazine by kind (the owner's practice and resupply, folded in by package 86).** The
+magazine keeps its filled cartridges by gun kind and calibre, not by calibre alone (the
+privateer schooner's long 12 had drawn on the carronades' 12-pounder cartridges), each with
+its charge, and its loose powder below in barrels of a hundred pounds; the charges, the
+barrels and a King's fit's monthly allowance for exercise are the fit's, through the
+generator (the charges' shares UNVERIFIED until Table No. 29 is read; 75's). A store pickled
+before it is converted once at the load, nothing drawn or logged. A gun's place may be
+`pivot` (PROVISIONAL, the owner's ask of 2026-10-25): no side, trained round by its crew,
+and bearing over either side through its own `arc_deg` from the ship file (the privateer
+schooner's 60 to 140 degrees off the bow); §8's as-built note says the rest.
+
 ### 8. The gunnery as evolutions (`freesail/evolutions/`; `freesail/crew/bill.py`)
 
 `clear for action` (the bulkheads down, the galley fire out, the boats towed or stowed, the
@@ -390,6 +410,36 @@ squared, the rating, the fatigue, the seaway and the weather), so **the rates fa
 the muster**: a frigate's 18-pounder every 104 s with her full company and every 159 s
 with a quarter of each gun's crew down (truth 7-135). A gun captain fires at nothing beyond
 his gun's throw. The rules captain gives them by his doctrine (§10).
+
+**As built (practice and resupply, between packages 72 and 73).** Built locally between
+packages from `docs/design/Build-PracticeAndResupply.md` and folded in by package 86 on top
+of 73 (`5b01fdf`), on the
+owner's rulings of 2026-10-25 (stages A and B; the Ordnance's issue to a King's ship free
+and vouched, merchants and privateers paying; practice giving no skill, the drill counted
+only; the galley fire out a state the needs read; ship-to-ship transfer deferred). The
+magazine of §7 keeps its filled cartridges by gun kind and calibre and its loose powder
+below in barrels (`ship/parts.py`; the charges, the barrels and the allowance for exercise
+in the fits through the generator), and the gunner fills them from it at quarters and by
+day (`combat/filling.py`), a gun with none filled of its kind waiting at the cartridge.
+Powder and shot are taken in at eleven ports by the hoy, a port job with the galley fire
+out while it is alongside: issued free and vouched by the Ordnance at Plymouth (in the
+Sound or Cawsand Bay) and Gibraltar to a King's ship of Britain, sold by the merchants to
+the rest (`world/ordnance.py`, `orders/ordnance.py`, `world/service.py`). The guns are
+exercised at a cask hove over the side, at a notional mark by day, by night or in fog, and
+in dumb show at the action's pace with nothing spent (`combat/marks.py`, `combat/guns.py`,
+`orders/gunnery.py`, `api/practice_readings.py`). Truths 7-161 to 7-171, the first action
+untouched among them (311 lines and its digest on both of the owner's trees), keep their
+numbers (73's are 7-172 to 7-184). Said as built at the fold-in: a port pickled before the
+port files carried their `ordnance:` block reads this build's block from its file, once and
+silently (`world/ordnance.block_of`); a rules captain's fighting book opens fire on a cask
+by the range reading as on a sail, by design, and nothing of the mark is an action's
+(recognition, morale, the outlaw); the gunner's filling party is read and never moved, so
+the fillers take no hands from other work (the build's decision 5), a stopgap that 75's or
+77's brief makes real posts; the pivot gun's arc is the gun's own (`arc_deg`), a default
+only where a file names none. The figures and their sources, the decisions as built, the
+pins, an old game and what is left out are in the tuning notes ("Between packages 72 and
+73: practice at the great guns, and powder and shot taken in", and package 86's section);
+the stations' side is Harness §21g.
 
 ### 8a. The quarter bill, and work in action (the owner's note 4; `freesail/crew/bill.py` a quarter bill beside the watch bill)
 
@@ -461,6 +511,8 @@ the muster off the bill. The fired-at ship's log says what her people saw once a
 the firer's her own fall of shot; the truth both. The figures are in the tuning notes with
 their sources; no water flows from the hole until 73.
 
+**As built (package 73), the men struck.** A man the hit model strikes (`hits.hit_man`) is killed three in ten, else wounded light or grave half and half with the wound in words (`crew/health.py`, the tables of splinter and ball); the quarterdeck's people take `QUARTERDECK_SHARE` (0.2) of the hits on the after deck, 0.4 of the musketry's. The wound's draws are the health stream's, so the gunnery's stream runs as 71 left it.
+
 ### 10. The fighting instructions, the captain's engaging, and morale (`data/captains/*.yaml`; `freesail/world/captains.py`, `brains.py`; `data/standing_orders/fighting.orders`)
 
 The rules captain's **engaging state** (present since M6, empty until now) is filled by
@@ -520,6 +572,8 @@ won or repulsed, a deck contested) is resolved in a few steps with cover, number
 temper on each side and the losses written to the muster, the marines' volleys and the
 guns' grape counted into it.
 
+**As built (package 73).** The kit by nation is `data/marines.yaml` (british, french, basic: the musket, the sergeant's and the officer's arms, `volley_s` 20/30/25, `hit_at_50_yd` 0.05/0.05/0.04, `tops_share` 0.2/0.4/0.2, `tops_factor`, `soldiers`, `boarding` 1.3/1.2/1.2; the ship's company's small arms with the served and unserved factors), named from each nation's entry (`marines: {kit: ...}`, `Nations.marines_kit_of`). The detachment is the muster's `marines` station (the frigate's forty, the brig's twenty; the cutter, the schooner, the lugger, the smack and the merchant brig bear none), its lieutenant and sergeant drawn from it in the people files (`data/people/frigate-36.yaml`, `brig.yaml`; the sergeant addressed 'Sergeant X'). By day the sentries and the drill are the reading's words (`the marines`); at quarters 70's beat puts the marines at the quarterdeck carronades, and `marines, fire by volley` or `at will` takes them to their muskets (the carronades short by them) and `marines, hold your fire` sends them back; `marines to the tops` sends the kit's share aloft, `to the gangways` brings it down. The fire (`combat/small_arms.py`, each tick of `combat/action.py`) is within `MUSKET_SHOT_M` (a hundred yards) of the battery's mark when she is a near deck (a crewed vessel's or the player's; a far vessel gets nothing, 74's): a volley every `volley_s` by the detachment, or the same fire spread over the seconds at will, the hits a Poisson draw about the muskets times the chance at the range (the kit's at fifty yards, five times it at point blank, falling with the square of the range to nought at musket shot) times the roll's scatter (`1/(1 + roll/10°)`), the marksmen aloft by `tops_factor`; each hit falls on an exposed man of the mark, the quarterdeck's people two in five, the marines and the gun crews of the side that bears first; killed three in ten, the wound a musket ball in the health keeper's words. The small-arms men are the quarter bill's `small_arms` (the generator: 20/6/8/2) with the stand of arms' muskets, at will once `serve out the small arms` (an evolution of five minutes with the gunner's party) has armed the company; the boarders the bill's `boarders` (60/20/30/6, Luce's first and second boarders) with the marines. The mark's minute line says 'musketry from her deck' (or 'her tops'), the firer's the volleys and the men seen to fall; the readings `the marines`, `the small arms`, `the boarders`. The hail before the order is the drill's comma, read by the grammar (`DIVISION_HAILS`), and the captain's log says the fight's orders as done in their own words. The rules captain opens by volley within `musketry_cables` (one) and sends the marksmen aloft by the kit's habit (`marines_tops: kit`); the standing orders of the design ('at boarders then repel boarders') were taken another way, as his own minute's work.
+
 ### 11a. Boarding, and the fight at far detail (`freesail/evolutions/`; `crews.py`)
 
 Boarding as an evolution: the ships brought together (the helm, the grapnels, the yards
@@ -534,6 +588,8 @@ engagement first among the cap's reasons.
 **Not built here (package 70).** §11 and §11a are 73's and 74's. The far fight is
 measured once (`combat/far.py`: the same tables at coarse steps, two cutters at two cables
 struck in twenty-one minutes; truth 7-139) and not wired to the far brains.
+
+**As built (package 73), the near fight.** `lay her aboard` is the chase's helm laid on the battery's mark with the boarding's word; `grapple her` an evolution (`fight_scripts.py`: eight hands, two minutes, refused beyond `GRAPPLE_RANGE_M` thirty metres) whose grapnels hold from the throw: `extra["grappled_to"]` on both ships, the integrator holding both as the ground holds a ship, so the two lie locked (and overlap on the chart until 78's collision; said). `boarders away` (`combat/boarding.py`) sends the attacker's boarders over: the crossing's fire first (the defenders' marines' volley at point blank and the loaded guns bearing, `CROSSING_GUN_MEAN` one man each), then a round a minute while grappled, each side's strength its men times their arms (served 1.0 or unserved 0.5, the marines by the kit's `boarding`) times its temper (70's morale) times its cover (the defenders 1.3 and the boarders 0.8 in the first round), each side losing a Poisson draw about `ROUND_LOSS` (1.0) times the other's strength over ten, the fallen killed three in ten, written to the muster with the blow in words; the deck **carried** when the defenders' strength falls under `CARRIED_RATIO` (0.5) of the boarders' or their temper under its line (the colours struck by the boarders' hand, `action.strike(words="carried by boarding")`, the prize alongside for 74), the boarders **repulsed** when theirs falls so or their temper under its line (cast off, the morale's `repulses` the worse by `REPULSE_COST` 0.1), a deck **contested** past `CONTEST_ROUNDS` (15) a repulse. The defenders are the marines, the helm, the trimmers, the quarterdeck and the small-arms men, or every fit man but the powder's, the carpenter's and the surgeon's once `repel boarders` has brought the gun crews up (the guns silent); `cast off the grapnels` frees the ships (the attacker's cast-off a repulse at his own word, the defender's refused with boarders on his deck). A line a round on both logs, the readings, and the rules captain's boarding by `board_odds` and `board_when` (the chase, the grapnels within their throw, the boarders away once grappled; her boarders on his deck repelled). Measured: a hundred boarders against a frigate's whole company awake are repulsed in a round (7-180); against her at quarters with the arms served out they carry her in six (7-181). Cutting out by the boats and the fight at far detail stay 74's and the far fight's.
 
 ### 12. Truths for 7-ii (outline)
 
@@ -577,6 +633,8 @@ stopped` and `the well pumped out` are superseded by the carpenter's work and th
 kept only as the director's causes with a doubt; 68's refusal line for the pumps ("not
 worked in this game yet") is retired here.
 
+**As built (package 73).** One quantity, the tons of water in the ship, kept by the World's water keeper (`freesail/world/water.py`, ticked after the chart's ground and before the navigation), its sources summed each tick: the shot holes by the orifice law (`Q = 0.6 A sqrt(2gh)`, the head from the hole's depth under the heeled waterline less the water inside), the ground's leak (`extra["leak_m_per_h"]` by the bilge's floor, afloat a third of it on soft ground), the seams working in a seaway (`0.02 t/h per 100 t × ((roll − 6°)/4)²`, trebled for a day after a grounding), the sea shipped over three metres unless the hatches are battened, and the director's seams (`leak_tons_per_h`, two tons an hour each). The well's depth is the tons over the bilge's floor (`0.45 L B`); the carpenter's feet, the hotfix's reading, are kept and read from it; the watch pumps a trickle out at the watch change unnoticed. The free surface takes from the metacentric height (`l b³/12 ∇`, applied from a tenth of a metre of depth; `Hull.gm_m` read by the equilibrium heel and the motion's particulars, the physics themselves untouched). The pumps are the ship file's (`pumps:` through the generator: the frigate two chain pumps of eighty tons an hour at four men and two hand pumps of fifteen at two, Falconer 1780; the brig one and two; the small craft hand pumps alone), a standing work of the hands' pool (`man the pumps`, `spell the pumps`, `secure the pumps`), the rate by the pump and the men's number to the power 1.5 and their skill over their fatigue and the seaway, spelled every half hour by the keeper, sucking under two inches and kept by spells while a leak other than the seams runs; the lines `well.rising` by the foot, `pumps.gaining`, `pumps.losing`, `pumps.sucked`. Foundering at half the displacement (`ship.settling` at three fifths of that), the ship held where she lies, her sails furled, `world.ship_lost`; a crewed vessel `done` with the parent's `action.enemy_sunk`; the hands to the boats are 75's. `batten down the hatches` and `open the hatches` are an evolution (ten minutes); the hands kept below is the sea's source stopped. 68's refusal of the pumps is retired; the hotfix's `aboard: the leak stopped` and `the well pumped out` act through the keeper and are doubted while the ship's own carpenter and pumps could do it (`pumps_cannot`). The rules captain mans the pumps at `pumps_at_m` (a foot) and strikes to an enemy at hand with the water past `give_up_at_share` and the pumps losing; the run for the land is the distress book's and not built here.
+
 ### 14. Damage control and jury work (`freesail/evolutions/`; `ship/parts.py` the spares)
 
 Plugging a shot hole (the carpenter and his crew, shot plugs and oakum, the time by the
@@ -587,6 +645,8 @@ rigging under fire; each an evolution competing for hands with the guns and the 
 which is where the fight's decisions live. The spares as the boatswain's and the
 carpenter's stores, counted.
 
+**As built (package 73).** Each a file in `data/evolutions/` with its crew line, its timing and its source, scripted in `evolutions/repair_scripts.py`, competing for hands as every evolution does: `plug_shot_hole` (the carpenter's crew to the holes worst leak first; above the water ten minutes, within half a metre under twenty from between decks, deeper forty from the hold, the ground's leak and a started seam three hours of caulking; a shot plug from the counted store, `stores.shot_plugs` 40/20/8/8/4/4/2), `fother_sail` (a sail from the sail room thrummed and hauled under: the hole's rate less `FOTHER_SHARE` 0.3 while she makes under six knots), `fish_spar` (a spar under sixty fished to seventy at most), `rig_preventers` (the preventer braces of the lower and topsail yards, the preventer backstays, the chain slings, each from the boatswain's cordage at half the line's fathoms; `Line.preventer` holds the line when the strain would part it), `set_up_rigging` (every parted shroud, backstay and stay, or the one named), `cut_away_mast` (the axes: the wreck over the side), `jury_mast` (a spare topmast in the stump, two fifths of the mast's rating, condition forty), and the owner's `reeve new lines` (every parted running line rove in turn). The damage report names everything: the lines parted (running and standing, with the order that mends each), the sprung spars, the jury masts, the holed sails, the shot holes by place and plugged or not, the well. The rules captain's repairs follow `damage_priority` (the leak, the rigging, the guns): in action the holes under water and the standing rigging, after it the running rigging rove, the spars fished.
+
 ### 15. Truths for 7-iii (outline)
 
 A shot hole below the waterline fills the well at the rate the hole and the heel give and
@@ -594,6 +654,8 @@ the pumps hold it with so many hands and not with fewer; the carpenter plugs it 
 the bill says; a ship that founders does so with the log saying when the pumps lost; the
 grounding at Horta replayed with the pumps and the carpenter instead of the stopgap gives
 the same tide and a repair that takes hands and hours.
+
+**As built (package 73):** truths 7-172 (the orifice law and the pumps' hands), 7-173 (the carpenter's twenty minutes), 7-174 (the cutter foundered with the log's order of lines), 7-175 (the Manacles' grounding with the pumps and three hours of caulking) and 7-184 (the leak scenario, `data/scenarios/leak.yaml`).
 
 ---
 
@@ -610,6 +672,8 @@ M7b meet their ends here (hunger and thirst to sickness and death, fatigue to co
 §20 of M7b left them; the butcher's bill in the log after an action, the sick list in the
 morning report. Disease as a thing of its own (the fever of a station, the scurvy of a long
 passage) is **M8's**, the hooks left.
+
+**As built (package 73).** The muster's states are the sailor's `hurt` ('', hurt, wounded, sick, killed) with his `wound` (light, grave, invalid), the tick and the words, `dressed` and `treated`; the dead buried are struck to `Crew.dead`. The health keeper (`crew/health.py`, once a minute) works the surgeon's queue (the surgeon and his mates as posts: the grave under the surgeon half an hour each, the light under a mate ten minutes, first come first served as Turnbull 1806 has it; no surgeon borne, the messmates dress the light in an hour and the grave wait their day), the courses (the light 'hurt' and fit for light duty seven to fourteen days, half as long again untreated; the grave judged at a day, dead three in ten treated and six in ten not, else an invalid for forty days; the sick three to seven days), the day at eight (the sick list from the foul water two in a hundred a day, the short allowance past a week one, the water expended from the second day a tenth and the dead from the fourth; the burial when not at quarters, `bury the dead` by order; the morning report), the butcher's bill ten minutes after the last shot, and the needs' ends for a stationed person (thirst collapses him at three days and kills at four, hunger at a week and three; water and food bring the collapsed round). The readings `the sick list`, `the wounded`, `the surgeon`, the bill's states; the places `cockpit` and `sick berth`; the director's forms `a man taken ill`, `the fever in the ship`, `<person> is hurt`, `<person> is badly hurt`, `the surgeon taken ill`. Disease of its own stays M8's.
 
 ### 16a. A station holder hurt (the owner's note 7; the harness)
 
@@ -628,12 +692,16 @@ his person and the scenario continues by Part 7-v's roads or ends; the deck pass
 bill. The fairness is the rules': the same hit model, the same exposure, the same choices,
 whoever holds the station.
 
+**As built (package 73).** A named person's sailor hit tells his station in an urgent line of his own with the two roads (`NeedsKeeper._tell`: the model's notice, the player's line), the muster saying 'wounded (a splinter in the hand), on deck'; on deck he is out of the surgeon's queue, a light wound dressed where he stands after an hour, a grave one collapsing him at the half hour (`holder.carried_below`: the harness's stand-by that no event or bell ends until `wound_dressed`); `go below to the surgeon` gives the deck (`_lose_deck`, the rules captain carrying on) and puts him in the cockpit and the queue, told when dressed; killed, or invalided at the surgeon's judgement, the station is stood down by the world with the reason (`agent.stopped`) and the command passes by the wardroom's order (`ship.command_passes`, `People.command_passed_to`); the player at the prompt is told the same words and loses his person, the scenario going on under whoever commands. At parity: one hit model, one exposure, one set of roads.
+
 ### 17. Truths for 7-iv (outline)
 
 A broadside's casualties are men of the muster, named where they were named, and the gun's
 crew short by them works the gun slower; the surgeon's work returns the lightly hurt to the
 bill in days and not the badly; a hand dead of thirst on a passage with the water foul and
 no port is a death the log explains from the needs' lines before it.
+
+**As built (package 73):** truths 7-176 (the casualties named, the bill), 7-177 (the surgeon's returns), 7-178 (the death of thirst explained), 7-182 (the holder's roads); §11's 7-179 to 7-181 (the volley, the repulse, the deck carried) and 7-183 (the first action replayed).
 
 ---
 
@@ -726,6 +794,23 @@ within the cover distance strikes and joins his company (`far_captures`; 74 puts
 fight in). What is not built: the line of battle's own book (76's numbers), the squadron
 shown to the player as an object of the world (the brief), the night and fog signals as a
 set's standing order (the books' `lights` rule stands in).
+
+**As fixed (the owner's playtest of 2026-10-27, folded in by package 86).** `keep station
+two cables astern of the Amazon` names the player's ship by her own name as well as by `the
+ship`, and `... of the frigate` a sail by her kind: the nearest of the kind among the sails
+her lookout has in sight (never one only the truth knows of), read from her description and
+what she is made out to be with a hyphened word whole or by its head ('brig' a merchant
+brig, not a brig-sloop; 'sloop' or 'brig-sloop' the brig-sloop). The name leans on the
+player's shadow and the id 'the ship', which 82 and 84 rework.
+
+**As built (package 84, steps 1 and 2; `docs/design/Design-OneWorld.md`, "As built, steps 1
+and 2").** The container of a promoted member is still her own World (`crews.CrewedWorld`)
+until the refactor's step 6, but what a World keeps of one ship, the player's or a member's,
+is a `Hull` behind the World's names (`freesail/world/hulls.py`, `world.own`), and the
+persons of every ship and of the shore are one registry of the world (`world.registry`,
+`people.Registry`) with each person's whereabouts (`Person.hull`, `Person.home`), a ship's
+company a view of it; hearing is by spot with the hull in it, so a word ashore is heard by
+whoever is at that place of that port, whichever ship brought him.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 

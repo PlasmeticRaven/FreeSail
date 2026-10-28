@@ -32,8 +32,9 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from freesail.combat import marks
 from freesail.combat.guns import Aim, Battery, Target
-from freesail.crew.model import Sailor
+from freesail.crew.model import Sailor, Station
 from freesail.physics import strain as ST
 from freesail.ship.parts import Charge, Gun, Line, LineState, SailState, Spar
 
@@ -121,7 +122,11 @@ def resolve_shot(
     """A shot that struck the mark: where it lands by the aim and what it does there,
     written to the mark's state. Returns what the firer's people could see of it (a spar
     coming down, a sail holed), for the battery's minute line; the mark's own log carries
-    the rest through her damage keeper (`action.py`)."""
+    the rest through her damage keeper (`action.py`). A mark for practice is the marks'
+    (practice and resupply, between packages 72 and 73): the cask knocked to staves, and
+    nothing drawn (`marks.struck`)."""
+    if marks.is_mark(target.id):
+        return marks.struck(battery, gun, target, tick)
     body = target.body
     if body is None:
         return []
@@ -202,7 +207,7 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
     guns = [
         g
         for g in getattr(ship, "guns", {}).values()
-        if g.side == side and g.place == "broadside" and not g.dismounted
+        if ((g.side == side and g.place == "broadside") or g.place == "pivot") and not g.dismounted
     ]
     if aft and rng.random() < HELM_SHOT_SHARE and not ship.extra.get("helm_lost"):
         ship.extra["helm_lost"] = "the wheel shot away"
@@ -317,11 +322,21 @@ def _rigging_hit(ship, keeper, gun, charge, pounder, scale, rng, tick) -> list[s
 # -- the men -----------------------------------------------------------------------------
 
 
+# The quarterdeck is the most exposed place (spec M7 §16a; the owner's note 7): of the
+# men hurt by a hit on the after deck, this share fall on the quarterdeck's people (the
+# posts, the helmsmen, a station holder's person) rather than the hands (judgement: a
+# frigate's quarterdeck in close action lost its captain or a lieutenant in a good third
+# of the recorded actions; James's returns).
+QUARTERDECK_SHARE = 0.2
+
+
 def _casualties(ship, keeper, mean: float, x_m: float, where: str, rng, tick) -> int:
     """So many men hurt, drawn about the mean (a Poisson draw by the inverse method on the
     stream), from the men at the part struck: the gun crews nearest along the hull first,
-    then the powder, the trimmers and the rest; each killed with `KILLED_SHARE`, else
-    wounded, written to the muster and off the bill. Returns how many."""
+    then the powder, the trimmers and the rest; on the after deck the quarterdeck's people
+    by their share (package 73); each killed with `KILLED_SHARE`, else wounded (light or
+    grave, the health keeper's: `crew/health.py`), written to the muster and off the bill.
+    Returns how many."""
     crew = ship.extra.get("crew")
     if crew is None or mean <= 0.0:
         return 0
@@ -340,15 +355,31 @@ def _casualties(ship, keeper, mean: float, x_m: float, where: str, rng, tick) ->
         candidates = [s for s in crew.on_deck(_clock_of(ship)) if s.fit]
     if not candidates:
         candidates = [s for s in crew.sailors if s.fit]
+    length = float(getattr(getattr(ship, "hull", None), "length", 40.0) or 40.0)
+    aft = where in ("deck", "gun") and x_m < -length / 4.0
+    quarterdeck = [s for s in crew.by_station[Station.QUARTERDECK] if s.fit] if aft else []
     hurt = 0
-    for s in candidates[:n]:
+    taken: set[str] = set()
+    # the quarterdeck's share is drawn on the health's stream, not the gunnery's, so that
+    # the shot's own sequence runs as 70 and 71 left it (package 73)
+    qd_rng = None
+    if quarterdeck:
+        from freesail.orders.prompt import world_of
+
+        world = world_of(ship)
+        qd_rng = world.rng.stream("health") if world is not None else None
+    for _ in range(n):
+        pool = candidates
+        if quarterdeck and qd_rng is not None and qd_rng.random() < QUARTERDECK_SHARE:
+            pool = quarterdeck
+        s = next((x for x in pool if x.id not in taken and x.fit), None)
+        if s is None:
+            s = next((x for x in candidates if x.id not in taken and x.fit), None)
+        if s is None:
+            break
+        taken.add(s.id)
         killed = rng.random() < KILLED_SHARE
-        s.fit = False
-        s.hurt = "killed" if killed else "wounded"
-        s.hurt_tick = tick
-        if s.at and not s.at.startswith("gun:"):
-            pass  # a hand at sail work: his evolution goes on short (the runner reads `fit`)
-        s.at = None
+        hit_man(ship, s, killed, rng, tick)
         hurt += 1
         if killed:
             keeper.killed += 1
@@ -356,6 +387,23 @@ def _casualties(ship, keeper, mean: float, x_m: float, where: str, rng, tick) ->
             keeper.wounded += 1
         keeper.minute_men.append(s)
     return hurt
+
+
+def hit_man(ship: Any, s: Sailor, killed: bool, rng: Any, tick: int, how: str = "") -> None:
+    """One man struck: the health keeper's states (killed, or wounded light or grave with
+    the wound in words, a person's station told); 70's two words where the ship sails
+    in no world."""
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    health = getattr(world, "health", None) if world is not None else None
+    if health is not None:
+        health.hit(s, killed, rng, tick, how=how)
+        return
+    s.fit = False
+    s.hurt = "killed" if killed else "wounded"
+    s.hurt_tick = tick
+    s.at = None
 
 
 def _poisson(mean: float, rng) -> int:

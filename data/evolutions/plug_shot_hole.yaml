@@ -1,0 +1,29 @@
+# Plug the shot holes, or stop the leak (spec M7 §14; package 73; scripted, PlugShotHoleScript
+# in evolutions/repair_scripts.py). The carpenter and his crew to the holes with the shot
+# plugs, oakum and tallow kept ready in action (the Regulations and Instructions 1806, the
+# Carpenter: his stores ready "for stopping shot-holes"; Falconer 1780, PLUG: "shot-plugs,
+# to stop holes made by cannon shot in the ship's side"), the worst leak first; or, with no
+# hole, the ground's leak and a started seam caulked (Steel 1794, the carpenter's duty; the
+# Western Islands' day of it). A phase a hole, its time by the hole's place: above the
+# waterline it is reached from between decks; at or just under, from inside with the water
+# coming in about the men; deeper, from the hold with the ship heeled to bring it up, which
+# takes longer (judgement for the minutes). A plugged hole flows no more (a plug that weeps
+# is 77's). A hole wants a plug of the carpenter's store (`crew.stores.shot_plugs`).
+id: plug_shot_hole
+verb: plug
+applies_to: {class: ship}
+script: plug_shot_hole
+params: {verb: "plug the shot holes"}
+preconditions: []
+timing:
+  above_s: 600      # a hole above the waterline: ten minutes (judgement)
+  near_s: 1200      # a hole at or within half a metre under the water: twenty minutes (judgement)
+  deep_s: 2400      # a hole deeper than that, reached from the hold: forty minutes (judgement)
+  caulk_s: 10800    # the ground's leak or a started seam found and caulked: three hours (judgement; the Western Islands' day of it)
+on_start: {log: "{begin}"}
+on_complete: {log: "{done}", kind: hole.plugged, severity: notable}
+on_fail: {log: "Could not {verb_word}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the carpenter and his crew (the idlers of that trade), else waisters and afterguard
+# to pass the plugs and hold the lanterns; four hands (judgement)
+crew: {hands: 4, rating: idler, stations: [idlers, waisters, afterguard]}
+source: "the Regulations and Instructions 1806, the Carpenter (his stores for stopping shot-holes ready in action); Falconer 1780, PLUG ('shot-plugs'); Steel 1794, the carpenter's duty (the seams caulked); the minutes judgement"

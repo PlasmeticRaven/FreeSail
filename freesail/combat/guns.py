@@ -24,6 +24,19 @@ bear` (the period's independent fire: the target within its arc and reach), `by 
 `fire`), `hold` (loaded and run out, silent). The shot's flight is `shot.py`'s and its fall
 `hits.py`'s; the battery writes **one line a minute** for all its guns (what her people can
 see: struck, short, over) and never a line a gun.
+
+**Practice and resupply** (between packages 72 and 73; docs/design/Build-PracticeAndResupply.md
+§1.6, §4, §6). A gun loads a **filled** cartridge of its own kind and calibre
+(`Magazine.has`); with none filled and powder below it waits at the cartridge phase while
+the gunner fills (`combat/filling.py`), told once an outage, and with no powder either the
+magazine is out as before. The guns may be **exercised in dumb show** (`begin_exercise`): the
+crews serve them through the phases at the action's pace with nothing taken from the
+magazine, a loaded gun from the run out to the point with its charge kept, and no gun fires
+but by name; each gun's drill is counted (`Drill`; kept, and read for nothing: the owner's
+ruling, practice improves no skill). A shot at a **mark** (`Target.mark`, a cask or a
+notional mark) is laid and drawn as a shot at a ship, with the mark's own size term, and is
+counted as practice (`last_practice_tick`), never as firing on a sail; a shotted gun fired
+with no mark sends its shot into the sea.
 """
 
 from __future__ import annotations
@@ -37,13 +50,18 @@ from freesail import units
 from freesail.combat import shot as S
 from freesail.crew import hands as H
 from freesail.crew.model import number_words
-from freesail.ship.parts import Charge, Gun, magazine
+from freesail.ship.parts import Charge, Gun, gun_words, magazine
 
 __all__ = [
     "ARC_BROADSIDE_DEG",
     "ARC_CHASER_DEG",
+    "ARC_PIVOT_FROM_DEG",
+    "ARC_PIVOT_TO_DEG",
+    "pivot_arc",
+    "PIVOT_TRAIN_DEG_S",
     "Aim",
     "Battery",
+    "Drill",
     "FireMode",
     "PHASES",
     "Service",
@@ -107,6 +125,33 @@ NUMBERS_POWER = 2.0
 ARC_BROADSIDE_DEG = 35.0
 ARC_CHASER_DEG = 25.0
 ARC_SWIVEL_DEG = 100.0
+# PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): a pivot gun on its
+# racers amidships fires over either side between the fore rigging and the main, through
+# the arc its ship file gives it (`arc_deg`, per gun since package 86's fold-in: the
+# privateer schooner's is sixty degrees off the bow to a hundred and forty, the owner's
+# ruling of the day reasoned from her rig, the fore topmast backstays at about 55 to 60
+# degrees from the pivot, the main shrouds at about 140 to 150;
+# docs/design/Proposal-PivotGun.md §3, which proposes each pivot's arcs from its own ship).
+# The two figures below are only the default for a pivot whose file names no arc (package
+# 75 gives each new pivot its own). It is trained round by its crew with the handspikes
+# and the training tackles: half a circle in a minute with its full crew, slower
+# short-handed (judgement); within five degrees of the mark the slide's play and the
+# handspikes point it, and it bears.
+ARC_PIVOT_FROM_DEG = 60.0
+ARC_PIVOT_TO_DEG = 140.0
+PIVOT_TRAIN_DEG_S = 3.0
+PIVOT_ON_DEG = 5.0
+
+
+def pivot_arc(gun: Any) -> tuple[float, float]:
+    """The arc a pivot gun fires through over either side, degrees off the bow: its own
+    (`Gun.arc_deg`, from its ship file), else the default (`ARC_PIVOT_FROM_DEG`,
+    `ARC_PIVOT_TO_DEG`)."""
+    arc = getattr(gun, "arc_deg", None)
+    if arc is None:
+        return (ARC_PIVOT_FROM_DEG, ARC_PIVOT_TO_DEG)
+    return (float(arc[0]), float(arc[1]))
+
 
 # The words for the charges the orders take.
 CHARGE_WORDS = {
@@ -146,6 +191,9 @@ class Service:
     left_s: float = 0.0
     stalled: str = ""  # why it is not served: "short-handed", "no cartridge", ""
     said_stalled: bool = False
+    # practice and resupply (between packages 72 and 73): the tick the cycle began at the
+    # sponge, for the drill's timing; a plain default, so that a service pickled before loads
+    began_tick: int | None = None
 
     @property
     def idle(self) -> bool:
@@ -182,6 +230,11 @@ class Target:
     nation: str | None
     body: Any  # a `Ship` (a crewed or the player's), or a far `Vessel`
     world: Any  # the World whose log her hits go to, or None for a far vessel
+    # practice and resupply (between packages 72 and 73): a mark's kind ("cask",
+    # "notional"; "" for a ship), and the hit chance's size term in place of the hull's
+    # (None: the hull's, as today). Rebuilt every tick and never pickled.
+    mark: str = ""
+    size: float | None = None
 
 
 @dataclass
@@ -192,10 +245,40 @@ class Volley:
     charge: Charge
     outcome: str  # "struck", "short", "over", "wide", "blank"
     seen: list[str] = field(default_factory=list)  # what the firer could see of the hit
+    mark: str = ""  # practice and resupply: the mark's kind when the shot was at a mark
+
+
+@dataclass
+class Drill:
+    """A gun's drill (practice and resupply, between packages 72 and 73;
+    docs/design/Build-PracticeAndResupply.md §1.6): the rounds served in dumb show and
+    fired live, the full cycles timed from the sponge (a swivel's from its cartridge) to
+    the point with their total and best seconds, and the falls of shot at the marks by
+    cables ("2 struck", "4 short"; at the notional mark "4 struck notional"). Kept and
+    never read for pace or aim (the owner's ruling: practice improves no skill). New
+    objects only; a field added later takes a plain default."""
+
+    dumb: int = 0
+    live: int = 0
+    cycles: int = 0
+    total_s: float = 0.0
+    best_s: float | None = None
+    falls: dict[str, int] = field(default_factory=dict)
 
 
 class Battery:
     """A ship's guns as one runtime (the module's head)."""
+
+    # practice and resupply (between packages 72 and 73; the build design's §1.6): plain
+    # class defaults, reassigned on the instance and never mutated here, so that a battery
+    # pickled before them loads
+    exercise: str | None = None  # "starboard", "larboard", "both": the guns in dumb show
+    drill: dict[str, Drill] | None = None  # gun id -> Drill, made at the first record
+    last_practice_tick: int | None = None
+    _dumb: list[tuple[str, float | None]] | None = None  # this minute's (gun id, seconds)
+    _said_filling: set[tuple[str, float]] | None = None  # (kind, pounder) told the gunner fills
+    _said_out: set[tuple[str, float]] | None = None  # (kind, pounder) told the magazine is out
+    # `_said_no_powder` (float keys) stays, unread: an old pickle's is inert
 
     def __init__(self, ship: Any) -> None:
         self.ship = ship
@@ -230,10 +313,13 @@ class Battery:
 
     def serving(self, gun: Gun) -> bool:
         """Whether the crew serves this gun under the intentions: cast loose, mounted, and
-        on the engaged side (or any side while none is engaged, to have both loaded)."""
+        on the engaged side (or any side while none is engaged, to have both loaded); while
+        the guns are exercised in dumb show, the exercised guns and no others."""
         if not gun.serves or not gun.cast_loose:
             return False
-        if gun.place in ("bow", "stern", "rail"):
+        if self.exercise is not None:
+            return self.exercised(gun)
+        if gun.place in ("bow", "stern", "rail", "pivot"):
             return True
         if self.engaged in (None, "both"):
             return True
@@ -244,12 +330,116 @@ class Battery:
 
     def wants_work(self, gun: Gun) -> bool:
         """Whether the gun has a phase to work: not yet loaded, run out (when wanted) and
-        primed."""
+        primed; an exercised gun always (its cycle begins again as it ends)."""
+        if self.exercise is not None and self.exercised(gun):
+            return True
         if not gun.loaded:
             return True
         if self.run_out_wanted and not gun.run_out and gun.kind != "swivel":
             return True
         return not gun.primed
+
+    # -- practice: dumb show and the drill (practice and resupply, between packages 72 and
+    # 73; the build design's §1.6 and §6) --------------------------------------------------
+
+    def exercised(self, gun: Gun) -> bool:
+        """Whether the gun is of the battery exercised in dumb show: its side, or either
+        side for a gun with none (the pivot)."""
+        return _of_exercise(self.exercise, gun)
+
+    def begin_exercise(self, side: str) -> list[str]:
+        """The guns of `side` ("starboard", "larboard", "both") exercised in dumb show from
+        now (Douglas 1820, the exercise; from memory, UNVERIFIED): each crew serves its gun
+        through the phases at the action's pace and nothing is taken from the magazine; an
+        empty gun runs the whole cycle from the sponge, a loaded gun is run out and pointed
+        and keeps its charge; no gun fires but by name. Each exercised gun's cycle begins
+        afresh. The guns of a side no longer exercised (`exercise both batteries`, then
+        `exercise the starboard battery`) are left as `end_exercise` leaves them (the
+        review's finding: an empty larboard gun was left run out and primed, its half-done
+        round worked on with no charge after `cease exercising`). The names of the loaded
+        guns exercised, which keep their charges."""
+        old = self.exercise
+        if old is not None and old != side:
+            for g in self.ship.guns.values():
+                if _of_exercise(old, g) and not _of_exercise(side, g):
+                    self._leave_dumb_show(g)
+        self.exercise = side
+        self._dumb = None
+        loaded = []
+        for g in self.ship.guns.values():
+            if not self.exercised(g):
+                continue
+            self.services[g.id] = Service()
+            if g.loaded:
+                loaded.append(g.name)
+        return loaded
+
+    def end_exercise(self) -> None:
+        """The exercise over: the empty guns exercised run in, unprimed and their cycles
+        cleared; a loaded gun kept as it stands, its work going on as the intentions say."""
+        if self.exercise is not None:
+            for g in self.ship.guns.values():
+                if self.exercised(g):
+                    self._leave_dumb_show(g)
+        self.exercise = None
+        self._dumb = None
+
+    def _leave_dumb_show(self, gun: Gun) -> None:
+        """An exercised gun out of the dumb show: an empty one run in, unprimed and its cycle
+        cleared, so that its live cycle begins at the sponge and takes a cartridge; a loaded
+        gun kept as it stands."""
+        if not gun.loaded:
+            gun.run_out = False
+            gun.primed = False
+            self.services[gun.id] = Service()
+
+    def serve_by_name(self, gun_id: str) -> None:
+        """A gun about to be ordered to fire by name, or as the gun to leeward, while its
+        battery is exercised in dumb show: an empty one leaves the dumb show
+        (`_leave_dumb_show`) and is served live while it is in `single`, taking a cartridge,
+        so that it fires as it would (decision 20; the review's finding: an empty gun named
+        in dumb show never loaded, and fired only after `cease exercising`). A loaded gun
+        fires as it stands; a gun named already, or not exercised, is left alone. The
+        caller puts the gun in `single`."""
+        g = self.ship.guns.get(gun_id)
+        if g is None or gun_id in self.single or not self.exercised(g):
+            return
+        self._leave_dumb_show(g)
+
+    def exercise_line(self, tick: int) -> tuple[str, dict[str, Any]] | None:
+        """This minute's line for the dumb show ('Exercising the starboard battery in dumb
+        show: nine rounds in the minute, No. 3 starboard gun the quickest, a minute and
+        twenty seconds from sponge to point.'), or None when no gun completed a round in it.
+        `tick_action` records it as `practice.exercise`, never `action.fired`."""
+        done, self._dumb = self._dumb, None
+        if not done or self.exercise is None:
+            return None
+        side = self.exercise
+        what = "both batteries" if side == "both" else f"the {side} battery"
+        n = len(done)
+        text = (
+            f"Exercising {what} in dumb show: {number_words(n)} round{'s' if n != 1 else ''} "
+            "in the minute"
+        )
+        data: dict[str, Any] = {"exercise": side, "rounds": n, "guns": [gid for gid, _ in done]}
+        timed = [(sec, gid) for gid, sec in done if sec is not None]
+        if timed:
+            sec, gid = min(timed)
+            g = self.ship.guns.get(gid)
+            name = g.name if g is not None else gid
+            start = "cartridge" if g is not None and g.kind == "swivel" else "sponge"
+            text += f", {name} the quickest, {seconds_words(sec)} from {start} to point"
+            data.update({"quickest": gid, "seconds": sec})
+        return text + ".", data
+
+    def drill_of(self, gun_id: str) -> Drill:
+        """The gun's drill, made at its first record."""
+        if self.drill is None:
+            self.drill = {}
+        d = self.drill.get(gun_id)
+        if d is None:
+            d = self.drill[gun_id] = Drill()
+        return d
 
     # -- the tick ------------------------------------------------------------------------
 
@@ -284,7 +474,31 @@ class Battery:
             factor = self._factor(hands, wanted, got, firer, active[0].kind, len(active))
             for g in active:
                 self._work(g, dt / factor, mag, tick)
+        self._train_pivots(dt, quarters, firer, target)
         self._fire(quarters, firer, target, rng, tick, resolve, mag)
+
+    def _train_pivots(self, dt: float, quarters: Any, firer: Firer, target: Target | None) -> None:
+        """A pivot gun cast loose is trained round toward the mark the shorter way, at its
+        crew's pace (`PIVOT_TRAIN_DEG_S` with the full crew, in proportion short-handed,
+        not at all with nobody at it); with no mark it stays where it points
+        (PROVISIONAL, 2026-10-25)."""
+        if target is None:
+            return
+        want = math.degrees(units.wrap_pi(target.bearing_rad - firer.heading_rad))
+        for g in self.ship.guns.values():
+            if g.place != "pivot" or not g.serves or not g.cast_loose:
+                continue
+            if quarters is not None:
+                hands = quarters.hands_at(g)
+                wanted = max(1, quarters.wanted_at(g))
+                share = min(1.0, len(hands) / wanted)
+            else:
+                share = 1.0
+            if share <= 0.0:
+                continue
+            off = _wrap_deg(want - g.train_deg)
+            step = PIVOT_TRAIN_DEG_S * share * dt
+            g.train_deg = _wrap_deg(g.train_deg + max(-step, min(step, off)))
 
     def _factor(
         self, hands: list[Any], wanted: int, got: float, firer: Firer, kind: str, n_active: int
@@ -316,9 +530,11 @@ class Battery:
         want = self.charge
         if gun.kind == "swivel" and want in (Charge.CHAIN, Charge.DOUBLE):
             want = Charge.ROUND
-        if mag.has(gun.pounder, want):
+        if mag.has(gun.kind, gun.pounder, want):
+            # the shot is there again (a receipt): its want may be told again when it is out
+            self._fell_back.discard((gun.pounder, want.value))
             return want
-        if want is not Charge.ROUND and mag.has(gun.pounder, Charge.ROUND):
+        if want is not Charge.ROUND and mag.has(gun.kind, gun.pounder, Charge.ROUND):
             key = (gun.pounder, want.value)
             if key not in self._fell_back:
                 self._fell_back.add(key)
@@ -326,12 +542,26 @@ class Battery:
                     "notable",
                     "guns.magazine_empty",
                     f"The gunner reports no more {_charge_words(want)} for the "
-                    f"{gun.kind_words}s: they load with round shot.",
+                    f"{self._calibre_words(gun)}: they load with round shot.",
                     gun.id,
                     {"pounder": gun.pounder, "charge": want.value, "instead": "round"},
                 )
             return Charge.ROUND
         return None
+
+    def _calibre_words(self, gun: Gun) -> str:
+        """The guns whose shot is out, as the gunner says it: by calibre ('the 12-pounders')
+        where two kinds of the fit share the calibre, for the shot is shared by calibre;
+        else by kind ('long 3-pounders'), as before."""
+        if any(g.pounder == gun.pounder and g.kind != gun.kind for g in self.ship.guns.values()):
+            calibre = "half" if gun.pounder == 0.5 else f"{gun.pounder:g}"
+            return f"{calibre}-pounders"
+        return f"{gun.kind_words}s"
+
+    def _same_guns(self, gun: Gun) -> int:
+        return sum(
+            1 for g in self.ship.guns.values() if g.kind == gun.kind and g.pounder == gun.pounder
+        )
 
     def _phases(self, gun: Gun) -> tuple[tuple[str, float], ...]:
         phases = PHASES.get(gun.kind, PHASES["long"])
@@ -343,29 +573,59 @@ class Battery:
     def _work(self, gun: Gun, dt_eff: float, mag: Any, tick: int) -> None:
         svc = self.services[gun.id]
         phases = self._phases(gun)
+        # a gun named to fire is served live while it is exercised (`serve_by_name`)
+        dumb = self.exercise is not None and self.exercised(gun) and gun.id not in self.single
         svc.stalled = ""
         if svc.idle:
-            # begin where the gun stands: loaded wants running out and priming only
-            if gun.loaded:
+            if dumb and gun.loaded:
+                # dumb show with the gun loaded: run out and pointed, the charge kept (a
+                # swivel pointed only)
+                start = "point" if gun.kind == "swivel" else "run out"
+                svc.phase = next(i for i, (name, _) in enumerate(phases) if name == start)
+                svc.began_tick = None
+            elif gun.loaded:
+                # begin where the gun stands: loaded wants running out and priming only
                 svc.phase = next(
                     i
                     for i, (name, _) in enumerate(phases)
                     if name == ("run out" if not gun.run_out and gun.kind != "swivel" else "prime")
                 )
+                svc.began_tick = None
             else:
                 svc.phase = 0
+                svc.began_tick = tick  # the whole cycle, timed for the drill
             svc.left_s = phases[svc.phase][1]
         left = dt_eff
         while left > 0.0 and not svc.idle:
             name = phases[svc.phase][0]
-            if name == "cartridge" and not gun.loaded and svc.left_s >= phases[svc.phase][1]:
-                # the powder comes up: a cartridge and the shot taken from the magazine as
-                # the loading begins; none, and the gun stays empty
+            if (
+                name == "cartridge"
+                and not dumb
+                and not gun.loaded
+                and svc.left_s >= phases[svc.phase][1]
+            ):
+                # the powder comes up: a filled cartridge and the shot taken from the
+                # magazine as the loading begins (in dumb show nothing is taken)
                 charge = self._charge_for(gun, mag)
                 if charge is None:
                     svc.stalled = "no cartridge"
-                    if gun.pounder not in self._said_no_powder:
-                        self._said_no_powder.add(gun.pounder)
+                    if (
+                        mag.filled_of(gun.kind, gun.pounder) <= 0
+                        and (mag.level or {}).get((gun.kind, float(gun.pounder)), 0) > 0
+                        and mag.powder_lb >= mag.charge_of(gun.kind, gun.pounder)
+                    ):
+                        # none filled, and powder below for a kind the gunner fills (one
+                        # with a level): the gun waits at the cartridge, its phase and
+                        # seconds kept, while the gunner fills
+                        self._say_filling(gun, mag)
+                        return
+                    # none filled, and no powder for it or no level the gunner fills to:
+                    # the magazine is out (as before)
+                    key = (gun.kind, gun.pounder)
+                    if self._said_out is None:
+                        self._said_out = set()
+                    if key not in self._said_out:
+                        self._said_out.add(key)
                         self.ship.note(
                             "notable",
                             "guns.magazine_empty",
@@ -376,7 +636,10 @@ class Battery:
                         )
                     svc.phase = -1
                     return
-                mag.take(gun.pounder, charge)
+                mag.take(gun.kind, gun.pounder, charge)
+                if self._said_out:
+                    # a cartridge again: the magazine's running out may be told again
+                    self._said_out.discard((gun.kind, gun.pounder))
                 gun.loaded = charge
             step = min(left, svc.left_s)
             svc.left_s -= step
@@ -392,7 +655,7 @@ class Battery:
                 pass
             svc.phase += 1
             if svc.phase >= len(phases):
-                svc.phase = -1
+                self._cycle_done(gun, svc, tick, dumb)
                 break
             # a phase the gun's state has no need of is passed over
             while svc.phase < len(phases):
@@ -405,9 +668,85 @@ class Battery:
                     continue
                 break
             if svc.phase >= len(phases):
-                svc.phase = -1
+                self._cycle_done(gun, svc, tick, dumb)
                 break
             svc.left_s = phases[svc.phase][1]
+            if phases[svc.phase][0] == "point" and svc.began_tick is not None:
+                # the gun pointed: a live gun is ready now and fires as it bears (its point is
+                # not worked: `ready`), so the cycle from the sponge is timed here; in dumb
+                # show the round ends here, at the action's pace
+                seconds = self._timed(gun, svc, tick)
+                if dumb:
+                    self._dumb_round(gun, svc, seconds)
+                    break
+
+    def _say_filling(self, gun: Gun, mag: Any) -> None:
+        """The guns waiting on the gunner, told once an outage of their kind (the outage
+        ends when the kind is back at its level: `combat.filling.fill_tick`)."""
+        key = (gun.kind, gun.pounder)
+        if self._said_filling is None:
+            self._said_filling = set()
+        if key in self._said_filling:
+            return
+        self._said_filling.add(key)
+        n = self._same_guns(gun)
+        words = gun_words(gun.kind, gun.pounder, n)
+        wait = "the gun waits" if n == 1 else "the guns wait"
+        if mag.filling_held:
+            text = (
+                f"No more filled cartridges for the {words}, and {wait}: the filling stopped "
+                "by order; say 'fill cartridges'."
+            )
+        else:
+            text = (
+                f"No more filled cartridges for the {words}: the gunner is filling, and {wait} "
+                "on him."
+            )
+        self.ship.note(
+            "notable",
+            "guns.filling",
+            text,
+            gun.id,
+            {
+                "kind": gun.kind,
+                "pounder": gun.pounder,
+                "powder_lb": round(float(mag.powder_lb), 4),
+                "held": bool(mag.filling_held),
+            },
+        )
+
+    def _cycle_done(self, gun: Gun, svc: Service, tick: int, dumb: bool) -> None:
+        """A gun's phases done (the point worked through: a loaded gun in dumb show, run out
+        and pointed with its charge kept): in dumb show the round counted."""
+        if svc.began_tick is not None:
+            self._timed(gun, svc, tick)
+        svc.phase = -1
+        if dumb:
+            self._dumb_round(gun, svc, None)
+
+    def _timed(self, gun: Gun, svc: Service, tick: int) -> float:
+        """A full cycle timed for the drill, from the sponge (a swivel's from its
+        cartridge) to the point, in seconds: the ticks it took, this one counted."""
+        seconds = float(tick - svc.began_tick + 1)
+        svc.began_tick = None
+        d = self.drill_of(gun.id)
+        d.cycles += 1
+        d.total_s += seconds
+        d.best_s = seconds if d.best_s is None else min(d.best_s, seconds)
+        return seconds
+
+    def _dumb_round(self, gun: Gun, svc: Service, seconds: float | None) -> None:
+        """A round in dumb show: counted for the drill and the minute's line, and the gun
+        run in again (unprimed when empty), its cycle to begin afresh."""
+        self.drill_of(gun.id).dumb += 1
+        gun.run_out = False
+        if not gun.loaded:
+            gun.primed = False
+        svc.phase = -1
+        svc.began_tick = None
+        if self._dumb is None:
+            self._dumb = []
+        self._dumb.append((gun.id, seconds))
 
     # -- firing ------------------------------------------------------------------------
 
@@ -422,6 +761,12 @@ class Battery:
             return abs(_wrap_deg(deg)) <= ARC_CHASER_DEG
         if gun.place == "stern":
             return abs(_wrap_deg(deg - 180.0)) <= ARC_CHASER_DEG
+        if gun.place == "pivot":
+            # within its arc over either side, and trained round on her
+            off_bow = abs(_wrap_deg(deg))
+            lo, hi = pivot_arc(gun)
+            in_arc = lo <= off_bow <= hi
+            return in_arc and abs(_wrap_deg(gun.train_deg - deg)) <= PIVOT_ON_DEG
         centre = 90.0 if gun.side == "starboard" else -90.0
         return abs(_wrap_deg(deg - centre)) <= ARC_SWIVEL_DEG
 
@@ -446,6 +791,10 @@ class Battery:
                 continue
             self.single.remove(gid)
             self._discharge(g, quarters, firer, target, relative, rng, tick, resolve)
+        if self.exercise is not None:
+            # dumb show: no gun fires but by name, and no broadside at the word
+            self.word = None
+            return
         if target is None or relative is None:
             self.word = None
             return
@@ -509,16 +858,29 @@ class Battery:
         gun.primed = False
         gun.fired += 1
         self.rounds_fired += 1
-        self.last_fired_tick = tick
+        # a shot at a mark is practice: counted apart, so that nothing of the action's (the
+        # morale's engagement, the fire opened) takes it for firing on a sail
+        at_mark = target is not None and bool(getattr(target, "mark", ""))
+        if at_mark:
+            self.last_practice_tick = tick
+        else:
+            self.last_fired_tick = tick
         self.services[gun.id].phase = -1
+        self.drill_of(gun.id).live += 1
         hands = quarters.hands_at(gun) if quarters is not None else []
         if target is None or relative is None or charge is Charge.BLANK or self.across_bows:
-            # a blank charge, a shot across her bows, or no mark: nothing struck
-            outcome = "blank" if charge is Charge.BLANK else "across her bows"
+            # a blank charge, a shot across her bows, or no mark (the shot into the sea):
+            # nothing struck
+            if charge is Charge.BLANK:
+                outcome = "blank"
+            elif self.across_bows:
+                outcome = "across her bows"
+            else:
+                outcome = "into the sea"
             self.across_bows = False
             self.volleys.append(Volley(gun.id, charge, outcome))
             return
-        if target.id not in self.opened_fire_at:
+        if not at_mark and target.id not in self.opened_fire_at:
             self.opened_fire_at[target.id] = tick
         b = S.ballistics_of(gun.kind, gun.pounder)
         lee = _is_lee(gun, firer.heel_deg)
@@ -543,6 +905,7 @@ class Battery:
             aspect_rad=aspect,
             aim=S.aim_of(hands),
             scatter_deg=scatter,
+            size=getattr(target, "size", None),
         )
         high = reach > target.range_m * 1.5  # laid to carry well over her: high
         if reach < target.range_m * 0.95:
@@ -551,9 +914,18 @@ class Battery:
             outcome = "struck"
         else:
             outcome = "over" if (high or rng.random() < 0.5) else "wide"
-        volley = Volley(gun.id, charge, outcome)
+        volley = Volley(gun.id, charge, outcome, mark=target.mark if at_mark else "")
         if outcome == "struck":
             volley.seen = resolve(self, gun, charge, target, high=high, rng=rng, tick=tick)
+        if at_mark:
+            # the fall of shot at the mark by whole cables, a cable at the least as the deck
+            # estimates a range (`geo.estimate_words`; the review's finding: a cask struck at
+            # 23 m was "at a cable" in the struck line and "0 cables" in the reading), the
+            # notional mark's marked so (the reading says its hits "on the mark")
+            falls = self.drill_of(gun.id).falls
+            cables = max(1, int(round(target.range_m / units.CABLE)))
+            fall = f"{cables} {outcome}" + (" notional" if target.mark == "notional" else "")
+            falls[fall] = falls.get(fall, 0) + 1
         self.volleys.append(volley)
 
     # -- the minute's line --------------------------------------------------------------
@@ -570,9 +942,12 @@ class Battery:
         over = sum(1 for v in volleys if v.outcome == "over")
         wide = sum(1 for v in volleys if v.outcome == "wide")
         blank = sum(1 for v in volleys if v.outcome in ("blank", "across her bows"))
+        sea = sum(1 for v in volleys if v.outcome == "into the sea")
         seen = [w for v in volleys for w in v.seen]
         at = f" at {self.target_words}" if self.target_words else ""
-        if n == blank:
+        if sea and n == sea:
+            text = f"Fired {number_words(n)} gun{'s' if n != 1 else ''}, the shot into the sea."
+        elif n == blank:
             across = any(v.outcome == "across her bows" for v in volleys)
             text = (
                 f"Fired {number_words(n)} gun{'s' if n != 1 else ''}"
@@ -581,8 +956,18 @@ class Battery:
             )
         else:
             fell = []
-            if struck:
-                fell.append(f"{number_words(struck)} struck her")
+            # at a mark (practice): the cask struck, the notional mark's shot on it
+            on_cask = sum(1 for v in volleys if v.outcome == "struck" and v.mark == "cask")
+            on_mark = sum(
+                1 for v in volleys if v.outcome == "struck" and v.mark and v.mark != "cask"
+            )
+            struck_her = struck - on_cask - on_mark
+            if struck_her:
+                fell.append(f"{number_words(struck_her)} struck her")
+            if on_cask:
+                fell.append(f"{number_words(on_cask)} struck the mark")
+            if on_mark:
+                fell.append(f"{number_words(on_mark)} on the mark")
             if short:
                 fell.append(f"{number_words(short)} fell short")
             if over:
@@ -594,6 +979,8 @@ class Battery:
                 fell.append(f"{number_words(across)} across her bows")
             if blank - across:
                 fell.append(f"{number_words(blank - across)} a blank charge")
+            if sea:
+                fell.append(f"{number_words(sea)} into the sea")
             text = f"{number_words(n).capitalize()} shot{at}: {_and(fell)}."
             if seen:
                 text += " " + " ".join(seen)
@@ -606,7 +993,20 @@ class Battery:
             "target": self.target,
             "guns": [v.gun_id for v in volleys],
         }
+        if sea:
+            data["sea"] = sea
+        marks = [v.mark for v in volleys if v.mark]
+        if marks:
+            data["mark"] = marks[0]
         return text, data
+
+
+def _of_exercise(side: str | None, gun: Gun) -> bool:
+    """Whether the gun is of the battery `side` exercises in dumb show: that side, or
+    either side for a gun with none (the pivot); none while `side` is None."""
+    if side is None:
+        return False
+    return side == "both" or gun.side is None or gun.side == side
 
 
 def battery_of(ship: Any) -> Battery | None:
@@ -631,10 +1031,13 @@ def _wrap_deg(d: float) -> float:
 
 def _is_lee(gun: Gun, heel_deg: float) -> bool:
     """Whether the gun is on the lee side: the side she heels toward (heel positive to
-    starboard)."""
-    if gun.side is None:
+    starboard). A pivot gun is on the side it is trained to."""
+    side = gun.side
+    if gun.place == "pivot":
+        side = "starboard" if gun.train_deg > 0.0 else "larboard"
+    if side is None:
         return False
-    return (heel_deg > 0.0) == (gun.side == "starboard")
+    return (heel_deg > 0.0) == (side == "starboard")
 
 
 def _elevation_for(b: S.Ballistics, range_m: float) -> float:
@@ -649,6 +1052,38 @@ def _elevation_for(b: S.Ballistics, range_m: float) -> float:
         return b.elevation_max_deg
     f = (range_m - b.point_blank_m) / (b.random_m - b.point_blank_m)
     return b.elevation_max_deg * f ** (1.0 / 0.9)
+
+
+_TEENS = ("thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen")
+_TENS = ("", "", "twenty", "thirty", "forty", "fifty", "sixty")
+
+
+def count_words(n: int) -> str:
+    """A count to sixty in words: 'sixteen', 'twenty', 'forty-five' (`number_words` says
+    those to twelve and the figures past them, so the teens and the tens are said here:
+    truth 7-164 found 'a minute and 16 seconds' beside 'a minute and twenty seconds' in
+    the practice's reading); the figures beyond."""
+    if 13 <= n < 20:
+        return _TEENS[n - 13]
+    if n < 20:
+        return number_words(n)
+    tens, ones = divmod(n, 10)
+    if tens >= len(_TENS):
+        return str(n)
+    return _TENS[tens] + (f"-{number_words(ones)}" if ones else "")
+
+
+def seconds_words(seconds: float) -> str:
+    """'forty seconds', 'a minute', 'a minute and twenty seconds', 'two minutes and five
+    seconds' (to the second; the deck's words, the practice's reading's and the drill's
+    minute line's alike)."""
+    s = int(round(seconds))
+    minutes, rest = divmod(s, 60)
+    tail = f"{count_words(rest)} second{'s' if rest != 1 else ''}"
+    if minutes == 0:
+        return tail
+    head = "a minute" if minutes == 1 else f"{count_words(minutes)} minutes"
+    return head + (f" and {tail}" if rest else "")
 
 
 def _charge_words(charge: Charge) -> str:

@@ -413,17 +413,10 @@ class World:
     WIND_SETTLE_S = 600
     WIND_SWING_S = 3600
     WIND_STEADY_S = 1800
-    wind_settled = True
-    _wind_unsettled_s = 0
-    _wind_settling_s = 0
-    _wind_unsettled_why = ""  # "light" or "swing" while `wind_settled` is false
-    _wind_swing_ref: float | None = None  # where an unsteady wind's mean last stood
-    _wind_settle_ref: float | None = None  # where a light air's settling began (58a)
-    # Package 58a (R-31): the last words of each recurring kind of line (`RECURRING_KINDS`),
-    # so that one whose words have not changed since its last logging is routine; a class
-    # default, for a checkpoint from before
-    _recurring_said: dict[str, str] | None = None
-    _wind_shifts_said: tuple[tuple[int, int], ...] = ()  # the last shifts logged: tick, sense
+    # The wind-shift bookkeeping's state (`_wind_shift_held_s`, `wind_settled`, `_wind_*`),
+    # the recurring kinds' last words (package 58a) and the dragging's lines (37f, 37k) are
+    # the ship's and live on her Hull (`freesail.world.hulls.Hull`, package 84 step 1), with
+    # their class defaults there for a checkpoint from before.
     # The builds this game has been played under, oldest first (package 37d): this build's
     # stamp at the start, and each later build's added when it takes the game up from a
     # checkpoint (`core.replay._rebind`); None stands for a build from before the stamp.
@@ -432,12 +425,6 @@ class World:
     # and replayed without a word. None as the class default: a checkpoint from before
     # the stamp loads with it and is given [None, this build].
     played_under: list[Any] | None = None
-    # Package 37f, the dragging's lines and "Brought up" after an anchor let go by itself:
-    # when each anchor's dragging was last spoken of and how far it had then come, and the
-    # seconds she has lain still on a cable not yet said to have brought her up. Class
-    # defaults, so that a checkpoint from an earlier build loads with them.
-    _drag_said: dict[str, tuple[int, float]] | None = None
-    _brought_up_s: int = 0
     # Package 37n (the owner's note 5 of 2026-10-09): the player's pencil on the captain's
     # chart, the lines, rings and notes he lays down in the browser, kept with the game:
     # saved as `"chart_marks"` and taken up again by the door that draws the chart
@@ -452,10 +439,6 @@ class World:
     # it journals no station's acts (a station of before has acts in no list).
     station_acts: list[dict[str, Any]] | None = None
     _acts_frames: list[Any] | None = None
-    # Package 37k: for each anchor whose dragging the log has opened, its come-home
-    # figure as last seen and the metres come home since the dragging began, across the
-    # spells of it (the physics counts each spell afresh). A class default, as above.
-    _drag_seen: dict[str, tuple[float, float]] | None = None
     # Package 43 (spec M6 §23): the director's seats held on the other ships, by the
     # ship's id (`world.orders.director_seats`), how many were made in the voyage, and
     # the consent records' directory the seat hook reads (the drivers set it from
@@ -474,6 +457,24 @@ class World:
     replayed_orders: dict[tuple[int, str], str] | None = None
 
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
+        # The Hull (package 84, step 1; `freesail.world.hulls`): what this World keeps of
+        # one ship, behind the World's names. Made first and empty; every per-ship
+        # assignment below lands on it through the properties installed after the class
+        # (`hulls.PER_SHIP_FIELDS`). Her id is the vessel's for a crewed ship's World
+        # (`CrewedWorld.vessel`, set before this constructor runs) and the player's
+        # ship's otherwise.
+        from freesail.world.hulls import Hull, own_id
+
+        vessel = getattr(self, "vessel", None)
+        self.own = Hull(self, getattr(vessel, "id", None) or own_id())
+        # The registry of the world's persons and things (package 84, step 2; `people.
+        # Registry`): one for the game, so a crewed ship's World (`CrewedWorld.parent`, set
+        # before this constructor runs) is given its parent's and her company is a view of
+        # it; her `people` registers her hull in it below.
+        from freesail.world.people import Registry
+
+        parent = getattr(self, "parent", None)
+        self.registry = parent.registry if parent is not None else Registry()
         # the build's stamp, worked once at the start (package 37d)
         self.played_under = [build_stamp()]
         self.seed = int(seed)
@@ -734,6 +735,19 @@ class World:
         from freesail.world.needs import NeedsKeeper
 
         self.needs = NeedsKeeper(self)
+        # the water in the ship (spec M7 §13; package 73): the shot holes, the ground, the
+        # seams and the sea into one quantity, the well, the pumps and foundering
+        # (`freesail.world.water`), ticked every tick after the ship's step; a flag the
+        # keeper raises when the ship is lost
+        from freesail.world.water import Water
+
+        self.water = Water(self)
+        self.ship_lost = False
+        # the health (spec M7 §16, §16a; package 73): the wounded, the sick and the dead,
+        # the surgeon's queue, the needs' ends (`freesail.crew.health`), once a minute
+        from freesail.crew.health import Health
+
+        self.health = Health(self)
         # The other sail on the sea at the start and the world orders by time (spec M5 §25
         # to §27; package 36; `freesail.world.ships`, `freesail.world.orders`): the ships
         # are the scenario's state, as the people are; the orders are applied at their
@@ -841,6 +855,42 @@ class World:
             # reading from tick 0, and a landfall at the start is a line like any other
             for severity, kind, text, data in self.lookout.look(self):
                 self.record(severity, kind, text, data=data)
+
+    # -- the checkpoint (package 84, step 1) -----------------------------------------
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """A World read from a checkpoint (`core.replay._Unpickler`): one written before the
+        Hull carries the per-ship fields on the World's own dict, and they are lifted into a
+        Hull here (`hulls.lift_old_state`), so that the kept saves and the owner's load by
+        the checkpoint road; one written since holds `own` and is read as it is."""
+        from freesail.world.hulls import lift_old_state
+
+        self.__dict__.update(lift_old_state(self, state))
+        self._adopt_old_people()
+
+    def _adopt_old_people(self) -> None:
+        """The persons and the things of a checkpoint written before the one registry
+        (package 84, step 2) taken into one: this World's own `People` into a registry made
+        here, and each crewed ship's World's (its own `__setstate__` ran first, with the
+        parent's dict still empty, so it made a registry of its own and may have taken the
+        player's id for its hull) absorbed under her vessel's id."""
+        from freesail.world.people import Registry
+
+        if "registry" not in self.__dict__:
+            self.registry = Registry()
+            people = self.own.__dict__.get("people")
+            if people is not None and "hull_id" not in people.__dict__:
+                self.registry.adopt_old(people, self.own.id)
+        for v in getattr(getattr(self, "vessels", None), "vessels", None) or []:
+            crew = getattr(v, "crew", None)
+            if crew is None or crew.__dict__.get("registry") is self.registry:
+                continue
+            was = crew.own.id
+            crew.own.id = str(v.id)
+            theirs = crew.__dict__.get("registry")
+            if theirs is not None:
+                self.registry.absorb(theirs, {was: str(v.id)} if was != v.id else None)
+            crew.registry = self.registry
 
     # -- logging -------------------------------------------------------------
 
@@ -1870,6 +1920,16 @@ class World:
             tick_action(self)
         if self.chart is not None:
             self._tick_chart()
+        # the water in the ship (spec M7 §13; package 73), after the ground has struck and
+        # the shot has landed: the sources summed, the pumps' lift taken off, the well
+        # written, the lines said; nothing on a ship without a hull
+        water = getattr(self, "water", None)
+        if water is None:
+            # a checkpoint from before package 73: the keeper made now
+            from freesail.world.water import Water
+
+            water = self.water = Water(self)
+        water.tick()
         if self.navigation is not None:
             # the reckoning (spec M5 §13, package 33a): the traverse board, the hourly
             # log, the casts and the noon, after the lookout has looked
@@ -1956,6 +2016,12 @@ class World:
 
             needs = self.needs = NeedsKeeper(self)
         needs.tick()
+        health = getattr(self, "health", None)
+        if health is None:
+            from freesail.crew.health import Health
+
+            health = self.health = Health(self)
+        health.tick()
 
     # -- queries -------------------------------------------------------------
 
@@ -2067,6 +2133,16 @@ class World:
             out["budget"] = state.to_dict()
         return out
 
+
+# The per-ship fields as properties to the Hull (package 84, step 1; `freesail.world.hulls`):
+# `world.ship` is `world.own.ship`, and so for every name in `PER_SHIP_FIELDS`, read, set
+# and deleted alike, so that nothing that reads a World moves.
+from freesail.world.hulls import PER_SHIP_FIELDS as _PER_SHIP_FIELDS  # noqa: E402
+from freesail.world.hulls import delegated as _delegated  # noqa: E402
+
+for _name in _PER_SHIP_FIELDS:
+    setattr(World, _name, _delegated("own", _name))
+del _name
 
 # The ground-tackle evolutions (`data/evolutions/`): while one is in hand the World does
 # not say "Brought up" of itself (the evolution says its own, or the cable is still running).

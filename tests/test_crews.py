@@ -351,38 +351,6 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
         assert h.agent.released
 
 
-def test_the_crewed_budget_is_a_setting_of_the_scenario_or_the_flags():
-    """The lead, 2026-10-17: the cap and the range are the build machine's constants
-    unless the scenario or the drivers' flags say otherwise (`crews.settings`); a cap of one
-    promotes one of two ships within the range, and the flags win over the scenario."""
-    w = hove_to_world()
-    assert K.settings(w) == (K.CREWED_CAP, K.CREWED_NM, K.CREWED_DEMOTE_NM)
-    w.crewed_settings = K.crewed_settings_of({"cap": 1, "range_nm": 5}, "the flags")
-    assert K.settings(w) == (1, 5.0, 7.0)
-    ships = [
-        put(
-            w,
-            "merchant brig",
-            "britain",
-            f"{lat} 5 30 W",
-            "bound for Falmouth",
-            "bound for Falmouth",
-            name=f"C{i}",
-        )
-        for i, lat in enumerate(("49 31 N", "49 32 N"))
-    ]
-    w.run(61)
-    assert [v.crew is not None for v in ships] == [True, False]
-    import pytest
-
-    with pytest.raises(ValueError):
-        K.crewed_settings_of({"cap": -1})
-    with pytest.raises(ValueError):
-        K.crewed_settings_of({"range_nm": 0})
-    with pytest.raises(ValueError):
-        K.crewed_settings_of("three")
-
-
 def test_a_door_on_another_ship_reads_its_turns_again_after_a_book_is_shelved(tmp_path):
     """The playtest of 2026-10-26: the captain of a cutter beside the player's ship
     shelved a book over MCP; the shelve moved the stream's revision, the door read its
@@ -423,3 +391,220 @@ def test_a_door_on_another_ship_reads_its_turns_again_after_a_book_is_shelved(tm
         assert turns and not game.stale
         assert "captain" not in w.agents and b.crew.agents["captain"].agent.released is False
         game.release("the test is done")
+
+
+def test_a_free_intent_is_taken_for_a_ship_on_the_sea_with_the_warning(tmp_path):
+    """The owner's lead, 2026-10-26: `ship "X": intent <words>` takes words no form reads
+    as a free intent, so that a model seated as her captain is told its goal; the order's
+    line says the rules-based captain will not follow it, and why he cannot. He lays no
+    plan for it. The forms he knows are taken as before, and `read_intent` itself refuses
+    the free words in the same words as before. A captain seated on her is told the free
+    intent is his goal, and that the rules-based captain will not follow it."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.agents import consent
+    from freesail.ui.server import Driver, create_app
+    from freesail.world.captains import FREE, FREE_WARNING, read_intent
+
+    goal = "find the smuggler's lugger said to be running brandy into Cawsand"
+    w = hove_to_world()
+    b = put(w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth")
+    assert b.brain is None
+    with pytest.raises(ValueError, match="is no intent a captain knows"):
+        read_intent(w, goal)
+    e = w.world_order(f'ship "X": intent {goal}')
+    said = getattr(e, "text", str(e))
+    assert f"given an intent: {goal}" in said and FREE_WARNING in said
+    assert "is no intent a captain knows" in said  # why he cannot sail by it
+    assert b.brain.intent.kind == FREE and b.brain.intent.words == goal
+    assert b.intent_words == goal
+    # no legs: she lies to where she is, and is not taken off the sea as a voyage done
+    w.run(61)
+    assert not b.done and b.plan and b.plan[0][0] == "lie_to"
+    assert b.crew is not None and b.crew.shape == "full"
+    cap = b.crew.captain
+    assert cap.intent.kind == FREE and not cap.error and not cap.legs
+    # a form he knows is taken as before, with no warning, and his plan laid again
+    e = w.world_order('ship "X": intent bound for Falmouth')
+    said = getattr(e, "text", str(e))
+    assert said.endswith("changed: bound for Falmouth.") and FREE_WARNING not in said
+    assert b.brain.intent.kind == "passage" and cap.intent.kind == "passage"
+    # a free intent again, and a model seated as her captain is told it
+    w.world_order(f'ship "X": intent {goal}')
+    assert cap.intent.kind == FREE
+    records = tmp_path / "consent"
+    records.mkdir()
+    weights = "made-up-crew-model-9b.Q4_K_M.gguf"
+    consent.Record(
+        weights, "a test runtime", "2026-10-16", consent.YES, answer="Yes.", drill="passed"
+    ).write(records)
+    driver = Driver(w, compression=60.0)
+    app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
+    with TestClient(app) as http:
+        a = http.post(
+            "/api/agents/captain", json={"model_name": weights, "door": "mcp", "ship": "X"}
+        ).json()
+        assert a["phase"] == "station"
+        brief = b.crew.agents["captain"].brief.text()
+        assert f"The intent the scenario gives the ship: {goal}. It is a free intent" in brief
+        assert "the rules-based captain will not follow it" in brief
+        http.post(
+            "/api/agents/captain/release",
+            json={"reason": "the test is done", "key": a["key"], "ship": "X"},
+        )
+
+
+def test_under_a_free_intent_the_crewed_captain_lies_her_to_once_and_keeps_her_service():
+    """Package 86's fold-in (the review of the owner's local work, section 3): the crewed
+    captain short-circuits a free intent as the far body does, where he had tried to plan it
+    every judgement and said a plan of no legs each time: on his passage he heaves her to
+    once, says nothing more in twenty minutes, and lays no legs. And she keeps her service's
+    role and doctrine: a cutter patrolling (a cruiser) given a free intent stays a cruiser,
+    far and crewed, where she had fallen to the merchant's doctrine."""
+    from freesail.world.captains import FREE
+
+    w = hove_to_world()
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    crew = b.crew
+    assert crew is not None and crew.captain.state == "on passage"
+    w.world_order('ship "X": intent wait here for the Amazon\'s boat')
+    n = len(list(crew.log))
+    w.run(20 * 60)
+    said = list(crew.log)[n:]
+    assert not [e for e in said if e.kind == "captain.plan"], "a plan said under a free intent"
+    heave = [e for e in said if e.kind == "order.accepted" and "free intent" in e.text]
+    assert len(heave) == 1 and "heaving to" in heave[0].text
+    assert crew.readings.value("manoeuvre_in_hand") == "hove to"
+    assert crew.captain.intent.kind == FREE and not crew.captain.legs
+    raven = put(
+        w,
+        "cutter",
+        "britain",
+        "49 31 N 5 31 W",
+        "patrolling off the Lizard within 5 miles",
+        "patrol off the Lizard within 5 miles",
+        name="Raven",
+    )
+    w.run(61)
+    assert raven.brain.role == "cruiser"
+    assert raven.crew is not None and raven.crew.captain.role == "cruiser"
+    cap = raven.crew.captain
+    w.world_order('ship "Raven": intent wait here for the Amazon\'s boat')
+    assert raven.brain.intent.kind == FREE and raven.brain.role == "cruiser"
+    assert raven.brain.doctrine is not None and raven.brain.doctrine.role == "cruiser"
+    assert cap.intent.kind == FREE and cap.role == "cruiser" and cap.doctrine.role == "cruiser"
+    # a form he knows given after it is read for its own role, as before
+    w.world_order('ship "Raven": intent bound for Falmouth')
+    assert raven.brain.role == "merchant"
+
+
+def test_the_crewed_budget_is_a_setting_of_the_scenario_or_the_flags():
+    """The lead, 2026-10-17: the cap and the range are the build machine's constants
+    unless the scenario or the drivers' flags say otherwise (`crews.settings`); a cap of one
+    promotes one of two ships within the range, and the flags win over the scenario."""
+    w = hove_to_world()
+    assert K.settings(w) == (K.CREWED_CAP, K.CREWED_NM, K.CREWED_DEMOTE_NM)
+    w.crewed_settings = K.crewed_settings_of({"cap": 1, "range_nm": 5}, "the flags")
+    assert K.settings(w) == (1, 5.0, 7.0)
+    ships = [
+        put(
+            w,
+            "merchant brig",
+            "britain",
+            f"{lat} 5 30 W",
+            "bound for Falmouth",
+            "bound for Falmouth",
+            name=f"C{i}",
+        )
+        for i, lat in enumerate(("49 31 N", "49 32 N"))
+    ]
+    w.run(61)
+    assert [v.crew is not None for v in ships] == [True, False]
+    import pytest
+
+    with pytest.raises(ValueError):
+        K.crewed_settings_of({"cap": -1})
+    with pytest.raises(ValueError):
+        K.crewed_settings_of({"range_nm": 0})
+    with pytest.raises(ValueError):
+        K.crewed_settings_of("three")
+
+
+def test_a_station_is_kept_on_the_players_ship_by_her_name_or_on_a_sail_by_her_kind():
+    """The playtest of 2026-10-27: the tender's model ordered 'keep station two cables
+    astern of the Amazon' and '... of the frigate', and both were refused ("No ship named
+    ... is on the sea"); only 'the ship' was taken. The player's ship is kept station on by
+    her own name and by her kind, and another sail by her kind, the nearest; the ship's own
+    kind with no other of it near, and a name nobody bears, are refused as before."""
+    w = hove_to_world()
+    raven = put(
+        w,
+        "cutter",
+        "britain",
+        "49 30.2 N 5 30 W",
+        "in company with the ship",
+        "patrol off the Lizard within 5 miles",
+        name="Raven",
+    )
+    put(w, "merchant brig", "britain", "49 31 N 5 31 W", "bound for Falmouth", name="Nancy")
+    w.run(61)
+    crew = raven.crew
+    assert crew is not None and crew.shape == "full" and w.ship.name == "Amazon"
+    w.run(60)  # her lookout's first sweep (a kind is taken among the sails in sight: 86)
+
+    def flag(words: str) -> str | None:
+        crew.ship.extra.pop("station", None)
+        e = crew.submit(f"keep station two cables astern of {words}")
+        if e.kind == "order.rejected":
+            assert "is on the sea to keep station on" in e.text, e.text
+            return None
+        return (crew.ship.extra.get("station") or {}).get("flag")
+
+    for words in ("the Amazon", "Amazon", "the frigate", "the ship"):
+        assert flag(words) == "the ship", words
+    nancy = w.vessels.find("Nancy")
+    assert flag("the brig") == nancy.id and flag("the Nancy") == nancy.id
+    assert flag("the cutter") is None and flag("the Victory") is None
+
+
+def test_a_station_by_kind_is_kept_only_on_a_sail_in_sight_and_brig_is_no_brig_sloop():
+    """Package 86's fold-in (the review of the owner's local work, section 3): the kind is
+    matched only among the sails her lookout has in sight, where it had searched the whole
+    sea by truth (a frigate nobody aboard could know of was taken); and 'brig' takes a
+    merchant brig, not a brig-sloop, which 'sloop' and 'brig-sloop' take. A lugger
+    thirty-five miles off is refused by her kind, out of sight, and by her name is
+    taken as before (the name is the order's own knowledge)."""
+    w = hove_to_world()
+    raven = put(
+        w,
+        "cutter",
+        "britain",
+        "49 30.2 N 5 30 W",
+        "in company with the ship",
+        "patrol off the Lizard within 5 miles",
+        name="Raven",
+    )
+    harpy = put(w, "brig-sloop", "britain", "49 31 N 5 31 W", "bound for Falmouth", name="Harpy")
+    belle = put(w, "lugger", "france", "48 55 N 5 30 W", "bound for Brest", name="Belle")
+    w.run(121)
+    crew = raven.crew
+    assert crew is not None and crew.shape == "full"
+    seen = {str(s.feature.modern) for s in crew.lookout.sightings if s.seen_as == "sail"}
+    assert harpy.id in seen and belle.id not in seen
+
+    def flag(words: str) -> str | None:
+        crew.ship.extra.pop("station", None)
+        e = crew.submit(f"keep station two cables astern of {words}")
+        if e.kind == "order.rejected":
+            assert "no sail of that kind is in sight" in e.text, e.text
+            return None
+        return (crew.ship.extra.get("station") or {}).get("flag")
+
+    assert flag("the brig") is None  # a brig-sloop is no 'brig' of the order's words
+    assert flag("the sloop") == harpy.id and flag("the brig-sloop") == harpy.id
+    assert flag("the lugger") is None  # beyond her horizon: nobody aboard knows of her
+    assert flag("the Belle") == belle.id  # her name said: `Vessels.find`, as before

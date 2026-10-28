@@ -13,7 +13,8 @@ The rows, each a state in words the dialect compares by `is <words>` and `is not
                       ('is none', 'is not none')
     the bill          the butcher's bill and the hands' temper: the killed and wounded of
                       the complement, the figure's words ('is steady', 'is wavering')
-    the magazine      the cartridges and shot by calibre, as the gunner counts them
+    the magazine      the filled cartridges by gun, the powder below and the shot, as the
+                      gunner counts them; it rides in port while she wants powder or shot
     the enemy         the mark engaged, in the lookout's words, with her bearing and her
                       colours as made out, and 'struck' when they are down
     the range         the range of the mark by the lookout's estimate, in cables (a
@@ -56,6 +57,15 @@ ACTION_ROWS: tuple[str, ...] = (
 
 
 def idle_rows(world: Any) -> set[str]:
+    """The rows to leave out of a sample now: the action's and the squadron's
+    (`_idle_action_rows`), and the practice's on every path (practice and resupply, between
+    packages 72 and 73: `practice_readings.idle_practice_rows`)."""
+    from freesail.api.practice_readings import idle_practice_rows
+
+    return _idle_action_rows(world) | idle_practice_rows(world)
+
+
+def _idle_action_rows(world: Any) -> set[str]:
     """The action's rows to leave out of a sample now: all of them while she is not at
     quarters, undamaged, nobody hurt, no mark engaged and the colours flying; `guns` always
     rides (one line)."""
@@ -81,10 +91,29 @@ def idle_rows(world: Any) -> set[str]:
     locker = extra.get("signals")
     if locker is not None and locker.colours.state != "shown":
         idle.discard("colours")  # package 71: false or no colours are worth a row
+    if _wants_in_port(world, ship, extra):
+        idle.discard("magazine")  # practice and resupply: the magazine to complete in port
     from freesail.api.squadron_readings import idle_squadron_rows
 
     idle |= idle_squadron_rows(world)  # package 72: nothing of a set for a ship in none
     return idle
+
+
+def _wants_in_port(world: Any, ship: Any, extra: dict[str, Any]) -> bool:
+    """Practice and resupply (between packages 72 and 73): whether she lies in port with her
+    magazine short of its establishment (`Magazine.wanting`), when the magazine's row rides
+    a sample for the powder and the shot to be taken in. A magazine not yet made is her
+    fit's, complete; none is made here (`magazine` is asked only of one she has)."""
+    if not getattr(ship, "guns", None):
+        return False
+    from freesail.ship.parts import Magazine, magazine
+
+    if not isinstance(extra.get("magazine"), Magazine):
+        return False
+    ports = getattr(world, "ports", None)
+    if ports is None or ports.in_port() is None:
+        return False
+    return not magazine(ship).wanting().empty
 
 
 CABLE_M = units.NAUTICAL_MILE / 10.0  # the cable of a tenth of a mile (608 feet)
@@ -147,10 +176,14 @@ def _guns(world: Any, _: str | None) -> dict[str, Any] | None:
         parts.append("holding fire" if mode == "hold" else f"firing {mode}")
         if battery.roll_doctrine:
             parts.append(f"on the {battery.roll_doctrine}-roll")
+    exercise = battery.exercise  # practice and resupply: the dumb show (a class default)
+    if exercise:
+        which = "both batteries" if exercise == "both" else f"the {exercise} battery"
+        parts.append(f"exercising {which} in dumb show")
     if dismounted:
         names = _and([g.name for g in dismounted])
         parts.append(f"{number_words(len(dismounted))} dismounted ({names})")
-    return {
+    value = {
         "words": "; ".join(parts),
         "count": len(serving),
         "cast_loose": cast,
@@ -165,6 +198,9 @@ def _guns(world: Any, _: str | None) -> dict[str, Any] | None:
         "dismounted": [g.id for g in dismounted],
         "rounds_fired": battery.rounds_fired,
     }
+    if exercise:
+        value["exercise"] = exercise  # only while it is set, so the data is as it was
+    return value
 
 
 def _kinds_words(guns: list[Any]) -> str:
@@ -202,24 +238,57 @@ def _damage(world: Any, _: str | None) -> dict[str, Any] | None:
     spars = [s for s in (getattr(ship, "spars", None) or {}).values() if s.wrecked]
     if spars:
         items.append(f"{_and([_part_name(ship, s.id) for s in spars])} carried away")
+    # package 73 (the owner's first action, 2026-10-24: "the damage report should list the
+    # parted lines by name"): every parted line named, the running rigging to be rove and
+    # the standing to be set up, the lines gone with a spar said so; every sprung spar;
+    # each holed sail with its share; each shot hole by its side and place, plugged or
+    # not; the jury masts
+    sprung = [
+        s
+        for s in (getattr(ship, "spars", None) or {}).values()
+        if not s.wrecked and not getattr(s, "sent_down", False) and s.condition < 60.0
+    ]
+    if sprung:
+        items.append(f"{_and([_part_name(ship, s.id) for s in sprung])} sprung")
+    jury = [s for s in (getattr(ship, "spars", None) or {}).values() if getattr(s, "jury", False)]
+    if jury:
+        items.append(f"{_and([_part_name(ship, s.id) for s in jury])} a jury mast")
     lines = [
         ln
         for ln in (getattr(ship, "lines", None) or {}).values()
         if getattr(ln.state, "value", ln.state) == "parted"
     ]
-    if lines:
-        items.append(f"{number_words(len(lines))} line{'s' if len(lines) != 1 else ''} parted")
+    running = [ln for ln in lines if not ln.is_standing and not ln.wrecked]
+    standing = [ln for ln in lines if ln.is_standing and not ln.wrecked]
+    gone = [ln for ln in lines if ln.wrecked]
+    if running:
+        items.append(
+            f"{_and([_part_name(ship, ln.id) for ln in running])} parted (to be rove: "
+            "'reeve new lines')"
+        )
+    if standing:
+        items.append(
+            f"{_and([_part_name(ship, ln.id) for ln in standing])} shot away (standing "
+            "rigging, to be set up: 'set up the rigging')"
+        )
+    if gone:
+        items.append(
+            f"{number_words(len(gone))} line{'s' if len(gone) != 1 else ''} gone with "
+            "the spars carried away"
+        )
     sails = (getattr(ship, "sails", None) or {}).values()
     holed = [s for s in sails if getattr(s, "holed_m2", 0.0) > 0.0]
     if holed:
-        items.append(f"{_and([_part_name(ship, s.id) for s in holed])} holed")
+        items.append(_and([f"{_part_name(ship, s.id)} holed ({s.holed_share:.0%})" for s in holed]))
     holes = list(keeper.holes) if keeper is not None else []
     if holes:
-        below = sum(1 for h in holes if float(h.get("z_m", 1.0)) <= 0.0)
-        words = f"{number_words(len(holes))} shot hole{'s' if len(holes) != 1 else ''} in the side"
-        if below:
-            words += f", {number_words(below)} at or below the waterline"
-        items.append(words)
+        from freesail.world.water import _hole_words
+
+        said = []
+        for h in holes:
+            words = _hole_words(ship, h)
+            said.append(words + (", plugged" if h.get("plugged") is not None else ""))
+        items.append(_and(said))
     dismounted = [g for g in getattr(ship, "guns", {}).values() if g.dismounted]
     if dismounted:
         items.append(f"{_and([g.name for g in dismounted])} dismounted")
@@ -228,17 +297,58 @@ def _damage(world: Any, _: str | None) -> dict[str, Any] | None:
         items.append("the helm shot away")
     if extra.get("boats_stove"):
         items.append("a boat stove")
+    water = getattr(world, "water", None)
+    if water is not None and water.state is not None:
+        d = water.describe()
+        if d["tons"] >= 1.0 or d["gain_t_per_h"] > 0.0:
+            from freesail.world.ground import well_words
+
+            words = well_words(d["well_m"])
+            if d["gain_t_per_h"] > 0.0:
+                words += f", gaining {d['gain_t_per_h']:.1f} tons an hour"
+            items.append(words)
+        if d["hatches"] == "battened down":
+            items.append("the hatches battened down")
     words = "; ".join(items) if items else "none"
     return {
         "words": words,
         "count": len(items),
         "spars": [s.id for s in spars],
+        "sprung": [s.id for s in sprung],
         "lines": [ln.id for ln in lines],
+        "running_parted": [ln.id for ln in running],
+        "standing_parted": [ln.id for ln in standing],
         "sails_holed": [s.id for s in holed],
         "holes": holes,
         "dismounted": [g.id for g in dismounted],
         "helm_lost": bool(extra.get("helm_lost")),
         "hits": keeper.hits if keeper is not None else 0,
+    }
+
+
+def _parted_lines(world: Any, _: str | None) -> dict[str, Any] | None:
+    """`the parted lines` (package 73): every parted line by name, the running rigging
+    first, the standing after, the lines gone with a spar last; 'none'."""
+    ship = getattr(world, "ship", None)
+    if ship is None or not getattr(ship, "lines", None):
+        return None
+    lines = [ln for ln in ship.lines.values() if getattr(ln.state, "value", ln.state) == "parted"]
+    running = [ln for ln in lines if not ln.is_standing and not ln.wrecked]
+    standing = [ln for ln in lines if ln.is_standing and not ln.wrecked]
+    gone = [ln for ln in lines if ln.wrecked]
+    parts = []
+    if running:
+        parts.append(f"running: {_and([_part_name(ship, ln.id) for ln in running])}")
+    if standing:
+        parts.append(f"standing: {_and([_part_name(ship, ln.id) for ln in standing])}")
+    if gone:
+        parts.append(f"gone with their spars: {_and([_part_name(ship, ln.id) for ln in gone])}")
+    return {
+        "words": "; ".join(parts) if parts else "none",
+        "count": len(lines),
+        "running": [ln.id for ln in running],
+        "standing": [ln.id for ln in standing],
+        "gone": [ln.id for ln in gone],
     }
 
 
@@ -256,29 +366,44 @@ def _bill(world: Any, _: str | None) -> dict[str, Any] | None:
     crew = getattr(ship, "extra", {}).get("crew") if ship is not None else None
     if crew is None:
         return None
-    killed = [s for s in crew.sailors if s.hurt == "killed"]
-    wounded = [s for s in crew.sailors if s.hurt and s.hurt != "killed"]
-    complement = len(crew.sailors)
+    # package 73 (spec M7 §16): the states beyond 70's two, the buried counted, the names
+    buried = list(getattr(crew, "dead", []) or [])
+    killed = [s for s in crew.sailors if s.hurt == "killed"] + buried
+    wounded = [s for s in crew.sailors if s.hurt == "wounded"]
+    grave = [s for s in wounded if getattr(s, "wound", "") in ("grave", "invalid")]
+    light = [s for s in crew.sailors if s.hurt == "hurt"]
+    sick = [s for s in crew.sailors if s.hurt == "sick"]
+    complement = len(crew.sailors) + len(buried)
     morale = ship.extra.get("morale")
     temper = morale.words if morale is not None else "steady"
-    if not killed and not wounded:
+    if not killed and not wounded and not light:
         words = f"nobody hurt of {complement}; the hands {temper}"
     else:
         said = []
         if killed:
             said.append(f"{number_words(len(killed))} killed")
         if wounded:
-            said.append(f"{number_words(len(wounded))} wounded")
-        words = f"{' and '.join(said)} of {complement}; the hands {temper}"
+            said.append(
+                f"{number_words(len(wounded))} wounded"
+                + (f" ({number_words(len(grave))} dangerously)" if grave else "")
+            )
+        if light:
+            said.append(f"{number_words(len(light))} hurt and at light duty")
+        words = f"{', '.join(said)} of {complement}; the hands {temper}"
+    if sick:
+        words += f"; {number_words(len(sick))} sick"
     return {
         "words": words,
         "killed": len(killed),
-        "wounded": len(wounded),
+        "wounded": len(wounded) + len(light),
+        "grave": len(grave),
+        "light": len(light),
+        "sick": len(sick),
         "complement": complement,
         "fit": sum(1 for s in crew.sailors if s.fit),
         "temper": temper,
         "morale": round(float(morale.value), 2) if morale is not None else None,
-        "names": [(s.name, s.hurt) for s in killed + wounded],
+        "names": [(s.name, s.hurt) for s in killed + wounded + light],
     }
 
 
@@ -286,10 +411,10 @@ def _magazine(world: Any, _: str | None) -> dict[str, Any] | None:
     ship = getattr(world, "ship", None)
     if ship is None or not getattr(ship, "guns", None):
         return None
+    from freesail.combat.filling import magazine_lines
     from freesail.ship.parts import magazine
 
-    mag = magazine(ship)
-    lines = mag.describe()
+    lines = magazine_lines(world, ship, magazine(ship))
     return {"words": " ".join(lines) if lines else "empty", "lines": lines}
 
 
@@ -445,6 +570,22 @@ def register() -> None:
     )
     R.REGISTRY.add(
         R.Reading(
+            "parted_lines",
+            (
+                "the parted lines",
+                "the lines parted",
+                "the rigging shot away",
+                "the lines shot away",
+            ),
+            "state",
+            "",
+            _parted_lines,
+            description="every parted line by name: the running rigging to be rove, the "
+            "standing to be set up, the lines gone with a spar; 'none' (package 73)",
+        )
+    )
+    R.REGISTRY.add(
+        R.Reading(
             "bill",
             ("the bill", "the butcher's bill", "the butchers bill", "the casualties"),
             "state",
@@ -461,7 +602,8 @@ def register() -> None:
             "state",
             "",
             _magazine,
-            description="the magazine as the gunner counts it: cartridges and shot by calibre",
+            description="the magazine as the gunner counts it: filled cartridges by gun, the "
+            "powder below and the shot",
             none_words=_no_guns_words,
         )
     )

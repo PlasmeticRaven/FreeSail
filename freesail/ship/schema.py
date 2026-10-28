@@ -188,8 +188,16 @@ ANCHOR_KEYS = ("id", "kind", "name", "weight_kg", "cable_fathoms", "cable_in", "
 # or more **fits** the scenario chooses between (`ship: {fit: ...}`): the cutter's
 # carronades of 1805 and her long 3-pounders of the hired cutters' fit (the owner,
 # 2026-10-23). Each fit names its magazine: cartridges by calibre and shot by kind.
+# Practice and resupply (between packages 72 and 73; docs/design/Build-PracticeAndResupply.md
+# §1.2): the filled cartridges and their charges by the gun's kind and calibre (a calibre's
+# cartridges may still be said alone where one kind of the fit has it), the powder below in
+# barrels, and a King's fit's allowance of charges for exercise a month.
+# PROVISIONAL (the owner's ask of 2026-10-25, ahead of package 75): the **pivot**, a long
+# gun on a slide carriage turning about a bolt on the deck's racers, amidships and firing
+# over either side (the Baltimore privateers' "long Tom"); it has no side, and trains to
+# the mark (`combat/guns.py`).
 GUN_KINDS = ("long", "carronade", "swivel")
-GUN_PLACES = ("broadside", "bow", "stern", "rail")
+GUN_PLACES = ("broadside", "bow", "stern", "rail", "pivot")
 SHOT_KINDS = ("round", "chain", "grape")
 GUN_KEYS = (
     "id",
@@ -202,13 +210,23 @@ GUN_KEYS = (
     "height_m",
     "crew",
     "weight_cwt",
+    "arc_deg",
 )
-FIT_KEYS = ("source", "guns", "cartridges", "shot")
+FIT_KEYS = (
+    "source",
+    "guns",
+    "cartridges",
+    "charges",
+    "powder_barrels",
+    "exercise_charges",
+    "shot",
+)
 ARMAMENT_KEYS = ("default", "fits")
 # The quarter bill beyond the gun crews (spec M7 §8a; `docs/design/Design-WorkInAction.md`):
 # the sail trimmers by station, the hands at the helm, the powder, and the fighting book's
-# priority between the sails and the guns when hands are short.
-QUARTER_BILL_KEYS = ("trimmers", "helm", "powder", "priority")
+# priority between the sails and the guns when hands are short; package 73's small-arms
+# men and boarders; and (practice and resupply) the men of the powder who fill cartridges.
+QUARTER_BILL_KEYS = ("trimmers", "helm", "powder", "priority", "small_arms", "boarders", "filling")
 PRIORITIES = ("sail before guns", "guns before sail")
 
 # Default load ratings (kN) by class, used with a warning when a file omits one.
@@ -271,6 +289,9 @@ SEAMAN_STATIONS = CREW_STATIONS[:6]
 
 # The ratings a ship file may share its seamen among, best first.
 SEAMAN_RATINGS = ("able", "ordinary", "landsman")
+# The ratings a named role may be drawn by (package 73): the seamen's, and the marines'
+# for the detachment's officer and sergeant (`crew.model.Rating`).
+PERSON_RATINGS = SEAMAN_RATINGS + ("marine", "petty officer", "idler", "officer")
 RATINGS_SUM_TOLERANCE = 1e-6  # the shares must add up to one within this
 
 # The idlers' trades (spec §2.1): what the `idlers_by_trade` mapping may name.
@@ -295,6 +316,7 @@ STORE_KEYS = (
     "spare_spars",
     "cordage_fathoms",
     "sails",  # milestone 3b: the sail room's contents, one entry a sail (spec 3b §6.3)
+    "shot_plugs",  # package 73 (spec M7 §14): the carpenter's shot plugs, counted
 )
 SPARE_SAIL_KEYS = ("kind", "canvas_no", "condition")
 
@@ -441,6 +463,7 @@ class StoresSpec:
     cordage_fathoms: float = 0.0
     sails: list[SpareSailSpec] | None = None  # the sail room, when the file lists it
     spars: dict[str, int] | None = None  # the booms by spar class (package 30b), when given so
+    shot_plugs: float = 0.0  # the carpenter's shot plugs (package 73, spec M7 §14)
 
 
 @dataclass
@@ -480,6 +503,15 @@ class QuarterBillSpec:
     helm: int = 2
     powder: int = 0
     priority: str = "sail before guns"
+    # package 73 (spec M7 §11): the small-arms men with the stand of arms' muskets, and
+    # the boarders told off from the guns' crews (Luce 1884 ch. XX), beside the marines
+    small_arms: int = 0
+    boarders: int = 0
+    # practice and resupply (between packages 72 and 73): the men who fill cartridges, the
+    # quarter gunners and the gunner's crew, one to every four cannon (Falconer 1780,
+    # QUARTER-GUNNER, l.14283-14289); None, reckoned so from the guns (`combat.filling`). A
+    # plain default, so that a bill pickled before it loads.
+    filling: int | None = None
 
 
 @dataclass
@@ -509,7 +541,10 @@ class GunSpec:
     side where the place has them, where it stands along the hull (metres from midships,
     forward positive) and its muzzle's height above the water upright, the men who serve
     it by the quarter bill, and its weight in hundredweight (the crew's rule and the
-    dismount's)."""
+    dismount's). A pivot gun's `arc_deg` is the arc it fires through over either side, from
+    and to so many degrees off the bow (PROVISIONAL, the owner's pivot gun folded in by
+    package 86: each pivot's arc its own ship's, as `docs/design/Proposal-PivotGun.md` §3
+    proposes; None, `combat.guns`' default arc)."""
 
     id: str
     kind: str
@@ -521,18 +556,27 @@ class GunSpec:
     height_m: float
     crew: int
     weight_cwt: float
+    arc_deg: tuple[float, float] | None = None
 
 
 @dataclass
 class FitSpec:
-    """A fit of guns with its magazine: the guns, the cartridges by calibre and the shot
-    by calibre and kind, and the source the generator names for the whole."""
+    """A fit of guns with its magazine: the guns, the filled cartridges by the gun's kind and
+    calibre, the shot by calibre and kind, and the source the generator names for the whole;
+    and (practice and resupply, between packages 72 and 73) a cartridge's charge in pounds by
+    kind and calibre (None: `ship.parts.charge_lb`'s), the powder below in barrels, and a
+    King's fit's allowance of charges for exercise a month (the Regulations 1806, the
+    Gunner, Art. XXI, l.13122-13144). A fit pickled before them has calibre-keyed
+    `cartridges` and reads the plain defaults (`ship.parts.fit_levels` splits the keys)."""
 
     name: str
     guns: list[GunSpec]
-    cartridges: dict[float, int] = field(default_factory=dict)
+    cartridges: dict[tuple[str, float], int] = field(default_factory=dict)
     shot: dict[float, dict[str, int]] = field(default_factory=dict)
     source: str = ""
+    charges: dict[tuple[str, float], float] | None = None
+    powder_barrels: int = 0
+    exercise_charges: int = 0
 
 
 @dataclass
@@ -619,6 +663,24 @@ class GearSpec:
     hooks: int | None = None
 
 
+@dataclass
+class PumpSpec:
+    """One of the ship's pumps (package 73, spec M7 §13): its kind (the chain pump of Cole
+    and Bentinck, standard in the King's ships by 1805, or the common brake pump), the
+    name the hands use, the tons of water an hour it lifts with its hands fresh at it and
+    the hands it wants (Falconer 1780, PUMP: the chain pump "wrought by four men,
+    discharged a ton of water in 43 seconds and a half"). Read by `freesail/world/water.py`."""
+
+    id: str
+    kind: str
+    name: str
+    tons_per_hour: float
+    hands: int
+
+
+PUMP_KINDS = ("chain", "hand")
+PUMP_KEYS = ("id", "kind", "name", "tons_per_hour", "hands")
+
 GEAR_KINDS = ("trawl", "drift nets", "seine", "lines")
 GEAR_KEYS = ("id", "kind", "name", "beam_ft", "length_fathoms", "nets", "hooks")
 
@@ -646,6 +708,7 @@ class ShipSpec:
     boats: list[BoatSpec] = field(default_factory=list)  # none: no boat to send (package 35)
     gear: list[GearSpec] = field(default_factory=list)  # none: no fishing gear (package 56)
     armament: ArmamentSpec | None = None  # None: no guns, and the gunnery refused in words
+    pumps: list[PumpSpec] = field(default_factory=list)  # none: no pumps (package 73)
 
 
 # ---------------------------------------------------------------------------
@@ -718,9 +781,45 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         armament=(
             _parse_armament(data["armament"], source) if data.get("armament") is not None else None
         ),
+        pumps=_parse_pumps(data["pumps"], source) if data.get("pumps") is not None else [],
     )
     validate(spec)
     return spec
+
+
+def _parse_pumps(raw: Any, source: str) -> list[PumpSpec]:
+    """The `pumps:` list (package 73, spec M7 §13): each a mapping of PUMP_KEYS."""
+    if not isinstance(raw, list):
+        raise ShipFileError(f"{source}: 'pumps' is not a list of pumps.")
+    pumps: list[PumpSpec] = []
+    seen: set[str] = set()
+    for i, p in enumerate(raw):
+        where = f"pump #{i + 1}"
+        if not isinstance(p, dict):
+            raise ShipFileError(f"{source}: {where} is not a mapping.")
+        for key in p:
+            if key not in PUMP_KEYS:
+                raise ShipFileError(
+                    f"{source}: {where} has '{key}', which is no key of a pump; the keys are "
+                    f"{', '.join(PUMP_KEYS)}."
+                )
+        pid = _str(p, "id", where, source)
+        if pid in seen:
+            raise ShipFileError(f"{source}: the pump id '{pid}' is given twice.")
+        seen.add(pid)
+        kind = _str(p, "kind", where, source)
+        if kind not in PUMP_KINDS:
+            raise ShipFileError(
+                f"{source}: {where} is a '{kind}' pump; the kinds are {' or '.join(PUMP_KINDS)}."
+            )
+        tons = _num(p, "tons_per_hour", where, source)
+        hands_n = p.get("hands")
+        if isinstance(hands_n, bool) or not isinstance(hands_n, int) or hands_n < 1:
+            raise ShipFileError(
+                f"{source}: {where} wants {hands_n!r} hands; say a number, one or more."
+            )
+        pumps.append(PumpSpec(pid, kind, _str(p, "name", where, source), float(tons), int(hands_n)))
+    return pumps
 
 
 def _parse_armament(raw: Any, source: str) -> ArmamentSpec:
@@ -757,9 +856,52 @@ def _parse_fit(name: str, raw: Any, source: str) -> FitSpec:
     if not isinstance(raw_guns, list) or not raw_guns:
         raise ShipFileError(f"{source}: {where} lists no guns.")
     guns = [_parse_gun(g, i, where, source) for i, g in enumerate(raw_guns)]
-    cartridges: dict[float, int] = {}
-    for k, v in (raw.get("cartridges") or {}).items():
-        cartridges[_pounder(k, where, source)] = _count(v, f"{where}'s cartridges of {k}", source)
+    kinds_of: dict[float, list[str]] = {}
+    for g in guns:
+        kinds = kinds_of.setdefault(g.pounder, [])
+        if g.kind not in kinds:
+            kinds.append(g.kind)
+            kinds.sort(key=GUN_KINDS.index)
+    cartridges: dict[tuple[str, float], int] = {}
+    for key, n, what in _by_kind(raw.get("cartridges"), "cartridges", where, source):
+        if isinstance(key, float):
+            # a calibre's cartridges said alone (the shape of packages 70 to 72): for the one
+            # kind of the fit that has it
+            kinds = kinds_of.get(key, [])
+            if len(kinds) > 1:
+                p = f"{key:g}"
+                raise ShipFileError(
+                    f"{source}: {where}'s cartridges of {p} are for guns of two kinds "
+                    f"({', '.join(kinds)}); say them by kind: cartridges: "
+                    f"{{{', '.join(f'{k}: {{{p}: n}}' for k in kinds)}}}."
+                )
+            if not kinds:
+                raise ShipFileError(
+                    f"{source}: {where}'s magazine holds {key:g}-pounder cartridges or shot, "
+                    f"and no gun of that calibre."
+                )
+            key = (kinds[0], key)
+        cartridges[key] = cartridges.get(key, 0) + _count(n, what, source)
+    charges: dict[tuple[str, float], float] | None = None
+    if raw.get("charges") is not None:
+        charges = {}
+        for key, v, what in _by_kind(raw.get("charges"), "charges", where, source):
+            if not isinstance(key, tuple):
+                raise ShipFileError(
+                    f"{source}: {where}'s charges are said by calibre alone; say them by kind: "
+                    f"charges: {{long: {{{key:g}: pounds}}}}."
+                )
+            if isinstance(v, bool) or not isinstance(v, int | float) or v <= 0:
+                raise ShipFileError(
+                    f"{source}: {what} is {v!r}; say the pounds of powder in a cartridge."
+                )
+            charges[key] = float(v)
+    for key in list(cartridges) + list(charges or {}):
+        if key[1] not in kinds_of or key[0] not in kinds_of[key[1]]:
+            raise ShipFileError(
+                f"{source}: {where}'s magazine holds cartridges for "
+                f"{_gun_words(key[0], key[1])}, and no gun of that kind and calibre."
+            )
     shot: dict[float, dict[str, int]] = {}
     for k, kinds in (raw.get("shot") or {}).items():
         if not isinstance(kinds, dict):
@@ -774,7 +916,7 @@ def _parse_fit(name: str, raw: Any, source: str) -> FitSpec:
             by_kind[str(kind)] = _count(n, f"{where}'s {kind} shot of {k}", source)
         shot[_pounder(k, where, source)] = by_kind
     calibres = {g.pounder for g in guns}
-    for p in list(cartridges) + list(shot):
+    for p in shot:
         if p not in calibres:
             raise ShipFileError(
                 f"{source}: {where}'s magazine holds {p:g}-pounder cartridges or shot, and no "
@@ -786,7 +928,49 @@ def _parse_fit(name: str, raw: Any, source: str) -> FitSpec:
         cartridges=cartridges,
         shot=shot,
         source=str(raw.get("source") or ""),
+        charges=charges,
+        powder_barrels=_count(raw.get("powder_barrels", 0), f"{where}'s powder barrels", source),
+        exercise_charges=_count(
+            raw.get("exercise_charges", 0), f"{where}'s charges for exercise", source
+        ),
     )
+
+
+def _by_kind(raw: Any, what: str, where: str, source: str) -> list[tuple[Any, Any, str]]:
+    """A fit's `cartridges:` or `charges:` as (key, value, words) entries: by the gun's kind
+    and then its calibre (`long: {12: 55}`), the key `(kind, calibre)`; or by calibre alone
+    (`12: 275`, the shape of packages 70 to 72), the key the calibre (practice and resupply,
+    between packages 72 and 73)."""
+    if raw is None:
+        return []
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: {where}'s {what} is not a mapping by kind and calibre.")
+    out: list[tuple[Any, Any, str]] = []
+    for k, v in raw.items():
+        if isinstance(k, str):
+            if k not in GUN_KINDS:
+                raise ShipFileError(
+                    f"{source}: {where}'s {what} name the kind '{k}'; the kinds are "
+                    f"{', '.join(GUN_KINDS)}."
+                )
+            if not isinstance(v, dict):
+                raise ShipFileError(
+                    f"{source}: {where}'s {what} for the {k} guns is not a mapping by calibre."
+                )
+            for p, n in v.items():
+                pounder = _pounder(p, where, source)
+                out.append(((k, pounder), n, f"{where}'s {what} for {_gun_words(k, pounder)}"))
+        else:
+            out.append((_pounder(k, where, source), v, f"{where}'s {what} of {k}"))
+    return out
+
+
+def _gun_words(kind: str, pounder: float) -> str:
+    """'long 12-pounders', '12-pounder carronades', 'half-pounder swivels'."""
+    calibre = "half" if pounder == 0.5 else f"{pounder:g}"
+    if kind == "long":
+        return f"long {calibre}-pounders"
+    return f"{calibre}-pounder {kind}s"
 
 
 def _pounder(v: Any, where: str, source: str) -> float:
@@ -823,9 +1007,14 @@ def _parse_gun(g: Any, i: int, where: str, source: str) -> GunSpec:
         number = _count(number, f"{at}'s number", source)
     if place == "broadside" and (number is None or side is None):
         raise ShipFileError(f"{source}: {at} is a broadside gun and wants a number and a side.")
+    if place == "pivot" and side is not None:
+        raise ShipFileError(
+            f"{source}: {at} is a pivot gun and has no side; it trains to either side."
+        )
     crew = _count(g.get("crew", 1), f"{at}'s crew", source)
     if crew < 1:
         raise ShipFileError(f"{source}: {at} has no crew; a gun wants a man at the least.")
+    arc = _pivot_arc(g.get("arc_deg"), place, at, source)
     return GunSpec(
         id=gid,
         kind=kind,
@@ -837,7 +1026,34 @@ def _parse_gun(g: Any, i: int, where: str, source: str) -> GunSpec:
         height_m=float(_num(g, "height_m", at, source, required=False) or 0.0),
         crew=crew,
         weight_cwt=float(_num(g, "weight_cwt", at, source, required=False) or 0.0),
+        arc_deg=arc,
     )
+
+
+def _pivot_arc(raw: Any, place: str, at: str, source: str) -> tuple[float, float] | None:
+    """A pivot gun's `arc_deg: [from, to]`, degrees off the bow over either side (package
+    86: per gun, where it had been one arc for every pivot); only a pivot gun takes one."""
+    if raw is None:
+        return None
+    if place != "pivot":
+        raise ShipFileError(
+            f"{source}: {at} is placed '{place}' and has an arc_deg; only a pivot gun takes "
+            "its own arc."
+        )
+    if not isinstance(raw, list) or len(raw) != 2:
+        raise ShipFileError(
+            f"{source}: {at}'s arc_deg is [from, to], degrees off the bow; it is {raw!r}."
+        )
+    try:
+        lo, hi = float(raw[0]), float(raw[1])
+    except (TypeError, ValueError):
+        raise ShipFileError(f"{source}: {at}'s arc_deg is not two numbers: {raw!r}.") from None
+    if not 0.0 <= lo < hi <= 180.0:
+        raise ShipFileError(
+            f"{source}: {at}'s arc_deg runs from {lo:g} to {hi:g} degrees off the bow; it runs "
+            "from nought to a hundred and eighty, the first the less."
+        )
+    return (lo, hi)
 
 
 def _parse_quarter_bill(raw: Any, source: str) -> QuarterBillSpec:
@@ -863,11 +1079,17 @@ def _parse_quarter_bill(raw: Any, source: str) -> QuarterBillSpec:
             f"{source}: the quarter bill's priority is '{priority}'; say one of "
             f"{', '.join(PRIORITIES)}."
         )
+    filling = raw.get("filling")
     return QuarterBillSpec(
         trimmers=trimmers,
         helm=_count(raw.get("helm", 2), "the hands at the helm", source),
         powder=_count(raw.get("powder", 0), "the powder's hands", source),
         priority=priority,
+        small_arms=_count(raw.get("small_arms", 0), "the small-arms men", source),
+        boarders=_count(raw.get("boarders", 0), "the boarders", source),
+        filling=_count(filling, "the hands filling cartridges", source)
+        if filling is not None
+        else None,
     )
 
 
@@ -1702,7 +1924,8 @@ def _parse_crew(c: Any, source: str) -> CrewSpec:
         station = _known(p.get("station", "afterguard"), CREW_STATIONS, "the station", source)
         rating = p.get("rating")
         if rating is not None:
-            rating = _known(rating, SEAMAN_RATINGS, "the rating", source)
+            # package 73: the marines' officer and sergeant are drawn by the rating `marine`
+            rating = _known(rating, PERSON_RATINGS, "the rating", source)
         messenger = p.get("messenger", False)
         if not isinstance(messenger, bool):
             raise ShipFileError(

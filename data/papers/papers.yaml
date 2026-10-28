@@ -73,3 +73,13 @@ papers:
     place: cabin
     source: signal_book
     words: the nation's signal books, the day signals by number with their meanings, the night and fog signals, the convoy's instructions
+  # practice and resupply (between packages 72 and 73; docs/design/Build-PracticeAndResupply.md
+  # §1.4, §5): the gunner's count of the magazine and his account of what he receives and
+  # expends (the Regulations of 1806, the Gunner: the ammunition received of the storekeeper
+  # of the Ordnance, Art. I; the allowance for exercise, Art. XXI); kept by the boatswain
+  # where there is no gunner, then the mate, then the master
+  - handle: the gunner's account
+    keeper: gunner
+    place: gunroom
+    source: magazine
+    words: the powder below, the filled cartridges and the shot, with the receipts and the practice beyond the allowance

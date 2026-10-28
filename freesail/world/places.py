@@ -130,6 +130,23 @@ PLACES: dict[str, Place] = {
             "victuals in the cook's charge (judgement: a frigate's of the period, under the "
             "forecastle and open to the waist; a small vessel's is her caboose on deck)",
         ),
+        # package 73 (spec M7 §16): the surgeon's places
+        Place(
+            "cockpit",
+            "the cockpit",
+            "the surgeon's place in action, on the orlop below the waterline, where the "
+            "wounded are brought down to him (Falconer 1780, COCKPIT: 'the place where the "
+            "wounded men are dressed'); the sick berth under the forecastle else",
+            below=True,
+        ),
+        Place(
+            "sick_berth",
+            "the sick berth",
+            "the sick berth under the forecastle, in the surgeon's charge (the frigates' sick "
+            "berth of the 1800s, screened off forward on the upper deck: judgement on the "
+            "Regulations' surgeon)",
+            below=True,
+        ),
         Place(
             "boat",
             "the boat",
@@ -529,6 +546,12 @@ class Stores:
     # for a thing found foul, `days_since_watered`): 0, the voyage's start, until she
     # waters; a class default, as `foul`
     watered_tick: int = 0
+    # practice and resupply (between packages 72 and 73; the build design's §1.4, §5): the
+    # galley fire put out while the powder comes aboard ("powder"; the Regulations of 1806,
+    # the Gunner, Art. V, l.12800-12809), which the person's meal and the company's read,
+    # and the meals served cold for it; class defaults, as `foul`
+    galley_fire_out: str = ""
+    cold_meals: int = 0
 
     def lines(
         self, complement: int, water_days: float | None = None, day_words: str = ""
@@ -562,6 +585,13 @@ class Stores:
             out.append(
                 "Nothing is yet expended against them; the books stand as the ship was stored."
             )
+        # practice and resupply: the galley's state only while it is so, and the cold meals
+        # once there have been any, so that the page is otherwise what it was
+        if getattr(self, "galley_fire_out", ""):
+            out.append("The galley fire is out while the powder comes aboard.")
+        cold = int(getattr(self, "cold_meals", 0) or 0)
+        if cold > 0:
+            out.append(f"{cold} meal{'s' if cold != 1 else ''} served cold.")
         if day_words:
             out.append(f"{day_words}.")
         return out
@@ -576,6 +606,9 @@ class Stores:
         provisions = f"provisions for {self.provisions_days:.0f} days"
         if allowance < 1.0:
             provisions += f" ({self.provisions_days / allowance:.0f} at short allowance)"
+        if getattr(self, "galley_fire_out", ""):
+            # practice and resupply: only while it is so
+            provisions += ", the galley fire out while the powder comes aboard"
         return f"{water}, {provisions}"
 
 
@@ -635,6 +668,10 @@ class Papers:
         self.world = world
         doc = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
         self.catalogue: list[dict[str, Any]] = [dict(p) for p in (doc.get("papers") or [])]
+        # the catalogue's own file, for `_merge` (package 86's fold-in, the review's finding:
+        # it had mended every catalogue from `PAPERS_PATH`); None for the project's file, so
+        # that a checkpoint carries no machine's path and is mended by the build resuming it
+        self.path: str | None = None if Path(path).resolve() == PAPERS_PATH else str(path)
         # the last entry of each paper: the tick and the clock's stamp (the muster at the
         # start, until a keeper writes it)
         self.entries: dict[str, tuple[int, str]] = {}
@@ -661,14 +698,49 @@ class Papers:
         people = getattr(self.world, "people", None)
         if keeper == "purser" and people is not None and people.find("the purser") is None:
             return "mate" if people.find("the mate") is not None else "master"
+        if keeper == "gunner" and people is not None and people.find("the gunner") is None:
+            # practice and resupply: the gunner's account in a ship with no gunner (the
+            # cutter's people, data/people/cutter.yaml) falls to the boatswain, the mate
+            # and then the master
+            for role in ("boatswain", "mate"):
+                if people.find(f"the {role}") is not None:
+                    return role
+            return "master"
         return keeper
 
     def _entry(self, handle: str) -> dict[str, Any]:
         key = _paper_key(handle)
+        found = self._match(key)
+        if found is None and self._merge():
+            # practice and resupply (between packages 72 and 73): a checkpoint's catalogue
+            # from before a paper was added mended from the file, and looked in again
+            found = self._match(key)
+        if found is None:
+            raise KeyError(f"no paper aboard answers to '{handle}'")
+        return found
+
+    def _match(self, key: str) -> dict[str, Any] | None:
         for p in self.catalogue:
             if _paper_key(p["handle"]) == key or key in _paper_key(p["handle"]):
                 return p
-        raise KeyError(f"no paper aboard answers to '{handle}'")
+        return None
+
+    def _merge(self) -> bool:
+        """The papers of this catalogue's own file (`self.path`; the project's
+        `PAPERS_PATH` when it is that one, or a `Papers` pickled before the path was kept)
+        that the catalogue lacks, appended in the file's order; True when any were. On every
+        miss, against the file as this process has read it (`_file_papers`), and nothing is
+        kept on the `Papers` to say it was done: so a checkpoint is mended by whichever
+        build resumes it, a later build's new paper too, and not only by the first build
+        that had this. Nothing is logged or drawn."""
+        own = getattr(self, "path", None)
+        source = Path(own) if own else PAPERS_PATH
+        have = {_paper_key(p["handle"]) for p in self.catalogue}
+        added = [dict(p) for p in _file_papers(source) if _paper_key(p["handle"]) not in have]
+        if not added:
+            return False
+        self.catalogue = [*self.catalogue, *added]
+        return True
 
     def find(self, handle: str) -> dict[str, Any] | None:
         try:
@@ -764,6 +836,16 @@ class Papers:
                 lines.append(f"Prices at {port.name}, {when}, a ton at the quay:")
                 lines.extend(f"  {good}, {pounds_words(price)}." for good, price in listed)
             return lines, keeper
+        if source == "magazine":
+            # practice and resupply (between packages 72 and 73): the gunner's count of the
+            # magazine, with his account of the receipts and the practice beyond the allowance
+            if not getattr(ship, "guns", None):
+                return ["She carries no guns; the gunner keeps no account."], keeper
+            from freesail.combat.filling import magazine_lines
+            from freesail.ship.parts import magazine
+
+            mag = magazine(ship)
+            return [*magazine_lines(world, ship, mag), *mag.account_lines()], keeper
         if source == "private_signals":
             from freesail.world.signals import table_of
 
@@ -812,3 +894,28 @@ class Papers:
 def _paper_key(handle: str) -> str:
     text = str(handle).lower().replace("’", "'").replace("'", "")
     return " ".join(text.replace("-", " ").split()).removeprefix("the ")
+
+
+# practice and resupply (between packages 72 and 73): the papers file's catalogue as this
+# process read it, by the file's path, time and size, for `Papers._merge`; the module's,
+# never a `Papers`'s, so nothing of it is pickled into a checkpoint
+_FILE_PAPERS: dict[tuple[str, int, int], tuple[dict[str, Any], ...]] = {}
+
+
+def _file_papers(path: Path) -> tuple[dict[str, Any], ...]:
+    """The papers of the file at `path`, read once while the file is unchanged; none when
+    it cannot be read."""
+    try:
+        st = Path(path).stat()
+    except OSError:
+        return ()
+    key = (str(path), st.st_mtime_ns, st.st_size)
+    got = _FILE_PAPERS.get(key)
+    if got is None:
+        try:
+            doc = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+        except OSError:
+            doc = {}
+        got = tuple(dict(p) for p in (doc.get("papers") or []) if isinstance(p, dict))
+        _FILE_PAPERS[key] = got
+    return got
