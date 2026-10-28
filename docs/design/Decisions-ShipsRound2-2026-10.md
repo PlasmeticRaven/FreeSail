@@ -27,9 +27,11 @@
 **The owner's word on the viewer (2026-10-27).** "Changing the viewer is alright now." The sourced hull profile, and drawing it properly in the viewer, are part of this package and are to be properly implemented.
 
 **The 74 (2026-10-28).** The owner chose HMS *Bellerophon*, the Arrogant-class 74 of 1786 on the Bellona-class draughts, as this package's 74 (`Research-74-2026-10.md` §1.2). A *Téméraire*-class French 74 is the second ship of the line, a later goal outside this package. The owner answered the note's other questions (§11, 2-18) the same day, by number, in the note's §13.1. In brief:
-- **Two files, one for each rig era:**
-  - c. 1794-95, with the lateen mizen yard on the lateen class (D9(c)) and the 1793 and 1794 fits;
-  - 1801-1815, with the gaff, the 1795-1805 fit (82 pieces) and an 1815 fit.
+- **One file, one rig** (first two files by rig era; revised by the owner the same day, the note's §13.5).
+  - **The mizen:** her mizen course is set on the mizen yard abaft the mast only, its fore part cut away (Lavery's I31-I32). It is built as a sail between the lateen and the gaff.
+  - **The 64:** her D9(c) mizen is the same sail.
+  - **The tartane:** the full lateen stays for the tartane.
+  - **Her fits:** 1793 (74 pieces), 1795-1805 (82, the default), and a late fit after the *Bellona*'s list of 1812 (78).
 - **The hull:** ZAZ1357 as drawn.
 - **The sill:** first *Elephant*'s 5.6 ft at the drawn line, as recommended. Revised by the owner the same day to the *Bellona*'s own reported 5 ft 2 in at Channel draught (§13.2), so the lee port shuts at 10.6°. The design reconciles the hull profile with it.
 - **The lee-port rule:** heel with the roll's amplitude, the sill and the half-breadth both from the hull profile (for every ship, under D12(b)).
@@ -37,16 +39,17 @@
 - **The company:** 590, with a rear-admiral's flag as a fit.
 - **The marines:** as suggested, with leave to use TNA's Trafalgar Ancestors.
 - **The guns and their crews:** by the sources (Falconer and Douglas). The razee's gun crews follow the sources too (the owner, 2026-10-28): D31 becomes (a) for her guns and (c) for her crews. The existing files are the lead's.
-- **Ground tackle and boats:** by Steel's tables, as D33.
+- **Ground tackle and boats:** by Steel's tables, as D33: four bowers of 67 cwt and six boats, as Lavery's Tables 4-5 for about 1800 agree.
 - **The best speed:** about 11 kn.
 - **The scenario:** Basque Roads, July 1815.
 - **D25:** stays open.
 
 The owner's copy of Lavery's *The 74-Gun Ship Bellona* (1985) supplied:
 - the *Bellona*'s own sailing reports of 1763 and 1783 (p. 9, Table 2; the note's §13.2);
-- Tables 4-19 on ground tackle, boats, her company of 1761 with its marines, the *Dragon*'s masts and yards, the 1773 sails, and her guns of 1761 and 1812 (the note's §13.4).
+- Tables 4-19 on ground tackle, boats, her company of 1761 with its marines, the *Dragon*'s masts and yards, the 1773 sails, and her guns of 1761 and 1812 (the note's §13.4);
+- the tables' sources, with her masts, spritsail yards, sails, braces and mizen course in the drawings (the note's §13.5).
 
-All are held privately; the repository cites them by page.
+All are held privately; the repository cites them by page. *French Warships 1786-1861* and Winfield's 1793-1817 are set aside for now (the owner, 2026-10-28).
 
 **What follows from the answers:**
 - **D46 becomes (d) with rule 3 restored,** since D3 is (b). In stays, the ourse is braced to leeward as the helm goes down, and the yard is changed last. Each rule is carried over by judgement from a ship's mizen, and its truth says so.
