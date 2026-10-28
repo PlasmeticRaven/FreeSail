@@ -51,7 +51,10 @@ def test_a_vessel_with_a_brain_within_the_range_is_promoted_and_demoted_beyond_i
     assert cap.role == "merchant" and cap.state == "on passage" and cap.commands
     assert crew.standing.books_loaded() == ["on passage"]
     assert nm_between(crew.navigation.account_now(), crew.position) < 1.0
-    assert crew.ports.ports == {} and crew.systems is None and crew.chart is w.chart
+    # the ports the world's, hers to deal with (package 84, step 3): her own dealings
+    assert crew.ports is w.ports and crew.dealings is not w.dealings
+    assert crew.dealings.ports is w.ports.ports and crew.dealings.pilot is None
+    assert crew.systems is None and crew.chart is w.chart
     # the body mirrored, and the player's lookout sees one sail, hailed once
     w.run(600)
     assert b.position == crew.position

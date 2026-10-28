@@ -827,7 +827,7 @@ class Papers:
                 lines.append(words + ".")
             return lines, keeper
         if source == "prices":
-            ports = getattr(world, "ports", None)
+            ports = getattr(world, "dealings", None)
             if ports is None or not ports.price_lists:
                 return ["No price list aboard: the boat has not been ashore in any port."], keeper
             lines = []

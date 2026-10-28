@@ -6894,7 +6894,7 @@ class GetUnderWayScript(_AnchorScript):
         if self.ship.extra.get("aground"):
             return "she is aground"
         world = _world_of(self.ship)
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         if ports is not None and ports.boat.away:
             return f"{ports.boat.boat_name} is away; she cannot leave without her boat"
         self.anchor = self.tackle.riding_by()
@@ -7630,7 +7630,7 @@ class LayOutKedgeScript(_AnchorScript):
         # aground is the kedge's own work: carried out to deep water and hove taut, its
         # strain heaves her off as the ground's grip lessens (`world.ground`)
         world = _world_of(self.ship)
-        self.ports = getattr(world, "ports", None)
+        self.ports = getattr(world, "dealings", None)
         boat = self.ports.boat_spec() if self.ports is not None else None
         if boat is None:
             return "she carries no boat to lay it out with"
@@ -7771,7 +7771,7 @@ class LayOutKedgeScript(_AnchorScript):
 class SendBoatScript(Script):
     """The boat sent ashore and back (data/evolutions/send_boat.yaml): a passage by
     distance at a boat's pace; what she does ashore and brings back is the port's
-    (`freesail.world.ports.Ports.boat_phase`). Holds the boat and not the ship."""
+    (`freesail.world.dealings.Dealings.boat_phase`). Holds the boat and not the ship."""
 
     holds_subject = False
 
@@ -7788,7 +7788,7 @@ class SendBoatScript(Script):
 
     def check(self, words: dict[str, Any]) -> str | None:
         world = _world_of(self.ship)
-        self.ports = getattr(world, "ports", None)
+        self.ports = getattr(world, "dealings", None)
         if self.ports is None:
             return "there is no port here to send her to"
         port = self.ports.ports.get(str(self.params.get("port") or ""))

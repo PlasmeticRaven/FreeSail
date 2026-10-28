@@ -1551,7 +1551,7 @@ def execute(ship: Any, order: Order) -> Result:
             # naval cruise chased the admiral's cutter for two hours after her letter was
             # aboard, the French brig in sight on her quarter)
             chases = getattr(lookout, "_chases", None) or {}
-            ports = getattr(world, "ports", None)
+            ports = getattr(world, "dealings", None)
             own = ports.ship_nation if ports is not None else None
             known = lookout.stranger(world, float(world.ship.heading), own)
             ids = {i["id"] for i in known["items"]}

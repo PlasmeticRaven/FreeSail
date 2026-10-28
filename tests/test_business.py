@@ -387,11 +387,11 @@ def test_a_cargo_freighted_comes_off_by_the_lighter_at_no_price_with_its_cause_i
     # the dispatches: the master's cargo in the boat, the freight engaged beside it)
     w.submit("send the boat ashore")
     for _ in range(120):
-        if not w.ports.boat.away:
+        if not w.dealings.boat.away:
             break
         w.run(60)
     w.submit(f"buy {w.hold.room_tons - 2:.0f} tons of copper ore")
-    assert w.ports.boat.away
+    assert w.dealings.boat.away
     e = w.world_order("aboard: five tons of wool freighted by Mr Veale at the quay", "the test")
     assert e.data["result"] == "refused" and "tons bought are coming off" in e.text
 
@@ -408,7 +408,7 @@ def test_the_channel_doubts_money_from_nobody_a_far_payer_and_a_sum_beyond_the_p
     w = in_falmouth()
     w.world_order('person: make "Mr Veale", a clerk, ashore at Falmouth', "the test")
     w.world_order('person: make "Mr Gill", a merchant, ashore at Brest', "the test")
-    falmouth = w.ports.ports["falmouth"]
+    falmouth = w.dealings.ports["falmouth"]
     means = B.port_means_pounds(w, falmouth)
     assert means == pytest.approx(
         max(

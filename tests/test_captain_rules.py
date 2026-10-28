@@ -296,14 +296,14 @@ def anchored_at(where, **kw):
 
 def test_in_port_is_within_the_ports_reach_and_the_boat_goes_ashore_from_the_road():
     w = anchored_at(FALMOUTH_OUTER)
-    assert w.ports.ports["falmouth"].reach_nm == 2.0 and w.ports.in_port().id == "falmouth"
+    assert w.dealings.ports["falmouth"].reach_nm == 2.0 and w.dealings.in_port().id == "falmouth"
     # a mile and a half from the outer road: in port, and the boat goes for the prices
     w = anchored_at(SE_OF_THE_ROAD, cargo={"purse_pounds": 100.0})
-    assert w.ports.in_port() is not None and w.ports.in_port().id == "falmouth"
+    assert w.dealings.in_port() is not None and w.dealings.in_port().id == "falmouth"
     e = w.submit("send the boat ashore")
-    assert e.kind == "order.accepted" and w.ports.boat.errand == "prices"
+    assert e.kind == "order.accepted" and w.dealings.boat.errand == "prices"
     # two miles and three quarters south of the road: at sea
     w = anchored_at(S_OF_THE_ROAD)
-    assert w.ports.in_port() is None
+    assert w.dealings.in_port() is None
     e = w.submit("send the boat ashore")
     assert e.kind == "order.rejected" and "not in port" in e.text

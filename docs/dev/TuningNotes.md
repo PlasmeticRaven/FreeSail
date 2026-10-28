@@ -11011,3 +11011,62 @@ The whole slow tier was not run here (the lead's, by the whole-suite workflow at
 no pin was re-measured, since nothing a pin reads moved by either step (the proof above and
 the slow tier of the touched files; the whole tier at the merge is the last word). What
 changed after each tree's fast tier: nothing of the code; this section.
+
+### Step 3: the ports split, `Ports` the world's and `Dealings` the hull's
+
+Built from the merged head `8db8b9a` (86 and steps 1 and 2 in). **What moved: nothing
+pinned.** The one `Ports` class became two by moving method text verbatim: the world's
+`Ports` (the files, the markets, the stances with the nation an argument, the places, the
+blockades, the nearest port to a place; thirty-two members, `ports.py` 1,210 lines from
+4,301) and the hull's `Dealings` (`dealings.py`, new, ninety-six members, 3,465 lines: the
+pilot and his conn, the cutter, the boat, the price lists, the bargains, the yard, the pool,
+the waterman, the jobs). Each hull's dealings tick where the one class ticked in her World's
+tick and apply her jobs in the same order, so no line of any passage moves; the world's
+`Ports.tick` is called once by the owning World and does nothing yet. The crewed ship's
+World is given the parent's ports (the second sharing) and her own dealings, so she can send
+her boat and land her captain at full detail; the port's pilot is not offered unasked to a
+crewed stranger under a rules captain (`Dealings.pilot_offered`; step 4's doctrine), so no
+new sail comes on the player's sea by the step. The checkpoint's converter
+(`World._adopt_old_ports`) parts an older checkpoint's one `Ports` into the two, the three
+kept saves load and run on, and `test_hulls.py` writes the one `Ports` of before with a
+crewed ship and loads it parted.
+
+**The count.** Forty-one files: `ports.py` and `dealings.py`; `core/world.py` (the shared
+ports, the hull's dealings, the tick's call, the converter); `hulls.py` (the two lists);
+twenty-three files of the game that read a hull's dealing through the ports' name redirected
+to `world.dealings` (the grammar's `orders/port.py`, `people.py`, `fishing.py`,
+`navigation.py`, `gunnery.py`; the boat's scripts; `api/readings.py`, `action_readings.py`;
+`agents/director.py`, `agent.py`; `world/orders.py`, `movement.py`, `things.py`, `places.py`,
+`books.py`, `captains.py`, `ships.py`, `people.py`, `ordnance.py`, `regimes.py`,
+`signals.py`, `squadrons.py`; `combat/action.py`, `small_arms.py`), about seventy sites;
+fourteen test files, about a hundred and twenty sites, by the same rule. The redirect was a
+script over the files that read any dealing (every binding of the ports object from a World
+in such a file becomes the dealings, which answer the world's half too), then the readers by
+other names, then the `getattr` readers of `ship_nation`, `pilot`, `boat` and `jobs`; the
+world's `Ports.__getattr__` refuses a dealing's name in words, so every reader missed failed
+loudly in the fast tier of the touched files (eighteen at the first run, all of the kind,
+all mended) and none reads silently wrong.
+
+**New tests** (`test_ports.py`): the ports the world's and a hull's dealings hers (the two
+objects, the names answered on both, the stance by nation against hers, the refusal, the
+jobs' view with the hull on each); a crewed stranger in Carrick Road deals with the port by
+her own boat (promoted beside the frigate at anchor, anchored by her captain's order, her
+boat for the prices and back with her list and not the player's, her captain landed at the
+quay and found there among the world's people, no cutter sent after her, the player's
+dealings untouched). `test_crews.py`'s assertion that a crewed World has no ports became the
+sharing. Found by the tests: `places_lines` read the company's `everyone`, which musters it
+and answers nothing for a company not yet built (mended: the registry's persons as they
+stand); the schooner's nation by her names is not Britain's.
+
+**The slow tier of step 3's proof** (`--slow -m "slow and not pace"` over the five captain's
+trials, the known truths and the touched files, four workers): 155 passed, 8 expected
+failures, 1 failed: the lee-shore trial's digest (`test_with_ushant_under_her_lee_she_is_not_
+left_hove_to_onto_it`): 1,597 lines and the states as pinned, the digest `7fad0ce7e46ba366`
+against the pinned `ed48ca3d61e52f20`. **Not this step's and not this package's**: the trial
+dumped line by line on step 3's tree, on the merged head `8db8b9a` and on the base `e7a3ee8`
+(73 merged, before 84 and 86) gives the same 1,597 lines and the same `7fad0ce7e46ba366` on
+all three, identical to the line, so the digest was off the pin before this package began on
+this container. Package 73's record has the trial back on its pin exactly after its mends on
+the build machine, so the difference is this container's against that machine's (as truth
+7b-108's harbour line was the runner's), a line's words or data and not a state or a count;
+left for the lead's whole suite in the cloud to judge, not re-pinned here.

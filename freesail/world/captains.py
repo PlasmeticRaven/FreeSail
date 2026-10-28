@@ -766,7 +766,7 @@ def read_intent(world: Any, words: str, free: bool = False) -> Intent:
         return Intent("passage", said, origin=a, destination=b, via=via, convoy=True)
     m = _BLOCKADE.match(text)
     if m:
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         port = ports.find(group(m, "port")) if ports is not None and ports.ports else None
         if port is None:
             raise ValueError(f"'{group(m, 'port')}' is no port of the chart to blockade.")
@@ -805,7 +805,7 @@ def _place_id(world: Any, words: str) -> str:
     """A port's id, a feature's id or a pricked position's words, for a place named in an
     intent; refused in words when the chart knows no such place."""
     text = " ".join(str(words).split()).strip(" .")
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     port = ports.find(text) if ports is not None and getattr(ports, "ports", None) else None
     if port is not None:
         return port.id
@@ -1121,7 +1121,7 @@ class Planner:
     # -- the ports' tracks -----------------------------------------------------------
 
     def _port(self, place: str) -> Any:
-        ports = getattr(self.world, "ports", None)
+        ports = getattr(self.world, "dealings", None)
         return (getattr(ports, "ports", None) or {}).get(place) if ports is not None else None
 
     def _port_track(self, port: Any, which: str) -> list[Leg]:
@@ -2636,7 +2636,7 @@ class Captain(Judgement):
         return "E"
 
     def _port_of(self, place: str) -> Any:
-        ports = getattr(self.world, "ports", None)
+        ports = getattr(self.world, "dealings", None)
         return (
             (getattr(ports, "ports", None) or {}).get(place)
             if ports is not None and place
@@ -3694,7 +3694,7 @@ class Captain(Judgement):
 
         d = self.doctrine
         th = d.threshold if d is not None else (lambda k, v=None: v)
-        ports = getattr(self.world, "ports", None)
+        ports = getattr(self.world, "dealings", None)
         nation = str(getattr(ports, "ship_nation", "") or "")
         nations = getattr(self.world, "nations", None)
         habit = nations.habits_of(nation) if nations is not None else dict(DEFAULT_HABITS)
@@ -4128,7 +4128,7 @@ class Captain(Judgement):
         if not nation:
             return False
         nations = getattr(self.world, "nations", None)
-        ports = getattr(self.world, "ports", None)
+        ports = getattr(self.world, "dealings", None)
         own = ports.ship_nation if ports is not None else None
         return bool(nations is not None and own and nations.at_war(str(nation), own))
 
@@ -4170,7 +4170,7 @@ class Captain(Judgement):
     def _shelter_port(self, p: Perception) -> Any:
         """The nearest port open to her within the doctrine's reach, by the port's
         reading (by account)."""
-        ports = getattr(self.world, "ports", None)
+        ports = getattr(self.world, "dealings", None)
         if ports is None or not getattr(ports, "ports", None):
             return None
         d = self.doctrine

@@ -2039,7 +2039,7 @@ def voyage_words(world: Any) -> str:
     ship = getattr(world, "ship", None)
     name = getattr(ship, "name", "") or "the ship"
     rig = getattr(getattr(ship, "spec", None), "rig", "") or ""
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     nation = getattr(ports, "ship_nation", "") if ports is not None else ""
     said = f"The ship: {name}" + (f", a {rig.replace('-', ' ')}" if rig else "")
     said += f", of {nation.replace('-', ' ')}." if nation else "."

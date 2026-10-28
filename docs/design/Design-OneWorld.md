@@ -1533,3 +1533,64 @@ hands') keeps a bool `aboard` and no hull, and `spot_of` gives it the World's ow
 `_to_full` (a station's World brought back from the far shape) remakes her ship and muster
 and keeps her `People` as it did; the persons' `sailor_id`s then name the old muster, which
 step 5's wake without a remake ends.
+
+### Step 3: the ports split, `Ports` the world's and `Dealings` the hull's
+
+Built from the merged head `8db8b9a` (86 and steps 1 and 2 merged; 86's 29 lines in
+`ports.py` carried). **Built.** `freesail/world/ports.py` keeps the world's half as `Ports`,
+one for the game on `world.ports` (a shared field, given to a crewed ship's World from her
+parent as the registry is): the port files and their state (`ports`, `_load`, `find`), the
+markets (`price_of`), the blockades (`blockades`, `watched_by`), the port's news, the places
+ashore with who of the whole world is found there (`places_lines`, reading the registry's
+persons as they stand and mustering nobody), **`stance(port, nation)`** with the nation an
+argument, the nearest port to a place and the port a place lies in (`nearest_to(pos)`,
+`in_port_at(pos)`, `to_shore_from(pos, port)`), the jobs of every hull as a view (`jobs`,
+each `Job` carrying its hull), and a `tick` the owning World calls once (empty yet: the
+markets recover as they are read; the sleeping hulls' jobs are step 5's place).
+`freesail/world/dealings.py` (new) takes the hull's half as `Dealings`, one per hull on
+`world.dealings` (`Hull.dealings`, in `PER_SHIP_FIELDS` where `ports` was): the pilot and his
+conn, the cutter sent for her, her boat and its errands, her price lists, `lay_in`,
+`declined_until`, her bargains (`trade`, `trade_together`, `trade_list`), the yard's work
+(`demand`), the hands she enters, the waterman, her jobs and their applying, her readings'
+words. **The method text moved verbatim** (ninety-six methods, 3,300 lines; the history is
+`ports.py`'s), with the world's half reached through `self.world.ports`, and the names a
+reader of the one class had answered on the dealings too (`dealings.ports` the files,
+`find`, `stance(port)` with her nation, `nearest()` and `in_port()` from her position,
+`blockades`, `price_of`, `places_lines`), so that a reader of a hull's dealing changes the
+object it reads and nothing else. **The readers moved** (`world.ports` to `world.dealings`
+where the thing read is hers): twenty-six files of the game, among them the grammar's
+`orders/port.py`, the boat's scripts, the readings registry, the director's forms, the
+far captain, the ordnance's resupply and the free intent's port, and fourteen test files;
+the world's-half readers (the business, the brains, the hail, the seats) read `world.ports`
+as before. A dealing read on the world's `Ports` is refused in words naming where it lives
+(`Ports.__getattr__`, `DEALINGS_NAMES`), so a missed reader fails loudly and never reads the
+player's boat for another hull's. **The crewed ship's World has the ports** (the second
+sharing): her `Dealings` is her own, her boat goes to the quay of the port she lies in,
+her captain goes ashore at full detail and is found at the quay among the world's people,
+her price list is hers, and the player's boat is where it was (`test_ports.py`, the design's
+test for the step). The checkpoint: `World._adopt_old_ports` parts an older checkpoint's one
+`Ports` object (the fixture saves' and the owner's) into the world's files and the hull's
+dealings, each job given its hull; a crewed World's is given the parent's ports; the three
+kept saves load and run on, and `test_hulls.py` writes the one `Ports` of before and loads
+it parted.
+
+**Taken another way, with the reason.** The design has `Ports.tick` run every hull's jobs;
+here each hull's `Dealings.tick` applies her own, in the place and order the one class
+applied them in her World's tick, so that no line of any passage can move by the step; the
+world's `Ports.tick` is called once by the owning World and does nothing yet, the hook for
+the sleeping hulls' jobs at step 5. **A staging rule, said plainly:** the port's pilot comes
+off unasked only for a ship whose captain can answer his hail (`Dealings.pilot_offered`:
+the World's own hull, or a hull a station holds); a crewed stranger under her rules captain
+is not offered one until step 4 gives him the port's acts by doctrine, since until then his
+boat would hail twice and bear away, a sail on the player's sea for nothing, and a pin
+moved for nothing. Every other dealing of hers (her boat, the market, the yard, the pool,
+the waterman) works by her captain's orders now.
+
+**Found on the way.** `places_lines` read the company's `everyone`, which musters the
+company first and answers nothing for one not yet built, so a brig's captain landed at
+Falmouth before the frigate's company had been looked at went unnamed: the reading walks the
+registry's persons as they stand now. The boat's scripts (`evolutions/scripts.py`) keep the
+attribute name `ports` for the dealings they hold, since a checkpoint mid-errand pickles the
+script with it; the rename is the long tail's. `Job.hull` is "" in a checkpoint from
+before and is filled from the list it is found in. The schooner's nation by her company's
+names is not Britain's (`ship_nation`), which the step's first test learned.

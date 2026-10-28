@@ -40,7 +40,7 @@ stream, so a sail on the sea never moves the land's draws and the pinned passage
 **The pilot cutter** (package 35; spec M5 §23) is the first vessel and is built on this
 machinery: 32b's cutter, which comes off from the port when a ship is in the pilot's
 cruising ground, closes her, lies to under her lee while the pilot boards, and goes back
-(`freesail.world.ports.Ports`). Nothing here is special to any ship: every vessel is a
+(`freesail.world.dealings.Dealings`). Nothing here is special to any ship: every vessel is a
 hull from a file, her polar drawn from it. Package 37h gives her a leg of her own,
 `company`: hailed, the pilot's boat keeps company with the ship at the ship's pace, a
 cable and a half off, until she is slow enough for him to board or her captain sends her
@@ -1016,7 +1016,7 @@ def place_position(world: Any, words: str) -> tuple[Position, str] | None:
     from freesail.world.geo import parse_position
 
     text = " ".join(str(words).split())
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     port = ports.find(text) if ports is not None and ports.ports else None
     if port is not None:
         return port.outer_road.position, port.name
@@ -1113,7 +1113,7 @@ def _goal_plan(world: Any, goal: str, start: Position) -> tuple[list[tuple[Any, 
 
 def _out_of_port(world: Any, port_id: str) -> list[tuple[Any, ...]]:
     """The marks of a port's track to sea (`Planner._port_track`), as a far body's plan."""
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     port = (getattr(ports, "ports", None) or {}).get(port_id) if ports is not None else None
     if port is None:
         return []
@@ -1207,7 +1207,7 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         # package 72 (spec M7 §22): a hull laid up at a port's anchorage, commissioned later
         from freesail.world.regimes import put_in_ordinary
 
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         port = None
         best = None
         for p in (getattr(ports, "ports", None) or {}).values():
@@ -1471,7 +1471,7 @@ class Vessels:
                 # read a trader as 'a ship' of the line's class
                 key = SHADOW_FILES.get(source.replace("\\", "/").split("/")[-1], "")
             d = description(key) if key else {"file": source, "rig": "a ship", "what": "a ship"}
-            ports = getattr(world, "ports", None)
+            ports = getattr(world, "dealings", None)
             nation_id = str(getattr(ports, "ship_nation", "") or "britain")
             try:
                 nation = world.nations.get(nation_id)

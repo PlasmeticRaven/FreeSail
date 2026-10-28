@@ -482,9 +482,9 @@ def test_the_magazine_row_rides_in_port_while_she_wants_powder_or_shot(monkeypat
     assert "magazine" in _sampled(w)
     # not in port: idle, whatever she wants
     w.ship.extra["magazine"] = ShortMagazine(layout=2)
-    assert w.ports.in_port() is None and "magazine" in _sampled(w)
+    assert w.dealings.in_port() is None and "magazine" in _sampled(w)
     # in port and short: it rides; in port and complete: idle
-    monkeypatch.setattr(w.ports, "in_port", lambda: object())
+    monkeypatch.setattr(w.dealings, "in_port", lambda: object())
     assert "magazine" not in _sampled(w)
     w.ship.extra["magazine"] = Magazine(layout=2)
     assert "magazine" in _sampled(w)

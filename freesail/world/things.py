@@ -245,7 +245,7 @@ def _person(world: Any, words: str) -> Any:
 
 
 def _port(world: Any, pid: str | None) -> Any:
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if ports is None or not pid:
         return None
     return ports.ports.get(pid)
@@ -447,7 +447,7 @@ def read_where(world: Any, phrase: str) -> dict[str, Any] | None:
         return {"place": IN_THE_BOAT, "spot": "", "hull": own_hull(world)}
     m = _ASHORE.match(text)
     if m is not None:
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         words = (m.group("port") or "").strip()
         if words:
             port = ports.find(words) if ports is not None else None
@@ -462,7 +462,7 @@ def read_where(world: Any, phrase: str) -> dict[str, Any] | None:
     found = _place_in(text)
     if found is not None:
         return {"place": found[0], "spot": found[1], "hull": own_hull(world)}
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     m = _PLACE_AT_PORT.match(text)
     if m is not None and ports is not None:
         port = ports.find(m.group("port"))

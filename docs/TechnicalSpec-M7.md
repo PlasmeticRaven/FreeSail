@@ -803,14 +803,18 @@ what she is made out to be with a hyphened word whole or by its head ('brig' a m
 brig, not a brig-sloop; 'sloop' or 'brig-sloop' the brig-sloop). The name leans on the
 player's shadow and the id 'the ship', which 82 and 84 rework.
 
-**As built (package 84, steps 1 and 2; `docs/design/Design-OneWorld.md`, "As built, steps 1
-and 2").** The container of a promoted member is still her own World (`crews.CrewedWorld`)
-until the refactor's step 6, but what a World keeps of one ship, the player's or a member's,
-is a `Hull` behind the World's names (`freesail/world/hulls.py`, `world.own`), and the
-persons of every ship and of the shore are one registry of the world (`world.registry`,
-`people.Registry`) with each person's whereabouts (`Person.hull`, `Person.home`), a ship's
-company a view of it; hearing is by spot with the hull in it, so a word ashore is heard by
-whoever is at that place of that port, whichever ship brought him.
+**As built (package 84, steps 1 to 3; `docs/design/Design-OneWorld.md`, "As built, steps 1
+and 2" and "Step 3").** The container of a promoted member is still her own World
+(`crews.CrewedWorld`) until the refactor's step 6, but what a World keeps of one ship, the
+player's or a member's, is a `Hull` behind the World's names (`freesail/world/hulls.py`,
+`world.own`); the persons of every ship and of the shore are one registry of the world
+(`world.registry`, `people.Registry`) with each person's whereabouts (`Person.hull`,
+`Person.home`), a ship's company a view of it; hearing is by spot with the hull in it, so a
+word ashore is heard by whoever is at that place of that port, whichever ship brought him;
+and the ports are the world's (`world.ports`, `ports.Ports`: the files, the markets, a stance
+toward a nation, who is found ashore) while each ship's dealings with them are hers
+(`world.dealings`, `dealings.Dealings`: her pilot, her boat, her price lists, her bargains),
+a promoted member's World sharing the ports and dealing with them by her own boat.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 
