@@ -21,6 +21,7 @@
 | **D14** | **(c), in this package.** The sourced hull profile goes into every ship file **and is drawn by the viewer**, for every ship. |
 | **D18** | **Open, with the owner's measure:** whichever choice gives the best impression in the viewer and matches the sources. The convention may change, so long as the change is an improvement. |
 | **D35** | **(b), limited.** The fore topgallant studding sail, together with (a)'s studding sails and main topmast staysail. |
+| **D25** | **Open** until the 74's research reports. A French 74 would make the *Droits de l'Homme* action of January 1797 a third candidate, beside the sheet's (b) and the lead's (c). |
 
 **The owner's word on the viewer (2026-10-27).** "Changing the viewer is alright now." The sourced hull profile, and drawing it properly in the viewer, are part of this package and are to be properly implemented.
 
@@ -32,7 +33,9 @@
 - **D18, the lead's reading for the design:** with D14(c), the viewer draws her true sides, sheer, wales and port sills from the hull profile, and no longer from the one deck line. The deck-height convention can then serve the physics and the spar heights alone. The design proposes against the owner's measure and shows the screenshots.
 
 **Beyond the brief as written, for the lead.** The owner's answers widen package 75 in five places. The brief's own text says otherwise, so the lead should know before stage 0:
-1. **The viewer.** The brief says "the viewer itself stays at the current standard in this package" and, under "Not built here", "the viewer's hull (81's)". The owner's answer to D14 brings the sourced hull's drawing into 75, for every ship. Package 81 keeps the guns, their movement, the flash and the smoke.
+1. **The viewer.** The brief says "the viewer itself stays at the current standard in this package" and, under "Not built here", "the viewer's hull (81's)". The owner's answer to D14 brings the sourced hull's drawing into 75, for every ship.
+   - **The owner's reading (2026-10-27):** package 81 is booked for the gun ports, the guns, the muzzle flash and the smoke. Drawing the hull itself properly is booked to no package, so it comes to 75 without taking anything from 81.
+   - The owner is confirming this with the lead.
 2. **The lateen class** (D9), finished for the 64's mizen: its evolutions, its brace, its curve and its drawing.
 3. **Yards under the bowsprit** (D8): new engine and viewer work. The engine note found that such a yard changes how a ship is classed and handled (Eng §5; §7, risk 2).
 4. **The lee ports wired for every ship** (D12): every existing ship's combat pins move, and are re-measured old beside new.
