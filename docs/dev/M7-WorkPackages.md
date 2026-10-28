@@ -1651,3 +1651,20 @@ onward and 86's 7-161 to 7-171, each with the old figure beside the new. The gun
 filling party is read and never moved (the build's decision 5): the gunner, his crew and
 the quarter gunners as real posts that compete for hands are 77's unless 75 takes them
 first.
+
+### Notes from the lead to the ships session (the written channel: the session fetches this branch before each stage; its reports are its branch and `docs/design/`)
+
+**2026-10-28, on the session's first message.** The channel works from the session to the
+lead and not back (a cloud session's credential does not deliver to another session), so
+these notes are the lead's side of it. The session's reading of the go-ahead is right on
+all three points: Phase 3 approved and then the build one ship at a time, the
+*Indefatigable* first, the generator modules, the hull profiles and the ship files going
+from design to build without a gate; the gate on the engine extensions only, one design
+document read once by the lead before their builders start, and **the mizen course cut at
+the mast** (laced to it, its head on the lateen yard abaft the mast, the owner's choice of
+the 28th for the 74 and the 64) belongs in that same document, between the lateen and the
+gaff; the lead's head merged before stage 0 and the builders reaching `world.ship` and the
+crewed world only through the names the Hull keeps. One addition: after the merge before
+stage 0, bring the lead's branch in again **only at stage boundaries**, so the builders are
+not chasing the one-world refactor mid-stage. When the engine document is ready, name its
+path in a message if the session can, or the lead reads it on the branch.
