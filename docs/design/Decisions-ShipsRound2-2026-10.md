@@ -22,6 +22,7 @@
 | **D18** | **Open, with the owner's measure:** whichever choice gives the best impression in the viewer and matches the sources. The convention may change, so long as the change is an improvement. |
 | **D35** | **(b), limited.** The fore topgallant studding sail, together with (a)'s studding sails and main topmast staysail. |
 | **D25** | **Open** until the 74's research reports. A French 74 would make the *Droits de l'Homme* action of January 1797 a third candidate, beside the sheet's (b) and the lead's (c). The research has reported (`Research-74-2026-10.md`): it recommends the British *Bellerophon* for this package and proposes a *Téméraire*-class French 74 as a later ship of its own, which the *Droits de l'Homme* option needs (its owner's question 16). The owner holds D25 open. With the French 74 a later ship (below), that option would wait for her. |
+| **D31** | **(a) for the guns, (c) for the crews** (2026-10-28, with the 74's answers). The razee's gun crews are counted by the period sources (Falconer and Douglas), as the 74's are. |
 
 **The owner's word on the viewer (2026-10-27).** "Changing the viewer is alright now." The sourced hull profile, and drawing it properly in the viewer, are part of this package and are to be properly implemented.
 
@@ -35,13 +36,17 @@
 - **The quarter bill:** by deck, with a deck key on each gun.
 - **The company:** 590, with a rear-admiral's flag as a fit.
 - **The marines:** as suggested, with leave to use TNA's Trafalgar Ancestors.
-- **The guns and their crews:** by the sources (Falconer and Douglas). This departs from D31(a)'s rule for the razee; whether she follows is open.
+- **The guns and their crews:** by the sources (Falconer and Douglas). The razee's gun crews follow the sources too (the owner, 2026-10-28): D31 becomes (a) for her guns and (c) for her crews. The existing files are the lead's.
 - **Ground tackle and boats:** by Steel's tables, as D33.
 - **The best speed:** about 11 kn.
 - **The scenario:** Basque Roads, July 1815.
 - **D25:** stays open.
 
-The owner's copy of Lavery's *The 74-Gun Ship Bellona* (1985) supplied the *Bellona*'s own sailing reports of 1763 and 1783 (p. 9, Table 2; held privately, cited in the note's §13.2).
+The owner's copy of Lavery's *The 74-Gun Ship Bellona* (1985) supplied:
+- the *Bellona*'s own sailing reports of 1763 and 1783 (p. 9, Table 2; the note's §13.2);
+- Tables 4-19 on ground tackle, boats, her company of 1761 with its marines, the *Dragon*'s masts and yards, the 1773 sails, and her guns of 1761 and 1812 (the note's §13.4).
+
+All are held privately; the repository cites them by page.
 
 **What follows from the answers:**
 - **D46 becomes (d) with rule 3 restored,** since D3 is (b). In stays, the ourse is braced to leeward as the helm goes down, and the yard is changed last. Each rule is carried over by judgement from a ship's mizen, and its truth says so.
