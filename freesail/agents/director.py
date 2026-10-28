@@ -344,7 +344,7 @@ class DirectorBrief:
                 return "the brief forbids your ships the ruse: no false colours (package 71)"
         if order.channel == "port" and lim.get("the_war_as_it_is"):
             m = world_orders._PORT.match(body)
-            ports = getattr(world, "ports", None)
+            ports = getattr(world, "dealings", None)
             if m is not None and ports is not None and m.group("what").lower() != "price of":
                 nation = world.nations.find(m.group("rest").strip())
                 own = getattr(ports, "ship_nation", "")
@@ -410,7 +410,7 @@ def _enemy_heavier(world: Any, body: str, heaviest: str) -> str | None:
     if m is None:
         return None
     nation = world.nations.find(m.group("nation"))
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     own = getattr(ports, "ship_nation", "") if ports is not None else ""
     if nation is None or not own or not world.nations.at_war(nation.id, own):
         return None
@@ -1989,7 +1989,7 @@ def _person_where(world: Any, person: Any) -> str:
 
     if person.aboard:
         return place_words(world.people.effective_place(person))
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     port = ports.ports.get(person.port) if (ports is not None and person.port) else None
     return f"ashore at {port.name}" if port is not None else place_words(person.where)
 

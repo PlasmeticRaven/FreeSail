@@ -11011,3 +11011,144 @@ The whole slow tier was not run here (the lead's, by the whole-suite workflow at
 no pin was re-measured, since nothing a pin reads moved by either step (the proof above and
 the slow tier of the touched files; the whole tier at the merge is the last word). What
 changed after each tree's fast tier: nothing of the code; this section.
+
+### Step 3: the ports split, `Ports` the world's and `Dealings` the hull's
+
+Built from the merged head `8db8b9a` (86 and steps 1 and 2 in). **What moved: nothing
+pinned.** The one `Ports` class became two by moving method text verbatim: the world's
+`Ports` (the files, the markets, the stances with the nation an argument, the places, the
+blockades, the nearest port to a place; thirty-two members, `ports.py` 1,210 lines from
+4,301) and the hull's `Dealings` (`dealings.py`, new, ninety-six members, 3,465 lines: the
+pilot and his conn, the cutter, the boat, the price lists, the bargains, the yard, the pool,
+the waterman, the jobs). Each hull's dealings tick where the one class ticked in her World's
+tick and apply her jobs in the same order, so no line of any passage moves; the world's
+`Ports.tick` is called once by the owning World and does nothing yet. The crewed ship's
+World is given the parent's ports (the second sharing) and her own dealings, so she can send
+her boat and land her captain at full detail; the port's pilot is not offered unasked to a
+crewed stranger under a rules captain (`Dealings.pilot_offered`; step 4's doctrine), so no
+new sail comes on the player's sea by the step. The checkpoint's converter
+(`World._adopt_old_ports`) parts an older checkpoint's one `Ports` into the two, the three
+kept saves load and run on, and `test_hulls.py` writes the one `Ports` of before with a
+crewed ship and loads it parted.
+
+**The count.** Forty-one files: `ports.py` and `dealings.py`; `core/world.py` (the shared
+ports, the hull's dealings, the tick's call, the converter); `hulls.py` (the two lists);
+twenty-three files of the game that read a hull's dealing through the ports' name redirected
+to `world.dealings` (the grammar's `orders/port.py`, `people.py`, `fishing.py`,
+`navigation.py`, `gunnery.py`; the boat's scripts; `api/readings.py`, `action_readings.py`;
+`agents/director.py`, `agent.py`; `world/orders.py`, `movement.py`, `things.py`, `places.py`,
+`books.py`, `captains.py`, `ships.py`, `people.py`, `ordnance.py`, `regimes.py`,
+`signals.py`, `squadrons.py`; `combat/action.py`, `small_arms.py`), about seventy sites;
+fourteen test files, about a hundred and twenty sites, by the same rule. The redirect was a
+script over the files that read any dealing (every binding of the ports object from a World
+in such a file becomes the dealings, which answer the world's half too), then the readers by
+other names, then the `getattr` readers of `ship_nation`, `pilot`, `boat` and `jobs`; the
+world's `Ports.__getattr__` refuses a dealing's name in words, so every reader missed failed
+loudly in the fast tier of the touched files (eighteen at the first run, all of the kind,
+all mended) and none reads silently wrong.
+
+**New tests** (`test_ports.py`): the ports the world's and a hull's dealings hers (the two
+objects, the names answered on both, the stance by nation against hers, the refusal, the
+jobs' view with the hull on each); a crewed stranger in Carrick Road deals with the port by
+her own boat (promoted beside the frigate at anchor, anchored by her captain's order, her
+boat for the prices and back with her list and not the player's, her captain landed at the
+quay and found there among the world's people, no cutter sent after her, the player's
+dealings untouched). `test_crews.py`'s assertion that a crewed World has no ports became the
+sharing. Found by the tests: `places_lines` read the company's `everyone`, which musters it
+and answers nothing for a company not yet built (mended: the registry's persons as they
+stand); the schooner's nation by her names is not Britain's.
+
+**The slow tier of step 3's proof** (`--slow -m "slow and not pace"` over the five captain's
+trials, the known truths and the touched files, four workers): 155 passed, 8 expected
+failures, 1 failed: the lee-shore trial's digest (`test_with_ushant_under_her_lee_she_is_not_
+left_hove_to_onto_it`): 1,597 lines and the states as pinned, the digest `7fad0ce7e46ba366`
+against the pinned `ed48ca3d61e52f20`. **Not this step's and not this package's**: the trial
+dumped line by line on step 3's tree, on the merged head `8db8b9a` and on the base `e7a3ee8`
+(73 merged, before 84 and 86) gives the same 1,597 lines and the same `7fad0ce7e46ba366` on
+all three, identical to the line, so the digest was off the pin before this package began on
+this container. Package 73's record has the trial back on its pin exactly after its mends on
+the build machine, so the difference is this container's against that machine's (as truth
+7b-108's harbour line was the runner's), a line's words or data and not a state or a count;
+left for the lead's whole suite in the cloud to judge, not re-pinned here.
+
+### Step 4: the coarse acts on a sleeping hull, and the far brain's port acts
+
+Built on step 3 (the design note's postscript "Step 4" has the shape). **What moved: nothing
+pinned.** The business is off in every recorded scenario, no recorded scenario seats a
+station on another ship, and the chart's new coasting track (`torbay-to-plymouth`) is a way
+the planner takes only where a straight line was not clear of the shore, which no recorded
+passage's plan is.
+
+**The count.** `crews.py` (the routing by "needs no physics", `COARSE_OBJECTS`; the far
+tick running her dealings' jobs and her people's moves; the anchor by the track's end and
+the plan's end said in her log; `far_order`'s course for a port by the tracks; the seat
+reading the scenario's crewed budget), `dealings.py` (`coarse`, `anchored`, the boat's
+errand as two jobs with the boat's time, the pilot's minute and the cutter not run asleep),
+`ships.py` (`port_course`, `approach_plan`, `Vessel.station_held`, `mark_reached`, the far
+body lying to at the plan's end under a held station), `brains.py` and `business.py` (the
+far trader's transaction, `data/business.yaml` `transact:`), `world/orders.py` (a word said
+as a person ashore heard by whoever of any hull is at his place; a free line in his mouth
+performed), `orders/free.py` (`spoken`), `things.py` (`Thing.keeper_home`),
+`data/charts/features/channel-west.yaml` (the coasting track), `data/scenarios/tender.yaml`
+(new); tests in `test_crews.py` (five), `test_business.py` (one), `test_captains.py` (the
+tracks' list), `test_world_orders.py` (the refusal's words), and truth 7-200.
+
+**The tender's day** (truth 7-200, seed 7, `data/scenarios/tender.yaml`): the Amazon at
+anchor in Brixham road, the Raven a King's cutter beside her at far detail with a fake at
+her captain's station through the harness (lockstep every ten minutes and on the notable
+lines; a word at every sample, since a door silent past its patience loses the deck to the
+rules captain, whose judgements stand in). The walk: anchored by the fake at the start; the
+frigate's No. 131 (steer for the place indicated: Plymouth) seen at a minute and read at two,
+the fake answering it with the pendant, weighing and shaping the course; the course by the
+tracks out of Torbay (50 24 N 3 26 W), by the coasting track outside the Start and the Bolt
+Head (50 23 N 3 24 W, 50 11 N 3 37 W, 50 09 N 3 52 W), to Plymouth's sea mark (50 11 N 4 18
+W) and in by its track to the anchorage in the Sound, where the plan's last leg anchors her.
+The day's figures (seed 7, a north-westerly of fourteen knots falling to twelve): anchored
+at 05:01; the hoist seen at 05:04, read at 05:06, the fake's three orders at 05:07; six
+miles off the Amazon at 06:47; brought to an anchor in the Sound by the track's end at
+18:19 (thirteen hours for some forty-five miles by the tracks, the far body's polar and her
+sailing factor, the last legs into the Sound close-hauled); the boat back from landing her
+captain at 19:25, Mr Gill's packet given at the counting house and the boat back with him
+at 20:37; weighed and shaped for Torbay at once; the lugger made out on the starboard bow
+at 04:14 of the 13th, passing to the westward; brought to an anchor in Brixham road at
+09:57 of the 13th (thirteen hours home, the last leg into the bay a beat against the
+north-westerly) and the hail heard on the Amazon at 10:03. The Raven's log 366 lines, the
+Amazon's 210, the fake called 206 times over 199 samples; 131 s of wall on this container
+for the twenty-nine hours (the frigate at anchor at full detail the whole while). Nothing
+of it is pinned; the truth asserts the walk and the two logs' silences, not the figures.
+
+**Found on the way.** The seat on another ship (`station_world`) read the build machine's
+constants and promoted a ship under a scenario whose cap was nought (mended: it reads
+`settings`). The far body's end-of-plan took a crewed hull off the sea with her station
+seated (mended: she lies to under a held station, `plan.ended`). The planner had no track
+along the coast from the Berry Head to the Start and the Bolt Head, and its headland offing
+could not clear the Prawle, so `shape a course for Plymouth` from Torbay was refused by the
+land guard until the coasting track was added; Torbay's track to sea begins at its
+anchorage, which the far course drops as a mark to anchor at. A fake that answered its
+samples with silence lost the deck to the rules captain after its patience (the harness's
+rule for a silent door), whose judgements stood in and laid his own plan; the truth's fake
+says a word at every sample. The director's `say as` for a person ashore was refused beyond
+a boat's reach of the player's ship (package 66's rule), which the one registry makes a
+question of who is at his place; and a thing given to the cutter's master was found in the
+frigate's master's hands by his id (`Thing.keeper_home`). The step 3 fast tier on its
+worktree: 1 failure, `test_pictures.py`'s blank-image check (`std 7.95 > 8.0`) under the
+machine's load beside this step's smokes, as the baseline's run had; it passes alone on the
+same tree. The hand's refusal of a reading (`_READING_WORDS`) keeps the strict meaning
+(`_is_a_reading`), the far shape's routing the widened one (`_needs_no_physics`): a port
+order given over her captain's head is his to give or refuse in her words, as before.
+
+**The fast tier on step 4's tree** (`-n auto`, four workers, this container): 2 failures.
+`test_pictures.py`'s blank-image check under load again (passes alone), and
+`test_squadrons.py::test_the_convoy_tacks_in_succession_by_the_wake_...`: the gaps between
+the merchantmen's tacks `[300, 240]` against its band of 300 to 420 s. **Bisected to the
+chart's coasting track** (the test passes with `channel-west.yaml` as it was): the convoy
+bound from off the Lizard for the Start was routed by the planner's headland offing (a mark
+at 50 12.0 N 3 34.6 W) and is now routed by the track's marks (50 09 N 3 52 W, 50 11 N 3 37
+W, the Start), her heading 055 for 058, her pace 5.8 for 5.7 knots. Four cables at that
+pace is 247 s, so the gap counted by the minute is the fourth or the fifth minute by its
+phase: `[300, 300]` before, `[300, 240]` now. The band of five to seven minutes was the old
+route's phase and not the rule the test states (the run of the interval at the pace, not
+71's three minutes); the assertion is the rule now, each gap within a minute of the
+interval's run at the measured pace and more than three minutes, the old figure beside the
+new here. Nothing else of the chart's routing moved in the fast tier; the slow tier of the
+touched files and the known truths is below.

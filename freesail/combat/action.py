@@ -284,7 +284,7 @@ def _recognition(world: Any, target: Target) -> None:
     from freesail.world.signals import player_locker
 
     nations = getattr(world, "nations", None)
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     own = getattr(ports, "ship_nation", None) if ports is not None else None
     tick = int(world.clock.tick)
     colours = player_locker(world).colours

@@ -1,0 +1,76 @@
+# FreeSail: the tender (package 84, step 4; docs/design/Design-OneWorld.md §2.12, the
+# owner's acceptance test). The frigate Amazon lies at anchor in Brixham road under the
+# Berry Head with the cutter Raven, her tender, in company; a model (or the truth's fake)
+# seated as the Raven's captain is ordered to Plymouth by the frigate's signal and sails
+# her there by the port's tracks, sends her boat ashore, goes to the counting house for a
+# person the director made there, comes back aboard with a thing, passes the lugger the
+# director placed and comes home within hail. Nobody is promoted (`crewed: {cap: 0}`): the
+# Raven's hull sleeps the whole day and every act is a coarse act of step 4 on her dealings
+# and the one registry; the switch between the shapes is truth 89's. Truth 7-200 walks it.
+#     py -m freesail.ui.server --scenario data/scenarios/tender.yaml --station captain --ship Raven
+#
+# The weather is scripted so that the day is the same on every machine: a fresh north-westerly,
+# a reach along the coast for Plymouth and a reach home again (a westerly made the passage
+# out a dead beat of fifteen hours, a northerly the beat into the Sound five); fine, the horizon clear.
+
+name: The tender, Torbay for Plymouth and home
+seed: 7
+start: 1805-06-12T05:00
+position: {lat_deg: 50.4100, lon_deg: -3.4950}   # Brixham road, under the Berry Head (Imray 1874 pp. 67-68)
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  name: Amazon
+  heading_deg: 320
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.2
+  variability: 0.2
+
+people:
+  - {role: master, skill: 0.8}
+
+papers:
+  chart: {year: 1804}
+  epitome: moore
+  almanac: 1805
+
+ports: [torbay, plymouth, dartmouth]
+
+# No ship beside the player's is promoted: the tender stays at far detail, her hull asleep,
+# and a station on her works the coarse acts (the design's §2.5).
+crewed: {cap: 0}
+
+weather:
+  wind:
+    - {at: 1805-06-12T05:00, from_deg: 320, knots: 14, air_mass: neutral}
+    - {at: 1805-06-12T18:00, from_deg: 315, knots: 12}
+    - {at: 1805-06-13T06:00, from_deg: 310, knots: 10}
+  background:
+    {hpa: 1020, gradient_hpa_per_100km: 0.3, high_toward_deg: 200}
+  systems:
+    - name: the old high over Biscay
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-11T12:00, x_km: 300, y_km: -500, hpa: 1024}
+        - {at: 1805-06-13T12:00, x_km: 500, y_km: -600, hpa: 1022}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+# The tender: a King's cutter with a free intent, so that a station seated on her is told
+# her goal and the rules-based captain lays no plan of his own for it.
+ships:
+  - {id: raven, description: cutter, name: Raven, nation: britain,
+     position: {lat_deg: 50.4120, lon_deg: -3.4915}, goal: "bound for Torbay",
+     free_intent: "the Amazon's tender: lie in Brixham road in her company and carry her orders"}
+
+# The Raven under the Amazon's orders, so that she reads and answers the frigate's signals;
+# her captain's station brings her to an anchor beside the frigate at the seating.
+world_orders:
+  - {at: 1805-06-12T05:00, order: 'ship "Raven": under the orders of the ship'}
+
+orders:
+  - let go the best bower

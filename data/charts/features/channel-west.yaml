@@ -2532,3 +2532,7 @@ tracks:
     name: the track up Channel from the Lizard to Plymouth, a mile to the westward of the Eddystone
     source: "White 1835 pp. 26 to 31 and Imray 1874 pp. 75 to 85, the coast from the Lizard to Plymouth with the Eddystone kept to the eastward; the naval cruise's book for the point off the Eddystone; judgement for the point off the Deadman"
     marks: [49 52 N 5 06 W, 50 08 N 4 42 W, 50 11 N 4 18 W]
+  - id: torbay-to-plymouth
+    name: the coasting track from Torbay to Plymouth, outside the Start and the Bolt Head
+    source: "Imray 1874 pp. 67 to 75, the coast from the Berry Head to the Start, the Prawle and the Bolt Head, with the Skerries bank off the Start and the tide race off the Bolt Tail given a berth; judgement for the points, two miles outside the Start and four outside the Bolt Tail (package 84, step 4: the tender's passage, the planner's other way round the Start crossing the Prawle)"
+    marks: [50 23 N 3 24 W, 50 11 N 3 37 W, 50 09 N 3 52 W, 50 11 N 4 18 W]

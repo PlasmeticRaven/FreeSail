@@ -130,7 +130,7 @@ def test_the_merchant_ship_scenario_is_a_merchantman_by_her_papers():
 
     sf = load_scenario("data/scenarios/merchant-ship.yaml")
     w = make_scenario_world(sf)
-    assert w.ports.ship_nation == "united-states" and _is_kings_ship(w)
+    assert w.dealings.ship_nation == "united-states" and _is_kings_ship(w)
     assert w.scenario.papers["service"] == "merchant"
     assert service_of(w) == MERCHANT and not under_the_regulations(w)
 

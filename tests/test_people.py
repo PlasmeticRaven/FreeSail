@@ -268,11 +268,11 @@ def test_the_pilot_is_a_person_aboard_of_his_port_and_waits_for_his_boat():
     surname, and at the gangway once he has asked for his boat."""
     w = world_for()
     pilot = w.people.add(PE.Person("pilot-falmouth-1", "Mr Hocking", "pilot", 0.9, port="falmouth"))
-    w.ports.pilot, w.ports.pilot_port = pilot, "falmouth"
+    w.dealings.pilot, w.dealings.pilot_port = pilot, "falmouth"
     assert w.people.find("the pilot") is pilot and w.people.find("Hocking") is pilot
     said = w.readings.words("people")
     assert "Mr Hocking, pilot of Falmouth: on the quarterdeck." in said
-    w.ports.pilot_boat_asked = True
+    w.dealings.pilot_boat_asked = True
     w.run(1)  # the readings are the tick's
     assert "Mr Hocking, pilot of Falmouth: at the gangway, waiting for his boat." in (
         w.readings.words("people")
@@ -628,7 +628,10 @@ def test_a_thing_is_made_from_words_with_a_place_and_nothing_more_and_shows_wher
         ("in the captain's cabin", ("cabin", "")),
     ):
         assert TH._place_in(words) == want, words
-    assert TH.read_where(w, "in the captain's keeping") == {"keeper": w.people.captain.id}
+    assert TH.read_where(w, "in the captain's keeping") == {
+        "keeper": w.people.captain.id,
+        "keeper_home": w.own.id,  # the keeper's home hull (package 84, step 4)
+    }
     with pytest.raises(TH.ThingWordsError, match="nobody answering to 'Mr Nobody'"):
         TH.read_where(w, "in the keeping of Mr Nobody")
     e = w.world_order("aboard: a rat, gnawing the bread", "the test")
@@ -884,7 +887,7 @@ def test_a_word_ashore_is_heard_by_whoever_is_at_that_place_whichever_hull_broug
     assert w.people.captain in H.people_hearing(w, ("aboard", w.own.id, "quarterdeck"))
     assert crew.people.captain not in H.people_hearing(w, ("aboard", w.own.id, "quarterdeck"))
     # the port's places name him among those found there, with the player's Mr Gill
-    lines = " ".join(w.ports.places_lines(w.ports.ports["falmouth"]))
+    lines = " ".join(w.dealings.places_lines(w.dealings.ports["falmouth"]))
     assert master.name in lines and "Mr Gill" in lines
     # a thing ashore within his reach, taken, kept, given to Mr Gill by his own hand
     e = w.world_order("aboard: a sealed packet, ashore at Falmouth, at the counting house", "t")

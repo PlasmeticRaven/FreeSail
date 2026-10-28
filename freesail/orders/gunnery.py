@@ -349,7 +349,7 @@ def _mark(ship: Any, words: str) -> tuple[str, str]:
             want = want[len(lead) :]
     if not want or words.lower() in _HER:
         nations = getattr(world, "nations", None)
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         own = getattr(ports, "ship_nation", None)
         enemies = [
             i

@@ -49,7 +49,7 @@ def in_falmouth(**kw):
     w.run(60)
     w.submit("let go the best bower")
     w.run(300)
-    assert w.at_anchor and w.ports.in_port().id == "falmouth"
+    assert w.at_anchor and w.dealings.in_port().id == "falmouth"
     return w
 
 
@@ -81,7 +81,7 @@ def seat(world, name, script=None, every=600):
 
 def test_every_port_has_the_five_places_and_a_ports_file_adds_its_own():
     w = in_falmouth()
-    falmouth = w.ports.ports["falmouth"]
+    falmouth = w.dealings.ports["falmouth"]
     ids = list(P.port_places(falmouth))
     assert ids[:5] == ["quay", "market", "counting_house", "tavern", "pilots_office"]
     assert "packet_office" in ids
@@ -91,7 +91,7 @@ def test_every_port_has_the_five_places_and_a_ports_file_adds_its_own():
     assert P.ashore_place_of(falmouth, "Guernsey pilot") == "pilots_office"
     assert P.ashore_place_of(falmouth, "merchant") == "counting_house"
     assert P.ashore_place_of(falmouth, "") == "quay"
-    assert "dockyard" in P.port_places(w.ports.ports["plymouth"])
+    assert "dockyard" in P.port_places(w.dealings.ports["plymouth"])
 
 
 def test_the_port_in_port_says_its_places_and_who_is_found_there():
@@ -193,7 +193,7 @@ def test_the_player_ashore_is_out_of_hail_of_the_ship_and_cannot_send_her_boat()
     w = in_falmouth()
     master = w.people.captain
     w.submit("go ashore")
-    until(w, lambda: master.where == "shore" and not w.ports.boat.away)
+    until(w, lambda: master.where == "shore" and not w.dealings.boat.away)
     assert w.submit("send the boat ashore").text.endswith("'come aboard' sends the boat for you.")
     e = w.submit("tell the mate we sail on the morning tide")
     assert e.kind == "order.rejected" and "he is out of hail" in e.text
@@ -301,7 +301,7 @@ def test_a_manifest_that_cannot_be_struck_whole_is_refused_and_nothing_paid():
     w.submit('draft a book "short": sell 5 tons of tin')
     e = w.submit('give the book "short" to the boat')
     assert e.kind == "order.rejected" and "The hold has 0 tons of tin" in e.text
-    assert w.purse.pounds == purse and not w.ports.boat.away
+    assert w.purse.pounds == purse and not w.dealings.boat.away
 
 
 # ---------------------------------------------------------------------------
@@ -385,14 +385,14 @@ def test_the_boats_passengers_are_carried_or_refused_in_words_never_dropped():
     mate, boatswain = w.people.find("the mate"), w.people.find("the boatswain")
     e = w.submit(f"send the boat ashore with the captain and {mate.name}")
     assert e.kind == "order.rejected" and "The captain goes ashore by his own word" in e.text
-    assert "the boat is not sent" in e.text and not w.ports.boat.away and mate.aboard
+    assert "the boat is not sent" in e.text and not w.dealings.boat.away and mate.aboard
     e = w.submit("send the boat ashore with Mr Nobody")
     assert e.kind == "order.rejected" and "Nobody aboard answers to 'mr nobody'" in e.text
-    assert not w.ports.boat.away
+    assert not w.dealings.boat.away
     e = w.submit(f"send the boat ashore with {mate.name} and {boatswain.name}")
     assert e.kind == "order.accepted", e.text
-    assert w.ports.boat.away and w.ports.boat.errand == "person"
-    assert {mate.id, boatswain.id} <= set(w.ports.boat.people)
+    assert w.dealings.boat.away and w.dealings.boat.errand == "person"
+    assert {mate.id, boatswain.id} <= set(w.dealings.boat.people)
 
 
 def test_a_waterman_takes_the_captain_ashore_while_the_boat_is_away_and_brings_him_off():
@@ -404,7 +404,7 @@ def test_a_waterman_takes_the_captain_ashore_while_the_boat_is_away_and_brings_h
     made = w.world_order("aboard: a sealed packet, in the boat", "the test")
     assert made.data["result"] == "done" and made.text.endswith("in the boat."), made.text
     e = w.submit("send the boat ashore for the prices")
-    assert e.kind == "order.accepted" and w.ports.boat.away
+    assert e.kind == "order.accepted" and w.dealings.boat.away
     purse = w.purse.pounds
     e = w.submit("hire a waterman")
     assert e.kind == "person.waterman" and "the fare a shilling" in e.text, e.text

@@ -659,6 +659,16 @@ class FarCaptain(Judgement):
             return
         if self.intent.kind == "trade" and port == self.intent.destination:
             if self._ready_for_sea(p):
+                from freesail.world.business import transact
+
+                if transact(self.world, self, port):
+                    # package 84, step 4 (the owner's decision 5): her cargo sold, a return
+                    # cargo bought, and she sails again by her new intent's plan
+                    self._departing = port
+                    self._plan()
+                    self.vessel.tack = 0.0
+                    self._enter("on passage")
+                    return
                 self.intent.done = True
                 self.vessel.done = True
             return

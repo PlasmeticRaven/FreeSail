@@ -422,7 +422,7 @@ def _give(ship: Any, world: Any, book: Book, after: str) -> tuple[str, str, dict
             "given to the boat."
         )
     movement.check(ship, "send the boat", "port")
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if ports is None or not ports.ports:
         raise OrderError("There is no port to deal with: the ship is not in a world with a chart.")
     bargains = []

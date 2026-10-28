@@ -130,7 +130,7 @@ def _sail(world: Any, vessel: Any, words: str, port: Any) -> None:
 
 
 def _port_of(world: Any, vessel: Any) -> Any:
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     best = None
     for port in (getattr(ports, "ports", None) or {}).values():
         _, d = bearing_and_distance(vessel.position, port.anchorage.position)
@@ -200,7 +200,7 @@ def _enemy_men_of_war_near(world: Any, port: Any, nation: str, within_nm: float)
             return True
     # the player's own ship, a King's ship of a nation at war with hers
     pos = getattr(world, "position", None)
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     own = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
     if pos is not None and own and nations.at_war(own, nation):
         from freesail.world.captains import _is_kings_ship

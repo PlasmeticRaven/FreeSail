@@ -9,7 +9,7 @@ mates, and a midshipman or a boy as the messenger. Each is a sailor of the muste
 by his post or drawn from his station by the ship file's `crew.people` list
 (`tools/gen_ships.py` writes it; no ship is special-cased), so his name is the muster's
 and the counts of spec M3 §2.3 are what they were. The pilot comes aboard as a person
-too (`freesail.world.ports`), borne as a supernumerary as the Regulations have him.
+too (`freesail.world.dealings`), borne as a supernumerary as the Regulations have him.
 
 A person's **place** is one of `freesail.world.places.PLACES`; his **state** is read
 from it and from the watch bill: on deck, below, asleep (a watch-keeper in his watch
@@ -1178,7 +1178,7 @@ class People:
             return f"at the {p.task}, {place_words(p.where)}"
         if p.pending is not None:
             return f"sent for, on his way to {PLACES[p.pending[0]].name}"
-        ports = getattr(self.world, "ports", None)
+        ports = getattr(self.world, "dealings", None)
         if (
             p.role == "pilot"
             and getattr(ports, "pilot_boat_asked", False)
@@ -1289,7 +1289,7 @@ class People:
             role = "" if p.role in ("captain", "commander", "") else f", {p.role}"
             if p.role == "pilot" and p.port:
                 # package 37h: the pilot of his port, a supernumerary aboard
-                port = (getattr(getattr(self.world, "ports", None), "ports", None) or {}).get(
+                port = (getattr(getattr(self.world, "dealings", None), "ports", None) or {}).get(
                     p.port
                 )
                 role += f" of {port.name}" if port is not None else ""

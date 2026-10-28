@@ -110,7 +110,7 @@ def _wants_in_port(world: Any, ship: Any, extra: dict[str, Any]) -> bool:
 
     if not isinstance(extra.get("magazine"), Magazine):
         return False
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if ports is None or ports.in_port() is None:
         return False
     return not magazine(ship).wanting().empty

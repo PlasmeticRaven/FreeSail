@@ -146,6 +146,66 @@ def execute(ship: Any, text: str, verb: str, phrase: str) -> Result:
     return FREE_KIND, line, data
 
 
+# The free verbs a person's words begin with when the director speaks as him (package 84,
+# step 4; the design's §2.12, step 6): `say as Mr Gill: give the packet to Mr Pope`.
+_SPOKEN = re.compile(
+    r"^(?P<verb>give|gives|hand|hands|show|shows|take|takes|throw|throws|stow|stows|hide|hides"
+    r"|put|puts)\s+(?P<rest>.+)$",
+    re.I,
+)
+
+
+def spoken(world: Any, person: Any, words: str) -> tuple[str, str, dict[str, Any]] | None:
+    """A free line in the words a person nobody holds is given to say (`say as <person>:
+    give the packet to <person>`; package 84, step 4): performed as his own, by the rule of
+    reach, where the words begin with a free verb; (the log's kind, the line, its data), or
+    None when they are no free line. Heard by the stations held at his place on any hull,
+    as a free line of his own would be."""
+    from freesail.agents.agent import DIRECTOR
+    from freesail.world import movement
+    from freesail.world import things as TH
+    from freesail.world.hearing import spot_of, station_spot, stations_everywhere, within_hearing
+
+    low = " ".join(str(words).split()).rstrip(".")
+    m = _SPOKEN.match(low)
+    if m is None:
+        return None
+    verb = m.group("verb").lower().rstrip("s")
+    verb = "give" if verb == "hand" else verb
+    rest = m.group("rest")
+    moved, outcome, why, thing, to = _carry_out(world, person, verb, rest)
+    where = movement.where_words(world, person)
+    done = f"{PAST.get(verb, verb)} {rest}"
+    if moved:
+        line = f"{person.name}, {where}: {done}; {outcome}."
+    else:
+        line = f"{person.name}, {where}: {done}, {AS_SAID}" + (f" ({why})." if why else ".")
+    here = spot_of(world, person)
+    heard = [
+        h
+        for w, h in stations_everywhere(world)
+        if h.station.name != DIRECTOR and within_hearing(here, station_spot(w, h.station.name))
+    ]
+    for h in heard:
+        h.hear(line)
+    place = TH._where_of_person(world, person)[0]
+    data: dict[str, Any] = {
+        "verb": verb,
+        "said": low,
+        "person": person.name,
+        "place": place,
+        "moved": moved,
+        "heard_by": [h.station.name for h in heard],
+        "notable": True,
+        "spoken_as": True,
+    }
+    if thing is not None:
+        data["thing"] = thing.id
+    if to is not None:
+        data["to"] = to.name
+    return FREE_KIND, line, data
+
+
 def _carry_out(world: Any, person: Any, verb: str, rest: str) -> tuple[bool, str, str, Any, Any]:
     """(moved, the outcome's words, the reason nothing moved or "", the thing, the person
     given to) for a free line's words."""
@@ -191,7 +251,7 @@ def _carry_out(world: Any, person: Any, verb: str, rest: str) -> tuple[bool, str
                 thing,
                 to,
             )
-        TH.put(thing, {"keeper": to.id})
+        TH.put(thing, {"keeper": to.id, "keeper_home": str(getattr(to, "home", "") or "")})
         return True, f"{thing.the} is in {_who(world, to)}'s keeping", "", thing, to
     if verb in ("open", "read"):
         thing = _one(world, person, rest)
@@ -206,7 +266,7 @@ def _carry_out(world: Any, person: Any, verb: str, rest: str) -> tuple[bool, str
         why = TH.reach_why(world, person, thing)
         if why:
             return False, "", why, thing, None
-        TH.put(thing, {"keeper": person.id})
+        TH.put(thing, {"keeper": person.id, "keeper_home": str(getattr(person, "home", "") or "")})
         return True, f"{thing.the} is in {_who(world, person)}'s keeping", "", thing, None
     if verb == "throw":
         m = _OVERBOARD.match(rest)

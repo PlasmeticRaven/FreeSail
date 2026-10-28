@@ -213,7 +213,7 @@ def ashore_place_words(place_id: str, port: Any = None) -> str:
 
 
 def _port_of(world: Any, person: Any) -> Any:
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     pid = getattr(person, "port", None)
     if ports is None or not pid:
         return None
@@ -338,7 +338,7 @@ def places_ashore(world: Any, person: Any = None) -> tuple[str, dict[str, Any]]:
     """`the places ashore`: the places of the port the asker is ashore at, or of the port
     the ship lies in, each with what is done there and who is found there, the world's
     people ashore at each by name (spec M7b §14; package 53). Refused in words at sea."""
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     port = None
     if person is not None and not person.aboard and person.where == "shore":
         port = _port_of(world, person)
@@ -464,7 +464,7 @@ def go(world: Any, person: Any, verb: str, words: str = "") -> tuple[str, str, d
             found = Places().find(low)
             if found is None and low in ("wardroom", "the wardroom"):
                 found = PLACES["gunroom"]
-            ports = getattr(world, "ports", None)
+            ports = getattr(world, "dealings", None)
             port = ports.in_port() if ports is not None and ports.ports else None
             ashore = find_port_place(port, low) if port is not None else None
             if found is None and ashore is not None:
@@ -526,7 +526,7 @@ def _go_ashore_place(
 def go_ashore(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
     """`go ashore`: the boat lands him at the quay of the port she lies in, and comes back
     without him (spec M7b §14, "by the boat, at a port's reach")."""
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if not person.aboard:
         raise OrderError(f"You are {where_words(world, person)} already.")
     if person.mirror is not None and person is not world.people.captain:
@@ -561,7 +561,7 @@ def go_ashore(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
 def by_waterman(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
     """`hire a waterman` (package 68, R-62): a shore boat between the ship and the
     quay of the port she lies at, her own boat away or not (`Ports.waterman`)."""
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if ports is None or not ports.ports:
         raise OrderError("There is no port, and no waterman to hire.")
     return ports.waterman(person)
@@ -569,7 +569,7 @@ def by_waterman(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
 
 def come_aboard(world: Any, person: Any) -> tuple[str, str, dict[str, Any]]:
     """`come aboard`: the boat sent for him from the ship lying at his port."""
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     if person.aboard:
         raise OrderError(f"You are aboard already, {place_words(person.where)}.")
     if person.where != "shore":

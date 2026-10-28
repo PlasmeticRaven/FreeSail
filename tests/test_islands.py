@@ -178,7 +178,7 @@ def test_the_islands_ports_are_portuguese_neutral_and_stand_on_their_own_positio
     whole = world_at(FUNCHAL_ROAD, ports=ISLANDS_PORTS)
     for pid in ISLANDS_PORTS:
         port = whole.ports.ports[pid]
-        assert port.nation == "portugal" and whole.ports.stance(port) == "neutral"
+        assert port.nation == "portugal" and whole.dealings.stance(port) == "neutral"
         for key in ("outer_road", "anchorage", "shore"):
             spot = getattr(port, key)
             if spot.feature_id:
@@ -186,9 +186,9 @@ def test_the_islands_ports_are_portuguese_neutral_and_stand_on_their_own_positio
                 assert f is not None and f.position.lat_deg == pytest.approx(spot.position.lat_deg)
         doc = yaml.safe_load((ROOT / "data" / "ports" / f"{pid}.yaml").read_text(encoding="utf-8"))
         assert doc["datum"] == "unverified"
-    assert whole.ports.nearest()[0].id == "funchal"
+    assert whole.dealings.nearest()[0].id == "funchal"
     neutral = world_at(FUNCHAL_ROAD, ship=SCHOONER, ports=ISLANDS_PORTS)
-    assert all(neutral.ports.stance(neutral.ports.ports[p]) == "neutral" for p in ISLANDS_PORTS)
+    assert all(neutral.dealings.stance(neutral.ports.ports[p]) == "neutral" for p in ISLANDS_PORTS)
 
 
 def test_the_islands_gauges_are_read_and_held_and_norie_gives_their_hours(tide=None):
@@ -277,7 +277,7 @@ def test_the_islands_scenarios_load_on_the_whole_chart_in_the_islands_water(name
     assert w.chart.level_at(w.position) == 3  # Funchal's harbour patch
     for place in ("Funchal Road", "Porto Santo Road", "Angra Road"):
         assert w.chart.find_feature(place) is not None, place
-    assert {w.ports.stance(p) for p in w.ports.ports.values()} == {"neutral"}
+    assert {w.dealings.stance(p) for p in w.dealings.ports.values()} == {"neutral"}
     # the book is read whole, every order accepted by the dialect
     assert begin(w, sf) >= 4
     assert not [e for e in w.log if e.kind == "order.rejected"]

@@ -57,7 +57,7 @@ def asked(ship, text):
 
 
 def without_hoy(w):
-    w.ports.jobs = [j for j in w.ports.jobs if j.kind != "ordnance"]
+    w.dealings.jobs = [j for j in w.dealings.jobs if j.kind != "ordnance"]
 
 
 # ---------------------------------------------------------------------------
@@ -315,7 +315,7 @@ def test_each_quantity_is_cut_to_what_the_magazine_wants_and_says_so():
     e = w.submit("take in 20 grape shot")
     assert e.kind == "order.rejected"
     assert e.data["reason"] == f"Her magazine wants no more shot: {first}"
-    assert not w.ports.jobs
+    assert not w.dealings.jobs
 
 
 # ---------------------------------------------------------------------------

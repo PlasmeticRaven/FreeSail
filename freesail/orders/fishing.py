@@ -138,7 +138,7 @@ def execute(ship: Any, order: Order) -> Result:
             f"{most:.0f} at the most."
         )
     if kind == "seine":
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         if ports is not None and getattr(ports, "boat", None) is not None and ports.boat.away:
             raise OrderError("The boat is away; the seine is shot from her.")
     return _start(ship, world, fishery, kind, "shoot", ground.id, data | {"ground": ground.id})
@@ -161,7 +161,7 @@ def _sell(world: Any, data: dict[str, Any]) -> Result:
     from freesail.world import fishing
 
     fishery = _fishery(world)
-    ports = getattr(world, "ports", None)
+    ports = getattr(world, "dealings", None)
     port = ports.in_port() if ports is not None and getattr(ports, "ports", None) else None
     if port is None:
         raise OrderError("She is not in port; the fish are sold on a quay.")

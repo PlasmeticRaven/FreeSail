@@ -90,7 +90,7 @@ def execute(ship: Any, order: Order) -> Result:
         text, data = movement.places_ashore(world, movement.person_of_actor(world, actor))
         return "query.places", text, {"verb": verb} | data
     if verb == "ask the pilot":
-        ports = getattr(world, "ports", None)
+        ports = getattr(world, "dealings", None)
         if ports is None or ports.pilot is None:
             raise OrderError("There is no pilot aboard to ask.")
         question = rest or order.verb_phrase.removeprefix("ask the pilot").strip()
