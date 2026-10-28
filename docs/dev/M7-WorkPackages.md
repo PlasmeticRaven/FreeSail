@@ -58,8 +58,9 @@ on these packages; that is the owner's choice.
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
 | 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 and 2 launched 2026-10-28 as a sibling session on `claude/pkg-84` off `ec56664`, beside 86; step 3 onward from the head after 86's merge** |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
-| 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | launched 2026-10-28 (Opus, in a worktree off `ec56664`) |
+| 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | **merged 2026-10-28** (`cd97ce7`); the record below |
 | 87 | Fable | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief once most of the milestone's orders are in, after 73, 77 and 84 |
+| 88 | Fable | **The captain's pass of M7**: the commodore's recovery when aback with no way and no tack while the hands are at a shortening (the convoy's stall, 86's finding; truths 7-152 and 7-153 move with it); 57's offing's tack among islands with no room to wear (the station-gale trial's expected failure lifted); 72's near station law read against 58b's; the colours held once shown before an enemy (71's flicker, if 85 has not taken it) | after 84; to brief |
 | 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
@@ -382,6 +383,46 @@ and 22, the four design notes, the tuning notes (his sections and package 86's),
 briefs of 74, 75, 77 (below the waves) and 82. **Left out:** his four consent records, his
 copy of this file, and nothing of `tests/test_pictures.py`. **The builder's suites:** ruff clean; the fast tier on the final tree 3,891 passed, 1 failed (the pictures test, this machine's Chromium, before and after alike); the slow tier of the touched files and the captain's trials 147 passed, 8 expected failures; the pace tests 8 passed, 2 under the floor before and after alike. **The whole suite on the merged
 tree is the lead's in the cloud.**
+
+### Package 86 as merged (2026-10-28)
+
+Merged `--no-ff` from the builder's worktree (six commits on `e7a3ee8`, pushed to
+`claude/pkg-86`; 92 files, ~15,600 lines) with no conflict; ruff clean; the lead's sweeps
+clean (no consent file, no physics file, no model identifier; the ship files regenerated
+byte-identical). The builder took the owner's tree as a commit over `2774be3` in a scratch
+index and cherry-picked it onto the line without committing, so that every shared file was
+merged hunk by hunk over 73's version and nothing copied; the review's edits made (the
+pivot's arc per gun as an optional `arc_deg` of the ship file, the stale docstring and
+comment, the duplicated helpers replaced by `guns.count_words`, `guns.seconds_words` and
+`parts.kind_rank`, `Papers._merge` reading its own path, the 7-164 slip); the owner's
+truths 7-161 to 7-171 placed before 73's with the build machine's figures beside his; the
+unit counts recomputed with the old beside the new (evolutions 98, papers 11, the officer's
+handover budget 20,500); the three fixes taken as he made them and then tightened as the
+review asked (the crewed captain under a free intent lain to once and planning nothing,
+the ship keeping her service role; the hail's `commands` branch the player's ship's only;
+station keeping by kind among sails in sight, hyphen-aware); **no recorded passage moved**
+(the hail's gating reverted in a copy and 37 logs compared: identical but for one unasserted
+scene); the records recast into the line's files with the one model-naming line reworded;
+the builder's fast tier 3,891 passed and one failed (the pictures test's threshold on this
+machine), the touched files' slow tier 147 passed, 8 expected failures; **the whole suite
+on the merged tree is the lead's in the cloud (the figures below when it ends).**
+
+**Judgements, the lead's:** the privateer schooner's eight small-arms men and twenty-six
+boarders, scaled from the cutter's and marked provisional, accepted for 75 to source. **The
+convoy's stall reproduced and named, not mended** (`convoy-six.yaml`, no orders; the same
+on `2774be3`, the owner's tree and the line since 72): not the near `keep station` order
+the study suspected (the merchantmen have no brain and are never crewed) but the
+commodore's own brig-sloop, which starts a tack at 10:17 with thirty-one hands while her
+book is shortening sail, spends eight minutes and a half in stays, comes out with no way,
+is taken aback at 10:30 some forty degrees off the wind under the full-and-by helm, and
+lies so until the book's second shortening at 10:45 lets her pay off; the far convoy capped
+at her pace lies with her. The mend is the near captain's and the helm's (no tack while the
+hands are at a shortening; a recovery when aback with no way, the counterpart of 58b's law)
+and it moves truths 7-152 and 7-153: **booked as the captain's pass after 84** with 57's
+offing's tack and 72's station law. **Found, carried:** a misspelt port is taken as a free
+intent (85's hint); the pace tests on this machine spread 450 to 530 against the floor of
+500 before and after the fold-in alike (the cloud's pace job is informative for the same
+reason).
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
