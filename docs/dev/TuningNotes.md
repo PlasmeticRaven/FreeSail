@@ -10000,6 +10000,21 @@ the machine running:
   the trade stranger, 7-148 and 7-137), each bisected and mended or re-pinned above.
 - **The package's own files**: `test_water` 11, `test_damage_control` 10, `test_health` 12,
   `test_fight` 12, the truths 7-172 to 7-184: 13; all passing.
-- **The pace tests alone, last**: (below).
+- **The last round, on cd224fc's tree** (the lead's rule of 2026-10-28: no whole tier after
+  it, the whole suite the lead's at the merge): the fast tier 3689 passed, 2 failed (the
+  pictures test above, which passes alone, and `test_water`'s free-surface test: the keeper's
+  new quiet path left the stiffness unrestored when the well was pumped out by hand; mended in
+  c60c361 and `tests/test_water.py` and `tests/test_pictures.py` run again: the water's eleven
+  pass, the pictures test passes alone); the slow tier 334 passed, 0 failed, 11 expected
+  failures.
+- **The pace tests alone, last** (`--slow -m pace`, on c60c361): 9 passed, 1 failed: truth
+  7-159 (the convoy of six at far detail) at 481 ticks a second against the floor of 500, and
+  482 alone again on the quiet machine (486 before the keeper's quiet path, when its full
+  tick cost 0.08 ms of the far tick's two; 484 and 481 since are within this machine's
+  noise: package 72's own first run had it at 483 and a quiet second at 581). The keeper
+  adds nothing to a dry ship's tick now but the quiet test itself; the health keeper is once a
+  minute. The lead's six machines decide it at the merge.
 
-Nothing of the package changed after the whole slow tier's run but this section of the notes.
+What changed after the whole slow tier's last run: the quiet path's stiffness line (c60c361,
+one line of `water.py`) and this section; the water file and the pictures test were run again
+after it, and the pace tests.
