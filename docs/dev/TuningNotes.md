@@ -9984,6 +9984,22 @@ arm before an action) and the owner may turn it off per role by `board_odds: 0`.
 
 ### The suites
 
-(filled at the end of the package: the fast tier, the slow tier of the touched files, the
-whole slow tier without the pace tests, the pace tests alone; the station-gale trial of
-`tests/test_captain_trials.py` the expected failure, left.)
+Run at the end of the package on the whole branch (465dcd2), four cores, nothing else of
+the machine running:
+
+- **The fast tier whole** (`-m "not slow and not pace"`): 3690 passed, 1 failed:
+  `tests/test_pictures.py::test_the_mcp_bridge_returns_the_chart_and_the_ships_view_as_images_that_are_not_blank`
+  ("the chart is blank (std 7.9)" against 8.0, with the slow tier running beside it), which
+  passes alone; not the package's. An earlier whole run before the last fixes gave 3677
+  passed and 14 failed, every one accounted for above (four truths of this package since
+  settled, ten tests that counted or refused what the package built, updated as true
+  changes, and the fingerprint test once under load).
+- **The slow tier whole without the pace tests** (`-m "slow and not pace"`): 334 passed, 0
+  failed, 11 expected failures (the station-gale trial among them, left as it was). The
+  earlier run before the mends gave 329 passed and 5 failed (gate 5a's day, the lee shore,
+  the trade stranger, 7-148 and 7-137), each bisected and mended or re-pinned above.
+- **The package's own files**: `test_water` 11, `test_damage_control` 10, `test_health` 12,
+  `test_fight` 12, the truths 7-172 to 7-184: 13; all passing.
+- **The pace tests alone, last**: (below).
+
+Nothing of the package changed after the whole slow tier's run but this section of the notes.

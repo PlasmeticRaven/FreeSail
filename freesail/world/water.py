@@ -337,13 +337,22 @@ class Water:
         return float(getattr(motion, "roll_deg", 0.0) or 0.0) if motion is not None else 0.0
 
     def _sea_height_m(self) -> float:
+        """The sea's height, read once a minute (the reading is the sea model's work, and
+        the sea she ships does not change by the second; the far convoy's pace, truth 7-159,
+        felt the reading every tick)."""
         sea = getattr(self.world, "sea", None)
         if sea is None:
             return 0.0
+        minute = int(self.world.clock.tick) // 60
+        cached = getattr(self, "_sea_cache", None)
+        if cached is not None and cached[0] == minute:
+            return cached[1]
         try:
-            return float(sea.reading().height_m)
+            height = float(sea.reading().height_m)
         except Exception:  # noqa: BLE001  (a sea that cannot be read ships nothing)
-            return 0.0
+            height = 0.0
+        self._sea_cache = (minute, height)
+        return height
 
     def gain_t_per_h(self) -> float:
         return sum(lk.t_per_h for lk in self.leaks())
@@ -378,6 +387,13 @@ class Water:
                 "The fothered sail has gone from under her, and the leak runs as it did.",
                 data={"tick": tick},
             )
+        if self._quiet(st, ship):
+            # a dry ship with no source running: nothing to sum, nothing to say (the far
+            # convoy's pace, truth 7-159, felt the keeper's full tick at every second)
+            st.last_gain_t_per_h = 0.0
+            st.last_pumped_t_per_h = 0.0
+            hull.water_in_well_m = 0.0
+            return
         gain = self.gain_t_per_h()
         st.last_gain_t_per_h = gain
         pumped = self.pumps.tick(tick)
@@ -389,6 +405,26 @@ class Water:
         hull.water_in_well_m = depth
         self._free_surface(hull, depth)
         self._lines(st, gain, pumped, before, depth, tick)
+
+    def _quiet(self, st: WaterState, ship: Any) -> bool:
+        """Dry, nothing manned, and no source that could run: no holes unplugged, no
+        ground's leak, no started seam, the roll under the seams' free angle, and the sea
+        under the hatches' height (or the hatches battened)."""
+        if st.tons > 0.0 or st.pumps_manned or st.fothered:
+            return False
+        extra = ship.extra
+        if float(extra.get("leak_m_per_h", 0.0) or 0.0) > 0.0:
+            return False
+        keeper = extra.get("damage")
+        if any(h.get("plugged") is None for h in (getattr(keeper, "holes", []) or [])):
+            return False
+        if any(seam.get("stopped") is None for seam in st.seams):
+            return False
+        if self._roll_deg() > SEAMS_ROLL_FREE_DEG:
+            return False
+        if not st.hatches_battened and self._sea_height_m() > SEA_SHIPS_OVER_M:
+            return False
+        return True
 
     def _routine_pumping(self, st: WaterState, gain: float) -> None:
         """Every glass the watch pumps her dry unasked while the well is shallow and nothing
