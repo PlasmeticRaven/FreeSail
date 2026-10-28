@@ -464,7 +464,14 @@ class Squadron:
         role = str(getattr(getattr(body, "brain", None), "role", "") or "")
         if role in ("kings-ship", "cruiser", "commodore"):
             return True
-        return str(getattr(body, "description", "") or "") in ("frigate", "brig-sloop")
+        # the men of war by their descriptions (package 75 adds the new ships' keys)
+        return str(getattr(body, "description", "") or "") in (
+            "frigate",
+            "brig-sloop",
+            "sixty-four",
+            "razee",
+            "seventy-four",
+        )
 
     def stations(self, world: Any) -> dict[str, Position]:
         """Every member's station point now, by the commander's frame (his position less
@@ -1517,7 +1524,10 @@ def _locker_of(world: Any, vid: str) -> Any:
 CUT_OUT_M = 0.4 * units.NAUTICAL_MILE
 COVER_NM = 2.0
 _ARMED_ROLES = frozenset({"privateer", "cruiser", "kings-ship", "commodore"})
-_MAN_OF_WAR_DESCRIPTIONS = frozenset({"frigate", "brig-sloop"})
+# package 75 adds the new ships' descriptions, keyed before their files come
+_MAN_OF_WAR_DESCRIPTIONS = frozenset(
+    {"frigate", "brig-sloop", "sixty-four", "razee", "seventy-four"}
+)
 
 
 def _yields(body: Any) -> bool:

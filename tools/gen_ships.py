@@ -110,6 +110,7 @@ sharp up, Fincham 19; the limits here are 55 to 62 degrees from square
 from __future__ import annotations
 
 import copy
+import importlib
 import math
 import os
 import re
@@ -133,6 +134,10 @@ ROPE_KN_PER_SQ_IN = round(1044.9 * 4.44822 / 1000.0 / 3.0, 4)  # 1.5493
 # The engine's force coefficient at the peak of each class's curve (data/sail_classes.yaml,
 # |(C_L, C_D)| at the best angle). Package 10: if the curves change, change these and rerun.
 PEAK_COEFF = {"square": 1.23, "studding": 1.25, "gaff": 1.29, "jibheaded": 1.32, "lug": 1.29}
+# Package 75 (docs/design/Design-ShipsEngineExtensions.md §3.1): the lateen row's 1.15 and 0.48
+# at its best angle, 35 degrees, give 1.246 by the same rule. No file of the eight carries a
+# lateen sail; without the entry the rating pass would fail on the first that does.
+PEAK_COEFF["lateen"] = 1.25
 
 # Sustained load / static peak-coefficient load, measured with tools/measure_loads.py on the
 # frigate on a beam reach with the yards trimmed to the wind: 0.9 at 35 knots under all
@@ -570,6 +575,78 @@ def quarter(x: float) -> float:
     return round(x * 4.0) / 4.0
 
 
+# ---------------------------------------------------------------------------
+# The hull's profile (package 75; docs/design/Build-Ships.md §5.1, §5.3): the side, the decks
+# and the ports in the fore-and-aft plane, x forward of midships and z above the file's
+# waterline, in metres. A ship's function or module gives it as the last key of her hull dict,
+# with a note for each line in her `hull_notes`, keyed "profile.<key>" (and
+# "profile.<key>.<deck>" for one deck's line); `Builder.dump` writes each line on one line.
+# ---------------------------------------------------------------------------
+
+
+def hull_profile(rail, breadth, **parts):
+    """The hull's `profile:` mapping from its lines: `rail`, [[x, z], ...] from the taffrail
+    to the stem head, and `breadth`, [[x, hb_water, hb_rail], ...], with those of the other
+    parts the sources give, named as the schema's keys without their `_m` (`keel`, `stem`,
+    `stern`, `wales`, `section`; by deck word, `decks`, `ports` and `port_size`), each in its
+    key's form. The keys in the schema's order (`schema.PROFILE_KEYS`), every figure in metres
+    to the centimetre. Whatever the load would refuse (Build-Ships.md §5.2) raises ValueError
+    here with the schema's own sentence, its check (`schema._parse_profile`) run on the mapping
+    as it will be written, so that a ship's module fails at generation and not at the load."""
+    from freesail.ship.schema import PROFILE_KEYS, ShipFileError, _parse_profile
+
+    given = {"rail_m": rail, "breadth_m": breadth}
+    others = [key for key in PROFILE_KEYS if key not in given]
+    for word, line in parts.items():
+        if f"{word}_m" not in others:
+            words = ", ".join(key.removesuffix("_m") for key in others)
+            raise ValueError(
+                f"hull_profile takes no part '{word}'; beside the rail and the breadth its parts "
+                f"are {words}."
+            )
+        if line is not None:
+            given[f"{word}_m"] = line
+    profile = {key: _centimetres(given[key]) for key in PROFILE_KEYS if key in given}
+    try:
+        _parse_profile(profile, "hull_profile")
+    except ShipFileError as e:
+        raise ValueError(str(e)) from e
+    return profile
+
+
+def _centimetres(v):
+    """A profile's figures to the centimetre, its points as lists (yaml's safe dump writes no
+    tuple); anything that is not a number is left for the schema to refuse in words."""
+    if isinstance(v, dict):
+        return {str(k): _centimetres(x) for k, x in v.items()}
+    if isinstance(v, list | tuple):
+        return [_centimetres(x) for x in v]
+    if isinstance(v, int | float) and not isinstance(v, bool):
+        return round(float(v), 2) + 0.0  # + 0.0: never a "-0.0" in a file
+    return v
+
+
+def _flow_profile(block):
+    """The hull's `  profile:` block as yaml writes it, with each list in it on one flow line,
+    as `Builder.dump` sets a sail's corners: a line of points `rail_m: [[x, z], ...]`, a
+    deck's under its word, and a port's size `[width, depth]`."""
+
+    def points(mo):
+        indent, key, body = mo.groups()
+        pts = re.findall(rf"^{indent}- - (\S+)\n((?:{indent}  - \S+\n)+)", body, flags=re.M)
+        flow = ", ".join(
+            "[" + ", ".join([first, *re.findall(r"- (\S+)\n", rest)]) + "]" for first, rest in pts
+        )
+        return f"{indent}{key}: [{flow}]\n"
+
+    def numbers(mo):
+        indent, key, body = mo.groups()
+        return f"{indent}{key}: [" + ", ".join(re.findall(r"- (\S+)\n", body)) + "]\n"
+
+    block = re.sub(r"^( +)(\w+):\n((?:\1- - \S+\n(?:\1  - \S+\n)+)+)", points, block, flags=re.M)
+    return re.sub(r"^( +)(\w+):\n((?:\1- \S+\n)+)", numbers, block, flags=re.M)
+
+
 class Builder:
     def __init__(self, name, rig, era_notes, hull, hull_notes=None):
         self.doc = {
@@ -866,7 +943,10 @@ class Builder:
             if s.state is not SailState.UNBENT and (b := ship.spar_of_role(s, "boom")) is not None
         }
         for sail in ship.sails.values():
-            entry = (sail.id, sail.area_m2, sail.centre_height_m, sail.cls)
+            # rated at the peak of the curve the physics takes for it (package 75: its
+            # `curve_class`, its own class until stage 0E gives a lateen cut at the mast the
+            # gaff's)
+            entry = (sail.id, sail.area_m2, sail.centre_height_m, sail.curve_class)
             boom = ship.spar_of_role(sail, "boom") if sail.cls == "studding" else None
             if sail.state is SailState.UNBENT:
                 own = boom is not None and boom.cls == "studdingsail_boom"
@@ -948,8 +1028,15 @@ class Builder:
             text,
             flags=re.M,
         )
+        # the hull's profile (package 75) likewise, each of its lists on one line; only inside
+        # `  profile:`, so that no other list in a file moves
+        text = re.sub(
+            r"^  profile:\n(?:    .*\n)+", lambda mo: _flow_profile(mo.group(0)), text, flags=re.M
+        )
         out = []
         in_hull = False
+        hull_key = ""
+        profile_key = ""
         in_crew = False
         crew_key = ""
         store_key = ""
@@ -1072,6 +1159,19 @@ class Builder:
             m = re.match(r"^  (\w+):", line) if in_hull else None
             if m and m.group(1) in self.hull_notes:
                 out.append("  # " + self.hull_notes[m.group(1)])
+            if m:
+                hull_key = m.group(1)
+            # the hull's profile (package 75): its lines noted by their dotted keys,
+            # "profile.<key>" above a line and "profile.<key>.<deck>" above a deck's; only
+            # those, the profile's keys being four and six spaces in and the hull's own two
+            elif in_hull and hull_key == "profile" and (m := re.match(r"^( {4}| {6})(\w+):", line)):
+                if len(m.group(1)) == 4:
+                    profile_key = m.group(2)
+                    note = self.hull_notes.get(f"profile.{profile_key}")
+                else:
+                    note = self.hull_notes.get(f"profile.{profile_key}.{m.group(2)}")
+                if note:
+                    out.append(m.group(1) + "# " + note)
             out.append(line)
         # LF and UTF-8 on every platform (the comments carry the section sign and the degree)
         with open(path, "w", newline="\n", encoding="utf-8") as f:
@@ -3653,13 +3753,17 @@ def fit_magazine(guns, rounds_by_kind, exercise_charges=0):
     return out
 
 
-def exercise_allowance(upper_deck_guns):
-    """The Regulations' allowance for exercise in a ship of one deck: a charge of powder and
-    a round shot a month for a fourth of the upper deck guns, the figure for the first six
-    months after the guns are received (the Regulations 1806, 1808 printing, the Gunner,
-    Art. XXI, OCR l.13122-13144; a third in ships of two or three decks; the game keeps no
-    commissioning date, so the first six months' figure: judgement). A King's fit only."""
-    return upper_deck_guns // 4
+def exercise_allowance(upper_deck_guns, decks=1):
+    """The Regulations' allowance for exercise: a charge of powder and a round shot a month
+    for a fourth of the upper deck guns in a ship of one deck, a third in ships of two or
+    three decks (package 75: `decks`, a two-decker's), the figure for the first six months
+    after the guns are received (the Regulations 1806, 1808 printing, the Gunner, Art. XXI,
+    OCR l.13122-13144; the game keeps no commissioning date, so the first six months'
+    figure: judgement). A King's fit only. A two-decker's note is
+    `tools/ships/period.py`'s `TWO_DECKS_EXERCISE_NOTE`."""
+    if decks not in (1, 2, 3):
+        raise ValueError(f"the Regulations allow for ships of one, two or three decks, not {decks}")
+    return upper_deck_guns // (4 if decks == 1 else 3)
 
 
 def filling_party(guns):
@@ -3706,9 +3810,34 @@ FILLING_NOTE = (
 )
 
 
-def broadside_pair(number, kind, pounder, cwt, x_m, height_m, note=None):
+# Package 75 (docs/design/Build-Ships.md §3.1 item 7, §5.3): each gun helper below takes the
+# deck its guns stand on, `deck`, one of `schema.DECK_WORDS`, written last in each gun's
+# mapping and left out when None, as every gun of the eight files is; and `round_to`, the step
+# its x_m and height_m are rounded to: the tenth of a metre the eight files have, or the
+# centimetre of a port's own x and sill from a hull's profile. Rounded as round(v, 1) or
+# round(v, 2), never as round(v / step) * step, whose floats (2.4 as 2.4000000000000004) would
+# move the files' bytes.
+GUN_ROUNDING_PLACES = {0.1: 1, 0.01: 2}
+
+
+def _gun_places(round_to):
+    """The decimal places of a gun helper's `round_to`."""
+    if round_to not in GUN_ROUNDING_PLACES:
+        raise ValueError(f"a gun's x_m and height_m round to 0.1 or 0.01 m, not {round_to!r}")
+    return GUN_ROUNDING_PLACES[round_to]
+
+
+def _on_deck(g, deck):
+    """The gun's mapping with its deck written last, where the caller gives one."""
+    if deck is not None:
+        g["deck"] = deck
+    return g
+
+
+def broadside_pair(number, kind, pounder, cwt, x_m, height_m, note=None, deck=None, round_to=0.1):
     """The two guns of one number, starboard then larboard, as (mapping, note) entries;
     the note on the starboard gun alone."""
+    places = _gun_places(round_to)
     out = []
     for i, side in enumerate(SIDES):
         g = {
@@ -3718,17 +3847,18 @@ def broadside_pair(number, kind, pounder, cwt, x_m, height_m, note=None):
             "place": "broadside",
             "number": number,
             "side": side,
-            "x_m": round(x_m, 1),
-            "height_m": round(height_m, 1),
+            "x_m": round(x_m, places),
+            "height_m": round(height_m, places),
             "crew": gun_crew(kind, cwt),
             "weight_cwt": cwt,
         }
-        out.append((g, note if i == 0 else None))
+        out.append((_on_deck(g, deck), note if i == 0 else None))
     return out
 
 
-def chasers(place, kind, pounder, cwt, x_m, height_m, note=None):
+def chasers(place, kind, pounder, cwt, x_m, height_m, note=None, deck=None, round_to=0.1):
     """A pair of chase guns at the bow or the stern, one a side."""
+    places = _gun_places(round_to)
     out = []
     for i, side in enumerate(SIDES):
         g = {
@@ -3737,36 +3867,38 @@ def chasers(place, kind, pounder, cwt, x_m, height_m, note=None):
             "pounder": pounder,
             "place": place,
             "side": side,
-            "x_m": round(x_m, 1),
-            "height_m": round(height_m, 1),
+            "x_m": round(x_m, places),
+            "height_m": round(height_m, places),
             "crew": gun_crew(kind, cwt),
             "weight_cwt": cwt,
         }
-        out.append((g, note if i == 0 else None))
+        out.append((_on_deck(g, deck), note if i == 0 else None))
     return out
 
 
-def pivot_gun(kind, pounder, cwt, x_m, height_m, arc_deg, note=None):
+def pivot_gun(kind, pounder, cwt, x_m, height_m, arc_deg, note=None, deck=None, round_to=0.1):
     """A gun on a pivot amidships (PROVISIONAL, the owner's ask of 2026-10-25): no side, it
     trains to either (`combat/guns.py`) through its own arc, (from, to) degrees off the bow
     over either side (package 86: per gun, each pivot's from its own ship's rig); its own
     crew by the gun's rule."""
+    places = _gun_places(round_to)
     g = {
         "id": "pivot",
         "kind": kind,
         "pounder": pounder,
         "place": "pivot",
         "arc_deg": [float(arc_deg[0]), float(arc_deg[1])],
-        "x_m": round(x_m, 1),
-        "height_m": round(height_m, 1),
+        "x_m": round(x_m, places),
+        "height_m": round(height_m, places),
         "crew": gun_crew(kind, cwt),
         "weight_cwt": cwt,
     }
-    return [(g, note)]
+    return [(_on_deck(g, deck), note)]
 
 
-def swivels(count, xs_m, height_m, note=None):
+def swivels(count, xs_m, height_m, note=None, deck=None, round_to=0.1):
     """So many half-pounder swivels on the rail, numbered a side from forward."""
+    places = _gun_places(round_to)
     out = []
     n = 0
     for x in xs_m:
@@ -3781,12 +3913,12 @@ def swivels(count, xs_m, height_m, note=None):
                 "place": "rail",
                 "number": (n + 1) // 2,
                 "side": side,
-                "x_m": round(x, 1),
-                "height_m": round(height_m, 1),
+                "x_m": round(x, places),
+                "height_m": round(height_m, places),
                 "crew": 1,
                 "weight_cwt": SWIVEL_CWT,
             }
-            out.append((g, note if n == 1 else None))
+            out.append((_on_deck(g, deck), note if n == 1 else None))
     return out
 
 
@@ -8476,6 +8608,19 @@ def smack_crew(b):
     )
 
 
+# Package 75 (docs/design/Build-Ships.md §3.1 items 1 and 2; Design-Ship-Indefatigable.md
+# §1.2): the new ships are built by their own modules under tools/ships/, run after the eight
+# above in the order they are built (the lead's ruling of 2026-10-28, in
+# docs/dev/M7-WorkPackages.md): the Indefatigable, the Prince de Neufchatel, the bilander, the
+# 74. Each is named here from stage 0, a stub writing nothing until its builder fills it, so
+# that no ship's builder edits this script. A module begins `import gen_ships as g` and takes
+# every helper as `g.<name>`; it is imported only below, after `gen_ships` is made this running
+# script, so that its Builders, DesignLoads and helpers are these, one copy (a Builder of one
+# copy with a DesignLoad of another fails at `dump`: measured, Design-Ship-Indefatigable.md
+# §1.2).
+SHIP_MODULES = ("indefatigable", "neufchatel", "bilander", "bellerophon")
+
+
 if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else "data/ships"
     os.makedirs(out, exist_ok=True)
@@ -8487,4 +8632,9 @@ if __name__ == "__main__":
     brig(out, merchant=True)
     lugger(out)
     smack(out)
+    # the per-ship modules, each `build(out_dir)`: `ships` is tools/ships/, this script's own
+    # directory being on the path when it runs (the repository root, put before it, has none)
+    sys.modules.setdefault("gen_ships", sys.modules[__name__])
+    for name in SHIP_MODULES:
+        importlib.import_module(f"ships.{name}").build(out)
     print(f"written to {out}", file=sys.stderr)

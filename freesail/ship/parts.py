@@ -28,6 +28,7 @@ from enum import StrEnum
 from typing import Any
 
 from freesail import units
+from freesail.ship.charges import CHARGE_TABLE_LB
 from freesail.ship.schema import (
     GUN_KINDS,
     FitSpec,
@@ -367,6 +368,14 @@ class Sail(Part):
         return self.cls in {"gaff", "jibheaded", "lug", "lateen", "sprit"}
 
     @property
+    def curve_class(self) -> str:
+        """The class whose curve and trim the physics and the readings take for this sail
+        (package 75; docs/design/Design-ShipsEngineExtensions.md §3.1): its own class, until
+        stage 0E gives a lateen cut at the mast the gaff's; the lookups that read a sail's
+        curve by its class read this instead."""
+        return self.cls
+
+    @property
     def sent_down(self) -> bool:
         """A flying sail stowed: on deck with its yard (package 57)."""
         return self.flying and self.state is SailState.FURLED
@@ -489,8 +498,21 @@ class Gun(Part):
     dismounted: bool = False
     fired: int = 0  # rounds fired, for the log and the gunner's count
     # a pivot gun's own arc over either side, degrees off the bow (package 86; None, and a
-    # gun pickled before it, the default arc of `combat.guns.pivot_arc`)
+    # gun pickled before it, the default arc of `combat.guns.pivot_arc`; since package 75 a
+    # pivot's file must give one)
     arc_deg: tuple[float, float] | None = None
+    # the deck it stands on, one of `schema.DECK_WORDS` (package 75; None, a file that does
+    # not say, and a gun pickled before it): read by nothing yet, the lee ports' rule and the
+    # 74's bill by deck will
+    deck: str | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, its deck only where its file names one (package
+        75), so that a gun without one is pickled as before it."""
+        state = dict(self.__dict__)
+        if state.get("deck") is None:
+            state.pop("deck", None)
+        return state
 
     @classmethod
     def from_spec(cls, g: GunSpec) -> Gun:
@@ -508,6 +530,7 @@ class Gun(Part):
             crew_n=int(g.crew),
             weight_cwt=float(g.weight_cwt),
             arc_deg=tuple(g.arc_deg) if g.arc_deg is not None else None,
+            deck=g.deck,
         )
 
     @property
@@ -572,14 +595,16 @@ def _pounder_words(pounder: float) -> str:
 # poudre, a powder-cask, containing an hundred pounds of gun-powder" (l.22563-22564). The
 # English barrel's weight is UNVERIFIED.
 BARREL_LB = 100.0
-# A cartridge's powder as a share of its shot's weight by the gun's kind, until the
-# Regulations' Table No. 29 (OCR l.27498-27502, its figures lost in the OCR) is read from
-# the page image (package 75). A long gun a third: Falconer 1780, CANNON (from l.4037),
-# quoting Robins at l.4826-4831, the present allowance is half the ball in the smaller
-# pieces and seven sixteenths in the 32-pounders, and a third or even less would be an
-# advantage; that the service charge of 1805 was a third is from memory, UNVERIFIED. A
-# carronade a twelfth, from memory, UNVERIFIED (Falconer 1780 is before the carronade). A
-# swivel a half, Falconer's smaller pieces (l.4827) applied to a half-pounder (judgement).
+# A cartridge's powder as a share of its shot's weight by the gun's kind, where the
+# Regulations' Table No. 29 (OCR l.27498-27502, its figures lost in the OCR) gives none: the
+# table, read from the page image, is `CHARGE_TABLE_LB` in `freesail/ship/charges.py`
+# (package 75's shared work SW-1), which `charge_lb` reads first, and which is empty until it
+# is filled. A long gun a third: Falconer 1780, CANNON (from l.4037), quoting Robins at
+# l.4826-4831, the present allowance is half the ball in the smaller pieces and seven
+# sixteenths in the 32-pounders, and a third or even less would be an advantage; that the
+# service charge of 1805 was a third is from memory, UNVERIFIED. A carronade a twelfth, from
+# memory, UNVERIFIED (Falconer 1780 is before the carronade). A swivel a half, Falconer's
+# smaller pieces (l.4827) applied to a half-pounder (judgement).
 CHARGE_SHARE: dict[str, float] = {"long": 1 / 3, "carronade": 1 / 12, "swivel": 1 / 2}
 # The powder below at completion, as a share of the filled powder (judgement: the period
 # kept most of its powder in the barrels).
@@ -594,7 +619,12 @@ MAGAZINE_LAYOUT = 2
 
 
 def charge_lb(kind: str, pounder: float) -> float:
-    """A cartridge's powder in pounds for a gun of the kind and calibre, to the ounce."""
+    """A cartridge's powder in pounds for a gun of the kind and calibre: Table No. 29's figure
+    where `charges.CHARGE_TABLE_LB` has one (package 75), else its kind's share of the shot,
+    to the ounce."""
+    table = CHARGE_TABLE_LB.get((kind, float(pounder)))
+    if table is not None:
+        return float(table)
     share = CHARGE_SHARE.get(kind, CHARGE_SHARE["long"])
     return round(share * float(pounder) * 16.0) / 16.0
 

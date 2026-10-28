@@ -26,6 +26,7 @@ from freesail.crew.model import Crew, Station, Watch
 from freesail.physics.sails import SAIL_CLASSES
 from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, Sail, SailState, Spar, booms, sail_room
+from freesail.ship.schema import PROFILE_KEYS, HullProfile
 
 
 def weather_block(world: World) -> dict[str, Any]:
@@ -331,7 +332,10 @@ def _spar_entry(s: Spar) -> dict[str, Any]:
 
 
 def _sail_entry(s: Sail) -> dict[str, Any]:
-    cls = SAIL_CLASSES.get(s.cls)
+    # the reef factor by the class whose curve the physics takes for the sail (package 75:
+    # `Sail.curve_class`, its own class until stage 0E gives a lateen cut at the mast the
+    # gaff's)
+    cls = SAIL_CLASSES.get(s.curve_class)
     return {
         "id": s.id,
         "class": s.cls,
@@ -377,27 +381,51 @@ def _line_entry(ln: Line) -> dict[str, Any]:
     }
 
 
+def _profile_entry(p: HullProfile) -> dict[str, Any]:
+    """The hull's profile as her file gives it (package 75; docs/design/Build-Ships.md §5.1,
+    §6), in plain lists in `PROFILE_KEYS`' order: each line a list of points, `decks_m`,
+    `ports_m` and `port_size_m` mappings by deck word. A line the file does not give is
+    left out, as it is out of the file."""
+    out: dict[str, Any] = {}
+    for key in PROFILE_KEYS:
+        value = getattr(p, key)
+        if not value:
+            continue
+        if key in ("decks_m", "ports_m"):
+            out[key] = {word: [list(pt) for pt in pts] for word, pts in value}
+        elif key == "port_size_m":
+            out[key] = {word: list(size) for word, size in value}
+        else:
+            out[key] = [list(pt) for pt in value]
+    return out
+
+
 def ship_graph(ship: Ship) -> dict[str, Any]:
     """Everything a drawing needs to build the ship once: parts, dimensions, roles.
 
     Spars carry their class, `x_m` (root spars only; a child spar stands at its
     parent's x), `height_m`, `length_m`, parent, side and brace angle. Sails
     carry class, roles, area, state, reefs, sheet angle and centre height.
-    The hull carries its principal dimensions. SI throughout.
+    The hull carries its principal dimensions, and its profile where the file gives one
+    (package 75: the side, the decks and the ports; absent otherwise). SI throughout.
     """
     h = ship.hull.spec
+    hull: dict[str, Any] = {
+        "length_waterline_m": h.length_waterline_m,
+        "beam_m": h.beam_m,
+        "draught_m": h.draught_m,
+        "deck_height_m": h.deck_height_m,
+        "displacement_kg": h.displacement_kg,
+        "gm_m": h.gm_m,
+        "clr_x_m": h.clr_x_m,
+    }
+    profile = getattr(h, "profile", None)
+    if profile is not None:
+        hull["profile"] = _profile_entry(profile)
     return {
         "name": ship.name,
         "rig": ship.spec.rig,
-        "hull": {
-            "length_waterline_m": h.length_waterline_m,
-            "beam_m": h.beam_m,
-            "draught_m": h.draught_m,
-            "deck_height_m": h.deck_height_m,
-            "displacement_kg": h.displacement_kg,
-            "gm_m": h.gm_m,
-            "clr_x_m": h.clr_x_m,
-        },
+        "hull": hull,
         "spars": [_spar_entry(s) for s in ship.spars.values()],
         "sails": [_sail_entry(s) for s in ship.sails.values()],
         "lines": [_line_entry(ln) for ln in ship.lines.values()],

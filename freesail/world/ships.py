@@ -263,11 +263,16 @@ def description_key(words: str) -> str | None:
     return None
 
 
-@functools.lru_cache(maxsize=8)
-def file_descriptions(ship_file: str) -> dict[str, dict[str, str]]:
+# The three caches by ship file (the descriptions, the masthead, the polar) hold 32: the
+# eight files and the new ships' (package 75), each drawn once a run as before
+# (docs/design/Design-Ship-Indefatigable.md §8: results unchanged, the pace kept).
+@functools.lru_cache(maxsize=32)
+def file_descriptions(ship_file: str) -> dict[str, dict[str, Any]]:
     """The descriptions a ship file carries of itself (`ship.descriptions`, written by
-    `tools/gen_ships.py`: the brig's two), each {rig, what, note}; empty for a file
-    without them. The file is the source and `DESCRIPTIONS` the index."""
+    `tools/gen_ships.py`: the brig's two), each {rig, what, note} and, where the file gives
+    them (package 75; docs/design/Build-Ships.md §8.1), the `fit` a far ship of it carries
+    when the scenario names none and the `roles` a scenario may give her, kept a list;
+    empty for a file without them. The file is the source and `DESCRIPTIONS` the index."""
     import yaml
 
     try:
@@ -275,7 +280,18 @@ def file_descriptions(ship_file: str) -> dict[str, dict[str, str]]:
     except OSError:
         return {}
     found = (doc.get("ship") or {}).get("descriptions") or {}
-    return {str(k): {kk: str(vv) for kk, vv in (v or {}).items()} for k, v in found.items()}
+    return {
+        str(k): {kk: _description_value(kk, vv) for kk, vv in (v or {}).items()}
+        for k, v in found.items()
+    }
+
+
+def _description_value(key: str, value: Any) -> Any:
+    """A word of a file's description as kept: `roles` a list of words (one word read as a
+    list of one), every other a string."""
+    if key == "roles":
+        return [str(r) for r in value] if isinstance(value, list | tuple) else [str(value)]
+    return str(value)
 
 
 # The player's ship files that no far description sails, by the description their words
@@ -283,18 +299,23 @@ def file_descriptions(ship_file: str) -> dict[str, dict[str, str]]:
 SHADOW_FILES: dict[str, str] = {"merchant-brig.yaml": "merchant brig"}
 
 
-def description(key: str) -> dict[str, str]:
+def description(key: str) -> dict[str, Any]:
     """A description by its key: the index's entry with the ship file's own words for
-    her rig and what she is where the file gives them."""
-    d = dict(DESCRIPTIONS[key])
+    her rig and what she is where the file gives them, and her file's `fit` and `roles`
+    for it where it gives them (package 75; absent otherwise)."""
+    d: dict[str, Any] = dict(DESCRIPTIONS[key])
     own = file_descriptions(d["file"]).get(key)
     if own:
         d["rig"] = own.get("rig") or d["rig"]
         d["what"] = own.get("what") or d["what"]
+        if own.get("fit"):
+            d["fit"] = own["fit"]
+        if own.get("roles"):
+            d["roles"] = list(own["roles"])
     return d
 
 
-@functools.lru_cache(maxsize=8)
+@functools.lru_cache(maxsize=32)
 def rig_height_m(ship_file: str) -> float:
     """The height of a vessel's masthead above the water from her ship file, which
     decides her horizon (truth 67): the deck's height plus the tallest chain of masts."""
@@ -375,7 +396,8 @@ def _rigged_for_plain_sail(ship_file: str) -> Any:
 def _trim_for(ship: Any, awa: float) -> None:
     """The yards braced and the sheets tended to the apparent wind as `trim sails` does
     (`orders.verbs._trim`: the yard square less the wind's angle beyond the sail class's
-    peak, within its limit; `evolutions.trim.wanted_sheet_angle` for the sheets)."""
+    peak, within its limit; `evolutions.trim.wanted_sheet_angle` for the sheets, by the
+    class whose curve drives the sail, `Sail.curve_class`, package 75)."""
     from freesail.evolutions.trim import set_sheet_angle, wanted_sheet_angle
     from freesail.physics.sails import SAIL_CLASSES
 
@@ -388,7 +410,7 @@ def _trim_for(ship: Any, awa: float) -> None:
         y.brace_angle = min(math.pi / 2 - chord, y.brace_limit)
     for sail in ship.sails.values():
         if sail.is_set and sail.is_fore_and_aft:
-            set_sheet_angle(ship, sail, wanted_sheet_angle(sail.cls, awa))
+            set_sheet_angle(ship, sail, wanted_sheet_angle(sail.curve_class, awa))
 
 
 def _balanced_speed_ms(ship: Any, off_wind_deg: float, wind_kn: float) -> float:
@@ -420,7 +442,7 @@ def _balanced_speed_ms(ship: Any, off_wind_deg: float, wind_kn: float) -> float:
     return 0.5 * (lo + hi)
 
 
-@functools.lru_cache(maxsize=8)
+@functools.lru_cache(maxsize=32)
 def polar_of(ship_file: str) -> Polar:
     """The polar drawn once from a ship file (spec M5 §25): plain sail, the yards and
     sheets trimmed to the wind, the sails' thrust against the hull's resistance at each
@@ -545,6 +567,20 @@ class Vessel:
     regime: str = ""
     sortie: str = ""
     commission_tick: int = -1
+    # package 75 (docs/design/Build-Ships.md §8.1): the role a scenario gives her (`role:`),
+    # one of her description's `roles` and of `captains.ROLES`, which her captain sails by
+    # before the one her description and intent give (`brains.role_of_vessel`,
+    # `captains.role_for`); "" for none, and in a checkpoint from before. Left out of her
+    # saved forms while empty (`to_dict`, `__getstate__`), so that none of them moves
+    role: str = ""
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Her state for the checkpoint, her role only where a scenario gave her one
+        (package 75), so that a vessel without one is pickled as before it."""
+        state = dict(self.__dict__)
+        if not state.get("role"):
+            state.pop("role", None)
+        return state
 
     @property
     def height_m(self) -> float:
@@ -1007,6 +1043,8 @@ class Vessel:
             d["warning"] = self.warning
         if getattr(self, "fit", ""):
             d["fit"] = self.fit  # package 70
+        if getattr(self, "role", ""):
+            d["role"] = self.role  # package 75: only where a scenario gave her one
         if getattr(self, "struck", False):
             d["struck"] = True
         locker = getattr(self, "signals", None)
@@ -1215,11 +1253,43 @@ def _out_of_port(world: Any, port_id: str) -> list[tuple[Any, ...]]:
     return _plan_of_legs(Planner(world)._port_track(port, "to_sea"))
 
 
+def _role_of_spec(spec: dict[str, Any], key: str, d: dict[str, Any]) -> str:
+    """A far ship's `role:` (package 75; Build-Ships.md §8.1): a captain's role
+    (`captains.ROLES`) that her description's file gives her among its `roles`, "in their
+    reasonable degrees"; "" where the scenario names none. Anything else is refused in
+    words, at her making."""
+    role = " ".join(str(spec.get("role") or "").lower().split())
+    if not role:
+        return ""
+    from freesail.world.captains import ROLES
+
+    if role not in ROLES:
+        raise ValueError(f"'{role}' is no captain's role; the roles: {', '.join(ROLES)}.")
+    roles = list(d.get("roles") or [])
+    if role not in roles:
+        given = f"the roles {', '.join(roles)}" if roles else "no role"
+        raise ValueError(f"'{role}' is no role a {key} takes; her file gives a {key} {given}.")
+    return role
+
+
+def _default_fit(ship_file: str) -> str:
+    """Her file's default fit (package 75): its armament's `default`, or `unarmed` for a
+    file with no armament, whose ship carries no guns already."""
+    from freesail.ship.loader import load_spec
+    from freesail.ship.schema import UNARMED
+
+    armament = load_spec(ship_file).armament
+    return armament.default if armament is not None else UNARMED
+
+
 def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
     """A vessel from a scenario's `ships:` entry or a world order's words: her
     description (one of `DESCRIPTIONS`), her name, her nation, her position and her goal;
     `colours: shown | none` whether she wears them. Her sailing factor is drawn from the
-    `ships` stream, so that two brigs of one file are not one brig."""
+    `ships` stream, so that two brigs of one file are not one brig. Package 75
+    (docs/design/Build-Ships.md §8.1): `role:` the role her captain sails by, one of her
+    description's `roles` and of `captains.ROLES`, else refused in words; with no `fit:`
+    she carries her description's fit where her file gives one that is not its default."""
     key = description_key(str(spec.get("description") or spec.get("kind") or ""))
     if key is None:
         raise ValueError(
@@ -1227,6 +1297,7 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
             f"of {', '.join(DESCRIPTIONS)}."
         )
     d = description(key)
+    role = _role_of_spec(spec, key, d)
     nation_id = str(spec.get("nation") or "britain")
     nation = world.nations.get(nation_id)
     raw = spec.get("position")
@@ -1256,6 +1327,12 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         factor = SAILING_FACTOR_MIN + (1.0 - SAILING_FACTOR_MIN) * stream.random()
     colours_word = str(spec.get("colours", "shown")).lower().strip()
     shows = colours_word not in ("none", "no", "false", "hidden")
+    fit = " ".join(str(spec.get("fit") or "").split())
+    if not fit and d.get("fit") and d["fit"] != _default_fit(d["file"]):
+        # package 75 (§8.1): the sub-type's fit where the scenario names none, and only
+        # where it is not her file's default, so that a far ship of the default keeps the
+        # pinned form she had (`to_dict` writes a fit only where she has one)
+        fit = str(d["fit"])
     vessel = Vessel(
         id=str(spec.get("id") or f"ship-{serial}"),
         name=name,
@@ -1273,7 +1350,8 @@ def vessel_from_spec(world: Any, spec: dict[str, Any], serial: int) -> Vessel:
         plan=plan,
         cycle=cycle,
         sailing_factor=round(factor, 3),
-        fit=" ".join(str(spec.get("fit") or "").split()),
+        fit=fit,
+        role=role,
     )
     # package 71: `colours: <another nation>` is false colours of that nation ('colours:
     # British' on a French privateer); `under_the_orders_of:` whose signals command her;
