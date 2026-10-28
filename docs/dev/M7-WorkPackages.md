@@ -53,7 +53,7 @@ on these packages; that is the owner's choice.
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
 | 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | briefed 2026-10-27 (below); launches the moment 73 is merged |
 | 87 | Fable | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief once most of the milestone's orders are in, after 73, 77 and 84 |
-| 81 | Opus | The viewer's action: the gun ports and the guns drawn with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
+| 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -1409,9 +1409,20 @@ them and says what it took another way.
    the way, the suite as run on the owner's machine: the fast tier and the touched files'
    slow tier; the whole slow tier and the pace tests the lead's on the build machine).
 
-**Not built here:** the physics (read, not changed; a rig the engine lacks is reported);
-the boats as files (82's); the viewer's hull (81's); the Bermuda sloop (the Caribbean's
-block, 79 or later). **The head rules bind** as the briefs before have them: no model
+**The session's five extensions, ruled on by the lead (2026-10-28)** after the owner's
+answers to its decision sheet: the hull profile **drawn** in the viewer for every ship is in
+this package (the owner's word that the viewer is in scope), the pictures' tests kept
+passing and any threshold that moves re-pinned with the old beside the new, 81 starting
+from the drawn hull; the lateen class finished and the yards under the bowsprit are
+accepted **under the lead's gate with the settee** (one design document for the three
+engine extensions reaches the lead before Phase 4; the physics' equations are not changed);
+the lee ports wired with sourced sill heights for every ship is accepted as data honesty,
+built only after 86's head is in, every combat pin it moves with the old figure beside the
+new, the reason and the proof by bisection; the settee tacking as a ship's mizen is within
+the settee's design.
+
+**Not built here:** the physics' equations (read, not changed); the boats as files (82's);
+the Bermuda sloop (the Caribbean's block, 79 or later). **The head rules bind** as the briefs before have them: no model
 identifier in any file or commit; nothing under `docs/agents/consent/` touched; the ship
 files never edited by hand; the pins re-measured only where a change moves them, old
 beside new, proven; never a test skipped, disabled or quarantined; realism, not pacing.

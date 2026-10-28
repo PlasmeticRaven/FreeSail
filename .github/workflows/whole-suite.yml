@@ -1,0 +1,89 @@
+name: whole suite
+
+# The whole suite, spread over several machines so that a merge is gated in twenty
+# minutes or so instead of seventy on the build machine (the lead, 2026-10-28, on the
+# owner's question of why a suite should take so long). Run by hand from the Actions tab
+# or dispatched by the lead at a merge; never on a push, since the account's Actions
+# minutes are finite (the note at the head of ci.yml). What it runs:
+#   - the slow tier without the pace tests, in N shards (tests/conftest.py's
+#     FREESAIL_SHARD: a stable split by xdist group, so a module-scoped day or passage
+#     stays whole on one machine), each shard on all its runner's cores;
+#   - the pace tests alone and last, on one runner, serial, as the release does;
+#   - the lint once.
+# Linux by default (the recorded passages are pinned on Linux); Windows as well when
+# asked, for the owner's platform (package 69 has the five cross-platform pins).
+
+on:
+  workflow_dispatch:
+    inputs:
+      windows:
+        description: "Also run the shards on Windows"
+        type: boolean
+        default: false
+
+concurrency:
+  group: whole-suite-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SHARDS: "6"
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[dev,server]"
+      - run: |
+          python -m ruff check .
+          python -m ruff format --check .
+
+  slow:
+    name: slow tier, shard ${{ matrix.shard }} of 6 (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ inputs.windows && fromJSON('["ubuntu-latest", "windows-latest"]') || fromJSON('["ubuntu-latest"]') }}
+        shard: [0, 1, 2, 3, 4, 5]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONUTF8: "1"
+      FREESAIL_SHARD: ${{ matrix.shard }}/6
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[dev,server]"
+      - name: The slow tier, this shard, without the pace tests
+        run: python -m pytest -n auto --dist loadgroup --slow -m "not pace" -rfE -p no:cacheprovider
+
+  pace:
+    name: pace tests, alone (${{ matrix.os }})
+    needs: slow
+    if: always()
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ inputs.windows && fromJSON('["ubuntu-latest", "windows-latest"]') || fromJSON('["ubuntu-latest"]') }}
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONUTF8: "1"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[dev,server]"
+      - name: The pace tests, serial
+        run: python -m pytest --slow -m pace -rfE -p no:cacheprovider
