@@ -1247,7 +1247,7 @@ Each builder's branch is reviewed as soon as it is done, then fixed (plan Phase 
 **Answered by the owner (2026-10-28; Decisions, "The design's questions").** Item 3: "as carried
 1796". Item 4: the spritsail yard only, out of plain sail. Items 5, 6 and 8: as proposed. Item 7:
 as proposed, except the lifts, now drawn on every yard (§6). Item 10: the six-inch margin. Item
-11: fetched and read (below). Item 13: left out (below). Still open: 1, 2, 9, the weather side
+11: fetched and read (below). Item 13: carried (below). Still open: 1, 2, 9, the weather side
 of 10, and 12.
 
 1. **D18:** (a) proposed for every file (§5.5); the razee's gun deck at 1.39 m, or (c) her old
@@ -1279,13 +1279,13 @@ of 10, and 12.
     calibre.
 13. **The driver** of the 64 and the 74 (Indf §4.4; Ext §14 item 10): the occasional light-weather
     sail hoisted to the mizen yard's peak on its own small yard, abaft the mizen course. The
-    mizen course itself stays her after sail. *Left out (2026-10-28; the owner left the choice to
-    the session):* a light-weather sail, and carrying it would reopen the approved engine design.
-    Lever sets it like a studding sail: its yard hoisted to the peak, the tack to the weather fife
-    rail, the sheet to a pole run out over the taffrail
-    (`docs/references/lever/lever-1827-young-sea-officers-sheet-anchor-ocr.txt:8264-8270`). A
-    later package may add it as a ringtail whose host sail has no boom (`physics/sails.py`
-    `_gaff_host`).
+    mizen course itself stays her after sail. *Carried (the owner, 2026-10-28):* Lever sets it like
+    a studding sail, its yard hoisted to the peak, the tack to the weather fife rail, the sheet to
+    a pole run out over the taffrail
+    (`docs/references/lever/lever-1827-young-sea-officers-sheet-anchor-ocr.txt:8264-8270`).
+    Proposed as a ringtail whose host is the mizen course, which has no boom (`physics/sails.py`
+    `_gaff_host` finds a ringtail's host by its boom): an addendum to Ext for the lead's gate,
+    built with the 64's stage B and the 74.
 
 ### 19.2 For the lead
 
