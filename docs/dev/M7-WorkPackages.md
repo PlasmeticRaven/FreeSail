@@ -483,6 +483,29 @@ used only where a straight line is not clear. **Found on the way, fixed:** `stat
 ignoring the scenario's crewed cap. **Open for the lead:** the director's lines for a
 person land in the player's log as before (the director's-reach step's).
 
+**The whole suite in the cloud on the merged head `5e3f7b5`** (run 5, 34 minutes): lint
+clean; the slow tier's six shards 4,246 passed, 3 skipped, 11 xfailed and **2 failed**, both
+pinned truths that passed on the previous head `3421829`: 7-154 (the blockade squadron
+blown off for Torbay restored its station at 34200 for the pinned 37920) and 7-156 (the
+convoy's tack-in-succession gaps `[300, 240]` for the band 300 to 420); truth 7b-108's
+harbour line passed with the line buffering; the pace job (informative) missed two floors on
+the runner as before (the gates' day 487, 7-159 476 for 500). **The cause, step 4's
+coasting track**, which the planner took for every route whose ends reached it, bisected by
+the sibling on its own tree the same hour (the known truths' slow tier run after all, on
+the merged head) and by the lead on this one; the lead's recast of 7-156 to the rule it
+states (`bd220cb`) reverted (`ad041ca`) when the sibling's mend came, since a data change
+is no reason to re-pin three figures. **The mend merged `--no-ff` from `claude/pkg-84` at
+`ef7b7fe`:** the track withdrawn, the squadrons' and the captains' tests' original
+assertions restored, and the far course for a port taking the captain's marks (`shape a
+course for Plymouth via the Start`, the intents' `via` of package 45, each headland given
+its offing), the land guard's refusal naming the way by marks ("give the way by marks");
+truth 7-200's fake reads the refusal in its order's result and gives the way (two refusals
+in the day, out and home, each answered). **The lead's judgement:** right as the thing is:
+a captain told that the straight course for Plymouth crosses the Start names the Start, in
+the words the intents already take, and a model captain gets the same refusal naming what
+to say; the record and the acceptance test say so. The whole suite in the cloud again on
+the mended head (the figures below).
+
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
 Fable; the first package of the milestone, and the one that sets the shape every later
