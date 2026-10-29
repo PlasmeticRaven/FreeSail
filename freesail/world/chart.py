@@ -985,11 +985,12 @@ class Chart:
 
     def bounds_words(self) -> str:
         s, n, w, e = self.bounds
-        return (
-            f"{s:g} to {n:g} N, {abs(w):g} to {abs(e):g} W"
-            if e <= 0
-            else f"{s:g}-{n:g} N, {w:g}-{e:g} E"
-        )
+        if e <= 0:
+            return f"{s:g} to {n:g} N, {abs(w):g} to {abs(e):g} W"
+        if w < 0:
+            # across the meridian (package 79b: the Channel's east block reaches 2.5 E)
+            return f"{s:g} to {n:g} N, {abs(w):g} W to {e:g} E"
+        return f"{s:g}-{n:g} N, {w:g}-{e:g} E"
 
     def _cell_key(self, lat: float, lon: float) -> str:
         d = self.index_cell_deg

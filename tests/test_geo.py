@@ -260,6 +260,7 @@ def test_the_scenario_file_reads_a_chart_beside_a_region_and_a_save_before_it_lo
     assert both.chart.regions == [
         "channel-west",
         "channel-mid",
+        "channel-east",  # package 79b
         "biscay-north",
         "biscay-south",
         "portugal",

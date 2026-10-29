@@ -1,0 +1,209 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"197,-3": [
+"rocks-of-calvados"
+],
+"197,0": [
+"l-eclat",
+"havre-little-road",
+"le-havre",
+"the-amfar",
+"honfleur",
+"notre-dame-de-grace"
+],
+"198,0": [
+"aiguille-detretat",
+"cap-dantifer",
+"cap-de-la-heve",
+"la-heve-lights",
+"havre-great-road"
+],
+"199,1": [
+"fecamp",
+"notre-dame-du-salut",
+"fecamp-great-road"
+],
+"199,2": [
+"st-valery-en-caux"
+],
+"199,3": [
+"pointe-dailly",
+"ailly-light",
+"la-galere"
+],
+"199,4": [
+"dieppe",
+"dieppe-castle",
+"dieppe-road"
+],
+"200,5": [
+"le-treport"
+],
+"200,6": [
+"st-valery-sur-somme"
+],
+"202,-3": [
+"the-owers",
+"owers-light"
+],
+"202,-4": [
+"selsey-bill",
+"the-mixon",
+"the-owers-brake"
+],
+"202,-5": [
+"horse-sand",
+"dean-sand",
+"the-warner",
+"no-mans-land",
+"ryde",
+"nettlestone-point",
+"st-helens-sea-mark",
+"st-helens-road",
+"ashey-down-tower",
+"bembridge-point",
+"bembridge-ledge",
+"the-nab",
+"nab-light",
+"princessa-shoal",
+"culver-cliff"
+],
+"202,-8": [
+"poole",
+"south-haven-point",
+"brownsea-castle",
+"poole-bar",
+"studland-bay"
+],
+"202,0": [
+"beachy-head",
+"belle-tout-light"
+],
+"202,1": [
+"royal-sovereign-shoals"
+],
+"202,6": [
+"boulogne",
+"boulogne-road",
+"boulogne-mast-light",
+"cap-dalprech",
+"mont-lambert",
+"etaples"
+],
+"203,-1": [
+"brighthelmstone"
+],
+"203,-2": [
+"shoreham"
+],
+"203,-3": [
+"bognor-rocks"
+],
+"203,-4": [
+"chichester-cathedral"
+],
+"203,-5": [
+"portsmouth",
+"round-tower-portsmouth",
+"southsea-castle",
+"fort-monckton",
+"gilkicker-point",
+"gosport",
+"portsmouth-dockyard",
+"portsmouth-harbour",
+"portchester-castle",
+"portsdown-hill",
+"spithead",
+"spit-sand"
+],
+"203,0": [
+"newhaven",
+"seaford-head",
+"seaford-road"
+],
+"203,2": [
+"hastings",
+"fairlight-down",
+"rye"
+],
+"203,3": [
+"dungeness",
+"dungeness-light",
+"dungeness-east-road",
+"dungeness-west-bay"
+],
+"203,5": [
+"the-varne",
+"the-ridge"
+],
+"203,6": [
+"blanc-nez",
+"gris-nez",
+"gris-nez-light",
+"wissant-road",
+"st-johns-road",
+"ambleteuse"
+],
+"203,7": [
+"calais",
+"calais-road",
+"calais-tour-du-guet",
+"calais-tour-du-guet-light",
+"calais-light"
+],
+"203,8": [
+"gravelines"
+],
+"204,4": [
+"folkestone"
+],
+"204,5": [
+"shakespeare-cliff",
+"dover-castle",
+"dover",
+"dover-road",
+"south-foreland",
+"south-foreland-upper-light",
+"south-foreland-lower-light",
+"walmer-castle",
+"deal-castle",
+"deal",
+"sandown-castle",
+"the-downs",
+"deal-bank",
+"south-sand-head-light"
+],
+"204,6": [
+"goodwin-callipers",
+"south-goodwin",
+"south-sand-head"
+],
+"204,8": [
+"gravelines-light"
+],
+"204,9": [
+"dunkirk",
+"dunkirk-belfry",
+"dunkirk-risban-light",
+"dunkirk-road",
+"the-brack",
+"the-splinter",
+"mardick"
+],
+"205,5": [
+"small-downs",
+"gull-stream",
+"the-brake",
+"gull-light",
+"ramsgate",
+"north-foreland",
+"north-foreland-light"
+],
+"205,6": [
+"north-goodwin",
+"goodwin-trinity-bay-head",
+"north-goodwin-light"
+]
+}
+}

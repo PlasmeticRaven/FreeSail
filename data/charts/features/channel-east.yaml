@@ -1,0 +1,1658 @@
+# The features of the Channel's east block (package 79b; docs/dev/ChartBlocks.md): the
+# Wight's eastern end, Spithead, St Helens road and Portsmouth; Poole; Selsey and the
+# Owers; the Sussex coast to Beachy Head; Rye bay and Dungeness; Dover, the South
+# Foreland, the Downs and Deal, the Goodwin Sands and the North Foreland; and on the
+# French side the Seine's mouth and Le Havre, Fecamp, Dieppe, the Somme, Boulogne, Calais
+# and the Flemish banks to Dunkirk. Spithead and Poole lie in channel-mid's bounds (west of
+# 1 W), where channel-mid lists no level-3 tile: their harbour patches and their marks are
+# this block's, as Dartmouth's were package 39a's (the bounds' check takes a harbour
+# patch's box as the block's); the rest of the Wight, the Solent west of the Spithead
+# patch, the Needles and Hurst are channel-mid's file. The form and the rules are
+# channel-west.yaml's (its head). The sources, in the references' form
+# (docs/references/README.md; docs/references/Charts.md, package 79b):
+#
+#   Faden 1793      Le Petit Neptune Français; or, French Coasting Pilot (Internet Archive
+#                   lepetitneptunefr00fade): Dunkirk, its road behind the Brack and the
+#                   banks of Flanders, Gravelines and Calais (pp. 2 to 9); Blanc Nez, Gris
+#                   Nez, the Calbarde, St John's road, Boulogne, Etaples, the Somme,
+#                   Treport, Dieppe, Cape Lailly's light of 1775, St Vallery, Fecamp, the
+#                   Needles of Etretat, Cape la Heve's two lights of 1775, the roads of
+#                   Havre by M. de Gaulle (1776), the Havre, Honfleur and the Amfar, the
+#                   rocks of Calvados (pp. 10 to 22). In period exactly.
+#   Moore 1799      The New Practical Navigator (Internet Archive
+#                   bim_eighteenth-century_the-practical-navigator_moore-john-hamilton_1799):
+#                   the catechism's Downs, Goodwin, Ripraps, Dungeness, Beachy Head, the
+#                   Owers with "a floating light on them which has been shifted several
+#                   times", and the approach to Spithead by the Princessa, the Dean, the
+#                   Warner and the Nab buoy (pp. 298 to 300). In period exactly.
+#   White 1835      Sailing Directions for the English Channel (Internet Archive
+#                   sailingdirectio00whitgoog): 'Coast of England' pp. 45 to 58 (Dunnose to
+#                   the Downs: Spithead's marks and anchorage, St Helens, the Owers and
+#                   their light-vessel, the Park, Seaford road, Beachy Head, the Royal
+#                   Sovereign shoals, Fairlight, Dungeness and its bays, the Downs, the
+#                   Varne and the Ridge, the Vergoyers, the tides of the Strait); 'Coast of
+#                   France' pp. 58 to 60 (Cape la Heve, Fecamp, Antifer, Point d'Ailly and
+#                   La Galere, the Somme, Montalembert).
+#   Imray 1874      Sailing Directions for the English Channel, part I (Internet Archive
+#                   sailingdirection00unse_0): 'Margate Roads to South Foreland' pp. 1 to 11
+#                   (the North Foreland, the Goodwin, Trinity bay, the Gull Stream, the
+#                   Brake, the Downs, Deal bank, Ramsgate); 'South Foreland to Beachy Head'
+#                   pp. 11 to 12 (Dover); 'Spithead and its approaches' pp. 35 to 38 (the
+#                   Horse and Dean, the Princessa, Bembridge ledge, the Nab, St Helen's
+#                   road, the anchorage at Spithead); 'Poole' pp. 54 to 55. Later than the
+#                   period: the banks are the same banks, the works are not (the Admiralty
+#                   pier at Dover, building from 1847, is not drawn).
+#   the encyclopaedia   en.wikipedia.org and fr.wikipedia.org, read 2026-10-29: 'South
+#                   Foreland Lighthouses', 'North Foreland', 'Dungeness Lighthouse', 'Belle
+#                   Tout Lighthouse', 'Goodwin Sands', 'Lightship', 'Phare de la Hève',
+#                   'Phare d'Ailly', 'Phare de Calais', 'Tour du Guet', 'Phare du cap
+#                   Gris-Nez', 'Phare de Dunkerque', 'Phare de Gravelines', 'Tour d'Odre'.
+#   The Maritime Archaeology Trust, 'Lighthouses and Lightvessels'
+#                   (maritimearchaeologytrust.org, read 2026-10-29): the Nab lightvessel
+#                   active from 24 September 1812 (the Public Ledger and Daily Advertiser of
+#                   29 September); the Owers from 1788; the North Goodwin from 1795. Cited
+#                   as "the encyclopaedia" form's named reference, with the page.
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from), first placed from the modern chart and the pilots' bearings, then checked against
+# this block's tiles by the rule of channel-west.yaml's head (a scratch script outside the
+# repository); a move is said in `fix`. Heights are above the sea for the horizon. A
+# light's `lit` has `from` and `until`, so that 1805 sees the South Foreland's two, the
+# North Foreland, Dungeness (Wyatt's tower of 1792), the Owers' floating light, the North
+# Goodwin's, Cape la Heve's two, Cape Lailly's, Dunkirk's fanal on the Risban and the
+# lantern on Boulogne's bank, and not the Nab (1812), the Gull and the South Sand Head
+# (named first in 1832), Belle Tout (1828), Calais (the Tour du Guet 1818, the tower of
+# 1848), Gris Nez (1837) or Gravelines (1843); `range_nm` is the period lamp's, a
+# judgement from the pilot's words or the elevation. `dries_m` is a danger's head against
+# the chart's datum (LAT taken as the pilot's low water of springs): negative for the water
+# over it, positive for how far it dries. A danger's `extent_m` is kept under a kilometre
+# and laid on the foul ground itself (ChartBlocks.md): the Goodwin is given as five heads.
+#
+# Not here: the Thames above the North Foreland and the Nore, and the Flemish coast east
+# of Dunkirk (Ostend, Flushing) are later blocks; Cherbourg, La Hougue, the Isles St
+# Marcouf, Barfleur, the Needles, Hurst, St Catherine's and Dunnose are channel-mid's.
+
+region: channel-east
+features:
+
+  # ---------------------------------------------------------------------------
+  # Spithead, St Helens road and Portsmouth (the harbour patch spithead, in channel-mid's
+  # water west of 1 W)
+  # ---------------------------------------------------------------------------
+
+  - id: portsmouth
+    kind: town
+    name: Portsmouth
+    modern: Old Portsmouth
+    lat_deg: 50.7915
+    lon_deg: -1.1023
+    height_m: 15
+    fix: "moved 120 m east to the grid's land (the Point's low ground reads a metre and a half above the datum)"
+    source: "White 1835, 'Coast of England', p. 46: the eastern end of the trees on Portsmouth Lines in one with South-Sea Castle, the mark for the Nab light-vessel; Imray 1874, 'Spithead and its approaches', p. 36: Portsmouth church tower in line with Southsea castle"
+    says: "Portsmouth, the King's dockyard and the garrison town on the east side of the harbour's mouth, its church tower and the trees of its lines over Spithead."
+
+  - id: round-tower-portsmouth
+    kind: tower
+    name: the Round Tower
+    modern: the Round Tower, Old Portsmouth
+    lat_deg: 50.7900
+    lon_deg: -1.1025
+    height_m: 10
+    fix: "moved 420 m to the grid's land: the grid smooths the harbour's narrow mouth and its points"
+    source: "White 1835, 'Coast of England', p. 44: Sconce Point open of Round Tower Point (the Needles' channel); Modern chart: the Round Tower at the mouth of Portsmouth harbour, built in the fifteenth century"
+    says: "The Round Tower on the point at the mouth of Portsmouth harbour, the town's side."
+
+  - id: southsea-castle
+    kind: castle
+    name: South-Sea Castle
+    modern: Southsea Castle
+    lat_deg: 50.7796
+    lon_deg: -1.0864
+    height_m: 12
+    fix: "moved 255 m north-east to the grid's land (the castle's point reads as foreshore)"
+    source: "White 1835, 'Coast of England', p. 46: the limits of the best anchorage at Spithead are South Sea-Castle N E to E by N and the Kicker Point N N W to N W; the large chalk-pit on Portsdown Hill on with South-Sea Castle; Moore 1799, the catechism, p. 300: the flagstaff of Portsmouth platform a little open to the westward of a round sentry-box of South Sea Castle"
+    says: "South-Sea Castle on the low point east of the harbour's mouth, the mark of the anchorage at Spithead."
+
+  - id: fort-monckton
+    kind: castle
+    name: Fort Monkton
+    modern: Fort Monckton
+    lat_deg: 50.7835
+    lon_deg: -1.1305
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 46: the leading mark into Spithead is Kickergill Tower on with the middle of the Barracks in Fort Monkton, bearing N N W; Moore 1799, the catechism, p. 300: the Kickergill on the S W part of Monckton Fort"
+    says: "Fort Monkton on the Gosport shore west of the harbour's mouth, Kickergill tower behind it: the leading mark into Spithead."
+
+  - id: gilkicker-point
+    kind: headland
+    name: the Kicker Point
+    modern: Gilkicker Point
+    lat_deg: 50.7765
+    lon_deg: -1.1380
+    height_m: 4
+    source: "White 1835, 'Coast of England', p. 46: the limits of the best anchorage at Spithead are South Sea-Castle N E to E by N and the Kicker Point N N W to N W; Imray 1874, 'Spithead and its approaches', p. 37: Gilkicker point from N N W to N W"
+    says: "The Kicker Point, the low point of the Gosport shore at the north-west corner of Spithead."
+
+  - id: gosport
+    kind: town
+    name: Gosport
+    modern: Gosport
+    lat_deg: 50.7971
+    lon_deg: -1.1194
+    height_m: 10
+    fix: "moved 255 m to the grid's land"
+    source: "Moore 1799, the catechism, p. 300: Monckton Fort and the Kickergill on the Gosport side, the leading mark; Modern chart: Gosport on the west side of Portsmouth harbour's mouth, Haslar hospital (built 1746 to 1761) beside it"
+    says: "Gosport on the western side of the harbour's mouth, with the great hospital of Haslar."
+
+  - id: portsmouth-dockyard
+    kind: place
+    name: the King's dockyard
+    modern: HM Naval Base Portsmouth
+    lat_deg: 50.8010
+    lon_deg: -1.1070
+    height_m: 10
+    source: "Imray 1874, 'Spithead and its approaches', p. 41: at the dockyard it is high water on the full and change days at 11h 41m, springs rise 12 1/2 feet; Modern chart: the dockyard on the east side of the harbour within the Point"
+    says: "The King's dockyard within the harbour, on the Portsmouth side, its storehouses and slips and the ships in ordinary up the harbour."
+
+  - id: portsmouth-harbour
+    kind: anchorage
+    name: Portsmouth harbour
+    modern: Portsmouth Harbour, off the dockyard
+    lat_deg: 50.8030
+    lon_deg: -1.1130
+    height_m: 0
+    depth_fathoms: 5
+    bottom: mud
+    source: "Modern chart: the harbour's channel off the dockyard; Imray 1874, 'Spithead and its approaches', p. 41, 'Brading Haven, Portsmouth Harbour': the harbour and its tides; the depth JUDGEMENT within the grid's channel"
+    says: "Portsmouth harbour off the dockyard, the King's ships at their moorings on mud, entered between the Point and Blockhouse on the young flood."
+
+  - id: portchester-castle
+    kind: castle
+    name: Porchester Castle
+    modern: Portchester Castle
+    lat_deg: 50.8375
+    lon_deg: -1.1135
+    height_m: 18
+    source: "Imray 1874, 'Spithead and its approaches', p. 36: the marks to avoid the Long Rock are Dunnose open of Bembridge point and Porchester castle open eastward of Southsea castle"
+    says: "Porchester Castle at the head of Portsmouth harbour, its keep a mark over Southsea for the Long Rock."
+
+  - id: portsdown-hill
+    kind: hill
+    name: Portsdown Hill
+    modern: Portsdown Hill
+    lat_deg: 50.8500
+    lon_deg: -1.0950
+    height_m: 120
+    source: "White 1835, 'Coast of England', pp. 45 to 46: the westernmost chalk-pit on Portsdown Hill, the Nursery Gardens or six clumps of trees on its eastern part, the large chalk-pit on Portsdown Hill on with South-Sea Castle; Moore 1799, the catechism, p. 300: the chalk-pit on Portsdown Hill"
+    says: "Portsdown Hill, the long chalk down behind Portsmouth harbour with its chalk-pits and clumps of trees, the marks for the channel into Spithead."
+
+  - id: spithead
+    kind: anchorage
+    name: Spithead
+    modern: Spithead anchorage
+    lat_deg: 50.7600
+    lon_deg: -1.1250
+    height_m: 0
+    depth_fathoms: 11
+    bottom: mud and clay
+    source: "White 1835, 'Coast of England', p. 46: the limits of the best anchorage at Spithead are South Sea-Castle N E to E by N and the Kicker Point N N W to N W; Imray 1874, 'Spithead and its approaches', p. 37: a good berth for large ships in from 10 to 12 fathoms; Moore 1799, the catechism, p. 300: run into Spithead between the buoy of the Dean and the buoy of the Warner"
+    says: "Spithead, the King's anchorage between Portsmouth and the Wight, ten to twelve fathoms, South-Sea Castle north-east and the Kicker Point north-north-west: sheltered by the island from every southerly wind."
+
+  - id: spit-sand
+    kind: bank
+    name: the Spit
+    modern: Spit Sand
+    lat_deg: 50.7765
+    lon_deg: -1.1050
+    height_m: 0
+    source: "Imray 1874, 'Spithead and its approaches', p. 37: vessels of moderate draught may berth themselves near the Spit sand, in about 7 fathoms; Modern chart: the Spit Sand off Southsea, west of the castle"
+    says: "The Spit, the sand off Southsea that narrows the way into Portsmouth harbour; ships of moderate draught berth near it in seven fathoms."
+
+  - id: horse-sand
+    kind: bank
+    name: the Horse
+    modern: Horse Sand
+    lat_deg: 50.7480
+    lon_deg: -1.0800
+    height_m: 0
+    source: "White 1835, 'Coast of England', p. 46: the five buoys of the Dean and Horse; when the large chalk-pit on Portsdown Hill comes on with South-Sea Castle she will be to the westward of the Horse; Imray 1874, 'Spithead and its approaches', p. 35: the Horse Tail, 6 to 9 feet over it and the edge very steep, 8 to 12 fathoms immediately off it"
+    says: "The Horse, the flat on the north-eastern side of the channel into Spithead, very shallow and steep at its western edge, its buoys left on the starboard hand going in."
+
+  - id: dean-sand
+    kind: bank
+    name: the Dean
+    modern: Dean Sand (Dean Tail)
+    lat_deg: 50.7280
+    lon_deg: -1.0450
+    height_m: 0
+    source: "Moore 1799, the catechism, p. 300: in going for Spithead from the eastward there are 5 black buoys lying on the Dean and Horse, to be left on the starboard side; the outer called the East Buoy of Dean, in 27 feet; White 1835, 'Coast of England', p. 47: the south-east buoy of the Dean"
+    says: "The Dean, the outer end of the flat on the north-eastern side of the channel, its buoys black, left on the starboard hand going in."
+
+  - id: the-warner
+    kind: shoal
+    name: the Warner
+    modern: Warner Shoal
+    lat_deg: 50.7210
+    lon_deg: -1.0670
+    height_m: 0
+    source: "Moore 1799, the catechism, p. 300: run into Spithead between the buoy of the Dean and the buoy of the Warner; the buoy of the Warner bears west southerly from the third buoy about 1 1/2 mile; White 1835, 'Coast of England', p. 46: the white buoy of the Warner"
+    says: "The Warner, the shoal on the Wight's side of the channel into Spithead, its white buoy left on the larboard hand."
+
+  - id: no-mans-land
+    kind: bank
+    name: No-Man's Land
+    modern: No Man's Land
+    lat_deg: 50.7400
+    lon_deg: -1.0950
+    height_m: 0
+    source: "White 1835, 'Coast of England', p. 46: the white buoys of the Warner and of No-Mans Land; Moore 1799, the catechism, p. 300: the buoy of Noman's Land and the Kickergill lie all in a line"
+    says: "No-Man's Land, the flat on the Wight's side of Spithead, its white buoy in a line with the Kickergill."
+
+  - id: ryde
+    kind: town
+    name: Ryde
+    modern: Ryde
+    lat_deg: 50.7310
+    lon_deg: -1.1600
+    height_m: 20
+    source: "Imray 1874, 'Spithead and its approaches', p. 36: Ryde church open of Nettlestone point, bearing N W 3/4 W, the mark to go northward of the New Grounds; p. 43: it is high water at Ryde pier at 11h 20m, springs rise 13 1/2 feet"
+    says: "Ryde on the Wight's shore of Spithead, a village on the slope with its church above."
+
+  - id: nettlestone-point
+    kind: headland
+    name: Nettlestone Point
+    modern: Nettlestone Point
+    lat_deg: 50.7213
+    lon_deg: -1.1127
+    height_m: 5
+    fix: "moved 590 m west to the grid's land: the point's foreshore reads as shoal water"
+    source: "White 1835, 'Coast of England', p. 46 note: Ashey Down Tower three times its breadth open south of the new houses on Nettlestone Point; Imray 1874, 'Spithead and its approaches', p. 36: Ryde church open of Nettlestone point"
+    says: "Nettlestone Point on the Wight's side, the north-eastern corner of the island over Spithead."
+
+  - id: st-helens-sea-mark
+    kind: mark
+    name: St Helens sea-mark
+    modern: the old church tower of St Helens (the sea-mark)
+    lat_deg: 50.6930
+    lon_deg: -1.0960
+    height_m: 15
+    fix: "on the grid's land of the Duver at St Helens, 1.1 km south-west of the first place: the shore there reads as drying sand; unverified within a quarter mile"
+    source: "White 1835, 'Coast of England', p. 46: the best anchorage in 7 fathoms with Ashey Down Tower on St Helens Sea-mark W 1/2 N; St Helens Water-mill, St Helens Sea-mark and St Helens Point in one; Moore 1799, the catechism, p. 300: St Helen Mark, which is a white building, open of the Red Cliff"
+    says: "St Helens sea-mark, the old church tower whitened on the point by St Helens, the mark of the road."
+
+  - id: st-helens-road
+    kind: anchorage
+    name: St Helens road
+    modern: St Helens Roads
+    lat_deg: 50.7020
+    lon_deg: -1.0620
+    height_m: 0
+    depth_fathoms: 7
+    bottom: gravel and clay
+    source: "White 1835, 'Coast of England', p. 46: ships going into St Helens may pass between the buoy of Bembridge Ledge and the Nab light-vessel; the best anchorage in 7 fathoms, with Ashey Down Tower on St Helens Sea-mark W 1/2 N; Imray 1874, 'Spithead and its approaches', p. 36: 6 and 7 fathoms in St Helen's road outside the Long Rock"
+    says: "St Helens road off the Wight's north-eastern shore, seven fathoms with Ashey Down tower on St Helens sea-mark: where the fleet waits for a wind down Channel, open to the north-easterly."
+
+  - id: ashey-down-tower
+    kind: tower
+    name: Ashey Down Tower
+    modern: the sea-mark on Ashey Down
+    lat_deg: 50.6870
+    lon_deg: -1.1900
+    height_m: 130
+    source: "White 1835, 'Coast of England', pp. 46 to 47: Ashey Down Tower on St Helens Sea-mark W 1/2 N, the anchorage of St Helens; Ashey Down Tower in one with the spire of Bembridge new church, the Nab light-vessel's mark; Ashey Down Tower shut in with the north side of Brading Down will lead you to the southward of all danger about the Owers"
+    says: "Ashey Down Tower, the sea-mark on the down in the middle of the eastern Wight, seen far off over St Helens."
+
+  - id: bembridge-point
+    kind: headland
+    name: Bembridge Point
+    modern: Bembridge Foreland
+    lat_deg: 50.6822
+    lon_deg: -1.0743
+    height_m: 15
+    fix: "moved 380 m to the grid's land"
+    source: "Imray 1874, 'Spithead and its approaches', p. 36: Bembridge ledge surrounds Bembridge point and extends three-quarters of a mile from the shore; Moore 1799, the catechism, p. 300: to the northward of Bembridge Point, bound to Spithead"
+    says: "Bembridge Point, the easternmost point of the Wight, low and skirted by its ledge."
+
+  - id: bembridge-ledge
+    kind: ledge
+    name: Bembridge Ledge
+    modern: Bembridge Ledge
+    lat_deg: 50.6845
+    lon_deg: -1.0617
+    height_m: 0
+    dries_m: 0.3
+    extent_m: 600
+    fix: "on the grid's shoalest within 400 m (1.0 m)"
+    source: "Imray 1874, 'Spithead and its approaches', p. 36: this dangerous ledge surrounds Bembridge point and extends three-quarters of a mile from the shore, close to its edge 6 to 7 fathoms; upon it the Cole and Dawe rocks, the former of which uncovers at low water; White 1835, 'Coast of England', p. 46: the buoy of Bembridge Ledge, black"
+    says: "Bembridge Ledge, three-quarters of a mile of rocks off the Wight's eastern point, the Cole rock uncovering at low water; its black buoy marks the edge."
+
+  - id: the-nab
+    kind: rock
+    name: the Nab
+    modern: Nab Rock
+    lat_deg: 50.6799
+    lon_deg: -1.0277
+    height_m: 0
+    dries_m: -7.0
+    extent_m: 400
+    fix: "on the grid's shoalest within 400 m, 10.5 m (Imray's head 23 feet: the grid smooths a rock's head)"
+    source: "Imray 1874, 'Spithead and its approaches', p. 36: the Nab shoal, about a mile long N W and S E and a quarter broad, with numerous spots of 25 to 27 feet; the small head known as Nab rock, near its centre, has only 23 feet over it at low tide; Moore 1799, the catechism, p. 300: the Nob buoy is red"
+    says: "The Nab, a rocky shoal east of Bembridge ledge with twenty-three feet on its head, its red buoy the mark of the channel's eastern entrance."
+
+  - id: nab-light
+    kind: light
+    name: the Nab light-vessel
+    modern: the Nab lightvessel (replaced by the Nab Tower, 1920)
+    lat_deg: 50.6880
+    lon_deg: -1.0280
+    height_m: 12
+    lit:
+      from: 1812
+      until: 1920
+      range_nm: 8
+      character: "two fixed lights on separate masts 43 feet apart"
+    fix: "White's marks (Ashey Down tower on Bembridge new church W N W 1/2 W, Portsmouth Lines' trees on Southsea castle's east face north, magnetic, variation 24 W) meet about here, east of Bembridge ledge in 4 fathoms; the grid's 7 m"
+    source: "The Maritime Archaeology Trust, 'Lighthouses and Lightvessels', read 2026-10-29: the Nab lightvessel active from 24 September 1812 as announced in the Public Ledger and Daily Advertiser of 29 September, two lanthorns on two masts 43 ft apart; replaced in September 1920 by a lighthouse; White 1835, 'Coast of England', p. 46 note: she lies in 4 fathoms at low water and shews two lights on separate masts 43 feet asunder; Moore 1799, the catechism, p. 300: the Nob buoy (no light there in 1799)"
+    says: "The Nab light-vessel east of Bembridge ledge, two lights on two masts, the mark of the eastern entrance to St Helens and Spithead; not on her station before 1812."
+
+  - id: princessa-shoal
+    kind: shoal
+    name: the Princessa
+    modern: Princessa Shoal
+    lat_deg: 50.6640
+    lon_deg: -1.0560
+    height_m: 0
+    source: "White 1835, 'Coast of England', p. 45: in approaching the Princessa keep the red clay cliff next westward of Culver Cliff open to the southward of the latter; Imray 1874, 'Spithead and its approaches', p. 35: about 1 1/2 miles S S E from Bembridge point, three-quarters of a mile in extent, 4 to 4 1/2 fathoms with patches of 18 to 20 feet; Moore 1799, the catechism, p. 300: the two buoys of the Princessa Shoal, each in five fathoms"
+    says: "The Princessa, a shoal a mile and a half south-south-east of Bembridge Point with eighteen feet on its patches, the first danger approaching Spithead from the southward."
+
+  - id: culver-cliff
+    kind: headland
+    name: Culver Cliff
+    modern: Culver Cliff
+    lat_deg: 50.6640
+    lon_deg: -1.0989
+    height_m: 100
+    fix: "moved 60 m to the grid's land"
+    source: "White 1835, 'Coast of England', p. 45: the red clay cliff, which is the next westward of Culver Cliff, open to the southward of the latter; p. 47: Culver Cliff will then bear about W N W; Moore 1799, the catechism, p. 300: Sandown Castle clear of Culver Cliff; Culver white cliff"
+    says: "Culver Cliff, the white chalk cliff at the Wight's eastern end, high and bold, with Sandown bay south of it."
+
+  # ---------------------------------------------------------------------------
+  # Poole (the harbour patch poole, in channel-mid's water west of 1 W)
+  # ---------------------------------------------------------------------------
+
+  - id: poole
+    kind: town
+    name: Poole
+    modern: Poole
+    lat_deg: 50.7130
+    lon_deg: -1.9850
+    height_m: 10
+    source: "Moore 1799, 'Tides', p. 142: Pool in the N N W group of the table; Imray 1874, 'Poole', pp. 54 to 55: two red lights at the town; anchorage within the entrance in the branches of the harbour in 10 to 40 feet"
+    says: "Poole at the head of its great shallow harbour, a town of the Newfoundland trade."
+
+  - id: south-haven-point
+    kind: headland
+    name: South Haven Point
+    modern: South Haven Point (Shell Bay)
+    lat_deg: 50.6746
+    lon_deg: -1.9526
+    height_m: 3
+    fix: "moved 650 m south to the grid's land: the sandy point reads as drying ground"
+    source: "Imray 1874, 'Poole', p. 55: the lights on the south part of North Haven point at the entrance to the harbour (the entrance between the two Haven points); Modern chart: the low sandy point on the south side of Poole harbour's mouth"
+    says: "South Haven Point, the low sandy point on the southern side of the narrow mouth of Poole harbour."
+
+  - id: brownsea-castle
+    kind: castle
+    name: Brownsea Castle
+    modern: Brownsea Castle
+    lat_deg: 50.6864
+    lon_deg: -1.9587
+    height_m: 15
+    fix: "moved 215 m to the grid's land"
+    source: "Imray 1874, 'Poole', p. 55: the rise on springs at Brownsea island is about 6 1/2 feet; Modern chart: Henry VIII's blockhouse on Brownsea island inside the harbour's mouth"
+    says: "Brownsea Castle on the island just inside Poole harbour's mouth."
+
+  - id: poole-bar
+    kind: bank
+    name: Poole bar
+    modern: Poole Bar (Hook Sands and the Swash)
+    lat_deg: 50.6720
+    lon_deg: -1.9230
+    height_m: 0
+    source: "Imray 1874, 'Poole', p. 54: the bar of Poole harbour lies nearly 13 miles W N W from the Needles point and has on it generally from 6 to 8 feet at low water, by no means certain, as it frequently shifts; no stranger ought to attempt it without a pilot; at high water springs about 14 1/2 feet"
+    says: "Poole bar, six to eight feet at low water and shifting, across the approach from Studland bay: no ship crosses it but on the tide with a pilot."
+
+  - id: studland-bay
+    kind: anchorage
+    name: Studland bay
+    modern: Studland Bay
+    lat_deg: 50.6466
+    lon_deg: -1.9283
+    height_m: 0
+    depth_fathoms: 5
+    bottom: sand
+    fix: "moved 570 m east to the grid's 4.7 m (the bay shoals to its beach)"
+    source: "Imray 1874, 'Poole', p. 55: Studland bay, between Poole bar and Foreland point, affords shelter from westerly winds; the anchorage is in 4 to 6 fathoms, with Durlston head between Standfast point and Old Harry; pilots are usually taken on board in Studland bay (p. 54)"
+    says: "Studland bay between Poole bar and Old Harry, four to six fathoms on sand, sheltered from the westerly winds: Poole's road, where the pilots board."
+
+  # ---------------------------------------------------------------------------
+  # Selsey and the Owers
+  # ---------------------------------------------------------------------------
+
+  - id: selsey-bill
+    kind: headland
+    name: Selsey Bill
+    modern: Selsey Bill
+    lat_deg: 50.7236
+    lon_deg: -0.7880
+    height_m: 5
+    fix: "moved 180 m to the grid's land"
+    source: "White 1835, 'Coast of England', p. 47: the Owers Rocks lie to the southward of the pitch of Selsea Bill; the Elbow distant from the Bill 5 1/2 miles; p. 49: 12 feet water close to Selsea Bill, between which and the Mixon the stream sweeps with great velocity"
+    says: "Selsey Bill, a low point of the Sussex shore with the Owers spreading south and south-east of it."
+
+  - id: the-mixon
+    kind: rock
+    name: the Mixon
+    modern: Mixon Rocks
+    lat_deg: 50.7062
+    lon_deg: -0.7760
+    height_m: 0
+    dries_m: 0.5
+    extent_m: 500
+    fix: "on the grid's shoalest within 400 m, drying 0.9 m"
+    source: "White 1835, 'Coast of England', p. 49: the anchorage in the Park 2 1/4 miles to the eastward of the Mixon; 12 feet water close to Selsea Bill, between which and the Mixon the stream sweeps with great velocity; the height of its head JUDGEMENT (the modern chart's drying rocks)"
+    says: "The Mixon, the rocks off Selsey Bill, the stream sweeping hard between them and the Bill."
+
+  - id: the-owers
+    kind: ledge
+    name: the Elbow of the Owers
+    modern: Owers (the Elbow, Outer Owers)
+    lat_deg: 50.6660
+    lon_deg: -0.6860
+    height_m: 0
+    dries_m: -1.2
+    extent_m: 900
+    fix: "the grid's outer shoal heads, 2 to 3 m, at 50 40 N 0 41 W (the Outer Owers); White's 5 1/2 miles from the Bill"
+    source: "White 1835, 'Coast of England', p. 47: the Owers form an almost continuous though irregular ledge resembling the letter S; the south-eastern extremity called the Elbow, distant from the Bill 5 1/2 miles, from 4 to 24 feet on different parts; very extensive as well as dangerous; Moore 1799, the catechism, p. 300: I will come no nearer to them in thick weather than 18 or 20 fathoms"
+    says: "The Owers, the long ledge of rocks south and south-east of Selsey Bill, four feet on its worst heads, the Elbow at its south-eastern end: given a berth of two miles."
+
+  - id: the-owers-brake
+    kind: ledge
+    name: the Brake of the Owers
+    modern: the Owers' western part (Pullar and Boulder banks to the west)
+    lat_deg: 50.6850
+    lon_deg: -0.8150
+    height_m: 0
+    dries_m: -1.2
+    extent_m: 800
+    fix: "the grid's shoal head of 2 m at the ledge's western end, 4 1/2 miles south of the Bill"
+    source: "White 1835, 'Coast of England', p. 47: the western extreme is called the Brake or Cross Ledge, with similar depths of water (4 to 24 feet)"
+    says: "The Brake or Cross Ledge, the western end of the Owers, as foul as the Elbow."
+
+  - id: owers-light
+    kind: light
+    name: the Owers light-vessel
+    modern: the Owers lightvessel
+    lat_deg: 50.6790
+    lon_deg: -0.6800
+    height_m: 11
+    lit:
+      from: 1788
+      until: null
+      range_nm: 9
+      character: "a single fixed light at the main, red flags by day"
+    fix: "White's bearing from the Elbow, N 22 E five-sixths of a mile, from the grid's Outer Owers"
+    source: "The Maritime Archaeology Trust, 'Lighthouses and Lightvessels', read 2026-10-29: Owers, operational from 1788; the encyclopaedia, 'Lightship' (en.wikipedia.org, read 2026-10-29): vessels placed at Owers Bank in Sussex in 1788; Moore 1799, the catechism, p. 300: there is a floating light on them which has been shifted several times; White 1835, 'Coast of England', p. 48: a vessel with a single light off the eastern end of the Owers, bearing from the Elbow N 22 E five-sixths of a mile; three masts, a single light at the main, 36 feet high"
+    says: "The Owers floating light off the eastern end of the ledge, a single light at her main: not to be approached within two miles from the southward."
+
+  - id: chichester-cathedral
+    kind: church
+    name: Chichester spire
+    modern: Chichester Cathedral
+    lat_deg: 50.8365
+    lon_deg: -0.7810
+    height_m: 85
+    source: "White 1835, 'Coast of England', pp. 47 to 48: Chichester Cathedral spire in one with the west end of Medmerry barn; the White Road-way on Bow Hill in sight to the eastward of the spire of Chichester Cathedral will carry you at least one mile to the eastward of the Owers; Moore 1799, the catechism, p. 300: Brow-Hill in one with Chichester Church"
+    says: "Chichester's spire over the flat land behind Selsey, the mark for clearing the Owers."
+
+  # ---------------------------------------------------------------------------
+  # The Sussex coast to Beachy Head
+  # ---------------------------------------------------------------------------
+
+  - id: bognor-rocks
+    kind: ledge
+    name: the Bognor rocks
+    modern: Bognor Rocks
+    lat_deg: 50.7704
+    lon_deg: -0.6601
+    height_m: 0
+    dries_m: 0.5
+    extent_m: 800
+    fix: "on the grid's shoalest within 400 m (1.3 m)"
+    source: "White 1835, 'Coast of England', p. 50: the Bognor and Shelly rocks and Felpham ledges are the principal; the former lie nearly 5 miles to the eastward of Selsea Bill and project 2 1/4 miles to seaward; the height of the head JUDGEMENT (they dry at low water springs on the modern chart)"
+    says: "The Bognor rocks, a ledge off the Sussex shore east of Selsey, running two miles to seaward."
+
+  - id: shoreham
+    kind: town
+    name: Shoreham
+    modern: Shoreham-by-Sea
+    lat_deg: 50.8320
+    lon_deg: -0.2750
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 50: between the meridians of Shoreham and Beachy Head the soundings very gradually shoalen; Moore 1799, 'Tides', p. 142: Shoreham in the N W group of the table"
+    says: "Shoreham at the mouth of the Adur, a little port of the coasting trade."
+
+  - id: brighthelmstone
+    kind: town
+    name: Brighthelmstone
+    modern: Brighton
+    lat_deg: 50.8195
+    lon_deg: -0.1380
+    height_m: 15
+    source: "White 1835, 'Coast of England', p. 50: between Shoreham and Beachy Head you may anchor all along the coast with off-shore winds in from 2 to 9 fathoms; Modern chart: Brighton, the Brighthelmstone of the period, the Prince of Wales's resort, on the open beach"
+    says: "Brighthelmstone on the open beach, the Prince's watering place, with its fishing boats hauled up on the shingle."
+
+  - id: newhaven
+    kind: town
+    name: Newhaven
+    modern: Newhaven
+    lat_deg: 50.7930
+    lon_deg: 0.0550
+    height_m: 10
+    source: "Imray 1874, 'Beachy Head to Spithead', pp. 23 to 24: it is high water at Newhaven (full and change) at 11h 51m, springs rise 20 and neaps 15 feet; Modern chart: the harbour at the Ouse's mouth west of Seaford"
+    says: "Newhaven at the mouth of the Ouse, a small tidal harbour."
+
+  - id: seaford-head
+    kind: headland
+    name: Seaford Head
+    modern: Seaford Head
+    lat_deg: 50.7620
+    lon_deg: 0.1200
+    height_m: 85
+    source: "White 1835, 'Coast of England', p. 50: Seaford Head is often mistaken for Beachy Head by vessels coming up Channel within 4 or 5 miles of the land; they may be distinguished by there being a small building on the highest part of Beachy Head, whereas there is nothing on the former"
+    says: "Seaford Head, a chalk headland west of Beachy Head, often taken for it; nothing stands on its summit."
+
+  - id: seaford-road
+    kind: anchorage
+    name: Seaford road
+    modern: Seaford Bay
+    lat_deg: 50.7639
+    lon_deg: 0.0942
+    height_m: 0
+    depth_fathoms: 8
+    bottom: fine dark sand and marl
+    fix: "moved 130 m to the grid's 7.5 m"
+    source: "White 1835, 'Coast of England', p. 50: the anchorage of most general resort is that of Seaford Roads, abreast of the village, in 8 or 9 fathoms, with the church bearing N 59 E; bottom fine dark sand mixed with marl; the pitch of Beachy Head will afford shelter with the wind as far southerly as E S E"
+    says: "Seaford road, eight or nine fathoms on fine dark sand and marl, sheltered by Beachy Head from the easterly winds as far as east-south-east."
+
+  - id: beachy-head
+    kind: headland
+    name: Beachy Head
+    modern: Beachy Head
+    lat_deg: 50.7355
+    lon_deg: 0.2430
+    height_m: 162
+    fix: "moved 60 m to the grid's land"
+    source: "White 1835, 'Coast of England', pp. 50 to 51: the promontory of Beachy Head is rendered strikingly remarkable by the uniform convexity in the profile of its cliffs, seven in number; a small building on the highest part; Moore 1799, the catechism, p. 299: from Dungeness to Beachy Head W 1/2 S about nine leagues"
+    says: "Beachy Head, the great chalk promontory of Sussex, its seven white cliffs convex in profile, a small building on its summit."
+
+  - id: belle-tout-light
+    kind: light
+    name: the Belle Tout light
+    modern: Belle Tout Lighthouse
+    lat_deg: 50.7383
+    lon_deg: 0.2147
+    height_m: 87
+    lit:
+      from: 1828
+      until: 1902
+      range_nm: 20
+      character: "revolving, its greatest brilliancy every two minutes"
+    source: "the encyclopaedia, 'Belle Tout Lighthouse' (en.wikipedia.org, read 2026-10-29): a temporary wooden structure in service from 1 October 1828, the permanent tower operational on 11 October 1834, in service until 2 October 1902; White 1835, 'Coast of England', p. 50 note: now an excellent revolving light on a spot called Belle-tout, near the summit of the second cliff to the westward of Beachy Head, 285 feet above the water"
+    says: "The Belle Tout light on the cliff west of Beachy Head, a revolving light; not lit before 1828."
+
+  - id: royal-sovereign-shoals
+    kind: shoal
+    name: the Royal Sovereign shoals
+    modern: Royal Sovereign Shoals
+    lat_deg: 50.7230
+    lon_deg: 0.4350
+    height_m: 0
+    source: "White 1835, 'Coast of England', p. 51: the centre of the Royal Sovereign shoals, on which there are only 9 feet water in many places, lies from Beachy Head distant 6 1/2 miles; the sea breaks heavily upon them in bad weather; by keeping Seaford Cliff in sight to the southward of the pitch of Beachy Head you will pass at least 2 miles to the southward of these dangerous shoals"
+    says: "The Royal Sovereign shoals six miles and a half east of Beachy Head, nine feet in many places, breaking heavily in bad weather."
+
+  - id: hastings
+    kind: town
+    name: Hastings
+    modern: Hastings
+    lat_deg: 50.8560
+    lon_deg: 0.5850
+    height_m: 20
+    source: "White 1835, 'Coast of England', pp. 50 to 51: towards Hastings the land again becomes elevated; the cliff on which the ruins of Hastings Castle stand; small rocky heads in the vicinity of Hastings"
+    says: "Hastings in its valley under the castle's ruined cliff, the fishermen's luggers on the beach."
+
+  - id: fairlight-down
+    kind: hill
+    name: Fairlight Down
+    modern: Fairlight (Fire Hills)
+    lat_deg: 50.8780
+    lon_deg: 0.6400
+    height_m: 170
+    source: "White 1835, 'Coast of England', p. 51: the Mill on Fairlight Down is 600 feet above the sea; the land appears double, rising very high in the interior; Moore 1799, the catechism, p. 300: of the high land of Fairleigh there is a shoal of rocky ground with 14 feet on it pretty close in; the height the modern chart's (the mill above it)"
+    says: "Fairlight Down east of Hastings, the high land of the coast with its mill, seen far off down Channel."
+
+  - id: rye
+    kind: town
+    name: Rye
+    modern: Rye
+    lat_deg: 50.9500
+    lon_deg: 0.7330
+    height_m: 20
+    source: "White 1835, 'Coast of England', p. 52: Playden steeple in one with the turret of Rye church will lead considerably to the south-eastward of the Boulder Bank; Imray 1874, 'South Foreland to Beachy Head', p. 15: high water in Rye bay"
+    says: "Rye on its hill above the marsh, its church turret a mark, the harbour a winding creek that dries."
+
+  - id: dungeness
+    kind: headland
+    name: Dungeness
+    modern: Dungeness
+    lat_deg: 50.9141
+    lon_deg: 0.9770
+    height_m: 4
+    fix: "moved 120 m to the grid's land"
+    source: "White 1835, 'Coast of England', pp. 52 to 53: Romney Marsh, upon the south-east point of which stands Dungeness light-house; Dungeness Point is steep-to, 10 or 12 fathoms within a cable's length of the beach; Moore 1799, the catechism, p. 299: the Ness Point"
+    says: "Dungeness, the long low shingle point of Romney Marsh, steep-to, its red light-house standing on it."
+
+  - id: dungeness-light
+    kind: light
+    name: Dungeness light
+    modern: Wyatt's lighthouse at Dungeness (demolished 1904)
+    lat_deg: 50.9150
+    lon_deg: 0.9750
+    height_m: 35
+    lit:
+      from: 1792
+      until: 1904
+      range_nm: 14
+      character: "a fixed light"
+    fix: "placed on the point behind the modern lighthouse, where Wyatt's tower stood near the sea in 1792 (the shingle has since grown seaward); unverified within two cables"
+    source: "the encyclopaedia, 'Dungeness Lighthouse' (en.wikipedia.org, read 2026-10-29): a new and more up-to-date lighthouse was built near the sea in 1792 by Samuel Wyatt, about 35 m high, demolished in 1904 when the fourth light was first lit; White 1835, 'Coast of England', p. 52: Dungeness light-house, which is coloured red, and is in all respects very conspicuous; Moore 1799, the catechism, p. 299: the light-house W S W athwart Romney Town"
+    says: "Dungeness light, Wyatt's tall red tower on the point, a fixed light."
+
+  - id: dungeness-east-road
+    kind: anchorage
+    name: Dungeness east road
+    modern: Dungeness East Road
+    lat_deg: 50.9389
+    lon_deg: 0.9993
+    height_m: 0
+    depth_fathoms: 7
+    bottom: sand and shells
+    fix: "moved 320 m to the grid's 6.5 m"
+    source: "White 1835, 'Coast of England', p. 53: when the wind is between N by E and W by S the Eastern Bay affords good shelter, in from 4 to 12 fathoms, upon pretty good holding ground; the best position with Lydd Church open to the northward of Lydd north-east Mill and the light-house S W by W 1/2 W in 7 fathoms; Moore 1799, the catechism, p. 299: anchor with the Ness Point S W by W in 8, 9 or 10 fathoms"
+    says: "Dungeness east road under the Ness, seven fathoms with the light-house south-west by west: shelter from the westerly gales, where ships wait for a wind down Channel."
+
+  - id: dungeness-west-bay
+    kind: anchorage
+    name: the West Bay of Dungeness
+    modern: Dungeness West Bay (Rye Bay)
+    lat_deg: 50.9050
+    lon_deg: 0.9150
+    height_m: 0
+    depth_fathoms: 6
+    bottom: sand
+    source: "White 1835, 'Coast of England', p. 52: the West Bay of Dungeness affords very good anchorage against north-easterly winds, and is certainly preferable to Dover Road; from hence Dungeness light will bear N 69 E and a depth of 6 fathoms may always be insured"
+    says: "The West Bay of Dungeness, six fathoms with the light east, shelter from the north-easterly winds."
+
+  - id: the-varne
+    kind: bank
+    name: the Varne
+    modern: The Varne
+    lat_deg: 50.9500
+    lon_deg: 1.3000
+    height_m: 0
+    source: "White 1835, 'Coast of England', p. 54: the Varne and Ridge lie exactly in the fair-way of the Strait of Dover; the Varne is 5 3/4 miles in length and 1 1/4 in breadth; its north-east end from Dover Castle 8 1/2 miles; Faden 1793, p. 11 (the Calbarde beside it)"
+    says: "The Varne, a narrow bank in the fair-way of the Strait between Dover and the French coast, its shoalest patches sixteen feet."
+
+  - id: the-ridge
+    kind: bank
+    name: the Ridge (the Calbarde, or the Ripraps)
+    modern: Le Colbart (The Ridge)
+    lat_deg: 50.8650
+    lon_deg: 1.2700
+    height_m: 0
+    source: "Faden 1793, 'Calbarde or Ripraps', p. 11: a narrow bank of sand and large flints about 4 leagues long and not much above a mile broad, the N E end the shoalest with but 15 feet at low water spring tides, 22 or 23 fathoms on either side; White 1835, 'Coast of England', p. 55: towards the south-western end as little as 8 1/2 feet; Moore 1799, the catechism, p. 299: the Ripraps lie N E and S W about 5 leagues in length, 15 or 16 feet on the N E part, steep-to on both sides"
+    says: "The Ridge, which the French call the Calbarde and our pilots the Ripraps, a long narrow bank in the middle of the Strait, fifteen feet and less on its heads, steep-to."
+
+  - id: folkestone
+    kind: town
+    name: Folkestone
+    modern: Folkestone
+    lat_deg: 51.0800
+    lon_deg: 1.1800
+    height_m: 20
+    source: "White 1835, 'Coast of England', p. 54: the Fir-trees at Padlesworth twice their breadth open to the eastward of Folkstone Church; Moore 1799, the catechism, p. 299: to the westward of Folkstone there is a ledge of rocks that runs a large mile off the shore; I would come no nearer in than 14 fathoms"
+    says: "Folkestone under its cliffs, a fishing town with its church on the hill; rocks off the shore to the westward."
+
+  - id: shakespeare-cliff
+    kind: headland
+    name: Shakespeare Cliff
+    modern: Shakespeare Cliff
+    lat_deg: 51.1048
+    lon_deg: 1.2790
+    height_m: 100
+    fix: "moved 590 m to the grid's land, the foot of the cliff"
+    source: "White 1835, 'Coast of England', p. 52: Shakespear Cliff open to the southward of the light-house (Dungeness) will carry you well to the southward of Stephenson shoal"
+    says: "Shakespeare Cliff west of Dover, the high white chalk of the Kent shore."
+
+  - id: dover-castle
+    kind: castle
+    name: Dover Castle
+    modern: Dover Castle
+    lat_deg: 51.1290
+    lon_deg: 1.3220
+    height_m: 115
+    source: "Faden 1793, p. 10 note: the distance between Calais and the castle of Dover geometrically ascertained in 1681 by Picart and La Hire, the intermediate point between the two most visible towers of Dover castle; White 1835, 'Coast of England', p. 54: the north-east end of the Varne bears from Dover Castle S 18 E; Imray 1874, 'South Foreland to Beachy Head', p. 11: easily recognised by its historic castle, standing on an eminence on the eastern side of the town"
+    says: "Dover Castle on its height east of the town, its towers seen far off across the Strait."
+
+  - id: dover
+    kind: town
+    name: Dover
+    modern: Dover
+    lat_deg: 51.1250
+    lon_deg: 1.3130
+    height_m: 15
+    source: "Imray 1874, 'South Foreland to Beachy Head', p. 11: a good tidal harbour, the outlet facing the S E, the piers 140 feet apart; the outer harbour dries an hour before low water; Moore 1799, 'Tides', p. 143: at Dover the tide from the Channel runs northward 7 1/2 hours"
+    says: "Dover in its gap of the chalk under the castle, the packets' port to Calais; the harbour between its piers dries at low water."
+
+  - id: dover-road
+    kind: anchorage
+    name: Dover road
+    modern: Dover Bay, off the town (before the Admiralty harbour)
+    lat_deg: 51.1145
+    lon_deg: 1.3200
+    height_m: 0
+    depth_fathoms: 8
+    bottom: chalk and sand
+    fix: "moved 60 m to the grid's 9.4 m"
+    source: "White 1835, 'Coast of England', p. 52: the West Bay of Dungeness is certainly preferable to Dover Road; Imray 1874, 'South Foreland to Beachy Head', p. 11: during north-easterly winds Dover bay is much frequented by coasters bound northward, the usual anchorage being abreast the esplanade, the shelter not great and the holding ground not good; the depth JUDGEMENT from the grid's water off the town"
+    says: "Dover road off the town, open to every wind from the south-west round to the south-east and of poor holding: a road to wait a tide in, not to ride a gale."
+
+  - id: south-foreland
+    kind: headland
+    name: the South Foreland
+    modern: South Foreland
+    lat_deg: 51.1400
+    lon_deg: 1.3750
+    height_m: 100
+    source: "Imray 1874, 'South Foreland to Beachy Head', p. 11: the South Foreland consists of extremely lofty chalk cliffs, having on their face layers of flint in horizontal lines; upon the summit two lighthouses; Faden 1793, p. 10: its distance from Blanc Nez about 7 leagues, the South Foreland which also makes the south entrance of the Downs"
+    says: "The South Foreland, the lofty chalk at the southern entrance of the Downs, its two light-houses on the summit."
+
+  - id: south-foreland-upper-light
+    kind: light
+    name: the South Foreland upper light
+    modern: South Foreland Upper Lighthouse
+    lat_deg: 51.1405
+    lon_deg: 1.3705
+    height_m: 113
+    lit:
+      from: 1636
+      until: 1988
+      range_nm: 17
+      character: "a fixed light, the higher of the two (oil lamps and reflectors since 1793)"
+    source: "the encyclopaedia, 'South Foreland Lighthouses' (en.wikipedia.org, read 2026-10-29): the first pair built in 1635 by Sir John Meldrum; in 1793 the Upper Lighthouse rebuilt with an oil lamp and parabolic reflectors; the Upper decommissioned 30 September 1988; Imray 1874, 'Margate Roads to South Foreland', p. 1: fixed lights at 372 and 275 feet above the sea, the towers 1347 feet apart E by S and W by N; Moore 1799, the catechism, p. 299: the upper light-house on the South Foreland in one with the westernmost end of the southernmost cliff in Old Stairs Bay"
+    says: "The South Foreland upper light on the summit of the chalk, the higher of the two fixed lights; in one with the lower they mark the South Sand Head."
+
+  - id: south-foreland-lower-light
+    kind: light
+    name: the South Foreland lower light
+    modern: South Foreland Lower Lighthouse
+    lat_deg: 51.1395
+    lon_deg: 1.3746
+    height_m: 84
+    lit:
+      from: 1636
+      until: 1904
+      range_nm: 14
+      character: "a fixed light, the lower of the two (rebuilt 1795)"
+    fix: "moved 60 m to the grid's land"
+    source: "the encyclopaedia, 'South Foreland Lighthouses' (en.wikipedia.org, read 2026-10-29): the first pair built in 1635; the Lower rebuilt in 1795 with oil lamps; taken out of commission in 1904; Moore 1799, the catechism, p. 299: I must stand out till I bring the lights in one, then I am clear of the South Sand-head"
+    says: "The South Foreland lower light toward the cliff's edge east of the upper; the two in one lead clear of the South Sand Head."
+
+  - id: walmer-castle
+    kind: castle
+    name: Walmer Castle
+    modern: Walmer Castle
+    lat_deg: 51.2010
+    lon_deg: 1.4020
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 54: the west end of the trees in Admiral Harvey's park at Walmer on with the centre of Walmer Castle N N W, the mark for the light-vessel off the Goodwin's south head; Moore 1799, the catechism, p. 299: between Deal and Walmer castles there are shoals near the shore, not having more than 16 or 17 feet"
+    says: "Walmer Castle on the beach south of Deal, the Lord Warden's seat."
+
+  - id: deal-castle
+    kind: castle
+    name: Deal Castle
+    modern: Deal Castle
+    lat_deg: 51.2185
+    lon_deg: 1.4040
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 53: anchor with Upper Deal Mill on with Deal Castle, W by S, and the South Foreland upper light-house on with the south side of Old Stairs Point S W 1/4 W, in 7 or 8 fathoms; Moore 1799, the catechism, p. 298: the best anchoring in the Downs, Upper Deal church and castle in one, in eight or nine fathoms"
+    says: "Deal Castle on the beach, Henry's low round fort, the mark of the anchorage in the Downs."
+
+  - id: deal
+    kind: town
+    name: Deal
+    modern: Deal
+    lat_deg: 51.2230
+    lon_deg: 1.4020
+    height_m: 10
+    source: "White 1835, 'Coast of England', p. 54: Upper Deal Church tower on with the flag-staff in the King's Yard at Deal W 1/2 N; p. 58: it is high water at Deal full and change at XI. 15; Imray 1874, 'Margate Roads to South Foreland', p. 9: ships in the Downs can be supplied with fresh water"
+    says: "Deal on its open shingle beach, the King's naval yard and the boatmen's luggers, the town of the Downs."
+
+  - id: sandown-castle
+    kind: castle
+    name: Sandown Castle
+    modern: the site of Sandown Castle (ruined)
+    lat_deg: 51.2400
+    lon_deg: 1.4010
+    height_m: 10
+    source: "Moore 1799, the catechism, p. 298: the marks for anchoring in the Downs, the South Foreland S S W, Deal castle bearing W and Sandown castle N; White 1835, 'Coast of England', p. 54: St Clement's Church tower at Sandwich on with the west side of Sandown Castle N N W"
+    says: "Sandown Castle on the beach north of Deal, the northern mark of the Downs."
+
+  - id: the-downs
+    kind: anchorage
+    name: the Downs
+    modern: The Downs
+    lat_deg: 51.2200
+    lon_deg: 1.4400
+    height_m: 0
+    depth_fathoms: 8
+    bottom: chalk and sand
+    source: "White 1835, 'Coast of England', pp. 53 to 54: anchor with Upper Deal Mill on with Deal Castle W by S and the South Foreland upper light-house on with the south side of Old Stairs Point, in 7 or 8 fathoms; moor with the best bower to the southward; to the eastward of the red buoy of Deal Sand; Moore 1799, the catechism, p. 298: moor with the best bower to the south-west and the small bower to the north-east; Imray 1874, 'Margate Roads to South Foreland', p. 8: between Walmer and Sandown castles, eastward of Deal bank; a good berth in about 8 fathoms over a chalky bottom"
+    says: "The Downs off Deal, seven to eight fathoms on chalk with the Goodwin to the eastward: the great road of the Strait, where the fleets and the convoys lie for a wind; moor with the best bower to the southward."
+
+  - id: small-downs
+    kind: anchorage
+    name: the Small Downs
+    modern: Small Downs
+    lat_deg: 51.2650
+    lon_deg: 1.4150
+    height_m: 0
+    depth_fathoms: 4
+    bottom: clay
+    source: "Imray 1874, 'Margate Roads to South Foreland', p. 9: the anchorage in the Small Downs lies between Sandown castle and No. 2 battery, abreast the south end of the Brake; far more secure than the Downs for vessels of less than 15 feet draught, better holding-ground, shoaler water"
+    says: "The Small Downs north of Sandown, abreast the Brake, shoal water and good holding for the smaller vessels."
+
+  - id: deal-bank
+    kind: shoal
+    name: Deal bank
+    modern: Deal Bank
+    lat_deg: 51.2150
+    lon_deg: 1.4150
+    height_m: 0
+    source: "Imray 1874, 'Margate Roads to South Foreland', p. 9: this bank lies about half a mile off Deal pier in an E by S direction, and has upon it a depth of 18 feet at low tide, dangerous to vessels of large draught; close to its eastern edge 6 fathoms; White 1835, 'Coast of England', p. 54: the red buoy of Deal Sand, in 5 fathoms near the eastern projection of that shoal"
+    says: "Deal bank half a mile off the town, eighteen feet at low water, its buoy marking the inner edge of the anchorage."
+
+  - id: gull-stream
+    kind: bottom
+    name: the Gull Stream
+    modern: Gull Stream
+    lat_deg: 51.2900
+    lon_deg: 1.4700
+    height_m: 0
+    depth_fathoms: 7
+    bottom: chalk
+    source: "Imray 1874, 'Margate Roads to South Foreland', pp. 2 and 10: the Gull Stream is a deep-water channel lying between the Goodwin on the eastern and the Brake sand, the Gull, the Elbow and other knolls on the western side; its narrowest part between the Brake and the Bunt head only about half a mile wide and 6 to 9 and 10 fathoms deep; Moore 1799, the catechism, p. 299: the marks for running through the Gull Stream"
+    says: "The Gull Stream, the deep channel between the Brake and the Goodwin, six to ten fathoms on chalk, the way from the Downs to the North Foreland."
+
+  - id: the-brake
+    kind: bank
+    name: the Brake
+    modern: Brake Sand
+    lat_deg: 51.2950
+    lon_deg: 1.4300
+    height_m: 0
+    source: "Imray 1874, 'Margate Roads to South Foreland', p. 5: the Brake is an extensive sand bounding the Gull Stream on its western side, 5 miles long N N E and S S W, upon it many shallow patches of 2 to 9 feet at low tide; Moore 1799, the catechism, p. 299: between the Brake and the Goodwin Sands"
+    says: "The Brake, the sand on the western side of the Gull Stream, two feet on its patches at low water."
+
+  - id: north-goodwin
+    kind: drying
+    name: the North Goodwin
+    modern: Goodwin Sands (the North Goodwin, near the North Sand Head)
+    lat_deg: 51.2996
+    lon_deg: 1.5354
+    height_m: 0
+    dries_m: 2.0
+    extent_m: 900
+    fix: "on the grid's drying head within 400 m (2.3 m above the datum)"
+    source: "Imray 1874, 'Margate Roads to South Foreland', p. 2: the Goodwin is extensive and extremely dangerous, shoal all over, and in many parts dry when the tide is down; the North Goodwin very shallow, and dries for a considerable extent at low water; the whole steep, deep water at a short distance; Moore 1799, the catechism, p. 299: stand to the Goodwin Sand in 10 or 11 fathoms, it being steep-to; the head's height the grid's drying sand, rounded"
+    says: "The North Goodwin, dry for a great extent at low water and steep-to: the sands that swallow ships whole."
+
+  - id: goodwin-trinity-bay-head
+    kind: drying
+    name: the Goodwin by Trinity bay
+    modern: Goodwin Sands (the head of Trinity Bay, Kellett Gut)
+    lat_deg: 51.2800
+    lon_deg: 1.5300
+    height_m: 0
+    dries_m: 1.0
+    extent_m: 900
+    fix: "on the grid's drying sand of the North Goodwin's south-western part above the head of Trinity bay (the grid's shoal inlet at 51 16 N)"
+    source: "Imray 1874, 'Margate Roads to South Foreland', p. 2: near its middle on its western side a deep inlet named Trinity bay, which extends so far into the body of the sand as nearly to divide it into two parts, its depth decreasing from 10 fathoms at its entrance to 15 and 9 feet at its head; the height of the sand about it JUDGEMENT"
+    says: "The Goodwin about the head of Trinity bay, the sand dry about the inlet that all but cuts it in two."
+
+  - id: goodwin-callipers
+    kind: drying
+    name: the Callipers
+    modern: Goodwin Sands (the South Calliper)
+    lat_deg: 51.2378
+    lon_deg: 1.5723
+    height_m: 0
+    dries_m: 2.0
+    extent_m: 900
+    fix: "on the grid's drying head within 400 m (2.4 m above the datum)"
+    source: "Imray 1874, 'Margate Roads to South Foreland', p. 2: the north-east part of the South Goodwin dries for a considerable extent, and is known by the name of Callipers; almost the whole of the eastern portion of the sand dry at low water, and extremely steep, within half a mile of it 10 to 12 fathoms; the height of the head JUDGEMENT"
+    says: "The Callipers, the high dry back of the South Goodwin, steep-to on its eastern side."
+
+  - id: south-goodwin
+    kind: drying
+    name: the South Goodwin
+    modern: Goodwin Sands (the South Goodwin)
+    lat_deg: 51.2118
+    lon_deg: 1.5394
+    height_m: 0
+    dries_m: 1.0
+    extent_m: 900
+    fix: "on the grid's shoalest within 400 m, 2.4 m (the modern sand lower than the pilots' 'dry in many parts')"
+    source: "Imray 1874, 'Margate Roads to South Foreland', p. 2: the South Goodwin is similar in character to the North Goodwin, shallow all over; from the Callipers it extends to the S W by W to the South Sand-head; Moore 1799, the catechism, p. 299: the South Sand-head will lie off three miles; the height of the head JUDGEMENT"
+    says: "The South Goodwin, shoal all over and dry in many parts at low water, running south-west to the Sand Head."
+
+  - id: south-sand-head
+    kind: drying
+    name: the South Sand Head
+    modern: Goodwin Sands (South Sand Head)
+    lat_deg: 51.2000
+    lon_deg: 1.5000
+    height_m: 0
+    dries_m: 0.3
+    extent_m: 700
+    fix: "on the grid's shoal head under 2 m at the sand's south-western end"
+    source: "Imray 1874, 'Margate Roads to South Foreland', p. 4: Ripple mill over Kingsdown church N W 3/4 W leads a short distance southward of the South Sand-head; Moore 1799, the catechism, p. 299: Deal church open with Walmer castle about a ship's length, I must stand out till I bring the lights in one, then I am clear of the South Sand-head; the height of the head JUDGEMENT"
+    says: "The South Sand Head, the south-western tail of the Goodwin, the South Foreland's lights in one leading clear of it."
+
+  - id: north-goodwin-light
+    kind: light
+    name: the Goodwin floating light
+    modern: the North Goodwin (North Sand Head) lightvessel
+    lat_deg: 51.3300
+    lon_deg: 1.5900
+    height_m: 12
+    lit:
+      from: 1795
+      until: 1988
+      range_nm: 9
+      character: "three fixed lights in a triangle, on three masts"
+    fix: "Imray's station, about a mile east of the 5-fathom north extreme of Goodwin Knoll, in 10 fathoms; the grid's 16 m"
+    source: "The Maritime Archaeology Trust, 'Lighthouses and Lightvessels', read 2026-10-29: the North Goodwin was first stationed in 1795 and was removed in April 1988; the encyclopaedia, 'Goodwin Sands' (en.wikipedia.org, read 2026-10-29): in 1795 the first lightship was positioned on the Sands ('Lightship' gives 1793 for the Goodwin, a disagreement: 1795 taken); Imray 1874, 'Margate Roads to South Foreland', p. 3: the North Sand-head lightvessel exhibits three fixed lights, each on a separate mast, forming a triangle, visible in clear weather 10 miles"
+    says: "The Goodwin floating light off the North Sand Head, three lights in a triangle: the mark for keeping east of the Goodwin coming from the northward."
+
+  - id: gull-light
+    kind: light
+    name: the Gull light-vessel
+    modern: the Gull lightvessel (Gull Stream)
+    lat_deg: 51.2800
+    lon_deg: 1.4950
+    height_m: 11
+    lit:
+      from: 1832
+      until: 1940
+      range_nm: 7
+      character: "a revolving light"
+    fix: "Imray's station, about five-eighths of a mile westward of the 5-fathom western edge of the North Goodwin, in 8 1/2 fathoms"
+    source: "Imray 1874, 'Margate Roads to South Foreland', pp. 2 and 4: the notice of the Corporation of Trinity House of 8 November 1832 to the Goodwin, Gull Stream and South Sand-head lightvessels; the Gull lightvessel in 8 1/2 fathoms in the Gull Stream, a revolving light at 36 feet visible 7 miles; the first year of her station is UNVERIFIED and earlier than 1832, which is the earliest record read here (taken as `from`, so that 1805 does not see her)"
+    says: "The Gull light-vessel in the Gull Stream west of the North Goodwin, a revolving light; on her station by 1832."
+
+  - id: south-sand-head-light
+    kind: light
+    name: the South Sand Head light-vessel
+    modern: the South Goodwin (South Sand Head) lightvessel
+    lat_deg: 51.1750
+    lon_deg: 1.4900
+    height_m: 12
+    lit:
+      from: 1832
+      until: 2006
+      range_nm: 10
+      character: "a fixed light"
+    fix: "off the southern end of the South Goodwin in 13 fathoms (Imray); placed by White's mark, Walmer castle N N W and the South Foreland upper light W 1/2 N, magnetic"
+    source: "Imray 1874, 'Margate Roads to South Foreland', pp. 2 and 4: the notice of 8 November 1832 to the South Sand-head lightvessel; moored off the southern end of the South Goodwin in 13 fathoms, the light fixed at 38 feet, visible 10 miles; White 1835, 'Coast of England', p. 54: the floating light-vessel off the south head of the Goodwin Sand lies in 13 fathoms, exhibiting a single light; its first year UNVERIFIED and earlier than 1832, the earliest record read here (taken as `from`)"
+    says: "The South Sand Head light-vessel off the southern end of the Goodwin, a single fixed light; on her station by 1832."
+
+  - id: ramsgate
+    kind: town
+    name: Ramsgate
+    modern: Ramsgate
+    lat_deg: 51.3290
+    lon_deg: 1.4180
+    height_m: 15
+    source: "Imray 1874, 'Margate Roads to South Foreland', pp. 5 and 8: the port of Ramsgate, an outer harbour formed by stone piers; it is high water full and change at Ramsgate at 11h 15m, springs rise 13 feet and neaps 10 with southerly winds; Modern chart: the harbour of refuge for the Downs, its piers building from 1749"
+    says: "Ramsgate, the harbour of refuge north of the Downs, its stone piers on the chalk."
+
+  - id: north-foreland
+    kind: headland
+    name: the North Foreland
+    modern: North Foreland
+    lat_deg: 51.3750
+    lon_deg: 1.4470
+    height_m: 50
+    source: "Imray 1874, 'Margate Roads to South Foreland', p. 1: the lighthouse on the North Foreland; p. 10: at the North Foreland it is high water at about 11h 15m; Faden 1793, p. 9: about North Foreland 26 and 28 fathoms"
+    says: "The North Foreland, the chalk corner of Kent at the mouth of the Thames, its light-house on the cliff."
+
+  - id: north-foreland-light
+    kind: light
+    name: the North Foreland light
+    modern: North Foreland Lighthouse
+    lat_deg: 51.3750
+    lon_deg: 1.4450
+    height_m: 57
+    lit:
+      from: 1636
+      until: null
+      range_nm: 17
+      character: "a fixed light (oil lamps since 1792)"
+    source: "the encyclopaedia, 'North Foreland' (en.wikipedia.org, read 2026-10-29): the first distinct intimation concerning a lighthouse on the North Foreland is in the year 1636; the tower of 1691; in 1792 oil lamps were installed in the tower; at 51 22 30 N 1 26 42 E; Imray 1874, 'Margate Roads to South Foreland', p. 1: a white tower 85 feet high, a fixed light at 188 feet above high water, visible about 19 miles"
+    says: "The North Foreland light on the cliff at the corner of Kent, a fixed light."
+
+  # ---------------------------------------------------------------------------
+  # Flanders: Dunkirk to Calais
+  # ---------------------------------------------------------------------------
+
+  - id: dunkirk
+    kind: town
+    name: Dunkirk
+    modern: Dunkerque
+    lat_deg: 51.0360
+    lon_deg: 2.3770
+    height_m: 15
+    source: "Faden 1793, 'Dunkirk', pp. 2 to 3: the road of Dunkirk lies at the distance of 2 1/2 miles from the town, behind the Brack; to sail into Dunkirk harbour bring the innermost beacon a handspike's length to the eastward of the outermost, into the channel between the two jetties; the tide rises here 12 feet"
+    says: "Dunkirk behind its dunes, the privateers' port of Flanders, its harbour between two long jetties dry at low water."
+
+  - id: dunkirk-belfry
+    kind: church
+    name: Dunkirk steeple
+    modern: the belfry of Saint-Éloi, Dunkerque
+    lat_deg: 51.0375
+    lon_deg: 2.3765
+    height_m: 58
+    source: "Faden 1793, 'Description of the Banks of Flanders', p. 7: when the outermost of the mills east of Dunkirk is in a line with the east end of the town, the steeple of Dunkirk will be 5 leagues S E; Modern chart: the belfry of Saint-Éloi, 58 m, built in the fifteenth century"
+    says: "Dunkirk steeple, the great belfry in the town, seen five leagues off over the banks."
+
+  - id: dunkirk-risban-light
+    kind: light
+    name: the Risban fanal
+    modern: the fanal of the Risban, Dunkerque (carried away 1825)
+    lat_deg: 51.0440
+    lon_deg: 2.3640
+    height_m: 15
+    lit:
+      from: 1683
+      until: 1825
+      range_nm: 6
+      character: "a fanal, a fire in a lantern at the harbour's mouth"
+    fix: "placed at the seaward end of the harbour's western side, where the Risban fort stood; unverified within two cables"
+    source: "the encyclopaedia, 'Phare de Dunkerque' (fr.wikipedia.org, read 2026-10-29): before the lighthouse of 1843, a fanal lit in 1683, which was carried away by a storm in 1825; the Leughenaer raised to the rank of a lighthouse from 1825; the range and the height JUDGEMENT"
+    says: "The Risban fanal at the mouth of Dunkirk harbour, a small light for the jetties."
+
+  - id: dunkirk-road
+    kind: anchorage
+    name: the road of Dunkirk
+    modern: Rade de Dunkerque
+    lat_deg: 51.0619
+    lon_deg: 2.3691
+    height_m: 0
+    depth_fathoms: 8
+    bottom: clay mixed with sand
+    fix: "moved 660 m north to the grid's 7.4 m, inside the Brack"
+    source: "Faden 1793, 'Dunkirk', p. 2: the road lies behind the Brack, a sand-bank which extends parallel to the shore 6 miles east and west and shelters ships from a N W, north and N E wind; you may anchor to the east of Dunkirk almost close to the jetties in 9 or 10 fathoms, very good holding ground, clay mixed with sand; and to the west in 6, 7 or 8 fathoms"
+    says: "The road of Dunkirk inside the Brack, seven to ten fathoms on clay and sand, the bank breaking the sea from the north."
+
+  - id: the-brack
+    kind: bank
+    name: the Brack
+    modern: Banc Breedt (le Braek)
+    lat_deg: 51.0730
+    lon_deg: 2.3300
+    height_m: 0
+    source: "Faden 1793, 'Dunkirk', p. 2: the Brack, a sand-bank which extends parallel to the shore 6 miles east and west; the depth upon this bank being only 4 feet at low water, it cannot be got over but at flood time; p. 4: the east point of the bank named the Heist, which is a continuation of the Brack"
+    says: "The Brack, the long bank outside Dunkirk road with four feet at low water, crossed only on the flood."
+
+  - id: the-splinter
+    kind: drying
+    name: the Splinter
+    modern: Snouw (the Splinter bank, west of Dunkirk)
+    lat_deg: 51.0540
+    lon_deg: 2.2900
+    height_m: 0
+    dries_m: 0.3
+    extent_m: 800
+    fix: "on the grid's shoal of 1 to 3 m off Mardick, west of Dunkirk's jetties: the period's sand nearer the old shore lies under the modern Port Ouest's works, which the grid has as land; placed by Faden's words, unverified within half a mile"
+    source: "Faden 1793, 'Description of the Banks of Flanders', p. 7: from the west of Dunkirk runs another bank called the Splinter, which is dry in many places at low water; p. 2: the Splinter is steep-to and has no more than 6 or 8 feet on it at low water; the place on the grid's shoal and the head's height JUDGEMENT"
+    says: "The Splinter west of Dunkirk, steep-to and dry in places, the black buoy on its point left to starboard going into the road."
+
+  - id: mardick
+    kind: place
+    name: Mardick
+    modern: Mardyck
+    lat_deg: 51.0230
+    lon_deg: 2.2600
+    height_m: 10
+    source: "Faden 1793, 'Dunkirk', pp. 2 to 3: open Mardick Tower to the eastward of Berg steeples to shun the Splinter; haul in for Mardick pier-heads till within the Brack; the Plateau of Mardick; Modern chart: Mardyck west of Dunkerque, its canal of 1715 filled since"
+    says: "Mardick west of Dunkirk, its tower and its old canal's pier-heads, the mark for the western channel."
+
+  - id: gravelines
+    kind: town
+    name: Gravelines
+    modern: Gravelines
+    lat_deg: 50.9870
+    lon_deg: 2.1280
+    height_m: 10
+    source: "Faden 1793, 'Gravelines', p. 4: Gravelines has a tall spiry steeple, and is easily known by two mills, one at the west end of the town and the other at the east end; as you come from the sea the town appears like an island; the harbour dry at low water, entered at high tide by two beacons in a line"
+    says: "Gravelines with its tall spire and its two mills, standing like an island on the low shore; its harbour dry at low water."
+
+  - id: gravelines-light
+    kind: light
+    name: the Gravelines light
+    modern: Phare de Gravelines
+    lat_deg: 51.0039
+    lon_deg: 2.1092
+    height_m: 29
+    lit:
+      from: 1843
+      until: 1985
+      range_nm: 14
+      character: "a fixed light"
+    source: "the encyclopaedia, 'Phare de Gravelines' (fr.wikipedia.org, read 2026-10-29): September 1843, the light of Gravelines is lit; in service from 1843 to 1985; at 51 00 14 N 2 06 33 E"
+    says: "The Gravelines light at the mouth of the Aa; not lit before 1843."
+
+  - id: calais
+    kind: town
+    name: Calais
+    modern: Calais
+    lat_deg: 50.9580
+    lon_deg: 1.8520
+    height_m: 15
+    source: "Faden 1793, 'Calais', p. 5: keep the mill at the east end of the town right over the eastern jetty head, keeping the citadel to the west; between the jetties steer to the westward for Paradise, where you will lie dry at low water; this port is dangerous with a northerly wind; p. 10 note: the bastion of the Risbank of Calais"
+    says: "Calais within its walls and citadel, the packets' port from Dover, its harbour between the jetties dry at low water and dangerous with a northerly wind."
+
+  - id: calais-road
+    kind: anchorage
+    name: Calais road
+    modern: Rade de Calais
+    lat_deg: 50.9750
+    lon_deg: 1.8450
+    height_m: 0
+    depth_fathoms: 6
+    bottom: fine sand
+    source: "Faden 1793, 'Calais', p. 5: the port not safe to enter till it is almost high tide, when there is but three fathoms of water; p. 9: in the middle between Dover and Calais the flood sets N E by E; the bottom in this sea a fine sand (p. 10); the depth of the road JUDGEMENT from the grid's water outside the jetties"
+    says: "Calais road outside the jetties, fine sand, a berth to wait the tide in fair weather; the harbour within is entered near high water."
+
+  - id: calais-tour-du-guet
+    kind: tower
+    name: the watch-tower of Calais
+    modern: Tour du Guet, Calais
+    lat_deg: 50.9589
+    lon_deg: 1.8497
+    height_m: 39
+    source: "the encyclopaedia, 'Tour du Guet' (fr.wikipedia.org, read 2026-10-29): the thirteenth-century watch-tower in the town, fitted as a lighthouse with a revolving light in 1818, replaced by the present lighthouse on 15 October 1848; at 50 57 32 N 1 50 59 E; Faden 1793, p. 5: the town and the citadel"
+    says: "The old watch-tower of Calais standing over the town's roofs."
+
+  - id: calais-tour-du-guet-light
+    kind: light
+    name: the light on the watch-tower of Calais
+    modern: Tour du Guet, Calais (its light, 1818 to 1848)
+    lat_deg: 50.9590
+    lon_deg: 1.8498
+    height_m: 39
+    lit:
+      from: 1818
+      until: 1848
+      range_nm: 12
+      character: "a revolving light, oil"
+    source: "the encyclopaedia, 'Tour du Guet' (fr.wikipedia.org, read 2026-10-29): in 1818 the watch-tower was fitted as a lighthouse with a revolving light, burning oil, until its replacement by the present lighthouse of Calais on 15 October 1848"
+    says: "The revolving light on Calais watch-tower; not lit before 1818."
+
+  - id: calais-light
+    kind: light
+    name: the Calais light
+    modern: Phare de Calais
+    lat_deg: 50.9614
+    lon_deg: 1.8536
+    height_m: 59
+    lit:
+      from: 1848
+      until: null
+      range_nm: 20
+      character: "a fixed light"
+    source: "the encyclopaedia, 'Phare de Calais' (fr.wikipedia.org, read 2026-10-29): built in 1848, in service 15 October 1848, electrified 1883, automated 1987; it replaced the thirteenth-century Tour du Guet; at 50 57 41 N 1 51 13 E"
+    says: "The Calais light, the white tower in the town; not lit before 1848."
+
+  - id: blanc-nez
+    kind: headland
+    name: Blanc Nez
+    modern: Cap Blanc-Nez
+    lat_deg: 50.9280
+    lon_deg: 1.7160
+    height_m: 134
+    source: "Faden 1793, 'Chap. II', p. 10: the cape of Calais, by the Dutch called Calais Cliff, is a very white cliff, named by the French Blanc Nez; a pretty high land, which appears 6 or 7 leagues off; within pistol-shot of Blanc Nez are rocks under water"
+    says: "Blanc Nez, Calais Cliff, a very white high cliff seen six or seven leagues off, rocks under water close in."
+
+  - id: gris-nez
+    kind: headland
+    name: Cape Gris Nez
+    modern: Cap Gris-Nez
+    lat_deg: 50.8710
+    lon_deg: 1.5840
+    height_m: 50
+    source: "Faden 1793, 'Chap. II', p. 11: from Blanc Nez to Cape Grisnez, by the Dutch called Stuart Ness, N E and S W near 2 leagues, the land between pretty high and mountainous; a little south of Grisnez stands a mill with some houses; several rocks along the coast"
+    says: "Cape Gris Nez, the grey headland at the narrowest of the Strait, a mill and houses a little south of it, rocks along its foot."
+
+  - id: gris-nez-light
+    kind: light
+    name: the Gris Nez light
+    modern: Phare du cap Gris-Nez
+    lat_deg: 50.8681
+    lon_deg: 1.5828
+    height_m: 72
+    lit:
+      from: 1837
+      until: null
+      range_nm: 18
+      character: "a fixed light"
+    source: "the encyclopaedia, 'Phare du cap Gris-Nez' (fr.wikipedia.org, read 2026-10-29): the first lighthouse was lit in 1837 and raised in 1861; the present one in service in 1957; at 50 52 05 N 1 34 58 E"
+    says: "The Gris Nez light on the cape; not lit before 1837."
+
+  - id: wissant-road
+    kind: anchorage
+    name: the road of Wissant
+    modern: Baie de Wissant
+    lat_deg: 50.9015
+    lon_deg: 1.6526
+    height_m: 0
+    depth_fathoms: 8
+    bottom: sand
+    fix: "moved 740 m north to the grid's 7.4 m"
+    source: "Faden 1793, 'Chap. II', p. 11: between Blanc Nez and Grisnez you may cast anchor and wait for the tide when the wind is contrary, for the ground is very good everywhere; the best anchorage is to the N W of Wissan, near the Anclin Bank, from 4 to 15 fathoms; the tides set N E one quarter E and S W one quarter W"
+    says: "The road of Wissant between the two capes, good ground everywhere in four to fifteen fathoms: where a ship waits a tide against a contrary wind."
+
+  - id: st-johns-road
+    kind: anchorage
+    name: St John's road
+    modern: off Ambleteuse
+    lat_deg: 50.8100
+    lon_deg: 1.5850
+    height_m: 0
+    depth_fathoms: 10
+    bottom: sand
+    source: "Faden 1793, 'St. John's Road', pp. 11 to 12: in the cove before Ambleteuse is a very good riding called St John's road, shelter from the winds from the N E as far as the S S E; when they come about to the south and thence to the north and N W the road becomes very bad; the anchorage from 9 to 15 fathoms; keep the tower of Ambleteuse through the middle of the houses, and not too near the land, because of rocks a large cable's length from the shore"
+    says: "St John's road before Ambleteuse, nine to fifteen fathoms, good with easterly winds and very bad from the south round to the north-west."
+
+  - id: ambleteuse
+    kind: town
+    name: Ambleteuse
+    modern: Ambleteuse
+    lat_deg: 50.8080
+    lon_deg: 1.6050
+    height_m: 15
+    source: "Faden 1793, 'St. John's Road', p. 12: keep in view the tower of Ambleteuse through the middle of the houses; a small river above Ambleteuse serves only for fishing-boats; Modern chart: Fort Mahon on the beach, Vauban's tower"
+    says: "Ambleteuse at its little river's mouth, Vauban's tower on the beach."
+
+  # ---------------------------------------------------------------------------
+  # Boulogne to the Somme
+  # ---------------------------------------------------------------------------
+
+  - id: boulogne
+    kind: town
+    name: Boulogne
+    modern: Boulogne-sur-Mer
+    lat_deg: 50.7260
+    lon_deg: 1.6000
+    height_m: 30
+    source: "Faden 1793, 'Boulogne', p. 12: the harbour of Boulogne is dry at low water and almost barred by a sand-bank, which lies N E and S W; it may be passed on two sides, north and south, in 2 1/2 or 3 fathoms; White 1835, 'Coast of England', p. 55: the Hotel de Ville in the upper town of Boulogne"
+    says: "Boulogne, its walled upper town on the hill and the harbour of the Liane below, dry at low water and barred by a bank."
+
+  - id: boulogne-road
+    kind: anchorage
+    name: Boulogne road
+    modern: Rade de Boulogne
+    lat_deg: 50.7316
+    lon_deg: 1.5640
+    height_m: 0
+    depth_fathoms: 6
+    bottom: sand
+    fix: "moved 460 m west to the grid's 6.6 m, outside the bank"
+    source: "Faden 1793, 'Boulogne', p. 12: the bank before the harbour may be passed on two sides, by the north and by the south, in 2 1/2 or 3 fathoms; the tides in this port flood north and N N E and ebb south and S W; the depth of the road JUDGEMENT from the grid's water outside the bank"
+    says: "Boulogne road outside the bank, open to every westerly wind, where the flotilla's prames lie under the batteries."
+
+  - id: boulogne-mast-light
+    kind: light
+    name: the lantern on Boulogne bank
+    modern: Boulogne harbour's entrance (the mast and lantern of the period)
+    lat_deg: 50.7275
+    lon_deg: 1.5880
+    height_m: 10
+    lit:
+      from: 1793
+      until: null
+      range_nm: 4
+      character: "a lantern on a mast"
+    fix: "at the south-west end of the bank before the harbour's mouth, by Faden's words; unverified within two cables"
+    source: "Faden 1793, 'Boulogne', p. 12: over the N E end of the bank there is a buoy, and at the S W extreme a mast is erected, having a lanthorn on its top; its first year is unknown: the edition's year taken as `from`, its end unknown (a harbour light ever since), JUDGEMENT"
+    says: "The lantern on its mast at the south-west end of the bank before Boulogne's harbour."
+
+  - id: cap-dalprech
+    kind: headland
+    name: Point Alprech
+    modern: Cap d'Alprech
+    lat_deg: 50.6980
+    lon_deg: 1.5620
+    height_m: 50
+    source: "White 1835, 'Coast of England', p. 56: Montalembert semaphore just open to the southward of the Guard-house on Cape Alprec; two conspicuous mills upon the heights within Point Alprec"
+    says: "Point Alprech south of Boulogne, its guard-house and two mills on the heights."
+
+  - id: mont-lambert
+    kind: hill
+    name: Montalembert
+    modern: Mont Lambert
+    lat_deg: 50.7160
+    lon_deg: 1.6650
+    height_m: 189
+    source: "White 1835, 'Coast of France', p. 60: the most remarkable eminence in this quarter is that of Montalembert, near Boulogne, which in clear weather may be seen 12 leagues; 'Coast of England', p. 55: the semaphore on Montalembert"
+    says: "Montalembert behind Boulogne, the high land of the coast, seen twelve leagues off in clear weather."
+
+  - id: etaples
+    kind: town
+    name: Etaples
+    modern: Étaples
+    lat_deg: 50.5130
+    lon_deg: 1.6400
+    height_m: 10
+    source: "Faden 1793, 'Etaples', pp. 12 to 13: the river of Etaples is dry every tide and has many shifting banks at its entrance; it admits only small bilanders, which pass up as far as Montreuil; the town on the north side; high water at 30 min. past 10 o'clock on the full and new moon"
+    says: "Etaples on the Canche, a river dry every tide among shifting banks, the flotilla's boats drawn up along it."
+
+  - id: st-valery-sur-somme
+    kind: town
+    name: St Valery on the Somme
+    modern: Saint-Valery-sur-Somme
+    lat_deg: 50.1860
+    lon_deg: 1.6330
+    height_m: 15
+    source: "Faden 1793, 'River Somme', p. 13: the river capable of vessels of a moderate size, its entrance very difficult because of a sand bank before its mouth; steer by St Valery along the south coast; within the river many beacons; White 1835, 'Coast of France', p. 60: you will obtain sight of the light at St Valery on losing sight of that on Point d'Ailly"
+    says: "St Valery at the Somme's mouth, a river entered only by its beacons among shifting quicksands."
+
+  - id: le-treport
+    kind: town
+    name: Treport
+    modern: Le Tréport
+    lat_deg: 50.0620
+    lon_deg: 1.3750
+    height_m: 15
+    source: "Faden 1793, 'Treport', p. 14: at Treport is the small river Bresle, little frequented, only capable of small barks; points of sand on both sides that run half a league into the sea; about 4 miles westward of Treport a small ledge of sunken rocks 7 or 8 feet under water"
+    says: "Treport at the Bresle's mouth, a little port of small barks between points of sand."
+
+  # ---------------------------------------------------------------------------
+  # Dieppe to Cape la Heve, the Seine and the Havre
+  # ---------------------------------------------------------------------------
+
+  - id: dieppe
+    kind: town
+    name: Dieppe
+    modern: Dieppe
+    lat_deg: 49.9250
+    lon_deg: 1.0830
+    height_m: 20
+    source: "Faden 1793, 'Dieppe', pp. 14 to 15: situated in the bottom of a valley between the cliffs; coming from the sea you descry two high steeples with a large castle W S W of the town; two stone jetties make the entrance; the harbour dry at low water, its entrance very difficult because of the great current both inward and outward"
+    says: "Dieppe in its valley between the white cliffs, two high steeples and the castle on the western height, the harbour between its jetties dry at low water."
+
+  - id: dieppe-castle
+    kind: castle
+    name: Dieppe castle
+    modern: Château de Dieppe
+    lat_deg: 49.9240
+    lon_deg: 1.0740
+    height_m: 40
+    source: "Faden 1793, 'Dieppe', p. 14: you descry two high steeples with a large castle which stands W S W of the town near the sea-shore"
+    says: "Dieppe castle on the cliff west-south-west of the town."
+
+  - id: dieppe-road
+    kind: anchorage
+    name: the road of Dieppe
+    modern: off Dieppe, west of the jetties
+    lat_deg: 49.9361
+    lon_deg: 1.0592
+    height_m: 0
+    depth_fathoms: 8
+    bottom: sand and marl
+    fix: "moved 130 m to the grid's 7.4 m"
+    source: "Faden 1793, 'Dieppe', p. 15: the road of Dieppe is to the west of the town, under a small church on the cliff called St Nicholas de Cotecote; the bottom very good and your anchors never drive; sheltered against winds from S W to S E; when it blows from the W N W or N N E the swell great and violent; the anchorage in 7 or 9 fathoms; you are visited by pilots"
+    says: "The road of Dieppe west of the town under St Nicholas's church, seven to nine fathoms, holding well; the pilots come off and signal from the shore when the harbour may be entered."
+
+  - id: pointe-dailly
+    kind: headland
+    name: Cape Lailly
+    modern: Pointe d'Ailly
+    lat_deg: 49.9170
+    lon_deg: 0.9590
+    height_m: 80
+    source: "Faden 1793, 'Cape Lailly and its Light-House', p. 15: two leagues and a half west from Dieppe is Cape Lailly; the rocks of Lailly lie off the land almost half a league; White 1835, 'Coast of France', p. 59: the beach under Point d'Ailly projects considerably to the northward of the point, and is rocky"
+    says: "Cape Lailly west of Dieppe, a high cliff with its light-house, rocks running off half a league."
+
+  - id: ailly-light
+    kind: light
+    name: the Lailly light
+    modern: Phare d'Ailly (the tower of 1775)
+    lat_deg: 49.9160
+    lon_deg: 0.9590
+    height_m: 95
+    lit:
+      from: 1775
+      until: 1958
+      range_nm: 12
+      character: "a fixed light, an open fire"
+    source: "Faden 1793, 'Cape Lailly and its Light-House', p. 15: the Chamber of Commerce at Rouen caused a light-house to be erected, lighted for the first time on the first day of November, 1775, 80 fathoms from the edge of the cliff facing the rock named La Galère; the whole height 56 feet; the encyclopaedia, 'Phare d'Ailly' (fr.wikipedia.org, read 2026-10-29): the first tower lit from 1775 by an open fire; the old light of 1775 in service until 22 April 1958; White 1835, 'Coast of France', p. 59: a revolving light on Point d'Ailly 305 feet above high water (later)"
+    says: "The Lailly light on the cliff west of Dieppe, a single light, lit since November 1775."
+
+  - id: la-galere
+    kind: rock
+    name: La Galère
+    modern: rocks off the Pointe d'Ailly
+    lat_deg: 49.9214
+    lon_deg: 0.9600
+    height_m: 0
+    dries_m: 1.0
+    extent_m: 500
+    fix: "on the grid's shoalest within 400 m, drying 3.4 m"
+    source: "Faden 1793, 'Cape Lailly and its Light-House', p. 15: the rock named La Galère, the most considerable of those marked on the coast under the denomination of the Rocks of Lailly; White 1835, 'Coast of France', p. 59: the principal danger there is called La Galère, close to which are 5 and 6 fathoms; the height of its head JUDGEMENT"
+    says: "La Galère, the chief of the rocks of Lailly off the point, five and six fathoms close to it."
+
+  - id: st-valery-en-caux
+    kind: town
+    name: St Vallery en Caux
+    modern: Saint-Valery-en-Caux
+    lat_deg: 49.8710
+    lon_deg: 0.7110
+    height_m: 15
+    source: "Faden 1793, 'St. Vallery en Caux', p. 16: lies in the third bottom, a small port dry at low tide, admitting none but small vessels, little frequented by strangers"
+    says: "St Vallery en Caux in its gap of the cliffs, a little port dry at low water."
+
+  - id: fecamp
+    kind: town
+    name: Fecamp
+    modern: Fécamp
+    lat_deg: 49.7580
+    lon_deg: 0.3760
+    height_m: 15
+    source: "Faden 1793, 'Fécamp', p. 16: Fecamp stands in a broad valley and is easily known by the church of stone to the N E called Notre Dame des Bois on the edge of the shore; its harbour dry at low water and filled up with pebbles and flints; White 1835, 'Coast of France', p. 59: the first opening to the eastward of the Cape"
+    says: "Fecamp in its broad valley, a harbour dry at low water and choked with shingle."
+
+  - id: notre-dame-du-salut
+    kind: church
+    name: Notre Dame des Bois
+    modern: Chapelle Notre-Dame-du-Salut, Fécamp
+    lat_deg: 49.7660
+    lon_deg: 0.3700
+    height_m: 110
+    source: "Faden 1793, 'Fécamp', p. 16: the church of stone to the N E called Notre Dame des Bois, on the edge of the shore; White 1835, 'Coast of France', p. 59: the church of Notre Dame des Bois, which stands on the brow of the cliff to the eastward of the harbour's mouth"
+    says: "The church of Notre Dame on the brow of the cliff above Fecamp, the mark of the harbour."
+
+  - id: fecamp-great-road
+    kind: anchorage
+    name: the Great Road of Fecamp
+    modern: off Criquebeuf-en-Caux
+    lat_deg: 49.7700
+    lon_deg: 0.3300
+    height_m: 0
+    depth_fathoms: 13
+    bottom: red clay and sand
+    source: "Faden 1793, 'Fécamp', p. 16: two roads before Fecamp; the Great Road over against Criquebeuf above 2 miles off, sheltered from all winds from S E to S W, in 16 fathoms at high water and 13 at low tide, on a red clay ground mixed with sand which secures the anchors; the Little Road opposite the west side of the harbour, 10 to 7 fathoms"
+    says: "The Great Road of Fecamp off Criquebeuf, thirteen fathoms at low water on red clay and sand that holds."
+
+  - id: aiguille-detretat
+    kind: rock
+    name: the Needle of Etretat
+    modern: Aiguille d'Étretat
+    lat_deg: 49.7045
+    lon_deg: 0.1879
+    height_m: 51
+    dries_m: 51
+    extent_m: 100
+    fix: "on the grid's shoalest within 400 m (the grid has no needle: the rock is the feature's alone, its height Faden's 'high' and the modern chart's 51 m)"
+    source: "Faden 1793, p. 17: to the north of the cape are the rocks called Les Eguilles (the Needles) d'Etretat, near the shore; the northernmost, L'Eguille de Bellerat, and the southernmost, Eguille d'Etretat, two high rocks white and sharp pointed; the middlemost, Roche d'Etretat, covered at high water; White 1835, 'Coast of France', p. 59: the sharp-pointed rocks called Les Aiguilles close to the beach and bold close-to"
+    says: "The Needle of Etretat, the high white sharp-pointed rock off the cliffs north of Cape Antifer, bold close-to."
+
+  - id: cap-dantifer
+    kind: headland
+    name: Cape Antifer
+    modern: Cap d'Antifer
+    lat_deg: 49.6889
+    lon_deg: 0.1667
+    height_m: 100
+    fix: "moved 170 m to the grid's land"
+    source: "Faden 1793, p. 16: from Fecamp to Cape de Caux, called also Cape Antifer, S W by W 3 leagues, all white cliffs steep and very high; White 1835, 'Coast of France', p. 59: from Cape Antifer to Fecamp the distance is 8 miles"
+    says: "Cape Antifer, the Cape de Caux, high white cliffs at the corner of the coast north of the Seine."
+
+  - id: cap-de-la-heve
+    kind: headland
+    name: Cape la Heve
+    modern: Cap de la Hève
+    lat_deg: 49.5100
+    lon_deg: 0.0670
+    height_m: 100
+    source: "Faden 1793, p. 17: from Cape de Caux to the south pitch of Cape la Heve or Cape de Seine the course S S W 4 leagues, the shore white and very steep cliffs; White 1835, 'Coast of France', p. 59: Cape la Heve is lofty, and particularly distinguished by two stone light-houses"
+    says: "Cape la Heve, the Seine's head, a lofty cliff with its two stone light-houses, the Havre a league within it."
+
+  - id: la-heve-lights
+    kind: light
+    name: the lights of Cape la Heve
+    modern: Phares de la Hève (the two towers of 1775)
+    lat_deg: 49.5125
+    lon_deg: 0.0690
+    height_m: 115
+    lit:
+      from: 1775
+      until: 1944
+      range_nm: 15
+      character: "two fixed lights of equal height, fifty fathoms apart"
+    source: "Faden 1793, 'Light-houses of Cape la Heve', pp. 17 to 18: two light-houses erected in 1775 by the Chamber of Commerce, placed so that they cannot be seen in a line by ships coming from the north, N W and west, that they be not mistaken for Barfleur or Cape Lailly, which are single; of equal height, the bodies 56 feet, the lanthorns 15 feet; the encyclopaedia, 'Phare de la Hève' (fr.wikipedia.org, read 2026-10-29): two identical towers of 17 m built in 1775 and lit from 1775; both destroyed in 1944; White 1835, 'Coast of France', p. 59: these lights are fixed"
+    says: "The two lights of Cape la Heve, side by side on the cliff, never in one from the offing: the Seine's mark, lit since 1775."
+
+  - id: l-eclat
+    kind: ledge
+    name: L'Éclat
+    modern: Les Ratelets (the ledge south-west of the Hève)
+    lat_deg: 49.4962
+    lon_deg: 0.0515
+    height_m: 0
+    dries_m: -2.2
+    extent_m: 500
+    fix: "on the grid's shoalest within 400 m (2.8 m)"
+    source: "Faden 1793, p. 17: about one mile to the S W of La Heve is the small ledge of rocks called L'Eclat, on which there is not above 7 or 8 feet in ordinary tides; p. 18: the two roads separated by the banks called Les Hauts de la Rade and L'Eclat"
+    says: "L'Éclat, a small ledge a mile south-west of the Hève with seven or eight feet over it, between the Great and the Little Road."
+
+  - id: havre-little-road
+    kind: anchorage
+    name: the Little Road of Havre
+    modern: off Sainte-Adresse and the Havre
+    lat_deg: 49.4949
+    lon_deg: 0.0792
+    height_m: 0
+    depth_fathoms: 3.5
+    bottom: pebbles and oysters on clay
+    fix: "moved 460 m to the grid's 3.6 m"
+    source: "Faden 1793, 'Directions for the Roads of Havre, by Mons. De Gaulle', pp. 18 to 19: the Little Road but half a league from the harbour, S S E from Cape la Heve; halfway between La Heve and Havre anchor in 3 or 4 fathoms at low water; the bottom all pebbles and oysters on clay, good hold, but cables are cut in a very little time, and ships moor there only for one tide"
+    says: "The Little Road of Havre between the Hève and the town, three or four fathoms on pebbles and oysters that cut a cable: a berth for one tide, to wait the water for the harbour."
+
+  - id: havre-great-road
+    kind: anchorage
+    name: the Great Road of Havre
+    modern: Grande Rade du Havre
+    lat_deg: 49.5100
+    lon_deg: 0.0000
+    height_m: 0
+    depth_fathoms: 10
+    bottom: ooze
+    source: "Faden 1793, 'Directions for the Roads of Havre, by Mons. De Gaulle', p. 18: the Great Road is two good leagues from the harbour, lies W S W from Cape la Heve and extends a whole league north and south; in 1690 the whole French fleet lay at anchor there; to the W N W of La Heve a large league, the Castle of Orcher a little open of the coast of Ingouville, anchor on oozy ground from 10 to 14 fathoms"
+    says: "The Great Road of Havre outside the banks, ten to fourteen fathoms on ooze, where a ship of great draught waits the high tide; the Seine's stream runs hard across it."
+
+  - id: le-havre
+    kind: town
+    name: the Havre
+    modern: Le Havre
+    lat_deg: 49.4890
+    lon_deg: 0.1050
+    height_m: 10
+    source: "Faden 1793, 'Le Havre de Grace, or the Havre', pp. 19 to 20: about one league S E 1/2 E from the south pitch of Cape la Heve; the sea-port of Paris at the mouth of the Seine on ground gained out of the sea; its harbour entirely the work of art, can contain about 300 vessels; in spring tides the water rises 20 feet within it; the entrance between two jetties of stone; to enter the port a pilot is required"
+    says: "The Havre de Grace, the sea-port of Paris at the Seine's mouth, its harbour within the walls entered between two stone jetties with a pilot; the water stands near three hours at the top of the tide."
+
+  - id: the-amfar
+    kind: drying
+    name: the Amfar
+    modern: the banks off the Seine's mouth (Banc d'Amfard, under Le Havre's modern port)
+    lat_deg: 49.4650
+    lon_deg: 0.1250
+    height_m: 0
+    dries_m: 1.0
+    extent_m: 700
+    source: "Faden 1793, 'Honfleur', pp. 20 to 21: between Havre and Honfleur several sand-banks, some shifting; the most noted is Amfar, which is dry every tide, about half a league S 1/2 E and S S E from Havre; the height of the bank JUDGEMENT; its place now under the modern port's works"
+    says: "The Amfar, a sand south of the Havre dry every tide, among the Seine's shifting banks."
+
+  - id: honfleur
+    kind: town
+    name: Honfleur
+    modern: Honfleur
+    lat_deg: 49.4200
+    lon_deg: 0.2330
+    height_m: 15
+    source: "Faden 1793, 'Honfleur', pp. 20 to 21: from Havre to Honfleur, on the other side of the Seine, 2 leagues S E, several sand-banks between, some shifting; neither the ships of Havre or Honfleur nor those for Rouen ever enter this river without country pilots, from Quillebeuf"
+    says: "Honfleur on the south shore of the Seine's mouth, across the shifting banks from the Havre."
+
+  - id: notre-dame-de-grace
+    kind: church
+    name: Notre Dame de Grace
+    modern: Chapelle Notre-Dame-de-Grâce, Honfleur
+    lat_deg: 49.4230
+    lon_deg: 0.2180
+    height_m: 90
+    source: "Faden 1793, 'Directions for the Roads of Havre', p. 19: keeping the Guard-house on the jetty of Havre in one with the Chapel called Notre Dame de Grace, that is seen a little to the westward of Honfleur"
+    says: "The chapel of Notre Dame de Grace on the wooded height west of Honfleur, a mark for the Little Road of Havre."
+
+  - id: rocks-of-calvados
+    kind: ledge
+    name: the Rocks of Calvados
+    modern: Rochers du Calvados
+    lat_deg: 49.3718
+    lon_deg: -0.5517
+    height_m: 0
+    dries_m: 0.5
+    extent_m: 900
+    fix: "on the grid's shoalest within 400 m (2.6 m)"
+    source: "Faden 1793, p. 22: at the west end of the Essarts de Bernieres begin the Rocks of Calvados, which stretch along the coast parallel to it at the distance of half a league for 4 1/2 leagues; never uncovered but at spring tides; do not approach the land nearer than 14 or 16 fathoms; the place on the grid's shoal heads and the head's height JUDGEMENT"
+    says: "The Rocks of Calvados off the coast west of the Orne, half a league off the shore, uncovered only at spring tides."

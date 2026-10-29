@@ -554,8 +554,9 @@ def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_m
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    # the Channel east's two (Biscay north's nine, package 39b, are held beside them)
-    held = {g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] > 48.5}
+    # the Channel east's two (Biscay north's nine, package 39b, are held beside them;
+    # the Channel's east block's six, package 79b, east of 1 W)
+    held = {g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] > 48.5 and g["lon_deg"] < -1.0}
     assert set(held) == {"bournemouth", "portsmouth"}
     assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & set(held)
@@ -586,7 +587,8 @@ def test_the_blocks_gauges_are_read_and_held_out_of_the_blend_that_would_move_th
     south = [g for g in doc["held_gauges"] if 42.0 <= g["lat_deg"] < 45.9]  # package 39c's
     # (Portugal and Cadiz's five, package 39d, after them, south of 42 N)
     north_of_42 = [g for g in doc["held_gauges"] if g["lat_deg"] >= 42.0]
-    assert len(north_of_42) == 2 + len(held) + len(south)
+    # (and the Channel's east block's six, package 79b)
+    assert len(north_of_42) == 2 + 6 + len(held) + len(south)
     assert [g["id"] for g in held] == [
         "concarneau",
         "port-tudy",
