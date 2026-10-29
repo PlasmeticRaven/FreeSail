@@ -128,9 +128,13 @@ def test_the_razees_hull_is_the_64s_at_her_own_line(sixty_four, razee):
     assert 0.0 <= h.clr_x_m <= h.length_waterline_m / 8.0  # as the 64's (judgement; tuned)
     # her plane at her line, 3,050-3,052 sq ft (measured, 1407F 1.45 ft below WL1)
     assert 3_040 <= h.lateral_area_m2 / SQ_FT <= 3_060
-    # her datum, D18 (a): her gun deck at midships, 4 ft 7 in above her line (the 64's lower
-    # deck, measured on 1280T; 4 ft 5 in-4 ft 8 in on ZAZ2371: Ind §2.3.5)
-    assert (4.0 + 5.0 / 12.0) * FT <= h.deck_height_m <= (4.0 + 8.0 / 12.0) * FT
+    # her datum, D18 (c), the owner's choice (2026-10-29: Indf §2.2, §17 item 1): her old upper
+    # deck at midships, 12 ft 0 in above her line (measured on ZAZ2371 and 1280T: Ind §2.3.5),
+    # the 64's upper deck raised by her rise at midships, 1.46 ft: 3.67 m. Was D18 (a), her gun
+    # deck there, 4 ft 7 in above her line (the 64's lower deck; 4 ft 5 in-4 ft 8 in on
+    # ZAZ2371): 1.39 m
+    assert abs(h.deck_height_m - 3.66) <= 0.05
+    assert h.deck_height_m == pytest.approx(h64.deck_height_m + 1.46 * FT, abs=0.01)
     assert 90.0 <= h.rudder.area_m2 / SQ_FT <= 92.0  # 90.4-91.8 sq ft below her line
 
 
@@ -211,16 +215,32 @@ def test_the_razees_profile_is_the_64s_cut_down_at_her_own_line(sixty_four, raze
     # 118.5 ft (measured, ZAZ2375: Ind §2.3.5); the waist between them open but for gangways
     assert decks["quarterdeck"][-1][0] == pytest.approx((74.4 - 80.0) * FT, abs=0.01)
     assert decks["forecastle"][0][0] == pytest.approx((118.5 - 80.0) * FT, abs=0.01)
-    assert deck_at(p, 0.0) == pytest.approx(razee.hull.spec.deck_height_m, abs=0.01)
+    # the deck she is worked from in the waist is her gun deck, 4 ft 7 in above her line (4 ft
+    # 5 in-4 ft 8 in on ZAZ2371), and her datum, D18 (c), her old upper deck at midships, which
+    # in the waist is none of her decks (her rise there 0.445 m, RISE_M to the centimetre). Was,
+    # under D18 (a): deck_at(p, 0.0) == her datum, her gun deck, 1.39 m
+    assert deck_at(p, 0.0) == pytest.approx(interp(decks["upper"], 0.0))
+    assert (4.0 + 5.0 / 12.0) * FT <= deck_at(p, 0.0) <= (4.0 + 8.0 / 12.0) * FT
+    assert razee.hull.spec.deck_height_m == pytest.approx(old_upper, abs=0.02)
+    assert razee.hull.spec.deck_height_m - deck_at(p, 0.0) == pytest.approx(2.28, abs=0.005)
     # six ports a side on her quarterdeck and three on her forecastle (ZAZ2375, measured), and
     # her chase port before them for the 12-pounders of 1796 (D30 (a); judgement)
     assert len(ports_of(p, "quarterdeck")) == 6 and len(ports_of(p, "forecastle")) == 4
-    # her taffrail 5 ft 6 in abaft AP (measured, ZAZ2375), her quarterdeck rail 4 ft 6 in above
-    # her quarterdeck (Ind §2.3.5, not re-measured)
-    assert p.rail_m[0][0] == pytest.approx((-5.5 - 80.0) * FT, abs=0.01)
-    assert p.rail_m[0][1] - interp(decks["quarterdeck"], p.rail_m[0][0]) == pytest.approx(
-        4.5 * FT, abs=0.02
-    )
+    # her taffrail, the top of her stern and of her side, on the 64's stern line 22 ft above
+    # WL1 and 10 ft 3 in abaft AP, where ZAZ2371 ends her stern's outline (measured there, 10.4
+    # ft and 21.9 ft, ±0.2 ft), 7.15 m above her water. Was 5 ft 6 in abaft AP (ZAZ2375's, the
+    # stern at her quarterdeck's height) at her quarterdeck rail's height, 5.26 m: her short
+    # roundhouse not yet in her profile (2026-10-29)
+    assert p.rail_m[0] == p.stern_m[-1]
+    assert p.rail_m[0][0] == pytest.approx((-10.25 - 80.0) * FT, abs=0.01)
+    assert p.rail_m[0][1] == pytest.approx(22.0 * FT + RISE_M, abs=0.01)
+    # her quarterdeck rail 4 ft 6 in above her quarterdeck (Ind §2.3.5, not re-measured), from
+    # her roundhouse's breast to the quarterdeck's
+    breast, qd_end = decks["roundhouse"][-1][0], decks["quarterdeck"][-1][0]
+    on_qd = [(x, z) for x, z in p.rail_m if breast < x <= qd_end]
+    assert len(on_qd) == 2
+    for x, z in on_qd:
+        assert z - interp(decks["quarterdeck"], x) == pytest.approx(4.5 * FT, abs=0.02), x
     # her waist's top-side, 30.8 ft above K (measured, ZAZ2371), more than a metre under the
     # 64's waist rail at midships (1407F)
     assert interp(p.rail_m, 0.0) < interp(p64.rail_m, 0.0) - 1.0
@@ -234,6 +254,102 @@ def test_the_razees_profile_is_the_64s_cut_down_at_her_own_line(sixty_four, raze
     assert [x for x, _z in p.stem_m] == [x for x, _z in p64.stem_m]
     for (_x0, z0), (_x1, z1) in zip(p64.stem_m, p.stem_m, strict=True):
         assert abs(z1 - z0 - RISE_M) <= 0.02, (z0, z1)
+
+
+def test_the_razees_short_roundhouse_stands_over_her_cabin_under_her_taffrail(sixty_four, razee):
+    """ZAZ2371's N.B.: her roundhouse "shortened to the Beam abaft the Mizen" by the Navy Board's
+    warrant of December 1794 (read, tentative: Ind table V10), as she was in 1796 (Build-Ships.md
+    §19.1 item 18; the owner, 2026-10-29). Her roundhouse is the 64's quarterdeck (1280T) kept
+    over her cabin at her line, which ZAZ2371 draws in red within half a foot, from 7.3 ft abaft
+    AP to the beam abaft the mizen, 23.3 ft from AP (ZAZ2375's beam under the coach's fore
+    bulkhead), abaft her mizen; her rail 6 in above it (ZAZ2371's side at the stern; forward of
+    it the drawn top sweeps down under the red deck to her quarterdeck rail's height at the
+    mizen, with no rail drawn over the deck: judged, a deck standing under its rail, and her
+    note says so), stepping down at its breast to her quarterdeck rail; her stern lights and quarter
+    gallery, the 64's lower band and tier at her line, under her taffrail and her roundhouse's
+    deck, the tier forward of her stern's line. Was: no roundhouse, her taffrail at her
+    quarterdeck rail 5 ft 6 in abaft AP, the band and the tier above it (recorded, not moved).
+    Her ports, guns and fits are as they were: none on her roundhouse."""
+    p64, p = sixty_four.hull.spec.profile, razee.hull.spec.profile
+    decks64, decks = dict(p64.decks_m), dict(p.decks_m)
+    rh = decks["roundhouse"]
+    assert rh[0][0] == pytest.approx(x_of(-7.3), abs=0.01)
+    assert rh[-1][0] == pytest.approx(x_of(23.3), abs=0.01)
+    assert rh[-1][0] < x_of(MAST_STEPS_FT["mizzen"][0])  # abaft her mizen at its partners
+    qd64 = decks64["quarterdeck"]
+    for x, z in rh:
+        if x >= qd64[0][0]:  # the 64's quarterdeck at her line, over its measured extent
+            assert z - interp(qd64, x) == pytest.approx(RISE_M, abs=0.02), x
+    assert dict(p.marks)["decks_m"] == "judged"  # the N.B.'s beam taken for ZAZ2375's
+    # her rail 6 in above her roundhouse's deck, stepping down at its breast 0.86 m to her
+    # quarterdeck rail
+    over = [(x, z) for x, z in p.rail_m if rh[0][0] <= x <= rh[-1][0]]
+    assert len(over) == len(rh)
+    for x, z in over:
+        assert z - interp(rh, x) == pytest.approx(0.5 * FT, abs=0.01), x
+    after = next(pt for pt in p.rail_m if pt[0] > rh[-1][0])
+    assert after[0] - rh[-1][0] < 0.05
+    assert over[-1][1] - after[1] == pytest.approx(0.86, abs=0.02)
+    # the rail over the roundhouse a judgement over ZAZ2371's drawn top, and her note says so
+    assert "the drawn top sweeps down fair, without a step" in text_of(RAZEE)
+    # her stern lights and quarter gallery under her taffrail and her roundhouse's deck
+    stern = p.form.stern
+    taff_x, taff_z = p.stern_m[-1]
+    ((x_aft, x_fore, _z_low, z_high),) = stern.galleries_m
+    assert z_high < min(taff_z, interp(rh, x_aft), interp(rh, x_fore))
+    assert x_aft > interp([(z, x) for x, z in p.stern_m], z_high)
+    ((_low, high, _n, _hb),) = stern.lights_m
+    assert high < min(taff_z, interp(rh, taff_x))
+    # her ports and her guns are as they were: no port and no gun on her roundhouse
+    assert "roundhouse" not in dict(p.ports_m)
+    for fit in razee.spec.armament.fits.values():
+        assert not [g for g in fit.guns if g.deck == "roundhouse"], fit.name
+
+
+# The razee's spar heights above the datum as filed under D18 (a), 09dde99 (her datum her gun
+# deck, 1.39 m), and the lower masts' x_m there, their places at the partners on her gun deck.
+RAZEE_HEIGHTS_UNDER_A = {"main.mast": 23.7, "main.yard": 18.8, "bowsprit": 11.6, "mizzen.boom": 4.4}
+RAZEE_MASTS_X_UNDER_A = {"fore": 19.23, "main": -2.78, "mizzen": -16.33}
+
+
+def test_the_razees_datum_is_her_old_upper_deck_and_moves_nothing_above_her_water(razee):
+    """D18 (c), the owner's choice (2026-10-29; Indf §2.2): her datum is her old upper deck at
+    midships, 3.67 m above her water, 2.28 m above her gun deck, the deck she is worked from in
+    the waist and the datum under (a). Her rig is cut above her gun deck as (a) cut it and
+    written above the new datum, so that no spar stands elsewhere above her water: each height
+    above the datum 2.28 m less than under (a) (the main mast's head 23.7 m, now 21.42), and
+    each lower mast's x_m its place at the datum's height, raked from its partners on her gun
+    deck (the main -2.78 m, now -2.84). Her lower mast heads stand where Steel's lengths, her
+    cuts at the heel and her line put them, as the 64's do. What moves is what reads the datum or
+    a height written above it, the deck's wind's eye and the lower masts' windage among them, and
+    her note names each. Plainly: (c) departs from the frigate-36's rule, the uppermost continuous
+    deck, and her file says so."""
+    h = razee.hull.spec
+    gun_deck = deck_at(h.profile, 0.0)
+    assert gun_deck == pytest.approx(1.39, abs=0.005)
+    assert h.deck_height_m - gun_deck == pytest.approx(2.28, abs=0.005)
+    for sid, under_a in RAZEE_HEIGHTS_UNDER_A.items():
+        assert razee.spars[sid].height_m == pytest.approx(under_a - 2.28, abs=1e-9), sid
+        assert above_water(razee, sid) == pytest.approx(under_a + 1.39, abs=1e-9), sid
+    for mast, length in STEEL_MASTS_FT.items():
+        x, heel = MAST_STEPS_FT[mast]
+        water = 21.245 - 1.04 * x / 160.0 - (1.45 + 0.02 * x / 160.0)  # her line above K
+        head = (heel + length - CUT_FT[mast] - water) * FT
+        assert above_water(razee, f"{mast}.mast") == pytest.approx(head, abs=0.06), mast
+        spar = razee.spars[f"{mast}.mast"]
+        at_gun_deck = spar.x_m + math.tan(spar.rake) * (h.deck_height_m - gun_deck)
+        assert at_gun_deck == pytest.approx(RAZEE_MASTS_X_UNDER_A[mast], abs=0.005), mast
+    text = text_of(RAZEE)
+    assert "D18 (c), the owner's choice" in text
+    assert "departs from the frigate-36's rule, the uppermost continuous deck" in text
+    readers = (
+        "the deck's wind's eye",
+        "each lower mast's windage",
+        "the blanket's reach",
+        "the spanker sheet's lead",
+    )
+    for reader in readers:
+        assert reader in text, reader
 
 
 # ---------------------------------------------------------------------------
@@ -253,13 +369,16 @@ SHAPE_MARKS = {
         ),
         "judged": ("wales_m", "decks_m", "ports_m", "port_size_m", "form.head"),
     },
+    # her roundhouse in (2026-10-29): stern_m was judged (her taffrail's height), now measured
+    # on ZAZ2371; decks_m was sourced, now judged (her roundhouse's breast, the N.B.'s beam
+    # taken for ZAZ2375's)
     RAZEE: {
         "sourced": (
-            "keel_m", "section_m", "decks_m", "breadth_line_m", "sections_m", "channel_wales_m",
+            "keel_m", "stern_m", "section_m", "breadth_line_m", "sections_m", "channel_wales_m",
             "form.stern", "form.stern.knuckle_z_m", "form.stern.round_up_m",
         ),
         "judged": (
-            "rail_m", "breadth_m", "stem_m", "stern_m", "wales_m", "ports_m", "port_size_m",
+            "rail_m", "breadth_m", "stem_m", "wales_m", "decks_m", "ports_m", "port_size_m",
             "head_m", "form.stern.transom_hb_m", "form.stern.galleries_m",
             "form.stern.lights_m", "form.head",
         ),
@@ -436,9 +555,10 @@ def test_her_stern_is_square_with_its_galleries_and_lights_as_measured(sixty_fou
     13 ft 0 in at the knuckle, plank on; two tiers of quarter gallery (1407F), the upper deck's
     and the quarterdeck's, forward of her stern; two bands of five stern lights (ZAZ1953), within
     10 ft 9 in and 9 ft 7 in of the middle line, at the quarter gallery's lights' heights and
-    within the transom's face. The razee keeps the 64's stern below her cut, and one tier and
-    one band, the 64's lower ones at her line (ZAZ2371, tentative); her transom at her taffrail
-    as filed is the outline's 10 ft 10 in there."""
+    within the transom's face. The razee keeps the 64's stern up to her taffrail, and one tier
+    and one band, the 64's lower ones at her line (ZAZ2371, tentative), her cabin's under her
+    roundhouse; her transom at her taffrail, 22 ft above WL1 (ZAZ2371), is the outline's 9 ft
+    8 in there (was 10 ft 10 in at her taffrail as filed before her roundhouse, 15.8 ft)."""
     s64, s = sixty_four.hull.spec.profile.form.stern, razee.hull.spec.profile.form.stern
     assert s64.type == s.type == "square"
     assert s64.knuckle_z_m == pytest.approx(6.38 * FT, abs=0.01)
@@ -449,7 +569,7 @@ def test_her_stern_is_square_with_its_galleries_and_lights_as_measured(sixty_fou
         ((9.03 + PLANK_FT) * FT, (12.99 + PLANK_FT) * FT), abs=0.01
     )
     assert s.transom_hb_m[1] == s64.transom_hb_m[1]
-    assert s.transom_hb_m[0] == pytest.approx((10.81 + PLANK_FT) * FT, abs=0.01)
+    assert s.transom_hb_m[0] == pytest.approx((9.69 + PLANK_FT) * FT, abs=0.01)  # was 10.81
     lower = (x_of(-6.9), x_of(3.7), 12.7 * FT, 17.4 * FT)
     upper = (x_of(-8.2), x_of(-0.4), 19.9 * FT, 24.4 * FT)
     assert flat(s64.galleries_m) == pytest.approx([*lower, *upper], abs=0.01)
@@ -475,12 +595,14 @@ def test_her_stern_is_square_with_its_galleries_and_lights_as_measured(sixty_fou
     p64 = sixty_four.hull.spec.profile
     for x_a, _x_f, _z_lo, z_hi in s64.galleries_m:  # each tier forward of the 64's stern
         assert x_a > interp([(z, x) for x, z in p64.stern_m], z_hi)
-    # Plainly: the razee's tier and band stand above her taffrail as filed, and the tier's after
-    # end abaft it, her short roundhouse (ZAZ2371's note; Build-Ships.md §19.1 item 18) not in
-    # her profile: recorded in her stern's note, not moved
+    # the razee's tier and band under her taffrail and the tier forward of her stern's top, her
+    # short roundhouse in her profile (ZAZ2371's note; Build-Ships.md §19.1 item 18; 2026-10-29).
+    # Was: both above her taffrail as filed and the tier's after end abaft it, recorded in her
+    # stern's note and not moved ("her rail and stern there are open")
     p = razee.hull.spec.profile
-    assert z_high > p.stern_m[-1][1] and x_aft < p.stern_m[-1][0]
-    assert "her rail and stern there are open" in text_of(RAZEE)
+    assert z_high < p.stern_m[-1][1] and x_aft > p.stern_m[-1][0]
+    assert high < p.stern_m[-1][1]
+    assert "her rail and stern there are open" not in text_of(RAZEE)
 
 
 # The main wale's edges, ft above WL1, at four of her stations (measured on 1407F at full
@@ -1073,14 +1195,16 @@ def test_her_polars_are_drawn_from_her_files_and_agree_with_her_sailed_beam_reac
     """`polar_of` balances the sails model against the hull's resistance at each angle off the
     wind (tests/test_ships.py:74-93). Her beam reaches in fifteen knots are within half a knot
     of those she sails under plain sail with the yards trimmed, the known truths' polar form
-    (`under_plain_sail` at 90 deg): the 64 7.50 kn, the razee 7.78 kn (measured, seed 7). By
-    `polar_of`: the 64's best 4.25, 7.59 and 10.92 kn in 8, 15 and 25 kn, the razee's 4.41, 7.93
-    and 11.54, the frigate-36's 4.62, 8.19 and 11.63; all three closest at 50 deg and beating
-    at 60. Indf §9's targets that hold: the razee above the 64 she was cut from, her best in 25
-    kn at or above the Virginie chase's mean of 11.2 kn (Osler p. 125; Gazette 13887 p. 388;
-    D24), and her closest within a step of the frigate-36's (the brace limits the frigate's:
-    Indf §4.2). The razee outsailing the frigate-36 close-hauled and running large does not
-    hold (truth 7-187's docstring)."""
+    (`under_plain_sail` at 90 deg): the 64 7.50 kn, the razee 7.79 kn (measured, seed 7; 7.78
+    under D18 (a), her deck's wind's eye 2.28 m lower and her lower masts' windage taken from
+    it). By `polar_of`: the 64's best 4.25, 7.59
+    and 10.92 kn in 8, 15 and 25 kn, the razee's 4.41, 7.93 and 11.54 (under (a) the same; her
+    polar moved 0.04 kn at most by D18 (c)), the frigate-36's 4.62, 8.19 and 11.63; all three
+    closest at 50 deg and beating at 60. Indf §9's targets that hold: the razee above the 64
+    she was cut from, her best in 25 kn at or above the Virginie chase's mean of 11.2 kn
+    (Osler p. 125; Gazette 13887 p. 388; D24), and her closest within a step of the
+    frigate-36's (the brace limits the frigate's: Indf §4.2). The razee outsailing the
+    frigate-36 close-hauled and running large does not hold (truth 7-187's docstring)."""
     from freesail.world import ships as S
 
     frigate = S.polar_of(FRIGATE)
@@ -1259,27 +1383,29 @@ def test_truth_7_187_the_razee_is_lighter_stiffer_and_faster_than_the_64_she_was
     files); she draws 0.44 ± 0.03 m less (0.45); her righting moment at 10 degrees of heel is
     greater by at least 4% (1,925 t at 1.65 m against 2,170 t at 1.35 m: 8.4% by the files);
     and under plain sail on a beam reach in fifteen knots she heels less (the known truths'
-    polar form at seed 7: the razee 4.1 deg at 7.78 kn, the 64 4.6 deg at 7.50 kn; the
-    frigate-36 5.5 deg at 7.97 kn). Pinned at once.
+    polar form at seed 7: the razee 4.04 deg at 7.79 kn under D18 (c), 4.06 at 7.78 under (a);
+    the 64 4.6 deg at 7.50 kn; the frigate-36 5.5 deg at 7.97 kn). Pinned at once.
 
     **The speed clause waits on stage B** (Build-Ships.md §15): her speed greater at every
     angle from her closest to 180 degrees in 15 and 25 kn. Measured now on the 64's stand-in
     mizen course it holds (`polar_of`: the razee faster at every angle from 50 to 180 degrees,
-    by 0.16-0.34 kn in 15 kn and 0.30-0.65 kn in 25 kn); but the 64's after sail changes when
+    by 0.16-0.34 kn in 15 kn and 0.33-0.66 kn in 25 kn under D18 (c); 0.30-0.65 in 25 kn under
+    (a)); but the 64's after sail changes when
     her mizen course goes to its yard (Indf §0, §16 item 3), so the clause is pinned then, old
     beside new, and on the stand-in, said so, if the gate slips past the package's merge.
 
     **Not pinned: the razee outsailing the frigate-36** (Indf §14 truth 4; D24; the Virginie
     chase). Her best in 25 kn, 11.54 kn, meets the chase's mean of 11.2; but in 15 kn she is
-    under the frigate-36 close-hauled and running large (`polar_of`: 60 deg 4.15 against 4.29,
-    70 deg 5.96 against 6.14, 120 deg 7.60 against 7.86, 130 deg 7.21 against 7.40, 140 deg 6.82
-    against 6.99, 150 deg 6.39 against 6.53), and sailed (60 deg 3.58 against 3.63, 120 deg 7.37
-    against 7.53). `hull_speed_kn` at the top of D24's band, 14.5, raises her 15-kn figures by
-    0.04 kn at most; `clr_x_m` does not reach the polar; the brace limits move only with a
-    source. Reported, not forced (Indf §9). The owner (2026-10-29; Indf §17) leaves it to the
-    tuning of both ships against the period's accounts, neither presumed the one at fault: the
-    razee may be right and the frigate-36 too fast, or the razee too slow and the frigate-36
-    right."""
+    under the frigate-36 close-hauled and running large (`polar_of` under D18 (c): 60 deg 4.17
+    against 4.29, 70 deg 5.97 against 6.14, 120 deg 7.60 against 7.86, 130 deg 7.21 against
+    7.40, 140 deg 6.81 against 6.99, 150 deg 6.39 against 6.53; under (a) 4.15, 5.96 and 6.82
+    at 60, 70 and 140 deg), and sailed (60 deg 3.60 against 3.63, 120 deg 7.47 against 7.53;
+    under (a) 3.58 and 7.37). `hull_speed_kn` at the top of D24's band, 14.5, raises her
+    15-kn figures by 0.04 kn at most; `clr_x_m` does not reach the polar; the brace limits
+    move only with a source. Reported, not forced (Indf §9). The owner (2026-10-29; Indf §17)
+    leaves it to the tuning of both ships against the period's accounts, neither presumed the
+    one at fault: the razee may be right and the frigate-36 too fast, or the razee too slow
+    and the frigate-36 right."""
     from tests.test_known_truths import under_plain_sail
 
     s64, s = load_spec(SIXTY_FOUR), load_spec(RAZEE)
