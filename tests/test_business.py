@@ -520,3 +520,26 @@ def test_a_far_trader_at_her_port_sells_buys_a_return_cargo_and_sails_again_unde
     finally:
         B.load_business = original
     assert B.load_business().get("transact") is True
+
+
+def test_a_dated_entry_is_drawn_between_its_days_and_the_commission_gives_her_nations_intents(busy):
+    """Package 79a (spec M7 §22): a blockade dated by its sources is drawn only between its
+    `since` and `until`, either absent; the business's commission gives a ship an intent of
+    her own nation's, a station of her doctrine's within the region or a passage to another
+    of her ports, and none to a nation with neither."""
+    from datetime import date
+
+    entry = {"since": date(1805, 5, 31), "until": "1805-08-20"}
+    assert not B._between(datetime(1805, 5, 30, 23), entry)
+    assert B._between(datetime(1805, 5, 31, 0), entry)
+    assert B._between(datetime(1805, 8, 20, 12), entry)
+    assert not B._between(datetime(1805, 8, 21), entry)
+    assert B._between(datetime(1790, 1, 1), {})
+    b = busy.business
+    brest = busy.ports.ports["brest"]
+    french = b.intents_for("france", brest)
+    assert french[0] == "keep the station off the Isle of Bas within 10 miles"
+    assert all(w.startswith(("keep the station off", "bound for")) for w in french)
+    assert "bound for Brest" not in french
+    assert b.intents_for("britain", None)[-1].startswith("bound for")
+    assert b.intents_for("morocco", None) == []

@@ -233,3 +233,24 @@ def test_the_news_moves_the_table_and_the_market_reads_it(chart):
     assert not table.declare_war("britain", "france")  # at war already: nothing moves
     with pytest.raises(KeyError):
         table.declare_war("britain", "ruritania")
+
+
+def test_the_naval_blocks_name_ports_of_the_index_and_dated_blockades_are_in_order():
+    """Package 79a (spec M7 §22): every blockade and ship in ordinary of a nation's `naval:`
+    names a port of the index, of another nation for a blockade and of her own for a ship
+    in ordinary; a dated blockade's `since` comes before its `until`; and every entry the
+    package added carries its source."""
+    table = N.load_nations()
+    for nid, nation in table.nations.items():
+        naval = nation.naval
+        for item in naval.get("blockades") or []:
+            entry = item if isinstance(item, dict) else {"port": item}
+            port = str(entry["port"])
+            assert port in table.port_nations and table.port_nations[port] != nid, (nid, port)
+            if entry.get("since") and entry.get("until"):
+                assert entry["since"] < entry["until"], (nid, entry)
+            if isinstance(item, dict):
+                assert item.get("source"), (nid, port)
+        for entry in naval.get("in_ordinary") or []:
+            assert table.port_nations[str(entry["port"])] == nid, (nid, entry)
+        assert naval.get("source"), nid
