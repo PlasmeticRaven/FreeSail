@@ -332,25 +332,37 @@ def test_a_person_made_aboard_another_ship_is_refused_in_words_and_her_own_name_
     """Package 68 (the cold review of 2026-10-22, R-15): "aboard the Two Brothers, on the
     quarterdeck" fell into the made man's history, and "on the quarterdeck" put three
     foreign captains on the Sherbourne's quarterdeck and in her people. Words naming
-    another ship are refused in words and nothing is made; the player's own ship by her
-    name is aboard, at the place said ("onto the Amazon's quarterdeck"), and a place said
-    in the words is honoured, never the cabin by default."""
+    another ship are refused in words and nothing is made where she cannot keep him: a
+    ship not on the sea, or one on it with no captain of her own to keep a hull (package
+    84, step 9: aboard a ship with a hull he is made of her company, the world-orders
+    tests' ground); the player's own ship by her name is aboard, at the place said ("onto
+    the Amazon's quarterdeck"), and a place said in the words is honoured, never the cabin
+    by default."""
     from tests.test_brains import put
 
     w = world_for(ports=["falmouth"])
     put(w, "merchant brig", "britain", "49 30 N 5 50 W", "bound for Falmouth", name="Two Brothers")
     own = w.ship.name
     before = w.people.describe()
-    for text in (
-        'person: make "Captain Tregarthen", her master, aboard the Two Brothers, on the '
-        "quarterdeck",
-        'person: make "Mr Dunn", a waterman, on the quarterdeck of Cudlip\'s Boat',
-        'person: make "Capitaine Etcheverry", a privateer, aboard the Sainte-Barbe',
-        'person: make "Mr Coffin", master, onto the Lydia\'s quarterdeck',
+    for text, why in (
+        (
+            'person: make "Captain Tregarthen", her master, aboard the Two Brothers, on the '
+            "quarterdeck",
+            "no captain of her own",
+        ),
+        (
+            'person: make "Mr Dunn", a waterman, on the quarterdeck of Cudlip\'s Boat',
+            "No ship named",
+        ),
+        (
+            'person: make "Capitaine Etcheverry", a privateer, aboard the Sainte-Barbe',
+            "No ship named",
+        ),
+        ('person: make "Mr Coffin", master, onto the Lydia\'s quarterdeck', "No ship named"),
     ):
         e = w.world_order(text, "the test")
         assert e.data["result"] == "refused", e.text
-        assert "names another ship" in e.text and "nothing is made" in e.text, e.text
+        assert why in e.text, e.text
     assert w.people.describe() == before
     e = w.world_order(f'person: make "Mr Furtado", a pilot, onto the {own}\'s quarterdeck', "t")
     assert e.data["result"] == "done", e.text

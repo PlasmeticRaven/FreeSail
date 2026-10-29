@@ -1947,3 +1947,51 @@ reads the agents' records, so the doors are not touched. The converter for a che
 with `CrewedWorld`s stands as step 6 left it (`_adopt_old_crews`): the owner's eleven
 saves came as JSON without checkpoints, so the second test the design names waits for his
 folder; the hulls tests' old-shape writer is its proof meanwhile.
+
+### Step 9: the director's reach and the truth over the hulls
+
+Built on step 8 as merged, the lead's head `76eb22c` (package 79b's Channel east block on it)
+brought in at the boundary. **Built.** **The forms with a hull.** An `aboard` order names
+her at its head, `aboard the Raven: ...` or `aboard "Raven": ...` (`_HEAD` widened for the
+article's form; the followed hull when none is named): the thing found, made or moved, her
+purse and her hold, by her own names, the handler run with her façade as its world
+(`orders.hull_named`: the World for the player's ship by her name or "the ship", another
+ship's hull by her name or id, made in the far shape by `crews.station_world` when she has
+none, refused in words for a ship not on the sea or one with no captain of her own to keep a
+hull); her people's report is a line of her log and none of the player's, and the order's own
+line in the player's log names her (`aboard the Raven: ...`, with `ship` in its data). A
+person made `aboard the Raven` is made of her company by her names where package 68 refused
+the words (`_make_person` passes the order to her with the ship's phrase turned to
+`aboard[, in the <place>]`); `person: "X" comes aboard the Raven [as <station>]` moves a
+person of any company into her (his `hull` hers, her log's line, her station bound when
+named: `_comes_aboard_hull`, the person found across the one registry by
+`_person_anywhere`). `message: by a cutter from <port> from <whom> to the Raven: "..."`
+sends the cutter for her: the letter carries `to_hull`, the `to_ship` leg steers for her body
+(`Vessel._ship_target`) and within hail the letter comes aboard her
+(`Vessels._deliver_to_hulls`: the line in her log, her messenger, nothing in the player's).
+`say as` anywhere by spot was step 4's. **The rule of reach over the hulls**
+(`held_stations_everywhere`): a word said as a person of a held station on any hull, or his
+moving, is refused as the player's ship's would be; and the hearing's walk over the stations
+(`hearing.stations_everywhere`) is over `world.hulls`, each once, where a walk over the
+vessels' hulls would have counted the followed hull twice since step 7. **The truth** walks
+the hulls: every hull's row says whether she is awake or asleep and gives her purse, her cargo
+and her water; the persons ashore at every port, of every hull's company, are a list of their
+own (`ashore`); her people, guns and damage as before; the things of every hull as step 2
+left them (one registry). **`read_log(ship=)`**, the director's alone: another hull's log by
+her name, awake or asleep, from its start by default; refused in words at any other station
+and for a ship with no hull. **The seat at a person aboard any hull** (67's refusal lifted):
+`seats._resolve` finds him across the registry and the seat's target is his hull, his voice
+bound on her as `--ship` makes a station there. **The library** gains the hull forms as
+examples (`aboard the Harpy: a cask found stove`, `aboard the Harpy: a cask of brandy, in the
+hold`, `person: make "Mr Gill", ..., aboard the Harpy, in the cabin`, `message: by a cutter
+from Falmouth from the agent to the Harpy: "..."`), each performed by the forms test on its
+sea with the Harpy crewed.
+
+**Taken another way, with the reason.** The design's `message: ... to the Raven` is given
+for the cutter's form alone; a letter left at a port (`message: at <port>`) lies for
+whichever ship's boat comes, as before, since the port's letters are the port's. A `focus`
+tool is not made: `read_log(ship=)` is the reading the design asks for (§12b's ground) and
+the truth names every hull. The rule of reach for the hand (`ship "X": order`) stands as
+package 62 left it. A person made aboard a ship on the sea without a captain of her own is
+refused in her words (no hull to keep him), where package 68's words said "names another
+ship": the test of 68 is restated to the hull's refusal.

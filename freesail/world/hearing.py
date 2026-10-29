@@ -147,12 +147,12 @@ def stations_everywhere(world: Any) -> list[tuple[Any, Any]]:
     from freesail.agents.harness import _stations_held
 
     parent = getattr(world, "parent", None) or world
-    out = [(parent, h) for h in _stations_held(parent)]
-    for v in getattr(getattr(parent, "vessels", None), "vessels", None) or []:
-        crew = getattr(v, "crew", None)
-        if crew is not None and not getattr(v, "done", False):
-            out.extend((crew, h) for h in _stations_held(crew))
-    return out
+    hulls = list((getattr(parent, "hulls", None) or {}).values())
+    if not hulls:
+        return [(parent, h) for h in _stations_held(parent)]
+    # every hull once (package 84, step 9: the player's ship is a vessel of the sea too, so
+    # a walk over the vessels' hulls would count the followed hull twice)
+    return [(hull, h) for hull in hulls for h in _stations_held(hull)]
 
 
 def spot_words(world: Any, spot: Spot) -> str:

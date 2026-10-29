@@ -359,6 +359,7 @@ def read_log(
     severity: str = "routine",
     before_tick: int | None = None,
     count: int | None = None,
+    ship: str | None = None,
 ) -> dict[str, Any]:
     """The log from `since_tick` on, at `severity` or above. With no tick, from the
     station's last sample (package 31c; playtest 11's finding 4: a read with no tick
@@ -376,10 +377,24 @@ def read_log(
     else:
         since = int(since_tick)
     limit = READ_LOG_LIMIT if count is None else max(1, min(int(count), READ_LOG_MAX))
+    log = world.log
+    if ship:
+        # another hull's log, the director's reach (package 84, step 9; spec M7b §12b): by
+        # her name, awake or asleep; refused in words at any other station
+        from freesail.agents.agent import DIRECTOR
+        from freesail.world.orders import WorldOrderError, hull_named
+
+        if station != DIRECTOR:
+            return {"error": "the log of another ship is the director's to read (ship=)"}
+        try:
+            hull = hull_named(world, str(ship), make=False)
+        except WorldOrderError as e:
+            return {"error": f"{str(e).rstrip('.')}."}
+        log = hull.log
+        if since_tick is None and before_tick is None:
+            since = 0
     events = [
-        e
-        for e in world.log
-        if e.tick >= since and e.severity.rank >= sev.rank and not for_the_record(e)
+        e for e in log if e.tick >= since and e.severity.rank >= sev.rank and not for_the_record(e)
     ]  # decision 46: a world order as given is not a station's to read
     if before_tick is not None:
         events = [e for e in events if e.tick < int(before_tick)]
@@ -1330,6 +1345,8 @@ TOOLS: dict[str, Tool] = {
                 "further back than the newest lines)",
                 "count": "int, optional: how many lines, the newest of the range (default "
                 f"{READ_LOG_LIMIT}, at most {READ_LOG_MAX})",
+                "ship": "string, optional, the director's alone: another ship's log by her "
+                "name (a ship with a hull of her own, awake or asleep)",
             },
             read_log,
         ),
