@@ -1257,6 +1257,12 @@ is in (the papers, the captain's role, the wardroom) and who may buy of whom. 74
 the prize court, the prize's stores and captured powder as prize goods (the owner's ruling)
 on these, not beside them.
 
+**Found by package 75 (2026-10-29), for this package:** `combat/far.py:111` reads
+`spec.hull.length_m`, a key `HullSpec` has not (`length_waterline_m` is its), so every far
+ship's length is 0.0 and `combat/shot.py:167` floors her size at 0.5 whatever she is. The
+mend is one read, and it moves the far fight's pins: re-measure them where moved, old
+beside new, the cause this line.
+
 ## Package 79a: the regimes filled out and sourced (`data/regimes.yaml`, `data/nations.yaml` `naval:`; `freesail/world/regimes.py`, `freesail/world/business.py` the commission drawn; `data/weather/` only if Iberia's drift is taken; `docs/TechnicalSpec-M7.md` §22 as built; `docs/dev/TuningNotes.md`; `tests/test_business.py`, `test_nations.py`, `test_known_truths.py` truths 7-260 to 7-269)
 
 Opus. The first of 79's four packages (the owner's split of 2026-10-29), none of which waits
@@ -1888,7 +1894,10 @@ history; the owner's machine gives different digests from the build machine's (d
 gains a hull profile through the generator** (a dozen sourced points for the sheer, the
 stem, the stern, the wales and the port sills, beside the guns' `x_m` and `height_m` of 70),
 the existing seven ships included, so that package 81 draws real ports from data; the
-viewer itself stays at the current standard in this package. Spec M7 §27
+viewer draws each hull from it, toward hulls distinguishable and as near the sources as
+they allow (the lead's ruling of 2026-10-29 in the notes below; the owner's end goal,
+`docs/design/Build-Ships.md` §5.0); the ports, the guns, the flash and the smoke are
+package 81's. Spec M7 §27
 and §28 (the Bermuda sloop's description for later), §7 as built by 70 and extended by 86
 (the magazine by kind, the fits, the pivot gun with its arc to be made per gun), §8a's
 quarter bill, 73's marines' detachment and kit, 72's naval knobs, 71's colours and signals
@@ -2146,3 +2155,45 @@ block: row 3′'s equality (the model is the spanker to the physics) and the shi
 minutes, in `tests/test_driver.py` as proposed. B1 and B7 measure their own polars and
 balance at the flip, old beside new, as the addendum says. Go on: the stage-0 allowance,
 B3.5 after B3.1, B5's drawing, B1's flip at the 64's stage B.
+
+**2026-10-29, the hull's principles, design and order approved** (`85b5a2a` on
+`claude/pkg-75`: `Build-Ships.md` §5.0, §5.7, §3.5, §5.1 to §5.3, §5.6, §6, §2.6 and §19.2
+items 13 to 21; read whole). **1. The hull (item 13): approved.** The twelve principles are
+right, and the two that carry the weight are the ones the lead would have written: the
+drawing never changes how a ship sails or fights, and nothing is invented. The design holds
+to them in the code's shape, which is what the gate reads: eight optional shape keys after
+`port_size_m`, drawn only; `freesail/ship/form.py` pure, computing the drawn stations when
+`/api/ship` is served so that a rule's change moves no file; the guard that nothing under
+`physics/`, `combat/`, `crew/` or `world/` reads a shape key; no port triple ever written
+from the drawing and the lee port reading only stored triples; the two-way byte test at 0H;
+`HullProfile.__getstate__` leaving the new fields out while empty. The ladder of evidence
+with its one-word marks on every line, sourced points winning over the rule, a stand-in's
+departures recorded beside the file's figures and never moved, and the pair check that no
+two files draw alike unless listed as one class in two roles: all accepted as the method.
+It goes beyond the brief's dozen points, and the brief is amended (above) to say what it
+now says. **2. The owner's answers (items 14 to 18): recorded** as the design has them;
+the hull below the water and the close-up stay open for the owner's sheets. **3. The order
+(§2.6): approved.** B1's window stays open until the *Indefatigable* is whole, with the
+hull's form built and drawn first on her two files, held for the owner's first test; no
+later ship's window opens before it; the session brings the lead's head in before reporting
+her, and the lead merges her whole as each ship is merged. One leave the lead adds, for the
+drift's sake while 84's later steps rework `world/ships.py` and its kin: **the inert engine
+steps may be reported at their boundaries for merge before her** (0H with SW-2b.1, B3.1,
+B3.2, B3.5), each green on the fast tier and the touched files' slow tier with its byte
+test, so that the ships' branch and the lead's do not diverge for the length of her window;
+the lead merges them as the inert steps they are, and the pilot's test is of the whole
+tree. The session may take that leave or not. **4. Beside the pilot (item 20):** SW-1 runs
+beside the pilot under the stage 0 rule (the charge table serves the new ships alone if a
+figure of the eight would move; the two-way byte test the gate on its commit). SW-4 runs
+beside the pilot but for its rows in `world/ships.py`, which wait for B1's window to close
+and for 84's step 7, which reworks that file. **5. Package 81's boundary (item 19):**
+accepted as read: 75 draws no port, lid or opening, its stern lights plain marks; the
+ports, the guns, the flash and the smoke are 81's; the brief's stale line is replaced.
+**6. The far ship's length (item 21): confirmed and not 75's.** `combat/far.py:111` reads
+`spec.hull.length_m`, a key `HullSpec` has not (it has `length_waterline_m`), so every far
+ship's length is 0.0 and `shot.py:167` floors her size at 0.5 whatever she is; the mend
+moves the far fight's pins and belongs to package 74, the far fight's package, where it is
+booked with the old figures to be shown beside the new. **7. Stage A's two points** (the
+rail ending 0.8 m abaft the stem; the knee of the head carried in `stem_m` where the design
+gives it `head_m`): the session's refinement, checked against §5.1's form, as it says.
+Go on: stage 0H.
