@@ -612,7 +612,7 @@ failed, the lee-shore trial's container digest and truth 7-143 before the hail's
 alone after it); its pace tests on a worktree at `f99648d` and on the step's tree in turn
 under the container's floor on both, the step costing nothing the measure sees; the lead's
 fast tier of the touched files (seven files, none failed); **the whole suite on the merged
-tree `de36e0a` in the cloud (run 9, 39 minutes): green, every shard and the pace tests
+tree `de36e0a` in the cloud (run 9, 39 minutes; 4,256 passed over the six shards, 3 skipped, 11 expected failures, none failed; the pace tests 10 of 10 in 155 seconds): green, every shard and the pace tests
 passing; the shards' counts to be written in when read.** Step 7 stands merged green, the
 cap's order's retirement of the not-crewed states moving no recorded passage. **The step:**
 the player's ship is a vessel of the sea (`Vessels.own`,
@@ -686,8 +686,8 @@ sibling's fast tier whole 3,920 passed with the pictures' known flake the one fa
 slow tier of the known truths, the trials and the touched files 169 of 178 passed with eight
 left out by their marks and the lee-shore trial's container digest the one failure, its pace
 read in a three-way A/B against the step 7 head on the same hour's machine and within the
-head's own spread; the lead's run of the touched files; **the whole suite on the merged tree
-in the cloud (the figures below).** **The step:** the save and the replay of many hulls. The
+head's own spread; the lead's run of the touched files (with 79b's, 279 passed, none failed); **the whole suite on the merged tree
+in the cloud (run 11 on `76eb22c`, with 79b: lint green, 4,287 passed over the six shards, 3 skipped, 11 expected failures, none failed, 37 minutes; the pace job, informative, 7 of 10 with three under the floor at 452 to 491 ticks a second, read below).** **The step:** the save and the replay of many hulls. The
 hull on each input and act of a station on another ship (`ship`: her id; the followed hull's
 entries read as they did), given to her again by either road (the hull by id, or made in the
 far shape by `station_world` as a seat made her in play); the save's `hulls` block with every
@@ -714,7 +714,18 @@ README's count of works recounted to thirty-two); ruff clean; the builder's gate
 and the eleven recorded passages passing to their digests, its slow tests of the chart, the
 ports, the tide and the scenarios and truths 7-270 to 7-279 green, its fast tier on the
 final tree with the pictures' known flake the one failure; the lead's run of the touched
-files; **the whole suite on the merged tree in the cloud (the figures below).** **The block:**
+files (with step 8's, 279 passed, none failed); **the whole suite on the merged tree in the cloud (run 11 on
+`76eb22c`: green, the figures in step 8's record above).** **The pace job of runs 10 and 11, read:**
+run 9 on `de36e0a` passed its ten pace tests in 155 seconds; run 10 on `995d515` (79a alone)
+failed two at 458 and 478 in 279 seconds, and run 11 failed three at 452, 463 and 491 in 290
+seconds, the job as a whole near twice as long on the same tests, which is the runner's day
+and not the tree's: an A/B on the lead's machine, the three tests on `de36e0a`, `995d515` and
+`76eb22c` in turn, twice, had `de36e0a` and `76eb22c` pass both rounds and `995d515` fail once
+at 498 and 500 and pass once, every head at the floor's edge with the machine's noise and no
+head below another; the step 8 sibling's own three-way A/B against the step 7 head was within
+the head's spread. The pace job is informative by the workflow's design for this reason;
+nothing is re-pinned, and the next green pace job on a quiet runner closes the note.
+**The block:**
 the region `channel-east` from the Wight to Dunkirk, 49 to 51.5 N and 1 W to 2.5 E,
 abutting `channel-mid` at 1 W exactly; 57 level-2 and 73 level-3 tiles (13 MB: shallow
 water compresses well), six seam tiles kept `channel-mid`'s; eight harbour patches; 137
