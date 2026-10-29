@@ -50,17 +50,18 @@ on these packages; that is the owner's choice.
 | 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52) |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
-| 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue | behind 70 and 73 |
+| 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
-| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a merged 2026-10-29** (the record below); 79b launched 2026-10-29 as an Opus sibling session on `claude/pkg-79b`, its region built; 79c and 79d after them; the order 79a, 79b, 79c, 79d; none depends on 84 |
+| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); 79c and 79d after them, 79c beginning with its research pass; none depends on 84 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 7 merged 2026-10-28/29** (steps 1 and 2 at `d9dba1f`, steps 3 to 7 from the sibling's `claude/pkg-84` after it; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 8 merged 2026-10-28/29** (steps 1 and 2 at `d9dba1f`, steps 3 to 8 from the sibling's `claude/pkg-84` after it; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
 | 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | **merged 2026-10-28** (`cd97ce7`); the record below |
 | 87 | Fable | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief once most of the milestone's orders are in, after 73, 77 and 84 |
 | 88 | Fable | **The captain's pass of M7**: the commodore's recovery when aback with no way and no tack while the hands are at a shortening (the convoy's stall, 86's finding; truths 7-152 and 7-153 move with it); 57's offing's tack among islands with no room to wear (the station-gale trial's expected failure lifted); 72's near station law read against 58b's; the colours held once shown before an enemy (71's flicker, if 85 has not taken it) | after 84; to brief |
+| 89 | Opus | **The held gauges' water** (79b's finding): a held gauge enters the tide's blend for the positions within its own block's bounds alone, so that the Channel east's six, Biscay's, Portugal's and the islands' gauges give their water its own tide and no position west of 1 W reads anything new; the master's epitome's rises by the same water; the proof that no recorded passage's digest moves | briefed below (2026-10-29), for the owner's approval; independent of 84 |
 | 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
@@ -673,6 +674,73 @@ Mediterranean's nations:** the blockade book's westerly sector is Brest's for ev
 blockade as a frigate and a brig, the far body having no ship of the line until package 75's
 74. The launch prompt named a CLAUDE.md the repository does not have; the briefs' heads and
 the records served, and the next prompts will not name it.
+
+### Package 84, step 8, as merged (2026-10-29)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` at `4b312fe` (three commits over
+the lead's `de36e0a`: the step pushed in progress at the lead's word with the usage near its
+limit, the fast tier's figure, the step green; 9 files, 416 lines added and 35 removed; the
+tuning notes' conflict with 79a's section resolved by keeping both); ruff clean; the
+sibling's fast tier whole 3,920 passed with the pictures' known flake the one failure, its
+slow tier of the known truths, the trials and the touched files 169 of 178 passed with eight
+left out by their marks and the lee-shore trial's container digest the one failure, its pace
+read in a three-way A/B against the step 7 head on the same hour's machine and within the
+head's own spread; the lead's run of the touched files; **the whole suite on the merged tree
+in the cloud (the figures below).** **The step:** the save and the replay of many hulls. The
+hull on each input and act of a station on another ship (`ship`: her id; the followed hull's
+entries read as they did), given to her again by either road (the hull by id, or made in the
+far shape by `station_world` as a seat made her in play); the save's `hulls` block with every
+hull's stations, their journals, her book and her bindings; by the transcript a hull's block
+seated when her first station is due, by the acts her `seated` act makes her; every hull's
+stations in the replay's loop and taking up the game at its end; `transcripts_in` naming a
+hull's station as "raven/captain". **Found and mended, two:** no act of a station on a hull
+had been journaled since step 6, the façade answering a World class default over the
+instance's value so the harness took it for no journaling; and a sleeping hull's station
+order went by the far road before the acts' capture. Three tests new: a fake captain of a
+promoted hull and of a far hull replayed by both roads to the same digests of both logs; the
+owner's tender save loaded and replayed its first thousand ticks (another build's rules and
+no station in it, replayed from its journal with the words that say so). **Taken another
+way:** the doors untouched, the load's words already naming the stations a save holds; the
+converter for a checkpoint with crewed Worlds as step 6 left it. Nothing pinned moved.
+
+### Package 79b as merged (2026-10-29)
+
+Merged `--no-ff` from the Opus sibling session's `claude/pkg-79b` at `174d002` (six commits
+on the lead's `de36e0a`, five steps; 42 files beside the tiles, 132 tile, coast and index
+files all new and none of another region's touched; the tuning notes', the known truths' and
+the references README's conflicts with 79a's additions resolved by keeping both, the
+README's count of works recounted to thirty-two); ruff clean; the builder's gate selection
+and the eleven recorded passages passing to their digests, its slow tests of the chart, the
+ports, the tide and the scenarios and truths 7-270 to 7-279 green, its fast tier on the
+final tree with the pictures' known flake the one failure; the lead's run of the touched
+files; **the whole suite on the merged tree in the cloud (the figures below).** **The block:**
+the region `channel-east` from the Wight to Dunkirk, 49 to 51.5 N and 1 W to 2.5 E,
+abutting `channel-mid` at 1 W exactly; 57 level-2 and 73 level-3 tiles (13 MB: shallow
+water compresses well), six seam tiles kept `channel-mid`'s; eight harbour patches; 137
+marks from Faden 1793, Moore 1799, Norie 1805, White 1835 and Imray 1874, the lights dated
+so that 1805 sees what 1805 had, the Goodwin's five drying heads; eight port files
+(Portsmouth with the King's yard, Poole, the Downs with the Deal boatmen, Dover without the
+Admiralty harbour; the Havre, Boulogne, Calais and Dunkirk, French and hostile, the
+invasion flotilla and its batteries noted in their heads and not modelled), every one
+`datum: unverified` with no sheet read; the six TICON gauges read and **held**, the French
+mean levels SHOM's; eight stream areas by the directions and the block's box in the
+directions' limits; Norie 1805's Table XLI read from the page images for 27 places; the
+Channel's weather box to 2.5 E, the same rows; `data/scenarios/spithead.yaml` sailed at seed
+7 from the Downs through the Strait to St Helens for the night and Spithead at daylight, 28
+hours, with the book's lessons recorded; truths 7-270 to 7-279 as behaviours; the pilots'
+texts under `docs/references/pilots/` with their rows. No gauge of the eleven moved, no
+recorded passage's digest moved. **The lead's rulings on its findings:** (1) the world's tide
+over the block is the eleven's blend and wrong in its range (Newhaven's spring range 3.9 feet
+for the gauge's 19.5), the block's gauges held as every block's are: **the gauges' water is
+now the most pressing of the held decisions, since this block is the Channel itself, and is
+booked as package 89** (below), the rule that a held gauge serves the positions within its
+own block's bounds alone, so that no position west of 1 W reads anything new; (2) the spec's
+pointer under §28, the chart's section, is right (the brief's §26 was the lead's slip);
+(3) Portsmouth without an Ordnance block, the table being the practice-and-resupply
+design's eleven: a finding for the magazine's table, booked to 77 with its source (the Gun
+Wharf issuing at Spithead under the Regulations of 1806); (4) the modern ports land in the
+grid where 1805 had water or sand, no sheet read: a later package with Bellin's plans of
+the Havre and Dunkirk; (5) and (6) as the builder has them.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
@@ -1501,6 +1569,54 @@ The hard rules as every brief has them; `claude/pkg-79b`, pushed after each comm
 lead merges, rebuilding `channel-mid`'s index by hand only if a mark of this block lies in
 its bounds, as 39a's were. Runs after 79a or beside it (the two share no file but the
 nations' ports index, which the lead merges).
+
+## Package 89: the held gauges' water (`freesail/world/tide.py` the blend; `data/tides/constituents.yaml` the held gauges given their water; `data/tides/establishments.yaml` the rises by the same water; `docs/references/Tides.md`; `docs/dev/ChartBlocks.md` item 6 rewritten; `docs/TechnicalSpec-M7.md` §28 as built; `docs/dev/TuningNotes.md`; `tests/test_tide.py`, `test_known_truths.py` truths 7-280 to 7-284)
+
+Opus. Independent of 84 and of 75. The finding every chart block since 39a has carried and
+79b made pressing: the world's tide blends every gauge within `reach_nm` (400 miles) of a
+position, so a gauge added to `gauges:` enters the blend at Falmouth and moves every
+recorded passage's digest, and the blocks' gauges (Bournemouth and Portsmouth, Biscay
+north's nine, Vigo, Portugal's five, the islands' five, the Channel east's six) have been
+read, verified and **held** under `held_gauges:`, the world's tide over their water the
+eleven's blend and wrong: at Newhaven the world's spring range is 3.9 feet for the gauge's
+19.5, at Dieppe 5.3 for 27, at Beachy Head 4.8 for Norie's 20 (79b's tuning notes), over
+Biscay the Channel's tide (39b's), at Cape Trafalgar Le Conquet's eighteen feet (39f's). Read
+`docs/dev/ChartBlocks.md` item 6, `docs/references/Tides.md`, the tide module's head and the
+blocks' tuning notes on their gauges before anything.
+
+1. **The rule.** A held gauge serves the positions within its own block's bounds (the region
+   of `data/charts/manifest.yaml` its block names) and no position outside them; the eleven
+   serve as they do today everywhere. Within a block the blend is the eleven within reach
+   **and** the block's gauges, by the present weighting; outside it the eleven alone. So no
+   position in `channel-west` or west of 1 W in `channel-mid` reads anything new, and every
+   recorded passage's digest stands: that is the test, run first and last (the eleven
+   passage tests by name, `gate_5b` and `gate_5c`, the trials' digests, as 79b's notes list
+   them). Where the lead's rule would move a Channel-west or Channel-mid passage all the
+   same (a passage that reaches into a block), the package stops and says which and why,
+   with the old figure beside the new, and the lead rules; it does not re-pin.
+2. **The data.** `held_gauges:` becomes `gauges:` entries each with its `block:` (the region
+   id), the eleven with none; the loader refuses a held gauge without a block and a block
+   the manifest does not name; the form is otherwise the eleven's. Newhaven's mean level
+   stays null and is said unverified; nothing of the figures moves.
+3. **The epitome.** The master's table's `rise_judgement` places (the 37j rule: the world's
+   spring range at the place to the foot) read the same water, so a rise over a block is the
+   block's own; Norie's and Moore's given rises do not move. The tuning notes list each
+   place whose judged rise changes, old beside new.
+4. **The words.** `ChartBlocks.md` item 6 rewritten for the rule (a block's gauges go in
+   `gauges:` with their `block:`, verified, and the test that no recorded passage moves is
+   the block's); `Tides.md`; spec §28 as built. Nothing a reading says changes in its form.
+5. **Truths 7-280 to 7-284:** the world's spring range at Newhaven, Dieppe and Beachy Head
+   within a foot of the gauge's and Norie's; at Vigo and Cadiz within a foot of their
+   gauges'; a position a mile west of 1 W in `channel-mid` reading the same tide to the
+   centimetre as before the package, and one a mile east reading the block's; every
+   recorded passage's digest unchanged (the eleven and the gate's two, by name); the pace of
+   the tide's blend unchanged within the measure (the blend adds a membership, not a gauge).
+6. **The suites:** the fast tier whole on the final tree; `test_tide.py`, `test_chart.py`,
+   `test_scenarios.py` and the recorded passages in the slow tier; the whole suite is the
+   lead's in the cloud at the merge.
+
+The hard rules as every brief has them; `claude/pkg-89`, pushed after each commit; the lead
+merges. No CLAUDE.md is in the repository: the briefs' heads and the records serve.
 
 ## Package 82: the boat as a vessel, and the player aboard another ship (`freesail/core/world.py`, `ui/console.py`, `ui/server.py`, the drivers: the followed ship; `freesail/world/crews.py`, `ships.py`, `people.py`, `places.py`, `stations.py`, `seats.py`, `orders.py` a person aboard another ship and the seat that follows him; `freesail/core/replay.py` the station on another ship replayed; `freesail/physics/` an oar force on a hull (new, by the brief's leave); `freesail/evolutions/` the boat's orders and the tow; `data/ships/boat-*.yaml` through `tools/gen_ships.py`; `freesail/world/movement.py`, `ports.py` the boat's errands as they are; `freesail/api/readings.py` the readings following the person; `freesail/agents/harness.py`, `director.py`, `data/director/`; the viewer (`client/`) drawing the boat; `docs/TechnicalSpec-M7b.md` §11, §12, §21k as built; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7b-113, 7b-114 and the M7 numbers after 73's)
 
