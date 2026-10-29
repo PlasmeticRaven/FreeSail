@@ -856,6 +856,7 @@ MID = "channel-mid"  # package 39a
 EAST = "channel-east"  # package 79b
 GULF = "gulf-of-lion"  # package 79d
 LIGURIAN = "ligurian-sea"  # package 79d
+TYRRHENIAN = "tyrrhenian"  # package 79d
 # The corridor's budget (spec M6 §26: "some 11 MB raw, half that compressed"; with the
 # distance field the tiles compress to under 6 MB, measured in package 38).
 CORRIDOR_BUDGET_BYTES = 8 * 1024 * 1024
@@ -895,7 +896,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     regions += ["portugal"]  # package 39d
     regions += ISLANDS  # package 39e: the islands after the coast's blocks
     regions += ["strait"]  # package 39f
-    regions += [GULF, LIGURIAN]  # package 79d: the Mediterranean's north after the Strait
+    regions += [GULF, LIGURIAN, TYRRHENIAN]  # package 79d: the Mediterranean after the Strait
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
     assert whole.region == whole.name == WHOLE and whole.regions == regions
@@ -903,10 +904,10 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # the envelope of the regions and the corridor: Biscay north reaches 0.9 W for
     # Rochefort on the Charente (package 39b), the Western Islands 31.5 W (package 39e;
     # 32 W with the corridor widened to them); the Channel's east block 51.5 N and 2.5 E
-    # (package 79b), across the meridian; the Ligurian sea's block 11 E (package 79d)
+    # (package 79b), across the meridian; the Tyrrhenian's block 15.5 E (package 79d)
     west = min(-31.5, float(manifest["corridors"][CORRIDOR]["bounds"]["west"]))
-    assert whole.bounds == (32.0, 51.5, west, 11.0)
-    assert whole.bounds_words() == f"32 to 51.5 N, {abs(west):g} W to 11 E"
+    assert whole.bounds == (32.0, 51.5, west, 15.5)
+    assert whole.bounds_words() == f"32 to 51.5 N, {abs(west):g} W to 15.5 E"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None
@@ -921,6 +922,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     east = load_chart(EAST)  # package 79b
     gulf = load_chart(GULF)  # package 79d
     ligurian = load_chart(LIGURIAN)
+    tyrrhenian = load_chart(TYRRHENIAN)
     assert whole.features.keys() == (
         chart.features.keys()
         | mid.features.keys()
@@ -932,6 +934,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         | east.features.keys()
         | gulf.features.keys()
         | ligurian.features.keys()
+        | tyrrhenian.features.keys()
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
@@ -942,6 +945,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     assert all(whole.region_of[fid] == EAST for fid in east.features)  # package 79b
     assert all(whole.region_of[fid] == GULF for fid in gulf.features)  # package 79d
     assert all(whole.region_of[fid] == LIGURIAN for fid in ligurian.features)
+    assert all(whole.region_of[fid] == TYRRHENIAN for fid in tyrrhenian.features)
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
@@ -956,6 +960,7 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         + len(east.coast_lines())
         + len(gulf.coast_lines())
         + len(ligurian.coast_lines())
+        + len(tyrrhenian.coast_lines())
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor

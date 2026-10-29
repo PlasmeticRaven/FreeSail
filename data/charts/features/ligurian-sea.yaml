@@ -63,9 +63,10 @@
 # mole-head fire are `from` 1826, the earliest record read, UNVERIFIED (for the lead: the
 # builder's memory has Porto Ferrajo's of 1788). `range_nm` is the period lamp's, from the pilot's leagues or JUDGEMENT.
 #
-# Not here: Monte Argentario, Port Ercole and Giannutri, east of 11 E, are the Tyrrhenian's
-# (the region `tyrrhenian`, built after this one), as is Sardinia south of 40.99 N (Monte
-# Limbara among it); west of 7.73 E the region `gulf-of-lion`'s.
+# Not here: Monte Argentario and Port Ercole, east of 11.15 E, are the Tyrrhenian's (the
+# region `tyrrhenian`), as is Sardinia south of 40.99 N (Monte Limbara among it); west of
+# 7.73 E the region `gulf-of-lion`'s. Porto Santo Stefano and Giannutri (11.10 to 11.12 E)
+# lie in this block's tiles east of its bounds and are given by neither file (a later pass).
 
 region: ligurian-sea
 features:

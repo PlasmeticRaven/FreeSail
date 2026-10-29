@@ -1,0 +1,116 @@
+# FreeSail: Naples as a port (package 79d, the Tyrrhenian's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The road, the mole and the marks are
+# features/tyrrhenian.yaml's (the harbour patch naples).
+#
+# Sources. Michelot 1709, pp. 113 and 121 (his survey of the gulf made in 1701): the high
+# brick tower with its great lantern at the elbow of the mole, lit at night. Michelot 1715,
+# p. 78: men of war anchor S S E of the lanthorn a mile off. Purdy 1826, pp. 109 to 111:
+# the city's splendid churches, palaces and castles toward the sea; Mr Smith's marks of
+# 1818, St Elmo on with the light-house and Posilipo a sail's breadth open south of the
+# Castle dell'Ovo, in 18 to 14 fathoms, mud and clay; wood and water in any quantity, the
+# water in the mole from pipes; fresh beef and wine in plenty. Smyth 1854, p. 178: the
+# tide-hour 11h 20m, with his doubt. James 1837, vol. 4, p. 121: the Anglo-Russian landing
+# of 20 November 1805.
+#
+# The stance. The capital of the Two Sicilies: the King of Naples', neutral by the treaty of 1801 with France until the French occupation of 1806: neutral to a King's ship, to an American and to a Frenchman, open to his own; the King's
+# arsenal a yard. The modern port's works are the grid's: the road is laid off the old
+# mole. No period sheet read: `datum: unverified`. Prices JUDGEMENT, in sterling.
+
+id: naples
+name: Naples
+nation: naples
+source: "Michelot 1709 pp. 113, 121; Michelot 1715 p. 78; Purdy 1826 pp. 109-111; Smyth 1854 p. 178"
+datum: unverified   # no period sheet read; no published level read for the Italian gauge
+
+outer_road:
+  feature: naples-road
+  name: the road of Naples
+  lat_deg: 40.8289
+  lon_deg: 14.2638
+  depth_fathoms: 16
+anchorage:
+  feature: naples-road
+  name: the road of Naples
+  lat_deg: 40.8289
+  lon_deg: 14.2638
+  depth_fathoms: 16
+mooring:
+  name: within the mole
+  lat_deg: 40.8350     # the grid's 3 m within the mole (judgement)
+  lon_deg: 14.2587
+  depth_fathoms: 4
+  bottom: mud
+shore:
+  feature: naples
+  name: the mole of Naples
+  lat_deg: 40.8480
+  lon_deg: 14.2560
+
+pilot:
+  station: naples-road
+  cruising_nm: 6                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Naples felucca
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Esposito, Russo, Coppola, Starace, Iovine, Scotto, Lauro, Aprea]   # Neapolitan names: judgement
+  skill: 0.85
+  fee_pounds: 3                  # judgement, in sterling; unverified
+  cast: starboard                 # judgement
+  course_out_deg: 200            # out of the bay to the south-south-westward between Capri and Ischia
+  words:
+    channel: "Come in between Capri and Ischia, the bay clean and deep; bring the lantern north-north-west and steer for it with the lead going."
+    marks: "Vesuvius smoking by day and burning by night to the east; St Elmo on its hill over the city; the lantern on its high tower at the elbow of the mole; the Castle dell'Ovo on its rock; Posilipo point to the west."
+    anchorage: "Anchor with St Elmo on with the lantern and Posilipo a sail's breadth open south of the Castle dell'Ovo, in fourteen to eighteen fathoms, mud and clay; men of war lie a mile south-south-east of the lantern. A south-wester sends in a great swell."
+    tide: "It is high water about twenty minutes after eleven at full and change, and the water rises a foot or two at most."
+
+tide:
+  establishment: Naples
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 21, origin: naples, note: "the place's own; the country's; judgement"}
+    - {good: olive oil, price: 42, origin: naples, note: "the place's own; the country's; judgement"}
+    - {good: brandy, price: 80, origin: naples, note: "judgement"}
+    - {good: salt, price: 10, origin: naples, note: "judgement"}
+    - {good: salt fish, price: 34, origin: naples, note: "brought in; anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: naples, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: naples, note: "judgement"}
+    - {good: hemp, price: 52, origin: null, note: "brought in; judgement"}
+    - {good: timber, price: 10, origin: naples, note: "brought in; judgement"}
+    - {good: silk, price: 210, origin: naples, note: "the place's own; raw silk; judgement"}
+    - {good: oranges, price: 4.2, origin: naples, note: "the place's own; the season's; judgement"}
+    - {good: lemons, price: 6, origin: naples, note: "judgement"}
+    - {good: fresh beef, price: 30, origin: naples, note: "judgement"}
+    - {good: vegetables, price: 4, origin: naples, note: "judgement"}
+
+dockyard:
+  kind: yard                 # the King of Naples' arsenal
+  items:
+    - {item: topmast, hours: 8, pounds: 46, note: "judgement"}
+    - {item: topgallant_mast, hours: 4, pounds: 15}
+    - {item: yard, hours: 6, pounds: 27}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1, note: "the water in the mole from pipes (Purdy 1826, p. 110)"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: Neapolitan seamen; the King's navy idle in port
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [naples-road, 40 45 N 14 12 E]
+  from_sea: [40 45 N 14 12 E, naples-road]
+  in: [naples-road]

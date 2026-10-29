@@ -74,18 +74,18 @@ market:
   currency: pounds
   goods:
     - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
-    - {good: olive oil, price: 60, origin: france, note: "the country's; judgement"}
-    - {good: brandy, price: 80, origin: france, note: "judgement"}
+    - {good: olive oil, price: 42, origin: france, note: "the place's own; the country's; judgement"}
+    - {good: brandy, price: 56, origin: france, note: "the place's own; judgement"}
     - {good: salt, price: 10, origin: france, note: "judgement"}
     - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
     - {good: biscuit, price: 22, origin: france, note: "judgement"}
     - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
     - {good: canvas, price: 46, origin: france, note: "judgement"}
-    - {good: hemp, price: 40, origin: null, note: "judgement"}
-    - {good: timber, price: 8, origin: france, note: "judgement"}
-    - {good: soap, price: 40, origin: france, note: "Marseille's; judgement"}
+    - {good: hemp, price: 52, origin: null, note: "brought in; judgement"}
+    - {good: timber, price: 10, origin: france, note: "brought in; judgement"}
+    - {good: soap, price: 28, origin: france, note: "the place's own; Marseille's; judgement"}
     - {good: silk, price: 300, origin: france, note: "raw silk; judgement"}
-    - {good: almonds, price: 30, origin: france, note: "judgement"}
+    - {good: almonds, price: 21, origin: france, note: "the place's own; judgement"}
     - {good: figs, price: 18, origin: france, note: "judgement"}
 
 dockyard:

@@ -1,0 +1,110 @@
+# FreeSail: Civita Vecchia as a port (package 79d, the Tyrrhenian's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The port, the road and the marks are
+# features/tyrrhenian.yaml's (the harbour patch civita-vecchia).
+#
+# Sources. Michelot 1709, pp. 107 to 108: the town the Pope's, fortified with good walls
+# and ditches, half-moons and other works; the light-tower on the new mole; anchor N W of
+# the mole-head two or three cables off in ten to twelve fathoms by night. Purdy 1826,
+# p. 99: the two towers enclose the port; in at either entrance in mid-channel, 17 feet in
+# the north, 30 in the south; ships anchor in the new mole or the middle of the port in 16 or
+# 18 feet, sheltered from all winds; the basin shut with a chain. Norie 1831, pp. 96 to 97:
+# an arsenal and a light-house, 10,000 people, the water impure.
+#
+# The stance. The Papal state's port: neutral to a King's ship, to an American and to a
+# Frenchman, open to the Pope's own. The modern port's works are the grid's: the road is
+# laid south-west of the old mole. No period sheet read: `datum: unverified`. Prices
+# JUDGEMENT, in sterling.
+
+id: civita-vecchia
+name: Civita Vecchia
+nation: papal-state
+source: "Michelot 1709 pp. 107-108; Purdy 1826 p. 99; Norie 1831 pp. 96-97"
+datum: unverified   # no period sheet read; no published level read for the Italian gauge
+
+outer_road:
+  feature: civita-vecchia-road
+  name: the road without the mole of Civita Vecchia
+  lat_deg: 42.0880
+  lon_deg: 11.7800
+  depth_fathoms: 11
+anchorage:
+  feature: civita-vecchia-port
+  name: the port of Civita Vecchia
+  lat_deg: 42.0937
+  lon_deg: 11.7840
+  depth_fathoms: 3
+mooring:
+  feature: civita-vecchia-port
+  name: within the new mole
+  lat_deg: 42.0937
+  lon_deg: 11.7840
+  depth_fathoms: 3
+shore:
+  feature: civita-vecchia
+  name: the quay of Civita Vecchia
+  lat_deg: 42.0945
+  lon_deg: 11.7990
+
+pilot:
+  station: civita-vecchia-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Civita Vecchia felucca
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Mastrangeli, Rossi, Calisse, Bruschi, Pucci, Ceccarelli, Fumi, Tolfa]   # Roman names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: larboard                 # judgement
+  course_out_deg: 240            # out by the south entrance to the south-westward
+  words:
+    channel: "Run in at either entrance in mid-channel, or rather nearer the new mole: seventeen feet in the north entrance, above thirty in the south."
+    marks: "The light-tower on the new mole and the town raised together coming in from Cape Linaro; the castle at the port's head; Monte Argentario, Giannutri and Corneto from the west."
+    anchorage: "Anchor in the new mole or the middle of the port in sixteen or eighteen feet, mud and weed, sheltered from all winds, though a south-west gale breaks over the mole. By night, if you cannot get in, lie north-west of the mole-head three or four cables off in nine to twelve fathoms."
+    tide: "There is no tide to speak of."
+
+tide:
+  establishment: Naples
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 39, origin: papal-state, note: "brought in; the country's; judgement"}
+    - {good: olive oil, price: 78, origin: papal-state, note: "brought in; the country's; judgement"}
+    - {good: salt, price: 7, origin: papal-state, note: "the place's own; judgement"}
+    - {good: salt fish, price: 26, origin: papal-state, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: papal-state, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: papal-state, note: "judgement"}
+    - {good: timber, price: 8, origin: papal-state, note: "judgement"}
+    - {good: wheat, price: 18, origin: papal-state, note: "the place's own; the quarter's price in sterling; judgement"}
+    - {good: cheese, price: 35, origin: papal-state, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # the Pope's arsenal of galleys and the town's chandlers
+  items:
+    - {item: topmast, hours: 14, pounds: 50, note: "judgement"}
+    - {item: topgallant_mast, hours: 7, pounds: 16}
+    - {item: yard, hours: 12, pounds: 30}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 25, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "impure, from the aqueduct (Norie 1831, p. 97)"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the galleys' seamen
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 5, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [civita-vecchia-port, civita-vecchia-road, 42 03 N 11 42 E]
+  from_sea: [42 03 N 11 42 E, civita-vecchia-road, civita-vecchia-port]
+  in: [civita-vecchia-port]

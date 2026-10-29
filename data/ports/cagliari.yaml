@@ -1,0 +1,112 @@
+# FreeSail: Cagliari as a port (package 79d, the Tyrrhenian's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The road and the marks are
+# features/tyrrhenian.yaml's (the harbour patch cagliari).
+#
+# Sources. Smyth 1828, pp. 205 to 207: the castle on its hill, the Marina down to the sea,
+# about thirty churches and 26,000 people; ships lie about a mile S W by S from the mole in
+# six or eight fathoms on an excellent bottom of mud; the north and north-west winds off the
+# land the most frequent and violent, and the sea never blows home; provisions cheap but
+# water so scarce it is sold at the doors, so that ships go or send to Pula for it. Purdy
+# 1826, pp. 83 to 86: the road W S W of the city; the shoal midway between Cape Savora and
+# the city's west side, the city bearing N E by N leading clear. James 1837, vol. 3, pp. 338
+# to 340: Nelson's fleet at Pula and in the gulf of Palmas, February to April 1805.
+#
+# The stance. The King of Sardinia's capital, his court here since 1799: the King of Sardinia's, at peace with Britain and France: neutral to a King's ship and to an American, open to his own.
+# The darsena is the grid's land at its sixteenth of a minute: the mooring is laid off the
+# mole. No period sheet read: `datum: unverified`. Prices JUDGEMENT, in sterling.
+
+id: cagliari
+name: Cagliari
+nation: sardinia
+source: "Smyth 1828 pp. 205-207; Purdy 1826 pp. 83-86; James 1837 vol. 3 pp. 338-340"
+datum: unverified   # no period sheet read; no published level read for the Italian gauge
+
+outer_road:
+  feature: cagliari-road
+  name: the road of Cagliari
+  lat_deg: 39.1937
+  lon_deg: 9.1035
+  depth_fathoms: 7
+anchorage:
+  feature: cagliari-road
+  name: the road of Cagliari
+  lat_deg: 39.1937
+  lon_deg: 9.1035
+  depth_fathoms: 7
+mooring:
+  name: off the mole
+  lat_deg: 39.1977     # the grid's 3 m: the darsena is its land (judgement)
+  lon_deg: 9.1028
+  depth_fathoms: 3
+  bottom: mud
+shore:
+  feature: cagliari
+  name: the Marina of Cagliari
+  lat_deg: 39.2150
+  lon_deg: 9.1110
+
+pilot:
+  station: cagliari-road
+  cruising_nm: 5                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Cagliari boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Porcu, Melis, Pinna, Serra, Sanna, Piras, Deidda, Murru]   # Sardinian names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: larboard                 # judgement
+  course_out_deg: 200            # out of the gulf to the south-south-westward
+  words:
+    channel: "Coming from the westward keep in twenty to eight fathoms and give the shoal between Cape Savora and the city a berth: the city bearing north-east by north leads clear of it. The gulf is easy of access from Cape Carbonara to Pula."
+    marks: "The castle and the Marina on their hill, with many steeples; Cape St Elias and its tower east of the town; Cape Carbonara at the gulf's east horn and the mountains of the Seven Brothers behind."
+    anchorage: "Lie about a mile south-west by south from the mole in six or eight fathoms on an excellent bottom of mud. The north and north-west winds blow hard off the land; the sea never blows home."
+    tide: "There is no tide to speak of; water is scarce in the town, and the fleets send to Pula for it."
+
+tide:
+  establishment: Naples
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: sardinia, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: sardinia, note: "the country's; judgement"}
+    - {good: salt, price: 7, origin: sardinia, note: "the place's own; judgement"}
+    - {good: salt fish, price: 18, origin: sardinia, note: "the place's own; anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: sardinia, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 60, origin: sardinia, note: "brought in; judgement"}
+    - {good: timber, price: 10, origin: sardinia, note: "brought in; judgement"}
+    - {good: wheat, price: 18, origin: sardinia, note: "the place's own; the quarter's price in sterling; judgement"}
+    - {good: cheese, price: 24, origin: sardinia, note: "the place's own; judgement"}
+    - {good: cattle, price: 9, origin: sardinia, note: "the head; judgement"}
+    - {good: fresh beef, price: 30, origin: sardinia, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # the King's few galleys' stores and the town's chandlers
+  items:
+    - {item: topmast, hours: 14, pounds: 50, note: "judgement"}
+    - {item: topgallant_mast, hours: 7, pounds: 16}
+    - {item: yard, hours: 12, pounds: 30}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 25, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.6, pounds_per_ton: 0.1, note: "scarce: sold at the doors; the fleets water at Pula (Smyth 1828, p. 206)"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: Sardinian and Genoese seamen of the coasting trade
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 5, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [cagliari-road, 39 05 N 9 05 E]
+  from_sea: [39 05 N 9 05 E, cagliari-road]
+  in: [cagliari-road]

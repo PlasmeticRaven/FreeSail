@@ -861,3 +861,84 @@ held_gauges:
     M2: {amplitude_m: 0.104, phase_deg: 227.6}
     S2: {amplitude_m: 0.038, phase_deg: 250.4}
     N2: {amplitude_m: 0.022, phase_deg: 212.5}
+
+  # THE GAUGES OF THE TYRRHENIAN'S BLOCK, READ AND HELD (package 79d, the region
+  # `tyrrhenian`): TICON's file read by its coordinates over the block's box (38.5 to
+  # 42.5 N, 8 to 15.5 E, less the Ligurian sea's tiles north of 40.99 N and west of
+  # 11.15 E), the same file: eight stations, one record each, ISPRA's (idromare) series in
+  # GESLA-2; their mean levels unread (null). Ortona is the Adriatic's, on the block's north-
+  # eastern shore, its tide another sea's (the phase opposite the Tyrrhenian's): read and
+  # held with the rest, said so. HELD, as the Gulf's: the world's tide over the block is
+  # Le Conquet's alone; blended they would move no recorded passage.
+  - id: carloforte
+    name: Carloforte (San Pietro)
+    lat_deg: 39.1480
+    lon_deg: 8.3095
+    record: "GESLA-2, ISPRA (idromare), 1988 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.065, phase_deg: 232.5}
+    S2: {amplitude_m: 0.026, phase_deg: 254.3}
+    N2: {amplitude_m: 0.013, phase_deg: 220.8}
+  - id: cagliari
+    name: Cagliari
+    lat_deg: 39.2102
+    lon_deg: 9.1143
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.081, phase_deg: 244.2}
+    S2: {amplitude_m: 0.029, phase_deg: 268.7}
+    N2: {amplitude_m: 0.017, phase_deg: 229.2}
+  - id: porto-torres
+    name: Porto Torres
+    lat_deg: 40.8422
+    lon_deg: 8.4039
+    record: "GESLA-2, ISPRA (idromare), 1985 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.066, phase_deg: 252.3}
+    S2: {amplitude_m: 0.026, phase_deg: 273.2}
+    N2: {amplitude_m: 0.014, phase_deg: 243.3}
+  - id: civita-vecchia
+    name: Civita Vecchia
+    lat_deg: 42.0937
+    lon_deg: 11.7897
+    record: "GESLA-2, ISPRA (idromare), 2000 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.102, phase_deg: 236.0}
+    S2: {amplitude_m: 0.038, phase_deg: 254.2}
+    N2: {amplitude_m: 0.021, phase_deg: 223.5}
+  - id: naples
+    name: Naples
+    lat_deg: 40.8409
+    lon_deg: 14.2693
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.113, phase_deg: 244.4}
+    S2: {amplitude_m: 0.042, phase_deg: 265.6}
+    N2: {amplitude_m: 0.023, phase_deg: 230.6}
+  - id: salerno
+    name: Salerno
+    lat_deg: 40.6722
+    lon_deg: 14.7677
+    record: "GESLA-2, ISPRA (idromare), 1991 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.118, phase_deg: 235.4}
+    S2: {amplitude_m: 0.043, phase_deg: 255.6}
+    N2: {amplitude_m: 0.024, phase_deg: 222.3}
+  - id: palinuro
+    name: Palinuro
+    lat_deg: 40.0315
+    lon_deg: 15.2751
+    record: "GESLA-2, ISPRA (idromare), 1987 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.110, phase_deg: 244.7}
+    S2: {amplitude_m: 0.041, phase_deg: 265.6}
+    N2: {amplitude_m: 0.022, phase_deg: 230.5}
+  - id: ortona
+    name: Ortona (the Adriatic)
+    lat_deg: 42.3560
+    lon_deg: 14.4149
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.066, phase_deg: 68.3}
+    S2: {amplitude_m: 0.047, phase_deg: 77.5}
+    N2: {amplitude_m: 0.010, phase_deg: 65.0}

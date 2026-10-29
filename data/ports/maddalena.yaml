@@ -77,18 +77,18 @@ tide:
 market:
   currency: pounds
   goods:
-    - {good: wine, price: 30, origin: sardinia, note: "the country's; judgement"}
+    - {good: wine, price: 39, origin: sardinia, note: "brought in; the country's; judgement"}
     - {good: olive oil, price: 60, origin: sardinia, note: "the country's; judgement"}
     - {good: salt, price: 10, origin: sardinia, note: "judgement"}
     - {good: salt fish, price: 26, origin: sardinia, note: "anchovies and tunny, the coast's; judgement"}
-    - {good: biscuit, price: 22, origin: sardinia, note: "judgement"}
+    - {good: biscuit, price: 29, origin: sardinia, note: "brought in; judgement"}
     - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
-    - {good: canvas, price: 46, origin: sardinia, note: "judgement"}
+    - {good: canvas, price: 60, origin: sardinia, note: "brought in; judgement"}
     - {good: timber, price: 8, origin: sardinia, note: "judgement"}
-    - {good: cattle, price: 9, origin: sardinia, note: "the head; judgement"}
-    - {good: fresh beef, price: 30, origin: sardinia, note: "judgement"}
+    - {good: cattle, price: 6.3, origin: sardinia, note: "the place's own; the head; judgement"}
+    - {good: fresh beef, price: 21, origin: sardinia, note: "the place's own; judgement"}
     - {good: vegetables, price: 4, origin: sardinia, note: "judgement"}
-    - {good: cheese, price: 35, origin: sardinia, note: "judgement"}
+    - {good: cheese, price: 24, origin: sardinia, note: "the place's own; judgement"}
 
 dockyard:
   kind: chandlers                 # no yard: the islanders' boats and what the fleet's victuallers brought

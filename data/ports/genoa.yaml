@@ -82,8 +82,8 @@ tide:
 market:
   currency: pounds
   goods:
-    - {good: wine, price: 30, origin: liguria, note: "the country's; judgement"}
-    - {good: olive oil, price: 60, origin: liguria, note: "the country's; judgement"}
+    - {good: wine, price: 39, origin: liguria, note: "brought in; the country's; judgement"}
+    - {good: olive oil, price: 42, origin: liguria, note: "the place's own; the country's; judgement"}
     - {good: brandy, price: 80, origin: liguria, note: "judgement"}
     - {good: salt, price: 10, origin: liguria, note: "judgement"}
     - {good: salt fish, price: 26, origin: liguria, note: "anchovies and tunny, the coast's; judgement"}
@@ -91,10 +91,10 @@ market:
     - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
     - {good: canvas, price: 46, origin: liguria, note: "judgement"}
     - {good: hemp, price: 40, origin: null, note: "judgement"}
-    - {good: timber, price: 8, origin: liguria, note: "judgement"}
-    - {good: silk, price: 300, origin: liguria, note: "raw silk; judgement"}
-    - {good: lemons, price: 6, origin: liguria, note: "judgement"}
-    - {good: cheese, price: 35, origin: liguria, note: "judgement"}
+    - {good: timber, price: 10, origin: liguria, note: "brought in; judgement"}
+    - {good: silk, price: 210, origin: liguria, note: "the place's own; raw silk; judgement"}
+    - {good: lemons, price: 4.2, origin: liguria, note: "the place's own; judgement"}
+    - {good: cheese, price: 46, origin: liguria, note: "brought in; judgement"}
 
 dockyard:
   kind: yard                 # the darsena, where the Genois, 74, was building for France (James vol. 3 p. 176)

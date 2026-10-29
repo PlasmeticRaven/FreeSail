@@ -499,6 +499,31 @@ REGIONS: dict[str, dict[str, Any]] = {
         # as gulf-of-lion's (the fetch box the first build's, which covers the tiles whole)
         "fill_to_chart_datum": True,
     },
+    # package 79d: the Tyrrhenian, Sardinia south of 40.99 N, the Roman coast from Monte
+    # Argentario by Civita Vecchia and the Tiber to Gaeta and the Pontine islands, the bay of
+    # Naples and south to Cape Palinuro. The level-2 tiles that meet the bounds span 38.43 to
+    # 42.69 N and 7.73 to 15.84 E (190 tiles, 19 columns by 10 rows); the 32 of them north of
+    # the row edge 40.99 N and west of the column edge 11.15 E are `ligurian-sea`'s (the
+    # Maddalena, Corsica's south, Elba and the Tuscan coast), kept so by the seam rule ("32
+    # kept"): the boundary between the two regions. The north-east corner reaches the
+    # Adriatic's shore about Ortona and Pescara, a later block's water in this block's tiles;
+    # the south row (38.43 to 38.85 N) holds the sea north of the Lipari islands, which with
+    # Sicily and the Strait of Messina are a later block.
+    "tyrrhenian": {
+        "title": "The Tyrrhenian, Sardinia, Civita Vecchia, Gaeta and the bay of Naples",
+        "bounds": {"south": 38.5, "north": 42.5, "west": 8.0, "east": 15.5},
+        "fetch": {"south": 38.3, "north": 42.85, "west": 7.6, "east": 16.0},
+        "harbours": {
+            "cagliari": {"south": 39.14, "north": 39.23, "west": 9.05, "east": 9.18},
+            "alghero": {"south": 40.53, "north": 40.62, "west": 8.18, "east": 8.33},
+            "civita-vecchia": {"south": 42.06, "north": 42.11, "west": 11.75, "east": 11.81},
+            "gaeta": {"south": 41.19, "north": 41.24, "west": 13.54, "east": 13.61},
+            "naples": {"south": 40.78, "north": 40.87, "west": 14.17, "east": 14.30},
+            "ponza": {"south": 40.88, "north": 40.93, "west": 12.93, "east": 12.98},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -525,7 +550,7 @@ CORRIDORS: dict[str, dict[str, Any]] = {
 # a block adds its region here when its tiles are built (docs/dev/ChartBlocks.md).
 CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
-        "title": "The Channel, Biscay, Iberia, Madeira, the Strait and the Gulf of Lion",
+        "title": "The Channel, Biscay, Iberia, the Strait, the Gulf of Lion and the Tyrrhenian",
         "regions": [
             "channel-west",
             "channel-mid",
@@ -542,6 +567,7 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 79d: the Gulf of Lion and the Tyrrhenian, the Mediterranean's north
             "gulf-of-lion",
             "ligurian-sea",
+            "tyrrhenian",
         ],
         "corridor": "atlantic-corridor",
     },

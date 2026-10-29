@@ -1,0 +1,108 @@
+# FreeSail: Alghero as a port (package 79d, the Tyrrhenian's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The road and the marks are
+# features/tyrrhenian.yaml's (the harbour patch alghero).
+#
+# Sources. Smyth 1828, pp. 280 to 282: the approach shallow some distance out, its outer
+# extreme marked by the Maddalena rock with its ruined chapel N W of the town; to the S W
+# of it a tolerable summer anchorage in ten to fifteen fathoms, good holding ground, seldom
+# used by cruisers; the town walled on a low rocky point, its mole and landing-place on the
+# north; 6,700 souls. Purdy 1826, p. 83: anchorage off Alghero in 8 or 10 fathoms, quite
+# exposed to the west and south-west. Norie 1831: the better berth in Porto Conte.
+#
+# The stance. the King of Sardinia's, at peace with Britain and France: neutral to a King's ship and to an American, open to his own. No period sheet read: `datum: unverified`. Prices
+# JUDGEMENT, in sterling.
+
+id: alghero
+name: Alghero
+nation: sardinia
+source: "Smyth 1828 pp. 280-282; Purdy 1826 p. 83"
+datum: unverified   # no period sheet read; no published level read
+
+outer_road:
+  feature: alghero-road
+  name: the road of Alghero
+  lat_deg: 40.5740
+  lon_deg: 8.2930
+  depth_fathoms: 10
+anchorage:
+  feature: alghero-road
+  name: the road of Alghero
+  lat_deg: 40.5740
+  lon_deg: 8.2930
+  depth_fathoms: 10
+mooring:
+  name: by the mole
+  lat_deg: 40.5620     # the grid's 4 m off the mole (judgement)
+  lon_deg: 8.3084
+  depth_fathoms: 2
+  bottom: sand
+shore:
+  feature: alghero
+  name: the landing-place at Alghero
+  lat_deg: 40.5578
+  lon_deg: 8.3125
+
+pilot:
+  station: alghero-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Alghero coral boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Sechi, Arca, Carta, Manca, Fois, Masala, Canu, Pala]   # Sardinian and Catalan names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: larboard                 # judgement
+  course_out_deg: 270            # off the road to the westward
+  words:
+    channel: "The approach is shallow some way out: keep outside the Maddalena rock with its ruined chapel north-west of the town, and come to south-west of it."
+    marks: "Capo Caccia's high cliff to the westward; the town's walls, bastions and steeples on their low point; the Maddalena rock; Monte Doglia behind."
+    anchorage: "A summer berth south-west of the Maddalena rock in ten to fifteen fathoms, good holding ground; it is open to every wind from the westward, and Porto Conte under Capo Caccia is the better shelter."
+    tide: "There is no tide to speak of."
+
+tide:
+  establishment: Naples
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 21, origin: sardinia, note: "the place's own; the country's; judgement"}
+    - {good: olive oil, price: 78, origin: sardinia, note: "brought in; the country's; judgement"}
+    - {good: salt, price: 10, origin: sardinia, note: "judgement"}
+    - {good: salt fish, price: 26, origin: sardinia, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 29, origin: sardinia, note: "brought in; judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: sardinia, note: "judgement"}
+    - {good: timber, price: 8, origin: sardinia, note: "judgement"}
+    - {good: coral, price: 280, origin: sardinia, note: "the place's own; worked coral; judgement"}
+    - {good: cheese, price: 35, origin: sardinia, note: "judgement"}
+    - {good: cattle, price: 6.3, origin: sardinia, note: "the place's own; the head; judgement"}
+
+dockyard:
+  kind: chandlers                 # no yard: the coral fishery's few stores
+  items:
+    - {item: topmast, hours: 18, pounds: 54, note: "judgement"}
+    - {item: topgallant_mast, hours: 9, pounds: 18}
+    - {item: yard, hours: 16, pounds: 32}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 27, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "cisterns within the walls and fountains outside (Smyth 1828, p. 282)"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the coral fishermen
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 4, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [alghero-road, 40 34 N 8 12 E]
+  from_sea: [40 34 N 8 12 E, alghero-road]
+  in: [alghero-road]

@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-29'
 tool: tools/build_charts.py
-build_hash: 724470adaf9fe89c
+build_hash: 336a7c42da76575c
 levels:
   '0':
     cell_sec: 150.0
@@ -33,7 +33,7 @@ levels:
 nodata: -32768
 charts:
   atlantic-east:
-    title: The Channel, Biscay, Iberia, Madeira, the Strait and the Gulf of Lion
+    title: The Channel, Biscay, Iberia, the Strait, the Gulf of Lion and the Tyrrhenian
     regions:
     - channel-west
     - channel-mid
@@ -46,6 +46,7 @@ charts:
     - strait
     - gulf-of-lion
     - ligurian-sea
+    - tyrrhenian
     corridor: atlantic-corridor
 regions:
   channel-west:
@@ -7468,6 +7469,1017 @@ regions:
       shoal: 7
       tower: 7
       town: 19
+  tyrrhenian:
+    title: The Tyrrhenian, Sardinia, Civita Vecchia, Gaeta and the bay of Naples
+    bounds:
+      south: 38.5
+      north: 42.5
+      west: 8.0
+      east: 15.5
+    levels:
+    - 2
+    - 3
+    tiles:
+      '2':
+      - name: '138336_27840'
+        south_sec: 138336
+        west_sec: 27840
+        min_depth_m: 260.9
+        bytes: 253719
+      - name: '138336_29376'
+        south_sec: 138336
+        west_sec: 29376
+        min_depth_m: 56.0
+        bytes: 293215
+      - name: '138336_30912'
+        south_sec: 138336
+        west_sec: 30912
+        min_depth_m: 81.0
+        bytes: 281586
+      - name: '138336_32448'
+        south_sec: 138336
+        west_sec: 32448
+        min_depth_m: 82.4
+        bytes: 292271
+      - name: '138336_33984'
+        south_sec: 138336
+        west_sec: 33984
+        min_depth_m: 148.1
+        bytes: 271726
+      - name: '138336_35520'
+        south_sec: 138336
+        west_sec: 35520
+        min_depth_m: 934.5
+        bytes: 328125
+      - name: '138336_37056'
+        south_sec: 138336
+        west_sec: 37056
+        min_depth_m: 488.6
+        bytes: 333843
+      - name: '138336_38592'
+        south_sec: 138336
+        west_sec: 38592
+        min_depth_m: 521.1
+        bytes: 322114
+      - name: '138336_40128'
+        south_sec: 138336
+        west_sec: 40128
+        min_depth_m: 120.1
+        bytes: 310670
+      - name: '138336_41664'
+        south_sec: 138336
+        west_sec: 41664
+        min_depth_m: 134.6
+        bytes: 325058
+      - name: '138336_43200'
+        south_sec: 138336
+        west_sec: 43200
+        min_depth_m: 464.7
+        bytes: 322921
+      - name: '138336_44736'
+        south_sec: 138336
+        west_sec: 44736
+        min_depth_m: 497.9
+        bytes: 344209
+      - name: '138336_46272'
+        south_sec: 138336
+        west_sec: 46272
+        min_depth_m: 0.0
+        bytes: 381372
+      - name: '138336_47808'
+        south_sec: 138336
+        west_sec: 47808
+        min_depth_m: 651.7
+        bytes: 353147
+      - name: '138336_49344'
+        south_sec: 138336
+        west_sec: 49344
+        min_depth_m: 303.2
+        bytes: 353254
+      - name: '138336_50880'
+        south_sec: 138336
+        west_sec: 50880
+        min_depth_m: 0.2
+        bytes: 351924
+      - name: '138336_52416'
+        south_sec: 138336
+        west_sec: 52416
+        min_depth_m: 0.0
+        bytes: 365603
+      - name: '138336_53952'
+        south_sec: 138336
+        west_sec: 53952
+        min_depth_m: 0.0
+        bytes: 352004
+      - name: '138336_55488'
+        south_sec: 138336
+        west_sec: 55488
+        min_depth_m: 0.1
+        bytes: 307337
+      - name: '139872_27840'
+        south_sec: 139872
+        west_sec: 27840
+        min_depth_m: 88.4
+        bytes: 227886
+      - name: '139872_29376'
+        south_sec: 139872
+        west_sec: 29376
+        min_depth_m: 0.0
+        bytes: 225125
+      - name: '139872_30912'
+        south_sec: 139872
+        west_sec: 30912
+        min_depth_m: -2.3
+        bytes: 148374
+      - name: '139872_32448'
+        south_sec: 139872
+        west_sec: 32448
+        min_depth_m: 0.0
+        bytes: 244375
+      - name: '139872_33984'
+        south_sec: 139872
+        west_sec: 33984
+        min_depth_m: 0.0
+        bytes: 317742
+      - name: '139872_35520'
+        south_sec: 139872
+        west_sec: 35520
+        min_depth_m: 563.3
+        bytes: 312599
+      - name: '139872_37056'
+        south_sec: 139872
+        west_sec: 37056
+        min_depth_m: 1179.9
+        bytes: 269376
+      - name: '139872_38592'
+        south_sec: 139872
+        west_sec: 38592
+        min_depth_m: 1169.1
+        bytes: 308809
+      - name: '139872_40128'
+        south_sec: 139872
+        west_sec: 40128
+        min_depth_m: 1163.2
+        bytes: 332759
+      - name: '139872_41664'
+        south_sec: 139872
+        west_sec: 41664
+        min_depth_m: 1712.6
+        bytes: 307164
+      - name: '139872_43200'
+        south_sec: 139872
+        west_sec: 43200
+        min_depth_m: 1912.5
+        bytes: 306160
+      - name: '139872_44736'
+        south_sec: 139872
+        west_sec: 44736
+        min_depth_m: 1943.9
+        bytes: 325829
+      - name: '139872_46272'
+        south_sec: 139872
+        west_sec: 46272
+        min_depth_m: 2275.3
+        bytes: 184820
+      - name: '139872_47808'
+        south_sec: 139872
+        west_sec: 47808
+        min_depth_m: 2046.8
+        bytes: 164747
+      - name: '139872_49344'
+        south_sec: 139872
+        west_sec: 49344
+        min_depth_m: 1748.7
+        bytes: 167968
+      - name: '139872_50880'
+        south_sec: 139872
+        west_sec: 50880
+        min_depth_m: 575.4
+        bytes: 175666
+      - name: '139872_52416'
+        south_sec: 139872
+        west_sec: 52416
+        min_depth_m: 1827.1
+        bytes: 242922
+      - name: '139872_53952'
+        south_sec: 139872
+        west_sec: 53952
+        min_depth_m: 889.5
+        bytes: 335375
+      - name: '139872_55488'
+        south_sec: 139872
+        west_sec: 55488
+        min_depth_m: 509.9
+        bytes: 297175
+      - name: '141408_27840'
+        south_sec: 141408
+        west_sec: 27840
+        min_depth_m: 148.8
+        bytes: 260886
+      - name: '141408_29376'
+        south_sec: 141408
+        west_sec: 29376
+        min_depth_m: 0.0
+        bytes: 211492
+      - name: '141408_30912'
+        south_sec: 141408
+        west_sec: 30912
+        min_depth_m: null
+        bytes: 108208
+      - name: '141408_32448'
+        south_sec: 141408
+        west_sec: 32448
+        min_depth_m: null
+        bytes: 124086
+      - name: '141408_33984'
+        south_sec: 141408
+        west_sec: 33984
+        min_depth_m: 0.0
+        bytes: 266802
+      - name: '141408_35520'
+        south_sec: 141408
+        west_sec: 35520
+        min_depth_m: 997.9
+        bytes: 269169
+      - name: '141408_37056'
+        south_sec: 141408
+        west_sec: 37056
+        min_depth_m: 885.7
+        bytes: 294408
+      - name: '141408_38592'
+        south_sec: 141408
+        west_sec: 38592
+        min_depth_m: 1969.7
+        bytes: 279643
+      - name: '141408_40128'
+        south_sec: 141408
+        west_sec: 40128
+        min_depth_m: 2045.2
+        bytes: 307156
+      - name: '141408_41664'
+        south_sec: 141408
+        west_sec: 41664
+        min_depth_m: 2660.4
+        bytes: 111963
+      - name: '141408_43200'
+        south_sec: 141408
+        west_sec: 43200
+        min_depth_m: 2311.7
+        bytes: 46406
+      - name: '141408_44736'
+        south_sec: 141408
+        west_sec: 44736
+        min_depth_m: 2639.0
+        bytes: 109311
+      - name: '141408_46272'
+        south_sec: 141408
+        west_sec: 46272
+        min_depth_m: 2853.9
+        bytes: 40326
+      - name: '141408_47808'
+        south_sec: 141408
+        west_sec: 47808
+        min_depth_m: 1842.8
+        bytes: 132453
+      - name: '141408_49344'
+        south_sec: 141408
+        west_sec: 49344
+        min_depth_m: 1836.5
+        bytes: 188382
+      - name: '141408_50880'
+        south_sec: 141408
+        west_sec: 50880
+        min_depth_m: 510.1
+        bytes: 286761
+      - name: '141408_52416'
+        south_sec: 141408
+        west_sec: 52416
+        min_depth_m: 84.4
+        bytes: 334084
+      - name: '141408_53952'
+        south_sec: 141408
+        west_sec: 53952
+        min_depth_m: 254.2
+        bytes: 341855
+      - name: '141408_55488'
+        south_sec: 141408
+        west_sec: 55488
+        min_depth_m: 0.0
+        bytes: 295931
+      - name: '142944_27840'
+        south_sec: 142944
+        west_sec: 27840
+        min_depth_m: 88.8
+        bytes: 304334
+      - name: '142944_29376'
+        south_sec: 142944
+        west_sec: 29376
+        min_depth_m: -4.5
+        bytes: 215408
+      - name: '142944_30912'
+        south_sec: 142944
+        west_sec: 30912
+        min_depth_m: null
+        bytes: 116240
+      - name: '142944_32448'
+        south_sec: 142944
+        west_sec: 32448
+        min_depth_m: null
+        bytes: 131624
+      - name: '142944_33984'
+        south_sec: 142944
+        west_sec: 33984
+        min_depth_m: 0.0
+        bytes: 235287
+      - name: '142944_35520'
+        south_sec: 142944
+        west_sec: 35520
+        min_depth_m: 520.5
+        bytes: 297537
+      - name: '142944_37056'
+        south_sec: 142944
+        west_sec: 37056
+        min_depth_m: 1115.8
+        bytes: 289886
+      - name: '142944_38592'
+        south_sec: 142944
+        west_sec: 38592
+        min_depth_m: 1700.7
+        bytes: 288794
+      - name: '142944_40128'
+        south_sec: 142944
+        west_sec: 40128
+        min_depth_m: 2205.0
+        bytes: 297067
+      - name: '142944_41664'
+        south_sec: 142944
+        west_sec: 41664
+        min_depth_m: 1518.5
+        bytes: 156596
+      - name: '142944_43200'
+        south_sec: 142944
+        west_sec: 43200
+        min_depth_m: 2699.7
+        bytes: 57635
+      - name: '142944_44736'
+        south_sec: 142944
+        west_sec: 44736
+        min_depth_m: 776.6
+        bytes: 126460
+      - name: '142944_46272'
+        south_sec: 142944
+        west_sec: 46272
+        min_depth_m: 2006.2
+        bytes: 160110
+      - name: '142944_47808'
+        south_sec: 142944
+        west_sec: 47808
+        min_depth_m: 1492.2
+        bytes: 333258
+      - name: '142944_49344'
+        south_sec: 142944
+        west_sec: 49344
+        min_depth_m: 865.4
+        bytes: 345271
+      - name: '142944_50880'
+        south_sec: 142944
+        west_sec: 50880
+        min_depth_m: 508.5
+        bytes: 333732
+      - name: '142944_52416'
+        south_sec: 142944
+        west_sec: 52416
+        min_depth_m: 116.8
+        bytes: 323124
+      - name: '142944_53952'
+        south_sec: 142944
+        west_sec: 53952
+        min_depth_m: 0.0
+        bytes: 287749
+      - name: '142944_55488'
+        south_sec: 142944
+        west_sec: 55488
+        min_depth_m: 0.0
+        bytes: 258734
+      - name: '144480_27840'
+        south_sec: 144480
+        west_sec: 27840
+        min_depth_m: 44.2
+        bytes: 276734
+      - name: '144480_29376'
+        south_sec: 144480
+        west_sec: 29376
+        min_depth_m: 0.0
+        bytes: 199527
+      - name: '144480_30912'
+        south_sec: 144480
+        west_sec: 30912
+        min_depth_m: null
+        bytes: 119116
+      - name: '144480_32448'
+        south_sec: 144480
+        west_sec: 32448
+        min_depth_m: null
+        bytes: 123386
+      - name: '144480_33984'
+        south_sec: 144480
+        west_sec: 33984
+        min_depth_m: 0.0
+        bytes: 213858
+      - name: '144480_35520'
+        south_sec: 144480
+        west_sec: 35520
+        min_depth_m: 43.8
+        bytes: 339937
+      - name: '144480_37056'
+        south_sec: 144480
+        west_sec: 37056
+        min_depth_m: 174.3
+        bytes: 334299
+      - name: '144480_38592'
+        south_sec: 144480
+        west_sec: 38592
+        min_depth_m: 1895.6
+        bytes: 289148
+      - name: '144480_40128'
+        south_sec: 144480
+        west_sec: 40128
+        min_depth_m: 2217.3
+        bytes: 287708
+      - name: '144480_41664'
+        south_sec: 144480
+        west_sec: 41664
+        min_depth_m: 1196.5
+        bytes: 286873
+      - name: '144480_43200'
+        south_sec: 144480
+        west_sec: 43200
+        min_depth_m: 2254.1
+        bytes: 127373
+      - name: '144480_44736'
+        south_sec: 144480
+        west_sec: 44736
+        min_depth_m: 2406.9
+        bytes: 64393
+      - name: '144480_46272'
+        south_sec: 144480
+        west_sec: 46272
+        min_depth_m: 1223.3
+        bytes: 254088
+      - name: '144480_47808'
+        south_sec: 144480
+        west_sec: 47808
+        min_depth_m: 950.6
+        bytes: 340350
+      - name: '144480_49344'
+        south_sec: 144480
+        west_sec: 49344
+        min_depth_m: 184.5
+        bytes: 307694
+      - name: '144480_50880'
+        south_sec: 144480
+        west_sec: 50880
+        min_depth_m: 0.1
+        bytes: 308940
+      - name: '144480_52416'
+        south_sec: 144480
+        west_sec: 52416
+        min_depth_m: 0.0
+        bytes: 220259
+      - name: '144480_53952'
+        south_sec: 144480
+        west_sec: 53952
+        min_depth_m: 0.0
+        bytes: 129829
+      - name: '144480_55488'
+        south_sec: 144480
+        west_sec: 55488
+        min_depth_m: null
+        bytes: 124455
+      - name: '146016_27840'
+        south_sec: 146016
+        west_sec: 27840
+        min_depth_m: 0.0
+        bytes: 335566
+      - name: '146016_29376'
+        south_sec: 146016
+        west_sec: 29376
+        min_depth_m: 0.0
+        bytes: 162435
+      - name: '146016_30912'
+        south_sec: 146016
+        west_sec: 30912
+        min_depth_m: 0.0
+        bytes: 141171
+      - name: '146016_32448'
+        south_sec: 146016
+        west_sec: 32448
+        min_depth_m: null
+        bytes: 121300
+      - name: '146016_33984'
+        south_sec: 146016
+        west_sec: 33984
+        min_depth_m: 0.0
+        bytes: 208243
+      - name: '146016_35520'
+        south_sec: 146016
+        west_sec: 35520
+        min_depth_m: 65.4
+        bytes: 327302
+      - name: '146016_37056'
+        south_sec: 146016
+        west_sec: 37056
+        min_depth_m: 234.0
+        bytes: 324883
+      - name: '146016_38592'
+        south_sec: 146016
+        west_sec: 38592
+        min_depth_m: 933.9
+        bytes: 315442
+      - name: '146016_40128'
+        south_sec: 146016
+        west_sec: 40128
+        min_depth_m: 1135.0
+        bytes: 313840
+      - name: '146016_41664'
+        south_sec: 146016
+        west_sec: 41664
+        min_depth_m: 1071.5
+        bytes: 326130
+      - name: '146016_43200'
+        south_sec: 146016
+        west_sec: 43200
+        min_depth_m: 1469.2
+        bytes: 318273
+      - name: '146016_44736'
+        south_sec: 146016
+        west_sec: 44736
+        min_depth_m: 4.4
+        bytes: 300157
+      - name: '146016_46272'
+        south_sec: 146016
+        west_sec: 46272
+        min_depth_m: 0.0
+        bytes: 339262
+      - name: '146016_47808'
+        south_sec: 146016
+        west_sec: 47808
+        min_depth_m: 0.3
+        bytes: 313443
+      - name: '146016_49344'
+        south_sec: 146016
+        west_sec: 49344
+        min_depth_m: 0.0
+        bytes: 283799
+      - name: '146016_50880'
+        south_sec: 146016
+        west_sec: 50880
+        min_depth_m: 0.0
+        bytes: 198531
+      - name: '146016_52416'
+        south_sec: 146016
+        west_sec: 52416
+        min_depth_m: 0.0
+        bytes: 148276
+      - name: '146016_53952'
+        south_sec: 146016
+        west_sec: 53952
+        min_depth_m: null
+        bytes: 120075
+      - name: '146016_55488'
+        south_sec: 146016
+        west_sec: 55488
+        min_depth_m: null
+        bytes: 113951
+      - name: '147552_40128'
+        south_sec: 147552
+        west_sec: 40128
+        min_depth_m: 579.4
+        bytes: 313246
+      - name: '147552_41664'
+        south_sec: 147552
+        west_sec: 41664
+        min_depth_m: 535.9
+        bytes: 343582
+      - name: '147552_43200'
+        south_sec: 147552
+        west_sec: 43200
+        min_depth_m: 121.5
+        bytes: 317116
+      - name: '147552_44736'
+        south_sec: 147552
+        west_sec: 44736
+        min_depth_m: 0.0
+        bytes: 245499
+      - name: '147552_46272'
+        south_sec: 147552
+        west_sec: 46272
+        min_depth_m: 0.0
+        bytes: 174690
+      - name: '147552_47808'
+        south_sec: 147552
+        west_sec: 47808
+        min_depth_m: 0.0
+        bytes: 170196
+      - name: '147552_49344'
+        south_sec: 147552
+        west_sec: 49344
+        min_depth_m: 0.0
+        bytes: 116378
+      - name: '147552_50880'
+        south_sec: 147552
+        west_sec: 50880
+        min_depth_m: null
+        bytes: 112023
+      - name: '147552_52416'
+        south_sec: 147552
+        west_sec: 52416
+        min_depth_m: null
+        bytes: 113492
+      - name: '147552_53952'
+        south_sec: 147552
+        west_sec: 53952
+        min_depth_m: null
+        bytes: 110414
+      - name: '147552_55488'
+        south_sec: 147552
+        west_sec: 55488
+        min_depth_m: null
+        bytes: 91753
+      - name: '149088_40128'
+        south_sec: 149088
+        west_sec: 40128
+        min_depth_m: 290.2
+        bytes: 305465
+      - name: '149088_41664'
+        south_sec: 149088
+        west_sec: 41664
+        min_depth_m: 81.9
+        bytes: 310088
+      - name: '149088_43200'
+        south_sec: 149088
+        west_sec: 43200
+        min_depth_m: 0.0
+        bytes: 189802
+      - name: '149088_44736'
+        south_sec: 149088
+        west_sec: 44736
+        min_depth_m: 0.0
+        bytes: 113584
+      - name: '149088_46272'
+        south_sec: 149088
+        west_sec: 46272
+        min_depth_m: null
+        bytes: 114461
+      - name: '149088_47808'
+        south_sec: 149088
+        west_sec: 47808
+        min_depth_m: null
+        bytes: 123255
+      - name: '149088_49344'
+        south_sec: 149088
+        west_sec: 49344
+        min_depth_m: null
+        bytes: 128173
+      - name: '149088_50880'
+        south_sec: 149088
+        west_sec: 50880
+        min_depth_m: null
+        bytes: 118419
+      - name: '149088_52416'
+        south_sec: 149088
+        west_sec: 52416
+        min_depth_m: null
+        bytes: 111287
+      - name: '149088_53952'
+        south_sec: 149088
+        west_sec: 53952
+        min_depth_m: null
+        bytes: 104030
+      - name: '149088_55488'
+        south_sec: 149088
+        west_sec: 55488
+        min_depth_m: null
+        bytes: 84038
+      - name: '150624_40128'
+        south_sec: 150624
+        west_sec: 40128
+        min_depth_m: 34.6
+        bytes: 221152
+      - name: '150624_41664'
+        south_sec: 150624
+        west_sec: 41664
+        min_depth_m: 0.0
+        bytes: 182366
+      - name: '150624_43200'
+        south_sec: 150624
+        west_sec: 43200
+        min_depth_m: 0.0
+        bytes: 113528
+      - name: '150624_44736'
+        south_sec: 150624
+        west_sec: 44736
+        min_depth_m: null
+        bytes: 108559
+      - name: '150624_46272'
+        south_sec: 150624
+        west_sec: 46272
+        min_depth_m: null
+        bytes: 127008
+      - name: '150624_47808'
+        south_sec: 150624
+        west_sec: 47808
+        min_depth_m: null
+        bytes: 123594
+      - name: '150624_49344'
+        south_sec: 150624
+        west_sec: 49344
+        min_depth_m: null
+        bytes: 134466
+      - name: '150624_50880'
+        south_sec: 150624
+        west_sec: 50880
+        min_depth_m: 0.0
+        bytes: 120924
+      - name: '150624_52416'
+        south_sec: 150624
+        west_sec: 52416
+        min_depth_m: 0.0
+        bytes: 124709
+      - name: '150624_53952'
+        south_sec: 150624
+        west_sec: 53952
+        min_depth_m: 0.0
+        bytes: 106623
+      - name: '150624_55488'
+        south_sec: 150624
+        west_sec: 55488
+        min_depth_m: 0.0
+        bytes: 109307
+      - name: '152160_40128'
+        south_sec: 152160
+        west_sec: 40128
+        min_depth_m: 0.0
+        bytes: 136000
+      - name: '152160_41664'
+        south_sec: 152160
+        west_sec: 41664
+        min_depth_m: 0.0
+        bytes: 102831
+      - name: '152160_43200'
+        south_sec: 152160
+        west_sec: 43200
+        min_depth_m: null
+        bytes: 108353
+      - name: '152160_44736'
+        south_sec: 152160
+        west_sec: 44736
+        min_depth_m: null
+        bytes: 121459
+      - name: '152160_46272'
+        south_sec: 152160
+        west_sec: 46272
+        min_depth_m: null
+        bytes: 128827
+      - name: '152160_47808'
+        south_sec: 152160
+        west_sec: 47808
+        min_depth_m: null
+        bytes: 125330
+      - name: '152160_49344'
+        south_sec: 152160
+        west_sec: 49344
+        min_depth_m: 0.0
+        bytes: 122009
+      - name: '152160_50880'
+        south_sec: 152160
+        west_sec: 50880
+        min_depth_m: 0.0
+        bytes: 146968
+      - name: '152160_52416'
+        south_sec: 152160
+        west_sec: 52416
+        min_depth_m: 14.7
+        bytes: 106798
+      - name: '152160_53952'
+        south_sec: 152160
+        west_sec: 53952
+        min_depth_m: 95.0
+        bytes: 87890
+      - name: '152160_55488'
+        south_sec: 152160
+        west_sec: 55488
+        min_depth_m: 41.1
+        bytes: 83530
+      '3':
+      - name: '140896_32448'
+        south_sec: 140896
+        west_sec: 32448
+        min_depth_m: 0.0
+        bytes: 72624
+        harbour: cagliari
+      - name: '140896_32704'
+        south_sec: 140896
+        west_sec: 32704
+        min_depth_m: 0.0
+        bytes: 84294
+        harbour: cagliari
+      - name: '140896_32960'
+        south_sec: 140896
+        west_sec: 32960
+        min_depth_m: 0.0
+        bytes: 92611
+        harbour: cagliari
+      - name: '141152_32448'
+        south_sec: 141152
+        west_sec: 32448
+        min_depth_m: 0.0
+        bytes: 32069
+        harbour: cagliari
+      - name: '141152_32704'
+        south_sec: 141152
+        west_sec: 32704
+        min_depth_m: 0.0
+        bytes: 45720
+        harbour: cagliari
+      - name: '141152_32960'
+        south_sec: 141152
+        west_sec: 32960
+        min_depth_m: 0.0
+        bytes: 50255
+        harbour: cagliari
+      - name: '145760_29376'
+        south_sec: 145760
+        west_sec: 29376
+        min_depth_m: 0.6
+        bytes: 90778
+        harbour: alghero
+      - name: '145760_29632'
+        south_sec: 145760
+        west_sec: 29632
+        min_depth_m: 11.6
+        bytes: 100795
+        harbour: alghero
+      - name: '145760_29888'
+        south_sec: 145760
+        west_sec: 29888
+        min_depth_m: 0.0
+        bytes: 84024
+        harbour: alghero
+      - name: '146016_29376'
+        south_sec: 146016
+        west_sec: 29376
+        min_depth_m: 0.0
+        bytes: 87856
+        harbour: alghero
+      - name: '146016_29632'
+        south_sec: 146016
+        west_sec: 29632
+        min_depth_m: 0.0
+        bytes: 79266
+        harbour: alghero
+      - name: '146016_29888'
+        south_sec: 146016
+        west_sec: 29888
+        min_depth_m: 0.0
+        bytes: 46884
+        harbour: alghero
+      - name: '151392_42176'
+        south_sec: 151392
+        west_sec: 42176
+        min_depth_m: 0.0
+        bytes: 85903
+        harbour: civita-vecchia
+      - name: '151392_42432'
+        south_sec: 151392
+        west_sec: 42432
+        min_depth_m: 0.0
+        bytes: 63906
+        harbour: civita-vecchia
+      - name: '148064_48576'
+        south_sec: 148064
+        west_sec: 48576
+        min_depth_m: 39.8
+        bytes: 80881
+        harbour: gaeta
+      - name: '148064_48832'
+        south_sec: 148064
+        west_sec: 48832
+        min_depth_m: 40.1
+        bytes: 61007
+        harbour: gaeta
+      - name: '148320_48576'
+        south_sec: 148320
+        west_sec: 48576
+        min_depth_m: 0.0
+        bytes: 80230
+        harbour: gaeta
+      - name: '148320_48832'
+        south_sec: 148320
+        west_sec: 48832
+        min_depth_m: 0.0
+        bytes: 83857
+        harbour: gaeta
+      - name: '146784_50880'
+        south_sec: 146784
+        west_sec: 50880
+        min_depth_m: 0.0
+        bytes: 88448
+        harbour: naples
+      - name: '146784_51136'
+        south_sec: 146784
+        west_sec: 51136
+        min_depth_m: 0.0
+        bytes: 101775
+        harbour: naples
+      - name: '146784_51392'
+        south_sec: 146784
+        west_sec: 51392
+        min_depth_m: 0.0
+        bytes: 96898
+        harbour: naples
+      - name: '147040_50880'
+        south_sec: 147040
+        west_sec: 50880
+        min_depth_m: null
+        bytes: 50977
+        harbour: naples
+      - name: '147040_51136'
+        south_sec: 147040
+        west_sec: 51136
+        min_depth_m: null
+        bytes: 45311
+        harbour: naples
+      - name: '147040_51392'
+        south_sec: 147040
+        west_sec: 51392
+        min_depth_m: null
+        bytes: 37305
+        harbour: naples
+      - name: '147040_46528'
+        south_sec: 147040
+        west_sec: 46528
+        min_depth_m: 0.0
+        bytes: 129423
+        harbour: ponza
+      - name: '147296_46528'
+        south_sec: 147296
+        west_sec: 46528
+        min_depth_m: 0.0
+        bytes: 120744
+        harbour: ponza
+    coast: coast/tyrrhenian.geojson
+    features: features/tyrrhenian.yaml
+    index: features/tyrrhenian.index.json
+    overrides: []
+    harbours:
+      cagliari:
+        south: 39.14
+        north: 39.23
+        west: 9.05
+        east: 9.18
+      alghero:
+        south: 40.53
+        north: 40.62
+        west: 8.18
+        east: 8.33
+      civita-vecchia:
+        south: 42.06
+        north: 42.11
+        west: 11.75
+        east: 11.81
+      gaeta:
+        south: 41.19
+        north: 41.24
+        west: 13.54
+        east: 13.61
+      naples:
+        south: 40.78
+        north: 40.87
+        west: 14.17
+        east: 14.3
+      ponza:
+        south: 40.88
+        north: 40.93
+        west: 12.93
+        east: 12.98
+    fill_to_chart_datum: true
+    feature_count: 123
+    features_by_kind:
+      anchorage: 19
+      bank: 1
+      castle: 8
+      church: 1
+      headland: 24
+      hill: 10
+      island: 15
+      ledge: 2
+      light: 5
+      mark: 2
+      place: 3
+      rock: 9
+      tower: 4
+      town: 20
 corridors:
   atlantic-corridor:
     title: 'The corridor: the Western Approaches, Biscay and the Iberian coast to Madeira'
@@ -7897,6 +8909,12 @@ sources:
       sha256: 1258717d0d68162355cfbb44e725d984ea088c3db48c477c616989580a4d6644
       bytes: 11264276
       file: gebco_2025_s40.75_n45.05_w2.40_e11.40_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 38.2, ''north'':
+        42.95, ''west'': 7.5, ''east'': 16.1})'
+      retrieved: '2026-10-29'
+      sha256: a5615085fd9f7f96a007de7afa49359924c3e75bac56c8fbb1c3a11f09cf6162
+      bytes: 12325410
+      file: gebco_2025_s38.20_n42.95_w7.50_e16.10_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -8021,6 +9039,16 @@ sources:
       sha256: 2c8f082e88a770066dca5a1709428ee1368d8f9982e5d49f499d236e94c07645
       bytes: 133158776
       file: emodnet_dtm2024_elevation_max_40.85_44.95_2.50_11.30.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(38.3):(42.85)%5D%5B(7.6):(16.0)%5D
+      retrieved: '2026-10-29'
+      sha256: 83d0e5b5174ab4b9aa612f22fd843f988d275bf511b2e6d9e874267cabbbbbdd
+      bytes: 141048608
+      file: emodnet_dtm2024_elevation_38.30_42.85_7.60_16.00.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(38.3):(42.85)%5D%5B(7.6):(16.0)%5D
+      retrieved: '2026-10-29'
+      sha256: 2d8915a7960b1f088f3e54eb8a49edfa27cb5646185b4501a9ceb7a4de9e05ee
+      bytes: 141048248
+      file: emodnet_dtm2024_elevation_max_38.30_42.85_7.60_16.00.nc
     status: fetched
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m

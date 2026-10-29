@@ -106,6 +106,7 @@ book_limits:
   - {south: 49.0, north: 51.5, west: -1.0, east: 2.5}  # the Channel's east block (package 79b)
   - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
   - {south: 41.0, north: 44.5, west: 7.74, east: 11.0}  # the Ligurian sea's block (package 79d)
+  - {south: 38.5, north: 42.5, west: 8.0, east: 15.5}  # the Tyrrhenian's block (package 79d)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -1158,6 +1159,44 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT: no constant current and no tide stated for the open Ligurian sea (Smyth 1854, p. 178; Admiralty 1916, p. 13: its currents follow the winds)"
+  # package 79d, the Tyrrhenian's block (the region `tyrrhenian`): the streams nought and the
+  # coast's set as `current:` alone, as the Gulf's: from Civita Vecchia to Naples the
+  # current sets most frequently north-eastward near the land (the Admiralty 1916, p. 14),
+  # and the block's open water after it with none (its currents follow the winds).
+  - id: roman-coast-current
+    chart: tyrrhenian
+    name: the Roman coast, Civita Vecchia to Naples
+    polygon: [[42.15, 11.70], [41.85, 12.10], [41.40, 12.70], [41.15, 13.40], [40.85, 13.95], [40.55, 14.30], [40.40, 14.10], [40.70, 13.60], [41.00, 12.90], [41.20, 12.40], [41.65, 11.85], [42.00, 11.45]]
+    axis_deg: 45
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 45, kn: 0.5}
+    source: "Admiralty 1916, p. 14: on the coast between Leghorn and the Strait of Messina the currents very variable, subject to the winds; from Civita Vecchia to Naples however they set most frequently north-eastward near the land, and the mariner must guard against them, particularly in very fine weather; the rate and the band (about twelve miles) JUDGEMENT; no tide (Smyth 1854, p. 178)"
+    book:
+      set: NE
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: NE, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "the current's sense the Admiralty 1916's (p. 14), the rate JUDGEMENT; no period statement read for the Roman coast's set"
+  - id: tyrrhenian-open
+    chart: tyrrhenian
+    name: the Tyrrhenian sea, Sardinia to Naples
+    polygon: [[38.50, 8.00], [42.50, 8.00], [42.50, 15.50], [38.50, 15.50]]
+    axis_deg: 180
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "Admiralty 1916, p. 14: the currents very variable, subject to the force and direction of the winds; no constant set and no tidal stream (Smyth 1854, p. 178): the world's water still"
+    book:
+      set: S
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open Tyrrhenian (Smyth 1854, p. 178; Admiralty 1916, p. 14)"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

@@ -12346,3 +12346,116 @@ sailing at five in the afternoon she comes back to the strait at noon (the night
 kept as a guard). Hove to off Toulon, she drifted twenty miles east to Porquerolles by
 dawn and went home having seen Toulon's heights only at four leagues; she now stands back
 in at daylight to look before she bears away.
+
+### Step 5: the region `tyrrhenian`, Sardinia, the Roman coast, Gaeta and the bay of Naples
+
+**The recipe**: bounds 38.5 to 42.5 N and 8.0 to 15.5 E as the brief has them; fetch 38.3 to
+42.85 N, 7.6 to 16.0 E (fetched at step 1, the cache's); six harbour patches (Cagliari,
+Alghero, Civita Vecchia, Gaeta, Naples, Ponza); EMODnet over GEBCO; the fill as the Gulf's.
+Built `--region tyrrhenian --reuse-world --skip-fetch` with both Gulf regions in the
+manifest. The checks as printed:
+
+```
+Checks for the block tyrrhenian:
+  licences: emodnet_dtm_2024, gebco_2025 (allowed)
+  features within the bounds: 123 of 123 (a harbour patch's box counts as the region's)
+  ids unique across the manifest's regions: yes
+  sources in the references' form: 123 of 123
+  harbour patches with their datum stated: 0 of 0
+  the fetch box covers the tiles whole: yes (38.3 to 42.85 N, 7.6 E to 16 E)
+  tiles another region lists: 32 kept (level 2: 32, level 3: 0; not written, not listed)
+  the block passes its checks (the shore's sweep for GEBCO's fill is the build's).
+```
+
+**The seam with `ligurian-sea`**: the 32 tiles north of the row edge 40.99 N and west of the
+column edge 11.15 E are the Ligurian sea's (the Maddalena, Corsica's south, Elba, the Tuscan
+coast to Monte Argentario's west), kept by the seam rule; the Tyrrhenian's marks lie south
+of that row or east of that column. **The count and bytes, before the commit**: 158 level-2
+tiles of 35.2 MB (29 all land, 3.4 MB; 57 open sea beyond ten miles, 15.0 MB; 72 with a
+shore or near one, 16.9 MB), 26 level-3 tiles of 2.0 MB, the coast 0.61 MB, the features and
+the index 0.13 MB: **38.0 MB**, within the rule. The north-east corner reaches the Adriatic's
+shore about Ortona, Pescara and the Gargano (the tiles of 41.84 to 42.69 N east of 13.7 E): a
+later block's water in this block's tiles, and the sweep's largest places are there. The
+shore's sweep: 15,200 cells in 416 places, the largest the lagoons of Lesina and Varano under
+the Gargano on the Adriatic (2,442, 1,374, 430, 339, 322, 294, 271 cells about 41.88 to
+41.93 N, 15.38 to 15.78 E), the lagoon of Orbetello behind Monte Argentario's tombolos (900
+and 762 about 42.43 to 42.48 N, 11.23 E) and the stagno of Cabras by Oristano (285 about
+39.73 N, 8.53 E); water, closed from the sea, said so. `git status` after the build: the
+manifest and the block's own files; nothing of either Gulf region's, or any other's.
+
+**The features**: 123 (Sardinia's west and south with Alghero, Oristano, San Pietro, the
+gulf of Palmas and Pula where Nelson's fleet lay and watered from February to April 1805
+(James vol. 3, pp. 338 to 340), Cagliari and Cape Carbonara, and its east coast from Tavolara
+to Capo Ferrato; the Roman coast from Monte Argentario by Civita Vecchia, the Tiber, Anzio,
+Monte Circeo and Terracina to Gaeta and the Pontine islands; the bay of Naples with Ischia,
+Procida, Capri and Vesuvius, the gulf of Salerno to Cape Palinuro), researched and checked as
+the Gulf's: Cape Marargiu moved 899 m to the grid's land; **six islets the grid lacks** (the
+Toro, Cavoli, the Catalano rock, La Botte, Santo Stefano of Ventotene, Li Galli) given as
+rocks; the Formiche of Vivara and the banks of Licosa at the pilots' positions. **The lights
+of 1805**: Civita Vecchia's and Anzio's fanals (Michelot 1709, the earliest record read) and
+Naples' lantern at the elbow of the mole (Michelot's survey of 1701; the tower older,
+UNVERIFIED). **Not yet**: Fiumicino's on the Clementine tower (1825, Norie 1831's notice, its
+year an OCR's reading, UNVERIFIED) and Gaeta's (1831, Norie's first record, UNVERIFIED). No
+light on Sardinia in 1805: Smyth 1828 found Cape St Elias' tower used only for signals and
+San Pietro's column never lit. **Not given**: Porto Santo Stefano and Giannutri (11.10 to
+11.12 E, north of 40.99 N) lie in the Ligurian sea's tiles and in neither features file; Monte
+Limbara (40.85 N) the same way out of the Maddalena's; a later pass.
+
+**The ports**: Cagliari (the King of Sardinia's capital: water so scarce it is sold at the
+doors and the fleets send to Pula for it, Smyth 1828 p. 206, which the port's yard and its
+pilot's words say; the darsena the grid's land, the mooring off the mole), Alghero (the
+summer road outside the Maddalena rock, Porto Conte the better shelter), Civita Vecchia (the
+Papal state's: the port within the new mole, the night's berth outside; the modern works the
+grid's, the road laid south-west of the old mole), Gaeta (the King of Naples' fortress, the
+galleys stern to the walls) and Naples (the King's capital and arsenal, a yard; Mr Smith's
+marks of 1818 for the road; Smyth's tide-hour). All five neutral to a King's ship, to a
+Frenchman and to an American, open to their own; `datum: unverified` in all five; the ports
+index, `test_ports.py`'s `TYRRHENIAN_PORTS`, the ordnance count raised by five. **The
+markets, all sixteen of the package's ports**: the first draft priced every Mediterranean
+good from one table, so that no cargo between two of the block's ports cleared the business's
+least ratio of 1.3 and the business drew no trader at all (truth 7-302's first run found it);
+each port's own produce is now seven-tenths of the table's price and what it must bring in
+thirteen-tenths (Toulon's wine, oil and salt, its hemp and timber dear; Cagliari's salt,
+wheat and cheese; Naples' wine, silk and oranges; Porto Ferrajo's iron; Alghero's and
+Leghorn's coral; ...), judgement, each so noted.
+
+**The tide**: eight gauges held (Carloforte, Cagliari, Porto Torres, Civita Vecchia, Naples,
+Salerno, Palinuro, and Ortona on the Adriatic, its tide another sea's, said so), ISPRA's
+series, their levels unread; two stream areas (`roman-coast-current`, from Civita Vecchia
+to Naples within some twelve miles of the land, half a knot toward the north-east, the
+Admiralty 1916's "most frequently north-eastward near the land", p. 14, the rate judgement;
+`tyrrhenian-open` over the box with none) and the box in `book_limits`; Naples in the
+master's epitome (Smyth 1854, p. 178: 11h 20m, with his doubt, the rise a foot).
+
+**The weather**: a new box `tyrrhenian` over the region's bounds, after the Gulf's (which
+keeps the overlap, Sardinia's north and the Ligurian sea's south). Its rows' checks are
+**Naples' printed table** (the Admiralty's Mediterranean Pilot vol. II, 1916, appendix III,
+p. 466, 1866 to 1900: the days of wind by the eight points, the glass, the gale days in each
+row's note, seven in January). The run, 480 months at seed 7:
+
+| month | W | E | S | N | none | days of 22 kn+ |
+|---|---|---|---|---|---|---|
+| 1 | 28.2 (21) | 25.9 (27) | 11.8 (15) | 25.2 (37) | 8.8 | 4.1 |
+| 4 | 35.6 (33) | 19.9 (22) | 12.3 (25) | 21.6 (20) | 10.6 | 0.8 |
+| 7 | 48.2 (39) | 15.0 (18) | 7.3 (27) | 17.5 (16) | 12.0 | 0.3 |
+| 10 | 35.7 (27) | 21.1 (23) | 16.3 (24) | 14.4 (26) | 12.5 | 1.4 |
+| 12 | 32.5 (23) | 25.8 (23) | 11.0 (15) | 23.2 (40) | 7.4 | 3.5 |
+
+The easterlies hold within four points; the westerlies run five to nine points over the
+table, the winter's northerlies (the tramontana and the greco) ten to seventeen under, and
+the summer's southerlies (the libeccio and the sea breeze, which the systems do not make)
+up to twenty under: the one track a month again (step 2's finding), and the sea breeze a
+coast's hook the weather has inert (`test_the_hooks_for_the_coast_are_inert_until_5b`). The
+gale days are the table's, in the note; the rows' gust days judgement.
+
+**Truths** 7-300 (from the road of Naples, the patch's level 3 on mud and clay: the lantern,
+the Castle dell'Ovo and St Elmo within two miles, Posilipo and Vesuvius within eight, Capri,
+Ischia and Epomeo within eighteen; the lantern lit in 1805), 7-301 (Cagliari, the Maddalena,
+Civita Vecchia, Gaeta and Naples neutral to a King's ship, Cagliari to a Frenchman and an
+American too and open to a Sardinian; its water at Pula in its own words), 7-302 (the
+schooner east of Sardinia crosses the row edge 40.99 N from `tyrrhenian` into `ligurian-sea`
+within the hour, the business following and peopling the new region, the depth continuous
+across the seam), 7-303 (Li Galli, an islet the grid reads as forty metres of water, grounds a
+frigate's keel as a rock, and a mile off she is clear) and 7-304 (the master's tide-hour in
+the road of Naples is Smyth's Naples, off Toulon Smyth's Toulon; the Tyrrhenian's box is
+Naples' table with its gale days).

@@ -149,6 +149,8 @@ LIGURIAN_PORTS = [
     "porto-ferrajo",
     "san-fiorenzo",
 ]
+# and the Tyrrhenian's five
+TYRRHENIAN_PORTS = ["alghero", "cagliari", "civita-vecchia", "gaeta", "naples"]
 ALL_PORTS = sorted(
     ALL_PORTS
     + PORTUGAL_PORTS
@@ -157,6 +159,7 @@ ALL_PORTS = sorted(
     + CHANNEL_EAST_PORTS
     + GULF_PORTS
     + LIGURIAN_PORTS
+    + TYRRHENIAN_PORTS
 )
 
 
@@ -329,6 +332,8 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # Maddalena (the King of Sardinia's) neutral
     french_ports |= set(GULF_PORTS) | set(LIGURIAN_PORTS) - {"leghorn", "maddalena"}
     neutral_ports |= {"leghorn", "maddalena"}
+    # the Tyrrhenian's: the King of Sardinia's, the Pope's and the King of Naples', neutral
+    neutral_ports |= set(TYRRHENIAN_PORTS)
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS

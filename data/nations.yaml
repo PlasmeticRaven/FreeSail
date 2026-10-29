@@ -663,3 +663,10 @@ ports:
   ajaccio: france
   san-fiorenzo: france
   maddalena: sardinia
+  # the Tyrrhenian's block (package 79d): Cagliari and Alghero the King of Sardinia's, Civita
+  # Vecchia the Pope's, Gaeta and Naples the King of Naples', all neutral to a King's ship
+  cagliari: sardinia
+  alghero: sardinia
+  civita-vecchia: papal-state
+  gaeta: naples
+  naples: naples

@@ -76,16 +76,16 @@ market:
   goods:
     - {good: wine, price: 30, origin: etruria, note: "the country's; judgement"}
     - {good: olive oil, price: 60, origin: etruria, note: "the country's; judgement"}
-    - {good: brandy, price: 80, origin: etruria, note: "judgement"}
-    - {good: salt, price: 10, origin: etruria, note: "judgement"}
+    - {good: brandy, price: 56, origin: etruria, note: "the place's own; judgement"}
+    - {good: salt, price: 13, origin: etruria, note: "brought in; judgement"}
     - {good: salt fish, price: 26, origin: etruria, note: "anchovies and tunny, the coast's; judgement"}
     - {good: biscuit, price: 22, origin: etruria, note: "judgement"}
     - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
     - {good: canvas, price: 46, origin: etruria, note: "judgement"}
     - {good: hemp, price: 40, origin: null, note: "judgement"}
-    - {good: timber, price: 8, origin: etruria, note: "judgement"}
-    - {good: coral, price: 400, origin: etruria, note: "worked coral; judgement"}
-    - {good: wheat, price: 25, origin: etruria, note: "the quarter's price in sterling; judgement"}
+    - {good: timber, price: 10, origin: etruria, note: "brought in; judgement"}
+    - {good: coral, price: 280, origin: etruria, note: "the place's own; worked coral; judgement"}
+    - {good: wheat, price: 18, origin: etruria, note: "the place's own; the quarter's price in sterling; judgement"}
     - {good: cheese, price: 35, origin: etruria, note: "judgement"}
 
 dockyard:

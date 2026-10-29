@@ -221,6 +221,12 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "ajaccio": "france",
         "san-fiorenzo": "france",
         "maddalena": "sardinia",
+        # the Tyrrhenian's (package 79d)
+        "cagliari": "sardinia",
+        "alghero": "sardinia",
+        "civita-vecchia": "papal-state",
+        "gaeta": "naples",
+        "naples": "naples",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

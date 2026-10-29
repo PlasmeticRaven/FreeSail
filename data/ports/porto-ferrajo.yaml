@@ -75,15 +75,15 @@ tide:
 market:
   currency: pounds
   goods:
-    - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
+    - {good: wine, price: 39, origin: france, note: "brought in; the country's; judgement"}
     - {good: olive oil, price: 60, origin: france, note: "the country's; judgement"}
     - {good: salt, price: 10, origin: france, note: "judgement"}
-    - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
-    - {good: biscuit, price: 22, origin: france, note: "judgement"}
+    - {good: salt fish, price: 18, origin: france, note: "the place's own; anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 29, origin: france, note: "brought in; judgement"}
     - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
     - {good: canvas, price: 46, origin: france, note: "judgement"}
     - {good: timber, price: 8, origin: france, note: "judgement"}
-    - {good: iron, price: 20, origin: france, note: "Elba's ore; judgement"}
+    - {good: iron, price: 14, origin: france, note: "the place's own; Elba's ore; judgement"}
     - {good: figs, price: 18, origin: france, note: "judgement"}
 
 dockyard:
