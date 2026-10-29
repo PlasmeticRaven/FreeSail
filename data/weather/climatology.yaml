@@ -55,7 +55,12 @@ default_box: channel
 boxes:
   channel:
     title: "the western Channel and the Western Approaches"
-    bounds: {south: 47.5, north: 52.0, west: -20.0, east: 2.0}
+    bounds: {south: 47.5, north: 52.0, west: -20.0, east: 2.5}
+    # package 79b: the east bound moved from 2 E to 2.5 E so that the Channel's east block
+    # (to Dunkirk and the Flemish banks) lies in the Channel's box and not in the nearest
+    # other by `Climatology.box_at`; the same rows, JUDGEMENT (no printed table of the
+    # Strait's or the Flemish coast's winds read)
+    note: "the east bound 2.5 E since package 79b (the Channel's east block): the same rows over the Strait of Dover and the Flemish banks, JUDGEMENT; no printed climatic table read"
     provisional: true
     source: "docs/design/WeatherSystems.md sections 1.1, 1.2, 1.3, 5 (2026-09-29): the Channel indices of Mellado-Cano et al. (S1) and Ushant's gust days (S4); the rest judgement"
     months:

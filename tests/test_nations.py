@@ -192,6 +192,15 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "tarifa": "spain",
         "ceuta": "spain",
         "tangier": "morocco",
+        # the Channel's east block (package 79b)
+        "portsmouth": "britain",
+        "poole": "britain",
+        "downs": "britain",
+        "dover": "britain",
+        "le-havre": "france",
+        "boulogne": "france",
+        "calais": "france",
+        "dunkirk": "france",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

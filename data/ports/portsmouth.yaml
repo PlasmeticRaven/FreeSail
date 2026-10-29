@@ -1,0 +1,135 @@
+# FreeSail: Portsmouth as a port (package 79b, the Channel's east block; the same form as
+# plymouth.yaml, on package 35's machinery). The roads and the marks are
+# features/channel-east.yaml's (the harbour patch spithead, in channel-mid's water).
+#
+# Sources. White 1835, 'Coast of England', pp. 45 to 47 (the approach from Dunnose and the
+# eastward by the Princessa, the Nab light-vessel, the Dean and the Warner; Kickergill
+# Tower on the middle of the barracks in Fort Monkton, the leading mark into Spithead; the
+# limits of the best anchorage, South-Sea Castle N E to E by N and the Kicker Point N N W
+# to N W; St Helens' anchorage in 7 fathoms with Ashey Down Tower on St Helens sea-mark);
+# Moore 1799 and Norie 1805, the catechisms (Moore p. 300, Norie pp. 299 to 302: the five
+# black buoys of the Dean and Horse left on the starboard hand from the eastward; moor at
+# Spithead with the best bower to the S E and the small bower to the N W; unmoor for the
+# westward at the beginning of the flood); Imray 1874, 'Spithead and its approaches',
+# pp. 35 to 43 (a good berth for large ships in 10 to 12 fathoms; the dockyard's high
+# water at 11h 41m, springs rising 12 1/2 feet). The yard and the Ordnance: as Plymouth's,
+# the Regulations of 1806 (the Captain's articles on stores; the Gunner, Art. VI: powder
+# taken in at "Plymouth Sound or Cawsand Bay, Spithead, Blackstakes, Longreach"). Prices
+# FROM MEMORY as Plymouth's; the yard's times judgement.
+#
+# Powder and shot: the Ordnance's storekeeper at the Gun Wharf issued to the King's ships
+# at Spithead (the Regulations of 1806, the Gunner, Art. VI, names Spithead), as Plymouth's
+# does; the ordnance table of the practice-and-resupply design (its §1.3, eleven ports) has
+# no Portsmouth, and this package does not widen it: no block here, so 'none to be had',
+# a finding for the package that takes the magazine's table on.
+#
+# The shoreline of 1805: the harbour without the later basins of the dockyard (the steam
+# basin of 1848 and the great extension of the 1860s) and Haslar's later reclamations. The
+# chart's tiles are EMODnet's, whose sixteenth of a minute smooths the harbour's mouth and
+# shows no basin as water; no period sheet of the harbour was read (Mackenzie's survey of
+# the coast east of Plymouth was not found from this machine, as package 39a found), so no
+# patch: `datum: unverified`.
+
+id: portsmouth
+name: Portsmouth
+nation: britain
+source: "White 1835, 'Coast of England', pp. 45-47; Moore 1799 p. 300; Norie 1805 pp. 299-302; Imray 1874 pp. 35-43; the Regulations of 1806 (the yard's supply by demand and survey)"
+datum: unverified   # no period sheet of the harbour read: no patch, the tiles EMODnet's
+
+outer_road:
+  feature: st-helens-road
+  name: St Helens road
+  lat_deg: 50.7020
+  lon_deg: -1.0620
+  depth_fathoms: 7
+anchorage:
+  feature: spithead
+  name: Spithead
+  lat_deg: 50.7600
+  lon_deg: -1.1250
+  depth_fathoms: 11
+mooring:
+  feature: portsmouth-harbour
+  name: Portsmouth harbour
+  lat_deg: 50.8030
+  lon_deg: -1.1130
+  depth_fathoms: 5
+shore:
+  name: the Sally Port at Portsmouth
+  lat_deg: 50.7905
+  lon_deg: -1.1040
+
+pilot:
+  station: st-helens-road
+  cruising_nm: 10                 # judgement: the Portsmouth pilots met ships off the Nab and Dunnose
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  names: [Ayling, Hellyer, Dore, Tribe, Gosden, Cole, Hammond, Lock]   # Hampshire and Wight names: judgement
+  skill: 0.9
+  fee_pounds: 5                   # judgement; unverified
+  cast: starboard                 # the head paying off to the eastward from Spithead, for St Helens and the Nab (judgement)
+  course_out_deg: 125             # S E by E out of Spithead between the Dean and the Warner to St Helens and the sea
+  words:
+    channel: "From the eastward come in between the Dean and the Warner: the five black buoys of the Dean and the Horse are left on the starboard hand, the Warner's white buoy and No-Man's Land's on the larboard. Give the Princessa a berth to the southward and keep the Nab's buoy to larboard; the Horse is steep, eight and twelve fathoms close to its edge."
+    marks: "Kickergill Tower on with the middle of the barracks in Fort Monkton, north-north-west, is the leading mark into Spithead. The chalk-pits and the clumps of trees on Portsdown Hill, South-Sea Castle and the trees of Portsmouth Lines are the marks of the approach; Ashey Down Tower on St Helens sea-mark is the mark of St Helens road."
+    anchorage: "The best anchorage at Spithead lies between South-Sea Castle north-east to east by north and the Kicker Point north-north-west to north-west, ten to twelve fathoms; moor with the best bower to the south-east and the small bower to the north-west. St Helens road, seven fathoms, is where the fleet waits a wind down Channel. The King's ships go into the harbour to refit and lie at their moorings off the yard."
+    tide: "It is high water at the dockyard about half past eleven at full and change, and the tide rises twelve or thirteen feet; at Spithead there is a double high water, and the flood makes up the harbour from low water to high. Unmoor for the westward at the beginning of the flood, which runs westward through the Solent."
+
+tide:
+  establishment: Portsmouth
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: coal, price: 2, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "Newcastle coal by the colliers; from memory, as at Plymouth"}
+    - {good: canvas, price: 55, origin: britain, note: "from memory, as at Plymouth"}
+    - {good: hemp, price: 65, origin: null, note: "Baltic hemp; from memory, as at Plymouth"}
+    - {good: salt, price: 24, origin: britain, note: "Lymington salt; from memory"}
+    - {good: wine, price: 75, origin: portugal, season: {12: 1.1}, note: "from memory, as at Plymouth"}
+    - {good: brandy, price: 210, origin: france, note: "from memory, as at Plymouth"}
+    - {good: biscuit, price: 40, origin: britain, note: "the victualling office's bread at Weevil, by the ton; from memory"}
+    - {good: timber, price: 6, origin: britain, note: "New Forest oak by the load; from memory"}
+    - {good: salt beef, price: 50, origin: britain, note: "the victualling office's; from memory"}
+    - {good: beer, price: 6, origin: britain, note: "the brewery at Weevil, by the ton; judgement"}
+    - {good: tea, price: 280, origin: null, note: "the Company's tea from the London sales; judgement"}
+
+dockyard:
+  kind: yard                      # the King's yard at Portsmouth: the frigate's stores by demand and survey, no money
+  items:
+    - {item: topmast, hours: 8, pounds: 0, note: "by demand on the yard (the Regulations of 1806: stores supplied by the yard on the captain's demand, surveyed and vouched); the time to send it off and get it in: judgement, as at Plymouth"}
+    - {item: topgallant_mast, hours: 4, pounds: 0}
+    - {item: yard, hours: 6, pounds: 0}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 0, note: "from the yard's sail loft: two days, judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0, note: "from the ropehouse"}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0, note: "by the water-hoys at Spithead: ten tons an hour, judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0, note: "from the victualling office"}
+
+crew_pool:
+  # the press and the receiving ships take the seamen; the most of any port (judgement)
+  able: {hands: 12, pounds: 5, delay_h: 24}
+  ordinary: {hands: 25, pounds: 3, delay_h: 24}
+  landsman: {hands: 40, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+# The port's tracks: from Spithead out between the Dean and the Warner to St Helens and a
+# point two miles east of the Nab (White's track from the eastward reversed); `in` from St
+# Helens road to Spithead. The points JUDGEMENT on the grid's channel.
+tracks:
+  to_sea: [spithead, 50 44.1 N 1 03.9 W, st-helens-road, 50 40 N 0 58 W]
+  from_sea: [50 40 N 0 58 W, st-helens-road, 50 44.1 N 1 03.9 W, spithead]
+  in: [spithead]
+
+places:
+  - id: dockyard
+    name: the dockyard
+    done: "a ship of war's demands are surveyed and supplied from the King's stores"
+    found: "the master attendant, the storekeeper and the shipwrights"
+    roles: [master attendant, storekeeper, shipwright]
+  - id: port_admiral
+    name: the port admiral's office
+    done: "a ship of war's orders are given and her letters taken"
+    found: "the port admiral's secretary and the officers waiting on him"
+    roles: [port admiral, secretary, flag lieutenant]

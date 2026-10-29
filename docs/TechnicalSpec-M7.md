@@ -1007,6 +1007,14 @@ chart's own tools as the Channel's and the Bay's were. The signals'
 sources (the 1799 book, Popham 1803, the convoy instructions, du Pavillon) are a research
 item before 7-i is briefed, each book marked verified or made.
 
+**As built: the Channel's east block (package 79b, 2026-10-29).** Milestone 7's first chart
+block, split from package 79 by the owner (79a the regimes, 79b this block, 79c and 79d the
+Mediterranean west): `channel-east`, the Wight and Spithead to the Downs, Dover and Dunkirk
+and the French coast from the Seine to the Flemish banks, built by `docs/dev/ChartBlocks.md`
+on milestone 6's machinery; as built in spec M6 §26's list, figures in
+`docs/dev/TuningNotes.md`, "Package 79b". (The brief named this section §26; the chart's
+section of this spec is §28, and the pointer is here.)
+
 ---
 
 ## 29. Consent (one revision before any adversarial seat)

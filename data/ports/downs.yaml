@@ -1,0 +1,119 @@
+# FreeSail: the Downs and Deal as a port (package 79b, the Channel's east block; on package
+# 35's machinery). The roads and the marks are features/channel-east.yaml's (the harbour
+# patch downs). Deal has no harbour: ships lie in the Downs and the Deal boatmen bring off
+# everything, pilots, stores, water, letters and people, in their luggers and galleys.
+#
+# Sources. White 1835, 'Coast of England', pp. 53 to 54 and 58: round the South Foreland
+# half a mile off in 14 to 12 fathoms; anchor with Upper Deal Mill on Deal Castle W by S
+# and the South Foreland upper light on the south side of Old Stairs Point, 7 or 8 fathoms;
+# moor with the best bower to the southward; to the eastward of Deal Sand's red buoy; high
+# water at Deal XI. 15 at full and change, the stream to the north-east till four hours'
+# ebb. Moore 1799 and Norie 1805, the catechisms (Moore pp. 298 to 299, Norie pp. 299 to
+# 301: the best anchoring Upper Deal church or mill and the castle in one in 8 to 10
+# fathoms; moor with the best bower to the south-west and the small to the north-east;
+# working out of the Downs, the Goodwin steep-to in 10 or 11 fathoms; the South Foreland's
+# lights in one clear the South Sand Head; parting in a south-westerly gale, through the
+# Gull Stream). Norie 1805, Table XLI, p. 249: Deal and the Downs 11h 0m, 15 feet. Imray
+# 1874, 'Margate Roads to South Foreland', pp. 8 to 9: the anchorage between Walmer and
+# Sandown castles eastward of Deal bank, a chalky bottom; the Small Downs for vessels of
+# less than 15 feet; Deal bank 18 feet; ships supplied with fresh water from Deal.
+#
+# The datum: no period sheet of the Downs read (the brief's Hurd sheets not found from this
+# machine): `datum: unverified`. Prices FROM MEMORY and JUDGEMENT; the boatmen's charges
+# were notorious and are judgement too.
+
+id: downs
+name: the Downs
+nation: britain
+source: "White 1835, 'Coast of England', pp. 53-54, 58; Moore 1799 pp. 298-299; Norie 1805 pp. 299-301 and Table XLI p. 249; Imray 1874 pp. 8-9"
+datum: unverified   # no period sheet of the Downs read
+
+outer_road:
+  feature: the-downs
+  name: the Downs
+  lat_deg: 51.2200
+  lon_deg: 1.4400
+  depth_fathoms: 8
+anchorage:
+  feature: small-downs
+  name: the Small Downs
+  lat_deg: 51.2650
+  lon_deg: 1.4150
+  depth_fathoms: 4
+mooring:
+  name: off Deal beach
+  lat_deg: 51.2230     # close in off the town within Deal bank (judgement)
+  lon_deg: 1.4110
+  depth_fathoms: 3
+  bottom: chalk and sand
+  deep_draught_ft: 14  # judgement: within Deal bank's eighteen feet only small craft lie; a ship lies in the Downs
+shore:
+  name: the beach at Deal
+  lat_deg: 51.2230
+  lon_deg: 1.4040
+
+pilot:
+  station: the-downs
+  cruising_nm: 10                 # judgement: the Deal pilots and boatmen came off as far as the South Sand Head and the Gull Stream
+  comes_off_by_night: true        # the Deal boatmen came off in any weather (judgement from their fame)
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a Deal lugger
+    under: lugsails
+    note: "the Deal boatmen's luggers and galleys off the beach (judgement)"
+  names: [Erridge, Roberts, Atkins, Bushell, Finnis, Mockett, Pritchard, Adams, Baker, Hoile]   # Deal names: judgement
+  skill: 0.92
+  fee_pounds: 4                   # judgement; unverified
+  cast: starboard                 # from the Downs the head paying off to the southward, for the South Foreland (judgement)
+  course_out_deg: 200             # S S W out of the Downs past the South Sand Head for the Strait
+  words:
+    channel: "From the westward round the South Foreland half a mile off in fourteen to twelve fathoms, and when the light-houses bear west haul up north-east into the Downs. From the northward come in through the Gull Stream between the Brake and the Goodwin, keeping no nearer the Brake than seven fathoms nor the Goodwin than ten or eleven; the Goodwin is steep-to and swallows a ship whole."
+    marks: "Deal Castle, Walmer Castle to the southward and Sandown to the northward stand on the beach; Upper Deal mill and church behind the town. The South Foreland's two lights in one, west by north, lead clear of the South Sand Head by night; by day Upper Deal mill open to the southward of Walmer Castle."
+    anchorage: "Anchor with Upper Deal mill on Deal Castle, west by south, and the South Foreland upper light on Old Stairs Point, in eight or nine fathoms on chalk; moor with the best bower to the south-west and the small bower to the north-east. Smaller vessels lie in the Small Downs north of Sandown, better sheltered. The Goodwin breaks the sea from the east, but a south-westerly gale makes the Downs a hard road to ride in."
+    tide: "It is high water at Deal about eleven at full and change, and the tide rises fifteen feet at springs. The stream in the Downs runs to the north-eastward until four hours' ebb and then south-westward until three and a half hours' flood. Unmoor for Spithead at half flood and weigh at high water."
+
+tide:
+  establishment: the Downs
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: fresh beef, price: 60, origin: britain, note: "brought off by the boatmen; judgement"}
+    - {good: vegetables, price: 15, origin: britain, note: "from the Kentish gardens; judgement"}
+    - {good: biscuit, price: 42, origin: britain, note: "judgement"}
+    - {good: salt beef, price: 52, origin: britain, note: "judgement"}
+    - {good: beer, price: 7, origin: britain, note: "judgement"}
+    - {good: coal, price: 2, origin: britain, note: "from memory"}
+    - {good: canvas, price: 57, origin: britain, note: "from memory"}
+    - {good: cordage, price: 72, origin: britain, note: "from memory"}
+    - {good: wine, price: 78, origin: portugal, note: "from memory"}
+    - {good: brandy, price: 200, origin: france, note: "and the run brandy of the Deal smugglers cheaper; from memory"}
+    - {good: geneva, price: 120, origin: null, note: "Dutch gin, much run on this coast; judgement"}
+    - {good: tea, price: 280, origin: null, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # the King's naval yard at Deal served the ships in the Downs with small stores; spars and stores by the boatmen (judgement)
+  items:
+    - {item: topmast, hours: 12, pounds: 44, note: "judgement: brought off from Deal by the boatmen"}
+    - {item: topgallant_mast, hours: 6, pounds: 13}
+    - {item: yard, hours: 8, pounds: 26}
+    - {item: suit of sails, hours: 72, pounds_per_100m2: 28, note: "judgement: from London by the hoys"}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.06}
+    - {item: water, hours_per_ton: 0.3, pounds_per_ton: 0.3, note: "Imray 1874 p. 9: fresh water supplied to ships in the Downs; in 1805 by the boatmen in casks, dear and slow (judgement)"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.07}
+
+crew_pool:
+  # the Deal men are the boatmen and pilots, exempt or hard to press (judgement)
+  able: {hands: 3, pounds: 5, delay_h: 24}
+  ordinary: {hands: 6, pounds: 3, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [the-downs, 51 11 N 1 28 E, 51 08 N 1 26 E]
+  from_sea: [51 08 N 1 26 E, 51 11 N 1 28 E, the-downs]
+  in: [the-downs]

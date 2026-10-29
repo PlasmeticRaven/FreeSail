@@ -1,0 +1,125 @@
+# FreeSail: the Havre as a port (package 79b, the Channel's east block; the same form as
+# st-malo.yaml, on package 35's machinery). The roads and the marks are
+# features/channel-east.yaml's (the harbour patch le-havre).
+#
+# Sources. Faden 1793, pp. 17 to 21: Cape la Heve's two light-houses of 1775; 'Directions
+# for the Roads of Havre, by Mons. De Gaulle, Professor of Hydrography, 1776': the Great
+# Road two good leagues from the harbour W S W of Cape la Heve, 10 to 14 fathoms on ooze,
+# where the whole French fleet lay in 1690; the Little Road half a league from the harbour,
+# 3 or 4 fathoms on pebbles and oysters that cut a cable, a berth for one tide; L'Eclat a
+# mile S W of the Heve with 7 or 8 feet; 'Le Havre de Grace': the sea-port of Paris at the
+# Seine's mouth on ground gained out of the sea, its harbour the work of art within the
+# walls, about 300 vessels; in spring tides the water rises 20 feet; the water stands near
+# three hours at the top of the flood; the entrance between two stone jetties, a pilot
+# required, the pilots in their sloops or signalling from the north end of the harbour;
+# 'Honfleur': the Amfar dry every tide; no ship enters the Seine without a Quillebeuf
+# pilot. White 1835, 'Coast of France', p. 59: Cape la Heve's two fixed lights; do not
+# bring them in one until four hours' flood. Norie 1805, Table XLI, p. 250: Havre de Grace
+# 10h 30m, 22 feet; Honfleur 10h 30m.
+#
+# The datum: SHOM's RAM at Le Havre, BMVE 1.25 m above the zero (read 2026-10-29), for a
+# patch; no period sheet read (Bellin's plan of the Havre was not fetched): `datum:
+# unverified`. The grid's shore is the modern port's: the basins and the industrial port
+# reclaimed east and south of the town over the Amfar and the Seine's banks, land in the
+# tiles where 1805 had sand and water (a finding for a patch, not modelled here).
+#
+# The stance. The Havre is French: hostile to a King's ship in June 1805, open to a
+# neutral. The invasion flotilla of 1803 to 1805 had its building yards and a division
+# here, the batteries of the Heve and of the jetties covering the road (from memory; noted,
+# not modelled). The market is the colonial trade the blockade has strangled: sugar,
+# coffee and cotton dear, Norman produce cheap; FROM MEMORY and JUDGEMENT, in sterling.
+
+id: le-havre
+name: the Havre
+nation: france
+source: "Faden 1793, pp. 17-21 (the roads of Havre by M. de Gaulle, 1776); White 1835, 'Coast of France', p. 59; Norie 1805, Table XLI, p. 250"
+datum: unverified   # no period sheet read; SHOM's RAM BMVE 1.25 m for a patch
+
+outer_road:
+  feature: havre-great-road
+  name: the Great Road of Havre
+  lat_deg: 49.5100
+  lon_deg: 0.0000
+  depth_fathoms: 10
+anchorage:
+  feature: havre-little-road
+  name: the Little Road of Havre
+  lat_deg: 49.4949
+  lon_deg: 0.0792
+  depth_fathoms: 3.5
+mooring:
+  name: the harbour within the jetties
+  lat_deg: 49.4870     # the harbour's mouth between the jetties (judgement)
+  lon_deg: 0.1020
+  depth_fathoms: 0.5   # judgement: the harbour all but dry at low water, twenty feet at springs
+  bottom: mud
+  deep_draught_ft: 15  # judgement
+shore:
+  name: the quay at the Havre
+  lat_deg: 49.4890
+  lon_deg: 0.1050
+
+pilot:
+  station: havre-great-road
+  cruising_nm: 20                # Faden: the pilots go generally as far as Barfleur and farther to meet ships
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Havre pilots' sloop
+    under: a gaff mainsail and jib
+    note: "the pilots in their sloops (Faden 1793 p. 20)"
+  names: [Lecoq, Duval, Lemonnier, Leroux, Hauguel, Lefebvre, Vasse, Thieullent]   # Norman names: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, in sterling for the one account; unverified
+  cast: starboard                # from the Little Road the head paying off to the westward, for the Heve (judgement)
+  course_out_deg: 290            # W N W out of the roads past the Heve, as Faden's ship from the Havre steers
+  words:
+    channel: "Do not bring the two lights of the Heve in one until four hours' flood. Between the Heve and L'Éclat, a mile south-west of it with seven or eight feet, keep the guard-house on the jetty in one with the chapel of Notre Dame de Grace; south of L'Éclat keep the castle of Orcher on the two towers of the gate of Ingouville. When two-thirds of the flood are run you may pass everywhere."
+    marks: "Cape la Heve with its two stone light-houses, never in one from the offing; the town low on its plain within the jetties, full of windmills; the chapel of Notre Dame de Grace on the wooded height west of Honfleur across the river."
+    anchorage: "A ship of great draught waits in the Great Road two leagues west-south-west of the Heve, ten to fourteen fathoms on ooze, on two anchors south-south-east and north-north-west. The Little Road between the Heve and the town has three or four fathoms on pebbles and oysters that cut a cable in a very little time: moor there for one tide only."
+    tide: "It is high water about half past ten at full and change and the water rises twenty feet within the harbour; the water stands near three hours at the top before it ebbs. The first two hours of the flood set to the south, then south-east, then east, and the rest north-east to north-west."
+
+tide:
+  establishment: Havre de Grace
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: sugar, price: 110, origin: null, note: "colonial sugar, dear under the blockade; judgement"}
+    - {good: coffee, price: 160, origin: null, note: "dear under the blockade; judgement"}
+    - {good: cotton, price: 150, origin: null, note: "for the Rouen mills, dear under the blockade; judgement"}
+    - {good: cider, price: 8, origin: france, note: "Norman cider; judgement"}
+    - {good: butter, price: 48, origin: france, note: "Norman butter; judgement"}
+    - {good: brandy, price: 95, origin: france, note: "from memory, as at Brest"}
+    - {good: wine, price: 36, origin: france, note: "from memory, as at Brest"}
+    - {good: salt, price: 12, origin: france, note: "from memory"}
+    - {good: canvas, price: 42, origin: france, note: "from memory"}
+    - {good: timber, price: 6, origin: france, note: "Norman oak; judgement"}
+    - {good: salt beef, price: 70, origin: france, note: "from memory, as at Brest"}
+
+dockyard:
+  kind: chandlers                # the builders of the flotilla and the merchants' chandlers; the navy's yard is Brest's
+  items:
+    - {item: topmast, hours: 10, pounds: 40, note: "judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 12}
+    - {item: yard, hours: 7, pounds: 25}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the Inscription maritime and the flotilla take the seamen
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 10, pounds: 1, delay_h: 12}
+
+closed_to: []                    # the table's war with Britain makes the stance
+
+tracks:
+  to_sea: [havre-little-road, 49 30.5 N 0 03 E, havre-great-road, 49 33 N 0 05 W]
+  from_sea: [49 33 N 0 05 W, havre-great-road, 49 30.5 N 0 03 E, havre-little-road]
+  in: [havre-little-road]
