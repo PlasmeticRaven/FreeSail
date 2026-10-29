@@ -194,7 +194,7 @@ def hurry(w):
 # ---------------------------------------------------------------------------
 
 
-def test_the_eleven_ports_have_their_blocks_and_the_other_twenty_seven_none():
+def test_the_eleven_ports_have_their_blocks_and_the_others_none():
     """§1.3's table: Plymouth and Gibraltar the Ordnance's (Plymouth selling nothing, its
     roads Cawsand Bay and the Sound), nine ports the merchants', each with its source and
     the prices at home or abroad; Lisbon's knob written in its file and left unset; every
@@ -202,7 +202,8 @@ def test_the_eleven_ports_have_their_blocks_and_the_other_twenty_seven_none():
     w = world_at(OFF_THE_LIZARD, ports=tuple(PT.port_files()))
     with_block = {pid for pid, port in w.dealings.ports.items() if port.ordnance is not None}
     assert with_block == set(BLOCKS)
-    assert len(w.dealings.ports) - len(with_block) == 27
+    # the other twenty-seven, and the Channel's east block's eight (package 79b), none
+    assert len(w.dealings.ports) - len(with_block) == 27 + 8
     for pid, (kind, sells, roads, hours, barrel, ton) in BLOCKS.items():
         block = w.dealings.ports[pid].ordnance
         assert (block["kind"], block["sells"], block["roads"]) == (kind, sells, roads), pid

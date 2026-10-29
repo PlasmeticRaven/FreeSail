@@ -106,15 +106,6 @@ dockyard:
     - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1}
     - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
 
-ordnance:
-  kind: merchants
-  hoy_hours: 3
-  barrels_an_hour: 20
-  shot_tons_an_hour: 2
-  powder_per_barrel_pounds: 5.0
-  shot_per_ton_pounds: 12.0
-  source: "the merchants' trade in powder: Proposal-MagazineResupply.md's list, UNVERIFIED; the prices and the hours judgement, UNVERIFIED"
-
 crew_pool:
   # judgement: the privateers take the seamen
   able: {hands: 2, pounds: 2, delay_h: 24}

@@ -2041,6 +2041,24 @@ the figures are in `docs/dev/TuningNotes.md`.
    frigate from five miles south-west of Cape Trafalgar (not Cadiz bay, `portugal`'s) through
    the Strait with the inset (the brief's "against" read as the passage out has it) to
    Gibraltar road, at anchor at 12:52 in six fathoms off the Old Mole. The figures are in `docs/dev/TuningNotes.md`.
+   **As built (package 79b, 2026-10-29), the Channel's east block of milestone 7's line.**
+   `channel-east`, 49 to 51.5 N and 1 W to 2.5 E, abutting `channel-mid` at 1 W: 57
+   level-2 tiles (the seam's column of six channel-mid's, kept) and 73 level-3 in eight
+   harbour patches (Spithead and Poole in channel-mid's water where it lists no level-3
+   tile, the Downs, Dover, the Havre, Boulogne, Calais, Dunkirk), 13.2 MB with the coast and
+   the features, every tile written (no corridor east of 1 W); 137 marks from Faden 1793,
+   Moore 1799, Norie 1805, White 1835 and Imray 1874, the lights dated by Norie 1805's own
+   list (1805 sees the Forelands', Dungeness's, the Owers' and the North Goodwin's floating
+   lights, Cape la Heve's two, Lailly's, Dieppe's and St Valery's, Dunkirk's fanal and
+   Boulogne's lanthorn; not the Nab, 1812, nor Calais, Gris Nez or Gravelines); no patch,
+   no sheet having been read with its datum. Eight port files (Portsmouth with the King's
+   yard, Poole, the Downs, Dover; the Havre, Boulogne, Calais and Dunkirk French and
+   hostile). The tide: Newhaven, Le Havre, Dieppe, Boulogne, Calais and Dunkirk read and
+   held (the world's range over the block is the eleven's blend, a fifth of Newhaven's and
+   Dieppe's own: the lead's decision); eight stream areas, the Looe's rates Mackenzie's;
+   Norie 1805's Table XLI for 27 places. The Channel's weather box to 2.5 E. The scenario
+   `spithead.yaml`: the frigate from the Downs to Spithead by St Helens for the night.
+   Figures in `docs/dev/TuningNotes.md`.
 
 Each block (the Strait's included) is a port file per port on 35's machinery, a patch per harbour where a period
 sheet can be read, the features file's marks with their sources in the references'

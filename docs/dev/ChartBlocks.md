@@ -36,7 +36,9 @@ region's, its tide and its weather are rows in tables that already reach its wat
    `UNIT_M`'s; Tofiño's Spanish sheets are in `brazas` (six pies de Castilla, 1.6718 m,
    package 39d). Biscay south (package 39c) uses both: `fill_mean_level_m: 2.5` (the
    French gauges' 2.48 to 2.53 m; the Spanish ones' are not read) and `skip_dry_tiles`
-   (its tiles of Castile, León and the Landes). A bound may be moved to its tile
+   (its tiles of Castile, León and the Landes). **Not beyond the corridor** (package 79b):
+   east of 1 W no corridor lies under the regions, so a dry tile left unwritten leaves a
+   query there nothing at all; a block there writes every tile. A bound may be moved to its tile
    column's or row's edge to take in a mark at no cost in tiles, as Biscay south's west
    was to 9.33 W for Finisterre (the brief's 9.0 W left the cape out; the column from
    9.33 W meets 9.0 W already).
@@ -408,6 +410,39 @@ hour Bowditch's; the rest judgement, marked.
 What the block need not do: nothing of `freesail/` changes for a block, unless its
 water wants a rule the engine lacks, which is a finding for the tuning notes and the
 lead, not a patch in the block.
+
+## The Channel's east block (package 79b, as built)
+
+`channel-east`, 49 to 51.5 N and 1 W to 2.5 E, abutting `channel-mid` at 1 W: the seam's
+column (1.23 to 0.80 W) is channel-mid's, six tiles kept; Spithead's and Poole's patches lie
+in channel-mid's water where it lists no level-3 tile, and are the block's with their marks,
+as Dartmouth's were 39a's. What it found, for the next blocks:
+
+- **The world's tide can be wrong inside the Channel.** Dover is one of the eleven, and yet
+  the blend east of the Wight sets Weymouth's and Cherbourg's small ranges against Dover's:
+  the world's range at Newhaven and Dieppe is a fifth of the gauges' own. The block's
+  gauges are held as every block's; a block of the Channel itself shows the held gauges'
+  cost most, and its master's rises where the period gives none (the 37j rule) are the
+  blend's and too small: give the period's rise wherever a table has one.
+- **Norie's Table XLI of 1805 is legible in the page images** (Internet Archive
+  `norie-1805-a-new-and-complete-epitome-of-practical-navigation`, pp. 248 to 252, the
+  IIIF server at 800 pixels when 1,200 answers 504): the hours and rises of every English
+  and French Channel place a block wants, the better table's own; and his 'Examination of a
+  Young Sea Officer' (pp. 299 to 302) lists the lights on the coasts of England and France
+  in 1805, which settles what 1805 sees on a coast where the encyclopaedias are silent.
+- **The modern ports are the grid's land**: the Havre's industrial port, Dunkerque's Port
+  Ouest and Dover's Western Docks are land or dredged water in EMODnet's grid where 1805 had
+  sand, beach and shoal; the grid has no breakwater at its sixteenth of a minute. Without a
+  sheet read with its datum there is no patch: say so in the port file's head.
+- **A stream area is the period's statement of a water**: the Looe's three knots belong to
+  the channel within the Owers, and drawn over the water outside them they set a ship
+  going outside, as the pilots would not have it, two miles out in her account.
+- **A block's chart may cross the meridian**: `Chart.bounds_words` now says so.
+- **The pilots' texts go under `docs/references/pilots/`** with their README row (the
+  brief's rule from 79b on), read as data; a sweep for identifiers will meet star names in
+  the old navigators' tables (Gemini, Canopus) and an OCR's F for the T of "Table" (corrected).
+- **The lookout calls the nearest marks first**: a truth of what a ship sees at a road asks
+  the chart's `in_sight` for the farther high marks, the calls being a few a sweep.
 
 ## Out in the ocean: the islands and the corridor (package 39e)
 

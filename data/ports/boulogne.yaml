@@ -107,15 +107,6 @@ dockyard:
     - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1}
     - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.08}
 
-ordnance:
-  kind: merchants
-  hoy_hours: 3
-  barrels_an_hour: 15
-  shot_tons_an_hour: 1.5
-  powder_per_barrel_pounds: 6.0
-  shot_per_ton_pounds: 14.0
-  source: "the merchants' trade in powder: Proposal-MagazineResupply.md's list, UNVERIFIED; dearer with the army in camp; the prices and the hours judgement, UNVERIFIED"
-
 crew_pool:
   # judgement: the flotilla has the seamen
   able: {hands: 1, pounds: 3, delay_h: 36}

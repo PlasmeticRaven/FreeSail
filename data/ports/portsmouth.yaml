@@ -17,6 +17,12 @@
 # taken in at "Plymouth Sound or Cawsand Bay, Spithead, Blackstakes, Longreach"). Prices
 # FROM MEMORY as Plymouth's; the yard's times judgement.
 #
+# Powder and shot: the Ordnance's storekeeper at the Gun Wharf issued to the King's ships
+# at Spithead (the Regulations of 1806, the Gunner, Art. VI, names Spithead), as Plymouth's
+# does; the ordnance table of the practice-and-resupply design (its §1.3, eleven ports) has
+# no Portsmouth, and this package does not widen it: no block here, so 'none to be had',
+# a finding for the package that takes the magazine's table on.
+#
 # The shoreline of 1805: the harbour without the later basins of the dockyard (the steam
 # basin of 1848 and the great extension of the 1860s) and Haslar's later reclamations. The
 # chart's tiles are EMODnet's, whose sixteenth of a minute smooths the harbour's mouth and
@@ -99,22 +105,6 @@ dockyard:
     - {item: cordage, hours: 2, pounds_per_fathom: 0, note: "from the ropehouse"}
     - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0, note: "by the water-hoys at Spithead: ten tons an hour, judgement"}
     - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0, note: "from the victualling office"}
-
-# Powder and shot: the storekeeper of the Ordnance at the Gun Wharf issues to the King's
-# ships, free and vouched (the Regulations of 1806, the Gunner, Art. I), and the powder is
-# taken in at the roads only, Spithead or St Helens and never in the harbour (Art. VI names
-# Spithead). As at Plymouth, whether the town's merchants sold powder is UNVERIFIED: none.
-ordnance:
-  kind: ordnance
-  sells: false
-  roads: [outer_road, anchorage]
-  roads_words: Spithead or St Helens
-  hoy_hours: 4
-  barrels_an_hour: 20
-  shot_tons_an_hour: 2
-  powder_per_barrel_pounds: 5.0
-  shot_per_ton_pounds: 12.0
-  source: "Regulations 1806 (1808 printing), Gunner, Art. I l.12722-12738, Art. V l.12800-12809, Art. VI l.12833-12839"
 
 crew_pool:
   # the press and the receiving ships take the seamen; the most of any port (judgement)
