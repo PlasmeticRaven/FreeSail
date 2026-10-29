@@ -1880,3 +1880,36 @@ fields out at their defaults, which is the right way to keep every pin. Four thi
 The 64's exercise allowance by `decks=2`, Adye's and Falconer's tables in `tools/ships/period.py`
 with their pages, and the pivot's arc required at the load (the old pickles keeping the
 default, as ruled) are all as they should be. Go on to stage 0E.
+
+**2026-10-29, stage 0E read and the driver's addendum ruled** (`2ead5f0` and `0dbde00` on
+`claude/pkg-75`). **Stage 0E accepted as laid:** the three keys refused in words where they
+cannot stand (`settee` a dipping lug naming its mast with four corners, never flying nor
+sheeted to another sail; `cut_at_mast` a lateen naming its mast with four corners;
+`heave_to_aback` a lower mast's and one mast's at most), the runtime fields class defaults
+left out of the pickle while false, `curve_class` the gaff's for a sail cut at the mast,
+`Ship.under_bowsprit` defined and called by nothing, the runner's `class: settee` and
+`wanted_sheet`, the served keys only where true; nothing under `freesail/physics/` or
+`data/`; the eight files byte for byte and every pickle byte-identical to `5326e24`'s. One
+thing seen and accepted for the interval: between 0E and B3.1 the rating, the polar's sheets
+and the readings take the gaff's curve for a sail cut at the mast while the physics' own
+lookups still take the lateen's; no file carries the key, so nothing differs, and B3.1
+closes it, in that order and not the other.
+
+**The driver (Ext §17): approved.** The lens is met in full: nothing in the physics or the
+class table changes, not even a lookup; the curve is the gaff's through `curve_class`; no new
+host, since the sail is Steel's driver boomsail and not the 1773 ringtail; and the frigate's
+spanker re-filed as the driver's model (row 3′) gives her polar and her yaw equal to the
+filed spanker at every angle, in speed and in moment. The two changes are what they say:
+a schema allowance (a boom on a lateen cut at the mast, refused on a whole lateen) and a
+handling membership (two sails bent in one place are rivals, so the storm mizzen and the
+driver are never bent together), the second reaching `orders/storm.py`'s own copy of the
+rule, so the storm's slow tier runs on that commit. The model's departure from the owner's
+item, the course unbent while the driver is bent in place of brailed beside it, is the
+engine's one-place rule keeping one after sail bent on every path that sets sail unasked;
+the owner chose Steel's sail for both ships with that explained, and §17.9 keeps the brailed
+way open should they want it later. The 64's low confidence is recorded as it should be: the
+owner's choice, not the evidence's. **Truth 7-230 is allotted to the driver** from the spare
+block: row 3′'s equality (the model is the spanker to the physics) and the shift's thirteen
+minutes, in `tests/test_driver.py` as proposed. B1 and B7 measure their own polars and
+balance at the flip, old beside new, as the addendum says. Go on: the stage-0 allowance,
+B3.5 after B3.1, B5's drawing, B1's flip at the 64's stage B.
