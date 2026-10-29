@@ -1260,6 +1260,13 @@ proposes Steel's driver boomsail, which the owner chose (2026-10-28; its §17.9 
 
 1. **D18 (owner):** (a) proposed, the razee's gun deck at 1.39 m; (c), her old upper deck at
    3.66 m, one figure away; decided on screenshots of both beside the 64 and the frigate-36 (§2.2).
+   *Answered (2026-10-29): (c) for the razee* (`Build-Ships.md` §5.5): her datum her old upper
+   deck, her working deck in the waist her gun deck (`Particulars.datum_line`); the 64 keeps (a).
+   With it, her short roundhouse is in her profile (ZAZ2371's note of the December 1794 warrant;
+   measured on ZAZ2371): her taffrail at 7.15 m, her stern lights and gallery under it. *Open, at
+   her stage B:* her driver boom's jaws, 6 ft 6 in above her quarterdeck, now run under her
+   roundhouse; raising them clear moves her spanker and her sailing figures, for the owner and
+   the lead.
 2. **D25 (owner):** the razee's scenario among (a)-(d) (§11.2); what is common is built now.
 3. **The razee's default fit (owner):** "as razeed 1795" by the brief, or "as carried 1796", the
    guns of every action read (§5.1); it also settles §11.1's second way.

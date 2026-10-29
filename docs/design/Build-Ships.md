@@ -861,7 +861,9 @@ The side's half-breadth at the sill, narrower than half the beam, raises each fi
 The brig's sill is the largest move among the existing files; where in Steel's band it lands
 is B8's measure of the *Raven*'s figures.
 
-### 5.5 D18, proposed: (a) for every file (open, the owner's)
+### 5.5 D18, proposed: (a) for every file; the razee (c), the owner's choice
+
+*Answered (the owner, 2026-10-29), for the razee:* (c), "I say C, it looks slightly more right to me": her datum her old upper deck at midships, 3.67 m above her water, her working deck in the waist still her gun deck. **Plainly:** (c) departs from the frigate-36's rule, which the 64 and the eight keep; her file's notes say so. Her spars keep their heights above the water (written above the new datum); her bowsprit stands as the 64's; on a beam reach in 15 kn she makes 7.79 kn against 7.78 under (a).
 
 The owner's measure: "whichever choice gives the best impression in the viewer and matches the
 sources". The lead's reading: with the profile drawn, the deck height serves the physics and the
@@ -965,6 +967,12 @@ any other is cited by link and credit only, never copied.
   smack's and an English lugger's Cooke etchings of 1829; the cutter's "Nimble" aquatint; the
   bilander's Gwyn drawing c. 1780 (with her stern) and the PSF line drawing; the tartane's
   Roux-school watercolour.
+- **the razee:** Vanguard Models' kit of HMS *Indefatigable* 1794, photographs of the built
+  model's stern and quarter (the owner, 2026-10-29; a modern model, in copyright: kept privately
+  in owner-notes, never copied). One tier of five stern lights with an end light under a fan top
+  at each side, a decorated taffrail above them, the name on the counter, a quarter gallery of
+  three lights: her cabin under the short roundhouse that ZAZ2371's note gives her, now in her
+  profile.
 
 Wanted from the owner where they turn up: bow-on and stern-on views, and hulls out of the water,
 which show the sections and the body under the water that a broadside cannot.
@@ -1642,7 +1650,8 @@ both (below, Ext §17). *The hull (2026-10-28):* items 14, 15, 17 and 20 answere
 from item 3; 16 and 19 open, for the owner to decide on the sheets (below).
 
 1. **D18:** (a) proposed for every file (§5.5); the razee's gun deck at 1.39 m, or (c) her old
-   upper deck at 3.66 m; decided on B5's screenshots.
+   upper deck at 3.66 m; decided on B5's screenshots. *Answered (2026-10-29): (c) for the razee
+   (§5.5).*
 2. **D25:** (c), the Lizard of April 1796, proposed (the lead's view and the shared draft; Indf
    §11.2 lays out all four); held open by the owner.
 3. **The razee's default fit:** "as razeed 1795" by the brief, or "as carried 1796", her guns in
@@ -1692,7 +1701,7 @@ from item 3; 16 and 19 open, for the owner to decide on the sheets (below).
 16. **Below the waterline.** Proposed: hidden by the sea, as in life, so that only what heel lifts out shows. Or faintly visible, or a solid band as today. All three are shown on the sheets.
 17. **Stern windows, quarter galleries and figureheads.** *Answered (the owner, 2026-10-28): plain shapes, as proposed.* Drawn as plain shapes where a source shows them, or where her type certainly had them; nothing invented. Carving and paint come later. If the owner photographs Lavery 1985 pp. 54-57 (the decoration drawings), the 74's stern and head can be drawn from her class's own drawings.
 18. **The razee's stern.** Proposed: as in 1796, with the roundhouse as shortened by the Navy Board's warrant of December 1794 (ZAZ2371's note, read, tentative: Ind's table V10), to match her default fit "as carried 1796" (item 3). **Plainly:** not answered as a question of its own; taken from item 3 unless the owner says otherwise. Her one tier of gallery windows is a tentative reading, to be checked. The alternative is the stern as reduced by April 1797.
-19. **A close-up of the hull.** In the page's panel at the built-in 800 × 600 window a metre is 3-9 px, so a foot of tumblehome is about 1 px. Proposed: decide on the first sheet. If the differences are lost in the panel, a hull close-up is added to B5.6.
+19. **A close-up of the hull.** In the page's panel at the built-in 800 × 600 window a metre is 3-9 px, so a foot of tumblehome is about 1 px. Proposed: decide on the first sheet. If the differences are lost in the panel, a hull close-up is added to B5.6. *The owner (2026-10-29), on the sheets:* "the viewer is certainly large enough to show these details, and the final decision will be after I've seen it in the browser window"; no close-up is planned unless that look asks for one.
 20. **The scope of the hull's drawing.** *Answered (the owner, 2026-10-28): as proposed* (§5.0, §5.7, §6): every hull, with her sheer, sections, stern by type, head and wales, and galleries and lights as plain shapes, in B5.1 and B5.6, first on the *Indefatigable* (§2.6).
 
 Items 16 and 19 stay open until the owner decides them on the sheets.

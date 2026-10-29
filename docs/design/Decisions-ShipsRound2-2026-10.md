@@ -346,6 +346,8 @@ Every mast, yard, sail corner and gun height in a file is measured from its deck
 
 *Depends on it:* every height in both files; spar windage and the deck wind's height; Δdeck in the derivation; the drawn freeboard and bowsprit (D14).
 
+*Answered (the owner, 2026-10-29), for the razee:* (c), "I say C, it looks slightly more right to me": her datum her old upper deck at midships, 3.67 m above her water, her working deck in the waist still her gun deck. **Plainly:** (c) departs from the frigate-36's rule, which the 64 and the eight keep; her file's notes say so. Her spars keep their heights above the water (written above the new datum); her bowsprit stands as the 64's; on a beam reach in 15 kn she makes 7.79 kn against 7.78 under (a). The 64 keeps (a), her upper deck (`Build-Ships.md` §5.5).
+
 ### D19. The razee's lower masts
 
 When she took the 64's masts again, were the lower masts shortened at the heel by the height of the deck taken off, or kept at their full length?
