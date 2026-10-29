@@ -11911,3 +11911,42 @@ meets: the Mistral (the wind, through the Admiralty's volumes, Bérard and Smyth
 (Smyth 1854) and *opus* in Latin, Spanish *llama* ("is called"), the long s read as
 *fable*, the constellation Gemini (Admiralty 1916, Norie 1831): words of the texts, kept
 verbatim as the Channel's pilots' star names were.
+### Step 9: the director's reach and the truth over the hulls
+
+Built on step 8 as merged, the lead's head `76eb22c` brought in at the boundary (the design
+note's postscript "Step 9" has the shape). **What moved: nothing pinned.** No recorded
+passage names a hull in a world order, and the forms that read as they did read as they did.
+**The count.** `world/orders.py` (`hull_named`, `_aboard_target`, `_on_hull_words`, the head
+for `aboard the X:`, a person made or come aboard another hull, the cutter's letter to a hull,
+`held_stations_everywhere`), `world/ships.py` (`Vessel._ship_target`,
+`Vessels._deliver_to_hulls`), `world/people.py` (`Message.to_hull`), `agents/tools.py`
+(`read_log(ship=)`), `api/readings.py` (the hulls' rows, the persons ashore),
+`world/seats.py` (a person of any hull), `world/hearing.py` (the stations' walk over the
+hulls), `agents/director.py` (four examples); tests: six new in `test_world_orders.py`, the
+people test of package 68 restated (a ship without a captain of her own refuses in the
+hull's words), the forms test performing the new examples on its crewed sea.
+
+**Found on the way.** The hearing's walk over every World's stations
+(`stations_everywhere`) walked the parent and then the vessels' hulls, so since step 7 (the
+player's ship a vessel of the sea, her hull the followed) it counted the followed hull's
+stations twice; it walks `world.hulls` now, each once. Nothing read it twice to a pinned
+line (the hearers of a word are a set of persons), so nothing moved.
+
+**The suites on the step's tree** (the merged head `76eb22c` with the step; this container,
+three workers). The fast tier whole: **3944 passed, none failed** (the pictures' blank-image
+check passed this time); ruff clean.
+
+**For the lead's merge with package 79d** (the lead's note of 2026-10-29, 21:00): the step
+reworks no reader of a port's nation; its one read of one (`_message`'s cutter takes the
+port's nation for her colours) is the line as it was, and the trunk's head `449a72a` (79c's
+and 79d's records) is brought in under the step's changes, records only, before the commit.
+**The slow tier** of the known truths, the trials and the touched files (step 8's list with
+`test_director.py` and `test_seat_hook.py`; 191 tests): 182 passed, eight left out by their
+own marks, one failed, the lee-shore trial's digest (`7fad0ce7e46ba366` against
+`ed48ca3d61e52f20`, this container's figure as at every step). **The pace** (alone, load
+1.0 right after the slow set): truth 51's frigate alone over the floor; the day under
+systems 471, the gates' day 465 and 7-159's convoy 423 against the floor of 500, within the
+spread step 8's three-way A/B measured on this machine for the step 7 head (446 to 489 for
+the first two, 395 to 475 for 7-159), so the step costs nothing the measure sees and no A/B
+was run; `make_hull` of a brig 0.78 s (0.75 at step 8); truth 88's form with three hulls
+awake 214 ticks a second against the crewed floor of 60 (198 at step 8, 233 at step 7).
