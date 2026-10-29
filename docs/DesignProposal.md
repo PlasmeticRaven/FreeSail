@@ -715,6 +715,17 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     before 85 was booked; after them the two are fill-ins of settled patterns whose errors
     show at review, where 82's would be silent in a replay.
 
+56. **The tartane and the xebec next after 75, inside milestone 7; the ships' loose count.**
+    Owner, 2026-10-29, with the Mediterranean's west block (79c) building. The ships
+    session's next window after the 74 closes package 75 is the two lateen hulls of the
+    Mediterranean, the tartane of decision 11 and the xebec, each as a trader or fisherman
+    and as a corsair or the King's by fits and roles, with the regency's cruisers as a role
+    (package 90, booked in `docs/dev/M7-WorkPackages.md`). The count aimed at, loosely:
+    twenty-some ships counting fits and sub-types on the same hull as the initial goal (the
+    files hold eight hulls and thirteen sub-types today; 75 makes thirteen hulls and about
+    twenty-three; the two make fifteen and about twenty-seven); once the work is mostly
+    content, the number grows as far as it likes.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
