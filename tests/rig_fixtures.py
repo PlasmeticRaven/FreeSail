@@ -1,8 +1,8 @@
-"""Two rigs for package 75's engine extensions, built in memory from the committed files
-(docs/design/Design-ShipsEngineExtensions.md §8 item 7): the ships the engine's steps and the
-viewer work on before any ship file carries the new keys. Neither is a ship of the package;
-each is a committed file with its new parts cut to the design's contracts, so that what is
-built against them is built against the contracts the ship builders write to.
+"""Three rigs for package 75's engine extensions, built in memory from the committed files
+(docs/design/Design-ShipsEngineExtensions.md §8 item 7, §17.8): the ships the engine's steps
+and the viewer work on before any ship file carries the new keys. None is a ship of the
+package; each is a committed file with its new parts cut to the design's contracts, so that
+what is built against them is built against the contracts the ship builders write to.
 
 - `frigate_with_mizen_yard()`: `frigate-36.yaml` with her spanker, its gaff and boom (and the
   ringtail on the boom) replaced by a lateen mizen course cut at the mast on a `lateen_yard`
@@ -15,9 +15,16 @@ built against them is built against the contracts the ship builders write to.
   bilander of Eng §4.4 (docs/design/Research-ShipsEngine-2026-10.md) with that variant's two
   faults corrected: its centre of effort is the corners' centroid above the water, not above
   the deck, and its peak is inside the stern, not abaft it.
+- `frigate_with_driver()` (Ext §17.8, the driver's stage 0): the first with the frigate's
+  `mizzen.boom` put back, lengthened to the 64's and hung where the 64's driver puts its jaws,
+  and the 64's driver boomsail (Steel's, Ext §17.1-§17.2) on its four corners, a lateen cut at
+  the mast on the mizen yard and the boom, filed after the course in its place and in the sail
+  room; `bent=True` gives it bent in the course's place, the course in the sail room, for the
+  drawing. The storm mizzen stays in the course's place, so that the one-place rule has its
+  case; the ringtail and its boom stay out, as the 64 carries none (Indf §4.7).
 
 Each `..._doc()` gives the document, fresh at every call, for a test that changes it or
-writes it out (`write_ship`, for `make_world`, which reads a path); the two functions above
+writes it out (`write_ship`, for `make_world`, which reads a path); the three functions above
 give the `Ship`. The new parts' figures are the design's where it gives them (the mizen
 course is the 64's, by Steel's table) and marked judgement where it does not; the lines'
 ratings are those of the lines they stand for in the same file. Nothing here is read by the
@@ -102,6 +109,28 @@ SETTEE_YARD_DEG = 44.0
 SETTEE_HEAD_M = 17.0
 SETTEE_TACK_M = 1.0
 
+# -- the driver (Ext §17.2, §17.8) ----------------------------------------------------------
+
+# The 64's driver boomsail as Ext §17.2 cuts it on her geometry (`mend17/driver_four.py`): the
+# fore leech 6.98 m down the mast from the course's throat to the boom's jaws, 1.71 m short of
+# Steel's 9 1/2 yd (her jaws 2.4 m above her quarterdeck, judgement); the head 17.15 m along the
+# mizen yard's line from the throat, 6.09 m beyond the yard's peak; the foot 16.57 m along the
+# boom from the jaws; about 197 square metres against 198.5 by Steel's rule (vol. I, OCR l.
+# 10891-10897: mean cloths by mean depth, 22 1/2 in to a cloth). Canvas No. 5 (Steel: "No. 5 or
+# 6", l. 13819).
+DRIVER_FORE_LEECH_M = 6.98
+DRIVER_HEAD_M = 17.15
+DRIVER_FOOT_M = 16.57
+DRIVER_STEEL_AREA_M2 = 198.5
+DRIVER_CANVAS_NO = 5
+# Her boom by Steel's p. 40 rule, the main topsail yard's length: 65 ft 4 in (Indf §4.5); laid
+# level, its jaws where the fore leech from the fixture's truss puts them, about 4.5 m above the
+# frigate's deck (Ext §17.8, judgement).
+DRIVER_BOOM_M = 19.91
+# Her driver yard by the same rule, 34 ft 6 in (Ext §17.2), not filed as a spar: it went aloft
+# with the sail. The peak stands no more than two-thirds of it beyond the mizen yard's peak.
+DRIVER_YARD_M = 10.52
+
 
 # ---------------------------------------------------------------------------
 # The fixtures
@@ -137,6 +166,20 @@ def brig_with_settee_doc() -> dict[str, Any]:
 
 def brig_with_settee() -> Ship:
     return ship_from_dict(brig_with_settee_doc(), "tests/rig_fixtures.py:brig")
+
+
+def frigate_with_driver_doc(bent: bool = False) -> dict[str, Any]:
+    """`frigate_with_mizen_yard_doc()` with the 64's driver (Ext §17.8): the frigate's boom put
+    back, lengthened and hung at the driver's jaws, and the driver filed after the course in its
+    place, in the sail room; `bent`, bent in the course's place with the course in the sail
+    room, for the drawing (Ext §17.6)."""
+    doc = frigate_with_mizen_yard_doc()
+    _driver(doc, doc["hull"]["deck_height_m"], bent)
+    return doc
+
+
+def frigate_with_driver(bent: bool = False) -> Ship:
+    return ship_from_dict(frigate_with_driver_doc(bent), "tests/rig_fixtures.py:frigate-driver")
 
 
 def write_ship(doc: dict[str, Any], folder: str | Path, name: str = "fixture") -> Path:
@@ -229,6 +272,80 @@ def _mizen_course(doc: dict[str, Any], deck: float, mast: dict[str, Any]) -> Non
     _remove(doc, {"mizzen.spanker", "mizzen.gaff", "mizzen.boom", "ringtail_boom", "ringtail"})
     for name in ("mizen", "mizzen course", "mizen course"):
         doc["aliases"][name] = "mizzen.course"
+
+
+# ---------------------------------------------------------------------------
+# The driver (Ext §17.2, §17.8)
+# ---------------------------------------------------------------------------
+
+
+def _driver(doc: dict[str, Any], deck: float, bent: bool) -> None:
+    frigate = _file("frigate-36")
+    like = _like(frigate)  # the frigate's own spanker's and gaff's lines, gone from the doc
+    mast = _by_id(doc["spars"])["mizzen.mast"]
+    # the throat the course's, under the same truss; the tack down the mast's raked line at the
+    # boom's jaws, the fore leech below the throat; the head along the mizen yard's line (the
+    # course's head, the throat to its peak) and on past the yard's peak on the driver yard;
+    # the clew along the level boom
+    rake = math.radians(mast.get("rake_deg", 0.0))
+    throat = (_mast_x(mast, MIZEN_TRUSS_M), MIZEN_TRUSS_M)
+    jaws_z = MIZEN_TRUSS_M - DRIVER_FORE_LEECH_M * math.cos(rake)
+    tack = (_mast_x(mast, jaws_z), jaws_z)
+    along = DRIVER_HEAD_M / math.hypot(MIZEN_HEAD_RUN_M, MIZEN_HEAD_RISE_M)
+    peak = (throat[0] - along * MIZEN_HEAD_RUN_M, throat[1] + along * MIZEN_HEAD_RISE_M)
+    clew = (tack[0] - DRIVER_FOOT_M, jaws_z)
+    corners = _rounded([tack, throat, peak, clew])
+    area, cx, cz = area_centroid(corners)
+    # the frigate's spanker boom put back, lengthened to the 64's and hung at the jaws; its
+    # horse and its rating kept (the rating pass loads nothing on a boom whose sail starts in
+    # the sail room: Ext §17.2)
+    boom = dict(_by_id(frigate["spars"])["mizzen.boom"])
+    boom.update(length_m=DRIVER_BOOM_M, height_m=round(jaws_z, 2))
+    driver = {
+        "id": "mizzen.driver",
+        "class": "lateen",
+        "yard": "mizzen.yard",
+        "mast": "mizzen.mast",
+        "boom": "mizzen.boom",
+        "cut_at_mast": True,
+        "corners_m": corners,
+        "area_m2": round(area),
+        "reef_bands": 0,  # Steel names no reef band in the driver (Ext §17.2)
+        "x_m": round(cx, 1),
+        "centre_height_m": round(deck + cz, 1),  # above the water
+        "canvas_no": DRIVER_CANVAS_NO,
+    }
+    if bent:
+        _by_id(doc["sails"])["mizzen.course"]["bent"] = False  # in the sail room
+    else:
+        driver["bent"] = False
+    driver["in_place_of"] = "mizzen.course"
+    # Steel's lines (vol. I, "THE DRIVER or SPANKER SAIL", OCR l. 24523-24545; Ext §17.2), each
+    # rated as the frigate's line it stands for: one halyard for Steel's pairs of halyards (the
+    # gaff's peak halyard's), the tack to the boom's throat (the course's tack, the spanker's
+    # outhaul's), one unsided sheet rove through the boom's end, two parts (the spanker's
+    # sheet's), and the downhaul (the storm mizzen's)
+    d = "mizzen.driver"
+    lines = [
+        _line(f"{d}.halyard", "halyard", d, like("mizzen.gaff.peak_halyard")),
+        _line(f"{d}.tack", "tack", d, like("mizzen.spanker.outhaul")),
+        _line(f"{d}.sheet", "sheet", d, like("mizzen.spanker.sheet")),
+        _line(f"{d}.downhaul", "downhaul", d, like("storm_mizzen.downhaul")),
+    ]
+    # the course filed first, so that the yard's sail (`sail_of`, the first naming it) stays it
+    _add_after(doc["spars"], "mizzen.yard", [boom])
+    _add_after(doc["sails"], "mizzen.course", [driver])
+    doc["lines"].extend(lines)
+    # "occasional sails" alone, never "plain sail", "courses" or "all sail" (Ext §17.2)
+    doc["groups"]["occasional sails"].insert(0, d)
+    for name in ("driver", "spanker", "driver boomsail"):
+        doc["aliases"][name] = d
+    for name in ("driver boom", "spanker boom"):
+        doc["aliases"][name] = "mizzen.boom"
+    # its spare in the sail room, with the occasional sails' (Ext §17.2)
+    doc["crew"]["stores"]["sails"].append(
+        {"kind": d, "canvas_no": DRIVER_CANVAS_NO, "condition": 100}
+    )
 
 
 # ---------------------------------------------------------------------------

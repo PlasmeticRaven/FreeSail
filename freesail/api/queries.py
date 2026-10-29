@@ -24,9 +24,10 @@ from freesail.core.world import World
 from freesail.crew import bill
 from freesail.crew.model import Crew, Station, Watch
 from freesail.physics.sails import SAIL_CLASSES
+from freesail.ship.form import stations as drawn_stations
 from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, Sail, SailState, Spar, booms, sail_room
-from freesail.ship.schema import PROFILE_KEYS, HullProfile
+from freesail.ship.schema import PROFILE_KEYS, STERN_KEYS, HullForm, HullProfile
 
 
 def weather_block(world: World) -> dict[str, Any]:
@@ -394,8 +395,9 @@ def _line_entry(ln: Line) -> dict[str, Any]:
 def _profile_entry(p: HullProfile) -> dict[str, Any]:
     """The hull's profile as her file gives it (package 75; docs/design/Build-Ships.md §5.1,
     §6), in plain lists in `PROFILE_KEYS`' order: each line a list of points, `decks_m`,
-    `ports_m` and `port_size_m` mappings by deck word. A line the file does not give is
-    left out, as it is out of the file."""
+    `ports_m` and `port_size_m` mappings by deck word; from stage 0H the shape keys, the
+    `form` and the `marks` as mappings in the file's form (§5.1). A line the file does not
+    give is left out, as it is out of the file."""
     out: dict[str, Any] = {}
     for key in PROFILE_KEYS:
         value = getattr(p, key)
@@ -405,9 +407,42 @@ def _profile_entry(p: HullProfile) -> dict[str, Any]:
             out[key] = {word: [list(pt) for pt in pts] for word, pts in value}
         elif key == "port_size_m":
             out[key] = {word: list(size) for word, size in value}
+        elif key == "form":
+            out[key] = _form_entry(value)
+        elif key == "marks":
+            out[key] = dict(value)
         else:
             out[key] = [list(pt) for pt in value]
     return out
+
+
+def _form_entry(form: HullForm) -> dict[str, Any]:
+    """The profile's `form` as her file gives it (stage 0H; Build-Ships.md §5.1): the fullness,
+    the stern by its keys in the file's order and the head's word, each only where given."""
+    out: dict[str, Any] = {}
+    if form.fullness is not None:
+        out["fullness"] = list(form.fullness)
+    if form.stern is not None:
+        stern: dict[str, Any] = {}
+        for key in STERN_KEYS:
+            value = getattr(form.stern, key)
+            if value is None or value == ():
+                continue
+            if key in ("galleries_m", "lights_m"):
+                stern[key] = [list(pt) for pt in value]
+            elif key == "transom_hb_m":
+                stern[key] = list(value)
+            else:
+                stern[key] = value
+        out["stern"] = stern
+    if form.head is not None:
+        out["head"] = form.head
+    return out
+
+
+def _station_entry(station: tuple[tuple[float, float, float], ...]) -> list[list[float]]:
+    """A drawn station (`freesail.ship.form`) as plain lists of [x, z, hb], to the millimetre."""
+    return [[round(c, 3) + 0.0 for c in pt] for pt in station]  # + 0.0: never a "-0.0"
 
 
 def ship_graph(ship: Ship) -> dict[str, Any]:
@@ -417,7 +452,9 @@ def ship_graph(ship: Ship) -> dict[str, Any]:
     parent's x), `height_m`, `length_m`, parent, side and brace angle. Sails
     carry class, roles, area, state, reefs, sheet angle and centre height.
     The hull carries its principal dimensions, and its profile where the file gives one
-    (package 75: the side, the decks and the ports; absent otherwise). SI throughout.
+    (package 75: the side, the decks and the ports; absent otherwise), with the hull as drawn
+    from it (stage 0H: `stations`, `freesail.ship.form`'s, the ends' closures first and last,
+    each station's [x, z, hb] from its lowest point up to the rail). SI throughout.
     """
     h = ship.hull.spec
     hull: dict[str, Any] = {
@@ -432,6 +469,7 @@ def ship_graph(ship: Ship) -> dict[str, Any]:
     profile = getattr(h, "profile", None)
     if profile is not None:
         hull["profile"] = _profile_entry(profile)
+        hull["stations"] = [_station_entry(s) for s in drawn_stations(h)]
     return {
         "name": ship.name,
         "rig": ship.spec.rig,

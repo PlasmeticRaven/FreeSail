@@ -30,6 +30,10 @@ itself; each fixture loads and validates, cut to its contract (Ext §3.4, §4.1,
 runner's `class: settee` takes a settee and nothing else, and its `wanted_sheet(sail)` the
 sheet of the sail's curve class; and the served graph and snapshot carry `settee`,
 `cut_at_mast` and `yard_lowered` only where they hold.
+
+The driver's stage 0 (Ext §17.4, §17.7, §17.8): a lateen cut at the mast may name a boom, and a
+whole lateen naming one is refused in words; no file of the eight carries a lateen naming a
+boom (the probe); and `frigate_with_driver()` loads, bent and unbent, cut to §17.2's contract.
 """
 
 from __future__ import annotations
@@ -44,9 +48,14 @@ from types import SimpleNamespace
 import pytest
 import yaml
 from rig_fixtures import (
+    DRIVER_BOOM_M,
+    DRIVER_STEEL_AREA_M2,
+    DRIVER_YARD_M,
     area_centroid,
     brig_with_settee,
     brig_with_settee_doc,
+    frigate_with_driver,
+    frigate_with_driver_doc,
     frigate_with_mizen_yard,
     frigate_with_mizen_yard_doc,
     write_ship,
@@ -435,10 +444,12 @@ def _root(spars: dict[str, dict], s: dict) -> dict:
 @pytest.mark.parametrize("name", list(TABLE))
 def test_no_file_of_the_eight_carries_a_new_key_a_lateen_yard_or_a_yard_under_the_bowsprit(name):
     """Ext §8 item 8, the probe, read off the file itself and again as loaded: what keeps
-    every extension inert on the eight files until a ship's builder writes it."""
+    every extension inert on the eight files until a ship's builder writes it; from the
+    driver's stage 0 (Ext §17.7), a lateen naming a boom among them."""
     doc = yaml.safe_load((ROOT / "data" / "ships" / f"{name}.yaml").read_text(encoding="utf-8"))
     spars = {s["id"]: s for s in doc["spars"]}
     assert [s["id"] for s in doc["sails"] if {"settee", "cut_at_mast"} & set(s)] == []
+    assert [s["id"] for s in doc["sails"] if s["class"] == "lateen" and "boom" in s] == []
     assert [s["id"] for s in doc["spars"] if "heave_to_aback" in s] == []
     assert [s["id"] for s in doc["spars"] if s["class"] == "lateen_yard"] == []
     yards = [s for s in doc["spars"] if s["class"] == "yard"]
@@ -451,6 +462,11 @@ def test_no_file_of_the_eight_carries_a_new_key_a_lateen_yard_or_a_yard_under_th
 FIXTURES = {
     "frigate": (frigate_with_mizen_yard, frigate_with_mizen_yard_doc),
     "brig": (brig_with_settee, brig_with_settee_doc),
+    "frigate-driver": (frigate_with_driver, frigate_with_driver_doc),
+    "frigate-driver-bent": (
+        lambda: frigate_with_driver(bent=True),
+        lambda: frigate_with_driver_doc(bent=True),
+    ),
 }
 
 
@@ -667,3 +683,115 @@ def test_the_graph_and_the_snapshot_serve_the_keys_only_where_they_hold(tmp_path
     assert [(s["id"], s["yard_lowered"]) for s in sails if "yard_lowered" in s] == [
         ("main.settee", True)
     ]
+
+
+# -- the driver's stage 0 (Ext §17.4, §17.7, §17.8) ----------------------------------------
+
+
+def _rig_with_boom(**course) -> dict:
+    """The hand-built rig with a boom on the mizzen mast and the mizen course naming it, the
+    course's keys given `course` (None taking a key out)."""
+    doc = _rig("mizzen.course", boom="mizzen.boom", **course)
+    boom = {"id": "mizzen.boom", "class": "boom", "on": "mizzen.mast", "length_m": 12.0}
+    doc["spars"].insert(6, dict(boom, height_m=3.0))
+    return doc
+
+
+def test_a_boom_spreads_a_lateen_cut_at_the_mast_and_is_refused_on_a_whole_one():
+    """Ext §17.4: a lateen cut at the mast (a driver) names a boom and loads with the role; a
+    whole lateen naming one is refused in words; a lateen's boom is a boom."""
+    ship = ship_from_dict(_rig_with_boom(), "rig.yaml")
+    course = ship.sails["mizzen.course"]
+    assert course.roles["boom"] == "mizzen.boom" and course.cut_at_mast
+    assert ship.spec.sails[2].roles == {
+        "yard": "mizzen.yard",
+        "mast": "mizzen.mast",
+        "boom": "mizzen.boom",
+    }
+    whole = _rig_with_boom(cut_at_mast=None, mast=None, corners_m=None)
+    with pytest.raises(ShipFileError) as e:
+        ship_from_dict(whole, "bad.yaml")
+    assert str(e.value) == (
+        "bad.yaml: sail 'mizzen.course' is a whole lateen and names a boom; only a lateen cut at "
+        "the mast (a driver) is spread on a boom."
+    )
+    yard_for_boom = _rig_with_boom()
+    next(s for s in yard_for_boom["sails"] if s["id"] == "mizzen.course")["boom"] = "fore.yard"
+    with pytest.raises(ShipFileError, match="names 'fore.yard' as its boom, but that is a yard"):
+        ship_from_dict(yard_for_boom, "bad.yaml")
+
+
+def _off_the_line(p, a, b) -> float:
+    """How far the point p lies off the straight line through a and b."""
+    (x, z), (x0, z0), (x1, z1) = p, a, b
+    return abs((x1 - x0) * (z0 - z) - (x0 - x) * (z1 - z0)) / math.hypot(x1 - x0, z1 - z0)
+
+
+def test_the_driver_fixture_is_cut_to_its_contract():
+    """Ext §17.2's generator assertions on the fixture (§17.8): the throat at the course's
+    throat, and the tack on the mast's raked line at the boom's jaws, within 0.1 m; the foot on
+    the boom's line, the clew within the boom's length; the peak on the mizen yard's line within
+    0.1 m, abaft and above the yard's peak by no more than two-thirds of the driver yard; the four
+    corners' area within 10% of Steel's rule, and the sail's area, x and centre its corners'."""
+    ship = frigate_with_driver()
+    deck = ship.hull.spec.deck_height_m
+    mast, boom = ship.spars["mizzen.mast"], ship.spars["mizzen.boom"]
+    driver, course = ship.sails["mizzen.driver"], ship.sails["mizzen.course"]
+    tack, throat, peak, clew = driver.corners_m
+    _c_tack, c_throat, yard_peak, _c_clew = course.corners_m
+    assert math.dist(throat, c_throat) <= 0.1
+    assert abs(_off_the_mast(mast, *tack)) <= 0.1 and abs(tack[1] - boom.height_m) <= 0.1
+    assert boom.length_m == DRIVER_BOOM_M
+    assert clew[1] == pytest.approx(boom.height_m, abs=0.1)  # the boom lies level
+    assert 0.0 < tack[0] - clew[0] <= boom.length_m
+    assert _off_the_line(peak, c_throat, yard_peak) <= 0.1
+    assert peak[0] < yard_peak[0] and peak[1] > yard_peak[1]
+    assert math.dist(peak, yard_peak) <= 2.0 / 3.0 * DRIVER_YARD_M
+    area, _cx, _cz = area_centroid(driver.corners_m)
+    assert area == pytest.approx(DRIVER_STEEL_AREA_M2, rel=0.10)
+    _cut_from_its_corners(driver, deck)
+
+
+def test_the_driver_is_filed_in_the_courses_place_with_its_boom_lines_and_names():
+    """Ext §17.2 and §17.8: the driver a lateen cut at the mast on the mizen yard, the mast and
+    the boom, filed after the course (the yard's sail stays the course) in its place, in the sail
+    room with one spare; the storm mizzen in the course's place too; no ringtail; its group the
+    occasional sails' alone, its names, and Steel's four lines; bent, the course is in the sail
+    room in its stead."""
+    ship = frigate_with_driver()
+    driver = ship.sails["mizzen.driver"]
+    order = [s.id for s in ship.spec.sails]
+    assert order.index("mizzen.driver") == order.index("mizzen.course") + 1
+    assert (driver.cls, driver.cut_at_mast, driver.curve_class) == ("lateen", True, "gaff")
+    assert driver.roles == {"yard": "mizzen.yard", "mast": "mizzen.mast", "boom": "mizzen.boom"}
+    assert driver.state == SailState.UNBENT and driver.reef_bands == 0
+    assert ship.sail_of("mizzen.yard").id == "mizzen.course"
+    assert {s.id for s in ship.spec.sails if s.in_place_of == "mizzen.course"} == {
+        "mizzen.driver",
+        "storm_mizzen",
+    }
+    assert not {"ringtail", "ringtail_boom", "mizzen.gaff", "mizzen.spanker"} & set(ship.parts)
+    assert ship.spars["mizzen.boom"].parent == "mizzen.mast"
+    assert {g for g, m in ship.groups.items() if "mizzen.driver" in m} == {"occasional sails"}
+    assert {a for a, t in ship.aliases.items() if t == "mizzen.driver"} == {
+        "driver",
+        "spanker",
+        "driver boomsail",
+    }
+    assert {a for a, t in ship.aliases.items() if t == "mizzen.boom"} == {
+        "driver boom",
+        "spanker boom",
+    }
+    lines = {(ln.cls, ln.side, ln.parts) for ln in ship.lines_of(driver)}
+    assert lines == {
+        ("halyard", None, 1),
+        ("tack", None, 1),
+        ("sheet", None, 2),
+        ("downhaul", None, 1),
+    }
+    room = frigate_with_driver_doc()["crew"]["stores"]["sails"]
+    assert [s["canvas_no"] for s in room if s["kind"] == "mizzen.driver"] == [5]
+    bent = frigate_with_driver(bent=True)
+    assert bent.sails["mizzen.driver"].state != SailState.UNBENT
+    assert bent.sails["mizzen.course"].state == SailState.UNBENT
+    assert bent.sails["mizzen.driver"].corners_m == driver.corners_m
