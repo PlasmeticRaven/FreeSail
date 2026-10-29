@@ -202,10 +202,29 @@ def _resolve(world: Any, who: str) -> dict[str, Any]:
     except Exception:  # noqa: BLE001  (a world with no muster names nobody)
         person = None
     if person is None:
+        # a person of another hull's company (package 84, step 9; 67's refusal lifted): his
+        # voice bound on her
+        from freesail.world.orders import _person_anywhere
+
+        other = _person_anywhere(world, who)
+        if other is not None:
+            hid = str(getattr(other, "hull", "") or getattr(other, "home", "") or "")
+            vessels = getattr(world, "vessels", None)
+            vessel = vessels.get(hid) if vessels is not None else None
+            if vessel is not None and not vessel.done:
+                where = "aboard" if getattr(other, "aboard", True) else "ashore"
+                return {
+                    "ship": vessel.id,
+                    "vessel": vessel,
+                    "station": _voice_name(other),
+                    "person": other.name,
+                    "aboard": where == "aboard",
+                    "what": f"the voice of {other.name} ({vessel.name})",
+                }
         raise _error(
             f"Nobody answers to {who!r}: a seat is at a station ('as captain of <ship>', 'as "
             "officer of the watch') or for a person of the voyage by his name ('as Mr "
-            "Veale'); a person aboard another ship has no World of hers to be seated in."
+            "Veale', of any hull's company)."
         )
     stations = getattr(world, "stations", None)
     if stations is not None:

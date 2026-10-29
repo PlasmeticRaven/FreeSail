@@ -833,7 +833,10 @@ Since step 7 the player's ship is a vessel of the sea like any member (`Vessels.
 retired), a hull at anchor or in port may be awake, and the cap's order is a ship in
 dealings, then a hull with a stationed person, then the nearest. Since step 8 the save holds
 every hull's stations (`hulls`), each input and act of a station on another ship names her
-hull, and a replay gives them to her again by either road.
+hull, and a replay gives them to her again by either road. Since step 9 the director's forms
+name a hull (`aboard the Raven: ...`, a person made or come aboard her, a cutter's letter
+to her), the truth walks every hull and the persons ashore, `read_log(ship=)` reads a hull's
+log, and a seat may be at a person aboard any hull.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 

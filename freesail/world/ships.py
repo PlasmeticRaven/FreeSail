@@ -792,7 +792,7 @@ class Vessel:
             keep_station(self, world, dt, wind_from, wind_kn)
             return
         if kind == "to_ship":
-            target = world.position
+            target = self._ship_target(world)
             if target is None:
                 self.plan.pop(0)
                 return
@@ -876,6 +876,15 @@ class Vessel:
         east, north = tide.stream_at(self.position, greenwich_time(world))
         if east or north:
             self.position = self.position.advanced(east * dt, north * dt)
+
+    def _ship_target(self, world: Any) -> Any:
+        """Where 'the ship' of a `to_ship` leg is: the player's, or the hull a letter she
+        carries is for (`Message.to_hull`; package 84, step 9)."""
+        to_hull = str(getattr(self.letter, "to_hull", "") or "") if self.letter is not None else ""
+        hull = (getattr(world, "hulls", None) or {}).get(to_hull) if to_hull else None
+        if hull is not None and hull is not getattr(world, "own", None):
+            return hull.position
+        return world.position
 
     def _arrived(self, world: Any, leg: tuple[Any, ...]) -> None:
         kind = leg[0]
@@ -1549,6 +1558,7 @@ class Vessels:
                 mirror_far(v.crew)  # a sleeping hull follows her far body's move
         lines.extend(self._spoke_lines)
         self._spoke_lines = []
+        self._deliver_to_hulls(world)
         lines.extend(self._promote_and_hail(world))
         if any(v.brain is not None for v in self.vessels) or self.crewed_ids:
             # the crewed promotion by the range and the cap (package 43; `world.crews`),
@@ -1762,6 +1772,36 @@ class Vessels:
         lines = self._promote_and_hail(world)
         self.vessels = [v for v in self.vessels if not v.done]
         return lines
+
+    def _deliver_to_hulls(self, world: Any) -> None:
+        """A letter carried for another hull comes aboard her within hail (package 84,
+        step 9), the lines hers; the carrier goes home after."""
+        from freesail.core.events import Severity
+
+        hulls = getattr(world, "hulls", None) or {}
+        for v in self.vessels:
+            letter = v.letter
+            to_hull = str(getattr(letter, "to_hull", "") or "") if letter is not None else ""
+            if v.done or not to_hull:
+                continue
+            hull = hulls.get(to_hull)
+            if hull is None or hull is getattr(world, "own", None) or hull.position is None:
+                continue
+            _, distance = bearing_and_distance(hull.position, v.position)
+            if distance / units.NAUTICAL_MILE > HAIL_NM:
+                continue
+            words = v.what or v.name
+            hull.record(
+                Severity.NOTABLE,
+                "sail.within_hail",
+                f"{_head(words)} is within hail, {v.course_words()}; she has a letter for "
+                "the ship.",
+                data={"id": v.id, "letter": True},
+            )
+            v.letter, v.alongside = None, True
+            for severity, kind, text, data in hull.people.message_aboard(letter):
+                hull.record(severity, kind, text, data=data)
+            v.alongside = False
 
     def _promote_and_hail(self, world: Any) -> list[tuple[Any, ...]]:
         """The level of detail by the distance from the player, and a vessel come within
