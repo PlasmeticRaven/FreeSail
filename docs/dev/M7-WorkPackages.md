@@ -52,7 +52,7 @@ on these packages; that is the owner's choice.
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
-| 79 | Opus | The regimes from 72; the chart's Mediterranean block | behind 72 |
+| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | 79a and 79b briefed below (2026-10-29), for the owner's approval; the order 79a, 79b, 79c, 79d; none depends on 84 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
@@ -1248,6 +1248,169 @@ galley fire out while she is alongside), and `world/service.py` says whose servi
 is in (the papers, the captain's role, the wardroom) and who may buy of whom. 74 builds
 the prize court, the prize's stores and captured powder as prize goods (the owner's ruling)
 on these, not beside them.
+
+## Package 79a: the regimes filled out and sourced (`data/regimes.yaml`, `data/nations.yaml` `naval:`; `freesail/world/regimes.py`, `freesail/world/business.py` the commission drawn; `data/weather/` only if Iberia's drift is taken; `docs/TechnicalSpec-M7.md` §22 as built; `docs/dev/TuningNotes.md`; `tests/test_business.py`, `test_nations.py`, `test_known_truths.py` truths 7-260 to 7-269)
+
+Opus. The first of 79's four packages (the owner's split of 2026-10-29), none of which waits
+on 84: it touches the business, the regimes and their data, which 84's remaining steps
+(the player's ship a hull, the save, the director's reach, the drivers) do not. It builds on
+package 72's shape (spec §22 "as built"; `docs/design/Design-Squadrons.md`; 72's record and
+its "left to 79" lines above) and **changes no rule a recorded passage runs**: the truths
+7-152 to 7-160 and the trials stand, and the scenarios that name no business draw nothing
+new. Read 72's record, the regimes file's head and `regimes.py`'s head before anything.
+
+1. **Every knob sourced, or said to be judgement.** Each figure in `data/regimes.yaml` and
+   each nation's `naval:` block is marked "from memory" today. The repository now holds
+   the period's own books under `docs/references/` (James's six volumes of the *Naval
+   History*, Nicolas's *Dispatches and Letters of Nelson*, Niles' *Register* for 1812 to
+   1815, the *Regulations and Instructions* of 1806, Jackson's *Logs of the Great Sea
+   Fights*, Falconer, Steel): read each knob against them and write the source by volume and
+   page where one is found (the blockade of Brest's inshore and offshore squadrons and its
+   being blown off, the convoy acts and the convoys' sizes, a commission's weeks, the
+   French keeping port and the sorties when the blockaders were blown off, the Dutch at
+   the Texel, Ferrol and Cadiz under blockade); where none is found, the figure stays and
+   its `source:` says "judgement" plainly, with what was looked for. Mahan is not in the
+   repository: a figure that rests on him alone is said so and left. **No figure moves in
+   this item**: a source that gives a different figure is written beside the knob as "the
+   source gives N; kept at M until re-measured", and the lead rules. (The pins: a knob that
+   a recorded passage reads, the sortie's fifteen miles, hour and 22 knots among them,
+   moves no digest only if it does not move.)
+2. **The commission's delay drawn by the business** (72's first left item). A hull in
+   ordinary is commissioned today by the director's form (`ship "X": commissioned for
+   <intent> [at once | in <n> hours | in <n> days]`) or at once by the business. Give the
+   business the regime's delay: a nation's ship in ordinary with no sortie is commissioned
+   by the business for an intent of her nation's (a cruise on one of her doctrine's
+   stations, a passage between her ports) after `commission_delay_h` drawn under the
+   seed, said in her story and the port's news as the director's commission is; a ship
+   with a `sortie` keeps the sortie rule as it is. The draw is from the business's own
+   stream so that no other draw moves (`test_the_draw_is_the_seeds_and_moves_no_other_draw`
+   says how). Off unless the business is on; every recorded passage leaves it off.
+3. **The nations' doctrines as data, for the waters the chart has.** The `naval:` blocks
+   of Britain, France, Spain, the Batavian Republic, the United States, Portugal, Denmark
+   and Morocco filled where 72 left them thin: who blockades whom and where (Britain's
+   `blockades:` names Brest alone; Ferrol, Rochefort, Cadiz and the Texel belong there
+   with the dates the sources give), who convoys and with what escort, who keeps ships in
+   ordinary at which ports with what sortie (France's one frigate at Brest is the whole
+   list today), the privateers' prey. Each entry with its source as item 1 has it. **No
+   new nation in this package**: the Mediterranean's (the Ligurian and Italian republics,
+   Naples, the Barbary regencies, the Ottomans) come with their blocks, 79c and 79d.
+4. **Iberia's drift** (72's second left item): the seasonal bound of the weather 72 took only
+   as far as the squadrons' gale wanted, and the Portuguese coast's drift and northerlies
+   of summer that the climatology's PROVISIONAL rows stand in for. Read what the pilots on
+   file say (Tofiño's directions for the summer northerlies, the references' index); if a
+   printed climatic table is found it replaces a PROVISIONAL row as `ChartBlocks.md` item
+   7 says; if not, the item is a note in the tuning notes and nothing changes. Truth
+   7-158 (the bound off in every recorded scenario) stands either way.
+5. **Not this package's**: the nations' fighting habits (firing high, the single actions),
+   which are the far fight's and the action's and go with package 74; the regimes' words
+   in the primer (85's); any new regime (the eight stand).
+6. **Truths 7-260 to 7-269** in `tests/test_known_truths.py`: a ship in ordinary at Brest
+   with no sortie commissioned by the business after the regime's delay under seed 7, her
+   intent her nation's and her commission in her story and the port's news; the knobs'
+   table read whole with every source in the references' form or "judgement"; and what the
+   items above earn, each a behaviour and not a digest. The fast tier whole on the final
+   tree; `test_business.py`, `test_nations.py` and the squadrons' truths 7-152 to 7-160 in
+   the slow tier; the whole suite is the lead's in the cloud at the merge.
+7. **The records**: spec §22 as built (the list of what is still judgement, by knob); the
+   tuning notes' section (the sources read, the figures found that differ and kept, the
+   commission's draw and its first run, the suite as run).
+
+The hard rules as every brief has them: no model identifier in any file or commit message's
+body; the two attribution lines; nothing under `docs/agents/consent/` touched; no pin moved
+without the old beside the new and the proof; the physics not changed; the references
+read as data and never run. Work in a worktree on a branch `claude/pkg-79a`, pushed after
+each commit; the lead merges.
+
+## Package 79b: the Channel's east block (`channel-east`; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` the region's tiles, coast, index and manifest entry, `features/channel-east.yaml`, `overrides/channel-east/`; `data/ports/*.yaml` new per port; `data/nations.yaml` the ports' index; `data/tides/constituents.yaml` `held_gauges:`, `streams.yaml`, `establishments.yaml`; `data/weather/climatology.yaml` only the Channel box's east bound; `data/scenarios/spithead.yaml` new; `docs/references/README.md` the pilots fetched; `docs/dev/ChartBlocks.md` where the how-to proves wrong; `docs/TechnicalSpec-M7.md` §26's pointer as built; `docs/dev/TuningNotes.md`; `tests/test_chart.py`, `test_ports.py`, `test_tide.py`, `test_scenarios.py`, `test_known_truths.py` truths 7-270 to 7-279)
+
+Opus. The second of 79's four packages: the Channel one block to the eastward (the owner,
+2026-10-29), built as `docs/dev/ChartBlocks.md` says (read it whole first, with the recipe
+form over `REGIONS` in `tools/build_charts.py`, package 38's and the six blocks' sections
+of the tuning notes, and 39a's brief in `docs/dev/M6-WorkPackages.md`, whose region
+`channel-mid` this one abuts). It touches nothing of any other region's tiles, coast or
+index, and nothing 84 reworks.
+
+1. **The region** `channel-east`: the Wight and the Solent, Spithead and St Helens road,
+   Portsmouth; Poole; Beachy Head; the Downs and Deal, the Goodwin Sands, the South and
+   North Forelands, Dover; Dungeness and Rye bay; on the French side the Seine's mouth and
+   Le Havre, Fécamp, Dieppe, Boulogne, Calais and the Flemish banks to Dunkirk. **Bounds
+   49.0 N to 51.5 N and 1.0 W to 2.5 E, abutting `channel-mid` at 1 W exactly** (its east
+   bound), the fetch box widened as the form says; a bound moved to a tile column's or
+   row's edge where a mark asks it, at no cost in tiles, as Biscay south's was. The Thames
+   above the North Foreland and the Nore, and the Flemish coast east of Dunkirk (Ostend,
+   Flushing), are later blocks and are said so. Cherbourg (1.6 W) lies in `channel-mid`'s
+   bounds: not this block's (a left item there, as Morlaix was for 39a).
+2. **The harbour patches** (level 3, about 15′ by 15′ each): Spithead with Portsmouth
+   harbour's mouth and St Helens road; Poole; the Downs with Deal and the Gull Stream;
+   Dover; Le Havre and the Seine's mouth; Boulogne; Calais; Dunkirk. Dieppe, Newhaven,
+   Shoreham and Rye are roads and marks without a patch unless a sheet is read for them.
+   The seam rule for the tiles `channel-mid` lists, as the how-to has it.
+3. **The period data.** The English side from the Hurd and Mackenzie sheets where they can
+   be fetched, and the Channel pilots on file (White 1835, Imray 1874, Moore 1799's
+   catechism) for the directions and the marks; the French side from Bellin and the
+   *Neptune François* where fetched, and the pilots for the rest. The period shoreline
+   where it differs from the modern: **Dover without the Admiralty harbour** (built from
+   1847) and Portsmouth without the later dockyard basins and Haslar's reclamation, as
+   Plymouth is drawn without the breakwater; the Goodwins as the sheets of the day have
+   them, with `dries_m` and an `extent_m` under a kilometre a head. The lights of 1805 dated
+   (the South Foreland's two, Dungeness, the Nab's floating light, the Owers, Calais,
+   Gris-Nez, Dunkirk, and the rest the directions give), so that 1805 sees what 1805 had.
+   Every source fetched goes under `docs/references/` with its README row, read as data
+   and never run; where a sheet cannot be fetched or its datum read, the port file says
+   `datum: unverified` and no figure is invented.
+4. **The ports** on package 35's machinery, each a file: Portsmouth (Spithead the outer
+   road, St Helens, the harbour; the King's dockyard: the yard's goods and the Ordnance's,
+   as Plymouth has them), Poole, the Downs (Deal, the anchorage and its boatmen), Dover,
+   Le Havre, Boulogne, Calais, Dunkirk; each with its nation, its state (Le Havre,
+   Boulogne, Calais and Dunkirk French and hostile to a King's ship; the invasion flotilla's
+   ports of 1803 to 1805 and their batteries noted in the file's head, not modelled),
+   its road, pilot's station, market, yard, pool and the pilot's four words, and every
+   `feature:` spot with its position beside it; entered in the nations' index and
+   `test_ports.py`'s list. No new nation.
+5. **The tide.** TICON's gauges of the block read as package 34 read the file (Portsmouth is
+   held already from 39a and Dover is among the eleven: which others it has, Newhaven, Le
+   Havre, Dieppe, Boulogne, Calais, Dunkirk, is unverified until read), **held** under
+   `held_gauges:` after the last, as every block's are until the lead rules on the gauges'
+   water; the eleven and their figures do not move. The stream areas by the directions: the
+   Solent and Spithead, the Looe and the Owers, Beachy Head, the Downs and the Gull Stream,
+   the Strait of Dover, the Seine's mouth; an area over the block's whole box after them,
+   and the block's box appended to `book_limits`. The master's epitome places with the
+   period's rise where a pilot gives one (Portsmouth's, Dover's, the Downs', Le Havre's).
+   The polygons kept off the water the recorded passages' other sail use.
+6. **The weather.** The Channel box reaches 2 E; the block's water to 2.5 E would take the
+   nearest box by `Climatology.box_at`. Extend the Channel box's east bound to 2.5 E
+   (the same rows: judgement, said in the row's note), unless a printed table is read.
+7. **A scenario** `spithead.yaml`: a free passage of the block's stretch (the frigate from
+   St Helens road down Channel through the Needles, or from the Downs through the Strait
+   to Spithead against the stream: the package's choice), `chart: atlantic-east`, sailed
+   once at seed 7 to the anchor by a short book, its figures in the notes; not pinned.
+   (39a's scenario `channel-east.yaml` sails `channel-mid` and keeps its name.)
+8. **The build**: `python tools/build_charts.py --region channel-east` through the proxy,
+   the checks printed and passing, the tiles committed (expect 20 to 30 MB: the block is
+   mostly coast and shoal water), the manifest with every other entry carried over, the
+   region appended to `CHARTS["atlantic-east"]["regions"]` after `channel-mid`, and after
+   the build `git status` showing no change to any tile, coast or index another region
+   lists. Build early, to fetch; rebuild with `--skip-fetch` after the marks are written so
+   that the index holds them.
+9. **Truths 7-270 to 7-279**: the frigate's lookout from Spithead sees the Nab's light at
+   its range by night and the Wight's marks by day; a ship through the Strait of Dover at
+   springs is set by the stream as the directions say (the master's account against the
+   world's water); the Goodwins ground a ship that stands on across them with less water
+   than she draws; the Downs' anchorage holds her in a south-westerly with the sands to
+   leeward; the ports' files load and the passages of 7-157's kind cross the seam at 1 W
+   with the business carried; and what the build earns, each a behaviour.
+10. **The records**: the tuning notes' section (the sources with their licences, the
+    patches' datums and residuals, the checks as printed, the scenario's run, what was found
+    on the way, the suite as run: the fast tier whole on the final tree, the chart's, the
+    ports', the tide's and the scenarios' slow tests; the recorded passages of the Channel
+    west, `gate_5b` and `gate_5c` once, which must pass to the digest); `ChartBlocks.md`
+    corrected where the how-to proved wrong; spec M6 §26's as-built list extended by the
+    block and M7 §26's pointer.
+
+The hard rules as every brief has them; `claude/pkg-79b`, pushed after each commit; the
+lead merges, rebuilding `channel-mid`'s index by hand only if a mark of this block lies in
+its bounds, as 39a's were. Runs after 79a or beside it (the two share no file but the
+nations' ports index, which the lead merges).
 
 ## Package 82: the boat as a vessel, and the player aboard another ship (`freesail/core/world.py`, `ui/console.py`, `ui/server.py`, the drivers: the followed ship; `freesail/world/crews.py`, `ships.py`, `people.py`, `places.py`, `stations.py`, `seats.py`, `orders.py` a person aboard another ship and the seat that follows him; `freesail/core/replay.py` the station on another ship replayed; `freesail/physics/` an oar force on a hull (new, by the brief's leave); `freesail/evolutions/` the boat's orders and the tow; `data/ships/boat-*.yaml` through `tools/gen_ships.py`; `freesail/world/movement.py`, `ports.py` the boat's errands as they are; `freesail/api/readings.py` the readings following the person; `freesail/agents/harness.py`, `director.py`, `data/director/`; the viewer (`client/`) drawing the boat; `docs/TechnicalSpec-M7b.md` §11, §12, §21k as built; `docs/agents/Harness.md`; the primer; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7b-113, 7b-114 and the M7 numbers after 73's)
 
