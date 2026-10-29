@@ -1,0 +1,62 @@
+# FreeSail: the captain's orders for the Gulf of Lion's block, from the Maddalena to look
+# into Toulon and back (package 79d). A short book: the frigate's own, the starter book not
+# loaded. Outward and back she passes the same marks; the outward rules ask the flying jib
+# not set (plain sail leaves it furled; her royal yards are sent down, so not a royal) and the homeward rules ask it set, which she does off
+# Toulon when she bears away for home, so that a mark reached on the way home does not send
+# her north again. (Her heading served first and failed: beating, her head crossed any gate
+# on each tack.)
+
+# The departure (the scenario's orders make sail and shape her course in the sound): out by
+# the western passage, round Point Liche in fifteen or sixteen fathoms (Purdy 1826, p. 89) and between
+# Spargi and the Sardinian shore to the open strait; each turn within six cables of its
+# mark by account, a fix among the islands moving the account by four.
+standing order "round Point Liche": when the distance to 41 12.3 N 9 22.5 E is under 0.6 miles and the flying jib is not set then shape a course for 41 13.5 N 9 19.5 E
+standing order "inside Spargi": when the distance to 41 13.5 N 9 19.5 E is under 0.6 miles and the flying jib is not set then shape a course for 41 16.2 N 9 16.8 E
+standing order "the strait": when the distance to 41 16.2 N 9 16.8 E is under 0.8 miles and the flying jib is not set then shape a course for 41 19.8 N 9 04.8 E
+
+# Up the west of Corsica, well outside the Monks, the Sanguinaires and the Revellata, then
+# across the Gulf for a point five miles south of Cape Cepet.
+standing order "the west mouth": when the distance to 41 19.8 N 9 04.8 E is under 1 mile and the flying jib is not set then shape a course for 41 39 N 8 27 E
+standing order "the course past Valinco": every hour, if the flying jib is not set and the distance to 41 39 N 8 27 E is over 2 miles and the distance to 41 39 N 8 27 E is under 36 miles and the distance to 41 19.8 N 9 04.8 E is under 36 miles then shape a course for 41 39 N 8 27 E
+standing order "off Valinco": when the distance to 41 39 N 8 27 E is under 2 miles and the flying jib is not set then shape a course for 42 21 N 8 21 E
+standing order "the course up Corsica": every hour, if the flying jib is not set and the distance to 42 21 N 8 21 E is over 2 miles and the distance to 42 21 N 8 21 E is under 44 miles and the distance to 41 39 N 8 27 E is under 44 miles then shape a course for 42 21 N 8 21 E
+standing order "off Cape Rosso": when the distance to 42 21 N 8 21 E is under 2 miles and the flying jib is not set then shape a course for 42 42 N 8 27 E
+standing order "off the Revellata": when the distance to 42 42 N 8 27 E is under 2 miles and the flying jib is not set then shape a course for 42 58 N 5 57 E
+standing order "the course for Toulon": every hour, if the flying jib is not set and the distance to 42 58 N 5 57 E is over 4 miles and the distance to 42 58 N 5 57 E is under 114 miles and the distance to 42 42 N 8 27 E is under 130 miles then shape a course for 42 58 N 5 57 E
+
+# Off Toulon: by daylight she looks into the roads from five miles south of Cape Cepet and
+# bears away for the Revellata; coming to the point by night she heaves to until day, as
+# the watching frigates did, and at daylight stands back in to the point to look (the fifth
+# run, filling away for home at dawn, had drifted east to Porquerolles in the night and saw
+# Toulon's heights only at four leagues).
+standing order "off Toulon by night": when the distance to 42 58 N 5 57 E is under 4 miles and the daylight is not day then heave to
+standing order "looking in": when the distance to 42 58 N 5 57 E is under 4 miles and the daylight is day then take a bearing of the land; set the flying jib; shape a course for 42 42 N 8 27 E
+standing order "the morning off Toulon": every 10 minutes, if the daylight is day and the distance to 42 58 N 5 57 E is under 30 miles and the manoeuvre in hand is hove to and the flying jib is not set then fill away; shape a course for 42 58 N 5 57 E
+
+# Home: the same marks in the other order, the flying jib set. Each hourly course holds
+# only short of the next mark, so that a course is never shaped back for a mark already
+# passed (the first runs' fault: she was hauled back for the Revellata after passing it,
+# and wandered onto the Riviera between). Coming to the strait by night she lies to fifteen
+# miles off its west mouth and goes in among the islands at daylight, as the fleet did (the
+# third run's fault: she ran in by night with her account two miles out and struck on the
+# Magdalena's north side).
+standing order "the course back to Corsica": every hour, if the flying jib is set and the distance to 42 58 N 5 57 E is over 6 miles and the distance to 42 42 N 8 27 E is over 2 miles and the distance to 42 58 N 5 57 E is under 114 miles and the distance to 42 42 N 8 27 E is under 114 miles and the distance to 42 21 N 8 21 E is over 22 miles then shape a course for 42 42 N 8 27 E
+standing order "home past the Revellata": when the distance to 42 42 N 8 27 E is under 2 miles and the flying jib is set then shape a course for 42 21 N 8 21 E
+standing order "home past Cape Rosso": when the distance to 42 21 N 8 21 E is under 2 miles and the flying jib is set then shape a course for 41 39 N 8 27 E
+standing order "home down Corsica": every hour, if the flying jib is set and the distance to 41 39 N 8 27 E is over 2 miles and the distance to 41 39 N 8 27 E is under 44 miles and the distance to 42 21 N 8 21 E is under 44 miles and the distance to 41 19.8 N 9 04.8 E is over 34 miles then shape a course for 41 39 N 8 27 E
+standing order "home past Valinco": when the distance to 41 39 N 8 27 E is under 2 miles and the flying jib is set then shape a course for 41 19.8 N 9 04.8 E
+standing order "home for the strait": every hour, if the flying jib is set and the manoeuvre in hand is not hove to and the distance to 41 19.8 N 9 04.8 E is over 1 mile and the distance to 41 19.8 N 9 04.8 E is under 36 miles and the distance to 41 39 N 8 27 E is under 36 miles then shape a course for 41 19.8 N 9 04.8 E
+standing order "off the strait by night": when the distance to 41 19.8 N 9 04.8 E is under 15 miles and the flying jib is set and the daylight is not day then heave to
+standing order "the morning off the strait": every 10 minutes, if the daylight is day and the flying jib is set and the manoeuvre in hand is hove to and the distance to 41 19.8 N 9 04.8 E is under 30 miles then fill away; shape a course for 41 19.8 N 9 04.8 E
+standing order "home at the west mouth": when the distance to 41 19.8 N 9 04.8 E is under 1 mile and the flying jib is set then shape a course for 41 16.2 N 9 16.8 E
+standing order "home in the strait": when the distance to 41 16.2 N 9 16.8 E is under 0.8 miles and the flying jib is set then shape a course for 41 13.5 N 9 19.5 E
+standing order "home inside Spargi": when the distance to 41 13.5 N 9 19.5 E is under 0.6 miles and the flying jib is set then shape a course for 41 12.3 N 9 22.5 E
+standing order "home round Point Liche": when the distance to 41 12.3 N 9 22.5 E is under 0.6 miles and the flying jib is set then shape a course for 41 11.2 N 9 22.7 E
+standing order "in the sound": when the distance to 41 11.2 N 9 22.7 E is under 0.4 miles and the flying jib is set then come to an anchor
+
+# The yards and the sheets, the bearings, and the lead among the islands.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
+standing order "the lead among the islands": every 10 minutes, if the distance to 41 11.2 N 9 22.7 E is under 6 miles then heave the lead

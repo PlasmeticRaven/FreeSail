@@ -1,0 +1,87 @@
+# FreeSail: the Gulf of Lion's block, from the Maddalena to look into Toulon and back
+# (package 79d). A free passage of the block's water, not a gate's and not pinned: the
+# frigate from Agincourt Sound, where Nelson's fleet watered and lay in 1803 to 1805 while
+# his frigates watched Toulon (James 1837, vol. 3, pp. 176 to 178), out by the western
+# passage between Point Liche and Spargi and the strait of Bonifacio's west mouth, up the
+# west coast of Corsica outside the Sanguinaires and the Revellata, across the Gulf to five
+# miles off Cape Cepet to look into Toulon's roads by daylight, and back the same way to an
+# anchor in the sound; on the whole chart (`chart: atlantic-east`), so that she sails the
+# regions `ligurian-sea` and `gulf-of-lion` and their patches. The French fleet in the road
+# is noted and not modelled. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/agincourt-sound.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/agincourt-sound.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/agincourt-sound.yaml --hours 72 --reckoning
+#
+# The passage as the book beside this file sails it (agincourt-sound.orders): she lies at
+# unmoored and ready in Agincourt Sound at five in the afternoon of 20 May 1805, her head to
+# the north and her topsails loosed (the frigates' watch on
+# Toulon before Villeneuve's second sailing, James vol. 3, pp. 341 to 342, FROM MEMORY of
+# the dates; she starts with no anchor down, so that her book's last order, to anchor in
+# the sound, is not followed by its first), makes sail and goes out by the west, round Point Liche in fifteen or sixteen
+# fathoms (Purdy 1826, p. 89), outside Spargi and the Barelino isles, through the strait's
+# west mouth with Cape Pertusato and Capo Testa abeam, and runs up the west of Corsica
+# before a south-easterly; she raises Cape Sicie and the high land over Toulon, stands in to
+# five miles off Cape Cepet by daylight, looks into the roads, and bears away; the wind
+# comes round to the north-west, the mistral's quarter, and she runs back down Corsica and
+# in by the same passage to an anchor in the sound. Her own book holds all she needs: the
+# starter book is not loaded.
+#
+# She sails in the afternoon so as to clear the islands by daylight and come back to the
+# strait by daylight two days later (the fourth run, sailing at dawn, came to it at dusk).
+# The weather is pinned (a south-easterly of fourteen knots for the run north, the wind
+# coming round to the north-west at eighteen on the third evening for the run back, the sky clear), so that the
+# passage is the same on every machine; the sea and the motion are kept. Its figures at seed
+# 7 are in docs/dev/TuningNotes.md (package 79d), measured once: not a gate's, not pinned.
+
+name: The Gulf of Lion, from the Maddalena to look into Toulon and back
+seed: 7
+start: 1805-05-20T17:00
+position: {lat_deg: 41.1870, lon_deg: 9.3790}   # Agincourt Sound (features/ligurian-sea.yaml's `agincourt-sound`)
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 0
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # a ship of war's
+  almanac: 1805
+
+cargo:
+  purse_pounds: 200
+
+ports: [maddalena, ajaccio, san-fiorenzo, toulon, hyeres, marseille]
+
+weather:
+  wind:
+    - {at: 1805-05-20T16:00, from_deg: 135, knots: 14, air_mass: neutral}
+    - {at: 1805-05-22T00:00, from_deg: 160, knots: 12}
+    - {at: 1805-05-22T20:00, from_deg: 315, knots: 18, air_mass: unstable}
+  background:
+    {hpa: 1014, gradient_hpa_per_100km: 0.3, high_toward_deg: 45}
+  systems:
+    - name: the high over the Alps
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-05-19T12:00, x_km: 300, y_km: 500, hpa: 1020}
+        - {at: 1805-05-24T12:00, x_km: 400, y_km: 400, hpa: 1018}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/agincourt-sound.orders
+
+orders:
+  - set plain sail
+  - shape a course for 41 12.3 N 9 22.5 E

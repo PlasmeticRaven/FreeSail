@@ -12308,3 +12308,41 @@ and Longo Sardo's tower within fifteen miles, the Maddalena and Monte Cinto beyo
 in 1805, Pertusato's in 1850; the strait's set east, the master's directions saying it) and
 7-299 (Genoa neutral to a King's ship in May 1805 and hostile in July, a Frenchman's neutral
 then open, an American's neutral; Leghorn neutral throughout). 7-297 is in the slow list.
+
+### Step 4: the scenario, sailed once (`data/scenarios/agincourt-sound.yaml`, seed 7)
+
+The frigate unmoored in Agincourt Sound at 17:00 on 20 May 1805, a south-easterly of
+fourteen knots under a high over the Alps, by her short book (`agincourt-sound.orders`, the
+starter book not loaded): out by the western passage, round Point Liche at 17:09, inside
+Spargi at 17:37, through the strait's west mouth at 19:52 with Cape Pertusato and Capo Testa
+abeam; up the west of Corsica outside the Monks and the Sanguinaires, off Valinco at 01:36
+and off Cape Rosso at 09:39 on the 21st, off the Revellata at 10:00 and across the Gulf;
+coming to the point five miles south of Cape Cepet by night she hove to at 02:23 on the
+22nd, filled away at daylight (04:51), stood back in and looked into Toulon's roads at 05:15
+from seven miles south-south-east of Cape Cepet (her bearing of Cape Escampobariou NE by N
+three miles), set the flying jib and bore away for home; the wind came round to the
+north-west at eighteen knots that evening, and she ran back past the Revellata (21:57),
+Cape Rosso (00:15 on the 23rd) and Valinco (06:39), through the strait's west mouth at
+12:00 and in by Spargi and Point Liche to an anchor in the sound at 14:28 on the 23rd, in
+seven fathoms and a half on weed, brought up at 14:45. Seventy hours, no ground touched,
+her account within a cable of the truth among the islands and within three miles at the
+worst offshore. `tools/day_log.py data/scenarios/agincourt-sound.yaml --hours 100
+--reckoning` (the build machine): 3,837 lines, digest `7ba2146a323761ee`. Not a gate's, not
+pinned.
+
+**The first runs, kept for the book.** Her book passes the same marks out and home, and a
+mark reached on the way home sent her north again; her heading served first as the gate
+between the outward and the homeward rules and failed, since beating her head crossed any
+gate on each tack; the mizzen royal next, but the frigate's royal yards are sent down, so
+it never read "set"; the flying jib serves (plain sail leaves it furled; she sets it off
+Toulon). A turn at a mark within three cables by account never fired among the islands,
+where a fix moved her account four cables: six cables now. An hourly course for the
+Revellata, lacking the next mark's bound, hauled her back for it after passing it, and she
+wandered onto the Riviera (each hourly course now holds only short of the next mark, as
+79b's did). Sailing at dawn, she came back to the strait at dusk, ran in among the islands
+by night with her account two miles out and struck on the Magdalena's north side; told to
+lie to fifteen miles off the mouth by night, she drifted onto Corsica's south-west shore;
+sailing at five in the afternoon she comes back to the strait at noon (the night's rule is
+kept as a guard). Hove to off Toulon, she drifted twenty miles east to Porquerolles by
+dawn and went home having seen Toulon's heights only at four leagues; she now stands back
+in at daylight to look before she bears away.
