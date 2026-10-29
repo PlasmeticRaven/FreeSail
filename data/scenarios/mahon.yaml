@@ -1,0 +1,77 @@
+# FreeSail: the Mediterranean west, Gibraltar bay to Port Mahon (package 79c). A free passage
+# of the block's water, not a gate's and not pinned: the frigate from Gibraltar road out
+# past Europa Point and east along the coast of Granada to the offing of Cape de Gata, to
+# the south of the Hormigas off Cape Palos, south of Formentera and by the channel between
+# the Pityuses and Majorca to the south of Cabrera, and so round the Isla del Aire to the
+# mouth of Port Mahon, where she anchors without the ledges (Tofiño 1787 p. 213: with a
+# scant wind a ship may anchor among the ledges or farther out in 20 to 30 brazas, good
+# ground, where with a hard northerly there is much sea); on the whole chart (`chart:
+# atlantic-east`), so that she sails both of the block's regions and crosses their seam at
+# 0.05 E. The Spanish ports are hostile to her (Spain at war with Britain since December
+# 1804): she keeps off their batteries and does not go in under St Philip's ruins (the
+# batteries and the guard boats not modelled). Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/mahon.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/mahon.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/mahon.yaml --hours 98 --reckoning
+#
+# The weather is pinned (the summer's Poniente out of the Strait, westerly at fifteen knots,
+# backing south-westerly and southerly as she runs east, then the Balearics' northerly once
+# she is at anchor at the mouth), so that the passage is the same on every machine; the sea
+# and the motion are kept. Its figures at seed 7 are in docs/dev/TuningNotes.md (package
+# 79c), measured once: not a gate's, not pinned.
+
+name: The Mediterranean west, Gibraltar bay to Port Mahon
+seed: 7
+start: 1805-06-14T05:00
+position: {lat_deg: 36.1440, lon_deg: -5.3640}   # Gibraltar road (features/strait.yaml `gibraltar-road`)
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 200
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # a ship of war's
+  almanac: 1805
+
+cargo:
+  purse_pounds: 200
+
+ports: [gibraltar, algeciras, malaga, almeria, cartagena, ivica, palma, port-mahon, oran, algiers]
+
+weather:
+  wind:
+    - {at: 1805-06-14T04:00, from_deg: 270, knots: 17, air_mass: neutral}
+    - {at: 1805-06-15T10:00, from_deg: 250, knots: 16}
+    - {at: 1805-06-16T00:00, from_deg: 225, knots: 15}
+    - {at: 1805-06-16T18:00, from_deg: 190, knots: 14}
+    - {at: 1805-06-17T12:00, from_deg: 175, knots: 12}
+    - {at: 1805-06-17T22:00, from_deg: 0, knots: 14}
+    - {at: 1805-06-18T04:00, from_deg: 5, knots: 18}
+  background:
+    {hpa: 1016, gradient_hpa_per_100km: 0.3, high_toward_deg: 180}
+  systems:
+    - name: the summer's high over Iberia
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-13T12:00, x_km: -300, y_km: 400, hpa: 1022}
+        - {at: 1805-06-18T12:00, x_km: 200, y_km: 500, hpa: 1020}
+  sky: {sky: detached clouds, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/mahon.orders
+
+orders:
+  - let go the best bower

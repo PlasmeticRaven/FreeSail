@@ -53,6 +53,46 @@
 
 region: mediterranean-west
 features:
+- id: sierra-de-marbella
+  kind: hill
+  name: the top of the Sierra de Marbella
+  modern: La Concha (Sierra Blanca), above Marbella
+  lat_deg: 36.5481
+  lon_deg: -4.9306
+  height_m: 1215
+  source: "Tofiño 1787, 'Sierra de Marbella', p. 31: N 39° W 2 1/2 miles from the castle of San Luis the highest of the Sierra de Marbella, and N 12° W 2 1/2 miles the Picacho de Juana; these two points, as the Sierra de Estepona, may serve in thick weather when the Rock of Gibraltar is not seen, to know where you are and the course to keep off or to find Europa Point"
+  says: "The top of the Sierra de Marbella, the mark to know where you are when the Rock is hidden."
+  fix: "the modern chart's summit of La Concha (FROM MEMORY), within a mile and a quarter of Tofiño's bearing and distance from the castle; the height FROM MEMORY"
+- id: picacho-de-juanar
+  kind: hill
+  name: the Picacho de Juana
+  modern: the Juanar peak, above Marbella and Ojén
+  lat_deg: 36.5649
+  lon_deg: -4.8907
+  height_m: 1180
+  source: "Tofiño 1787, 'Sierra de Marbella', p. 31: N 12° W 2 1/2 miles from the castle of San Luis the Picacho de Juana, a mark with the Sierra de Marbella's top for thick weather"
+  says: "The Picacho de Juana over Marbella, a mark for thick weather."
+  fix: "the modern chart's Juanar (FROM MEMORY), Tofiño's bearing from the castle; his distance falls short, as on these beaches (the head); the height FROM MEMORY"
+- id: sierra-de-mijas
+  kind: hill
+  name: the top of the Sierra de Mijas
+  modern: Pico de Mijas
+  lat_deg: 36.6178
+  lon_deg: -4.6636
+  height_m: 1150
+  source: "Tofiño 1787, 'Sierra de Mijar', p. 32: N 22° W 5 1/2 miles from the castle of the Frangerola the highest point of the Sierra de Mijar, the town of the same name at its foot"
+  says: "The top of the Sierra de Mijas over the Frangerola."
+  fix: "the modern chart's Pico de Mijas (FROM MEMORY), within half a mile of Tofiño's bearing and distance from the castle; the height FROM MEMORY"
+- id: mulhacen
+  kind: hill
+  name: the peak of the Sierra Nevada
+  modern: Mulhacén
+  lat_deg: 37.0533
+  lon_deg: -3.3112
+  height_m: 3479
+  source: "Smyth 1854, Part V, the table of positions, p. 431: 'Cerro de Mula-hacen, 37 8 0 N, 3 28 0 W, 11,370, Peak of Sierra Nevada' (a later survey; the mountain the period's as the modern's)"
+  says: "The peak of the Sierra Nevada, snow on it, seen far out at sea."
+  fix: "the modern chart's summit (FROM MEMORY), five miles from Smyth's latitude; the height the modern 3,479 m (Smyth's 11,370 feet, 3,466 m)"
 - id: marbella
   kind: town
   name: Marbella and the castle of St. Luis

@@ -444,6 +444,57 @@ as Dartmouth's were 39a's. What it found, for the next blocks:
 - **The lookout calls the nearest marks first**: a truth of what a ship sees at a road asks
   the chart's `in_sight` for the farther high marks, the calls being a few a sweep.
 
+## The Mediterranean west (package 79c, as built)
+
+`mediterranean-west` (35 to 40.5 N, 5 W to 0.05 E, abutting `strait` at 5 W) and `balearics`
+(the same rows, 0.05 E to 4.5 E): one block of the brief's, built as two regions by the
+lead's ruling when it measured 57.5 MB in one. What it found, for the next blocks (79d's
+Gulf of Lion and Tyrrhenian among them):
+
+- **Measure before committing, and plan the regions by the 40 MB.** A Mediterranean tile of
+  open deep water is 125 to 130 KB (the multibeam relief compresses badly, as the Azores'),
+  and a box of five and a half degrees by nine and a half is some 320 level-2 tiles: half of
+  them all land (Andalusia's and the Rif's interior, 15 MB) and a third open sea. A seam
+  between two regions of one block is drawn at a tile column's edge (0.05 E here, the column
+  from 0.37 W to 0.05 E meeting both bounds and kept by the region built first); east of 1 W
+  no corridor lies under them, so every tile is written, land and deep sea alike.
+- **The world's tide over the Mediterranean is a far gauge's** while the block's gauges are
+  held: Le Conquet's over the Alboran and **Saint-Malo's over the Balearics** (the nearest
+  of the eleven), so `fill_to_chart_datum` raises GEBCO's fill by 6.83 m there and the
+  world's range is metres where the sea's is a foot. The block keeps the world's level, as
+  the Strait's recipe does (the land must stand above that tide's high water). The master's
+  epitome takes its rises from the pilots (a foot or two; Málaga's three, Purdy 1826) and
+  its hours from the block's own held gauges' establishments, not the world's.
+- **Spanish gauges' mean levels**: Puertos del Estado's REDMAR reports (`GLOB_2_3_<code>.pdf`,
+  the codes in `INT_3.pdf`) give the NMM and the lowest astronomical tide on the gauge's
+  zero in their "Referencias de nivel del mar": the level above LAT is their difference
+  (Málaga 3546, Motril 3543, Almería 3545, Melilla 3510, Ibiza 3856, Formentera 3855, Palma
+  3851, Alcudia 3853, Mahón 3860).
+- **Isles the grid lacks**, again (39e's finding): Alboran, the Hormiga off Cape Palos, Isla
+  Grosa, the Isla del Aire and Port Mahon's harbour islands are water in EMODnet's grid;
+  each is a rock of its height with an extent. A harbour's islands so smoothed become shoals
+  in its channel (the Isla del Rey a ridge of 9 to 11 m): place them by the period's plan
+  of the entry and keep the pilot's passage open.
+- **Draft positions from memory miss by a kilometre** on a coast the builder does not know
+  well: the features rule moves most within its reach, but render each harbour with its
+  marks over the tiles' land and water before trusting it (Mahon's entrance marks came out
+  a kilometre south of the mouth, its islands pushed onto the south shore by "the nearest
+  land").
+- **A region the business can people** wants the same good dear in one of its ports and
+  cheap in another by the price ratio's least (1.3): with every port's market alike the
+  region draws no trader at all; the Barbary grain (Oran's and Algiers' wheat in the Spanish
+  ports' markets) was the period's trade that gave this block its routes.
+- **The Admiralty's meteorological tables** (Mediterranean Pilot vol. I, 1913, and vol. II,
+  1916, Appendix III) are printed sideways, and their OCR is upside down: read them from the
+  PDFs' pages (`pdftoppm` at 200 dpi, turned upright), check each month's row against the
+  printed totals; Port Mahon's wind columns are blank. A weather box's check rows from
+  them, and its generator's figures fitted by simulated months (the checking tool's
+  functions with the box named), held to the sea's plausible synoptic ranges.
+- **The period's Spanish pilot of this sea is on the Internet Archive** (Tofiño 1787,
+  `derroterodelasco00tofi`, and the Derrotero of 1849 for the coasts east of Cape Creus);
+  Gallica, the Biblioteca Digital Hispánica, HathiTrust and Europeana refuse the build
+  network with their own Cloudflare pages.
+
 ## Out in the ocean: the islands and the corridor (package 39e)
 
 Madeira and the Western Islands are two regions with no neighbour (`madeira`, `azores`),

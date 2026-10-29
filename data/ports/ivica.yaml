@@ -79,6 +79,7 @@ tide:
 market:
   currency: pounds
   goods:
+    - {good: wheat, price: 20, origin: algiers, note: "the Barbary grain the coast and the islands imported from Oran and Algiers (from memory); the price judgement"}
     - {good: salt, price: 8, origin: spain, note: "the salt pans by Cape Falcó, the island's great export; from memory"}
     - {good: almonds, price: 38, origin: spain, note: "judgement"}
     - {good: carobs, price: 8, origin: spain, note: "judgement"}

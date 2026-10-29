@@ -49,13 +49,13 @@ outer_road:
 anchorage:
   feature: mahon-arsenal-anchorage
   name: Port Mahon, south of the arsenal's island
-  lat_deg: 39.8905
-  lon_deg: 4.2720
+  lat_deg: 39.8895
+  lon_deg: 4.2800
 mooring:
   feature: mahon-arsenal-anchorage
   name: south of the arsenal's island, moored north-east and south-west
-  lat_deg: 39.8905
-  lon_deg: 4.2720
+  lat_deg: 39.8895
+  lon_deg: 4.2800
   depth_fathoms: 7
   bottom: good holding ground
   deep_draught_ft: 22    # judgement: seven or eight brazas
@@ -94,6 +94,7 @@ tide:
 market:
   currency: pounds
   goods:
+    - {good: wheat, price: 21, origin: algiers, note: "the Barbary grain the coast and the islands imported from Oran and Algiers (from memory); the price judgement"}
     - {good: cheese, price: 30, origin: spain, note: "the Minorcan cheese; from memory"}
     - {good: wine, price: 26, origin: spain, note: "judgement"}
     - {good: brandy, price: 85, origin: spain, note: "judgement"}

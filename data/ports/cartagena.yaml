@@ -84,6 +84,7 @@ tide:
 market:
   currency: pounds
   goods:
+    - {good: wheat, price: 21, origin: algiers, note: "the Barbary grain the coast and the islands imported from Oran and Algiers (from memory); the price judgement"}
     - {good: esparto, price: 9, origin: spain, note: "the matting grass of Murcia; judgement"}
     - {good: barilla, price: 16, origin: spain, note: "from memory"}
     - {good: wine, price: 28, origin: spain, note: "judgement"}

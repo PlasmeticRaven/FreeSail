@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-29'
 tool: tools/build_charts.py
-build_hash: 7f092a77ecdd6dc9
+build_hash: 7604d467b0598429
 levels:
   '0':
     cell_sec: 150.0
@@ -7049,12 +7049,12 @@ regions:
         west: -0.74
         east: -0.6
     fill_to_chart_datum: true
-    feature_count: 91
+    feature_count: 95
     features_by_kind:
       anchorage: 32
       castle: 7
       headland: 14
-      hill: 4
+      hill: 8
       island: 10
       light: 1
       place: 1

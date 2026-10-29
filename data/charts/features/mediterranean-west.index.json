@@ -88,12 +88,15 @@
 "malaga-road"
 ],
 "146,-19": [
+"sierra-de-mijas",
 "calaburras-point",
 "fuengirola-castle",
 "fuengirola-road",
 "torre-bermeja-rock"
 ],
 "146,-20": [
+"sierra-de-marbella",
+"picacho-de-juanar",
 "marbella"
 ],
 "146,-9": [
@@ -120,6 +123,9 @@
 "san-jose-anchorage",
 "los-frailes",
 "san-felipe-anchorage"
+],
+"148,-14": [
+"mulhacen"
 ],
 "149,-6": [
 "cape-cope"

@@ -12098,3 +12098,69 @@ the high from the west round to the north-east), and then hand-mended: at 1,200 
 July 13.6 and 25.9). Some figures are a fit and not a synoptic climatology (summer lows five
 or six a month to give the shares' variety): PROVISIONAL, said in every row. The positions
 at Málaga, Port Mahon and Algiers take the box; the Strait's western door keeps Portugal's.
+
+### Step 7: the scenario, sailed once (`data/scenarios/mahon.yaml`, seed 7)
+
+The frigate at anchor in Gibraltar road at 05:00 on 14 June 1805, the summer's Poniente
+from the west at seventeen knots, backing south-westerly and southerly as she runs east,
+then the Balearics' northerly after she arrives; pinned so that every machine sails the same.
+Her short book (`mahon.orders`): round Europa Point two leagues off, along the coast of
+Granada four leagues off and more to five leagues south of Cape de Gata, to four leagues
+south-east of the Hormigas, south of Formentera and up the channel between the Pityuses and
+Majorca to ten miles south of Cabrera, round the Isla del Aire, and anchor without the
+ledges at the mouth of Port Mahon (Tofiño p. 213); the Spanish port hostile, she does not go
+in under St Philip's ruins (its batteries and guard boats not modelled). She weighed at
+05:27, made Cape de Gata's offing at 02:07 on the 15th and Cape Palos's at 16:49, passed
+south of Cabrera at 20:47 on the 16th, came round the Aire at 09:45 on the 17th and anchored
+at 11:09 in 25 fathoms and a half, brought up at 11:27 with 128 fathoms of cable; the
+northerly came on at 22:00 and rose to eighteen knots, and she lay through it, not
+dragging, Cape Mola to windward; at 07:00 on the 18th her account was on the truth. On the
+coast of Granada the Picacho de Juana, the Sierra de Mijas and Sierra Nevada's peak gave her
+cross-bearing fixes (as Tofiño has the Sierra's marks serve, p. 31), off the Balearics Mount
+Toro and the Puig Major. Ninety-eight hours: 3,157 lines, digest `2daf47f56207a296`
+(`tools/day_log.py data/scenarios/mahon.yaml --hours 98 --reckoning`, this container). Not
+a gate's, not pinned. The first runs, kept for the book: the order named "the bay's mouth"
+was refused (an apostrophe in a standing order's name breaks its parse), so she never
+rounded Europa by her book; making for six miles off Cape de Gata with her account seven
+miles astray after twenty hours without a fix, she stood onto the shoal water west of the
+cape (the offings now five leagues and four, as a master with no fix keeps them); and off
+Minorca the hourly course for Formentera, a hundred and twenty miles astern, was still
+within its reach and wore her back (every hourly course now holds only while the marks
+beyond are far).
+
+### Found on the way (package 79c)
+
+- **The block was past the brief's 40 MB in one region** (57.5 MB: 142 all-land tiles and
+  a deep basin that compresses badly); built as two by the lead's ruling, each under 32 MB.
+- **The world's tide over the Mediterranean is a far gauge's**, Saint-Malo's over the
+  Balearics (6.83 m mean level, an M2 of 3.7 m, where Mahón's is 0.05 m): the held gauges'
+  cost at its sharpest, for the lead with package 89; the block's gauges are read and held,
+  their mean levels VERIFIED from REDMAR, so that 89's blend would give the Mediterranean its
+  own foot of tide at once.
+- **The business peoples no region whose ports' prices are alike**: with the block's first
+  markets the routes' price ratio never reached 1.3 and the business drew nothing in either
+  region; the Barbary grain (Oran's and Algiers' wheat in the Spanish ports' markets, from
+  memory) gave it its routes, the Algerine grain ships the regions' first traders.
+- **A standing order's name with an apostrophe is refused** ("After the name say a colon"):
+  the grammar's, not the block's; said here for package 85's pass over the orders.
+- **The lookout calls an isle the grid lacks "a danger"** (the Isla del Rey, a rock of its
+  height): the kind is a rock so that a ship cannot sail through it; its call as an island
+  wants a kind the chart has not (an island with an extent): for the lead.
+- **The brief's "Mahon's light" is not in the period's texts**: Purdy 1840 finds no light-
+  tower in the Balearics but Palma's, Grasset 1807 and Tofiño name none at Mahon; 1805 sees
+  none (truth 7-292). Málaga's mole lantern is Tofiño's leading mark by day, its lighting in
+  1805 UNVERIFIED; kept a light, said so.
+- **The regency's war with Portugal** (from memory: Algerine corsairs taking Portuguese ships
+  until the peace of 1813) is in the nation's relations and not in `wars:`, no work on file
+  giving it: Portugal's ships and the regency's ports neutral to each other in the table,
+  for the lead.
+- **Mahon's harbour in the grid**: the inlet is right at EMODnet's 115 m, its islands
+  smoothed into shoals; placed by hand by Tofiño's plan; a frigate would want a patch read
+  from Tofiño's plan with its datum to go in (the plan is CC BY-NC-SA on the Archive and was
+  read, not transcribed: a later package's, as Bellin's are).
+- **The modern ports are the grid's land** at Málaga, Almería, Palma, Oran, Algiers and
+  Escombreras (Cartagena's bay east of the mouth reclaimed): the port files' heads say so,
+  the anchorages laid in the period's water outside them.
+- **The committed texts carry period words a sweep for identifiers meets** (the Mistral, the
+  emperor Claudius as 'Claude', Fort Opus, Spanish 'llama', the long s as 'fable', Gemini):
+  kept verbatim, as the research pass's report says.

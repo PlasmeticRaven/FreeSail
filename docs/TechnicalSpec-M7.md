@@ -1015,6 +1015,16 @@ on milestone 6's machinery; as built in spec M6 §26's list, figures in
 `docs/dev/TuningNotes.md`, "Package 79b". (The brief named this section §26; the chart's
 section of this spec is §28, and the pointer is here.)
 
+**As built: the Mediterranean west (package 79c, 2026-10-29).** The block from the Strait's
+east bound at 5 W to Cape Palos and Cartagena, the Balearics, and the Barbary coast from
+Ceuta's east to Algiers, begun with the research pass that serves 79d's basin too (fifteen
+period and later pilots under `docs/references/pilots/`, the Admiralty's meteorological
+tables as page images). Past the brief's 40 MB in one region it was built as two by the
+lead's ruling, `mediterranean-west` (5 W to 0.05 E) and `balearics` (0.05 E to 4.5 E), on
+milestone 6's machinery; the regency of Algiers a nation of data alone; the Mediterranean's
+first weather box from a printed table; as built in spec M6 §26's list, figures in
+`docs/dev/TuningNotes.md`, "Package 79c".
+
 ---
 
 ## 29. Consent (one revision before any adversarial seat)

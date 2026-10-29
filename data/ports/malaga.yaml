@@ -78,6 +78,7 @@ tide:
 market:
   currency: pounds
   goods:
+    - {good: wheat, price: 21, origin: algiers, note: "the Barbary grain the coast and the islands imported from Oran and Algiers (from memory); the price judgement"}
     - {good: wine, price: 34, origin: spain, note: "the Málaga wines, the 'mountain'; from memory"}
     - {good: raisins, price: 40, origin: spain, note: "the Málaga raisins, the port's great export; from memory"}
     - {good: oranges, price: 6, origin: spain, note: "judgement"}

@@ -705,14 +705,14 @@ features:
   kind: anchorage
   name: the anchorage off the Arsenal
   modern: Port de Maó, off Illa Pinto and the naval base
-  lat_deg: 39.8905
-  lon_deg: 4.272
+  lat_deg: 39.8895
+  lon_deg: 4.28
   height_m: 0
   depth_fathoms: 6.9
   bottom: good quality
   source: 'Tofiño 1787, p. 212: past the Isla del Rey and the islet one may go on within, close to either shore at half a cable without fear, till abreast of and on the south side of the island of the Machina de Arbolar, or of the Arsenal that follows it, to which it is joined by a bridge at its NW, where anchor in 7 or 8 brazas of good quality and moor NE and SW; Grasset 1807, p. 124 (the same, mooring ''N.E. et S.O.''); Purdy 1826, p. 43 (''in from 5 to 6 1/2 fathoms, good ground, and moor E.N.E. and W.S.W.''); Vargas Ponce 1787, p. 117: opposite the city the fine Arsenal, before it an almost circular islet, once a useless rock, built up by the English'
   says: Anchored off the Arsenal of Mahon, south of the masting island, in seven brazas good ground; moored north-east and south-west.
-  fix: FROM MEMORY, south of Illa Pinto; 7 1/2 brazas (6.9 fathoms); placed by hand on the tiles' harbour by Tofiño 1787's plan of the entry (pp. 211 to 213), the grid's inlet and its cross-sections (EMODnet's cells some 115 m, the harbour's islands smoothed into shoals)
+  fix: FROM MEMORY, south of Illa Pinto; 7 1/2 brazas (6.9 fathoms); placed by hand on the tiles' harbour by Tofiño 1787's plan of the entry (pp. 211 to 213), the grid's inlet and its cross-sections (EMODnet's cells some 115 m, the harbour's islands smoothed into shoals); the hand placing then moved 680 m east to the grid's channel holding Tofiño's 7 or 8 brazas (13 to 16 m), still south of the arsenal's island
 - id: georgetown
   kind: town
   name: Georgetown, or the Arrabal of St George

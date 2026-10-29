@@ -2058,6 +2058,25 @@ the figures are in `docs/dev/TuningNotes.md`.
    Dieppe's own: the lead's decision); eight stream areas, the Looe's rates Mackenzie's;
    Norie 1805's Table XLI for 27 places. The Channel's weather box to 2.5 E. The scenario
    `spithead.yaml`: the frigate from the Downs to Spithead by St Helens for the night.
+   **As built (package 79c, 2026-10-29), the Mediterranean west of milestone 7's line.** Past
+   the brief's 40 MB in one region (57.5 MB), built as two by the lead's ruling:
+   `mediterranean-west`, 35 to 40.5 N and 5 W to 0.05 E, abutting `strait` at 5 W (its
+   column of three kept), 165 level-2 tiles and the patches of Málaga, Almería, Cartagena
+   and Oran, 26.5 MB; and `balearics`, the same rows to 4.5 E, abutting it at 0.05 E (the
+   column of fourteen kept `mediterranean-west`'s), 154 level-2 tiles and the patches of
+   Palma, Port Mahon, Ivica and Algiers, 30.9 MB; every tile written (no corridor east of
+   1 W). 182 marks from Tofiño 1787 with Purdy, Vargas Ponce, Grasset, Michelot, Bérard and
+   Smyth, the lights of 1805 three (Málaga's mole, Porto Pí's, Algiers'), the isles the grid
+   lacks as rocks of their height, Port Mahon placed by hand by Tofiño's plan of its entry;
+   no patch, no sheet having been read with its datum. Eight port files (Málaga, Almería,
+   Cartagena with the King of Spain's arsenal, Palma, Ivica, Port Mahon with its arsenal,
+   Spain's and hostile; Oran and Algiers, the regency's and neutral) and the regency of
+   Algiers a nation of data alone. The tide: nine gauges read and held, their mean levels
+   from REDMAR; seven stream areas with no tidal stream and the period's currents; the
+   epitome's places with the pilots' foot of rise. The weather: the box `mediterranean-west`,
+   its check rows the Admiralty's meteorological tables (1913). The scenario `mahon.yaml`:
+   the frigate from Gibraltar road to the mouth of Port Mahon, anchored without the ledges
+   through a northerly.
    Figures in `docs/dev/TuningNotes.md`.
 
 Each block (the Strait's included) is a port file per port on 35's machinery, a patch per harbour where a period
