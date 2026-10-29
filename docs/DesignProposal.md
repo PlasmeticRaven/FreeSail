@@ -734,6 +734,33 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     class, with plans scattered through most sections), so a candidate seldom lacks at least
     a sourced row; the ships session cites him by page as it does James and Steel.
 
+57. **The viewer's light and air: three references for a later viewer package.** Owner,
+    2026-10-29, sending two pictures of vessels they made in an unrelated game (a cutter
+    at dusk with a long telltale streaming from her masthead and warm lanterns; a brig under
+    all plain sail in a rose evening haze), as visual references to log for the viewer when
+    its turn comes, not as a request now. The pictures are that game's work and stay with the
+    owner; what they show is written here. **Three things to note, with the lead's reading
+    of what the present viewer (SVG, flat fills from the stylesheet, redrawn at each
+    snapshot) can do:** (1) **the ship's own lights**, warm and distinctive: feasible and
+    cheap, since 71 already hoists the stern lantern and the top lights and the binnacle has
+    a place; each is a radial glow at its position when the hour is dark, and the hull and
+    sail faces near it take a warm tint by their distance, which flat polygons can carry.
+    (2) **The scene's mood and the time of day**, the warm glow in the sky, the tone and
+    shading: the mood is feasible in the flat style (a gradient sky and sea keyed to the
+    sun's altitude and azimuth, which `core/moon.py` already computes, the faces tinted by
+    their side to the light, dusk's warmth and night's dark with the lights alone, the
+    weather's cover and visibility as cloud and haze); the lit three-dimensional rendering
+    of the pictures is not, short of a second viewer on WebGL, which the hull's form from 75
+    (sections by station, lofted) would feed when the owner ever wants it. (3) **A lively
+    telltale, and a waving ensign**: feasible and the best return of the three, since the
+    physics already gives the apparent wind at the deck and aloft; a telltale or flag as a
+    few points animated between snapshots, its direction the apparent wind's, its flutter a
+    canned wave whose rate and amplitude follow the apparent speed, at trivial cost. The
+    owner's rule: a static straight line for the apparent wind is not worth drawing, a lively
+    one is worth disproportionately much, and a static flag hurts where a waving one helps.
+    Booked as package 91 (`docs/dev/M7-WorkPackages.md`), after 81 and 75's hull, when the
+    owner likes.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
