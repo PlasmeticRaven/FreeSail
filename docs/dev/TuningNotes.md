@@ -11590,10 +11590,11 @@ tests/test_ports.py tests/test_tide.py tests/test_scenarios.py -n 4`, 10 passed;
 truths 7-270 to 7-279 with `--slow`, 10 passed (7-279, the passage sailed whole, 147 s
 alone).
 
-**The fast tier**, once on the final tree (`python -m pytest -n auto -q -p no:cacheprovider`):
-two failed. `test_ordnance.py::test_the_eleven_ports_have_their_blocks_and_the_other_twenty_seven_none`,
+**The fast tier**, once on the final tree (`python -m pytest -n auto -q -p no:cacheprovider`,
+368 slow tests left out): two failed (the tier's count of passes did not print under its
+`-q`, so it is not stated here). `test_ordnance.py::test_the_eleven_ports_have_their_blocks_and_the_other_twenty_seven_none`,
 this package's (above: the blocks taken out, the count raised, the test renamed `..._and_the_others_none`;
-its file and the ports', nations' and tackle tests run again, 42 passed, and truth 7-275
+its file and the ports', nations' and tackle tests run again, 114 passed, and truth 7-275
 again, passed). `test_pictures.py::test_the_mcp_bridge_returns_the_chart_and_the_ships_view_as_images_that_are_not_blank`,
 "the chart is blank (std 7.9)" against its floor of 8.0, under the tier's load; it passes
 alone on this tree (run once after), and its picture is the default scenario's chart about
