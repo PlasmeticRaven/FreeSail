@@ -187,6 +187,9 @@ tables:
       # the 37j rule would be the world's range there, Le Conquet's twenty feet while the
       # block's gauges are held, and the master takes the nearest place of his table.
       - {name: Toulon, lat_deg: 43.105, lon_deg: 5.920, hw_h: 3, hw_m: 30, spring_rise_ft: 1, note: "Smyth 1854, p. 178: Toulon 3h 30m, the rise a foot or two on the shores of France and Italy; the hour given with his doubt (the accounts inconsistent)"}
+      # package 79d, the Ligurian sea's block: Smyth 1854's tide-hour for Spezzia (p. 178),
+      # with his doubt, the rise his foot; the block's other places take it as the nearest
+      - {name: Spezia, lat_deg: 44.095, lon_deg: 9.830, hw_h: 1, hw_m: 45, spring_rise_ft: 1, note: "Smyth 1854, p. 178: Spezzia 1h 45m, the rise a foot or two; the hour given with his doubt"}
 
   moore:
     title: "Moore's table of high water by the moon's bearing (Moore 1799), a point to every three quarters of an hour"

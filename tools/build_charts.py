@@ -476,6 +476,29 @@ REGIONS: dict[str, dict[str, Any]] = {
         # the figures) and the land must stand above that tide's high water
         "fill_to_chart_datum": True,
     },
+    # package 79d: the Ligurian sea and Corsica, Genoa to Leghorn, the Tuscan islands and
+    # Elba, Corsica whole and the Maddalena with Agincourt Sound (the Gulf's east part by
+    # the lead's ruling). The level-2 tiles that meet the bounds span 40.99 to 44.83 N and
+    # 7.73 to 11.15 E (72 tiles, 8 columns by 9 rows); the west column abuts
+    # `gulf-of-lion`'s at 7.73 E. The south row (40.99 to 41.41 N) holds the Maddalena and
+    # Sardinia's north shore; `tyrrhenian`, built after, meets these tiles and keeps them
+    # this block's (the boundary at the row edge 40.99 N west of 11.15 E).
+    "ligurian-sea": {
+        "title": "The Ligurian sea, Genoa and Leghorn, Elba, Corsica and the Maddalena",
+        "bounds": {"south": 41.0, "north": 44.5, "west": 7.74, "east": 11.0},
+        "fetch": {"south": 40.85, "north": 44.95, "west": 2.5, "east": 11.3},
+        "harbours": {
+            "genoa": {"south": 44.38, "north": 44.43, "west": 8.86, "east": 8.96},
+            "leghorn": {"south": 43.50, "north": 43.60, "west": 10.20, "east": 10.33},
+            "porto-ferrajo": {"south": 42.79, "north": 42.84, "west": 10.29, "east": 10.36},
+            "san-fiorenzo": {"south": 42.66, "north": 42.75, "west": 9.24, "east": 9.33},
+            "ajaccio": {"south": 41.85, "north": 41.94, "west": 8.68, "east": 8.80},
+            "agincourt-sound": {"south": 41.17, "north": 41.27, "west": 9.36, "east": 9.48},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # as gulf-of-lion's (the fetch box the first build's, which covers the tiles whole)
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -518,6 +541,7 @@ CHARTS: dict[str, dict[str, Any]] = {
             "strait",
             # package 79d: the Gulf of Lion and the Tyrrhenian, the Mediterranean's north
             "gulf-of-lion",
+            "ligurian-sea",
         ],
         "corridor": "atlantic-corridor",
     },

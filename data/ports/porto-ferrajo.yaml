@@ -1,0 +1,111 @@
+# FreeSail: Porto Ferrajo on Elba as a port (package 79d, the Gulf of Lion's block; the same
+# form as dunkirk.yaml, on package 35's machinery). The road and the marks are
+# features/gulf-of-lion.yaml's (the harbour patch porto-ferrajo).
+#
+# Sources. Michelot 1715, p. 64: anchor opposite the tower at the mole's entrance in six and
+# seven fathom, very good oozy ground. Purdy 1826, p. 96: give the town point a berth of two
+# cables; the best anchorage in 9 to 7 fathoms, oozy, three to five cables south of the
+# mole; the light-house on the fortification's N E point. Derrotero 1849, p. 160: south of
+# the city before the darsena in 6 and 7 brazas, weed. James 1837, vol. 3, pp. 77 to 78:
+# Naples ceded its part of Elba to France by the treaty of 28 March 1801, and the French
+# besieged Porto Ferrajo's Tuscan garrison from May 1801; the island France's by the peace
+# (FROM MEMORY: 1802).
+#
+# The stance. French and hostile to a King's ship, neutral to an American (the nations table: Britain at war with France since May 1803). The forts Stella and Falcone
+# over the town. The town's promontory is narrower in the grid than the forts: the light is
+# laid on the grid's land. No period sheet read: `datum: unverified`. Prices JUDGEMENT,
+# in sterling.
+
+id: porto-ferrajo
+name: Porto Ferrajo
+nation: france
+source: "Michelot 1715 p. 64; Purdy 1826 p. 96; Derrotero 1849 p. 160; James 1837 vol. 3 pp. 77-78"
+datum: unverified   # no period sheet read; no published level read
+
+outer_road:
+  feature: porto-ferrajo-road
+  name: the road of Porto Ferrajo
+  lat_deg: 42.8115
+  lon_deg: 10.3250
+  depth_fathoms: 7
+anchorage:
+  feature: porto-ferrajo-road
+  name: the road of Porto Ferrajo
+  lat_deg: 42.8115
+  lon_deg: 10.3250
+  depth_fathoms: 7
+mooring:
+  name: before the darsena
+  lat_deg: 42.8140     # the grid's 12.8 m south of the town (judgement)
+  lon_deg: 10.3290
+  depth_fathoms: 6
+  bottom: ooze and weed
+shore:
+  feature: porto-ferrajo
+  name: the mole of Porto Ferrajo
+  lat_deg: 42.8149
+  lon_deg: 10.3226
+
+pilot:
+  station: porto-ferrajo-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Porto Ferrajo boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Gasparri, Lambardi, Foresi, Ninci, Bigeschi, Tonietti, Martorella, Pacini]   # Elban names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: larboard                 # judgement
+  course_out_deg: 0            # out of the bay to the northward
+  words:
+    channel: "The bay is open and clean to the north; give the town's point a berth of two cables for the shoal spots off it, and the tunny-nets half a mile east-south-east of the light-house."
+    marks: "Monte Capanne's peak to the west over all the island; the forts Stella and Falcone on the heights over the town; the light on the point of the fortification; Cape Enfola to the west of the bay."
+    anchorage: "Anchor three to five cables south of the mole in seven to nine fathoms, good oozy ground; the north-westers and the south-westers blow over the land and raise no sea."
+    tide: "No tide to speak of; the current in the canal of Piombino runs with the wind."
+
+tide:
+  establishment: Spezia
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: france, note: "the country's; judgement"}
+    - {good: salt, price: 10, origin: france, note: "judgement"}
+    - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: france, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: france, note: "judgement"}
+    - {good: timber, price: 8, origin: france, note: "judgement"}
+    - {good: iron, price: 20, origin: france, note: "Elba's ore; judgement"}
+    - {good: figs, price: 18, origin: france, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # the garrison's stores and the town's chandlers
+  items:
+    - {item: topmast, hours: 14, pounds: 50, note: "judgement"}
+    - {item: topgallant_mast, hours: 7, pounds: 16}
+    - {item: yard, hours: 12, pounds: 30}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 25, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "the fountains by the darsena; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the island's fishermen and the miners of Rio
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 4, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [porto-ferrajo-road, 42 52 N 10 20 E]
+  from_sea: [42 52 N 10 20 E, porto-ferrajo-road]
+  in: [porto-ferrajo-road]

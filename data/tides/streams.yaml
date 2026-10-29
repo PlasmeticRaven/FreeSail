@@ -105,6 +105,7 @@ book_limits:
   - {south: 36.5, north: 40.0, west: -31.5, east: -24.5}  # the Western Islands (package 39e)
   - {south: 49.0, north: 51.5, west: -1.0, east: 2.5}  # the Channel's east block (package 79b)
   - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
+  - {south: 41.0, north: 44.5, west: 7.74, east: 11.0}  # the Ligurian sea's block (package 79d)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -1100,6 +1101,63 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT: no constant current and no tide stated for the open gulf (Smyth 1854, p. 178; Admiralty 1916, p. 12: its currents follow the wind)"
+  # package 79d, the Ligurian sea's block (the region `ligurian-sea`): as the Gulf's, the
+  # streams nought and the coast's set as `current:` alone: the western Riviera's to the
+  # south-west (from Genoa to Antibes, the polygon reaching west into the Gulf's water to
+  # Antibes, where the Admiralty's set turns west), the strait of Bonifacio's eastward after
+  # the north-westerlies, and the block's open water after them with none.
+  - id: riviera-current
+    chart: ligurian-sea
+    name: the western Riviera, Genoa to Antibes
+    polygon: [[44.55, 8.95], [44.42, 8.95], [44.20, 8.95], [44.00, 8.45], [43.75, 8.10], [43.55, 7.60], [43.45, 7.05], [43.75, 7.05], [43.95, 7.60], [44.15, 8.10], [44.55, 8.40]]
+    axis_deg: 225
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 225, kn: 1.0}
+    source: "Admiralty 1916, pp. 12 to 13: in the Gulf of Genoa the currents follow the trend of the shore from east to west, felt one to two miles off, strongest at Capo di Noli, Capo Lena and Capo delle Mele; from Capo delle Mele to Antibes about south-west; their mean rate one knot, at times two with strong northerly winds; Purdy 1826, OCR l. 12989: off Albenga a current generally sets to the S.W.; no tidal stream (Smyth 1854, p. 178); the band's breadth (about fifteen miles) JUDGEMENT"
+    book:
+      set: SW
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: SW, kn: 1.0}
+      judgement: [set, rates, hour, current]
+      source: "the current's sense the period's own (Purdy 1826, OCR l. 12989: off Albenga a current generally sets to the S.W.), its rate the Admiralty 1916's mean (pp. 12 to 13) and JUDGEMENT for 1805; no tide (Smyth 1854, p. 178)"
+  - id: bonifacio-strait
+    chart: ligurian-sea
+    name: the strait of Bonifacio
+    polygon: [[41.20, 8.95], [41.48, 8.95], [41.48, 9.65], [41.20, 9.65]]
+    axis_deg: 90
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 90, kn: 0.5}
+    source: "Admiralty 1916, p. 13: in the strait of Bonifacio the currents follow the direction of the wind at a rate depending on its force, sometimes preceding it by many hours; after north-westerly gales a current of two knots sets eastward through the strait; Purdy 1826, p. 89: the current round Point Liche will run nearly two and a half miles an hour; the constant half knot eastward (the north-westerly the prevailing wind) JUDGEMENT"
+    book:
+      set: E
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: E, kn: 0.5}
+      judgement: [set, rates, hour, current]
+      source: "JUDGEMENT within the period's words (Purdy 1826, p. 89: the strong current about Point Liche) and the Admiralty 1916's (p. 13: the current with the wind, eastward after the north-westerlies)"
+  - id: ligurian-sea-open
+    chart: ligurian-sea
+    name: the Ligurian sea and the sea about Corsica and Elba
+    polygon: [[41.00, 7.74], [44.50, 7.74], [44.50, 11.00], [41.00, 11.00]]
+    axis_deg: 180
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "Admiralty 1916, p. 13: in the middle of the entrance to the Gulf of Genoa the currents very variable and much affected by the force and direction of the winds; with south-west winds the water rises in the gulf and afterwards a southerly current sets out of it; no constant set and no tidal stream (Smyth 1854, p. 178): the world's water still"
+    book:
+      set: S
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open Ligurian sea (Smyth 1854, p. 178; Admiralty 1916, p. 13: its currents follow the winds)"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

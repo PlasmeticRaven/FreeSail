@@ -799,3 +799,65 @@ held_gauges:
     M2: {amplitude_m: 0.070, phase_deg: 224.6}
     S2: {amplitude_m: 0.028, phase_deg: 242.0}
     N2: {amplitude_m: 0.014, phase_deg: 212.9}
+
+  # THE GAUGES OF THE LIGURIAN SEA'S BLOCK, READ AND HELD (package 79d, the region
+  # `ligurian-sea`, the Gulf's east part by the lead's ruling): TICON's file read by its
+  # coordinates over the block's box (41.0 to 44.5 N, 7.74 to 11.0 E), the same file:
+  # six stations, one record each. Named as the Gulf's are; the French gauges' (Centuri,
+  # Ajaccio, Solenzara) `mean_level_m` SHOM's RAM's NM (VERIFIED, read 2026-10-29), the
+  # Italian gauges' (Imperia, Genoa, Leghorn) unread (null). HELD, as the Gulf's: the world's
+  # tide over the block is Le Conquet's alone; blended they would move no recorded passage.
+  - id: imperia
+    name: Imperia (Porto Maurizio)
+    lat_deg: 43.8784
+    lon_deg: 8.0188
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.069, phase_deg: 229.9}
+    S2: {amplitude_m: 0.027, phase_deg: 247.8}
+    N2: {amplitude_m: 0.014, phase_deg: 217.9}
+  - id: genoa
+    name: Genoa
+    lat_deg: 44.4101
+    lon_deg: 8.9253
+    record: "GESLA-2, ISPRA (idromare), 1998 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.085, phase_deg: 222.5}
+    S2: {amplitude_m: 0.031, phase_deg: 241.6}
+    N2: {amplitude_m: 0.017, phase_deg: 212.9}
+  - id: leghorn
+    name: Leghorn (Livorno)
+    lat_deg: 43.5464
+    lon_deg: 10.2989
+    record: "GESLA-2, ISPRA (idromare), 1972 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.042, phase_deg: 216.4}
+    S2: {amplitude_m: 0.016, phase_deg: 233.6}
+    N2: {amplitude_m: 0.008, phase_deg: 206.9}
+  - id: centuri
+    name: Centuri (Cape Corse)
+    lat_deg: 42.9658
+    lon_deg: 9.3498
+    record: "GESLA-2, REFMAR, 2010 to 2014"
+    mean_level_m: 0.48  # SHOM's RAM, Centuri's NM
+    M2: {amplitude_m: 0.085, phase_deg: 223.2}
+    S2: {amplitude_m: 0.034, phase_deg: 241.1}
+    N2: {amplitude_m: 0.017, phase_deg: 211.9}
+  - id: ajaccio
+    name: Ajaccio
+    lat_deg: 41.9228
+    lon_deg: 8.7628
+    record: "GESLA-2, REFMAR, 1981 to 2014"
+    mean_level_m: 0.47  # SHOM's RAM, Ajaccio's NM
+    M2: {amplitude_m: 0.077, phase_deg: 225.4}
+    S2: {amplitude_m: 0.030, phase_deg: 244.0}
+    N2: {amplitude_m: 0.016, phase_deg: 213.7}
+  - id: solenzara
+    name: Solenzara
+    lat_deg: 41.8569
+    lon_deg: 9.4038
+    record: "GESLA-2, REFMAR, 2012 to 2014"
+    mean_level_m: 0.58  # SHOM's RAM, Solenzara's NM
+    M2: {amplitude_m: 0.104, phase_deg: 227.6}
+    S2: {amplitude_m: 0.038, phase_deg: 250.4}
+    N2: {amplitude_m: 0.022, phase_deg: 212.5}

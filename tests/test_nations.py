@@ -212,6 +212,15 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "marseille": "france",
         "hyeres": "france",
         "villefranche": "france",
+        # the Ligurian sea's (package 79d): Genoa the table's Ligurian Republic, its file's
+        # first dated entry (France's from June 1805, read by the day)
+        "genoa": "liguria",
+        "leghorn": "etruria",
+        "porto-ferrajo": "france",
+        "bastia": "france",
+        "ajaccio": "france",
+        "san-fiorenzo": "france",
+        "maddalena": "sardinia",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

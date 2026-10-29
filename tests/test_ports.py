@@ -138,10 +138,25 @@ CHANNEL_EAST_PORTS = [
     "poole",
     "portsmouth",
 ]
-# package 79d: the Gulf of Lion's block's four, in their own list
+# package 79d: the Gulf of Lion's block's four and the Ligurian sea's seven, in their lists
 GULF_PORTS = ["hyeres", "marseille", "toulon", "villefranche"]
+LIGURIAN_PORTS = [
+    "ajaccio",
+    "bastia",
+    "genoa",
+    "leghorn",
+    "maddalena",
+    "porto-ferrajo",
+    "san-fiorenzo",
+]
 ALL_PORTS = sorted(
-    ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS + STRAIT_PORTS + CHANNEL_EAST_PORTS + GULF_PORTS
+    ALL_PORTS
+    + PORTUGAL_PORTS
+    + ISLANDS_PORTS
+    + STRAIT_PORTS
+    + CHANNEL_EAST_PORTS
+    + GULF_PORTS
+    + LIGURIAN_PORTS
 )
 
 
@@ -308,8 +323,12 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # the Channel's east block (package 79b): the French ports of the invasion coast hostile,
     # the English ones the King's
     french_ports |= {"le-havre", "boulogne", "calais", "dunkirk"}
-    # the Gulf of Lion's block (package 79d): the French coast hostile
-    french_ports |= set(GULF_PORTS)
+    # the Gulf of Lion's block (package 79d): the French coast hostile; the Ligurian sea's
+    # Corsica and Elba hostile, and Genoa too, France's from the annexation of 4 June 1805
+    # (its file's dated nation; this world's day is after it); Leghorn (Etruria's) and the
+    # Maddalena (the King of Sardinia's) neutral
+    french_ports |= set(GULF_PORTS) | set(LIGURIAN_PORTS) - {"leghorn", "maddalena"}
+    neutral_ports |= {"leghorn", "maddalena"}
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS
@@ -2025,3 +2044,51 @@ def test_a_crewed_stranger_in_carrick_road_deals_with_the_port_by_her_own_boat()
     assert w.dealings.pilot is None and w.dealings.cutter_id is None
     assert len(w.vessels.vessels) == sails_before + 1
     assert [j.hull for j in w.ports.jobs] == [b.id] * len(crew.dealings.jobs)
+
+
+def test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_frances():
+    """Package 79d (the lead's ruling on Genoa): a port's `nation:` is one word or a list of
+    {nation, since, until} in 79a's dated form; the loader takes the entry in force on the
+    scenario's first day, the first entry with no day (the nations' index's), and the
+    stance reads the entry for the world's day. Genoa is the Ligurian Republic's until
+    3 June 1805 and France's from the annexation of 4 June: neutral to a King's ship before
+    and hostile after, open to a French ship after, neutral to an American throughout. No
+    other port has a dated nation, so no recorded passage reads anything new."""
+    from datetime import date
+
+    path = PT.port_files()["genoa"]
+    assert PT.load_port(path).nation == "liguria"  # the index's, with no day
+    assert PT.load_port(path, when=date(1805, 6, 3)).nation == "liguria"
+    assert PT.load_port(path, when=date(1805, 6, 4)).nation == "france"
+    genoa = PT.load_port(path)
+    assert [(e["nation"], e["since"], e["until"]) for e in genoa.nations] == [
+        ("liguria", None, date(1805, 6, 3)),
+        ("france", date(1805, 6, 4), None),
+    ]
+    assert genoa.nation_on(datetime(1805, 5, 20, 12)) == "liguria"
+    assert genoa.nation_on(datetime(1805, 7, 1, 12)) == "france"
+    import yaml
+
+    dated = [
+        pid
+        for pid, p in PT.port_files().items()
+        if isinstance(yaml.safe_load(p.read_text(encoding="utf-8")).get("nation"), list)
+    ]
+    assert dated == ["genoa"]
+    for when, british, french in (
+        (datetime(1805, 6, 3, 18), "neutral", "neutral"),
+        (datetime(1805, 6, 4, 6), "hostile", "open"),
+    ):
+        w = world_at(OFF_THE_LIZARD, ports=("genoa",), start=when)
+        assert w.dealings.stance(w.ports.ports["genoa"]) == british
+        f = world_at(OFF_THE_LIZARD, ship=SCHOONER, nation="france", ports=("genoa",), start=when)
+        assert f.dealings.stance(f.ports.ports["genoa"]) == french
+        a = world_at(OFF_THE_LIZARD, ship=SCHOONER, ports=("genoa",), start=when)
+        assert a.dealings.stance(a.ports.ports["genoa"]) == "neutral"
+    # the stance follows the world's day across the annexation, the loaded nation the first
+    w = world_at(OFF_THE_LIZARD, ports=("genoa",), start=datetime(1805, 6, 3, 22))
+    assert w.dealings.stance(w.ports.ports["genoa"]) == "neutral"
+    w.run(4 * 3600)
+    assert w.clock.ship_time.date() == date(1805, 6, 4)
+    assert w.ports.ports["genoa"].nation == "liguria"
+    assert w.dealings.stance(w.ports.ports["genoa"]) == "hostile"

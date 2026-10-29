@@ -1,0 +1,231 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"164,36": [
+"capo-testa",
+"longo-sardo-tower",
+"port-longo-sardo"
+],
+"164,37": [
+"paganetto-rocks",
+"porto-pozzo",
+"point-liche",
+"agincourt-sound",
+"mezzo-passo-rocks",
+"parau-rocks",
+"parau-watering-place",
+"maddalena-road",
+"maddalena-village",
+"guardia-vecchia",
+"maddalena-island",
+"santo-stefano",
+"fort-san-giorgio",
+"spargi",
+"spargiotto",
+"caprera",
+"porto-palma",
+"capo-d-orso",
+"arsachena-sound",
+"arsachena-reef",
+"pedestal-rock"
+],
+"164,38": [
+"biscie-island",
+"middle-reef",
+"the-monks-maddalena",
+"excellent-reef"
+],
+"165,35": [
+"the-monks-corsica"
+],
+"165,36": [
+"bonifacio",
+"bonifacio-harbour",
+"cape-pertusato",
+"pertusato-light",
+"sharks-mouth-point"
+],
+"165,37": [
+"lavezzi",
+"lavezzi-rock",
+"cavallo",
+"sharks-mouth-bay",
+"budelli",
+"razzoli",
+"santa-maria",
+"barrettini"
+],
+"166,34": [
+"cape-muro"
+],
+"166,35": [
+"valinco-road"
+],
+"166,37": [
+"porto-vecchio",
+"porto-vecchio-road"
+],
+"167,34": [
+"parata",
+"sanguinaires",
+"sanguinaires-light",
+"ajaccio",
+"ajaccio-citadel",
+"citadel-rock",
+"ajaccio-road"
+],
+"167,36": [
+"monte-incudine"
+],
+"168,34": [
+"cape-rosso"
+],
+"168,36": [
+"monte-rotondo",
+"monte-d-oro",
+"monte-renoso"
+],
+"168,38": [
+"aleria-tower"
+],
+"169,35": [
+"monte-cinto"
+],
+"169,41": [
+"montecristo"
+],
+"169,43": [
+"giglio"
+],
+"170,34": [
+"revellata",
+"revellata-light"
+],
+"170,35": [
+"calvi",
+"calvi-road",
+"algajola-shoal",
+"isola-rossa"
+],
+"170,37": [
+"bastia",
+"bastia-mole-light",
+"bastia-road",
+"mortella-tower",
+"mortella-road",
+"fornali-tower",
+"san-fiorenzo-road",
+"san-fiorenzo"
+],
+"170,40": [
+"pianosa"
+],
+"170,43": [
+"formiche-di-grosseto"
+],
+"171,37": [
+"cape-sagro"
+],
+"171,40": [
+"monte-capanne"
+],
+"171,41": [
+"cape-baratto",
+"palmaiola",
+"porto-ferrajo",
+"porto-ferrajo-light",
+"forte-falcone",
+"porto-ferrajo-road",
+"cape-enfola",
+"porto-longone",
+"porto-longone-anchorage"
+],
+"171,42": [
+"piombino"
+],
+"172,37": [
+"giraglia",
+"giraglia-light",
+"cape-corse"
+],
+"172,39": [
+"capraia"
+],
+"173,39": [
+"gorgona"
+],
+"173,41": [
+"montenero",
+"secca-di-vada"
+],
+"174,40": [
+"meloria-tower",
+"meloria-south",
+"meloria-north"
+],
+"174,41": [
+"arno-mouth",
+"pisa-tower",
+"leghorn",
+"leghorn-light",
+"marzocco-tower",
+"leghorn-road"
+],
+"175,31": [
+"san-remo"
+],
+"175,32": [
+"cape-delle-mele",
+"alassio-road"
+],
+"175,40": [
+"viareggio"
+],
+"176,32": [
+"gallinara"
+],
+"176,33": [
+"finale"
+],
+"176,38": [
+"punta-mesco",
+"riomaggiore"
+],
+"176,39": [
+"porto-venere",
+"porto-venere-anchorage",
+"palmaria",
+"tino",
+"tino-light",
+"la-scola",
+"fort-santa-maria-spezia",
+"gulf-of-spezia",
+"spezia",
+"lerici",
+"cape-magrezo",
+"magra-mouth"
+],
+"177,33": [
+"cape-vado",
+"vado-road",
+"savona"
+],
+"177,35": [
+"genoa-lanterna",
+"genoa",
+"genoa-heights",
+"genoa-new-mole",
+"genoa-old-mole",
+"genoa-port",
+"genoa-road"
+],
+"177,36": [
+"monte-portofino",
+"cape-portofino",
+"portofino-harbour"
+],
+"177,37": [
+"sestri-levante"
+]
+}
+}

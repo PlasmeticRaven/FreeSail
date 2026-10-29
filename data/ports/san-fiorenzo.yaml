@@ -1,0 +1,107 @@
+# FreeSail: San Fiorenzo (Saint-Florent) as a port (package 79d, the Gulf of Lion's block;
+# the same form as dunkirk.yaml, on package 35's machinery). The road, the Mortella tower and
+# the marks are features/gulf-of-lion.yaml's (the harbour patch san-fiorenzo).
+#
+# Sources. Purdy 1826, p. 82: abreast of Porto Forno, nearly a mile off, good anchorage for
+# ships of war in 12 to 14 fathoms, or three or four cables from the shore in 9 or 10
+# fathoms, oozy ground, the town S S E, Porto Forno W N W, Point Mortella N N W; abreast
+# of the Mortella tower three cables off in 12 or 13 fathoms. Derrotero 1849, pp. 106 to
+# 107: at the foot of the Fornella tower two or three cables off in 10 or 11 brazas, sand
+# and weed, the only good anchorage at all times. Smyth 1854, p. 248.
+#
+# The stance. Corsica French since 1768 (FROM MEMORY), the British kingdom of Corsica of 1794 to 1796 ended (FROM MEMORY); in 1805 French and hostile to a King's ship, neutral to an American (the nations table: Britain at war with France since May 1803); the gulf the British
+# fleet's anchorage of 1794 to 1796 (FROM MEMORY). No period sheet read: `datum:
+# unverified`. Prices JUDGEMENT, in sterling.
+
+id: san-fiorenzo
+name: San Fiorenzo
+nation: france
+source: "Purdy 1826 p. 82; Derrotero 1849 pp. 106-107; Smyth 1854 p. 248"
+datum: unverified   # no period sheet read; no RAM station at Saint-Florent read
+
+outer_road:
+  feature: mortella-road
+  name: Mortella Road
+  lat_deg: 42.7160
+  lon_deg: 9.2660
+  depth_fathoms: 12
+anchorage:
+  feature: san-fiorenzo-road
+  name: San Fiorenzo Anchorage
+  lat_deg: 42.6875
+  lon_deg: 9.2900
+  depth_fathoms: 10
+mooring:
+  name: off the town
+  lat_deg: 42.6840     # the grid's 6.6 m off the town (judgement)
+  lon_deg: 9.2970
+  depth_fathoms: 4
+  bottom: ooze
+shore:
+  name: the landing at San Fiorenzo
+  lat_deg: 42.6810
+  lon_deg: 9.3025
+
+pilot:
+  station: mortella-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the San Fiorenzo boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Grimaldi, Ceccaldi, Leoni, Franceschi, Benedetti, Rocca, Sisco, Agostini]   # Corsican names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: larboard                 # judgement
+  course_out_deg: 340            # out of the gulf to the north-north-westward past the Mortella
+  words:
+    channel: "Run in past Point Mortella and its tower, the gulf clean and deep, and stand up for Porto Forno and the town at the gulf's head."
+    marks: "The Mortella tower on its point at the gulf's west side; the Fornali tower farther in; the little town at the head under its fort; the Nebbio's hills behind."
+    anchorage: "A ship of war anchors abreast of Porto Forno nearly a mile off in twelve to fourteen fathoms, or three or four cables from the shore in nine or ten, oozy ground, the town south-south-east and Point Mortella north-north-west; at the foot of the Fornali tower it is good in all weather."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Spezia
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: france, note: "the country's; judgement"}
+    - {good: salt, price: 10, origin: france, note: "judgement"}
+    - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: france, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: france, note: "judgement"}
+    - {good: timber, price: 8, origin: france, note: "judgement"}
+    - {good: cattle, price: 9, origin: france, note: "the head; judgement"}
+    - {good: cheese, price: 35, origin: france, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # no yard: the town's few chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 52, note: "judgement"}
+    - {item: topgallant_mast, hours: 8, pounds: 17}
+    - {item: yard, hours: 14, pounds: 31}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 26, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "the river Aliso at the head of the gulf, by the boats; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: a few fishermen
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [san-fiorenzo-road, mortella-road, 42 46 N 9 15 E]
+  from_sea: [42 46 N 9 15 E, mortella-road, san-fiorenzo-road]
+  in: [san-fiorenzo-road]

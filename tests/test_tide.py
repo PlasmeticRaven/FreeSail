@@ -320,8 +320,14 @@ def test_the_lead_reads_the_tide_and_the_master_allows_for_it_by_his_almanac():
 PERIOD_RATES = {"alderney-race", "the-looe"}
 # package 79d: the Mediterranean blocks' charts, whose areas carry the coasts' constant sets
 # and no tide (`current:` alone), and their areas' ids
-MEDITERRANEAN = {"gulf-of-lion"}
-MEDITERRANEAN_AREAS = ("provence-current", "gulf-of-lion-open")
+MEDITERRANEAN = {"gulf-of-lion", "ligurian-sea"}
+MEDITERRANEAN_AREAS = (
+    "provence-current",
+    "gulf-of-lion-open",
+    "riviera-current",
+    "bonifacio-strait",
+    "ligurian-sea-open",
+)
 
 
 def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_figures(tide):

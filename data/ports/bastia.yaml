@@ -1,0 +1,108 @@
+# FreeSail: Bastia as a port (package 79d, the Gulf of Lion's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The road and the marks are
+# features/gulf-of-lion.yaml's.
+#
+# Sources. Purdy 1826, p. 76: anchoring-ground in 10 and 11 fathoms a cable's length east
+# of the mole and the northern part of the town; within the mole 3 or 4 fathoms on weeds
+# and ooze; a fire lit in bad weather in the watch-house at the mole-head. Derrotero 1849,
+# p. 132: large ships anchor a short while N E of the light, never for the night; the road
+# south of the citadel 15 to 18 brazas, sand. Admiralty 1916, p. 234 (the depths only).
+#
+# The stance. Corsica French since 1768 (FROM MEMORY), the British kingdom of Corsica of 1794 to 1796 ended (FROM MEMORY); in 1805 French and hostile to a King's ship, neutral to an American (the nations table: Britain at war with France since May 1803).
+# No harbour patch: the road is the level-2 grid's. No period sheet read: `datum:
+# unverified`. Prices JUDGEMENT, in sterling.
+
+id: bastia
+name: Bastia
+nation: france
+source: "Purdy 1826 p. 76; Derrotero 1849 p. 132"
+datum: unverified   # no period sheet read; no RAM station at Bastia read
+
+outer_road:
+  feature: bastia-road
+  name: Bastia Road
+  lat_deg: 42.6985
+  lon_deg: 9.4580
+  depth_fathoms: 11
+anchorage:
+  feature: bastia-road
+  name: Bastia Road
+  lat_deg: 42.6985
+  lon_deg: 9.4580
+  depth_fathoms: 11
+mooring:
+  name: within the mole
+  lat_deg: 42.6975     # the grid's 18 m off the old port: the old port is the grid's land (judgement)
+  lon_deg: 9.4542
+  depth_fathoms: 3
+  bottom: weeds and ooze
+shore:
+  feature: bastia
+  name: the old port of Bastia
+  lat_deg: 42.6990
+  lon_deg: 9.4485
+
+pilot:
+  station: bastia-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Bastia boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Santelli, Vincentelli, Mattei, Orsini, Casanova, Guidicelli, Saliceti, Natali]   # Corsican names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: starboard                 # judgement
+  course_out_deg: 90            # off the road to the eastward
+  words:
+    channel: "The coast is clean and steep; stand in for the mole and the citadel, the town under its hills."
+    marks: "The citadel on its rock south of the old port, the town and its towers along the shore, the high ridge of Cape Corse behind; Capraia and Elba in sight to the east in clear weather."
+    anchorage: "Anchor a cable east of the mole in ten or eleven fathoms; within the mole small craft lie in three or four fathoms on weeds and ooze. There is no berth here for the night with the wind easterly: go to sea."
+    tide: "No tide to speak of."
+
+tide:
+  establishment: Spezia
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: france, note: "the country's; judgement"}
+    - {good: salt, price: 10, origin: france, note: "judgement"}
+    - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: france, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: france, note: "judgement"}
+    - {good: timber, price: 8, origin: france, note: "judgement"}
+    - {good: cheese, price: 35, origin: france, note: "judgement"}
+    - {good: cattle, price: 9, origin: france, note: "the head; judgement"}
+    - {good: lemons, price: 6, origin: france, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # the town's chandlers
+  items:
+    - {item: topmast, hours: 14, pounds: 50, note: "judgement"}
+    - {item: topgallant_mast, hours: 7, pounds: 16}
+    - {item: yard, hours: 12, pounds: 30}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 25, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "the town's fountains, by the boats; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: Corsican seamen of the coasting trade
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 5, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [bastia-road, 42 42 N 9 35 E]
+  from_sea: [42 42 N 9 35 E, bastia-road]
+  in: [bastia-road]

@@ -652,3 +652,14 @@ ports:
   marseille: france
   hyeres: france
   villefranche: france
+  # the Ligurian sea's block (package 79d): Corsica and Elba France's, hostile to a King's
+  # ship and neutral to an American; Genoa the Ligurian Republic's in the table (its file's
+  # dated nation France's from the annexation of June 1805); Leghorn Etruria's and the
+  # Maddalena the King of Sardinia's, neutral to a King's ship
+  genoa: liguria
+  leghorn: etruria
+  porto-ferrajo: france
+  bastia: france
+  ajaccio: france
+  san-fiorenzo: france
+  maddalena: sardinia

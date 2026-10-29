@@ -12190,3 +12190,121 @@ Gulf of Lion. Run on this commit's tree: the chart's, ports', nations', ordnance
 tackle's, log lines', tide's, weather's and scenarios' files, every test green; the two
 truths with `--slow`, passed. The whole suites are run once on the package's final tree
 (below).
+
+### Step 3: the region `ligurian-sea`, Genoa, Leghorn, Elba, Corsica and the Maddalena
+
+**The recipe**: bounds 41.0 to 44.5 N and 7.74 to 11.0 E (the west bound just past the
+column edge 7.7333 E, so that its first column is the one `gulf-of-lion` stops short of:
+the seam between the two regions, no tile built twice, "0 kept" both ways since the two
+grids of columns meet at the edge); fetch the first build's box, 40.85 to 44.95 N, 2.5 to
+11.3 E, which covers the tiles whole and was in the cache (built `--skip-fetch`); six
+harbour patches (Genoa, Leghorn, Porto Ferrajo, San Fiorenzo, Ajaccio, Agincourt Sound);
+EMODnet over GEBCO; the fill as the Gulf's. The south row (40.99 to 41.41 N) holds the
+Maddalena and Sardinia's north shore; `tyrrhenian`, built after, keeps its 32 tiles west of
+11.15 E and north of 40.99 N this block's (the boundary at the row edge 40.99 N). The
+checks as printed:
+
+```
+Checks for the block ligurian-sea:
+  licences: emodnet_dtm_2024, gebco_2025 (allowed)
+  features within the bounds: 140 of 140 (a harbour patch's box counts as the region's)
+  ids unique across the manifest's regions: yes
+  sources in the references' form: 140 of 140
+  harbour patches with their datum stated: 0 of 0
+  the fetch box covers the tiles whole: yes (40.85 to 44.95 N, 2.5 E to 11.3 E)
+  tiles another region lists: 0 kept (level 2: 0, level 3: 0; not written, not listed)
+  the block passes its checks (the shore's sweep for GEBCO's fill is the build's).
+```
+
+**The count and bytes, before the commit**: 72 level-2 tiles of 17.1 MB (12 all land,
+1.4 MB; 14 open sea beyond ten miles, 4.3 MB; 46 with a shore or near one, 11.4 MB), 32
+level-3 tiles of 2.9 MB, the coast 0.43 MB, the features and the index 0.13 MB: **20.6 MB**.
+The shore's sweep: 6,987 cells in 268 places, the largest the lake of Massaciuccoli and
+the marshes of the Serchio and the Arno behind the Tuscan shore (562, 227, 217, 207, 157
+cells about 43.53 to 43.88 N, 10.33 to 10.38 E: water, closed from the sea), the
+Maddalena's islands' shores (138 and 110 about 41.18 to 41.23 N, 9.43 E: GEBCO's cells
+straddling the islets and channels EMODnet holds; the marks there were checked against the
+level-3 tiles), the marsh of Piombino (124 about 42.93 N, 10.58 E), Genoa's Bisagno (101
+about 44.43 N, 8.78 E), the Bonifacio shore (99 about 41.33 N, 9.28 E); water, said so.
+`git status` after the build: the manifest (this region's entry, its chart line, the build
+hash and the sources' records reordered), the block's own new files; nothing of
+`gulf-of-lion`'s or any other region's tiles, coast or index.
+
+**The features**: 140 (the western Riviera from San Remo to Genoa, Portofino and Spezia,
+Leghorn and the Meloria, the Tuscan islands and Elba, Corsica whole, the Maddalena and the
+north shore of Sardinia), researched and checked as the Gulf's; **six islets the grid
+lacks** (Tino, Palmaiola, the Formiche of Grosseto, the Giraglia, the Lavezzi, the
+Sanguinaires) given as rocks of their height and extent; the Maddalena's reefs from Captain
+Ryves's survey of 1802 and Mr Atkinson's of 1804 (Purdy 1826, pp. 88 to 90: the Monks,
+the Excellent's reef struck on 20 May 1804, the Middle reef, the Parau and Mezzo Passo
+rocks) and the Algajola shoal left at the pilots' positions, the grid holding none of them;
+the Monks of Valinco moved 1,642 m to the grid's shoal head, the Revellata's and Porto
+Ferrajo's lights to the grid's land, Porto Ferrajo's town promontory being narrower in the
+grid than its forts. **The lights of 1805**: Genoa's Lanterna (`from` 1709, Michelot's
+first record; its tower of 1543 the builder's memory, UNVERIFIED) and Leghorn's (`from`
+1715; its tower of 1303 memory, UNVERIFIED). **Not yet**: the Tino (1838, Purdy 1840),
+and Corsica's coast lights: Purdy 1840 names Bastia's alone on the island, the Derrotero
+1849 the Revellata, the Sanguinaires and Pertusato lit and the Giraglia building, so all
+fall between 1841 and 1849 (their years from memory, UNVERIFIED, said). **Two lights for
+the lead**: Porto Ferrajo's on Fort Stella and Bastia's mole-head fire are `from` 1826, the
+earliest record read (Purdy 1826), no pilot dating them; the builder's memory has Porto
+Ferrajo's of 1788, in which case 1805 would see it.
+
+**The ports**: Genoa (its nation dated, below; the darsena a yard, where the Genois, 74,
+was building for France, James vol. 3 p. 176), Leghorn (Etruria's free port, neutral and
+French-leaning; the modern breakwaters the grid's, the road laid west of them), Porto
+Ferrajo (France's since the peace), Bastia (no patch: the old port the grid's land, the
+mooring off it), Ajaccio, San Fiorenzo (the Mortella's road its outer road), and **the
+Maddalena** (the King of Sardinia's, neutral; its anchorage Agincourt Sound, its outer road
+the road before the town; the watering at the Pararau, Smyth 1828 p. 248; James vol. 3
+pp. 177 to 178 for the fleet's first anchoring). Every spot with its position; every road
+and anchorage within three kilometres of a note of the bottom; `datum: unverified` in all
+seven; the nations' index and `tests/test_ports.py`'s `LIGURIAN_PORTS`; the ordnance
+count raised by seven; the tide's place Spezia (Smyth 1854's 1h 45m) the establishment of
+the Italian and Corsican ports, the nearest of the master's table.
+
+**Genoa's nation, dated** (the lead's ruling 3): a port's `nation:` may be, beside the one
+word, a list of `{nation, since, until}` in 79a's dated form (`since` and `until` counted
+in, as `business._within` counts a blockade's days). Genoa's: the Ligurian Republic's
+`until` 3 June 1805, France's `since` 4 June (the decree of annexation, FROM MEMORY; the
+Senate's petition of 25 May). **The lines touched, all in `freesail/world/ports.py`**: the
+`date` import (line 78); `Port.nations`, a plain class default so that a checkpoint from
+before loads, and `Port.nation_on` (after `ordnance`, lines 540 to 549); `load_port`'s
+`when` (its signature, lines 623 to 628) and the `nation=` it builds (lines 728 to 738,
+the entry in force on the scenario's first day, the first entry with no day, which is the
+nations' index's); `_nations` and `_dated_nation` beside `_port_state` (lines 767 to 799);
+`Ports._load` passing the scenario's start (lines 1036 to 1038); and `Ports.stance` reading
+the entry for the world's day, `world.clock.ship_time` (lines 1045 to 1048). **The other
+readers of a port's nation**, named and left reading `Port.nation`, the entry in force on
+the scenario's first day: the markets' prices (`business.py` lines 107, 123 to 124, 202,
+452 to 453, 1282 to 1283; `dealings.py`'s price list), the business's own stance and its
+ports of a nation (`business.py` 466 to 470, 727 to 737, 819 to 826, 998, 1158), the brains'
+(`brains.py` 447, 496 to 497) and the port's reading (`dealings.py` 324 to 331, its nation
+and colours). Only the stance follows the day across the annexation; a world that starts
+before it and sails past it reads the Republic's prices and colours and France's hostility,
+which is the smallest change that serves (the ruling's word) and is said here for 84's
+steps. The test of the form (`test_ports.py`,
+`test_a_ports_nation_may_be_dated_and_genoas_is_the_ligurian_republics_then_frances`):
+the loader's three answers, the entries, the stance on the 3rd and the 4th of June to a
+King's ship, a French ship and an American, a world run across midnight of the 3rd, and
+Genoa the only dated port, so that no recorded passage reads anything new.
+
+**The tide**: six gauges more, held after the Gulf's (Imperia, Genoa, Leghorn, Centuri,
+Ajaccio, Solenzara; the French levels SHOM's RAM's, the Italian null); three stream areas
+(`riviera-current`, Genoa to Antibes, a knot toward the south-west, Purdy 1826's set off
+Albenga and the Admiralty 1916's rate; `bonifacio-strait`, half a knot toward the east,
+judgement within the Admiralty's "after north-westerly gales a current of two knots sets
+eastward" and Purdy 1826's current round Point Liche; `ligurian-sea-open`, none) and the
+box appended to `book_limits`; Spezia's tide-hour in the epitome. The weather is the
+Gulf's box, which covers this region too.
+
+**Truths** 7-297 (Agincourt Sound: land within two miles in every quarter but the
+north-east's channel, about three square kilometres of water of eight to thirty metres,
+the frigate brought up by the best bower in twelve fathoms on weed in a north-wester of
+thirty knots and lying six hours without dragging once brought up; she came home a cable
+and a half while bringing up, the anchor let go with way on in a gale, as 7-273's did not),
+7-298 (the strait of Bonifacio from its west mouth: Bonifacio, Cape Pertusato, Capo Testa
+and Longo Sardo's tower within fifteen miles, the Maddalena and Monte Cinto beyond; no light
+in 1805, Pertusato's in 1850; the strait's set east, the master's directions saying it) and
+7-299 (Genoa neutral to a King's ship in May 1805 and hostile in July, a Frenchman's neutral
+then open, an American's neutral; Leghorn neutral throughout). 7-297 is in the slow list.

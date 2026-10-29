@@ -11447,3 +11447,120 @@ def test_truth_7_296_toulons_roads_are_seen_from_the_road_of_hyeres_and_its_ligh
         s.feature.id for s in w.chart.in_sight(road, eye, None, "night", datetime(1840, 1, 15, 23))
     }
     assert set(lights) <= by_night_1840
+
+
+LIGURIAN_PORTS = [
+    "genoa",
+    "leghorn",
+    "porto-ferrajo",
+    "bastia",
+    "ajaccio",
+    "san-fiorenzo",
+    "maddalena",
+]
+AGINCOURT_SOUND = (41.1870, 9.3790)  # features/ligurian-sea.yaml's `agincourt-sound`
+
+
+def test_truth_7_297_agincourt_sound_holds_a_fleet_in_a_north_wester():
+    """The brief's truth (79d): Agincourt Sound, where Nelson's squadron anchored on 31
+    October 1803 (James vol. 3, p. 177), 'land-locked' (Purdy 1826, p. 89): from the berth
+    the land lies within two miles in every quarter but the north-east's channel; there is
+    water of eight to thirty metres over some three square kilometres about it, room for a
+    fleet's berths; and the frigate, brought up by the best bower in twelve fathoms on weed
+    in a north-westerly of thirty knots (the north-wester 'blows with great violence'), lies
+    six hours without dragging once brought up."""
+    from freesail.world.geo import Position, bearing_and_distance, destination
+
+    w = _gulf_at(
+        *AGINCOURT_SOUND,
+        datetime(1805, 1, 15, 8, 0),
+        wind_from_deg=315.0,
+        wind_speed_kn=30.0,
+        ship_heading_deg=315.0,
+        ports=LIGURIAN_PORTS,
+    )
+    berth = Position(*AGINCOURT_SOUND)
+    assert w.chart.region_at(berth) == "ligurian-sea" and w.chart.level_at(berth) == 3
+    assert "weed" in w.chart.bottom_near(berth)
+    for bearing in (0, 90, 135, 180, 225, 270, 315):
+        to_land = next(
+            (
+                k * 50.0
+                for k in range(1, 90)
+                if w.chart.depth_at(destination(berth, bearing, k * 50.0)) < 0.0
+            ),
+            None,
+        )
+        assert to_land is not None and to_land < 4000.0, (bearing, to_land)
+    room = sum(
+        1
+        for i in range(-10, 11)
+        for j in range(-10, 11)
+        if 8.0
+        <= (w.chart.depth_at(Position(41.1870 + 0.0015 * i, 9.3790 + 0.002 * j)) or -1.0)
+        <= 30.0
+    )
+    assert room >= 120, room  # of 441 points over 3.5 by 3.4 km
+    w.submit("let go the best bower")
+    w.run(1200)
+    brought = [e for e in w.log if e.kind == "ship.brought_up"]
+    assert brought
+    since = len(w.log)
+    at = w.position
+    w.run(6 * 3600)
+    assert not [e for e in w.log[since:] if "drag" in e.kind or "aground" in e.kind]
+    assert bearing_and_distance(at, w.position)[1] < 0.2 * units.NAUTICAL_MILE
+    assert w.ports.ports["maddalena"].anchorage.feature_id == "agincourt-sound"
+
+
+def test_truth_7_298_the_strait_of_bonifacio_is_entered_on_its_marks_and_sets_her_east():
+    """The brief's truth (79d): at the strait's west mouth by day her masthead has the
+    strait's marks in sight, Bonifacio on its cliff and Cape Pertusato on the north, Capo
+    Testa and the tower of Longo Sardo on the south, the Maddalena's islands beyond, and
+    Corsica's mountains thirty to sixty miles off; by night in 1805 no light (Pertusato's is
+    of the 1840s, the Derrotero 1849's). Within the strait the world's water sets her east
+    (after the north-westerlies, the Admiralty 1916, p. 13) and the master's directions
+    name the set."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position
+
+    mouth = Position(41.37, 8.95)
+    w = _gulf_at(mouth.lat_deg, mouth.lon_deg, datetime(1805, 1, 15, 12, 0), ports=LIGURIAN_PORTS)
+    in_sight = {
+        s.feature.id: s.distance_m / units.NAUTICAL_MILE
+        for s in w.chart.in_sight(mouth, 20.0, None, "day", datetime(1805, 1, 15, 12, 5))
+    }
+    for mark in ("bonifacio", "cape-pertusato", "capo-testa", "longo-sardo-tower"):
+        assert mark in in_sight and in_sight[mark] < 15.0, (mark, in_sight.get(mark))
+    assert {"maddalena-island", "monte-cinto"} <= set(in_sight)
+    night = lambda year: {  # noqa: E731
+        s.feature.id
+        for s in w.chart.in_sight(mouth, 20.0, None, "night", datetime(year, 1, 15, 23))
+    }
+    assert "pertusato-light" not in night(1805) and "pertusato-light" in night(1850)
+    inside = Position(41.33, 9.25)
+    state = T.load_tide().at(inside, datetime(1805, 1, 15, 12))
+    assert state.area_id == "bonifacio-strait"
+    assert state.stream_east_ms > 0.0 and abs(state.stream_north_ms) < 1e-6
+    said = T.load_directions().area_at(inside)
+    assert said.id == "bonifacio-strait" and (said.current_point, said.current_kn) == ("E", 0.5)
+
+
+def test_truth_7_299_genoa_is_neutral_before_the_annexation_of_june_1805_and_hostile_after():
+    """The brief's truth (79d): Genoa, 'as much France as Toulon' (James vol. 3, p. 176), is
+    the Ligurian Republic's in the table until the annexation of 4 June 1805 and France's
+    after it (its file's dated nation): a King's ship in Genoa road in May 1805 finds the
+    port neutral and in July hostile; an American neutral in both; a French ship neutral and
+    then open; Leghorn, Etruria's, neutral to her throughout."""
+    road = (44.3880, 8.9150)  # features/ligurian-sea.yaml's `genoa-road`
+    for when, british, french in (
+        (datetime(1805, 5, 20, 12), "neutral", "neutral"),
+        (datetime(1805, 7, 20, 12), "hostile", "open"),
+    ):
+        w = _gulf_at(*road, when, ports=LIGURIAN_PORTS)
+        assert w.dealings.stance(w.ports.ports["genoa"]) == british
+        assert w.dealings.stance(w.ports.ports["leghorn"]) == "neutral"
+        f = _gulf_at(*road, when, ship=SCHOONER, nation="france", ports=LIGURIAN_PORTS)
+        assert f.dealings.stance(f.ports.ports["genoa"]) == french
+        a = _gulf_at(*road, when, ship=SCHOONER, nation="united-states", ports=LIGURIAN_PORTS)
+        assert a.dealings.stance(a.ports.ports["genoa"]) == "neutral"

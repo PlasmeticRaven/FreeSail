@@ -1,0 +1,121 @@
+# FreeSail: Genoa as a port (package 79d, the Gulf of Lion's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The road, the moles and the marks are
+# features/gulf-of-lion.yaml's (the harbour patch genoa).
+#
+# Sources. Michelot 1715, p. 59: great ships moor in the middle of the harbour in 8 and 10
+# fathom, anchors N W and S E; the light lit every night. Purdy 1826, pp. 68 to 69: room
+# enough between the mole-heads for the largest ships; the general anchorage for large
+# ships behind the New Mole, mud and clay, an anchor ahead and two fasts astern to the
+# mole; the road one to two miles without the mole in 10 to 24 fathoms, clay, the
+# light-house N by W to N N W; the north and north-east winds blow very strongly from the
+# mountains in winter; with the wind at S S E and S E the sea runs very high in the
+# harbour. Derrotero 1849, pp. 67 to 68. James 1837, vol. 3, p. 176: in 1803 'Genoa was
+# as much France as Toulon, and in her dockyard was constructing a French 74, to be named
+# after her, the Genois'.
+#
+# The stance, dated (79a's form, `since`): the Ligurian Republic's port, France's ally,
+# neutral to a King's ship by the nations table (no war of its own with Britain read);
+# annexed to the Empire in June 1805 (the decree of 4 June 1805, FROM MEMORY), from which
+# day the port is France's and hostile to a King's ship (`nation:` below, dated, read by
+# `Ports.stance` with the world's date). No period sheet read: `datum: unverified`.
+# Prices JUDGEMENT, in sterling.
+
+id: genoa
+name: Genoa
+# the Ligurian Republic's until the annexation of June 1805, France's from it (79a's dated
+# form; `Ports` reads the entry for the world's day)
+nation:
+  - {nation: liguria, until: 1805-06-03, source: "the Ligurian Republic, France's ally since 1797 (FROM MEMORY); 'Genoa was as much France as Toulon' (James 1837, vol. 3, p. 176)"}
+  - {nation: france, since: 1805-06-04, source: "the decree of 4 June 1805 annexing the Ligurian Republic to the Empire, the Senate's petition of 25 May (FROM MEMORY)"}
+source: "Michelot 1715 p. 59; Purdy 1826 pp. 68-69; Derrotero 1849 pp. 67-68; James 1837 vol. 3 p. 176"
+datum: unverified   # no period sheet read; no published level read for the Italian gauge
+
+outer_road:
+  feature: genoa-road
+  name: the road of Genoa
+  lat_deg: 44.3880
+  lon_deg: 8.9150
+  depth_fathoms: 18
+anchorage:
+  feature: genoa-port
+  name: the port of Genoa
+  lat_deg: 44.4082
+  lon_deg: 8.9188
+  depth_fathoms: 8
+mooring:
+  name: behind the New Mole
+  lat_deg: 44.4100     # the grid's 3 m within the moles (judgement)
+  lon_deg: 8.9230
+  depth_fathoms: 5
+  bottom: mud and clay
+shore:
+  name: the Ponte Reale at Genoa
+  lat_deg: 44.4120
+  lon_deg: 8.9290
+
+pilot:
+  station: genoa-road
+  cruising_nm: 5                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Genoese pilots' felucca
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Cambiaso, Lomellino, Parodi, Ferrari, Bozzo, Repetto, Canepa, Gaggero]   # Genoese names: judgement
+  skill: 0.85
+  fee_pounds: 3                  # judgement, in sterling; unverified
+  cast: larboard                 # judgement
+  course_out_deg: 180            # out between the mole-heads to the southward
+  words:
+    channel: "Stand in for the light-house on its point and keep a berth from it; there is no difficulty between the mole-heads, room enough for the largest ship, but do not close either head."
+    marks: "The great light-tower on the point west of the harbour, seen far by day and night; the city on its hills and the walls and forts of its heights behind; the New Mole from the light-house point and the Old Mole from the town."
+    anchorage: "A great ship anchors behind the New Mole in eight or ten fathoms, mud and clay, an anchor ahead and two fasts astern to the mole; in the road a mile or two without the moles, ten to twenty-four fathoms on clay, the light-house north by west. A south-easter sends a high sea into the harbour, and the north wind comes down off the mountains very hard in winter."
+    tide: "There is no tide to speak of, a foot or so; the water stands higher with a southerly gale."
+
+tide:
+  establishment: Spezia
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: liguria, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: liguria, note: "the country's; judgement"}
+    - {good: brandy, price: 80, origin: liguria, note: "judgement"}
+    - {good: salt, price: 10, origin: liguria, note: "judgement"}
+    - {good: salt fish, price: 26, origin: liguria, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: liguria, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: liguria, note: "judgement"}
+    - {good: hemp, price: 40, origin: null, note: "judgement"}
+    - {good: timber, price: 8, origin: liguria, note: "judgement"}
+    - {good: silk, price: 300, origin: liguria, note: "raw silk; judgement"}
+    - {good: lemons, price: 6, origin: liguria, note: "judgement"}
+    - {good: cheese, price: 35, origin: liguria, note: "judgement"}
+
+dockyard:
+  kind: yard                 # the darsena, where the Genois, 74, was building for France (James vol. 3 p. 176)
+  items:
+    - {item: topmast, hours: 9, pounds: 46, note: "judgement"}
+    - {item: topgallant_mast, hours: 4, pounds: 15}
+    - {item: yard, hours: 7, pounds: 27}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1, note: "the aqueduct's fountains on the quays; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the Genoese seamen the French conscription has not yet taken
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [genoa-road, 44 20 N 8 55 E]
+  from_sea: [44 20 N 8 55 E, genoa-road]
+  in: [genoa-road]

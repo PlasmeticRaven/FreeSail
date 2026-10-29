@@ -203,8 +203,8 @@ def test_the_eleven_ports_have_their_blocks_and_the_others_none():
     with_block = {pid for pid, port in w.dealings.ports.items() if port.ordnance is not None}
     assert with_block == set(BLOCKS)
     # the other twenty-seven, the Channel's east block's eight (package 79b) and the Gulf
-    # of Lion's four (package 79d), none
-    assert len(w.dealings.ports) - len(with_block) == 27 + 8 + 4
+    # of Lion's four and the Ligurian sea's seven (package 79d), none
+    assert len(w.dealings.ports) - len(with_block) == 27 + 8 + 4 + 7
     for pid, (kind, sells, roads, hours, barrel, ton) in BLOCKS.items():
         block = w.dealings.ports[pid].ordnance
         assert (block["kind"], block["sells"], block["roads"]) == (kind, sells, roads), pid
