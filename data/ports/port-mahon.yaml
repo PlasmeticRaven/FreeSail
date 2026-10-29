@@ -1,0 +1,125 @@
+# FreeSail: Port Mahon as a port (spec M6 §26; package 79c, the Balearics), on package 35's
+# machinery; the marks are the features file's (data/charts/features/balearics.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Entrada en el Puerto de Mahon', pp. 211
+# to 213: with a fair wind steer up the middle of the mouth till past the Point of Philipet,
+# leaving it to starboard and to port the point where stood the famous castle of St Philip,
+# among whose ruins some low batteries remain; past them a ship may close either shore,
+# five brazas close to and twelve and eighteen in the middle; the south shore preferred,
+# passing between it and the island of the Lazareto; at Cala Pedrera a ship of the line or a
+# frigate must close the south shore, passing between it and the Isla del Rey (where the
+# hospital is) and the islet Redonda, or between those two, for the north channel of five
+# brazas is narrow and wants much practice; east-north-east of the Isla del Rey a flat of 24
+# feet on which ships anchored on its south side with southerly winds have touched with
+# their sterns; then on within half a cable of either shore to abreast of the island of the
+# masting sheers and the arsenal's island joined to it by a bridge, and anchor south of it
+# in 7 or 8 brazas, good ground, moored NE and SW. With scant winds mind the ledges off the
+# Mola, off Philipet and off St Philip's point, which break with any sea, and Es Redó under
+# the castle; or anchor among them or without in 20 to 30 brazas, good ground, where there
+# is much sea with a hard northerly. On Cape Mola a signal tower, its signals repeated from
+# another over the arsenal. Vargas Ponce 1787, pp. 113 to 117, and Grasset 1807 (the
+# lazaretto; the hospital of the Isla del Rey, the English building of 1711 and its
+# successor); Purdy 1826, pp. 42 to 44.
+#
+# The yard and the hospital island. The arsenal of Mahon (the masting sheers and the
+# careening wharves the British built in their years here, 1708 to 1756, 1763 to 1782 and
+# 1798 to 1802, FROM MEMORY) is the King of Spain's in 1805: a yard. The Isla del Rey's
+# hospital is noted and not modelled. Port Mahon was given back to Spain by the Peace of
+# Amiens (1802); Nelson's fleet did not use it in 1803 to 1805 (FROM MEMORY).
+#
+# The datum: UNVERIFIED. No period sheet is patched at Mahon in this package (Tofiño's plan
+# 'El Puerto de Mahon y su costa' and Roux's plate 10, read and not transcribed, CC BY-NC-SA;
+# the harbour's marks are placed by hand on the tiles by Tofiño's plan of the entry, the
+# features file says how). The chart's depths are EMODnet's at the lowest astronomical tide.
+#
+# The stance. Port Mahon is Spain's in 1805: hostile to a King's ship from December 1804,
+# open to a neutral. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange.
+
+id: port-mahon
+name: Port Mahon
+nation: spain
+source: "Tofiño 1787 pp. 211-213 (the entry, the passages, the flat of 24 feet, the anchorage by the arsenal, the ledges, the outer anchorage); Vargas Ponce 1787 pp. 113-117; Grasset 1807; Purdy 1826 pp. 42-44"
+datum: unverified
+
+outer_road:
+  feature: mahon-outer-road
+  name: off the mouth of Port Mahon
+  lat_deg: 39.8600
+  lon_deg: 4.3170
+anchorage:
+  feature: mahon-arsenal-anchorage
+  name: Port Mahon, south of the arsenal's island
+  lat_deg: 39.8905
+  lon_deg: 4.2720
+mooring:
+  feature: mahon-arsenal-anchorage
+  name: south of the arsenal's island, moored north-east and south-west
+  lat_deg: 39.8905
+  lon_deg: 4.2720
+  depth_fathoms: 7
+  bottom: good holding ground
+  deep_draught_ft: 22    # judgement: seven or eight brazas
+shore:
+  feature: mahon-town
+  name: the quay below Mahon
+  lat_deg: 39.8885
+  lon_deg: 4.2650
+
+pilot:
+  station: mahon-outer-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a llaüt of Mahon
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Pons, Orfila, Mercadal, Seguí, Carreras, Taltavull, Febrer, Sintes]   # Minorcan names: judgement
+  skill: 0.9
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 120            # out by the mouth to the south-east (judgement)
+  words:
+    channel: "With a fair wind steer up the middle of the mouth till past the Point of Philipet, leaving it to starboard and to port the ruins of St Philip; then keep the south shore, passing between it and the Lazareto's island, and at Cala Pedrera close the south shore to pass between it and the Isla del Rey with its hospital and the islet Redonda; the north channel is narrow and wants practice. With a scant wind mind the ledges off the Mola, off Philipet and off St Philip's point, which break with any sea, and Es Redó under the castle."
+    marks: "Mount Toro over the island; Cape Mola with its signal tower on the north-east of the mouth; Philipet's point and the ruins of St Philip on either hand; Georgetown on the south shore; the Isla del Rey's hospital; the town of Mahon at the head of the harbour."
+    anchorage: "Go on within half a cable of either shore to abreast of the arsenal's island and anchor south of it in seven or eight brazas, good ground, moored north-east and south-west. Do not anchor on the south side of the flat east-north-east of the Isla del Rey, with twenty-four feet on it, with a southerly wind: ships have touched with their sterns."
+    tide: "There is no regular tide here; the sea rises a foot or two with the gales, and the current outside follows the wind."
+
+tide:
+  establishment: Port Mahon
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: cheese, price: 30, origin: spain, note: "the Minorcan cheese; from memory"}
+    - {good: wine, price: 26, origin: spain, note: "judgement"}
+    - {good: brandy, price: 85, origin: spain, note: "judgement"}
+    - {good: wool, price: 28, origin: spain, note: "judgement"}
+    - {good: honey, price: 30, origin: spain, note: "judgement"}
+    - {good: fresh beef, price: 26, origin: spain, note: "judgement"}
+    - {good: fowls, price: 4, origin: spain, note: "judgement"}
+    - {good: vegetables, price: 3, origin: spain, note: "judgement"}
+    - {good: salt, price: 11, origin: spain, note: "judgement"}
+    - {good: biscuit, price: 32, origin: spain, note: "judgement"}
+
+dockyard:
+  kind: yard                     # the arsenal of Mahon, the King of Spain's in 1805
+  items:
+    - {item: topmast, hours: 10, pounds: 48, note: "the arsenal's stores, much run down since 1802: judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 15}
+    - {item: yard, hours: 8, pounds: 30}
+    - {item: suit of sails, hours: 60, pounds_per_100m2: 24}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.06}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05}
+
+crew_pool:
+  # judgement: Minorcan seamen, many of whom served the British before 1802
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []

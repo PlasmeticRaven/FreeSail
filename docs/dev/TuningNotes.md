@@ -12042,3 +12042,59 @@ entered in `wars:` until a work on file gives it, for the lead; Morocco's relati
 it. The tests that list the chart's regions and the nations gain the block's (as 79b's
 did); the Strait's gauge test's "block's" filter bounded at its own east bound (5 W),
 Melilla lying east of it, its assertions unchanged.
+
+### Steps 4 to 6: the ports, the streams and the epitome, the weather's box
+
+**Eight port files** on package 35's machinery, every spot naming a checked mark and
+repeating its position: Málaga, Almería, Cartagena (the King of Spain's arsenal, a yard as
+Ferrol's), Palma, Ivica, Port Mahon (Spain's again since Amiens; its arsenal a yard, the Isla
+del Rey's hospital noted), all Spain's and hostile to a King's ship; Oran with
+Mers-el-Kebir and Algiers, the regency's, neutral to her as to every flag (the Dey's
+corsairs in the files' heads, not modelled). The pilots' words, roads, moorings and marks are
+Tofiño 1787's own pages (Málaga pp. 34 to 36, Almería pp. 47 to 48, Cartagena pp. 76 to 90,
+Palma pp. 184 to 188, Ivica pp. 181 to 182, Mahon pp. 211 to 213, Mers-el-Kebir and Oran
+pp. 147 to 148, Algiers pp. 152 to 153); markets, yards and pools JUDGEMENT as every block's,
+said so line by line; `datum: unverified` in all eight (no sheet read with its datum: the
+plans of Roux and Heather are CC BY-NC-SA and read, not transcribed). No ordnance block (the
+practice-and-resupply design's eleven; `test_ordnance.py`'s count of ports without one
+raised by the eight, as 79b's was). The nations' ports index and `test_ports.py`'s list
+gain the eight; the stance test the Spanish six hostile and the two Algerine neutral.
+
+**The streams** (`data/tides/streams.yaml`): seven areas, none with a tidal stream (Torbay's
+form) and six with the period's constant current: Cape Palos's offing SE 1 kn (Tofiño p. 79,
+Norie, Purdy), the coast of Granada E 1 kn (Smyth 1854 p. 161; Tofiño p. 46), the Barbary
+shore close in from Oran toward the Strait W half a knot (Tofiño p. 155, the period's own
+inshore counter-set), the Barbary shore from Arzew to Algiers E half a knot (Bérard 1837
+pp. 71 to 72), the Alboran sea E 1.5 kn (Purdy p. 14, Tofiño p. 46), the block's open sea
+E half a knot (Tofiño p. 155, Bérard); the Balearic channels none, the currents there
+following the wind (Tofiño p. 208). The block's box appended to `book_limits`. The polygons
+lie some 900 miles from every recorded passage's water. The tide's tests that held only the
+Strait's areas to a current name the block's six beside them.
+
+**The epitome** (Norie's table, a ship of war's): nine places with the period's rises
+(Málaga's three feet and its hour XII Purdy 1826's, p. 12; the rest a foot, Smyth's
+Cartagena and Mahon, Tofiño's Balearics pp. 210 and 226, Bérard's sixteen inches at
+Algiers), their hours each the block's own held gauge's establishment by the tide's rule
+(the nearest held gauge's for Cartagena, Oran and Algiers), JUDGEMENT; the rule gives
+Gibraltar 1h 38m by its own gauge against Tofiño's 1h. Not the world's: over the block the
+world's hour and range are a far gauge's (Málaga's world hour 3h 44m, its range Le
+Conquet's) while the gauges are held. Moore's table has no Mediterranean group and gains
+none.
+
+**The weather** (`data/weather/climatology.yaml`): the box `mediterranean-west` over both
+regions. Its check rows from the Admiralty's tables read from the page images: the days of
+wind from each point at Gibraltar (26 years), Cartagena (4), Palma (11), Oran (21) and Algiers
+(25), each table's totals checked against its months; Port Mahon's wind columns are blank
+and no table is given for Málaga or Toulon. The five blended with Palma and Oran at half
+weight (their bays' sea breezes: Palma's south-westerly days, Oran's north and south),
+a half-point's days split between its quarters, a tenth left for days of no prevailing
+quarter: January W 29, E 15, S 18, N 28; July W 18, E 29, S 18, N 25. The gale days
+(Cartagena, Palma, Mahon) give the strong-gale days at half and the strong-breeze days at
+three times, JUDGEMENT. The generator's figures were fitted to the rows by a scratch search
+outside the repository over simulated months (the tool `climatology_check.py`'s functions,
+the box named), the search held to the Mediterranean's plausible ranges (lows moving east,
+the high from the west round to the north-east), and then hand-mended: at 1,200 months, seed
+7, all twelve within five points of the westerly and easterly shares (January 29.1 and 16.2,
+July 13.6 and 25.9). Some figures are a fit and not a synoptic climatology (summer lows five
+or six a month to give the shares' variety): PROVISIONAL, said in every row. The positions
+at Málaga, Port Mahon and Algiers take the box; the Strait's western door keeps Portugal's.

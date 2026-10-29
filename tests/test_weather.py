@@ -721,6 +721,8 @@ def test_the_climatology_has_four_boxes_the_channels_as_it_was_and_three_provisi
         "madeira",
         # package 39e: the Western Islands
         "azores",
+        # package 79c: the Mediterranean west
+        "mediterranean-west",
     ]
     channel = clim.boxes["channel"]
     # package 79b: the east bound at 2.5 E, so that the Channel's east block is the Channel's
@@ -750,6 +752,34 @@ def test_the_climatology_has_four_boxes_the_channels_as_it_was_and_three_provisi
     # the Portuguese trades and the north-east trade in the gradient's bearing
     assert clim.boxes["portugal"].month(7).gradient == (0.25, 285.0)
     assert clim.boxes["madeira"].month(7).gradient == (0.25, 330.0)
+
+
+def test_the_mediterranean_west_has_a_box_of_its_own_checked_against_a_printed_table():
+    """Package 79c (item 6): no box covered the Mediterranean, and its water took the
+    nearest Atlantic box's (Portugal's); the block's box is over both its regions, its check
+    rows the Admiralty's meteorological tables (the Mediterranean Pilot vol. I, 1913,
+    Appendix III, read from the page images), its generator's figures judgement fitted to
+    them, every row saying so: westerlies ahead in winter, easterlies ahead in summer (the
+    Levanter), the north and south a fifth to a third each."""
+    clim = load_climatology()
+    box = clim.boxes["mediterranean-west"]
+    assert box.bounds == (35.0, 40.5, -5.0, 4.5) and box.provisional
+    assert "Admiralty" in box.source and "Appendix III" in box.source
+    raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
+    for m, row in raw["boxes"]["mediterranean-west"]["months"].items():
+        assert row["note"].startswith("judgement") and "Appendix III" in row["note"], m
+        check = row["check"]
+        quarters = sum(check[k] for k in ("westerly_pct", "easterly_pct", "southerly_pct"))
+        assert 85 <= quarters + check["northerly_pct"] <= 95, m  # a tenth of days with none
+    january, july = box.month(1).check, box.month(7).check
+    assert january["westerly_pct"] > january["easterly_pct"]
+    assert july["easterly_pct"] > july["westerly_pct"]
+    # by position: Málaga, Port Mahon, Algiers and the open sea between are the block's; the
+    # Strait's western door and the Portuguese coast are Portugal's still
+    for lat, lon in ((36.71, -4.41), (39.88, 4.30), (36.78, 3.12), (37.5, 1.0)):
+        assert clim.box_at(lat, lon).name == "mediterranean-west", (lat, lon)
+    assert clim.box_at(36.1, -5.5).name == "portugal"
+    assert clim.box_at(38.7, -9.5).name == "portugal"
 
 
 def test_a_scenario_is_seeded_from_the_box_she_starts_in_and_the_channel_draws_as_before():

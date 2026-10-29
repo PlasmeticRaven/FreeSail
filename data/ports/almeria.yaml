@@ -1,0 +1,105 @@
+# FreeSail: Almería as a port (spec M6 §26; package 79c, the Mediterranean west's block), on
+# package 35's machinery; the marks are the features file's
+# (data/charts/features/mediterranean-west.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Fondeadero y Ciudad de Almería', pp. 47
+# to 48: the road from the Point of Torrejón (a fort of two guns) to the Point of the River,
+# two miles; the city at the bottom of a bay a little more than three quarters of a mile
+# deep; ships wanting shelter from the east wind moor SSW of the bastion of the Santísima
+# Trinidad, the city's east angle, in 10 to 15 brazas sand three quarters of a mile from
+# the beach; frigates, xebecs and lesser craft more commodiously SW and WSW of the bastion
+# in 8 to 10 brazas, the smaller in 5 or 6 off the guards' house, where they may make fast
+# to the shore; all the road strewn with the ballast stones of the ships that come to load,
+# which chafe the cables; water easily got at the city's fountains, good and plentiful.
+# Purdy 1826, pp. 14 to 15.
+#
+# The datum: UNVERIFIED. No period sheet is patched at Almería in this package (Roux's plate
+# 4 and Heather's plan by Michelot are read and not transcribed, CC BY-NC-SA); the chart's
+# depths are EMODnet's at the lowest astronomical tide, the modern port's moles in the grid.
+#
+# The stance. Almería is Spain's: hostile to a King's ship from December 1804, open to a
+# neutral. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange.
+
+id: almeria
+name: Almería
+nation: spain
+source: "Tofiño 1787 pp. 47-48 (the road of Almería, the bastion of the Santísima Trinidad, the ballast stones, the water); Purdy 1826 pp. 14-15"
+datum: unverified
+
+outer_road:
+  name: the bay of Almería off the Point of Torrejón
+  lat_deg: 36.8100
+  lon_deg: -2.4750
+anchorage:
+  feature: almeria-road
+  name: Almería road
+  lat_deg: 36.8250
+  lon_deg: -2.4620
+mooring:
+  feature: almeria-road
+  name: south-west of the bastion of the Santísima Trinidad
+  lat_deg: 36.8250
+  lon_deg: -2.4620
+  depth_fathoms: 8
+  bottom: sand strewn with ballast stones
+  deep_draught_ft: 20    # judgement: eight to ten brazas for a frigate
+shore:
+  feature: almeria
+  name: the beach before the city of Almería
+  lat_deg: 36.8390
+  lon_deg: -2.4640
+
+pilot:
+  station: almeria-road
+  cruising_nm: 3                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a falucho of Almería
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Martínez, Góngora, Sánchez, Cara, Fernández, Ibáñez, Moya, Salmerón]   # judgement
+  skill: 0.8
+  fee_pounds: 1.5                # judgement; unverified
+  cast: starboard
+  course_out_deg: 180            # out to the south (judgement)
+  words:
+    channel: "The road is open from the Point of Torrejón to the Point of the River, two miles; there is no danger in it but the ballast stones, and the coast eastward of the river is foul with stones and has no anchorage."
+    marks: "The city at the bottom of its bay under the Alcazaba, the bastion of the Santísima Trinidad at its east angle, the fort on the Point of Torrejón."
+    anchorage: "A frigate moors south-west of the bastion of the Santísima Trinidad in eight to ten brazas, sand; for shelter from the east wind, south-south-west of it in ten to fifteen, three quarters of a mile off. Mind the ballast stones the ships have thrown over, which chafe the cables. Good water at the city's fountains."
+    tide: "There is next to no tide; the current runs to the eastward along the coast."
+
+tide:
+  establishment: Almería
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: grapes, price: 10, origin: spain, season: {8: 0.8, 9: 0.8, 10: 0.9}, note: "the Almería grapes; judgement"}
+    - {good: barilla, price: 16, origin: spain, note: "the soda ash of the Andalusian coast; from memory"}
+    - {good: esparto, price: 9, origin: spain, note: "the matting grass; judgement"}
+    - {good: lead, price: 22, origin: spain, note: "the Sierra de Gádor's lead; from memory"}
+    - {good: olive oil, price: 46, origin: spain, note: "judgement"}
+    - {good: wine, price: 28, origin: spain, note: "judgement"}
+    - {good: almonds, price: 40, origin: spain, note: "judgement"}
+    - {good: salt, price: 11, origin: spain, note: "judgement"}
+    - {good: fresh beef, price: 25, origin: spain, note: "judgement"}
+    - {good: vegetables, price: 3, origin: spain, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 55, note: "a spar from the merchants, slowly; judgement"}
+    - {item: cordage, hours: 4, pounds_per_fathom: 0.06, note: "esparto and hemp; judgement"}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.08, note: "the fountains, good and plentiful (Tofiño 1787 p. 48); judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.05, note: "judgement"}
+
+crew_pool:
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []

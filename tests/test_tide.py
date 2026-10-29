@@ -318,6 +318,16 @@ def test_the_lead_reads_the_tide_and_the_master_allows_for_it_by_his_almanac():
 # The waters whose rates, springs and neaps, are the period's own (package 39a).
 # (package 79b: the Looe, Mackenzie's survey as White 1835 quotes it, three knots and two)
 PERIOD_RATES = {"alderney-race", "the-looe"}
+# package 79c: the Mediterranean west's areas that carry the period's constant current (the
+# Balearic channels' follows the wind and is none), in the file's order
+MED_WEST_CURRENTS = [
+    "cape-palos-offing",
+    "granada-coast",
+    "barbary-inshore-west",
+    "barbary-algiers",
+    "alboran-sea",
+    "med-west-open",
+]
 
 
 def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_figures(tide):
@@ -802,6 +812,8 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
         "strait-middle",
         "strait-east-mouth",
         "strait-west-approach",
+        # package 79c: the Mediterranean west's currents, some 900 miles from the Channel
+        *MED_WEST_CURRENTS,
     ]
     start = datetime(1805, 6, 12, 0, 0)  # springs
     states = [tide.at(MID_STRAIT, start + timedelta(minutes=10 * i)) for i in range(6 * 25)]
@@ -823,7 +835,11 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
         for i in range(6 * 25)
     ]
     assert sum(shore_east) / len(shore_east) == pytest.approx(0.0, abs=0.2)
-    assert all(a.current_kn == 0.0 for a in tide.areas if a.chart != "strait")
+    assert all(
+        a.current_kn == 0.0
+        for a in tide.areas
+        if a.chart != "strait" and a.id not in MED_WEST_CURRENTS  # package 79c
+    )
 
 
 def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_strait():
@@ -845,6 +861,7 @@ def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_stra
         a.current_kn == 0.0
         for a in book.areas
         if a.id not in {"strait-middle", "strait-east-mouth", "strait-west-approach"}
+        and a.id not in MED_WEST_CURRENTS  # package 79c
     )
     sc = Scenario(
         start_time=datetime(1805, 6, 12, 10, 0),

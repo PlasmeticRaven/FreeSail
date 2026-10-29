@@ -505,3 +505,14 @@ ports:
   boulogne: france
   calais: france
   dunkirk: france
+  # the Mediterranean west (package 79c, the regions mediterranean-west and balearics):
+  # the Spanish ports at war with Britain since December 1804, hostile to a King's ship and
+  # open to a neutral; Oran and Algiers the regency of Algiers', at peace with Britain
+  malaga: spain
+  almeria: spain
+  cartagena: spain
+  palma: spain
+  port-mahon: spain
+  ivica: spain
+  oran: algiers
+  algiers: algiers

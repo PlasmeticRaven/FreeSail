@@ -203,6 +203,15 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "boulogne": "france",
         "calais": "france",
         "dunkirk": "france",
+        # the Mediterranean west (package 79c): Spain's, and the regency of Algiers'
+        "malaga": "spain",
+        "almeria": "spain",
+        "cartagena": "spain",
+        "palma": "spain",
+        "port-mahon": "spain",
+        "ivica": "spain",
+        "oran": "algiers",
+        "algiers": "algiers",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

@@ -716,7 +716,7 @@ held_gauges:
   # where Málaga's is 0.19 and Mahón's 0.05, its mean level 3.98 m above the datum where
   # these are 0.16 to 0.43). The pilots agree with the gauges: Gibraltar five or six feet
   # (Michelot 1709, Tofiño 1787), Málaga three (Purdy 1826), Cartagena about sixteen inches
-  # (Smyth 1854), the Balearics one to two feet with gales (Tofiño 1787 p. 223), Mahón "no
+  # (Smyth 1854), the Balearics one to two feet with gales (Tofiño 1787 pp. 210 and 226), Mahón "no
   # regular tides" (the Admiralty 1913).
   - id: malaga
     name: Málaga

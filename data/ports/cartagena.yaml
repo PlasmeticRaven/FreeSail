@@ -1,0 +1,116 @@
+# FreeSail: Cartagena as a port (spec M6 §26; package 79c, the Mediterranean west's block),
+# on package 35's machinery; the marks are the features file's
+# (data/charts/features/mediterranean-west.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Ciudad de Cartagena y su Puerto',
+# pp. 76 to 78, and 'Entrada en el Puerto de Cartagena', pp. 78 to 90: the harbour some 800
+# toesas deep from its mouth to the north; the narrows between the fort of the Navidad and
+# the battery of Santa Florentina, 325 toesas; the Podadera's point clean, eight brazas
+# close to it; the Espalmador grande, a cove north of the Navidad 260 toesas across with
+# 5 and 6 brazas, the ordinary anchorage of the King's ships, the best sheltered and near
+# the arsenal in the north-west angle of the harbour; the islet of Escombrera at the mouth,
+# a shoal some 200 toesas west of it; off Cape Palos the water runs south-east, and close to
+# Cape Tiñoso it sets into the bay of La Subida; the 'birazones', the winds of the third
+# quadrant, regular in summer from ten in the morning to sunset. Purdy 1826, pp. 17 to 19;
+# Smyth 1854, p. 6 and the table (the mole-light later).
+#
+# The datum: UNVERIFIED. No period sheet is patched at Cartagena in this package (Tofiño's
+# plan as Heather engraved it, and Roux's plate 5, read and not transcribed, CC BY-NC-SA).
+# The chart's depths are EMODnet's at the lowest astronomical tide; the arsenal's basin of
+# the 1750s is in the grid as the harbour's water, and the modern port of Escombreras is the
+# grid's land over the bay east of the mouth, which 1805 had as water (the anchorage of
+# Escombrera is laid outside it).
+#
+# The stance. Cartagena is Spain's, the King of Spain's arsenal of the Mediterranean: a yard,
+# as Ferrol's. Hostile to a King's ship from December 1804 by the nations table, open to a
+# neutral. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange.
+
+id: cartagena
+name: Cartagena
+nation: spain
+source: "Tofiño 1787 pp. 76-90 (the harbour, the narrows, the Espalmador, the entry from Capes Palos and Tiñoso, the winds); Purdy 1826 pp. 17-19"
+datum: unverified
+
+outer_road:
+  feature: podadera-fort
+  name: within the Podadera
+  lat_deg: 37.5800
+  lon_deg: -0.9840
+anchorage:
+  feature: espalmador-grande
+  name: the Espalmador grande
+  lat_deg: 37.5910
+  lon_deg: -0.9852
+mooring:
+  feature: espalmador-grande
+  name: the Espalmador grande, by the arsenal
+  lat_deg: 37.5910
+  lon_deg: -0.9852
+  depth_fathoms: 5
+  bottom: mud
+  deep_draught_ft: 22    # judgement: five and six brazas
+shore:
+  feature: cartagena
+  name: the quay of Cartagena
+  lat_deg: 37.6000
+  lon_deg: -0.9860
+
+pilot:
+  station: espalmador-grande
+  cruising_nm: 4                 # judgement: the arsenal's pilots met ships off the mouth
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the arsenal's pilot boat
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Conesa, Saura, Madrid, Martínez, Pagán, Sáez, Aznar, Ros]   # Murcian names: judgement
+  skill: 0.9
+  fee_pounds: 3                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 180            # out through the narrows to the south (judgement)
+  words:
+    channel: "From Cape Palos with an easterly, being past the Hormigas, close the coast to the south of the islet of Escombrera and a cable and a half from it go west-south-west till Santa Ana bears north a quarter east, which clears the shoal two hundred toesas west of the islet; then luff for Trinca Botijas and fetch the Podadera. With a westerly, beat to the middle of the mouth and run in half a musket shot off the Podadera, the coast being clean."
+    marks: "The islet of Escombrera at the mouth; the forts of the Podadera and the Navidad on the west side, the battery of Santa Florentina and the castle of Santa Ana on the east; the city on the north of the harbour, the castle of the Galeras on its hill to the west."
+    anchorage: "Anchor within the Podadera in eight to ten brazas and warp in; the King's ships lie in the Espalmador grande, north of the Navidad, in five and six brazas, the best sheltered and near the arsenal."
+    tide: "There is no tide to speak of. Off Cape Palos the water runs fast to the south-east, and close to Cape Tiñoso it draws into the bay of La Subida. In summer the birazones blow from the south-west from ten in the morning to sunset."
+
+tide:
+  establishment: Cartagena
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: esparto, price: 9, origin: spain, note: "the matting grass of Murcia; judgement"}
+    - {good: barilla, price: 16, origin: spain, note: "from memory"}
+    - {good: wine, price: 28, origin: spain, note: "judgement"}
+    - {good: olive oil, price: 46, origin: spain, note: "judgement"}
+    - {good: salt, price: 10, origin: spain, note: "the salt pans by Cape Palos; judgement"}
+    - {good: hemp, price: 52, origin: spain, note: "for the arsenal's ropery; judgement"}
+    - {good: timber, price: 6, origin: spain, note: "the arsenal's; judgement"}
+    - {good: canvas, price: 42, origin: null, note: "judgement"}
+    - {good: salt beef, price: 72, origin: spain, note: "judgement"}
+    - {good: biscuit, price: 31, origin: spain, note: "the victualling of the squadron; judgement"}
+    - {good: fresh beef, price: 25, origin: spain, note: "judgement"}
+
+dockyard:
+  kind: yard                     # the King of Spain's arsenal: a yard, as Ferrol's
+  items:
+    - {item: topmast, hours: 8, pounds: 46, note: "the arsenal sells to a neutral at a price: judgement, as Ferrol's"}
+    - {item: topgallant_mast, hours: 4, pounds: 14}
+    - {item: yard, hours: 6, pounds: 28}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the Matrícula de Mar takes the coast's seamen for the King's ships
+  able: {hands: 4, pounds: 2, delay_h: 24}
+  ordinary: {hands: 8, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 14, pounds: 1, delay_h: 12}
+
+closed_to: []
