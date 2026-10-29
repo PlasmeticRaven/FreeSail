@@ -2668,3 +2668,29 @@ length is booked to 74 as the last note said; §19.2 item 5 (the merchant brig's
 to `merchant-brig.yaml`, the packet's description) is ruled as §8.4 proposes, built by its
 owner before the brig's phrases are next touched. Go on: stage 0H's merge wait is lifted (item
 1), so stage B when B3.5 and its drawing are in.
+
+**2026-10-29, the owner's six sheets of the pilot seen by the lead** (the viewer's sheets of
+the 64 and the razee at the head after `09dde99`: abeam and on the quarter at 135 degrees,
+old beside new, furled and under plain sail; the hull alone beside the frigate-36, one scale
+and normalised; the hull below the water three ways at 10 degrees of heel; astern with the
+razee's short roundhouse under D18 (c); sent to the lead by the owner, not in the branch).
+**The read:** the hull is a two-decker at a glance where the old viewer had a slab, the rig
+the same in old and new and the masts' feet and the bowsprit's heel on the drawn hull, which
+is the principles kept; the quarter view holds, the run aft narrowing as it should; the
+razee one tier fewer with the same lower wales, her short roundhouse the stepped block,
+her stern one row of lights under the roundhouse where the 64 has two and two tiers of
+galleries; the frigate-36 normalised, a box 2.69 times too high with no sheer, the plainest
+case yet for SW-2 directly after the pilot, which is the order. **Rulings:** (1) §19.1 item
+16: **hidden by the sea is the default**, as proposed; *faint* is kept as the viewer's toggle
+for sheets like these, since it shows the body against its waterline when the lines are
+judged; *solid* goes with the shared hull when SW-2 lands. (2) §19.1 item 19 is closed by the
+owner's word in `164027c` (the browser's look decides); at 7.9 px a metre the tumblehome
+reads plainly. (3) The tan strips at the deck levels read as planking bands until 81 draws
+the ports over them: as designed, and the sheets say so; nothing to change. (4) One question
+for the Vanguard photographs, not a fault: the razee's roundhouse is drawn as a plain block
+with no lights in its after bulkhead; whether the model shows lights there is the owner's to
+read, and the file's note should say which way it was judged. (5) **The sheets go into the
+record** with B1's testing report, under `docs/playtests/<date>-pilot-indefatigable/pictures/`
+in the form the playtests' pictures take (the six as PNG, a README naming each by its head
+and what it shows), since they are the sheets §2.6 step 7 promised and the record of the
+hull's first drawing; the Vanguard photographs stay private as the design has them.
