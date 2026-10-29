@@ -444,6 +444,32 @@
         onDeck: down,
       };
     }
+    /** Package 75 (B5.2; docs/design/Design-ShipsEngineExtensions.md §6.1): a lateen cut at
+     *  the mast (the 64's and the 74's mizen course), its corners [tack, throat, peak, clew]
+     *  swung whole about its mast's raked line, where its luff is laced, by the sheet's angle
+     *  to the sheet's side, as a gaff is (`sheetDirection`); `inPlane`, not swung, as the file
+     *  has it (the fixed frame's rig). The yard's truss is on the mast at the throat's height.
+     *  `mastAt(id)` places a mast. Returns {pts, truss, aft, normal, mast}, aft the swung
+     *  direction of the ship's stern, or null for any other sail. */
+    function mastCut(spec, mastAt, inPlane) {
+      if (!spec || !spec.cut_at_mast || !spec.corners_m || spec.corners_m.length !== 4) return null;
+      var M = mastAt((spec.roles || {}).mast);
+      if (!M || !M.xAt) return null;
+      var tz = deck + spec.corners_m[1][1];
+      var truss = v(M.xAt(tz), 0, tz);
+      var axis = norm(v(M.xAt(tz + 1) - M.xAt(tz), 0, 1)); // up the mast's raked line
+      var lee = tack === "larboard" ? 1 : -1; // as `sheetDirection`: to starboard on the larboard tack
+      var turn = inPlane ? 0 : -lee * Math.abs(sailDyn(spec).sheet_angle || 0);
+      var c = Math.cos(turn), s = Math.sin(turn);
+      function swing(p) {
+        // about the axis through the truss, by `turn` (Rodrigues)
+        return add(add(mul(p, c), mul(cross(axis, p), s)), mul(axis, dot(axis, p) * (1 - c)));
+      }
+      var pts = spec.corners_m.map(function (q) {
+        return add(truss, swing(sub(v(q[0], 0, deck + q[1]), truss)));
+      });
+      return { pts: pts, truss: truss, aft: swing(v(-1, 0, 0)), normal: swing(v(0, 1, 0)), mast: M };
+    }
     /** Whether a studding sail boom is rigged out: the snapshot's state (spec 3b §7), else
      *  the ship file's (booms start rigged in), else out while a sail on it is not stowed. */
     function riggedOut(spec) {
@@ -602,9 +628,43 @@
           r.a = rootP;
           r.b = v(rootP[0] + Math.sqrt(Math.max(L * L - dz2 * dz2, 0)), 0, rootP[2] + dz2);
           r.tip = r.b;
-        } else if (where && spec.class === "lug_yard" && lugCut(sailOnYard(id), resolve)) {
+        } else if (spec.class === "lateen_yard" && mastCut(sailOnYard(id), resolve)) {
+          // package 75 (B5.2; Ext §6.1): the mizen yard of a course cut at the mast, slung at
+          // its truss on the mast at the throat's height, its after part along the sail's head
+          // to the peak, swung with the sail to the sheet's side; its bare fore part on the
+          // same line forward of the mast by the rest of its length, so that it lies to
+          // windward as the after part lies to leeward. Aloft in every state: it is not
+          // lowered to set, take in or furl its sail. The frame takes it in the file's plane
+          // and reaches its swing about the truss (`fullRigFrame`: `pivot` and `reach`) at the
+          // heights of the yard's ends and the sail's foot (`heights`), so that the swung peak
+          // and clew stay inside it when she heels
+          var mc = mastCut(sailOnYard(id), resolve, !where);
+          var truss = mc.truss, peakY = mc.pts[2];
+          var headL = len(sub(peakY, truss));
+          var fore = Math.max((spec.length_m || headL) - headL, 0);
+          r.x = truss[0];
+          r.arm = norm(sub(peakY, truss));
+          r.a = sub(truss, mul(r.arm, fore)); // the heel, forward of the mast and to windward
+          r.b = peakY;
+          r.centre = lerp(r.a, r.b, 0.5);
+          r.half = (spec.length_m || headL) / 2;
+          r.normal = mc.normal;
+          r.brace = 0;
+          r.hoist = 1;
+          r.truss = truss;
+          r.cutAtMast = true;
+          r.pivot = truss;
+          r.reach = Math.max(headL, fore);
+          r.heights = [r.a[2], r.b[2], mc.pts[0][2], mc.pts[3][2]]; // heel, peak, tack, clew
+        } else if (
+          where &&
+          (spec.class === "lug_yard" || spec.class === "lateen_yard") &&
+          lugCut(sailOnYard(id), resolve)
+        ) {
           // package 57: a lug's yard from its cut, slung a third from its fore end on its
-          // side of the mast, or on deck while its lug is lowered or sent down
+          // side of the mast, or on deck while its lug is lowered or sent down; and so a whole
+          // lateen's yard with its cut (package 75, B5.2; Ext §6.1), as a standing sail on its
+          // lee side, until the package that builds a whole lateen draws it as its own
           var lc = lugCut(sailOnYard(id), resolve);
           var lsp = sailOnYard(id);
           var throatP = lc.pts[1], peakP = lc.pts[2];
@@ -1124,7 +1184,36 @@
         return sp ? sentDown(sp) : false;
       });
       if (onDeck) return; // sent down with its spar
-      if (cls === "square" || cls === "lug" || cls === "lateen") {
+      if (cls === "lateen" && spec.cut_at_mast) {
+        // package 75 (B5.2; Ext §6.1): the mizen course cut at the mast, on its corners swung
+        // about the mast (`mastCut`), its luff on the mast and its head along its yard. The
+        // reef raises the foot as a gaff sail's does: the tack up the mast and the clew with
+        // it. Brailed up in the gear, it is gathered to the mast and up under the yard;
+        // furled, a bundle along the yard's after part, aloft (Falconer 1780, YARD)
+        var mcs = mastCut(spec, function (mid) {
+          return spars[mid];
+        });
+        if (!mcs) return;
+        var mp = mcs.pts; // tack, throat, peak, clew
+        var rfc = reefFraction(spec, dyn);
+        var tackC = lerp(mp[0], mp[1], 1 - rfc);
+        var clewC = add(mp[3], v(0, 0, tackC[2] - mp[0][2]));
+        var luffC = len(sub(mp[1], tackC));
+        var cfig = sailFigure(spec, dyn, [mp[1], mp[2], clewC, tackC], mcs.normal, spars[roles.yard] || mcs.mast, luffC);
+        cfig.mastId = mcs.mast.id;
+        cfig.clewAt = clewC; // where its sheet is drawn from
+        if (dyn.state === "furled") {
+          cfig.path = bundle(mp[1], mp[2], 0.35);
+        } else if (dyn.state === "in_the_gear") {
+          var upC = lerp(mp[1], mp[0], IN_GEAR_DEPTH); // the foot hauled up the mast
+          var underC = lerp(mp[1], mp[2], IN_GEAR_DEPTH); // and the leech in under the yard
+          cfig.path = [[mp[1]], [lerp(mp[1], underC, 0.5), underC], [add(lerp(underC, upC, 0.5), mul(mcs.aft, 0.8)), upC], [lerp(upC, mp[1], 0.5), mp[1]]];
+          // the clew brailed in with the foot and the leech: on the bundle's after side, the
+          // middle of the curve between them, not where it stood with the sail set
+          cfig.clewAt = add(lerp(underC, upC, 0.5), mul(mcs.aft, 0.4));
+        }
+        figures.push(cfig);
+      } else if (cls === "square" || cls === "lug" || cls === "lateen") {
         var Y = spars[roles.yard];
         if (!Y || !Y.arm) return;
         var corners, depth;
@@ -1133,8 +1222,9 @@
           var cut = squareCut(spec, dyn, Y);
           corners = cut.corners;
           depth = cut.depth;
-        } else if (cls === "lug" && spec.corners_m) {
-          // package 57: a lug from its cut, on its side of the mast (`lugCut`)
+        } else if ((cls === "lug" || cls === "lateen") && spec.corners_m) {
+          // package 57: a lug from its cut, on its side of the mast (`lugCut`); and a whole
+          // lateen with its cut (package 75, B5.2; Ext §6.1), as a standing lug on its lee side
           var lcut = lugCut(spec, function (mid) {
             return spars[mid];
           });
@@ -1387,10 +1477,18 @@
       } else if (ln.class === "lift") {
         // package 75 (B5.1; the owner's answer, Build-Ships.md §19.1 item 7): faint, from the
         // yard's arm on its side up to the head of the mast it hangs on. A spar with no arms
-        // (the 64's mizen yard, a gaff until B3.1's yard) has none drawn.
+        // (a gaff) has none drawn. The mizen yard of a course cut at the mast (B5.2; Ext §6.1)
+        // is held up by its after part, where the sail hangs: its lifts from about the middle
+        // of that part, the starboard one a twentieth of it nearer the peak and the larboard
+        // one a twentieth nearer the mast, so that the pair are not drawn one over the other;
+        // the derrick (its lift with no side) from two-thirds along it toward the peak,
+        // "between the slings and the peak" (Steel 1794 vol. I p. 207; judgement)
         var Yl = spars[ln.of];
         if (!Yl || !Yl.arm || sentDown(Yl) || Yl.onDeck || !Yl.parent || !Yl.parent.head) return;
         var arm = sideSign(ln.side) > 0 ? Yl.b : Yl.a;
+        if (Yl.cutAtMast) {
+          arm = lerp(Yl.truss, Yl.b, ln.side ? 0.5 + 0.05 * sideSign(ln.side) : 2 / 3);
+        }
         var up = state === "parted" ? add(arm, v(0, 0, -2.5)) : Yl.parent.head;
         figures.push({ kind: "line", id: ln.id, cls: "lift", of: ln.of, state: state, pts: [arm, up], busy: !!busy[ln.of] });
       } else if (ln.class === "sheet") {
@@ -1399,9 +1497,15 @@
         if (sf.state === "goose_winged" && ln.side === (tack === "starboard" ? "larboard" : "starboard")) return; // the lee clew is up
         var pts;
         var sheetSpec = sailSpecs[ln.of] || {};
-        if (sf.cls === "lug" && sheetSpec.corners_m) {
-          // package 57: a lug's sheet from its clew aft to the lee side; a lug topsail's is
-          // at its lower lug's peak, where its clew is, and is not drawn
+        if (sheetSpec.cut_at_mast) {
+          // package 75 (B5.2; Ext §6.1): the mizen course's one sheet, from its clew (brailed
+          // in with the sail in the gear) to the taffrail on the centreline, where its horse is
+          // (Steel 1794 vol. I p. 208)
+          pts = [sf.clewAt || sf.corners[2], taffrail(hull)];
+        } else if ((sf.cls === "lug" || sf.cls === "lateen") && sheetSpec.corners_m) {
+          // package 57: a lug's sheet from its clew aft to the lee side, and a whole lateen's
+          // drawn as a lug (package 75); a lug topsail's is at its lower lug's peak, where its
+          // clew is, and is not drawn
           if (sheetSpec.sheeted_to) return;
           var lc2 = sf.corners[2];
           var lugLeeSide = lc2[1] >= 0 ? 1 : -1;
@@ -1471,8 +1575,9 @@
 
   /** The full rig's reach, for the view's fixed scale (spec M3 §9 item 14): every spar in
    *  the ship file, aloft whatever its state now, with each swinging spar's reach about its
-   *  pivot in all four horizontal directions, so that no brace or sheet angle and no spar
-   *  sent down changes it; and the hull. */
+   *  pivot in all four horizontal directions (at each height its swing reaches from, for the
+   *  mizen yard of a course cut at the mast: package 75), so that no brace or sheet angle
+   *  and no spar sent down changes it; and the hull. */
   function fullRigFrame(graph, spars, hull) {
     var pts = [];
     var dirs = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]];
@@ -1484,7 +1589,9 @@
       if (!SWINGING[s.class]) return;
       var pivot, reach;
       if (r.pivot) {
-        pivot = r.pivot; // a studding sail boom: out beyond its yardarm, however braced
+        // a studding sail boom: out beyond its yardarm, however braced; the mizen yard of a
+        // course cut at the mast about its truss (package 75)
+        pivot = r.pivot;
         reach = r.reach;
       } else if (r.centre) {
         pivot = r.centre; // a yard about its slings
@@ -1493,8 +1600,12 @@
         pivot = r.a; // a gaff, boom or sprit about its mast
         reach = len(sub(r.b, r.a));
       }
-      dirs.forEach(function (d) {
-        pts.push(add(pivot, mul(d, reach)));
+      // at the pivot's height, or at each height a swing reaches from (the mizen yard's)
+      (r.heights || [pivot[2]]).forEach(function (z) {
+        var at = v(pivot[0], pivot[1], z);
+        dirs.forEach(function (d) {
+          pts.push(add(at, mul(d, reach)));
+        });
       });
     });
     hullFigures(hull).forEach(function (f) {
@@ -1633,6 +1744,17 @@
     if (z === null) return null;
     for (var k = 0; k < 3; k++) z = deckAt(profile, xAt(z)); // the rake moves it a hair
     return z;
+  }
+
+  /** The taffrail on the centreline, where a sheet led to the stern is drawn to (package 75,
+   *  B5.2; Ext §6.1): the rail's after end where the file gives a profile, else the stern of
+   *  the hull `hullFigures` draws without one (0.52 of her length abaft midships, at its
+   *  sheer there). */
+  function taffrail(hull) {
+    var p = drawnProfile(hull);
+    if (p) return v(p.rail_m[0][0], 0, p.rail_m[0][1]);
+    var L = hull.length_waterline_m;
+    return v(-L / 2 - 0.02 * L, 0, (hull.deck_height_m || 1.5) * 1.02);
   }
 
   /** The stem head, the top of the stem's fore edge (`stem_m`'s last point; the rail's last

@@ -22,6 +22,12 @@ fields the projection reads always run.
   (freesail/ship/form.py's), down to the drawn depth; the stern by its type, the quarter
   galleries, the stern lights, the head and the channel wale; a lower mast's foot behind the
   near side; the hull below the water drawn three ways, hidden by the sea by default.
+- Package 75 (B5.2, docs/design/Design-ShipsEngineExtensions.md §6.1), on the fixture
+  `frigate_with_mizen_yard()` (tests/rig_fixtures.py): the mizen course cut at the mast swung
+  whole about its mast on its file's corners, its yard slung at its truss with the bare fore
+  part to windward, its lifts from the yard's after part, its sheet to the taffrail; brailed to
+  the mast and up under the yard, furled along it, reefed from the foot; the frame equal across
+  states; a whole lateen with its cut drawn as a standing lug to leeward.
 """
 
 from __future__ import annotations
@@ -34,12 +40,14 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from rig_fixtures import frigate_with_mizen_yard, frigate_with_mizen_yard_doc, write_ship
 
 from freesail.api import queries
 from freesail.api.session import make_ship, make_world
 from freesail.core.world import Scenario
 from freesail.evolutions.trim import set_sheet_angle
 from freesail.ship import form
+from freesail.ship.loader import ship_from_dict
 from freesail.ship.parts import LineState, SailState
 from freesail.ship.profile import deck_at, interp
 from freesail.ship.schema import HullStern
@@ -2136,3 +2144,374 @@ def test_where_a_deck_ends_over_another_a_bulkhead_closes_the_space_between(
         half = len(pts) // 2
         for p, q in zip(pts[:half], reversed(pts[half:]), strict=True):
             assert p[1] > 0.0 and q[1] == pytest.approx(-p[1]) and q[2] == p[2]
+
+
+# ---------------------------------------------------------------------------
+# Package 75 (B5.2, docs/design/Design-ShipsEngineExtensions.md §6.1): the mizen course cut at the
+# mast and its yard, on the fixture (tests/rig_fixtures.py; no file carries one yet)
+# ---------------------------------------------------------------------------
+
+MIZEN_COURSE = "mizzen.course"
+
+
+def mizen_by_the_wind(
+    tack: str, sheet_deg: float = 30.0, state: SailState = SailState.SET, reefs: int = 0
+) -> dict:
+    """`frigate_with_mizen_yard()` under plain sail on `tack`, her mizen course in `state`,
+    sheeted `sheet_deg` off the centreline: the graph and snapshot."""
+    ship = frigate_with_mizen_yard()
+    for sid in ship.groups["plain sail"]:
+        ship.sails[sid].state = SailState.SET
+    course = ship.sails[MIZEN_COURSE]
+    set_sheet_angle(ship, course, math.radians(sheet_deg))
+    course.state, course.reefs = state, reefs
+    awa = math.radians(60.0) * (1.0 if tack == "starboard" else -1.0)
+    return ship_state(ship, awa=awa, tack=tack)
+
+
+MIZEN_FIGURES = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    const y = sk.spars['mizzen.yard'], m = sk.spars['mizzen.mast'];
+    const course = sk.figures.filter(f => f.id === 'mizzen.course');
+    const fig = course.length ? course[0] : null;
+    const pts = fig ? fig.path.reduce((a, seg) => a.concat(seg), []) : [];
+    const off = p => [Math.hypot(p[0] - m.xAt(p[2]), p[1]), p[2]];
+    return {
+      heel: y.a, peak: y.b, truss: y.truss, mx: m.xAt(y.truss[2]),
+      corners: fig ? fig.corners : null, off: fig ? fig.corners.map(off) : null,
+      path: pts, pathOff: pts.map(off), state: fig ? fig.state : null,
+      lines: sk.figures.filter(f => f.kind === 'line' && (f.of === 'mizzen.yard' ||
+        f.of === 'mizzen.course')).map(f => ({id: f.id, cls: f.cls, pts: f.pts,
+        off: f.pts.map(off)})),
+      masthead: m.head,
+    };
+"""
+
+
+def _course_and_yard(graph: dict) -> tuple[dict, dict, float]:
+    sail = next(s for s in graph["sails"] if s["id"] == MIZEN_COURSE)
+    yard = next(s for s in graph["spars"] if s["id"] == "mizzen.yard")
+    return sail, yard, graph["hull"]["deck_height_m"]
+
+
+def _mast_line(graph: dict) -> tuple[list, list]:
+    """The mizzen mast's raked line (`client/projection.js`'s `xAt`): a point on it at the deck
+    and its direction up the mast."""
+    mast = next(s for s in graph["spars"] if s["id"] == "mizzen.mast")
+    deck = graph["hull"]["deck_height_m"]
+    slope = -math.tan(mast.get("rake") or 0.0)
+    up = math.hypot(slope, 1.0)
+    return [mast["x_m"], 0.0, deck], [slope / up, 0.0, 1.0 / up]
+
+
+def _off_the_line(p: list, origin: list, axis: list) -> list:
+    """The part of p's offset from a line square to it (the line through `origin` along the
+    unit `axis`)."""
+    d = [a - b for a, b in zip(p, origin, strict=True)]
+    along = sum(a * b for a, b in zip(d, axis, strict=True))
+    return [a - along * b for a, b in zip(d, axis, strict=True)]
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_mizen_yard_is_slung_at_its_truss_its_fore_part_to_windward(tmp_path, tack):
+    """Ext §6.1: the truss at the mast at deck plus the throat's height; the course swung whole
+    about the mast, where its luff is laced, by the sheet's angle to the sheet's side, on its
+    corners (each as far from the mast and from the others as the file has it); the yard's
+    after part along its head to the peak, and the bare fore part on the same line forward of
+    the mast by the rest of the yard, to windward as the after part lies to leeward. Its one
+    sheet runs from the clew to the taffrail on the centreline."""
+    data = mizen_by_the_wind(tack)
+    got = run_js(tmp_path, data, MIZEN_FIGURES)
+    sail, yard, deck = _course_and_yard(data["graph"])
+    origin, axis = _mast_line(data["graph"])
+    lee = 1.0 if tack == "larboard" else -1.0  # +1 starboard
+    file = [[q[0], 0.0, deck + q[1]] for q in sail["corners_m"]]  # tack, throat, peak, clew
+    heel, peak, truss = got["heel"], got["peak"], got["truss"]
+    truss_z = deck + sail["corners_m"][1][1]
+    on_mast = origin[0] + axis[0] / axis[2] * (truss_z - deck)
+    assert truss == [pytest.approx(on_mast), 0.0, pytest.approx(truss_z)]
+    assert heel[0] > truss[0] > peak[0]  # the fore part forward of the mast, the head abaft it
+    assert heel[1] * lee < 0.0 < peak[1] * lee  # the fore part to windward, the peak to leeward
+    assert math.dist(heel, peak) == pytest.approx(yard["length_m"])
+    u = [p - t for p, t in zip(peak, truss, strict=True)]
+    w = [h - t for h, t in zip(heel, truss, strict=True)]
+    normal = (u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0])
+    assert math.hypot(*normal) / math.hypot(*u) < 1e-6  # heel, truss and peak on one line
+    # the corners, drawn [throat, peak, clew, tack]: swung whole, each as far from the mast and
+    # from the others as in the file; the luff on the mast within 0.1 m; the throat at the truss
+    # and the peak at the yard's peak
+    drawn = [got["corners"][i] for i in (3, 0, 1, 2)]  # tack, throat, peak, clew
+    for i, (p, q) in enumerate(zip(drawn, file, strict=True)):
+        off_p, off_q = _off_the_line(p, origin, axis), _off_the_line(q, origin, axis)
+        assert math.hypot(*off_p) == pytest.approx(math.hypot(*off_q), abs=1e-6), i
+        for j in range(i):
+            assert math.dist(p, drawn[j]) == pytest.approx(math.dist(q, file[j]), abs=1e-6)
+    assert math.hypot(*_off_the_line(drawn[0], origin, axis)) <= 0.1  # the tack on the mast
+    assert math.dist(drawn[1], truss) <= 0.1 and drawn[2] == pytest.approx(peak)
+    # the sheet's angle about the mast: the peak's offset from it, swung from the file's
+    off_p, off_q = _off_the_line(peak, origin, axis), _off_the_line(file[2], origin, axis)
+    cos = sum(a * b for a, b in zip(off_p, off_q, strict=True)) / (
+        math.hypot(*off_p) * math.hypot(*off_q)
+    )
+    assert math.degrees(math.acos(min(cos, 1.0))) == pytest.approx(30.0, abs=1e-6)
+    assert drawn[3][1] * lee > 0.5  # the clew to leeward
+    sheets = [ln for ln in got["lines"] if ln["cls"] == "sheet"]
+    length = data["graph"]["hull"]["length_waterline_m"]
+    assert [s["id"] for s in sheets] == ["mizzen.course.sheet"]
+    assert sheets[0]["pts"] == [
+        pytest.approx(drawn[3]),
+        pytest.approx([-0.52 * length, 0.0, 1.02 * deck]),
+    ]
+
+
+@needs_node
+def test_the_course_unswung_lies_on_its_files_corners(tmp_path):
+    """With its sheet at no angle the course lies in the fore-and-aft plane on the file's
+    corners, to the millimetre: the drawing is the file's cut, swung."""
+    data = mizen_by_the_wind("larboard")
+    for s in data["snap"]["sails"]:
+        if s["id"] == MIZEN_COURSE:
+            s["sheet_angle"] = 0.0
+    got = run_js(tmp_path, data, MIZEN_FIGURES)
+    sail, _yard, deck = _course_and_yard(data["graph"])
+    drawn = [got["corners"][i] for i in (3, 0, 1, 2)]  # tack, throat, peak, clew
+    for p, q in zip(drawn, sail["corners_m"], strict=True):
+        assert p == pytest.approx([q[0], 0.0, deck + q[1]], abs=1e-3)
+
+
+@needs_node
+def test_the_mizen_yards_lifts_hold_its_after_part_from_the_masthead(tmp_path):
+    """The lifts of every yard drawn faint (B5.1): the mizen yard's from its after part, where
+    the sail hangs, the pair about its middle a twentieth of it apart either way (the starboard
+    one nearer the peak), so that neither is drawn over the other, and the derrick nearer the
+    peak, each up to the mizzen mast's head; no brace."""
+    got = run_js(tmp_path, mizen_by_the_wind("larboard"), MIZEN_FIGURES)
+    truss, peak = got["truss"], got["peak"]
+    lifts = {ln["id"]: ln["pts"] for ln in got["lines"] if ln["cls"] == "lift"}
+    shares = {
+        "mizzen.yard.derrick": 2.0 / 3.0,
+        "mizzen.yard.lift.starboard": 0.55,
+        "mizzen.yard.lift.larboard": 0.45,
+    }
+    assert set(lifts) == set(shares)
+    for lid, (foot, top) in lifts.items():
+        want = [t + shares[lid] * (p - t) for t, p in zip(truss, peak, strict=True)]
+        assert foot == pytest.approx(want), lid
+        assert top == pytest.approx(got["masthead"]), lid
+    starboard, larboard = (
+        lifts["mizzen.yard.lift.starboard"][0],
+        lifts["mizzen.yard.lift.larboard"][0],
+    )
+    assert math.dist(starboard, larboard) == pytest.approx(0.1 * math.dist(truss, peak))
+    assert not [ln for ln in got["lines"] if ln["cls"] == "brace"]
+
+
+HEELS = [0.0, 0.15, -0.15, 0.3, -0.3]
+
+
+@needs_node
+@pytest.mark.parametrize("facing_deg", [0.0, 45.0, 90.0, 135.0, 225.0])
+def test_the_frame_holds_the_mizen_yards_swing_across_states(tmp_path, facing_deg):
+    """Ext §6.1: `fullRigFrame` reaches the yard's swing about its truss, the fore part's with
+    it, at the heights of the yard's ends and the sail's foot and at the quarters as well as
+    the four sides, so every point of the yard, the course and their lines lies within the
+    frame alone, upright or heeled; and the view's scale is the same on either tack, at any
+    sheet, set, in the gear or furled."""
+    states = {
+        f"{tack}-{sheet}-{state.value}": mizen_by_the_wind(tack, sheet, state)
+        for tack in ("starboard", "larboard")
+        for sheet in (18.0, 45.0, 85.0)
+        for state in (SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED)
+    }
+    body = f"""
+        const f = {math.radians(facing_deg)};
+        const mizen = g => [g.id, g.of].some(i => i === 'mizzen.yard' || i === 'mizzen.course');
+        const out = {{}};
+        Object.keys(d).forEach(k => {{
+          const sk = P.buildSkeleton(d[k].graph, d[k].snap);
+          out[k] = {json.dumps(HEELS)}.map(h => {{
+            const proj = P.makeProjector(f, h);
+            const fr = sk.frame.map(proj);
+            const xs = fr.map(p => p.x), ys = fr.map(p => p.y);
+            const box = {{minX: Math.min(...xs), maxX: Math.max(...xs),
+                          minY: Math.min(...ys), maxY: Math.max(...ys)}};
+            let over = -1e9, n = 0;
+            sk.figures.filter(mizen).forEach(g => {{
+              (g.path ? P.flattenPath(g.path) : g.pts).map(proj).forEach(q => {{
+                over = Math.max(over, box.minX - q.x, q.x - box.maxX, box.minY - q.y,
+                                q.y - box.maxY);
+                n += 1;
+              }});
+            }});
+            return {{frame: box, over: over, n: n, bounds: P.project(sk, f, h).bounds}};
+          }});
+        }});
+        return out;
+    """
+    got = run_js(tmp_path, states, body)
+    first = got[next(iter(got))]
+    for name, views in got.items():
+        for heel, view, same in zip(HEELS, views, first, strict=True):
+            assert view["n"] > 10 and view["over"] <= 1e-6, (name, heel, view["over"])
+            for k in ("minX", "maxX", "minY", "maxY"):
+                assert view["frame"][k] == pytest.approx(same["frame"][k], abs=1e-6), (name, k)
+                assert view["bounds"][k] == pytest.approx(same["bounds"][k], abs=1e-6), (name, k)
+
+
+def _off_the_segment(p: list, a: list, b: list) -> float:
+    """How far the point p lies from the segment a-b."""
+    u = [y - x for x, y in zip(a, b, strict=True)]
+    t = sum((q - x) * c for q, x, c in zip(p, a, u, strict=True)) / sum(c * c for c in u)
+    t = max(0.0, min(1.0, t))
+    return math.dist(p, [x + t * c for x, c in zip(a, u, strict=True)])
+
+
+@needs_node
+def test_the_course_is_brailed_to_the_mast_and_furled_along_its_yard(tmp_path):
+    """Ext §6.1: in the gear the course is gathered to the mast and up under the yard, its foot
+    hauled up the mast and its leech in along the yard by the gear's depth (IN_GEAR_DEPTH,
+    0.35), its sheet from the clew brailed in with it; furled, a bundle along the yard's after
+    part, aloft, with no sheet drawn. The yard stays where it was."""
+    lee = run_js(tmp_path, mizen_by_the_wind("larboard"), MIZEN_FIGURES)
+    gear = mizen_by_the_wind("larboard", state=SailState.IN_THE_GEAR)
+    brailed = run_js(tmp_path, gear, MIZEN_FIGURES)
+    furled = run_js(tmp_path, mizen_by_the_wind("larboard", state=SailState.FURLED), MIZEN_FIGURES)
+    truss, peak = lee["truss"], lee["peak"]
+    for got in (brailed, furled):
+        assert got["truss"] == pytest.approx(truss) and got["peak"] == pytest.approx(peak)
+    luff = truss[2] - lee["corners"][3][2]
+    head_aft = lee["off"][1][0]  # the peak's distance abaft the mast
+    assert min(z for _aft, z in lee["pathOff"]) < truss[2] - 0.9 * luff  # set, down to its foot
+    assert brailed["state"] == "in_the_gear"
+    for aft, z in brailed["pathOff"]:
+        assert z >= truss[2] - 0.35 * luff - 1e-6
+        assert aft <= 0.35 * head_aft + 0.8 + 1e-6
+    # the sheet from the clew in the bundle, not where it stood set, to the taffrail
+    (sheet,) = [ln for ln in brailed["lines"] if ln["cls"] == "sheet"]
+    aft, z = sheet["off"][0]
+    assert truss[2] - 0.35 * luff < z < truss[2] and 0.0 < aft <= 0.35 * head_aft + 0.8
+    length = gear["graph"]["hull"]["length_waterline_m"]
+    deck = gear["graph"]["hull"]["deck_height_m"]
+    assert sheet["pts"][1] == pytest.approx([-0.52 * length, 0.0, 1.02 * deck])
+    assert furled["state"] == "furled"
+    assert max(_off_the_segment(p, truss, peak) for p in furled["path"]) <= 0.35 + 1e-6
+    assert not [ln for ln in furled["lines"] if ln["cls"] == "sheet"]  # furled: none drawn
+
+
+@needs_node
+@pytest.mark.parametrize("path", PROFILED)
+def test_the_courses_sheet_leads_to_the_taffrail_of_a_hull_drawn_from_its_profile(tmp_path, path):
+    """Ext §6.1: where the file gives a profile, as the 64's and the 74's do, the course's sheet
+    runs from its clew to the profile's taffrail, the rail's after end (`rail_m`'s first point)
+    on the centreline, not to the stern of the hull drawn without one. The fixture's rig on each
+    profiled hull served."""
+    data = mizen_by_the_wind("larboard")
+    data["graph"]["hull"] = ship_state(make_ship(path))["graph"]["hull"]
+    got = run_js(tmp_path, data, MIZEN_FIGURES)
+    rail = data["graph"]["hull"]["profile"]["rail_m"][0]
+    length = data["graph"]["hull"]["length_waterline_m"]
+    (sheet,) = [ln["pts"] for ln in got["lines"] if ln["cls"] == "sheet"]
+    assert sheet[0] == pytest.approx(got["corners"][2])  # the clew
+    assert sheet[1] == pytest.approx([rail[0], 0.0, rail[1]], abs=1e-3)
+    assert abs(rail[0] + 0.52 * length) > 0.1  # not the stern drawn without a profile
+
+
+@needs_node
+def test_a_reef_raises_the_courses_foot_up_the_mast(tmp_path):
+    """Ext §6.1: the reef raises the foot as a gaff sail's does: the tack up the luff on the mast
+    by the reef's share of it (the curve class's `reef_factor`, served), the clew with it."""
+    whole = run_js(tmp_path, mizen_by_the_wind("larboard"), MIZEN_FIGURES)
+    data = mizen_by_the_wind("larboard", reefs=1)
+    reefed = run_js(tmp_path, data, MIZEN_FIGURES)
+    sail, _yard, _deck = _course_and_yard(data["graph"])
+    rise = sail["reef_factor"] * (whole["corners"][0][2] - whole["corners"][3][2])
+    assert rise > 0.5
+    assert reefed["corners"][3][2] == pytest.approx(whole["corners"][3][2] + rise)
+    assert reefed["off"][3][0] <= 0.1  # the tack still on the mast
+    assert reefed["corners"][2][2] == pytest.approx(whole["corners"][2][2] + rise)
+    assert reefed["corners"][:2] == [pytest.approx(p) for p in whole["corners"][:2]]
+
+
+@needs_node
+def test_a_whole_lateen_with_its_cut_is_drawn_as_a_standing_lug_to_leeward(tmp_path):
+    """Ext §6.1: a lateen with four corners and no key (a later package's tartane) is drawn by
+    the lug's cut as a standing sail on the lee side of its tack, its yard from the cut's throat
+    to its peak, not at the fixed tilt a lateen yard with no cut keeps."""
+    doc = frigate_with_mizen_yard_doc()
+    next(s for s in doc["sails"] if s["id"] == MIZEN_COURSE).pop("cut_at_mast")
+    ship = ship_from_dict(doc, "whole.yaml")
+    course = ship.sails[MIZEN_COURSE]
+    course.state = SailState.SET
+    set_sheet_angle(ship, course, math.radians(30.0))
+    data = ship_state(ship, awa=math.radians(-60.0), tack="larboard")
+    got = run_js(
+        tmp_path,
+        data,
+        """
+        const sk = P.buildSkeleton(d.graph, d.snap);
+        const y = sk.spars['mizzen.yard'];
+        const pieces = sk.figures.filter(f => f.id === 'mizzen.course');
+        return {a: y.a, b: y.b, cut: !!y.cutAtMast, n: pieces.length,
+                corners: pieces[0].corners};
+        """,
+    )
+    deck = data["graph"]["hull"]["deck_height_m"]
+    sail = next(s for s in data["graph"]["sails"] if s["id"] == MIZEN_COURSE)
+    _tack, throat, peak, _clew = sail["corners_m"]
+    assert not got["cut"] and got["n"] >= 1
+    assert got["a"][2] == pytest.approx(deck + throat[1])
+    assert got["b"][2] == pytest.approx(deck + peak[1])
+    assert got["b"][1] > 0.5 and got["corners"][2][1] > 0.5  # the peak and the clew to leeward
+
+
+@needs_node
+def test_the_course_as_the_game_serves_it_is_drawn_at_its_mast(tmp_path):
+    """The fixture's world through the game's own doors (`/api/ship`, `/api/state`): the graph
+    serves the course's cut and key and the yard's class, and the drawing takes them as above.
+    As she starts, the course furled at no sheet: the yard in the fore-and-aft plane, slung at
+    its truss, the course a bundle along its after part; then set and sheeted, to leeward of
+    the tack the state gives, the yard's fore part to windward, its sheet to the taffrail."""
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from freesail.ui.server import Driver, create_app
+
+    path = write_ship(frigate_with_mizen_yard_doc(), tmp_path)
+    scenario = Scenario(wind_from_deg=0.0, wind_speed_kn=10.0, ship_heading_deg=60.0)
+    world = make_world(7, str(path), scenario)
+    world.tick()  # her tack and her sails' states are read at a tick
+    course = world.ship.sails[MIZEN_COURSE]
+    with TestClient(create_app(Driver(world))) as client:
+        start = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
+        course.state = SailState.SET
+        set_sheet_angle(world.ship, course, math.radians(30.0))
+        world.tick()
+        sheeted = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
+    sail, yard, deck = _course_and_yard(start["graph"])
+    assert sail["cut_at_mast"] is True and len(sail["corners_m"]) == 4
+    assert yard["class"] == "lateen_yard"
+    assert start["snap"]["ship"]["tack"] == sheeted["snap"]["ship"]["tack"] == "larboard"
+    origin, axis = _mast_line(start["graph"])
+    truss_z = deck + sail["corners_m"][1][1]
+    on_mast = origin[0] + axis[0] / axis[2] * (truss_z - deck)
+
+    furled = run_js(tmp_path, start, MIZEN_FIGURES)
+    assert furled["state"] == "furled"
+    assert furled["truss"] == [pytest.approx(on_mast), 0.0, pytest.approx(truss_z)]
+    assert furled["heel"][1] == pytest.approx(0.0) and furled["peak"][1] == pytest.approx(0.0)
+    assert furled["heel"][0] > furled["truss"][0] > furled["peak"][0]
+    truss, peak = furled["truss"], furled["peak"]
+    assert max(_off_the_segment(p, truss, peak) for p in furled["path"]) <= 0.35 + 1e-6
+    assert not [ln for ln in furled["lines"] if ln["cls"] == "sheet"]
+
+    set_ = run_js(tmp_path, sheeted, MIZEN_FIGURES)
+    assert set_["state"] == "set" and set_["truss"] == pytest.approx(truss)
+    assert set_["heel"][1] < 0.0 < set_["peak"][1]  # on the larboard tack: the peak to starboard
+    assert set_["corners"][2][1] > 0.5  # the clew to leeward
+    (sheet,) = [ln["pts"] for ln in set_["lines"] if ln["cls"] == "sheet"]
+    length = start["graph"]["hull"]["length_waterline_m"]
+    assert sheet == [
+        pytest.approx(set_["corners"][2]),
+        pytest.approx([-0.52 * length, 0.0, 1.02 * deck]),
+    ]
