@@ -715,6 +715,52 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     before 85 was booked; after them the two are fill-ins of settled patterns whose errors
     show at review, where 82's would be silent in a replay.
 
+56. **The tartane and the xebec next after 75, inside milestone 7; the ships' loose count.**
+    Owner, 2026-10-29, with the Mediterranean's west block (79c) building. The ships
+    session's next window after the 74 closes package 75 is the two lateen hulls of the
+    Mediterranean, the tartane of decision 11 and the xebec, each as a trader or fisherman
+    and as a corsair or the King's by fits and roles, with the regency's cruisers as a role
+    (package 90, booked in `docs/dev/M7-WorkPackages.md`). The count aimed at, loosely,
+    **revised the same day: twenty classes, that is hulls, fits not counted** (the files hold
+    eight today; 75 makes thirteen; the two make fifteen; five more to the goal, which the
+    owner expects to pass either way); more fits and sub-types on a hull are welcome and
+    cost only research and tuning; once the work is mostly content, the number grows as
+    far as it likes. **The choosing (the owner, the same day):** the armed Indiaman, yes;
+    after it, rigs and variations the game does not have yet before another of a rig it has
+    (a snow, a brigantine, a polacre, a ship-sloop, the small unrated vessels such as
+    gunboats), with exceptions as the fancy strikes; the earlier and the later sides of the
+    era want plenty of vessels in the world, so the options stay open and the feeling free.
+    **Winfield's lists are now a source on the owner's shelf** (basic particulars for every
+    class, with plans scattered through most sections), so a candidate seldom lacks at least
+    a sourced row; the ships session cites him by page as it does James and Steel.
+
+57. **The viewer's light and air: three references for a later viewer package.** Owner,
+    2026-10-29, sending two pictures of vessels they made in an unrelated game (a cutter
+    at dusk with a long telltale streaming from her masthead and warm lanterns; a brig under
+    all plain sail in a rose evening haze), as visual references to log for the viewer when
+    its turn comes, not as a request now. The pictures are that game's work and stay with the
+    owner; what they show is written here. **Three things to note, with the lead's reading
+    of what the present viewer (SVG, flat fills from the stylesheet, redrawn at each
+    snapshot) can do:** (1) **the ship's own lights**, warm and distinctive: feasible and
+    cheap, since 71 already hoists the stern lantern and the top lights and the binnacle has
+    a place; each is a radial glow at its position when the hour is dark, and the hull and
+    sail faces near it take a warm tint by their distance, which flat polygons can carry.
+    (2) **The scene's mood and the time of day**, the warm glow in the sky, the tone and
+    shading: the mood is feasible in the flat style (a gradient sky and sea keyed to the
+    sun's altitude and azimuth, which `core/moon.py` already computes, the faces tinted by
+    their side to the light, dusk's warmth and night's dark with the lights alone, the
+    weather's cover and visibility as cloud and haze); the lit three-dimensional rendering
+    of the pictures is not, short of a second viewer on WebGL, which the hull's form from 75
+    (sections by station, lofted) would feed when the owner ever wants it. (3) **A lively
+    telltale, and a waving ensign**: feasible and the best return of the three, since the
+    physics already gives the apparent wind at the deck and aloft; a telltale or flag as a
+    few points animated between snapshots, its direction the apparent wind's, its flutter a
+    canned wave whose rate and amplitude follow the apparent speed, at trivial cost. The
+    owner's rule: a static straight line for the apparent wind is not worth drawing, a lively
+    one is worth disproportionately much, and a static flag hurts where a waving one helps.
+    Booked as package 91 (`docs/dev/M7-WorkPackages.md`), after 81 and 75's hull, when the
+    owner likes.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
