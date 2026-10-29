@@ -22,6 +22,17 @@ day) separated the stem's fore edge from the knee of the head, ended the rail wh
 ends at the beakhead, cut four of the staysails between the masts to Steel's table IV and left
 out the mizen topgallant staysail, and recorded the owner's answers where they bear.
 
+**Her shape (stage B's step 7, taken first as the hull's pilot: Build-Ships.md §2.6; Indf §3.5
+item 8).** Both files carry the shape keys of stage 0H through `g.hull_profile` and
+`g.hull_form` (`hull_block`): her waterlines by station as sourced section points, her main
+breadth at its drawn height, her channel wale, the knee of the head, the square stern with its
+quarter galleries and lights, the figure on the head, and every line's rung. They are drawn
+only: no figure the physics, the guns or the lee ports read is taken from them, and no port
+triple is written from the drawing (Build-Ships.md §5.0 principle 8); each port's gap to the
+drawn side is in its deck's note. Her stage-B flips (`MIZEN_COURSE`, `BOWSPRIT_YARDS`, the
+driver) and Steel p. 42's topgallants wait on the engine's steps, so her sailing figures are
+stage A's.
+
 The module is imported only by the generator's entry block, after `gen_ships` is made the
 running script, and takes every helper as `g.<name>` (Indf §1.2). No function or table of the
 generator is changed; the eight files stay byte for byte as they are.
@@ -262,12 +273,14 @@ WL1_ABOVE_RABBET_FT = 18.8
 # above K: Ind's "about 49 ft", tentative, now measured); the roundhouse's rail to its scroll at
 # 34.8 ft; the quarterdeck's rail from 35 ft to its breast, its scroll at 72 ft; the waist rail,
 # 15.8-16.0 ft (5 ft 4 in above the upper deck); the forecastle's rail from 119.6 ft to the
-# beakhead bulkhead (extended there on its own slope from 144.8 ft, where the channel's
-# deadeyes hide it). The bulkhead's edge, where her side ends, stands 153.3 ft from AP, upright
-# from 17.8 to 19.0 ft above WL1 (measured, 1407F at full resolution, row by row); forward of it
-# is the head, not the side (Build-Ships.md §5.1: a two-decker's rail ends abaft the stem head,
-# at a beakhead bulkhead; Indf §3.5 item 9). Stage A carried the rail on to the knighthead's cap
-# at 160.8 ft (`KNIGHTHEAD_FT`).
+# beakhead bulkhead, read by columns from 147.5 ft (±0.03 ft) and taken straight across the
+# timber heads between 145 and 147.5 ft, where the columns find no line. The bulkhead's edge,
+# where her side ends, stands 153.3 ft from AP, upright from 17.8 to 19.0 ft above WL1
+# (measured, 1407F at full resolution, row by row); forward of it is the head, not the side
+# (Build-Ships.md §5.1: a two-decker's rail ends abaft the stem head, at a beakhead bulkhead;
+# Indf §3.5 item 9). Stage A carried the rail on to the knighthead's cap at 160.8 ft
+# (`KNIGHTHEAD_FT`); its refinement ended it at the bulkhead, extended from 144.8 ft on its own
+# slope to 19.39 ft there, 0.11 ft under the line as read.
 RAIL = [
     (-13.0, 28.0), (-10.61, 27.03), (-5.61, 26.43), (-0.61, 25.87), (4.39, 25.33), (9.39, 24.83),
     (14.40, 24.36), (19.40, 23.92), (24.40, 23.51), (29.40, 23.14), (34.40, 22.79),
@@ -275,7 +288,8 @@ RAIL = [
     (60.81, 20.30), (64.0, 19.53), (68.0, 18.79), (70.0, 18.63), (72.0, 17.59), (72.4, 16.0),
     (76.0, 15.97), (90.0, 15.77), (100.0, 15.76), (110.0, 15.88), (119.3, 15.95),
     (119.6, 17.90), (122.0, 18.14), (126.0, 18.26), (130.0, 18.38), (134.0, 18.53),
-    (138.0, 18.69), (142.0, 18.88), (144.8, 19.03), (153.3, 19.39),
+    (138.0, 18.69), (142.0, 18.88), (144.8, 19.03), (147.5, 19.17), (150.0, 19.30),
+    (153.3, 19.50),
 ]  # fmt: skip
 BEAKHEAD_FT = 153.3
 # The stem's fore edge, (ft from AP, ft above WL1), low to high: the foremost of the lines
@@ -328,9 +342,130 @@ STERN = [
 ]  # fmt: skip
 # K under the post's heel and at the band's square fore end (Ind §2.3.6).
 KEEL_FT = (0.08, 147.75)
-# The main wale at midships, 20.2-24.7 ft above K (measured on ZAZ2371, not re-measured: Ind
-# §2.3.5); along the side it is carried parallel to the gun deck's sills (judgement).
-MAIN_WALE_K_FT = (20.2, 24.7)
+# The main wale, (ft from AP, its lower edge and its upper edge ft above WL1): both edges tracked
+# on 1407F at full resolution by columns (±0.05 ft), the lower drawn heavy, from where it sweeps
+# up into the counter to the stem; 4 ft 3 in broad, its lower edge 10 in below WL1 at 85-90 ft
+# (19.9-24.1 ft above K), rising 3 ft 9 in to the stem and 6 ft 0 in aft (measured here). Abaft
+# 6 ft its upper edge runs under the quarter gallery's lower finishing, and is held at its
+# height there (judgement); forward of 154.5 ft the lower cheek of the head lies along it.
+# ZAZ2371 measures it 20.2-24.7 ft above K at midships (Ind §2.3.5, at about 6 px to the foot),
+# which stage A carried along parallel to the gun deck's sills (judgement), a nearly flat band
+# from 10.8 to 145.3 ft.
+MAIN_WALE_FT = [
+    (1.0, 5.22, 7.60), (2.0, 4.61, 7.60), (4.0, 3.96, 7.60), (6.0, 3.50, 7.60), (8.0, 3.17, 7.41),
+    (15.0, 2.50, 6.75), (20.0, 2.06, 6.30), (30.0, 1.31, 5.53), (40.0, 0.63, 4.88),
+    (50.0, 0.11, 4.35), (60.0, -0.32, 3.93), (70.0, -0.60, 3.63), (80.0, -0.76, 3.48),
+    (90.0, -0.83, 3.46), (100.0, -0.74, 3.57), (110.0, -0.51, 3.81), (120.0, -0.14, 4.15),
+    (130.0, 0.30, 4.60), (140.0, 0.92, 5.16), (145.0, 1.31, 5.51), (150.0, 1.75, 5.97),
+    (155.0, 2.27, 6.53), (158.0, 2.64, 6.77), (160.0, 2.90, 7.07),
+]  # fmt: skip
+
+# ---------------------------------------------------------------------------
+# The hull's shape (stage B: Indf §3.5 item 8; Build-Ships.md §5.0, §5.1, §5.7), drawn only
+# ---------------------------------------------------------------------------
+
+# WL1 to WL5's half-breadths by station (Ind §2.3.2, measured), moulded, feet, at stations in
+# feet from AP: on 1407T from 5 to 130 ft (±0.15 ft between 20 and 130, ±0.5 at the ends), on
+# 1407F from 140 to 159 ft (±0.1 ft); None where the waterline has ended at the rabbet (WL5 at
+# 151.8 ft, WL4 155.4, WL3 157.6, WL2 159.6). WL1 is taken at full resolution where
+# WL1_HALF_BREADTHS gives the station (the profile's water, so that the two lines give one
+# place alike). WL2 to WL5 stand WL2_BELOW_WL1_FT apart below WL1 (Ind §2.3.1; the checker's
+# fitted lines on 1407F put them 3.74, 7.49, 11.25 and 15.02 ft below it at midships, within
+# 0.06 ft of the spacing). The post (0.6 ft) and 160 ft (0.63) give WL1 alone, a station of one
+# point, and are left out.
+WATERLINES = {
+    5: (7.2, 3.1, 1.5, 1.0, 0.4),
+    10: (12.1, 5.6, 2.6, 1.3, 0.6),
+    20: (16.6, 13.0, 7.3, 3.5, 1.4),
+    30: (18.8, 16.9, 12.6, 7.2, 2.9),
+    40: (20.06, 18.9, 16.1, 11.4, 5.4),
+    50: (20.8, 20.1, 18.0, 14.5, 9.0),
+    60: (21.3, 20.7, 19.1, 16.3, 12.0),
+    70: (21.6, 21.1, 19.7, 17.3, 13.8),
+    80: (21.7, 21.3, 20.0, 17.8, 14.5),
+    90: (21.75, 21.3, 20.0, 17.9, 14.7),
+    100: (21.75, 21.3, 20.0, 17.6, 14.2),
+    110: (21.75, 21.2, 19.6, 16.8, 12.8),
+    120: (21.5, 20.7, 18.7, 15.1, 9.9),
+    130: (20.5, 19.2, 16.5, 12.0, 6.2),
+    140: (17.68, 15.54, 11.66, 7.17, 2.99),
+    142: (16.81, 14.47, 10.46, 6.14, 2.47),
+    144: (15.82, 13.22, 9.18, 5.13, 1.99),
+    146: (14.62, 11.81, 7.80, 4.17, 1.54),
+    148: (13.23, 10.28, 6.47, 3.29, 1.11),
+    150: (11.70, 8.60, 5.12, 2.44, 0.72),
+    152: (9.96, 6.88, 3.85, 1.63, None),
+    154: (7.96, 5.11, 2.7, 0.89, None),
+    155: (6.87, 4.24, 2.05, 0.55, None),
+    156: (5.70, 3.35, 1.44, None, None),
+    157: (4.51, 2.50, 0.92, None, None),
+    158: (3.25, 1.63, None, None, None),
+    159: (1.96, 0.77, None, None, None),
+}
+# The main breadth's height by station, (ft from AP, ft above WL1): the upper height of breadth,
+# the higher of the two dashed lines ZAZ1407's sheer plan draws below the lower deck's ports,
+# tracked on 1407F at full resolution along its ink (its red alteration lines passed over),
+# ±0.05 ft, read at MAIN_BREADTH's stations (measured here). 2 ft 8 in above WL1 at midships,
+# it sweeps up to 8 ft 4 in at 155 ft, toward the hawse holes, and to 8 ft 1 in at AP, above the
+# wing transom (WING_TRANSOM_FT), as Steel's rule lifts the heights of breadth (1805, OCR l.
+# 15190-15194). The lower of the two, 4 in above WL1 at midships, is Steel's lower height of
+# breadth "a few inches higher" than the load line there; it joins this one forward at the
+# hawse holes and aft at the counter. Forward of 155 ft the two run into the hawse holes and
+# the stem, and are not read.
+HEIGHT_OF_BREADTH = [
+    (0.0, 8.12), (10.0, 6.75), (20.0, 5.52), (30.0, 4.57), (40.0, 3.80), (50.0, 3.26),
+    (60.0, 2.92), (70.0, 2.72), (80.0, 2.66), (90.0, 2.71), (100.0, 2.75), (110.0, 2.84),
+    (120.0, 3.18), (125.0, 3.45), (130.0, 3.84), (135.0, 4.34), (140.0, 5.02), (145.0, 5.86),
+    (150.0, 6.96), (155.0, 8.29),
+]  # fmt: skip
+# The channel wale, the band between the two tiers of ports where the main and fore chain
+# plates end: its lower edge (ft from AP, ft above WL1) and its breadth, both tracked on 1407F
+# at full resolution along its whole length (measured here): 8.05 ft above WL1 at 90 ft (28.7
+# ft above K; ZAZ2371's 28.8, Ind §2.3.5, within 0.1 ft), its upper edge 2.36-2.45 ft above
+# it from 10 to 154 ft, the mean taken. ZAZ2371's 1.9 ft broad (28.8-30.7 ft above K) is the
+# razee's, the wale cut with her side in the waist (`the_upper_works`). Abaft 10 ft it runs
+# into the quarter gallery's lower finishing, and is drawn from there.
+CHANNEL_WALE_FT = [
+    (10.0, 11.81), (20.0, 10.95), (30.0, 10.20), (40.0, 9.57), (50.0, 9.05), (60.0, 8.63),
+    (70.0, 8.31), (80.0, 8.11), (90.0, 8.05), (100.0, 8.09), (110.0, 8.26), (120.0, 8.52),
+    (130.0, 8.88), (140.0, 9.35), (150.0, 10.02), (155.0, 10.51), (160.0, 11.06),
+]  # fmt: skip
+CHANNEL_WALE_BREADTH_FT = 2.4
+# The stern (Build-Ships.md §5.1, square), measured on 1407F's body plan, ZAZ1407 at full
+# resolution (its heights from K, the band's bottom in the body plan's keel box at 5952 px, WL1
+# 21.245 ft above it at AP: Ind §2.3.1; its after body's green WL1 agrees within 0.05 ft): the
+# wing transom, the transom's foot, (ft above WL1 at the middle line, at its ends, and its ends'
+# half-breadth moulded): 6.74 ft at the middle line and 6.38 at its ends, 12.99 ft out, so
+# rounded up 0.36 ft, the middle the higher, as a beam rounds up; and the stern's outline, the
+# side counter timber seen from aft, traced from the wing transom's end to the taffrail's side,
+# (ft above WL1, half-breadth moulded), ±0.05 ft. The lower counter's and the upper counter's
+# touches at the middle line stand 11.39 and 14.09 ft above WL1 on it; Steel's 64 (1805, Folio
+# LI, read on the cached leaf, IA n587) puts them 30 ft 6 in and 33 ft 0 in above the rabbet
+# (10.9 and 13.4 ft above WL1, the rabbet 19.63 ft below it at AP), the folio's taffrail 50 ft
+# 0 in (30.4: hers is 28.0, stage A's stern_m) and its stern 22 ft 0 in broad at the top-timber
+# line (hers 19.8-22.1 ft on the outline from 20.6 to 14.6 ft above WL1): a check, Steel's 64
+# being of 1369 tons to her 1384. Plainly: stern_m's after face runs straight up the post on
+# 1407F to 8.0 ft above WL1 before the counter leaves it, 1 ft 3 in above the wing transom at the
+# middle line; the two readings are not reconciled (the line above 6 ft 9 in may be the rudder
+# head's), and are open for B1 on 1407F.
+WING_TRANSOM_FT = (6.74, 6.38, 12.99)
+STERN_OUTLINE = [
+    (6.6, 13.18), (8.6, 13.15), (10.6, 12.33), (12.6, 11.63), (14.6, 11.07), (16.6, 10.63),
+    (18.6, 10.26), (20.6, 9.91), (22.6, 9.60), (24.6, 9.31), (26.6, 9.03),
+]  # fmt: skip
+# The quarter galleries, two tiers (ft from AP aft and forward, ft above WL1 low and high), each
+# at its middle from its rail's lower edge to its top rail and from its after frame to its fore
+# frame: the upper deck's three lights and the quarterdeck's three, measured on 1407F at full
+# resolution (±0.1 ft), the lower tier's lower finishing and the upper's roof left out.
+QUARTER_GALLERIES_FT = [(-6.9, 3.7, 12.7, 17.4), (-8.2, -0.4, 19.9, 24.4)]
+# The stern lights, two bands (ft above WL1 low and high, count, half-breadth ft): the
+# wardroom's at the upper deck and the captain's at the quarterdeck, behind the balcony, five
+# lights each on her own draught as built, ZAZ1953's stern elevation (read; the quarter
+# galleries' windows outboard of them in line), the lower band within 10.79 ft of the middle
+# line and the upper within 9.60, between the outer pilasters' centres (measured at 4.634 px to
+# the foot by its scale strip, ±0.3 ft); their heights the quarter gallery's aftmost lights on
+# 1407F, in the same tiers (measured, ±0.1 ft).
+STERN_LIGHTS = [(13.7, 16.9, 5, 10.79), (20.9, 23.5, 5, 9.60)]
 
 # ---------------------------------------------------------------------------
 # The rig (Indf §4.1-§4.3)
@@ -543,7 +678,10 @@ class Particulars:
     her water's rise against WL1 aft and forward (the 64's none); `datum_deck` the D18 deck
     whose midship height is the file's datum (Indf §2.2). `rail` and `stern` are (ft from AP,
     ft above WL1), `breadth` (ft from AP, half-breadth at her water, at the top of her side),
-    moulded; `mizen` is her after sail, "course" (the 64's) or "spanker" (the razee's)."""
+    moulded; `mizen` is her after sail, "course" (the 64's) or "spanker" (the razee's). Her
+    shape (stage B, drawn only): `channel_wale` (ft from AP, its lower and upper edges ft above
+    WL1), `galleries` and `lights` as QUARTER_GALLERIES_FT and STERN_LIGHTS give them, and
+    `marks`, each line's rung (Build-Ships.md §5.0 principle 4)."""
 
     key: str
     file: str
@@ -565,6 +703,10 @@ class Particulars:
     fore_channel_k_ft: float
     masts: dict
     mizen: str
+    channel_wale: list
+    galleries: list
+    lights: list
+    marks: dict
 
     def water_ft(self, x_ft):
         """Her load water above K at `x_ft` forward of AP, feet."""
@@ -754,26 +896,79 @@ def sixty_four():
             "rail_m": "The top of the side, from the taffrail to where the side ends at the "
             "beakhead bulkhead, 153.3 ft from AP, measured on ZAZ1407 at full resolution (Indf "
             "§3.5 items 3 and 9): the roundhouse's rail to 34.8 ft, the quarterdeck's to its "
-            "breast at 72 ft, the waist rail, the forecastle's rail from 119.6 ft. Forward of the "
-            "bulkhead is the head (Build-Ships.md §5.1).",
+            "breast at 72 ft, the waist rail, the forecastle's rail from 119.6 ft, read by "
+            "columns forward of the timber heads at 145-147.5 ft and taken straight across them. "
+            "Forward of the bulkhead is the head (Build-Ships.md §5.1).",
             "stem_m": "The stem's fore edge, from its foot boxed into the keel 1.1 ft above K to "
             "the top of the stem head's fore face under the bowsprit, 162.5 ft from AP and 16.0 "
             "ft above WL1: measured on ZAZ1407 at full resolution (±0.05 ft), separated from the "
-            "knee of the head, which is kept in tools/ships/indefatigable.py for head_m at stage "
-            "B (Indf §3.5 items 8 and 9).",
+            "knee of the head, which is head_m (Indf §3.5 items 8 and 9).",
             "breadth_m": f"At {len(WL1_HALF_BREADTHS)} stations: the half-breadth at WL1 "
             "(measured, Ind §2.3.2) and at the top of the side, the half-breadth plan's "
             "top-timber line (measured on 1407F at full resolution), each with 4 1/2 in of plank.",
             "stern_m": "The post's after face (Ind §2.3.6), the counter and the stern to the "
             "taffrail, measured on 1407F at full resolution (±0.3 ft; the quarter gallery and the "
             "rudder left out).",
-            "wales_m": "The main wale, 20.2-24.7 ft above K at midships (measured on ZAZ2371, not "
-            "re-measured: Ind §2.3.5), carried along parallel to the gun deck's sills "
-            "(judgement).",
+            "wales_m": "The main wale, from 1 ft from AP, where it sweeps up into the counter, to "
+            "the stem at 160 ft: both edges tracked on 1407F at full resolution (±0.05 ft), 4 ft "
+            "3 in broad, 19.9-24.1 ft above K at 85-90 ft, rising 3 ft 9 in to the stem and 6 ft "
+            "0 in aft; abaft 6 ft its upper edge, under the quarter gallery's lower finishing, "
+            "held at its height there (judgement). ZAZ2371 measures it 20.2-24.7 ft above K at "
+            "midships (Ind §2.3.5, at about 6 px to the foot), which stage A carried parallel to "
+            "the gun deck's sills from 10.8 to 145.3 ft (judgement).",
             "decks_m": "Each deck at the middle line (measured, 1280T: Ind §2.3.5), over its "
             "extent; the roundhouse's at the side, 1 ft 3 in under its rail from abaft AP to its "
             "breast at 34.4 ft (measured on ZAZ1280 at 3840 px; judgement that the line is the "
             "deck), for the class's carronades of 1794.",
+            "head_m": "The knee of the head's fore edge, the gripe's, the cutwater's and the "
+            "knee's, from where it leaves the stem's line at the band's square fore end on K, "
+            "147.75 ft from AP and ahead of the stem's foot boxed into the keel, to the head's "
+            "top 20 ft above WL1 at 174.5 ft: measured on ZAZ1407 (to WL1, Ind §2.3.6; above it "
+            "on 1407F at full resolution by rows), stage A's stem_m.",
+            "breadth_line_m": "The main breadth by station, Steel's upper height of breadth at "
+            "the main half-breadth, from AP to 155 ft: the half-breadth plan's main-breadth line "
+            "(measured on 1407F at full resolution) at the height of the upper of the two dashed "
+            "lines of breadth on the sheer plan, 2 ft 8 in above WL1 at midships, swept up to "
+            "8 ft 4 in at 155 ft toward the hawse holes and 8 ft 1 in at AP above the wing "
+            "transom (tracked on 1407F at full resolution, ±0.05 ft; Steel 1805's rule, OCR l. "
+            "15190-15194), with 4 1/2 in of plank.",
+            "sections_m": "WL1 to WL5 by station, 5 to 159 ft from AP (measured, Ind §2.3.2: on "
+            "1407T to 130 ft, ±0.15 ft, ±0.5 at the ends; on 1407F from 140 ft, ±0.1 ft; WL1 at "
+            "full resolution where breadth_m gives it), each waterline 3.77 ft below the last "
+            "(Ind §2.3.1), with 4 1/2 in of plank; a waterline ended at the rabbet is left out "
+            "at its station.",
+            "channel_wales_m": "The channel wale, the band between the tiers of ports where the "
+            "chain plates end, from 10 to 160 ft: its lower edge 8.05 ft above WL1 at 90 ft "
+            "(28.7 ft above K) and its breadth 2.4 ft, the mean of 2.36-2.45, both tracked on "
+            "1407F at full resolution (ZAZ2371's 28.8 ft above K at midships agrees within 0.1 "
+            "ft: Ind §2.3.5).",
+            "form": "Her form (Build-Ships.md §5.1): no fullness, the ends under the water "
+            "drawn through her measured waterlines (sections_m).",
+            "form.stern": "Square. The knuckle, the transom's foot where the side closes to it, "
+            "is the wing transom at its ends, 6 ft 4 1/2 in above WL1, rounded up 4 in to 6 ft "
+            "9 in at the middle line, the middle the higher, as a beam rounds up; the transom's "
+            "half-breadths 13 ft 0 in at the knuckle, the wing transom's end, and 9 ft 0 in at "
+            "the taffrail's side, 26 ft 11 in above WL1, on the side counter timber's outline "
+            "seen from aft, each with the plank: measured on 1407F's body plan, ±0.05 ft. "
+            "Plainly: stern_m's after face runs straight up the post on 1407F to 8.0 ft above "
+            "WL1 before the counter leaves it, 1 ft 3 in above the wing transom at the middle "
+            "line; the two readings are not reconciled (the line above 6 ft 9 in may be the "
+            "rudder head's), open for B1 on 1407F. Two tiers of "
+            "quarter gallery, the upper deck's and the quarterdeck's, each from its rail's lower "
+            "edge to its top rail, measured on 1407F at full resolution. Two bands of five "
+            "stern lights, read on ZAZ1953's stern elevation, her own as built, the lower within "
+            "10 ft 9 in of the middle line and the upper within 9 ft 7 in (measured at 4.63 px "
+            "to the foot, ±0.3 ft), at the heights of the quarter gallery's aftmost lights on "
+            "1407F, which ZAZ1953 draws in line with them. Steel's 64 (1805 Folio LI, read) as a "
+            "check: the lower counter's touch at the middle line 10.9 ft above WL1 against "
+            "1407F's 11.4, the upper's 13.4 against 14.1, the taffrail 30.4 against 28.0, the "
+            "stern 22 ft broad at the top-timber line against 19.8-22.1 ft on the outline.",
+            "form.head": "A figure on the knee of the head: judgement, her type certainly "
+            "carrying one (Build-Ships.md §5.0 principle 9, §5.7); ZAZ1407 and ZAZ1953 draw the "
+            "knee in outline only, with no figure.",
+            "marks": "Each line's rung (Build-Ships.md §5.0 principles 3 and 4): sourced, "
+            "measured on her own draughts (ZAZ1407, ZAZ1280, ZAZ1953; ZAZ2371); judged, a "
+            "judgement at its weakest point, which the line's note names.",
         },
         fore_channel_k_ft=FORE_CHANNEL_K_FT_64,
         masts={
@@ -787,6 +982,32 @@ def sixty_four():
             for name, (x, heel, rake) in MASTS.items()
         },
         mizen="course",
+        channel_wale=[(x, z, z + CHANNEL_WALE_BREADTH_FT) for x, z in CHANNEL_WALE_FT],
+        galleries=list(QUARTER_GALLERIES_FT),
+        lights=list(STERN_LIGHTS),
+        marks={
+            "rail_m": "sourced",
+            "breadth_m": "sourced",
+            "keel_m": "sourced",
+            "stem_m": "sourced",
+            "stern_m": "sourced",
+            "wales_m": "judged",  # its upper edge abaft 6 ft, under the gallery's finishing
+            "section_m": "sourced",
+            "decks_m": "judged",  # the roundhouse's line taken for its deck
+            "ports_m": "judged",  # the half-breadths at the sills
+            "port_size_m": "judged",  # the forecastle's and the roundhouse's
+            "head_m": "sourced",
+            "breadth_line_m": "sourced",
+            "sections_m": "sourced",
+            "channel_wales_m": "sourced",
+            "form.stern": "sourced",
+            "form.stern.knuckle_z_m": "sourced",
+            "form.stern.transom_hb_m": "sourced",
+            "form.stern.round_up_m": "sourced",
+            "form.stern.galleries_m": "sourced",
+            "form.stern.lights_m": "sourced",
+            "form.head": "judged",
+        },
     )
 
 
@@ -799,6 +1020,23 @@ def upper_sill_half_breadth(x_ft):
     """The side's half-breadth at an upper-deck sill, feet outside the plank."""
     tt, mb = interp(TOP_TIMBER, x_ft), interp(MAIN_BREADTH, x_ft)
     return tt + UPPER_SILL_FRACTION * (mb - tt) + PLANK_FT
+
+
+def side_half_breadth_64(x_ft, z_ft):
+    """The 64's side, moulded, at `x_ft` from AP and `z_ft` above WL1, between her main breadth
+    and the top of her side: from the main-breadth line at its height of breadth to the
+    top-timber line at her rail, along the midship section's shape between the same two lines
+    there (its breadth at the upper height of breadth, its top at the waist rail), the height
+    taken as the same share of the way up (judgement on measured lines; at midships it is the
+    section as measured: Ind §2.3.2)."""
+    z_b, z_t = interp(HEIGHT_OF_BREADTH, x_ft), interp(RAIL, x_ft)
+    mb, tt = interp(MAIN_BREADTH, x_ft), interp(TOP_TIMBER, x_ft)
+    share = min(max((z_ft - z_b) / (z_t - z_b), 0.0), 1.0)
+    section = [(h - WL1_ABOVE_RABBET_FT, hb) for h, hb in SECTION]  # ft above WL1
+    mid_b, mid_t = interp(HEIGHT_OF_BREADTH, MIDSHIPS_FT), interp(RAIL, MIDSHIPS_FT)
+    flat, top = interp(section, mid_b), interp(section, mid_t)
+    tumble = (flat - interp(section, mid_b + share * (mid_t - mid_b))) / (flat - top)
+    return mb - tumble * (mb - tt)
 
 
 def open_deck_sill(x_ft, deck_k_ft):
@@ -957,12 +1195,12 @@ def the_upper_works(p):
     x1, z1 = next(pt for pt in STERN if pt[1] is not None and pt[0] <= taff)
     meet = z0 + (z1 - z0) * (taff - x0) / (x1 - x0)
     stern = counter + [(taff, round(meet, 2)), rail[0]]
-    # the top of her side: the top-timber line under the quarterdeck and forecastle rails, the
+    # the top of her side: the 64's side at her quarterdeck and forecastle rails' height, the
     # waist's top-side between them
     breadth = []
     for x, hb1 in WL1_HALF_BREADTHS:
         tt = interp(TOP_TIMBER, x)
-        top = tt
+        top = side_half_breadth_64(x, interp(rail, x))
         if qd_end < x < fc_start:
             top = tt + RAZEE_WAIST_SIDE_FRACTION * (interp(MAIN_BREADTH, x) - tt)
         breadth.append((x, hb1, top))  # her water's half-breadth is `her_hull`'s (step 9)
@@ -994,6 +1232,21 @@ def the_upper_works(p):
         "quarterdeck's (judgement); and her chase port at 155.1 ft, for the bow chasers she "
         "carried from 1796 (D30 (a); no bow port measured, judgement), found as the others",
     }
+    # the channel wale: the 64's, its top cut with her side in the waist to the waist's
+    # top-side, as ZAZ2371 measures it (28.8-30.7 ft above K at midships: Ind §2.3.5)
+    lower = [(x, z) for x, z, _ in p.channel_wale]
+    upper = [(x, z) for x, _, z in p.channel_wale]
+    waist = {qd_end, qd_end + 0.1, fc_start - 0.1, fc_start}
+    channel_wale = []
+    for x in sorted({x for x, _ in lower} | waist):
+        top = interp(upper, x)
+        if qd_end < x < fc_start:
+            top = min(top, RAZEE_WAIST_SIDE_K_FT - wl1_above_k(x))
+        channel_wale.append((x, interp(lower, x), top))
+    # the stern: the 64's below her cut; one tier of quarter gallery and its band of lights, the
+    # 64's lower tier, the upper deck's, which ZAZ2371 draws in its place (tentative)
+    taffrail_above = rail[0][1]
+    tier, band = QUARTER_GALLERIES_FT[0], STERN_LIGHTS[0]
     # the 64's stem head above her forecastle deck: her head is not measured on ZAZ2371
     head_x, head_z = STEM_HEAD_FT
     head_above = wl1_above_k(head_x) + head_z - interp(forecastle, head_x)
@@ -1013,19 +1266,64 @@ def the_upper_works(p):
             "keel to the top of the stem head's fore face under the bowsprit (measured on 1407F), "
             "kept with her head and not measured on ZAZ2371 (judgement; Indf §3.5 items 3 and 9): "
             f"the stem head {head_above:.1f} ft above her forecastle deck. The 64's knee of the "
-            "head, kept in tools/ships/indefatigable.py, is head_m's at stage B.",
+            "head is her head_m.",
+            "head_m": "The 64's knee of the head (measured on ZAZ1407) at her own line, kept with "
+            "her head and bowsprit and not measured on ZAZ2371 (judgement): its fore edge from "
+            "the band's square fore end on K, 147.75 ft from AP, where it leaves the stem's "
+            "line, to the head's top.",
+            "sections_m": "The 64's WL1 to WL5 by station, 5 to 159 ft from AP (measured, Ind "
+            "§2.3.2: on 1407T to 130 ft, ±0.15 ft, ±0.5 at the ends; on 1407F from 140 ft, "
+            "±0.1 ft), each 3.77 ft below the last (Ind §2.3.1), at her own line, so each "
+            "0.44-0.45 m higher; with 4 1/2 in of plank.",
+            "breadth_line_m": "The 64's main breadth by station, from AP to 155 ft, at her own "
+            "line: the half-breadth plan's main-breadth line at the upper height of breadth "
+            "drawn on the sheer plan (both measured on 1407F at full resolution), below her cut, "
+            "with 4 1/2 in of plank.",
+            "channel_wales_m": "The 64's channel wale (measured on 1407F at full resolution) at "
+            "her own line, its top cut with her side in the waist to the waist's top-side, 30.8 "
+            "ft above K: ZAZ2371 measures it 28.8-30.7 ft above K at midships (Ind §2.3.5), within "
+            "0.1 ft of these.",
+            "form.stern": "Square: the 64's below her cut (ZAZ2371 draws it kept), the knuckle at "
+            "the wing transom's ends, its round-up to the middle line and the transom's "
+            "half-breadth there the 64's (measured on 1407F's body plan; the 64's post on 1407F "
+            "runs on up to 8.0 ft above WL1, a reading not reconciled with it, open for B1); at "
+            "her taffrail, stern_m's top, the outline's "
+            f"{interp(STERN_OUTLINE, taffrail_above):.2f} ft at that height (judgement on the "
+            "measured outline, her taffrail's height judgement). One tier of quarter gallery and "
+            "one band of five lights, the 64's lower tier, the upper deck's (measured on 1407F; "
+            "the lights read on ZAZ1953), which ZAZ2371 draws in its place, one tier of three "
+            "lights, its sill about 4 ft 7 in above her aftmost gun-deck port's top as on 1407F "
+            "and its ends within half a foot, at about 6 px to the foot: tentative "
+            "(Build-Ships.md §19.1 item 18). Plainly: the tier's top and the band's stand "
+            f"{tier[3] - taffrail_above:.1f} and {band[1] - taffrail_above:.1f} ft above her "
+            f"taffrail as filed and the tier's after end {taff - tier[0]:.1f} ft abaft it, "
+            "since the short roundhouse ZAZ2371's note gives her, under which they stood, is not "
+            "in her profile (Indf §1.5), and ZAZ2371 draws her side at the mizen about 2 ft "
+            "above the filed rail (read at 6 px to the foot, not measured): recorded, not moved; "
+            "her rail and stern there are open, and the viewer draws the tier and the lights cut "
+            "to her side and her transom.",
+            "marks": "Each line's rung (Build-Ships.md §5.0 principles 3 and 4): sourced, "
+            "measured on her own draughts (the 64's ZAZ1407, ZAZ1280, ZAZ1953; hers ZAZ2371, "
+            "ZAZ2375) at her own line; judged, a judgement at its weakest point, which the line's "
+            "note names.",
             "breadth_m": f"At {len(breadth)} stations: the half-breadth at her line, taken between "
             "WL1's and WL2's by her rise (measured lines, Ind §2.3.2; judgement between them), and "
-            "at the top of her side: the 64's top-timber line under the quarterdeck and "
-            "forecastle rails (her quarterdeck rail 34 ft across moulded: Ind §2.3.2), and in the "
-            "waist her top-side, 37 ft 6 in across at midships, carried along between the "
-            "top-timber and main-breadth lines (judgement on measured lines); each with 4 1/2 in "
-            "of plank.",
+            "at the top of her side: under the quarterdeck and forecastle rails, the 64's side at "
+            "her rail's height, taken from the main-breadth line at its height of breadth to the "
+            "top-timber line at the 64's rail along the midship section's shape between them (her "
+            "quarterdeck rail about 34 ft across moulded at midships, the section's there: Ind "
+            "§2.3.2), and in the waist her top-side, 37 ft 6 in across at midships, carried along "
+            "between the top-timber and main-breadth lines (judgement on measured lines); each "
+            "with 4 1/2 in of plank. Stage A took the 64's top-timber line under her rails, the "
+            "64's breadth at the 64's own rails 3-10 ft higher, up to 0.43 m inside the 64's side "
+            "at the same timbers aft.",
             "stern_m": "The 64's post and counter (measured on 1407F: Ind §2.3.6), to the old "
             "upper deck's height at the middle line, where her taffrail stands 5 ft 6 in abaft AP "
             "(measured, ZAZ2375), and the taffrail's bulwark above it to the rail (judgement).",
-            "wales_m": "The main wale, 20.2-24.7 ft above K at midships (measured on ZAZ2371: Ind "
-            "§2.3.5), carried along parallel to the gun deck's sills (judgement).",
+            "wales_m": "The 64's main wale (both edges tracked on 1407F at full resolution; abaft "
+            "6 ft from AP its upper edge held, judgement) at her own line, kept below her cut: "
+            "19.9-24.1 ft above K at 85-90 ft, where ZAZ2371 measures it 20.2-24.7 ft above K at "
+            "midships (Ind §2.3.5, at about 6 px to the foot), 0.3-0.6 ft higher.",
             "decks_m": "Each deck at the middle line over its extent (the 64's, measured on 1280T: "
             "Ind §2.3.5): her gun deck the 64's lower deck; her quarterdeck the 64's upper deck to "
             "its breast at 74.4 ft and her forecastle from 118.5 ft (measured, ZAZ2375), the waist "
@@ -1047,6 +1345,23 @@ def the_upper_works(p):
         breadth=breadth,
         profile_notes=notes,
         fore_channel_k_ft=FORE_CHANNEL_K_FT_RAZEE,
+        channel_wale=channel_wale,
+        galleries=[tier],
+        lights=[band],
+        marks=dict(
+            p.marks,
+            rail_m="judged",  # her forecastle's rail and her taffrail's height
+            breadth_m="judged",  # her water between WL1 and WL2, her waist's top-side
+            stem_m="judged",  # her head not measured on ZAZ2371
+            stern_m="judged",  # her taffrail's height
+            decks_m="sourced",
+            head_m="judged",  # her head not measured on ZAZ2371
+            **{
+                "form.stern.transom_hb_m": "judged",  # at her taffrail as filed
+                "form.stern.galleries_m": "judged",  # ZAZ2371 at 6 px to the foot
+                "form.stern.lights_m": "judged",  # the 64's band, ZAZ2371 drawing no stern
+            },
+        ),
     )
 
 
@@ -1233,11 +1548,7 @@ def hull_block(p):
     stern = [k(x) if z is None else pt(x, z) for x, z in p.stern]
     rail = [pt(x, z) for x, z in p.rail]
     breadth = [[x_m(x), (hb + PLANK_FT) * FT, (top + PLANK_FT) * FT] for x, hb, top in p.breadth]
-    mid_sill = interp(LOWER_SILLS, MIDSHIPS_FT)
-    wales = [
-        [x_m(x)] + [p.z_m(z + (s - mid_sill), x) for z in MAIN_WALE_K_FT]
-        for x, s in LOWER_SILLS[::3]
-    ]
+    wales = [[x_m(x), pt(x, lo)[1], pt(x, hi)[1]] for x, lo, hi in MAIN_WALE_FT]
     rabbet_k = wl1_above_k(MIDSHIPS_FT) - WL1_ABOVE_RABBET_FT
     section = [[p.z_m(rabbet_k + h, MIDSHIPS_FT), (hb + PLANK_FT) * FT] for h, hb in SECTION]
     decks = {word: [[x_m(x), p.z_m(z, x)] for x, z in pts] for word, pts in p.decks.items()}
@@ -1246,6 +1557,14 @@ def hull_block(p):
         for word, triples in p.ports.items()
     }
     sizes = {word: [w * FT, d * FT] for word, (w, d) in p.port_size_ft.items()}
+    # her shape (stage B; Indf §3.5 item 8), drawn only: nothing the physics, the guns or the
+    # lee ports read is taken from it (Build-Ships.md §5.0 principle 8)
+    head = [k(x) if z is None else pt(x, z) for x, z in KNEE_OF_THE_HEAD]
+    breadth_line = [
+        pt(x, z) + [(interp(MAIN_BREADTH, x) + PLANK_FT) * FT] for x, z in HEIGHT_OF_BREADTH
+    ]
+    sections = [pt(x, z) + [(hb + PLANK_FT) * FT] for x, z, hb in waterline_points()]
+    channel_wales = [[x_m(x), pt(x, lo)[1], pt(x, hi)[1]] for x, lo, hi in p.channel_wale]
     hull["profile"] = g.hull_profile(
         rail,
         breadth,
@@ -1257,6 +1576,10 @@ def hull_block(p):
         decks=decks,
         ports=ports,
         port_size=sizes,
+        head=head,
+        breadth_line=breadth_line,
+        sections=sections,
+        channel_wales=channel_wales,
     )
     notes["profile"] = (
         "Her side, decks and ports (Indf §3; Build-Ships.md §5.1): x forward of the middle of "
@@ -1278,7 +1601,52 @@ def hull_block(p):
     notes["profile.decks_m"] = p.profile_notes["decks_m"]
     for word, text in p.port_notes.items():
         notes[f"profile.ports_m.{word}"] = text[0].upper() + text[1:] + "."
+    for key in ("head_m", "breadth_line_m", "sections_m", "channel_wales_m", "form"):
+        notes[f"profile.{key}"] = p.profile_notes[key]
+    notes["profile.form.stern"] = p.profile_notes["form.stern"]
+    notes["profile.form.head"] = p.profile_notes["form.head"]
+    notes["profile.marks"] = p.profile_notes["marks"]
+    # the stern's features at AP, the knuckle and the transom by the body plan's outline: the
+    # knuckle the wing transom's ends, where the side closes to the transom (freesail/ship/
+    # form.py's closure), its middle rounded up above them
+    middle, knuckle, end_hb = WING_TRANSOM_FT
+    taffrail = p.stern[-1][1]
+    form = {
+        "stern": {
+            "type": "square",
+            "knuckle_z_m": pt(0.0, knuckle)[1],
+            "transom_hb_m": [
+                (interp(STERN_OUTLINE, taffrail) + PLANK_FT) * FT,
+                (end_hb + PLANK_FT) * FT,
+            ],
+            "round_up_m": (middle - knuckle) * FT,
+            "galleries_m": [
+                [x_m(aft), x_m(fore)] + [pt(0.5 * (aft + fore), z)[1] for z in (low, high)]
+                for aft, fore, low, high in p.galleries
+            ],
+            "lights_m": [
+                [pt(0.0, low)[1], pt(0.0, high)[1], n, hb * FT] for low, high, n, hb in p.lights
+            ],
+        },
+        "head": "figure",
+    }
+    # no port triple's half-breadth was measured at its port (Indf §3.3, §3.5 item 8: each is
+    # judgement on the measured lines), so every gap is reported in the notes and none raises
+    g.hull_form(hull, notes, form=form, marks=p.marks, measured=())
     return hull, notes
+
+
+def waterline_points():
+    """WL1 to WL5 by station as sourced section points, (ft from AP, ft above WL1, half-breadth
+    moulded), each station low to high (Ind §2.3.2; `WATERLINES`): WL1 at full resolution where
+    `WL1_HALF_BREADTHS` gives the station, a waterline ended at the rabbet left out."""
+    wl1 = dict(WL1_HALF_BREADTHS)
+    out = []
+    for x, row in WATERLINES.items():
+        hbs = (wl1.get(x, row[0]), *row[1:])
+        points = [(x, -i * WL2_BELOW_WL1_FT, hb) for i, hb in enumerate(hbs) if hb is not None]
+        out += sorted(points, key=lambda q: q[1])
+    return out
 
 
 def write(out_dir, p):

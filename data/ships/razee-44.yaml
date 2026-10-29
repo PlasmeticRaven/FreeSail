@@ -28,9 +28,9 @@ hull:
   length_waterline_m: 48.8
   # 44 ft 5 in extreme as built (Winfield 1793-1817 p. 100; D34 (a)): the cut took nothing off her breadth.
   beam_m: 13.54
-  # 19 ft 3 in mean to K, the band's bottom, at ZAZ2371's drawn line, 1.45 ft aft and 1.47 ft forward below WL1 (measured, 2371 against 1407F, ±0.25 ft: Ind §2.3.1; D28 (a), D29 (b)); 5.71 m to the main keel. Osler's 'nineteen and a half feet abaft' (p. 111, May 1795) lies within that line's ±0.25 ft.
+  # 19 ft 3 in mean to K, the band's bottom, at ZAZ2371's drawn line, 1.45 ft aft and 1.47 ft forward below WL1 (measured, 2371 against 1407F, ±0.25 ft: Ind §2.3.1; D28 (a), D29 (b)); 5.71 m to the main keel. Osler's 'nineteen and a half feet abaft' (p. 111, May 1795) lies within that line's ±0.25 ft. The hull as drawn (freesail/ship/form.py): drawn 5.08 m deep at the greatest section (x 4.575) against the file's draught of 5.88 m.
   draught_m: 5.88
-  # 1,925 t: judgement within the band integrated on her measured lines, 1,900-1,955 t (Ind §2.3.3), the 64's 2,170 t less the slice measured between the two lines, 238-244 tons of 35 cu ft (Indf §2.1).
+  # 1,925 t: judgement within the band integrated on her measured lines, 1,900-1,955 t (Ind §2.3.3), the 64's 2,170 t less the slice measured between the two lines, 238-244 tons of 35 cu ft (Indf §2.1). The hull as drawn (freesail/ship/form.py): drawn displacement 1906 t against the filed 1925 t (-1%).
   displacement_kg: 1925000.0
   # 5 ft 5 in: judgement within 1.5-1.8 m (Ind §2.3.4): KM measured 7.25 m above K, her KG about 1 ft lower than the 64's for the upper works and the 18- and 9-pounders taken off; no period figure for either was found.
   gm_m: 1.65
@@ -52,16 +52,16 @@ hull:
   profile:
     # The top of her side, from the taffrail to where it ends at the 64's beakhead bulkhead: the quarterdeck rail 4 ft 6 in above the quarterdeck (measured on ZAZ2371, not re-measured: Ind §2.3.5) from her taffrail, 5 ft 6 in abaft AP at the middle line (measured, ZAZ2375), to its breast at 74.4 ft; the waist top-side 30.8 ft above K (measured, 2371); the forecastle's rail from 118.5 ft as the quarterdeck's (judgement), to the 64's bulkhead at 153.3 ft (measured on 1407F), kept with her head and bowsprit and not measured on ZAZ2371 (judgement; Indf §3.5 items 3 and 9). The roundhouse, shortened to the beam abaft the mizen in December 1794, is not measured and is left out (Indf §1.5).
     rail_m: [[-26.06, 5.26], [-23.16, 5.28], [-1.71, 5.05], [-1.68, 3.5], [11.7, 3.59], [11.73, 5.12], [19.81, 5.18], [22.34, 5.2]]
-    # At 17 stations: the half-breadth at her line, taken between WL1's and WL2's by her rise (measured lines, Ind §2.3.2; judgement between them), and at the top of her side: the 64's top-timber line under the quarterdeck and forecastle rails (her quarterdeck rail 34 ft across moulded: Ind §2.3.2), and in the waist her top-side, 37 ft 6 in across at midships, carried along between the top-timber and main-breadth lines (judgement on measured lines); each with 4 1/2 in of plank.
-    breadth_m: [[-24.38, 0.3, 3.51], [-21.34, 3.06, 3.93], [-18.29, 4.76, 4.31], [-15.24, 5.62, 4.62], [-12.19, 6.09, 4.86], [-9.14, 6.37, 5.05], [-6.1, 6.54, 5.18], [-3.05, 6.64, 5.25], [0.0, 6.68, 5.84], [3.05, 6.69, 5.84], [6.1, 6.69, 5.84], [9.14, 6.68, 5.84], [12.19, 6.57, 5.22], [15.24, 6.21, 5.06], [18.29, 5.25, 4.76], [21.34, 3.31, 4.26], [22.86, 1.9, 3.89]]
+    # At 17 stations: the half-breadth at her line, taken between WL1's and WL2's by her rise (measured lines, Ind §2.3.2; judgement between them), and at the top of her side: under the quarterdeck and forecastle rails, the 64's side at her rail's height, taken from the main-breadth line at its height of breadth to the top-timber line at the 64's rail along the midship section's shape between them (her quarterdeck rail about 34 ft across moulded at midships, the section's there: Ind §2.3.2), and in the waist her top-side, 37 ft 6 in across at midships, carried along between the top-timber and main-breadth lines (judgement on measured lines); each with 4 1/2 in of plank. Stage A took the 64's top-timber line under her rails, the 64's breadth at the 64's own rails 3-10 ft higher, up to 0.43 m inside the 64's side at the same timbers aft.
+    breadth_m: [[-24.38, 0.3, 4.01], [-21.34, 3.06, 4.5], [-18.29, 4.76, 4.87], [-15.24, 5.62, 5.17], [-12.19, 6.09, 5.31], [-9.14, 6.37, 5.46], [-6.1, 6.54, 5.55], [-3.05, 6.64, 5.53], [0.0, 6.68, 5.84], [3.05, 6.69, 5.84], [6.1, 6.69, 5.84], [9.14, 6.68, 5.84], [12.19, 6.57, 5.44], [15.24, 6.21, 5.29], [18.29, 5.25, 4.96], [21.34, 3.31, 4.26], [22.86, 1.9, 3.59]]
     # K, the band's bottom, from the post's heel to its square fore end (Ind §2.3.6).
     keel_m: [[-24.36, -6.03], [20.65, -5.74]]
-    # The 64's stem's fore edge at her own line, from its foot boxed into the keel to the top of the stem head's fore face under the bowsprit (measured on 1407F), kept with her head and not measured on ZAZ2371 (judgement; Indf §3.5 items 3 and 9): the stem head 4.9 ft above her forecastle deck. The 64's knee of the head, kept in tools/ships/indefatigable.py, is head_m's at stage B.
+    # The 64's stem's fore edge at her own line, from its foot boxed into the keel to the top of the stem head's fore face under the bowsprit (measured on 1407F), kept with her head and not measured on ZAZ2371 (judgement; Indf §3.5 items 3 and 9): the stem head 4.9 ft above her forecastle deck. The 64's knee of the head is her head_m.
     stem_m: [[19.66, -5.42], [20.03, -5.32], [20.39, -5.19], [20.76, -5.04], [21.12, -4.87], [21.49, -4.66], [21.85, -4.41], [22.22, -4.13], [22.59, -3.81], [22.95, -3.44], [23.37, -2.9], [23.58, -2.6], [23.77, -2.3], [23.93, -1.99], [24.2, -1.38], [24.39, -0.77], [24.53, -0.16], [24.64, 0.45], [24.73, 1.06], [24.81, 1.67], [24.87, 2.28], [24.94, 2.89], [25.01, 3.65], [25.06, 4.26], [25.1, 4.72], [25.15, 5.32]]
     # The 64's post and counter (measured on 1407F: Ind §2.3.6), to the old upper deck's height at the middle line, where her taffrail stands 5 ft 6 in abaft AP (measured, ZAZ2375), and the taffrail's bulwark above it to the rail (judgement).
     stern_m: [[-24.36, -6.03], [-24.76, 0.44], [-24.93, 2.88], [-25.65, 3.49], [-26.06, 3.83], [-26.06, 5.26]]
-    # The main wale, 20.2-24.7 ft above K at midships (measured on ZAZ2371: Ind §2.3.5), carried along parallel to the gun deck's sills (judgement).
-    wales_m: [[-21.09, 0.47, 1.84], [-10.94, 0.31, 1.68], [-0.36, 0.28, 1.65], [9.78, 0.43, 1.8], [19.91, 0.72, 2.09]]
+    # The 64's main wale (both edges tracked on 1407F at full resolution; abaft 6 ft from AP its upper edge held, judgement) at her own line, kept below her cut: 19.9-24.1 ft above K at 85-90 ft, where ZAZ2371 measures it 20.2-24.7 ft above K at midships (Ind §2.3.5, at about 6 px to the foot), 0.3-0.6 ft higher.
+    wales_m: [[-24.08, 2.03, 2.76], [-23.77, 1.85, 2.76], [-23.16, 1.65, 2.76], [-22.56, 1.51, 2.76], [-21.95, 1.41, 2.7], [-19.81, 1.2, 2.5], [-18.29, 1.07, 2.36], [-15.24, 0.84, 2.13], [-12.19, 0.64, 1.93], [-9.14, 0.48, 1.77], [-6.1, 0.35, 1.64], [-3.05, 0.26, 1.55], [0.0, 0.21, 1.51], [3.05, 0.19, 1.5], [6.1, 0.22, 1.53], [9.14, 0.29, 1.61], [12.19, 0.4, 1.71], [15.24, 0.54, 1.85], [18.29, 0.73, 2.02], [19.81, 0.85, 2.13], [21.34, 0.98, 2.27], [22.86, 1.14, 2.44], [23.77, 1.25, 2.51], [24.38, 1.33, 2.6]]
     # The midship section, ZAZ1407's outermost (measured, 1407T, ±0.15 ft: Ind §2.3.2), with 4 1/2 in of plank.
     section_m: [[-5.07, 1.33], [-4.83, 3.28], [-4.57, 3.92], [-4.31, 4.35], [-4.07, 4.69], [-3.55, 5.14], [-3.06, 5.51], [-2.54, 5.84], [-2.05, 6.12], [-1.54, 6.36], [-1.05, 6.52], [-0.53, 6.64], [-0.01, 6.71], [1.73, 6.71], [2.21, 6.64], [2.73, 6.45], [3.25, 6.18], [3.74, 5.83], [4.26, 5.6], [5.26, 5.3], [6.02, 5.02]]
     # Each deck at the middle line over its extent (the 64's, measured on 1280T: Ind §2.3.5): her gun deck the 64's lower deck; her quarterdeck the 64's upper deck to its breast at 74.4 ft and her forecastle from 118.5 ft (measured, ZAZ2375), the waist between them open but for the gangways along the sides.
@@ -70,16 +70,85 @@ hull:
       quarterdeck: [[-23.16, 3.9], [-1.71, 3.68]]
       forecastle: [[11.73, 3.75], [19.81, 3.81]]
     ports_m:
-      # Her gun deck's thirteen a side, the 64's lower-deck ports kept (ZAZ2374 marks the same thirteen within 0.4 ft: Ind §2.3.7): every sill measured on ZAZ1407 at full resolution and raised by her rise, the half-breadths the 64's (judgement on measured lines).
+      # Her gun deck's thirteen a side, the 64's lower-deck ports kept (ZAZ2374 marks the same thirteen within 0.4 ft: Ind §2.3.7): every sill measured on ZAZ1407 at full resolution and raised by her rise, the half-breadths the 64's (judgement on measured lines). The hull as drawn (freesail/ship/form.py): the side at each sill, aft to forward, off the half-breadth by -0.05, +0.03, +0.04, +0.01, -0.01, -0.05, -0.17, -0.16, -0.17, -0.18, -0.05, +0.01, +0.03 m; more than 0.05 m at x -0.36, 3.01, 6.4, 9.78, 13.18, reported and never moved to the drawing.
       upper: [[-21.09, 2.3, 4.86], [-17.7, 2.21, 5.49], [-14.32, 2.13, 5.98], [-10.94, 2.07, 6.31], [-7.54, 2.03, 6.5], [-4.17, 2.0, 6.63], [-0.36, 1.98, 6.69], [3.01, 1.99, 6.7], [6.4, 2.02, 6.7], [9.78, 2.06, 6.68], [13.18, 2.12, 6.55], [16.58, 2.19, 6.1], [19.91, 2.29, 5.01]]
-      # Six a side at ZAZ2375's centres (measured, ±0.5 ft: Ind §2.3.7), the first four the 64's upper-deck ports 1-4 within 0.8 ft: the sill the 64's upper-deck sill line (measured on 1407F) at each port's station, raised by her rise (judgement; not re-measured on ZAZ2371); 2 ft 9 in-3 ft 3 in wide, the mean, and as deep as the 64's upper-deck ports (judgement); the half-breadth as at the 64's upper-deck sills (judgement on measured lines).
+      # Six a side at ZAZ2375's centres (measured, ±0.5 ft: Ind §2.3.7), the first four the 64's upper-deck ports 1-4 within 0.8 ft: the sill the 64's upper-deck sill line (measured on 1407F) at each port's station, raised by her rise (judgement; not re-measured on ZAZ2371); 2 ft 9 in-3 ft 3 in wide, the mean, and as deep as the 64's upper-deck ports (judgement); the half-breadth as at the 64's upper-deck sills (judgement on measured lines). The hull as drawn (freesail/ship/form.py): the side at each sill, aft to forward, off the half-breadth by +0.33, +0.34, +0.33, +0.27, +0.22, +0.18 m; more than 0.05 m at x -22.28, -19.05, -15.79, -12.86, -9.94, -6.86, reported and never moved to the drawing.
       quarterdeck: [[-22.28, 4.38, 4.06], [-19.05, 4.29, 4.54], [-15.79, 4.2, 4.94], [-12.86, 4.14, 5.22], [-9.94, 4.08, 5.43], [-6.86, 4.04, 5.58]]
-      # Three a side at ZAZ2375's centres (measured, ±0.5 ft: Ind §2.3.7): the sill the 64's upper-deck sill line at each station, held at her foremost upper-deck port's beyond it (judgement), raised by her rise; the size and the half-breadth as the quarterdeck's (judgement); and her chase port at 155.1 ft, for the bow chasers she carried from 1796 (D30 (a); no bow port measured, judgement), found as the others.
+      # Three a side at ZAZ2375's centres (measured, ±0.5 ft: Ind §2.3.7): the sill the 64's upper-deck sill line at each station, held at her foremost upper-deck port's beyond it (judgement), raised by her rise; the size and the half-breadth as the quarterdeck's (judgement); and her chase port at 155.1 ft, for the bow chasers she carried from 1796 (D30 (a); no bow port measured, judgement), found as the others. The hull as drawn (freesail/ship/form.py): the side at each sill, aft to forward, off the half-breadth by +0.05, +0.05, -0.04, -0.35 m; more than 0.05 m at x 13.53, 22.89, reported and never moved to the drawing.
       forecastle: [[13.53, 4.17, 5.58], [16.67, 4.24, 5.29], [21.03, 4.3, 4.35], [22.89, 4.32, 3.61]]
     port_size_m:
       upper: [1.0, 0.81]
       quarterdeck: [0.91, 0.8]
       forecastle: [0.91, 0.8]
+    # The 64's knee of the head (measured on ZAZ1407) at her own line, kept with her head and bowsprit and not measured on ZAZ2371 (judgement): its fore edge from the band's square fore end on K, 147.75 ft from AP, where it leaves the stem's line, to the head's top.
+    head_m: [[20.65, -5.74], [21.41, -5.56], [21.88, -5.37], [22.17, -5.22], [22.72, -4.76], [23.0, -4.46], [23.23, -4.15], [23.59, -3.54], [23.9, -2.94], [24.29, -2.02], [24.67, -1.11], [25.09, -0.19], [25.44, 0.45], [25.81, 1.06], [26.69, 1.97], [27.79, 2.89], [28.32, 3.5], [28.62, 4.11], [28.75, 4.72], [28.77, 5.33], [28.81, 5.94], [28.79, 6.54]]
+    # The 64's main breadth by station, from AP to 155 ft, at her own line: the half-breadth plan's main-breadth line at the upper height of breadth drawn on the sheer plan (both measured on 1407F at full resolution), below her cut, with 4 1/2 in of plank.
+    breadth_line_m: [[-24.38, 2.92, 4.21], [-21.34, 2.5, 4.86], [-18.29, 2.13, 5.43], [-15.24, 1.84, 5.92], [-12.19, 1.6, 6.27], [-9.14, 1.44, 6.47], [-6.1, 1.33, 6.61], [-3.05, 1.27, 6.7], [0.0, 1.26, 6.73], [3.05, 1.27, 6.74], [6.1, 1.28, 6.74], [9.14, 1.31, 6.74], [12.19, 1.42, 6.66], [13.72, 1.5, 6.55], [15.24, 1.62, 6.38], [16.76, 1.77, 6.1], [18.29, 1.98, 5.7], [19.81, 2.23, 5.1], [21.34, 2.57, 4.26], [22.86, 2.97, 2.99]]
+    # The 64's WL1 to WL5 by station, 5 to 159 ft from AP (measured, Ind §2.3.2: on 1407T to 130 ft, ±0.15 ft, ±0.5 at the ends; on 1407F from 140 ft, ±0.1 ft), each 3.77 ft below the last (Ind §2.3.1), at her own line, so each 0.44-0.45 m higher; with 4 1/2 in of plank.
+    sections_m: [[-22.86, -4.15, 0.24], [-22.86, -3.01, 0.42], [-22.86, -1.86, 0.57], [-22.86, -0.71, 1.06], [-22.86, 0.44, 2.31],
+                 [-21.34, -4.15, 0.3], [-21.34, -3.0, 0.51], [-21.34, -1.86, 0.91], [-21.34, -0.71, 1.82], [-21.34, 0.44, 3.83],
+                 [-18.29, -4.15, 0.54], [-18.29, -3.0, 1.18], [-18.29, -1.86, 2.34], [-18.29, -0.71, 4.08], [-18.29, 0.44, 5.19],
+                 [-15.24, -4.15, 1.0], [-15.24, -3.0, 2.31], [-15.24, -1.86, 3.95], [-15.24, -0.71, 5.27], [-15.24, 0.44, 5.84],
+                 [-12.19, -4.15, 1.76], [-12.19, -3.0, 3.59], [-12.19, -1.85, 5.02], [-12.19, -0.71, 5.88], [-12.19, 0.44, 6.23],
+                 [-9.14, -4.15, 2.86], [-9.14, -3.0, 4.53], [-9.14, -1.85, 5.6], [-9.14, -0.71, 6.24], [-9.14, 0.44, 6.45],
+                 [-6.1, -4.15, 3.77], [-6.1, -3.0, 5.08], [-6.1, -1.85, 5.94], [-6.1, -0.7, 6.42], [-6.1, 0.44, 6.61],
+                 [-3.05, -4.15, 4.32], [-3.05, -3.0, 5.39], [-3.05, -1.85, 6.12], [-3.05, -0.7, 6.55], [-3.05, 0.44, 6.7],
+                 [0.0, -4.15, 4.53], [0.0, -3.0, 5.54], [0.0, -1.85, 6.21], [0.0, -0.7, 6.61], [0.0, 0.45, 6.73],
+                 [3.05, -4.15, 4.59], [3.05, -3.0, 5.57], [3.05, -1.85, 6.21], [3.05, -0.7, 6.61], [3.05, 0.45, 6.74],
+                 [6.1, -4.15, 4.44], [6.1, -3.0, 5.48], [6.1, -1.85, 6.21], [6.1, -0.7, 6.61], [6.1, 0.45, 6.74],
+                 [9.14, -4.15, 4.02], [9.14, -3.0, 5.23], [9.14, -1.85, 6.09], [9.14, -0.7, 6.58], [9.14, 0.45, 6.74],
+                 [12.19, -4.15, 3.13], [12.19, -3.0, 4.72], [12.19, -1.85, 5.81], [12.19, -0.7, 6.42], [12.19, 0.45, 6.66],
+                 [15.24, -4.15, 2.0], [15.24, -3.0, 3.77], [15.24, -1.85, 5.14], [15.24, -0.7, 5.97], [15.24, 0.45, 6.36],
+                 [18.29, -4.15, 1.03], [18.29, -3.0, 2.3], [18.29, -1.85, 3.67], [18.29, -0.7, 4.85], [18.29, 0.45, 5.5],
+                 [18.9, -4.15, 0.87], [18.9, -3.0, 1.99], [18.9, -1.85, 3.3], [18.9, -0.7, 4.52], [18.9, 0.45, 5.24],
+                 [19.51, -4.15, 0.72], [19.51, -3.0, 1.68], [19.51, -1.85, 2.91], [19.51, -0.7, 4.14], [19.51, 0.45, 4.94],
+                 [20.12, -4.15, 0.58], [20.12, -3.0, 1.39], [20.12, -1.85, 2.49], [20.12, -0.7, 3.71], [20.12, 0.45, 4.57],
+                 [20.73, -4.15, 0.45], [20.73, -3.0, 1.12], [20.73, -1.85, 2.09], [20.73, -0.7, 3.25], [20.73, 0.45, 4.15],
+                 [21.34, -4.15, 0.33], [21.34, -3.0, 0.86], [21.34, -1.85, 1.67], [21.34, -0.7, 2.74], [21.34, 0.45, 3.68],
+                 [21.95, -3.0, 0.61], [21.95, -1.85, 1.29], [21.95, -0.7, 2.21], [21.95, 0.45, 3.15],
+                 [22.56, -3.0, 0.39], [22.56, -1.85, 0.94], [22.56, -0.7, 1.67], [22.56, 0.45, 2.54],
+                 [22.86, -3.0, 0.28], [22.86, -1.85, 0.74], [22.86, -0.7, 1.41], [22.86, 0.45, 2.21],
+                 [23.16, -1.85, 0.55], [23.16, -0.7, 1.14], [23.16, 0.45, 1.85],
+                 [23.47, -1.85, 0.39], [23.47, -0.7, 0.88], [23.47, 0.45, 1.49],
+                 [23.77, -0.7, 0.61], [23.77, 0.45, 1.1],
+                 [24.08, -0.7, 0.35], [24.08, 0.45, 0.71]]
+    # The 64's channel wale (measured on 1407F at full resolution) at her own line, its top cut with her side in the waist to the waist's top-side, 30.8 ft above K: ZAZ2371 measures it 28.8-30.7 ft above K at midships (Ind §2.3.5), within 0.1 ft of these.
+    channel_wales_m: [[-21.34, 4.04, 4.77], [-18.29, 3.78, 4.51], [-15.24, 3.55, 4.28], [-12.19, 3.36, 4.09], [-9.14, 3.2, 3.93], [-6.1, 3.07, 3.81], [-3.05, 2.98, 3.71], [-1.71, 2.95, 3.68], [-1.68, 2.95, 3.5], [0.0, 2.92, 3.52], [3.05, 2.9, 3.54], [6.1, 2.91, 3.56], [9.14, 2.96, 3.58], [11.7, 3.03, 3.59], [11.73, 3.03, 3.76], [12.19, 3.04, 3.77], [15.24, 3.15, 3.89], [18.29, 3.3, 4.03], [21.34, 3.5, 4.23], [22.86, 3.65, 4.38], [24.38, 3.82, 4.55]]
+    # Her form (Build-Ships.md §5.1): no fullness, the ends under the water drawn through her measured waterlines (sections_m).
+    form:
+      # Square: the 64's below her cut (ZAZ2371 draws it kept), the knuckle at the wing transom's ends, its round-up to the middle line and the transom's half-breadth there the 64's (measured on 1407F's body plan; the 64's post on 1407F runs on up to 8.0 ft above WL1, a reading not reconciled with it, open for B1); at her taffrail, stern_m's top, the outline's 10.81 ft at that height (judgement on the measured outline, her taffrail's height judgement). One tier of quarter gallery and one band of five lights, the 64's lower tier, the upper deck's (measured on 1407F; the lights read on ZAZ1953), which ZAZ2371 draws in its place, one tier of three lights, its sill about 4 ft 7 in above her aftmost gun-deck port's top as on 1407F and its ends within half a foot, at about 6 px to the foot: tentative (Build-Ships.md §19.1 item 18). Plainly: the tier's top and the band's stand 1.6 and 1.1 ft above her taffrail as filed and the tier's after end 1.4 ft abaft it, since the short roundhouse ZAZ2371's note gives her, under which they stood, is not in her profile (Indf §1.5), and ZAZ2371 draws her side at the mizen about 2 ft above the filed rail (read at 6 px to the foot, not measured): recorded, not moved; her rail and stern there are open, and the viewer draws the tier and the lights cut to her side and her transom.
+      stern:
+        type: square
+        knuckle_z_m: 2.39
+        transom_hb_m: [3.41, 4.07]
+        round_up_m: 0.11
+        galleries_m: [[-26.49, -23.26, 4.31, 5.75]]
+        lights_m: [[4.62, 5.59, 5, 3.29]]
+      # A figure on the knee of the head: judgement, her type certainly carrying one (Build-Ships.md §5.0 principle 9, §5.7); ZAZ1407 and ZAZ1953 draw the knee in outline only, with no figure.
+      head: figure
+    # Each line's rung (Build-Ships.md §5.0 principles 3 and 4): sourced, measured on her own draughts (the 64's ZAZ1407, ZAZ1280, ZAZ1953; hers ZAZ2371, ZAZ2375) at her own line; judged, a judgement at its weakest point, which the line's note names.
+    marks:
+      rail_m: judged
+      breadth_m: judged
+      keel_m: sourced
+      stem_m: judged
+      stern_m: judged
+      wales_m: judged
+      section_m: sourced
+      decks_m: sourced
+      ports_m: judged
+      port_size_m: judged
+      head_m: judged
+      breadth_line_m: sourced
+      sections_m: sourced
+      channel_wales_m: sourced
+      form.stern: sourced
+      form.stern.knuckle_z_m: sourced
+      form.stern.transom_hb_m: judged
+      form.stern.round_up_m: sourced
+      form.stern.galleries_m: judged
+      form.stern.lights_m: judged
+      form.head: judged
 spars:
 # fore lower mast 83 ft 4 in: the 64's 89 ft 7 in (Steel 1794 vol. I p. 49) cut 6 ft 3 in at the heel, the height of the 64's deck above the old upper deck at the mast (D19 (a): the kit's account, the cut measured on 1280T, Ind §3.3), its head 12 ft 5 in by Steel's rule; its heel 9.67 ft above K and its place at the lower-deck partners 143.09 ft from AP, raking 0.3 deg (measured, ZAZ1280: Ind §3.1): its head 22.60 m above her water, 69.6 ft above the datum. Provisional (truth 9), see gen_ships.py. Rating: fore.course, fore.topsail, fore.topgallant, fore.royal, fore.staysail, fore.topmast_staysail, jib in 55 kn -> 498.9 kN.
 - id: fore.mast

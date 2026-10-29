@@ -166,11 +166,12 @@ def test_the_64s_profile_holds_her_measured_sills_rail_and_decks(sixty_four):
     size = dict(p.port_size_m)["lower"]
     assert size == pytest.approx((3.27 * FT, 2.66 * FT), abs=0.01)
     # the taffrail 13 ft abaft AP and 28 ft above WL1; the rail ends where her side ends, at the
-    # beakhead bulkhead 153.3 ft from AP, 19.39 ft above WL1 (measured on 1407F; was the near
-    # knighthead's cap, 160.8 ft and 20 ft, which stage A read as the stem head: Indf §3.5 item
-    # 9); x forward of the middle of the load line, 80 ft from AP
+    # beakhead bulkhead 153.3 ft from AP, 19.50 ft above WL1 (measured on 1407F by columns; was
+    # 19.39, extended on its own slope from 144.8 ft, and before that the near knighthead's cap,
+    # 160.8 ft and 20 ft, which stage A read as the stem head: Indf §3.5 item 9); x forward of
+    # the middle of the load line, 80 ft from AP
     assert p.rail_m[0] == pytest.approx(((-13.0 - 80.0) * FT, 28.0 * FT), abs=0.01)
-    assert p.rail_m[-1] == pytest.approx(((153.3 - 80.0) * FT, 19.39 * FT), abs=0.01)
+    assert p.rail_m[-1] == pytest.approx(((153.3 - 80.0) * FT, 19.50 * FT), abs=0.01)
     # the stem's fore edge, separated from the knee of the head (measured on 1407F at full
     # resolution, Build-Ships.md §5.1): at WL1 160.84 ft from AP, 2.6 ft abaft the knee's fore
     # edge (163.45, Ind §2.3.6), and up to the stem head and no further, the top of its fore face
@@ -233,6 +234,340 @@ def test_the_razees_profile_is_the_64s_cut_down_at_her_own_line(sixty_four, raze
     assert [x for x, _z in p.stem_m] == [x for x, _z in p64.stem_m]
     for (_x0, z0), (_x1, z1) in zip(p64.stem_m, p.stem_m, strict=True):
         assert abs(z1 - z0 - RISE_M) <= 0.02, (z0, z1)
+
+
+# ---------------------------------------------------------------------------
+# Her shape (stage B, the hull's pilot: Indf §3.5 item 8; Build-Ships.md §2.6, §5.1, §5.7)
+# ---------------------------------------------------------------------------
+
+# Each line of her profile, each group of her form and each key of her stern, marked by its
+# rung (Build-Ships.md §5.0 principle 4): a line measured on her draughts at every point
+# sourced, a line with a judgement at its weakest point judged, the figure on her head judged.
+SHAPE_MARKS = {
+    SIXTY_FOUR: {
+        "sourced": (
+            "rail_m", "breadth_m", "keel_m", "stem_m", "stern_m", "section_m", "head_m",
+            "breadth_line_m", "sections_m", "channel_wales_m", "form.stern",
+            "form.stern.knuckle_z_m", "form.stern.transom_hb_m", "form.stern.round_up_m",
+            "form.stern.galleries_m", "form.stern.lights_m",
+        ),
+        "judged": ("wales_m", "decks_m", "ports_m", "port_size_m", "form.head"),
+    },
+    RAZEE: {
+        "sourced": (
+            "keel_m", "section_m", "decks_m", "breadth_line_m", "sections_m", "channel_wales_m",
+            "form.stern", "form.stern.knuckle_z_m", "form.stern.round_up_m",
+        ),
+        "judged": (
+            "rail_m", "breadth_m", "stem_m", "stern_m", "wales_m", "ports_m", "port_size_m",
+            "head_m", "form.stern.transom_hb_m", "form.stern.galleries_m",
+            "form.stern.lights_m", "form.head",
+        ),
+    },
+}  # fmt: skip
+# WL1 to WL5's half-breadths, moulded, ft, at three of her stations (Ind §2.3.2, measured: 80 ft
+# on 1407T, WL1 at full resolution; 140 and 150 ft on 1407F), 3.77 ft apart below WL1 (Ind
+# §2.3.1); and the plank outside them, 4 1/2 in (Indf §3.3).
+WATERLINES_FT = {
+    80: (21.72, 21.3, 20.0, 17.8, 14.5),
+    140: (17.68, 15.54, 11.66, 7.17, 2.99),
+    150: (11.70, 8.60, 5.12, 2.44, 0.72),
+}
+WL_SPACING_FT = 3.77
+PLANK_FT = 4.5 / 12.0
+
+
+def x_of(ft_from_ap):
+    """Feet forward of AP as her files' x: metres forward of the middle of WL1, 80 ft."""
+    return (ft_from_ap - 80.0) * FT
+
+
+def flat(points):
+    """A line of points as one list of numbers, for `pytest.approx`."""
+    return [v for point in points for v in point]
+
+
+def text_of(path):
+    """Her file as written, its notes with it."""
+    return (ROOT / path).read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("path", [SIXTY_FOUR, RAZEE])
+def test_every_line_of_her_shape_carries_its_rung(path):
+    """A mark on every line her profile gives, every group of her form and every key of her
+    stern, in the profile's order, each its weakest point's word (Build-Ships.md §5.0 principle
+    4; §5.6). The rising line and the rabbet are reserved and not written."""
+    p = load_spec(path).hull.profile
+    lines = [
+        key
+        for key in (
+            "rail_m", "breadth_m", "keel_m", "stem_m", "stern_m", "wales_m", "section_m",
+            "decks_m", "ports_m", "port_size_m", "head_m", "breadth_line_m", "sections_m",
+            "channel_wales_m", "floor_m", "rabbet_m",
+        )
+        if getattr(p, key)
+    ]  # fmt: skip
+    assert "floor_m" not in lines and "rabbet_m" not in lines
+    stern = ["knuckle_z_m", "transom_hb_m", "round_up_m", "galleries_m", "lights_m"]
+    given = [*lines, "form.stern", *(f"form.stern.{key}" for key in stern), "form.head"]
+    marks = dict(p.marks)
+    assert list(marks) == given
+    assert marks == {key: word for word, keys in SHAPE_MARKS[path].items() for key in keys}
+
+
+def test_her_waterlines_are_drawn_through_as_measured(sixty_four, razee):
+    """`sections_m` is Ind §2.3.2's WL1 to WL5 by station with the plank, 5 to 159 ft from AP,
+    each station low to high and a waterline ended at the rabbet left out; the razee's are the
+    64's at her own line, each 0.44-0.45 m higher. The drawn side passes through every one of
+    them and every point of her main breadth within a millimetre (`form.check`, as at
+    generation)."""
+    from freesail.ship import form
+
+    p64, p = sixty_four.hull.spec.profile, razee.hull.spec.profile
+    by_station = {}
+    for x, z, hb in p64.sections_m:
+        by_station.setdefault(x, []).append((z, hb))
+    assert len(by_station) == 27
+    assert min(by_station) == pytest.approx(x_of(5.0), abs=0.01)
+    assert max(by_station) == pytest.approx(x_of(159.0), abs=0.01)
+    for station, row in WATERLINES_FT.items():
+        want = [(-i * WL_SPACING_FT * FT, (hb + PLANK_FT) * FT) for i, hb in enumerate(row)]
+        got = by_station[round(x_of(station), 2)]
+        assert flat(sorted(got)) == pytest.approx(flat(sorted(want)), abs=0.006), station
+    counts = [len(by_station[round(x_of(s), 2)]) for s in (152.0, 155.0, 157.0, 159.0)]
+    assert counts == [4, 4, 3, 2]  # WL5 ends at 151.8 ft, WL4 155.4, WL3 157.6, WL2 159.6
+    assert [(x, hb) for x, _z, hb in p.sections_m] == [(x, hb) for x, _z, hb in p64.sections_m]
+    for (_x, z0, _hb), (_x1, z1, _hb1) in zip(p64.sections_m, p.sections_m, strict=True):
+        assert 0.43 <= z1 - z0 <= 0.46, (z0, z1)
+    for spec in (sixty_four.hull.spec, razee.hull.spec):
+        q = spec.profile
+        for x, z, hb in q.sections_m + q.breadth_line_m:
+            assert form.half_breadth_at(spec, x, z) == pytest.approx(hb, abs=0.001), (x, z)
+
+
+def test_her_main_breadth_stands_at_the_drawn_height_of_breadth(sixty_four, razee):
+    """`breadth_line_m`, from AP to 155 ft: the half-breadth plan's main-breadth line, 21.74 ft
+    moulded at midships, at the upper height of breadth on the sheer plan, 2 ft 8 in above WL1 at
+    midships and lifted toward both ends, to 8 ft 4 in at 155 ft and 8 ft 1 in at AP (measured on
+    ZAZ1407 at full resolution), as Steel's rule lifts it (1805, OCR l. 15190-15194). The
+    razee's is the 64's at her own line."""
+    p64, p = sixty_four.hull.spec.profile, razee.hull.spec.profile
+    line = p64.breadth_line_m
+    assert line[0][0] == pytest.approx(x_of(0.0), abs=0.01)
+    assert line[-1][0] == pytest.approx(x_of(155.0), abs=0.01)
+    heights = [z for _x, z, _hb in line]
+    low = heights.index(min(heights))
+    assert line[low][0] == pytest.approx(0.0, abs=0.01)  # lowest at midships, 80 ft from AP
+    assert heights[low] == pytest.approx(2.66 * FT, abs=0.01)
+    assert all(a > b for a, b in zip(heights[:low], heights[1 : low + 1], strict=True))
+    assert all(a < b for a, b in zip(heights[low:-1], heights[low + 1 :], strict=True))
+    assert heights[0] == pytest.approx(8.12 * FT, abs=0.01)
+    assert heights[-1] == pytest.approx(8.29 * FT, abs=0.01)
+    assert max(hb for _x, _z, hb in line) == pytest.approx((21.74 + PLANK_FT) * FT, abs=0.01)
+    assert [(x, hb) for x, _z, hb in p.breadth_line_m] == [(x, hb) for x, _z, hb in line]
+    for (_x, z0, _hb), (_x1, z1, _hb1) in zip(line, p.breadth_line_m, strict=True):
+        assert abs(z1 - z0 - RISE_M) <= 0.02
+
+
+def test_her_channel_wale_lies_between_her_tiers_of_ports(sixty_four, razee):
+    """`channel_wales_m`, measured on 1407F at full resolution from 10 to 160 ft: its lower edge
+    8.05 ft above WL1 at 90 ft (28.7 ft above K; ZAZ2371's 28.8, Ind §2.3.5, within 0.1 ft), above
+    every port of the lower deck, and 2.4 ft broad, the upper deck's ports cut into its upper
+    edge abaft about 40 ft as drawn. The razee's is the 64's at her line, its top cut with her
+    side in the waist to her waist's top-side, where ZAZ2371 measures it 28.8-30.7 ft above K at
+    midships."""
+    p64, p = sixty_four.hull.spec.profile, razee.hull.spec.profile
+    wale = p64.channel_wales_m
+    assert wale[0][0] == pytest.approx(x_of(10.0), abs=0.01)
+    assert wale[-1][0] == pytest.approx(x_of(160.0), abs=0.01)
+    mid = min(wale, key=lambda w: abs(w[0] - x_of(90.0)))
+    assert mid[1] == pytest.approx(8.05 * FT, abs=0.01)
+    for _x, lo, hi in wale:
+        assert hi - lo == pytest.approx(2.4 * FT, abs=0.011)
+    depth = dict(p64.port_size_m)["lower"][1]
+    for x, sill, _hb in ports_of(p64, "lower"):
+        assert sill + depth < interp([(w[0], w[1]) for w in wale], x), x
+    k_at_midships = -interp(p.keel_m, 0.0)  # her water above K at midships, metres
+    # between the breast at 74.4 ft and the forecastle at 118.5 ft, her rail's step a tenth of a
+    # foot inside each (`the_upper_works`)
+    in_waist = [w for w in p.channel_wales_m if x_of(74.45) < w[0] < x_of(118.45)]
+    assert len(in_waist) >= 4
+    for x, _lo, hi in in_waist:
+        assert hi == pytest.approx(interp(p.rail_m, x), abs=0.011)  # cut to her waist's top-side
+    at_mid = min(in_waist, key=lambda w: abs(w[0]))
+    assert (at_mid[1] + k_at_midships) / FT == pytest.approx(28.8, abs=0.1)
+    assert (at_mid[2] + k_at_midships) / FT == pytest.approx(30.7, abs=0.15)
+    by_x = {w[0]: w for w in wale}
+    kept = [w for w in p.channel_wales_m if w[0] in by_x and w not in in_waist]
+    assert len(kept) >= 10
+    for x, lo, hi in kept:
+        assert abs(lo - by_x[x][1] - RISE_M) <= 0.02 and abs(hi - by_x[x][2] - RISE_M) <= 0.02
+
+
+def test_her_head_is_the_knee_measured_on_her_draught(sixty_four, razee):
+    """`head_m`, the knee of the head's fore edge: from where it leaves the stem's line at the
+    band's square fore end on K, 147.75 ft from AP (keel_m's foremost point, ahead of the stem's
+    foot boxed into the keel), through WL1 at 163.45 ft, 2.6 ft before the stem's fore edge, to
+    the head's top 20 ft above WL1 at 174.5 ft (measured on ZAZ1407: Ind §2.3.6, and 1407F at
+    full resolution); a figure stands on it (judgement). The razee's is the 64's at her own
+    line, her head not measured on ZAZ2371."""
+    p64, p = sixty_four.hull.spec.profile, razee.hull.spec.profile
+    head = p64.head_m
+    assert head[0] == pytest.approx(p64.keel_m[-1], abs=0.005)
+    assert head[0][0] > p64.stem_m[0][0]
+    at_water = interp([(z, x) for x, z in head], 0.0)
+    assert at_water == pytest.approx(x_of(163.45), abs=0.01)
+    assert at_water - interp([(z, x) for x, z in p64.stem_m], 0.0) == pytest.approx(
+        2.61 * FT, abs=0.01
+    )
+    assert head[-1] == pytest.approx((x_of(174.46), 20.0 * FT), abs=0.01)
+    assert all(a[1] < b[1] for a, b in zip(head, head[1:], strict=False))
+    assert sixty_four.hull.spec.profile.form.head == razee.hull.spec.profile.form.head == "figure"
+    assert [x for x, _z in p.head_m] == [x for x, _z in head]
+    for (_x0, z0), (_x1, z1) in zip(head, p.head_m, strict=True):
+        assert abs(z1 - z0 - RISE_M) <= 0.02
+
+
+def test_her_stern_is_square_with_its_galleries_and_lights_as_measured(sixty_four, razee):
+    """The 64's stern, square (1407F's body plan and sheer plan, ZAZ1953): the knuckle, where the
+    side closes to the transom, at the wing transom's ends, 6 ft 4 1/2 in above WL1 and 13 ft 0 in
+    out moulded, rounded up 4 in to 6 ft 9 in at the middle line, the middle the higher; the
+    transom's half-breadths 9 ft 0 in at the taffrail on the side counter timber's outline and
+    13 ft 0 in at the knuckle, plank on; two tiers of quarter gallery (1407F), the upper deck's
+    and the quarterdeck's, forward of her stern; two bands of five stern lights (ZAZ1953), within
+    10 ft 9 in and 9 ft 7 in of the middle line, at the quarter gallery's lights' heights and
+    within the transom's face. The razee keeps the 64's stern below her cut, and one tier and
+    one band, the 64's lower ones at her line (ZAZ2371, tentative); her transom at her taffrail
+    as filed is the outline's 10 ft 10 in there."""
+    s64, s = sixty_four.hull.spec.profile.form.stern, razee.hull.spec.profile.form.stern
+    assert s64.type == s.type == "square"
+    assert s64.knuckle_z_m == pytest.approx(6.38 * FT, abs=0.01)
+    assert abs(s.knuckle_z_m - s64.knuckle_z_m - RISE_M) <= 0.02
+    # the middle line's 6.74 ft, rounded up above the ends
+    assert s64.round_up_m == s.round_up_m == pytest.approx((6.74 - 6.38) * FT, abs=0.01)
+    assert s64.transom_hb_m == pytest.approx(
+        ((9.03 + PLANK_FT) * FT, (12.99 + PLANK_FT) * FT), abs=0.01
+    )
+    assert s.transom_hb_m[1] == s64.transom_hb_m[1]
+    assert s.transom_hb_m[0] == pytest.approx((10.81 + PLANK_FT) * FT, abs=0.01)
+    lower = (x_of(-6.9), x_of(3.7), 12.7 * FT, 17.4 * FT)
+    upper = (x_of(-8.2), x_of(-0.4), 19.9 * FT, 24.4 * FT)
+    assert flat(s64.galleries_m) == pytest.approx([*lower, *upper], abs=0.01)
+    bands = ((13.7 * FT, 16.9 * FT, 5, 10.79 * FT), (20.9 * FT, 23.5 * FT, 5, 9.60 * FT))
+    assert flat(s64.lights_m) == pytest.approx(flat(bands), abs=0.01)
+    assert [n for _lo, _hi, n, _hb in s64.lights_m] == [5, 5]
+    ((x_aft, x_fore, z_low, z_high),) = s.galleries_m
+    assert (x_aft, x_fore) == s64.galleries_m[0][:2]
+    assert (z_low - lower[2], z_high - lower[3]) == pytest.approx((RISE_M, RISE_M), abs=0.02)
+    ((low, high, n, hb),) = s.lights_m
+    assert (n, hb) == s64.lights_m[0][2:]
+    assert (low - bands[0][0], high - bands[0][1]) == pytest.approx((RISE_M, RISE_M), abs=0.02)
+    for spec in (sixty_four.hull.spec, razee.hull.spec):
+        p = spec.profile
+        stern = p.form.stern
+        taffrail = p.stern_m[-1][1]
+        top, foot = stern.transom_hb_m
+        assert stern.knuckle_z_m < taffrail
+        for z_lo, z_hi, _n, half in stern.lights_m:  # each band within the transom's face
+            z = 0.5 * (z_lo + z_hi)
+            face = foot + (top - foot) * (z - stern.knuckle_z_m) / (taffrail - stern.knuckle_z_m)
+            assert half < face, (z, half, face)
+    p64 = sixty_four.hull.spec.profile
+    for x_a, _x_f, _z_lo, z_hi in s64.galleries_m:  # each tier forward of the 64's stern
+        assert x_a > interp([(z, x) for x, z in p64.stern_m], z_hi)
+    # Plainly: the razee's tier and band stand above her taffrail as filed, and the tier's after
+    # end abaft it, her short roundhouse (ZAZ2371's note; Build-Ships.md §19.1 item 18) not in
+    # her profile: recorded in her stern's note, not moved
+    p = razee.hull.spec.profile
+    assert z_high > p.stern_m[-1][1] and x_aft < p.stern_m[-1][0]
+    assert "her rail and stern there are open" in text_of(RAZEE)
+
+
+# The main wale's edges, ft above WL1, at four of her stations (measured on 1407F at full
+# resolution by columns, ±0.05 ft): its lowest at 90 ft, sweeping up into the counter aft and
+# to the stem forward.
+MAIN_WALE_FT = {6.0: (3.50, 7.60), 30.0: (1.31, 5.53), 90.0: (-0.83, 3.46), 150.0: (1.75, 5.97)}
+
+
+def test_her_main_wale_sweeps_up_to_the_counter_and_the_stem(sixty_four, razee):
+    """`wales_m`, both edges tracked on 1407F at full resolution from 1 ft from AP, where it runs
+    up into the counter, to the stem at 160 ft: 4 ft 3 in broad, 10 in below WL1 at its lowest at
+    85-90 ft (19.9-24.1 ft above K, where ZAZ2371 measures 20.2-24.7 at about 6 px to the foot),
+    rising 6 ft aft and 3 ft 9 in forward; abaft 6 ft its upper edge, under the quarter gallery's
+    lower finishing, held at its height there (judgement, so the line is judged). The razee's is
+    the 64's at her line, point for point (truth 7-186)."""
+    p64, p = sixty_four.hull.spec.profile, razee.hull.spec.profile
+    wale = p64.wales_m
+    assert wale[0][0] == pytest.approx(x_of(1.0), abs=0.01)
+    assert wale[-1][0] == pytest.approx(x_of(160.0), abs=0.01)
+    for station, (lo, hi) in MAIN_WALE_FT.items():
+        got = [w for w in wale if abs(w[0] - x_of(station)) < 0.005]
+        assert got and got[0][1:] == pytest.approx([lo * FT, hi * FT], abs=0.01), station
+    lows = [lo for _x, lo, _hi in wale]
+    deepest = lows.index(min(lows))
+    assert wale[deepest][0] == pytest.approx(x_of(90.0), abs=0.01)
+    assert all(a > b for a, b in zip(lows[:deepest], lows[1 : deepest + 1], strict=True))
+    assert all(a < b for a, b in zip(lows[deepest:-1], lows[deepest + 1 :], strict=True))
+    assert lows[0] - lows[deepest] == pytest.approx((5.22 + 0.83) * FT, abs=0.01)
+    assert lows[-1] - lows[deepest] == pytest.approx((2.90 + 0.83) * FT, abs=0.01)
+    for x, lo, hi in wale:
+        if x >= x_of(8.0):
+            assert 4.1 * FT <= hi - lo <= 4.35 * FT, x
+    assert dict(p64.marks)["wales_m"] == dict(p.marks)["wales_m"] == "judged"
+    # it ends inside her stern's and her stem's lines
+    assert wale[0][0] > interp([(z, x) for x, z in p64.stern_m], wale[0][2])
+    assert wale[-1][0] < interp([(z, x) for x, z in p64.stem_m], wale[-1][1])
+
+
+def test_the_razees_side_is_the_64s_at_her_rails(sixty_four, razee):
+    """Her side below her rails is the 64's cut down (Build-Ships.md §5.0 principles 1 and 10;
+    Indf §1.5): at the top of her side under her quarterdeck and forecastle rails, `breadth_m`
+    takes the 64's side at her rail's height, between the 64's main-breadth line at its height of
+    breadth and its top-timber line at the 64's rail, along the midship section's shape (her
+    quarterdeck rail about 34 ft across at midships: Ind §2.3.2), not the top-timber line, the
+    64's breadth at the 64's own rails 3-10 ft higher. Her rail's half-breadth so taken stands
+    within 0.2 m of the 64's drawn side there (measured: 0.18 m at 10 ft from AP, where the rule
+    and the section's shape part most), and the two draw her timbers within 0.25 m of each other
+    at the same heights (measured: 0.17 m under her quarterdeck and forecastle, 0.24 m in the
+    waist under her top-side, the rule's fit between the breadth and her rail; up to 0.45 m
+    before), and alike under the water, within 2 cm."""
+    from freesail.ship import form
+
+    s64, s = sixty_four.hull.spec, razee.hull.spec
+    p = s.profile
+    for x, _hw, hr in p.breadth_m[1:-1]:  # the post and 155 ft, the rule's ends, left out
+        rail = interp(p.rail_m, x)
+        if rail > 4.0:  # under her quarterdeck and forecastle rails
+            assert hr == pytest.approx(form.half_breadth_at(s64, x, rail - RISE_M), abs=0.2), x
+        for z in (-1.0, 0.5, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5):
+            if z < rail - 0.05:
+                here, there = (
+                    form.half_breadth_at(s, x, z),
+                    form.half_breadth_at(s64, x, z - RISE_M),
+                )
+                assert here == pytest.approx(there, abs=0.25), (x, z)
+                if z <= 0.5:
+                    assert here == pytest.approx(there, abs=0.02), (x, z)
+
+
+def test_her_drawn_hull_is_recorded_beside_her_file_and_moves_nothing():
+    """The drawing never changes how she sails or fights (Build-Ships.md §5.0 principle 8): her
+    drawn displacement within 2% of the filed (2,158 t against 2,170 and 1,906 against 1,925,
+    measured), it and her drawn depth are in her notes, and every port triple's gap to the drawn
+    side at its sill is reported in its deck's note; none was measured at its port (Indf §3.3),
+    so none raises and none is moved."""
+    from freesail.ship import form
+
+    for path in (SIXTY_FOUR, RAZEE):
+        hull = load_spec(path).hull
+        share = form.drawn_displacement_kg(hull) / hull.displacement_kg - 1.0
+        assert abs(share) <= 0.02, (path, share)
+        text = text_of(path)
+        assert "The hull as drawn (freesail/ship/form.py): drawn displacement " in text
+        assert " deep at the greatest section " in text
+        said = text.count("the side at each sill, aft to forward, off the half-breadth by")
+        assert said == len(hull.profile.ports_m), path
+        assert "measured each within" not in text
 
 
 # ---------------------------------------------------------------------------
