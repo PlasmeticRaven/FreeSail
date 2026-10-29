@@ -682,6 +682,23 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     cap's order; the business's region the followed hull's; two sleeping hulls fighting far
     from the player by 74's rounds asleep. 84 launches when 73 and the fold-in of the
     owner's local work are merged; the owner's usage is to be spent without hurry.
+54. **Notes for milestone 8 and beyond: shore batteries, and the steam expansion.** Owner,
+    2026-10-29. Two things noted ahead of their design, so that the records keep them.
+    **Shore batteries** come first and may come early (M8's side: a port's or a headland's
+    guns as a thing of the world that fires on a ship within its reach, which the invasion
+    ports of the Channel east, the Goulet's and Cadiz's batteries, and the lee ports' and
+    the far fight's work of M7 make possible; 79b notes the batteries of Boulogne, Calais
+    and Dunkirk in the ports' files without modelling them). **The steam expansion** is to be
+    the first major expansion once the base game is fully established: an era beyond the
+    baseline of decision 27 (1792 to 1825), the 1830s to the 1850s, with paddle and screw
+    under sail, and the ships the owner names for it: HMS *Agamemnon* (the 91-gun screw
+    two-decker of 1852), HMS *Gorgon* (the paddle sloop of 1837), HMS *Dolphin* (the
+    brigantine of 1836, not steam but of the era), the French corvette *Sphinx* (the
+    paddle corvette of 1829, France's first steam warship) and USS *Mississippi* (the
+    side-wheel steam frigate of 1841); the ships' dates are the lead's from memory, for
+    their research notes to confirm. **The chart's goal** for that expansion is the
+    coastline of the Americas. Nothing of this binds M7 or M8's packages; the base game's
+    establishment (the gates, the campaign layer, the obscure kit) comes first.
 
 ### Still open
 
