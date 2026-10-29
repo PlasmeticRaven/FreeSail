@@ -20,7 +20,10 @@ the 64's handling with her mizen yard and spritsails, is stage B's.
 
 **Stage A.** The 64 sails on her stand-in mizen course with no yards under the bowsprit (Indf
 §0): her rig's figures here are pinned on the stand-in, and measured again, old beside new, when
-stage B flips `MIZEN_COURSE`, `BOWSPRIT_YARDS` and the driver. The razee is final.
+stage B flips `MIZEN_COURSE`, `BOWSPRIT_YARDS` and the driver. The razee is final. Its
+refinement (Indf §3.5 item 9, §17's answers of 2026-10-29) moved the bow's lines and the
+staysails between the masts, each pin that moved old beside new where it stands; her polars, her
+helm and her heave-to and tack were measured again on it (the notes of `clr_x_m`).
 
 The figures quoted as measured were measured at seed 7 on the owner's machine (Windows 11,
 2026-10-28); the bands are the sources' or judgement where they say so.
@@ -162,10 +165,26 @@ def test_the_64s_profile_holds_her_measured_sills_rail_and_decks(sixty_four):
     # her gun-deck ports 3 ft 3 in by 2 ft 8 in (measured: 3.27 by 2.66 ft the mean)
     size = dict(p.port_size_m)["lower"]
     assert size == pytest.approx((3.27 * FT, 2.66 * FT), abs=0.01)
-    # the taffrail 13 ft abaft AP and 28 ft above WL1, the stem head 160.8 ft from AP and 20 ft
-    # above it (measured on 1407F); x forward of the middle of the load line, 80 ft from AP
+    # the taffrail 13 ft abaft AP and 28 ft above WL1; the rail ends where her side ends, at the
+    # beakhead bulkhead 153.3 ft from AP, 19.39 ft above WL1 (measured on 1407F; was the near
+    # knighthead's cap, 160.8 ft and 20 ft, which stage A read as the stem head: Indf §3.5 item
+    # 9); x forward of the middle of the load line, 80 ft from AP
     assert p.rail_m[0] == pytest.approx(((-13.0 - 80.0) * FT, 28.0 * FT), abs=0.01)
-    assert p.rail_m[-1] == pytest.approx(((160.8 - 80.0) * FT, 20.0 * FT), abs=0.01)
+    assert p.rail_m[-1] == pytest.approx(((153.3 - 80.0) * FT, 19.39 * FT), abs=0.01)
+    # the stem's fore edge, separated from the knee of the head (measured on 1407F at full
+    # resolution, Build-Ships.md §5.1): at WL1 160.84 ft from AP, 2.6 ft abaft the knee's fore
+    # edge (163.45, Ind §2.3.6), and up to the stem head and no further, the top of its fore face
+    # 162.5 ft from AP and 16.0 ft above WL1 under the bowsprit (was the knee up to its top,
+    # 174.5 ft and 20 ft); the rail ends abaft the stem head, as a two-decker's forecastle does
+    assert interp([(z, x) for x, z in p.stem_m], 0.0) == pytest.approx(
+        (160.84 - 80.0) * FT, abs=0.01
+    )
+    assert p.stem_m[-1] == pytest.approx(((162.52 - 80.0) * FT, 16.0 * FT), abs=0.01)
+    assert max(x for x, _z in p.stem_m) == p.stem_m[-1][0]
+    assert p.rail_m[-1][0] < p.stem_m[-1][0] and p.rail_m[-1][1] > p.stem_m[-1][1]
+    # its foot boxed into the keel, 1.1 ft above K at 144.5 ft, abaft K's square fore end
+    assert p.stem_m[0][0] < p.keel_m[-1][0]
+    assert p.stem_m[0][1] - interp(p.keel_m, p.stem_m[0][0]) == pytest.approx(1.06 * FT, abs=0.02)
     # her upper deck at midships is the datum, the uppermost continuous deck (D18 (a))
     decks = dict(p.decks_m)
     assert interp(decks["upper"], 0.0) == pytest.approx(sixty_four.hull.spec.deck_height_m)
@@ -204,6 +223,16 @@ def test_the_razees_profile_is_the_64s_cut_down_at_her_own_line(sixty_four, raze
     # her waist's top-side, 30.8 ft above K (measured, ZAZ2371), more than a metre under the
     # 64's waist rail at midships (1407F)
     assert interp(p.rail_m, 0.0) < interp(p64.rail_m, 0.0) - 1.0
+    # her head the 64's, not measured on ZAZ2371 (judgement): her rail ends at the 64's
+    # beakhead bulkhead, her forecastle rail 4 ft 6 in above her forecastle (was carried on to
+    # the knighthead's cap: Indf §3.5 item 9), and her stem is the 64's raised by her rise
+    assert p.rail_m[-1][0] == p64.rail_m[-1][0]
+    assert p.rail_m[-1][1] - interp(decks["forecastle"], p.rail_m[-1][0]) == pytest.approx(
+        4.5 * FT, abs=0.02
+    )
+    assert [x for x, _z in p.stem_m] == [x for x, _z in p64.stem_m]
+    for (_x0, z0), (_x1, z1) in zip(p64.stem_m, p.stem_m, strict=True):
+        assert abs(z1 - z0 - RISE_M) <= 0.02, (z0, z1)
 
 
 # ---------------------------------------------------------------------------
@@ -254,7 +283,8 @@ def test_her_spars_follow_steels_table_for_a_64(sixty_four, razee):
     truck = sum(s.height_m for s in sixty_four.spar_chain("main.royal_mast"))
     assert truck + sixty_four.hull.spec.deck_height_m == pytest.approx(47.1, abs=0.2)
     # her brace limits are the frigate-36's (Fincham 1843 art. 102; Indf §4.2, judgement): the
-    # lee lower shrouds do not stop her lower yards before 70 degrees (measured on 1407F)
+    # lee lower shrouds do not stop her lower yards before 70 degrees (measured on 1407F), and the
+    # owner keeps them, the lee topmast backstays eased when braced sharp up (2026-10-29: Indf §17)
     frigate = load_ship(FRIGATE)
     for yard_id in ("fore.yard", "main.yard", "main.topsail.yard", "mizzen.topsail.yard"):
         assert sixty_four.spars[yard_id].brace_limit == frigate.spars[yard_id].brace_limit
@@ -316,11 +346,13 @@ def test_her_sails_follow_steels_table_iv(sixty_four, razee):
     assert abs(course.area_m2 / steel - 1.0) <= 0.10 and course.cls == "gaff"
     assert sixty_four.spars["mizzen.yard"].cls == "gaff"  # stage A; the gated class at stage B
     # the razee's spanker on her gaff of 40 ft 10 in and driver boom of 65 ft 4 in (Steel p. 40:
-    # the boom the main topsail yard's length, the gaff five eighths of it; D20 (a)), about
-    # 240 m2 by the frigate's rule (Indf §4.5, ±10%)
+    # the boom the main topsail yard's length, the gaff five eighths of it; D20 (a)), 218 m2 by
+    # the frigate's rule on her spars, kept by the owner (2026-10-29, "meant 218": Indf §17)
+    # within 8% of Steel's driver for a 38, 202 m2 (table IV, read on the page image: Indf §3.5
+    # item 6); ±10% of it (was 216-264 m2, Indf §4.5's 240 ±10%)
     assert razee.spars["mizzen.boom"].length_m == pytest.approx((65.0 + 4.0 / 12.0) * FT, abs=0.06)
     assert razee.spars["mizzen.gaff"].length_m == pytest.approx((40.0 + 10.0 / 12.0) * FT, abs=0.06)
-    assert 216.0 <= razee.sails["mizzen.spanker"].area_m2 <= 264.0
+    assert abs(razee.sails["mizzen.spanker"].area_m2 / 202.0 - 1.0) <= 0.10
     # plain sail: the 64's above the frigate-36's 1,584 m2 (a ship of 1,369 tons to her 930),
     # the razee's above the 64's by her spanker for the mizen course
     frigate = load_ship(FRIGATE)
@@ -334,7 +366,7 @@ def test_her_sails_follow_steels_table_iv(sixty_four, razee):
 
 # Her staysails between the masts in Steel's table IV, the 64 column (Ind §5), m2, and the band of
 # Indf §4.3's check: ±10% the main staysail, a triangle; ±25% the four-sided ones, their areas
-# an upper bound. Steel's 64 has no mizen topgallant staysail.
+# an upper bound. Steel's 64 has no mizen topgallant staysail, and she carries none.
 STEEL_BETWEEN = {
     "main.staysail": (102.0, 0.10),
     "main.topmast_staysail": (190.0, 0.25),
@@ -345,29 +377,37 @@ STEEL_BETWEEN = {
 }
 
 
-def test_her_staysails_between_the_masts_stand_against_steels_table_iv_as_recorded(
-    sixty_four, razee
-):
-    """Indf §4.3: the helper's staysails between the masts (`between_the_masts`, the frigate's
-    rules on her spars) checked against Steel's table IV. Four of the six fall outside the
-    check's bands, measured: the main staysail +26% (the razee's +27%), the middle -29%, the
-    mizzen -35% (-34%) and the mizzen topmast +40%; the main topmast +18% (+19%) and the main
-    topgallant -11% lie within. They are kept as cut, each note saying so, open for the owner
-    or the lead; this pins that state, so that a recut or a drift is seen."""
+def test_her_staysails_between_the_masts_stand_within_steels_table_iv(sixty_four, razee):
+    """Indf §4.3 and §17 (the owner, 2026-10-29: "Agreed"): every staysail between the masts
+    within its band of Steel's table IV for a 64. The main, middle, mizen and mizen topmast
+    staysails are cut to the table's own figures, where the generator's rules on her spars left
+    them outside (old beside new, the 64's and the razee's alike to a square metre: the main
+    staysail 129 m2, +26%, now 102, +0%; the middle 78, -29%, now 110-111, +0-1%; the mizen 65,
+    -35%, now 101, +1%; the mizen topmast 112, +40%, now 78, -3%); the main topmast (225, +18%)
+    and main topgallant (80, -11%) are kept as those rules cut them; and the mizen topgallant
+    staysail (54 m2), which the table's 64 column has not, is gone with its stay, its lines and
+    its names, from both files. The razee's canvas is the 64's column, as her design gives it."""
     for ship in (sixty_four, razee):
         between = ship.groups["staysails between the masts"]
-        assert set(between) == set(STEEL_BETWEEN) | {"mizzen.topgallant_staysail"}
-        outside = {
-            sid
-            for sid, (steel, band) in STEEL_BETWEEN.items()
-            if abs(ship.sails[sid].area_m2 / steel - 1.0) > band
-        }
-        assert outside == {
-            "main.staysail",
-            "middle_staysail",
-            "mizzen.staysail",
-            "mizzen.topmast_staysail",
-        }
+        assert set(between) == set(STEEL_BETWEEN)
+        for sid, (steel, band) in STEEL_BETWEEN.items():
+            assert abs(ship.sails[sid].area_m2 / steel - 1.0) <= band, (
+                sid,
+                ship.sails[sid].area_m2,
+            )
+        assert "mizzen.topgallant_staysail" not in ship.sails
+        assert "mizzen.topgallant.stay" not in ship.lines
+        assert not [
+            ln for ln in ship.lines.values() if ln.id.startswith("mizzen.topgallant_staysail")
+        ]
+        for name, members in ship.groups.items():
+            assert "mizzen.topgallant_staysail" not in members, name
+        # the main staysail, a triangle of Steel's 28 cloths and 14 yards square at the clew
+        assert ship.sails["main.staysail"].area_m2 == round(
+            0.5 * 28.0 * CLOTH_FT * 14.0 * 3.0 * SQ_FT
+        )
+    # her lying-to staysail is the main staysail, as the frigate-36's (package 57)
+    assert sixty_four.groups["lying-to staysails"] == ["main.staysail"]
 
 
 # ---------------------------------------------------------------------------
@@ -659,7 +699,7 @@ def test_her_descriptions_name_her_files_and_rank_the_razee_a_frigate():
                 "cro'jack yard",
                 "fore staysail",
                 "middle staysail",
-                "mizen topgallant staysail",
+                "mizen topmast staysail",
                 "head sails",
                 "kites",
                 "upper yards",
@@ -677,10 +717,14 @@ def test_her_descriptions_name_her_files_and_rank_the_razee_a_frigate():
 def test_her_period_names_resolve(path, phrases):
     """test_period_names_resolve's form (tests/test_ship_particulars.py): object phrases as the
     grammar hands them to the resolver, the article already gone. Her 64 has no spanker (Indf
-    §4.7): her after sail is the mizen course, and 'the spanker' finds nothing on her."""
+    §4.7): her after sail is the mizen course, and 'the spanker' finds nothing on her. Neither
+    carries a mizen topgallant staysail (Steel's 64 column has none: Indf §17), and its name
+    finds nothing."""
     table = noun_table(load_ship(path))
     for phrase in phrases:
         assert table.lookup(phrase) is not None, phrase
+    for word in ("mizen", "mizzen"):
+        assert table.lookup(f"{word} topgallant staysail") is None
     if path == SIXTY_FOUR:
         assert table.lookup("spanker") is None and table.lookup("driver") is None
 
@@ -897,7 +941,10 @@ def test_truth_7_187_the_razee_is_lighter_stiffer_and_faster_than_the_64_she_was
     against 6.99, 150 deg 6.39 against 6.53), and sailed (60 deg 3.58 against 3.63, 120 deg 7.37
     against 7.53). `hull_speed_kn` at the top of D24's band, 14.5, raises her 15-kn figures by
     0.04 kn at most; `clr_x_m` does not reach the polar; the brace limits move only with a
-    source. Reported, not forced (Indf §9)."""
+    source. Reported, not forced (Indf §9). The owner (2026-10-29; Indf §17) leaves it to the
+    tuning of both ships against the period's accounts, neither presumed the one at fault: the
+    razee may be right and the frigate-36 too fast, or the razee too slow and the frigate-36
+    right."""
     from tests.test_known_truths import under_plain_sail
 
     s64, s = load_spec(SIXTY_FOUR), load_spec(RAZEE)

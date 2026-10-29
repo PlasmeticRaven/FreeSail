@@ -34,11 +34,11 @@ hull:
   displacement_kg: 1925000.0
   # 5 ft 5 in: judgement within 1.5-1.8 m (Ind §2.3.4): KM measured 7.25 m above K, her KG about 1 ft lower than the 64's for the upper works and the 18- and 9-pounders taken off; no period figure for either was found.
   gm_m: 1.65
-  # The measured centroid of the plane the file counts (hull and band, no rudder), 0.58-0.64 m abaft the middle of the load line (Ind §2.3.6), with the frigate-36's tuned lead of 9.6% of her load line ahead of it (Indf §2.1; judgement), kept as tuned against the helm's truths (6 and 17), measured at seed 7 in 15 kn under plain sail: she carries 1.5-2.5 deg of weather helm from six points to eleven, about the frigate-36's; truth 6's form holds (the headsails in, 3.6 deg; the spanker in, 1.2 of lee helm); she gets under way from rest close-hauled in 6 1/2 minutes without coming above 66 deg off or gathering sternway (truth 17), and tacks in 6-8 minutes. At +3.5 m her helm close-hauled falls to a degree and she forereaches 1.6 kn hove to.
+  # The measured centroid of the plane the file counts (hull and band, no rudder), 0.58-0.64 m abaft the middle of the load line (Ind §2.3.6), with the frigate-36's tuned lead of 9.6% of her load line ahead of it (Indf §2.1; judgement), kept as tuned against the helm's truths (6 and 17), measured at seed 7 in 15 kn under plain sail: she carries 1.5-2.5 deg of weather helm from six points to eleven, about the frigate-36's; truth 6's form holds (the headsails in, 3.6 deg; the spanker in, 1.2 of lee helm); she gets under way from rest close-hauled in 6 1/2 minutes without coming above 65.9 deg off or gathering sternway (truth 17), and tacks in 6-8 minutes. At +3.5 m her helm close-hauled falls to a degree and she forereaches 1.6 kn hove to. Measured again with the staysails between the masts cut to Steel's table (2026-10-29): the helm under plain sail moves by 0.01-0.04 deg and truth 17's by 0.22 (+1.63 to +1.85 deg), her closest there from 66.0 to 65.9 deg off, the furled staysails' windage; no truth breaks, and it is kept.
   clr_x_m: 4.1
   # Below her line with the band, the rudder left out, as the frigate's (measured, 1407F at 1.45 ft below WL1: 3,050-3,052 sq ft; Ind §2.3.6).
   lateral_area_m2: 283.4
-  # D24 (a): the frigate-36's 13.0 carried by the root of the lengths, sqrt(160/137) = 14.05 (Indf §2.1), tuned only within 13-14.5; no period knots for her were found (Ind §7). Kept at its start: at 14.5 her polar in 15 kn rises by 0.04 kn at most and stays under the frigate-36's close-hauled and running large, so the band cannot bear out the Virginie chase there (Indf §9; measured, reported and not forced); her best in 25 kn, 11.5 kn, meets the chase's 11.2. Plainly: the 64 and the razee have one length, so the gap between their figures is the decision's ranking, not the waterline's.
+  # D24 (a): the frigate-36's 13.0 carried by the root of the lengths, sqrt(160/137) = 14.05 (Indf §2.1), tuned only within 13-14.5; no period knots for her were found (Ind §7). Kept at its start: at 14.5 her polar in 15 kn rises by 0.04 kn at most and stays under the frigate-36's close-hauled and running large, so the band cannot bear out the Virginie chase there (Indf §9; measured, reported and not forced); her best in 25 kn, 11.5 kn, meets the chase's 11.2. The owner (2026-10-29; Indf §17): left to the tuning of both ships against the period's accounts, the razee perhaps right and the frigate-36 too fast, or the razee too slow and the frigate-36 right, neither presumed the one at fault (truth 7-187's fourth clause). Plainly: the 64 and the razee have one length, so the gap between their figures is the decision's ranking, not the waterline's.
   hull_speed_kn: 14.0
   # Her gun deck at midships, 4 ft 7 in above her line (the 64's lower deck, measured on 1280T: Ind §2.3.5; 4 ft 5 in-4 ft 8 in on ZAZ2371): the uppermost continuous deck, her waist having gangways only (ZAZ2375), D18 (a) as proposed (open: Indf §2.2); under (c), her old upper deck, it would be 3.66 m. The datum of every spar height and every sail's corners.
   deck_height_m: 1.39
@@ -50,14 +50,14 @@ hull:
     span_m: 6.04
   # Her side, decks and ports (Indf §3; Build-Ships.md §5.1): x forward of the middle of the load line, z above her load water at each station, metres; every point measured on her draughts but where its line's note says judgement.
   profile:
-    # The top of her side, taffrail to stem head: the quarterdeck rail 4 ft 6 in above the quarterdeck (measured on ZAZ2371, not re-measured: Ind §2.3.5) from her taffrail, 5 ft 6 in abaft AP at the middle line (measured, ZAZ2375), to its breast at 74.4 ft; the waist top-side 30.8 ft above K (measured, 2371); the forecastle's rail from 118.5 ft as the quarterdeck's (judgement), to the 64's beakhead and stem head (measured on 1407F), kept with her head and bowsprit and not measured on ZAZ2371 (judgement; Indf §3.5 item 3): the stem head 8.9 ft above her forecastle deck. The roundhouse, shortened to the beam abaft the mizen in December 1794, is not measured and is left out (Indf §1.5).
-    rail_m: [[-26.06, 5.26], [-23.16, 5.28], [-1.71, 5.05], [-1.68, 3.5], [11.7, 3.59], [11.73, 5.12], [19.81, 5.18], [22.4, 5.2], [24.63, 6.54]]
+    # The top of her side, from the taffrail to where it ends at the 64's beakhead bulkhead: the quarterdeck rail 4 ft 6 in above the quarterdeck (measured on ZAZ2371, not re-measured: Ind §2.3.5) from her taffrail, 5 ft 6 in abaft AP at the middle line (measured, ZAZ2375), to its breast at 74.4 ft; the waist top-side 30.8 ft above K (measured, 2371); the forecastle's rail from 118.5 ft as the quarterdeck's (judgement), to the 64's bulkhead at 153.3 ft (measured on 1407F), kept with her head and bowsprit and not measured on ZAZ2371 (judgement; Indf §3.5 items 3 and 9). The roundhouse, shortened to the beam abaft the mizen in December 1794, is not measured and is left out (Indf §1.5).
+    rail_m: [[-26.06, 5.26], [-23.16, 5.28], [-1.71, 5.05], [-1.68, 3.5], [11.7, 3.59], [11.73, 5.12], [19.81, 5.18], [22.34, 5.2]]
     # At 17 stations: the half-breadth at her line, taken between WL1's and WL2's by her rise (measured lines, Ind §2.3.2; judgement between them), and at the top of her side: the 64's top-timber line under the quarterdeck and forecastle rails (her quarterdeck rail 34 ft across moulded: Ind §2.3.2), and in the waist her top-side, 37 ft 6 in across at midships, carried along between the top-timber and main-breadth lines (judgement on measured lines); each with 4 1/2 in of plank.
     breadth_m: [[-24.38, 0.3, 3.51], [-21.34, 3.06, 3.93], [-18.29, 4.76, 4.31], [-15.24, 5.62, 4.62], [-12.19, 6.09, 4.86], [-9.14, 6.37, 5.05], [-6.1, 6.54, 5.18], [-3.05, 6.64, 5.25], [0.0, 6.68, 5.84], [3.05, 6.69, 5.84], [6.1, 6.69, 5.84], [9.14, 6.68, 5.84], [12.19, 6.57, 5.22], [15.24, 6.21, 5.06], [18.29, 5.25, 4.76], [21.34, 3.31, 4.26], [22.86, 1.9, 3.89]]
     # K, the band's bottom, from the post's heel to its square fore end (Ind §2.3.6).
     keel_m: [[-24.36, -6.03], [20.65, -5.74]]
-    # The fore edge of the stem, the gripe and the knee of the head, the 64's at her own line: below the water as Ind §2.3.6 measures it, above it the 64's knee of the head measured on 1407F to the head's top, kept with her head and not measured on ZAZ2371 (judgement; Indf §3.5 item 3).
-    stem_m: [[20.65, -5.74], [21.41, -5.56], [21.88, -5.37], [22.17, -5.22], [22.72, -4.76], [23.0, -4.46], [23.23, -4.15], [23.59, -3.54], [23.9, -2.94], [24.29, -2.02], [24.67, -1.11], [25.09, -0.19], [25.44, 0.45], [25.81, 1.06], [26.69, 1.97], [27.79, 2.89], [28.32, 3.5], [28.62, 4.11], [28.75, 4.72], [28.77, 5.33], [28.81, 5.94], [28.79, 6.54]]
+    # The 64's stem's fore edge at her own line, from its foot boxed into the keel to the top of the stem head's fore face under the bowsprit (measured on 1407F), kept with her head and not measured on ZAZ2371 (judgement; Indf §3.5 items 3 and 9): the stem head 4.9 ft above her forecastle deck. The 64's knee of the head, kept in tools/ships/indefatigable.py, is head_m's at stage B.
+    stem_m: [[19.66, -5.42], [20.03, -5.32], [20.39, -5.19], [20.76, -5.04], [21.12, -4.87], [21.49, -4.66], [21.85, -4.41], [22.22, -4.13], [22.59, -3.81], [22.95, -3.44], [23.37, -2.9], [23.58, -2.6], [23.77, -2.3], [23.93, -1.99], [24.2, -1.38], [24.39, -0.77], [24.53, -0.16], [24.64, 0.45], [24.73, 1.06], [24.81, 1.67], [24.87, 2.28], [24.94, 2.89], [25.01, 3.65], [25.06, 4.26], [25.1, 4.72], [25.15, 5.32]]
     # The 64's post and counter (measured on 1407F: Ind §2.3.6), to the old upper deck's height at the middle line, where her taffrail stands 5 ft 6 in abaft AP (measured, ZAZ2375), and the taffrail's bulwark above it to the rail (judgement).
     stern_m: [[-24.36, -6.03], [-24.76, 0.44], [-24.93, 2.88], [-25.65, 3.49], [-26.06, 3.83], [-26.06, 5.26]]
     # The main wale, 20.2-24.7 ft above K at midships (measured on ZAZ2371: Ind §2.3.5), carried along parallel to the gun deck's sills (judgement).
@@ -106,7 +106,7 @@ spars:
   steps_on: fore.topgallant_mast
   height_m: 3.1
   rating_kn: 2.7
-# fore course yard 79 ft 6 in (Steel p. 49, the 64); braces 62 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: fore.course in 55 kn -> 118.5 kN.
+# fore course yard 79 ft 6 in (Steel p. 49, the 64); braces 62 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: fore.course in 55 kn -> 118.5 kN.
 - id: fore.yard
   class: yard
   'on': fore.mast
@@ -114,7 +114,7 @@ spars:
   height_m: 16.8
   brace_limit_deg: 62
   rating_kn: 118.5
-# fore topsail yard 57 ft 6 in (Steel p. 49, the 64); braces 64 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: fore.topsail in 40 kn -> 82.2 kN.
+# fore topsail yard 57 ft 6 in (Steel p. 49, the 64); braces 64 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: fore.topsail in 40 kn -> 82.2 kN.
 - id: fore.topsail.yard
   class: yard
   'on': fore.topmast
@@ -122,7 +122,7 @@ spars:
   height_m: 31.8
   brace_limit_deg: 64
   rating_kn: 82.2
-# fore topgallant yard 34 ft 6 in (Steel p. 49, the 64); braces 66 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant in 25 kn -> 7.3 kN.
+# fore topgallant yard 34 ft 6 in (Steel p. 49, the 64); braces 66 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant in 25 kn -> 7.3 kN.
 - id: fore.topgallant.yard
   class: yard
   'on': fore.topgallant_mast
@@ -130,7 +130,7 @@ spars:
   height_m: 36.2
   brace_limit_deg: 66
   rating_kn: 7.3
-# fore royal yard 28 ft 6 in (Steel p. 49, the 64); braces 68 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: fore.royal in 20 kn -> 2.7 kN.
+# fore royal yard 28 ft 6 in (Steel p. 49, the 64); braces 68 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: fore.royal in 20 kn -> 2.7 kN.
 - id: fore.royal.yard
   class: yard
   'on': fore.royal_mast
@@ -138,19 +138,19 @@ spars:
   height_m: 39.6
   brace_limit_deg: 68
   rating_kn: 2.7
-# main lower mast 94 ft 5 in: the 64's 101 ft (Steel 1794 vol. I p. 49) cut 6 ft 7 in at the heel, the height of the 64's deck above the old upper deck at the mast (D19 (a): the kit's account, the cut measured on 1280T, Ind §3.3), its head 14 ft by Steel's rule; its heel 7.15 ft above K and its place at the lower-deck partners 70.87 ft from AP, raking 1.4 deg (measured, ZAZ1280: Ind §3.1): its head 25.07 m above her water, 77.7 ft above the datum. Provisional (truth 9), see gen_ships.py. Rating: main.course, main.topsail, main.topgallant, main.royal, main.staysail, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 55 kn -> 787.2 kN.
+# main lower mast 94 ft 5 in: the 64's 101 ft (Steel 1794 vol. I p. 49) cut 6 ft 7 in at the heel, the height of the 64's deck above the old upper deck at the mast (D19 (a): the kit's account, the cut measured on 1280T, Ind §3.3), its head 14 ft by Steel's rule; its heel 7.15 ft above K and its place at the lower-deck partners 70.87 ft from AP, raking 1.4 deg (measured, ZAZ1280: Ind §3.1): its head 25.07 m above her water, 77.7 ft above the datum. Provisional (truth 9), see gen_ships.py. Rating: main.course, main.topsail, main.topgallant, main.royal, main.staysail, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 55 kn -> 793.9 kN.
 - id: main.mast
   class: mast
   x_m: -2.78
   rake_deg: 1.4
   height_m: 23.7
-  rating_kn: 787.2
-# main topmast 58 ft 6 in (Steel p. 49), 44.5 ft above the lower cap, its head 6 ft 6 in by Steel's rule. Provisional (truth 9), see gen_ships.py. Rating: main.topsail, main.topgallant, main.royal, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 40 kn -> 286.4 kN.
+  rating_kn: 793.9
+# main topmast 58 ft 6 in (Steel p. 49), 44.5 ft above the lower cap, its head 6 ft 6 in by Steel's rule. Provisional (truth 9), see gen_ships.py. Rating: main.topsail, main.topgallant, main.royal, main.topmast_staysail, middle_staysail, main.topgallant_staysail in 40 kn -> 298.3 kN.
 - id: main.topmast
   class: topmast
   steps_on: main.mast
   height_m: 13.6
-  rating_kn: 286.4
+  rating_kn: 298.3
 # main topgallant mast 29 ft 3 in with its royal pole, one stick (Steel p. 49: no royal masts in the 64's column), 11.4 ft of it above the topmast cap to the stop under the pole, Steel's common pole-head (seven-eighteenths of the length) above it. Provisional (truth 9), see gen_ships.py. Rating: main.topgallant, main.royal, main.topgallant_staysail in 25 kn -> 26.9 kN.
 - id: main.topgallant_mast
   class: topgallant_mast
@@ -163,7 +163,7 @@ spars:
   steps_on: main.topgallant_mast
   height_m: 3.5
   rating_kn: 3.5
-# main course yard 90 ft 4 in (Steel p. 49, the 64); braces 64 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: main.course in 55 kn -> 172 kN.
+# main course yard 90 ft 4 in (Steel p. 49, the 64); braces 64 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: main.course in 55 kn -> 172 kN.
 - id: main.yard
   class: yard
   'on': main.mast
@@ -171,7 +171,7 @@ spars:
   height_m: 18.8
   brace_limit_deg: 64
   rating_kn: 172.0
-# main topsail yard 65 ft 4 in (Steel p. 49, the 64); braces 66 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: main.topsail in 40 kn -> 108.8 kN.
+# main topsail yard 65 ft 4 in (Steel p. 49, the 64); braces 66 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: main.topsail in 40 kn -> 108.8 kN.
 - id: main.topsail.yard
   class: yard
   'on': main.topmast
@@ -179,7 +179,7 @@ spars:
   height_m: 35.3
   brace_limit_deg: 66
   rating_kn: 108.8
-# main topgallant yard 39 ft (Steel p. 49, the 64); braces 68 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: main.topgallant in 25 kn -> 9.4 kN.
+# main topgallant yard 39 ft (Steel p. 49, the 64); braces 68 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: main.topgallant in 25 kn -> 9.4 kN.
 - id: main.topgallant.yard
   class: yard
   'on': main.topgallant_mast
@@ -187,7 +187,7 @@ spars:
   height_m: 40.2
   brace_limit_deg: 68
   rating_kn: 9.4
-# main royal yard 32 ft (Steel p. 49, the 64); braces 70 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: main.royal in 20 kn -> 3.5 kN.
+# main royal yard 32 ft (Steel p. 49, the 64); braces 70 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: main.royal in 20 kn -> 3.5 kN.
 - id: main.royal.yard
   class: yard
   'on': main.royal_mast
@@ -195,32 +195,32 @@ spars:
   height_m: 43.9
   brace_limit_deg: 70
   rating_kn: 3.5
-# mizzen lower mast 79 ft 3 in: the 64's 86 ft (Steel 1794 vol. I p. 49) cut 6 ft 9 in at the heel, the height of the 64's deck above the old upper deck at the mast (D19 (a): the kit's account, the cut measured on 1280T, Ind §3.3), its head 9 ft 7 in by Steel's rule; its heel 10.35 ft above K and its place at the lower-deck partners 26.42 ft from AP, raking 2.15 deg (measured, ZAZ1280: Ind §3.1): its head 21.33 m above her water, 65.4 ft above the datum. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.spanker, mizzen.staysail, mizzen.topmast_staysail, mizzen.topgallant_staysail in 55 kn -> 397.6 kN.
+# mizzen lower mast 79 ft 3 in: the 64's 86 ft (Steel 1794 vol. I p. 49) cut 6 ft 9 in at the heel, the height of the 64's deck above the old upper deck at the mast (D19 (a): the kit's account, the cut measured on 1280T, Ind §3.3), its head 9 ft 7 in by Steel's rule; its heel 10.35 ft above K and its place at the lower-deck partners 26.42 ft from AP, raking 2.15 deg (measured, ZAZ1280: Ind §3.1): its head 21.33 m above her water, 65.4 ft above the datum. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.spanker, mizzen.staysail, mizzen.topmast_staysail in 55 kn -> 363.1 kN.
 - id: mizzen.mast
   class: mast
   x_m: -16.33
   rake_deg: 2.15
   height_m: 19.9
-  rating_kn: 397.6
-# mizzen topmast 43 ft 6 in (Steel p. 49), 33.9 ft above the lower cap, its head 4 ft 3 in by Steel's rule. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.topmast_staysail, mizzen.topgallant_staysail in 40 kn -> 125.8 kN.
+  rating_kn: 363.1
+# mizzen topmast 43 ft 6 in (Steel p. 49), 33.9 ft above the lower cap, its head 4 ft 3 in by Steel's rule. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail, mizzen.topgallant, mizzen.royal, mizzen.topmast_staysail in 40 kn -> 94.4 kN.
 - id: mizzen.topmast
   class: topmast
   steps_on: mizzen.mast
   height_m: 10.3
-  rating_kn: 125.8
-# mizzen topgallant mast 21 ft 9 in with its royal pole, one stick (Steel p. 49: no royal masts in the 64's column), 9.1 ft of it above the topmast cap to the stop under the pole, Steel's common pole-head (seven-eighteenths of the length) above it. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topgallant, mizzen.royal, mizzen.topgallant_staysail in 25 kn -> 15.2 kN.
+  rating_kn: 94.4
+# mizzen topgallant mast 21 ft 9 in with its royal pole, one stick (Steel p. 49: no royal masts in the 64's column), 9.1 ft of it above the topmast cap to the stop under the pole, Steel's common pole-head (seven-eighteenths of the length) above it. Provisional (truth 9), see gen_ships.py. Rating: mizzen.topgallant, mizzen.royal in 25 kn -> 7.3 kN.
 - id: mizzen.topgallant_mast
   class: topgallant_mast
   steps_on: mizzen.topmast
   height_m: 2.8
-  rating_kn: 15.2
+  rating_kn: 7.3
 # mizzen royal pole 8.5 ft, the topgallant mast's own head, filed as a royal mast stepped on it as the frigate-36 files hers, so that the royal yard has its own spar (Indf §4.1). Provisional (truth 9), see gen_ships.py. Rating: mizzen.royal in 20 kn -> 1.6 kN.
 - id: mizzen.royal_mast
   class: royal_mast
   steps_on: mizzen.topgallant_mast
   height_m: 2.6
   rating_kn: 1.6
-# mizzen topsail yard 43 ft 3 in (Steel p. 49, the 64); braces 62 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail in 40 kn -> 48.5 kN.
+# mizzen topsail yard 43 ft 3 in (Steel p. 49, the 64); braces 62 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: mizzen.topsail in 40 kn -> 48.5 kN.
 - id: mizzen.topsail.yard
   class: yard
   'on': mizzen.topmast
@@ -228,7 +228,7 @@ spars:
   height_m: 29.0
   brace_limit_deg: 62
   rating_kn: 48.5
-# mizzen topgallant yard 29 ft (Steel p. 49, the 64); braces 64 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: mizzen.topgallant in 25 kn -> 4.8 kN.
+# mizzen topgallant yard 29 ft (Steel p. 49, the 64); braces 64 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: mizzen.topgallant in 25 kn -> 4.8 kN.
 - id: mizzen.topgallant.yard
   class: yard
   'on': mizzen.topgallant_mast
@@ -236,7 +236,7 @@ spars:
   height_m: 32.7
   brace_limit_deg: 64
   rating_kn: 4.8
-# mizzen royal yard 21 ft (Steel p. 49, the 64); braces 66 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2). Provisional (truth 9), see gen_ships.py. Rating: mizzen.royal in 20 kn -> 1.6 kN.
+# mizzen royal yard 21 ft (Steel p. 49, the 64); braces 66 deg from square (the frigate-36's, Fincham 1843 art. 102; judgement for her, Indf §4.2), kept by the owner with the lee topmast backstays eased when braced sharp up (2026-10-29; Indf §17). Provisional (truth 9), see gen_ships.py. Rating: mizzen.royal in 20 kn -> 1.6 kN.
 - id: mizzen.royal.yard
   class: yard
   'on': mizzen.royal_mast
@@ -267,7 +267,7 @@ spars:
   height_m: 4.4
   horse_m: 6.8
   rating_kn: 83.1
-# bowsprit 60 ft 4 in (Steel p. 49, the 64), steeved 27 deg (measured, Ind §3.1): its heel just before the fore mast on ZAZ1280, so 46.3 ft outboard of the stem head (measured, ±1 ft; Luce's third inboard would give 40.2), its root at the stem head's after face on ZAZ1407; height_m its end above the datum. The 64's, in its place in the hull (D8 (b) as answered; Indf §1.5 step 7). No spritsail yard until the lead's gate: the owner gives her one, an occasional sail out of plain sail, and no sprit-topsail yard (Indf §4.6, §17 item 5). Rating: the sails named in the script in 55 kn -> 169.7 kN (the engine's graph loads nothing on it).
+# bowsprit 60 ft 4 in (Steel p. 49, the 64), steeved 27 deg (measured, Ind §3.1): its heel just before the fore mast on ZAZ1280, so 46.3 ft outboard of its root (measured, ±1 ft; Luce's third inboard would give 40.2), its root at the near knighthead's cap on ZAZ1407, which stage A read as the stem head's after face: on 1407F the bowsprit is drawn about 4 ft lower there, lying on the stem head (Indf §3.5 item 9; open for the lead, not moved here); height_m its end above the datum. The 64's, in its place in the hull (D8 (b) as answered; Indf §1.5 step 7). No spritsail yard until the lead's gate: the owner gives her one, an occasional sail out of plain sail, and no sprit-topsail yard (Indf §4.6, §17 item 5). Rating: the sails named in the script in 55 kn -> 169.7 kN (the engine's graph loads nothing on it).
 - id: bowsprit
   class: bowsprit
   x_m: 24.63
@@ -493,7 +493,7 @@ sails:
   centre_height_m: 35.3
   canvas_no: 8
   cloth_rating_kn: 3.3
-# spanker (driver) 218 m2 by the frigate-36's rule on her spars (D20 (a); Indf §4.5): its foot 0.9 of the boom, its head 0.9 of the gaff peaked 40 degrees, its hoist from the boom to the gaff's jaws 38.3 ft (judgement, ±10%); corners [tack, throat, peak, clew]. Steel's table IV (read on the page image, Indf §3.5 item 6) gives the 44 a gaff mizen course of about 88 m2 and a driver of 157, the 38 105 and 202, the 64's driver 198; the frigate-36's spanker is 167. Two reef bands, as the frigate-36's (Steel's mizen course has one). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen-course' (the gaff mizzen of 1794): No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the spanker of No. 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
+# spanker (driver) 218 m2 by the frigate-36's rule on her spars (D20 (a); Indf §4.5): its foot 0.9 of the boom, its head 0.9 of the gaff peaked 40 degrees, its hoist from the boom to the gaff's jaws 38.3 ft (judgement, ±10%); corners [tack, throat, peak, clew]. Steel's table IV (read on the page image, Indf §3.5 item 6) gives the 44 a gaff mizen course of about 88 m2 and a driver of 157, the 38 105 and 202, the 64's driver 198; the frigate-36's spanker is 167. Kept at its cut by the owner (2026-10-29; Indf §17), within 8% of the 38's driver. Two reef bands, as the frigate-36's (Steel's mizen course has one). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen-course' (the gaff mizzen of 1794): No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): the spanker of No. 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: mizzen.spanker
   class: gaff
   mast: mizzen.mast
@@ -536,17 +536,17 @@ sails:
   canvas_no: 6
   cloth_rating_kn: 32.9
   corners_m: [[44.13, 15.09], [23.23, 29.01], [31.53, 9.68]]
-# main staysail 130 m2, a triangle, square on the foot (Steel 1794 vol. I, Sail-making): leech 16.2 m, foot 16.1 m; its tack at the stay over the boats on the booms (a fifth of the main mast's height above the deck, judgement), its peak before the main top. 'This sail is seldom used in large vessels' (Steel), and lying to under it is 'a mean between the two others' (Steel 1794 vol. II, 'Lying-to under the main staysail'). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Main staysail': 'made of canvas No. 1 to 3', the middle taken); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E. Steel's table IV, the 64 (0 / 28 cloths, leech 14 yards; Ind §5): about 102 m2, the cut +27% of it, outside Indf §4.3's ±10%: kept as cut, open for the owner or the lead.
+# main staysail 102 m2, a triangle, cut to Steel's table IV, the 64, as the owner chose (2026-10-29; Indf §17): 28 cloths of 22 1/2 in in the foot (16.0 m) and 14 yards in the leech (12.8 m), square at the clew, its luff up the stay from its tack, as her headsails are cut (judgement on Steel's figures); its tack at the stay over the boats on the booms (a fifth of the main mast's height above the deck, judgement), its peak 1.7 m before the main top; corners [tack, peak, clew]. 'This sail is seldom used in large vessels' (Steel), and lying to under it is 'a mean between the two others' (Steel 1794 vol. II, 'Lying-to under the main staysail'). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Main staysail': 'made of canvas No. 1 to 3', the middle taken); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E. Steel's table IV, the 64 (0 / 28 cloths, leech 14 yards; Ind §5): about 102 m2, the cut +0% of it, within Indf §4.3's ±10%. Hers is the 64's column, as her design gives her canvas, her spars being the 64's (Indf §4.2-§4.3).
 - id: main.staysail
   class: jibheaded
   stay: main.staysail.stay
-  area_m2: 130
-  x_m: 4.8
-  centre_height_m: 11.5
+  area_m2: 102
+  x_m: 5.4
+  centre_height_m: 11.6
   canvas_no: 2
-  cloth_rating_kn: 41.6
-  corners_m: [[15.5, 4.74], [-0.61, 20.94], [-0.61, 4.74]]
-# main topmast staysail 226 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 20.6 m, bunt 10.4 m (0.50 of the leech), foot 14.6 m (24 cloths); the leech 4 or 5 yards deeper than the main topsail, a cloth or two more in the foot than the leech's yards (Steel; the mean of each taken), the bunt as the stay leaves it (Steel: two-fifths of the leech), its peak before the main top. Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Main topmast staysail': No. 5 or 6; Kipping 1847 (1898 printing), Sails and Sailmaking: No. 6 in the royal navy); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E. Steel's table IV, the 64 (22 / 24 cloths, bunt 9, after leech 22 1/4 yards; Ind §5): about 190 m2, the cut +19% of it, within Indf §4.3's ±25%.
+  cloth_rating_kn: 32.6
+  corners_m: [[15.5, 4.74], [1.05, 19.27], [-0.4, 6.55]]
+# main topmast staysail 226 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 20.6 m, bunt 10.4 m (0.50 of the leech), foot 14.6 m (24 cloths); the leech 4 or 5 yards deeper than the main topsail, a cloth or two more in the foot than the leech's yards (Steel; the mean of each taken), the bunt as the stay leaves it (Steel: two-fifths of the leech), its peak before the main top. Canvas No. 5 (Steel 1794 vol. I, Sail-making, 'Main topmast staysail': No. 5 or 6; Kipping 1847 (1898 printing), Sails and Sailmaking: No. 6 in the royal navy); cloth 0.244 kN/m2, 0.76 of No. 2 by Luce App. E. Steel's table IV, the 64 (22 / 24 cloths, bunt 9, after leech 22 1/4 yards; Ind §5): about 190 m2, the cut +19% of it, within Indf §4.3's ±25%. Hers is the 64's column, as her design gives her canvas, her spars being the 64's (Indf §4.2-§4.3).
 - id: main.topmast_staysail
   class: jibheaded
   stay: main.topmast.stay
@@ -556,17 +556,17 @@ sails:
   canvas_no: 5
   cloth_rating_kn: 55.1
   corners_m: [[13.99, 14.44], [13.99, 24.8], [-0.61, 35.04], [-0.61, 14.44]]
-# middle staysail 78 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 10.0 m, bunt 4.4 m (0.44 of the leech), foot 10.9 m (18 cloths); the leech 4 to 7 yards (5.5) deeper than the main topgallant sail, 7 cloths more in the foot than the leech's yards (6 to 8) (Steel), the bunt as the stay leaves it (Steel: five-twelfths of the leech), its peak before the main top. Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Middle staysail': 'No. 6, or 7', the heavier); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E. Steel's table IV, the 64 (21 / 21 cloths, bunt 6, after leech 13 1/2 yards; Ind §5): about 110 m2, the cut -29% of it, outside Indf §4.3's ±25%: kept as cut, open for the owner or the lead.
+# middle staysail 111 m2, four-sided, square on the foot, cut to Steel's table IV, the 64, as the owner chose (2026-10-29; Indf §17): the after leech 12.3 m, the foot 12.0 m (21 cloths of 22 1/2 in, the head's and the foot's halved, as Steel's rule for the canvas squares them), the bunt 6.1 m as the stay leaves it (the table's 5.5); its peak before the main top (the generator's, judgement). Canvas No. 6 (Steel 1794 vol. I, Sail-making, 'Middle staysail': 'No. 6, or 7', the heavier); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E. Steel's table IV, the 64 (21 / 21 cloths, bunt 6, after leech 13 1/2 yards; Ind §5): about 110 m2, the cut +1% of it, within Indf §4.3's ±25%. Hers is the 64's column, as her design gives her canvas, her spars being the 64's (Indf §4.2-§4.3).
 - id: middle_staysail
   class: jibheaded
   stay: middle_staysail.stay
-  area_m2: 78
-  x_m: 4.1
-  centre_height_m: 30.8
+  area_m2: 111
+  x_m: 4.7
+  centre_height_m: 29.5
   canvas_no: 6
-  cloth_rating_kn: 17.8
-  corners_m: [[10.29, 25.62], [10.29, 30.02], [-0.61, 35.62], [-0.61, 25.62]]
-# main topgallant staysail 80 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 10.0 m, bunt 7.1 m (0.71 of the leech), foot 9.4 m (15 cloths); the leech nearly the middle staysail's, 4 or 5 cloths more in the foot than the leech's yards (Steel: 3 to 6), the bunt as the stay leaves it (Steel: a third to three-sevenths of the leech), its peak before the topmast cross-trees. Canvas No. 7 (Steel 1794 vol. I, Sail-making, 'Main topgallant staysail': 'canvas No. 7'); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E. Steel's table IV, the 64 (18 / 18 cloths, bunt 5, after leech 14 yards; Ind §5): about 90 m2, the cut -11% of it, within Indf §4.3's ±25%.
+  cloth_rating_kn: 25.4
+  corners_m: [[11.39, 23.32], [11.39, 29.46], [-0.61, 35.62], [-0.61, 23.32]]
+# main topgallant staysail 80 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 10.0 m, bunt 7.1 m (0.71 of the leech), foot 9.4 m (15 cloths); the leech nearly the middle staysail's by Steel's rule (4 to 7 yards, 5 1/2, deeper than the main topgallant sail; the middle staysail itself is cut to Steel's table), 4 or 5 cloths more in the foot than the leech's yards (Steel: 3 to 6), the bunt as the stay leaves it (Steel: a third to three-sevenths of the leech), its peak before the topmast cross-trees. Canvas No. 7 (Steel 1794 vol. I, Sail-making, 'Main topgallant staysail': 'canvas No. 7'); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E. Steel's table IV, the 64 (18 / 18 cloths, bunt 5, after leech 14 yards; Ind §5): about 90 m2, the cut -11% of it, within Indf §4.3's ±25%. Hers is the 64's column, as her design gives her canvas, her spars being the 64's (Indf §4.2-§4.3).
 - id: main.topgallant_staysail
   class: jibheaded
   stay: main.topgallant.stay
@@ -576,36 +576,26 @@ sails:
   canvas_no: 7
   cloth_rating_kn: 17.1
   corners_m: [[7.7, 30.05], [7.7, 37.13], [-1.7, 40.05], [-1.7, 30.05]]
-# mizzen staysail 66 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 15.3 m, bunt 6.1 m (0.40 of the leech), foot 6.1 m (10 cloths); the bunt two-fifths of the leech and the foot 6 ft 6 in above the deck (Steel's 'within 6 or 7 feet of the quarter-deck'), its peak before the mizen top. Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen staysail': 'No. 2 or 3', the heavier); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E. Steel's table IV, the 64 (19 1/2 / 21 cloths, bunt 7 1/2, after leech 11 1/2 yards; Ind §5): about 100 m2, the cut -34% of it, outside Indf §4.3's ±25%: kept as cut, open for the owner or the lead.
+# mizzen staysail 101 m2, four-sided, square on the foot, cut to Steel's table IV, the 64, as the owner chose (2026-10-29; Indf §17): the after leech 10.5 m, the foot 11.6 m (20.25 cloths of 22 1/2 in, the head's and the foot's halved, as Steel's rule for the canvas squares them), the bunt 6.9 m as the stay leaves it (the table's 6.9); its peak before the mizen top (the generator's, judgement). So cut, its foot stands 21 ft above her quarterdeck, where Steel's sail-making has it drop 'within 6 or 7 feet' of it (OCR l. 12308-12312): with the leech upright under a peak before the top, the table's figures and those words cannot both hold on her spars, and the table is taken (judgement). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Mizen staysail': 'No. 2 or 3', the heavier); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E. Steel's table IV, the 64 (19 1/2 / 21 cloths, bunt 7 1/2, after leech 11 1/2 yards; Ind §5): about 100 m2, the cut +1% of it, within Indf §4.3's ±25%. Hers is the 64's column, as her design gives her canvas, her spars being the 64's (Indf §4.2-§4.3).
 - id: mizzen.staysail
   class: jibheaded
   stay: mizzen.staysail.stay
-  area_m2: 66
-  x_m: -12.7
-  centre_height_m: 9.1
+  area_m2: 101
+  x_m: -9.9
+  centre_height_m: 14.7
   canvas_no: 2
-  cloth_rating_kn: 21.1
-  corners_m: [[-9.2, 2.0], [-9.2, 8.11], [-15.33, 17.28], [-15.33, 2.0]]
-# mizzen topmast staysail 112 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 14.7 m, bunt 6.6 m (0.45 of the leech), foot 10.5 m (17 cloths); the main topmast staysail's rule on the main's topsail and five-sevenths of it (judgement: Steel's article is not in the OCR), the bunt as the stay leaves it, its peak before the mizen top. Canvas No. 7 (Steel 1794's navy number as docs/references/RigGeometryNotes.md reads it (No. 7); his article is not in the OCR); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E. Steel's table IV, the 64 (16 / 17 cloths, bunt 5, after leech 13 yards; Ind §5): about 80 m2, the cut +40% of it, outside Indf §4.3's ±25%: kept as cut, open for the owner or the lead.
+  cloth_rating_kn: 32.3
+  corners_m: [[-3.73, 8.86], [-3.73, 15.76], [-15.33, 19.36], [-15.33, 8.86]]
+# mizzen topmast staysail 78 m2, four-sided, square on the foot, cut to Steel's table IV, the 64, as the owner chose (2026-10-29; Indf §17): the after leech 11.9 m, the foot 9.4 m (16.5 cloths of 22 1/2 in, the head's and the foot's halved, as Steel's rule for the canvas squares them), the bunt 4.7 m as the stay leaves it (the table's 4.6); its peak before the mizen top (the generator's, judgement). Canvas No. 7 (Steel 1794's navy number as docs/references/RigGeometryNotes.md reads it (No. 7); his article is not in the OCR); cloth 0.213 kN/m2, 0.67 of No. 2 by Luce App. E. Steel's table IV, the 64 (16 / 17 cloths, bunt 5, after leech 13 yards; Ind §5): about 80 m2, the cut -3% of it, within Indf §4.3's ±25%. Hers is the 64's column, as her design gives her canvas, her spars being the 64's (Indf §4.2-§4.3).
 - id: mizzen.topmast_staysail
   class: jibheaded
   stay: mizzen.topmast.stay
-  area_m2: 112
-  x_m: -10.7
-  centre_height_m: 20.9
+  area_m2: 78
+  x_m: -11.3
+  centre_height_m: 22.6
   canvas_no: 7
-  cloth_rating_kn: 23.9
-  corners_m: [[-4.83, 13.96], [-4.83, 20.61], [-15.33, 28.66], [-15.33, 13.96]]
-# mizzen topgallant staysail 54 m2, four-sided, square on the foot (Steel 1794 vol. I, Sail-making): leech 7.1 m, bunt 9.1 m (1.29 of the leech), foot 6.7 m (11 cloths); the main topgallant staysail's rule and five-sevenths of it (judgement; Steel's 'Royal staysails ... the same as a topgallant-staysail'), its peak before the mizen topmast cross-trees. Canvas No. 8 (judgement: Steel 1794 vol. I, Sail-making, 'Royal staysails': 'canvas No. 8 ... the same as a topgallant-staysail', the lightest of his numbers for the lightest of the staysails); cloth 0.183 kN/m2, 0.57 of No. 2 by Luce App. E. Steel's table IV gives the 64 no such sail (Ind §5): the helper's kept (judgement; open for the owner or the lead).
-- id: mizzen.topgallant_staysail
-  class: jibheaded
-  stay: mizzen.topgallant.stay
-  area_m2: 54
-  x_m: -12.7
-  centre_height_m: 31.8
-  canvas_no: 8
-  cloth_rating_kn: 9.9
-  corners_m: [[-9.45, 26.33], [-9.45, 35.46], [-16.15, 33.43], [-16.15, 26.33]]
+  cloth_rating_kn: 16.6
+  corners_m: [[-5.93, 16.76], [-5.93, 21.45], [-15.33, 28.66], [-15.33, 16.76]]
 # fore lower studding sail 102 m2: Steel's table IV, the 64 (Ind §5), 15 cloths at the head and 15 at the foot, 13 yards deep; its head on its yard at the yardarm of the sail it spreads. Canvas No. 6 (Kipping 1847 (1898 printing), Sails and Sailmaking, 'On Studding-sails': 'Under frigates of the second class to frigates of the sixth class inclusive, the lower and top studding-sails are made of No. 6'; Steel 1794 vol. I, Sail-making, 'Lower Fore Studdingsails': No. 6 or 7); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: fore.lower.studdingsail.starboard
   class: studding
@@ -1637,22 +1627,22 @@ lines:
 - id: main.staysail.halyard
   class: halyard
   of: main.staysail
-  rating_kn: 43.6
-# 3.75 in, to bear its sail: its working load half the cloth's rating (judgement).
+  rating_kn: 38.0
+# 3.5 in, to bear its sail: its working load half the cloth's rating (judgement).
 - id: main.staysail.sheet.starboard
   class: sheet
   of: main.staysail
   side: starboard
-  rating_kn: 21.8
+  rating_kn: 19.0
 - id: main.staysail.sheet.larboard
   class: sheet
   of: main.staysail
   side: larboard
-  rating_kn: 21.8
+  rating_kn: 19.0
 - id: main.staysail.downhaul
   class: downhaul
   of: main.staysail
-  rating_kn: 13.9
+  rating_kn: 11.7
 - id: main.topmast_staysail.halyard
   class: halyard
   of: main.topmast_staysail
@@ -1680,22 +1670,22 @@ lines:
 - id: middle_staysail.halyard
   class: halyard
   of: middle_staysail
-  rating_kn: 19.4
-# 2.5 in, to bear its sail: its working load half the cloth's rating (judgement).
+  rating_kn: 27.9
+# 3.0 in, to bear its sail: its working load half the cloth's rating (judgement).
 - id: middle_staysail.sheet.starboard
   class: sheet
   of: middle_staysail
   side: starboard
-  rating_kn: 9.7
+  rating_kn: 13.9
 - id: middle_staysail.sheet.larboard
   class: sheet
   of: middle_staysail
   side: larboard
-  rating_kn: 9.7
+  rating_kn: 13.9
 - id: middle_staysail.downhaul
   class: downhaul
   of: middle_staysail
-  rating_kn: 6.2
+  rating_kn: 9.7
 # the main topgallant stay, through a block at the fore topmast head and down to the fore top (Steel 1794 vol. I, 'The main-topgallant-stay'); 3.5 in, judgement; the main topgallant staysail sets on it.
 - id: main.topgallant.stay
   class: stay
@@ -1720,7 +1710,7 @@ lines:
   class: downhaul
   of: main.topgallant_staysail
   rating_kn: 6.2
-# the mizen staysail stay (Steel 1794 vol. I, 'The mizen-staysail': 'clinches round the head of the mizen-mast, then reeves through a thimble ... in a collar lashed round the main-mast, and sets up ... [to] an eye-bolt in the deck abaft the mast. In small ships, the mizen-staysail bends to the mizen-stay'); 6 in, judgement.
+# the mizen staysail stay (Steel 1794 vol. I, 'The mizen-staysail': 'clinches round the head of the mizen-mast, then reeves through a thimble ... in a collar lashed round the main-mast, and sets up ... [to] an eye-bolt in the deck abaft the mast. In small ships, the mizen-staysail bends to the mizen-stay'); 6 in, judgement; the collar 15.6 m above the datum, where Steel's table IV bunt falls under its leech and foot (judgement), the staysail on the span above it.
 - id: mizzen.staysail.stay
   class: stay
   of: mizzen.mast
@@ -1728,18 +1718,18 @@ lines:
 - id: mizzen.staysail.halyard
   class: halyard
   of: mizzen.staysail
-  rating_kn: 27.9
-# 3.0 in, to bear its sail: its working load half the cloth's rating (judgement).
+  rating_kn: 32.7
+# 3.25 in, to bear its sail: its working load half the cloth's rating (judgement).
 - id: mizzen.staysail.sheet.starboard
   class: sheet
   of: mizzen.staysail
   side: starboard
-  rating_kn: 13.9
+  rating_kn: 16.4
 - id: mizzen.staysail.sheet.larboard
   class: sheet
   of: mizzen.staysail
   side: larboard
-  rating_kn: 13.9
+  rating_kn: 16.4
 - id: mizzen.staysail.downhaul
   class: downhaul
   of: mizzen.staysail
@@ -1768,30 +1758,6 @@ lines:
   class: downhaul
   of: mizzen.topmast_staysail
   rating_kn: 9.7
-# the mizen topgallant stay, which 'trices up to the main-topmast-head' (Steel 1794 vol. I); 3 in, judgement; the mizen topgallant staysail sets on it.
-- id: mizzen.topgallant.stay
-  class: stay
-  of: mizzen.topgallant_mast
-  rating_kn: 13.9
-- id: mizzen.topgallant_staysail.halyard
-  class: halyard
-  of: mizzen.topgallant_staysail
-  rating_kn: 12.4
-# 2.0 in, to bear its sail: its working load half the cloth's rating (judgement).
-- id: mizzen.topgallant_staysail.sheet.starboard
-  class: sheet
-  of: mizzen.topgallant_staysail
-  side: starboard
-  rating_kn: 6.2
-- id: mizzen.topgallant_staysail.sheet.larboard
-  class: sheet
-  of: mizzen.topgallant_staysail
-  side: larboard
-  rating_kn: 6.2
-- id: mizzen.topgallant_staysail.downhaul
-  class: downhaul
-  of: mizzen.topgallant_staysail
-  rating_kn: 3.5
 - id: fore.lower.studdingsail.starboard.halyard
   class: halyard
   of: fore.lower.studdingsail.starboard
@@ -2073,7 +2039,6 @@ groups:
   - main.topgallant_staysail
   - mizzen.staysail
   - mizzen.topmast_staysail
-  - mizzen.topgallant_staysail
   staysails between the masts:
   - main.staysail
   - main.topmast_staysail
@@ -2081,7 +2046,6 @@ groups:
   - main.topgallant_staysail
   - mizzen.staysail
   - mizzen.topmast_staysail
-  - mizzen.topgallant_staysail
   studdingsails:
   - fore.lower.studdingsail.starboard
   - fore.lower.studdingsail.larboard
@@ -2115,7 +2079,6 @@ groups:
   - main.topgallant_staysail
   - mizzen.staysail
   - mizzen.topmast_staysail
-  - mizzen.topgallant_staysail
   - mizzen.spanker
   light sails:
   - fore.royal
@@ -2125,7 +2088,6 @@ groups:
   - middle_staysail
   - main.topgallant_staysail
   - mizzen.topmast_staysail
-  - mizzen.topgallant_staysail
   - fore.lower.studdingsail.starboard
   - fore.lower.studdingsail.larboard
   - fore.topmast.studdingsail.starboard
@@ -2171,7 +2133,6 @@ groups:
   - main.topgallant_staysail
   - mizzen.staysail
   - mizzen.topmast_staysail
-  - mizzen.topgallant_staysail
   - mizzen.spanker
   - fore.lower.studdingsail.starboard
   - fore.lower.studdingsail.larboard
@@ -2348,10 +2309,8 @@ aliases:
   main topgallant staysail: main.topgallant_staysail
   mizzen staysail: mizzen.staysail
   mizzen topmast staysail: mizzen.topmast_staysail
-  mizzen topgallant staysail: mizzen.topgallant_staysail
   mizen staysail: mizzen.staysail
   mizen topmast staysail: mizzen.topmast_staysail
-  mizen topgallant staysail: mizzen.topgallant_staysail
   stuns'ls: studdingsails
   studding sails: studdingsails
   kites: studdingsails
