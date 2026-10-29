@@ -7,6 +7,8 @@
 (function (root) {
   "use strict";
   var NS = "http://www.w3.org/2000/svg";
+  // package 75 (B5.6): the hull's parts named in their titles where the part's word is short
+  var HULL_WORDS = { gallery: "quarter gallery", light: "stern light" };
 
   function el(name, attrs, parent) {
     var e = document.createElementNS(NS, name);
@@ -56,8 +58,16 @@
     scene.figures.forEach(function (f) {
       var node;
       if (f.kind === "hull") {
-        node = el("polygon", { class: "hull " + f.part + (f.side ? " " + f.side : ""), points: polygonPoints(f.pts) }, rig);
-        title(node, "hull " + f.part + (f.side ? " (" + f.side + " side)" : ""));
+        // package 75: a hull drawn from her profile comes in strips (class `strip`, their seams
+        // not drawn) with an outline, a line stroked along the side's edges with no fill; below
+        // the water, drawn faint where the view asks it (class `under`, B5.6)
+        var hcls = "hull " + f.part + (f.side ? " " + f.side : "") + (f.cls ? " " + f.cls : "") + (f.under ? " under" : "");
+        node = el(f.part === "outline" ? "polyline" : "polygon", { class: hcls, points: polygonPoints(f.pts) }, rig);
+        var what = HULL_WORDS[f.part] || f.part;
+        if (f.part === "head" && f.cls && f.cls !== "strip") what = "the " + f.cls + " on the head";
+        if (f.part === "wale" && f.cls && f.cls.indexOf("channel") >= 0) what = "channel wale";
+        if (f.part === "transom" && f.cls && f.cls.indexOf("tuck") >= 0) what = "tuck";
+        title(node, "hull " + what + (f.side ? " (" + f.side + " side)" : "") + (f.under ? ", below the water" : ""));
       } else if (f.kind === "spar") {
         var cls = "spar " + f.cls + " " + f.state + (f.busy ? " busy" : "");
         node = el("line", { class: cls, x1: f.pts[0].x.toFixed(2), y1: f.pts[0].y.toFixed(2), x2: f.pts[1].x.toFixed(2), y2: f.pts[1].y.toFixed(2) }, rig);
