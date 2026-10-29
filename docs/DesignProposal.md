@@ -700,6 +700,21 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     coastline of the Americas. Nothing of this binds M7 or M8's packages; the base game's
     establishment (the gates, the campaign layer, the obscure kit) comes first.
 
+55. **The Fable packages after 84 narrowed to three.** Owner, 2026-10-29, on the lead's
+    account of the five Fable packages left on the waves table. **Fable:** 85 (the orders,
+    the primer, the library and now the documentation whole, "might as well go all the
+    way", with the interim gate's draft last), 82 (the boat as a vessel and the player
+    aboard another ship, kept whole on Fable for its seams in the seat, the acts and the
+    replay, its re-brief to carry the ships session's principles for a hull and a ship so
+    that the boat is built to the new standard) and 74 (prizes, the strike and the far
+    fight). **Opus:** 88, the captain's pass, each item briefed as a symptom, the rule as
+    it stands, the rule as it should read and its proof, the moved pins by bisection; and
+    87, the warrant officers' stations, after 85's pass is merged so that the orders'
+    grammar is settled, its brief fixing the pattern on the gunner for the four to follow.
+    The reasoning recorded: the three were tagged Fable before 84 settled the hulls and
+    before 85 was booked; after them the two are fill-ins of settled patterns whose errors
+    show at review, where 82's would be silent in a replay.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
