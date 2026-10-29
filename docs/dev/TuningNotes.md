@@ -11911,3 +11911,117 @@ meets: the Mistral (the wind, through the Admiralty's volumes, Bérard and Smyth
 (Smyth 1854) and *opus* in Latin, Spanish *llama* ("is called"), the long s read as
 *fable*, the constellation Gemini (Admiralty 1916, Norie 1831): words of the texts, kept
 verbatim as the Channel's pilots' star names were.
+
+
+## Package 79d: the Gulf of Lion and the Tyrrhenian, Toulon, Corsica, Sardinia, Elba and Naples (2026-10-29)
+
+Package 79d (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79d", which leans on
+"Package 79c" for the period data, the ports, the tide, the weather, the scenario, the build
+and the records; built as `docs/dev/ChartBlocks.md` says, from 79c's research pass merged at
+`38b0145`). Two regions, `gulf-of-lion` first and `tyrrhenian` second, each built, checked
+and committed in turn. The sections below follow the steps as they are done.
+
+### Step 1: the tiles' count and bytes of both regions (stopped at the report, for the lead's ruling)
+
+Both regions were built once, to fetch and to measure, through the proxy (`python
+tools/build_charts.py --region <region> --reuse-world`), each with its recipe in `REGIONS`
+and an empty features file, nothing refused by any host: GEBCO's extracts 11.3 MB (the
+Gulf) and 12.3 MB (the Tyrrhenian) in two seconds each; EMODnet's `elevation` and
+`elevation_max` 133 MB each for the Gulf and 141 MB each for the Tyrrhenian, thirteen to
+fifteen seconds each. The checks as printed passed for both ("the fetch box covers the
+tiles whole: yes"; the Gulf "tiles another region lists: 0 kept"; the Tyrrhenian, built with
+the Gulf in the working manifest, "32 kept", below). `git status` after each: the manifest
+and the region's own new files, nothing of any other region's. The Tyrrhenian's files were
+then set aside (the region is built again after the Gulf is committed, as the brief orders);
+the Gulf's recipe, tiles, coast and manifest entry are held in the working tree, not
+committed, until the ruling (a recipe and a manifest entry without their tiles is no
+mergeable state).
+
+**The recipes as measured.** `gulf-of-lion`: bounds 41.0 to 44.5 N and 3.0 to 11.0 E as the
+brief has them; fetch 40.85 to 44.95 N, 2.5 to 11.3 E; ten harbour patches (Toulon with its
+roads, Marseille, the Hyères road, Villefranche, Genoa, Leghorn, Porto Ferrajo, San
+Fiorenzo, Ajaccio, Agincourt Sound); EMODnet over GEBCO; `fill_to_chart_datum` by the
+world's mean level as the Strait's (the block's gauges to be held; the build printed
+"raised ... by the world's mean level, 3.70 to 6.83 m", the far gauges' alone, for the lead
+with the tide's step). `tyrrhenian`: bounds 38.5 to 42.5 N and 8.0 to 15.5 E as the brief
+has them; fetch 38.3 to 42.85 N, 7.6 to 16.0 E; six patches (Cagliari, Alghero, Civita
+Vecchia, Gaeta, Naples, Ponza); the same sources and fill.
+
+**The seams.** The level-2 tiles that meet the Gulf's bounds span 40.99 to 44.83 N and 2.61
+to 11.15 E (20 columns by 9 rows); the Tyrrhenian's 38.43 to 42.69 N and 7.73 to 15.84 E
+(19 by 10). **The boundary between the two is the row edge 40.99 N (40° 59′ 12″) west of
+11.15 E**: the 32 tiles of the Tyrrhenian's box from 40.99 to 42.69 N and 7.73 to 11.15 E
+are the Gulf's (the Maddalena, Bonifacio, the north shore of Sardinia, Corsica's south,
+Elba and the Tuscan coast to Monte Argentario's west), kept so by the seam rule when the
+Tyrrhenian is built after the Gulf ("32 kept"); the Tyrrhenian's marks lie south of that
+edge or east of 11.15 E. **Toward 79c**: the Gulf's west bound 3 E lies within
+`mediterranean-west`'s east bound (4.5 E), but that block's tiles end at the row edge
+40.56 N and the Gulf's begin at 40.99 N, so no tile is both blocks'; the open water between
+(40.56 to 40.99 N, from 79c's 4.75 E to the Tyrrhenian's 7.73 E, and west of 4.75 E too)
+is **neither's tiles**: a strip of some 26 miles of the sea between Minorca and Sardinia
+with no level-2 tile, where (east of 1 W, no corridor) the chart answers nothing. Either
+block may take it by the seam rule should the lead want it filled (a row of 20 tiles of
+deep water, some 4.5 MB); no mark, port or passage of either brief lies in it. Said here
+for 79c's notes.
+
+**The count and bytes** (79c's item 1, the brief's "the tiles within 79c's 40 MB rule for
+each region"):
+
+| | `gulf-of-lion` | `tyrrhenian` |
+|---|---|---|
+| level 2 | 180 tiles, 39.3 MB | 158 tiles (190 less the 32 kept the Gulf's), 35.2 MB |
+| level 3, the harbour patches | 64 tiles, 6.2 MB (Toulon 12, the Hyères road 10, Marseille, Genoa, Leghorn, Ajaccio and Agincourt Sound 6 each, Villefranche, Porto Ferrajo and San Fiorenzo 4 each) | 26 tiles, 2.0 MB |
+| the coast | 0.58 MB | 0.61 MB |
+| **as built** | **46.1 MB, past the rule** | **37.8 MB, within it** |
+
+Where the Gulf's level-2 bytes lie (L all land, c a shore in the tile, `.` open sea within
+three miles of a shore, o three to ten miles, `>` beyond ten; kilobytes each):
+
+```
+        2.61  3.04  3.47  3.89  4.32  4.75  5.17  5.60  6.03  6.45  6.88  7.31  7.73  8.16  8.59  9.01  9.44  9.87 10.29 10.72
+ 44.40 L 121 L 127 L 125 L 133 L 128 L 132 L 144 L 146 L 146 L 152 L 149 L  97 L 112 L 110 c 119 L 126 L 119 L 113 L  91 L  75
+ 43.97 L 129 L 129 L 130 L 129 L 113 L 106 L 126 L 127 L 143 L 153 L 156 L 147 L 145 c 256 c 349 c 257 c 187 c 135 L 127 L 121
+ 43.55 L 132 L 129 L 124 c  95 L  82 L  94 L 113 L 114 L 127 L 130 c 176 c 271 c 281 c 308 > 356 > 331 o 230 c 149 c 100 L 104
+ 43.12 L 116 c 120 c 143 c 148 c 116 c 138 c 168 c 129 c 121 c 239 c 378 o 320 > 287 > 286 > 311 o 339 . 263 c 219 c 146 L 110
+ 42.69 c 112 c 143 o 191 > 239 > 275 o 327 . 365 c 328 c 322 c 345 > 312 > 306 > 296 o 310 . 368 c 338 c 270 c 213 c 185 c 120
+ 42.27 c 117 c 210 o 312 > 340 > 318 > 285 > 252 > 257 > 301 > 286 > 294 > 292 > 292 c 364 c 231 c 142 c 242 c 255 c 175 c 203
+ 41.84 L 116 c 180 o 302 > 313 > 249 > 260 > 254 > 253 > 268 > 310 > 304 > 269 > 285 c 368 c 202 c 149 c 264 . 291 . 288 c 279
+ 41.41 c 224 c 216 > 339 > 257 > 220 > 209 > 248 > 226 > 255 > 303 > 245 > 200 > 296 o 355 c 293 c 186 . 279 > 294 > 335 > 299
+ 40.99 > 298 > 247 > 224 > 184 > 221 > 202 > 238 > 241 > 227 > 220 > 175 > 188 . 315 c 336 c 290 c 203 c 269 o 296 > 308 > 319
+```
+
+47 tiles all land (5.8 MB: Languedoc's, Provence's and the Alps' interior, the Apennines
+behind Genoa and Tuscany), 58 open sea beyond ten miles of any shore (15.7 MB: the
+Gulf's abyssal plain and the Ligurian sea, 2,300 to 2,700 m, which compress badly as the
+Azores' and the Algerian basin's did), 75 with a shore or within ten miles of one. The top
+row (44.40 to 44.83 N) is land but for the one tile of Genoa's (Genoa lies at 44.41 N,
+so the row cannot go); the west column (2.61 to 3.04 E) holds the Roussillon's shore, which
+runs along 3.03 to 3.05 E (it cannot go either).
+
+**The ways I see for the Gulf, with their cost** (level 2 + level 3 + the coast):
+
+1. **Two regions split at the column edge 7.73 E** (the brief's own remedy in 79c's item 1,
+   "a second region"; 79c recommends the same for its block): `gulf-of-lion` from 3 E to
+   7.73 E, the Roussillon, the Gulf, Marseille, Toulon, the Hyères, Fréjus, Antibes, Nice
+   and Villefranche (108 level-2 tiles, 22.2 MB, with five patches 3.3 MB: about 25.8 MB),
+   and a second, the Ligurian sea and Corsica, from 7.73 E to 11 E, Genoa, Leghorn, Elba,
+   Corsica whole and the Maddalena with Agincourt Sound (72 tiles, 17.1 MB, five patches
+   2.9 MB: about 20.3 MB); each within the rule, every tile written, no hole; the same
+   46 MB committed in two entries. The package would then hold three regions; the second
+   takes the Gulf's truths 7-296 to 7-298 (Agincourt Sound, Bonifacio, Genoa) and the
+   scenario's start, and the Tyrrhenian's seam (32 tiles) is the second's.
+2. **The all-land tiles not written** (`skip_dry_tiles`): 133 level-2 tiles, 33.4 MB, about
+   40.2 MB in all, a hair over the rule (a tighter Hyères patch, ten tiles of 1.1 MB, would
+   bring it under); but east of 1 W no corridor lies under the regions (79b's finding), so
+   a query in those 47 tiles answers nothing at all, though no ship's water lies in them.
+3. **As built**, 46.1 MB, by the lead's leave.
+
+The deep water cannot be dropped (east of 1 W nothing would answer there, and the
+scenario's track from the Maddalena to Toulon crosses it).
+
+**My recommendation: way 1** for the Gulf (two regions at 7.73 E, every tile written), as
+79c's for its block; way 2 if the lead would rather keep the brief's two regions and accept
+the inland hole. **The Tyrrhenian is within the rule as briefed** (37.8 MB) and needs no
+ruling. Nothing of the tiles, the recipe, the manifest or the coast is committed until the
+ruling; the marks, the ports, the nations, the tide's and the weather's rows of the Gulf go
+on meanwhile in the working tree and wait with them.
