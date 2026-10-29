@@ -138,7 +138,20 @@ CHANNEL_EAST_PORTS = [
     "poole",
     "portsmouth",
 ]
-ALL_PORTS = sorted(ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS + STRAIT_PORTS + CHANNEL_EAST_PORTS)
+# package 79c: the Mediterranean west's eight (two regions), in their own list
+MED_WEST_PORTS = [
+    "algiers",
+    "almeria",
+    "cartagena",
+    "ivica",
+    "malaga",
+    "oran",
+    "palma",
+    "port-mahon",
+]
+ALL_PORTS = sorted(
+    ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS + STRAIT_PORTS + CHANNEL_EAST_PORTS + MED_WEST_PORTS
+)
 
 
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
@@ -304,6 +317,10 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # the Channel's east block (package 79b): the French ports of the invasion coast hostile,
     # the English ones the King's
     french_ports |= {"le-havre", "boulogne", "calais", "dunkirk"}
+    # the Mediterranean west (package 79c): the Spanish ports hostile, the regency of
+    # Algiers' at peace with Britain and neutral to her
+    french_ports |= {"malaga", "almeria", "cartagena", "palma", "port-mahon", "ivica"}
+    neutral_ports |= {"oran", "algiers"}
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS

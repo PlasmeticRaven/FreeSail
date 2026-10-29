@@ -1280,3 +1280,255 @@ boxes:
           radius_km: {min: 1200, max: 2000}
           life_h: {min: 120, max: 360}
         check: {westerly_pct: 40, easterly_pct: 10, southerly_pct: 22, northerly_pct: 22, gust31_days: 7, gust54_days: 1.0}
+  # package 79c: the Mediterranean west, over both of the block's regions (`mediterranean-west`
+  # and `balearics`). No box covered the Mediterranean, and `box_at` gave its water the nearest
+  # Atlantic box's (Portugal's), which is wrong (the Levanter and the Poniente, the Alboran's
+  # easterlies, the Balearics' winter northerlies). The check rows are a printed table's (the
+  # Admiralty's, read from the page images under docs/references/pilots/pages/), the
+  # generator's figures judgement fitted to them; PROVISIONAL as every box beyond the Channel.
+  mediterranean-west:
+    title: "the Mediterranean west, the Strait's east bound to Cape Palos, the Balearics and Barbary to Algiers"
+    bounds: {south: 35.0, north: 40.5, west: -5.0, east: 4.5}
+    provisional: true
+    source: "the check rows the Admiralty's Mediterranean Pilot vol. I, fifth edition (1913), Appendix III, the meteorological tables of Gibraltar, Cartagena, Palma, Port Mahon, Oran and Algiers (pp. 724 to 730, the page images under docs/references/pilots/pages/; modern observations, 4 to 36 years each); the generator's figures judgement fitted to them; package 79c"
+    months:
+      1:
+        name: January
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.07, high_toward_deg: 242}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 93, spread: 30}
+        closest_approach_km: {mean: 95, spread: 794}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1008, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 255, spread: 118}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 29, easterly_pct: 15, southerly_pct: 18, northerly_pct: 28, gust31_days: 5, gust54_days: 0.9}
+      2:
+        name: February
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.12, high_toward_deg: 228}
+        lows_per_month: 9
+        track_bearing_deg: {mean: 90, spread: 30}
+        closest_approach_km: {mean: -162, spread: 757}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1004, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 314, spread: 106}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 31, easterly_pct: 15, southerly_pct: 19, northerly_pct: 25, gust31_days: 5, gust54_days: 0.8}
+      3:
+        name: March
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.09, high_toward_deg: 205}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 48, spread: 30}
+        closest_approach_km: {mean: 221, spread: 346}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 991, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 306, spread: 69}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 27, easterly_pct: 19, southerly_pct: 18, northerly_pct: 25, gust31_days: 7, gust54_days: 1.1}
+      4:
+        name: April
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.13, high_toward_deg: 218}
+        lows_per_month: 9
+        track_bearing_deg: {mean: 75, spread: 30}
+        closest_approach_km: {mean: -23, spread: 313}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 997, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.92
+          bearing_deg: {mean: 275, spread: 114}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 32, easterly_pct: 15, southerly_pct: 22, northerly_pct: 21, gust31_days: 5, gust54_days: 0.8}
+      5:
+        name: May
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.08, high_toward_deg: 215}
+        lows_per_month: 6
+        track_bearing_deg: {mean: 40, spread: 30}
+        closest_approach_km: {mean: -23, spread: 703}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 995, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 48, spread: 123}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 24, easterly_pct: 22, southerly_pct: 20, northerly_pct: 24, gust31_days: 3, gust54_days: 0.5}
+      6:
+        name: June
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.06, high_toward_deg: 263}
+        lows_per_month: 6
+        track_bearing_deg: {mean: 97, spread: 30}
+        closest_approach_km: {mean: 69, spread: 454}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1003, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.94
+          bearing_deg: {mean: 358, spread: 116}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 22, easterly_pct: 23, southerly_pct: 21, northerly_pct: 23, gust31_days: 2, gust54_days: 0.3}
+      7:
+        name: July
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.02, high_toward_deg: 159}
+        lows_per_month: 5
+        track_bearing_deg: {mean: 45, spread: 30}
+        closest_approach_km: {mean: 26, spread: 403}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 991, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 331, spread: 101}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 18, easterly_pct: 29, southerly_pct: 18, northerly_pct: 25, gust31_days: 2, gust54_days: 0.2}
+      8:
+        name: August
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.0, high_toward_deg: 31}
+        lows_per_month: 7
+        track_bearing_deg: {mean: 49, spread: 30}
+        closest_approach_km: {mean: 11, spread: 681}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 994, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 295, spread: 84}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 17, easterly_pct: 27, southerly_pct: 21, northerly_pct: 24, gust31_days: 2, gust54_days: 0.2}
+      9:
+        name: September
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.09, high_toward_deg: 265}
+        lows_per_month: 6
+        track_bearing_deg: {mean: 94, spread: 30}
+        closest_approach_km: {mean: -875, spread: 84}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1006, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 262, spread: 116}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 19, easterly_pct: 28, southerly_pct: 14, northerly_pct: 29, gust31_days: 2, gust54_days: 0.3}
+      10:
+        name: October
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.06, high_toward_deg: 330}
+        lows_per_month: 5
+        track_bearing_deg: {mean: 74, spread: 30}
+        closest_approach_km: {mean: 613, spread: 474}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 994, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 298, spread: 115}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 24, easterly_pct: 22, southerly_pct: 16, northerly_pct: 27, gust31_days: 4, gust54_days: 0.6}
+      11:
+        name: November
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.08, high_toward_deg: 215}
+        lows_per_month: 9
+        track_bearing_deg: {mean: 69, spread: 30}
+        closest_approach_km: {mean: 324, spread: 358}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1004, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 305, spread: 61}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 29, easterly_pct: 17, southerly_pct: 17, northerly_pct: 27, gust31_days: 4, gust54_days: 0.7}
+      12:
+        name: December
+        note: "judgement: the generator's figures fitted by simulated months (a scratch run of 1,200 at seed 7, all twelve within five points of the check row) to the check row, which is the Admiralty's tables read from the page images (the Mediterranean Pilot vol. I, 1913, Appendix III: Gibraltar p. 724, Cartagena p. 725, Palma p. 727, Oran p. 729, Algiers p. 730; the days of wind from each point, a half-point's days split between its two quarters, Palma and Oran at half weight for their bays' sea breezes, a tenth left for days of no prevailing quarter as the Channel's indices leave; the strong-gale days half the gale days of Cartagena, Palma and Port Mahon, pp. 725, 727 and 728, the strong-breeze days three times them, JUDGEMENT); modern observations of 1880 to 1912, not the period's"
+        background_hpa: 1016
+        gradient: {hpa_per_100km: 0.0, high_toward_deg: 131}
+        lows_per_month: 3
+        track_bearing_deg: {mean: 92, spread: 30}
+        closest_approach_km: {mean: 497, spread: 295}
+        speed_kn: {min: 10, max: 25}
+        central_hpa: {mean: 1002, spread: 8, floor: 980}
+        radius_km: {min: 300, max: 550}
+        life_h: {min: 36, max: 90}
+        high:
+          probability: 0.95
+          bearing_deg: {mean: 275, spread: 87}
+          distance_km: {min: 700, max: 1300}
+          anomaly_hpa: {min: 6, max: 14}
+          radius_km: {min: 900, max: 1500}
+          life_h: {min: 96, max: 240}
+        check: {westerly_pct: 28, easterly_pct: 16, southerly_pct: 18, northerly_pct: 28, gust31_days: 5, gust54_days: 0.9}

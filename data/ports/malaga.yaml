@@ -1,0 +1,108 @@
+# FreeSail: Málaga as a port (spec M6 §26; package 79c, the Mediterranean west's block), on
+# package 35's machinery; the marks are the features file's
+# (data/charts/features/mediterranean-west.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Málaga', pp. 34 to 36: the city under
+# its Alcazaba and Gibralfaro, the mole running out to the south-east with its lantern on
+# the head; the bank off the river Guadalmedina to be cleared by bringing the lantern of the
+# mole in one with the hermitage of San Christóbal on the mountain within the Alcazaba,
+# which leads over 4 1/2 brazas; the anchorage before the mole in 8 to 12 brazas, sand in
+# the approach; the Levanter sends a heavy sea into the road. Purdy 1826, 'Malaga', pp. 11
+# to 12: muddy ground in the road; the port 'now distinguished by a light-house' (the later
+# revolving light, not 1805's); the tide rises about three feet. Smyth 1854, p. 6.
+#
+# The datum: UNVERIFIED. No period sheet is patched at Málaga in this package (Roux's plate
+# 3 and Heather's plan of the bay are read and not transcribed, CC BY-NC-SA); the chart's
+# depths are EMODnet's at the lowest astronomical tide, and the modern port's moles and
+# docks stand in the grid where 1805 had the old mole and the beach.
+#
+# The stance. Málaga is Spain's (the nations table): hostile to a King's ship from December
+# 1804, open to a neutral. The prices are FROM MEMORY or JUDGEMENT, sterling at the
+# exchange (a peso duro four shillings and sixpence, from memory).
+
+id: malaga
+name: Málaga
+nation: spain
+source: "Tofiño 1787 pp. 34-36 (Málaga, the mole, the bank off the river, the road); Purdy 1826 pp. 11-12"
+datum: unverified
+
+outer_road:
+  name: off the mole of Málaga
+  lat_deg: 36.7000
+  lon_deg: -4.3950
+anchorage:
+  feature: malaga-road
+  name: Málaga road
+  lat_deg: 36.7110
+  lon_deg: -4.4060
+mooring:
+  feature: malaga-road
+  name: before the mole of Málaga
+  lat_deg: 36.7110
+  lon_deg: -4.4060
+  depth_fathoms: 9
+  bottom: sand and mud
+  deep_draught_ft: 20    # judgement: eight to twelve brazas before the mole
+shore:
+  feature: malaga
+  name: the mole of Málaga
+  lat_deg: 36.7210
+  lon_deg: -4.4190
+
+pilot:
+  station: malaga-road
+  cruising_nm: 3                 # judgement: the port's boats
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the pilots' falucho of Málaga
+    under: a lateen sail and oars
+    note: "a Mediterranean falucho (judgement)"
+  names: [Ruiz, Moreno, Navarro, Gálvez, Torres, Romero, Cabello, Doblas]   # judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 150            # out to the south-east past the mole's head (judgement)
+  words:
+    channel: "Coming from the westward keep off the bank before the river Guadalmedina: bring the lantern of the mole in one with the hermitage of San Christóbal on the mountain within the Alcazaba, and you pass over four brazas and a half; a ship of the line opens them to the eastward."
+    marks: "The Alcazaba and the castle of Gibralfaro over the city, the great church, the mole with its lantern running out to the south-east."
+    anchorage: "Anchor before the mole in eight to twelve brazas, sand and mud. With the Levanter there is a heavy sea in the road: be ready to slip or to run under the mole."
+    tide: "The tide is small here, three feet at most, and the current sets to the eastward along the coast."
+
+tide:
+  establishment: Málaga
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 21, origin: algiers, note: "the Barbary grain the coast and the islands imported from Oran and Algiers (from memory); the price judgement"}
+    - {good: wine, price: 34, origin: spain, note: "the Málaga wines, the 'mountain'; from memory"}
+    - {good: raisins, price: 40, origin: spain, note: "the Málaga raisins, the port's great export; from memory"}
+    - {good: oranges, price: 6, origin: spain, note: "judgement"}
+    - {good: lemons, price: 6, origin: spain, note: "judgement"}
+    - {good: almonds, price: 42, origin: spain, note: "from memory"}
+    - {good: figs, price: 18, origin: spain, note: "judgement"}
+    - {good: olive oil, price: 48, origin: spain, note: "judgement"}
+    - {good: brandy, price: 90, origin: spain, note: "from memory"}
+    - {good: salt, price: 12, origin: spain, note: "judgement"}
+    - {good: fresh beef, price: 26, origin: spain, note: "judgement"}
+    - {good: biscuit, price: 32, origin: spain, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 16, pounds: 52, note: "a spar from the merchants' stores; judgement"}
+    - {item: cordage, hours: 3, pounds_per_fathom: 0.06, note: "judgement"}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.05, note: "judgement"}
+
+crew_pool:
+  # judgement: the Matrícula de Mar takes the coast's seamen for the King's ships
+  able: {hands: 3, pounds: 2, delay_h: 24}
+  ordinary: {hands: 6, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 10, pounds: 1, delay_h: 12}
+
+closed_to: []

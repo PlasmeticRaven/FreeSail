@@ -360,3 +360,47 @@ def test_spithead_is_a_passage_on_the_whole_chart_from_the_downs_to_spithead():
     assert load_climatology().box_at(51.05, 2.37).name == "channel"
     assert begin(world, sf) >= 10
     assert not [e for e in world.log if e.kind == "order.rejected"]
+
+
+# Package 79c: the Mediterranean west, the frigate from Gibraltar bay to Port Mahon.
+MAHON = ROOT / "data" / "scenarios" / "mahon.yaml"
+
+
+def test_mahon_is_a_passage_on_the_whole_chart_from_gibraltar_road_to_port_mahon():
+    """The scenario names the chart, starts at anchor in Gibraltar road (the Strait's patch),
+    loads Gibraltar and the block's eight ports and its own book, every order of which is
+    taken, and its mark is the chart's: the anchorage off the mouth of Port Mahon by name in
+    the Balearics' patch, some five hundred and ten miles direct, the block's two regions
+    and its own weather box between."""
+    sf = load_scenario(MAHON)
+    sc = sf.scenario
+    assert sc.chart == "atlantic-east" and sf.seed == 7 and sc.nation == "britain"
+    assert sf.standing_orders == ["data/scenarios/mahon.orders"]
+    world = make_scenario_world(sf)
+    chart = world.chart
+    assert {"mediterranean-west", "balearics"} <= set(chart.regions)
+    start = world.position
+    assert chart.region_at(start) == "strait" and chart.level_at(start) == 3
+    assert list(world.dealings.ports) == [
+        "gibraltar",
+        "algeciras",
+        "malaga",
+        "almeria",
+        "cartagena",
+        "ivica",
+        "palma",
+        "port-mahon",
+        "oran",
+        "algiers",
+    ]
+    mouth = chart.find_feature("the anchorage off the mouth of Port Mahon")
+    assert mouth is not None and mouth.id == "mahon-outer-road"
+    assert chart.level_at(mouth.position) == 3 and chart.region_at(mouth.position) == "balearics"
+    _, run_m = bearing_and_distance(start, mouth.position)
+    assert 490.0 < run_m / 1852.0 < 530.0  # some five hundred and ten miles direct
+    from freesail.world.weather import load_climatology
+
+    clim = load_climatology()
+    assert clim.box_at(36.6, -3.0).name == clim.box_at(39.86, 4.32).name == "mediterranean-west"
+    assert begin(world, sf) >= 10
+    assert not [e for e in world.log if e.kind == "order.rejected"]

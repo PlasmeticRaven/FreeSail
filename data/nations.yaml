@@ -375,6 +375,50 @@ nations:
       portugal: "peace; JUDGEMENT"
       denmark: "peace; JUDGEMENT"
       batavian-republic: "peace; JUDGEMENT"
+      algiers: "peace; JUDGEMENT (package 79c: neighbours on the Barbary shore, no war between them read)"
+
+  # package 79c: the regency of Algiers, for Algiers and Oran (the Mediterranean's west
+  # block), data alone in Morocco's form. The Dey's corsairs (the reis's cruisers, the
+  # regency's whole navy and its revenue with the tributes) are noted here and not
+  # modelled: the brief, and the naval entry below. Oran and Mers-el-Kebir the regency's
+  # since Spain gave them up in 1792 (Tofiño 1787, pp. 147 to 149, describes them Spanish;
+  # the cession FROM MEMORY). The relations from the works on file where they speak
+  # (James), else from memory, said so.
+  algiers:
+    name: Algiers
+    adjective: Algerine
+    people: the Algerines
+    names: english               # no Algerine names list; the pilots' names are the port files'
+    colours: "the regency's flag of horizontal stripes, red, yellow and green (FROM MEMORY; the flags flown at Algiers varied, the corsairs' red with the sword of Ali among them)"
+    flag: "the striped flag of Algiers"    # the flag's short word, for the lookout (package 36)
+    letters_of_marque: false     # the corsairs are the Dey's own cruisers, at peace with Britain, noted and not modelled (the brief)
+    closed_to: []
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "no record read; the common habit (judgement, as Morocco's, package 71)"
+    signals: {root: basic, system: basic}
+    marines: {kit: basic}
+    # the Dey's cruisers keep the sea against the nations at war with him or behind in their
+    # tribute, and are not modelled (the brief): the knobs say none goes to sea in the world
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "judgement: the regency's corsairs not modelled (the brief); James vol. 3 pp. 168 to 169 (1800 to 1802): the regencies of Algiers, Tripoli and Tunis paid tribute by the Christian powers to abstain from their commerce, the United States among them"
+    relations:
+      britain: "peace, with differences settled by the fleet's visits: James vol. 3 p. 235 (January 1804, Captain Keats in the Superb detached 'to settle some dispute with the Dey of Algiers', Nelson himself off the Barbary coast on the 17th) and pp. 333 to 334 (January 1805, the Superb rejoined 'from Algiers; whither she had been sent to arrange some difference with the Dey'); the fleet's bullocks and water from the Barbary shore"
+      spain: "peace since the treaty of 1786 (FROM MEMORY); Oran and Mers-el-Kebir given up to the Dey in 1792 (FROM MEMORY), Spanish when Tofiño surveyed them (Tofiño 1787, pp. 147 to 149)"
+      france: "peace since the treaty of December 1801, after the rupture over Egypt in 1798 (FROM MEMORY)"
+      united-states: "peace by the treaty of 1795 and its tribute: James vol. 3 pp. 168 to 169 (the George Washington sent to Constantinople with the Dey's presents in October 1800, Algiers 'partially appeased' by the arrears of the subsidy); the Tripolitan war of 1801 to 1805 not Algiers' (James vol. 3 p. 169)"
+      portugal: "war, the regency's corsairs taking Portuguese ships, a truce of 1793 broken and no peace until 1813 (FROM MEMORY; NOT entered in the wars below until a work on file gives it, so that the table's stance between them is neutral: for the lead)"
+      denmark: "peace by treaty and tribute (FROM MEMORY)"
+      batavian-republic: "UNVERIFIED (the Dutch paid tribute; the state of 1805 not found in the works on file); taken as peace"
+      morocco: "peace; JUDGEMENT"
 
 # Who is at war with whom in June 1805, each war once, with its beginning and its source.
 wars:
@@ -461,3 +505,14 @@ ports:
   boulogne: france
   calais: france
   dunkirk: france
+  # the Mediterranean west (package 79c, the regions mediterranean-west and balearics):
+  # the Spanish ports at war with Britain since December 1804, hostile to a King's ship and
+  # open to a neutral; Oran and Algiers the regency of Algiers', at peace with Britain
+  malaga: spain
+  almeria: spain
+  cartagena: spain
+  palma: spain
+  port-mahon: spain
+  ivica: spain
+  oran: algiers
+  algiers: algiers

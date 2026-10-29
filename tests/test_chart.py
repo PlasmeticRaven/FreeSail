@@ -893,6 +893,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     regions += ["portugal"]  # package 39d
     regions += ISLANDS  # package 39e: the islands after the coast's blocks
     regions += ["strait"]  # package 39f
+    # package 79c: the Mediterranean west in two regions (the lead's ruling)
+    regions += ["mediterranean-west", "balearics"]
     assert manifest["charts"][WHOLE]["regions"] == regions
     assert manifest["charts"][WHOLE]["corridor"] == CORRIDOR
     assert whole.region == whole.name == WHOLE and whole.regions == regions
@@ -900,10 +902,10 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     # the envelope of the regions and the corridor: Biscay north reaches 0.9 W for
     # Rochefort on the Charente (package 39b), the Western Islands 31.5 W (package 39e;
     # 32 W with the corridor widened to them); the Channel's east block 51.5 N and 2.5 E
-    # (package 79b), across the meridian
+    # (package 79b), across the meridian; the Balearics 4.5 E (package 79c)
     west = min(-31.5, float(manifest["corridors"][CORRIDOR]["bounds"]["west"]))
-    assert whole.bounds == (32.0, 51.5, west, 2.5)
-    assert whole.bounds_words() == f"32 to 51.5 N, {abs(west):g} W to 2.5 E"
+    assert whole.bounds == (32.0, 51.5, west, 4.5)
+    assert whole.bounds_words() == f"32 to 51.5 N, {abs(west):g} W to 4.5 E"
     assert whole.contains(OFF_LISBON) and whole.contains(LIZARD)
     assert not whole.contains(Position(52.0, -5.0))
     assert whole.region_at(LIZARD) == "channel-west" and whole.region_at(OFF_MOROCCO) is None
@@ -916,6 +918,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     islands = [load_chart(r) for r in ISLANDS]
     strait = load_chart("strait")  # package 39f
     east = load_chart(EAST)  # package 79b
+    medw = load_chart("mediterranean-west")  # package 79c
+    balearics = load_chart("balearics")  # package 79c
     assert whole.features.keys() == (
         chart.features.keys()
         | mid.features.keys()
@@ -925,6 +929,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         | set().union(*(i.features.keys() for i in islands))
         | strait.features.keys()
         | east.features.keys()
+        | medw.features.keys()
+        | balearics.features.keys()
     )
     assert all(whole.region_of[fid] == "channel-west" for fid in chart.features)
     assert all(whole.region_of[fid] == MID for fid in mid.features)
@@ -933,6 +939,9 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
     assert all(whole.region_of[fid] == "portugal" for fid in portugal.features)
     assert all(whole.region_of[fid] == "strait" for fid in strait.features)  # package 39f
     assert all(whole.region_of[fid] == EAST for fid in east.features)  # package 79b
+    # package 79c: the Mediterranean west's two regions
+    assert all(whole.region_of[fid] == "mediterranean-west" for fid in medw.features)
+    assert all(whole.region_of[fid] == "balearics" for fid in balearics.features)
     assert whole.find_feature("the Lizard") is chart.find_feature("the Lizard") or (
         whole.find_feature("the Lizard").id == chart.find_feature("the Lizard").id
     )
@@ -945,6 +954,8 @@ def test_the_chart_is_the_whole_manifest_and_a_regions_name_is_a_chart_of_that_r
         + sum(len(i.coast_lines()) for i in islands)
         + len(strait.coast_lines())
         + len(east.coast_lines())
+        + len(medw.coast_lines())
+        + len(balearics.coast_lines())
     )
     assert len(chart.coast_lines()) > 0 and len(biscay.coast_lines()) > 0
     # the one-region chart as before: its own levels and bounds, no corridor
@@ -2030,3 +2041,118 @@ def test_the_depths_in_the_channel_easts_roads_and_its_seam_at_1_w():
     assert whole.region_at(a) == MID and whole.region_at(b) == EAST
     assert whole.level_at(a) == whole.level_at(b) == 2
     assert abs(whole.depth_at(a) - whole.depth_at(b)) < 1.0
+
+
+# ---------------------------------------------------------------------------
+# Package 79c: the Mediterranean west, two regions by the lead's ruling
+# ---------------------------------------------------------------------------
+
+MEDW = "mediterranean-west"  # package 79c
+BALEARICS = "balearics"  # package 79c
+
+
+def test_the_mediterranean_wests_two_regions_pass_their_checks_and_keep_their_seams(
+    manifest, capsys
+):
+    """The block, past the brief's 40 MB in one region (57.5 MB), built as two by the lead's
+    ruling: `mediterranean-west` abuts the Strait at 5 W, whose column of three tiles there
+    stays the Strait's ("3 kept"); `balearics` abuts it at 0.05 E, the column that meets both
+    bounds `mediterranean-west`'s, built first ("14 kept"); every tile written, each region
+    under the 40 MB; its harbour patches its own; every feature within its bounds and citing
+    its source; no override, no sheet having been read with its datum."""
+    tool = build_tool()
+    for region, kept, patches in (
+        (MEDW, 3, {"malaga", "almeria", "cartagena", "oran"}),
+        (BALEARICS, 14, {"palma", "port-mahon", "ivica", "algiers"}),
+    ):
+        assert tool.main(["--check", region]) == 0
+        out = capsys.readouterr().out
+        for words in (
+            "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
+            "ids unique across the manifest's regions: yes",
+            "harbour patches with their datum stated: 0 of 0",
+            "the fetch box covers the tiles whole: yes",
+            f"tiles another region lists: {kept} kept",
+            "passes its checks",
+        ):
+            assert words in out, (region, words)
+        features, _ = tool.load_features(region)
+        assert len(features) >= 85, region
+        assert f"features within the bounds: {len(features)} of {len(features)}" in out
+        assert f"sources in the references' form: {len(features)} of {len(features)}" in out
+        entry = manifest["regions"][region]
+        assert entry["fill_to_chart_datum"] is True and entry["overrides"] == []
+        assert set(entry["harbours"]) == patches
+        size = 0
+        for level in ("2", "3"):
+            for t in entry["tiles"].get(level, []):
+                path = CHARTS / "tiles" / level / f"{t['name']}.npz"
+                assert path.exists(), t["name"]
+                size += path.stat().st_size
+        assert size < 40e6, (region, size)  # the brief's rule, each region
+    medw, bal = manifest["regions"][MEDW], manifest["regions"][BALEARICS]
+    assert medw["bounds"] == {"south": 35.0, "north": 40.5, "west": -5.0, "east": 0.05}
+    assert bal["bounds"] == {"south": 35.0, "north": 40.5, "west": 0.05, "east": 4.5}
+    for other in ("strait", MEDW):
+        for level in ("2", "3"):
+            theirs = {t["name"] for t in manifest["regions"][other]["tiles"].get(level, [])}
+            mine = {t["name"] for t in (bal if other == MEDW else medw)["tiles"].get(level, [])}
+            assert not theirs & mine, (other, level)
+    regions = manifest["charts"][WHOLE]["regions"]
+    assert regions.index(MEDW) == regions.index("strait") + 1
+    assert regions.index(BALEARICS) == regions.index(MEDW) + 1
+
+
+def test_the_mediterranean_wests_lights_of_1805_are_three_and_mahon_has_none():
+    """The brief's item 3: 1805 sees what 1805 had. Málaga's mole lantern (Tofiño 1787,
+    p. 34), Porto Pí's by Palma, lit every night at the hour of the Ánimas (p. 185; its
+    privilege of 1369, Vargas Ponce 1787), and Algiers' mole lantern, lit every night
+    (Michelot 1709, 1715): three. No light at Cartagena, Cape de Gata, Alboran, Cape Palos,
+    Melilla, Oran or Mahon (Purdy 1840: no regular light-tower in the Balearics but Palma's);
+    Mers-el-Kebir's 'linterna' a tower of the castle, its light only planned in 1837."""
+    tool = build_tool()
+    whole = load_chart(WHOLE)
+    lights = []
+    for region in (MEDW, BALEARICS):
+        features, _ = tool.load_features(region)
+        lights += [whole.feature(f["id"]) for f in features if f["kind"] == "light"]
+    assert sorted(f.id for f in lights if f.lit_in(1805)) == [
+        "algiers-lantern",
+        "malaga-mole-light",
+        "porto-pi-light",
+    ]
+    assert whole.feature("mers-el-kebir-linterna").kind == "tower"
+    mahon = whole.feature("mahon-outer-road").position
+    near_mahon = [f for f in lights if bearing_and_distance(f.position, mahon)[1] < 60_000]
+    assert near_mahon == []
+
+
+def test_the_mediterranean_wests_roads_and_its_seams_at_5_w_and_0_05_e():
+    """The block's roads at their pilots' depths within the grid's smoothing, each at level
+    3 in its patch: Málaga's eight to twelve brazas, Almería's eight to fifteen, the
+    Espalmador grande's five and six, Mers-el-Kebir's sixteen to twenty, Palma's off the
+    Lazareto, Port Mahon's south of the arsenal's island seven or eight and at its mouth
+    twenty to thirty; a cable either side of 5 W and of 0.05 E reads its own region's tile
+    with no step."""
+    whole = load_chart(WHOLE)
+    for fid, (lo, hi) in {
+        "malaga-road": (12.0, 30.0),
+        "almeria-road": (10.0, 30.0),
+        "espalmador-grande": (6.0, 14.0),
+        "mers-el-kebir-road": (10.0, 40.0),
+        "palma-road": (5.0, 20.0),
+        "mahon-arsenal-anchorage": (11.0, 20.0),
+        "mahon-outer-road": (30.0, 55.0),
+    }.items():
+        f = whole.feature(fid)
+        d = whole.depth_at(f.position)
+        assert lo < d < hi, (fid, d)
+        assert whole.level_at(f.position) == 3, fid
+    for lat, lon, west, east in (
+        (36.40, -5.0, "strait", MEDW),
+        (37.0, 0.05, MEDW, BALEARICS),
+    ):
+        a, b = Position(lat, lon - 0.002), Position(lat, lon + 0.002)
+        assert whole.region_at(a) == west and whole.region_at(b) == east
+        assert whole.level_at(a) == whole.level_at(b) == 2
+        assert abs(whole.depth_at(a) - whole.depth_at(b)) < 6.0

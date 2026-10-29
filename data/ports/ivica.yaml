@@ -1,0 +1,107 @@
+# FreeSail: Ivica (Ibiza) as a port (spec M6 §26; package 79c, the Balearics), on package
+# 35's machinery; the marks are the features file's (data/charts/features/balearics.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Entrada en el Puerto de Iviza', pp. 181
+# to 182: from the westward a great ship takes the Freu Grande, steering for the tower of the
+# Espalmador and, with it east a mile and a half, for the middle of the Freu, minding only
+# the four brazas a cable off the Ahorcados; then for the castle of Ivica, leaving the Dados
+# to starboard and the Esponja and the Malvins to port; into the middle of the harbour's
+# mouth, the islands Grosa and Botafoc to starboard and the Point Rayada to port, and anchor
+# in 7 or 8 brazas, the best, the best cable to the south-west and nearer the Isla Plana
+# than the town, to make fast to it in the hard easterlies; in winter, when the north and
+# north-west winds blow hard, back the north-east anchor, for they drag easily; not to be
+# entered by night without much practice; many have taken the Espalmador's tower for that of
+# the Portas and been lost on the Trocados. Purdy 1826, pp. 32 to 35; Vargas Ponce 1787,
+# pp. 1 to 20.
+#
+# The datum: UNVERIFIED. No period sheet is patched at Ivica in this package (Roux's plate 7
+# read and not transcribed, CC BY-NC-SA); the chart's depths are EMODnet's at the lowest
+# astronomical tide, the modern port's moles in the grid.
+#
+# The stance. Ivica is Spain's: hostile to a King's ship from December 1804, open to a
+# neutral. Prices FROM MEMORY or JUDGEMENT, sterling at the exchange.
+
+id: ivica
+name: Ivica
+nation: spain
+source: "Tofiño 1787 pp. 181-182 (the entry by the Freus, the harbour, the anchoring); Purdy 1826 pp. 32-35; Vargas Ponce 1787 pp. 1-20"
+datum: unverified
+
+outer_road:
+  name: off the mouth of Ivica harbour
+  lat_deg: 38.8950
+  lon_deg: 1.4650
+anchorage:
+  feature: ivica-harbour-anchorage
+  name: the harbour of Ivica
+  lat_deg: 38.9095
+  lon_deg: 1.4440
+mooring:
+  feature: ivica-harbour-anchorage
+  name: in the harbour of Ivica, nearer the Isla Plana than the town
+  lat_deg: 38.9095
+  lon_deg: 1.4440
+  depth_fathoms: 7
+  bottom: sand and mud
+  deep_draught_ft: 18    # judgement: seven or eight brazas, the best
+shore:
+  feature: ivica-castle
+  name: the town of Ivica under its castle
+  lat_deg: 38.9067
+  lon_deg: 1.4360
+
+pilot:
+  station: ivica-harbour-anchorage
+  cruising_nm: 3                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a llaüt of Ivica
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Tur, Ribas, Marí, Torres, Costa, Planells, Serra, Prats]   # Ivizan names: judgement
+  skill: 0.85
+  fee_pounds: 1.5                # judgement; unverified
+  cast: starboard
+  course_out_deg: 140            # out to the south-east between the Grosa and the Dados (judgement)
+  words:
+    channel: "From the westward take the Freu Grande: steer for the tower of the Espalmador and with it east a mile and a half you have the Freu open; keep its middle, minding only the four brazas a cable off the Ahorcados. Then steer for the castle of Ivica, leaving the Dados to starboard and the Esponja and the Malvins to port. Do not take the Espalmador's tower for that of the Portas, or you are on the Trocados; and do not enter by night without much practice."
+    marks: "The castle and the town of Ivica on their hill; the islands Grosa and Botafoc at the harbour's mouth; the tower of the Espalmador and the tower of the Portas at the Freus; the Vedrá to the south-west."
+    anchorage: "Anchor in seven or eight brazas, the best, with the best cable to the south-west, nearer the Isla Plana than the town, so that you may make fast to it in the hard easterlies. In winter, when the north and north-west winds blow hard, back the north-east anchor, for they drag easily."
+    tide: "There is no tide here to speak of."
+
+tide:
+  establishment: Ivica
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 20, origin: algiers, note: "the Barbary grain the coast and the islands imported from Oran and Algiers (from memory); the price judgement"}
+    - {good: salt, price: 8, origin: spain, note: "the salt pans by Cape Falcó, the island's great export; from memory"}
+    - {good: almonds, price: 38, origin: spain, note: "judgement"}
+    - {good: carobs, price: 8, origin: spain, note: "judgement"}
+    - {good: figs, price: 16, origin: spain, note: "judgement"}
+    - {good: timber, price: 6, origin: spain, note: "the island's pines; judgement"}
+    - {good: wine, price: 26, origin: spain, note: "judgement"}
+    - {good: fresh beef, price: 25, origin: spain, note: "judgement"}
+    - {good: fowls, price: 4, origin: spain, note: "judgement"}
+    - {good: vegetables, price: 3, origin: spain, note: "judgement"}
+    - {good: biscuit, price: 32, origin: spain, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 24, pounds: 50, note: "a pine spar of the island, slowly; judgement"}
+    - {item: cordage, hours: 4, pounds_per_fathom: 0.07, note: "judgement"}
+    - {item: water, hours_per_ton: 0.2, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.05, note: "judgement"}
+
+crew_pool:
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 3, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 5, pounds: 1, delay_h: 12}
+
+closed_to: []

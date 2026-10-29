@@ -1,0 +1,109 @@
+# FreeSail: Oran with Mers-el-Kebir as a port (spec M6 §26; package 79c, the Mediterranean
+# west's block), on package 35's machinery; the marks are the features file's
+# (data/charts/features/mediterranean-west.yaml).
+#
+# Sources. Tofiño 1787, Derrotero del Mediterráneo, 'Punta de Mazalquivir', 'Castillo de
+# Santa Cruz', pp. 147 to 148 (surveyed while Oran was Spain's): S 66° E five miles from
+# Cape Falcón the point of Mers-el-Kebir and the castle of Almansa with its lantern at the
+# end; south of the point the harbour of that name, good for every kind of vessel, moored
+# NW and SE with the backing anchor that way in 20 to 16 brazas, sand and weed, for ships of
+# the line, in less or with a hawser ashore for xebecs; the south-west wind, the
+# 'Polvorista', blows very hard down the valley, so that the anchors must be backed, for
+# they drag; the castle of Santa Cruz on its hill, the town at its foot, a level mountain
+# (the Meseta) west of it for its knowledge, and Mount San Agustín inland to the east; in
+# fine weather a ship may anchor off Oran to land her cargo at the little beach of the
+# Blanquillo. Purdy 1826, p. 323 ('Marsa Kibbeer'); Bérard 1837, pp. 172 to 174.
+#
+# The datum: UNVERIFIED. No period sheet is patched at Oran in this package (Roux's plate 48
+# read and not transcribed, CC BY-NC-SA); the chart's depths are EMODnet's at the lowest
+# astronomical tide, the modern ports of Oran and Mers-el-Kebir in the grid.
+#
+# The stance. Oran and Mers-el-Kebir were Spain's until 1792 and are the regency of
+# Algiers' in 1805 (the nations table, `algiers`; the Bey of the West at Oran under the Dey,
+# FROM MEMORY): at peace with Britain, neutral to a King's ship, as to every flag the table
+# has. The regency's corsairs are noted here and not modelled (the brief). Prices FROM
+# MEMORY or JUDGEMENT, sterling at the exchange.
+
+id: oran
+name: Oran
+nation: algiers
+source: "Tofiño 1787 pp. 147-148 (Mers-el-Kebir's harbour, the Polvorista, Santa Cruz, the Blanquillo); Purdy 1826 p. 323; Bérard 1837 pp. 172-174"
+datum: unverified
+
+outer_road:
+  name: the bay of Oran
+  lat_deg: 35.7400
+  lon_deg: -0.6700
+anchorage:
+  feature: mers-el-kebir-road
+  name: the harbour of Mers-el-Kebir
+  lat_deg: 35.7290
+  lon_deg: -0.6976
+mooring:
+  feature: mers-el-kebir-road
+  name: south of the point of Mers-el-Kebir, moored north-west and south-east
+  lat_deg: 35.7290
+  lon_deg: -0.6976
+  depth_fathoms: 16
+  bottom: sand and weed
+  deep_draught_ft: 22    # judgement: twenty to sixteen brazas for a ship of the line
+shore:
+  feature: oran
+  name: the beach of the Blanquillo before Oran
+  lat_deg: 35.7050
+  lon_deg: -0.6450
+
+pilot:
+  station: mers-el-kebir-road
+  cruising_nm: 2                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: a boat of Mers-el-Kebir
+    under: a lateen sail and oars
+    note: "judgement"
+  names: [Hamet, Ali, Mustafa, Hassan, Ibrahim, Yusuf, Omar, Salah]   # judgement
+  skill: 0.8
+  fee_pounds: 1                  # judgement; unverified
+  cast: starboard
+  course_out_deg: 45             # out of the bay to the north-east (judgement)
+  words:
+    channel: "The point of Mers-el-Kebir lies five miles east-south-east of Cape Falcón, the castle on it with its lantern at the end; round it and the harbour opens to the southward, good for every kind of vessel."
+    marks: "The castle of Mers-el-Kebir on its point; the castle of Santa Cruz on its hill over Oran with the town at its foot; the level mountain west of it, and Mount San Agustín inland to the east."
+    anchorage: "A ship of the line moors north-west and south-east in twenty to sixteen brazas, sand and weed, south of the point; back your anchors, for the south-wester they call the Polvorista blows very hard down the valley and they drag. In fine weather you may lie off Oran to land at the Blanquillo."
+    tide: "There is no tide; inshore from Oran the current runs to the westward toward the Strait."
+
+tide:
+  establishment: Oran
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wheat, price: 14, origin: algiers, note: "the Oranais grain; judgement"}
+    - {good: barley, price: 11, origin: algiers, note: "judgement"}
+    - {good: cattle, price: 18, origin: algiers, note: "judgement"}
+    - {good: fresh beef, price: 22, origin: algiers, note: "judgement"}
+    - {good: hides, price: 44, origin: algiers, note: "judgement"}
+    - {good: wool, price: 28, origin: algiers, note: "judgement"}
+    - {good: wax, price: 115, origin: algiers, note: "judgement"}
+    - {good: olive oil, price: 44, origin: algiers, note: "judgement"}
+    - {good: fowls, price: 3, origin: algiers, note: "judgement"}
+    - {good: vegetables, price: 3, origin: algiers, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 36, pounds: 65, note: "a spar hard come by on this coast; judgement"}
+    - {item: cordage, hours: 6, pounds_per_fathom: 0.08, note: "judgement"}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "judgement"}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.04, note: "judgement"}
+
+crew_pool:
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 0, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 0, pounds: 1, delay_h: 24}
+
+closed_to: []
