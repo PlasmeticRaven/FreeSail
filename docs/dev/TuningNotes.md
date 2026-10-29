@@ -11773,3 +11773,141 @@ again, passed). `test_pictures.py::test_the_mcp_bridge_returns_the_chart_and_the
 alone on this tree (run once after), and its picture is the default scenario's chart about
 Falmouth, which this block does not reach. Not run again whole, as the suites' rule has it.
 
+
+## Package 79c: the Mediterranean's west block, the Strait to Cartagena, the Balearics and Barbary to Algiers (2026-10-29)
+
+Package 79c (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79c"; built as
+`docs/dev/ChartBlocks.md` says). The region `mediterranean-west`, abutting `strait` at 5 W.
+It begins with the research pass (the brief's item 0), committed and pushed on its own
+because package 79d builds from it; the build's sections follow below it as the steps are
+done.
+
+### The research pass (step 0): the pilots and plans of both basins
+
+**Where it was looked for.** The Internet Archive answered every request (its advanced
+search, metadata, downloads and IIIF server; the IIIF server answers 504 for some leaves
+under load and 403 for a width above the scan's own, so the tables' pages were cut from the
+items' PDFs instead). **Refused, by the hosts and not by this environment's network** (the
+proxy passed every request; each host answered with its own Cloudflare page): Gallica
+(`gallica.bnf.fr`, 403 "Attention Required! | Cloudflare", to curl and to the session's
+web reader alike), the Biblioteca Digital Hispánica (`bdh.bne.es`, 403 from Cloudflare),
+HathiTrust (`catalog.hathitrust.org` and `babel.hathitrust.org`, 403 "Just a moment...")
+and Europeana (403 "Just a moment..."). Google's Books API answered 429, its unkeyed daily
+quota nought. So Tofiño's derrotero and atlas were taken from the Archive's copies rather
+than the BDH's, and no edition of Michelot and Brémond after 1709 was reachable (Gallica's).
+
+**Found, fetched and committed** (OCR texts under `docs/references/pilots/`, each with its
+README row saying what it covers and is trusted for; all public domain by age, the
+Admiralty's two volumes Crown copyright expired fifty years after publication):
+
+| Text | Period | Answers for |
+|---|---|---|
+| Tofiño, *Derrotero ... en el Mediterráneo*, 1787 | the period's own survey | **79c's spine**: the Spanish coast from Europa Point to Cape Creus, the Balearics whole, Africa from Ceuta to Bugia; Cartagena's arsenal, Mahón's lazaretto and the Isla del Rey's hospital; the lights of 1787 (the "linternas" of Málaga's mole, Porto Pí, Mers-el-Kebir, Algiers); the Barbary current; the Balearics' rise |
+| Vargas Ponce, *Descripciones de las islas Pithiusas y Baleares*, 1787 | the period | the islands' towns and works (Porto Pí's old light; the Isla del Rey's hospital of 1711; Fornells) |
+| Michelot, *Portulan de la mer Méditerranée*, 1709, and *The Mediterranean Pilot*, 1715 | before the period, in use through it | both basins (no Alboran, Oran or Melilla; Sardinia not described); the Gulf of Lion, Provence, the Riviera, Corsica for 79d |
+| Grasset de Saint-Sauveur, *Voyage dans les îles Baléares et Pithiuses ... 1801 à 1805*, 1807 | the period exactly | the Balearics in 1801 to 1805: Mahón's lazaretto and hospital, Porto Pí's fanal, the islands' state |
+| Purdy, *New Sailing Directions for the Mediterranean*, 1826 | twenty years after | both basins whole, with Barbary (Tetuan to Algiers) and Agincourt Sound; lights dated where it dates them |
+| Norie, *New Piloting Directions for the Mediterranean*, 1831 | after | both basins; the currents at Palos and off Algiers |
+| Bérard, *Description nautique des côtes de l'Algérie*, 1837 | after (survey 1831 to 1833) | Algiers, Oran and Mers-el-Kebir, the Zafarines; the currents; Algiers' gauge of 1831 |
+| Purdy, *New Sailing Directory for the Strait and the Western Division*, 1840 | after | **the lights' dates** (its "Pharonology"), the edition the Archive has in place of the brief's 1832 |
+| Lamberti, *Portolano del mare Mediterraneo*, 1844 | Michelot in Italian, with the lights | 79d chiefly (Provence, the Riviera, Elba, Naples, Corsica, Sardinia with the Maddalena) |
+| *Derrotero ... desde el cabo de Creus*, 1849 | Tofiño's sequel | **79d's spine in Spanish**: the Gulf of Lion to Italy, Corsica, Sardinia, Elba; not Spain or Algiers |
+| Smyth, *Sketch of the Present State of Sardinia*, 1828 | his survey of 1823 to 1824 | 79d: Sardinia's coasts, the Maddalena and Nelson's berth at Mezzo Schifo (Agincourt Sound) |
+| Smyth, *The Mediterranean*, 1854 | after | both basins: the currents, the tides, the winds, the table of positions with the lights |
+| Admiralty, *Mediterranean Pilot* vol. I, 1913 (and its supplement of 1917), vol. II, 1916 | modern | the banks, depths and water of both basins; **the meteorological tables** (below); never 1805's lights or works |
+
+**Page images** under `docs/references/pilots/pages/`: the Admiralty's meteorological
+tables, printed sideways and read upside down by the OCR, cut from the PDFs at 200 dpi:
+vol. I pp. 724 (Gibraltar), 725 (Cartagena), 727 (Palma), 728 (Port Mahon), 729 (Oran),
+730 (Algiers), 738 (Cagliari); vol. II pp. 462 (Marseille), 463 (Ajaccio), 464 (Genoa),
+465 (Leghorn), 466 (Naples). Each gives by month the barometer, the air's temperature,
+the humidity, cloud, rain, the number of days of wind from each of the eight points and
+calm, and the days of gales and fogs, from ten to forty years' observations. **Port
+Mahon's wind columns are blank** (its gales and fogs only); **no table for Málaga or
+Toulon**; Barcelona's (p. 726) is outside both blocks and not cut.
+
+**The plans, read and not committed** (the David Rumsey Map Collection's scans on the
+Archive, CC BY-NC-SA 3.0, as the blocks before treated Bellin's: read at full resolution,
+cached, cited): Roux's *Recueil des principaux plans des ports et rades de la Méditerranée*
+(1764), all 176 plates, among them pl. 2 Gibraltar bay, 3 Málaga, 4 Almería, 5 Cartagena,
+7 Ivica and Formentera, 8 Palma, 9 Alcudia, 10 Port Mahon, 47 Tangier, 48 Oran, 49 Arzew,
+50 Algiers, and for 79d pls. 12 to 39 (Barcelona and Roses to Marseille, Toulon, the Hyères,
+Villefranche, Genoa, Spezia, Leghorn, Porto Ferrajo, Civita Vecchia, Gaeta, Naples, Calvi,
+Porto Vecchio, Bonifacio, the Gulf of Palmas, Cagliari); Heather's *New Mediterranean Harbour
+Pilot* (1814, 224 plans on 60 sheets; Tofiño's Cartagena and Port Mahon, Michelot's Málaga
+and Almería, Ivica, the Bay of Algiers, Ceuta; Toulon, Corsica, Sardinia, Elba, Gaeta,
+Naples and the Bonifacio strait for 79d); Tofiño's *Atlas Marítimo de España* sheets of the
+Mediterranean (1786 to 1789: Europa Point to Cape de Gata with Africa from Ceuta to Cape
+Hone, Gata to Oropesa, Oropesa to Creus, the Balearics, Majorca, Ivica and Formentera,
+Minorca, *El Puerto de Mahón y su costa*, Algeciras bay, the Strait, the coastal views);
+the Universidad de Sevilla's copy of the atlas (`A062039040`, Public Domain Mark) has the
+Mediterranean sheets too (its leaves seen in a contact sheet, ten of them answering 504 at
+the IIIF server and to be read at the build). No plan of Cartagena by Tofiño is among the
+Rumsey atlas sheets; Heather's engraving of it is.
+
+**Not found.** Heather's *New Mediterranean Pilot*'s text (1802 or after): on the Archive
+are only his 1814 harbour plans. Roux's *Recueil* as text: plates only. Michelot and
+Brémond's later editions (1730, 1779, 1802): Gallica's, refused; the Archive has the
+Sevilla *Recueil de plusieurs plans* of about 1727 to 1730 (`A298163`, `BUSA298_163`,
+plates) and the 1709 *Portulan*. **The Admiralty's *Mediterranean Pilot* of the 1880s**:
+not on the Archive (its earliest volume I there is 1913's, its volume II 1916's); the
+fifth editions serve, for the water and the tables. Norie's Mediterranean directions are
+the 1831 edition. A second part of Baudin's *Manuel du pilote de la mer Méditerranée*
+(1840) was fetched and is not committed: it is the eastern sea only, from Tunis.
+
+**Which text answers for which coast.**
+
+- *The Spanish coast, Europa Point to Cape Palos (79c)*: Tofiño 1787 for the coast and
+  works of the period, his atlas's sheets for the shape; Michelot 1709/1715 beside him;
+  Purdy 1826, Norie 1831 and the Admiralty 1913 (ch. II) for the depths; Roux's and
+  Heather's plans of Málaga, Almería and Cartagena for the patches.
+- *The Balearics (79c)*: Tofiño 1787 (pp. 156 to 224), Vargas Ponce 1787 and Grasset 1807
+  for the towns and works of the period (Mahón's lazaretto and the Isla del Rey hospital,
+  Porto Pí's light); Tofiño's island sheets and his plan of Mahón, Roux's Palma, Alcudia
+  and Port Mahon; the Admiralty 1913 ch. IV.
+- *The Barbary coast, Ceuta to Algiers (79c)*: Tofiño 1787 (pp. 55 to 63 and 145 to 155),
+  Purdy 1826 § XXI, Bérard 1837 for the survey of the 1830s; Roux's Oran and Algiers;
+  Heather's Algiers and Ceuta; the Admiralty 1913 ch. V.
+- *The Gulf of Lion, Provence and the Riviera (79d)*: Michelot 1709/1715, the Derrotero
+  1849, Lamberti 1844, Purdy 1826 § IV and V, Norie 1831 § IV and V, the Admiralty 1916
+  ch. II; Roux's plates 12 to 28.
+- *Corsica, Elba and Tuscany (79d)*: Michelot, the Derrotero 1849, Lamberti, Purdy § VI and
+  VIII, Norie § VI and VII, the Admiralty 1916 chs. III and IV; Roux's 30, 31, 35 to 37;
+  Heather's Corsican and Elban plans.
+- *Sardinia, the Maddalena and Agincourt Sound (79d)*: Smyth 1828 (the survey), Purdy 1826
+  § VII, Norie 1831 § VI, the Derrotero 1849, the Admiralty 1913 ch. IX; Roux's 37 to 39.
+- *Naples and the Tyrrhenian (79d)*: Michelot, Lamberti, the Derrotero 1849, Purdy § VIII,
+  Norie § VII, the Admiralty 1916 ch. V; Roux's 32 to 34; Heather's Gaeta and Naples.
+- *The lights' dates, both basins*: what the period texts name (Tofiño's linternas,
+  Michelot's fanals) is what 1805 had; Purdy 1840's Pharonology and the Derrotero 1849's
+  notes date the later ones; the encyclopaedias and the Lighthouse Directory at the build.
+- *The winds*: the Admiralty's tables (above) for the rows, the texts for the Levanter and
+  Poniente (Admiralty 1913 pp. 36 to 52; Purdy; Smyth 1854 Part III) and the Mistral
+  (Admiralty 1916 pp. 7 to 12).
+
+**What the pass already says for the build (to be read with the page at each step).**
+
+- *Lights of 1805 in 79c's water*: Málaga's mole (Tofiño's "linterna", and Purdy 1826's
+  "now distinguished by a light-house ... revolving", the later light), Porto Pí by Palma
+  (Vargas Ponce: privileged 1369), Mers-el-Kebir's castle (Tofiño), Algiers' mole (Tofiño,
+  Michelot). Not yet: Europa Point (begun 1838), Mers-el-Kebir's tower (planned in 1837),
+  any Minorcan light (Purdy 1840: none in the Balearics but Palma's), Alboran's and Cape
+  Palos's (the Admiralty's, later). Cartagena's mole-light Smyth 1854 lists, undated.
+- *The currents*: east from the Strait along the coast of Granada at about a knot (Smyth
+  1854 p. 168; the Admiralty 1913: four or five knots near the Strait to Málaga's meridian,
+  one or two to Gata), south-east off Cape Palos (Purdy, Norie), east along Barbary at about
+  a knot (the Admiralty; Bérard half a mile), but **westward close inshore from Oran toward
+  the Strait** (Tofiño p. 155, quoted by Bérard; Norie's north-westerly set off Algiers);
+  the Balearic channels' currents follow the wind (Tofiño).
+- *The tides*: Gibraltar five or six feet (Michelot; Tofiño "5 á 6 pies" in the bay), Málaga
+  about three (Purdy; Michelot "almost imperceptible"), Cartagena about sixteen inches
+  (Smyth), Mahón "a foot or two, irregular" (Smyth; the Admiralty "no regular tides"), the
+  Balearics one to two feet with gales (Tofiño), Algiers sixteen inches at most (Bérard's
+  gauge).
+
+**For the lead's sweep.** The committed texts carry period words a sweep for identifiers
+meets: the Mistral (the wind, through the Admiralty's volumes, Bérard and Smyth),
+"Claude" (the emperor Claudius, in Grasset's history, line 10913), Fort Opus in Dalmatia
+(Smyth 1854) and *opus* in Latin, Spanish *llama* ("is called"), the long s read as
+*fable*, the constellation Gemini (Admiralty 1916, Norie 1831): words of the texts, kept
+verbatim as the Channel's pilots' star names were.
