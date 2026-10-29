@@ -497,11 +497,21 @@ print(repr(seen))
 """
 
 
-def test_the_hook_runs_the_four_ships_modules_after_the_eight_writing_nothing(tmp_path):
-    """Build-Ships.md §3.1 items 1, 2 and 28: the generator writes the same eight files with
-    the four stubs in place, each module imported in the lead's order (the Indefatigable, the
-    Prince de Neufchatel, the bilander, the 74) after `gen_ships` is made the running script,
-    and each build writing nothing."""
+# The files each ships module writes, in the lead's order (Build-Ships.md §4.1): a stub writes
+# none, and a built module its own files only.
+MODULE_FILES = {
+    "ships.indefatigable": ["razee-44.yaml", "sixty-four.yaml"],
+    "ships.neufchatel": [],
+    "ships.bilander": [],
+    "ships.bellerophon": [],
+}
+
+
+def test_the_hook_runs_the_four_ships_modules_after_the_eight_each_writing_its_own(tmp_path):
+    """Build-Ships.md §3.1 items 1, 2 and 28: the generator writes the eight files unchanged,
+    then imports each module in the lead's order (the Indefatigable, the Prince de Neufchatel,
+    the bilander, the 74) after `gen_ships` is made the running script; each build adds its
+    own files and no other (§4.1), a stub none."""
     out = tmp_path / "ships"
     run = subprocess.run(
         [sys.executable, "-c", HOOK_PROBE, str(ROOT / "tools" / "gen_ships.py"), str(out)],
@@ -511,18 +521,16 @@ def test_the_hook_runs_the_four_ships_modules_after_the_eight_writing_nothing(tm
         text=True,
     )
     seen = ast.literal_eval(run.stdout.strip())
-    eight = sorted(p.name for p in (ROOT / "data" / "ships").glob("*.yaml"))
+    committed = sorted(p.name for p in (ROOT / "data" / "ships").glob("*.yaml"))
+    eight = sorted(set(committed) - {f for files in MODULE_FILES.values() for f in files})
     assert len(eight) == 8
-    assert [name for name, *_ in seen] == [
-        "ships.indefatigable",
-        "ships.neufchatel",
-        "ships.bilander",
-        "ships.bellerophon",
-    ]
+    assert [name for name, *_ in seen] == list(MODULE_FILES)
+    assert seen[0][2] == eight
     for name, aliased, before, after in seen:
         assert aliased, name
-        assert before == after == eight, name
-    for name in eight:
+        assert set(before) <= set(after), name
+        assert sorted(set(after) - set(before)) == MODULE_FILES[name], name
+    for name in committed:
         made = (out / name).read_text(encoding="utf-8")
         assert made == (ROOT / "data" / "ships" / name).read_text(encoding="utf-8"), name
 
