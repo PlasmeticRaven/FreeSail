@@ -720,11 +720,12 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     session's next window after the 74 closes package 75 is the two lateen hulls of the
     Mediterranean, the tartane of decision 11 and the xebec, each as a trader or fisherman
     and as a corsair or the King's by fits and roles, with the regency's cruisers as a role
-    (package 90, booked in `docs/dev/M7-WorkPackages.md`). The count aimed at, loosely:
-    twenty-some ships counting fits and sub-types on the same hull as the initial goal (the
-    files hold eight hulls and thirteen sub-types today; 75 makes thirteen hulls and about
-    twenty-three; the two make fifteen and about twenty-seven); once the work is mostly
-    content, the number grows as far as it likes.
+    (package 90, booked in `docs/dev/M7-WorkPackages.md`). The count aimed at, loosely,
+    **revised the same day: twenty classes, that is hulls, fits not counted** (the files hold
+    eight today; 75 makes thirteen; the two make fifteen; five more to the goal, which the
+    owner expects to pass either way); more fits and sub-types on a hull are welcome and
+    cost only research and tuning; once the work is mostly content, the number grows as
+    far as it likes.
 
 ### Still open
 

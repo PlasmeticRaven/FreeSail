@@ -2705,5 +2705,6 @@ a role; inside milestone 7. The design is the session's, in its plan's form (a d
 document each, the ladder of evidence, the lead's gate before a file), drawn from Roux's and
 Tofiño's plans and the pilots 79c lays under `docs/references/pilots/`; the lateen's
 handling is B3.1's. Nothing of it opens before 75's last window closes. The count the owner
-is aiming at, loosely: twenty-some ships counting fits and sub-types, which 75 reaches and
-these two carry to the high twenties; the number grows in the content phase as it likes.
+is aiming at, loosely: **twenty hulls**, fits not counted (eight today, thirteen after 75,
+fifteen after these two); more fits on a hull are welcome, at the cost of research and
+tuning only; the number grows in the content phase as it likes.
