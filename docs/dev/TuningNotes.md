@@ -11966,3 +11966,79 @@ open sea was dear).
 matter more than the inland hole. Nothing of the tiles, the recipe, the manifest or the
 coast is committed until the ruling; the marks, the ports, the nation, the tide's and the
 weather's rows go on meanwhile in the working tree, and wait with them.
+
+### Steps 1 to 3 as ruled: two regions, the marks, the gauges and the regency
+
+**The lead's ruling** (2026-10-29, `7e9728b`): two regions, every tile written, the
+numbering one package's. `mediterranean-west`, 35.0 to 40.5 N and 5.0 W to 0.05 E, abutting
+`strait` at 5 W; `balearics`, the same rows from 0.05 E to 4.5 E. The column from 0.37 W to
+0.05 E meets both bounds and is `mediterranean-west`'s, built first (the seam rule). Built
+with `--reuse-world`, the second region against the first's manifest, then both again with
+`--skip-fetch` once the marks were written (the tiles byte for byte the same):
+
+```
+Checks for the block mediterranean-west:
+  licences: emodnet_dtm_2024, gebco_2025 (allowed)
+  features within the bounds: 91 of 91 (a harbour patch's box counts as the region's)
+  ids unique across the manifest's regions: yes
+  sources in the references' form: 91 of 91
+  harbour patches with their datum stated: 0 of 0
+  the fetch box covers the tiles whole: yes (34.45 to 40.7 N, 5.2 W to 0.2 E)
+  tiles another region lists: 3 kept (level 2: 3, level 3: 0; not written, not listed)
+Checks for the block balearics:
+  features within the bounds: 87 of 87 ...
+  the fetch box covers the tiles whole: yes (34.45 to 40.7 N, 0.5 W to 4.9 E)
+  tiles another region lists: 14 kept (level 2: 14, level 3: 0; not written, not listed)
+```
+
+| region | level 2 | level 3 (patches) | coast | in all |
+|---|---|---|---|---|
+| `mediterranean-west` | 165 tiles, 24.0 MB | 30 tiles, 2.1 MB (Málaga, Almería, Cartagena, Oran) | 0.39 MB | 26.5 MB |
+| `balearics` | 154 tiles, 28.8 MB | 24 tiles, 1.7 MB (Palma, Port Mahon, Ivica, Algiers) | 0.33 MB | 30.9 MB |
+
+GEBCO's fill raised by the world's mean level: 3.98 to 6.83 m over `mediterranean-west`,
+**6.83 m over the whole of `balearics`**: there the nearest of the eleven gauges is
+Saint-Malo's (some 650 miles off), so the world's tide over the Balearics is Saint-Malo's
+(an M2 of 3.7 m and a mean level of 6.83 m where Mahón's M2 is 0.05 m and its level 0.20 m
+above the datum): the held gauges' cost at its sharpest, for the lead with package 89. The
+shore's sweep: 2,190 cells in 155 places (`mediterranean-west`) and 3,243 in 228
+(`balearics`), the largest the modern ports' moles and docks and the lagoons behind the
+shore (the Albufera of Valencia, a later block's water; the Mar Menor behind La Manga),
+left as water. `git status` after every build: the manifest (the two entries, their
+sources' fetches, the chart's line and title, the build hash) and the two regions' new
+files; nothing of any other region's.
+
+**The marks** (178: 91 and 87), drafted from Tofiño 1787 with Purdy 1826, Vargas Ponce
+1787, Grasset 1807, Michelot 1709 and 1715 and Bérard 1837 by three readers working from
+the pages and checked by a script kept outside the repository against the tiles by the
+features files' rule; 49 moved within the rule's reach, 11 beyond it (the first placing,
+from memory, a kilometre out: Vela Blanca's tower, Cape Pera, Fornells' Mola; the
+anchorages of San Pedro, Carboneras, Escombreras and Mers-el-Kebir), each said in its
+`fix`. **Isles the grid lacks**: Alboran (its shoalest within 2 km 14 m under water), the
+Hormiga off Cape Palos, Isla Grosa, the Isla del Aire, and Port Mahon's islands (the
+Lazaretto's, the Quarantine island, the Isla del Rey, Redonda): rocks of their height with
+an extent, 39e's form. **Port Mahon placed by hand** on the tiles' inlet by Tofiño's plan of
+the entry (pp. 211 to 213): Philipet point to starboard and the ruins of St Philip to port
+going in, the three ledges off the Mola, Philipet and St Philip, Es Redó under the castle,
+the passage between the south shore and the islands, the 24-foot flat east-north-east of
+the Isla del Rey, the anchorage south of the arsenal's island in 7 or 8 brazas; the grid
+has the inlet whole at its 115 m and smooths the Isla del Rey into a mid-channel ridge of
+9 to 11 m with 26 m on its south-west side, where Tofiño's passage is. **The lights of
+1805**: Málaga's mole lantern (Tofiño p. 34, used as a leading mark by day; that it was lit
+UNVERIFIED, a mole's linterna in Spanish usage a light), Porto Pí's by Palma (lit every
+night, Tofiño p. 185) and Algiers' (Michelot 1709, 1715): three; none at Cartagena, Cape
+de Gata, Alboran, Cape Palos, Mahon (Purdy 1840: no light-tower in the Balearics but
+Palma's; the brief's "Mahon's" light is not in the period's texts), Melilla or Oran.
+
+**The gauges** (item 5, ahead of its step): nine of TICON's in the block's coast, held
+(package 89 not merged), with their mean levels VERIFIED from Puertos del Estado's REDMAR
+reports (Málaga 0.43, Motril 0.39, Almería 0.29, Melilla 0.33, Ibiza 0.17, Formentera 0.16,
+Palma 0.16, Alcudia 0.19, Mahón 0.20 m above the lowest astronomical tide); none at
+Cartagena, Oran or Algiers; Gandía, Sagunto and Valencia north of Cape Palos left for a
+later block. **The regency** (item 4's nation): `algiers` in `data/nations.yaml` in
+Morocco's form, its relations from James vol. 3 (pp. 168 to 169, 235, 333 to 334) where
+they speak and from memory otherwise, said so; its war with Portugal (from memory) NOT
+entered in `wars:` until a work on file gives it, for the lead; Morocco's relations gain
+it. The tests that list the chart's regions and the nations gain the block's (as 79b's
+did); the Strait's gauge test's "block's" filter bounded at its own east bound (5 W),
+Melilla lying east of it, its assertions unchanged.

@@ -1,0 +1,160 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"140,-10": [
+"zafarine-west-isle",
+"zafarine-middle-isle",
+"zafarines-anchorage",
+"zafarines-rock"
+],
+"140,-16": [
+"alhucemas",
+"alhucemas-road",
+"alhucemas-bay"
+],
+"140,-18": [
+"cala-iris",
+"penon-de-velez",
+"velez-road"
+],
+"140,-7": [
+"cape-hone"
+],
+"141,-12": [
+"cape-tres-forcas",
+"tres-forcas-farallon",
+"la-lupiana",
+"melilla",
+"melilla-road",
+"monte-carama"
+],
+"141,-16": [
+"morro-nuevo"
+],
+"142,-3": [
+"mers-el-kebir-castle",
+"mers-el-kebir-linterna",
+"mers-el-kebir-road",
+"oran",
+"santa-cruz-oran",
+"oran-road"
+],
+"142,-5": [
+"habibas"
+],
+"143,-13": [
+"alboran",
+"alboran-anchorage"
+],
+"143,-2": [
+"point-abuja",
+"arzew-island",
+"arzew-road"
+],
+"143,-3": [
+"mount-san-agustin"
+],
+"143,-4": [
+"ile-plane",
+"cape-falcon"
+],
+"145,-20": [
+"marbella-road"
+],
+"146,-12": [
+"guardias-viejas"
+],
+"146,-13": [
+"adra-road"
+],
+"146,-14": [
+"cape-sacratif"
+],
+"146,-15": [
+"almunecar-road",
+"motril-road"
+],
+"146,-16": [
+"nerja-road"
+],
+"146,-17": [
+"torre-del-mar-road"
+],
+"146,-18": [
+"torremolinos-point",
+"rio-gordo-bank",
+"malaga",
+"malaga-mole-light",
+"malaga-road"
+],
+"146,-19": [
+"calaburras-point",
+"fuengirola-castle",
+"fuengirola-road",
+"torre-bermeja-rock"
+],
+"146,-20": [
+"marbella"
+],
+"146,-9": [
+"cape-de-gata",
+"corralete-anchorage",
+"gata-rock",
+"vela-blanca-tower",
+"genoves-anchorage"
+],
+"147,-10": [
+"almeria",
+"almeria-road"
+],
+"147,-11": [
+"roquetas-road"
+],
+"147,-8": [
+"san-pedro-anchorage",
+"mesa-de-roldan",
+"carboneras-road",
+"carboneras-islet"
+],
+"147,-9": [
+"san-jose-anchorage",
+"los-frailes",
+"san-felipe-anchorage"
+],
+"149,-6": [
+"cape-cope"
+],
+"149,-7": [
+"aguilas-anchorage"
+],
+"150,-3": [
+"cape-palos",
+"hormiga-grande",
+"bajo-de-dentro",
+"bajo-de-fuera",
+"isla-grosa",
+"grosa-anchorage",
+"grosa-losa"
+],
+"150,-4": [
+"cartagena",
+"cartagena-arsenal",
+"galeras-castle",
+"podadera-fort",
+"navidad-fort",
+"la-losa",
+"espalmador-grande",
+"escombrera-island",
+"escombrera-shoal",
+"escombrera-bay",
+"portman-anchorage",
+"portman-rock",
+"cabo-del-agua"
+],
+"150,-5": [
+"la-subida-anchorage",
+"cape-tinoso",
+"cabezo-de-roldan"
+]
+}
+}

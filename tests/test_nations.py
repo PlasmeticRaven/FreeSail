@@ -35,6 +35,8 @@ def test_the_eight_nations_and_the_wars_of_june_1805(table):
         "denmark",
         # package 39f: Morocco, for Tangier
         "morocco",
+        # package 79c: the regency of Algiers, for Algiers and Oran
+        "algiers",
     ]
     assert table.at_war("britain", "france") and table.at_war("france", "britain")
     assert table.at_war("britain", "spain") and table.at_war("britain", "batavian-republic")

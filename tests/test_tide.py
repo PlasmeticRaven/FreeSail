@@ -873,8 +873,8 @@ def test_the_straits_gauges_are_read_and_held_and_would_move_no_channel_position
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
     held = {
-        g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] < 36.4 and g["lon_deg"] > -7.0
-    }  # the block's
+        g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] < 36.4 and -7.0 < g["lon_deg"] < -5.0
+    }  # the block's (west of its east bound at 5 W: package 79c's Melilla lies east of it)
     assert list(held) == ["ceuta", "tarifa", "algeciras", "gibraltar"]
     assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
     assert not set(held) & {g.id for g in tide.gauges}
