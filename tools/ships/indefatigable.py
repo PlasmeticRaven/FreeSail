@@ -1,12 +1,3473 @@
 """HMS *Indefatigable*, the 64 of 1784 and the razee of 1795 (package 75, the first ship; her
-builder B1): a stub writing nothing, laid by stage 0 (docs/design/Build-Ships.md §3.1 item 2).
+builder B1).
 
-Her design is docs/design/Design-Ship-Indefatigable.md: §1 the module, §12.1 what stage 0 lays
-for her. Built, the module begins `import gen_ships as g` and writes
-`data/ships/sixty-four.yaml` and `data/ships/razee-44.yaml` (the names the lead accepted on
-2026-10-28), the 64 first and the razee derived from her as data.
+Her design is docs/design/Design-Ship-Indefatigable.md (cited here as Indf), from the research
+note docs/design/Research-Indefatigable-2026-10.md (Ind) and the owner's answers
+(docs/design/Decisions-ShipsRound2-2026-10.md; docs/design/Build-Ships.md §19.1). One module
+writes two files, the 64 first and the razee derived from her as data (Indf §1): `sixty_four()`
+gives the 64's particulars, `write(out_dir, p)` builds and dumps one file from them, and
+`build(out_dir)` is the generator's hook (`tools/gen_ships.py`, `SHIP_MODULES`). `razeed(p)`
+derives the razee from the 64's particulars by the dockyard's steps, and the same `write()`
+builds her file (Indf §1.5). Built so far (Indf §13, steps 1 to 5): both hulls, profiles and
+sills, masts, yards with their lifts, square sails, the 64's stand-in mizen course and the
+razee's spanker, the head, the staysails between the masts, the studding sails, the storm and
+occasional canvas, the groups and the aliases; the fits with their guns on the profile's ports,
+the magazines, the company and the quarter bill, the people drawn from her wardroom files
+(data/people/sixty-four.yaml, razee-44.yaml), the stores, the sail room, the ground tackle, the
+boats, the pumps, the hold and her description at far detail. Step 6 tuned each hull's centre
+of lateral resistance against the helm's truths (the notes of `clr_x_m`) and measured both
+polars; her tests and her truths 7-186 to 7-188 are tests/test_indefatigable.py.
+
+The module is imported only by the generator's entry block, after `gen_ships` is made the
+running script, and takes every helper as `g.<name>` (Indf §1.2). No function or table of the
+generator is changed; the eight files stay byte for byte as they are.
+
+**The frame (Indf §1.4).** The figures at the top are in the drawings' own frame, as the sources
+give them: feet forward of the after perpendicular (AP), feet above K (the bottom of the band
+under the keel), or feet above WL1, the 64's load line, where a measure was taken from it. They
+are converted once: x in metres forward of the middle of the load waterline, 80 ft forward of AP;
+z in metres above the variant's own load water at that station (the water is inclined to the
+keel by the drawn drag, and the engine has no trim). A spar's `height_m` and a sail's
+`corners_m` are then taken above the datum, the D18 deck at midships, as the file's convention
+has them; a sail's centre and a gun's height stay above the water.
+
+**The two gates (Indf §0).** Two pieces of the 64 wait on the engine extensions:
+`MIZEN_COURSE = "stand-in"` writes her mizen course as a loose-footed gaff-class sail on the
+after part of her mizen yard (stage A; "gated", the lateen cut at the mast, is stage B), and
+`BOWSPRIT_YARDS = False` writes no yards under the bowsprit (stage B writes them). A third flip,
+the driver boomsail the owner chose (Indf §4.4; the engine design's §17), is stage B's and is
+not here. Every id is final from stage A, so stage B renames nothing.
+
+Marks as the design's: measured (on the held page images, or arithmetic on the notes' measured
+figures), read, read (OCR), judgement. The measurements of Indf §3.5 were taken on the held
+images (ZAZ1407 at full resolution, ZAZ1280 at 3840 px) by the research's method, the checker's
+registration of ZAZ1407 (AP at 7405.9 px, 99.97 px to the foot, WL1 and K fitted lines); the
+images are not in the repository. Taken: items 1, 5, 6 and 7, and the 64's part of items 2
+and 3. Not taken: the half-breadth at each port's sill on 1407T's body plan (item 2), and on
+ZAZ2371, whose 1280 px give about 6 1/2 px to the foot, the razee's head, rails and taffrail's
+height (item 3) and her quarterdeck and forecastle sills (item 4); those figures are judgement
+on the 64's measured lines, and their notes say so.
 """
+
+from __future__ import annotations
+
+import math
+import os
+from dataclasses import dataclass, replace
+
+import gen_ships as g
+
+from ships import period
+
+FT = g.FT
+
+# The 64's mizen course (Indf §4.4): "stand-in", a loose-footed gaff-class sail on the yard's
+# after part, whose physics is the owner's ruling for the sail (Bel §13.5); "gated", the
+# lateen cut at the mast, waits on the lead's gate (stage B).
+MIZEN_COURSE = "stand-in"
+# The yards under the bowsprit (D8 (b); Indf §4.6, §17 item 5 as answered): the 64's spritsail
+# and sprit-topsail yards and the razee's spritsail yard, written at stage B, when the engine
+# keeps a yard under the bowsprit out of her head yards (map-engine §3.1-3.2).
+BOWSPRIT_YARDS = False
+
+# ---------------------------------------------------------------------------
+# The drawings' frame: the load line and the decks
+# ---------------------------------------------------------------------------
+
+# WL1, the top green waterline of ZAZ1407, taken as the 64's load line: 21.22-21.27 ft above K
+# at AP and 20.16-20.26 ft at 160 ft forward of it, the keel dragging 1.04 ft over the 160 ft
+# (measured, 1407F and the checker: Ind §2.3.1). The mean of each band at AP and the drawn drag.
+WL1_AT_AP_FT = 21.245
+WL1_DRAG_FT = 1.04
+# The middle of the load waterline, the file's x = 0: WL1 rabbet to rabbet, D29 (b) (Ind §2.4).
+MIDSHIPS_FT = 80.0
+
+
+def wl1_above_k(x_ft):
+    """WL1's height above K at `x_ft` forward of AP, feet."""
+    return WL1_AT_AP_FT - WL1_DRAG_FT * x_ft / 160.0
+
+
+# The decks at the middle line, feet above K, at (ft from AP, ft above K): measured on ZAZ1280
+# by the checker, ±0.4 ft for which edge of the drawn deck is its surface, agreeing with ZAZ1407
+# and ZAZ2371 at midships to 3 in (Ind §2.3.5): aft at 2-6 ft, midships at 86-110 ft (taken at
+# the middle of the load line, as Indf §3.2), forward at 140-150 ft. The 64's quarterdeck from
+# the stern to its breast at 73.1-73.3 ft, ended here at 72.0 ft, where the side's scroll ends
+# the quarterdeck's rail (measured on 1407F; the deck at the side is below its rail there); the
+# forecastle from about 119.7 ft (Ind §2.3.5, measured, 1280T).
+DECKS_64 = {
+    "lower": [(4.0, 25.42), (80.0, 23.83), (145.0, 24.17)],
+    "upper": [(4.0, 32.58), (80.0, 31.29), (145.0, 31.33)],
+    "quarterdeck": [(4.0, 39.5), (72.0, 39.5 + (38.0 - 39.5) * (72.0 - 4.0) / (73.2 - 4.0))],
+    "forecastle": [(119.7, 37.55), (145.0, 37.55)],
+}
+
+# ---------------------------------------------------------------------------
+# The ports and their sills (Indf §3.3, §3.5 item 1): (ft from AP, sill ft above WL1)
+# ---------------------------------------------------------------------------
+
+# The gun deck (the 64's lower deck): thirteen a side, centres and sills measured on ZAZ1407 at
+# full resolution by the checker's method (each port's box found by its edges, its sill a dark
+# run's centroid, the height above WL1 at the port's own x), all thirteen: the five Ind §2.3.7
+# gives (6.09, 5.35, 5.02, 5.30, 6.03 ft at ports 1, 4, 7, 10 and 13 from aft) found again to the
+# hundredth, the eight between measured where Indf §3.3 interpolated them (within 0.02 m of it).
+# Each port 3 ft 2 in-3 ft 4 in wide and 2 ft 8 in deep (measured: 3.27 by 2.66 ft the mean).
+LOWER_SILLS = [
+    (10.80, 6.09),
+    (21.93, 5.79),
+    (33.03, 5.55),
+    (44.12, 5.35),
+    (55.25, 5.20),
+    (66.32, 5.10),
+    (78.82, 5.02),
+    (89.88, 5.08),
+    (100.99, 5.16),
+    (112.10, 5.30),
+    (123.24, 5.50),
+    (134.38, 5.72),
+    (145.32, 6.03),
+]
+LOWER_PORT_FT = (3.27, 2.66)
+# The 64's upper deck: thirteen a side at Ind §2.3.7's centres, all thirteen sills measured on
+# 1407F at full resolution by the same finder (Ind's "11 ft 11 in at midships, not re-measured"
+# is port 5's 11.90; the midship ports stand at 11.67-11.74). 2.80 by 2.61 ft the mean.
+UPPER_SILLS = [
+    (6.00, 12.96),
+    (16.62, 12.64),
+    (27.44, 12.34),
+    (38.57, 12.10),
+    (49.68, 11.90),
+    (60.79, 11.77),
+    (71.72, 11.69),
+    (84.39, 11.67),
+    (95.45, 11.74),
+    (106.52, 11.88),
+    (117.64, 12.07),
+    (128.81, 12.29),
+    (139.93, 12.59),
+]
+UPPER_PORT_FT = (2.80, 2.61)
+# The 64's quarterdeck: six a side measured on 1407F at full resolution, the five of Ind
+# §2.3.7 (about 21.5 to 60.8 ft, tentative there) and its doubtful sixth at about 12 ft, a clean
+# box of the same size under the roundhouse; each cut down from the rail, 2.52 by 2.27 ft (the
+# mean). Her fit's five a side are her guns' (Winfield 1793-1817 p. 99); the sixth is drawn.
+QUARTERDECK_SILLS = [
+    (11.91, 19.14),
+    (21.40, 18.87),
+    (32.30, 18.58),
+    (41.77, 18.38),
+    (51.18, 18.22),
+    (60.72, 18.11),
+]
+QUARTERDECK_PORT_FT = (2.52, 2.27)
+# The 64's forecastle: one a side at about 140.4 ft (Ind §2.3.7, measured on 1407T, tentative).
+# On 1407F at full resolution no port is drawn there, the forecastle's rail standing 1 ft 3 in-
+# 1 ft 9 in above its deck, so her forecastle gun fires over the rail (judgement); its sill the
+# deck and 0.41 m (Indf §3.3, judgement), the quarterdeck's port size (judgement).
+FORECASTLE_PORT_X_FT = 140.4
+FORECASTLE_SILL_ABOVE_DECK_M = 0.41
+# The class's carronades of 1794, never hers (Winfield 1793-1817 p. 99: two 24-pounders on the
+# forecastle, six 18-pounders on the roundhouse; Indf §5.1), whose ports no draught of hers
+# shows: the forecastle's one a side at +14.6 m, 127.9 ft from AP, and the roundhouse's three a
+# side between -23 and -17 m, about 9 ft 10 in apart (Indf §5.1, judgement), their port size the
+# quarterdeck's (judgement). The roundhouse's deck at the side 1 ft 3 in under its rail: on
+# ZAZ1280 at 3840 px the line under the rail stands 1.20-1.27 ft below it from 4 to 32 ft from
+# AP, measured from the quarterdeck's first port, whose sill and the rail above it agree with
+# 1407F's within 0.05 ft (measured here; judgement that it is the deck), from abaft AP to the
+# roundhouse's breast at 34.4 ft, where its rail's scroll ends (RAIL).
+FORECASTLE_CARRONADE_X_FT = 127.9
+ROUNDHOUSE_PORTS_FT = (4.54, 14.38, 24.23)
+ROUNDHOUSE_BELOW_RAIL_FT = 1.25
+ROUNDHOUSE_FT = (-10.61, 34.40)
+# On a deck whose rail stands less than a port's sill above it (the 64's forecastle, its rail
+# 1 ft 2 in-1 ft 9 in above the deck on 1407F, and her roundhouse), the gun fires over the
+# rail: its sill taken 2 in under the rail, so that the gun's height is the rail's (judgement).
+OVER_THE_RAIL_M = 0.05
+
+# ---------------------------------------------------------------------------
+# The side's half-breadths (Indf §3.3, §3.5 item 2): feet, moulded, at (ft from AP, hb)
+# ---------------------------------------------------------------------------
+
+# WL1's half-breadths (measured, 1407T and 1407F, the checker within 0.06-0.19 ft: Ind §2.3.2):
+# 0.6 at the post, 12.19 to 21.75 between, 0.63 at 160 ft.
+WL1_HALF_BREADTHS = [
+    (0.0, 0.6),
+    (10.0, 12.19),
+    (20.0, 16.65),
+    (30.0, 18.8),
+    (40.0, 20.06),
+    (50.0, 20.8),
+    (60.0, 21.31),
+    (70.0, 21.6),
+    (80.0, 21.72),
+    (90.0, 21.75),
+    (100.0, 21.75),
+    (110.0, 21.75),
+    (120.0, 21.47),
+    (130.0, 20.5),
+    (140.0, 17.68),
+    (150.0, 11.70),
+    (155.0, 6.87),
+]
+# The half-breadth plan's main-breadth line, the hull's greatest breadth at each station, and
+# its top-timber line, the breadth at the top of the side (16.96 ft at midships: the midship
+# section's 17.0 at 34.6 ft above the rabbet, the waist rail's height); both tracked on 1407F at
+# full resolution from midships both ways, read at round stations (measured here, ±0.1 ft).
+MAIN_BREADTH = [
+    (0.0, 13.44), (10.0, 15.56), (20.0, 17.45), (30.0, 19.04), (40.0, 20.18), (50.0, 20.85),
+    (60.0, 21.31), (70.0, 21.61), (80.0, 21.72), (90.0, 21.74), (100.0, 21.74), (110.0, 21.74),
+    (120.0, 21.46), (125.0, 21.12), (130.0, 20.55), (135.0, 19.64), (140.0, 18.33),
+    (145.0, 16.37), (150.0, 13.60), (155.0, 9.44), (160.0, 2.95),
+]  # fmt: skip
+TOP_TIMBER = [
+    (-5.0, 10.38), (0.0, 11.14), (10.0, 12.53), (20.0, 13.76), (30.0, 14.78), (40.0, 15.58),
+    (50.0, 16.20), (60.0, 16.61), (70.0, 16.86), (80.0, 16.96), (90.0, 16.96), (100.0, 16.96),
+    (110.0, 16.96), (120.0, 16.76), (125.0, 16.53), (130.0, 16.22), (135.0, 15.79),
+    (140.0, 15.25), (145.0, 14.55), (150.0, 13.61), (155.0, 12.40),
+]  # fmt: skip
+# The plank outside the moulded lines, 4 1/2 in (Steel's 5-in plank, Ind §2.3.3; Indf §3.3).
+PLANK_FT = 4.5 / 12.0
+# At a gun-deck sill the side stands a little inside its greatest breadth: at midships the
+# section is 21.52 ft at the sill against its dead flat's 21.65 (Ind §2.3.2; Indf §3.3, measured
+# there), 0.13 ft, taken off the main-breadth line at every port (judgement on measured lines).
+LOWER_SILL_INSIDE_BREADTH_FT = 21.65 - 21.52
+# At an upper-deck sill the side stands between the two lines: at the midship sill (11.67 ft
+# above WL1, 30.47 ft above the rabbet, WL1 18.8 ft above it: Ind §2.3.2, R1) the section gives
+# 18.37 ft, 0.30 of the way from the top-timber line (16.96) to the dead flat (21.65); the same
+# fraction taken at every port (judgement on measured lines). The quarterdeck's and the
+# forecastle's sills, within 2 ft of the top of the side, take the top-timber line (judgement).
+UPPER_SILL_FRACTION = (18.37 - 16.96) / (21.65 - 16.96)
+
+# The midship section, ZAZ1407's outermost section (measured, 1407T, ±0.15 ft: Ind §2.3.2):
+# (ft above the rabbet, half-breadth moulded); the rabbet 18.8 ft below WL1 at midships (R1).
+SECTION = [
+    (0.7, 4.0), (1.5, 10.4), (2.35, 12.5), (3.2, 13.9), (4.0, 15.0), (5.7, 16.5), (7.3, 17.7),
+    (9.0, 18.8), (10.6, 19.7), (12.3, 20.5), (13.9, 21.0), (15.6, 21.4), (17.3, 21.65),
+    (23.0, 21.65), (24.6, 21.4), (26.3, 20.8), (28.0, 19.9), (29.6, 18.75), (31.3, 18.0),
+    (34.6, 17.0), (37.1, 16.1),
+]  # fmt: skip
+WL1_ABOVE_RABBET_FT = 18.8
+
+# ---------------------------------------------------------------------------
+# The profile's lines (Indf §3.2, §3.5 item 3)
+# ---------------------------------------------------------------------------
+
+# The top of the side, taffrail to stem head, (ft from AP, ft above WL1): measured on 1407F at
+# full resolution, each line tracked along its drawn ink (the red alteration lines left out):
+# the taffrail's crown 13 ft abaft AP, 28.0 ft above WL1 (49.3 above K: Ind's "about 49 ft",
+# tentative, now measured); the roundhouse's rail to its scroll at 34.8 ft; the quarterdeck's
+# rail from 35 ft to its breast, its scroll at 72 ft; the waist rail, 15.8-16.0 ft (5 ft 4 in
+# above the upper deck); the forecastle's rail from 119.6 ft to the beakhead at about 153.5 ft
+# (extended there on its own slope from 144.8 ft, where the channel's deadeyes hide it); the
+# stem head's block, its after face 160.8 ft from AP and its cap 20.0 ft above WL1.
+RAIL = [
+    (-13.0, 28.0), (-10.61, 27.03), (-5.61, 26.43), (-0.61, 25.87), (4.39, 25.33), (9.39, 24.83),
+    (14.40, 24.36), (19.40, 23.92), (24.40, 23.51), (29.40, 23.14), (34.40, 22.79),
+    (35.0, 21.88), (40.0, 21.37), (44.0, 21.12), (48.01, 20.90), (52.01, 20.70), (56.01, 20.51),
+    (60.81, 20.30), (64.0, 19.53), (68.0, 18.79), (70.0, 18.63), (72.0, 17.59), (72.4, 16.0),
+    (76.0, 15.97), (90.0, 15.77), (100.0, 15.76), (110.0, 15.88), (119.3, 15.95),
+    (119.6, 17.90), (122.0, 18.14), (126.0, 18.26), (130.0, 18.38), (134.0, 18.53),
+    (138.0, 18.69), (142.0, 18.88), (144.8, 19.03), (153.5, 19.40), (160.8, 20.0),
+]  # fmt: skip
+STEM_HEAD_FT = (160.8, 20.0)
+# The fore edge of the stem, the gripe and the knee of the head, (ft from AP, ft above WL1),
+# low to high: below the water as Ind §2.3.6 measures it (1407F, ±0.05-0.15 ft), from the band's
+# bottom at about 147.75 ft to WL1 at 163.45 ft; above it the knee of the head's fore edge,
+# measured on 1407F at full resolution by rows to the head's top at 20 ft (174.5 ft from AP).
+STEM = [
+    (147.75, None), (150.25, -19.7), (151.8, -19.1), (152.75, -18.6), (154.55, -17.1),
+    (155.45, -16.1), (156.2, -15.1), (157.4, -13.1), (158.4, -11.1), (159.7, -8.1),
+    (160.95, -5.1), (162.3, -2.1), (163.45, 0.0), (164.68, 2.0), (167.56, 5.0), (171.16, 8.0),
+    (172.91, 10.0), (173.91, 12.0), (174.31, 14.0), (174.40, 16.0), (174.53, 18.0),
+    (174.46, 20.0),
+]  # fmt: skip
+# The post's after face (Ind §2.3.6: 0.08 ft before AP at the heel, 1.24 ft abaft it at WL1,
+# raking 3.5 degrees) and above it the counter and the stern to the taffrail, (ft from AP, ft above
+# WL1), measured on 1407F at full resolution by rows (the stern's outline, the quarter gallery's
+# carvings and the rudder left out; ±0.3 ft).
+STERN = [
+    (0.08, None), (-1.24, 0.0), (-1.79, 8.0), (-4.14, 10.0), (-6.60, 12.0), (-7.84, 14.0),
+    (-8.37, 16.0), (-9.14, 18.0), (-9.52, 20.0), (-10.25, 22.0), (-10.68, 24.0), (-11.0, 26.0),
+    (-11.62, 27.0), (-13.0, 28.0),
+]  # fmt: skip
+# K under the post's heel and at the band's square fore end (Ind §2.3.6).
+KEEL_FT = (0.08, 147.75)
+# The main wale at midships, 20.2-24.7 ft above K (measured on ZAZ2371, not re-measured: Ind
+# §2.3.5); along the side it is carried parallel to the gun deck's sills (judgement).
+MAIN_WALE_K_FT = (20.2, 24.7)
+
+# ---------------------------------------------------------------------------
+# The rig (Indf §4.1-§4.3)
+# ---------------------------------------------------------------------------
+
+# The masts at the lower-deck partners (ft from AP), their heel shoulders above K and their
+# rakes, measured on ZAZ1280 by the checker (Ind §3.1). Their places in the file: mizen -16.33
+# m, main -2.78 m, fore +19.23 m (Indf §2.1).
+MASTS = {
+    "fore": (143.09, 9.67, 0.3),
+    "main": (70.87, 7.15, 1.4),
+    "mizzen": (26.42, 10.35, 2.15),
+}
+# Steel 1794 vol. I p. 49, "64 GUNS. 1369 TONS." (page image IA leaf n66, read twice in Ind §3.1
+# and again in Indf §4.1), feet: the lower masts, topmasts and topgallant masts (each with its
+# royal pole: the "Royal" rows read 0 0, so the royal sets on the topgallant's pole), and their
+# yards; the bowsprit and the jib-boom.
+STEEL_64 = {
+    "mast": {"main": 101.0, "fore": 89 + 7 / 12, "mizzen": 86.0},
+    "topmast": {"main": 58.5, "fore": 53.0, "mizzen": 43.5},
+    "topgallant_mast": {"main": 29.25, "fore": 26.5, "mizzen": 21.75},
+    "yard": {"main": 90 + 4 / 12, "fore": 79.5, "mizzen": 57.5},  # the mizzen's: the crossjack
+    "topsail_yard": {"main": 65 + 4 / 12, "fore": 57.5, "mizzen": 43.25},
+    "tg_yard": {"main": 39.0, "fore": 34.5, "mizzen": 29.0},
+    "royal_yard": {"main": 32.0, "fore": 28.5, "mizzen": 21.0},
+    "mizen_yard": 77.0,
+    "bowsprit": 60 + 4 / 12,
+    "jib_boom": 43.75,
+}
+# Steel's diameters at the partners and the slings, inches (p. 49, as above).
+STEEL_64_DIAMETER_IN = {"main": 33.5, "fore": 29.75, "mizzen": 19.75, "mizen_yard": 14.0}
+# Steel's heads (vol. I, OCR l. 4697-4699, read (OCR)): the main and fore masts' heads 5 in to
+# every yard of the mast's length; the mizen mast's and the main and fore topmasts' 4 in; the
+# mizen topmast's and every topgallant mast's 3 1/2 in.
+HEAD_IN_PER_YARD = {
+    "mast": {"main": 5.0, "fore": 5.0, "mizzen": 4.0},
+    "topmast": {"main": 4.0, "fore": 4.0, "mizzen": 3.5},
+    "topgallant_mast": {"main": 3.5, "fore": 3.5, "mizzen": 3.5},
+}
+# The topgallant mast's pole: "a common pole-head is seven-eighteenths of the length", set up
+# from the stop, and the hounds "three-fifths" of the square head's length below the stop
+# (Steel 1794 vol. I, 'Mizen top-mast' and 'Topgallant-masts', OCR l. 2934-2942, read (OCR));
+# the common pole-head taken, of Steel's stump, common and long (judgement), so that a royal
+# of 32 ft sets on it.
+POLE_OF_TOPGALLANT = 7.0 / 18.0
+HOUNDS_OF_STOP = 3.0 / 5.0
+# The bowsprit's steeve, about 27 degrees, ±2 (measured on ZAZ1280 and 2371: Ind §3.1). Its
+# heel on ZAZ1280 (3840 px, registered on the measured main and fore masts, 20.0 px to the foot)
+# just before the fore mast, about 148.3 ft from AP: so 12.5 ft of it lies within the stem
+# head's after face, 14.0 ft along its steeve, and 46.3 ft of its 60 ft 4 in stand outboard
+# (measured here, ±1 ft; Luce's third inboard, the frigate's rule, would give 40.2).
+BOWSPRIT_STEEVE_DEG = 27.0
+BOWSPRIT_HEEL_FT = 148.3
+# The jib-boom: 7/12 of it outboard (Luce 1866 ch. VII, the frigate's rule; judgement for her).
+JIB_BOOM_OUTBOARD = 7.0 / 12.0
+
+# Steel's sail table IV, the 64 column (Steel 1794 vol. I p. *149, page image IA leaf n244, read
+# in full by R1 and the checker: Ind §5): cloths at the head and the foot, and the depth in
+# yards (the mizen topsail's the mean of its middle, 12, and its clue, 12 3/4). Each cloth 22 1/2
+# in in the sail: 24-in canvas less Steel's seam for ships of 50 guns and up (Ind §5, judgement).
+STEEL_SAILS_64 = {
+    "main.course": (41.5, 44.0, 14.0),
+    "fore.course": (36.0, 34.0, 12.0),
+    "main.topsail": (27.0, 43.0, 17.5),
+    "fore.topsail": (23.0, 37.0, 15.75),
+    "mizzen.topsail": (18.5, 27.0, 12.375),
+    "main.topgallant": (19.5, 27.5, 9.0),
+    "fore.topgallant": (17.0, 24.0, 8.25),
+    "mizzen.topgallant": (13.5, 19.5, 6.75),
+    "main.royal": (15.0, 20.0, 7.0),
+    "fore.royal": (13.0, 17.5, 6.25),
+    "mizzen.royal": (10.0, 14.0, 5.0),
+}
+CLOTH_IN_SAIL_FT = 22.5 / 12.0
+# The triangular headsails of the same table: the cloths in the foot and the leech's depth in
+# yards (Ind §5): the fore staysail 0 / 19 / 11 1/2, the fore topmast staysail 0 / 18 / 16, the
+# jib ("Jib Flying") 0 / 24 / 23.
+STEEL_HEADSAILS_64 = {
+    "fore.staysail": (19.0, 11.5),
+    "fore.topmast_staysail": (18.0, 16.0),
+    "jib": (24.0, 23.0),
+}
+# The staysails between the masts in the same table (Ind §5): its row, and the area Ind §5 gives
+# it (the four-sided ones an upper bound), m2. Indf §4.3 checks the helper's cuts against them,
+# ±10% the triangle and ±25% the four-sided; Steel's 64 has no mizen topgallant staysail.
+STEEL_BETWEEN_64 = {
+    "main.staysail": ("0 / 28 cloths, leech 14 yards", 102.0, 0.10),
+    "main.topmast_staysail": ("22 / 24 cloths, bunt 9, after leech 22 1/4 yards", 190.0, 0.25),
+    "middle_staysail": ("21 / 21 cloths, bunt 6, after leech 13 1/2 yards", 110.0, 0.25),
+    "main.topgallant_staysail": ("18 / 18 cloths, bunt 5, after leech 14 yards", 90.0, 0.25),
+    "mizzen.staysail": ("19 1/2 / 21 cloths, bunt 7 1/2, after leech 11 1/2 yards", 100.0, 0.25),
+    "mizzen.topmast_staysail": ("16 / 17 cloths, bunt 5, after leech 13 yards", 80.0, 0.25),
+}
+# The mizen course (Steel's table IV, 64 column; Ind §5): 14 1/2 cloths at the head and 15 1/2
+# at the foot, its fore (mast) leech 9 1/4 yards and its after leech 17 1/4.
+STEEL_MIZEN_COURSE_64 = (14.5, 15.5, 9.25, 17.25)
+# Its fore leech "is attached to the mizen-mast within 6 or 7 feet of the deck" (Steel 1794
+# vol. I, 'Mizen-course', OCR l. 11441-11442, read (OCR)): its tack 6 ft 6 in above her
+# quarterdeck, the mean. Indf §4.4 judged 3 ft (the truss 11.6 m above her datum); Steel's text
+# gives 6 or 7 ft, so 6 ft 6 in is built and the truss stands 12.7 m above the datum.
+MIZEN_TACK_ABOVE_DECK_FT = 6.5
+
+# Steel's reef bands for her rate (Ind §5; Steel 1794 vol. I, the sail-making articles, read
+# (OCR)): two in each course; three or four in the main topsail (l. 11640), the four taken; three
+# in the mizen topsail in ships of 50 guns and up; the fore topsail's three (judgement); one in
+# the mizen course a fifth up its mast leech (l. 11448). The frigate-36 reefs her courses once.
+REEFS = {"course": 2, "topsail": {"main": 4, "fore": 3, "mizzen": 3}, "topgallant": 0, "royal": 0}
+
+# The brace limits, degrees from square: the frigate-36's (Fincham 1843 art. 102, the long
+# ships' upper values, two degrees more a level aloft), judgement for her (Indf §4.2). Checked
+# against her lee rigging from the channels measured on 1407F (Indf §3.5 item 7): the lower
+# yards, slung 2 ft under the hounds, meet the foremost lee shroud only at 70-74 degrees; the
+# foremost lee topmast backstay, set up, would stop the main yard at about 50 and the fore at
+# about 47 (measured here), so the limits are kept and the backstays' easing left to the owner.
+BRACE_PLANS = {
+    "fore": [("course", 62), ("topsail", 64), ("topgallant", 66), ("royal", 68)],
+    "main": [("course", 64), ("topsail", 66), ("topgallant", 68), ("royal", 70)],
+    "mizzen": [("topsail", 62), ("topgallant", 64), ("royal", 66)],
+}
+CROSSJACK_BRACE_DEG = 60
+
+# The frigate-36's plain sail, m2, against which her rope is scaled (Indf §4.2).
+FRIGATE_PLAIN_SAIL_M2 = 1584.0
+
+# Her studding sails, the frigate-36's set (Indf §4.3): Steel's table IV, the 64 column (Ind
+# §5), cloths at the head and the foot and the depth in yards; and Steel's booms for a 64 (p. 49;
+# Ind §3.1), feet: the lower boom 50 ft 0 in, five-ninths of the main yard, the topmast and
+# topgallant booms half the yard each is rigged on (Steel p. 40, read on the page image). Steel's
+# table also gives a main lower studding sail, 16 / 16 / 16 1/2 (138 m2), against the one pair
+# of lower booms; the frigate-36 carries none, and it is not built (Indf §4.3).
+STEEL_STUDDING_64 = {
+    ("fore", "lower"): (15.0, 15.0, 13.0, 50.0),
+    ("fore", "topmast"): (11.0, 15.0, 17.0, 39.75),
+    ("fore", "topgallant"): (8.0, 11.0, 8.5, 28.75),
+    ("main", "topmast"): (12.0, 16.0, 18.5, 45.0),
+    ("main", "topgallant"): (9.0, 12.0, 9.5, 32.0 + 8.0 / 12.0),
+}
+# The lower studding sail's boom "is fitted with an iron goose-neck and key, which connects to a
+# bolt in the forward part of the fore-channels" (Luce 1884 p. 137, OCR l. 10454-10456, read
+# (OCR)): it swings at the fore channel. The 64's fore shrouds' deadeyes about 38 ft above K
+# (measured on 1407F at full resolution, the main channel's at 37.0-37.5); the razee's lowered
+# channel, 32.0-32.2 ft (measured, ZAZ2371: Ind §2.3.8).
+FORE_CHANNEL_K_FT_64 = 38.0
+FORE_CHANNEL_K_FT_RAZEE = 32.1
+
+# The storm canvas's heights above the deck she works it from (the frigate-36's, gen_ships.
+# frigate(), judgement there): the mizen stay's collar 12 ft up the main mast (Steel 1794 vol. I,
+# 'Mizen-stay'), the mizzen storm staysail's head 0.6 of the way up the stay and its clew 7 ft
+# above the deck (Steel's mizen staysail "within 6 or 7 feet of the quarter-deck"); the storm
+# mizzen's tack 4 ft up its stay, its luff 0.8 of the stay's run to the hounds, its foot "towards
+# the taffarel" (Steel, 'Storm mizen') 0.45 of the driver boom.
+MIZEN_STAY_COLLAR_FT = 12.0
+STORM_STAYSAIL_HEAD_OF_STAY = 0.6
+STORM_STAYSAIL_CLEW_FT = 7.0
+STORM_MIZZEN_TACK_FT = 4.0
+STORM_MIZZEN_LUFF_OF_RUN = 0.8
+STORM_MIZZEN_FOOT_OF_BOOM = 0.45
+# The ringtail (the razee's, she having the driver boom): Kipping's brig's, 5 cloths in the head
+# and 7 in the foot, its depth the spanker's after leech, its boom the foot and a third (the
+# frigate-36's, judgement); the save-alls' head along 0.6 of the lower boom, down to half a
+# metre off the water (the frigate-36's, judgement).
+RINGTAIL_CLOTHS = (5.0, 7.0)
+SAVE_ALL_OF_BOOM = 0.6
+
+
+# ---------------------------------------------------------------------------
+# Her particulars: one variant's data, the 64's here and the razee's derived from them
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Particulars:
+    """One variant's figures in the drawings' frame, and the words of her file. `rise_ft` is
+    her water's rise against WL1 aft and forward (the 64's none); `datum_deck` the D18 deck
+    whose midship height is the file's datum (Indf §2.2). `rail` and `stern` are (ft from AP,
+    ft above WL1), `breadth` (ft from AP, half-breadth at her water, at the top of her side),
+    moulded; `mizen` is her after sail, "course" (the 64's) or "spanker" (the razee's)."""
+
+    key: str
+    file: str
+    name: str
+    era_notes: str
+    header: str
+    hull: dict
+    hull_notes: dict
+    rise_ft: tuple[float, float]
+    datum_deck: str
+    decks: dict
+    ports: dict
+    port_size_ft: dict
+    port_notes: dict
+    rail: list
+    stern: list
+    breadth: list
+    profile_notes: dict
+    fore_channel_k_ft: float
+    masts: dict
+    mizen: str
+
+    def water_ft(self, x_ft):
+        """Her load water above K at `x_ft` forward of AP, feet."""
+        aft, fwd = self.rise_ft
+        return wl1_above_k(x_ft) - (aft + (fwd - aft) * x_ft / 160.0)
+
+    def z_m(self, z_k_ft, x_ft):
+        """A height above K at `x_ft`, as metres above her water there."""
+        return (z_k_ft - self.water_ft(x_ft)) * FT
+
+    @property
+    def datum_z(self):
+        """The datum, metres above her water: her D18 deck at the middle of the load line."""
+        return round(self.z_m(interp(self.decks[self.datum_deck], MIDSHIPS_FT), MIDSHIPS_FT), 2)
+
+    def deck_k_ft(self, x_ft):
+        """The deck she is worked from at `x_ft`, feet above K: her quarterdeck or forecastle
+        over its extent, else the datum's deck (the waist)."""
+        for word in ("quarterdeck", "forecastle"):
+            pts = self.decks.get(word)
+            if pts and pts[0][0] <= x_ft <= pts[-1][0]:
+                return interp(pts, x_ft)
+        return interp(self.decks[self.datum_deck], x_ft)
+
+
+def interp(points, x):
+    """The value at `x` of a line of (x, value) points, straight between them and held at the
+    first and the last beyond them."""
+    if x <= points[0][0]:
+        return points[0][1]
+    for (x0, v0), (x1, v1) in zip(points, points[1:], strict=False):
+        if x <= x1:
+            return v0 + (v1 - v0) * (x - x0) / (x1 - x0)
+    return points[-1][1]
+
+
+def x_m(x_ft):
+    """Feet forward of AP as the file's x, metres forward of the middle of the load line."""
+    return (x_ft - MIDSHIPS_FT) * FT
+
+
+def head_ft(length_ft, in_per_yard):
+    """A mast's head by Steel's rule, so many inches to every yard of its length, feet."""
+    return length_ft / 3.0 * in_per_yard / 12.0
+
+
+def sixty_four():
+    """The 64 as built, 1784 (Indf §2-§4): her hull, decks, ports and masts."""
+    hull = {
+        "length_waterline_m": 48.8,
+        "beam_m": 13.54,
+        "draught_m": 6.33,
+        "displacement_kg": 2170000.0,
+        "gm_m": 1.35,
+        "clr_x_m": 5.2,
+        "lateral_area_m2": 305.5,
+        "hull_speed_kn": 12.8,
+        "rudder": {"area_m2": 8.95, "max_angle_deg": 35, "rate_deg_s": 3.0, "span_m": 6.47},
+    }
+    hull_notes = {
+        "length_waterline_m": "160 ft: WL1, ZAZ1407's load line, rabbet to rabbet (measured, "
+        "1407F; D29 (b): Ind §2.3.2, §2.4); 164.6 ft (50.2 m) outside the post and the stem.",
+        "beam_m": "44 ft 5 in extreme as built (Winfield 1793-1817 p. 100; D34 (a)); 43 ft 6 in "
+        "moulded at WL1, about 44 ft 3 in outside the plank (measured, Ind §2.4).",
+        "draught_m": "20 ft 9 in mean to K, the band's bottom: 21 ft 3 in at AP, 20 ft 2 in at 160 "
+        "ft (measured, 1407F; D29 (b): Ind §2.3.1); 6.15 m to the main keel; Steel's 64 of Folio I "
+        "draws 20 ft 8 in abaft and 19 ft 4 in afore (read).",
+        "displacement_kg": "2,170 t: judgement within the band integrated on her measured lines, "
+        "2,120-2,240 t (Ind §2.3.3), the razee's 1,925 t less by the measured slice of 238-244 "
+        "tons of 35 cu ft (Indf §2.1).",
+        "gm_m": "4 ft 5 in: judgement within 1.2-1.5 m (Ind §2.3.4), KM measured 7.3 m above K; "
+        "no period figure for her KG was found.",
+        "clr_x_m": "Tuned against the helm's truths (6 and 17; Indf §2.1), measured at seed 7 in "
+        "15 kn under plain sail. Her start, the measured centroid of the plane the file counts "
+        "(hull and band, no rudder), 0.55 m abaft the middle of the load line (Ind §2.3.6), with "
+        "the frigate-36's tuned lead of 9.6% of her load line ahead of it, +4.1 m (judgement), "
+        "gave her lee helm close-hauled (4.6 deg at six points off, 1.2 at seven) and none on "
+        "the beam, her stand-in mizen course a smaller after sail than the frigate's spanker; "
+        "she tacked in 3-3 1/2 minutes, under Luce's five to ten. At +5.2 m, a lead of 11.8%, "
+        "she carries weather helm from seven points to eleven (0.3 deg at 70 deg off, 0.9 on "
+        "the beam, 1.1 at 120), truth 6's form holds (the headsails in, 2.7 deg; the mizen "
+        "course in, 0.4 of lee helm), she gets under way from rest close-hauled in 6 minutes "
+        "without coming above 65 deg off or gathering sternway (truth 17), and tacks in 4 1/4-"
+        "5 1/2 minutes. Measured again at stage B, when her mizen course's balance moves (Indf "
+        "§16 item 3).",
+        "lateral_area_m2": "Below WL1 with the band, the rudder left out, as the frigate's "
+        "(measured, 1407F: 3,288-3,290 sq ft; Ind §2.3.6).",
+        "hull_speed_kn": "Judgement within D24 (a)'s 12.5-13.0 for the 64 (Indf §2.1); no period "
+        "knots for her or her sister were found (Ind §7.2). Tuned only within that band; kept, "
+        "no truth asking more of it (the razee faster at every point, D24's 'Plainly': the 64 "
+        "is not pinned against the frigate-36).",
+        "deck_height_m": "Her upper deck at midships, 10 ft 7 in above WL1 (measured, 1280T: Ind "
+        "§2.3.5): the uppermost continuous deck, D18 (a) as proposed (open: Indf §2.2), the datum "
+        "of every spar height and every sail's corners.",
+        "rudder": "Measured on 1407F (Ind §2.3.6): 95.4-96.9 sq ft below WL1, its sole to the "
+        "band's bottom, 21 ft 3 in, the span; 35 degrees and 3 deg/s the frigate-36's "
+        "(judgement).",
+    }
+    lower_ports = [(x, wl1_above_k(x) + s, lower_sill_half_breadth(x)) for x, s in LOWER_SILLS]
+    upper_ports = [(x, wl1_above_k(x) + s, upper_sill_half_breadth(x)) for x, s in UPPER_SILLS]
+    qd_ports = [
+        (x, wl1_above_k(x) + s, interp(TOP_TIMBER, x) + PLANK_FT) for x, s in QUARTERDECK_SILLS
+    ]
+    decks = dict(DECKS_64)
+    aft, breast = ROUNDHOUSE_FT
+    decks["roundhouse"] = [
+        (x, wl1_above_k(x) + z - ROUNDHOUSE_BELOW_RAIL_FT) for x, z in RAIL if aft <= x <= breast
+    ]
+    fc_ports = [
+        (x, open_deck_sill(x, interp(decks["forecastle"], x)), interp(TOP_TIMBER, x) + PLANK_FT)
+        for x in (FORECASTLE_CARRONADE_X_FT, FORECASTLE_PORT_X_FT)
+    ]
+    rh_ports = [
+        (x, open_deck_sill(x, interp(decks["roundhouse"], x)), interp(TOP_TIMBER, x) + PLANK_FT)
+        for x in ROUNDHOUSE_PORTS_FT
+    ]
+    port_notes = {
+        "lower": "the gun deck's thirteen a side, every sill measured on ZAZ1407 at full "
+        "resolution (Indf §3.5 item 1); the half-breadth at the sill the main-breadth line "
+        "measured on the half-breadth plan, less the midship section's 0.13 ft above the dead "
+        "flat, with 4 1/2 in of plank (judgement on measured lines)",
+        "upper": "the upper deck's thirteen a side, every sill measured on 1407F at full "
+        "resolution; the half-breadth 0.30 of the way from the top-timber line to the main "
+        "breadth, as the midship section stands at the midship sill, with the plank "
+        "(judgement on measured lines)",
+        "quarterdeck": "six a side measured on 1407F at full resolution, the after one under "
+        "the roundhouse; the half-breadth the top-timber line's with the plank (judgement)",
+        "forecastle": "one a side at 140.4 ft (Ind §2.3.7, tentative; none drawn on 1407F at "
+        "full resolution, her gun firing over the rail): the sill the deck and 0.41 m, the "
+        "half-breadth the top-timber line's (judgement); and one at 127.9 ft for the class's "
+        "24-pounder carronade of 1794 (Winfield 1793-1817 p. 99; Indf §5.1, judgement), where "
+        "the rail stands 1 ft 2 in above the deck and the gun fires over it, its sill 2 in under "
+        "the rail (judgement)",
+        "roundhouse": "three a side at 4.5, 14.4 and 24.2 ft from AP for the class's 18-pounder "
+        "carronades of 1794 (Winfield 1793-1817 p. 99; Indf §5.1, judgement), firing over the "
+        "rail, 1 ft 3 in above the deck: each sill 2 in under the rail, the half-breadth the "
+        "top-timber line's (judgement)",
+    }
+    return Particulars(
+        key="sixty-four",
+        file="sixty-four.yaml",
+        name="Indefatigable",
+        era_notes="HMS Indefatigable as built, a 64-gun ship of the Ardent class (Slade's design "
+        "of 1762 on the lines of the Fougueux): ordered 1780, launched by Adams at Bucklers Hard "
+        "in 1784, never commissioned as a 64 and cut down to a frigate in 1794-95 (Winfield "
+        "1793-1817 pp. 99-100). 160 ft 1 1/4 in on the gun deck, 44 ft 5 in extreme, 1384 tons. "
+        "Hull measured on her draughts (ZAZ1407, ZAZ1280; Research-Indefatigable-2026-10.md); "
+        "spars and sails by Steel 1794 vol. I p. 49 and table IV, the 64's columns; see "
+        "tools/ships/indefatigable.py for every figure and judgement.",
+        header=(
+            "# HMS Indefatigable as built, 1784: a 64-gun ship of the Ardent class (Slade, 1762).\n"
+            "# Generated by tools/gen_ships.py (tools/ships/indefatigable.py); edit those and\n"
+            "# rerun, do not edit this file. Hull and profile: measured on her draughts\n"
+            "# (RMG ZAZ1407, ZAZ1280; docs/design/Research-Indefatigable-2026-10.md).\n"
+            "# Spars: Steel 1794 vol. I p. 49, the 64 column. Sails: Steel's table IV, the\n"
+            "# 64 column, the topgallants and royals cut to the spars (the owner's rule).\n"
+            "# Her mizen course is a stand-in, PROVISIONAL behind the lead's gate\n"
+            "# (docs/design/Design-Ship-Indefatigable.md §0).\n"
+            "# Units: metres, m2, kg, kN. Comments mark each judgement.\n"
+        ),
+        hull=hull,
+        hull_notes=hull_notes,
+        rise_ft=(0.0, 0.0),
+        datum_deck="upper",
+        decks=decks,
+        ports={
+            "lower": lower_ports,
+            "upper": upper_ports,
+            "quarterdeck": qd_ports,
+            "forecastle": fc_ports,
+            "roundhouse": rh_ports,
+        },
+        port_size_ft={
+            "lower": LOWER_PORT_FT,
+            "upper": UPPER_PORT_FT,
+            "quarterdeck": QUARTERDECK_PORT_FT,
+            "forecastle": QUARTERDECK_PORT_FT,
+            "roundhouse": QUARTERDECK_PORT_FT,
+        },
+        port_notes=port_notes,
+        rail=list(RAIL),
+        stern=list(STERN),
+        breadth=[(x, hb, interp(TOP_TIMBER, x)) for x, hb in WL1_HALF_BREADTHS],
+        profile_notes={
+            "rail_m": "The top of the side, taffrail to stem head, measured on ZAZ1407 at full "
+            "resolution (Indf §3.5 item 3): the roundhouse's rail to 34.8 ft from AP, the "
+            "quarterdeck's to its breast at 72 ft, the waist rail, the forecastle's rail from "
+            "119.6 ft, the stem head 20 ft above WL1.",
+            "stem_m": "The fore edge of the stem, the gripe and the knee of the head: below the "
+            "water as Ind §2.3.6 measures it, above it the knee of the head measured on 1407F to "
+            "the head's top.",
+            "breadth_m": f"At {len(WL1_HALF_BREADTHS)} stations: the half-breadth at WL1 "
+            "(measured, Ind §2.3.2) and at the top of the side, the half-breadth plan's "
+            "top-timber line (measured on 1407F at full resolution), each with 4 1/2 in of plank.",
+            "stern_m": "The post's after face (Ind §2.3.6), the counter and the stern to the "
+            "taffrail, measured on 1407F at full resolution (±0.3 ft; the quarter gallery and the "
+            "rudder left out).",
+            "wales_m": "The main wale, 20.2-24.7 ft above K at midships (measured on ZAZ2371, not "
+            "re-measured: Ind §2.3.5), carried along parallel to the gun deck's sills "
+            "(judgement).",
+            "decks_m": "Each deck at the middle line (measured, 1280T: Ind §2.3.5), over its "
+            "extent; the roundhouse's at the side, 1 ft 3 in under its rail from abaft AP to its "
+            "breast at 34.4 ft (measured on ZAZ1280 at 3840 px; judgement that the line is the "
+            "deck), for the class's carronades of 1794.",
+        },
+        fore_channel_k_ft=FORE_CHANNEL_K_FT_64,
+        masts={
+            name: {
+                "x_ft": x,
+                "heel_k_ft": heel,
+                "rake_deg": rake,
+                "length_ft": STEEL_64["mast"][name],
+                "cut_ft": 0.0,
+            }
+            for name, (x, heel, rake) in MASTS.items()
+        },
+        mizen="course",
+    )
+
+
+def lower_sill_half_breadth(x_ft):
+    """The side's half-breadth at a gun-deck sill, feet outside the plank."""
+    return interp(MAIN_BREADTH, x_ft) - LOWER_SILL_INSIDE_BREADTH_FT + PLANK_FT
+
+
+def upper_sill_half_breadth(x_ft):
+    """The side's half-breadth at an upper-deck sill, feet outside the plank."""
+    tt, mb = interp(TOP_TIMBER, x_ft), interp(MAIN_BREADTH, x_ft)
+    return tt + UPPER_SILL_FRACTION * (mb - tt) + PLANK_FT
+
+
+def open_deck_sill(x_ft, deck_k_ft):
+    """A port's sill on the 64's forecastle or roundhouse, feet above K, where no port is drawn:
+    the deck and 0.41 m (Indf §3.3, judgement), or 2 in under the rail where the rail stands
+    lower than that, the gun firing over it (judgement)."""
+    rail_k = wl1_above_k(x_ft) + interp(RAIL, x_ft)
+    return min(deck_k_ft + FORECASTLE_SILL_ABOVE_DECK_M / FT, rail_k - OVER_THE_RAIL_M / FT)
+
+
+# ---------------------------------------------------------------------------
+# The razee (Indf §1.5, §2-§4.5): the dockyard's work on the 64, as data
+# ---------------------------------------------------------------------------
+
+# Her load line, ZAZ2371's drawn waterline: 1.45 ft below WL1 aft and 1.47 ft forward, parallel
+# to it within the image's resolution, ±0.25 ft (measured, 2371 against 1407F: Ind §2.3.1; D28
+# (a)).
+RAZEE_RISE_FT = (1.45, 1.47)
+# The upper works taken off: the three 64s of 1794, "excepting the portion of bulwark that lay
+# abaft the gangway-entrance, ... were cut down level with the upper deck" (James vol. 5 p. 428,
+# OCR l. 21885-21887, read (OCR)), and the upper deck in the waist with them, gangways left
+# along the sides (ZAZ2375, read). Her quarterdeck the old upper deck to its breast at 74.4 ft
+# from AP, her forecastle from 118.5 ft (measured, ZAZ2375: Ind §2.3.5). The roundhouse,
+# shortened to the beam abaft the mizen in December 1794 (ZAZ2371's N.B., tentative), was not
+# measured and is left out of the profile (Indf §1.5).
+RAZEE_QUARTERDECK_BREAST_FT = 74.4
+RAZEE_FORECASTLE_FT = 118.5
+# Her sides (measured, ZAZ2371: Ind §2.3.5): the waist top-side about 30.8 ft above K, 6 in
+# below the old upper deck; the quarterdeck rail about 4 ft 6 in above the quarterdeck (not
+# re-measured), taken for the forecastle's too (judgement). Her taffrail 5 ft 6 in abaft AP at
+# the middle line (measured, ZAZ2375), where the 64's counter (measured on 1407F) stands at the
+# old upper deck's height, and at the quarterdeck rail's height (judgement).
+RAZEE_WAIST_SIDE_K_FT = 30.8
+RAZEE_RAIL_ABOVE_DECK_FT = 4.5
+RAZEE_TAFFRAIL_FT = -5.5
+# The breadth at her top-side in the waist, 37 ft 6 in moulded (measured on the midship
+# section: Ind §2.3.2), taken along the waist at the same place between the top-timber and the
+# main-breadth lines as at the midship section (judgement on measured lines); her quarterdeck
+# rail's 34 ft is the top-timber line's.
+RAZEE_WAIST_SIDE_FRACTION = (37.5 / 2.0 - 16.96) / (21.65 - 16.96)
+# WL2, 3.77 ft below WL1 (measured, 1407T and 1407F: Ind §2.3.1-§2.3.2), its half-breadths at
+# WL1_HALF_BREADTHS's stations, moulded (the post's 0.6 at AP taken for it, judgement); her own
+# line's taken between WL1's and WL2's by her rise (judgement on measured lines).
+WL2_BELOW_WL1_FT = 3.77
+WL2_HALF_BREADTHS = [
+    (0.0, 0.6), (10.0, 5.6), (20.0, 13.0), (30.0, 16.9), (40.0, 18.9), (50.0, 20.1),
+    (60.0, 20.7), (70.0, 21.1), (80.0, 21.3), (90.0, 21.3), (100.0, 21.3), (110.0, 21.2),
+    (120.0, 20.7), (130.0, 19.2), (140.0, 15.54), (150.0, 8.60), (155.0, 4.24),
+]  # fmt: skip
+# Her quarterdeck and forecastle ports (measured, ZAZ2375, ±0.5 ft: Ind §2.3.7), ft from AP:
+# six a side on the quarterdeck, the first four the 64's upper-deck ports 1-4 within 0.8 ft;
+# three on the forecastle, 6-9 ft before the 64's 11-13. Each 2 ft 9 in-3 ft 3 in wide (the mean
+# taken); their depth the 64's upper-deck ports' (judgement).
+RAZEE_QUARTERDECK_PORTS_FT = [6.9, 17.5, 28.2, 37.8, 47.4, 57.5]
+RAZEE_FORECASTLE_PORTS_FT = [124.4, 134.7, 149.0]
+RAZEE_QD_PORT_FT = (3.0, UPPER_PORT_FT[1])
+# Her chase port a side for the two long 12s she carried from 1796 as bow chasers (D30 (a)):
+# no bow port is measured, so at about +22.9 m (Indf §5.1), 155.1 ft from AP, before the
+# catheads (ZAZ2375, from about 151 ft) and 5 ft 8 in abaft the stem head, its sill and
+# half-breadth found as the forecastle ports' are (judgement); a chaser's port is a triple of
+# its deck at the chaser's x (Build-Ships.md §5.1).
+RAZEE_CHASE_PORT_FT = 155.1
+# The lower masts cut at the heel (D19 (a)): each by the height of the deck taken off at that
+# mast, so that each head stands as high above the deck worked as the 64's (the kit's account,
+# the owner's notes V11; the cut measured on 1280T: Ind §3.3, judgement on measured decks).
+RAZEE_CUT_FT = {"fore": 6.25, "main": 6.0 + 7.0 / 12.0, "mizzen": 6.75}
+# Her mizen (D20 (a); Indf §4.5): Steel 1794 vol. I p. 40 (the page image, IA leaf n57, read):
+# "Driver boom, the same length as the main-topsail-yard", 65 ft 4 in on the 64's; "gaffs 5/8
+# of their booms", 40 ft 10 in.
+RAZEE_BOOM_FT = STEEL_64["topsail_yard"]["main"]
+RAZEE_GAFF_FT = 5.0 / 8.0 * RAZEE_BOOM_FT
+# The spanker cut by the frigate-36's rule (gen_ships.frigate(): its head 0.9 of the gaff, its
+# foot 0.9 of the boom, the gaff peaked 40 degrees; judgement there): the throat 3 ft below the
+# mizen's hounds (the frigate's gaff); the boom's jaws 6 ft 6 in above her quarterdeck, where the
+# 64's mizen course has its tack (Steel's mizen course "within 6 or 7 feet of the deck"), which
+# carries the boom clear over her taffrail. Indf §4.5's hoist of 43.7 ft (about 240 m2) had the
+# jaws about 1 ft above the deck, as the frigate's boom; so built, the hoist is 38.3 ft (218 m2).
+SPANKER_HEAD_OF_GAFF = 0.9
+SPANKER_FOOT_OF_BOOM = 0.9
+SPANKER_PEAK_DEG = 40.0
+SPANKER_THROAT_BELOW_HOUNDS_FT = 3.0
+SPANKER_BOOM_ABOVE_DECK_FT = 6.5
+# Her displacement against the 64's (Indf §2.1): the slice between the two lines, 238-244 tons
+# of 35 cu ft (measured, 1407F, ±5%: Ind §2.3.3), at 1.016 t a ton.
+SLICE_TONS = (238.0, 244.0)
+TONNE_OF_TON = 1.016
+# Her midship gun-deck sill, 6 ft 5 in above ZAZ2371's line (measured there: Ind §2.3.7), and
+# her old upper deck at midships, 12 ft 0 in above it (measured, 2371 and 1280T: Ind §2.3.5):
+# the independent measures the derivation is checked against (Indf §1.5), metres.
+RAZEE_MIDSHIP_SILL_M = (1.96, 0.03)
+RAZEE_OLD_UPPER_DECK_M = (3.66, 0.05)
+
+
+def razeed(p64):
+    """The razee of 1795 derived from the 64 as data (Indf §1.5): the dockyard's work applied by
+    named steps, each writing its source into what it changes, and the derivation's checks
+    raised before any file is written. Steps 5 and 7 change nothing: her topmasts,
+    topgallants, every square yard, the crossjack and the studding-sail booms, and her bowsprit
+    and jib-boom, are the 64's (D19 (a); D8 (b) as answered), standing on her new heads and in
+    their place in the hull; her guns, people and stores (step 8) are her own (Indf §5-§7)."""
+    p = the_rise(p64)
+    p = the_upper_works(p)
+    p = the_datum(p)
+    p = the_heels_cut(p)
+    p = the_mizen(p)
+    p = her_hull(p)
+    check_derivation(p64, p)
+    return p
+
+
+def the_rise(p):
+    """Step 1: her water drops 1.45 ft aft and 1.47 ft forward against WL1, so that every height
+    above it rises by as much at its station (D28 (a); Ind §2.3.1)."""
+    return replace(p, rise_ft=RAZEE_RISE_FT)
+
+
+def the_upper_works(p):
+    """Step 2: the 64's quarterdeck, forecastle and their sides off, and the upper deck in the
+    waist: her quarterdeck the old upper deck to its breast, her forecastle from 118.5 ft, her
+    gun deck (`upper`) the 64's lower deck; her rail, stern, side and ports as the cut left
+    them (James vol. 5 p. 428; ZAZ2371, ZAZ2374, ZAZ2375: Ind §2.2, §2.3.5, §2.3.7)."""
+    old_upper = DECKS_64["upper"]
+    qd_end, fc_start = RAZEE_QUARTERDECK_BREAST_FT, RAZEE_FORECASTLE_FT
+    quarterdeck = [pt for pt in old_upper if pt[0] < qd_end] + [(qd_end, interp(old_upper, qd_end))]
+    forecastle = [(fc_start, interp(old_upper, fc_start))] + [
+        pt for pt in old_upper if pt[0] > fc_start
+    ]
+    decks = {"upper": list(DECKS_64["lower"]), "quarterdeck": quarterdeck, "forecastle": forecastle}
+
+    def above_wl1(x_ft, z_k_ft):
+        return round(z_k_ft - wl1_above_k(x_ft), 2)
+
+    # the rail: the quarterdeck's from the taffrail to the breast, the waist top-side, the
+    # forecastle's rail, then the 64's beakhead and stem head, kept with her head and bowsprit
+    rail_above = RAZEE_RAIL_ABOVE_DECK_FT
+    taff = RAZEE_TAFFRAIL_FT
+    rail = [(taff, above_wl1(taff, interp(quarterdeck, taff) + rail_above))]
+    rail += [(x, above_wl1(x, z + rail_above)) for x, z in quarterdeck]
+    rail += [
+        (qd_end + 0.1, above_wl1(qd_end + 0.1, RAZEE_WAIST_SIDE_K_FT)),
+        (fc_start - 0.1, above_wl1(fc_start - 0.1, RAZEE_WAIST_SIDE_K_FT)),
+    ]
+    rail += [(x, above_wl1(x, z + rail_above)) for x, z in forecastle]
+    beak = RAIL[-2][0]  # the 64's beakhead, where her forecastle rail met the head (RAIL)
+    rail += [(beak, above_wl1(beak, interp(forecastle, beak) + rail_above)), STEM_HEAD_FT]
+    # the stern: the 64's counter up to the old upper deck's height where her taffrail stands at
+    # the middle line, and the taffrail's bulwark above it to the rail
+    counter = [pt for pt in STERN if pt[1] is None or pt[0] > taff]
+    x0, z0 = counter[-1]
+    x1, z1 = next(pt for pt in STERN if pt[1] is not None and pt[0] <= taff)
+    meet = z0 + (z1 - z0) * (taff - x0) / (x1 - x0)
+    stern = counter + [(taff, round(meet, 2)), rail[0]]
+    # the top of her side: the top-timber line under the quarterdeck and forecastle rails, the
+    # waist's top-side between them
+    breadth = []
+    for x, hb1 in WL1_HALF_BREADTHS:
+        tt = interp(TOP_TIMBER, x)
+        top = tt
+        if qd_end < x < fc_start:
+            top = tt + RAZEE_WAIST_SIDE_FRACTION * (interp(MAIN_BREADTH, x) - tt)
+        breadth.append((x, hb1, top))  # her water's half-breadth is `her_hull`'s (step 9)
+    # the ports: the 64's gun deck, and her quarterdeck and forecastle's at ZAZ2375's stations,
+    # with her chase port before them
+    old_sill = [(x, wl1_above_k(x) + s) for x, s in UPPER_SILLS]
+    fc_ports = RAZEE_FORECASTLE_PORTS_FT + [RAZEE_CHASE_PORT_FT]
+    ports = {
+        "upper": list(p.ports["lower"]),
+        "quarterdeck": [
+            (x, interp(old_sill, x), upper_sill_half_breadth(x)) for x in RAZEE_QUARTERDECK_PORTS_FT
+        ],
+        "forecastle": [(x, interp(old_sill, x), upper_sill_half_breadth(x)) for x in fc_ports],
+    }
+    port_notes = {
+        "upper": "her gun deck's thirteen a side, the 64's lower-deck ports kept (ZAZ2374 marks "
+        "the same thirteen within 0.4 ft: Ind §2.3.7): every sill measured on ZAZ1407 at full "
+        "resolution and raised by her rise, the half-breadths the 64's (judgement on measured "
+        "lines)",
+        "quarterdeck": "six a side at ZAZ2375's centres (measured, ±0.5 ft: Ind §2.3.7), the first "
+        "four the 64's upper-deck ports 1-4 within 0.8 ft: the sill the 64's upper-deck sill line "
+        "(measured on 1407F) at each port's station, raised by her rise (judgement; not "
+        "re-measured on ZAZ2371); 2 ft 9 in-3 ft 3 in wide, the mean, and as deep as the 64's "
+        "upper-deck ports (judgement); the half-breadth as at the 64's upper-deck sills "
+        "(judgement on measured lines)",
+        "forecastle": "three a side at ZAZ2375's centres (measured, ±0.5 ft: Ind §2.3.7): the "
+        "sill the 64's upper-deck sill line at each station, held at her foremost upper-deck "
+        "port's beyond it (judgement), raised by her rise; the size and the half-breadth as the "
+        "quarterdeck's (judgement); and her chase port at 155.1 ft, for the bow chasers she "
+        "carried from 1796 (D30 (a); no bow port measured, judgement), found as the others",
+    }
+    # the 64's stem head above her forecastle deck: her head is not measured on ZAZ2371
+    head_x, head_z = STEM_HEAD_FT
+    head_above = wl1_above_k(head_x) + head_z - interp(forecastle, head_x)
+    notes = dict(p.profile_notes)
+    notes.update(
+        {
+            "rail_m": "The top of her side, taffrail to stem head: the quarterdeck rail 4 ft 6 in "
+            "above the quarterdeck (measured on ZAZ2371, not re-measured: Ind §2.3.5) from her "
+            "taffrail, 5 ft 6 in abaft AP at the middle line (measured, ZAZ2375), to its breast at "
+            "74.4 ft; the waist top-side 30.8 ft above K (measured, 2371); the forecastle's rail "
+            "from 118.5 ft as the quarterdeck's (judgement), to the 64's beakhead and stem head "
+            "(measured on 1407F), kept with her head and bowsprit and not measured on ZAZ2371 "
+            f"(judgement; Indf §3.5 item 3): the stem head {head_above:.1f} ft above her "
+            "forecastle deck. The roundhouse, shortened to the beam abaft the mizen in December "
+            "1794, is not measured and is left out (Indf §1.5).",
+            "stem_m": "The fore edge of the stem, the gripe and the knee of the head, the 64's at "
+            "her own line: below the water as Ind §2.3.6 measures it, above it the 64's knee of "
+            "the head measured on 1407F to the head's top, kept with her head and not measured on "
+            "ZAZ2371 (judgement; Indf §3.5 item 3).",
+            "breadth_m": f"At {len(breadth)} stations: the half-breadth at her line, taken between "
+            "WL1's and WL2's by her rise (measured lines, Ind §2.3.2; judgement between them), and "
+            "at the top of her side: the 64's top-timber line under the quarterdeck and "
+            "forecastle rails (her quarterdeck rail 34 ft across moulded: Ind §2.3.2), and in the "
+            "waist her top-side, 37 ft 6 in across at midships, carried along between the "
+            "top-timber and main-breadth lines (judgement on measured lines); each with 4 1/2 in "
+            "of plank.",
+            "stern_m": "The 64's post and counter (measured on 1407F: Ind §2.3.6), to the old "
+            "upper deck's height at the middle line, where her taffrail stands 5 ft 6 in abaft AP "
+            "(measured, ZAZ2375), and the taffrail's bulwark above it to the rail (judgement).",
+            "wales_m": "The main wale, 20.2-24.7 ft above K at midships (measured on ZAZ2371: Ind "
+            "§2.3.5), carried along parallel to the gun deck's sills (judgement).",
+            "decks_m": "Each deck at the middle line over its extent (the 64's, measured on 1280T: "
+            "Ind §2.3.5): her gun deck the 64's lower deck; her quarterdeck the 64's upper deck to "
+            "its breast at 74.4 ft and her forecastle from 118.5 ft (measured, ZAZ2375), the waist "
+            "between them open but for the gangways along the sides.",
+        }
+    )
+    return replace(
+        p,
+        decks=decks,
+        ports=ports,
+        port_size_ft={
+            "upper": LOWER_PORT_FT,
+            "quarterdeck": RAZEE_QD_PORT_FT,
+            "forecastle": RAZEE_QD_PORT_FT,
+        },
+        port_notes=port_notes,
+        rail=rail,
+        stern=stern,
+        breadth=breadth,
+        profile_notes=notes,
+        fore_channel_k_ft=FORE_CHANNEL_K_FT_RAZEE,
+    )
+
+
+def the_datum(p):
+    """Step 3: D18 (a), the uppermost continuous deck: her gun deck, her waist having gangways
+    only (ZAZ2375), where the 64's was her upper deck (Indf §2.2; open)."""
+    return replace(p, datum_deck="upper")
+
+
+def the_heels_cut(p):
+    """Step 4: each lower mast cut at the heel by `RAZEE_CUT_FT` (D19 (a); Ind §3.3), its head
+    Steel's for the length the table gives, standing so much lower above K."""
+    masts = {name: dict(m, cut_ft=RAZEE_CUT_FT[name]) for name, m in p.masts.items()}
+    return replace(p, masts=masts)
+
+
+def the_mizen(p):
+    """Step 6: the 64's mizen yard and course give way to a gaff, a driver boom and a spanker
+    (D20 (a); Indf §4.5)."""
+    return replace(p, mizen="spanker")
+
+
+def her_hull(p):
+    """Step 9: her hull block, her own measured figures and not transforms (Indf §2.1; Ind
+    §2.3-§2.4), and the half-breadths at her own water."""
+    hull = {
+        "length_waterline_m": 48.8,
+        "beam_m": 13.54,
+        "draught_m": 5.88,
+        "displacement_kg": 1925000.0,
+        "gm_m": 1.65,
+        "clr_x_m": 4.1,
+        "lateral_area_m2": 283.4,
+        "hull_speed_kn": 14.0,
+        "rudder": {"area_m2": 8.45, "max_angle_deg": 35, "rate_deg_s": 3.0, "span_m": 6.04},
+    }
+    hull_notes = {
+        "length_waterline_m": "160 ft: WL1 rabbet to rabbet, as the 64's (D29 (b): Ind §2.3.2, "
+        "§2.4); 163.8 ft (49.9 m) outside the post and the stem at her own line (measured, Ind "
+        "§2.3.6).",
+        "beam_m": "44 ft 5 in extreme as built (Winfield 1793-1817 p. 100; D34 (a)): the cut took "
+        "nothing off her breadth.",
+        "draught_m": "19 ft 3 in mean to K, the band's bottom, at ZAZ2371's drawn line, 1.45 ft "
+        "aft and 1.47 ft forward below WL1 (measured, 2371 against 1407F, ±0.25 ft: Ind §2.3.1; "
+        "D28 (a), D29 (b)); 5.71 m to the main keel. Osler's 'nineteen and a half feet abaft' "
+        "(p. 111, May 1795) lies within that line's ±0.25 ft.",
+        "displacement_kg": "1,925 t: judgement within the band integrated on her measured lines, "
+        "1,900-1,955 t (Ind §2.3.3), the 64's 2,170 t less the slice measured between the two "
+        "lines, 238-244 tons of 35 cu ft (Indf §2.1).",
+        "gm_m": "5 ft 5 in: judgement within 1.5-1.8 m (Ind §2.3.4): KM measured 7.25 m above K, "
+        "her KG about 1 ft lower than the 64's for the upper works and the 18- and 9-pounders "
+        "taken off; no period figure for either was found.",
+        "clr_x_m": "The measured centroid of the plane the file counts (hull and band, no rudder), "
+        "0.58-0.64 m abaft the middle of the load line (Ind §2.3.6), with the frigate-36's tuned "
+        "lead of 9.6% of her load line ahead of it (Indf §2.1; judgement), kept as tuned against "
+        "the helm's truths (6 and 17), measured at seed 7 in 15 kn under plain sail: she carries "
+        "1.5-2.5 deg of weather helm from six points to eleven, about the frigate-36's; truth 6's "
+        "form holds (the headsails in, 3.6 deg; the spanker in, 1.2 of lee helm); she gets under "
+        "way from rest close-hauled in 6 1/2 minutes without coming above 66 deg off or "
+        "gathering sternway (truth 17), and tacks in 6-8 minutes. At +3.5 m her helm "
+        "close-hauled falls to a degree and she forereaches 1.6 kn hove to.",
+        "lateral_area_m2": "Below her line with the band, the rudder left out, as the frigate's "
+        "(measured, 1407F at 1.45 ft below WL1: 3,050-3,052 sq ft; Ind §2.3.6).",
+        "hull_speed_kn": "D24 (a): the frigate-36's 13.0 carried by the root of the lengths, "
+        "sqrt(160/137) = 14.05 (Indf §2.1), tuned only within 13-14.5; no period knots for her "
+        "were found (Ind §7). Kept at its start: at 14.5 her polar in 15 kn rises by 0.04 kn at "
+        "most and stays under the frigate-36's close-hauled and running large, so the band "
+        "cannot bear out the Virginie chase there (Indf §9; measured, reported and not forced); "
+        "her best in 25 kn, 11.5 kn, meets the chase's 11.2. Plainly: the 64 and the razee have "
+        "one length, so the gap between their figures is the decision's ranking, not the "
+        "waterline's.",
+        "deck_height_m": "Her gun deck at midships, 4 ft 7 in above her line (the 64's lower deck, "
+        "measured on 1280T: Ind §2.3.5; 4 ft 5 in-4 ft 8 in on ZAZ2371): the uppermost "
+        "continuous deck, her waist having gangways only (ZAZ2375), D18 (a) as proposed (open: "
+        "Indf §2.2); under (c), her old upper deck, it would be 3.66 m. The datum of every spar "
+        "height and every sail's corners.",
+        "rudder": "The 64's (ZAZ2371 shows the same stepped outline), measured on 1407F at her "
+        "line (Ind §2.3.6): 90.4-91.8 sq ft below it, span 19 ft 10 in; 35 degrees and 3 deg/s "
+        "the frigate-36's (judgement).",
+    }
+    aft, fwd = p.rise_ft
+    breadth = []
+    for x, _, top in p.breadth:
+        rise = aft + (fwd - aft) * x / 160.0
+        hb1, hb2 = interp(WL1_HALF_BREADTHS, x), interp(WL2_HALF_BREADTHS, x)
+        breadth.append((x, hb1 + (hb2 - hb1) * rise / WL2_BELOW_WL1_FT, top))
+    return replace(
+        p,
+        key="razee",
+        file="razee-44.yaml",
+        era_notes="HMS Indefatigable as razeed, 1795: the Ardent-class 64 of 1784 cut down to a "
+        "frigate by the Navy Office's draught of September 1794 (ZAZ2371), her quarterdeck, "
+        "forecastle and their sides taken off and her lower masts shortened, rated a 44 (Winfield "
+        "1793-1817 pp. 99-100; James vol. 1 p. 454, vol. 5 p. 428). Derived from the 64's file as "
+        "data: her hull and lines the 64's measured on her draughts (ZAZ1407, ZAZ1280) at her "
+        "own line (ZAZ2371), her spars the 64's by Steel 1794 vol. I p. 49 with her lower masts "
+        "cut at the heel and a gaff and driver boom by Steel's rule; see "
+        "tools/ships/indefatigable.py for every figure and judgement.",
+        header=(
+            "# HMS Indefatigable as razeed, 1795: the 64 of 1784 cut down to a 44-gun frigate.\n"
+            "# Generated by tools/gen_ships.py (tools/ships/indefatigable.py); edit those and\n"
+            "# rerun, do not edit this file. Derived from the 64 as data (razeed()): her hull\n"
+            "# and profile the 64's measured on her draughts (RMG ZAZ1407, ZAZ1280) at her own\n"
+            "# line (ZAZ2371, ZAZ2375; docs/design/Research-Indefatigable-2026-10.md). Spars:\n"
+            "# Steel 1794 vol. I p. 49, the 64 column, her lower masts cut at the heel; her\n"
+            "# gaff and driver boom by Steel's rule (p. 40). Sails: Steel's table IV, the 64\n"
+            "# column, the topgallants and royals cut to the spars (the owner's rule).\n"
+            "# Units: metres, m2, kg, kN. Comments mark each judgement.\n"
+        ),
+        hull=hull,
+        hull_notes=hull_notes,
+        breadth=breadth,
+    )
+
+
+def mast_head_k_ft(m):
+    """A lower mast's head above K, feet, as `write()` stands it: its heel on its step and its
+    length less any cut at the heel (the razee's; Indf §4.1)."""
+    return m["heel_k_ft"] + (m["length_ft"] - m["cut_ft"])
+
+
+def check_derivation(p64, p):
+    """The derivation's checks (Indf §1.5), raised before any file is written: her midship sill
+    and her old upper deck against ZAZ2371's independent measures, each lower mast's head as
+    `write()` stands it lower above K than the 64's by its cut (so no step but the fourth moves
+    a heel or a length), and her displacement less by the measured slice."""
+    sill = p.z_m(interp([(x, z) for x, z, _ in p.ports["upper"]], MIDSHIPS_FT), MIDSHIPS_FT)
+    want, tol = RAZEE_MIDSHIP_SILL_M
+    if abs(sill - want) > tol:
+        raise ValueError(
+            f"The razee's midship gun-deck sill stands {sill:.3f} m above her water, more than "
+            f"{tol} m from ZAZ2371's measured {want} m (Indf §1.5)."
+        )
+    old_upper = p.z_m(interp(DECKS_64["upper"], MIDSHIPS_FT), MIDSHIPS_FT)
+    want, tol = RAZEE_OLD_UPPER_DECK_M
+    if abs(old_upper - want) > tol:
+        raise ValueError(
+            f"The razee's old upper deck stands {old_upper:.3f} m above her water at midships, "
+            f"more than {tol} m from the {want} m measured on ZAZ2371 and 1280T (Indf §1.5)."
+        )
+    for name, m in p.masts.items():
+        lower = mast_head_k_ft(p64.masts[name]) - mast_head_k_ft(m)
+        if abs(lower - RAZEE_CUT_FT[name]) > 1e-9:
+            raise ValueError(
+                f"The razee's {name} mast head stands {lower:.3f} ft lower above K than the "
+                f"64's, not by its cut of {RAZEE_CUT_FT[name]:.3f} ft (Indf §1.5)."
+            )
+    slice_tons = (p64.hull["displacement_kg"] - p.hull["displacement_kg"]) / 1000.0 / TONNE_OF_TON
+    if not SLICE_TONS[0] <= slice_tons <= SLICE_TONS[1]:
+        raise ValueError(
+            f"The razee displaces {slice_tons:.1f} tons of 35 cu ft less than the 64, outside the "
+            f"slice measured between their lines, {SLICE_TONS[0]:g}-{SLICE_TONS[1]:g} (Indf §1.5)."
+        )
+
+
+# ---------------------------------------------------------------------------
+# The file
+# ---------------------------------------------------------------------------
+
+
+def hull_block(p):
+    """Her hull dict with its profile as the last key (Build-Ships.md §5.1), and its notes."""
+    hull = dict(p.hull)
+    hull["deck_height_m"] = p.datum_z
+    rudder = hull.pop("rudder")
+    hull["rudder"] = rudder
+    notes = dict(p.hull_notes)
+
+    def pt(x_ft, z_wl1_ft):
+        """A point measured above WL1, as the file's [x, z] above her own water."""
+        return [x_m(x_ft), p.z_m(wl1_above_k(x_ft) + z_wl1_ft, x_ft)]
+
+    def k(x_ft):
+        return [x_m(x_ft), p.z_m(0.0, x_ft)]
+
+    stem = [k(x) if z is None else pt(x, z) for x, z in STEM]
+    stern = [k(x) if z is None else pt(x, z) for x, z in p.stern]
+    rail = [pt(x, z) for x, z in p.rail]
+    breadth = [[x_m(x), (hb + PLANK_FT) * FT, (top + PLANK_FT) * FT] for x, hb, top in p.breadth]
+    mid_sill = interp(LOWER_SILLS, MIDSHIPS_FT)
+    wales = [
+        [x_m(x)] + [p.z_m(z + (s - mid_sill), x) for z in MAIN_WALE_K_FT]
+        for x, s in LOWER_SILLS[::3]
+    ]
+    rabbet_k = wl1_above_k(MIDSHIPS_FT) - WL1_ABOVE_RABBET_FT
+    section = [[p.z_m(rabbet_k + h, MIDSHIPS_FT), (hb + PLANK_FT) * FT] for h, hb in SECTION]
+    decks = {word: [[x_m(x), p.z_m(z, x)] for x, z in pts] for word, pts in p.decks.items()}
+    ports = {
+        word: [[x_m(x), p.z_m(z, x), hb * FT] for x, z, hb in triples]
+        for word, triples in p.ports.items()
+    }
+    sizes = {word: [w * FT, d * FT] for word, (w, d) in p.port_size_ft.items()}
+    hull["profile"] = g.hull_profile(
+        rail,
+        breadth,
+        keel=[k(x) for x in KEEL_FT],
+        stem=stem,
+        stern=stern,
+        wales=wales,
+        section=section,
+        decks=decks,
+        ports=ports,
+        port_size=sizes,
+    )
+    notes["profile"] = (
+        "Her side, decks and ports (Indf §3; Build-Ships.md §5.1): x forward of the middle of "
+        "the load line, z above her load water at each station, metres; every point measured "
+        "on her draughts but where its line's note says judgement."
+    )
+    notes["profile.rail_m"] = p.profile_notes["rail_m"]
+    notes["profile.breadth_m"] = p.profile_notes["breadth_m"]
+    notes["profile.keel_m"] = (
+        "K, the band's bottom, from the post's heel to its square fore end (Ind §2.3.6)."
+    )
+    notes["profile.stem_m"] = p.profile_notes["stem_m"]
+    notes["profile.stern_m"] = p.profile_notes["stern_m"]
+    notes["profile.wales_m"] = p.profile_notes["wales_m"]
+    notes["profile.section_m"] = (
+        "The midship section, ZAZ1407's outermost (measured, 1407T, ±0.15 ft: Ind §2.3.2), with 4 "
+        "1/2 in of plank."
+    )
+    notes["profile.decks_m"] = p.profile_notes["decks_m"]
+    for word, text in p.port_notes.items():
+        notes[f"profile.ports_m.{word}"] = text[0].upper() + text[1:] + "."
+    return hull, notes
+
+
+def write(out_dir, p):
+    """Build one variant's file in full and dump it to `out_dir`."""
+    hull, hull_notes = hull_block(p)
+    b = g.Builder(p.name, "ship", p.era_notes, hull, hull_notes)
+    datum = p.datum_z
+    datum_ft = datum / FT
+
+    # -- the masts' geometry, feet above the datum, keyed as the frigate's (Indf §1.3) --------
+    geom, mast_x, rake = {}, {}, {}
+    for name, m in p.masts.items():
+        L = m["length_ft"] - m["cut_ft"]
+        head = head_ft(m["length_ft"], HEAD_IN_PER_YARD["mast"][name])
+        # the heel on its step in the hold; a mast cut at the heel (the razee's) stands lower
+        # by its cut, its head Steel's for the length the table gives (Indf §4.1)
+        above = (mast_head_k_ft(m) - p.water_ft(m["x_ft"])) - datum_ft
+        T = STEEL_64["topmast"][name]
+        t_head = head_ft(T, HEAD_IN_PER_YARD["topmast"][name])
+        t_hoist = T - head  # above the lower cap: the doubling is the lower mast head
+        G = STEEL_64["topgallant_mast"][name]
+        g_square = head_ft(G, HEAD_IN_PER_YARD["topgallant_mast"][name])
+        pole = POLE_OF_TOPGALLANT * G
+        g_hoist = G - pole - t_head  # above the topmast cap, to the stop under the pole
+        tg_hounds = HOUNDS_OF_STOP * g_square  # the topgallant yard's hoist below the stop
+        geom[name] = {
+            "length": L,
+            "above": above,
+            "head": head,
+            "t_len": T,
+            "t_head": t_head,
+            "t_hoist": t_hoist,
+            "g_len": G,
+            "g_hoist": g_hoist,
+            "r_hoist": pole,
+            "yard": STEEL_64["yard"][name],
+            "topsail_yard": STEEL_64["topsail_yard"][name],
+            "tg_yard": STEEL_64["tg_yard"][name],
+            "royal_yard": STEEL_64["royal_yard"][name],
+            # the frigate's rules (gen_ships.frigate): the lower yards slung 2 ft below the
+            # hounds, the topsail yards hoisted to the topmast hounds; the topgallant yards to
+            # the topgallant's hounds, under the stop; the royals a foot below the pole's head
+            "yard_h": above - head - 2.0,
+            "topsail_h": above + t_hoist - t_head,
+            "tg_h": above + t_hoist + g_hoist - tg_hounds,
+            "royal_h": above + t_hoist + g_hoist + pole - 1.0,
+        }
+        mast_x[name] = round(x_m(m["x_ft"]), 2)
+        rake[name] = m["rake_deg"]
+
+    yard_lengths = {"course": "yard", "topsail": "topsail_yard", "topgallant": "tg_yard"}
+    yard_lengths["royal"] = "royal_yard"
+    yard_heights = {"course": "yard_h", "topsail": "topsail_h", "topgallant": "tg_h"}
+    yard_heights["royal"] = "royal_h"
+    level_of_spar = {"course": "lower", "topsail": "topsail", "topgallant": "topgallant"}
+    level_of_spar["royal"] = "royal"
+    below = {"topgallant": "topsail_h", "royal": "tg_h"}
+
+    # -- the square sails: Steel's below the topmast caps, cut to the spars above them ---------
+    def cut(sid, level, gm):
+        head_cl, foot_cl, depth_yd = STEEL_SAILS_64[sid]
+        head_w, foot_w = head_cl * CLOTH_IN_SAIL_FT, foot_cl * CLOTH_IN_SAIL_FT
+        hung = gm[yard_heights[level]]
+        if level in below:
+            # the owner's rule (Build-Ships.md §19.1 item 5): the spars rule over Steel's sail
+            # table above the topmast caps; the sail cut between its yard and the yard below
+            depth = hung - gm[below[level]]
+        else:
+            depth = 3.0 * depth_yd
+        area = round((head_w + foot_w) / 2.0 * depth * FT * FT)
+        # the centre of the trapezoid, its head on its yard
+        drop = depth * (head_w + 2.0 * foot_w) / (3.0 * (head_w + foot_w))
+        centre = round(datum + (hung - drop) * FT, 1)
+        table = round((head_w + foot_w) / 2.0 * 3.0 * depth_yd * FT * FT)
+        return area, centre, head_cl, foot_cl, depth_yd, depth, table
+
+    areas = {}
+    for name, levels in BRACE_PLANS.items():
+        for level, _ in levels:
+            sid = sail_of(name, level)
+            areas[sid] = cut(sid, level, geom[name])
+
+    # the after sail, its corners in the drawings' frame so that its area and centre are its
+    # cut's: the 64's mizen course (Indf §4.4), its tack on the mast above the quarterdeck; the
+    # razee's spanker on her gaff and driver boom (§4.5)
+    if p.mizen == "course":
+        mizen = mizen_course_cut(p, geom["mizzen"], mast_x["mizzen"], rake["mizzen"], datum)
+    else:
+        mizen = spanker_cut(p, geom["mizzen"], mast_x["mizzen"], rake["mizzen"], datum)
+    # the headsails, each a triangle on its stay (below)
+    bow = head_geometry(p, geom, mast_x, rake, datum)
+    plain = (
+        sum(areas[s][0] for s in areas if not s.endswith(".royal"))
+        + sum(h["area"] for sid, h in bow["sails"].items() if sid != "fore.staysail")
+        + mizen["area"]
+    )
+    # her rope: the frigate's scaled by the root of her plain sail over the frigate's, so that a
+    # line's rating grows with the sail it works (Indf §4.2; judgement); Steel's rigging table
+    # for a 64 (vol. II) is not legible in the OCR, and is the check still to make
+    rope_scale = math.sqrt(plain / FRIGATE_PLAIN_SAIL_M2)
+
+    yards_by_level = {"course": [], "topsail": [], "topgallant": [], "royal": []}
+    sails_by_level = {"course": [], "topsail": [], "topgallant": [], "royal": []}
+    prov = " Provisional (truth 9), see gen_ships.py."
+    for name in ("fore", "main", "mizzen"):
+        gm = geom[name]
+        m = p.masts[name]
+        x = mast_x[name]
+        lv = {lvl: areas[sail_of(name, lvl)] for lvl, _ in BRACE_PLANS[name]}
+        carried = {
+            level: [(lv[lev][0], lv[lev][1], "square") for lev in lv if lev in above_levels]
+            for level, above_levels in (
+                ("lower", ("course", "topsail", "topgallant", "royal")),
+                ("topsail", ("topsail", "topgallant", "royal")),
+                ("topgallant", ("topgallant", "royal")),
+                ("royal", ("royal",)),
+            )
+        }
+        if name == "mizzen":
+            carried["lower"].append((mizen["area"], mizen["centre"], "gaff"))
+        head_z = (gm["above"] + datum_ft) * FT
+        stick = f"{name} lower mast {fmt_ft(gm['length'])} (Steel 1794 vol. I p. 49, the 64)"
+        if m["cut_ft"]:
+            stick = (
+                f"{name} lower mast {fmt_ft(gm['length'])}: the 64's {fmt_ft(m['length_ft'])} "
+                f"(Steel 1794 vol. I p. 49) cut {fmt_ft(m['cut_ft'])} at the heel, the height of "
+                "the 64's deck above the old upper deck at the mast (D19 (a): the kit's account, "
+                "the cut measured on 1280T, Ind §3.3)"
+            )
+        lower = b.spar(
+            f"{name}.mast",
+            "mast",
+            x_m=x,
+            rake_deg=rake[name],
+            height_m=g.ft(gm["above"]),
+            rating_kn=g.design_kn(carried["lower"], g.DESIGN_WIND_KN["lower"]),
+            note=f"{stick}, its head {fmt_ft(gm['head'])} by Steel's rule; its heel "
+            f"{m['heel_k_ft']:.2f} ft above K and its place at the lower-deck partners "
+            f"{m['x_ft']:.2f} ft from AP, raking {rake[name]} deg (measured, ZAZ1280: Ind §3.1): "
+            f"its head {head_z:.2f} m above her water, {gm['above']:.1f} ft above the datum.{prov}",
+        )
+        top = b.spar(
+            f"{name}.topmast",
+            "topmast",
+            steps_on=lower,
+            height_m=g.ft(gm["t_hoist"]),
+            rating_kn=g.design_kn(carried["topsail"], g.DESIGN_WIND_KN["topsail"]),
+            note=f"{name} topmast {fmt_ft(gm['t_len'])} (Steel p. 49), {gm['t_hoist']:.1f} ft "
+            f"above the lower cap, its head {fmt_ft(gm['t_head'])} by Steel's rule.{prov}",
+        )
+        tg = b.spar(
+            f"{name}.topgallant_mast",
+            "topgallant_mast",
+            steps_on=top,
+            height_m=g.ft(gm["g_hoist"]),
+            rating_kn=g.design_kn(carried["topgallant"], g.DESIGN_WIND_KN["topgallant"]),
+            note=f"{name} topgallant mast {fmt_ft(gm['g_len'])} with its royal pole, one stick "
+            f"(Steel p. 49: no royal masts in the 64's column), {gm['g_hoist']:.1f} ft of it above "
+            "the topmast cap to the stop under the pole, Steel's common pole-head (seven-"
+            f"eighteenths of the length) above it.{prov}",
+        )
+        royal = b.spar(
+            f"{name}.royal_mast",
+            "royal_mast",
+            steps_on=tg,
+            height_m=g.ft(gm["r_hoist"]),
+            rating_kn=g.design_kn(carried["royal"], g.DESIGN_WIND_KN["royal"]),
+            note=f"{name} royal pole {gm['r_hoist']:.1f} ft, the topgallant mast's own head, "
+            "filed as a royal mast stepped on it as the frigate-36 files hers, so that the royal "
+            f"yard has its own spar (Indf §4.1).{prov}",
+        )
+        on_spar = {"course": lower, "topsail": top, "topgallant": tg, "royal": royal}
+        factor = g.FRIGATE_MAST_ROPE_FACTOR[name] * rope_scale
+        for level, limit in BRACE_PLANS[name]:
+            yard_id = f"{name}.{level}.yard" if level != "course" else f"{name}.yard"
+            sail_id = sail_of(name, level)
+            area, centre, head_cl, foot_cl, depth_yd, depth, table = areas[sail_id]
+            yard = b.spar(
+                yard_id,
+                "yard",
+                on=on_spar[level],
+                length_m=g.ft(gm[yard_lengths[level]]),
+                height_m=g.ft(gm[yard_heights[level]]),
+                brace_limit_deg=limit,
+                rating_kn=g.design_kn(
+                    carried[level_of_spar[level]], g.DESIGN_WIND_KN[level_of_spar[level]]
+                ),
+                note=f"{name} {level} yard {fmt_ft(gm[yard_lengths[level]])} (Steel p. 49, the "
+                f"64); braces {limit} deg from square (the frigate-36's, Fincham 1843 art. 102; "
+                f"judgement for her, Indf §4.2).{prov}",
+            )
+            reef = REEFS[level] if not isinstance(REEFS[level], dict) else REEFS[level][name]
+            canvas = g.FRIGATE_CANVAS[sail_id]
+            if level in ("topgallant", "royal"):
+                how = (
+                    f"cut between its yard and the yard below as the spars stand, {depth:.1f} ft "
+                    f"deep, on Steel's cloths ({head_cl:g} at the head, {foot_cl:g} at the foot): "
+                    f"the spars rule over the sail table above the topmast caps (the owner's "
+                    f"answer, Build-Ships.md §19.1 item 5); the table's {depth_yd:g} yards deep "
+                    f"would give {table} m2"
+                )
+            else:
+                how = (
+                    f"Steel's table IV, the 64: {head_cl:g} cloths at the head, {foot_cl:g} at "
+                    f"the foot, {depth_yd:g} yards deep, 22 1/2 in a cloth in the sail (Ind §5; "
+                    f"±10%, judgement); {reef} reef band{'s' if reef != 1 else ''} (Steel)"
+                )
+            sail = b.sail(
+                sail_id,
+                "square",
+                yard=yard,
+                area_m2=area,
+                reef_bands=reef,
+                # the royals set flying (Steel 1794 vol. I p. 214, ROYALS "Are set flying"),
+                # sent down on deck with their yards when taken in
+                flying=True if level == "royal" else None,
+                x_m=g.raked_x(x, rake[name], centre, deck_m=datum),
+                centre_height_m=centre,
+                canvas_no=canvas[0],
+                cloth_rating_kn=g.cloth(area, canvas[0]),
+                note=f"{name} {level}: {area} m2, {how}.{g.canvas_note(canvas)}",
+            )
+            sizes = {cls: g.quarter(c * factor) for cls, c in g.FRIGATE_ROPE[level].items()}
+            g.square_sail_lines(
+                b,
+                sail,
+                yard,
+                sizes,
+                hoisting=(level != "course"),
+                course=(level == "course"),
+                reef=(reef > 0),
+                bowline=(level == "topsail"),
+            )
+            yards_by_level[level].append(yard)
+            sails_by_level[level].append(sail)
+        shrouds = SHROUDS[name]
+        shroud_size = g.quarter((9.5 if name != "mizzen" else 6.5) * rope_scale)
+        b.sided(
+            f"{name}.shrouds",
+            "shroud",
+            lower,
+            rating=g.rope_kn(shroud_size, shrouds),
+            note=f"{shrouds} shrouds of {shroud_size} in a side: "
+            + (RAZEE_SHROUD_NOTES if m["cut_ft"] else SHROUD_NOTES)[name]
+            + f"; the frigate-36's size scaled by her rope's {rope_scale:.3f} (judgement).",
+        )
+        bs_size = g.quarter((6.0 if name != "mizzen" else 4.5) * rope_scale)
+        b.sided(f"{name}.topmast.backstay", "backstay", top, rating=g.rope_kn(bs_size, 2))
+
+    gz = geom["mizzen"]
+    lift_size = mizzen_lift_in(rope_scale)
+    b.spar(
+        "mizzen.crossjack.yard",
+        "yard",
+        on="mizzen.mast",
+        length_m=g.ft(gz["yard"]),
+        height_m=g.ft(gz["yard_h"]),
+        brace_limit_deg=CROSSJACK_BRACE_DEG,
+        rating_kn=g.design_kn(
+            [(areas["mizzen.topsail"][0], areas["mizzen.topsail"][1], "square")],
+            g.DESIGN_WIND_KN["lower"],
+        ),
+        note=f"crossjack yard {fmt_ft(gz['yard'])} (Steel p. 49, the 64); crosses no sail, spreads "
+        f"the mizzen topsail's foot; braces {CROSSJACK_BRACE_DEG} deg from square (the "
+        "frigate-36's; judgement).",
+    )
+    b.sided(
+        "mizzen.crossjack.yard.brace",
+        "brace",
+        "mizzen.crossjack.yard",
+        rating=g.rope_kn(g.quarter(5.0 * g.FRIGATE_MAST_ROPE_FACTOR["mizzen"] * rope_scale)),
+    )
+    b.sided(
+        "mizzen.crossjack.yard.lift",
+        "lift",
+        "mizzen.crossjack.yard",
+        rating=g.rope_kn(lift_size),
+        note=f"the crossjack's lifts, {lift_size} in, as a course's (judgement): every yard's "
+        "lifts are carried, and drawn (the owner's answer, Build-Ships.md §19.1 item 7).",
+    )
+
+    # -- the after sail: the 64's mizen course, the stand-in at stage A (Indf §4.4); the razee's
+    # spanker on her gaff and driver boom (§4.5) ------------------------------------------------
+    if p.mizen == "course":
+        after_sail = mizen_course(b, p, mizen, rope_scale)
+    else:
+        after_sail = spanker(b, p, mizen, rope_scale)
+
+    # -- the head (Indf §4.6) ------------------------------------------------------------------
+    headsails = write_head(b, p, bow, rope_scale)
+    head_yards(b, p)
+
+    # -- the stays the masts stand by (the frigate's, scaled; judgement) ------------------------
+    for sid, of, size, text in (
+        (
+            "fore.stay",
+            "fore.mast",
+            15.0,
+            "to a collar half way out the bowsprit's outboard part (judgement); the fore "
+            "staysail and the fore storm staysail set on it",
+        ),
+        ("main.stay", "main.mast", 16.0, None),
+        ("main.topmast.stay", "main.topmast", 7.5, None),
+        (
+            "mizzen.stay",
+            "mizzen.mast",
+            10.0,
+            "from the mizen mast head to a collar on the main mast twelve feet above the "
+            "quarterdeck (Steel 1794 vol. I, 'Mizen-stay'); the mizzen storm staysail sets on it",
+        ),
+    ):
+        size = g.quarter(size * rope_scale)
+        b.line(
+            sid,
+            "stay",
+            of,
+            rating=g.rope_kn(size),
+            note=f"{size} in: the frigate-36's scaled by her rope's {rope_scale:.3f} "
+            f"(judgement){'; ' + text if text else ''}.",
+        )
+
+    # -- the staysails between the masts by Steel's rules on her geometry (Indf §4.3; the
+    # frigate's helper, package 57), each note giving Steel's table IV figure for the 64 and how
+    # far the cut stands from it: four of the six fall outside the check's bands, kept as cut
+    # and open for the owner or the lead --------------------------------------------------------
+    staysail_kw = dict(
+        geom=geom,
+        mast_x=mast_x,
+        rake_deg=rake,
+        deck_height=datum,
+        canvas=g.FRIGATE_CANVAS,
+        brig=False,
+    )
+    between = g.between_the_masts(b, ahead="fore", after="main", **staysail_kw)
+    between += g.between_the_masts(b, ahead="main", after="mizzen", **staysail_kw)
+    cut_areas = {s["id"]: s["area_m2"] for s in b.doc["sails"]}
+    for sid in between:
+        b.notes[sid] += steels_staysail_words(sid, cut_areas[sid])
+
+    # -- the studding sails, the storm canvas and the occasional sails (Indf §4.3, §4.7) --------
+    stuns = studding_sails(b, p, geom, mast_x, rake, rope_scale)
+    storm = storm_canvas(b, p, geom, mast_x, rake, bow, after_sail, rope_scale)
+    occasional, save_alls = occasional_sails(b, p, mast_x, mizen, rope_scale)
+
+    # -- groups (the frigate-36's set, with the names the engine reads: Indf §4.7) ---------------
+    square = sum(sails_by_level.values(), [])
+    b.group("courses", sails_by_level["course"])
+    b.group("topsails", sails_by_level["topsail"])
+    b.group("topgallants", sails_by_level["topgallant"])
+    b.group("royals", list(sails_by_level["royal"]))
+    b.group("headsails", headsails)
+    b.group("jibs", ["jib"])
+    b.group("staysails", headsails[:2] + between)
+    # Steel's staysails between the masts as one group, as the frigate-36's (package 57)
+    b.group("staysails between the masts", between)
+    b.group("studdingsails", stuns)
+    b.group("square sails", square)
+    b.group("fore-and-aft sails", headsails + between + [after_sail])
+    # the light sails, as the frigate-36's: the royals, the light staysails (the main and mizen
+    # staysails, of No. 2, are not light canvas) and the studding sails; her one jib, Steel's
+    # "Jib Flying", is in plain sail as the frigate's jib is, and not here
+    light_staysails = [s for s in between if s not in ("main.staysail", "mizzen.staysail")]
+    b.group("light sails", sails_by_level["royal"] + light_staysails + stuns)
+    # lying to (package 57): Steel 1794 vol. II, 'Lying-to under the main staysail'
+    b.group("lying-to staysails", ["main.staysail"])
+    # the polar reads this group alone (world/ships.py): courses, topsails, topgallants, the
+    # fore topmast staysail and the jib, and the mizen course or the spanker, as the frigate's
+    b.group(
+        "plain sail",
+        sails_by_level["course"]
+        + sails_by_level["topsail"]
+        + sails_by_level["topgallant"]
+        + headsails[1:]
+        + [after_sail],
+    )
+    b.group("all sail", square + headsails + between + [after_sail] + stuns)
+    for name in ("fore", "main", "mizzen"):
+        b.group(
+            f"{name} yards",
+            [y for lvl in yards_by_level for y in yards_by_level[lvl] if y.startswith(name + ".")]
+            + (["mizzen.crossjack.yard"] if name == "mizzen" else []),
+        )
+    b.group(
+        "yards",
+        [y for lvl in yards_by_level for y in yards_by_level[lvl]] + ["mizzen.crossjack.yard"],
+    )
+    b.group("lower yards", yards_by_level["course"] + ["mizzen.crossjack.yard"])
+    b.group("topsail yards", yards_by_level["topsail"])
+    b.group("topgallant yards", yards_by_level["topgallant"])
+    b.group("royal yards", yards_by_level["royal"])
+    b.group(
+        "head yards",
+        [y for lvl in yards_by_level for y in yards_by_level[lvl] if y.startswith("fore.")],
+    )
+    b.group(
+        "after yards",
+        [y for lvl in yards_by_level for y in yards_by_level[lvl] if not y.startswith("fore.")]
+        + ["mizzen.crossjack.yard"],
+    )
+    b.group("lower masts", ["fore.mast", "main.mast", "mizzen.mast"])
+    b.group("topmasts", ["fore.topmast", "main.topmast", "mizzen.topmast"])
+    b.group(
+        "topgallant masts",
+        ["fore.topgallant_mast", "main.topgallant_mast", "mizzen.topgallant_mast"],
+    )
+    b.group("royal masts", ["fore.royal_mast", "main.royal_mast", "mizzen.royal_mast"])
+    # aliases: what an officer of 1795 would say (Falconer 1780; Lever 1827), the frigate-36's;
+    # the first a part has is its name in the log (evolutions/runner.py, part_name)
+    if p.mizen == "course":
+        # Steel's 'Mizen-course' on the mizen yard (Indf §4.7); no "spanker" or "driver": the
+        # driver is Steel's own occasional sail, stage B's (Indf §4.4)
+        for word in ("mizzen course", "mizen course", "mizzen", "mizen"):
+            b.alias(word, "mizzen.course")
+        for word in ("mizzen yard", "mizen yard"):
+            b.alias(word, "mizzen.yard")
+    else:
+        b.alias("spanker", "mizzen.spanker")
+        b.alias("driver", "mizzen.spanker")
+        b.alias("mizzen", "mizzen.spanker")
+        b.alias("mizen", "mizzen.spanker")
+    b.alias("foresail", "fore.course")
+    b.alias("mainsail", "main.course")
+    b.alias("fore yard", "fore.yard")
+    b.alias("main yard", "main.yard")
+    b.alias("crossjack yard", "mizzen.crossjack.yard")
+    b.alias("cro'jack yard", "mizzen.crossjack.yard")
+    b.alias("crossjack", "mizzen.crossjack.yard")
+    if p.mizen == "spanker":
+        b.alias("spanker boom", "mizzen.boom")
+        b.alias("driver boom", "mizzen.boom")
+        b.alias("spanker gaff", "mizzen.gaff")
+    b.alias("fore staysail", "fore.staysail")
+    b.alias("fore topmast staysail", "fore.topmast_staysail")
+    b.alias("main topmast staysail", "main.topmast_staysail")
+    b.alias("main staysail", "main.staysail")
+    b.alias("main topgallant staysail", "main.topgallant_staysail")
+    for word in ("mizzen", "mizen"):
+        b.alias(f"{word} staysail", "mizzen.staysail")
+        b.alias(f"{word} topmast staysail", "mizzen.topmast_staysail")
+        b.alias(f"{word} topgallant staysail", "mizzen.topgallant_staysail")
+    b.alias("stuns'ls", "studdingsails")
+    b.alias("studding sails", "studdingsails")
+    b.alias("kites", "studdingsails")
+    b.alias("head sails", "headsails")
+    b.alias("topgallant sails", "topgallants")
+    b.alias("upper yards", "topgallant yards")
+    # the sail room's own canvas (milestone 3b): "storm canvas" and "occasional sails" are the
+    # groups freesail.ship.parts reads for the muster's sail-room line; none of them is in "all
+    # sail" or "light sails", which name the working canvas
+    b.group("storm canvas", storm)
+    b.group("storm staysails", storm[:2])
+    b.group("occasional sails", occasional)
+    b.group("save-alls", save_alls)
+    b.alias("save-all", "save-alls")
+    for (name, level), _ in STEEL_STUDDING_64.items():
+        b.group(
+            f"{name} {level} studdingsails", [f"{name}.{level}.studdingsail.{s}" for s in g.SIDES]
+        )
+    # the courses' lines and the topsails' bowlines by their period names, each a group of the
+    # two sided lines read as a sided family by its singular (the frigate-36's, WP15 and 3b)
+    for name in ("fore", "main"):
+        for cls in ("sheet", "tack", "bowline"):
+            b.group(f"{name} {cls}s", [f"{name}.course.{cls}.{s}" for s in g.SIDES])
+            b.alias(f"{name} {cls}", f"{name} {cls}s")
+    for name in ("fore", "main", "mizzen"):
+        b.group(f"{name} topsail bowlines", [f"{name}.topsail.bowline.{s}" for s in g.SIDES])
+        b.alias(f"{name} top bowline", f"{name} topsail bowlines")
+
+    # -- the ground tackle, the company, the guns and the stores (Indf §5-§7), in the
+    # frigate-36's order; her description at far detail (§8) ---------------------------------
+    fits = fits_of(p, hull["profile"])
+    guns = default_guns(p, fits)
+    ground_tackle(b)
+    company(b, p, guns)
+    armament(b, p, fits)
+    quarter_bill(b, p, guns)
+    boats_pumps_hold(b)
+    b.descriptions([DESCRIPTIONS[p.key]])
+    b.dump(os.path.join(out_dir, p.file), p.header)
+
+
+# The shrouds a side (Indf §4.2): the main channel on ZAZ1407 at full resolution shows ten
+# deadeyes before its three backstays' (counted on the crop), the fore the same (judgement);
+# the razee's mizen channel seven (measured, ZAZ2371: Ind §2.3.8), the 64's taken the same.
+SHROUDS = {"fore": 10, "main": 10, "mizzen": 7}
+SHROUD_NOTES = {
+    "fore": "the main channel's count on ZAZ1407 (judgement for the fore)",
+    "main": "ten deadeyes before the three backstays' in her main channel on ZAZ1407 (measured "
+    "on the crop at full resolution)",
+    "mizzen": "the razee's mizen channel's seven deadeyes (ZAZ2371: Ind §2.3.8), hers the same "
+    "(judgement)",
+}
+# The razee's, on her lowered channels (measured, ZAZ2371: Ind §2.3.8).
+RAZEE_SHROUD_NOTES = {
+    "fore": "the main channel's count (judgement for the fore), on her fore channel lowered to "
+    "32 ft above K (ZAZ2371: Ind §2.3.8)",
+    "main": "ten deadeyes in her main channel from 49.8 to 70.5 ft from AP, lowered about 5 ft to "
+    "32 ft above K (measured, ZAZ2371: Ind §2.3.8), the 64's count on ZAZ1407",
+    "mizzen": "seven deadeyes in her mizen channel, 37.3 ft above K (measured, ZAZ2371: Ind "
+    "§2.3.8)",
+}
+
+
+def sail_of(mast, level):
+    """A square sail's id by its mast and level: `main.course`, `fore.topsail`."""
+    return f"{mast}.{level}"
+
+
+def mizzen_lift_in(rope_scale):
+    """The lifts of the mizzen's lower yards, inches: a course's lift, the mizzen's share of
+    the frigate's rope, scaled with hers (judgement)."""
+    rope = g.FRIGATE_ROPE["course"]["lift"] * g.FRIGATE_MAST_ROPE_FACTOR["mizzen"]
+    return g.quarter(rope * rope_scale)
+
+
+def steels_staysail_words(sid, area):
+    """The words a staysail between the masts adds to its note: Steel's table IV figure for the
+    64 and how far her cut of `area` m2 stands from it (Indf §4.3's check)."""
+    if sid not in STEEL_BETWEEN_64:
+        return (
+            " Steel's table IV gives the 64 no such sail (Ind §5): the helper's kept (judgement; "
+            "open for the owner or the lead)."
+        )
+    row, steel, band = STEEL_BETWEEN_64[sid]
+    gap = area / steel - 1.0
+    if abs(gap) <= band:
+        return (
+            f" Steel's table IV, the 64 ({row}; Ind §5): about {steel:.0f} m2, the cut {gap:+.0%} "
+            f"of it, within Indf §4.3's ±{band:.0%}."
+        )
+    return (
+        f" Steel's table IV, the 64 ({row}; Ind §5): about {steel:.0f} m2, the cut {gap:+.0%} "
+        f"of it, outside Indf §4.3's ±{band:.0%}: kept as cut, open for the owner or the lead."
+    )
+
+
+def fmt_ft(v):
+    """Feet as the period writes them, feet and inches to the nearest inch."""
+    feet = math.floor(v + 1e-9)
+    inches = round((v - feet) * 12.0)
+    if inches == 12:
+        feet, inches = feet + 1, 0
+    return f"{feet} ft {inches} in" if inches else f"{feet} ft"
+
+
+# ---------------------------------------------------------------------------
+# The mizen course (Indf §4.4) and the head (§4.6)
+# ---------------------------------------------------------------------------
+
+
+def mizen_course_cut(p, gm, mast_x_m, rake_deg, datum):
+    """The mizen course's corners from Steel's cut: its tack on the mast above the quarterdeck,
+    its throat at the yard's truss a fore leech above, its head running aft and up to the peak,
+    its foot aft to the clew; (x, z above her water) in metres, with its area and centre."""
+    head_cl, foot_cl, fore_yd, after_yd = STEEL_MIZEN_COURSE_64
+    x_ft = p.masts["mizzen"]["x_ft"]
+    deck = p.z_m(interp(p.decks["quarterdeck"], x_ft), x_ft)
+    tack_z = deck + MIZEN_TACK_ABOVE_DECK_FT * FT
+    throat_z = tack_z + 3.0 * fore_yd * FT
+    peak_z = tack_z + 3.0 * after_yd * FT
+    run = head_cl * CLOTH_IN_SAIL_FT * FT  # the head's run aft, the cloths square to the foot
+    foot = foot_cl * CLOTH_IN_SAIL_FT * FT
+    lean = math.tan(math.radians(rake_deg))
+
+    def on_mast(z):
+        return mast_x_m - lean * (z - datum)
+
+    tack = (on_mast(tack_z), tack_z)
+    throat = (on_mast(throat_z), throat_z)
+    peak = (throat[0] - run, peak_z)
+    clew = (tack[0] - foot, tack_z)
+    corners = [tack, throat, peak, clew]
+    area, cx, cz = g._quad_area_centroid(corners)
+    return {
+        "corners": corners,
+        "area": round(area),
+        "x": round(cx, 1),
+        "centre": round(cz, 1),
+        "deck": deck,
+        "head_m": math.hypot(run, peak_z - throat_z),
+        "run": run,
+        "rise": peak_z - throat_z,
+        "foot": foot,
+    }
+
+
+def mizen_course(b, p, mz, rope_scale):
+    """The 64's mizen course on her mizen yard. Stage A (`MIZEN_COURSE = "stand-in"`): a
+    loose-footed gaff-class sail on the yard's after part, class `gaff`, as the owner rules the
+    sail in the physics (Bel §13.5); stage B, the lateen cut at the mast on the whole yard,
+    waits on the lead's gate. Returns the sail's id."""
+    if MIZEN_COURSE != "stand-in":
+        raise ValueError(
+            f"MIZEN_COURSE is {MIZEN_COURSE!r}: the gated mizen course waits on the engine's "
+            "lateen step and is not built yet (Indf §0)."
+        )
+    datum = p.datum_z
+    corners = [[round(x, 2), round(z - datum, 2)] for x, z in mz["corners"]]
+    throat = mz["corners"][1]
+    canvas = g.FRIGATE_CANVAS["mizzen.spanker"]
+    load = [(mz["area"], mz["centre"], "gaff")]
+    yard = b.spar(
+        "mizzen.yard",
+        "gaff",
+        on="mizzen.mast",
+        length_m=round(mz["head_m"], 1),
+        height_m=round(throat[1] - datum, 1),
+        rating_kn=g.design_kn(load, g.DESIGN_WIND_KN["gaff"]),
+        note=f"the mizen yard, PROVISIONAL behind the lead's gate (Indf §0): Steel's 77 ft by 14 "
+        f"in (p. 49, the 64), slung at its truss with lifts, its fore part bare (Lavery 1985 "
+        f"I31-I32, the 74's). Filed at stage A as a gaff, its after part alone: the course's "
+        f"head, {mz['head_m']:.1f} m, its truss the throat {throat[1]:.2f} m above her water.",
+    )
+    sail = b.sail(
+        "mizzen.course",
+        "gaff",
+        mast="mizzen.mast",
+        gaff=yard,
+        area_m2=mz["area"],
+        reef_bands=1,
+        x_m=mz["x"],
+        centre_height_m=mz["centre"],
+        canvas_no=canvas[0],
+        cloth_rating_kn=g.cloth(mz["area"], canvas[0]),
+        corners_m=corners,
+        note=f"mizen course {mz['area']} m2, PROVISIONAL behind the lead's gate (Indf §0, §4.4): "
+        "Steel's table IV, the 64 (14 1/2 cloths at the head, 15 1/2 at the foot, its fore leech "
+        "9 1/4 yards and its after leech 17 1/4; Ind §5), its fore leech on the mast from its "
+        f"tack 6 ft 6 in above the quarterdeck (Steel: 'within 6 or 7 feet of the deck'; Indf "
+        f"§4.4 judged 3 ft, its truss 11.6 m above the datum, here {throat[1] - datum:.1f}), its "
+        f"head {mz['run']:.2f} m aft and {mz['rise']:.2f} m up to the peak, its foot "
+        f"{mz['foot']:.2f} m aft, loose. A four-sided, loose-footed sail like the gaff sail in "
+        "the physics (the owner, Bel §13.5), filed as a gaff sail with no boom until the lateen "
+        "cut at the mast is built; corners [tack, throat, peak, clew]. One reef band a fifth up "
+        "its mast leech (Steel, OCR l. 11448)." + g.canvas_note(canvas),
+    )
+    # the frigate-36's spanker's lines but the outhaul (it has no boom), scaled with her rope:
+    # the throat and peak halyards stand for the yard's jeers (Indf §4.4), the sheet aft
+    for lid, cls, of, size, parts in (
+        ("mizzen.yard.throat_halyard", "throat_halyard", yard, 4.5, 3),
+        ("mizzen.yard.peak_halyard", "peak_halyard", yard, 4.0, 4),
+    ):
+        b.line(lid, cls, of, rating=g.rope_kn(g.quarter(size * rope_scale), parts))
+    b.line(
+        "mizzen.course.sheet",
+        "sheet",
+        sail,
+        rating=g.rope_kn(g.quarter(5.0 * rope_scale), 2),
+        parts=2,
+    )
+    b.sided("mizzen.yard.vang", "vang", yard, rating=g.rope_kn(g.quarter(3.5 * rope_scale)))
+    lift = mizzen_lift_in(rope_scale)
+    b.sided(
+        "mizzen.yard.lift",
+        "lift",
+        yard,
+        rating=g.rope_kn(lift),
+        note=f"the mizen yard's lifts (Lavery 1985 I31-I32; Steel's derrick), {lift} in as the "
+        "crossjack's (judgement): every yard's lifts are carried (the owner's answer, "
+        "Build-Ships.md §19.1 item 7).",
+    )
+    return sail
+
+
+def spanker_cut(p, gm, mast_x_m, rake_deg, datum):
+    """The razee's spanker on her gaff and driver boom by the frigate-36's rule (Indf §4.5): its
+    tack at the boom's jaws above her quarterdeck, its throat at the gaff's jaws under the
+    mizen's hounds, its head 0.9 of the gaff peaked 40 degrees, its foot 0.9 of the boom along
+    it; (x, z above her water) in metres, with its area and centre."""
+    x_ft = p.masts["mizzen"]["x_ft"]
+    deck = p.z_m(p.deck_k_ft(x_ft), x_ft)
+    boom_z = deck + SPANKER_BOOM_ABOVE_DECK_FT * FT
+    throat_z = datum + (gm["above"] - gm["head"] - SPANKER_THROAT_BELOW_HOUNDS_FT) * FT
+    lean = math.tan(math.radians(rake_deg))
+
+    def on_mast(z):
+        return mast_x_m - lean * (z - datum)
+
+    head = SPANKER_HEAD_OF_GAFF * RAZEE_GAFF_FT * FT
+    foot = SPANKER_FOOT_OF_BOOM * RAZEE_BOOM_FT * FT
+    peak_rad = math.radians(SPANKER_PEAK_DEG)
+    tack = (on_mast(boom_z), boom_z)
+    throat = (on_mast(throat_z), throat_z)
+    peak = (throat[0] - head * math.cos(peak_rad), throat_z + head * math.sin(peak_rad))
+    clew = (tack[0] - foot, boom_z)
+    corners = [tack, throat, peak, clew]
+    area, cx, cz = g._quad_area_centroid(corners)
+    return {
+        "corners": corners,
+        "area": round(area),
+        "x": round(cx, 1),
+        "centre": round(cz, 1),
+        "deck": deck,
+        "boom_z": boom_z,
+        "throat_z": throat_z,
+        "leech": peak[1] - boom_z,
+        "clew_x": clew[0],
+    }
+
+
+def spanker(b, p, sp, rope_scale):
+    """The razee's gaff, driver boom and spanker (D20 (a); Indf §4.5), with the frigate-36's
+    spanker's lines scaled by her rope. Returns the sail's id."""
+    datum = p.datum_z
+    canvas = g.FRIGATE_CANVAS["mizzen.spanker"]
+    load = [(sp["area"], sp["centre"], "gaff")]
+    corners = [[round(x, 2), round(z - datum, 2)] for x, z in sp["corners"]]
+    gaff = b.spar(
+        "mizzen.gaff",
+        "gaff",
+        on="mizzen.mast",
+        length_m=g.ft(RAZEE_GAFF_FT),
+        height_m=round(sp["throat_z"] - datum, 1),
+        rating_kn=g.design_kn(load, g.DESIGN_WIND_KN["gaff"]),
+        note=f"spanker gaff {fmt_ft(RAZEE_GAFF_FT)}, five-eighths of the driver boom (Steel 1794 "
+        "vol. I p. 40: 'gaffs 5/8 of their booms'; D20 (a), the 41 ft 10 in of the 44's and 38's "
+        "ratio a foot longer); its jaws 3 ft below the mizen's hounds, as the frigate-36's "
+        f"(judgement), {sp['throat_z']:.2f} m above her water. She lost 'her Gaff and "
+        "Mizen-Top-Mast' on 20 April 1796 (Gazette 13887 p. 388).",
+    )
+    boom = b.spar(
+        "mizzen.boom",
+        "boom",
+        on="mizzen.mast",
+        length_m=g.ft(RAZEE_BOOM_FT),
+        height_m=round(sp["boom_z"] - datum, 1),
+        horse_m=round(0.5 * p.hull["beam_m"], 1),
+        rating_kn=g.design_kn(load, g.DESIGN_WIND_KN["gaff"]),
+        note=f"driver boom {fmt_ft(RAZEE_BOOM_FT)}, the main topsail yard's length (Steel 1794 "
+        "vol. I p. 40: 'Driver boom, the same length as the main-topsail-yard'; D20 (a)), "
+        "overhanging her taffrail by 33-34 ft (Ind §3.3; no source objects); its jaws 6 ft 6 in "
+        "above her quarterdeck, where the 64's mizen course has its tack (Steel's 'within 6 or 7 "
+        "feet of the deck', judgement for the boom), so that it clears her taffrail; horse_m "
+        + g.HORSE_NOTE,
+    )
+    sail = b.sail(
+        "mizzen.spanker",
+        "gaff",
+        mast="mizzen.mast",
+        gaff=gaff,
+        boom=boom,
+        area_m2=sp["area"],
+        reef_bands=2,
+        x_m=sp["x"],
+        centre_height_m=sp["centre"],
+        canvas_no=canvas[0],
+        cloth_rating_kn=g.cloth(sp["area"], canvas[0]),
+        corners_m=corners,
+        note=f"spanker (driver) {sp['area']} m2 by the frigate-36's rule on her spars (D20 (a); "
+        "Indf §4.5): its foot 0.9 of the boom, its head 0.9 of the gaff peaked 40 degrees, its "
+        f"hoist from the boom to the gaff's jaws {(sp['throat_z'] - sp['boom_z']) / FT:.1f} ft "
+        "(judgement, ±10%); corners [tack, throat, peak, clew]. Steel's table IV (read on the "
+        "page image, Indf §3.5 item 6) gives the 44 a gaff mizen course of about 88 m2 and a "
+        "driver of 157, the 38 105 and 202, the 64's driver 198; the frigate-36's spanker is "
+        "167. Two reef bands, as the frigate-36's (Steel's mizen course has one)."
+        + g.canvas_note(canvas),
+    )
+    for lid, cls, of, size, parts in (
+        ("mizzen.gaff.throat_halyard", "throat_halyard", gaff, 4.5, 3),
+        ("mizzen.gaff.peak_halyard", "peak_halyard", gaff, 4.0, 4),
+    ):
+        b.line(lid, cls, of, rating=g.rope_kn(g.quarter(size * rope_scale), parts))
+    b.line(
+        "mizzen.spanker.sheet",
+        "sheet",
+        sail,
+        rating=g.rope_kn(g.quarter(5.0 * rope_scale), 2),
+        parts=2,
+    )
+    b.line("mizzen.spanker.outhaul", "outhaul", sail, rating=g.rope_kn(g.quarter(3.5 * rope_scale)))
+    b.sided("mizzen.gaff.vang", "vang", gaff, rating=g.rope_kn(g.quarter(3.5 * rope_scale)))
+    return sail
+
+
+def head_geometry(p, geom, mast_x, rake, datum):
+    """The bowsprit, the jib-boom and the headsails' triangles, feet and metres above her water.
+
+    The bowsprit's root at the stem head's after face, steeved 27 degrees, its outboard part
+    measured; the jib-boom along it. The fore stay to a collar half way out the bowsprit's
+    outboard part (judgement: where Steel's fore staysail, cut as below, stands clear before
+    the fore mast), the fore topmast stay to the bowsprit's end and the jib's stay to the
+    jib-boom's (the frigate's leads; judgement). Each headsail a triangle on its stay from its
+    tack at the stay's foot: Steel's leech and the cloths of Steel's foot, square to each other
+    at the clew ("square on the foot", as Steel cuts the staysails), so that its area is
+    Steel's (judgement on Steel's figures)."""
+    stem_x, stem_z = STEM_HEAD_FT
+    root = (x_m(stem_x), p.z_m(wl1_above_k(stem_x) + stem_z, stem_x))
+    inboard = (stem_x - BOWSPRIT_HEEL_FT) / math.cos(math.radians(BOWSPRIT_STEEVE_DEG))
+    outboard = STEEL_64["bowsprit"] - inboard
+    jib_out = JIB_BOOM_OUTBOARD * STEEL_64["jib_boom"]
+    c, s = math.cos(math.radians(BOWSPRIT_STEEVE_DEG)), math.sin(math.radians(BOWSPRIT_STEEVE_DEG))
+
+    def along(d_ft):
+        return (root[0] + d_ft * c * FT, root[1] + d_ft * s * FT)
+
+    tip = along(outboard)
+    jib_tip = along(outboard + jib_out)
+    fore = geom["fore"]
+
+    def at_mast(h_ft):
+        z = datum + h_ft * FT
+        return (mast_x["fore"] - math.tan(math.radians(rake["fore"])) * (z - datum), z)
+
+    stays = {
+        "fore.staysail": (
+            "fore.stay",
+            along(outboard / 2.0),
+            at_mast(fore["above"] - fore["head"]),
+        ),
+        "fore.topmast_staysail": (
+            "fore.topmast.stay",
+            tip,
+            at_mast(fore["above"] + fore["t_hoist"] - fore["t_head"]),
+        ),
+        "jib": ("jib.stay", jib_tip, at_mast(fore["above"] + fore["t_hoist"] - fore["t_head"])),
+    }
+    sails = {}
+    for sid, (stay, low, high) in stays.items():
+        foot_cl, leech_yd = STEEL_HEADSAILS_64[sid]
+        foot, leech = foot_cl * CLOTH_IN_SAIL_FT * FT, 3.0 * leech_yd * FT
+        luff = math.hypot(foot, leech)
+        run = math.hypot(high[0] - low[0], high[1] - low[1])
+        # a sail whose luff is longer than its stay (the razee's fore staysail, her fore mast
+        # head lowered by its cut) is cut to the stay, Steel's proportions kept: the spars rule
+        # over the sail table (the owner's answer, Build-Ships.md §19.1 item 5)
+        fit = min(1.0, run / luff)
+        foot, leech, luff = foot * fit, leech * fit, luff * fit
+        ux, uz = (high[0] - low[0]) / run, (high[1] - low[1]) / run
+        nx, nz = (-uz, ux) if ux > 0 else (uz, -ux)  # the side below and abaft the stay
+        if nz > 0:
+            nx, nz = -nx, -nz
+        peak = (low[0] + luff * ux, low[1] + luff * uz)
+        ca, sa = foot / luff, leech / luff
+        clew = (low[0] + foot * (ca * ux + sa * nx), low[1] + foot * (ca * uz + sa * nz))
+        corners = [low, peak, clew]
+        sails[sid] = {
+            "stay": stay,
+            "corners": corners,
+            "area": round(0.5 * foot * leech),
+            "x": round(sum(q[0] for q in corners) / 3.0, 1),
+            "centre": round(sum(q[1] for q in corners) / 3.0, 1),
+            "foot_cl": foot_cl,
+            "leech_yd": leech_yd,
+            "fit": fit,
+            "table": round(0.5 * foot * leech / (fit * fit)),
+        }
+    return {
+        "root": root,
+        "outboard": outboard,
+        "inboard": inboard,
+        "tip": tip,
+        "jib_out": jib_out,
+        "jib_tip": jib_tip,
+        "collar": stays["fore.staysail"][1],
+        "sails": sails,
+    }
+
+
+HEAD_CANVAS = {
+    "fore.staysail": (
+        2,
+        f"{g.STEEL_SM}, 'Fore staysail': No. 1 to 3, the middle taken (Ind §5)",
+    ),
+    "fore.topmast_staysail": g.FRIGATE_CANVAS["fore.topmast_staysail"],
+    "jib": g.FRIGATE_CANVAS["jib"],
+}
+
+
+def write_head(b, p, head, rope_scale):
+    """The bowsprit, the jib-boom, their stays and the headsails (Indf §4.3, §4.6). Returns the
+    headsails' ids, the fore staysail first."""
+    datum = p.datum_z
+    loads = {sid: (h["area"], h["centre"], "jibheaded") for sid, h in head["sails"].items()}
+    bowsprit = b.spar(
+        "bowsprit",
+        "bowsprit",
+        x_m=round(head["root"][0], 2),
+        length_m=g.ft(head["outboard"]),
+        height_m=round(head["tip"][1] - datum, 1),
+        rating_kn=g.design_kn(list(loads.values()), g.DESIGN_WIND_KN["lower"]),
+        note=f"bowsprit {fmt_ft(STEEL_64['bowsprit'])} (Steel p. 49, the 64), steeved "
+        f"{BOWSPRIT_STEEVE_DEG:g} deg (measured, Ind §3.1): its heel just before the fore mast on "
+        f"ZAZ1280, so {head['outboard']:.1f} ft outboard of the stem head (measured, ±1 ft; "
+        "Luce's third inboard would give 40.2), its root at the stem head's after face on "
+        "ZAZ1407; height_m its end above the datum. "
+        + (
+            "No spritsail or sprit-topsail yard until the lead's gate (Indf §0, §4.6)."
+            if p.key == "sixty-four"
+            else "The 64's, in its place in the hull (D8 (b) as answered; Indf §1.5 step 7). No "
+            "spritsail yard until the lead's gate: the owner gives her one, an occasional sail "
+            "out of plain sail, and no sprit-topsail yard (Indf §4.6, §17 item 5)."
+        ),
+    )
+    jib_boom = b.spar(
+        "jib_boom",
+        "jib_boom",
+        on=bowsprit,
+        length_m=g.ft(head["jib_out"]),
+        height_m=round(head["jib_tip"][1] - datum, 1),
+        rating_kn=g.design_kn([loads["jib"]], g.DESIGN_WIND_KN["jib_boom"]),
+        note=f"jib-boom {fmt_ft(STEEL_64['jib_boom'])} (Steel p. 49), {head['jib_out']:.1f} ft "
+        "outboard, 7/12 of it (Luce, the frigate's rule; judgement). No flying jib-boom: Steel's "
+        "64 has none, Steel's 'flying jib boom' rule being this boom's (Ind §3.1, judgement).",
+    )
+    for lid, of, size, text in (
+        (
+            "fore.topmast.stay",
+            "fore.topmast",
+            7.5,
+            "to the bowsprit's end; the fore topmast staysail sets on it",
+        ),
+        (
+            "jib.stay",
+            "fore.topmast",
+            5.0,
+            "from the fore topmast head to the jib-boom's end: the "
+            "jib sets on it (Steel's was set flying on its traveller)",
+        ),
+        ("bobstay", bowsprit, 12.0, None),
+        ("martingale", jib_boom, 5.0, None),
+    ):
+        size = g.quarter(size * rope_scale)
+        b.line(
+            lid,
+            "stay",
+            of,
+            rating=g.rope_kn(size),
+            note=f"{size} in, the frigate-36's scaled (judgement){'; ' + text if text else ''}.",
+        )
+    out = []
+    for sid, h in head["sails"].items():
+        canvas = HEAD_CANVAS[sid]
+        s = b.sail(
+            sid,
+            "jibheaded",
+            stay=h["stay"],
+            area_m2=h["area"],
+            x_m=h["x"],
+            centre_height_m=h["centre"],
+            canvas_no=canvas[0],
+            cloth_rating_kn=g.cloth(h["area"], canvas[0]),
+            corners_m=[[round(x, 2), round(z - datum, 2)] for x, z in h["corners"]],
+            note=f"{sid.replace('_', ' ').replace('.', ' ')} {h['area']} m2, a triangle (Steel's "
+            f"table IV, the 64: {h['foot_cl']:g} cloths in the foot, {h['leech_yd']:g} yards in "
+            "the leech; Ind §5): its tack at its stay's foot, its luff up the stay, foot and "
+            "leech square at the clew (judgement on Steel's figures)"
+            + (
+                f", cut to her stay, {h['fit']:.3f} of Steel's in each side, the spars ruling "
+                f"(the owner's answer, Build-Ships.md §19.1 item 5; the table's {h['table']} m2)"
+                if h["fit"] < 1.0
+                else ""
+            )
+            + "; corners [tack, peak, clew]."
+            + g.canvas_note(canvas),
+        )
+        size = g.quarter(3.5 * rope_scale)
+        b.line(f"{sid}.halyard", "halyard", s, rating=g.rope_kn(size, 2))
+        b.sided(f"{sid}.sheet", "sheet", s, rating=g.rope_kn(size))
+        b.line(f"{sid}.downhaul", "downhaul", s, rating=g.rope_kn(g.quarter(size * 0.8)))
+        out.append(s)
+    return out
+
+
+def head_yards(b, p):
+    """The yards under the bowsprit (D8 (b); Indf §4.6): the 64's spritsail and sprit-topsail
+    yards, Steel's 57 ft 6 in by 12 1/8 in and 34 ft 6 in by 7 in (p. 49), with the sprit course
+    (102 m2) and the sprit topsail (103 m2) of table IV; the razee's spritsail yard alone, the
+    64's spar, an occasional sail out of plain sail (the owner's answer, Indf §17 item 5).
+    Written at stage B (`BOWSPRIT_YARDS = True`), at the station along the bowsprit the gated
+    design gives; until then nothing."""
+    if BOWSPRIT_YARDS:
+        raise ValueError(
+            "BOWSPRIT_YARDS is True: the yards under the bowsprit wait on the engine's step and "
+            "are not built yet (Indf §0)."
+        )
+
+
+# ---------------------------------------------------------------------------
+# The studding sails, the storm canvas and the occasional sails (Indf §4.3, §4.7)
+# ---------------------------------------------------------------------------
+
+
+def studding_sails(b, p, geom, mast_x, rake, rope_scale):
+    """The studding sails, the frigate-36's set on Steel's figures for a 64: the fore lower and
+    the fore and main topmast and topgallant, a pair each, on Steel's booms. Below the topmast
+    caps Steel's cloths and depths; the topgallant studding sails as deep as the topgallants
+    they spread, cut to the spars by the owner's rule as the topgallants are. Each boom linked
+    to its sail's own yard and sitting where it is rigged, as the frigate's: the lower boom at
+    the fore channel, the topmast booms on the lower yard, the topgallant booms on the topsail
+    yard. Returns the sails' ids."""
+    datum = p.datum_z
+    fore_x_ft = p.masts["fore"]["x_ft"]
+    channel_m = p.z_m(p.fore_channel_k_ft, fore_x_ft) - datum
+    out = []
+    for (name, level), (head_cl, foot_cl, depth_yd, boom_ft) in STEEL_STUDDING_64.items():
+        gm = geom[name]
+        parent, hung, boom_h = {
+            "lower": (f"{name}.yard", gm["yard_h"], round(channel_m, 1)),
+            "topmast": (f"{name}.topsail.yard", gm["topsail_h"], g.ft(gm["yard_h"])),
+            "topgallant": (f"{name}.topgallant.yard", gm["tg_h"], g.ft(gm["topsail_h"])),
+        }[level]
+        head_w, foot_w = head_cl * CLOTH_IN_SAIL_FT, foot_cl * CLOTH_IN_SAIL_FT
+        if level == "topgallant":
+            depth = gm["tg_h"] - gm["topsail_h"]
+            how = (
+                f"as deep as the topgallant it spreads, {depth:.1f} ft, cut to the spars as the "
+                f"topgallants are (the owner's answer, Build-Ships.md §19.1 item 5); the table's "
+                f"{depth_yd:g} yards would give "
+                f"{round((head_w + foot_w) / 2.0 * 3.0 * depth_yd * FT * FT)} m2"
+            )
+        else:
+            depth = 3.0 * depth_yd
+            how = f"{depth_yd:g} yards deep"
+        area = round((head_w + foot_w) / 2.0 * depth * FT * FT)
+        drop = depth * (head_w + 2.0 * foot_w) / (3.0 * (head_w + foot_w))
+        centre = round(datum + (hung - drop) * FT, 1)
+        canvas = g.FRIGATE_CANVAS[f"{level} studding"]
+        size = g.quarter({"lower": 3.0, "topmast": 2.5, "topgallant": 2.0}[level] * rope_scale)
+        for side in g.SIDES:
+            first = side == g.SIDES[0]
+            boom = b.spar(
+                f"{name}.{level}.studdingsail_boom.{side}",
+                "studdingsail_boom",
+                on=parent,
+                side=side,
+                length_m=g.ft(boom_ft),
+                height_m=boom_h,
+                rating_kn=g.design_kn([(area, centre, "studding")], g.DESIGN_WIND_KN["studding"]),
+                note=(
+                    f"{name} {level} studding-sail boom {fmt_ft(boom_ft)} (Steel 1794 vol. I p. "
+                    "49, the 64; p. 40: "
+                    + (
+                        "five-ninths of the main yard), goose-necked at the fore channel (Luce "
+                        "1884 p. 137), its height there measured"
+                        if level == "lower"
+                        else "half the yard it is rigged on)"
+                    )
+                    + f"; rated for its sail in {g.DESIGN_WIND_KN['studding']:.0f} kn."
+                    if first
+                    else None
+                ),
+            )
+            sid = b.sail(
+                f"{name}.{level}.studdingsail.{side}",
+                "studding",
+                boom=boom,
+                yard=parent,
+                side=side,
+                area_m2=area,
+                x_m=g.raked_x(mast_x[name], rake[name], centre, deck_m=datum),
+                centre_height_m=centre,
+                canvas_no=canvas[0],
+                cloth_rating_kn=g.cloth(area, canvas[0]),
+                note=(
+                    f"{name} {level} studding sail {area} m2: Steel's table IV, the 64 (Ind §5), "
+                    f"{head_cl:g} cloths at the head and {foot_cl:g} at the foot, {how}; its head "
+                    "on its yard at the yardarm of the sail it spreads." + g.canvas_note(canvas)
+                    if first
+                    else None
+                ),
+            )
+            b.line(f"{sid}.halyard", "halyard", sid, rating=g.rope_kn(size))
+            b.line(f"{sid}.tack", "tack", sid, rating=g.rope_kn(size))
+            b.line(f"{sid}.sheet", "sheet", sid, rating=g.rope_kn(g.quarter(size * 0.8)))
+            b.line(f"{sid}.downhaul", "downhaul", sid, rating=g.rope_kn(g.quarter(size * 0.7)))
+            out.append(sid)
+    return out
+
+
+def storm_canvas(b, p, geom, mast_x, rake, bow, after_sail, rope_scale):
+    """The storm canvas, the frigate-36's pattern on her figures (Indf §4.7), every sail in the
+    sail room: the fore storm staysail on the fore stay, the mizzen storm staysail on the mizen
+    stay, the storm mizzen on its own stay abaft the mizen mast, bent in place of her after sail.
+    Each fixed height is taken above the deck she works it from (her quarterdeck), and each sail
+    written with its corners. Returns the sails' ids, the storm staysails first."""
+    datum = p.datum_z
+    storm = g.FRIGATE_CANVAS["storm"]
+
+    def deck_at(x_m_):
+        x_ft = x_m_ / FT + MIDSHIPS_FT
+        return p.z_m(p.deck_k_ft(x_ft), x_ft)
+
+    def on_mast(name, z):
+        return mast_x[name] - math.tan(math.radians(rake[name])) * (z - datum)
+
+    def storm_sail(sid, stay, corners, words, **kw):
+        area, cx, cz = g._quad_area_centroid(corners)
+        area = round(area)
+        return b.sail(
+            sid,
+            "jibheaded",
+            stay=stay,
+            area_m2=area,
+            x_m=round(cx, 1),
+            centre_height_m=round(cz, 1),
+            canvas_no=storm[0],
+            cloth_rating_kn=g.storm_cloth(area),
+            bent=False,
+            corners_m=[[round(x, 2), round(z - datum, 2)] for x, z in corners],
+            note=f"{sid.replace('_', ' ').replace('.', ' ')} {area} m2, {words}; in the sail room."
+            + g.canvas_note(storm, storm=True),
+            **kw,
+        )
+
+    # the fore storm staysail on the fore stay (Luce 1884 ch. X: "The storm-staysails set on the
+    # respective lower-stays"): the frigate's is Kipping's fore staysail, the sail of No. 1 or 2
+    # set on the forestay; hers is Steel's fore staysail as her working one is cut (No. 1 to 3),
+    # of storm canvas, bent beside it and set in its place
+    fss_corners = bow["sails"]["fore.staysail"]["corners"]
+    fss = storm_sail(
+        "fore.storm_staysail",
+        "fore.stay",
+        fss_corners,
+        "Steel's fore staysail cut as her working one is (table IV, the 64: 19 cloths in the "
+        "foot, 11 1/2 yards in the leech; Steel's canvas No. 1 to 3), of storm canvas, on the fore "
+        "stay (Luce 1884 ch. X); the frigate-36's is Kipping's fore staysail of No. 1 or 2, the "
+        "same sail; corners [tack, peak, clew]",
+    )
+    size = g.quarter(3.5 * rope_scale)
+    b.line("fore.storm_staysail.halyard", "halyard", fss, rating=g.rope_kn(size, 2))
+    b.sided("fore.storm_staysail.sheet", "sheet", fss, rating=g.rope_kn(size, 3))
+    b.line(
+        "fore.storm_staysail.downhaul",
+        "downhaul",
+        fss,
+        rating=g.rope_kn(g.quarter(2.75 * rope_scale)),
+    )
+    # the mizzen storm staysail on the mizen stay: its tack at the collar on the main mast, its
+    # head 0.6 up the stay towards the mizen's hounds, its clew under the head 7 ft above the
+    # quarterdeck (the frigate's; Steel's mizen staysail)
+    gz = geom["mizzen"]
+    main_deck = deck_at(mast_x["main"])
+    collar_z = main_deck + MIZEN_STAY_COLLAR_FT * FT
+    collar = (on_mast("main", collar_z), collar_z)
+    top_z = datum + (gz["above"] - gz["head"]) * FT
+    top = (on_mast("mizzen", top_z), top_z)
+    f = STORM_STAYSAIL_HEAD_OF_STAY
+    head = (collar[0] + f * (top[0] - collar[0]), collar[1] + f * (top[1] - collar[1]))
+    clew = (head[0], deck_at(head[0]) + STORM_STAYSAIL_CLEW_FT * FT)
+    mss = storm_sail(
+        "mizzen.storm_staysail",
+        "mizzen.stay",
+        [collar, head, clew],
+        "on the mizen stay (Luce 1884 ch. X; the Trenton's allowance has one, Luce p. 171): its "
+        "tack at the stay's collar on the main mast, 12 ft above the quarterdeck (Steel, "
+        "'Mizen-stay'), its head 0.6 of the way up the stay, its clew under the head 7 ft above "
+        "the quarterdeck (Steel's mizen staysail; the frigate-36's, 0.6 judgement); corners "
+        "[tack, peak, clew]",
+    )
+    size = g.quarter(3.0 * rope_scale)
+    b.line("mizzen.storm_staysail.halyard", "halyard", mss, rating=g.rope_kn(size, 2))
+    b.sided("mizzen.storm_staysail.sheet", "sheet", mss, rating=g.rope_kn(size, 3))
+    b.line(
+        "mizzen.storm_staysail.downhaul",
+        "downhaul",
+        mss,
+        rating=g.rope_kn(g.quarter(2.5 * rope_scale)),
+    )
+    # the storm mizzen: "a triangular sail set abaft the mizzen-mast on a vertical 'stay',
+    # hooked under the after trestle-tree, and set up on deck" (Luce 1884 ch. X), "a substitute
+    # for the spanker" (ch. XXVII); Steel's 'Storm mizen', bent "to a horse, abaft and parallel
+    # to the mizen-mast. The foot is extended towards the taffarel by a sheet"
+    size = g.quarter(5.0 * rope_scale)
+    b.line(
+        "storm_mizzen.stay",
+        "stay",
+        "mizzen.mast",
+        rating=g.rope_kn(size),
+        note=f"the storm mizzen's stay abaft the mizen mast, under its after trestle-tree (Luce "
+        f"1884 ch. X); {size} in, the jib stay's, scaled by her rope (judgement).",
+    )
+    mz_deck = deck_at(mast_x["mizzen"])
+    tack_z = mz_deck + STORM_MIZZEN_TACK_FT * FT
+    luff = STORM_MIZZEN_LUFF_OF_RUN * (top_z - tack_z)
+    foot = STORM_MIZZEN_FOOT_OF_BOOM * RAZEE_BOOM_FT * FT
+    tack = (on_mast("mizzen", tack_z), tack_z)
+    peak = (on_mast("mizzen", tack_z + luff), tack_z + luff)
+    sm = storm_sail(
+        "storm_mizzen",
+        "storm_mizzen.stay",
+        [tack, peak, (tack[0] - foot, tack_z)],
+        f"triangular (Luce 1884 ch. X; Steel 1794 'Storm mizen'): its luff {luff / FT:.0f} ft up "
+        "its stay from a tack 4 ft above the quarterdeck (0.8 of the stay's run to the hounds), "
+        f"its foot {foot / FT:.0f} ft towards the taffrail, 0.45 of the driver boom by Steel's "
+        "rule (the main topsail yard's length, p. 40), as the frigate-36's is of her spanker boom "
+        f"(judgement); bent in place of the {'mizen course' if p.mizen == 'course' else 'spanker'};"
+        " corners [tack, peak, clew]",
+        in_place_of=after_sail,
+    )
+    b.line("storm_mizzen.halyard", "halyard", sm, rating=g.rope_kn(g.quarter(3.0 * rope_scale), 2))
+    b.line(
+        "storm_mizzen.sheet",
+        "sheet",
+        sm,
+        rating=g.rope_kn(g.quarter(3.5 * rope_scale), 3),
+        parts=3,
+    )
+    b.line("storm_mizzen.downhaul", "downhaul", sm, rating=g.rope_kn(g.quarter(2.5 * rope_scale)))
+    return [fss, mss, sm]
+
+
+def occasional_sails(b, p, mast_x, after, rope_scale):
+    """The occasional sails, the frigate-36's pattern (Indf §4.7), in the sail room: the ringtail
+    on the razee alone, she having the driver boom it runs out on, and a save-all under each fore
+    lower studding-sail boom. Returns the occasional sails and the save-alls."""
+    datum = p.datum_z
+    out = []
+    if p.mizen == "spanker":
+        # the ringtail, abaft the spanker (Luce 1884 ch. XXIII: "a ring-tail, which sets abaft the
+        # spanker"), on a ringtail boom run out on the driver boom (Kipping 1847, 'Ringtail
+        # Sails'; Steel 1794 vol. I, 'Ringtail-boom'), as the frigate-36's
+        depth_ft = after["leech"] / FT
+        rt_head, foot_ft = (c * CLOTH_IN_SAIL_FT for c in RINGTAIL_CLOTHS)
+        area = round((rt_head + foot_ft) / 2.0 * depth_ft * FT * FT)
+        boom_ft = foot_ft * 4.0 / 3.0
+        centre = round(after["boom_z"] + 0.45 * depth_ft * FT, 1)
+        rt_boom = b.spar(
+            "ringtail_boom",
+            "studdingsail_boom",
+            on="mizzen.boom",
+            length_m=g.ft(boom_ft),
+            height_m=round(after["boom_z"] - datum, 1),
+            rating_kn=g.design_kn([(area, centre, "studding")], g.DESIGN_WIND_KN["studding"]),
+            note=f"ringtail boom {boom_ft:.0f} ft, run out on the driver boom (Kipping's sliding "
+            "gunter-boom; Steel 1794 vol. I, 'Ringtail-boom': 'lashed occasionally to the outer "
+            "end of the main-sail-boom'): the ringtail's foot and a third that bears on the boom "
+            f"(the frigate-36's, judgement); rated for its sail in "
+            f"{g.DESIGN_WIND_KN['studding']:.0f} kn, as a studding sail boom.",
+        )
+        canvas = g.FRIGATE_CANVAS["ringtail"]
+        rt = b.sail(
+            "ringtail",
+            "studding",
+            boom=rt_boom,
+            area_m2=area,
+            x_m=round(after["clew_x"] - foot_ft / 2.0 * FT, 1),
+            centre_height_m=centre,
+            canvas_no=canvas[0],
+            cloth_rating_kn=g.cloth(area, canvas[0]),
+            bent=False,
+            note=f"ringtail {area} m2 (Kipping, Luce 1884): {depth_ft:.0f} ft deep, the depth of "
+            "the spanker's after leech it borders, 5 cloths in the head and 7 in the foot "
+            "(Kipping's brig's, her 22 1/2-in cloth), as the frigate-36's (judgement); a "
+            "studding-class sail with no side, lying in the spanker's plane; in the sail room."
+            + g.canvas_note(canvas),
+        )
+        size = g.quarter(2.5 * rope_scale)
+        b.line("ringtail.halyard", "halyard", rt, rating=g.rope_kn(size))
+        b.line("ringtail.tack", "tack", rt, rating=g.rope_kn(size))
+        b.line("ringtail.sheet", "sheet", rt, rating=g.rope_kn(g.quarter(2.0 * rope_scale)))
+        out.append(rt)
+    # a save-all under each fore lower studding-sail boom (Luce 1884 ch. XXIII, 'Other Sails';
+    # Steel 1794 vol. I: "Some ships have a water-sail, similar to a sloop's"): its head along
+    # 0.6 of the boom, down to half a metre off the water (the frigate-36's, judgement)
+    boom_ft = STEEL_STUDDING_64[("fore", "lower")][3]
+    boom_z = p.z_m(p.fore_channel_k_ft, p.masts["fore"]["x_ft"])
+    depth = boom_z - 0.5
+    area = round(SAVE_ALL_OF_BOOM * boom_ft * FT * depth)
+    canvas = g.FRIGATE_CANVAS["save-all"]
+    save_alls = []
+    for side in g.SIDES:
+        sa = b.sail(
+            f"fore.save_all.{side}",
+            "studding",
+            boom=f"fore.lower.studdingsail_boom.{side}",
+            yard="fore.yard",
+            side=side,
+            area_m2=area,
+            x_m=round(mast_x["fore"], 1),
+            centre_height_m=round(0.5 + depth / 2.0, 1),
+            canvas_no=canvas[0],
+            cloth_rating_kn=g.cloth(area, canvas[0]),
+            bent=False,
+            note=(
+                f"save-all {area} m2 under the fore lower studding sail boom (Luce 1884): its head "
+                f"along 0.6 of the boom, down from the boom at the fore channel, {boom_z:.2f} m "
+                "above her water, to half a metre off it (the frigate-36's, judgement); in the "
+                "sail room." + g.canvas_note(canvas)
+                if side == g.SIDES[0]
+                else None
+            ),
+        )
+        size = g.quarter(2.0 * rope_scale)
+        b.line(f"{sa}.halyard", "halyard", sa, rating=g.rope_kn(size))
+        b.line(f"{sa}.tack", "tack", sa, rating=g.rope_kn(size))
+        b.line(f"{sa}.sheet", "sheet", sa, rating=g.rope_kn(g.quarter(1.75 * rope_scale)))
+        save_alls.append(sa)
+    return out + save_alls, save_alls
+
+
+# ---------------------------------------------------------------------------
+# The guns (Indf §5)
+# ---------------------------------------------------------------------------
+
+# Her long guns' lengths (Indf §5.3), each a pattern of `period.ADYE_LONG_GUN_CWT` (Adye 1804
+# p. 155, the page image read: Ind §6.4), which gives its weight: the 24-pounder of 9 ft 6 in,
+# 49 cwt 2 qr (D31 (a); the pattern a 64's lower deck usually had, memory, unverified: Ind
+# §6.4); the 18 of 9 ft 0 in, 40 cwt, and the 9 of 7 ft 6 in, 24 cwt 2 qr, the 74's patterns
+# (Bel §13.1 answer 12; Lavery 1985 Table 17 gives the Bellona's 18s 40 cwt in 1761, via Bel
+# §13.4), judgement for hers and accepted by the owner (Build-Ships.md §19.1 item 6); the 12 of
+# 9 ft 6 in, 34 cwt, the generator's (D31 (a)). Her carronades are Adye's by
+# `period.ADYE_CARRONADE_CWT` (p. 72), the longer of Adye's two for the 24 and the 18.
+LONG_PATTERNS = {24: (9, 6), 18: (9, 0), 12: (9, 6), 9: (7, 6)}
+# Her fits' defaults (Indf §5.1; the fits' names accepted by the lead, 2026-10-28): the 64's as
+# built in 1784 (D17 (a)); the razee's as carried in 1796 (the owner, 2026-10-28).
+DEFAULT_FIT = {"sixty-four": "ardent class 1784", "razee": "as carried 1796"}
+# The Regulations' allowance for exercise (Indf §5.4) counts the upper deck's guns: the 64's
+# twenty-six 18-pounders, a third in a ship of two decks; the razee's twenty-six 24-pounders, a
+# fourth in a ship of one (the Regulations 1806, the Gunner, Art. XXI, OCR l. 13118-13144).
+UPPER_DECK_GUNS = 26
+DECKS_OF = {"sixty-four": 2, "razee": 1}
+# Her cartridges' powder (Indf §5.4): the engine's shares give every calibre of her fits to the
+# ounce of the Regulations' Table No. 29, read on the page image (Ind §6.4), so the shared
+# note, which waits on that table, is overridden in her fits until the shared work (SW-1) fills
+# the table and its note serves her (Build-Ships.md §10).
+CHARGES_NOTE = (
+    "A cartridge's powder in pounds, to the ounce: the service charges of cylinder powder for "
+    "one shot, the Regulations 1806 (1808 printing), Table No. 29 (the page image read: "
+    "Research-Indefatigable-2026-10.md §6.4; the OCR has its title at l.27498-27502 and lost its "
+    "figures): the long 24-pounder 8 lb, the 18 6 lb, the 12 4 lb, the 9 3 lb; the 42-pounder "
+    "carronade 3 lb 8 oz, the 24 2 lb, the 18 1 lb 8 oz. The engine's shares of the shot, a "
+    "third for a long gun and a twelfth for a carronade (freesail/ship/parts.py, charge_lb), "
+    "give each of them to the ounce."
+)
+ARMAMENT_NOTE = (
+    "The armament (spec M7 7; package 70; docs/design/Design-Ship-Indefatigable.md §5): the "
+    "guns as parts of the graph by their place, in her fits, each on its port of the hull's "
+    "profile to the centimetre with its deck named (Build-Ships.md §4.4); their weights by Adye "
+    "1804 (pp. 72, 155) and their crews by Falconer 1780 and Douglas 1829 (D31); the magazine's "
+    "allowance by kind and calibre. Every figure's source is in tools/ships/indefatigable.py."
+)
+
+
+def piece(kind, pounder):
+    """A piece's weight, cwt, and its crew to the pair (Indf §5.3): Adye's weight of her
+    pattern; Falconer's men to a long gun "when the ship is well manned, so as to fight both
+    sides at once occasionally" (1780, QUARTERS, OCR l. 14315-14340), and Douglas's four to a
+    carronade of any nature (1829, art. 136): D31 (c)."""
+    if kind == "long":
+        weight = period.ADYE_LONG_GUN_CWT[pounder][LONG_PATTERNS[pounder]]
+        return weight, period.FALCONER_CREW[pounder]
+    return period.ADYE_CARRONADE_CWT[pounder], period.DOUGLAS_CARRONADE_CREW
+
+
+def ports_from_forward(profile, deck):
+    """A deck's ports in the hull's profile as (x, sill) from forward, metres to the centimetre
+    as the profile has them, so that a gun on one stands on its triple (Build-Ships.md §4.4)."""
+    return [(x, sill) for x, sill, _ in reversed(profile["ports_m"][deck])]
+
+
+def pairs(ports, deck, first, kind, pounder, note):
+    """Broadside pairs on `ports`, numbered on from `first` from forward (Indf §5.2), each gun's
+    x and height its port's x and sill, its crew the period's (§5.3); the note on the first."""
+    cwt, crew = piece(kind, pounder)
+    out = []
+    for i, (x, sill) in enumerate(ports):
+        made = g.broadside_pair(
+            first + i,
+            kind,
+            pounder,
+            cwt,
+            x,
+            sill,
+            note if i == 0 else None,
+            deck=deck,
+            round_to=0.01,
+        )
+        for gun, _ in made:
+            gun["crew"] = crew  # reassigned, so the key keeps its place (Indf §5.2)
+        out += made
+    return out
+
+
+def bow_chasers(port, pounder, note):
+    """A pair of long guns as bow chasers in her chase ports, one a side, on the forecastle."""
+    cwt, crew = piece("long", pounder)
+    made = g.chasers(
+        "bow", "long", pounder, cwt, port[0], port[1], note, deck="forecastle", round_to=0.01
+    )
+    for gun, _ in made:
+        gun["crew"] = crew
+    return made
+
+
+def sixty_four_fits(profile):
+    """The 64's two fits (Indf §5.1) as (name, source, guns, note): the Ardent class's guns as
+    she was built, the default, and the class's from 1794, never hers."""
+    lower = ports_from_forward(profile, "lower")
+    upper = ports_from_forward(profile, "upper")
+    # the quarterdeck's five foremost ports a side; the sixth, under the roundhouse, is drawn
+    # and carries no gun of her fit (QUARTERDECK_SILLS)
+    quarterdeck = ports_from_forward(profile, "quarterdeck")[:5]
+    forecastle = ports_from_forward(profile, "forecastle")  # the 9's port, then the carronade's
+    roundhouse = ports_from_forward(profile, "roundhouse")
+
+    def as_built():
+        return (
+            pairs(
+                lower,
+                "lower",
+                1,
+                "long",
+                24,
+                "The lower deck's twenty-six long 24-pounders, thirteen a side: the 9 ft 6 in gun "
+                "of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), each on its port, its x and its sill "
+                "to the centimetre (Indf §5.2); eleven men to the pair, who fight whichever side "
+                "bears (Falconer 1780, QUARTERS; D31 (c)). Numbered from forward and on across her "
+                "decks, as the frigate-36 numbers hers; the period numbered each deck from No. 1 "
+                "(Bel §7.2).",
+            )
+            + pairs(
+                upper,
+                "upper",
+                14,
+                "long",
+                18,
+                "The upper deck's twenty-six long 18-pounders: the 9 ft gun of 40 cwt (Adye 1804 "
+                "p. 155), the 74's pattern (Bel §13.1 answer 12; judgement for hers); nine men to "
+                "the pair (Falconer 1780, QUARTERS).",
+            )
+            + pairs(
+                quarterdeck,
+                "quarterdeck",
+                27,
+                "long",
+                9,
+                "The quarterdeck's ten long 9-pounders in its five foremost ports a side, the "
+                "sixth, under the roundhouse, empty: the 7 ft 6 in gun of 24 cwt 2 qr (Adye 1804 "
+                "p. 155; the 74's pattern, judgement for hers); six men to the pair (Falconer "
+                "1780).",
+            )
+            + pairs(
+                forecastle[:1],
+                "forecastle",
+                32,
+                "long",
+                9,
+                "The forecastle's two long 9-pounders, one a side, firing over its rail (no port "
+                "is drawn on 1407F: Indf §3.3); six men to the pair (Falconer 1780).",
+            )
+        )
+
+    source = (
+        "RMG ZAZ1407, the gun table (read; written for Stately on the shared sheet); Winfield, "
+        "British Warships in the Age of Sail 1793-1817, p. 99, the Ardent class; Adye 1804 pp. "
+        "72 and 155, the pieces; Falconer 1780 (QUARTERS) and Douglas 1829 (art. 136), the crews"
+    )
+    return [
+        (
+            "ardent class 1784",
+            source,
+            as_built(),
+            "The Ardent class's guns as she was built: 26 x 24-pounders on the lower deck, 26 x "
+            "18-pounders on the upper deck, 10 x 9-pounders on the quarterdeck and 2 x 9-pounders "
+            "on the forecastle, 64 pieces (ZAZ1407's gun table; Winfield 1793-1817 p. 99; D17 "
+            "(a)). The default.",
+        ),
+        (
+            "ardent class 1794",
+            source,
+            as_built()
+            + pairs(
+                forecastle[1:],
+                "forecastle",
+                33,
+                "carronade",
+                24,
+                "The forecastle's two 24-pounder carronades of 1794, one a side, at +14.6 m (Indf "
+                "§5.1, judgement), firing over the rail: 13 cwt, the 3 ft 7 1/2 in carronade (Adye "
+                "1804 p. 72); four men to the pair, its captain, two privates and a provider "
+                "(Douglas 1829 art. 136).",
+            )
+            + pairs(
+                roundhouse,
+                "roundhouse",
+                34,
+                "carronade",
+                18,
+                "The roundhouse's six 18-pounder carronades of 1794, three a side between -17 and "
+                "-23 m (Indf §5.1; the roundhouse unmeasured but its rail and the line under it, "
+                "judgement), firing over the rail: 9 cwt, the 3 ft 3 in carronade (Adye 1804 p. "
+                "72); four men to the pair (Douglas 1829 art. 136).",
+            ),
+            "The class's guns from 1794: those of 1784 with 2 x 24-pounder carronades on the "
+            "forecastle and 6 x 18-pounder carronades on the roundhouse, 72 pieces (Winfield "
+            "1793-1817 p. 99). Never hers: she was not in commission as a 64 and was cut down from "
+            "September 1794 (Ind §4.1, judgement); a fit for a 64 of the class at sea after 1794.",
+        ),
+    ]
+
+
+def razee_fits(profile):
+    """The razee's two fits (Indf §5.1) as (name, source, guns, note): the establishment as
+    razeed in 1795, and the guns she carried from 1796, the default."""
+    gun_deck = ports_from_forward(profile, "upper")
+    quarterdeck = ports_from_forward(profile, "quarterdeck")
+    chase, *forecastle = ports_from_forward(profile, "forecastle")
+    twenty_fours = (
+        "Her gun deck's twenty-six long 24-pounders, thirteen a side, the 64's lower-deck guns "
+        "kept (James vol. 1 p. 454): the 9 ft 6 in gun of 49 cwt 2 qr (Adye 1804 p. 155; D31 (a)), "
+        "each on its port, its x and its sill to the centimetre (Indf §5.2); eleven men to the "
+        "pair, who fight whichever side bears (Falconer 1780, QUARTERS; D31 (c)). Numbered from "
+        "forward and on across her decks, as the frigate-36 numbers hers."
+    )
+    carronade = (
+        "22 cwt 1 qr, the 4 ft 3 1/2 in carronade (Adye 1804 p. 72); four men to the pair, its "
+        "captain, two privates and a provider (Douglas 1829 art. 136; D31 (c)), the marines "
+        "first at the beat to quarters (crew/quarters.py)"
+    )
+    as_razeed = (
+        pairs(gun_deck, "upper", 1, "long", 24, twenty_fours)
+        + pairs(
+            quarterdeck[:4],
+            "quarterdeck",
+            14,
+            "long",
+            12,
+            "The quarterdeck's eight long 12-pounders in its four foremost ports a side: the 9 ft "
+            "6 in gun of 34 cwt (Adye 1804 p. 155, the generator's pattern; D31 (a)); seven men to "
+            "the pair (Falconer 1780, QUARTERS).",
+        )
+        + pairs(
+            quarterdeck[4:],
+            "quarterdeck",
+            18,
+            "carronade",
+            42,
+            "The quarterdeck's four 42-pounder carronades in its two aftmost ports a side, by the "
+            "cabin and the wheel, where a carronade's short recoil wants the least room "
+            f"(judgement, Indf §5.1): {carronade}.",
+        )
+        + pairs(
+            forecastle[:1],
+            "forecastle",
+            20,
+            "carronade",
+            42,
+            "The forecastle's two 42-pounder carronades in its foremost port a side, by the "
+            "catheads and the bitts (judgement, Indf §5.1); four men to the pair.",
+        )
+        + pairs(
+            forecastle[1:],
+            "forecastle",
+            21,
+            "long",
+            12,
+            "The forecastle's four long 12-pounders in its after two ports a side: seven men to "
+            "the pair.",
+        )
+    )
+    as_carried = (
+        pairs(gun_deck, "upper", 1, "long", 24, twenty_fours)
+        + pairs(
+            quarterdeck,
+            "quarterdeck",
+            14,
+            "carronade",
+            42,
+            "The quarterdeck's twelve 42-pounder carronades, one in each of its six ports a side "
+            "(James vol. 1 p. 361: eighteen on the quarterdeck and forecastle together, which "
+            f"fill their ports exactly, ZAZ2375): {carronade}.",
+        )
+        + pairs(
+            forecastle,
+            "forecastle",
+            20,
+            "carronade",
+            42,
+            "The forecastle's six 42-pounder carronades, one in each of its three ports a side; "
+            "four men to the pair.",
+        )
+        + bow_chasers(
+            chase,
+            12,
+            "Her two long 12-pounders as bow chasers, one a side in her chase ports (James vol. 1 "
+            "p. 361 puts them on the quarterdeck and forecastle; that they were bow chasers is the "
+            "kit's word and the build's judgement, D30 (a)): the 9 ft 6 in gun of 34 cwt (Adye "
+            "1804 p. 155, the generator's pattern; the note leans to a short 12 of 7 ft 6 in-8 ft "
+            "6 in and 29 1/4-31 1/2 cwt, Ind §6.4); seven men each (Falconer 1780).",
+        )
+    )
+    return [
+        (
+            "as razeed 1795",
+            "Winfield, British Warships in the Age of Sail 1793-1817, p. 99, Indefatigable as a "
+            "frigate; RMG ZAZ2371 and ZAZ2398, the armament tables (read); James, Naval History "
+            "vol. 1 p. 454; Adye 1804 pp. 72 and 155, the pieces; Falconer 1780 (QUARTERS) and "
+            "Douglas 1829 (art. 136), the crews",
+            as_razeed,
+            "The establishment of 1794 as razeed, registered a 38: 26 x 24-pounders on her gun "
+            "deck; on the quarterdeck 8 x 12-pounders and 4 x 42-pounder carronades; on the "
+            "forecastle 4 x 12-pounders and 2 x 42-pounder carronades; 44 pieces, which fill the "
+            "quarterdeck's six ports and the forecastle's three a side (ZAZ2375, measured). The "
+            "split within each deck is judgement. James: none of the three razees went to sea with "
+            "the establishment's long guns; 'The Indefatigable mounted but 28' (vol. 1 p. 454).",
+        ),
+        (
+            "as carried 1796",
+            "James, Naval History vol. 1 p. 361 (read); Troude vol. 3 p. 31; D30 (a); Adye 1804 "
+            "pp. 72 and 155, the pieces; Falconer 1780 (QUARTERS) and Douglas 1829 (art. 136), the "
+            "crews",
+            as_carried,
+            "As she carried them under Pellew at the Virginie, 20-21 April 1796: 26 long "
+            "24-pounders on her gun deck, 18 x 42-pounder carronades in the eighteen ports of her "
+            "quarterdeck and forecastle, and 2 long 12-pounders, bow chasers by judgement (James "
+            "vol. 1 p. 361; Troude vol. 3 p. 31; D30 (a)); 46 pieces. The same in January 1797 "
+            "(James vol. 2 pp. 16-17) and in 1805 (vol. 3 p. 313; ADM 1/2408/84, catalogue). James "
+            "gives her broadside as 702 lb, counting one 12 (vol. 1 p. 362); counted with both "
+            "chasers, as the far-detail rule counts them (combat/far.py), it is 714 lb. The "
+            "default (the owner, 2026-10-28).",
+        ),
+    ]
+
+
+def fits_of(p, profile):
+    """Her fits (Indf §5.1) as (name, source, guns, note), in the file's order."""
+    return sixty_four_fits(profile) if p.key == "sixty-four" else razee_fits(profile)
+
+
+def default_guns(p, fits):
+    """The default fit's guns, against which her quarter bill and her stores are set."""
+    return next(guns for name, _, guns, _ in fits if name == DEFAULT_FIT[p.key])
+
+
+def armament(b, p, fits):
+    """Her fits and their magazines (Indf §5), the charges' notes overridden to cite Table No.
+    29 and the 64's exercise note a two-decker's."""
+    decks = DECKS_OF[p.key]
+    exercise = g.exercise_allowance(UPPER_DECK_GUNS, decks=decks)
+    rounds = {"long": g.KINGS_ROUNDS, "carronade": g.KINGS_ROUNDS, "swivel": g.SWIVEL_ROUNDS}
+    b.armament(
+        ARMAMENT_NOTE,
+        DEFAULT_FIT[p.key],
+        [
+            (name, source, guns, g.fit_magazine(guns, rounds, exercise), note)
+            for name, source, guns, note in fits
+        ],
+    )
+    for name, *_ in fits:
+        b.armament_notes[("magazine", name, "charges")] = CHARGES_NOTE
+        if decks == 2:
+            b.armament_notes[("magazine", name, "exercise_charges")] = (
+                period.TWO_DECKS_EXERCISE_NOTE
+            )
+
+
+# ---------------------------------------------------------------------------
+# The company, the marines and the quarter bill (Indf §6)
+# ---------------------------------------------------------------------------
+
+# Her company on the Regulations' table of officers and ratings (1806, 1808 printing, p. 165
+# and IA leaves 455-460, the page images read: Ind §4.2): the 64 on the 491 column, the class's
+# complement from 1794 (Winfield 1793-1817 p. 99; D17 (a)); the razee on the 44's 294 column
+# with 36 seamen over it, 330 (James vol. 1 p. 454: "at first of 310, but afterwards of 330
+# men"; D32 (a)). The posts are her wardroom file's (data/people/); the marines the column's
+# officers and NCOs and the privates by judgement (no establishment of private marines was
+# found: Ind §10.8); the idlers the column's rows by trade, and by judgement a cooper, a cook's
+# mate, a gunroom steward and the servants; the seamen shared among the six stations as the
+# frigate-36's 182 are (28, 24, 30, 14, 50, 36: judgement), the column's petty officers and its
+# boys among them (Indf §6.1-§6.2).
+COMPANY = {
+    "sixty-four": {
+        "complement": 491,
+        "column": 64,
+        "marines": 84,
+        "seamen": {
+            "forecastle": 54,
+            "fore_top": 46,
+            "main_top": 58,
+            "mizzen_top": 27,
+            "afterguard": 96,
+            "waisters": 70,
+        },
+        "idlers": {
+            "carpenter's crew": (
+                11,
+                "the carpenter's mate and crew of eight, the caulker and the caulker's mate",
+            ),
+            "sailmaker's crew": (4, "the sailmaker's mate and crew of two, and the ropemaker"),
+            "cooper": (1, "a cooper, for the casks (judgement: the column has none)"),
+            "armourer": (3, "the armourer and two armourer's mates"),
+            "cook": (2, "the ship's cook, and a cook's mate (judgement)"),
+            "steward": (
+                3,
+                "the purser's steward and the steward's mate, and a gunroom steward (judgement)",
+            ),
+            "servant": (
+                12,
+                "officers' servants (judgement: the frigate-36's eight, and more for her five "
+                "lieutenants and the captain of marines)",
+            ),
+            "surgeon's mate": (2, "the two assistant surgeons"),
+            "clerk": (2, "the captain's clerk and the schoolmaster"),
+            "master-at-arms's party": (2, "the two ship's corporals"),
+        },
+        "marines_note": "the 491 column's captain, two lieutenants, two serjeants, two corporals "
+        "and a drummer, 8, and 76 privates (judgement: the Bellona's share in 1761, 97 marines in "
+        "her 567, Lavery 1985 p. 17 Table 7, via Bel §13.4; the frigate-36's share would give 74; "
+        "the owner's leave of 2026-10-28)",
+    },
+    "razee": {
+        "complement": 330,
+        "column": 44,
+        "marines": 50,
+        "seamen": {
+            "forecastle": 37,
+            "fore_top": 31,
+            "main_top": 39,
+            "mizzen_top": 18,
+            "afterguard": 66,
+            "waisters": 47,
+        },
+        "idlers": {
+            "carpenter's crew": (7, "the carpenter's mate and crew of five, and the caulker"),
+            "sailmaker's crew": (3, "the sailmaker's mate and crew of one, and the ropemaker"),
+            "cooper": (1, "a cooper, for the casks (judgement: the column has none)"),
+            "armourer": (2, "the armourer and an armourer's mate"),
+            "cook": (2, "the ship's cook, and a cook's mate (judgement)"),
+            "steward": (2, "the purser's steward, and a gunroom steward (judgement)"),
+            "servant": (8, "officers' servants, the frigate-36's eight (judgement)"),
+            "surgeon's mate": (1, "the assistant surgeon"),
+            "clerk": (2, "the captain's clerk and the schoolmaster"),
+            "master-at-arms's party": (2, "the two ship's corporals"),
+        },
+        "marines_note": "the 294 column's two lieutenants, two serjeants, two corporals and a "
+        "drummer, 7, and 43 privates, the frigate-36's share of her 264 carried to 330 "
+        "(judgement; D32 (a))",
+    },
+}
+# The quarter bill's figures beyond the trimmers (Indf §6.4): the frigate-36's two at the helm
+# and no powder beyond the idlers; her small-arms men the frigate-36's share of her seamen, 20 of
+# 182; her boarders a quarter of the seamen (`gen_ships.BOARDERS_NOTE`); all judgement as hers.
+HELM = 2
+SMALL_ARMS_OF_SEAMEN = 20.0 / 182.0
+BOARDERS_OF_SEAMEN = 0.25
+# The trimmers' shares by station, the frigate-36's 8, 10, 12, 6 and 8 of her 44 (judgement).
+TRIMMER_SHARES = {"forecastle": 8, "fore_top": 10, "main_top": 12, "mizzen_top": 6, "afterguard": 8}
+
+
+def half_up(v):
+    """A count to the nearest whole man, a half up."""
+    return math.floor(v + 0.5)
+
+
+def shares(total, weights):
+    """`total` men split by `weights` to whole men, the largest remainders taking the odd ones
+    (a tie to the station first in the bill)."""
+    whole = sum(weights.values())
+    exact = {k: total * w / whole for k, w in weights.items()}
+    out = {k: math.floor(v) for k, v in exact.items()}
+    for k in sorted(exact, key=lambda k: out[k] - exact[k])[: total - sum(out.values())]:
+        out[k] += 1
+    return out
+
+
+def at_the_guns(guns, marines):
+    """The men one side's guns of a fit take, the chasers included (each chaser its own crew,
+    a broadside pair one: `parts.Gun.pair_key`), and how many of them are marines, who take the
+    carronades first (crew/quarters.py, the marines at the quarterdeck carronades)."""
+    one_side = [gun for gun, _ in guns if gun["place"] != "broadside" or gun["side"] == g.SIDES[0]]
+    men = sum(gun["crew"] for gun in one_side)
+    carronades = sum(gun["crew"] for gun in one_side if gun["kind"] == "carronade")
+    return men, min(carronades, marines)
+
+
+# Her quarters at the beat (`Quarters.beat`, crew/quarters.py), measured at muster at seed 7 on
+# each default fit, as Indf §6.4 asks: (marines at the guns, of them at the long guns, the
+# trimmers' division). Every gun crew fills; the beat takes the marines to the long guns before
+# the topmen, so no marines' division forms (as on the frigate-36: Indf §18 item 13), and the
+# topmen the guns leave fall to the trimmers. The station order is the engine's, not hers.
+BEAT_MEASURED = {"sixty-four": (84, 84, 137), "razee": (50, 18, 93)}
+
+
+def quarter_bill(b, p, guns):
+    """Her quarter bill set against the default fit (Indf §6.4): the trimmers what her seamen
+    leave when one side's guns, the chasers and the wheel are manned, the marines taking the
+    carronades first, split by the frigate-36's shares; the bill leaves the marines not at the
+    carronades for their division, which the beat to quarters does not (`BEAT_MEASURED`)."""
+    co = COMPANY[p.key]
+    seamen = sum(co["seamen"].values())
+    men, marines_at = at_the_guns(guns, co["marines"])
+    total = seamen - (men - marines_at) - HELM
+    trimmers = shares(total, TRIMMER_SHARES)
+    fit = DEFAULT_FIT[p.key]
+    beat_marines, beat_long, beat_trimmers = BEAT_MEASURED[p.key]
+    b.quarter_bill(
+        g.QUARTER_BILL_NOTE,
+        [
+            (
+                "forecastle",
+                trimmers["forecastle"],
+                f"The trimmers: what her {seamen} seamen leave when one side's guns of '{fit}', "
+                f"the chasers and the wheel are manned, the marines taking the carronades first: "
+                f"{men} men at the guns, {marines_at} of them marines, and {HELM} at the wheel "
+                f"leave {total}, split by the frigate-36's trimmer shares, 8, 10, 12, 6 and 8 of "
+                "44 (Indf §6.4; judgement). The bill leaves the marines not wanted at the "
+                "carronades for their division, as Falconer quarters them on the poop and "
+                "forecastle or gangway (1780, QUARTERS); the beat to quarters (crew/quarters.py) "
+                "takes the marines to the long guns before the topmen, so at muster on "
+                f"'{fit}' every gun crew fills, {beat_marines} marines stand at the guns, "
+                f"{beat_long} of them at the long guns, no marines' division forms and the "
+                f"trimmers are {beat_trimmers}, the topmen the guns leave among them (measured at "
+                "seed 7, Indf §6.4; the station order is the engine's, open for the lead). Of the "
+                "forecastlemen, for the head sails and the fore braces (Luce 1884 ch. XX: the "
+                "forecastlemen 'the best older seamen').",
+            ),
+            ("fore_top", trimmers["fore_top"], "Of the fore topmen, for the fore braces aloft."),
+            ("main_top", trimmers["main_top"], "Of the main topmen, the largest top."),
+            (
+                "mizzen_top",
+                trimmers["mizzen_top"],
+                "Of the mizzen topmen, for the crossjack braces and the "
+                + ("mizen course." if p.mizen == "course" else "spanker."),
+            ),
+            (
+                "afterguard",
+                trimmers["afterguard"],
+                "Of the afterguard, at the main sheet and the after braces.",
+            ),
+        ],
+        HELM,
+        0,
+        "sail before guns",
+        {
+            "helm": "Two quartermasters at the wheel (Luce 1884 ch. XX, the quartermasters), as "
+            "the frigate-36's (judgement).",
+            "powder": "The powder beyond the idlers: none; her cooks, stewards, servants, clerks, "
+            "the cooper, the armourers and the sailmaker's crew pass the cartridges, as the "
+            "frigate-36's (judgement after Luce 1884 ch. XX, the powder division).",
+            "priority": g.PRIORITY_NOTE,
+        },
+        small_arms=half_up(seamen * SMALL_ARMS_OF_SEAMEN),
+        boarders=half_up(seamen * BOARDERS_OF_SEAMEN),
+        small_arms_note=f"Seamen with the muskets of the stand of arms, the frigate-36's share of "
+        f"her {seamen} seamen (20 of 182; judgement). Falconer's men to the small arms by the "
+        "Admiralty's order (1780, QUARTERS, OCR l. 14335-14372: a 5th rate 50, a 4th rate of 60 "
+        "guns 70, a 3rd rate of 70 guns 80) run close to whole detachments of marines, and stand "
+        "for the whole party, marines and seamen (Indf §6.4).",
+        boarders_note=f"The boarders by the bill, a quarter of her {seamen} seamen told off from "
+        "the guns' crews (Luce 1884 ch. XX; judgement, the shared rule), with the marines, who "
+        "board with the bayonet.",
+        filling=g.filling_party(guns),
+    )
+    b.crew_notes[("quarter_bill", "filling")] = (
+        g.FILLING_NOTE + f" Her {g.filling_party(guns)} are the Regulations' quarter gunners of "
+        f"the {period.REGULATIONS_COLUMNS[co['column']]} column (p. 165: Ind §4.2), the period's "
+        "figure twice over (Indf §5.4)."
+    )
+
+
+def company(b, p, guns):
+    """Her crew section (Indf §6.1-§6.2), the people drawn at muster from her wardroom file
+    (§6.3), and the stores beside them: water, provisions and cordage by her complement, a shot
+    plug to each of the default fit's `guns` (§7), the spare spars and the sail room by the
+    frigate-36's method."""
+    co = COMPANY[p.key]
+    posts, drawn = g.wardroom(os.path.splitext(p.file)[0])
+    seamen = sum(co["seamen"].values())
+    idlers = sum(n for n, _ in co["idlers"].values())
+    column = period.REGULATIONS_COLUMNS[co["column"]]
+    complement = co["complement"]
+    # the frigate-36's stores for her 264, carried by the complement (Indf §7; judgement): water
+    # 100 tons, cordage 600 fathoms to the nearest fifty
+    water = half_up(100.0 * complement / 264.0)
+    cordage = 50 * half_up(600.0 * complement / 264.0 / 50.0)
+    plugs = len(guns)
+    if p.key == "sixty-four":
+        whence = (
+            "The class's establishment from 1794, 491 (Winfield 1793-1817 p. 99; the Regulations "
+            "1806 p. 165, the 64's column; D17 (a)); 500 as built, but a file carries one "
+            "complement whatever its fits, and the nine make no difference to her sailing."
+        )
+    else:
+        whence = (
+            "330 men and boys, 'at first of 310, but afterwards of 330 men' (James vol. 1 p. 454; "
+            "at the Virginie, p. 361), on the 44's column of the Regulations 1806 (p. 165) with 36 "
+            "seamen over it (D32 (a))."
+        )
+    stations_note = (
+        f"Hands per station, both watches together: her {seamen} seamen, the complement less the "
+        f"posts, the marines and the idlers, shared among the six stations as the frigate-36's "
+        "182 are (28, 24, 30, 14, 50 and 36: judgement, Indf §6.1-§6.2), the column's petty "
+        "officers and its boys among them, the boys in the afterguard as landsmen (spec M3 9 "
+        "item 6). Forecastlemen: the head, anchors and headsails; the best older seamen (Luce "
+        "1884 ch. XX)."
+    )
+    entries = [
+        (("complement",), complement, whence),
+        (("names",), "english", "A King's ship: the english list in data/crew/names.yaml."),
+        (("stations", "forecastle"), co["seamen"]["forecastle"], stations_note),
+        (("stations", "fore_top"), co["seamen"]["fore_top"], "Fore topmen."),
+        (("stations", "main_top"), co["seamen"]["main_top"], "Main topmen, the largest top."),
+        (("stations", "mizzen_top"), co["seamen"]["mizzen_top"], "Mizzen topmen."),
+        (
+            ("stations", "afterguard"),
+            co["seamen"]["afterguard"],
+            "Afterguard, the boys included (spec M3 9 item 6: boys count as landsmen).",
+        ),
+        (("stations", "waisters"), co["seamen"]["waisters"], "Waisters."),
+        (
+            ("stations", "marines"),
+            co["marines"],
+            f"Marines: {co['marines_note']}; no establishment of private marines by rate was "
+            "found (Ind §10.8). They stand watch and work as afterguard, never aloft (Luce 1884 "
+            "ch. XX).",
+        ),
+        (
+            ("stations", "idlers"),
+            idlers,
+            "Idlers: the trades below (Luce 1884 ch. XX: they stand no night watches).",
+        ),
+        (
+            ("ratings", "able"),
+            0.30,
+            "Share of the seamen (not marines, idlers or officers) by rating: the frigate-36's "
+            "(judgement, Indf §6.1). Able: 0.30.",
+        ),
+        (("ratings", "ordinary"), 0.40, "Ordinary: 0.40, judgement."),
+        (("ratings", "landsman"), 0.30, "Landsmen: 0.30, judgement."),
+    ]
+    entries += [
+        (
+            ("posts", post),
+            None,
+            (
+                "Station holders by post (spec M3 2.3): the commissioned officers, the column's "
+                f"{sum(1 for x in posts if x.endswith('lieutenant'))} lieutenants (the "
+                f"Regulations 1806 p. 165, the {column} column), then the standing and warrant "
+                "officers and the master-at-arms, as the frigate-36's; her wardroom file "
+                f"(data/people/{p.file}) gives them. Names are drawn at muster unless a post "
+                "gives one."
+            )
+            if i == 0
+            else None,
+        )
+        for i, post in enumerate(posts)
+    ]
+    entries += [
+        (
+            ("idlers_by_trade", trade),
+            n,
+            (
+                f"How the idlers are made up, the {column} column's rows by trade (the "
+                "Regulations 1806; Ind §4.2) and judgement where it says so; they must sum to "
+                "the idlers. "
+                if i == 0
+                else ""
+            )
+            + f"{text[0].upper() + text[1:]}: {n}.",
+        )
+        for i, (trade, (n, text)) in enumerate(co["idlers"].items())
+    ]
+    entries += [
+        (
+            ("stores", "water_tons"),
+            water,
+            f"Water: the frigate-36's 100 tons for her 264 carried by the complement, {water} "
+            "tons in iron-hooped casks (Indf §7; judgement), as many weeks at a gallon a man a "
+            "day as hers.",
+        ),
+        (
+            ("stores", "provisions_days"),
+            120,
+            "Provisions: four months at full allowance for the complement, as the frigate-36's "
+            "(judgement).",
+        ),
+        (("stores", "spare_spars"), {}, None),  # the booms, by class: below
+        (
+            ("stores", "cordage_fathoms"),
+            cordage,
+            "Spare rope in the boatswain's store: the frigate-36's 600 fathoms carried by the "
+            "complement, to fifty fathoms (Indf §7; judgement).",
+        ),
+        (
+            ("stores", "shot_plugs"),
+            plugs,
+            g.SHOT_PLUGS_NOTE + f" One a gun of her default fit, {plugs} (Indf §7).",
+        ),
+        *g.ration_entries("a King's ship"),
+    ]
+    b.crew(entries)
+    # the named few beyond the posts (package 35), each drawn from a station at muster, the
+    # counts above unchanged; the roles and their notes are her wardroom file's (Indf §6.3)
+    b.people(
+        "The named people beyond the posts (package 35, spec M5 §22): each drawn from a station "
+        f"at muster, the counts above unchanged; see data/people/{p.file}.",
+        drawn,
+    )
+    # the booms (package 30b): the frigate-36's, by Luce's stowage (gen_ships.frigate_crew), on
+    # her own spars: Steel's 64 has a jib-boom and no flying jib-boom (p. 49)
+    b.spare_spars(
+        "The booms: the spare spars by class, as the frigate-36's (Luce 1866 ch. XVII, 'Stowing "
+        "Booms'; Luce 1884 ch. XI; Steel 1794 vol. I, 'Lashing of Booms'), of her own spars (Indf "
+        "§7); see tools/ships/indefatigable.py.",
+        [
+            ("topmast", 2, "The fore and main topmasts, one in each pile (Luce 1866)."),
+            (
+                "topgallant_mast",
+                2,
+                "A stump fore and a stump main topgallant mast, one in each pile (Luce 1866).",
+            ),
+            ("yard", 2, "The spare fore and main topsail yards, on the quarters (Luce 1866)."),
+            (
+                "studdingsail_boom",
+                4,
+                "The fore and main topmast studding-sail booms, a pair in each pile (Luce 1866; "
+                "the pair judgement).",
+            ),
+            (
+                "jib_boom",
+                1,
+                "The spare jib-boom, amidships (Luce 1866); she has no flying jib-boom (Steel "
+                "1794 vol. I p. 49, the 64).",
+            ),
+        ],
+    )
+    sail_room(b, p)
+
+
+def sail_room(b, p):
+    """Her sail room by the frigate-36's method (Luce 1884 ch. X p. 171; gen_ships.frigate_crew)
+    on her own sails (Indf §7): the second of each working sail of the frigate's list that she
+    carries, the heavy-weather foresail and topsails of No. 1, one of each storm sail, and her
+    occasional sails."""
+    canvas = {s["id"]: s["canvas_no"] for s in b.doc["sails"]}
+    after = "mizzen.course" if p.mizen == "course" else "mizzen.spanker"
+    working = [
+        "main.course",
+        "mizzen.topsail",
+        "fore.topgallant",
+        "main.topgallant",
+        "mizzen.topgallant",
+        "fore.royal",
+        "main.royal",
+        "mizzen.royal",
+        "jib",
+        after,
+        "fore.topmast_staysail",
+    ]
+    heavy = ["fore.course", "fore.topsail", "main.topsail"]
+    storm = ["fore.storm_staysail", "mizzen.storm_staysail", "storm_mizzen"]
+    occasional = [k for k in ("ringtail",) if k in canvas] + [f"fore.save_all.{s}" for s in g.SIDES]
+
+    def first(text, i):
+        return text if i == 0 else None
+
+    b.sail_room(
+        "The sail room (spec 3b §6.3): Luce's allowance for a frigate (1884 ch. X p. 171), as "
+        "the frigate-36's, on her own sails (Indf §7), every sail new; see "
+        "tools/ships/indefatigable.py.",
+        [
+            (
+                k,
+                canvas[k],
+                first(
+                    "The second of each working sail, of the working number (Luce p. 171); she "
+                    "has one jib and no flying jib, and her "
+                    + ("mizen course" if p.mizen == "course" else "spanker")
+                    + " stands for the frigate's spanker.",
+                    i,
+                ),
+            )
+            for i, k in enumerate(working)
+        ]
+        + [
+            (
+                k,
+                1,
+                first(
+                    "The heavy-weather foresail and fore and main topsails, of No. 1 (Luce p. 171, "
+                    "the table's note).",
+                    i,
+                ),
+            )
+            for i, k in enumerate(heavy)
+        ]
+        + [
+            (k, canvas[k], first("Storm canvas, one of each (Luce p. 171).", i))
+            for i, k in enumerate(storm)
+        ]
+        + [
+            (k, canvas[k], first("The occasional sails, one each (spec 3b §6.4).", i))
+            for i, k in enumerate(occasional)
+        ],
+    )
+
+
+# ---------------------------------------------------------------------------
+# Ground tackle, boats, pumps and hold (Indf §7)
+# ---------------------------------------------------------------------------
+
+# Steel's 64 in both files (D33 (a): her burthen stayed 1,384 tons against Steel's 64's 1,369,
+# and anchors answer to the hull's mass), from `period.STEEL_ANCHORS`: four bowers of 57 cwt and
+# seven 21-in cables, laid three on the best bower and two on the small as on the Channel
+# service (Lever 1808 p. 67, as gen_ships cites it), one on the sheet and one on the spare; 120
+# fathoms a cable (Falconer 1780, CABLE). The spare anchor is of the kind `sheet`: the schema's
+# kinds are four, and the moorings' "two bowers down" counts the bowers (Indf §7).
+BOWER_CABLES = {"best_bower": 3, "small_bower": 2, "sheet": 1, "spare_anchor": 1}
+# Her burthen and her length on the gun deck as built (Winfield 1793-1817 p. 100: 1,384 3/94
+# tons; 160 ft 1 1/4 in), which the hold's and the boats' rules read; the razee's burthen the
+# same (D33 (a)).
+BURTHEN_TONS = 1384.0
+GUN_DECK_FT = 160.0 + 1.25 / 12.0
+
+
+def ground_tackle(b):
+    """Steel's anchors and cables for a 64 (Indf §7), through `Builder.ground_tackle`."""
+    steel = period.STEEL_ANCHORS[64]
+    if len(BOWER_CABLES) != steel["bowers"] or sum(BOWER_CABLES.values()) != steel["bower_cables"]:
+        raise ValueError(
+            f"Steel's 64 has {steel['bowers']} bowers and {steel['bower_cables']} bower cables; "
+            f"BOWER_CABLES lays {sum(BOWER_CABLES.values())} on {len(BOWER_CABLES)} (Indf §7)."
+        )
+    bower = round(steel["bower_cwt"] * g.CWT_KG)
+    cable = steel["bower_cable_in"]
+    stream = steel["stream_cable_in"]
+    hawser = g.KEDGE_HAWSER_OF_BOWER * cable
+    fathoms = g.CABLE_FATHOMS
+    bowers = {
+        "best_bower": (
+            "bower",
+            "the best bower",
+            f"The bowers: Steel's four of {steel['bower_cwt']:g} cwt for a 64 (Steel 1794 vol. I, "
+            "the anchor table, the page image read: Ind §6.2; D33 (a)); the cables Steel's seven "
+            f"of {cable:g} in ('A Cordage Table', read), rated as every rope by Luce 1866 ch. IV, "
+            "laid three on the best bower and two on the small, 'three Cables on the best Bower, "
+            "two on the small Bower' (Lever 1808 p. 67), 120 fathoms a cable (Falconer 1780, "
+            "CABLE).",
+        ),
+        "small_bower": ("bower", "the small bower", None),
+        "sheet": ("sheet", "the sheet anchor", "The sheet anchor, a bower's size, on one cable."),
+        "spare_anchor": (
+            "sheet",
+            "the spare anchor",
+            "The spare anchor, Steel's fourth bower, on the seventh cable; of the kind 'sheet', "
+            "the schema's kinds being four (Indf §7).",
+        ),
+    }
+    anchors = [
+        (aid, kind, name, float(bower), fathoms * BOWER_CABLES[aid], cable, g.rope_kn(cable), text)
+        for aid, (kind, name, text) in bowers.items()
+    ]
+    anchors += [
+        (
+            "stream",
+            "stream",
+            "the stream anchor",
+            float(round(steel["stream_cwt"] * g.CWT_KG)),
+            fathoms,
+            stream,
+            g.rope_kn(stream),
+            f"The stream anchor, Steel's {steel['stream_cwt']:g} cwt for a 64, on the stream "
+            f"cable of {stream:g} in (Steel 1794 vol. I, the anchor and cordage tables: Ind "
+            "§6.2).",
+        ),
+        (
+            "kedge",
+            "kedge",
+            "the kedge",
+            float(round(steel["kedge_cwt"] * g.CWT_KG)),
+            fathoms,
+            hawser,
+            g.rope_kn(hawser),
+            "The kedge, Steel's 7 cwt 2 qr for a 64 (as above), on a hawser of half the bower "
+            "cable's size, the house rule (gen_ships.KEDGE_HAWSER_OF_BOWER; judgement).",
+        ),
+    ]
+    b.ground_tackle(
+        "The ground tackle (package 34, spec M5 §18): Steel's anchors and cables for a 64 (Steel "
+        "1794 vol. I; D33 (a); Indf §7), every figure's source in tools/ships/indefatigable.py; "
+        "chain cable is later than 1805.",
+        anchors,
+        chain=False,
+    )
+
+
+def boats_pumps_hold(b):
+    """Her boats by Luce's rule on her length, the frigate-36's allowance; her pumps, two chain
+    and two hand; her hold by her burthen (Indf §7)."""
+    g.hold_for(
+        b,
+        BURTHEN_TONS,
+        True,
+        "1,384 tons as built, Winfield 1793-1817 p. 100; a ship of war's hold is her own stores "
+        "and ballast: judgement",
+    )
+    b.pumps(
+        g.PUMPS_NOTE + " Hers in the well round the main mast (ZAZ2372, read: Ind §6.5).",
+        g.pump_entries(
+            2,
+            2,
+            [
+                "the starboard chain pump",
+                "the larboard chain pump",
+                "the starboard hand pump",
+                "the larboard hand pump",
+            ],
+        ),
+    )
+    launch = g.LAUNCH_LENGTH_FACTOR * math.sqrt(GUN_DECK_FT)
+    b.boats(
+        g.BOATS_NOTE,
+        g.boat_entries(
+            GUN_DECK_FT,
+            True,
+            [
+                (
+                    "launch",
+                    "launch",
+                    "the launch",
+                    1.0,
+                    f"The launch, 2.6 root(160 ft) = {launch:.0f} ft (Luce 1866's rule); her own "
+                    "boats were not found (Ind §10.11), and Steel's list for a 64, a longboat, a "
+                    "pinnace and yawls or cutters (vol. II, read (OCR): Ind §6.1), agrees in kind "
+                    "with the frigate-36's allowance, taken (Indf §7). The stream anchor is sent "
+                    "in her (Steel 1794 vol. I: 'sent in the long-boat').",
+                ),
+                (
+                    "barge",
+                    "barge",
+                    "the barge",
+                    1.03,
+                    "The captain's barge, a little longer than the launch and narrower "
+                    "(Falconer, BARGE: 'longer, slighter, and narrower').",
+                ),
+                ("pinnace", "pinnace", "the pinnace", 0.9, "The pinnace (Falconer, PINNACE)."),
+                (
+                    "first_cutter",
+                    "cutter",
+                    "the first cutter",
+                    0.9,
+                    "The first cutter, 0.9 of the launch (Luce's rule).",
+                ),
+                (
+                    "second_cutter",
+                    "cutter",
+                    "the second cutter",
+                    0.81,
+                    "The second cutter, 0.9 of the first.",
+                ),
+                (
+                    "jolly_boat",
+                    "jolly boat",
+                    "the jolly boat",
+                    g.JOLLY_BOAT_OF_LAUNCH,
+                    "The jolly boat, the small boat at the stern davits (judgement in the size).",
+                ),
+            ],
+        ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Her descriptions (Indf §8; D16 (a))
+# ---------------------------------------------------------------------------
+
+DESCRIPTIONS = {
+    "sixty-four": (
+        "sixty-four",
+        "a ship",
+        "a sixty-four, a ship of the line of two tiers of ports",
+        "The Ardent class's 64 (Winfield 1793-1817 p. 99), a third rate (Falconer 1780, RATES): "
+        "what the glass makes out, her two tiers of ports; her rig's word the frigate's, three "
+        "masts square-rigged.",
+    ),
+    "razee": (
+        "razee",
+        "a ship",
+        "a razee, a heavy frigate cut down from a sixty-four, one tier of twenty-four-pounders",
+        "Rated a 44 in Steel's List 1799-1802, the Navy List 1815-16 and by James for 1805 "
+        "(vol. 3 p. 311): a frigate in every list (Indf §8), her one tier of ports a 64's lower "
+        "deck's.",
+    ),
+}
 
 
 def build(out_dir: str) -> None:
-    """Write her files to `out_dir`: none yet."""
+    """Write her files to `out_dir`: the 64's (`sixty-four.yaml`), then the razee's derived from
+    her (`razee-44.yaml`), each through `write()` (Indf §1)."""
+    p64 = sixty_four()
+    razee = razeed(p64)  # the derivation's checks raised before either file is written
+    write(out_dir, p64)
+    write(out_dir, razee)

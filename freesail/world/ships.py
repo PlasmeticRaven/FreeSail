@@ -201,6 +201,20 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "rig": "a smack",
         "what": "a fishing smack, her well amidships",
     },
+    # package 75 (docs/design/Design-Ship-Indefatigable.md §8; D16 (a)): the Indefatigable as
+    # built, an Ardent-class 64 of 1784, and as razeed in 1795, a 44 cut down from her; the
+    # tops make out a ship
+    "sixty-four": {
+        "file": "data/ships/sixty-four.yaml",
+        "rig": "a ship",
+        "what": "a sixty-four, a ship of the line of two tiers of ports",
+    },
+    "razee": {
+        "file": "data/ships/razee-44.yaml",
+        "rig": "a ship",
+        "what": "a razee, a heavy frigate cut down from a sixty-four, one tier of "
+        "twenty-four-pounders",
+    },
 }
 _DESCRIPTION_WORDS = {
     "a frigate": "frigate",
@@ -238,6 +252,15 @@ _DESCRIPTION_WORDS = {
     "smack": "smack",
     "a fishing smack": "smack",
     "fishing smack": "smack",
+    # package 75 (Design-Ship-Indefatigable.md §8): never "a ship of the line", the 74's words
+    "a sixty-four": "sixty-four",
+    "sixty-four": "sixty-four",
+    "a 64": "sixty-four",
+    "a sixty-four gun ship": "sixty-four",
+    "a razee": "razee",
+    "razee": "razee",
+    "a razee frigate": "razee",
+    "a cut-down sixty-four": "razee",
 }
 
 
