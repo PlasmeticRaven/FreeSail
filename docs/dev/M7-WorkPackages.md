@@ -609,8 +609,11 @@ the trials and the touched files 151 of 161 passed with eight left out by their 
 failed, the lee-shore trial's container digest and truth 7-143 before the hail's mend (green
 alone after it); its pace tests on a worktree at `f99648d` and on the step's tree in turn
 under the container's floor on both, the step costing nothing the measure sees; the lead's
-fast tier of the touched files; **the whole suite on the merged tree in the cloud (the
-figures below).** **The step:** the player's ship is a vessel of the sea (`Vessels.own`,
+fast tier of the touched files (seven files, none failed); **the whole suite on the merged
+tree `de36e0a` in the cloud (run 9, 39 minutes): green, every shard and the pace tests
+passing; the shards' counts to be written in when read.** Step 7 stands merged green, the
+cap's order's retirement of the not-crewed states moving no recorded passage. **The step:**
+the player's ship is a vessel of the sea (`Vessels.own`,
 under `ships.PLAYER_ID`, the one definition, which the brains, the squadrons and the action
 import), made at the World's start after the scenario's and the business's ships and at an
 old checkpoint's load, appended last and kept last, her hull the followed hull and the
