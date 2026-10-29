@@ -559,8 +559,13 @@ with every failure mended or re-pinned and the whole set running again after the
 lead's fast tier of the touched files (six files, none failed); **the whole suite on the
 merged tree `f99648d` in the cloud (run 8, 48 minutes): lint clean; the slow tier's six
 shards 4,250 passed, 3 skipped, 11 xfailed, none failed, the three moved pins at their new
-figures; the pace tests 10 of 10.** Step 6 stands merged green. **The step:** the Hull is
-the container. A crewed ship is a `Hull` of
+figures; the pace tests 10 of 10.** Step 6 stands merged green. The sibling's own slow set
+on the step's tree, reported after (the known truths and the touched files, 148 tests):
+146 passed and two failed, the lee-shore trial's digest (its container's known difference)
+and truth 7-200 under three workers, which passes alone and passed in the cloud: a
+load-sensitive test, the fake at the tender's station lost to the stand-in when its reply
+is late under load, carried as a finding into step 7's notes and not mended in step 6.
+**The step:** the Hull is the container. A crewed ship is a `Hull` of
 the one World in `world.hulls`; the World's per-ship names read the current hull through a
 thread-local stack (`World.as_hull`), the followed hull their default, so a door's thread
 reads the player's ship while the driver ticks another; the Hull is the façade her systems
