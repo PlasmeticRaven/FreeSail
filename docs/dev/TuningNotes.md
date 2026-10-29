@@ -11422,4 +11422,17 @@ trials' and touched files' slow tier (`--slow -m "slow and not pace"`, the files
 list with `test_replay.py` and `test_checkpoint.py`); the pace tests alone and `pace6.py`;
 the figures into this section and the design postscript; the green commit and its report.
 **The fast tier whole on this tree (05:56 UTC): 3920 passed, one failed**, the pictures'
-blank-image check (the known flake, as at step 7); ruff clean. The slow set is next.
+blank-image check (the known flake, as at step 7); ruff clean. **The slow tier** of the
+known truths, the trials and the touched files (`test_replay.py`, `test_checkpoint.py` and
+`test_agents.py` with step 7's list; 178 tests): 169 passed, eight left out by their own
+marks, one failed, the lee-shore trial's digest (`7fad0ce7e46ba366` against
+`ed48ca3d61e52f20`, this container's figure as at every step). **The pace** (alone): the
+pace tests read lower this hour than at step 7 (truth 51's frigate alone 491, the day under
+systems 458, the gates' day 438, 7-159 402, against the floor of 500), so the three-way A/B
+was run alone, the step 7 head on a worktree at `de36e0a`, this tree, and the head again:
+489/446/451/451, then 485/481/431/432, then 472/459 with the other two over the floor. The
+hour's machine misses the floor on the step 7 head as on this tree, truth 51 among them
+(491 at step 7 was over), and the step's figures lie within the head's own spread: the step
+costs nothing the measure sees, and the container is slower this hour than last. `make_hull`
+of a brig 0.75 s (0.72 at step 7); truth 88's form with three hulls awake 198 ticks a second
+against the crewed floor of 60 (233 at step 7, load 1.0 right after the slow set).
