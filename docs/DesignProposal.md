@@ -725,7 +725,14 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     eight today; 75 makes thirteen; the two make fifteen; five more to the goal, which the
     owner expects to pass either way); more fits and sub-types on a hull are welcome and
     cost only research and tuning; once the work is mostly content, the number grows as
-    far as it likes.
+    far as it likes. **The choosing (the owner, the same day):** the armed Indiaman, yes;
+    after it, rigs and variations the game does not have yet before another of a rig it has
+    (a snow, a brigantine, a polacre, a ship-sloop, the small unrated vessels such as
+    gunboats), with exceptions as the fancy strikes; the earlier and the later sides of the
+    era want plenty of vessels in the world, so the options stay open and the feeling free.
+    **Winfield's lists are now a source on the owner's shelf** (basic particulars for every
+    class, with plans scattered through most sections), so a candidate seldom lacks at least
+    a sourced row; the ships session cites him by page as it does James and Steel.
 
 ### Still open
 

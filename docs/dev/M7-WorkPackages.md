@@ -2718,4 +2718,11 @@ Tofiño's plans and the pilots 79c lays under `docs/references/pilots/`; the lat
 handling is B3.1's. Nothing of it opens before 75's last window closes. The count the owner
 is aiming at, loosely: **twenty hulls**, fits not counted (eight today, thirteen after 75,
 fifteen after these two); more fits on a hull are welcome, at the cost of research and
-tuning only; the number grows in the content phase as it likes.
+tuning only; the number grows in the content phase as it likes. **After 90, the choosing
+(the owner, 2026-10-29; decision 56):** the armed Indiaman first; then rigs and variations
+the game has not got before another of a rig it has (a snow, a brigantine, a polacre, a
+ship-sloop, the small unrated vessels such as gunboats), with exceptions as the fancy
+strikes; Winfield's lists are now on the owner's shelf as a source, with plans scattered
+through most sections, to be cited by page as James and Steel are. Nothing of this is
+booked yet; the session may name candidates with their sources in its plan when 90's
+design is written, for the owner's choosing.
