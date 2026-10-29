@@ -11911,3 +11911,58 @@ meets: the Mistral (the wind, through the Admiralty's volumes, Bérard and Smyth
 (Smyth 1854) and *opus* in Latin, Spanish *llama* ("is called"), the long s read as
 *fable*, the constellation Gemini (Admiralty 1916, Norie 1831): words of the texts, kept
 verbatim as the Channel's pilots' star names were.
+
+### Step 1: the tiles' count and bytes (stopped at the report, for the lead's ruling)
+
+The recipe (held in the working tree, not committed until the ruling: a recipe in `REGIONS`
+and the chart's list without its tiles is no mergeable state): `mediterranean-west`, bounds
+35.0 to 40.5 N and 5.0 W to 4.5 E as the brief has them, abutting `strait` at 5 W; fetch
+34.45 to 40.7 N, 5.2 W to 4.9 E; eight harbour patches (Málaga, Almería, Cartagena, Palma,
+Port Mahon, Ivica, Oran with Mers-el-Kebir, Algiers); EMODnet over GEBCO; `fill_to_chart_
+datum` by the world's mean level as the Strait's (the block's gauges held, the world's tide
+over it a far gauge's: the build printed "raised ... by the world's mean level, 3.98 to
+6.83 m", Le Conquet's alone, for the lead with item 5). Built once, to fetch and to measure,
+`python tools/build_charts.py --region mediterranean-west --reuse-world`: GEBCO's extract
+18.7 MB in 2 s, EMODnet's `elevation` and `elevation_max` 233 MB each in 20 s, nothing
+refused. The checks as printed passed (licences allowed; "the fetch box covers the tiles
+whole: yes"; "tiles another region lists: 3 kept", the column 5.07 to 4.64 W from 35.44 to
+36.72 N, `strait`'s). `git status` after it: the manifest (this region's entry and the
+sources' fetches) and the block's own new files; nothing of any other region's.
+
+**The count and bytes** (the brief's item 1: past 40 MB the package stops at the report):
+
+| | tiles | MB |
+|---|---|---|
+| level 2 (14 rows by 23 columns, less the 3 seam tiles) | 319 | 52.9 |
+| level 3, the eight harbour patches | 54 | 3.9 |
+| the coast | 1 | 0.7 |
+| **as built** | | **57.5** |
+
+Of the 319 level-2 tiles, **142 are all land** (no cell below the datum: Andalusia's,
+Murcia's and Valencia's interior, the Rif and the Tell; 15.2 MB; 79 of them west of 1 W,
+where the corridor answers, 8.4 MB; 63 east of it, where nothing would, 6.8 MB), and 101
+are open sea more than half a mile from any shore (23.1 MB; 77 beyond ten miles, 17.0 MB).
+The top row (40.13 to 40.56 N, 23 tiles, 3.3 MB) holds no mark the brief asks (Minorca's
+north coast is at 40.09 N; the coast there is Castellón's, a later block's). The deep
+basin compresses badly (the Algerian basin's tiles 125 to 130 KB each, as the Azores'
+open sea was dear).
+
+**The ways I see, with their cost** (level 2 + level 3 + the coast):
+
+1. **Two regions** split at a tile column (e.g. at 0.05 E: `mediterranean-west` from 5 W,
+   the Alboran sea with Málaga, Almería, Cartagena, Melilla and Oran, 165 level-2 tiles,
+   about 26.5 MB; and a second, the Balearics with Algiers to 4.5 E, 154 tiles, about
+   31 MB); each within the rule, every tile written, no hole east of 1 W; the same 57.5 MB
+   committed in two entries. The brief names this way ("or a second region").
+2. **The north bound to 40.13 N** (the row's edge, no mark asks the row above) **and the
+   all-land tiles not written** (`skip_dry_tiles`): 166 level-2 tiles, 35.8 MB, about
+   40.4 MB in all, a hair over the rule; east of 1 W the inland tiles would answer nothing
+   (79b's finding: no corridor there), though no ship's water lies in them.
+3. **The deep water dropped** beyond ten miles of the shore (17 MB): not recommended, since
+   east of 1 W nothing would answer there and the Algiers to Mahon passage crosses it.
+4. **As built**, 57.5 MB, by the lead's leave.
+
+**My recommendation: way 1** (two regions, all tiles written), or way 2 if the bytes
+matter more than the inland hole. Nothing of the tiles, the recipe, the manifest or the
+coast is committed until the ruling; the marks, the ports, the nation, the tide's and the
+weather's rows go on meanwhile in the working tree, and wait with them.
