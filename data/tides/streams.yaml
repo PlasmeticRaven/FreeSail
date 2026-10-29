@@ -103,6 +103,10 @@ book_limits:
   - {south: 36.4, north: 42.0, west: -10.0, east: -6.0}  # Portugal and Cadiz (package 39d)
   - {south: 35.5, north: 36.4, west: -6.5, east: -5.0}  # the Strait (package 39f)
   - {south: 36.5, north: 40.0, west: -31.5, east: -24.5}  # the Western Islands (package 39e)
+  - {south: 49.0, north: 51.5, west: -1.0, east: 2.5}  # the Channel's east block (package 79b)
+# Package 79b: the Channel's east block's box is the region's bounds, every position of it
+# in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
+# west of 1 W, are within the first box and have their own area.
 # Package 39e: the Western Islands' box is the region's bounds, far out in the ocean; the
 # only statement within it is the channel between Fayal and Pico (Tofiño's, below), and
 # elsewhere among the islands the master has none (the open Channel's is of its own
@@ -909,6 +913,148 @@ areas:
       current: {set: E, kn: 0.5}
       judgement: [set, rates, current]
       source: "JUDGEMENT throughout but for Purdy 1826's general tendency to the eastward many leagues out (p. 350)"
+  # Package 79b (the Channel's east block, the Wight to Dunkirk): the block's waters, each
+  # with its world's figures and the directions' statement in the same form, before the
+  # open Channel's (first match). The period's sources give sets and hours and one pair of
+  # rates (the Looe's, Mackenzie's survey as White 1835 quotes it); every other rate is
+  # JUDGEMENT, the neaps half the springs. The hours: White 1835's (the stream off Beachy
+  # Head east from two hours' flood to two hours' ebb; on the Varne and the Ridge north-east
+  # from four and a half hours' flood for six and a half hours; in the Downs north-east till
+  # four hours' ebb), Moore 1799's (the Downs' current 4 1/2 hours north and 3 1/2 south,
+  # the tides set N N E and S S W), Faden 1793's (in the middle of the Strait the flood
+  # N E by E; the Havre's first hours of flood south, then south-east, then east). The
+  # polygons lie east of 1.2 W, far from the water the recorded passages' other sail use
+  # (the Iroise, the Raz and the Western Approaches). The last, `channel-east-open`, holds
+  # the block's whole box (and 2 E to 2.5 E, beyond the open Channel's bounds), so that no
+  # position of the block is without a statement.
+  - id: spithead-road
+    chart: channel-east
+    name: Spithead and St Helens
+    polygon: [[50.69, -1.22], [50.81, -1.22], [50.81, -1.00], [50.69, -1.00]]
+    axis_deg: 290
+    spring_kn: 1.5
+    neap_kn: 0.75
+    phase_h: -3.0
+    source: "Imray 1874, 'Spithead and its approaches', p. 41: the flood strongest between the 5th and 7th hour, the double high water of these waters; p. 36: the western stream has a strong tendency to set over Bembridge ledge; the set toward the Solent and the harbour on the flood, the rate and the hour (a harbour's mouth, the flood strongest at half flood) JUDGEMENT"
+    book:
+      set: WNW
+      spring_kn: 1.5
+      neap_kn: 0.75
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT throughout: the flood toward the Solent and the harbour, the rate the world's rounded, strongest at half flood as in a harbour's mouth (the double high water of Spithead, Imray 1874 p. 41, is not in the period's books)"
+  - id: the-looe
+    chart: channel-east
+    name: the Looe and the Owers
+    polygon: [[50.60, -0.95], [50.75, -0.95], [50.75, -0.60], [50.60, -0.60]]
+    axis_deg: 75
+    spring_kn: 3.0
+    neap_kn: 2.0
+    phase_h: -4.5
+    source: "White 1835, 'Coast of England', p. 48 note: according to the former survey of Lieut. Murdoch M'Kensie the stream of ebb in the Looe makes to the westward about ten o'clock at full and change, about 1 1/2 hours before high water by the shore in Selsea harbour, and the stream of flood makes to the eastward about four, or about the same time before low water; spring tides in the Looe run about three knots and neaps about two; in the vicinity of the Owers the streams set with great velocity; the set E by N along the channel, JUDGEMENT"
+    book:
+      set: E by N
+      spring_kn: 3.0
+      neap_kn: 2.0
+      strongest_h: -4.5
+      judgement: [set]
+      source: "the rates and the hour the period's own: Mackenzie's survey as White 1835 quotes it (p. 48 note), the eastern stream from four o'clock to ten at full and change, high water by the shore at Selsey about half past eleven (Norie 1805's Selsea harbour 11h 15m), so strongest four hours and a half before high water; three knots at springs and two at neaps; the set JUDGEMENT along the Looe"
+  - id: beachy-head
+    chart: channel-east
+    name: the offing of Beachy Head
+    polygon: [[50.60, 0.05], [50.78, 0.05], [50.78, 0.55], [50.60, 0.55]]
+    axis_deg: 70
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: -1.0
+    source: "White 1835, 'Coast of England', p. 57: it is high water by the ground at Beachy Head at XI. 15 at full and change; the stream in the offing begins to run to the eastward at two hours flood, and continues to do so until two hours ebb, a similar law applying to the western stream (strongest about an hour before high water); the set along the coast and the rate JUDGEMENT"
+    book:
+      set: ENE
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: -1.0
+      judgement: [set, rates]
+      source: "the hour the period's own: White 1835 p. 57, the eastern stream from two hours' flood to two hours' ebb in the offing of Beachy Head; the set and the rates JUDGEMENT"
+  - id: the-downs-stream
+    chart: channel-east
+    name: the Downs, the Goodwin and the Gull Stream
+    polygon: [[51.15, 1.38], [51.40, 1.38], [51.40, 1.65], [51.15, 1.65]]
+    axis_deg: 20
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: 0.5
+    source: "Moore 1799, 'Tides', p. 143: the current in the Downs generally runs 4 1/2 hours to the north and 3 1/2 hours to the southward; the tides set in the Downs N N E and S S W; White 1835, 'Coast of England', p. 58: high water at Deal XI. 15, the stream in the Downs runs to the north-eastward till four hours ebb, the south-western from then until three and a half hours flood (strongest about half an hour after high water); the rate JUDGEMENT"
+    book:
+      set: NNE
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: 0.5
+      judgement: [set, rates]
+      source: "the set the period's own (Moore 1799 p. 143, the tides set in the Downs N N E and S S W, marked judgement by the form's rule), the hour White 1835's (p. 58: north-east till four hours' ebb, south-west till three and a half hours' flood); the rates JUDGEMENT"
+  - id: strait-of-dover
+    chart: channel-east
+    name: the Strait of Dover
+    polygon: [[50.75, 1.05], [51.15, 1.05], [51.15, 2.00], [50.75, 2.00]]
+    axis_deg: 56
+    spring_kn: 3.0
+    neap_kn: 1.5
+    phase_h: 1.5
+    source: "Faden 1793, 'Tides and Currents', p. 9: in the middle between Dover and Calais the flood sets N E by E and the ebb S W by W; p. 10: the tides in this strait set N E by E and S W by W; White 1835, 'Coast of England', p. 57: upon the Varne and Ridge high water at X. 40, the north-eastern stream commencing at four hours and a half flood and running six and a half hours (strongest about an hour and a half after high water); the rate JUDGEMENT (Imray 1874 p. 18 gives the stream off the South Foreland E N E five and a half hours)"
+    book:
+      set: NE by E
+      spring_kn: 3.0
+      neap_kn: 1.5
+      strongest_h: 1.5
+      judgement: [set, rates]
+      source: "the set the period's own (Faden 1793 pp. 9 to 10: in the middle of the Strait the flood sets N E by E, marked judgement by the form's rule), the hour White 1835's (p. 57: on the Varne and the Ridge the north-eastern stream from four hours and a half flood for six hours and a half); the rates JUDGEMENT"
+  - id: flemish-banks
+    chart: channel-east
+    name: the Flemish banks off Dunkirk
+    polygon: [[50.95, 2.00], [51.50, 2.00], [51.50, 2.50], [50.95, 2.50]]
+    axis_deg: 65
+    spring_kn: 2.0
+    neap_kn: 1.0
+    phase_h: 0.0
+    source: "Faden 1793, 'The Tides and Currents', pp. 8 to 9: along the coast of Flanders on the land a south and north moon makes high tides, off the banks a S W moon; along the banks the first of the flood sets over them toward the land, about one third of the tide along the shore, the after-flood directly to the north; the set along the shore, the rate and the hour JUDGEMENT"
+    book:
+      set: ENE
+      spring_kn: 2.0
+      neap_kn: 1.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT within Faden 1793's words (pp. 8 to 9: the flood over the banks toward the land, then along the shore, then north)"
+  - id: seine-mouth
+    chart: channel-east
+    name: the mouth of the Seine
+    polygon: [[49.38, -0.10], [49.56, -0.10], [49.56, 0.35], [49.38, 0.35]]
+    axis_deg: 112
+    spring_kn: 3.0
+    neap_kn: 1.5
+    phase_h: -3.0
+    source: "Faden 1793, 'Directions for the Roads of Havre', p. 18: the two first hours of the flood the current sets to the south, then two hours to the S E, one hour to the east, and the remainder of the tide from N E to N W; p. 21: the tides in all these parts have their course S E and N W, the great currents run very strong up and down the river; the set into the river, the rate and the hour (an estuary's, strongest at half flood) JUDGEMENT"
+    book:
+      set: ESE
+      spring_kn: 3.0
+      neap_kn: 1.5
+      strongest_h: -3.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT within Faden 1793's words (pp. 18 and 21: the flood south, then south-east, then east, the course of the tides S E and N W, very strong up and down the river)"
+  - id: channel-east-open
+    chart: channel-east
+    name: the Channel's eastern reach
+    polygon: [[49.00, -1.00], [51.50, -1.00], [51.50, 2.50], [49.00, 2.50]]
+    axis_deg: 68
+    spring_kn: 1.5
+    neap_kn: 0.75
+    phase_h: 0.0
+    source: "Bowditch 1802 (T §1): the current in the mid Channel is N E about an hour and a half after high water; White 1835, 'Coast of England', p. 57: between Beachy Head and Cape Grisnez the rise, velocity and duration of the tides affected by local circumstances; Faden 1793, p. 17: from Treport to Cape la Heve the tides N N W and S S E along the coast; the set up Channel, the rate and the hour JUDGEMENT"
+    book:
+      set: ENE
+      spring_kn: 1.5
+      neap_kn: 0.75
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: the stream up and down the Channel's eastern reach, the rate the world's rounded, strongest at high water as the progressive wave has it in the open Channel (this file's head)"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

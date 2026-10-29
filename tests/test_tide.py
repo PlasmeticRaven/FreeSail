@@ -316,7 +316,8 @@ def test_the_lead_reads_the_tide_and_the_master_allows_for_it_by_his_almanac():
 
 
 # The waters whose rates, springs and neaps, are the period's own (package 39a).
-PERIOD_RATES = {"alderney-race"}
+# (package 79b: the Looe, Mackenzie's survey as White 1835 quotes it, three knots and two)
+PERIOD_RATES = {"alderney-race", "the-looe"}
 
 
 def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_figures(tide):

@@ -723,7 +723,9 @@ def test_the_climatology_has_four_boxes_the_channels_as_it_was_and_three_provisi
         "azores",
     ]
     channel = clim.boxes["channel"]
-    assert channel.months is clim.months and channel.bounds == (47.5, 52.0, -20.0, 2.0)
+    # package 79b: the east bound at 2.5 E, so that the Channel's east block is the Channel's
+    assert channel.months is clim.months and channel.bounds == (47.5, 52.0, -20.0, 2.5)
+    assert clim.box_at(51.05, 2.37).name == "channel"  # Dunkirk road
     assert clim.month(1).check["westerly_pct"] == 29.0 and clim.month(7).lows_per_month == 3.0
     assert clim.month(6).high_bearing_deg == (300.0, 110.0)  # W §1: the Azores ridge
     for name in ("biscay", "portugal", "madeira", "azores"):
