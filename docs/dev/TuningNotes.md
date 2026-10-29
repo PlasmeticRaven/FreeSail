@@ -11325,7 +11325,9 @@ against the crewed floor of 60 (213 to 256 at step 5); the pace tests alone all 
 the gates' day with the region loaded at 495 and truth 7-159 at 468 against the build
 machine's floor of 500, and the same two run alone on a worktree at 5949e18 in turn gave
 489 and 453: the container's figures (step 4's 493, step 5's 461), the step's swap costing
-nothing the measure can see.
+nothing the measure can see. The step's commit `b33e164` ends its message "nothing pinned
+moved", written before the slow tier ran: three pins moved, for the one clock, as recorded
+above, and this line is the correction.
 
 The step 5 fixture in `test_crews.py` that asserted a `CrewedWorld` on the vessel asserts a
 `crews.Hull` (re-exported there), and the crewed checkpoint test `crew.world is c` and
