@@ -556,8 +556,11 @@ pace tests all but the two container floors (the gates' day 495, 7-159 468, the 
 and 453 on a worktree at `5949e18`: the container's, the step costing nothing the measure
 sees), its known truths' and touched files' slow tier run to 146 of 362 before the bell mend
 with every failure mended or re-pinned and the whole set running again after the push; the
-lead's fast tier of the touched files; **the whole suite on the merged tree in the cloud
-(the figures below).** **The step:** the Hull is the container. A crewed ship is a `Hull` of
+lead's fast tier of the touched files (six files, none failed); **the whole suite on the
+merged tree `f99648d` in the cloud (run 8, 48 minutes): lint clean; the slow tier's six
+shards 4,250 passed, 3 skipped, 11 xfailed, none failed, the three moved pins at their new
+figures; the pace tests 10 of 10.** Step 6 stands merged green. **The step:** the Hull is
+the container. A crewed ship is a `Hull` of
 the one World in `world.hulls`; the World's per-ship names read the current hull through a
 thread-local stack (`World.as_hull`), the followed hull their default, so a door's thread
 reads the player's ship while the driver ticks another; the Hull is the façade her systems
