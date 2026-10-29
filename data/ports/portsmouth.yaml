@@ -128,8 +128,8 @@ closed_to: []
 # point two miles east of the Nab (White's track from the eastward reversed); `in` from St
 # Helens road to Spithead. The points JUDGEMENT on the grid's channel.
 tracks:
-  to_sea: [spithead, 50 43.5 N 1 03.6 W, st-helens-road, 50 40 N 0 58 W]
-  from_sea: [50 40 N 0 58 W, st-helens-road, 50 43.5 N 1 03.6 W, spithead]
+  to_sea: [spithead, 50 44.1 N 1 03.9 W, st-helens-road, 50 40 N 0 58 W]
+  from_sea: [50 40 N 0 58 W, st-helens-road, 50 44.1 N 1 03.9 W, spithead]
   in: [spithead]
 
 places:

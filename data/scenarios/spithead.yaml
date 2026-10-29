@@ -1,0 +1,80 @@
+# FreeSail: the Channel's east block, the Downs to Spithead (package 79b). A free passage
+# of the block's stretch, not a gate's and not pinned: the frigate from the Downs through
+# the Strait of Dover and down Channel past Dungeness, Beachy Head and the Owers to St
+# Helens and Spithead, on the whole chart (`chart: atlantic-east`), so that she sails the
+# block's tiles from end to end and comes into the Spithead patch in channel-mid's water
+# west of 1 W. Given to either driver with --scenario:
+#     py -m freesail.ui.server --scenario data/scenarios/spithead.yaml
+#     py -m freesail.ui.console --scenario data/scenarios/spithead.yaml
+# and printed whole, with the account against the truth, by
+#     py tools/day_log.py data/scenarios/spithead.yaml --hours 22 --reckoning
+#
+# The passage as the book beside this file sails it (spithead.orders): she lies at anchor
+# in the Downs at four in the morning of 20 June 1805, an easterly come at last after the
+# westerlies that held the convoys there (the Downs' long waits for a wind down Channel,
+# Moore 1799 and Norie 1805: to sail out of the Downs to the westward unmoor at a quarter
+# or half flood and weigh at high water); she weighs and runs south past the South Sand
+# Head with the South Foreland half a mile or more on the starboard hand (White 1835
+# p. 53), then down the Strait for two miles south of Dungeness, two leagues south of the
+# Royal Sovereign shoals (White p. 51: Seaford Cliff open south of Beachy Head clears them
+# by two miles), and so outside the Owers in 25 fathoms (White p. 47) to the Nab; there
+# she takes the Portsmouth pilot if he comes off and goes in by St Helens road between
+# the Dean and the Warner to Spithead, where she anchors (White p. 46: the limits of the
+# best anchorage). Her own book holds all she needs: the starter book is not loaded.
+#
+# The weather is pinned (an easterly of fifteen knots under a high over the North Sea,
+# veering east-south-easterly and easing through the day, the sky clear), so that the
+# passage is the same on every machine; the sea and the motion are kept. Its figures at
+# seed 7 are in docs/dev/TuningNotes.md (package 79b), measured once: not a gate's, not
+# pinned.
+
+name: The Channel's east block, the Downs to Spithead
+seed: 7
+start: 1805-06-20T04:00
+position: {lat_deg: 51.2200, lon_deg: 1.4400}   # the Downs off Deal (White 1835 p. 53: Upper Deal mill on Deal Castle, 7 or 8 fathoms)
+chart: atlantic-east
+nation: britain
+ship:
+  file: data/ships/frigate-36.yaml
+  heading_deg: 30
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+
+people:
+  - {role: master, skill: 0.95}
+
+papers:
+  chart: {year: 1804}
+  epitome: norie                  # a ship of war's
+  almanac: 1805
+
+cargo:
+  purse_pounds: 200
+
+ports: [downs, dover, portsmouth, poole, boulogne, calais, dunkirk, le-havre]
+
+weather:
+  wind:
+    - {at: 1805-06-20T03:00, from_deg: 80, knots: 15, air_mass: neutral}
+    - {at: 1805-06-20T14:00, from_deg: 95, knots: 13}
+    - {at: 1805-06-21T02:00, from_deg: 105, knots: 10}
+  background:
+    {hpa: 1022, gradient_hpa_per_100km: 0.4, high_toward_deg: 20}
+  systems:
+    - name: the high over the North Sea
+      kind: high
+      radius_km: 900
+      track:
+        - {at: 1805-06-19T12:00, x_km: 200, y_km: 500, hpa: 1028}
+        - {at: 1805-06-21T12:00, x_km: 300, y_km: 400, hpa: 1025}
+  sky: {sky: clear, weather: fine, visibility: the horizon}
+  sea: true
+
+standing_orders:
+  - data/scenarios/spithead.orders
+
+orders:
+  - let go the best bower

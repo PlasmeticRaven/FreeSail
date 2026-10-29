@@ -1,0 +1,55 @@
+# FreeSail: the captain's orders for the Channel's east block, the Downs to Spithead
+# (package 79b). A short book: the frigate's own, the starter book not loaded.
+
+# The departure: with the anchor down in the Downs at the start she weighs at once, cast
+# on the starboard tack (the wind easterly, her head paying off to the southward), and
+# runs south for a point three miles south-east of the South Foreland, giving the Foreland
+# a berth against the south-western stream, inside the South Sand Head (White 1835 p. 53:
+# ships for the Downs round the Foreland half a mile off in 14 to 12 fathoms; the Foreland's
+# two lights in one lead clear of the Sand Head).
+standing order "weigh": at the anchor let go, if the distance to the Downs is under 3 miles then get under way on the starboard tack and steer S
+standing order "out of the Downs": at under way, if the distance to the Downs is under 3 miles then set plain sail; shape a course for 51 08 N 1 28 E
+standing order "the course for the Foreland": every hour, if the distance to 51 08 N 1 28 E is over 1.5 miles and the distance to the Downs is under 6 miles then shape a course for 51 08 N 1 28 E
+
+# Down the Strait for two miles south of Dungeness (White p. 52: Dungeness steep-to, ten
+# or twelve fathoms within a cable), then two leagues south of the Royal Sovereign shoals.
+standing order "off the Foreland": when the distance to 51 08 N 1 28 E is under 1.5 miles then shape a course for 50 52 N 0 58 E
+standing order "the course for Dungeness": every hour, if the distance to 51 08 N 1 28 E is over 3 miles and the distance to 50 52 N 0 58 E is over 2 miles and the distance to 50 52 N 0 58 E is under 25 miles and the distance to 50 39 N 0 25 E is over 25 miles then shape a course for 50 52 N 0 58 E
+standing order "off Dungeness": when the distance to 50 52 N 0 58 E is under 2 miles then shape a course for 50 39 N 0 25 E
+standing order "the course past the Sovereign": every hour, if the distance to 50 52 N 0 58 E is over 3 miles and the distance to 50 39 N 0 25 E is over 2 miles and the distance to 50 39 N 0 25 E is under 26 miles and the distance to 50 36 N 0 42 W is over 43 miles then shape a course for 50 39 N 0 25 E
+
+# Outside the Owers in five-and-twenty fathoms to a point four miles south of their outer
+# heads (White p. 47: between St Catherine's and Beachy Head not within 25 fathoms, and
+# so without the Elbow), then for a point two miles east of the Nab.
+standing order "south of the Sovereign": when the distance to 50 39 N 0 25 E is under 2 miles then shape a course for 50 36 N 0 42 W
+standing order "the course outside the Owers": every hour, if the distance to 50 39 N 0 25 E is over 3 miles and the distance to 50 36 N 0 42 W is over 2 miles and the distance to 50 36 N 0 42 W is under 45 miles and the distance to 50 40 N 0 58 W is over 11 miles then shape a course for 50 36 N 0 42 W
+standing order "south of the Owers": when the distance to 50 36 N 0 42 W is under 2 miles then shape a course for 50 40 N 0 58 W
+standing order "the course for the Nab": every hour, if the distance to 50 36 N 0 42 W is over 3 miles and the distance to 50 40 N 0 58 W is over 1.5 miles and the distance to 50 40 N 0 58 W is under 12 miles and the distance to St Helens road is over 4.5 miles then shape a course for 50 40 N 0 58 W
+
+# In by St Helens road between the Dean and the Warner to Spithead, where she anchors;
+# coming to St Helens by night she anchors in the road by the lead in seven or eight
+# fathoms (White p. 46: the best anchorage in 7 fathoms) and goes up to Spithead at
+# daylight, as the fleet did (the second run's fault: her account a mile and a half out
+# after the Looe's stream, she stood on in the dark onto the shore by St Helens)
+# (White p. 46: the best anchorage between South-Sea Castle N E to E by N and the Kicker
+# Point N N W to N W; Imray 1874 p. 37: ten to twelve fathoms). The Portsmouth pilot, if
+# he comes off about the Nab, is taken and she fills away; any other port's is let be.
+standing order "off the Nab": when the distance to 50 40 N 0 58 W is under 1.5 miles then shorten sail; shape a course for St Helens road
+standing order "in St Helens road": when the distance to St Helens road is under 0.8 miles and the daylight is day then shape a course for 50 44.1 N 1 03.9 W
+standing order "St Helens for the night": when the distance to St Helens road is under 2.5 miles and the depth is under 9 fathoms and the daylight is not day then come to an anchor
+standing order "the morning": every 10 minutes, if the daylight is day and the distance to St Helens road is under 2.5 miles and the distance to Spithead is over 2 miles and the speed is under 1 knot then get under way on the starboard tack and steer NNW
+standing order "for Spithead": at under way, if the distance to St Helens road is under 2.5 miles then set plain sail; shape a course for 50 44.1 N 1 03.9 W
+standing order "between the Dean and the Warner": when the distance to 50 44.1 N 1 03.9 W is under 0.5 miles then shape a course for Spithead
+standing order "the pilot boards": at the pilot's hail, if the distance to Spithead is under 12 miles then take the pilot
+standing order "the pilot aboard": at the pilot aboard, if the distance to Spithead is under 12 miles then fill away
+standing order "at Spithead": when the distance to Spithead is under 0.4 miles then come to an anchor
+
+# Each hourly course holds only short of the next mark, so that a course is never shaped
+# back for a mark already passed (the first run's fault: she wore back for Dungeness).
+
+# The yards and the sheets, the bearings, and the lead in the Wight's water.
+standing order "trim to the course": at steady on the course, if the manoeuvre in hand is not hove to then trim sails
+standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
+standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
+standing order "bearings": every glass, if the land is in sight then take a bearing of the land; take a fix
+standing order "the lead off the Wight": every 10 minutes, if the distance to Spithead is under 7 miles then heave the lead

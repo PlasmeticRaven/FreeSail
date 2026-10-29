@@ -1905,3 +1905,128 @@ def test_the_depths_in_the_straits_roads_its_dangers_and_the_green_islands_patch
     inside = Position(36.1275, -5.4395)  # between the isle and the town, the sheet's 2 brazas
     assert whole.depth_at(inside) == pytest.approx(2 * 1.6718 + 0.3, abs=0.2)
     assert whole.region_at(inside) == STRAIT and whole.level_at(inside) == 3
+
+
+# ---------------------------------------------------------------------------
+# Package 79b: the Channel's east block, the Wight to Dunkirk
+# ---------------------------------------------------------------------------
+
+
+def test_the_channel_easts_block_passes_its_checks_and_keeps_the_seam_tiles_channel_mids(
+    manifest, capsys
+):
+    """The block's recipe, built and committed: its bounds abut channel-mid's at 1 W; the
+    level-2 column that straddles the seam is channel-mid's and is neither written again
+    nor listed (the check prints "6 kept"); its harbour patches (Spithead and Poole in
+    channel-mid's water, where channel-mid lists no level-3 tile) are its own; every feature
+    cites its source; no override, no sheet having been read with its datum."""
+    tool = build_tool()
+    assert tool.main(["--check", EAST]) == 0
+    out = capsys.readouterr().out
+    for words in (
+        "licences: emodnet_dtm_2024, gebco_2025 (allowed)",
+        "ids unique across the manifest's regions: yes",
+        "harbour patches with their datum stated: 0 of 0",
+        "the fetch box covers the tiles whole: yes",
+        "tiles another region lists: 6 kept",
+        "passes its checks",
+    ):
+        assert words in out, words
+    features, _ = tool.load_features(EAST)
+    assert len(features) >= 130
+    assert f"features within the bounds: {len(features)} of {len(features)}" in out
+    assert f"sources in the references' form: {len(features)} of {len(features)}" in out
+    entry = manifest["regions"][EAST]
+    assert entry["bounds"] == {"south": 49.0, "north": 51.5, "west": -1.0, "east": 2.5}
+    assert entry["fill_to_chart_datum"] is True and entry["overrides"] == []
+    mid = manifest["regions"][MID]
+    for level in ("2", "3"):
+        theirs = {t["name"] for t in mid["tiles"].get(level, [])}
+        ours = {t["name"] for t in entry["tiles"].get(level, [])}
+        assert not theirs & ours, level
+        for name in ours:
+            assert (CHARTS / "tiles" / level / f"{name}.npz").exists(), name
+    assert set(entry["harbours"]) == {
+        "spithead",
+        "poole",
+        "downs",
+        "dover",
+        "le-havre",
+        "boulogne",
+        "calais",
+        "dunkirk",
+    }
+    assert manifest["charts"][WHOLE]["regions"].index(EAST) == (
+        manifest["charts"][WHOLE]["regions"].index(MID) + 1
+    )
+
+
+def test_the_channel_easts_lights_are_those_of_1805_by_norie_and_the_rest_are_dated_later():
+    """The brief's item 3: 1805 sees the lights Norie 1805's catechism lists on the block's
+    coasts (the North Foreland, the North Sand Head's floating light, the South Foreland's
+    two, Dungeness, the Owers' floating light, Cape la Heve's two, Cape Lailly, Dieppe, St
+    Valery) and two harbour lights the period's pilots give (Dunkirk's fanal on the Risban,
+    the lantern on Boulogne's bank); the Nab (24 September 1812), the Gull and the South
+    Sand Head (named first in 1832), Belle Tout (1828), Calais (1818, 1848), Gris Nez
+    (1837) and Gravelines (1843) are not lit yet."""
+    tool = build_tool()
+    features, _ = tool.load_features(EAST)
+    whole = load_chart(WHOLE)
+    lights = [whole.feature(f["id"]) for f in features if f["kind"] == "light"]
+    assert sorted(f.id for f in lights if f.lit_in(1805)) == [
+        "ailly-light",
+        "boulogne-mast-light",
+        "dieppe-light",
+        "dungeness-light",
+        "dunkirk-risban-light",
+        "la-heve-lights",
+        "north-foreland-light",
+        "north-goodwin-light",
+        "owers-light",
+        "south-foreland-lower-light",
+        "south-foreland-upper-light",
+        "st-valery-light",
+    ]
+    later = {f.id for f in lights if not f.lit_in(1805)}
+    assert later == {
+        "nab-light",
+        "gull-light",
+        "south-sand-head-light",
+        "belle-tout-light",
+        "calais-tour-du-guet-light",
+        "calais-light",
+        "gris-nez-light",
+        "gravelines-light",
+    }
+    assert whole.feature("nab-light").lit_in(1813) and not whole.feature("nab-light").lit_in(1811)
+    # the Goodwin's heads are solid ground under a kilometre each (ChartBlocks.md)
+    heads = [
+        f
+        for f in features
+        if f["id"].startswith(("north-goodwin", "goodwin-", "south-goodwin", "south-sand-head"))
+    ]
+    dangers = [f for f in heads if f["kind"] == "drying"]
+    assert len(dangers) == 5 and all(0 < f["extent_m"] < 1000 for f in dangers)
+
+
+def test_the_depths_in_the_channel_easts_roads_and_its_seam_at_1_w():
+    """The block's roads at their pilots' depths within the grid's smoothing: Spithead's ten
+    to twelve fathoms, St Helens road's seven, the Downs' seven or eight, the Great Road of
+    Havre's ten to fourteen, the road of Dunkirk's within the Brack; each at level 3 in its
+    patch; a cable either side of 1 W reads its own region's tile with no step."""
+    whole = load_chart(WHOLE)
+    for fid, (lo, hi) in {
+        "spithead": (15.0, 30.0),
+        "st-helens-road": (6.0, 16.0),
+        "the-downs": (10.0, 20.0),
+        "havre-great-road": (12.0, 30.0),
+        "dunkirk-road": (5.0, 16.0),
+    }.items():
+        f = whole.feature(fid)
+        d = whole.depth_at(f.position)
+        assert lo < d < hi, (fid, d)
+        assert whole.level_at(f.position) == 3, fid
+    a, b = Position(50.40, -1.002), Position(50.40, -0.998)
+    assert whole.region_at(a) == MID and whole.region_at(b) == EAST
+    assert whole.level_at(a) == whole.level_at(b) == 2
+    assert abs(whole.depth_at(a) - whole.depth_at(b)) < 1.0

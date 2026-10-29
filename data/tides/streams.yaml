@@ -946,7 +946,7 @@ areas:
   - id: the-looe
     chart: channel-east
     name: the Looe and the Owers
-    polygon: [[50.60, -0.95], [50.75, -0.95], [50.75, -0.60], [50.60, -0.60]]
+    polygon: [[50.68, -0.92], [50.75, -0.92], [50.75, -0.62], [50.68, -0.62]]  # the channel within the Owers
     axis_deg: 75
     spring_kn: 3.0
     neap_kn: 2.0

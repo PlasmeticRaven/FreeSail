@@ -406,6 +406,15 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_168_powder_is_taken_in_at_the_road_not_the_harbour_and_bought_only_of_necessity",
         "test_known_truths.py::test_truth_7_170_a_checkpoint_with_the_hoy_alongside_resumes_to_one_digest_and_replays_to_it",
         "test_known_truths.py::test_truth_7_171_a_practice_forenoon_is_checkpointed_and_replayed",
+        # package 79b: the Channel's east block's truths that sail for an hour and more (the
+        # Strait's drift, the Goodwin, six hours in the Downs, the seam at 1 W, the ports on
+        # both charts, the passage to Spithead: 6 to 22 s at six workers, 2026-10-29)
+        "test_known_truths.py::test_truth_7_271_the_strait_of_dover_sets_her_as_the_directions_say_at_springs",
+        "test_known_truths.py::test_truth_7_272_the_goodwin_grounds_a_ship_standing_across_it_drawing_more_than_its_water",
+        "test_known_truths.py::test_truth_7_273_the_downs_hold_her_in_a_south_westerly_with_the_goodwin_to_leeward",
+        "test_known_truths.py::test_truth_7_274_a_passage_crosses_the_seam_at_1_w_with_the_business_carried",
+        "test_known_truths.py::test_truth_7_275_the_blocks_ports_load_on_either_chart_and_take_the_tables_stance",
+        "test_known_truths.py::test_truth_7_279_the_frigate_sails_from_the_downs_to_spithead_by_her_short_book",
     }
 )
 
