@@ -11389,3 +11389,119 @@ under three workers at its stage 7 ("hail.heard" not reached in half an hour, th
 Raven's station through the harness losing the deck to the stand-in when its reply comes
 late under load, not a fault of the step's; a finding for the harness's sampling, noted and
 not mended here.
+
+## Package 79a: the regimes filled out and sourced (2026-10-29)
+
+Built as an Opus sibling session in its own container on `claude/pkg-79a` off the lead's
+`b3aff3a` (the launch row), beside 79b; on package 72's shape (spec M7 §22 as built,
+`docs/design/Design-Squadrons.md`). The physics are not touched; no ship file, no consent
+file, no model identifier; no pin moved. Spec M7 §22 "As built (package 79a)" is the record
+of what was built and of what is still judgement, by knob; this section is the sources, the
+figures that differ, the draw, the suite and what was found.
+
+### The sources read
+
+The brief names the period's books as held under `docs/references/`; on this branch they are
+not: James's six volumes, Nicolas's two, Niles' three and Jackson's two came in with package
+75 (`claude/pkg-75`, `docs/references/james/`, `nicolas/`, `niles/`, `jackson/`, its README
+rows), which is not merged. They were read from that branch as data (extracted to the
+scratchpad, nothing run, nothing committed here), so **the citations in `data/regimes.yaml`
+and `data/nations.yaml` point at files that arrive with 75's merge**; the Regulations of 1806
+and Falconer are on this branch. Read: James vol. 3 (1803 to 1805: the Channel fleet off
+Brest, pp. 169 to 170, 214 to 215, 307 to 314; Ferrol and Cadiz, pp. 333, 341, 356, 375 to 380;
+the convoys, p. 259), vol. 4 (Rochefort, pp. 47, 78 to 79, 287; Cadiz 1806, pp. 119 to 120;
+Brest 1808 and 1809, pp. 286, 390; Lorient 1808, pp. 312 to 313; convoys, pp. 13, 89 to 91,
+368 to 369, 383), vol. 5 (pp. 36, 231, 389), vol. 6 (p. 70); Nicolas vol. 1 (the Agamemnon's
+commissioning, pp. 298 to 304; the French privateers' prizes, p. 306); Niles vols. VI and VII
+(the convoys and their escorts of 1814, the masters prosecuted for sailing without convoy, the
+Prince de Neufchatel's prizes, the Glasgow resolution); the Regulations 1806 (Convoys, Sect.
+XII, pp. 398 to 403; the ship newly commissioned, pp. 74 to 75 and 92 to 93; the warrant
+officers in ordinary, pp. 203 to 205; the guard ship, pp. 110 to 113); Falconer 1780 (CONVOY,
+ORDINARY, CRUISE; he has no STATION, which 72's head cited). Two readers searched James,
+Nicolas, Niles and the Regulations in parallel and returned each finding with its lines and a
+verbatim quote; a sample of their pages (thirteen) was checked by eye against the running heads
+before any went into the data, and two corrected (Nelson's Cadiz dispositions on p. 379; the
+warrant officers' article between pp. 203 and 206). Not found in any book held: the convoy acts
+of 1798 and 1803; Torbay as the Brest blockade's rendezvous; any distance at which a port's
+look-outs judged the offing clear; any interval between the offing's clearing and a sortie;
+a British coasting convoy of the Channel numbered; a Texel blockade by name; Orde's first day
+off Cadiz; the corsairs of St Malo and Dunkirk and their prey. Mahan is not in the repository
+and no knob rests on him now.
+
+### The figures found that differ, kept (the lead rules)
+
+| Knob | Kept | The source gives |
+|---|---|---|
+| `in ordinary.commission_delay_h` | 48 to 120 hours | the Agamemnon 64 commissioned 26 or 30 January 1793, down the Medway 16 March, at Spithead 28 April still short of men: eleven to thirteen weeks (Nicolas vol. 1 pp. 298 to 304) |
+| `in ordinary.slip_out_wind_max_kn` | 22 knots from any quarter | sorties in a strong fair wind off the land: eleven of the line out of Brest in a brisk north-easterly gale, 13 December 1805 (James vol. 3 p. 314); frigates out of Cadiz in a strong easterly, February 1806 (vol. 4 pp. 119 to 120); and in a moderate breeze (vol. 4 p. 287) |
+| `in convoy.size` | 4 to 8 | 6 to 35 under a sloop or frigates (James vols. 3 to 6, Niles vol. VII p. 192); 70 to 137 from the Baltic |
+| the blockade book's rendezvous (`data/squadrons/blockade.yaml`, not this package's file) | Torbay | Plymouth and other ports (James vol. 3 p. 170), Cawsand Bay (p. 169); Torbay named on none of James's Brest pages in vols. 3 and 4 |
+
+The sortie's fifteen miles and hour, which truth 7-154 reads, agree with what the sources give
+as far as they give it (the inshore frigates four miles south by east of the Black Rocks, the
+main body three leagues south by west of Ushant, James vol. 3 pp. 311 to 312: both inside the
+offing the rule watches) and stay judgement; `slip_out_clear_nm` 15 is also the offshore
+distance James gives off Cadiz (22 sail about fifteen miles off, vol. 3 p. 379), used as Cadiz's
+offshore station. The escort's brig-sloop is what the sources give for a convoy of a handful.
+
+### The commission's draw, and its first run
+
+`Business._commissions` runs at the region's peopling and every minute of the business's
+tick: a vessel in ordinary with no sortie and no commission due, not looked at before, is
+given an intent of her nation's (`intents_for`, in the data's order: her doctrine's stations
+within the region, then a passage to each other port of hers in play within it) and the
+delay, both drawn from `world.rng.stream("business")` (the delay first, then the intent),
+and `regimes.commission` sets her `sortie` to the intent and her `commission_tick`; the
+regimes' minute sails her at the first minute at or after it, as it sails a director's
+commission. Since the draw is the business's stream, it shifts the business's later draws
+in a world that has such a ship; no world had one before this package (the Hortense and the
+business's Brest frigate both carry sorties), so nothing that ran before draws differently:
+the business's record and every vessel's place after an hour, in the Channel's west and the
+mid-Channel scenarios of `test_business.py` and truth 7-157, compared byte for byte against
+the base tree (`b3aff3a`), identical. **The first run** (truth 7-260, seed 7, the frigate Aigle
+laid up at Brest at 10.00 on 12 June 1805 with the region at full business): commissioned at
+tick 60 for "keep the station off the Lizard within 20 miles" (of France's three stations in
+the region and her ports), the delay 55 hours (due at 197345); the pilot's news "Aigle, a
+frigate, is commissioning in Brest, her company raising: she is to sail in about 2 days."; she
+sails at 197400 on passage for the station and the line is gone from the news. In Biscay north
+the business's Lorient frigate (Sans-Souci) is commissioned at the peopling for a passage to La
+Rochelle, the delay some 78 hours. The truth sets the clock forward over the 55 hours (the
+region at full business runs some 180 ticks a second: the days sailed would be twenty minutes
+of the suite), said in its docstring; she is a brainless hull at the anchorage throughout.
+
+### Iberia's drift (72's second left item): a note, nothing changed
+
+Tofiño's *Derrotero de las costas de España en el Océano Atlántico* (Madrid 1789, Internet
+Archive `derroterodelasco00tofi_0`, the OCR text fetched to the scratchpad and read as data,
+not committed): his Portuguese pages (pp. 74 to 93) give the marks and directions and no word
+of the summer's northerlies or the coast's drift; the coves by Sagres are good anchorage in
+summer but for the levanters (p. 95); of the Cantabrian coast he gives the reigning winds as of
+the third and fourth quadrants in winter, steady and rainy, and spells of easterlies in summer
+(p. 145). No printed climatic table: the climatology's PROVISIONAL rows for the Portuguese box
+stand as `ChartBlocks.md` item 7 leaves them, `data/weather/` untouched, the seasonal bound
+still under its switch and off (truth 7-158 stands). The nearest table would be a later pilot
+chart's roses (Maury's or the Admiralty's), not held.
+
+### The suite as run
+
+SUITE_PLACEHOLDER
+
+### Found on the way, and left
+
+- **The blockade book is Brest's for every port.** `data/squadrons/blockade.yaml` blows a
+  squadron off in a gale from 225° to 315° wherever it is; off Cadiz the danger was the
+  other way (an easterly drove Collingwood's squadron west, James vol. 4 pp. 119 to 120; the
+  westerlies threatened to force a squadron into the Mediterranean, vol. 3 p. 380). The
+  business now gives each blockade its own rendezvous (Rochefort's Quiberon) but the book's
+  sector is the book's; a per-port `blown_off` belongs with the book (not this package's file).
+- **The business's blockade is a frigate and a brig** for every port (the book's `kind`s),
+  where James gives five to eighteen of the line off Brest, Ferrol, Rochefort and Cadiz: the
+  far body has no ship of the line to draw (package 75's 74). Written as the sources give it
+  in the entries; the force not changed.
+- **The ships in ordinary are frigates** for the same reason (the sources' ports held ships
+  of the line).
+- **The brief's CLAUDE.md** is not in the repository; the brief's head and records served.
+- **Two Cadiz entries** share the set's id `blockade-cadiz`; their dates do not overlap, so
+  one set at most is drawn.
+- `tests/conftest.py`'s `SLOW_TESTS` takes four of the new truths (over the five seconds
+  under load: the business peopling a region).

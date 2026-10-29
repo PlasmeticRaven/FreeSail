@@ -864,6 +864,50 @@ once on entry and carrying over a set whole while any member is within the carry
 distance (`carry_over_nm`). Not built, left to 79: the nations' fighting habits (fire high,
 single actions) as regime rules; the commission's delay drawn by the business.
 
+**As built (package 79a).** **Every knob sourced, or said to be judgement:** each figure of
+`data/regimes.yaml` and each key of the eight nations' `naval:` blocks (a `sources:` map
+beside 72's `source:`) names its source by work, volume and page from the books under
+`docs/references/` (James's *Naval History*, Nicolas's *Dispatches and Letters of Nelson*,
+Niles' *Register*, the *Regulations and Instructions* of 1806, Falconer), or says judgement
+with what was looked for; Mahan, not in the repository, is no knob's only source. **No figure
+moved:** where a source gives another, it is written beside the knob ("the source gives N;
+kept at M until re-measured") for the lead to rule (the commission's delay, the sortie's
+wind, the convoy's size). **The commission drawn by the business:** a ship in ordinary with
+no sortie, the business on, is commissioned at the business's first minute with her for an
+intent of her nation's (`Business.intents_for`: a cruise on each of her doctrine's stations
+within the region, `data/captains/cruiser.yaml` `stations:`, and a passage to each other port
+of hers in play within it), after `commission_delay_h` drawn from the business's own stream;
+said in her story and the port's news while her company is raised (`regimes.commission`, the
+director's form's too), the line gone when she sails; a ship with a `sortie` keeps the sortie
+rule; a ship with no intent of her nation's in the waters stays in ordinary, said in her story.
+**The doctrines as data for the waters the chart has:** Britain's `blockades:` entries are a
+port's id (Brest's, the book's stations, as 72 had it) or a port with its sources' dates
+(`since`, `until`), its own offshore station and lee rendezvous: Rochefort (1803 to 12 July
+1805, off Chassiron, Quiberon), Ferrol (from Spain's war, off Cape Prior), Cadiz (Orde's
+until 9 April 1805; the frigate and brigs from 31 May, Collingwood by August; off Cadiz within
+fifteen miles), Lorient (from March 1808, off Groix); France's frigates in ordinary at
+Rochefort (her sortie off the Baleines) and Lorient (none: commissioned by the business),
+Spain's at Ferrol (off Cape Ortegal) and Cadiz (off Cape Santa Maria). The Texel lies off the
+chart and is drawn for nobody. Nothing new is drawn in the Channel's two regions, the business-on
+free games' waters. **Iberia's drift** (72's second left item): Tofiño's *Derrotero* of 1789,
+the pilot of the Portuguese and Galician coasts, read for the summer northerlies; no climatic
+table found, so the climatology's PROVISIONAL rows stand and the item is a note in the tuning
+notes (truth 7-158 stands).
+
+**Still judgement, by knob** (79a): `in ordinary.slip_out_clear_nm` (the fifteen miles: no
+distance at which the port's look-outs judged the offing clear in the books held),
+`slip_out_clear_minutes` (the hour: no interval between the offing's clearing and the
+weighing), `slip_out_wind_max_kn` (22 knots, kept against the sources' sorties in a fair gale
+off the land), `commission_delay_h` (two to five days, kept against the Agamemnon's eleven to
+thirteen weeks), `in convoy.size` (four to eight, kept against the six to 35 James and Niles
+number); the blockade book's Torbay rendezvous (James gives Plymouth and Cawsand Bay; the book is
+not this package's file) and its westerly gale for every port (off Cadiz an easterly drove the
+squadron off); Rochefort's and Lorient's offshore stations and Rochefort's beginning; the ships
+in ordinary's sortie stations; every nation's `engages`, `single_actions` and the fighting
+habits (package 74's); Portugal's, Denmark's and Morocco's blocks whole; the privateers' prey
+but the Americans' (Niles) and the French privateers' prizes of 1793 (Nicolas); the convoy
+acts of 1798 and 1803 (named by none of the books held). Truths 7-260 to 7-269.
+
 ### 23. Truths for 7-vi (outline)
 
 A convoy of six under a brig-sloop meets a privateer schooner: the escort makes the signal
