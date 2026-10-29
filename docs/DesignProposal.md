@@ -761,6 +761,38 @@ M0–M2 are mostly engineering. M3–M4 is where it becomes a game. M5–M6 is w
     Booked as package 91 (`docs/dev/M7-WorkPackages.md`), after 81 and 75's hull, when the
     owner likes.
 
+58. **A career system: the frame for its study, the study after 85, the building in
+    milestone 8.** Owner, 2026-10-29, thinking ahead of 84's end. **The owner's sketch:**
+    the player and the world run on the same rules and the loops the player can take up are
+    the world's own; the world runs two overarching systems, the naval and the economic,
+    with the navy, privateers, merchants and fishermen their actors and pirates implicit;
+    the player a person with a purse, items and papers, with standings with actors; the
+    systems' factions each with a lead actor who allots tasks, the player able to take them;
+    the director able to work every lever of it, and models able to hold stations as actors,
+    the lead actor's among them as a director constrained to a sub-domain; the progression
+    broadly defined so that a director enriches it and the game stands without one; the
+    naval system fights the wars the nations dictate, the merchant system's factions make
+    money; the height of the decision chain open to a model or the player to be considered.
+    **The lead's frame, which the owner took whole as the study's:** the state is the frame
+    both systems run within (the Admiralty's commission, the prize court, the letter of
+    marque, the press, the customs house), not a third faction, and piracy a legal state a
+    person or ship falls into, not a faction; tasks fall out of the world's needs as the
+    business already draws commissions, never generated because the player exists; a lead
+    actor is a station with a domain of orders and readings, as the commodore and the
+    business are, not a second director; standings are two kinds only, with named persons
+    (specific, decaying) and with institutions (coarse, slow), in the period's words of
+    interest and character, the character in the papers, no bare number to grind;
+    progression in the period's currencies (rank and seniority, the purse and credit, the
+    ship held, the papers), no experience points; the time between voyages an ellipsis, the
+    world advanced at a coarse step with the business and the regimes running and the hulls
+    asleep, journaled, the one new mechanism; a closed economy so that the director's tasks
+    redistribute and never print; the decision chain's ceiling at a squadron's commodore, a
+    port admiral's orders and a merchant house's head, the nations' wars the regimes' dated
+    data and the director's hand; every career change an act in the journal (decision 14).
+    **The road:** a study package in 83's shape, Fable, no code, a design document and the
+    first career package's brief (package 92, after 85's review); the building itself
+    milestone 8's.
+
 ### Still open
 
 Nothing at the proposal level. Open items now live in the technical specification's §12 and in the known-truths table, where the owner's seamanship is most useful.
