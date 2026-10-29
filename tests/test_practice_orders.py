@@ -805,7 +805,7 @@ def test_the_scenario_is_written_again_byte_for_byte_and_loads():
     assert "no model seated, nothing happens" in text
     w = make_scenario_world(sf)
     begin(w, sf)
-    assert w.ship.spec.name == "Amazon" and not w.vessels.vessels
+    assert w.ship.spec.name == "Amazon" and not w.vessels.active()  # her own vessel apart
     w.run(120)
     assert not [e for e in w.log if e.kind.startswith(("practice.", "guns.", "action."))]
 

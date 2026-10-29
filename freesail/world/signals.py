@@ -1298,8 +1298,8 @@ def held_books(world: Any) -> tuple[str, ...]:
 def has_glass(world: Any) -> bool:
     """Whether a glass is aboard for the flags: the scenario's, or any crewed ship's
     captain's (the far brain has one on the sail he has in hand)."""
-    if getattr(world, "vessel", None) is not None:
-        return True
+    if getattr(world, "parent", None) is not None:
+        return True  # another hull: her captain's glass
     return bool(getattr(getattr(world, "scenario", None), "glass", False))
 
 

@@ -3824,7 +3824,7 @@ def test_truth_70_a_port_closed_to_the_ships_nation_refuses_her_in_the_pilots_wo
     frigate = standing_in(FRIGATE)
     assert frigate.dealings.stance(frigate.ports.ports["brest"]) == "hostile"
     frigate.run(2 * 3600)
-    assert not events(frigate, "port.pilot_hail") and not frigate.vessels.vessels
+    assert not events(frigate, "port.pilot_hail") and not frigate.vessels.active()
     assert "the port hostile to the English" in frigate.readings.words("port")
     # open: her own port, where the pilot comes off (the passage of gate 5b has it)
     assert frigate.dealings.stance(frigate.ports.ports["falmouth"]) == "open"

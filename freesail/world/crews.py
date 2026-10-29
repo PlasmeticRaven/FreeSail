@@ -98,7 +98,12 @@ DEALING_S = 1800
 PROMOTION_ACCOUNT_SIGMA_NM = 0.5
 # The states a crewed vessel is demoted in, and a far one not promoted in: the port's
 # business is not the crewed body's (see the module's head).
-_NOT_CREWED_STATES = frozenset({"at anchor", "in port", "running for shelter", "in distress"})
+# Retired at package 84, step 7 (the owner's decision 6, the design's 5.2): a hull at anchor
+# or in port may be awake under the cap's order (a third of the cost of one under way; a
+# stationed hull in port at full detail is what the tender's game wants; the pilot cutter
+# sent for her steers for her hull since the dealings are per hull). Kept, empty, for the
+# rule's one place, as `FAR_ONLY_ROLES` is.
+_NOT_CREWED_STATES: frozenset[str] = frozenset()
 # The roles never crewed: none since package 56 (spec M7b §21a; the owner, 2026-10-17:
 # "the crewed promotion includes the fishermen"). Package 43b kept the fisherman of the
 # world's business at far detail only; a fishing vessel near the player is now promoted
@@ -130,15 +135,9 @@ class HullView:
 
     @property
     def vessels(self) -> list[Any]:
-        sea = self.sea
+        # the sea but her own body; the player's ship is a vessel of it (step 7), last
         own = self.hull.vessel
-        out = [v for v in sea.vessels if v is not own and not v.done]
-        # the player's ship as a vessel, read with the followed hull current
-        # (`Vessels.player_shadow`), not from this hull's names
-        shadow = sea.player_shadow(self.__dict__.get("game") or self.hull.world)
-        if shadow is not None:
-            out.append(shadow)
-        return out
+        return [v for v in self.sea.vessels if v is not own and not v.done]
 
     def active(self) -> list[Any]:
         return list(self.vessels)
@@ -168,13 +167,20 @@ class HullView:
     def tick_near(self, world: Any, dt: float = 1.0) -> list[tuple[Any, ...]]:
         return []
 
-    def in_sight(self, pos: Position, height_of_eye_m: float, visibility_nm: Any, daylight: str):
+    def in_sight(
+        self,
+        pos: Position,
+        height_of_eye_m: float,
+        visibility_nm: Any,
+        daylight: str,
+        viewer: Any = None,
+    ):
         from freesail.world.ships import Vessels
 
         view = Vessels.__new__(Vessels)
         view.world = self.hull
-        view.vessels = self.vessels
-        return Vessels.in_sight(view, pos, height_of_eye_m, visibility_nm, daylight)
+        view.vessels = self.vessels  # her own body already left out
+        return Vessels.in_sight(view, pos, height_of_eye_m, visibility_nm, daylight, viewer)
 
     def to_dict(self) -> list[dict[str, Any]]:
         return []
@@ -568,7 +574,11 @@ def mirror(vessel: Any, crew: CrewedWorld, minute: bool) -> None:
 def _crew_ids(world: World) -> tuple[str, ...]:
     """Every vessel with a World of her own, full or far in shape: the parent ticks each
     (`Vessels.tick_crews`, gated on `crewed_ids`)."""
-    return tuple(v.id for v in world.vessels.vessels if v.crew is not None and not v.done)
+    return tuple(
+        v.id
+        for v in world.vessels.vessels
+        if v.crew is not None and not v.done and not v.crew.is_followed
+    )
 
 
 def crewed(world: World) -> list[Any]:
@@ -577,7 +587,7 @@ def crewed(world: World) -> list[Any]:
     return [
         v
         for v in world.vessels.vessels
-        if v.crew is not None and v.crew.shape == "full" and not v.done
+        if v.crew is not None and v.crew.shape == "full" and not v.done and not v.crew.is_followed
     ]
 
 
@@ -746,6 +756,16 @@ def crewed_settings_of(raw: Any, where: str = "the scenario") -> dict[str, Any]:
         if rng <= 0:
             raise ValueError(f"{where}: the crewed range is in miles over nought, not {rng!r}.")
         out["range_nm"] = rng
+    if raw.get("stationed") is not None:
+        # `stationed: always` (the owner's decision 3, package 84 step 7): a hull with a
+        # stationed person is awake at full detail at all times, whatever her distance
+        word = str(raw["stationed"]).strip().lower()
+        if word not in ("always", "by the cap"):
+            raise ValueError(
+                f"{where}: `crewed.stationed` is 'always' or 'by the cap', not "
+                f"{raw['stationed']!r}."
+            )
+        out["stationed"] = word
     return out
 
 
@@ -766,12 +786,33 @@ def settings(world: Any) -> tuple[int, float, float]:
     return cap, rng, rng + (CREWED_DEMOTE_NM - CREWED_NM)
 
 
+def stationed_always(world: Any) -> bool:
+    """Whether the scenario (or a driver's flags) keeps a hull with a stationed person awake
+    at all times (`crewed: {stationed: always}`; the owner's decision 3)."""
+    chosen: dict[str, Any] = {}
+    sc = getattr(world, "scenario", None)
+    if isinstance(getattr(sc, "crewed", None), dict):
+        chosen.update(sc.crewed)
+    if isinstance(getattr(world, "crewed_settings", None), dict):
+        chosen.update(world.crewed_settings)
+    return str(chosen.get("stationed", "") or "") == "always"
+
+
+def _stationed(vessel: Any) -> bool:
+    """Whether a person is stationed on her hull (a model's or the player's seat at one of
+    her stations: `hull.agents`), the second rank of the cap's order (the design's 2.6)."""
+    hull = getattr(vessel, "crew", None)
+    return bool(getattr(hull, "agents", None)) if hull is not None else False
+
+
 def switch(world: World) -> None:
     """The crewed promotion by the distance from the centre, once a minute: demoted
-    beyond `CREWED_DEMOTE_NM` or when she anchors; promoted within `CREWED_NM` up to the
-    cap, a ship in dealings with the player before a nearer one that is not, and a
-    dealing ship within the range taking the place of the farthest crewed ship that has
-    none when the cap is full."""
+    beyond `CREWED_DEMOTE_NM`; promoted within `CREWED_NM` up to the cap in the cap's order
+    (package 84, step 7; the design's 2.6): a ship in dealings with the player first, then a
+    hull with a stationed person, then the nearest; a dealing or stationed ship within the
+    range taking the place of the farthest crewed ship that is neither when the cap is
+    full. A hull at anchor or in port is awake like any other (the owner's decision 6), and
+    a stationed hull is never demoted by the range under `crewed: {stationed: always}`."""
     release_done(world)
     centre = world.position
     if centre is None:
@@ -784,34 +825,44 @@ def switch(world: World) -> None:
     far_nm: dict[str, float] = {}
     for v in with_brain:
         far_nm[v.id] = bearing_and_distance(centre, v.position)[1] / units.NAUTICAL_MILE
+    always = stationed_always(world)
+
+    def held_fast(v: Any) -> bool:
+        # kept awake whatever the distance: in dealings, or stationed under `always`
+        return _dealing(world, v) or (always and _stationed(v))
+
+    def rank(v: Any) -> int:
+        # the cap's order: dealings first, then a stationed hull, then the rest
+        return 0 if _dealing(world, v) else (1 if _stationed(v) else 2)
+
     # demotions
     for v in list(crewed(world)):
         state = v.crew.captain.state if v.crew.shape == "full" else v.brain.state
         beyond = far_nm.get(v.id, math.inf) > demote_nm
-        if (beyond and not _dealing(world, v)) or state in _NOT_CREWED_STATES:
+        if (beyond and not held_fast(v)) or state in _NOT_CREWED_STATES:
             demote(world, v)
-    # promotions, dealings first and then the nearest
+    # promotions, in the cap's order and then the nearest
     wanted = [
         v
         for v in with_brain
         if (v.crew is None or v.crew.shape == "far")
-        and far_nm[v.id] <= within_nm
+        and (far_nm[v.id] <= within_nm or (always and _stationed(v)))
         and (v.brain.state or "on passage") not in _NOT_CREWED_STATES
         and getattr(v.brain, "role", "") not in FAR_ONLY_ROLES
     ]
-    wanted.sort(key=lambda v: (not _dealing(world, v), far_nm[v.id]))
+    wanted.sort(key=lambda v: (rank(v), far_nm[v.id]))
     for v in wanted:
         held = crewed(world)
         if len(held) < cap:
             promote(world, v)
             continue
-        if not _dealing(world, v):
+        if rank(v) == 2:
             break
-        # the cap full: the farthest crewed ship without dealings gives her place
-        idle = [c for c in held if not _dealing(world, c)]
-        if not idle:
+        # the cap full: the farthest crewed ship of a lower rank gives her place
+        lower = [c for c in held if rank(c) > rank(v)]
+        if not lower:
             break
-        farthest = max(idle, key=lambda c: far_nm.get(c.id, 0.0))
+        farthest = max(lower, key=lambda c: far_nm.get(c.id, 0.0))
         demote(world, farthest)
         promote(world, v)
 
@@ -1548,18 +1599,13 @@ def ask_crewed(parent: World, vessel: Any) -> str:
             f"{vessel.name} is {nm:.1f} miles from the ship, beyond the promotion's range of "
             f"{within_nm:g}: a ship is crewed only near the ship (the owner's budget)"
         )
-    state = vessel.brain.state or "on passage"
-    if state in _NOT_CREWED_STATES:
-        raise ValueError(
-            f"{vessel.name} is {state}, and a ship {state} is not crewed: the port's business "
-            "is her far captain's"
-        )
     held = crewed(parent)
     if len(held) >= cap:
         names = ", ".join(v.name for v in held)
         raise ValueError(
-            f"the crewed cap is full ({cap}: {names}); the cap and its order stand (the "
-            "nearest first, a ship in dealings with the player before a nearer one), and she "
+            f"the crewed cap is full ({cap}: {names}); the cap and its order stand (a ship in "
+            "dealings with the player first, then a hull with a stationed person, then the "
+            "nearest), and she "
             "takes her turn"
         )
     crew = promote(parent, vessel)

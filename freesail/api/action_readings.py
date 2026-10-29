@@ -431,9 +431,6 @@ def _enemy(world: Any, _: str | None) -> dict[str, Any] | None:
     sea = getattr(world, "vessels", None)
     if sea is not None:
         vessel = sea.get(battery.target)
-        if vessel is None and battery.target == "the ship":
-            parent = getattr(world, "parent", None)
-            vessel = parent.vessels.player_shadow(parent) if parent is not None else None
     if vessel is not None:
         struck = bool(getattr(vessel, "struck", False))
     rel = ""

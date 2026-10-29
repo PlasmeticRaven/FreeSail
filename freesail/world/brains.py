@@ -44,6 +44,7 @@ from freesail.world.captains import (
     station_off,
 )
 from freesail.world.geo import Position, bearing_and_distance, destination
+from freesail.world.ships import PLAYER_ID
 
 __all__ = [
     "AT_ANCHOR_LEAST_S",
@@ -74,7 +75,6 @@ __all__ = [
 # shows them when asked, and nothing of the player's models his colours yet).
 IN_PORT_WAIT_S = 12 * 3600
 AT_ANCHOR_LEAST_S = 3600
-PLAYER_ID = "the ship"
 # The states the far-detail body resolves without a brain (spec M6 §4; package 40): on
 # passage is her plan, hove to is no way. A vessel with a brain resolves every state.
 FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather", "in company")

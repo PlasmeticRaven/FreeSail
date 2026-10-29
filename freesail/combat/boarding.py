@@ -228,11 +228,8 @@ def _other_body(world: Any, other_id: str) -> Any:
 
 
 def _other_world(world: Any, other_id: str) -> Any:
-    from freesail.world.brains import PLAYER_ID
 
     parent = getattr(world, "parent", None)
-    if other_id == PLAYER_ID and parent is not None:
-        return parent
     sea = parent.vessels if parent is not None else getattr(world, "vessels", None)
     v = sea.get(other_id) if sea is not None else None
     crew = getattr(v, "crew", None) if v is not None else None

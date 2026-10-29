@@ -161,12 +161,12 @@ def _addressee(world: Any, who_words: str) -> Any:
     w = " ".join(str(who_words or "").lower().split())
     if w.startswith("the "):
         w = w[4:]
-    candidates = [v for v in getattr(sea, "vessels", []) or [] if not getattr(v, "done", False)]
-    parent = getattr(world, "parent", None)
-    if parent is not None:
-        shadow = parent.vessels.player_shadow(parent)
-        if shadow is not None:
-            candidates.append(shadow)
+    own = _own_id(world)  # her own body is on the sea (package 84, step 7) and no addressee
+    candidates = [
+        v
+        for v in getattr(sea, "vessels", []) or []
+        if not getattr(v, "done", False) and str(v.id) != own
+    ]
     here = getattr(world, "position", None)
     if here is None:
         return None
@@ -192,7 +192,7 @@ def _addressee(world: Any, who_words: str) -> Any:
     if by_kind:
         return min(by_kind, key=near)
     found = sea.find(who_words.strip()) if hasattr(sea, "find") else None
-    return found
+    return found if found is not None and str(found.id) != own else None
 
 
 def _words_for(world: Any, vessel: Any) -> str:
@@ -220,9 +220,9 @@ def _spoken(world: Any, vessel: Any) -> None:
     ids = getattr(captain, "spoken_ids", None)
     if isinstance(ids, set):
         ids.add(str(vessel.id))
-    parent = getattr(world, "parent", None)
-    if parent is not None and vessel.id == "the ship":
-        pc = getattr(parent, "captain", None)
+    other = getattr(vessel, "crew", None)
+    if other is not None and getattr(other, "shape", "") == "full":
+        pc = getattr(other, "captain", None)
         pids = getattr(pc, "spoken_ids", None)
         if isinstance(pids, set):
             pids.add(own)
@@ -248,9 +248,6 @@ def deliver(world: Any, vessel: Any, said: str, tick: int) -> str | None:
     heard = f"{_cap(hailer_words)}, within hail, hails us: '{said}'"
     crew = getattr(vessel, "crew", None)
     other_world = crew if crew is not None and getattr(crew, "shape", "") == "full" else None
-    parent = getattr(world, "parent", None)
-    if vessel.id == "the ship" and parent is not None:
-        other_world = parent
     if other_world is not None:
         other_world.record(
             Severity.URGENT,
@@ -288,9 +285,6 @@ def _hailer_words(world: Any, vessel: Any) -> str:
     """The hailer in the hailed ship's words: her lookout's name for him, else his rig."""
     crew = getattr(vessel, "crew", None)
     other = crew if crew is not None and getattr(crew, "shape", "") == "full" else None
-    parent = getattr(world, "parent", None)
-    if vessel.id == "the ship" and parent is not None:
-        other = parent
     own = _own_id(world)
     if other is not None:
         lookout = getattr(other, "lookout", None)
@@ -301,17 +295,11 @@ def _hailer_words(world: Any, vessel: Any) -> str:
                     return name
             except Exception:  # noqa: BLE001
                 pass
-    shadow_kind = ""
-    sea = getattr(parent if parent is not None else world, "vessels", None)
-    if sea is not None and parent is not None:
-        v = sea.get(own)
-        shadow_kind = str(getattr(v, "kind", "") or "")
-    elif parent is None:
-        shadow = (
-            world.vessels.player_shadow(world) if hasattr(world.vessels, "player_shadow") else None
-        )
-        shadow_kind = str(getattr(shadow, "kind", "") or "")
-    return f"the {shadow_kind.removeprefix('a ')}" if shadow_kind else "a sail"
+    # his rig: his own vessel's on the sea (the player's ship one of them, package 84, step 7)
+    sea = getattr(getattr(world, "parent", None) or world, "vessels", None)
+    v = sea.get(own) if sea is not None else None
+    kind = str(getattr(v, "kind", "") or "")
+    return f"the {kind.removeprefix('a ')}" if kind else "a sail"
 
 
 def _stations_hear(other_world: Any, line: str) -> None:

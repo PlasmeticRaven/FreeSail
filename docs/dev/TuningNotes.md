@@ -11335,3 +11335,57 @@ The step 5 fixture in `test_crews.py` that asserted a `CrewedWorld` on the vesse
 line of a passage on 5949e18's behaviour: each restores what the crewed World's names gave,
 and the probes above end alike on both trees once mended (7-134's hits one, the first
 action's strike at 6300 s, the brig's captain judging at 3900 s).
+
+### Step 7: the player's ship a hull among the hulls; the shadow retired
+
+Built on step 6 as merged (`f99648d`; the design note's postscript "Step 7" has the shape).
+**What moved: nothing pinned by the step's own changes** (the player's vessel is last in the
+sea and left out of every viewer's own sail, the design's rule 3, and the followed hull's
+way and frame are her ship's as the shadow's were). **The cap's order** retires the
+not-crewed states (the owner's decision 6): a far ship at anchor or in port within the range
+is promoted where before she was not, and a crewed ship that anchors stays awake; the slow
+tier is the proof of what that moves in the recorded passages (below). **The count.**
+`world/ships.py` (`PLAYER_ID`, `Vessels.own`, `player_shadow` the vessel's bring-up, `add`
+keeping her last, `in_sight(viewer=)`, the skips), `core/world.py` (made at the start and at
+a load, brought up each tick), `world/crews.py` (`HullView.vessels` the sea but her own,
+`crewed`/`_crew_ids` without the followed, the cap's order, `stationed_always`,
+`_stationed`, `_NOT_CREWED_STATES` empty), `world/squadrons.py`, `combat/action.py`,
+`combat/boarding.py`, `world/hail.py`, `world/captains.py`, `world/signalling.py`,
+`world/signals.py` (`has_glass`), `world/lookout.py`, `orders/station.py`,
+`api/action_readings.py`, `api/readings.py` (the truth), `world/business.py` (the names in
+use), `world/brains.py`, `world/hulls.py`; tests: four new in `test_hulls.py`, two in
+`test_crews.py`, the cap test's anchor assertion restated under decision 6, the old-shape
+writer leaving her out, and six assertions that the sea was empty (the pilot's tests of
+`test_ports.py`, truth 70, the practice orders' written scenario) restated as "no sail but
+her own" (`Vessels.active()`).
+
+**The suites on the step's tree** (this container, three workers). The fast tier whole on
+the tree before the hail's mend: 3912 passed, six failed, five of them the assertions above
+that the sea was empty (the player's vessel is on it now) and the sixth the pictures'
+blank-image check (std 7.9 against 8.0), which this day fails alone as well, on this tree
+and on a worktree at `f99648d` alike, with the same figure (7.9456): the known flake, not
+the step's. The slow tier of the known truths, the trials and the touched files (161 tests
+in those files): 151 passed, eight left out by their own marks, two failed: the lee-shore
+trial's digest (`7fad0ce7e46ba366`, this container's as before) and truth 7-143, which
+found the hail taking the ship herself for "her" (above), mended and green alone. **The
+pace** (alone, this container; the three pace tests of the known truths run on a worktree at
+`f99648d` and then on this tree in turn, the same hour): the day under systems 478 then 490
+ticks a second, the gates' day with the region loaded 444 then 492, truth 7-159's convoy of
+six at far detail 397 then 475, all against the build machine's floor of 500, which this
+container misses on both trees by its own measure (steps 4 to 6 the same); the step costs
+nothing the measure can see, the own vessel's bring-up each tick being a few attribute reads
+and the manoeuvre's (read straight from the ship, not through the readings view).
+`make_hull` of a brig 0.72 s (0.60 at step 6, load 1.0 against 0.7); truth 88's form with
+three hulls awake 233 ticks a second against the crewed floor of 60 (234 at step 6). **The
+fast tier whole on the final tree: 3917 passed, one failed**, the pictures' blank-image
+check again (the known flake above); ruff clean.
+
+**Step 6's slow set, closed here.** The known truths' and touched files' slow tier on the
+step 6 tree (`fc43086`; 148 tests in those files) gave 146 passed and two failed: the
+lee-shore trial's digest (`7fad0ce7e46ba366` against the pinned `ed48ca3d61e52f20`, this
+container's figure before and after the step) and truth 7-200 (the tender), which fails
+under three workers at its stage 7 ("hail.heard" not reached in half an hour, the Raven at
+50 25 N 3 30 W) and passes alone, twice on that tree: a load-sensitive test, the fake at the
+Raven's station through the harness losing the deck to the stand-in when its reply comes
+late under load, not a fault of the step's; a finding for the harness's sampling, noted and
+not mended here.

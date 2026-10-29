@@ -1851,3 +1851,55 @@ ship fired into by a crewed stranger came before its ten minutes. On the one clo
 stranger sees the challenge and the bluffing privateer answers it wrong, and the bill comes
 in its time. A step 6 hull is `crews.Hull` to the tests that held a `CrewedWorld`
 (`isinstance` restated, the crewed checkpoint's `crew.world is c`).
+
+### Step 7: the player's ship a hull among the hulls; the shadow retired
+
+Built on step 6 (the lead's head `f99648d`). **Built.** The player's ship is a vessel of the
+sea (`Vessels.own`, under `ships.PLAYER_ID`, the one definition; `brains`, `squadrons` and
+`combat.action` import it): made at the World's start after the scenario's and the business's
+ships and at an old checkpoint's load, **appended last and kept last** (`Vessels.add` puts a
+new vessel before her), her hull the followed hull and the followed hull's `vessel` she
+(`World.vessel` names her for the followed hull as it names another hull's far body), her
+detail "crewed", no brain, never moved by the sea (the loops that move, promote, hail or
+tick a vessel pass her by, and the followed hull's tick is the World's own). Every tick of
+the followed hull's (`World._tick_vessels`, before the other hulls tick) and at every asking
+she is brought up to her truth: position, heading, speed, her colours struck, her locker the
+player's, her sail state by her manoeuvre, as the shadow was; `Vessels.player_shadow` keeps
+its name and answers with her, so every reader that asked for the shadow reads the vessel.
+**The shadow retired**: `HullView.vessels` is the sea but the hull's own body (the player's
+ship among them, last); `strangers_of` and the signalling's and the station's lists append
+nothing; a viewer's own body is left out of `Vessels.in_sight` (the lookout gives
+`world.vessel`), so no lookout sights its own hull. **The `PLAYER_ID` cases one rule**: a
+member's body is `sea.get(id)` for the player as for any (`squadrons._body`,
+`action._body_of`, `target_of`, `boarding._other_world`, the hail's other world, the
+captains' `_vessel_of`), the body her hull's ship when the hull is awake; her name and her
+locker her vessel's; the followed hull's way and frame her ship's own (`_followed_hull`,
+the rule on the hull where it was on the id), where another hull's are her far body's
+mirrored record, so that the sets' stations compute as the shadow gave them. **The cap's
+order** (the owner's decisions 3 and 6): `_NOT_CREWED_STATES` is retired (kept empty for
+its one place, as `FAR_ONLY_ROLES` is), so a hull at anchor or in port is awake under the
+cap like any other and `station_world` seats a station on her; the order is a ship in
+dealings, then a hull with a stationed person (`hull.agents`), then the nearest, a
+higher rank within the range taking the farthest crewed ship of a lower rank's place when
+the cap is full; and `crewed: {stationed: always}` keeps a stationed hull awake whatever
+her distance. **Found on the way:** the business could name a trader after the player's
+ship (a second Speedwell beside the Speedwell), since the names in use were the sea's and
+she was not on it; the player's name is in use (`Business._names_used`). The old-shape
+checkpoint writer of the hulls tests leaves her out of the sea it writes, as a build before
+this step did, and a load re-links her hull when a sea comes with her. The readers that
+appended the shadow to the sea's list for themselves (the hail's addressee, the action's
+watch for struck colours, the station by flag, the signalling's body by id) read the sea
+alone now, and the hail leaves the hailer's own body out of its addressees: with her on the
+sea, `hail her` at eighteen cables from the only stranger took the ship herself for "her"
+and hailed at no distance (truth 7-143 found it). `Vessels.active()` is the other sail,
+every vessel not done but the player's own, which is what its readers (the station by kind,
+the seats' and the switch's lists of the sail in sight) meant by it.
+
+**Taken another way, with the reason.** `has_glass` reads whether a hull has a parent, not
+whether a vessel is hers (every hull has a vessel now). The sixty-six cases are not all
+gone: the squadrons' commander branches that read the player's captain stay (the player's
+captain is `world.captain`, read in the followed hull's tick), and `_fired_on`'s
+"the player's own ship" test on `firer != PLAYER_ID` stands; what moved is every reading
+of her body, name, locker, way and frame. The truth's listing of ships keeps the player's
+ship as its first entry and leaves her vessel out of the sea's rows, so the director reads
+her once.
