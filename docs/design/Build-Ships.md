@@ -283,7 +283,7 @@ before:
    of the lead's branch, with 84's merged steps (§2.1). **Plainly:** stage A was under way when
    the owner gave this direction. It is finished, reviewed and committed, and goes no further
    until the lead approves.
-2. **The lead's approval** of the hull's principles (§5.0), its plan hull by hull (§5.7), its
+2. **The lead's approval** (given 2026-10-29, the lead's notes) of the hull's principles (§5.0), its plan hull by hull (§5.7), its
    design (§3.5, §5.1-§5.3, §6) and this order (§19.2 items 13-21). Ext was approved on
    2026-10-28 and its addendum on 2026-10-29 (the lead's notes at ea5ad59, on the lead's branch,
    brought in at the next merge), and stage 0E is in.
@@ -1687,7 +1687,7 @@ Items 16 and 19 stay open until the owner decides them on the sheets.
     §2.1 settles it before stage 0.
 12. **The frigate's draught** (15 ft against Steel's 17 ft 10 in) and the frigate-36's trimmers,
     which spend her marines at the guns (Indf §18 item 13): recorded for the frigate's own file.
-13. **For your approval: the hull's principles and design, and the order of §2.6.** The owner asked that this be put to you, and that nothing past B1's stage A start before your approval.
+13. **For your approval: the hull's principles and design, and the order of §2.6.** The owner asked that this be put to you, and that nothing past B1's stage A start before your approval. *Approved (the lead, 2026-10-29: items 13-21 ruled in the lead's notes, `docs/dev/M7-WorkPackages.md`). The inert steps (0H with SW-2b.1, B3.1, B3.2, B3.5) may be reported for merge at their boundaries; SW-1 runs beside the pilot; SW-4 beside it but for its rows in `world/ships.py`, which wait for B1's window to close and for 84's step 7; the far ship's length (item 21) is booked to package 74.*
     - The owner's end goal and the twelve principles (§5.0), and the plan hull by hull (§5.7).
     - The design: the shape keys and the computed stations on `/api/ship` (§3.5, §5.1-§5.3, §6). They go beyond the brief's "a dozen sourced points" (M7 l. 1655) and §5.1's first form, so they are put plainly, as the five extensions were.
     - The order of §2.6, by the owner's direction: the *Indefatigable* built whole, with the hull's form built and drawn first on her two files, and held for the owner's first test before any other ship or the eight's hulls.

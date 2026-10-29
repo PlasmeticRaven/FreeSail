@@ -1282,6 +1282,21 @@ proposes Steel's driver boomsail, which the owner chose (2026-10-28; its §17.9 
     frigate's share; the 64's exercise allowance read as a third of her upper-deck guns.
 11. **Brace limits** for a two-decker and the razee's lowered channels (§4.2).
 
+**Answered by the owner (2026-10-29), on stage A's open items** (the staysails, the spanker, the
+razee against the frigate-36, the brace limits):
+- **The staysails between the masts:** "Agreed" to the proposal: the main, middle, mizen and
+  mizen topmast staysails cut to Steel's table IV figures for a 64 (§4.3's bands), and the mizen
+  topgallant staysail, which his 64 column has not, left out. Done at the refinement of stage A
+  (§3.5 item 9's step).
+- **The razee's spanker:** kept at 218 m², the frigate's rule on her spars, within 8% of
+  Steel's driver for a 38 (202 m²) (the owner: "meant 218").
+- **The razee against the frigate-36** (7-187's clause 4, 0.13-0.26 kn short in 15 kn): "We'll
+  rely on tuning for this, the razee could be right and the frigate-36 too fast, or the razee
+  too slow and the frigate-36 right." Left to tuning of both ships against the period's
+  accounts, neither presumed the one at fault; reported, not forced.
+- **Brace limits (item 11):** the frigate's limits kept, on the reading that the lee topmast
+  backstays were eased when the yards were braced sharp up ("Reasonable").
+
 ---
 
 ## 18. Found on the way
