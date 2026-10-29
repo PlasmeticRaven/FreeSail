@@ -588,21 +588,29 @@ def hull_profile(rail, breadth, **parts):
     """The hull's `profile:` mapping from its lines: `rail`, [[x, z], ...] from the taffrail
     to the stem head, and `breadth`, [[x, hb_water, hb_rail], ...], with those of the other
     parts the sources give, named as the schema's keys without their `_m` (`keel`, `stem`,
-    `stern`, `wales`, `section`; by deck word, `decks`, `ports` and `port_size`), each in its
-    key's form. The keys in the schema's order (`schema.PROFILE_KEYS`), every figure in metres
-    to the centimetre. Whatever the load would refuse (Build-Ships.md §5.2) raises ValueError
-    here with the schema's own sentence, its check (`schema._parse_profile`) run on the mapping
-    as it will be written, so that a ship's module fails at generation and not at the load."""
+    `stern`, `wales`, `section`; by deck word, `decks`, `ports` and `port_size`; and stage 0H's
+    shape points, `head`, `breadth_line`, `sections`, `channel_wales`, `floor` and `rabbet`),
+    each in its key's form. The keys in the schema's order (`schema.PROFILE_KEYS`), every figure
+    in metres to the centimetre. The form and the marks are not parts: `hull_form` adds them.
+    Whatever the load would refuse (Build-Ships.md §5.2) raises ValueError here with the
+    schema's own sentence, its check (`schema._parse_profile`) run on the mapping as it will be
+    written, so that a ship's module fails at generation and not at the load."""
     from freesail.ship.schema import PROFILE_KEYS, ShipFileError, _parse_profile
 
     given = {"rail_m": rail, "breadth_m": breadth}
-    others = [key for key in PROFILE_KEYS if key not in given]
+    # every line of points in `_m`, the shape's six among them; `form` and `marks` are not
+    others = [key for key in PROFILE_KEYS if key.endswith("_m") and key not in given]
     for word, line in parts.items():
         if f"{word}_m" not in others:
             words = ", ".join(key.removesuffix("_m") for key in others)
+            later = (
+                "; the form and the marks are hull_form's (Build-Ships.md §5.3)"
+                if word in ("form", "marks")
+                else ""
+            )
             raise ValueError(
                 f"hull_profile takes no part '{word}'; beside the rail and the breadth its parts "
-                f"are {words}."
+                f"are {words}{later}."
             )
         if line is not None:
             given[f"{word}_m"] = line
@@ -629,15 +637,26 @@ def _centimetres(v):
 def _flow_profile(block):
     """The hull's `  profile:` block as yaml writes it, with each list in it on one flow line,
     as `Builder.dump` sets a sail's corners: a line of points `rail_m: [[x, z], ...]`, a
-    deck's under its word, and a port's size `[width, depth]`."""
+    deck's under its word, and a port's size `[width, depth]`; and from stage 0H, `sections_m`
+    one station to a line, each under the first, and in the form's blocks its lists the same
+    (`fullness`, `transom_hb_m`, a tier of galleries, a band of lights)."""
 
     def points(mo):
         indent, key, body = mo.groups()
         pts = re.findall(rf"^{indent}- - (\S+)\n((?:{indent}  - \S+\n)+)", body, flags=re.M)
-        flow = ", ".join(
+        each = [
             "[" + ", ".join([first, *re.findall(r"- (\S+)\n", rest)]) + "]" for first, rest in pts
-        )
-        return f"{indent}{key}: [{flow}]\n"
+        ]
+        if key != "sections_m":
+            return f"{indent}{key}: [{', '.join(each)}]\n"
+        stations = []  # the points of each x in turn, as written
+        for (first, _rest), point in zip(pts, each, strict=True):
+            if stations and stations[-1][0] == first:
+                stations[-1][1].append(point)
+            else:
+                stations.append((first, [point]))
+        under = ",\n" + " " * len(f"{indent}{key}: [")
+        return f"{indent}{key}: [" + under.join(", ".join(s) for _x, s in stations) + "]\n"
 
     def numbers(mo):
         indent, key, body = mo.groups()
@@ -645,6 +664,436 @@ def _flow_profile(block):
 
     block = re.sub(r"^( +)(\w+):\n((?:\1- - \S+\n(?:\1  - \S+\n)+)+)", points, block, flags=re.M)
     return re.sub(r"^( +)(\w+):\n((?:\1- \S+\n)+)", numbers, block, flags=re.M)
+
+
+# ---------------------------------------------------------------------------
+# The hull's shape (package 75, SW-2b.1; docs/design/Build-Ships.md §5.0, §5.1, §5.3): the
+# helpers through which every ship's builder writes stage 0H's shape keys. `hull_profile` takes
+# their six lines of points as parts; `hull_form` adds the form and the marks, and checks the
+# hull as `freesail/ship/form.py` draws it against the file; `midship_section` makes a section
+# by Steel's sweeps for a hull with no measured one; `from_steel_table` makes a stand-in's main
+# breadth and section points from one of Steel's bodies tables. The shape is drawn only: nothing
+# the physics, the guns or the lee ports read is taken from it, and no port triple is ever
+# written from the drawing (§5.0 principle 8).
+# ---------------------------------------------------------------------------
+
+# The keel's half-siding where a made section is given none: the main keel's siding at midships
+# as a share of the moulded breadth, Steel 1805 Folio I, rows K and S (read:
+# ships-design/pages-steel-1805-bodies.md §4): 1 ft 4 in of 37 ft 6 in in the frigate of 36,
+# 1 ft 1 in of 29 ft 3 in in the cutter, 0.036 and 0.037; the coasting sloop's 10 in of 16 ft
+# 4 in, 0.051, is a merchant's keel (judgement: the ships of war's share).
+KEEL_SIDING_OF_BREADTH = 0.036
+# A made section's arcs are set down in steps of no more than this (judgement: a section in a
+# file is a few points to the centimetre, as a draught's are read off it).
+SWEEP_STEP_DEG = 15.0
+
+
+def hull_form(hull, notes, *, form, marks, measured=()):
+    """The hull's form and its marks added to its profile (Build-Ships.md §5.1, §5.3: stage
+    0H's `form` and `marks`), and the hull as drawn checked against the file. `hull` is the
+    ship's hull mapping, her profile in it from `hull_profile` and her displacement and draught
+    beside it; `notes`, her hull notes. `form` is {fullness, stern, head} in §5.1's form and
+    `marks` each line's one word, {line: word} (§5.0 principle 4); either None or empty gives
+    none. The form is written in the schema's order, its metres to the centimetre and its
+    fullness to two places, a band's count of lights whole and its words as given (not through
+    `_centimetres`, which would make a count a float); the marks in the profile's order.
+
+    Whatever the load would refuse raises ValueError with the schema's own sentence, and then
+    `freesail.ship.form.check` draws the hull, raising where the drawing fails. Written into the
+    notes, beside the file's own figures and never in their place (§5.0 principles 7 and 8):
+    the drawn displacement beside the filed one (`displacement_kg`), the drawn depth beside the
+    draught (`draught_m`), and each port triple's gap to the drawn side at its sill, deck by
+    deck (`profile.ports_m.<deck>`). `measured` names the triples the ship's sources measured,
+    each a deck word (all its ports) or (deck word, x): a gap over `form.PORT_GAP_M` raises for
+    one of them and is reported for every other. No triple is ever written from the drawing.
+    Returns each triple's gap in metres, the drawn side less the triple's half-breadth, keyed
+    (deck word, x)."""
+    from freesail.ship import form as drawn
+    from freesail.ship.schema import ShipFileError, _parse_hull
+
+    profile = hull.get("profile") if isinstance(hull, dict) else None
+    if not isinstance(profile, dict):
+        raise ValueError("hull_form: the hull has no profile; hull_profile makes it first.")
+    if "form" in profile or "marks" in profile:
+        raise ValueError(
+            "hull_form: the profile has its form or its marks already; hull_form adds them once."
+        )
+    shaped = dict(profile)
+    if form:
+        shaped["form"] = _form_figures(form)
+    if marks:
+        shaped["marks"] = _marks_in_order(marks)
+    try:
+        spec = _parse_hull({**hull, "profile": shaped}, "hull_form")
+    except ShipFileError as e:
+        raise ValueError(str(e)) from e
+    try:
+        lines = drawn.check(spec)
+    except ValueError as e:
+        raise ValueError(f"hull_form: {e}") from e
+
+    ports = dict(spec.profile.ports_m)
+    named = set()
+    for entry in measured:
+        if isinstance(entry, str):
+            if entry not in ports:
+                raise ValueError(
+                    f"hull_form: measured names the {entry} deck's ports, and the profile gives "
+                    f"that deck none; its port decks are {', '.join(ports) or 'none'}."
+                )
+            named |= {(entry, x) for x, _sill, _hb in ports[entry]}
+            continue
+        word, x = entry
+        at = [t[0] for t in ports.get(word, ()) if abs(t[0] - x) < 0.005]
+        if not at:
+            raise ValueError(
+                f"hull_form: measured names the {word} port at x {x:g}, and the profile gives "
+                "no port there; name a triple by its deck and its x to the centimetre."
+            )
+        named.add((word, at[0]))
+    gaps = {}
+    for word, triples in spec.profile.ports_m:
+        for x, sill, hb in triples:
+            gaps[(word, x)] = drawn.half_breadth_at(spec, x, sill) - hb
+    wrong = [(k, g) for k, g in gaps.items() if k in named and abs(g) > drawn.PORT_GAP_M]
+    if wrong:
+        each = "; ".join(f"the {w} port at x {x:g}, {g:+.2f} m" for (w, x), g in wrong)
+        raise ValueError(
+            f"hull_form: the drawn side misses a measured port triple by more than "
+            f"{drawn.PORT_GAP_M:g} m at its sill: {each}. A port is never moved to the drawing "
+            "(Build-Ships.md §5.0 principle 8): mend the shape's lines, or measure the port again."
+        )
+
+    hull["profile"] = shaped
+    said = "The hull as drawn (freesail/ship/form.py):"
+    _add_note(notes, "displacement_kg", f"{said} {_line_of(lines, 'drawn displacement ')}.")
+    _add_note(notes, "draught_m", f"{said} {_line_of(lines, ' deep at the greatest section')}.")
+    for word, triples in spec.profile.ports_m:
+        off = [x for x, _sill, _hb in triples if abs(gaps[(word, x)]) > drawn.PORT_GAP_M]
+        figures = ", ".join(f"{round(gaps[(word, x)], 2) + 0.0:+.2f}" for x, _s, _h in triples)
+        text = f"{said} the side at each sill, aft to forward, off the half-breadth by {figures} m"
+        if off:
+            text += (
+                f"; more than {drawn.PORT_GAP_M:g} m at x {', '.join(f'{x:g}' for x in off)}, "
+                "reported and never moved to the drawing"
+            )
+        mine = sum(1 for x, _s, _h in triples if (word, x) in named)
+        if mine:
+            text += f"; the {mine} measured each within {drawn.PORT_GAP_M:g} m"
+        _add_note(notes, f"profile.ports_m.{word}", text + ".")
+    return gaps
+
+
+def _form_figures(form):
+    """The profile's `form` as `hull_form` writes it: its keys in the schema's order and the
+    stern's likewise (any other after them, for the schema to refuse in words); a key given
+    None left out; its metres to the centimetre, the fullness to two places, a band's count of
+    lights whole, its words as given."""
+    from freesail.ship.schema import FORM_KEYS, STERN_KEYS
+
+    if not isinstance(form, dict):
+        return form
+    out = {}
+    for key in _schema_order(form, FORM_KEYS):
+        v = form[key]
+        if v is None:
+            continue
+        if key == "stern" and isinstance(v, dict):
+            kept = [k for k in _schema_order(v, STERN_KEYS) if v[k] is not None]
+            v = {k: _stern_figure(k, v[k]) for k in kept}
+        elif key == "fullness":
+            v = _centimetres(v)
+        out[key] = v
+    return out
+
+
+def _stern_figure(key, v):
+    """One of the stern's keys as written: its type a word, a band of lights [z_low, z_high,
+    n, hb] with its count whole, every other figure metres to the centimetre."""
+    if key == "type":
+        return v
+    if key == "lights_m" and isinstance(v, list | tuple):
+        return [
+            [*_centimetres(band[:2]), _whole(band[2]), _centimetres(band[3])]
+            if isinstance(band, list | tuple) and len(band) == 4
+            else _centimetres(band)
+            for band in v
+        ]
+    return _centimetres(v)
+
+
+def _whole(n):
+    """A count as a whole number where it is one (a float of a whole number to an int);
+    anything else left for the schema to refuse in words."""
+    if isinstance(n, float) and n.is_integer():
+        return int(n)
+    return n
+
+
+def _schema_order(given, keys):
+    """A mapping's keys in the schema's order, and any the schema does not know after them."""
+    return [k for k in keys if k in given] + [k for k in given if k not in keys]
+
+
+def _marks_in_order(marks):
+    """Each line's word in the profile's order: its lines, then the form's groups, each group's
+    stern keys after it; any other after them, for the schema to refuse in words."""
+    from freesail.ship.schema import FORM_KEYS, PROFILE_KEYS, STERN_KEYS
+
+    order = [k for k in PROFILE_KEYS if k not in ("form", "marks")]
+    for group in FORM_KEYS:
+        order.append(f"form.{group}")
+        if group == "stern":
+            order += [f"form.stern.{k}" for k in STERN_KEYS]
+    if not isinstance(marks, dict):
+        return marks
+    named = {str(k): w for k, w in marks.items()}
+    return {k: named[k] for k in _schema_order(named, order)}
+
+
+def _line_of(lines, words):
+    """The one of `form.check`'s lines that says `words`."""
+    return next(line for line in lines if words in line)
+
+
+def _add_note(notes, key, text):
+    """A sentence added to a hull note, after what it says already."""
+    notes[key] = f"{notes[key]} {text}" if notes.get(key) else text[0].upper() + text[1:]
+
+
+def midship_section(
+    *,
+    half_breadth,
+    breadth_z,
+    depth,
+    deadrise_deg,
+    bilge_m,
+    tumblehome_m,
+    rail_z,
+    half_siding=None,
+):
+    """A midship section, [[z, half_breadth], ...] low to high, metres to the centimetre, z above
+    the water, by Steel's sweeps simplified (Steel 1805, OCR l. 2862-2883, "FRAMES", and
+    11753-11785, "SWEEPS"), for a hull with no measured one (Build-Ships.md §5.1, §5.3; its line
+    is marked `judged`):
+    - the floor, straight from the keel's edge, `half_siding` out and `depth` below the water,
+      rising at `deadrise_deg` (Steel: "a straight line ... drawn from the upper edge of the keel
+      to touch the back of the floor sweep");
+    - the bilge, one arc of radius `bilge_m` tangent to the floor and to the side (Steel's
+      floor sweep, reconciling sweep and lower breadth sweep taken as one);
+    - the side, upright to the main breadth, `half_breadth` at `breadth_z` (Steel's lower and
+      upper heights of breadth taken as one);
+    - the topside, Steel's upper breadth sweep and top-timber hollow taken as two equal arcs,
+      the one turned against the other, from the breadth to the rail, `tumblehome_m` inside it (less
+      than nothing, a flare) at `rail_z`, upright at both.
+    `half_siding`, the keel's, is by default Steel's share of the breadth
+    (`KEEL_SIDING_OF_BREADTH`). Figures that make no section raise ValueError in words: a bilge
+    too great for the floor and the side to hold, a floor reaching the side above the breadth, a
+    rail at or below it, a topside leaning in or out as far as it rises."""
+    figures = {
+        "half_breadth": half_breadth,
+        "breadth_z": breadth_z,
+        "depth": depth,
+        "deadrise_deg": deadrise_deg,
+        "bilge_m": bilge_m,
+        "tumblehome_m": tumblehome_m,
+        "rail_z": rail_z,
+    }
+    if half_siding is not None:
+        figures["half_siding"] = half_siding
+    for name, v in figures.items():
+        if isinstance(v, bool) or not isinstance(v, int | float) or not math.isfinite(v):
+            raise ValueError(f"midship_section: {name} is {v!r}, which is not a number.")
+    big_y, z_b, z_r, r, t = half_breadth, breadth_z, rail_z, bilge_m, tumblehome_m
+    z_k = -depth
+    y_k = KEEL_SIDING_OF_BREADTH * big_y if half_siding is None else half_siding
+    if not depth > 0.0:
+        raise ValueError(
+            f"midship_section: the keel's edge is {depth:g} m down; the depth below the water is "
+            "more than nothing."
+        )
+    if not 0.0 < y_k < big_y:
+        raise ValueError(
+            f"midship_section: the keel's half-siding is {y_k:g} m against a main half-breadth of "
+            f"{big_y:g} m; it is more than nothing and less than the half-breadth."
+        )
+    if not z_k < z_b < z_r:
+        raise ValueError(
+            f"midship_section: the keel's edge at z {z_k:g}, the main breadth at {z_b:g} and the "
+            f"rail at {z_r:g} m; each stands above the last."
+        )
+    if not 0.0 <= deadrise_deg < 90.0:
+        raise ValueError(
+            f"midship_section: a deadrise of {deadrise_deg:g} degrees; the floor rises from the "
+            "keel at nothing or more, and less than upright."
+        )
+    if not r >= 0.0:
+        raise ValueError(
+            f"midship_section: a bilge of radius {r:g} m; a radius is not less than nothing."
+        )
+    if not t < big_y:
+        raise ValueError(
+            f"midship_section: a tumblehome of {t:g} m leaves the rail no half-breadth inside the "
+            f"main half-breadth of {big_y:g} m."
+        )
+    if not abs(t) < z_r - z_b:
+        raise ValueError(
+            f"midship_section: a tumblehome of {t:g} m on a topside {z_r - z_b:.2f} m high; the "
+            "side leans in or out less than it rises."
+        )
+    a = math.radians(deadrise_deg)
+    sa, ca = math.sin(a), math.cos(a)
+    corner = z_k + (big_y - y_k) * sa / ca  # where the floor alone meets the side
+    if corner > z_b:
+        raise ValueError(
+            f"midship_section: the floor, rising at {deadrise_deg:g} degrees from the keel's edge, "
+            f"meets the side at z {corner:.2f}, above the main breadth at {z_b:g} m; a smaller "
+            "deadrise or a higher breadth is wanted."
+        )
+    # the bilge's centre stands no higher than the breadth, and its foot on the floor no nearer
+    # the middle line than the keel's edge
+    fits = min(((z_b - z_k) * ca - (big_y - y_k) * sa), big_y - y_k) / (1.0 - sa)
+    if r > fits + 1e-9:
+        raise ValueError(
+            f"midship_section: a bilge of radius {r:g} m does not fit between the floor and the "
+            f"side below the main breadth; with these figures it is at most {fits:.2f} m."
+        )
+    z_c = z_k + (r + (big_y - r - y_k) * sa) / ca
+    pts = [(z_k, y_k)]
+    turn = a - 0.5 * math.pi  # the floor's tangent point, seen from the bilge's centre
+    steps = max(1, math.ceil((90.0 - deadrise_deg) / SWEEP_STEP_DEG))
+    for i in range(steps + 1):
+        th = turn * (1.0 - i / steps)
+        pts.append((z_c + r * math.sin(th), big_y - r + r * math.cos(th)))
+    if z_b > z_c:
+        pts.append((z_b, big_y))
+    h = z_r - z_b
+    if t == 0.0:
+        pts.append((z_r, big_y))
+    else:
+        s = 1.0 if t > 0.0 else -1.0
+        sweep = (t * t + h * h) / (4.0 * abs(t))  # each arc's radius, the two meeting halfway
+        phi = math.asin(min(1.0, 0.5 * h / sweep))
+        n = max(1, math.ceil(math.degrees(phi) / SWEEP_STEP_DEG))
+        for i in range(1, n + 1):  # the upper breadth sweep, from the breadth to halfway
+            p = phi * i / n
+            pts.append((z_b + sweep * math.sin(p), big_y - s * sweep * (1.0 - math.cos(p))))
+        for i in range(n - 1, -1, -1):  # the hollow, from halfway to the rail
+            p = phi * i / n
+            pts.append((z_r - sweep * math.sin(p), big_y - t + s * sweep * (1.0 - math.cos(p))))
+    out = []
+    for z, hb in pts:
+        point = [round(z, 2) + 0.0, round(hb, 2) + 0.0]
+        if out and point[0] <= out[-1][0]:
+            if len(out) == 1 and point[0] == out[0][0] and point[1] > out[0][1]:
+                out.append(point)  # a flat floor: the keel's edge, then the bilge's foot
+            elif point[0] == out[-1][0]:
+                out[-1] = point  # a centimetre apart: the later stands, the rail last of all
+            continue
+        out.append(point)
+    return out
+
+
+def feet_and_inches(v):
+    """Feet and inches as Steel's tables print them ('18 10', '17 4¼', '0 8'), or a number of
+    feet as it is, in feet."""
+    if isinstance(v, int | float) and not isinstance(v, bool):
+        return float(v)
+    try:
+        feet, inches = str(v).replace("¼", ".25").replace("½", ".5").replace("¾", ".75").split()
+        return float(feet) + float(inches) / 12.0
+    except ValueError:
+        raise ValueError(f"'{v}' is not feet and inches as Steel prints them ('18 10½').") from None
+
+
+def from_steel_table(rows, *, length_ratio, beam_ratio):
+    """One of Steel's bodies tables (1805; ships-design/pages-steel-1805-bodies.md §3: the
+    frigate of 36 guns, the cutter of 273 tons, the coasting sloop of 60 tons) as a stand-in's
+    main breadth and section points (Build-Ships.md §5.0 principles 5 and 7, §5.3). Returns the
+    parts for `hull_profile`, {`breadth_line`, `sections`}, and their marks for `hull_form`,
+    each `stand-in` (S†).
+
+    `rows` is the table as read, every height above Steel's base (the rabbet) and every breadth
+    in Steel's feet and inches ('18 10½') or in feet:
+    - `water`: the load line above the base, [[x, height], ...] aft to forward (§5.1), straight
+      between its points and held beyond them;
+    - `diagonals`: each [its height up the middle line, [its end's half-breadth, its end's
+      height]], the 1st first (§3, "the diagonals");
+    - `timbers`: aft to forward, each [its name, x, the lower height of breadth (None where the
+      table prints one height), the upper, the main half-breadth, [its length down each
+      diagonal, None where Steel leaves it blank]], x forward of the table's mid-perpendiculars
+      in metres (§5.2).
+
+    At each timber the main breadth is the upper height of breadth at the main half-breadth;
+    the section's points are each diagonal's and the lower height of breadth's, moulded as
+    Steel's are. The top-timber line is the file's rail, from her own source, not the
+    stand-in's (§5.0 principle 7). Scaled by principle 7: x by `length_ratio`, the waterlines'
+    lengths hers over the table's; the heights above the water and the half-breadths by
+    `beam_ratio`, the beams', so that the stand-in's floor, tumblehome and flare keep their
+    angles. Every figure to the centimetre; a point of a timber within a centimetre of the one
+    below it, so rounded, is left out."""
+    from freesail.ship.profile import interp
+
+    for name, ratio in (("length_ratio", length_ratio), ("beam_ratio", beam_ratio)):
+        if isinstance(ratio, bool) or not isinstance(ratio, int | float) or not ratio > 0.0:
+            raise ValueError(
+                f"from_steel_table: {name} is {ratio!r}; a ratio is more than nothing."
+            )
+
+    def feet(v, where):
+        """A figure of the table in feet, refused with its place in the table named."""
+        try:
+            return feet_and_inches(v)
+        except ValueError as e:
+            raise ValueError(f"from_steel_table: {where}, {e}") from None
+
+    water = sorted((float(x), feet(h, "the load line")) for x, h in rows["water"])
+    diagonals = []
+    for i, (height, (out, up)) in enumerate(rows["diagonals"], start=1):
+        h = feet(height, f"diagonal {i}")
+        vy, vz = feet(out, f"diagonal {i}"), feet(up, f"diagonal {i}") - h
+        n = math.hypot(vy, vz)
+        diagonals.append((h, vy / n, vz / n))
+    breadth_line, sections = [], []
+    last = None
+    for name, x, lower, upper, main, reaches in rows["timbers"]:
+        where = f"timber {name}"
+        if last is not None and not x > last[1]:
+            raise ValueError(
+                f"from_steel_table: timber {name} at x {x:g} is not forward of timber {last[0]} "
+                f"(x {last[1]:g}); the timbers run aft to forward."
+            )
+        if len(reaches) != len(diagonals):
+            raise ValueError(
+                f"from_steel_table: timber {name} gives {len(reaches)} diagonals and the table "
+                f"{len(diagonals)}; give None where Steel leaves one blank."
+            )
+        last = (name, x)
+        load = interp(water, x)
+        main_ft = feet(main, where)
+
+        def at(z_ft, hb_ft, x=x, load=load):
+            """A point of this timber above Steel's base, as the file's [x, z, hb], scaled."""
+            return [
+                _centimetres(x * length_ratio),
+                _centimetres((z_ft - load) * FT * beam_ratio),
+                _centimetres(hb_ft * FT * beam_ratio),
+            ]
+
+        breadth_line.append(at(feet(upper, where), main_ft))
+        points = [
+            at(h + feet(d, where) * uz, feet(d, where) * uy)
+            for (h, uy, uz), d in zip(diagonals, reaches, strict=True)
+            if d is not None
+        ]
+        if lower is not None:
+            points.append(at(feet(lower, where), main_ft))
+        for point in sorted(points, key=lambda p: p[1]):
+            if sections and sections[-1][0] == point[0] and point[1] <= sections[-1][1]:
+                continue
+            sections.append(point)
+    parts = {"breadth_line": breadth_line, "sections": sections}
+    return parts, {"breadth_line_m": "stand-in", "sections_m": "stand-in"}
 
 
 class Builder:
@@ -1028,7 +1477,8 @@ class Builder:
             text,
             flags=re.M,
         )
-        # the hull's profile (package 75) likewise, each of its lists on one line; only inside
+        # the hull's profile (package 75) likewise, each of its lists on one line and
+        # `sections_m` one station to a line, the form's mappings left as blocks; only inside
         # `  profile:`, so that no other list in a file moves
         text = re.sub(
             r"^  profile:\n(?:    .*\n)+", lambda mo: _flow_profile(mo.group(0)), text, flags=re.M
