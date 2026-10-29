@@ -38,6 +38,12 @@ class Clock:
             self._bell_last_tick = self.tick
         return n
 
+    def bells_struck(self) -> int | None:
+        """Bells struck at this tick, or None, without the once-a-tick guard: the clock is
+        one and the bell each hull's (package 84, step 6), so the guard is the hull's
+        (`World._bells_struck`)."""
+        return units.bells_at(self.ship_time)
+
     def stamp(self) -> str:
         return units.time_stamp(self.ship_time)
 

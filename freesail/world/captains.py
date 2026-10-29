@@ -2126,6 +2126,9 @@ class Captain(Judgement):
         # until `captain: carry on` gives her back to him
         self.aside = False
         self.last_judged = -1
+        # the tick of his making: his first judgement comes `JUDGE_FIRST_S` after it, on
+        # the one clock (package 84, step 6; a crewed ship's World counted from its own zero)
+        self.made_at = int(getattr(getattr(world, "clock", None), "tick", 0) or 0)
         self._seen_log = 0
         self._road_said: dict[str, int] = {}
         self._state_entered: int | None = None
@@ -2368,7 +2371,7 @@ class Captain(Judgement):
         tick = world.clock.tick
         if tick - self.last_judged < JUDGE_EVERY_S and self.last_judged >= 0:
             return
-        if self.last_judged < 0 and tick < JUDGE_FIRST_S:
+        if self.last_judged < 0 and tick < getattr(self, "made_at", 0) + JUDGE_FIRST_S:
             return
         self.last_judged = tick
         events = [world.log[i] for i in range(self._seen_log, len(world.log))]
