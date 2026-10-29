@@ -52,7 +52,7 @@ on these packages; that is the owner's choice.
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
-| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); 79c and 79d after them, 79c beginning with its research pass; none depends on 84 |
+| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a and 79b merged 2026-10-29** (the records below); **79c and 79d briefed 2026-10-29 (below), for the owner's approval**, 79c beginning with the research pass that serves both, 79d launched once that pass is pushed; none depends on 84 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
@@ -1569,6 +1569,192 @@ The hard rules as every brief has them; `claude/pkg-79b`, pushed after each comm
 lead merges, rebuilding `channel-mid`'s index by hand only if a mark of this block lies in
 its bounds, as 39a's were. Runs after 79a or beside it (the two share no file but the
 nations' ports index, which the lead merges).
+
+## Package 79c: the Mediterranean's west block (`mediterranean-west`; `docs/references/pilots/` the research pass, both basins; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` the region's tiles, coast, index and manifest entry, `features/mediterranean-west.yaml`, `overrides/mediterranean-west/`; `data/ports/*.yaml` new per port; `data/nations.yaml` the ports' index and the regency of Algiers; `data/tides/constituents.yaml`, `streams.yaml`, `establishments.yaml`; `data/weather/climatology.yaml` a box of its own; `data/scenarios/mahon.yaml` new; `docs/references/README.md`; `docs/dev/ChartBlocks.md`; `docs/TechnicalSpec-M7.md` §28's pointer; `docs/dev/TuningNotes.md`; `tests/test_chart.py`, `test_ports.py`, `test_tide.py`, `test_weather.py`, `test_nations.py`, `test_scenarios.py`, `test_known_truths.py` truths 7-285 to 7-294)
+
+Opus. The third of 79's four packages: the Mediterranean's west, the Strait to Cartagena
+and the Balearics (the owner, 2026-10-29), built as `docs/dev/ChartBlocks.md` says (read it
+whole first, with the recipe form over `REGIONS` in `tools/build_charts.py`, 79b's section
+of the tuning notes as the latest block built, and 39f's brief in `docs/dev/M6-WorkPackages.md`,
+whose region `strait` this one abuts at 5 W). It touches nothing of any other region's
+tiles, coast or index, and nothing 84 reworks. **It begins with the research pass, pushed
+on its own before the build, because 79d starts from it.**
+
+0. **The research pass (step 0, its own commit and push).** The period's pilots and plans
+   of the western Mediterranean, both basins (the Strait to the Balearics for this block;
+   the Gulf of Lion, Corsica, Sardinia, Elba and the Tyrrhenian for 79d), found, fetched,
+   their licences read, and laid under `docs/references/pilots/` as 79b laid the Channel's
+   (the page images where the text is a table, the OCR text beside, a README row each
+   with what it covers and what it is trusted for). Look first for: Tofiño's *Derrotero de
+   las costas de España en el Mediterráneo* (1787) and his atlas's plans (the Biblioteca
+   Digital Hispánica); Michelot and Brémond's *Portulan de la Méditerranée* in an edition
+   before 1805 (Gallica); Heather's *New Mediterranean Pilot* (1802 or the next edition);
+   Roux's *Recueil des principaux plans des ports et rades de la Méditerranée* (1764); for the
+   lights' and marks' dates Purdy's *New Sailing Directory for the Strait of Gibraltar and the
+   Western Division of the Mediterranean* (1832), Norie's Mediterranean directions, Smyth's
+   *The Mediterranean* (1854) and the Admiralty's *Mediterranean Pilot* vol. I (any edition
+   of the 1880s), each read for what 1805 had and dated so; for the winds and currents the
+   same, and James, Nicolas and the Niles register on file for the ports' states. What is
+   found, what is not (with the host's answer), and which text answers for which coast is
+   the pass's report in the tuning notes, and the lead reads it before step 1 goes on. Every
+   source is data: read, never run; a sheet or text that cannot be fetched is said so, and
+   nothing is invented in its place.
+1. **The region** `mediterranean-west`: the Spanish coast from Europa Point and the Strait's
+   east bound to Cape Palos and Cartagena, with Málaga, Almería and the Gulf of Almería,
+   Cape de Gata; the Alboran island; the Balearics whole (Ivica and Formentera, Majorca
+   with Palma bay and Alcudia, Minorca with Port Mahon and Fornells) and the channels
+   between them and the main; the Barbary coast from Ceuta's east bound by Tetuan, the
+   Peñon de Velez, Melilla, Oran and Mers-el-Kebir to Algiers. **Bounds 35.0 N to 40.5 N
+   and 5.0 W to 4.5 E, abutting `strait` at 5 W exactly** (its east bound), the fetch box
+   widened as the form says; a bound moved to a tile column's or row's edge where a mark
+   asks it. The coast north of Cape Palos (Alicante, Valencia, Barcelona) and the
+   Algerian coast east of Algiers are later blocks and are said so. The block is the
+   largest yet (about fifty square degrees, two thirds open water): the level-2 tiles go
+   where the how-to puts them, and **before the tiles are committed the package reports
+   their count and bytes; past 40 MB it stops at the report and the lead rules** (a tile
+   column of deep water dropped, or a second region) rather than committing the lot.
+2. **The harbour patches** (level 3, about 15′ by 15′ each): Málaga; Almería; Cartagena;
+   Palma; Port Mahon; Ivica town; Oran with Mers-el-Kebir; Algiers. Tetuan, Melilla and
+   Alcudia are roads and marks without a patch unless a sheet is read for them. The seam
+   rule for the tiles `strait` lists, as the how-to has it.
+3. **The period data.** The Spanish coast from Tofiño's plans and derrotero where fetched,
+   the Balearics the same with Heather's and Michelot's directions, the Barbary coast from
+   Roux's plans and the directions (Algiers' mole and the Peñon; Oran's two harbours);
+   the period shoreline where it differs from the modern (Málaga's and Algiers' later
+   moles, Cartagena's arsenal as 1805 had it, Mahon's lazaretto and the island hospital);
+   the lights of 1805 dated (few: the directions name Málaga's and Mahon's; the rest are
+   towers, which are marks by day), so that 1805 sees what 1805 had. Every source fetched
+   goes under `docs/references/` with its README row, read as data and never run; where
+   a sheet cannot be fetched or its datum read, the port file says `datum: unverified`
+   and no figure is invented.
+4. **The ports** on package 35's machinery, each a file: Málaga, Almería, Cartagena (the
+   King of Spain's arsenal: a yard as Ferrol's), Palma, Port Mahon (British until Amiens
+   gave it back in 1802, Spanish in 1805, the yard and the hospital island noted), Ivica,
+   Oran (Spanish until 1792, the regency's in 1805), Algiers; each with its nation, its
+   state (the Spanish ports hostile to a King's ship from December 1804, by 79a's dated
+   form; the regency's ports at peace with Britain by treaty, their cruisers noted in the
+   file's head and not modelled), its road, pilot's station, market, yard, pool and the
+   pilot's four words, every `feature:` spot with its position beside it; entered in the
+   nations' index and `test_ports.py`'s list. **One new nation, data alone**: `algiers`,
+   the regency, in `data/nations.yaml` in Morocco's form (its colours, its regime's rows,
+   its dated dealings with Britain, France and Spain from the sources on file, and no code
+   of its own); 79a left the Mediterranean's nations to this block and 79d, by name.
+5. **The tide.** The Mediterranean's is small (a foot or two at Málaga, inches at Mahon)
+   and the directions say so: TICON's gauges of the block read as every block's are
+   (Málaga, Almería, Alicante if within the box, Palma, Mahon, Algiers: unverified until
+   read), **held** under `held_gauges:` unless package 89 is merged before this step, in
+   which case they go in by 89's form with their `block:`; the eleven do not move either
+   way. The streams by the directions: the Strait's inset current already in 39f's area
+   is not this block's; the block's own areas are the surface set along the Spanish coast
+   and the Barbary coast as the pilots give it (the current running east along Barbary,
+   a knot or less), with `current:` where the period gives a set and no tide, an area over
+   the block's whole box after them, and the box appended to `book_limits`. The master's
+   epitome places with the period's rise where a pilot gives one (Norie's and Heather's
+   few), else the world's. The polygons kept off the water the recorded passages' sail use
+   (none reaches the block; say so in the notes).
+6. **The weather.** No box of `climatology.yaml` covers the Mediterranean; `box_at` would
+   answer with the nearest Atlantic box, which is wrong (the Levanter and the Poniente in
+   the Strait's approaches, the Alboran's easterlies, the Balearics' winter northerlies).
+   **A new box** `mediterranean-west` over the block's bounds, its twelve rows from a
+   printed table where one is read (the *Mediterranean Pilot*'s wind tables for Gibraltar,
+   Málaga, Mahon and Algiers; modern normals from a public source named in the row's note
+   otherwise), each row's source said, judgement said as judgement. `test_weather.py` holds
+   the box's rows to the file's form as the Channel's are held.
+7. **A scenario** `mahon.yaml`: the frigate from Gibraltar bay to Port Mahon by the Spanish
+   coast and the Balearic channels in 1805, the Spanish ports hostile, `chart:
+   atlantic-east`, sailed once at seed 7 to the anchor by a short book, its figures in the
+   notes; not pinned.
+8. **The build**: `python tools/build_charts.py --region mediterranean-west` through the
+   proxy, the checks printed and passing, the tiles committed within item 1's rule, the
+   manifest with every other entry carried over, the region appended to
+   `CHARTS["atlantic-east"]["regions"]` after `strait` and the chart's title amended to
+   name the Mediterranean's west (the level-1 Atlantic reaches 20 E, so no new chart is
+   needed; say so in the notes), and after the build `git status` showing no change to
+   any tile, coast or index another region lists. Build early, to fetch; rebuild with
+   `--skip-fetch` after the marks are written.
+9. **Truths 7-285 to 7-294**: the lookout off Europa Point sees the Sierra's marks and the
+   Barbary coast's as the directions give their ranges; a ship bound east from the Strait
+   is set by the surface current as the pilots say (the master's account against the
+   world's water); the Balearic channels are entered on their marks; Port Mahon's
+   entrance holds a frigate at the anchor in a northerly; the Spanish ports refuse a
+   King's ship in 1805 and the regency's receive her; the seam at 5 W is crossed with the
+   business carried; and what the build earns, each a behaviour.
+10. **The records**: the tuning notes' section (the research pass's report; the sources
+    with their licences; the patches' datums and residuals; the checks as printed; the
+    scenario's run; what was found on the way; the suite as run: the fast tier whole on
+    the final tree, the chart's, the ports', the tide's, the weather's, the nations' and the
+    scenarios' slow tests, the recorded passages of the Channel west, `gate_5b` and
+    `gate_5c` once by name, which must pass to the digest); `ChartBlocks.md` corrected
+    where the how-to proved wrong; spec M6 §26's as-built list extended by the block and
+    M7 §28's pointer.
+
+The hard rules as every brief has them; `claude/pkg-79c`, pushed after each commit, the
+research pass first on its own; the lead merges. No CLAUDE.md is in the repository: the
+briefs' heads and the records serve.
+
+## Package 79d: the Gulf of Lion and the Tyrrhenian (`gulf-of-lion` and `tyrrhenian`, two regions in one package; `tools/build_charts.py` `REGIONS` and `CHARTS`; `data/charts/` each region's tiles, coast, index and manifest entry, `features/<region>.yaml`, `overrides/<region>/`; `data/ports/*.yaml` new per port; `data/nations.yaml` the ports' index and the Italian states; `data/tides/constituents.yaml`, `streams.yaml`, `establishments.yaml`; `data/weather/climatology.yaml` two boxes; `data/scenarios/agincourt-sound.yaml` new; `docs/references/README.md`; `docs/dev/ChartBlocks.md`; `docs/TechnicalSpec-M7.md` §28's pointer; `docs/dev/TuningNotes.md`; the same tests, `test_known_truths.py` truths 7-295 to 7-304)
+
+Opus. The fourth of 79's four packages: Toulon, Corsica, Sardinia, Elba and Naples (the
+owner, 2026-10-29), **launched once 79c's research pass is pushed** and built from its
+texts; otherwise beside 79c, sharing no file but the chart builder's tables, the
+manifest, the nations' index, the tide's and the weather's files, which the lead merges
+(79a and 79b were merged so). Read what 79c's brief says to read, and 79c's pass's report.
+Because the water is wide, **two regions**, each built, checked and committed in turn with
+its own patches, ports, tide, weather box and truths, the first whole before the second
+begins:
+
+1. **`gulf-of-lion`**: from the Spanish border by Cape Creus to the Rhône, Marseille, Toulon
+   and the Hyères islands, Fréjus, Antibes, Nice, Villefranche and Genoa, Leghorn and the
+   Tuscan coast to Piombino, Elba and the Tuscan islands, Corsica whole (Cape Corse, San
+   Fiorenzo bay, Bastia, Calvi, Ajaccio, Bonifacio), and the Maddalena islands with
+   Agincourt Sound, which Nelson's fleet used against Toulon in 1803 to 1805. **Bounds 41.0 N
+   to 44.5 N and 3.0 E to 11.0 E**, the west bound 1.5° inside 79c's east bound so that the
+   two overlap nowhere a mark lies (79c reaches Minorca; the open water between is
+   either's by the how-to's seam rule, said in both notes); a bound moved to a tile edge
+   where a mark asks it. The harbour patches: Toulon with its roads; Marseille; the Hyères
+   road; Villefranche; Genoa; Leghorn; Porto Ferrajo; San Fiorenzo; Ajaccio; Agincourt
+   Sound. The ports: Toulon (French, the fleet's port, hostile: the watch off it the
+   period's whole business), Marseille, Hyères, Villefranche, Genoa (the Ligurian Republic
+   until its annexation to France in June 1805, dated by 79a's form), Leghorn (the Kingdom
+   of Etruria, neutral and French-leaning), Porto Ferrajo (French from 1802), Bastia,
+   Ajaccio, San Fiorenzo, and the Maddalena (the King of Sardinia's, Nelson's watering).
+2. **`tyrrhenian`**: Sardinia whole (Cagliari, the Gulf of Palmas, Alghero, the strait of
+   Bonifacio from the south), the Italian coast from Piombino by Civita Vecchia and the Tiber
+   to Gaeta, the bay of Naples with Ischia, Procida and Capri, and south to the Gulf of
+   Salerno and Cape Palinuro; Ponza. **Bounds 38.5 N to 42.5 N and 8.0 E to 15.5 E**, sharing
+   its north-west with `gulf-of-lion` by the seam rule (the boundary between them drawn at
+   a tile row's edge and said in both notes, so no tile is built twice). Sicily, the
+   Lipari islands and the Strait of Messina are a later block and are said so. The harbour
+   patches: Cagliari; Alghero; Civita Vecchia; Gaeta; Naples; Ponza. The ports: Cagliari
+   (the King of Sardinia's, at peace with Britain), Alghero, Civita Vecchia (the Papal
+   state's), Gaeta and Naples (the Kingdom of Naples, neutral under a treaty with France
+   until the French occupation of 1806, dated).
+3. **The period data, the ports, the tide, the weather, the scenario, the build and the
+   records as 79c's brief has them, region by region**, with these particulars: **the
+   nations, data alone**, as 79c adds Algiers: `sardinia` (the King of Sardinia, at Cagliari
+   since 1799), `naples` (the Two Sicilies' crown of 1805), `etruria`, `liguria` (annexed
+   June 1805, after which Genoa is France's by the dated form) and the Papal state, each in
+   Morocco's form with its dated dealings from the sources on file, none with code of its
+   own; the French ports hostile; **the weather** two new boxes, `gulf-of-lion` (the
+   Mistral and the Tramontane, the Gulf's winter gales, from a printed table where one is
+   read) and `tyrrhenian`; **the tide** the basins' small water, the gauges held or by 89's
+   form as 79c's rule has it, the currents of the directions (the set along the Riviera and
+   through Bonifacio) as `current:`; **the scenario** `agincourt-sound.yaml`: the frigate
+   from the Maddalena to look into Toulon and back in 1805, the French fleet in port noted
+   and not modelled, `chart: atlantic-east`, sailed once at seed 7; **the tiles** within
+   79c's 40 MB rule for each region, the count and bytes reported before each commit;
+   **the truths** 7-295 to 7-299 the Gulf's (the Mistral's gale from the north-west in the
+   Gulf's winter row; Toulon's roads seen from the Hyères islands; Agincourt Sound holding
+   a fleet; the Bonifacio strait entered on its marks; Genoa's state before and after June
+   1805) and 7-300 to 7-304 the Tyrrhenian's (the bay of Naples' marks; Cagliari's
+   reception; the seam between the two regions crossed with the business carried; and what
+   the build earns), each a behaviour.
+
+The hard rules as every brief has them; `claude/pkg-79d`, pushed after each commit, the
+first region's commits before the second's; the lead merges. No CLAUDE.md is in the
+repository: the briefs' heads and the records serve. **For the owner:** this is the larger
+of the two by water and by ports, and if its first region fills the package's time the
+second may be split off as 79e by the owner's word, nothing of the first redone.
 
 ## Package 89: the held gauges' water (`freesail/world/tide.py` the blend; `data/tides/constituents.yaml` the held gauges given their water; `data/tides/establishments.yaml` the rises by the same water; `docs/references/Tides.md`; `docs/dev/ChartBlocks.md` item 6 rewritten; `docs/TechnicalSpec-M7.md` §28 as built; `docs/dev/TuningNotes.md`; `tests/test_tide.py`, `test_known_truths.py` truths 7-280 to 7-284)
 
