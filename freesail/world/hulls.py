@@ -249,10 +249,15 @@ class Hull:
             raise AttributeError(name)
         world = self.__dict__["world"]
         attr = getattr(type(world), name, _MISSING)
-        if attr is _MISSING:
+        if not isinstance(attr, property) and not callable(attr):
+            # a plain attribute of the World's: the instance's value over a class default
+            # (package 84, step 8: `_acts_frames` is None on the class and a list on the
+            # World, and a hull's station journaled no acts while the class default won)
             if name in world.__dict__:
                 return world.__dict__[name]  # a shared thing set on the instance
-            raise AttributeError(name)
+            if attr is _MISSING:
+                raise AttributeError(name)
+            return attr
         if isinstance(attr, property):
             with world.as_hull(self):
                 return getattr(world, name)
@@ -265,7 +270,7 @@ class Hull:
 
             bound.__name__ = name
             return bound
-        return attr
+        raise AttributeError(name)  # pragma: no cover - every kind is answered above
 
     @property
     def parent(self) -> Any:

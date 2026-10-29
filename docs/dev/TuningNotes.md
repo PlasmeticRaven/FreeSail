@@ -11390,6 +11390,52 @@ Raven's station through the harness losing the deck to the stand-in when its rep
 late under load, not a fault of the step's; a finding for the harness's sampling, noted and
 not mended here.
 
+### Step 8: the save and the replay of many hulls
+
+Built on step 7 as merged (`de36e0a`; the design note's postscript "Step 8" has the shape).
+**What moved: nothing pinned.** No recorded passage has a station on another ship, and the
+followed hull's inputs and acts read as they did (no key). **The count.** `core/acts.py`
+(`hull_id_of`, `target_of`, the hull on each entry, `give` on the entry's hull),
+`core/world.py` (the hull on an input, the acts' capture before the sleeping hull's road, the
+save's `hulls` block), `core/replay.py` (`agent_records`, `acts_whole` and `transcripts_in`
+over the hulls, the hulls' blocks seated when due, `restore_hull`, every hull's stations in
+the loop and at the end), `world/hulls.py` (the façade's plain attributes: the instance over
+the class default); tests: three new (`test_replay.py` two, a fake captain on a promoted
+hull and on a far hull replayed by both roads; `test_checkpoint.py` one, the owner's tender
+save loaded and replayed its first thousand ticks).
+
+**Found on the way.** No act of a station on a hull had been journaled since step 6: the
+façade's `__getattr__` answered `_acts_frames` with the World class's default (None) and
+the harness's `frame` took it for "no journaling"; a hull's fake captain gave orders into
+her log and the save held nothing of them. And a sleeping hull's station order went to
+`crews.submit_far` before the acts' capture, so a seat on a far hull journaled no order.
+Both mended; the two new replay tests are the proof (a far hull's "heave to" by her fake
+captain lies her to in play and in the replay by the acts alike, where before the replay's
+brig sailed on for Falmouth).
+
+**Where this stopped (2026-10-29, 05:10 UTC; the account's usage near its weekly limit, the
+lead's word to push the work as it stands).** Step 8 is built as the postscript says and its
+targeted suites are green (`test_replay.py`, `test_checkpoint.py`, `test_crews.py`,
+`test_hulls.py`, `test_agents.py`, ruff clean); the whole fast tier was running on this tree
+when it was pushed. Next, in order: the fast tier whole on the final tree; the known truths',
+trials' and touched files' slow tier (`--slow -m "slow and not pace"`, the files of step 7's
+list with `test_replay.py` and `test_checkpoint.py`); the pace tests alone and `pace6.py`;
+the figures into this section and the design postscript; the green commit and its report.
+**The fast tier whole on this tree (05:56 UTC): 3920 passed, one failed**, the pictures'
+blank-image check (the known flake, as at step 7); ruff clean. **The slow tier** of the
+known truths, the trials and the touched files (`test_replay.py`, `test_checkpoint.py` and
+`test_agents.py` with step 7's list; 178 tests): 169 passed, eight left out by their own
+marks, one failed, the lee-shore trial's digest (`7fad0ce7e46ba366` against
+`ed48ca3d61e52f20`, this container's figure as at every step). **The pace** (alone): the
+pace tests read lower this hour than at step 7 (truth 51's frigate alone 491, the day under
+systems 458, the gates' day 438, 7-159 402, against the floor of 500), so the three-way A/B
+was run alone, the step 7 head on a worktree at `de36e0a`, this tree, and the head again:
+489/446/451/451, then 485/481/431/432, then 472/459 with the other two over the floor. The
+hour's machine misses the floor on the step 7 head as on this tree, truth 51 among them
+(491 at step 7 was over), and the step's figures lie within the head's own spread: the step
+costs nothing the measure sees, and the container is slower this hour than last. `make_hull`
+of a brig 0.75 s (0.72 at step 7); truth 88's form with three hulls awake 198 ticks a second
+against the crewed floor of 60 (233 at step 7, load 1.0 right after the slow set).
 ## Package 79a: the regimes filled out and sourced (2026-10-29)
 
 Built as an Opus sibling session in its own container on `claude/pkg-79a` off the lead's

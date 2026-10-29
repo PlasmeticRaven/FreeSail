@@ -472,3 +472,31 @@ def test_a_station_left_in_a_playtest_save_is_taken_again_by_the_one_rule(name, 
     again = replay_mod.save_to_file(world, tmp_path / "on.json")
     copy, report = replay_mod.load_report(again, ship_factory)
     assert report.how == "checkpoint" and copy.log.digest() == world.log.digest()
+
+
+def test_the_owners_tender_save_loads_and_replays_its_first_minutes_when_asked():
+    """Package 84, step 8: the owner's `m7-cutter-tender-test.json` (the frigate Amazon with
+    a model as captain of her tender, the cutter Raven, in Torbay; another build's rules, no
+    station in it, since a station on another ship was not saved before this step) loads
+    and replays its first minutes under this build when asked (`--replay-anyway`): the
+    Raven on the sea beside her, the player's orders given at their ticks."""
+    import json
+    from pathlib import Path
+
+    from freesail.api.session import ship_factory
+
+    path = Path(
+        "docs/playtests/2026-10-25-to-27-owner-playtests-70-72/saves/m7-cutter-tender-test.json"
+    )
+    data = json.loads(path.read_text(encoding="utf-8"))
+    assert data["agents"] == [] and "hulls" not in data
+    # no station's transcript in it (hers was not saved before this step): replayed from
+    # its journal under this build's rules, with the words that say so
+    report = replay_mod.check_replay(data, path)
+    assert report.how == "replay" and not report.same_build
+    assert any("written by another build" in w for w in report.words)
+    w = replay_mod.replay(data, ship_factory, until_tick=1000, road=report.road)
+    assert w.clock.tick == 1000 and w.vessels.find("Raven") is not None
+    assert [e.text for e in w.log if e.kind == "order.accepted"][:1] == [
+        "Order: hoist the signal no. 82."
+    ]
