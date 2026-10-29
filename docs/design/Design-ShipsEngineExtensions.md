@@ -917,6 +917,11 @@ Each step is committed, reviewed by its lenses and merged before the next. All t
    `after_gaff_sails_all`, `yards_to_back`); the four settee data files and the vocabulary;
    `tests/test_settee.py`.
 
+*Since (2026-10-28):* B3.4 is D10(a)'s key (`Build-Ships.md` decision 34), and **B3.5, the
+driver**, if the owner and the lead take §17: `_in_each_others_place` in `scripts.py` and
+`_in_its_place` in `orders/storm.py`; `tests/test_driver.py`. It follows B3.1 at a step
+boundary, as these (§17.8).
+
 ### 9.2 The viewer builder (B5)
 
 Draws §6 after each of B3's steps lands, from the fixtures first and the files when they
@@ -1173,7 +1178,10 @@ do:**
 10. **The 74's driver** of 1773, set abaft the mizen course without a boom (Lavery Table 15; Bel
     §13.5): no engine path hangs a sail from another sail's yard (`graph.py:85-92` returns a
     yard's first sail; `_gaff_host` needs a boom, `sails.py:947-961`). The 74's design leaves it
-    out or asks for it.
+    out or asks for it. *Reopened by the owner (2026-10-28), who asked for the driver
+    (`Build-Ships.md` §19.1 item 13):* §17 proposes Steel's driver boomsail of 1794 for the 64
+    and the 74, bent on a boom in the mizen course's place, rather than the 1773 sail that item
+    describes. The owner chose it for both (2026-10-28; §17.9 item 1); it waits on the lead's read.
 11. **The truths' share**: three numbers for the settee (D46(d) with rule 3), and the 64's offered
     to the Indefatigable's (§10.3).
 12. **D10(a)'s key** for the *Neufchatel*'s main topgallant ("yards the handling ignores") would
@@ -1235,3 +1243,649 @@ Three drafts were judged: reuse first, fidelity first, and risk and test first.
    through 7354-7365). §4.2 removes it.
 5. `PEAK_COEFF["studding"]` is 1.25 against the curve's 1.44 (map-engine §10). Not this package's
    to change silently.
+
+---
+
+## 17. Addendum (2026-10-28): the driver of the 64 and the 74
+
+**Why.** The owner asked for the occasional driver of the 64 and the 74 (`Build-Ships.md` §19.1
+item 13), which §14 item 10 had left out. The lead's ruling (`docs/dev/M7-WorkPackages.md`, the
+notes from the lead, "stage 0 read", item 4) asks for this addendum and reads it with the gate's
+lens: the physics' ranges byte-identical, the sail's curve an existing class's, `_gaff_host`'s
+new host a membership and not an equation, and the frigate's polar re-measured equal. Stage 0E
+and B1 do not wait on it.
+
+**Marks** as at the head of this document. The scratch scripts are kept outside the repository
+in the session's scratch folder `stage0e/` (`driver_geom.py`, `driver_cut.py`,
+`driver_polar.py`, `driver_polar2.py`, and for the four-cornered cut `mend17/driver_four.py`
+and `mend17/driver_polar4.py`). They were run from the tree root at 5326e24, with stage
+0E's edits in the working tree; no file of the eight reaches those edits. Nothing is built.
+The *Indefatigable*'s design (`Design-Ship-Indefatigable.md`) is **Indf**. Lever 1808 is read
+in its 1827 printing (`docs/references/README.md`).
+
+**In brief.**
+- **The sail.** Chosen by the owner for both ships (2026-10-28; §17.9 item 1): Steel's
+  **driver boomsail** of 1794, "the driver or spanker" (§17.1). It is a four-sided sail. Its
+  luff is on the mizzen mast, its head runs along the mizen yard's line and on past the
+  yard's peak on Steel's small driver yard, and its foot is on a boom over the stern. It is
+  not the 1773 driver, which hung from the peak on its own yard abaft a set course, and which
+  the owner's item describes.
+- **Beside the course, or in its place.** For these ships the period bent the driver beside
+  the mizen course, the course brailed up while the driver drew (§17.3). The model bends it
+  in the course's place instead, one shifted for the other in a thirteen-minute shift, by
+  choice (§17.3).
+- **The model.** The driver is class `lateen` with `cut_at_mast: true`, the course's own
+  class and key. Its roles are `yard`, `mast` and a new optional `boom`. It is filed
+  `in_place_of: mizzen.course` and starts in the sail room. A `boom` spar is added on the
+  mizzen mast. This is the storm trysail's pattern (a sail bent to the same spars in the
+  working sail's place), not the ringtail's.
+- **The engine.**
+  - Nothing in `freesail/physics/` or `data/sail_classes.yaml` changes, not even a lookup:
+    every physics path reads the boom by its role (§17.4).
+  - `_gaff_host` is not touched, since the driver is no ringtail.
+  - One schema allowance: a lateen cut at the mast may name a boom.
+  - One handling membership: two sails bent in one place are rivals, so the storm mizzen and
+    the driver are never bent together.
+- **Observed.** The frigate's spanker, re-filed in memory as the driver's model, gives her
+  polar and her sails' yaw moment equal at every angle (§17.5).
+- **Who.** Once the lead has read this (the owner has chosen the sail), the stage-0 agent
+  lays the allowance. B3 adds one small step after B3.1, and B5 draws the sail. B1 writes it
+  into `mizen_yard.py` behind a flip of its own at the 64's stage B, and B7 imports it
+  (§17.8).
+
+### 17.1 Which sail, from the evidence
+
+Two sails go by the name:
+- **(a) The older driver.** An oblong sail on its own yard, hoisted to the mizen peak "when
+  the wind is very fair". Its lower corners are spread on a pole over the lee quarter or the
+  taffrail. Sources: Falconer 1780, DRIVER, OCR l. 6843-6846; Röding 1794 vol. I, OCR
+  l. 72694-72718; Lever 1808, OCR l. 8264-8270, as the merchant service's way. It hangs abaft
+  the course, which stays set.
+- **(b) Steel's driver boomsail.** Quadrilateral, "occasionally hoisted to the mizen-yard or
+  gaff, in light fair winds" (Steel 1794 vol. I, DRIVER BOOMSAIL, OCR l. 13816-13843).
+  - Its fore leech is laced to the mizen mast, its head to the yard or gaff, and its foot is
+    on a boom fore and aft.
+  - The fore leech is as deep as the mizen course's, and the after leech two to four yards
+    deeper.
+  - The driver yard "expands the head of the driver without the peek of the gaff" (l. 20863).
+  - It is bent "as a temporary matter" by four or five pair of halyards to the yard or gaff,
+    its tack to the eye-bolt in the throat of the boom and its sheet through the boom's outer
+    end; or "instead of the mizen, it bends exactly the same, only the foot of the sail is
+    extended on the boom" (l. 24523-24538). Both ways spread the foot on the boom. That the
+    first leaves the mizen bent beside it is judgement, with Lever's plate key (§17.3).
+
+**For the owner, plainly.** The driver is a large four-sided sail on the aftermost mast. Its
+front edge is laced to the mast, its top edge hangs along the slanting mizen yard and runs on
+past the yard's end on a short extra yard, and its bottom edge is stretched along a long pole,
+the boom, that reaches out over the stern. In these ships' day it was bent beside the mizen
+course, which was brailed up while the driver drew. In the game it lives in the sail room and
+is shifted for the mizen course, about thirteen minutes' work, when the wind is fair and
+moderate, giving her about twice the sail aft. Shifting one for the other is the game's choice,
+so that only one after sail is ever bent (§17.3). It comes in before it blows hard or when the
+wind is right astern.
+
+**The evidence, by date** (the session's research of 2026-10-28; the marks as found):
+
+| Date | Source | Which sail |
+|---|---|---|
+| 1773 | Lavery 1985, Table 15 (p. 21): 19 and 27 cloths, 21 yd deep, canvas sort 6, 483 yd of canvas, listed after the steering sails. 483 = 23 × 21, a uniform depth, so it was cut as a studding sail is (measured); the same table's mizen course does not check so. On I32 the throat stands about 42 ft above the deck, so a 63-ft leech could not hang at the mast below it (measured): it hung from the peak. I31 does not draw it | (a); read (owner's book), measured |
+| 1780, 1794 | Falconer, DRIVER (and OCR l. 2897-2900, 15944-15946, 20452-20453); Röding: rather a studding sail, set before the wind at the head of the mizen yard or gaff, its sheet on a spar over the quarter gallery | (a); read |
+| 1794 | Steel's Table IV cuts the 64's and the 74's drivers (the two columns read) to the DRIVER BOOMSAIL rule: the 64's fore leech 9½ yd against her mizen's 9¼, after leech 20 against 17¼ (Ind §5); the 74's 11 against 11, 24 against 21 (Bel §5.6). Elsewhere drivers are boom-and-gaff sails (OCR l. 9800-9801) and the "driver boom sail" of the mizen mast (l. 9960). The rigging runs from the mizen yard, used "in ships above 50 guns" (l. 23039-23041), to the "DRIVER or SPANKER-BOOM" (l. 23103-23118) | (b); read, Table IV from the page images, not re-read here |
+| 1794-98 | "Spanker" and "driver" are one sail (Steel l. 24523; Lever l. 8272). *Orion* (74), 1 June 1794: "Mizen yard shot in two in the slings" and her spanker boom wounded, a lateen yard and a boom together (Jackson, *Logs* vol. 1, OCR l. 8189-8196). *Audacious* (74) set the spanker in fresh breezes (l. 7221-7231). *Alexander*'s spanker boom shot away, November 1794 (James vol. 1, OCR l. 15786). *Lancaster* (64), 11 October 1797: cross-jack yard and spanker boom shot away (Jackson vol. 1, l. 21330-21331, 21351). *Agamemnon* (64), 13 March 1795, in a chase on or near a wind: "the driver and after-sails to be braced up and shivered" (Nicolas vol. 2, OCR l. 3193, 3212-3213, 32041; on a wind is judgement). At the Nile (Jackson vol. 2): *Vanguard* "Set driver" in moderate breezes, then set the mainsail and hauled to the wind (l. 2700-2702; her point of sailing before is not given); *Goliath*'s driver cut away (l. 606-608); *Majestic* lost "one mizen" and "one driver" with her main and mizen masts (l. 3683-3688; both bent is judgement); *Culloden* brailed her spanker (l. 4063-4064) | (b); read |
+| 1808 | Lever gives the merchant sail of (a), then "The DRIVER or SPANKER is now cut Mainsail Fashion: and, in this case, it is spread by a Boom". It "acts as a large Mizen", the after part of its head bent to a yard because the gaff will not spread it (OCR l. 8272-8285). The plate key reads "The Driver or Spanker with the Mizen brailed up" (l. 6276-6277) | (b); read |
+
+**Against (b):**
+- Steel's p. 49 spar columns give the 64 and the 74 a driver boom of "0 0" (Ind §3.1; Bel
+  §5.3-§5.4). The driver yard is not in that table, only in the p. 40 rule (as the fore
+  topgallant yard).
+- Steel's vol. II rigging lists rig a boomless driver: two pair of halyards, two sheets, two
+  tacks and a downhauler (the 74's at OCR l. 23831-23833, the 64's at l. 24844-24847). But the
+  same lists rig a lateen mizen yard for the 38 and the 50/44 (l. 26904, 26935-26944, 25832),
+  whose spar columns carry a gaff and a driver boom. So the lists read as an older pattern and
+  weigh little (judgement).
+- Steel's plate of a 20-gun ship groups its driver with the square sails (vol. I, l. 23657,
+  23730-23732, 23773). The plate itself has not been seen.
+
+**The verdict:**
+- **The 64 of her dates, 1784-1794** (her file is the 64 of 1784, rigged by Steel's tables of
+  1794, with the fits "ardent class 1784" and "ardent class 1794": Indf, "Decisions taken",
+  10 and 16): **(b), low confidence.**
+  - For: Table IV's cut of her own column, and the 74s' booms of 1794 beside their lateen
+    mizen yards (*Orion*, *Alexander*).
+  - Against: Steel's 64 column has no boom ("0 0"), and Steel's 64 rigging list rigs the boomless
+    driver above (vol. II, OCR l. 24844-24847). No source
+    names the *Indefatigable*'s own driver (Ind §5). For 1784 nothing was found either way
+    between Falconer's (a) of 1780 and Steel's (b) of 1794.
+  - After her dates: *Agamemnon*'s driver (1795) and *Lancaster*'s boom (1797) bear only on a
+    64 sailing later, as D48(a) may sail her in the razee's scenario (1795-1797 among D25's
+    dates; Indf §11). They are recorded, not counted for her.
+- **The 74 of 1798: (b), good confidence.**
+  - For: the same table, *Orion*'s yard and boom together in 1794, the Nile's logs, and Bel
+    §5.4's own transitional rig, the lateen mizen yard with a boomed driver beside it.
+  - Against: Lavery's table of 1773, 25 years earlier, and Steel's "0 0".
+- **One model serves both**, cut from each ship's Steel figures by one helper (§17.2).
+- **(a) is not proposed.** It is the 1773 establishment's driver and the older or merchant
+  practice. What it would take is recorded in §17.4.
+
+**Plainly:** this departs from what the owner's leave carried on b562bae: sail (a), "a
+ringtail-like sail on a pole over the taffrail, hosted by the mizen course" (`Build-Ships.md`
+§19.1 item 13; the decision sheet's "The 74's driver"). The owner asked for the driver, and for
+these ships' dates the evidence leans to (b), for the 64 weakly. Lever gives (a) as the
+merchant service's way, beside the driver "now cut Mainsail Fashion". It departs too from that
+item's "The mizen course itself stays her after sail": as modelled, the course is unbent while
+the driver is bent (§17.3). *The owner chose (b) for both on 2026-10-28, with these departures
+before them (§17.9 item 1).*
+
+### 17.2 The file contract (the 64's and the 74's modules)
+
+**The sail** `mizzen.driver`:
+- **Class and keys.** Class `lateen`, `cut_at_mast: true`. Roles `yard: mizzen.yard`,
+  `mast: mizzen.mast` and `boom: mizzen.boom`. `in_place_of: mizzen.course`.
+- **In the sail room.** `bent: false`, so it starts the voyage in the sail room as the storm
+  canvas and the occasional sails do (`Sail.from_spec`). The room's list holds one spare of
+  its kind and canvas, under "The occasional sails".
+- **Corners.** `corners_m` are `[tack, throat, peak, clew]`, heights above the deck, cut after
+  the boom's height is fixed (below):
+  - the throat is the course's (the same nock under the same truss), and the tack is below
+    it on the mast's raked line, both within 0.1 m;
+  - the tack is at the boom's jaws, so the fore leech follows from the boom's height, and the
+    clew is along the boom at Steel's foot cloths;
+  - the peak is on the mizen yard's line at Steel's head cloths, abaft and above the yard's
+    peak: the head runs straight along the yard and on along the driver yard, whose inner
+    part lies along the mizen yard's after end (Lever l. 8282-8285: the outer halyards at the
+    gaff's end, bent to the yard "about one-third from the inner Arm").
+- **Area and centre.** `area_m2`, `x_m` and `centre_height_m` come from the four corners, as
+  the course's do (§3.4: the centroid's height plus the deck height).
+- **Reefs.** `reef_bands: 0`: Steel names no reef band in the driver, and `_sail_check`
+  (`orders/verbs.py`) refuses "reef" on a sail with none.
+- **Canvas.** `canvas_no` 5 (Steel: "No. 5 or 6", l. 13819), and `cloth_rating_kn` by
+  `cloth(area, 5)`.
+- **Groups.** "occasional sails" alone, as the frigate's ringtail.
+  - Never "plain sail": `_rigged_for_plain_sail` (`world/ships.py`) sets every sail of that
+    group, bent or not, so the polar would draw the course and the driver together.
+  - Not "courses", which the gale reads, nor "all sail" (`Builder.whole_ship_groups`: the
+    occasional sails are not set with the rest).
+- **Aliases.** "driver", "spanker" and "driver boomsail" name `mizzen.driver`; "driver boom"
+  and "spanker boom" name `mizzen.boom`. The course keeps "mizen" and its kin (Indf §4.7).
+
+**Its figures.** Areas are by Steel's rule: mean cloths by mean depth, at 22½ in to a cloth
+(vol. I, OCR l. 10891-10897). The four corners are measured on the research's geometry
+(`mend17/driver_four.py`, after `driver_geom.py`), the mast upright, the boom level, the 74's
+yard as I32 lies; the 64's jaws 2.4 m above her quarterdeck and the 74's at Steel's fore leech
+(the boom's height, below).
+
+| | The 64 | The 74 |
+|---|---|---|
+| Cloths, head / foot | 22½ / 29 (Ind §5) | 25½ / 32½ (Bel §5.6) |
+| Fore / after leech, Steel's | 9½ / 20 yd (8.69 / 18.29 m) | 11 / 24 yd (10.06 / 21.95 m) |
+| Fore / after leech, as cut | 6.98 / 18.71 m: the fore leech 1.71 m short, the after leech within Steel's "2 to 4 yards deeper" than the course's (17.60-19.43 m) | 10.06 / 22.73 m, within the same rule (21.03-22.86 m) |
+| Area, Steel's rule | 198.5 m² | 265.2 m²; Bel's scaling for her 168 ft (×0.915, judgement) gives 242.7, her design's call as for all her sails |
+| Area, the four corners | 197 m² (−1%) | 281 m² (+6%) |
+| Centre | 8.55 m abaft the mast, 14.51 m above the water | 9.43 m abaft the mast |
+| Against her mizen course | 3.8 m further aft, 1.9 m higher; after sail 104 → 198 m² | 3.9 m aft, 0.9 m higher; 138 → 265 m² |
+| The foot | 16.57 m, the clew about 7 m beyond the taffrail (the mast 31 ft 4 in to 31 ft 11 in before it: Ind §3.3) | 18.57 m, about 7 m beyond the taffrail (I32: about 37½ ft abaft the mast) |
+| The head | 17.15 m on the yard's line, the peak 6.09 m beyond the yard's peak; the driver yard's inner arm 4.4 m inside it, 0.42 of the driver yard | 19.08 m, 5.39 m beyond; the inner arm 6.95 m inside, 0.56 |
+| Canvas | No. 5 | No. 5 |
+
+**The boom** `mizzen.boom`:
+- **Class and place.** Class `boom`, `on: mizzen.mast`.
+- **Length.** By Steel's p. 40 rule, the main topsail yard's length: 65 ft 4 in × 12⅛ in
+  (19.91 m) for the 64 (Indf §4.5, read for the razee's boom), and 70 ft 0 in × 13 in
+  (21.34 m) for the 74 (Bel §5.3). The foot is then 0.83 and 0.87 of the boom, as the
+  frigate's spanker foot is 0.9 of hers.
+  - **Plainly:** Steel's p. 49 column gives both ships "0 0". The rule is the only figure.
+    *Orion*'s and *Alexander*'s booms of 1794 are the evidence that 74s carried one beside a
+    lateen mizen yard; *Lancaster*'s of 1797 is the only 64's, after her dates (§17.1).
+- **Height, fixed first.** The boom lies level, its jaws on the mast, clear of the
+  quarterdeck rail, the roundhouse and the taffrail; `height_m` is the jaws, and the sail's
+  tack is cut to them.
+  - Steel's fore leech would put the 64's jaws about 0.7 m above her quarterdeck at the mizen
+    (measured: the throat 14.85 m above the water, less 8.69 m, against the quarterdeck's
+    5.47 m), below a rail of 4 ft 6 in (the razee's quarterdeck rail, Indf §3.2). The 64's own
+    rails, roundhouse and taffrail are still "to measure" there.
+  - Until they are measured, her jaws stand 2.4 m above her quarterdeck, as the frigate's
+    boom stands above her deck (`frigate-36.yaml`, `mizzen.boom`) (judgement). Her fore leech
+    is then 6.98 m against Steel's 8.69; that shortfall is the cost (§17.9 risk 4).
+  - The four corners hold the 10% check from the jaws at the rail (212 m², +7%) to about
+    3.6 m above her quarterdeck (179 m², −10%) (measured, `driver_four.py`). If the profile
+    wants them higher, B1 reports it to the lead rather than force the cut.
+  - The 74's fore leech puts her jaws about 2.7 m above her quarterdeck (I32: the throat about
+    42 ft above it), at or above the frigate's height; her poop is B7's to measure.
+- **Horse.** `horse_m` as the frigate's (`HORSE_NOTE`). Steel's guy pendants lead to "the
+  horse within the taffarel" (l. 23118-23121), and the sheet's geometry reads it
+  (`evolutions/trim.py`, `sheet_geometry`).
+- **Rating.** `rating_kn` is `design_kn([(area, centre, "gaff")], DESIGN_WIND_KN["gaff"])`,
+  as the frigate's spanker boom.
+  - The rating pass loads nothing on a boom whose only sail starts unbent
+    (`Builder.rate_spars`: "keep the rating from the sails the script named for it").
+  - The physics loads no boom: `_load_path` follows `_principal_spar`, the yard first.
+- **Its own lines.** Steel's topping lifts and guy pendants (l. 23103-23121) are named in its
+  note, not filed as lines, as the frigate files none on her spanker boom (E17: such lines are
+  read by nothing but the reeving and repair tables).
+
+**The driver yard is not filed as a spar.**
+- Its figures are Steel's p. 40 rule: 34 ft 6 in × 7 in (10.52 m) for the 64 and 40 ft 6 in ×
+  8¼ in (12.34 m) for the 74 (Ind §3.1; Bel §5.3).
+- **Why not filed.** It went aloft with the sail and came down with it ("hoisted by haliards",
+  l. 20863). A spar in the file stands for the whole voyage, catches wind and is drawn
+  whether the driver is bent or in the sail room.
+- **What it bounds.** The generator asserts the peak no more than two-thirds of the driver
+  yard beyond the mizen yard's peak, since Lever's outer halyards are bent at a third of it.
+  Its inner part lies along the mizen yard's after end (4.4 m on the 64, 7.0 m on the 74), so
+  the viewer draws the head beyond the yard's peak as the driver yard and the rest as the
+  mizen yard (§17.6).
+
+**The mizen yard** keeps the course's contract (§3.4) and its rating, which the rating pass takes
+from the course, the bent sail.
+- **The driver's pull on it.** The driver pulls about 1.9 times as hard as the course in the
+  same wind (198.5 against 104 m²; 265 against 138). A yard rated for the course at a design
+  wind W therefore carries the driver to about 0.72 W: about 32 kn for 45 (measured, the pull
+  as the area by the wind's square; judgement that the centre's 0.9-1.9 m changes it little).
+- **No rating moves.** Steel's "light fair winds" sit well inside that limit.
+
+**Its lines** are from Steel 1794 vol. I, "THE DRIVER or SPANKER SAIL" (OCR l. 24523-24545).
+- **Sizes.** From Steel's vol. II lists:
+  - the 74's halyards as Bel §5.4 read them on the page image;
+  - the rest from the OCR, which B1 and B7 read again on the page images.
+- **Ratings.** Each line is rated by `rope_kn` of Steel's size, as the ringtail's are rated
+  by theirs.
+- **The lines:**
+  - **one `halyard`** of the sail, for Steel's "four or five pair of haliards" and the throat
+    halyards (Lever's outer, middle, inner and throat halyards). The engine reads one
+    `halyard_of(sail)`. The 64's is 3 in, the 74's 3½ in;
+  - **one `tack`** of the sail, "set tight with a luff-tackle" to the throat of the boom:
+    3 in;
+  - **one unsided `sheet`**, `parts: 2`, rove through the boom's end to the clew, with its
+    luff tackle to the taffrail. Steel's one line does the outhauler's work too. The 64's is
+    3 in (judgement: her size is not legible in the OCR), the 74's 3½ in, each
+    `rope_kn(size, 2)` as the frigate's spanker sheet;
+  - **one `downhaul`** of the sail, "through a block made fast to the middle of the
+    driver-yard": 2 in.
+- **What follows from them.** With one unsided sheet the driver never joins `shifted_sails`.
+  With no brace it loads none. Its working sheet carries the boomed share of its pull
+  (`_sheet_load_kn`).
+
+**The storm mizzen** stays `in_place_of: mizzen.course` (Indf §4.7). The course keeps every key of
+§3.4.
+
+**The generator asserts**, in `driver(...)` as it writes them (§9.3's rule):
+- the throat at the course's throat, and the tack on the mast's raked line at the boom's jaws,
+  within 0.1 m;
+- the foot on the boom's line, with the clew within the boom's length;
+- the peak on the mizen yard's line within 0.1 m, abaft and above the yard's peak by no more
+  than two-thirds of the driver yard;
+- the four corners' area within 10% of Steel's rule. Measured (`driver_four.py`): 197 m² on
+  the 64 (−1%) and 281 m² on the 74 (+6%). At Steel's own fore leech the 64's cut overshoots,
+  222 m² (+12%), its boom below her rail;
+- the boom clear of the rail and the roundhouse as her profile gives them, and its end above
+  the taffrail.
+
+**The modules.**
+- `tools/ships/mizen_yard.py` (B1's, pure, importing nothing from `gen_ships`) gains
+  `driver(...)`. It writes the sail, the boom and the lines from the ship's Steel figures, the
+  boom's height, the course's corners and the mast's line, each with Steel's size or figure
+  and no rating.
+- The ship's module applies the ratings through `g` (`import gen_ships as g`, Indf §1.2): the
+  boom's `g.design_kn`, the cloth's `g.cloth(area, 5)`, each line's `g.rope_kn`, and the
+  horse's note `g.HORSE_NOTE`.
+- `tools/ships/indefatigable.py` gains a third stage-B flip, `DRIVER = False`, beside
+  `MIZEN_COURSE` and `BOWSPRIT_YARDS`, so that the driver never holds her stage B. Each flip
+  regenerates `sixty-four.yaml` alone.
+  - The module refuses `DRIVER = True` unless `MIZEN_COURSE == "gated"`: a lateen's yard must
+    be a `lateen_yard` (`ship/schema.py`), which the stand-in's gaff-class yard is not.
+  - The course is filed before the driver, so that `sail_of(mizzen.yard)` (`ship/graph.py`,
+    the first sail filed on the yard) stays the course.
+- The 74's module calls the same function with her figures, under the same two rules.
+
+### 17.3 The handling: the period, and the engine's paths
+
+**The period:**
+- **Two ways of bending it.** Steel gives both, each with its foot on the boom: the tack to
+  "the eye-bolt in the throat of the boom", the sheet through "the outer end of the boom"
+  (l. 24523-24538). They differ in how the head is bent and what becomes of the mizen:
+  - bent "as a temporary matter" by four or five pair of halyards to the yard or gaff, beside
+    the mizen, which is brailed up while the driver is set (the mizen left bent: Lever's plate
+    key, "The Driver or Spanker with the Mizen brailed up", l. 6276-6277; *Majestic*'s two
+    sails lost at the Nile; judgement from these);
+  - or bent to the mast, yard or gaff "instead of the mizen", "exactly the same".
+- **For these ships** the evidence is of the first way: Lever's plate, *Majestic*, and Bel
+  §5.4's transitional rig, the lateen mizen yard with a boomed driver beside it. The second
+  is Steel's alternative, and *Venus*, below, is a frigate with a gaff mizen.
+- **Shifted at sea.** *Venus*, a frigate, in fresh gales in 1794 "Split the spanker, unbent
+  it, and bent the mizen" (Jackson vol. 1, OCR l. 11064-11076).
+- **Setting it.** Lever: "The Spanker is set like a lower Studding Sail, by hauling out the
+  Sheet Rope to the Boom End hoisting on the outer Halliards, then the inner and Throat ones,
+  and hauling the Tack forwards" (OCR l. 9904-9906).
+- **Taking it in.** It comes in when the wind is right aft, because "it will not stand well,
+  or if it did, being so far aft, it would cause the Ship to steer wild" (l. 9930-9938).
+- **When it was set.** Steel's article says light fair winds. The logs set it in moderate and
+  fresh breezes: *Vanguard* before she hauled to the wind, *Audacious* before she tacked in a
+  chase, *Agamemnon* in a chase on or near a wind (the points of sailing are judgement).
+
+**The engine takes Steel's second way, through `in_place_of`, by choice (below).** The times
+and steps are the course's and the storm mizzen's, all judgement (§3.6).
+**Not modelled:** Lever's hoist (the outer halyards, then the inner and the throat) and Steel's
+downhauler on the driver yard. `set_lateen` has no hoist and `take_in_lateen` brails, as for
+the course; the driver's halyard is read only when parted (the set refused, the sail dropped
+into the gear), and its downhaul by no step.
+
+| Order | What runs | Note |
+|---|---|---|
+| "shift the mizen for the driver" | `shift_sail` (`ShiftScript`). A drawing course is brailed up (90 s), unbent (180), sent down while the driver is swayed up (150), the driver bent (240) and set (120): 780 s by the hands' factor. A course brailed or furled is shifted where it hangs, and the driver left furled | the storm mizzen's way ("shift the spanker for the storm mizzen") |
+| "shift the driver for the mizen" | the same, back | *Venus*'s shift |
+| "bend the driver" with the course bent | refused by `_SailWork._rival`: "The mizen is bent in the driver's place; unbend it first, or shift the mizen for the driver." | existing words |
+| "set the driver" while it is in the sail room | refused by `_sail_check` (`orders/verbs.py`): "the driver is unbent; there is no sail on the yard. Bend one first", untrue while the course is on the yard; "bend the driver" then gives the shift's words above | accepted as they stand: the frigate gives the same for her storm mizzen today, and a words-only fix would change hers (§17.10 item 4) |
+| "set plain sail", "make all sail" with the driver bent | every sail of the group but the after sail: the course is reported unbent ("Not done: the mizen is unbent; there is no sail on the yard ..."), and the driver, in "occasional sails" alone, is not set | accepted: the frigate does the same with her storm mizzen bent. The driver is set by name |
+| set, take in (brail up), furl, trim | `set_lateen`, `take_in_lateen`, `furl_lateen` (aloft on the yard) and `trim_lateen_sheet`, by class (B3.1, §3.6) | the sheet within the gaff's 18-85° by `wanted_sheet(sail)` |
+| reef | refused: no reef band | Steel names none |
+| in stays, wearing, hove to, the gale, the cast | the driver's paths by `drives_aft` (§3.5): hauled aft at helm's a-lee, brailed at "up helm" and hauled out by the wind, brailed up hove to, taken in at the gale's third reef, set after the cast | as the course; the log names it "the driver" |
+| "shift the driver for the storm mizzen" | allowed by §17.4's one-place rule; the storm mizzen is never bent beside the driver | without the rule both could be bent |
+
+**Plainly:** the brailed way, both sails bent with the mizen brailed while the driver is set, is
+not modelled, though it is the way the evidence gives for these ships. The course is unbent while
+the driver is bent, against `Build-Ships.md` §19.1 item 13's "The mizen course itself stays her
+after sail".
+- **Why.** The engine's one refusal (a sail is bent only while no sail in its place is bent)
+  keeps one after sail of the place bent on every path that sets sail without asking. Those
+  paths are the polar's "plain sail"; `_set_fore_and_aft` after the cast, which sets only a
+  furled, loosed or brailed sail and never an unbent one; the gale; and the captains. Both
+  sails bent would need a new exclusion on each of those paths, each a place to miss.
+- **What is lost.** The shift's thirteen minutes against brailing the course and setting the
+  driver, and the brailed course's windage while the driver draws.
+- **Open** for the owner, should they want it later (§17.9 item 2); they chose (b) with the
+  shift explained.
+
+**Not modelled:** Lever's rule to take the driver in before the wind. The engine does not
+make her steer wild under it: at 150° off it adds only 11 kN m of yaw on the frigate (§17.5).
+The player's officers are not told the rule. The captains never bend an occasional sail.
+
+### 17.4 The engine change, exactly
+
+**`freesail/physics/` and `data/sail_classes.yaml`: nothing changes**, not even a lookup. Every
+physics path the driver takes, read:
+
+| Path | Where (read) | What it reads for the driver | Change |
+|---|---|---|---|
+| its curve and reef factor | `_read_rig` (`physics/sails.py`) | `SAIL_CLASSES[sail.curve_class]`, the gaff's (B3.1's lookup, §3.1) | none here |
+| its side and angle | `_read_rig` → `yard_trim.refresh_reading` | a fore-and-aft sail (`Sail.is_fore_and_aft` holds `lateen`), by its sheet | none |
+| its chord | `_chord_angle`, `_chord` | `sail.sheet_angle`: not of the square family, not in a gaff's plane | none |
+| its lateral offset | `_lateral_offset` | the length of `ship.spar_of_role(sail, "boom")`, as for every fore-and-aft sail with a boom | none |
+| its sheet's load | `_sheet_load_kn` → `trim.sheet_geometry` | the boomed geometry from the boom's length, horse and height, by role | none (B3.1 reads the floor through `curve_class`) |
+| its loads | `_load_path`, `_apply_loads` | `spar_chain` from `_principal_spar`, the yard first: the mizen yard and the mast | none |
+| its windage furled | `_sail_windage_area` | the class's furled windage (B3.1's `curve_class` lookup); unbent, none | none here |
+| a ringtail's host | `_gaff_host` | not reached: the driver is no studding sail. Were a ringtail ever run out on its boom, the driver would already be found as its host (a fore-and-aft sail naming the boom) | none |
+| a sideless studding sail | `_in_gaff_plane`, `_trim_yard`, `studding_level`, `studding_stall`; `set_studding.yaml`'s host precondition | not reached | none |
+
+**Against the lead's lens:**
+1. *The physics' ranges byte-identical.* The whole of `freesail/physics/` and
+   `data/sail_classes.yaml` is untouched by the driver's commits: a diff of them shows nothing.
+   That covers more than `_plate_force`, `compute_sail_forces`'s sums, `_lateral_offset` and
+   the load fractions.
+2. *The sail's curve an existing class's.* The gaff's, through `Sail.curve_class` for a sail
+   cut at the mast (stage 0E).
+3. *`_gaff_host`'s new host.* None is needed. Sail (a) would have needed one (below).
+4. *The frigate's polar re-measured equal.* See §17.5 and §17.7.
+
+**The changes**, each keyed on something no file of the eight has:
+1. **Schema** (`ship/schema.py`, the stage-0 agent's).
+   - `SAIL_OPTIONAL_ROLES["lateen"]` gains `"boom": frozenset({"boom"})`.
+   - `validate` refuses a boom on a lateen that is not cut at the mast: "sail 'X' is a whole
+     lateen and names a boom; only a lateen cut at the mast (a driver) is spread on a boom."
+     The tartane's whole lateen has none.
+   - Inert: no file of the eight has a lateen (measured: the 0E probe).
+   - No runtime field, so no `__getstate__`.
+2. **One place, one sail** (`evolutions/scripts.py`, B3).
+   - `_in_each_others_place(a, b)` is also true when both name one place:
+     `a.in_place_of is not None and a.in_place_of == b.in_place_of`.
+   - It is read by `_SailWork._rival` (bending and shifting) and by `ShiftScript.check` (the
+     order's "for"). So "bend the storm mizzen" with the driver bent is refused, and "shift
+     the driver for the storm mizzen" is allowed.
+   - `orders/storm.py`'s `_in_its_place` calls the same rule, in place of its own copy.
+   - It is a membership: which bent sail holds a place.
+   - Inert on the eight (measured): their thirteen `in_place_of` keys name each place once per
+     file.
+
+**Nothing else.** Each of these was read and needs no change:
+- **The driver's paths.** `drives_aft` (B3.1) takes the driver by `cut_at_mast`, and with it
+  `boom_sails`, `after_gaff_sails`, `_after_sail` and `after_gaff_sails_all`.
+- **Unbent sails.** `after_gaff_sails_all` lists the driver unbent too, as it lists the brig's
+  unbent storm trysail today, and `_set_fore_and_aft` sets neither.
+- **Ratings.** `Builder.rate_spars` leaves an unbent sail out, so the course's ratings stand.
+- **The yard's sail.** `sail_of(mizzen.yard)` returns the first sail naming the yard, the
+  course, even while the driver is bent.
+  - It is read for words (`_sail_hint`) and for the sail in hand of a spar evolution on the
+    mizen yard (`sails_in_hand`).
+  - The lugger's taille-vent on her main lug's yard, and the schooners' storm trysails on the
+    main gaff, live with the same today.
+- **The unbent refusal.** `_sail_check`'s "is unbent; there is no sail on the yard" answers
+  "take in the mizen" while the driver is bent. It is true of the course, and the frigate
+  gives the same words for her spanker with the storm mizzen bent. Left (§17.10).
+- **The API.** The served graph's roles and stage 0E's `cut_at_mast` carry the driver; nothing
+  new is served.
+
+**What sail (a) would have needed**, kept for a later ship of the 1770s or a merchantman:
+- a studding-class sail with no side, on a pole over the taffrail;
+- the schema to let a sideless pole stand where there is no boom or gaff (`_on_fore_and_aft`,
+  `FORE_AND_AFT_SPAR_CLASSES`);
+- `_gaff_host` to find a sail cut at the mast as the host of a pole on its mast, a membership;
+- `set_studding.yaml`'s host precondition, which reads the sails of the pole's parent;
+- the viewer's ringtail branch, which finds its host by class `gaff` or `sprit` alone.
+
+### 17.5 What the physics makes of it (observed)
+
+**The method** is §3.2's (`driver_polar.py`, `driver_polar2.py`; row 4 `driver_polar4.py`):
+- the frigate in memory under plain sail, with the polar's balanced speed in 15 kn
+  (`world/ships.py`, `_balanced_speed_ms`);
+- and the sails' yaw moment there, in kN m, where + turns her head toward a wind on her
+  starboard bow (weather helm);
+- the lateen read with the gaff's curve and trim by patching the class tables, as §3.2 did,
+  since B3.1's `curve_class` lookups are not built yet; `is_yard` narrowed.
+
+Speed (kn) / yaw (kN m):
+
+| Row | 50° | 60° | 90° | 120° | 150° |
+|---|---|---|---|---|---|
+| 1. The spanker as filed | 2.21 / −45 | 4.29 / −15 | 8.19 / 102 | 7.86 / 89 | 6.53 / −31 |
+| 2. The course cut at the mast at the spanker's area and place, on a 16-m lateen yard beside her gaff (§3.2's third row) | 2.18 / −43 | 4.28 / −13 | 8.18 / 102 | 7.86 / 86 | 6.54 / −34 |
+| 3. Row 2 on the spanker's boom: the driver's model | 2.18 / −41 | 4.28 / −10 | 8.18 / 107 | 7.86 / 92 | 6.54 / −30 |
+| 3′. Row 3 with the gaff taken out and the lateen yard at its length and height | **2.21 / −45** | **4.29 / −15** | **8.19 / 102** | **7.86 / 89** | **6.53 / −31** |
+| 4. Row 2 cut to the 64's course's proportions of her driver (§17.2's four corners): 87 m², 3.10 m abaft the mast against 5.60, 1.92 m lower | 1.92 / −112 | 4.11 / −92 | 8.04 / 32 | 7.64 / 62 | 6.45 / −41 |
+
+- **Row 3′ equals row 1 at every angle, in speed and in yaw.** To the physics, the driver's
+  model (a lateen cut at the mast, read with the gaff's curve, spread on a boom) is the
+  frigate's spanker. Row 3 differs from row 1 only by the windage of the extra lateen yard
+  that the in-memory rig adds beside her gaff (§3.2's 0.03 kn); row 2 also by its lateral
+  offset, 0.8√A for a sail that names no boom.
+- **The boom moves the yaw, not the speed** (row 3 against row 2). The lateral offset becomes
+  half the boom's length by the sheet's sine, in place of 0.8√A's.
+- **What the shift does** (row 3 against row 4, the frigate's spanker standing for a driver):
+  - speed: 0.26 kn more at 50°, 0.17 at 60°, 0.14 at 90°, 0.22 at 120° and 0.09 at 150°;
+  - yaw: 71-82 kN m more toward the wind from 50° to 90°, 30 at 120° and 11 at 150°;
+  - so more sail, further aft, makes her faster and gives her more weather helm by the wind.
+- **On the 64 and the 74** the after sail nearly doubles, and its centre goes 3.8-3.9 m aft and
+  0.9-1.9 m up (§17.2). B1 and B7 measure their own polars and balance at the flip, old beside
+  new. Nothing is pinned from the frigate.
+- **The lateral offset reads the boom's whole length.** That is 19.91 m against a foot of
+  16.57 m on the 64, a fifth long, as the frigate's offset reads her whole boom against a foot
+  of 0.9 of it. Kept: it is the frigate's convention, and needs no physics change.
+
+### 17.6 The drawing (`client/projection.js`; B5)
+
+Every change is reached only by a lateen cut at the mast that names a boom, so no existing ship
+draws differently.
+- **The boom's swing.** `sheetAngleOf(sparId)` returns the sheet angle of the first gaff or
+  sprit sail on the spar. It also takes a lateen cut at the mast that is not unbent (a
+  membership). With the driver in the sail room the boom lies amidships, as a boom with no
+  sail does now.
+- **The sail**, in §6.1's branch for a sail cut at the mast:
+  - with `roles.boom`, the tack is at the boom's jaws and the clew along the boom (`Bm.a`,
+    `Bm.b`, as the gaff branch's `Bm`);
+  - the head runs straight from the throat along the yard's line to the sail's peak (§17.2's
+    four corners); beyond the yard's peak it is drawn as Steel's driver yard, a spar line
+    drawn with the sail, whose inner part lies along the mizen yard and is drawn as it;
+  - no reef; in the gear it is brailed to the mast as the course is; furled, it is a bundle
+    along the yard's after part.
+- **The yard.** §6.1 swings the mizen yard by its sail's sheet and lays it at "the corners' run
+  and rise".
+  - `sailOnYard` already returns a yard's bent sail (`bent[0] || on[0]`).
+  - The yard's own line is taken from the course's corners whichever sail is bent: the sail
+    cut at the mast with no boom, served whether bent or not. So the yard never moves when
+    the driver is shifted.
+- **The sheet** runs from the boom's end to the taffrail on the centreline, as §6.1's does.
+- **The pictures.**
+  - `tests/test_pictures.py`'s thresholds and every existing `tests/test_view_geometry.py` case
+    stay as they are.
+  - New cases on the fixture: the driver on its corners within 0.1 m; the foot along the boom;
+    the yard's line equal with the course bent and with the driver bent; the boom swung to the
+    sheet's side; the frame (`fullRigFrame`) holding the boom's swing beyond the taffrail.
+  - Screenshots of each state for the owner.
+
+### 17.7 Tests, truths, pins
+
+- **The guard set** (§10.1) is unchanged. The 0E probe gains "a lateen naming a boom" among
+  the things no file of the eight carries.
+- **`tests/test_driver.py`** (B3, on the fixture `frigate_with_driver()` alone; the 64's file
+  carries no driver until B1's flip):
+  - "shift the mizen for the driver" and back each run to their end. The room holds the
+    course's canvas while the driver is bent;
+  - "bend the driver" is refused while the course is bent. "bend the storm mizzen" is refused
+    while the driver is bent, with words naming the driver. "shift the driver for the storm
+    mizzen" runs;
+  - bent, the driver is her driver: hauled aft at helm's a-lee, brailed up hove to, brailed at
+    "up helm" and hauled out by the wind, taken in at the gale's third reef, and set after the
+    cast. Unbent, none of those paths touches it, and the cast sets the course;
+  - its sheet stays within the gaff's 18-85° by every route (set, trim, `trim sails`,
+    `draw_sheets`, the polar), and its sheet geometry is the boomed one;
+  - "reef the driver" is refused;
+  - the words of §17.3: "set the driver" in the sail room, and "set plain sail" and "make all
+    sail" with the driver bent, each as the table has them;
+  - **the frigate's polar row.** `frigate-36.yaml`'s balanced speed at 50, 60, 90, 120 and 150°
+    in 15 kn equals §3.2's first row (2.21, 4.29, 8.19, 7.86, 6.53) on the final tree;
+  - **row 3′ as a test.** The frigate's spanker re-filed in memory as a lateen cut at the mast,
+    on a lateen yard in the gaff's place and on her boom, with no patch (B3.1's lookups read
+    `curve_class`). Speed and yaw equal row 1 at the five angles, within 0.01 kn and 1 kN m.
+- **The 64's own cases** (B1's, in `tests/test_indefatigable.py`, at the `DRIVER` flip): the
+  shift and back, the two refusals and the paths by `drives_aft` above, run on
+  `sixty-four.yaml`; the generator's assertions of §17.2 on her figures.
+- **The schema's refusal** (the stage-0 commit's test): a whole lateen naming a boom is refused
+  in words, and a lateen cut at the mast naming one loads with the role.
+- **The 0E pickling guard** holds as it is: the driver adds no field.
+- **Truth candidate 7-230**, from the spare block, for the lead to allot. B1 measures it at stage
+  B with `DRIVER = True`. *The 64 shifts her mizen for the driver, and the driver draws as her
+  after sail.* What it pins:
+  - the shift's phases, and its ticks in a band at her company;
+  - with the driver bent and set, her polar above the course's from 90° to 150° in 10 kn,
+    Steel's "light fair winds". Measured first, and pinned only if it holds; else reported;
+  - the driver hauled aft at helm's a-lee and brailed up hove to.
+
+  Its sources: Steel l. 13819-13821 and 24536-24538, and *Venus*'s shift.
+- **The 74's polar point S7** (*Vanguard*, 1798, "under courses, topsails and driver": Bel §6.3)
+  is measured with the driver bent in the course's place, and her truth says so. It is one of
+  B7's numbers, not a new one.
+- **Pins.**
+  - None move on the eight: every change is keyed on a role, a key or a shared place no file
+    of the eight has.
+  - The 64's own figures move at the `DRIVER` flip by the boom and the spare alone, since the
+    driver starts unbent: the boom's windage; the boom among the spars a shot aloft can carry
+    away (`combat/hits.py`, `_rigging_hit`, a boom weighted 1.5 by `_spar_weight`); and the
+    sail room's count with the driver's spare (`spare_sails`, the muster line). B1 re-measures
+    each, shown old beside new in her review and her tuning notes.
+  - The same holds for the 74 in her window.
+
+### 17.8 Who builds what, and when
+
+| Who | What | When |
+|---|---|---|
+| The stage-0 agent | One commit, checked as `Build-Ships.md` §3.4: the schema's `boom` role for a lateen cut at the mast, and its refusal; `frigate_with_driver()` in `tests/rig_fixtures.py`; the probe's line; the refusal's test. The fixture is the 0E fixture (`frigate_with_mizen_yard()`) with the frigate's `mizzen.boom` put back, lengthened to the 64's 19.91 m and set where it hangs the 64's driver from the fixture's truss as §17.2 cuts it (the fore leech 6.98 m below `MIZEN_TRUSS_M`, so the jaws about 4.5 m above her deck: judgement), and the 64's driver on its four corners filed after the course, `in_place_of` it, unbent, with a bent variant for the drawing. The storm mizzen stays `in_place_of` the course, so the one-place rule has its case; the ringtail and its boom stay out, as the 64 carries none (Indf §4.7), so `_gaff_host` is not reached | after the lead has read this addendum (the owner chose the sail, §17.9 item 1), and after stage 0E (2ead5f0). §17.4's list for (a) is where a later design of (a) would start |
+| B3, step B3.5 (the driver) | `_in_each_others_place` widened, and `_in_its_place` calling it; `tests/test_driver.py`. Nothing in `physics/` | after B3.1 (it needs `drives_aft`, the `curve_class` lookups and the six lateen evolutions) and after the stage-0 commit, at the engine builder's next step boundary |
+| B5 | §17.6, with or after §6.1's mizen yard, from the fixture | after B3.5 lands |
+| B1 | `driver(...)` in `tools/ships/mizen_yard.py`; `DRIVER` in `indefatigable.py`, flipped after B3.5 and B5's drawing; the sail room's spare, the aliases and the group; the 64's cases in `tests/test_indefatigable.py`; truth 7-230 if allotted | at her stage B, as its third flip. Her stage A and the other two flips do not wait on it. If B3.5 or B5's drawing is not in by then, `DRIVER` stays False in that merge, and B1 flips it alone at a later boundary between two windows once both are in (`indefatigable.py` stays B1's; `sixty-four.yaml` regenerated alone, old beside new). If they are not in by the package's merge, she ships without it, as `Build-Ships.md` §2.4 has it for the stand-ins |
+| B7 | the 74's driver by the same function, with her figures and her scaling | in her window, after B3.5 and B5's drawing; if either is missing, her file goes without it, as the 64's |
+
+**What stage 0 and stage 0E already hold for it:**
+- `SailSpec.cut_at_mast` and `Sail.cut_at_mast`, with their refusals and their pickling;
+- `Sail.curve_class`, which gives the gaff's for a sail cut at the mast;
+- stage 0's `curve_class` lookups: the polar's trim in `world/ships.py`, `api/queries.py`,
+  `api/readings.py`, and the rating pass in `gen_ships.py`, so the driver rates at the gaff's
+  1.29;
+- `wanted_sheet(sail)` in the runner;
+- the served `cut_at_mast`;
+- `frigate_with_mizen_yard()` and the 0E guards.
+
+From before the package: `in_place_of`, the sail room, `shift_sail`, `bend_sail` and
+`unbend_sail`.
+
+**Nothing here waits for B1's first steps.** Nothing of B1's stage A, and nothing of stage 0E,
+waits for it.
+
+### 17.9 Risks, ranked, and what stays open
+
+**Risks:**
+1. **The 64's verdict is of low confidence.** For her dates Steel's own tables split: Table IV
+   cuts a boomsail, while the 64 column has no boom and the 64 list rigs a boomless driver. No
+   source names her own driver, and the 64s' evidence (*Agamemnon*, *Lancaster*) is later.
+   *Mitigation:* the owner chose it knowing the evidence is weak (item 1 below); its own flip; left off, her stage B is as §3
+   has it.
+2. **The brailed way is not modelled** (Steel's first way; Lever's plate; *Majestic*'s two
+   sails), though it is the evidence's way for these ships. A player who wants the driver pays
+   a thirteen-minute shift, and the course is unbent meanwhile. *Mitigation:* the one refusal
+   guards every path; the cost is recorded in the tuning notes; the way is left open.
+3. **The light canvas.**
+   - The driver is No. 5 against the course's No. 2, so it reaches its cloth's rating in less
+     wind, and the gale takes it in only at the third reef.
+   - Once it is taken in, she has no after sail until it is shifted back.
+   - *Mitigation:* B1 measures the wind at which it blows out, set and drawing, and records it
+     beside Steel's "light fair winds" and the logs' fresh breezes.
+4. **The boom over the rail, the taffrail and the roundhouse**, all unmeasured on the 64
+   (Indf §3.2). *Mitigation:* the boom's height fixed first, from her profile, 2.4 m above her
+   quarterdeck until measured (judgement). The cost is her fore leech, 6.98 m against Steel's
+   8.69 at that height; the area check holds the four corners to jaws about 3.6 m up, and
+   above that B1 reports to the lead.
+5. **The offset from the boom's whole length** overstates the driver's yaw by about a fifth on
+   the 64. *Mitigation:* the frigate's convention; measured at the flip; no physics change.
+6. **`sail_of` names the course while the driver is bent**, in words and in a spar evolution's
+   sail in hand. *Mitigation:* the lugger's and the schooners' precedent. B3.5 runs "send down
+   the mizen yard" with the driver bent and records the words.
+7. **The yard drawn from the course's corners** would move if a module cut the two sails'
+   throats apart. *Mitigation:* the generator's throat assertion, and the view test's equal
+   yard line.
+
+**Open, for the owner or the lead:**
+1. **Which sail each ship carries** (answered): (b), proposed for both (for the 64 on weak evidence),
+   departing from the (a) carried on b562bae (§17.1), and, as modelled, from that item's "The
+   mizen course itself stays her after sail" (§17.3). *The owner's answer (2026-10-28): (b) for
+   both, chosen with the two sails drawn side by side and the shift explained, as the simpler.*
+   The stage-0 commit and everything after it wait on the lead's read (§17.8).
+2. **`in_place_of` against the brailed way** (§17.3). If the owner wants both sails bent, it is a
+   new exclusion on each path that sets sail, and a design of its own.
+3. **The research's uncertainties.**
+   - The boom's length, by Steel's rule against Steel's "0 0" column.
+   - The Table IV figures, read earlier from the page images and not re-read here; the 64's
+     ¼-yd departure from Steel's rule may be a misreading.
+   - *Agamemnon*'s driver, inferred from its use, not described; *Majestic*'s two sails bent
+     and the logs' points of sailing, inferred.
+   - The 64's rails, roundhouse and taffrail, and so her boom's height and fore leech.
+   - Whether *Culloden*'s "spanker" was her mizen course under another name.
+   - What Steel's 20-gun plate shows.
+4. **The lines' sizes**, from the OCR of Steel's vol. II lists but for the 74's halyards. B1 and
+   B7 read the page images.
+5. **Truth 7-230**, for the lead to allot from the spare block.
+6. **Sail (a)**, kept possible as §17.4 says. The 1773 rig is no file's.
+7. **The decision sheet's "The 74's driver"** (`Decisions-ShipsRound2-2026-10.md`) still
+   describes (a) as carried. This addendum does not edit it.
+
+### 17.10 Found on the way
+
+1. `client/projection.js`'s `sheetAngleOf` and the ringtail branch's host lookup find a sail by
+   class `gaff` or `sprit` alone. A sail cut at the mast is added where it is a boom's sail
+   (§17.6).
+2. `world/ships.py`'s `_rigged_for_plain_sail` sets every sail of "plain sail", bent or not. A
+   file that put an occasional sail there would draw both sails of one place in its polar. No
+   file does; every occasional sail is kept out of "plain sail".
+3. `after_gaff_sails_all` lists unbent gaff sails (the brig's storm trysail). Harmless, since
+   `_set_fore_and_aft` sets none.
+4. `_sail_check`'s refusal for an unbent sail ("there is no sail on the yard") is untrue when
+   another sail is bent in its place, as for the frigate's spanker with the storm mizzen bent. A
+   words-only fix would change the frigate's words in that state, so it is left.
+5. A ringtail on a driver boom would already find the driver as its host (`_gaff_host` reads the
+   fore-and-aft sail naming the boom). The 64 carries none (Indf §4.7).

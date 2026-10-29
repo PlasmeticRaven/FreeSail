@@ -130,6 +130,10 @@ its yard (D9 (c) as revised in Bel §13.5) and her yards under the bowsprit (D8 
   is left out and named in her note (§4.4, as settled);
 - `BOWSPRIT_YARDS = True`: the two yards and their sails, at the station along the bowsprit the
   gated design gives a key for (§4.6);
+- *chosen since by the owner (the engine design §17, its §17.9 item 1; the lead's read open):*
+  `DRIVER = True`, a third flip: Steel's driver boomsail in the sail room, `in_place_of` the
+  course, and its boom on the mizen mast; only with `MIZEN_COURSE = "gated"`, and only after
+  the engine's step B3.5 and the viewer's drawing of it (§4.4);
 - each flip regenerates `sixty-four.yaml` alone; every figure it moves (her polar, her balance,
   her truths' measures) is shown old beside new in the review and the tuning notes.
 
@@ -577,7 +581,11 @@ OCR l. 13822; Ind §5) on a driver yard the length of the fore topgallant yard, 
 §3.4: the jeers, the lifts, the vangs, the heel's bowlines as guys, one sheet, one tack). The
 schema has no `truss` or `brail` line class (`schema.py:119-141`), and `take_in_lateen` brails
 without one. Steel's driver is **left out** and named in her file's note: no engine path hangs a
-sail from another sail's yard (the engine design §14 item 10).
+sail from another sail's yard (the engine design §14 item 10). *Since asked for by the owner
+(2026-10-28; `Build-Ships.md` §19.1 item 13):* the engine design's addendum (its §17) proposes
+Steel's driver boomsail, bent on a boom in the mizen course's place and built at her stage B
+behind its own flip, `DRIVER`. The owner chose it (2026-10-28; its §17.9 item 1); it waits on
+the lead's read.
 
 ### 4.5 The razee's mizen (D20 (a))
 
@@ -1057,8 +1065,10 @@ yard follows from the corners on the mast and `length_m`. **Item 3 is answered o
 offset comes from 0.8√A, 8.16 m against Steel's foot of 8.86 m (§3.2 there), with no physics
 change; the stand-in reads its 11.1-m head and overstates it, so the move at stage B is the
 stand-in's error, shown old beside new. Item 5: no `truss` or `brail` lines (§3.4 there). Item 8:
-Steel's driver is left out (§4.4 above). Item 9: each yard's own `x_m` and `height_m` are its
-station (§4.1 there). Items 10-12: §4.2, §4.3 and §6.2 there.
+Steel's driver is left out (§4.4 above); *chosen since by the owner (the engine design §17,
+2026-10-28; its §17.9 item 1)*: class `lateen` cut at the mast with roles `yard`, `mast` and `boom`,
+bent `in_place_of` the course, at her stage B behind `DRIVER`. Item 9: each yard's own `x_m`
+and `height_m` are its station (§4.1 there). Items 10-12: §4.2, §4.3 and §6.2 there.
 
 ### 12.3 What the viewer builder (B5) is asked for
 
@@ -1217,6 +1227,8 @@ default fit is "as carried 1796", so §11.1's second way holds for her. Item 5: 
 a spritsail yard, out of plain sail, and no sprit-topsail yard; `head_yards()` writes the
 spritsail yard for both files and the sprit-topsail yard for the 64 alone. Item 6: the spars
 rule. Item 10: as proposed. Steel's driver (§4.4) stays left out unless the owner asks for it.
+*The owner has since asked for it (`Build-Ships.md` §19.1 item 13); the engine design's §17
+proposes Steel's driver boomsail, which the owner chose (2026-10-28; its §17.9 item 1).*
 
 1. **D18 (owner):** (a) proposed, the razee's gun deck at 1.39 m; (c), her old upper deck at
    3.66 m, one figure away; decided on screenshots of both beside the 64 and the frigate-36 (§2.2).

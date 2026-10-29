@@ -129,7 +129,7 @@ scratch scripts named are not.
 | 26 | The truths allocated as §15 | The brief item 6; the three designs |
 | 27 | Each new scenario's round trip and first hour are B6's tests, not a truth | Settled here; the shared draft's 7-188 not taken (§15) |
 | 28 | The 64's mizen course at stage B takes Ext's lateral offset (0.8√A); the move from the stand-in is shown old beside new | Ext §3.2; settles Indf §12.2 item 3 |
-| 29 | Steel's occasional driver on the 64's mizen yard is left out; brails and the truss are not lines | Ext §3.4, §14 item 10; settles Indf §4.4 |
+| 29 | Steel's occasional driver on the 64's mizen yard is left out (*reopened*: the owner asked for the driver, §19.1 item 13, and chose Steel's driver boomsail for both, Ext §17); brails and the truss are not lines | Ext §3.4, §14 item 10, §17; settles Indf §4.4 |
 | 30 | The frigate-36's quarterdeck is not corrected | The owner, 2026-10-25; the shared draft S12 |
 | 31 | The fillers as posts are left to 77 | The shared draft S14; the lead's call (§19.2) |
 | 32 | The merchant brig's description moved to `merchant-brig.yaml`, and a packet description: for the lead before they are built | The shared draft §4.4 |
@@ -158,7 +158,7 @@ scratch scripts named are not.
 | Ext's interfaces | — | stage 0 | — | Stage 0E, after the lead's approval | Ext §8 |
 | The mizen course's lateral offset at stage B | from the yard's after part, as a gaff's from its gaff (§12.2 item 3) | 0.8√A, 3-8% short of Steel's foot, kept (§3.2) | — | Ext's: no physics change, and 0.8√A (8.16 m) is nearer Steel's foot (8.86 m) than the stand-in's 11.1-m head. The stand-in overstates the offset, and the move at stage B is shown old beside new | Indf §12.2 |
 | The mizen yard's lines | lifts, truss and brails as lines | jeers, lifts, vangs, bowlines as guys, one sheet, one tack; no brace, no brails (§3.4) | — | Ext's: the schema has no `brail` or `truss` line (`schema.py:119-141`), and `take_in_lateen` brails without one | Indf §4.4 |
-| Steel's occasional driver on the 64's mizen yard | added at stage B | no engine path hangs a sail from another sail's yard (§14 item 10) | — | Left out, noted in her file; the lead may ask for the path | Indf §4.4, §12.2 |
+| Steel's occasional driver on the 64's mizen yard | added at stage B | no engine path hangs a sail from another sail's yard (§14 item 10) | — | Left out, noted in her file; the lead may ask for the path. *Reopened by the owner (§19.1 item 13):* Ext §17 proposes Steel's driver boomsail behind its own flip; the owner chose it, and the lead's read is open (its §17.9 item 1) | Indf §4.4, §12.2 |
 | Where a ship's tests and truths go | `tests/test_ship_particulars.py`, `tests/test_ships.py`, `tests/test_known_truths.py` | B3's own test files | `tests/test_ship_particulars.py` | Each builder's own new files; truths moved into `tests/test_known_truths.py` in Phase 5 | Indf §6.3, §13 |
 | The truths | five | three for the settee, one offered for the 64 | four shared (7-185 to 7-188) | §15 | Indf §14, Ext §10.3 |
 
@@ -193,11 +193,11 @@ scratch scripts named are not.
 | 0E | stage-0 agent | Ext's interfaces (§3.2) | the lead's approval of Ext | B3 | none (proven) |
 | B3.1, B3.2, B3.3 | B3 | the lateen, the bowsprit yards, the settee (Ext §9.1), each merged before the next | 0E | B1's stage B (3.1, 3.2); the bilander's handling truths (3.3) | none expected |
 | B5.2-B5.4 | B5 | each of B3's drawings (Ext §6), after its step | each B3 step | — | none |
-| **B2** | the *Neufchatel* | her design, stage 0b, her file | B1, SW-4 | B7 | none existing |
+| **B2** | the *Neufchatel* | her design, stage 0b, her file | B1, SW-4 | B4 | none existing |
 | B1 stage B | B1 | `MIZEN_COURSE = "gated"`, `BOWSPRIT_YARDS = True`, the 64 regenerated (Indf §13 step 7) | B3.1, B3.2; taken at a boundary between ships | — | the 64's own figures, old beside new |
 | SW-5 L2, L3 | B8 | the lee port on heel, then with the roll (§7) | SW-2 | B7's port truth | combat pins, bisected |
-| **B7** | the *Bellerophon* | her design, stage 0c, her file | B2, SW-1, SW-5 (for her port truth) | B4 | three assertions (§16) |
-| **B4** | the bilander | her design, stage 0d, her file | B7, B3.3 (for her handling truths) | — | none existing |
+| **B4** | the bilander | her design, stage 0d, her file | B2, B3.3 (for her handling truths) | B7 | none existing |
+| **B7** | the *Bellerophon* | her design, stage 0c, her file | B4, SW-1, SW-5 (for her port truth) | — | three assertions (§16) |
 | B6 | scenarios | one per ship (§12) | each ship's file, SW-4 | Phase 5 | none existing |
 | Phase 5 | integrator | truths moved in, notes, spec §27 as built, the primer's chapter, the whole-change review | every merge | the lead | — |
 
@@ -207,12 +207,13 @@ scratch scripts named are not.
   and needs nothing gated.
 - **The *Neufchatel* second.** She waits on nothing gated if her design takes D10(c) or the lead
   puts D10(a)'s key with B3 (§13.1). She needs SW-4's pivot rule if she carries a pivot.
-- **The *Bellerophon* third.** Her long 32s need Table No. 29 (SW-1: 10 lb 10 oz, not the share's
+- **The bilander third**, as the owner asked (the lead's ruling on stage 0's questions, item 8,
+  in `docs/dev/M7-WorkPackages.md`). Her handling truths wait for B3.3, the last engine step,
+  and she uses B1's `spritsail_yards.py`.
+- **The *Bellerophon* last.** Her long 32s need Table No. 29 (SW-1: 10 lb 10 oz, not the share's
   10 lb 11 oz), her port truth needs the lee port wired (SW-5), and her mizen course and
   spritsail yards come from B1's stage-B helpers when B3.1 and B3.2 are in. If her window opens
-  first, she takes the 64's stand-in pattern.
-- **The bilander last.** Her handling truths wait for B3.3, the last engine step, and she uses
-  B1's `spritsail_yards.py`.
+  before B1's stage B, she takes the 64's stand-in pattern.
 
 **One ship at a time** holds for the ship builders: each ship's window opens with the fresh
 merge and her stage 0, and closes with her merge. B1's stage B is taken between two windows.
@@ -228,6 +229,7 @@ B8, B5 and B3 run beside the ship of the window, on files disjoint from hers (§
 | The *Neufchatel* | no (D10(a)'s key, if built, is the lead's call: §13.1) |
 | The 74's file at stage A | no |
 | The 74's mizen course and spritsail yards | yes (B3.1, B3.2) |
+| The driver of the 64 and the 74 (Ext §17, the addendum) | yes: the lead's read of the addendum (the owner chose the sail, Ext §17.9 item 1), then its stage-0 commit, B3.5 and B5's drawing; the 64 takes it by its own flip (`DRIVER`), so her stage B is not held by it, and if it misses her stage B, B1 flips it at a later boundary (Ext §17.8) |
 | The bilander's file | generates after stage 0E; her handling truths wait for B3.3 |
 | Stage 0E, B3, B5.2-B5.4 | yes |
 | The shared work (B8), B5.1, B6 | no |
@@ -449,7 +451,7 @@ By an agent that did not write it:
 | **B2, the *Neufchatel*** | `tools/ships/neufchatel.py`; her file and her people file; `tests/test_neufchatel.py`; in her window, her `world/ships.py` rows and `period.py` appends |
 | **B7, the *Bellerophon*** | `tools/ships/bellerophon.py`; `data/ships/seventy-four.yaml`; her people file; `tests/test_bellerophon.py`; `tools/pace.py` (her mode); in her window, her `world/ships.py` rows with the words "a ship of the line", and the three assertions they move (`tests/test_ships.py:99`, `:188`; `tests/test_world_orders.py:98`); `period.py` appends; the files her bill by deck needs (`crew/quarters.py` and the orders her design names), taken after B3's merge where they are B3's; `world/captains.py` if her design takes a rank-4 rule for the frigates (Bel §7) |
 | **B4, the bilander** | `tools/ships/bilander.py`, `tools/ships/settee.py`; `data/ships/bilander.yaml`; her people file; `tests/test_bilander.py`; in her window, her `world/ships.py` rows |
-| **B3, the engine** | `freesail/ship/parts.py` and `ship/graph.py` (after 0E); `physics/sails.py`; `evolutions/scripts.py`, `trim.py`, `runner.py`; `orders/verbs.py`, `storm.py`, `orders/__init__.py`, `navigation.py`; `combat/hits.py`; `data/evolutions/` (the ten new files); `data/vocabulary.yaml`; `tests/test_lateen.py`, `test_bowsprit_yards.py`, `test_settee.py`; `data/sail_classes.yaml` and `tests/test_sails.py:65-74` only under D44(c), the lead's (Ext §5.10) |
+| **B3, the engine** | `freesail/ship/parts.py` and `ship/graph.py` (after 0E); `physics/sails.py`; `evolutions/scripts.py`, `trim.py`, `runner.py`; `orders/verbs.py`, `storm.py`, `orders/__init__.py`, `navigation.py`; `combat/hits.py`; `data/evolutions/` (the ten new files); `data/vocabulary.yaml`; `tests/test_lateen.py`, `test_bowsprit_yards.py`, `test_settee.py`; `tests/test_driver.py` (step B3.5, the driver, if Ext §17 is taken); `data/sail_classes.yaml` and `tests/test_sails.py:65-74` only under D44(c), the lead's (Ext §5.10) |
 | **B5, the viewer** | `client/projection.js`, `client/shipview.js`, `client/style.css`; `tests/test_view_geometry.py`; `tests/test_pictures.py` only for a threshold that moves; the screenshots |
 | **B6, the scenarios** | `data/scenarios/` (the four new files); `tests/test_scenarios_75.py` (new); `world/scenarios.py` only if the lead rules in D48's third way (Indf §11.1) |
 | **B8, the gun deck and the sub-types** | `tools/gen_ships.py` after stage 0; the eight existing files (generated); `freesail/ship/charges.py`; `freesail/combat/ports.py`; `freesail/combat/guns.py` after stage 0 (§7.2: the gun run in, the named gun dropped with a line); `api/action_readings.py` (the guns' reading's "ports shut", :548-); `world/captains.py` (`ROLES` only) and `world/service.py` (`ROLE_SERVICE`, :54-) until SW-4 merges; `data/captains/indiaman.yaml`, `revenue.yaml` (new); `world/ships.py` at the boundary after B1 only (§4.2); `tests/test_magazine.py` (:59, :61); `tests/test_pivot_gun.py` (only if the arc moves); `tests/test_ships.py:103` (only if §8.4 is ruled in); `tests/test_profiles.py`, `test_lee_ports.py`, `test_subtypes.py` (new) |
@@ -1034,7 +1036,9 @@ reserved; her place third.
 **Her design settles:**
 - one file, one rig (Bel §13.5): her mizen course through B1's `mizen_yard.py` (the same sail as
   the 64's), and her spritsail yards through `spritsail_yards.py`; the 1773 driver abaft the
-  mizen course, which no engine path can hang (Ext §14 item 10): left out or asked of the lead;
+  mizen course, which no engine path can hang (Ext §14 item 10): left out or asked of the lead
+  (*reopened by the owner*, §19.1 item 13: Ext §17 proposes Steel's driver boomsail for her by
+  the same function as the 64's, which the owner chose);
 - **the foot between the drawing and the ship** (Bel §13.2): her profile reconciled with the
   *Bellona*'s reported 5 ft 2 in at Channel draught, the shut heel 10.6° on 22.7 ft (7-195);
 - her displacement at the load line the file takes (answer 6);
@@ -1229,7 +1233,9 @@ Each builder's branch is reviewed as soon as it is done, then fixed (plan Phase 
 - **The smuggler and the search; sweeps** (D11(a)): not modelled.
 - **The razee's first rig** (D17): no file.
 - **Steel's occasional driver on the 64's mizen yard, the 74's 1773 driver:** no engine path
-  (Ext §14 item 10).
+  (Ext §14 item 10). *Reopened by the owner (§19.1 item 13):* Ext §17 proposes Steel's driver
+  boomsail for both, which the owner chose (2026-10-28; its §17.9 item 1); the 1773 sail stays
+  unbuilt.
 - **The spritsail yard's topping, the sprit-topsail traveller, Steel's diagonal reefs, the
   spritsail yard got fore and aft:** Ext §4.4.
 - **The vangs, ourses and derrick drawn:** the current standard (Ext §6.3).
@@ -1248,7 +1254,8 @@ Each builder's branch is reviewed as soon as it is done, then fixed (plan Phase 
 1796". Item 4: the spritsail yard only, out of plain sail. Items 5, 6 and 8: as proposed. Item 7:
 as proposed, except the lifts, now drawn on every yard (§6). Item 10: the six-inch margin. Item
 11: fetched and read (below). Item 13: carried (below). Still open: 1, 2, 9, the weather side
-of 10, and 12.
+of 10, and 12. Item 13's second question, which sail, is answered: Steel's driver boomsail for
+both (below, Ext §17).
 
 1. **D18:** (a) proposed for every file (§5.5); the razee's gun deck at 1.39 m, or (c) her old
    upper deck at 3.66 m; decided on B5's screenshots.
@@ -1285,7 +1292,17 @@ of 10, and 12.
     (`docs/references/lever/lever-1827-young-sea-officers-sheet-anchor-ocr.txt:8264-8270`).
     Proposed as a ringtail whose host is the mizen course, which has no boom (`physics/sails.py`
     `_gaff_host` finds a ringtail's host by its boom): an addendum to Ext for the lead's gate,
-    built with the 64's stage B and the 74.
+    built with the 64's stage B and the 74. *For the owner (Ext §17, the addendum,
+    2026-10-28):* from the evidence, the addendum proposes for both ships, in place of the sail
+    above, Steel's driver boomsail of 1794: four-sided, its luff laced to the mast, its head
+    along the mizen yard and on along a small driver yard, its foot on a boom over the stern
+    (Ext §17.1; for the 64 the evidence is weak). In their day it was bent beside the course,
+    which was brailed up while it drew; the game would shift one for the other (`in_place_of`),
+    so the course would be unbent while the driver is bent, against "The mizen course itself
+    stays her after sail" above (Ext §17.3). Which sail each ship carries was put to the owner.
+    *Answered (the owner, 2026-10-28):* Steel's driver boomsail for both, as proposed, chosen with
+    the two sails drawn side by side. Nothing of the addendum is built until the lead has read it
+    (Ext §17.8, §17.9 item 1).
 
 ### 19.2 For the lead
 
