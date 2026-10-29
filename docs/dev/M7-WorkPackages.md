@@ -62,7 +62,7 @@ on these packages; that is the owner's choice.
 | 87 | Fable | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief once most of the milestone's orders are in, after 73, 77 and 84 |
 | 88 | Fable | **The captain's pass of M7**: the commodore's recovery when aback with no way and no tack while the hands are at a shortening (the convoy's stall, 86's finding; truths 7-152 and 7-153 move with it); 57's offing's tack among islands with no room to wear (the station-gale trial's expected failure lifted); 72's near station law read against 58b's; the colours held once shown before an enemy (71's flicker, if 85 has not taken it) | after 84; to brief |
 | 89 | Opus | **The held gauges' water** (79b's finding): a held gauge enters the tide's blend for the positions within its own block's bounds alone, so that the Channel east's six, Biscay's, Portugal's and the islands' gauges give their water its own tide and no position west of 1 W reads anything new; the master's epitome's rises by the same water; the proof that no recorded passage's digest moves | briefed below (2026-10-29), for the owner's approval; independent of 84 |
-| 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24) | after 71; when the owner likes |
+| 81 | Opus | The viewer's action, **from the hull 75 draws**: the guns drawn in their ports with their movement, a muzzle flash and a smoke plume over a few seconds at each gun's firing, the smoke lingering to leeward; the damage as the viewer's present honesty draws it (the owner's first action, 2026-10-24); the ports drawn from the files' port triples and `port_size_m`, and a triple within `OVER_THE_RAIL_M` of the rail at its x a gun place over the rail, not a port (from 75's design of the 74, 2026-10-29) | after 71 and 75's hull; when the owner likes |
 
 The M7b work wrapped up alongside: 58a, 58b and 67 merged (2026-10-23), the one whole suite
 on the merged tree the lead's; the lead's playtest of 58b's gale book (its two trials
@@ -2389,3 +2389,87 @@ booked with the old figures to be shown beside the new. **7. Stage A's two point
 rail ending 0.8 m abaft the stem; the knee of the head carried in `stem_m` where the design
 gives it `head_m`): the session's refinement, checked against §5.1's form, as it says.
 Go on: stage 0H.
+
+**2026-10-29, after the usage reset: the three designs read, the stage B items, the merge of
+the pilot** (`claude/pkg-75` at `164027c`: `Design-Ship-PrinceDeNeufchatel.md`,
+`Design-Ship-Bilander.md`, `Design-Ship-Bellerophon.md` whole, each one's list for the lead;
+`Build-Ships.md` §2.6 as the owner's direction of 2026-10-29 rewrote it; the owner's answers of
+`8f30be9` and `164027c`). The lead's head is `76eb22c`: 84's step 8 (the save and the replay of
+many hulls) and 79b (the Channel's east block, `channel-east`, 1 W to 2.5 E, its own tiles and
+truths, nothing of the Channel west's moved) are merged; bring it in before stage B as §2.6
+says. **1. The merge of the pilot.** The leave of the last note (the inert steps merged at their
+boundaries) cannot be taken as the branch stands: 0H, SW-2b.1 and the viewer's steps sit on
+stage A's ship files in the history, so no inert step can come over without her. The lead takes
+her whole at her report, as §2.6 step 7 has it, with the testing report in place of the
+owner's test; the leave stands only for an inert step the session carves onto a branch from the
+lead's head, which it is not asked to do. **2. Stage B, settled:** the topgallants and royals
+by Steel p. 42's pole-heads for the 64 and the 74 (the owner's "Agreed"), the 64's at her stage
+B, her file regenerated, the polar and the light-air figures old beside new (Bel §17.2 item 8:
+yes, in her window); the viewer roots the bowsprit from the profile's stem head in the same
+step as the yards under the bowsprit are drawn, so that the spritsail yards hang from a
+bowsprit that stands where the file has it and the 2.3 m stand-in goes with them; the clew
+check of Bel §1.5 runs at B1's stage B on both her files (Bel item 13's last question: yes),
+and where the 64's course clew ends under her roundhouse deck at the side the head room goes
+first, as the 74's pick has it, to 5 ft, past that a report with the figures; the razee's
+driver boom's jaws under her roundhouse (Indf, open at her stage B) the same: raised clear by
+the least that clears, her spanker kept within 8 % of Steel's driver for a 38 as the owner
+settled it, the figures old beside new in the testing report. The files' notes carry sources,
+departures and judgements, not figures a rule computes from the file's own keys (an area from
+a cut, a heel from a sill): those live in the generator's report and the tests, where they
+cannot go stale. **3. The order (Bel item 6): confirmed.** B1 merged on her testing report;
+SW-2 with SW-2b.2 as one step after her merge, SW-5 L2 and L3 behind them; then B2, B4, B7 in
+that order, each on a testing report of her own and merged as each ship is; the session records
+it in §2.6 at her window's opening by a design-record commit, as 8f30be9 was made, and the
+same commit writes the direction into §2.2's B2 row. **4. The *Neufchatel* (her §17).** (1)
+D10(a)'s key in the proposed form: `schooner_mast` on the mast, `Spar.schooner_mast` and
+`Ship.on_schooner_mast`, read at Ext §4.2's places 1 and 3 only, place 2 left as it is; the
+schema key by a stage-0 commit at B3.4's boundary, the field and the predicate B3.4's; B3.4
+right after B3.5 and before B3.3, so her file takes the key from its first commit; the two
+findings of §12.2 item 8 reported before any further place. (2) Yes. (3) Yes: 84's step 7 is
+merged, so SW-4's rows in `world/ships.py` wait on B1's merge alone now; if they are not in when
+she is otherwise done, hers go first in her window and SW-4's follow. (4) Yes, the direction
+holds for her, a testing report and the lead's merge on it. The scenario's `nations:` block
+(§19.2 item 6, open since the gate) is **ruled in**: laid at her stage 0b as a parsed and kept
+block that nothing reads until her scenario, the stage 0b commit made on the lead's head of
+the day; B6's D48 change to `world/scenarios.py` merges onto it. (5) Yes, that meets the
+brief: her best speed in 25 kn within her accounts' band pinned, the best point's angle
+reported, the pointing clause reported and not forced if her file misses it. (6) As the design
+has it. (7) Recorded for a later package of the rigging's evolutions. (8) Yes, at her merge, old
+beside new, by the session's design-record commit. (9) Accepted. **5. The bilander (her §17).**
+(1) Her window after B2's merge, her file on the package's branch only after B3.3 is merged
+there, held unmerged if B3.3 lags, the 74 waiting as §2.2 has it. (2) Yes. (3) Yes. (4) **The
+design's block:** the reserve branch from the start, keyed on `settee`, the foot from the
+corners with the block a fathom abaft the clew and abreast of it, the trim reading no part of
+the profile; Ext §5.9's taffrail block is the one approved and this is the departure from it,
+so Ext §5.9 gains the line (one block for a settee's cut, the other for every other), by the
+session, and the lateral offset's understatement goes in TuningNotes as said. (5) Noted against
+the plan hull by hull: S† for her body and for Gwyn's heights, the marks as the ladder has
+them; the plan's §5.7 row amended at her merge, old beside new. (6) Unscaled, as picked;
+"about 130" holds 128. (7) Yes: report first, no curve moved for rule 1 alone. (8) Yes: B4 runs
+them; a follow-up B3 step keyed on `settee` alone before her merge if one is needed, her polar
+and 7-197's rule-1 clause measured again on it, old beside new. (9) Accepted. **6. The 74 (her
+§17.2).** (1) One `marines` key, the same on her bill, the 64's and the razee's, laid inert in
+stage 0c; whether a division forms at the beat is B7's to measure on all three. (2) Keyed on
+two gun decks and a `lower` deck, the two two-deckers alike, the 64's beat lines and robbing
+order old beside new. (3) B7.d at the end of her window, both two-deckers together, on the
+lead's allotment of `parts.py` and `graph.py` after B3's merge, checked as Build §3.4. (4)
+B7.c, its own commit, bisected, old beside new for 7-136 and every file's tack at quarters;
+the lead reads the moved pins before the merge. (5) Agreed. (6) Confirmed (item 3 above). (7)
+Hold her window for SW-5 L3. (8) B1's stage B (item 2 above). (9) Accepted. (10) If the owner
+takes the rank-4 rule, B7.e owns `world/captains.py` and the two doctrine books for that step
+alone, and the 64's scenario tests are re-run. (11) Accepted. (12) A later package of the
+physics; a line in TuningNotes with the *Bellona*'s figures beside the engine's, for both files.
+(13) The pick: head room first, to 5 ft; past that, a report with the figures and `DRIVER =
+False` until the lead rules; the 64's clew check at B1's stage B (item 2 above). (14) Yes: the
+line is passed to 81's row (above): a triple within `OVER_THE_RAIL_M` of the rail at its x is a
+gun place over the rail and is not drawn as a port. (15) The key laid inert in stage 0c is
+75's; the world code that brings the flag's people aboard with their stations is a package of
+its own after 84, beside 87, booked when the owner asks for a scenario that hoists a flag; 75
+does not build it. Named for the lead (§12.3): `freesail/orders/gunnery.py` is B7's for the
+whole package; `evolutions/runner.py`, `ship/graph.py`, `ship/parts.py` and
+`tools/ships/indefatigable.py` B7's for B7.c and B7.d alone, each returned at that step's
+merge; `tools/ships/mizen_yard.py` B7's for the driver's jaws. **7. Also:** the far ship's
+length is booked to 74 as the last note said; §19.2 item 5 (the merchant brig's description
+to `merchant-brig.yaml`, the packet's description) is ruled as §8.4 proposes, built by its
+owner before the brig's phrases are next touched. Go on: stage 0H's merge wait is lifted (item
+1), so stage B when B3.5 and its drawing are in.
