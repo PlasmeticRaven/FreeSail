@@ -11484,7 +11484,19 @@ chart's roses (Maury's or the Admiralty's), not held.
 
 ### The suite as run
 
-SUITE_PLACEHOLDER
+On the final tree, in this container (four cores): **the fast tier** (`python -m pytest -n auto
+-q -p no:cacheprovider`) 3,924 passed and one failed, `test_pictures.py::test_the_mcp_bridge_
+returns_the_chart_and_the_ships_view_as_images_that_are_not_blank` (the chart's picture "blank",
+its spread 7.9 against the floor of 8.0, beside the workers). It passed on the base tree alone,
+then failed alone on this tree once and **passed alone on this tree on the next run**. Its
+scenario (the lesson off Falmouth) has the business off and reads nothing this package
+touched, so it is the pictures' timing on a loaded machine (72's record carries the same
+test's time-out beside four workers), not this package's. **The slow tier of the files
+touched** (`--slow -m "not pace"`): `test_business.py` and `test_nations.py` 23 passed; the
+squadrons' truths 7-152 to 7-158 and the new 7-260 to 7-269, 17 passed (7-159 and 7-160 are
+pace tests and the brief's `-m "not pace"` leaves them out). The counts are from pytest's
+progress dots; the project's `-q` prints no summary line. The whole suite is the lead's,
+in the cloud at the merge.
 
 ### Found on the way, and left
 
