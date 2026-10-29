@@ -11421,3 +11421,5 @@ when it was pushed. Next, in order: the fast tier whole on the final tree; the k
 trials' and touched files' slow tier (`--slow -m "slow and not pace"`, the files of step 7's
 list with `test_replay.py` and `test_checkpoint.py`); the pace tests alone and `pace6.py`;
 the figures into this section and the design postscript; the green commit and its report.
+**The fast tier whole on this tree (05:56 UTC): 3920 passed, one failed**, the pictures'
+blank-image check (the known flake, as at step 7); ruff clean. The slow set is next.
