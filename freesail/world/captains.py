@@ -3887,7 +3887,6 @@ class Captain(Judgement):
         grappled; a fight in hand holds the course."""
         from freesail.combat.boarding import GRAPPLE_RANGE_M, boarders_of, fight_of, grappled_to
         from freesail.combat.hits import damage_of
-        from freesail.world.brains import PLAYER_ID
 
         ship = self.world.ship
         odds = float(self._th("board_odds", 0.0) or 0.0)
@@ -3906,9 +3905,6 @@ class Captain(Judgement):
             if crew_world is not None and getattr(crew_world, "shape", "full") == "full"
             else None
         )
-        if body is None and mid == PLAYER_ID:
-            parent = getattr(self.world, "parent", None)
-            body = parent.ship if parent is not None else None
         if body is None or body.extra.get("crew") is None:
             return False
         theirs = sum(1 for s in body.extra["crew"].sailors if s.fit)
@@ -4111,11 +4107,7 @@ class Captain(Judgement):
     def _vessel_of(self, vid: str) -> Any:
         world = self.world
         sea = getattr(world, "vessels", None)
-        v = sea.get(vid) if sea is not None else None
-        if v is None and vid == "the ship":
-            parent = getattr(world, "parent", None)
-            v = parent.vessels.player_shadow(parent) if parent is not None else None
-        return v
+        return sea.get(vid) if sea is not None else None
 
     def _nearest_stranger(self, p: Perception) -> dict[str, Any] | None:
         items = self._unspoken(p)

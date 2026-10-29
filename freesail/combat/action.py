@@ -41,11 +41,11 @@ from freesail.core.events import Severity
 from freesail.crew.model import number_words
 from freesail.crew.quarters import quarters_of
 from freesail.world.geo import bearing_and_distance
+from freesail.world.ships import PLAYER_ID
 
 __all__ = ["GUNNERY_STREAM", "strike", "target_of", "tick_action"]
 
 GUNNERY_STREAM = "gunnery"
-PLAYER_ID = "the ship"
 
 
 class _LazyStream:
@@ -138,13 +138,8 @@ def target_of(world: Any, target_id: str) -> Target | None:
     if here is None:
         return None
     parent = getattr(world, "parent", None)
-    if target_id == PLAYER_ID and parent is not None:
-        body, tw = parent.ship, parent
-        pos = parent.position
-        heading = float(body.heading)
-        heel = math.degrees(float(getattr(body.dyn, "heel", 0.0)))
-        words = _words_for(world, PLAYER_ID, getattr(body, "name", "the ship"))
-        nation = _nation_made_out(world, PLAYER_ID)
+    if False:  # pragma: no cover - the branch the shadow needed (package 84, step 7)
+        pass
     else:
         sea = parent.vessels if parent is not None else world.vessels
         vessel = sea.get(target_id)
@@ -469,8 +464,6 @@ def _far_weight(vessel: Any) -> float:
 
 def _body_of(world: Any, ship_id: str) -> Any:
     parent = getattr(world, "parent", None)
-    if ship_id == PLAYER_ID and parent is not None:
-        return parent.ship
     sea = parent.vessels if parent is not None else world.vessels
     v = sea.get(ship_id)
     if v is None:
@@ -538,11 +531,7 @@ def _watch_struck(world: Any, battery: Battery, tick: int) -> None:
     sea = parent.vessels if parent is not None else getattr(world, "vessels", None)
     if sea is None:
         return
-    candidates = list(getattr(sea, "vessels", []) or [])
-    if parent is not None:
-        shadow = parent.vessels.player_shadow(parent)
-        if shadow is not None:
-            candidates.append(shadow)
+    candidates = list(getattr(sea, "vessels", []) or [])  # the player's ship among them (step 7)
     here = world.position
     own = _own_id(world)
     for v in candidates:

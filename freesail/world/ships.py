@@ -61,6 +61,11 @@ from freesail import units
 from freesail.world.chart import Feature, Sighting
 from freesail.world.geo import Position, bearing_and_distance, horizon_nm
 
+# The followed hull's vessel's id (package 84, step 7): the player's ship as a vessel of
+# the sea, the far brains' word for her since package 43 and the squadrons', the action's
+# and the signals' since (`brains`, `squadrons` and `combat.action` import it from here).
+PLAYER_ID = "the ship"
+
 __all__ = [
     "COLOURS_MADE_OUT_NM",
     "COMPANY_CLOSING_KN",
@@ -1454,7 +1459,9 @@ class Vessels:
         self.world = world
         self.vessels: list[Vessel] = []
         self.serial = 0
-        self._shadow = None
+        # the followed hull's own vessel (package 84, step 7; the shadow before it): the
+        # player's ship as a vessel of the sea, last in `vessels`, never moved by the sea
+        self.own: Vessel | None = None
         self._spoke_lines = []
         self.crewed_ids = ()
 
@@ -1471,7 +1478,13 @@ class Vessels:
                 vessel.nation_adjective = nation.adjective
                 vessel.flag = getattr(nation, "flag", "")
                 vessel.colours = vessel.colours or nation.colours
-        self.vessels.append(vessel)
+        own = self.__dict__.get("own")
+        if own is not None and self.vessels and self.vessels[-1] is own:
+            # the followed hull's vessel stays last (the design's rule 3: the brains'
+            # nearest-first orders and the lookouts' lists as the shadow gave them)
+            self.vessels.insert(len(self.vessels) - 1, vessel)
+        else:
+            self.vessels.append(vessel)
         return vessel
 
     def get(self, vessel_id: str) -> Vessel | None:
@@ -1489,7 +1502,10 @@ class Vessels:
         return None
 
     def active(self) -> list[Vessel]:
-        return [v for v in self.vessels if not v.done]
+        """The other sail on the sea: every vessel not done but the player's own (package 84,
+        step 7: she is on the sea, last, and no sail of her own lookout's)."""
+        own = self.__dict__.get("own")
+        return [v for v in self.vessels if not v.done and v is not own]
 
     def tick(self, world: Any, dt: float = float(VESSEL_TICK_S)) -> list[tuple[Any, ...]]:
         """The minute's move of every far-detail vessel; the second's of a near one
@@ -1556,8 +1572,8 @@ class Vessels:
         minute = world.clock.ship_time.second == 0
         for v in self.vessels:
             crew = v.crew
-            if crew is None or v.done:
-                continue
+            if crew is None or v.done or crew.is_followed:
+                continue  # the followed hull's tick is the World's own
             if not crew.awake:
                 far_tick(crew)
                 continue
@@ -1566,14 +1582,16 @@ class Vessels:
                 world.tick()
             mirror(v, crew, minute)
 
-    # -- what a far-detail brain sees (package 43) ----------------------------------------
+    # -- the followed hull's own vessel (package 84, step 7; the shadow of package 43) -----
 
     def player_shadow(self, world: Any) -> Vessel | None:
-        """The player's ship as the brains of the other sail see her: a vessel of her
-        file's description under the id `captains.PLAYER_ID`, at her truth, her colours
-        taken as shown, her sail state by her manoeuvre; None on the endless plane. Kept
-        and brought up once a minute; never in `vessels`."""
-        from freesail.world.brains import PLAYER_ID
+        """The player's ship as a vessel of the sea (package 84, step 7; `Vessels.own`): a
+        vessel of her file's description under `PLAYER_ID`, at her truth, her colours
+        taken as shown, her sail state by her manoeuvre, her hull the followed hull and the
+        followed hull's `vessel` her; made at the first asking and kept last in `vessels`,
+        brought up to her truth every tick of the followed hull's (`World._tick_vessels`)
+        and at every asking; None on the endless plane. The name is the shadow's, which
+        every reader of hers asked by it; she is the one vessel the sea never moves."""
         from freesail.world.captains import _is_kings_ship
 
         with players_current(world) as world:
@@ -1581,7 +1599,7 @@ class Vessels:
             if pos is None:
                 return None
             ship = world.ship
-            s = self._shadow
+            s = self.__dict__.get("own")
             if s is None:
                 source = str(getattr(getattr(ship, "spec", None), "source", "") or "")
                 key = ""
@@ -1619,9 +1637,16 @@ class Vessels:
                     nation_adjective=getattr(nation, "adjective", ""),
                     description=key,
                     what=d["what"],
+                    detail="crewed",
                 )
-                self._shadow = s
-            # package 71: the player's locker is the shadow's (her colours as she shows them,
+                self.own = s
+                self.vessels.append(s)  # last, and kept last by `add`
+            hull = world.own
+            if s.crew is not hull:
+                # her hull the followed hull, and she its vessel (a load re-links them)
+                s.crew = hull
+                hull.vessel = s
+            # package 71: the player's locker is her vessel's (her colours as she shows them,
             # her signals flying), one object
             from freesail.world.signals import player_locker
 
@@ -1630,10 +1655,11 @@ class Vessels:
             s.struck = bool((getattr(ship, "extra", None) or {}).get("struck"))  # package 70
             s.heading_deg = units.rad_to_deg(float(ship.heading)) % 360.0
             s.speed_kn = units.ms_to_knots(_ship_speed_ms(ship))
-            manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")
+            # her sail state by her manoeuvre, read from the ship as the reading
+            # `manoeuvre_in_hand` reads it (`api.readings._manoeuvre`), every tick
             if getattr(world, "at_anchor", False):
                 s.sail_state = "at anchor"
-            elif manoeuvre in ("hove to", "heaving to"):
+            elif _lying_to(world):
                 s.sail_state = "lying to"
             else:
                 s.sail_state = "under plain sail"
@@ -1658,10 +1684,8 @@ class Vessels:
         pos, eye = vessel.position, vessel.height_m
         heading = math.radians(vessel.heading_deg)
         items: list[dict[str, Any]] = []
+        self.player_shadow(world)  # the followed hull's vessel brought up to her truth
         others: list[Vessel] = [o for o in self.vessels if o is not vessel and not o.done]
-        shadow = self.player_shadow(world)
-        if shadow is not None:
-            others.append(shadow)
         for o in others:
             bearing, distance = bearing_and_distance(pos, o.position)
             nm = distance / units.NAUTICAL_MILE
@@ -1748,8 +1772,9 @@ class Vessels:
         if pos is None:
             return []
         lines: list[tuple[Any, ...]] = []
+        own = self.__dict__.get("own")
         for v in self.vessels:
-            if v.done:
+            if v.done or v is own:
                 continue
             _, distance = bearing_and_distance(pos, v.position)
             nm = distance / units.NAUTICAL_MILE
@@ -1812,7 +1837,12 @@ class Vessels:
         return lines
 
     def in_sight(
-        self, pos: Position, height_of_eye_m: float, visibility_nm: float | None, daylight: str
+        self,
+        pos: Position,
+        height_of_eye_m: float,
+        visibility_nm: float | None,
+        daylight: str,
+        viewer: Vessel | None = None,
     ) -> list[Sighting]:
         """The vessels in sight from the masthead: within the horizon her rig's height
         and the eye give (truth 67), within the weather's visibility, by day; at night a
@@ -1823,8 +1853,8 @@ class Vessels:
         vis_nm = math.inf if visibility_nm is None else float(visibility_nm)
         out: list[Sighting] = []
         for v in self.vessels:
-            if v.done:
-                continue
+            if v.done or v is viewer:
+                continue  # her own body is no sail of hers (package 84, step 7)
             bearing, distance = bearing_and_distance(pos, v.position)
             nm = distance / units.NAUTICAL_MILE
             limit = min(vis_nm, horizon_nm(height_of_eye_m, v.height_m))
@@ -1880,9 +1910,16 @@ class Vessels:
 
 
 def _player_id() -> str:
-    from freesail.world.brains import PLAYER_ID
-
     return PLAYER_ID
+
+
+def _lying_to(world: Any) -> bool:
+    """Whether the ship lies to or is heaving to, as the reading `the manoeuvre in hand`
+    says it (`api.readings._manoeuvre`: the evolution runner's work in hand, else the
+    heave-to's record on the ship), read straight and not through the readings view."""
+    from freesail.api.readings import _manoeuvre
+
+    return str(_manoeuvre(world, None) or "") in ("hove to", "heaving to")
 
 
 def _sound_of(v: Vessel, nm: float) -> str:

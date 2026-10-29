@@ -463,7 +463,15 @@ class Lookout:
         if vessels is not None and vessels.vessels:
             # the other sail (spec M5 §25; package 35's pilot cutter): at the horizon her
             # rig's height and the eye give, within the weather's visibility
-            found.extend(vessels.in_sight(pos, self.height_of_eye_m, visibility_nm, daylight))
+            found.extend(
+                vessels.in_sight(
+                    pos,
+                    self.height_of_eye_m,
+                    visibility_nm,
+                    daylight,
+                    viewer=getattr(world, "vessel", None),  # her own body no sail (step 7)
+                )
+            )
             found.sort(key=lambda s: s.distance_m)
         # the cask hove over for a mark (practice and resupply, between packages 72 and 73;
         # `combat.marks`): a sighting of its own kind, never hailed; sorted in only when

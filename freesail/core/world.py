@@ -863,6 +863,10 @@ class World:
         # after the readings, which the player's shadow as a commander reads
         from freesail.world.squadrons import sets_from_scenario
 
+        # the player's ship a vessel of the sea (package 84, step 7; `Vessels.own`), last in
+        # the list after the scenario's and the business's, before the sets are read (a set
+        # may name her); her bring-up reads the readings, made just above
+        self.vessels.player_shadow(self)
         sets_from_scenario(self)
         # The agents at their stations (spec M4 §11), by station name, in the order they
         # were stationed: each is a `freesail.agents.harness.Harness`, called after the
@@ -930,6 +934,11 @@ class World:
         self._adopt_old_people()
         self._adopt_old_ports()
         self._adopt_old_crews()
+        # a checkpoint of before step 7 has no vessel of the player's on the sea: made here
+        # for the game's World (a crewed World of before has her view where its sea was)
+        sea = self.__dict__["_own"].__dict__.get("vessels")
+        if sea is not None and not hasattr(sea, "hull") and not hasattr(sea, "crew"):
+            sea.player_shadow(self)
 
     def _adopt_old_crews(self) -> None:
         """A checkpoint written before the Hull was the container (package 84, step 6): a
@@ -1413,7 +1422,10 @@ class World:
         if business is not None and self._position is not None:
             if self.clock.ship_time.second == 0:
                 business.tick()  # the draw and the ships beyond the edge (package 43b)
-        if self._position is None or not self.vessels.vessels:
+        # the followed hull's own vessel brought up to her truth (package 84, step 7), the
+        # other hulls and the brains reading her from the sea as they read any sail
+        own = self.vessels.player_shadow(self)
+        if self._position is None or not any(v is not own for v in self.vessels.vessels):
             return
         if getattr(self.vessels, "crewed_ids", ()):
             # the crewed ships beside her, each a World of her own (package 43)

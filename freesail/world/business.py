@@ -461,10 +461,18 @@ class Business:
         options = kinds.get(nation) or kinds.get("default") or ["merchant brig"]
         return str(options[int(self._rng().random() * len(options)) % len(options)])
 
+    def _names_used(self) -> set[str]:
+        """The names on the sea, the player's ship's among them (package 84, step 7: she is
+        a vessel of the sea, made after the business's first draw; found on the way, the
+        business named a trader Speedwell beside the Speedwell)."""
+        used = {v.name for v in self.world.vessels.vessels}
+        used.add(str(getattr(getattr(self.world, "ship", None), "name", "") or ""))
+        return used
+
     def _name(self, nation: str) -> str:
         names = self.data.get("names", {})
         options = names.get(nation) or names.get("default") or ["Fortune"]
-        used = {v.name for v in self.world.vessels.vessels}
+        used = self._names_used()
         rng = self._rng()
         for _ in range(8):
             name = str(options[int(rng.random() * len(options)) % len(options)])
@@ -1122,7 +1130,7 @@ class Business:
         if not names:
             return f"the {nation} cruiser"
         rng = self._rng()
-        used = {v.name for v in self.world.vessels.vessels}
+        used = self._names_used()
         for _ in range(8):
             name = str(names[int(rng.random() * len(names)) % len(names)])
             if name not in used:

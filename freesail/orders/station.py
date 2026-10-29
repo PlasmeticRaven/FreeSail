@@ -169,12 +169,12 @@ def _named_or_kind(world: Any, root: Any, key: str) -> Any:
     from freesail.world.geo import bearing_and_distance
 
     own = _own_id(world)
-    shadow = root.vessels.player_shadow(root)
     others = [(v, str(v.id)) for v in root.vessels.active() if str(v.id) != own]
-    if shadow is not None and own != str(shadow.id):
-        if key in (shadow.name.lower(), shadow.name.lower().removeprefix("the ")):
-            return shadow
-        others.append((shadow, "the ship"))
+    players = getattr(root.vessels, "own", None)  # the player's ship, a vessel of the sea (step 7)
+    if players is not None and own != str(players.id):
+        if key in (players.name.lower(), players.name.lower().removeprefix("the ")):
+            return players
+        others.append((players, str(players.id)))
     said = " ".join(key.replace("-", " ").split())  # 'brig-sloop' and 'brig sloop' alike
     phrase = re.compile(rf"(?<![\w-]){re.escape(said)}(?![\w-])")
 
@@ -220,7 +220,7 @@ def _flag_course_deg(world: Any, flag: str, sighting: Any) -> float | None:
     if level < 1 and not in_set:
         return None
     root = _root(world)
-    body = root.vessels.get(flag) if flag != "the ship" else root.vessels.player_shadow(root)
+    body = root.vessels.get(flag)  # the player's ship a vessel of the sea too (step 7)
     if body is None:
         return None
     heading = float(getattr(body, "heading_deg", 0.0)) % 360.0

@@ -828,6 +828,10 @@ the far body's record, and she wakes without being remade when the cap takes her
 container of a member is a `Hull` of the one World since step 6 (`world.hulls`, the
 `CrewedWorld` retired to the unpickler): one clock, her own log and streams, her systems
 and her stations holding the hull as their world, the World's tick run with her current.
+Since step 7 the player's ship is a vessel of the sea like any member (`Vessels.own`, under
+`ships.PLAYER_ID`, last in the list and left out of every viewer's own sail; the shadow
+retired), a hull at anchor or in port may be awake, and the cap's order is a ship in
+dealings, then a hull with a stationed person, then the nearest.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 

@@ -184,7 +184,7 @@ def own_id() -> str:
     """The id of the World's own hull, the player's ship: the far brains' word for her
     (`brains.PLAYER_ID`, "the ship"), so that the id the sets, the action and the signals
     know her by is the hull's. Step 7 defines it once, in `ships.py`."""
-    from freesail.world.brains import PLAYER_ID
+    from freesail.world.ships import PLAYER_ID
 
     return str(PLAYER_ID)
 
