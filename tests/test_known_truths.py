@@ -8875,7 +8875,10 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     ships astern to make more sail) when she has been out of her station ten minutes, and
     she regains it; after two hours every ship is within a cable of her station and holds
     it. At seed 7: the signal ordered at 2760, up at 2866, answered at 3000; the Friendship
-    back in her station at 5280 (`squadron.in_station`); at 7200 and after, every ship
+    back in her station at 6420 (`squadron.in_station`; 5280 before package 84's step 6, when
+    the privateer's World, on a clock of her own, never saw the private signal flying and made
+    no answer; on the one clock she bluffs a reply, is judged an enemy, and the commodore
+    closes the convoy round him first); at 7200 and after, every ship
     within 165 m of her station (the far station leg holds at the tolerance's edge, half a
     cable, and the lookout's rounding adds the rest)."""
     w = _scenario_world(CONVOY_SIX)
@@ -8900,7 +8903,7 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     back = [e for e in w.log if e.kind == "squadron.in_station" and "Friendship" in e.text]
     assert ordered and made and answered and back, (ordered, made, answered, back)
     when = (ordered[0].tick, made[0].tick, answered[0].tick, back[0].tick)
-    assert when == (2760, 2866, 3000, 5280), when
+    assert when == (2760, 2866, 3000, 6420), when  # 5280 before 84's step 6 (the one clock)
     worst = 0.0
     for _ in range(6):
         w.run(600)
@@ -10491,7 +10494,7 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
     begin(w, sf)
     w.run(60)
     raven, crew = station_world(w, "Raven")
-    assert crew.shape == "far" and raven.detail == "crewed"
+    assert crew.shape == "far" and raven.detail == "far"  # asleep: the sea's word (step 6)
     stage = {"n": 0, "orders": []}
 
     def act(last, turns):

@@ -1728,3 +1728,126 @@ moved every digest in which a demoted ship is glassed again: `crewed` is awake a
 detail, as it read before the step, and `asleep` is said apart. The checkpoint: a World asleep is carried as a seated far World was, and the
 three kept saves and the fixture's checkpoint are untouched; three sleeping brigs beside
 the frigate add nothing the gzip can see beside the log's growth (the notes have the bytes).
+
+### Step 6: the Hull the container; `CrewedWorld` retired; the tick over the hulls
+
+Built on step 5. **Built.** A crewed ship is a `Hull` of the one World (`world.hulls`, by
+id; `world.followed` the hull the drivers and the cap centre on, the player's ship until
+step 7), and `CrewedWorld` is a World no longer kept: it builds a hull's fields (the World's
+own constructor run with `parent` and `vessel` set, as before) and is discarded once the
+hull is adopted (`crews.make_hull`, `adopt_hull`), its name kept for the unpickler alone.
+**The mechanism is the swap.** Every per-ship attribute of the World has been a property
+to `world.own` since step 1; `own` is now the *current* hull, a thread-local stack with the
+followed hull at its bottom (`World.as_hull(hull)` makes another current for a block;
+`World.is_followed` says which), so that every method of the World's that works per-ship
+fields (its `tick`, its `_tick_*`, `submit`, `record`, `readings`, the readers) works on
+whichever hull is current, with the shared fields unchanged. **The Hull is the façade** her
+systems and the stations hold as their world: her per-ship fields are her own attributes
+(`seed`, `scenario`, `rng` and `vessels` joined them, each hull her own streams and her own
+view of the sail, `HullView`, the followed hull's the `Vessels` of the sea), the World's
+shared fields are properties to the World, and every other name of the World's is reached
+through `Hull.__getattr__`, which runs it with the hull current; `Hull.shape` ("full" or
+"far" from `awake`) and `Hull.parent` keep the names a crewed World answered, and
+`Vessel.hull` is `Vessel.crew`'s other name. **One clock**: the World's, which another
+hull's tick does not advance; **her own log**, `hull.log`, never dropped since step 5;
+**her own `Rng`**, seeded as her World's was, so that every draw of hers is what it was.
+**The tick over the hulls** (`World.tick`): the shared head (the clock, the world orders due)
+for the followed hull alone; `_follow_weather` at another hull's place by the followed
+hull's systems and plane (a crewed World's `_follow_weather` before it), the conditions the
+followed hull's; her body, her seeing and acting as the World's own; the far bodies, the
+switch, the ports' jobs and the seats' budgets for the followed hull alone. Another hull's
+whole tick runs where a crewed World's ran, inside `_tick_vessels` (`Vessels.tick_crews`:
+`with world.as_hull(hull): world.tick()`, then the mirror into her far body), and a sleeping
+hull's minute is `crews.far_tick(hull)`, a function over the hull. **The adoption**
+(`adopt_hull`): the building World's `own` becomes the vessel's hull, her fields as they
+stand; a walk over her own graph (`_rebind_world`) makes every reference to the building
+World the hull, and every reference to its clock the World's one clock (the watch bill's,
+the routine's, the runner's); the shared things are not entered. **The checkpoint**: a hull
+pickles as a World did (the readings view nulled), the thread-local stack is the module's
+and not pickled; a checkpoint of before step 6 holds a `CrewedWorld` on each crewed vessel,
+converted at the load into a hull by the same adoption (`World._adopt_old_crews`, after the
+registry's and the ports' converters), and `own` on an older World's dict is read as `_own`
+behind the property; the fixture saves and the hulls tests' old-shape checkpoints (a step 6
+hull written as the crewed World of before) load and run on alike.
+
+**Taken another way, with the reason.** The design has `World.tick` in two strict phases
+(every body moves, then every hull sees and acts); here another hull's whole tick runs
+between the followed hull's body and her seeing, in the order a crewed World's ran, so that
+no line of any passage moves by the step: the brief names this the one step where a pin can
+move for the order's sake and says the order is the mend, so the order is kept, and the two
+strict phases are a refinement for the owner to ask for. The World's per-ship methods stay on
+the World and run under the swap rather than moving to the Hull: the façade reaches them,
+and the World's text stands. `Vessels.tick_crews` and `station_world` keep their names
+(`hull_for` is the design's), the hull's sea and conditions stay the followed hull's (the
+study's findings 5 and 6 are the owner's knob), and `_NOT_CREWED_STATES` stands until step 7
+settles the cap's order for a hull at anchor.
+
+**Found on the way.** A readings view made for another hull captured the World and read the
+followed hull's ship when a station read it after the block: the view is made over the hull's
+façade (`World.readings`). The building World's clock rode into the hull's runner and
+routine through `attach_crew` and would have stood still: the adoption's walk maps it to the
+one clock. A per-ship field a hull lacks must not be forwarded to the World (whose property
+would read her again): `Hull.__getattr__` refuses `PER_SHIP_FIELDS` names it has not got.
+The `HullView` answers `player_shadow` (the station-by-kind reader asks the view). **The
+one clock from the first tick of her making**: a hull's builder sets the World's clock before
+the constructor runs, so that every tick her making stores (her log's first line, the hold a
+hand laid on her far body carried into her captain, her account's fix) is the game's; before
+it a crewed World counted from her promotion, and the hold's end came out short by the tick
+she was promoted at. **A sleeping hull's cadence by distance** (the lead's finding on step
+5): a vessel asleep kept `detail == "crewed"`, so the sea never gave her the near level's
+every-second tick when she came within the near range over the cap; her level of detail is
+now the sea's word for her body, "crewed" awake and, asleep, "far" or "near" by her
+distance as a hull-less vessel's (`Vessels._promote_and_hail`). So a sleeping hull within
+the near range does each second what a near vessel does: her far body moves by the plan
+every second instead of every minute, and her hull mirrors it (`tick_near`); her dealings'
+jobs, her people's moves, her lookout's minute and her stations' samples run in her far
+tick as everywhere asleep.
+
+**The player's things read under another hull's swap** (found by the fast tier: the fights,
+truths 7-134, 7-140, 7-147, 7-180, 7-181, 7-183 and 7b-113, the wardroom's evade). The
+swap makes the World's per-ship names the current hull's, which is right for her own tick
+and wrong for every shared reader that means the player's ship and was given the World, or
+reads it through an object that holds the World: a crewed World's `parent` was the player's
+World and its names hers whichever ticked, and that was the contract the shared code stood
+on. Each place had its own symptom and one cure, a hull named instead of the World. (1) The
+player's shadow (`Vessels.player_shadow`) was built in a hull's block from `world.ship` and
+`world.dealings.ship_nation`, hers; the shadow came out of the enemy's nation and every
+captain of her colours showed the Amazon the private signal instead of engaging. The build
+runs under `ships.players_current(world)`, a block with the followed hull current: her
+façade would have answered `dealings` right but not what is read of it afterwards (the
+façade forwards a property's fetch under the swap, not the property of the object it
+returns, and `Dealings.ship_nation` reads `self.world.scenario`), so a shared reader of the
+player's holds her hull or runs under that block. (2) `HullView` holds the game's World
+(`game`) from the build: found through the hull's world it was the building World's own
+view while she was built (a recursion when her captain's first order looked out), and its
+shadow would have been built of her. (3) `Hull.parent` is the followed hull's façade (None
+for the followed hull), and `World.parent` the same while another hull is current: the shared
+code given the World in a hull's tick (`action.target_of`, the hail, the stations by flag,
+the boarding's other world) tells the player's ship from another by `parent is None`, and
+the World under the swap had none, so a hull's battery found no mark in the player's ship
+and the privateer of the first action never fired. (4) `World.vessel` is the current hull's
+far body (None for the followed hull), where the World had none: `action.strike` wrote her
+colours struck on `world.vessel`, so the player's watch never saw them come down and her
+guns fired on a struck ship (three hits for one in 7-134). (5) The fight's `attacker_world`
+is the attacker's hull: the round runs in whichever hull ticks first in the minute, and the
+World's `record` was the current hull's, so the boarders' line went to the enemy's log. (6)
+A captain's first judgement comes `JUDGE_FIRST_S` after his making on the one clock
+(`Captain.made_at`): a crewed World's clock counted from her promotion, and on the one clock
+a hull's captain judged at his first tick, before his lookout had looked, and left his
+investigating for his passage. (7) The checkpoint converters walk the sea for the game's
+World alone (`World._old_sea`): a crewed World of before has her view where its sea was,
+and its own `__setstate__` runs first. (8) The ship's bell is each hull's on the one clock:
+`Clock.bells` reported a tick's bells once, a guard that was each World's with its clock
+and became the first hull's to ask, so the brig's log took the half hour's bells and the
+player's lost them (two lines of the trade-stranger trial by 7500 s, the pinned digest
+moved); the guard is the hull's (`World._bells_struck`, `Hull._bell_said`), the clock's
+reading pure (`Clock.bells_struck`). (9) The one clock mends two faults of the two clocks,
+and three pins move for it (the tuning notes have the figures): a hull's lookout read the
+player's hoists as flying by her own tick (`Hoist.flying(tick)`, `tick >= breaks_out`), and
+her World's clock, counted from her promotion, stood hours behind the tick a hoist broke out
+at, so no crewed stranger ever saw the King's ship's private signal; and a hit's tick was
+written by the firer's clock (`keeper.struck_by[firer] = tick`), so the butcher's bill of a
+ship fired into by a crewed stranger came before its ten minutes. On the one clock the
+stranger sees the challenge and the bluffing privateer answers it wrong, and the bill comes
+in its time. A step 6 hull is `crews.Hull` to the tests that held a `CrewedWorld`
+(`isinstance` restated, the crewed checkpoint's `crew.world is c`).

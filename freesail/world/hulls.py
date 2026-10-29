@@ -46,10 +46,20 @@ from freesail import units
 
 __all__ = ["PER_SHIP_FIELDS", "SHARED_FIELDS", "Hull", "delegated", "lift_old_state", "own_id"]
 
+_MISSING = object()
+
 # Every per-ship field of a World (the study's §1.1), by the name the World's consumers read
 # it under; each becomes a property of `World` to `World.own`, and each is a field of the
 # Hull. The order is the World's constructor's, for the reader.
 PER_SHIP_FIELDS: tuple[str, ...] = (
+    # her seed and her streams, her scenario (the game's for the followed hull, her own copy
+    # for another: her nation, her intent, her fit) and the sail she sees (the `Vessels` of
+    # the sea for the followed hull, a `HullView` of every far body but her own for another),
+    # each hull's since step 6; before it the crewed World's own copies
+    "seed",
+    "scenario",
+    "rng",
+    "vessels",
     # her hull and rig, and her place on the sphere (spec M5 §9)
     "ship",
     "origin",
@@ -130,10 +140,7 @@ PER_SHIP_FIELDS: tuple[str, ...] = (
 # The World's shared fields a Hull exposes under the same names (the design's §2.2), so
 # that a consumer given a hull reads what it reads of a World.
 SHARED_FIELDS: tuple[str, ...] = (
-    "seed",
-    "scenario",
     "clock",
-    "rng",
     "chart",
     "tide",
     "systems",
@@ -141,7 +148,6 @@ SHARED_FIELDS: tuple[str, ...] = (
     "nations",
     "registry",
     "ports",
-    "vessels",
     "squadrons",
     "business",
     "world_orders",
@@ -209,6 +215,13 @@ class Hull:
     # checkpoint from before lacks them (`World.tick`, `_tick_needs`)
     player_seat: Any = None
     ship_lost: bool = False
+    # the container (package 84, step 6): whether her physics run (`awake`; a sleeping
+    # hull's body is her far body's, the plan's), her far body on the sea (`vessel`, None
+    # for the followed hull until step 7), and the far body's anchor said once
+    awake: bool = True
+    vessel: Any = None
+    _far_anchored: bool = False
+    _bell_said: int = -1  # the tick her bell last struck (`World._bells_struck`)
 
     def __init__(self, world: Any, hull_id: str) -> None:
         self.world = world
@@ -217,6 +230,67 @@ class Hull:
     def __repr__(self) -> str:
         name = getattr(getattr(self, "ship", None), "name", "") or self.id
         return f"Hull({name!r})"
+
+    # -- the façade (package 84, step 6): a Hull stands where a World stood -----------------
+    #
+    # Her systems (`People`, `Dealings`, `Navigation`, the standing runtime, her captain, her
+    # harnesses) hold her as their `world`, and the grammar's and the readings' functions
+    # take her as one. Her per-ship fields are her own attributes; the World's shared fields
+    # are properties to the World (installed below from `SHARED_FIELDS`); and every other
+    # name of the World's (its methods, `_tick_*`, `plane_of`, `world_order`, `run`, the
+    # properties over per-ship fields) is reached through `__getattr__`, which runs it with
+    # this hull current (`World.as_hull`), so that `self.<per-ship field>` inside the World's
+    # text reads and writes hers. Nothing of the World's text moves for it.
+
+    def __getattr__(self, name: str) -> Any:
+        if name.startswith("__") or "world" not in self.__dict__ or name in PER_SHIP_FIELDS:
+            # a per-ship field she has not got is missing, not the World's (whose property
+            # for it would read her again)
+            raise AttributeError(name)
+        world = self.__dict__["world"]
+        attr = getattr(type(world), name, _MISSING)
+        if attr is _MISSING:
+            if name in world.__dict__:
+                return world.__dict__[name]  # a shared thing set on the instance
+            raise AttributeError(name)
+        if isinstance(attr, property):
+            with world.as_hull(self):
+                return getattr(world, name)
+        if callable(attr):
+            hull = self
+
+            def bound(*args: Any, **kw: Any) -> Any:
+                with world.as_hull(hull):
+                    return attr(world, *args, **kw)
+
+            bound.__name__ = name
+            return bound
+        return attr
+
+    @property
+    def parent(self) -> Any:
+        """The followed hull's façade (the player's ship), the name a crewed ship's World had
+        for the World it sailed in: its per-ship names (`parent.ship`, `parent.position`,
+        `parent.vessels`, `parent.record`) are the player's whichever hull is current, where
+        the World's own would read the current hull; None for the followed hull herself, as a
+        World has no parent."""
+        world = self.world
+        followed = world.hulls.get(world.followed)
+        return None if followed is self else followed
+
+    @property
+    def shape(self) -> str:
+        """ "full" awake, "far" asleep: the word the far shape of a station's World had."""
+        return "full" if self.awake else "far"
+
+    @shape.setter
+    def shape(self, value: str) -> None:
+        self.awake = str(value) == "full"
+
+    @property
+    def is_followed(self) -> bool:
+        """Whether this is the World's followed hull (the player's ship until step 7)."""
+        return self.world.hulls.get(self.world.followed) is self
 
     # -- her own, read from her state -------------------------------------------------
 
@@ -285,22 +359,25 @@ class Hull:
     # -- the World's, forwarded -------------------------------------------------------
 
     def record(self, *args: Any, **kw: Any) -> Any:
-        """A line of her log, by the World's `record` (her log is the World's `log` in
-        this step; step 6 gives each hull its own)."""
-        return self.world.record(*args, **kw)
+        """A line of her log, by the World's `record` with this hull current."""
+        with self.world.as_hull(self):
+            return self.world.record(*args, **kw)
 
     def submit(self, *args: Any, **kw: Any) -> Any:
-        """An order of hers, by the World's `submit`."""
-        return self.world.submit(*args, **kw)
+        """An order of hers, by the World's `submit` with this hull current."""
+        with self.world.as_hull(self):
+            return self.world.submit(*args, **kw)
 
     @property
     def readings(self) -> Any:
         """The readings registry's view of her now (`World.readings`)."""
-        return self.world.readings
+        with self.world.as_hull(self):
+            return self.world.readings
 
     @property
     def daylight(self) -> str:
-        return self.world.daylight
+        with self.world.as_hull(self):
+            return self.world.daylight
 
 
 for _name in SHARED_FIELDS:
@@ -315,13 +392,22 @@ def lift_old_state(world: Any, state: dict[str, Any]) -> dict[str, Any]:
     the player's ship's otherwise. Returns the state to set; a state that holds `own`
     already is returned as it is."""
     if "own" in state:
+        # a checkpoint of steps 1 to 5: `own` on the dict, which step 6 keeps as `_own`
+        # behind the `own` property; the fields that became hers at step 6 lifted too
+        hull = state.pop("own")
+        for name in ("seed", "scenario", "rng", "vessels", "vessel"):
+            if name in state and name not in hull.__dict__:
+                hull.__dict__[name] = state.pop(name)
+        state["_own"] = hull
+        return state
+    if "_own" in state:
         return state
     vessel = state.get("vessel")
     hull = Hull.__new__(Hull)
     hull.world = world
     hull.id = str(getattr(vessel, "id", "") or own_id())
-    for name in PER_SHIP_FIELDS:
+    for name in PER_SHIP_FIELDS + ("vessel",):
         if name in state:
             hull.__dict__[name] = state.pop(name)
-    state["own"] = hull
+    state["_own"] = hull
     return state

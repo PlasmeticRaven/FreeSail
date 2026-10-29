@@ -9,6 +9,9 @@ and `save`. Determinism: same seed, same scenario, same ship, same
 from __future__ import annotations
 
 import math
+import threading
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import MISSING, asdict, dataclass, field, fields, replace
 from datetime import datetime, timedelta
 from typing import Any
@@ -456,6 +459,45 @@ class World:
     # seat's consent is read from (`world.seats.hold`); None in play
     replayed_orders: dict[tuple[int, str], str] | None = None
 
+    # -- the current hull (package 84, step 6) ---------------------------------------------
+    #
+    # `own` is the hull the World's per-ship names read now: the followed hull, unless a
+    # block has made another current (`with world.as_hull(hull): ...`), which the tick does
+    # for each hull in turn and a Hull's façade does for every call made through it. The
+    # stack is per thread (a door's thread reads a hull while the driver ticks another).
+
+    @property
+    def own(self) -> Any:
+        stack = _current_hulls(self)
+        return stack[-1] if stack else self.__dict__["_own"]
+
+    @own.setter
+    def own(self, hull: Any) -> None:
+        self.__dict__["_own"] = hull
+
+    @contextmanager
+    def as_hull(self, hull: Any) -> Iterator[Any]:
+        """The block's per-ship names read `hull`'s fields."""
+        stack = _current_hulls(self)
+        stack.append(hull)
+        try:
+            yield hull
+        finally:
+            stack.pop()
+
+    @property
+    def is_followed(self) -> bool:
+        """Whether the current hull is the World's own (the followed hull): the shared
+        parts of the tick (the clock, the world orders, the far bodies, the switch, the
+        ports' jobs, the business) run for her alone."""
+        return self.own is self.__dict__["_own"]
+
+    @property
+    def sea_vessels(self) -> Any:
+        """The `Vessels` of the sea, whichever hull is current (another hull's `vessels` is
+        her view of them)."""
+        return self.__dict__["_own"].vessels
+
     def __init__(self, seed: int, scenario: Scenario | None = None, ship: Any = None):
         # The Hull (package 84, step 1; `freesail.world.hulls`): what this World keeps of
         # one ship, behind the World's names. Made first and empty; every per-ship
@@ -465,8 +507,15 @@ class World:
         # ship's otherwise.
         from freesail.world.hulls import Hull, own_id
 
-        vessel = getattr(self, "vessel", None)
+        vessel = self.__dict__.pop("_vessel", None)
         self.own = Hull(self, getattr(vessel, "id", None) or own_id())
+        if vessel is not None:
+            self.own.vessel = vessel
+        # the hulls of the world (package 84, step 6): every ship kept whole, by id, the
+        # World's own first; `followed` the hull the drivers and the cap centre on, whose
+        # fields the World's names read when no other hull is current (`as_hull`)
+        self.hulls: dict[str, Any] = {self.own.id: self.own}
+        self.followed: str = self.own.id
         # The registry of the world's persons and things (package 84, step 2; `people.
         # Registry`): one for the game, so a crewed ship's World (`CrewedWorld.parent`, set
         # before this constructor runs) is given its parent's and her company is a view of
@@ -479,7 +528,9 @@ class World:
         self.played_under = [build_stamp()]
         self.seed = int(seed)
         self.scenario = scenario or Scenario()
-        self.clock = Clock(self.scenario.start_time)
+        # the one clock (package 84, step 6): a hull's builder (`crews.CrewedWorld`) sets the
+        # World's clock before this runs, so that every tick her making stores is the game's
+        self.clock = self.__dict__.get("clock") or Clock(self.scenario.start_time)
         self.rng = Rng(self.seed)
         self.log = Log()
         # The geographic frame (spec M5 §9): with a `position` the ship's latitude and
@@ -859,7 +910,7 @@ class World:
         if self.lookout is not None:
             # the lookout's first look, at the start (spec M5 §12): what is in sight is a
             # reading from tick 0, and a landfall at the start is a line like any other
-            for severity, kind, text, data in self.lookout.look(self):
+            for severity, kind, text, data in self.lookout.look(self.own):
                 self.record(severity, kind, text, data=data)
 
     # -- the checkpoint (package 84, step 1) -----------------------------------------
@@ -872,8 +923,25 @@ class World:
         from freesail.world.hulls import lift_old_state
 
         self.__dict__.update(lift_old_state(self, state))
+        if "hulls" not in self.__dict__:
+            own = self.__dict__["_own"]
+            self.hulls = {own.id: own}
+            self.followed = own.id
         self._adopt_old_people()
         self._adopt_old_ports()
+        self._adopt_old_crews()
+
+    def _adopt_old_crews(self) -> None:
+        """A checkpoint written before the Hull was the container (package 84, step 6): a
+        crewed ship's World found on a vessel (`CrewedWorld`, its own `__setstate__` run
+        first) becomes a hull of this World, her per-ship fields the ones its `own` lifted,
+        her systems rebound to the hull (`crews.adopt_hull`)."""
+        from freesail.world.crews import adopt_hull
+
+        for v in self._old_sea():
+            crew = getattr(v, "crew", None)
+            if crew is not None and isinstance(crew, World):
+                adopt_hull(self, v, crew)
 
     def _adopt_old_ports(self) -> None:
         """A checkpoint written before the ports' split (package 84, step 3): the one
@@ -907,11 +975,20 @@ class World:
             for job in dealings.__dict__.get("jobs", ()) or ():
                 if not getattr(job, "hull", ""):
                     job.hull = own.id
-        for v in getattr(getattr(self, "vessels", None), "vessels", None) or []:
+        for v in self._old_sea():
             crew = getattr(v, "crew", None)
             if crew is None or crew.__dict__.get("ports") is self.ports:
                 continue
             crew.ports = self.ports
+
+    def _old_sea(self) -> list[Any]:
+        """The far bodies of a checkpoint being read, for the converters: the sea's for the
+        game's World; none for a crewed ship's World of before step 6 (its own `__setstate__`
+        runs first, and what it has is her view of the parent's sea, not yet adopted)."""
+        sea = self.__dict__["_own"].__dict__.get("vessels")
+        if sea is None or hasattr(sea, "hull") or hasattr(sea, "crew"):
+            return []
+        return list(getattr(sea, "vessels", None) or [])
 
     def _adopt_old_people(self) -> None:
         """The persons and the things of a checkpoint written before the one registry
@@ -926,7 +1003,7 @@ class World:
             people = self.own.__dict__.get("people")
             if people is not None and "hull_id" not in people.__dict__:
                 self.registry.adopt_old(people, self.own.id)
-        for v in getattr(getattr(self, "vessels", None), "vessels", None) or []:
+        for v in self._old_sea():
             crew = getattr(v, "crew", None)
             if crew is None or crew.__dict__.get("registry") is self.registry:
                 continue
@@ -1324,7 +1401,7 @@ class World:
         if self.at_anchor:
             self._tick_anchors()
         if self.lookout is not None and self.clock.ship_time.second == 0:
-            for severity, kind, text, data in self.lookout.look(self):
+            for severity, kind, text, data in self.lookout.look(self.own):
                 self.record(severity, kind, text, data=data)
 
     def _tick_vessels(self) -> None:
@@ -1406,6 +1483,19 @@ class World:
             _, text = self._scenario_orders[self._scenario_order_i]
             self._scenario_order_i += 1
             self._apply_world_order(text, "the scenario")
+
+    def _bells_struck(self) -> int | None:
+        """The bells struck this tick for the current hull, once: the clock is one (package
+        84, step 6) and each hull strikes her own bell, so the once-a-tick guard the clock
+        kept is hers (`Hull._bell_said`); before it each World's clock guarded its own."""
+        own = self.own
+        tick = self.clock.tick
+        if own.__dict__.get("_bell_said", -1) == tick:
+            return None
+        bells = self.clock.bells_struck()
+        if bells is not None:
+            own._bell_said = tick
+        return bells
 
     def _tick_sun(self) -> None:
         phase = self.daylight
@@ -1609,13 +1699,28 @@ class World:
 
         key = (self.clock.tick, len(self.log))
         if self._readings_key != key:
-            self._readings_view = REGISTRY.at(self)
+            # another hull's view reads her façade (package 84, step 6): a view is read
+            # after the block that made it, when the World's names are the followed hull's
+            self._readings_view = REGISTRY.at(self if self.is_followed else self.own)
             self._readings_key = key
         return self._readings_view
 
     # -- orders --------------------------------------------------------------
 
     def submit(
+        self, text: str, actor: str = "captain", said: str | None = None, routine: bool = False
+    ) -> Event:
+        """An order to the current hull: the grammar's at full detail; for a hull asleep
+        (package 84, steps 4 and 6) the plan layer's (`crews.submit_far`: the far orders on
+        her body, the acts that want no physics through the grammar, the rest refused)."""
+        own = self.own
+        if not self.is_followed and not getattr(own, "awake", True):
+            from freesail.world.crews import submit_far
+
+            return submit_far(own, text, actor, said, routine)
+        return self._submit_awake(text, actor=actor, said=said, routine=routine)
+
+    def _submit_awake(
         self, text: str, actor: str = "captain", said: str | None = None, routine: bool = False
     ) -> Event:
         """Apply an order now, at the current tick. Journal it if accepted.
@@ -1887,6 +1992,31 @@ class World:
         """The wind's base from the weather every tick: the systems moved and their
         surface wind at the ship, or the pinned script's wind (a crewed vessel's own
         World follows its parent's weather instead, `world.crews`, package 43)."""
+        if not self.is_followed:
+            # another hull (package 84, step 6; a crewed World's `_follow_weather` before it):
+            # the systems the followed hull advanced, read at her own place; the script's wind
+            # where the world sails by a script; else the followed hull's wind
+            own = self.__dict__["_own"]
+            if self.systems is not None and self.weather is None:
+                # the systems' plane is the followed hull's frame
+                pos = self.position
+                plane = None
+                if pos is not None and own._position is not None:
+                    dx, dy = own._position.offset_to(pos)
+                    plane = (own._geo_last[0] + dx, own._geo_last[1] + dy)
+                if plane is not None:
+                    km = (plane[0] / 1000.0, plane[1] / 1000.0)
+                    self.wind.follow(*self.systems.surface_wind_at(*km))
+                self.wind.air_mass = own.wind.air_mass
+            elif self.weather is not None:
+                self.wind.follow(*self.weather.at(self.clock.ship_time))
+                self.wind.air_mass = self.weather.air_mass_at(
+                    self.clock.ship_time, self.scenario.air_mass
+                )
+            else:
+                self.wind.follow(own.wind.base_direction, own.wind.base_speed)
+                self.wind.air_mass = own.wind.air_mass
+            return
         if self.systems is not None:
             # the systems move every tick (microseconds: a bell and two segments a system);
             # the sky and the glass are read once a minute (`_observe_weather`)
@@ -1900,16 +2030,27 @@ class World:
             )
 
     def _tick_weather_minute(self) -> None:
-        """The minute's sky and glass, where the world keeps systems."""
+        """The minute's sky and glass, where the world keeps systems; another hull's are
+        the followed hull's at the ship (the brief of package 43: the same visibility the
+        player's lookout has), no line of the weather's in her log."""
+        if not self.is_followed:
+            self.conditions = self.__dict__["_own"].conditions
+            return
         if self.systems is not None:
             self._tick_weather()
 
     def tick(self) -> None:
-        """Advance the world by one game second."""
-        self.clock.advance()
-        if self._scenario_order_i < len(self._scenario_orders):
-            # the scenario's world orders due now, before the weather moves (package 36)
-            self._tick_world_orders()
+        """Advance the world by one game second: the shared parts for the followed hull
+        (the clock, the world orders, the far bodies and the other hulls' ticks within them,
+        the ports' jobs, the seats' budgets), and the hull's own for whichever hull is
+        current (package 84, step 6: another hull's tick is this method run with her
+        current, from `Vessels.tick_crews`, in the order a crewed World's ran)."""
+        followed = self.is_followed
+        if followed:
+            self.clock.advance()
+            if self._scenario_order_i < len(self._scenario_orders):
+                # the scenario's world orders due now, before the weather moves (package 36)
+                self._tick_world_orders()
         self._follow_weather()
         # the ten-minute mean, which the gusts and squalls are drawn as multiples of (spec
         # M5 §3; under every wind since package 31b)
@@ -1955,8 +2096,10 @@ class World:
         # the geographic frame (spec M5 §9): the tick's run turned to latitude and
         # longitude, then the chart's grounding check and the lookout (§11, §12)
         self._tick_geo()
-        # the other sail move before the lookout looks (packages 35 and 36)
-        self._tick_vessels()
+        # the other sail move before the lookout looks (packages 35 and 36); the other hulls
+        # tick within (`Vessels.tick_crews`), each with herself current
+        if followed:
+            self._tick_vessels()
         # the action (spec M7 Part 7-ii; package 70): the guns served and fired, the shot
         # resolved on the mark's body, the strike; nothing on a ship without guns
         if getattr(self.ship, "guns", None):
@@ -1984,7 +2127,7 @@ class World:
         # the yard's and the pool's jobs when due; then the people's tasks done, the moves
         # in hand finished and the letters delivered through the door (§22)
         self.dealings.tick()
-        if self.ports.world is self:
+        if followed and self.ports.world is self:
             self.ports.tick()  # the world's ports, once, by the World that owns them
         for severity, kind, text, data in self.people.tick(self.clock.tick):
             self.record(severity, kind, text, data=data)
@@ -2008,13 +2151,13 @@ class World:
             if fishery is not None:
                 for severity, kind, text, data in fishery.tick(self):
                     self.record(severity, kind, text, data=data)
-            if self.director_seats:
+            if followed and self.director_seats:
                 # the director's seats kept once a minute whatever sail is about (package
                 # 67: a seat on her own stations or a person's voice, with no other ship)
                 from freesail.world.crews import enforce_budgets
 
                 enforce_budgets(self)
-        bells = self.clock.bells()
+        bells = self._bells_struck()
         if bells is not None:
             self.record(
                 Severity.ROUTINE,
@@ -2187,8 +2330,75 @@ class World:
 from freesail.world.hulls import PER_SHIP_FIELDS as _PER_SHIP_FIELDS  # noqa: E402
 from freesail.world.hulls import delegated as _delegated  # noqa: E402
 
+_CURRENT = threading.local()
+
+
+def _current_hulls(world: Any) -> list[Any]:
+    """This thread's stack of current hulls for `world` (`World.as_hull`)."""
+    stacks = getattr(_CURRENT, "stacks", None)
+    if stacks is None:
+        stacks = _CURRENT.stacks = {}
+    return stacks.setdefault(id(world), [])
+
+
 for _name in _PER_SHIP_FIELDS:
     setattr(World, _name, _delegated("own", _name))
+
+
+def _sea_get(self: Any) -> Any:
+    # `world.vessels` is the sea whichever hull is current (package 84, step 6): the readers
+    # of a parent World's vessels (the action, the signals, the stations by flag, the hail)
+    # want the sea; a hull's own view of it is `hull.vessels`, read through her façade
+    return self.__dict__["_own"].vessels
+
+
+def _sea_set(self: Any, value: Any) -> None:
+    self.own.vessels = value
+
+
+World.vessels = property(_sea_get, _sea_set)
+
+
+def _vessel_get(self: Any) -> Any:
+    # `world.vessel` is the current hull's far body (package 84, step 6), None for the
+    # followed hull: the action, the signals and the stations tell the player's ship from
+    # another by it, as they told her World from a crewed ship's; before the World's own hull
+    # is made (`CrewedWorld.__init__` names the vessel first) the builder's own
+    own = self.__dict__.get("_own")
+    return self.own.vessel if own is not None else self.__dict__.get("_vessel")
+
+
+def _vessel_set(self: Any, vessel: Any) -> None:
+    if self.__dict__.get("_own") is not None:
+        self.own.vessel = vessel
+    else:
+        self.__dict__["_vessel"] = vessel
+
+
+World.vessel = property(_vessel_get, _vessel_set)
+
+
+def _parent_get(self: Any) -> Any:
+    # `world.parent` is the followed hull's façade while another hull is current (package
+    # 84, step 6), None for the followed hull: the shared code given the World in a hull's
+    # tick (the action's mark, the hail, the stations by flag) tells the player's ship from
+    # another by it, as it told her World from a crewed ship's; a hull's building World
+    # (`CrewedWorld.__init__`) names the game's World its parent before the fields are made
+    parent = self.__dict__.get("_parent")
+    if parent is not None:
+        return parent
+    own = self.__dict__.get("_own")
+    if own is None:
+        return None
+    current = self.own
+    return None if current is own else self.hulls.get(self.followed)
+
+
+def _parent_set(self: Any, parent: Any) -> None:
+    self.__dict__["_parent"] = parent
+
+
+World.parent = property(_parent_get, _parent_set)
 del _name
 
 # The ground-tackle evolutions (`data/evolutions/`): while one is in hand the World does

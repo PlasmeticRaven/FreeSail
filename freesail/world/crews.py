@@ -52,8 +52,10 @@ from freesail import units
 from freesail.core.events import Severity
 from freesail.core.world import Scenario, World
 from freesail.world.geo import Position, bearing_and_distance
+from freesail.world.hulls import Hull
 
 __all__ = [
+    "Hull",
     "CREWED_CAP",
     "CREWED_DEMOTE_NM",
     "crewed_settings_of",
@@ -106,22 +108,34 @@ _NOT_CREWED_STATES = frozenset({"at anchor", "in port", "running for shelter", "
 FAR_ONLY_ROLES: frozenset[str] = frozenset()
 
 
-class CrewView:
-    """The other sail as a crewed vessel's World sees them: the parent's vessels but
-    herself, and the player's ship as a vessel (`Vessels.player_shadow`); nothing is
-    moved from here (the parent moves them), and a vessel added here (a pilot's boat sent
-    off for her) goes to the parent's sea."""
+class HullView:
+    """The other sail as a hull sees them (package 84, step 6; `CrewView` before it): the
+    sea's vessels but her own body, and the player's ship as a vessel
+    (`Vessels.player_shadow`); nothing is moved from here (the World moves them), and a
+    vessel added here (a pilot's boat sent off for her) goes to the sea."""
 
-    def __init__(self, crew: CrewedWorld) -> None:
-        self.crew = crew
+    def __init__(self, hull: Any, game: Any) -> None:
+        self.hull = hull
+        # the game's World, held from the build (a hull is built in a World of her own,
+        # `CrewedWorld`, whose sea would be this view), so that the sea and the player's
+        # shadow are the game's whichever hull is current
+        self.game = game
         self.serial = 0
 
     @property
+    def sea(self) -> Any:
+        """The sea's `Vessels`, the game's."""
+        game = self.__dict__.get("game")
+        return (game if game is not None else self.hull.world).sea_vessels
+
+    @property
     def vessels(self) -> list[Any]:
-        parent = self.crew.parent
-        own = self.crew.vessel
-        out = [v for v in parent.vessels.vessels if v is not own and not v.done]
-        shadow = parent.vessels.player_shadow(parent)
+        sea = self.sea
+        own = self.hull.vessel
+        out = [v for v in sea.vessels if v is not own and not v.done]
+        # the player's ship as a vessel, read with the followed hull current
+        # (`Vessels.player_shadow`), not from this hull's names
+        shadow = sea.player_shadow(self.__dict__.get("game") or self.hull.world)
         if shadow is not None:
             out.append(shadow)
         return out
@@ -143,7 +157,10 @@ class CrewView:
         return None
 
     def add(self, vessel: Any) -> Any:
-        return self.crew.parent.vessels.add(vessel)
+        return self.sea.add(vessel)
+
+    def player_shadow(self, world: Any = None) -> Any:
+        return self.sea.player_shadow(self.__dict__.get("game") or self.hull.world)
 
     def tick(self, world: Any, dt: float = 60.0) -> list[tuple[Any, ...]]:
         return []
@@ -155,7 +172,7 @@ class CrewView:
         from freesail.world.ships import Vessels
 
         view = Vessels.__new__(Vessels)
-        view.world = self.crew
+        view.world = self.hull
         view.vessels = self.vessels
         return Vessels.in_sight(view, pos, height_of_eye_m, visibility_nm, daylight)
 
@@ -163,13 +180,17 @@ class CrewView:
         return []
 
 
+CrewView = HullView  # the name a checkpoint of before step 6 pickled
+
+
 class CrewedWorld(World):
-    """A vessel's own World while she is promoted: her ship from her file at her truth,
-    her company, her stations, her captain with the brain's intent and state; the chart,
-    the tide and the weather the parent's. `shape` is "full" while her body is the
-    physics', and "far" while a station seated on her is kept across a demotion (spec M6
-    §20): then the far body moves her and this World only mirrors it for the station's
-    readings (`far_tick`)."""
+    """The builder of a hull's fields (package 84, step 6; before it a vessel's own World
+    while she was promoted): her ship from her file at her truth, her company, her
+    stations, her captain with the brain's intent and state, made by the World's own
+    constructor with `parent` and `vessel` set, and then adopted into the one World as a
+    `Hull` (`make_hull`, `adopt_hull`), this World discarded. Kept under its name for the
+    unpickler: a checkpoint of before step 6 holds one on each crewed vessel, which
+    `World._adopt_old_crews` converts the same way."""
 
     # whether the far body rode at anchor at the last far tick (package 84, step 4): the
     # anchor by the plan's own end said once; a class default, as a checkpoint from before
@@ -181,6 +202,7 @@ class CrewedWorld(World):
         self.parent = parent
         self.vessel = vessel
         self.shape = "full"
+        self.clock = parent.clock  # the one clock (step 6): her ticks are the game's
         sc = _crew_scenario(parent, vessel)
         seed = (int(parent.seed) * 1009 + zlib.crc32(str(vessel.id).encode("utf-8"))) % (2**31)
         ship = make_ship(vessel.ship_file, sc)
@@ -192,7 +214,7 @@ class CrewedWorld(World):
         from freesail.world.signals import vessel_locker
 
         self.ship.extra["signals"] = vessel_locker(vessel)
-        self.vessels = CrewView(self)
+        self.vessels = HullView(self.own, parent)  # her view of the game's sail
         if getattr(self.ship, "extra", None) is not None:
             self.ship.extra["vessels_view"] = True
         self.conditions = parent.conditions
@@ -224,124 +246,6 @@ class CrewedWorld(World):
             f"{self.captain.name} in command ({self.captain.state or 'on passage'}).",
             data={"id": vessel.id, "state": self.captain.state},
         )
-
-    # -- the parent's weather at her place -------------------------------------------
-
-    def _plane_km(self) -> tuple[float, float] | None:
-        pos = self.position
-        plane = self.parent.plane_of(pos) if pos is not None else None
-        if plane is None:
-            return None
-        return plane[0] / 1000.0, plane[1] / 1000.0
-
-    def _follow_weather(self) -> None:
-        parent = self.parent
-        if parent.systems is not None and parent.weather is None:
-            km = self._plane_km()
-            if km is not None:
-                self.wind.follow(*parent.systems.surface_wind_at(km[0], km[1]))
-            self.wind.air_mass = parent.wind.air_mass
-        elif self.weather is not None:
-            super()._follow_weather()
-        else:
-            self.wind.follow(parent.wind.base_direction, parent.wind.base_speed)
-            self.wind.air_mass = parent.wind.air_mass
-
-    def _tick_weather_minute(self) -> None:
-        # the sky and the visibility are the parent's at the ship: the same visibility the
-        # player's lookout has (the brief); no line of the weather's in her log
-        self.conditions = self.parent.conditions
-
-    # -- the far shape (spec M6 §20) ----------------------------------------------------
-
-    def submit(
-        self, text: str, actor: str = "captain", said: str | None = None, routine: bool = False
-    ) -> Any:
-        """An order to the crewed ship: the World's own at full detail; in the far shape
-        the plan layer's (`submit_far`: the far-shape orders on the body, the readings and
-        the conversation through the grammar, the rest refused in words)."""
-        if getattr(self, "shape", "full") == "far":
-            return submit_far(self, text, actor, said, routine)
-        return super().submit(text, actor=actor, said=said, routine=routine)
-
-    def mirror_far(self) -> None:
-        """The far body's truth into this World's ship and position (the far shape):
-        called each second of the tick and again after the far body has moved at the
-        minute, so that the station's readings and the body are one."""
-        v = self.vessel
-        self._position = v.position
-        self._geo_last = (self.ship_x, self.ship_y)
-        dyn = getattr(self.ship, "dyn", None)
-        if dyn is not None:
-            dyn.heading = units.deg_to_rad(v.heading_deg)
-            dyn.target_heading = dyn.heading
-            dyn.u = dyn.speed = units.knots_to_ms(v.speed_kn)
-            dyn.v = 0.0
-
-    def far_tick(self) -> None:
-        """The World in the far shape, each second: the clock kept with the parent's,
-        the body's truth mirrored into the ship and the account, the lookout once a
-        minute, the stations sampled; no physics, no book, no judgement of the near
-        captain's (the brain has her)."""
-        self.clock.advance()
-        self.mirror_far()
-        anchored = bool(self.vessel.plan) and self.vessel.plan[0][0] == "anchor"
-        if anchored and not self._far_anchored:
-            # brought to an anchor by the plan's own last leg (a course for a port by the
-            # tracks, step 4), not by an order: said once, so that the station knows
-            port = self.ports.in_port_at(self.vessel.position) if self.ports is not None else None
-            spot = port.nearest_spot(self.vessel.position)[0].name if port is not None else None
-            where = f" in {spot}" if spot else ""
-            self.record(
-                Severity.NOTABLE,
-                "ship.anchored",
-                f"Brought to an anchor{where} by the track's end (the far body rides head to "
-                "wind).",
-                data={"port": port.id if port is not None else "", "far_shape": True},
-            )
-        self._far_anchored = anchored
-        reached = getattr(self.vessel, "mark_reached", "")
-        if reached:
-            # the plan's last mark under a held station (package 84, step 4; `Vessel.
-            # _arrived`): she lies to there, said in her log so that the station's sample
-            # carries it
-            self.vessel.mark_reached = ""
-            self.record(
-                Severity.NOTABLE,
-                "plan.ended",
-                f"The plan's last mark reached, {reached}: she lies to there (the far body) "
-                "until a course is shaped or she is brought to an anchor.",
-                data={"mark": reached},
-            )
-        self._follow_weather()
-        self.wind.step(1.0, self.wind_record.mean_speed())
-        self.wind_record.add(self.wind.effective_speed, self.wind.direction_from)
-        if self.clock.ship_time.second == 0:
-            self.conditions = self.parent.conditions
-            if self.navigation is not None:
-                self.navigation.reckoning.set_position(
-                    self.vessel.position, self.clock.tick, sigma_nm=0.25
-                )
-            if self.lookout is not None:
-                for severity, kind, text, data in self.lookout.look(self):
-                    self.record(severity, kind, text, data=data)
-        # her dealings' jobs due (the boat's errands by the plan's time, the yard's, the
-        # lighter's) and her people's moves (package 84, step 4: the coarse acts of a
-        # sleeping hull), with no physics
-        self.dealings.tick()
-        for severity, kind, text, data in self.people.tick(self.clock.tick):
-            self.record(severity, kind, text, data=data)
-        self._tick_sun()
-        bells = self.clock.bells()
-        if bells is not None:
-            self.record(
-                Severity.ROUTINE,
-                "clock.bell",
-                f"{units.format_bells(bells).capitalize()}.",
-                data={"bells": bells},
-            )
-        for agent in list(self.agents.values()):
-            agent.on_tick()
 
 
 def _crew_scenario(parent: World, vessel: Any) -> Scenario:
@@ -384,6 +288,194 @@ def _crew_scenario(parent: World, vessel: Any) -> Scenario:
     # package 72: the sets are the parent's; her own World has none (its ships are not in it)
     sc.squadrons = []
     return sc
+
+
+def make_hull(world: World, vessel: Any) -> Any:
+    """A hull for a far-detail vessel (package 84, step 6): her fields built by the World's
+    own constructor under `CrewedWorld` (her ship from her file at her truth, her company,
+    her stations, her captain with the brain's intent), then adopted into the one World
+    (`adopt_hull`), the building World discarded. Measured 0.5 to 0.7 s on the build
+    machine; made once per ship, since step 5 keeps her asleep."""
+    temp = CrewedWorld(world, vessel)
+    return adopt_hull(world, vessel, temp)
+
+
+def adopt_hull(world: World, vessel: Any, temp: Any) -> Any:
+    """The `Hull` a building World (or a crewed World of before step 6, read from a
+    checkpoint) made as its own, taken into `world` as the vessel's hull: her per-ship
+    fields as they stand, her seed, streams and scenario her own, her view of the sail, her
+    systems' `world` references rebound from the building World to the hull (`People`,
+    `Dealings`, `Navigation`, the standing runtime, the captain, the harnesses: each reads
+    the hull as its world from here, the shared things through its properties and the
+    World's methods with her current); registered in `world.hulls` and on the vessel."""
+    hull = temp.__dict__["_own"]
+    hull.world = world
+    hull.id = str(vessel.id)
+    hull.vessel = vessel
+    hull.awake = str(getattr(temp, "shape", "full")) == "full"
+    hull._far_anchored = bool(getattr(temp, "_far_anchored", False))
+    for name in ("seed", "scenario", "rng"):
+        if name not in hull.__dict__ and name in temp.__dict__:
+            hull.__dict__[name] = temp.__dict__[name]
+    hull.vessels = HullView(hull, world)
+    _rebind_world(hull, temp)
+    world.hulls[hull.id] = hull
+    vessel.crew = hull
+    # her level of detail is the sea's word for her body: "crewed" awake; asleep, "far" or
+    # "near" by her distance as a hull-less vessel's (`Vessels._promote_and_hail`), so that
+    # within the near range her far body ticks every second (the lead's finding on step 5)
+    vessel.detail = "crewed" if hull.awake else "far"
+    world.sea_vessels.crewed_ids = _crew_ids(world)
+    return hull
+
+
+def _rebind_world(hull: Any, temp: Any) -> None:
+    """Every reference to the building World in the hull's own graph (her systems' `world`,
+    the ship's `extra`, the harnesses, the view) made the hull, and every reference to its
+    clock (the watch bill's, the routine's, the runner's) the World's one clock. The walk
+    stays within hers: the shared things (the chart, the registry, the ports, the nations,
+    the tide, the systems, the sea's vessels, the parent World) are not entered."""
+    world = hull.world
+    swap = {id(temp): hull}
+    temp_clock = temp.__dict__.get("clock")
+    if temp_clock is not None and temp_clock is not world.clock:
+        swap[id(temp_clock)] = world.clock
+    skip = {
+        id(world),
+        id(temp),
+        id(world.clock),
+        id(getattr(world, "chart", None)),
+        id(getattr(world, "registry", None)),
+        id(getattr(world, "ports", None)),
+        id(getattr(world, "nations", None)),
+        id(getattr(world, "tide", None)),
+        id(getattr(world, "systems", None)),
+        id(getattr(world, "weather", None)),
+        id(getattr(world, "squadrons", None)),
+        id(getattr(world, "business", None)),
+        id(world.sea_vessels),
+        id(getattr(world, "hulls", None)),
+    }
+    seen: set[int] = set()
+    stack: list[Any] = [hull]
+    while stack:
+        obj = stack.pop()
+        oid = id(obj)
+        if oid in seen or oid in skip:
+            continue
+        seen.add(oid)
+        if isinstance(obj, dict):
+            for k, v in list(obj.items()):
+                if id(v) in swap:
+                    obj[k] = swap[id(v)]
+                elif _walkable(v):
+                    stack.append(v)
+            continue
+        if isinstance(obj, (list, tuple, set, frozenset)):
+            if isinstance(obj, list):
+                for i, v in enumerate(obj):
+                    if id(v) in swap:
+                        obj[i] = swap[id(v)]
+                    elif _walkable(v):
+                        stack.append(v)
+            else:
+                for v in obj:
+                    if _walkable(v):
+                        stack.append(v)
+            continue
+        d = getattr(obj, "__dict__", None)
+        if d is None:
+            continue
+        for k, v in list(d.items()):
+            if id(v) in swap:
+                d[k] = swap[id(v)]
+            elif _walkable(v):
+                stack.append(v)
+
+
+def _walkable(v: Any) -> bool:
+    return isinstance(v, (dict, list, tuple, set, frozenset)) or (
+        hasattr(v, "__dict__") and not isinstance(v, type) and not callable(v)
+    )
+
+
+def mirror_far(hull: Any) -> None:
+    """The far body's truth into a sleeping hull's ship and position: called each second
+    of her far tick and again after the far body has moved at the minute, so that a
+    station's readings and the body are one."""
+    v = hull.vessel
+    hull._position = v.position
+    hull._geo_last = (hull.ship_x, hull.ship_y)
+    dyn = getattr(hull.ship, "dyn", None)
+    if dyn is not None:
+        dyn.heading = units.deg_to_rad(v.heading_deg)
+        dyn.target_heading = dyn.heading
+        dyn.u = dyn.speed = units.knots_to_ms(v.speed_kn)
+        dyn.v = 0.0
+
+
+def far_tick(hull: Any) -> None:
+    """A sleeping hull's second (the far shape since package 43; a function over the hull
+    since step 6): the body's truth mirrored into her ship and her account, the wind at
+    her, the lookout once a minute, her dealings' jobs and her people's moves, the bells,
+    the sun, the stations sampled; no physics, no book, no judgement of the near captain's
+    (the brain has her). The clock is the World's and is not advanced here."""
+    world = hull.world
+    v = hull.vessel
+    mirror_far(hull)
+    anchored = bool(v.plan) and v.plan[0][0] == "anchor"
+    if anchored and not hull._far_anchored:
+        # brought to an anchor by the plan's own last leg (a course for a port by the
+        # tracks, step 4), not by an order: said once, so that the station knows
+        port = world.ports.in_port_at(v.position) if world.ports is not None else None
+        spot = port.nearest_spot(v.position)[0].name if port is not None else None
+        where = f" in {spot}" if spot else ""
+        hull.record(
+            Severity.NOTABLE,
+            "ship.anchored",
+            f"Brought to an anchor{where} by the track's end (the far body rides head to wind).",
+            data={"port": port.id if port is not None else "", "far_shape": True},
+        )
+    hull._far_anchored = anchored
+    reached = getattr(v, "mark_reached", "")
+    if reached:
+        # the plan's last mark under a held station (step 4; `Vessel._arrived`): she lies
+        # to there, said in her log so that the station's sample carries it
+        v.mark_reached = ""
+        hull.record(
+            Severity.NOTABLE,
+            "plan.ended",
+            f"The plan's last mark reached, {reached}: she lies to there (the far body) "
+            "until a course is shaped or she is brought to an anchor.",
+            data={"mark": reached},
+        )
+    hull._follow_weather()
+    hull.wind.step(1.0, hull.wind_record.mean_speed())
+    hull.wind_record.add(hull.wind.effective_speed, hull.wind.direction_from)
+    clock = world.clock
+    if clock.ship_time.second == 0:
+        hull.conditions = world.hulls[world.followed].conditions
+        if hull.navigation is not None:
+            hull.navigation.reckoning.set_position(v.position, clock.tick, sigma_nm=0.25)
+        if hull.lookout is not None:
+            for severity, kind, text, data in hull.lookout.look(hull):
+                hull.record(severity, kind, text, data=data)
+    # her dealings' jobs due (the boat's errands by the plan's time, the yard's, the
+    # lighter's) and her people's moves (step 4: the coarse acts of a sleeping hull)
+    hull.dealings.tick()
+    for severity, kind, text, data in hull.people.tick(clock.tick):
+        hull.record(severity, kind, text, data=data)
+    hull._tick_sun()
+    bells = hull._bells_struck()
+    if bells is not None:
+        hull.record(
+            Severity.ROUTINE,
+            "clock.bell",
+            f"{units.format_bells(bells).capitalize()}.",
+            data={"bells": bells},
+        )
+    for agent in list(hull.agents.values()):
+        agent.on_tick()
 
 
 def _set_sail(crew: CrewedWorld, sail_state: str) -> None:
@@ -494,14 +586,10 @@ def promote(world: World, vessel: Any) -> CrewedWorld:
     made once, from her file at her truth; woken, not remade, when she has one asleep
     (package 84, step 5)."""
     if vessel.crew is not None:
-        if vessel.crew.shape == "far":
+        if not vessel.crew.awake:
             _to_full(vessel)
         return vessel.crew
-    crew = CrewedWorld(world, vessel)
-    vessel.crew = crew
-    vessel.detail = "crewed"
-    world.vessels.crewed_ids = _crew_ids(world)
-    return crew
+    return make_hull(world, vessel)
 
 
 def _to_full(vessel: Any) -> None:
@@ -514,8 +602,9 @@ def _to_full(vessel: Any) -> None:
     crew = vessel.crew
     crew._geo_last = (0.0, 0.0)
     crew._position = vessel.position
-    crew.shape = "full"
-    crew.mirror_far()
+    crew.awake = True
+    vessel.detail = "crewed"
+    mirror_far(crew)
     if _sail_state_of(crew) != vessel.sail_state:
         _set_sail(crew, vessel.sail_state)
     if crew.navigation is not None and crew.position is not None:
@@ -585,7 +674,8 @@ def demote(world: World, vessel: Any) -> None:
             brain.fold_back(crew.captain)
         write_damage(vessel, crew)
     seated = any(not h.agent.released for h in crew.agents.values())
-    crew.shape = "far"
+    crew.awake = False
+    vessel.detail = "far"  # near by distance from here, as a hull-less vessel (step 6)
     crew._far_anchored = bool(vessel.plan) and vessel.plan[0][0] == "anchor"
     if seated:
         crew.record(
@@ -605,7 +695,7 @@ def demote(world: World, vessel: Any) -> None:
             "again.",
             data={"id": vessel.id, "asleep": True},
         )
-    world.vessels.crewed_ids = _crew_ids(world)
+    world.sea_vessels.crewed_ids = _crew_ids(world)
 
 
 def release_done(world: World) -> None:
@@ -619,7 +709,8 @@ def release_done(world: World) -> None:
         if people is not None and hasattr(people, "discharge"):
             people.discharge()
         v.crew = None
-    world.vessels.crewed_ids = _crew_ids(world)
+        world.hulls.pop(str(v.id), None)
+    world.sea_vessels.crewed_ids = _crew_ids(world)
 
 
 def _dealing(world: World, vessel: Any) -> bool:
@@ -802,11 +893,10 @@ def station_world(parent: World, words: str) -> tuple[Any, CrewedWorld]:
     # scenario whose cap was nought)
     cap, range_nm, _ = settings(parent)
     full = nm <= range_nm and len(crewed(parent)) < cap
-    crew = CrewedWorld(parent, vessel)
-    vessel.crew = crew
-    vessel.detail = "crewed"
+    crew = make_hull(parent, vessel)
     if not full:
-        crew.shape = "far"
+        crew.awake = False
+        vessel.detail = "far"
         crew.record(
             Severity.NOTABLE,
             "crew.demoted",
@@ -815,7 +905,6 @@ def station_world(parent: World, words: str) -> tuple[Any, CrewedWorld]:
             "as a state, heaving to, the chase, the intent) until she is near again.",
             data={"id": vessel.id},
         )
-    parent.vessels.crewed_ids = _crew_ids(parent)
     return vessel, crew
 
 
@@ -1053,7 +1142,8 @@ def submit_far(crew: CrewedWorld, text: str, actor: str, said: str | None, routi
 
     text = " ".join(text.split())
     if _needs_no_physics(crew, text):
-        return World.submit(crew, text, actor=actor, said=said, routine=routine)
+        with crew.world.as_hull(crew):
+            return crew.world._submit_awake(text, actor=actor, said=said, routine=routine)
     try:
         found = far_order(crew, text)
     except OrderError as e:
@@ -1367,10 +1457,8 @@ def _hand_crewed(vessel: Any, crew: CrewedWorld, text: str, until: int, event: s
     if e.kind == "order.rejected":
         why = str((e.data or {}).get("reason") or e.text).rstrip(".")
         raise ValueError(f"{vessel.name}'s captain could not give it as said: {why}")
-    # her own clock: a crewed World counts its ticks from her promotion
-    cap.over_his_head(
-        text, int(crew.clock.tick) + (until - int(crew.parent.clock.tick)), event=event
-    )
+    # one clock since step 6 (a crewed World counted its ticks from her promotion before)
+    cap.over_his_head(text, until, event=event)
     return f"{vessel.name}'s captain gave it as his own, at full detail ({said})"
 
 
