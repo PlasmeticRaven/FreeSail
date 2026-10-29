@@ -1296,6 +1296,11 @@ razee against the frigate-36, the brace limits):
   accounts, neither presumed the one at fault; reported, not forced.
 - **Brace limits (item 11):** the frigate's limits kept, on the reading that the lee topmast
   backstays were eased when the yards were braced sharp up ("Reasonable").
+- **Her topgallants and royals by Steel p. 42's long pole-heads** (put with the 74's design,
+  Design-Ship-Bellerophon.md §17.0): "Agreed", for both ships. The pole-heads read as rising
+  above the listed topgallant masts, so her topgallants and royals are cut to Steel's sail table
+  within the spars so read (the owner's spars rule kept). Taken at her stage B, her file
+  regenerated, her polar and light-air figures old beside new.
 
 ---
 

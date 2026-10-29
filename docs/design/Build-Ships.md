@@ -144,7 +144,7 @@ scratch scripts named are not.
 | 34 | D10(a)'s key for the *Neufchatel*'s main topgallant: her design reports it to the lead; B3 builds it as a fourth step if the lead agrees | D10; Ext §14 item 12 |
 | 35 | One test suite at a time on the owner's machine | The plan §4; the brief's suites rule |
 | 36 | The hull's shape. The owner's end goal and twelve principles (§5.0). Eight optional shape keys in stage 0H (§3.5, §5.1); the stations computed by `freesail/ship/form.py` and served. B8's helpers in SW-2b.1 right after 0H, before B1's stage B, the eight files' shape in SW-2b.2, each new ship's from her first commit, B1's at stage B. The drawing in B5.1 (strips, the head rule) and B5.6 (§6). The owner's sheets (§6) and the pair check (§5.6). No port triple is written from the drawing. One class in two roles draws as one hull (the brig and the merchant brig; the two schooners) | The owner, 2026-10-28 (the scope as proposed; §19.1 items 14, 15, 17, 20); for the lead's approval (§19.2 item 13) |
-| 37 | The *Indefatigable* whole before any other ship: stage A; B3.1, B3.2, B3.5 and their drawings; stage B, with the hull's form built and drawn first on her two files (the pilot). Held for the owner's first test. Then SW-2 and SW-2b.2 as one step, and the other ships | The owner, 2026-10-28 (§2.6); for the lead (§19.2 items 13, 20) |
+| 37 | The *Indefatigable* whole before any other ship: stage A; B3.1, B3.2, B3.5 and their drawings; stage B, with the hull's form built and drawn first on her two files (the pilot). A testing report to the owner in place of their own test (2026-10-29). Then SW-2 and SW-2b.2 as one step, and the other ships | The owner, 2026-10-28 and 2026-10-29 (§2.6); for the lead (§19.2 items 13, 20) |
 
 ---
 
@@ -306,15 +306,19 @@ before:
    views, with the three ways of drawing the hull below the water and the page's panel at
    800 × 600 (§19.1 items 16 and 19, open until then). The owner's choices are applied before
    the test.
-8. **Held for the owner's first test** of the whole *Indefatigable* in the game, when the owner
-   chooses. They mean to playtest once 84 is complete; the fresh merges bring 84's steps in.
+8. **The owner's testing report** of the whole *Indefatigable* (her figures beside the frigate-36's,
+   her handling, her truths, and pictures of both files old beside new in the five views), in
+   place of the owner's own test before the work goes on (the owner, 2026-10-29: "I am
+   comfortable for you to continue with the implementation without my full testing, just
+   sending a "testing report" for me with the basics and images showing the important views").
 
-**Held until the test:** SW-2 and SW-2b.2, taken together as one step (the eight existing
-ships' hulls: §5.6), B2, B4, B7 and B6. SW-1 and SW-4 change no hull; they run beside the pilot
+**After her (the owner's direction of 2026-10-29, replacing the hold for the owner's test):**
+SW-2 and SW-2b.2, taken together as one step (the eight existing ships' hulls: §5.6), and B2,
+B4, B7 and B6 in their order, each ship reported done with a testing report of her own. SW-1 and SW-4 change no hull; they run beside the pilot
 or wait, at the lead's word (§19.2 item 20). The session reports B1 done when she is whole
 (step 7), and the lead merges her as each ship is merged; her window closes with that merge.
-**Plainly:** her window is longer than the lead's order of the ships foresaw, and no later
-ship's window opens before the owner's test.
+**Plainly:** her window is longer than the lead's order of the ships foresaw; the next ship's
+window opens at her merge.
 
 **Why.** The form and its drawing are proved on the two hulls with the best sources (her own
 draughts, measured) before thirteen files depend on them, and a change the owner asks for on
@@ -925,6 +929,45 @@ Rungs as §5.0 gives them. "To read" means R or T until it is read. A stand-in k
 | *Neufchatel* | S: three waterlines by station; the dead-flat section (Neuf §2.4) | square, about 17 ft S; knee to read, T meanwhile; counter, wale and transom face to read (B2) | ZAZ6177 |
 | bilander | S† Chapman No. 5's proportions; a trader's body R/T; Gwyn's raised quarterdeck S (Bil §2.3) | round, three windows on its face (Gwyn) S; figure with rails S | Steel's brig collier (p. 26) or brigantine (p. 16) |
 | the 74 | S: WL1-WL5 by station (Research-74 §3.2.3); the midship section (§3.2.4); main and channel wales | square; two gallery tiers, 8.5 ft abaft to 3.7 ft before AP at 14.5-17.7 and 21.7-24.6 ft above WL1 (§3.3) S; the stern face to read, T meanwhile; figure T | Steel's 74 Folio LI (cached); Lavery 1985 pp. 54-57 by page, if the owner photographs them (§19.1 item 17) |
+
+### 5.8 Pictures for the eye
+
+A contemporary picture of a ship or her class, a later reconstruction, or a photograph of a
+replica is a check for the eye on the owner's sheets: the sheer and its steps, the head, the
+galleries and lights, the wales, the transom, the ports (81's), and the paint in words. It is
+never a source of points and holds no rung of §5.0's ladder; a line it agrees with keeps its
+own. Public-domain pictures may be held in `docs/references/images/` with their provenance;
+any other is cited by link and credit only, never copied.
+
+- **frigate-36:** Thomas Luny, "His Majesty's frigate 'Amazon', 38 guns, arriving off Dover",
+  signed and dated 1807 (public domain; Wikimedia Commons). Commons files it under the *Amazon*
+  of 1799, the 38 of Rule's later design, not the 1795 *Amazon* the file stands for: a near
+  relation of her type. An open waist between the bulwarks, one quarter gallery, a figurehead on
+  its knee with head rails, a flat sheer rising to both ends, a black wale under a buff band of
+  ports, the spanker on a boom over the taffrail.
+- **the 64 (Ardent class):** Derek Gardner, "His Britannic Majesty's 64-Gun Ship 'Agamemnon'"
+  (20th century, in copyright: cited only). An Ardent-class sister: two tiers of ports, a
+  beakhead with the forecastle ending abaft the stem and the head rails sweeping up to the
+  catheads (her bow as §5.1 has it), a quarter gallery, the stern higher than the bow.
+- **the 74:** Thomas Luny, "H.M.S. Bellerophon lying at anchor off Berry Head, Torbay ...
+  6 August 1815", painted 1827 (public domain; Commons): two tiers of stern lights, a quarter
+  gallery, two tiers of ports with lids, as she was in 1815. Chalon's *Bellerophon* at
+  Plymouth (BHC3227) and Pocock's sketch of 1794 are in the 74's research. Lavery 1985's
+  decoration drawings (D1-D11) are her class's own drawings, a source, not a picture for the
+  eye (Design-Ship-Bellerophon.md §17.0).
+- **both schooners (*Lynx*):** two photographs of the replica built from her draught: Don Ramey
+  Logan, 26 August 2017, and RoySmith, 18 October 2026 (both CC BY-SA 4.0, Wikimedia Commons;
+  cited with credit, never copied). Long, low and flush, a nearly straight sheer, the stem raked
+  hard and the post aft, a raked transom with two stern-chase ports beside a carved eagle (as the
+  1816 draught has them), its foot clear of the water above a short counter. A sail-training
+  replica: her fittings and rig may depart from 1812.
+- **Held** (`docs/references/images/`): the lugger's Baugean "Chasse Marée au plus près"; the
+  smack's and an English lugger's Cooke etchings of 1829; the cutter's "Nimble" aquatint; the
+  bilander's Gwyn drawing c. 1780 (with her stern) and the PSF line drawing; the tartane's
+  Roux-school watercolour.
+
+Wanted from the owner where they turn up: bow-on and stern-on views, and hulls out of the water,
+which show the sections and the body under the water that a broadside cannot.
 
 ## 6. The viewer draws the profile (B5)
 
