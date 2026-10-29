@@ -214,19 +214,32 @@ def head_sails(ship: Ship) -> list[Sail]:
     ]
 
 
+def drives_aft(sail: Sail) -> bool:
+    """Whether a sail is worked as a ship's driver: a gaff sail, or a lateen cut at the
+    mast, the mizen course on its yard (package 75; docs/design/Design-ShipsEngineExtensions.md
+    §3.5). "Haul the mizen out, while you put at the same time the helm a-lee", its yard not
+    changed (Steel 1794 vol. II p. 316); hauled up as she bears up and hauled out once the wind
+    is on the new quarter (pp. 321-322): what the engine does to a spanker. The driver of the
+    place is still found by its mast (`after_gaff_sails`); a sail cut at the mast is a boom
+    sail with a boom or none (`boom_sails`)."""
+    return sail.cls == "gaff" or sail.cut_at_mast
+
+
 def boom_sails(ship: Ship) -> list[Sail]:
     """The gaff sails set on a boom (a ship's spanker, a fore-and-after's mainsail): the
     sails whose sheet a tack hauls aft and holds over (package 32e). A standing lug (a
     lugger's mizen sheeted to its outrigger, the taille-vent tacked at the foot of the
     mast) is worked as they are, its sheet hauled aft to bring her up: "les focs & le
     tapecul ... favorisent & accélèrent efficacement le mouvement giratoire" (Forfait 1788
-    p. 53; package 43b)."""
+    p. 53; package 43b); and so is a lateen cut at the mast, boom or none, hauled out as the
+    helm goes a-lee as a spanker is (package 75, `drives_aft`)."""
     return [
         sl
         for sl in ship.sails.values()
         if sl.is_set
         and (
             (sl.cls == "gaff" and ship.spar_of_role(sl, "boom") is not None)
+            or sl.cut_at_mast
             or (sl.cls == "lug" and not sl.dipping and not sl.sheeted_to)
         )
         and ship.sheets_of(sl)
@@ -274,7 +287,8 @@ def draw_sheets(
     head passes the wind)."""
     wind = ship.dyn.apparent_wind_angle if awa is None else awa
     for sl in sails:
-        yard_trim.set_sheet_angle(ship, sl, yard_trim.wanted_sheet_angle(sl.cls, wind), side)
+        wanted = yard_trim.wanted_sheet_angle(sl.curve_class, wind)
+        yard_trim.set_sheet_angle(ship, sl, wanted, side)
         sl.shivering = False
 
 
@@ -422,9 +436,11 @@ HANDING_EVOLUTIONS = frozenset(
         "take_in_gaff",
         "take_in_jibheaded",
         "take_in_studding",
+        "take_in_lateen",  # package 75: the mizen course brailed up, or furled on its yard
         "furl_square",
         "furl_gaff",
         "furl_jibheaded",
+        "furl_lateen",
         "unbend_sail",
         "shift_sail",
     }
@@ -566,7 +582,9 @@ def after_gaff_sails(ship: Ship) -> list:
     # mast forward of it does too (a ship's mizzen, a brig's main, whose spanker brought
     # the brig head to wind with sternway hove to, as the frigate's did before package
     # 10); a vessel whose yards are all on one mast, the schooner's fore or the cutter's
-    # one mast, keeps her gaff sail, which is her driving sail.
+    # one mast, keeps her gaff sail, which is her driving sail. Package 75: the 64's and
+    # the 74's mizen course, a lateen cut at the mast, is her driver as a spanker is
+    # (`drives_aft`).
     with_yards = _masts_with_yards(ship)
     if len(with_yards) < 2:
         return []
@@ -577,7 +595,7 @@ def after_gaff_sails(ship: Ship) -> list:
     return [
         sl
         for sl in ship.sails.values()
-        if sl.cls == "gaff" and sl.is_set and ship.mast_of(sl) is aftermost
+        if drives_aft(sl) and sl.is_set and ship.mast_of(sl) is aftermost
     ]
 
 
@@ -613,6 +631,18 @@ def names_of_sails(ship: Ship, sails: list) -> str:
     from freesail.evolutions.runner import part_name  # local import to avoid a cycle
 
     return " and ".join(f"the {part_name(ship, sl.id)}" for sl in sails) if sails else "the sail"
+
+
+def driver_words(ship: Ship, drivers: list) -> str:
+    """'the spanker' for the log while every driver is a gaff sail, as the words have
+    always been; the sails by name otherwise (package 75: the mizen course, 'the mizen').
+    With none in hand (none set as she brings up), the ship's drivers bent, set or not, say
+    which: a ship whose mizen course is furled is told to brail up the mizen, not a spanker
+    she has not got."""
+    named = drivers or [sl for sl in after_gaff_sails_all(ship) if sl.state is not SailState.UNBENT]
+    if all(sl.cls == "gaff" for sl in named):
+        return "the spanker"
+    return names_of_sails(ship, named)
 
 
 def lowest_square_sails(ship: Ship) -> list:
@@ -1078,6 +1108,10 @@ class TackScript(Script):
             words += "; ease off the head sheets"
         if self.booms:
             words += f"; haul aft the {self._boom_words().replace('the ', '')} sheet"
+            if any(sl.cut_at_mast for sl in self.booms):
+                # the mizen course on its yard (package 75): "brace the bowline quite to
+                # leeward" (Steel 1794 vol. II p. 316), words for a line no order works
+                words += " and brace the bowline to leeward"
         # a lugger's dipping lugs come down as she goes about (package 43b)
         self.dip = LugDip(self.ship)
         lowered = self.dip.lower()
@@ -1316,8 +1350,16 @@ class TackScript(Script):
         if self.heads:
             words.append("the head sheets held to windward")
         if self.booms:
+            names = self._boom_words().replace("the ", "")
+            # the mizen course cut at the mast has no boom: its sheet hauls the sail itself
+            # over (package 75); with a boom, or for a lug, the words are as they were
+            boomless = all(
+                sl.cut_at_mast and self.ship.spar_of_role(sl, "boom") is None for sl in self.booms
+            )
             words.append(
-                f"the {self._boom_words().replace('the ', '')} boom hauled over to windward"
+                f"the {names} hauled over to windward"
+                if boomless
+                else f"the {names} boom hauled over to windward"
             )
         self.note("; ".join(words) + ".", "helm.order")
 
@@ -1830,7 +1872,7 @@ def _work_lying_to_sheets(ship: Ship, info: dict[str, Any], demand: float, box: 
         rest = (
             geo.floor
             if fore_and_aft
-            else yard_trim.wanted_sheet_angle(sl.cls, HOVE_TO_DRIVER_APPARENT)
+            else yard_trim.wanted_sheet_angle(sl.curve_class, HOVE_TO_DRIVER_APPARENT)
         )
         to = geo.floor if demand > 0 else geo.ceiling
         yard_trim.set_sheet_angle(ship, sl, rest + (to - rest) * abs(demand), lee)
@@ -2327,7 +2369,7 @@ class HeaveToScript(Script):
             others += [sl for sl in head_sails(self.ship) if sl is not self.headsail]
         lee = _lee_name(self.sign)
         for sl in others:
-            wanted = yard_trim.wanted_sheet_angle(sl.cls, HOVE_TO_DRIVER_APPARENT)
+            wanted = yard_trim.wanted_sheet_angle(sl.curve_class, HOVE_TO_DRIVER_APPARENT)
             reading = yard_trim.read_sheet(self.ship, sl)
             eased = reading.angle > wanted + units.deg_to_rad(1.0)
             if reading.free or reading.held_to_windward or eased:
@@ -4225,7 +4267,8 @@ def _after_courses(ship: Ship) -> list:
 def _after_sail(ship: Ship) -> list:
     """What is hauled up to box-haul: the courses abaft the head yards and the
     gaff sails set on the aftermost mast (Luce: "Up mainsail and spanker!"; on a
-    schooner, whose after sail is her main gaff sail, that is lowered)."""
+    schooner, whose after sail is her main gaff sail, that is lowered), or the mizen course
+    cut at the mast in the spanker's stead (package 75, `drives_aft`)."""
     masts = [sp for sp in ship.spars.values() if sp.cls == "mast" and not sp.wrecked]
     drivers: list = []
     if masts:
@@ -4233,7 +4276,7 @@ def _after_sail(ship: Ship) -> list:
         drivers = [
             sl
             for sl in ship.sails.values()
-            if sl.cls == "gaff" and sl.is_set and ship.mast_of(sl) is aftermost
+            if drives_aft(sl) and sl.is_set and ship.mast_of(sl) is aftermost
         ]
     return _after_courses(ship) + drivers
 
@@ -5265,7 +5308,8 @@ class TrimSheetScript(Script):
         if isinstance(angle, int | float):
             wanted = units.deg_to_rad(float(angle))
         else:
-            wanted = yard_trim.wanted_sheet_angle(self.sail.cls, self.ship.dyn.apparent_wind_angle)
+            awa = self.ship.dyn.apparent_wind_angle
+            wanted = yard_trim.wanted_sheet_angle(self.sail.curve_class, awa)
         self.target_angle = max(geo.floor, min(geo.ceiling, wanted))
         self.target_hauled = geo.hauled_from_angle(self.target_angle)
 
@@ -6128,11 +6172,13 @@ class ComeToAnchorScript(_AnchorScript):
             if self._veer(dt, factor, self.target, "veer_fathoms_per_s"):
                 self.phase = "brought_up"
                 self.phase_t = 0.0
-                for sl in after_gaff_sails(ship):
+                drivers = after_gaff_sails(ship)
+                for sl in drivers:
                     if sl.is_set:
                         sl.state = SailState.IN_THE_GEAR
                 self.note(
-                    f"Veered to {_fathoms_words(self.anchor.scope_fathoms)}; brail up the spanker."
+                    f"Veered to {_fathoms_words(self.anchor.scope_fathoms)}; brail up "
+                    f"{driver_words(ship, drivers)}."
                 )
             return
         if self.phase == "brought_up":
@@ -7254,15 +7300,17 @@ class GetUnderWayScript(_AnchorScript):
                         [self.sign * y.brace_limit for y in head + after],
                         self.timing_value("brace_s", 60.0),
                     )
-                    _set_fore_and_aft(ship, after_gaff_sails_all(ship), self.tack)
+                    drivers = after_gaff_sails_all(ship)
+                    _set_fore_and_aft(ship, drivers, self.tack)
                     self._steer_out(wind)
                     self.phase = "under_way"
                     self.phase_t = 0.0
+                    driver = driver_words(ship, [sl for sl in drivers if sl.is_set])
                     self.note(
                         f"{how}; right the helm, draw the jib, haul aft the main sheet, brace "
                         "round the topsail yard."
                         if self.fore_and_aft
-                        else f"{how}; right the helm, brace round the head yards, set the spanker."
+                        else f"{how}; right the helm, brace round the head yards, set {driver}."
                     )
                 return
             if self.anchor_phase == "done" and (self.swing is None or self.swing.done):
@@ -7353,7 +7401,8 @@ class GetUnderWayScript(_AnchorScript):
 
 def after_gaff_sails_all(ship: Ship) -> list[Sail]:
     """The driver, set or not: the gaff sail on the aftermost of two or more masts with
-    yards (a ship's spanker, a brig's main); nothing on a fore-and-after."""
+    yards (a ship's spanker, a brig's main), or the mizen course cut at the mast (package
+    75, `drives_aft`); nothing on a fore-and-after."""
     with_yards = _masts_with_yards(ship)
     if len(with_yards) < 2:
         return []
@@ -7361,7 +7410,7 @@ def after_gaff_sails_all(ship: Ship) -> list[Sail]:
     return [
         sl
         for sl in ship.sails.values()
-        if sl.cls == "gaff" and not sl.wrecked and ship.mast_of(sl) is aftermost
+        if drives_aft(sl) and not sl.wrecked and ship.mast_of(sl) is aftermost
     ]
 
 

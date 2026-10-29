@@ -577,7 +577,9 @@ def _read_rig(ship: Ship) -> _Rig:
     drawing = []
     lee = yard_trim.lee_side_sign(ship)
     for sail in driving:
-        cls = SAIL_CLASSES[sail.cls]
+        # the class whose curve drives it: the gaff's for a lateen cut at the mast (package
+        # 75, `Sail.curve_class`), else its own
+        cls = SAIL_CLASSES[sail.curve_class]
         reefs = min(max(sail.reefs, 0), sail.reef_bands)
         square_faced = not _in_gaff_plane(sail)
         square_chord = None
@@ -1526,7 +1528,7 @@ STOWED_STAYSAIL_WINDAGE = 0.5
 
 
 def _sail_windage_area(ship: Ship, sail: Sail) -> float:
-    cls = SAIL_CLASSES.get(sail.cls)
+    cls = SAIL_CLASSES.get(sail.curve_class)  # the gaff's for a lateen cut at the mast
     if cls is None or sail.state is SailState.UNBENT:
         # unbent: in the sail room, or gone over the side with a wreck cleared away
         # (package 30b), whatever became of the spars it was bent to

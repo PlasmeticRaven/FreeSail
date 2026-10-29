@@ -373,7 +373,9 @@ def sheet_geometry(ship: Ship, sail: Sail) -> SheetGeometry:
     memo = ship.extra.setdefault("trim.sheet_geometry", {})
     geo = memo.get(sail.id)
     if geo is None:
-        floor, ceiling = TRIM_RANGE.get(sail.cls, TRIM_RANGE["gaff"])
+        # by the class whose trim it takes: the gaff's for a lateen cut at the mast (package
+        # 75, `Sail.curve_class`)
+        floor, ceiling = TRIM_RANGE.get(sail.curve_class, TRIM_RANGE["gaff"])
         boom = ship.spar_of_role(sail, "boom")
         sheets = ship.sheets_of(sail)
         parts = max((ln.parts for ln in sheets), default=1)

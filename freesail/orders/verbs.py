@@ -1215,7 +1215,7 @@ def _trim(
             extra_s = {**extra_s, "log_group": new_group()}
         for sail in candidates:
             name = resolve.the(ship, sail.id)
-            wanted = yard_trim.wanted_sheet_angle(sail.cls, awa_signed)
+            wanted = yard_trim.wanted_sheet_angle(sail.curve_class, awa_signed)
             reading = yard_trim.read_sheet(ship, sail)
             if (
                 not reading.free
@@ -1362,6 +1362,10 @@ def _trim_targets(ship: Ship, res: resolve.Resolution) -> tuple[list[Spar], list
         part = ship.parts[pid]
         name = resolve.the(ship, pid)
         if isinstance(part, Spar):
+            if part.cls == "lateen_yard":
+                # called a yard but not braced (package 75): refused in the brace orders'
+                # words, its sail trimmed with its sheet and vangs (`_yard_for` raises)
+                _yard_for(ship, pid)
             if not part.is_yard:
                 raise OrderError(
                     f"{name[0].upper()}{name[1:]} is not a yard; trim a sail or a yard."
@@ -1558,7 +1562,9 @@ def _yard_for(ship: Ship, pid: str) -> Spar:
         if part.is_yard:
             return part
         sail = ship.sail_of(part)
-        how = " it is trimmed with its sheet and vangs" if part.cls in ("gaff", "boom") else ""
+        # a lateen yard has vangs in place of braces (package 75; Falconer 1780, VANGS)
+        vangs = part.cls in ("gaff", "boom", "lateen_yard")
+        how = " it is trimmed with its sheet and vangs" if vangs else ""
         hint = f"; the {sail.cls} sail on it is not braced;{how}" if sail else f";{how}"
         hint = hint.rstrip(";")
         raise OrderError(f"The {name} is a {part.cls.replace('_', ' ')}, not a yard{hint}.")
@@ -1913,7 +1919,7 @@ def _draw(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
             failed.append(f"{name} has no sheet")
             continue
         reading = yard_trim.read_sheet(ship, part)
-        wanted = yard_trim.wanted_sheet_angle(part.cls, ship.dyn.apparent_wind_angle)
+        wanted = yard_trim.wanted_sheet_angle(part.curve_class, ship.dyn.apparent_wind_angle)
         if (
             not reading.free
             and not reading.held_to_windward

@@ -260,8 +260,11 @@ class Spar(Part):
     def is_yard(self) -> bool:
         """A yard that is braced. A lug's yard has no braces and no lifts ("les ralingues
         en font l'office", Forfait 1788 p. 53): its sail is trimmed by the sheet, as a
-        fore-and-aft sail's is (package 43b), so it is no yard of the braces' orders."""
-        return self.cls in {"yard", "lateen_yard"}
+        fore-and-aft sail's is (package 43b), so it is no yard of the braces' orders. Nor
+        is a lateen yard (package 75; docs/design/Design-ShipsEngineExtensions.md §3.3): the
+        mizen yard has vangs in place of braces (Falconer 1780, VANGS and BRACE) and a
+        bowline at its heel (Lavery, I32), and its sail is trimmed by the sheet."""
+        return self.cls == "yard"
 
     @property
     def strain_ratio(self) -> float:
@@ -299,11 +302,12 @@ class Sail(Part):
     # yard is on deck now (`yard_lowered`, runtime only): lowered to be dipped, while in the
     # gear a settee is clewed up aloft where a lug is lowered on deck; a lateen cut at the
     # mast (the 64's and the 74's mizen course), whose curve and trim are the gaff's
-    # (`curve_class`). Read now only by `curve_class`, the runner's `class: settee` and the
+    # (`curve_class`), and the ship's driver (`evolutions.scripts.drives_aft`, the engine's
+    # lateen step). The settee's are read now only by the runner's `class: settee` and the
     # served graph and snapshot, none of which differs for a sail without them: the engine's
-    # steps will give them their behaviour. Class defaults, left out of the checkpoint while
-    # false (`__getstate__`), so that older saves load and a sail without them is pickled as
-    # before them.
+    # settee step will give them their behaviour. Class defaults, left out of the checkpoint
+    # while false (`__getstate__`), so that older saves load and a sail without them is
+    # pickled as before them.
     settee: bool = False
     yard_lowered: bool = False
     cut_at_mast: bool = False
@@ -412,11 +416,10 @@ class Sail(Part):
         docs/design/Design-ShipsEngineExtensions.md §3.1): the gaff's for a lateen cut at the
         mast, a four-sided, loose-footed sail laced to its mast like a gaff sail, as the owner
         asked (docs/design/Research-74-2026-10.md §13.5); its own class for every other sail.
-        The rating, the polar's sheets, the served reef factor, the readings' luff and the
-        runner's `wanted_sheet` read it now; the physics' own lookups (the curve driving the
-        sail, its furled windage, the sheet's floor) and the orders' and scripts' wanted sheet
-        read it from the engine's lateen step, B3.1 (§3.1), and take the sail's class until
-        then."""
+        Every lookup of a sail's curve or trim by its class reads it (§3.1): the curve driving
+        the sail and its furled windage (`physics.sails`), the sheet's floor and ceiling
+        (`evolutions.trim`), the wanted sheet of the scripts, the orders, the polar and the
+        runner's `wanted_sheet`, the rating, the served reef factor and the readings' luff."""
         return "gaff" if self.cut_at_mast else self.cls
 
     @property

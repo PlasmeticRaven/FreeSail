@@ -1,0 +1,31 @@
+# Furl a lateen sail (package 75; docs/design/Design-ShipsEngineExtensions.md §3.6, E6):
+# brail it up if it is still drawing, then furl it on its yard aloft, the topmen laying out
+# along the yard. The woldings of a lateen yard are the steps "to climb to the peek to furl or
+# loose the sail" (Falconer 1780, YARD): a sail laced to a yard is furled on its spar, where a
+# gaff sail keeps package 37l's refusal. Times as furl_gaff's (judgement).
+id: furl_lateen
+verb: furl
+applies_to: {class: lateen}
+preconditions:
+  - {check: sail.state != furled, reason: "The {sail} is furled already.", done: true}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; there is nothing left to furl."}
+requires:
+  - {check: not wrecked(spar_chain(sail)), reason: "the {sail}'s yard or mast is wrecked"}
+steps:
+  - do: brail_up
+    duration_s: 90
+    if: sail.state in [set, loosed]
+    sets: {sail.state: in_the_gear}
+    log: "Brailed up the {sail}."
+  - do: furl
+    duration_s: 120
+    aloft: true
+    sets: {sail.state: furled}
+on_start: {log: "Hands to furl the {sail}."}
+on_complete: {log: "Furled the {sail} on its yard.", kind: sail.furled, severity: notable}
+on_fail: {log: "Could not furl the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: the afterguard and the topmen of the sail's mast, who "loose and furl the peak of the
+# spanker" (Luce 1884, ch. XVIII Organization, 'Duties of Men in Different Parts of the Ship',
+# as furl_gaff's); furl_gaff's eight (judgement).
+crew: {hands: 8, rating: ordinary, stations: [afterguard, topmen]}
+source: "Falconer 1780, YARD (the woldings); furl_gaff's times (judgement)"

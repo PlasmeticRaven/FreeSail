@@ -517,6 +517,7 @@ def _spar_weight(spar: Spar) -> float:
         "gaff": 2.0,
         "boom": 1.5,
         "lug_yard": 2.0,
+        "lateen_yard": 2.0,  # package 75: the mizen yard, a yard's exposure aloft
         "jib_boom": 1.5,
         "flying_jib_boom": 1.5,
         "mast": 0.6,
