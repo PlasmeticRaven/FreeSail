@@ -10768,7 +10768,7 @@ def test_truth_7_261_every_knob_of_the_regimes_and_the_nations_has_its_source_or
             for entry in block.get(kind) or []:
                 if isinstance(entry, dict) and "source" in entry:
                     naval.append((f"{nid}.{kind}.{entry['port']}", entry["source"]))
-    assert len(nations) == 8 and len(naval) > 50
+    assert len(nations) == 9 and len(naval) > 50  # package 79c: the regency of Algiers the ninth
     for where, said in knobs + naval:
         assert said and _SOURCE_FORM.search(said), (where, said)
         if not re.search(r"(James|Nicolas|Niles|Regulations 1806|Falconer 1780) ", said):

@@ -12205,6 +12205,43 @@ here. **`skip_dry_tiles`** is a key the builder has had since package 39d (Portu
 inland tiles); it is not taken here, as the ruling has it: the Alboran's inland tiles east
 of 1 W (63 of the old count, 6.8 MB) are a later tidy for the lead.
 
+### The suite, as run (package 79c)
+
+On this session's own container (four cores), on the tree with the lead's branch merged in
+(`fafee99`, package 84's step 9 among it; the tuning notes the one conflict, both sides
+kept). `python -m ruff check .` and `ruff format --check .` clean; `python
+tools/build_charts.py --check` passes for both regions as printed above.
+
+**The recorded passages of the Channel west**: `python -m pytest tests/test_known_truths.py
+--slow -k "gate_5b or gate_5c"`, as the brief has it, selected one test (the passage for gate
+5b's constants) and it passed to its digest; the eleven tests that read the passages'
+fixtures, by node id (79b's list: the frigate's and the schooner's passages of gate 5b with
+the schooner's octant and pilot, the pace on the passage, the merchant passage with its
+deep-sea cast, the naval cruise with its stranger, truths 72, 77 and 78), `--slow -n 4`:
+**11 passed**, every pinned digest, line count and tick held. With the block's ten port files
+loaded on the Channel's chart by the passages that list no ports, the nine held gauges, the
+seven stream areas, the epitome's places, the regency and the weather box in place, nothing
+of the Channel moved.
+
+**The slow tests of the files touched**: `--slow -m slow -n 4 tests/test_chart.py
+tests/test_ports.py tests/test_tide.py tests/test_weather.py tests/test_nations.py
+tests/test_scenarios.py`, 14 passed; **the block's truths 7-285 to 7-294** with `--slow -n 4`,
+10 passed (7-294, the passage sailed whole to the northerly at the mouth of Port Mahon, 530 s
+alone).
+
+**The fast tier**, once on the final tree (`python -m pytest -n auto -q -p no:cacheprovider`,
+378 slow tests left out): four failed. Two this package's: `test_geo.py::test_the_scenario_
+file_reads_a_chart_beside_a_region_and_a_save_before_it_loads` (the chart's list of regions
+gains the block's two, as the other lists did) and truth 7-261 (package 79a's: its count of
+the nations, eight, now nine with the regency, whose `naval:` source cites James as the rule
+asks); both mended, their files run again with the pictures' (16 passed). Two the pictures'
+known flake under the tier's load, `test_pictures.py`'s chart "blank (std 7.9)" against its
+floor of 8.0 (79b's finding, the default scenario's chart about Falmouth, which this block
+does not reach): both pass alone on this tree. After the run the `balearics` recipe's title
+was mended ("Barbary from Mostaganem", Arzew lying in `mediterranean-west`) and the region
+rebuilt from the cache, no tile changed, the manifest's title line alone; `test_chart.py`
+run again, passed. Not run again whole, as the suites' rule has it.
+
 ### Step 9: the director's reach and the truth over the hulls
 
 Built on step 8 as merged, the lead's head `76eb22c` brought in at the boundary (the design

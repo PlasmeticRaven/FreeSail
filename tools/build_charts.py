@@ -487,7 +487,7 @@ REGIONS: dict[str, dict[str, Any]] = {
     # mediterranean-west's (the seam rule): computed with the block and not written. The
     # Algerian coast east of 4.5 E is a later block's.
     "balearics": {
-        "title": "The Balearics, and Barbary from Arzew to Algiers",
+        "title": "The Balearics, and Barbary from Mostaganem to Algiers",
         "bounds": {"south": 35.0, "north": 40.5, "west": 0.05, "east": 4.5},
         "fetch": {"south": 34.45, "north": 40.7, "west": -0.5, "east": 4.9},
         "harbours": {

@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-29'
 tool: tools/build_charts.py
-build_hash: 7604d467b0598429
+build_hash: 8be3b9314fb08fa8
 levels:
   '0':
     cell_sec: 150.0
@@ -7063,7 +7063,7 @@ regions:
       tower: 2
       town: 6
   balearics:
-    title: The Balearics, and Barbary from Arzew to Algiers
+    title: The Balearics, and Barbary from Mostaganem to Algiers
     bounds:
       south: 35.0
       north: 40.5
