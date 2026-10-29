@@ -625,7 +625,10 @@
           var lowerM = resolve(chainTop(spec));
           var Ld = spec.length_m || 0;
           r.x = lowerM ? lowerM.x : spec.x_m || 0;
-          r.centre = v(r.x, 0.25 * beamM, deck + ON_DECK_M);
+          // on the drawn deck at the mast where a profile gives one (package 75: a datum
+          // above the waist, as the razee's under D18 (c), would float it over her rail)
+          var onDeck = profile ? deckAt(profile, r.x) : null;
+          r.centre = v(r.x, 0.25 * beamM, (onDeck === null ? deck : onDeck) + ON_DECK_M);
           r.arm = [1, 0, 0];
           r.half = Ld / 2;
           r.a = sub(r.centre, mul(r.arm, r.half));

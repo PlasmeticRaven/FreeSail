@@ -1628,9 +1628,9 @@ def test_each_gallery_and_band_of_lights_lies_at_its_place(tmp_path, path):
     heights within a centimetre, in n even bays within its half-breadth, each the light's share
     of its bay, on the transom (the stern's line at its height). Nothing stands off the hull: a
     tier is cut to the top of the side over its extent and to the stern's line at its heights, a
-    band to the transom's knuckle and taffrail. The 64's are drawn as filed; the razee's, filed
-    above and abaft her taffrail (her short roundhouse not yet in her profile: Build-Ships.md
-    §19.1 item 18), are cut to her side and her transom."""
+    band to the transom's knuckle and taffrail. Both ships' are drawn as filed: the razee's stand
+    under her taffrail since her short roundhouse is in her profile (Build-Ships.md §19.1 item
+    18), where before it they were cut to her side and her transom."""
     hull = graph_of(path)["hull"]
     profile = hull["profile"]
     stern = profile["form"]["stern"]
@@ -1655,10 +1655,7 @@ def test_each_gallery_and_band_of_lights_lies_at_its_place(tmp_path, path):
         z_top = min(zh, taffrail)
         cut = cut or z_top != zh
         bands.append((max(zl, stern["knuckle_z_m"]), z_top, n, hb))
-    assert cut == (path == RAZEE)
-    if path == RAZEE:  # her tier now under her taffrail and forward of her stern
-        assert tiers[0][3] <= taffrail and tiers[0][0] >= stern_line[-1][0] - 1e-9
-        assert bands[0][1] == taffrail
+    assert not cut  # the razee's roundhouse in (B1, 2026-10-29): nothing cut on either file
     got = run_js(
         tmp_path,
         {"hull": hull},
@@ -2117,7 +2114,7 @@ def test_where_a_deck_ends_over_another_a_bulkhead_closes_the_space_between(
     )
     ends = {
         "sixty-four": {("roundhouse", "fore"), ("quarterdeck", "fore"), ("forecastle", "aft")},
-        "razee-44": {("quarterdeck", "fore"), ("forecastle", "aft")},
+        "razee-44": {("roundhouse", "fore"), ("quarterdeck", "fore"), ("forecastle", "aft")},
     }[Path(path).stem]
     at = {(f["deck"], "aft" if f["pts"][0][0] == decks[f["deck"]][0][0] else "fore") for f in got}
     assert at == ends and len(got) == len(ends)
