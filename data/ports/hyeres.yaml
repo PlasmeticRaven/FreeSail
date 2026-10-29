@@ -1,0 +1,111 @@
+# FreeSail: the Road of Hyeres as a port (package 79d, the Gulf of Lion's block; the same
+# form as dunkirk.yaml, on package 35's machinery). The road and the marks are
+# features/gulf-of-lion.yaml's (the harbour patch hyeres).
+#
+# Sources. Michelot 1715, pp. 49 to 50: Porquerolles' sandy bay between its two forts,
+# 6 and 7 fathoms, grass and sand, sheltered from all the sea-winds; men of war anchor
+# over against the store-house a league off. Purdy 1826, pp. 57 to 58 (Captain Smith's
+# remarks of 1818): good anchorage in most of the bay out of gun-shot, the best on the
+# north side in 13 to 10 fathoms, soft mud, the salt-houses north and Bregancon east; the
+# Great Pass between Porquerolles and Port-Cros, 20 fathoms and more, the fleet's way in.
+# Norie 1831, p. 61. Smyth 1854, p. 16: the blockading fleet lay here three weeks in
+# August 1811. James 1837, vol. 3, p. 177: Nelson's station off Cape Sicie chosen so that
+# he might shelter under the Hyeres islands from a north-north-westerly gale.
+#
+# The stance. The road is the King's ships' shelter in the watch on Toulon, but the shore
+# and the islands' forts are French: French and hostile to a King's ship, neutral to an American (the nations table: Britain at war with France since May 1803); the
+# water is had at Porquerolles' well when the forts allow. No period sheet read: `datum:
+# unverified`. Prices JUDGEMENT, in sterling.
+
+id: hyeres
+name: the Road of Hyeres
+nation: france
+source: "Michelot 1715 pp. 49-50; Purdy 1826 pp. 57-58; Norie 1831 p. 61; Smyth 1854 p. 16; James 1837 vol. 3 p. 177"
+datum: unverified   # no period sheet read; the nearest RAM station Toulon's (NM 0.42 m)
+
+outer_road:
+  feature: porquerolles-anchorage
+  name: the anchorage off Porquerolles
+  lat_deg: 43.0150
+  lon_deg: 6.2040
+  depth_fathoms: 10
+anchorage:
+  feature: hyeres-road
+  name: the Road of Hyeres
+  lat_deg: 43.0950
+  lon_deg: 6.2150
+  depth_fathoms: 12
+mooring:
+  name: under Porquerolles
+  lat_deg: 43.0290     # the grid's 20 m north of the island (judgement)
+  lon_deg: 6.2050
+  depth_fathoms: 10
+  bottom: grass and sand
+shore:
+  name: the landing at Porquerolles
+  lat_deg: 43.0010
+  lon_deg: 6.2020
+
+pilot:
+  station: hyeres-road
+  cruising_nm: 5                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the boat of Porquerolles
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Ollivier, Bernard, Granet, Paul, Aubert, Cauvin, Gros, Mathieu]   # Provençal names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: starboard                 # judgement
+  course_out_deg: 150            # out by the Great Pass between Porquerolles and Port-Cros
+  words:
+    channel: "Come in by the Great Pass between Porquerolles and Port-Cros, twenty fathoms and more, giving the Sarraniers off Porquerolles' east end a berth; the Little Pass between Giens and Porquerolles is for small craft, the Fourmigues and the Rascas in it."
+    marks: "The castle of Porquerolles over its sandy bay; Bregancon's fort on its rock to the east; the salt-houses on the north shore; Cape Benat beyond; the high land of the Maures behind."
+    anchorage: "The best berth is on the north side in ten to thirteen fathoms, soft mud, with the salt-houses north and Bregancon east, out of gun-shot of the forts; it is open to the east-south-east and the south."
+    tide: "There is no tide to reckon: a foot at the most. The current sets west among the islands at times with great strength."
+
+tide:
+  establishment: Toulon
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: france, note: "the country's; judgement"}
+    - {good: salt, price: 10, origin: france, note: "judgement"}
+    - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: france, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: france, note: "judgement"}
+    - {good: timber, price: 8, origin: france, note: "judgement"}
+    - {good: vegetables, price: 4, origin: france, note: "judgement"}
+    - {good: fresh beef, price: 30, origin: france, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # no yard: what the fishermen of the islands have
+  items:
+    - {item: topmast, hours: 14, pounds: 50, note: "judgement"}
+    - {item: topgallant_mast, hours: 7, pounds: 16}
+    - {item: yard, hours: 12, pounds: 30}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 25, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.25, pounds_per_ton: 0.1, note: "the well of Porquerolles and the stream of the Gapeau, by the boats; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: a few fishermen of the islands
+  able: {hands: 0, pounds: 2, delay_h: 24}
+  ordinary: {hands: 1, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 3, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [hyeres-road, porquerolles-anchorage, 42 58 N 6 18 E]
+  from_sea: [42 58 N 6 18 E, porquerolles-anchorage, hyeres-road]
+  in: [hyeres-road]

@@ -694,3 +694,108 @@ held_gauges:
     M2: {amplitude_m: 2.146, phase_deg: 352.4}
     S2: {amplitude_m: 0.648, phase_deg: 44.9}
     N2: {amplitude_m: 0.374, phase_deg: 329.1}
+
+  # THE GAUGES OF THE GULF OF LION'S BLOCK, READ AND HELD (package 79d, the region
+  # `gulf-of-lion`). TICON's file read again 2026-10-29 by its coordinates over the block's
+  # box (40.56 to 44.5 N, 3.0 to 7.73 E; the zip at doi.pangaea.de, SHA-256
+  # 7055f8ed1a14abf8...6514, the same file as every block's): ten stations, one record
+  # each, but Monaco's two (the harbour's long record of 1959 to 2014 taken, its short
+  # record of 1999 to 2010 at 43.7328 N 7.4240 E, M2 0.078 m, left out as the same water).
+  # Each named by the station of SHOM's RAM at its coordinates (the WFS layer
+  # RAM_BDD_WLD_WGS84G_WFS:ram_3857, Licence Ouverte 2.0, read 2026-10-29), whose NM gives
+  # every gauge's (Monaco's among them) `mean_level_m` above the zero: VERIFIED. The water is the Mediterranean's, a tide of inches
+  # (M2 four to ten centimetres, the period's "almost imperceptible": Michelot 1715, Smyth
+  # 1854). HELD, as every block's: the world's tide over the block is the nearest of the
+  # eleven alone (Le Conquet's, beyond the reach of every gauge), two metres of M2 where the
+  # gauges have six centimetres; blended, they lie beyond 400 miles of every Channel and
+  # Biscay position and would move no recorded passage (tests/test_tide.py says so).
+  - id: port-vendres
+    name: Port-Vendres
+    lat_deg: 42.5199
+    lon_deg: 3.1075
+    record: "GESLA-2, REFMAR, 1981 to 2014"
+    mean_level_m: 0.52  # SHOM's RAM, Port-Vendres's NM
+    M2: {amplitude_m: 0.056, phase_deg: 217.4}
+    S2: {amplitude_m: 0.019, phase_deg: 237.9}
+    N2: {amplitude_m: 0.012, phase_deg: 207.2}
+  - id: sete
+    name: Cette (Sète)
+    lat_deg: 43.3976
+    lon_deg: 3.6991
+    record: "GESLA-2, REFMAR, 1956 to 2014"
+    mean_level_m: 0.46  # SHOM's RAM, Port de Sète's NM
+    M2: {amplitude_m: 0.062, phase_deg: 211.6}
+    S2: {amplitude_m: 0.023, phase_deg: 232.7}
+    N2: {amplitude_m: 0.013, phase_deg: 201.2}
+  - id: port-camargue
+    name: Port-Camargue (Le Grau-du-Roi)
+    lat_deg: 43.5203
+    lon_deg: 4.1264
+    record: "GESLA-2, REFMAR, 2009 to 2012"
+    mean_level_m: 0.53  # SHOM's RAM, Port Camargue's NM
+    M2: {amplitude_m: 0.067, phase_deg: 213.3}
+    S2: {amplitude_m: 0.024, phase_deg: 230.6}
+    N2: {amplitude_m: 0.014, phase_deg: 200.3}
+  - id: fos
+    name: Fos-sur-Mer
+    lat_deg: 43.4049
+    lon_deg: 4.8929
+    record: "GESLA-2, REFMAR, 2006 to 2014"
+    mean_level_m: 0.49  # SHOM's RAM, Fos-sur-Mer's NM (the station 1.4 km from the gauge)
+    M2: {amplitude_m: 0.068, phase_deg: 215.7}
+    S2: {amplitude_m: 0.025, phase_deg: 233.3}
+    N2: {amplitude_m: 0.014, phase_deg: 204.6}
+  - id: marseille
+    name: Marseille
+    lat_deg: 43.2788
+    lon_deg: 5.3538
+    record: "GESLA-2, REFMAR, 1985 to 2014"
+    mean_level_m: 0.49  # SHOM's RAM, Marseille (Corniche)'s NM
+    M2: {amplitude_m: 0.066, phase_deg: 219.4}
+    S2: {amplitude_m: 0.024, phase_deg: 237.4}
+    N2: {amplitude_m: 0.014, phase_deg: 208.7}
+  - id: toulon
+    name: Toulon
+    lat_deg: 43.1172
+    lon_deg: 5.9131
+    record: "GESLA-2, REFMAR, 1960 to 2014"
+    mean_level_m: 0.42  # SHOM's RAM, Toulon's NM
+    M2: {amplitude_m: 0.065, phase_deg: 216.6}
+    S2: {amplitude_m: 0.024, phase_deg: 235.7}
+    N2: {amplitude_m: 0.013, phase_deg: 207.1}
+  - id: port-ferreol
+    name: Port Ferréol (by St Raphael)
+    lat_deg: 43.3591
+    lon_deg: 6.7176
+    record: "GESLA-2, REFMAR, 2012 to 2014"
+    mean_level_m: 0.50  # SHOM's RAM, Port Ferréol's NM
+    M2: {amplitude_m: 0.074, phase_deg: 219.8}
+    S2: {amplitude_m: 0.028, phase_deg: 238.0}
+    N2: {amplitude_m: 0.015, phase_deg: 207.5}
+  - id: la-figueirette
+    name: La Figueirette (Théoule, the gulf of La Napoule)
+    lat_deg: 43.4835
+    lon_deg: 6.9349
+    record: "GESLA-2, REFMAR, 2011 to 2014"
+    mean_level_m: 0.51  # SHOM's RAM, La Figueirette's NM
+    M2: {amplitude_m: 0.076, phase_deg: 219.9}
+    S2: {amplitude_m: 0.029, phase_deg: 237.7}
+    N2: {amplitude_m: 0.015, phase_deg: 208.4}
+  - id: nice
+    name: Nice
+    lat_deg: 43.6955
+    lon_deg: 7.2853
+    record: "GESLA-2, REFMAR, 1981 to 2014"
+    mean_level_m: 0.54  # SHOM's RAM, Nice's NM
+    M2: {amplitude_m: 0.077, phase_deg: 221.4}
+    S2: {amplitude_m: 0.029, phase_deg: 240.2}
+    N2: {amplitude_m: 0.016, phase_deg: 210.7}
+  - id: monaco
+    name: Monaco
+    lat_deg: 43.7288
+    lon_deg: 7.4215
+    record: "GESLA-2, REFMAR, 1959 to 2014"
+    mean_level_m: 0.52  # SHOM's RAM, Monaco's NM
+    M2: {amplitude_m: 0.070, phase_deg: 224.6}
+    S2: {amplitude_m: 0.028, phase_deg: 242.0}
+    N2: {amplitude_m: 0.014, phase_deg: 212.9}

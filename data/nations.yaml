@@ -375,6 +375,191 @@ nations:
       portugal: "peace; JUDGEMENT"
       denmark: "peace; JUDGEMENT"
       batavian-republic: "peace; JUDGEMENT"
+      # package 79d: the Italian states and the King of Sardinia, all at peace with the
+      # Emperor in June 1805 (nothing read of their dealings with Morocco)
+      sardinia: "peace; JUDGEMENT"
+      naples: "peace; JUDGEMENT"
+      etruria: "peace; JUDGEMENT"
+      liguria: "peace; JUDGEMENT"
+      papal-state: "peace; JUDGEMENT"
+  # package 79d, the Gulf of Lion and the Tyrrhenian: the Italian states and the King of
+  # Sardinia, data alone in Morocco's form (no code of their own). Each relation with its
+  # source (James's Naval History vol. 3 on file) or FROM MEMORY or JUDGEMENT said so; the
+  # stance reads the wars below and `closed_to`, and none of the five is at war with
+  # anyone in June 1805, so their ports are neutral to every other nation and open to
+  # their own.
+  #
+  # The King of Sardinia (Victor Emmanuel I from 1802), his mainland French and his court
+  # at Cagliari since 1799 (FROM MEMORY). The Maddalena and Cagliari are his.
+  sardinia:
+    name: Sardinia
+    adjective: Sardinian
+    people: the Sardinians
+    names: english               # no names list of its own; the pilots' names are the port files'
+    colours: "white, the red cross of St George with a Moor's head in each quarter, for the island, the arms of Savoy over (FROM MEMORY)"
+    flag: "the Sardinian colours"    # the flag's short word, for the lookout (package 36)
+    letters_of_marque: false     # judgement: his galleys and half-galleys kept against the Barbary corsairs
+    closed_to: []
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "no record read; the common habit (judgement, package 71's form)"
+    signals: {root: basic, system: basic}
+    marines: {kit: basic}
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "judgement: the King's few galleys against the Barbary corsairs; no Sardinian doctrine looked for in James vols. 3 and 4"
+    relations:
+      britain: "peace; Nelson's fleet watered in the Maddalena, anchoring in Agincourt Sound on 31 October 1803 (James vol. 3 p. 177), and in the gulf of Palmas and the bay of Cagliari in 1805; Sardinia 'gradually becoming French ... although under the mask of a rigid neutrality' (James vol. 3 p. 176)"
+      france: "peace and a rigid neutrality (James vol. 3 p. 176); the King's mainland French since 1798 to 1799 (FROM MEMORY)"
+      spain: "peace; JUDGEMENT"
+      naples: "peace; JUDGEMENT"
+      morocco: "peace; JUDGEMENT"
+  # The Two Sicilies (Ferdinand IV at Naples), neutral by the treaty of Florence of 28 March
+  # 1801, by which Naples ceded Porto-Longone and its part of Elba to France (James vol. 3
+  # p. 77); a treaty of neutrality with France of 21 September 1805, the coalition's troops
+  # landed in November, the French occupation of February 1806 and Joseph king from March
+  # (FROM MEMORY): after this table's date, said and not modelled.
+  naples:
+    name: Naples
+    adjective: Neapolitan
+    people: the Neapolitans
+    names: english
+    colours: "white, with the arms of the Two Sicilies (FROM MEMORY)"
+    flag: "the white with the arms"
+    letters_of_marque: false     # judgement: the King's frigates and gunboats against the Barbary corsairs
+    closed_to: []
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "no record read; the common habit (judgement, package 71's form)"
+    signals: {root: basic, system: basic}
+    marines: {kit: basic}
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "judgement: neutral and in port in 1805; three Neapolitan frigates were to have joined Ganteaume in 1801 (James vol. 3 p. 75)"
+    relations:
+      britain: "peace: 'except Naples, every state in the two Sicilies was obedient to the nod of Buonaparte' (James vol. 3 p. 176); Nelson's despatches carried to Naples by his frigates (James vol. 3, 1805)"
+      france: "peace by the treaty of 28 March 1801 (James vol. 3 p. 77) and the neutrality of 21 September 1805; war and the French occupation from February 1806 (FROM MEMORY), beyond this table's date"
+      spain: "peace; JUDGEMENT (the two Bourbon crowns)"
+      sardinia: "peace; JUDGEMENT"
+      morocco: "peace; JUDGEMENT"
+  # The Kingdom of Etruria (Tuscany as Bonaparte gave it to the Bourbons of Parma by the
+  # treaty of Aranjuez of 21 March 1801; Charles Louis under the queen regent Maria Luisa,
+  # a Spanish infanta, from 1803; FROM MEMORY), neutral and French-leaning in June 1805;
+  # Leghorn its port; annexed to France in December 1807 (FROM MEMORY).
+  etruria:
+    name: Etruria
+    adjective: Etrurian
+    people: the Tuscans
+    names: english
+    colours: "white, with the arms of the Bourbon-Parma kings of Etruria (FROM MEMORY)"
+    flag: "the Tuscan white"
+    letters_of_marque: false     # judgement: no Etrurian cruisers looked for
+    closed_to: []
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "no record read; the common habit (judgement, package 71's form)"
+    signals: {root: basic, system: basic}
+    marines: {kit: basic}
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "judgement: no Etrurian navy to speak of; Leghorn a neutral port"
+    relations:
+      britain: "peace; 'Tuscany was gradually becoming French' (James vol. 3 p. 176); Leghorn neutral and French-leaning, open by the table (JUDGEMENT: no closure of Leghorn to the British read)"
+      france: "peace, a kingdom of Bonaparte's making (the treaty of Aranjuez, FROM MEMORY); the French took Porto Ferrajo's Tuscan part of Elba in 1801 to 1802 (James vol. 3 pp. 77 to 78)"
+      spain: "peace; the queen regent a Spanish infanta (FROM MEMORY)"
+      naples: "peace; JUDGEMENT"
+      sardinia: "peace; JUDGEMENT"
+  # The Ligurian Republic (Genoa), France's ally since 1797 and in all but name France's:
+  # 'Genoa was as much France as Toulon, and in her dockyard was constructing a French 74,
+  # to be named after her, the Genois' (James vol. 3 p. 176). Annexed to the Empire in June
+  # 1805 (the decree of 4 June 1805, the Senate's petition of 25 May; FROM MEMORY): after it
+  # Genoa is France's by the port file's dated nation. No war of its own with Britain is in
+  # this table (none read), so before the annexation Genoa is neutral to a King's ship and
+  # after it hostile.
+  liguria:
+    name: Liguria
+    adjective: Ligurian
+    people: the Genoese
+    names: english
+    colours: "the Ligurian colours, the red cross of St George on white with the republic's emblem (FROM MEMORY)"
+    flag: "the Ligurian colours"
+    letters_of_marque: false     # judgement: the Genoese privateers sailed under French commissions (not read)
+    closed_to: []
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "no record read; the common habit (judgement, package 71's form)"
+    signals: {root: basic, system: basic}
+    marines: {kit: basic}
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "judgement: the republic's few vessels under French orders; the Genois, 74, building at Genoa for France (James vol. 3 p. 176)"
+    relations:
+      britain: "no war declared in the pages read; the port as much France's as Toulon (James vol. 3 p. 176); neutral by the table until the annexation, France's and hostile after (FROM MEMORY: the decree of 4 June 1805)"
+      france: "allied since 1797 (FROM MEMORY); annexed to the Empire in June 1805"
+      spain: "peace; JUDGEMENT"
+      sardinia: "peace; JUDGEMENT"
+      naples: "peace; JUDGEMENT"
+  # The Papal state (Pius VII), neutral in June 1805; Civita Vecchia its port on the
+  # Tyrrhenian; Ancona occupied by the French in November 1805 and Rome in February 1808
+  # (FROM MEMORY), beyond this table's date.
+  papal-state:
+    name: the Papal state
+    adjective: Papal
+    people: the Pope's subjects
+    names: english
+    colours: "white and yellow, with the keys and the tiara (FROM MEMORY)"
+    flag: "the Pope's white and yellow"
+    letters_of_marque: false     # judgement: the Pope's few galleys against the Barbary corsairs
+    closed_to: []
+    habits:
+      range_factor: 1.0
+      aim: hull
+      roll: down
+      source: "no record read; the common habit (judgement, package 71's form)"
+    signals: {root: basic, system: basic}
+    marines: {kit: basic}
+    naval:
+      keeps_the_sea: false
+      keeps_port: true
+      engages: false
+      blockades: []
+      convoys: false
+      privateers: none
+      source: "judgement: no Papal navy to speak of in 1805"
+    relations:
+      britain: "peace; JUDGEMENT (no British dealing with the Papal ports read)"
+      france: "peace by the Concordat of 1801 (FROM MEMORY)"
+      spain: "peace; JUDGEMENT"
+      naples: "peace; JUDGEMENT"
+      sardinia: "peace; JUDGEMENT"
 
 # Who is at war with whom in June 1805, each war once, with its beginning and its source.
 wars:
@@ -461,3 +646,9 @@ ports:
   boulogne: france
   calais: france
   dunkirk: france
+  # the Gulf of Lion's block (package 79d): the French coast France's, hostile to a King's
+  # ship and neutral to an American
+  toulon: france
+  marseille: france
+  hyeres: france
+  villefranche: france

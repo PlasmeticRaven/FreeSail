@@ -35,6 +35,12 @@ def test_the_eight_nations_and_the_wars_of_june_1805(table):
         "denmark",
         # package 39f: Morocco, for Tangier
         "morocco",
+        # package 79d: the King of Sardinia and the Italian states
+        "sardinia",
+        "naples",
+        "etruria",
+        "liguria",
+        "papal-state",
     ]
     assert table.at_war("britain", "france") and table.at_war("france", "britain")
     assert table.at_war("britain", "spain") and table.at_war("britain", "batavian-republic")
@@ -201,6 +207,11 @@ def test_the_stance_of_a_port_toward_a_ship(table, chart):
         "boulogne": "france",
         "calais": "france",
         "dunkirk": "france",
+        # the Gulf of Lion's block (package 79d)
+        "toulon": "france",
+        "marseille": "france",
+        "hyeres": "france",
+        "villefranche": "france",
     }
     for pid, path in port_files().items():
         assert load_port(path, chart).nation == table.port_nations[pid]

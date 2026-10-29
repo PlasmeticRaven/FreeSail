@@ -104,6 +104,7 @@ book_limits:
   - {south: 35.5, north: 36.4, west: -6.5, east: -5.0}  # the Strait (package 39f)
   - {south: 36.5, north: 40.0, west: -31.5, east: -24.5}  # the Western Islands (package 39e)
   - {south: 49.0, north: 51.5, west: -1.0, east: 2.5}  # the Channel's east block (package 79b)
+  - {south: 40.56, north: 44.5, west: 3.0, east: 7.73}  # the Gulf of Lion's block (package 79d)
 # Package 79b: the Channel's east block's box is the region's bounds, every position of it
 # in one of the block's areas below (`channel-east-open` the rest); Spithead and St Helens,
 # west of 1 W, are within the first box and have their own area.
@@ -1055,6 +1056,50 @@ areas:
       strongest_h: 0.0
       judgement: [set, rates, hour]
       source: "JUDGEMENT: the stream up and down the Channel's eastern reach, the rate the world's rounded, strongest at high water as the progressive wave has it in the open Channel (this file's head)"
+  # package 79d, the Gulf of Lion's block (the region `gulf-of-lion`): the Mediterranean's
+  # water has no tidal stream to speak of ("the tides are of little moment", Smyth 1854,
+  # p. 178), so every area's stream is nought at springs and neaps (Torbay's form, package
+  # 43b) and the water moves by its `current:` alone, the set of the coast the directions
+  # give: westward along Provence ("the current on these coasts generally sets westward
+  # following the contour of the land; thus from Capo delle Mele to Antibes its direction
+  # is about south-west, and thence to Marseille westerly", Admiralty 1916, p. 13); the
+  # Gulf's open water after it, with no constant set (its currents follow the wind, which
+  # the world does not model as a current). The polygons lie in the Mediterranean, far from
+  # every recorded passage's water.
+  - id: provence-current
+    chart: gulf-of-lion
+    name: the coast of Provence, Antibes to Marseille and the Hyeres
+    polygon: [[43.75, 7.05], [43.45, 7.05], [43.15, 6.70], [42.90, 6.40], [42.95, 5.90], [43.05, 5.30], [43.40, 5.30], [43.30, 5.90], [43.30, 6.40], [43.55, 6.70]]
+    axis_deg: 260
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    current: {toward_deg: 260, kn: 0.75}
+    source: "Admiralty 1916, p. 13: from Antibes to Marseille the current sets westerly, running at times among the Hyeres islands with great strength; often modified and sometimes reversed by gales, eastward between Marseille and Toulon during and after north-west gales; the rate JUDGEMENT, below the Riviera's knot; no tidal stream (Smyth 1854, p. 178)"
+    book:
+      set: W by S
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      current: {set: W by S, kn: 0.75}
+      judgement: [set, rates, hour, current]
+      source: "the current's sense the Admiralty 1916's (p. 13), the rate JUDGEMENT; no period statement read for the coast of Provence beyond Purdy 1826's warning of the current into the bight of Aigues-Mortes with southerly winds (OCR l. 11825)"
+  - id: gulf-of-lion-open
+    chart: gulf-of-lion
+    name: the Gulf of Lion and the sea off Provence
+    polygon: [[40.56, 3.00], [44.50, 3.00], [44.50, 7.73], [40.56, 7.73]]
+    axis_deg: 180
+    spring_kn: 0.0
+    neap_kn: 0.0
+    phase_h: 0.0
+    source: "Admiralty 1916, p. 12: in the Gulf of Lyons the water drawn toward the head of the gulf in fine weather, driven out of it southward at one to two knots by the north-west winds, its currents following the wind; Purdy 1826, OCR l. 11825: with southerly winds the current at times sets strongly to the north and N.W. into the bight of Aigues-Mortes; no constant set and no tidal stream (Smyth 1854, p. 178): the world's water still"
+    book:
+      set: S
+      spring_kn: 0.0
+      neap_kn: 0.0
+      strongest_h: 0.0
+      judgement: [set, rates, hour]
+      source: "JUDGEMENT: no constant current and no tide stated for the open gulf (Smyth 1854, p. 178; Admiralty 1916, p. 12: its currents follow the wind)"
   - id: mid-channel
     chart: channel-west
     name: the open Channel

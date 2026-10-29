@@ -179,6 +179,15 @@ tables:
       - {name: Fecamp, lat_deg: 49.762, lon_deg: 0.370, hw_h: 10, hw_m: 30, spring_rise_ft: 11, rise_judgement: true, note: "Norie 1805, Table XLI p. 249 (the page image): Fecamp, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held) (Faden 1793 p. 16: the moon in the S S E or N N W makes high tide)"}
       - {name: Havre de Grace, lat_deg: 49.488, lon_deg: 0.105, hw_h: 10, hw_m: 30, spring_rise_ft: 22, note: "Norie 1805, Table XLI p. 250 (the page image): Havre de Grace, 10h 30m, 22 feet; Faden 1793 p. 20: in the spring tides the water rises 20 feet within the harbour"}
       - {name: Honfleur, lat_deg: 49.422, lon_deg: 0.233, hw_h: 10, hw_m: 30, spring_rise_ft: 14, rise_judgement: true, note: "Norie 1805, Table XLI p. 250 (the page image): Honfleur, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held)"}
+      # package 79d, the Gulf of Lion's block: the period's tide-hour for the shores of
+      # France, Smyth 1854's ("the most exact observations giving only a foot or two of
+      # rise ... the tide-hours at Toulon, Spezzia, and Naples ... 3h 30m, 1h 45m and 11h
+      # 20m", p. 178), which he gives with his doubt and which is kept so; the rise his
+      # foot (the lower of his "a foot or two"). No other place of the block: a rise of
+      # the 37j rule would be the world's range there, Le Conquet's twenty feet while the
+      # block's gauges are held, and the master takes the nearest place of his table.
+      - {name: Toulon, lat_deg: 43.105, lon_deg: 5.920, hw_h: 3, hw_m: 30, spring_rise_ft: 1, note: "Smyth 1854, p. 178: Toulon 3h 30m, the rise a foot or two on the shores of France and Italy; the hour given with his doubt (the accounts inconsistent)"}
+
   moore:
     title: "Moore's table of high water by the moon's bearing (Moore 1799), a point to every three quarters of an hour"
     ports:

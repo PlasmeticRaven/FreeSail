@@ -1,0 +1,165 @@
+{
+"cell_deg": 0.25,
+"cells": {
+"169,13": [
+"cape-creus"
+],
+"170,12": [
+"cape-bear",
+"cape-bear-light",
+"port-vendres-light",
+"port-vendres",
+"collioure"
+],
+"171,24": [
+"porquerolles",
+"porquerolles-light",
+"sarranier"
+],
+"171,25": [
+"gabiniere"
+],
+"172,20": [
+"planier",
+"the-veyrun"
+],
+"172,21": [
+"cape-croisette",
+"maire",
+"riou"
+],
+"172,22": [
+"cassis",
+"cassidaigne",
+"bec-de-l-aigle",
+"ile-verte",
+"ile-verte-shoal",
+"la-ciotat",
+"ciotat-road"
+],
+"172,23": [
+"bandol",
+"embiez",
+"brusc-road",
+"cape-sicie",
+"notre-dame-du-mai",
+"the-brothers",
+"sablettes",
+"cape-cepet",
+"rascas",
+"st-george-anchorage",
+"toulon-great-road",
+"fort-balaguier",
+"fort-eguillette",
+"grosse-tour",
+"tasse",
+"toulon-inner-road-mark",
+"toulon-inner-road",
+"toulon",
+"toulon-arsenal",
+"la-seyne",
+"fort-lamalgue",
+"mount-faron"
+],
+"172,24": [
+"mount-coudon",
+"fourmigues-giens",
+"cape-escampobariou",
+"grand-ribaud",
+"cape-esterel",
+"hyeres",
+"hyeres-road",
+"porquerolles-castle",
+"porquerolles-anchorage"
+],
+"172,25": [
+"bregancon",
+"cape-benat",
+"bagaud",
+"port-cros",
+"ile-du-levant"
+],
+"172,26": [
+"titan-light",
+"esquillade",
+"cape-lardier",
+"cape-taillat",
+"cape-camarat",
+"camarat-light"
+],
+"173,14": [
+"mount-st-loup",
+"mount-agde-light",
+"fort-brescou",
+"mount-st-clair",
+"cette-light"
+],
+"173,18": [
+"tour-du-tampan"
+],
+"173,19": [
+"tour-st-louis",
+"tour-de-bouc",
+"bouc-harbour"
+],
+"173,20": [
+"cape-couronne",
+"the-regas"
+],
+"173,21": [
+"ratonneau",
+"pomegues",
+"port-of-pomegues",
+"chateau-d-if",
+"canoubier",
+"marseille-light",
+"notre-dame-de-la-garde",
+"marseille-road"
+],
+"173,26": [
+"cape-st-tropez",
+"st-tropez",
+"canoubiers-road",
+"frejus"
+],
+"173,27": [
+"frejus-road",
+"mont-vinaigre",
+"cape-roux"
+],
+"174,16": [
+"aigues-mortes"
+],
+"174,28": [
+"ste-marguerite-fort",
+"st-honorat",
+"la-fourmigue-golfe-juan",
+"golfe-juan-road",
+"la-garoupe-chapel",
+"la-garoupe-light",
+"antibes"
+],
+"174,29": [
+"nice-castle-hill",
+"nice-port-limpia",
+"mont-alban-fort",
+"mont-boron",
+"villefranche-citadel",
+"villefranche",
+"villefranche-road",
+"villefranche-leading-mark",
+"cape-ferrat",
+"villefranche-lighthouse",
+"st-hospice-fort",
+"monaco",
+"monaco-anchorage"
+],
+"175,29": [
+"table-of-monaco"
+],
+"175,30": [
+"menton",
+"ventimiglia"
+]
+}
+}

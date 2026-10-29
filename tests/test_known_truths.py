@@ -11341,3 +11341,109 @@ def test_truth_7_279_the_frigate_sails_from_the_downs_to_spithead_by_her_short_b
     assert w.clock.tick <= 27 * 3600
     _, off = bearing_and_distance(w.position, Position(*SPITHEAD))
     assert off < 0.5 * units.NAUTICAL_MILE
+
+
+# ---------------------------------------------------------------------------
+# Package 79d: the Gulf of Lion and the Tyrrhenian (truths 7-295 to 7-304); the Gulf's
+# five (7-295 to 7-299) over the regions `gulf-of-lion` and `ligurian-sea`
+# ---------------------------------------------------------------------------
+
+GULF_PORTS = ["toulon", "marseille", "hyeres", "villefranche"]
+HYERES_ROAD = (43.0950, 6.2150)  # features/gulf-of-lion.yaml's `hyeres-road`
+
+
+def _gulf_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart in the Gulf of Lion at seed 7, the Gulf's ports loaded, a
+    steady breeze (from the north-west, the mistral's quarter, unless given)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 315.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 12.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", GULF_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def test_truth_7_295_the_gulfs_winter_row_blows_its_gales_from_the_north_west():
+    """The brief's truth (79d): the mistral. The Gulf has a weather box of its own, whose
+    check is Marseille's table (the Admiralty's Mediterranean Pilot, vol. II, 1916, p. 462:
+    the north-west the commonest wind of every winter month); a position in the Gulf takes
+    it, not the nearest Atlantic box. Over Januaries drawn from its row the strong
+    winds (22 knots and more) blow most often from the north-west, and two hours in three
+    from west to north, the mistral and the tramontane; the summer row has a tenth of the
+    winter's strong hours."""
+    import hashlib
+    import random
+
+    from freesail.world import weather as W
+
+    clim = W.load_climatology()
+    box = clim.box_at(43.0, 5.0)
+    assert box.name == "gulf-of-lion" and clim.box_at(43.7, 7.3).name == "gulf-of-lion"
+    raw = yaml.safe_load(W.CLIMATOLOGY_PATH.read_text(encoding="utf-8"))
+    note = raw["boxes"]["gulf-of-lion"]["months"][1]["note"]
+    assert "Marseille" in note and "NW 10" in note  # the table's commonest winter wind
+
+    def strong_hours(month: int, months: int = 36) -> dict[str, int]:
+        points = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+        counts = dict.fromkeys(points, 0)
+        for serial in range(months):
+            digest = hashlib.sha256(f"7:weather:{serial}".encode()).digest()
+            stream = random.Random(int.from_bytes(digest[:8], "big"))
+            weather = W.Weather(
+                datetime(1805, month, 1), stream, seed=7000 + serial, climatology=clim, box=box
+            )
+            t = datetime(1805, month, 1)
+            for _ in range(24 * 28):
+                weather.advance(t)
+                d, s = weather.surface_wind_at(0.0, 0.0, t)
+                if units.ms_to_knots(s) >= 22.0:
+                    counts[points[int(((math.degrees(d) + 22.5) % 360.0) // 45.0)]] += 1
+                t += timedelta(hours=1)
+        return counts
+
+    winter = strong_hours(1)
+    total = sum(winter.values())
+    assert total > 0 and max(winter, key=winter.get) == "NW", winter
+    assert (winter["W"] + winter["NW"] + winter["N"]) / total > 0.6, winter
+    summer = strong_hours(7)
+    assert sum(summer.values()) < 0.1 * total, (summer, total)
+
+
+def test_truth_7_296_toulons_roads_are_seen_from_the_road_of_hyeres_and_its_lights_are_later():
+    """The brief's truth (79d): at anchor in the Road of Hyeres, the fleet's shelter in the
+    watch on Toulon (Purdy 1826, p. 58; James vol. 3, p. 177), her masthead has in sight by
+    day the marks of Toulon's roads, Cape Cepet, the Great Tower, Mount Faron and Mount
+    Coudon, and Cape Sicie's chapel beyond, three to five leagues off; the islands' marks
+    her lookout calls first. By night in 1805 no light shows: Porquerolles', the Titan's and
+    Camarat's are of the 1830s and are seen in 1840."""
+    w = _gulf_at(*HYERES_ROAD, datetime(1805, 1, 15, 12, 0))
+    from freesail.world.geo import Position
+
+    road = Position(*HYERES_ROAD)
+    assert w.chart.region_at(road) == "gulf-of-lion" and w.chart.level_at(road) == 3
+    w.run(300)
+    seen = set(_sighted(w))
+    assert {"porquerolles", "bregancon"} & seen, seen
+    eye = 20.0  # her masthead
+    in_sight = {
+        s.feature.id: s.distance_m / units.NAUTICAL_MILE
+        for s in w.chart.in_sight(road, eye, None, "day", datetime(1805, 1, 15, 12, 5))
+    }
+    for mark in ("cape-cepet", "grosse-tour", "mount-faron", "mount-coudon", "notre-dame-du-mai"):
+        assert mark in in_sight and 9.0 < in_sight[mark] < 17.0, (mark, in_sight.get(mark))
+    lights = ("porquerolles-light", "titan-light", "camarat-light")
+    by_night_1805 = {
+        s.feature.id for s in w.chart.in_sight(road, eye, None, "night", datetime(1805, 1, 15, 23))
+    }
+    assert not by_night_1805 & set(lights)
+    by_night_1840 = {
+        s.feature.id for s in w.chart.in_sight(road, eye, None, "night", datetime(1840, 1, 15, 23))
+    }
+    assert set(lights) <= by_night_1840

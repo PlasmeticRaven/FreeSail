@@ -1280,3 +1280,641 @@ boxes:
           radius_km: {min: 1200, max: 2000}
           life_h: {min: 120, max: 360}
         check: {westerly_pct: 40, easterly_pct: 10, southerly_pct: 22, northerly_pct: 22, gust31_days: 7, gust54_days: 1.0}
+
+  # package 79d: the Gulf of Lion, Provence, the Riviera, Corsica and the Maddalena, the
+  # regions `gulf-of-lion` and `ligurian-sea` together (40.56 to 44.5 N, 3 to 11 E), the
+  # Gulf's one box as the brief has it. Before it the Mediterranean took the nearest Atlantic
+  # box (`box_at`). Each row's check is a printed table's: Marseille's days of wind by the
+  # eight points and calm (the Admiralty's Mediterranean Pilot, vol. II, 1916, appendix
+  # III, p. 462, page image docs/references/pilots/pages/), its glass the background.
+  # The rest is JUDGEMENT, set by a thousand simulated months (tools/climatology_check.py's
+  # run with this box the default, a scratch harness outside the repository) toward the
+  # table's quarters and toward the period's word for the Gulf's winter: the mistral, the
+  # north-west wind, "prevails throughout the year, and during winter and spring is often
+  # very violent" (Admiralty 1916, p. 8), "the chilly and searching northerly wind called
+  # the mistral ... very impetuous in coming down the valley formed by the Rhone" (Smyth
+  # 1854, p. 245). From November to March the lows are the Gulf of Genoa's, born in the
+  # lee of the Alps and running south-south-east down Italy east of the box, with the high
+  # to the west-north-west: the strong winds blow from west to north (two in three of the
+  # hours over 22 knots), the mistral and the tramontane. What the one track cannot also
+  # give: Marseille's winter easterlies (a third of the days in the table, about a tenth
+  # here), which the lows passing south of the box in the Levant's weather would bring;
+  # a finding for the weather's lows (one track per month), docs/dev/TuningNotes.md.
+  gulf-of-lion:
+    title: "the Gulf of Lion, Provence and the Riviera, Corsica and the Maddalena, with the mistral"
+    bounds: {south: 40.56, north: 44.5, west: 3.0, east: 11.0}
+    provisional: true
+    source: "Marseille's table (Admiralty 1916, vol. II, p. 462) for the quarters and the glass; the mistral's season and quarter Admiralty 1916, pp. 2 and 8 to 9, and Smyth 1854, pp. 244 to 246; the systems judgement, said in each row"
+    months:
+      1:
+        name: January
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 6, E 6, SE 3, S 1, SW 1, W 2, NW 10, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.06 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1018
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 24
+          easterly_pct: 34
+          southerly_pct: 10
+          northerly_pct: 29
+          gust31_days: 10
+          gust54_days: 1.0
+      2:
+        name: February
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 5, E 5, SE 3, S 1, SW 1, W 3, NW 9, calm 0, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.02 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1017
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 29
+          easterly_pct: 32
+          southerly_pct: 11
+          northerly_pct: 29
+          gust31_days: 10
+          gust54_days: 1.0
+      3:
+        name: March
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 4, E 4, SE 3, S 1, SW 3, W 4, NW 10, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.93 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1014
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 34
+          easterly_pct: 24
+          southerly_pct: 13
+          northerly_pct: 26
+          gust31_days: 10
+          gust54_days: 1.0
+      4:
+        name: April
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 3, E 3, SE 4, S 2, SW 3, W 5, NW 9, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.89 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1012
+        gradient:
+          hpa_per_100km: 0.15
+          high_toward_deg: 213
+        lows_per_month: 3.0
+        track_bearing_deg:
+          mean: 107
+          spread: 50
+        closest_approach_km:
+          mean: -225
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1003
+          spread: 8
+          floor: 982
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 351
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 6
+            max: 15
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 37
+          easterly_pct: 22
+          southerly_pct: 18
+          northerly_pct: 20
+          gust31_days: 7
+          gust54_days: 0.4
+      5:
+        name: May
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 3, E 3, SE 3, S 2, SW 4, W 6, NW 8, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.95 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1014
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 235
+        lows_per_month: 2.1
+        track_bearing_deg:
+          mean: 123
+          spread: 50
+        closest_approach_km:
+          mean: -117
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 5
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 39
+          easterly_pct: 19
+          southerly_pct: 18
+          northerly_pct: 21
+          gust31_days: 5
+          gust54_days: 0.1
+      6:
+        name: June
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 3, E 2, SE 2, S 2, SW 5, W 7, NW 8, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.98 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1015
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 235
+        lows_per_month: 2.1
+        track_bearing_deg:
+          mean: 123
+          spread: 50
+        closest_approach_km:
+          mean: -117
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 5
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 45
+          easterly_pct: 15
+          southerly_pct: 18
+          northerly_pct: 18
+          gust31_days: 5
+          gust54_days: 0.1
+      7:
+        name: July
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 3, E 2, SE 2, S 2, SW 5, W 7, NW 9, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.00 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 235
+        lows_per_month: 2.1
+        track_bearing_deg:
+          mean: 123
+          spread: 50
+        closest_approach_km:
+          mean: -117
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 5
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 45
+          easterly_pct: 15
+          southerly_pct: 18
+          northerly_pct: 19
+          gust31_days: 5
+          gust54_days: 0.1
+      8:
+        name: August
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 4, E 2, SE 2, S 2, SW 5, W 7, NW 8, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.01 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.12
+          high_toward_deg: 235
+        lows_per_month: 2.1
+        track_bearing_deg:
+          mean: 123
+          spread: 50
+        closest_approach_km:
+          mean: -117
+          spread: 350
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1007
+          spread: 8
+          floor: 990
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.6
+          bearing_deg:
+            mean: 5
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 5
+            max: 12
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 44
+          easterly_pct: 16
+          southerly_pct: 18
+          northerly_pct: 19
+          gust31_days: 5
+          gust54_days: 0.1
+      9:
+        name: September
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 5, E 3, SE 3, S 1, SW 4, W 6, NW 7, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.02 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1017
+        gradient:
+          hpa_per_100km: 0.11
+          high_toward_deg: 231
+        lows_per_month: 4.3
+        track_bearing_deg:
+          mean: 109
+          spread: 50
+        closest_approach_km:
+          mean: -214
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1002
+          spread: 8
+          floor: 980
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 351
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 6
+            max: 15
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 38
+          easterly_pct: 23
+          southerly_pct: 15
+          northerly_pct: 20
+          gust31_days: 7
+          gust54_days: 0.4
+      10:
+        name: October
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 0, NE 6, E 4, SE 3, S 2, SW 2, W 4, NW 9, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.98 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1015
+        gradient:
+          hpa_per_100km: 0.11
+          high_toward_deg: 231
+        lows_per_month: 4.3
+        track_bearing_deg:
+          mean: 109
+          spread: 50
+        closest_approach_km:
+          mean: -214
+          spread: 330
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 1002
+          spread: 8
+          floor: 980
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 351
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 6
+            max: 15
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 31
+          easterly_pct: 27
+          southerly_pct: 15
+          northerly_pct: 24
+          gust31_days: 7
+          gust54_days: 0.4
+      11:
+        name: November
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 7, E 5, SE 3, S 1, SW 1, W 3, NW 8, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 30.00 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 25
+          easterly_pct: 33
+          southerly_pct: 10
+          northerly_pct: 28
+          gust31_days: 10
+          gust54_days: 1.0
+      12:
+        name: December
+        note: 'Marseille''s days of wind (Admiralty 1916, vol. II, p. 462, chiefly 1881 to 1905): N 1, NE 7, E 5, SE 3, S 0, SW 1, W 2, NW 11, calm 1, the check''s quarters with each half-point day split between its two quarters; the glass Marseille''s mean of 29.99 inches; the gradient, the lows, the high and the gale days JUDGEMENT, set so that a thousand months give the table''s quarters'
+        background_hpa: 1016
+        gradient:
+          hpa_per_100km: 0.05
+          high_toward_deg: 150
+        lows_per_month: 6
+        track_bearing_deg:
+          mean: 160
+          spread: 50
+        closest_approach_km:
+          mean: 300
+          spread: 250
+        speed_kn:
+          min: 10
+          max: 25
+        central_hpa:
+          mean: 996
+          spread: 8
+          floor: 975
+        radius_km:
+          min: 250
+          max: 450
+        life_h:
+          min: 36
+          max: 72
+        high:
+          probability: 0.7
+          bearing_deg:
+            mean: 290
+            spread: 50
+          distance_km:
+            min: 600
+            max: 1100
+          anomaly_hpa:
+            min: 12
+            max: 24
+          radius_km:
+            min: 900
+            max: 1400
+          life_h:
+            min: 72
+            max: 168
+        check:
+          westerly_pct: 26
+          easterly_pct: 32
+          southerly_pct: 6
+          northerly_pct: 32
+          gust31_days: 10
+          gust54_days: 1.0

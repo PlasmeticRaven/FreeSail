@@ -1,0 +1,117 @@
+# FreeSail: Toulon as a port (package 79d, the Gulf of Lion's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The roads and the marks are
+# features/gulf-of-lion.yaml's (the harbour patch toulon).
+#
+# Sources. Michelot 1715, pp. 47 to 48: the town north of the Great Tower, its incomparable
+# bay, harbours and basins and the fleets the King fits out there; the Little Road before
+# the town, 8 to 3 fathoms, mud and grass. Purdy 1826, p. 56 (Captain Smith's remarks of
+# 1818): the Great Road all over in 16 to 6 fathoms, mud and clay, good holding, open to
+# the E N E; the Inner Road 8 to 6 fathoms, soft mud; the leading mark in, the Two
+# Brothers on with Balaguier; the harbour two basins before the town. Norie 1831, p. 60.
+# Derrotero 1849, p. 29: never a ship of the line in the Little Road without a pilot.
+# Smyth 1854, p. 178: the tide-hour 3h 30m and a foot or two of rise. James 1837, vol. 3,
+# pp. 176 to 177: in 1803 eight sail of the line ready in the road and five on the stocks
+# under Latouche-Tréville, watched by Nelson from his station off Cape Sicie.
+#
+# The stance. Toulon is the French fleet's port in the Mediterranean and the arsenal of
+# the Empire on this sea: French and hostile to a King's ship, neutral to an American (the nations table: Britain at war with France since May 1803).
+# The fleet in the road and the watch off the port are the period's whole business
+# here; they are noted, and not modelled (the scenario agincourt-sound.yaml looks in on
+# them). The arsenal a yard, as Ferrol's (the brief). No period sheet read with its
+# datum: `datum: unverified`. Prices JUDGEMENT, in sterling.
+
+id: toulon
+name: Toulon
+nation: france
+source: "Michelot 1715 pp. 47-48; Purdy 1826 p. 56; Norie 1831 p. 60; Derrotero 1849 p. 29; Smyth 1854 p. 178"
+datum: unverified   # no period sheet read; SHOM's RAM gives Toulon's NM 0.42 m above the zero for a patch
+
+outer_road:
+  feature: toulon-great-road
+  name: the Great or Outer Road of Toulon
+  lat_deg: 43.0935
+  lon_deg: 5.9330
+  depth_fathoms: 10
+anchorage:
+  feature: toulon-inner-road
+  name: the Little or Inner Road of Toulon
+  lat_deg: 43.1120
+  lon_deg: 5.9230
+  depth_fathoms: 7
+mooring:
+  name: the inner road off the arsenal
+  lat_deg: 43.1150     # the grid's 5.6 m before the old basin (judgement)
+  lon_deg: 5.9250
+  depth_fathoms: 4
+  bottom: mud
+shore:
+  feature: toulon
+  name: the quay of Toulon
+  lat_deg: 43.1240
+  lon_deg: 5.9300
+
+pilot:
+  station: toulon-great-road
+  cruising_nm: 6                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Toulon pilots' boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Audibert, Reboul, Giraud, Martin, Arnaud, Isnard, Garnier, Roux]   # Provençal names: judgement
+  skill: 0.85
+  fee_pounds: 3                  # judgement, in sterling; unverified
+  cast: starboard                 # judgement
+  course_out_deg: 170            # out of the Great Road between Cape Cepet and Cape Brun to the southward
+  words:
+    channel: "From Cape Cepet stand in for Eguillette until the Two Brothers off Cape Sicie come on with, or a little open east of, Balaguier tower: so you go clear of the Tasse; then steer for the middle of the town into the Little Road. Never take a ship of the line into the Little Road without one of us aboard."
+    marks: "Cape Sicie and its chapel of Our Lady high over the sea to the west; Cape Cepet, the Great Tower at the mouth of the Little Road, Balaguier and Eguillette on the west side; Mount Faron and Mount Coudon over the town."
+    anchorage: "The Great Road gives anchorage all over in six to sixteen fathoms on mud and clay, good holding, open only to the east-north-east; the Little Road before the town six to eight fathoms, soft mud and grass, where the fleet lies."
+    tide: "There is no tide to speak of: the water rises a foot or two, high water about half past three at full and change; a north-wester raises it no more, but a gale from the south-east piles the sea into the road."
+
+tide:
+  establishment: Toulon
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: france, note: "the country's; judgement"}
+    - {good: brandy, price: 80, origin: france, note: "judgement"}
+    - {good: salt, price: 10, origin: france, note: "judgement"}
+    - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: france, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: france, note: "judgement"}
+    - {good: hemp, price: 40, origin: null, note: "judgement"}
+    - {good: timber, price: 8, origin: france, note: "judgement"}
+    - {good: figs, price: 18, origin: france, note: "judgement"}
+    - {good: soap, price: 40, origin: france, note: "Marseille's; judgement"}
+
+dockyard:
+  kind: yard                 # the Emperor's arsenal: a yard, as Ferrol's (the brief)
+  items:
+    - {item: topmast, hours: 8, pounds: 48, note: "judgement"}
+    - {item: topgallant_mast, hours: 4, pounds: 16}
+    - {item: yard, hours: 6, pounds: 28}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 22, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.1, pounds_per_ton: 0.1, note: "the fountains of the town and the arsenal; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the arsenal and the fleet take every seaman of Provence
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 6, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [toulon-inner-road, toulon-great-road, 43 02 N 5 56 E]
+  from_sea: [43 02 N 5 56 E, toulon-great-road, toulon-inner-road]
+  in: [toulon-inner-road]

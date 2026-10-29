@@ -1,0 +1,110 @@
+# FreeSail: Villa Franca (Villefranche) as a port (package 79d, the Gulf of Lion's block;
+# the same form as dunkirk.yaml, on package 35's machinery). The road and the marks are
+# features/gulf-of-lion.yaml's (the harbour patch villefranche).
+#
+# Sources. Purdy 1826, pp. 62 to 65 (with Captain Smith's remarks of 1818): between the
+# two points of the entrance 35 to 40 fathoms; the usual anchorage before the town in 15 to
+# 18 fathoms, moored to the southward with a hawser to one of the marble pillars; the best
+# berth on the west side near the town in 8 and 10 fathoms, fine clay; the tides never rise
+# more than two or three feet. Derrotero 1849, pp. 63 to 64: weed and mud, the holding
+# excellent; Montalban in one with the castle, bearing west, the line of the anchorage.
+# Admiralty 1916, p. 157 (the depths only).
+#
+# The stance. The King of Sardinia's naval port until the county of Nice was taken by the
+# French in 1792 (FROM MEMORY): in 1805 French and hostile to a King's ship, neutral to an American (the nations table: Britain at war with France since May 1803).
+# No period sheet read: `datum: unverified`. Prices JUDGEMENT, in sterling.
+
+id: villefranche
+name: Villa Franca
+nation: france
+source: "Purdy 1826 pp. 62-65; Derrotero 1849 pp. 63-64"
+datum: unverified   # no period sheet read; SHOM's RAM gives Nice's NM 0.54 m above the zero for a patch
+
+outer_road:
+  feature: villefranche-road
+  name: the road of Villa Franca
+  lat_deg: 43.7040
+  lon_deg: 7.3137
+  depth_fathoms: 10
+anchorage:
+  feature: villefranche-road
+  name: the road of Villa Franca
+  lat_deg: 43.7040
+  lon_deg: 7.3137
+  depth_fathoms: 10
+mooring:
+  name: under the citadel
+  lat_deg: 43.6990     # the grid's 19 m south of the town (judgement)
+  lon_deg: 7.3105
+  depth_fathoms: 8
+  bottom: fine clay
+shore:
+  feature: villefranche
+  name: the landing at Villa Franca
+  lat_deg: 43.7042
+  lon_deg: 7.3112
+
+pilot:
+  station: villefranche-road
+  cruising_nm: 4                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Villa Franca boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Gioan, Raibaud, Baudoin, Funel, Gastaud, Rancurel, Dalmas, Musso]   # Nissart names: judgement
+  skill: 0.85
+  fee_pounds: 2                  # judgement, in sterling; unverified
+  cast: larboard                 # judgement
+  course_out_deg: 200            # out of the bay between Mount Boron and St Hospice to the south-south-westward
+  words:
+    channel: "The entrance between the two points is clean and deep, thirty-five to forty fathoms: steer in north-east by north up the middle of the bay, and haul to the west side for the town."
+    marks: "Fort Montalban high on the hill between Nice and the bay; the citadel and the town on the west shore; the white light-house on Cape Ferrat's point and St Hospice's tower to the east."
+    anchorage: "Bring Montalban in one with the castle, bearing west, and you are on the line of the anchorage; anchor off the town on the west side in eight or ten fathoms, fine clay, the farther north the better, and send a hawser to the marble pillars. A southerly sends in a great swell but scarce strains the cable."
+    tide: "The tide never rises more than two or three feet, and keeps no regular hour."
+
+tide:
+  establishment: Toulon
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: france, note: "the country's; judgement"}
+    - {good: salt, price: 10, origin: france, note: "judgement"}
+    - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: france, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: france, note: "judgement"}
+    - {good: timber, price: 8, origin: france, note: "judgement"}
+    - {good: oranges, price: 6, origin: france, note: "the season's; judgement"}
+    - {good: lemons, price: 6, origin: france, note: "judgement"}
+    - {good: figs, price: 18, origin: france, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # the old darse of the King of Sardinia's galleys, its stores gone with the war: judgement
+  items:
+    - {item: topmast, hours: 12, pounds: 46, note: "judgement"}
+    - {item: topgallant_mast, hours: 6, pounds: 15}
+    - {item: yard, hours: 10, pounds: 27}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 24, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1, note: "the town's fountain, a short pull; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the conscription takes the seamen
+  able: {hands: 1, pounds: 2, delay_h: 24}
+  ordinary: {hands: 2, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 5, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [villefranche-road, 43 40 N 7 18 E]
+  from_sea: [43 40 N 7 18 E, villefranche-road]
+  in: [villefranche-road]

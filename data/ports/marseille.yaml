@@ -1,0 +1,113 @@
+# FreeSail: Marseilles as a port (package 79d, the Gulf of Lion's block; the same form as
+# dunkirk.yaml, on package 35's machinery). The road and the marks are
+# features/gulf-of-lion.yaml's (the harbour patch marseille).
+#
+# Sources. Michelot 1715, pp. 42 to 44: the islands of Ratoneau and Pomegue, the Chateau
+# d'If, the Port of Pomegue where ships from the Levant perform quarantine; the road
+# without before the town, 12 and 15 fathoms, mud and grass, not proper to stay the night;
+# the round tower of St John at the harbour's mouth, the light-house. Purdy 1826, pp. 52 to
+# 54 (Captain Smith's remarks of 1818): the bay before the town, St John's tower S S E,
+# the Chateau d'If S W, 18 to 15 fathoms, sand and mud, moored open hawse to the W N W,
+# the north-westers the strongest. Derrotero 1849, OCR l. 1248 to 1250 and 1406 to 1414.
+#
+# The stance. Marseilles is the great port of trade of Provence: French and hostile to a King's ship, neutral to an American (the nations table: Britain at war with France since May 1803).
+# The old port is the grid's land at its sixteenth of a minute (the basin and its quays
+# read as ground): the mooring is laid at its mouth. No period sheet read: `datum:
+# unverified`. Prices JUDGEMENT, in sterling.
+
+id: marseille
+name: Marseilles
+nation: france
+source: "Michelot 1715 pp. 42-44; Purdy 1826 pp. 52-54; Derrotero 1849 OCR l. 1248-1414"
+datum: unverified   # no period sheet read; SHOM's RAM gives Marseille's NM 0.49 m above the zero for a patch
+
+outer_road:
+  feature: marseille-road
+  name: the road of Marseilles
+  lat_deg: 43.3030
+  lon_deg: 5.3500
+  depth_fathoms: 15
+anchorage:
+  feature: marseille-road
+  name: the road of Marseilles
+  lat_deg: 43.3030
+  lon_deg: 5.3500
+  depth_fathoms: 15
+mooring:
+  name: the mouth of the old port
+  lat_deg: 43.2948     # the grid's 6 m at the harbour's mouth: the old port is its land (judgement)
+  lon_deg: 5.3614
+  depth_fathoms: 3
+  bottom: mud
+shore:
+  name: the quay of the old port
+  lat_deg: 43.2960
+  lon_deg: 5.3760
+
+pilot:
+  station: marseille-road
+  cruising_nm: 6                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Marseilles pilots' boat
+    under: a lateen sail and oars
+    note: "judgement: the felucca and the gozzo of the coast"
+  names: [Rostan, Fabre, Michel, Blanc, Guigou, Olive, Chabert, Isoard]   # Provençal names: judgement
+  skill: 0.85
+  fee_pounds: 3                  # judgement, in sterling; unverified
+  cast: larboard                 # judgement
+  course_out_deg: 225            # out between the Chateau d'If and the main to the south-westward
+  words:
+    channel: "Come in between Planier and the islands of Ratoneau and Pomegue, leaving the Chateau d'If on either hand, and stand for St John's tower at the harbour's mouth; give the Canoubier off the town's point a berth."
+    marks: "Our Lady of the Guard on its hill over the town, seen far at sea; the Chateau d'If on its rock; Planier's tower far out to the south-west; St John's round tower at the harbour's mouth, the light-house."
+    anchorage: "Anchor in the bay before the town in fifteen to eighteen fathoms, sand and mud, St John's tower south-south-east and the Chateau d'If south-west; moor open hawse to the north-west, for the north-westers blow hardest; go in before night. Ships from the Levant ride their quarantine in Pomegue."
+    tide: "There is no tide here worth the name, a foot or two at most; a north-wester lowers the water in the port and a south-easter raises it."
+
+tide:
+  establishment: Toulon
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: wine, price: 30, origin: france, note: "the country's; judgement"}
+    - {good: olive oil, price: 60, origin: france, note: "the country's; judgement"}
+    - {good: brandy, price: 80, origin: france, note: "judgement"}
+    - {good: salt, price: 10, origin: france, note: "judgement"}
+    - {good: salt fish, price: 26, origin: france, note: "anchovies and tunny, the coast's; judgement"}
+    - {good: biscuit, price: 22, origin: france, note: "judgement"}
+    - {good: salt beef, price: 75, origin: null, note: "dear in the Mediterranean; judgement"}
+    - {good: canvas, price: 46, origin: france, note: "judgement"}
+    - {good: hemp, price: 40, origin: null, note: "judgement"}
+    - {good: timber, price: 8, origin: france, note: "judgement"}
+    - {good: soap, price: 40, origin: france, note: "Marseille's; judgement"}
+    - {good: silk, price: 300, origin: france, note: "raw silk; judgement"}
+    - {good: almonds, price: 30, origin: france, note: "judgement"}
+    - {good: figs, price: 18, origin: france, note: "judgement"}
+
+dockyard:
+  kind: chandlers                 # the merchants' builders and chandlers of the old port
+  items:
+    - {item: topmast, hours: 10, pounds: 44, note: "judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 14}
+    - {item: yard, hours: 8, pounds: 26}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 23, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.12, pounds_per_ton: 0.1, note: "the town's fountains, brought off by the boats; judgement"}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the conscription for the fleet at Toulon takes the seamen
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [marseille-road, 43 16 N 5 18 E]
+  from_sea: [43 16 N 5 18 E, marseille-road]
+  in: [marseille-road]

@@ -138,7 +138,11 @@ CHANNEL_EAST_PORTS = [
     "poole",
     "portsmouth",
 ]
-ALL_PORTS = sorted(ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS + STRAIT_PORTS + CHANNEL_EAST_PORTS)
+# package 79d: the Gulf of Lion's block's four, in their own list
+GULF_PORTS = ["hyeres", "marseille", "toulon", "villefranche"]
+ALL_PORTS = sorted(
+    ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS + STRAIT_PORTS + CHANNEL_EAST_PORTS + GULF_PORTS
+)
 
 
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
@@ -304,6 +308,8 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # the Channel's east block (package 79b): the French ports of the invasion coast hostile,
     # the English ones the King's
     french_ports |= {"le-havre", "boulogne", "calais", "dunkirk"}
+    # the Gulf of Lion's block (package 79d): the French coast hostile
+    french_ports |= set(GULF_PORTS)
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS

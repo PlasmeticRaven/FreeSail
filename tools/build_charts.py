@@ -452,6 +452,30 @@ REGIONS: dict[str, dict[str, Any]] = {
         # blend and not a far gauge's (docs/dev/ChartBlocks.md, "GEBCO's fill")
         "fill_to_chart_datum": True,
     },
+    # package 79d: the Gulf of Lion, the Roussillon to Nice and Villefranche (the lead's
+    # ruling on step 1: the Gulf split at the column edge 7.73 E, its east part the region
+    # `ligurian-sea`). The level-2 tiles that meet the bounds span 40.56 to 44.83 N and
+    # 2.61 to 7.73 E (120 tiles, 12 columns by 10 rows). The south bound is the row edge
+    # 40.56 N (the ruling's second item), where `balearics` (package 79c) ends: the two
+    # blocks' tiles meet at that row, so that no open water between them answers nothing
+    # (Mahon to Toulon sails through it). The east bound stops short of the column edge
+    # 7.7333 E so that the column beyond is `ligurian-sea`'s, the seam between the two.
+    "gulf-of-lion": {
+        "title": "The Gulf of Lion, the Roussillon and Provence to Nice and Villefranche",
+        "bounds": {"south": 40.56, "north": 44.5, "west": 3.0, "east": 7.73},
+        "fetch": {"south": 40.45, "north": 44.95, "west": 2.5, "east": 7.85},
+        "harbours": {
+            "toulon": {"south": 43.02, "north": 43.13, "west": 5.85, "east": 6.05},
+            "marseille": {"south": 43.25, "north": 43.33, "west": 5.27, "east": 5.39},
+            "hyeres": {"south": 42.98, "north": 43.12, "west": 6.12, "east": 6.42},
+            "villefranche": {"south": 43.67, "north": 43.72, "west": 7.28, "east": 7.35},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level, as the Strait's: the block's gauges
+        # are held, so the world's tide over it is the nearest far gauge's (the build prints
+        # the figures) and the land must stand above that tide's high water
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -478,7 +502,7 @@ CORRIDORS: dict[str, dict[str, Any]] = {
 # a block adds its region here when its tiles are built (docs/dev/ChartBlocks.md).
 CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
-        "title": "The Channel, Biscay and the Iberian coast to Madeira and the Strait",
+        "title": "The Channel, Biscay, Iberia, Madeira, the Strait and the Gulf of Lion",
         "regions": [
             "channel-west",
             "channel-mid",
@@ -492,6 +516,8 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 39f: the Strait, the voyage's last (its own line, so that the four
             # blocks' additions merge as lines)
             "strait",
+            # package 79d: the Gulf of Lion and the Tyrrhenian, the Mediterranean's north
+            "gulf-of-lion",
         ],
         "corridor": "atlantic-corridor",
     },

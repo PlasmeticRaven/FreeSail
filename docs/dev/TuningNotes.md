@@ -12025,3 +12025,168 @@ the inland hole. **The Tyrrhenian is within the rule as briefed** (37.8 MB) and 
 ruling. Nothing of the tiles, the recipe, the manifest or the coast is committed until the
 ruling; the marks, the ports, the nations, the tide's and the weather's rows of the Gulf go
 on meanwhile in the working tree and wait with them.
+
+### The lead's rulings on step 1 (2026-10-29)
+
+(1) The Gulf split as recommended: three regions in the package, **`gulf-of-lion`** from
+3 E to the column edge 7.73 E (the Roussillon to Nice and Villefranche), **`ligurian-sea`**
+from 7.73 E to 11 E (Genoa, Leghorn, Elba, Corsica and the Maddalena), and `tyrrhenian`
+as measured; every tile written, no hole; each built, checked and committed in turn;
+truths 7-295 to 7-299 the Gulf's across the first two, 7-300 to 7-304 the Tyrrhenian's;
+one scenario; one notes section with a heading per region. Way (2) not taken: the key
+`skip_dry_tiles` is one the builder has already (package 39d), so the 35 inland tiles of
+`gulf-of-lion` (4.5 MB) can be a later tidy if the lead likes. (2) **The strip between the
+blocks filled, and this package's**: `gulf-of-lion`'s south bound moved to the row edge
+40.56 N, where 79c's `balearics` ends (its own split of 79c's block), so that the two
+blocks' tiles meet at that row and the sea between Minorca and the Gulf answers.
+(3) Genoa's nation in June 1805 by a dated form of the port's `nation:`, generic and small
+(the Ligurian sea's step below).
+
+### Step 2: the region `gulf-of-lion`, the Roussillon to Nice and Villefranche
+
+**The recipe**: bounds 40.56 to 44.5 N and 3.0 to 7.73 E (the south bound the row edge of
+the ruling; the east bound short of the column edge 7.7333 E, so that the column beyond is
+`ligurian-sea`'s, the seam between the two regions said in both recipes' comments); fetch
+40.45 to 44.95 N, 2.5 to 7.85 E; four harbour patches (Toulon with its roads, 12 level-3
+tiles; Marseille, 6; the Hyères road, 10; Villefranche, 4); EMODnet over GEBCO;
+`fill_to_chart_datum` by the world's mean level as the Strait's, the block's gauges held
+("raised ... by the world's mean level, 3.70 to 6.83 m": the far gauges' water, for the
+lead with the gauges' decision). Built `--region gulf-of-lion --reuse-world` (GEBCO's
+extract 8.0 MB in a second, EMODnet's two 88.9 MB each in eight seconds, nothing refused),
+then rebuilt with `--skip-fetch` as the marks were written. The checks as printed:
+
+```
+Checks for the block gulf-of-lion:
+  licences: emodnet_dtm_2024, gebco_2025 (allowed)
+  features within the bounds: 114 of 114 (a harbour patch's box counts as the region's)
+  ids unique across the manifest's regions: yes
+  sources in the references' form: 114 of 114
+  harbour patches with their datum stated: 0 of 0
+  the fetch box covers the tiles whole: yes (40.45 to 44.95 N, 2.5 E to 7.85 E)
+  tiles another region lists: 0 kept (level 2: 0, level 3: 0; not written, not listed)
+  the block passes its checks (the shore's sweep for GEBCO's fill is the build's).
+```
+
+**The count and bytes, before the commit**: 120 level-2 tiles of 24.6 MB (35 all land,
+4.5 MB; 56 open sea beyond ten miles of a shore, 13.8 MB; 29 with a shore or near one,
+6.3 MB), 32 level-3 tiles of 3.3 MB, the coast 0.14 MB, the features and the index 0.12 MB:
+**28.1 MB**, within the rule. The shore's sweep: 3,760 cells in 151 places, the largest the
+étangs of Leucate and Salses behind the Roussillon's lido (355, 319, 310, 210 and 61 cells
+about 42.83 to 42.98 N, 2.98 to 3.03 E: lagoons closed from the sea, left as water), the
+basins of Toulon's arsenal (152 about 43.12 N, 5.93 E: the darses, water), the étang of
+Berre's shore (94 about 43.48 N, 4.98 E), the salt-pans of Hyères (77 and 65 about
+43.03 N, 6.12 to 6.18 E) and the mouth of the Siagne (65 about 43.53 N, 7.03 E); water,
+said so. `git status` after every build: the manifest (this region's entry, its chart line,
+its sources' fetches, the build hash) and the block's own new files; nothing of any other
+region's tiles, coast or index.
+
+**The features**: 114, from the pilots of 79c's pass (Michelot 1709 and 1715, Purdy 1826
+with Captain Smith's remarks of 1818, Norie 1831, Purdy 1840's Pharonology, Lamberti 1844,
+the Derrotero 1849, Smyth 1854, the Admiralty 1916 for the heights and depths only; James
+vol. 3 for Nelson's station off Cape Sicie), researched coast by coast and checked against
+the tiles by the channel-west rule (a scratch script outside the repository): 25 moved
+within the rule, each in `fix`; five moved farther by reading, said in `fix` (Cape
+Escampobariou, Cape Lardier and Cape Taillat to the grid's land, the Titan's light to the
+Levant's east end); **five islets the grid lacks** (Planier, the Fourmigues of Giens,
+Grand Ribaud, Bagaud, the Fourmigue of Golfe Juan, water in EMODnet's sixteenth of a
+minute) given as rocks of their height and an extent of their size, as ChartBlocks.md's
+"An isle the grid lacks" has it; four dangers the grid does not hold left at the pilots'
+positions (the Regas, the Veyrun, the Cassidaigne, the Esquillade). The roads are features
+of kind `anchorage`: the chart reads a note of the bottom from `anchorage` and `bottom`
+features alone (`Chart.bottom_near`), and the first draft's kind `road` left four ports'
+spots with no note (`test_tackle_orders.py` found it). **The lights of 1805**: the fanals
+of Cette (Michelot 1709, p. 57, lit in the evening), Port-Vendres (Michelot 1715, p. 35) and
+Marseille's tower of St John (Michelot 1709 and 1715), each `from` the earliest record
+read, no pilot giving the year first lit. **Not yet**: Cape Bearn's and Mount Agde's (1836,
+the Derrotero 1849's notes), Camarat (1831), Porquerolles and the Titan (1837), La Garoupe
+(1 July 1837, Purdy 1840 p. v); where no text gives the year the year is UNVERIFIED and
+said so, the texts bracketing each after 1805 (Purdy 1826 and Norie 1831 name none, Purdy
+1840 lists them). Planier's tower has no `lit`: Michelot 1715 has it unlit, Captain Smith
+(Purdy 1826, p. 54) lit by 1818, and nothing read dates it between (for the lead: whether
+1805 had a light there).
+
+**The ports**: Toulon (the arsenal a yard, as Ferrol's; the fleet in the road and the watch
+off it noted in the head and not modelled), Marseille (the old port is the grid's land: the
+mooring at its mouth), the Road of Hyères (the King's ships' shelter in the watch, the
+shore French), Villa Franca (the King of Sardinia's naval port until 1792, French in
+1805); all four French and hostile to a King's ship, neutral to an American; every spot
+with its position; every road and anchorage within three kilometres of a note of the
+bottom; `datum: unverified` in all four, no sheet read; entered in the nations' ports index
+and `tests/test_ports.py`'s list (`GULF_PORTS`), the ordnance test's count of ports
+without a block raised by four.
+
+**The nations, data alone** (all five of the brief, in Morocco's form, in this commit
+because the table holds them whatever region their ports are in): `sardinia` (Victor
+Emmanuel I at Cagliari), `naples`, `etruria`, `liguria` and `papal-state`, each with its
+colours and flag word (FROM MEMORY, said), the common habit, the basic signals and kit, a
+`naval:` block of a nation at peace in port, and its `relations:` with every nation it deals
+with, sourced to James vol. 3 (pp. 75, 77 to 78, 176 to 177) or said FROM MEMORY or
+JUDGEMENT; none at war in June 1805 (no war added to the table), so their ports are neutral
+to every other nation and open to their own. Morocco's relations gain the five ("peace;
+JUDGEMENT"), as its test holds every nation named.
+
+**The tide**: TICON read again (the zip's SHA-256 7055f8ed…6514, the same file) by
+coordinates over the box: ten gauges (Port-Vendres, Cette, Port-Camargue, Fos, Marseille,
+Toulon, Port Ferréol, La Figueirette, Nice, Monaco; Monaco's short second record left out),
+M2 five to eight centimetres, **held** after Dunkirk under `held_gauges:` (package 89 is
+not merged), each named by SHOM's RAM station at its coordinates and its `mean_level_m`
+the RAM's NM (VERIFIED, read 2026-10-29). The stream areas: the Mediterranean has no tidal
+stream to speak of (Smyth 1854, p. 178), so the block's areas are Torbay's form, nought at
+springs and neaps, with `current:` alone: `provence-current` (Antibes to Marseille and the
+Hyères, 0.75 knot toward W by S, the Admiralty 1916's westerly set, p. 13, the rate
+judgement) and `gulf-of-lion-open` over the block's box with no constant set (its currents
+follow the wind); before `mid-channel`; the box appended to `book_limits`. The tests that
+held the Strait's three areas the only ones with a current, and Biscay south's gauges by
+their latitude alone, name the Mediterranean's apart (`MEDITERRANEAN` in
+`tests/test_tide.py`; Biscay south's west of the meridian). The master's epitome gains
+Toulon from Smyth 1854 (p. 178: the tide-hour 3h 30m, "a foot or two" of rise, which he
+gives with his doubt), the rise one foot; no other place of the block, since a 37j rise
+would be the world's range there, Le Conquet's twenty feet. The polygons lie a thousand
+miles from every recorded passage's water.
+
+**The weather**: a new box `gulf-of-lion` over both of the Gulf's regions (40.56 to 44.5 N,
+3 to 11 E, the brief's one box for the Gulf), before which the Mediterranean took the
+nearest Atlantic box. Its twelve rows' checks are **Marseille's printed table** (the
+Admiralty's Mediterranean Pilot vol. II, 1916, appendix III, p. 462, chiefly 1881 to 1905,
+the page image under `docs/references/pilots/pages/`): the days of wind from each of the
+eight points and calm, each half-point's days split between its two quarters; its glass the
+background. The systems are judgement, set by a thousand simulated months (the check
+tool's `run` with this box the default, a scratch harness) toward the quarters and toward
+the period's mistral (Admiralty 1916, pp. 2 and 8 to 9; Smyth 1854, pp. 244 to 246): from
+November to March the lows the Gulf of Genoa's, running south-south-east down Italy east of
+the box with the high to the west-north-west, so that the strong winds blow from west to
+north. The run, 480 months at seed 7 (the shares in per cent, the table's in brackets):
+
+| month | W | E | S | N | none | days of 22 kn+ |
+|---|---|---|---|---|---|---|
+| 1 | 27.6 (24) | 7.4 (34) | 7.8 (10) | 25.1 (29) | 32.2 | 5.5 |
+| 4 | 37.7 (37) | 18.6 (22) | 13.6 (18) | 18.8 (20) | 11.3 | 0.6 |
+| 7 | 50.2 (45) | 12.7 (15) | 8.8 (18) | 17.6 (19) | 10.7 | 0.3 |
+| 10 | 35.5 (31) | 21.0 (27) | 13.4 (15) | 19.5 (24) | 10.6 | 1.4 |
+| 12 | 23.3 (26) | 9.8 (32) | 7.0 (6) | 26.8 (32) | 33.2 | 4.5 |
+
+The westerly and northerly shares hold within six points in every month; **what the one
+track cannot give**: Marseille's winter easterlies (a third of its winter days, a tenth
+here) and its calm-light days, which come with the lows that pass south of the box in the
+Levant's weather while the mistral's lows pass east of it; the month's lows are drawn on
+one track (`track_bearing_deg`), so the row takes the mistral's and says so (a finding for
+the weather: two tracks a month, or a second low slot). The strong-breeze days are the
+model's five in January against the judgement's ten in the row's `gust31_days` (Marseille's
+gales column is blank, and the Admiralty gives no count): the check rows are judgement there.
+
+**Truths** 7-295 (the Gulf's box is Marseille's table and its winter strong winds blow most
+often from the north-west, two hours in three from west to north, the summer's a tenth of
+the winter's) and 7-296 (from the Road of Hyères, the patch's level 3, her masthead has
+Cape Cepet, the Great Tower, Mount Faron, Mount Coudon and Cape Sicie's chapel in sight at
+nine to seventeen miles, the islands' marks called first; by night in 1805 no light, in
+1840 Porquerolles', the Titan's and Camarat's).
+
+**The tests of the whole chart** updated to hold the region beside the others: the chart's
+regions and its envelope east to 7.73 E (`test_chart.py`), the boxes' list
+(`test_weather.py`), the nations' list and ports index (`test_nations.py`), the ports' list
+and stances (`test_ports.py`), the ordnance count (`test_ordnance.py`), the tide's
+Mediterranean areas and Biscay south's gauges (`test_tide.py`). The chart's title names the
+Gulf of Lion. Run on this commit's tree: the chart's, ports', nations', ordnance's,
+tackle's, log lines', tide's, weather's and scenarios' files, every test green; the two
+truths with `--slow`, passed. The whole suites are run once on the package's final tree
+(below).
