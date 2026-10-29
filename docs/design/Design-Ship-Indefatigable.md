@@ -34,7 +34,8 @@ scratch scripts named are not.
 **One sentence.** One module writes two files, the 64 first and the razee derived from her as
 data; both are built at once except two pieces of the 64 (her mizen course on its yard, and her
 yards under the bowsprit), which wait behind two stubs for the gated engine design, while the
-64 sails meanwhile on a stand-in whose physics is already the owner's.
+64 sails meanwhile on a stand-in whose physics is already the owner's. Both files take the hull's
+shape keys at stage B (§3.5 item 8).
 
 ---
 
@@ -110,7 +111,8 @@ its yard (D9 (c) as revised in Bel §13.5) and her yards under the bowsprit (D8 
 **Stage A, at once, no gate:**
 - the module, both people files, and both ship files complete in hull, profile, masts, yards,
   sails, lines, groups, guns, crew, quarter bill, ground tackle, boats, pumps, hold and stores;
-- the razee's file **final**;
+- the razee's file **final** but for the hull's shape keys, which both files take at stage B
+  (§3.5 item 8);
 - the 64's file complete but for two pieces, each in one function of the module and switched by
   one module constant:
   - `mizen_course(b, p)` with `MIZEN_COURSE = "stand-in"`: the course as a loose-footed
@@ -130,7 +132,7 @@ its yard (D9 (c) as revised in Bel §13.5) and her yards under the bowsprit (D8 
   is left out and named in her note (§4.4, as settled);
 - `BOWSPRIT_YARDS = True`: the two yards and their sails, at the station along the bowsprit the
   gated design gives a key for (§4.6);
-- *chosen since by the owner (the engine design §17, its §17.9 item 1; the lead's read open):*
+- *chosen since by the owner (the engine design §17, its §17.9 item 1; approved by the lead, 2026-10-29):*
   `DRIVER = True`, a third flip: Steel's driver boomsail in the sail room, `in_place_of` the
   course, and its boom on the mizen mast; only with `MIZEN_COURSE = "gated"`, and only after
   the engine's step B3.5 and the viewer's drawing of it (§4.4);
@@ -459,6 +461,25 @@ images never do:
 6. Steel's table IV, the 44's and the 38's mizen course and driver rows (the held page image), as
    the check on the razee's gaff mizen (§4.5);
 7. the brace check of §4.2 against the measured channels.
+8. **At stage B, the hull's shape** (`Build-Ships.md` §5.0, §5.7; the pilot, §2.6; after the lead's approval, stage 0H and SW-2b.1). For both files:
+   - **`sections_m`** from Ind §2.3.2's WL1-WL5 by station (measured; no new reading; the razee's z each +0.44 m);
+   - **`breadth_line_m`**: 1407T's main-breadth line, with its heights of breadth from 1407F (task 2 extended);
+   - **`channel_wales_m`**: §3.2's channel wale;
+   - **`form`**: the stern `square`, from 1407T's body plan and 1407F (2371 for the razee; Steel's 64 Folio LI on the cached leaf as a check; task 3 extended to the stern face):
+     - its knuckle;
+     - the transom's half-breadths at the taffrail and the knuckle;
+     - the galleries' tiers and the lights, at their measured positions;
+     - the head `figure`, `judged` until read;
+   - **`marks`**;
+   - **`head_m`**: the knee of the head as measured on 1407F, kept until then in the module's notes (item 9).
+
+   Each measured port triple must lie within 0.05 m of the drawn side at its sill (`g.hull_form`). An end port still on the midship fallback (§3.3) is either measured on 1407T or stays on the fallback, its gap reported. No triple is taken from the drawing. Nothing of this at stage A.
+9. **Before B5.1 draws her files** (`Build-Ships.md` §2.6 step 5): `stem_m` is the stem's fore
+   edge up to the stem head and no further, and `rail_m` ends where her side ends (at the
+   forecastle's fore end, abaft the stem head, if that is where it ends), as `Build-Ships.md`
+   §5.1 has them. The working file's `rail_m` ends at x 24.63, 0.8 m abaft the stem's fore edge
+   at the water (x 25.44), so its foremost point is not the stem head; the knee of the head
+   goes to `head_m` at stage B (item 8).
 
 ---
 
@@ -584,8 +605,8 @@ without one. Steel's driver is **left out** and named in her file's note: no eng
 sail from another sail's yard (the engine design §14 item 10). *Since asked for by the owner
 (2026-10-28; `Build-Ships.md` §19.1 item 13):* the engine design's addendum (its §17) proposes
 Steel's driver boomsail, bent on a boom in the mizen course's place and built at her stage B
-behind its own flip, `DRIVER`. The owner chose it (2026-10-28; its §17.9 item 1); it waits on
-the lead's read.
+behind its own flip, `DRIVER`. The owner chose it (2026-10-28; its §17.9 item 1); the lead
+approved it (2026-10-29).
 
 ### 4.5 The razee's mizen (D20 (a))
 
@@ -1075,8 +1096,14 @@ and `height_m` are its station (§4.1 there). Items 10-12: §4.2, §4.3 and §6.
 Her profile drawn from `hull.profile` (sides, sheer, wales, decks, rails; the ports from the
 triples for 81 to build on); **a bowsprit rooted at the profile's stem head** where a file has a
 profile (`projection.js:528-544` roots it at the datum today), which removes (a)'s one visible
-cost; the screenshots of D18 (a) and (c) (§2.2); and, at stage B, the 64's mizen yard with its
+cost; D18 (a) and (c) on the owner's first sheet at B5.1 (§2.2; `Build-Ships.md` §2.6 step 5); and, at stage B, the 64's mizen yard with its
 bare fore part and lifts, her loose foot from `corners_m`, and the spritsail.
+
+**The hull's shape** (`Build-Ships.md` §6, B5.1 and B5.6):
+- **After stage A (B5.1):** her two files, the first with a profile, are drawn by B5.1's strips from their stage-0 profiles, with the measured `section_m` as it stands.
+  - The side closes forward up `stem_m` to the stem head, where the bowsprit's heel is drawn, then to `rail_m`'s foremost point abaft it (§3.5 item 9).
+  - The knee of the head is `head_m`, drawn by B5.6.
+- **At stage B:** her shape keys (§3.5 item 8) are drawn by B5.6: her sections, her main breadth, the channel wale, the square stern with its galleries (two tiers on the 64, one on the razee, tentative), and her head (`head_m`).
 
 ---
 
@@ -1109,8 +1136,9 @@ runs once at the end, with the slow tier of the files touched, by the suites' ru
 | 3 | `razeed()`; the razee's file through the same `write()` | the derivation's checks (§1.5) | 2 |
 | 4 | Staysails, studding sails, storm and occasional canvas, aliases | every group the engine reads by name exists | 2 |
 | 5 | Fits, magazine, quarter bill, crew, people files, stores, sail room, ground tackle, boats, pumps, hold, descriptions | `Quarters.beat` fills every crew of each default fit; the marines' division recorded | 2-4 |
-| 6 | Tests and truths; both polars measured, tuned within bounds, recorded; the screenshots of D18 (a) and (c) | §14 | 5, B5's drawn profile for the screenshots |
-| 7 | **After the gate's builder merges:** `MIZEN_COURSE = "gated"`, `BOWSPRIT_YARDS = True`, the 64 regenerated, her polar and her rig clauses re-measured | old beside new for the 64 alone | the gated builder |
+| 6 | Tests and truths; both polars measured, tuned within bounds, recorded | §14 | 5 |
+| 7 | **After the gate's builder merges:** `MIZEN_COURSE = "gated"`, `BOWSPRIT_YARDS = True`, `DRIVER = True` (Ext §17.8), the 64 regenerated, her polar and her rig clauses re-measured; the shape keys of both files (§3.5 item 8) | old beside new for the 64's rig, polar and balance; both files' bytes for the shape keys; the measured port triples within 0.05 m of the drawn side | the gated builder (B3.1, B3.2, B3.5 and B5's drawings); for the shape keys, the lead's approval of the hull's design, stage 0H and B8's SW-2b.1 (`Build-Ships.md` §2.6) |
+| 8 | **Held for the owner's first test** of the whole ship, in the game, after the owner's sheets of her two files (D18 (a) and (c) at B5.1; the rest at B5.6) and their choices applied (`Build-Ships.md` §2.6) | — | 7; B5.6's drawing of her two files |
 
 ---
 
@@ -1175,8 +1203,8 @@ after the wiring. Her files' byte identity is the package's generator truth.
   "razee" or "sixty-four" (grep); `tests/test_ships.py:99` and its two kin stand.
 - **The caches:** raised, results unchanged.
 - **The harbour's glob** (`ui/harbour.py:382`) lists her files; its test checks membership only.
-- **Within the package:** stage B moves only `sixty-four.yaml` and her own truth clauses pinned
-  after it, each old beside new.
+- **Within the package:** stage B moves `sixty-four.yaml`'s rig and her own truth clauses pinned
+  after it, each old beside new, and both files' bytes for the hull's shape keys (no behaviour).
 - **Not hers:** the lee-port wiring moves existing combat pins; it is the lee-port builder's.
 
 ---

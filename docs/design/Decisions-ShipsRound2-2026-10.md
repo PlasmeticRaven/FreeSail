@@ -2,7 +2,7 @@
 
 **Status (2026-10-28): answered by the owner (2026-10-27) and ruled on by the lead (2026-10-28), both recorded below; D18 and D25 stay open.** The sheet was written before Package 75's brief (`docs/dev/M7-WorkPackages.md`), which binds. The brief reopened or settled these decisions, as the answers below take into account:
 - **D12** (the lee ports): the brief has the 74's lower-deck ports shut within a foot of the water as the sources give. A truth pins it.
-- **D14** (the viewer's hull): the brief adds a sourced hull profile to every ship file through the generator. The viewer still stays at today's standard.
+- **D14** (the viewer's hull): the brief adds a sourced hull profile to every ship file through the generator. The owner's answer (c) and the lead's ruling bring its drawing into this package, for every ship. The owner's end goal for the hulls (2026-10-28, under D14 below) sets the aim the drawing follows.
 - **D17** (the Indefatigable's fits): the brief wants a fit "as razeed 1795", with later armaments as data for the scenario editor.
 - **D27 and D39** (the Neufchatel's scenario and names): the brief makes her an American vessel of 1812.
 - **D10** (her main topgallant): the brief leaves the physics unchanged and has a rig the engine lacks reported to the lead.
@@ -180,7 +180,7 @@ No lines of any bilander exist, and the game draws every hull with one shape. Sh
 - **(b) The brig's hull scaled to her tonnage** (Harpy: 88 ft by 28 ft 1½ in, 3.1 breadths, flush-decked). The plan named this as the fallback "until the research finds better" (plan §1).
 - **(c) Gwyn's profile at an assumed scale:** a raised quarterdeck from abaft the main shrouds, and freeboard in the waist 0.08 of the length. The drawing has no scale (the figures on her deck would make her about 290 ft long), so it gives her shape, not her size.
 
-**Recommended: (a), drawing about 11-12 ft loaded at 130 tons.** The research has found the better figure the fallback was waiting for, measured to Chapman's own scale bar. Gwyn's raised quarterdeck, round windowed stern and figurehead go into her description. They show in the viewer only if D14 adds a hull setting.
+**Recommended: (a), drawing about 11-12 ft loaded at 130 tons.** The research has found the better figure the fallback was waiting for, measured to Chapman's own scale bar. Gwyn's raised quarterdeck, round windowed stern and figurehead go into her description. They show in the viewer only if D14 adds a hull setting. *Since (2026-10-28):* D14 (c) draws them (the D14 entry).
 
 *Depends on it:* B4's hull fields; her polar and stiffness; her hull speed (D24). The viewer reads only the length, beam and deck height (Eng §6.1).
 
@@ -275,6 +275,20 @@ Keep the one generic hull every ship has, with no ports and one deck line, so th
 **Recommended: (a), as your viewer ruling asks.** With D18, the razee's deck line stands about 1.4 m above the water, against the 64's 3.2 m and the frigate's 1.8 m, so her cutting down shows. Her real sides stood higher than the line drawn, as the frigate's do. Ports for every ship can be a later package; until then the Neufchatel's ports, and Gwyn's quarterdeck and stern, are not drawn either.
 
 *Depends on it:* B5; the hull schema and `/api/ship`, if a setting is added; your screenshot checks.
+
+**Answered (c) (2026-10-27), and the owner's end goal for the hulls (2026-10-28).** With D14 answered (c), the owner set the aim for the drawn hull: "I think my end goal and idea of 'drawn properly' at this point is fairly simple and achievable, currently, each hull is essentially the same as drawn and only differ in gross proportion. In real life, the profile and stern view, for example, of all the different ships we have are quite different, with different lines and proportions between things like the keel shape, deadrise, tumblehome, gunwales, different deck levels, stern shapes, bow shapes, and general lines. A 'properly drawn' hull, in my view, will move from the simple and shared hull shape to, where sourceable, proper lines, or, where not sourceable precisely, lines that capture the intended differences in shape between hulls. They need not be perfect or incredibly detailed in this pass, but we should establish principles to move each ship towards a distinguishable and accurate-as-possible representation of their hulls." And: "You're right that the keel is probably unnecessary, as it won't be seen, but if we move towards more detailed viewers, careening, etc., then it may be necessary, so we should not rule it out. Overall, moving towards a better visible representation where possible, and not in every aspect, is also acceptable."
+
+Where the answer is carried out in `Build-Ships.md`:
+- the principles: §5.0;
+- the plan, hull by hull: §5.7;
+- the stage-0 commit: §3.5;
+- the drawing: §6;
+- the owner's questions: §19.1 items 14-20 (answered: the scope as proposed; one class in two roles drawn as one hull; galleries, lights and figureheads as plain shapes. Open: items 16 and 19, for the sheets);
+- asked of the lead: §19.2 items 13-21.
+
+Gwyn's raised quarterdeck, round windowed stern and figurehead for the bilander (D7) are drawn under it.
+
+Built first on the *Indefatigable*'s two files as a pilot, and held for the owner's first test of the whole ship before the other files take it (`Build-Ships.md` §2.6).
 
 ### D15. What the game calls the Neufchatel's rig, and so her size class
 

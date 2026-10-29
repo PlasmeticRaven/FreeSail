@@ -918,7 +918,7 @@ Each step is committed, reviewed by its lenses and merged before the next. All t
    `tests/test_settee.py`.
 
 *Since (2026-10-28):* B3.4 is D10(a)'s key (`Build-Ships.md` decision 34), and **B3.5, the
-driver**, if the owner and the lead take §17: `_in_each_others_place` in `scripts.py` and
+driver**, taken by the owner and the lead (§17.9 item 1): `_in_each_others_place` in `scripts.py` and
 `_in_its_place` in `orders/storm.py`; `tests/test_driver.py`. It follows B3.1 at a step
 boundary, as these (§17.8).
 
@@ -1529,7 +1529,8 @@ from the course, the bent sail.
   boom's `g.design_kn`, the cloth's `g.cloth(area, 5)`, each line's `g.rope_kn`, and the
   horse's note `g.HORSE_NOTE`.
 - `tools/ships/indefatigable.py` gains a third stage-B flip, `DRIVER = False`, beside
-  `MIZEN_COURSE` and `BOWSPRIT_YARDS`, so that the driver never holds her stage B. Each flip
+  `MIZEN_COURSE` and `BOWSPRIT_YARDS`, so that the driver is a change of its own, measured old
+  beside new by itself (taken at her stage B: `Build-Ships.md` §2.6). Each flip
   regenerates `sixty-four.yaml` alone.
   - The module refuses `DRIVER = True` unless `MIZEN_COURSE == "gated"`: a lateen's yard must
     be a `lateen_yard` (`ship/schema.py`), which the stand-in's gaff-class yard is not.
@@ -1770,7 +1771,8 @@ draws differently.
 - **The schema's refusal** (the stage-0 commit's test): a whole lateen naming a boom is refused
   in words, and a lateen cut at the mast naming one loads with the role.
 - **The 0E pickling guard** holds as it is: the driver adds no field.
-- **Truth candidate 7-230**, from the spare block, for the lead to allot. B1 measures it at stage
+- **Truth 7-230**, allotted by the lead (2026-10-29): row 3′'s equality and the shift's thirteen
+  minutes, in `tests/test_driver.py`. As first proposed, B1 measures it at stage
   B with `DRIVER = True`. *The 64 shifts her mizen for the driver, and the driver draws as her
   after sail.* What it pins:
   - the shift's phases, and its ticks in a band at her company;
@@ -1796,10 +1798,10 @@ draws differently.
 
 | Who | What | When |
 |---|---|---|
-| The stage-0 agent | One commit, checked as `Build-Ships.md` §3.4: the schema's `boom` role for a lateen cut at the mast, and its refusal; `frigate_with_driver()` in `tests/rig_fixtures.py`; the probe's line; the refusal's test. The fixture is the 0E fixture (`frigate_with_mizen_yard()`) with the frigate's `mizzen.boom` put back, lengthened to the 64's 19.91 m and set where it hangs the 64's driver from the fixture's truss as §17.2 cuts it (the fore leech 6.98 m below `MIZEN_TRUSS_M`, so the jaws about 4.5 m above her deck: judgement), and the 64's driver on its four corners filed after the course, `in_place_of` it, unbent, with a bent variant for the drawing. The storm mizzen stays `in_place_of` the course, so the one-place rule has its case; the ringtail and its boom stay out, as the 64 carries none (Indf §4.7), so `_gaff_host` is not reached | after the lead has read this addendum (the owner chose the sail, §17.9 item 1), and after stage 0E (2ead5f0). §17.4's list for (a) is where a later design of (a) would start |
+| The stage-0 agent | One commit, checked as `Build-Ships.md` §3.4: the schema's `boom` role for a lateen cut at the mast, and its refusal; `frigate_with_driver()` in `tests/rig_fixtures.py`; the probe's line; the refusal's test. The fixture is the 0E fixture (`frigate_with_mizen_yard()`) with the frigate's `mizzen.boom` put back, lengthened to the 64's 19.91 m and set where it hangs the 64's driver from the fixture's truss as §17.2 cuts it (the fore leech 6.98 m below `MIZEN_TRUSS_M`, so the jaws about 4.5 m above her deck: judgement), and the 64's driver on its four corners filed after the course, `in_place_of` it, unbent, with a bent variant for the drawing. The storm mizzen stays `in_place_of` the course, so the one-place rule has its case; the ringtail and its boom stay out, as the 64 carries none (Indf §4.7), so `_gaff_host` is not reached | after the lead's approval (2026-10-29; the owner chose the sail, §17.9 item 1), and after stage 0E (2ead5f0). §17.4's list for (a) is where a later design of (a) would start |
 | B3, step B3.5 (the driver) | `_in_each_others_place` widened, and `_in_its_place` calling it; `tests/test_driver.py`. Nothing in `physics/` | after B3.1 (it needs `drives_aft`, the `curve_class` lookups and the six lateen evolutions) and after the stage-0 commit, at the engine builder's next step boundary |
 | B5 | §17.6, with or after §6.1's mizen yard, from the fixture | after B3.5 lands |
-| B1 | `driver(...)` in `tools/ships/mizen_yard.py`; `DRIVER` in `indefatigable.py`, flipped after B3.5 and B5's drawing; the sail room's spare, the aliases and the group; the 64's cases in `tests/test_indefatigable.py`; truth 7-230 if allotted | at her stage B, as its third flip. Her stage A and the other two flips do not wait on it. If B3.5 or B5's drawing is not in by then, `DRIVER` stays False in that merge, and B1 flips it alone at a later boundary between two windows once both are in (`indefatigable.py` stays B1's; `sixty-four.yaml` regenerated alone, old beside new). If they are not in by the package's merge, she ships without it, as `Build-Ships.md` §2.4 has it for the stand-ins |
+| B1 | `driver(...)` in `tools/ships/mizen_yard.py`; `DRIVER` in `indefatigable.py`, flipped after B3.5 and B5's drawing; the sail room's spare, the aliases and the group; the 64's cases in `tests/test_indefatigable.py`; truth 7-230 if allotted | at her stage B, as its third flip, in her own window (`Build-Ships.md` §2.6): her stage B waits for B3.5 and B5's drawing, so that the owner's first test is of the whole ship. Her stage A does not wait on it. If they are not in by the package's merge, she ships without it, as `Build-Ships.md` §2.4 has it for the stand-ins |
 | B7 | the 74's driver by the same function, with her figures and her scaling | in her window, after B3.5 and B5's drawing; if either is missing, her file goes without it, as the 64's |
 
 **What stage 0 and stage 0E already hold for it:**
@@ -1855,7 +1857,7 @@ waits for it.
    departing from the (a) carried on b562bae (§17.1), and, as modelled, from that item's "The
    mizen course itself stays her after sail" (§17.3). *The owner's answer (2026-10-28): (b) for
    both, chosen with the two sails drawn side by side and the shift explained, as the simpler.*
-   The stage-0 commit and everything after it wait on the lead's read (§17.8).
+   *Approved by the lead (2026-10-29, the notes in `docs/dev/M7-WorkPackages.md`).*
 2. **`in_place_of` against the brailed way** (§17.3). If the owner wants both sails bent, it is a
    new exclusion on each path that sets sail, and a design of its own.
 3. **The research's uncertainties.**
@@ -1869,7 +1871,7 @@ waits for it.
    - What Steel's 20-gun plate shows.
 4. **The lines' sizes**, from the OCR of Steel's vol. II lists but for the 74's halyards. B1 and
    B7 read the page images.
-5. **Truth 7-230**, for the lead to allot from the spare block.
+5. **Truth 7-230**: allotted to the driver by the lead (2026-10-29).
 6. **Sail (a)**, kept possible as §17.4 says. The 1773 rig is no file's.
 7. **The decision sheet's "The 74's driver"** (`Decisions-ShipsRound2-2026-10.md`) still
    describes (a) as carried. This addendum does not edit it.

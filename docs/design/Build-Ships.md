@@ -20,7 +20,8 @@ and where a settlement changed Ext or Indf, that document was edited to agree (�
 
 **Where.** The clone `D:/Projects/FreeSail/FreeSail-pkg-75` on the package's branch at 6b94731, the
 lead's 3421829 merged in (packages 73 and 86, and 84's steps 1 and 2). Every `file:line` is at
-that head. Paths are from the repository root. A builder re-checks a line before editing it.
+that head, but those added with the hull's design (§2.6, §3.5, §5.0-§5.7's additions, §19.2
+items 13-21), which are at 0dbde00. Paths are from the repository root. A builder re-checks a line before editing it.
 
 **What binds, in order:**
 1. The brief, `docs/dev/M7-WorkPackages.md`: its head rules (l. 1-33) and "## Package 75"
@@ -62,19 +63,25 @@ scratch scripts named are not.
 
 ## In brief
 
-- **The order.** Stage 0, then the ships one at a time: the *Indefatigable* (B1), the *Prince
-  de Neufchatel* (B2), the *Bellerophon* (B7), the bilander (B4). Beside them run three tracks,
+- **The order.** Stage 0, then the ships one at a time: the *Indefatigable* (B1), built whole
+  with the hull's pilot and held for the owner's first test (§2.6), the *Prince de Neufchatel*
+  (B2), the bilander (B4), the *Bellerophon* (B7). Beside them run three tracks,
   each one builder: the shared work (B8: Table No. 29, the profiles and sills of the eight
   files, the sub-types and small ships' fits, the lee ports in two steps), the viewer (B5) and,
   once the lead approves Ext, the engine (B3: the lateen, the bowsprit yards, the settee). The
   scenarios (B6) follow each ship.
+- **The hull.** Each hull to be drawn as herself, by the owner's end goal and twelve principles
+  (§5.0), hull by hull (§5.7), for the lead's approval. The form is built and drawn first on the
+  *Indefatigable*'s two files, as a pilot (§2.6).
 - **The gate.** Only B3 and what it carries wait for the lead: the 64's mizen course on its
   yard and her spritsail yards (behind two module constants; Indf §0), the same pieces of the
   74, and the bilander's handling. The razee, the 64's stand-in, the Neufchatel and the 74's
-  plain parts do not wait.
+  plain parts do not wait. Ext and its driver's addendum are approved. The hull's design, and
+  the order of §2.6, wait for the lead's approval (§19.2 item 13).
 - **Stage 0 in four kinds.** Stage 0 now lays every un-gated hook, key, registry slot and stub
-  (§3.1). Stage 0E lays Ext's own interfaces after the lead approves Ext (§3.2). Stages 0b, 0c
-  and 0d lay what each later ship's design names (§3.3). Each is checked by an agent that did
+  (§3.1). Stage 0E lays Ext's own interfaces after the lead approves Ext (§3.2), and the driver's
+  stage 0 its boom (Ext §17.8). Stage 0H lays the hull's shape keys (§3.5). Stages 0b, 0c and
+  0d lay what each later ship's design names (§3.3). Each is checked by an agent that did
   not write it to change nothing.
 - **The merge.** The lead's branch is in at 6b94731. Before each later stage the integrator
   takes the brief's fetch and merge of the lead's branch into the package's branch again
@@ -101,7 +108,7 @@ scratch scripts named are not.
 
 | # | Decision | Source |
 |---|---|---|
-| 1 | The ships one at a time: the *Indefatigable*, the *Neufchatel*, the *Bellerophon*, the bilander | The go-ahead (the first); judgement on the rest, by what each waits on (§2.3) |
+| 1 | The ships one at a time: the *Indefatigable*, the *Neufchatel*, the bilander, the *Bellerophon* | The go-ahead (the first); the owner's ask for the bilander third, ruled by the lead at the gate (§19.2 item 8); judgement on the rest, by what each waits on (§2.3) |
 | 2 | The razee, the 64's stage A, the *Neufchatel* and the 74's plain parts wait for nothing gated. The gate holds B3 and the pieces it carries | The go-ahead, item 2; Indf §0; Ext §9.4 |
 | 3 | Ext goes to the lead with this document's three edits to it (§20). B3 starts on the lead's approval, after stage 0E | The go-ahead; Ext E18-E19 |
 | 4 | Stage 0 lays every un-gated inert hook now. Stage 0E lays Ext §8's interfaces after the approval. Stages 0b-0d lay what each later design names | The plan's behaviour-free stage 0; the gate. **Plainly:** Ext §8 put its interfaces in stage 0. They are laid after the approval because the gate is on that design and nothing un-gated needs them |
@@ -136,6 +143,8 @@ scratch scripts named are not.
 | 33 | A scenario's `nations:` block: for the lead; laid in stage 0b if ruled in | The shared draft S13. **Plainly:** `world/scenarios.py` and `core/world.py` are outside the brief's file list |
 | 34 | D10(a)'s key for the *Neufchatel*'s main topgallant: her design reports it to the lead; B3 builds it as a fourth step if the lead agrees | D10; Ext §14 item 12 |
 | 35 | One test suite at a time on the owner's machine | The plan §4; the brief's suites rule |
+| 36 | The hull's shape. The owner's end goal and twelve principles (§5.0). Eight optional shape keys in stage 0H (§3.5, §5.1); the stations computed by `freesail/ship/form.py` and served. B8's helpers in SW-2b.1 right after 0H, before B1's stage B, the eight files' shape in SW-2b.2, each new ship's from her first commit, B1's at stage B. The drawing in B5.1 (strips, the head rule) and B5.6 (§6). The owner's sheets (§6) and the pair check (§5.6). No port triple is written from the drawing. One class in two roles draws as one hull (the brig and the merchant brig; the two schooners) | The owner, 2026-10-28 (the scope as proposed; §19.1 items 14, 15, 17, 20); for the lead's approval (§19.2 item 13) |
+| 37 | The *Indefatigable* whole before any other ship: stage A; B3.1, B3.2, B3.5 and their drawings; stage B, with the hull's form built and drawn first on her two files (the pilot). Held for the owner's first test. Then SW-2 and SW-2b.2 as one step, and the other ships | The owner, 2026-10-28 (§2.6); for the lead (§19.2 items 13, 20) |
 
 ---
 
@@ -158,7 +167,7 @@ scratch scripts named are not.
 | Ext's interfaces | — | stage 0 | — | Stage 0E, after the lead's approval | Ext §8 |
 | The mizen course's lateral offset at stage B | from the yard's after part, as a gaff's from its gaff (§12.2 item 3) | 0.8√A, 3-8% short of Steel's foot, kept (§3.2) | — | Ext's: no physics change, and 0.8√A (8.16 m) is nearer Steel's foot (8.86 m) than the stand-in's 11.1-m head. The stand-in overstates the offset, and the move at stage B is shown old beside new | Indf §12.2 |
 | The mizen yard's lines | lifts, truss and brails as lines | jeers, lifts, vangs, bowlines as guys, one sheet, one tack; no brace, no brails (§3.4) | — | Ext's: the schema has no `brail` or `truss` line (`schema.py:119-141`), and `take_in_lateen` brails without one | Indf §4.4 |
-| Steel's occasional driver on the 64's mizen yard | added at stage B | no engine path hangs a sail from another sail's yard (§14 item 10) | — | Left out, noted in her file; the lead may ask for the path. *Reopened by the owner (§19.1 item 13):* Ext §17 proposes Steel's driver boomsail behind its own flip; the owner chose it, and the lead's read is open (its §17.9 item 1) | Indf §4.4, §12.2 |
+| Steel's occasional driver on the 64's mizen yard | added at stage B | no engine path hangs a sail from another sail's yard (§14 item 10) | — | Left out, noted in her file; the lead may ask for the path. *Reopened by the owner (§19.1 item 13):* Ext §17 proposes Steel's driver boomsail behind its own flip; the owner chose it, and the lead approved it (the lead's notes of 2026-10-29, at ea5ad59 on the lead's branch, brought in at the next merge) | Indf §4.4, §12.2 |
 | Where a ship's tests and truths go | `tests/test_ship_particulars.py`, `tests/test_ships.py`, `tests/test_known_truths.py` | B3's own test files | `tests/test_ship_particulars.py` | Each builder's own new files; truths moved into `tests/test_known_truths.py` in Phase 5 | Indf §6.3, §13 |
 | The truths | five | three for the settee, one offered for the 64 | four shared (7-185 to 7-188) | §15 | Indf §14, Ext §10.3 |
 
@@ -171,7 +180,7 @@ scratch scripts named are not.
 - **Before stage 0** the stage-0 agent checks that the head the go-ahead names, 8db8b9a, is an
   ancestor of the package's branch (`git merge-base --is-ancestor`). If it is not, the fresh
   merge below is taken first.
-- **Before each later stage** (stage 0E; each of 0b, 0c, 0d; the fork of each builder's worktree;
+- **Before each later stage** (stage 0E; the driver's stage 0; 0H; each of 0b, 0c, 0d; the fork of each builder's worktree;
   each B3 step; each B8 step) the integrator runs the fetch and merge the brief gives
   (`docs/dev/M7-WorkPackages.md`, Package 75: `git fetch origin`, then a merge of the lead's
   branch from the origin into the package's branch). It is a merge into the package's own
@@ -185,20 +194,25 @@ scratch scripts named are not.
 | Step | Builder | What | After | Before | Moves pins |
 |---|---|---|---|---|---|
 | S0 | stage-0 agent | §3.1 | the ancestor check | everything | none (proven) |
-| **B1** | the *Indefatigable* | stage A: the razee final, the 64 with a stand-in mizen course and no sprit yards (Indf §0, §13 steps 1-6) | S0 | B2 | none |
+| **B1** | the *Indefatigable* | stage A: the razee final but for her shape keys (stage B), the 64 with a stand-in mizen course and no sprit yards (Indf §0, §13 steps 1-6) | S0 | 0H, B5.1 (§2.6) | none |
 | SW-1 | B8 | Table No. 29's charges (§10) | S0 | B7's magazine (the long 32) | §16 |
-| SW-2 = L1 | B8 | the profiles and sourced sills of the eight files (§5.3, §5.4) | S0 | SW-5, and B5's drawing of the eight | bytes only |
-| B5.1 | B5 | the profile drawn (§6) | the first profile on the trunk (B1's or SW-2's) | the owner's screenshot check | pictures measured |
-| SW-4 | B8 | the sub-types, the roles, the small ships' fits and bills, the privateer's arc (§8, §9) | S0; its `world/ships.py` rows at the boundary after B1 | B2, B6 | §16 |
 | 0E | stage-0 agent | Ext's interfaces (§3.2) | the lead's approval of Ext | B3 | none (proven) |
+| the driver's stage 0 | stage-0 agent | the schema's `boom` for a lateen cut at the mast, its refusal, `frigate_with_driver()` (Ext §17.8) | 0E; the lead's approval of Ext §17 (given); the lead's approval of §2.6 | B3.5 | none (proven) |
+| 0H | stage-0 agent | the hull's shape: the eight keys, `freesail/ship/form.py`, the served stations (§3.5) | B1's stage A; the lead's approval of the hull's design (§19.2 item 13) | SW-2b.1, B5.6, every ship's shape keys | none (proven) |
+| SW-2b.1 | B8 | `g.hull_form`, `g.midship_section`, `g.from_steel_table`, the dump's shape work; no file written (§5.3) | 0H, merged at the same boundary | B1's stage-B shape keys; B2's, B4's and B7's | none (the byte test) |
+| B5.1 | B5 | the profile drawn (§6): the strips, the head rule, the masts' feet, the bowsprit's heel, the lifts on every yard; first on the *Indefatigable*'s two files; the owner's first sheet, with D18 (a) and (c) | B1's stage A on the package's branch; the lead's approval of §2.6 | B1's stage B (D18 as chosen); B5.6 | pictures measured |
 | B3.1, B3.2, B3.3 | B3 | the lateen, the bowsprit yards, the settee (Ext §9.1), each merged before the next | 0E | B1's stage B (3.1, 3.2); the bilander's handling truths (3.3) | none expected |
-| B5.2-B5.4 | B5 | each of B3's drawings (Ext §6), after its step | each B3 step | — | none |
-| **B2** | the *Neufchatel* | her design, stage 0b, her file | B1, SW-4 | B4 | none existing |
-| B1 stage B | B1 | `MIZEN_COURSE = "gated"`, `BOWSPRIT_YARDS = True`, the 64 regenerated (Indf §13 step 7) | B3.1, B3.2; taken at a boundary between ships | — | the 64's own figures, old beside new |
+| B3.5 | B3 | the driver (Ext §17.4) | B3.1; the driver's stage 0 | B1's `DRIVER`; the 74's driver | none expected |
+| B5.2-B5.5 | B5 | each of B3's drawings (Ext §6) after its step; B5.5 the driver's (Ext §17.6) after B3.5 | each B3 step | B1's stage B (B5.2, B5.3, B5.5) | none |
+| B1 stage B | B1 | `MIZEN_COURSE = "gated"`, `BOWSPRIT_YARDS = True`, `DRIVER = True`, her shape keys (Indf §3.5 item 8), both files regenerated (Indf §13 step 7) | B3.1, B3.2, B3.5 and their drawings; 0H; SW-2b.1; in her own window (§2.6) | B5.6's pilot; the owner's first test | the 64's own figures, old beside new |
+| B5.6 | B5 | the form drawn (§6): the served stations, the sterns, heads, galleries and lights as plain shapes, the channel wales, the drawn depth, the hull below the water as the owner chooses; the owner's sheets | 0H; B1's shape keys (the pilot); SW-2b.2 for the eight | the owner's first test; the owner's check of the hulls | pictures measured |
+| SW-4 | B8 | the sub-types, the roles, the small ships' fits and bills, the privateer's arc (§8, §9) | S0; its `world/ships.py` rows at the boundary after B1's merge, when her window closes | B2, B6 | §16 |
+| SW-2 = L1, SW-2b.2 | B8 | one step: the eight files' profiles and sourced sills (§5.3, §5.4), their shape and marks (§5.7); the pair check; the triple gaps reported; B5 then measures the pictures, old beside new | the owner's test of the pilot (§2.6); SW-2b.1 | SW-5; B5's drawing of the eight | bytes only |
+| **B2** | the *Neufchatel* | her design, stage 0b, her file | B1 whole and merged, and the owner's test (§2.6); SW-4 | B4 | none existing |
 | SW-5 L2, L3 | B8 | the lee port on heel, then with the roll (§7) | SW-2 | B7's port truth | combat pins, bisected |
 | **B4** | the bilander | her design, stage 0d, her file | B2, B3.3 (for her handling truths) | B7 | none existing |
 | **B7** | the *Bellerophon* | her design, stage 0c, her file | B4, SW-1, SW-5 (for her port truth) | — | three assertions (§16) |
-| B6 | scenarios | one per ship (§12) | each ship's file, SW-4 | Phase 5 | none existing |
+| B6 | scenarios | one per ship (§12) | each ship's file, SW-4; the owner's test (§2.6) | Phase 5 | none existing |
 | Phase 5 | integrator | truths moved in, notes, spec §27 as built, the primer's chapter, the whole-change review | every merge | the lead | — |
 
 ### 2.3 Why this order
@@ -207,16 +221,17 @@ scratch scripts named are not.
   and needs nothing gated.
 - **The *Neufchatel* second.** She waits on nothing gated if her design takes D10(c) or the lead
   puts D10(a)'s key with B3 (§13.1). She needs SW-4's pivot rule if she carries a pivot.
-- **The bilander third**, as the owner asked (the lead's ruling on stage 0's questions, item 8,
+- **The bilander third**, as the owner asked (the lead's ruling at the gate on §19.2 item 8,
   in `docs/dev/M7-WorkPackages.md`). Her handling truths wait for B3.3, the last engine step,
   and she uses B1's `spritsail_yards.py`.
 - **The *Bellerophon* last.** Her long 32s need Table No. 29 (SW-1: 10 lb 10 oz, not the share's
   10 lb 11 oz), her port truth needs the lee port wired (SW-5), and her mizen course and
-  spritsail yards come from B1's stage-B helpers when B3.1 and B3.2 are in. If her window opens
-  before B1's stage B, she takes the 64's stand-in pattern.
+  spritsail yards come from B1's stage-B helpers when B3.1 and B3.2 are in. Under §2.6 her
+  window opens after B1's stage B.
 
 **One ship at a time** holds for the ship builders: each ship's window opens with the fresh
-merge and her stage 0, and closes with her merge. B1's stage B is taken between two windows.
+merge and her stage 0, and closes with her merge. B1's window stays open through her stage B
+and the hull's pilot, and closes with the owner's first test (§2.6).
 B8, B5 and B3 run beside the ship of the window, on files disjoint from hers (§4).
 
 ### 2.4 What waits on the gate, and what does not
@@ -229,9 +244,10 @@ B8, B5 and B3 run beside the ship of the window, on files disjoint from hers (§
 | The *Neufchatel* | no (D10(a)'s key, if built, is the lead's call: §13.1) |
 | The 74's file at stage A | no |
 | The 74's mizen course and spritsail yards | yes (B3.1, B3.2) |
-| The driver of the 64 and the 74 (Ext §17, the addendum) | yes: the lead's read of the addendum (the owner chose the sail, Ext §17.9 item 1), then its stage-0 commit, B3.5 and B5's drawing; the 64 takes it by its own flip (`DRIVER`), so her stage B is not held by it, and if it misses her stage B, B1 flips it at a later boundary (Ext §17.8) |
+| The driver of the 64 and the 74 (Ext §17, the addendum) | yes: approved (the lead's notes of 2026-10-29, at ea5ad59 on the lead's branch, brought in at the next merge); then its stage-0 commit, B3.5 and B5.5's drawing. The 64 takes it by its own flip (`DRIVER`) at her stage B, which waits for B3.5 and the drawing so that the owner's first test has it (§2.6) |
 | The bilander's file | generates after stage 0E; her handling truths wait for B3.3 |
-| Stage 0E, B3, B5.2-B5.4 | yes |
+| The hull's shape (§5.0: stage 0H, SW-2b, B5.6, the ships' shape keys) | not Ext's gate: the lead's approval of the hull's design (§19.2 item 13) |
+| Stage 0E, B3, B5.2-B5.5 | yes |
 | The shared work (B8), B5.1, B6 | no |
 
 If the gate slips past the package's merge, the 64 and the 74 ship on their stand-ins with no
@@ -247,6 +263,62 @@ mend touches a per-tick path. The whole suite is the lead's, on the build machin
 at a time on the owner's machine** (plan §4): builders running beside each other queue their
 suites. The pace tests are run on the owner's machine only to record a figure; the floor is the
 build machine's.
+
+### 2.6 The whole *Indefatigable* first, and the hull's pilot (the owner, 2026-10-28)
+
+The owner's direction, after the hull's plan (§5.0): "I would like to see the ship as made by
+your workflow, plus with the hull principles first embodied, before we jump into converting
+every ship and the other new ships." And then: "present the hull principles to the lead, and
+anything else that you need to now, and wait for their approval. If they approve, you can
+continue with B1 until it's fully implemented and ready for a test, as 84 is still working,
+and there's no rush to test it before it's ready. Once the lead has approved, you can fold in
+the hull principles to the Indefatigable implementation so that my first test is of the full
+version as intended."
+
+So B1's window stays open past stage A until the *Indefatigable* is whole, and the hull's form
+is built and drawn first on her two files. Nothing past stage A starts before the lead approves
+the hull's design and this order. In order, each step at its own boundary and checked as
+before:
+1. **B1 stage A** (Indf §13 steps 1-6), committed on the package's branch; then the fresh merge
+   of the lead's branch, with 84's merged steps (§2.1). **Plainly:** stage A was under way when
+   the owner gave this direction. It is finished, reviewed and committed, and goes no further
+   until the lead approves.
+2. **The lead's approval** of the hull's principles (§5.0), its plan hull by hull (§5.7), its
+   design (§3.5, §5.1-§5.3, §6) and this order (§19.2 items 13-21). Ext was approved on
+   2026-10-28 and its addendum on 2026-10-29 (the lead's notes at ea5ad59, on the lead's branch,
+   brought in at the next merge), and stage 0E is in.
+3. **Stage 0H** (§3.5: the shape keys in the ship-file format, and the module that turns them
+   into the drawn hull) and **the driver's stage 0** (Ext §17.8: the driver's boom in the
+   file format); then B8's **SW-2b.1** (§5.3: the generator's helpers for writing the shape;
+   no ship file changes).
+4. **B3.1** (the lateen), **B3.2** (the bowsprit yards), then **B3.5** (the driver), each merged
+   before the next. B3.3 (the settee) and B3.4 (D10(a)'s key) follow, before the ships that
+   need them.
+5. **B5.1** (§6), drawn first on the 64 and the razee. The eight keep today's hull, since they
+   have no profile yet; only the lifts on every yard change their pictures. The owner's first
+   sheet: her two files old beside new, under D18 (a) and (c) (§19.1 item 1). Then **B5.2**,
+   **B5.3** and **B5.5** (the driver's drawing, Ext §17.6), each after its B3 step.
+6. **B1 stage B** (Indf §13 step 7): `MIZEN_COURSE = "gated"`, `BOWSPRIT_YARDS = True`,
+   `DRIVER = True`, her shape keys (Indf §3.5 item 8) through SW-2b.1's helper, and D18 as the
+   owner chose it on the first sheet.
+7. **B5.6** (§6), built for every file and drawn first on her two: her sections, stern,
+   galleries, head and wales. The owner's sheets of her two files, old beside new, in five
+   views, with the three ways of drawing the hull below the water and the page's panel at
+   800 × 600 (§19.1 items 16 and 19, open until then). The owner's choices are applied before
+   the test.
+8. **Held for the owner's first test** of the whole *Indefatigable* in the game, when the owner
+   chooses. They mean to playtest once 84 is complete; the fresh merges bring 84's steps in.
+
+**Held until the test:** SW-2 and SW-2b.2, taken together as one step (the eight existing
+ships' hulls: §5.6), B2, B4, B7 and B6. SW-1 and SW-4 change no hull; they run beside the pilot
+or wait, at the lead's word (§19.2 item 20). The session reports B1 done when she is whole
+(step 7), and the lead merges her as each ship is merged; her window closes with that merge.
+**Plainly:** her window is longer than the lead's order of the ships foresaw, and no later
+ship's window opens before the owner's test.
+
+**Why.** The form and its drawing are proved on the two hulls with the best sources (her own
+draughts, measured) before thirteen files depend on them, and a change the owner asks for on
+the pilot moves two files, not thirteen.
 
 ## 3. Stage 0
 
@@ -440,13 +512,34 @@ By an agent that did not write it:
 - a diff read for any reach beyond its list: no behaviour, no pin, no `world.ship` or
   `CrewedWorld` read that the Hull does not keep, no model or vendor name.
 
+### 3.5 Stage 0H: the hull's shape (after B1's stage A and the lead's approval, before her stage B: §2.6)
+
+One behaviour-free commit by the stage-0 agent, checked as §3.4. It waits on the lead's approval of the hull's design (§19.2 item 13), and is taken at the first boundary after it (§2.6). Lines below are at 0dbde00.
+1. **`schema.py`:**
+   - `head_m`, `breadth_line_m`, `sections_m`, `channel_wales_m`, `floor_m`, `rabbet_m`, `form` and `marks` appended to `PROFILE_KEYS`;
+   - `_PROFILE_LINES` rows for the six point keys, and `_NUMBER_WORDS` taking four (a gallery tier, a band of lights);
+   - a frozen `HullForm` (`fullness`, `stern`, `head`);
+   - `HullProfile`'s eight fields, plain class defaults;
+   - a `HullProfile.__getstate__` that leaves them out while empty (it has none at 0dbde00; `HullSpec`'s is at :431-437 there);
+   - §5.2's new refusals.
+2. **`freesail/ship/form.py`** (new, pure): `stations(spec)`, `half_breadth_at(spec, x, z)`, `outline(spec, view)`, `drawn_displacement_kg(spec)` and `check(spec)`, by §5.3's rule, its constants named at its head.
+3. **`api/queries.py`** (no owner after 0E): `_profile_entry`'s branches for `form` and `marks`; `ship_graph` serves `hull["stations"]` where the file has a profile.
+4. **`tests/test_hull_form.py`** (§14.1).
+
+**Inert.**
+- No file carries a new key (the two-way byte test).
+- The served graph gains `hull.stations`, which B5.1 does not read, so no picture moves.
+- Nothing under `physics/`, `combat/`, `crew/` or `world/` reads a shape key (the guard).
+
+**Then,** at the same boundary, B8 merges SW-2b.1 (§5.3). **After 0H,** `form.py` and `profile.py` pass to B8 (§4.1).
+
 ## 4. File ownership and contracts
 
 ### 4.1 The owners
 
 | Owner | Owns (edits only these) |
 |---|---|
-| **Stage-0 agent** | every file of §3.1, §3.2 and §3.3, at its commit; `freesail/ship/schema.py` for the whole package (a later need goes back to a stage-0 commit) |
+| **Stage-0 agent** | every file of §3.1, §3.2, §3.3 and §3.5, at its commit; `freesail/ship/schema.py` for the whole package (a later need goes back to a stage-0 commit) |
 | **B1, the *Indefatigable*** | `tools/ships/indefatigable.py`; `tools/ships/mizen_yard.py` and `tools/ships/spritsail_yards.py` (at stage B; Ext §9.3); `data/ships/sixty-four.yaml` and `razee-44.yaml` (generated); `data/people/sixty-four.yaml` and `razee-44.yaml`; `tests/test_indefatigable.py` (new); in her window, `freesail/world/ships.py`'s rows `sixty-four` and `razee` with their words (Indf §8) and appends to `tools/ships/period.py` |
 | **B2, the *Neufchatel*** | `tools/ships/neufchatel.py`; her file and her people file; `tests/test_neufchatel.py`; in her window, her `world/ships.py` rows and `period.py` appends |
 | **B7, the *Bellerophon*** | `tools/ships/bellerophon.py`; `data/ships/seventy-four.yaml`; her people file; `tests/test_bellerophon.py`; `tools/pace.py` (her mode); in her window, her `world/ships.py` rows with the words "a ship of the line", and the three assertions they move (`tests/test_ships.py:99`, `:188`; `tests/test_world_orders.py:98`); `period.py` appends; the files her bill by deck needs (`crew/quarters.py` and the orders her design names), taken after B3's merge where they are B3's; `world/captains.py` if her design takes a rank-4 rule for the frigates (Bel §7) |
@@ -454,7 +547,7 @@ By an agent that did not write it:
 | **B3, the engine** | `freesail/ship/parts.py` and `ship/graph.py` (after 0E); `physics/sails.py`; `evolutions/scripts.py`, `trim.py`, `runner.py`; `orders/verbs.py`, `storm.py`, `orders/__init__.py`, `navigation.py`; `combat/hits.py`; `data/evolutions/` (the ten new files); `data/vocabulary.yaml`; `tests/test_lateen.py`, `test_bowsprit_yards.py`, `test_settee.py`; `tests/test_driver.py` (step B3.5, the driver, if Ext §17 is taken); `data/sail_classes.yaml` and `tests/test_sails.py:65-74` only under D44(c), the lead's (Ext §5.10) |
 | **B5, the viewer** | `client/projection.js`, `client/shipview.js`, `client/style.css`; `tests/test_view_geometry.py`; `tests/test_pictures.py` only for a threshold that moves; the screenshots |
 | **B6, the scenarios** | `data/scenarios/` (the four new files); `tests/test_scenarios_75.py` (new); `world/scenarios.py` only if the lead rules in D48's third way (Indf §11.1) |
-| **B8, the gun deck and the sub-types** | `tools/gen_ships.py` after stage 0; the eight existing files (generated); `freesail/ship/charges.py`; `freesail/combat/ports.py`; `freesail/combat/guns.py` after stage 0 (§7.2: the gun run in, the named gun dropped with a line); `api/action_readings.py` (the guns' reading's "ports shut", :548-); `world/captains.py` (`ROLES` only) and `world/service.py` (`ROLE_SERVICE`, :54-) until SW-4 merges; `data/captains/indiaman.yaml`, `revenue.yaml` (new); `world/ships.py` at the boundary after B1 only (§4.2); `tests/test_magazine.py` (:59, :61); `tests/test_pivot_gun.py` (only if the arc moves); `tests/test_ships.py:103` (only if §8.4 is ruled in); `tests/test_profiles.py`, `test_lee_ports.py`, `test_subtypes.py` (new) |
+| **B8, the gun deck and the sub-types** | `tools/gen_ships.py` after stage 0; the eight existing files (generated); `freesail/ship/charges.py`; `freesail/combat/ports.py`; `freesail/combat/guns.py` after stage 0 (§7.2: the gun run in, the named gun dropped with a line); `api/action_readings.py` (the guns' reading's "ports shut", :548-); `world/captains.py` (`ROLES` only) and `world/service.py` (`ROLE_SERVICE`, :54-) until SW-4 merges; `data/captains/indiaman.yaml`, `revenue.yaml` (new); `world/ships.py` at the boundary after B1 only (§4.2); `tests/test_magazine.py` (:59, :61); `tests/test_pivot_gun.py` (only if the arc moves); `tests/test_ships.py:103` (only if §8.4 is ruled in); `tests/test_profiles.py`, `test_lee_ports.py`, `test_subtypes.py` (new); `freesail/ship/profile.py`, `freesail/ship/form.py` and `tests/test_hull_form.py` after stage 0H (§3.5) |
 | **The integrator** | the merges into the package's branch; the fresh fetch and merge; the regenerated files of §4.4's last row; Phase 5: `tests/test_known_truths.py` (the truths moved in by number), `tests/conftest.py` (`SLOW_TESTS`), `docs/dev/TuningNotes.md`, `docs/TechnicalSpec-M7.md` §27 as built, the primer's ships chapter, `docs/agents/Harness.md` (the two events) |
 
 **Plainly:** the brief's heading names `world/ships.py`, `captains.py`'s `SIZE_RANK`,
@@ -467,8 +560,8 @@ the brief's item 4 (`world/brains.py`, `regimes.py`, `squadrons.py`, `service.py
 ### 4.2 Files that pass, and when
 
 A file passes only at a merge into the package's branch, never while two owners are open.
-- `freesail/world/ships.py`: stage 0; then B1 in her window; then **B8 at the boundary after
-  B1's merge** (SW-4's sub-type rows, and §8.4's move if the lead rules it in); then B2, B7 and
+- `freesail/world/ships.py`: stage 0; then B1 in her window, which stays open through her stage B
+  (§2.6); then **B8 at the boundary after B1's merge** (SW-4's sub-type rows, and §8.4's move if the lead rules it in); then B2, B7 and
   B4, each in her window.
 - `freesail/world/captains.py`: stage 0; B8 (`ROLES`) until SW-4 merges; B7 in her window if her
   design takes the rank-4 rule.
@@ -478,10 +571,13 @@ A file passes only at a merge into the package's branch, never while two owners 
 - `tools/ships/mizen_yard.py`, `spritsail_yards.py`: B1 at stage B; then B7 or B4 in her window
   if she needs an extension.
 - `freesail/ship/parts.py`, `graph.py`, `evolutions/runner.py`, `api/queries.py`: stage 0, then
-  stage 0E, then B3 (`queries.py` has no owner after 0E).
+  stage 0E, then B3 (`queries.py` has no owner after 0E but stage 0H's commit).
 - Anything B7's bill by deck needs from B3's files: after B3's merge.
 - `freesail/world/scenarios.py`: B6, only if D48's third way is ruled in, merged before stage
   0b; then stage 0b, only if the `nations:` block is ruled in (§12.1).
+- `freesail/ship/profile.py`: stage 0, then B8 from 0H's boundary. `freesail/ship/form.py` and
+  `tests/test_hull_form.py`: 0H, then B8. `api/queries.py`: stage 0, 0E and 0H, with no owner
+  between.
 
 **Nobody touches** after stage 0: `core/world.py` (unless §12.1 is ruled in, at 0b),
 `core/replay.py`, `crew/` (but B7's `quarters.py`), `world/hulls.py`, the books, the consent
@@ -499,6 +595,8 @@ fast tier once on its final tree, and the slow tier of the files it touched (§2
 |---|---|
 | Stage 0 | `build(out_dir: str) -> None` called after `smack(out)` and the alias; `import gen_ships as g` gives the running script; `g.hull_profile`, `g.broadside_pair(..., deck=, round_to=)` and its kin, `g.exercise_allowance(n, decks=)`; `period.py`'s constants; §5.1's form; `profile.py`'s readings; `DECK_WORDS`; `"unarmed"`; the keyed registries of §3.1 items 23-25; `CHARGE_TABLE_LB`; `ports.update`; `Sail.curve_class` |
 | Stage 0E | Ext §7's table: the keys, fields, predicate, runner hooks and served fields, each inert until B3 |
+| Stage 0H → B5, B8, every ship builder | §5.1's shape keys and §5.2's refusals; `freesail/ship/form.py`'s `stations`, `half_breadth_at`, `outline`, `drawn_displacement_kg` and `check`; `hull.stations` served on `/api/ship` |
+| B8 (SW-2b.1) → every ship builder | `g.hull_form`, `g.midship_section` and `g.from_steel_table` (§5.3) |
 | Every ship builder → B5, B8 | a `profile` in §5.1's form in each file; every port gun's `(x_m, height_m)` equal to one triple of its deck's `ports_m` to the centimetre, its `deck` named; every height above the file's waterline; the mast ids `fore.`, `main.`, `mizzen.` (two z's: the mizzen top's men, `crew/hands.py:104-108`) |
 | Every ship builder → B6 | her description key and file, her fits and default, her date range, her wardroom file |
 | B1 → B7, B4 | `mizen_yard.py` and `spritsail_yards.py` as Ext §9.3 gives them: pure, importing nothing from `gen_ships`, each asserting its geometry at generation |
@@ -517,6 +615,55 @@ fast tier once on its final tree, and the slow tier of the files it touched (§2
 The brief asks for "a dozen sourced points for the sheer, the stem, the stern, the wales and
 the port sills, beside the guns' `x_m` and `height_m`", so that package 81 draws real ports
 from data. The lead's ruling adds the drawing (§6) and the lee port (§7) reads the same points.
+
+### 5.0 The aim and the principles (the owner's end goal, 2026-10-28)
+
+**The aim, in the owner's words:** "I think my end goal and idea of 'drawn properly' at this point is fairly simple and achievable, currently, each hull is essentially the same as drawn and only differ in gross proportion. In real life, the profile and stern view, for example, of all the different ships we have are quite different, with different lines and proportions between things like the keel shape, deadrise, tumblehome, gunwales, different deck levels, stern shapes, bow shapes, and general lines. A 'properly drawn' hull, in my view, will move from the simple and shared hull shape to, where sourceable, proper lines, or, where not sourceable precisely, lines that capture the intended differences in shape between hulls. They need not be perfect or incredibly detailed in this pass, but we should establish principles to move each ship towards a distinguishable and accurate-as-possible representation of their hulls." And: "You're right that the keel is probably unnecessary, as it won't be seen, but if we move towards more detailed viewers, careening, etc., then it may be necessary, so we should not rule it out. Overall, moving towards a better visible representation where possible, and not in every aspect, is also acceptable."
+
+**What this package draws.** What the viewer shows, at and above the water, and what heel lifts out of it:
+- the sheer (the gunwale, the rail along the top of the side) and its steps;
+- the stem, the head and the stern;
+- the wales, the breadth, the tumblehome or flare;
+- the bottom near the water.
+
+Each hull is to be distinguishable from the others and as near the sources as they allow. The keel and the body under the water are kept as data where sourced, and not drawn.
+
+**The principles** (for this package and later ones):
+1. **The aim.** Every hull is drawn as herself. Her lines come from the first of these that exists: her own lines; the lines of her type; period rules and the stated differences of her type. No two hulls draw alike unless they are one class in two roles (principle 10).
+2. **Visible first.** A line earns its place if it moves the owner's 960 × 720 picture by more than about 2 px.
+   - That picture is 9-35 px a metre across the ten files that exist, from the razee to the smack (measured in the session's scratch).
+   - In the page's panel, at the built-in 800 × 600 window, it is 3-9 px a metre. There a foot of tumblehome is about 1 px, so the finer lines are judged on the owner's sheets and in a large window (§19.1 item 19).
+3. **The ladder of evidence**, used from the top:
+   - **S:** her own lines, her class's or a sister's.
+   - **S†:** a period plan or table of her type, scaled (principle 7).
+   - **R:** a named period rule applied to her own particulars: for example Steel's rule for the heights of breadth (Steel 1805, OCR l. 15190-15194), or Chapman's for a merchant ship's greatest breadth (Chapman 1781, OCR l. 10096-10123).
+   - **T:** a judgement. Either a type judgement, naming the difference it carries and the hull it must differ from, or the design's default rule (§5.3), which is the design's own and is named as such.
+
+   A source on file but unread is no rung: the line is R or T, and its note says "to read: <source>".
+4. **Marked in the file.** Each line of the shape says where it came from, in one word: `sourced` (S), `stand-in` (S†), `rule` (R) or `judged` (T) (the `marks` key). A line takes the word of its weakest point, and its note names the source by page and where along the hull the weak points are.
+5. **Sourced points win.** A body plan, a bodies table's diagonals or waterlines by station are drawn as read, scaled by principle 7. The default rule fills only between and beyond them.
+6. **One reference.** Every point is measured as §5.1 has it, forward of midships and above her waterline, the keel and the underwater body too, so a later careening or close view needs nothing new.
+7. **Scaling a stand-in:**
+   - lengths by the ratio of the waterline lengths;
+   - the sections by one factor, the ratio of the beams, so that the stand-in's floor, tumblehome and flare keep their angles;
+   - the height of her side above the water from her own source for the port sills (§5.1), and the sheer's rise above it by the length ratio.
+
+   The depth so drawn is recorded beside her file's draught, never moved. Every factor goes in the note. The drawn hull is her file's length and beam, so her masts sit true on it.
+8. **The drawing never changes how a ship sails or fights.** Only the viewer, the module that computes the drawn hull (`freesail/ship/form.py`), the server that sends it to the viewer, the generator's checks and the tests read the shape (§5.6; the guard of §14.1).
+   - Nothing the physics, the guns or the lee ports read is taken from the drawing. Each gun port's position and height keep their own source; where the drawn side misses a port by more than 5 cm, that is checked or reported, and the port's figures are never changed to match the drawing.
+   - A difference between the drawing and the file is recorded, never moved: a stand-in's size or depth, or a drawn displacement more than 15% off the filed one.
+9. **Nothing invented.** Galleries, stern windows and figureheads are drawn:
+   - where a source shows them, at its positions; or
+   - where her type certainly carried them, placed by Steel's sheer-draught method (1805 pp. 250-251), marked `judged` and tagged on the owner's sheets.
+
+   They are plain shapes with no openings (ports are 81's). Carving and paint are recorded in words where sourced.
+10. **One class in two roles; no silent sharing.** Where one class of hull serves in two roles today, she is drawn as one hull, alike in the two files except where they specifically differ in details (the owner, 2026-10-28):
+    - the brig and the merchant brig: "Keep her like the brig, for the purposes of hulls that currently are shared between navy and merchant roles, we shall consider them one class in two purposes, so the hull may stay the same between the roles for current examples."
+    - the topsail schooner and the privateer schooner: "Alike for now, same reasoning as the brig, they are one class in two roles, so they would look alike except for where they specifically differ in details. In the future, for ships purpose-made to certain roles that we do not expect to be repurposed, they shall gain the hull that they are built to represent."
+
+    In the future, a ship purpose-made for a role she is not expected to leave takes the hull she was built to represent; the files of today are alike for now. Any two files that draw alike must stand in §5.6's list as one class in two roles, with the owner's reason; a measured check fails any other pair. The owner's eye has the last word.
+11. **Keep what is found.** The keel, the rising line and the body under the water are written wherever a source gives them, drawn or not.
+12. **A better source changes the drawing, never the game's behaviour.** When a source is read, its higher rung replaces the lower one in the file and the pictures, with the old figure recorded beside the new; no tested behaviour moves.
 
 ### 5.1 The form
 
@@ -557,6 +704,46 @@ hull:
 - **Plainly:** `breadth_m`, `decks_m` and the triples' half-breadth go beyond the brief's list.
   The drawing and the owner's lee-port rule need them; each is a few points.
 
+**The shape keys (stage 0H, §3.5): drawn only.** They are appended after `port_size_m` in `PROFILE_KEYS`, every one optional. `g.hull_profile` writes the point keys and `g.hull_form` writes `form` and `marks`; a module that gives none moves no byte.
+
+```yaml
+    head_m:          [[x, z], ...]                # the knee of the head's fore edge, from where it leaves the stem to its top
+    breadth_line_m:  [[x, z, hb], ...]            # the main breadth by station: Steel's upper height of breadth, main half-breadth
+    sections_m:      [[x, z, hb], ...]            # sourced section points: a body plan, a bodies table's diagonals, waterlines by station
+    channel_wales_m: [[x, z_lower, z_upper], ...]
+    floor_m:         [[x, z, hb], ...]            # reserved: the rising line, the floor's half-breadth (not drawn)
+    rabbet_m:        [[x, z, half_siding], ...]   # reserved: the keel's rabbet (not drawn)
+    form:
+      fullness: [run, entry]                      # the ends under water: 1 the default rule; above 1 fuller, below 1 finer
+      stern:
+        type: square                              # square | raked | round
+        knuckle_z_m: z                            # the transom's foot
+        transom_hb_m: [at the taffrail, at the knuckle]
+        round_up_m: r
+        galleries_m: [[x_aft, x_fore, z_low, z_high], ...]   # one per tier, drawn on both quarters
+        lights_m: [[z_low, z_high, n, hb], ...]              # n lights in a band across the stern's face, within ±hb
+      head: figure                                # none | knee | scroll | billet | figure
+    marks: {rail_m: stand-in, sections_m: stand-in, form.stern: stand-in, form.stern.galleries_m: judged, form.head: rule}
+```
+
+- **The stern.**
+  - `square` is a flat transom above the knuckle. `raked` is a transom along `stern_m`'s rake, with no counter. `round` has no transom, and `transom_hb_m` is refused with it.
+  - `knuckle_z_m` is the transom's foot. No fixed point of `stern_m` can stand for it: the working 64's runs fourteen points from the heel to the taffrail, so the shared draft's "second point from the top" (`ships-design/shared-design.md` §2) would miss it.
+  - The transom's half-breadths live here because `breadth_m` cannot hold a rail's breadth beyond the water's ends (its half-breadths are more than nothing).
+- **Galleries and lights** are given by position:
+  - a tier's extent fore and aft and its heights;
+  - a band's heights, its count, and the half-breadth the lights spread within across the stern's face, a transom's or a round stern's.
+
+  A source's positions are drawn as read. Where a source gives only a count, the builder places them by Steel's sheer-draught method (1805 pp. 250-251) and marks them `judged` (§5.0 principle 9).
+- **The head** is `head_m`, the knee of the head's fore edge from where it leaves the stem to its
+  top; `form.head` says what stands on it.
+  - `stem_m` stays the stem's fore edge, low to high, as the first form has it. Its top point is
+    the stem head, where §6 roots the bowsprit's heel.
+  - `rail_m` may end abaft the stem head, at a beakhead bulkhead, as a two-decker's forecastle
+    does.
+- **The midship section** is `section_m`. Where no source gives one, `g.midship_section` makes it (§5.3), marked `judged`.
+- **Plainly:** these go beyond the brief's "dozen sourced points" and this section's first form. They are put to the lead as the five extensions were (§19.2 item 13).
+
 ### 5.2 The schema's refusals (in words, stage 0)
 
 - A key not in `PROFILE_KEYS`, or a deck word not in `DECK_WORDS`.
@@ -572,6 +759,24 @@ hull:
 The equality of a port gun and its triple is a test (truth 7-185) and the generator's assertion,
 not a refusal: a hand-written file may carry guns between ports.
 
+**The shape keys' refusals (stage 0H), in words:**
+- x not increasing in `breadth_line_m`, `channel_wales_m`, `floor_m` or `rabbet_m`; z not
+  increasing in `head_m`.
+- In `sections_m`: x decreasing, z not rising within one station, or a station of one point.
+- A half-breadth or half-siding not positive.
+- In `form`:
+  - a sub-key other than `fullness`, `stern` and `head`, or a stern key other than its six;
+  - a stern type other than `square`, `raked` and `round`, or a head word other than `none`, `knee`, `scroll`, `billet` and `figure`;
+  - `fullness` that is not two positive numbers;
+  - `transom_hb_m` missing on a square or raked stern, or given on a round one;
+  - a `stern` given without `stern_m`;
+  - `knuckle_z_m` at or above the taffrail (`stern_m`'s top);
+  - a gallery tier that is not four numbers with its aft x below its fore x and its low z below its high z;
+  - a band of lights whose low z is not below its high z, whose count is not a whole number of one or more, or whose half-breadth is not positive.
+- In `marks`: a key that is not a line the profile gives, a `form.<group>` it gives or a `form.stern.<key>` it gives, or a word other than `sourced`, `stand-in`, `rule` and `judged`.
+
+That the drawn side passes within 0.05 m of a port triple is the generator's check and a test (§5.6), not a refusal. No triple is ever written from the drawing.
+
 ### 5.3 The generator
 
 - `g.hull_profile(rail, breadth, **parts)` returns the mapping; each ship function or module adds
@@ -584,6 +789,39 @@ not a refusal: a hand-written file may carry guns between ports.
   port's own x and sill (Indf §5.2).
 - **`PORT_SILL_M`** (:3615, judgement) then has no caller among the eight. It stays only if a
   new ship's builder uses it for a deck the sources leave open, and says so.
+
+**The shape (B8: SW-2b.1 the helpers, SW-2b.2 the eight files; each ship's builder for hers, through the helpers).**
+- **`g.hull_form(hull, notes, *, form, marks, measured=())`** takes the ship's hull mapping (her profile in it, her displacement and draught beside it) and her notes, and adds `form` and `marks` to the profile: metres to the centimetre, counts whole, words kept. It cannot go through `_centimetres`, which makes counts floats. `measured` names the port triples a new ship measured.
+  - It runs the schema's check and `form.check`.
+  - It writes into the notes the drawn displacement beside the filed one, and each port triple's gap to the drawn side at its sill.
+  - A gap over 0.05 m raises for a triple in `measured` and is reported for every other. No triple is written from the drawing (§5.0 principle 8).
+- **`g.midship_section(*, half_breadth, breadth_z, depth, deadrise_deg, bilge_m, tumblehome_m, rail_z)`** makes a section by Steel's sweeps, simplified (OCR l. 2862-2883, 11753-11785), for a hull with no measured one.
+- **`g.from_steel_table(rows, *, length_ratio, beam_ratio)`** turns a bodies table's rows and diagonals (`ships-design/pages-steel-1805-bodies.md` §3: the 36, the cutter, and the coasting sloop for the smack) into `breadth_line_m` and `sections_m`, marked `stand-in`.
+- **The dump** keeps `form`'s mappings as blocks and writes `sections_m` one station to a line.
+- **SW-2b.1** brings these and writes no file. It merges right after 0H, before B1's stage B (§2.6), since the ship builders never edit this file (§4.1).
+
+**The rule** (`freesail/ship/form.py`, stage 0H; pure; read by `/api/ship`, the generator and the tests, never by the physics or the lee port). `stations(spec)` works in seven steps:
+1. The stations are `breadth_m`'s, `sections_m`'s and `breadth_line_m`'s x's, with gaps kept under L/16.
+2. At each station, the rail point and the water point come from `breadth_m`. The main breadth comes from `breadth_line_m`. By default (`judged`) it follows Steel's rule for the heights of breadth (OCR l. 15190-15194): a few inches above the load line amidships, lifted toward the ends to about the hawse holes forward and a little above the wing transom aft.
+   - The lift is Steel's 36's, as a share of the rail's height above the water: about a quarter at the greatest section, 0.70 at the foremost station and 0.45 at the aftmost (measured in the session's scratch on `ships-design/pages-steel-1805-bodies.md` §3.1, §5.2).
+   - Its half-breadth is `section_m`'s greatest, its excess over the rail faded to nothing at the end stations.
+3. Under the water (the design's default, `judged`): `section_m`'s shape, scaled to the station's depth and to its half-breadth at the water, blended toward a straight V from the keel's edge by f^p. f is 0 within a quarter of the half-length each side of the greatest section and rises linearly to 1 at the waterline's ends; p is `fullness`.
+4. Above the water: `section_m`'s upper shape, fitted between the water, the breadth and the rail.
+5. `sections_m`'s points are passed through. The rule fills only beyond them, scaled to meet them.
+6. The ends close straight to `stem_m`'s fore edge. Aft, they close to the post below the knuckle and to `transom_hb_m` above it. A round stern closes to the centreline.
+7. Without `section_m`, the station is §6's three points.
+
+The module also gives:
+- `half_breadth_at(spec, x, z)`: the drawn side, read by the tests and the gap check;
+- `outline(spec, view)`;
+- `drawn_displacement_kg(spec)`;
+- `check(spec)`.
+
+**Measured** in the session's scratch. In the band that 15° of heel can lift out of the water, the rule is off by:
+- a mean of 0.12 m (max 0.37 m) on the 64 (Ind §2.3.2), and a mean of 0.12 m (max 0.34 m) on *Lynx* (`pages-chapelle-fig17.md` §5.2): waterlines it was not tuned on (`proposal/second_hull_check.py`);
+- a mean of 0.18 m (max 0.51 m) on Steel's 36, the hull it was tuned on (the judge's re-run).
+
+Over the whole body its mean error is 0.28-0.53 m, and its largest 0.81-1.68 m. That is enough for this pass, not for careening, so sourced points replace it wherever they exist.
 
 ### 5.4 The eight files' sources (SW-2; read by the shared draft unless marked)
 
@@ -648,15 +886,45 @@ frigate-36's convention, and both files and the tuning notes would say so.
 
 ### 5.6 Pins, tests, order
 
-- **Pins:** none. The heights are read only by the lee port (SW-5) and the profile only by the
-  viewer (B5). `tests/test_server.py:139-160` checks the graph's hull as a superset, so the added
-  key stands.
-- **Tests** (`tests/test_profiles.py`, B8): every file carries a profile whose rail stands above
-  its decks and sills; every port gun stands on a triple of its deck within 0.01 m and names it;
-  each existing file's sill in its source's band, the source in a comment
-  (`tests/test_ship_particulars.py:93-104`'s form).
-- **Order:** SW-2 after stage 0. B1 writes her two profiles from her first commit, through the
-  same helper.
+- **Pins:** none.
+  - The heights are read only by the lee port (SW-5), and the profile only by the viewer (B5), the generator's checks and the tests.
+  - The shape keys (stage 0H) are read only by the viewer, `freesail/ship/form.py`, `api/queries.py`, the generator and the tests. No port triple is written from the drawing (§5.0 principle 8).
+  - `tests/test_server.py`'s `test_ship_graph_shape` checks the graph's hull as a superset, so the added keys and `hull.stations` stand.
+- **Tests** (`tests/test_profiles.py`, B8):
+  - every file carries a profile whose rail stands above its decks and sills;
+  - every port gun stands on a triple of its deck within 0.01 m and names it;
+  - each existing file's sill is in its source's band, the source in a comment (`tests/test_ship_particulars.py:93-104`'s form).
+
+  From SW-2b.2:
+  - a mark on every shape line;
+  - each port triple's gap to the drawn side at its sill, reported for the eight and asserted within 0.05 m for a new ship's measured triple;
+  - the drawn displacement and depth beside the filed ones, reported;
+  - **the pair check:** every two files' outlines abeam, ahead and astern, normalised to one length, beam, freeboard and draught and drawn in a 100-px box, differ by 4 px or more (Hausdorff) in at least one view, or the pair stands in `SAME_HULL_BY_INTENT` as one class in two roles, with the owner's reason (§5.0 principle 10). It holds the brig with the merchant brig and the topsail schooner with the privateer schooner. Today every pair is 0 px apart. The 4 px is judgement, re-set after the owner's first sheet, old beside new.
+- **Order** (§2.6):
+  - B1 writes her two profiles from her first commit, through the same helper (stage A).
+  - After the lead's approval of the hull's design (§19.2 item 13): stage 0H (§3.5), then SW-2b.1's merge; then B1's shape keys with her stage B (Indf §3.5 item 8), drawn by B5.6. This is the pilot, held for the owner's first test.
+  - After the owner's test: SW-2 and SW-2b.2 as one step, so that the eight move in bytes once, with `section_m` where the pages notes give it (`pages-steel-1805-bodies.md` §5.4 for the frigate and the cutter; `pages-chapman-pl59.md` §4.7; `pages-chapelle-fig17.md` §5.6), before SW-5 L2.
+  - B2, B4 and B7 write their shape keys from their first commits.
+
+### 5.7 The shape, hull by hull
+
+Rungs as §5.0 gives them. "To read" means R or T until it is read. A stand-in keeps its angles; its drawn depth is recorded beside the file's draught (§5.0 principle 7).
+
+| Hull | Body and side | Stern and head | Next source |
+|---|---|---|---|
+| frigate-36 | S† Steel's 36 (bodies p. 9; the folios): the breadths, the main breadth, and the sections from the diagonals, scaled to *Amazon*; drawn about 5.4 m deep against her file's 4.6 m | square, two counters, 20 ft 9 in at the top-timber line (Folio LI) S†; one gallery tier T, placed by Steel's method; lights T, plain; figure, its reach R (Folio I less LI) | *Amazon*'s own lines (not reached); Steel's 38 (bodies p. 8) |
+| brig | S† the *Raven*'s contract (Steel 1805 pp. lix-lxv) at midships; `g.midship_section`, T (a man-of-war's sharper floor); along the length T (the default rule); drag T, inferred from *Harpy*'s as-built draughts (Winfield p. 256) | square, plain, 16 ft 9 in (p. lix) S†; scroll head (p. lxv) S†; no galleries or lights | Steel's sloop of 18 guns (bodies p. 15) |
+| merchant-brig | the brig's: one class in two roles (§5.0 principle 10; §19.1 item 14) | the brig's, except where they specifically differ in details | as the brig |
+| cutter | S† Steel's 273-ton cutter (bodies p. 18), sections from the diagonals, scaled to 85 tons; drawn about 2.1 m deep against her file's 2.6 m, with her file's 2 ft of drag | square counter, 10 ft 9 in (Folio LI) S†; no head | *Sherbourne*'s own draught |
+| lugger | S above the water (ZAZ6306: stepped rail, plan); under the water T (no body plan; Chapelle 1930's "great deadrise" of a French lugger, OCR l. 508) | round at the rail S; no counter, no head S | Chapelle 1930 fig. 1 (p. 7), *Le Coureur*'s lines (the vessel of ZAZ6170 by name and date, inference); ZAZ4734-4736 |
+| smack | S† Chapman Pl. LIX No. 3: the water, the main breadth and the rail by station, the midship section; under the water between, S† Steel's coasting sloop of 60 tons (bodies p. 27, read: `pages-steel-1805-bodies.md` §3.3, §5.4) through `g.from_steel_table`, the plate's section ruling at midships | raked, rounded, 0.78 m S†; no head | none named: both sources are read |
+| topsail-schooner | S† *Lynx* (Chapelle 1930 fig. 17): sections from the LWL, WL2, WL3, sill line and rail by station | raked about 45°, 2.25 m S†; small knee S† | Steel's schooner of 133 tons (p. 25) and *Flying Fish* (Chapelle pp. 48-49), as checks on the class |
+| privateer-schooner | the topsail schooner's: one class in two roles (§5.0 principle 10; §19.1 item 15) | as above, except where they specifically differ in details | as above |
+| the 64 | S: 17 stations; WL1-WL5 by station (Ind §2.3.2); the midship section; the channel wale; the main breadth to read (B1, stage B) | square, two gallery tiers at measured positions, transom to read (B1, stage B); the knee of the head in `head_m` S (1407F, at stage B); figure T | Steel's 64 Folio LI (cached) as a check |
+| razee | S: the 64's, +0.44 m; her decks and open waist (ZAZ2375); main and channel wales (ZAZ2371) | one gallery tier and a short roundhouse, to read and tentative (ZAZ2371 viewed at low resolution); the year, §19.1 item 18 | ZAZ2371 measured |
+| *Neufchatel* | S: three waterlines by station; the dead-flat section (Neuf §2.4) | square, about 17 ft S; knee to read, T meanwhile; counter, wale and transom face to read (B2) | ZAZ6177 |
+| bilander | S† Chapman No. 5's proportions; a trader's body R/T; Gwyn's raised quarterdeck S (Bil §2.3) | round, three windows on its face (Gwyn) S; figure with rails S | Steel's brig collier (p. 26) or brigantine (p. 16) |
+| the 74 | S: WL1-WL5 by station (Research-74 §3.2.3); the midship section (§3.2.4); main and channel wales | square; two gallery tiers, 8.5 ft abaft to 3.7 ft before AP at 14.5-17.7 and 21.7-24.6 ft above WL1 (§3.3) S; the stern face to read, T meanwhile; figure T | Steel's 74 Folio LI (cached); Lavery 1985 pp. 54-57 by page, if the owner photographs them (§19.1 item 17) |
 
 ## 6. The viewer draws the profile (B5)
 
@@ -665,16 +933,20 @@ frigate-36's convention, and both files and the tuning notes would say so.
 - `hullFigures(hull)` (:1416-1448) keeps today's lens for a graph with no profile, so a
   hand-written file and the tests' fixtures draw as now. With a profile it calls a new
   `profileHullFigures(hull)`:
-  - **stations:** the union of `rail_m`'s and `breadth_m`'s x's with a grid of sixteen between
-    the taffrail and the stem head; at each, the rail's z, the half-breadths at the rail and the
-    water, and the low edge at −0.8 m at 0.92 of the water's half-breadth (today's cut,
-    :1432-1433);
-  - **sides** (`part: side`, both): along the rail from the taffrail to the stem head, down the
-    stem to the cut, aft along the cut, up the stern to the taffrail;
+  - **stations:** the union of `rail_m`'s and `breadth_m`'s x's, with a grid of sixteen between the taffrail and the stem head. At each:
+    - the cut at −0.8 m at 0.92 of the water's half-breadth (today's cut, :1432-1433), the water and the rail;
+    - or, where the file gives `section_m`, its points scaled by the water's half-breadth there against midships (judgement), cut at −0.8 m.
+
+    From B5.6 the served `hull.stations` (§5.3's rule) take their place. This builder stays for a graph that serves none;
+  - **sides** (`part: side`, both): one polygon per pair of neighbouring stations on each side, from the low edge to the rail, with the seams not stroked.
+    - Aft, each closes to the stern.
+    - Forward, each closes along `stem_m` to its top, the stem head, then straight to `rail_m`'s foremost point where the rail ends abaft it (a beakhead bulkhead), so the bow never rakes aft. The knee of the head (`head_m`, 0H) is drawn by B5.6.
+    - One `part: outline` figure strokes the rail, the stem, the low edge and the stern (styled with a stroke and no fill).
+    - Strips fill the bow and stern views, which one polygon a side leaves about 40% unfilled dead ahead (measured in the session's scratch).
   - **decks** (`part: deck`): one polygon per deck of `decks_m`, at its own heights and extent,
     at 0.95 of the rail's half-breadth (judgement: inside the bulwark). The razee's open waist
     shows her gun deck below the gangways;
-  - **the transom** (`part: transom`): from the taffrail down to the counter's knuckle;
+  - **the transom** (`part: transom`): from the taffrail down to the counter's knuckle, at `form.stern.knuckle_z_m` where the file gives it. No fixed point of `stern_m` stands for the knuckle: the working 64's carries fourteen points. From B5.6 the transom is drawn by the stern's type (below);
   - **the wales** (`part: wale`): a band on each side, its y between the water's and the rail's
     half-breadths by height, sorted a hair nearer than its side (`DEPTH_TIE`, :1529);
   - **port bands** (`part: band`, optional): each deck's strake from the sill up the port's
@@ -689,16 +961,36 @@ frigate-36's convention, and both files and the tuning notes would say so.
   physics changes.
 - **The lifts of every yard** (proposed after the owner's question, 2026-10-28; Decisions, "The
   design's questions"): each `lift` line the files already carry is drawn faint from its yard's
-  arm to the masthead above, at the braces' opacity, in the same step as the profile, since the
-  profile changes every picture anyway. This replaces Ext §6.1's lifts on a lateen yard alone.
+  arm to the masthead above, at the braces' opacity, in the same step as the profile. Under
+  §2.6 they are the only change B5.1 makes to the eight's pictures. This replaces Ext §6.1's lifts on a lateen yard alone.
   The pictures' figures are measured with the lifts and without, old beside new.
 
 **The rendering:** `client/shipview.js:58-60` draws each hull figure with the class
-`"hull " + part`; `client/style.css` (:155-158) gains `.hull.wale` and `.hull.band` (an SVG
-polygon with no rule fills black).
+`"hull " + part`; `client/style.css` (:155-158) gains `.hull.outline` (a stroke, no fill), `.hull.wale` and
+`.hull.band` (an SVG polygon with no rule fills black), and the side strips a rule with no stroke,
+so that their seams do not show; `.hull.transom` is already there.
 
 **Then** Ext §6, after each B3 step: the mizen yard and course; the yards under the bowsprit;
 the settee; the settee's sheet to the profile's taffrail.
+
+**The form's drawing (B5.6; §5.0's principles).** Built for every file after stage 0H, and drawn first on the *Indefatigable*'s two files once her shape keys are in (the pilot, §2.6); the eight's after SW-2b.2. `hullFigures` draws the served `hull.stations` where the graph has them:
+- **the stern by `form.stern.type`:**
+  - `square`: a transom from the knuckle to the taffrail at `transom_hb_m`, rounded up by `round_up_m`;
+  - `raked`: the same along `stern_m`'s rake;
+  - `round`: no transom; the strips close to the centreline;
+- **`part: gallery`:** a plain box on each quarter for each tier of `galleries_m`, at its extent and heights;
+- **`part: light`:** plain dark marks for each band of `lights_m`, spread within its half-breadth across the transom or across the drawn face of a round stern. There is no opening, port or lid (81's);
+- **`part: head`:** the plate on the centreline between `head_m` and the stem, with a plain shape at its top for `figure`, `scroll` or `billet`;
+- **`channel_wales_m`:** drawn as the main wale is;
+- **the decks:** at 0.95 of the drawn side's half-breadth at their height;
+- **the drawn depth:** the strips go down to D(x) = max(0.8 m, the water's half-breadth × tan 20°), no deeper than the keel.
+  - `UNDERWATER_HEEL_DEG = 20` (judgement) is named at the top of `projection.js`.
+  - So no cut edge rises out of the water below 20° of heel. Today's flat cut does at 8.5° on the frigate (measured in the session's scratch);
+- **the hull below the waterline** drawn in the way the owner chooses on the sheets (§19.1 item 16: hidden by the sea, proposed; faintly visible; or a solid band as today);
+- **a close-up of the hull,** only if the owner asks for it on the first sheet (§19.1 item 19);
+- **styles:** `.hull.gallery`, `.light`, `.head` and the channel wale in `client/style.css` (`.hull.outline` from B5.1; `.hull.transom` is already there).
+
+Galleries and lights follow §5.0 principle 9.
 
 **Tests** (`tests/test_view_geometry.py`, Node): the side's top through every `rail_m` point
 within a millimetre; the transom's top at the taffrail; each deck at its points; a lower mast's
@@ -707,15 +999,37 @@ unmoved; a graph with no profile drawing today's figures point for point; every 
 closed side with no NaN. Standing: the fixed frame across states (:181-203, :620-658), the
 cutter's hull ends (:445-478), a yard at its hoist (:630), the lowered lug (:778-781).
 
+From B5.1:
+- at facings 0° and 180°, every station's outline lies inside the hull's figures (no hollow), and the widest point is the greatest half-breadth within 1 cm;
+- no side figure stands forward of the head rule's closure above the water.
+
+From B5.6:
+- the strips lie on the served stations within 1 mm;
+- the transom's top is at the taffrail and at `transom_hb_m`, and a round stern has no transom;
+- each gallery and band of lights lies at its `galleries_m` and `lights_m` within 1 cm;
+- the head lies on `head_m`;
+- nothing is drawn below the drawn depth;
+- a lower mast's foot against the near bulwark is sorted in front of it;
+- the head and the galleries stay inside the fixed frame across states.
+
 **The pictures** (`tests/test_pictures.py:57-59`: `BLANK_STD` 8.0, `DARK_LEVEL` 110,
 `DARK_FRACTION` 0.001): a taller hull adds dark pixels (the side #4a3d31, mean 61), so none is
 expected to move. B5 measures the frigate's picture before and after with
 `FREESAIL_KEEP_PICTURES` (:186-189) and records the standard deviation and the dark fraction old
 beside new. A threshold is re-pinned only if one fails, old beside new.
 
-**Screenshots** for the owner: all eight ships and the two new files, abeam to leeward, on the
-quarter and ahead, furled and under plain sail, at 800 × 600 in the built-in pane, beside the
-same views at this head; the razee and the 64 under D18 (a) and (c).
+**Screenshots** for the owner: all eight ships and the two new files, beside the same views at this head; the razee and the 64 under D18 (a) and (c).
+- Views: abeam to leeward, on the quarter, ahead **and astern** (the owner names the stern view).
+- Furled and under plain sail, at 800 × 600 in the built-in pane.
+
+**The owner's sheets** (the pilot's two files first: a first sheet at B5.1 with D18, the rest at B5.6 (§2.6); every file when SW-2b.2 lands; and again as each ship lands):
+- every file with a profile, the hull alone, at 960 × 720 (`FreeSailApp.picture` in `client/app.js`, or the same drawing rendered headless outside the repository);
+- five views: abeam, ahead, astern, on the quarter at 135°, and heeled 10° seen from windward;
+- each hull twice: at one common scale, and normalised to one length, beam and freeboard so that only the lines differ;
+- the page's panel at 800 × 600 beside one view of each hull, so that the owner sees what shows in play;
+- each hull's rung letters under it;
+- today's shared shape beside the eight;
+- D18 (a) and (c) on the first sheet; the three ways of drawing the hull below the water (§19.1 item 16) at B5.6.
 
 ## 7. The lee ports (B8: L1 = SW-2, then L2 and L3)
 
@@ -1094,7 +1408,16 @@ yard; truths 7-197 to 7-199 reserved; her place last.
 ### 14.1 Each builder's tests (in its own new files)
 
 - **Stage 0:** `tests/test_profile.py`, `tests/test_rig_classing.py` (§3.1); 0E's fixtures and
-  guards (§3.2).
+  guards (§3.2); 0H's `tests/test_hull_form.py` (§3.5):
+  - the shape keys' refusals in words;
+  - the drawn side through every given point within 1 mm, and the ends closed;
+  - a profile without `section_m` or shape keys drawn as §6's three points at each station;
+  - a `HullProfile` without them pickled as before 0H;
+  - the guard: no module outside `schema.py`, `ship/form.py`, `api/queries.py` and the tools reads a `HullProfile`'s shape fields (an attribute read off a profile, since `form` and `marks` are common names elsewhere);
+  - the rule against measured lines, typed from the notes with the source in a comment: Steel's
+    36 (`pages-steel-1805-bodies.md` §3.1), the widest point within 0.20 m and the band 15° of
+    heel lifts out within a mean of 0.25 m; the 64 (Ind §2.3.2) and *Lynx*
+    (`pages-chapelle-fig17.md` §5.2), the band within a mean of 0.20 m.
 - **B1** (`tests/test_indefatigable.py`), in the band form with the source in a comment
   (`tests/test_ship_particulars.py:93-104`): her hulls, profiles and sills against the measured
   lines; her spars against Steel p. 49; her sails against table IV (±10%); her guns, fits, crews,
@@ -1104,8 +1427,10 @@ yard; truths 7-197 to 7-199 reserved; her place last.
   descriptions and size ranks; her polars in `tests/test_ships.py:74-93`'s form with her own beam
   reaches; the round trip under rules captains at seed 7 with no named fit (Indf §14).
 - **B2, B7, B4:** the same kinds, on their designs.
-- **B3:** `tests/test_lateen.py`, `test_bowsprit_yards.py`, `test_settee.py` (Ext §10.2).
-- **B5:** the new `tests/test_view_geometry.py` cases (§6; Ext §6.5).
+- **B3:** `tests/test_lateen.py`, `test_bowsprit_yards.py`, `test_settee.py` (Ext §10.2);
+  `tests/test_driver.py` at B3.5 (Ext §17.7; truth 7-230).
+- **B5:** the new `tests/test_view_geometry.py` cases (§6; Ext §6.5): the strips' and the head
+  rule's from B5.1, and the form's from B5.6.
 - **B6:** `tests/test_scenarios_75.py`: each new scenario loads, round-trips and sails its first
   hour; the 64 sails the razee's scenario by the command line (D48(a)) under the way the lead
   chooses.
@@ -1113,7 +1438,9 @@ yard; truths 7-197 to 7-199 reserved; her place last.
   `tests/test_lee_ports.py` (the rule at each file's shut heel, the reopening margin, a shut gun
   neither run out nor fired, the log once a change, an old `Battery` with no `_shut`, no sea no
   roll); `tests/test_subtypes.py` (every description's fit a fit of its file, its roles in
-  `ROLES`, a far ship's `role:` refused outside them, the unarmed defaults, the arc from the rig).
+  `ROLES`, a far ship's `role:` refused outside them, the unarmed defaults, the arc from the rig);
+  from SW-2b.2, in `tests/test_profiles.py`, a mark on every shape line, the pair check, and the
+  triple gaps, drawn depth and drawn displacement reported (§5.6).
 
 ### 14.2 The guard set every step runs
 
@@ -1153,6 +1480,7 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | **7-197** | the bilander's particulars hold their sources, and by the wind she lies as close as a brig | her design; her polar's `closest_deg` and `beat_deg(15)` no wider than the brig's 50° and 60° (rule 1: Ext §5.9) | B4 | the brief item 6; D46 rule 1 |
 | **7-198** | the settee in stays is kept drawing, its ourse to leeward, and dipped last | Ext §10.3 item 1 (D46 rules 2 and 3), and rule 5's case if Ext §5.10's measure holds (else that half goes to the lead) | B4, on B3.3 | D3(b), D46 |
 | **7-199** | in wearing the settee is lowered as she bears up and hoisted on the new lee once the stern is past the wind | Ext §10.3 item 2 (D46 rule 4) | B4, on B3.3 | D46 |
+| **7-230** | the driver, filed as the frigate's spanker, is the spanker to the physics, and the shift of the mizen for the driver takes about thirteen minutes | row 3′'s equality (Ext §17.5); the shift's phases and ticks in a band | B3 at B3.5, in `tests/test_driver.py` | the lead's allotment (the lead's notes of 2026-10-29, at ea5ad59 on the lead's branch, brought in at the next merge) |
 
 **Not truths, said:**
 - **Each scenario's round trip** (the shared draft's 7-188; Indf's truth 5): B6's tests. The
@@ -1172,12 +1500,15 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | Stage 0, 0E, 0b-0d | nothing | the byte test, the guards, the fast tier |
 | B1, B2, B7, B4 | nothing of the existing ships; their own files only | — |
 | B7 | `tests/test_ships.py:99` and `:188`, `tests/test_world_orders.py:98`: "a ship of the line" names her description | old beside new, the reason |
-| B1 stage B | the 64's own figures (her polar, her balance: the mizen course's offset from 0.8√A in place of the stand-in's 11.1-m head) | old beside new in her notes |
-| B3.1-B3.3 | none expected: every change is keyed on something no existing file carries (Ext §11) | the guards; the trace |
+| B1 stage B | the 64's own figures (her polar, her balance: the mizen course's offset from 0.8√A in place of the stand-in's 11.1-m head; the driver); both files' bytes for the hull's shape keys and marks (no behaviour, no port triple) | old beside new in her notes |
+| B3.1-B3.3, B3.5 | none expected: every change is keyed on something no existing file carries (Ext §11) | the guards; the trace |
 | B3, B5 (conditional) | `tests/test_sails.py:65-74` (B3's), only if rule 5 fails and a settee row is added (D44(c)); `tests/test_view_geometry.py:572-602` (B5's), only if the new files join its list and the sprit topsail's trapezoid falls short | old beside new, bisected; never a sail left out of the test |
 | B5 | the drawing; the pictures' standard deviation and dark fraction (thresholds expected to stand) | old beside new in the notes; screenshots |
+| 0H | nothing: no file carries a shape key; the served graph gains `hull.stations`, which nothing draws until B5.6 | the byte test, the guard, the fast tier |
+| SW-2b.1 | nothing: helpers only, no file written | the byte test |
+| SW-2 with SW-2b.2 | the eight files' bytes (profile, heights, `deck`, the shape keys and marks); no behaviour; the eight's pictures (B5 measures them) | the suite unmoved; old beside new |
+| B5.6 | the drawing; the pictures' standard deviation and dark fraction (thresholds expected to stand) | old beside new in the notes; the owner's sheets |
 | SW-1 | the `charges` and perhaps `powder_barrels` of the frigate, the brig, the cutter's "long guns" and the privateer's two fits (bytes); `tests/test_magazine.py:59` (`("carronade", 32, 2.6875, 160)` → `2.625`, 159) and `:61` (`("swivel", 0.5, 0.25, 124)` → `0.125`, 122): `fill_seconds` gives 159.4 and 121.9 against the test's ±0.5 (the shared draft, measured); 86's 7-161 to 7-171 where they pin powder, barrels or filling times (measured) | old beside new, on the one commit |
-| SW-2 | the eight files' bytes (profile, heights, `deck`); no behaviour | the suite unmoved |
 | SW-4 | the privateer's arc, if it moves from [60, 140]: `tests/test_pivot_gun.py:184` and her pivot's pins; quarters beaten in an unarmed schooner, lugger or smack (measured); §8.4 only if ruled in: far and crewed merchant brigs, `tests/test_ships.py:103` | old beside new, bisected on the commit |
 | SW-5 L2 | actions heeled past their new shut heels (the privateer's 11.6°, the brig's 12.3-16.4°) | old beside new, the reason, the bisection of §7.3 |
 | SW-5 L3 | actions in a sea, on the player's ship | the bisection L2 → L3 |
@@ -1198,6 +1529,7 @@ existing file changes in this package.
 | Recorded replays across SW-1, L2, L3 | the replay truths (7-170, 7-171, 7-183) re-run at each of those commits; any move shown old beside new |
 | The kept saves (`tests/fixtures/saves/`) | loaded by the fast tier at every step |
 | 84's later steps merged under the package | the fresh merge before each stage; new code reads only the names the Hull keeps; `World.__setstate__` (`core/world.py:861-`) is 84's |
+| A `HullProfile` pickled before stage 0H | the eight shape fields are plain class defaults, left out of the pickle while empty (`HullProfile.__getstate__`, 0H), so a profile without them pickles as before and an old one reads the defaults |
 
 ### 16.3 Pace
 
@@ -1245,6 +1577,14 @@ Each builder's branch is reviewed as soon as it is done, then fixed (plan Phase 
   silently (map-engine §10).
 - **The privateer schooner's wardroom file** (§9.5); **HMS *Dolphin*'s arc** (§9.2).
 - **The French 74, the Bermuda sloop, the boats as files:** later, by the brief and the owner.
+- **The keel and the body below the drawn depth, drawn:** for careening and heaving down, which the model "should not preclude" (`docs/DesignProposal.md` l. 517), or for a close view. Kept as data where sourced (`keel_m`, `sections_m`, the reserved `floor_m` and `rabbet_m`), not drawn (§5.0 principle 11).
+- **Carving, head rails, catheads, channels, window detail, paint and bands:** a later pass. Recorded in words where sourced: Gwyn's blue stern with a red band (Bil §2.3); the privateers' colours (Chapelle 1930 p. 170).
+- **A raised camera, a zoom:** later. A hull close-up only if the owner asks for it (§19.1 item 19).
+- **The sheets, braces, stays' feet and bowlines re-rooted on the drawn rail:** later, unless B5.6 finds it cheap.
+- **The lugger's lines under the water:** Chapelle 1930 fig. 1 (p. 7), *Le Coureur*, to be read on the page image.
+- **Steel 1805's unread bodies tables:** the 74 p. 4, the 64 p. 5, the sloop of 18 guns p. 15, the brigantine p. 16, the merchant ship of 329 tons p. 24, the packet and schooner p. 25, the brig collier p. 26. Their OCR (l. 26683-28423) is garbled, so they are to be read on the page images.
+
+These would raise `rule` and `judged` lines in a later pass. Nothing waits on them.
 
 ## 19. Open
 
@@ -1255,7 +1595,8 @@ Each builder's branch is reviewed as soon as it is done, then fixed (plan Phase 
 as proposed, except the lifts, now drawn on every yard (§6). Item 10: the six-inch margin. Item
 11: fetched and read (below). Item 13: carried (below). Still open: 1, 2, 9, the weather side
 of 10, and 12. Item 13's second question, which sail, is answered: Steel's driver boomsail for
-both (below, Ext §17).
+both (below, Ext §17). *The hull (2026-10-28):* items 14, 15, 17 and 20 answered; 18 taken
+from item 3; 16 and 19 open, for the owner to decide on the sheets (below).
 
 1. **D18:** (a) proposed for every file (§5.5); the razee's gun deck at 1.39 m, or (c) her old
    upper deck at 3.66 m; decided on B5's screenshots.
@@ -1301,8 +1642,17 @@ both (below, Ext §17).
     so the course would be unbent while the driver is bent, against "The mizen course itself
     stays her after sail" above (Ext §17.3). Which sail each ship carries was put to the owner.
     *Answered (the owner, 2026-10-28):* Steel's driver boomsail for both, as proposed, chosen with
-    the two sails drawn side by side. Nothing of the addendum is built until the lead has read it
-    (Ext §17.8, §17.9 item 1).
+    the two sails drawn side by side. *Approved by the lead (the lead's notes of 2026-10-29, at ea5ad59 on the lead's branch, brought in at the next merge), truth 7-230
+    allotted.*
+14. **The merchant brig's hull.** *Answered (the owner, 2026-10-28):* "Keep her like the brig, for the purposes of hulls that currently are shared between navy and merchant roles, we shall consider them one class in two purposes, so the hull may stay the same between the roles for current examples." She is drawn as the brig (§5.0 principle 10).
+15. **The two schooners.** *Answered (the owner, 2026-10-28):* "Alike for now, same reasoning as the brig, they are one class in two roles, so they would look alike except for where they specifically differ in details. In the future, for ships purpose-made to certain roles that we do not expect to be repurposed, they shall gain the hull that they are built to represent." Both are drawn as *Lynx*, alike except where they specifically differ in details (§5.0 principle 10).
+16. **Below the waterline.** Proposed: hidden by the sea, as in life, so that only what heel lifts out shows. Or faintly visible, or a solid band as today. All three are shown on the sheets.
+17. **Stern windows, quarter galleries and figureheads.** *Answered (the owner, 2026-10-28): plain shapes, as proposed.* Drawn as plain shapes where a source shows them, or where her type certainly had them; nothing invented. Carving and paint come later. If the owner photographs Lavery 1985 pp. 54-57 (the decoration drawings), the 74's stern and head can be drawn from her class's own drawings.
+18. **The razee's stern.** Proposed: as in 1796, with the roundhouse as shortened by the Navy Board's warrant of December 1794 (ZAZ2371's note, read, tentative: Ind's table V10), to match her default fit "as carried 1796" (item 3). **Plainly:** not answered as a question of its own; taken from item 3 unless the owner says otherwise. Her one tier of gallery windows is a tentative reading, to be checked. The alternative is the stern as reduced by April 1797.
+19. **A close-up of the hull.** In the page's panel at the built-in 800 × 600 window a metre is 3-9 px, so a foot of tumblehome is about 1 px. Proposed: decide on the first sheet. If the differences are lost in the panel, a hull close-up is added to B5.6.
+20. **The scope of the hull's drawing.** *Answered (the owner, 2026-10-28): as proposed* (§5.0, §5.7, §6): every hull, with her sheer, sections, stern by type, head and wales, and galleries and lights as plain shapes, in B5.1 and B5.6, first on the *Indefatigable* (§2.6).
+
+Items 16 and 19 stay open until the owner decides them on the sheets.
 
 ### 19.2 For the lead
 
@@ -1325,7 +1675,8 @@ both (below, Ext §17).
 7. **D10(a)'s key** for the *Neufchatel* built by B3 as a fourth step (§13.1).
 8. **The order of the ships** after the *Indefatigable* (§2.3), and whether the lead merges
    the package's branch after each ship or once at the end (the road works either way: no description
-   row dangles, and each window closes with a merge).
+   row dangles, and each window closes with a merge). *Ruled (the lead, 2026-10-28):* the order
+   as §2.3 has it; the lead merges after each ship, and the window closes with the merge.
 9. **The names:** `sixty-four.yaml`, `razee-44.yaml`, `hermaphrodite-brig.yaml`,
    `seventy-four.yaml`, `bilander.yaml`; the modules; the fits "ardent class 1784", "ardent class
    1794", "as razeed 1795", "as carried 1796"; the description keys.
@@ -1336,6 +1687,27 @@ both (below, Ext §17).
     §2.1 settles it before stage 0.
 12. **The frigate's draught** (15 ft against Steel's 17 ft 10 in) and the frigate-36's trimmers,
     which spend her marines at the guns (Indf §18 item 13): recorded for the frigate's own file.
+13. **For your approval: the hull's principles and design, and the order of §2.6.** The owner asked that this be put to you, and that nothing past B1's stage A start before your approval.
+    - The owner's end goal and the twelve principles (§5.0), and the plan hull by hull (§5.7).
+    - The design: the shape keys and the computed stations on `/api/ship` (§3.5, §5.1-§5.3, §6). They go beyond the brief's "a dozen sourced points" (M7 l. 1655) and §5.1's first form, so they are put plainly, as the five extensions were.
+    - The order of §2.6, by the owner's direction: the *Indefatigable* built whole, with the hull's form built and drawn first on her two files, and held for the owner's first test before any other ship or the eight's hulls.
+    - The lens: drawing only (the guard test; no port triple is written from the drawing, and the lee port reads only stored triples); no file moving at 0H (the two-way byte test); checkpoints (`HullProfile.__getstate__`); nothing under `physics/`.
+    - By the owner's direction everything past B1's stage A waits for your approval. As a dependency of the work itself, only 0H, SW-2b, B5.6 and the ships' shape keys need it.
+14. **Stage 0H** (§3.5): its four items. Its place: after B1's stage A and your approval, then SW-2b.1's merge, before B1's stage B (§2.6), so that she can write `form` and `marks` through B8's helper.
+15. **`form.py` and `profile.py` pass to B8 after 0H.** `profile.py` has had no owner after stage 0.
+16. **The eight files move in bytes once.** SW-2 waits for the owner's test of the pilot and is taken with SW-2b.2 as one step, before SW-5 L2 (§2.2). Port-triple gaps over 0.05 m are reported before L2, so no lee-port pin moves twice.
+17. **B5's wider step.** The strips and the head rule at B5.1; B5.6 for the form, first on the pilot's two files; the hull below the water drawn as the owner chooses (§19.1 item 16); the astern view and the owner's sheets; a hull close-up if the owner asks (§19.1 item 19).
+18. **The drawing may depart from the file's figures, recorded and never moved** (§5.0 principles 7-8). Cases:
+    - the stand-ins scaled, their angles kept and their drawn depth recorded (the frigate about 5.4 m against 4.6 m; the cutter about 2.1 m against 2.6 m);
+    - the drawn displacement reported.
+19. **Package 81's boundary.** Package 75 draws no port, lid or opening, and its stern lights are plain marks.
+    - 81 draws the ports from the triples and `port_size_m` (§5.1); the drawn side passes within 0.05 m of every new ship's measured triple, and the eight's gaps are reported. Reading `form.half_breadth_at` instead would change §5.1's contract, for 81's design to put to the lead.
+    - Proposed reading: "package 81's hull work" (M7 l. 1843) means the ports, the guns, the flash and the smoke, as the owner reads it (Decisions, "Beyond the brief" item 1).
+    - Also, from the session: the brief's line "the viewer itself stays at the current standard in this package" (M7 l. 1658), for the lead to amend.
+20. **Beside the pilot, your word.**
+    - SW-1 (Table No. 29) and SW-4 (the sub-types and fits) change no hull. They may run beside the pilot or wait for the owner's test.
+    - B1 is reported done when she is whole (§2.6 step 7), and merged as each ship is; no later ship's window opens before the owner's test. SW-4's rows in `world/ships.py` wait for her window to close (§4.2).
+21. **Found on the way, not this package's.** `combat/far.py:111` reads `spec.hull.length_m`, which `HullSpec` does not have (it has `length_waterline_m`, `freesail/ship/schema.py:417`). So every far ship's length is 0.0, and `combat/shot.py:167` floors her size at its least, 0.5, whatever her length. Correcting it moves the far fight's pins, so it is for the far fight's own package or a later one.
 
 ## 20. What this document changed in the two designs
 
@@ -1349,6 +1721,8 @@ The smallest edits that make each agree with a settlement above. Nothing else wa
 2. §9.1, B3.1: "the thirteen `curve_class` lookups" becomes the nine in its own files; §13 risk
    4's mitigation says the same.
 3. §10.3: the candidates' numbers (7-198, 7-199, rule 1 in 7-197, the 64's in 7-189).
+4. §9.1, §17.2, §17.7, §17.8 and §17.9: the addendum approved and 7-230 allotted (the lead,
+   2026-10-29); the driver taken at the 64's stage B, which waits for B3.5 and its drawing (§2.6).
 
 **`Design-Ship-Indefatigable.md`:**
 1. §1.2 and §12.1 item 1: `SHIP_MODULES` names the four modules from stage 0, each a stub.
@@ -1368,6 +1742,9 @@ The smallest edits that make each agree with a settlement above. Nothing else wa
 9. §12.2: Ext's answers to items 3, 5, 8 and 9.
 10. §14: the truths' numbers (7-186 to 7-189; her truth 4 a clause of 7-187; her truth 5 a test of
     B6's).
+11. §3.5: item 8, the hull's shape at stage B (§5.0, §5.7; stage 0H), the port triples kept on their own sources.
+12. §3.5 item 9 and §12.3: the strips and the head rule after stage A, on `stem_m` ending at the stem head; the knee of the head in `head_m`; the shape keys drawn by B5.6 at stage B.
+13. §13: step 7 gains `DRIVER` and the shape keys in "What", the triple gaps in "Proves", and B3.5, the lead's approval, 0H and SW-2b.1 in "Waits on"; a step 8, the hold for the owner's first test (§2.6).
 
 **The adversarial check's edits** (by an agent that wrote none of the three, against the code
 at 6b94731 and the notes; the smallest that make each agree):
