@@ -12165,6 +12165,46 @@ beyond are far).
   emperor Claudius as 'Claude', Fort Opus, Spanish 'llama', the long s as 'fable', Gemini):
   kept verbatim, as the research pass's report says.
 
+### The region `mediterranean-west` (the Alboran sea, Málaga to Cartagena, Barbary to Oran)
+
+35.0 to 40.5 N and 5.0 W to 0.05 E (the north bound kept at 40.5 N: the ruling allowed
+40.13 N where no mark lies above, and the tiles are the same either way, the row from 40.13
+to 40.56 N meeting both; kept as the brief has it). **Its seams**: at 5 W with `strait`
+(the column from 5.07 to 4.64 W, 35.44 to 36.72 N, three tiles, the Strait's: "3 kept"); at
+0.05 E with `balearics` (the column from 0.37 W to 0.05 E, fourteen tiles, this region's,
+built first). 165 level-2 tiles of 24.0 MB, the patches of Málaga (12 tiles), Almería (6),
+Cartagena (6) and Oran with Mers-el-Kebir (6), 2.1 MB, the coast 0.39 MB: **26.5 MB**. 95
+marks (Spain from Marbella to Cape Palos and Isla Grosa, the Sierra's marks and Sierra
+Nevada's peak, Alboran, the Barbary coast from Cala Iris to Arzew); the gauges of Málaga,
+Motril, Almería and Melilla held; the stream areas of Cape Palos, the coast of Granada, the
+Barbary shore inshore from Oran, the Alboran sea and the block's open sea; four port files
+(Málaga, Almería, Cartagena, Oran).
+
+### The region `balearics` (the Balearics, Barbary from Mostaganem to Algiers)
+
+35.0 to 40.5 N and 0.05 E to 4.5 E. **Its seams**: at 0.05 E with `mediterranean-west`
+(the column from 0.37 W to 0.05 E, fourteen tiles, that region's: "14 kept"); at **40.56 N
+with 79d's `gulf-of-lion`**, by the lead's ruling of 2026-10-29: this region's tiles end
+at the row edge 40.56 N, and 79d moves the Gulf's south bound to 40.56 N and fills the strip
+of open sea that no tile answered, so the Gulf begins there west of 7.73 E; 79d's west bound
+at 3 E lies inside this region's 4.5 E, the open water between either's by the seam rule;
+nothing of this region's changes. 154 level-2 tiles of 28.8 MB, the patches of Palma (9),
+Port Mahon (3), Ivica (6) and Algiers (6), 1.7 MB, the coast 0.33 MB: **30.9 MB**. 87
+marks (Ivica, the Freus and Formentera, Majorca with Cabrera, Minorca with Port Mahon placed
+by hand, the Barbary coast from Mostaganem to Cape Matifu); the gauges of Ibiza, Formentera,
+Palma, Alcudia and Mahón held; the Balearic channels' area and the Barbary shore to Algiers;
+four port files (Palma, Ivica, Port Mahon, Algiers).
+
+**The order of the work against the ruling.** The ruling (read from the lead's branch when
+it landed) asked each region built, checked and committed in turn, its count and bytes
+reported before its commit. Both regions were built in turn (`mediterranean-west`, then
+`balearics` against its manifest), each one's checks printed and passing, and their counts
+and bytes are in the notes above and in "Steps 1 to 3 as ruled"; but they went into **one**
+commit (`5513042`) with the marks, not two. The history is not rewritten (no rebase); said
+here. **`skip_dry_tiles`** is a key the builder has had since package 39d (Portugal's
+inland tiles); it is not taken here, as the ruling has it: the Alboran's inland tiles east
+of 1 W (63 of the old count, 6.8 MB) are a later tidy for the lead.
+
 ### Step 9: the director's reach and the truth over the hulls
 
 Built on step 8 as merged, the lead's head `76eb22c` brought in at the boundary (the design
