@@ -486,15 +486,18 @@ def _rebind(world: World, _seen: set[int] | None = None) -> None:
         lineage.append(here)
     world.played_under = lineage
     chart_name = getattr(world.scenario, "chart", None) or world.scenario.region
-    if chart_name:
+    is_world = isinstance(world, World)
+    if chart_name and is_world:
         from freesail.world.chart import load_chart
 
         world.chart = load_chart(chart_name)
-        if world.lookout is not None:
-            world.lookout.chart = world.chart
         if world.systems is not None:
             world.systems.coast = world._coast_of_plane
             world.systems.coast_trend = world._coast_trend_of_plane
+    if chart_name and world.lookout is not None:
+        # a hull's lookout reads the shared chart (package 84, step 6: a hull is rebound
+        # as a World was, its chart and systems the World's)
+        world.lookout.chart = world.chart
     ship = world.ship
     if getattr(ship, "extra", None) is not None and "evolutions" in ship.extra:
         from freesail.api.session import rebind_hooks

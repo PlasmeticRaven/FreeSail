@@ -52,6 +52,8 @@ from __future__ import annotations
 import functools
 import math
 import random
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -508,6 +510,8 @@ class Vessel:
     # gives at her making (a leg across the land, a plan that cannot be laid).
     intent_words: str = ""
     brain: Any = None
+    # her hull (package 84, step 6): the `Hull` of the one World that keeps her whole,
+    # awake or asleep, None for a ship with none; `crew` is the field's old name
     crew: Any = None
     dealing_tick: int = -1
     warning: str = ""
@@ -545,6 +549,15 @@ class Vessel:
     regime: str = ""
     sortie: str = ""
     commission_tick: int = -1
+
+    @property
+    def hull(self) -> Any:
+        """Her `Hull` (the design's name; `crew` the field's)."""
+        return self.crew
+
+    @hull.setter
+    def hull(self, value: Any) -> None:
+        self.crew = value
 
     @property
     def height_m(self) -> float:
@@ -1029,6 +1042,23 @@ class Vessel:
 # ---------------------------------------------------------------------------
 
 
+@contextmanager
+def players_current(world: Any) -> Iterator[Any]:
+    """The block reads the player's ship: given a World or a hull, the followed hull is made
+    current for it and the World yielded, so that her per-ship names (`ship`, `position`,
+    `dealings`, `readings`) and the properties of her per-ship objects are hers whichever
+    hull was current (package 84, step 6); what was given is yielded as it is when she is
+    current already, on the endless plane and in an old shape."""
+    base = world.__dict__.get("world", world) if hasattr(world, "__dict__") else world
+    hulls = getattr(base, "hulls", None)
+    followed = hulls.get(getattr(base, "followed", None)) if hulls else None
+    if followed is None or (base is world and getattr(world, "is_followed", True)):
+        yield world
+        return
+    with base.as_hull(followed):
+        yield base
+
+
 def _ward(heading_deg: float) -> str:
     quarter = int(((heading_deg % 360.0) + 22.5) // 45.0) % 8
     return (
@@ -1498,7 +1528,9 @@ class Vessels:
                 continue
             v.tick(world, dt)
             if v.crew is not None:
-                v.crew.mirror_far()  # a station's World in the far shape follows the move
+                from freesail.world.crews import mirror_far
+
+                mirror_far(v.crew)  # a sleeping hull follows her far body's move
         lines.extend(self._spoke_lines)
         self._spoke_lines = []
         lines.extend(self._promote_and_hail(world))
@@ -1519,17 +1551,19 @@ class Vessels:
         mirrors the far body instead."""
         if not self.crewed_ids:
             return
-        from freesail.world.crews import mirror
+        from freesail.world.crews import far_tick, mirror
 
         minute = world.clock.ship_time.second == 0
         for v in self.vessels:
             crew = v.crew
             if crew is None or v.done:
                 continue
-            if crew.shape == "far":
-                crew.far_tick()
+            if not crew.awake:
+                far_tick(crew)
                 continue
-            crew.tick()
+            # her tick is the World's own with her current (package 84, step 6)
+            with world.as_hull(crew):
+                world.tick()
             mirror(v, crew, minute)
 
     # -- what a far-detail brain sees (package 43) ----------------------------------------
@@ -1542,64 +1576,68 @@ class Vessels:
         from freesail.world.brains import PLAYER_ID
         from freesail.world.captains import _is_kings_ship
 
-        pos = getattr(world, "position", None)
-        if pos is None:
-            return None
-        ship = world.ship
-        s = self._shadow
-        if s is None:
-            source = str(getattr(getattr(ship, "spec", None), "source", "") or "")
-            key = ""
-            for k, d in DESCRIPTIONS.items():
-                if source and d["file"].split("/")[-1] == source.replace("\\", "/").split("/")[-1]:
-                    key = k
-                    if k != "merchant brig":
-                        break
-            if key in ("merchant brig", "brig-sloop"):
-                key = "brig-sloop" if _is_kings_ship(world) else "merchant brig"
-            if not key:
-                # a player's file no far description sails (the merchant brig's own, package
-                # 70): her words by the file's name, so that another ship's lookout does not
-                # read a trader as 'a ship' of the line's class
-                key = SHADOW_FILES.get(source.replace("\\", "/").split("/")[-1], "")
-            d = description(key) if key else {"file": source, "rig": "a ship", "what": "a ship"}
-            ports = getattr(world, "dealings", None)
-            nation_id = str(getattr(ports, "ship_nation", "") or "britain")
-            try:
-                nation = world.nations.get(nation_id)
-            except KeyError:
-                nation = None
-            s = Vessel(
-                id=PLAYER_ID,
-                name=str(getattr(ship, "name", "") or "the ship"),
-                kind=d["rig"],
-                ship_file=d["file"] or source,
-                nation=nation_id,
-                position=pos,
-                colours=getattr(nation, "colours", ""),
-                flag=getattr(nation, "flag", ""),
-                nation_adjective=getattr(nation, "adjective", ""),
-                description=key,
-                what=d["what"],
-            )
-            self._shadow = s
-        # package 71: the player's locker is the shadow's (her colours as she shows them,
-        # her signals flying), one object
-        from freesail.world.signals import player_locker
+        with players_current(world) as world:
+            pos = getattr(world, "position", None)
+            if pos is None:
+                return None
+            ship = world.ship
+            s = self._shadow
+            if s is None:
+                source = str(getattr(getattr(ship, "spec", None), "source", "") or "")
+                key = ""
+                for k, d in DESCRIPTIONS.items():
+                    if (
+                        source
+                        and d["file"].split("/")[-1] == source.replace("\\", "/").split("/")[-1]
+                    ):
+                        key = k
+                        if k != "merchant brig":
+                            break
+                if key in ("merchant brig", "brig-sloop"):
+                    key = "brig-sloop" if _is_kings_ship(world) else "merchant brig"
+                if not key:
+                    # a player's file no far description sails (the merchant brig's own, package
+                    # 70): her words by the file's name, so that another ship's lookout does not
+                    # read a trader as 'a ship' of the line's class
+                    key = SHADOW_FILES.get(source.replace("\\", "/").split("/")[-1], "")
+                d = description(key) if key else {"file": source, "rig": "a ship", "what": "a ship"}
+                ports = getattr(world, "dealings", None)
+                nation_id = str(getattr(ports, "ship_nation", "") or "britain")
+                try:
+                    nation = world.nations.get(nation_id)
+                except KeyError:
+                    nation = None
+                s = Vessel(
+                    id=PLAYER_ID,
+                    name=str(getattr(ship, "name", "") or "the ship"),
+                    kind=d["rig"],
+                    ship_file=d["file"] or source,
+                    nation=nation_id,
+                    position=pos,
+                    colours=getattr(nation, "colours", ""),
+                    flag=getattr(nation, "flag", ""),
+                    nation_adjective=getattr(nation, "adjective", ""),
+                    description=key,
+                    what=d["what"],
+                )
+                self._shadow = s
+            # package 71: the player's locker is the shadow's (her colours as she shows them,
+            # her signals flying), one object
+            from freesail.world.signals import player_locker
 
-        s.signals = player_locker(world)
-        s.position = pos
-        s.struck = bool((getattr(ship, "extra", None) or {}).get("struck"))  # package 70
-        s.heading_deg = units.rad_to_deg(float(ship.heading)) % 360.0
-        s.speed_kn = units.ms_to_knots(_ship_speed_ms(ship))
-        manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")
-        if getattr(world, "at_anchor", False):
-            s.sail_state = "at anchor"
-        elif manoeuvre in ("hove to", "heaving to"):
-            s.sail_state = "lying to"
-        else:
-            s.sail_state = "under plain sail"
-        return s
+            s.signals = player_locker(world)
+            s.position = pos
+            s.struck = bool((getattr(ship, "extra", None) or {}).get("struck"))  # package 70
+            s.heading_deg = units.rad_to_deg(float(ship.heading)) % 360.0
+            s.speed_kn = units.ms_to_knots(_ship_speed_ms(ship))
+            manoeuvre = str(world.readings.value("manoeuvre_in_hand") or "")
+            if getattr(world, "at_anchor", False):
+                s.sail_state = "at anchor"
+            elif manoeuvre in ("hove to", "heaving to"):
+                s.sail_state = "lying to"
+            else:
+                s.sail_state = "under plain sail"
+            return s
 
     def strangers_of(
         self, world: Any, vessel: Vessel, spoken: set[str], glass_for: str | None = None
@@ -1693,6 +1731,10 @@ class Vessels:
         for v in self.vessels:
             if v.detail == "near" and not v.done:
                 v.tick(world, dt)
+                if v.crew is not None:
+                    from freesail.world.crews import mirror_far
+
+                    mirror_far(v.crew)  # a sleeping hull within the near range (step 6)
         lines = self._promote_and_hail(world)
         self.vessels = [v for v in self.vessels if not v.done]
         return lines

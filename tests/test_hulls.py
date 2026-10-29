@@ -41,6 +41,9 @@ def test_the_worlds_per_ship_names_are_the_hulls_fields_and_the_shared_ones_stay
         assert name not in w.own.__dict__, name
         assert getattr(w.own, name) is getattr(w, name), name
     assert w.own.clock is w.clock and w.own.rng is w.rng and w.own.vessels is w.vessels
+    # since step 6 her seed, her streams, her scenario and her view of the sail are hers
+    assert all(name in w.own.__dict__ for name in ("seed", "scenario", "rng", "vessels"))
+    assert w.hulls == {PLAYER_ID: w.own} and w.followed == PLAYER_ID and w.is_followed
     # the Hull's own reads of her state agree with the World's
     assert w.own.name == w.ship.name and w.own.position == w.position
     assert w.own.ship_x == w.ship_x and w.own.at_anchor == w.at_anchor
@@ -82,17 +85,20 @@ def test_a_crewed_ships_world_has_a_hull_of_her_own_under_her_vessels_id():
     )
     w.run(61)
     crew = b.crew
-    assert crew is not None and isinstance(crew.own, hulls.Hull)
-    assert crew.own.id == b.id and crew.own.world is crew and crew.own is not w.own
-    assert crew.own.name == b.name and crew.ship is crew.own.ship and crew.ship is not w.ship
+    # since step 6 she is a Hull of the one World, her own being herself (the façade)
+    assert crew is not None and isinstance(crew, hulls.Hull) and crew.own is crew
+    assert crew.id == b.id and crew.world is w and crew is not w.own and w.hulls[b.id] is crew
+    assert crew.name == b.name and crew.ship is not w.ship
     assert crew.people is not w.people and crew.log is not w.log
-    assert crew.own.chart is w.chart  # the shared chart, through her World's view of it
+    assert crew.chart is w.chart and crew.clock is w.clock  # the shared, through the façade
+    assert crew.rng is not w.rng and crew.vessels is not w.vessels
     # the checkpoint carries both hulls, and both worlds tick on alike
     data = replay_mod.checkpoint_bytes(w)
     again = replay_mod._Unpickler(io.BytesIO(data)).load()
     replay_mod._rebind(again)
     v = again.vessels.get(b.id)
-    assert v.crew.own.id == b.id and v.crew.own.world is v.crew and again.own.id == PLAYER_ID
+    assert v.crew.id == b.id and v.crew.world is again and again.own.id == PLAYER_ID
+    assert again.hulls[b.id] is v.crew
     again.run(60)
     w.run(60)
     assert again.log.digest() == w.log.digest()
@@ -112,7 +118,9 @@ def _old_shape_checkpoint(world: World) -> bytes:
 
     def world_state(w: World) -> dict:
         state = dict(w.__dict__)
-        hull = state.pop("own")
+        hull = state.pop("_own")  # `own` is a property over `_own` since step 6
+        state.pop("hulls", None)
+        state.pop("followed", None)
         state.pop("registry", None)
         for name in hulls.PER_SHIP_FIELDS:
             if name in hull.__dict__ and name != "dealings":
@@ -124,6 +132,29 @@ def _old_shape_checkpoint(world: World) -> bytes:
                 old_ports.__dict__[key] = value
         old_ports.world = w
         old_ports.ports = w.ports.ports
+        state["ports"] = old_ports
+        state["chart"] = None
+        state["_readings_view"] = None
+        state["_readings_key"] = None
+        state["_acts_frames"] = []
+        return state
+
+    def crew_state(h: hulls.Hull) -> dict:
+        # a hull of step 6 written as the crewed World a build before step 6 had: her fields
+        # on the World's dict with `parent`, `vessel` and `shape`, as `world_state` writes
+        # the World's own
+        state = {k: v for k, v in h.__dict__.items() if k in hulls.PER_SHIP_FIELDS}
+        state.pop("dealings", None)
+        state["parent"] = h.world
+        state["vessel"] = h.vessel
+        state["shape"] = h.shape
+        state["clock"] = h.world.clock
+        old_ports = Ports.__new__(Ports)
+        for key, value in h.dealings.__dict__.items():
+            if key != "world":
+                old_ports.__dict__[key] = value
+        old_ports.world = h
+        old_ports.ports = h.world.ports.ports
         state["ports"] = old_ports
         state["chart"] = None
         state["_readings_view"] = None
@@ -162,6 +193,10 @@ def _old_shape_checkpoint(world: World) -> bytes:
         def reducer_override(self, obj):
             if isinstance(obj, World):
                 return replay_mod._new, (type(obj),), world_state(obj)
+            if isinstance(obj, hulls.Hull) and obj is not world.own:
+                from freesail.world.crews import CrewedWorld
+
+                return replay_mod._new, (CrewedWorld,), crew_state(obj)
             if isinstance(obj, Ports):
                 return replay_mod._new, (Ports,), ports_state(obj)
             if isinstance(obj, People):
@@ -184,7 +219,7 @@ def test_a_checkpoint_from_before_the_hull_converts_on_load_and_carries_on_alike
     old = _old_shape_checkpoint(w)
     loaded = replay_mod._Unpickler(io.BytesIO(old)).load()
     replay_mod._rebind(loaded)
-    assert "own" in loaded.__dict__ and isinstance(loaded.own, hulls.Hull)
+    assert "_own" in loaded.__dict__ and isinstance(loaded.own, hulls.Hull)
     assert not any(name in loaded.__dict__ for name in hulls.PER_SHIP_FIELDS)
     # the ports parted (step 3): the world's files on `ports`, her dealings on the hull
     assert type(loaded.ports).__name__ == "Ports" and "boat" not in loaded.ports.__dict__
@@ -205,14 +240,17 @@ def test_a_checkpoint_from_before_the_hull_converts_on_load_and_carries_on_alike
     # written again it holds `own`, and the pickler leaves the Hull's readings cache out
     again = replay_mod.checkpoint_bytes(loaded)
     copy = replay_mod._Unpickler(io.BytesIO(again)).load()
-    assert "own" in copy.__dict__ and copy.own._readings_view is None
+    assert "_own" in copy.__dict__ and copy.own._readings_view is None
     assert copy.own._readings_key is None and copy.log.digest() == loaded.log.digest()
 
 
 def test_lift_old_state_leaves_a_state_with_a_hull_as_it_is():
     w = make_world(7, CUTTER)
     state = {"own": w.own, "seed": 7}
-    assert hulls.lift_old_state(w, state) is state and state["own"] is w.own
+    assert hulls.lift_old_state(w, state) is state and state["_own"] is w.own
+    assert "own" not in state  # step 6: `_own` behind the property
+    state = {"_own": w.own}
+    assert hulls.lift_old_state(w, state) is state and state["_own"] is w.own
 
 
 def test_a_checkpoint_from_before_with_a_crewed_ship_and_persons_moved_converts_whole():
@@ -242,7 +280,7 @@ def test_a_checkpoint_from_before_with_a_crewed_ship_and_persons_moved_converts_
     replay_mod._rebind(loaded)
     v = loaded.vessels.get(b.id)
     lc = v.crew
-    assert loaded.own.id == PLAYER_ID and lc.own.id == b.id and lc.own.world is lc
+    assert loaded.own.id == PLAYER_ID and lc.id == b.id and lc.world is loaded  # a hull now
     assert lc.registry is loaded.registry and loaded.registry.hulls == [PLAYER_ID, b.id]
     assert lc.people.hull_id == b.id and lc.people.people is loaded.registry.company(b.id)
     assert [p.name for p in lc.people.all] == [p.name for p in crew.people.all]

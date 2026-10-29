@@ -43,7 +43,7 @@ def test_a_vessel_with_a_brain_within_the_range_is_promoted_and_demoted_beyond_i
     w.run(61)
     assert b.crew is not None and b.detail == "crewed" and w.vessels.crewed_ids == (b.id,)
     crew = b.crew
-    assert isinstance(crew, K.CrewedWorld) and crew.shape == "full"
+    assert isinstance(crew, K.Hull) and crew.shape == "full"  # a hull of the World (step 6)
     assert crew.ship.name and crew.ship.spec.source.endswith("brig.yaml")
     assert crew.people.captain.name and crew.stations.aboard("captain")
     cap = crew.captain
@@ -136,8 +136,8 @@ def test_a_checkpoint_carries_a_crewed_ship_and_ticks_on_alike(tmp_path):
     path = replay_mod.write_checkpoint(w, tmp_path / "crewed.ckpt")
     _, c = replay_mod.read_checkpoint(path)
     cb = c.vessels.get(b.id)
-    assert cb.crew is not None and isinstance(cb.crew, K.CrewedWorld)
-    assert cb.crew.chart is c.chart and cb.crew.parent is c
+    assert cb.crew is not None and isinstance(cb.crew, K.Hull)
+    assert cb.crew.chart is c.chart and cb.crew.world is c and cb.crew.parent is c.own
     c.run(300)
     w.run(300)
     assert c.log.digest() == w.log.digest()
@@ -308,7 +308,7 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
                 break
         assert crew.shape == "far" and b.crew is crew and crew.agents["captain"] is h
         assert any(e.kind == "crew.demoted" for e in crew.log)
-        assert b.detail == "crewed" and b.plan and b.plan[0][0] == "to"
+        assert b.detail == "far" and b.plan and b.plan[0][0] == "to"  # asleep: the sea's word
         # the far body moves her by the plan each minute, mirrored into her World
         p0 = crew.position
         driver.tick(120)
@@ -758,7 +758,7 @@ def test_the_seat_on_another_ship_honours_the_scenarios_crewed_budget():
     )
     assert nm_between(w.position, b.position) < K.CREWED_NM
     _, crew = K.station_world(w, "X")
-    assert crew.shape == "far" and b.detail == "crewed"
+    assert crew.shape == "far" and b.detail == "far"  # asleep: near by distance (step 6)
 
 
 def test_a_word_said_as_a_person_ashore_reaches_another_ships_captain_landed_there():
@@ -848,7 +848,7 @@ def test_a_ship_demoted_sleeps_with_her_damage_and_wakes_the_same_ship(tmp_path)
     gun = next(iter(ship.guns.values()))
     gun.dismounted = True
     _asleep(w, b)
-    assert b.crew is crew and crew.shape == "far" and b.detail == "crewed"
+    assert b.crew is crew and crew.shape == "far" and b.detail == "far"  # near by distance
     assert b.id in w.vessels.crewed_ids and b not in K.crewed(w)
     assert [p for p in w.registry.persons() if p.home == b.id] == hers
     assert b.damage["wounded"] == 3 and b.damage["killed"] == 0

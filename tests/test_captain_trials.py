@@ -74,8 +74,12 @@ TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [10423] at 45c; neve
 # made out and reads no answer (a man of war's rig: the tell), thirty-one lines of the
 # challenge and its reading; the states and the chase as before, proved by bisection
 # (`signalling.CHALLENGES` off gives 756 and 9c24b2e01bb801e7 again)
-TRIAL_STATION_STRANGER_LINES = 787  # package 71 (756 at package 56, the glass; 754 at 57)
-TRIAL_STATION_STRANGER_DIGEST = "f8f4e544cc34b86e"  # package 71 (9c24b2e01bb801e7 at 56)
+# package 84, step 6 (the one clock): the Palinure's lookout reads the brig's hoists as flying by
+# the game's tick, where her World's clock, counted from her promotion, stood behind the tick
+# the private signal broke out at and never showed it her; she answers it now (a reply at
+# 9840, one line more), the states, the books and the chase as before (TuningNotes, step 6)
+TRIAL_STATION_STRANGER_LINES = 788  # package 84 step 6 (787 at 71; 756 at 56, the glass; 754 at 57)
+TRIAL_STATION_STRANGER_DIGEST = "d56963daf49d566a"  # 84 step 6 (f8f4e544cc34b86e at 71)
 
 
 @pytest.fixture(scope="module")
@@ -323,8 +327,11 @@ TRIAL_TRADE_STRANGER_LINES = 1247  # package 73 (1246 at 71; 1248 at 70; 1407 at
 # package 56, the glass: 7b8012b076ebea42 (e73870448a788eac at 57)
 # the merged tree of 58a and 58b (2026-10-23): 58b alone gave 5bbca78fdc6b5093; the digest reads
 # severity, and 58a's recurring lines are routine in this passage too
+# package 84, step 6 (the one clock): the butcher's bill at 20220, ten minutes after the brig's
+# last shot by the game's tick; at 17520 before, the shot's tick written by the brig's World's
+# clock, counted from her promotion and behind the game's (TuningNotes, step 6)
 TRIAL_TRADE_STRANGER_DIGEST = (
-    "11b8a45bdc8c935a"  # package 73 (e55bc37c58ccb31b at 71; 0a480f7a4b7f321a at 70)
+    "02313d83240a11d5"  # 84 step 6 (11b8a45bdc8c935a at 73; e55bc37c58ccb31b at 71)
 )
 
 

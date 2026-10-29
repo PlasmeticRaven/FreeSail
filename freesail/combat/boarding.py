@@ -378,7 +378,9 @@ def boarders_away(world: Any) -> str:
     f = Fight(
         attacker=ship,
         defender=body,
-        attacker_world=world,
+        # the attacker's hull, not the World (package 84, step 6): the round runs in
+        # whichever hull ticks first in the minute, and a World's names are hers then
+        attacker_world=getattr(world, "own", world),
         defender_world=other_world,
         attacker_id=_own_id(world),
         defender_id=other_id,

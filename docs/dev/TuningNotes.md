@@ -11206,3 +11206,130 @@ brains and the squadrons (`--slow -m "slow and not pace"`, three workers): 1 fai
 lee-shore trial's digest, the container's difference recorded at step 3; the pace tests
 alone as above. Nothing pinned moved: no recorded passage wakes a ship twice (the design's
 §3.3 said where to look, and the trials' and the truths' pins stand).
+
+### Step 6: the Hull the container; `CrewedWorld` retired; the tick over the hulls
+
+Built on step 5 (the design note's postscript "Step 6" has the shape and the reasons). **What
+moved: nothing pinned.** The order of the tick is today's (the followed hull's body, each
+other hull's whole tick where a crewed World's ran, the far bodies, the followed hull's
+seeing and acting), every hull's streams are the ones her World had, and the hull's fields
+are the ones the crewed World's own held; the suites below are the proof. **The count.**
+`core/world.py` (the current hull as a thread-local stack behind `own`, `hulls`, `followed`,
+`as_hull`, `is_followed`, `sea_vessels`; the tick's shared parts for the followed hull alone;
+the weather at another hull by the followed hull's systems and plane; `submit` the sleeping
+hull's road; the readings view over the hull's façade; the converter for a crewed World of
+before; `vessel` and `parent` the current hull's), `world/hulls.py` (the façade: `__getattr__` under the swap, `awake`, `vessel`,
+`shape`, `parent`, `is_followed`; `seed`, `scenario`, `rng`, `vessels` per hull; the
+converter's `_own`), `world/crews.py` (`HullView`, `make_hull`, `adopt_hull`, the rebinding
+walk, `far_tick` and `mirror_far` as functions, the switch over hulls), `world/ships.py`
+(`Vessel.hull`, the hulls' ticks, `players_current`), `core/replay.py` (the rebind of a
+hull), `combat/boarding.py` (the fight's attacker a hull), `world/captains.py` (`made_at`);
+tests:
+`test_hulls.py` (the step 1 contract restated for the container, the old-shape writer
+emitting a crewed World for a hull), four assertions of a sleeper's `detail` in
+`test_crews.py` ("far", the sea's word, where step 5 had kept "crewed"), the hold test's
+clock arithmetic in `test_world_orders.py` unchanged in text and passing under one clock.
+
+**A sleeping hull within the near range** (the lead's finding on step 5, settled here): her
+`detail` is "far" or "near" by her distance from the ship, as a hull-less vessel's, so the
+sea's near level ticks her far body every second within `NEAR_DETAIL_NM` and her hull
+mirrors each move; awake she is "crewed". Nothing pinned shows it (no recorded passage has a
+sleeper within the near range over the cap).
+
+**The one clock from her making.** A crewed World's clock counted from her promotion; the
+hull's builder now sets the World's clock before the constructor runs, so the ticks in her
+log and in her captain's holds are the game's. Nothing pinned reads a crewed ship's ticks
+(the design's §3.3), and truth 89 reads kinds and words.
+
+**Found by the fast tier, and the cure of each** (the design note's postscript "Step 6",
+"The player's things read under another hull's swap", has the mechanism). The step's first
+tree failed the three fights of `test_fight.py`, truths 7-134, 7-140, 7-147, 7-180, 7-181,
+7-183 and 7b-113 and the wardroom's evade, all one cause in seven places: shared code that
+means the player's ship read the World while another hull was current, and so read her.
+Probed against a worktree at 5949e18 (the step 5 head), the same scenario on both:
+
+- the player's shadow built in a hull's block came out of her nation (the Amazon French to a
+  French captain, who showed her the private signal, `on passage`, where 5949e18's engaged):
+  `ships.players_current` makes the followed hull current for the build;
+- the French frigate's battery had no mark in the player's ship (`action.target_of` told her
+  World from a crewed one by `parent is None`, and the World under the swap had none): the
+  first action's privateer never fired in three hours where 5949e18's struck at 6300 s.
+  `World.parent` is the followed hull's façade while another hull is current;
+- `action.strike` wrote the colours struck on `world.vessel`, None on the World under the
+  swap, so the player's watch (`_watch_struck`) never saw them and her guns, reloaded, fired
+  on a struck ship: 7-134's keeper counted three hits for the one shot that struck, the
+  battery's mode `as they bear` to 341 s where 5949e18's went to `hold` at 300 s with "A
+  cutter has struck her colours!". `World.vessel` is the current hull's far body;
+- the boarding's round recorded the attacker's line by the World's `record`, the current
+  hull's: both lines on the enemy's log, none on the player's (7-180, 7-181 and the two
+  fights). `Fight.attacker_world` is the attacker's hull;
+- the trade-stranger trial's brig, promoted at 3600 s, judged at her first tick on the one
+  clock (`tick >= JUDGE_FIRST_S` was her World's 300 s before) and her captain left
+  "investigating a stranger" for "on passage", heading 70 to 23, the player's lookout a
+  minute later with her course and the player's captain evading at 3720 s where 5949e18's
+  did at 3660 s (the wardroom test asserts `evading` at 3700 s). `Captain.made_at`, the gate
+  `tick < made_at + JUDGE_FIRST_S`: her first judgement at 3900 s on both trees now;
+- 7b-113's hand ran out of frames at the promotion: the building World's `sea_vessels` was
+  her own view (`HullView` found the sea through her world). `HullView` holds the game's
+  World from the build;
+- the old-shape crewed checkpoint (`test_hulls`): the converters walked `self.vessels`,
+  which for a crewed World of before is her view, with no `_own` yet (`World._old_sea`);
+- found by the slow tier (the trade-stranger and station-stranger trials, their digests and
+  line counts): the player's log lost "3 bells." at 5400 s and "4 bells." at 7200 s, every
+  other line of hers and of the brig's the same as 5949e18's to 7500 s (the two logs diffed
+  line by line, the brig's ticks rebased by her promotion). `Clock.bells` reported a tick's
+  bells once, and on the one clock the brig's tick asked first; each hull now keeps her own
+  guard (`World._bells_struck`), and the diff is empty.
+
+**Moved pins: three, for the one clock, old figure beside new.** With the bells mended the
+slow tier left three pinned passages apart from 5949e18's, each with a crewed stranger, and
+the logs of both trees diffed line by line name the first line that differs in each:
+
+- the station-stranger trial: 788 lines and `d56963daf49d566a` (787 and `f8f4e544cc34b86e`
+  at package 71), the one line more "The brig makes a reply: a blue and white flag at the fore
+  yardarm" at 9840 s; the states, the books, the hail and the chase as pinned;
+- truth 7-152: the Friendship back in her station at 6420 s (5280 s), the first differing
+  lines at 3480 s "The schooner makes a reply" and "answers the private signal wrong: a
+  stranger under false colours, an enemy", where 5949e18's log has "makes no answer to the
+  private signal: a merchantman, who has none" at 3660 s; the commodore then makes No. 8, the
+  convoy to close round him (3540 s), and the straggler's station comes later; the signal to
+  her at 2760, 2866 and 3000 s as pinned, every ship within 165 m at 7200 s as pinned;
+- the trade-stranger trial: `02313d83240a11d5` (`11b8a45bdc8c935a` at 73), 1247 lines as
+  pinned, the one line moved "The butcher's bill: nobody hurt" from 17520 s to 20220 s.
+
+The cause is the same in the first two and its mirror in the third, read in the code rather
+than guessed. A hoist is seen when it flies by the reader's tick (`signals.Hoist.flying`:
+`tick >= breaks_out`); the King's ship's private signal broke out at the game's 3312 s
+(convoy) and the crewed stranger's World, on a clock counted from her promotion, read it
+at her own tick, hours short of it, so she never saw it flying and never answered: 5949e18's
+"makes no answer" was the two clocks, not her doctrine (the Vengeur's bluffs,
+`bluff_private_signal`). A shot that strikes writes its tick on the keeper by the firer's
+clock (`action.py`, `keeper.struck_by[firer] = tick`) and the bill waits ten minutes from it
+(`health.BILL_AFTER_S`); the brig's clock stood behind the schooner's, so the bill at 17520 s
+came 158 s after her first shot instead of ten minutes after her last. On the one clock the
+three passages run as the rules say, so the pins are moved to them and not the rules;
+nothing of the ships' sailing moved (the states and the manoeuvres' ticks of all three stand).
+The lee-shore trial's digest reads `7fad0ce7e46ba366` against `ed48ca3d61e52f20` on this
+container as it did before the step (the known container difference), and is not touched.
+
+**The suites on the step's tree** (this container, four cores, three workers). The fast tier
+whole on the final tree: **3912 passed, none failed** (the run before the bell mend gave the
+same 3912 with the pictures' blank-image check the one failure under load, std 7.9 against
+8.0, the baseline's figure; it passed in the final run). Ruff clean. The slow tier of the
+known truths, the trials and the touched files ran to 146 of 362 on the tree before the bell
+mend with the five failures above, all mended or re-pinned and the five re-run green alone;
+the whole set runs again on the final tree after this commit and its result is reported
+apart, with a mend if it finds anything. **The pace** (alone, quiet, load 0.7 to 0.8):
+`make_hull` of a brig 0.60 s; truth 88's form with three hulls awake 234 ticks a second
+against the crewed floor of 60 (213 to 256 at step 5); the pace tests alone all passed but
+the gates' day with the region loaded at 495 and truth 7-159 at 468 against the build
+machine's floor of 500, and the same two run alone on a worktree at 5949e18 in turn gave
+489 and 453: the container's figures (step 4's 493, step 5's 461), the step's swap costing
+nothing the measure can see.
+
+The step 5 fixture in `test_crews.py` that asserted a `CrewedWorld` on the vessel asserts a
+`crews.Hull` (re-exported there), and the crewed checkpoint test `crew.world is c` and
+`crew.parent is c.own` for `crew.parent is c`. Nothing of the seven changes a draw or a
+line of a passage on 5949e18's behaviour: each restores what the crewed World's names gave,
+and the probes above end alike on both trees once mended (7-134's hits one, the first
+action's strike at 6300 s, the brig's captain judging at 3900 s).
