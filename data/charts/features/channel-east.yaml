@@ -25,6 +25,15 @@
 #                   Owers with "a floating light on them which has been shifted several
 #                   times", and the approach to Spithead by the Princessa, the Dean, the
 #                   Warner and the Nab buoy (pp. 298 to 300). In period exactly.
+#   Norie 1805      A New and Complete Epitome of Practical Navigation (Internet Archive
+#                   norie-1805-a-new-and-complete-epitome-of-practical-navigation): the
+#                   'Examination of a Young Sea Officer', pp. 299 to 302 (the Downs and
+#                   Spithead, and the lights on the coasts of England and France in 1805:
+#                   the North Foreland, the North Sand Head's floating light, the South
+#                   Foreland's two, Dungeness, the Owers' floating light; Cape la Heve's
+#                   two, Cape Lailly, Dieppe and St Valery); Table XL, p. 217 (the
+#                   latitudes and longitudes), Table XLI, pp. 248 to 252 (the high water).
+#                   In period exactly.
 #   White 1835      Sailing Directions for the English Channel (Internet Archive
 #                   sailingdirectio00whitgoog): 'Coast of England' pp. 45 to 58 (Dunnose to
 #                   the Downs: Spithead's marks and anchorage, St Helens, the Owers and
@@ -59,8 +68,9 @@
 # repository); a move is said in `fix`. Heights are above the sea for the horizon. A
 # light's `lit` has `from` and `until`, so that 1805 sees the South Foreland's two, the
 # North Foreland, Dungeness (Wyatt's tower of 1792), the Owers' floating light, the North
-# Goodwin's, Cape la Heve's two, Cape Lailly's, Dunkirk's fanal on the Risban and the
-# lantern on Boulogne's bank, and not the Nab (1812), the Gull and the South Sand Head
+# Goodwin's, Cape la Heve's two, Cape Lailly's, Dieppe's and St Valery's (Norie 1805's list
+# of the lights), Dunkirk's fanal on the Risban and the lantern on Boulogne's bank (harbour
+# lights Norie leaves out), and not the Nab (1812), the Gull and the South Sand Head
 # (named first in 1832), Belle Tout (1828), Calais (the Tour du Guet 1818, the tower of
 # 1848), Gris Nez (1837) or Gravelines (1843); `range_nm` is the period lamp's, a
 # judgement from the pilot's words or the elevation. `dries_m` is a danger's head against
@@ -411,6 +421,19 @@ features:
     fix: "moved 215 m to the grid's land"
     source: "Imray 1874, 'Poole', p. 55: the rise on springs at Brownsea island is about 6 1/2 feet; Modern chart: Henry VIII's blockhouse on Brownsea island inside the harbour's mouth"
     says: "Brownsea Castle on the island just inside Poole harbour's mouth."
+
+  - id: brownsea-road
+    kind: anchorage
+    name: Brownsea road
+    modern: Poole Harbour, the anchorage north of Brownsea Island
+    lat_deg: 50.6989
+    lon_deg: -1.9754
+    height_m: 0
+    depth_fathoms: 3
+    bottom: soft mud
+    fix: "moved 700 m north-west to the grid's 2.9 m in the channel toward the town (the harbour is GEBCO's fill, which EMODnet does not survey)"
+    source: "Imray 1874, 'Poole', pp. 54 to 55: within the entrance there is anchorage for vessels in the various branches of the harbour, where the depths at low water vary from 10 to 40 feet; the banks within soft mud; the place in the channel north of Brownsea JUDGEMENT on the grid's water"
+    says: "Brownsea road within Poole harbour's mouth, three fathoms on soft mud, landlocked: where a vessel lies that has crossed the bar."
 
   - id: poole-bar
     kind: bank
@@ -867,7 +890,7 @@ features:
     height_m: 0
     depth_fathoms: 8
     bottom: chalk and sand
-    source: "White 1835, 'Coast of England', pp. 53 to 54: anchor with Upper Deal Mill on with Deal Castle W by S and the South Foreland upper light-house on with the south side of Old Stairs Point, in 7 or 8 fathoms; moor with the best bower to the southward; to the eastward of the red buoy of Deal Sand; Moore 1799, the catechism, p. 298: moor with the best bower to the south-west and the small bower to the north-east; Imray 1874, 'Margate Roads to South Foreland', p. 8: between Walmer and Sandown castles, eastward of Deal bank; a good berth in about 8 fathoms over a chalky bottom"
+    source: "White 1835, 'Coast of England', pp. 53 to 54: anchor with Upper Deal Mill on with Deal Castle W by S and the South Foreland upper light-house on with the south side of Old Stairs Point, in 7 or 8 fathoms; moor with the best bower to the southward; to the eastward of the red buoy of Deal Sand; Moore 1799, the catechism, p. 298: moor with the best bower to the south-west and the small bower to the north-east; Norie 1805, 'Examination of a Young Sea Officer', p. 301: the best mark for large ships to anchor in the Downs, Upper Deal mill and Deal castle in one, in 9 or 10 fathoms; Imray 1874, 'Margate Roads to South Foreland', p. 8: between Walmer and Sandown castles, eastward of Deal bank; a good berth in about 8 fathoms over a chalky bottom"
     says: "The Downs off Deal, seven to eight fathoms on chalk with the Goodwin to the eastward: the great road of the Strait, where the fleets and the convoys lie for a wind; moor with the best bower to the southward."
 
   - id: small-downs
@@ -1388,6 +1411,22 @@ features:
     source: "Faden 1793, 'River Somme', p. 13: the river capable of vessels of a moderate size, its entrance very difficult because of a sand bank before its mouth; steer by St Valery along the south coast; within the river many beacons; White 1835, 'Coast of France', p. 60: you will obtain sight of the light at St Valery on losing sight of that on Point d'Ailly"
     says: "St Valery at the Somme's mouth, a river entered only by its beacons among shifting quicksands."
 
+  - id: st-valery-light
+    kind: light
+    name: the St Valery light
+    modern: the light at the mouth of the Somme (Le Hourdel, St Valery)
+    lat_deg: 50.2150
+    lon_deg: 1.5650
+    height_m: 15
+    lit:
+      from: 1805
+      until: null
+      range_nm: 8
+      character: "a fixed light"
+    fix: "on the point of Le Hourdel at the Somme's mouth, JUDGEMENT: Norie gives St Valery, and White 1835 has the light at St Valery seen on losing Point d'Ailly's when bound into the Somme"
+    source: "Norie 1805, 'Examination of a Young Sea Officer', p. 301: Dieppe 1, St Valery 1 (after Dieppe in the order of the coast eastward, so St Valery on the Somme); White 1835, 'Coast of France', p. 60: you will obtain sight of the light at St Valery, on losing sight of that on Point d'Ailly; Faden 1793, 'River Somme', p. 13, names no light: its first year UNVERIFIED, Norie's year taken as `from`"
+    says: "The St Valery light at the Somme's mouth, the guide into the river."
+
   - id: le-treport
     kind: town
     name: Treport
@@ -1459,6 +1498,22 @@ features:
       character: "a fixed light, an open fire"
     source: "Faden 1793, 'Cape Lailly and its Light-House', p. 15: the Chamber of Commerce at Rouen caused a light-house to be erected, lighted for the first time on the first day of November, 1775, 80 fathoms from the edge of the cliff facing the rock named La Galère; the whole height 56 feet; the encyclopaedia, 'Phare d'Ailly' (fr.wikipedia.org, read 2026-10-29): the first tower lit from 1775 by an open fire; the old light of 1775 in service until 22 April 1958; White 1835, 'Coast of France', p. 59: a revolving light on Point d'Ailly 305 feet above high water (later)"
     says: "The Lailly light on the cliff west of Dieppe, a single light, lit since November 1775."
+
+  - id: dieppe-light
+    kind: light
+    name: the Dieppe light
+    modern: Dieppe, the harbour light on the jetty
+    lat_deg: 49.9300
+    lon_deg: 1.0830
+    height_m: 12
+    lit:
+      from: 1805
+      until: null
+      range_nm: 6
+      character: "a harbour light"
+    fix: "at the head of the western jetty, unverified within two cables (Norie names the light, not its place)"
+    source: "Norie 1805, 'Examination of a Young Sea Officer', p. 301: the lights on the coast of France, Cape la Heve 2, Cape Lailly 1, Dieppe 1, St Valery 1; Faden 1793, 'Dieppe', pp. 14 to 15, names no light: its first year UNVERIFIED between the two, Norie's year taken as `from`"
+    says: "The Dieppe light at the harbour's mouth, a small light for the jetties."
 
   - id: la-galere
     kind: rock

@@ -385,3 +385,14 @@ ports:
   tarifa: spain
   ceuta: spain
   tangier: morocco
+  # the Channel's east block (package 79b): the English ports the King's, the French ports
+  # France's, hostile to a King's ship and open to a neutral by the wars above (Le Havre,
+  # Boulogne, Calais and Dunkirk the invasion flotilla's ports of 1803 to 1805)
+  portsmouth: britain
+  poole: britain
+  downs: britain
+  dover: britain
+  le-havre: france
+  boulogne: france
+  calais: france
+  dunkirk: france

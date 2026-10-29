@@ -127,7 +127,18 @@ PORTUGAL_PORTS = ["cadiz", "lagos", "lisbon", "oporto", "setubal"]
 ISLANDS_PORTS = ["angra", "funchal", "horta", "ponta-delgada", "porto-santo"]
 # package 39f: the Strait's five, in their own list (the blocks' lists merge as lines)
 STRAIT_PORTS = ["algeciras", "ceuta", "gibraltar", "tangier", "tarifa"]
-ALL_PORTS = sorted(ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS + STRAIT_PORTS)
+# package 79b: the Channel's east block's eight, in their own list
+CHANNEL_EAST_PORTS = [
+    "boulogne",
+    "calais",
+    "dover",
+    "downs",
+    "dunkirk",
+    "le-havre",
+    "poole",
+    "portsmouth",
+]
+ALL_PORTS = sorted(ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS + STRAIT_PORTS + CHANNEL_EAST_PORTS)
 
 
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
@@ -290,6 +301,9 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # Tangier the Emperor of Morocco's, at peace with all and neutral to her
     french_ports |= {"algeciras", "ceuta", "tarifa"}
     neutral_ports |= {"tangier"}
+    # the Channel's east block (package 79b): the French ports of the invasion coast hostile,
+    # the English ones the King's
+    french_ports |= {"le-havre", "boulogne", "calais", "dunkirk"}
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS

@@ -35,13 +35,15 @@
 "199,4": [
 "dieppe",
 "dieppe-castle",
-"dieppe-road"
+"dieppe-road",
+"dieppe-light"
 ],
 "200,5": [
 "le-treport"
 ],
 "200,6": [
-"st-valery-sur-somme"
+"st-valery-sur-somme",
+"st-valery-light"
 ],
 "202,-3": [
 "the-owers",
@@ -73,6 +75,7 @@
 "poole",
 "south-haven-point",
 "brownsea-castle",
+"brownsea-road",
 "poole-bar",
 "studland-bay"
 ],
