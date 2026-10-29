@@ -1552,7 +1552,7 @@ moves them into `tests/test_known_truths.py` by number and re-measures them on t
 | B1, B2, B7, B4 | nothing of the existing ships; their own files only | — |
 | B7 | `tests/test_ships.py:99` and `:188`, `tests/test_world_orders.py:98`: "a ship of the line" names her description | old beside new, the reason |
 | B1 stage B | the 64's own figures (her polar, her balance: the mizen course's offset from 0.8√A in place of the stand-in's 11.1-m head; the driver); both files' bytes for the hull's shape keys and marks (no behaviour, no port triple) | old beside new in her notes |
-| B3.1-B3.3, B3.5 | none expected: every change is keyed on something no existing file carries (Ext §11) | the guards; the trace |
+| B3.1-B3.3, B3.5 | none expected: every change is keyed on something no existing file carries (Ext §11). The library's count of evolutions (`tests/test_agents.py:1873`), a count of data files, moves with each step that adds evolution files: B3.1 98 → 104, B3.3 → 108 | the guards; the trace; the count old beside new |
 | B3, B5 (conditional) | `tests/test_sails.py:65-74` (B3's), only if rule 5 fails and a settee row is added (D44(c)); `tests/test_view_geometry.py:572-602` (B5's), only if the new files join its list and the sprit topsail's trapezoid falls short | old beside new, bisected; never a sail left out of the test |
 | B5 | the drawing; the pictures' standard deviation and dark fraction (thresholds expected to stand) | old beside new in the notes; screenshots |
 | 0H | nothing: no file carries a shape key; the served graph gains `hull.stations`, which nothing draws until B5.6 | the byte test, the guard, the fast tier |
@@ -1584,8 +1584,8 @@ existing file changes in this package.
 
 ### 16.3 Pace
 
-The per-tick additions: one `curve_class` read a driving sail in `_read_rig`, held for the tick's
-four substeps; one predicate a square sail in the helm's mark (B3.2); one clause in `boom_sails`;
+The per-tick additions: one `curve_class` read a sail in `_read_rig` (the driving sails' curve
+and the idle sails' furled windage), held for the tick's four substeps; one predicate a square sail in the helm's mark (B3.2); one clause in `boom_sails`;
 a sine and a compare a port gun (L2); the settee's change only in a manoeuvre. Measured with
 `tools/pace.py` alone and crewed before and after B3.2 and L2, the runs alternated (Eng §2.7's
 first-world artifact), and with thirteen files and caches of 32. The floors stand

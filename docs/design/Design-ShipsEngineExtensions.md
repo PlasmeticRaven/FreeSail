@@ -344,7 +344,7 @@ One predicate is read where the code now says `sl.cls == "gaff"` for the driver:
 | set | `set_lateen` (`vocabulary.yaml:1756` names it already) | Furled: cast off the gaskets and clear away the brails, 60. In the gear: let go the brails, 15. Haul out the sheet and haul down the tack, 30, which sets it, the sheet at `wanted_sheet(sail)`. **No hoist**: the yard stands. 10 ordinary, afterguard and topmen | Steel 1794 II p. 316 ("haul the mizen out"); Lavery I32; `set_gaff`'s times (judgement) |
 | take in | `take_in_lateen` (`vocabulary.yaml:1765`) | Brail up, 90, to the gear. 8 ordinary, afterguard | Steel 1794 II p. 37 (brails at the peak, middle, throat and foot); `take_in_gaff`'s time |
 | furl | `furl_lateen` | Brail up, 90, if set; furl on the yard, 120, `aloft: true`. 8 ordinary, afterguard and topmen | Falconer 1780, YARD; `furl_gaff`'s times |
-| reef, shake out | `reef_lateen`, `shake_out_lateen` | Ease the sheet and brail in, 30; tie (cast off) the points along the foot band, 120 (90); haul out, 30. 10 able (ordinary), afterguard | Steel's one band a fifth of the mast leech up (Bel §5.6). Times as `reef_gaff`'s, less its settling: the yard is not lowered |
+| reef, shake out | `reef_lateen`, `shake_out_lateen` | Ease the sheet and brail in, 30; tie (cast off) the points along the foot band, 120 (90); haul out, 30. 10 able (ordinary), afterguard | Steel's one band a fifth of the mast leech up (Bel §5.6). The times are this row's own (judgement): the yard is not lowered, so there is no settling and no hoist. (B3.1 found that `reef_gaff`'s less its settling would be 240 s, and `shake_out_gaff`'s 180, against these 180 and 150; the files cite this row) |
 | trim | `trim_lateen_sheet` | As `trim_gaff_sheet`: script `trim_sheet`, 0.4 s/m², 20-120 s, 6 ordinary afterguard | the sheet to the horse at the taffrail (Steel p. 208; Lavery I32) |
 | bend, unbend, shift | `bend_sail`, `unbend_sail`, `shift_sail` (`applies_to: sail`) | vocabulary rows for `lateen` | — |
 
@@ -771,6 +771,21 @@ a yard under the bowsprit, so no existing ship draws differently.
 - `SWINGING` (61) holds `lateen_yard` already; the fixed frame (`fullRigFrame`, 1383-1414) must
   reach the fore part's swing. A view-geometry case pins the bounds equal across states.
 
+**As built (B5.2, 2026-10-29): the departures, each judgement.**
+- The course and yard swing whole about the mast's **raked** line, not its vertical. The
+  frigate's mizzen rakes 4.5°, so a vertical axis would carry the luff off the mast. The
+  corners' heights shift a little at large sheet angles (on the fixture the peak rises up to
+  about 0.6 m swung abeam).
+- The lifts' feet are on the yard's after part: the two side lifts at 0.45 and 0.55 of it, so
+  that they are not drawn on one line, and the derrick at two-thirds (Steel 1794 I p. 207: the
+  derrick between the slings and the peak).
+- In the gear the sheet is drawn from the clew brailed in on the bundle, not from the set clew.
+  Every other sail in the gear keeps its sheet from its set clew, as before.
+- A whole lateen with corners, drawn as a lug, lies on deck in the gear or furled, as a lowered
+  lug does, until the tartane's package draws its own. No file carries one.
+- The frame reaches the yard's swing at the heights of its two ends and of the tack and clew
+  (`r.heights`), so the course stays inside it when she heels.
+
 ### 6.2 The yards under the bowsprit
 
 - **The yard's place.** A yard whose parent is a bowsprit or jib-boom stands at its own served
@@ -1063,8 +1078,8 @@ The bilander's heave-to (D4(a)) is a test, not a truth: no source says how a bil
 
 ### 10.4 Pace and checkpoints
 
-- The per-tick additions: one property read per driving sail in `_read_rig` (held for the
-  tick's four substeps), one predicate per square sail in the helm's mark, one clause in
+- The per-tick additions: one `curve_class` read a sail in `_read_rig`, the driving sails' curve
+  and the idle sails' furled windage (held for the tick's four substeps; B3.1's review), one predicate per square sail in the helm's mark, one clause in
   `boom_sails`. The settee's change runs only in a manoeuvre.
 - Measured with `tools/pace.py` alone and crewed, before and after B3.1 and B3.2, the runs
   alternated (Eng §2.7's first-world artifact). The floors stand: `BUILD_MACHINE_FLOOR` 500
@@ -1092,6 +1107,13 @@ do:**
 - `tests/test_view_geometry.py:572-602` (each square sail drawn to its file's area within 5%),
   only if the new files are added to its list and the sprit topsail's trapezoid falls short
   (risk 9). The remedy is the drawing's or the cut's, never a sail left out of the test.
+
+**Moved at B3.1 (2026-10-29), not foreseen:** `tests/test_agents.py:1873`, the library's count
+of evolutions in its contents, 98 → 104. Cause: §3.6's six lateen files, served in every ship's
+catalogue as the lug's six have been since package 43b. A count of data files, not behaviour;
+moved old beside new by the session in its own commit, as package 86 moved it
+(`docs/dev/M7-WorkPackages.md:381`), for the lead's ruling at the merge. B3.3's four settee
+files take it to 108.
 
 ---
 
@@ -1243,6 +1265,15 @@ Three drafts were judged: reuse first, fidelity first, and risk and test first.
    through 7354-7365). §4.2 removes it.
 5. `PEAK_COEFF["studding"]` is 1.25 against the curve's 1.44 (map-engine §10). Not this package's
    to change silently.
+6. (B3.1) `physics/strain.py:631` says a yard carried away "in the slings" only for `is_yard`.
+   The lateen yard, out of `is_yard` now (§3.3), carries away without the words, though it is
+   slung. No existing file has a lateen yard. For the lead under the gate: a membership
+   (`spar.is_yard or spar.cls == "lateen_yard"`), or accepted as it stands.
+7. (B3.1) At tick 0 the served `ship.tack` is "starboard" whatever the wind: `ShipDynamics.tack`
+   reads the apparent wind, which is 0 until the first tick. A page drawing the first snapshot
+   puts the fore-and-aft sails to larboard until then. Not this package's.
+8. (B3.1) `set_lateen` checks no boom. The driver on its boom (§17.3), set by it, gains
+   `not wrecked(spar_of_role(sail, boom))` at B3.5, with its case in `tests/test_driver.py`.
 
 ---
 

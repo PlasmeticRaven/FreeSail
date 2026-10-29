@@ -1869,8 +1869,9 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     # preventers, the rigging set up, the mast cut away, the jury mast, the grapple and the
     # small arms served) beside 71's hoist and 70's three; and the owner's practice and
     # resupply, folded in by package 86: heave_mark.yaml, the cask over the side for a mark
-    # (97 before it; the owner's tree, before 73, had 88 for 87)
-    assert "98 evolutions; the list about" in contents
+    # (97 before it; the owner's tree, before 73, had 88 for 87); and package 75's lateen six
+    # (set, take in, furl, reef, shake out and trim its sheet; 98 before them)
+    assert "104 evolutions; the list about" in contents
     # the ship's papers are a topic beside the ship (package 35), listed with their handles;
     # practice and resupply (package 86's fold-in): the gunner's account the eleventh (10
     # before it; 73 added none)
