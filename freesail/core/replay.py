@@ -95,11 +95,19 @@ def load_file(path: str | Path) -> dict[str, Any]:
 BY_TRANSCRIPT, BY_ACTS = "transcript", "acts"
 
 
+def agent_records(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Every station's record in a save: the World's own and each hull's (package 84,
+    step 8: the save's `hulls` block)."""
+    out = list(data.get("agents") or [])
+    for block in data.get("hulls") or []:
+        out.extend(block.get("agents") or [])
+    return out
+
+
 def acts_whole(data: dict[str, Any]) -> bool:
     """Whether every station of a save has its acts in it, from before it started
     (package 42), so that it may be replayed by them."""
-    agents = data.get("agents") or []
-    return "station_acts" in data and all(bool(a.get("acts")) for a in agents)
+    return "station_acts" in data and all(bool(a.get("acts")) for a in agent_records(data))
 
 
 def road_of(data: dict[str, Any], road: str | None = None) -> str:
@@ -107,10 +115,10 @@ def road_of(data: dict[str, Any], road: str | None = None) -> str:
     save is this build's own game, or when its stations' acts are not whole in it; by its
     acts otherwise (another build's game with its stations' acts in it)."""
     if road in (BY_TRANSCRIPT, BY_ACTS):
-        if road == BY_ACTS and data.get("agents") and not acts_whole(data):
+        if road == BY_ACTS and agent_records(data) and not acts_whole(data):
             raise ValueError("this save's stations' acts are not in it (a save from before 42)")
         return road
-    if not data.get("agents") or not acts_whole(data):
+    if not agent_records(data) or not acts_whole(data):
         return BY_TRANSCRIPT
     own = same_build(stamp_of(data)) and all(same_build(b) for b in played_under(data))
     return BY_TRANSCRIPT if own else BY_ACTS
@@ -170,6 +178,34 @@ def replay(
     i = 0
     j = 0
 
+    # the other hulls' stations a save of this build holds (package 84, step 8): each hull
+    # made in the far shape and her stations restored when the first of them is due, as a
+    # seat made her in play; by its acts the `seated` act makes her instead
+    pending_hulls = list(data.get("hulls") or []) if road == BY_TRANSCRIPT else []
+
+    def every_agent() -> list[Any]:
+        out: list[Any] = []
+        for hull in list((getattr(world, "hulls", None) or {}).values()):
+            out.extend(list((hull.__dict__.get("agents") or {}).values()))
+        return out
+
+    def seat_hulls_due() -> None:
+        for block in list(pending_hulls):
+            records = block.get("agents") or []
+            due_tick = min((int(r.get("stationed_tick") or 0) for r in records), default=0)
+            after = min(
+                (
+                    int(r["stationed_after_inputs"])
+                    for r in records
+                    if r.get("stationed_after_inputs") is not None
+                ),
+                default=0,
+            )
+            if world.clock.tick < due_tick or i < after:
+                continue
+            pending_hulls.remove(block)
+            restore_hull(world, block)
+
     def give_acts(within: tuple[int, str] | None = None) -> None:
         # the stations' acts due here: of this tick, after as many inputs as are given;
         # `within`, the acts of a station made inside the input about to be given
@@ -182,7 +218,7 @@ def replay(
             and (within is None or station_acts[j].get("station") == within[1])
         ):
             act = station_acts[j]
-            acts_mod.give(world, act, lambda seated: driven_station(world, seated))
+            acts_mod.give(world, act, driven_station)
             if world.station_acts is not None:
                 world.station_acts.append(dict(act))  # the record, kept for a save of it
             j += 1
@@ -192,7 +228,8 @@ def replay(
         # loop are made here and after an input, where a door made them in play, and never
         # inside the World's tick (package 37i: game 10's last save replayed one line short
         # when a standing order's firing inside the tick made the door's stand-down early)
-        for agent in list(world.agents.values()):
+        seat_hulls_due()
+        for agent in every_agent():
             agent.on_between_ticks()
         give_acts()
         while i < len(inputs) and int(inputs[i]["tick"]) == world.clock.tick:
@@ -205,7 +242,8 @@ def replay(
             i += 1
             # a station seated after this input, whatever it was (package 37d: a driver's
             # line and a refused order are inputs and no orders), is seated here
-            for agent in list(world.agents.values()):
+            seat_hulls_due()
+            for agent in every_agent():
                 agent.on_input()
             give_acts()
         if world.clock.tick >= end:
@@ -215,29 +253,53 @@ def replay(
             break
     if road == BY_ACTS:
         # the stations take up the game where the replay leaves them, their record the
-        # save's transcript as far as the replay went
-        records = {str((r.get("station") or {}).get("name")): r for r in data.get("agents") or []}
-        for name, h in world.agents.items():
-            kept = [
-                e
-                for e in (records.get(name) or {}).get("transcript") or []
-                if int(e.get("tick") or 0) <= world.clock.tick
-            ]
-            h.take_up_after_replay(kept)
+        # save's transcript as far as the replay went; each hull's by her block
+        blocks = [("", data)] + [(str(b.get("id") or ""), b) for b in data.get("hulls") or []]
+        for hid, block in blocks:
+            hull = world.hulls.get(hid) if hid else world
+            if hull is None:
+                continue
+            records = {
+                str((r.get("station") or {}).get("name")): r for r in block.get("agents") or []
+            }
+            for name, h in (hull.__dict__.get("agents") if hid else hull.agents).items():
+                kept = [
+                    e
+                    for e in (records.get(name) or {}).get("transcript") or []
+                    if int(e.get("tick") or 0) <= world.clock.tick
+                ]
+                h.take_up_after_replay(kept)
     return world
 
 
-def driven_station(world: World, seated: dict[str, Any]) -> Any:
+def driven_station(world: Any, seated: dict[str, Any]) -> Any:
+    """A station built where its `seated` act stands, on the world the act names (the
+    World or a hull's façade; package 84, step 8)."""
     from freesail.agents.harness import driven_station as build
 
     return build(world, seated)
+
+
+def restore_hull(world: World, block: dict[str, Any]) -> Any:
+    """A hull of a save's `hulls` block made (in the far shape, as a seat made her in play)
+    and her stations restored on her (package 84, step 8)."""
+    from freesail.agents.harness import restore
+    from freesail.world.crews import station_world
+
+    hid = str(block.get("id") or "")
+    hull = (getattr(world, "hulls", None) or {}).get(hid)
+    if hull is None:
+        hull = station_world(world, hid)[1]
+    restore(hull, block)
+    return hull
 
 
 def _give(world: World, entry: dict[str, Any]) -> None:
     """One input again: an order to the ship, a world order from outside the scenario
     (package 36: at its tick with its source, truth 72), or a driver's line to the log."""
     if "order" in entry:
-        world.submit(str(entry["order"]), actor=str(entry["actor"]))
+        # another hull's order to her (package 84, step 8: the hull on each input)
+        acts_mod.target_of(world, entry).submit(str(entry["order"]), actor=str(entry["actor"]))
         return
     if "world_order" in entry:
         world.world_order(str(entry["world_order"]), source=str(entry.get("source", "")))
@@ -611,6 +673,12 @@ def transcripts_in(data: dict[str, Any]) -> dict[str, int]:
         entries = record.get("transcript") or []
         if entries:
             out[str((record.get("station") or {}).get("name") or "station")] = len(entries)
+    for block in data.get("hulls") or []:  # package 84, step 8: "raven/captain"
+        for record in block.get("agents") or []:
+            entries = record.get("transcript") or []
+            if entries:
+                name = str((record.get("station") or {}).get("name") or "station")
+                out[f"{block.get('id')}/{name}"] = len(entries)
     return out
 
 

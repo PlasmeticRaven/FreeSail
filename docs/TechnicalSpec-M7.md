@@ -831,7 +831,9 @@ and her stations holding the hull as their world, the World's tick run with her 
 Since step 7 the player's ship is a vessel of the sea like any member (`Vessels.own`, under
 `ships.PLAYER_ID`, last in the list and left out of every viewer's own sail; the shadow
 retired), a hull at anchor or in port may be awake, and the cap's order is a ship in
-dealings, then a hull with a stationed person, then the nearest.
+dealings, then a hull with a stationed person, then the nearest. Since step 8 the save holds
+every hull's stations (`hulls`), each input and act of a station on another ship names her
+hull, and a replay gives them to her again by either road.
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 

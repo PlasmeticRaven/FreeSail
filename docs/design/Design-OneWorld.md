@@ -1903,3 +1903,47 @@ captain is `world.captain`, read in the followed hull's tick), and `_fired_on`'s
 of her body, name, locker, way and frame. The truth's listing of ships keeps the player's
 ship as its first entry and leaves her vessel out of the sea's rows, so the director reads
 her once.
+
+### Step 8: the save and the replay of many hulls
+
+Built on step 7 as merged (the lead's head `de36e0a`). **Built.** The journal is one for the
+game (`journal`, `inputs`, `station_acts` and `world_orders` are the World's shared fields;
+`agents`, `agent_journals`, `stations` and `standing` each hull's), so a station on another
+ship's hull wrote her orders and her acts into the one record without her name, a replay
+gave them to the player's ship, and her stations were in no save (43's left-undone: the
+owner's tender save holds `agents: []` with a model at the Raven's captain's station).
+**The hull on each input and act**: an order to a hull that is not the followed carries
+`"ship": <her id>` in `inputs` (`World.submit`), and every act of a station on her carries
+it (`acts._entry`, `hull_id_of`); the followed hull's entries read as they did, with no key.
+**Given to her again**: `acts.give` and the replay's `_give` resolve the entry's hull
+(`acts.target_of`: `world.hulls[id]`, or `crews.station_world` to make her in the far shape
+as a seat made her in play) and submit, record, seat and note on her; a `seated` act builds
+its station on her (`driven_station(target, seated)`). **The save's `hulls` block**
+(`World._hull_blocks`): each hull but the followed with a station or a journal, her agents'
+records, their journals, her book of standing orders and her bindings, as the World's own
+stand at the top; her log is rebuilt by the replay as the World's is, and the checkpoint
+pickles it with her. **The replay**: by the transcript, a hull's block is made when the
+first of her stations is due (its stationed tick and count of inputs, as a station of the
+World's is seated), her hull made in the far shape and her stations restored on her
+(`replay.restore_hull`); by the acts, the `seated` act makes her at its tick; the loop's
+between-ticks and after-input calls reach every hull's stations, and at the end by the acts
+every hull's stations take up the game from their block's transcripts.
+`acts_whole`, `road_of` and `transcripts_in` read the hulls' records too ("raven/captain").
+**Found on the way, two:** a sleeping hull's station order went by the plan layer's road
+(`submit_far`) before the acts' capture, so it was journaled nowhere (the far-shape seat
+test found it): the capture comes first on that road now, as on the awake one. And the
+hull's façade answered a plain attribute of the World's by the class default over the
+instance's value (`_acts_frames` is None on the class and a list on the World), so no act
+of any station on a hull was ever journaled since step 6: the instance's value wins now.
+**The owner's tender save** loads and replays its first minutes under this build when asked
+(another build's rules, no station in it: replayed from its journal with the words that say
+so); the Raven's captain's acts were never saved by that build and cannot be replayed from
+it, which this step ends for every save from here.
+
+**Taken another way, with the reason.** The design names `ui/console.py` and `ui/server.py`
+for the load: the load's words already name the stations a save holds through
+`transcripts_in`, now the hulls' with their ship before them, and nothing else of the doors
+reads the agents' records, so the doors are not touched. The converter for a checkpoint
+with `CrewedWorld`s stands as step 6 left it (`_adopt_old_crews`): the owner's eleven
+saves came as JSON without checkpoints, so the second test the design names waits for his
+folder; the hulls tests' old-shape writer is its proof meanwhile.

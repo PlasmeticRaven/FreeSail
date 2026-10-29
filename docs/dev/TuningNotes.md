@@ -11389,3 +11389,35 @@ under three workers at its stage 7 ("hail.heard" not reached in half an hour, th
 Raven's station through the harness losing the deck to the stand-in when its reply comes
 late under load, not a fault of the step's; a finding for the harness's sampling, noted and
 not mended here.
+
+### Step 8: the save and the replay of many hulls
+
+Built on step 7 as merged (`de36e0a`; the design note's postscript "Step 8" has the shape).
+**What moved: nothing pinned.** No recorded passage has a station on another ship, and the
+followed hull's inputs and acts read as they did (no key). **The count.** `core/acts.py`
+(`hull_id_of`, `target_of`, the hull on each entry, `give` on the entry's hull),
+`core/world.py` (the hull on an input, the acts' capture before the sleeping hull's road, the
+save's `hulls` block), `core/replay.py` (`agent_records`, `acts_whole` and `transcripts_in`
+over the hulls, the hulls' blocks seated when due, `restore_hull`, every hull's stations in
+the loop and at the end), `world/hulls.py` (the façade's plain attributes: the instance over
+the class default); tests: three new (`test_replay.py` two, a fake captain on a promoted
+hull and on a far hull replayed by both roads; `test_checkpoint.py` one, the owner's tender
+save loaded and replayed its first thousand ticks).
+
+**Found on the way.** No act of a station on a hull had been journaled since step 6: the
+façade's `__getattr__` answered `_acts_frames` with the World class's default (None) and
+the harness's `frame` took it for "no journaling"; a hull's fake captain gave orders into
+her log and the save held nothing of them. And a sleeping hull's station order went to
+`crews.submit_far` before the acts' capture, so a seat on a far hull journaled no order.
+Both mended; the two new replay tests are the proof (a far hull's "heave to" by her fake
+captain lies her to in play and in the replay by the acts alike, where before the replay's
+brig sailed on for Falmouth).
+
+**Where this stopped (2026-10-29, 05:10 UTC; the account's usage near its weekly limit, the
+lead's word to push the work as it stands).** Step 8 is built as the postscript says and its
+targeted suites are green (`test_replay.py`, `test_checkpoint.py`, `test_crews.py`,
+`test_hulls.py`, `test_agents.py`, ruff clean); the whole fast tier was running on this tree
+when it was pushed. Next, in order: the fast tier whole on the final tree; the known truths',
+trials' and touched files' slow tier (`--slow -m "slow and not pace"`, the files of step 7's
+list with `test_replay.py` and `test_checkpoint.py`); the pace tests alone and `pace6.py`;
+the figures into this section and the design postscript; the green commit and its report.

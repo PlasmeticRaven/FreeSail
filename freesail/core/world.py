@@ -1729,6 +1729,12 @@ class World:
         if not self.is_followed and not getattr(own, "awake", True):
             from freesail.world.crews import submit_far
 
+            text = " ".join(text.split())
+            if actor in STATION_ACTORS and acts.capturing(self):
+                # a station's order on a sleeping hull, journaled as its act (package 42)
+                # before the plan layer takes it, so that a replay gives it to her again
+                # (package 84, step 8: before this the far road passed the journal by)
+                return acts.order(self, text, actor, said, routine)
             return submit_far(own, text, actor, said, routine)
         return self._submit_awake(text, actor=actor, said=said, routine=routine)
 
@@ -1760,7 +1766,10 @@ class World:
         # them again at their ticks (spec M4 §11; `freesail.agents.harness`)
         station = actor in STATION_ACTORS
         if not standing and not station:
-            self.inputs.append({"tick": self.clock.tick, "actor": actor, "order": text})
+            entry: dict[str, Any] = {"tick": self.clock.tick, "actor": actor, "order": text}
+            if not self.is_followed:
+                entry["ship"] = self.own.id  # another hull's order (package 84, step 8)
+            self.inputs.append(entry)
         # whose order it is, for the lines that say so (package 37g, item 10: all hands
         # called by the officer of the watch were logged "by the captain's order"): kept
         # on the ship while the order is carried out and no longer (`orders.crew.
@@ -2321,7 +2330,34 @@ class World:
             # day's budget, for the reader and a load; the director's log is the station's
             # journal (`agent_journals["director"]`), replayed as a station's notes are
             "director": self._director_block(),
+            # the other hulls (package 84, step 8): each with her stations' agents, their
+            # journals, her book and her bindings, as the World's own are above; her log is
+            # rebuilt by the replay as the World's is, and the checkpoint keeps it
+            "hulls": self._hull_blocks(),
         }
+
+    def _hull_blocks(self) -> list[dict[str, Any]]:
+        own = self.__dict__.get("_own")
+        out: list[dict[str, Any]] = []
+        for hid, hull in list((self.__dict__.get("hulls") or {}).items()):
+            if hull is own:
+                continue
+            agents = hull.__dict__.get("agents") or {}
+            journals = hull.__dict__.get("agent_journals") or {}
+            if not agents and not journals:
+                continue
+            standing = hull.__dict__.get("standing")
+            stations = hull.__dict__.get("stations")
+            out.append(
+                {
+                    "id": str(hid),
+                    "agents": [agent.save() for agent in agents.values()],
+                    "agent_journals": {name: j.save() for name, j in journals.items()},
+                    "standing_orders": standing.book.save() if standing is not None else {},
+                    "stations": stations.to_dict() if stations is not None else {},
+                }
+            )
+        return out
 
     def _director_block(self) -> dict[str, Any]:
         from freesail.agents.director import DirectorBrief
