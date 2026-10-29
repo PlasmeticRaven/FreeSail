@@ -56,7 +56,7 @@ on these packages; that is the owner's choice.
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 6 merged 2026-10-28/29** (steps 1 and 2 at `d9dba1f`, steps 3 to 6 from the sibling's `claude/pkg-84` after it; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 7 merged 2026-10-28/29** (steps 1 and 2 at `d9dba1f`, steps 3 to 7 from the sibling's `claude/pkg-84` after it; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities | briefed 2026-10-27 (below); after 83's design, beside or after 84 as the usage allows |
 | 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | **merged 2026-10-28** (`cd97ce7`); the record below |
 | 87 | Fable | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief once most of the milestone's orders are in, after 73, 77 and 84 |
@@ -597,6 +597,39 @@ body moves every second and her hull mirrors each move. **Noted for a later tidy
 mend:** the thread-local stacks are keyed by `id(world)` and never dropped, an empty list
 per World made; and the façade's `__getattr__` wraps every World method in the swap, which
 the pace figures show costing nothing the measure sees.
+
+### Package 84, step 7, as merged (2026-10-29)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` at `d9ea717` (one commit over the
+lead's `f99648d`, brought in at the boundary; 25 files, 534 lines added and 172 removed);
+ruff clean; the sibling's fast tier whole on the final tree 3,917 passed and one failed, the
+pictures' blank-image check, which that day failed alone on the step's tree and on a worktree
+at `f99648d` alike with the same figure (the known flake); its slow tier of the known truths,
+the trials and the touched files 151 of 161 passed with eight left out by their marks and two
+failed, the lee-shore trial's container digest and truth 7-143 before the hail's mend (green
+alone after it); its pace tests on a worktree at `f99648d` and on the step's tree in turn
+under the container's floor on both, the step costing nothing the measure sees; the lead's
+fast tier of the touched files; **the whole suite on the merged tree in the cloud (the
+figures below).** **The step:** the player's ship is a vessel of the sea (`Vessels.own`,
+under `ships.PLAYER_ID`, the one definition, which the brains, the squadrons and the action
+import), made at the World's start after the scenario's and the business's ships and at an
+old checkpoint's load, appended last and kept last, her hull the followed hull and the
+followed hull's vessel she, brought up to her truth every tick; `player_shadow` keeps its
+name and answers with her, so every reader of the shadow reads the vessel; a viewer's own
+body is left out of `in_sight` and of the hail's addressees; the `PLAYER_ID` cases are one
+rule through the vessel's hull (the squadrons' body, the action's, the boarding's, the hail's,
+the captains'), the followed hull's way and frame her ship's own so the sets' stations
+compute as before; `Vessels.active()` the other sail. **The cap's order** (decisions 3 and
+6): the not-crewed states retired, so a hull at anchor or in port is awake under the cap and
+a station may be seated on her in port; the order a ship in dealings, then a hull with a
+stationed person, then the nearest, a higher rank within the range taking the farthest
+lower-ranked crewed ship's place at a full cap; `crewed: {stationed: always}` keeps a
+stationed hull awake whatever her distance. **Found on the way, both mended:** the business
+could name a trader after the player's ship (her name was not among the sea's); and with her
+on the sea the hail took the ship herself for "her" (truth 7-143 found it). **The lead's
+review:** sound; two tidies for step 11's long tail, not mends: `combat/action.py`'s
+`target_of` keeps an `if False:` arm where the shadow's branch was, and `world/ships.py`'s
+`_lying_to` imports the readings' `_manoeuvre` from the api layer (lazily, so no cycle).
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
