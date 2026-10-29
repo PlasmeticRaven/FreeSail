@@ -52,7 +52,7 @@ on these packages; that is the owner's choice.
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue | behind 70 and 73 |
 | 78 | Opus | Sight across land; collision; fine control of the sails and the gybe as an evolution | where the sailing wants it |
-| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | 79a and 79b briefed below and **launched 2026-10-29** as Opus sibling sessions on `claude/pkg-79a` and `claude/pkg-79b` (the owner's approval); 79c and 79d after them; the order 79a, 79b, 79c, 79d; none depends on 84 |
+| 79 | Opus | **Split 2026-10-29 (the owner):** 79a the regimes filled out and sourced; 79b the Channel's east block (`channel-east`, the Wight to Dunkirk); 79c the Mediterranean west (the Strait to Cartagena and the Balearics, with its research pass for the period's pilots); 79d the Gulf of Lion and the Tyrrhenian (Toulon, Corsica, Sardinia, Elba, Naples); Sicily and Malta, and the eastern basin, later blocks | **79a merged 2026-10-29** (the record below); 79b launched 2026-10-29 as an Opus sibling session on `claude/pkg-79b`, its region built; 79c and 79d after them; the order 79a, 79b, 79c, 79d; none depends on 84 |
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs with or after 84 |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
@@ -633,6 +633,46 @@ on the sea the hail took the ship herself for "her" (truth 7-143 found it). **Th
 review:** sound; two tidies for step 11's long tail, not mends: `combat/action.py`'s
 `target_of` keeps an `if False:` arm where the shadow's branch was, and `world/ships.py`'s
 `_lying_to` imports the readings' `_manoeuvre` from the api layer (lazily, so no cycle).
+
+### Package 79a as merged (2026-10-29)
+
+Merged `--no-ff` from the Opus sibling session's `claude/pkg-79a` at `44fc890` (three
+commits on the lead's `b3aff3a`; 10 files, 807 lines added and 34 removed), after the
+period's books the ships session filed were brought forward from `claude/pkg-75` as data
+(`docs/references/`, James, Nicolas, Niles, Jackson, Steel 1805 and the rest, with their
+README rows), since the package's citations point at them; ruff clean; the builder's fast
+tier whole 3,924 passed with the pictures' blank-image check the one failure (the known
+flake, passing alone), its slow tier of the touched files and the squadrons' truths green;
+the lead's run of the touched files and the new truths; **the whole suite on the merged tree
+in the cloud (the figures below).** **The package:** every knob of `data/regimes.yaml` and
+every key of the eight nations' `naval:` blocks (a `sources:` map each) cited by work,
+volume and page, or said to be judgement with what was looked for; **no figure moved**; the
+three a source gives differently written beside their knobs for the lead (below). The
+commission drawn by the business: a ship in ordinary with no sortie is commissioned at the
+region's peopling or the business's minute for an intent of her nation's (a doctrine station
+within the region, else a passage to another of her ports), the delay from the regime's
+knob drawn from the business's own stream, said in her story and the port's news (the
+director's form writes the news too now), the line gone when she sails; a ship with a sortie
+keeps the sortie rule; a ship with no intent of her nation's stays laid up and says so. The
+blockades the sources give, dated: Rochefort to 12 July 1805 (off Chassiron, the rendezvous
+Quiberon), Ferrol off Cape Prior, Cadiz under Orde to 9 April 1805 and from 31 May off
+Cadiz at fifteen miles, Lorient from 1808; the ships in ordinary of Rochefort, Lorient,
+Ferrol and Cadiz. The Channel's two regions draw nothing new (truth 7-267; the business's
+record byte for byte the base's). Iberia's drift a note: Tofiño has no climatic table, the
+weather untouched. Truths 7-260 to 7-269 (7-260 sets the clock forward over the 55-hour
+delay, said in its docstring, the ship a brainless hull throughout). **The lead's rulings on
+the figures that differ, all kept as the builder left them:** the commission's delay stays
+two to five days (the record's eleven to thirteen weeks cut for play, the owner's earlier
+judgement); the sortie's wind stays 22 knots from any quarter, with the sources' better rule
+(a sortie on a strong fair wind off the land) booked for the regimes' next pass, since it
+moves truth 7-154; the convoy's size stays four to eight under the cap; the blockade book's
+Torbay stays, Plymouth and Cawsand being James's and Torbay the fleet's lee anchorage in
+every account the game's earlier packages read. **Found and left, booked for 79c with the
+Mediterranean's nations:** the blockade book's westerly sector is Brest's for every port
+(Cadiz's danger was easterly), a per-port `blown_off` for the book; the business draws every
+blockade as a frigate and a brig, the far body having no ship of the line until package 75's
+74. The launch prompt named a CLAUDE.md the repository does not have; the briefs' heads and
+the records served, and the next prompts will not name it.
 
 ## Package 70: the combat core (`freesail/combat/` new: `shot.py`, `hits.py`, `morale.py` or as the design finds; `freesail/crew/bill.py` the quarter bill beside the watch bill, `crew/model.py`, `muster.py` the casualties' states; `freesail/ship/schema.py`, `parts.py`, `graph.py` the gun as a part, the magazine and the shot as stores; `tools/gen_ships.py` and `data/ships/cutter.yaml`, `frigate-36.yaml` first, the others as reached; `freesail/evolutions/` the gunnery's evolutions and the work in action, `data/evolutions/*.yaml`; `freesail/world/captains.py`, `brains.py`, `data/captains/*.yaml` the engaging state filled, `data/standing_orders/fighting.orders` new; `freesail/world/orders.py`, `data/vocabulary.yaml`, `freesail/orders/` the orders of the gun deck; `freesail/api/readings.py` the guns, the damage and the bill as readings; `freesail/agents/harness.py`, `director.py`, `data/director/` the stations in action and the director's forms; `freesail/world/scenarios.py`, `data/scenarios/` the first action; `docs/TechnicalSpec-M7.md` §7 to §12 as built; `docs/agents/Harness.md`; the primer's new chapter; `docs/dev/TuningNotes.md`; tests beside each, `tests/test_known_truths.py` truths 7-133 onward)
 
