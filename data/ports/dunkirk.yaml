@@ -1,0 +1,120 @@
+# FreeSail: Dunkirk as a port (package 79b, the Channel's east block; the same form as
+# st-malo.yaml, on package 35's machinery). The road and the marks are
+# features/channel-east.yaml's (the harbour patch dunkirk).
+#
+# Sources. Faden 1793, 'Dunkirk', pp. 2 to 4: the road two miles and a half from the town
+# behind the Brack, a bank parallel to the shore six miles east and west with 4 feet at low
+# water, sheltering ships from the N W, north and N E; anchor east of the town almost close
+# to the jetties in 9 or 10 fathoms, clay and sand, very good holding, or to the west in 6
+# to 8; the west channel between the Wilbraert and the Bree, Gravelines steeple and Mardick
+# tower and Berg's steeples the marks, the Splinter steep-to with 6 or 8 feet; the east
+# channel between the Brack's tail and the Cams; into the harbour by the two beacons a
+# handspike's length open, between the jetties; the tide rises 12 feet; the buoys of the
+# road laid by the Admiralty of Dunkirk in 1771 and 1776; pp. 5 to 9: the banks of
+# Flanders, the tides. Norie 1805, Table XLI, p. 249: Dunkirk 11h 45m, 12 feet. Moore 1799,
+# 'Tides', p. 142: Dunkirk in the table's N by W group. The encyclopaedia, 'Phare de
+# Dunkerque' (fr.wikipedia.org, read 2026-10-29): a fanal at the Risban lit in 1683 and
+# carried away in 1825. The datum: SHOM's RAM at Dunkerque, BMVE 0.60 m above the zero
+# (read 2026-10-29), for a patch; no period sheet read: `datum: unverified`.
+#
+# The stance. Dunkirk is French and hostile to a King's ship: the privateers' port, Jean
+# Bart's, its harbour's works destroyed by the treaty of Utrecht and rebuilt; a division of
+# the invasion flotilla lay here (from memory; noted, not modelled). The grid's shore west
+# of the town is the modern port's (Port Ouest), land in the tiles where the Splinter's
+# sands and the shore of Mardick were in 1805. Prices JUDGEMENT, in sterling.
+
+id: dunkirk
+name: Dunkirk
+nation: france
+source: "Faden 1793, 'Dunkirk', pp. 2-9; Norie 1805, Table XLI, p. 249; Moore 1799, 'Tides', p. 142"
+datum: unverified   # no period sheet read; SHOM's RAM BMVE 0.60 m for a patch
+
+outer_road:
+  feature: dunkirk-road
+  name: the road of Dunkirk
+  lat_deg: 51.0619
+  lon_deg: 2.3691
+  depth_fathoms: 8
+anchorage:
+  feature: dunkirk-road
+  name: the road of Dunkirk
+  lat_deg: 51.0619
+  lon_deg: 2.3691
+  depth_fathoms: 8
+mooring:
+  name: the harbour between the jetties
+  lat_deg: 51.0430     # within the jetties' mouth (judgement)
+  lon_deg: 2.3670
+  depth_fathoms: -0.3  # judgement: the harbour all but dry at low water, twelve feet at springs
+  bottom: sand
+  deep_draught_ft: 12  # Faden: the tide rises twelve feet
+shore:
+  name: the quay at Dunkirk
+  lat_deg: 51.0390
+  lon_deg: 2.3720
+
+pilot:
+  station: dunkirk-road
+  cruising_nm: 10                # judgement: the Dunkirk pilots at the heads of the west channel
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Dunkirk pilots' boat
+    under: lugsails
+    note: "a schuyt or lugger (judgement)"
+  names: [Bart, Vandamme, Coppens, Verstraete, Declercq, Hennebert, Lefebvre, Baert]   # Flemish names: judgement
+  skill: 0.9
+  fee_pounds: 4                  # judgement, in sterling; unverified
+  cast: larboard                 # the head paying off to the westward, for the west channel (judgement)
+  course_out_deg: 280            # W by N out of the road by the west channel along the shore
+  words:
+    channel: "By the west channel: bring Gravelines steeple south by west and you are abreast the Wilbraert's head; steer in between it and the Bree by your lead, keep Gravelines steeple touching the sand-hill until Mardick tower opens east of Berg's steeples, to shun the Splinter, which is steep-to with six or eight feet; then haul in for Mardick's pier-heads until within the Brack. By the east channel borrow on the main, Berg's steeples half a ship's length west of Zudcote's."
+    marks: "Dunkirk's great steeple over the dunes, seen five leagues off; the mills east of the town; Gravelines' tall spire and its two mills to the west; Mardick tower; the Brack's white buoy at its west end, the black buoys of the Splinter and the Geere on the land side."
+    anchorage: "The road lies behind the Brack, which breaks the sea from the north; anchor east of the town almost close to the jetties in nine or ten fathoms on clay and sand, very good holding, or to the west in six to eight. Into the harbour on the flood by the two beacons, the inner a handspike's length east of the outer, between the jetties."
+    tide: "It is high water about a quarter before twelve at full and change and the tide rises twelve feet. Along the banks the first of the flood sets over them toward the land, then along the shore, the after-flood to the north; when the flood begins to run athwart the banks it is half flood at the land."
+
+tide:
+  establishment: Dunkirk
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: geneva, price: 65, origin: null, note: "Dutch and Flemish gin; judgement"}
+    - {good: brandy, price: 95, origin: france, note: "judgement"}
+    - {good: wine, price: 40, origin: france, note: "judgement"}
+    - {good: salt fish, price: 28, origin: france, note: "the herring and Iceland cod of Dunkirk's fishery; judgement"}
+    - {good: salt, price: 12, origin: france, note: "judgement"}
+    - {good: canvas, price: 44, origin: france, note: "judgement"}
+    - {good: linen, price: 85, origin: france, note: "Flemish linen; judgement"}
+    - {good: butter, price: 46, origin: france, note: "Flemish butter; judgement"}
+    - {good: tobacco, price: 75, origin: null, note: "the Flemish manufactories; judgement"}
+    - {good: salt beef, price: 72, origin: france, note: "judgement"}
+    - {good: timber, price: 7, origin: france, note: "judgement"}
+    - {good: tea, price: 150, origin: null, note: "for the English smugglers, who came over for it before the war; judgement"}
+
+dockyard:
+  kind: chandlers                # the privateers' builders and the town's chandlers
+  items:
+    - {item: topmast, hours: 10, pounds: 42, note: "judgement"}
+    - {item: topgallant_mast, hours: 5, pounds: 12}
+    - {item: yard, hours: 7, pounds: 26}
+    - {item: suit of sails, hours: 48, pounds_per_100m2: 23, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # judgement: the privateers take the seamen
+  able: {hands: 2, pounds: 2, delay_h: 24}
+  ordinary: {hands: 4, pounds: 1.5, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [dunkirk-road, 51 04 N 2 15 E, 51 06 N 2 05 E]
+  from_sea: [51 06 N 2 05 E, 51 04 N 2 15 E, dunkirk-road]
+  in: [dunkirk-road]

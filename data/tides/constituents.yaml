@@ -624,3 +624,73 @@ held_gauges:
     M2: {amplitude_m: 0.307, phase_deg: 52.9}
     S2: {amplitude_m: 0.113, phase_deg: 79.5}
     N2: {amplitude_m: 0.063, phase_deg: 38.1}
+  # THE CHANNEL EAST'S GAUGES, THE WIGHT TO DUNKIRK, READ AND HELD (package 79b). TICON's
+  # file read 2026-10-29 by coordinates over 49.0 to 51.6 N and 2.1 W to 2.6 E (the zip at
+  # doi.pangaea.de, SHA-256 7055f8ed1a14abf8...6514, the same file as 39a's): Newhaven,
+  # Le Havre, Dieppe, Boulogne, Calais and Dunkirk, one record each; Dover is among the
+  # eleven (its figures again to the centimetre and the degree), Portsmouth and
+  # Bournemouth are package 39a's (above), Cherbourg the eleven's; Sheerness (51.44 N,
+  # 0.74 E) is in the file and is the Thames's, a later block's, and not taken here. No
+  # gauge at Deal, Ramsgate, Rye, Fecamp or Saint-Valery. The French gauges' mean levels
+  # are the NM of SHOM's RAM at the gauge's station (the WFS layer
+  # RAM_BDD_WLD_WGS84G_WFS:ram_3857, Licence Ouverte 2.0, read 2026-10-29): VERIFIED.
+  # Newhaven's is UNVERIFIED (no published level read), null.
+  #
+  # HELD, NOT BLENDED, as every block's are until the lead rules on the gauges' water:
+  # these lie within the reach (400 miles) of every Channel position, so each would enter
+  # the blend at Falmouth and move every recorded passage. The world's tide over the
+  # block is the eleven's blend, in which Dover is the nearest gauge.
+  - id: newhaven
+    name: Newhaven
+    lat_deg: 50.7818
+    lon_deg: 0.0570
+    record: "GESLA-2, BODC, 1982 to 2014"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 2.247, phase_deg: 321.0}
+    S2: {amplitude_m: 0.728, phase_deg: 10.8}
+    N2: {amplitude_m: 0.425, phase_deg: 299.6}
+  - id: le-havre
+    name: Le Havre
+    lat_deg: 49.4819
+    lon_deg: 0.1060
+    record: "GESLA-2, REFMAR, 1938 to 2014"
+    mean_level_m: 4.96  # SHOM's RAM, Le Havre's NM
+    M2: {amplitude_m: 2.621, phase_deg: 285.6}
+    S2: {amplitude_m: 0.880, phase_deg: 333.1}
+    N2: {amplitude_m: 0.494, phase_deg: 265.3}
+  - id: dieppe
+    name: Dieppe
+    lat_deg: 49.9292
+    lon_deg: 1.0845
+    record: "GESLA-2, REFMAR, 1953 to 2014"
+    mean_level_m: 5.08  # SHOM's RAM, Dieppe's NM
+    M2: {amplitude_m: 3.102, phase_deg: 311.1}
+    S2: {amplitude_m: 1.019, phase_deg: 1.3}
+    N2: {amplitude_m: 0.573, phase_deg: 290.7}
+  - id: boulogne
+    name: Boulogne
+    lat_deg: 50.7274
+    lon_deg: 1.5777
+    record: "GESLA-2, REFMAR, 1941 to 2014"
+    mean_level_m: 5.00  # SHOM's RAM, Boulogne-sur-Mer's NM
+    M2: {amplitude_m: 2.947, phase_deg: 328.8}
+    S2: {amplitude_m: 0.958, phase_deg: 20.2}
+    N2: {amplitude_m: 0.538, phase_deg: 307.0}
+  - id: calais
+    name: Calais
+    lat_deg: 50.9694
+    lon_deg: 1.8677
+    record: "GESLA-2, REFMAR, 1941 to 2014"
+    mean_level_m: 4.03  # SHOM's RAM, Calais's NM
+    M2: {amplitude_m: 2.465, phase_deg: 342.5}
+    S2: {amplitude_m: 0.770, phase_deg: 34.7}
+    N2: {amplitude_m: 0.441, phase_deg: 320.1}
+  - id: dunkirk
+    name: Dunkirk
+    lat_deg: 51.0481
+    lon_deg: 2.3667
+    record: "GESLA-2, REFMAR, 1956 to 2014"
+    mean_level_m: 3.24  # SHOM's RAM, Dunkerque's NM
+    M2: {amplitude_m: 2.146, phase_deg: 352.4}
+    S2: {amplitude_m: 0.648, phase_deg: 44.9}
+    N2: {amplitude_m: 0.374, phase_deg: 329.1}

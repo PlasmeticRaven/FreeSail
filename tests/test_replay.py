@@ -978,3 +978,124 @@ def test_the_players_seat_hears_a_stations_say_and_a_replay_by_the_acts_hears_it
         for name, journal in world.agent_journals.items():
             assert copy.agent_journals[name].save() == journal.save(), (road, name)
     assert OFFICER in world.agents
+
+
+# ---------------------------------------------------------------------------
+# Package 84, step 8: the save and the replay of many hulls
+# ---------------------------------------------------------------------------
+
+
+def _hull_with_a_fake_captain(orders: tuple[str, ...] = ("set the royals",)):
+    """The frigate hove to with a brig promoted beside her and a fake captain seated at the
+    brig's station through her hull (as the desk seats one with `ship`)."""
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents.agent import captain
+    from freesail.agents.fake import captain_of_the_ship
+    from tests.test_crews import hove_to_world
+
+    w = hove_to_world()
+    w.record_driver("routine", "driver.book", "The book of standing orders begins empty.")
+    # the brig put on the sea by world orders, which a replay gives again at their tick
+    e = w.world_order('ship: a merchant brig "X" of Britain at 49 33 N 5 30 W, bound for Falmouth')
+    assert e.kind == "world.order" and e.data.get("result") == "done", e.text
+    e = w.world_order('ship "X": intent bound for Falmouth')
+    assert e.data.get("result") == "done", e.text
+    b = w.vessels.find("X")
+    w.run(61)
+    hull = b.crew
+    assert hull is not None and hull.shape == "full"
+    every = SamplingPolicy.in_lockstep(600, "notable", "urgent")
+    h = Harness(hull, captain(every, world=hull), captain_of_the_ship(list(orders)))
+    h.start()
+    return w, b, hull, h
+
+
+def test_a_fake_captain_of_another_ship_is_saved_with_her_hull_and_replays_by_both_roads():
+    """Package 84, step 8 (43's left-undone closed): a station on another ship's hull is
+    in the save (the `hulls` block), her orders are journaled with her hull's id and given
+    to her again, her acts name her hull, and a replay by the transcript and by the acts
+    gives the player's log and her log the same digests, her station restored on her hull
+    and the player's ship with no station of hers."""
+    import json
+
+    from freesail.api.session import ship_factory
+
+    w, b, hull, h = _hull_with_a_fake_captain()
+    w.run(1800)
+    assert any(e.actor == "the captain" and "royals" in e.text for e in hull.log)
+    assert not any(e.actor == "the captain" and "royals" in e.text for e in w.log)
+    assert "captain" not in w.agents and hull.agents["captain"] is h
+    # the hull on each input and act
+    hers = [e for e in w.inputs if e.get("ship") == b.id]
+    assert not hers  # a station's orders are its acts, in no list of the player's inputs
+    acts_of_hers = [a for a in w.station_acts if a.get("ship") == b.id]
+    assert acts_of_hers and all(a["station"] == "captain" for a in acts_of_hers)
+    assert {
+        k for a in acts_of_hers for k in a if k not in ("tick", "after_inputs", "station", "ship")
+    } >= {
+        "seated",
+        "order",
+    }
+    data = json.loads(json.dumps(w.save()))
+    assert [blk["id"] for blk in data["hulls"]] == [b.id]
+    assert [a["station"]["name"] for a in data["hulls"][0]["agents"]] == ["captain"]
+    assert data["hulls"][0]["agents"][0]["acts"] is True and data["agents"] == []
+    assert replay.acts_whole(data) and replay.transcripts_in(data) == {
+        f"{b.id}/captain": len(h.transcript)
+    }
+    for road in (replay.BY_TRANSCRIPT, replay.BY_ACTS):
+        copy = replay.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == w.log.digest(), road
+        ch = copy.hulls[b.id]
+        assert ch.log.digest() == hull.log.digest(), road
+        assert "captain" in ch.agents and "captain" not in copy.agents, road
+        assert ch.agents["captain"].world is ch
+        assert ch.agent_journals["captain"].save() == hull.agent_journals["captain"].save(), road
+    # by its acts her station takes up the game where it stands, and a save of it replays
+    copy = replay.replay(data, ship_factory, road=replay.BY_ACTS)
+    ch = copy.hulls[b.id].agents["captain"]
+    assert not ch.driven and ch.transcript == h.transcript
+    copy.run(600)
+    again = json.loads(json.dumps(copy.save()))
+    assert replay.replay(again, ship_factory, road=replay.BY_ACTS).log.digest() == copy.log.digest()
+
+
+def test_a_station_seated_on_a_far_hull_is_made_again_by_the_replay_when_she_is_due():
+    """A seat on a ship beyond the range makes her hull in the far shape (`station_world`);
+    a replay by the transcript makes her so again when her station is due, and by the acts
+    at her `seated` act, to the same logs."""
+    import json
+
+    from freesail.agents import Harness, SamplingPolicy
+    from freesail.agents.agent import captain
+    from freesail.agents.fake import captain_of_the_ship
+    from freesail.api.session import ship_factory
+    from freesail.world import crews as K
+    from tests.test_crews import hove_to_world
+
+    w = hove_to_world()
+    w.record_driver("routine", "driver.book", "The book of standing orders begins empty.")
+    e = w.world_order(
+        'ship: a merchant brig "Far" of Britain at 49 45 N 5 30 W, bound for Falmouth'
+    )
+    assert e.data.get("result") == "done", e.text
+    e = w.world_order('ship "Far": intent bound for Falmouth')
+    assert e.data.get("result") == "done", e.text
+    b = w.vessels.find("Far")
+    w.run(120)
+    assert b.crew is None  # fifteen miles off: not promoted
+    _, hull = K.station_world(w, "Far")
+    assert hull.shape == "far"
+    every = SamplingPolicy.in_lockstep(600, "notable", "urgent")
+    Harness(hull, captain(every, world=hull), captain_of_the_ship(["heave to"])).start()
+    w.run(1800)
+    assert b.id in w.hulls and any(
+        e.kind == "crew.promoted" or e.kind == "crew.demoted" for e in hull.log
+    )
+    data = json.loads(json.dumps(w.save()))
+    assert [blk["id"] for blk in data["hulls"]] == [b.id]
+    for road in (replay.BY_TRANSCRIPT, replay.BY_ACTS):
+        copy = replay.replay(data, ship_factory, road=road)
+        assert copy.log.digest() == w.log.digest(), road
+        assert copy.hulls[b.id].log.digest() == hull.log.digest(), road
+        assert "captain" in copy.hulls[b.id].agents, road

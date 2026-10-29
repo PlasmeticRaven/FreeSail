@@ -53,11 +53,32 @@ nations:
       keeps_the_sea: true
       keeps_port: false
       engages: true
-      blockades: [brest]
+      # package 79a (the brief's item 3): the blockades the sources give, each a port of
+      # the chart with the dates of the blockade (`since`, `until`) and its own offshore
+      # station and lee rendezvous where the blockade book's (Brest's) do not serve; drawn
+      # by the business only between the dates. Brest's entry is 72's, the book's stations
+      # (the Channel's two regions are the business-on free games': nothing new drawn there)
+      blockades:
+        - brest
+        - {port: rochefort, since: 1803-06-01, until: 1805-07-12, offshore: {place: the point of Chassiron, within_nm: 15}, rendezvous: the Bay of Quiberon, source: "James vol. 4 p. 78: Collingwood and before him Calder blockading Missiessy's squadron in Rochefort in 1804, Calder close off the port on 2 August; p. 79: the blockaders under Graves put into Quiberon Bay in a south-westerly gale, January 1805; p. 47: Stirling raised the blockade of the road of Aix by Gardner's order on 12 July 1805, and Allemand sailed on the 16th. The beginning judgement (the war's first summer); the offshore station off Chassiron judgement (looked for: the blockaders' station off the Pertuis in James vols. 3 and 4)"}
+        - {port: ferrol, since: 1804-12-12, offshore: {place: Cape Prior, within_nm: 15}, source: "James vol. 3 p. 333: off Ferrol, with five French and seven Spanish of the line ready for sea, cruised Cochrane's squadron of seven of the line at the war's beginning with Spain; p. 307: Calder sent to the station off Ferrol and Corunna in February 1805; p. 356: Calder off Cape Prior from March 1805, never more than nine of the line. The beginning Spain's declaration (the wars below); the end none in the pages read"}
+        - {port: cadiz, since: 1804-12-12, until: 1805-04-09, offshore: {place: Cadiz, within_nm: 15}, source: "James vol. 3 p. 333: off Cadiz a squadron of five and occasionally six of the line under Orde at the beginning of 1805; p. 341: driven away by Villeneuve standing into the bay on 9 April 1805. The beginning Spain's declaration, Orde's first day not found in the pages read"}
+        - {port: cadiz, since: 1805-05-31, offshore: {place: Cadiz, within_nm: 15}, source: "James vol. 3 p. 375: on 31 May 1805 a frigate and two brigs the only British force off Cadiz (the Lively; the Glorioso slipped out past them), the force the business draws for a blockade; Collingwood, chased off by the combined fleet on 20 August, resumed his station before daylight on the 21st with four of the line; p. 379: of Nelson's 27 sail, 22 cruised about fifteen miles off Cadiz and five under Louis close off the harbour: the offshore fifteen miles as the source gives them"}
+        - {port: lorient, since: 1808-03-01, offshore: {place: the Isle of Groix, within_nm: 12}, source: "James vol. 4 pp. 312 to 313: in March 1808 Lorient, with three or four of the line ready or fitting, watched by the Impetueux and Saturn, 74s, the frigates Aigle and Narcissus and two or three smaller vessels; no blockade of Lorient in 1803 to 1805 in the pages read (the Didon sailed from it on 2 May 1805, vol. 3 p. 350). The offshore station off Groix and its miles judgement"}
       convoys: true
       convoy_escort: brig-sloop
       privateers: "chase what pays"
-      source: "the British practice of 1803 to 1805: the close blockade of Brest under Cornwallis, the convoy acts, the single-ship actions sought (Mahan, James, from memory); judgement"
+      source: "the British practice of 1803 to 1805: the close blockade of Brest under Cornwallis, the convoys under the Regulations, the single-ship actions sought; every key's source below"
+      # package 79a (the brief's item 1): each knob's source by work, volume and page, or
+      # judgement with what was looked for; no figure moved
+      sources:
+        keeps_the_sea: "James vol. 3 p. 307: Cornwallis kept the blockade of Brest for 22 months, two boisterous winters among them, with a force not exceeding eleven of the line against 21; vol. 4 p. 286: the Brest ships of 1808 kept in port by the vigilance of Gambier's Channel fleet"
+        keeps_port: "the converse of keeps_the_sea (James vol. 3 p. 307)"
+        engages: "judgement: the single-ship actions are the far fight's and the action's (package 74; the brief's item 5)"
+        blockades: "the entries' own sources above; the Texel's Dutch squadron of seven (James vol. 3 p. 309) lies off the chart and is not drawn (three British ships were all the North Sea required in 1803, vol. 3 pp. 169 to 170)"
+        convoys: "the Regulations 1806 pp. 398 to 403, Convoys; Niles vol. VII p. 175: masters prosecuted for sailing without convoy"
+        convoy_escort: "James vol. 3 p. 259, vol. 4 p. 91, vol. 5 p. 389, vol. 6 p. 70: a ship-sloop or brig-sloop over the smaller convoys (data/regimes.yaml `escorting`)"
+        privateers: "judgement: the British privateer's prey not looked for in this package (her letters of marque the nation's entry above)"
   france:
     name: France
     adjective: French
@@ -92,10 +113,25 @@ nations:
       blockades: []
       convoys: false
       slips_out_when_blown_off: true
+      # package 79a (the brief's item 3): the ships in ordinary of the ports the sources
+      # name beside Brest's (72's, kept: the Channel's regions draw nothing new); a ship
+      # with a `sortie` slips out when the offing is clear, one with none is commissioned
+      # by the business after the regime's delay for an intent of France's
       in_ordinary:
         - {port: brest, description: frigate, sortie: "cruise off the Lizard within 20 miles"}
+        - {port: rochefort, description: frigate, sortie: "cruise off the Baleines within 20 miles", source: "James vol. 4 p. 79: Missiessy out of Rochefort on 11 January 1805 in the blockaders' absence; vol. 4 p. 47: Allemand out four days after the blockade was raised; a frigate for the squadrons (the ship files have no ship of the line for the far body); judgement on the station"}
+        - {port: lorient, description: frigate, source: "James vol. 3 p. 350: the Didon sailed from Lorient on 2 May 1805 with Napoleon's duplicates, Lorient unblockaded in the pages read: a frigate commissioned for a cruise or a passage, not a sortie"}
       privateers: "chase what pays"
-      source: "the Brest fleet and frigates keeping port under the blockade and sailing when the blockaders were blown off (Mahan, from memory); the corsairs of St Malo and Dunkirk; judgement"
+      source: "the Brest fleet and frigates keeping port under the blockade and sailing when the blockaders were off their station; every key's source below"
+      sources:
+        keeps_the_sea: "James vol. 3 p. 170: the French ready for sea at Brest made no attempt to sail when the blockaders retired in the gales of Christmas 1803; p. 307: 21 of the line kept in Brest by eleven"
+        keeps_port: "as keeps_the_sea; James vol. 3 pp. 307 to 308: the van of nine came out off the Black Rocks on 15 April 1805 and returned into port after manoeuvring between Bertheaume and Camaret; pp. 308 to 309: the fleet's anchorage outside the Goulet under 150 guns"
+        engages: "judgement: the fighting habits are the far fight's and the action's (package 74; the brief's item 5)"
+        blockades: "none: no French blockade of a port of the chart in James vols. 3 and 4 (looked for); judgement"
+        convoys: "James vol. 4 p. 383 (a convoy of ten sail of coasters under a gun-boat on the coast of Italy, 1808) and vol. 5 p. 36 (another convoy of about 30 sail in the Maumusson passage, 1810) number French coasting convoys under gun-vessels, which the business does not draw: the source gives France convoying her coasters; kept at false until re-measured"
+        slips_out_when_blown_off: "James vol. 3 p. 314: eleven of the line out of Brest on 13 December 1805 in the absence of the blockading fleet; vol. 4 p. 79: Missiessy out of Rochefort in Graves's absence, January 1805; vol. 4 p. 390: Willaumez out of Brest in February 1809 after westerly gales had driven Gambier off"
+        in_ordinary: "the entries' own sources above; Brest's frigate 72's (James vol. 4 p. 286: large frigates occasionally slipping out of the ports of the French Channel and Atlantic frontier, 1808)"
+        privateers: "Nicolas vol. 1 p. 306 (18 May 1793): Nantes, Bordeaux and Lorient filled with English prizes to the French privateers and frigates; the corsairs of St Malo and Dunkirk looked for in James and Nicolas and not found"
   spain:
     name: Spain
     adjective: Spanish
@@ -128,8 +164,22 @@ nations:
       blockades: []
       convoys: false
       slips_out_when_blown_off: true
+      # package 79a (the brief's item 3): the ships in ordinary at the two ports under
+      # blockade the sources give
+      in_ordinary:
+        - {port: ferrol, description: frigate, sortie: "cruise off Cape Ortegal within 20 miles", source: "James vol. 3 p. 333: seven Spanish of the line ready for sea at Ferrol and three more fitting, January 1805; a frigate for them; the station judgement"}
+        - {port: cadiz, description: frigate, sortie: "cruise off Cape Santa Maria within 20 miles", source: "James vol. 3 p. 333: seven Spanish of the line ready at Cadiz and four equipping; vol. 3 p. 375: the Glorioso put to sea from Cadiz on 31 May 1805 finding a frigate and two brigs the only British force off it; the station judgement"}
       privateers: "chase what pays"
-      source: "Ferrol and Cadiz under blockade in 1805 (from memory); judgement"
+      source: "Ferrol and Cadiz under blockade in 1805; every key's source below"
+      sources:
+        keeps_the_sea: "James vol. 3 p. 333: the Spanish ships ready for sea lay in Ferrol, Cadiz and Carthagena under the British squadrons off them"
+        keeps_port: "as keeps_the_sea (James vol. 3 p. 333)"
+        engages: "judgement (package 74's)"
+        blockades: "none: no Spanish blockade in James vols. 3 and 4 (looked for); judgement"
+        convoys: "judgement (looked for: a Spanish convoy in James vols. 3 and 4; the treasure ships of 1804, vol. 3 pp. 286 to 289, sailed as a squadron of frigates)"
+        slips_out_when_blown_off: "James vol. 4 pp. 119 to 120: French frigates out of Cadiz in February 1806 when a strong easterly had driven the squadron west to Cape Santa Maria; vol. 3 p. 375: the Glorioso out when the watch was light"
+        in_ordinary: "the entries' own sources above (James vol. 3 pp. 333 and 375)"
+        privateers: "judgement (looked for in James vol. 3: a Spanish privateer waiting for the dispersed Newfoundland convoy, 1800, p. 36)"
   batavian-republic:
     name: the Batavian Republic
     adjective: Dutch
@@ -162,7 +212,14 @@ nations:
       blockades: []
       convoys: false
       privateers: "chase what pays"
-      source: "the Texel squadron under blockade (from memory); judgement"
+      source: "the Texel squadron; every key's source below"
+      sources:
+        keeps_port: "James vol. 3 p. 309: the Texel squadron of seven, in Napoleon's design of 1805"
+        keeps_the_sea: "as keeps_port (James vol. 3 p. 309)"
+        engages: "judgement (package 74's)"
+        blockades: "none: the Texel lies off the chart, and no Dutch port is in its index (data/nations.yaml `ports:`); no blockade of the Texel named in James vols. 3 and 4 (three British ships all the North Sea required in 1803, James vol. 3 pp. 169 to 170); judgement"
+        convoys: "judgement (not looked for: the Dutch trade lies off the chart)"
+        privateers: "judgement (not looked for)"
   united-states:
     name: the United States
     adjective: American
@@ -197,7 +254,15 @@ nations:
       blockades: []
       convoys: false
       privateers: "chase what pays"
-      source: "the frigate actions of 1812 (James, from memory); judgement"
+      source: "the frigate actions of 1812; at peace in 1805; every key's source below"
+      sources:
+        keeps_the_sea: "judgement: the frigate actions of 1812 are James vols. 5 and 6 and the action's (package 74); at peace in 1805, nothing of it drawn"
+        keeps_port: "judgement: the converse of keeps_the_sea (package 74's)"
+        engages: "judgement (package 74's, the brief's item 5)"
+        single_actions: "judgement (package 74's, the brief's item 5)"
+        blockades: "none: at peace in 1805; judgement"
+        convoys: "judgement (looked for in Niles vols. VI to VIII: the American trade of 1814 under blockade, no American convoy found)"
+        privateers: "Niles vol. VII p. 120: the Prince de Neufchatel's prizes in the Channel, 1814, a sloop of 70 tons with lumber, a brig of 137 tons with coffee, a transport, a cutter of 37 tons; p. 122: privateers taking fifteen or twenty prizes in twice as many days without firing a gun, and the ship James taken out of a convoy; p. 189: above 800 vessels captured in less than 24 months (the Glasgow resolution of 7 September 1814)"
   portugal:
     name: Portugal
     adjective: Portuguese
@@ -230,7 +295,7 @@ nations:
       blockades: []
       convoys: false
       privateers: none
-      source: "judgement"
+      source: "judgement: no Portuguese naval doctrine looked for in the works held beyond James's pages on Lisbon (none read in this package)"
   denmark:
     name: Denmark
     adjective: Danish
@@ -263,7 +328,7 @@ nations:
       blockades: []
       convoys: false
       privateers: none
-      source: "judgement"
+      source: "judgement: Denmark at peace in 1805; Copenhagen of 1801 and 1807 not looked for in this package"
   # package 39f, the Strait: Morocco, for Tangier and the African shore. The Emperor
   # Muley Soliman (Mawlay Sulayman, from 1792) at peace with every nation in June 1805:
   # no war in the table below, so a Moorish port is neutral to all and open to its own.
@@ -301,7 +366,7 @@ nations:
       blockades: []
       convoys: false
       privateers: none
-      source: "judgement"
+      source: "judgement: the Emperor at peace with all (the relations below); his cruisers not looked for in the works held"
     relations:
       britain: "peace; the Emperor apparently prefers the English to any other European power and allows Gibraltar its cattle from Tangier, a grant of Muley Ismael (Purdy 1826, p. 5, quoting Jackson); the fleets water at Tetuan (p. 8)"
       spain: "peace since Muley Yazid's war of 1790 and 1791 on Ceuta (Lempriere 1800, pp. 318 and 326, the war's beginning); the peace of 1799 FROM MEMORY"
@@ -385,3 +450,14 @@ ports:
   tarifa: spain
   ceuta: spain
   tangier: morocco
+  # the Channel's east block (package 79b): the English ports the King's, the French ports
+  # France's, hostile to a King's ship and open to a neutral by the wars above (Le Havre,
+  # Boulogne, Calais and Dunkirk the invasion flotilla's ports of 1803 to 1805)
+  portsmouth: britain
+  poole: britain
+  downs: britain
+  dover: britain
+  le-havre: france
+  boulogne: france
+  calais: france
+  dunkirk: france

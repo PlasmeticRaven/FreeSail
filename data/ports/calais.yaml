@@ -1,0 +1,114 @@
+# FreeSail: Calais as a port (package 79b, the Channel's east block; the same form as
+# st-malo.yaml, on package 35's machinery). The road and the marks are
+# features/channel-east.yaml's (the harbour patch calais).
+#
+# Sources. Faden 1793, 'Calais', p. 5: keep the mill at the east end of the town right
+# over the eastern jetty head and run in close by it, the citadel to the west; avoid the
+# little reef from the head of the western jetty; between the jetties steer westward for
+# Paradise, where you lie dry at low water; not safe to enter till it is almost high tide,
+# when there is but three fathoms; the port dangerous with a northerly wind; p. 9: in the
+# middle between Dover and Calais the flood sets N E by E and the ebb S W by W; p. 10:
+# from Calais to Dover W N W 7 leagues; the Risbank of Calais. Moore 1799, 'Tides', p. 142:
+# Calais in the table's N N W group. Norie 1805, Table XL, p. 217 (Calais 50 57 31 N
+# 1 51 11 E). The datum: SHOM's RAM at Calais, BMVE 0.80 m above the zero (read 2026-10-29),
+# for a patch; no period sheet read: `datum: unverified`.
+#
+# The stance. Calais is French and hostile to a King's ship; the packet to Dover stopped by
+# the war. A division of the invasion flotilla lay here and the batteries of the Risban and
+# the forts covered the road (from memory; noted, not modelled). No light at Calais in
+# 1805: the watch-tower was fitted with one in 1818 (features/channel-east.yaml). Prices
+# JUDGEMENT, in sterling.
+
+id: calais
+name: Calais
+nation: france
+source: "Faden 1793, 'Calais', p. 5, pp. 9-10; Moore 1799, 'Tides', p. 142; Norie 1805, Table XL, p. 217"
+datum: unverified   # no period sheet read; SHOM's RAM BMVE 0.80 m for a patch
+
+outer_road:
+  feature: calais-road
+  name: Calais road
+  lat_deg: 50.9750
+  lon_deg: 1.8450
+  depth_fathoms: 6
+anchorage:
+  feature: calais-road
+  name: Calais road
+  lat_deg: 50.9750
+  lon_deg: 1.8450
+  depth_fathoms: 6
+mooring:
+  name: Paradise, within the jetties
+  lat_deg: 50.9640     # the basin west of the channel within the jetties (judgement from Faden's words)
+  lon_deg: 1.8490
+  depth_fathoms: -0.5  # dry at low water (Faden)
+  bottom: sand and mud
+  deep_draught_ft: 14  # judgement: three fathoms at high tide in the entrance
+shore:
+  name: the quay at Calais
+  lat_deg: 50.9600
+  lon_deg: 1.8520
+
+pilot:
+  station: calais-road
+  cruising_nm: 8                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Calais pilots' boat
+    under: lugsails
+    note: "a lugger (judgement)"
+  names: [Mouron, Delattre, Pigache, Leprince, Fournier, Hénon, Ducrocq, Vasseur]   # Calaisis names: judgement
+  skill: 0.88
+  fee_pounds: 3                  # judgement, in sterling; unverified
+  cast: larboard                 # the head paying off to the westward out of the road (judgement)
+  course_out_deg: 300            # W N W out of the road toward the Strait
+  words:
+    channel: "The port is dry at low water and not safe to enter till almost high tide, when there is but three fathoms in it; it is dangerous with a northerly wind. Keep the mill at the east end of the town over the eastern jetty head and run in close by it, the citadel to the west; avoid the little reef off the western jetty's head."
+    marks: "Calais within its walls, its citadel to the west and the old watch-tower over the roofs; Blanc Nez, the very white cliff, two leagues to the westward, seen six or seven leagues off."
+    anchorage: "Wait the tide in the road outside the jetties in five or six fathoms on fine sand, in fair weather; between the jetties steer west for Paradise, where you lie dry at low water."
+    tide: "It is high water about half past eleven at full and change and the tide rises four fathoms at springs; in the middle of the Strait the flood sets north-east by east and the ebb south-west by west, strong along the shore."
+
+tide:
+  establishment: Calais
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: brandy, price: 95, origin: france, note: "from memory, as at Brest"}
+    - {good: wine, price: 38, origin: france, note: "judgement"}
+    - {good: salt, price: 12, origin: france, note: "judgement"}
+    - {good: salt fish, price: 30, origin: france, note: "judgement"}
+    - {good: fresh fish, price: 12, origin: france, note: "judgement"}
+    - {good: canvas, price: 44, origin: france, note: "judgement"}
+    - {good: linen, price: 85, origin: france, note: "the lace and linen of Flanders; judgement"}
+    - {good: timber, price: 7, origin: france, note: "judgement"}
+    - {good: salt beef, price: 72, origin: france, note: "judgement"}
+    - {good: butter, price: 50, origin: france, note: "Flemish butter; judgement"}
+    - {good: geneva, price: 70, origin: null, note: "judgement"}
+
+dockyard:
+  kind: chandlers
+  items:
+    - {item: topmast, hours: 12, pounds: 44, note: "judgement"}
+    - {item: topgallant_mast, hours: 6, pounds: 13}
+    - {item: yard, hours: 8, pounds: 27}
+    - {item: suit of sails, hours: 60, pounds_per_100m2: 24, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.06}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.07}
+
+crew_pool:
+  able: {hands: 1, pounds: 3, delay_h: 36}
+  ordinary: {hands: 3, pounds: 2, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [calais-road, 51 00 N 1 45 E]
+  from_sea: [51 00 N 1 45 E, calais-road]
+  in: [calais-road]

@@ -1,0 +1,107 @@
+# FreeSail: Poole as a port (package 79b, the Channel's east block; the same form as
+# weymouth.yaml, on package 35's machinery). The roads and the marks are
+# features/channel-east.yaml's (the harbour patch poole, in channel-mid's water).
+#
+# Sources. Imray 1874, 'Poole', pp. 54 to 55: the bar of Poole harbour nearly 13 miles
+# W N W from the Needles point, from 6 to 8 feet at low water and shifting, no stranger to
+# attempt it without a pilot; about 14 1/2 feet at high water springs; within the entrance
+# anchorage in the branches of the harbour in 10 to 40 feet; pilots usually taken on board
+# in Studland bay; the double high water; the rise on springs at Brownsea about 6 1/2 feet;
+# Studland bay 4 to 6 fathoms, sheltered from westerly winds. Moore 1799, 'Tides', p. 142:
+# Pool in the table's N N W group. Norie 1805, Table XL, p. 217: Poole 50 42 50 N
+# 1 58 55 W.
+#
+# The harbour is GEBCO's fill (EMODnet does not survey it, package 39a's sweep found it),
+# shallow and drying in the tiles; no period sheet read: `datum: unverified`. A town of the
+# Newfoundland trade: its ships, its cod and its train oil; the war has the trade in convoy.
+# Prices FROM MEMORY and JUDGEMENT, as Weymouth's.
+
+id: poole
+name: Poole
+nation: britain
+source: "Imray 1874, 'Poole', pp. 54-55; Moore 1799, 'Tides', p. 142; Norie 1805, Table XL, p. 217"
+datum: unverified   # no period sheet of the harbour read; the harbour GEBCO's fill
+
+outer_road:
+  feature: studland-bay
+  name: Studland bay
+  lat_deg: 50.6466
+  lon_deg: -1.9283
+  depth_fathoms: 5
+anchorage:
+  feature: brownsea-road
+  name: Brownsea road
+  lat_deg: 50.6989
+  lon_deg: -1.9754
+  depth_fathoms: 3
+mooring:
+  name: Poole quay
+  lat_deg: 50.7110     # the channel before the quay (judgement)
+  lon_deg: -1.9850
+  depth_fathoms: 1.5   # judgement: the town's channel, small vessels lie aground at low water
+  bottom: soft mud
+  deep_draught_ft: 10  # judgement: the bar's six to eight feet at low water and fourteen at high springs
+shore:
+  name: the quay at Poole
+  lat_deg: 50.7125
+  lon_deg: -1.9855
+
+pilot:
+  station: studland-bay
+  cruising_nm: 6                  # judgement: the Poole pilots board in Studland bay (Imray)
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  names: [Spurrier, Kemp, Lester, Bushrod, Garland, Jolliffe, Slade, White]   # Dorset names: judgement
+  skill: 0.85
+  fee_pounds: 3                   # judgement; unverified
+  cast: starboard                 # from Brownsea road the head paying off to the eastward, for the harbour's mouth (judgement)
+  course_out_deg: 135             # S E out of the harbour's mouth over the bar to Studland bay
+  words:
+    channel: "The bar has six to eight feet at low water and shifts with every gale; no stranger should attempt it without a pilot. The channel inward is marked by buoys between the Hook sand and the Haven's points; within the mouth it branches about Brownsea."
+    marks: "The two Haven points close the harbour's narrow mouth, Brownsea Castle just within it on the island; Old Harry's white chalk stack and the Foreland stand south of Studland bay, and the Needles show over the bay to the eastward."
+    anchorage: "Take the pilot in Studland bay, four to six fathoms on sand, sheltered from the westerly winds. Within the mouth there is anchorage in the branches of the harbour in ten to forty feet on soft mud; small vessels lie aground at the quay."
+    tide: "The tide here ebbs and flows twice in the twelve hours: a first high water, a short ebb, and a second flood before the true ebb. The rise is small, six or seven feet at springs. Cross the bar on the last of the flood; a heavy sea breaks on it with southerly and easterly winds."
+
+tide:
+  establishment: Poole
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: salt fish, price: 28, origin: britain, note: "Newfoundland cod of the Poole ships; judgement"}
+    - {good: train oil, price: 30, origin: britain, note: "cod-liver and seal oil of the Newfoundland trade; judgement"}
+    - {good: salt, price: 24, origin: britain, note: "from memory, as at Weymouth"}
+    - {good: coal, price: 2, origin: britain, season: {11: 1.2, 12: 1.2, 1: 1.2, 2: 1.2}, note: "from memory"}
+    - {good: canvas, price: 56, origin: britain, note: "Bridport sailcloth; from memory"}
+    - {good: cordage, price: 70, origin: britain, note: "Bridport cordage and nets; judgement"}
+    - {good: wine, price: 76, origin: portugal, note: "from memory"}
+    - {good: brandy, price: 210, origin: france, note: "from memory"}
+    - {good: timber, price: 6, origin: britain, note: "from memory"}
+    - {good: salt beef, price: 52, origin: britain, note: "from memory"}
+    - {good: stone, price: 3, origin: britain, note: "Purbeck stone from the quarries; judgement"}
+
+dockyard:
+  kind: chandlers                 # the town's builders and chandlers; the King's yard is Portsmouth's
+  items:
+    - {item: topmast, hours: 12, pounds: 40, note: "judgement, as Weymouth's"}
+    - {item: topgallant_mast, hours: 6, pounds: 12}
+    - {item: yard, hours: 8, pounds: 24}
+    - {item: suit of sails, hours: 60, pounds_per_100m2: 26, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.05}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.05, pounds_per_man_day: 0.06}
+
+crew_pool:
+  # the Newfoundland men are protected in the season and pressed out of it (judgement)
+  able: {hands: 4, pounds: 4, delay_h: 24}
+  ordinary: {hands: 8, pounds: 2.5, delay_h: 24}
+  landsman: {hands: 12, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [brownsea-road, 50 40.3 N 1 56.5 W, studland-bay, 50 38 N 1 52 W]
+  from_sea: [50 38 N 1 52 W, studland-bay, 50 40.3 N 1 56.5 W, brownsea-road]
+  in: [brownsea-road]

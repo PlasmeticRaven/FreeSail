@@ -127,7 +127,18 @@ PORTUGAL_PORTS = ["cadiz", "lagos", "lisbon", "oporto", "setubal"]
 ISLANDS_PORTS = ["angra", "funchal", "horta", "ponta-delgada", "porto-santo"]
 # package 39f: the Strait's five, in their own list (the blocks' lists merge as lines)
 STRAIT_PORTS = ["algeciras", "ceuta", "gibraltar", "tangier", "tarifa"]
-ALL_PORTS = sorted(ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS + STRAIT_PORTS)
+# package 79b: the Channel's east block's eight, in their own list
+CHANNEL_EAST_PORTS = [
+    "boulogne",
+    "calais",
+    "dover",
+    "downs",
+    "dunkirk",
+    "le-havre",
+    "poole",
+    "portsmouth",
+]
+ALL_PORTS = sorted(ALL_PORTS + PORTUGAL_PORTS + ISLANDS_PORTS + STRAIT_PORTS + CHANNEL_EAST_PORTS)
 
 
 def test_the_five_ports_are_files_on_one_machinery_placed_from_the_chart():
@@ -290,6 +301,9 @@ def test_the_ships_nation_is_her_companys_names_or_the_scenarios_word_and_the_st
     # Tangier the Emperor of Morocco's, at peace with all and neutral to her
     french_ports |= {"algeciras", "ceuta", "tarifa"}
     neutral_ports |= {"tangier"}
+    # the Channel's east block (package 79b): the French ports of the invasion coast hostile,
+    # the English ones the King's
+    french_ports |= {"le-havre", "boulogne", "calais", "dunkirk"}
     assert {p.id: frigate.dealings.stance(p) for p in frigate.ports.ports.values()} == {
         pid: ("hostile" if pid in french_ports else "neutral" if pid in neutral_ports else "open")
         for pid in ALL_PORTS
@@ -385,7 +399,7 @@ def test_the_pilot_comes_off_in_his_cutter_hails_boards_and_is_a_person_aboard()
     cutter = w.dealings._cutter()
     assert cutter is not None and not cutter.alongside and cutter.plan[0][0] == "lie_to"
     w.run(2 * 3600)
-    assert w.dealings._cutter() is None and not w.vessels.vessels
+    assert w.dealings._cutter() is None and not w.vessels.active()  # no sail but her own
     assert not events(w, "port.pilot_refused")
 
 
@@ -393,13 +407,13 @@ def test_no_pilot_comes_off_by_night_to_a_ship_at_anchor_or_to_one_without_way()
     night = world_at(SOUTH_OF_FALMOUTH, heading=0.0, speed=4.0, start=datetime(1805, 6, 10, 1, 0))
     night.submit("set plain sail")
     night.run(1800)
-    assert not night.vessels.vessels and not events(night, "port.pilot_hail")
+    assert not night.vessels.active() and not events(night, "port.pilot_hail")
     still = world_at(FALMOUTH_OUTER, heading=0.0, speed=0.0)
     still.run(1800)  # no way on her: nothing comes off
-    assert not still.vessels.vessels
+    assert not still.vessels.active()
     riding = at_anchor_in(FALMOUTH_OUTER)
     riding.run(1800)
-    assert not riding.vessels.vessels and riding.dealings.pilot is None
+    assert not riding.vessels.active() and riding.dealings.pilot is None
     assert riding.dealings.in_port() is riding.ports.ports["falmouth"]
     assert riding.readings.words("port").startswith("at anchor in Falmouth, the outer road")
 
@@ -988,7 +1002,7 @@ def test_roscoff_is_hostile_to_british_colours_and_closed_in_the_pilots_words_by
     assert cutter.dealings.stance(cutter.ports.ports["roscoff"]) == "hostile"
     cutter.submit("set plain sail")
     cutter.run(3600)
-    assert not cutter.vessels.vessels and not events(cutter, "port.pilot_hail")
+    assert not cutter.vessels.active() and not events(cutter, "port.pilot_hail")
     assert "the port hostile to the English" in cutter.readings.words("port")
     riding = at_anchor_in({"lat_deg": 48.7356, "lon_deg": -4.0170}, ship=CUTTER, heading=250.0)
     assert riding.dealings.in_port() is riding.ports.ports["roscoff"]

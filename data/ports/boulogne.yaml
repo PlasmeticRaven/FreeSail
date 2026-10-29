@@ -1,0 +1,121 @@
+# FreeSail: Boulogne as a port (package 79b, the Channel's east block; the same form as
+# st-malo.yaml, on package 35's machinery). The road and the marks are
+# features/channel-east.yaml's (the harbour patch boulogne).
+#
+# Sources. Faden 1793, 'Boulogne', p. 12: the harbour dry at low water and almost barred by
+# a sand-bank lying N E and S W, a buoy over its N E end and at the S W extreme a mast with
+# a lanthorn on its top; the bank passed on the north or the south in 2 1/2 or 3 fathoms;
+# on the south beware the rock projecting from the harbour's southern point; the tides
+# flood north and N N E and ebb south and S W; rocks under water two or three cables off
+# between the Tour d'Ordre and St John's road. White 1835: 'Coast of England', pp. 55 to
+# 56 (Montalembert's semaphore, the Hotel de Ville in the upper town, Boulogne Middle);
+# 'Coast of France', p. 60 (Montalembert seen 12 leagues; the column erected by Bonaparte
+# north of the town). Norie 1805, Table XL, p. 217 (the latitude). The datum: SHOM's RAM at
+# Boulogne-sur-Mer, BMVE 1.15 m above the zero (read 2026-10-29), for a patch; no period
+# sheet read: `datum: unverified`.
+#
+# The stance and the camp. Boulogne is French and hostile to a King's ship. It is the head
+# of the invasion: from 1803 the Army of the Coasts of the Ocean camped on the heights
+# north and south of the town, the flotilla's prames, gun-brigs, gun-boats and pinnaces
+# filled the harbour and the new basin dug in the Liane, and new harbours were dug at
+# Wimereux and Ambleteuse; the road was covered by the batteries of the cliffs, the Fort de
+# l'Heurt on its rock off Le Portel and the forts of the Crèche and the wooden fort on
+# piles at the harbour's mouth; the King's ships watched it from the offing and attacked
+# the flotilla in the road (all from memory; noted in the head, not modelled). The market is
+# the army's: provisions dear, everything for the flotilla bought up; JUDGEMENT, in
+# sterling.
+
+id: boulogne
+name: Boulogne
+nation: france
+source: "Faden 1793, 'Boulogne', p. 12; White 1835, 'Coast of England', pp. 55-56, 'Coast of France', p. 60; Norie 1805, Table XL, p. 217"
+datum: unverified   # no period sheet read; SHOM's RAM BMVE 1.15 m for a patch
+
+outer_road:
+  feature: boulogne-road
+  name: Boulogne road
+  lat_deg: 50.7316
+  lon_deg: 1.5640
+  depth_fathoms: 6
+anchorage:
+  feature: boulogne-road
+  name: Boulogne road
+  lat_deg: 50.7316
+  lon_deg: 1.5640
+  depth_fathoms: 6
+mooring:
+  name: the harbour of the Liane
+  lat_deg: 50.7265     # within the jetties (judgement)
+  lon_deg: 1.5950
+  depth_fathoms: -0.5  # dry at low water (Faden)
+  bottom: sand
+  deep_draught_ft: 12  # judgement: the bar's three fathoms at the flood
+shore:
+  name: the quay at Boulogne
+  lat_deg: 50.7260
+  lon_deg: 1.5990
+
+pilot:
+  station: boulogne-road
+  cruising_nm: 8                 # judgement
+  comes_off_by_night: false
+  cutter: data/ships/cutter.yaml
+  vessel:
+    kind: a boat
+    name: the Boulogne pilots' boat
+    under: lugsails
+    note: "a lugger (judgement)"
+  names: [Fourny, Caron, Delpierre, Baheu, Leprêtre, Fontaine, Bouclet, Ramet]   # Boulonnais names: judgement
+  skill: 0.88
+  fee_pounds: 3                  # judgement, in sterling; unverified
+  cast: starboard                # the head paying off to the northward out of the road (judgement)
+  course_out_deg: 290            # W N W out of the road clear of the bank
+  words:
+    channel: "The harbour is dry at low water and almost barred by a bank lying north-east and south-west, a buoy on its north-east end and a mast with a lantern on its south-west end. Pass it on the north or the south in two and a half or three fathoms at the flood; on the south side beware the point of rock running out from the harbour's southern head."
+    marks: "Montalembert's height behind the town, seen twelve leagues off; the upper town with its walls and its town hall on the hill; Point Alprech and its guard-house to the south, and the old Tour d'Ordre's place on the cliff to the north."
+    anchorage: "The road lies outside the bank in six or seven fathoms on sand, open to every wind from the south-west round to the north, and covered by the batteries of the cliffs and the forts; ships go into the harbour on the top of the flood and lie dry."
+    tide: "It is high water about eleven at full and change and the tide rises five fathoms and more at springs; the flood runs north and north-north-east along the shore and the ebb south and south-west."
+
+tide:
+  establishment: Boulogne
+  enter_on: flood
+  leave_on: ebb
+
+market:
+  currency: pounds
+  goods:
+    - {good: salt fish, price: 30, origin: france, note: "herring and cod of the Boulogne fishery; judgement"}
+    - {good: fresh fish, price: 12, origin: france, note: "judgement"}
+    - {good: brandy, price: 100, origin: france, note: "dear with the army in camp; judgement"}
+    - {good: wine, price: 40, origin: france, note: "judgement"}
+    - {good: salt, price: 12, origin: france, note: "judgement"}
+    - {good: canvas, price: 45, origin: france, note: "judgement"}
+    - {good: timber, price: 8, origin: france, note: "bought up for the flotilla; judgement"}
+    - {good: salt beef, price: 75, origin: france, note: "the army's; judgement"}
+    - {good: biscuit, price: 45, origin: france, note: "the army's; judgement"}
+    - {good: cider, price: 9, origin: france, note: "judgement"}
+    - {good: geneva, price: 70, origin: null, note: "judgement"}
+
+dockyard:
+  kind: chandlers                # the flotilla's builders and the town's chandlers
+  items:
+    - {item: topmast, hours: 12, pounds: 45, note: "judgement: the flotilla takes everything"}
+    - {item: topgallant_mast, hours: 6, pounds: 14}
+    - {item: yard, hours: 8, pounds: 28}
+    - {item: suit of sails, hours: 60, pounds_per_100m2: 25, note: "judgement"}
+    - {item: cordage, hours: 2, pounds_per_fathom: 0.06}
+    - {item: water, hours_per_ton: 0.15, pounds_per_ton: 0.1}
+    - {item: provisions, hours_per_day: 0.06, pounds_per_man_day: 0.08}
+
+crew_pool:
+  # judgement: the flotilla has the seamen
+  able: {hands: 1, pounds: 3, delay_h: 36}
+  ordinary: {hands: 3, pounds: 2, delay_h: 24}
+  landsman: {hands: 8, pounds: 1, delay_h: 12}
+
+closed_to: []
+
+tracks:
+  to_sea: [boulogne-road, 50 44 N 1 30 E]
+  from_sea: [50 44 N 1 30 E, boulogne-road]
+  in: [boulogne-road]

@@ -115,15 +115,44 @@ def acting_station(world: Any) -> str:
     return f[-1].station if f else ""
 
 
+def hull_id_of(world: Any) -> str:
+    """The hull a station acts on, by id: "" for the followed hull (the player's ship), so
+    that every entry of hers reads as it did; another hull's id for a station on her
+    (package 84, step 8: the hull on each input and act)."""
+    from freesail.world.ships import PLAYER_ID
+
+    hull = getattr(world, "own", None)
+    hid = str(getattr(hull, "id", "") or "")
+    return "" if not hid or hid == PLAYER_ID else hid
+
+
+def target_of(world: Any, entry: dict[str, Any]) -> Any:
+    """The world an entry is given to again: the hull it names (`ship`), made in the far
+    shape by `crews.station_world` when the replay has not made her yet (a seat made her
+    so in play), else the World itself (the followed hull)."""
+    ship = str(entry.get("ship") or "")
+    if not ship:
+        return world
+    hulls = getattr(world, "hulls", None) or {}
+    hull = hulls.get(ship)
+    if hull is not None:
+        return hull
+    from freesail.world.crews import station_world
+
+    return station_world(world, ship)[1]
+
+
 def _entry(world: Any, station: str, kind: str, payload: Any) -> None:
-    world.station_acts.append(
-        {
-            "tick": world.clock.tick,
-            "after_inputs": len(world.inputs),
-            "station": station,
-            kind: payload,
-        }
-    )
+    entry = {
+        "tick": world.clock.tick,
+        "after_inputs": len(world.inputs),
+        "station": station,
+        kind: payload,
+    }
+    hid = hull_id_of(world)
+    if hid:
+        entry["ship"] = hid
+    world.station_acts.append(entry)
 
 
 @contextlib.contextmanager
@@ -338,14 +367,15 @@ def apply_state(h: Any, encoded: dict[str, Any]) -> None:
 # ---------------------------------------------------------------------------
 
 
-def give(world: Any, entry: dict[str, Any], build: Callable[[dict[str, Any]], Any]) -> None:
-    """One act again, as the replay reaches it. `build` makes a station from its
-    `seated` entry (`harness.driven_station`)."""
+def give(world: Any, entry: dict[str, Any], build: Callable[[Any, dict[str, Any]], Any]) -> None:
+    """One act again, as the replay reaches it. `build(world, seated)` makes a station from
+    its `seated` entry on the world the act names (`harness.driven_station`)."""
     station = str(entry.get("station") or "")
+    world = target_of(world, entry)  # the hull the act is hers (package 84, step 8)
     if "seated" in entry:
         h = world.agents.get(station)
         if h is None:
-            h = build(entry["seated"])
+            h = build(world, entry["seated"])
         apply_state(h, entry["seated"]["state"])
         return
     if "line" in entry:

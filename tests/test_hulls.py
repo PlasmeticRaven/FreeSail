@@ -114,6 +114,7 @@ def _old_shape_checkpoint(world: World) -> bytes:
     the crewed ships' included."""
     from freesail.world.people import People, Person
     from freesail.world.ports import Ports
+    from freesail.world.ships import Vessels
     from freesail.world.things import Thing
 
     def world_state(w: World) -> dict:
@@ -197,6 +198,12 @@ def _old_shape_checkpoint(world: World) -> bytes:
                 from freesail.world.crews import CrewedWorld
 
                 return replay_mod._new, (CrewedWorld,), crew_state(obj)
+            if isinstance(obj, Vessels) and obj.__dict__.get("own") is not None:
+                # the sea of before step 7: no vessel of the player's on it, no `own`
+                state = dict(obj.__dict__)
+                state["vessels"] = [v for v in obj.vessels if v is not obj.own]
+                state.pop("own", None)
+                return replay_mod._new, (Vessels,), state
             if isinstance(obj, Ports):
                 return replay_mod._new, (Ports,), ports_state(obj)
             if isinstance(obj, People):
@@ -297,3 +304,103 @@ def test_a_checkpoint_from_before_with_a_crewed_ship_and_persons_moved_converts_
     loaded.run(60)
     w.run(60)
     assert loaded.log.digest() == w.log.digest() and lc.log.digest() == crew.log.digest()
+
+
+# -- step 7: the player's ship a hull among the hulls; the shadow retired ------------------
+
+
+def test_the_players_ship_is_a_vessel_of_the_sea_last_in_the_list_and_her_hull_the_followed():
+    """Package 84, step 7: the player's ship is a vessel of the sea under `ships.PLAYER_ID`
+    (the one definition), appended last and kept last when a vessel is added; her hull is
+    the followed hull and the followed hull's `vessel` is she; `World.vessel` names her for
+    the followed hull as it names another hull's far body; the shadow's name still answers
+    with her and never moves her."""
+    from freesail.world import ships as SH
+    from freesail.world.brains import PLAYER_ID as from_brains
+    from tests.test_crews import hove_to_world, put
+
+    assert from_brains is SH.PLAYER_ID == "the ship"
+    w = hove_to_world()
+    own = w.vessels.own
+    assert own is not None and own.id == SH.PLAYER_ID and own is w.vessels.vessels[-1]
+    assert own.crew is w.own and w.own.vessel is own and w.vessel is own
+    assert own.detail == "crewed" and own.brain is None and own.name == w.ship.name
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    assert w.vessels.vessels[-1] is own and w.vessels.vessels[-2] is b
+    assert w.vessels.player_shadow(w) is own
+    pos = own.position
+    w.run(120)
+    assert own.position == w.position and own.position != pos  # brought up to her truth
+    assert own.speed_kn < 1.5  # hove to, a little way on; her sail state the shadow's words
+    assert not own.done and own in w.vessels.vessels and w.vessels.vessels[-1] is own
+
+
+def test_the_players_vessel_is_left_out_of_every_viewers_own_sail():
+    """Rule 3 of the design's 3.3: the player's lookout never sights her own body, a hull's
+    view of the sea has the player's ship but not the hull's own, and a brain's strangers
+    list has her as the shadow gave her, nearest first."""
+    from freesail.world import brains as B
+    from freesail.world import ships as SH
+    from tests.test_crews import hove_to_world, put
+
+    w = hove_to_world()
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    own = w.vessels.own
+    seen = w.vessels.in_sight(w.position, 20.0, 10.0, "day", viewer=own)
+    assert [s.feature.name for s in seen] and all(
+        "sail:the ship" not in s.feature.name for s in seen
+    )
+    assert not [
+        e
+        for e in w.log
+        if e.kind == "lookout.sighting" and "a cable" in e.text and "frigate" in e.text
+    ]
+    hull = b.crew
+    assert hull is not None and hull.shape == "full"
+    theirs = hull.vessels.vessels
+    assert own in theirs and b not in theirs and all(v is not b for v in theirs)
+    p = B.perceive_vessel(w, b, b.brain)
+    ids = [s["id"] for s in p.strangers]
+    assert SH.PLAYER_ID in ids and b.id not in ids
+
+
+def test_the_players_body_is_found_from_a_hulls_tick_as_any_vessels_is():
+    """`action._body_of` and `target_of` find the player's ship through her vessel's hull as
+    they find a crewed ship's, with the World under another hull's swap (step 6's finding,
+    settled by one rule in step 7)."""
+    from freesail.combat.action import _body_of
+    from freesail.world import ships as SH
+    from tests.test_crews import hove_to_world, put
+
+    w = hove_to_world()
+    b = put(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    hull = b.crew
+    assert _body_of(w, SH.PLAYER_ID) is w.ship and _body_of(w, b.id) is hull.ship
+    with w.as_hull(hull):
+        assert _body_of(w, SH.PLAYER_ID) is w.own.parent.ship
+        assert _body_of(hull, SH.PLAYER_ID) is w.hulls[w.followed].ship
+    assert _body_of(hull, SH.PLAYER_ID) is w.vessels.own.crew.ship
+
+
+def test_a_checkpoint_keeps_the_players_vessel_as_the_seas_own(tmp_path):
+    from tests.test_crews import hove_to_world, put
+
+    w = hove_to_world()
+    put(w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth")
+    w.run(61)
+    path = replay_mod.write_checkpoint(w, tmp_path / "own.ckpt")
+    _, c = replay_mod.read_checkpoint(path)
+    own = c.vessels.own
+    assert own is not None and own is c.vessels.vessels[-1] and own.crew is c.own
+    assert c.own.vessel is own and c.vessel is own
+    c.run(60)
+    w.run(60)
+    assert c.log.digest() == w.log.digest()

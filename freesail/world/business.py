@@ -206,6 +206,18 @@ def port_means_pounds(world: Any, port: Any) -> float | None:
     return max(prices) * tons if prices else None
 
 
+def _between(when: Any, entry: dict[str, Any]) -> bool:
+    """Whether a day falls within an entry's `since` and `until` (ISO dates, either
+    absent; package 79a: a blockade drawn only in the years the sources give it)."""
+    from datetime import date
+
+    day = when.date() if hasattr(when, "date") else when
+    since, until = entry.get("since"), entry.get("until")
+    if since and day < date.fromisoformat(str(since)):
+        return False
+    return not (until and day > date.fromisoformat(str(until)))
+
+
 @dataclass
 class Drawn:
     """A ship the business drew: her id, what she is about, where she began, and how her
@@ -248,6 +260,9 @@ class Business:
     # package 72 (the owner's requirement of 2026-10-17): the regions the player's ship has
     # entered, each peopled once when he enters it; the business follows the centre
     regions_entered: list[str] = field(default_factory=list)
+    # package 79a (spec M7 §22): the ships in ordinary the business has looked at for a
+    # commission, once each (commissioned, or with no intent of her nation's to give her)
+    looked_at: set[str] = field(default_factory=set)
 
     # -- the stream and the data ---------------------------------------------------------
 
@@ -299,6 +314,7 @@ class Business:
             self._convoy()
         self._blockades()
         self._in_ordinary()
+        self._commissions()
 
     # -- the region followed (package 72; the owner, 2026-10-17) -------------------------
 
@@ -370,6 +386,7 @@ class Business:
         world = self.world
         now = world.clock.tick
         self._follow()
+        self._commissions()
         live = {v.id: v for v in world.vessels.vessels}
         for d in self.drawn:
             if d.ended:
@@ -461,10 +478,18 @@ class Business:
         options = kinds.get(nation) or kinds.get("default") or ["merchant brig"]
         return str(options[int(self._rng().random() * len(options)) % len(options)])
 
+    def _names_used(self) -> set[str]:
+        """The names on the sea, the player's ship's among them (package 84, step 7: she is
+        a vessel of the sea, made after the business's first draw; found on the way, the
+        business named a trader Speedwell beside the Speedwell)."""
+        used = {v.name for v in self.world.vessels.vessels}
+        used.add(str(getattr(getattr(self.world, "ship", None), "name", "") or ""))
+        return used
+
     def _name(self, nation: str) -> str:
         names = self.data.get("names", {})
         options = names.get(nation) or names.get("default") or ["Fortune"]
-        used = {v.name for v in self.world.vessels.vessels}
+        used = self._names_used()
         rng = self._rng()
         for _ in range(8):
             name = str(options[int(rng.random() * len(options)) % len(options)])
@@ -961,13 +986,21 @@ class Business:
         ports = self.world.ports
         book = load_book("blockade")
         for nation in sorted(nations.nations):
-            for pid in self._naval(nation).get("blockades") or []:
+            for item in self._naval(nation).get("blockades") or []:
+                # package 79a: an entry is a port's id (the book's stations, as 72 had it) or
+                # the port with its own offshore station, rendezvous and the dates the
+                # sources give (`since`, `until`), drawn only between them
+                entry = dict(item) if isinstance(item, dict) else {"port": item}
+                pid = entry.get("port")
                 port = ports.ports.get(str(pid)) if ports is not None else None
                 if port is None or not self.inside(port.outer_road.position):
                     continue
                 if not nations.at_war(nation, str(port.nation)):
                     continue
-                off = book.get("offshore") or {}
+                if not _between(self.world.clock.ship_time, entry):
+                    continue
+                off = dict(book.get("offshore") or {})
+                off.update(entry.get("offshore") or {})
                 f = chart.find_feature(str(off.get("place") or "Ushant"))
                 if f is None:
                     continue
@@ -1015,6 +1048,7 @@ class Business:
                     formation="line ahead",
                     book="blockade",
                     regime="on blockade",
+                    rendezvous=str(entry.get("rendezvous") or ""),
                 )
                 self.world.squadrons.add(sq, self.world)
                 if brig is not None:
@@ -1052,6 +1086,80 @@ class Business:
                 for d in self.drawn:
                     if d.id == vessel.id:
                         d.intent = f"in ordinary at {port.name}; the sortie {vessel.sortie}"
+
+    # -- the commissions (package 79a; spec M7 §22) -------------------------------------
+
+    def _commissions(self) -> None:
+        """A nation's ship in ordinary with no sortie, not yet commissioned, is commissioned
+        by the business for an intent of her nation's (a cruise on one of her doctrine's
+        stations in the region, or a passage to another of her ports), to sail after the
+        regime's `commission_delay_h` drawn under the seed from the business's own stream;
+        said in her story and the port's news as the director's commission is
+        (`regimes.commission`). A ship with a `sortie` keeps the sortie rule; a ship with no
+        intent of her nation's in these waters stays in ordinary, said in her story."""
+        from freesail.world.regimes import _port_of, _story, commission, regime_knob
+
+        world = self.world
+        sea = getattr(world, "vessels", None)
+        if sea is None:
+            return
+        for v in list(sea.vessels):
+            if (
+                v.done
+                or getattr(v, "regime", "") != "in ordinary"
+                or getattr(v, "sortie", "")
+                or int(getattr(v, "commission_tick", -1)) >= 0
+                or v.id in self.looked_at
+            ):
+                continue
+            self.looked_at.add(v.id)
+            port = _port_of(world, v)
+            intents = self.intents_for(str(v.nation), port)
+            if not intents:
+                _story(
+                    v,
+                    world.clock.tick,
+                    "no intent of her nation's in these waters: she stays in ordinary",
+                )
+                continue
+            rng = self._rng()
+            lo, hi = regime_knob("in ordinary", "commission_delay_h", [48, 120])
+            delay_s = int((float(lo) + (float(hi) - float(lo)) * rng.random()) * 3600.0)
+            words = intents[int(rng.random() * len(intents)) % len(intents)]
+            try:
+                commission(world, v, words, port, delay_s=delay_s)
+            except ValueError as e:
+                _story(v, world.clock.tick, f"cannot be commissioned for '{words}': {e}")
+                continue
+            for d in self.drawn:
+                if d.id == v.id:
+                    d.intent = f"commissioned for {words}; to sail at {v.commission_tick}"
+
+    def intents_for(self, nation: str, port: Any) -> list[str]:
+        """The intents of a nation's that the business gives a ship it commissions: a cruise
+        on each of her doctrine's stations within the region (`data/captains/cruiser.yaml`
+        `stations:`, the cruisers' form), and a passage to each other port of hers in play
+        within it (any of hers in play when none is), in the order of the data."""
+        from freesail.world.captains import CAPTAINS_DIR
+
+        world = self.world
+        chart = getattr(world, "chart", None)
+        out: list[str] = []
+        raw = yaml.safe_load((CAPTAINS_DIR / "cruiser.yaml").read_text(encoding="utf-8")) or {}
+        for entry in (raw.get("stations") or {}).get(nation) or []:
+            f = chart.find_feature(str(entry["place"])) if chart is not None else None
+            if f is not None and self.inside(f.position):
+                within = float(entry.get("within_nm", 10))
+                out.append(f"keep the station off {f.name} within {within:g} miles")
+        ports = getattr(world, "ports", None)
+        theirs = [
+            p
+            for _pid, p in sorted((getattr(ports, "ports", None) or {}).items())
+            if p.nation == nation and p is not port
+        ]
+        near = [p for p in theirs if self.inside(p.outer_road.position)]
+        out.extend(f"bound for {p.name}" for p in (near or theirs))
+        return out
 
     # -- putting a ship on the sea -----------------------------------------------------
 
@@ -1122,7 +1230,7 @@ class Business:
         if not names:
             return f"the {nation} cruiser"
         rng = self._rng()
-        used = {v.name for v in self.world.vessels.vessels}
+        used = self._names_used()
         for _ in range(8):
             name = str(names[int(rng.random() * len(names)) % len(names)])
             if name not in used:

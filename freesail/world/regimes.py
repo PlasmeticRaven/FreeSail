@@ -103,9 +103,36 @@ def commission(world: Any, vessel: Any, intent: str, port: Any = None, delay_s: 
             tick,
             f"commissioned for {words}: her company raising, to sail in {_hours(delay_s)}",
         )
+        # package 79a (spec M7 §22): the commission is the port's news while her company is
+        # raised, the director's and the business's alike; gone from it when she sails
+        if port is None:
+            port = _port_of(world, vessel)
+        if port is not None:
+            line = _news_line(vessel, port, delay_s)
+            news = getattr(port, "news", None)
+            if news is not None and line not in news:
+                news.append(line)
         return f"commissioned for {words}; she sails in {_hours(delay_s)}"
     _sail(world, vessel, words, port)
     return f"commissioned for {words}; under way"
+
+
+def _news_prefix(vessel: Any) -> str:
+    return f"{vessel.name}, {_article(str(vessel.description))}, is commissioning"
+
+
+def _news_line(vessel: Any, port: Any, delay_s: int) -> str:
+    days = max(1, int(round(delay_s / 86400.0)))
+    when = "a day" if days == 1 else f"{days} days"
+    return (
+        f"{_news_prefix(vessel)} in {port.name}, her company raising: she is to sail in "
+        f"about {when}."
+    )
+
+
+def _article(description: str) -> str:
+    words = description.replace("-", " ")
+    return ("an " if words[:1].lower() in "aeiou" else "a ") + words
 
 
 def _sail(world: Any, vessel: Any, words: str, port: Any) -> None:
@@ -117,6 +144,12 @@ def _sail(world: Any, vessel: Any, words: str, port: Any) -> None:
     vessel.regime = ""
     vessel.sortie = ""
     vessel.commission_tick = -1
+    if port is not None:
+        # the commission's line gone from the port's news when she sails (package 79a)
+        news = getattr(port, "news", None)
+        if news:
+            prefix = _news_prefix(vessel)
+            news[:] = [n for n in news if not str(n).startswith(prefix)]
     vessel.intent_words = words
     vessel.brain = FarCaptain(world, vessel, words)
     if port is not None:

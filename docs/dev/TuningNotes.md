@@ -11335,3 +11335,441 @@ The step 5 fixture in `test_crews.py` that asserted a `CrewedWorld` on the vesse
 line of a passage on 5949e18's behaviour: each restores what the crewed World's names gave,
 and the probes above end alike on both trees once mended (7-134's hits one, the first
 action's strike at 6300 s, the brig's captain judging at 3900 s).
+
+### Step 7: the player's ship a hull among the hulls; the shadow retired
+
+Built on step 6 as merged (`f99648d`; the design note's postscript "Step 7" has the shape).
+**What moved: nothing pinned by the step's own changes** (the player's vessel is last in the
+sea and left out of every viewer's own sail, the design's rule 3, and the followed hull's
+way and frame are her ship's as the shadow's were). **The cap's order** retires the
+not-crewed states (the owner's decision 6): a far ship at anchor or in port within the range
+is promoted where before she was not, and a crewed ship that anchors stays awake; the slow
+tier is the proof of what that moves in the recorded passages (below). **The count.**
+`world/ships.py` (`PLAYER_ID`, `Vessels.own`, `player_shadow` the vessel's bring-up, `add`
+keeping her last, `in_sight(viewer=)`, the skips), `core/world.py` (made at the start and at
+a load, brought up each tick), `world/crews.py` (`HullView.vessels` the sea but her own,
+`crewed`/`_crew_ids` without the followed, the cap's order, `stationed_always`,
+`_stationed`, `_NOT_CREWED_STATES` empty), `world/squadrons.py`, `combat/action.py`,
+`combat/boarding.py`, `world/hail.py`, `world/captains.py`, `world/signalling.py`,
+`world/signals.py` (`has_glass`), `world/lookout.py`, `orders/station.py`,
+`api/action_readings.py`, `api/readings.py` (the truth), `world/business.py` (the names in
+use), `world/brains.py`, `world/hulls.py`; tests: four new in `test_hulls.py`, two in
+`test_crews.py`, the cap test's anchor assertion restated under decision 6, the old-shape
+writer leaving her out, and six assertions that the sea was empty (the pilot's tests of
+`test_ports.py`, truth 70, the practice orders' written scenario) restated as "no sail but
+her own" (`Vessels.active()`).
+
+**The suites on the step's tree** (this container, three workers). The fast tier whole on
+the tree before the hail's mend: 3912 passed, six failed, five of them the assertions above
+that the sea was empty (the player's vessel is on it now) and the sixth the pictures'
+blank-image check (std 7.9 against 8.0), which this day fails alone as well, on this tree
+and on a worktree at `f99648d` alike, with the same figure (7.9456): the known flake, not
+the step's. The slow tier of the known truths, the trials and the touched files (161 tests
+in those files): 151 passed, eight left out by their own marks, two failed: the lee-shore
+trial's digest (`7fad0ce7e46ba366`, this container's as before) and truth 7-143, which
+found the hail taking the ship herself for "her" (above), mended and green alone. **The
+pace** (alone, this container; the three pace tests of the known truths run on a worktree at
+`f99648d` and then on this tree in turn, the same hour): the day under systems 478 then 490
+ticks a second, the gates' day with the region loaded 444 then 492, truth 7-159's convoy of
+six at far detail 397 then 475, all against the build machine's floor of 500, which this
+container misses on both trees by its own measure (steps 4 to 6 the same); the step costs
+nothing the measure can see, the own vessel's bring-up each tick being a few attribute reads
+and the manoeuvre's (read straight from the ship, not through the readings view).
+`make_hull` of a brig 0.72 s (0.60 at step 6, load 1.0 against 0.7); truth 88's form with
+three hulls awake 233 ticks a second against the crewed floor of 60 (234 at step 6). **The
+fast tier whole on the final tree: 3917 passed, one failed**, the pictures' blank-image
+check again (the known flake above); ruff clean.
+
+**Step 6's slow set, closed here.** The known truths' and touched files' slow tier on the
+step 6 tree (`fc43086`; 148 tests in those files) gave 146 passed and two failed: the
+lee-shore trial's digest (`7fad0ce7e46ba366` against the pinned `ed48ca3d61e52f20`, this
+container's figure before and after the step) and truth 7-200 (the tender), which fails
+under three workers at its stage 7 ("hail.heard" not reached in half an hour, the Raven at
+50 25 N 3 30 W) and passes alone, twice on that tree: a load-sensitive test, the fake at the
+Raven's station through the harness losing the deck to the stand-in when its reply comes
+late under load, not a fault of the step's; a finding for the harness's sampling, noted and
+not mended here.
+
+### Step 8: the save and the replay of many hulls
+
+Built on step 7 as merged (`de36e0a`; the design note's postscript "Step 8" has the shape).
+**What moved: nothing pinned.** No recorded passage has a station on another ship, and the
+followed hull's inputs and acts read as they did (no key). **The count.** `core/acts.py`
+(`hull_id_of`, `target_of`, the hull on each entry, `give` on the entry's hull),
+`core/world.py` (the hull on an input, the acts' capture before the sleeping hull's road, the
+save's `hulls` block), `core/replay.py` (`agent_records`, `acts_whole` and `transcripts_in`
+over the hulls, the hulls' blocks seated when due, `restore_hull`, every hull's stations in
+the loop and at the end), `world/hulls.py` (the façade's plain attributes: the instance over
+the class default); tests: three new (`test_replay.py` two, a fake captain on a promoted
+hull and on a far hull replayed by both roads; `test_checkpoint.py` one, the owner's tender
+save loaded and replayed its first thousand ticks).
+
+**Found on the way.** No act of a station on a hull had been journaled since step 6: the
+façade's `__getattr__` answered `_acts_frames` with the World class's default (None) and
+the harness's `frame` took it for "no journaling"; a hull's fake captain gave orders into
+her log and the save held nothing of them. And a sleeping hull's station order went to
+`crews.submit_far` before the acts' capture, so a seat on a far hull journaled no order.
+Both mended; the two new replay tests are the proof (a far hull's "heave to" by her fake
+captain lies her to in play and in the replay by the acts alike, where before the replay's
+brig sailed on for Falmouth).
+
+**Where this stopped (2026-10-29, 05:10 UTC; the account's usage near its weekly limit, the
+lead's word to push the work as it stands).** Step 8 is built as the postscript says and its
+targeted suites are green (`test_replay.py`, `test_checkpoint.py`, `test_crews.py`,
+`test_hulls.py`, `test_agents.py`, ruff clean); the whole fast tier was running on this tree
+when it was pushed. Next, in order: the fast tier whole on the final tree; the known truths',
+trials' and touched files' slow tier (`--slow -m "slow and not pace"`, the files of step 7's
+list with `test_replay.py` and `test_checkpoint.py`); the pace tests alone and `pace6.py`;
+the figures into this section and the design postscript; the green commit and its report.
+**The fast tier whole on this tree (05:56 UTC): 3920 passed, one failed**, the pictures'
+blank-image check (the known flake, as at step 7); ruff clean. **The slow tier** of the
+known truths, the trials and the touched files (`test_replay.py`, `test_checkpoint.py` and
+`test_agents.py` with step 7's list; 178 tests): 169 passed, eight left out by their own
+marks, one failed, the lee-shore trial's digest (`7fad0ce7e46ba366` against
+`ed48ca3d61e52f20`, this container's figure as at every step). **The pace** (alone): the
+pace tests read lower this hour than at step 7 (truth 51's frigate alone 491, the day under
+systems 458, the gates' day 438, 7-159 402, against the floor of 500), so the three-way A/B
+was run alone, the step 7 head on a worktree at `de36e0a`, this tree, and the head again:
+489/446/451/451, then 485/481/431/432, then 472/459 with the other two over the floor. The
+hour's machine misses the floor on the step 7 head as on this tree, truth 51 among them
+(491 at step 7 was over), and the step's figures lie within the head's own spread: the step
+costs nothing the measure sees, and the container is slower this hour than last. `make_hull`
+of a brig 0.75 s (0.72 at step 7); truth 88's form with three hulls awake 198 ticks a second
+against the crewed floor of 60 (233 at step 7, load 1.0 right after the slow set).
+## Package 79a: the regimes filled out and sourced (2026-10-29)
+
+Built as an Opus sibling session in its own container on `claude/pkg-79a` off the lead's
+`b3aff3a` (the launch row), beside 79b; on package 72's shape (spec M7 §22 as built,
+`docs/design/Design-Squadrons.md`). The physics are not touched; no ship file, no consent
+file, no model identifier; no pin moved. Spec M7 §22 "As built (package 79a)" is the record
+of what was built and of what is still judgement, by knob; this section is the sources, the
+figures that differ, the draw, the suite and what was found.
+
+### The sources read
+
+The brief names the period's books as held under `docs/references/`; on this branch they are
+not: James's six volumes, Nicolas's two, Niles' three and Jackson's two came in with package
+75 (`claude/pkg-75`, `docs/references/james/`, `nicolas/`, `niles/`, `jackson/`, its README
+rows), which is not merged. They were read from that branch as data (extracted to the
+scratchpad, nothing run, nothing committed here), so **the citations in `data/regimes.yaml`
+and `data/nations.yaml` point at files that arrive with 75's merge**; the Regulations of 1806
+and Falconer are on this branch. Read: James vol. 3 (1803 to 1805: the Channel fleet off
+Brest, pp. 169 to 170, 214 to 215, 307 to 314; Ferrol and Cadiz, pp. 333, 341, 356, 375 to 380;
+the convoys, p. 259), vol. 4 (Rochefort, pp. 47, 78 to 79, 287; Cadiz 1806, pp. 119 to 120;
+Brest 1808 and 1809, pp. 286, 390; Lorient 1808, pp. 312 to 313; convoys, pp. 13, 89 to 91,
+368 to 369, 383), vol. 5 (pp. 36, 231, 389), vol. 6 (p. 70); Nicolas vol. 1 (the Agamemnon's
+commissioning, pp. 298 to 304; the French privateers' prizes, p. 306); Niles vols. VI and VII
+(the convoys and their escorts of 1814, the masters prosecuted for sailing without convoy, the
+Prince de Neufchatel's prizes, the Glasgow resolution); the Regulations 1806 (Convoys, Sect.
+XII, pp. 398 to 403; the ship newly commissioned, pp. 74 to 75 and 92 to 93; the warrant
+officers in ordinary, pp. 203 to 205; the guard ship, pp. 110 to 113); Falconer 1780 (CONVOY,
+ORDINARY, CRUISE; he has no STATION, which 72's head cited). Two readers searched James,
+Nicolas, Niles and the Regulations in parallel and returned each finding with its lines and a
+verbatim quote; a sample of their pages (thirteen) was checked by eye against the running heads
+before any went into the data, and two corrected (Nelson's Cadiz dispositions on p. 379; the
+warrant officers' article between pp. 203 and 206). Not found in any book held: the convoy acts
+of 1798 and 1803; Torbay as the Brest blockade's rendezvous; any distance at which a port's
+look-outs judged the offing clear; any interval between the offing's clearing and a sortie;
+a British coasting convoy of the Channel numbered; a Texel blockade by name; Orde's first day
+off Cadiz; the corsairs of St Malo and Dunkirk and their prey. Mahan is not in the repository
+and no knob rests on him now.
+
+### The figures found that differ, kept (the lead rules)
+
+| Knob | Kept | The source gives |
+|---|---|---|
+| `in ordinary.commission_delay_h` | 48 to 120 hours | the Agamemnon 64 commissioned 26 or 30 January 1793, down the Medway 16 March, at Spithead 28 April still short of men: eleven to thirteen weeks (Nicolas vol. 1 pp. 298 to 304) |
+| `in ordinary.slip_out_wind_max_kn` | 22 knots from any quarter | sorties in a strong fair wind off the land: eleven of the line out of Brest in a brisk north-easterly gale, 13 December 1805 (James vol. 3 p. 314); frigates out of Cadiz in a strong easterly, February 1806 (vol. 4 pp. 119 to 120); and in a moderate breeze (vol. 4 p. 287) |
+| `in convoy.size` | 4 to 8 | 6 to 35 under a sloop or frigates (James vols. 3 to 6, Niles vol. VII p. 192); 70 to 137 from the Baltic |
+| the blockade book's rendezvous (`data/squadrons/blockade.yaml`, not this package's file) | Torbay | Plymouth and other ports (James vol. 3 p. 170), Cawsand Bay (p. 169); Torbay named on none of James's Brest pages in vols. 3 and 4 |
+
+The sortie's fifteen miles and hour, which truth 7-154 reads, agree with what the sources give
+as far as they give it (the inshore frigates four miles south by east of the Black Rocks, the
+main body three leagues south by west of Ushant, James vol. 3 pp. 311 to 312: both inside the
+offing the rule watches) and stay judgement; `slip_out_clear_nm` 15 is also the offshore
+distance James gives off Cadiz (22 sail about fifteen miles off, vol. 3 p. 379), used as Cadiz's
+offshore station. The escort's brig-sloop is what the sources give for a convoy of a handful.
+
+### The commission's draw, and its first run
+
+`Business._commissions` runs at the region's peopling and every minute of the business's
+tick: a vessel in ordinary with no sortie and no commission due, not looked at before, is
+given an intent of her nation's (`intents_for`, in the data's order: her doctrine's stations
+within the region, then a passage to each other port of hers in play within it) and the
+delay, both drawn from `world.rng.stream("business")` (the delay first, then the intent),
+and `regimes.commission` sets her `sortie` to the intent and her `commission_tick`; the
+regimes' minute sails her at the first minute at or after it, as it sails a director's
+commission. Since the draw is the business's stream, it shifts the business's later draws
+in a world that has such a ship; no world had one before this package (the Hortense and the
+business's Brest frigate both carry sorties), so nothing that ran before draws differently:
+the business's record and every vessel's place after an hour, in the Channel's west and the
+mid-Channel scenarios of `test_business.py` and truth 7-157, compared byte for byte against
+the base tree (`b3aff3a`), identical. **The first run** (truth 7-260, seed 7, the frigate Aigle
+laid up at Brest at 10.00 on 12 June 1805 with the region at full business): commissioned at
+tick 60 for "keep the station off the Lizard within 20 miles" (of France's three stations in
+the region and her ports), the delay 55 hours (due at 197345); the pilot's news "Aigle, a
+frigate, is commissioning in Brest, her company raising: she is to sail in about 2 days."; she
+sails at 197400 on passage for the station and the line is gone from the news. In Biscay north
+the business's Lorient frigate (Sans-Souci) is commissioned at the peopling for a passage to La
+Rochelle, the delay some 78 hours. The truth sets the clock forward over the 55 hours (the
+region at full business runs some 180 ticks a second: the days sailed would be twenty minutes
+of the suite), said in its docstring; she is a brainless hull at the anchorage throughout.
+
+### Iberia's drift (72's second left item): a note, nothing changed
+
+Tofiño's *Derrotero de las costas de España en el Océano Atlántico* (Madrid 1789, Internet
+Archive `derroterodelasco00tofi_0`, the OCR text fetched to the scratchpad and read as data,
+not committed): his Portuguese pages (pp. 74 to 93) give the marks and directions and no word
+of the summer's northerlies or the coast's drift; the coves by Sagres are good anchorage in
+summer but for the levanters (p. 95); of the Cantabrian coast he gives the reigning winds as of
+the third and fourth quadrants in winter, steady and rainy, and spells of easterlies in summer
+(p. 145). No printed climatic table: the climatology's PROVISIONAL rows for the Portuguese box
+stand as `ChartBlocks.md` item 7 leaves them, `data/weather/` untouched, the seasonal bound
+still under its switch and off (truth 7-158 stands). The nearest table would be a later pilot
+chart's roses (Maury's or the Admiralty's), not held.
+
+### The suite as run
+
+On the final tree, in this container (four cores): **the fast tier** (`python -m pytest -n auto
+-q -p no:cacheprovider`) 3,924 passed and one failed, `test_pictures.py::test_the_mcp_bridge_
+returns_the_chart_and_the_ships_view_as_images_that_are_not_blank` (the chart's picture "blank",
+its spread 7.9 against the floor of 8.0, beside the workers). It passed on the base tree alone,
+then failed alone on this tree once and **passed alone on this tree on the next run**. Its
+scenario (the lesson off Falmouth) has the business off and reads nothing this package
+touched, so it is the pictures' timing on a loaded machine (72's record carries the same
+test's time-out beside four workers), not this package's. **The slow tier of the files
+touched** (`--slow -m "not pace"`): `test_business.py` and `test_nations.py` 23 passed; the
+squadrons' truths 7-152 to 7-158 and the new 7-260 to 7-269, 17 passed (7-159 and 7-160 are
+pace tests and the brief's `-m "not pace"` leaves them out). The counts are from pytest's
+progress dots; the project's `-q` prints no summary line. The whole suite is the lead's,
+in the cloud at the merge.
+
+### Found on the way, and left
+
+- **The blockade book is Brest's for every port.** `data/squadrons/blockade.yaml` blows a
+  squadron off in a gale from 225° to 315° wherever it is; off Cadiz the danger was the
+  other way (an easterly drove Collingwood's squadron west, James vol. 4 pp. 119 to 120; the
+  westerlies threatened to force a squadron into the Mediterranean, vol. 3 p. 380). The
+  business now gives each blockade its own rendezvous (Rochefort's Quiberon) but the book's
+  sector is the book's; a per-port `blown_off` belongs with the book (not this package's file).
+- **The business's blockade is a frigate and a brig** for every port (the book's `kind`s),
+  where James gives five to eighteen of the line off Brest, Ferrol, Rochefort and Cadiz: the
+  far body has no ship of the line to draw (package 75's 74). Written as the sources give it
+  in the entries; the force not changed.
+- **The ships in ordinary are frigates** for the same reason (the sources' ports held ships
+  of the line).
+- **The brief's CLAUDE.md** is not in the repository; the brief's head and records served.
+- **Two Cadiz entries** share the set's id `blockade-cadiz`; their dates do not overlap, so
+  one set at most is drawn.
+- `tests/conftest.py`'s `SLOW_TESTS` takes four of the new truths (over the five seconds
+  under load: the business peopling a region).
+## Package 79b: the Channel's east block, the Wight to Dunkirk (2026-10-29)
+
+Package 79b (the brief in `docs/dev/M7-WorkPackages.md`, "Package 79b"; built as
+`docs/dev/ChartBlocks.md` says, which this package corrected where it proved wrong). The
+region `channel-east` beside `channel-mid`, abutting it at 1 W; its tiles, coast, index and
+137 marks; eight port files; the block's six gauges read and held, eight stream areas, 27
+places of Norie's 1805 table and 11 of Moore's; the Channel's weather box to 2.5 E; a
+scenario; truths 7-270 to 7-279. Nothing of channel-mid's or any other region's tiles,
+coast, index or manifest entry touched; nothing 84 reworks; no gauge of the eleven moved.
+
+### The constants and their sources
+
+| Constant | Value | Source | Verified |
+|---|---|---|---|
+| `REGIONS["channel-east"]["bounds"]` | 49.0 to 51.5 N, 1.0 W to 2.5 E | the brief's, exactly: abutting channel-mid's east bound at 1 W | the check's "features within the bounds: 137 of 137" |
+| `REGIONS["channel-east"]["fetch"]` | 48.55 to 51.75 N, 2.15 W to 2.75 E | the level-2 tiles that meet the bounds span 48.67 to 51.65 N and 1.23 W to 2.61 E; Poole's level-3 tiles reach 2.08 W | "the fetch box covers the tiles whole: yes" |
+| the harbour patches | Spithead (12 level-3 tiles), Poole (9), the Downs (20), Dover (4), the Havre (10), Boulogne (6), Calais (4), Dunkirk (8) | one per port of the block; Spithead's and Poole's in channel-mid's water west of 1 W where channel-mid lists no level-3 tile (39a's Dartmouth precedent); Spithead's box raised to 50.86 N for Portsdown Hill, no tile more | built; "0" of them channel-mid's |
+| the seam (`tiles_listed_elsewhere`) | six level-2 tiles of the column 1.23 to 0.80 W, 48.67 to 51.23 N, channel-mid's | the brief's item 1 and ChartBlocks.md's seam | "tiles another region lists: 6 kept"; `git status` clean for every other region's file |
+| `fill_to_chart_datum` | true; the world's mean level 1.48 to 6.83 m over the fetch box | Dover among the eleven, so the blend over the block is the Channel's own (wrong in range, see below, but not a far gauge's); `fill_mean_level_m` not set | the sweep (below) |
+| `skip_dry_tiles` | not set | the corridor ends at 1 W: a dry tile east of it left unwritten would leave the chart nothing there, not the corridor's land (ChartBlocks.md corrected) | built |
+| the lights' years | the South Foreland's pair 1636 (rebuilt 1793, 1795), the North Foreland 1636, Dungeness (Wyatt's tower) 1792 to 1904, the Owers' floating light 1788, the North Goodwin's 1795, Cape la Heve's two and Cape Lailly's 1775, Dunkirk's fanal on the Risban 1683 to 1825, Boulogne's mast and lanthorn by 1793, Dieppe's and St Valery's by 1805; not yet: the Nab 24 September 1812, the Gull and the South Sand Head (named first 1832), Belle Tout 1828, Calais's watch-tower 1818 and its lighthouse 1848, Gris Nez 1837, Gravelines 1843 | Norie 1805's catechism's list of the lights on both coasts (p. 301), Faden 1793 (pp. 12, 15, 17), Moore 1799 (p. 300: the Owers' floating light, the Nab's buoy and no light), the encyclopaedias' pages, the Maritime Archaeology Trust's page for the Nab (the Public Ledger's notice of 29 September 1812) | read; the ranges JUDGEMENT; Dieppe's and St Valery's first years and Boulogne's lanthorn's UNVERIFIED (the earliest record read taken as `from`) |
+| the Goodwin | five drying heads (the North Goodwin 2.0 m, by Trinity bay 1.0, the Callipers 2.0, the South Goodwin 1.0, the South Sand Head 0.3), `extent_m` 700 to 900 | Imray 1874 pp. 2 to 4 (dry for a considerable extent, steep-to), Moore 1799 p. 299; the heads on the grid's drying sand where it has any | the heights JUDGEMENT, the grid's where it dries |
+| the held gauges | Newhaven, Le Havre, Dieppe, Boulogne, Calais, Dunkirk (TICON); the French mean levels SHOM's RAM's NM (4.96, 5.08, 5.00, 4.03, 3.24 m), Newhaven's null | TICON read 2026-10-29 (the zip's SHA-256 7055f8ed…6514, the same file); the RAM's WFS layer read 2026-10-29 | the constants and the French levels VERIFIED; Newhaven's level unverified |
+| the stream areas | Spithead and St Helens 1.5 kn WNW (-3 h); the Looe 3 kn E by N at springs and 2 at neaps (-4.5 h); the offing of Beachy Head 2 kn ENE (-1 h); the Downs 2 kn NNE (+0.5 h); the Strait of Dover 3 kn NE by E (+1.5 h); the Flemish banks 2 kn ENE (0 h); the Seine's mouth 3 kn ESE (-3 h); the block's open reach 1.5 kn ENE (0 h) | the Looe's rates and hour Mackenzie's survey as White 1835 quotes it (p. 48 note: PERIOD_RATES); the Downs' set Moore 1799's (p. 143, N N E), the Strait's Faden 1793's (pp. 9 to 10, N E by E); the hours White 1835's (pp. 57 to 58) where he gives them; every other rate and hour JUDGEMENT | `test_tide.py`'s form test |
+| `book_limits` | the block's box appended, 49 to 51.5 N, 1 W to 2.5 E | the brief's item 5 | `test_tide.py` |
+| the epitome's places | Norie 1805's Table XLI for 27 places (e.g. Portsmouth harbour 11h 36m and 18 feet, Spithead 9h 30m, St Helen's 11h 45m and 16, the Downs 11h 0m and 15, Dungeness 10h 51m and 24, Calais 11h 30m and 18, Dunkirk 11h 45m and 12, Dieppe 10h 30m and 18, the Havre 10h 30m and 22); Dover's rise Norie's 14 feet; Moore 1799's groups for 11 places | the page images of Norie's Table XLI, pp. 248 to 252, through the archive's IIIF server (the study's "illegible" table of 1803 read at last in the 1805 edition); Moore's table's OCR | Norie's VERIFIED from the page images; Moore's unverified against the page |
+| the Channel's weather box | east bound 2.5 E (from 2.0), the same rows | the brief's item 6; no printed table read | `test_weather.py` |
+
+### The sources, fetched
+
+EMODnet's DTM 2024 for the region (`elevation` and `elevation_max`, 48.55 to 51.75 N, 2.15 W
+to 2.75 E, 57.9 MB each, CC BY 4.0) and GEBCO_2025's area extract (48.45 to 51.85 N, 2.25 W
+to 2.85 E, 4.0 MB, public domain), retrieved 2026-10-29 through the proxy in a second and
+six seconds each, their checksums in the manifest. TICON's zip (CC BY 4.0; PANGAEA's
+landing page answered 500, its `?format=zip` the file) and SHOM's RAM as GeoJSON (Licence
+Ouverte 2.0). The pilots' OCR texts from the Internet Archive (public domain): Faden 1793,
+Moore 1799, Norie 1805, White 1835 and Imray 1874, committed under
+`docs/references/pilots/` with their README row (the brief's "every source fetched goes
+under `docs/references/`"; the blocks before kept them in the cache), read as data; one OCR
+error in Norie's text corrected (the T of "Table XVIII" read as an F, line 32750). Norie's
+Tables XL and XLI as page images through the archive's IIIF server (the server answered 504
+at 1,200 pixels for two pages and served them at 800). The lights' pages through the
+session's web reader (the encyclopaedias served; Trinity House's lighthouse pages answered
+404 at every address tried, their site rebuilt; the Lighthouse Directory 503). Nothing from
+any host was refused by the environment's network. Everything fetched lies under `.cache/`
+(the pilots' texts copied into the repository), read by the tool and by scripts kept
+outside it.
+
+### The build, the checks as printed
+
+`python tools/build_charts.py --region channel-east --reuse-world` through the proxy, then
+three rebuilds `--skip-fetch` as the marks were written (the index is the build's: the
+first build's was empty); the tiles came out byte for byte the same each time (`save_tile`;
+the block has no override). The checks:
+
+```
+Checks for the block channel-east:
+  licences: emodnet_dtm_2024, gebco_2025 (allowed)
+  features within the bounds: 137 of 137 (a harbour patch's box counts as the region's)
+  ids unique across the manifest's regions: yes
+  sources in the references' form: 137 of 137
+  harbour patches with their datum stated: 0 of 0
+  the fetch box covers the tiles whole: yes (48.55 to 51.75 N, 2.15 W to 2.75 E)
+  tiles another region lists: 6 kept (level 2: 6, level 3: 0; not written, not listed)
+  the block passes its checks (the shore's sweep for GEBCO's fill is the build's).
+```
+
+At the build: "GEBCO's fill raised to the chart's datum by the world's mean level, 1.48 to
+6.83 m"; the shore's sweep 3,807 cells in 82 places, the largest the Seine's estuary above
+the Havre (313 and 212 cells about 49.43 to 49.48 N, 0.38 to 0.43 E) and the Havre's modern
+port (302 about 49.48 N, 0.12 E), the Thames's marshes north of the block's bounds (200,
+181, 151, 122 about 51.48 N, 0.28 to 0.48 E; 118 and 104 about 51.6 N, 0.85 E: the later
+block's water in this block's top row of tiles) and Dunkerque's Port Ouest (159 about
+51.03 N, 2.18 E); water, said so. 57 level-2 tiles of 7.6 MB, 73 level-3 tiles of 5.3 MB,
+the coast 0.18 MB and the features 0.10 MB: 13.2 MB, under the brief's 20 to 30 (the
+block's water is shallow and compresses well). `git status` after every build: the
+manifest (the block's entry, its chart line, its sources' fetches, the build hash) and the
+block's own new files, and nothing of any other region's tiles, coast or index.
+
+### The features, the ports, the nations
+
+137 features: Spithead, St Helens and Portsmouth with Portsdown Hill and the Wight's eastern
+end (29), Poole (6), Selsey and the Owers (7), the Sussex coast to Beachy Head (11), Rye
+bay, Dungeness and the Strait's banks (8), Dover and the South Foreland (8), the Downs, the
+Goodwin and the North Foreland (21), Flanders from Dunkirk to Calais (15), Blanc Nez to the
+Somme (13), Dieppe to the Seine, the Havre and the Orne (19). Positions placed from the
+modern chart and the pilots' bearings and checked against the block's tiles by the file's
+rule (a scratch script outside the repository): 44 moved, each in `fix`; the Nab rock and
+the Goodwin's heads on the grid's shoalest; the Splinter off Mardick moved off the modern
+Port Ouest's land. Eight port files: Portsmouth (the King's yard, as Plymouth's; no
+Ordnance block, below), Poole, the Downs (the Deal boatmen, who come off by
+night), Dover (no King's yard; the harbour dries), the Havre, Boulogne, Calais and Dunkirk
+(French, hostile to a King's ship and neutral to an American; the invasion flotilla and
+its batteries in the files' heads, not modelled); every spot with its position; every road
+and anchorage within three kilometres of a note of the bottom (Brownsea road added for
+Poole's anchorage); `datum: unverified` in all eight, no sheet having been read. The
+nations' ports index gains the eight; no new nation.
+
+### The scenario, sailed once (`data/scenarios/spithead.yaml`, seed 7)
+
+The frigate at anchor in the Downs at 04:00 on 20 June 1805, an easterly of fifteen knots
+under a high over the North Sea, veering and easing through the day: aweigh 04:19 (the Deal
+lugger's pilot hailing and let be), the course shaped at 05:05 off the South Foreland (the
+Dover cutter's pilot hailing at 05:40 and let be), off Dungeness at 09:14, two leagues south
+of the Royal Sovereign at 12:59 (noon by observation 50° 43′ N, the account kept, half a
+mile from the truth), south of the Owers at 21:18, off the Nab at 00:50 in the dark; by the
+lead into St Helens road and anchored at 01:38 in seven fathoms and a half (her account a
+mile and a half north of the truth after the Looe's water); weighed at 04:15 at daylight,
+the Portsmouth pilot (Mr Lock) aboard at 04:34, his marks bringing the account to her;
+anchored at Spithead at 05:52 in thirteen fathoms, brought up at 06:08, the pilot off at
+06:15 and £5 paid. Twenty-eight hours: 1,275 lines, digest `f60626aa5d4f6388` (`tools/
+day_log.py data/scenarios/spithead.yaml --hours 28 --reckoning`, the build machine), the
+account at the end a cable from the truth. Not a gate's, not pinned. The first runs, kept
+here for the book: steered south-south-west out of the Downs for a mark a mile and a half off
+the South Foreland she was set onto the Foreland's foot and struck at seven knots (the mark
+moved to three miles off, the departure steered south); an hourly course still shaped for
+Dungeness after she had passed it wore her back into the West Bay and onto its sands (every
+hourly course now holds only short of the next mark); with the Looe's area drawn over the
+water outside the Owers its three knots against her slowed her to the Nab by midnight and
+her account went two miles and more astray (the area drawn back within the Owers, the
+channel the period's statement is of); standing on for St Helens road in the dark with her
+account a mile and a half out she ran onto the shore by St Helens at 02:21 (the book now
+anchors in the road by the lead at night and goes up at daylight, as the fleet did).
+
+### Found on the way (package 79b)
+
+- **The world's tide over the block is wrong in its range though Dover is a gauge.** The
+  eleven's blend east of the Wight sets Weymouth's and Cherbourg's small ranges against
+  Dover's: the world's spring range at Newhaven is 3.9 feet where the gauge has 19.5 (Norie
+  1805: 20), at Dieppe 5.3 against 27 (Norie: 18), at Beachy Head 4.8 (Norie: 20), at the
+  Havre 14 against 23. The six gauges read would mend it, and each is within the reach of
+  every Channel position: blended they move Falmouth's M2 and every recorded passage (the
+  test says so). Held, as the brief has them; the lead's decision with the other blocks',
+  and the most pressing of them, since this block is the Channel itself. The rises the
+  master's table gives where Norie gives none are this blend's (the 37j rule) and so too
+  small; Norie's own rises are given wherever he has them.
+- **The corridor ends at 1 W.** East of it the block's tiles are the only chart; a dry tile
+  left unwritten (`skip_dry_tiles`) would leave a query there nothing, not the corridor's
+  land, so the recipe writes every tile (the Weald's and Picardy's among them; the block is
+  13 MB all the same).
+- **The chart's envelope crosses the meridian.** `Chart.bounds_words` wrote "-32-2.5 E";
+  it now says "32 to 51.5 N, 32 W to 2.5 E" (`freesail/world/chart.py`, the words only; the
+  refusal that quotes them is no recorded passage's line).
+- **The modern ports are land in the grid where 1805 had sand and water**: the Havre's
+  industrial port over the Amfar and the Seine's banks, Dunkerque's Port Ouest over the
+  Splinter's shore, Dover's Western Docks at the foot of the Western Heights (the Admiralty
+  pier and the breakwaters are not in the grid at its sixteenth of a minute: Dover bay is
+  open water, its inner part dredged deeper than 1805's). No sheet read with its datum, so
+  no patch: a finding for a later package with Bellin's plans of the Havre and Dunkirk.
+- **Norie's Table XLI of 1805 is legible in the page images** and gives the hours and rises
+  of 27 of the block's places, the period's own; and his catechism (p. 301) lists the
+  lights on both coasts in 1805, which settled what 1805 sees: no light at Calais, Gris Nez
+  or the Nab, and lights at Dieppe and St Valery that no encyclopaedia page gave.
+- **The Goodwin as the grid has it** dries only in small patches about 51.30 N 1.53 E and
+  51.24 N 1.57 E, two to five metres over the rest; the frigate grounds on the sand's water
+  at low water before she reaches a named head (truth 7-272), and the heads by name ground
+  her where the grid does not.
+- **The lookout calls the nearest first**: from Spithead in the first minutes the Kicker
+  Point, Ryde and Nettlestone Point; Culver Cliff, Ashey Down tower and Portsdown Hill are
+  in sight and not yet called, so truth 7-270 asks the chart what stands in sight for them.
+- **The weather box's widening is in name**: the water from 2 E to 2.5 E took the Channel's
+  box already as the nearest (`box_at`); it now lies within it.
+- **The brief names M7 §26 for the pointer**, which is "The cold"; the chart's section of
+  M7 is §28 ("The chart's next goal"), where the pointer is put. For the lead.
+- **The brief's slow selection** `-k "gate_5b or gate_5c"` selects the tests by their names
+  (as 39a and 39b found); the eleven tests that read the passages' fixtures were run too,
+  by node id (below).
+- **The ordnance table is a design's, eleven ports**: the first draft gave every port of the
+  block a powder-and-shot block, and `test_ordnance.py` (the practice-and-resupply design's
+  §1.3, eleven ports and none elsewhere) refused it; taken out of all eight, the test's
+  count of ports without one raised by the eight (its name no longer counting them). So
+  Portsmouth, whose Gun Wharf issued to the ships at Spithead as Plymouth's does (the
+  Regulations' Gunner, Art. VI, names Spithead), says "none to be had": a finding for the
+  package that takes the magazine's table on.
+- **Moore's star table names the constellation Gemini** (and Norie's Canopus), in the
+  pilots' texts committed: star names, not identifiers; said here for the lead's sweep.
+
+### The suite, as run (package 79b)
+
+On this session's own container (four cores, no other package's suite beside it). `python
+-m ruff check .` and `python -m ruff format --check .` clean; `python tools/build_charts.py
+--check channel-east` passes as printed above.
+
+**The recorded passages of the Channel west**: `python -m pytest tests/test_known_truths.py
+--slow -k "gate_5b or gate_5c"`, as the brief has it, selected one test (the passage for
+gate 5b's own constants) and it passed to its digest; the eleven tests that read the
+passages' fixtures, by name (the frigate's and the schooner's passages of gate 5b with the
+schooner's pilot and octant, the merchant passage with its deep-sea cast, the naval cruise
+with its stranger, truths 72, 77 and 78, and the pace on the passage), `--slow -n 4`: 11
+passed, **every pinned digest, line count and tick held**, the pace floor among them. With
+the block's eight port files loaded on the Channel's chart by the passages that list no
+ports, the held gauges, the stream areas and the limits, the epitome's places and the
+weather box in place: nothing of the Channel moved.
+
+**The slow tests of the files touched**: `--slow -m slow tests/test_chart.py
+tests/test_ports.py tests/test_tide.py tests/test_scenarios.py -n 4`, 10 passed; the same of
+`tests/test_weather.py tests/test_geo.py tests/test_nations.py`, 4 passed; the block's
+truths 7-270 to 7-279 with `--slow`, 10 passed (7-279, the passage sailed whole, 147 s
+alone).
+
+**The fast tier**, once on the final tree (`python -m pytest -n auto -q -p no:cacheprovider`,
+368 slow tests left out): two failed (the tier's count of passes did not print under its
+`-q`, so it is not stated here). `test_ordnance.py::test_the_eleven_ports_have_their_blocks_and_the_other_twenty_seven_none`,
+this package's (above: the blocks taken out, the count raised, the test renamed `..._and_the_others_none`;
+its file and the ports', nations' and tackle tests run again, 114 passed, and truth 7-275
+again, passed). `test_pictures.py::test_the_mcp_bridge_returns_the_chart_and_the_ships_view_as_images_that_are_not_blank`,
+"the chart is blank (std 7.9)" against its floor of 8.0, under the tier's load; it passes
+alone on this tree (run once after), and its picture is the default scenario's chart about
+Falmouth, which this block does not reach. Not run again whole, as the suites' rule has it.
+

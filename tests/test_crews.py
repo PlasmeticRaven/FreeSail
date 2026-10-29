@@ -115,7 +115,10 @@ def test_the_cap_holds_the_nearest_first_and_a_ship_in_dealings_before_a_nearer_
     w.run(60)
     assert ships[3].crew is not None and ships[2].crew.shape == "far"  # asleep (step 5)
     assert len(K.crewed(w)) == K.CREWED_CAP  # awake; `crewed_ids` counts the sleepers too
-    # a vessel at anchor or in port is not promoted, and a crewed one that anchors is demoted
+    # a hull at anchor or in port is awake like any other under the cap's order (package 84,
+    # step 7; the owner's decision 6: before it a vessel at anchor was not promoted and a
+    # crewed one that anchored was demoted): the crewed one that anchors stays awake, and the
+    # sleeper at anchor within the range waits her turn at the full cap
     from freesail.world import brains as B
 
     B.resolve_state(ships[2], "at anchor", ships[2].brain)
@@ -123,7 +126,8 @@ def test_the_cap_holds_the_nearest_first_and_a_ship_in_dealings_before_a_nearer_
     B.resolve_state(ships[0], "at anchor", ships[0].brain)
     ships[0].crew.captain._enter("at anchor")
     w.run(60)
-    assert ships[0].crew.shape == "far" and ships[2].crew.shape == "far"
+    assert ships[0].crew.shape == "full" and ships[2].crew.shape == "far"
+    assert [v.id for v in K.crewed(w)] == [ships[0].id, ships[1].id, ships[3].id]
 
 
 def test_a_checkpoint_carries_a_crewed_ship_and_ticks_on_alike(tmp_path):
@@ -906,3 +910,76 @@ def test_a_ship_woken_keeps_her_streams_and_her_sail_follows_the_plans_word():
     assert K._sail_state_of(crew) == "under reefed topsails"  # before her captain's judgement
     w.run(61)
     assert crew.shape == "full"
+
+
+# -- step 7: the cap's order with a stationed hull; a hull at anchor awake ------------------
+
+
+def test_the_cap_holds_a_stationed_hull_before_a_nearer_one_and_always_when_the_scenario_says():
+    """The design's 2.6 (the owner's decision 3): the cap's order is a ship in dealings, then
+    a hull with a stationed person, then the nearest; a stationed hull within the range takes
+    the place of the farthest crewed ship of a lower rank when the cap is full, and under
+    `crewed: {stationed: always}` she is awake whatever her distance."""
+    w = hove_to_world()
+    ships = [
+        put(
+            w,
+            "merchant brig",
+            "britain",
+            f"{lat} 5 30 W",
+            "bound for Falmouth",
+            "bound for Falmouth",
+            name=f"B{i}",
+        )
+        for i, lat in enumerate(["49 31 N", "49 32 N", "49 33 N", "49 33.5 N"])
+    ]
+    w.run(61)
+    assert [v.id for v in K.crewed(w)] == [v.id for v in ships[:3]] and ships[3].crew is None
+    # a station seated on the farthest within the range: her hull is made asleep (the cap is
+    # full) and takes the farthest idle ship's place at the next switch
+    _, crew = K.station_world(w, "B3")
+    assert crew.shape == "far" and ships[3].crew is crew
+
+    from unittest.mock import MagicMock
+
+    seated = MagicMock(name="a seat's harness")  # a person stationed on her, told nothing
+    seated.agent.released = False
+    crew.agents["captain"] = seated
+    w.run(60)
+    assert [v.id for v in K.crewed(w)] == [ships[0].id, ships[1].id, ships[3].id]
+    assert ships[2].crew.shape == "far"
+    # the ship fifteen miles off: beyond the range every hull sleeps but the stationed one
+    # under `stationed: always`; by the cap alone she sleeps as any
+    from freesail.world.geo import parse_position
+
+    w._position = parse_position("49 48 N 5 30 W")
+    w.crewed_settings = {"stationed": "always"}
+    assert K.stationed_always(w)
+    w.run(60)
+    assert [v.id for v in K.crewed(w)] == [ships[3].id] and ships[0].crew.shape == "far"
+    w.crewed_settings = {}
+    w.run(60)
+    assert not K.crewed(w) and ships[3].crew.shape == "far"  # by the range alone again
+
+
+def test_a_station_may_be_seated_on_a_ship_at_anchor_and_she_is_awake_under_the_cap():
+    """The owner's decision 6 (package 84, step 7): a hull at anchor or in port may be awake;
+    `station_world` no longer refuses her for her state."""
+    from freesail.world import brains as B
+
+    w = hove_to_world()
+    b = put(
+        w,
+        "merchant brig",
+        "britain",
+        "49 33 N 5 30 W",
+        "bound for Falmouth",
+        "bound for Falmouth",
+        name="Anchored",
+    )
+    B.resolve_state(b, "at anchor", b.brain)
+    b.brain.state = "at anchor"
+    _, crew = K.station_world(w, "Anchored")
+    assert crew is b.crew and crew.shape == "full" and b.detail == "crewed"
+    w.run(120)
+    assert b.crew.shape == "full"  # not demoted for her anchor

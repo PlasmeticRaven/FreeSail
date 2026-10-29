@@ -200,6 +200,11 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_155_the_squadron_keeps_its_line_at_far_detail_and_through_the_promotion",
         "test_known_truths.py::test_truth_7_156_the_succession_is_by_the_wake_each_ship_putting_about_at_the_turning_point",
         "test_known_truths.py::test_truth_7_157_the_business_follows_the_ship_across_the_regions_edge_and_carries_the_convoy",
+        # package 79a: the business peopling a region, over the threshold under load
+        "test_known_truths.py::test_truth_7_260_a_ship_in_ordinary_at_brest_is_commissioned_by_the_business_after_the_delay",
+        "test_known_truths.py::test_truth_7_264_cadiz_is_watched_from_the_last_of_may_and_not_between_orde_and_it",
+        "test_known_truths.py::test_truth_7_268_the_commission_is_drawn_from_the_business_stream_and_moves_no_other",
+        "test_known_truths.py::test_truth_7_269_a_ship_in_ordinary_with_no_intent_of_her_nations_in_the_waters_stays_laid_up",
         "test_known_truths.py::test_truth_7_137_a_merchant_brig_fired_into_strikes_by_morale_and_the_log_says_why",
         "test_known_truths.py::test_the_schooner_sails_the_passage_with_her_octant_and_the_log_every_two_hours",
         "test_known_truths.py::test_truth_10_she_misses_stays_when_put_about_under_three_knots",
@@ -406,6 +411,15 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_168_powder_is_taken_in_at_the_road_not_the_harbour_and_bought_only_of_necessity",
         "test_known_truths.py::test_truth_7_170_a_checkpoint_with_the_hoy_alongside_resumes_to_one_digest_and_replays_to_it",
         "test_known_truths.py::test_truth_7_171_a_practice_forenoon_is_checkpointed_and_replayed",
+        # package 79b: the Channel's east block's truths that sail for an hour and more (the
+        # Strait's drift, the Goodwin, six hours in the Downs, the seam at 1 W, the ports on
+        # both charts, the passage to Spithead: 6 to 22 s at six workers, 2026-10-29)
+        "test_known_truths.py::test_truth_7_271_the_strait_of_dover_sets_her_as_the_directions_say_at_springs",
+        "test_known_truths.py::test_truth_7_272_the_goodwin_grounds_a_ship_standing_across_it_drawing_more_than_its_water",
+        "test_known_truths.py::test_truth_7_273_the_downs_hold_her_in_a_south_westerly_with_the_goodwin_to_leeward",
+        "test_known_truths.py::test_truth_7_274_a_passage_crosses_the_seam_at_1_w_with_the_business_carried",
+        "test_known_truths.py::test_truth_7_275_the_blocks_ports_load_on_either_chart_and_take_the_tables_stance",
+        "test_known_truths.py::test_truth_7_279_the_frigate_sails_from_the_downs_to_spithead_by_her_short_book",
     }
 )
 

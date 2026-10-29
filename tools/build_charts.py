@@ -423,6 +423,35 @@ REGIONS: dict[str, dict[str, Any]] = {
         # hills of Medina Sidonia): computed for the field, not written, the corridor's
         "skip_dry_tiles": True,
     },
+    # package 79b: the Channel's east block, the Wight to Dunkirk, abutting `channel-mid`
+    # (package 39a) at 1 W exactly. The level-2 tiles that meet the bounds span 48.67 to
+    # 51.65 N and 1.23 W to 2.61 E; the western column (1.23 to 0.80 W) from 48.67 to
+    # 51.23 N is channel-mid's (the seam rule, `tiles_listed_elsewhere`): computed with
+    # the block, so that the field knows the Wight's and Portsmouth's shores, and not
+    # written. Spithead and Poole lie in channel-mid's bounds, where it lists no level-3
+    # tile: their patches and marks are this block's, as Dartmouth's were 39a's (the
+    # bounds' check takes a harbour's box as the block's). Poole's level-3 tiles reach
+    # 2.08 W, so the fetch box does too (`--check`).
+    "channel-east": {
+        "title": "The Channel east, the Wight and Spithead to the Downs, Dover and Dunkirk",
+        "bounds": {"south": 49.0, "north": 51.5, "west": -1.0, "east": 2.5},
+        "fetch": {"south": 48.55, "north": 51.75, "west": -2.15, "east": 2.75},
+        "harbours": {
+            "spithead": {"south": 50.66, "north": 50.86, "west": -1.24, "east": -1.02},
+            "poole": {"south": 50.63, "north": 50.73, "west": -2.05, "east": -1.90},
+            "downs": {"south": 51.15, "north": 51.35, "west": 1.37, "east": 1.62},
+            "dover": {"south": 51.08, "north": 51.14, "west": 1.27, "east": 1.38},
+            "le-havre": {"south": 49.38, "north": 49.52, "west": 0.0, "east": 0.30},
+            "boulogne": {"south": 50.70, "north": 50.76, "west": 1.53, "east": 1.62},
+            "calais": {"south": 50.94, "north": 51.00, "west": 1.78, "east": 1.90},
+            "dunkirk": {"south": 51.02, "north": 51.10, "west": 2.20, "east": 2.42},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised to the chart's datum by the world's mean level: Dover is
+        # among the eleven gauges, so over this block the world's tide is the coast's own
+        # blend and not a far gauge's (docs/dev/ChartBlocks.md, "GEBCO's fill")
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -453,6 +482,7 @@ CHARTS: dict[str, dict[str, Any]] = {
         "regions": [
             "channel-west",
             "channel-mid",
+            "channel-east",  # package 79b
             "biscay-north",
             "biscay-south",  # package 39c
             "portugal",  # package 39d

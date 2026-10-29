@@ -3824,7 +3824,7 @@ def test_truth_70_a_port_closed_to_the_ships_nation_refuses_her_in_the_pilots_wo
     frigate = standing_in(FRIGATE)
     assert frigate.dealings.stance(frigate.ports.ports["brest"]) == "hostile"
     frigate.run(2 * 3600)
-    assert not events(frigate, "port.pilot_hail") and not frigate.vessels.vessels
+    assert not events(frigate, "port.pilot_hail") and not frigate.vessels.active()
     assert "the port hostile to the English" in frigate.readings.words("port")
     # open: her own port, where the pilot comes off (the passage of gate 5b has it)
     assert frigate.dealings.stance(frigate.ports.ports["falmouth"]) == "open"
@@ -10644,3 +10644,700 @@ def test_truth_7_200_the_tender_sent_to_plymouth_by_signal_lands_for_a_packet_an
     assert stage["orders"][0] == "come to an anchor" and stage["orders"][-1] == "hail the frigate"
     assert fake.calls > 6
     h.release("the test is done") if hasattr(h, "release") else None
+
+
+# ---------------------------------------------------------------------------
+# Package 79a: the regimes filled out and sourced (spec M7 §22; truths 7-260 to 7-269)
+# ---------------------------------------------------------------------------
+
+import yaml  # noqa: E402  (package 79a's truths read the knobs' tables)
+
+REGIMES_YAML = "data/regimes.yaml"
+NATIONS_YAML = "data/nations.yaml"
+# a source in the references' form: a work held under docs/references/ cited by volume and
+# page (or Falconer by his entry), or the word judgement
+_SOURCE_FORM = re.compile(
+    r"(James vol\. \d+ pp?\. \d+|Nicolas vol\. \d+ pp?\. \d+|Niles vol\. [IVX]+ pp?\. \d+"
+    r"|the Regulations 1806 pp?\. \d+|Falconer 1780, [A-Z]{4,}|[Jj]udgement)"
+)
+
+
+def _business_world(region: str, lat: float, lon: float, ports: list[str], when: datetime):
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        region=region,
+        ports=ports,
+        nation="britain",
+        business="on",
+    )
+    return make_world(SEED, "data/ships/topsail-schooner.yaml", sc)
+
+
+def _laid_up(w, vid: str, name: str, nation: str, port_id: str):
+    from freesail.world.ships import vessel_from_spec
+
+    port = w.ports.ports[port_id]
+    spec = {
+        "id": vid,
+        "description": "frigate",
+        "name": name,
+        "nation": nation,
+        "position": port.anchorage.position.to_dict(),
+        "goal": f"bound for {port.name}",
+        "regime": "in ordinary",
+    }
+    v = vessel_from_spec(w, spec, w.vessels.serial + 1)
+    w.vessels.serial += 1
+    w.vessels.add(v)
+    return v, port
+
+
+def test_truth_7_260_a_ship_in_ordinary_at_brest_is_commissioned_by_the_business_after_the_delay():
+    """Spec M7 §22 (package 79a, the brief's item 2): a French frigate in ordinary at Brest
+    with no sortie, the business on, is commissioned by the business at its first minute
+    for an intent of France's (a cruise on one of her doctrine's stations in the region or a
+    passage to another of her ports), to sail after the regime's `commission_delay_h` drawn
+    under the seed: at seed 7 the station off the Lizard within 20 miles, the delay 55 hours
+    (her commission due at 197345, inside the regime's two to five days). Said in her story
+    and in the port's news (the pilot's words) while her company is raised; she sails at the
+    first minute after it falls due and the news is gone. The clock is set forward over the
+    55 hours (the region at full business runs some 180 ticks a second, so the days sailed
+    would be some twenty minutes of the suite): she is a brainless hull at the anchorage
+    throughout, and nothing of hers lies between."""
+    w = _business_world(
+        "channel-west", 50.0, -5.0, ["falmouth", "plymouth", "brest"], datetime(1805, 6, 12, 10)
+    )
+    v, brest = _laid_up(w, "aigle", "Aigle", "france", "brest")
+    assert v.regime == "in ordinary" and v.sortie == "" and v.brain is None
+    w.run(120)
+    assert v.story[0] == (
+        60,
+        "commissioned for keep the station off the Lizard within 20 miles: her company "
+        "raising, to sail in 55 hours",
+    )
+    assert v.commission_tick == 197345
+    lo, hi = 48 * 3600, 120 * 3600
+    assert lo <= v.commission_tick - 60 <= hi
+    assert v.sortie in w.business.intents_for("france", brest)
+    assert v.regime == "in ordinary" and v.brain is None
+    news = w.ports.news_words(brest)
+    assert "Aigle, a frigate, is commissioning in Brest, her company raising" in news
+    assert "about 2 days" in news
+    w.clock.tick = v.commission_tick - 90
+    w.run(180)
+    assert v.regime == "" and v.brain is not None and v.state == "on passage"
+    assert v.intent_words == "keep the station off the Lizard within 20 miles"
+    assert v.story[-1] == (
+        197400,
+        "commissioned and under way: keep the station off the Lizard within 20 miles",
+    )
+    assert "Aigle" not in w.ports.news_words(brest)
+
+
+def test_truth_7_261_every_knob_of_the_regimes_and_the_nations_has_its_source_or_says_judgement():
+    """Spec M7 §22 (package 79a, the brief's item 1): the knobs' table read whole. Every
+    figure of `data/regimes.yaml` (a knob with a `value`) and every key of every nation's
+    `naval:` block names its source in the references' form (a work held, by volume and
+    page, or Falconer by his entry) or says judgement; a judgement on its own says what was
+    looked for (or that nothing was); Mahan, not in the repository, is never the only
+    source; and no source leans on memory alone."""
+    regimes = yaml.safe_load(Path(REGIMES_YAML).read_text(encoding="utf-8"))["regimes"]
+    knobs = [
+        (f"{r}.{k}", v["source"])
+        for r, body in regimes.items()
+        for k, v in body.items()
+        if isinstance(v, dict) and "value" in v
+    ]
+    assert len(knobs) == 6, knobs
+    nations = yaml.safe_load(Path(NATIONS_YAML).read_text(encoding="utf-8"))["nations"]
+    naval = []
+    for nid, body in nations.items():
+        block = body.get("naval") or {}
+        sources = block.get("sources") or {}
+        for key in block:
+            if key in ("source", "sources"):
+                continue
+            said = sources.get(key) or block.get("source")
+            naval.append((f"{nid}.{key}", said))
+        for kind in ("blockades", "in_ordinary"):
+            for entry in block.get(kind) or []:
+                if isinstance(entry, dict) and "source" in entry:
+                    naval.append((f"{nid}.{kind}.{entry['port']}", entry["source"]))
+    assert len(nations) == 8 and len(naval) > 50
+    for where, said in knobs + naval:
+        assert said and _SOURCE_FORM.search(said), (where, said)
+        if not re.search(r"(James|Nicolas|Niles|Regulations 1806|Falconer 1780) ", said):
+            # a judgement with nothing cited says why: what was looked for, or the package
+            assert re.search(r"looked for|package \d+|at peace|off the chart", said), (where, said)
+        assert "Mahan" not in said or "not in the repository" in said, (where, said)
+        assert "from memory" not in said or _SOURCE_FORM.search(said), (where, said)
+
+
+def test_truth_7_262_no_figure_moved_and_a_differing_source_is_written_beside_the_knob():
+    """Spec M7 §22 (package 79a, the brief's item 1: no figure moves): the regimes' figures
+    are package 72's, the sortie's fifteen miles, hour and 22 knots that truth 7-154 reads
+    among them; where a source gives another figure it is said beside the knob, "the source
+    gives ...; kept at ... until re-measured", for the lead to rule."""
+    from freesail.world.regimes import regime_knob
+
+    assert regime_knob("in ordinary", "commission_delay_h") == [48, 120]
+    assert regime_knob("in ordinary", "slip_out_clear_nm") == 15
+    assert regime_knob("in ordinary", "slip_out_clear_minutes") == 60
+    assert regime_knob("in ordinary", "slip_out_wind_max_kn") == 22
+    assert regime_knob("in convoy", "size") == [4, 8]
+    assert regime_knob("escorting", "escort") == "brig-sloop"
+    regimes = yaml.safe_load(Path(REGIMES_YAML).read_text(encoding="utf-8"))["regimes"]
+    kept = {
+        k
+        for body in regimes.values()
+        for k, v in body.items()
+        if isinstance(v, dict) and "until re-measured" in str(v.get("source"))
+    }
+    assert kept == {"commission_delay_h", "slip_out_wind_max_kn", "size"}
+    assert "eleven to thirteen weeks" in regimes["in ordinary"]["commission_delay_h"]["source"]
+    assert "Plymouth and Cawsand Bay" in regimes["on blockade"]["source"]
+
+
+def test_truth_7_263_rochefort_is_blockaded_in_june_1805_and_not_after_stirling_raised_it():
+    """Spec M7 §22 (package 79a, the brief's item 3): Britain's blockades by the dates the
+    sources give. In Biscay north on 12 June 1805 the business draws the blockade of
+    Rochefort (James vol. 4 pp. 78 to 79), its main body on its own offshore station off the
+    point of Chassiron and its inshore brig on the road, the set's lee rendezvous the Bay of
+    Quiberon (vol. 4 p. 79); on 1 August 1805, after Stirling raised it on 12 July (vol. 4
+    p. 47), none; France's frigate in ordinary at Rochefort is drawn either way with her
+    sortie, and keeps the sortie rule (no commission)."""
+    ports = ["rochefort", "lorient", "la-rochelle", "le-palais"]
+    june = _business_world("biscay-north", 46.3, -2.0, ports, datetime(1805, 6, 12, 10))
+    sq = june.squadrons.find("the blockade of Rochefort")
+    assert sq is not None and sq.rendezvous == "the Bay of Quiberon" and sq.nation == "britain"
+    flag, brig = (june.vessels.get(m) for m in sq.members)
+    assert flag.brain.intent_words == "keep the station off the point of Chassiron within 15 miles"
+    assert brig.brain.intent_words == "blockade Rochefort within 6 miles"
+    ordinary = [d for d in june.business.drawn if d.kind == "ordinary" and "Rochefort" in d.where]
+    assert len(ordinary) == 1
+    v = june.vessels.get(ordinary[0].id)
+    assert v.sortie == "cruise off the Baleines within 20 miles" and v.commission_tick == -1
+    august = _business_world("biscay-north", 46.3, -2.0, ports, datetime(1805, 8, 1, 10))
+    assert august.squadrons.find("the blockade of Rochefort") is None
+    assert not [d for d in august.business.drawn if d.kind == "blockade"]
+
+
+def test_truth_7_264_cadiz_is_watched_from_the_last_of_may_and_not_between_orde_and_it():
+    """Spec M7 §22 (package 79a, the brief's item 3): Cadiz under blockade by the sources'
+    dates: Orde's squadron off it until Villeneuve drove him away on 9 April 1805 (James
+    vol. 3 pp. 333 and 341), and from 31 May a frigate and two brigs, Collingwood by August
+    (vol. 3 p. 375), the main body some fifteen miles off (p. 379). On 12 June 1805 the
+    business draws the blockade of Cadiz, its frigate on the station off Cadiz within 15
+    miles; on 1 May 1805, between the two, none; Spain's frigate in ordinary at Cadiz is
+    drawn with her sortie off Cape Santa Maria."""
+    ports = ["cadiz", "lisbon", "lagos"]
+    june = _business_world("portugal", 36.4, -6.8, ports, datetime(1805, 6, 12, 10))
+    sq = june.squadrons.find("the blockade of Cadiz")
+    assert sq is not None
+    assert june.vessels.get(sq.commander).brain.intent_words == (
+        "keep the station off Cadiz within 15 miles"
+    )
+    spain = [d for d in june.business.drawn if d.kind == "ordinary"]
+    assert [d.nation for d in spain] == ["spain"]
+    assert june.vessels.get(spain[0].id).sortie == "cruise off Cape Santa Maria within 20 miles"
+    may = _business_world("portugal", 36.4, -6.8, ports, datetime(1805, 5, 1, 10))
+    assert may.squadrons.find("the blockade of Cadiz") is None
+
+
+def test_truth_7_265_ferrol_is_blockaded_off_cape_prior_and_spains_frigate_waits_her_sortie():
+    """Spec M7 §22 (package 79a, the brief's item 3): in Biscay south on 12 June 1805 the
+    business draws Britain's blockade of Ferrol, its main body off Cape Prior within 15
+    miles (James vol. 3 pp. 333 and 356) and its inshore brig on Ferrol's road, and Spain's
+    frigate in ordinary at Ferrol with her sortie off Cape Ortegal: Spain slips out when
+    the blockade is blown off (vol. 4 pp. 119 to 120), so she keeps the sortie rule and is
+    not commissioned by the business."""
+    w = _business_world(
+        "biscay-south",
+        43.8,
+        -8.6,
+        ["ferrol", "corunna", "vigo", "santander"],
+        datetime(1805, 6, 12, 10),
+    )
+    sq = w.squadrons.find("the blockade of Ferrol")
+    assert sq is not None and len(sq.members) == 2
+    assert w.vessels.get(sq.commander).brain.intent_words == (
+        "keep the station off Cape Prior within 15 miles"
+    )
+    (d,) = [d for d in w.business.drawn if d.kind == "ordinary"]
+    v = w.vessels.get(d.id)
+    assert v.nation == "spain" and v.sortie == "cruise off Cape Ortegal within 20 miles"
+    w.run(120)
+    assert v.commission_tick == -1 and v.regime == "in ordinary"
+
+
+def test_truth_7_266_lorients_frigate_with_no_sortie_is_commissioned_for_a_passage_of_frances():
+    """Spec M7 §22 (package 79a, items 2 and 3): France's frigate in ordinary at Lorient has
+    no sortie (Lorient unblockaded in 1805 and the Didon sailing from it on 2 May, James vol.
+    3 p. 350), so the business commissions her when it peoples the region: at seed 7 for a
+    passage to La Rochelle, the delay drawn inside the regime's two to five days, in her
+    story, in Lorient's news and in the business's record; Rochefort's frigate beside her,
+    with her sortie, is not commissioned."""
+    w = _business_world(
+        "biscay-north",
+        46.3,
+        -2.0,
+        ["rochefort", "lorient", "la-rochelle", "le-palais"],
+        datetime(1805, 6, 12, 10),
+    )
+    drawn = {d.where: d for d in w.business.drawn if d.kind == "ordinary"}
+    lorient = next(d for where, d in drawn.items() if "L'Orient" in where or "Lorient" in where)
+    v = w.vessels.get(lorient.id)
+    assert v.sortie == "bound for La Rochelle"
+    assert (
+        lorient.intent == f"commissioned for bound for La Rochelle; to sail at {v.commission_tick}"
+    )
+    assert 48 * 3600 <= v.commission_tick <= 120 * 3600
+    assert v.story[-1][1].startswith("commissioned for bound for La Rochelle: her company raising")
+    assert f"{v.name}, a frigate, is commissioning in" in w.ports.news_words(
+        w.ports.ports["lorient"]
+    )
+    assert v.sortie in w.business.intents_for("france", w.ports.ports["lorient"])
+    rochefort = next(d for where, d in drawn.items() if "Rochefort" in where)
+    assert w.vessels.get(rochefort.id).commission_tick == -1
+
+
+def test_truth_7_267_the_channels_business_draws_nothing_new():
+    """Spec M7 §22 (package 79a: no rule a recorded passage runs is changed): in the
+    Channel's west the business draws, as package 72 had it, the one blockade (Brest's,
+    under the book's stations, with no rendezvous of its own) and the one ship in ordinary
+    (the frigate at Brest with her sortie off the Lizard), and commissions nobody: the new
+    doctrine lies in Biscay and off Cadiz."""
+    w = _business_world(
+        "channel-west", 50.0, -5.0, ["falmouth", "plymouth", "brest"], datetime(1805, 6, 12, 10)
+    )
+    blockades = [s for s in w.squadrons.sets if s.regime == "on blockade"]
+    assert [s.id for s in blockades] == ["blockade-brest"] and blockades[0].rendezvous == ""
+    (d,) = [d for d in w.business.drawn if d.kind == "ordinary"]
+    assert d.intent == "in ordinary at Brest; the sortie cruise off the Lizard within 20 miles"
+    w.run(120)
+    assert w.vessels.get(d.id).commission_tick == -1
+    assert all(not p.news for p in w.ports.ports.values())
+
+
+def test_truth_7_268_the_commission_is_drawn_from_the_business_stream_and_moves_no_other():
+    """Spec M7 §22 (package 79a, the brief's item 2): the commission's delay and intent are
+    the business's own stream's (`test_the_draw_is_the_seeds_and_moves_no_other_draw`'s
+    rule): the same seed draws the same commission, and a world with the ship in ordinary
+    laid up has every other stream as a world without her (the weather's first draw the
+    same). The director's form without a delay draws from the same stream and says the
+    commission in the port's news alike."""
+
+    def commissioned():
+        w = _business_world(
+            "channel-west",
+            50.0,
+            -5.0,
+            ["falmouth", "plymouth", "brest"],
+            datetime(1805, 6, 12, 10),
+        )
+        v, _ = _laid_up(w, "aigle", "Aigle", "france", "brest")
+        w.run(60)
+        return w, v
+
+    a, va = commissioned()
+    b, vb = commissioned()
+    assert (va.sortie, va.commission_tick) == (vb.sortie, vb.commission_tick)
+    plain = _business_world(
+        "channel-west", 50.0, -5.0, ["falmouth", "plymouth", "brest"], datetime(1805, 6, 12, 10)
+    )
+    plain.run(60)
+    assert plain.rng.stream("weather").random() == a.rng.stream("weather").random()
+    # the director's commission with no delay said: the regime's delay, the port's news
+    quiet = make_world(
+        SEED,
+        "data/ships/topsail-schooner.yaml",
+        Scenario(
+            start_time=datetime(1805, 6, 12, 10),
+            wind_from_deg=270.0,
+            wind_speed_kn=14.0,
+            gustiness=0.0,
+            variability=0.0,
+            position={"lat_deg": 50.0, "lon_deg": -5.0},
+            region="channel-west",
+            ports=["falmouth", "plymouth", "brest"],
+            nation="britain",
+        ),
+    )
+    v, brest = _laid_up(quiet, "harpy", "Harpy", "france", "brest")
+    quiet.world_order('ship "Harpy": commissioned for bound for Roscoff', "the test")
+    assert 48 * 3600 <= v.commission_tick <= 120 * 3600
+    assert "Harpy, a frigate, is commissioning in Brest" in quiet.ports.news_words(brest)
+
+
+def test_truth_7_269_a_ship_in_ordinary_with_no_intent_of_her_nations_in_the_waters_stays_laid_up():
+    """Spec M7 §22 (package 79a, the brief's item 2): the business gives a ship it
+    commissions an intent of her own nation's in the waters in play; a Moorish frigate in
+    ordinary at Tangier, the Emperor's one port in play and no station of his in the
+    cruisers' doctrine, has none, and stays in ordinary, said once in her story; nothing
+    is drawn for her and the port's news is silent of her."""
+    w = _business_world("strait", 36.0, -5.6, ["gibraltar", "tangier"], datetime(1805, 6, 12, 10))
+    v, tangier = _laid_up(w, "mabrouk", "Mabrouk", "morocco", "tangier")
+    w.run(180)
+    assert v.regime == "in ordinary" and v.commission_tick == -1 and v.brain is None
+    assert [words for _t, words in v.story] == [
+        "no intent of her nation's in these waters: she stays in ordinary"
+    ]
+    assert "Mabrouk" not in w.ports.news_words(tangier)
+
+
+# ---------------------------------------------------------------------------
+# Package 79b: the Channel's east block, the Wight to Dunkirk (truths 7-270 to 7-279)
+# ---------------------------------------------------------------------------
+
+EAST_PORTS = ["portsmouth", "poole", "downs", "dover", "le-havre", "boulogne", "calais", "dunkirk"]
+SPITHEAD = (50.7600, -1.1250)  # features/channel-east.yaml's `spithead`
+
+
+def _east_at(lat: float, lon: float, when: datetime, ship: str = FRIGATE, **kw):
+    """A world on the whole chart in the Channel's east block at seed 7, the block's eight
+    ports loaded, a steady breeze (from the east unless given)."""
+    sc = Scenario(
+        start_time=when,
+        wind_from_deg=kw.pop("wind_from_deg", 80.0),
+        wind_speed_kn=kw.pop("wind_speed_kn", 12.0),
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": lat, "lon_deg": lon},
+        chart="atlantic-east",
+        ports=kw.pop("ports", EAST_PORTS),
+        nation=kw.pop("nation", "britain"),
+        **kw,
+    )
+    return make_world(SEED, ship, sc)
+
+
+def _sighted(w) -> dict[str, dict]:
+    return {e.data["id"]: e.data for e in w.log if e.kind == "lookout.sighting" and e.data}
+
+
+def test_truth_7_270_from_spithead_the_nab_is_seen_by_night_at_its_range_and_the_wight_by_day():
+    """The brief's item 9: the frigate's lookout at Spithead. By night the Nab light-vessel
+    east of Bembridge ledge is raised at her range of two leagues, but only from the year
+    she came on her station (24 September 1812: in 1805 there was a buoy, Moore 1799); from
+    ten miles off, beyond her eight, she is not seen. By day the Wight's marks are made out:
+    the Kicker Point, Ryde, Nettlestone Point, and Culver Cliff or Ashey Down tower."""
+    night_1805 = _east_at(*SPITHEAD, datetime(1805, 6, 20, 23, 30))
+    assert night_1805.daylight == "night"
+    night_1805.run(120)
+    assert "nab-light" not in _sighted(night_1805)
+    night_1815 = _east_at(*SPITHEAD, datetime(1815, 6, 20, 23, 30))
+    night_1815.run(120)
+    nab = _sighted(night_1815).get("nab-light")
+    assert nab is not None and nab["seen_as"] == "light"
+    assert 4.0 < nab["distance_m"] / units.NAUTICAL_MILE < 8.0  # within her eight miles
+    from freesail.world.geo import Position, destination
+
+    nab_pos = night_1815.chart.feature("nab-light").position
+    off = destination(nab_pos, 160.0, 10.0 * units.NAUTICAL_MILE)
+    beyond = _east_at(off.lat_deg, off.lon_deg, datetime(1815, 6, 20, 23, 30))
+    beyond.run(120)
+    assert "nab-light" not in _sighted(beyond)
+    day = _east_at(*SPITHEAD, datetime(1805, 6, 20, 12, 0))
+    day.run(300)
+    seen = set(_sighted(day))  # the lookout's first calls, the nearest first
+    assert {"gilkicker-point", "ryde", "nettlestone-point"} <= seen, seen
+    # and what stands in sight of her masthead in clear weather: the Wight's high marks
+    eye = nab["height_of_eye_m"]
+    in_sight = {
+        s.feature.id
+        for s in day.chart.in_sight(day.position, eye, None, "day", datetime(1805, 6, 20, 12, 5))
+    }
+    assert {"culver-cliff", "ashey-down-tower", "portsdown-hill", "bembridge-point"} <= in_sight
+    assert "nab-light" not in in_sight or not day.chart.feature("nab-light").lit_in(1805)
+    assert day.chart.region_at(Position(*SPITHEAD)) == "channel-mid"  # the patch in its water
+    assert day.chart.level_at(Position(*SPITHEAD)) == 3
+
+
+def test_truth_7_271_the_strait_of_dover_sets_her_as_the_directions_say_at_springs():
+    """The brief's item 9: in the middle of the Strait at springs (two days after the new
+    moon of 10 June 1805) the world's stream runs north-east by east on the flood and
+    south-west by west on the ebb (Faden 1793: the flood N E by E, the ebb S W by W), and
+    the master's directions say the same water; a ship lying with no way on through the
+    hour of the ebb's strength is carried two miles and more to the south-west by west,
+    and his account, working the directions' stream, goes with her within half a mile."""
+    import freesail.world.tide as T
+    from freesail.world.geo import Position, bearing_and_distance
+
+    tide = T.load_tide()
+    mid = Position(51.0, 1.45)
+    start = datetime(1805, 6, 12, 0, 0)
+    states = [
+        (start + timedelta(minutes=10 * i), tide.at(mid, start + timedelta(minutes=10 * i)))
+        for i in range(150)
+    ]
+    assert {s.area_id for _, s in states} == {"strait-of-dover"}
+    flood = [
+        s for _, s in states if abs(((s.stream_toward_deg - 56.25) + 180.0) % 360.0 - 180.0) < 1.0
+    ]
+    ebb = [
+        s for _, s in states if abs(((s.stream_toward_deg - 236.25) + 180.0) % 360.0 - 180.0) < 1.0
+    ]
+    assert max(s.stream_kn for s in flood) > 2.0 and max(s.stream_kn for s in ebb) > 2.0
+    said = T.load_directions().area_at(mid)
+    assert said.id == "strait-of-dover" and said.set_point == "NE by E" and said.spring_kn == 3.0
+    when, strongest = max(states, key=lambda t: t[1].stream_kn if t[1] in ebb else 0.0)
+    w = _east_at(
+        51.0,
+        1.45,
+        when - timedelta(minutes=30),
+        wind_from_deg=0.0,
+        wind_speed_kn=2.0,
+        ship_heading_deg=225.0,
+        ship_speed_kn=0.0,
+    )
+    truth0, account0 = w.position, w.navigation.account_now()
+    w.run(3600)
+    toward, run_m = bearing_and_distance(truth0, w.position)
+    assert run_m / units.NAUTICAL_MILE > 2.0
+    assert abs(((toward - 236.25) + 180.0) % 360.0 - 180.0) < 15.0  # south-west by west
+    a_toward, a_run = bearing_and_distance(account0, w.navigation.account_now())
+    assert abs(((a_toward - 236.25) + 180.0) % 360.0 - 180.0) < 15.0
+    _, error = bearing_and_distance(w.position, w.navigation.account_now())
+    assert error / units.NAUTICAL_MILE < 0.6
+
+
+def test_truth_7_272_the_goodwin_grounds_a_ship_standing_across_it_drawing_more_than_its_water():
+    """The brief's item 9: the frigate, drawing fifteen feet, stands east out of the Gull
+    Stream across the North Goodwin near low water (the sand dry for a great extent, Imray
+    1874; steep-to, Moore 1799) and takes the ground on it; the head of the North Goodwin
+    by name grounds her too where the tide leaves less water over it than she draws, and
+    a ship over the same head at high water with water to spare is not aground."""
+    from freesail.world.geo import bearing_and_distance
+
+    w = _east_at(
+        51.300,
+        1.500,
+        datetime(1805, 6, 20, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        ship_heading_deg=90.0,
+        ship_speed_kn=6.0,
+    )
+    assert w.tide_height_m < 2.6  # near low water
+    w.submit("set plain sail")
+    w.submit("steer east")
+    w.run(1500)
+    aground = [e for e in w.log if e.kind == "ship.aground"]
+    assert aground, [e.text for e in w.log if e.kind.startswith("ship.")][-5:]
+    head = w.chart.feature("north-goodwin")
+    _, off = bearing_and_distance(w.position, head.position)
+    assert off < 3000.0  # on the North Goodwin's sand
+    draught = units.feet_to_m(15.0)  # the frigate's, as the grounding's line says
+    grounding = w.chart.danger_under(head.position, math.radians(90.0), 40.0, draught, tide_m=2.2)
+    assert grounding is not None and "North Goodwin" in grounding.bottom
+    assert w.chart.danger_under(head.position, math.radians(90.0), 40.0, 1.0, tide_m=5.0) is None
+
+
+def test_truth_7_273_the_downs_hold_her_in_a_south_westerly_with_the_goodwin_to_leeward():
+    """The brief's item 9: brought up by the best bower in the Downs off Deal (seven or
+    eight fathoms on chalk, White 1835), a south-westerly of twenty-four knots for six
+    hours does not drag her: she lies within her cable's swing of where she brought up,
+    and the Goodwin lies to leeward of her, three miles off."""
+    from freesail.world.geo import bearing_and_distance
+
+    w = _east_at(
+        51.2200,
+        1.4400,
+        datetime(1805, 6, 20, 4, 0),
+        wind_from_deg=225.0,
+        wind_speed_kn=24.0,
+        ship_heading_deg=225.0,
+    )
+    w.submit("let go the best bower")
+    w.run(600)
+    assert any(e.kind == "ship.brought_up" for e in w.log)
+    brought = w.position
+    w.run(6 * 3600)
+    assert not [e for e in w.log if "drag" in e.kind or "aground" in e.kind]
+    _, moved = bearing_and_distance(brought, w.position)
+    assert moved < 0.2 * units.NAUTICAL_MILE
+    sand_bearing, sand_m = bearing_and_distance(
+        w.position, w.chart.feature("south-goodwin").position
+    )
+    downwind = 45.0  # the wind from the south-west blows toward the north-east
+    assert abs(((sand_bearing - downwind) + 180.0) % 360.0 - 180.0) < 60.0
+    assert 2.0 < sand_m / units.NAUTICAL_MILE < 5.0
+
+
+def test_truth_7_274_a_passage_crosses_the_seam_at_1_w_with_the_business_carried():
+    """The brief's item 9 (truth 7-157's kind): the schooner from three miles west of 1 W,
+    south of the Wight, before a westerly, crosses from channel-mid's water into the
+    Channel's east block within the hour; the business follows her and peoples the new
+    region once, and the depth does not step across the seam (the two tiles cut from the
+    one grid)."""
+    from freesail.world.geo import Position
+
+    w = _east_at(
+        50.40,
+        -1.08,
+        datetime(1805, 6, 12, 10, 0),
+        ship=SCHOONER,
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        ship_heading_deg=90.0,
+        ship_speed_kn=5.0,
+        business="on",
+    )
+    b = w.business
+    assert b.region == "channel-mid" and b.regions_entered == ["channel-mid"]
+    before = len(b.drawn)
+    w.submit("set plain sail")
+    w.submit("steer east")
+    crossed = None
+    for _ in range(12):
+        w.run(600)
+        if b.region == "channel-east":
+            crossed = w.clock.tick
+            break
+    assert crossed is not None and crossed <= 3600, (b.region, w.position)
+    assert b.regions_entered == ["channel-mid", "channel-east"] and len(b.drawn) > before
+    a, c = Position(50.40, -1.002), Position(50.40, -0.998)
+    assert w.chart.region_at(a) == "channel-mid" and w.chart.region_at(c) == "channel-east"
+    assert abs(w.chart.depth_at(a) - w.chart.depth_at(c)) < 1.0
+
+
+def test_truth_7_275_the_blocks_ports_load_on_either_chart_and_take_the_tables_stance():
+    """The brief's items 4 and 9: the eight port files load on the whole chart, their roads
+    the block's features, and on the Channel's chart alone (a recorded passage's), where
+    every spot falls back to its own position, the same; Portsmouth's yard is the King's
+    and its powder is taken in at Spithead; the four French ports of the invasion coast
+    are hostile to a King's ship and neutral to an American; the Downs' boatmen come off
+    by night."""
+    whole = _east_at(51.0, 1.45, datetime(1805, 6, 12, 12, 0))
+    # the Channel's chart alone with no ports named, as the gate 5b passages: every file
+    alone = make_world(
+        SEED,
+        FRIGATE,
+        Scenario(
+            start_time=datetime(1805, 6, 12, 12, 0),
+            wind_from_deg=270.0,
+            wind_speed_kn=14.0,
+            position={"lat_deg": 49.5, "lon_deg": -5.5},
+            region="channel-west",
+            nation="britain",
+        ),
+    )
+    for pid in EAST_PORTS:
+        port = whole.ports.ports[pid]
+        same = alone.ports.ports[pid]
+        for label in ("outer_road", "anchorage", "mooring"):
+            spot, other = getattr(port, label), getattr(same, label)
+            assert spot.position.lat_deg == pytest.approx(other.position.lat_deg, abs=1e-6), pid
+            if spot.feature_id:
+                f = whole.chart.feature(spot.feature_id)
+                assert spot.position.lat_deg == pytest.approx(f.position.lat_deg, abs=1e-4), pid
+    ports = whole.ports.ports
+    assert ports["portsmouth"].dockyard.kind == "yard"
+    assert ports["portsmouth"].anchorage.feature_id == "spithead"
+    assert {pid: whole.dealings.stance(ports[pid]) for pid in EAST_PORTS} == {
+        "portsmouth": "open",
+        "poole": "open",
+        "downs": "open",
+        "dover": "open",
+        "le-havre": "hostile",
+        "boulogne": "hostile",
+        "calais": "hostile",
+        "dunkirk": "hostile",
+    }
+    american = _east_at(
+        51.0, 1.45, datetime(1805, 6, 12, 12, 0), ship=SCHOONER, nation="united-states"
+    )
+    assert {american.dealings.stance(american.ports.ports[p]) for p in EAST_PORTS} == {"neutral"}
+    assert ports["downs"].pilot.by_night and not ports["dover"].pilot.by_night
+
+
+def test_truth_7_276_the_strait_by_night_shows_the_lights_1805_had_and_not_the_later():
+    """The brief's item 3: from the middle of the Strait by night in 1805 the South
+    Foreland's two lights are seen, and neither Gris Nez's (lit 1837) nor Calais's (the
+    watch-tower's light of 1818, the tower of 1848), though Gris Nez stands nearest; in
+    1840 Gris Nez's light is seen from the same place."""
+    w = _east_at(51.0, 1.45, datetime(1805, 6, 12, 23, 30))
+    eye = 36.0
+
+    def lights(year: int) -> set[str]:
+        return {
+            s.feature.id
+            for s in w.chart.in_sight(w.position, eye, None, "night", datetime(year, 6, 12, 23, 30))
+            if s.seen_as == "light"
+        }
+
+    in_1805 = lights(1805)
+    assert {"south-foreland-upper-light", "south-foreland-lower-light"} <= in_1805, in_1805
+    assert not in_1805 & {"gris-nez-light", "calais-tour-du-guet-light", "calais-light"}
+    assert "gris-nez-light" in lights(1840)
+
+
+def test_truth_7_277_dover_and_portsmouth_have_their_1805_waters_not_the_later_works():
+    """The brief's item 3: Dover without the Admiralty harbour (its pier begun in 1847):
+    the line of the later breakwaters across Dover bay is water, a ship may stand across
+    it; the harbour's mouth at Portsmouth between the Point and Blockhouse is a channel for
+    a frigate; the port files say their datum is unverified, no sheet being read."""
+    from freesail.world.geo import Position
+
+    w = _east_at(51.0, 1.45, datetime(1805, 6, 12, 12, 0))
+    for i in range(11):
+        f = i / 10.0
+        p = Position(51.1080 + 0.004 * f, 1.3100 + 0.035 * f)
+        assert w.chart.depth_at(p) > 3.0, p
+    assert w.chart.depth_at(Position(50.7895, -1.1085)) > 6.0
+    for pid in ("portsmouth", "dover"):
+        import yaml
+
+        doc = yaml.safe_load(
+            (Path(__file__).resolve().parents[1] / "data" / "ports" / f"{pid}.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert doc["datum"] == "unverified"
+
+
+def test_truth_7_278_the_masters_tide_in_the_block_is_norie_1805s():
+    """The brief's item 5: the master's tide by the almanac at Spithead names his epitome's
+    Spithead (Norie 1805, Table XLI: 9h 30m at full and change), in the Downs the Downs
+    (11h 0m), off Dunkirk Dunkirk (11h 45m); each the nearest place of his table."""
+    for (lat, lon), name in (
+        (SPITHEAD, "Spithead"),
+        ((51.2200, 1.4400), "the Downs"),
+        ((51.0619, 2.3691), "Dunkirk"),
+    ):
+        w = _east_at(lat, lon, datetime(1805, 6, 12, 12, 0))
+        words = w.navigation.tide_by_almanac()["words"]
+        assert name in words and "may differ by hours" not in words, words
+
+
+def test_truth_7_279_the_frigate_sails_from_the_downs_to_spithead_by_her_short_book():
+    """The brief's item 7: the block's scenario (`spithead.yaml`) sailed at seed 7 by its
+    short book: from the Downs past the South Foreland, Dungeness, the Royal Sovereign
+    and the Owers to the Nab without touching ground; at St Helens by night she anchors by
+    the lead in the road, at daylight she weighs, the Portsmouth pilot boards her, and she
+    brings up at Spithead within its limits and he leaves her, within a day and a quarter."""
+    from freesail.world.geo import Position, bearing_and_distance
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    root = Path(__file__).resolve().parents[1]
+    sf = load_scenario(root / "data" / "scenarios" / "spithead.yaml")
+    w = make_scenario_world(sf)
+    assert begin(w, sf) >= 10
+    for _ in range(28 * 6):
+        w.run(600)
+        if any(e.kind == "port.pilot_left" for e in w.log):
+            break
+    assert not [e for e in w.log if e.kind == "ship.aground"]
+    anchored = [e for e in w.log if e.kind == "ship.anchored"]
+    assert len(anchored) == 3  # the Downs at the start, St Helens for the night, Spithead
+    pilot = [e for e in w.log if e.kind == "port.pilot_aboard"]
+    assert pilot and "Portsmouth" in pilot[0].text
+    assert any(e.kind == "port.pilot_left" for e in w.log)
+    assert w.clock.tick <= 27 * 3600
+    _, off = bearing_and_distance(w.position, Position(*SPITHEAD))
+    assert off < 0.5 * units.NAUTICAL_MILE

@@ -317,3 +317,46 @@ def test_a_merchant_brig_free_sails_a_merchant_brigs_own_file():
     assert roles[:5] == ["master", "mate", "second mate", "boatswain", "carpenter"]
     assert world.people.captain.role == "master"
     assert not set(roles) & {"commander", "lieutenant", "surgeon", "purser", "gunner"}
+
+
+# Package 79b: the Channel's east block, the frigate from the Downs to Spithead.
+SPITHEAD = ROOT / "data" / "scenarios" / "spithead.yaml"
+
+
+def test_spithead_is_a_passage_on_the_whole_chart_from_the_downs_to_spithead():
+    """The scenario names the chart, starts at anchor in the Downs on the block's harbour
+    patch, loads the block's eight ports and its own book, and its marks are the chart's:
+    Spithead by name in the patch west of 1 W, the Strait's water between, the Channel's
+    weather box over the whole of it."""
+    sf = load_scenario(SPITHEAD)
+    sc = sf.scenario
+    assert sc.chart == "atlantic-east" and sf.seed == 7 and sc.nation == "britain"
+    assert sf.standing_orders == ["data/scenarios/spithead.orders"]
+    world = make_scenario_world(sf)
+    chart = world.chart
+    assert "channel-east" in chart.regions
+    start = world.position
+    assert chart.region_at(start) == "channel-east" and chart.level_at(start) == 3  # the Downs
+    assert 9.0 < chart.depth_at(start) < 20.0  # seven or eight fathoms
+    assert list(world.dealings.ports) == [
+        "downs",
+        "dover",
+        "portsmouth",
+        "poole",
+        "boulogne",
+        "calais",
+        "dunkirk",
+        "le-havre",
+    ]
+    road = chart.find_feature("Spithead")
+    assert road is not None and road.id == "spithead"
+    assert chart.level_at(road.position) == 3 and chart.region_at(road.position) == "channel-mid"
+    _, run_m = bearing_and_distance(start, road.position)
+    assert 100.0 < run_m / 1852.0 < 125.0  # some hundred and twelve miles direct
+    strait = Position(51.0, 1.45)
+    assert world.tide.area_at(strait).id == "strait-of-dover"
+    from freesail.world.weather import load_climatology
+
+    assert load_climatology().box_at(51.05, 2.37).name == "channel"
+    assert begin(world, sf) >= 10
+    assert not [e for e in world.log if e.kind == "order.rejected"]

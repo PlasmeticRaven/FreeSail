@@ -316,7 +316,8 @@ def test_the_lead_reads_the_tide_and_the_master_allows_for_it_by_his_almanac():
 
 
 # The waters whose rates, springs and neaps, are the period's own (package 39a).
-PERIOD_RATES = {"alderney-race"}
+# (package 79b: the Looe, Mackenzie's survey as White 1835 quotes it, three knots and two)
+PERIOD_RATES = {"alderney-race", "the-looe"}
 
 
 def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_figures(tide):
@@ -554,8 +555,9 @@ def test_the_channel_easts_gauges_were_read_and_are_held_and_the_eleven_do_not_m
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    # the Channel east's two (Biscay north's nine, package 39b, are held beside them)
-    held = {g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] > 48.5}
+    # the Channel east's two (Biscay north's nine, package 39b, are held beside them;
+    # the Channel's east block's six, package 79b, east of 1 W)
+    held = {g["id"]: g for g in doc["held_gauges"] if g["lat_deg"] > 48.5 and g["lon_deg"] < -1.0}
     assert set(held) == {"bournemouth", "portsmouth"}
     assert all(g["mean_level_m"] is None for g in held.values())  # unverified, not invented
     assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & set(held)
@@ -586,7 +588,8 @@ def test_the_blocks_gauges_are_read_and_held_out_of_the_blend_that_would_move_th
     south = [g for g in doc["held_gauges"] if 42.0 <= g["lat_deg"] < 45.9]  # package 39c's
     # (Portugal and Cadiz's five, package 39d, after them, south of 42 N)
     north_of_42 = [g for g in doc["held_gauges"] if g["lat_deg"] >= 42.0]
-    assert len(north_of_42) == 2 + len(held) + len(south)
+    # (and the Channel's east block's six, package 79b)
+    assert len(north_of_42) == 2 + 6 + len(held) + len(south)
     assert [g["id"] for g in held] == [
         "concarneau",
         "port-tudy",
@@ -908,3 +911,70 @@ def test_torbay_is_its_own_water_with_next_to_no_stream(tide):
     outside = max(tide.at(off_berry_head, day + timedelta(hours=h)).stream_kn for h in range(25))
     assert inside <= 0.25 < outside
     assert T.load_directions().by_id("torbay").spring_kn == 0.0
+
+
+# ---------------------------------------------------------------------------
+# Package 79b: the Channel's east block's tide (the Wight to Dunkirk)
+# ---------------------------------------------------------------------------
+
+
+def test_the_east_blocks_six_gauges_are_held_and_blending_them_would_move_the_channel(tide):
+    """TICON's gauges of the block (Newhaven, Le Havre, Dieppe, Boulogne, Calais, Dunkirk;
+    Dover among the eleven) read into `held_gauges:` after the last, the French mean levels
+    SHOM's RAM's and Newhaven's unverified; held, because every one is within the reach of
+    every Channel position and would move Falmouth's tide and every recorded passage. What
+    holding them costs: the world's tide over the block is the eleven's blend, whose range
+    at Newhaven and Dieppe is a fifth of the gauges' own."""
+    import yaml
+
+    doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
+    held = [g for g in doc["held_gauges"] if g["lat_deg"] > 48.5 and g["lon_deg"] > -1.0]
+    assert [g["id"] for g in held] == [
+        "newhaven",
+        "le-havre",
+        "dieppe",
+        "boulogne",
+        "calais",
+        "dunkirk",
+    ]
+    assert held[0]["mean_level_m"] is None  # unverified, not invented
+    assert all(3.0 < g["mean_level_m"] < 5.5 for g in held[1:])
+    assert len(tide.gauges) == 11 and not {g.id for g in tide.gauges} & {g["id"] for g in held}
+    # Newhaven's level unread: Dover's taken for the trial blend alone (never in the file)
+    trial = [{**g, "mean_level_m": g["mean_level_m"] or 3.7} for g in held]
+    blended = T.Tide({**doc, "gauges": doc["gauges"] + trial}, {"areas": []})
+    _, here = tide.constants_at(FALMOUTH)
+    _, there = blended.constants_at(FALMOUTH)
+    assert here["M2"] != there["M2"]  # blending them would move the recorded passages
+    for g in (held[0], held[2]):  # Newhaven and Dieppe
+        at = Position(g["lat_deg"], g["lon_deg"])
+        _, world = tide.constants_at(at)
+        gauge_range = 2.0 * (g["M2"]["amplitude_m"] + g["S2"]["amplitude_m"])
+        world_range = 2.0 * (world["M2"][0] + world["S2"][0])
+        assert world_range < 0.5 * gauge_range, (g["id"], world_range, gauge_range)
+
+
+def test_the_east_blocks_waters_answer_from_their_own_areas_before_the_open_channels():
+    """The block's stream areas are looked up first-match before the open Channel's; the
+    block's box is in the directions' limits, every position of it within an area (the
+    block's open reach the rest, beyond the open Channel's 2 E too); the polygons keep east
+    of 1.3 W, far from the recorded passages' other sail."""
+    book = T.load_directions()
+    for pos, area in (
+        (Position(50.76, -1.12), "spithead-road"),
+        (Position(50.71, -0.75), "the-looe"),
+        (Position(50.70, 0.30), "beachy-head"),
+        (Position(51.25, 1.50), "the-downs-stream"),
+        (Position(51.00, 1.45), "strait-of-dover"),
+        (Position(51.10, 2.30), "flemish-banks"),
+        (Position(49.47, 0.10), "seine-mouth"),
+        (Position(50.20, 0.00), "channel-east-open"),
+        (Position(49.20, 2.40), "channel-east-open"),
+    ):
+        assert book.area_at(pos).id == area, (pos, area)
+    assert {"south": 49.0, "north": 51.5, "west": -1.0, "east": 2.5} in [
+        {"south": s, "north": n, "west": w, "east": e} for s, n, w, e in book.boxes
+    ]
+    for a in book.areas:
+        if a.id in {"spithead-road", "the-looe", "channel-east-open"}:
+            assert min(lon for _, lon in a.polygon) > -1.3

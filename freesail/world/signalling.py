@@ -100,13 +100,9 @@ def _root_world(cap: Any) -> Any:
 
 
 def _body_of(cap: Any, sid: str) -> Any:
-    """The body a stranger's id names, for its locker: a far vessel, or the player's
-    shadow under `the ship`."""
-    root = _root_world(cap)
-    v = root.vessels.get(sid)
-    if v is None and sid == "the ship":
-        v = root.vessels.player_shadow(root)
-    return v
+    """The body a stranger's id names, for its locker: a vessel of the sea, the player's
+    ship among them under `the ship` (package 84, step 7)."""
+    return _root_world(cap).vessels.get(sid)
 
 
 def _light(cap: Any) -> str:
@@ -204,9 +200,6 @@ def _hear_fog_guns(brain: Any, locker: S.Locker, books: S.Books, tick: int, hear
     vessel = brain.vessel
     root = _root_world(brain)
     others = [o for o in root.vessels.vessels if o is not vessel and not o.done]
-    shadow = root.vessels.player_shadow(root)
-    if shadow is not None:
-        others.append(shadow)
     orders_of = str(getattr(vessel, "under_orders_of", "") or "")
     for o in others:
         sid = str(o.id)

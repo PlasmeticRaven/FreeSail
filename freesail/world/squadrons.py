@@ -41,6 +41,7 @@ import yaml
 from freesail import units
 from freesail.core.events import Severity
 from freesail.world.geo import Position, bearing_and_distance, distance_words
+from freesail.world.ships import PLAYER_ID
 
 __all__ = [
     "CONVOY_PACE_FACTOR",
@@ -58,8 +59,8 @@ __all__ = [
 
 SQUADRONS_DIR = Path(__file__).resolve().parents[2] / "data" / "squadrons"
 
-# The player's ship as a commander or a member (`brains.PLAYER_ID`).
-PLAYER_ID = "the ship"
+# The player's ship as a commander or a member: `ships.PLAYER_ID`, the followed hull's
+# vessel's id (package 84, step 7), imported above.
 
 KINDS: tuple[str, ...] = ("squadron", "convoy")
 FORMATIONS: tuple[str, ...] = ("line ahead", "line abreast", "order of sailing", "close order")
@@ -1106,9 +1107,6 @@ class Squadron:
     # -- words ------------------------------------------------------------------------
 
     def _name_of(self, world: Any, vid: str) -> str:
-        if vid == PLAYER_ID:
-            ship = getattr(world, "ship", None)
-            return str(getattr(ship, "name", "the ship") or "the ship")
         body = _body(world, vid)
         return str(getattr(body, "name", vid) or vid)
 
@@ -1385,22 +1383,27 @@ def _slug(words: str) -> str:
 
 
 def _body(world: Any, vid: str) -> Any:
-    """A member's far body: a vessel of the sea, or the player's shadow for `the ship`."""
-    if vid == PLAYER_ID:
-        sea = getattr(world, "vessels", None)
-        return (
-            sea.player_shadow(world) if sea is not None and hasattr(sea, "player_shadow") else None
-        )
+    """A member's body on the sea: a vessel of it, the player's ship among them (package 84,
+    step 7: `Vessels.own`, under `PLAYER_ID`)."""
     sea = getattr(world, "vessels", None)
     return sea.get(vid) if sea is not None else None
 
 
+def _followed_hull(body: Any) -> Any:
+    """The followed hull when `body` is her vessel (package 84, step 7), else None: her way
+    and her frame are her ship's own, as the shadow's were, where another hull's are her
+    far body's mirrored record."""
+    hull = getattr(body, "crew", None) if body is not None else None
+    return hull if hull is not None and getattr(hull, "is_followed", False) else None
+
+
 def _velocity_of(world: Any, vid: str) -> tuple[float, float]:
-    if vid == PLAYER_ID:
+    body = _body(world, vid)
+    hull = _followed_hull(body)
+    if hull is not None:
         from freesail.world.ships import _ship_velocity
 
-        return _ship_velocity(world)
-    body = _body(world, vid)
+        return _ship_velocity(hull)
     if body is None:
         return 0.0, 0.0
     ms = units.knots_to_ms(float(body.speed_kn))
@@ -1416,9 +1419,10 @@ def _frame_of(world: Any, vid: str) -> tuple[Position, float, float] | None:
     to leeward' into a bearing offset) of the ship a station is kept on. Her course is her
     heading when she has way and her last course when she has none, so that a stopped
     commodore's drift does not swing the set (71's finding)."""
-    if vid == PLAYER_ID:
-        pos = getattr(world, "position", None)
-        ship = getattr(world, "ship", None)
+    hull = _followed_hull(_body(world, vid))
+    if hull is not None:
+        pos = getattr(hull, "position", None)
+        ship = getattr(hull, "ship", None)
         if pos is None or ship is None:
             return None
         heading = units.rad_to_deg(float(ship.heading)) % 360.0
@@ -1506,9 +1510,6 @@ def _val(raw: Any, default: Any) -> Any:
 def _locker_of(world: Any, vid: str) -> Any:
     from freesail.world import signals as S
 
-    if vid == PLAYER_ID:
-        ship = getattr(world, "ship", None)
-        return S.player_locker(world) if ship is not None and hasattr(ship, "extra") else None
     body = _body(world, vid)
     return S.vessel_locker(body) if body is not None else None
 
