@@ -1498,6 +1498,25 @@ intent binds.
    the director's form, `gybe the mainsail`'s answer); the record of redactions; the tuning
    notes; the Harness; the suite as run (the fast tier, the slow tier of the touched files,
    the whole slow tier when quiet, the pace tests alone and last).
+7. **The interim gate's draft (the owner, 2026-10-29).** The last gate document is M6c's
+   (`docs/gates/gate-m6c.md`); the owner's next playtests are after package 84 completes and
+   after package 75's *Indefatigable* is in, and the documentation is to be brought up to date
+   before them. This package's reviewer, primed by the reading above, drafts
+   `docs/gates/gate-m7-interim.md` as its last deliverable: not a full gate, but **where M7
+   stands since M6c** from the player's and the reader's side (what a captain, an officer and
+   a model at a station can now do and read, package by package 70 to 86 and 84's steps, as
+   the records have them), **the open items** it finds in the records (the playtests of
+   70 to 72 and their debrief, the model officer's points, the tuning notes' "open" and
+   "noted" lines, the pins moved and why, the container floors and the pictures' threshold),
+   and **suggested tests for the two playtests**: after 84 (the one world: a station on a far
+   ship, the tender's day, two crewed strangers signalling and fighting on one clock, a save
+   with many hulls replayed, the pace with hulls asleep) and after the first new ship (the
+   64 and the razee: her fits, her mizen course and driver, her gun decks and the lee ports,
+   the pictures, a scenario of 1796). The lead adds the engine's and the world's half from
+   the as-merged records (84's eleven steps, 86, 73, the suites' figures, what 88 is booked to
+   mend) and anything the draft missed, and the owner reads the whole before the playtest.
+   Runs after 84's last step is merged; the draft's engine half may be begun by the lead
+   before that.
 
 **Not done here:** the one-world refactor (84), the boat (82); any change to
 `docs/agents/consent/` or `docs/agents/ConsentBrief.md` (if the brief's wording offends the
