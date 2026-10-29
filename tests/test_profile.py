@@ -741,8 +741,9 @@ def test_the_ship_graph_serves_the_profile_where_the_file_gives_one():
 
 def test_the_lookups_by_a_sails_class_read_its_curve_class(monkeypatch):
     """Items 20 to 22: the served reef factor, the readings' luff and the polar's sheets
-    read `Sail.curve_class` (each sail's own class until stage 0E widens it), shown by
-    giving every sail another curve for the length of the test."""
+    read `Sail.curve_class` (each sail's own class, the gaff's for a lateen cut at the mast:
+    every sail's own on the brig), shown by giving every sail another curve for the length of
+    the test."""
     from freesail.evolutions import trim
     from freesail.physics import sails as sails_mod
 

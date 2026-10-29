@@ -943,9 +943,9 @@ class Builder:
             if s.state is not SailState.UNBENT and (b := ship.spar_of_role(s, "boom")) is not None
         }
         for sail in ship.sails.values():
-            # rated at the peak of the curve the physics takes for it (package 75: its
-            # `curve_class`, its own class until stage 0E gives a lateen cut at the mast the
-            # gaff's)
+            # rated at the peak of its `curve_class`'s curve (package 75: the gaff's for a
+            # lateen cut at the mast, as the physics will take it from the engine's lateen step;
+            # else its own class)
             entry = (sail.id, sail.area_m2, sail.centre_height_m, sail.curve_class)
             boom = ship.spar_of_role(sail, "boom") if sail.cls == "studding" else None
             if sail.state is SailState.UNBENT:

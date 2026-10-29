@@ -211,6 +211,20 @@ class Spar(Part):
     # file's figure, kept for the dockyard); dataclass defaults, so older saves load
     jury: bool = False
     rating_whole_kn: float = 0.0
+    # The lower mast whose yards are laid aback to heave to, where the file names one (package
+    # 75; docs/design/Design-ShipsEngineExtensions.md §5.7: the bilander's main); false, the
+    # mast of the most square sail, as before. Read by nothing yet: the engine's settee step
+    # will. A class default, left out of the checkpoint while false (`__getstate__`), so
+    # that older saves load and a spar without it is pickled as before it.
+    heave_to_aback: bool = False
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, `heave_to_aback` only where its file sets it
+        (package 75), so that a spar without it is pickled as before it."""
+        state = dict(self.__dict__)
+        if not state.get("heave_to_aback"):
+            state.pop("heave_to_aback", None)
+        return state
 
     @classmethod
     def from_spec(cls, s: SparSpec) -> Spar:
@@ -239,6 +253,7 @@ class Spar(Part):
             housed_length_m=housed if running else 0.0,
             full_length_m=full if running else 0.0,
             horse_m=s.horse_m or 0.0,
+            heave_to_aback=bool(s.heave_to_aback),
         )
 
     @property
@@ -279,6 +294,19 @@ class Sail(Part):
     flying: bool = False
     sheeted_to: str | None = None
     corners_m: list[tuple[float, float]] | None = None  # the cut, for the drawing (package 57)
+    # Package 75 (docs/design/Design-ShipsEngineExtensions.md §3.1, §5.2): a settee, a
+    # dipping lug set and clewed up as a square sail (the bilander's main), and whether its
+    # yard is on deck now (`yard_lowered`, runtime only): lowered to be dipped, while in the
+    # gear a settee is clewed up aloft where a lug is lowered on deck; a lateen cut at the
+    # mast (the 64's and the 74's mizen course), whose curve and trim are the gaff's
+    # (`curve_class`). Read now only by `curve_class`, the runner's `class: settee` and the
+    # served graph and snapshot, none of which differs for a sail without them: the engine's
+    # steps will give them their behaviour. Class defaults, left out of the checkpoint while
+    # false (`__getstate__`), so that older saves load and a sail without them is pickled as
+    # before them.
+    settee: bool = False
+    yard_lowered: bool = False
+    cut_at_mast: bool = False
     # Package 70 (spec M7 §9): the area shot out of the sail, square metres, which the
     # physics takes off its drawing area and the strain off what the cloth bears; nothing
     # mends it until a new sail is bent (the sailmaker's patch is 73's).
@@ -301,6 +329,15 @@ class Sail(Part):
     side_force_kn: float = 0.0
     area_effective_m2: float = 0.0
 
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, `settee`, `yard_lowered` and `cut_at_mast` only
+        while true (package 75), so that a sail without them is pickled as before them."""
+        state = dict(self.__dict__)
+        for key in ("settee", "yard_lowered", "cut_at_mast"):
+            if not state.get(key):
+                state.pop(key, None)
+        return state
+
     @classmethod
     def from_spec(cls, s: SailSpec) -> Sail:
         cloth = s.cloth_rating_kn if s.cloth_rating_kn is not None else 0.9 * s.area_m2
@@ -321,6 +358,8 @@ class Sail(Part):
             flying=bool(getattr(s, "flying", False)),
             sheeted_to=getattr(s, "sheeted_to", None),
             corners_m=getattr(s, "corners_m", None),
+            settee=bool(getattr(s, "settee", False)),
+            cut_at_mast=bool(getattr(s, "cut_at_mast", False)),
             # storm canvas and the occasional sails start the voyage in the sail room
             state=SailState.FURLED if s.bent else SailState.UNBENT,
         )
@@ -369,11 +408,16 @@ class Sail(Part):
 
     @property
     def curve_class(self) -> str:
-        """The class whose curve and trim the physics and the readings take for this sail
-        (package 75; docs/design/Design-ShipsEngineExtensions.md §3.1): its own class, until
-        stage 0E gives a lateen cut at the mast the gaff's; the lookups that read a sail's
-        curve by its class read this instead."""
-        return self.cls
+        """The class whose curve and trim are taken for this sail (package 75;
+        docs/design/Design-ShipsEngineExtensions.md §3.1): the gaff's for a lateen cut at the
+        mast, a four-sided, loose-footed sail laced to its mast like a gaff sail, as the owner
+        asked (docs/design/Research-74-2026-10.md §13.5); its own class for every other sail.
+        The rating, the polar's sheets, the served reef factor, the readings' luff and the
+        runner's `wanted_sheet` read it now; the physics' own lookups (the curve driving the
+        sail, its furled windage, the sheet's floor) and the orders' and scripts' wanted sheet
+        read it from the engine's lateen step, B3.1 (§3.1), and take the sail's class until
+        then."""
+        return "gaff" if self.cut_at_mast else self.cls
 
     @property
     def sent_down(self) -> bool:

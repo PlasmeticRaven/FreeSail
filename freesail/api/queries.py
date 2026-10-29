@@ -276,6 +276,8 @@ def snapshot(world: World) -> dict[str, Any]:
             "shivering": s.shivering,  # a studding sail too near the wind (spec 3b §7)
             "sheet_angle": s.sheet_angle,
             "lug_side": _lug_side(ship, s),  # package 57: a lug drawn on its side of the mast
+            # package 75: a settee's yard lowered on deck to be dipped, only while it is
+            **_only_when_true(s, "yard_lowered"),
         }
         for s in ship.sails.values()
     ]
@@ -332,9 +334,8 @@ def _spar_entry(s: Spar) -> dict[str, Any]:
 
 
 def _sail_entry(s: Sail) -> dict[str, Any]:
-    # the reef factor by the class whose curve the physics takes for the sail (package 75:
-    # `Sail.curve_class`, its own class until stage 0E gives a lateen cut at the mast the
-    # gaff's)
+    # the reef factor by `Sail.curve_class` (package 75: the gaff's for a lateen cut at the
+    # mast, as the physics will take it from the engine's lateen step; else its own class)
     cls = SAIL_CLASSES.get(s.curve_class)
     return {
         "id": s.id,
@@ -354,7 +355,16 @@ def _sail_entry(s: Sail) -> dict[str, Any]:
         "flying": s.flying,
         "sheeted_to": s.sheeted_to,
         "corners_m": _corners_of(s),
+        # package 75: a settee and a lateen cut at the mast, each only where the file says
+        **_only_when_true(s, "settee", "cut_at_mast"),
     }
+
+
+def _only_when_true(s: Sail, *keys: str) -> dict[str, bool]:
+    """Package 75's keys on a sail (docs/design/Design-ShipsEngineExtensions.md §6.4), each
+    served as true where it holds and left out where it does not, so that the graph and the
+    snapshot of a ship without them are as before them."""
+    return {key: True for key in keys if getattr(s, key, False)}
 
 
 def _corners_of(s: Sail) -> list[list[float]] | None:

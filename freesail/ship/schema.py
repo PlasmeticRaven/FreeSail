@@ -62,6 +62,16 @@ gun's `deck`, one of `DECK_WORDS`; and the fit `unarmed`, a ship of the file wit
 (`ArmamentSpec.fit` gives None). No file of the eight carries any of them, so each is inert
 until a ship's builder writes it. A pivot gun's own `arc_deg` is now required: the one pivot
 on file, the privateer schooner's long Tom, gives it already.
+
+Package 75's stage 0E (docs/design/Design-ShipsEngineExtensions.md §8) adds the engine
+extensions' three keys: a sail's `settee: true`, the bilander's main, a dipping lug set and
+clewed up as a square sail (§5.1-§5.2); a sail's `cut_at_mast: true`, the 64's and the 74's
+mizen course, a lateen with its fore part cut away and its luff laced to the mast (§3.1); and a
+lower mast's `heave_to_aback: true`, the one mast whose yards are laid aback to heave to
+(§5.7). Unknown keys are dropped silently, so each is a field here, refused in words where it
+cannot stand. No file of the eight carries any of them. Beyond the refusals here, only
+`Sail.curve_class`, the runner's `class: settee` and the served graph and snapshot read them,
+none of which differs for a ship without them, until the engine's steps build their behaviour.
 """
 
 from __future__ import annotations
@@ -454,6 +464,19 @@ class SparSpec:
     # at the ends to the inside of the stern of vessels that carry a fore and aft mainsail,
     # for the main sheet to travel on"); the sheet's geometry reads it (evolutions/trim.py).
     horse_m: float | None = None
+    # Package 75 (docs/design/Design-ShipsEngineExtensions.md §5.7): the lower mast whose
+    # yards are laid aback to heave to, where the file names one (the bilander's main: her
+    # main topsail goes to the mast, D4(a)); None, the mast of the most square sail, as
+    # before. A lower mast's key, and one mast's at most (`validate`).
+    heave_to_aback: bool | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, `heave_to_aback` only where the file gives it
+        (package 75), so that a spar without it is pickled as before it."""
+        state = dict(self.__dict__)
+        if state.get("heave_to_aback") is None:
+            state.pop("heave_to_aback", None)
+        return state
 
     @property
     def parent(self) -> str | None:
@@ -494,6 +517,28 @@ class SailSpec:
     # it is four-sided, [tack, peak, clew] when it is a triangle. None: drawn by its class's
     # rule from its spars and its area.
     corners_m: list[tuple[float, float]] | None = None
+    # Package 75 (docs/design/Design-ShipsEngineExtensions.md §5.1-§5.2): a settee, the
+    # bilander's main, a four-cornered sail on a yard hung obliquely and peaked over the stern
+    # (Falconer 1780, BILANDER), set and clewed up as a square sail and dipped round the mast
+    # as a lug (Lescallier p. 390; D1(a)). A dipping lug with this key, which routes it to its
+    # own evolutions: it names its mast and gives its [tack, throat, peak, clew], and is never
+    # set flying or sheeted to another sail.
+    settee: bool = False
+    # Package 75 (Ext §3.1): a lateen mizen course cut at the mast, the 64's and the 74's: its
+    # head laced to the yard abaft the mast, its luff to the mast, its foot loose, the yard
+    # running on forward with no sail there (Lavery I31-I32). Handled and drawn as a sail on
+    # a yard; its curve and trim are the gaff's (`Sail.curve_class`). It names its mast and
+    # gives its [tack, throat, peak, clew].
+    cut_at_mast: bool = False
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, `settee` and `cut_at_mast` only where the file sets
+        them (package 75), so that a sail without them is pickled as before them."""
+        state = dict(self.__dict__)
+        for key in ("settee", "cut_at_mast"):
+            if not state.get(key):
+                state.pop(key, None)
+        return state
 
 
 @dataclass
@@ -1569,6 +1614,7 @@ def _parse_spar(s: Any, i: int, source: str) -> SparSpec:
         running=running,
         housed_length_m=_housed_length(s, cls, where, source, running=bool(running)),
         horse_m=_num(s, "horse_m", where, source, required=False),
+        heave_to_aback=_heave_to_aback(s, where, source),
     )
 
 
@@ -1632,6 +1678,20 @@ def _housed_length(s: dict, cls: str, where: str, source: str, running: bool) ->
     return value
 
 
+def _heave_to_aback(s: dict, where: str, source: str) -> bool | None:
+    """Whether this is the mast whose yards are laid aback to heave to (package 75), if the
+    file says; `validate` refuses it off a lower mast and on a second one."""
+    value = s.get("heave_to_aback")
+    if value is None:
+        return None
+    if not isinstance(value, bool):
+        raise ShipFileError(
+            f"{source}: {where} has heave_to_aback = {value!r}; say true (her yards on this "
+            "mast are laid aback to heave to) or leave it out."
+        )
+    return value
+
+
 def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
     if not isinstance(s, dict):
         raise ShipFileError(f"{source}: sail #{i + 1} is not a mapping.")
@@ -1674,6 +1734,8 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
         raise ShipFileError(
             f"{source}: {where} is a {cls} sail; only a lug topsail is sheeted to another sail."
         )
+    settee = _settee(s, cls, roles, where, source, dipping, flying, sheeted_to)
+    cut_at_mast = _cut_at_mast(s, cls, roles, where, source)
     return SailSpec(
         id=sid,
         cls=cls,
@@ -1691,7 +1753,83 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
         flying=flying,
         sheeted_to=sheeted_to,
         corners_m=_corners(s.get("corners_m"), where, source),
+        settee=settee,
+        cut_at_mast=cut_at_mast,
     )
+
+
+def _settee(
+    s: dict,
+    cls: str,
+    roles: dict[str, str],
+    where: str,
+    source: str,
+    dipping: bool,
+    flying: bool,
+    sheeted_to: str | None,
+) -> bool:
+    """Whether the sail is a settee (package 75; docs/design/Design-ShipsEngineExtensions.md
+    §5.1-§5.2): a dipping lug that names its mast and gives its four corners, never set
+    flying and never sheeted to another sail."""
+    value = s.get("settee", False)
+    if not isinstance(value, bool):
+        raise ShipFileError(f"{source}: {where} has settee = {value!r}; say true or false.")
+    if not value:
+        return False
+    if cls != "lug":
+        raise ShipFileError(f"{source}: {where} is a {cls} sail; only a lug is a settee.")
+    if not dipping:
+        raise ShipFileError(
+            f"{source}: {where} is a settee and is not dipping; a settee is a dipping lug "
+            "(say dipping: true)."
+        )
+    if "mast" not in roles:
+        raise ShipFileError(
+            f"{source}: {where} is a settee and names no 'mast'; a settee names the mast it is "
+            "dipped round."
+        )
+    corners = _corners(s.get("corners_m"), where, source)
+    if corners is None or len(corners) != 4:
+        raise ShipFileError(
+            f"{source}: {where} is a settee and does not give four corners_m; a settee gives its "
+            "tack, throat, peak and clew."
+        )
+    if sheeted_to is not None:
+        raise ShipFileError(
+            f"{source}: {where} is a settee sheeted to '{sheeted_to}'; a settee's sheet leads "
+            "aft to the taffrail, not to another sail."
+        )
+    if flying:
+        raise ShipFileError(
+            f"{source}: {where} is a settee set flying; a settee is set and furled on its yard "
+            "aloft, never sent down whole."
+        )
+    return True
+
+
+def _cut_at_mast(s: dict, cls: str, roles: dict[str, str], where: str, source: str) -> bool:
+    """Whether the sail is a lateen cut at the mast (package 75;
+    docs/design/Design-ShipsEngineExtensions.md §3.1): a lateen that names the mast its luff
+    is laced to and gives its four corners."""
+    value = s.get("cut_at_mast", False)
+    if not isinstance(value, bool):
+        raise ShipFileError(f"{source}: {where} has cut_at_mast = {value!r}; say true or false.")
+    if not value:
+        return False
+    if cls != "lateen":
+        raise ShipFileError(f"{source}: {where} is a {cls} sail; only a lateen is cut at the mast.")
+    if "mast" not in roles:
+        raise ShipFileError(
+            f"{source}: {where} is cut at the mast and names no 'mast'; it names the mast its "
+            "luff is laced to."
+        )
+    corners = _corners(s.get("corners_m"), where, source)
+    if corners is None or len(corners) != 4:
+        raise ShipFileError(
+            f"{source}: {where} is cut at the mast and does not give four corners_m; it gives "
+            "its tack, throat, peak and clew."
+        )
+    return True
 
 
 def _corners(v: Any, where: str, source: str) -> list[tuple[float, float]] | None:
@@ -1802,6 +1940,11 @@ def validate(spec: ShipSpec) -> None:
                     f"{src}: spar '{s.id}' has rake_deg = {s.rake_deg:g}; a mast rakes between "
                     f"-30 (forward) and 30 (aft) degrees."
                 )
+        if s.heave_to_aback is not None and s.cls != "mast":
+            raise ShipFileError(
+                f"{src}: spar '{s.id}' is a {s.cls.replace('_', ' ')}; only a lower mast takes "
+                "'heave_to_aback', its yards laid aback to heave to."
+            )
         if s.rating_kn is None:
             s.rating_kn = DEFAULT_SPAR_RATING_KN[s.cls]
             missing_ratings.setdefault(("spar", s.cls, s.rating_kn), []).append(s.id)
@@ -1814,6 +1957,13 @@ def validate(spec: ShipSpec) -> None:
                 raise ShipFileError(f"{src}: spar '{s.id}' stands on itself through {path}.")
             chain.append(cur.id)
             cur = spars.get(cur.parent) if cur.parent else None
+    # the mast laid aback to heave to (package 75): one at most
+    aback = [s.id for s in spec.spars if s.heave_to_aback]
+    if len(aback) > 1:
+        raise ShipFileError(
+            f"{src}: spar '{aback[1]}' is laid aback to heave to as well as '{aback[0]}'; she "
+            "heaves to with one mast's yards laid aback, so name one mast."
+        )
 
     # sails: class requirements, roles exist and are the right kind
     for sl in spec.sails:
