@@ -13621,3 +13621,41 @@ records; nothing of any other region, the index and every port file and mark unt
 to 7-299 with `--slow -n 4` (7-294, Gibraltar to Port Mahon whole, among them), 11 passed.
 **The scenario** `strait.yaml`, 10 hours: **the same log byte for byte**, 588 lines, digest
 `c9459f107afdfe79`.
+
+### The region `mediterranean-west`
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. **The Alboran's inland tiles are left written**: the
+how-to's rule for Portugal's (`skip_dry_tiles`) does not apply cleanly, since east of 1 W no
+corridor lies under the regions and a dry tile unwritten leaves a query there nothing at all
+(ChartBlocks.md, "Not beyond the corridor"); 79c's note stands. `python
+tools/build_charts.py --region mediterranean-west --reuse-world`: the checks as printed (95
+of 95 features, ids unique, no override, the fetch box covering the tiles, "3 kept");
+"GEBCO's fill raised to the chart's datum by the world's mean level, 0.17 to 6.83 m"
+(within the bounds 0.29 to 0.43 m, the block's gauges' Málaga, Motril, Almería and
+Melilla; the 6.83 in the tiles south of 35 N, Morocco's and Algeria's interior outside
+every block, the eleven's nearest alone as before). **The shore's sweep 33,549 cells in
+293 places** (the old raise's, by the control, 2,190 in 155): with the fill no longer
+lifted six metres out of the sea, GEBCO's low ground below mean sea level reads as water
+again, the largest the Albufera of Valencia and its marshes (3,228, 2,963, 2,475, 2,119,
+1,618, 1,368, 1,047 about 39.23 to 39.38 N, 0.28 to 0.38 W, a later block's coast in this
+block's tiles) and the Sebkha of Oran (1,150 about 35.73 N, 0.12 W, the salt lake south of
+the town): water, a lagoon and a salt lake, as they are.
+
+| | Old (79c, 3.98 to 6.83 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 165 tiles, 23.99 MB | 165 tiles, 24.02 MB |
+| level 3 | 30 tiles, 2.14 MB | 30 tiles, 2.16 MB |
+| coast | 1,363 pieces, 11,428 points, 392,355 bytes | 1,250 pieces, 10,818 points, 366,564 bytes |
+| tiles changed | | 157 of level 2, all 30 of level 3 |
+| cells changed | | 26,870,887 at level 2, 3,917,826 at level 3, the largest 6.60 m |
+| above the datum to below | | 38,252 at level 2, 23,446 at level 3 |
+| below the datum to above | | none |
+
+`git status` after the build: the region's tiles, its coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-280 to 7-299
+with `--slow -n 4` (7-285 to 7-294, the block's, among them, 7-294 Gibraltar to Port Mahon
+whole), 20 passed. **The scenario** `mahon.yaml`, 98 hours, on the head's tree and this one
+(`balearics` not yet rebuilt; sailed again after it, below): **the same log byte for
+byte**, 3,190 lines, digest `8bcb18bb603cb7c6`.
