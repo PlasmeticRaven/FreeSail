@@ -81,12 +81,15 @@ tables:
       # coast of Poitou, La Rochelle and the roads of Ré 15 feet; the south coast of
       # Bretagne 18 feet, the OCR's '«8', taken by the world's figure as judgement). A
       # moon's bearing is turned to the hour as Moore's table has it, a point to 45 minutes.
+      # Since package 89 the world's figure over the block is its own gauges', 13 to 15
+      # feet on the south coast of Bretagne, and the judged rises are those (the OCR's '«8'
+      # stays unread: the Channel's blend had read it eighteen).
       - {name: Hodierne, lat_deg: 48.022, lon_deg: -4.538, hw_h: 4, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Faden p. 65: at the foot of the cliffs high water at 4 o'clock, or a little less"}
-      - {name: the Penmarks, lat_deg: 47.798, lon_deg: -4.373, hw_h: 3, hw_m: 45, spring_rise_ft: 17, rise_judgement: true, note: "Faden pp. 66 and 92: from a fraction after 3 to 4 o'clock (the fraction illegible in the OCR), the mean taken"}
-      - {name: Concarneau, lat_deg: 47.871, lon_deg: -3.918, hw_h: 4, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Faden p. 66: the tides are at above 4 o'clock"}
-      - {name: Port Louis, lat_deg: 47.708, lon_deg: -3.355, hw_h: 4, hw_m: 30, spring_rise_ft: 18, rise_judgement: true, note: "Faden pp. 68 and 70: high water at 4 o'clock and a half at new and full moon (p. 92 says 4); his rise in spring tides illegible in the OCR"}
-      - {name: Point Mehan, lat_deg: 47.548, lon_deg: -2.913, hw_h: 3, hw_m: 45, spring_rise_ft: 19, rise_judgement: true, note: "Faden pp. 73 and 92: at the entrance of the rivers of Vannes and Auray high water at 45 minutes after 3"}
-      - {name: Noirmoustier, lat_deg: 47.004, lon_deg: -2.253, hw_h: 4, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Faden pp. 76 and 93: at Noirmoustier and the Bay of Bourgneuf high water about 4 o'clock"}
+      - {name: the Penmarks, lat_deg: 47.798, lon_deg: -4.373, hw_h: 3, hw_m: 45, spring_rise_ft: 14, rise_judgement: true, note: "Faden pp. 66 and 92: from a fraction after 3 to 4 o'clock (the fraction illegible in the OCR), the mean taken"}
+      - {name: Concarneau, lat_deg: 47.871, lon_deg: -3.918, hw_h: 4, hw_m: 0, spring_rise_ft: 13, rise_judgement: true, note: "Faden p. 66: the tides are at above 4 o'clock"}
+      - {name: Port Louis, lat_deg: 47.708, lon_deg: -3.355, hw_h: 4, hw_m: 30, spring_rise_ft: 13, rise_judgement: true, note: "Faden pp. 68 and 70: high water at 4 o'clock and a half at new and full moon (p. 92 says 4); his rise in spring tides illegible in the OCR"}
+      - {name: Point Mehan, lat_deg: 47.548, lon_deg: -2.913, hw_h: 3, hw_m: 45, spring_rise_ft: 15, rise_judgement: true, note: "Faden pp. 73 and 92: at the entrance of the rivers of Vannes and Auray high water at 45 minutes after 3"}
+      - {name: Noirmoustier, lat_deg: 47.004, lon_deg: -2.253, hw_h: 4, hw_m: 0, spring_rise_ft: 15, rise_judgement: true, note: "Faden pp. 76 and 93: at Noirmoustier and the Bay of Bourgneuf high water about 4 o'clock"}
       - {name: St Gilles, lat_deg: 46.697, lon_deg: -1.943, hw_h: 3, hw_m: 0, spring_rise_ft: 15, note: "Faden p. 77: the moon in the N E and S W makes high water (S W is 3 o'clock); the rise the coast of Poitou's"}
       - {name: the Isle of Ré, lat_deg: 46.204, lon_deg: -1.367, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden pp. 81 and 93: in the Pertuis d'Antioche high tide from half an hour after 3 to 4 o'clock; the tide rises 15 feet in the roads of Ré"}
       - {name: La Rochelle, lat_deg: 46.159, lon_deg: -1.152, hw_h: 3, hw_m: 45, spring_rise_ft: 15, note: "Faden p. 81: the tides from half an hour after 3 to 4 o'clock at new and full moon; the tide rises 15 feet at La Rochelle"}
@@ -98,7 +101,7 @@ tables:
       # de Burgos (0.2786 m, a third of the vara; UNVERIFIED here, from memory) and are
       # turned to English feet and rounded (thirteen and a half pies are twelve feet).
       - {name: the Tower of Cordouan, lat_deg: 45.586, lon_deg: -1.174, hw_h: 4, hw_m: 30, spring_rise_ft: 15, note: "Faden p. 88: on the new and full moons high water to the northward of the Tower of Cordouan at 30 min. after 4 o'clock, and to the south of it 15 min. later; the perpendicular rise 14 or 15 feet, in the neap tides only 7 or 8"}
-      - {name: Arcasson, lat_deg: 44.665, lon_deg: -1.165, hw_h: 3, hw_m: 15, spring_rise_ft: 15, rise_judgement: true, note: "Faden pp. 90 and 93: in the Bassin of Arcasson at new and full moon high water at a quarter after 3 o'clock; no rise given"}
+      - {name: Arcasson, lat_deg: 44.665, lon_deg: -1.165, hw_h: 3, hw_m: 15, spring_rise_ft: 12, rise_judgement: true, note: "Faden pp. 90 and 93: in the Bassin of Arcasson at new and full moon high water at a quarter after 3 o'clock; no rise given"}
       - {name: Bayonne, lat_deg: 43.527, lon_deg: -1.515, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Faden p. 91: at Bayonne high water at 3 o'clock, or a little later; Tofiño 1789 p. 132: at full and change at three in the afternoon, rising 12 pies, 8 or 9 at the quarters"}
       - {name: Passages, lat_deg: 43.338, lon_deg: -1.929, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Tofiño 1789 p. 145: at conjunction and opposition high water at three in the afternoon and the tide rises 12 pies, 8 to 10 at the quarters, 15 at the equinoxes and solstices"}
       - {name: Santander, lat_deg: 43.462, lon_deg: -3.805, hw_h: 3, hw_m: 0, spring_rise_ft: 12, note: "Tofiño 1789 p. 172: at conjunction and opposition high water at three in the afternoon, the tide rising 13 1/2 pies, 9 or 10 at the quarters"}
@@ -112,13 +115,13 @@ tables:
       # Biscay's). His rise at Cadiz, eleven Castilian feet at springs (3.06 m), is ten
       # English feet; at Ayamonte "more than two brazas" (3.34 m), eleven. Where he gives
       # no rise (Lisbon, San Lucar) it is the world's spring range at the place, the
-      # 37j rule (JUDGEMENT), which over the block is Le Conquet's tide alone while the
-      # block's gauges are held (constituents.yaml), and not the coast's own (Cascais's
-      # is some eleven feet). Moore 1799's table of latitudes and high water names Oporto,
-      # the Rock of Lisbon, Lisbon, Cape Espichel, Cape St Vincent and Cadiz, but its OCR
-      # loses the hours' column: no Moore row is added.
-      - {name: Lisbon, lat_deg: 38.704, lon_deg: -9.145, hw_h: 2, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Tofiño 1789, p. 88: high water on the days of new and full moon at two in the afternoon, the ebb running up to seven miles an hour"}
-      - {name: San Lucar, lat_deg: 36.790, lon_deg: -6.405, hw_h: 3, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Tofiño 1789, p. 108: on the days of new and full moon high water at three in the afternoon (the bar of the Guadalquivir)"}
+      # 37j rule (JUDGEMENT), which over the block was Le Conquet's tide alone while the
+      # block's gauges were held (eighteen feet), and since package 89 is the block's own
+      # gauges' (Lisbon nine feet, San Lucar eight). Moore 1799's table of latitudes and
+      # high water names Oporto, the Rock of Lisbon, Lisbon, Cape Espichel, Cape St Vincent
+      # and Cadiz, but its OCR loses the hours' column: no Moore row is added.
+      - {name: Lisbon, lat_deg: 38.704, lon_deg: -9.145, hw_h: 2, hw_m: 0, spring_rise_ft: 9, rise_judgement: true, note: "Tofiño 1789, p. 88: high water on the days of new and full moon at two in the afternoon, the ebb running up to seven miles an hour"}
+      - {name: San Lucar, lat_deg: 36.790, lon_deg: -6.405, hw_h: 3, hw_m: 0, spring_rise_ft: 8, rise_judgement: true, note: "Tofiño 1789, p. 108: on the days of new and full moon high water at three in the afternoon (the bar of the Guadalquivir)"}
       - {name: Ayamonte, lat_deg: 37.170, lon_deg: -7.398, hw_h: 3, hw_m: 0, spring_rise_ft: 11, note: "Tofiño 1789, p. 101: the water rises more than two brazas on the days of new and full moon, high water at three in the afternoon (the bar of the Guadiana)"}
       - {name: Cadiz, lat_deg: 36.548, lon_deg: -6.276, hw_h: 2, hw_m: 0, spring_rise_ft: 10, note: "Tofiño 1789, p. 119: on the days of new and full moon high water at two in the afternoon and the tide rises eleven feet (Castilian), twelve the days after, six at the quarters"}
       # Package 39e, Madeira and the Western Islands: Norie's own Table XLI of 1805 (the
@@ -138,7 +141,7 @@ tables:
       # from the page image); Tofiño's feet are the pie de Burgos (0.279 m), turned to
       # English feet. Purdy's figures are largely Tofiño's in English: JUDGEMENT that a ship
       # of war's table of 1805 had them.
-      - {name: Cape Trafalgar, lat_deg: 36.183, lon_deg: -6.035, hw_h: 5, hw_m: 15, spring_rise_ft: 18, rise_judgement: true, note: "Purdy 1826, p. 8: from Cadiz the flood sets towards Cape Trafalgar, where it is high water at full and change at about V 1/4; no rise given: the world's spring range there, which is Le Conquet's while the Strait's gauges are held, JUDGEMENT"}
+      - {name: Cape Trafalgar, lat_deg: 36.183, lon_deg: -6.035, hw_h: 5, hw_m: 15, spring_rise_ft: 3, rise_judgement: true, note: "Purdy 1826, p. 8: from Cadiz the flood sets towards Cape Trafalgar, where it is high water at full and change at about V 1/4; no rise given: the world's spring range there, the Strait's own gauges' since package 89 (Le Conquet's eighteen feet while they were held), JUDGEMENT"}
       - {name: Tarifa, lat_deg: 36.001, lon_deg: -5.609, hw_h: 0, hw_m: 0, spring_rise_ft: 7, note: "Tofiño 1787, 'Marea', p. 9: high water at Tarifa on the day of conjunction about 12 at noon, rising 7 to 8 feet of Burgos at the greatest (7 English); Purdy 1826, p. 8: about XI 1/4"}
       - {name: Gibraltar, lat_deg: 36.130, lon_deg: -5.360, hw_h: 1, hw_m: 0, spring_rise_ft: 5, note: "Tofiño 1787, 'Mareas', pp. 21 to 22: in the bay high water at one in the afternoon at conjunction and opposition, the greatest tides 5 to 6 feet of Burgos (5 English); Purdy 1826, p. 8: XII 1/4, rising about 5 feet"}
       - {name: Tangier, lat_deg: 35.788, lon_deg: -5.800, hw_h: 0, hw_m: 0, spring_rise_ft: 5, note: "Purdy 1826, p. 8: near Tangier high water at 12; p. 6: at full and change the tide in the bay rises 5 feet"}
@@ -147,12 +150,13 @@ tables:
       # images of pp. 248 to 252 read through the archive's IIIF server 2026-10-29, as
       # package 39e read them): the period's own hours and rises, in period exactly. Where
       # Norie gives no rise it is the world's spring range at the place (the 37j rule),
-      # which over this block is the eleven's blend while the block's gauges are held, and
+      # which over this block was the eleven's blend while the block's gauges were held,
       # far below the coast's own east of the Wight (Newhaven's and Dieppe's ranges of
       # twenty feet and more read four and five in the blend: docs/dev/TuningNotes.md,
-      # package 79b): so Norie's own rises are given wherever he has them.
+      # package 79b): so Norie's own rises are given wherever he has them. Since package
+      # 89 the block's gauges serve its water, and the judged rises are theirs.
       - {name: Portsmouth, lat_deg: 50.795, lon_deg: -1.105, hw_h: 11, hw_m: 36, spring_rise_ft: 18, note: "Norie 1805, Table XLI p. 251 (the page image): Portsmouth Harb., 11h 36m, 18 feet; Imray 1874 p. 41 has the dockyard's 11h 41m and 12 1/2 feet"}
-      - {name: Spithead, lat_deg: 50.765, lon_deg: -1.115, hw_h: 9, hw_m: 30, spring_rise_ft: 10, rise_judgement: true, note: "Norie 1805, Table XLI p. 252 (the page image): Spithead, 9h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held) (Imray 1874's Ryde 13 1/2 feet)"}
+      - {name: Spithead, lat_deg: 50.765, lon_deg: -1.115, hw_h: 9, hw_m: 30, spring_rise_ft: 10, rise_judgement: true, note: "Norie 1805, Table XLI p. 252 (the page image): Spithead, 9h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which west of 1 W is the eleven's blend and not the place's own (Portsmouth's and Bournemouth's gauges are held) (Imray 1874's Ryde 13 1/2 feet)"}
       - {name: St Helen's, lat_deg: 50.700, lon_deg: -1.075, hw_h: 11, hw_m: 45, spring_rise_ft: 16, note: "Norie 1805, Table XLI p. 250 (the page image): Helens (St.), England, 11h 45m, 16 feet"}
       - {name: Poole, lat_deg: 50.712, lon_deg: -1.985, hw_h: 9, hw_m: 0, spring_rise_ft: 7, note: "Norie 1805, Table XLI p. 251 (the page image): Poole, 9h 0m, 7 feet; Imray 1874 p. 55: the double high water, the rise at Brownsea about 6 1/2 feet"}
       - {name: the Owers, lat_deg: 50.665, lon_deg: -0.690, hw_h: 9, hw_m: 36, spring_rise_ft: 15, note: "Norie 1805, Table XLI p. 251 (the page image): Owers, Eng. Channel, 9h 36m, 15 feet"}
@@ -160,25 +164,25 @@ tables:
       - {name: Shoreham, lat_deg: 50.828, lon_deg: -0.270, hw_h: 9, hw_m: 21, spring_rise_ft: 16, note: "Norie 1805, Table XLI p. 252 (the page image): Shoreham, 9h 21m, 16 feet"}
       - {name: Newhaven, lat_deg: 50.790, lon_deg: 0.055, hw_h: 10, hw_m: 16, spring_rise_ft: 20, note: "Norie 1805, Table XLI p. 251 (the page image): Newhaven, 10h 16m, 20 feet; Seaford the same (p. 252)"}
       - {name: Beachy Head, lat_deg: 50.735, lon_deg: 0.243, hw_h: 9, hw_m: 45, spring_rise_ft: 20, note: "Norie 1805, Table XLI p. 248 (the page image): Beachy, on shore, 9h 45m, 20 feet (in the offing 11h 0m); White 1835 p. 57: high water by the ground at Beachy Head at XI. 15"}
-      - {name: Hastings, lat_deg: 50.853, lon_deg: 0.585, hw_h: 10, hw_m: 35, spring_rise_ft: 11, rise_judgement: true, note: "Norie 1805, Table XLI p. 250 (the page image): Hastings, 10h 35m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held)"}
+      - {name: Hastings, lat_deg: 50.853, lon_deg: 0.585, hw_h: 10, hw_m: 35, spring_rise_ft: 18, rise_judgement: true, note: "Norie 1805, Table XLI p. 250 (the page image): Hastings, 10h 35m, no rise given: the world's spring range at the place, JUDGEMENT, the block's own gauges' since package 89 (the eleven's blend before, while they were held)"}
       - {name: Rye Harbour, lat_deg: 50.935, lon_deg: 0.765, hw_h: 10, hw_m: 51, spring_rise_ft: 24, note: "Norie 1805, Table XLI p. 251 (the page image): Rye Harbour, 10h 51m, 24 feet"}
       - {name: Dungeness, lat_deg: 50.913, lon_deg: 0.977, hw_h: 10, hw_m: 51, spring_rise_ft: 24, note: "Norie 1805, Table XLI p. 249 (the page image): Dungeness, 10h 51m, 24 feet"}
-      - {name: Folkestone, lat_deg: 51.078, lon_deg: 1.185, hw_h: 10, hw_m: 51, spring_rise_ft: 19, rise_judgement: true, note: "Norie 1805, Table XLI p. 249 (the page image): Folkstone, 10h 51m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held)"}
+      - {name: Folkestone, lat_deg: 51.078, lon_deg: 1.185, hw_h: 10, hw_m: 51, spring_rise_ft: 19, rise_judgement: true, note: "Norie 1805, Table XLI p. 249 (the page image): Folkstone, 10h 51m, no rise given: the world's spring range at the place, JUDGEMENT, the block's own gauges' since package 89 (the eleven's blend before, while they were held)"}
       - {name: the South Foreland, lat_deg: 51.140, lon_deg: 1.375, hw_h: 11, hw_m: 6, spring_rise_ft: 15, note: "Norie 1805, Table XLI p. 249 (the page image): Foreland (South), 11h 6m, 15 feet"}
       - {name: the Downs, lat_deg: 51.222, lon_deg: 1.430, hw_h: 11, hw_m: 0, spring_rise_ft: 15, note: "Norie 1805, Table XLI p. 249 (the page image): Downs, 11h 0m, 15 feet; Deal the same; White 1835 p. 58: high water at Deal XI. 15"}
-      - {name: Ramsgate, lat_deg: 51.327, lon_deg: 1.420, hw_h: 11, hw_m: 0, spring_rise_ft: 18, rise_judgement: true, note: "Norie 1805, Table XLI p. 251 (the page image): Ramsgate, 11h 0m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held) (Imray 1874 p. 8: springs rise 13 feet)"}
+      - {name: Ramsgate, lat_deg: 51.327, lon_deg: 1.420, hw_h: 11, hw_m: 0, spring_rise_ft: 19, rise_judgement: true, note: "Norie 1805, Table XLI p. 251 (the page image): Ramsgate, 11h 0m, no rise given: the world's spring range at the place, JUDGEMENT, the block's own gauges' since package 89 (the eleven's blend before, while they were held) (Imray 1874 p. 8: springs rise 13 feet)"}
       - {name: the North Foreland, lat_deg: 51.375, lon_deg: 1.447, hw_h: 11, hw_m: 15, spring_rise_ft: 16, note: "Norie 1805, Table XLI p. 249 (the page image): Foreland (North), 11h 15m, 16 feet"}
       - {name: Calais, lat_deg: 50.965, lon_deg: 1.850, hw_h: 11, hw_m: 30, spring_rise_ft: 18, note: "Norie 1805, Table XLI p. 248 (the page image): Calais, 11h 30m, 18 feet"}
-      - {name: Boulogne, lat_deg: 50.727, lon_deg: 1.595, hw_h: 10, hw_m: 30, spring_rise_ft: 15, rise_judgement: true, note: "Norie 1805, Table XLI p. 248 (the page image): Boulogne, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held)"}
-      - {name: Gris Nez, lat_deg: 50.870, lon_deg: 1.580, hw_h: 11, hw_m: 0, spring_rise_ft: 17, rise_judgement: true, note: "Norie 1805, Table XLI p. 250 (the page image): Grizness, 11h 0m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held)"}
+      - {name: Boulogne, lat_deg: 50.727, lon_deg: 1.595, hw_h: 10, hw_m: 30, spring_rise_ft: 26, rise_judgement: true, note: "Norie 1805, Table XLI p. 248 (the page image): Boulogne, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, the block's own gauges' since package 89 (the eleven's blend before, while they were held)"}
+      - {name: Gris Nez, lat_deg: 50.870, lon_deg: 1.580, hw_h: 11, hw_m: 0, spring_rise_ft: 23, rise_judgement: true, note: "Norie 1805, Table XLI p. 250 (the page image): Grizness, 11h 0m, no rise given: the world's spring range at the place, JUDGEMENT, the block's own gauges' since package 89 (the eleven's blend before, while they were held)"}
       - {name: Gravelines, lat_deg: 50.990, lon_deg: 2.125, hw_h: 11, hw_m: 45, spring_rise_ft: 18, note: "Norie 1805, Table XLI p. 250 (the page image): Gravelines, 11h 45m, 18 feet"}
       - {name: Dunkirk, lat_deg: 51.040, lon_deg: 2.367, hw_h: 11, hw_m: 45, spring_rise_ft: 12, note: "Norie 1805, Table XLI p. 249 (the page image): Dunkirk, 11h 45m, 12 feet; Faden 1793 p. 3: the tide rises here 12 feet"}
-      - {name: the Somme, lat_deg: 50.200, lon_deg: 1.580, hw_h: 10, hw_m: 30, spring_rise_ft: 5, rise_judgement: true, note: "Norie 1805, Table XLI p. 252 (the page image): Somme River, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held) (Faden 1793 p. 13 gives the tides S S E and N N W)"}
+      - {name: the Somme, lat_deg: 50.200, lon_deg: 1.580, hw_h: 10, hw_m: 30, spring_rise_ft: 21, rise_judgement: true, note: "Norie 1805, Table XLI p. 252 (the page image): Somme River, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, the block's own gauges' since package 89 (the eleven's blend before, while they were held) (Faden 1793 p. 13 gives the tides S S E and N N W)"}
       - {name: Dieppe, lat_deg: 49.930, lon_deg: 1.083, hw_h: 10, hw_m: 30, spring_rise_ft: 18, note: "Norie 1805, Table XLI p. 249 (the page image): Dieppe, 10h 30m, 18 feet; Faden 1793 p. 15: high tides in the road and the harbour at 30 minutes past 10 o'clock"}
       - {name: St Valery en Caux, lat_deg: 49.872, lon_deg: 0.711, hw_h: 11, hw_m: 15, spring_rise_ft: 18, note: "Norie 1805, Table XLI p. 252 (the page image): Vallery en Caux (St.), 11h 15m, 18 feet"}
-      - {name: Fecamp, lat_deg: 49.762, lon_deg: 0.370, hw_h: 10, hw_m: 30, spring_rise_ft: 11, rise_judgement: true, note: "Norie 1805, Table XLI p. 249 (the page image): Fecamp, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held) (Faden 1793 p. 16: the moon in the S S E or N N W makes high tide)"}
+      - {name: Fecamp, lat_deg: 49.762, lon_deg: 0.370, hw_h: 10, hw_m: 30, spring_rise_ft: 19, rise_judgement: true, note: "Norie 1805, Table XLI p. 249 (the page image): Fecamp, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, the block's own gauges' since package 89 (the eleven's blend before, while they were held) (Faden 1793 p. 16: the moon in the S S E or N N W makes high tide)"}
       - {name: Havre de Grace, lat_deg: 49.488, lon_deg: 0.105, hw_h: 10, hw_m: 30, spring_rise_ft: 22, note: "Norie 1805, Table XLI p. 250 (the page image): Havre de Grace, 10h 30m, 22 feet; Faden 1793 p. 20: in the spring tides the water rises 20 feet within the harbour"}
-      - {name: Honfleur, lat_deg: 49.422, lon_deg: 0.233, hw_h: 10, hw_m: 30, spring_rise_ft: 14, rise_judgement: true, note: "Norie 1805, Table XLI p. 250 (the page image): Honfleur, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, which over the block is the eleven's blend and not the place's own (the block's gauges are held)"}
+      - {name: Honfleur, lat_deg: 49.422, lon_deg: 0.233, hw_h: 10, hw_m: 30, spring_rise_ft: 22, rise_judgement: true, note: "Norie 1805, Table XLI p. 250 (the page image): Honfleur, 10h 30m, no rise given: the world's spring range at the place, JUDGEMENT, the block's own gauges' since package 89 (the eleven's blend before, while they were held)"}
       # package 79c, the Mediterranean west (both regions): the period's tables have no
       # Mediterranean row but Gibraltar's (Norie 1805's Table XLI gives the sea's places
       # their positions only); the rises are the pilots' (a foot or two at most), so the
@@ -187,7 +191,8 @@ tables:
       # establishment by the tide's rule (data/tides/constituents.yaml, TICON's M2), the
       # nearest held gauge's where the place has none (Cartagena by Almería's, Oran by
       # Melilla's, Algiers by Palma's): JUDGEMENT, said in each note; the world's own hour
-      # over the block is a far gauge's (Le Conquet's or Saint-Malo's) while they are held.
+      # over the block was a far gauge's (Le Conquet's or Saint-Malo's) while they were
+      # held, and since package 89 is the block's gauges' own.
       # The gauges' own hours agree with the period where it speaks: Gibraltar's by its
       # gauge 1h 38m against Tofiño's 1h.
       - {name: Málaga, lat_deg: 36.716, lon_deg: -4.417, hw_h: 12, hw_m: 0, spring_rise_ft: 3, note: "Purdy 1826, 'Malaga', p. 12: 'The tide flows here at XII h., full and change, and rises about 3 feet'; Smyth 1854, p. 176: the master of the fleet found at Málaga a regular rise and fall, flood at about 12 hours"}
@@ -204,8 +209,9 @@ tables:
       # rise ... the tide-hours at Toulon, Spezzia, and Naples ... 3h 30m, 1h 45m and 11h
       # 20m", p. 178), which he gives with his doubt and which is kept so; the rise his
       # foot (the lower of his "a foot or two"). No other place of the block: a rise of
-      # the 37j rule would be the world's range there, Le Conquet's twenty feet while the
-      # block's gauges are held, and the master takes the nearest place of his table.
+      # the 37j rule was the world's range there, Le Conquet's twenty feet while the
+      # block's gauges were held (since package 89 the gauges' own inches), and the
+      # master takes the nearest place of his table.
       - {name: Toulon, lat_deg: 43.105, lon_deg: 5.920, hw_h: 3, hw_m: 30, spring_rise_ft: 1, note: "Smyth 1854, p. 178: Toulon 3h 30m, the rise a foot or two on the shores of France and Italy; the hour given with his doubt (the accounts inconsistent)"}
       # package 79d, the Ligurian sea's block: Smyth 1854's tide-hour for Spezzia (p. 178),
       # with his doubt, the rise his foot; the block's other places take it as the nearest
@@ -250,13 +256,13 @@ tables:
       - {name: Spithead, lat_deg: 50.765, lon_deg: -1.115, hw_h: 10, hw_m: 30, bearing: "NNW", spring_rise_ft: 10, rise_judgement: true, note: "Moore 1799's NNW group (with Margate, Harwich, Pool, Portsmouth and Calais); unverified against the page image"}
       - {name: Portsmouth, lat_deg: 50.795, lon_deg: -1.105, hw_h: 10, hw_m: 30, bearing: "NNW", spring_rise_ft: 9, rise_judgement: true, note: "Moore 1799's NNW group (with Margate, Harwich, Pool, Spithead and Calais); unverified against the page image"}
       - {name: Pool, lat_deg: 50.712, lon_deg: -1.985, hw_h: 10, hw_m: 30, bearing: "NNW", spring_rise_ft: 8, rise_judgement: true, note: "Moore 1799's NNW group (with Margate, Harwich, Portsmouth, Spithead and Calais); unverified against the page image"}
-      - {name: Shoreham, lat_deg: 50.828, lon_deg: -0.270, hw_h: 9, hw_m: 0, bearing: "NW", spring_rise_ft: 5, rise_judgement: true, note: "Moore 1799's NW group (with the North Foreland, Dungeness and Dunnose); unverified against the page image"}
-      - {name: Dungeness, lat_deg: 50.913, lon_deg: 0.977, hw_h: 9, hw_m: 0, bearing: "NW", spring_rise_ft: 17, rise_judgement: true, note: "Moore 1799's NW group (with the North Foreland, Dunnose and Shoreham); unverified against the page image"}
-      - {name: the North Foreland, lat_deg: 51.375, lon_deg: 1.447, hw_h: 9, hw_m: 0, bearing: "NW", spring_rise_ft: 18, rise_judgement: true, note: "Moore 1799's NW group (with Dungeness, Dunnose and Shoreham); unverified against the page image"}
+      - {name: Shoreham, lat_deg: 50.828, lon_deg: -0.270, hw_h: 9, hw_m: 0, bearing: "NW", spring_rise_ft: 18, rise_judgement: true, note: "Moore 1799's NW group (with the North Foreland, Dungeness and Dunnose); unverified against the page image"}
+      - {name: Dungeness, lat_deg: 50.913, lon_deg: 0.977, hw_h: 9, hw_m: 0, bearing: "NW", spring_rise_ft: 20, rise_judgement: true, note: "Moore 1799's NW group (with the North Foreland, Dunnose and Shoreham); unverified against the page image"}
+      - {name: the North Foreland, lat_deg: 51.375, lon_deg: 1.447, hw_h: 9, hw_m: 0, bearing: "NW", spring_rise_ft: 19, rise_judgement: true, note: "Moore 1799's NW group (with Dungeness, Dunnose and Shoreham); unverified against the page image"}
       - {name: the Downs, lat_deg: 51.222, lon_deg: 1.430, hw_h: 9, hw_m: 45, bearing: "NW by N", spring_rise_ft: 19, rise_judgement: true, note: "Moore 1799's NW by N group (with Deal, Dover and the South Foreland; his note says the Downs by the shore at half past ten); unverified against the page image"}
       - {name: Dover, lat_deg: 51.117, lon_deg: 1.318, hw_h: 9, hw_m: 45, bearing: "NW by N", spring_rise_ft: 19, rise_judgement: true, note: "Moore 1799's NW by N group (with the Downs, Deal and the South Foreland); unverified against the page image"}
-      - {name: Calais, lat_deg: 50.965, lon_deg: 1.850, hw_h: 10, hw_m: 30, bearing: "NNW", spring_rise_ft: 16, rise_judgement: true, note: "Moore 1799's NNW group (with Margate, Harwich, Pool, Portsmouth and Spithead); unverified against the page image"}
-      - {name: Dunkirk, lat_deg: 51.040, lon_deg: 2.367, hw_h: 11, hw_m: 15, bearing: "N by W", spring_rise_ft: 12, rise_judgement: true, note: "Moore 1799's N by W group (with Embden, the Elbe, the coast of Flanders and Ostend); unverified against the page image"}
+      - {name: Calais, lat_deg: 50.965, lon_deg: 1.850, hw_h: 10, hw_m: 30, bearing: "NNW", spring_rise_ft: 21, rise_judgement: true, note: "Moore 1799's NNW group (with Margate, Harwich, Pool, Portsmouth and Spithead); unverified against the page image"}
+      - {name: Dunkirk, lat_deg: 51.040, lon_deg: 2.367, hw_h: 11, hw_m: 15, bearing: "N by W", spring_rise_ft: 18, rise_judgement: true, note: "Moore 1799's N by W group (with Embden, the Elbe, the coast of Flanders and Ostend); unverified against the page image"}
 
 # Moore's rule of 48 minutes a day: the moon's southing comes later each day by this
 # (Moore 1799, the catechism; Bowditch 1802 uses 49). The true mean is 50 minutes and

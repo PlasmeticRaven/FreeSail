@@ -7069,7 +7069,7 @@ regions:
     title: The Balearics, and Barbary from Mostaganem to Algiers
     bounds:
       south: 35.0
-      north: 40.5
+      north: 40.56
       west: 0.05
       east: 4.5
     levels:

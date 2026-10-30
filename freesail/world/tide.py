@@ -39,6 +39,17 @@ part the height above mean level, its argument the phase (0 at high water, the s
 clock), its modulus the amplitude now, between neaps and springs, which scales the stream.
 Every constant names its source or says "judgement"; the figures the study marks
 unverified are marked in the data files and in `docs/dev/TuningNotes.md`.
+
+**A block's gauges serve its own water** (package 89). The eleven serve every position;
+each gauge a chart block added has its `block:` (a region of `data/charts/manifest.yaml`,
+or a list of them where a block became two or three) and serves the positions within that
+region's bounds and no other. Within a block the blend is the eleven within the reach
+and the block's gauges, by the same weighting; outside every block the eleven alone, so
+that a block's gauge moves nothing beyond its block (until package 89 they were held out
+of the blend, since one gauge within the reach of Falmouth moved every recorded passage).
+The membership is the cell's centre's, as the blend is. A block's gauge with no mean
+level read gives the blend its constants and not its level; where no gauge of the blend
+has a level (the Strait's, the islands') the level is the eleven's there, as it was.
 """
 
 from __future__ import annotations
@@ -100,6 +111,8 @@ GAUGE_FLOOR_M = 100.0
 # region lies from Dover, so that every Channel position blends the eleven gauges as
 # package 34 pinned it.
 GAUGE_REACH_NM = 400.0
+# The regions' bounds a block's gauge is kept to (package 89): the manifest's `regions:`.
+MANIFEST_PATH = Path(__file__).resolve().parents[2] / "data" / "charts" / "manifest.yaml"
 # A place beyond this many miles from the nearest place in the master's table is far
 # enough that his tide there is a guess he says so of (judgement: a day's sail).
 FAR_PLACE_NM = 60.0
@@ -172,8 +185,14 @@ class Gauge:
     id: str
     name: str
     position: Position
-    mean_level_m: float
+    # a block's gauge may have none read (None: unverified, not invented), and then gives
+    # the blend its constants and not its level; the eleven have each theirs
+    mean_level_m: float | None
     constants: dict[str, tuple[float, float]]  # name -> (amplitude m, phase lag deg)
+    # package 89: the regions of data/charts/manifest.yaml whose positions the gauge
+    # serves (`block:` in the file, a region or a list of them); () for the eleven, which
+    # serve every position
+    blocks: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -315,25 +334,55 @@ class Tide:
         dict[tuple[int, int], tuple[float, dict[str, tuple[float, float]], float, bool]] | None
     ) = None
 
-    def __init__(self, constituents: dict[str, Any], streams: dict[str, Any]):
+    # package 89: a Tide pickled before the blocks' gauges were given their water
+    block_gauges: list[Gauge] = []  # noqa: RUF012 (the class default an old pickle reads)
+    block_bounds: dict[str, tuple[float, float, float, float]] = {}  # noqa: RUF012
+
+    def __init__(
+        self,
+        constituents: dict[str, Any],
+        streams: dict[str, Any],
+        regions: dict[str, tuple[float, float, float, float]] | None = None,
+    ):
         self.speeds: dict[str, float] = {
             str(k): float(v["speed_deg_per_h"]) for k, v in constituents["constituents"].items()
         }
+        # the eleven, which serve every position, and the blocks' gauges, each serving the
+        # positions within its own block's bounds and no other (package 89)
         self.gauges: list[Gauge] = []
+        self.block_gauges = []
         for g in constituents["gauges"]:
             consts = {
                 name: (float(g[name]["amplitude_m"]), float(g[name]["phase_deg"]))
                 for name in self.speeds
             }
-            self.gauges.append(
-                Gauge(
-                    str(g["id"]),
-                    str(g["name"]),
-                    Position(float(g["lat_deg"]), float(g["lon_deg"])),
-                    float(g["mean_level_m"]),
-                    consts,
+            blocks = _gauge_blocks(g)
+            level = g.get("mean_level_m")
+            if level is None and not blocks:
+                raise ValueError(
+                    f"the gauge '{g['id']}' has no mean level and no block: a gauge that "
+                    "serves every position wants its level"
                 )
+            gauge = Gauge(
+                str(g["id"]),
+                str(g["name"]),
+                Position(float(g["lat_deg"]), float(g["lon_deg"])),
+                None if level is None else float(level),
+                consts,
+                blocks,
             )
+            (self.block_gauges if blocks else self.gauges).append(gauge)
+        self.block_bounds = {}
+        if self.block_gauges:
+            known = region_bounds() if regions is None else regions
+            for g in self.block_gauges:
+                for b in g.blocks:
+                    if b not in known:
+                        raise ValueError(
+                            f"the gauge '{g.id}' names the block '{b}', which the chart's "
+                            "manifest does not name"
+                        )
+                    self.block_bounds[b] = known[b]
         interpolation = constituents.get("interpolation") or {}
         self.power = float(interpolation.get("power", 2))
         self.reach_m = float(interpolation.get("reach_nm", GAUGE_REACH_NM)) * units.NAUTICAL_MILE
@@ -402,35 +451,82 @@ class Tide:
             (key[0] + 0.5) * CONSTANTS_CELL_DEG,
             (key[1] + 0.5) * CONSTANTS_CELL_DEG,
         )
-        distances = [bearing_and_distance(centre, g.position)[1] for g in self.gauges]
+        # the membership (package 89), by the cell's centre as the blend is: the eleven,
+        # and within a block's bounds the block's gauges beside them
+        gauges = self.gauges_at(centre)
+        distances = [bearing_and_distance(centre, g.position)[1] for g in gauges]
         nearest = min(distances)
-        within = [g for g, d in zip(self.gauges, distances, strict=True) if d <= self.reach_m]
+        within = [g for g, d in zip(gauges, distances, strict=True) if d <= self.reach_m]
         far = not within
         if far:
-            within = [self.gauges[distances.index(nearest)]]
+            within = [gauges[distances.index(nearest)]]
         total = 0.0
         level = 0.0
+        level_total = 0.0
         sums: dict[str, complex] = {name: 0j for name in self.speeds}
         for g in within:
             _, d = bearing_and_distance(centre, g.position)
             w = 1.0 / max(d, GAUGE_FLOOR_M) ** self.power
             total += w
-            level += w * g.mean_level_m
+            if g.mean_level_m is not None:
+                level_total += w
+                level += w * g.mean_level_m
             for name, (amp, lag) in g.constants.items():
                 sums[name] += w * cmath.rect(amp, -math.radians(lag))
         consts = {}
         for name, z in sums.items():
             z /= total
             consts[name] = (abs(z), (-math.degrees(cmath.phase(z))) % 360.0)
-        out = (level / total, consts, nearest / units.NAUTICAL_MILE, far)
+        if level_total > 0.0:
+            mean_level = level / level_total
+        else:
+            # every gauge of the blend a block's with its level unread (the Strait's, the
+            # islands'): the level is the eleven's there, as it was, and not invented
+            mean_level = self._eleven_level(centre)
+        out = (mean_level, consts, nearest / units.NAUTICAL_MILE, far)
         if len(cache) > 256:
             cache.clear()
         cache[key] = out
         return out
 
+    def blocks_at(self, pos: Position) -> frozenset[str]:
+        """The blocks whose bounds hold a position, of those the gauges name (package
+        89; a position on two regions' bounds, the Ligurian sea's and the Tyrrhenian's
+        overlap, is within both)."""
+        return frozenset(
+            b
+            for b, (s, n, w, e) in self.block_bounds.items()
+            if s <= pos.lat_deg <= n and w <= pos.lon_deg <= e
+        )
+
+    def gauges_at(self, pos: Position) -> list[Gauge]:
+        """The gauges that serve a position (package 89): the eleven everywhere, and
+        within a block's bounds the block's gauges after them; outside every block the
+        eleven alone, so that no position outside a block reads anything new."""
+        blocks = self.blocks_at(pos)
+        if not blocks:
+            return self.gauges
+        return self.gauges + [g for g in self.block_gauges if blocks.intersection(g.blocks)]
+
+    def _eleven_level(self, pos: Position) -> float:
+        """The mean level the eleven alone give a position, as the blend gave it before
+        package 89: the gauges within the reach, else the nearest alone."""
+        distances = [bearing_and_distance(pos, g.position)[1] for g in self.gauges]
+        within = [
+            (g, d) for g, d in zip(self.gauges, distances, strict=True) if d <= self.reach_m
+        ] or [(self.gauges[distances.index(min(distances))], min(distances))]
+        total = 0.0
+        level = 0.0
+        for g, d in within:
+            w = 1.0 / max(d, GAUGE_FLOOR_M) ** self.power
+            total += w
+            level += w * float(g.mean_level_m or 0.0)
+        return level / total
+
     def nearest_gauge(self, pos: Position) -> tuple[Gauge, float]:
-        """The nearest gauge to a position and its distance in miles."""
-        best = min(self.gauges, key=lambda g: bearing_and_distance(pos, g.position)[1])
+        """The nearest gauge that serves a position (`gauges_at`) and its distance in
+        miles."""
+        best = min(self.gauges_at(pos), key=lambda g: bearing_and_distance(pos, g.position)[1])
         return best, bearing_and_distance(pos, best.position)[1] / units.NAUTICAL_MILE
 
     def area_at(self, pos: Position) -> StreamArea:
@@ -541,6 +637,40 @@ def load_tide(
     c = yaml.safe_load(Path(constituents).read_text(encoding="utf-8"))
     s = yaml.safe_load(Path(streams).read_text(encoding="utf-8"))
     return Tide(c, s)
+
+
+def _gauge_blocks(g: dict[str, Any]) -> tuple[str, ...]:
+    """A gauge's `block:` (package 89): a region of the chart's manifest, or a list of
+    them where a block became two or three; absent for the eleven. A `block:` that names
+    nothing is refused: a block's gauge without its block would serve everywhere."""
+    if "block" not in g:
+        return ()
+    raw = g["block"]
+    blocks = tuple(str(b) for b in (raw if isinstance(raw, list) else [raw]) if b)
+    if not blocks:
+        raise ValueError(f"the gauge '{g.get('id')}' has a `block:` that names no region")
+    return blocks
+
+
+_REGION_BOUNDS: dict[str, dict[str, tuple[float, float, float, float]]] = {}
+
+
+def region_bounds(path: str | Path = MANIFEST_PATH) -> dict[str, tuple[float, float, float, float]]:
+    """The regions' bounds of the chart's manifest (south, north, west, east), read once a
+    process (package 89: the blocks a gauge is kept to)."""
+    key = str(path)
+    found = _REGION_BOUNDS.get(key)
+    if found is not None:
+        return found
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)  # the manifest is long
+    doc = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=loader) or {}  # noqa: S506
+    out = {
+        str(name): tuple(float(r["bounds"][k]) for k in ("south", "north", "west", "east"))
+        for name, r in (doc.get("regions") or {}).items()
+        if r.get("bounds")
+    }
+    _REGION_BOUNDS[key] = out
+    return out
 
 
 # ---------------------------------------------------------------------------

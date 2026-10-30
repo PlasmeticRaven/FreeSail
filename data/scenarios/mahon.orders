@@ -31,8 +31,13 @@ standing order "the course for the Aire": every hour, if the distance to 38 57 N
 
 # The mouth of Port Mahon: with the hostile port before her she does not go in, but anchors
 # without the ledges in twenty brazas and more, good ground (Tofiño p. 213), by day or by
-# night, sounding as she closes the land.
+# night, sounding as she closes the land. The course for the mouth is shaped again every
+# ten minutes as she closes it (package 89: shaped once from off the Aire, six miles and a
+# half, the set put her line a few cables north-east of the spot, her account never within
+# the 0.4 miles she anchors at, and she ran on up the coast; on the held gauges' false seven
+# metres of tide the same line had come within it).
 standing order "south-east of the Aire": when the distance to 39 45.6 N 4 25.2 E is under 1.5 miles then shorten sail; shape a course for the anchorage off the mouth of Port Mahon
+standing order "the course for the mouth": every 10 minutes, if the distance to the anchorage off the mouth of Port Mahon is under 7 miles and the distance to the anchorage off the mouth of Port Mahon is over 0.4 miles and the distance to 39 45.6 N 4 25.2 E is under 8 miles then shape a course for the anchorage off the mouth of Port Mahon
 standing order "at the mouth": when the distance to the anchorage off the mouth of Port Mahon is under 0.4 miles then come to an anchor
 standing order "the lead off Mahon": every 10 minutes, if the distance to the anchorage off the mouth of Port Mahon is under 6 miles then heave the lead
 

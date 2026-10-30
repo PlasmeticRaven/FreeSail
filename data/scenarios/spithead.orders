@@ -34,11 +34,17 @@ standing order "the course for the Nab": every hour, if the distance to 50 36 N 
 # (White p. 46: the best anchorage between South-Sea Castle N E to E by N and the Kicker
 # Point N N W to N W; Imray 1874 p. 37: ten to twelve fathoms). The Portsmouth pilot, if
 # he comes off about the Nab, is taken and she fills away; any other port's is let be.
+# The morning's weigh looks for her within three miles and a half of the road, a mile more
+# than the night's anchoring (package 89: on the Channel east's own tide she came to the
+# road later in the night and let go at the band's edge, a mile east of the road on the
+# seam at 1 W, and her first fix at daylight moved the account seven cables farther, out
+# of the band she had anchored in; she lay there all day). The band to weigh in holds
+# every berth the night's order can give her and a fix's correction.
 standing order "off the Nab": when the distance to 50 40 N 0 58 W is under 1.5 miles then shorten sail; shape a course for St Helens road
 standing order "in St Helens road": when the distance to St Helens road is under 0.8 miles and the daylight is day then shape a course for 50 44.1 N 1 03.9 W
 standing order "St Helens for the night": when the distance to St Helens road is under 2.5 miles and the depth is under 9 fathoms and the daylight is not day then come to an anchor
-standing order "the morning": every 10 minutes, if the daylight is day and the distance to St Helens road is under 2.5 miles and the distance to Spithead is over 2 miles and the speed is under 1 knot then get under way on the starboard tack and steer NNW
-standing order "for Spithead": at under way, if the distance to St Helens road is under 2.5 miles then set plain sail; shape a course for 50 44.1 N 1 03.9 W
+standing order "the morning": every 10 minutes, if the daylight is day and the distance to St Helens road is under 3.5 miles and the distance to Spithead is over 2 miles and the speed is under 1 knot then get under way on the starboard tack and steer NNW
+standing order "for Spithead": at under way, if the distance to St Helens road is under 3.5 miles then set plain sail; shape a course for 50 44.1 N 1 03.9 W
 standing order "between the Dean and the Warner": when the distance to 50 44.1 N 1 03.9 W is under 0.5 miles then shape a course for Spithead
 standing order "the pilot boards": at the pilot's hail, if the distance to Spithead is under 12 miles then take the pilot
 standing order "the pilot aboard": at the pilot aboard, if the distance to Spithead is under 12 miles then fill away

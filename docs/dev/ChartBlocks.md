@@ -129,18 +129,39 @@ region's, its tide and its weather are rows in tables that already reach its wat
    read Cascais, Lagos, Huelva, Bonanza and Cadiz, and found no Leixões, Lisbon or
    Setúbal; package 39e Funchal, Ponta Delgada, Angra, Horta and Santa Cruz das Flores);
    the form is the eleven's: the record, the mean level above the
-   chart's datum with its source, M2, S2 and N2), **held** under `held_gauges:` in
-   `data/tides/constituents.yaml` and not in `gauges:`, each block's after the last
-   (package 39a's Bournemouth and Portsmouth, package 39b's nine of Biscay north, package
-   39e's five of the islands, which no Channel position's reach meets). **A new
-   gauge moves every Channel position's tide**: the interpolation blends every gauge
-   within `reach_nm` (400 miles, the Channel's whole region) of a position, so a gauge
-   added to `gauges:`, however far, enters the blend at Falmouth and moves every recorded
-   passage's digest (Brest to the Gironde is about 260 miles); until the engine gives a
-   gauge its own water (a reach or a chart of its own: the lead's decision, the finding
-   of 39a and of 39b), the block's gauges wait there, read and verified, and the world's
-   tide over the block is the eleven's blend, which over Biscay is the Channel's tide and
-   wrong. The stream areas in `data/tides/streams.yaml`, each with `chart: <region>` (and,
+   chart's datum with its source, M2, S2 and N2), **in `gauges:` after the last, each with
+   its `block:`**, the region of `data/charts/manifest.yaml` it serves (or a list of them,
+   where a block became two or three), the eleven with none (package 89). **A block's
+   gauge serves the positions within its own block's bounds and no other**: within the
+   bounds the blend is the eleven within `reach_nm` and the block's gauges, by the
+   inverse square as before; outside every block the eleven alone, so that a block's
+   gauges move nothing beyond its water (until package 89 every block's were held under
+   `held_gauges:`, since the blend took every gauge within 400 miles, and one gauge added
+   at Brest's distance entered it at Falmouth and moved every recorded passage's digest).
+   The loader refuses a `block:` that names no region or a region the manifest does not
+   name, and a gauge with neither a block nor a mean level. A gauge's mean level not read
+   stays null and is said unverified: it gives the blend its constants and not its level,
+   and where no gauge of the blend has a level (the Strait's, the islands') the level is
+   the eleven's there, as it was, which is the level the tiles' fill was raised by
+   ("GEBCO's fill", below). **The fill raise reads the eleven alone** (`mean_level_grid`)
+   until the package that rebuilds the blocks' tiles on their own water (the lead's,
+   booked after 89): within a block the world's sea now stands other than the land was
+   raised against (in the Mediterranean six metres and more lower, in the Channel east's
+   high water up to four higher), and a block built before that package keeps the
+   eleven's raise so that its tiles match the others'. Each gauge lies within its block's bounds (`test_tide.py`
+   holds it), and the bounds are the membership: water between two blocks' bounds that
+   no region names reads the eleven alone, so abut a block's bounds on its neighbour's
+   (the tiles' edge is not the bounds: `balearics` ended at 40.5 N under tiles to 40.56
+   until package 89). **The block's test is that no recorded passage
+   moves**: run them (below) before the gauges go in and after, and where a passage's
+   water reaches into the block (a ship of its other sail patrolling across the block's
+   bound) say which, with the old digest beside the new, for the lead to rule; never
+   re-pin to make it pass. Bournemouth and Portsmouth (package 39a) lie in `channel-mid`,
+   whose water west of 1 W the rule keeps the eleven's; they stay under `held_gauges:`,
+   read by nothing, by the lead's ruling of 2026-10-30 (channel-mid's passages are pinned
+   on the eleven; the options and the seam's step at 1 W in docs/dev/TuningNotes.md,
+   package 89; a taper of the weights across a seam band is a later tidy).
+   The stream areas in `data/tides/streams.yaml`, each with `chart: <region>` (and,
    for an area with no polygon, `bounds:`) and its `book:` in the period's form
    (`tests/test_tide.py` holds every statement to it: the set to a point, the springs to
    the half knot, the neaps half the springs unless the period gives both rates,
@@ -165,15 +186,12 @@ region's, its tide and its weather are rows in tables that already reach its wat
    from the Raz and Hirondelle from Sein), or their digests move with them. The places
    of the master's epitome in `establishments.yaml`, Norie's and Moore's, with
    `rise_judgement` where the period gives no rise: such a rise is the world's spring
-   range at the place to the foot (`test_tide.py` holds it), which over a block whose
-   gauges are held is the Channel's blend and not the place's own, and beyond the reach
-   of every gauge (the Strait, Portugal's south, Madeira) the nearest gauge's alone, Le
-   Conquet's eighteen feet at Cape Trafalgar (package 39f): give the period's rise where
-   a pilot has one. The eleven gauges and their figures do not move. A block whose
-   gauges lie beyond 400 miles of every Channel and Biscay north position (the Strait's,
-   the islands') would move no recorded passage if its gauges were blended; they are
-   held all the same until the lead rules on the gauges' water, and the block's tests
-   say what blending them would and would not move.
+   range at the place to the foot (`test_tide.py` holds it), which over a block is the
+   block's own gauges' (package 89: the places whose judged rise moved with the block's
+   water are listed in its tuning notes, old beside new), and beyond the reach of every
+   gauge and every block the nearest gauge's alone: give the period's rise where a pilot
+   has one. The eleven gauges and their figures do not move, and a block's gauges'
+   figures do not move once read.
 7. **The weather**: nothing, unless the block's water lies in no box of
    `data/weather/climatology.yaml` (the four boxes do not cover the corridor whole:
    35 to 36 N east of 9 W, the Strait's southern half and the Moroccan coast, lies in
@@ -447,7 +465,9 @@ as Dartmouth's were 39a's. What it found, for the next blocks:
 ## The Mediterranean west (package 79c, as built)
 
 `mediterranean-west` (35 to 40.5 N, 5 W to 0.05 E, abutting `strait` at 5 W) and `balearics`
-(the same rows, 0.05 E to 4.5 E): one block of the brief's, built as two regions by the
+(the same rows, 0.05 E to 4.5 E; its north bound 40.56 N since package 89, its tiles' edge
+and the Gulf's south bound, where it was 40.5 and the strip between answered to no block's
+tide): one block of the brief's, built as two regions by the
 lead's ruling when it measured 57.5 MB in one. What it found, for the next blocks (79d's
 Gulf of Lion and Tyrrhenian among them):
 

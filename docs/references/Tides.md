@@ -10,9 +10,19 @@ citation, and the period's figures are read from the books and cited by page.
 
 | Source | Taken | Licence | Text |
 |---|---|---|---|
-| **TICON** (Piccioni, Dettmering, Bosch and Seitz, "TICON: TIdal CONstants based on GESLA sea-level records from globally distributed tide gauges", Geoscience Data Journal 6, 2019; the data file PANGAEA doi:10.1594/PANGAEA.896587) | The M2, S2 and N2 amplitudes and Greenwich phase lags of the eleven gauges of `data/tides/constituents.yaml` (Newlyn, Devonport, Weymouth, Dover, St Mary's, Brest, Le Conquet, Roscoff, Saint-Malo, St Helier, Cherbourg), read from the dataset's own `TICON.txt` (the zip at doi.pangaea.de, fetched 2026-10-01), the stations found by their coordinates. The nodal corrections are the game's own (Schureman's f and u). | Creative Commons Attribution 4.0 International, as PANGAEA states for the dataset. | `licences/cc-by-4.0.txt` |
+| **TICON** (Piccioni, Dettmering, Bosch and Seitz, "TICON: TIdal CONstants based on GESLA sea-level records from globally distributed tide gauges", Geoscience Data Journal 6, 2019; the data file PANGAEA doi:10.1594/PANGAEA.896587) | The M2, S2 and N2 amplitudes and Greenwich phase lags of the eleven gauges of `data/tides/constituents.yaml` (Newlyn, Devonport, Weymouth, Dover, St Mary's, Brest, Le Conquet, Roscoff, Saint-Malo, St Helier, Cherbourg; the blocks' gauges after them, below), read from the dataset's own `TICON.txt` (the zip at doi.pangaea.de, fetched 2026-10-01), the stations found by their coordinates. The nodal corrections are the game's own (Schureman's f and u). | Creative Commons Attribution 4.0 International, as PANGAEA states for the dataset. | `licences/cc-by-4.0.txt` |
 | **SHOM, Références Altimétriques Maritimes (RAM)** | The mean level above the chart datum (the ZH, lowest astronomical tide) of the French ports, which TICON's amplitudes about the gauge's mean level want to sit on the chart's datum: Brest, Le Conquet, Roscoff, Saint-Malo, Cherbourg. The British ports' offsets are from the study's figures and the UKHO's published datum differences (`constituents.yaml` says which are UNVERIFIED). | Licence Ouverte 2.0 (Etalab), as data.gouv.fr states for SHOM's RAM. | `licences/licence-ouverte-2.0.md` |
 | **EMODnet Bathymetry DTM 2024** | Nothing new: the chart's datum, lowest astronomical tide, which the tide's heights are above (`Charts.md`). | CC BY 4.0 | `licences/cc-by-4.0.txt` |
+
+**The blocks' gauges** (packages 39a to 39f, 79b to 79d): the M2, S2 and N2 of the gauges
+each chart block read from the same `TICON.txt` (the zip at doi.pangaea.de, SHA-256
+`7055f8ed…6514`), in the eleven's form, with the mean levels above the chart's datum from
+SHOM's RAM (the French gauges, Licence Ouverte 2.0) and Puertos del Estado's REDMAR reports
+(the Spanish, where read), each named in the file; a level not read is null and said
+unverified. Each gauge's `block:` names the chart region it serves (package 89): the eleven
+serve every position, a block's gauge only the positions within its region's bounds, so
+that a block's figures move no other water. Bournemouth and Portsmouth (39a's, in
+`channel-mid`) stay under `held_gauges:`, read by nothing, for the lead's ruling.
 
 The streams (`data/tides/streams.yaml`) are rates and directions by area, each entry with
 its `source`: the headland table of Bowditch 1802 ('Of the Tides', the rates off the
