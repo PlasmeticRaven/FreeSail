@@ -681,9 +681,13 @@ class Papers:
         # where and when it came (`news_heard`; the paper `the news of the war`, the reading
         # `the war`)
         nations = getattr(world, "nations", None)
-        self.known_wars: list[dict[str, Any]] = (
-            [dict(w) for w in nations.sailed_with] if nations is not None else []
-        )
+        # a `Nations` unpickled from a checkpoint before package 85 has no `sailed_with`
+        # (a dataclass default is not an old object's): the table she sailed with is then
+        # her wars as saved
+        sailed = getattr(nations, "sailed_with", None) if nations is not None else None
+        if sailed is None and nations is not None:
+            sailed = nations.wars
+        self.known_wars: list[dict[str, Any]] = [dict(w) for w in sailed] if sailed else []
         self.war_news: list[dict[str, Any]] = []
 
     # -- entries -------------------------------------------------------------------

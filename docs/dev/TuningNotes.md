@@ -13909,8 +13909,9 @@ under `docs/agents/consent/` or the consent brief touched.
   got that before; the sample that ends the stand-by named what ran, and still does).
 - **The action's severities**, with the owner's "the flow of the game through the log" as
   the measure: the firer's minute line (`action.fired`) is notable when a shot struck her or
-  the fire opened on her, routine when the minute's shot all fell short, over, wide or into
-  the sea; a shot that struck us stays notable, urgent when it killed or carried away a
+  the fire opened on her or a gun was fired with no mark (a shot into the sea, the signal
+  gun's: `data["sea"]`), routine when the minute's shot all fell short, over or wide; a
+  shot that struck us stays notable, urgent when it killed or carried away a
   spar or the helm; **at quarters the trimmers' bracing yard by yard** (`yard.braced`) is
   routine (`evolutions/runner.py`), a trim's one line for all the yards and the sails' lines
   notable as ever. Measured on two cutters at pistol shot over ten minutes: our log three
@@ -14042,6 +14043,31 @@ under `docs/agents/consent/` or the consent brief touched.
   the builder's; the primer's chapters 17 and 19 say what a station on another hull may
   do, and nothing says in one place what a save of many hulls holds, what `follow` shows at
   the console, or what a hull asleep is to the person aboard her).
+
+### The lead's review of items 1 to 8, mended (read late, after item 7's commit)
+
+The lead's two messages (the review of items 1 and 2 at `c8ca131`, of 3 to 8 at
+`36d69be`) reached this session's queue at 14:12 and 15:31 and were read after the
+close; their findings are mended here as one commit, after item 7's and the suites'.
+- **The hail's head never crosses a colon or a comma** (`orders/signals.py`,
+  `hail_parts`; the lead's finding): the loop over the heads stops at the first token
+  that ends in one, so `say to the master: the brig has tacked` and `say to the lookout:
+  watch the brig` are the station's word (`agent.told`) and `hail the deck: a sail two
+  points on the bow`, `hail the deck: the brig is bearing away` the lookout's refusal,
+  where this package's head had taken the brig after the mark for the addressee; `say
+  to the Nancy heave to, I am sending a boat` still finds her before the comma. The four
+  lines in `test_signals.py`'s colon test with the trunk's outcomes; the voice part's
+  example `say to the master: the brig has tacked` added.
+- **Chapter 20** said the grammar topic's world orders were "a fourth part": the sixth
+  of six, as chapter 8's table and the Harness say.
+- **Truth 7b-117's date and the checkpoints' `sailed_with`** the lead found on `36d69be`
+  are the same two the whole fast tier found here, mended in item 7's commit (above);
+  for the checkpoints `Papers.__init__` now also reads `sailed_with` with a fallback to
+  the wars as saved, beside the rebind step, as the lead's reading of the tide's rule
+  for an old pickle asks; `test_checkpoint.py` and `test_replay.py` run whole, green.
+- **Item 4's note** said a minute's shot into the sea was routine; `action.py` makes it
+  notable (`data["sea"]`, a gun fired with no mark being a signal gun): the note now says
+  what the code does.
 
 ### The suites on the final tree (package 85)
 

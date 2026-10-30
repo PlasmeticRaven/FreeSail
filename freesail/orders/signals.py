@@ -223,7 +223,10 @@ def hail_parts(ship: Any, m: re.Match[str]) -> tuple[str, str] | None:
     in sight ('the brig', 'the fore topsail schooner', 'her') and the rest is said to her
     ('hail the brig what ship is that', 'say to the Nancy heave to, I am sending a
     boat'). A name without 'the' ('hail Nancy what ship is that') is a sail only when a
-    sail of that name is on the sea, so that the lookout's 'hail Sail ho' stays his."""
+    sail of that name is on the sea, so that the lookout's 'hail Sail ho' stays his. The
+    head never crosses a colon or a comma: 'say to the master: the brig has tacked' and
+    'hail the deck: the brig is bearing away' hail no sail (the master's word, the
+    lookout's hail), whatever sail the words after the mark name."""
     rest = m.group("rest").strip()
     cut = re.match(r"^(?P<who>[^:,]+?)\s*[:,]\s*(?P<words>.*)$", rest)
     if cut is not None and _names_a_sail(ship, cut.group("who")):
@@ -235,7 +238,13 @@ def hail_parts(ship: Any, m: re.Match[str]) -> tuple[str, str] | None:
     if low != "the":
         name = tokens[0].rstrip(",:")
         return (name, " ".join(tokens[1:]).strip(" ,:")) if _found_on_the_sea(ship, name) else None
-    for n in range(2, len(tokens) + 1):
+    # the heads stop at the first token that ends in a colon or a comma
+    last = len(tokens)
+    for i, token in enumerate(tokens):
+        if token.endswith((":", ",")):
+            last = i + 1
+            break
+    for n in range(2, last + 1):
         head = " ".join(tokens[:n]).rstrip(",:")
         if _names_a_sail(ship, head):
             return head, " ".join(tokens[n:]).strip(" ,:")

@@ -2300,8 +2300,8 @@ def _voice_lines() -> list[str]:
         "have a blow')",
         "  say to the <station> <words> (also: tell the <station> <words>): a word to a "
         "station by its name or its person's ('tell the master mind the glass', 'say to "
-        "Mr Harvey ...'); no answer is owed. To a person nobody holds the word goes to the "
-        "director, who may answer in his voice",
+        "Mr Harvey ...', 'say to the master: the brig has tacked'); no answer is owed. To "
+        "a person nobody holds the word goes to the director, who may answer in his voice",
         "  ask the <station> <question>: a question to a station, its answer back to you "
         "in the log; you are told when none comes within the station's patience ('ask the "
         "lookout what she is')",

@@ -473,3 +473,14 @@ def test_the_hail_names_the_sail_with_or_without_the_colon():
     assert w.submit("say to the watcher all is well").kind == "agent.told"
     e = w.submit("hail the cutter what ship")
     assert e.kind == "order.rejected" and "Nothing in sight answers to 'the cutter'" in e.text
+    # the head never crosses a colon or a comma (the lead's finding at the review of
+    # items 1 and 2): a word to a station that names a sail after the colon is the
+    # station's, and the lookout's hail of the deck that names one is his
+    for words in ("say to the master: the brig has tacked", "say to the lookout: watch the brig"):
+        assert w.submit(words).kind == "agent.told", words
+    for words in (
+        "hail the deck: a sail two points on the bow",
+        "hail the deck: the brig is bearing away",
+    ):
+        e = w.submit(words)
+        assert e.kind == "order.rejected" and "A hail is the lookout's" in e.text, words
