@@ -1836,6 +1836,25 @@ draws differently.
     sheet's side; the frame (`fullRigFrame`) holding the boom's swing beyond the taffrail.
   - Screenshots of each state for the owner.
 
+**As built (B5.5, 2026-10-29), the departures, each judgement.**
+- **Furled**, the driver is a bundle along its whole head, on past the mizen yard's peak along
+  the driver yard to its own peak: the head is laced to both spars, and the driver yard stays
+  aloft while the sail is bent. A case pins the bundle reaching the driver's peak.
+- **The driver yard** is drawn as a spar figure carrying the sail's id (class `driver_yard`,
+  1.2 px, as the flying jib-boom), in every state the driver is bent; it is no part of the file.
+- **The yard** is laid on the course's corners whichever sail is bent (`cutAtMastOn`) and
+  swung by the bent sail's sheet (`mastCut`'s `swungBy`), so it does not move when the driver
+  is shifted for the course (B5.2's open item, closed).
+- **The boom** swings level about the vertical, as every boom does, so swung far the leech
+  stretches a little (on the fixture the peak rises 0.85 m at 85°). The sheet runs from the
+  boom's end set and in the gear, since it is rove there whatever the clew does.
+- **The frame** takes sixteen points about the jaws of a boom spread by a sail cut at the mast
+  (`boomOfCut`), as for a yard under the bowsprit; with four the bounds moved seen on the
+  quarter.
+- **At the 64's flip** (B1's stage B), the cases run on the fixture only; they should be run on
+  `sixty-four.yaml` too, and the owner's first sight of her driver is on her own hull (on the
+  fixture the boom overhangs the frigate's taffrail by 14.5 m, against about 10 m on the 64).
+
 ### 17.7 Tests, truths, pins
 
 - **The guard set** (§10.1) is unchanged. The 0E probe gains "a lateen naming a boom" among
@@ -1876,6 +1895,20 @@ draws differently.
   - the driver hauled aft at helm's a-lee and brailed up hove to.
 
   Its sources: Steel l. 13819-13821 and 24536-24538, and *Venus*'s shift.
+- **As built (B3.5, 2026-10-29).** The rule is guarded against a sail paired with itself (`a is
+  not b`): without it, "shift the X for the X" on six existing files changed its refusal. The
+  one-place test walks all ten files with each sail against itself, and allows one moved answer
+  only, two sails of one place with a driver among them, which the 64's flip will give. Truth
+  7-230 pins on the fixture row 3′'s equality (row 1 to the third decimal) and the shift's five
+  phases at its company, seed 7, 10 kn, 120° off: 102, 206, 171, 274 and 137 s against the file's
+  90, 180, 150, 240 and 120, the whole 890 s, each phase banded between its file's time and 1.25
+  of it, the whole between 13 and 16 minutes. Her own polar clause, her shift at her company and
+  her paths on her file are B1's at the flip. On the fixture the driver beats the course from
+  90° to 150° in 10 kn by 0.15, 0.19 and 0.08 kn (measured, not pinned).
+- **For the sailing lens (B1, the lead):** with the driver bent the fixture tacks far slower,
+  "Tacked" at 471 s from 60° off in 15 kn against 181 s with the course, all three rigs hanging
+  in stays at 72-76 s; the driver adds 55-62 kN m of weather helm from 50° to 90° in 10 kn.
+  B1 measures it on the 64's file at the flip, beside Steel's "light fair winds".
 - **The 74's polar point S7** (*Vanguard*, 1798, "under courses, topsails and driver": Bel §6.3)
   is measured with the driver bent in the course's place, and her truth says so. It is one of
   B7's numbers, not a new one.
@@ -1986,3 +2019,24 @@ waits for it.
    words-only fix would change the frigate's words in that state, so it is left.
 5. A ringtail on a driver boom would already find the driver as its host (`_gaff_host` reads the
    fore-and-aft sail naming the boom). The 64 carries none (Indf §4.7).
+6. (B3.5) A shift bends and sets the new sail on a wrecked or sent-down spar: "shift the mizen
+   for the driver" sets the driver on a wrecked boom, round `set_lateen`'s new boom check, as
+   the frigate's "shift the storm mizzen for the spanker" does over a wrecked gaff or boom
+   today. Older than the driver; for the lead.
+7. (B3.5) The shift sets a fore-and-aft sail where its own sheet lies, flat aft at its floor
+   (the driver at 18°, the storm mizzen at 15°), until "trim sails"; and its take-in says
+   "clewed up" where the period's word for a lateen or gaff sail is "brailed up". Mending
+   either moves the frigate's words; for the lead.
+8. (B3.5) `set_lateen.yaml`'s served header describes only the course; with the boom check it
+   should name the driver too. Outside B3's leave on that file; for the lead.
+9. (B3.5) The bent variant of `frigate_with_driver()` files the course in the sail room but
+   stows no course canvas there, so "shift the driver for the mizen" is refused on it. Stage
+   0's fixture: stow the course's canvas when `bent`.
+10. (B5.5) With the course bent and the driver in the sail room, the bare boom is drawn
+    amidships with its jaws 1.5 m up the course's laced luff, its foot below the boom. Right
+    by §17.6; the 64's file decides whether the boom is topped up or unshipped while the course
+    is set.
+11. (B5.5) Older: `quadSail` bellies the luff as it does the leech and foot, so every sail
+    laced to a mast shows its luff bellied forward of the mast once swung (the spanker, every
+    gaff sail, the course, the driver). Mending it moves every gaff sail's drawing; for B5,
+    later.
