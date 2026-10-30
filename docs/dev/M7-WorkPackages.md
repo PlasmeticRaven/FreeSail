@@ -56,7 +56,7 @@ on these packages; that is the owner's choice.
 | 80 | Opus | Prizes and the continuation from 74; the consent revision's package if 55 has closed | behind 74 |
 | 82 | Fable | **The boat as a vessel, and the player aboard another ship** (M7b's 63 and the heart of 51, brought forward by the owner, 2026-10-24): the followed ship in place of the given one and a world with no player's ship; the player and any person aboard another ship, moving between ships by the boat, by boarding or by capture, the seat following the person, 68's refusal lifted; the boat crewed and sailed, towing by an oar force; the replay of a station on another ship | briefed 2026-10-24 (below); **re-briefed after 83's design** (decision 52), runs after 84; Fable whole (the owner, 2026-10-29), **the re-brief carrying the ships session's principles for a hull and a ship** (`docs/design/Build-Ships.md` §5.0's twelve, the ladder of evidence with its marks, sourced points over the rule, the drawing never changing how a vessel sails, nothing invented; the boat a ship file written by a module of `tools/ships/` through `tools/gen_ships.py` with her shape keys and port triples as the ships are, never by hand), so that the boat is built to the new standard |
 | 83 | Fable | **The one-world study** (decision 52): the design of a world the player is one part of, many crewed hulls in one World, the person's coarse acts anywhere, the leaders' roles left room for; the migration in steps that keep the suite green; the cost in pace and pins; a brief for 84; no code | **merged 2026-10-27** (`docs/design/Design-OneWorld.md`; road A recommended; 84's draft brief below) |
-| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **steps 1 to 10 merged 2026-10-28/30** (steps 1 and 2 at `d9dba1f`, steps 3 to 10 from the sibling's `claude/pkg-84` after it; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
+| 84 | Fable | **The one-world refactor**, on 83's design: the promotion builds a hull and not a World, the ports, people, things, markets, business, weather and the director's hand the world's once, every crewed ship with her own people, places and log; 82 folded into or behind it as 83 says | briefed by 83 (below); the eight decisions taken (decision 53); **merged whole, steps 1 to 11, 2026-10-28/30** (steps 1 and 2 at `d9dba1f`, steps 3 to 11 from the sibling's `claude/pkg-84` after it; the package closed with step 11's record below; three pins moved at step 6 for the one clock, bugs of the two clocks; **the owner's acceptance test passes whole as truth 7-200 at step 4**); steps 5 onward continue in the sibling |
 | 85 | Fable | **The orders, the primer and the library reviewed for a model reader** (the owner's notes 3 to 6 and the officer's five points): the primer and the library made general and in-world, every scenario-, book-, ship- or build-specific reference redacted and kept elsewhere, with a test that guards it; the date and the war's state readable; the voice's one grammar; the stand-by's words; the action's severities; **and the documentation whole** (the owner, 2026-10-29: "might as well go all the way": `docs/` read for completeness and refinement with the same pass, item 8 of the brief) | briefed 2026-10-27 (below), widened 2026-10-29; after 84's last step; 87 follows it |
 | 86 | Opus | **The owner's local work folded in** by the review's plan (`docs/playtests/2026-10-25-to-27-owner-playtests-70-72/review-of-the-local-work.md`): the practice-and-resupply package and the pivot gun with the listed edits, the free intents tightened, the hail fix with its pins proven, station keeping by name and kind limited to sails in sight, the records recast; the whole slow tier and the convoy's stall reproduced | **merged 2026-10-28** (`cd97ce7`); the record below |
 | 87 | Opus (the owner, 2026-10-29; Fable before) | **The warrant officers' stations** (the owner, 2026-10-27): the gunner, the surgeon, the carpenter, the sailmaker and the boatswain as stations a person or a model may hold, each with a domain of orders and readings of its own and its peculiarities (the gunner's magazine, filling, practice and the batteries' service from 70 and 86; the surgeon's sick list, the wounded and the cockpit from 73; the carpenter's well, leaks, plugs and spars from 73 and 77; the boatswain's rigging, the spares, the hands' work and the bill from 77; the sailmaker's sails, the holes and the sailroom from 70's damage and 65's work in its place), a brief and a station line for each, a reason to be stationed by the milestone's end; the equal-reach rule and the handover as every station has them | to brief after 85's pass over the orders, the primer and the docs is merged (the owner, 2026-10-29), and after 77; the brief fixes the pattern on the gunner and the four follow it |
@@ -770,6 +770,53 @@ player's ship is 82's question, noted; no office built. The parity table lists `
 the owner's by design, as the clock's commands are. The step 9 tidies are booked in its
 notes for step 11. Nothing pinned moved.
 
+### Package 84, step 11, as merged, and the package closed (2026-10-30)
+
+Merged `--no-ff` from the sibling session's `claude/pkg-84` at `32c03d3` (one commit on the
+trunk's `90cef2c`, brought in at the boundary before the step's final fast tier; merged here
+over 79d's block with the tuning notes the one conflict, both kept; 14 files, 284 lines
+added and 81 removed); ruff clean; the sibling's fast tier whole 3,957 passed with the
+pictures' known flake the one failure, its slow tier of the known truths, the trials and the
+touched files 190 of 199 passed with eight left out by their marks and the lee-shore
+trial's container digest the one failure as at every step, its pace within step 8's spread;
+the lead's run of the touched files and the gate selection (147 passed) and of the fight's,
+the lying-to's, the ships' and the staying's tests (128 passed), none failed; **the whole
+suite on the merged tree in the cloud (run 16, the figures below).** **The step:** the long
+tail, the words and the records. The booked tidies made: the fight's mark on one road with
+the shadow's dead arm gone; the lying-to reading taken from the ship by the reading's own
+rule with no import of the api layer into the world; a person found by his name whole and
+by his surname only when one person of the world bears it; the two test lines that
+asserted nothing now assert what they name; the thread-local hull stack dropped when its
+last block ends. The words: the awake notice ("awake, a hull of the one world"), the
+crews' and the seats' heads recast, the Harness document's §17, the primer's chapter 17,
+and specs M6 §19 and §20 and M7b §11, §12 and §12b given "as built since package 84"
+pointers that say what 84 built and what stays each section's own. The records: the
+design note's head recast as "As built, steps 1 to 11" with a table of the eleven steps
+against the brief and the owner's decisions placed, a step 11 postscript, and "What 84
+leaves"; the tuning notes' head likewise with the pace of every step beside the study's
+figures. **Taken another way:** the `world` to `hull` rename is made nowhere, every
+consumer holding its hull as its `world` by the façade; the façade's wrapping of the
+World's methods in the swap stands, the pace of every step showing nothing the measure
+sees. Nothing pinned moved.
+
+**The package, closed.** Eleven steps in three days, each a green commit with the lead's
+head brought in at its boundary, each reviewed and merged in turn, the whole suite green
+in the cloud at every merge; the pins moved by the package three, all at step 6 for the
+one clock and all judged bugs of the two clocks (the station-stranger and trade-stranger
+trials, truth 7-152), old beside new in the notes. **What 84 leaves,** as its record has
+it: for 82, the world with no followed hull and its words (`World.followed_words` stands
+ready, the branch unreached), the player's own seat on another ship with the drivers
+following him (step 10's follow the mechanism, step 8's save and replay the record), and
+the director's door's question when another hull is followed; for 85's review of the
+words, the words recast and the ones left as they were (the far notice, "the player's
+ship" where "the followed hull" is meant, `CrewedWorld` as the builder's name, `world` as
+every consumer's name for its hull, the tests' `crew`); for the design's own open items,
+the tick's two strict phases, the empty `_NOT_CREWED_STATES` and `FAR_ONLY_ROLES`, the
+business's region and the sleeping hulls' fight as the study recommends, and the gauges'
+water (89, running). Three load-sensitive tests recorded and not mended: truth 7-200
+under three workers, the pictures' blank-image check, the lee-shore trial's container
+digest. The 84 session stands by for the review's findings; none is outstanding.
+
 ### Package 79d as merged (2026-10-30)
 
 Merged `--no-ff` from the Opus sibling session's `claude/pkg-79d` at `7ceaae7` (the trunk
@@ -782,8 +829,11 @@ files' slow tests 14, truths 7-295 to 7-304 with 7-261 11, its fast tier on the 
 with the pictures' known flake the one failure, the three regions rebuilt after the merge
 with no tile of theirs or 79c's changed, the scenario sailed again to the same digest; the
 lead's run of the touched files with five of its truths and the gate selection (268 passed,
-none failed); **the whole suite on the merged tree in the cloud (run 15, the figures
-below).** **The block, three regions by the lead's ruling at the builder's report of the
+none failed); **the whole suite on the merged tree in the cloud (run 15 on `26af9bf`: lint
+green, 4,323 passed over the six shards, 3 skipped, 11 expected failures, none failed, 60
+minutes, shard 1 alone 53 of them with the Mediterranean's long truths in it; the pace job,
+informative, 7 of 10 at 449 to 488 in 297 seconds, the slow runner's day again as 79b's
+record reads it).** **The block, three regions by the lead's ruling at the builder's report of the
 Gulf at 46.1 MB:** `gulf-of-lion`, 3 to 7.73 E, its south bound moved to the row edge
 40.56 N where `balearics` ends so that the strip between the blocks answers, 120 level-2
 tiles, the patches of Toulon, Marseille, the Hyères road and Villefranche, 28.1 MB;
