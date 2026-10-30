@@ -47,7 +47,7 @@ on these packages; that is the owner's choice.
 | 71 | Fable | Signals and the voice between ships: colours, the private signal, the hail, the lights and the bell, the signal hoisted and read; the books' shape for any nation and the first books of Britain and France (spec §1 to §6) | **merged 2026-10-24** (`142b739`); the record below |
 | 72 | Fable | The naval system: the squadron as a genuine set, the formations and station keeping, the squadron's book, the regimes and the nations' knobs, the business following the player's ship (spec §21 to §23) | **merged 2026-10-24** (`29b538b`); the record below |
 | 73 | Fable | Water, damage control, health and the fight on deck: leaks and the pumps, the carpenter and the surgeon, the muster's states, the marines, the fight on deck, a station holder hurt at parity (spec §11, §13 to §17) | **merged 2026-10-28** (`ec56664`; the first run lost with the machine's rebuild of the 24th to 27th, relaunched off `7da0c0e`); the record below |
-| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52) |
+| 74 | Fable | Prizes, the strike and what follows, and the far fight; the consent revision for adversarial seats drafted with it (spec §11a, §18 to §20, §29) | briefed 2026-10-24 (below), for the owner's approval; **runs after 84 and 82** (decision 52); **refreshed 2026-10-30 (below)** on the one world and 82's design, to launch when 82's item 3 (the person's movement between hulls) is merged |
 | 75 | Opus | The ships: the *Indefatigable*, the *Prince de Neufchatel*, the 74; every file's armament, quarter bill and marines from 70's shape; **the ship's sub-types as fits and roles the scenario editor selects and customises in their reasonable degrees** (armed and unarmed, by rig, hull and role: the armed Indiaman, the revenue cutter, the privateer; the owner, 2026-10-24) | briefed 2026-10-28 (below) for **the owner's own local session** on `claude/pkg-75`, from the head after 86 is merged |
 | 76 | Opus | The signal books built out from 71's baseline | behind 71 |
 | 77 | Opus | The gunnery's and the fight's evolutions from 70 and 73; the damage-control catalogue; the fillers as posts (from 75); Portsmouth's Ordnance block in the magazine's table (79b's finding: the Gun Wharf issuing at Spithead under the Regulations of 1806) | behind 70 and 73 |
@@ -1928,6 +1928,53 @@ on these, not beside them.
 ship's length is 0.0 and `combat/shot.py:167` floors her size at 0.5 whatever she is. The
 mend is one read, and it moves the far fight's pins: re-measure them where moved, old
 beside new, the cause this line.
+
+### The refresh after 84, 85 and 82's design (the lead, 2026-10-30; launches when 82's item 3 is merged)
+
+The brief above stands as the intent; this refresh says what the one world and 82's design
+give it, so that the builder designs on them and not beside them. **Fable, in steps merged in
+parts as 84 and 82 are**, the design note first and reported at its boundary; the trunk
+brought in at every boundary (82's later steps, 88 and 75 run beside it). **Truths 7-350 to
+7-369** (82's are 7-320 to 7-339, 88's 7-340 to 7-349).
+
+1. **The prize is a hull of the one world (item 1 on 84).** A ship struck is possessed as a
+   `Hull` with a new nation and goal: awake under the cap while the fight and the boarding are
+   near, asleep under the plan with her state whole when she parts company (84's rule, no
+   second machinery; her damage summed into the far body as 84's step 5 sums it); the prize
+   crew out of the captor's muster put aboard her by **82's `movement.put_aboard`** (the one
+   function for every change of a person's hull), the prize master a person bound to her
+   captain's station under the rules or a model's seat by 67's door with his harness
+   following him (`seat="follows"`), her people prisoners confined below by their place in her
+   or divided between the hulls by the same function; the two in company by 72's set or
+   parting; a prize retaken by her prisoners rising or by a cruiser coming up; the far body
+   carrying her as 84 carries any hull asleep.
+2. **The captive's channel is 82's visitor's voice (item 3 on 82).** The player who strikes
+   is put aboard the captor by `put_aboard` with his harness following, his station of the
+   passenger's kind under his own name as 82 binds a visitor (the reach a passenger has: his
+   place, what he sees from it, `say to the captain: ...`, his journal; no order of the
+   captor's deck), his own ship's station standing bound to him or stood down by the
+   handover's rule (`seat="stands down"`, the game saved and the journal kept) as the design
+   decides for a captive; the parole, the confinement's places and the captor's doctrine as
+   the brief has them; `where am I` and `the ship` (85's) answering the captor's hull. The
+   same for a prisoner of the player's own prize.
+3. **The far fight on the sleeping hulls (item 5 on 84's open item).** 84 left "the sleeping
+   hulls' fight as the study recommends" (`Design-OneWorld.md` part 5); this package wires
+   70's far rounds to the hulls asleep, the engagement first among the cap's reasons to wake
+   them, the far state carried into the near body and back by 84's switch; **75's finding
+   first**: `combat/far.py` reads `spec.hull.length_m`, a key `HullSpec` has not, so every far
+   ship's length is 0.0 and `shot.py` floors her size; the mend is one read and moves the far
+   fight's pins, re-measured old beside new with this line as the cause, before the wiring.
+4. **The rest as the brief has it:** the prize court and the money on 86's ordnance and
+   service (item 2), the court martial and a new command (item 4), the consent revision
+   drafted and not applied with the refusal in words (item 6: 82's design read the brief as
+   covering a visitor's station of the passenger's kind; an adversarial seat is not that, and
+   the refusal stands until 55), the readings, forms and truths (items 7 and 8), the primer's
+   chapter **in-world under 85's rule** and run through `tests/test_in_world.py` and the forms
+   tables.
+
+**The head rules bind** as the brief above has them, and 84's three pin rules and 85's
+in-world rule with them; nothing under `docs/agents/consent/` or in the consent brief touched;
+nothing of 75's files touched.
 
 ## Package 79a: the regimes filled out and sourced (`data/regimes.yaml`, `data/nations.yaml` `naval:`; `freesail/world/regimes.py`, `freesail/world/business.py` the commission drawn; `data/weather/` only if Iberia's drift is taken; `docs/TechnicalSpec-M7.md` §22 as built; `docs/dev/TuningNotes.md`; `tests/test_business.py`, `test_nations.py`, `test_known_truths.py` truths 7-260 to 7-269)
 
