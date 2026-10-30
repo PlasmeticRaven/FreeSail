@@ -14440,3 +14440,15 @@ passed. **The scenario** `biscay-south.yaml`, 30 hours: 894 lines both on the br
 here (`d7d819e4439f6b19`); **three moments moved**: at Corunna she veers thirty-one fathoms
 for thirty-two (the depth at the berth a step shallower), brought up the same, and one
 cross-bearing fix reads the castle of San Antón WSW for W by S, the fix the same.
+
+**`portugal`, second rebuild.** The control on the merged tree and the new rule give the
+same tiles: **2 level-2 tiles moved** (the northern row from 41.84 N, 9.33 to 8.48 W, the
+Minho's mouth and the Galician shore south of it, which lie in Biscay south's bounds and
+read the Isle of Aix's level in its blend since 94's rule of the seams), 93,621 cells, the
+largest 0.30 m, 5 from below the datum to above; no level-3 tile. The taper's band at the
+open edges (the 1.80 m of the table) lies in tiles all land, not written. The checks as
+before ("0 kept", 72 dry tiles not written); the sweep 7,381 cells in 226 places (7,383);
+the coast 1,706 pieces, 12,287 points, 451,176 bytes (1,706, 12,285, 451,137). The block's
+tests: the six files fast 205 passed, slow 11 passed; truths 7-260 to 7-269 and 7-310 to
+7-314, 15 passed. **The scenario** `portugal.yaml`, 30 hours: 671 lines, digest
+`05c7693be1e19a73`, the same on the original head, the branch's head and here.

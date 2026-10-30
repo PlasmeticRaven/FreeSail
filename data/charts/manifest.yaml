@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-30'
 tool: tools/build_charts.py
-build_hash: 2a00a5d308e91c53
+build_hash: 8beeb3495dd95356
 levels:
   '0':
     cell_sec: 150.0
@@ -3532,12 +3532,12 @@ regions:
         south_sec: 150624
         west_sec: -33600
         min_depth_m: 1.2
-        bytes: 156537
+        bytes: 156530
       - name: 150624_-32064
         south_sec: 150624
         west_sec: -32064
         min_depth_m: -2.2
-        bytes: 154906
+        bytes: 156389
       '3':
       - name: 147808_-31552
         south_sec: 147808
@@ -10908,12 +10908,6 @@ sources:
       sha256: 69c4dbf90f95a63b4e531d7c0b26fc2191339337e99938491bbeb2b644f2eb9c
       bytes: 193316251
       file: gebco_2025_s31.90_n51.10_w-32.10_e-0.90_ascii.zip
-    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 36.1, ''north'':
-        42.45, ''west'': -10.4, ''east'': -5.7})'
-      retrieved: '2026-10-30'
-      sha256: 2c526967a9a325c98ed797deb52830740922be843f10a4dfe7ad962415aff026
-      bytes: 8064872
-      file: gebco_2025_s36.10_n42.45_w-10.40_e-5.70_ascii.zip
     - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 35.25, ''north'':
         36.9, ''west'': -6.95, ''east'': -4.45})'
       retrieved: '2026-10-30'
@@ -10968,6 +10962,12 @@ sources:
       sha256: 54fbdb027560a5188050cf5c11cc64370f56983fbe3f00b800ece775151cab9f
       bytes: 11799506
       file: gebco_2025_s41.70_n46.25_w-9.50_e-0.65_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 36.1, ''north'':
+        42.45, ''west'': -10.4, ''east'': -5.7})'
+      retrieved: '2026-10-30'
+      sha256: 2c526967a9a325c98ed797deb52830740922be843f10a4dfe7ad962415aff026
+      bytes: 8064872
+      file: gebco_2025_s36.10_n42.45_w-10.40_e-5.70_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -11022,16 +11022,6 @@ sources:
       sha256: e29680eeec93019816ff98a46d137f658288cdf71015928a3ded46a526f78c92
       bytes: 111365244
       file: emodnet_dtm2024_elevation_max_36.20_40.25_-31.60_-24.15.nc
-    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(36.2):(42.35)%5D%5B(-10.3):(-5.8)%5D
-      retrieved: '2026-10-30'
-      sha256: 0133bf6f4954d81a38f76d3d36d9c967006ee0a4493ec3740e0d7a1c13bf6ce4
-      bytes: 102149028
-      file: emodnet_dtm2024_elevation_36.20_42.35_-10.30_-5.80.nc
-    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(36.2):(42.35)%5D%5B(-10.3):(-5.8)%5D
-      retrieved: '2026-10-30'
-      sha256: 1287a9f2bc172c91961be5ec9db898d1d4e290cbcccde01b649212a0e2786a32
-      bytes: 102148668
-      file: emodnet_dtm2024_elevation_max_36.20_42.35_-10.30_-5.80.nc
     - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(35.35):(36.8)%5D%5B(-6.85):(-4.55)%5D
       retrieved: '2026-10-30'
       sha256: 258fee781c2984d7bae7f69437025bf5679a33f746bac76231c9b3b6ecf6c000
@@ -11122,6 +11112,16 @@ sources:
       sha256: c3bfa1c786d59ec6b1dba5ad74d3e34748b66c2db8a73d1fa13601d815d51388
       bytes: 138864636
       file: emodnet_dtm2024_elevation_max_41.80_46.15_-9.40_-0.75.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(36.2):(42.35)%5D%5B(-10.3):(-5.8)%5D
+      retrieved: '2026-10-30'
+      sha256: 0133bf6f4954d81a38f76d3d36d9c967006ee0a4493ec3740e0d7a1c13bf6ce4
+      bytes: 102149028
+      file: emodnet_dtm2024_elevation_36.20_42.35_-10.30_-5.80.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(36.2):(42.35)%5D%5B(-10.3):(-5.8)%5D
+      retrieved: '2026-10-30'
+      sha256: 1287a9f2bc172c91961be5ec9db898d1d4e290cbcccde01b649212a0e2786a32
+      bytes: 102148668
+      file: emodnet_dtm2024_elevation_max_36.20_42.35_-10.30_-5.80.nc
     status: fetched
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
