@@ -13426,3 +13426,16 @@ clear; the pilot's line and the master's dangers name it. `test_chart.py`: an is
 the key is ground and a hazard, an island without it (Belle Isle) neither; the nineteen
 carry a height and an extent under a kilometre, lie in the five regions, and each grounds
 a ship over its place.
+
+### Item 2: a road with a bottom
+
+`Chart.bottom_near` reads the note of the ground from the kinds `chart.BOTTOM_NOTE_KINDS`,
+`bottom`, `anchorage` and now `road` (79d's finding: a road with a `bottom:` gave no
+note, the roads being anchorages). **No feature file changes and nothing moves**: no
+feature of any region is of kind `road` today (79d gave its roads as anchorages, and the
+earlier blocks did the same), so every note the lead's arming, the grounding's words
+and the world's `bottom` read is the same as before; the roads' files are unchanged, as
+the brief has it. ChartBlocks.md's 79d bullet and item 5 say a road's bottom counts.
+**7-311**: on a chart of its own (not the shared one), Naples' road as an `anchorage`
+gives the arming of the lead its "mud and clay, fine sand"; recast in memory as a `road`
+it gives the same; as a `town` the note is not that.

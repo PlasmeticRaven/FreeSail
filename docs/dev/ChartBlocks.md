@@ -118,8 +118,8 @@ region's, its tide and its weather are rows in tables that already reach its wat
    machinery does not read). The port is entered in the ports' index of
    `data/nations.yaml` (`ports:`, which `tests/test_nations.py` holds equal to the
    files), and `tests/test_ports.py` names the port files in a list: the block adds its
-   own to both. Every road, anchorage and mooring has a note of the bottom (an anchorage
-   or a bottom feature with `bottom:`) within three kilometres (`test_tackle_orders.py`,
+   own to both. Every road, anchorage and mooring has a note of the bottom (an anchorage,
+   a road or a bottom feature with `bottom:`) within three kilometres (`test_tackle_orders.py`,
    on the whole chart), and every book the game ships names places of the whole chart
    (`test_log_lines.py`). `tests/test_ports.py` holds every port file to ten goods at
    least in its market, a yard's or a chandler's topmast and water, the three ratings
@@ -611,9 +611,11 @@ where 79c's `balearics` ends, so that the two blocks' tiles meet), `ligurian-sea
   the Giraglia, the Lavezzi, the Sanguinaires, Li Galli ...) read as water in EMODnet's
   sixteenth of a minute; each a rock of its height and extent then, eleven of them an
   island the grid lacks since package 94 ("An isle the grid lacks").
-- **A road with its bottom is a feature of kind `anchorage`**: `Chart.bottom_near` reads the
-  note from `anchorage` and `bottom` features only, so a `road` with a `bottom:` leaves a
-  port's spots without a note (`test_tackle_orders.py`).
+- **A road with its bottom was a feature of kind `anchorage`**: `Chart.bottom_near` read the
+  note from `anchorage` and `bottom` features only, so a `road` with a `bottom:` left a
+  port's spots without a note (`test_tackle_orders.py`). Since package 94 a `road`'s
+  `bottom:` is read as an anchorage's (`chart.BOTTOM_NOTE_KINDS`); the roads given as
+  anchorages stay so.
 - **The business needs prices that differ**: a cargo is drawn between two of a region's
   ports only where a good's price at one is 1.3 times the other's; ports priced from one
   table draw no trader at all. Give each port its own produce cheap and its wants dear.

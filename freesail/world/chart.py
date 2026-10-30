@@ -195,6 +195,10 @@ DANGER_KINDS = frozenset({"rock", "ledge", "drying"})
 ISLAND_KIND = "island"
 
 
+# The kinds whose `bottom:` is a note of the ground (`Chart.bottom_near`; the road since
+# package 94).
+BOTTOM_NOTE_KINDS = frozenset({"bottom", "anchorage", "road"})
+
 _GROUND_SEARCH_KINDS = DANGER_KINDS | {ISLAND_KIND}
 _HAZARD_SEARCH_KINDS = HAZARD_KINDS | {ISLAND_KIND}
 
@@ -1266,9 +1270,11 @@ class Chart:
         return math.degrees(math.atan2(gx, gy)) % 360.0
 
     def bottom_near(self, pos: Position, within_m: float = 3000.0) -> str:
-        """The ground from the nearest bottom note within `within_m`, or ''."""
+        """The ground from the nearest bottom note within `within_m`, or '': a `bottom`
+        feature's, an anchorage's, or a road's (package 94: a road is an anchorage, and
+        79d's roads with their `bottom:` had given no note of it)."""
         best = None
-        for f in self.nearby(pos, within_m, {"bottom", "anchorage"}):
+        for f in self.nearby(pos, within_m, BOTTOM_NOTE_KINDS):
             if f.bottom:
                 _, d = bearing_and_distance(pos, f.position)
                 if best is None or d < best[0]:

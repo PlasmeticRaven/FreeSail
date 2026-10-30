@@ -12260,3 +12260,26 @@ def test_truth_7_310_the_isla_del_rey_is_an_island_to_the_lookout_and_ground_to_
     ahead = w.chart.dangers_ahead(near, 90.0, 1500.0, units.CABLE, 0.5, 6.0)
     assert ahead and ahead[0][0].id == "isla-del-rey"
     assert "isla-del-rey" in {f.id for f, _b, _d in w.chart.dangers_near(near, 2000.0)}
+
+
+def test_truth_7_311_a_roads_bottom_is_in_the_leads_note_as_an_anchorages_is():
+    """79d's finding: `Chart.bottom_near` read the note of the ground from `anchorage` and
+    `bottom` features alone, so a `road` with its `bottom:` gave none, and 79d gave its
+    roads as anchorages. Since package 94 a road's bottom is read as an anchorage's: the
+    road of Naples as a `road` gives the arming of the lead and the grounding its mud and
+    clay as the anchorage did; a feature of another kind with a `bottom:` gives nothing."""
+    from dataclasses import replace
+
+    from freesail.world.chart import Chart, load_manifest
+    from freesail.world.reckoning import ground_words
+
+    chart = Chart("tyrrhenian", load_manifest())  # its own, not the shared chart
+    road = chart.feature("naples-road")
+    assert road.kind == "anchorage" and road.bottom
+    near = road.position.advanced(300.0, 300.0)
+    assert ground_words(chart, near, 30.0) == road.bottom
+    chart.features[road.id] = replace(road, kind="road")
+    assert chart.bottom_near(near) == road.bottom
+    assert ground_words(chart, near, 30.0) == road.bottom
+    chart.features[road.id] = replace(road, kind="town")
+    assert chart.bottom_near(near) != road.bottom
