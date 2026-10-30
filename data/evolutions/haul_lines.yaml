@@ -1,7 +1,7 @@
-# Haul the lines (package 56). "The foresail of the smack is lowered, and the end buoy
-# being taken on board, the vessel makes short tacks along the course of the line", the
-# fish taken off the hooks, the cod put alive into the well (Holdsworth 1874 pp. 138 to
-# 139). Three hours for the string: judgement.
+# Haul the lines. "The foresail of the smack is lowered, and the end buoy being taken on
+# board, the vessel makes short tacks along the course of the line", the fish taken off
+# the hooks, the cod put alive into the well (Holdsworth 1874 pp. 138 to 139). Three hours
+# for the string: judgement.
 #
 # The script (freesail/evolutions/scripts.py, FishingGearScript) holds the gear and not the
 # ship; the order's checks (the gear she carries, the ground she is on, its season, the

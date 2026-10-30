@@ -1,16 +1,15 @@
-# Heave a cask overboard for a mark (practice and resupply, between packages 72 and 73;
-# docs/design/Build-PracticeAndResupply.md §6; scripted, HeaveMarkScript in
+# Heave a cask overboard for a mark (scripted, HeaveMarkScript in
 # evolutions/action_scripts.py). Two hands at the quarter put an empty cask with a flag on
-# a staff over the side, four points abaft the beam, for the guns to be exercised at;
-# from then it floats where it fell, set by the stream and a little to leeward, and the
-# masthead has it in sight by day within a mile (freesail/combat/marks.py). The captain
-# is "to exercise the Ship's company frequently at the guns" and the times are to be
-# entered in the log (Regulations 1808 printing, the Captain, Art. IX, l.8738-8742), and
-# the Gunner is to instruct the men "to point the guns properly" with the powder and
-# round shot allowed him for it each month (Art. XI, l.8842-8879; the Gunner, Art. XXI,
-# l.13122-13144). The cask with its flag as the mark is from memory, UNVERIFIED against
-# a page. The subject is `her`, and the script holds nothing of the ship's, so the two
-# hands at the quarter never hold her against a tack or a wear.
+# a staff over the side, four points abaft the beam, for the guns to be exercised at; from
+# then it floats where it fell, set by the stream and a little to leeward, and the
+# masthead has it in sight by day within a mile (freesail/combat/marks.py). The captain is
+# "to exercise the Ship's company frequently at the guns" and the times are to be entered
+# in the log (Regulations 1808 printing, the Captain, Art. IX, l.8738-8742), and the
+# Gunner is to instruct the men "to point the guns properly" with the powder and round
+# shot allowed him for it each month (Art. XI, l.8842-8879; the Gunner, Art. XXI,
+# l.13122-13144). The cask with its flag as the mark is from memory, UNVERIFIED against a
+# page. The subject is `her`, and the script holds nothing of the ship's, so the two hands
+# at the quarter never hold her against a tack or a wear.
 id: heave_mark
 verb: heave_mark
 applies_to: {class: ship}

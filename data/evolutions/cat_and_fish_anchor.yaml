@@ -1,10 +1,10 @@
-# Cat and fish the anchor (spec M5 §18; package 34): an anchor hove up and left hanging
-# at the bows (aweigh, or catted and not fished) secured for sea: "the two Bowers are
-# catted and fished; and the Stoppers and Shank Painters passed" (Lever 1808, 'Catting
-# and Fishing the Anchors', p. 68): the cat block hooked to the ring and the cat fall
-# swayed upon to the cat-head (catting), the fish hook on the inner arm and the fluke
-# hove up to the gunwale, the shank painter belayed to the timber heads (fishing). The
-# weigh does this of itself at its end; this is the order for an anchor left aweigh.
+# Cat and fish the anchor: an anchor hove up and left hanging at the bows (aweigh, or
+# catted and not fished) secured for sea: "the two Bowers are catted and fished; and the
+# Stoppers and Shank Painters passed" (Lever 1808, 'Catting and Fishing the Anchors', p.
+# 68): the cat block hooked to the ring and the cat fall swayed upon to the cat-head
+# (catting), the fish hook on the inner arm and the fluke hove up to the gunwale, the
+# shank painter belayed to the timber heads (fishing). The weigh does this of itself at
+# its end; this is the order for an anchor left aweigh.
 id: cat_and_fish_anchor
 verb: cat_and_fish_anchor
 applies_to: {class: ship}

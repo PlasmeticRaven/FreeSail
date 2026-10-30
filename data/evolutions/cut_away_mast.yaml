@@ -1,11 +1,11 @@
-# Cut away a lower mast (spec M7 §14; package 73; scripted, CutAwayMastScript in
-# evolutions/repair_scripts.py). A standing lower mast cut away by the axes at the
-# partners and the lanyards of its rigging: "the mizen-mast must instantly be cut away"
-# (Falconer 1780, VEERING, a ship that will not wear in a gale); a ship on her beam ends
-# righted by cutting away her masts (Luce 1884, ch. XXIX 'On her Beam Ends'). The mast goes
-# over the side with all it carries, as a mast carried away does (the strain model's own
-# wrecking, `how="cut away"`), and the wreck is cleared with it. Phases: axes (on deck: the
-# lanyards and the mast cut through), clear (on deck: the wreck cut adrift).
+# Cut away a lower mast (scripted, CutAwayMastScript in evolutions/repair_scripts.py). A
+# standing lower mast cut away by the axes at the partners and the lanyards of its
+# rigging: "the mizen-mast must instantly be cut away" (Falconer 1780, VEERING, a ship
+# that will not wear in a gale); a ship on her beam ends righted by cutting away her masts
+# (Luce 1884, ch. XXIX 'On her Beam Ends'). The mast goes over the side with all it
+# carries, as a mast carried away does (the strain model's own wrecking, `how="cut
+# away"`), and the wreck is cleared with it. Phases: axes (on deck: the lanyards and the
+# mast cut through), clear (on deck: the wreck cut adrift).
 id: cut_away_mast
 verb: cut_away_mast
 applies_to: {class: spar}

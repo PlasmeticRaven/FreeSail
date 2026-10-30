@@ -1,11 +1,11 @@
 # Shift a spar carried away for a spare of its class from the booms (scripted,
-# ShiftSparScript in scripts.py; package 30b). The wreck must have been cleared
-# (clear_wreck.yaml) and the spar it stands on must stand; a spar that went with another
-# waits for that one. The spare comes from the ship's store of spare spars by class
-# (`parts.booms`, the ship file's `crew.stores.spare_spars`); with none of its class the
-# order is refused in words ("No spare studding-sail boom aboard; the dockyard must supply
-# one."). The spar stands whole again, the gear the wreck took is rove afresh where its
-# parts stand, and a sail that belongs on it is left in the sail room, to be bent by order.
+# ShiftSparScript in scripts.py). The wreck must have been cleared (clear_wreck.yaml) and
+# the spar it stands on must stand; a spar that went with another waits for that one. The
+# spare comes from the ship's store of spare spars by class (`parts.booms`, the ship
+# file's `crew.stores.spare_spars`); with none of its class the order is refused in words
+# ("No spare studding-sail boom aboard; the dockyard must supply one."). The spar stands
+# whole again, the gear the wreck took is rove afresh where its parts stand, and a sail
+# that belongs on it is left in the sail room, to be bent by order.
 #
 # Luce's shifts (1884, ch. XXXII Shifting Sails and Spars) are these phases here:
 #   get_up  on deck: the spare got out of the booms and its gear put on it ("Suppose the

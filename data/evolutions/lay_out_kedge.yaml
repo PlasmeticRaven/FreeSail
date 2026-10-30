@@ -1,16 +1,15 @@
-# Lay out a kedge by the boat (spec M5 §23; package 35; package 34's note "a kedge laid
-# by the boat"). The kedge and its hawser carried out in the launch to a bearing and let
-# go there, the hawser's end aboard: Falconer 1780, KEDGE: "a small anchor used to keep
-# a ship steady whilst she rides in a harbour or river, particularly at the turn of the
-# tide, when she might otherwise drive over her principal anchor, and entangle the stock
-# or flukes with her slack cable"; Lever 1808, 'Mooring' (p. 100): "When the Ship cannot
-# be managed by the Helm and Sails, in light winds, a Kedge Anchor and Hawser must be
-# carried out, and she may be hove to it by the Capstern, the Hawser being led in
+# Lay out a kedge by the boat. The kedge and its hawser carried out in the launch to a
+# bearing and let go there, the hawser's end aboard: Falconer 1780, KEDGE: "a small anchor
+# used to keep a ship steady whilst she rides in a harbour or river, particularly at the
+# turn of the tide, when she might otherwise drive over her principal anchor, and entangle
+# the stock or flukes with her slack cable"; Lever 1808, 'Mooring' (p. 100): "When the
+# Ship cannot be managed by the Helm and Sails, in light winds, a Kedge Anchor and Hawser
+# must be carried out, and she may be hove to it by the Capstern, the Hawser being led in
 # through one of the Quarter Ports"; Luce 1866, ch. XXXIV, 'Laying out a kedge' (the
 # hawser coiled in the boat's stern sheets, the kedge slung over the stern, paid out as
-# she pulls, let go at the end). Warping to it (heaving the ship up to the kedge) is
-# milestone 8's; here the kedge holds as any anchor down does (physics/anchor.py), the
-# ship riding between it and her bower at the turn of the tide, which is Falconer's use.
+# she pulls, let go at the end). here the kedge holds as any anchor down does
+# (physics/anchor.py), the ship riding between it and her bower at the turn of the tide,
+# which is Falconer's use.
 #
 # The script (freesail/evolutions/scripts.py, LayOutKedgeScript):
 #   hoist_out   the boat hoisted out, the kedge slung and the hawser coiled in her

@@ -66,7 +66,7 @@ wardroom:
     traits: [careful, slow, sober]
     history: "Gunner's mate in the Channel fleet; his warrant two years old."
     brief: >-
-      The carronades, the powder and the shot; the quarters when milestone 7 brings them.
+      The carronades, the powder and the shot; the quarters and the drill.
   - role: carpenter
     post: true
     rank: warrant officer

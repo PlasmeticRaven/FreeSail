@@ -1,13 +1,11 @@
-# Clear away the wreck of a spar carried away, or the rags of a sail blown out
-# (scripted, ClearWreckScript in scripts.py; package 30b, playtest 10's finding 1: a
-# studding-sail boom carried away and no order could clear it). The script keeps the
-# sail room and decides what goes where, which a step list cannot. It saves what can be
-# saved and cuts adrift what cannot: a sail that is whole goes down to the sail room, the
-# rags of one blown out go over the side, the remains of a spar and of every spar that
-# went with it are sent down on deck, and the wreck of a lower mast or the bowsprit, which
-# lies in the water, is cut adrift with all it carries. The spars stay carried away (the
-# part graph keeps the wreck's consequences) until `shift the <spar>` replaces each with a
-# spare (shift_spar.yaml).
+# Clear away the wreck of a spar carried away, or the rags of a sail blown out (scripted,
+# ClearWreckScript in scripts.py). The script keeps the sail room and decides what goes
+# where, which a step list cannot. It saves what can be saved and cuts adrift what cannot:
+# a sail that is whole goes down to the sail room, the rags of one blown out go over the
+# side, the remains of a spar and of every spar that went with it are sent down on deck,
+# and the wreck of a lower mast or the bowsprit, which lies in the water, is cut adrift
+# with all it carries. The spars stay carried away (the part graph keeps the wreck's
+# consequences) until `shift the <spar>` replaces each with a spare (shift_spar.yaml).
 #
 # Luce's order of work when a spar goes (1884, ch. XXXI Carrying Away Masts and Spars)
 # is these phases here, each left out when it has nothing to do:

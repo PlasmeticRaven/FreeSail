@@ -1,7 +1,7 @@
-# Haul the seine (package 56). The circle contracted, the bunt raised "so as to get the
-# net under the fish and bring them to the surface, when they are taken out in baskets
-# and put into the boats" (Holdsworth 1874 p. 158, the tuck-sean), the boat bringing them
-# alongside and the fish struck into the well and the hold. An hour: judgement.
+# Haul the seine. The circle contracted, the bunt raised "so as to get the net under the
+# fish and bring them to the surface, when they are taken out in baskets and put into the
+# boats" (Holdsworth 1874 p. 158, the tuck-sean), the boat bringing them alongside and the
+# fish struck into the well and the hold. An hour: judgement.
 #
 # The script (freesail/evolutions/scripts.py, FishingGearScript) holds the gear and not the
 # ship; the order's checks (the gear she carries, the ground she is on, its season, the

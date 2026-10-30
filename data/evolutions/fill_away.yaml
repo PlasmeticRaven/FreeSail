@@ -1,18 +1,15 @@
-# Fill away after lying to (scripted): keep the helm a-lee while she has
-# sternway (and put it up once she has headway) until her head is fill_off_deg
-# off the true wind, far enough for the backed sails to fill when braced, then
-# brace the yards that are aback round full over brace_s and give the helm its
-# course. Lying to as heave_to leaves her (five points off) she is braced at
-# once; braced full from closer than that she would only be taken aback
-# (package 10, truth 12). Undoes heave_to; needs ship.extra["hove_to"] to be
-# present. The courses, driver and topgallant that heave_to hauled up are left
-# for the captain to set again.
+# Fill away after lying to (scripted): keep the helm a-lee while she has sternway (and put
+# it up once she has headway) until her head is fill_off_deg off the true wind, far enough
+# for the backed sails to fill when braced, then brace the yards that are aback round full
+# over brace_s and give the helm its course. Lying to as heave_to leaves her (five points
+# off) she is braced at once; braced full from closer than that she would only be taken
+# aback. Undoes heave_to; needs ship.extra["hove_to"] to be present. The courses, driver
+# and topgallant that heave_to hauled up are left for the captain to set again.
 #
-# She is filled on the tack she is on (package 37f): the side the wind is on
-# now, not the tack recorded when she hove to. A ship that had come round of
-# herself was taken back through the wind by the record, every sail aback
-# (three times in the playtest). The yards braced round are whichever are aback
-# for that tack. The words name the tack and the course.
+# She is filled on the tack she is on: the side the wind is on now, not the tack recorded
+# when she hove to. A ship that had come round of herself was taken back through the wind
+# by the record, every sail aback. The yards braced round are whichever are aback for that
+# tack. The words name the tack and the course.
 #
 # Parameter `course_deg` ("fill away and steer SW by W"): when she is full the
 # helm has that course, if it can be laid on the tack she is on (the wind on the

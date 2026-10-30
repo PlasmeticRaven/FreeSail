@@ -1,13 +1,13 @@
-# Trim a gaff sail's sheet (package 32e, spec M5 open item 13): the afterguard work the
-# sheet to the length the wanted angle needs, hauling in or easing off, and belay it; a
-# sheet let fly is taken up and hauled as part of it. The sheet holds the trim: the sail's
-# angle is read from the sheet's length through the boom's geometry (the boom's length,
-# the horse's breadth, the purchase's parts; freesail/evolutions/trim.py), and this
-# evolution is the one way the trim is worked with hands and time, by `trim the <sail>`,
-# by `trim sails` and `trim the sheets`, by the standing book's tending routine and by the
-# manoeuvres. "Trim aft the head sheets", "haul aft the spanker sheet as the sail lifts"
-# (Luce 1866, ch. XXIV, 'Tacking'); "trim aft the main sheet and right the helm" (Luce
-# 1884, ch. XXXIV, 'Sloops').
+# Trim a gaff sail's sheet: the afterguard work the sheet to the length the wanted angle
+# needs, hauling in or easing off, and belay it; a sheet let fly is taken up and hauled as
+# part of it. The sheet holds the trim: the sail's angle is read from the sheet's length
+# through the boom's geometry (the boom's length, the horse's breadth, the purchase's
+# parts; freesail/evolutions/trim.py), and this evolution is the one way the trim is
+# worked with hands and time, by `trim the <sail>`, by `trim sails` and `trim the sheets`,
+# by the standing book's tending routine and by the manoeuvres. "Trim aft the head
+# sheets", "haul aft the spanker sheet as the sail lifts" (Luce 1866, ch. XXIV,
+# 'Tacking'); "trim aft the main sheet and right the helm" (Luce 1884, ch. XXXIV,
+# 'Sloops').
 #
 # Parameters:
 #   angle_deg   the angle off the centreline wanted; null: the trim for the apparent

@@ -1,8 +1,8 @@
-# Take in a lug sail (package 43b): let go the halyard and lower the yard on deck, the
-# sail gathered in along it and stopped, the tack unhooked. A lug is not brailed up nor
-# furled aloft: it comes down with its yard ("amener tout-à-fait la vergue", Forfait 1788
-# p. 6; the chasse-marée's mainsail "qu'on amène sur le pont", Willaumez 1831,
-# CHASSE-MARÉE), so it is left stowed. Times judgement.
+# Take in a lug sail: let go the halyard and lower the yard on deck, the sail gathered in
+# along it and stopped, the tack unhooked. A lug is not brailed up nor furled aloft: it
+# comes down with its yard ("amener tout-à-fait la vergue", Forfait 1788 p. 6; the
+# chasse-marée's mainsail "qu'on amène sur le pont", Willaumez 1831, CHASSE-MARÉE), so it
+# is left stowed. Times judgement.
 id: take_in_lug
 verb: take_in
 applies_to: {class: lug}

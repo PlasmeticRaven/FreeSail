@@ -2,7 +2,8 @@
 # bent on, the boom rigged out, and the sail hoisted and its tack hauled out
 # to the boom end. It needs the sail on its yard to be set, since it extends
 # that sail's foot or head. About four minutes.
-#
+
+# Build notes (not served by the library's catalogue):
 # Milestone 3b (package 23, spec 3b §7): nothing here refuses a studding sail on a
 # wind. Forward of Luce's angle it shakes in its gear and flogs through the physics
 # (data/sail_classes.yaml, the studding class's stall); and its boom starts rigged in,

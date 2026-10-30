@@ -1,10 +1,10 @@
-# Cast loose the guns (spec M7 §8; package 70; scripted, CastLooseScript in
-# evolutions/action_scripts.py). The crews cast off the tackles and the breechings'
-# lashings, take out the tompions and provide the guns (the powder horns, the match,
-# the rammers and sponges; Douglas 1820, part II, "Cast loose your guns"); from then the
-# guns are served by the battery's cycle (`freesail/combat/guns.py`): loaded, run out and
-# primed as the standing intentions have it, and fired as they bear or at the word.
-# Wanted at quarters; refused in words before the beat.
+# Cast loose the guns (scripted, CastLooseScript in evolutions/action_scripts.py). The
+# crews cast off the tackles and the breechings' lashings, take out the tompions and
+# provide the guns (the powder horns, the match, the rammers and sponges; Douglas 1820,
+# part II, "Cast loose your guns"); from then the guns are served by the battery's cycle
+# (`freesail/combat/guns.py`): loaded, run out and primed as the standing intentions have
+# it, and fired as they bear or at the word. Wanted at quarters; refused in words before
+# the beat.
 id: cast_loose_guns
 verb: cast_loose_guns
 applies_to: {class: ship}

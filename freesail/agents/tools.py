@@ -1592,7 +1592,7 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "world_order",
-            "The director's hand (spec M7b §3): an order to the world, not to any ship, in "
+            "The director's hand: an order to the world, not to any ship, in "
             "the channel's words ('weather: ...', 'ship: ...', 'ship \"X\": intent ...', "
             "'aboard: ...', 'message: ...', 'port <id>: ...', 'mark: ...', 'person: make "
             "\"<name>\", ...', 'person: \"<name>\" comes aboard as <station>', 'say as "
@@ -1620,7 +1620,7 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "truth",
-            "The truth, the director's alone (spec M7b §2): every ship's true position, "
+            "The truth, the director's alone: every ship's true position, "
             "heading, speed, sail and state with her captain's intent, the weather as it is "
             "at the player's ship and as the systems will make it for the next watch, the "
             "tide, the people aboard every crewed ship and their states, the markets' "

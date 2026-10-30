@@ -2,9 +2,8 @@
 
 Chapter 22 fought the guns. This chapter is what the guns do to a ship and her people, and
 the two fights that are not the guns': the fight against the water, and the fight on deck.
-It is package 73's (spec M7 §11, §11a, §13 to §17; the design in
-`docs/design/Design-WaterAndHealth.md`), and everything in it is a state of the ship or the
-muster that the readings give and the log says, never a figure set.
+Everything in it is a state of the ship or the muster that the readings give and the log
+says, never a figure set.
 
 ## The well
 
@@ -145,7 +144,7 @@ The crossing costs the boarders her marines' volley and whatever guns bear on th
 is a round a minute, each side's strength its men by their arms (served out or not, the
 bayonet) and their temper and their cover, each side losing by the other's strength. The deck
 is carried when the defenders' strength falls under half the boarders' or their temper
-breaks: her colours come down by your boarders' hand, and the prize is the next milestone's.
+breaks: her colours come down by your boarders' hand, and the prize is not yet in the game.
 The boarders are repulsed the other way, or after a quarter of an hour contested; they cast
 off, and the hands' temper pays for it. A hundred boarders against a frigate's whole company
 awake on deck are driven back in a round; against her at quarters, her gun crews at the guns,
@@ -161,4 +160,4 @@ station bill's boarders and small-arms men) and ch. XXXI; Steel 1794 and the Reg
 the carpenter's and the gunner's duties; Turnbull 1806 and Trotter's Medicina Nautica for the
 surgeon's order of work and the sick lists; Hughes, Firepower, for the musket's volley and
 its chance; James, Naval History, for the actions' returns. Every figure is in the files with
-its source or marked judgement, and `docs/dev/TuningNotes.md` (package 73) has the measures.
+its source or marked judgement.

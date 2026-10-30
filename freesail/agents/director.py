@@ -289,7 +289,7 @@ class DirectorBrief:
         if lim.get("the_chart_as_it_is"):
             out.append("the chart as it is (a point of interest is not the chart)")
         if lim.get("false_colours") is False:
-            out.append("no false colours: your ships fight under their own (package 71)")
+            out.append("no false colours: your ships fight under their own")
         return "; ".join(out) if out else "none beyond the channel's doubt"
 
     def body(self) -> str:
@@ -341,7 +341,7 @@ class DirectorBrief:
         if order.channel == "ship" and lim.get("false_colours") is False:
             low = " ".join(body.lower().split())
             if "false colours" in low or _names_false_colours(world, low):
-                return "the brief forbids your ships the ruse: no false colours (package 71)"
+                return "the brief forbids your ships the ruse: no false colours"
         if order.channel == "port" and lim.get("the_war_as_it_is"):
             m = world_orders._PORT.match(body)
             ports = getattr(world, "dealings", None)
@@ -824,7 +824,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             'ship "Harpy": under the orders of the Medusa',
             'ship "Harpy": under the orders of nobody',
         ),
-        "whose signals command her (package 71, the least relation under 72's squadron): "
+        "whose signals command her: "
         "the player's ship, another by her name, or nobody; a ship under orders answers "
         "and obeys that ship's signals and no other's",
     ),
@@ -837,7 +837,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             'ship "Harpy": in ordinary at Falmouth',
             'ship "Harpy": commissioned for cruise off the Lizard within 10 miles in 2 days',
         ),
-        "the regimes (package 72, spec M7 §22): a hull laid up at a port's anchorage with no "
+        "the regimes: a hull laid up at a port's anchorage with no "
         "company and no intent, and a ship in ordinary commissioned for an intent, at once or "
         "after the regime's delay (two to five days when none is said); the business "
         "commissions a nation's ships in ordinary by its knobs when the blockade is off",
@@ -850,7 +850,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
             'squadron: "the inshore squadron" of Britain under the Medusa with the Nimble, keep '
             "the station off the Deadman within 8 miles",
         ),
-        "a set made of ships on the sea (package 72, spec M7 §21): the commander, the members "
+        "a set made of ships on the sea: the commander, the members "
         "in their order of sailing, the goal his intent; a convoy when the members are "
         "merchantmen; the members keep their stations on him at far detail and by their "
         "books when crewed, and read his signals",
@@ -895,7 +895,7 @@ WORLD_ORDER_FORMS: tuple[Form, ...] = (
         "captain",
         "captain: intent <words>",
         ("captain: intent trade tin from Falmouth to Brest",),
-        "the player's ship's rules-based captain given an intent (the owner's seam)",
+        "the followed ship's rules-based captain given an intent",
     ),
     Form(
         "seat",
@@ -966,7 +966,7 @@ def world_page() -> tuple[tuple[str, str], ...]:
         "centre and the field at the ship). A seeded system drifts at its velocity and lives "
         "a life, rising to its peak at the middle of it and dying away, and is dropped "
         f"beyond {wx.SYSTEM_REACH_KM:g} km of the ship's box; an appended one follows its "
-        "track, held at its ends. Appended in play (package 58a), a system grows in from "
+        "track, held at its ends. Appended in play, a system grows in from "
         f"nothing at the order's tick over {wx.APPEND_RAMP_S // 60} minutes at the least, or "
         "until its first point's time if that is later; a waypoint appended to a track "
         "already ended runs from where the system stands at the order's tick, reached "
@@ -1026,7 +1026,7 @@ def world_page() -> tuple[tuple[str, str], ...]:
     from freesail.world import water as wt
 
     bodies = (
-        "Package 73: the water, the wounded and the fight on deck. The water in a ship is one "
+        "The water in a ship is one "
         "quantity in tons (the well's depth the tons over the bilge's floor, "
         f"{wt.WELL_FLOOR_COEFF:g} of her length by her beam), fed by the shot holes by the orifice "
         f"law (a coefficient of {wt.ORIFICE_CD:g}), the ground's leak, the seams working in a "

@@ -1,15 +1,15 @@
-# Back the anchor (spec M5 §18; package 34): the stream anchor let go on the riding
-# cable to help the bower hold. "If you want to back your anchor with another one, on
-# account of dragging, or the danger of doing so, put an anchor shackle on the riding
-# cable; shackle the end of the backing anchor cable (taken outside all) to this; look
-# out for, or give the ship a sheer, and let go" (Luce 1866, ch. XXXIV, p. 568); "the
-# anchor is backed, or retained, by carrying out the stream, or kedge, ahead of the
-# anchor the ship usually rides by. In this situation, the bower anchor is confined by
-# the stream, or kedge, in the same manner as the ship is restrained by the bower anchor"
-# (Steel 1794 vol. II, p. 292). Steel's way wants the boat (package 35); Luce's is done
-# from the ship, and that is this: the stream anchor goes down on the bower's cable and
-# the two hold together (physics/anchor.py takes each anchor's holding on the same
-# cable's line, which is the backing). Luce's third answer to an anchor dragging.
+# Back the anchor: the stream anchor let go on the riding cable to help the bower hold.
+# "If you want to back your anchor with another one, on account of dragging, or the danger
+# of doing so, put an anchor shackle on the riding cable; shackle the end of the backing
+# anchor cable (taken outside all) to this; look out for, or give the ship a sheer, and
+# let go" (Luce 1866, ch. XXXIV, p. 568); "the anchor is backed, or retained, by carrying
+# out the stream, or kedge, ahead of the anchor the ship usually rides by. In this
+# situation, the bower anchor is confined by the stream, or kedge, in the same manner as
+# the ship is restrained by the bower anchor" (Steel 1794 vol. II, p. 292). Steel's way
+# wants the boat; Luce's is done from the ship, and that is this: the stream anchor goes
+# down on the bower's cable and the two hold together (physics/anchor.py takes each
+# anchor's holding on the same cable's line, which is the backing). Luce's third answer to
+# an anchor dragging.
 id: back_anchor
 verb: back_anchor
 applies_to: {class: ship}

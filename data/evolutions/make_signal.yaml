@@ -1,15 +1,15 @@
-# Make a signal (spec M7 §3; package 71; docs/design/Design-Signals.md; scripted,
-# MakeSignalScript in evolutions/action_scripts.py). The flags bent on and run up to the
-# masthead by the yeoman of the signals and two hands at the halyards, a minute a hoist
-# (Popham's own reckoning of a minute or more a hoist, the signal officer reading the book;
-# judgement for the figure); a telegraphic sentence as many hoists as it has words and
-# spelt letters, each a phase, the next bent as the last is hauled down. The hoist breaks
-# out on the sender's body when the hands have the first hoist up (the phase's end, not
-# the book's minute: a short watch is slower), where every lookout near enough with
-# light enough sees it (`freesail/world/signals.py` `read_flying`). By night the lanterns
-# and the false fires take the same minute to show; in fog the gun is the signal and takes
-# the gun's own time (the gunnery's), so the fog book's signals are made by the battery and
-# not by these hands. Fails in words when the hands cannot be had, and the hoist comes down.
+# Make a signal (scripted, MakeSignalScript in evolutions/action_scripts.py). The flags
+# bent on and run up to the masthead by the yeoman of the signals and two hands at the
+# halyards, a minute a hoist (Popham's own reckoning of a minute or more a hoist, the
+# signal officer reading the book; judgement for the figure); a telegraphic sentence as
+# many hoists as it has words and spelt letters, each a phase, the next bent as the last
+# is hauled down. The hoist breaks out on the sender's body when the hands have the first
+# hoist up (the phase's end, not the book's minute: a short watch is slower), where every
+# lookout near enough with light enough sees it (`freesail/world/signals.py`
+# `read_flying`). By night the lanterns and the false fires take the same minute to show;
+# in fog the gun is the signal and takes the gun's own time (the gunnery's), so the fog
+# book's signals are made by the battery and not by these hands. Fails in words when the
+# hands cannot be had, and the hoist comes down.
 id: make_signal
 verb: make_signal
 applies_to: {class: ship}

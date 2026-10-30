@@ -1,6 +1,6 @@
 # 24. The squadron, the convoy and the station
 
-Ships in company, in the player's words (package 72; spec M7 §21 to §23). A ship of 1805 seldom sailed alone on the King's business: she kept her station in a squadron's line, she convoyed the trade in the order of sailing, she lay off an enemy's port on a blockade with an inshore squadron under the land and the main body in the offing, and when a gale blew the whole off to its rendezvous the enemy slipped out. The game has the squadron as a genuine set: its members in their order, its formation, its pace the slowest ship's, its commander's book read by his rules captain when no model is seated, and one minute's work for the whole set at far detail, so that a convoy of six costs the machine little more than one ship with a brain.
+Ships in company, in the player's words. A ship of 1805 seldom sailed alone on the King's business: she kept her station in a squadron's line, she convoyed the trade in the order of sailing, she lay off an enemy's port on a blockade with an inshore squadron under the land and the main body in the offing, and when a gale blew the whole off to its rendezvous the enemy slipped out. The game has the squadron as a genuine set: its members in their order, its formation, its pace the slowest ship's, its commander's book read by his rules captain when no model is seated, and one minute's work for the whole set at far detail, so that a convoy of six costs the machine little more than one ship with a brain.
 
 ## The set, and your place in it
 
@@ -66,9 +66,9 @@ The intent `blockade <port>` keeps the port's blockade station (`data/ports/bres
 
 ## The three days at seed 7
 
-- `data/scenarios/convoy-six.yaml`: the convoy of six and the privateer. The Friendship a mile astern is signalled a straggler at 2760 and back in her station at 5280; the privateer works down to investigate, finds the King's brig within her doctrine's distance and evades at two miles; the six hold their stations within a cable (truths 7-152 and 7-153).
-- `data/scenarios/blockade.yaml`: the inshore squadron under a far commodore off the Black Rocks, your frigate on the Ushant station, the Hortense in ordinary in Brest; the low's gale blows the squadron off to Torbay at 11400, the station is restored at 37920 when the wind moderates, and the Hortense slips out at 43200 (truth 7-154).
-- `data/scenarios/squadron.yaml`: the Channel squadron in line ahead at two cables, kept within a cable at far detail; within the crewed distance of your frigate its three are promoted under the cap and keep the line by their books (truth 7-155).
+- `data/scenarios/convoy-six.yaml`: the convoy of six and the privateer. The Friendship a mile astern is signalled a straggler at 2760 and back in her station at 6420; the privateer works down to investigate, finds the King's brig within her doctrine's distance and evades at two miles; the six hold their stations within a cable.
+- `data/scenarios/blockade.yaml`: the inshore squadron under a far commodore off the Black Rocks, your frigate on the Ushant station, the Hortense in ordinary in Brest; the low's gale blows the squadron off to Torbay at 11400, the station is restored at 37920 when the wind moderates, and the Hortense slips out at 43200.
+- `data/scenarios/squadron.yaml`: the Channel squadron in line ahead at two cables, kept within a cable at far detail; within the crewed distance of your frigate its three are woken under the cap and keep the line by their books.
 
 ## The forms, in a table
 

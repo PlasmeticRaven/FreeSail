@@ -1,6 +1,6 @@
 # 23. Colours, the private signal, a hail, a signal made and read
 
-The voice between ships, in the player's words (package 71; spec M7 §1 to §6). Before a gun is fired a captain of 1805 knew whom he had to deal with by three means and no more: the colours she showed, the private signal of the month, and the hail within the trumpet's reach; and he worked his consorts and his convoy by the signal book. The game has each as a thing of the ship's state, seen by the lookout at the range the thing carries, and nothing is refused for being unwise: a shot under false colours is a pirate's act, and the log says so.
+The voice between ships, in the player's words. Before a gun is fired a captain of 1805 knew whom he had to deal with by three means and no more: the colours she showed, the private signal of the month, and the hail within the trumpet's reach; and he worked his consorts and his convoy by the signal book. The game has each as a thing of the ship's state, seen by the lookout at the range the thing carries, and nothing is refused for being unwise: a shot under false colours is a pirate's act, and the log says so.
 
 ## The colours
 
@@ -115,4 +115,4 @@ the lights
 | `hail her` / `hail the <sail>: <words>` / `say to the <sail>: <words>` | the trumpet within four cables |
 | `the colours`, `the signals`, `the private signal`, `the lights` | the readings |
 
-Every signal of every book is listed in `the signal book` of the library, with its number, its meaning and its source; the hoists the builder made in the period's form rather than read from the books are marked so in the files, under `data/signals/`.
+Every signal of every book is listed in `the signal book` of the library, with its number, its meaning and its source; the hoists made up in the period's form rather than read from a book are marked so in the files, under `data/signals/`.

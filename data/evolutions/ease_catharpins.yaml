@@ -1,9 +1,9 @@
-# Ease the catharpins on one lower mast (milestone 3b, spec 3b §3): the counter to
-# swiftering them in. The catharpin legs' seizings are cast off aloft, the swifter
-# eased on deck and unrove, and the lower shrouds stand out to their chains again, so
-# the mast is stayed athwartships as rigged and the lower yard braces no sharper than
-# the rigging allows (Steel 1794, vol. I, CATHARPINS; Lever 1808, fig. 182, read in
-# reverse; no period text describes the easing itself).
+# Ease the catharpins on one lower mast: the counter to swiftering them in. The catharpin
+# legs' seizings are cast off aloft, the swifter eased on deck and unrove, and the lower
+# shrouds stand out to their chains again, so the mast is stayed athwartships as rigged
+# and the lower yard braces no sharper than the rigging allows (Steel 1794, vol. I,
+# CATHARPINS; Lever 1808, fig. 182, read in reverse; no period text describes the easing
+# itself).
 #
 # The subject is the lower mast. The last step clears `swiftered_in`; the lower yard's
 # brace limit falls back to the ship file's, and a yard braced sharper than that comes
@@ -12,8 +12,8 @@
 # Parameter, from the order: `gain`, what the lower yard loses, in words, with the
 # semicolon that joins it ("; the main yard braces as rigged again").
 #
-# The steps' times are judgement: about twenty minutes a mast, as for swiftering in
-# (spec 3b §3); no period timing found.
+# The steps' times are judgement: about twenty minutes a mast, as for swiftering in; no
+# period timing found.
 id: ease_catharpins
 verb: ease_the_catharpins_on
 applies_to: {class: mast}

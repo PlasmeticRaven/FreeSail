@@ -1,5 +1,5 @@
-# Shake a reef out of a lug sail (package 43b): settle the halyard, cast off the points
-# and the earing, hoist away. Times judgement.
+# Shake a reef out of a lug sail: settle the halyard, cast off the points and the earing,
+# hoist away. Times judgement.
 id: shake_out_lug
 verb: shake_out
 applies_to: {class: lug}

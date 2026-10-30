@@ -1,6 +1,6 @@
 # 11. The starting book
 
-A captain's standing orders are his own. They say what the officer of the watch is to do without asking: take in the light sails at sunset, shorten sail when it blows, call him when the glass falls. The game keeps them in a **book** (chapter 7 shows the book at work), and comes with one ready written, the **starter book**, `data/standing_orders/starter.orders`. It is a choice and never a requirement: a game begins with an empty book unless its scenario names the starter (the gates' days and passages do) or you ask for it, and the console and the browser say so in their opening words. Load it whole at the prompt, or at the start:
+A captain's standing orders are his own. They say what the officer of the watch is to do without asking: take in the light sails at sunset, shorten sail when it blows, call him when the glass falls. The game keeps them in a **book** (chapter 7 shows the book at work), and comes with one ready written, the **starter book**, `data/standing_orders/starter.orders`. It is a choice and never a requirement: a game begins with an empty book unless its scenario names the starter (the shipped days and passages do) or you ask for it, and the console and the browser say so in their opening words. Load it whole at the prompt, or at the start:
 
 ```
 read the standing orders from data/standing_orders/starter.orders
@@ -8,7 +8,7 @@ python -m freesail.ui.console data/ships/frigate-36.yaml --standing-orders data/
 python -m freesail.ui.server data/ships/frigate-36.yaml --standing-orders data/standing_orders/starter.orders
 ```
 
-Or begin with none, and give the ones you want one at a time, or write your own. This chapter prints each of the starter's routines with the reason it exists, so that you can judge which suit your ship and your passage, and then the dialect whole, so that you can write the rest. A passage's own orders (the noon cast, the lead going in, lying off at the end) are not in the starter: they belong to the passage, and the gates keep theirs in their scenario's file (`data/scenarios/gate-5b-passage.orders` is a passage's book, worth reading for its reasons too).
+Or begin with none, and give the ones you want one at a time, or write your own. This chapter prints each of the starter's routines with the reason it exists, so that you can judge which suit your ship and your passage, and then the dialect whole, so that you can write the rest. A passage's own orders (the noon cast, the lead going in, lying off at the end) are not in the starter: they belong to the passage, and the shipped passages keep theirs in their scenario's file (`data/scenarios/naval-cruise.orders` is a passage's book, worth reading for its reasons too).
 
 ## The routines, and why each
 
@@ -18,7 +18,7 @@ Or begin with none, and give the ones you want one at a time, or write your own.
 standing order "night routine": at sunset then take in the studdingsails; take in the royals
 ```
 
-**The morning sail.** The reverse at daylight, if the breeze allows: under twenty knots every sail is carried without a strain line (the strain tables and truth 9); over it the royals stay in.
+**The morning sail.** The reverse at daylight, if the breeze allows: under twenty knots every sail is carried without a strain line (the strain tables); over it the royals stay in.
 
 ```orders frigate
 standing order "morning sail": at sunrise, if the true wind is under 20 knots then set the royals
@@ -36,14 +36,14 @@ standing order "shorten sail for weather": when the true wind exceeds 30 knots f
 standing order "keep her full": when the apparent wind is forward of 55 degrees then bear away one point
 ```
 
-**Getting under way: the course when she gathers way.** The book gives no course of its own, since where she is bound is the captain's word, but it says when a course is given after weighing: when she gathers way, and not when the anchor breaks out. In the lead's playtest of the second wave the Éclair's standing order `at the anchor aweigh then steer E` put her helm over the moment the anchor was aweigh, before the jib and the helm had cast her, and her head fell off to the south with the land a cable on the bow. Since package 58b the ship holds a course given after weighing (a helm order, a course shaped, a standing order's) while she casts and until she has a knot of way through the water with her sails drawing, says so at the aweigh ("E is held till she has gathered way"), and steers it then ("She has gathered way, 1.1 knots, her sails drawing: E is steered"). So either of these gives it at the right time; the second says the tack she casts on as well:
+**Getting under way: the course when she gathers way.** The book gives no course of its own, since where she is bound is the captain's word, but it says when a course is given after weighing: when she gathers way, and not when the anchor breaks out. A standing order `at the anchor aweigh then steer E` once put a lugger's helm over the moment the anchor was aweigh, before the jib and the helm had cast her, and her head fell off to the south with the land a cable on the bow. The ship now holds a course given after weighing (a helm order, a course shaped, a standing order's) while she casts and until she has a knot of way through the water with her sails drawing, says so at the aweigh ("E is held till she has gathered way"), and steers it then ("She has gathered way, 1.1 knots, her sails drawing: E is steered"). So either of these gives it at the right time; the second says the tack she casts on as well:
 
 ```orders lugger
 standing order "out": at the anchor aweigh then steer E
 standing order "out on the starboard tack": at the turn to the ebb then get under way on the starboard tack and steer E
 ```
 
-**Trimming on a shift.** The yards are trimmed to the wind as it shifts, a point at a time, as Luce's table of the yard's best angle is given point by point. It is measured afresh from each firing, so a wind veering steadily through a night has the yards trimmed to it point by point. Not while she is hove to: her yards are then set against each other on purpose, and in two playtests this rule braced a hove-to ship's backed yard round and filled her. The guard is the dialect's own, `and the manoeuvre in hand is not hove to`; with it the rule sleeps while she lies to and wakes when she has filled away. (`trim sails` given by hand to a ship hove to is refused in words; chapter 5.) Put the same guard on any trimming rule of your own.
+**Trimming on a shift.** The yards are trimmed to the wind as it shifts, a point at a time, as Luce's table of the yard's best angle is given point by point. It is measured afresh from each firing, so a wind veering steadily through a night has the yards trimmed to it point by point. Not while she is hove to: her yards are then set against each other on purpose, and without its guard this rule would brace a hove-to ship's backed yard round and fill her. The guard is the dialect's own, `and the manoeuvre in hand is not hove to`; with it the rule sleeps while she lies to and wakes when she has filled away. (`trim sails` given by hand to a ship hove to is refused in words; chapter 5.) Put the same guard on any trimming rule of your own.
 
 ```orders frigate
 standing order "trim on a shift": when the true wind veers 1 point or backs 1 point and the manoeuvre in hand is not hove to then trim sails
@@ -55,7 +55,7 @@ standing order "trim on a shift": when the true wind veers 1 point or backs 1 po
 standing order "tend the sheets": every glass, if the manoeuvre in hand is not hove to then trim the sheets
 ```
 
-**Shortening sail, and the head sails.** The book's thirty knots gives `shorten sail`, and since package 37p `shorten sail` does more than its list as the wind rises (chapter 9): a jib loaded near its rating comes in before a gust blows it out, the courses are reefed with the second reef and the mainsail and the spanker taken in with the third, and the storm staysails go up over forty knots or when the fore topmast staysail is loaded near its rating. In the captain's trials, before it did, the frigate's jib and fore topmast staysail blew out of their bolt-ropes and she lay aback for an hour with nothing set forward.
+**Shortening sail, and the head sails.** The book's thirty knots gives `shorten sail`, and `shorten sail` does more than its list as the wind rises (chapter 9): a jib loaded near its rating comes in before a gust blows it out, the courses are reefed with the second reef and the mainsail and the spanker taken in with the third, and the storm staysails go up over forty knots or when the fore topmast staysail is loaded near its rating.
 
 **Heavy weather, and the storm staysails.** Forty knots is a gale; five minutes tells a gale from a squall. The close reef leads, because the hands go to the first clause first and the topsails must be reefed before the weather comes; the topgallant masts come down next; and `set the storm staysails` bends them from the sail room, sets each as soon as it is bent, and takes in the head sails and the spanker it replaces once it is set, so that she is never left with nothing forward. Lying to is not the book's: whether she has the sea room to lie to is the captain's judgement (`lie a-try`, chapter 9).
 
@@ -63,7 +63,7 @@ standing order "tend the sheets": every glass, if the manoeuvre in hand is not h
 standing order "heavy weather": when the true wind exceeds 40 knots for 5 minutes then close reef the topsails; send down the topgallant masts; set the storm staysails
 ```
 
-**The well.** Sounding the well every glass is the pump routine of Luce's day, and the book kept it, held and silent, while the ship had no well. The well is a reading now, the carpenter's last sounding, and the order has left the starter book: there it would sound a dry well every glass in every log. The water in the well is a grounding's leak's and nothing else's yet, and moves nothing of her handling (the pumps are a later milestone's). A captain who has taken the ground enters it himself, and the carpenter says each glass whether she gains:
+**The well.** Sounding the well every glass is the pump routine of Luce's day, and the book kept it, held and silent, while the ship had no well. The well is a reading, the carpenter's last sounding, the pumps are the hands' and the water takes her stiffness before it takes her (chapter 25); the order has left the starter book, where it would sound a dry well every glass in every log. A captain who has taken the ground, or taken a shot below the waterline, enters it himself, and the carpenter says each glass whether she gains:
 
 ```orders frigate
 standing order "sound the well": every glass then sound the well
@@ -105,7 +105,7 @@ Two orders that lay hands on the same part within five minutes, while the first 
 
 ## The dialect's forms, in a table
 
-Every form of a trigger, a condition and the book's orders; the test (`tests/test_primer.py`) gives each in the table's first column to the frigate as a standing order, and fails if one is not taken.
+Every form of a trigger, a condition and the book's orders; the game's own tests give each in the table's first column to the frigate as a standing order, and fail if one is not taken.
 
 | Form | What it waits for, or does |
 |---|---|
@@ -125,10 +125,10 @@ Every form of a trigger, a condition and the book's orders; the test (`tests/tes
 | `every glass`, `every hour`, `every watch`, `every 10 minutes`, `every half an hour` | an interval |
 | `every glass, if the land is in sight`, `at sunrise, if the true wind is under 20 knots`, `at noon, if she is not hove to` | a condition tested at the firing |
 
-The orders after `then` are read whole when the standing order is given, every one of them by the reader that carries it out: a sail named ambiguously, a mark or a place the chart has not got, the marks of a fix that are none, an anchor she does not carry, a number that cannot be read, each refused then with the order named (package 37l).
+The orders after `then` are read whole when the standing order is given, every one of them by the reader that carries it out: a sail named ambiguously, a mark or a place the chart has not got, the marks of a fix that are none, an anchor she does not carry, a number that cannot be read, each refused then with the order named.
 
 The book's orders: `standing orders` lists the book, each order with who gave it and its state (standing, belayed, held, fired how often and when last); `show standing order "x"`; `belay standing order "x"` keeps it idle in the book; `resume standing order "x"`; `belay all standing orders`; `strike standing order "x"` (or `cancel`, `remove`) takes it out; and `read the standing orders from <file>` gives every order in a file of them.
 
 ## Sources
 
-The starter's reasons are its file's comments, with their sources in full (`data/standing_orders/starter.orders`): Luce 1866, ch. XXIV and XXXII; Luce 1884, ch. XXV, XXVII and XXIX; the strain truths and the tuning notes for the thresholds.
+The starter's reasons are its file's comments, with their sources in full (`data/standing_orders/starter.orders`): Luce 1866, ch. XXIV and XXXII; Luce 1884, ch. XXV, XXVII and XXIX; the strain tables for the thresholds.

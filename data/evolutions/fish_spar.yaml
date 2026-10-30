@@ -1,14 +1,14 @@
-# Fish a sprung spar (spec M7 §14; package 73; scripted, FishSparScript in
-# evolutions/repair_scripts.py). "FISH, a machine employed to hoist or draw up the flukes of
-# the ship's anchor ... Also a long piece of oak, convex on one side and concave on the
-# other, used to fasten upon the outside of the lower masts, as an additional security, to
-# strengthen them when they are sprung" (Falconer 1780, FISH); "a lower mast sprung may be
-# fished and woolded" (Luce 1884, ch. XXXI 'Lower Mast Carried Away or Sprung': the fishes
-# of capstan bars or spare spars, the wooldings hove taut). A sprung spar (its condition
-# under the mark) fished and woolded stands at a condition of seventy at most: it will not
-# bear a press of sail, and the strain model reads it so. The fishes are not counted (the
-# capstan bars and the makings of the booms). Phases: fishes (on deck: the fishes made and
-# got aloft), woold (aloft: the fishes clapped on and the wooldings hove taut).
+# Fish a sprung spar (scripted, FishSparScript in evolutions/repair_scripts.py). "FISH, a
+# machine employed to hoist or draw up the flukes of the ship's anchor ... Also a long
+# piece of oak, convex on one side and concave on the other, used to fasten upon the
+# outside of the lower masts, as an additional security, to strengthen them when they are
+# sprung" (Falconer 1780, FISH); "a lower mast sprung may be fished and woolded" (Luce
+# 1884, ch. XXXI 'Lower Mast Carried Away or Sprung': the fishes of capstan bars or spare
+# spars, the wooldings hove taut). A sprung spar (its condition under the mark) fished and
+# woolded stands at a condition of seventy at most: it will not bear a press of sail, and
+# the strain model reads it so. The fishes are not counted (the capstan bars and the
+# makings of the booms). Phases: fishes (on deck: the fishes made and got aloft), woold
+# (aloft: the fishes clapped on and the wooldings hove taut).
 id: fish_spar
 verb: fish
 applies_to: {class: spar}

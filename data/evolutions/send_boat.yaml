@@ -1,16 +1,15 @@
-# Send the boat (spec M5 §23; package 35; InwardAndOutward.md: "the boat alongside").
-# A passage by distance at a boat's pace with hands and time: the boat hoisted out, away
-# to the port's quay, her business ashore, back alongside and hoisted in; carrying a
-# person, a message or a purchase, and bringing back the purser's list of the prices,
-# the letters that wait at the port, and the goods bought. What she brings reaches the
-# captain where he is through the messenger and the door (freesail/world/people.py,
-# truth 68). Luce 1866, 'Boats' (the boats a ship carries, lowering and hoisting, the
-# launch bringing off the water in gang casks); Falconer 1780, BOAT and LONG-BOAT; the
-# Regulations of 1806 for the purser's purchases ashore (p. 106 of the 1808 printing,
-# by survey and voucher). The boat and her crew are the ship file's (`boats:`, from
-# tools/gen_ships.py); the hands below are the launch's crew of a frigate, which the
-# smaller vessels' boats take as well (judgement: the file's crew figure is the words,
-# the request the hands).
+# Send the boat (InwardAndOutward.md: "the boat alongside"). A passage by distance at a
+# boat's pace with hands and time: the boat hoisted out, away to the port's quay, her
+# business ashore, back alongside and hoisted in; carrying a person, a message or a
+# purchase, and bringing back the purser's list of the prices, the letters that wait at
+# the port, and the goods bought. What she brings reaches the captain where he is through
+# the messenger and the door. Luce 1866, 'Boats' (the boats a ship carries, lowering and
+# hoisting, the launch bringing off the water in gang casks); Falconer 1780, BOAT and
+# LONG-BOAT; the Regulations of 1806 for the purser's purchases ashore (p. 106 of the 1808
+# printing, by survey and voucher). The boat and her crew are the ship file's (`boats:`,
+# from tools/gen_ships.py); the hands below are the launch's crew of a frigate, which the
+# smaller vessels' boats take as well (judgement: the file's crew figure is the words, the
+# request the hands).
 #
 # The script (freesail/evolutions/scripts.py, SendBoatScript) holds the boat and not
 # the ship, so that the cable is veered and the sheets tended while she is away:

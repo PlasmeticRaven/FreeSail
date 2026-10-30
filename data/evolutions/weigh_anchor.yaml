@@ -1,21 +1,22 @@
-# Weigh anchor (spec M5 §18; package 34): the cable hove in at the capstan from
-# wherever it stands to up and down, the anchor broken out of the ground ("the officer
-# of the forecastle reports when the cable is 'up and down', and also, when the anchor is
-# 'aweigh!'", Luce 1866 ch. XXI), hove up to the bows ("heave the anchor up to the bows;
-# and as soon as it is high enough, Avast heaving! Pawl the capstan! stopper the cable;
-# cat and fish the anchor", the same), then catted and fished: "The Hook of the Cat Block
-# is put through the Ring of the Anchor: the Cat Fall ... being swayed upon, the Anchor
-# is thus brought up to the Cat-head. This is called Catting the Anchor ... The Fish Hook
-# is taken to the inner Arm of the Anchor ... and the Shank Painter ... belayed to Timber
-# Heads" (Lever 1808, 'Catting and Fishing the Anchors', p. 68). The time is by the
-# scope: the cable comes in at the capstan's rate, the anchor comes up at the depth's;
-# a frigate riding to sixty fathoms in twelve is a quarter of an hour at it (the
-# package's measure, docs/dev/TuningNotes.md). Once the anchor is aweigh she is adrift:
-# the sails are the captain's to set, as Luce has them made before the anchor is tripped.
+# Weigh anchor: the cable hove in at the capstan from wherever it stands to up and down,
+# the anchor broken out of the ground ("the officer of the forecastle reports when the
+# cable is 'up and down', and also, when the anchor is 'aweigh!'", Luce 1866 ch. XXI),
+# hove up to the bows ("heave the anchor up to the bows; and as soon as it is high enough,
+# Avast heaving! Pawl the capstan! stopper the cable; cat and fish the anchor", the same),
+# then catted and fished: "The Hook of the Cat Block is put through the Ring of the
+# Anchor: the Cat Fall ... being swayed upon, the Anchor is thus brought up to the
+# Cat-head. This is called Catting the Anchor ... The Fish Hook is taken to the inner Arm
+# of the Anchor ... and the Shank Painter ... belayed to Timber Heads" (Lever 1808,
+# 'Catting and Fishing the Anchors', p. 68). The time is by the scope: the cable comes in
+# at the capstan's rate, the anchor comes up at the depth's; a frigate riding to sixty
+# fathoms in twelve is a quarter of an hour at it. Once the anchor is aweigh she is
+# adrift: the sails are the captain's to set, as Luce has them made before the anchor is
+# tripped.
 #
 # "aweigh" is Falconer's word (1780, AWEIGH: "the state of the anchor when it is drawn out
 # of the ground in a perpendicular direction"; ATRIP the same); the log says it.
-#
+
+# Build notes (not served by the library's catalogue):
 # Package 37f (the review of gate 5c's playtests, 5.8 and 10.4): the anchor named is the
 # anchor weighed (parameter `anchor`; the one she rides by when none is named). In game
 # 9, moored, `weigh the small bower` weighed the best bower. With another anchor down its

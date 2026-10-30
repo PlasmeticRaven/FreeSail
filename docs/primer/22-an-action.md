@@ -1,6 +1,6 @@
 # 22. An action
 
-From clearing for action to the colours struck, in the player's words (package 70; spec M7 §7 to §12). What the game can fairly do with a fight between two ships in 1805, and no more: the guns as parts of the ship with their crews from the muster, served by a cycle that runs while hands and powder last; the shot's fall by the range, the heel and the sea; a hit as a change of the state the ship already has (a line parted, a spar carried away, a sail holed, a gun dismounted, a shot hole, a man hurt); the company's temper, and the colours that come down when it fails. The marines' fire, the fight on deck, the water from the holes and the surgeon are later chapters' (the milestone's next packages); the prize is another's.
+From clearing for action to the colours struck, in the player's words. What the game can fairly do with a fight between two ships in 1805, and no more: the guns as parts of the ship with their crews from the muster, served by a cycle that runs while hands and powder last; the shot's fall by the range, the heel and the sea; a hit as a change of the state the ship already has (a line parted, a spar carried away, a sail holed, a gun dismounted, a shot hole, a man hurt); the company's temper, and the colours that come down when it fails. The marines' fire, the fight on deck, the water from the holes and the surgeon are chapter 25's; the prize is not yet in the game.
 
 ## The guns
 
@@ -70,7 +70,7 @@ Each shot is laid for the range by its gun captain, the quoin answering only so 
 
 ## The damage
 
-No second model of the ship exists for the fight. A hit is a change of state the game already has: a line shot away comes down as a parted line does, a spar shot away is cleared as a wreck is, a sail holed draws the less, a gun dismounted is out of the bill, the wheel shot away loses you the helm until the relieving tackles are rove, a shot hole is written with its place against the waterline for the well to read when the water comes (the next package's), and the men at the part struck are killed and wounded in the muster, off the bill. The carpenter's and the boatswain's report:
+No second model of the ship exists for the fight. A hit is a change of state the game already has: a line shot away comes down as a parted line does, a spar shot away is cleared as a wreck is, a sail holed draws the less, a gun dismounted is out of the bill, the wheel shot away loses you the helm until the relieving tackles are rove, a shot hole is written with its place against the waterline for the well to read when the water comes (chapter 25), and the men at the part struck are killed and wounded in the muster, off the bill. The carpenter's and the boatswain's report:
 
 ```
 the damage
@@ -104,7 +104,7 @@ Morale is the one new quantity: the company's readiness to fight on, from the ca
 ! Forenoon watch (11:12)  The colours are struck: five of 30 hurt, against a broadside of 36 pounds to our 13; the hands will not stand to the guns. The guns fall silent and she lies to for her captor.
 ```
 
-What follows the colours down (the prize crew, the prisoners, the captive's channel) is a later package's; this one ends at the colours struck and the firing ceased.
+What follows the colours down (the prize crew, the prisoners, the captive's channel) is not yet in the game; this chapter ends at the colours struck and the firing ceased.
 
 ## The first action
 
@@ -160,4 +160,4 @@ The gunner fills no more cartridges until he is ordered; the magazine shut.
 
 ## Where to read more
 
-Douglas, *A Treatise on Naval Gunnery* (1820), for the exercise of the guns and the effect of shot; Lavery, *The Arming and Fitting of English Ships of War*, for the guns and their carriages; the Establishments and Winfield for what each class carried; Falconer for the words; the spec's M7 §7 to §12 for what is built and what is judgement, and `docs/dev/TuningNotes.md` (package 70) for every figure with its source and its measure.
+Douglas, *A Treatise on Naval Gunnery* (1820), for the exercise of the guns and the effect of shot; Lavery, *The Arming and Fitting of English Ships of War*, for the guns and their carriages; the Establishments and Winfield for what each class carried; Falconer for the words; every figure is in the files with its source or marked judgement.

@@ -1,39 +1,37 @@
-# Come to an anchor (spec M5 §18; package 34; decision 30: "full Luce/reference based
-# anchor handling"). The evolution as Luce 1866 ch. XXXIV, p. 569, 'Having a leading
-# wind, to run in and anchor', gives it: "Call all hands, bring ship to anchor! ... Haul
-# taut! In studding-sails and royals! ... In top-gallant sails, up foresail! ... Man the
-# topsail clew-jiggers and buntlines; jib downhaul! spanker outhaul! ... When near the
-# anchorage, put the helm to starboard or port, as the case may be, having allowed for
-# head-reach in bringing her to the wind. Then give the order, Haul taut! Let go the
-# topsail sheets! Clew up! Haul down the jib! Haul out the spanker! ... She comes to the
-# wind by the effect of the helm and spanker, and as soon as she loses entirely her
-# headway, give the orders, Stand clear of the cable! Stream the buoy! Let go the
-# starboard (or port) anchor! ... and as soon as she swings to the anchor, Brail up the
-# spanker! Direct the navigator to give the ship the requisite number of fathoms ...
-# furl sails, square yards, haul taut rigging, and pipe down." In a tideway "always come
-# to, however, with the head of the ship to that which is the stronger, either the wind
-# or the tide" (p. 573), and "Much benefit may result from letting go the anchor stemming
-# the tide, especially with a rapid tide, for it gives an opportunity to observe at what
-# rate the ship drives astern" (Steel 1794 vol. II, p. 296). The scope "the depth of water
-# wants": five times the depth (Luce 1866 ch. XXXIV, p. 568, against the old rule of
-# three), as far as the cable bent to the anchor allows.
+# Come to an anchor. The evolution as Luce 1866 ch. XXXIV, p. 569, 'Having a leading wind,
+# to run in and anchor', gives it: "Call all hands, bring ship to anchor! ... Haul taut!
+# In studding-sails and royals! ... In top-gallant sails, up foresail! ... Man the topsail
+# clew-jiggers and buntlines; jib downhaul! spanker outhaul! ... When near the anchorage,
+# put the helm to starboard or port, as the case may be, having allowed for head-reach in
+# bringing her to the wind. Then give the order, Haul taut! Let go the topsail sheets!
+# Clew up! Haul down the jib! Haul out the spanker! ... She comes to the wind by the
+# effect of the helm and spanker, and as soon as she loses entirely her headway, give the
+# orders, Stand clear of the cable! Stream the buoy! Let go the starboard (or port)
+# anchor! ... and as soon as she swings to the anchor, Brail up the spanker! Direct the
+# navigator to give the ship the requisite number of fathoms ... furl sails, square yards,
+# haul taut rigging, and pipe down." In a tideway "always come to, however, with the head
+# of the ship to that which is the stronger, either the wind or the tide" (p. 573), and
+# "Much benefit may result from letting go the anchor stemming the tide, especially with a
+# rapid tide, for it gives an opportunity to observe at what rate the ship drives astern"
+# (Steel 1794 vol. II, p. 296). The scope "the depth of water wants": five times the depth
+# (Luce 1866 ch. XXXIV, p. 568, against the old rule of three), as far as the cable bent
+# to the anchor allows.
 #
 # The script (freesail/evolutions/scripts.py, ComeToAnchorScript) does it in phases:
-#   shorten_sail   the studding sails, royals, topgallants and courses clewed up (the M2
-#                  simplification heave_to uses: the sails' states set, the hands' time
-#                  the phase's)
+#   shorten_sail   the studding sails, royals, topgallants and courses clewed up
 #   round_to       the helm put down for the wind or the stream, whichever is the
 #                  stronger; the topsails clewed up and the jib hauled down as the sails
 #                  shake; the spanker kept to bring her to
-#   let_go         when her headway is gone (or the timeout), the anchor let go where
-#                  the hawse is, the depth the lead's
+#   let_go         when her headway is gone (or the timeout), the anchor let go where the
+#                  hawse is, the depth the lead's
 #   veer           the cable veered roundly to the scope the depth wants
-#   brought_up     the cable taut and her way over the ground stopped: the spanker
-#                  brailed up, the sails furled and the yards squared over furl_s;
-#                  "riding to the flood, the wind across the tide" in the log
-# Parameter `anchor`: which (the best bower unless said). The physics does the riding:
-# the cable's pull at the hawse, the stream and the windage (physics/anchor.py).
-#
+#   brought_up     the cable taut and her way over the ground stopped: the spanker brailed
+#                  up, the sails furled and the yards squared over furl_s; "riding to the
+#                  flood, the wind across the tide" in the log
+# Parameter `anchor`: which (the best bower unless said). The physics does the riding: the
+# cable's pull at the hawse, the stream and the windage (physics/anchor.py).
+
+# Build notes (not served by the library's catalogue):
 # Package 37f (the review of gate 5c's playtests, 5.8): "come to an anchor in twelve
 # fathoms" is the depth to let go in, as the primer always had it (parameter
 # `depth_fathoms`): with her sail shortened she stands on until the lead calls it
