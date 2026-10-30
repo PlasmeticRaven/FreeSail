@@ -13659,3 +13659,47 @@ with `--slow -n 4` (7-285 to 7-294, the block's, among them, 7-294 Gibraltar to 
 whole), 20 passed. **The scenario** `mahon.yaml`, 98 hours, on the head's tree and this one
 (`balearics` not yet rebuilt; sailed again after it, below): **the same log byte for
 byte**, 3,190 lines, digest `8bcb18bb603cb7c6`.
+
+### The region `balearics`
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. `python tools/build_charts.py --region balearics
+--reuse-world`: the checks as printed (87 of 87 features, ids unique, no override, the
+fetch box covering the tiles, "14 kept"); "GEBCO's fill raised to the chart's datum by the
+world's mean level, 0.16 to 6.83 m" (within the bounds 0.16 to 0.24 m, the block's five
+gauges; the 6.83 south of 35 N and east of 4.5 E, outside every block, the eleven's nearest
+alone, Saint-Malo's, as before). **The shore's sweep 31,176 cells in 360 places** (by the
+control 3,243 in 228): the Albufera of Valencia again (in `mediterranean-west`'s kept
+column, computed with the block and not written), the Sebkha of Oran, and S'Albufera of
+Majorca at Alcúdia (1,129 about 39.78 N, 3.08 E): water, as they are.
+
+**The harbours the grid lacks are water again.** EMODnet has no sounding inside Port Mahon,
+Palma's port or Ivica's harbour, and GEBCO fills them three metres or so below mean sea
+level; raised by Saint-Malo's 6.83 m they stood as land three metres above the datum.
+Level 3's cells from above the datum to below, by harbour: Palma 17,583, Ivica 16,004 (the
+harbour, 38.91 N 1.44 E, and the salt pans south of the town, 38.86 N 1.36 E), Algiers
+6,915, **Port Mahon 6,126** (the inner harbour, 39.87 to 39.89 N, 4.27 to 4.31 E, its
+median +3.3 m before and -3.3 m now).
+
+| | Old (79c, 6.83 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 154 tiles, 28.81 MB | 154 tiles, 28.59 MB |
+| level 3 | 24 tiles, 1.72 MB | 24 tiles, 1.73 MB |
+| coast | 1,126 pieces, 10,369 points, 332,416 bytes | 1,146 pieces, 10,191 points, 331,430 bytes |
+| tiles changed | | 127 of level 2, 23 of level 3 |
+| cells changed | | 11,496,326 at level 2, 3,262,225 at level 3, the largest 6.70 m |
+| above the datum to below | | 14,399 at level 2, 46,628 at level 3 |
+| below the datum to above | | none |
+
+`git status` after the build: the region's tiles, its coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-280 to 7-299
+with `--slow -n 4`, 20 passed (7-288, the frigate at anchor in the mouth of Port Mahon in a
+northerly, 7-292, Palma's and Mahon's lights, and 7-294, Gibraltar to Port Mahon whole,
+among them). **The scenario** `mahon.yaml`, 98 hours, on the head's tree and on this one
+with both its regions rebuilt: 3,190 lines both; **one line moved**, the lookout's "The land
+about Georgetown, or the Arrabal of St George on the larboard bow, bearing NW, distant three
+miles" at tick 277,500 for 277,440 (a minute later, off the mouth of the harbour, the
+harbour's fill now water and the land so much farther); every other line the same, her
+anchoring at the mouth among them; the digest `6320afb76b044a01` for `8bcb18bb603cb7c6`.
+Not a gate's, not pinned.
