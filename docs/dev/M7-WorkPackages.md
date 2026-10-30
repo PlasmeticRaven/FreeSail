@@ -1338,8 +1338,9 @@ mast, `Sail.curve_class` for a lateen cut at the mast, the slings' words) and no
 no consent file touched, no model identifier in any file; 85's in-world test green on her
 served heads and the tools' words the first time they met it; the grammar book, the primer,
 the particulars and the profile tests green after the mend below; **the whole fast tier on
-the merged tree here and the whole suite in the cloud dispatched at the push (run 22; its
-figures written here when it is in).**
+the merged tree here (whole but the pictures' flake under four workers, the MCP bridge's
+images, passing alone as at 93's merge) and the whole suite in the cloud dispatched at the
+push (run 22; its figures written here when it is in).**
 
 **What was built** (`docs/playtests/2026-10-30-pilot-indefatigable/testing-report.md`, the
 tuning notes "Package 75", `docs/design/Design-Ship-Indefatigable.md` and the research,
