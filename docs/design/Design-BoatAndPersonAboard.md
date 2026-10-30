@@ -694,6 +694,18 @@ the step's final run; never the whole slow tier.
    apart in the save as a hull's log under her name: the fold is simpler and the save has
    no block for a hull gone from the sea; the design folds.
 
+**The lead's rulings on the three (2026-10-30, the note read whole and approved as written):**
+(1) the physics' figure stands: 7b-113's frigate clause reads "her head brought round in a
+calm by her launch, and her way under a knot and falling as the men tire", Luce 1866 pp. 339
+and 466 cited in the truth's words, the brief's "little or nothing" recorded as the lead's
+judgement given way to the measurement; `F_0` stays 50 N, and the table of a smaller one's
+cost goes in the postscript for the owner, who may ask for the lesser later. (2) `go to the
+boat` moves the drivers' centre with the player, her readings his while he is in her;
+`follow` stays the owner's hand for the rest. (3) The fold: the boat's log into the ship's at
+the hoist-in as `boat.log` lines, the boat's name at the head of each. And one ask on §2: the
+visitor's reach is to be said in the refusal's words and in the Harness's section, so that a
+model aboard another ship knows what it has and has not.
+
 ## As built (the postscripts, step by step)
 
 ### Step 1: the person's movement between hulls (§2; 2026-10-30)
