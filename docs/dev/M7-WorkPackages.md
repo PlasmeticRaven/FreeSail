@@ -3172,3 +3172,48 @@ strikes; Winfield's lists are now on the owner's shelf as a source, with plans s
 through most sections, to be cited by page as James and Steel are. Nothing of this is
 booked yet; the session may name candidates with their sources in its plan when 90's
 design is written, for the owner's choosing.
+
+**2026-10-30, Ext §17.11 approved, the four points ruled, and the in-world rule coming**
+(the session's message on `6fcc35a`; B3.1 with B5.2, B3.2 with B5.3 and B3.5 with B5.5 on
+the branch, each with the fast tier, the guard sets and the seed-7 trace identical; B1's
+stage B running). **§17.11 is approved as written:** the driver's boom out with the shift on
+the engine's own `Spar.rigged_out`, keyed on a `boom` that a lateen cut at the mast names
+and refused on any other, so that nothing moves on the eight or the razee; the phases as
+tabled (120 s each way, the judgement said); nothing in `physics/` or `combat/`, the stowed
+boom's windage and its hit said plainly as the small untruth it is; truth 7-230's band
+13-16 to 15-19 minutes old beside new, the toggle (the key absent against present on the
+fixture) the proof; B5.5's "boom amidships" cases moved old beside new; §17.10's items 6
+(for the driver), 9 and 10 closed by it; the order as proposed (B1's stage B, the stage-0
+commit, one step by the engine's workflow with B3 and B5 together, her regeneration, then
+the owner's testing report). **The four points:** (1) the library's evolution count
+(`tests/test_agents.py`) 98 to 104 for the lateen's six is confirmed, a pin of structure
+moved old beside new in its own commit as 86 moved it, and 108 at the settee the same way;
+(2) `physics/strain.py:631`'s membership (`spar.is_yard or spar.cls == "lateen_yard"`) is
+the log's words and no equation, so it is allowed under the gate, one line in its own
+commit, said in the notes, with a case in the strain's tests on the fixture where the
+carrying-away's words have one: a lateen yard is slung, and "in the slings" is its; (3) as
+built: the sprit yards stay in "spritsails" and "all sail" and out of "yards" and "head
+yards" in the 64's and the 74's files, the spritsail yard being the forecastle's and not the
+braces', and "square the yards" leaving it the period's; whether the harbour stow squares it
+is a later question with the harbour stow; (4) the draught rules: the 64's bowsprit root on
+the stem head as 1407F draws it, at the measured 27°, the end down 1.2 m, old beside new in
+B1's report. **SW-2:** the three Greenwich draughts of Build-Ships §5.9 (ZAZ2587 and ZAZ2559
+the *Amazon* class, ZAZ4491 and ZAZ4492 the *Diligence* class, ZAZ6381 and its fellows the
+*Sherbourne*), marked "to read" until measured, change its sources and not its order,
+accepted. B1 is taken whole at her testing report, as agreed. **Coming toward the branch, to
+build for now rather than mend at the merge:** package 85 (the orders, the primer and the
+library for a model reader) merges onto the trunk in the next hours with a rule and a test:
+the primer and the library's served topics (the catalogue's served head of every
+`data/evolutions/*.yaml`, the grammar, the briefs, the tools' words) are in-world documents
+and carry no reference to a milestone, a package, a spec's section, a truth's or a
+decision's number, a ruling, a gate, a builder, a playtest, the lead or the owner's rulings,
+or a model's or a vendor's name; `tests/test_in_world.py` scans them all and fails naming
+the line. 85 moved every evolution file's build notes below a blank line under a head
+`# Build notes (not served by the library's catalogue)`, where the catalogue's reader stops,
+the served head keeping the evolution, its steps, its sources in the period's books and what
+is judgement. The session's new evolution files (the lateen's six and any after) and the
+primer's chapter on the ships want the same form before the merge, so that the trunk's test
+passes at it: the served head in the period's words with its sources, the package's and the
+Ext's references below the build-notes head. The trunk's head is `1e3523b` (package 94
+merged: the chart's islets, the tide's seam taper and the Solent's region; nothing of the
+ships' files); 85's merge will be noted here when it lands.
