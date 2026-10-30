@@ -78,7 +78,7 @@ A standing order is one sentence:
 standing order "<name>" [by the <officer>]: <trigger> [, if <condition>] then <order> [; <order> ...]
 ```
 
-The **name** is in quotes, and the book finds it again by it, without regard to capitals and by any part of it that names one order and no other: `belay standing order "trim by the wind"` belays "Trim Sails by the Wind". The book's own orders may drop the words *standing order* when the name is in quotes: `belay "blind lead"`, `resume "trim by the wind"`, `show "night routine"`.
+The **name** is in quotes (an apostrophe inside it is the name's: `"the bay's mouth"`), and the book finds it again by it, without regard to capitals and by any part of it that names one order and no other: `belay standing order "trim by the wind"` belays "Trim Sails by the Wind". The book's own orders may drop the words *standing order* when the name is in quotes: `belay "blind lead"`, `resume "trim by the wind"`, `show "night routine"`.
 
 The **trigger** is when it fires. `when <condition>` fires as the condition comes to hold, and not again until it has been false for five minutes and the work it began has ended; `for 2 minutes` after it means the condition must hold that long first. `at <event>` fires at each event. `every <interval>` fires on the interval, a glass, an hour, a watch or so many minutes.
 

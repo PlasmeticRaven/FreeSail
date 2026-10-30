@@ -350,7 +350,7 @@ fill away
 gybe
 ```
 
-The later word for wearing a fore-and-aft vessel is *gybe*, and the parser takes it as a synonym of `wear ship` with a note in the log ("Gybe, that is, wear ship (the period word); the boom will come over as the wind crosses her stern"). Luce 1884 says *wear*; so should you.
+The later word for wearing a fore-and-aft vessel is *gybe*, and the parser takes it as a synonym of `wear ship` whole (`gybe the mainsail` is answered that the gybe names no sail: the boom comes over of itself, and a boom sail's sheet is handled by `ease the main sheet`) with a note in the log ("Gybe, that is, wear ship (the period word); the boom will come over as the wind crosses her stern"). Luce 1884 says *wear*; so should you.
 
 ```
   Morning watch (04:20)  Order: wear ship.

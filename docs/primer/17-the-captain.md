@@ -64,7 +64,7 @@ Beside that, you and a model are at parity for the roles on ships: **you may tak
 | `stand down the captain` | | the owner's: the station stood down, with a save, the rules holding her; to be taken again |
 | `resume the captain` | | the owner's answer to a pause; the deck is his again |
 | `show the standing orders` | `the standing orders`, `list the standing orders` | the book of standing orders, a state's rules marked with the book's name beside your own |
-| `intent: trade tin from Falmouth to Brest` | in the scenario file | the rules-based captain's intent; `captain: <intent>` is a world order, the scenario's and the director's |
+| `intent: trade tin from Falmouth to Brest` | in the scenario file | the rules-based captain's intent; `captain: <intent>` is a world order, the scenario's and the director's. `captain: carry on` alone is yours at the prompt: your hand on an order of the ship's (the helm, a sail, a course) makes the rules-based captain stand aside and strikes his book, said once in the log, and `captain: carry on` gives her back to him, his plan worked afresh |
 | `intent: run home to Brest` | in a `ships:` entry, or after a `ship:` world order's goal | a captain of her own on a far-detail ship; `ship "X": intent <words>` gives or changes one |
 | `--station captain` | at every door | a model at the captain's station (`docs/agents/Harness.md`, section 14) |
 | `--station captain --ship Palinure` | at the MCP bridge, the local runner and the API door | a model as the captain of another ship, kept across the far-detail switch (chapter 19; `docs/agents/Harness.md`, section 17) |

@@ -13356,3 +13356,168 @@ them: 35 passed. **The fast tier**, once (379 slow tests left out, 25 minutes): 
 the pictures' known flake ("the chart is blank (std 8.0)" under the tier's load), which
 passes alone on this tree; the pilot off Aix passes. The whole slow tier not run (the
 lead's in the cloud at the merge).
+
+## Package 85: the orders, the primer and the library for a model reader (2026-10-30)
+
+A review that mends what it finds, by the owner's word of 2026-10-27 (the notes 3 to 6 of
+the playtests of 70 to 72, the model officer's five friction points, the dispatches test's
+and the Roscoff station's findings, the owner's reading of the door logs). Each item of the
+brief its own commit on `claude/pkg-85`; the lead's branch merged at every boundary, never
+rebased. Nothing of the physics, the pins or the recorded passages' digests moved; nothing
+under `docs/agents/consent/` or the consent brief touched.
+
+### Item 1: the rule, stated once and enforced
+
+- **The rule** is `docs/dev/PrimerRedactions.md`'s head, enforced by `tests/test_in_world.py`
+  over every primer file, every brief constant, the tools' words, the library's topics
+  rendered on a King's ship and on a hired cutter, every station's brief head and the
+  starter briefs, by the forbidden words and patterns (milestones, packages, gates,
+  builders, playtests, the lead's and the owner's development senses, specs, truth and
+  decision numbers, rulings, the build's folders and dates, vendor and model names), with
+  an allow-list and its reasons (the owner at the door, the sounding lead, seed 7, the two
+  shipped scenario files' names).
+- **Cut and recorded**, by chapter, in the record: every such reference in the twenty-five
+  chapters and the README; the evolution files' build notes moved below a blank line under
+  `# Build notes` where the catalogue's reader stops (156 cuts); the captain's brief, the
+  world-order forms' notes, the world page, two tools' words and two people files freed of
+  package references. Stale lines mended against the code on the way (chapters 1, 2, 5, 8,
+  11, 12, 13, 14 Roscoff and the colours shown, 15, 17, 19, 20, 24 the Friendship at 6420).
+- **A pin moved**: chapter 3's measured size, 11,370 to 11,280 tokens (`tests/test_agents.py`,
+  two places), the cut notes' worth.
+- **Noted, not touched**: `docs/agents/ConsentBrief.md`'s preamble provenance (package 55);
+  the playtest folders' names; `BUILD_NAME = "m6c"` in `core/world.py`, which the save's
+  line names and the primer calls "the game's own".
+
+### Item 2: categorised, complete, correct
+
+- **The grammar topic is six parts**, every one generated from the game's own tables and
+  guarded by `tests/test_grammar_book.py`: the order language (the readings' asking forms
+  taken out of it, the free lines, a paragraph on the person's own), **the readings**
+  (every registry row by its words with what it answers; eight rows given descriptions,
+  three descriptions freed of package numbers), the standing dialect, **the voice** (say,
+  say to, tell, ask, the lookout's hail, the hail of a sail, the answer, the captain's
+  station sentences), **the stand-by** (every event, interval and tripwire) and the world
+  orders. The contents line and the library's pin follow (4 parts to 6).
+- **The `query` kind.** Nineteen readings that are questions in words (the people, the
+  pilot, the port, the prices, who commands, the stations...) were registered under kind
+  `ground`, and the grammar page described each as "the ground the lead brings up":
+  `KINDS["query"]`, read and never compared, the standing grammar refusing a condition on
+  one in words that say to ask it (`'the pilot' is read, not compared in a standing order`).
+- **The hail's colon is optional** (`orders/signals.py`, `hail_parts`): `hail the brig what
+  ship is that?`, `say to the Nancy heave to, I am sending a boat`, `hail her what ship is
+  that`; the sail told from the words by her rig, her name or 'her' (the shortest head of
+  the line that names a sail in sight); the lookout's `hail sail ho`, `hail the deck ...`
+  and a capitalised `hail Sail ho` stay his; `say to the watcher ...` a word to a station.
+- **The person's own** (`agent.YOUR_PERSON_WORDS`), appended by `Brief.build` to every
+  station brief with authority but the director's, true at every station by the judge
+  (the reach verbs, the deck's conversation, the needs, the free lines; measured at the
+  officer's, the master's, the lookout's and the passenger's seats): moving about the
+  ship, going ashore and coming aboard, eating, drinking and sleeping, reading, handling
+  things, saying, saying to, hailing a sail; `submit_order` says the same. The officer's
+  handover budget in its test rose five hundred for it (20,500 to 21,000, the test's own
+  pattern since 53).
+- **The primer measured against the vocabulary** (every verb or a synonym, every reading by
+  one of its words, every event, every tripwire, every world order's channel): the 23
+  verbs it never named added to their chapters' tables (calling the watch, the pilot
+  taking her out, the wardroom stations' stand-down, resume and journal sentences, the
+  pumps secured, the hatches opened, the marines' and the small arms' orders), the water
+  in the ship by its words, and chapter 11 given **the events whole** by family (184), a
+  table `test_primer` keeps equal to `R.EVENTS`. Every chapter with a forms table runs
+  through the ship (12, 13, 17, 19, 20, 23 and 24 beside 10, 11, 14, 15 and 16), the doors'
+  flags, placeholders and the director's forms left out by a stated rule and the world
+  orders' forms parsed to their channels.
+- **Chapter 7 re-recorded** from the game as it stands (the frigate's watch now takes the
+  work in turn; the schooner's `tack ship` succeeds by hanging in stays, so "a known
+  fault" was stale): both passages run again at seed 7 with the chapter's own orders, the
+  logs quoted with the routine filler cut by a rule the chapter states, the prose's figures
+  rewritten; the save's digest the run's own (`989736f3e847a6fc`). Chapter 8 gains the map
+  of the library's topics and where each thing is for a reader at a station.
+- **Open, for the lead**: the console's `state` prints seven lines now (the followed hull,
+  the wind, the sun, the watch on deck), and the hands' rationing lines ("Only four hands
+  to the jib; the rest are...") are many at 1x; the primer quotes them with a cut rule, and
+  a reader typing along sees the whole.
+
+### Item 3: the date, and the war, as readings
+
+- **`the date`** (`what day is it`, `today`, `the day`): "Wednesday 12 June 1805", the day
+  of the week with it, changing once a day so that it rides no sample between; the ship's
+  time stays `the time`. **Every station's line and the director's close with it**
+  (`readings.station_line`, `director_line`), so the date is in every sample's first line
+  and never deduced from the log's stamps; the three tests that pin the line's words
+  moved to the line with the date (`test_director`, `test_known_truths` twice).
+- **`the war`** (`the war's state`, `who is at war`, `the news of the war`) is what the
+  ship knows and never the world's table as it stands: the nations' table she sailed with
+  (`Nations.sailed_with`, the file's wars when the world was made) and every change the
+  news brought her since, each entered in her papers as a price is. The paper **`the news
+  of the war`** (`data/papers/papers.yaml`, kept by the captain in the cabin;
+  `Papers.news_heard(how)` compares the world's table with the one she knows and writes
+  up each war declared or peace made with where and when it came, the log saying the
+  paper was written up as the price list's line does) is written at the pilot's news
+  (`world/dealings.py`). Nothing in play moves the wars yet (no world order declares one):
+  the mechanism is proved by the table moved by hand in the tests. Truths 7-240 and 7-241.
+  The library's papers count twelve.
+
+### Item 4: the stand-by's words, the action's severities, the signal book's whose
+
+- **The calls before a stand-by are answered with their results.** The harness keeps the
+  results of the calls that ran before the reply's stand-by on the model's turn
+  (`Reply.ran`, carried in the transcript); the API door and the local runner answer those
+  calls with what they returned, the stand-by with its words, and only the calls after it
+  with "Not run: a stand-by earlier in the reply ended your turn" (every call of the reply
+  got that before; the sample that ends the stand-by named what ran, and still does).
+- **The action's severities**, with the owner's "the flow of the game through the log" as
+  the measure: the firer's minute line (`action.fired`) is notable when a shot struck her or
+  the fire opened on her, routine when the minute's shot all fell short, over, wide or into
+  the sea; a shot that struck us stays notable, urgent when it killed or carried away a
+  spar or the helm; **at quarters the trimmers' bracing yard by yard** (`yard.braced`) is
+  routine (`evolutions/runner.py`), a trim's one line for all the yards and the sails' lines
+  notable as ever. Measured on two cutters at pistol shot over ten minutes: our log three
+  lines (the fire opened, the strike), hers seventeen (the hit, her strike, her captain's
+  state); a fight that lasts gives one notable line a minute a firer where a shot tells.
+  The same read at the console, where routine lines show at 1x and roll up above ten times.
+- **The signal book's whose.** On the tree as it stands both papers are the hull's own
+  nation's on a crewed French ship (proved by the test; the officer's finding of two books
+  was on the tree of 2026-10-27, before 86's fold-in). The signal book's page now says
+  whose it is ("The Britain signal books, this ship's own by her service"), and the common
+  book of no nation, served to a ship whose nation keeps no book, says it is no nation's
+  own and no other ship's numbers are to be read from it. Truths 7-242 and 7-243.
+
+### Item 5: the ship herself, said plainly
+
+- **`readings.ship_words(world)`**: her name; her rig and class from her file's era note
+  (the first clause, her own name kept where it is the class's, the file's ship's name
+  dropped on a hull sailing under another, 'H.M.' kept for a King's vessel and made 'an
+  armed cutter' for a hired one); her service by the captain's role and the wardroom's
+  binding (a King's ship, a ship of the French navy, a merchantman, a privateer, a packet, a
+  fisherman, the convoy's escort) and her nation; her fit of guns in the guns reading's
+  words; her people's number by the muster; who commands in the captain reading's words;
+  the ports of her voyage. **Every station's brief opens its situation with it** (the
+  harness gives it for every station but the director's, above the game), the handover
+  fold keeps the brief whole with it, and **`the ship`** (`what ship`, `my ship`, `this
+  ship`, `what ship is this`) reads the same at any time. Truth 7-244.
+
+### Item 6: found on the way
+
+- **A standing order's name with an apostrophe** (79c's finding): `_quoted_name` took any
+  quote character as the closing quote; the closing quote now pairs with the opening one
+  (`"the bay's mouth"`, `“Mr Pearce’s trim”`), a single-quoted name closing at a single
+  quote as before.
+- **The hail over the wreck** (the model officer's second point): `_addressee` matched a
+  rig word among every vessel on the world's sea, nearest first, so 'the lugger' at three
+  cables from a dismasted lugger in sight resolved to a far lugger (359 cables off in the
+  test's sea, 878 in the playtest's). A rig word or a description now names a sail the
+  lookout has in sight alone; a sail's name reaches beyond his sight and is refused for the
+  distance; and a mark in sight that answers to the words (a `mark:` put on the sea, a
+  wreck) is said to be no sail, nobody being aboard her to speak. The director's placed
+  things with a person aboard are the one-world study's, not touched.
+- **`captain: carry on`** (decision 41's word that gives the ship back after the player's
+  hand) was refused at the prompt as a world order, the captain channel's form being the
+  director's (`captain: <intent>`): at the prompt the two words alone are the player's own
+  (`orders._carry_on`, logged `captain.carry_on`), every other captain order the world's
+  as before.
+- **`gybe the mainsail`** was answered "'wear ship' was understood, but not 'the mainsail'":
+  the gybe is `wear ship` whole and names no sail; the answer says so, with the sheet's
+  order for a boom handled by hand. Truth 7-245; `tests/test_found_on_the_way_85.py`.
+- **The documents touched on the way** (beside the primer's chapters): the Harness's
+  standing-by paragraph, its station-line section (the date, the ship herself), its line on
+  the grammar's parts; the records above. The documentation whole is item 8's.

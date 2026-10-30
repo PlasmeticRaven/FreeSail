@@ -91,6 +91,8 @@ BOOK_VERBS: tuple[str, ...] = (
 STANDING_VERBS: tuple[str, ...] = ("standing order", *BOOK_VERBS)
 
 _QUOTES = "\"'“”‘’"
+# the quote that closes each opening quote (a straight quote closes itself)
+_CLOSES = {'"': '"', "'": "'", "“": "”", "‘": "’", "”": "”", "’": "’"}
 
 
 def recognises(text: str) -> str | None:
@@ -128,9 +130,13 @@ def _quoted_name(text: str, after: str) -> tuple[str, str]:
             f'A standing order is named in quotes: {after} "night routine": at sunset then '
             f"take in the royals."
         )
+    # the closing quote pairs with the opening one, so that an apostrophe inside a name in
+    # double quotes ("the bay's mouth", "Mr Pearce's trim") is the name's and not its end
+    # (package 79c's finding: such a name was refused with "After the name say a colon")
+    closing = _CLOSES.get(rest[0], rest[0])
     close = -1
     for i in range(1, len(rest)):
-        if rest[i] in _QUOTES:
+        if rest[i] == closing or (closing == "'" and rest[i] == "\u2019"):
             close = i
             break
     if close < 0:

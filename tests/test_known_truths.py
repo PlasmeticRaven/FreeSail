@@ -12346,3 +12346,31 @@ def test_truth_7_244_every_station_is_told_her_ship_and_the_ship_reading_says_th
             ship=words,
         )
         assert next(i.text for i in brief.head if i.name == "situation").startswith(words)
+
+
+def test_truth_7_245_four_refusals_found_by_the_reading_are_mended():
+    """Package 85's reading of the orders: a standing order's name may carry an apostrophe;
+    `hail the lugger` names a sail in sight and never a far one, a wreck in sight being no
+    sail; `captain: carry on` at the prompt is the player's own hand given back; `gybe the
+    mainsail` is answered that the gybe names no sail."""
+    from freesail import orders
+    from freesail.orders.errors import OrderError
+    from tests.test_primer import make_ship
+
+    ship = make_ship("frigate", "plain-sail", "starboard")
+    bays = 'standing order "the bay\'s mouth": every glass then trim sails'
+    kind, log, _ = orders.handle(ship, bays)
+    assert kind == "standing.given" and "'the bay's mouth'" in log
+    schooner = make_ship("schooner", "plain-sail", "starboard")
+    try:
+        orders.handle(schooner, "gybe the mainsail")
+    except OrderError as e:
+        assert "takes no sail after it" in str(e)
+    else:
+        raise AssertionError("taken")
+    w = _package_85_cutter()
+    w.run(900)
+    w.submit("steer east")
+    w.run(2)
+    assert w.captain.aside
+    assert w.submit("captain: carry on").kind == "captain.carry_on" and not w.captain.aside

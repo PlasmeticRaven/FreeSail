@@ -244,6 +244,15 @@ def parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     tail = list(rest)
     for seg in segments[1:]:
         tail.extend(seg)
+    if verb == "wear ship" and verb_phrase.split()[0] in ("gybe", "jibe") and tail:
+        # 'gybe the mainsail': the gybe is the wear of a fore-and-aft vessel whole, and
+        # names no sail; said so, with the sheet's order for a boom handled by hand
+        raise OrderError(
+            f"'{verb_phrase}' is wear ship whole, the period word, and takes no sail after "
+            f"it: the boom comes over of itself as the wind crosses her stern, and the log "
+            f"says when. Say 'gybe' or 'wear ship'; to handle a boom sail's sheet by hand, "
+            f"'ease the main sheet' or 'haul the main sheet'."
+        )
     try:
         mods, side_from_mods = _parse_modifiers(tail, vocab, verb)
     except OrderError:

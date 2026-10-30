@@ -175,6 +175,13 @@ def _addressee(world: Any, who_words: str) -> Any:
     def near(v: Any) -> float:
         return bearing_and_distance(here, v.position)[1]
 
+    # the sails in sight first (the model officer's second point: 'the lugger' at three
+    # cables from a dismasted lugger in sight resolved to a far lugger on the world's sea):
+    # a rig word or a description is matched among the sails the lookout has in sight,
+    # and only a name reaches beyond them; a mark in sight that answers to the words (a
+    # wreck, a hulk) is said to be no sail
+    seen = getattr(getattr(world, "lookout", None), "_sails_seen", None) or {}
+    pool = [v for v in candidates if f"sail:{v.id}" in seen or v.id in seen]
     if w in ("her", "him", "them", "stranger", "sail", "chase", "enemy", "vessel", "ship"):
         battery = (getattr(world.ship, "extra", None) or {}).get("battery")
         target = getattr(battery, "target", None) if battery is not None else None
@@ -182,17 +189,39 @@ def _addressee(world: Any, who_words: str) -> Any:
             for v in candidates:
                 if v.id == target:
                     return v
-        return min(candidates, key=near) if candidates else None
+        return min(pool, key=near) if pool else None
     for v in candidates:
         if v.name.lower() == w or v.name.lower() == who_words.strip().lower():
             return v
-    by_kind = [v for v in candidates if w in (v.kind.lower(), v.kind.lower().removeprefix("a "))]
+    by_kind = [v for v in pool if w in (v.kind.lower(), v.kind.lower().removeprefix("a "))]
     if not by_kind:
-        by_kind = [v for v in candidates if w in str(v.what or "").lower() or w in v.kind.lower()]
+        by_kind = [v for v in pool if w in str(v.what or "").lower() or w in v.kind.lower()]
     if by_kind:
         return min(by_kind, key=near)
+    mark = _mark_in_sight(world, w)
+    if mark is not None:
+        raise OrderError(
+            f"{mark[:1].upper()}{mark[1:]} is in sight, but she is no sail to answer a hail: "
+            "nobody is aboard her to speak."
+        )
     found = sea.find(who_words.strip()) if hasattr(sea, "find") else None
     return found if found is not None and str(found.id) != own else None
+
+
+def _mark_in_sight(world: Any, words: str) -> str | None:
+    """A mark or a danger in sight (a wreck, a hulk, a point of interest the world put on
+    the sea) whose name or description carries the words: its words, or None."""
+    lookout = getattr(world, "lookout", None)
+    for s in getattr(lookout, "sightings", None) or []:
+        if getattr(s, "seen_as", "") not in ("mark", "danger"):
+            continue
+        feature = getattr(s, "feature", None)
+        text = " ".join(
+            str(getattr(feature, a, "") or "") for a in ("name", "description", "kind")
+        ).lower()
+        if words and words in text:
+            return str(getattr(feature, "name", "") or getattr(feature, "description", "") or words)
+    return None
 
 
 def _words_for(world: Any, vessel: Any) -> str:

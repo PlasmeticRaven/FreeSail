@@ -69,6 +69,13 @@ def handle(ship: Ship, text: str) -> tuple[str, str, dict[str, Any]]:
     from freesail.world import orders as world_channel
 
     if world_channel.recognises(text):
+        if " ".join(text.lower().split()).rstrip(".") in ("captain: carry on", "captain, carry on"):
+            # the player's own hand given back (decision 41): `captain: carry on` is the
+            # player's word to the rules-based captain standing aside at his order, not a
+            # world order to the scenario, though it wears the captain channel's form (the
+            # collision found by package 85's reading: refused at the prompt as the
+            # director's)
+            return _carry_on(ship)
         # a world order at the captain's prompt (spec M5 §26, truth 71; package 36): the
         # channel is the scenario's and the director's, never the captain's grammar's;
         # refused in the vocabulary's words
@@ -408,3 +415,23 @@ def _group_evolution(
         "failed": failed,
     }
     return "evolution.started", text, data
+
+
+def _carry_on(ship: Any) -> tuple[str, str, dict[str, Any]]:
+    """`captain: carry on` at the prompt: the rules-based captain, standing aside at the
+    player's hand, commands again from where she is (`captains.Captain.carry_on`)."""
+    from freesail.orders.prompt import world_of
+
+    world = world_of(ship)
+    captain = getattr(world, "captain", None) if world is not None else None
+    if captain is None:
+        raise OrderError("She has no rules-based captain to carry on; the ship is yours.")
+    try:
+        words = captain.carry_on()
+    except ValueError as e:
+        raise OrderError(str(e)) from None
+    return (
+        "captain.carry_on",
+        f"By the captain's word: {words}.",
+        {"verb": "captain: carry on", "level": 1, "intent": captain.intent_words},
+    )
