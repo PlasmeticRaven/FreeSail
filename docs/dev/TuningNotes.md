@@ -13356,3 +13356,117 @@ them: 35 passed. **The fast tier**, once (379 slow tests left out, 25 minutes): 
 the pictures' known flake ("the chart is blank (std 8.0)" under the tier's load), which
 passes alone on this tree; the pilot off Aix passes. The whole slow tier not run (the
 lead's in the cloud at the merge).
+
+## Package 93: the blocks' tiles rebuilt on their true water (2026-10-30)
+
+89's finding (its table "GEBCO's fill"): every block's tiles had their GEBCO fill raised by
+the eleven's mean level, false over the blocks once 89 gave them their own water. **The
+rule, as built** (item 1, its own commit before any region): `mean_level_grid`
+(`tools/build_charts.py`) reads at each cell of its grid the gauges that serve it, as
+`Tide.gauges_at` does: within a block's bounds (the manifest's) the block's own gauges
+after the eleven, the level the blend of those of them that have one by the blend's own
+weights, the eleven's where none has (the Strait's, the islands'); outside every block the
+eleven alone, the arithmetic as it was to the bit (the same gauges, in the same order,
+summed the same way). Matched against the world's tide (`Tide.constants_at` at each cell's
+centre) over every region's bounds: the largest difference 2.4e-7 m. The test that held the
+fill to the eleven (`test_tide.py`) is the rule's test now
+(`test_the_fill_is_raised_by_the_level_the_worlds_tide_gives_each_cell`: the Channel east's
+cells the world's within 1e-4 m and a metre over the eleven's at Dieppe, Mahón's its own
+0.20 m, the Strait's the eleven's, the Channel west's the eleven's alone).
+
+**The raise, old against new, over each region's fetch box** (the tiles' whole extent, the
+grid of 0.05 degrees; "old" is the raise the committed tiles carry, the recipe's
+`fill_mean_level_m` where it had one and nought where it had no `fill_to_chart_datum`):
+
+| Region | Old raise | New raise | New less old | Cells moved |
+|---|---|---|---|---|
+| channel-west (not rebuilt, no key) | none | (1.20 to 6.23) | | |
+| channel-mid (not rebuilt) | 1.20 to 6.83 | 1.20 to 6.83 | -0.06 to +0.46 | 379 of 4,221 |
+| biscay-north | none (no key) | 3.06 to 6.35 | +3.06 to +6.35 | all |
+| biscay-south | 2.50 | 1.89 to 6.83 | -0.61 to +4.33 | 16,008 of 16,016 |
+| portugal | 2.00 | 1.54 to 4.06 | -0.46 to +2.06 | 11,627 of 11,844 |
+| madeira | 3.98 | 3.98 | 0 | 0 of 2,499 |
+| azores | 3.20 to 3.98 | 3.20 to 3.98 | 0 | 0 of 12,852 |
+| strait | 3.98 | 0.37 to 3.98 | -3.61 to 0 | 564 of 1,600 |
+| channel-east | 1.48 to 6.83 | 1.48 to 6.83 | -0.52 to +1.26 | 3,490 of 6,868 |
+| mediterranean-west | 3.98 to 6.83 | 0.17 to 6.83 | -6.66 to 0 | 11,665 of 14,208 |
+| balearics | 6.83 | 0.16 to 6.83 | -6.67 to 0 | 11,399 of 14,208 |
+| gulf-of-lion | 3.70 to 6.83 | 0.18 to 6.83 | -6.65 to 0 | 7,908 of 10,230 |
+| ligurian-sea | 3.70 to 6.83 | 0.42 to 6.83 | -6.41 to 0 | 11,580 of 15,300 |
+| tyrrhenian | 3.70 to 6.83 | 0.47 to 6.83 | -6.36 to 0 | 2,775 of 16,340 |
+
+So **madeira and azores are not rebuilt** (the rule moves no cell of their raise: their
+gauges' levels are unread and the world's level there is the eleven's, as it was); the
+Strait moves only in its tile column east of 5 W, which lies in `mediterranean-west`'s
+bounds; the 6.83 m left in the Mediterranean regions' maxima are their tiles' cells outside
+every block (south of 35 N, east of 4.5 E south of 40.56 N), where the eleven's nearest
+alone is Saint-Malo's, as before. **Biscay north takes `fill_to_chart_datum`** (39b built
+it without, and ChartBlocks.md said it "wants a rebuild with it"; the brief names it among
+the regions), and **Biscay south and Portugal lose `fill_mean_level_m`** (2.5 and 2.0, the
+coasts' own figures made while the gauges were held): their world's level now is their own
+gauges' (within the bounds 2.48 to 3.88 and 1.54 to 2.36 m).
+
+**A finding, not touched:** `channel-mid`'s seam column (1.23 to 0.80 W) lies partly within
+`channel-east`'s bounds, where the world's level now differs from the raise its tiles carry
+by up to 0.46 m; the brief keeps `channel-mid` untouched.
+
+**The sources, fetched again** through the proxy for the ten regions to rebuild (GEBCO's
+queue and EMODnet's ERDDAP, 30 files, 1.9 GB; no host refused). Each file's bytes are the
+builders' to the byte count; the hashes differ (GEBCO's zip dates its entries, ERDDAP's
+netCDF its history), so **a control** was run first: `channel-east` rebuilt by the head's
+own tool (a clean worktree of `21a25e7`) from today's fetch, `--skip-fetch`: every tile,
+the coast and the index byte for byte the committed ones, the manifest's fetch records
+alone changed. What moves in the regions below is the rule's and nothing else.
+
+**The proof on the head** (a clean worktree of `21a25e7`, before anything was written; this
+container, four cores): the eleven recorded passages by node id, `--slow -n 4`, 11 passed;
+`-k "gate_5b or gate_5c"`, the one test selected passed; the captain's trials, the
+lee-shore trial failing with `7fad0ce7e46ba366` against the pin `ed48ca3d61e52f20`, this
+container's known difference as 89's record has it. The proof on the final tree is below.
+
+### The region `channel-east`
+
+`python tools/build_charts.py --region channel-east --reuse-world`: the checks as printed
+(137 of 137 features within the bounds and in the references' form, ids unique, no
+override, the fetch box covering the tiles, "6 kept" as before); "GEBCO's fill raised to the
+chart's datum by the world's mean level, 1.48 to 6.83 m" (the grid's whole range, the
+eleven's 6.83 at its far corner as before). The shore's sweep **3,513 cells in 79 places**
+(79b's 3,807 in 82): the largest the Seine's estuary above the Havre (242 and 174 about
+49.43 to 49.48 N, 0.38 to 0.43 E; 79b's 313 and 212), the Thames's marshes north of the
+bounds (202, 179, 142, 124), the Havre's modern port (181; 302) and Dunkerque's Port Ouest
+(168; 159): water, as 79b said.
+
+| | Old (79b, the eleven's raise) | New (the block's water) |
+|---|---|---|
+| level 2 | 57 tiles, 7.64 MB | 57 tiles, 7.77 MB |
+| level 3 | 72 tiles, 5.23 MB | 72 tiles, 5.23 MB |
+| coast | 620 pieces, 5,670 points, 182,912 bytes | 619 pieces, 5,635 points, 182,125 bytes |
+| tiles changed | | 53 of level 2, 32 of level 3 |
+| cells changed | | 6,957,134 at level 2, 4,099,398 at level 3, the largest 1.30 m |
+| below the datum to above | | 502 at level 2, 7,171 at level 3 |
+| above the datum to below | | 7 at level 2, 88 at level 3 |
+
+`git status` after the build: the region's 85 tiles, its coast and the manifest (its entry's
+bytes, its three fetch records, the build's date and hash); no tile, coast or index of any
+other region, the index and every port file and mark untouched (the features unchanged, the
+index written the same).
+
+**The low shores against the world's high water springs** (625 points over each box, the
+elevation less the mean level + M2 + S2 there, old tiles beside new): Romney Marsh (50.95 to
+51.03 N, 0.78 to 0.98 E) median -1.31 to -0.98 m, 54 to 87 points above; the Dungeness
+foreland -0.56 to -0.19, 176 to 282; Pevensey Levels -1.65 to -1.16, 163 to 190; the Somme's
+banks +1.24 to +1.54, 415 to 456. The raise lifts the land by the block's level less the
+eleven's (+0.33 m at Romney, +0.73 at the Somme); the marsh lay under high water springs on
+the eleven's water as well (their HWS there 6.24 m, the block's 6.95): GEBCO has Romney
+Marsh some two metres above mean sea level, and the true marsh lies under high water
+springs behind the Dymchurch Wall, a dyked level the tiles cannot hold at 15 seconds.
+Truth 7-305's wording is asked of the lead (below).
+
+**The block's tests** on the rebuilt tiles: `tests/test_chart.py`, `test_ports.py`,
+`test_tide.py`, `test_scenarios.py`, `test_islands.py`, `test_tackle_orders.py`, fast 203
+passed, slow 11 passed; truths 7-270 to 7-289 with `--slow -n 4`, 20 passed (7-271, 7-279
+and the 89 truths among them). **The scenario** `spithead.yaml`, 28 hours with
+`--reckoning`, sailed on the head's tree and on this one in this container: **the same log
+byte for byte**, 1,241 lines, digest `eef946bdabaf39cf`, anchored at Spithead at 06:08 on
+the 21st (79b's record on the build machine, 1,275 lines, `f60626aa5d4f6388`, is another
+machine's and an older tide's): her water is EMODnet's, and the fill is the land's.
