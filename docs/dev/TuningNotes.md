@@ -13710,8 +13710,8 @@ The recipe unchanged (the world's level). The control: the head's tool on today'
 the committed tiles byte for byte. `python tools/build_charts.py --region gulf-of-lion
 --reuse-world`: the checks as printed (114 of 114 features, ids unique, no override, the
 fetch box covering the tiles, "0 kept"); "GEBCO's fill raised to the chart's datum by the
-world's mean level, 0.18 to 6.83 m" (within the bounds 0.42 to 0.75 m, Marseille's, Toulon's
-and Sète's gauges with Port-Vendres', Nice's and Monaco's; the 6.83 in the tiles' strip south
+world's mean level, 0.18 to 6.83 m" (within the bounds 0.42 to 0.75 m, the block's ten gauges
+from Port-Vendres to Monaco, 0.42 to 0.54 m, blended with the eleven where they reach; the 6.83 in the tiles' strip south
 of 40.56 N east of 4.5 E, outside every block, as before). **The shore's sweep 105,638 cells
 in 288 places** (by the control 3,760 in 151): the Camargue's lagoons and marshes (3,600,
 3,346, 2,692, 2,554, 2,517, 2,338, 2,315 about 43.43 to 43.53 N, 4.42 to 4.62 E, the
@@ -13742,3 +13742,80 @@ records; nothing of any other region, the index and every port file and mark unt
 with `--slow -n 4`, 15 passed (7-295 the Gulf's winter row, 7-296 Toulon's roads from
 Hyères', among them). The scenario `agincourt-sound.yaml` is sailed once the three regions
 of 79d are rebuilt (below).
+
+### The region `ligurian-sea`: built, and **stopped for the lead's ruling** (truth 7-297 fails on the rebuilt tiles)
+
+The recipe unchanged (the world's level). The control: the head's tool on today's fetch gives
+the committed tiles byte for byte. `python tools/build_charts.py --region ligurian-sea
+--reuse-world`: the checks as printed (140 of 140 features, ids unique, no override, the
+fetch box covering the tiles, "0 kept"); "GEBCO's fill raised to the chart's datum by the
+world's mean level, 0.42 to 6.83 m" (within the bounds the blend of the block's three gauges
+with a level, Centuri 0.48, Ajaccio 0.47 and Solenzara 0.58, Imperia's, Genoa's and
+Leghorn's unread, with the eleven where they reach; the 6.83 where a cell lies in no
+block). **The shore's
+sweep 34,144 cells in 353 places** (by the control 6,987 in 268): the Arno's plain and the
+lake of Massaciuccoli by Pisa (2,207, 2,122, 1,580, 1,428, 1,374, 1,262 about 43.62 to 43.88
+N, 10.28 to 10.43 E), the Grosseto marshes (1,319 about 42.78 N, 10.93 E) and the étang de
+Biguglia (1,144 about 42.62 N, 9.47 E).
+
+| | Old (79d, 3.70 to 6.83 m) | New (the block's water) |
+|---|---|---|
+| level 2 | 72 tiles, 17.10 MB | 72 tiles, 17.16 MB |
+| level 3 | 32 tiles, 2.89 MB | 32 tiles, 2.89 MB |
+| coast | 1,565 pieces, 12,552 points, 431,014 bytes | 1,608 pieces, 13,182 points, 449,010 bytes |
+| tiles changed | | 70 of level 2, 30 of level 3 |
+| cells changed | | 4,575,308 at level 2, 4,032,648 at level 3, the largest 6.40 m |
+| above the datum to below | | 41,525 at level 2, 145,827 at level 3 |
+| below the datum to above | | none |
+
+Level 3's cells from above the datum to below, by harbour: Leghorn 56,754 (the port and the
+Darsena, +2.2 m before, -1.0 now), **Agincourt Sound 44,265**, San Fiorenzo 15,475, Ajaccio
+14,324, Genoa 6,915, Porto Ferrajo 4,033. `git status` after the build: the region's tiles,
+its coast, the manifest's entry and fetch records; nothing of any other region, the index
+and every port file and mark untouched.
+
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-290 to 7-304
+with `--slow -n 4`: **14 passed, 7-297 failed** (twice, the same).
+
+**7-297, Agincourt Sound holds a fleet in a north-wester (79d).** The truth asks that from
+the berth (41.1870 N, 9.3790 E) the chart has land within 4,000 m on each of seven bearings
+(the north-east's channel left out), 120 points of 441 with 8 to 30 m about it, and the
+frigate brought up and riding six hours. The distance to the first cell under the datum
+(`depth_at < 0`), by bearing, old tiles beside new (this container, both trees):
+
+| Bearing | 0 | 45 (not asked) | 90 | 135 | 180 | 225 | 270 | 315 |
+|---|---|---|---|---|---|---|---|---|
+| Old | 3,850 m | 4,050 | 2,900 | 1,250 | 500 | 600 | 900 | 1,500 |
+| New | none within 9,950 m | 4,100 | **6,500** | 1,250 | 700 | 750 | 950 | 1,650 |
+
+The room 135 points old, **148 new** (holds); the berth's depth 11.7 m old, 18.0 m new (a
+fill cell itself). So the bearings north and east fail. The cause: EMODnet has no sounding
+over the shores of the islands about the Sound, and GEBCO's fifteen seconds smear them,
+reading their cells some three to six metres below mean sea level; raised by Saint-Malo's
+6.83 m (the eleven's nearest, while the gauges were held) they stood as land, and on the
+block's own water (0.53 m at the berth, M2 8 cm) they are water. Within five kilometres of
+the berth 13,398 level-3 cells went from above the datum (median +3.1 m) to below (median
+-3.2 m, the deepest -6.2). The islands' shores that closed the Sound to the north and east
+were the false raise's, not the grid's. The anchoring part of the truth (six hours in a
+north-wester) is not reached; nothing is loosened, re-pinned or marked.
+
+**The scenario** `agincourt-sound.yaml`, 100 hours, on the head's tree and on this one
+(`gulf-of-lion` rebuilt, `tyrrhenian` not): the head's 4,012 lines, digest
+`4434a8a16c6a4fda`; this tree's 3,829, digest `c276a70d729670ef`; they part at tick 0 (the
+lookout's land about the watering place at the Pararau three cables off, not two). **On
+both trees she takes the ground** at about 23 14:28 (tick 250,034 on the head at six knots,
+250,114 here at a knot and a half, "two fathoms and a half of water by the chart, and she
+draws 15 feet"), and on the head she lies aground on her beam ends that evening: a finding
+of the scenario as it stands on the head in this container (79d's record, on the build
+machine, 3,837 lines and `7ba2146a323761ee`), not of this package. Not a gate's, not pinned.
+
+**For the lead** (the options as I read them): (a) the islands about the Sound given their
+land the grid lacks, by a period sheet read with its datum (a land patch, `overrides/`, as
+79d's "An isle the grid lacks" and ChartBlocks.md's rule: no sheet is read here, and I draw
+none); (b) the islands as features of kind island with an extent, which package 94 is
+building beside this one (the lookout and the grounding, but not `depth_at`, which the
+truth reads); (c) the fill's raise kept at the eleven's for the cells of a harbour patch
+the grid lacks until a sheet is read (a recipe rule, not the brief's); (d) the truth
+re-measured on the true water, old beside new, which would be loosening it and is not mine
+to do. **The package stops here**: `tyrrhenian` is not rebuilt, and the proof on the final
+tree, truths 7-305 to 7-309 and the records wait on the ruling.
