@@ -14423,3 +14423,20 @@ channel-mid's 48.5 N) and one at the open west edge (47.39 N, 5.07 W). The block
 the six files fast 205 passed, slow 11 passed; truths 7-260 to 7-269 and 7-310 to 7-314,
 15 passed. **The scenario** `biscay-north.yaml`, 9 hours: 348 lines, digest
 `28c449dbbda73eb1`, the same on the first rebuild's head, on the branch's head and here.
+
+**`biscay-south`, second rebuild.** The control on the merged tree differs from the
+committed tiles by 94's rule of the seams alone (the Isle of Aix's gauge serving the block
+now: 38 level-2 and 28 level-3 tiles, up to 0.3 m, the coast). The build: the checks as
+before ("12 kept", 59 dry tiles not written); "raised ... 1.89 to 6.83 m"; the sweep 4,967
+cells in 305 places (5,058); the coast 885 pieces, 13,123 points, 368,304 bytes (884,
+13,098, 367,692). Against the first rebuild: **38 level-2 tiles and 28 level-3 tiles
+moved**, 2,739,100 and 2,616,125 cells, the largest 0.90 m at level 2 and 0.30 at level 3,
+149 and 877 from below the datum to above, none the other way: Aix's level in the blend
+over the whole block, and the taper's band at the open 42 N edge east of 6 W, Spain's
+interior (the 3.87 m of the table lies in tiles all land, not written). The block's tests:
+the six files fast 205 passed, slow 11 passed; truths 7-260 to 7-269 and 7-310 to 7-314, 15
+passed. **The scenario** `biscay-south.yaml`, 30 hours: 894 lines both on the branch's head
+(`0aa8d30dbe67660b`; package 94's tide moved it from 880 lines and `922f024f1d07d067`) and
+here (`d7d819e4439f6b19`); **three moments moved**: at Corunna she veers thirty-one fathoms
+for thirty-two (the depth at the berth a step shallower), brought up the same, and one
+cross-bearing fix reads the castle of San Antón WSW for W by S, the fix the same.
