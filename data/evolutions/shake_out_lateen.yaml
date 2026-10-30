@@ -1,8 +1,10 @@
-# Shake a reef out of a lateen sail (package 75; docs/design/Design-ShipsEngineExtensions.md
-# §3.6): ease the sheet and brail the sail in, cast off the points along the reef band, and
-# haul it out again. The yard is not lowered, so there is no settling of halyards and no
-# hoist as in shake_out_gaff: the sail is brailed in and hauled out, 30 seconds each, and the
-# points cast off in 90, the design's times (§3.6; judgement).
+# Shake a reef out of a lateen sail: ease the sheet and brail the sail in, cast off the points
+# along the reef band, and haul it out again. The yard is not lowered, so there is no settling
+# of halyards and no hoist: the sail is brailed in and hauled out, 30 seconds each, and the
+# points cast off in 90 (judgement).
+
+# Build notes (not served by the library's catalogue):
+# Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6.
 id: shake_out_lateen
 verb: shake_out
 applies_to: {class: lateen}
@@ -27,4 +29,4 @@ on_fail: {log: "Could not shake out the reef in the {sail}: {reason}.", kind: ev
 # crew: the afterguard work the after sail (Luce 1884, ch. XVIII Organization, 'Duties of Men
 # in Different Parts of the Ship', as shake_out_gaff's); ten ordinary (judgement).
 crew: {hands: 10, rating: ordinary, stations: [afterguard]}
-source: "Steel's sail table, the mizen's one reef band (docs/design/Research-74-2026-10.md §5.6); the times of docs/design/Design-ShipsEngineExtensions.md §3.6 (judgement): brail in and haul out 30 s each in place of shake_out_gaff's settling and hoist, the points cast off 90 s; the yard is not lowered"
+source: "Steel's sail table, the mizen's one reef band; the times are judgement"

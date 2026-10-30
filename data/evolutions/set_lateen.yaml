@@ -1,12 +1,15 @@
-# Set a lateen sail (package 75; docs/design/Design-ShipsEngineExtensions.md §3.6): the
-# mizen course of the 64 and the 74, cut at the mast, its head laced to the mizen yard abaft
-# the mast and its luff to the mast. Cast off the gaskets and clear away the brails, or let go
-# the brails if it is brailed up in the gear, then haul out the sheet and haul down the tack,
-# which sets it: "haul the mizen out" (Steel 1794 vol. II p. 316). There is no hoist: the
-# yard stands slung at its truss, held by its lifts (Lavery, I32). The sheet is trimmed to
-# the point of sail by the class whose trim the sail takes (`wanted_sheet`: the gaff's 18 to
-# 85 degrees for a sail cut at the mast, the lateen's own 8 to 85 for a whole lateen). Times
-# as set_gaff's clearing away and hauling out (judgement).
+# Set a lateen sail: a mizen course cut at the mast, its head laced to the mizen yard abaft
+# the mast and its luff to the mast, or a driver bent in its place with its foot on the boom.
+# Cast off the gaskets and clear away the brails, or let go the brails if it is brailed up in
+# the gear, then haul out the sheet and haul down the tack, which sets it: "haul the mizen
+# out" (Steel 1794 vol. II p. 316). There is no hoist: the yard stands slung at its truss,
+# held by its lifts (Lavery, I32). The sheet is trimmed to the point of sail, 18 to 85 degrees
+# for a sail cut at the mast and 8 to 85 for a whole lateen. Times as for setting a gaff sail
+# (judgement). It is not set on a wrecked boom.
+
+# Build notes (not served by the library's catalogue):
+# Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6, and §16 item 8, §17.2 for the
+# boom's check. The angle is `wanted_sheet`'s, by the class whose trim the sail takes.
 id: set_lateen
 verb: set
 applies_to: {class: lateen}

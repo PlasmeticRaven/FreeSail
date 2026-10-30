@@ -1,8 +1,11 @@
-# Take in a lateen sail (package 75; docs/design/Design-ShipsEngineExtensions.md §3.6): ease
-# the sheet and tack and brail it up to the mast and the yard, where it hangs in the gear, not
-# stowed. The 74's mizen has brails at the peak, the middle, the throat and the foot (Steel
-# 1794 vol. II p. 37); the yard is not lowered. A whole lateen is clewed up "comme les autres
-# voiles" (Lescallier 1791 p. 379), the same work here. Time as take_in_gaff's (judgement).
+# Take in a lateen sail: ease the sheet and tack and brail it up to the mast and the yard,
+# where it hangs in the gear, not stowed. A ship's mizen has brails at the peak, the middle,
+# the throat and the foot (Steel 1794 vol. II p. 37); the yard is not lowered. A whole lateen
+# is clewed up "comme les autres voiles" (Lescallier 1791 p. 379), the same work here. Time as
+# for taking in a gaff sail (judgement).
+
+# Build notes (not served by the library's catalogue):
+# Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6.
 id: take_in_lateen
 verb: take_in
 applies_to: {class: lateen}

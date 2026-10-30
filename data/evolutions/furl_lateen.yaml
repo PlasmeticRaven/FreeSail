@@ -1,8 +1,11 @@
-# Furl a lateen sail (package 75; docs/design/Design-ShipsEngineExtensions.md §3.6, E6):
-# brail it up if it is still drawing, then furl it on its yard aloft, the topmen laying out
-# along the yard. The woldings of a lateen yard are the steps "to climb to the peek to furl or
-# loose the sail" (Falconer 1780, YARD): a sail laced to a yard is furled on its spar, where a
-# gaff sail keeps package 37l's refusal. Times as furl_gaff's (judgement).
+# Furl a lateen sail: brail it up if it is still drawing, then furl it on its yard aloft, the
+# topmen laying out along the yard. The woldings of a lateen yard are the steps "to climb to
+# the peek to furl or loose the sail" (Falconer 1780, YARD): a sail laced to a yard is furled
+# on its spar. Times as for furling a gaff sail (judgement).
+
+# Build notes (not served by the library's catalogue):
+# Package 75: docs/design/Design-ShipsEngineExtensions.md §3.6, E6. A gaff sail keeps package
+# 37l's refusal.
 id: furl_lateen
 verb: furl
 applies_to: {class: lateen}
