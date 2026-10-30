@@ -878,13 +878,15 @@ class Vessel:
             self.position = self.position.advanced(east * dt, north * dt)
 
     def _ship_target(self, world: Any) -> Any:
-        """Where 'the ship' of a `to_ship` leg is: the player's, or the hull a letter she
-        carries is for (`Message.to_hull`; package 84, step 9)."""
+        """Where 'the ship' of a `to_ship` leg is: the player's own hull (whichever is
+        followed; package 84, step 10), or the hull a letter she carries is for
+        (`Message.to_hull`; package 84, step 9)."""
         to_hull = str(getattr(self.letter, "to_hull", "") or "") if self.letter is not None else ""
         hull = (getattr(world, "hulls", None) or {}).get(to_hull) if to_hull else None
-        if hull is not None and hull is not getattr(world, "own", None):
+        if hull is not None:
             return hull.position
-        return world.position
+        players = getattr(world, "players", None)
+        return players.position if players is not None else world.position
 
     def _arrived(self, world: Any, leg: tuple[Any, ...]) -> None:
         kind = leg[0]
@@ -1058,18 +1060,18 @@ class Vessel:
 
 @contextmanager
 def players_current(world: Any) -> Iterator[Any]:
-    """The block reads the player's ship: given a World or a hull, the followed hull is made
-    current for it and the World yielded, so that her per-ship names (`ship`, `position`,
-    `dealings`, `readings`) and the properties of her per-ship objects are hers whichever
-    hull was current (package 84, step 6); what was given is yielded as it is when she is
-    current already, on the endless plane and in an old shape."""
+    """The block reads the player's ship: given a World or a hull, the player's own hull
+    (`World.players`, whichever hull is followed or current since step 10) is made current
+    for it and the World yielded, so that her per-ship names (`ship`, `position`,
+    `dealings`, `readings`) and the properties of her per-ship objects are hers (package
+    84, step 6); what was given is yielded as it is when she is current already, on the
+    endless plane and in an old shape."""
     base = world.__dict__.get("world", world) if hasattr(world, "__dict__") else world
-    hulls = getattr(base, "hulls", None)
-    followed = hulls.get(getattr(base, "followed", None)) if hulls else None
-    if followed is None or (base is world and getattr(world, "is_followed", True)):
-        yield world
+    players = base.__dict__.get("_own") if hasattr(base, "__dict__") else None
+    if players is None or getattr(base, "own", None) is players:
+        yield base if players is not None else world
         return
-    with base.as_hull(followed):
+    with base.as_hull(players):
         yield base
 
 
@@ -1779,12 +1781,15 @@ class Vessels:
         from freesail.core.events import Severity
 
         hulls = getattr(world, "hulls", None) or {}
+        players = getattr(world, "players", None)
         for v in self.vessels:
             letter = v.letter
-            to_hull = str(getattr(letter, "to_hull", "") or "") if letter is not None else ""
-            if v.done or not to_hull:
+            if v.done or letter is None:
                 continue
-            hull = hulls.get(to_hull)
+            to_hull = str(getattr(letter, "to_hull", "") or "")
+            hull = hulls.get(to_hull) if to_hull else None
+            if hull is None and players is not None and players is not getattr(world, "own", None):
+                hull = players  # the player's letter while another hull is followed (step 10)
             if hull is None or hull is getattr(world, "own", None) or hull.position is None:
                 continue
             _, distance = bearing_and_distance(hull.position, v.position)

@@ -173,6 +173,25 @@ class WorldOrder:
     channel: str
     text: str  # the order as given, which is what the journal keeps (the reason peeled off)
     reason: str = ""  # the director's `[reason: ...]`, when the order was entered again
+    by: str = ""  # the purview it is given under (package 84, step 10): "" and the director's whole
+
+
+# The purviews a world order may be given under (package 84, step 10; the design's 2.10):
+# the channels each may use, None for the whole channel; the director's and the bare order
+# pass whole, and an office of M8's would name its own. An unknown purview is refused.
+PURVIEWS: dict[str, frozenset[str] | None] = {"": None, "the director": None, "director": None}
+
+
+def purview_allows(by: str, channel: str) -> str | None:
+    """Why a world order given under the purview `by` may not use `channel`, in words, or
+    None when it may (the hook an office's purview will fill)."""
+    key = " ".join(str(by or "").lower().split())
+    if key not in PURVIEWS:
+        return f"'{by}' is no purview this world knows; the orders stand outside it"
+    allowed = PURVIEWS[key]
+    if allowed is not None and channel not in allowed:
+        return f"a {channel} order is outside the purview of {by}"
+    return None
 
 
 def recognises(text: str) -> bool:
@@ -208,6 +227,9 @@ def parse(text: str) -> WorldOrder:
 def apply(world: Any, order: WorldOrder) -> tuple[str, dict[str, Any]]:
     """Carry a world order out on the world: (the words for the journal's line, data).
     Raises `WorldOrderError` in words."""
+    outside = purview_allows(order.by, order.channel)
+    if outside:
+        raise WorldOrderError(outside)
     body = order.text
     if order.channel == "weather":
         return _weather(world, body)

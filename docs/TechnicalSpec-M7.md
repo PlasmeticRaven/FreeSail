@@ -836,7 +836,11 @@ every hull's stations (`hulls`), each input and act of a station on another ship
 hull, and a replay gives them to her again by either road. Since step 9 the director's forms
 name a hull (`aboard the Raven: ...`, a person made or come aboard her, a cutter's letter
 to her), the truth walks every hull and the persons ashore, `read_log(ship=)` reads a hull's
-log, and a seat may be at a person aboard any hull.
+log, and a seat may be at a person aboard any hull. Since step 10 the drivers follow a hull
+(`follow "X"`, a driver's line replayed; the World's names, the snapshot, the chart and the
+prompt read the followed hull, the player's own until told), the player's own hull is awake
+always and the save the game's, `World.offices` stands empty beside the hulls for M8's
+offices, and a world order may be given under a purview (`by`).
 
 ### 22. The regimes (`data/captains/`, `data/nations/`, `business.py`)
 

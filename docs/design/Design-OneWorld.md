@@ -1995,3 +1995,46 @@ the truth names every hull. The rule of reach for the hand (`ship "X": order`) s
 package 62 left it. A person made aboard a ship on the sea without a captain of her own is
 refused in her words (no hull to keep him), where package 68's words said "names another
 ship": the test of 68 is restated to the hull's refusal.
+
+### Step 10: the drivers follow a hull; the offices' room
+
+Built on step 9 as merged (the lead's head `6f8c708`). **Built.** **The drivers follow a
+hull.** `World.own`'s default is the followed hull (`hulls[followed]`; the player's own hull
+until `follow` names another, so nothing recorded moves), and with it every per-ship name of
+the World's, the drivers' `state()`, the browser's snapshot and chart, the console's prompt
+and `state`, the log the drivers show and the shared parts of the tick (the clock, the
+world orders, the far bodies, the switch, the ports' jobs) run for her: `is_followed` is
+hers. `World.players` is the player's own hull apart (`hulls[PLAYER_ID]`): the sea stays hers
+(`World.vessels`, `sea_vessels`), her vessel on it (`Vessels.own`) is brought up from her
+hull and not from the followed (`ships.players_current` makes her current), her way and her
+frame are her ship's own to the sets (`squadrons._followed_hull` reads her), the squadrons'
+commander branches read her captain (`_players_captain`), the save is the game's with her
+current (`World.save` under `as_hull(players)`: the seed, the scenario, the ship and the
+stations at the top are hers, every other hull's in `hulls`), and she is awake always: the
+switch leaves her out of its demotions and its count against the cap (`crews.crewed`), while
+`tick_crews` ticks her as any hull when another is followed. **`follow "X"`** (`World.follow`;
+82's §11): the hull by her name (the player's by hers or 'the ship'; another made in the far
+shape when she has none), `followed` set, a driver's line `driver.follow` written in the
+followed hull's log and journaled, which a replay gives again (`replay._give`); the console's
+`follow <ship>` and `state` ("Following the X."), the server's `/api/driver` `follow` and
+`state()["followed"]` with her id and name; refused in words for a ship not on the sea or one
+with no captain of her own. A letter for the player's ship comes aboard her hull whichever is
+followed (`Vessels._deliver_to_hulls`), and a `to_ship` leg steers for her. **The walks over
+the hulls** are each once: `harness.all_agents` names the followed hull's stations under their
+own names and every other hull's as 'captain of <ship>' (the pace rule's open samples), where
+the walk over the vessels' hulls counted the player's twice since step 7. **The offices'
+room** (the design's 2.10): `World.offices` beside `world.hulls`, an empty mapping for a
+station of the world and of no hull (M8's to build); `Stations(world, domain=None)` keeps its
+domain, the hull whose bindings these are (its World today). **The purview hook**:
+`World.world_order(text, source, by="")` journals `by` on the input, `WorldOrder.by` carries
+it, `orders.apply` checks `purview_allows(by, channel)` (the bare order and the director's
+pass whole; an unknown purview is refused in words), and the replay gives `by` again.
+
+**Taken another way, with the reason.** `followed` None with "no ship followed" is not
+reached in 84: every World keeps the player's hull, so `followed` always names one; the
+words stand ready in `World.followed_words` for 82's world with no player's ship. The
+director's door, when another hull is followed, reads the World's names as the drivers do
+(the followed hull's log and readings between ticks), its own harness ticking on the
+player's hull as her station; whether the director should follow the drivers or stay with
+the player's ship is a question for 82, noted. The design's "harness takes a domain" is
+`Harness.world`, the hull it samples, named as such; no office built.

@@ -12281,3 +12281,45 @@ spread step 8's three-way A/B measured on this machine for the step 7 head (446 
 the first two, 395 to 475 for 7-159), so the step costs nothing the measure sees and no A/B
 was run; `make_hull` of a brig 0.78 s (0.75 at step 8); truth 88's form with three hulls
 awake 214 ticks a second against the crewed floor of 60 (198 at step 8, 233 at step 7).
+
+### Step 10: the drivers follow a hull; the offices' room
+
+Built on step 9 as merged (`6f8c708`, brought in at the boundary; the design note's postscript
+"Step 10" has the shape). **What moved: nothing pinned.** The followed hull is the player's
+own until `follow` names another, and no recorded passage follows one. **The count.**
+`core/world.py` (`own` by `followed`, `players`, `is_followed`, `follow`, `followed_words`,
+`offices`, the save with the player's hull current, `world_order(by=)`), `world/ships.py`
+(`players_current` the player's hull; a letter for her to her hull), `world/squadrons.py`
+(`_followed_hull` hers, `_players_captain`), `world/crews.py` (`crewed` without her),
+`agents/harness.py` (`all_agents` over the hulls), `world/stations.py` (`domain`),
+`world/orders.py` (`WorldOrder.by`, `PURVIEWS`, `purview_allows`), `core/replay.py`
+(`driver.follow`, `by`), `ui/console.py` (`follow`, `state`), `ui/server.py` (`follow`,
+`state()["followed"]`); tests: three new in `test_crews.py`, one in `test_world_orders.py`,
+the two server tests' `state()` dictionaries restated with the `followed` key.
+
+**Found on the way, two.** The pace rule's walk over every station (`all_agents`) listed the
+player's stations twice since step 7 (under their own names and as 'captain of <ship>'
+through her vessel's hull); it walks the hulls each once. And the first `follow` put the
+player's hull to sleep: the switch counted her among the crewed hulls beyond the range (her
+vessel has no brain, so her distance read as infinite) and demoted her, and the save wrote
+the followed hull's seed, scenario and ship at its top, so a replay rebuilt the brig's world;
+both mended (the player's hull is never demoted nor counted against the cap, and the save
+is written with her current). **Booked to step 11** with the lead's two tidies of step 9
+(the reach test's `or True`, `_person_anywhere`'s surname match).
+
+**The suites on the step's tree** (the merged head `6f8c708` with the step; this container,
+three workers). The fast tier whole: **3946 passed, two failed**: the parity test, which
+lists every console command's road at the station and found `follow SHIP` unlisted (listed
+as the owner's by design, as the clock's commands are: the drivers' centre is the owner's,
+and a station reads its own hull and no other); and the pictures' blank-image check, failing
+alone too with its known figure (std 7.9456 against 8.0). Ruff clean.
+**The slow tier** of the known truths, the trials and the touched files (step 9's list with
+`test_server.py`, `test_console.py` and `test_parity.py`; 194 tests): 185 passed, eight left
+out by their own marks, one failed, the lee-shore trial's digest (`7fad0ce7e46ba366`
+against `ed48ca3d61e52f20`, this container's figure as at every step). **The pace** (alone,
+load 1.0 right after the slow set): truth 51's frigate alone and the day under systems over
+the floor; the gates' day 468 and 7-159's convoy 453 against the floor of 500, within the
+spread step 8's three-way A/B measured for the step 7 head on this machine (446 to 489 for
+the gates' day, 395 to 475 for 7-159), so the step costs nothing the measure sees and no
+A/B was run; `make_hull` of a brig 0.76 s (0.78 at step 9); truth 88's form with three
+hulls awake 221 ticks a second against the crewed floor of 60 (214 at step 9).
