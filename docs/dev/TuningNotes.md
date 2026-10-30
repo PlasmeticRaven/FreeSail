@@ -13580,3 +13580,44 @@ and mark untouched. **One test recast**, as Biscay south's:
 203 passed, slow 11 passed (`test_islands.py`'s Portugal tests among them); truths 7-260 to
 7-269 (7-264, Cadiz watched, among them), 10 passed. **The scenario** `portugal.yaml`, 30
 hours: **the same log byte for byte**, 671 lines, digest `05c7693be1e19a73`.
+
+### The regions `madeira` and `azores`: not rebuilt
+
+The rule moves no cell of their raise (the table above: 0 of 2,499 and 0 of 12,852 over
+their fetch boxes): their gauges' levels are unread, so the world's level over the islands
+is the eleven's there (Le Conquet's 3.98 m, 3.20 over the Azores' west where the blend
+reaches), as it was and as the tiles were raised by. Their tiles, coasts and indexes are
+untouched. The day their gauges' levels are read, the rule moves them and the regions are
+rebuilt.
+
+### The region `strait`
+
+The recipe unchanged (the world's level, as 39f's comment has it). The control: the head's
+tool on today's fetch gives the committed tiles byte for byte. `python tools/build_charts.py
+--region strait --reuse-world`: the checks as printed (100 of 100 features, ids unique,
+the override's datum stated, the fetch box covering the tiles, "2 kept"); "GEBCO's fill
+raised to the chart's datum by the world's mean level, 0.37 to 3.98 m": within the Strait's
+own bounds 3.98 as before (its gauges' levels unread, the eleven's), and 0.37 to 0.43 in its
+tile column east of 5 W, which lies in `mediterranean-west`'s bounds and reads that block's
+gauges' water. **Two level-2 tiles moved** (`2/129120_-18240` and `2/130656_-18240`, the
+column from 5.07 W, Ceuta's east and the coast of Spain from Gibraltar's bay east to
+Estepona): 126,335 cells changed, the largest 3.60 m, **97 cells from above the datum to
+below** (the shore's fill the old raise lifted 3.6 m out of a sea whose high water is now a
+foot above its mean), none the other way; no level-3 tile moved (the harbours lie west of
+5 W). The shore's sweep 1,847 cells in 74 places (by the control 1,553 in 67), the largest
+about Cadiz's bay (97 and 88 about 36.52 to 36.58 N, 6.23 to 6.28 W, in `portugal`'s two
+kept tiles, computed with the block and not written, which read Portugal's water now) and
+Gibraltar's bay and the Moroccan shore as before (88, 81, 78, 77).
+
+| | Old | New |
+|---|---|---|
+| level 2 | 12 tiles, 2.45 MB | 12 tiles, 2.46 MB |
+| level 3 | 14 tiles, 1.36 MB | 14 tiles, 1.36 MB (unchanged) |
+| coast | 160 pieces, 2,131 points, 61,805 bytes | 160 pieces, 2,091 points, 61,010 bytes |
+
+`git status` after the build: the two tiles, the coast, the manifest's entry and fetch
+records; nothing of any other region, the index and every port file and mark untouched.
+**The block's tests**: the six files fast 203 passed, slow 11 passed; truths 7-269 and 7-290
+to 7-299 with `--slow -n 4` (7-294, Gibraltar to Port Mahon whole, among them), 11 passed.
+**The scenario** `strait.yaml`, 10 hours: **the same log byte for byte**, 588 lines, digest
+`c9459f107afdfe79`.

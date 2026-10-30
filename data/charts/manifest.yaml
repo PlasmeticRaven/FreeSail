@@ -4,7 +4,7 @@
 format: 1
 built: '2026-10-30'
 tool: tools/build_charts.py
-build_hash: b38c50d1ffdfde1b
+build_hash: f50c9fedfc45610f
 levels:
   '0':
     cell_sec: 150.0
@@ -5032,7 +5032,7 @@ regions:
         south_sec: 129120
         west_sec: -18240
         min_depth_m: 348.8
-        bytes: 202648
+        bytes: 202641
       - name: 130656_-19776
         south_sec: 130656
         west_sec: -19776
@@ -5042,7 +5042,7 @@ regions:
         south_sec: 130656
         west_sec: -18240
         min_depth_m: 0.0
-        bytes: 167722
+        bytes: 176460
       '3':
       - name: 129632_-19776
         south_sec: 129632
@@ -10899,12 +10899,6 @@ sources:
       sha256: 69c4dbf90f95a63b4e531d7c0b26fc2191339337e99938491bbeb2b644f2eb9c
       bytes: 193316251
       file: gebco_2025_s31.90_n51.10_w-32.10_e-0.90_ascii.zip
-    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 35.25, ''north'':
-        36.9, ''west'': -6.95, ''east'': -4.45})'
-      retrieved: '2026-10-10'
-      sha256: bf531695c26180c04e2b5a7f6413a4fe6540d407a28b4a6ea6bc69c8cc6f26df
-      bytes: 1447981
-      file: gebco_2025_s35.25_n36.90_w-6.95_e-4.45_ascii.zip
     - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 34.35, ''north'':
         40.8, ''west'': -5.3, ''east'': 0.3})'
       retrieved: '2026-10-29'
@@ -10959,6 +10953,12 @@ sources:
       sha256: 2c526967a9a325c98ed797deb52830740922be843f10a4dfe7ad962415aff026
       bytes: 8064872
       file: gebco_2025_s36.10_n42.45_w-10.40_e-5.70_ascii.zip
+    - url: 'https://download.gebco.net/api/queue (gebco_2025_global, ascii, {''south'': 35.25, ''north'':
+        36.9, ''west'': -6.95, ''east'': -4.45})'
+      retrieved: '2026-10-30'
+      sha256: 146d64390b8194c0316ac80f7231f8fdc5ffbd42c1443c6f60ace7061f97d3cb
+      bytes: 1447981
+      file: gebco_2025_s35.25_n36.90_w-6.95_e-4.45_ascii.zip
     status: fetched
   emodnet_dtm_2024:
     name: EMODnet Bathymetry DTM 2024
@@ -11013,16 +11013,6 @@ sources:
       sha256: e29680eeec93019816ff98a46d137f658288cdf71015928a3ded46a526f78c92
       bytes: 111365244
       file: emodnet_dtm2024_elevation_max_36.20_40.25_-31.60_-24.15.nc
-    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(35.35):(36.8)%5D%5B(-6.85):(-4.55)%5D
-      retrieved: '2026-10-10'
-      sha256: 450a001461ce4d1205e9b4c5d375a1fcf0326d1cb535fadf9845127f11bbe043
-      bytes: 12342564
-      file: emodnet_dtm2024_elevation_35.35_36.80_-6.85_-4.55.nc
-    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(35.35):(36.8)%5D%5B(-6.85):(-4.55)%5D
-      retrieved: '2026-10-10'
-      sha256: f03b9920fe0a9bfb9111f53930e51d173d6ffdcd9739637326963431b4b845cf
-      bytes: 12342204
-      file: emodnet_dtm2024_elevation_max_35.35_36.80_-6.85_-4.55.nc
     - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(34.45):(40.7)%5D%5B(-5.2):(0.2)%5D
       retrieved: '2026-10-29'
       sha256: 7a180b7a6b6af1f5d44c00bc6d34279bfe5503979b5dd8b3f66393719cc358ca
@@ -11113,6 +11103,16 @@ sources:
       sha256: 1287a9f2bc172c91961be5ec9db898d1d4e290cbcccde01b649212a0e2786a32
       bytes: 102148668
       file: emodnet_dtm2024_elevation_max_36.20_42.35_-10.30_-5.80.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation%5B(35.35):(36.8)%5D%5B(-6.85):(-4.55)%5D
+      retrieved: '2026-10-30'
+      sha256: 258fee781c2984d7bae7f69437025bf5679a33f746bac76231c9b3b6ecf6c000
+      bytes: 12342564
+      file: emodnet_dtm2024_elevation_35.35_36.80_-6.85_-4.55.nc
+    - url: https://erddap.emodnet.eu/erddap/griddap/bathymetry_dtm_2024.nc?elevation_max%5B(35.35):(36.8)%5D%5B(-6.85):(-4.55)%5D
+      retrieved: '2026-10-30'
+      sha256: ffed2c3c9f9bc3b3abb56bd423d7808e27bbd334c88ddc636f1213f49607986f
+      bytes: 12342204
+      file: emodnet_dtm2024_elevation_max_35.35_36.80_-6.85_-4.55.nc
     status: fetched
   shom_homonim:
     name: SHOM MNT bathymétrique de façade Atlantique (projet HOMONIM), 100 m
