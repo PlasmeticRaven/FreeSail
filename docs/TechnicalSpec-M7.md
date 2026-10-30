@@ -1031,6 +1031,15 @@ lead's ruling, `mediterranean-west` (5 W to 0.05 E) and `balearics` (0.05 E to 4
 milestone 6's machinery; the regency of Algiers a nation of data alone; the Mediterranean's
 first weather box from a printed table; as built in spec M6 §26's list, figures in
 `docs/dev/TuningNotes.md`, "Package 79c".
+**As built: the Gulf of Lion and the Tyrrhenian (package 79d, 2026-10-29).** The fourth of
+79's packages, three regions by the lead's ruling on its first step's measure: `gulf-of-lion`
+(the Roussillon and Provence to Nice and Villefranche, its south bound meeting 79c's
+`balearics` at 40.56 N), `ligurian-sea` (Genoa, Leghorn, Elba, Corsica and the Maddalena
+with Agincourt Sound) and `tyrrhenian` (Sardinia, the Roman coast to Gaeta, the bay of
+Naples); the five Italian and Sardinian nations as data; a port's nation by date (Genoa's
+annexation of June 1805); the Gulf's and the Tyrrhenian's weather boxes from the
+Admiralty's printed tables of Marseille and Naples; the scenario `agincourt-sound.yaml`. As
+built in spec M6 §26's list, figures in `docs/dev/TuningNotes.md`, "Package 79d".
 
 ---
 

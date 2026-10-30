@@ -199,6 +199,22 @@ tables:
       - {name: Melilla, lat_deg: 35.293, lon_deg: -2.935, hw_h: 2, hw_m: 10, spring_rise_ft: 1, note: "Purdy 1826, p. 322: at the Zafarines the tide rises very little; the hour Melilla's held gauge's establishment (TICON), JUDGEMENT"}
       - {name: Oran, lat_deg: 35.713, lon_deg: -0.642, hw_h: 2, hw_m: 20, spring_rise_ft: 1, note: "no period figure; the rise JUDGEMENT with Melilla's and Algiers'; the hour Melilla's held gauge's establishment, 114 miles off, JUDGEMENT"}
       - {name: Algiers, lat_deg: 36.786, lon_deg: 3.069, hw_h: 7, hw_m: 20, spring_rise_ft: 1, note: "Bérard 1837, pp. 76 to 77: the tide scale set up in the port of Algiers in 1831 ranged sixteen inches at the most, its rise and fall tied to the wind and the glass; the hour Palma's held gauge's establishment, 168 miles off, JUDGEMENT"}
+      # package 79d, the Gulf of Lion's block: the period's tide-hour for the shores of
+      # France, Smyth 1854's ("the most exact observations giving only a foot or two of
+      # rise ... the tide-hours at Toulon, Spezzia, and Naples ... 3h 30m, 1h 45m and 11h
+      # 20m", p. 178), which he gives with his doubt and which is kept so; the rise his
+      # foot (the lower of his "a foot or two"). No other place of the block: a rise of
+      # the 37j rule would be the world's range there, Le Conquet's twenty feet while the
+      # block's gauges are held, and the master takes the nearest place of his table.
+      - {name: Toulon, lat_deg: 43.105, lon_deg: 5.920, hw_h: 3, hw_m: 30, spring_rise_ft: 1, note: "Smyth 1854, p. 178: Toulon 3h 30m, the rise a foot or two on the shores of France and Italy; the hour given with his doubt (the accounts inconsistent)"}
+      # package 79d, the Ligurian sea's block: Smyth 1854's tide-hour for Spezzia (p. 178),
+      # with his doubt, the rise his foot; the block's other places take it as the nearest
+      - {name: Spezia, lat_deg: 44.095, lon_deg: 9.830, hw_h: 1, hw_m: 45, spring_rise_ft: 1, note: "Smyth 1854, p. 178: Spezzia 1h 45m, the rise a foot or two; the hour given with his doubt"}
+      # package 79d, the Tyrrhenian's block: Smyth 1854's tide-hour for Naples (p. 178), with
+      # his doubt (General Visconti told him Blagden's nine to ten o'clock was wrong), the
+      # rise his foot; the block's other places take it as the nearest
+      - {name: Naples, lat_deg: 40.838, lon_deg: 14.258, hw_h: 11, hw_m: 20, spring_rise_ft: 1, note: "Smyth 1854, p. 178: Naples 11h 20m, the rise a foot or two on the shores of Italy; the hour given with his doubt"}
+
   moore:
     title: "Moore's table of high water by the moon's bearing (Moore 1799), a point to every three quarters of an hour"
     ports:

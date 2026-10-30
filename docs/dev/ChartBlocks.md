@@ -546,3 +546,46 @@ so the seam rule keeps nothing (`tiles another region lists: 0 kept`); what they
   (`https://iiif.archive.org/iiif/<item>$<leaf>/full/900,/0/default.jpg`, the leaf from
   the archive's full-text search); the encyclopaedia's pages serve where its API refuses
   for its rate.
+
+## The Gulf of Lion, the Ligurian sea and the Tyrrhenian (package 79d, as built)
+
+Three regions in one package, the Gulf split by the lead at a column edge when its tiles
+measured 46 MB: `gulf-of-lion` (40.56 to 44.5 N, 3 to 7.73 E, its south bound the row edge
+where 79c's `balearics` ends, so that the two blocks' tiles meet), `ligurian-sea` (41 to
+44.5 N, 7.74 to 11 E) and `tyrrhenian` (38.5 to 42.5 N, 8 to 15.5 E, its 32 tiles north of
+40.99 N and west of 11.15 E the Ligurian sea's). What they found, for the next blocks:
+
+- **Measure before committing, and split at a tile edge.** A block of thirty square degrees
+  of deep sea runs past 40 MB (the Gulf's 180 tiles 46 MB); two regions whose bounds stop
+  short of and start just past one column edge (7.73 E and 7.74 E) share no tile and keep
+  "0 kept" both ways; a bound ending exactly on an edge takes in the column beyond it.
+- **Mind the gap between two blocks' bounds.** Two neighbours whose boxes do not overlap in
+  latitude leave the rows between them in nobody's tiles, and east of 1 W no corridor
+  answers there (79c's 40.56 N and the Gulf's first 41.0 N left 26 miles of open sea with
+  no chart); move one bound to the other's row edge.
+- **The Mediterranean is tideless, and its streams are currents.** A stream area with
+  nought at springs and neaps (Torbay's form) and a `current:` alone carries the coast's set
+  (the Riviera's westward knot, the Roman coast's north-easterly half knot); every area of
+  the box, and an open area over it after them. The world's tide over these blocks is Le
+  Conquet's alone while the gauges are held (two metres of M2 where the gauges have five to
+  twelve centimetres), and the fill raise follows it (3.7 to 6.8 m); the master's epitome
+  gives Smyth 1854's few tide-hours (p. 178: Toulon, Spezia, Naples) and no 37j rise, which
+  would be twenty feet.
+- **Islets the grid lacks are many here**: seventeen of the three regions (Planier, Tino,
+  the Giraglia, the Lavezzi, the Sanguinaires, Li Galli ...) read as water in EMODnet's
+  sixteenth of a minute; each a rock of its height and extent ("An isle the grid lacks").
+- **A road with its bottom is a feature of kind `anchorage`**: `Chart.bottom_near` reads the
+  note from `anchorage` and `bottom` features only, so a `road` with a `bottom:` leaves a
+  port's spots without a note (`test_tackle_orders.py`).
+- **The business needs prices that differ**: a cargo is drawn between two of a region's
+  ports only where a good's price at one is 1.3 times the other's; ports priced from one
+  table draw no trader at all. Give each port its own produce cheap and its wants dear.
+- **A port's nation may be dated** (`nation:` a list of `{nation, since, until}`, 79a's
+  form; package 79d for Genoa's annexation of June 1805): the loader takes the entry in
+  force on the scenario's first day, `Ports.stance` the world's day.
+- **The weather's box for a sea without one**: a printed table's days of wind by the eight
+  points (the Admiralty's Mediterranean Pilot of 1913 and 1916 has them for Marseille,
+  Genoa, Leghorn, Naples, Ajaccio and Cagliari) give the check row, each half-point's days
+  split between two quarters; the systems are tuned toward it by the check tool's `run` with
+  the box made the default. One track of lows a month cannot give two regimes at once (the
+  mistral's lows east of the Gulf and the Levant's south of it): say which the box takes.

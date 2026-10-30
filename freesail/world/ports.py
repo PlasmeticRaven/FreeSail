@@ -75,7 +75,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -537,6 +537,16 @@ class Port:
     # default; a port pickled before it has none of its own, and `ordnance.block_of` reads
     # its file once.
     ordnance: dict[str, Any] | None = None
+    # The port's nation by date (package 79d; 79a's dated form): the file's `nation:` as a
+    # list of {nation, since, until}, Genoa the Ligurian Republic's until the annexation of
+    # June 1805 and France's after; `nation` is the entry in force on the scenario's first
+    # day, `nation_on` the entry for a day. Empty for a port of one nation. A plain class
+    # default, so that a checkpoint from before loads.
+    nations: tuple[dict[str, Any], ...] = ()
+
+    def nation_on(self, when: datetime | date | None) -> str:
+        """The port's nation on a day: its dated entry for the day, else `nation`."""
+        return _dated_nation(self.nations, when) or self.nation
 
     @property
     def blockaded_by(self) -> str | None:
@@ -610,7 +620,12 @@ def port_files(root: Path = PORTS_DIR) -> dict[str, Path]:
     return {p.stem: p for p in sorted(root.glob("*.yaml"))}
 
 
-def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None = None) -> Port:
+def load_port(
+    path: str | Path,
+    chart: Any = None,
+    state: dict[str, Any] | None = None,
+    when: datetime | date | None = None,
+) -> Port:
     """A port from its file, its spots placed from the chart's features where the file
     names one (`feature:`), else from its own latitude and longitude; `state` is the
     scenario's for this port (closures, letters waiting, news)."""
@@ -710,11 +725,17 @@ def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None 
                     str(letter.get("to") or "captain"),
                 )
             )
+    nations = _nations(doc.get("nation"), where)
     return Port(
         reach_nm=float(doc.get("reach_nm", IN_PORT_NM)),
         id=str(doc.get("id") or p.stem),
         name=str(doc.get("name") or p.stem),
-        nation=str(doc.get("nation") or ""),
+        nation=(
+            (_dated_nation(nations, when) or nations[0]["nation"])
+            if nations
+            else str(doc.get("nation") or "")
+        ),
+        nations=nations,
         source=str(doc.get("source") or ""),
         outer_road=spot("outer_road"),
         anchorage=spot("anchorage"),
@@ -741,6 +762,39 @@ def load_port(path: str | Path, chart: Any = None, state: dict[str, Any] | None 
 
 
 PORT_STATES = ("open", "blockaded")
+
+
+def _nations(raw: Any, where: str) -> tuple[dict[str, Any], ...]:
+    """A port's dated nations (package 79d): `nation:` as a list of {nation, since, until}
+    (ISO dates, either open), in the order given; () for the one word."""
+    if not isinstance(raw, list):
+        return ()
+    out = []
+    for entry in raw:
+        if not isinstance(entry, dict) or not entry.get("nation"):
+            raise ValueError(f"{where}: each entry of a dated nation gives its nation")
+        dates = {
+            k: (v if isinstance(v, date) or v is None else date.fromisoformat(str(v)))
+            for k in ("since", "until")
+            for v in [entry.get(k)]
+        }
+        out.append({**entry, "nation": str(entry["nation"]), **dates})
+    return tuple(out)
+
+
+def _dated_nation(nations: tuple[dict[str, Any], ...], when: datetime | date | None) -> str:
+    """The dated entry in force on a day ('' for none, or no day): `since` and `until`
+    both counted in, as the business's dated blockades are (`business._within`)."""
+    if when is None:
+        return ""
+    day = when.date() if isinstance(when, datetime) else when
+    for entry in nations:
+        if entry["since"] and day < entry["since"]:
+            continue
+        if entry["until"] and day > entry["until"]:
+            continue
+        return str(entry["nation"])
+    return ""
 
 
 def _port_state(
@@ -979,15 +1033,19 @@ class Ports:
                 raise ValueError(
                     f"no port file for '{pid}' in {PORTS_DIR} (the ports are {', '.join(files)})"
                 )
-            self.ports[pid] = load_port(path, world.chart, states.get(pid))
+            self.ports[pid] = load_port(
+                path, world.chart, states.get(pid), getattr(world.scenario, "start_time", None)
+            )
 
     # -- the ports against a place and a nation ---------------------------------------------
 
     def stance(self, port: Port, nation: str) -> str:
         """The port's stance toward a ship of the nation: the nations' table over the
         port's closures and its blockade (`Nations.stance`)."""
+        # package 79d: a port of dated nations by the world's day (Genoa's annexation)
+        port_nation = port.nation_on(self.world.clock.ship_time) if port.nations else port.nation
         return self.world.nations.stance(
-            port.nation, str(nation), port.closed_to, blockaded_by=port.blockaded_by
+            port_nation, str(nation), port.closed_to, blockaded_by=port.blockaded_by
         )
 
     def nearest_to(

@@ -500,6 +500,78 @@ REGIONS: dict[str, dict[str, Any]] = {
         # as mediterranean-west's: the world's mean level, the block's gauges held
         "fill_to_chart_datum": True,
     },
+    # package 79d: the Gulf of Lion, the Roussillon to Nice and Villefranche (the lead's
+    # ruling on step 1: the Gulf split at the column edge 7.73 E, its east part the region
+    # `ligurian-sea`). The level-2 tiles that meet the bounds span 40.56 to 44.83 N and
+    # 2.61 to 7.73 E (120 tiles, 12 columns by 10 rows). The south bound is the row edge
+    # 40.56 N (the ruling's second item), where `balearics` (package 79c) ends: the two
+    # blocks' tiles meet at that row, so that no open water between them answers nothing
+    # (Mahon to Toulon sails through it). The east bound stops short of the column edge
+    # 7.7333 E so that the column beyond is `ligurian-sea`'s, the seam between the two.
+    "gulf-of-lion": {
+        "title": "The Gulf of Lion, the Roussillon and Provence to Nice and Villefranche",
+        "bounds": {"south": 40.56, "north": 44.5, "west": 3.0, "east": 7.73},
+        "fetch": {"south": 40.45, "north": 44.95, "west": 2.5, "east": 7.85},
+        "harbours": {
+            "toulon": {"south": 43.02, "north": 43.13, "west": 5.85, "east": 6.05},
+            "marseille": {"south": 43.25, "north": 43.33, "west": 5.27, "east": 5.39},
+            "hyeres": {"south": 42.98, "north": 43.12, "west": 6.12, "east": 6.42},
+            "villefranche": {"south": 43.67, "north": 43.72, "west": 7.28, "east": 7.35},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # GEBCO's fill raised by the world's mean level, as the Strait's: the block's gauges
+        # are held, so the world's tide over it is the nearest far gauge's (the build prints
+        # the figures) and the land must stand above that tide's high water
+        "fill_to_chart_datum": True,
+    },
+    # package 79d: the Ligurian sea and Corsica, Genoa to Leghorn, the Tuscan islands and
+    # Elba, Corsica whole and the Maddalena with Agincourt Sound (the Gulf's east part by
+    # the lead's ruling). The level-2 tiles that meet the bounds span 40.99 to 44.83 N and
+    # 7.73 to 11.15 E (72 tiles, 8 columns by 9 rows); the west column abuts
+    # `gulf-of-lion`'s at 7.73 E. The south row (40.99 to 41.41 N) holds the Maddalena and
+    # Sardinia's north shore; `tyrrhenian`, built after, meets these tiles and keeps them
+    # this block's (the boundary at the row edge 40.99 N west of 11.15 E).
+    "ligurian-sea": {
+        "title": "The Ligurian sea, Genoa and Leghorn, Elba, Corsica and the Maddalena",
+        "bounds": {"south": 41.0, "north": 44.5, "west": 7.74, "east": 11.0},
+        "fetch": {"south": 40.85, "north": 44.95, "west": 2.5, "east": 11.3},
+        "harbours": {
+            "genoa": {"south": 44.38, "north": 44.43, "west": 8.86, "east": 8.96},
+            "leghorn": {"south": 43.50, "north": 43.60, "west": 10.20, "east": 10.33},
+            "porto-ferrajo": {"south": 42.79, "north": 42.84, "west": 10.29, "east": 10.36},
+            "san-fiorenzo": {"south": 42.66, "north": 42.75, "west": 9.24, "east": 9.33},
+            "ajaccio": {"south": 41.85, "north": 41.94, "west": 8.68, "east": 8.80},
+            "agincourt-sound": {"south": 41.17, "north": 41.27, "west": 9.36, "east": 9.48},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        # as gulf-of-lion's (the fetch box the first build's, which covers the tiles whole)
+        "fill_to_chart_datum": True,
+    },
+    # package 79d: the Tyrrhenian, Sardinia south of 40.99 N, the Roman coast from Monte
+    # Argentario by Civita Vecchia and the Tiber to Gaeta and the Pontine islands, the bay of
+    # Naples and south to Cape Palinuro. The level-2 tiles that meet the bounds span 38.43 to
+    # 42.69 N and 7.73 to 15.84 E (190 tiles, 19 columns by 10 rows); the 32 of them north of
+    # the row edge 40.99 N and west of the column edge 11.15 E are `ligurian-sea`'s (the
+    # Maddalena, Corsica's south, Elba and the Tuscan coast), kept so by the seam rule ("32
+    # kept"): the boundary between the two regions. The north-east corner reaches the
+    # Adriatic's shore about Ortona and Pescara, a later block's water in this block's tiles;
+    # the south row (38.43 to 38.85 N) holds the sea north of the Lipari islands, which with
+    # Sicily and the Strait of Messina are a later block.
+    "tyrrhenian": {
+        "title": "The Tyrrhenian, Sardinia, Civita Vecchia, Gaeta and the bay of Naples",
+        "bounds": {"south": 38.5, "north": 42.5, "west": 8.0, "east": 15.5},
+        "fetch": {"south": 38.3, "north": 42.85, "west": 7.6, "east": 16.0},
+        "harbours": {
+            "cagliari": {"south": 39.14, "north": 39.23, "west": 9.05, "east": 9.18},
+            "alghero": {"south": 40.53, "north": 40.62, "west": 8.18, "east": 8.33},
+            "civita-vecchia": {"south": 42.06, "north": 42.11, "west": 11.75, "east": 11.81},
+            "gaeta": {"south": 41.19, "north": 41.24, "west": 13.54, "east": 13.61},
+            "naples": {"south": 40.78, "north": 40.87, "west": 14.17, "east": 14.30},
+            "ponza": {"south": 40.88, "north": 40.93, "west": 12.93, "east": 12.98},
+        },
+        "sources": ["emodnet_dtm_2024", "gebco_2025"],
+        "fill_to_chart_datum": True,
+    },
 }
 
 # The corridor (spec M6 §26; package 38; the owner's ruling 5): level 1 from GEBCO over
@@ -528,7 +600,7 @@ CHARTS: dict[str, dict[str, Any]] = {
     "atlantic-east": {
         "title": (
             "The Channel, Biscay and the Iberian coast to Madeira, the Strait, the "
-            "Mediterranean west and the Balearics"
+            "Mediterranean west and the Balearics, the Gulf of Lion and the Tyrrhenian"
         ),
         "regions": [
             "channel-west",
@@ -546,6 +618,10 @@ CHARTS: dict[str, dict[str, Any]] = {
             # package 79c: the Mediterranean west in two regions (the lead's ruling)
             "mediterranean-west",
             "balearics",
+            # package 79d: the Gulf of Lion and the Tyrrhenian, the Mediterranean's north
+            "gulf-of-lion",
+            "ligurian-sea",
+            "tyrrhenian",
         ],
         "corridor": "atlantic-corridor",
     },

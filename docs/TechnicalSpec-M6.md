@@ -2077,6 +2077,27 @@ the figures are in `docs/dev/TuningNotes.md`.
    its check rows the Admiralty's meteorological tables (1913). The scenario `mahon.yaml`:
    the frigate from Gibraltar road to the mouth of Port Mahon, anchored without the ledges
    through a northerly.
+   **As built (package 79d, 2026-10-29), the Gulf of Lion and the Tyrrhenian.** Three
+   regions, the Gulf split at the column edge 7.73 E by the lead when its tiles measured
+   46 MB: `gulf-of-lion` (40.56 to 44.5 N, 3 to 7.73 E; 120 level-2 and 32 level-3 tiles,
+   28.1 MB; Toulon, Marseille, the Hyères road, Villefranche), `ligurian-sea` (41 to 44.5 N,
+   7.74 to 11 E; 72 and 32, 20.6 MB; Genoa, Leghorn, Porto Ferrajo, San Fiorenzo, Ajaccio,
+   Agincourt Sound; Bastia without a patch) and `tyrrhenian` (38.5 to 42.5 N, 8 to 15.5 E;
+   158 and 26, 38.0 MB, its 32 tiles north of 40.99 N and west of 11.15 E the Ligurian
+   sea's; Cagliari, Alghero, Civita Vecchia, Gaeta, Naples, Ponza); every tile written; 377
+   marks from Michelot 1709 and 1715, Purdy 1826, Norie 1831, Purdy 1840, Lamberti 1844, the
+   Derrotero 1849, Smyth 1828 and 1854 and James vol. 3, the islets the grid lacks as rocks,
+   the lights dated so that 1805 sees the fanals of Cette, Port-Vendres, Marseille, Genoa,
+   Leghorn, Civita Vecchia, Anzio and Naples and none of the 1830s and 1840s; no patch, no
+   sheet read with its datum. Sixteen port files (the French coast, Corsica and Elba hostile;
+   Genoa the Ligurian Republic's and then France's by a dated nation; Leghorn, the
+   Maddalena, Cagliari, Alghero, Civita Vecchia, Gaeta and Naples neutral); the nations
+   `sardinia`, `naples`, `etruria`, `liguria` and `papal-state` as data. The tide: 24 TICON
+   gauges read and held; current-only stream areas (the Riviera's and Provence's westward
+   set, Bonifacio's, the Roman coast's); Smyth 1854's tide-hours for Toulon, Spezia and
+   Naples. Two weather boxes, `gulf-of-lion` (Marseille's table, the mistral's lows) and
+   `tyrrhenian` (Naples' table). The scenario `agincourt-sound.yaml`: the frigate from the
+   Maddalena to look into Toulon and back.
    Figures in `docs/dev/TuningNotes.md`.
 
 Each block (the Strait's included) is a port file per port on 35's machinery, a patch per harbour where a period

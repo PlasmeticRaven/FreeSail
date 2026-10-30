@@ -328,6 +328,18 @@ MED_WEST_CURRENTS = [
     "alboran-sea",
     "med-west-open",
 ]
+# package 79d: the Mediterranean blocks' charts, whose areas carry the coasts' constant sets
+# and no tide (`current:` alone), and their areas' ids
+MEDITERRANEAN = {"gulf-of-lion", "ligurian-sea", "tyrrhenian"}
+MEDITERRANEAN_AREAS = (
+    "provence-current",
+    "gulf-of-lion-open",
+    "riviera-current",
+    "bonifacio-strait",
+    "ligurian-sea-open",
+    "roman-coast-current",
+    "tyrrhenian-open",
+)
 
 
 def test_the_directions_state_every_water_in_the_periods_form_beside_the_worlds_figures(tide):
@@ -596,8 +608,10 @@ def test_the_blocks_gauges_are_read_and_held_out_of_the_blend_that_would_move_th
     # the block's nine, after the Channel east's two (package 39a) under the same key
     held = [g for g in doc["held_gauges"] if 45.9 <= g["lat_deg"] < 48.0]
     south = [g for g in doc["held_gauges"] if 42.0 <= g["lat_deg"] < 45.9]  # package 39c's
+    # (west of the meridian: package 79d's Mediterranean gauges lie in the same latitudes)
+    south = [g for g in south if g["lon_deg"] < 0.0]
     # (Portugal and Cadiz's five, package 39d, after them, south of 42 N)
-    north_of_42 = [g for g in doc["held_gauges"] if g["lat_deg"] >= 42.0]
+    north_of_42 = [g for g in doc["held_gauges"] if g["lat_deg"] >= 42.0 and g["lon_deg"] < 3.0]
     # (and the Channel's east block's six, package 79b)
     assert len(north_of_42) == 2 + 6 + len(held) + len(south)
     assert [g["id"] for g in held] == [
@@ -666,7 +680,8 @@ def test_biscay_souths_gauges_are_read_and_held_and_the_worlds_tide_there_is_lat
     import yaml
 
     doc = yaml.safe_load(open(T.CONSTITUENTS_PATH, encoding="utf-8"))
-    south = [g for g in doc["held_gauges"] if 42.0 <= g["lat_deg"] < 45.9]
+    # (west of the meridian: package 79d's Mediterranean gauges lie in the same latitudes)
+    south = [g for g in doc["held_gauges"] if 42.0 <= g["lat_deg"] < 45.9 and g["lon_deg"] < 0.0]
     assert [g["id"] for g in south] == [
         "le-verdon",
         "arcachon",
@@ -808,7 +823,8 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
     area = tide.area_at(MID_STRAIT)
     assert area.id == "strait-middle" and area.chart == "strait"
     assert (area.current_toward_deg, area.current_kn) == (90.0, 2.0)
-    assert [a.id for a in tide.areas if a.current_kn] == [
+    # (package 79d: the Mediterranean blocks' areas carry the coasts' sets, below)
+    assert [a.id for a in tide.areas if a.current_kn and a.chart not in MEDITERRANEAN] == [
         "strait-middle",
         "strait-east-mouth",
         "strait-west-approach",
@@ -838,7 +854,8 @@ def test_the_straits_middle_runs_east_on_the_inset_whatever_the_tide_and_the_sho
     assert all(
         a.current_kn == 0.0
         for a in tide.areas
-        if a.chart != "strait" and a.id not in MED_WEST_CURRENTS  # package 79c
+        if a.chart not in {"strait", *MEDITERRANEAN}  # package 79d
+        and a.id not in MED_WEST_CURRENTS  # package 79c
     )
 
 
@@ -862,6 +879,7 @@ def test_the_master_allows_the_inset_from_his_directions_and_they_reach_the_stra
         for a in book.areas
         if a.id not in {"strait-middle", "strait-east-mouth", "strait-west-approach"}
         and a.id not in MED_WEST_CURRENTS  # package 79c
+        and not a.id.startswith(MEDITERRANEAN_AREAS)
     )
     sc = Scenario(
         start_time=datetime(1805, 6, 12, 10, 0),

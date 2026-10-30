@@ -1,0 +1,1681 @@
+# The features of the Ligurian sea's block (package 79d, the region `ligurian-sea`, the
+# Gulf of Lion's east part by the lead's ruling on the package's first step, east of the
+# column edge 7.73 E; docs/dev/ChartBlocks.md): the western Riviera from San Remo to
+# Genoa, Portofino and the gulf of Spezia, Leghorn and the Meloria, the Tuscan islands
+# and Elba, Corsica whole, and the Maddalena islands with Agincourt Sound and the north
+# shore of Sardinia, where Nelson's fleet watered in 1803 to 1805 while it watched Toulon.
+# West of 7.73 E is the region `gulf-of-lion` (features/gulf-of-lion.yaml). The form and
+# the rules are channel-west.yaml's (its head). The sources, in the references'
+# form (docs/references/README.md; the texts under docs/references/pilots/, package 79c's
+# research pass, its report in docs/dev/TuningNotes.md, "Package 79c"):
+#
+#   Michelot 1709   Le Portulan de la mer Mediterranee (Marseille): the French coast, the
+#                   Riviera and Italy; the fanals of the period. Before the period and in
+#                   use through it.
+#   Michelot 1715   The Mediterranean Pilot (the English of the same): the Gulf of Lyons,
+#                   Provence, Genoa, Leghorn, Elba.
+#   Purdy 1826      The New Sailing Directions for the Mediterranean Sea: sections IV to
+#                   VIII, with Captain Smith's remarks of 1818 on the French coast, Captain
+#                   Ryves's survey of the Maddalena of 1802 and Mr Atkinson's of 1804.
+#   Norie 1831      New Piloting Directions for the Mediterranean Sea.
+#   Purdy 1840      The New Sailing Directory for the Strait of Gibraltar and the Western
+#                   Division: its 'Pharonology' dates the lights first lit after 1805.
+#   Lamberti 1844   Portolano del mare Mediterraneo (Michelot in Italian with the lights).
+#   Derrotero 1849  Derrotero de las costas de Europa y Africa en el Mediterraneo, desde el
+#                   cabo de Creus: the spine, in Spanish; its translator's notes date the
+#                   lights of the 1830s and 1840s.
+#   Smyth 1828      Sketch of the Present State of the Island of Sardinia: the Maddalena
+#                   and Nelson's berth at Mezzo Schifo (Agincourt Sound).
+#   Smyth 1854      The Mediterranean: the table of positions, the heights.
+#   Admiralty 1913, 1916   The Mediterranean Pilot, vols. I (ch. IX, Sardinia) and II (the
+#                   French coast, Corsica, Italy): MODERN, for the heights, depths and
+#                   banks only, never for 1805's works or lights.
+#   James 1837      The Naval History of Great Britain, vol. 3 (docs/references/james/):
+#                   Nelson's station off Cape Sicie and the fleet in Agincourt Sound,
+#                   31 October 1803 (pp. 176 to 177).
+#
+# Where a page could not be read with confidence from an OCR's running heads the line of
+# the OCR text is cited instead ("OCR l. 4821").
+#
+# Positions are in the modern frame (WGS 84, the EMODnet DTM 2024 grid the tiles are cut
+# from), first placed from the modern chart and the pilots' bearings, then checked against
+# this block's tiles by the rule of channel-west.yaml's head (a scratch script outside the
+# repository: a land mark to the nearest land within 800 m, a light to land or a shoal head
+# within 400 m, an anchorage to water of half the pilot's depth within 800 m, a danger to
+# the nearest shoal head within 400 m); a move is said in `fix`, and the few moved farther
+# by the builder's reading say so. **Islets the grid lacks** (EMODnet's sixteenth of a
+# minute reads water over them: Tino, Palmaiola, the Formiche of Grosseto, the Giraglia,
+# the Lavezzi and the Sanguinaires) are given as rocks of their height and an extent of
+# their size (ChartBlocks.md, "An isle the grid lacks"), so that a ship cannot sail
+# through them; dangers the grid does not hold (the Maddalena's reefs from Ryves's and
+# Atkinson's surveys, the Algajola shoal) are left at the pilots' positions
+# and say so. Heights are above the sea for the horizon: the mountains of Corsica (Monte
+# Cinto 2,706 m, seen thirty leagues off) and of Elba are the great marks of this sea
+# (`chart.SEARCH_HEIGHT_M`, package 39e).
+#
+# The lights: a light's `lit` has `from` and `until`, so that 1805 sees what 1805 had. In
+# 1805: Genoa's Lanterna and Leghorn's tower, each `from` the earliest record read
+# (Michelot 1709 and 1715) where no pilot gives the year it was first lit, the builder's
+# memory of the true year (Genoa's of 1543, Leghorn's of 1303) said UNVERIFIED beside it.
+# Not yet in 1805: the Tino (1838, Purdy 1840), and Corsica's coast lights (the Revellata, the Sanguinaires and
+# Pertusato in the 1840s, the Giraglia 1848: Purdy 1840 names only Bastia's on the island,
+# the Derrotero 1849 the rest lit or building). Porto Ferrajo's on Fort Stella and Bastia's
+# mole-head fire are `from` 1826, the earliest record read, UNVERIFIED (for the lead: the
+# builder's memory has Porto Ferrajo's of 1788). `range_nm` is the period lamp's, from the pilot's leagues or JUDGEMENT.
+#
+# Not here: Monte Argentario and Port Ercole, east of 11.15 E, are the Tyrrhenian's (the
+# region `tyrrhenian`), as is Sardinia south of 40.99 N (Monte Limbara among it); west of
+# 7.73 E the region `gulf-of-lion`'s. Porto Santo Stefano and Giannutri (11.10 to 11.12 E)
+# lie in this block's tiles east of its bounds and are given by neither file (a later pass).
+
+region: ligurian-sea
+features:
+  # ---------------------------------------------------------------------------
+  # The western Riviera from San Remo to Genoa (the harbour patch genoa)
+  # ---------------------------------------------------------------------------
+
+  - id: san-remo
+    kind: town
+    name: St. Remo
+    modern: Sanremo
+    lat_deg: 43.816
+    lon_deg: 7.7745
+    height_m: 50
+    source: 'Purdy 1826, p. 66: between Cape Nero and Cape dell''Arma, each with a square watch-tower, the small and pleasant town of St. Remo on a little rising ground, gardens with orange, lemon and palm trees; within a small mole 6 to 8 feet; large vessels anchor off the town at a mile in 7 or 8 fathoms on mud and sand; Derrotero 1849, p. 65: at San Remo anchor in 6 to 10 brazas, sand and mud; height JUDGEMENT'
+    says: 'St. Remo, the little town on its rising ground among orange and palm trees, between two capes with square towers; ships lie a mile off in seven or eight fathoms, mud and sand.'
+
+  - id: cape-delle-mele
+    kind: headland
+    name: Cape delle Melle
+    modern: Capo Mele
+    lat_deg: 43.958
+    lon_deg: 8.17
+    height_m: 221
+    source: 'Purdy 1826, p. 66: Cape delle Melle five miles E.N.E. 1/2 E. from Cape Verde or Oneglia, a large high point, almost round, projecting far into the sea, a watch-tower on it with two houses adjoining; Michelot 1715, p. 57 (OCR l. 4652): the point that stretches the most out into the sea of any upon this coast; Derrotero 1849, p. 66: when coming from the W. along the coast Cape Mele is the last that can be seen to the E., the coast falling away N.E. beyond it; some reckon it the western limit of the gulf of Genoa; Admiralty 1916, p. 247: steep, rounded, covered with olive trees, 725 feet high'
+    says: 'Cape delle Melle, the great round high cape with its watch-tower, standing out farthest of any on the Riviera of the west; beyond it the coast falls away to the north-east for Genoa.'
+
+  - id: alassio-road
+    kind: anchorage
+    name: the road of Alassio
+    modern: Baia di Alassio
+    lat_deg: 43.9965
+    lon_deg: 8.186
+    height_m: 0
+    depth_fathoms: 12
+    bottom: sand and mud
+    source: 'Purdy 1826, p. 67: the town of Allassio a league from Cape delle Melle, three small forts and a small mole; anchor opposite it at a mile, the best berth with the church-steeple on with another farther inland, in from 18 to 10 fathoms on sand and mud; the S.E. winds blow in but a current generally sets to the S.W.; Derrotero 1849, p. 66: the anchorage before the town in 12 to 18 brazas, bottom mud, sheltered from the W.'
+    says: 'Alassio road, a mile off the long town with its three little forts, ten to eighteen fathoms on sand and mud, the church steeple on with the one inland; the current sets south-west.'
+
+  - id: gallinara
+    kind: island
+    name: Isola Galinara
+    modern: Isola Gallinara
+    lat_deg: 44.0255
+    lon_deg: 8.2255
+    height_m: 87
+    source: 'Purdy 1826, p. 67: the Isola Galinara, about a mile in circumference, a mile to the southward of Albenga, very high, with a watch-tower; anchor to the west of it in 14 to 10 fathoms with a fast upon the island; a channel between it and the coast with 9 fathoms in the middle, shoal near the coast; the town of Albenga a mile up the country with several towers; Derrotero 1849, p. 66: a very high island with a tower on it, a passage between it and the cape for all ships keeping nearer the island; Admiralty 1916, p. 249: 285 feet high, a tower on its summit; a spit with 3 1/2 fathoms 2 cables north of it'
+    says: 'Gallinara, the high little island with its watch-tower off Albenga; there is a passage inside it, keeping nearer the island than the low sandy point of the river.'
+
+  - id: finale
+    kind: town
+    name: Finale
+    modern: Finale Ligure (Finalmarina)
+    lat_deg: 44.1715
+    lon_deg: 8.3415
+    height_m: 60
+    source: 'Purdy 1826, p. 67: the smaller town of Finale 3 miles west of Cape Noli; anchor before it in from 8 to 5 fathoms, but no shelter from the sea-winds; behind the town on a little eminence two considerable forts near each other, by which and Cape Noli the place may be known from sea; Michelot 1715, p. 58: belonging to the King of Spain, two very considerable forts upon a little hill, and a large point with great white spots of sand seen from the westward; Derrotero 1849, p. 66: the town at the foot of a hill with a fortress on either side above it; anchor before it with land winds in 6 to 8 brazas; height JUDGEMENT (the forts'' eminence)'
+    says: 'Finale, the town under its two forts on the eminence behind, known from the westward by the white spots on its point; an open road in six to eight fathoms.'
+
+  - id: cape-vado
+    kind: headland
+    name: Cape Vado
+    modern: Capo di Vado
+    lat_deg: 44.2575
+    lon_deg: 8.448
+    height_m: 161
+    source: 'Purdy 1826, p. 67: Cape Vado stretches some distance out to seaward and appears whitish at a distance; on its summit the fort of St. Stefano and the ruins of some old fortifications; Michelot 1715, p. 58: a large point appearing whitish, ruins of fortifications on its top; Derrotero 1849, p. 66: part of a high mountain, a watch-tower on its summit, covered with ruins and whitish in colour; Admiralty 1916, p. 251: large caves on its eastern extreme give it a whitish appearance; on its summit, 528 feet high, the ruins of an old fort'
+    says: 'Cape Vado, the whitish cape with the old fort and ruins on its top, the mark of Vado road.'
+
+  - id: vado-road
+    kind: anchorage
+    name: the road of Vado
+    modern: Rada di Vado Ligure
+    lat_deg: 44.2733
+    lon_deg: 8.448
+    height_m: 0
+    depth_fathoms: 8
+    bottom: mud and weeds
+    fix: moved 135 m to water of 8 m (the first placing read -0.5 m)
+    source: 'Purdy 1826, pp. 67 to 68: the road and town of Vado to the N.W. of the cape; in the bottom some houses along shore with a small chapel, before which anchor in 5 or 6 fathoms with fasts on shore, the ground mud and weeds; Fort St. Lorenzo half a mile S.E. of the town, sunken rocks off it; large ships anchor farther out; East and S.E. winds send a great swell but the ground is good; guard against the N.W.; Derrotero 1849, p. 67: anchor opposite a chapel in 5 to 6 brazas, weed and mud, larger ships farther out in 9 or 12 brazas, of such good holding that with good moorings all weathers may be ridden; Admiralty 1916, p. 252: anchorage 3 cables off between Forti Vado and San Lorenzo in about 11 fathoms, mud, good holding'
+    says: 'Vado road, under the whitish cape, the great ships in eight or ten fathoms off the chapel, mud and weeds, good holding though the south-easters send in a swell.'
+
+  - id: savona
+    kind: town
+    name: Savona
+    modern: Savona (with the Fortezza del Priamar)
+    lat_deg: 44.3075
+    lon_deg: 8.481
+    height_m: 30
+    source: 'Purdy 1826, p. 68: Savona nearly four miles N.E. of Vado, defended by a considerable fortress to the south of it upon a rock near the sea; before the town a mole open to the N.E., now almost choked with sand and rocks, 7 or 9 feet within; lie without the mole with a hawser to it in 12 or 14 feet; Derrotero 1849, p. 67: the city defended by a citadel crowning a rock by the sea, its little port almost closed by a sand bar with about 8 feet at most; height JUDGEMENT'
+    says: 'Savona, a large town with its fortress on the rock by the sea; the old mole harbour is nearly choked with sand and fit only for small craft.'
+
+  - id: genoa-lanterna
+    kind: light
+    name: the Lanthorn of Genoa
+    modern: 'Lanterna di Genova (Capo del Faro, San Benigno)'
+    lat_deg: 44.4042
+    lon_deg: 8.9047
+    height_m: 117
+    lit:
+      from: 1709
+      until: null
+      range_nm: 20
+      character: 'a fixed light, a great lantern atop the square white tower'
+    source: 'Michelot 1715, p. 59 (OCR l. 4821): without the New Mole to the westward, upon a high fortified rock, a very high square white tower called the Light-house, upon which a large lanthorn is lighted in the night-time for a mark to all ships, and by day signals made for ships and galleys; Michelot 1709, OCR l. 7183: the same, ''le Fanal''; Purdy 1826, p. 68: upon the summit of a high point of rock a cable''s length west of the New Mole the lighthouse, a lofty square white tower with a lantern on its top, seen at a great distance; give the point a berth for rocks off it; Purdy 1840, Pharonology, p. v (OCR l. 697): an antient square white tower on the rocky point of San Benigno, total height above the sea 410 feet, fixed, five large lamps with reflectors (1840); Derrotero 1849, p. 67: the great light on a fortified rock, seen more than 24 miles; Admiralty 1916, p. 259: 385 feet above high water, the tower 249 feet high; the YEAR 1543 (the present tower rebuilt and relit after the siege of the Briglia; a light kept on the point since the twelfth century) is the builder''s knowledge, not the pilots'', JUDGEMENT: the pilots attest it lit in 1709 and through the period; range_nm JUDGEMENT for the oil lamps of 1805, less than the 24 miles of 1849; the light''s from is the earliest record read, Michelot 1709 (the tower of 1543, rebuilt and lit that year, is the builder''s memory and UNVERIFIED)'
+    says: 'The great Lanthorn of Genoa, the lofty square white tower on its fortified rock west of the New Mole, lighted every night; give its point a berth for the rocks off it.'
+
+  - id: genoa
+    kind: town
+    name: Genoa
+    modern: Genova (the old city)
+    lat_deg: 44.408
+    lon_deg: 8.931
+    height_m: 50
+    source: 'Purdy 1826, p. 68: the city of Genoa, beautified with noble buildings, at the foot of some high mountains at the bottom of the gulf of the same name, seen at a great distance from sea; a wall not only about the town but around the mountain; the port before the town formed on the south by two moles; St. Pietro de Arena, a suburb of magnificent buildings along a sandy shore to the west; Michelot 1715, p. 59: the capital of a very ancient republick, a trading city very flourishing; easily known by the number of country seats about it, the whiteness of its great walls and the very high light-house; height JUDGEMENT'
+    says: 'Genoa the Superb, the republic''s city of palaces rising from its port up the foot of the mountains, walled about together with the mountain behind.'
+
+  - id: genoa-heights
+    kind: hill
+    name: the mountain of the walls of Genoa
+    modern: 'Forte Sperone, the summit of the Mura Nuove (Monte Peralto)'
+    lat_deg: 44.427
+    lon_deg: 8.933
+    height_m: 490
+    source: 'Purdy 1826, p. 68: Genoa stands at the foot of some high mountains and may be seen at a great distance from sea; there is a wall not only about the town but around the mountain, which is cultivated and covered with fine gardens; Michelot 1715, p. 59: a pretty high wall not only about the town but round all the mountain; Derrotero 1849, p. 67: the city at the foot of a high mountain, walled, and another outer wall takes in the city and the mountain; the summit''s height and its fort (Sperone, on the apex of the walls of the 1630s) are the modern chart''s: JUDGEMENT'
+    says: 'The high mountain behind Genoa girdled by the city''s outer wall, its fort on the summit where the walls meet, seen far out to sea.'
+
+  - id: genoa-new-mole
+    kind: mark
+    name: the New Mole of Genoa
+    modern: 'Molo Nuovo (its head of the period, now within the port''s later works)'
+    lat_deg: 44.403
+    lon_deg: 8.911
+    height_m: 5
+    fix: 'laid by the pilots'' figures (the mole runs E.S.E. from the foot of the light about 200 to 280 toises), not on the modern chart: the head of 1805 lies within the later port works and quays'
+    source: 'Purdy 1826, p. 68: the port formed on the south by two moles 16 or 18 feet above the water; that on the west, stretching eastward, is the New Mole; the mole-heads about 300 fathoms asunder; you may range very near the head of the New Mole, 10 and 12 fathoms close to it; the general anchorage for large ships behind it; Michelot 1715, p. 59: the new mole stretches into the sea to the S.E. about 180 fathom, the galleys lying along it with their sterns to it; Derrotero 1849, p. 67: the west or great mole, also called the new, runs 200 toises E.S.E. from the foot of the light, fitted with granite bollards'
+    says: 'The New Mole, running out from under the light-house; its head is steep-to with ten and twelve fathoms close to, and the great ships lie behind it.'
+
+  - id: genoa-old-mole
+    kind: mark
+    name: the Old Mole of Genoa
+    modern: Molo Vecchio
+    lat_deg: 44.4093
+    lon_deg: 8.9205
+    height_m: 5
+    fix: laid at the head of the modern Molo Vecchio; the mole of 1805 may have been somewhat shorter (Michelot's 150 fathom; Lamberti 1844 says it was lengthened)
+    source: 'Purdy 1826, p. 68: the mole on the east, which stretches to the westward, is called the Old Mole; you may not approach so near its head as some loose rocks lie a little way from it; p. 69: the eastern side within the Old Mole used by merchant-vessels only, the depths insufficient for large ships; water to be had at the old mole; Michelot 1715, p. 59: the old mole before the town stretches toward the point of the New Mole about 150 fathom; at its end a battery of 9 or 10 guns and near its middle a little square fort; Lamberti 1844, p. 134: the old mole lengthened to narrow the mouth, a small light kindled on it every night'
+    says: 'The Old Mole before the town, with its battery at the head and a little square fort; keep off its head, where loose rocks lie under water.'
+
+  - id: genoa-port
+    kind: anchorage
+    name: the port of Genoa
+    modern: 'Porto di Genova, the old harbour within the moles'
+    lat_deg: 44.4082
+    lon_deg: 8.9188
+    height_m: 0
+    depth_fathoms: 8
+    bottom: mud and clay
+    fix: laid in the water of the modern inner harbour between the old moles' lines; the berth behind the New Mole of 1805 is now largely quays; moved 67 m to water of 8 m (the first placing read -0.2 m)
+    source: 'Purdy 1826, p. 68: the general anchorage for large ships is behind the New Mole, mud and clay bottom, good holding ground, an anchor ahead and two fasts astern to the New Mole; room for four or five sail to lie at their anchors; the North and N.E. winds blow very strongly from the mountains in winter; p. 69: with the winds at S.S.E. and S.E. the sea runs very high in the harbour; Michelot 1715, p. 59: great ships moor in the middle of the harbour in 8 and 10 fathom, anchors N.W. and S.E.; Derrotero 1849, pp. 67 to 68: ships of the line and frigates moor in the west part of the port inside the new mole in 9 or 10 brazas'
+    says: 'Within the moles of Genoa, the men-of-war behind the New Mole in eight or ten fathoms on mud and clay, an anchor ahead and two fasts to the mole; a south-easter sends a high sea into the harbour.'
+
+  - id: genoa-road
+    kind: anchorage
+    name: the road of Genoa
+    modern: the roadstead south of the port of Genoa (outside the Diga foranea)
+    lat_deg: 44.388
+    lon_deg: 8.915
+    height_m: 0
+    depth_fathoms: 18
+    bottom: clay
+    fix: 'laid by Purdy''s bearing and distance: one to two miles without the mole, the lighthouse bearing N. by W. to N.N.W.; the modern breakwater stands between it and the old port'
+    source: 'Purdy 1826, p. 69: there is anchorage in the roads from between one to two miles without the mole, in from 10 to 24 fathoms, clay bottom, with the lighthouse bearing from N. by W. to N.N.W.; p. 68: there is no difficulty in sailing in between the mole-heads, room enough for the largest ships; Derrotero 1849, p. 68: S.W., S. and S.E. winds raise much sea in the port; the only precaution entering is to give a berth to the point of the light and not to close the mole-heads'
+    says: 'Genoa road, a mile or two without the moles with the light-house bearing north by west, ten to twenty-four fathoms on clay; open to all the winds from the sea.'
+
+
+  # ---------------------------------------------------------------------------
+  # Portofino, the gulf of Spezia, Leghorn and the Meloria (the harbour patch leghorn), the Tuscan islands and Elba with Porto Ferrajo (the harbour patch porto-ferrajo)
+  # ---------------------------------------------------------------------------
+
+  - id: monte-portofino
+    kind: hill
+    name: Mount Porto-Fino
+    modern: Monte di Portofino
+    lat_deg: 44.321
+    lon_deg: 9.17
+    height_m: 610
+    source: 'Purdy 1826, p. 72: the point of Mount Porto-Fino is large, and appears round and steep on all sides, the land very high and steep; Admiralty 1916, p. 267: Monte Portofino, the summit of the promontory, is 2,001 feet high'
+    says: 'Mount Porto-Fino, the great round headland east of Genoa, high and steep on all sides, the first mark of the Riviera of the Levant.'
+
+  - id: cape-portofino
+    kind: headland
+    name: the point of Porto-Fino
+    modern: Punta del Capo (Punta di Portofino)
+    lat_deg: 44.3001
+    lon_deg: 9.215
+    height_m: 100
+    fix: moved 409 m to the grid's land (the first placing read 62 m of water)
+    source: 'Purdy 1826, p. 72: from the point of Mount Porto-Fino to that which forms the harbour of Porto-Fino the distance to the E.S.E. is 3 miles, the land between very high and steep; the last point forms the western point of the Gulf of Rapalo; height JUDGEMENT from the steep land behind the point'
+    says: 'The point of Porto-Fino, the steep south-east end of the mount, the western point of the Gulf of Rapalo.'
+
+  - id: portofino-harbour
+    kind: anchorage
+    name: Porto-Fino
+    modern: Portofino harbour
+    lat_deg: 44.3034
+    lon_deg: 9.2135
+    height_m: 0
+    depth_fathoms: 4
+    bottom: mud and weeds
+    fix: moved 240 m to water of 30 m (the first placing read -38.5 m)
+    source: 'Purdy 1826, p. 72: the fortified town and little harbour of Porto-Fino, capable of seven or eight galleys, 140 fathoms long and 70 wide, cannot be seen until nearly opposite; 9 fathoms at the entrance, within only 3 or 4 fathoms, the ground mud and weeds; a small fort on the south point; open to winds from the E.N.E.'
+    says: 'Porto-Fino, a little harbour for galleys under the mount, in 3 or 4 fathoms on mud and weeds, open to the E.N.E.'
+
+  - id: sestri-levante
+    kind: town
+    name: Sestri di Levante
+    modern: Sestri Levante
+    lat_deg: 44.271
+    lon_deg: 9.395
+    height_m: 15
+    source: 'Purdy 1826, p. 72: the town of Sestri di Levante stands near the S.E. point of the Gulf of Rapalo, 3 leagues E. by E. from Porto-Fino; the gulf very deep, the anchorage close to the land but in no part safe, being exposed to southerly winds'
+    says: 'Sestri di Levante on its point at the south-east end of the Gulf of Rapalo, no safe anchorage with the wind southerly.'
+
+  - id: punta-mesco
+    kind: headland
+    name: Point del Mesco
+    modern: Punta Mesco
+    lat_deg: 44.1335
+    lon_deg: 9.634
+    height_m: 311
+    source: 'Purdy 1826, p. 72: at 10 1/2 miles from Sestri Point is the Point del Mesco, large, very high, steep on all sides, with a chapel on it; thence to Porto Venere 7 miles, the coast very high and steep with several villages near the sea; Admiralty 1916, p. 272: on the point the ruins of San Antonio convent, 1,020 feet above high water'
+    says: 'Point del Mesco, large, very high and steep, with a chapel on it, the western end of the high coast of the Cinque Terre.'
+
+  - id: riomaggiore
+    kind: town
+    name: Rio Maggiore
+    modern: Riomaggiore (Cinque Terre)
+    lat_deg: 44.0995
+    lon_deg: 9.7378
+    height_m: 30
+    source: 'Purdy 1826, p. 72: from the Point del Mesco to Porto Venere the coast is very high and steep, and has several villages near the sea; Admiralty 1916, p. 274: Rio Maggiore village at the mouth of a narrow valley just northward of Capo di Negro, which rises to a mountain 1,115 feet high with a white sanctuary'
+    says: The villages of the Cinque Terre in their clefts of the high steep coast between the Mesco and Porto Venere; Rio Maggiore the easternmost.
+
+  - id: porto-venere
+    kind: town
+    name: Porto Venere
+    modern: Porto Venere
+    lat_deg: 44.0505
+    lon_deg: 9.8355
+    height_m: 20
+    source: 'Purdy 1826, p. 72: Porto Venere lies a little to the west of the entrance of the Gulf of La Spezia, a small town by the sea-side at the foot of a mountain covered with olive-trees; the island Palmaria directly opposite forms the harbour; Derrotero 1849, p. 71: water at a well outside the town and in the cloister of the convent of San Francisco'
+    says: 'Porto Venere, a small walled town at the foot of its olive mountain, Palmaria across the narrow strait making its harbour.'
+
+  - id: porto-venere-anchorage
+    kind: anchorage
+    name: the harbour of Porto Venere
+    modern: 'Seno di Porto Venere, between Palmaria and the main'
+    lat_deg: 44.0545
+    lon_deg: 9.8445
+    height_m: 0
+    depth_fathoms: 7
+    bottom: mud
+    source: 'Purdy 1826, p. 72: from the middle of Palmaria a long point of sand and mud stretches under water towards a convent east of the town, with not more than 2 1/2 fathoms; between the two eastern points of the entrance 9 or 10 fathoms; you may anchor in 6 or 7 fathoms and lie secure from all winds; Derrotero 1849, pp. 70 to 71: the true anchorage of Porto Venere is between Palmaria and the main, in 7 to 8 brazas in the middle, the bank of mud (lama)'
+    says: 'The harbour of Porto Venere within Palmaria, in 6 or 7 fathoms on mud, secure from all winds, the sand and mud spit from the island to be approached with caution.'
+
+  - id: palmaria
+    kind: island
+    name: the island Palmaria
+    modern: Isola Palmaria
+    lat_deg: 44.042
+    lon_deg: 9.842
+    height_m: 188
+    source: 'Purdy 1826, pp. 72 to 73: the island Palmaria, directly opposite Porto Venere, forms the harbour; higher and much larger than the other islands, nearly a mile and a half long (the officer of 1817); Admiralty 1916, p. 275: triangular, each side about a mile, the summit 617 feet high'
+    says: 'Palmaria, the high island at the west side of the gulf''s entrance, covered with olives, making the harbour of Porto Venere.'
+
+  - id: tino
+    kind: rock
+    name: the Isle Tino
+    modern: Isola del Tino
+    lat_deg: 44.0267
+    lon_deg: 9.85
+    height_m: 122
+    extent_m: 250
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    source: 'Purdy 1826, p. 73: off the south side of Palmaria is the Isle Tino, the passage between 16 to 18 fathoms; close to the southward of Tino two rocks above water and several covered, approach them no nearer than 14 fathoms; Admiralty 1916, p. 276: Tino 306 feet high, Tinetto an islet one cable south of it, the ground between rocky and foul'
+    says: 'The Isle Tino off the south end of Palmaria, with the Tinetto and foul rocks close south of it: keep in 14 fathoms.'
+
+  - id: tino-light
+    kind: light
+    name: the light of Tino
+    modern: Faro dell'Isola del Tino
+    lat_deg: 44.0255
+    lon_deg: 9.8495
+    height_m: 117
+    lit:
+      from: 1838
+      until: null
+      range_nm: 20
+      character: a fixed light
+    source: 'Purdy 1840, Pharonology, OCR l. 707: TINO, at the entrance of the Gulf of Spezia, a new fixed light with the improved lenses, at 384 feet above the sea, seen in clear weather 25 miles (1838); Admiralty 1916, p. 276: the light at 386 feet on the summit of Tino; range_nm JUDGEMENT, the lens light''s 25 miles reduced for the common observer'
+    says: 'Tino''s light at the mouth of the Gulf of Spezia, first lit in 1838: no light here in 1805.'
+
+  - id: la-scola
+    kind: castle
+    name: La Scola
+    modern: Torre Scola
+    lat_deg: 44.0517
+    lon_deg: 9.85
+    height_m: 10
+    fix: moved 60 m to the grid's land (the first placing read 1 m of water)
+    source: 'Purdy 1826, p. 73: just off the eastern end of Palmaria is an islet of rock called La Scola, with a square castle on it, and 6 fathoms close to it; the officer of 1817: about 160 fathoms from Palmaria, sunken rocks between; Derrotero 1849, p. 71: pass outside fort Lescora with a large ship'
+    says: 'La Scola, the square castle on its rock off the east end of Palmaria; sunken rocks between it and the island.'
+
+  - id: fort-santa-maria-spezia
+    kind: castle
+    name: Fort St. Mary
+    modern: 'Punta Santa Maria (Forte Santa Maria), Gulf of La Spezia'
+    lat_deg: 44.0741
+    lon_deg: 9.861
+    height_m: 25
+    fix: moved 319 m to the grid's land (the first placing read 3 m of water)
+    source: 'Purdy 1826, p. 73: at two miles east of Porto Venere, and one mile north of its parallel, the citadel or fort of Santa Maria on the outer end of a long point of rocks, fortified on all sides; thence to the town of Spezia 5 miles; the officer of 1817: the citadel standing on a high rocky point on the western shore'
+    says: 'Fort St. Mary on its rocky point on the western shore of the gulf, the creeks of the lazaretto and the anchorage of the ships of war within it.'
+
+  - id: gulf-of-spezia
+    kind: anchorage
+    name: the Gulf of La Spezia
+    modern: 'Golfo della Spezia, off the western shore'
+    lat_deg: 44.0774
+    lon_deg: 9.8751
+    height_m: 0
+    depth_fathoms: 7
+    bottom: soft mud with sea-weed
+    fix: moved 651 m to water of 11 m (the first placing read 4.1 m)
+    source: 'Purdy 1826, pp. 73 to 74 (the officer of 1817): the three southernmost creeks receive ships of any size sheltered from all winds, the lazaretto creek 7 to 3 fathoms where ships of war lie off it; all over the gulf the bottom very good, soft and muddy with sea-weeds; ships may anchor in any depths from 18 to 7 fathoms; the bank in the entrance, 9 to 12 fathoms, breaks off the sea; Derrotero 1849, p. 71: one of the best anchorages of the Mediterranean, the usual anchorage on the west shore north of the citadel of Santa Maria'
+    says: 'The Gulf of La Spezia, good anchorage all over it in 18 to 7 fathoms on soft mud and weed, the ships of war lying off the lazaretto creek on the western shore.'
+
+  - id: spezia
+    kind: town
+    name: Spezia
+    modern: La Spezia
+    lat_deg: 44.103
+    lon_deg: 9.824
+    height_m: 10
+    source: 'Purdy 1826, p. 73: the town of Spezia at the bottom of the gulf, surrounded with very old walls, almost square, on a plain by the sea-side, a small kay for boats only; p. 74: a shoal a quarter mile off the S.E. end of the town'
+    says: 'Spezia in its old square walls at the bottom of the gulf, landing for boats only.'
+
+  - id: lerici
+    kind: castle
+    name: Lerici
+    modern: Lerici and its castle
+    lat_deg: 44.075
+    lon_deg: 9.912
+    height_m: 40
+    source: 'Purdy 1826, p. 73: the town of Lerici, on a point of land, upon which also near the town is a small fort on the sea-side; Derrotero 1849, p. 71: the point of Lerici notable for a square fort near which is the town'
+    says: 'Lerici on its point on the eastern side of the gulf, its square fort by the sea.'
+
+  - id: cape-magrezo
+    kind: headland
+    name: Cape Magrezo
+    modern: Punta Bianca (Capo Corvo)
+    lat_deg: 44.038
+    lon_deg: 9.97
+    height_m: 200
+    source: 'Purdy 1826, p. 73: at a mile and a half south-eastward of Lerici, 6 miles from Fort St. Mary, is Cape Magrezo, the south-easternmost point of the Gulf of Spezia, very high and bluff (the officer of 1817); Derrotero 1849, p. 71: the coast always high forms a great broad cape, east of which runs the river Magra; height JUDGEMENT'
+    says: 'Cape Magrezo, very high and bluff, the eastern point of the Gulf of Spezia.'
+
+  - id: magra-mouth
+    kind: place
+    name: the River Magra
+    modern: Bocca di Magra
+    lat_deg: 44.049
+    lon_deg: 9.987
+    height_m: 5
+    source: 'Purdy 1826, p. 74: the River Magra is less than half a league eastward of Cape Magrezo, a considerable stream; the Genoese territory ends a league more to the east; the town and fortress of Sarzana a league from the sea; Derrotero 1849, p. 71: anchorage at the east point of the cape with land winds, the sea winds very terrible'
+    says: 'The mouth of the Magra under Cape Magrezo, the end of the Genoese shore; anchorage only with the wind off the land.'
+
+  - id: viareggio
+    kind: town
+    name: Viareggio
+    modern: Viareggio
+    lat_deg: 43.869
+    lon_deg: 10.249
+    height_m: 10
+    source: 'Purdy 1826, p. 90: from Palmaria to Viareggio, in the Duchy of Lucca, 23 miles S.E.; the coast between low, the interior high with Carrara and Massa seen from the sea; in the road of Viareggio the anchorage very near the land and the ground very bad, no shelter from the sea-winds, little frequented; the town inconsiderable'
+    says: 'Viareggio, the small town of Lucca on the low shore; its road very near the land, the ground bad and no shelter from the sea-winds.'
+
+  - id: arno-mouth
+    kind: place
+    name: the mouth of the Arno
+    modern: Bocca d'Arno (Marina di Pisa)
+    lat_deg: 43.676
+    lon_deg: 10.279
+    height_m: 3
+    source: 'Purdy 1826, p. 91: the mouth of the River Arno is 8 miles south of Viareggio; from it the steeples of Pisa may be seen; the coast a flat sandy shore and some points stretch a great way under water; Derrotero 1849, p. 71: the banks of the Arno''s mouth stretch well out, the coast not to be approached within a long league without the lead; Smyth 1854, p. 436: Arno fort, flagstaff, 43 40 50, the river with a bar'
+    says: 'The mouth of the Arno on the low sandy shore, its banks stretching far out: keep a league off with the lead going.'
+
+  - id: pisa-tower
+    kind: tower
+    name: the leaning tower of Pisa
+    modern: Torre pendente di Pisa
+    lat_deg: 43.723
+    lon_deg: 10.3966
+    height_m: 78
+    source: 'Purdy 1826, p. 91: from the mouth of the Arno you may see the steeples of Pisa, over the Great Plain; Smyth 1854, p. 436: Pisa, campanile, ''Leaning Tower, with ground 255 f.'', a coast mark'
+    says: 'The leaning tower of Pisa, white over the plain, seen from the offing as a mark for the Arno.'
+
+  - id: leghorn
+    kind: town
+    name: Leghorn
+    modern: Livorno
+    lat_deg: 43.551
+    lon_deg: 10.309
+    height_m: 10
+    source: 'Purdy 1826, pp. 91 to 92: Livorno, the chief port of Tuscany, by the English called Leghorn; well fortified, two basins on the west shut by night with chains and a boom, the entrance between two forts; about 50,000 inhabitants; p. 94: surrounded by walls and ditches with an immense number of cannon; Michelot 1715, p. 63: very well fortified, a great commerce with all foreign nations'
+    says: 'Leghorn, the free port of Tuscany, walled and ditched with a great many cannon, its basins shut with a boom at sun-set.'
+
+  - id: leghorn-light
+    kind: light
+    name: the light-house of Leghorn
+    modern: Fanale dei Pisani (Livorno lighthouse)
+    lat_deg: 43.5446
+    lon_deg: 10.2937
+    height_m: 52
+    lit:
+      from: 1715
+      until: null
+      range_nm: 15
+      character: a fixed light
+    fix: moved 105 m to the grid's land or shoal head
+    source: 'Michelot 1715, p. 63: without the mole to the southward, a tower standing upon a rock with the sea all round it, on the top a lanthorn lighted every night for a mark, surrounded with rocks which stretch out about 30 fathom; Purdy 1826, p. 92: the light-house stands on a clump of rock without the mole; Purdy 1840, Pharonology, OCR l. 712: a fixed light at about 170 feet above the sea, half a mile S.W. of the western end of the city walls; Smyth 1854, p. 436: Leghorn lighthouse 154 feet; the year 1303 is the modern record of the Pisans'' tower (the builder''s knowledge, not in these pilots: Michelot attests it lit before 1715); range_nm JUDGEMENT from the elevation and Lamberti 1844, p. 142 (25 miles for the light of the first order, after the period); the light''s from is the earliest record read, Michelot 1715 (the Pisans'' tower of 1303 is the builder''s memory and UNVERIFIED)'
+    says: 'Leghorn light-house on its rock without the mole, a fixed light, the Pisans'' old tower: keep clear of the ledge it stands on.'
+
+  - id: marzocco-tower
+    kind: tower
+    name: the Marzocco tower
+    modern: Torre del Marzocco
+    lat_deg: 43.5627
+    lon_deg: 10.3012
+    height_m: 54
+    fix: moved 30 m to the grid's land (the first placing read 0 m of water)
+    source: 'Michelot 1715, p. 63: near the town two small towers surrounded by the sea, the highest white and called Marzocco, keep at a distance from it, the place full of rocks; Derrotero 1849, p. 72: the fine tower of Marzocco with its foundations in the water, to the north; Admiralty 1916, p. 290: an old tower built of white marble on the beach half a mile north of the city; height JUDGEMENT'
+    says: 'The white marble tower of the Marzocco north of the town, rocks about it level with the water.'
+
+  - id: leghorn-road
+    kind: anchorage
+    name: Leghorn Road
+    modern: 'Rada di Livorno, north-west of the light'
+    lat_deg: 43.565
+    lon_deg: 10.272
+    height_m: 0
+    depth_fathoms: 6
+    bottom: 'mud and sand, good holding-ground'
+    source: 'Purdy 1826, pp. 92 to 93: the road lies with the mole S.E. by E., sheltered from westerly winds by the Malora Bank; the ground in the road of mud and sand; the best anchorage north-westward of the town, the south end of Gorgona just open north of the Malora tower, the light-house S.S.E. 1/2 E. or S.E. by S., in 5 1/2 to 7 fathoms, good holding-ground; six shoal spots of about 4 fathoms in the road; Michelot 1715, p. 63: half a league W.N.W. of the mole, the great road, 7, 8 and 10 fathom, muddy ground; Derrotero 1849, p. 72: N.W. of the light in 7 to 9 brazas, fango; the position laid west of the modern breakwaters'
+    says: 'Leghorn Road, north-west of the light-house in 5 1/2 to 7 fathoms on mud and sand, sheltered from the west by the Malora but open to a heavy swell from the south.'
+
+  - id: meloria-tower
+    kind: tower
+    name: the Malora tower
+    modern: Torre della Meloria
+    lat_deg: 43.5475
+    lon_deg: 10.22
+    height_m: 20
+    source: 'Purdy 1826, p. 92: near the south end of the Malora Bank, the shoalest part, stands a square tower with an archway, called the Malora tower, a useful mark, from which the light-house bears E.S.E. 4 miles; Purdy 1840, Pharonology, OCR l. 718: an excellent day mark on approaching the roads; Derrotero 1849, p. 72: built on a reef, with four great openings for the sea; Smyth 1854, p. 436: Melora beacon, on the head of Melora bank; Admiralty 1916, p. 288: a square building 65 feet high with arched openings at the base; Michelot 1715, p. 63 had only stones raised in the middle'
+    says: 'The Malora tower, square with its arches, on the south end of the bank four miles W.N.W. of the light-house: a day mark, no light.'
+
+  - id: meloria-south
+    kind: shoal
+    name: the Malora Bank (its south end)
+    modern: 'Secche della Meloria, south end'
+    lat_deg: 43.5499
+    lon_deg: 10.2206
+    height_m: 0
+    dries_m: -0.6
+    extent_m: 600
+    fix: moved 34 m to the grid's shoal head (3.5 m)
+    source: 'Purdy 1826, p. 92: an extensive shoal of quicksand 4 miles north and south, a mile to a mile and a half broad, the depths from 2 feet to 3 fathoms; the outer edge and south end rocky; the shoalest part near the south end where the tower stands; Michelot 1715, p. 63: a ledge almost level with the water, 50 or 60 fathom above water; Admiralty 1916, p. 288: a rocky patch awash, with less than 3 feet, near the south end'
+    says: 'The south end of the Malora Bank, rocks awash about the tower: give the tower a berth of a mile.'
+
+  - id: meloria-north
+    kind: shoal
+    name: the Malora Bank (its north part)
+    modern: 'Secche della Meloria, northern part'
+    lat_deg: 43.5838
+    lon_deg: 10.2248
+    height_m: 0
+    dries_m: -1.8
+    extent_m: 900
+    fix: moved 136 m to the grid's shoal head (4.7 m)
+    source: 'Michelot 1715, p. 63: especially to the northward a bank of sand half a league off with only six and seven foot water, where the sea breaks sometimes; Lamberti 1844, p. 143: the same; Derrotero 1849, p. 72: a narrow and very long bank begins at the tower and runs nearly 6 miles north of it, nothing marks its north end; depths from 3 to 1 braza; Purdy 1826, p. 93: the sea breaks on every part of the Malora in heavy gales; dries_m from the six feet'
+    says: 'The north part of the Malora, six or seven feet of water and nothing to mark it: come from the northward outside the bank or by the north channel in 5 fathoms.'
+
+  - id: montenero
+    kind: church
+    name: the church and convent of Our Lady of Monte Nero
+    modern: Santuario di Montenero
+    lat_deg: 43.492
+    lon_deg: 10.354
+    height_m: 190
+    source: 'Purdy 1826, p. 92: on the lower part of the western side of Monte Nero, nearly two miles north-east from the point, the church and convent of Madonna de Monte Nero with houses near them, a useful mark; the light-house in one with the third white house on Monte Nero the leading mark of the north channel; Michelot 1715, p. 63: a large convent of our Lady of Montenegro half way up the cape; height JUDGEMENT'
+    says: 'The convent of Our Lady of Monte Nero on the hill south of Leghorn, the light-house in one with its white houses leading through the north channel.'
+
+  - id: secca-di-vada
+    kind: shoal
+    name: the shoal of Vada
+    modern: Secche di Vada
+    lat_deg: 43.3203
+    lon_deg: 10.3619
+    height_m: 0
+    dries_m: -1.2
+    extent_m: 500
+    fix: 'moved 1,144 m to the grid''s shoalest head (2.9 m), the bank the pilots'' bearings describe'
+    source: 'Purdy 1826, p. 94: about 8 miles south of Monte Nero a rocky shoal, said to have been the town of Vada, the depth only 15 feet but 6 and 7 fathoms near it, lying in the track of ships along shore; Michelot 1715, p. 63: only 3 or 4 foot water upon it, keep without the line from Cape Monte Nero to Baratto; Derrotero 1849, p. 74: the ancient city sunk 3 or 4 feet below the surface; Admiralty 1916, p. 299: a rock with 8 feet water; dries_m between the older and the modern figures'
+    says: 'The shoal of Vada, the drowned town, but three or four feet on its rocks in the track along shore: keep without the line of Monte Nero and Cape Baratto.'
+
+  - id: gorgona
+    kind: island
+    name: the island Gorgona
+    modern: Isola di Gorgona
+    lat_deg: 43.431
+    lon_deg: 9.903
+    height_m: 255
+    source: 'Purdy 1826, p. 93: ships from the westward make the island Gorgona, an excellent mark for Leghorn; the light-house bears from it E.N.E. 17 miles; a high island 2 1/2 miles long, appearing almost round, with two towers and some fishermen''s huts and an old monastery; Michelot 1715, p. 63: a large high island almost round; Admiralty 1916, p. 297: the summit 837 feet high'
+    says: 'Gorgona, high and almost round with its two towers, the landfall for Leghorn from the westward.'
+
+  - id: capraia
+    kind: island
+    name: the island Capraia
+    modern: Isola di Capraia
+    lat_deg: 43.045
+    lon_deg: 9.825
+    height_m: 447
+    source: 'Purdy 1826, p. 94: Capraia, between Corsica and Tuscany, inhabited, with a small fortress; small vessels may anchor off a cove on its eastern side; Derrotero 1849, p. 159: very high, a town on the north point and a small fort on the east coast before which anchor with westerly winds in 10 or 12 brazas; Admiralty 1916, p. 303: Monte Castello 1,467 feet'
+    says: 'Capraia, high and bold with its small fortress, between Cape Corso and Leghorn; anchorage for small vessels off its eastern cove.'
+
+  - id: cape-baratto
+    kind: headland
+    name: Cape Baratto
+    modern: Promontorio di Populonia
+    lat_deg: 42.992
+    lon_deg: 10.488
+    height_m: 180
+    source: 'Purdy 1826, p. 94: Cape Baratto, 10 leagues south of Monte Nero, a large high point with a castle and tower on it and a redoubt to the northward; connected to the main by a neck of low land, it appears on both sides like an island; Michelot 1715, p. 63: a very large high point; height JUDGEMENT'
+    says: 'Cape Baratto, a large high point with its castle and tower, looking like an island from either side.'
+
+  - id: piombino
+    kind: town
+    name: Piombino
+    modern: Piombino
+    lat_deg: 42.9245
+    lon_deg: 10.528
+    height_m: 20
+    source: 'Purdy 1826, pp. 94 to 95: the town of Piombino on the S.E. point of the promontory, which with Elba forms the Channel of Piombino; close to the end of the point a great rock above water; small but well fortified, a square tower on a low point of rocks within which an anchorage sheltered from N.W. winds; Derrotero 1849, OCR l. 4905: the canal of Piombino'
+    says: 'Piombino, small and well fortified at the end of its promontory, the Channel of Piombino between it and Elba.'
+
+  - id: palmaiola
+    kind: rock
+    name: the isle Palmaria of Piombino
+    modern: Isola di Palmaiola
+    lat_deg: 42.865
+    lon_deg: 10.473
+    height_m: 105
+    extent_m: 300
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    source: 'Purdy 1826, p. 95: south of the fort of Piombino two isles a mile apart named Palmaria and Cerboli, very high, each with a watch-tower; near Palmaria a rock, but you may range along and pass between them; Derrotero 1849, OCR l. 4921: two small high round islands with watch-towers in mid-channel; Smyth 1854, p. 437: Palmajola I., 344 feet'
+    says: 'Palmaiola, the high isle with its watch-tower in the Channel of Piombino; Cerboli three miles east of it, and a clear passage either side.'
+
+  - id: porto-ferrajo
+    kind: town
+    name: Porto Ferrajo
+    modern: Portoferraio
+    lat_deg: 42.8149
+    lon_deg: 10.3226
+    height_m: 30
+    fix: moved 513 m to the grid's land (the first placing read 14 m of water)
+    source: 'Purdy 1826, pp. 95 to 96: the city on the western side of the entrance, on a high steep point separated from the island by a canal with a bridge; the citadel and fortifications of great strength; a little harbour on the south side for five or six galleys, 3 or 4 fathoms, shut with a chain; Michelot 1715, p. 63: very well fortified, upon the two ends of the point two very considerable forts; Derrotero 1849, p. 160: a place of arms on a rock cut off by a ditch, two great forts commanding it'
+    says: 'Porto Ferrajo, the strong town on its high steep point at the west side of the bay, with its little galley harbour shut by a chain.'
+
+  - id: porto-ferrajo-light
+    kind: light
+    name: the light of Porto Ferrajo
+    modern: 'Faro di Forte Stella, Portoferraio'
+    lat_deg: 42.8152
+    lon_deg: 10.3224
+    height_m: 58
+    lit:
+      from: 1826
+      until: null
+      range_nm: 10
+      character: a fixed light
+    fix: 'moved 853 m to the grid''s land on the town''s promontory: the grid smooths the point of Fort Stella into the sea'
+    source: 'Purdy 1826, p. 96: a light-house stands on the N.E. point of the fortification, seen at a great distance, on which a light is shown by night; Purdy 1840, Pharonology, OCR l. 726: upon the western side of the entrance a brilliant harbour light, lat. 42 49 10; Derrotero 1849, p. 160 (the translator''s note): a fixed light in the angle of the fort della Stella, visible 12 miles; Smyth 1854, p. 437: (Fort) Stella light 192 feet; Lamberti 1844, p. 146: seen 10 miles; Michelot 1715, pp. 63 to 64 names no light here; the year 1788 is the modern record of the lighthouse on Forte Stella (the builder''s knowledge, not in these pilots); range_nm from Lamberti; the light''s from is the earliest record read, Purdy 1826: no pilot of the period read dates it and Michelot 1715 names none; the builder''s memory of 1788 (Fort Stella''s light) is UNVERIFIED, and with it 1805 would see the light: for the lead'
+    says: 'Porto Ferrajo light on the N.E. bastion of Fort Stella, a fixed light at the west side of the entrance.'
+
+  - id: forte-falcone
+    kind: castle
+    name: Fort Falcone
+    modern: 'Forte Falcone, Portoferraio'
+    lat_deg: 42.8157
+    lon_deg: 10.322
+    height_m: 79
+    fix: moved 223 m to the grid's land (the first placing read 5 m of water)
+    source: 'Michelot 1715, p. 63: the town on a very high long point, upon the two ends of which two very considerable forts; Purdy 1826, p. 95: the citadel and fortifications have great strength; Derrotero 1849, p. 160: two great fortresses protect and command the city; the names Stella and Falcone and the height are the modern chart''s (JUDGEMENT)'
+    says: 'Fort Falcone on the highest ground of Porto Ferrajo''s point, with Fort Stella at its seaward end, the two forts that command the town.'
+
+  - id: porto-ferrajo-road
+    kind: anchorage
+    name: the road of Porto Ferrajo
+    modern: 'Rada di Portoferraio, south of the old town'
+    lat_deg: 42.8115
+    lon_deg: 10.325
+    height_m: 0
+    depth_fathoms: 7
+    bottom: oozy ground with weed
+    source: 'Purdy 1826, p. 96: give the town point a berth of two cables for the shoal spots off it; the best anchorage in 9 to 7 fathoms, good oozy ground, 3 to 5 cables south of the mole; galleys carry fasts to the foot of the tower at the entrance of the mole; tunny-nets half a mile E.S.E. of the light-house; Michelot 1715, p. 64: anchor opposite the tower at the entrance of the mole in six and seven fathom, very good owzy ground; Derrotero 1849, p. 160: anchor south of the city before the darsena in 6 and 7 brazas, weed (yerbas), never more than two cables from the city'
+    says: 'Porto Ferrajo road, south of the town before the mole in 7 fathoms on good oozy ground; winds from the N.W. and S.W. blow over the land and raise no sea.'
+
+  - id: cape-enfola
+    kind: headland
+    name: Point Anfola
+    modern: Capo d'Enfola
+    lat_deg: 42.827
+    lon_deg: 10.269
+    height_m: 136
+    source: 'Purdy 1826, p. 96: proceeding westward from Porto Ferrajo you pass Cape Biante, a broad point, with two shoals near it on which the sea sometimes breaks; at 3 1/2 miles more to the west is Point Anfola; Norie 1831, OCR l. 8053: Point Infola, with some rocks about it; Admiralty 1916, p. 306: the headland 445 feet high, conical, joined to the island by a low isthmus'
+    says: 'Point Anfola, the conical headland on its low neck west of Porto Ferrajo, with rocks about it.'
+
+  - id: monte-capanne
+    kind: hill
+    name: Monte Capanne
+    modern: Monte Capanne
+    lat_deg: 42.7685
+    lon_deg: 10.169
+    height_m: 1019
+    source: 'Purdy 1826, p. 95: Elba is high, and abounds in lofty mountains; Derrotero 1849, p. 160: the summits of its mountains seem from far off so many islands; Smyth 1854, p. 437: Elba, M. Capanne, 2700 feet, a mark for the channels; Admiralty 1916, p. 304: Monte Capanne 3,343 feet high'
+    says: 'Monte Capanne, the great mountain of the west end of Elba, seen far off over all the islands, the mark for the channels either side.'
+
+  - id: porto-longone
+    kind: castle
+    name: the citadel of Porto Longone
+    modern: 'Forte Longone (Forte San Giacomo), Porto Azzurro'
+    lat_deg: 42.7615
+    lon_deg: 10.4035
+    height_m: 60
+    source: 'Purdy 1826, pp. 95 to 97: the town of Porto Longone on the S.E., the harbour long and narrow; the upper town within the citadel on the top of a mountain, very strong; upon the starboard side going in the citadel stands on a point of rocks steep-to, Castel Focardo opposite; Michelot 1715, p. 63: a very good port belonging to the King of Spain; Smyth 1854, p. 437: Longona citadel flag; height JUDGEMENT'
+    says: 'The citadel of Porto Longone on its point at the entrance, Castel Focardo over against it, a Spanish garrison in Michelot''s time.'
+
+  - id: porto-longone-anchorage
+    kind: anchorage
+    name: Porto Longone
+    modern: Golfo di Porto Azzurro
+    lat_deg: 42.765
+    lon_deg: 10.407
+    height_m: 0
+    depth_fathoms: 8
+    bottom: weed
+    source: 'Derrotero 1849, p. 161: between the point of the Pescada and the town 15 brazas, and 10, 6, 5 and 4 toward the inside; the usual anchorage in the middle in 8 or 9 brazas, weedy bottom (yerbazales); sheltered from all winds, though the S. and S.W. send in a swell; Purdy 1826, p. 97: very deep, several places where ships and galleys may anchor, within the citadel point; E.S.E. winds blow directly up the harbour'
+    says: 'Porto Longone, the deep narrow harbour on Elba''s east side, in 8 or 9 fathoms on weed, sheltered from almost every wind.'
+
+  - id: pianosa
+    kind: island
+    name: Pianosa
+    modern: Isola di Pianosa
+    lat_deg: 42.585
+    lon_deg: 10.078
+    height_m: 29
+    source: 'Purdy 1826, p. 97: three leagues south of the S.W. point of Elba, a very low island covered with shrubs, about three miles broad; from the south point a reef of rocks stretches a considerable distance; galleys anchor east or west in 10 to 12 fathoms; equal caution for it by night, being very low; Michelot 1715, p. 64: very low and full of shrubs, rocks above water to the southward a mile and a half out; Admiralty 1916, p. 317: very flat, 95 feet high at the south-east end'
+    says: 'Pianosa, very low and covered with shrubs, a reef running off its south point: hard to see by night.'
+
+  - id: montecristo
+    kind: island
+    name: Monte Christo
+    modern: Isola di Montecristo
+    lat_deg: 42.333
+    lon_deg: 10.31
+    height_m: 645
+    source: 'Purdy 1826, p. 97: Monte Christo lies five leagues S.S.E. from Pianosa and eight leagues south from the S.W. point of Elba; very high, a large rock above water at its east end; anchor off its S.E. side in case of necessity; Smyth 1854, p. 437: summit ruins, 1900 feet; Admiralty 1916, p. 319: Pico della Fortezza 2,093 feet, deep water all round'
+    says: 'Monte Christo, a very high lone island with deep water all round, a large rock off its east end.'
+
+  - id: formiche-di-grosseto
+    kind: rock
+    name: the Formiche of Grosseto
+    modern: Formiche di Grosseto (Formica Maggiore)
+    lat_deg: 42.5765
+    lon_deg: 10.882
+    height_m: 20
+    extent_m: 300
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    source: 'Smyth 1854, p. 437: Formiche di Grosseto, N. rock, N. rock 32 feet, S. one 13; Purdy 1826, p. 98: the Formiche of Talamone, three flat rocks four or five miles from the coast, about 400 fathoms apart, with rocks above and under water about them, not dangerous without that space; Derrotero 1849, OCR l. 4955: small very flat low islands, dangerous by night, better passed outside; Admiralty 1916, p. 328: three islets, Formica Maggiore 32 feet high, a patch of 1 1/2 fathoms half a mile north-west of it'
+    says: 'The Formiche, three low flat rocks off the Ombrone, dangerous by night: pass outside them.'
+
+  - id: giglio
+    kind: island
+    name: the Island Giglio
+    modern: Isola del Giglio
+    lat_deg: 42.356
+    lon_deg: 10.905
+    height_m: 498
+    source: 'Purdy 1826, p. 98: two leagues without Mount Argentaro the Island Giglio, very high, three or four miles long, with a fort and some fishermen''s houses; Derrotero 1849, OCR l. 4965: five miles W.S.W. of Monte Argentaro, steep-to, pass either side; Smyth 1854, p. 437: Giglio, town spire, M. Pagana; Admiralty 1916, p. 320: Poggio della Pagana 1,634 feet'
+    says: 'Giglio, very high with its fort and castle, steep-to all round, seen with Mount Argentaro behind it.'
+
+
+  # ---------------------------------------------------------------------------
+  # Corsica: Cape Corse, Bastia, Bonifacio and the Lavezzi, Ajaccio (the harbour patch ajaccio), Calvi, San Fiorenzo (the harbour patch san-fiorenzo) and the high mountains
+  # ---------------------------------------------------------------------------
+
+  - id: giraglia
+    kind: rock
+    name: Giraglia
+    modern: Île de la Giraglia
+    lat_deg: 43.027
+    lon_deg: 9.4045
+    height_m: 65
+    extent_m: 450
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    source: 'Purdy 1826, p. 75: ''At about a mile from the middle of the north coast is an islet, named Giraglia, with a watch-tower on it; and there is a passage between it and the cape-land, having a depth of from 9 to 7 fathoms; but this channel should be attempted only with a leading wind''; Derrotero 1849, pp. 105 to 106: an island a little lower than the cape, steep to the north, ''con una hermosa torre en la cumbre'', the channel a mile wide with 7 to 10 brazas, sand and coral; Admiralty 1916, p. 201: steep, whitish, 180 feet high near the north end, an old square tower on the north end.'
+    says: 'The Giraglia, off the head of Cape Corse, a steep whitish islet with its watch-tower; the channel inside it is fit only with a leading wind.'
+
+  - id: giraglia-light
+    kind: light
+    name: Giraglia Light
+    modern: Phare de la Giraglia
+    lat_deg: 43.0295
+    lon_deg: 9.4045
+    height_m: 82
+    lit:
+      from: 1848
+      until: null
+      range_nm: 24
+      character: a light on a round tower
+    source: 'Derrotero 1849, p. 106, translator''s note: ''En la isla Giraglia se está construyendo un faro'' in 43°1''48" (building when the note was written); Purdy 1840, Pharonology p. vi: no light on Corsica but Bastia''s mole in 1840; Admiralty 1916, p. 201: the light 269 feet above high water from a round tower on the north end. The year 1848 is JUDGEMENT (the modern record), inside the pilots'' bracket; range_nm JUDGEMENT from the elevation. Not lit in 1805.'
+    says: No light on the Giraglia in these years; the tower is a day-mark only.
+
+  - id: cape-corse
+    kind: headland
+    name: Baccaggio Point (Cape Corse)
+    modern: 'Pointe de Barcaggio, Cap Corse'
+    lat_deg: 43.0066
+    lon_deg: 9.4051
+    height_m: 30
+    fix: moved 228 m to the grid's land (the first placing read 7 m of water)
+    source: 'Purdy 1826, p. 75: ''Cape Corso or Corse, a great promontory stretching to the north... of a moderate height near the sea, but the interior is a part of that mountainous range''; p. 82: ''Baccaggio Point, the northernmost point of Corsica''; Derrotero 1849, p. 105: Cape Corso in 43°1'', the point rounded, of middling height, white patches on its west side. Height JUDGEMENT (the low point; the land behind rises to Monte Stello, 4,282 feet, Admiralty 1916, p. 196).'
+    says: 'Cape Corse, the north head of the island, low at the point with the mountains rising behind.'
+
+  - id: cape-sagro
+    kind: headland
+    name: Cape Sagro
+    modern: Cap Sagro
+    lat_deg: 42.7975
+    lon_deg: 9.4923
+    height_m: 40
+    fix: moved 15 m to the grid's land (the first placing read 14 m of water)
+    source: 'Purdy 1826, p. 76: ''Cape Sagro, a broad point, which stretches a little way out to sea; it is distinguished by a tower... At 6 miles to the southward of Cape Sagro is the town and port of Bastia''; Derrotero 1849, p. 133: cape Sagro near 6 miles N by E of Bastia, the coast between lined with towers, clean. Height JUDGEMENT.'
+    says: Cape Sagro with its tower; Bastia lies six miles to the southward.
+
+  - id: bastia
+    kind: town
+    name: Bastia
+    modern: Bastia
+    lat_deg: 42.699
+    lon_deg: 9.4485
+    height_m: 30
+    source: 'Purdy 1826, p. 76: ''Bastia is the chief town... and the capital of Corsica. It is commanded by high land... a small indent, which is defended by a mole. The town is divided into two parts, Terra Nuova and Terra Vecchia... in the former of which is a citadel... The harbour is small, and fit for small vessels only. Its latitude is 42° 42''''; Derrotero 1849, p. 131: the town on the slope of the high land, the citadel and upper town on the rocks south of the port. Height JUDGEMENT (the citadel''s rock).'
+    says: 'Bastia, the capital, under the high land, its citadel over the little mole-harbour; fit for small vessels only.'
+
+  - id: bastia-mole-light
+    kind: light
+    name: Bastia Mole-head Fire
+    modern: 'Vieux-Port de Bastia, Jetée du Dragon'
+    lat_deg: 42.697
+    lon_deg: 9.4537
+    height_m: 9
+    lit:
+      from: 1826
+      until: null
+      range_nm: 4
+      character: 'a fire lit in the watch-house on the mole-head, in bad weather'
+    source: 'Purdy 1826, p. 76: ''At the end of the mole is a watch-house, where, in bad weather, a fire is lighted, to direct vessels during the night''; Lamberti 1844, p. 319 (Michelot''s text; Lamberti d. 1813): ''alla punta vi è un fanale che si accende la sera... la torre del fanale, sulla quale passeggia la sentinella''; Purdy 1840, Pharonology p. vi: a fixed harbour-light on the extremity of the mole, 3? feet above the sea, visible three leagues; Derrotero 1849, p. 131 note: fixed, 16 metres, 10 miles. No source gives the year first lit: from 1750 is JUDGEMENT (in Michelot''s text as Lamberti gives it, before 1813); range_nm JUDGEMENT for a fire.; the light''s from is the earliest record read, Purdy 1826 (a fire lit in bad weather at the mole-head); Lamberti 1844 gives Michelot''s words of a light lit at evening, undated: UNVERIFIED'
+    says: 'A fire is lit on Bastia mole-head in foul weather to show the entrance, ninety yards wide between the mole and the Lion rock.'
+
+  - id: bastia-road
+    kind: anchorage
+    name: Bastia Road
+    modern: 'off the Vieux-Port, Bastia'
+    lat_deg: 42.6985
+    lon_deg: 9.458
+    height_m: 0
+    depth_fathoms: 11
+    bottom: sand and weed
+    source: 'Purdy 1826, p. 76: ''There is anchoring-ground, in 10 and 11 fathoms, at a cable''s length to the eastward from the mole and the northern part of Bastia''; within the mole they lie in 3 or 4 fathoms ''on a ground covered with weeds and oaze''; Derrotero 1849, p. 132: large ships anchor a short while NE of the light, never for the night; the road south of the citadel 15 to 18 brazas sand; Admiralty 1916, p. 234: outer anchorage outside the moles 18 to 22 fathoms, weeds.'
+    says: 'Bastia road, a cable off the mole in 10 or 11 fathoms; no berth for the night with the wind easterly.'
+
+  - id: aleria-tower
+    kind: tower
+    name: Tower of Aleria
+    modern: 'mouth of the Tavignano, Aléria'
+    lat_deg: 42.1051
+    lon_deg: 9.5507
+    height_m: 10
+    fix: moved 295 m to the grid's land (the first placing read 3 m of water)
+    source: 'Purdy 1826, p. 76: ''The coast hence trends nearly true South, 22 miles, to the Tower of Aleria, on the south side of the mouth of the River Tavignano... From the mouth of the Tavignano, about which are several shoals''; the coast ''low, marshy''; Derrotero 1849, OCR l. 9147: the tower of Alleria on the left of the Tavignano''s mouth, the sands of the rivers; Admiralty 1916, p. 228: the coast northward of Solenzara a sandy beach nearly to Bastia, not to be approached under 11 fathoms. Height JUDGEMENT.'
+    says: 'The tower of Aleria at the Tavignano''s mouth, on the low marshy plain; keep in fifteen fathoms along this shore.'
+
+  - id: porto-vecchio
+    kind: town
+    name: Porto Vecchio
+    modern: Porto-Vecchio
+    lat_deg: 41.5911
+    lon_deg: 9.2794
+    height_m: 40
+    source: 'Purdy 1826, p. 77: ''The town and fort are at the west end of the harbour; but the former is nearly abandoned, and the latter is in ruins, owing to the noxious qualities of the air... this port may easily be known, by a high rocky mountain standing near it, like a stately column''; Michelot 1709, OCR ll. 10353 to 10370: ''une haute montagne hachée ou dentelée'', a citadel in poor order on a hill at the SW end. Height JUDGEMENT.'
+    says: 'Porto Vecchio town, half deserted for the bad air, with its ruined fort at the head of the gulf.'
+
+  - id: porto-vecchio-road
+    kind: anchorage
+    name: Porto Vecchio
+    modern: Golfe de Porto-Vecchio
+    lat_deg: 41.605
+    lon_deg: 9.305
+    height_m: 0
+    depth_fathoms: 6
+    bottom: grass and ooze
+    source: 'Purdy 1826, p. 77: ''Porto Vecchio is 2 1/2 miles deep, and there is good anchorage from the islands at the entrance to that which lies at the further end. In the middle are 5 or 6 fathoms of water, on grass and oaze; but, as the land-winds are violent, you must ride with a spring upon your cable''; the Great Channel between Pecorella and the Chiappino 12 to 15 fathoms; Michelot 1709, OCR l. 10398: ''par 3, 4 & 5 brasses d''eau fond d''herbe vaseux''.'
+    says: 'Anchored in Porto Vecchio in six fathoms, grass and ooze, with a spring on the cable against the land-winds.'
+
+  - id: bonifacio
+    kind: town
+    name: Bonifacio
+    modern: Bonifacio
+    lat_deg: 41.3871
+    lon_deg: 9.1597
+    height_m: 65
+    source: 'Purdy 1826, p. 78: ''Near the bottom of the port, on the starboard side, is a considerable citadel, with the town near it''; Norie 1831, OCR l. 6887: ''The Port of Bonifacio may be known by the white cliffs, houses''; Derrotero 1849, pp. 120 to 121: the town on the high land stretched E-W, walls built on the rock perpendicular to the sea, an old square tower midway of the outer line; Admiralty 1916, p. 208: limestone cliffs, 69 to 148 feet at the Madonetta, ''at the town of Bonifacio the cliffs overhang''. Height JUDGEMENT (the town on its cliff).'
+    says: 'Bonifacio on its white cliffs, the walls standing on the very edge of the rock; the harbour''s mouth is hard to see until abreast of it.'
+
+  - id: bonifacio-harbour
+    kind: anchorage
+    name: Harbour of Bonifacio
+    modern: Port de Bonifacio
+    lat_deg: 41.3858
+    lon_deg: 9.1623
+    height_m: 0
+    depth_fathoms: 5
+    bottom: ooze
+    fix: moved 330 m to water of 15 m (the first placing read -23.6 m)
+    source: 'Purdy 1826, p. 78: ''a creek, a mile in depth, about 70 fathoms in breadth, and appears like a river. It can be entered in fair weather only, and with a fair wind. At the entrance are 14 fathoms... opposite this castle you may anchor, in oazy ground, in from 4 to 6 fathoms of water, and moor across the harbour''; Michelot 1709, OCR l. 10524: ''par 4, 5 & 6 brasses d''eau fond de vase''; Derrotero 1849, p. 121: 16 to 18 brazas at the entrance, 6 and 5 at the head, weed everywhere.'
+    says: 'Moored head and stern under Bonifacio citadel in five fathoms, ooze, the creek no wider than a river.'
+
+  - id: cape-pertusato
+    kind: headland
+    name: Cape Blanco (the Pierced Cape)
+    modern: Capo Pertusato
+    lat_deg: 41.366
+    lon_deg: 9.18
+    height_m: 85
+    source: 'Purdy 1826, p. 78: ''From Cape Chiantarella the coast trends nearly true west, two miles, to Cape Blanco, or the White Cape, by some called Cape Antonio, by others the Pierced Cape, the rock being pierced through''; Michelot 1709, OCR l. 10476: ''Le Cap Blanc est une longue pointe de roche blanche''; Derrotero 1849, p. 121: cape Pertusato, very white, a great rock at its foot, 2 miles SE of the mouth of Bonifacio; Admiralty 1916, p. 210: the southern extremity of Corsica, a summit like a sailor''s hat. Height JUDGEMENT from the light''s 89 metres (Derrotero p. 121 note).'
+    says: 'Cape Blanco, white as chalk and pierced through, the south foot of Corsica; Bonifacio''s mouth two miles to the north-west.'
+
+  - id: pertusato-light
+    kind: light
+    name: Pertusato Light
+    modern: Phare de Pertusato
+    lat_deg: 41.368
+    lon_deg: 9.18
+    height_m: 89
+    lit:
+      from: 1844
+      until: null
+      range_nm: 27
+      character: 'a revolving light, eclipsed each minute'
+    source: 'Derrotero 1849, p. 121 note: ''En el cabo Pertusato... hay un faro giratorio de eclipses que se suceden de 1'' en 1'' y es visible á 27 millas... 89 metros''; p. 122: a commission sent to Corsica to choose the sites of the lights of the Bocas, and ''ambos faros quedaron establecidos''; Purdy 1840, Pharonology p. vi: not listed in 1840. The year 1844 is JUDGEMENT (the modern record), inside the bracket 1841 to 1849. Not lit in 1805.'
+    says: No light on Cape Blanco in these years; the strait is run by day.
+
+  - id: lavezzi
+    kind: rock
+    name: Lavezzi
+    modern: Île Lavezzi
+    lat_deg: 41.341
+    lon_deg: 9.255
+    height_m: 40
+    extent_m: 600
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    source: 'Purdy 1826, p. 78: the strait bounded on the north by ''the islands Cavallo, Lavezzi, and Perduto, all of which are encompassed with dangerous rocks and shoals... it is necessary to give Lavezzi a good berth, in order to avoid the sunken rocks, which lie off its southern side''; Derrotero 1849, p. 123: shaped like a T, of whitish rocks not very high; Admiralty 1916, p. 213: nearly a mile long, granite blocks heaped together, the south-eastern part 90 feet high. Height JUDGEMENT from the Admiralty''s figure.'
+    says: 'Lavezzi, a heap of grey granite at the strait''s eastern mouth; give it a good berth for the sunken rocks off its south side.'
+
+  - id: lavezzi-rock
+    kind: rock
+    name: Lavezzi Rock
+    modern: Écueil de Lavezzi
+    lat_deg: 41.317
+    lon_deg: 9.253
+    height_m: 0
+    dries_m: -2.4
+    extent_m: 150
+    fix: 'the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Derrotero 1849, p. 123: a mile S of Punta Beche, the south point of Lavezzi, ''un escollo muy peligroso, que antes era muy poco conocido'', in the very middle of the Great Pass, covered by 8 feet, steep on its south side; the sea breaks on it only in bad weather; Purdy 1826, p. 78: the sunken rocks off Lavezzi''s southern side; Admiralty 1916, p. 213: one mile southward of Pointe Becchi (the Sémillante lost on it in 1855). dries_m from the Derrotero''s 8 feet.'
+    says: 'The sunken rock a mile south of Lavezzi, eight feet on it and breaking only in a gale; little known to the charts.'
+
+  - id: cavallo
+    kind: island
+    name: Cavallo
+    modern: Île Cavallo
+    lat_deg: 41.365
+    lon_deg: 9.264
+    height_m: 31
+    source: 'Purdy 1826, p. 78: Cavallo among the islands ''encompassed with dangerous rocks and shoals'' on the strait''s north side; Derrotero 1849, OCR l. 8687: higher and more broken than Lavezzi, shaped like a butterfly with wings spread E-W, rocks all round but its east part; Admiralty 1916, p. 212: a mile long east and west, 49 to 102 feet high.'
+    says: 'Cavallo, north of Lavezzi, low and broken and ringed with rocks save on its east end.'
+
+  - id: the-monks-corsica
+    kind: ledge
+    name: The Monks
+    modern: Les Moines (Écueils des Moines)
+    lat_deg: 41.4626
+    lon_deg: 8.9152
+    height_m: 6
+    extent_m: 900
+    fix: 'moved 1,642 m to the grid''s shoal head (0.1 m) of the rocks south-west of the gulf of Valinco''s approach'
+    source: 'Purdy 1826, p. 79: ''a ledge of rocks, called the Monks, extending in a broken chain nearly 2 miles... several of which are above water... about 2 1/2 miles off Point Roccapina... The outermost of these rocks... has 5 feet on it... the highest of the westernmost group is about 40 feet, and that of the easternmost group about 30 feet, above water''; Michelot 1709, OCR ll. 10573 to 10580: ''Dangers nommez les Moines'', a bank of rocks above and awash about 5 miles long NE and SW; Admiralty 1916, p. 204: islets 16 to 20 feet high in three groups.'
+    says: 'The Monks, a broken chain of black rocks off Roccapina; pass well outside them or close in by the main.'
+
+  - id: valinco-road
+    kind: anchorage
+    name: Valinco Road
+    modern: 'off the mouth of the Rizzanese, Golfe de Valinco'
+    lat_deg: 41.666
+    lon_deg: 8.87
+    height_m: 0
+    depth_fathoms: 17
+    bottom: sand
+    fix: Placed off the river's mouth by the builder's estimate; the pilot gives no bearing.
+    source: 'Purdy 1826, p. 79: the Gulf of Valinco ''quite exposed to westerly winds, but has some tolerably good anchoring-places''; near Punta Bitorsima ''the River Valinco empties itself into the sea, off which you may anchor in 14 to 20 fathoms, on good sand, and clean every where; but this anchorage is not safe in the winter-season''; Port Campo Moro, 16 to 22 fathoms, with the tower NNW.'
+    says: 'Off the Valinco river in seventeen fathoms, good sand; no berth for the winter months.'
+
+  - id: cape-muro
+    kind: headland
+    name: Cape Muro
+    modern: Capu di Muro
+    lat_deg: 41.7408
+    lon_deg: 8.6592
+    height_m: 60
+    fix: moved 225 m to the grid's land (the first placing read 4 m of water)
+    source: 'Purdy 1826, p. 79: ''The Gulf of Ajaccio, which is the finest bay of Corsica, lies between Cape Muro on the south, and Cape Sanguinara on the north... at the distance of 3 leagues from each other''; Derrotero 1849, pp. 114 to 115: cape Muro ''sale mucho hacia el O.'', from high land sloping gradually to the sea, the S limit of the gulf of Ajaccio, with its tower. Height JUDGEMENT.'
+    says: 'Cape Muro, the south point of the Gulf of Ajaccio, three leagues from the Sanguinaires.'
+
+  - id: parata
+    kind: headland
+    name: Cape Sanguinara (Point Parata)
+    modern: Pointe de la Parata
+    lat_deg: 41.899
+    lon_deg: 8.6109
+    height_m: 58
+    fix: moved 75 m to the grid's land (the first placing read 2 m of water)
+    source: 'Michelot 1709, OCR l. 10681: ''Le Cap Sangonaire est... la pointe du Nord du Golfe d''Ajazo: Sur le bout de cette pointe qui semble isolée, il y a une Tour ronde armée de quelques canons''; Purdy 1826, pp. 79 to 80: ''Cape Sanguinara on the north... between it and the cape is a channel for small vessels, being about 2 cables'' length wide, and 3 1/2 to 4 fathoms deep''; Derrotero 1849, p. 111: punta Parata; Admiralty 1916, p. 176: ''a nearly detached hill, 190 feet high, and on it is Tour de Parata''.'
+    says: 'The Parata, the north point of Ajaccio gulf, a round tower on a hill that looks an island from far off.'
+
+  - id: sanguinaires
+    kind: rock
+    name: Sanguinara Isles
+    modern: Grande Sanguinaire (Îles Sanguinaires)
+    lat_deg: 41.8775
+    lon_deg: 8.5935
+    height_m: 80
+    extent_m: 500
+    fix: 'an islet the grid lacks (water in EMODnet''s grid, ChartBlocks.md ''An isle the grid lacks''): given as a rock of its height and an extent of its size, so that a ship cannot sail through it'
+    source: 'Purdy 1826, p. 80: ''The isles of Sanguinara lie to the S.W. of the cape; the larger one has a tower upon it, and some islets and rocks about it... when coming in from the northward, give Sanguinara Island and rocks... a good berth''; Michelot 1709, OCR l. 10687: ''la grosse Isle des Sangonaires qui est fort haute; sur son sommet il y a une Tour armée de deux pièces de canons''; Derrotero 1849, p. 111: the great Sanguinaria very high, a tower on its summit and another on its SW point, a walled lazaretto on its east side; Admiralty 1916, p. 176: 263 feet at the higher peak.'
+    says: 'The great Sanguinara, high and ragged, its tower on the summit; give it and its rocks a good berth going into Ajaccio.'
+
+  - id: sanguinaires-light
+    kind: light
+    name: Sanguinara Light
+    modern: Phare des Sanguinaires
+    lat_deg: 41.8795
+    lon_deg: 8.596
+    height_m: 85
+    lit:
+      from: 1844
+      until: null
+      range_nm: 18
+      character: a light varied by flashes
+    source: 'Derrotero 1849, pp. 111 to 112, translator''s note: ''En esta isla hay un faro'' in 41°53''50", its light varied by flashes; Purdy 1840, Pharonology p. vi: not listed in 1840; Admiralty 1916, p. 176: the lighthouse on the higher, north-east peak. The year 1844 is JUDGEMENT (the modern record), inside the bracket 1841 to 1849; range_nm JUDGEMENT from the elevation. Not lit in 1805.'
+    says: No light on the Sanguinaires in these years; the tower serves by day.
+
+  - id: ajaccio
+    kind: town
+    name: Ajaccio
+    modern: Ajaccio
+    lat_deg: 41.9196
+    lon_deg: 8.7376
+    height_m: 20
+    fix: moved 34 m to the grid's land (the first placing read 2 m of water)
+    source: 'Purdy 1826, p. 80: ''The town of Ajaccio, which is populous, is situate on the north side of the gulf'' (the footnote: Napoleon Buonaparte born here); Michelot 1709, OCR l. 10621: ''La ville d''Ajazo est dans le fond de ce Golfe du côté du Nord, située sur une pointe de moyenne hauteur''; Derrotero 1849, p. 113: the town on a low point running SW, ended by the citadel. Height JUDGEMENT.'
+    says: 'Ajaccio, the chief port of the island, on its low point at the north side of the gulf.'
+
+  - id: ajaccio-citadel
+    kind: castle
+    name: Ajaccio Citadel
+    modern: Citadelle d'Ajaccio
+    lat_deg: 41.9199
+    lon_deg: 8.7379
+    height_m: 15
+    fix: moved 330 m to the grid's land (the first placing read 8 m of water)
+    source: 'Michelot 1709, OCR l. 10623: ''à son extrémité il y a une Forteresse à quatre bastions qui défend les approches du mouillage: Au bout de cette pointe il y a plusieurs écueils hors de l''eau & sous l''eau''; Purdy 1826, p. 80: the point of the citadel, ''which you must not approach nearer than to the distance of a cable and a half''; Derrotero 1849, p. 113: the citadel on the rocks at the water''s edge. Height JUDGEMENT.'
+    says: 'Ajaccio citadel, four bastions on the point; keep a cable and a half off it for the sunken rock.'
+
+  - id: citadel-rock
+    kind: rock
+    name: The Citadel Rock
+    modern: Écueil de la Citadelle
+    lat_deg: 41.9147
+    lon_deg: 8.7403
+    height_m: 0
+    dries_m: -2.3
+    extent_m: 40
+    fix: moved 96 m to the grid's shoal head (4.8 m)
+    source: 'Purdy 1826, p. 80: ''a sunken rock, which lies to the southward of that point a cable''s length, with 10 feet of water on it: it is about 40 fathoms across each way''; Derrotero 1849, p. 113: the escollo de la Ciudadela S of the south bastion''s angle, kept clear by keeping the Sanguinaria''s high tower open left of La Botta; Admiralty 1916, p. 173: 1 1/4 fathoms, 2 1/4 cables southward of La Citadelle. dries_m from the Admiralty''s 1 1/4 fathoms (Purdy''s 10 feet is 3.0 m).'
+    says: 'The sunken rock off the citadel point, ten feet on it; keep the Sanguinara tower open of the Botta till past it.'
+
+  - id: ajaccio-road
+    kind: anchorage
+    name: Ajaccio Road
+    modern: 'Baie d''Ajaccio, off the citadel'
+    lat_deg: 41.9215
+    lon_deg: 8.746
+    height_m: 0
+    depth_fathoms: 12
+    bottom: mud and weed
+    source: 'Purdy 1826, p. 80: ''So soon as the citadel bears N. by E. from you, you may steer up N.E. by N. or N.E. for the road, and anchor in 10 to 14 fathoms of water, on muddy ground, with the point of the citadel bearing W.S.W.; or... near the bottom of the harbour, and anchor in from 7 to 9 fathoms''; Michelot 1709, OCR l. 10634: the ordinary anchorage between the town and the Capuchins'' convent ''à 5, 6, 7 & 8 brasses d''eau fond d''herbe vaseux''; Derrotero 1849, p. 113: the town anchorage 3 cables N of the citadel, 9 to 12 brazas weed (summer); the Capuchins'' 8 to 13 brazas sand and mud (winter); Admiralty 1916, p. 173: 20 fathoms decreasing to 5 near the head of the bay.'
+    says: 'Anchored in Ajaccio road in twelve fathoms, mud, the citadel point bearing west-south-west.'
+
+  - id: cape-rosso
+    kind: headland
+    name: Cape Turghio (Cape Rosso)
+    modern: Capo Rosso (Tour de Turghio)
+    lat_deg: 42.2365
+    lon_deg: 8.5442
+    height_m: 331
+    fix: moved 60 m to the grid's land (the first placing read 32 m of water)
+    source: 'Purdy 1826, p. 81: ''Cape Turghio, surrounded by rocks above and under water; it has a tower standing upon the high-land... From Cape Turghio to Cape Scandola the bearing and distance are N.N.E. 2 leagues. Between these capes is the Gulf of Porto, which is very little known''; Derrotero 1849, p. 115: ''El cabo Rojo y los altos de Calvi, son los puntos de reconocimiento cuando se está muy afuera''; Admiralty 1916, p. 183: ''nearly isolated mass, 1,122 feet high, with Tour Turghio on its summit''.'
+    says: 'Cape Rosso, a red mass with the Turghio tower on its top, the landfall for the Gulf of Porto and for Ajaccio.'
+
+  - id: revellata
+    kind: headland
+    name: Cape Rivellata
+    modern: Pointe de la Revellata
+    lat_deg: 42.58
+    lon_deg: 8.7249
+    height_m: 167
+    fix: moved 617 m to the grid's land (the first placing read 26 m of water)
+    source: 'Purdy 1826, p. 81: ''Cape Rivellata rises to a great height, and has a detached islet very near its easternmost point... It may easily be known by its height, and by being the north-west extremity of the Island of Corsica''; Michelot 1709, OCR l. 10771: ''prés de ce Cap il y a un gros écueil... La reconnoissance de Calvi est facile par cet écueil''; Admiralty 1916, p. 188: the ridge 548 feet high, 7 cables from the point.'
+    says: 'Cape Rivellata, high and steep with its islet off the point; Calvi lies two miles south-eastward of it.'
+
+  - id: revellata-light
+    kind: light
+    name: Rivellata Light
+    modern: Phare de la Revellata
+    lat_deg: 42.58
+    lon_deg: 8.7249
+    height_m: 88
+    lit:
+      from: 1844
+      until: null
+      range_nm: 18
+      character: a fixed light
+    fix: moved 459 m to the grid's land on the Revellata
+    source: 'Derrotero 1849, p. 109, translator''s note: ''Encima el cabo ó punta Revellata... hay un faro de luz fija que tiene 88 metros... de elevación visible á 18 millas''; Purdy 1840, Pharonology p. vi: not listed in 1840. The year 1844 is JUDGEMENT (the modern record), inside the bracket 1841 to 1849. Not lit in 1805.'
+    says: No light on the Rivellata in these years.
+
+  - id: calvi
+    kind: town
+    name: Calvi
+    modern: Calvi (the citadel)
+    lat_deg: 42.5658
+    lon_deg: 8.7574
+    height_m: 30
+    fix: moved 191 m to the grid's land (the first placing read 13 m of water)
+    source: 'Purdy 1826, p. 81: ''the town of that name. The town is fortified, and stands on a point of rocks, very steep to seaward: it is nearly 2 miles S.E. by S. from Cape Rivellata... a small watch-tower on the sea-side, without the fortress, and an old convent''; Michelot 1709, OCR ll. 10776 to 10797: ''la Forteresse de Calvi, sur un haut rocher... une petite Ville de Guerre... fortifiée de toutes parts, bien munie de canon''; Derrotero 1849, p. 109: above Calvi high broken mountains. Height JUDGEMENT.'
+    says: 'Calvi, a walled fortress on its steep rock in the middle of the bay.'
+
+  - id: calvi-road
+    kind: anchorage
+    name: Calvi Road
+    modern: 'Golfe de Calvi, south-east of the citadel'
+    lat_deg: 42.564
+    lon_deg: 8.762
+    height_m: 0
+    depth_fathoms: 5
+    bottom: sand and ooze
+    source: 'Purdy 1826, p. 81: ''the best place is near the town, at 2 cables'' length from the shore, in 4 to 5 fathoms of water, on sand and oaze, where you lie with one cable fast to the rocks towards the N.W., and an anchor to the S.E. You should not go farther in than the innermost bastion of the town''; Michelot 1709, OCR l. 10805: ''par 4, 5 à 6 brasses d''eau fond de sable & quelques mattes de vase''; Admiralty 1916, p. 189: 7 to 8 fathoms, sand and weeds, south-eastward of the citadel.'
+    says: 'Moored off Calvi in five fathoms, sand and ooze, a hawser to the rocks north-west and an anchor to the south-east.'
+
+  - id: algajola-shoal
+    kind: shoal
+    name: Algajola Shoal
+    modern: Écueil d'Algajola
+    lat_deg: 42.625
+    lon_deg: 8.84
+    height_m: 0
+    dries_m: -0.5
+    extent_m: 200
+    fix: 'Placed a mile NW of Pointe San Damiano by the Admiralty''s words (Purdy: 2 miles NNW of Algajola); the builder''s estimate, to be checked against the grid''s shoal head.; the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 81: ''At about 2 miles to the N.N.W. of Algajola is a shoal, with only 4 feet of water on it, and which, therefore, must be carefully avoided''; Michelot 1709, OCR l. 10846: ''une seche, sur laquelle il n''y a que quatre pieds d''eau''; Derrotero 1849, p. 107: a rock with 4 feet NNW of the village; Admiralty 1916, p. 191: ''one mile north-westward of Pointe San Damiano... about 2 cables in extent. Its highest part is almost awash''. dries_m from the Admiralty (''almost awash'').'
+    says: 'The shoal off Algajola, four feet on it; the sea breaks on it in a south-westerly wind.'
+
+  - id: isola-rossa
+    kind: island
+    name: Isola Rossa
+    modern: 'Île de la Pietra, L''Île-Rousse'
+    lat_deg: 42.6382
+    lon_deg: 8.9307
+    height_m: 45
+    fix: moved 276 m to the grid's land (the first placing read 5 m of water)
+    source: 'Purdy 1826, p. 82: ''At 4 miles to the eastward from Algajola is Isola Rossa; on the S.E. point of the island is a watch-tower, with guns in it; you cannot pass between the island and the land but in boats. Near to this isle there is a large rock above water, to the eastward of which small vessels may anchor with off-shore winds''; Michelot 1709, OCR ll. 10861 to 10862: ''une Tour de garde armée de deux canons''; Derrotero 1849, p. 107: three islets, the largest with a little fort, named for the red of its rocks; Admiralty 1916, pp. 191 to 192: the light on the summit at 180 feet, the turret 33 feet (height JUDGEMENT from these).'
+    says: 'Isola Rossa, red rocks with a gun-tower, close to the shore; small craft only lie behind it.'
+
+  - id: mortella-tower
+    kind: tower
+    name: Mortella Tower
+    modern: 'Torra di Mortella, Pointe de la Mortella'
+    lat_deg: 42.7173
+    lon_deg: 9.255
+    height_m: 12
+    fix: moved 488 m to the grid's land (the first placing read 22 m of water)
+    source: 'Purdy 1826, p. 82: ''Point Mortella, which is the western point of the Gulf of St. Fiorenzo... In advancing from the westward, approach not too near Point Mortella, as some rocks lie off it''; Derrotero 1849, p. 106: ''la torre de la Mortel-la sobre una punta baja y saliente. Esta torre defiende la rada del mismo nombre''; Admiralty 1916, p. 194: the point low, rugged, surrounded by rocks, ''on a point, about 1 1/2 cables to the southward, is a tower, in ruins''. The tower''s stand against our ships in February 1794 is history, not the pilots'': JUDGEMENT. Height JUDGEMENT.'
+    says: 'The Mortella tower on its low point at the west side of San Fiorenzo gulf, the round tower that cost us so dear in ''ninety-four.'
+
+  - id: mortella-road
+    kind: anchorage
+    name: Mortella Road
+    modern: Mouillage de la Mortella
+    lat_deg: 42.716
+    lon_deg: 9.266
+    height_m: 0
+    depth_fathoms: 12
+    bottom: mud and weed
+    source: 'Purdy 1826, p. 82: ''Abreast of this tower, at three cables'' length from the shore, there is anchorage in 12 or 13 fathoms of water''; Derrotero 1849, p. 106: one anchors sometimes in the Mortella road in 6 to 15 brazas when not going into the gulf; Admiralty 1916, p. 195: ''about 3 cables off the shore from 3 to 5 cables southward of the lighthouse... in from 11 to 15 fathoms, mud and weed, and good holding ground, but the sea is very heavy even with westerly winds''.'
+    says: 'Anchored in Mortella road in twelve fathoms, mud and weed, three cables off the tower.'
+
+  - id: fornali-tower
+    kind: tower
+    name: Tower of Fornali (Porto Forno)
+    modern: 'Tour de Fornali, Pointe de Fornali'
+    lat_deg: 42.6875
+    lon_deg: 9.2808
+    height_m: 25
+    fix: moved 190 m to the grid's land (the first placing read 14 m of water)
+    source: 'Purdy 1826, p. 82: ''Nearly 2 miles to the southward of Point Mortella is Porto Forno''; Derrotero 1849, p. 106: on a height ''una antigua torre arruinada llamada torre de Fornel-la, al pie de la cual hay también algunos cuarteles arruinados'', batteries on the points about it; Admiralty 1916, p. 195: Pointe de Fornali in 42°41'' N, 9°17'' E. Height JUDGEMENT.'
+    says: 'The old tower of Fornali on the west shore, the mark for the anchorage of San Fiorenzo.'
+
+  - id: san-fiorenzo-road
+    kind: anchorage
+    name: San Fiorenzo Anchorage
+    modern: 'Rade de Fornali, Golfe de Saint-Florent'
+    lat_deg: 42.6875
+    lon_deg: 9.29
+    height_m: 0
+    depth_fathoms: 10
+    bottom: ooze; sand and weed
+    source: 'Purdy 1826, p. 82: ''abreast of which [Porto Forno], at the distance of nearly a mile, is good anchorage for ships of war, in from 12 to 14 fathoms of water, or at 3 or 4 cables'' length from the shore, in 9 or 10 fathoms of water, oazy ground: you will then have the town of St. Fiorenzo bearing about S.S.E.; Porto Forno, W.N.W.; and Point Mortella, N.N.W.''; Derrotero 1849, pp. 106 to 107: the anchorage of San Florencio at the foot of the Fornella tower, 2 or 3 cables from the land in 10 or 11 brazas, ''arena y yerbas'', ''el único bueno en todo tiempo''; Admiralty 1916, p. 195: large vessels in 6 to 7 fathoms 2 1/4 cables SE of Pointe de Fornali; Smyth 1854, p. 248: the Berwick, riding in San Fiorenzo Bay under refit, rolled all three masts over the side in the swell.'
+    says: 'At anchor in San Fiorenzo in ten fathoms, oozy ground, Porto Forno bearing west-north-west and the town south-south-east.'
+
+  - id: san-fiorenzo
+    kind: town
+    name: San Fiorenzo
+    modern: Saint-Florent
+    lat_deg: 42.681
+    lon_deg: 9.3025
+    height_m: 15
+    source: 'Purdy 1826, p. 82: ''The Town of St. Fiorenzo lies 3 miles to the S.S.E. of the tower on Mortella Point... Small vessels may anchor opposite the town... careful of a rocky ledge which lies above 2 cables'' length from the shore''; Derrotero 1849, p. 106: the town on a point ''dominada por una gran torre redonda que es la fortaleza''; p. 107: no supplies, sent for from Bastia; water hard to get; the marshes unhealthy. Height JUDGEMENT.'
+    says: 'San Fiorenzo, a poor small town under its round fort at the head of the gulf, with fever in the marshes; stores must come over the hill from Bastia.'
+
+  - id: monte-cinto
+    kind: hill
+    name: Monte Cinto (the Heights of Calvi)
+    modern: Monte Cinto
+    lat_deg: 42.3797
+    lon_deg: 8.9456
+    height_m: 2706
+    source: 'Derrotero 1849, p. 105: ''Las altas montañas de su centro, conocidas con el nombre de Altos de Calvi... están casi siempre cubiertas de nieve y se descubren de 20 á 30 leguas de distancia en tiempo claro''; Michelot 1709, OCR l. 10872: ''une haute montagne qu''on apelle le Relevé de Calvi''; Admiralty 1916, p. 2: ''Mont Cinto 8,898 feet''. Height the modern chart''s.'
+    says: 'The snowy heights over Calvi, seen twenty and thirty leagues off in clear weather.'
+
+  - id: monte-rotondo
+    kind: hill
+    name: Monte Rotondo
+    modern: Monte Rotondo
+    lat_deg: 42.2183
+    lon_deg: 9.055
+    height_m: 2622
+    source: 'Admiralty 1916, p. 2: ''Mont Rotondo 8,626 feet... the summits, are covered with snow nearly throughout the year''; p. 173: Ajaccio citadel in line with Mont Rotondo, 22 miles, 38° true; Smyth 1854, OCR l. 27273: ''Rotondo peak''; Derrotero 1849, p. 105: the high mountains of the centre seen 20 to 30 leagues. Height the modern chart''s.'
+    says: 'Monte Rotondo, the great snowy summit in the middle of the island.'
+
+  - id: monte-d-oro
+    kind: hill
+    name: Monte d'Oro
+    modern: Monte d'Oro
+    lat_deg: 42.133
+    lon_deg: 9.087
+    height_m: 2389
+    source: 'Admiralty 1916, p. 2: ''Mont d''Oro (the Mons Aureus of Ptolemy) 7,845 feet high''; Derrotero 1849, p. 105: the high mountains of the centre, nearly always snow-covered. Height the modern chart''s.'
+    says: 'Monte d''Oro, snow on its head most of the year, over the pass between Ajaccio and Corte.'
+
+  - id: monte-renoso
+    kind: hill
+    name: Monte Renoso
+    modern: Monte Renoso
+    lat_deg: 42.055
+    lon_deg: 9.142
+    height_m: 2352
+    source: 'Derrotero 1849, p. 105: the high mountains of the centre seen 20 to 30 leagues in clear weather. The pilots do not name it: name, position and height JUDGEMENT (the modern chart).'
+    says: 'Monte Renoso, the high snowy ridge east of Ajaccio.'
+
+  - id: monte-incudine
+    kind: hill
+    name: Monte Incudine
+    modern: Monte Incudine
+    lat_deg: 41.8509
+    lon_deg: 9.216
+    height_m: 2134
+    source: 'Admiralty 1916, p. 228: ''Mont l''Incudine, 8 1/2 miles westward of La Solenzara, is 7,008 feet high''; Purdy 1826, p. 76: at the Tower of Solenzara ''high land commences''. Height the modern chart''s.'
+    says: 'Monte Incudine, the high southern mountain over Solenzara, the mark for the east coast below the plain.'
+
+
+  # ---------------------------------------------------------------------------
+  # The Maddalena islands, Agincourt Sound (the harbour patch agincourt-sound) and the north shore of Sardinia from Capo Testa to Arsachena
+  # ---------------------------------------------------------------------------
+
+  - id: capo-testa
+    kind: headland
+    name: Cape Longo Sardo
+    modern: Capo Testa
+    lat_deg: 41.2465
+    lon_deg: 9.143
+    height_m: 127
+    source: 'Purdy 1826, p. 88: Cape Longo Sardo, when it first comes in sight, appears perpendicular, with a tower on the top; a few small rocks off it above water but steep-to; a fleet may anchor to the southward of the cape sheltered from a N.E. wind; p. 90: the north point of Sardinia, a tower on its highest point, rough and rocky, equally remarkable from the eastward and westward; Smyth 1828, p. 257: the granite mountain of Testa Grossa joined to the main by a sandy isthmus, a deserted turret on the highest summit commanding the whole strait, in 41 14 28 N, 9 08 15 E; Derrotero 1849, p. 153: cabo Longo Sardo, reddish, of sharp crags, the torre Reparata on its summit, named cabo Testa in several charts, the first land seen coming from the N.W.; Admiralty 1913, p. 636: Torre Santa Reparata on the summit, 417 feet'
+    says: 'Cape Longo Sardo, a high round knob of red granite with a tower on its top, the west gate of the Bonifacio strait; with a north-easter a fleet may lie to the southward of it.'
+
+  - id: longo-sardo-tower
+    kind: tower
+    name: the tower of Longo Sardo
+    modern: 'Torre di Longonsardo, Santa Teresa Gallura'
+    lat_deg: 41.2458
+    lon_deg: 9.192
+    height_m: 30
+    source: 'Purdy 1826, p. 88: half-way between Cape Longo Sardo and the Shark''s Mouth is the harbour of Longo Sardo, where there is a tower, with a triangular wall between the tower and the sea; Smyth 1828, p. 255: the stout round tower of Longo Sardo, with a triangular space walled in, about two miles W.S.W. of point Falcone; Derrotero 1849, p. 152: the fortified tower on the west point of the harbour, 1 1/4 miles S.W. 1/4 W. of punta Falcone, girt with a triangular wall running down to the sea; height JUDGEMENT'
+    says: 'The round tower of Longo Sardo on the west point of its harbour, with a three-cornered wall down to the sea.'
+
+  - id: port-longo-sardo
+    kind: anchorage
+    name: Port Longo Sardo
+    modern: 'Porto Longone, Santa Teresa Gallura'
+    lat_deg: 41.2425
+    lon_deg: 9.1965
+    height_m: 0
+    depth_fathoms: 7
+    bottom: weed
+    source: 'Purdy 1826, p. 87: Port Longo Sardo is the Porto Vecchio of the Italian chart, 2 1/2 miles E.S.E. 1/2 E. from Cape Longo Sardo; Smyth 1828, p. 255: an iron-bound inlet, sandy beach at its south end and a small mole, depth for one or two vessels, but the north wind blows directly in; water near the Campo Santo, better outside the tower; Derrotero 1849, p. 152: a long cleft N. and S. between high lands, 800 toises from the tower to the beach, open to the north with a violent swell, middling vessels moor S.E. of the tower in 7 or 8 fathoms, weed; a shoal of 13 feet 1/4 mile N.E. of the tower'
+    says: 'Port Longo Sardo, a narrow cleft in the rocks under the tower, room for a vessel or two in seven fathoms, weed; a north wind sends a heavy swell up it.'
+
+  - id: sharks-mouth-point
+    kind: headland
+    name: Shark's Mouth Point
+    modern: Punta Falcone
+    lat_deg: 41.2576
+    lon_deg: 9.2241
+    height_m: 40
+    fix: moved 124 m to the grid's land (the first placing read 25 m of water)
+    source: 'Purdy 1826, p. 87: Shark''s Mouth Point is the Cape Falconetto of the Italian chart, 5 miles E.S.E. from Cape Longo Sardo; p. 88: a point of rocks, called Shark''s Mouth in Ryves''s chart, running a quarter of a mile into the sea, with one rock some distance off; soundings 6 fathoms close to the rock, then 7, 11, 15, 17, 24 and 40; Derrotero 1849, p. 152: punta Falcone, the most northerly part of Sardinia, girt with rocks, the two islets Marmorata on its east part, not to be approached within 1/4 mile; height JUDGEMENT'
+    says: 'Shark''s Mouth Point, the northernmost point of Sardinia, a tongue of rocks running a quarter mile into the sea; give it a quarter mile.'
+
+  - id: sharks-mouth-bay
+    kind: anchorage
+    name: the bay within Shark's Mouth (the Agincourt's first anchorage)
+    modern: the bay between Punta Falcone and Scoglio Paganetto
+    lat_deg: 41.252
+    lon_deg: 9.254
+    height_m: 0
+    depth_fathoms: 17
+    bottom: fine white clay
+    fix: placed in the bay between the point and the Paganetto rocks in about 17 fathoms from the pilot's words; the sounding not checked against a grid
+    source: 'Purdy 1826, p. 89: between these rocks and Shark''s Mouth Point is a bay, in which the Agincourt anchored, in 17 fathoms, on fine white clay, exposed only to a N.E. wind; the bay to the eastward of Shark''s Mouth Point has extremely good ground, and is open only to the N.E.'
+    says: 'The bay east of Shark''s Mouth where the Agincourt first lay, seventeen fathoms on fine white clay, open only to the north-east.'
+
+  - id: paganetto-rocks
+    kind: rock
+    name: the rocks off Shark's Mouth (the anchor-stock rock)
+    modern: Scoglio Paganetto
+    lat_deg: 41.242
+    lon_deg: 9.27
+    height_m: 1
+    dries_m: 0.6
+    extent_m: 200
+    source: 'Purdy 1826, p. 88: from the rocks at Shark''s Mouth Point, S.E. 1/2 S. [S.E. by E.] near 2 miles, are 4 or 5 rocks just above water, extending a mile from the shore, the outer one near a cable and a half from the others, with 10 fathoms between, not bigger than a barrel; p. 89: very dangerous in the night, one not bigger than the end of an anchor-stock; do not go nearer than 17 fathoms; Derrotero 1849, p. 152: el Pagnetto, 1 1/2 miles N.N.W. of the north point of isla de las Vacas and 2 1/4 miles E.S.E. of punta Falcone, only two feet above the water with a shoal of 6 feet; Admiralty 1913, p. 639: Paganetto awash'
+    says: 'The rocks off Shark''s Mouth, the outer one no bigger than a barrel and just above water; keep in seventeen fathoms, and beware them in the night.'
+
+  - id: porto-pozzo
+    kind: anchorage
+    name: Porto Pozzo
+    modern: Porto Pozzo
+    lat_deg: 41.214
+    lon_deg: 9.283
+    height_m: 0
+    depth_fathoms: 8
+    bottom: weed
+    source: 'Purdy 1826, p. 87: Porto Pozzo, one of three bays west of Agincourt Sound, not named in Ryves''s chart; Derrotero 1849, p. 151: puerto del Pozzo, a very narrow arm of the sea N. and S. west of isla de las Vacas, 1 to 3 cables wide, anchorage in the middle in 10, 8 and 5 fathoms, weed; open to the north but no sea gets in for its narrowness; Admiralty 1913, p. 639: a narrow vein of water with 3 1/2 to 8 fathoms, nearly 1 1/2 miles long'
+    says: 'Porto Pozzo, a narrow gut of water running south into the land, eight fathoms over weed, a dock for small craft.'
+
+  - id: point-liche
+    kind: headland
+    name: Point Liche
+    modern: Punta Sardegna
+    lat_deg: 41.2038
+    lon_deg: 9.3621
+    height_m: 50
+    fix: moved 339 m to the grid's land (the first placing read 32 m of water)
+    source: 'Purdy 1826, p. 87: westward of Agincourt Sound, Punta Santa or Licke Point; p. 89: the best anchorage in winter is found by hauling close round Point Liche, opposite to Magdalena, in 15 or 16 fathoms, under the high rocks on the Sardinian shore; the current round Point Liche runs nearly 2 1/2 miles an hour when it blows hard; Derrotero 1849, p. 150: la punta de Cerdeña, rising from very high ground, 3 1/2 miles N.W. of cabo del Orso; Admiralty 1913, p. 640: Punta Sardegna forms with the Maddalena a channel three quarters of a mile wide; height JUDGEMENT'
+    says: 'Point Liche, the high rocky point of Sardinia over against the Magdalena; haul close round it into Agincourt Sound, where the tide runs two knots and a half in a blow.'
+
+  - id: agincourt-sound
+    kind: anchorage
+    name: Agincourt Sound
+    modern: 'Rada di Mezzo Schifo, Palau'
+    lat_deg: 41.187
+    lon_deg: 9.379
+    height_m: 0
+    depth_fathoms: 12
+    bottom: weed; good holding ground
+    fix: 'laid from the Admiralty''s bearing (Punta Sardegna 331 degrees true, a quarter mile off the shore SE of Punta Stropello) and the Derrotero''s (S.S.E. of punta Cerdeña, W.S.W. of fort San Jorge); the sounding not checked against a grid'
+    source: 'James 1837, vol. 3, pp. 177-178: on 31 October 1803 the whole squadron anchored without an accident in Agincourt sound, under the Sardinian shore, a noble harbour formed by an indented bay, defended to the northward by St Estevan, Spargiotou, Magdalena and Cibrera; Captain Ryves of the Agincourt surveyed the islands in 1802 and Lord Nelson named the anchorage; Purdy 1826, p. 89: hauling round Point Liche in 15 or 16 fathoms, land-locked; the anchoring-ground is extremely good; the N.W. wind blows with great violence; the water rises and falls about 3 feet; Smyth 1828, p. 248: the berth to be preferred is at the Mezzo Schifo, S.W. of the town, near the Pararau, good for watering, wood cut close by; Derrotero 1849, p. 150: la rada de Agincurt, able to hold a squadron, anchor in 10 and 12 fathoms S.S.E. of punta Cerdeña and W.S.W. of fort San Jorge on San Stefano, sheltered from all seas and winds; Admiralty 1913, pp. 640-641: Rada di Mezzo Schifo (Agincourt road), 11 fathoms over weed, holding good, bad in the northern part'
+    says: 'Agincourt Sound, Lord Nelson''s anchorage under the Sardinian shore, land-locked in twelve fathoms, weed and good holding ground; the north-wester comes down off the hills very hard.'
+
+  - id: mezzo-passo-rocks
+    kind: rock
+    name: the two rocks in Agincourt Sound
+    modern: Secca di Mezzo Passo
+    lat_deg: 41.2005
+    lon_deg: 9.383
+    height_m: 1
+    dries_m: 0.6
+    extent_m: 100
+    fix: 'the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 89: the two rocks on the larboard side going round Cape Liche are bold close-to, and may be passed on either side, having between them and Magdalena 10 fathoms, between them and the other rocks in the centre 20 fathoms; Derrotero 1849, p. 154: the escollos de la Magdalena, two groups of low rocks 1/2 mile apart N.W. and S.E.; the N.W. group a little more than 1/2 mile S.W. of the west fort of the Magdalena and 3/4 mile E.S.E. of punta Cerdeña; the north pass between it and the fort''s point not much over 160 toises wide; Admiralty 1913, p. 641: Secca di Mezzo Passo, three black rocks 2 feet above the sea, half a mile S.W. of Forte Tegge, in 41 12 N, 9 23 E'
+    says: 'The two rocks on the larboard hand going round Point Liche, black and just out of the water, bold-to; ten fathoms inside them, twenty between them and the rocks in mid-channel.'
+
+  - id: parau-rocks
+    kind: rock
+    name: the rocks in the centre of Agincourt Sound
+    modern: Secca del Parau
+    lat_deg: 41.1945
+    lon_deg: 9.386
+    height_m: 1
+    dries_m: 0.9
+    extent_m: 100
+    fix: 'the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 89: between the two rocks and the other rocks in the centre, 20 fathoms; Derrotero 1849, p. 154: the S.E. group, south of the west fort, S.E. of punta Cerdeña, W.N.W. of fort San Jorge; the middle pass between the two groups the widest and safest, keep nearer the N.W. group, a rock awash lying off the west side of the S.E. group; Admiralty 1913, p. 641: Secca del Parau, four rocks about 3 feet above the sea with a rock awash on their west side, 4 cables S.S.E. of Mezzo Passo, deep water a cable off'
+    says: 'The rocks in the middle of the sound, a few feet out of the water with a sunk rock on their western side; take the wide middle pass, nearer the two rocks than these.'
+
+  - id: parau-watering-place
+    kind: place
+    name: the watering place at the Pararau
+    modern: Palau (the cove of Cala Palau)
+    lat_deg: 41.18
+    lon_deg: 9.3835
+    height_m: 5
+    source: 'Purdy 1826, p. 89: in winter, at the two rocks in Agincourt Sound, is plenty of good water; Smyth 1828, p. 248: Mezzo Schifo near the Pararau, and therefore good for watering, while wood may be cut in the immediate vicinity; Derrotero 1849, p. 150: half-way along the coast between punta Cerdeña and cabo del Orso a cove with an abundant spring of very good water, called de Pasaro, S.W. of the harbour of San Jorge; Admiralty 1913, p. 641: Parau, a bay 3/4 mile S.E. of Mezzo Schifo, a plentiful supply of water'
+    says: 'The Pararau cove under the Sardinian shore, a good spring of water and wood to be cut, the fleet''s watering place in Agincourt Sound.'
+
+  - id: maddalena-road
+    kind: anchorage
+    name: Maddalena road
+    modern: the water between La Maddalena town and Isola Santo Stefano
+    lat_deg: 41.2041
+    lon_deg: 9.4074
+    height_m: 0
+    depth_fathoms: 15
+    bottom: weed
+    fix: moved 323 m to water of 14 m (the first placing read 2.0 m)
+    source: 'Smyth 1828, p. 247: the town has a capital anchorage before it, and a cove for boats called Cala Gavetu; Derrotero 1849, p. 154: an excellent anchorage south of the Magdalena, between the town and the north part of San Stefano, 12 to 20 fathoms, weed, sheltered from all seas and winds, but to be taken with great care, giving a berth to the rocky S.W. and S. points of the Magdalena; p. 155: also anchorage N. of San Stefano, S.S.E. of the east fort of the Magdalena, 8 to 12 fathoms, weed; Admiralty 1913, p. 653: Rada di Santo Stefano 18 to 20 fathoms, sand and weeds'
+    says: 'The road before the Magdalena town, fifteen fathoms on weed, sheltered all round; mind the rocks off the island''s south points.'
+
+  - id: maddalena-village
+    kind: town
+    name: the Magdalena (the village on the Cala Gavetta)
+    modern: La Maddalena
+    lat_deg: 41.2135
+    lon_deg: 9.4065
+    height_m: 10
+    source: 'Purdy 1826, p. 87: south of the Barettini is Maddalena or Magdalena Island, on the south coast of which (toward the west) is a village, on the Cala Gavetta of the Italian chart; Smyth 1828, pp. 246-247: a village founded about seventy years ago, with a stout fort, by 1824 a town of upwards of 1600; tolerably clean but straggling, a capital anchorage before it and a boat cove, Cala Gavetu; Lord Nelson sent the church silver candlesticks and a crucifix; Derrotero 1849, p. 154: the town on the shore in the middle of the south coast, under the castle, a fort to the east and another to the west, a good spring at the foot of the west fort'
+    says: 'The Magdalena, a village of fishermen and Corsican settlers on the Cala Gavetta, with a fort on either hand; boats land in the cove.'
+
+  - id: guardia-vecchia
+    kind: hill
+    name: the Guardia Vecchia
+    modern: 'Guardia Vecchia, La Maddalena'
+    lat_deg: 41.218
+    lon_deg: 9.4
+    height_m: 152
+    source: 'Smyth 1828, p. 247: the principal fort, La Guardia Vecchia, stands on an elevation of upwards of six hundred feet, near the ruins of a former village, eight guns and a telegraph tower; p. 250: the telegraph tower of the Guardia Vecchia in 41 13 27 N, 9 23 42 E; Derrotero 1849, p. 154: the Magdalena very high on its south part, where the castle of Guardia Vecchia stands on a high knoll; Admiralty 1913, p. 650: Guardia Vecchia over the town, 499 feet, surmounted by a fort; the date of the fort''s building is not in these sources (Smyth saw it in 1823)'
+    says: 'The Guardia Vecchia, the high knoll over the Magdalena town, the mark of the island from the southward.'
+
+  - id: maddalena-island
+    kind: island
+    name: Magdalena Island
+    modern: Isola della Maddalena
+    lat_deg: 41.23
+    lon_deg: 9.41
+    height_m: 159
+    source: 'Purdy 1826, p. 90: the Island of Magdalena, S.W. of Caprera, nearly the same height, the same rough and barren appearance; to pass between it and the Barettini steer 70 fathoms off its north point, a rock above water N.W. of that point, bold close-to; Smyth 1828, pp. 247-248: about eleven miles in circuit, five forts, rocky shores, beaches only for boats, the north shores sterile; Derrotero 1849, p. 154: the largest island of the north coast, a triangle with its apex to the north; Admiralty 1913, p. 648: highest point 522 feet'
+    says: 'The Magdalena, the great island of the group, high, rugged and barren, the Agincourt Sound lying under its south side.'
+
+  - id: santo-stefano
+    kind: island
+    name: St Estevan
+    modern: Isola di Santo Stefano
+    lat_deg: 41.1896
+    lon_deg: 9.4073
+    height_m: 91
+    fix: moved 208 m to the grid's land (the first placing read 23 m of water)
+    source: 'Purdy 1826, p. 87: the Isle of St Estevan, south of Magdalena, is that of St Stefano; James 1837, vol. 3, p. 177: Agincourt sound defended to the northward by St Estevan; Smyth 1828, p. 249: a high island south of Maddalena, a small harbour defended by fort St George; Derrotero 1849, p. 155: small, high, narrow to the north and broad to the south, the channel between it and the Magdalena only 20 feet in the middle; the channel between it and Sardinia very narrow but fit for any ship; Admiralty 1913, p. 653: Monte Guardia Moro 299 feet'
+    says: 'St Estevan, a high small island between the Magdalena and the Sardinian shore, closing the sound to the eastward.'
+
+  - id: fort-san-giorgio
+    kind: castle
+    name: Fort St George
+    modern: 'Forte San Giorgio, Isola di Santo Stefano'
+    lat_deg: 41.1908
+    lon_deg: 9.4028
+    height_m: 30
+    fix: moved 446 m to the grid's land (the first placing read 37 m of water)
+    source: 'Smyth 1828, p. 249: Santo Stefano has a small harbour defended by fort St George, a garrison of three or four soldiers, the taking of which in 1793 was an incident in Napoleon''s career; Derrotero 1849, p. 150: anchor in the rada de Agincurt W.S.W. of the fort of San Jorge on San Stefano; p. 155: a small fort called San Jorge on the west coast defending the cove; Admiralty 1913, p. 653: a small fort, San Giorgio, on a height on the west side of the cove (Cala di Villamarina); height JUDGEMENT'
+    says: The little fort of St George on the west side of St Estevan; bring it E.N.E. and lie in Agincourt Sound.
+
+  - id: spargi
+    kind: island
+    name: Spargi
+    modern: Isola Spargi
+    lat_deg: 41.239
+    lon_deg: 9.346
+    height_m: 155
+    source: 'Purdy 1826, p. 89: a S.E. by S. course from Shark''s Mouth in 24 fathoms carries you up to the S.W. point of Spargi (a number of small rocks running into the sea), which may be approached as near as 10 fathoms; past it 25 fathoms; Smyth 1828, p. 249: west of Maddalena lies Spargi, high and covered with brushwood, two sandy bays, a spring of excellent water near the Cala Corsale; Derrotero 1849, p. 154: nearly round, high and clean on the N., E. and S.E., a shoal of 13 feet 1 1/2 cables S.W. of its S.W. point; Admiralty 1913, p. 646: Guardia Preposti 509 feet'
+    says: 'Spargi, a high round island thick with brushwood, the westernmost of the Magdalenas; round its south-west point in ten fathoms for Agincourt Sound.'
+
+  - id: spargiotto
+    kind: island
+    name: Spargiotto
+    modern: Isola Spargiotto
+    lat_deg: 41.2473
+    lon_deg: 9.3362
+    height_m: 48
+    fix: moved 605 m to the grid's land (the first placing read 19 m of water)
+    source: 'Purdy 1826, p. 87: south of the Barelino isles are two, Spargiotti and Spargi, the latter the Spargiotou of Capt. Ryves; p. 89: 28 fathoms half a mile north from the small island Spargiotto, in the passage between it and Martha island; Smyth 1828, p. 249: a rugged barren islet off Spargi, with rocks off its N.W. end called Spargiottelli; Derrotero 1849, p. 154: a large islet off the north end of Spargi''s west coast, clean all round but for three steep islets at its N.W. point; Admiralty 1913, p. 646: 157 feet'
+    says: 'Spargiotto, a rugged barren islet off Spargi, with little rocks off its north-west end; the passage north of it has twenty-eight fathoms.'
+
+  - id: budelli
+    kind: island
+    name: Martha Island
+    modern: Isola Budelli
+    lat_deg: 41.281
+    lon_deg: 9.3557
+    height_m: 87
+    fix: moved 105 m to the grid's land (the first placing read 7 m of water)
+    source: 'Purdy 1826, p. 87: of the Barelino islands, Budelli or Sta. Marta; p. 89: 14 fathoms close to a large rock at the south end of Martha; through this passage you come into a large sound, 35 fathoms in its centre, no danger but what appears; Smyth 1828, p. 250: Budelli, Razzoli, Santa Maria and La Presa, a group of more moderate height; Derrotero 1849, p. 154: Spargi lies 2 1/2 miles S. of the middle of Budelli; Admiralty 1913, p. 645: 285 feet'
+    says: 'Martha Island, or Budelli, the southern of the Barelinos; pass between it and Spargiotto in fourteen to twenty-eight fathoms into the great sound.'
+
+  - id: razzoli
+    kind: island
+    name: Rizzoli
+    modern: Isola Razzoli
+    lat_deg: 41.3
+    lon_deg: 9.341
+    height_m: 65
+    source: 'Purdy 1826, p. 87: of the Barelino islands, Risoli or Razzole; p. 90: the Great Passage, 3 miles wide at the narrowest, between Lavezzi and the Barelino isles, perfectly safe; Derrotero 1849, p. 149: Razzoli, Santa Maria and Budelli form with the Corsican islands the great pass of the Bocas de Bonifacio; Admiralty 1913, p. 645: the north-western of the group, rocky and arid, Monte Cappello 213 feet; a 4 1/2 fathom shoal half a mile N.W. (its light is of the later century)'
+    says: 'Rizzoli, the north-west island of the Barelinos, low, rocky and bare, on the south side of the Great Passage of the strait.'
+
+  - id: santa-maria
+    kind: island
+    name: Santa Maria
+    modern: Isola Santa Maria
+    lat_deg: 41.294
+    lon_deg: 9.378
+    height_m: 49
+    source: 'Purdy 1826, p. 87: of the Barelino islands there are four, Budelli or Sta. Marta, Risoli or Razzole, Sta. Maria, and one to the N.E. which may be called Barelino; Smyth 1828, p. 250: Budelli, Razzoli, Santa Maria and La Presa, of more moderate height; Admiralty 1913, p. 645: Isola Santa Maria 161 feet, cultivated'
+    says: 'Santa Maria, the eastern of the Barelino isles, low and part tilled.'
+
+  - id: barrettini
+    kind: rock
+    name: the Barettini
+    modern: Isolotti Barrettini
+    lat_deg: 41.277
+    lon_deg: 9.4
+    height_m: 40
+    fix: 'the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 87: east of the Barelinos a group un-named, extending nearly N. and S., Li Barettini of the Italian; p. 90: to sail between Magdalena and the Barettini the course is W.N.W. 1/2 W.; the channel narrow but plenty of water, to be taken with a fair wind; Smyth 1828, p. 250: the bare tabled rocks of Barettini, the channels amongst them mostly clear of hidden danger; Derrotero 1849, p. 153: islets in a N.-S. line 1 1/2 miles long, the southernmost 1/3 mile N.W. of the north point of the Magdalena, two groups with a narrow deep channel; Admiralty 1913, p. 646: the centre Barrettini 131 feet'
+    says: 'The Barettini, bare table-topped rocks north of the Magdalena; the narrow channel inside them is to be taken only with a fair wind.'
+
+  - id: caprera
+    kind: island
+    name: Caprera
+    modern: Isola Caprera
+    lat_deg: 41.216
+    lon_deg: 9.464
+    height_m: 212
+    source: 'Purdy 1826, p. 87: Cibiera to the east is Caprera; p. 90: of moderate height, rugged and rocky, perfectly barren, mountainous seen from Tavolara, the tops ending in points; Smyth 1828, p. 249: high and irregular, barren on its north and east faces, a peak called Tagiolona upwards of 750 feet near its centre with a spring of pure water; Derrotero 1849, p. 155: very high and long, the most easterly of the Magdalenas, monte Tajalone in its middle; Admiralty 1913, p. 651: the highest of the group, Punta Tejalone 696 feet'
+    says: 'Caprera, the high, bare, peaked island east of the Magdalena, its summit the Tagiolona; it shuts the sound in from the eastward.'
+
+  - id: porto-palma
+    kind: anchorage
+    name: Port Palma
+    modern: 'Porto Palma, Isola Caprera'
+    lat_deg: 41.187
+    lon_deg: 9.4521
+    height_m: 0
+    depth_fathoms: 8
+    bottom: weed
+    fix: moved 330 m to water of 8 m (the first placing read -5.1 m)
+    source: 'Purdy 1826, p. 87: on the north side of Arsakena Sound, within the island Caprera, is Port Palma; Smyth 1828, p. 249: the principal cove of Caprera, where the Neapolitan fishermen take cray-fish; Derrotero 1849, p. 155: a small port east of the S.W. point of Cabrera, opening south toward the gulf of Arsachena, anchor in 7 to 10 fathoms, weed, without going too far in; Admiralty 1913, p. 652: 9 to 16 fathoms in the entrance, a 4 1/2 fathom shoal and a 4 foot shoal in the middle of the entrance'
+    says: 'Port Palma on Caprera''s south side, seven to ten fathoms on weed, opening upon Arsakena Sound.'
+
+  - id: capo-d-orso
+    kind: headland
+    name: Bear Point
+    modern: Capo d'Orso (the Roccia dell'Orso)
+    lat_deg: 41.1745
+    lon_deg: 9.416
+    height_m: 122
+    source: 'Purdy 1826, p. 87: the west point of Arsakena Sound is Capo del Orso or Bear Point, westward of which is Agincourt Sound; note: according to one of the surveying officers, Bear Point is very high, and its highest rock appears in the form of a bear, looking to the S.W.; Smyth 1828, p. 250: the figure of a bear formed by a natural mass of granite on a rugged point between the Pararau and Salinas, named Punta dell''Urso, one of two objects for taking up an anchorage; Derrotero 1849, p. 150: punta del Orso, 3 miles N.W. of cabo Tre-Monti, from a very high bare mountain whose crags exactly imitate a bear lying down; Monte Fico on Caprera a little over 1/2 mile off, the channel only 1/2 mile; Admiralty 1913, p. 641: the sharp rocky summit resembles a bear reclining; foul ground 1 1/2 cables off between it and Mezzo Schifo; height JUDGEMENT from the modern chart'
+    says: 'Bear Point, high and bare, a great granite rock on its top like a bear lying down and looking south-west; the narrow passage to Arsakena lies between it and Caprera.'
+
+  - id: arsachena-sound
+    kind: anchorage
+    name: Arsakena Sound
+    modern: Golfo di Arzachena (Rada di Arsachena)
+    lat_deg: 41.14
+    lon_deg: 9.445
+    height_m: 0
+    depth_fathoms: 11
+    bottom: weed and mud
+    fix: laid in the gulf's entrance on the parallel of Capo Tre Monti from the Admiralty's words; the gulf's head and western shore are shoal
+    source: 'Purdy 1826, p. 87: Artaquena or Arsatkena Sound, Isle Biche on the east side of its entrance; Lamberti 1844, OCR l. 20108: a great gulf called Arsechena where a fleet may anchor; Derrotero 1849, p. 150: golfo de Arsachena, deep to the south and open to the N.W.; the road at its entrance E.-W. with cabo Tre-Monti in 10, 12 and 13 fathoms, weed, the holding excellent; 2 1/2 miles deep ending in marshes; Admiralty 1913, pp. 642-643: 5 to 11 fathoms over mud and weed, shelter for all classes, this anchorage much used by Lord Nelson; a fair berth in 11 fathoms on the parallel of Capo Tre Monti'
+    says: 'Arsakena Sound, a deep gulf running into the marshes, eleven fathoms over weed and mud at its mouth, sheltered from every sea by Caprera.'
+
+  - id: arsachena-reef
+    kind: shoal
+    name: the reef in Arsakena Bay
+    modern: Secca Tre Monti
+    lat_deg: 41.156
+    lon_deg: 9.448
+    height_m: 0
+    dries_m: -5.2
+    extent_m: 100
+    fix: 'the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 88: in Arsakena Bay a reef with 4 fathoms over it, bearing S.W. about 1 1/4 miles from the southernmost point of Caprera and West 3 1/2 miles from Bicea; not to be approached nearer than 12 fathoms; Derrotero 1849, p. 150: 1 mile N. of the west part of cabo Tre-Monti and 3/4 mile S.S.W. of punta Rossa, a small stone shoal with only 18 feet, in the middle of the channel; Admiralty 1913, p. 642: Secca Tre Monti, 17 feet, 8 cables 348 degrees true from Capo Tre Monti, 14 to 21 fathoms between'
+    says: 'A rocky patch of three fathoms in the mouth of Arsakena Sound, south-west of Caprera''s south point; keep in twelve fathoms.'
+
+  - id: biscie-island
+    kind: island
+    name: Biche Island
+    modern: Isola delle Bisce
+    lat_deg: 41.1541
+    lon_deg: 9.5184
+    height_m: 20
+    fix: moved 766 m to the grid's land (the first placing read 14 m of water)
+    source: 'Purdy 1826, p. 87: the Isle Biche, the Biscia of the Italian, on the east side of the entrance of Arsakena Sound; p. 88: nearly half a mile north of Cape Fer, a good passage between with 15 and 16 fathoms, but the rocks on its N.E. side extend nearly half a mile, not to be approached nearer than 15 fathoms; Smyth 1828, p. 249: the low isle of Biscie forms the outer point of the eastern channel, the worst entrance for strangers, three hidden dangers in the fairway; Derrotero 1849, p. 149: a round island of middling height, from afar like the end of cabo Ferro, a channel of two cables with much water between; Admiralty 1913, p. 644: low and barren, a quarter mile N. of Capo Ferro; height JUDGEMENT'
+    says: 'Biche Island, low and barren, off Cape Fer at the eastern entrance; a deep passage between, but keep off the rocks on its north-east side.'
+
+  - id: middle-reef
+    kind: shoal
+    name: the Middle Reef
+    modern: Secca delle Biscie
+    lat_deg: 41.186
+    lon_deg: 9.533
+    height_m: 0
+    dries_m: -4.6
+    extent_m: 300
+    fix: 'the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 88: between the Excellent''s Reef and the Isle Bicea, only 20 feet on its western end, extending West to East nearly a mile, deepening to 13 fathoms; the western part bears from Biche N.E. by N. three-quarters of a mile and from the Excellent''s Reef S.W. nearly 2 miles; fair-way mark: a small hill in the bottom of Arsakena Bay on with the middle peak of three on an inland mountain, S.W. by W. 1/2 W.; between it and the Bicea rocks, the southernmost point of Caprera on with a deep notch on a remarkable inland mountain, W. 1/2 N.; Derrotero 1849, p. 149: escollo de Biscia, 29 feet, 1 1/2 miles N.N.E. of the island; Admiralty 1913, p. 644: Secca delle Biscie, four heads in 3 1/2 cables, 2 1/2 fathoms on the western head, Capo Ferro bearing 193 degrees true nearly 2 miles'
+    says: 'The Middle Reef, north-east of Biche, twenty feet on its western end; one of the hidden dangers of the eastern entrance.'
+
+  - id: the-monks-maddalena
+    kind: rock
+    name: the Monks
+    modern: Isolotti Monaci
+    lat_deg: 41.213
+    lon_deg: 9.514
+    height_m: 3
+    dries_m: 3.0
+    extent_m: 150
+    fix: 'the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, pp. 87-88: an islet with rocks a mile and a half to the eastward of the N.E. point of Caprera are Li Monaci, the Monks; a cluster always above water, approachable within a cable; the passage between them and Caprera clear, more than 40 fathoms in mid-channel; Derrotero 1849, p. 149: los Monges, a group of rocks 1 1/2 cables S.W.-N.E., all visible and steep-to, the largest 3 miles N. of the west point of Biscia and 1 1/2 miles E. of the easternmost point of Cabrera; Admiralty 1913, p. 652: only a little above the sea, steep-to, 38 fathoms in the channel to Caprera; height JUDGEMENT'
+    says: 'The Monks, a cluster of low rocks always above water east of Caprera; bold-to, and forty fathoms between them and the island.'
+
+  - id: excellent-reef
+    kind: shoal
+    name: the Excellent's Reef
+    modern: Secca dei Monaci
+    lat_deg: 41.216
+    lon_deg: 9.545
+    height_m: 0
+    dries_m: -2.7
+    extent_m: 90
+    fix: 'the grid has no shoal here (EMODnet''s sixteenth of a minute does not hold it, ChartBlocks.md): left at the pilot''s position, a danger by name'
+    source: 'Purdy 1826, p. 87: within two miles to the eastward of the Monks a reef on which H.M. ship Excellent struck in 1804, surveyed by Mr Thos. Atkinson, Master of the Victory; p. 88: rather more than a mile from the Monks, struck 20 May 1804, least water 9 feet, approach no nearer than 18 fathoms; on the reef the Pedestal Rock and Bicea in one S.W. 3/4 S.; clear to the eastward when the gap on Tavolara''s west end is open east of Cape Figari''s high peak; variation 18 45 W. in 1804; Smyth 1828, p. 249: three hidden dangers in the fairway which Lord Nelson''s squadron escaped almost miraculously, afterwards detected by the Excellent striking in a light breeze; Derrotero 1849, p. 149: el Eccelente, a little over 1 mile N. 85 E. of the largest Monk, only 14 feet; Admiralty 1913, pp. 652-653: 1 1/2 fathoms, a cable in extent, 20 fathoms close round, 41 13 N, 9 33 E'
+    says: 'The Excellent''s Reef, nine feet of water, a mile and more east of the Monks, where the Excellent struck in May 1804; give it eighteen fathoms.'
+
+  - id: pedestal-rock
+    kind: mark
+    name: the Pedestal Rock
+    modern: 'the summit of Monte Moro, above Porto Cervo'
+    lat_deg: 41.11
+    lon_deg: 9.495
+    height_m: 370
+    source: 'Purdy 1826, p. 88: the Pedestal Rock, a singular rock on the summit of an inland hill; from the Excellent''s Reef the Pedestal Rock and Bicea Island in one S.W. 3/4 S.; clear of the reefs when it bears S.W. 1/4 W.; p. 89: the best mark coming in from the south is a high mountain inland with an inclined square rock on the top like a pedestal, bring it S.W. by compass and the rocks and Isle of Biche will be in one; Smyth 1828, p. 250: a square inclined rock called the pedestal, on Mount Mola over Porto Cervo, readily seen from the southern reaches; position and height JUDGEMENT'
+    says: 'The Pedestal, a square leaning rock on a high hill inland over Porto Cervo; on with Biche it leads clear into the eastern entrance.'

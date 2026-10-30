@@ -799,3 +799,251 @@ held_gauges:
     M2: {amplitude_m: 0.051, phase_deg: 223.6}
     S2: {amplitude_m: 0.020, phase_deg: 242.8}
     N2: {amplitude_m: 0.011, phase_deg: 210.1}
+
+  # THE GAUGES OF THE GULF OF LION'S BLOCK, READ AND HELD (package 79d, the region
+  # `gulf-of-lion`). TICON's file read again 2026-10-29 by its coordinates over the block's
+  # box (40.56 to 44.5 N, 3.0 to 7.73 E; the zip at doi.pangaea.de, SHA-256
+  # 7055f8ed1a14abf8...6514, the same file as every block's): ten stations, one record
+  # each, but Monaco's two (the harbour's long record of 1959 to 2014 taken, its short
+  # record of 1999 to 2010 at 43.7328 N 7.4240 E, M2 0.078 m, left out as the same water).
+  # Each named by the station of SHOM's RAM at its coordinates (the WFS layer
+  # RAM_BDD_WLD_WGS84G_WFS:ram_3857, Licence Ouverte 2.0, read 2026-10-29), whose NM gives
+  # every gauge's (Monaco's among them) `mean_level_m` above the zero: VERIFIED. The water is the Mediterranean's, a tide of inches
+  # (M2 four to ten centimetres, the period's "almost imperceptible": Michelot 1715, Smyth
+  # 1854). HELD, as every block's: the world's tide over the block is the nearest of the
+  # eleven alone (Le Conquet's, beyond the reach of every gauge), two metres of M2 where the
+  # gauges have six centimetres; blended, they lie beyond 400 miles of every Channel and
+  # Biscay position and would move no recorded passage (tests/test_tide.py says so).
+  - id: port-vendres
+    name: Port-Vendres
+    lat_deg: 42.5199
+    lon_deg: 3.1075
+    record: "GESLA-2, REFMAR, 1981 to 2014"
+    mean_level_m: 0.52  # SHOM's RAM, Port-Vendres's NM
+    M2: {amplitude_m: 0.056, phase_deg: 217.4}
+    S2: {amplitude_m: 0.019, phase_deg: 237.9}
+    N2: {amplitude_m: 0.012, phase_deg: 207.2}
+  - id: sete
+    name: Cette (Sète)
+    lat_deg: 43.3976
+    lon_deg: 3.6991
+    record: "GESLA-2, REFMAR, 1956 to 2014"
+    mean_level_m: 0.46  # SHOM's RAM, Port de Sète's NM
+    M2: {amplitude_m: 0.062, phase_deg: 211.6}
+    S2: {amplitude_m: 0.023, phase_deg: 232.7}
+    N2: {amplitude_m: 0.013, phase_deg: 201.2}
+  - id: port-camargue
+    name: Port-Camargue (Le Grau-du-Roi)
+    lat_deg: 43.5203
+    lon_deg: 4.1264
+    record: "GESLA-2, REFMAR, 2009 to 2012"
+    mean_level_m: 0.53  # SHOM's RAM, Port Camargue's NM
+    M2: {amplitude_m: 0.067, phase_deg: 213.3}
+    S2: {amplitude_m: 0.024, phase_deg: 230.6}
+    N2: {amplitude_m: 0.014, phase_deg: 200.3}
+  - id: fos
+    name: Fos-sur-Mer
+    lat_deg: 43.4049
+    lon_deg: 4.8929
+    record: "GESLA-2, REFMAR, 2006 to 2014"
+    mean_level_m: 0.49  # SHOM's RAM, Fos-sur-Mer's NM (the station 1.4 km from the gauge)
+    M2: {amplitude_m: 0.068, phase_deg: 215.7}
+    S2: {amplitude_m: 0.025, phase_deg: 233.3}
+    N2: {amplitude_m: 0.014, phase_deg: 204.6}
+  - id: marseille
+    name: Marseille
+    lat_deg: 43.2788
+    lon_deg: 5.3538
+    record: "GESLA-2, REFMAR, 1985 to 2014"
+    mean_level_m: 0.49  # SHOM's RAM, Marseille (Corniche)'s NM
+    M2: {amplitude_m: 0.066, phase_deg: 219.4}
+    S2: {amplitude_m: 0.024, phase_deg: 237.4}
+    N2: {amplitude_m: 0.014, phase_deg: 208.7}
+  - id: toulon
+    name: Toulon
+    lat_deg: 43.1172
+    lon_deg: 5.9131
+    record: "GESLA-2, REFMAR, 1960 to 2014"
+    mean_level_m: 0.42  # SHOM's RAM, Toulon's NM
+    M2: {amplitude_m: 0.065, phase_deg: 216.6}
+    S2: {amplitude_m: 0.024, phase_deg: 235.7}
+    N2: {amplitude_m: 0.013, phase_deg: 207.1}
+  - id: port-ferreol
+    name: Port Ferréol (by St Raphael)
+    lat_deg: 43.3591
+    lon_deg: 6.7176
+    record: "GESLA-2, REFMAR, 2012 to 2014"
+    mean_level_m: 0.50  # SHOM's RAM, Port Ferréol's NM
+    M2: {amplitude_m: 0.074, phase_deg: 219.8}
+    S2: {amplitude_m: 0.028, phase_deg: 238.0}
+    N2: {amplitude_m: 0.015, phase_deg: 207.5}
+  - id: la-figueirette
+    name: La Figueirette (Théoule, the gulf of La Napoule)
+    lat_deg: 43.4835
+    lon_deg: 6.9349
+    record: "GESLA-2, REFMAR, 2011 to 2014"
+    mean_level_m: 0.51  # SHOM's RAM, La Figueirette's NM
+    M2: {amplitude_m: 0.076, phase_deg: 219.9}
+    S2: {amplitude_m: 0.029, phase_deg: 237.7}
+    N2: {amplitude_m: 0.015, phase_deg: 208.4}
+  - id: nice
+    name: Nice
+    lat_deg: 43.6955
+    lon_deg: 7.2853
+    record: "GESLA-2, REFMAR, 1981 to 2014"
+    mean_level_m: 0.54  # SHOM's RAM, Nice's NM
+    M2: {amplitude_m: 0.077, phase_deg: 221.4}
+    S2: {amplitude_m: 0.029, phase_deg: 240.2}
+    N2: {amplitude_m: 0.016, phase_deg: 210.7}
+  - id: monaco
+    name: Monaco
+    lat_deg: 43.7288
+    lon_deg: 7.4215
+    record: "GESLA-2, REFMAR, 1959 to 2014"
+    mean_level_m: 0.52  # SHOM's RAM, Monaco's NM
+    M2: {amplitude_m: 0.070, phase_deg: 224.6}
+    S2: {amplitude_m: 0.028, phase_deg: 242.0}
+    N2: {amplitude_m: 0.014, phase_deg: 212.9}
+
+  # THE GAUGES OF THE LIGURIAN SEA'S BLOCK, READ AND HELD (package 79d, the region
+  # `ligurian-sea`, the Gulf's east part by the lead's ruling): TICON's file read by its
+  # coordinates over the block's box (41.0 to 44.5 N, 7.74 to 11.0 E), the same file:
+  # six stations, one record each. Named as the Gulf's are; the French gauges' (Centuri,
+  # Ajaccio, Solenzara) `mean_level_m` SHOM's RAM's NM (VERIFIED, read 2026-10-29), the
+  # Italian gauges' (Imperia, Genoa, Leghorn) unread (null). HELD, as the Gulf's: the world's
+  # tide over the block is Le Conquet's alone; blended they would move no recorded passage.
+  - id: imperia
+    name: Imperia (Porto Maurizio)
+    lat_deg: 43.8784
+    lon_deg: 8.0188
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.069, phase_deg: 229.9}
+    S2: {amplitude_m: 0.027, phase_deg: 247.8}
+    N2: {amplitude_m: 0.014, phase_deg: 217.9}
+  - id: genoa
+    name: Genoa
+    lat_deg: 44.4101
+    lon_deg: 8.9253
+    record: "GESLA-2, ISPRA (idromare), 1998 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.085, phase_deg: 222.5}
+    S2: {amplitude_m: 0.031, phase_deg: 241.6}
+    N2: {amplitude_m: 0.017, phase_deg: 212.9}
+  - id: leghorn
+    name: Leghorn (Livorno)
+    lat_deg: 43.5464
+    lon_deg: 10.2989
+    record: "GESLA-2, ISPRA (idromare), 1972 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.042, phase_deg: 216.4}
+    S2: {amplitude_m: 0.016, phase_deg: 233.6}
+    N2: {amplitude_m: 0.008, phase_deg: 206.9}
+  - id: centuri
+    name: Centuri (Cape Corse)
+    lat_deg: 42.9658
+    lon_deg: 9.3498
+    record: "GESLA-2, REFMAR, 2010 to 2014"
+    mean_level_m: 0.48  # SHOM's RAM, Centuri's NM
+    M2: {amplitude_m: 0.085, phase_deg: 223.2}
+    S2: {amplitude_m: 0.034, phase_deg: 241.1}
+    N2: {amplitude_m: 0.017, phase_deg: 211.9}
+  - id: ajaccio
+    name: Ajaccio
+    lat_deg: 41.9228
+    lon_deg: 8.7628
+    record: "GESLA-2, REFMAR, 1981 to 2014"
+    mean_level_m: 0.47  # SHOM's RAM, Ajaccio's NM
+    M2: {amplitude_m: 0.077, phase_deg: 225.4}
+    S2: {amplitude_m: 0.030, phase_deg: 244.0}
+    N2: {amplitude_m: 0.016, phase_deg: 213.7}
+  - id: solenzara
+    name: Solenzara
+    lat_deg: 41.8569
+    lon_deg: 9.4038
+    record: "GESLA-2, REFMAR, 2012 to 2014"
+    mean_level_m: 0.58  # SHOM's RAM, Solenzara's NM
+    M2: {amplitude_m: 0.104, phase_deg: 227.6}
+    S2: {amplitude_m: 0.038, phase_deg: 250.4}
+    N2: {amplitude_m: 0.022, phase_deg: 212.5}
+
+  # THE GAUGES OF THE TYRRHENIAN'S BLOCK, READ AND HELD (package 79d, the region
+  # `tyrrhenian`): TICON's file read by its coordinates over the block's box (38.5 to
+  # 42.5 N, 8 to 15.5 E, less the Ligurian sea's tiles north of 40.99 N and west of
+  # 11.15 E), the same file: eight stations, one record each, ISPRA's (idromare) series in
+  # GESLA-2; their mean levels unread (null). Ortona is the Adriatic's, on the block's north-
+  # eastern shore, its tide another sea's (the phase opposite the Tyrrhenian's): read and
+  # held with the rest, said so. HELD, as the Gulf's: the world's tide over the block is
+  # Le Conquet's alone; blended they would move no recorded passage.
+  - id: carloforte
+    name: Carloforte (San Pietro)
+    lat_deg: 39.1480
+    lon_deg: 8.3095
+    record: "GESLA-2, ISPRA (idromare), 1988 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.065, phase_deg: 232.5}
+    S2: {amplitude_m: 0.026, phase_deg: 254.3}
+    N2: {amplitude_m: 0.013, phase_deg: 220.8}
+  - id: cagliari
+    name: Cagliari
+    lat_deg: 39.2102
+    lon_deg: 9.1143
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.081, phase_deg: 244.2}
+    S2: {amplitude_m: 0.029, phase_deg: 268.7}
+    N2: {amplitude_m: 0.017, phase_deg: 229.2}
+  - id: porto-torres
+    name: Porto Torres
+    lat_deg: 40.8422
+    lon_deg: 8.4039
+    record: "GESLA-2, ISPRA (idromare), 1985 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.066, phase_deg: 252.3}
+    S2: {amplitude_m: 0.026, phase_deg: 273.2}
+    N2: {amplitude_m: 0.014, phase_deg: 243.3}
+  - id: civita-vecchia
+    name: Civita Vecchia
+    lat_deg: 42.0937
+    lon_deg: 11.7897
+    record: "GESLA-2, ISPRA (idromare), 2000 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.102, phase_deg: 236.0}
+    S2: {amplitude_m: 0.038, phase_deg: 254.2}
+    N2: {amplitude_m: 0.021, phase_deg: 223.5}
+  - id: naples
+    name: Naples
+    lat_deg: 40.8409
+    lon_deg: 14.2693
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.113, phase_deg: 244.4}
+    S2: {amplitude_m: 0.042, phase_deg: 265.6}
+    N2: {amplitude_m: 0.023, phase_deg: 230.6}
+  - id: salerno
+    name: Salerno
+    lat_deg: 40.6722
+    lon_deg: 14.7677
+    record: "GESLA-2, ISPRA (idromare), 1991 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.118, phase_deg: 235.4}
+    S2: {amplitude_m: 0.043, phase_deg: 255.6}
+    N2: {amplitude_m: 0.024, phase_deg: 222.3}
+  - id: palinuro
+    name: Palinuro
+    lat_deg: 40.0315
+    lon_deg: 15.2751
+    record: "GESLA-2, ISPRA (idromare), 1987 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.110, phase_deg: 244.7}
+    S2: {amplitude_m: 0.041, phase_deg: 265.6}
+    N2: {amplitude_m: 0.022, phase_deg: 230.5}
+  - id: ortona
+    name: Ortona (the Adriatic)
+    lat_deg: 42.3560
+    lon_deg: 14.4149
+    record: "GESLA-2, ISPRA (idromare), 1986 to 2010"
+    mean_level_m: null  # unverified: no published level read
+    M2: {amplitude_m: 0.066, phase_deg: 68.3}
+    S2: {amplitude_m: 0.047, phase_deg: 77.5}
+    N2: {amplitude_m: 0.010, phase_deg: 65.0}

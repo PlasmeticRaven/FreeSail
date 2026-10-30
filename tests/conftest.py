@@ -428,6 +428,8 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_290_the_seam_at_5_w_is_crossed_with_the_business_carried",
         "test_known_truths.py::test_truth_7_291_the_seam_between_the_blocks_two_regions_is_crossed_likewise",
         "test_known_truths.py::test_truth_7_294_the_frigate_sails_from_gibraltar_to_port_mahon_by_her_short_book",
+        # package 79d: Agincourt Sound's six hours in a north-wester (20 s alone, 2026-10-29)
+        "test_known_truths.py::test_truth_7_297_agincourt_sound_holds_a_fleet_in_a_north_wester",
     }
 )
 
