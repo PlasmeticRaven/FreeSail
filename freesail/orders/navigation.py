@@ -561,6 +561,19 @@ def judge_course(
         what = f"{shown} lies across the wind from her head, by the stern"
     tail = f" and kept full and by on the {said_tack} tack" if full_and_by else ""
     square = _square_sail_set(ship)
+    blocked = "" if helm_order else no_room_to_wear(ship)
+    wants_wear = (crossing == "eye" and speed < units.knots_to_ms(stay_kn)) or (
+        crossing != "eye" and square
+    )
+    if blocked and wants_wear and speed > WEAR_FOR_IT_MIN_MS:
+        # no wear onto the land (package 88, item 2): kept full and by on her tack to claw off
+        # and gather the way to stay, and put about by tacking when she has it
+        lacks = "she has not way enough to stay, and " if crossing == "eye" else ""
+        words = (
+            f"{what}; {lacks}there is no room to wear with {blocked}: she is kept full "
+            f"and by on the {own} tack to claw off"
+        )
+        return Judgement("full_and_by", course, words, full_and_by=True, tack=own)
     if crossing == "eye":
         if speed >= units.knots_to_ms(stay_kn):
             way = "she is put about for it" if laid else "she is put about"
@@ -1013,6 +1026,91 @@ MISSED_STAYS_WITHIN_S = 3600
 CLOSE_REEF = 3
 
 
+# The room a wear takes (package 88, item 2; 57's station gale: the frigate beating for her
+# station off Ushant in a westerly gale was worn round by the leg's course law with the land
+# two miles on her lee quarter, would not come round, and set down on the islands of the
+# Molène passage): the land or a charted danger within `TACK_REGARDLESS_NM` (the captain's
+# doctrine's `tack_regardless_nm` where a captain gives the order) anywhere in the lee half,
+# by the lookout's nearest land, the coast by the chart at the account and the charted
+# dangers by account, as the pilot's line reads them. A wear "making all her way to leeward"
+# (Lever 1808 p. 79, OCR line 9707: "whilst she is receding from the wind, she is forced
+# rapidly through the water, and making all her way to leeward"); measured in the station
+# gale, 0.41 nm to leeward in thirteen minutes, and then the drift of a wear that fails.
+# `WEAR_ROOM` is the law's switch, for the bisection of what it moved (package 88).
+WEAR_ROOM = True
+LEE_HALF_DEG = 90.0
+
+
+def _tack_regardless_nm(world: Any) -> float:
+    """The doctrine's `tack_regardless_nm` of the captain who has the ship, else the
+    default."""
+    cap = getattr(world, "captain", None)
+    d = getattr(cap, "doctrine", None) if cap is not None else None
+    try:
+        v = d.threshold("tack_regardless_nm") if d is not None else None
+    except Exception:  # noqa: BLE001 - a doctrine without the figure
+        v = None
+    return float(v) if v is not None else TACK_REGARDLESS_NM
+
+
+def no_room_to_wear(ship: Any) -> str:
+    """The words for the land or danger within the room a wear would take under her lee
+    (`WEAR_ROOM`), or "" when she has the room."""
+    from freesail.orders.prompt import world_of
+    from freesail.world.reckoning import miles_words
+
+    world = world_of(ship)
+    readings = getattr(world, "readings", None)
+    if not WEAR_ROOM or readings is None:
+        return ""
+    frm = readings.value("mean_true_wind_from")
+    if frm is None:
+        frm = readings.value("true_wind_from")
+    if frm is None:
+        return ""
+    lee = (units.rad_to_deg(float(frm)) + 180.0) % 360.0
+    room = _tack_regardless_nm(world)
+
+    def in_lee(brg: float) -> bool:
+        return abs(units.rad_to_deg(units.wrap_pi(math.radians(brg - lee)))) <= LEE_HALF_DEG
+
+    found: list[tuple[float, str]] = []
+    near = readings.value("nearest_land")
+    if isinstance(near, dict) and near.get("metres") is not None and near.get("bearing"):
+        try:
+            brg = units.rad_to_deg(units.parse_course(str(near["bearing"])))
+        except (ValueError, units.CourseError):
+            brg = None
+        nm = float(near["metres"]) / units.NAUTICAL_MILE
+        if brg is not None and in_lee(brg) and nm <= room:
+            found.append((nm, f"{near.get('name') or 'the land'} {miles_words(nm)} under her lee"))
+    nav = getattr(world, "navigation", None)
+    chart = getattr(world, "chart", None)
+    if nav is not None and chart is not None:
+        try:
+            here = nav.account_now()
+            coast = chart.coast_distance(here) if here is not None else None
+        except Exception:  # noqa: BLE001 - a chart with no field here
+            coast = None
+        if coast is not None:
+            nm = float(coast[0]) / units.NAUTICAL_MILE
+            if in_lee(float(coast[1])) and nm <= room:
+                found.append((nm, f"the coast {miles_words(nm)} under her lee by the chart"))
+    dangers = readings.value("dangers")
+    if isinstance(dangers, dict):
+        for item in dangers.get("items") or []:
+            if item.get("metres") is None or item.get("bearing") is None:
+                continue
+            nm = float(item["metres"]) / units.NAUTICAL_MILE
+            if in_lee(units.rad_to_deg(float(item["bearing"]))) and nm <= room:
+                found.append(
+                    (nm, f"{item.get('name') or 'a danger'} {miles_words(nm)} under her lee")
+                )
+    if not found:
+        return ""
+    return min(found)[1]
+
+
 def put_about_choice(ship: Any) -> tuple[str, str]:
     from freesail.world.reckoning import miles_words
 
@@ -1048,6 +1146,9 @@ def put_about_choice(ship: Any) -> tuple[str, str]:
         return "tack ship", (
             f"the land {miles_words(close)} to leeward, where wearing would lose the ground"
         )
+    blocked = no_room_to_wear(ship)
+    if blocked:
+        return "tack ship", f"{blocked}, where wearing would lose the ground"
     sails = getattr(ship, "sails", {}) or {}
     groups = getattr(ship, "groups", {}) or {}
     head = [
